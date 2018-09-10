@@ -9,33 +9,37 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import { uiModules } from 'ui/modules'
+import { uiModules } from 'ui/modules';
 
 const app = uiModules.get('app/wazuh', []);
 
 class CSVRequest {
-    /**
-     * Constructor
-     * @param {*} genericReq Service to make requests to our server
-     */
-    constructor(genericReq) {
-        this.genericReq = genericReq;
-    }
+  /**
+   * Constructor
+   * @param {*} genericReq Service to make requests to our server
+   */
+  constructor(genericReq) {
+    this.genericReq = genericReq;
+  }
 
-    /**
-     * It fetchs data from /api/wazuh-api/csv route using the below parameters.
-     * @param {string} path Wazuh API route
-     * @param {number|string} id Elasticsearch document ID
-     * @param {*} filters Array of Wazuh API filters. Optional
-     */
-    async fetch(path, id, filters = null) {
-        try {
-            const output = await this.genericReq.request('POST','/api/wazuh-api/csv',{ path, id, filters });
-            return output.data;
-        } catch (error) {
-           return Promise.reject(error);  
-        }
+  /**
+   * It fetchs data from /api/wazuh-api/csv route using the below parameters.
+   * @param {string} path Wazuh API route
+   * @param {number|string} id Elasticsearch document ID
+   * @param {*} filters Array of Wazuh API filters. Optional
+   */
+  async fetch(path, id, filters = null) {
+    try {
+      const output = await this.genericReq.request(
+        'POST',
+        '/api/wazuh-api/csv',
+        { path, id, filters }
+      );
+      return output.data;
+    } catch (error) {
+      return Promise.reject(error);
     }
+  }
 }
 
 app.service('csvReq', CSVRequest);

@@ -17,27 +17,34 @@
  * @param {number} defaultShards Default shards value if missing in configuration
  * @param {number} defaulReplicas Default replicas value if missing in configuration
  */
-export function BuildBody(file, indexName, defaultShards = 5, defaulReplicas = 1) {
-    if(indexName) {
-        const shards = file && typeof file[`${indexName}.shards`] !== 'undefined' ?
-                              file[`${indexName}.shards`] :
-                              defaultShards;
-    
-        const replicas = file && typeof file[`${indexName}.replicas`] !== 'undefined' ?
-                                file[`${indexName}.replicas`] :
-                                defaulReplicas;
-    
-        const configuration = {
-            settings: {
-                index: {
-                    number_of_shards: shards,
-                    number_of_replicas: replicas
-                }
-            }
-        };
+export function BuildBody(
+  file,
+  indexName,
+  defaultShards = 5,
+  defaulReplicas = 1
+) {
+  if (indexName) {
+    const shards =
+      file && typeof file[`${indexName}.shards`] !== 'undefined'
+        ? file[`${indexName}.shards`]
+        : defaultShards;
 
-        return configuration;
-    }
+    const replicas =
+      file && typeof file[`${indexName}.replicas`] !== 'undefined'
+        ? file[`${indexName}.replicas`]
+        : defaulReplicas;
 
-    return null;    
+    const configuration = {
+      settings: {
+        index: {
+          number_of_shards: shards,
+          number_of_replicas: replicas
+        }
+      }
+    };
+
+    return configuration;
+  }
+
+  return null;
 }

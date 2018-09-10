@@ -9,16 +9,28 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import audit      from './overview-audit'
-import aws        from './overview-aws'
-import fim        from './overview-fim'
-import general    from './overview-general'
-import oscap      from './overview-oscap'
-import ciscat     from './overview-ciscat'
-import pci        from './overview-pci'
-import gdpr       from './overview-gdpr'
-import pm         from './overview-pm'
-import virustotal from './overview-virustotal'
-import vuls       from './overview-vuls'
+import audit from './overview-audit';
+import aws from './overview-aws';
+import fim from './overview-fim';
+import general from './overview-general';
+import oscap from './overview-oscap';
+import ciscat from './overview-ciscat';
+import pci from './overview-pci';
+import gdpr from './overview-gdpr';
+import pm from './overview-pm';
+import virustotal from './overview-virustotal';
+import vuls from './overview-vuls';
 
-export { audit, aws, fim, general, oscap, ciscat, pci, gdpr, pm, virustotal, vuls }
+export {
+  audit,
+  aws,
+  fim,
+  general,
+  oscap,
+  ciscat,
+  pci,
+  gdpr,
+  pm,
+  virustotal,
+  vuls
+};

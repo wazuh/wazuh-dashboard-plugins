@@ -14,17 +14,17 @@ import { uiModules } from 'ui/modules';
 const app = uiModules.get('app/wazuh', []);
 
 class WazuhConfig {
-    constructor(){
-        this.config = {};
-    }
+  constructor() {
+    this.config = {};
+  }
 
-    setConfig(cfg) {
-        Object.assign(this.config, cfg);
-    }
+  setConfig(cfg) {
+    Object.assign(this.config, cfg);
+  }
 
-    getConfig() {
-        return this.config;
-    }
+  getConfig() {
+    return this.config;
+  }
 }
 
-app.service('wazuhConfig',WazuhConfig);
+app.service('wazuhConfig', WazuhConfig);

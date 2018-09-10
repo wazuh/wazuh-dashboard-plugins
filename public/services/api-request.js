@@ -14,40 +14,42 @@ import { uiModules } from 'ui/modules';
 const app = uiModules.get('app/wazuh', []);
 
 class ApiRequest {
-    constructor($q, genericReq, appState) {
-        this.$q         = $q;
-        this.genericReq = genericReq;
-        this.appState   = appState;
+  constructor($q, genericReq, appState) {
+    this.$q = $q;
+    this.genericReq = genericReq;
+    this.appState = appState;
+  }
+
+  async request(method, path, body) {
+    try {
+      if (!method || !path || !body) {
+        throw new Error('Missing parameters');
+      }
+
+      if (!this.appState.getCurrentAPI()) {
+        throw new Error('No API selected.');
+      }
+
+      const { id } = JSON.parse(this.appState.getCurrentAPI());
+      const requestData = { method, path, body, id };
+
+      const data = await this.genericReq.request(
+        'POST',
+        '/api/wazuh-api/request',
+        requestData
+      );
+
+      if (data.error) {
+        throw new Error(data.error);
+      }
+
+      return this.$q.resolve(data);
+    } catch (error) {
+      return error && error.data && error.data.message
+        ? this.$q.reject(error.data.message)
+        : this.$q.reject(error.message || error);
     }
-
-    async request(method, path, body) {
-        try {
-
-            if (!method || !path || !body) {
-                throw new Error('Missing parameters');
-            }
-
-            if (!this.appState.getCurrentAPI()){
-                throw new Error('No API selected.');
-            }
-
-            const { id }      = JSON.parse(this.appState.getCurrentAPI());
-            const requestData = { method, path, body, id };
-
-            const data = await this.genericReq.request('POST', '/api/wazuh-api/request', requestData);
-
-            if (data.error) {
-                throw new Error(data.error);
-            }
-            
-            return this.$q.resolve(data);
-
-        } catch (error) {
-            return error && error.data && error.data.message ?
-                   this.$q.reject(error.data.message) :
-                   this.$q.reject(error.message || error);
-        }
-    }
+  }
 }
 
 app.service('apiReq', ApiRequest);
