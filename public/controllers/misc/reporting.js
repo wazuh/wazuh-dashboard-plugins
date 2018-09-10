@@ -14,91 +14,108 @@ import { uiModules } from 'ui/modules';
 const app = uiModules.get('app/wazuh', []);
 
 // Logs controller
-app.controller('reportingController', function ($scope, errorHandler, genericReq) {
-    $scope.loading = true;
-    $scope.itemsPerPage = 15;
-    $scope.pagedItems = [];
-    $scope.currentPage = 0;
-    let items = [];
-    $scope.gap = 0;
+app.controller('reportingController', function(
+  $scope,
+  errorHandler,
+  genericReq
+) {
+  $scope.loading = true;
+  $scope.itemsPerPage = 15;
+  $scope.pagedItems = [];
+  $scope.currentPage = 0;
+  let items = [];
+  $scope.gap = 0;
 
-    const load = async () => {
-        try {
-            $scope.loading = true;
-            const data = await genericReq.request('GET','/api/wazuh-reporting/reports',{});
-            items = data.data.list;
-            const gap = items.length / 15;
-            const gapInteger = parseInt(items.length / 15);
-            $scope.gap = gap - parseInt(items.length / 15) > 0 ? gapInteger + 1 : gapInteger;
-            if($scope.gap > 5) $scope.gap = 5;
-            $scope.search();
-            $scope.loading = false;
-            if(!$scope.$$phase) $scope.$digest();
-        } catch (error) {
-            errorHandler.handle(error,'Reporting');
-        }
+  const load = async () => {
+    try {
+      $scope.loading = true;
+      const data = await genericReq.request(
+        'GET',
+        '/api/wazuh-reporting/reports',
+        {}
+      );
+      items = data.data.list;
+      const gap = items.length / 15;
+      const gapInteger = parseInt(items.length / 15);
+      $scope.gap =
+        gap - parseInt(items.length / 15) > 0 ? gapInteger + 1 : gapInteger;
+      if ($scope.gap > 5) $scope.gap = 5;
+      $scope.search();
+      $scope.loading = false;
+      if (!$scope.$$phase) $scope.$digest();
+    } catch (error) {
+      errorHandler.handle(error, 'Reporting');
     }
+  };
 
-    load();
-    
-    $scope.refresh = () => load();
+  load();
 
-    $scope.deleteReport = async name => {
-        try {
-            $scope.loading = true;
-            await genericReq.request('DELETE','/api/wazuh-reporting/report/' + name,{})
-            await load();
-            errorHandler.info('Success','Reporting');
-        } catch (error) {
-            errorHandler.handle(error,'Reporting');
-        }
-    }	
+  $scope.refresh = () => load();
 
-    // init the filtered items
-    $scope.search = function () {
-        $scope.filteredItems = items;
-        $scope.currentPage = 0;
-        // now group by pages
-        $scope.groupToPages();
-    };
-    // calculate page in place
-    $scope.groupToPages = function () {
-        $scope.pagedItems = [];
-        
-        for (let i = 0; i < $scope.filteredItems.length; i++) {
-            if (i % $scope.itemsPerPage === 0) {
-                $scope.pagedItems[Math.floor(i / $scope.itemsPerPage)] = [ $scope.filteredItems[i] ];
-            } else {
-                $scope.pagedItems[Math.floor(i / $scope.itemsPerPage)].push($scope.filteredItems[i]);
-            }
-        }
-    };
-    $scope.range = function (size,start, end) {
-        const ret = [];        
-                      
-        if (size < end) {
-            end = size;
-            start = size-$scope.gap;
-        }
-        for (let i = start; i < end; i++) {
-            ret.push(i);
-        }              
-        return ret;
-    };
+  $scope.deleteReport = async name => {
+    try {
+      $scope.loading = true;
+      await genericReq.request(
+        'DELETE',
+        '/api/wazuh-reporting/report/' + name,
+        {}
+      );
+      await load();
+      errorHandler.info('Success', 'Reporting');
+    } catch (error) {
+      errorHandler.handle(error, 'Reporting');
+    }
+  };
 
-    $scope.prevPage = function () {
-        if ($scope.currentPage > 0) {
-            $scope.currentPage--;
-        }
-    };
-    
-    $scope.nextPage = function () {
-        if ($scope.currentPage < $scope.pagedItems.length - 1) {
-            $scope.currentPage++;
-        }
-    };
-    
-    $scope.setPage = function () {
-        $scope.currentPage = this.n;
-    };
+  // init the filtered items
+  $scope.search = function() {
+    $scope.filteredItems = items;
+    $scope.currentPage = 0;
+    // now group by pages
+    $scope.groupToPages();
+  };
+  // calculate page in place
+  $scope.groupToPages = function() {
+    $scope.pagedItems = [];
+
+    for (let i = 0; i < $scope.filteredItems.length; i++) {
+      if (i % $scope.itemsPerPage === 0) {
+        $scope.pagedItems[Math.floor(i / $scope.itemsPerPage)] = [
+          $scope.filteredItems[i]
+        ];
+      } else {
+        $scope.pagedItems[Math.floor(i / $scope.itemsPerPage)].push(
+          $scope.filteredItems[i]
+        );
+      }
+    }
+  };
+  $scope.range = function(size, start, end) {
+    const ret = [];
+
+    if (size < end) {
+      end = size;
+      start = size - $scope.gap;
+    }
+    for (let i = start; i < end; i++) {
+      ret.push(i);
+    }
+    return ret;
+  };
+
+  $scope.prevPage = function() {
+    if ($scope.currentPage > 0) {
+      $scope.currentPage--;
+    }
+  };
+
+  $scope.nextPage = function() {
+    if ($scope.currentPage < $scope.pagedItems.length - 1) {
+      $scope.currentPage++;
+    }
+  };
+
+  $scope.setPage = function() {
+    $scope.currentPage = this.n;
+  };
 });

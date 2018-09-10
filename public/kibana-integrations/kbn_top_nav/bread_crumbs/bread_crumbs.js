@@ -4,7 +4,7 @@ import uiRouter from 'ui/routes';
 
 const module = uiModules.get('kibana');
 
-module.directive('wzBreadCrumbs', function () {
+module.directive('wzBreadCrumbs', function() {
   return {
     restrict: 'E',
     replace: true,
@@ -28,30 +28,24 @@ module.directive('wzBreadCrumbs', function () {
       useLinks: '='
     },
     template: breadCrumbsTemplate,
-    controller: function ($scope) {
-
+    controller: function($scope) {
       function omitPagesFilter(crumb) {
-        return (
-          !$scope.omitPages ||
-          !$scope.omitPages.includes(crumb.id)
-        );
+        return !$scope.omitPages || !$scope.omitPages.includes(crumb.id);
       }
 
       function omitCurrentPageFilter(crumb) {
         return !($scope.omitCurrentPage && crumb.current);
       }
 
-      $scope.$watchMulti([
-        '[]omitPages',
-        'omitCurrentPage'
-      ], function getBreadcrumbs() {
-        $scope.breadcrumbs = (
-          uiRouter
+      $scope.$watchMulti(
+        ['[]omitPages', 'omitCurrentPage'],
+        function getBreadcrumbs() {
+          $scope.breadcrumbs = uiRouter
             .getBreadcrumbs()
             .filter(omitPagesFilter)
-            .filter(omitCurrentPageFilter)
-        );
-      });
+            .filter(omitCurrentPageFilter);
+        }
+      );
     }
   };
 });

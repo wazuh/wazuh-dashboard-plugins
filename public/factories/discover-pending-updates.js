@@ -10,26 +10,26 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import { uiModules } from 'ui/modules'
+import { uiModules } from 'ui/modules';
 
 const app = uiModules.get('app/wazuh', []);
 
 class DiscoverPendingUpdates {
-    constructor(){
-        this.pendingUpdates = [];
-    }
+  constructor() {
+    this.pendingUpdates = [];
+  }
 
-    addItem (query, filters) {
-        this.pendingUpdates.push(query, filters);
-    }
+  addItem(query, filters) {
+    this.pendingUpdates.push(query, filters);
+  }
 
-    getList () {
-        return this.pendingUpdates;
-    }
+  getList() {
+    return this.pendingUpdates;
+  }
 
-    removeAll () {
-        this.pendingUpdates = [];
-    }
+  removeAll() {
+    this.pendingUpdates = [];
+  }
 }
 
 app.service('discoverPendingUpdates', DiscoverPendingUpdates);

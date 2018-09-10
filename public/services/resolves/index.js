@@ -10,12 +10,21 @@
  * Find more information about this on the LICENSE file.
  */
 import checkTimestamp from './check-timestamp';
-import healthCheck    from './health-check';
+import healthCheck from './health-check';
 import settingsWizard from './settings-wizard';
 import getSavedSearch from './get-saved-search';
-import goToKibana     from './go-to-kibana';
-import getIp          from './get-ip';
-import totalRAM       from './check-ram';
-import getWzConfig    from './get-config';
+import goToKibana from './go-to-kibana';
+import getIp from './get-ip';
+import totalRAM from './check-ram';
+import getWzConfig from './get-config';
 
-export { checkTimestamp, healthCheck, settingsWizard, getSavedSearch, goToKibana, getIp, totalRAM, getWzConfig };
+export {
+  checkTimestamp,
+  healthCheck,
+  settingsWizard,
+  getSavedSearch,
+  goToKibana,
+  getIp,
+  totalRAM,
+  getWzConfig
+};

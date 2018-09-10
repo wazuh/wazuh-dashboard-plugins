@@ -13,19 +13,36 @@ savedObjectManagementRegistry.register({
   title: 'visualizations'
 });
 
-app.service('wzsavedVisualizations', function (Promise, kbnIndex, SavedVis, Private, kbnUrl, $http, chrome) {
+app.service('wzsavedVisualizations', function(
+  Promise,
+  kbnIndex,
+  SavedVis,
+  Private,
+  kbnUrl,
+  $http,
+  chrome
+) {
   const visTypes = Private(VisTypesRegistryProvider);
 
-  const saveVisualizationLoader = new SavedObjectLoader(SavedVis, kbnIndex, kbnUrl, $http, chrome);
+  const saveVisualizationLoader = new SavedObjectLoader(
+    SavedVis,
+    kbnIndex,
+    kbnUrl,
+    $http,
+    chrome
+  );
 
-  saveVisualizationLoader.mapHitSource = function (source, id) {
+  saveVisualizationLoader.mapHitSource = function(source, id) {
     source.id = id;
     source.url = this.urlFor(id);
 
     let typeName = source.typeName;
     if (source.visState) {
-      try { typeName = JSON.parse(source.visState).type; }
-      catch (e) { /* missing typename handled below */ } // eslint-disable-line no-empty
+      try {
+        typeName = JSON.parse(source.visState).type;
+      } catch (e) {
+        /* missing typename handled below */
+      } // eslint-disable-line no-empty
     }
 
     if (!typeName || !visTypes.byName[typeName]) {
@@ -38,7 +55,7 @@ app.service('wzsavedVisualizations', function (Promise, kbnIndex, SavedVis, Priv
     return source;
   };
 
-  saveVisualizationLoader.urlFor = function (id) {
+  saveVisualizationLoader.urlFor = function(id) {
     return kbnUrl.eval('#/visualize/edit/{{id}}', { id: id });
   };
   return saveVisualizationLoader;

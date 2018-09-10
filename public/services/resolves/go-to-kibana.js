@@ -11,16 +11,21 @@
  */
 // Manage leaving the app to another Kibana tab
 export default ($location, $window) => {
+  const url = $location.$$absUrl.substring(0, $location.$$absUrl.indexOf('#'));
 
-    const url = $location.$$absUrl.substring(0, $location.$$absUrl.indexOf('#'));
+  if (
+    $window.sessionStorage
+      .getItem(`lastSubUrl:${url}`)
+      .includes('/wazuh#/visualize') ||
+    $window.sessionStorage
+      .getItem(`lastSubUrl:${url}`)
+      .includes('/wazuh#/doc') ||
+    $window.sessionStorage
+      .getItem(`lastSubUrl:${url}`)
+      .includes('/wazuh#/context')
+  ) {
+    $window.sessionStorage.setItem(`lastSubUrl:${url}`, url);
+  }
 
-    if ($window.sessionStorage.getItem(`lastSubUrl:${url}`).includes('/wazuh#/visualize') ||
-        $window.sessionStorage.getItem(`lastSubUrl:${url}`).includes('/wazuh#/doc') ||
-        $window.sessionStorage.getItem(`lastSubUrl:${url}`).includes('/wazuh#/context')){
-
-            $window.sessionStorage.setItem(`lastSubUrl:${url}`, url);
-
-    }
-
-    $window.location.href = $location.absUrl().replace('/wazuh#', '/kibana#');
-}
+  $window.location.href = $location.absUrl().replace('/wazuh#', '/kibana#');
+};
