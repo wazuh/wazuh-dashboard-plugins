@@ -29,7 +29,6 @@ class NewConfigurationController {
         this.$scope.configurationTab    = 'welcome';
         this.$scope.configurationSubTab = 'open-scap';
 
-        this.$scope.switchItem                = item => this.switchItem(item);
         this.$scope.getXML                    = name => this.getXML(name);
         this.$scope.getJSON                   = name => this.getJSON(name);
         this.$scope.switchConfigurationTab    = configurationTab => this.switchConfigurationTab(configurationTab);
@@ -62,17 +61,6 @@ class NewConfigurationController {
         this.$scope.XMLContent   = false;
         this.$scope.JSONContent  = false;
         this.$scope.configurationSubTab = configurationSubTab;
-        if(!this.$scope.$$phase) this.$scope.$digest();
-    }
-
-    /**
-     * Switchs between configuration sections
-     * @param {*} item
-     */
-    switchItem(item) {
-        this.$scope.XMLContent   = false;
-        this.$scope.JSONContent  = false;
-        this.$scope.selectedItem = item;
         if(!this.$scope.$$phase) this.$scope.$digest();
     }
 

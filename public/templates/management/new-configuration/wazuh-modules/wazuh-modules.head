@@ -17,9 +17,9 @@
         <md-nav-item class="wz-nav-item" md-nav-click="switchConfigurationSubTab('open-scap')" name="open-scap">OpenSCAP</md-nav-item>
         <md-nav-item class="wz-nav-item" md-nav-click="switchConfigurationSubTab('cis-cat')" name="cis-cat">CIS-CAT</md-nav-item>
         <md-nav-item class="wz-nav-item" md-nav-click="switchConfigurationSubTab('vulnerabilities')" name="vulnerabilities">Vulnerabilities</md-nav-item>
+        <md-nav-item class="wz-nav-item" md-nav-click="switchConfigurationSubTab('syscollector')" name="syscollector">Syscollector</md-nav-item>
         <md-nav-item class="wz-nav-item" md-nav-click="switchConfigurationSubTab('osquery')" name="osquery">Osquery</md-nav-item>
         <md-nav-item class="wz-nav-item" md-nav-click="switchConfigurationSubTab('amazon-s3')" name="amazon-s3">Amazon S3</md-nav-item>
         <md-nav-item class="wz-nav-item" md-nav-click="switchConfigurationSubTab('command')" name="command">Commands</md-nav-item>
-        <md-nav-item class="wz-nav-item" md-nav-click="switchConfigurationSubTab('syscollector')" name="syscollector">Syscollector</md-nav-item>
     </md-nav-bar>
     <!-- End Wazuh modules navigation bar -->
