@@ -25,6 +25,18 @@ class CommonData {
         this.globalState  = globalState;
     }
 
+    removeRuleId() {
+        if(!this.globalState || !this.globalState.filters) return;
+        const arr = [];
+        for(const item of this.globalState.filters){
+            if(item.query && item.query.match && item.query.match["rule.id"] && item.query.match["rule.id"].query) {
+                continue;
+            }
+            arr.push(item);
+        }
+        this.globalState.filters = arr;
+    }
+
     removeDuplicateRuleGroups(group) {
         if(!this.globalState || !this.globalState.filters) return;
         const globalRuleGroupFilters = this.globalState.filters.map(item => {
