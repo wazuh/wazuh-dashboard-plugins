@@ -64,6 +64,10 @@ function wzKibana($location, $window, $rootScope) {
     return goToKibana($location, $window);
 }
 
+function clearRuleId(commonData) {
+    commonData.removeRuleId()
+    return Promise.resolve()
+}
 
 //Routes
 routes.enable();
@@ -82,7 +86,7 @@ routes
     })
     .when('/manager/:tab?/', {
         template: managementTemplate,
-        resolve: { nestedResolve, ip, savedSearch }
+        resolve: { nestedResolve, ip, savedSearch, clearRuleId }
     })
     .when('/overview/', {
         template: overviewTemplate,
