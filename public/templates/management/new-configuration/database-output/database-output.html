@@ -1,0 +1,119 @@
+<div flex="auto" layout="column" ng-if="!load && configurationTab === 'database-output'">
+
+    <!-- Headline -->
+    <div layout="column" layout-padding>
+        <div>
+            <span class="font-size-18">Database output</span>
+        </div>
+        <span class="md-subheader">MySQL and PostgreSQL database output configuration</span>
+    </div>
+    <!-- End headline -->
+
+    <!-- This section contains the main content and the right sidenav -->
+    <div flex="auto" layout="row">
+
+        <!-- This section appears when there's no configuration -->
+        <wz-no-config flex ng-if="false"></wz-no-config>
+        <!-- End no configuration section -->
+
+        <!-- This section is the main content -->
+        <div flex layout="column">
+
+            <!-- The main card will all the settings -->
+            <md-card class="wz-md-card" ng-if="!JSONContent && !XMLContent">
+                <md-card-content>
+                    <span class="font-size-16">Database settings</span>
+                    <md-divider class="wz-margin-top-10"></md-divider>
+
+                    <!-- Configuration block -->
+                    <div class="wz-padding-top-10">
+
+                        <wz-config-item
+                            label="Database type"
+                            value="mysql">
+                        </wz-config-item>
+                        <wz-config-item
+                            label="Database name"
+                            value="Alerts_DB">
+                        </wz-config-item>
+                        <wz-config-item
+                            label="Database server IP"
+                            value="192.168.1.122">
+                        </wz-config-item>
+                        <wz-config-item
+                            label="Database username"
+                            value="MySQLadmin">
+                        </wz-config-item>
+                        <wz-config-item
+                            label="Database password"
+                            value="secret1234">
+                        </wz-config-item>
+
+                    </div>
+                    <!-- End configuration block -->
+                </md-card-content>
+            </md-card>
+            <!-- End main card with all the settings -->
+
+            <!-- JSON card -->
+            <md-card flex="auto" class="wz-md-card" ng-if="JSONContent">
+                <md-card-content flex layout="column">
+                    <span class="font-size-16">JSON viewer</span>
+                    <md-divider class="wz-margin-top-10"></md-divider>
+
+                    <!-- The JSON viewer -->
+                    <div flex="auto" class="wz-margin-top-10 wz-code-viewer">
+                        <pre><code wz-dynamic="JSONContent"></code></pre>
+                    </div>
+                    <!-- End JSON viewer -->
+                </md-card-content>
+            </md-card>
+            <!-- End JSON card -->
+
+            <!-- XML card -->
+            <md-card flex="auto" class="wz-md-card" ng-if="XMLContent">
+                <md-card-content flex layout="column">
+                    <span class="font-size-16">XML viewer</span>
+                    <md-divider class="wz-margin-top-10"></md-divider>
+
+                    <!-- The XML viewer -->
+                    <div flex="auto" class="wz-margin-top-10 wz-code-viewer">
+                        <pre>{{ XMLContent }}</pre>
+                    </div>
+                    <!-- End XML viewer -->
+                </md-card-content>
+            </md-card>
+            <!-- End XML card -->
+
+        </div>
+        <!-- End main content section -->
+
+        <!-- This section is the right sidenav content -->
+        <md-sidenav
+            class="md-sidenav-right"
+            md-is-locked-open="true">
+            <md-list>
+                <md-subheader>Any questions?</md-subheader>
+                <md-list-item target="_blank" class="wz-text-link" ng-href="https://documentation.wazuh.com/current/user-manual/reference/ossec-conf/database-output.html">Database output reference</md-list-item>
+
+                <md-divider></md-divider>
+
+                <md-subheader>Having trouble?</md-subheader>
+                <md-list-item target="_blank" class="wz-text-link" ng-href="https://groups.google.com/forum/#!forum/wazuh">Ask on the mailing list</md-list-item>
+                <md-list-item target="_blank" class="wz-text-link" ng-href="https://github.com/wazuh/wazuh/issues">Ask on GitHub</md-list-item>
+
+                <md-divider></md-divider>
+
+                <md-subheader>More options</md-subheader>
+                <md-list-item layout-wrap>
+                    <md-button ng-class="JSONContent ? 'active' : ''" class="wz-button md-raised md-primary small" ng-click="getJSON('database_output')">{{ JSONContent ? "Close JSON viewer" : "Open JSON viewer" }}</md-button>
+                    <md-button ng-class="XMLContent ? 'active' : ''" class="wz-button md-raised md-primary small" ng-click="getXML('database_output')">{{ XMLContent ? "Close XML viewer" : "Open XML viewer" }}</md-button>
+                </md-list-item>
+            </md-list>
+        </md-sidenav>
+        <!-- End right sidenav section -->
+
+    </div>
+    <!-- End main content and right sidenav section -->
+
+</div>
