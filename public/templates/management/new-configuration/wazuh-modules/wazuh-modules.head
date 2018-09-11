@@ -1,4 +1,4 @@
-<div flex="auto" layout="column" ng-if="!load && configurationTab === 'wazuh-modules'">
+<div flex="auto" layout="column" ng-if="!load && configurationTab === 'wazuh-modules'" ng-init="switchConfigurationSubTab('open-scap')">
 
     <!-- Headline -->
     <div layout="column" layout-padding>

@@ -26,13 +26,15 @@ class NewConfigurationController {
         this.$scope.isArray = Array.isArray;
         this.configRaw      = {};
 
-        this.$scope.configurationTab    = 'welcome';
-        this.$scope.configurationSubTab = 'open-scap';
+        this.$scope.configurationTab     = '';
+        this.$scope.configurationSubTab  = '';
+        this.$scope.configurationSection = '';
 
-        this.$scope.getXML                    = name => this.getXML(name);
-        this.$scope.getJSON                   = name => this.getJSON(name);
-        this.$scope.switchConfigurationTab    = configurationTab => this.switchConfigurationTab(configurationTab);
-        this.$scope.switchConfigurationSubTab = configurationSubTab => this.switchConfigurationSubTab(configurationSubTab);
+        this.$scope.getXML                       = name => this.getXML(name);
+        this.$scope.getJSON                      = name => this.getJSON(name);
+        this.$scope.switchConfigurationTab       = configurationTab => this.switchConfigurationTab(configurationTab);
+        this.$scope.switchConfigurationSubTab    = configurationSubTab => this.switchConfigurationSubTab(configurationSubTab);
+        this.$scope.switchConfigurationSection = configurationSection => this.switchConfigurationSection(configurationSection);
     }
 
     /**
@@ -43,24 +45,38 @@ class NewConfigurationController {
     }
 
     /**
-     * Switchs between configuration sections
+     * Switchs between configuration tabs
      * @param {*} configurationTab
      */
     switchConfigurationTab(configurationTab) {
         this.$scope.XMLContent   = false;
         this.$scope.JSONContent  = false;
+        this.$scope.configurationSubTab = false;
+        this.$scope.configurationSection = false;
         this.$scope.configurationTab = configurationTab;
         if(!this.$scope.$$phase) this.$scope.$digest();
     }
 
     /**
-     * Switchs between configuration sections
+     * Switchs between configuration sub-tabs
      * @param {*} configurationSubTab
      */
     switchConfigurationSubTab(configurationSubTab) {
         this.$scope.XMLContent   = false;
         this.$scope.JSONContent  = false;
+        this.$scope.configurationSection = false;
         this.$scope.configurationSubTab = configurationSubTab;
+        if(!this.$scope.$$phase) this.$scope.$digest();
+    }
+
+    /**
+     * Switchs between configuration sections
+     * @param {*} configurationSection
+     */
+    switchConfigurationSection(configurationSection) {
+        this.$scope.XMLContent   = false;
+        this.$scope.JSONContent  = false;
+        this.$scope.configurationSection = configurationSection;
         if(!this.$scope.$$phase) this.$scope.$digest();
     }
 

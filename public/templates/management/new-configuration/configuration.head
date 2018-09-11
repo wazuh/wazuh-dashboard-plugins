@@ -1,4 +1,4 @@
-<div flex="auto" layout="column" ng-controller="managementNewConfigurationController" ng-if="tab === 'new-configuration'">
+<div flex="auto" layout="column" ng-controller="managementNewConfigurationController" ng-if="tab === 'new-configuration'" ng-init="switchConfigurationTab('welcome')">
 
     <!-- Loading ring -->
     <div class='uil-ring-css' ng-show="load">
