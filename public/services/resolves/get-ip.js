@@ -11,10 +11,9 @@
  */
 
 import { SavedObjectsClientProvider } from 'ui/saved_objects';
+import { healthCheck } from './health-check';
 
-import healthCheck from './health-check';
-
-export default (
+export function getIp(
   indexPatterns,
   $q,
   $rootScope,
@@ -25,7 +24,7 @@ export default (
   genericReq,
   errorHandler,
   wzMisc
-) => {
+) {
   const deferred = $q.defer();
 
   const buildSavedObjectsClient = async () => {
@@ -92,4 +91,4 @@ export default (
     buildSavedObjectsClient();
   }
   return deferred.promise;
-};
+}

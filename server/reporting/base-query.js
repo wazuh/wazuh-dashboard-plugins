@@ -9,7 +9,7 @@
  *
  * Find more information about this on the LICENSE file.
  */
-export default (pattern, filters, gte, lte) => {
+export function Base(pattern, filters, gte, lte) {
   return {
     pattern: pattern,
     size: 0,
@@ -48,4 +48,4 @@ export default (pattern, filters, gte, lte) => {
       }
     }
   };
-};
+}

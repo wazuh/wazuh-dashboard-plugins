@@ -13,23 +13,29 @@ import { uiModules } from 'ui/modules';
 
 const app = uiModules.get('app/wazuh', []);
 
-app.controller('blankScreenController', function(
-  $scope,
-  $location,
-  errorHandler,
-  wzMisc
-) {
-  const catchedError = wzMisc.getBlankScr();
-  if (catchedError) {
-    let parsed = null;
-    try {
-      parsed = errorHandler.handle(catchedError, '', false, true);
-    } catch (error) {} // eslint-disable-line
-    $scope.errorToShow = parsed || catchedError;
-    wzMisc.setBlankScr(false);
-    if (!$scope.$$phase) $scope.$digest();
+class BlankScreenController {
+  constructor($scope, $location, errorHandler, wzMisc) {
+    this.$scope = $scope;
+    this.$location = $location;
+    this.errorHandler = errorHandler;
+    this.wzMisc = wzMisc;
   }
-  $scope.goOverview = () => {
-    $location.path('/overview');
-  };
-});
+
+  $onInit() {
+    const catchedError = this.wzMisc.getBlankScr();
+    if (catchedError) {
+      let parsed = null;
+      try {
+        parsed = this.errorHandler.handle(catchedError, '', false, true);
+      } catch (error) {} // eslint-disable-line
+      this.$scope.errorToShow = parsed || catchedError;
+      this.wzMisc.setBlankScr(false);
+      if (!this.$scope.$$phase) this.$scope.$digest();
+    }
+    this.$scope.goOverview = () => {
+      this.$location.path('/overview');
+    };
+  }
+}
+
+app.controller('blankScreenController', BlankScreenController);

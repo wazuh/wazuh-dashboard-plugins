@@ -9,7 +9,7 @@
  *
  * Find more information about this on the LICENSE file.
  */
-export default {
+export const TabDescription = {
   general: {
     title: 'Security events',
     description:

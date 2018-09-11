@@ -9,11 +9,7 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import { uiModules } from 'ui/modules';
-
-const app = uiModules.get('app/wazuh', []);
-
-class CommonData {
+export class CommonData {
   constructor(
     $rootScope,
     $timeout,
@@ -235,5 +231,3 @@ class CommonData {
     }
   }
 }
-
-app.service('commonData', CommonData);

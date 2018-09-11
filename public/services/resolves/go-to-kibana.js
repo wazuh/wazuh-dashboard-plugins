@@ -10,7 +10,7 @@
  * Find more information about this on the LICENSE file.
  */
 // Manage leaving the app to another Kibana tab
-export default ($location, $window) => {
+export function goToKibana($location, $window) {
   const url = $location.$$absUrl.substring(0, $location.$$absUrl.indexOf('#'));
 
   if (
@@ -28,4 +28,4 @@ export default ($location, $window) => {
   }
 
   $window.location.href = $location.absUrl().replace('/wazuh#', '/kibana#');
-};
+}

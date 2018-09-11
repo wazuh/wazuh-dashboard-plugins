@@ -12,8 +12,8 @@
 
 // Require some libraries
 import needle from 'needle';
-import pciRequirementsFile from '../integration-files/pci-requirements';
-import gdprRequirementsFile from '../integration-files/gdpr-requirements';
+import { pciRequirementsFile } from '../integration-files/pci-requirements';
+import { gdprRequirementsFile } from '../integration-files/gdpr-requirements';
 import { ElasticWrapper } from '../lib/elastic-wrapper';
 import { getPath } from '../../util/get-path';
 import packageInfo from '../../package.json';
@@ -25,7 +25,7 @@ import { totalmem } from 'os';
 import simpleTail from 'simple-tail';
 import path from 'path';
 import { log } from '../logger';
-import CsvKeys from '../../util/csv-key-equivalence';
+import { KeyEquivalenece } from '../../util/csv-key-equivalence';
 
 export class WazuhApiCtrl {
   constructor(server) {
@@ -815,7 +815,7 @@ export class WazuhApiCtrl {
 
         for (const field of fields) {
           if (csv.includes(field)) {
-            csv = csv.replace(field, CsvKeys[field] || field);
+            csv = csv.replace(field, KeyEquivalenece[field] || field);
           }
         }
 

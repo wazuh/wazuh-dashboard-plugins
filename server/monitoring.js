@@ -15,7 +15,7 @@ import { getPath } from '../util/get-path';
 import colors from 'ansicolors';
 import { log } from './logger';
 import { ElasticWrapper } from './lib/elastic-wrapper';
-import monitoringTemplate from './integration-files/monitoring-template';
+import { monitoringTemplate } from './integration-files/monitoring-template';
 import packageJSON from '../package.json';
 import { getConfiguration } from './lib/get-configuration';
 import { parseCron } from './lib/parse-cron';

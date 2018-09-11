@@ -9,11 +9,7 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import { uiModules } from 'ui/modules';
-
-const app = uiModules.get('app/wazuh', []);
-
-class ApiRequest {
+export class ApiRequest {
   constructor($q, genericReq, appState) {
     this.$q = $q;
     this.genericReq = genericReq;
@@ -51,5 +47,3 @@ class ApiRequest {
     }
   }
 }
-
-app.service('apiReq', ApiRequest);

@@ -28,7 +28,7 @@
     "scripts": {
         "pretty": "prettier --single-quote \"{,!(node_modules)/**/}*.js\" --write",
         "tslint": "tslint -c .tslint.yml server/**/*.ts server/**/*.tsx public/**/*.ts public/**/*.tsx",
-        "lint": "eslint ./server/ ./public/ ./util/ ./*.js -c .eslintrc.json --color",
+        "lint": "eslint . --ext .js -c .eslintrc.json --color",
         "prebuild": "tsc; find . -name \"*.ts*\" -type f -not -path \"./node_modules/*\" -delete",
         "build": "plugin-helpers build",
         "test": "_mocha test/**/*"
@@ -52,6 +52,7 @@
     "devDependencies": {
         "@elastic/plugin-helpers": "^7.1.8",
         "babel-eslint": "^8.2.6",
+        "chai": "^4.1.2",
         "eslint": "^5.4.0",
         "eslint-plugin-async-await": "^0.0.0",
         "eslint-plugin-import": "^2.14.0",

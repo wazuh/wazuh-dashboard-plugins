@@ -14,9 +14,9 @@ import colors from 'ansicolors';
 import { log } from './logger';
 import { ElasticWrapper } from './lib/elastic-wrapper';
 import packageJSON from '../package.json';
-import kibana_template from './integration-files/kibana-template';
+import { kibanaTemplate } from './integration-files/kibana-template';
 import { getConfiguration } from './lib/get-configuration';
-import defaultExt from './lib/default-ext';
+import { defaultExt } from './lib/default-ext';
 import { BuildBody } from './lib/replicas-shards-helper';
 
 export function Initialize(server) {
@@ -527,7 +527,7 @@ export function Initialize(server) {
     );
 
     try {
-      kibana_template.template = wzWrapper.WZ_KIBANA_INDEX + '*';
+      kibanaTemplate.template = wzWrapper.WZ_KIBANA_INDEX + '*';
     } catch (error) {
       log('[initialize][createKibanaTemplate]', error.message || error);
       server.log(
@@ -540,7 +540,7 @@ export function Initialize(server) {
       );
     }
 
-    return wzWrapper.putWazuhKibanaTemplate(kibana_template);
+    return wzWrapper.putWazuhKibanaTemplate(kibanaTemplate);
   };
 
   const createEmptyKibanaIndex = async () => {

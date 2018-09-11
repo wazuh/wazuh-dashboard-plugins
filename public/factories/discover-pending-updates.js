@@ -10,11 +10,7 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import { uiModules } from 'ui/modules';
-
-const app = uiModules.get('app/wazuh', []);
-
-class DiscoverPendingUpdates {
+export class DiscoverPendingUpdates {
   constructor() {
     this.pendingUpdates = [];
   }
@@ -31,5 +27,3 @@ class DiscoverPendingUpdates {
     this.pendingUpdates = [];
   }
 }
-
-app.service('discoverPendingUpdates', DiscoverPendingUpdates);

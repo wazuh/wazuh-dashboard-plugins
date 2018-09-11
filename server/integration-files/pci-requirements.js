@@ -9,7 +9,7 @@
  *
  * Find more information about this on the LICENSE file.
  */
-export default {
+export const pciRequirementsFile = {
   '1.1.1':
     'A formal process for approving and testing all network connections and changes to the firewall and router configurations',
   '1.3.4':

@@ -8,11 +8,6 @@ const headers = {
 };
 
 let API_ID = null;
-let API_PORT = null;
-let API_URL = null;
-let API_USER = null;
-
-const EXAMPLE_API = {};
 
 describe('wazuh-api-elastic', () => {
   /*
@@ -43,13 +38,12 @@ describe('wazuh-api-elastic', () => {
       {}
     );
     if (!res.body || !res.body.length) {
+      /* eslint-disable */
       console.log('There are no APIs stored in Elasticsearch, exiting...');
       process.exit(1);
+      /* eslint-enable */
     }
     API_ID = res.body[0]._id;
-    API_URL = res.body[0]._source.url;
-    API_PORT = res.body[0]._source.api_port;
-    API_USER = res.body[0]._source.api_user;
   });
 
   it('PUT /api/wazuh-api/settings', async () => {

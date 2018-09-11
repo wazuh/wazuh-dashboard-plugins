@@ -11,9 +11,9 @@
  */
 import { uiModules } from 'ui/modules';
 import { FilterHandler } from '../../utils/filter-handler';
-import generateMetric from '../../utils/generate-metric';
-import TabNames from '../../utils/tab-names';
-import TabDescription from '../../../server/reporting/tab-description';
+import { generateMetric } from '../../utils/generate-metric';
+import { TabNames } from '../../utils/tab-names';
+import { TabDescription } from '../../../server/reporting/tab-description';
 
 import {
   metricsGeneral,

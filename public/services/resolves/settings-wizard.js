@@ -9,11 +9,11 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import checkTimestamp from './check-timestamp';
-import healthCheck from './health-check';
-import totalRAM from './check-ram';
+import { checkTimestamp } from './check-timestamp';
+import { healthCheck } from './health-check';
+import { totalRAM } from './check-ram';
 
-export default (
+export function settingsWizard(
   $rootScope,
   $location,
   $q,
@@ -24,7 +24,7 @@ export default (
   errorHandler,
   wzMisc,
   wazuhConfig
-) => {
+) {
   try {
     const deferred = $q.defer();
 
@@ -87,7 +87,7 @@ export default (
       try {
         currentApi = JSON.parse(appState.getCurrentAPI()).id;
       } catch (error) {
-        // eslint-disable-next-line 
+        // eslint-disable-next-line
         console.log(`Error parsing JSON (settingsWizards.changeCurrentApi)`);
       }
       const clusterInfo = data.data.data.cluster_info;
@@ -110,7 +110,7 @@ export default (
       try {
         currentApi = JSON.parse(appState.getCurrentAPI()).id;
       } catch (error) {
-        // eslint-disable-next-line 
+        // eslint-disable-next-line
         console.log(`Error parsing JSON (settingsWizards.callCheckStored 1)`);
       }
 
@@ -142,7 +142,7 @@ export default (
                 try {
                   apiRaw = JSON.parse(appState.getCurrentAPI());
                 } catch (error) {
-                  // eslint-disable-next-line 
+                  // eslint-disable-next-line
                   console.log(
                     `Error parsing JSON (settingsWizards.callCheckStored 2)`
                   );
@@ -230,4 +230,4 @@ export default (
   } catch (error) {
     errorHandler.handle(error, 'Routes');
   }
-};
+}

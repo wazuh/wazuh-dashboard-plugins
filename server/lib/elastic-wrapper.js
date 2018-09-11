@@ -9,7 +9,7 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import knownFields from '../integration-files/known-fields';
+import { knownFields } from '../integration-files/known-fields';
 
 export class ElasticWrapper {
   constructor(server) {

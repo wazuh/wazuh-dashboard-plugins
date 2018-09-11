@@ -9,7 +9,7 @@
  *
  * Find more information about this on the LICENSE file.
  */
-export default {
+export const monitoringTemplate = {
   order: 0,
   template: 'wazuh-monitoring-3.x-*',
   settings: {

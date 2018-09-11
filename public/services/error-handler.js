@@ -9,12 +9,9 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import { uiModules } from 'ui/modules';
 import { toastNotifications } from 'ui/notify';
 
-const app = uiModules.get('app/wazuh', []);
-
-class ErrorHandler {
+export class ErrorHandler {
   /**
    * Constructor
    * @param {*} Notifier Useful class to create toasts
@@ -122,5 +119,3 @@ class ErrorHandler {
     return text;
   }
 }
-
-app.service('errorHandler', ErrorHandler);
