@@ -1,11 +1,22 @@
 <!-- This section contains the main content and the right sidenav -->
-<div flex="auto" layout="row" ng-if="configurationSubTab === 'open-scap'">
+<div flex="auto" layout="row" ng-if="configurationSubTab === 'open-scap'" ng-init="switchConfigurationSection('open-scap-general')">
+
+    <!-- This section appears when there's no configuration -->
+    <wz-no-config flex></wz-no-config>
+    <!-- End no configuration section -->
 
     <!-- This section is the main content -->
-    <div flex layout="column">
+    <div flex layout="column" ng-if="false">
 
-        <!-- The main card will all the settings -->
-        <md-card class="wz-md-card" ng-if="!JSONContent && !XMLContent">
+        <!-- Switch configuration sections buttons -->
+        <div layout="row" layout-align="center center" class="wz-margin-top-10">
+            <md-button ng-class="configurationSection === 'open-scap-general' ? 'active' : ''" class="wz-button wz-button-group md-raised small left" ng-click="switchConfigurationSection('open-scap-general')">General</md-button>
+            <md-button ng-class="configurationSection === 'open-scap-evaluations' ? 'active' : ''" class="wz-button wz-button-group md-raised small right" ng-click="switchConfigurationSection('open-scap-evaluations')">Evaluations</md-button>
+        </div>
+        <!-- End switch configuration sections buttons -->
+
+        <!-- General card -->
+        <md-card class="wz-md-card" ng-if="configurationSection === 'open-scap-general' && !JSONContent && !XMLContent">
             <md-card-content>
                 <span class="font-size-16">Main settings</span>
                 <md-divider class="wz-margin-top-10"></md-divider>
@@ -34,7 +45,53 @@
                 <!-- End configuration block -->
             </md-card-content>
         </md-card>
-        <!-- End main card with all the settings -->
+        <!-- End general card -->
+
+        <!-- Evaluations card -->
+        <md-card class="wz-md-card" ng-if="configurationSection === 'open-scap-evaluations' && !JSONContent && !XMLContent">
+            <md-card-content>
+                <span class="font-size-16">Evaluations</span>
+                <span class="wz-padding-top-10 md-subheader small">Scans executed according to specific security policies and their profiles</span>
+                <md-divider class="wz-margin-top-10"></md-divider>
+
+                <!-- Configuration block -->
+                <div class="wz-padding-top-10">
+
+                    <table class="table table-striped table-condensed" style="table-layout: fixed !important; margin: 0 !important;">
+                        <thead class="wz-text-bold">
+                            <th class="wz-text-left col-lg-1">Test</th>
+                            <th class="wz-text-left col-lg-3">Test</th>
+                            <th class="wz-text-left col-lg-8">Test</th>
+                        </thead>
+                        <tbody class="wz-word-wrap">
+                            <tr>
+                                <td>test</td>
+                                <td>test</td>
+                                <td>test</td>
+                            </tr>
+                            <tr>
+                                <td>test</td>
+                                <td>test</td>
+                                <td>test</td>
+                            </tr>
+                            <tr>
+                                <td>test</td>
+                                <td>test</td>
+                                <td>test</td>
+                            </tr>
+                            <tr>
+                                <td>test</td>
+                                <td>test</td>
+                                <td>test</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                </div>
+                <!-- End configuration block -->
+            </md-card-content>
+        </md-card>
+        <!-- End evaluations card -->
 
         <!-- JSON card -->
         <md-card flex="auto" class="wz-md-card" ng-if="JSONContent">
