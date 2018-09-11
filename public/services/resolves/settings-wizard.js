@@ -110,7 +110,7 @@ export default (
       try {
         currentApi = JSON.parse(appState.getCurrentAPI()).id;
       } catch (error) {
-        // eslint-disable-next-line
+        // eslint-disable-next-line 
         console.log(`Error parsing JSON (settingsWizards.callCheckStored 1)`);
       }
 
@@ -142,7 +142,7 @@ export default (
                 try {
                   apiRaw = JSON.parse(appState.getCurrentAPI());
                 } catch (error) {
-                  // eslint-disable-next-line
+                  // eslint-disable-next-line 
                   console.log(
                     `Error parsing JSON (settingsWizards.callCheckStored 2)`
                   );

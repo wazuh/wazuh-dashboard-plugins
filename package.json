@@ -28,7 +28,7 @@
     "scripts": {
         "pretty": "prettier --single-quote \"{,!(node_modules)/**/}*.js\" --write",
         "tslint": "tslint -c .tslint.yml server/**/*.ts server/**/*.tsx public/**/*.ts public/**/*.tsx",
-        "lint": "eslint ./server/ ./public/ ./util/ ./*.js -c .eslintrc.json --color",
+        "lint": "eslint . --ext .js -c .eslintrc.json --color",
         "prebuild": "tsc; find . -name \"*.ts*\" -type f -not -path \"./node_modules/*\" -delete",
         "build": "plugin-helpers build",
         "test": "_mocha test/**/*"

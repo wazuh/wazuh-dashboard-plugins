@@ -1,6 +1,8 @@
 const chai = require('chai');
 const needle = require('needle');
+
 const { version, revision } = require('../../package.json');
+
 chai.should();
 
 const headers = {
