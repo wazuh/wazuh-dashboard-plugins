@@ -1,0 +1,124 @@
+<!-- This section contains the main content and the right sidenav -->
+<div flex="auto" layout="row" ng-if="configurationSubTab === 'remote'">
+
+    <!-- This section appears when there's no configuration -->
+    <wz-no-config flex ng-if="false"></wz-no-config>
+    <!-- End no configuration section -->
+
+    <!-- This section is the main content -->
+    <div flex layout="column">
+
+        <!-- The main card will all the settings -->
+        <md-card class="wz-md-card" ng-if="!JSONContent && !XMLContent">
+            <md-card-content>
+                <span class="font-size-16">Remote settings</span>
+                <div class="wz-margin-top-10">
+                    <span class="md-subheader small">Configuration to listen for events from the agents</span>
+                </div>
+                <md-divider class="wz-margin-top-10"></md-divider>
+
+                <!-- Configuration block -->
+                <div class="wz-padding-top-10">
+
+                    <table class="table table-striped table-condensed" style="table-layout: fixed !important; margin: 0 !important;">
+                        <thead class="wz-text-bold">
+                            <th class="wz-text-left">Connection</th>
+                            <th class="wz-text-left">Port</th>
+                            <th class="wz-text-left">Protocol</th>
+                            <th class="wz-text-left">Allowed IPs</th>
+                            <th class="wz-text-left">Denied IPs</th>
+                            <th class="wz-text-left">Local IP</th>
+                            <th class="wz-text-left">IPv6</th>
+                            <th class="wz-text-left">Queue size</th>
+                        </thead>
+                        <tbody class="wz-word-wrap">
+                            <tr>
+                                <td>test</td>
+                                <td>test</td>
+                                <td>test</td>
+                                <td>test</td>
+                                <td>test</td>
+                                <td>test</td>
+                                <td>test</td>
+                                <td>test</td>
+                            </tr>
+                            <tr>
+                                <td>test</td>
+                                <td>test</td>
+                                <td>test</td>
+                                <td>test</td>
+                                <td>test</td>
+                                <td>test</td>
+                                <td>test</td>
+                                <td>test</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                </div>
+                <!-- End configuration block -->
+            </md-card-content>
+        </md-card>
+        <!-- End main card with all the settings -->
+
+        <!-- JSON card -->
+        <md-card flex="auto" class="wz-md-card" ng-if="JSONContent">
+            <md-card-content flex layout="column">
+                <span class="font-size-16">JSON viewer</span>
+                <md-divider class="wz-margin-top-10"></md-divider>
+
+                <!-- The JSON viewer -->
+                <div flex="auto" class="wz-margin-top-10 wz-code-viewer">
+                    <pre><code wz-dynamic="JSONContent"></code></pre>
+                </div>
+                <!-- End JSON viewer -->
+            </md-card-content>
+        </md-card>
+        <!-- End JSON card -->
+
+        <!-- XML card -->
+        <md-card flex="auto" class="wz-md-card" ng-if="XMLContent">
+            <md-card-content flex layout="column">
+                <span class="font-size-16">XML viewer</span>
+                <md-divider class="wz-margin-top-10"></md-divider>
+
+                <!-- The XML viewer -->
+                <div flex="auto" class="wz-margin-top-10 wz-code-viewer">
+                    <pre>{{ XMLContent }}</pre>
+                </div>
+                <!-- End XML viewer -->
+            </md-card-content>
+        </md-card>
+        <!-- End XML card -->
+
+    </div>
+    <!-- End main content section -->
+
+    <!-- This section is the right sidenav content -->
+    <md-sidenav
+        class="md-sidenav-right"
+        md-is-locked-open="true">
+        <md-list>
+            <md-subheader>Any questions?</md-subheader>
+            <md-list-item target="_blank" class="wz-text-link" ng-href="https://documentation.wazuh.com/current/user-manual/reference/daemons/ossec-remoted.html">Remote daemon reference</md-list-item>
+            <md-list-item target="_blank" class="wz-text-link" ng-href="https://documentation.wazuh.com/current/user-manual/reference/ossec-conf/remote.html">Remote configuration reference</md-list-item>
+
+            <md-divider></md-divider>
+
+            <md-subheader>Having trouble?</md-subheader>
+            <md-list-item target="_blank" class="wz-text-link" ng-href="https://groups.google.com/forum/#!forum/wazuh">Ask on the mailing list</md-list-item>
+            <md-list-item target="_blank" class="wz-text-link" ng-href="https://github.com/wazuh/wazuh/issues">Ask on GitHub</md-list-item>
+
+            <md-divider></md-divider>
+
+            <md-subheader>More options</md-subheader>
+            <md-list-item layout-wrap>
+                <md-button ng-class="JSONContent ? 'active' : ''" class="wz-button md-raised md-primary small" ng-click="getJSON('remote')">{{ JSONContent ? "Close JSON viewer" : "Open JSON viewer" }}</md-button>
+                <md-button ng-class="XMLContent ? 'active' : ''" class="wz-button md-raised md-primary small" ng-click="getXML('remote')">{{ XMLContent ? "Close XML viewer" : "Open XML viewer" }}</md-button>
+            </md-list-item>
+        </md-list>
+    </md-sidenav>
+    <!-- End right sidenav section -->
+
+</div>
+<!-- End main content and right sidenav section -->

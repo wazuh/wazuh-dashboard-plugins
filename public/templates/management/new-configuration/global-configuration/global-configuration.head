@@ -1,0 +1,20 @@
+<div flex="auto" layout="column" ng-if="!load && configurationTab === 'global-configuration'" ng-init="switchConfigurationSubTab('global')">
+
+    <!-- Headline -->
+    <div layout="column" layout-padding>
+        <div>
+            <span class="font-size-18">Global configuration</span>
+        </div>
+        <span class="md-subheader">Global and remote settings that applies to the whole cluster</span>
+    </div>
+    <!-- End headline -->
+
+    <!-- Global configuration navigation bar -->
+    <md-nav-bar
+        class="wz-nav-bar"
+        md-selected-nav-item="configurationSubTab"
+        nav-bar-aria-label="Global configuration navigation links">
+        <md-nav-item class="wz-nav-item" md-nav-click="switchConfigurationSubTab('global')" name="global">Global</md-nav-item>
+        <md-nav-item class="wz-nav-item" md-nav-click="switchConfigurationSubTab('remote')" name="remote">Remote</md-nav-item>
+    </md-nav-bar>
+    <!-- End global configuration navigation bar -->
