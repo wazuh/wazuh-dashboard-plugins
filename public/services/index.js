@@ -27,13 +27,14 @@ import { uiModules } from 'ui/modules';
 
 const app = uiModules.get('app/wazuh', []);
 
-app.service('errorHandler', ErrorHandler);
-app.service('apiReq', ApiRequest);
-app.service('genericReq', GenericRequest);
-app.service('appState', AppState);
-app.service('testAPI', ApiTester);
-app.service('patternHandler', PatternHandler);
-app.service('csvReq', CSVRequest);
-app.service('commonData', CommonData);
-app.service('reportingService', ReportingService);
-app.service('visFactoryService', VisFactoryService);
+app
+  .service('errorHandler', ErrorHandler)
+  .service('apiReq', ApiRequest)
+  .service('genericReq', GenericRequest)
+  .service('appState', AppState)
+  .service('testAPI', ApiTester)
+  .service('patternHandler', PatternHandler)
+  .service('csvReq', CSVRequest)
+  .service('commonData', CommonData)
+  .service('reportingService', ReportingService)
+  .service('visFactoryService', VisFactoryService);
