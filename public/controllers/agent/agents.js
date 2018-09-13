@@ -224,6 +224,10 @@ app.controller(
           apiReq.request('GET', `/syscollector/${id}/packages`, {
             limit: 1,
             select: 'scan_time'
+          }),
+          apiReq.request('GET', `/syscollector/${id}/processes`, {
+            limit: 1,
+            select: 'scan_time'
           })
         ]);
         if (
@@ -243,12 +247,15 @@ app.controller(
           const netiface = {};
           const ports = {};
           const packagesDate = {};
+          const processesDate = {};
           if (data[2] && data[2].data && data[2].data.data)
             Object.assign(netiface, data[2].data.data);
           if (data[3] && data[3].data && data[3].data.data)
             Object.assign(ports, data[3].data.data);
           if (data[4] && data[4].data && data[4].data.data)
             Object.assign(packagesDate, data[4].data.data);
+          if (data[5] && data[5].data && data[5].data.data)
+            Object.assign(processesDate, data[5].data.data);
           $scope.syscollector = {
             hardware: data[0].data.data,
             os: data[1].data.data,
@@ -257,6 +264,10 @@ app.controller(
             packagesDate:
               packagesDate && packagesDate.items && packagesDate.items.length
                 ? packagesDate.items[0].scan_time
+                : 'Unknown',
+            processesDate:
+            processesDate && processesDate.items && processesDate.items.length
+                ? processesDate.items[0].scan_time
                 : 'Unknown'
           };
         }
