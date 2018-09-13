@@ -1,0 +1,20 @@
+<div flex="auto" layout="column" ng-if="!load && configurationTab === 'integrity-monitoring'" ng-init="switchConfigurationSubTab('file-monitoring')">
+
+    <!-- Headline -->
+    <div layout="column" layout-padding>
+        <div>
+            <span class="font-size-18">Integrity monitoring</span>
+        </div>
+        <span class="md-subheader">Identification of changes in content, permissions, ownership, and attributes of files</span>
+    </div>
+    <!-- End headline -->
+
+    <!-- Integrity monitoring navigation bar -->
+    <md-nav-bar
+        class="wz-nav-bar"
+        md-selected-nav-item="configurationSubTab"
+        nav-bar-aria-label="Integrity monitoring navigation links">
+        <md-nav-item class="wz-nav-item" md-nav-click="switchConfigurationSubTab('file-monitoring')" name="file-monitoring">File monitoring</md-nav-item>
+        <md-nav-item class="wz-nav-item" md-nav-click="switchConfigurationSubTab('agentless')" name="agentless">Agentless devices</md-nav-item>
+    </md-nav-bar>
+    <!-- End Integrity monitoring navigation bar -->
