@@ -4,6 +4,7 @@
     <div layout="column" layout-padding>
         <div>
             <span class="font-size-18">Integrity monitoring</span>
+            <span class="wz-agent-status-indicator small teal">Enabled</span>
         </div>
         <span class="md-subheader">Identification of changes in content, permissions, ownership, and attributes of files</span>
     </div>
