@@ -16,6 +16,7 @@ import DataFactory from '../../services/data-factory';
 import KeyEquivalenece from '../../../util/csv-key-equivalence';
 import CheckRows from './wz-table-rows';
 import { FilterHandler } from '../../utils/filter-handler';
+import ProcessEquivalence from '../../../util/process-state-equivalence';
 const app = uiModules.get('app/wazuh', []);
 
 app
@@ -393,6 +394,9 @@ app
         });
 
         $scope.nonDecoderValue = (key, item) => {
+          if(key === 'state' && instance.path.includes('processes')){
+            return ProcessEquivalence[item.state] || 'Unknown'
+          }
           return key.value === 'local.ip'
             ? (item.local && item.local.ip
                 ? `${item.local.ip}:${item.local.port}`
