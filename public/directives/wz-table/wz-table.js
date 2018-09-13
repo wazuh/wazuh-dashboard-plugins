@@ -186,6 +186,7 @@ app
 
         $scope.nextPage = async currentPage => {
           try {
+            $scope.error = false;
             if (
               !currentPage &&
               $scope.currentPage < $scope.pagedItems.length - 1
@@ -206,6 +207,8 @@ app
               if (!$scope.$$phase) $scope.$digest();
             }
           } catch (error) {
+            $scope.wazuh_table_loading = false;
+            $scope.error = `Error paginating table due to ${error.message || error}. Please refresh your browser.`
             errorHandler.handle(
               `Error paginating table due to ${error.message || error}`,
               'Data factory'
@@ -229,6 +232,7 @@ app
 
         $scope.sort = async field => {
           try {
+            $scope.error = false;
             $scope.wazuh_table_loading = true;
             instance.addSorting(field.value || field);
             $scope.sortValue = instance.sortValue;
@@ -237,6 +241,10 @@ app
             $scope.wazuh_table_loading = false;
             if (!$scope.$$phase) $scope.$digest();
           } catch (error) {
+            $scope.wazuh_table_loading = false;
+            $scope.error = `Error sorting table by ${
+              field ? field.value : 'undefined'
+            }. ${error.message || error}. Please refresh your browser.`
             errorHandler.handle(
               `Error sorting table by ${
                 field ? field.value : 'undefined'
@@ -249,6 +257,7 @@ app
 
         const search = async (term, removeFilters) => {
           try {
+            $scope.error = false;
             $scope.wazuh_table_loading = true;
             if (removeFilters) instance.removeFilters();
             instance.addFilter('search', term);
@@ -257,6 +266,8 @@ app
             $scope.wazuh_table_loading = false;
             if (!$scope.$$phase) $scope.$digest();
           } catch (error) {
+            $scope.wazuh_table_loading = false;
+            $scope.error = `Error searching. ${error.message || error}. Please refresh your browser.`;
             errorHandler.handle(
               `Error searching. ${error.message || error}`,
               'Data factory'
@@ -267,6 +278,7 @@ app
 
         const filter = async filter => {
           try {
+            $scope.error = false;
             $scope.wazuh_table_loading = true;
             if (filter.name === 'platform' && instance.path === '/agents') {
               const platform = filter.value.split(' - ')[0];
@@ -281,6 +293,10 @@ app
             $scope.wazuh_table_loading = false;
             if (!$scope.$$phase) $scope.$digest();
           } catch (error) {
+            $scope.wazuh_table_loading = false;
+            $scope.error = `Error filtering by ${
+              filter ? filter.value : 'undefined'
+            }. ${error.message || error}. Please refresh your browser.`
             errorHandler.handle(
               `Error filtering by ${
                 filter ? filter.value : 'undefined'
@@ -322,6 +338,7 @@ app
 
         const realTimeFunction = async () => {
           try {
+            $scope.error = false;
             while (realTime) {
               await fetch({ realTime: true, limit: 10 });
               if (!$scope.$$phase) $scope.$digest();
@@ -329,6 +346,7 @@ app
             }
           } catch (error) {
             realTime = false;
+            $scope.error = `Real time feature aborted. ${error.message || error}. Please refresh your browser.`
             errorHandler.handle(
               `Real time feature aborted. ${error.message || error}`,
               'Data factory'
@@ -356,12 +374,15 @@ app
 
         const init = async () => {
           try {
+            $scope.error = false;
             $scope.wazuh_table_loading = true;
             await fetch();
             wzTableFilter.set(instance.filters);
             $scope.wazuh_table_loading = false;
             if (!$scope.$$phase) $scope.$digest();
           } catch (error) {
+            $scope.wazuh_table_loading = false;
+            $scope.error = `Error while init table. ${error.message || error}. Please refresh your browser.`
             errorHandler.handle(
               `Error while init table. ${error.message || error}`,
               'Data factory'
