@@ -104,6 +104,46 @@
     word-wrap: break-word;
 }
 
+/* CUstom styles for Configuration items list */
+
+.wz-item-list {
+    overflow: auto;
+    height: 100px;
+    margin-right: 5px;
+    background-color: #F9F9F9;
+    border: 1px solid #D9D9D9;
+    word-break: break-word;
+}
+
+.wz-item-detail {
+    overflow: auto;
+    height: 100px;
+    padding: 10px;
+    margin-left: 5px;
+    border: 1px solid #D9D9D9;
+}
+
+/* Custom styles for all app scroll bars */
+
+::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+}
+
+::-webkit-scrollbar-button {
+    width: 0;
+    height: 0;
+    display: none;
+}
+
+::-webkit-scrollbar-corner {
+    background-color: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background-color: rgba(0,0,0,0.1);
+}
+
 /* Special fix to make Kibana search bar similar to the rest from the app */
 
 .kuiLocalSearchInput,
