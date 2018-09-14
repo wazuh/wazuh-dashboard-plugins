@@ -2,6 +2,23 @@
 
 All notable changes to the Wazuh app project will be documented in this file.
 
+## Wazuh v3.6.1 - Kibana v6.4.0 - Revision 411
+
+### Added
+
+-   Redesigned the _Overview > Integrity monitoring_ tab, using more meaningful visualizations for a better overall view of your agents' status ([#893](https://github.com/wazuh/wazuh-kibana-app/pull/893)).
+-   Added a new table for the _Inventory_ tab: _Processes_ ([#895](https://github.com/wazuh/wazuh-kibana-app/pull/895)).
+-   Improved error handling for tables. Now the table will show an error message if it wasn't able to fetch and load data ([#896](https://github.com/wazuh/wazuh-kibana-app/pull/896)).
+
+### Changed
+
+-   The app source code has been improved, following best practices and coding guidelines ([#892](https://github.com/wazuh/wazuh-kibana-app/pull/892)).
+-   Included more app tests and prettifier for better code maintainability ([#883](https://github.com/wazuh/wazuh-kibana-app/pull/883) & [#885](https://github.com/wazuh/wazuh-kibana-app/pull/885)).
+
+### Fixed
+
+-   Fixed minor visual errors on some _GDPR_, _PCI DSS_ and _Vulnerabilities_ visualizations ([#894](https://github.com/wazuh/wazuh-kibana-app/pull/894)).
+
 ## Wazuh v3.6.1 - Kibana v6.4.0 - Revision 410
 
 ### Added
