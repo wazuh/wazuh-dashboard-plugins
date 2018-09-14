@@ -61,5 +61,7 @@ export const KeyEquivalenece = {
   address: 'Address',
   protocol: 'Protocol',
   'local.ip': 'Local',
-  'remote.ip': 'Remote'
+  'remote.ip': 'Remote',
+  euser: 'Effective user',
+  nice: 'Priority'
 };
