@@ -126,5 +126,5 @@ export function log(location, message, level) {
       console.error(
         `Cannot create the logs directory due to:\n${error.message || error}`
       )
-    ); 
+    );
 }

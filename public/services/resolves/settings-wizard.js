@@ -87,7 +87,7 @@ export default (
       try {
         currentApi = JSON.parse(appState.getCurrentAPI()).id;
       } catch (error) {
-        // eslint-disable-next-line 
+        // eslint-disable-next-line
         console.log(`Error parsing JSON (settingsWizards.changeCurrentApi)`);
       }
       const clusterInfo = data.data.data.cluster_info;
