@@ -9,7 +9,7 @@
  *
  * Find more information about this on the LICENSE file.
  */
-export default async (genericReq, errorHandler) => {
+export async function totalRAM(genericReq, errorHandler) {
   try {
     const data = await genericReq.request('GET', '/api/wazuh-api/ram');
     const totalRAM = data.data.ram;
@@ -32,4 +32,4 @@ export default async (genericReq, errorHandler) => {
       true
     );
   }
-};
+}

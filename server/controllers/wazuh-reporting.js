@@ -11,7 +11,7 @@
  */
 import path from 'path';
 import fs from 'fs';
-import descriptions from '../reporting/tab-description';
+import { TabDescription as descriptions } from '../reporting/tab-description';
 import * as TimSort from 'timsort';
 import rawParser from '../reporting/raw-parser';
 import PdfPrinter from 'pdfmake/src/printer';

@@ -9,17 +9,32 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import './error-handler';
+import { ErrorHandler } from './error-handler';
 import './theming';
-import './api-request';
-import './generic-request';
-import './app-state';
-import './api-tester';
-import './pattern-handler';
+import { ApiRequest } from './api-request';
+import { GenericRequest } from './generic-request';
+import { AppState } from './app-state';
+import { ApiTester } from './api-tester';
+import { PatternHandler } from './pattern-handler';
 import './routes';
-import './csv-request';
-import './common-data';
-import './reporting';
-import './vis-factory-handler';
+import { CSVRequest } from './csv-request';
+import { CommonData } from './common-data';
+import { ReportingService } from './reporting';
+import { VisFactoryService } from './vis-factory-handler';
 import './region-maps';
 import './order-object-by';
+import { uiModules } from 'ui/modules';
+
+const app = uiModules.get('app/wazuh', []);
+
+app
+  .service('errorHandler', ErrorHandler)
+  .service('apiReq', ApiRequest)
+  .service('genericReq', GenericRequest)
+  .service('appState', AppState)
+  .service('testAPI', ApiTester)
+  .service('patternHandler', PatternHandler)
+  .service('csvReq', CSVRequest)
+  .service('commonData', CommonData)
+  .service('reportingService', ReportingService)
+  .service('visFactoryService', VisFactoryService);

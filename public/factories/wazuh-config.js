@@ -9,11 +9,7 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import { uiModules } from 'ui/modules';
-
-const app = uiModules.get('app/wazuh', []);
-
-class WazuhConfig {
+export class WazuhConfig {
   constructor() {
     this.config = {};
   }
@@ -26,5 +22,3 @@ class WazuhConfig {
     return this.config;
   }
 }
-
-app.service('wazuhConfig', WazuhConfig);

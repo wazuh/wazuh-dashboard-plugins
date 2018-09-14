@@ -10,11 +10,7 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import { uiModules } from 'ui/modules';
-
-const app = uiModules.get('app/wazuh', []);
-
-class WzMisc {
+export class WzMisc {
   constructor() {
     this.state = {
       apiIsDown: false,
@@ -56,5 +52,3 @@ class WzMisc {
     return this.state.lastRestart;
   }
 }
-
-app.service('wzMisc', WzMisc);

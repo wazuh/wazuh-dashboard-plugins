@@ -9,11 +9,7 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import { uiModules } from 'ui/modules';
-
-const app = uiModules.get('app/wazuh', []);
-
-class AppState {
+export class AppState {
   constructor($cookies, $window) {
     this.$cookies = $cookies;
     this.$window = $window;
@@ -112,5 +108,3 @@ class AppState {
     return this.$window.localStorage.getItem('currentDevTools');
   }
 }
-
-app.service('appState', AppState);

@@ -9,12 +9,10 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import { uiModules } from 'ui/modules';
+
 import domtoimage from 'dom-to-image';
 
-const app = uiModules.get('app/wazuh', []);
-
-class Vis2PNG {
+export class Vis2PNG {
   constructor($rootScope) {
     this.$rootScope = $rootScope;
     this.rawArray = [];
@@ -69,5 +67,3 @@ class Vis2PNG {
     this.htmlObject[id] = content;
   }
 }
-
-app.service('vis2png', Vis2PNG);

@@ -8,33 +8,9 @@ const headers = {
 };
 
 let API_ID = null;
-let API_PORT = null;
-let API_URL = null;
-let API_USER = null;
-
-const EXAMPLE_API = {};
 
 describe('wazuh-api-elastic', () => {
-  /*
 
-    // Save the given API into elasticsearch
-    server.route({ method: 'PUT', path: '/api/wazuh-api/settings', handler: (req,reply) => ctrl.saveAPI(req,reply) });
-
-    // Update the given API into elasticsearch
-    server.route({ method: 'PUT', path: '/api/wazuh-api/update-settings', handler: (req,reply) => ctrl.updateFullAPI(req,reply) });
-
-    // Get Wazuh-API entries list (Multimanager) from elasticsearch index
-    server.route({ method: 'GET', path: '/api/wazuh-api/apiEntries', handler: (req,reply) => ctrl.getAPIEntries(req,reply) });
-
-    // Delete Wazuh-API entry (multimanager) from elasticsearch index
-    server.route({ method: 'DELETE', path: '/api/wazuh-api/apiEntries/{id}', handler: (req,reply) => ctrl.deleteAPIEntries(req,reply) });
-
-    // Set Wazuh-API as default (multimanager) on elasticsearch index
-    server.route({ method: 'PUT', path: '/api/wazuh-api/apiEntries/{id}', handler: (req,reply) => ctrl.setAPIEntryDefault(req,reply) });
-
-    // Update the API hostname
-    server.route({ method: 'PUT', path: '/api/wazuh-api/updateApiHostname/{id}', handler: (req,reply) => ctrl.updateAPIHostname(req,reply) });
-    */
   before(async () => {
     const res = await needle(
       'get',
@@ -43,13 +19,12 @@ describe('wazuh-api-elastic', () => {
       {}
     );
     if (!res.body || !res.body.length) {
+      /* eslint-disable */
       console.log('There are no APIs stored in Elasticsearch, exiting...');
       process.exit(1);
+      /* eslint-enable */
     }
     API_ID = res.body[0]._id;
-    API_URL = res.body[0]._source.url;
-    API_PORT = res.body[0]._source.api_port;
-    API_USER = res.body[0]._source.api_user;
   });
 
   it('PUT /api/wazuh-api/settings', async () => {
@@ -155,16 +130,12 @@ describe('wazuh-api-elastic', () => {
     res.body.result.should.be.eql('deleted');
   });
 
-  it('PUT /api/wazuh-api/apiEntries/{id}', async () => {
-    const res = await needle(
-      'put',
-      `localhost:5601/api/wazuh-api/apiEntries/${API_ID}`,
-      {},
-      headers
-    );
-    res.body.statusCode.should.be.eql(200);
-    res.body.message.should.be.eql('ok');
-  });
+  /*it('PUT /api/wazuh-api/apiEntries/{id}', async () => {
+        const res = await needle('put', `localhost:5601/api/wazuh-api/apiEntries/${API_ID}`, {}, headers);
+        console.log(res.body)
+        res.body.statusCode.should.be.eql(200)
+        res.body.message.should.be.eql('ok')
+    })*/
 
   it('PUT /api/wazuh-api/updateApiHostname/{id}', async () => {
     const res = await needle(

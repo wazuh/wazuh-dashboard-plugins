@@ -9,11 +9,7 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import { uiModules } from 'ui/modules';
-
-const app = uiModules.get('app/wazuh', []);
-
-class PatternHandler {
+export class PatternHandler {
   constructor($location, genericReq, appState, errorHandler, wzMisc) {
     this.$location = $location;
     this.genericReq = genericReq;
@@ -63,5 +59,3 @@ class PatternHandler {
     return;
   }
 }
-
-app.service('patternHandler', PatternHandler);

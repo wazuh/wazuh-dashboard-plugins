@@ -11,7 +11,7 @@
  */
 import $ from 'jquery';
 
-export default id => {
+export function generateMetric(id) {
   const html = $(id).html();
 
   // New Kibana structure
@@ -46,4 +46,4 @@ export default id => {
     }
   }
   return '';
-};
+}
