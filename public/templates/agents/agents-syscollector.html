@@ -61,7 +61,7 @@
                 <span class="wz-headline-title"><i class="fa fa-fw fa-exchange"></i> Network ports</span>
                 <span class="color-grey pull-right">Last scan: {{syscollector.ports.items[0].scan.time}}</span>
                 <md-divider class="wz-margin-top-10"></md-divider>
-                <wz-table flex path="'/syscollector/' + agent.id + '/ports'" row-sizes="[4]" keys="[{value:'local.ip',nosortable:true},'remote.ip','state','protocol']">
+                <wz-table flex path="'/syscollector/' + agent.id + '/ports'" row-sizes="[4]" keys="[{value:'local.ip',nosortable:true},{value:'remote.ip',nosortable:true},'state','protocol']">
                 </wz-table>
             </md-card-content>
         </md-card>
