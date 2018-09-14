@@ -20,13 +20,6 @@ const metricsGeneral = {
     '[vis-id="\'Wazuh-App-Overview-General-Authentication-success\'"]'
 };
 
-// Metrics FIM
-const metricsFim = {
-  fimAdded: '[vis-id="\'Wazuh-App-Overview-FIM-Added\'"]',
-  fimModified: '[vis-id="\'Wazuh-App-Overview-FIM-Modified\'"]',
-  fimDeleted: '[vis-id="\'Wazuh-App-Overview-FIM-Deleted\'"]'
-};
-
 // Metrics Audit
 const metricsAudit = {
   auditNewFiles: '[vis-id="\'Wazuh-App-Overview-Audit-New-files\'"]',
@@ -86,8 +79,7 @@ const metricsAws = {
 };
 
 export default {
-  metricsGeneral,
-  metricsFim,
+  metricsGeneral,  
   metricsAudit,
   metricsVulnerability,
   metricsScap,

@@ -16,8 +16,7 @@ import { TabNames } from '../../utils/tab-names';
 import { TabDescription } from '../../../server/reporting/tab-description';
 
 import {
-  metricsGeneral,
-  metricsFim,
+  metricsGeneral,  
   metricsAudit,
   metricsVulnerability,
   metricsScap,
@@ -85,9 +84,6 @@ app.controller('overviewController', function(
       switch (tab) {
         case 'general':
           createMetrics(metricsGeneral);
-          break;
-        case 'fim':
-          createMetrics(metricsFim);
           break;
         case 'audit':
           createMetrics(metricsAudit);
