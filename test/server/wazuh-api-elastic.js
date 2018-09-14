@@ -10,7 +10,6 @@ const headers = {
 let API_ID = null;
 
 describe('wazuh-api-elastic', () => {
-
   before(async () => {
     const res = await needle(
       'get',

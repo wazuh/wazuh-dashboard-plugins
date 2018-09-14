@@ -10,13 +10,13 @@
  * Find more information about this on the LICENSE file.
  */
 export default {
-    R: 'running',          
-    S: 'sleeping',         
-    D: 'disk sleep',       
-    T: 'stopped',         
-    t: 'tracing stop',     
-    X: 'dead',             
-    Z: 'zombie',           
-    P: 'parked',           
-    I: 'idle'
-}
+  R: 'running',
+  S: 'sleeping',
+  D: 'disk sleep',
+  T: 'stopped',
+  t: 'tracing stop',
+  X: 'dead',
+  Z: 'zombie',
+  P: 'parked',
+  I: 'idle'
+};

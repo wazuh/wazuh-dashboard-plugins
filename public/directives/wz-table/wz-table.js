@@ -209,7 +209,8 @@ app
             }
           } catch (error) {
             $scope.wazuh_table_loading = false;
-            $scope.error = `Error paginating table - ${error.message || error} - Please refresh your browser.`
+            $scope.error = `Error paginating table - ${error.message ||
+              error} - Please refresh your browser.`;
             errorHandler.handle(
               `Error paginating table due to ${error.message || error}`,
               'Data factory'
@@ -245,7 +246,7 @@ app
             $scope.wazuh_table_loading = false;
             $scope.error = `Error sorting table by ${
               field ? field.value : 'undefined'
-            } - ${error.message || error} - Please refresh your browser.`
+            } - ${error.message || error} - Please refresh your browser.`;
             errorHandler.handle(
               `Error sorting table by ${
                 field ? field.value : 'undefined'
@@ -268,7 +269,8 @@ app
             if (!$scope.$$phase) $scope.$digest();
           } catch (error) {
             $scope.wazuh_table_loading = false;
-            $scope.error = `Error searching - ${error.message || error} - Please refresh your browser.`;
+            $scope.error = `Error searching - ${error.message ||
+              error} - Please refresh your browser.`;
             errorHandler.handle(
               `Error searching. ${error.message || error}`,
               'Data factory'
@@ -297,7 +299,7 @@ app
             $scope.wazuh_table_loading = false;
             $scope.error = `Error filtering by ${
               filter ? filter.value : 'undefined'
-            } - ${error.message || error} - Please refresh your browser.`
+            } - ${error.message || error} - Please refresh your browser.`;
             errorHandler.handle(
               `Error filtering by ${
                 filter ? filter.value : 'undefined'
@@ -347,7 +349,8 @@ app
             }
           } catch (error) {
             realTime = false;
-            $scope.error = `Real time feature aborted - ${error.message || error} - Please refresh your browser.`
+            $scope.error = `Real time feature aborted - ${error.message ||
+              error} - Please refresh your browser.`;
             errorHandler.handle(
               `Real time feature aborted. ${error.message || error}`,
               'Data factory'
@@ -383,7 +386,8 @@ app
             if (!$scope.$$phase) $scope.$digest();
           } catch (error) {
             $scope.wazuh_table_loading = false;
-            $scope.error = `Error while init table - ${error.message || error} - Please refresh your browser.`
+            $scope.error = `Error while init table - ${error.message ||
+              error} - Please refresh your browser.`;
             errorHandler.handle(
               `Error while init table. ${error.message || error}`,
               'Data factory'
@@ -415,8 +419,8 @@ app
         });
 
         $scope.nonDecoderValue = (key, item) => {
-          if(key === 'state' && instance.path.includes('processes')){
-            return ProcessEquivalence[item.state] || 'Unknown'
+          if (key === 'state' && instance.path.includes('processes')) {
+            return ProcessEquivalence[item.state] || 'Unknown';
           }
           return key.value === 'local.ip'
             ? (item.local && item.local.ip
