@@ -9,11 +9,7 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import { uiModules } from 'ui/modules';
-
-const app = uiModules.get('app/wazuh', []);
-
-class VisFactoryService {
+export class VisFactoryService {
   constructor(
     $rootScope,
     appState,
@@ -80,5 +76,3 @@ class VisFactoryService {
     }
   }
 }
-
-app.service('visFactoryService', VisFactoryService);

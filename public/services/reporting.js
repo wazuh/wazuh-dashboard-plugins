@@ -9,12 +9,10 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import { uiModules } from 'ui/modules';
+
 import $ from 'jquery';
 
-const app = uiModules.get('app/wazuh', []);
-
-class ReportingService {
+export class ReportingService {
   constructor(
     $rootScope,
     vis2png,
@@ -94,5 +92,3 @@ class ReportingService {
     }
   }
 }
-
-app.service('reportingService', ReportingService);

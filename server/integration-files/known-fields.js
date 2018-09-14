@@ -10,7 +10,7 @@
  * Find more information about this on the LICENSE file.
  */
 
-export default [
+export const knownFields = [
   {
     name: '@timestamp',
     type: 'date',

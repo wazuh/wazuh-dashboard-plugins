@@ -20,10 +20,14 @@ describe('wazuh-api', () => {
       {},
       {}
     );
+
+    /* eslint-disable */
     if (!res.body || !res.body.length) {
       console.log('There are no APIs stored in Elasticsearch, exiting...');
       process.exit(1);
     }
+    /* eslint-enable */
+
     API_ID = res.body[0]._id;
     API_URL = res.body[0]._source.url;
     API_PORT = res.body[0]._source.api_port;

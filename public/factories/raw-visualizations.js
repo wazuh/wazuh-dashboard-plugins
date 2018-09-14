@@ -9,11 +9,7 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import { uiModules } from 'ui/modules';
-
-const app = uiModules.get('app/wazuh', []);
-
-class RawVisualizations {
+export class RawVisualizations {
   constructor() {
     this.list = [];
   }
@@ -34,5 +30,3 @@ class RawVisualizations {
     this.list = [];
   }
 }
-
-app.service('rawVisualizations', RawVisualizations);

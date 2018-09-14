@@ -10,7 +10,7 @@
  * Find more information about this on the LICENSE file.
  */
 
-export default async ($q, genericReq, errorHandler, wazuhConfig) => {
+export async function getWzConfig($q, genericReq, errorHandler, wazuhConfig) {
   // Remember to keep this values equal to default config.yml values
   const defaultConfig = {
     pattern: 'wazuh-alerts-3.x-*',
@@ -68,4 +68,4 @@ export default async ($q, genericReq, errorHandler, wazuhConfig) => {
   }
 
   return $q.resolve();
-};
+}

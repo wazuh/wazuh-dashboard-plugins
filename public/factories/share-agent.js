@@ -10,11 +10,7 @@
 *
 * Find more information about this on the LICENSE file.
 */
-import { uiModules } from 'ui/modules';
-
-const app = uiModules.get('app/wazuh', []);
-
-class ShareAgent {
+export class ShareAgent {
   constructor() {
     this.agent = null;
   }
@@ -31,5 +27,3 @@ class ShareAgent {
     this.agent = null;
   }
 }
-
-app.service('shareAgent', ShareAgent);

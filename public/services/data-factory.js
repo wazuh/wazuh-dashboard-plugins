@@ -10,7 +10,7 @@
  * Find more information about this on the LICENSE file.
  */
 
-export default class DataFactory {
+export class DataFactory {
   constructor(httpClient, path, implicitFilter) {
     this.implicitFilter = implicitFilter || false;
     this.httpClient = httpClient;

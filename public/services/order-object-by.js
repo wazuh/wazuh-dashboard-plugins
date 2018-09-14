@@ -16,7 +16,9 @@
 'use strict';
 import { uiModules } from 'ui/modules';
 
-uiModules.get('app/wazuh', []).filter('orderObjectBy', function() {
+const app = uiModules.get('app/wazuh', []);
+
+app.filter('orderObjectBy', function() {
   return function(items, field, reverse) {
     if (!items) return [];
 

@@ -10,7 +10,7 @@
  * Find more information about this on the LICENSE file.
  */
 import { ElasticWrapper } from '../lib/elastic-wrapper';
-import Base from './base-query';
+import { Base } from './base-query';
 
 export class GdprRequest {
   /**

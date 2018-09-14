@@ -19,8 +19,10 @@ describe('wazuh-api-elastic', () => {
       {}
     );
     if (!res.body || !res.body.length) {
+      /* eslint-disable */
       console.log('There are no APIs stored in Elasticsearch, exiting...');
       process.exit(1);
+      /* eslint-enable */
     }
     API_ID = res.body[0]._id;
   });

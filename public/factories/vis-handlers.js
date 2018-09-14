@@ -10,11 +10,9 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import { uiModules } from 'ui/modules';
 import dateMath from '@kbn/datemath';
-const app = uiModules.get('app/wazuh', []);
 
-class VisHandlers {
+export class VisHandlers {
   constructor() {
     this.list = [];
   }
@@ -110,5 +108,3 @@ class VisHandlers {
     this.list = [];
   }
 }
-
-app.service('visHandlers', VisHandlers);

@@ -9,9 +9,9 @@
  *
  * Find more information about this on the LICENSE file.
  */
-export default (windowHeight, sizes) => {
+export function calcTableRows(windowHeight, sizes) {
   if (windowHeight >= 950) return sizes[0];
   if (windowHeight >= 850 && windowHeight < 950) return sizes[1];
   if (windowHeight >= 750 && windowHeight < 850) return sizes[2];
   return sizes.length === 4 ? sizes[3] : 8;
-};
+}

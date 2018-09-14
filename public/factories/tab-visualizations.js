@@ -10,11 +10,7 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import { uiModules } from 'ui/modules';
-
-const app = uiModules.get('app/wazuh', []);
-
-class TabVisualizations {
+export class TabVisualizations {
   constructor() {
     this.agents = {
       welcome: 0,
@@ -75,5 +71,3 @@ class TabVisualizations {
     this.tabVisualizations = {};
   }
 }
-
-app.service('tabVisualizations', TabVisualizations);

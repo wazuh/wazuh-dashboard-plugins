@@ -12,9 +12,9 @@
 
 import template from './wz-table.html';
 import { uiModules } from 'ui/modules';
-import DataFactory from '../../services/data-factory';
-import KeyEquivalenece from '../../../util/csv-key-equivalence';
-import CheckRows from './wz-table-rows';
+import { DataFactory } from '../../services/data-factory';
+import { KeyEquivalenece } from '../../../util/csv-key-equivalence';
+import { calcTableRows } from './wz-table-rows';
 import { FilterHandler } from '../../utils/filter-handler';
 const app = uiModules.get('app/wazuh', []);
 
@@ -50,12 +50,12 @@ app
         $window.onresize = () => {
           clearTimeout(doit);
           doit = setTimeout(() => {
-            $scope.rowsPerPage = CheckRows($window.innerHeight, rowSizes);
+            $scope.rowsPerPage = calcTableRows($window.innerHeight, rowSizes);
             $scope.itemsPerPage = $scope.rowsPerPage;
             init();
           }, 150);
         };
-        $scope.rowsPerPage = CheckRows($window.innerHeight, rowSizes);
+        $scope.rowsPerPage = calcTableRows($window.innerHeight, rowSizes);
 
         $scope.keyEquivalence = KeyEquivalenece;
         $scope.totalItems = 0;

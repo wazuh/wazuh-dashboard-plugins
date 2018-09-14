@@ -9,7 +9,7 @@
  *
  * Find more information about this on the LICENSE file.
  */
-export default async (appState, genericReq, $location, wzMisc) => {
+export async function checkTimestamp(appState, genericReq, $location, wzMisc) {
   try {
     const data = await genericReq.request(
       'GET',
@@ -30,4 +30,4 @@ export default async (appState, genericReq, $location, wzMisc) => {
     $location.search('tab', null);
     $location.path('/blank-screen');
   }
-};
+}

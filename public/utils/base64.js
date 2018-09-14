@@ -1,4 +1,4 @@
-export default {
+export const base64 = {
   encode: text => {
     const textRegex = /([^\u0000-\u00ff])/; // eslint-disable-line
     if (textRegex.test(text)) {

@@ -10,11 +10,8 @@
  * Find more information about this on the LICENSE file.
  */
 import chrome from 'ui/chrome';
-import { uiModules } from 'ui/modules';
 
-const app = uiModules.get('app/wazuh', []);
-
-class GenericRequest {
+export class GenericRequest {
   constructor($q, $http, appState, wazuhConfig) {
     this.$q = $q;
     this.$http = $http;
@@ -83,5 +80,3 @@ class GenericRequest {
     }
   }
 }
-
-app.service('genericReq', GenericRequest);

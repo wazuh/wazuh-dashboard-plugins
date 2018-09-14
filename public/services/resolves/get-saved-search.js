@@ -9,16 +9,16 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import healthCheck from './health-check';
+import { healthCheck } from './health-check';
 import { recentlyAccessed } from 'ui/persisted_log';
-export default (
+export function getSavedSearch(
   redirectWhenMissing,
   $location,
   $window,
   $rootScope,
   savedSearches,
   $route
-) => {
+) {
   if (healthCheck($window, $rootScope)) {
     $location.path('/health-check');
     return Promise.reject();
@@ -45,4 +45,4 @@ export default (
         })
       );
   }
-};
+}

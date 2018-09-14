@@ -9,11 +9,7 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import { uiModules } from 'ui/modules';
-
-const app = uiModules.get('app/wazuh', []);
-
-class CSVRequest {
+export class CSVRequest {
   /**
    * Constructor
    * @param {*} genericReq Service to make requests to our server
@@ -41,5 +37,3 @@ class CSVRequest {
     }
   }
 }
-
-app.service('csvReq', CSVRequest);
