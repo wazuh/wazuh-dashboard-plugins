@@ -4857,7 +4857,7 @@ export const knownFields = [
     readFromDocValues: true
   },
   {
-    name: 'syscheck.audit.proccess.id',
+    name: 'syscheck.audit.process.id',
     type: 'string',
     count: 0,
     scripted: false,
@@ -4893,7 +4893,7 @@ export const knownFields = [
     readFromDocValues: true
   },
   {
-    name: 'syscheck.audit.proccess.name',
+    name: 'syscheck.audit.process.name',
     type: 'string',
     count: 0,
     scripted: false,
@@ -4902,7 +4902,7 @@ export const knownFields = [
     readFromDocValues: true
   },
   {
-    name: 'syscheck.audit.proccess.ppid',
+    name: 'syscheck.audit.process.ppid',
     type: 'string',
     count: 0,
     scripted: false,
