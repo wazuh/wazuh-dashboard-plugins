@@ -67,10 +67,6 @@ class AgentsController {
     this.filterHandler = new FilterHandler(this.appState.getCurrentPattern());
     this.visFactoryService.clearAll();
 
-    const currentApi = JSON.parse(this.appState.getCurrentAPI()).id;
-    const extensions = this.appState.getExtensions(currentApi);
-    this.$scope.extensions = extensions;
-
     this.$scope.tabView = this.commonData.checkTabViewLocation();
     this.$scope.tab = this.commonData.checkTabLocation();
 

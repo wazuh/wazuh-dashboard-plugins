@@ -22,8 +22,7 @@ export function settingsWizard(
   appState,
   genericReq,
   errorHandler,
-  wzMisc,
-  wazuhConfig
+  wzMisc
 ) {
   try {
     const deferred = $q.defer();
@@ -103,8 +102,6 @@ export function settingsWizard(
     };
 
     const callCheckStored = () => {
-      const config = wazuhConfig.getConfig();
-
       let currentApi = false;
 
       try {
@@ -112,19 +109,6 @@ export function settingsWizard(
       } catch (error) {
         // eslint-disable-next-line
         console.log(`Error parsing JSON (settingsWizards.callCheckStored 1)`);
-      }
-
-      if (currentApi && !appState.getExtensions(currentApi)) {
-        const extensions = {
-          audit: config['extensions.audit'],
-          pci: config['extensions.pci'],
-          gdpr: config['extensions.gdpr'],
-          oscap: config['extensions.oscap'],
-          ciscat: config['extensions.ciscat'],
-          aws: config['extensions.aws'],
-          virustotal: config['extensions.virustotal']
-        };
-        appState.setExtensions(currentApi, extensions);
       }
 
       checkTimestamp(appState, genericReq, $location, wzMisc)
