@@ -10,26 +10,20 @@
 *
 * Find more information about this on the LICENSE file.
 */
-import { uiModules } from 'ui/modules'
+export class ShareAgent {
+  constructor() {
+    this.agent = null;
+  }
 
-const app = uiModules.get('app/wazuh', []);
+  getAgent() {
+    return this.agent;
+  }
 
-class ShareAgent {
-    constructor(){
-        this.agent = null;
-    }
+  setAgent(ag) {
+    this.agent = ag;
+  }
 
-    getAgent() {
-        return this.agent;
-    }
-
-    setAgent (ag) {
-        this.agent = ag;
-    }
-
-    deleteAgent() {
-        this.agent = null;
-    }
+  deleteAgent() {
+    this.agent = null;
+  }
 }
-
-app.service('shareAgent', ShareAgent);

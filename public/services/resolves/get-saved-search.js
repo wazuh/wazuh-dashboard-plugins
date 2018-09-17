@@ -9,27 +9,40 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import healthCheck from './health-check';
+import { healthCheck } from './health-check';
 import { recentlyAccessed } from 'ui/persisted_log';
-export default (redirectWhenMissing, $location, $window, $rootScope, savedSearches, $route) => {
-    if (healthCheck($window, $rootScope)) {
-        $location.path('/health-check');
-        return Promise.reject();
-    } else {
-        const savedSearchId = $route.current.params.id;
-        return savedSearches.get(savedSearchId)
-          .then((savedSearch) => {
-            if (savedSearchId) {
-              recentlyAccessed.add(
-                savedSearch.getFullPath(),
-                savedSearch.title,
-                savedSearchId);
-            }
-            return savedSearch;
-          })
-          .catch(redirectWhenMissing({
-            'search': '/discover',
-            'index-pattern': '/management/kibana/objects/savedSearches/' + $route.current.params.id
-          }));
-    }
-};
+export function getSavedSearch(
+  redirectWhenMissing,
+  $location,
+  $window,
+  $rootScope,
+  savedSearches,
+  $route
+) {
+  if (healthCheck($window, $rootScope)) {
+    $location.path('/health-check');
+    return Promise.reject();
+  } else {
+    const savedSearchId = $route.current.params.id;
+    return savedSearches
+      .get(savedSearchId)
+      .then(savedSearch => {
+        if (savedSearchId) {
+          recentlyAccessed.add(
+            savedSearch.getFullPath(),
+            savedSearch.title,
+            savedSearchId
+          );
+        }
+        return savedSearch;
+      })
+      .catch(
+        redirectWhenMissing({
+          search: '/discover',
+          'index-pattern':
+            '/management/kibana/objects/savedSearches/' +
+            $route.current.params.id
+        })
+      );
+  }
+}

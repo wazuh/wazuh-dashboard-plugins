@@ -4,13 +4,15 @@
 import { uiModules } from 'ui/modules';
 import discoverTemplate from '../templates/kibana-template/kibana-discover-template.html';
 
-uiModules.get('app/wazuh', [  'kibana/courier']).directive('kbnDis', [function() {
+uiModules.get('app/wazuh', ['kibana/courier']).directive('kbnDis', [
+  function() {
     return {
-        restrict: 'E',
-        scope: {},
-        template: discoverTemplate
+      restrict: 'E',
+      scope: {},
+      template: discoverTemplate
     };
-}]);
+  }
+]);
 
 // Added dependencies (from Kibana module)
 import 'ui/pager';
@@ -45,7 +47,6 @@ import 'ui/pager';
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-
 import _ from 'lodash';
 import angular from 'angular';
 import { getSort } from 'ui/doc_table/lib/get_sort';
@@ -62,7 +63,10 @@ import 'ui/state_management/app_state';
 import { timefilter } from 'ui/timefilter';
 import 'ui/share';
 import 'ui/query_bar';
-import { hasSearchStategyForIndexPattern, isDefaultTypeIndexPattern } from 'ui/courier';
+import {
+  hasSearchStategyForIndexPattern,
+  isDefaultTypeIndexPattern
+} from 'ui/courier';
 import { toastNotifications, getPainlessError } from 'ui/notify';
 import { VisProvider } from 'ui/vis';
 import { BasicResponseHandlerProvider } from 'ui/vis/response_handlers/basic';
@@ -85,7 +89,7 @@ const app = uiModules.get('apps/discover', [
   'app/wazuh'
 ]);
 
-app.directive('discoverAppW', function () {
+app.directive('discoverAppW', function() {
   return {
     restrict: 'E',
     controllerAs: 'discoverApp',
@@ -115,7 +119,6 @@ function discoverController(
   loadedVisualizations,
   discoverPendingUpdates
 ) {
-
   const Vis = Private(VisProvider);
   const docTitle = Private(DocTitleProvider);
   const HitSortFn = Private(PluginsKibanaDiscoverHitSortFnProvider);
@@ -133,16 +136,15 @@ function discoverController(
     let wzInterval = false;
     try {
       const from = dateMath.parse(timefilter.getTime().from);
-      const to   = dateMath.parse(timefilter.getTime().to);
-      
+      const to = dateMath.parse(timefilter.getTime().to);
+
       const totalSeconds = (to - from) / 1000;
-      if(totalSeconds <= 3600 )                                 wzInterval = 'm';
-      else if(totalSeconds > 3600 && totalSeconds <= 86400)     wzInterval = 'h';
-      else if(totalSeconds > 86400 && totalSeconds <= 604800)   wzInterval = 'd';
-      else if(totalSeconds > 604800 && totalSeconds <= 2419200) wzInterval = 'w';
-      else                                                      wzInterval = 'M';
-
-
+      if (totalSeconds <= 3600) wzInterval = 'm';
+      else if (totalSeconds > 3600 && totalSeconds <= 86400) wzInterval = 'h';
+      else if (totalSeconds > 86400 && totalSeconds <= 604800) wzInterval = 'd';
+      else if (totalSeconds > 604800 && totalSeconds <= 2419200)
+        wzInterval = 'w';
+      else wzInterval = 'M';
     } catch (error) {} // eslint-disable-line
 
     return wzInterval;
@@ -194,23 +196,24 @@ function discoverController(
   $scope.showInterval = false;
   $scope.minimumVisibleRows = 50;
 
-  $scope.intervalEnabled = function (interval) {
+  $scope.intervalEnabled = function(interval) {
     return interval.val !== 'custom';
   };
 
   $scope.topNavMenu = [];
 
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////       WAZUH             //////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  //////////////////////////////////////       WAZUH             //////////////////////////////////////////////////////////////
+  /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-$scope.toggleRefresh = () => {
-  $scope.timefilter.refreshInterval.pause = !$scope.timefilter.refreshInterval.pause;
-};
+  $scope.toggleRefresh = () => {
+    $scope.timefilter.refreshInterval.pause = !$scope.timefilter.refreshInterval
+      .pause;
+  };
 
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
   // the saved savedSearch
   const savedSearch = $route.current.locals.savedSearch;
@@ -234,15 +237,16 @@ $scope.toggleRefresh = () => {
 
   $scope.searchSource.setParent(timeRangeSearchSource);
 
-  const pageTitleSuffix = savedSearch.id && savedSearch.title ? `: ${savedSearch.title}` : '';
+  const pageTitleSuffix =
+    savedSearch.id && savedSearch.title ? `: ${savedSearch.title}` : '';
   docTitle.change(`Discover${pageTitleSuffix}`);
 
   let stateMonitor;
-  const $appStatus = $scope.appStatus = this.appStatus = {
+  const $appStatus = ($scope.appStatus = this.appStatus = {
     dirty: !savedSearch.id
-  };
+  });
 
-  const $state = $scope.state = new AppState(getStateDefaults());
+  const $state = ($scope.state = new AppState(getStateDefaults()));
 
   const getFieldCounts = async () => {
     // the field counts aren't set until we have the data back,
@@ -252,7 +256,7 @@ $scope.toggleRefresh = () => {
     }
 
     return await new Promise(resolve => {
-      const unwatch = $scope.$watch('fetchStatus', (newValue) => {
+      const unwatch = $scope.$watch('fetchStatus', newValue => {
         if (newValue) {
           return;
         }
@@ -263,10 +267,9 @@ $scope.toggleRefresh = () => {
     });
   };
 
-
   const getSharingDataFields = async () => {
     const selectedFields = $state.columns;
-    if (selectedFields.length === 1 && selectedFields[0] ===  '_source') {
+    if (selectedFields.length === 1 && selectedFields[0] === '_source') {
       const fieldCounts = await getFieldCounts();
       return {
         searchFields: null,
@@ -275,7 +278,9 @@ $scope.toggleRefresh = () => {
     }
 
     const timeFieldName = $scope.indexPattern.timeFieldName;
-    const fields = timeFieldName ? [timeFieldName, ...selectedFields] : selectedFields;
+    const fields = timeFieldName
+      ? [timeFieldName, ...selectedFields]
+      : selectedFields;
     return {
       searchFields: fields,
       selectFields: fields
@@ -301,7 +306,9 @@ $scope.toggleRefresh = () => {
       },
       fields: selectFields,
       metaFields: $scope.indexPattern.metaFields,
-      conflictedTypesFields: $scope.indexPattern.fields.filter(f => f.type === 'conflict').map(f => f.name),
+      conflictedTypesFields: $scope.indexPattern.fields
+        .filter(f => f.type === 'conflict')
+        .map(f => f.name),
       indexPatternId: searchSource.getField('index').id
     };
   };
@@ -317,7 +324,6 @@ $scope.toggleRefresh = () => {
   $scope.uiState = $state.makeStateful('uiState');
 
   function getStateDefaults() {
-
     //////////////////////////////////////////////////////////
     //////////////////// WAZUH ///////////////////////////////
     /////////////////////////////////////////////////////////
@@ -325,14 +331,23 @@ $scope.toggleRefresh = () => {
     //////////////////////////////////////////////////////////
     //////////////////////////////////////////////////////////
     //////////////////////////////////////////////////////////
-    
-    
+
     return {
-      query: $scope.searchSource.getField('query') || { query: '', language: config.get('search:queryLanguage') },
-      sort: getSort.array(savedSearch.sort, $scope.indexPattern, config.get('discover:sort:defaultOrder')),
-      columns: savedSearch.columns.length > 0 ? savedSearch.columns : config.get('defaultColumns').slice(),
+      query: $scope.searchSource.getField('query') || {
+        query: '',
+        language: config.get('search:queryLanguage')
+      },
+      sort: getSort.array(
+        savedSearch.sort,
+        $scope.indexPattern,
+        config.get('discover:sort:defaultOrder')
+      ),
+      columns:
+        savedSearch.columns.length > 0
+          ? savedSearch.columns
+          : config.get('defaultColumns').slice(),
       index: $scope.indexPattern.id,
-      interval: wzInterval || 'h',  //// WAZUH /////
+      interval: wzInterval || 'h', //// WAZUH /////
       filters: _.cloneDeep($scope.searchSource.getOwnField('filter'))
     };
   }
@@ -341,13 +356,17 @@ $scope.toggleRefresh = () => {
   $state.sort = getSort.array($state.sort, $scope.indexPattern);
 
   $scope.getBucketIntervalToolTipText = () => {
-    return (
-      `This interval creates ${$scope.bucketInterval.scale > 1 ? 'buckets that are too large' : 'too many buckets'}
-      to show in the selected time range, so it has been scaled to ${$scope.bucketInterval.description }`
-    );
+    return `This interval creates ${
+      $scope.bucketInterval.scale > 1
+        ? 'buckets that are too large'
+        : 'too many buckets'
+    }
+      to show in the selected time range, so it has been scaled to ${
+        $scope.bucketInterval.description
+      }`;
   };
 
-  $scope.$watchCollection('state.columns', function () {
+  $scope.$watchCollection('state.columns', function() {
     $state.save();
   });
 
@@ -356,193 +375,199 @@ $scope.toggleRefresh = () => {
     sampleSize: config.get('discover:sampleSize'),
     timefield: $scope.indexPattern.timeFieldName,
     savedSearch: savedSearch,
-    indexPatternList: $route.current.locals.ip.list,
+    indexPatternList: $route.current.locals.ip.list
   };
 
-  const init = _.once(function () {
+  const init = _.once(function() {
     stateMonitor = stateMonitorFactory.create($state, getStateDefaults());
-    stateMonitor.onChange((status) => {
+    stateMonitor.onChange(status => {
       $appStatus.dirty = status.dirty || !savedSearch.id;
     });
     $scope.$on('$destroy', () => stateMonitor.destroy());
 
-    $scope.updateDataSource()
-      .then(function () {
-        $scope.$listen(timefilter, 'fetch', function () {
-          ////////////////////////////////////////////////
-          //               WAZUH                        //
-          ////////////////////////////////////////////////
-          $state.interval = calcWzInterval() || 'd';
-          ////////////////////////////////////////////////
-          ////////////////////////////////////////////////
-          ////////////////////////////////////////////////
-          
-          $scope.fetch();
-        });
+    $scope.updateDataSource().then(function() {
+      $scope.$listen(timefilter, 'fetch', function() {
+        ////////////////////////////////////////////////
+        //               WAZUH                        //
+        ////////////////////////////////////////////////
+        $state.interval = calcWzInterval() || 'd';
+        ////////////////////////////////////////////////
+        ////////////////////////////////////////////////
+        ////////////////////////////////////////////////
 
-        $scope.$watchCollection('state.sort', function (sort) {
-          if (!sort) return;
+        $scope.fetch();
+      });
 
-          // get the current sort from {key: val} to ["key", "val"];
-          // WAZUH: replaced _.pairs by Object.entries due to Lodash compatibility
-          const currentSort = Object.entries($scope.searchSource.getField('sort')).pop(); // eslint-disable-line
-          
-          // if the searchSource doesn't know, tell it so
-          if (!angular.equals(sort, currentSort)) $scope.fetch();
-        });
+      $scope.$watchCollection('state.sort', function(sort) {
+        if (!sort) return;
 
-        // update data source when filters update
-        $scope.$listen(queryFilter, 'update', function () {
-          return $scope.updateDataSource().then(function () {
-            
+        // get the current sort from {key: val} to ["key", "val"];
+        // WAZUH: replaced _.pairs by Object.entries due to Lodash compatibility
+        const currentSort = Object.entries(
+          $scope.searchSource.getField('sort')
+        ).pop(); // eslint-disable-line
+
+        // if the searchSource doesn't know, tell it so
+        if (!angular.equals(sort, currentSort)) $scope.fetch();
+      });
+
+      // update data source when filters update
+      $scope.$listen(queryFilter, 'update', function() {
+        return $scope
+          .updateDataSource()
+          .then(function() {
             ////////////////////////////////////////////////////////////////////////////
             ///////////////////////////////  WAZUH   ///////////////////////////////////
-            ////////////////////////////////////////////////////////////////////////////    
+            ////////////////////////////////////////////////////////////////////////////
             discoverPendingUpdates.removeAll();
-            discoverPendingUpdates.addItem($state.query,queryFilter.getFilters());
+            discoverPendingUpdates.addItem(
+              $state.query,
+              queryFilter.getFilters()
+            );
             $rootScope.$broadcast('updateVis');
             $rootScope.$broadcast('fetch');
-            if($location.search().tab != 'configuration') {
+            if ($location.search().tab != 'configuration') {
               loadedVisualizations.removeAll();
               $rootScope.rendered = false;
-              $rootScope.loadingStatus = "Fetching data...";
+              $rootScope.loadingStatus = 'Fetching data...';
             }
             ////////////////////////////////////////////////////////////////////////////
             ////////////////////////////////////////////////////////////////////////////
             ////////////////////////////////////////////////////////////////////////////
 
             $state.save();
-          }).catch(console.error); // eslint-disable-line
-        });
-
-        // update data source when hitting forward/back and the query changes
-        $scope.$listen($state, 'fetch_with_changes', function (diff) {
-          if (diff.indexOf('query') >= 0) $scope.fetch();
-        });
-
-        // fetch data when filters fire fetch event
-        $scope.$listen(queryFilter, 'fetch', $scope.fetch);
-
-        timefilter.enableAutoRefreshSelector();
-        $scope.$watch('opts.timefield', function (timefield) {
-          if (!!timefield) {
-            timefilter.enableTimeRangeSelector();
-          } else {
-            timefilter.disableTimeRangeSelector();
-          }
-        });
-
-        $scope.$watch('state.interval', function () {
-          $scope.fetch();
-        });
-
-        $scope.$watch('vis.aggs', function () {
-        // no timefield, no vis, nothing to update
-          if (!$scope.opts.timefield) return;
-          
-          const buckets = $scope.vis.getAggConfig().bySchemaGroup.buckets;
-
-          if (buckets && buckets.length === 1) {
-            $scope.bucketInterval = buckets[0].buckets.getInterval();
-          }
-        });
-
-        $scope.$watch('state.query', $scope.updateQueryAndFetch);
-
-        $scope.$watchMulti([
-          'rows',
-          'fetchStatus'
-        ], (function updateResultState() {
-            let prev = {};
-            const status = {
-              LOADING: 'loading', // initial data load
-              READY: 'ready', // results came back
-              NO_RESULTS: 'none' // no results came back
-            };
-
-            function pick(rows, oldRows, fetchStatus) {
-              // initial state, pretend we are loading
-              if (rows == null && oldRows == null) return status.LOADING;
-
-              const rowsEmpty = _.isEmpty(rows);
-              // An undefined fetchStatus means the requests are still being
-              // prepared to be sent. When all requests are completed,
-              // fetchStatus is set to null, so it's important that we
-              // specifically check for undefined to determine a loading status.
-              const preparingForFetch = _.isUndefined(fetchStatus);
-              if (preparingForFetch) return status.LOADING;
-              else if (rowsEmpty && fetchStatus) return status.LOADING;
-              else if (!rowsEmpty) return status.READY;
-              else return status.NO_RESULTS;
-            }
-
-            return function () {
-              const current = {
-                rows: $scope.rows,
-                fetchStatus: $scope.fetchStatus
-              };
-
-              $scope.resultState = pick(
-                current.rows,
-                prev.rows,
-                current.fetchStatus,
-                prev.fetchStatus
-              );
-
-              /////////////////////////////////////////////////////////////////
-              // Copying it to the rootScope to access it from the Wazuh App //
-              /////////////////////////////////////////////////////////////////
-              $rootScope.resultState = $scope.resultState;
-              /////////////////////////////////////////////////////////////////
-              /////////////////////////////////////////////////////////////////
-              /////////////////////////////////////////////////////////////////
-
-              prev = current;
-            };
-          }()));
-
-        if ($scope.opts.timefield) {
-          setupVisualization();
-          $scope.updateTime();
-        }
-
-        init.complete = true;
-        $state.replace();
+          })
+          .catch(console.error); // eslint-disable-line
       });
+
+      // update data source when hitting forward/back and the query changes
+      $scope.$listen($state, 'fetch_with_changes', function(diff) {
+        if (diff.indexOf('query') >= 0) $scope.fetch();
+      });
+
+      // fetch data when filters fire fetch event
+      $scope.$listen(queryFilter, 'fetch', $scope.fetch);
+
+      timefilter.enableAutoRefreshSelector();
+      $scope.$watch('opts.timefield', function(timefield) {
+        if (!!timefield) {
+          timefilter.enableTimeRangeSelector();
+        } else {
+          timefilter.disableTimeRangeSelector();
+        }
+      });
+
+      $scope.$watch('state.interval', function() {
+        $scope.fetch();
+      });
+
+      $scope.$watch('vis.aggs', function() {
+        // no timefield, no vis, nothing to update
+        if (!$scope.opts.timefield) return;
+
+        const buckets = $scope.vis.getAggConfig().bySchemaGroup.buckets;
+
+        if (buckets && buckets.length === 1) {
+          $scope.bucketInterval = buckets[0].buckets.getInterval();
+        }
+      });
+
+      $scope.$watch('state.query', $scope.updateQueryAndFetch);
+
+      $scope.$watchMulti(
+        ['rows', 'fetchStatus'],
+        (function updateResultState() {
+          let prev = {};
+          const status = {
+            LOADING: 'loading', // initial data load
+            READY: 'ready', // results came back
+            NO_RESULTS: 'none' // no results came back
+          };
+
+          function pick(rows, oldRows, fetchStatus) {
+            // initial state, pretend we are loading
+            if (rows == null && oldRows == null) return status.LOADING;
+
+            const rowsEmpty = _.isEmpty(rows);
+            // An undefined fetchStatus means the requests are still being
+            // prepared to be sent. When all requests are completed,
+            // fetchStatus is set to null, so it's important that we
+            // specifically check for undefined to determine a loading status.
+            const preparingForFetch = _.isUndefined(fetchStatus);
+            if (preparingForFetch) return status.LOADING;
+            else if (rowsEmpty && fetchStatus) return status.LOADING;
+            else if (!rowsEmpty) return status.READY;
+            else return status.NO_RESULTS;
+          }
+
+          return function() {
+            const current = {
+              rows: $scope.rows,
+              fetchStatus: $scope.fetchStatus
+            };
+
+            $scope.resultState = pick(
+              current.rows,
+              prev.rows,
+              current.fetchStatus,
+              prev.fetchStatus
+            );
+
+            /////////////////////////////////////////////////////////////////
+            // Copying it to the rootScope to access it from the Wazuh App //
+            /////////////////////////////////////////////////////////////////
+            $rootScope.resultState = $scope.resultState;
+            /////////////////////////////////////////////////////////////////
+            /////////////////////////////////////////////////////////////////
+            /////////////////////////////////////////////////////////////////
+
+            prev = current;
+          };
+        })()
+      );
+
+      if ($scope.opts.timefield) {
+        setupVisualization();
+        $scope.updateTime();
+      }
+
+      init.complete = true;
+      $state.replace();
+    });
   });
 
-  $scope.opts.saveDataSource = function () {
-    return $scope.updateDataSource()
-      .then(function () {
+  $scope.opts.saveDataSource = function() {
+    return $scope
+      .updateDataSource()
+      .then(function() {
         savedSearch.columns = $scope.state.columns;
         savedSearch.sort = $scope.state.sort;
 
-        return savedSearch.save()
-          .then(function (id) {
-            stateMonitor.setInitialState($state.toJSON());
-            $scope.wzKbnTopNav.close('save'); // WAZUH replaced kbnTopNav
+        return savedSearch.save().then(function(id) {
+          stateMonitor.setInitialState($state.toJSON());
+          $scope.wzKbnTopNav.close('save'); // WAZUH replaced kbnTopNav
 
-            if (id) {
-              // Using toaster service due to notify.info is now deprecated
-              toastNotifications.addSuccess({
-                title: `Search '${savedSearch.title}' was saved`,
-                'data-test-subj': 'saveSearchSuccess',
-              });
+          if (id) {
+            // Using toaster service due to notify.info is now deprecated
+            toastNotifications.addSuccess({
+              title: `Search '${savedSearch.title}' was saved`,
+              'data-test-subj': 'saveSearchSuccess'
+            });
 
-              if (savedSearch.id !== $route.current.params.id) {
-                kbnUrl.change('/discover/{{id}}', { id: savedSearch.id });
-              } else {
-                // Update defaults so that "reload saved query" functions correctly
-                $state.setDefaults(getStateDefaults());
-                docTitle.change(savedSearch.lastSavedTitle);
-              }
+            if (savedSearch.id !== $route.current.params.id) {
+              kbnUrl.change('/discover/{{id}}', { id: savedSearch.id });
+            } else {
+              // Update defaults so that "reload saved query" functions correctly
+              $state.setDefaults(getStateDefaults());
+              docTitle.change(savedSearch.lastSavedTitle);
             }
-          });
+          }
+        });
       })
       .catch(notify.error);
   };
 
-  $scope.opts.fetch = $scope.fetch = function () {
+  $scope.opts.fetch = $scope.fetch = function() {
     // ignore requests to fetch before the app inits
     if (!init.complete) return;
 
@@ -550,17 +575,17 @@ $scope.toggleRefresh = () => {
 
     $scope.updateTime();
 
-    $scope.updateDataSource()
+    $scope
+      .updateDataSource()
       .then(setupVisualization)
-      .then(function () {
+      .then(function() {
         $state.save();
         return courier.fetch();
       })
       .catch(notify.error);
   };
 
-  $scope.updateQueryAndFetch = function (query) {
-
+  $scope.updateQueryAndFetch = function(query) {
     ////////////////////////////////////////////////////////////////////////////
     ///////////////////////////////  WAZUH   ///////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////
@@ -569,13 +594,21 @@ $scope.toggleRefresh = () => {
       $state.filters = [];
     }*/
     const currentUrlPath = $location.path();
-    if(currentUrlPath && !currentUrlPath.includes('wazuh-discover')){
+    if (currentUrlPath && !currentUrlPath.includes('wazuh-discover')) {
       let filters = queryFilter.getFilters();
-      filters = Array.isArray(filters) ? filters.filter(item => item && item.$state && item.$state.store && item.$state.store === 'appState') : [];
-      if(!filters || !filters.length) return;
+      filters = Array.isArray(filters)
+        ? filters.filter(
+            item =>
+              item &&
+              item.$state &&
+              item.$state.store &&
+              item.$state.store === 'appState'
+          )
+        : [];
+      if (!filters || !filters.length) return;
     }
     discoverPendingUpdates.removeAll();
-    discoverPendingUpdates.addItem($state.query,queryFilter.getFilters());
+    discoverPendingUpdates.addItem($state.query, queryFilter.getFilters());
     $rootScope.$broadcast('updateVis');
     $rootScope.$broadcast('fetch');
     ////////////////////////////////////////////////////////////////////////////
@@ -585,7 +618,6 @@ $scope.toggleRefresh = () => {
     $state.query = migrateLegacyQuery(query);
     $scope.fetch();
   };
-
 
   function handleSegmentedFetch(segmented) {
     function flushResponseData() {
@@ -611,12 +643,12 @@ $scope.toggleRefresh = () => {
      *
      * @type {String}
      */
-    const sortBy = (function () {
+    const sortBy = (function() {
       if (!Array.isArray(sort)) return 'implicit';
       else if (sort[0] === '_score') return 'implicit';
       else if (sort[0] === timeField) return 'time';
       else return 'non-time';
-    }());
+    })();
 
     let sortFn = null;
     if (sortBy !== 'implicit') {
@@ -624,45 +656,51 @@ $scope.toggleRefresh = () => {
     }
 
     $scope.updateTime();
-    if (sort[0] === '_score') segmented.setMaxSegments(1);  
-    segmented.setDirection(sortBy === 'time' ? (sort[1] || 'desc') : 'desc');
+    if (sort[0] === '_score') segmented.setMaxSegments(1);
+    segmented.setDirection(sortBy === 'time' ? sort[1] || 'desc' : 'desc');
     segmented.setSortFn(sortFn);
     segmented.setSize($scope.opts.sampleSize);
 
     // triggered when the status updated
-    segmented.on('status', function (status) {
+    segmented.on('status', function(status) {
       $scope.fetchStatus = status;
     });
 
-    segmented.on('first', function () {
+    segmented.on('first', function() {
       flushResponseData();
     });
 
-    segmented.on('segment', (resp) => {
+    segmented.on('segment', resp => {
       if (resp._shards.failed > 0) {
         $scope.failures = _.union($scope.failures, resp._shards.failures);
-        $scope.failures = _.uniq($scope.failures, false, function (failure) {
+        $scope.failures = _.uniq($scope.failures, false, function(failure) {
           return failure.index + failure.shard + failure.reason;
         });
       }
     });
 
-    segmented.on('mergedSegment', function (merged) {
+    segmented.on('mergedSegment', function(merged) {
       $scope.mergedEsResp = merged;
 
       if ($scope.opts.timefield) {
         $scope.searchSource.rawResponse = merged;
-        Promise
-          .resolve(responseHandler($scope.vis, merged))
-          .then(resp => {
-            $scope.visData = resp;
-            if(($scope.tabView !== 'panels' || $location.path().includes('wazuh-discover')) && 
-               ($scope.tabView !== 'cluster-monitoring')
-              ) {
-              const visEl = $element.find('#discoverHistogram')[0];
-              visualizationLoader.render(visEl, $scope.vis, $scope.visData, $scope.uiState, { listenOnChange: true });
-            }
-          });
+        Promise.resolve(responseHandler($scope.vis, merged)).then(resp => {
+          $scope.visData = resp;
+          if (
+            ($scope.tabView !== 'panels' ||
+              $location.path().includes('wazuh-discover')) &&
+            $scope.tabView !== 'cluster-monitoring'
+          ) {
+            const visEl = $element.find('#discoverHistogram')[0];
+            visualizationLoader.render(
+              visEl,
+              $scope.vis,
+              $scope.visData,
+              $scope.uiState,
+              { listenOnChange: true }
+            );
+          }
+        });
       }
 
       $scope.hits = merged.hits.total;
@@ -677,7 +715,7 @@ $scope.toggleRefresh = () => {
       // if we haven't counted yet, or need a fresh count because we are sorting, reset the counts
       if (!counts || sortFn) counts = $scope.fieldCounts = {};
 
-      $scope.rows.forEach(function (hit) {
+      $scope.rows.forEach(function(hit) {
         // skip this work if we have already done it
         if (hit.$$_counted) return;
 
@@ -688,14 +726,15 @@ $scope.toggleRefresh = () => {
         const fields = _.keys(indexPattern.flattenHit(hit));
         let n = fields.length;
         let field;
-        while (field = fields[--n]) { // eslint-disable-line
+        while ((field = fields[--n])) {
+          // eslint-disable-line
           if (counts[field]) counts[field] += 1;
           else counts[field] = 1;
         }
       });
     });
 
-    segmented.on('complete', function () {
+    segmented.on('complete', function() {
       if ($scope.fetchStatus.hitCount === 0) {
         flushResponseData();
       }
@@ -704,10 +743,10 @@ $scope.toggleRefresh = () => {
     });
   }
 
-
   function beginSegmentedFetch() {
-    $scope.searchSource.onBeginSegmentedFetch(handleSegmentedFetch)
-      .catch((error) => {
+    $scope.searchSource
+      .onBeginSegmentedFetch(handleSegmentedFetch)
+      .catch(error => {
         const fetchError = getPainlessError(error);
 
         if (fetchError) {
@@ -722,15 +761,14 @@ $scope.toggleRefresh = () => {
   }
   beginSegmentedFetch();
 
-  $scope.updateTime = function () {
-
+  $scope.updateTime = function() {
     ////////////////////////////////////////////////////////////////////////////
     ///////////////////////////////  WAZUH   ///////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////
-    if($location.search().tab != 'configuration') {
+    if ($location.search().tab != 'configuration') {
       loadedVisualizations.removeAll();
       $rootScope.rendered = false;
-      $rootScope.loadingStatus = "Fetching data...";
+      $rootScope.loadingStatus = 'Fetching data...';
     }
     ////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////
@@ -742,11 +780,11 @@ $scope.toggleRefresh = () => {
     };
   };
 
-  $scope.resetQuery = function () {
+  $scope.resetQuery = function() {
     kbnUrl.change('/discover/{{id}}', { id: $route.current.params.id });
   };
 
-  $scope.newQuery = function () {
+  $scope.newQuery = function() {
     kbnUrl.change('/discover');
   };
 
@@ -763,9 +801,16 @@ $scope.toggleRefresh = () => {
   };
 
   // TODO: On array fields, negating does not negate the combination, rather all terms
-  $scope.filterQuery = function (field, values, operation) {
+  $scope.filterQuery = function(field, values, operation) {
     $scope.indexPattern.popularizeField(field, 1);
-    filterActions.addFilter(field, values, operation, $scope.indexPattern.id, $scope.state, filterManager);
+    filterActions.addFilter(
+      field,
+      values,
+      operation,
+      $scope.indexPattern.id,
+      $scope.state,
+      filterManager
+    );
   };
 
   $scope.addColumn = function addColumn(columnName) {
@@ -782,18 +827,18 @@ $scope.toggleRefresh = () => {
     columnActions.moveColumn($scope.state.columns, columnName, newIndex);
   };
 
-  $scope.scrollToTop = function () {
+  $scope.scrollToTop = function() {
     $window.scrollTo(0, 0);
   };
 
-  $scope.scrollToBottom = function () {
+  $scope.scrollToBottom = function() {
     // delay scrolling to after the rows have been rendered
     $timeout(() => {
       $element.find('#discoverBottomMarker').focus();
     }, 0);
   };
 
-  $scope.showAllRows = function () {
+  $scope.showAllRows = function() {
     $scope.minimumVisibleRows = $scope.hits;
   };
 
@@ -833,18 +878,23 @@ $scope.toggleRefresh = () => {
         aggs: visStateAggs
       });
 
-  
       $scope.searchSource.onRequestStart((searchSource, searchRequest) => {
-        return $scope.vis.getAggConfig().onSearchRequestStart(searchSource, searchRequest);
+        return $scope.vis
+          .getAggConfig()
+          .onSearchRequestStart(searchSource, searchRequest);
       });
 
-      $scope.searchSource.setField('aggs', function () {
+      $scope.searchSource.setField('aggs', function() {
         //////////////////// WAZUH ////////////////////////////////
         // Old code:                                             //
         // return $scope.vis.getAggConfig().toDsl();             //
         ///////////////////////////////////////////////////////////
         const result = $scope.vis.getAggConfig().toDsl();
-        if(result[2] && result[2].date_histogram && result[2].date_histogram.interval === '0ms') {
+        if (
+          result[2] &&
+          result[2].date_histogram &&
+          result[2].date_histogram.interval === '0ms'
+        ) {
           result[2].date_histogram.interval = '1d';
         }
         return result;
@@ -863,9 +913,9 @@ $scope.toggleRefresh = () => {
     const {
       loaded: loadedIndexPattern,
       stateVal,
-      stateValFound,
+      stateValFound
     } = $route.current.locals.ip;
-    
+
     const ownIndexPattern = $scope.searchSource.getOwnField('index');
 
     if (ownIndexPattern && !stateVal) {
@@ -878,14 +928,18 @@ $scope.toggleRefresh = () => {
       if (ownIndexPattern) {
         toastNotifications.addWarning({
           title: warningTitle,
-          text: `Showing the saved index pattern: "${ownIndexPattern.title}" (${ownIndexPattern.id})`,
+          text: `Showing the saved index pattern: "${ownIndexPattern.title}" (${
+            ownIndexPattern.id
+          })`
         });
         return ownIndexPattern;
       }
 
       toastNotifications.addWarning({
         title: warningTitle,
-        text: `Showing the default index pattern: "${loadedIndexPattern.title}" (${loadedIndexPattern.id})`,
+        text: `Showing the default index pattern: "${
+          loadedIndexPattern.title
+        }" (${loadedIndexPattern.id})`
       });
     }
 
@@ -894,46 +948,50 @@ $scope.toggleRefresh = () => {
 
   // Block the UI from loading if the user has loaded a rollup index pattern but it isn't
   // supported.
-  $scope.isUnsupportedIndexPattern = (
-    !isDefaultTypeIndexPattern($route.current.locals.ip.loaded)
-    && !hasSearchStategyForIndexPattern($route.current.locals.ip.loaded)
-  );
+  $scope.isUnsupportedIndexPattern =
+    !isDefaultTypeIndexPattern($route.current.locals.ip.loaded) &&
+    !hasSearchStategyForIndexPattern($route.current.locals.ip.loaded);
 
   if ($scope.isUnsupportedIndexPattern) {
     $scope.unsupportedIndexPatternType = $route.current.locals.ip.loaded.type;
     return;
   }
-  
+
   ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   ////////////////////////////////////////////////////// WAZUH //////////////////////////////////////////////////////////
   ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
   const loadFilters = (wzCurrentFilters, localChange) => {
     const appState = getAppState();
-    if(!appState || !globalState){
-      $timeout(100)
-      .then(() => {
+    if (!appState || !globalState) {
+      $timeout(100).then(() => {
         return loadFilters(wzCurrentFilters);
       });
     } else {
       $state.filters = localChange ? $state.filters : [];
 
-      queryFilter.addFilters(wzCurrentFilters)
-      .then(() => { })
-      .catch(error => console.log(error.message || error)); // eslint-disable-line
+      queryFilter
+        .addFilters(wzCurrentFilters)
+        .then(() => {})
+        .catch(error => console.log(error.message || error)); // eslint-disable-line
     }
   };
 
-  const wzEventFiltersListener = $rootScope.$on('wzEventFilters', (evt,parameters) => {
-    loadFilters(parameters.filters, parameters.localChange);
-  });
-
+  const wzEventFiltersListener = $rootScope.$on(
+    'wzEventFilters',
+    (evt, parameters) => {
+      loadFilters(parameters.filters, parameters.localChange);
+    }
+  );
 
   $scope.tabView = $location.search().tabView || 'panels';
-  const changeTabViewListener = $rootScope.$on('changeTabView',(evt,parameters) => {
-    $scope.tabView = parameters.tabView || 'panels';
-    $scope.updateQueryAndFetch($state.query);
-  });
+  const changeTabViewListener = $rootScope.$on(
+    'changeTabView',
+    (evt, parameters) => {
+      $scope.tabView = parameters.tabView || 'panels';
+      $scope.updateQueryAndFetch($state.query);
+    }
+  );
 
   $scope.$on('$destroy', () => {
     wzEventFiltersListener();

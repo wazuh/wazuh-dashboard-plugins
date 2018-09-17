@@ -9,108 +9,102 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import { uiModules } from 'ui/modules'
+export class AppState {
+  constructor($cookies, $window) {
+    this.$cookies = $cookies;
+    this.$window = $window;
+  }
 
-const app = uiModules.get('app/wazuh', [])
+  getExtensions(id) {
+    const current = this.$cookies.getObject('extensions');
+    return current ? current[id] : false;
+  }
 
-class AppState {
-    constructor($cookies, $window) {
-        this.$cookies = $cookies;
-        this.$window  = $window;
+  setExtensions(id, extensions) {
+    const current = this.$cookies.getObject('extensions') || {};
+    current[id] = extensions;
+    const exp = new Date();
+    exp.setDate(exp.getDate() + 365);
+    if (extensions) {
+      this.$cookies.putObject('extensions', current, { expires: exp });
     }
+  }
 
-    getExtensions(id) {
-        const current = this.$cookies.getObject('extensions');
-        return current ? current[id] : false;
-    }
+  getClusterInfo() {
+    return this.$cookies.getObject('_clusterInfo');
+  }
 
-    setExtensions(id,extensions) {
-        const current = this.$cookies.getObject('extensions') || {};
-        current[id] = extensions;
-        const exp = new Date();
-        exp.setDate(exp.getDate() + 365);
-        if (extensions) {
-            this.$cookies.putObject('extensions', current, { 'expires': exp });
-        }
-    }
+  removeClusterInfo() {
+    return this.$cookies.remove('_clusterInfo');
+  }
 
-    getClusterInfo() {
-        return this.$cookies.getObject('_clusterInfo');
+  setClusterInfo(cluster_info) {
+    const exp = new Date();
+    exp.setDate(exp.getDate() + 365);
+    if (cluster_info) {
+      this.$cookies.putObject('_clusterInfo', cluster_info, { expires: exp });
     }
+  }
 
-    removeClusterInfo() {
-        return this.$cookies.remove('_clusterInfo');
-    }
+  getCurrentPattern() {
+    return this.$cookies.getObject('_currentPattern');
+  }
 
-    setClusterInfo(cluster_info) {
-        const exp = new Date();
-        exp.setDate(exp.getDate() + 365);
-        if (cluster_info) {
-            this.$cookies.putObject('_clusterInfo', cluster_info, { 'expires': exp });
-        }
-    }
+  setCreatedAt(date) {
+    const exp = new Date();
+    exp.setDate(exp.getDate() + 365);
+    this.$cookies.putObject('_createdAt', date, { expires: exp });
+  }
 
-    getCurrentPattern() {
-        return this.$cookies.getObject('_currentPattern');
+  setCurrentPattern(newPattern) {
+    const exp = new Date();
+    exp.setDate(exp.getDate() + 365);
+    if (newPattern) {
+      this.$cookies.putObject('_currentPattern', newPattern, { expires: exp });
     }
+  }
 
-    setCreatedAt(date) {
-        const exp = new Date();
-        exp.setDate(exp.getDate() + 365);
-        this.$cookies.putObject('_createdAt',date,{ 'expires': exp });
-    }
+  removeCurrentPattern() {
+    return this.$cookies.remove('_currentPattern');
+  }
 
-    setCurrentPattern(newPattern) {
-        const exp = new Date();
-        exp.setDate(exp.getDate() + 365);
-        if (newPattern) {
-            this.$cookies.putObject('_currentPattern', newPattern, { 'expires': exp });
-        }
-    }
+  getCreatedAt() {
+    return this.$cookies.getObject('_createdAt');
+  }
 
-    removeCurrentPattern() {
-        return this.$cookies.remove('_currentPattern');
-    }
+  removeCreatedAt() {
+    return this.$cookies.remove('_createdAt');
+  }
 
-    getCreatedAt() {
-        return this.$cookies.getObject('_createdAt');
-    }
+  getCurrentAPI() {
+    return this.$cookies.getObject('API');
+  }
 
-    removeCreatedAt() {
-        return this.$cookies.remove('_createdAt');
-    }
+  removeCurrentAPI() {
+    return this.$cookies.remove('API');
+  }
 
-    getCurrentAPI() {
-        return this.$cookies.getObject('API');
+  setCurrentAPI(API) {
+    const exp = new Date();
+    exp.setDate(exp.getDate() + 365);
+    if (API) {
+      this.$cookies.putObject('API', API, { expires: exp });
     }
+  }
 
-    removeCurrentAPI() {
-        return this.$cookies.remove('API');
-    }
+  getPatternSelector() {
+    return this.$cookies.getObject('patternSelector');
+  }
 
-    setCurrentAPI(API) {
-        const exp = new Date();
-        exp.setDate(exp.getDate() + 365);
-        if (API) {
-            this.$cookies.putObject('API', API, { 'expires': exp});
-        }
-    }
+  setPatternSelector(value) {
+    this.$cookies.putObject('patternSelector', value);
+  }
 
-    getPatternSelector() {
-        return this.$cookies.getObject('patternSelector');
-    }
+  setCurrentDevTools(current) {
+    this.$window.localStorage.setItem('currentDevTools', current);
+  }
 
-    setPatternSelector(value) {
-        this.$cookies.putObject('patternSelector', value);
-    }
-
-    setCurrentDevTools(current) {
-        this.$window.localStorage.setItem('currentDevTools',current);
-    }
-
-    getCurrentDevTools() {
-        return this.$window.localStorage.getItem('currentDevTools')
-    }
+  getCurrentDevTools() {
+    return this.$window.localStorage.getItem('currentDevTools');
+  }
 }
-
-app.service('appState', AppState);

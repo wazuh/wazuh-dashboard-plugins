@@ -1,5 +1,5 @@
 /*
- * Wazuh app - File for app requirements and set up
+ * Wazuh app - Wazuh syscollector process state equivalence
  * Copyright (C) 2018 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -9,6 +9,14 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import './blank-screen-controller';
-import './health-check';
-import './reporting';
+export default {
+  R: 'running',
+  S: 'sleeping',
+  D: 'disk sleep',
+  T: 'stopped',
+  t: 'tracing stop',
+  X: 'dead',
+  Z: 'zombie',
+  P: 'parked',
+  I: 'idle'
+};

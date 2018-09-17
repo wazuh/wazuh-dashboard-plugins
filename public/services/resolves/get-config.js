@@ -10,56 +10,62 @@
  * Find more information about this on the LICENSE file.
  */
 
-export default async ($q, genericReq, errorHandler, wazuhConfig) => {
-    // Remember to keep this values equal to default config.yml values
-    const defaultConfig = {
-        pattern                : 'wazuh-alerts-3.x-*',
-        'checks.pattern'       : true,
-        'checks.template'      : true,
-        'checks.api'           : true,
-        'checks.setup'         : true,
-        'extensions.pci'       : true,
-        'extensions.gdpr'      : true,
-        'extensions.audit'     : true,
-        'extensions.oscap'     : true,
-        'extensions.ciscat'    : false,
-        'extensions.aws'       : false,
-        'extensions.virustotal': false,
-        timeout                : 8000,
-        'wazuh.shards'         : 1,
-        'wazuh.replicas'       : 1,
-        'wazuh-version.shards'  : 1,
-        'wazuh-version.replicas': 1,   
-        'ip.selector'          : true,
-        'xpack.rbac.enabled'   : true,
-        'wazuh.monitoring.enabled'  : true,
-        'wazuh.monitoring.frequency': 3600,
-        'wazuh.monitoring.shards'  : 5,
-        'wazuh.monitoring.replicas': 1
-    };
+export async function getWzConfig($q, genericReq, errorHandler, wazuhConfig) {
+  // Remember to keep this values equal to default config.yml values
+  const defaultConfig = {
+    pattern: 'wazuh-alerts-3.x-*',
+    'checks.pattern': true,
+    'checks.template': true,
+    'checks.api': true,
+    'checks.setup': true,
+    'extensions.pci': true,
+    'extensions.gdpr': true,
+    'extensions.audit': true,
+    'extensions.oscap': true,
+    'extensions.ciscat': false,
+    'extensions.aws': false,
+    'extensions.virustotal': false,
+    timeout: 8000,
+    'wazuh.shards': 1,
+    'wazuh.replicas': 1,
+    'wazuh-version.shards': 1,
+    'wazuh-version.replicas': 1,
+    'ip.selector': true,
+    'xpack.rbac.enabled': true,
+    'wazuh.monitoring.enabled': true,
+    'wazuh.monitoring.frequency': 3600,
+    'wazuh.monitoring.shards': 5,
+    'wazuh.monitoring.replicas': 1
+  };
 
-    try {
-        
-        const config = await genericReq.request('GET', '/api/wazuh-api/configuration', {});
+  try {
+    const config = await genericReq.request(
+      'GET',
+      '/api/wazuh-api/configuration',
+      {}
+    );
 
-        if(!config || !config.data || !config.data.data) throw new Error('No config available');
+    if (!config || !config.data || !config.data.data)
+      throw new Error('No config available');
 
-        const ymlContent = config.data.data;        
+    const ymlContent = config.data.data;
 
-        if(typeof ymlContent === 'object'){
-            // Replace default values by custom values from config.yml file
-            for(const key in ymlContent){
-                defaultConfig[key] = ymlContent[key];
-            }
-        }
-
-        wazuhConfig.setConfig(defaultConfig);
-
-    } catch (error) {
-        wazuhConfig.setConfig(defaultConfig);
-        errorHandler.handle('Error parsing config.yml, using default values.', 'Config', true);
+    if (typeof ymlContent === 'object') {
+      // Replace default values by custom values from config.yml file
+      for (const key in ymlContent) {
+        defaultConfig[key] = ymlContent[key];
+      }
     }
 
-    return $q.resolve();
+    wazuhConfig.setConfig(defaultConfig);
+  } catch (error) {
+    wazuhConfig.setConfig(defaultConfig);
+    errorHandler.handle(
+      'Error parsing config.yml, using default values.',
+      'Config',
+      true
+    );
+  }
 
-};
+  return $q.resolve();
+}

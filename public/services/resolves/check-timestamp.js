@@ -9,22 +9,25 @@
  *
  * Find more information about this on the LICENSE file.
  */
-export default async (appState, genericReq, $location, wzMisc) => {
-    try {
-        const data = await genericReq.request('GET', '/api/wazuh-elastic/timestamp');
-        const current = appState.getCreatedAt();
-        if(data && data.data){
-            if(!current) appState.setCreatedAt(data.data.lastRestart);
-            wzMisc.setLastRestart(data.data.lastRestart);
-        } else {
-            wzMisc.setBlankScr('Your .wazuh-version index is empty or corrupt.')
-            $location.search('tab',null);
-            $location.path('/blank-screen');
-        }
-        return;
-    } catch (error){
-        wzMisc.setBlankScr(error.message || error)
-        $location.search('tab',null);
-        $location.path('/blank-screen');
+export async function checkTimestamp(appState, genericReq, $location, wzMisc) {
+  try {
+    const data = await genericReq.request(
+      'GET',
+      '/api/wazuh-elastic/timestamp'
+    );
+    const current = appState.getCreatedAt();
+    if (data && data.data) {
+      if (!current) appState.setCreatedAt(data.data.lastRestart);
+      wzMisc.setLastRestart(data.data.lastRestart);
+    } else {
+      wzMisc.setBlankScr('Your .wazuh-version index is empty or corrupt.');
+      $location.search('tab', null);
+      $location.path('/blank-screen');
     }
+    return;
+  } catch (error) {
+    wzMisc.setBlankScr(error.message || error);
+    $location.search('tab', null);
+    $location.path('/blank-screen');
+  }
 }

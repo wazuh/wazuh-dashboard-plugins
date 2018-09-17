@@ -31,7 +31,7 @@ uiModules
   .directive('wzKbnGlobalTimepicker', (globalState, config, $rootScope) => {
     const getConfig = (...args) => config.get(...args);
 
-    const listenForUpdates = ($scope) => {
+    const listenForUpdates = $scope => {
       $scope.$listenAndDigestAsync(timefilter, 'refreshIntervalUpdate', () => {
         setTimefilterValues($scope);
       });
@@ -44,7 +44,7 @@ uiModules
     };
 
     function setTimefilterValues($scope) {
-      $rootScope.$broadcast('updateVis')
+      $rootScope.$broadcast('updateVis');
       const time = timefilter.getTime();
       const refreshInterval = timefilter.getRefreshInterval();
       $scope.timefilterValues = {
@@ -52,10 +52,10 @@ uiModules
         time: time,
         display: {
           time: prettyDuration(time.from, time.to, getConfig),
-          refreshInterval: prettyInterval(refreshInterval.value),
+          refreshInterval: prettyInterval(refreshInterval.value)
         },
         isAutoRefreshSelectorEnabled: timefilter.isAutoRefreshSelectorEnabled,
-        isTimeRangeSelectorEnabled: timefilter.isTimeRangeSelectorEnabled,
+        isTimeRangeSelectorEnabled: timefilter.isTimeRangeSelectorEnabled
       };
     }
 
@@ -72,35 +72,49 @@ uiModules
           timefilter.toggleRefresh();
         };
 
-        $scope.forward = function () {
-          timefilter.setTime(timeNavigation.stepForward(timefilter.getBounds()));
+        $scope.forward = function() {
+          timefilter.setTime(
+            timeNavigation.stepForward(timefilter.getBounds())
+          );
         };
 
-        $scope.back = function () {
-          timefilter.setTime(timeNavigation.stepBackward(timefilter.getBounds()));
+        $scope.back = function() {
+          timefilter.setTime(
+            timeNavigation.stepBackward(timefilter.getBounds())
+          );
         };
 
-        $scope.updateFilter = function (from, to, mode) {
+        $scope.updateFilter = function(from, to, mode) {
           timefilter.setTime({ from, to, mode });
           wzKbnTopNav.close('filter');
         };
 
-        $scope.updateInterval = function (interval) {
+        $scope.updateInterval = function(interval) {
           timefilter.setRefreshInterval(interval);
           wzKbnTopNav.close('interval');
         };
 
-        $scope.getSharedTimeFilterFromDate = function () {
-          return (timefilter.isAutoRefreshSelectorEnabled || timefilter.isTimeRangeSelectorEnabled)
-            ? timefilter.getBounds().min.clone().utc().format()
+        $scope.getSharedTimeFilterFromDate = function() {
+          return timefilter.isAutoRefreshSelectorEnabled ||
+            timefilter.isTimeRangeSelectorEnabled
+            ? timefilter
+                .getBounds()
+                .min.clone()
+                .utc()
+                .format()
             : null;
         };
 
-        $scope.getSharedTimeFilterToDate = function () {
-          return (timefilter.isAutoRefreshSelectorEnabled || timefilter.isTimeRangeSelectorEnabled)
-            ? timefilter.getBounds().max.clone().utc().format()
+        $scope.getSharedTimeFilterToDate = function() {
+          return timefilter.isAutoRefreshSelectorEnabled ||
+            timefilter.isTimeRangeSelectorEnabled
+            ? timefilter
+                .getBounds()
+                .max.clone()
+                .utc()
+                .format()
             : null;
         };
-      },
+      }
     };
   });

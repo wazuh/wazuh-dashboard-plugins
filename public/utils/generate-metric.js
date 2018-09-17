@@ -11,33 +11,39 @@
  */
 import $ from 'jquery';
 
-export default id => {
-    const html = $(id).html();
+export function generateMetric(id) {
+  const html = $(id).html();
 
-    // New Kibana structure
-    if( html.split('ng-non-bindable') &&
-        html.split('ng-non-bindable')[1] &&
-        html.split('ng-non-bindable')[1].split('>') &&
-        html.split('ng-non-bindable')[1].split('>')[1] && 
-        html.split('ng-non-bindable')[1].split('>')[1].split('</') && 
-        html.split('ng-non-bindable')[1].split('>')[1].split('</')[0]) {
+  // New Kibana structure
+  if (
+    html.split('ng-non-bindable') &&
+    html.split('ng-non-bindable')[1] &&
+    html.split('ng-non-bindable')[1].split('>') &&
+    html.split('ng-non-bindable')[1].split('>')[1] &&
+    html
+      .split('ng-non-bindable')[1]
+      .split('>')[1]
+      .split('</') &&
+    html
+      .split('ng-non-bindable')[1]
+      .split('>')[1]
+      .split('</')[0]
+  ) {
+    return html
+      .split('ng-non-bindable')[1]
+      .split('>')[1]
+      .split('</')[0];
+  }
 
-        return html.split('ng-non-bindable')[1].split('>')[1].split('</')[0];
-    
+  if (typeof html !== 'undefined' && html.includes('<span')) {
+    if (typeof html.split('<span>')[1] !== 'undefined') {
+      return html.split('<span>')[1].split('</span')[0];
+    } else if (html.includes('table') && html.includes('cell-hover')) {
+      let nonB = html.split('ng-non-bindable')[1];
+      if (nonB && nonB.split('>')[1] && nonB.split('>')[1].split('</')[0]) {
+        return nonB.split('>')[1].split('</')[0];
+      }
     }
-
-    if (typeof html !== 'undefined' && html.includes('<span')) {
-        if(typeof html.split('<span>')[1] !== 'undefined'){
-            return html.split('<span>')[1].split('</span')[0];
-        } else if(html.includes('table') && html.includes('cell-hover')){
-            let nonB = html.split('ng-non-bindable')[1];
-            if(nonB &&
-                nonB.split('>')[1] &&
-                nonB.split('>')[1].split('</')[0]
-            ) {
-                return nonB.split('>')[1].split('</')[0];
-            }
-        }
-    }
-    return '';
-};
+  }
+  return '';
+}
