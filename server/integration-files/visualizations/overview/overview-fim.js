@@ -44,34 +44,18 @@ export default [
     }
   },
   {
-    _id: 'Wazuh-App-Overview-FIM-Top-5-agents',
+    _id: 'Wazuh-App-Overview-FIM-Top-5-agents-pie',
     _type: 'visualization',
     _source: {
-      title: 'Top 5 agents',
+      title: 'Top 5 agents pie',
       visState:
-        '{"title":"Top 5 agents","type":"pie","params":{"type":"pie","addTooltip":true,"addLegend":true,"legendPosition":"right","isDonut":true,"labels":{"show":false,"values":true,"last_level":true,"truncate":100}},"aggs":[{"id":"1","enabled":true,"type":"count","schema":"metric","params":{}},{"id":"2","enabled":true,"type":"terms","schema":"segment","params":{"field":"agent.name","size":5,"order":"desc","orderBy":"1","otherBucket":false,"otherBucketLabel":"Other","missingBucket":false,"missingBucketLabel":"Missing"}}]}',
+        '{"title":"Top 5 agents pie","type":"pie","params":{"type":"pie","addTooltip":true,"addLegend":true,"legendPosition":"right","isDonut":true,"labels":{"show":false,"values":true,"last_level":true,"truncate":100}},"aggs":[{"id":"1","enabled":true,"type":"count","schema":"metric","params":{}},{"id":"2","enabled":true,"type":"terms","schema":"segment","params":{"field":"agent.name","size":5,"order":"desc","orderBy":"1","otherBucket":false,"otherBucketLabel":"Other","missingBucket":false,"missingBucketLabel":"Missing"}}]}',
       uiStateJSON: '{}',
       description: '',
       version: 1,
       kibanaSavedObjectMeta: {
         searchSourceJSON:
-          '{"index":"wazuh-alerts","query":{"query":"","language":"lucene"},"filter":[{"meta":{"index":"wazuh-alerts","negate":false,"disabled":false,"alias":null,"type":"phrase","key":"syscheck.audit.effective_user.name","value":"root","params":{"query":"root","type":"phrase"}},"query":{"match":{"syscheck.audit.effective_user.name":{"query":"root","type":"phrase"}}},"$state":{"store":"appState"}}]}'
-      }
-    }
-  },
-  {
-    _id: 'Wazuh-App-Overview-FIM-Percentage-affected',
-    _type: 'visualization',
-    _source: {
-      title: 'Affected alerts',
-      visState:
-        '{"title":"Affected alerts","type":"goal","params":{"addTooltip":true,"addLegend":false,"isDisplayWarning":false,"type":"gauge","gauge":{"verticalSplit":false,"autoExtend":false,"percentageMode":true,"gaugeType":"Arc","gaugeStyle":"Full","backStyle":"Full","orientation":"vertical","useRanges":false,"colorSchema":"Green to Red","gaugeColorMode":"None","colorsRange":[{"from":0,"to":10000}],"invertColors":false,"labels":{"show":true,"color":"black"},"scale":{"show":false,"labels":false,"color":"#333","width":2},"type":"meter","style":{"bgFill":"#000","bgColor":false,"labelColor":false,"subText":"","fontSize":60}}},"aggs":[{"id":"1","enabled":true,"type":"count","schema":"metric","params":{}}]}',
-      uiStateJSON: '{"vis":{"defaultColors":{"0 - 100":"rgb(0,104,55)"}}}',
-      description: '',
-      version: 1,
-      kibanaSavedObjectMeta: {
-        searchSourceJSON:
-          '{"index":"wazuh-alerts","query":{"query":"","language":"lucene"},"filter":[]}'
+          '{"index":"wazuh-alerts","query":{"language":"lucene","query":""},"filter":[]}'
       }
     }
   },
