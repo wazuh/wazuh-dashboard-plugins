@@ -1,5 +1,5 @@
 <!-- This section contains the main content and the right sidenav -->
-<div flex="auto" layout="row" ng-if="configurationSubTab === 'amazon-s3'" ng-init="switchConfigurationSection('amazon-s3-general')">
+<div flex="auto" layout="row" ng-if="configurationSubTab === 'amazon-buckets'">
 
     <!-- This section appears when there's no configuration -->
     <wz-no-config flex ng-if="false"></wz-no-config>
@@ -8,52 +8,8 @@
     <!-- This section is the main content -->
     <div flex layout="column">
 
-        <!-- Switch configuration sections buttons -->
-        <div layout="row" layout-align="center center" class="wz-margin-top-10">
-            <md-button ng-class="configurationSection === 'amazon-s3-general' ? 'active' : ''" class="wz-button wz-button-group md-raised small left" ng-click="switchConfigurationSection('amazon-s3-general')">General</md-button>
-            <md-button ng-class="configurationSection === 'amazon-s3-buckets' ? 'active' : ''" class="wz-button wz-button-group md-raised small right" ng-click="switchConfigurationSection('amazon-s3-buckets')">Buckets</md-button>
-        </div>
-        <!-- End switch configuration sections buttons -->
-
-        <!-- General card -->
-        <md-card class="wz-md-card" ng-if="configurationSection === 'amazon-s3-general' && !JSONContent && !XMLContent">
-            <md-card-content>
-                <span class="font-size-16">Main settings</span>
-                <md-divider class="wz-margin-top-10"></md-divider>
-
-                <!-- Configuration block -->
-                <div class="wz-padding-top-10">
-
-                    <wz-config-item
-                        label="Amazon S3 integration status"
-                        value="enabled">
-                    </wz-config-item>
-                    <wz-config-item
-                        label="Frequency for reading from S3 buckets"
-                        value="1800">
-                    </wz-config-item>
-                    <wz-config-item
-                        label="Run on start"
-                        value="enabled"
-                        notResponsive="true">
-                    </wz-config-item>
-                    <wz-config-item
-                        label="Remove bucket logs after being read"
-                        value="1d">
-                    </wz-config-item>
-                    <wz-config-item
-                        label="Skip logs that can't be processed"
-                        value="enabled">
-                    </wz-config-item>
-
-                </div>
-                <!-- End configuration block -->
-            </md-card-content>
-        </md-card>
-        <!-- End general card -->
-
         <!-- Buckets card -->
-        <md-card flex="auto" class="wz-md-card" ng-if="configurationSection === 'amazon-s3-buckets' && !JSONContent && !XMLContent">
+        <md-card flex="auto" class="wz-md-card" ng-if="!JSONContent && !XMLContent">
             <md-card-content flex layout="column">
                 <span class="font-size-16">Buckets</span>
                 <div class="wz-margin-top-10">

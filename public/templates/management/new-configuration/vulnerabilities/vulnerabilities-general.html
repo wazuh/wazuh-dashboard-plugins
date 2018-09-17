@@ -1,5 +1,5 @@
 <!-- This section contains the main content and the right sidenav -->
-<div flex="auto" layout="row" ng-if="configurationSubTab === 'vulnerabilities'">
+<div flex="auto" layout="row" ng-if="configurationSubTab === 'vulnerabilities-general'">
 
     <!-- This section appears when there's no configuration -->
     <wz-no-config flex ng-if="false"></wz-no-config>
@@ -12,6 +12,9 @@
         <md-card class="wz-md-card" ng-if="!JSONContent && !XMLContent">
             <md-card-content>
                 <span class="font-size-16">Main settings</span>
+                <div class="wz-margin-top-10">
+                    <span class="md-subheader small">General settings applied to the vulnerability detector and its feeds</span>
+                </div>
                 <md-divider class="wz-margin-top-10"></md-divider>
 
                 <!-- Configuration block -->

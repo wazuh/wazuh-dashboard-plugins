@@ -15,6 +15,7 @@
         md-selected-nav-item="configurationSubTab"
         nav-bar-aria-label="Commands & Active response navigation links">
         <md-nav-item class="wz-nav-item" md-nav-click="switchConfigurationSubTab('active-response')" name="active-response">Active response</md-nav-item>
-        <md-nav-item class="wz-nav-item" md-nav-click="switchConfigurationSubTab('ar-commands')" name="ar-commands">Commands</md-nav-item>
+        <md-nav-item class="wz-nav-item" md-nav-click="switchConfigurationSubTab('ar-commands')" name="ar-commands">AR commands</md-nav-item>
+        <md-nav-item class="wz-nav-item" md-nav-click="switchConfigurationSubTab('wazuh-commands')" name="wazuh-commands">Wazuh commands</md-nav-item>
     </md-nav-bar>
     <!-- End Commands & Active response navigation bar -->

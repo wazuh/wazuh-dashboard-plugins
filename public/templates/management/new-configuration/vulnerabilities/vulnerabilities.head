@@ -1,0 +1,20 @@
+<div flex="auto" layout="column" ng-if="!load && configurationTab === 'vulnerabilities'" ng-init="switchConfigurationSubTab('vulnerabilities-general')">
+
+    <!-- Headline -->
+    <div layout="column" layout-padding>
+        <div>
+            <span class="font-size-18">Vulnerabilities</span>
+        </div>
+        <span class="md-subheader">Discover what applications in your environment are affected by well-known vulnerabilities.</span>
+    </div>
+    <!-- End headline -->
+
+    <!-- Vulnerabilities navigation bar -->
+    <md-nav-bar
+        class="wz-nav-bar"
+        md-selected-nav-item="configurationSubTab"
+        nav-bar-aria-label="Vulnerabilities navigation links">
+        <md-nav-item class="wz-nav-item" md-nav-click="switchConfigurationSubTab('vulnerabilities-general')" name="vulnerabilities-general">General</md-nav-item>
+        <md-nav-item class="wz-nav-item" md-nav-click="switchConfigurationSubTab('vulnerabilities-feeds')" name="vulnerabilities-feeds">Feeds</md-nav-item>
+    </md-nav-bar>
+    <!-- End Vulnerabilities navigation bar -->

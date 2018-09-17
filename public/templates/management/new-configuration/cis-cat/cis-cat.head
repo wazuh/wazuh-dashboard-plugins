@@ -1,0 +1,20 @@
+<div flex="auto" layout="column" ng-if="!load && configurationTab === 'cis-cat'" ng-init="switchConfigurationSubTab('ciscat-general')">
+
+    <!-- Headline -->
+    <div layout="column" layout-padding>
+        <div>
+            <span class="font-size-18">CIS-CAT</span>
+        </div>
+        <span class="md-subheader">Configuration assessment using Center of Internet Security scanner and SCAP checks.</span>
+    </div>
+    <!-- End headline -->
+
+    <!-- CIS-CAT navigation bar -->
+    <md-nav-bar
+        class="wz-nav-bar"
+        md-selected-nav-item="configurationSubTab"
+        nav-bar-aria-label="CIS-CAT navigation links">
+        <md-nav-item class="wz-nav-item" md-nav-click="switchConfigurationSubTab('ciscat-general')" name="ciscat-general">General</md-nav-item>
+        <md-nav-item class="wz-nav-item" md-nav-click="switchConfigurationSubTab('ciscat-benchmarks')" name="ciscat-benchmarks">Benchmarks</md-nav-item>
+    </md-nav-bar>
+    <!-- End CIS-CAT navigation bar -->

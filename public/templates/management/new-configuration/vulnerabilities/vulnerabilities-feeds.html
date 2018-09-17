@@ -1,5 +1,5 @@
 <!-- This section contains the main content and the right sidenav -->
-<div flex="auto" layout="row" ng-if="configurationSubTab === 'open-scap'" ng-init="switchConfigurationSection('open-scap-general')">
+<div flex="auto" layout="row" ng-if="configurationSubTab === 'vulnerabilities-feeds'">
 
     <!-- This section appears when there's no configuration -->
     <wz-no-config flex ng-if="false"></wz-no-config>
@@ -8,51 +8,12 @@
     <!-- This section is the main content -->
     <div flex layout="column">
 
-        <!-- Switch configuration sections buttons -->
-        <div layout="row" layout-align="center center" class="wz-margin-top-10">
-            <md-button ng-class="configurationSection === 'open-scap-general' ? 'active' : ''" class="wz-button wz-button-group md-raised small left" ng-click="switchConfigurationSection('open-scap-general')">General</md-button>
-            <md-button ng-class="configurationSection === 'open-scap-evaluations' ? 'active' : ''" class="wz-button wz-button-group md-raised small right" ng-click="switchConfigurationSection('open-scap-evaluations')">Evaluations</md-button>
-        </div>
-        <!-- End switch configuration sections buttons -->
-
-        <!-- General card -->
-        <md-card class="wz-md-card" ng-if="configurationSection === 'open-scap-general' && !JSONContent && !XMLContent">
-            <md-card-content>
-                <span class="font-size-16">Main settings</span>
-                <md-divider class="wz-margin-top-10"></md-divider>
-
-                <!-- Configuration block -->
-                <div class="wz-padding-top-10">
-
-                    <wz-config-item
-                        label="OpenSCAP integration status"
-                        value="enabled">
-                    </wz-config-item>
-                    <wz-config-item
-                        label="Timeout (in seconds) for scan executions"
-                        value="1800">
-                    </wz-config-item>
-                    <wz-config-item
-                        label="Interval between scan executions"
-                        value="1d">
-                    </wz-config-item>
-                    <wz-config-item
-                        label="Scan on start"
-                        value="enabled">
-                    </wz-config-item>
-
-                </div>
-                <!-- End configuration block -->
-            </md-card-content>
-        </md-card>
-        <!-- End general card -->
-
         <!-- Evaluations card -->
-        <md-card class="wz-md-card" ng-if="configurationSection === 'open-scap-evaluations' && !JSONContent && !XMLContent">
+        <md-card class="wz-md-card" ng-if="!JSONContent && !XMLContent">
             <md-card-content>
-                <span class="font-size-16">Evaluations</span>
+                <span class="font-size-16">Feeds</span>
                 <div class="wz-margin-top-10">
-                    <span class="md-subheader small">Scans executed according to specific security policies and their profiles</span>
+                    <span class="md-subheader small">List of OVAL databases to check for vulnerability scans</span>
                 </div>
                 <md-divider class="wz-margin-top-10"></md-divider>
 
@@ -134,8 +95,8 @@
         md-is-locked-open="true">
         <md-list>
             <md-subheader>Any questions?</md-subheader>
-            <md-list-item target="_blank" class="wz-text-link" ng-href="https://documentation.wazuh.com/current/user-manual/capabilities/policy-monitoring/openscap/index.html">OpenSCAP module documentation</md-list-item>
-            <md-list-item target="_blank" class="wz-text-link" ng-href="https://documentation.wazuh.com/current/user-manual/reference/ossec-conf/wodle-openscap.html">OpenSCAP module reference</md-list-item>
+            <md-list-item target="_blank" class="wz-text-link" ng-href="https://documentation.wazuh.com/current/user-manual/capabilities/vulnerability-detection.html">Vulnerability detector documentation</md-list-item>
+            <md-list-item target="_blank" class="wz-text-link" ng-href="https://documentation.wazuh.com/current/user-manual/reference/ossec-conf/wodle-vuln-detector.html">Vulnerability detector reference</md-list-item>
 
             <md-divider></md-divider>
 
@@ -147,8 +108,8 @@
 
             <md-subheader>More options</md-subheader>
             <md-list-item layout-wrap>
-                <md-button ng-class="JSONContent ? 'active' : ''" class="wz-button md-raised md-primary small" ng-click="getJSON('open-scap')">{{ JSONContent ? "Close JSON viewer" : "Open JSON viewer" }}</md-button>
-                <md-button ng-class="XMLContent ? 'active' : ''" class="wz-button md-raised md-primary small" ng-click="getXML('open-scap')">{{ XMLContent ? "Close XML viewer" : "Open XML viewer" }}</md-button>
+                <md-button ng-class="JSONContent ? 'active' : ''" class="wz-button md-raised md-primary small" ng-click="getJSON('vulnerability-detector')">{{ JSONContent ? "Close JSON viewer" : "Open JSON viewer" }}</md-button>
+                <md-button ng-class="XMLContent ? 'active' : ''" class="wz-button md-raised md-primary small" ng-click="getXML('vulnerability-detector')">{{ XMLContent ? "Close XML viewer" : "Open XML viewer" }}</md-button>
             </md-list-item>
         </md-list>
     </md-sidenav>

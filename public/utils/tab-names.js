@@ -49,5 +49,11 @@ export default {
     "integrity-monitoring": "Integrity monitoring",
     "policy-monitoring": "Policy monitoring",
     "log-collection": "Log collection",
-    "agentless": "Agentless"
+    "agentless": "Agentless",
+    "inventory": "Inventory",
+    "osquery": "Osquery",
+    "open-scap": "OpenSCAP",
+    "cis-cat": "CIS-CAT",
+    "vulnerabilities": "Vulnerabilities",
+    "amazon-s3": "Amazon S3"
 }

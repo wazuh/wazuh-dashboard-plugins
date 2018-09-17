@@ -1,5 +1,5 @@
 <!-- This section contains the main content and the right sidenav -->
-<div flex="auto" layout="row" ng-if="configurationSubTab === 'cis-cat'">
+<div flex="auto" layout="row" ng-if="configurationSubTab === 'amazon-general'">
 
     <!-- This section appears when there's no configuration -->
     <wz-no-config flex ng-if="false"></wz-no-config>
@@ -8,67 +8,45 @@
     <!-- This section is the main content -->
     <div flex layout="column">
 
-        <!-- The main card will all the settings -->
+        <!-- General card -->
         <md-card class="wz-md-card" ng-if="!JSONContent && !XMLContent">
             <md-card-content>
                 <span class="font-size-16">Main settings</span>
+                <div class="wz-margin-top-10">
+                    <span class="md-subheader small">Common settings applied to all Amazon S3 buckets</span>
+                </div>
                 <md-divider class="wz-margin-top-10"></md-divider>
 
                 <!-- Configuration block -->
                 <div class="wz-padding-top-10">
 
                     <wz-config-item
-                        label="CIS-CAT integration status"
+                        label="Amazon S3 integration status"
                         value="enabled">
                     </wz-config-item>
                     <wz-config-item
-                        label="Timeout (in seconds) for scan executions"
+                        label="Frequency for reading from S3 buckets"
                         value="1800">
                     </wz-config-item>
                     <wz-config-item
-                        label="Path to Java executable directory"
-                        value="wodles/java">
+                        label="Run on start"
+                        value="enabled"
+                        notResponsive="true">
                     </wz-config-item>
                     <wz-config-item
-                        label="Path to CIS-CAT executable directory"
-                        value="wodles/ciscat">
-                    </wz-config-item>
-
-                </div>
-                <!-- End configuration block -->
-
-                <div class="wz-margin-top-10"><span class="font-size-16">Scheduling settings</span></div>
-                <md-divider class="wz-margin-top-10"></md-divider>
-
-                <!-- Configuration block -->
-                <div class="wz-padding-top-10">
-
-                    <wz-config-item
-                        label="Interval between scan executions"
+                        label="Remove bucket logs after being read"
                         value="1d">
                     </wz-config-item>
                     <wz-config-item
-                        label="Scan on start"
-                        value="yes">
-                    </wz-config-item>
-                    <wz-config-item
-                        label="Day of the month to run scans"
-                        value="20">
-                    </wz-config-item>
-                    <wz-config-item
-                        label="Day of the week to run scans"
-                        value="monday">
-                    </wz-config-item>
-                    <wz-config-item
-                        label="Time of the day to run scans"
-                        value="17:00">
+                        label="Skip logs that can't be processed"
+                        value="enabled">
                     </wz-config-item>
 
                 </div>
                 <!-- End configuration block -->
             </md-card-content>
         </md-card>
-        <!-- End main card with all the settings -->
+        <!-- End general card -->
 
         <!-- JSON card -->
         <md-card flex="auto" class="wz-md-card" ng-if="JSONContent">
@@ -109,8 +87,8 @@
         md-is-locked-open="true">
         <md-list>
             <md-subheader>Any questions?</md-subheader>
-            <md-list-item target="_blank" class="wz-text-link" ng-href="https://documentation.wazuh.com/current/user-manual/capabilities/policy-monitoring/ciscat/ciscat.html">CIS-CAT module documentation</md-list-item>
-            <md-list-item target="_blank" class="wz-text-link" ng-href="https://documentation.wazuh.com/current/user-manual/reference/ossec-conf/wodle-ciscat.html">CIS-CAT module reference</md-list-item>
+            <md-list-item target="_blank" class="wz-text-link" ng-href="https://documentation.wazuh.com/current/amazon/index.html">Using Wazuh to monitor AWS</md-list-item>
+            <md-list-item target="_blank" class="wz-text-link" ng-href="https://documentation.wazuh.com/current/user-manual/reference/ossec-conf/wodle-s3.html">Amazon S3 module reference</md-list-item>
 
             <md-divider></md-divider>
 
@@ -122,8 +100,8 @@
 
             <md-subheader>More options</md-subheader>
             <md-list-item layout-wrap>
-                <md-button ng-class="JSONContent ? 'active' : ''" class="wz-button md-raised md-primary small" ng-click="getJSON('cis-cat')">{{ JSONContent ? "Close JSON viewer" : "Open JSON viewer" }}</md-button>
-                <md-button ng-class="XMLContent ? 'active' : ''" class="wz-button md-raised md-primary small" ng-click="getXML('cis-cat')">{{ XMLContent ? "Close XML viewer" : "Open XML viewer" }}</md-button>
+                <md-button ng-class="JSONContent ? 'active' : ''" class="wz-button md-raised md-primary small" ng-click="getJSON('amazon-s3')">{{ JSONContent ? "Close JSON viewer" : "Open JSON viewer" }}</md-button>
+                <md-button ng-class="XMLContent ? 'active' : ''" class="wz-button md-raised md-primary small" ng-click="getXML('amazon-s3')">{{ XMLContent ? "Close XML viewer" : "Open XML viewer" }}</md-button>
             </md-list-item>
         </md-list>
     </md-sidenav>

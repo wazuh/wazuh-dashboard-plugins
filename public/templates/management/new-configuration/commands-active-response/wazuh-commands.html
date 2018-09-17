@@ -1,5 +1,5 @@
 <!-- This section contains the main content and the right sidenav -->
-<div flex="auto" layout="row" ng-if="configurationSubTab === 'command'">
+<div flex="auto" layout="row" ng-if="configurationSubTab === 'wazuh-commands'">
 
     <!-- This section appears when there's no configuration -->
     <wz-no-config flex ng-if="false"></wz-no-config>
@@ -11,9 +11,9 @@
         <!-- The main card will all the settings -->
         <md-card flex="auto" class="wz-md-card" ng-if="!JSONContent && !XMLContent">
             <md-card-content flex layout="column">
-                <span class="font-size-16">Commands definitions</span>
+                <span class="font-size-16">Wazuh commands definitions</span>
                 <div class="wz-margin-top-10">
-                    <span class="md-subheader small">Find here all the currently defined commands</span>
+                    <span class="md-subheader small">Find here all the currently defined commands using the Wazuh "Command" module</span>
                 </div>
                 <md-divider class="wz-margin-top-10"></md-divider>
 

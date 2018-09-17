@@ -1,5 +1,5 @@
 <!-- This section contains the main content and the right sidenav -->
-<div flex="auto" layout="row" ng-if="configurationSubTab === 'osquery'">
+<div flex="auto" layout="row" ng-if="configurationSubTab === 'ciscat-benchmarks'">
 
     <!-- This section appears when there's no configuration -->
     <wz-no-config flex ng-if="false"></wz-no-config>
@@ -11,36 +11,44 @@
         <!-- The main card will all the settings -->
         <md-card class="wz-md-card" ng-if="!JSONContent && !XMLContent">
             <md-card-content>
-                <span class="font-size-16">Main settings</span>
+                <span class="font-size-16">Benchmarks</span>
+                <div class="wz-margin-top-10">
+                    <span class="md-subheader small">List of CIS-CAT benchmarks to run and perform scans</span>
+                </div>
                 <md-divider class="wz-margin-top-10"></md-divider>
 
                 <!-- Configuration block -->
                 <div class="wz-padding-top-10">
 
-                    <wz-config-item
-                        label="Osquery integration status"
-                        value="enabled">
-                    </wz-config-item>
-                    <wz-config-item
-                        label="Auto-run the Osquery daemon"
-                        value="yes">
-                    </wz-config-item>
-                    <wz-config-item
-                        label="Path to the Osquery executable"
-                        value="/usr/share/osquery/bin/osqueryd">
-                    </wz-config-item>
-                    <wz-config-item
-                        label="Path to the Osquery results log file"
-                        value="/var/log/osquery/osqueryd.results.log">
-                    </wz-config-item>
-                    <wz-config-item
-                        label="Path to the Osquery configuration file"
-                        value="	/etc/osquery/osquery.conf">
-                    </wz-config-item>
-                    <wz-config-item
-                        label="Use defined labels as decorators"
-                        value="	/etc/osquery/osquery.conf">
-                    </wz-config-item>
+                    <table class="table table-striped table-condensed" style="table-layout: fixed !important;">
+                        <thead class="wz-text-bold">
+                            <th class="wz-text-left">Test</th>
+                            <th class="wz-text-left">Test</th>
+                            <th class="wz-text-left">Test</th>
+                        </thead>
+                        <tbody class="wz-word-wrap">
+                            <tr>
+                                <td>test</td>
+                                <td>test</td>
+                                <td>test</td>
+                            </tr>
+                            <tr>
+                                <td>test</td>
+                                <td>test</td>
+                                <td>test</td>
+                            </tr>
+                            <tr>
+                                <td>test</td>
+                                <td>test</td>
+                                <td>test</td>
+                            </tr>
+                            <tr>
+                                <td>test</td>
+                                <td>test</td>
+                                <td>test</td>
+                            </tr>
+                        </tbody>
+                    </table>
 
                 </div>
                 <!-- End configuration block -->
@@ -87,8 +95,8 @@
         md-is-locked-open="true">
         <md-list>
             <md-subheader>Any questions?</md-subheader>
-            <md-list-item target="_blank" class="wz-text-link" ng-href="https://documentation.wazuh.com/current/user-manual/capabilities/osquery.html">Osquery module documentation</md-list-item>
-            <md-list-item target="_blank" class="wz-text-link" ng-href="https://documentation.wazuh.com/current/user-manual/reference/ossec-conf/wodle-osquery.html">Osquery module reference</md-list-item>
+            <md-list-item target="_blank" class="wz-text-link" ng-href="https://documentation.wazuh.com/current/user-manual/capabilities/policy-monitoring/ciscat/ciscat.html">CIS-CAT module documentation</md-list-item>
+            <md-list-item target="_blank" class="wz-text-link" ng-href="https://documentation.wazuh.com/current/user-manual/reference/ossec-conf/wodle-ciscat.html">CIS-CAT module reference</md-list-item>
 
             <md-divider></md-divider>
 
@@ -100,8 +108,8 @@
 
             <md-subheader>More options</md-subheader>
             <md-list-item layout-wrap>
-                <md-button ng-class="JSONContent ? 'active' : ''" class="wz-button md-raised md-primary small" ng-click="getJSON('osquery')">{{ JSONContent ? "Close JSON viewer" : "Open JSON viewer" }}</md-button>
-                <md-button ng-class="XMLContent ? 'active' : ''" class="wz-button md-raised md-primary small" ng-click="getXML('osquery')">{{ XMLContent ? "Close XML viewer" : "Open XML viewer" }}</md-button>
+                <md-button ng-class="JSONContent ? 'active' : ''" class="wz-button md-raised md-primary small" ng-click="getJSON('cis-cat')">{{ JSONContent ? "Close JSON viewer" : "Open JSON viewer" }}</md-button>
+                <md-button ng-class="XMLContent ? 'active' : ''" class="wz-button md-raised md-primary small" ng-click="getXML('cis-cat')">{{ XMLContent ? "Close XML viewer" : "Open XML viewer" }}</md-button>
             </md-list-item>
         </md-list>
     </md-sidenav>
