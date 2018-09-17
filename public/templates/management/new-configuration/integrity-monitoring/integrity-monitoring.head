@@ -1,4 +1,4 @@
-<div flex="auto" layout="column" ng-if="!load && configurationTab === 'integrity-monitoring'" ng-init="switchConfigurationSubTab('file-monitoring')">
+<div flex="auto" layout="column" ng-if="!load && configurationTab === 'integrity-monitoring'" ng-init="switchConfigurationSubTab('fim-general')">
 
     <!-- Headline -->
     <div layout="column" layout-padding>
@@ -15,7 +15,10 @@
         class="wz-nav-bar"
         md-selected-nav-item="configurationSubTab"
         nav-bar-aria-label="Integrity monitoring navigation links">
-        <md-nav-item class="wz-nav-item" md-nav-click="switchConfigurationSubTab('file-monitoring')" name="file-monitoring">File monitoring</md-nav-item>
-        <md-nav-item class="wz-nav-item" md-nav-click="switchConfigurationSubTab('agentless')" name="agentless">Agentless devices</md-nav-item>
+        <md-nav-item class="wz-nav-item" md-nav-click="switchConfigurationSubTab('fim-general')" name="fim-general">General</md-nav-item>
+        <md-nav-item class="wz-nav-item" md-nav-click="switchConfigurationSubTab('fim-monitored')" name="fim-monitored">Monitored</md-nav-item>
+        <md-nav-item class="wz-nav-item" md-nav-click="switchConfigurationSubTab('fim-ignored')" name="fim-ignored">Ignored</md-nav-item>
+        <md-nav-item class="wz-nav-item" md-nav-click="switchConfigurationSubTab('fim-nodiff')" name="fim-nodiff">No diff</md-nav-item>
+        <md-nav-item class="wz-nav-item" md-nav-click="switchConfigurationSubTab('fim-windows')" name="fim-windows">Windows</md-nav-item>
     </md-nav-bar>
     <!-- End Integrity monitoring navigation bar -->
