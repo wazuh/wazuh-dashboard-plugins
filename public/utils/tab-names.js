@@ -48,5 +48,6 @@ export default {
     "global-configuration": "Global configuration",
     "integrity-monitoring": "Integrity monitoring",
     "policy-monitoring": "Policy monitoring",
-    "log-collection": "Log collection"
+    "log-collection": "Log collection",
+    "agentless": "Agentless"
 }
