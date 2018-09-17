@@ -1,0 +1,23 @@
+<div flex="auto" layout="column" ng-if="!load && configurationTab === 'policy-monitoring'" ng-init="switchConfigurationSubTab('pm-general')">
+
+    <!-- Headline -->
+    <div layout="column" layout-padding>
+        <div>
+            <span class="font-size-18">Policy monitoring</span>
+            <span class="wz-agent-status-indicator small teal">Enabled</span>
+        </div>
+        <span class="md-subheader">Verify that your systems are configured according to your security policies baseline</span>
+    </div>
+    <!-- End headline -->
+
+    <!-- Policy monitoring navigation bar -->
+    <md-nav-bar
+        class="wz-nav-bar"
+        md-selected-nav-item="configurationSubTab"
+        nav-bar-aria-label="Policy monitoring navigation links">
+        <md-nav-item class="wz-nav-item" md-nav-click="switchConfigurationSubTab('pm-general')" name="pm-general">General</md-nav-item>
+        <md-nav-item class="wz-nav-item" md-nav-click="switchConfigurationSubTab('pm-rootkit')" name="pm-rootkit">Rootkits</md-nav-item>
+        <md-nav-item class="wz-nav-item" md-nav-click="switchConfigurationSubTab('pm-unix')" name="pm-unix">UNIX</md-nav-item>
+        <md-nav-item class="wz-nav-item" md-nav-click="switchConfigurationSubTab('pm-windows')" name="pm-windows">Windows</md-nav-item>
+    </md-nav-bar>
+    <!-- End Policy monitoring navigation bar -->
