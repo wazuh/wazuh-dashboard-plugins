@@ -6,7 +6,7 @@
             <span class="font-size-18">Amazon S3</span>
             <span class="wz-agent-status-indicator small teal">Enabled</span>
         </div>
-        <span class="md-subheader">Security events related to your Amazon AWS services, collected directly via AWS API.</span>
+        <span class="md-subheader">Security events related to your Amazon AWS services, collected directly via AWS API</span>
     </div>
     <!-- End headline -->
 

@@ -6,7 +6,7 @@
             <span class="font-size-18">OpenSCAP</span>
             <span class="wz-agent-status-indicator small teal">Enabled</span>
         </div>
-        <span class="md-subheader">Configuration assessment and automation of compliance monitoring using SCAP checks.</span>
+        <span class="md-subheader">Configuration assessment and automation of compliance monitoring using SCAP checks</span>
     </div>
     <!-- End headline -->
 
