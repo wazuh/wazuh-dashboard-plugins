@@ -437,8 +437,7 @@ export class ElasticWrapper {
         url: data._source.url,
         port: data._source.api_port,
         insecure: data._source.insecure,
-        cluster_info: data._source.cluster_info,
-        extensions: data._source.extensions
+        cluster_info: data._source.cluster_info
       };
     } catch (error) {
       return Promise.reject(error);
