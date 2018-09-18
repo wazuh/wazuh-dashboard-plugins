@@ -38,6 +38,10 @@ class AgentsPreviewController {
   }
 
   $onInit() {
+    this.$scope.init = true;
+    const loc = this.$location.search();
+    if(loc && loc.agent) return this.showAgent({id:loc.agent})
+
     this.$scope.search = term => {
       this.$scope.$broadcast('wazuhSearch', { term });
     };
@@ -76,7 +80,7 @@ class AgentsPreviewController {
 
     this.$scope.downloadCsv = async () => this.downloadCsv();
     this.$scope.showAgent = agent => this.showAgent(agent);
-
+    this.$scope.init = false;
     //Load
     this.load();
   }
