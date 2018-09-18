@@ -25,5 +25,18 @@
             </div>
         </div>
         <!-- End breadcrumbs -->
+
+        <!-- Separator -->
+        <span flex></span>
+        <!-- End separator -->
+
+        <!-- Troubleshooting heading -->
+        <md-subheader>Questions?</md-subheader>
+
+        <!-- Mailing list button -->
+        <md-button md-no-ink class="wz-button-flat small" tooltip="Ask on the mailing list" tooltip-placement="bottom" target="_blank" ng-href="https://groups.google.com/forum/#!forum/wazuh" aria-label="Ask on the mailing list button"><i class="fa fa-fw fa-google" aria-hidden="true"></i> Mailing list</md-button>
+
+        <!-- Github button -->
+        <md-button md-no-ink class="wz-button-flat small" tooltip="Ask on GitHub" tooltip-placement="bottom" target="_blank" ng-href="https://github.com/wazuh/wazuh/issues" aria-label="Ask on GitHub button"><i class="fa fa-fw fa-github" aria-hidden="true"></i> GitHub</md-button>
     </div>
     <!-- End navigation section -->
