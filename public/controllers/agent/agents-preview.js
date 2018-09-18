@@ -40,7 +40,7 @@ class AgentsPreviewController {
   $onInit() {
     this.$scope.init = true;
     const loc = this.$location.search();
-    if(loc && loc.agent) return this.showAgent({id:loc.agent})
+    if(loc && loc.agent && loc.agent !== '000') return this.showAgent({id:loc.agent})
 
     this.$scope.search = term => {
       this.$scope.$broadcast('wazuhSearch', { term });
