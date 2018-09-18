@@ -38,7 +38,7 @@ export class TabVisualizations {
       audit: 15,
       pci: 6,
       gdpr: 6,
-      aws: 10,
+      aws: 6,
       virustotal: 7
     };
 

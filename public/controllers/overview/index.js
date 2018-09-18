@@ -16,13 +16,12 @@ import { TabNames } from '../../utils/tab-names';
 import { TabDescription } from '../../../server/reporting/tab-description';
 
 import {
-  metricsGeneral,  
+  metricsGeneral,
   metricsAudit,
   metricsVulnerability,
   metricsScap,
   metricsCiscat,
-  metricsVirustotal,
-  metricsAws
+  metricsVirustotal
 } from '../../utils/overview-metrics';
 
 const app = uiModules.get('app/wazuh', []);
@@ -99,9 +98,6 @@ app.controller('overviewController', function(
           break;
         case 'virustotal':
           createMetrics(metricsVirustotal);
-          break;
-        case 'aws':
-          createMetrics(metricsAws);
           break;
       }
     }

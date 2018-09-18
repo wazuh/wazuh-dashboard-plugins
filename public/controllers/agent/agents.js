@@ -340,7 +340,7 @@ class AgentsController {
               ? packagesDate.items[0].scan_time
               : 'Unknown',
           processesDate:
-          processesDate && processesDate.items && processesDate.items.length
+            processesDate && processesDate.items && processesDate.items.length
               ? processesDate.items[0].scan_time
               : 'Unknown'
         };

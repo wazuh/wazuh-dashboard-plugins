@@ -69,21 +69,12 @@ const metricsVirustotal = {
   virusTotal: '[vis-id="\'Wazuh-App-Overview-Virustotal-Total\'"]'
 };
 
-// Metrics AWS
-const metricsAws = {
-  awsLogins: '[vis-id="\'Wazuh-App-Overview-AWS-Metric-Successful-logins\'"]',
-  awsMostActiveUser: '[vis-id="\'Wazuh-App-Overview-AWS-Most-active-user\'"]',
-  awsAuthorized:
-    '[vis-id="\'Wazuh-App-Overview-AWS-Metric-Authorize-security\'"]',
-  awsRevoked: '[vis-id="\'Wazuh-App-Overview-AWS-Metric-Revoke-security\'"]'
-};
 
 export default {
-  metricsGeneral,  
+  metricsGeneral,
   metricsAudit,
   metricsVulnerability,
   metricsScap,
   metricsCiscat,
-  metricsVirustotal,
-  metricsAws
+  metricsVirustotal
 };
