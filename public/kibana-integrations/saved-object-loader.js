@@ -1,10 +1,10 @@
-import _ from 'lodash'
+import _ from 'lodash';
 import { Scanner } from 'ui/utils/scanner';
 import { StringUtils } from 'ui/utils/string_utils';
 import { SavedObjectsClient } from 'ui/saved_objects';
-import { SavedObjectProvider } from './saved-objects';
+
 export class SavedObjectLoader {
-  constructor(SavedObjectClass, kbnIndex, kbnUrl, $http, chrome ) {
+  constructor(SavedObjectClass, kbnIndex, kbnUrl, $http, chrome) {
     this.type = SavedObjectClass.type;
     this.Class = SavedObjectClass;
     this.lowercaseType = this.type.toLowerCase();
@@ -18,9 +18,9 @@ export class SavedObjectLoader {
     });
 
     this.loaderProperties = {
-      name: `${ this.lowercaseType }s`,
+      name: `${this.lowercaseType}s`,
       noun: StringUtils.upperFirst(this.type),
-      nouns: `${ this.lowercaseType }s`,
+      nouns: `${this.lowercaseType}s`
     };
 
     this.savedObjectsClient = new SavedObjectsClient({
@@ -29,9 +29,9 @@ export class SavedObjectLoader {
   }
 
   // Fake async function, only to resolve a promise
-  async processFunc () {
-      return;
-  } 
+  async processFunc() {
+    return;
+  }
 
   /**
    * Retrieve a saved object by id. Returns a promise that completes when the object finishes
@@ -39,43 +39,42 @@ export class SavedObjectLoader {
    * @param id
    * @returns {Promise<SavedObject>}
    */
-  get(id,raw) {
+  get(id, raw) {
     const instance = new this.Class(id);
 
     instance.init = _.once(() => {
-        // ensure that the esType is defined
-       
-        return Promise.resolve()
-          .then(() => {
-            // If there is not id, then there is no document to fetch from elasticsearch
-            if (!instance.id) {
-              // just assign the defaults and be done
-              _.assign(instance, instance.defaults);
-              return instance.hydrateIndexPattern().then(() => {
-                return afterESResp.call(instance);
-              });
-            }
-              return this.processFunc()
-              .then(() => {
-  
-                return {
-                  _id: raw.id,
-                  _type: raw.type,
-                  _source: _.cloneDeep(raw.attributes),
-                  found: raw._version ? true : false
-                };
-              })
-              .then(instance.applyESResp)
-              .catch(instance.applyEsResp);
-          })
-          .then(() => instance);
-      })
+      // ensure that the esType is defined
+
+      return Promise.resolve()
+        .then(() => {
+          // If there is not id, then there is no document to fetch from elasticsearch
+          if (!instance.id) {
+            // just assign the defaults and be done
+            _.assign(instance, instance.defaults);
+            return instance.hydrateIndexPattern().then(() => {
+              return afterESResp.call(instance); // eslint-disable-line
+            });
+          }
+          return this.processFunc()
+            .then(() => {
+              return {
+                _id: raw.id,
+                _type: raw.type,
+                _source: _.cloneDeep(raw.attributes),
+                found: raw._version ? true : false
+              };
+            })
+            .then(instance.applyESResp)
+            .catch(instance.applyEsResp);
+        })
+        .then(() => instance);
+    });
     const object = instance.init();
     return object;
   }
 
   urlFor(id) {
-    return this.kbnUrl.eval(`#/${ this.lowercaseType }/{{id}}`, { id: id });
+    return this.kbnUrl.eval(`#/${this.lowercaseType}/{{id}}`, { id: id });
   }
 
   delete(ids) {
@@ -132,20 +131,22 @@ export class SavedObjectLoader {
    * @returns {Promise}
    */
   findAll(search = '', size = 100) {
-    return this.savedObjectsClient.find(
-      {
+    return this.savedObjectsClient
+      .find({
         type: this.lowercaseType,
         search: search ? `${search}*` : undefined,
         perPage: size,
         page: 1,
         searchFields: ['title^3', 'description']
-      }).then((resp) => {
-      return {
-        total: resp.total,
-        hits: resp.savedObjects
-          .map((savedObject) => this.mapSavedObjectApiHits(savedObject))
-      };
-    });
+      })
+      .then(resp => {
+        return {
+          total: resp.total,
+          hits: resp.savedObjects.map(savedObject =>
+            this.mapSavedObjectApiHits(savedObject)
+          )
+        };
+      });
   }
 
   find(search = '', size = 100) {

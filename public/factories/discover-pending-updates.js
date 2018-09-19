@@ -10,26 +10,20 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import { uiModules } from 'ui/modules'
+export class DiscoverPendingUpdates {
+  constructor() {
+    this.pendingUpdates = [];
+  }
 
-const app = uiModules.get('app/wazuh', []);
+  addItem(query, filters) {
+    this.pendingUpdates.push(query, filters);
+  }
 
-class DiscoverPendingUpdates {
-    constructor(){
-        this.pendingUpdates = [];
-    }
+  getList() {
+    return this.pendingUpdates;
+  }
 
-    addItem (query, filters) {
-        this.pendingUpdates.push(query, filters);
-    }
-
-    getList () {
-        return this.pendingUpdates;
-    }
-
-    removeAll () {
-        this.pendingUpdates = [];
-    }
+  removeAll() {
+    this.pendingUpdates = [];
+  }
 }
-
-app.service('discoverPendingUpdates', DiscoverPendingUpdates);

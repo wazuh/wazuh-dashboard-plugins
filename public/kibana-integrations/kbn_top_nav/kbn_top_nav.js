@@ -47,10 +47,10 @@ import './bread_crumbs/bread_crumbs';
 const module = uiModules.get('kibana');
 
 // WAZUH. Renamed from kbnTopNav to wzKbnTopNav
-module.directive('wzKbnTopNav', function (Private) {
+module.directive('wzKbnTopNav', function(Private) {
   const KbnTopNavController = Private(KbnTopNavControllerProvider);
   const navbarExtensions = Private(NavBarExtensionsRegistryProvider);
-  const getNavbarExtensions = _.memoize(function (name) {
+  const getNavbarExtensions = _.memoize(function(name) {
     if (!name) throw new Error('navbar directive requires a name attribute');
     return _.sortBy(navbarExtensions.byAppName[name], 'order');
   });
@@ -96,7 +96,9 @@ module.directive('wzKbnTopNav', function (Private) {
 
         const transcludedContent = transcludedContentContainer.children;
         _.forEach(transcludedContent, transcludedItem => {
-          const transclusionSlot = transcludedItem.getAttribute('data-transclude-slot');
+          const transclusionSlot = transcludedItem.getAttribute(
+            'data-transclude-slot'
+          );
           $scope.transcludes[transclusionSlot] = transcludedItem;
         });
       });
@@ -143,7 +145,9 @@ module.directive('wzKbnTopNav', function (Private) {
       transclusionSlotNames.forEach(name => {
         const transcludedItem = scope.transcludes[name];
         if (transcludedItem) {
-          const transclusionSlot = document.querySelector(`[data-transclude-slot="${name}"]`);
+          const transclusionSlot = document.querySelector(
+            `[data-transclude-slot="${name}"]`
+          );
           angular.element(transclusionSlot).replaceWith(transcludedItem);
         }
       });

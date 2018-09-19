@@ -9,16 +9,27 @@
  *
  * Find more information about this on the LICENSE file.
  */
-export default async (genericReq, errorHandler) => {
-    try {
-        const data = await genericReq.request('GET', '/api/wazuh-api/ram');
-        const totalRAM = data.data.ram
-        if(totalRAM < 3072 && totalRAM > 2048) {
-            errorHandler.handle(`Kibana server has ${totalRAM}MB of RAM, performance will suffer. Please increase it.`, 'RAM', true);
-        } else if(totalRAM <= 2048) {
-            errorHandler.handle(`Kibana server has ${totalRAM}MB of RAM, performance will suffer. Please increase it.`, 'RAM');
-        }
-    } catch (error){
-        errorHandler.handle(`Kibana server has an unknown amount of RAM, please review it.`, 'RAM', true);
+export async function totalRAM(genericReq, errorHandler) {
+  try {
+    const data = await genericReq.request('GET', '/api/wazuh-api/ram');
+    const totalRAM = data.data.ram;
+    if (totalRAM < 3072 && totalRAM > 2048) {
+      errorHandler.handle(
+        `Kibana server has ${totalRAM}MB of RAM, performance will suffer. Please increase it.`,
+        'RAM',
+        true
+      );
+    } else if (totalRAM <= 2048) {
+      errorHandler.handle(
+        `Kibana server has ${totalRAM}MB of RAM, performance will suffer. Please increase it.`,
+        'RAM'
+      );
     }
+  } catch (error) {
+    errorHandler.handle(
+      `Kibana server has an unknown amount of RAM, please review it.`,
+      'RAM',
+      true
+    );
+  }
 }

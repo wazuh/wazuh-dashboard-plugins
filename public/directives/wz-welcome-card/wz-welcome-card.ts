@@ -35,7 +35,7 @@ class WzWelcomeCard {
         this.template = template;
     }
 
-    link(scope, elm, attrs) { // eslint-disable-line
+    link(scope, elm, attrs) { 
         scope.callSwitchTab = () => scope.switchTab();
     }
 }

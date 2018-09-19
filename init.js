@@ -11,18 +11,18 @@
  */
 
 // Imports all server modules
-import initialize      from './server/initialize';
-import wazuhElastic    from './server/routes/wazuh-elastic';
-import wazuhApiElastic from './server/routes/wazuh-api-elastic';
-import monitoring      from './server/monitoring';
-import wazuhApi        from './server/routes/wazuh-api';
-import wazuhReporting  from './server/routes/wazuh-reporting';
+import { Initialize } from './server/initialize';
+import { WazuhElasticRouter } from './server/routes/wazuh-elastic';
+import { WazuhApiElasticRoutes } from './server/routes/wazuh-api-elastic';
+import { Monitoring } from './server/monitoring';
+import { WazuhApiRoutes } from './server/routes/wazuh-api';
+import { WazuhReportingRoutes } from './server/routes/wazuh-reporting';
 
-export default (server, options) => {
-    initialize(server, options);
-    wazuhElastic(server, options);
-    wazuhApiElastic(server, options);
-    monitoring(server, false);
-    wazuhApi(server, options);
-    wazuhReporting(server, options);
-};
+export function initApp(server) {
+  Initialize(server);
+  WazuhElasticRouter(server);
+  WazuhApiElasticRoutes(server);
+  Monitoring(server, false);
+  WazuhApiRoutes(server);
+  WazuhReportingRoutes(server);
+}

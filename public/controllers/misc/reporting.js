@@ -13,92 +13,122 @@ import { uiModules } from 'ui/modules';
 
 const app = uiModules.get('app/wazuh', []);
 
-// Logs controller
-app.controller('reportingController', function ($scope, errorHandler, genericReq) {
-    $scope.loading = true;
-    $scope.itemsPerPage = 15;
-    $scope.pagedItems = [];
-    $scope.currentPage = 0;
-    let items = [];
-    $scope.gap = 0;
+class ReportingController {
+  constructor($scope, errorHandler, genericReq) {
+    this.$scope = $scope;
+    this.errorHandler = errorHandler;
+    this.genericReq = genericReq;
+    this.$scope.loading = true;
+    this.$scope.itemsPerPage = 15;
+    this.$scope.pagedItems = [];
+    this.$scope.currentPage = 0;
+    this.items = [];
+    this.$scope.gap = 0;
+  }
 
-    const load = async () => {
-        try {
-            $scope.loading = true;
-            const data = await genericReq.request('GET','/api/wazuh-reporting/reports',{});
-            items = data.data.list;
-            const gap = items.length / 15;
-            const gapInteger = parseInt(items.length / 15);
-            $scope.gap = gap - parseInt(items.length / 15) > 0 ? gapInteger + 1 : gapInteger;
-            if($scope.gap > 5) $scope.gap = 5;
-            $scope.search();
-            $scope.loading = false;
-            if(!$scope.$$phase) $scope.$digest();
-        } catch (error) {
-            errorHandler.handle(error,'Reporting');
-        }
+  $onInit() {
+    this.load();
+    this.$scope.refresh = () => this.load();
+    this.$scope.deleteReport = async name => this.deleteReport(name);
+    this.$scope.search = () => this.search();
+    this.$scope.groupToPages = () => this.groupToPages();
+    this.$scope.range = (size, start, end) => this.range(size, start, end);
+    this.$scope.prevPage = () => this.prevPage();
+    this.$scope.nextPage = () => this.nextPage();
+    this.$scope.setPage = () => this.setPage();
+  }
+
+  search() {
+    this.$scope.filteredItems = this.items;
+    this.$scope.currentPage = 0;
+    this.$scope.groupToPages();
+  }
+
+  async deleteReport(name) {
+    try {
+      this.$scope.loading = true;
+      await this.genericReq.request(
+        'DELETE',
+        '/api/wazuh-reporting/report/' + name,
+        {}
+      );
+      await this.load();
+      this.errorHandler.info('Success', 'Reporting');
+    } catch (error) {
+      this.errorHandler.handle(error, 'Reporting');
     }
+  }
 
-    load();
-    
-    $scope.refresh = () => load();
+  // calculate page in place
+  groupToPages() {
+    this.$scope.pagedItems = [];
 
-    $scope.deleteReport = async name => {
-        try {
-            $scope.loading = true;
-            await genericReq.request('DELETE','/api/wazuh-reporting/report/' + name,{})
-            await load();
-            errorHandler.info('Success','Reporting');
-        } catch (error) {
-            errorHandler.handle(error,'Reporting');
-        }
-    }	
+    for (let i = 0; i < this.$scope.filteredItems.length; i++) {
+      if (i % this.$scope.itemsPerPage === 0) {
+        this.$scope.pagedItems[Math.floor(i / this.$scope.itemsPerPage)] = [
+          this.$scope.filteredItems[i]
+        ];
+      } else {
+        this.$scope.pagedItems[Math.floor(i / this.$scope.itemsPerPage)].push(
+          this.$scope.filteredItems[i]
+        );
+      }
+    }
+  }
 
-    // init the filtered items
-    $scope.search = function () {
-        $scope.filteredItems = items;
-        $scope.currentPage = 0;
-        // now group by pages
-        $scope.groupToPages();
-    };
-    // calculate page in place
-    $scope.groupToPages = function () {
-        $scope.pagedItems = [];
-        
-        for (let i = 0; i < $scope.filteredItems.length; i++) {
-            if (i % $scope.itemsPerPage === 0) {
-                $scope.pagedItems[Math.floor(i / $scope.itemsPerPage)] = [ $scope.filteredItems[i] ];
-            } else {
-                $scope.pagedItems[Math.floor(i / $scope.itemsPerPage)].push($scope.filteredItems[i]);
-            }
-        }
-    };
-    $scope.range = function (size,start, end) {
-        const ret = [];        
-                      
-        if (size < end) {
-            end = size;
-            start = size-$scope.gap;
-        }
-        for (let i = start; i < end; i++) {
-            ret.push(i);
-        }              
-        return ret;
-    };
+  range(size, start, end) {
+    const ret = [];
 
-    $scope.prevPage = function () {
-        if ($scope.currentPage > 0) {
-            $scope.currentPage--;
-        }
-    };
-    
-    $scope.nextPage = function () {
-        if ($scope.currentPage < $scope.pagedItems.length - 1) {
-            $scope.currentPage++;
-        }
-    };
-    
-    $scope.setPage = function () {
-        $scope.currentPage = this.n;
-    };
-});
+    if (size < end) {
+      end = size;
+      start = size - this.$scope.gap;
+    }
+    for (let i = start; i < end; i++) {
+      ret.push(i);
+    }
+    return ret;
+  }
+
+  prevPage() {
+    if (this.$scope.currentPage > 0) {
+      this.$scope.currentPage--;
+    }
+  }
+
+  nextPage() {
+    if (this.$scope.currentPage < this.$scope.pagedItems.length - 1) {
+      this.$scope.currentPage++;
+    }
+  }
+
+  setPage() {
+    this.$scope.currentPage = this.n;
+  }
+
+  async load() {
+    try {
+      this.$scope.loading = true;
+      const data = await this.genericReq.request(
+        'GET',
+        '/api/wazuh-reporting/reports',
+        {}
+      );
+      this.items = data.data.list;
+      const gap = this.items.length / 15;
+      const gapInteger = parseInt(this.items.length / 15);
+      this.$scope.gap =
+        gap - parseInt(this.items.length / 15) > 0
+          ? gapInteger + 1
+          : gapInteger;
+      if (this.$scope.gap > 5) this.$scope.gap = 5;
+      this.$scope.search();
+      this.$scope.loading = false;
+      if (!this.$scope.$$phase) this.$scope.$digest();
+    } catch (error) {
+      this.errorHandler.handle(error, 'Reporting');
+    }
+  }
+}
+
+// Logs controller
+app.controller('reportingController', ReportingController);

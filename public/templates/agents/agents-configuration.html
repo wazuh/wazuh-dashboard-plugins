@@ -335,6 +335,14 @@
                                 <span flex="25">Restrict</span>
                                 <span class="wz-text-right color-grey">{{item.restrict}}</span>
                             </div>
+                            <div ng-if="item.recursion_level" layout="row" class="wz-padding-top-10">
+                                <span flex="25">Recursion level</span>
+                                <span class="wz-text-right color-grey">{{item.recursion_level}}</span>
+                            </div>
+                            <div ng-if="item.tags" layout="row" class="wz-padding-top-10">
+                                <span flex="25">Tags</span>
+                                <span class="wz-text-right color-grey">{{item.tags}}</span>
+                            </div>
                             <md-divider class="wz-margin-top-10" ng-if="!$last"></md-divider>
                         </div>
 

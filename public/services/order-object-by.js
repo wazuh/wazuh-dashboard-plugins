@@ -14,41 +14,42 @@
  * Find more information about this on the LICENSE file.
  */
 'use strict';
-import { uiModules } from 'ui/modules'
+import { uiModules } from 'ui/modules';
 
-uiModules.get('app/wazuh', [])
-.filter('orderObjectBy', function() {
-    return function(items, field, reverse) {
-        if(!items) return [];
+const app = uiModules.get('app/wazuh', []);
 
-        const isNumeric = n => !isNaN(parseFloat(n)) && isFinite(n);
+app.filter('orderObjectBy', function() {
+  return function(items, field, reverse) {
+    if (!items) return [];
 
-        const filtered = [];
+    const isNumeric = n => !isNaN(parseFloat(n)) && isFinite(n);
 
-        items.forEach((item, key) => {
-            item.key = key;
-            filtered.push(item);
-        });
+    const filtered = [];
 
-        const index = (obj, i) => obj[i];            
+    items.forEach((item, key) => {
+      item.key = key;
+      filtered.push(item);
+    });
 
-        filtered.sort((a, b) => {
-            let reducedA = field.split('.').reduce(index, a);
-            let reducedB = field.split('.').reduce(index, b);
+    const index = (obj, i) => obj[i];
 
-            if (isNumeric(reducedA) && isNumeric(reducedB)) {
-                reducedA = Number(reducedA);
-                reducedB = Number(reducedB);
-            }
+    filtered.sort((a, b) => {
+      let reducedA = field.split('.').reduce(index, a);
+      let reducedB = field.split('.').reduce(index, b);
 
-            if (reducedA === reducedB) return 0;
-            else return reducedA > reducedB ? 1 : -1;
-        });
+      if (isNumeric(reducedA) && isNumeric(reducedB)) {
+        reducedA = Number(reducedA);
+        reducedB = Number(reducedB);
+      }
 
-        if (reverse) {
-            filtered.reverse();
-        }
+      if (reducedA === reducedB) return 0;
+      else return reducedA > reducedB ? 1 : -1;
+    });
 
-        return filtered;
-    };
+    if (reverse) {
+      filtered.reverse();
+    }
+
+    return filtered;
+  };
 });

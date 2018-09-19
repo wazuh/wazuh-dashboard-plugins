@@ -10,51 +10,45 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import { uiModules } from 'ui/modules'
+export class WzMisc {
+  constructor() {
+    this.state = {
+      apiIsDown: false,
+      comeFromWizard: false,
+      blankScreenError: false,
+      lastRestart: null
+    };
+  }
 
-const app = uiModules.get('app/wazuh', []);
+  setApiIsDown(value) {
+    this.state.apiIsDown = value;
+  }
 
-class WzMisc {
-    constructor() {
-        this.state = {
-            apiIsDown       : false,
-            comeFromWizard  : false,
-            blankScreenError: false,
-            lastRestart     : null
-        }
-    }
+  getApiIsDown() {
+    return this.state.apiIsDown;
+  }
 
-    setApiIsDown (value) {
-        this.state.apiIsDown = value;
-    }
+  setWizard(value) {
+    this.state.comeFromWizard = value;
+  }
 
-    getApiIsDown() {
-        return this.state.apiIsDown;
-    }
+  getWizard() {
+    return this.state.comeFromWizard;
+  }
 
-    setWizard (value) {
-        this.state.comeFromWizard = value;
-    }
+  setBlankScr(value) {
+    this.state.blankScreenError = value;
+  }
 
-    getWizard() {
-        return this.state.comeFromWizard;
-    }
+  getBlankScr() {
+    return this.state.blankScreenError;
+  }
 
-    setBlankScr (value) { 
-        this.state.blankScreenError = value;
-    }
+  setLastRestart(value) {
+    this.state.lastRestart = value;
+  }
 
-    getBlankScr() {
-        return this.state.blankScreenError;
-    }
-
-    setLastRestart (value) {
-        this.state.lastRestart = value;
-    }
-
-    getLastRestart() {
-        return this.state.lastRestart;
-    }
+  getLastRestart() {
+    return this.state.lastRestart;
+  }
 }
-
-app.service('wzMisc', WzMisc);

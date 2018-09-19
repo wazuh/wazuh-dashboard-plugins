@@ -9,119 +9,167 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import { uiModules }  from 'ui/modules'
-import * as FileSaver from '../../services/file-saver'
+import { uiModules } from 'ui/modules';
+import * as FileSaver from '../../services/file-saver';
 
 const app = uiModules.get('app/wazuh', []);
 
-app.controller('agentsPreviewController', function ($scope, $routeParams, genericReq, appState, $location, errorHandler, csvReq, shareAgent, wzTableFilter) {
-    
-    $scope.search = term => {
-        $scope.$broadcast('wazuhSearch',{term})
-    }
-   
-    $scope.filter = filter => {
-        $scope.$broadcast('wazuhFilter',{filter})
-    }
+class AgentsPreviewController {
+  constructor(
+    $scope,
+    $routeParams,
+    genericReq,
+    appState,
+    $location,
+    errorHandler,
+    csvReq,
+    shareAgent,
+    wzTableFilter
+  ) {
+    this.$scope = $scope;
+    this.$routeParams = $routeParams;
+    this.genericReq = genericReq;
+    this.appState = appState;
+    this.$location = $location;
+    this.errorHandler = errorHandler;
+    this.csvReq = csvReq;
+    this.shareAgent = shareAgent;
+    this.wzTableFilter = wzTableFilter;
+  }
 
-    $scope.isClusterEnabled = appState.getClusterInfo() && appState.getClusterInfo().status === 'enabled'
-    $scope.loading     = true;
+  $onInit() {
+    this.$scope.search = term => {
+      this.$scope.$broadcast('wazuhSearch', { term });
+    };
 
-    $scope.status      = 'all';
-    $scope.osPlatform  = 'all';
-    $scope.version     = 'all'
-    $scope.osPlatforms = [];
-    $scope.versions    = [];
-    $scope.groups      = [];
-    $scope.nodes       = [];
-    $scope.node_name   = 'all';
-    $scope.mostActiveAgent = {
-        name: '',
-        id  : ''
+    this.$scope.filter = filter => {
+      this.$scope.$broadcast('wazuhFilter', { filter });
+    };
+
+    this.$scope.isClusterEnabled =
+      this.appState.getClusterInfo() &&
+      this.appState.getClusterInfo().status === 'enabled';
+
+    this.$scope.loading = true;
+    this.$scope.status = 'all';
+    this.$scope.osPlatform = 'all';
+    this.$scope.version = 'all';
+    this.$scope.osPlatforms = [];
+    this.$scope.versions = [];
+    this.$scope.groups = [];
+    this.$scope.nodes = [];
+    this.$scope.node_name = 'all';
+    this.$scope.mostActiveAgent = {
+      name: '',
+      id: ''
     };
 
     // Load URL params
-    if ($routeParams.tab){
-        $scope.submenuNavItem = $routeParams.tab;
+    if (this.$routeParams.tab) {
+      this.$scope.submenuNavItem = this.$routeParams.tab;
     }
 
     // Watcher for URL params
-    $scope.$watch('submenuNavItem', () => {
-        $location.search('tab', $scope.submenuNavItem);
+    this.$scope.$watch('submenuNavItem', () => {
+      this.$location.search('tab', this.$scope.submenuNavItem);
     });
 
-    $scope.downloadCsv = async () => {
-        try {
-            errorHandler.info('Your download should begin automatically...', 'CSV')
-            const currentApi   = JSON.parse(appState.getCurrentAPI()).id;
-            const output       = await csvReq.fetch('/agents', currentApi, wzTableFilter.get());
-            const blob         = new Blob([output], {type: 'text/csv'}); // eslint-disable-line
-
-            FileSaver.saveAs(blob, 'agents.csv');
-
-            return;
-
-        } catch (error) {
-            errorHandler.handle(error,'Download CSV');
-        }
-        return;
-    }
-
-    const load = async () => {
-        try{
-            const api = JSON.parse(appState.getCurrentAPI()).id
-            const clusterInfo    = appState.getClusterInfo();
-            const firstUrlParam  = clusterInfo.status === 'enabled' ? 'cluster' : 'manager';
-            const secondUrlParam = clusterInfo[firstUrlParam];
-
-            const pattern = appState.getCurrentPattern();
-            
-            const data = await Promise.all([
-                genericReq.request('GET', '/api/wazuh-api/agents-unique/' + api, {}),
-                genericReq.request('GET', `/api/wazuh-elastic/top/${firstUrlParam}/${secondUrlParam}/agent.name/${pattern}`)                
-            ]);
-            
-            const unique = data[0].data.result;
-
-            $scope.groups                    = unique.groups;
-            $scope.nodes                     = unique.nodes.map(item => { return {id: item} });
-            $scope.versions                  = unique.versions.map(item => { return {id: item} });
-            $scope.osPlatforms               = unique.osPlatforms;
-            $scope.lastAgent                 = unique.lastAgent;
-            $scope.agentsCountActive         = unique.summary.agentsCountActive;
-            $scope.agentsCountDisconnected   = unique.summary.agentsCountDisconnected;
-            $scope.agentsCountNeverConnected = unique.summary.agentsCountNeverConnected;
-            $scope.agentsCountTotal          = unique.summary.agentsCountTotal;
-            $scope.agentsCoverity            = unique.summary.agentsCoverity;
-
-            if (data[1].data.data === '') {
-                $scope.mostActiveAgent.name = appState.getClusterInfo().manager;
-                $scope.mostActiveAgent.id   = '000';
-            } else {
-                $scope.mostActiveAgent.name = data[1].data.data;
-                const info = await genericReq.request('GET', `/api/wazuh-elastic/top/${firstUrlParam}/${secondUrlParam}/agent.id/${pattern}`);
-                if (info.data.data === '' && $scope.mostActiveAgent.name !== '') {
-                    $scope.mostActiveAgent.id = '000';
-                } else {
-                    $scope.mostActiveAgent.id = info.data.data;
-                }
-            }
-
-            $scope.loading = false;
-            if(!$scope.$$phase) $scope.$digest();
-            return;
-        } catch (error) {
-            errorHandler.handle(error,'Agents Preview');
-        }
-        return;
-    };
-
-    $scope.showAgent = agent => {
-        shareAgent.setAgent(agent);
-        $location.path('/agents');
-    }
+    this.$scope.downloadCsv = async () => this.downloadCsv();
+    this.$scope.showAgent = agent => this.showAgent(agent);
 
     //Load
-    load();
+    this.load();
+  }
 
-});
+  showAgent(agent) {
+    this.shareAgent.setAgent(agent);
+    this.$location.path('/agents');
+  }
+
+  async downloadCsv() {
+    try {
+      this.errorHandler.info(
+        'Your download should begin automatically...',
+        'CSV'
+      );
+      const currentApi = JSON.parse(this.appState.getCurrentAPI()).id;
+      const output = await this.csvReq.fetch(
+        '/agents',
+        currentApi,
+        this.wzTableFilter.get()
+      );
+      const blob = new Blob([output], { type: 'text/csv' }); // eslint-disable-line
+
+      FileSaver.saveAs(blob, 'agents.csv');
+
+      return;
+    } catch (error) {
+      this.errorHandler.handle(error, 'Download CSV');
+    }
+    return;
+  }
+
+  async load() {
+    try {
+      const api = JSON.parse(this.appState.getCurrentAPI()).id;
+      const clusterInfo = this.appState.getClusterInfo();
+      const firstUrlParam =
+        clusterInfo.status === 'enabled' ? 'cluster' : 'manager';
+      const secondUrlParam = clusterInfo[firstUrlParam];
+
+      const pattern = this.appState.getCurrentPattern();
+
+      const data = await Promise.all([
+        this.genericReq.request(
+          'GET',
+          '/api/wazuh-api/agents-unique/' + api,
+          {}
+        ),
+        this.genericReq.request(
+          'GET',
+          `/api/wazuh-elastic/top/${firstUrlParam}/${secondUrlParam}/agent.name/${pattern}`
+        )
+      ]);
+      const [agentsUnique, agentsTop] = data;
+      const unique = agentsUnique.data.result;
+
+      this.$scope.groups = unique.groups;
+      this.$scope.nodes = unique.nodes.map(item => ({ id: item }));
+      this.$scope.versions = unique.versions.map(item => ({ id: item }));
+      this.$scope.osPlatforms = unique.osPlatforms;
+      this.$scope.lastAgent = unique.lastAgent;
+      this.$scope.agentsCountActive = unique.summary.agentsCountActive;
+      this.$scope.agentsCountDisconnected =
+        unique.summary.agentsCountDisconnected;
+      this.$scope.agentsCountNeverConnected =
+        unique.summary.agentsCountNeverConnected;
+      this.$scope.agentsCountTotal = unique.summary.agentsCountTotal;
+      this.$scope.agentsCoverity = unique.summary.agentsCoverity;
+
+      if (agentsTop.data.data === '') {
+        this.$scope.mostActiveAgent.name = this.appState.getClusterInfo().manager;
+        this.$scope.mostActiveAgent.id = '000';
+      } else {
+        this.$scope.mostActiveAgent.name = agentsTop.data.data;
+        const info = await this.genericReq.request(
+          'GET',
+          `/api/wazuh-elastic/top/${firstUrlParam}/${secondUrlParam}/agent.id/${pattern}`
+        );
+        if (info.data.data === '' && this.$scope.mostActiveAgent.name !== '') {
+          this.$scope.mostActiveAgent.id = '000';
+        } else {
+          this.$scope.mostActiveAgent.id = info.data.data;
+        }
+      }
+
+      this.$scope.loading = false;
+      if (!this.$scope.$$phase) this.$scope.$digest();
+      return;
+    } catch (error) {
+      this.errorHandler.handle(error, 'Agents Preview');
+    }
+    return;
+  }
+}
+
+app.controller('agentsPreviewController', AgentsPreviewController);

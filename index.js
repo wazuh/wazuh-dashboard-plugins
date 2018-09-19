@@ -11,21 +11,23 @@
  */
 
 // Imports the init module
-import init from './init';
+import { initApp } from './init';
 
-export default kibana => new kibana.Plugin({
+export default kibana =>
+  new kibana.Plugin({
     id: 'wazuh',
     name: 'wazuh',
     require: ['kibana', 'elasticsearch'],
     uiExports: {
-        app: {
-            id: 'wazuh',
-            title: 'Wazuh',
-            description: 'Wazuh app for Kibana',
-            icon: 'plugins/wazuh/img/icon.png',
-            main: 'plugins/wazuh/app'
-        }
+      app: {
+        id: 'wazuh',
+        title: 'Wazuh',
+        description: 'Wazuh app for Kibana',
+        icon: 'plugins/wazuh/img/icon.png',
+        main: 'plugins/wazuh/app'
+      }
     },
-    init: (server,options) => init(server,options)
-    
-});
+    init(server, options) {
+      return initApp(server, options);
+    }
+  });

@@ -9,19 +9,19 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import { uiModules }  from 'ui/modules'
+import { uiModules } from 'ui/modules';
 
 const app = uiModules.get('app/wazuh', []);
 
 app.directive('wzDynamic', function($compile) {
-    return {
-        restrict: 'A',
-        replace: true,
-        link: function(scope, ele, attrs) {
-            scope.$watch(attrs.wzDynamic, function(html) {
-                ele.html(html);
-                $compile(ele.contents())(scope);
-            });
-        },
-    };
+  return {
+    restrict: 'A',
+    replace: true,
+    link(scope, ele, attrs) {
+      scope.$watch(attrs.wzDynamic, function(html) {
+        ele.html(html);
+        $compile(ele.contents())(scope);
+      });
+    }
+  };
 });

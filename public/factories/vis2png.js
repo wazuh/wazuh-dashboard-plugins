@@ -9,56 +9,61 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import { uiModules } from 'ui/modules'
-import domtoimage    from 'dom-to-image'
 
-const app = uiModules.get('app/wazuh', []);
+import domtoimage from 'dom-to-image';
 
-class Vis2PNG {
-    constructor($rootScope) {
-        this.$rootScope = $rootScope;
-        this.rawArray   = [];
-        this.htmlObject = {};    
-        this.working    = false;
+export class Vis2PNG {
+  constructor($rootScope) {
+    this.$rootScope = $rootScope;
+    this.rawArray = [];
+    this.htmlObject = {};
+    this.working = false;
+  }
+
+  async checkArray(visArray) {
+    try {
+      this.working = true;
+      const len = visArray.length;
+      let currentCompleted = 0;
+      await Promise.all(
+        visArray.map(async currentValue => {
+          const tmpNode = this.htmlObject[currentValue];
+          try {
+            const tmpResult = await domtoimage.toPng(tmpNode[0]);
+            this.rawArray.push({
+              element: tmpResult,
+              width: tmpNode.width(),
+              height: tmpNode.height(),
+              id: currentValue
+            });
+          } catch (error) {} // eslint-disable-line
+          currentCompleted++;
+          this.$rootScope.reportStatus = `Generating report...${Math.round(
+            (currentCompleted / len) * 100
+          )}%`;
+          if (!this.$rootScope.$$phase) this.$rootScope.$digest();
+        })
+      );
+
+      this.working = false;
+      this.$rootScope.reportStatus = `Generating PDF document...`;
+      return this.rawArray;
+    } catch (error) {
+      this.working = false;
+      return Promise.reject(error);
     }
+  }
 
-    async checkArray (visArray) {
-        try {
-            this.working = true;
-            const len = visArray.length;
-            let currentCompleted = 0;
-            await Promise.all(visArray.map(async currentValue => {
-                const tmpNode = this.htmlObject[currentValue]
-                try {
-                    const tmpResult = await domtoimage.toPng(tmpNode[0]);
-                    this.rawArray.push({element:tmpResult,width:tmpNode.width(),height:tmpNode.height(), id: currentValue});
-                } catch (error) {} // eslint-disable-line
-                currentCompleted++;
-                this.$rootScope.reportStatus = `Generating report...${Math.round((currentCompleted/len) * 100)}%`
-                if(!this.$rootScope.$$phase) this.$rootScope.$digest()
-            }))
+  isWorking() {
+    return this.working;
+  }
 
-            this.working = false;
-            this.$rootScope.reportStatus = `Generating PDF document...`
-            return this.rawArray;
-        } catch (error) {
-            this.working = false;
-            return Promise.reject(error);
-        }
-    }
+  clear() {
+    this.rawArray = [];
+    this.htmlObject = {};
+  }
 
-    isWorking () {
-        return this.working;
-    }
-
-    clear () {
-        this.rawArray = []; 
-        this.htmlObject = {};
-    }
-
-    assignHTMLItem (id,content) {
-        this.htmlObject[id] = content;
-    } 
+  assignHTMLItem(id, content) {
+    this.htmlObject[id] = content;
+  }
 }
-
-app.service('vis2png', Vis2PNG);

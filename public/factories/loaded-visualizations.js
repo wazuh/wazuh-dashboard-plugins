@@ -10,26 +10,20 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import { uiModules } from 'ui/modules'
+export class LoadedVisualizations {
+  constructor() {
+    this.list = [];
+  }
 
-const app = uiModules.get('app/wazuh', []);
+  addItem(item) {
+    this.list.push(item);
+  }
 
-class LoadedVisualizations {
-    constructor(){
-        this.list = [];
-    }
+  getList() {
+    return this.list;
+  }
 
-    addItem(item) {
-        this.list.push(item);
-    }
-
-    getList() {
-        return this.list;
-    }
-
-    removeAll() {
-        this.list = [];
-    }
+  removeAll() {
+    this.list = [];
+  }
 }
-
-app.service('loadedVisualizations', LoadedVisualizations);
