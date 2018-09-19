@@ -2,11 +2,11 @@
 <div flex="auto" layout="row" ng-if="configurationSubTab === 'remote'">
 
     <!-- This section appears when there's no configuration -->
-    <wz-no-config flex ng-if="false"></wz-no-config>
+    <wz-no-config flex ng-if="!currentConfig['request-remote'] && !currentConfig['request-remote'].remote"></wz-no-config>
     <!-- End no configuration section -->
 
     <!-- This section is the main content -->
-    <div flex layout="column">
+    <div flex layout="column" ng-if="currentConfig['request-remote'] && currentConfig['request-remote'].remote">
 
         <!-- The main card will all the settings -->
         <md-card class="wz-md-card" ng-if="!JSONContent && !XMLContent">
@@ -40,25 +40,15 @@
                             <th class="wz-text-left">Queue size</th>
                         </thead>
                         <tbody class="wz-word-wrap">
-                            <tr>
-                                <td>test</td>
-                                <td>test</td>
-                                <td>test</td>
-                                <td>test</td>
-                                <td>test</td>
-                                <td>test</td>
-                                <td>test</td>
-                                <td>test</td>
-                            </tr>
-                            <tr>
-                                <td>test</td>
-                                <td>test</td>
-                                <td>test</td>
-                                <td>test</td>
-                                <td>test</td>
-                                <td>test</td>
-                                <td>test</td>
-                                <td>test</td>
+                            <tr ng-repeat="item in currentConfig['request-remote'].remote">
+                                <td>{{ item.connection ? item.connection : '---' }}</td>
+                                <td>{{ item.port ? item.port : '---' }}</td>
+                                <td>{{ item.protocol ? item.protocol : '---' }}</td>
+                                <td>{{ item['allowed-ips'] ? item['allowed-ips'] : '---' }}</td>
+                                <td>{{ item['denied-ips'] ? item['denied-ips'] : '---' }}</td>
+                                <td>{{ item.local_ip ? item.local_ip : '---' }}</td>
+                                <td>{{ item.ipv6 ? item.ipv6 : '---' }}</td>
+                                <td>{{ item.queue_size ? item.queue_size : '---' }}</td>
                             </tr>
                         </tbody>
                     </table>

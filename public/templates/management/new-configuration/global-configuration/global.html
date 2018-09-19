@@ -2,11 +2,11 @@
 <div flex="auto" layout="row" ng-if="configurationSubTab === 'global'">
 
     <!-- This section appears when there's no configuration -->
-    <wz-no-config flex ng-if="false"></wz-no-config>
+    <wz-no-config flex ng-if="!currentConfig['analysis-global'] && !currentConfig['analysis-global'].global"></wz-no-config>
     <!-- End no configuration section -->
 
     <!-- This section is the main content -->
-    <div flex layout="column">
+    <div flex layout="column" ng-if="currentConfig['analysis-global'] && currentConfig['analysis-global'].global">
 
         <!-- The main card will all the settings -->
         <md-card class="wz-md-card" ng-if="!JSONContent && !XMLContent">
@@ -30,35 +30,39 @@
 
                     <wz-config-item
                         label="Write alerts to alerts.log file"
-                        value="yes">
+                        value="currentConfig['analysis-global'].global.alerts_log">
                     </wz-config-item>
                     <wz-config-item
                         label="Write JSON formatted alerts to alerts.json file"
-                        value="yes">
+                        value="currentConfig['analysis-global'].global.jsonout_output">
                     </wz-config-item>
                     <wz-config-item
                         label="Archive all the alerts in plain text format"
-                        value="yes">
+                        value="currentConfig['analysis-global'].global.logall">
                     </wz-config-item>
                     <wz-config-item
                         label="Archive all the alerts in JSON format"
-                        value="no">
+                        value="currentConfig['analysis-global'].global.logall_json">
                     </wz-config-item>
                     <wz-config-item
                         label="Customized alerts format for alerts.log file"
-                        value="undefined">
+                        value="currentConfig['analysis-global'].global.custom_alert_output">
                     </wz-config-item>
                     <wz-config-item
-                        label="Format used for Wazuh internal logs"
-                        value="plain">
+                        label="Write Wazuh internal logs in plain text"
+                        value="currentConfig['com-logging'].logging.plain">
+                    </wz-config-item>
+                    <wz-config-item
+                        label="Write Wazuh internal logs in JSON format"
+                        value="currentConfig['com-logging'].logging.json">
                     </wz-config-item>
                     <wz-config-item
                         label="Size limit of alert files"
-                        value="1TiB">
+                        value="currentConfig['analysis-global'].global.max_output_size">
                     </wz-config-item>
                     <wz-config-item
                         label="File rotation interval"
-                        value="10h">
+                        value="currentConfig['analysis-global'].global.rotate_interval">
                     </wz-config-item>
 
 
@@ -78,31 +82,31 @@
 
                     <wz-config-item
                         label="Enable alerts sent by email"
-                        value="no">
+                        value="currentConfig['analysis-global'].global.email_notification">
                     </wz-config-item>
                     <wz-config-item
                         label="Sender address for email alerts"
-                        value="sender@example.wazuh.com">
+                        value="currentConfig['analysis-global'].global.email_from">
                     </wz-config-item>
                     <wz-config-item
                         label="Recipient address for email alerts "
-                        value="recipient@example.wazuh.com">
+                        value="currentConfig['analysis-global'].global.email_to">
                     </wz-config-item>
                     <wz-config-item
                         label="Reply-to address for email alerts"
-                        value="reply-to@example.wazuh.com">
+                        value="currentConfig['analysis-global'].global.email_reply_to">
                     </wz-config-item>
                     <wz-config-item
                         label="Address for SMTP mail server"
-                        value="smtp.example.wazuh.com">
+                        value="currentConfig['analysis-global'].global.smtp_server">
                     </wz-config-item>
                     <wz-config-item
                         label="Maximum number of email alerts sent per hour"
-                        value="12">
+                        value="currentConfig['analysis-global'].global.email_maxperhour">
                     </wz-config-item>
                     <wz-config-item
                         label="Name used for email alerts headers"
-                        value="wazuh">
+                        value="currentConfig['analysis-global'].global.email_idsname">
                     </wz-config-item>
 
                 </div>
@@ -121,27 +125,27 @@
 
                     <wz-config-item
                         label="Severity level for alerts generated by statistical analysis"
-                        value="8">
+                        value="currentConfig['analysis-global'].global.stats">
                     </wz-config-item>
                     <wz-config-item
                         label="Severity level for alerts generated by host change monitor"
-                        value="8">
+                        value="currentConfig['analysis-global'].global.host_information">
                     </wz-config-item>
                     <wz-config-item
                         label="Analysisd message input buffer size"
-                        value="16384">
+                        value="currentConfig['analysis-global'].global.queue_size">
                     </wz-config-item>
                     <wz-config-item
                         label="Memory size for the alert correlation engine"
-                        value="1024">
+                        value="currentConfig['analysis-global'].global.memory_size">
                     </wz-config-item>
                     <wz-config-item
                         label="White-listed IP addresses"
-                        value="10.0.0.0, 192.168.1.1">
+                        value="currentConfig['analysis-global'].global.white_list">
                     </wz-config-item>
                     <wz-config-item
                         label="Full path to MaxMind GeoIP IPv4 database file"
-                        value="/etc/GeoLiteCity.dat">
+                        value="currentConfig['analysis-global'].global.geoip_db_path">
                     </wz-config-item>
 
                 </div>
@@ -160,15 +164,15 @@
 
                     <wz-config-item
                         label="Enable Prelude output"
-                        value="yes">
+                        value="currentConfig['analysis-global'].global.prelude_output">
                     </wz-config-item>
                     <wz-config-item
                         label="Enable ZeroMQ output"
-                        value="yes">
+                        value="currentConfig['analysis-global'].global.zeromq_output">
                     </wz-config-item>
                     <wz-config-item
                         label="ZeroMQ URI to bind publisher socket"
-                        value="yes">
+                        value="currentConfig['analysis-global'].global.zeromq_uri">
                     </wz-config-item>
 
                 </div>
