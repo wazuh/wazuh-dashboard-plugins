@@ -22,3 +22,13 @@
         <md-nav-item class="wz-nav-item" md-nav-click="switchConfigurationSubTab('fim-windows')" name="fim-windows">Windows</md-nav-item>
     </md-nav-bar>
     <!-- End Integrity monitoring navigation bar -->
+
+    <!-- This section contains the main content and the right sidenav -->
+    <div flex="auto" layout="row">
+
+        <!-- This section appears when there's no configuration -->
+        <wz-no-config flex ng-if="false"></wz-no-config>
+        <!-- End no configuration section -->
+
+        <!-- This section is the main content -->
+        <div flex layout="column">

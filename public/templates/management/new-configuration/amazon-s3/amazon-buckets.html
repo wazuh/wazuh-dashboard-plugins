@@ -1,156 +1,98 @@
-<!-- This section contains the main content and the right sidenav -->
-<div flex="auto" layout="row" ng-if="configurationSubTab === 'amazon-buckets'">
-
-    <!-- This section appears when there's no configuration -->
-    <wz-no-config flex ng-if="false"></wz-no-config>
-    <!-- End no configuration section -->
-
-    <!-- This section is the main content -->
-    <div flex layout="column">
-
-        <!-- Buckets card -->
-        <md-card flex="auto" class="wz-md-card" ng-if="!JSONContent && !XMLContent">
-            <md-card-content flex layout="column">
+<!-- Buckets card -->
+<md-card flex="auto" class="wz-md-card" ng-if="!JSONContent && !XMLContent && configurationSubTab === 'amazon-buckets'">
+    <md-card-content flex layout="column">
+        <div layout="row" layout-align="start center">
+            <div>
                 <span class="font-size-16">Buckets</span>
                 <div class="wz-margin-top-10">
                     <span class="md-subheader small">Amazon buckets from where logs are read</span>
                 </div>
-                <md-divider class="wz-margin-top-10"></md-divider>
+            </div>
+            <span flex></span>
+            <span ng-class="JSONContent ? 'wz-text-active' : ''" class="wz-text-link small" ng-click="getJSON('amazon-s3')">JSON</span>
+            <span class="small">&nbsp;&centerdot;&nbsp;</span>
+            <span ng-class="XMLContent ? 'wz-text-active' : ''" class="wz-text-link small" ng-click="getXML('amazon-s3')">XML</span>
+        </div>
+        <md-divider class="wz-margin-top-10"></md-divider>
 
-                <!-- The container for both list and detail -->
-                <div flex="auto" layout="row" class="wz-margin-top-10">
+        <!-- The container for both list and detail -->
+        <div flex="auto" layout="row" class="wz-margin-top-10">
 
-                    <!-- List container -->
-                    <div flex="30" layout="column">
+            <!-- List container -->
+            <div flex="30" layout="column">
 
-                        <md-list flex="auto" class="wz-item-list">
-                            <md-list-item>Test</md-list-item>
-                        </md-list>
+                <md-list flex="auto" class="wz-item-list">
+                    <md-list-item>Test</md-list-item>
+                </md-list>
 
-                    </div>
-                    <!-- End list container -->
+            </div>
+            <!-- End list container -->
 
-                    <!-- Detail container -->
-                    <div flex layout="column">
+            <!-- Detail container -->
+            <div flex layout="column">
 
-                        <div flex="auto" class="wz-item-detail">
-                            <wz-config-item
-                                label="Bucket type"
-                                value="enabled"
-                                notResponsive="true">
-                            </wz-config-item>
-                            <wz-config-item
-                                label="Bucket name"
-                                value="enabled"
-                                notResponsive="true">
-                            </wz-config-item>
-                            <wz-config-item
-                                label="AWS account IDs"
-                                value="enabled"
-                                notResponsive="true">
-                            </wz-config-item>
-                            <wz-config-item
-                                label="AWS account alias"
-                                value="enabled"
-                                notResponsive="true">
-                            </wz-config-item>
-                            <wz-config-item
-                                label="IAM user access key"
-                                value="enabled"
-                                notResponsive="true">
-                            </wz-config-item>
-                            <wz-config-item
-                                label="IAM user secret key"
-                                value="enabled"
-                                notResponsive="true">
-                            </wz-config-item>
-                            <wz-config-item
-                                label="Profile name with read permissions"
-                                value="enabled"
-                                notResponsive="true">
-                            </wz-config-item>
-                            <wz-config-item
-                                label="IAM ARN role to read bucket logs"
-                                value="enabled"
-                                notResponsive="true">
-                            </wz-config-item>
-                            <wz-config-item
-                                label="Bucket path"
-                                value="enabled"
-                                notResponsive="true">
-                            </wz-config-item>
-                            <wz-config-item
-                                label="Parse only logs from this date onwards"
-                                value="enabled"
-                                notResponsive="true">
-                            </wz-config-item>
-                            <wz-config-item
-                                label="Limit log parsing to these regions"
-                                value="enabled"
-                                notResponsive="true">
-                            </wz-config-item>
-                        </div>
-
-                    </div>
-                    <!-- End detail container -->
+                <div flex="auto" class="wz-item-detail">
+                    <wz-config-item
+                        label="Bucket type"
+                        value="enabled"
+                        notResponsive="true">
+                    </wz-config-item>
+                    <wz-config-item
+                        label="Bucket name"
+                        value="enabled"
+                        notResponsive="true">
+                    </wz-config-item>
+                    <wz-config-item
+                        label="AWS account IDs"
+                        value="enabled"
+                        notResponsive="true">
+                    </wz-config-item>
+                    <wz-config-item
+                        label="AWS account alias"
+                        value="enabled"
+                        notResponsive="true">
+                    </wz-config-item>
+                    <wz-config-item
+                        label="IAM user access key"
+                        value="enabled"
+                        notResponsive="true">
+                    </wz-config-item>
+                    <wz-config-item
+                        label="IAM user secret key"
+                        value="enabled"
+                        notResponsive="true">
+                    </wz-config-item>
+                    <wz-config-item
+                        label="Profile name with read permissions"
+                        value="enabled"
+                        notResponsive="true">
+                    </wz-config-item>
+                    <wz-config-item
+                        label="IAM ARN role to read bucket logs"
+                        value="enabled"
+                        notResponsive="true">
+                    </wz-config-item>
+                    <wz-config-item
+                        label="Bucket path"
+                        value="enabled"
+                        notResponsive="true">
+                    </wz-config-item>
+                    <wz-config-item
+                        label="Parse only logs from this date onwards"
+                        value="enabled"
+                        notResponsive="true">
+                    </wz-config-item>
+                    <wz-config-item
+                        label="Limit log parsing to these regions"
+                        value="enabled"
+                        notResponsive="true">
+                    </wz-config-item>
                 </div>
-                <!-- End container for both list and detail -->
-            </md-card-content>
-        </md-card>
-        <!-- End buckets card -->
 
-        <!-- JSON card -->
-        <md-card flex="auto" class="wz-md-card" ng-if="JSONContent">
-            <md-card-content flex layout="column">
-                <span class="font-size-16">JSON viewer</span>
-                <md-divider class="wz-margin-top-10"></md-divider>
-
-                <!-- The JSON viewer -->
-                <div flex="auto" class="wz-margin-top-10 wz-code-viewer">
-                    <pre><code wz-dynamic="JSONContent"></code></pre>
-                </div>
-                <!-- End JSON viewer -->
-            </md-card-content>
-        </md-card>
-        <!-- End JSON card -->
-
-        <!-- XML card -->
-        <md-card flex="auto" class="wz-md-card" ng-if="XMLContent">
-            <md-card-content flex layout="column">
-                <span class="font-size-16">XML viewer</span>
-                <md-divider class="wz-margin-top-10"></md-divider>
-
-                <!-- The XML viewer -->
-                <div flex="auto" class="wz-margin-top-10 wz-code-viewer">
-                    <pre>{{ XMLContent }}</pre>
-                </div>
-                <!-- End XML viewer -->
-            </md-card-content>
-        </md-card>
-        <!-- End XML card -->
-
-    </div>
-    <!-- End main content section -->
-
-    <!-- This section is the right sidenav content -->
-    <md-sidenav
-        class="md-sidenav-right"
-        md-is-locked-open="true">
-        <md-list>
-            <md-subheader>More info about this section</md-subheader>
-            <md-list-item target="_blank" class="wz-text-link" ng-href="https://documentation.wazuh.com/current/amazon/index.html">Using Wazuh to monitor AWS</md-list-item>
-            <md-list-item target="_blank" class="wz-text-link" ng-href="https://documentation.wazuh.com/current/user-manual/reference/ossec-conf/wodle-s3.html">Amazon S3 module reference</md-list-item>
-
-            <md-divider></md-divider>
-
-            <md-subheader>More options</md-subheader>
-            <md-list-item layout-wrap>
-                <md-button ng-class="JSONContent ? 'active' : ''" class="wz-button md-raised md-primary small" ng-click="getJSON('amazon-s3')">{{ JSONContent ? "Close JSON viewer" : "Open JSON viewer" }}</md-button>
-                <md-button ng-class="XMLContent ? 'active' : ''" class="wz-button md-raised md-primary small" ng-click="getXML('amazon-s3')">{{ XMLContent ? "Close XML viewer" : "Open XML viewer" }}</md-button>
-            </md-list-item>
-        </md-list>
-    </md-sidenav>
-    <!-- End right sidenav section -->
-
-</div>
-<!-- End main content and right sidenav section -->
+            </div>
+            <!-- End detail container -->
+        </div>
+        <!-- End container for both list and detail -->
+    </md-card-content>
+</md-card>
+<!-- End buckets card -->

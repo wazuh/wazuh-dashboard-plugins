@@ -9,9 +9,9 @@
                         </div>
                     </div>
                     <span flex></span>
-                    <span ng-class="JSONContent ? 'wz-text-active' : ''" class="wz-text-link small" ng-click="getJSON('ruleset')">JSON</span>
+                    <span ng-class="JSONContent ? 'wz-text-active' : ''" class="wz-text-link small" ng-click="getJSON('rootcheck')">JSON</span>
                     <span class="small">&nbsp;&centerdot;&nbsp;</span>
-                    <span ng-class="XMLContent ? 'wz-text-active' : ''" class="wz-text-link small" ng-click="getXML('ruleset')">XML</span>
+                    <span ng-class="XMLContent ? 'wz-text-active' : ''" class="wz-text-link small" ng-click="getXML('rootcheck')">XML</span>
                 </div>
                 <md-divider class="wz-margin-top-10"></md-divider>
 
@@ -35,9 +35,9 @@
                         </div>
                     </div>
                     <span flex></span>
-                    <span ng-class="JSONContent ? 'wz-text-active' : ''" class="wz-text-link small" ng-click="getJSON('ruleset')">JSON</span>
+                    <span ng-class="JSONContent ? 'wz-text-active' : ''" class="wz-text-link small" ng-click="getJSON('rootcheck')">JSON</span>
                     <span class="small">&nbsp;&centerdot;&nbsp;</span>
-                    <span ng-class="XMLContent ? 'wz-text-active' : ''" class="wz-text-link small" ng-click="getXML('ruleset')">XML</span>
+                    <span ng-class="XMLContent ? 'wz-text-active' : ''" class="wz-text-link small" ng-click="getXML('rootcheck')">XML</span>
                 </div>
                 <md-divider class="wz-margin-top-10"></md-divider>
 
@@ -59,8 +59,9 @@
         md-is-locked-open="true">
         <md-list>
             <md-subheader>More info about this section</md-subheader>
-            <md-list-item target="_blank" class="wz-text-link" ng-href="https://documentation.wazuh.com/current/user-manual/ruleset/index.html">Ruleset documentation</md-list-item>
-            <md-list-item target="_blank" class="wz-text-link" ng-href="https://documentation.wazuh.com/current/user-manual/reference/ossec-conf/ruleset.html">Ruleset reference</md-list-item>
+            <md-list-item target="_blank" class="wz-text-link" ng-href="https://documentation.wazuh.com/current/user-manual/capabilities/anomalies-detection/index.html">Anomaly and malware detection documentation</md-list-item>
+            <md-list-item target="_blank" class="wz-text-link" ng-href="https://documentation.wazuh.com/current/user-manual/capabilities/policy-monitoring/index.html">Policy monitoring documentation</md-list-item>
+            <md-list-item target="_blank" class="wz-text-link" ng-href="https://documentation.wazuh.com/current/user-manual/reference/ossec-conf/rootcheck.html">Rootcheck reference</md-list-item>
         </md-list>
     </md-sidenav>
     <!-- End right sidenav section -->

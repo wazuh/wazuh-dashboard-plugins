@@ -1,9 +1,17 @@
 <!-- The main card will all the settings -->
 <md-card class="wz-md-card" ng-if="!JSONContent && !XMLContent && configurationSubTab === 'rules'">
     <md-card-content>
-        <span class="font-size-16">Rules directories</span>
-        <div class="wz-margin-top-10">
-            <span class="md-subheader small">Folders with rules to load</span>
+        <div layout="row" layout-align="start center">
+            <div>
+                <span class="font-size-16">Rules directories</span>
+                <div class="wz-margin-top-10">
+                    <span class="md-subheader small">Folders with rules to load</span>
+                </div>
+            </div>
+            <span flex></span>
+            <span ng-class="JSONContent ? 'wz-text-active' : ''" class="wz-text-link small" ng-click="getJSON('ruleset')">JSON</span>
+            <span class="small">&nbsp;&centerdot;&nbsp;</span>
+            <span ng-class="XMLContent ? 'wz-text-active' : ''" class="wz-text-link small" ng-click="getXML('ruleset')">XML</span>
         </div>
         <md-divider class="wz-margin-top-10"></md-divider>
 

@@ -11,9 +11,17 @@
         <!-- The main card will all the settings -->
         <md-card flex="auto" class="wz-md-card" ng-if="!JSONContent && !XMLContent">
             <md-card-content flex layout="column">
-                <span class="font-size-16">Output sockets</span>
-                <div class="wz-margin-top-10">
-                    <span class="md-subheader small">Define custom outputs to send log data</span>
+                <div layout="row" layout-align="start center">
+                    <div>
+                        <span class="font-size-16">Output sockets</span>
+                        <div class="wz-margin-top-10">
+                            <span class="md-subheader small">Define custom outputs to send log data</span>
+                        </div>
+                    </div>
+                    <span flex></span>
+                    <span ng-class="JSONContent ? 'wz-text-active' : ''" class="wz-text-link small" ng-click="getJSON('socket')">JSON</span>
+                    <span class="small">&nbsp;&centerdot;&nbsp;</span>
+                    <span ng-class="XMLContent ? 'wz-text-active' : ''" class="wz-text-link small" ng-click="getXML('socket')">XML</span>
                 </div>
                 <md-divider class="wz-margin-top-10"></md-divider>
 
@@ -67,7 +75,18 @@
         <!-- JSON card -->
         <md-card flex="auto" class="wz-md-card" ng-if="JSONContent">
             <md-card-content flex layout="column">
-                <span class="font-size-16">JSON viewer</span>
+                <div layout="row" layout-align="start center">
+                    <div>
+                        <span class="font-size-16">JSON viewer</span>
+                        <div class="wz-margin-top-10">
+                            <span class="md-subheader small">View this configuration in raw JSON format</span>
+                        </div>
+                    </div>
+                    <span flex></span>
+                    <span ng-class="JSONContent ? 'wz-text-active' : ''" class="wz-text-link small" ng-click="getJSON('socket')">JSON</span>
+                    <span class="small">&nbsp;&centerdot;&nbsp;</span>
+                    <span ng-class="XMLContent ? 'wz-text-active' : ''" class="wz-text-link small" ng-click="getXML('socket')">XML</span>
+                </div>
                 <md-divider class="wz-margin-top-10"></md-divider>
 
                 <!-- The JSON viewer -->
@@ -82,7 +101,18 @@
         <!-- XML card -->
         <md-card flex="auto" class="wz-md-card" ng-if="XMLContent">
             <md-card-content flex layout="column">
-                <span class="font-size-16">XML viewer</span>
+                <div layout="row" layout-align="start center">
+                    <div>
+                        <span class="font-size-16">XML viewer</span>
+                        <div class="wz-margin-top-10">
+                            <span class="md-subheader small">View this configuration in raw XML format</span>
+                        </div>
+                    </div>
+                    <span flex></span>
+                    <span ng-class="JSONContent ? 'wz-text-active' : ''" class="wz-text-link small" ng-click="getJSON('socket')">JSON</span>
+                    <span class="small">&nbsp;&centerdot;&nbsp;</span>
+                    <span ng-class="XMLContent ? 'wz-text-active' : ''" class="wz-text-link small" ng-click="getXML('socket')">XML</span>
+                </div>
                 <md-divider class="wz-margin-top-10"></md-divider>
 
                 <!-- The XML viewer -->
@@ -105,14 +135,6 @@
             <md-subheader>More info about this section</md-subheader>
             <md-list-item target="_blank" class="wz-text-link" ng-href="https://documentation.wazuh.com/current/user-manual/capabilities/log-data-collection/log-data-configuration.html#using-multiple-outputs">Using multiple outputs</md-list-item>
             <md-list-item target="_blank" class="wz-text-link" ng-href="https://documentation.wazuh.com/current/user-manual/reference/ossec-conf/socket.html">Socket reference</md-list-item>
-
-            <md-divider></md-divider>
-
-            <md-subheader>More options</md-subheader>
-            <md-list-item layout-wrap>
-                <md-button ng-class="JSONContent ? 'active' : ''" class="wz-button md-raised md-primary small" ng-click="getJSON('socket')">{{ JSONContent ? "Close JSON viewer" : "Open JSON viewer" }}</md-button>
-                <md-button ng-class="XMLContent ? 'active' : ''" class="wz-button md-raised md-primary small" ng-click="getXML('socket')">{{ XMLContent ? "Close XML viewer" : "Open XML viewer" }}</md-button>
-            </md-list-item>
         </md-list>
     </md-sidenav>
     <!-- End right sidenav section -->
