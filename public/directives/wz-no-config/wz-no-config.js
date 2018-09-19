@@ -10,15 +10,15 @@
  * Find more information about this on the LICENSE file.
  */
 
-import template      from './wz-no-config.html';
+import template from './wz-no-config.html';
 import { uiModules } from 'ui/modules';
 
 const app = uiModules.get('app/wazuh', []);
 
-app.directive('wzNoConfig', function () {
-    return {
-        restrict: 'E',
-        scope: {},
-        template: template
-    }
+app.directive('wzNoConfig', function() {
+  return {
+    restrict: 'E',
+    scope: {},
+    template: template
+  };
 });

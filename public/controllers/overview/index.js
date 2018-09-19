@@ -16,7 +16,7 @@ import { TabNames } from '../../utils/tab-names';
 import { TabDescription } from '../../../server/reporting/tab-description';
 
 import {
-  metricsGeneral,  
+  metricsGeneral,
   metricsAudit,
   metricsVulnerability,
   metricsScap,

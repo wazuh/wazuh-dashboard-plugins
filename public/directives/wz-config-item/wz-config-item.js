@@ -10,18 +10,18 @@
  * Find more information about this on the LICENSE file.
  */
 
-import template      from './wz-config-item.html';
+import template from './wz-config-item.html';
 import { uiModules } from 'ui/modules';
 
 const app = uiModules.get('app/wazuh', []);
 
-app.directive('wzConfigItem', function () {
-    return {
-        restrict: 'E',
-        scope: {
-            label: '@label',
-            value: '@value'
-        },
-        template: template
-    }
+app.directive('wzConfigItem', function() {
+  return {
+    restrict: 'E',
+    scope: {
+      label: '@label',
+      value: '@value'
+    },
+    template: template
+  };
 });

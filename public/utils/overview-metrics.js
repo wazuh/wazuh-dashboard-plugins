@@ -79,7 +79,7 @@ const metricsAws = {
 };
 
 export default {
-  metricsGeneral,  
+  metricsGeneral,
   metricsAudit,
   metricsVulnerability,
   metricsScap,
