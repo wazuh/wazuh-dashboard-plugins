@@ -25,19 +25,16 @@ class NewConfigurationController {
     this.$scope.load = true;
     this.$scope.isArray = Array.isArray;
     this.configRaw = {};
+    this.$scope.currentConfig = {};
 
     this.$scope.configurationTab = '';
     this.$scope.configurationSubTab = '';
-    this.$scope.configurationSection = '';
 
     this.$scope.getXML = name => this.getXML(name);
     this.$scope.getJSON = name => this.getJSON(name);
-    this.$scope.switchConfigurationTab = configurationTab =>
-      this.switchConfigurationTab(configurationTab);
-    this.$scope.switchConfigurationSubTab = configurationSubTab =>
-      this.switchConfigurationSubTab(configurationSubTab);
-    this.$scope.switchConfigurationSection = configurationSection =>
-      this.switchConfigurationSection(configurationSection);
+    this.$scope.switchConfigTab = configurationTab => this.switchConfigTab(configurationTab);
+    this.$scope.switchConfigurationTab = configurationTab => this.switchConfigurationTab(configurationTab);
+    this.$scope.switchConfigurationSubTab = configurationSubTab => this.switchConfigurationSubTab(configurationSubTab);
   }
 
   /**
@@ -45,6 +42,59 @@ class NewConfigurationController {
    */
   $onInit() {
     this.load();
+  }
+
+  fetchConfig(agentId,sections) {
+    // this.$scope.currentConfig = await moduloJesus.fetch(agentId, sections);
+    this.$scope.currentConfig = {
+      'analysis-global' : {
+        "global": {
+          "email_notification": "no",
+          "max_output_size": 0,
+          "alerts_log": "yes",
+          "zeromq_output": "no",
+          "host_information": 8,
+          "jsonout_output": "yes",
+          "rotate_interval": 0,
+          "rootkit_detection": 8,
+          "integrity_checking": 8,
+          "memory_size": 8192,
+          "logall": "no",
+          "prelude_output": "no",
+          "stats": 4,
+          "white_list": [
+            "127.0.0.1",
+            "80.58.61.250",
+            "80.58.61.254",
+            "127.0.1.1",
+            "localhost.localdomain"
+          ],
+          "logall_json": "no"
+        }
+      },
+      'request-remote': {
+        "remote": [
+        {
+          "queue_size": "131072",
+          "connection": "secure",
+          "protocol": "udp",
+          "port": "1514",
+          "ipv6": "no"
+        }
+        ]
+        }
+      }
+  }
+
+  switchConfigTab(configurationTab, sections) {
+    this.$scope.XMLContent = false;
+    this.$scope.JSONContent = false;
+    this.$scope.configurationSubTab = false;
+    this.$scope.configurationTab = configurationTab;
+
+    this.fetchConfig('000', sections);
+
+    if (!this.$scope.$$phase) this.$scope.$digest();
   }
 
   /**
@@ -55,7 +105,6 @@ class NewConfigurationController {
     this.$scope.XMLContent = false;
     this.$scope.JSONContent = false;
     this.$scope.configurationSubTab = false;
-    this.$scope.configurationSection = false;
     this.$scope.configurationTab = configurationTab;
     if (!this.$scope.$$phase) this.$scope.$digest();
   }
@@ -67,19 +116,7 @@ class NewConfigurationController {
   switchConfigurationSubTab(configurationSubTab) {
     this.$scope.XMLContent = false;
     this.$scope.JSONContent = false;
-    this.$scope.configurationSection = false;
     this.$scope.configurationSubTab = configurationSubTab;
-    if (!this.$scope.$$phase) this.$scope.$digest();
-  }
-
-  /**
-   * Switchs between configuration sections
-   * @param {*} configurationSection
-   */
-  switchConfigurationSection(configurationSection) {
-    this.$scope.XMLContent = false;
-    this.$scope.JSONContent = false;
-    this.$scope.configurationSection = configurationSection;
     if (!this.$scope.$$phase) this.$scope.$digest();
   }
 
