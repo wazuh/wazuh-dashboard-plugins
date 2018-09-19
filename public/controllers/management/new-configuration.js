@@ -14,6 +14,7 @@ import angular from 'angular';
 import js2xmlparser from 'js2xmlparser';
 import XMLBeautifier from '../../utils/xml-beautifier';
 import beautifier from '../../utils/json-beautifier';
+import { queryConfig } from '../../services/query-config';
 
 const app = uiModules.get('app/wazuh', []);
 
