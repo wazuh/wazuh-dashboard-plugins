@@ -29,7 +29,7 @@
     class="filter-bar wz-background-transparent wz-border-0"
     ng-class="filterNavToggle.isOpen == true || !showCollapseLink() ? '' : 'filter-panel--close'"
   >
-    <div class="filter-panel__pill">
+    <div class="filter-panel__pill wz-inline-block">
       <filter-pill-w
         ng-repeat="filter in filters track by $index"
         filter="filter"
