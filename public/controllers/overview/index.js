@@ -24,6 +24,8 @@ import {
   metricsVirustotal
 } from '../../utils/overview-metrics';
 
+import { queryConfig } from '../../services/query-config';
+
 const app = uiModules.get('app/wazuh', []);
 
 app.controller('overviewController', function(
@@ -39,6 +41,7 @@ app.controller('overviewController', function(
   visFactoryService,
   wazuhConfig
 ) {
+  $scope.wodlesConfiguration = false;
   $scope.TabDescription = TabDescription;
   $rootScope.reportStatus = false;
 
@@ -147,8 +150,52 @@ app.controller('overviewController', function(
     }
   };
 
+  let wodlesConfiguration;
+
+  const calculateWodleTagFromTab = tab => {
+    if (tab === 'aws') return 'aws-s3';
+    return false;
+  };
+
+  const filterWodle = tab => {
+    try {
+      $scope.wodlesConfiguration = false;
+      const tag = calculateWodleTagFromTab(tab);
+      let result = [];
+      if (
+        tag &&
+        wodlesConfiguration &&
+        wodlesConfiguration['wmodules-wmodules'] &&
+        wodlesConfiguration['wmodules-wmodules'].wmodules
+      ) {
+        result = wodlesConfiguration['wmodules-wmodules'].wmodules.filter(
+          item => typeof item[tag] !== 'undefined'
+        );
+      }
+      if (result.length) {
+        $scope.wodlesConfiguration = result[0];
+      }
+    } catch (error) {} // eslint-disable-line
+
+    if (!$scope.$$phase) $scope.$digest();
+  };
+
+  const fetchWodles = async () => {
+    try {
+      wodlesConfiguration = await queryConfig(
+        '000',
+        [{ component: 'wmodules', configuration: 'wmodules' }],
+        apiReq
+      );
+    } catch (error) {
+      wodlesConfiguration = false;
+    }
+    return;
+  };
+
   // Switch tab
   $scope.switchTab = (tab, force = false) => {
+    filterWodle(tab);
     if (tab !== 'welcome') tabHistory.push(tab);
     if (tabHistory.length > 2) tabHistory = tabHistory.slice(-2);
     tabVisualizations.setTab(tab);
@@ -223,7 +270,7 @@ app.controller('overviewController', function(
 
   const init = async () => {
     try {
-      await Promise.all([loadPciAndGDPR(), loadConfiguration()]);
+      await Promise.all([loadPciAndGDPR(), loadConfiguration(), fetchWodles()]);
 
       $scope.switchTab($scope.tab, true);
 
