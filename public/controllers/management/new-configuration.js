@@ -33,7 +33,7 @@ class NewConfigurationController {
 
     this.$scope.getXML = name => this.getXML(name);
     this.$scope.getJSON = name => this.getJSON(name);
-    this.$scope.isString = item => this.isString(item);
+    this.$scope.isString = item => typeof item === 'string';
     this.$scope.switchConfigTab = (configurationTab, sections) => this.switchConfigTab(configurationTab, sections);
     this.$scope.switchConfigurationTab = configurationTab => this.switchConfigurationTab(configurationTab);
     this.$scope.switchConfigurationSubTab = configurationSubTab => this.switchConfigurationSubTab(configurationSubTab);
@@ -44,10 +44,6 @@ class NewConfigurationController {
    */
   $onInit() {
     this.load();
-  }
-
-  isString(item) {
-    return angular.isString(item);
   }
 
   /**
