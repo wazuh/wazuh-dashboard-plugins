@@ -16,7 +16,7 @@
  * @param {Array<object>} sections Array that includes sections to be fetched
  * @param {object} apiReq API request service reference
  */
-export async function queryConfig(agentId, sections, apiReq) {
+export async function queryConfig(agentId, sections, apiReq, errorHandler) {
   try {
     if (
       !agentId ||
@@ -40,14 +40,17 @@ export async function queryConfig(agentId, sections, apiReq) {
       ) {
         throw new Error('Invalid section');
       }
-      const partialResult = await apiReq.request(
-        'GET',
-        `/agents/${agentId}/config/${component}/${configuration}`,
-        {}
-      );
-      result[`${component}-${configuration}`] = partialResult.data.data;
+      try {
+        const partialResult = await apiReq.request(
+          'GET',
+          `/agents/${agentId}/config/${component}/${configuration}`,
+          {}
+        );
+        result[`${component}-${configuration}`] = partialResult.data.data;
+      } catch (error) {
+        result[`${component}-${configuration}`] = errorHandler.handle(error, 'Fetch configuration', false, true);
+      }
     }
-
     return result;
   } catch (error) {
     return Promise.reject(error);

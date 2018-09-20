@@ -18,3 +18,8 @@
         <md-nav-item class="wz-nav-item" md-nav-click="switchConfigurationSubTab('remote')" name="remote">Remote</md-nav-item>
     </md-nav-bar>
     <!-- End global configuration navigation bar -->
+
+    <!-- Loading ring -->
+    <div class='uil-ring-css' ng-show="load">
+        <div></div>
+    </div>

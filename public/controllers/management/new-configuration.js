@@ -33,6 +33,7 @@ class NewConfigurationController {
 
     this.$scope.getXML = name => this.getXML(name);
     this.$scope.getJSON = name => this.getJSON(name);
+    this.$scope.isString = item => this.isString(item);
     this.$scope.switchConfigTab = (configurationTab, sections) => this.switchConfigTab(configurationTab, sections);
     this.$scope.switchConfigurationTab = configurationTab => this.switchConfigurationTab(configurationTab);
     this.$scope.switchConfigurationSubTab = configurationSubTab => this.switchConfigurationSubTab(configurationSubTab);
@@ -45,6 +46,10 @@ class NewConfigurationController {
     this.load();
   }
 
+  isString(item) {
+    return angular.isString(item);
+  }
+
   /**
    * Switchs between configuration tabs
    * @param {string} configurationTab The configuration tab to open
@@ -52,15 +57,18 @@ class NewConfigurationController {
    */
   async switchConfigTab(configurationTab, sections) {
     try {
+      this.$scope.load = true;
       this.$scope.currentConfig = null;
       this.$scope.XMLContent = false;
       this.$scope.JSONContent = false;
       this.$scope.configurationSubTab = false;
       this.$scope.configurationTab = configurationTab;
-      this.$scope.currentConfig = await queryConfig('000', sections, this.apiReq);
+      this.$scope.currentConfig = await queryConfig('000', sections, this.apiReq, this.errorHandler);
+      this.$scope.load = false;
       if (!this.$scope.$$phase) this.$scope.$digest();
     } catch (error) {
       this.errorHandler.handle(error, 'Manager');
+      this.$scope.load = false;
     }
     return;
   }

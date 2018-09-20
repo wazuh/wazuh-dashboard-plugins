@@ -1,8 +1,15 @@
 <!-- This section contains the main content and the right sidenav -->
-<div flex="auto" layout="row" ng-if="configurationSubTab === 'remote'">
+<div flex="auto" layout="row" ng-if="!load && configurationSubTab === 'remote'">
 
-    <!-- This section appears when there's no configuration -->
-    <wz-no-config flex ng-if="!currentConfig['request-remote'] && !currentConfig['request-remote'].remote"></wz-no-config>
+    <!-- No configuration section -->
+    <wz-no-config
+      flex
+      error="currentConfig['request-remote']"
+      ng-if="currentConfig['request-remote'] && isString(currentConfig['request-remote'])"></wz-no-config>
+    <wz-no-config
+      flex
+      error="'not-present'"
+      ng-if="currentConfig['request-remote'] && !isString(currentConfig['request-remote']) && !currentConfig['request-remote'].remote"></wz-no-config>
     <!-- End no configuration section -->
 
     <!-- This section is the main content -->

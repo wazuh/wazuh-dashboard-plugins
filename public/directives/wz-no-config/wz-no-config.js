@@ -18,7 +18,9 @@ const app = uiModules.get('app/wazuh', []);
 app.directive('wzNoConfig', function() {
   return {
     restrict: 'E',
-    scope: {},
+    scope: {
+      error: '=error'
+    },
     template: template
   };
 });

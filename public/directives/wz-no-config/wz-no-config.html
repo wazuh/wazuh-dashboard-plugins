@@ -6,10 +6,12 @@
             <i class="fa fa-fw fa-info-circle" aria-hidden="true"></i> <span class="wz-headline-title">Configuration not available</span>
             <md-divider class="wz-margin-top-10"></md-divider>
             <div layout="column" class="wz-padding-top-10">
-                <p>This section is not present on the Wazuh configuration file.</p>
+                <p ng-if="error === 'not-present'">This section is not present on the Wazuh configuration file.</p>
+                <p ng-if="error !== 'not-present'">There was a problem while fetching the configuration for this section.</p>
             </div>
             <div layout="column" class="wz-padding-top-10">
-                <p>Check the links on the right sidebar to learn more about how to configure it.</p>
+                <p ng-if="error === 'not-present'">Check the links on the right sidebar to learn more about how to configure it.</p>
+                <span ng-if="error !== 'not-present'" class="md-subheader small wz-text-red">{{ error }}<span>
             </div>
         </md-card-content>
     </md-card>
