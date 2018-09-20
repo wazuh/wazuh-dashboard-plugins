@@ -20,7 +20,8 @@ app.directive('wzConfigItem', function() {
     restrict: 'E',
     scope: {
       label: '@label',
-      value: '=value'
+      value: '=value',
+      isArray: '=isArray'
     },
     template: template
   };

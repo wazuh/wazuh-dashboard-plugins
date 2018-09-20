@@ -95,23 +95,16 @@ class NewConfigurationController {
 
   /**
    * Assigns XML raw content for specific configuration
-   * @param {string} name Name of the configuration section
+   * @param {object} config Raw content to show in XML
    */
-  getXML(name) {
+  getXML(config) {
     this.$scope.JSONContent = false;
     if (this.$scope.XMLContent) {
       this.$scope.XMLContent = false;
     } else {
       try {
-        if (name) {
-          this.$scope.XMLContent = XMLBeautifier(
-            js2xmlparser.parse(name, this.configRaw[name])
-          );
-        } else {
-          this.$scope.XMLContent = XMLBeautifier(
-            js2xmlparser.parse('configuration', this.configRaw)
-          );
-        }
+        config.map(item => delete item['$$hashKey']);
+        this.$scope.XMLContent = XMLBeautifier(js2xmlparser.parse('configuration', config));
       } catch (error) {
         this.$scope.XMLContent = false;
       }
@@ -121,21 +114,16 @@ class NewConfigurationController {
 
   /**
    * Assigns JSON raw content for specific configuration
-   * @param {string} name Name of the configuration section
+   * @param {object} config Raw content to show in JSON
    */
-  getJSON(name) {
+  getJSON(config) {
     this.$scope.XMLContent = false;
     if (this.$scope.JSONContent) {
       this.$scope.JSONContent = false;
     } else {
       try {
-        if (name) {
-          this.$scope.JSONContent = beautifier.prettyPrint(
-            this.configRaw[name]
-          );
-        } else {
-          this.$scope.JSONContent = beautifier.prettyPrint(this.configRaw);
-        }
+        config.map(item => delete item['$$hashKey']);
+        this.$scope.JSONContent = beautifier.prettyPrint(config);
       } catch (error) {
         this.$scope.JSONContent = false;
       }

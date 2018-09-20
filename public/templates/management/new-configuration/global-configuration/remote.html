@@ -26,9 +26,9 @@
                         </div>
                     </div>
                     <span flex></span>
-                    <span ng-class="JSONContent ? 'wz-text-active' : ''" class="wz-text-link small" ng-click="getJSON('remote')">JSON</span>
+                    <span ng-class="JSONContent ? 'wz-text-active' : ''" class="wz-text-link small" ng-click="getJSON(currentConfig['request-remote'].remote)">JSON</span>
                     <span class="small">&nbsp;&centerdot;&nbsp;</span>
-                    <span ng-class="XMLContent ? 'wz-text-active' : ''" class="wz-text-link small" ng-click="getXML('remote')">XML</span>
+                    <span ng-class="XMLContent ? 'wz-text-active' : ''" class="wz-text-link small" ng-click="getXML(currentConfig['request-remote'].remote)">XML</span>
                 </div>
                 <md-divider class="wz-margin-top-10"></md-divider>
 
@@ -51,8 +51,18 @@
                                 <td>{{ item.connection ? item.connection : '---' }}</td>
                                 <td>{{ item.port ? item.port : '---' }}</td>
                                 <td>{{ item.protocol ? item.protocol : '---' }}</td>
-                                <td>{{ item['allowed-ips'] ? item['allowed-ips'] : '---' }}</td>
-                                <td>{{ item['denied-ips'] ? item['denied-ips'] : '---' }}</td>
+                                <td>
+                                  <ul ng-if="item['allowed-ips']">
+                                    <li ng-repeat="ip in item['allowed-ips']">{{ ip }}</li>
+                                  </ul>
+                                  <span ng-if="!item['allowed-ips']">---</span>
+                                </td>
+                                <td>
+                                  <ul ng-if="item['denied-ips']">
+                                    <li ng-repeat="ip in item['denied-ips']">{{ ip }}</li>
+                                  </ul>
+                                  <span ng-if="!item['denied-ips']">---</span>
+                                </td>
                                 <td>{{ item.local_ip ? item.local_ip : '---' }}</td>
                                 <td>{{ item.ipv6 ? item.ipv6 : '---' }}</td>
                                 <td>{{ item.queue_size ? item.queue_size : '---' }}</td>
@@ -77,9 +87,9 @@
                         </div>
                     </div>
                     <span flex></span>
-                    <span ng-class="JSONContent ? 'wz-text-active' : ''" class="wz-text-link small" ng-click="getJSON('remote')">JSON</span>
+                    <span ng-class="JSONContent ? 'wz-text-active' : ''" class="wz-text-link small" ng-click="getJSON(currentConfig['request-remote'].remote)">JSON</span>
                     <span class="small">&nbsp;&centerdot;&nbsp;</span>
-                    <span ng-class="XMLContent ? 'wz-text-active' : ''" class="wz-text-link small" ng-click="getXML('remote')">XML</span>
+                    <span ng-class="XMLContent ? 'wz-text-active' : ''" class="wz-text-link small" ng-click="getXML(currentConfig['request-remote'].remote)">XML</span>
                 </div>
                 <md-divider class="wz-margin-top-10"></md-divider>
 
@@ -103,9 +113,9 @@
                         </div>
                     </div>
                     <span flex></span>
-                    <span ng-class="JSONContent ? 'wz-text-active' : ''" class="wz-text-link small" ng-click="getJSON('remote')">JSON</span>
+                    <span ng-class="JSONContent ? 'wz-text-active' : ''" class="wz-text-link small" ng-click="getJSON(currentConfig['request-remote'].remote)">JSON</span>
                     <span class="small">&nbsp;&centerdot;&nbsp;</span>
-                    <span ng-class="XMLContent ? 'wz-text-active' : ''" class="wz-text-link small" ng-click="getXML('remote')">XML</span>
+                    <span ng-class="XMLContent ? 'wz-text-active' : ''" class="wz-text-link small" ng-click="getXML(currentConfig['request-remote'].remote)">XML</span>
                 </div>
                 <md-divider class="wz-margin-top-10"></md-divider>
 
