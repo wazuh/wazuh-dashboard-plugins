@@ -1,24 +1,33 @@
-<div flex="auto" layout="column" ng-if="!load && configurationTab === 'registration-service'">
+<div flex="auto" layout="column" ng-if="configurationTab === 'registration-service'">
 
     <!-- Headline -->
     <div layout="column" layout-padding>
         <div>
             <span class="font-size-18">Registration service</span>
-            <span class="wz-agent-status-indicator small teal">Enabled</span>
+            <span ng-if="currentConfig['auth-auth'] && currentConfig['auth-auth'].auth && currentConfig['auth-auth'].auth.disabled === 'no'" class="wz-agent-status-indicator small teal">Enabled</span>
+            <span ng-if="currentConfig['auth-auth'] && isString(currentConfig['auth-auth'])" class="wz-agent-status-indicator small red">Disabled</span>
         </div>
         <span class="md-subheader">Automatic agent registration using the <span class="wz-text-monospace">ossec-authd</span> binary</span>
     </div>
     <!-- End headline -->
 
-    <!-- This section contains the main content and the right sidenav -->
-    <div flex="auto" layout="row">
+    <!-- Loading ring -->
+    <div class='uil-ring-css' ng-show="load">
+        <div></div>
+    </div>
 
-        <!-- This section appears when there's no configuration -->
-        <wz-no-config flex ng-if="false"></wz-no-config>
+    <!-- This section contains the main content and the right sidenav -->
+    <div flex="auto" layout="row" ng-if="!load">
+
+        <!-- No configuration section -->
+        <wz-no-config
+          flex
+          error="currentConfig['auth-auth']"
+          ng-if="currentConfig['auth-auth'] && isString(currentConfig['auth-auth']) && !currentConfig['auth-auth'].auth"></wz-no-config>
         <!-- End no configuration section -->
 
         <!-- This section is the main content -->
-        <div flex layout="column">
+        <div flex layout="column" ng-if="currentConfig['auth-auth'] && currentConfig['auth-auth'].auth && !isString(currentConfig['auth-auth'].auth)">
 
             <!-- The main card will all the settings -->
             <md-card class="wz-md-card" ng-if="!JSONContent && !XMLContent">
@@ -31,9 +40,9 @@
                             </div>
                         </div>
                         <span flex></span>
-                        <span ng-class="JSONContent ? 'wz-text-active' : ''" class="wz-text-link small" ng-click="getJSON('auth')">JSON</span>
+                        <span ng-class="JSONContent ? 'wz-text-active' : ''" class="wz-text-link small" ng-click="getJSON(currentConfig['auth-auth'].auth)">JSON</span>
                         <span class="small">&nbsp;&centerdot;&nbsp;</span>
-                        <span ng-class="XMLContent ? 'wz-text-active' : ''" class="wz-text-link small" ng-click="getXML('auth')">XML</span>
+                        <span ng-class="XMLContent ? 'wz-text-active' : ''" class="wz-text-link small" ng-click="getXML(currentConfig['auth-auth'].auth)">XML</span>
                     </div>
                     <md-divider class="wz-margin-top-10"></md-divider>
 
@@ -42,31 +51,31 @@
 
                         <wz-config-item
                             label="Service status"
-                            value="enabled">
+                            value="currentConfig['auth-auth'].auth.disabled === 'yes'? 'disabled' : 'enabled'">
                         </wz-config-item>
                         <wz-config-item
                             label="Listen to connections at port"
-                            value="1515">
+                            value="currentConfig['auth-auth'].auth.port">
                         </wz-config-item>
                         <wz-config-item
                             label="Use client's source IP address"
-                            value="enabled">
+                            value="currentConfig['auth-auth'].auth.use_source_ip">
                         </wz-config-item>
                         <wz-config-item
                             label="Use a password to register agents"
-                            value="disabled">
+                            value="currentConfig['auth-auth'].auth.use_password">
                         </wz-config-item>
                         <wz-config-item
                             label="Purge agents list when removing agents"
-                            value="disabled">
+                            value="currentConfig['auth-auth'].auth.purge">
                         </wz-config-item>
                         <wz-config-item
                             label="Limit registration to maximum number of agents"
-                            value="enabled">
+                            value="currentConfig['auth-auth'].auth.limit_maxagents">
                         </wz-config-item>
                         <wz-config-item
                             label="Force registration when using an existing IP address"
-                            value="enabled">
+                            value="currentConfig['auth-auth'].auth.force_insert">
                         </wz-config-item>
 
                     </div>
@@ -85,27 +94,27 @@
 
                         <wz-config-item
                             label="Verify agents using a CA certificate"
-                            value="enabled">
+                            value="currentConfig['auth-auth'].auth.ssl_verify_host">
                         </wz-config-item>
                         <wz-config-item
                             label="Auto-select the SSL negotiation method"
-                            value="disabled">
+                            value="currentConfig['auth-auth'].auth.ssl_auto_negotiate">
                         </wz-config-item>
                         <wz-config-item
                             label="CA certificate location"
-                            value="/var/ossec/etc/cacertificate.cert">
+                            value="currentConfig['auth-auth'].auth.ssl_agent_ca">
                         </wz-config-item>
                         <wz-config-item
                             label="Server SSL certificate location"
-                            value="/var/ossec/etc/sslmanager.cert">
+                            value="currentConfig['auth-auth'].auth.ssl_manager_cert">
                         </wz-config-item>
                         <wz-config-item
                             label="Server SSL key location"
-                            value="/var/ossec/etc/sslmanager.key">
+                            value="currentConfig['auth-auth'].auth.ssl_manager_key">
                         </wz-config-item>
                         <wz-config-item
                             label="Use the following SSL ciphers"
-                            value="HIGH:!ADH:!EXP:!MD5:!RC4:!3DES:!CAMELLIA:@STRENGTH">
+                            value="currentConfig['auth-auth'].auth.ciphers">
                         </wz-config-item>
 
                     </div>
@@ -125,9 +134,9 @@
                             </div>
                         </div>
                         <span flex></span>
-                        <span ng-class="JSONContent ? 'wz-text-active' : ''" class="wz-text-link small" ng-click="getJSON('auth')">JSON</span>
+                        <span ng-class="JSONContent ? 'wz-text-active' : ''" class="wz-text-link small" ng-click="getJSON(currentConfig['auth-auth'].auth)">JSON</span>
                         <span class="small">&nbsp;&centerdot;&nbsp;</span>
-                        <span ng-class="XMLContent ? 'wz-text-active' : ''" class="wz-text-link small" ng-click="getXML('auth')">XML</span>
+                        <span ng-class="XMLContent ? 'wz-text-active' : ''" class="wz-text-link small" ng-click="getXML(currentConfig['auth-auth'].auth)">XML</span>
                     </div>
                     <md-divider class="wz-margin-top-10"></md-divider>
 
@@ -151,9 +160,9 @@
                             </div>
                         </div>
                         <span flex></span>
-                        <span ng-class="JSONContent ? 'wz-text-active' : ''" class="wz-text-link small" ng-click="getJSON('auth')">JSON</span>
+                        <span ng-class="JSONContent ? 'wz-text-active' : ''" class="wz-text-link small" ng-click="getJSON(currentConfig['auth-auth'].auth)">JSON</span>
                         <span class="small">&nbsp;&centerdot;&nbsp;</span>
-                        <span ng-class="XMLContent ? 'wz-text-active' : ''" class="wz-text-link small" ng-click="getXML('auth')">XML</span>
+                        <span ng-class="XMLContent ? 'wz-text-active' : ''" class="wz-text-link small" ng-click="getXML(currentConfig['auth-auth'].auth)">XML</span>
                     </div>
                     <md-divider class="wz-margin-top-10"></md-divider>
 

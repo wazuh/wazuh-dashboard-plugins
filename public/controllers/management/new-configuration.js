@@ -96,9 +96,12 @@ class NewConfigurationController {
       this.$scope.XMLContent = false;
     } else {
       try {
-        config.map(item => delete item['$$hashKey']);
+        if(typeof config === 'array') {
+          config.map(item => delete item['$$hashKey']);
+        }
         this.$scope.XMLContent = XMLBeautifier(js2xmlparser.parse('configuration', config));
       } catch (error) {
+        console.log(error);
         this.$scope.XMLContent = false;
       }
     }
@@ -115,9 +118,12 @@ class NewConfigurationController {
       this.$scope.JSONContent = false;
     } else {
       try {
-        config.map(item => delete item['$$hashKey']);
+        if(typeof config === 'array') {
+          config.map(item => delete item['$$hashKey']);
+        }
         this.$scope.JSONContent = beautifier.prettyPrint(config);
       } catch (error) {
+        console.log(error);
         this.$scope.JSONContent = false;
       }
     }

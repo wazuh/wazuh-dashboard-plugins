@@ -1,24 +1,33 @@
-<div flex="auto" layout="column" ng-if="!load && configurationTab === 'cluster'">
+<div flex="auto" layout="column" ng-if="configurationTab === 'cluster'">
 
     <!-- Headline -->
     <div layout="column" layout-padding>
         <div>
             <span class="font-size-18">Cluster</span>
-            <span class="wz-agent-status-indicator small teal">Enabled</span>
+            <span ng-if="currentConfig['com-cluster'] && currentConfig['com-cluster'].disabled === 'no'" class="wz-agent-status-indicator small teal">Enabled</span>
+            <span ng-if="currentConfig['com-cluster'] && isString(currentConfig['com-cluster'])" class="wz-agent-status-indicator small red">Disabled</span>
         </div>
         <span class="md-subheader">Availability and scalability enhancement of the Wazuh service</span>
     </div>
     <!-- End headline -->
 
-    <!-- This section contains the main content and the right sidenav -->
-    <div flex="auto" layout="row">
+    <!-- Loading ring -->
+    <div class='uil-ring-css' ng-show="load">
+        <div></div>
+    </div>
 
-        <!-- This section appears when there's no configuration -->
-        <wz-no-config flex ng-if="false"></wz-no-config>
+    <!-- This section contains the main content and the right sidenav -->
+    <div flex="auto" layout="row" ng-if="!load">
+
+        <!-- No configuration section -->
+        <wz-no-config
+          flex
+          error="'not-present'"
+          ng-if="currentConfig['com-cluster'] && isString(currentConfig['com-cluster'])"></wz-no-config>
         <!-- End no configuration section -->
 
         <!-- This section is the main content -->
-        <div flex layout="column">
+        <div flex layout="column" ng-if="currentConfig['com-cluster'] && !isString(currentConfig['com-cluster'])">
 
             <!-- The main card will all the settings -->
             <md-card class="wz-md-card" ng-if="!JSONContent && !XMLContent">
@@ -31,9 +40,9 @@
                             </div>
                         </div>
                         <span flex></span>
-                        <span ng-class="JSONContent ? 'wz-text-active' : ''" class="wz-text-link small" ng-click="getJSON('cluster')">JSON</span>
+                        <span ng-class="JSONContent ? 'wz-text-active' : ''" class="wz-text-link small" ng-click="getJSON(currentConfig['com-cluster'])">JSON</span>
                         <span class="small">&nbsp;&centerdot;&nbsp;</span>
-                        <span ng-class="XMLContent ? 'wz-text-active' : ''" class="wz-text-link small" ng-click="getXML('cluster')">XML</span>
+                        <span ng-class="XMLContent ? 'wz-text-active' : ''" class="wz-text-link small" ng-click="getXML(currentConfig['com-cluster'])">XML</span>
                     </div>
                     <md-divider class="wz-margin-top-10"></md-divider>
 
@@ -42,35 +51,36 @@
 
                         <wz-config-item
                             label="Cluster status"
-                            value="enabled">
+                            value="currentConfig['com-cluster'].disabled === 'yes'? 'disabled' : 'enabled'">
                         </wz-config-item>
                         <wz-config-item
                             label="Cluster name"
-                            value="wazuh-cluster">
+                            value="currentConfig['com-cluster'].name">
                         </wz-config-item>
                         <wz-config-item
                             label="Node name"
-                            value="wazuh-node-01">
+                            value="currentConfig['com-cluster'].node_name">
                         </wz-config-item>
                         <wz-config-item
                             label="Node type"
-                            value="master">
+                            value="currentConfig['com-cluster'].node_type">
                         </wz-config-item>
                         <wz-config-item
+                            is-array="true"
                             label="Master node IP address"
-                            value="192.168.1.1">
+                            value="currentConfig['com-cluster'].nodes">
                         </wz-config-item>
                         <wz-config-item
                             label="Port to listen to cluster communications"
-                            value="1516">
+                            value="currentConfig['com-cluster'].port">
                         </wz-config-item>
                         <wz-config-item
                             label="IP address to listen to cluster communications"
-                            value="0.0.0.0">
+                            value="currentConfig['com-cluster'].bind_addr">
                         </wz-config-item>
                         <wz-config-item
                             label="Hide cluster information in alerts"
-                            value="yes">
+                            value="currentConfig['com-cluster'].hidden">
                         </wz-config-item>
 
                     </div>
@@ -90,9 +100,9 @@
                             </div>
                         </div>
                         <span flex></span>
-                        <span ng-class="JSONContent ? 'wz-text-active' : ''" class="wz-text-link small" ng-click="getJSON('cluster')">JSON</span>
+                        <span ng-class="JSONContent ? 'wz-text-active' : ''" class="wz-text-link small" ng-click="getJSON(currentConfig['com-cluster'])">JSON</span>
                         <span class="small">&nbsp;&centerdot;&nbsp;</span>
-                        <span ng-class="XMLContent ? 'wz-text-active' : ''" class="wz-text-link small" ng-click="getXML('cluster')">XML</span>
+                        <span ng-class="XMLContent ? 'wz-text-active' : ''" class="wz-text-link small" ng-click="getXML(currentConfig['com-cluster'])">XML</span>
                     </div>
                     <md-divider class="wz-margin-top-10"></md-divider>
 
@@ -116,9 +126,9 @@
                             </div>
                         </div>
                         <span flex></span>
-                        <span ng-class="JSONContent ? 'wz-text-active' : ''" class="wz-text-link small" ng-click="getJSON('cluster')">JSON</span>
+                        <span ng-class="JSONContent ? 'wz-text-active' : ''" class="wz-text-link small" ng-click="getJSON(currentConfig['com-cluster'])">JSON</span>
                         <span class="small">&nbsp;&centerdot;&nbsp;</span>
-                        <span ng-class="XMLContent ? 'wz-text-active' : ''" class="wz-text-link small" ng-click="getXML('cluster')">XML</span>
+                        <span ng-class="XMLContent ? 'wz-text-active' : ''" class="wz-text-link small" ng-click="getXML(currentConfig['com-cluster'])">XML</span>
                     </div>
                     <md-divider class="wz-margin-top-10"></md-divider>
 

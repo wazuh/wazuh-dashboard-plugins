@@ -29,22 +29,22 @@
                         </md-list-item>
                         <md-list-item flex="100" flex-gt-md="50" flex-gt-lg="33" class="md-2-line">
                             <div class="md-list-item-text">
-                                <h3 class="wz-text-link" ng-click="switchConfigurationTab('cluster')">Cluster</h3>
+                                <h3 class="wz-text-link" ng-click="switchConfigTab('cluster', [{component:'com',configuration:'cluster'}])">Cluster</h3>
                                 <p>Availability and scalability enhancement of the Wazuh service</p>
                             </div>
                         </md-list-item>
                         <md-list-item flex="100" flex-gt-md="50" flex-gt-lg="33" class="md-2-line">
                             <div class="md-list-item-text">
-                                <h3 class="wz-text-link" ng-click="switchConfigurationTab('ruleset')">Ruleset</h3>
-                                <p>Current rules, decoders and CDB lists loaded in the cluster</p>
-                            </div>
-                        </md-list-item>
-                        <md-list-item flex="100" flex-gt-md="50" flex-gt-lg="33" class="md-2-line">
-                            <div class="md-list-item-text">
-                                <h3 class="wz-text-link" ng-click="switchConfigurationTab('registration-service')">Registration service</h3>
+                                <h3 class="wz-text-link" ng-click="switchConfigTab('registration-service', [{component:'auth',configuration:'auth'}])">Registration service</h3>
                                 <p>Automatic agent registration using the <span class="wz-text-monospace">ossec-authd</span> binary</p>
                             </div>
                         </md-list-item>
+                        <!-- <md-list-item flex="100" flex-gt-md="50" flex-gt-lg="33" class="md-2-line">
+                            <div class="md-list-item-text">
+                                <h3 class="wz-text-link" ng-click="switchConfigurationTab('ruleset')">Ruleset</h3>
+                                <p>Current rules, decoders and CDB lists loaded in the cluster</p>
+                            </div>
+                        </md-list-item> -->
                     </md-list>
 
                 </md-card-content>
