@@ -1,4 +1,4 @@
-<div flex="auto" layout="column" ng-if="!load && configurationTab === 'global-configuration'" ng-init="switchConfigurationSubTab('global')">
+<div flex="auto" layout="column" ng-if="configurationTab === 'global-configuration'" ng-init="switchConfigurationSubTab('global')">
 
     <!-- Headline -->
     <div layout="column" layout-padding>

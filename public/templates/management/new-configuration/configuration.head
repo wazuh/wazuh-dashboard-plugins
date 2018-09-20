@@ -1,12 +1,7 @@
 <div flex="auto" layout="column" ng-controller="managementNewConfigurationController" ng-if="tab === 'new-configuration'" ng-init="switchConfigurationTab('welcome')">
 
-    <!-- Loading ring -->
-    <div class='uil-ring-css' ng-show="load">
-        <div></div>
-    </div>
-
     <!-- Navigation section (Breadcrumbs, etc) -->
-    <div layout="row" layout-align="start center" ng-if="!load">
+    <div layout="row" layout-align="start center">
         <!-- Breadcrumbs -->
         <div layout="row" layout-padding>
             <!-- Welcome section -->

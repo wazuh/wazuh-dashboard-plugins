@@ -23,7 +23,7 @@ class NewConfigurationController {
     this.$scope = $scope;
     this.errorHandler = errorHandler;
     this.apiReq = apiReq;
-    this.$scope.load = true;
+    this.$scope.load = false;
     this.$scope.isArray = Array.isArray;
     this.configRaw = {};
     this.$scope.currentConfig = null;
@@ -37,13 +37,6 @@ class NewConfigurationController {
     this.$scope.switchConfigTab = (configurationTab, sections) => this.switchConfigTab(configurationTab, sections);
     this.$scope.switchConfigurationTab = configurationTab => this.switchConfigurationTab(configurationTab);
     this.$scope.switchConfigurationSubTab = configurationSubTab => this.switchConfigurationSubTab(configurationSubTab);
-  }
-
-  /**
-   * Initialize
-   */
-  $onInit() {
-    this.load();
   }
 
   /**
@@ -129,54 +122,6 @@ class NewConfigurationController {
       }
     }
     if (!this.$scope.$$phase) this.$scope.$digest();
-  }
-
-  /**
-   * Fetchs required data
-   */
-  async load() {
-    try {
-      const data = await this.apiReq.request(
-        'GET',
-        '/manager/configuration',
-        {}
-      );
-      Object.assign(this.configRaw, angular.copy(data.data.data));
-      this.$scope.managerConfiguration = data.data.data;
-
-      if (
-        this.$scope.managerConfiguration &&
-        this.$scope.managerConfiguration['active-response']
-      ) {
-        for (const ar of this.$scope.managerConfiguration['active-response']) {
-          const rulesArray = ar.rules_id ? ar.rules_id.split(',') : [];
-          if (ar.rules_id && rulesArray.length > 1) {
-            const tmp = [];
-
-            for (const id of rulesArray) {
-              const rule = await this.apiReq.request('GET', `/rules/${id}`, {});
-              tmp.push(rule.data.data.items[0]);
-            }
-
-            ar.rules = tmp;
-          } else if (ar.rules_id) {
-            const rule = await this.apiReq.request(
-              'GET',
-              `/rules/${ar.rules_id}`,
-              {}
-            );
-            ar.rule = rule.data.data.items[0];
-          }
-        }
-      }
-
-      this.$scope.load = false;
-      if (!this.$scope.$$phase) this.$scope.$digest();
-      return;
-    } catch (error) {
-      this.errorHandler.handle(error, 'Manager');
-    }
-    return;
   }
 }
 
