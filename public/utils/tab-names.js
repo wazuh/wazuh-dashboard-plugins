@@ -54,6 +54,6 @@ export const TabNames = {
   osquery: 'Osquery',
   'open-scap': 'OpenSCAP',
   'cis-cat': 'CIS-CAT',
-  vulnerabilities: 'Vulnerabilities',
+  'vulnerability-detector': 'Vulnerabilities',
   'amazon-s3': 'Amazon S3'
 };

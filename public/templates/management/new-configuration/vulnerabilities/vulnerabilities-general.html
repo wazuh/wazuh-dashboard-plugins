@@ -9,9 +9,9 @@
                 </div>
             </div>
             <span flex></span>
-            <span ng-class="JSONContent ? 'wz-text-active' : ''" class="wz-text-link small" ng-click="getJSON('vulnerability-detector')">JSON</span>
+            <span ng-class="JSONContent ? 'wz-text-active' : ''" class="wz-text-link small" ng-click="getJSON(currentConfig['vulnerability-detector'])">JSON</span>
             <span class="small">&nbsp;&centerdot;&nbsp;</span>
-            <span ng-class="XMLContent ? 'wz-text-active' : ''" class="wz-text-link small" ng-click="getXML('vulnerability-detector')">XML</span>
+            <span ng-class="XMLContent ? 'wz-text-active' : ''" class="wz-text-link small" ng-click="getXML(currentConfig['vulnerability-detector'])">XML</span>
         </div>
         <md-divider class="wz-margin-top-10"></md-divider>
 
@@ -20,19 +20,19 @@
 
             <wz-config-item
                 label="Vulnerability detector status"
-                value="enabled">
+                value="currentConfig['vulnerability-detector'].disabled === 'yes' ? 'disabled' : 'enabled'">
             </wz-config-item>
             <wz-config-item
                 label="Interval between scan executions"
-                value="1d">
+                value="currentConfig['vulnerability-detector'].interval">
             </wz-config-item>
             <wz-config-item
                 label="Scan on start"
-                value="enabled">
+                value="currentConfig['vulnerability-detector'].run_on_start">
             </wz-config-item>
             <wz-config-item
                 label="Time to ignore already detected vulerabilities"
-                value="enabled">
+                value="currentConfig['vulnerability-detector'].ignore_time">
             </wz-config-item>
 
         </div>
