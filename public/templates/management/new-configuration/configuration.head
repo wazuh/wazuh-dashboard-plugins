@@ -26,7 +26,7 @@
         <!-- End separator -->
 
         <!-- Help button -->
-        <md-button md-no-ink class="md-icon-button small" tooltip="About the app" tooltip-placement="left" ng-href="#/settings/about" aria-label="Link to open app about section">
+        <md-button md-no-ink class="md-icon-button small" tooltip="About and help" tooltip-placement="left" ng-href="#/settings/about" aria-label="Link to open app about section">
             <i class="fa fa-fw fa-question-circle-o" aria-hidden="true"></i>
         </md-button>
         <!-- End help button -->

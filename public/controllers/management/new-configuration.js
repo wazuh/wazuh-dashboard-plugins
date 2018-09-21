@@ -35,6 +35,7 @@ class NewConfigurationController {
     this.$scope.getJSON = name => this.getJSON(name);
     this.$scope.isString = item => typeof item === 'string';
     this.$scope.switchConfigTab = (configurationTab, sections) => this.switchConfigTab(configurationTab, sections);
+    this.$scope.switchWodle = (wodleName) => this.switchWodle(wodleName);
     this.$scope.switchConfigurationTab = configurationTab => this.switchConfigurationTab(configurationTab);
     this.$scope.switchConfigurationSubTab = configurationSubTab => this.switchConfigurationSubTab(configurationSubTab);
   }
@@ -53,6 +54,46 @@ class NewConfigurationController {
       this.$scope.configurationSubTab = false;
       this.$scope.configurationTab = configurationTab;
       this.$scope.currentConfig = await queryConfig('000', sections, this.apiReq, this.errorHandler);
+      this.$scope.load = false;
+      if (!this.$scope.$$phase) this.$scope.$digest();
+    } catch (error) {
+      this.errorHandler.handle(error, 'Manager');
+      this.$scope.load = false;
+    }
+    return;
+  }
+
+  /**
+   * Switchs to a wodle section
+   * @param {string} wodleName The wodle to open
+   */
+  async switchWodle(wodleName) {
+    try {
+      this.$scope.load = true;
+      this.$scope.currentConfig = null;
+      this.$scope.XMLContent = false;
+      this.$scope.JSONContent = false;
+      this.$scope.configurationSubTab = false;
+      this.$scope.configurationTab = wodleName;
+
+      this.$scope.currentConfig = await queryConfig('000', [{component:'wmodules',configuration:'wmodules'}], this.apiReq, this.errorHandler);
+
+      // Filter by provided wodleName
+      let result = [];
+      if (
+        wodleName &&
+        this.$scope.currentConfig &&
+        this.$scope.currentConfig['wmodules-wmodules'] &&
+        this.$scope.currentConfig['wmodules-wmodules'].wmodules
+      ) {
+        result = this.$scope.currentConfig['wmodules-wmodules'].wmodules.filter(
+          item => typeof item[wodleName] !== 'undefined'
+        );
+      }
+      if (result.length) {
+        this.$scope.currentConfig = result[0];
+      }
+
       this.$scope.load = false;
       if (!this.$scope.$$phase) this.$scope.$digest();
     } catch (error) {

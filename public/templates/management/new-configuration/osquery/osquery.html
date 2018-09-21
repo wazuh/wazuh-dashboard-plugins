@@ -1,24 +1,37 @@
-<div flex="auto" layout="column" ng-if="!load && configurationTab === 'osquery'">
+<div flex="auto" layout="column" ng-if="configurationTab === 'osquery'">
 
     <!-- Headline -->
     <div layout="column" layout-padding>
         <div>
             <span class="font-size-18">Osquery</span>
-            <span class="wz-agent-status-indicator small teal">Enabled</span>
+            <span ng-if="currentConfig && currentConfig.osquery && currentConfig.osquery.disabled === 'no'" class="wz-agent-status-indicator small teal">Enabled</span>
+            <span ng-if="(currentConfig && currentConfig.osquery && currentConfig.osquery.disabled === 'yes') || (currentConfig && !currentConfig.osquery)" class="wz-agent-status-indicator small red">Disabled</span>
         </div>
         <span class="md-subheader">Osquery allows to expose an operating system as a high-performance relational database</span>
     </div>
     <!-- End headline -->
 
-    <!-- This section contains the main content and the right sidenav -->
-    <div flex="auto" layout="row">
+    <!-- Loading ring -->
+    <div class='uil-ring-css' ng-show="load">
+        <div></div>
+    </div>
 
-        <!-- This section appears when there's no configuration -->
-        <wz-no-config flex ng-if="false"></wz-no-config>
-        <!-- End no configuration section -->
+    <!-- This section contains the main content and the right sidenav -->
+    <div flex="auto" layout="row" ng-if="!load">
+
+      <!-- No configuration section -->
+      <wz-no-config
+        flex
+        error="currentConfig['wmodules-wmodules']"
+        ng-if="currentConfig['wmodules-wmodules'] && isString(currentConfig['wmodules-wmodules'])"></wz-no-config>
+      <wz-no-config
+        flex
+        error="'not-present'"
+        ng-if="currentConfig && !currentConfig.osquery && !isString(currentConfig['wmodules-wmodules'])"></wz-no-config>
+      <!-- End no configuration section -->
 
         <!-- This section is the main content -->
-        <div flex layout="column">
+        <div flex layout="column" ng-if="currentConfig && currentConfig.osquery">
 
             <!-- The main card will all the settings -->
             <md-card class="wz-md-card" ng-if="!JSONContent && !XMLContent">
@@ -31,9 +44,9 @@
                             </div>
                         </div>
                         <span flex></span>
-                        <span ng-class="JSONContent ? 'wz-text-active' : ''" class="wz-text-link small" ng-click="getJSON('osquery')">JSON</span>
+                        <span ng-class="JSONContent ? 'wz-text-active' : ''" class="wz-text-link small" ng-click="getJSON(currentConfig.osquery)">JSON</span>
                         <span class="small">&nbsp;&centerdot;&nbsp;</span>
-                        <span ng-class="XMLContent ? 'wz-text-active' : ''" class="wz-text-link small" ng-click="getXML('osquery')">XML</span>
+                        <span ng-class="XMLContent ? 'wz-text-active' : ''" class="wz-text-link small" ng-click="getXML(currentConfig.osquery)">XML</span>
                     </div>
                     <md-divider class="wz-margin-top-10"></md-divider>
 
@@ -42,28 +55,55 @@
 
                         <wz-config-item
                             label="Osquery integration status"
-                            value="enabled">
+                            value="currentConfig.osquery.disabled === 'yes' ? 'disabled' : 'enabled'">
                         </wz-config-item>
                         <wz-config-item
                             label="Auto-run the Osquery daemon"
-                            value="yes">
+                            value="currentConfig.osquery.run_daemon">
                         </wz-config-item>
                         <wz-config-item
                             label="Path to the Osquery executable"
-                            value="/usr/share/osquery/bin/osqueryd">
+                            value="currentConfig.osquery.bin_path">
                         </wz-config-item>
                         <wz-config-item
                             label="Path to the Osquery results log file"
-                            value="/var/log/osquery/osqueryd.results.log">
+                            value="currentConfig.osquery.log_path">
                         </wz-config-item>
                         <wz-config-item
                             label="Path to the Osquery configuration file"
-                            value="	/etc/osquery/osquery.conf">
+                            value="currentConfig.osquery.config_path">
                         </wz-config-item>
                         <wz-config-item
                             label="Use defined labels as decorators"
-                            value="	/etc/osquery/osquery.conf">
+                            value="currentConfig.osquery.add_labels">
                         </wz-config-item>
+
+                    </div>
+                    <!-- End configuration block -->
+
+                    <div class="wz-margin-top-10" ng-if="currentConfig.osquery.packs && isArray(currentConfig.osquery.packs)">
+                        <span class="font-size-16">Osquery packs</span>
+                        <div class="wz-margin-top-10">
+                            <span class="md-subheader small">A pack contains multiple, related queries to quickly get information</span>
+                        </div>
+                    </div>
+                    <md-divider class="wz-margin-top-10"></md-divider>
+
+                    <!-- Configuration block -->
+                    <div class="wz-padding-top-10" ng-if="currentConfig.osquery.packs && isArray(currentConfig.osquery.packs)">
+
+                        <table class="table table-striped table-condensed" style="table-layout: fixed !important;">
+                            <thead class="wz-text-bold">
+                                <th class="wz-text-left col-lg-4">Name</th>
+                                <th class="wz-text-left col-lg-8">Path</th>
+                            </thead>
+                            <tbody class="wz-word-wrap">
+                                <tr ng-repeat="item in currentConfig.osquery.packs track by $index">
+                                    <td>{{ item.name }}</td>
+                                    <td>{{ item.path }}</td>
+                                </tr>
+                            </tbody>
+                        </table>
 
                     </div>
                     <!-- End configuration block -->
@@ -82,9 +122,9 @@
                             </div>
                         </div>
                         <span flex></span>
-                        <span ng-class="JSONContent ? 'wz-text-active' : ''" class="wz-text-link small" ng-click="getJSON('osquery')">JSON</span>
+                        <span ng-class="JSONContent ? 'wz-text-active' : ''" class="wz-text-link small" ng-click="getJSON(currentConfig.osquery)">JSON</span>
                         <span class="small">&nbsp;&centerdot;&nbsp;</span>
-                        <span ng-class="XMLContent ? 'wz-text-active' : ''" class="wz-text-link small" ng-click="getXML('osquery')">XML</span>
+                        <span ng-class="XMLContent ? 'wz-text-active' : ''" class="wz-text-link small" ng-click="getXML(currentConfig.osquery)">XML</span>
                     </div>
                     <md-divider class="wz-margin-top-10"></md-divider>
 
@@ -108,9 +148,9 @@
                             </div>
                         </div>
                         <span flex></span>
-                        <span ng-class="JSONContent ? 'wz-text-active' : ''" class="wz-text-link small" ng-click="getJSON('osquery')">JSON</span>
+                        <span ng-class="JSONContent ? 'wz-text-active' : ''" class="wz-text-link small" ng-click="getJSON(currentConfig.osquery)">JSON</span>
                         <span class="small">&nbsp;&centerdot;&nbsp;</span>
-                        <span ng-class="XMLContent ? 'wz-text-active' : ''" class="wz-text-link small" ng-click="getXML('osquery')">XML</span>
+                        <span ng-class="XMLContent ? 'wz-text-active' : ''" class="wz-text-link small" ng-click="getXML(currentConfig.osquery)">XML</span>
                     </div>
                     <md-divider class="wz-margin-top-10"></md-divider>
 
