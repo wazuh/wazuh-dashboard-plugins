@@ -1,10 +1,23 @@
-<div flex="auto" layout="column" ng-if="!load && configurationTab === 'policy-monitoring'" ng-init="switchConfigurationSubTab('pm-general')">
+<div flex="auto" layout="column" ng-if="configurationTab === 'policy-monitoring'" ng-init="switchConfigurationSubTab('pm-general')">
 
     <!-- Headline -->
     <div layout="column" layout-padding>
         <div>
             <span class="font-size-18">Policy monitoring</span>
-            <span class="wz-agent-status-indicator small teal">Enabled</span>
+            <span
+              ng-if="currentConfig['syscheck-rootcheck']
+              && currentConfig['syscheck-rootcheck'].rootcheck
+              && currentConfig['syscheck-rootcheck'].rootcheck.disabled
+              && currentConfig['syscheck-rootcheck'].rootcheck.disabled === 'no'"
+              class="wz-agent-status-indicator small teal">Enabled</span>
+            <span
+              ng-if="(currentConfig['syscheck-rootcheck']
+              && currentConfig['syscheck-rootcheck'].rootcheck
+              && currentConfig['syscheck-rootcheck'].rootcheck.disabled
+              && currentConfig['syscheck-rootcheck'].rootcheck.disabled === 'yes')
+              ||
+              (currentConfig['syscheck-rootcheck']
+              && isString(currentConfig['syscheck-rootcheck']))" class="wz-agent-status-indicator small red">Disabled</span>
         </div>
         <span class="md-subheader">Verify that your systems are configured according to your security policies baseline</span>
     </div>
@@ -16,18 +29,28 @@
         md-selected-nav-item="configurationSubTab"
         nav-bar-aria-label="Policy monitoring navigation links">
         <md-nav-item class="wz-nav-item" md-nav-click="switchConfigurationSubTab('pm-general')" name="pm-general">General</md-nav-item>
-        <md-nav-item class="wz-nav-item" md-nav-click="switchConfigurationSubTab('pm-rootkit')" name="pm-rootkit">Rootkits</md-nav-item>
-        <md-nav-item class="wz-nav-item" md-nav-click="switchConfigurationSubTab('pm-unix')" name="pm-unix">UNIX</md-nav-item>
-        <md-nav-item class="wz-nav-item" md-nav-click="switchConfigurationSubTab('pm-windows')" name="pm-windows">Windows</md-nav-item>
+        <md-nav-item class="wz-nav-item" md-nav-click="switchConfigurationSubTab('pm-unix')" name="pm-unix">System audit</md-nav-item>
     </md-nav-bar>
     <!-- End Policy monitoring navigation bar -->
 
-    <!-- This section contains the main content and the right sidenav -->
-    <div flex="auto" layout="row">
+    <!-- Loading ring -->
+    <div class='uil-ring-css' ng-show="load">
+        <div></div>
+    </div>
 
-        <!-- This section appears when there's no configuration -->
-        <wz-no-config flex ng-if="false"></wz-no-config>
-        <!-- End no configuration section -->
+    <!-- This section contains the main content and the right sidenav -->
+    <div flex="auto" layout="row" ng-if="!load">
+
+      <!-- No configuration section -->
+      <wz-no-config
+        flex
+        error="currentConfig['syscheck-rootcheck']"
+        ng-if="currentConfig['syscheck-rootcheck'] && isString(currentConfig['syscheck-rootcheck'])"></wz-no-config>
+      <wz-no-config
+        flex
+        error="'not-present'"
+        ng-if="currentConfig['syscheck-rootcheck'] && !isString(currentConfig['syscheck-rootcheck']) && !currentConfig['syscheck-rootcheck'].rootcheck"></wz-no-config>
+      <!-- End no configuration section -->
 
         <!-- This section is the main content -->
-        <div flex layout="column">
+        <div flex layout="column" ng-if="currentConfig['syscheck-rootcheck'] && !isString(currentConfig['syscheck-rootcheck']) && currentConfig['syscheck-rootcheck'].rootcheck">
