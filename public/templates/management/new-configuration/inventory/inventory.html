@@ -1,24 +1,37 @@
-<div flex="auto" layout="column" ng-if="!load && configurationTab === 'inventory'">
+<div flex="auto" layout="column" ng-if="configurationTab === 'syscollector'">
 
     <!-- Headline -->
     <div layout="column" layout-padding>
         <div>
-            <span class="font-size-18">Inventory</span>
-            <span class="wz-agent-status-indicator small teal">Enabled</span>
+            <span class="font-size-18">Inventory data</span>
+            <span ng-if="currentConfig && currentConfig.syscollector && currentConfig.syscollector.disabled === 'no'" class="wz-agent-status-indicator small teal">Enabled</span>
+            <span ng-if="(currentConfig && currentConfig.syscollector && currentConfig.syscollector.disabled === 'yes') || (currentConfig && !currentConfig.syscollector)" class="wz-agent-status-indicator small red">Disabled</span>
         </div>
         <span class="md-subheader">Gather relevant information about your system OS, hardware, packages, etc.</span>
     </div>
     <!-- End headline -->
 
-    <!-- This section contains the main content and the right sidenav -->
-    <div flex="auto" layout="row">
+    <!-- Loading ring -->
+    <div class='uil-ring-css' ng-show="load">
+        <div></div>
+    </div>
 
-        <!-- This section appears when there's no configuration -->
-        <wz-no-config flex ng-if="false"></wz-no-config>
-        <!-- End no configuration section -->
+    <!-- This section contains the main content and the right sidenav -->
+    <div flex="auto" layout="row" ng-if="!load">
+
+      <!-- No configuration section -->
+      <wz-no-config
+        flex
+        error="currentConfig['wmodules-wmodules']"
+        ng-if="currentConfig['wmodules-wmodules'] && isString(currentConfig['wmodules-wmodules'])"></wz-no-config>
+      <wz-no-config
+        flex
+        error="'not-present'"
+        ng-if="currentConfig && !currentConfig.syscollector && !isString(currentConfig['wmodules-wmodules'])"></wz-no-config>
+      <!-- End no configuration section -->
 
         <!-- This section is the main content -->
-        <div flex layout="column">
+        <div flex layout="column" ng-if="currentConfig && currentConfig.syscollector">
 
             <!-- The main card will all the settings -->
             <md-card class="wz-md-card" ng-if="!JSONContent && !XMLContent">
@@ -31,9 +44,9 @@
                             </div>
                         </div>
                         <span flex></span>
-                        <span ng-class="JSONContent ? 'wz-text-active' : ''" class="wz-text-link small" ng-click="getJSON('syscollector')">JSON</span>
+                        <span ng-class="JSONContent ? 'wz-text-active' : ''" class="wz-text-link small" ng-click="getJSON(currentConfig.syscollector)">JSON</span>
                         <span class="small">&nbsp;&centerdot;&nbsp;</span>
-                        <span ng-class="XMLContent ? 'wz-text-active' : ''" class="wz-text-link small" ng-click="getXML('syscollector')">XML</span>
+                        <span ng-class="XMLContent ? 'wz-text-active' : ''" class="wz-text-link small" ng-click="getXML(currentConfig.syscollector)">XML</span>
                     </div>
                     <md-divider class="wz-margin-top-10"></md-divider>
 
@@ -42,15 +55,15 @@
 
                         <wz-config-item
                             label="Syscollector integration status"
-                            value="enabled">
+                            value="currentConfig.syscollector.disabled === 'yes' ? 'disabled' : 'enabled'">
                         </wz-config-item>
                         <wz-config-item
                             label="Interval between system scans"
-                            value="1h">
+                            value="currentConfig.syscollector.interval">
                         </wz-config-item>
                         <wz-config-item
                             label="Scan on start"
-                            value="yes">
+                            value="currentConfig.syscollector['scan-on-start']">
                         </wz-config-item>
 
                     </div>
@@ -69,31 +82,31 @@
 
                         <wz-config-item
                             label="Scan hardware info"
-                            value="yes">
+                            value="currentConfig.syscollector.hardware">
                         </wz-config-item>
                         <wz-config-item
                             label="Scan current processes"
-                            value="yes">
+                            value="currentConfig.syscollector.processes">
                         </wz-config-item>
                         <wz-config-item
                             label="Scan operating system info"
-                            value="yes">
+                            value="currentConfig.syscollector.os">
                         </wz-config-item>
                         <wz-config-item
                             label="Scan installed packages"
-                            value="yes">
+                            value="currentConfig.syscollector.packages">
                         </wz-config-item>
                         <wz-config-item
                             label="Scan network interfaces"
-                            value="yes">
+                            value="currentConfig.syscollector.network">
                         </wz-config-item>
                         <wz-config-item
                             label="Scan listening network ports"
-                            value="yes">
+                            value="currentConfig.syscollector.ports">
                         </wz-config-item>
                         <wz-config-item
                             label="Scan all network ports"
-                            value="no">
+                            value="currentConfig.syscollector.ports_all">
                         </wz-config-item>
 
                     </div>
@@ -114,9 +127,9 @@
                             </div>
                         </div>
                         <span flex></span>
-                        <span ng-class="JSONContent ? 'wz-text-active' : ''" class="wz-text-link small" ng-click="getJSON('syscollector')">JSON</span>
+                        <span ng-class="JSONContent ? 'wz-text-active' : ''" class="wz-text-link small" ng-click="getJSON(currentConfig.syscollector)">JSON</span>
                         <span class="small">&nbsp;&centerdot;&nbsp;</span>
-                        <span ng-class="XMLContent ? 'wz-text-active' : ''" class="wz-text-link small" ng-click="getXML('syscollector')">XML</span>
+                        <span ng-class="XMLContent ? 'wz-text-active' : ''" class="wz-text-link small" ng-click="getXML(currentConfig.syscollector)">XML</span>
                     </div>
                     <md-divider class="wz-margin-top-10"></md-divider>
 
@@ -140,9 +153,9 @@
                             </div>
                         </div>
                         <span flex></span>
-                        <span ng-class="JSONContent ? 'wz-text-active' : ''" class="wz-text-link small" ng-click="getJSON('syscollector')">JSON</span>
+                        <span ng-class="JSONContent ? 'wz-text-active' : ''" class="wz-text-link small" ng-click="getJSON(currentConfig.syscollector)">JSON</span>
                         <span class="small">&nbsp;&centerdot;&nbsp;</span>
-                        <span ng-class="XMLContent ? 'wz-text-active' : ''" class="wz-text-link small" ng-click="getXML('syscollector')">XML</span>
+                        <span ng-class="XMLContent ? 'wz-text-active' : ''" class="wz-text-link small" ng-click="getXML(currentConfig.syscollector)">XML</span>
                     </div>
                     <md-divider class="wz-margin-top-10"></md-divider>
 
