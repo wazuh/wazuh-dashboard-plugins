@@ -357,7 +357,7 @@ class AgentsController {
       const id = this.commonData.checkLocationAgentId(newAgentId, globalAgent);
 
       if (this.$scope.tab === 'configuration') {
-        //await this.loadSyscollector(id);
+        await this.loadSyscollector(id);
         return this.$scope.getAgentConfig(id);
       }
 
@@ -386,7 +386,7 @@ class AgentsController {
 
       this.$scope.switchTab(this.$scope.tab, true);
 
-      //await this.loadSyscollector(id);
+      await this.loadSyscollector(id);
 
       this.$scope.load = false;
       if (!this.$scope.$$phase) this.$scope.$digest();

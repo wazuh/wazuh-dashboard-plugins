@@ -13,17 +13,24 @@
 export class ShareAgent {
   constructor() {
     this.agent = null;
+    this.selectedGroup = null;
   }
 
   getAgent() {
     return this.agent;
   }
 
-  setAgent(ag) {
+  getSelectedGroup() {
+    return this.agent.group[this.selectedGroup];
+  }
+
+  setAgent(ag, group) {
     this.agent = ag;
+    this.selectedGroup = group;
   }
 
   deleteAgent() {
     this.agent = null;
+    this.selectedGroup = null;
   }
 }
