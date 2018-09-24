@@ -122,6 +122,7 @@ class NewConfigurationController {
    * @param {*} configurationTab
    */
   switchConfigurationTab(configurationTab) {
+    this.$scope.selectedItem = 0;
     this.$scope.currentConfig = null;
     this.$scope.XMLContent = false;
     this.$scope.JSONContent = false;
@@ -135,6 +136,7 @@ class NewConfigurationController {
    * @param {*} configurationSubTab
    */
   switchConfigurationSubTab(configurationSubTab) {
+    this.$scope.selectedItem = 0;
     this.$scope.XMLContent = false;
     this.$scope.JSONContent = false;
     this.$scope.configurationSubTab = configurationSubTab;
