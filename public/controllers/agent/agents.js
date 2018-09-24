@@ -28,6 +28,7 @@ import {
 import js2xmlparser from 'js2xmlparser';
 import XMLBeautifier from '../../utils/xml-beautifier';
 import { queryConfig } from '../../services/query-config';
+import { objectWithoutProperties } from '../../utils/remove-hash-key.js'
 
 const app = uiModules.get('app/wazuh', []);
 
@@ -668,10 +669,8 @@ class AgentsController {
       this.$scope.XMLContent = false;
     } else {
       try {
-        if(Array.isArray(config)) {
-          config.map(item => delete item['$$hashKey']);
-        }
-        this.$scope.XMLContent = XMLBeautifier(js2xmlparser.parse('configuration', config));
+        const cleaned = objectWithoutProperties(config)
+        this.$scope.XMLContent = XMLBeautifier(js2xmlparser.parse('configuration', cleaned));
       } catch (error) {
         this.$scope.XMLContent = false;
       }
@@ -691,13 +690,9 @@ class AgentsController {
       this.$scope.JSONContent = false;
     } else {
       try {
-        if(Array.isArray(config)) {
-          config.map(item => delete item['$$hashKey']);
-        }
-        console.log(config)
-        this.$scope.JSONContent = beautifier.prettyPrint(config);
+        const cleaned = objectWithoutProperties(config)
+        this.$scope.JSONContent = beautifier.prettyPrint(cleaned);
       } catch (error) {
-        console.log(error.message)
         this.$scope.JSONContent = false;
       }
     }
