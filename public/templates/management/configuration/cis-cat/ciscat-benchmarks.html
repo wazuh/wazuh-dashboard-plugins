@@ -1,0 +1,42 @@
+<!-- The main card will all the settings -->
+<md-card class="wz-md-card" ng-if="!JSONContent && !XMLContent && configurationSubTab === 'ciscat-benchmarks'">
+    <md-card-content>
+        <div layout="row" layout-align="start center">
+            <div>
+                <span class="font-size-16">Benchmarks</span>
+                <div class="wz-margin-top-10">
+                    <span class="md-subheader small">List of CIS-CAT benchmarks to run and perform scans</span>
+                </div>
+            </div>
+            <span flex></span>
+            <span ng-class="JSONContent ? 'wz-text-active' : ''" class="wz-text-link small" ng-click="getJSON(currentConfig['cis-cat'].content)">JSON</span>
+            <span class="small">&nbsp;&centerdot;&nbsp;</span>
+            <span ng-class="XMLContent ? 'wz-text-active' : ''" class="wz-text-link small" ng-click="getXML(currentConfig['cis-cat'].content)">XML</span>
+        </div>
+        <md-divider class="wz-margin-top-10"></md-divider>
+
+        <!-- Configuration block -->
+        <div class="wz-padding-top-10">
+
+            <table class="table table-striped table-condensed" style="table-layout: fixed !important;">
+                <thead class="wz-text-bold">
+                    <th class="wz-text-left">Path</th>
+                    <th class="wz-text-left">Profile</th>
+                    <th class="wz-text-left">Timeout</th>
+                    <th class="wz-text-left">Type</th>
+                </thead>
+                <tbody class="wz-word-wrap">
+                    <tr ng-repeat="item in currentConfig['cis-cat'].content">
+                        <td>{{item.path}}</td>
+                        <td>{{item.profile}}</td>
+                        <td>{{item.timeout}}</td>
+                        <td>{{item.type}}</td>
+                    </tr>
+                </tbody>
+            </table>
+
+        </div>
+        <!-- End configuration block -->
+    </md-card-content>
+</md-card>
+<!-- End main card with all the settings -->

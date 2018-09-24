@@ -1,0 +1,77 @@
+<!-- The main card will all the settings -->
+<md-card class="wz-md-card" ng-if="!JSONContent && !XMLContent && configurationSubTab === 'ciscat-general'">
+    <md-card-content>
+        <div layout="row" layout-align="start center">
+            <div>
+                <span class="font-size-16">Main settings</span>
+                <div class="wz-margin-top-10">
+                    <span class="md-subheader small">General settings applied to all the benchmarks</span>
+                </div>
+            </div>
+            <span flex></span>
+            <span ng-class="JSONContent ? 'wz-text-active' : ''" class="wz-text-link small" ng-click="getJSON(currentConfig['cis-cat'])">JSON</span>
+            <span class="small">&nbsp;&centerdot;&nbsp;</span>
+            <span ng-class="XMLContent ? 'wz-text-active' : ''" class="wz-text-link small" ng-click="getXML(currentConfig['cis-cat'])">XML</span>
+        </div>
+        <md-divider class="wz-margin-top-10"></md-divider>
+
+        <!-- Configuration block -->
+        <div class="wz-padding-top-10">
+
+            <wz-config-item
+                label="CIS-CAT integration status"
+                value="currentConfig['cis-cat'].disabled === 'yes' ? 'disabled' : 'enabled'">
+            </wz-config-item>
+            <wz-config-item
+                label="Timeout (in seconds) for scan executions"
+                value="currentConfig['cis-cat'].timeout">
+            </wz-config-item>
+            <wz-config-item
+                label="Path to Java executable directory"
+                value="currentConfig['cis-cat'].java_path">
+            </wz-config-item>
+            <wz-config-item
+                label="Path to CIS-CAT executable directory"
+                value="currentConfig['cis-cat'].ciscat_path">
+            </wz-config-item>
+
+        </div>
+        <!-- End configuration block -->
+
+        <div class="wz-margin-top-10">
+            <span class="font-size-16">Scheduling settings</span>
+            <div class="wz-margin-top-10">
+                <span class="md-subheader small">Customize the schedule for CIS-CAT benchmarks</span>
+            </div>
+        </div>
+        <md-divider class="wz-margin-top-10"></md-divider>
+
+        <!-- Configuration block -->
+        <div class="wz-padding-top-10">
+
+            <wz-config-item
+                label="Interval between scan executions"
+                value="currentConfig['cis-cat'].interval">
+            </wz-config-item>
+            <wz-config-item
+                label="Scan on start"
+                value="currentConfig['cis-cat']['scan-on-start']">
+            </wz-config-item>
+            <wz-config-item
+                label="Day of the month to run scans"
+                value="currentConfig['cis-cat'].day">
+            </wz-config-item>
+            <wz-config-item
+                label="Day of the week to run scans"
+                value="currentConfig['cis-cat'].wday">
+            </wz-config-item>
+            <wz-config-item
+                label="Time of the day to run scans"
+                value="currentConfig['cis-cat'].time">
+            </wz-config-item>
+
+        </div>
+        <!-- End configuration block -->
+    </md-card-content>
+</md-card>
+<!-- End main card with all the settings -->
