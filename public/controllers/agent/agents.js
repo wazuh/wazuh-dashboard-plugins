@@ -575,7 +575,6 @@ class AgentsController {
    */
   async switchConfigTab(configurationTab, sections) {
     try {
-      console.log('DEBUG PARAMS',configurationTab, sections)
       this.$scope.load = true;
       this.$scope.currentConfig = null;
       this.$scope.XMLContent = false;
@@ -583,7 +582,6 @@ class AgentsController {
       this.$scope.configurationSubTab = false;
       this.$scope.configurationTab = configurationTab;
       this.$scope.currentConfig = await queryConfig(this.$scope.agent.id, sections, this.apiReq, this.errorHandler);
-      console.log('DEBUG RESULT',this.$scope.currentConfig)
       this.$scope.load = false;
       if (!this.$scope.$$phase) this.$scope.$digest();
     } catch (error) {

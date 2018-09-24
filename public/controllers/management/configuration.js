@@ -108,7 +108,6 @@ class NewConfigurationController {
       if (result.length) {
         this.$scope.currentConfig = result[0];
       }
-      console.log(this.$scope.currentConfig)
       this.$scope.load = false;
       if (!this.$scope.$$phase) this.$scope.$digest();
     } catch (error) {
