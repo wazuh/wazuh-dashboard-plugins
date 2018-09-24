@@ -1,5 +1,12 @@
+<!-- No configuration section -->
+<wz-no-config
+  flex
+  error="'not-present'"
+  ng-if="configurationSubTab === 'openscap-evaluations' && currentConfig && currentConfig['open-scap'] && !currentConfig['open-scap'].content"></wz-no-config>
+<!-- End no configuration section -->
+
 <!-- Evaluations card -->
-<md-card class="wz-md-card" ng-if="!JSONContent && !XMLContent && configurationSubTab === 'openscap-evaluations'">
+<md-card class="wz-md-card" ng-if="!JSONContent && !XMLContent && configurationSubTab === 'openscap-evaluations' && currentConfig && currentConfig['open-scap'] && currentConfig['open-scap'].content">
     <md-card-content>
         <div layout="row" layout-align="start center">
             <div>
@@ -9,9 +16,9 @@
                 </div>
             </div>
             <span flex></span>
-            <span ng-class="JSONContent ? 'wz-text-active' : ''" class="wz-text-link small" ng-click="getJSON(currentConfig['open-scap'].content)">JSON</span>
+            <span ng-class="JSONContent ? 'wz-text-active' : ''" class="wz-text-link small" ng-click="getJSON()">JSON</span>
             <span class="small">&nbsp;&centerdot;&nbsp;</span>
-            <span ng-class="XMLContent ? 'wz-text-active' : ''" class="wz-text-link small" ng-click="getXML(currentConfig['open-scap'].content)">XML</span>
+            <span ng-class="XMLContent ? 'wz-text-active' : ''" class="wz-text-link small" ng-click="getXML()">XML</span>
         </div>
         <md-divider class="wz-margin-top-10"></md-divider>
 
@@ -27,9 +34,14 @@
                 <tbody class="wz-word-wrap">
                     <tr ng-repeat="item in currentConfig['open-scap'].content">
                         <td>{{item.path}}</td>
-                        <td><ul><li ng-repeat="profile in item.profile">{{profile}}</li></ul></td>
-                        <td>{{item.type}}</td>
-                        <td>{{item.timeout}}</td>
+                        <td>
+                          <ul>
+                            <li ng-repeat="profile in item.profile">{{profile}}</li>
+                          </ul>
+                          <span ng-if="!item.profile">n/a</span>
+                        </td>
+                        <td>{{ item.type }}</td>
+                        <td>{{ item.timeout }}</td>
                     </tr>
                 </tbody>
             </table>

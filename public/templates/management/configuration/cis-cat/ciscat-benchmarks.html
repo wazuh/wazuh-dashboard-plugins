@@ -1,5 +1,12 @@
+<!-- No configuration section -->
+<wz-no-config
+  flex
+  error="'not-present'"
+  ng-if="configurationSubTab === 'ciscat-benchmarks' && currentConfig && currentConfig['cis-cat'] && !currentConfig['cis-cat'].content"></wz-no-config>
+<!-- End no configuration section -->
+
 <!-- The main card will all the settings -->
-<md-card class="wz-md-card" ng-if="!JSONContent && !XMLContent && configurationSubTab === 'ciscat-benchmarks'">
+<md-card class="wz-md-card" ng-if="!JSONContent && !XMLContent && configurationSubTab === 'ciscat-benchmarks' && currentConfig && currentConfig['cis-cat'] && currentConfig['cis-cat'].content">
     <md-card-content>
         <div layout="row" layout-align="start center">
             <div>
@@ -9,9 +16,9 @@
                 </div>
             </div>
             <span flex></span>
-            <span ng-class="JSONContent ? 'wz-text-active' : ''" class="wz-text-link small" ng-click="getJSON(currentConfig['cis-cat'].content)">JSON</span>
+            <span ng-class="JSONContent ? 'wz-text-active' : ''" class="wz-text-link small" ng-click="getJSON()">JSON</span>
             <span class="small">&nbsp;&centerdot;&nbsp;</span>
-            <span ng-class="XMLContent ? 'wz-text-active' : ''" class="wz-text-link small" ng-click="getXML(currentConfig['cis-cat'].content)">XML</span>
+            <span ng-class="XMLContent ? 'wz-text-active' : ''" class="wz-text-link small" ng-click="getXML()">XML</span>
         </div>
         <md-divider class="wz-margin-top-10"></md-divider>
 

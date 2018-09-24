@@ -1,9 +1,11 @@
-<div flex="auto" layout="column" ng-if="!load && configurationTab === 'cis-cat'" ng-init="switchConfigurationSubTab('ciscat-general')">
+<div flex="auto" layout="column" ng-if="configurationTab === 'cis-cat'" ng-init="switchConfigurationSubTab('ciscat-general')">
 
     <!-- Headline -->
     <div layout="column" layout-padding>
         <div>
             <span class="font-size-18">CIS-CAT</span>
+            <span ng-if="currentConfig && currentConfig['cis-cat'] && currentConfig['cis-cat'].disabled === 'no'" class="wz-agent-status-indicator small teal">Enabled</span>
+            <span ng-if="(currentConfig && currentConfig['cis-cat'] && currentConfig['cis-cat'].disabled === 'yes') || (currentConfig && !currentConfig['cis-cat'])" class="wz-agent-status-indicator small red">Disabled</span>
         </div>
         <span class="md-subheader">Configuration assessment using Center of Internet Security scanner and SCAP checks</span>
     </div>
@@ -19,12 +21,24 @@
     </md-nav-bar>
     <!-- End CIS-CAT navigation bar -->
 
-    <!-- This section contains the main content and the right sidenav -->
-    <div flex="auto" layout="row">
+    <!-- Loading ring -->
+    <div class='uil-ring-css' ng-show="load">
+        <div></div>
+    </div>
 
-        <!-- This section appears when there's no configuration -->
-        <wz-no-config flex ng-if="false"></wz-no-config>
+    <!-- This section contains the main content and the right sidenav -->
+    <div flex="auto" layout="row" ng-if="!load">
+
+        <!-- No configuration section -->
+        <wz-no-config
+          flex
+          error="currentConfig['wmodules-wmodules']"
+          ng-if="currentConfig['wmodules-wmodules'] && isString(currentConfig['wmodules-wmodules'])"></wz-no-config>
+        <wz-no-config
+          flex
+          error="'not-present'"
+          ng-if="currentConfig && !currentConfig['cis-cat'] && !isString(currentConfig['wmodules-wmodules'])"></wz-no-config>
         <!-- End no configuration section -->
 
         <!-- This section is the main content -->
-        <div flex layout="column">
+        <div flex layout="column" ng-if="currentConfig && currentConfig['cis-cat']">

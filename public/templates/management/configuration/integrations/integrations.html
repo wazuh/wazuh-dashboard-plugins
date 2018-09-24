@@ -1,4 +1,4 @@
-<div flex="auto" layout="column" ng-if="!load && configurationTab === 'integrations'">
+<div flex="auto" layout="column" ng-if="configurationTab === 'integrations'">
 
     <!-- Headline -->
     <div layout="column" layout-padding>
@@ -9,15 +9,23 @@
     </div>
     <!-- End headline -->
 
-    <!-- This section contains the main content and the right sidenav -->
-    <div flex="auto" layout="row">
+    <!-- Loading ring -->
+    <div class='uil-ring-css' ng-show="load">
+        <div></div>
+    </div>
 
-        <!-- This section appears when there's no configuration -->
-        <wz-no-config flex ng-if="false"></wz-no-config>
-        <!-- End no configuration section -->
+    <!-- This section contains the main content and the right sidenav -->
+    <div flex="auto" layout="row" ng-if="!load">
+
+      <!-- No configuration section -->
+      <wz-no-config
+        flex
+        error="currentConfig['integrator-integration']"
+        ng-if="currentConfig['integrator-integration'] && isString(currentConfig['integrator-integration'])"></wz-no-config>
+      <!-- End no configuration section -->
 
         <!-- This section is the main content -->
-        <div flex layout="column">
+        <div flex layout="column" ng-if="currentConfig['integrator-integration'] && !isString(currentConfig['integrator-integration'])">
 
             <!-- VirusTotal integration card -->
             <md-card class="wz-md-card" ng-if="!JSONContent && !XMLContent">
