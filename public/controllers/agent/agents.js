@@ -177,8 +177,8 @@ class AgentsController {
     this.$scope.currentConfig = null;
     this.$scope.configurationTab = '';
     this.$scope.configurationSubTab = '';
-    this.$scope.getXML = name => this.getXML(name);
-    this.$scope.getJSON = name => this.getJSON(name);
+    this.$scope.getXML = () => this.getXML();
+    this.$scope.getJSON = () => this.getJSON();
     this.$scope.isString = item => typeof item === 'string';
     this.$scope.switchConfigTab = (configurationTab, sections) => this.switchConfigTab(configurationTab, sections);
     this.$scope.switchWodle = (wodleName) => this.switchWodle(wodleName);
@@ -660,7 +660,9 @@ class AgentsController {
    * Assigns XML raw content for specific configuration
    * @param {object} config Raw content to show in XML
    */
-  getXML(config) {
+  getXML() {
+    const config = {};
+    Object.assign(config,this.$scope.currentConfig)
     this.$scope.JSONContent = false;
     if (this.$scope.XMLContent) {
       this.$scope.XMLContent = false;
@@ -681,7 +683,9 @@ class AgentsController {
    * Assigns JSON raw content for specific configuration
    * @param {object} config Raw content to show in JSON
    */
-  getJSON(config) {
+  getJSON() {
+    const config = {};
+    Object.assign(config,this.$scope.currentConfig)
     this.$scope.XMLContent = false;
     if (this.$scope.JSONContent) {
       this.$scope.JSONContent = false;

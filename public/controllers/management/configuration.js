@@ -30,8 +30,8 @@ class NewConfigurationController {
     this.$scope.configurationTab = '';
     this.$scope.configurationSubTab = '';
 
-    this.$scope.getXML = name => this.getXML(name);
-    this.$scope.getJSON = name => this.getJSON(name);
+    this.$scope.getXML = () => this.getXML();
+    this.$scope.getJSON = () => this.getJSON();
     this.$scope.isString = item => typeof item === 'string';
     this.$scope.switchConfigTab = (configurationTab, sections) => this.switchConfigTab(configurationTab, sections);
     this.$scope.switchWodle = (wodleName) => this.switchWodle(wodleName);
@@ -146,7 +146,9 @@ class NewConfigurationController {
    * Assigns XML raw content for specific configuration
    * @param {object} config Raw content to show in XML
    */
-  getXML(config) {
+  getXML() {
+    const config = {};
+    Object.assign(config,this.$scope.currentConfig)
     this.$scope.JSONContent = false;
     if (this.$scope.XMLContent) {
       this.$scope.XMLContent = false;
@@ -155,7 +157,10 @@ class NewConfigurationController {
         if(Array.isArray(config)) {
           config.map(item => delete item['$$hashKey']);
         }
+        console.log(config)
         this.$scope.XMLContent = XMLBeautifier(js2xmlparser.parse('configuration', config));
+ 
+        console.log(this.$scope.XMLContent)
       } catch (error) {
         this.$scope.XMLContent = false;
       }
@@ -167,7 +172,9 @@ class NewConfigurationController {
    * Assigns JSON raw content for specific configuration
    * @param {object} config Raw content to show in JSON
    */
-  getJSON(config) {
+  getJSON() {
+    const config = {};
+    Object.assign(config,this.$scope.currentConfig)
     this.$scope.XMLContent = false;
     if (this.$scope.JSONContent) {
       this.$scope.JSONContent = false;
