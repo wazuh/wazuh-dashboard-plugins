@@ -1,4 +1,4 @@
-<div flex="auto" layout="column" ng-if="!load && configurationTab === 'log-collection'" ng-init="switchConfigurationSubTab('localfile')">
+<div flex="auto" layout="column" ng-if="configurationTab === 'log-collection'" ng-init="switchConfigurationSubTab('localfile')">
 
     <!-- Headline -->
     <div layout="column" layout-padding>
@@ -18,3 +18,8 @@
         <md-nav-item class="wz-nav-item" md-nav-click="switchConfigurationSubTab('socket')" name="socket">Sockets</md-nav-item>
     </md-nav-bar>
     <!-- End Log collection navigation bar -->
+
+    <!-- Loading ring -->
+    <div class='uil-ring-css' ng-show="load">
+        <div></div>
+    </div>

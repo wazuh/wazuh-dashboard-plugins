@@ -1,12 +1,19 @@
 <!-- This section contains the main content and the right sidenav -->
-<div flex="auto" layout="row" ng-if="configurationSubTab === 'socket'">
+<div flex="auto" layout="row" ng-if="!load && configurationSubTab === 'socket'">
 
-    <!-- This section appears when there's no configuration -->
-    <wz-no-config flex ng-if="false"></wz-no-config>
-    <!-- End no configuration section -->
+  <!-- No configuration section -->
+  <wz-no-config
+    flex
+    error="currentConfig['logcollector-socket']"
+    ng-if="currentConfig['logcollector-socket'] && isString(currentConfig['logcollector-socket'])"></wz-no-config>
+  <wz-no-config
+    flex
+    error="'not-present'"
+    ng-if="currentConfig['logcollector-socket'] && !isString(currentConfig['logcollector-socket']) && !currentConfig['logcollector-socket'].target"></wz-no-config>
+  <!-- End no configuration section -->
 
     <!-- This section is the main content -->
-    <div flex layout="column">
+    <div flex layout="column" ng-if="currentConfig['logcollector-socket'] && !isString(currentConfig['logcollector-socket']) && currentConfig['logcollector-socket'].target && currentConfig['logcollector-socket'].target.length">
 
         <!-- The main card will all the settings -->
         <md-card flex="auto" class="wz-md-card" ng-if="!JSONContent && !XMLContent">
@@ -32,34 +39,34 @@
                     <div flex="30" layout="column">
 
                         <md-list flex="auto" class="wz-item-list">
-                            <md-list-item>Test</md-list-item>
+                            <md-list-item class="wz-text-link" ng-click="updateSelectedItem($index)" ng-repeat="item in currentConfig['logcollector-socket'].target">{{ item.name }}</md-list-item>
                         </md-list>
 
                     </div>
                     <!-- End list container -->
 
                     <!-- Detail container -->
-                    <div flex layout="column">
+                    <div flex layout="column" ng-if="currentConfig['logcollector-socket'].target.length">
 
                         <div flex="auto" class="wz-item-detail">
                             <wz-config-item
                                 label="Socket name"
-                                value="'FOOFOOFOO'"
+                                value="currentConfig['logcollector-socket'].target[selectedItem].name || 'n/a'"
                                 notResponsive="true">
                             </wz-config-item>
                             <wz-config-item
                                 label="Socket location"
-                                value="'FOOFOOFOO'"
+                                value="currentConfig['logcollector-socket'].target[selectedItem].location || 'n/a'"
                                 notResponsive="true">
                             </wz-config-item>
                             <wz-config-item
                                 label="UNIX socket protocol"
-                                value="'FOOFOOFOO'"
+                                value="currentConfig['logcollector-socket'].target[selectedItem].mode || 'udp'"
                                 notResponsive="true">
                             </wz-config-item>
                             <wz-config-item
                                 label="Prefix to place before the message"
-                                value="'FOOFOOFOO'"
+                                value="currentConfig['logcollector-socket'].target[selectedItem].prefix || 'n/a'"
                                 notResponsive="true">
                             </wz-config-item>
                         </div>

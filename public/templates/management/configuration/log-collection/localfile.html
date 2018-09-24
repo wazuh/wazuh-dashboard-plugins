@@ -1,12 +1,19 @@
 <!-- This section contains the main content and the right sidenav -->
-<div flex="auto" layout="row" ng-if="configurationSubTab === 'localfile'">
+<div flex="auto" layout="row" ng-if="!load && configurationSubTab === 'localfile'">
 
-    <!-- This section appears when there's no configuration -->
-    <wz-no-config flex ng-if="false"></wz-no-config>
-    <!-- End no configuration section -->
+  <!-- No configuration section -->
+  <wz-no-config
+    flex
+    error="currentConfig['logcollector-localfile']"
+    ng-if="currentConfig['logcollector-localfile'] && isString(currentConfig['logcollector-localfile'])"></wz-no-config>
+  <wz-no-config
+    flex
+    error="'not-present'"
+    ng-if="currentConfig['logcollector-localfile'] && !isString(currentConfig['logcollector-localfile']) && !currentConfig['logcollector-localfile'].localfile"></wz-no-config>
+  <!-- End no configuration section -->
 
     <!-- This section is the main content -->
-    <div flex layout="column">
+    <div flex layout="column" ng-if="currentConfig['logcollector-localfile'] && !isString(currentConfig['logcollector-localfile']) && currentConfig['logcollector-localfile'].localfile && currentConfig['logcollector-localfile'].localfile.length">
 
         <!-- The main card will all the settings -->
         <md-card flex="auto" class="wz-md-card" ng-if="!JSONContent && !XMLContent">
@@ -19,9 +26,9 @@
                         </div>
                     </div>
                     <span flex></span>
-                    <span ng-class="JSONContent ? 'wz-text-active' : ''" class="wz-text-link small" ng-click="getJSON('localfile')">JSON</span>
+                    <span ng-class="JSONContent ? 'wz-text-active' : ''" class="wz-text-link small" ng-click="getJSON()">JSON</span>
                     <span class="small">&nbsp;&centerdot;&nbsp;</span>
-                    <span ng-class="XMLContent ? 'wz-text-active' : ''" class="wz-text-link small" ng-click="getXML('localfile')">XML</span>
+                    <span ng-class="XMLContent ? 'wz-text-active' : ''" class="wz-text-link small" ng-click="getXML()">XML</span>
                 </div>
                 <md-divider class="wz-margin-top-10"></md-divider>
 
@@ -32,65 +39,57 @@
                     <div flex="30" layout="column">
 
                         <md-list flex="auto" class="wz-item-list">
-                            <md-list-item>Test</md-list-item>
+                            <md-list-item class="wz-text-link" ng-click="updateSelectedItem($index)" ng-repeat="item in currentConfig['logcollector-localfile'].localfile">{{ item.file || item.alias || item.command }}</md-list-item>
                         </md-list>
 
                     </div>
                     <!-- End list container -->
 
                     <!-- Detail container -->
-                    <div flex layout="column">
+                    <div flex layout="column" ng-if="currentConfig['logcollector-localfile'].localfile.length">
 
                         <div flex="auto" class="wz-item-detail">
                             <wz-config-item
                                 label="Log location"
-                                value="'FOOFOOFOO'"
-                                notResponsive="true">
+                                value="currentConfig['logcollector-localfile'].localfile[selectedItem].file || 'n/a'">
                             </wz-config-item>
                             <wz-config-item
                                 label="Run this command"
-                                value="'FOOFOOFOO'"
-                                notResponsive="true">
+                                value="currentConfig['logcollector-localfile'].localfile[selectedItem].command || 'n/a'">
                             </wz-config-item>
                             <wz-config-item
                                 label="Command alias"
-                                value="'FOOFOOFOO'"
-                                notResponsive="true">
+                                value="currentConfig['logcollector-localfile'].localfile[selectedItem].alias || 'n/a'">
                             </wz-config-item>
                             <wz-config-item
                                 label="Interval between command executions"
-                                value="'FOOFOOFOO'"
-                                notResponsive="true">
+                                value="currentConfig['logcollector-localfile'].localfile[selectedItem].frequency || 'n/a'">
                             </wz-config-item>
                             <wz-config-item
                                 label="Only receive logs occured after start"
-                                value="'FOOFOOFOO'"
-                                notResponsive="true">
+                                value="currentConfig['logcollector-localfile'].localfile[selectedItem]['only-future-events'] || 'n/a'">
                             </wz-config-item>
                             <wz-config-item
                                 label="Filter logs using this XPATH query"
-                                value="'FOOFOOFOO'"
-                                notResponsive="true">
+                                value="currentConfig['logcollector-localfile'].localfile[selectedItem].query || 'n/a'">
                             </wz-config-item>
                             <wz-config-item
                                 label="Log labels"
-                                value="'FOOFOOFOO'"
-                                notResponsive="true">
+                                value="currentConfig['logcollector-localfile'].localfile[selectedItem].labels || 'n/a'">
                             </wz-config-item>
                             <wz-config-item
+                                is-array="true"
                                 label="Redirect output to this socket"
-                                value="'FOOFOOFOO'"
-                                notResponsive="true">
+                                value="currentConfig['logcollector-localfile'].localfile[selectedItem].target || 'agent'">
                             </wz-config-item>
                             <wz-config-item
                                 label="Log format"
-                                value="'FOOFOOFOO'"
-                                notResponsive="true">
+                                value="currentConfig['logcollector-localfile'].localfile[selectedItem].log_format || 'n/a'">
                             </wz-config-item>
                             <wz-config-item
+                                is-array="true"
                                 label="Log collection output format"
-                                value="'FOOFOOFOO'"
-                                notResponsive="true">
+                                value="currentConfig['logcollector-localfile'].localfile[selectedItem].target">
                             </wz-config-item>
                         </div>
 
@@ -113,9 +112,9 @@
                         </div>
                     </div>
                     <span flex></span>
-                    <span ng-class="JSONContent ? 'wz-text-active' : ''" class="wz-text-link small" ng-click="getJSON('localfile')">JSON</span>
+                    <span ng-class="JSONContent ? 'wz-text-active' : ''" class="wz-text-link small" ng-click="getJSON()">JSON</span>
                     <span class="small">&nbsp;&centerdot;&nbsp;</span>
-                    <span ng-class="XMLContent ? 'wz-text-active' : ''" class="wz-text-link small" ng-click="getXML('localfile')">XML</span>
+                    <span ng-class="XMLContent ? 'wz-text-active' : ''" class="wz-text-link small" ng-click="getXML()">XML</span>
                 </div>
                 <md-divider class="wz-margin-top-10"></md-divider>
 
@@ -139,9 +138,9 @@
                         </div>
                     </div>
                     <span flex></span>
-                    <span ng-class="JSONContent ? 'wz-text-active' : ''" class="wz-text-link small" ng-click="getJSON('localfile')">JSON</span>
+                    <span ng-class="JSONContent ? 'wz-text-active' : ''" class="wz-text-link small" ng-click="getJSON()">JSON</span>
                     <span class="small">&nbsp;&centerdot;&nbsp;</span>
-                    <span ng-class="XMLContent ? 'wz-text-active' : ''" class="wz-text-link small" ng-click="getXML('localfile')">XML</span>
+                    <span ng-class="XMLContent ? 'wz-text-active' : ''" class="wz-text-link small" ng-click="getXML()">XML</span>
                 </div>
                 <md-divider class="wz-margin-top-10"></md-divider>
 
