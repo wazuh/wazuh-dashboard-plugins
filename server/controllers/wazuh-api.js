@@ -602,7 +602,7 @@ export class WazuhApiCtrl {
         ? {message:response.body.message, code: response.body.error}
         : new Error('Unexpected error fetching data from the Wazuh API');
     } catch (error) {
-      return ErrorResponse(error.message || error, error.code || 3013, 500, reply);
+      return ErrorResponse(error.message || error, `Wazuh API error: ${error.code}` || 3013, 500, reply);
     }
   }
 
