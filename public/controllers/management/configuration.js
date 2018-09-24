@@ -10,58 +10,141 @@
  * Find more information about this on the LICENSE file.
  */
 import { uiModules } from 'ui/modules';
-import beautifier from '../../utils/json-beautifier';
+import angular from 'angular';
 import js2xmlparser from 'js2xmlparser';
 import XMLBeautifier from '../../utils/xml-beautifier';
-import angular from 'angular';
+import beautifier from '../../utils/json-beautifier';
+import { queryConfig } from '../../services/query-config';
 
 const app = uiModules.get('app/wazuh', []);
 
-class ConfigurationController {
+class NewConfigurationController {
   constructor($scope, errorHandler, apiReq) {
     this.$scope = $scope;
     this.errorHandler = errorHandler;
     this.apiReq = apiReq;
-    this.$scope.load = true;
+    this.$scope.load = false;
     this.$scope.isArray = Array.isArray;
     this.configRaw = {};
+    this.$scope.currentConfig = null;
 
-    this.$scope.switchItem = item => this.switchItem(item);
+    this.$scope.configurationTab = '';
+    this.$scope.configurationSubTab = '';
+
     this.$scope.getXML = name => this.getXML(name);
     this.$scope.getJSON = name => this.getJSON(name);
+    this.$scope.isString = item => typeof item === 'string';
+    this.$scope.switchConfigTab = (configurationTab, sections) => this.switchConfigTab(configurationTab, sections);
+    this.$scope.switchWodle = (wodleName) => this.switchWodle(wodleName);
+    this.$scope.switchConfigurationTab = configurationTab => this.switchConfigurationTab(configurationTab);
+    this.$scope.switchConfigurationSubTab = configurationSubTab => this.switchConfigurationSubTab(configurationSubTab);
+
+    this.$scope.selectedItem = 0;
+    this.$scope.updateSelectedItem = i => this.$scope.selectedItem = i;
   }
 
   /**
-   * Initialize
+   * Switchs between configuration tabs
+   * @param {string} configurationTab The configuration tab to open
+   * @param {Array<object>} sections Array that includes sections to be fetched
    */
-  $onInit() {
-    this.load();
+  async switchConfigTab(configurationTab, sections) {
+    try {
+      this.$scope.load = true;
+      this.$scope.currentConfig = null;
+      this.$scope.XMLContent = false;
+      this.$scope.JSONContent = false;
+      this.$scope.configurationSubTab = false;
+      this.$scope.configurationTab = configurationTab;
+      this.$scope.currentConfig = await queryConfig('000', sections, this.apiReq, this.errorHandler);
+      this.$scope.load = false;
+      if (!this.$scope.$$phase) this.$scope.$digest();
+    } catch (error) {
+      this.errorHandler.handle(error, 'Manager');
+      this.$scope.load = false;
+    }
+    return;
   }
 
   /**
-   * Switchs between configuration sections
-   * @param {*} item
+   * Switchs to a wodle section
+   * @param {string} wodleName The wodle to open
    */
-  switchItem(item) {
+  async switchWodle(wodleName) {
+    try {
+      this.$scope.load = true;
+      this.$scope.currentConfig = null;
+      this.$scope.XMLContent = false;
+      this.$scope.JSONContent = false;
+      this.$scope.configurationSubTab = false;
+      this.$scope.configurationTab = wodleName;
+
+      this.$scope.currentConfig = await queryConfig('000', [{component:'wmodules',configuration:'wmodules'}], this.apiReq, this.errorHandler);
+
+      // Filter by provided wodleName
+      let result = [];
+      if (
+        wodleName &&
+        this.$scope.currentConfig &&
+        this.$scope.currentConfig['wmodules-wmodules'] &&
+        this.$scope.currentConfig['wmodules-wmodules'].wmodules
+      ) {
+        result = this.$scope.currentConfig['wmodules-wmodules'].wmodules.filter(
+          item => typeof item[wodleName] !== 'undefined'
+        );
+      }
+
+      if (result.length) {
+        this.$scope.currentConfig = result[0];
+      }
+      console.log(this.$scope.currentConfig)
+      this.$scope.load = false;
+      if (!this.$scope.$$phase) this.$scope.$digest();
+    } catch (error) {
+      this.errorHandler.handle(error, 'Manager');
+      this.$scope.load = false;
+    }
+    return;
+  }
+
+  /**
+   * Switchs between configuration tabs
+   * @param {*} configurationTab
+   */
+  switchConfigurationTab(configurationTab) {
+    this.$scope.currentConfig = null;
     this.$scope.XMLContent = false;
     this.$scope.JSONContent = false;
-    this.$scope.selectedItem = item;
+    this.$scope.configurationSubTab = false;
+    this.$scope.configurationTab = configurationTab;
+    if (!this.$scope.$$phase) this.$scope.$digest();
+  }
+
+  /**
+   * Switchs between configuration sub-tabs
+   * @param {*} configurationSubTab
+   */
+  switchConfigurationSubTab(configurationSubTab) {
+    this.$scope.XMLContent = false;
+    this.$scope.JSONContent = false;
+    this.$scope.configurationSubTab = configurationSubTab;
     if (!this.$scope.$$phase) this.$scope.$digest();
   }
 
   /**
    * Assigns XML raw content for specific configuration
-   * @param {string} name Name of the configuration section
+   * @param {object} config Raw content to show in XML
    */
-  getXML(name) {
+  getXML(config) {
     this.$scope.JSONContent = false;
     if (this.$scope.XMLContent) {
       this.$scope.XMLContent = false;
     } else {
       try {
-        this.$scope.XMLContent = XMLBeautifier(
-          js2xmlparser.parse(name, this.configRaw[name])
-        );
+        if(Array.isArray(config)) {
+          config.map(item => delete item['$$hashKey']);
+        }
+        this.$scope.XMLContent = XMLBeautifier(js2xmlparser.parse('configuration', config));
       } catch (error) {
         this.$scope.XMLContent = false;
       }
@@ -71,70 +154,27 @@ class ConfigurationController {
 
   /**
    * Assigns JSON raw content for specific configuration
-   * @param {string} name Name of the configuration section
+   * @param {object} config Raw content to show in JSON
    */
-  getJSON(name) {
+  getJSON(config) {
     this.$scope.XMLContent = false;
     if (this.$scope.JSONContent) {
       this.$scope.JSONContent = false;
     } else {
       try {
-        this.$scope.JSONContent = beautifier.prettyPrint(this.configRaw[name]);
+        if(Array.isArray(config)) {
+          config.map(item => delete item['$$hashKey']);
+        }
+        this.$scope.JSONContent = beautifier.prettyPrint(config);
       } catch (error) {
         this.$scope.JSONContent = false;
       }
     }
     if (!this.$scope.$$phase) this.$scope.$digest();
   }
-
-  /**
-   * Fetchs required data
-   */
-  async load() {
-    try {
-      const data = await this.apiReq.request(
-        'GET',
-        '/manager/configuration',
-        {}
-      );
-      Object.assign(this.configRaw, angular.copy(data.data.data));
-      this.$scope.managerConfiguration = data.data.data;
-
-      if (
-        this.$scope.managerConfiguration &&
-        this.$scope.managerConfiguration['active-response']
-      ) {
-        for (const ar of this.$scope.managerConfiguration['active-response']) {
-          const rulesArray = ar.rules_id ? ar.rules_id.split(',') : [];
-          if (ar.rules_id && rulesArray.length > 1) {
-            const tmp = [];
-
-            for (const id of rulesArray) {
-              const rule = await this.apiReq.request('GET', `/rules/${id}`, {});
-              tmp.push(rule.data.data.items[0]);
-            }
-
-            ar.rules = tmp;
-          } else if (ar.rules_id) {
-            const rule = await this.apiReq.request(
-              'GET',
-              `/rules/${ar.rules_id}`,
-              {}
-            );
-            ar.rule = rule.data.data.items[0];
-          }
-        }
-      }
-
-      this.$scope.raw = beautifier.prettyPrint(data.data.data);
-      this.$scope.load = false;
-      if (!this.$scope.$$phase) this.$scope.$digest();
-      return;
-    } catch (error) {
-      this.errorHandler.handle(error, 'Manager');
-    }
-    return;
-  }
 }
 
-app.controller('managerConfigurationController', ConfigurationController);
+app.controller(
+  'managementNewConfigurationController',
+  NewConfigurationController
+);
