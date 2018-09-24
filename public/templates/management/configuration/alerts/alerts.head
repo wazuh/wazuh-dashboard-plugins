@@ -1,4 +1,4 @@
-<div flex="auto" layout="column" ng-if="!load && configurationTab === 'alerts'" ng-init="switchConfigurationSubTab('general-alerts')">
+<div flex="auto" layout="column" ng-if="configurationTab === 'alerts'" ng-init="switchConfigurationSubTab('general-alerts')">
 
     <!-- Headline -->
     <div layout="column" layout-padding>
@@ -21,3 +21,8 @@
         <md-nav-item class="wz-nav-item" md-nav-click="switchConfigurationSubTab('syslog')" name="syslog">Syslog output</md-nav-item>
     </md-nav-bar>
     <!-- End Alerts navigation bar -->
+
+    <!-- Loading ring -->
+    <div class='uil-ring-css' ng-show="load">
+        <div></div>
+    </div>
