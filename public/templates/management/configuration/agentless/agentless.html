@@ -1,4 +1,4 @@
-<div flex="auto" layout="column" ng-if="!load && configurationTab === 'agentless'">
+<div flex="auto" layout="column" ng-if="configurationTab === 'agentless'">
 
     <!-- Headline -->
     <div layout="column" layout-padding>
@@ -9,15 +9,23 @@
     </div>
     <!-- End headline -->
 
-    <!-- This section contains the main content and the right sidenav -->
-    <div flex="auto" layout="row">
+    <!-- Loading ring -->
+    <div class='uil-ring-css' ng-show="load">
+        <div></div>
+    </div>
 
-        <!-- This section appears when there's no configuration -->
-        <wz-no-config flex ng-if="false"></wz-no-config>
-        <!-- End no configuration section -->
+    <!-- This section contains the main content and the right sidenav -->
+    <div flex="auto" layout="row" ng-if="!load">
+
+      <!-- No configuration section -->
+      <wz-no-config
+        flex
+        error="currentConfig['agentless-agentless']"
+        ng-if="currentConfig['agentless-agentless'] && isString(currentConfig['agentless-agentless'])"></wz-no-config>
+      <!-- End no configuration section -->
 
         <!-- This section is the main content -->
-        <div flex layout="column">
+        <div flex layout="column" ng-if="currentConfig['agentless-agentless'] && !isString(currentConfig['agentless-agentless'])">
 
             <!-- The main card will all the settings -->
             <md-card flex="auto" class="wz-md-card" ng-if="!JSONContent && !XMLContent">
@@ -30,9 +38,9 @@
                             </div>
                         </div>
                         <span flex></span>
-                        <span ng-class="JSONContent ? 'wz-text-active' : ''" class="wz-text-link small" ng-click="getJSON('agentless')">JSON</span>
+                        <span ng-class="JSONContent ? 'wz-text-active' : ''" class="wz-text-link small" ng-click="getJSON()">JSON</span>
                         <span class="small">&nbsp;&centerdot;&nbsp;</span>
-                        <span ng-class="XMLContent ? 'wz-text-active' : ''" class="wz-text-link small" ng-click="getXML('agentless')">XML</span>
+                        <span ng-class="XMLContent ? 'wz-text-active' : ''" class="wz-text-link small" ng-click="getXML()">XML</span>
                     </div>
                     <md-divider class="wz-margin-top-10"></md-divider>
 
@@ -43,35 +51,36 @@
                         <div flex="30" layout="column">
 
                             <md-list flex="auto" class="wz-item-list">
-                                <md-list-item>Test</md-list-item>
+                                <md-list-item class="wz-text-link" ng-click="updateSelectedItem($index)" ng-repeat="item in currentConfig['agentless-agentless'].agentless">{{ item.type }} ({{ item.state }})</md-list-item>
                             </md-list>
 
                         </div>
                         <!-- End list container -->
 
                         <!-- Detail container -->
-                        <div flex layout="column">
+                        <div flex layout="column" ng-if="currentConfig['agentless-agentless'].agentless.length">
 
                             <div flex="auto" class="wz-item-detail">
                                 <wz-config-item
                                     label="Agentless monitoring type"
-                                    value="enabled">
+                                    value="currentConfig['agentless-agentless'].agentless[selectedItem].type">
                                 </wz-config-item>
                                 <wz-config-item
                                     label="Interval (in seconds) between checks"
-                                    value="enabled">
+                                    value="currentConfig['agentless-agentless'].agentless[selectedItem].frequency">
                                 </wz-config-item>
                                 <wz-config-item
+                                    is-array="true"
                                     label="Device username and hostname"
-                                    value="enabled">
+                                    value="currentConfig['agentless-agentless'].agentless[selectedItem].host">
                                 </wz-config-item>
                                 <wz-config-item
                                     label="Device check type"
-                                    value="enabled">
+                                    value="currentConfig['agentless-agentless'].agentless[selectedItem].state">
                                 </wz-config-item>
                                 <wz-config-item
                                     label="Pass these arguments to check"
-                                    value="enabled">
+                                    value="currentConfig['agentless-agentless'].agentless[selectedItem].arguments">
                                 </wz-config-item>
                             </div>
 
@@ -94,9 +103,9 @@
                             </div>
                         </div>
                         <span flex></span>
-                        <span ng-class="JSONContent ? 'wz-text-active' : ''" class="wz-text-link small" ng-click="getJSON('agentless')">JSON</span>
+                        <span ng-class="JSONContent ? 'wz-text-active' : ''" class="wz-text-link small" ng-click="getJSON()">JSON</span>
                         <span class="small">&nbsp;&centerdot;&nbsp;</span>
-                        <span ng-class="XMLContent ? 'wz-text-active' : ''" class="wz-text-link small" ng-click="getXML('agentless')">XML</span>
+                        <span ng-class="XMLContent ? 'wz-text-active' : ''" class="wz-text-link small" ng-click="getXML()">XML</span>
                     </div>
                     <md-divider class="wz-margin-top-10"></md-divider>
 
@@ -120,9 +129,9 @@
                             </div>
                         </div>
                         <span flex></span>
-                        <span ng-class="JSONContent ? 'wz-text-active' : ''" class="wz-text-link small" ng-click="getJSON('agentless')">JSON</span>
+                        <span ng-class="JSONContent ? 'wz-text-active' : ''" class="wz-text-link small" ng-click="getJSON()">JSON</span>
                         <span class="small">&nbsp;&centerdot;&nbsp;</span>
-                        <span ng-class="XMLContent ? 'wz-text-active' : ''" class="wz-text-link small" ng-click="getXML('agentless')">XML</span>
+                        <span ng-class="XMLContent ? 'wz-text-active' : ''" class="wz-text-link small" ng-click="getXML()">XML</span>
                     </div>
                     <md-divider class="wz-margin-top-10"></md-divider>
 
