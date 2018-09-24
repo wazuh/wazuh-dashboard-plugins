@@ -1,0 +1,44 @@
+<div flex="auto" layout="column" ng-if="configurationTab === 'vulnerability-detector'" ng-init="switchConfigurationSubTab('vulnerabilities-general')">
+
+    <!-- Headline -->
+    <div layout="column" layout-padding>
+        <div>
+            <span class="font-size-18">Vulnerabilities</span>
+            <span ng-if="currentConfig && currentConfig['vulnerability-detector'] && currentConfig['vulnerability-detector'].disabled === 'no'" class="wz-agent-status-indicator small teal">Enabled</span>
+            <span ng-if="(currentConfig && currentConfig['vulnerability-detector'] && currentConfig['vulnerability-detector'].disabled === 'yes') || (currentConfig && !currentConfig['vulnerability-detector'])" class="wz-agent-status-indicator small red">Disabled</span>
+        </div>
+        <span class="md-subheader">Discover what applications in your environment are affected by well-known vulnerabilities</span>
+    </div>
+    <!-- End headline -->
+
+    <!-- Vulnerabilities navigation bar -->
+    <md-nav-bar
+        class="wz-nav-bar"
+        md-selected-nav-item="configurationSubTab"
+        nav-bar-aria-label="Vulnerabilities navigation links">
+        <md-nav-item class="wz-nav-item" md-nav-click="switchConfigurationSubTab('vulnerabilities-general')" name="vulnerabilities-general">General</md-nav-item>
+        <md-nav-item class="wz-nav-item" md-nav-click="switchConfigurationSubTab('vulnerabilities-feeds')" name="vulnerabilities-feeds">Feeds</md-nav-item>
+    </md-nav-bar>
+    <!-- End Vulnerabilities navigation bar -->
+
+    <!-- Loading ring -->
+    <div class='uil-ring-css' ng-show="load">
+        <div></div>
+    </div>
+
+    <!-- This section contains the main content and the right sidenav -->
+    <div flex="auto" layout="row" ng-if="!load">
+
+      <!-- No configuration section -->
+      <wz-no-config
+        flex
+        error="currentConfig['wmodules-wmodules']"
+        ng-if="currentConfig['wmodules-wmodules'] && isString(currentConfig['wmodules-wmodules'])"></wz-no-config>
+      <wz-no-config
+        flex
+        error="'not-present'"
+        ng-if="currentConfig && !currentConfig['vulnerability-detector'] && !isString(currentConfig['wmodules-wmodules'])"></wz-no-config>
+      <!-- End no configuration section -->
+
+        <!-- This section is the main content -->
+        <div flex layout="column" ng-if="currentConfig && currentConfig['vulnerability-detector']">

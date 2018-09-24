@@ -1,0 +1,21 @@
+<div flex="auto" layout="column" ng-if="!load && configurationTab === 'commands-active-response'" ng-init="switchConfigurationSubTab('active-response')">
+
+    <!-- Headline -->
+    <div layout="column" layout-padding>
+        <div>
+            <span class="font-size-18">Commands & Active response</span>
+        </div>
+        <span class="md-subheader">Active threath addressing by inmmediate response</span>
+    </div>
+    <!-- End headline -->
+
+    <!-- Commands & Active response navigation bar -->
+    <md-nav-bar
+        class="wz-nav-bar"
+        md-selected-nav-item="configurationSubTab"
+        nav-bar-aria-label="Commands & Active response navigation links">
+        <md-nav-item class="wz-nav-item" md-nav-click="switchConfigurationSubTab('active-response')" name="active-response">Active response</md-nav-item>
+        <md-nav-item class="wz-nav-item" md-nav-click="switchConfigurationSubTab('ar-commands')" name="ar-commands">AR commands</md-nav-item>
+        <md-nav-item class="wz-nav-item" md-nav-click="switchConfigurationSubTab('wazuh-commands')" name="wazuh-commands">Wazuh commands</md-nav-item>
+    </md-nav-bar>
+    <!-- End Commands & Active response navigation bar -->

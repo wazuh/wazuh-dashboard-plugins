@@ -1,0 +1,42 @@
+<!-- General card -->
+<md-card class="wz-md-card" ng-if="!JSONContent && !XMLContent && configurationSubTab === 'vulnerabilities-general'">
+    <md-card-content>
+        <div layout="row" layout-align="start center">
+            <div>
+                <span class="font-size-16">Main settings</span>
+                <div class="wz-margin-top-10">
+                    <span class="md-subheader small">General settings applied to the vulnerability detector and its feeds</span>
+                </div>
+            </div>
+            <span flex></span>
+            <span ng-class="JSONContent ? 'wz-text-active' : ''" class="wz-text-link small" ng-click="getJSON(currentConfig['vulnerability-detector'])">JSON</span>
+            <span class="small">&nbsp;&centerdot;&nbsp;</span>
+            <span ng-class="XMLContent ? 'wz-text-active' : ''" class="wz-text-link small" ng-click="getXML(currentConfig['vulnerability-detector'])">XML</span>
+        </div>
+        <md-divider class="wz-margin-top-10"></md-divider>
+
+        <!-- Configuration block -->
+        <div class="wz-padding-top-10">
+
+            <wz-config-item
+                label="Vulnerability detector status"
+                value="currentConfig['vulnerability-detector'].disabled === 'yes' ? 'disabled' : 'enabled'">
+            </wz-config-item>
+            <wz-config-item
+                label="Interval between scan executions"
+                value="currentConfig['vulnerability-detector'].interval">
+            </wz-config-item>
+            <wz-config-item
+                label="Scan on start"
+                value="currentConfig['vulnerability-detector'].run_on_start">
+            </wz-config-item>
+            <wz-config-item
+                label="Time to ignore already detected vulerabilities"
+                value="currentConfig['vulnerability-detector'].ignore_time">
+            </wz-config-item>
+
+        </div>
+        <!-- End configuration block -->
+    </md-card-content>
+</md-card>
+<!-- End general card -->

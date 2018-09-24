@@ -1,0 +1,20 @@
+<div flex="auto" layout="column" ng-if="!load && configurationTab === 'log-collection'" ng-init="switchConfigurationSubTab('localfile')">
+
+    <!-- Headline -->
+    <div layout="column" layout-padding>
+        <div>
+            <span class="font-size-18">Log collection</span>
+        </div>
+        <span class="md-subheader">Log analysis from text files, Windows events or syslog outputs</span>
+    </div>
+    <!-- End headline -->
+
+    <!-- Log collection navigation bar -->
+    <md-nav-bar
+        class="wz-nav-bar"
+        md-selected-nav-item="configurationSubTab"
+        nav-bar-aria-label="Log collection navigation links">
+        <md-nav-item class="wz-nav-item" md-nav-click="switchConfigurationSubTab('localfile')" name="localfile">Localfiles</md-nav-item>
+        <md-nav-item class="wz-nav-item" md-nav-click="switchConfigurationSubTab('socket')" name="socket">Sockets</md-nav-item>
+    </md-nav-bar>
+    <!-- End Log collection navigation bar -->

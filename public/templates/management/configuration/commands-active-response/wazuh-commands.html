@@ -1,0 +1,177 @@
+<!-- This section contains the main content and the right sidenav -->
+<div flex="auto" layout="row" ng-if="configurationSubTab === 'wazuh-commands'">
+
+    <!-- This section appears when there's no configuration -->
+    <wz-no-config flex ng-if="false"></wz-no-config>
+    <!-- End no configuration section -->
+
+    <!-- This section is the main content -->
+    <div flex layout="column">
+
+        <!-- The main card will all the settings -->
+        <md-card flex="auto" class="wz-md-card" ng-if="!JSONContent && !XMLContent">
+            <md-card-content flex layout="column">
+                <div layout="row" layout-align="start center">
+                    <div>
+                        <span class="font-size-16">Wazuh commands definitions</span>
+                        <div class="wz-margin-top-10">
+                            <span class="md-subheader small">Find here all the currently defined commands using the Wazuh "Command" module</span>
+                        </div>
+                    </div>
+                    <span flex></span>
+                    <span ng-class="JSONContent ? 'wz-text-active' : ''" class="wz-text-link small" ng-click="getJSON('command')">JSON</span>
+                    <span class="small">&nbsp;&centerdot;&nbsp;</span>
+                    <span ng-class="XMLContent ? 'wz-text-active' : ''" class="wz-text-link small" ng-click="getXML('command')">XML</span>
+                </div>
+                <md-divider class="wz-margin-top-10"></md-divider>
+
+                <!-- The container for both list and detail -->
+                <div flex="auto" layout="row" class="wz-margin-top-10">
+
+                    <!-- List container -->
+                    <div flex="30" layout="column">
+
+                        <md-list flex="auto" class="wz-item-list">
+                            <md-list-item>Test</md-list-item>
+                        </md-list>
+
+                    </div>
+                    <!-- End list container -->
+
+                    <!-- Detail container -->
+                    <div flex layout="column">
+
+                        <div flex="auto" class="wz-item-detail">
+                            <wz-config-item
+                                label="Command status"
+                                value="'FOOFOOFOO'"
+                                notResponsive="true">
+                            </wz-config-item>
+                            <wz-config-item
+                                label="Command name"
+                                value="'FOOFOOFOO'"
+                                notResponsive="true">
+                            </wz-config-item>
+                            <wz-config-item
+                                label="Command to execute"
+                                value="'FOOFOOFOO'"
+                                notResponsive="true">
+                            </wz-config-item>
+                            <wz-config-item
+                                label="Interval between executions"
+                                value="'FOOFOOFOO'"
+                                notResponsive="true">
+                            </wz-config-item>
+                            <wz-config-item
+                                label="Run on start"
+                                value="'FOOFOOFOO'"
+                                notResponsive="true">
+                            </wz-config-item>
+                            <wz-config-item
+                                label="Ignore command output"
+                                value="'FOOFOOFOO'"
+                                notResponsive="true">
+                            </wz-config-item>
+                            <wz-config-item
+                                label="Timeout (in seconds) to wait for execution"
+                                value="'FOOFOOFOO'"
+                                notResponsive="true">
+                            </wz-config-item>
+                            <wz-config-item
+                                label="Verify MD5 sum"
+                                value="'FOOFOOFOO'"
+                                notResponsive="true">
+                            </wz-config-item>
+                            <wz-config-item
+                                label="Verify SHA1 sum"
+                                value="'FOOFOOFOO'"
+                                notResponsive="true">
+                            </wz-config-item>
+                            <wz-config-item
+                                label="Verify SHA256 sum"
+                                value="'FOOFOOFOO'"
+                                notResponsive="true">
+                            </wz-config-item>
+                            <wz-config-item
+                                label="Ignore checksum verification"
+                                value="'FOOFOOFOO'"
+                                notResponsive="true">
+                            </wz-config-item>
+                        </div>
+
+                    </div>
+                    <!-- End detail container -->
+                </div>
+                <!-- End container for both list and detail -->
+            </md-card-content>
+        </md-card>
+        <!-- End main card with all the settings -->
+
+        <!-- JSON card -->
+        <md-card flex="auto" class="wz-md-card" ng-if="JSONContent">
+            <md-card-content flex layout="column">
+                <div layout="row" layout-align="start center">
+                    <div>
+                        <span class="font-size-16">JSON viewer</span>
+                        <div class="wz-margin-top-10">
+                            <span class="md-subheader small">View this configuration in raw JSON format</span>
+                        </div>
+                    </div>
+                    <span flex></span>
+                    <span ng-class="JSONContent ? 'wz-text-active' : ''" class="wz-text-link small" ng-click="getJSON('command')">JSON</span>
+                    <span class="small">&nbsp;&centerdot;&nbsp;</span>
+                    <span ng-class="XMLContent ? 'wz-text-active' : ''" class="wz-text-link small" ng-click="getXML('command')">XML</span>
+                </div>
+                <md-divider class="wz-margin-top-10"></md-divider>
+
+                <!-- The JSON viewer -->
+                <div flex="auto" class="wz-margin-top-10 wz-code-viewer">
+                    <pre><code wz-dynamic="JSONContent"></code></pre>
+                </div>
+                <!-- End JSON viewer -->
+            </md-card-content>
+        </md-card>
+        <!-- End JSON card -->
+
+        <!-- XML card -->
+        <md-card flex="auto" class="wz-md-card" ng-if="XMLContent">
+            <md-card-content flex layout="column">
+                <div layout="row" layout-align="start center">
+                    <div>
+                        <span class="font-size-16">XML viewer</span>
+                        <div class="wz-margin-top-10">
+                            <span class="md-subheader small">View this configuration in raw XML format</span>
+                        </div>
+                    </div>
+                    <span flex></span>
+                    <span ng-class="JSONContent ? 'wz-text-active' : ''" class="wz-text-link small" ng-click="getJSON('command')">JSON</span>
+                    <span class="small">&nbsp;&centerdot;&nbsp;</span>
+                    <span ng-class="XMLContent ? 'wz-text-active' : ''" class="wz-text-link small" ng-click="getXML('command')">XML</span>
+                </div>
+                <md-divider class="wz-margin-top-10"></md-divider>
+
+                <!-- The XML viewer -->
+                <div flex="auto" class="wz-margin-top-10 wz-code-viewer">
+                    <pre>{{ XMLContent }}</pre>
+                </div>
+                <!-- End XML viewer -->
+            </md-card-content>
+        </md-card>
+        <!-- End XML card -->
+
+    </div>
+    <!-- End main content section -->
+
+    <!-- This section is the right sidenav content -->
+    <md-sidenav
+        class="md-sidenav-right"
+        md-is-locked-open="true">
+        <md-list>
+            <md-subheader>More info about this section</md-subheader>
+            <md-list-item target="_blank" class="wz-text-link" ng-href="https://documentation.wazuh.com/current/user-manual/reference/ossec-conf/wodle-command.html">Command module reference</md-list-item>
+        </md-list>
+    </md-sidenav>
+    <!-- End right sidenav section -->
+
+</div>
+<!-- End main content and right sidenav section -->
