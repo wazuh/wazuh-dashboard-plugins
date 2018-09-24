@@ -40,6 +40,13 @@ class NewConfigurationController {
 
     this.$scope.selectedItem = 0;
     this.$scope.updateSelectedItem = i => this.$scope.selectedItem = i;
+    this.$scope.getIntegration = list => this.getIntegration(list);
+    this.$scope.integrations = {};
+  }
+
+  buildIntegrations(list) {
+    if(!list || !list.length) return;
+    for(const integration of list) this.$scope.integrations[integration.name] = integration;
   }
 
   /**
@@ -56,7 +63,11 @@ class NewConfigurationController {
       this.$scope.configurationSubTab = false;
       this.$scope.configurationTab = configurationTab;
       this.$scope.currentConfig = await queryConfig('000', sections, this.apiReq, this.errorHandler);
-      console.log(this.$scope.currentConfig)
+      if(sections[0].component === 'integrator') {
+        this.buildIntegrations(this.$scope.currentConfig['integrator-integration'].integration)
+      } else {
+        this.$scope.integrations = {}
+      }
       this.$scope.load = false;
       if (!this.$scope.$$phase) this.$scope.$digest();
     } catch (error) {

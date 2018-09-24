@@ -30,38 +30,38 @@
                             </div>
                         </div>
                         <span flex></span>
-                        <span ng-class="JSONContent ? 'wz-text-active' : ''" class="wz-text-link small" ng-click="getJSON('integration')">JSON</span>
+                        <span ng-class="JSONContent ? 'wz-text-active' : ''" class="wz-text-link small" ng-click="getJSON(integrations)">JSON</span>
                         <span class="small">&nbsp;&centerdot;&nbsp;</span>
-                        <span ng-class="XMLContent ? 'wz-text-active' : ''" class="wz-text-link small" ng-click="getXML('integration')">XML</span>
+                        <span ng-class="XMLContent ? 'wz-text-active' : ''" class="wz-text-link small" ng-click="getXML(integrations)">XML</span>
                     </div>
                     <md-divider class="wz-margin-top-10"></md-divider>
 
                     <!-- Configuration block -->
                     <div class="wz-padding-top-10">
-
+                        <!--{"alert_format":"json","api_key":"VirusTotal_API_Key","group":"syscheck","name":"virustotal","level":0}-->
                         <wz-config-item
                             label="API key"
-                            value="'FOOFOOFOO'">
+                            value="integrations['virustotal'].api_key">
                         </wz-config-item>
                         <wz-config-item
                             label="Filter alerts by this level or above"
-                            value="8">
+                            value="integrations['virustotal'].level">
                         </wz-config-item>
                         <wz-config-item
                             label="Filter alerts by this rule IDs"
-                            value="1005">
+                            value="integrations['virustotal'].rule_id">
                         </wz-config-item>
                         <wz-config-item
                             label="Filter alerts by this rule groups"
-                            value="syscheck">
+                            value="integrations['virustotal'].group">
                         </wz-config-item>
                         <wz-config-item
                             label="Filter alerts by location (agent, IP or file)"
-                            value="10.0.0.69">
+                            value="integrations['virustotal'].event_location">
                         </wz-config-item>
                         <wz-config-item
                             label="Used format to write alerts"
-                            value="json">
+                            value="integrations['virustotal'].alert_format">
                         </wz-config-item>
 
                     </div>
@@ -80,27 +80,27 @@
 
                         <wz-config-item
                             label="Hook URL"
-                            value="'FOOFOOFOO'">
+                            value="integrations['slack'].hook_url">
                         </wz-config-item>
                         <wz-config-item
                             label="Filter alerts by this level or above"
-                            value="8">
+                            value="integrations['slack'].level">
                         </wz-config-item>
                         <wz-config-item
                             label="Filter alerts by this rule IDs"
-                            value="1005">
+                            value="integrations['slack'].rule_id">
                         </wz-config-item>
                         <wz-config-item
                             label="Filter alerts by this rule groups"
-                            value="syscheck">
+                            value="integrations['slack'].group">
                         </wz-config-item>
                         <wz-config-item
                             label="Filter alerts by location (agent, IP or file)"
-                            value="10.0.0.69">
+                            value="integrations['slack'].event_location">
                         </wz-config-item>
                         <wz-config-item
                             label="Used format to write alerts"
-                            value="json">
+                            value="integrations['slack'].alert_format">
                         </wz-config-item>
 
                     </div>
@@ -119,27 +119,27 @@
 
                         <wz-config-item
                             label="API key"
-                            value="'FOOFOOFOO'">
+                            value="integrations['pagerduty'].api_key">
                         </wz-config-item>
                         <wz-config-item
                             label="Filter alerts by this level or above"
-                            value="8">
+                            value="integrations['pagerduty'].level">
                         </wz-config-item>
                         <wz-config-item
                             label="Filter alerts by this rule IDs"
-                            value="1005">
+                            value="integrations['pagerduty'].rule_id">
                         </wz-config-item>
                         <wz-config-item
                             label="Filter alerts by this rule groups"
-                            value="syscheck">
+                            value="integrations['pagerduty'].group">
                         </wz-config-item>
                         <wz-config-item
                             label="Filter alerts by location (agent, IP or file)"
-                            value="10.0.0.69">
+                            value="integrations['pagerduty'].event_location">
                         </wz-config-item>
                         <wz-config-item
                             label="Used format to write alerts"
-                            value="json">
+                            value="integrations['pagerduty'].alert_format">
                         </wz-config-item>
 
                     </div>

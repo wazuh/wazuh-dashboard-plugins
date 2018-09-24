@@ -66,7 +66,7 @@
                         </md-list-item>
                         <md-list-item flex="100" flex-gt-md="50" flex-gt-lg="33" class="md-2-line" ng-if="!agent || agent.id==='000'">
                             <div class="md-list-item-text">
-                                <h3 class="wz-text-link" ng-click="switchConfigTab('integrations')">Integrations</h3>
+                                <h3 class="wz-text-link" ng-click="switchConfigTab('integrations',[{component:'integrator',configuration:'integration'}])">Integrations</h3>
                                 <p>Slack, VirusTotal and PagerDuty integrations with external APIs</p>
                             </div>
                         </md-list-item>
