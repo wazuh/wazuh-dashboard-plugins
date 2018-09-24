@@ -37,7 +37,6 @@ export const TabNames = {
   groups: 'Groups',
   monitoring: 'Monitoring',
   reporting: 'Reporting',
-  'new-configuration': 'New configuration (Beta)',
   'registration-service': 'Registration service',
   cluster: 'Cluster',
   'wazuh-modules': 'Wazuh modules',

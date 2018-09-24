@@ -173,6 +173,6 @@
     <!-- No results section -->
 
     <!-- Loading ring -->
-    <div class='uil-ring-css' ng-show="load">
+    <div class='uil-ring-css' ng-show="load && tab !== 'configuration'">
         <div></div>
     </div>
