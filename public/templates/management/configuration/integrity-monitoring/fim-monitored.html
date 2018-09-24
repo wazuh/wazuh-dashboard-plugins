@@ -1,5 +1,12 @@
+<!-- No configuration section -->
+<wz-no-config
+  flex
+  error="'not-present'"
+  ng-if="configurationSubTab === 'fim-monitored' && currentConfig && currentConfig['syscheck-syscheck'] && currentConfig['syscheck-syscheck'].syscheck && currentConfig['syscheck-syscheck'].syscheck.directories && !currentConfig['syscheck-syscheck'].syscheck.directories.length"></wz-no-config>
+<!-- End no configuration section -->
+
 <!-- Monitored card -->
-<md-card flex="auto" class="wz-md-card" ng-if="!JSONContent && !XMLContent && configurationSubTab === 'fim-monitored'">
+<md-card flex="auto" class="wz-md-card" ng-if="!JSONContent && !XMLContent && configurationSubTab === 'fim-monitored' && currentConfig && currentConfig['syscheck-syscheck'] && currentConfig['syscheck-syscheck'].syscheck && currentConfig['syscheck-syscheck'].syscheck.directories && currentConfig['syscheck-syscheck'].syscheck.directories.length">
     <md-card-content flex layout="column">
         <div layout="row" layout-align="start center">
             <div>
@@ -9,9 +16,9 @@
                 </div>
             </div>
             <span flex></span>
-            <span ng-class="JSONContent ? 'wz-text-active' : ''" class="wz-text-link small" ng-click="getJSON(currentConfig['syscheck-syscheck'].syscheck.directories)">JSON</span>
+            <span ng-class="JSONContent ? 'wz-text-active' : ''" class="wz-text-link small" ng-click="getJSON()">JSON</span>
             <span class="small">&nbsp;&centerdot;&nbsp;</span>
-            <span ng-class="XMLContent ? 'wz-text-active' : ''" class="wz-text-link small" ng-click="getXML(currentConfig['syscheck-syscheck'].syscheck.directories)">XML</span>
+            <span ng-class="XMLContent ? 'wz-text-active' : ''" class="wz-text-link small" ng-click="getXML()">XML</span>
         </div>
         <md-divider class="wz-margin-top-10"></md-divider>
 
@@ -34,94 +41,76 @@
                 <div flex="auto" class="wz-item-detail">
                     <wz-config-item
                         label="Selected item"
-                        value="currentConfig['syscheck-syscheck'].syscheck.directories[selectedItem].dir"
-                        notResponsive="true">
+                        value="currentConfig['syscheck-syscheck'].syscheck.directories[selectedItem].dir">
                     </wz-config-item>
                     <wz-config-item
                         label="Enable realtime monitoring"
-                        value="currentConfig['syscheck-syscheck'].syscheck.directories[selectedItem].opts.includes('realtime') ? 'yes' : 'no'"
-                        notResponsive="true">
+                        value="currentConfig['syscheck-syscheck'].syscheck.directories[selectedItem].opts.includes('realtime') ? 'yes' : 'no'">
                     </wz-config-item>
                     <wz-config-item
                         label="Enable auditing (who-data)"
-                        value="currentConfig['syscheck-syscheck'].syscheck.directories[selectedItem].opts.includes('whodata') ? 'yes' : 'no'"
-                        notResponsive="true">
+                        value="currentConfig['syscheck-syscheck'].syscheck.directories[selectedItem].opts.includes('whodata') ? 'yes' : 'no'">
                     </wz-config-item>
                     <wz-config-item
                         label="Report file changes"
-                        value="currentConfig['syscheck-syscheck'].syscheck.directories[selectedItem].opts.includes('report_changes') ? 'yes' : 'no'"
-                        notResponsive="true">
+                        value="currentConfig['syscheck-syscheck'].syscheck.directories[selectedItem].opts.includes('report_changes') ? 'yes' : 'no'">
                     </wz-config-item>
                     <wz-config-item
                         label="Perform all checksums"
-                        value="currentConfig['syscheck-syscheck'].syscheck.directories[selectedItem].opts.includes('check_all') ? 'yes' : 'no'"
-                        notResponsive="true">
+                        value="currentConfig['syscheck-syscheck'].syscheck.directories[selectedItem].opts.includes('check_all') ? 'yes' : 'no'">
                     </wz-config-item>
                     <wz-config-item
                         label="Check sums (MD5 & SHA1)"
-                        value="currentConfig['syscheck-syscheck'].syscheck.directories[selectedItem].opts.includes('check_sum') ? 'yes' : 'no'"
-                        notResponsive="true">
+                        value="currentConfig['syscheck-syscheck'].syscheck.directories[selectedItem].opts.includes('check_sum') ? 'yes' : 'no'">
                     </wz-config-item>
                     <wz-config-item
                         label="Check MD5 sum"
-                        value="currentConfig['syscheck-syscheck'].syscheck.directories[selectedItem].opts.includes('check_md5sum') ? 'yes' : 'no'"
-                        notResponsive="true">
+                        value="currentConfig['syscheck-syscheck'].syscheck.directories[selectedItem].opts.includes('check_md5sum') ? 'yes' : 'no'">
                     </wz-config-item>
                     <wz-config-item
                         label="Check SHA1 sum"
-                        value="currentConfig['syscheck-syscheck'].syscheck.directories[selectedItem].opts.includes('check_sha1sum') ? 'yes' : 'no'"
-                        notResponsive="true">
+                        value="currentConfig['syscheck-syscheck'].syscheck.directories[selectedItem].opts.includes('check_sha1sum') ? 'yes' : 'no'">
                     </wz-config-item>
                     <wz-config-item
                         label="Check SHA256 sum"
-                        value="currentConfig['syscheck-syscheck'].syscheck.directories[selectedItem].opts.includes('check_sha256sum') ? 'yes' : 'no'"
-                        notResponsive="true">
+                        value="currentConfig['syscheck-syscheck'].syscheck.directories[selectedItem].opts.includes('check_sha256sum') ? 'yes' : 'no'">
                     </wz-config-item>
                     <wz-config-item
                         label="Check files size"
-                        value="currentConfig['syscheck-syscheck'].syscheck.directories[selectedItem].opts.includes('check_size') ? 'yes' : 'no'"
-                        notResponsive="true">
+                        value="currentConfig['syscheck-syscheck'].syscheck.directories[selectedItem].opts.includes('check_size') ? 'yes' : 'no'">
                     </wz-config-item>
                     <wz-config-item
                         label="Check files owner"
-                        value="currentConfig['syscheck-syscheck'].syscheck.directories[selectedItem].opts.includes('check_owner') ? 'yes' : 'no'"
-                        notResponsive="true">
+                        value="currentConfig['syscheck-syscheck'].syscheck.directories[selectedItem].opts.includes('check_owner') ? 'yes' : 'no'">
                     </wz-config-item>
                     <wz-config-item
                         label="Check files groups"
-                        value="currentConfig['syscheck-syscheck'].syscheck.directories[selectedItem].opts.includes('check_group') ? 'yes' : 'no'"
-                        notResponsive="true">
+                        value="currentConfig['syscheck-syscheck'].syscheck.directories[selectedItem].opts.includes('check_group') ? 'yes' : 'no'">
                     </wz-config-item>
                     <wz-config-item
                         label="Check files permissions"
-                        value="currentConfig['syscheck-syscheck'].syscheck.directories[selectedItem].opts.includes('check_perm') ? 'yes' : 'no'"
-                        notResponsive="true">
+                        value="currentConfig['syscheck-syscheck'].syscheck.directories[selectedItem].opts.includes('check_perm') ? 'yes' : 'no'">
                     </wz-config-item>
                     <wz-config-item
                         label="Check files modification time"
-                        value="currentConfig['syscheck-syscheck'].syscheck.directories[selectedItem].opts.includes('check_mtime') ? 'yes' : 'no'"
-                        notResponsive="true">
+                        value="currentConfig['syscheck-syscheck'].syscheck.directories[selectedItem].opts.includes('check_mtime') ? 'yes' : 'no'">
                     </wz-config-item>
                     <wz-config-item
                         label="Check files inodes"
-                        value="currentConfig['syscheck-syscheck'].syscheck.directories[selectedItem].opts.includes('check_inode') ? 'yes' : 'no'"
-                        notResponsive="true">
+                        value="currentConfig['syscheck-syscheck'].syscheck.directories[selectedItem].opts.includes('check_inode') ? 'yes' : 'no'">
                     </wz-config-item>
-                    <!--<wz-config-item
+                    <wz-config-item
                         label="Restrict to files containing this string"
-                        value="'FOOFOOFOO'"
-                        notResponsive="true">
+                        value="currentConfig['syscheck-syscheck'].syscheck.directories[selectedItem].restrict">
                     </wz-config-item>
                     <wz-config-item
                         label="Custom tags for alerts"
-                        value="'FOOFOOFOO'"
-                        notResponsive="true">
+                        value="currentConfig['syscheck-syscheck'].syscheck.directories[selectedItem].tags">
                     </wz-config-item>
                     <wz-config-item
                         label="Recursion level"
-                        value="'FOOFOOFOO'"
-                        notResponsive="true">
-                    </wz-config-item>-->
+                        value="currentConfig['syscheck-syscheck'].syscheck.directories[selectedItem].recursion_level">
+                    </wz-config-item>
                 </div>
 
             </div>

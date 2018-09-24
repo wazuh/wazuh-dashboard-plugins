@@ -1,10 +1,23 @@
-<div flex="auto" layout="column" ng-if="!load && configurationTab === 'integrity-monitoring'" ng-init="switchConfigurationSubTab('fim-general')">
+<div flex="auto" layout="column" ng-if="configurationTab === 'integrity-monitoring'" ng-init="switchConfigurationSubTab('fim-general')">
 
     <!-- Headline -->
     <div layout="column" layout-padding>
         <div>
             <span class="font-size-18">Integrity monitoring</span>
-            <span class="wz-agent-status-indicator small teal">Enabled</span>
+            <span
+              ng-if="currentConfig['syscheck-syscheck']
+              && currentConfig['syscheck-syscheck'].syscheck
+              && currentConfig['syscheck-syscheck'].syscheck.disabled
+              && currentConfig['syscheck-syscheck'].syscheck.disabled === 'no'"
+              class="wz-agent-status-indicator small teal">Enabled</span>
+            <span
+              ng-if="(currentConfig['syscheck-syscheck']
+              && currentConfig['syscheck-syscheck'].syscheck
+              && currentConfig['syscheck-syscheck'].syscheck.disabled
+              && currentConfig['syscheck-syscheck'].syscheck.disabled === 'yes')
+              ||
+              (currentConfig['syscheck-syscheck']
+              && isString(currentConfig['syscheck-syscheck']))" class="wz-agent-status-indicator small red">Disabled</span>
         </div>
         <span class="md-subheader">Identification of changes in content, permissions, ownership, and attributes of files</span>
     </div>
@@ -23,12 +36,24 @@
     </md-nav-bar>
     <!-- End Integrity monitoring navigation bar -->
 
-    <!-- This section contains the main content and the right sidenav -->
-    <div flex="auto" layout="row">
+    <!-- Loading ring -->
+    <div class='uil-ring-css' ng-show="load">
+        <div></div>
+    </div>
 
-        <!-- This section appears when there's no configuration -->
-        <wz-no-config flex ng-if="false"></wz-no-config>
+    <!-- This section contains the main content and the right sidenav -->
+    <div flex="auto" layout="row" ng-if="!load">
+
+        <!-- No configuration section -->
+        <wz-no-config
+          flex
+          error="currentConfig['syscheck-syscheck']"
+          ng-if="currentConfig['syscheck-syscheck'] && isString(currentConfig['syscheck-syscheck'])"></wz-no-config>
+        <wz-no-config
+          flex
+          error="'not-present'"
+          ng-if="currentConfig['syscheck-syscheck'] && !isString(currentConfig['syscheck-syscheck']) && !currentConfig['syscheck-syscheck'].syscheck"></wz-no-config>
         <!-- End no configuration section -->
 
         <!-- This section is the main content -->
-        <div flex layout="column">
+        <div flex layout="column" ng-if="currentConfig['syscheck-syscheck'] && !isString(currentConfig['syscheck-syscheck']) && currentConfig['syscheck-syscheck'].syscheck">

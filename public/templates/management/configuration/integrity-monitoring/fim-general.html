@@ -9,9 +9,9 @@
                 </div>
             </div>
             <span flex></span>
-            <span ng-class="JSONContent ? 'wz-text-active' : ''" class="wz-text-link small" ng-click="getJSON(currentConfig['syscheck-syscheck'].syscheck)">JSON</span>
+            <span ng-class="JSONContent ? 'wz-text-active' : ''" class="wz-text-link small" ng-click="getJSON()">JSON</span>
             <span class="small">&nbsp;&centerdot;&nbsp;</span>
-            <span ng-class="XMLContent ? 'wz-text-active' : ''" class="wz-text-link small" ng-click="getXML(currentConfig['syscheck-syscheck'].syscheck)">XML</span>
+            <span ng-class="XMLContent ? 'wz-text-active' : ''" class="wz-text-link small" ng-click="getXML()">XML</span>
         </div>
         <md-divider class="wz-margin-top-10"></md-divider>
 
@@ -28,8 +28,7 @@
             </wz-config-item>
             <wz-config-item
                 label="Time of day to run integrity scans"
-                value="currentConfig['syscheck-syscheck'].syscheck.scan_time || 'n/a'"
-                notResponsive="true">
+                value="currentConfig['syscheck-syscheck'].syscheck.scan_time || 'n/a'">
             </wz-config-item>
             <wz-config-item
                 label="Day of the week to run integrity scans"
@@ -38,7 +37,7 @@
             <wz-config-item
                 ng-if="!agent || agent.id === '000'"
                 label="Ignore files that change too many times"
-                value="'FOOFOOFOO'">
+                value="currentConfig['syscheck-syscheck'].syscheck.auto_ignore || 'no'">
             </wz-config-item>
             <wz-config-item
                 label="Alert when new files are created"
@@ -46,33 +45,27 @@
             </wz-config-item>
             <wz-config-item
                 label="Scan on start"
-                value="currentConfig['syscheck-syscheck'].syscheck.scan_on_start"
-                notResponsive="true">
+                value="currentConfig['syscheck-syscheck'].syscheck.scan_on_start">
             </wz-config-item>
             <wz-config-item
                 label="Skip scan on CIFS/NFS mounts"
-                value="currentConfig['syscheck-syscheck'].syscheck.skip_nfs"
-                notResponsive="true">
+                value="currentConfig['syscheck-syscheck'].syscheck.skip_nfs">
             </wz-config-item>
             <wz-config-item
                 label="Remove old local snapshots"
-                value="currentConfig['syscheck-syscheck'].syscheck.remove_old_diff || 'yes'"
-                notResponsive="true">
+                value="currentConfig['syscheck-syscheck'].syscheck.remove_old_diff || 'yes'">
             </wz-config-item>
             <wz-config-item
                 label="Restart the Audit daemon"
-                value="currentConfig['syscheck-syscheck'].syscheck.restart_audit"
-                notResponsive="true">
+                value="currentConfig['syscheck-syscheck'].syscheck.restart_audit">
             </wz-config-item>
             <wz-config-item
                 label="Interval (in seconds) to check directories' SACLs"
-                value="currentConfig['syscheck-syscheck'].syscheck.windows_audit_interval || '300'"
-                notResponsive="true">
+                value="currentConfig['syscheck-syscheck'].syscheck.windows_audit_interval || '300'">
             </wz-config-item>
             <wz-config-item
                 label="Command to prevent prelinking"
-                value="currentConfig['syscheck-syscheck'].syscheck.prefilter_cmd || 'n/a'"
-                notResponsive="true">
+                value="currentConfig['syscheck-syscheck'].syscheck.prefilter_cmd || 'n/a'">
             </wz-config-item>
 
         </div>
