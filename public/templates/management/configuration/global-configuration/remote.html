@@ -26,9 +26,9 @@
                         </div>
                     </div>
                     <span flex></span>
-                    <span ng-class="JSONContent ? 'wz-text-active' : ''" class="wz-text-link small" ng-click="getJSON(currentConfig['request-remote'].remote)">JSON</span>
+                    <span ng-class="JSONContent ? 'wz-text-active' : ''" class="wz-text-link small" ng-click="getJSON()">JSON</span>
                     <span class="small">&nbsp;&centerdot;&nbsp;</span>
-                    <span ng-class="XMLContent ? 'wz-text-active' : ''" class="wz-text-link small" ng-click="getXML(currentConfig['request-remote'].remote)">XML</span>
+                    <span ng-class="XMLContent ? 'wz-text-active' : ''" class="wz-text-link small" ng-click="getXML()">XML</span>
                 </div>
                 <md-divider class="wz-margin-top-10"></md-divider>
 
@@ -50,22 +50,22 @@
                             <tr ng-repeat="item in currentConfig['request-remote'].remote">
                                 <td>{{ item.connection || '---' }}</td>
                                 <td>{{ item.port || '---' }}</td>
-                                <td>{{ item.protocol || '---' }}</td>
-                                <td>{{ item.ipv6 || '---' }}</td>
+                                <td>{{ item.protocol || 'udp' }}</td>
+                                <td>{{ item.ipv6 || 'n/a' }}</td>
                                 <td>
                                   <ul ng-if="item['allowed-ips']">
                                     <li ng-repeat="ip in item['allowed-ips']">{{ ip }}</li>
                                   </ul>
-                                  <span ng-if="!item['allowed-ips']">---</span>
+                                  <span ng-if="!item['allowed-ips']">n/a</span>
                                 </td>
                                 <td>
                                   <ul ng-if="item['denied-ips']">
                                     <li ng-repeat="ip in item['denied-ips']">{{ ip }}</li>
                                   </ul>
-                                  <span ng-if="!item['denied-ips']">---</span>
+                                  <span ng-if="!item['denied-ips']">n/a</span>
                                 </td>
-                                <td>{{ item.local_ip || '---' }}</td>
-                                <td>{{ item.queue_size || '---' }}</td>
+                                <td>{{ item.local_ip || 'All interfaces' }}</td>
+                                <td>{{ item.queue_size || '16384' }}</td>
                             </tr>
                         </tbody>
                     </table>
@@ -87,9 +87,9 @@
                         </div>
                     </div>
                     <span flex></span>
-                    <span ng-class="JSONContent ? 'wz-text-active' : ''" class="wz-text-link small" ng-click="getJSON(currentConfig['request-remote'].remote)">JSON</span>
+                    <span ng-class="JSONContent ? 'wz-text-active' : ''" class="wz-text-link small" ng-click="getJSON()">JSON</span>
                     <span class="small">&nbsp;&centerdot;&nbsp;</span>
-                    <span ng-class="XMLContent ? 'wz-text-active' : ''" class="wz-text-link small" ng-click="getXML(currentConfig['request-remote'].remote)">XML</span>
+                    <span ng-class="XMLContent ? 'wz-text-active' : ''" class="wz-text-link small" ng-click="getXML()">XML</span>
                 </div>
                 <md-divider class="wz-margin-top-10"></md-divider>
 
@@ -113,9 +113,9 @@
                         </div>
                     </div>
                     <span flex></span>
-                    <span ng-class="JSONContent ? 'wz-text-active' : ''" class="wz-text-link small" ng-click="getJSON(currentConfig['request-remote'].remote)">JSON</span>
+                    <span ng-class="JSONContent ? 'wz-text-active' : ''" class="wz-text-link small" ng-click="getJSON()">JSON</span>
                     <span class="small">&nbsp;&centerdot;&nbsp;</span>
-                    <span ng-class="XMLContent ? 'wz-text-active' : ''" class="wz-text-link small" ng-click="getXML(currentConfig['request-remote'].remote)">XML</span>
+                    <span ng-class="XMLContent ? 'wz-text-active' : ''" class="wz-text-link small" ng-click="getXML()">XML</span>
                 </div>
                 <md-divider class="wz-margin-top-10"></md-divider>
 
