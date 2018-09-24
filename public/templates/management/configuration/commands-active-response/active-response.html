@@ -19,9 +19,9 @@
                         </div>
                     </div>
                     <span flex></span>
-                    <span ng-class="JSONContent ? 'wz-text-active' : ''" class="wz-text-link small" ng-click="getJSON('active-response')">JSON</span>
+                    <span ng-class="JSONContent ? 'wz-text-active' : ''" class="wz-text-link small" ng-click="getJSON()">JSON</span>
                     <span class="small">&nbsp;&centerdot;&nbsp;</span>
-                    <span ng-class="XMLContent ? 'wz-text-active' : ''" class="wz-text-link small" ng-click="getXML('active-response')">XML</span>
+                    <span ng-class="XMLContent ? 'wz-text-active' : ''" class="wz-text-link small" ng-click="getXML()">XML</span>
                 </div>
                 <md-divider class="wz-margin-top-10"></md-divider>
 
@@ -32,7 +32,7 @@
                     <div flex="30" layout="column">
 
                         <md-list flex="auto" class="wz-item-list">
-                            <md-list-item>Test</md-list-item>
+                            <md-list-item class="wz-text-link" ng-click="updateSelectedItem($index)" ng-repeat="item in currentConfig['analysis-active_response']['active-response']">{{item.command}}</md-list-item>
                         </md-list>
 
                     </div>
@@ -44,42 +44,57 @@
                         <div flex="auto" class="wz-item-detail">
                             <wz-config-item
                                 label="Status of this active response"
-                                value="'FOOFOOFOO'"
+                                value="currentConfig['analysis-active_response']['active-response'][selectedItem].disabled === 'yes' ? 'disabled' : 'enabled'"
                                 notResponsive="true">
                             </wz-config-item>
                             <wz-config-item
                                 label="Command to execute"
-                                value="'FOOFOOFOO'"
+                                value="currentConfig['analysis-active_response']['active-response'][selectedItem].command"
                                 notResponsive="true">
                             </wz-config-item>
                             <wz-config-item
                                 label="Execute the command on this location"
-                                value="'FOOFOOFOO'"
+                                value="currentConfig['analysis-active_response']['active-response'][selectedItem].location"
                                 notResponsive="true">
                             </wz-config-item>
                             <wz-config-item
                                 label="Agent ID on which execute the command"
-                                value="'FOOFOOFOO'"
+                                value="currentConfig['analysis-active_response']['active-response'][selectedItem].agent_id"
                                 notResponsive="true">
                             </wz-config-item>
                             <wz-config-item
                                 label="Match to this severity level or above"
-                                value="'FOOFOOFOO'"
+                                value="currentConfig['analysis-active_response']['active-response'][selectedItem].level"
                                 notResponsive="true">
                             </wz-config-item>
                             <wz-config-item
                                 label="Match to one of these groups"
-                                value="'FOOFOOFOO'"
+                                value="currentConfig['analysis-active_response']['active-response'][selectedItem].rules_group"
                                 notResponsive="true">
                             </wz-config-item>
                             <wz-config-item
                                 label="Match to one of these rule IDs"
-                                value="'FOOFOOFOO'"
+                                value="currentConfig['analysis-active_response']['active-response'][selectedItem].rules_id"
                                 notResponsive="true">
                             </wz-config-item>
                             <wz-config-item
                                 label="Timeout (in seconds) before reverting"
-                                value="'FOOFOOFOO'"
+                                value="currentConfig['analysis-active_response']['active-response'][selectedItem].timeout"
+                                notResponsive="true">
+                            </wz-config-item>
+                            <wz-config-item
+                                label="Repeated offenders"
+                                value="currentConfig['analysis-active_response']['active-response'][selectedItem].repeated_offenders"
+                                notResponsive="true">
+                            </wz-config-item>
+                            <wz-config-item
+                                label="CA certificate"
+                                value="currentConfig['analysis-active_response']['active-response'][selectedItem].ca_store"
+                                notResponsive="true">
+                            </wz-config-item>
+                            <wz-config-item
+                                label="CA verification"
+                                value="currentConfig['analysis-active_response']['active-response'][selectedItem].ca_verification"
                                 notResponsive="true">
                             </wz-config-item>
                         </div>
@@ -104,9 +119,9 @@
                         </div>
                     </div>
                     <span flex></span>
-                    <span ng-class="JSONContent ? 'wz-text-active' : ''" class="wz-text-link small" ng-click="getJSON('active-response')">JSON</span>
+                    <span ng-class="JSONContent ? 'wz-text-active' : ''" class="wz-text-link small" ng-click="getJSON()">JSON</span>
                     <span class="small">&nbsp;&centerdot;&nbsp;</span>
-                    <span ng-class="XMLContent ? 'wz-text-active' : ''" class="wz-text-link small" ng-click="getXML('active-response')">XML</span>
+                    <span ng-class="XMLContent ? 'wz-text-active' : ''" class="wz-text-link small" ng-click="getXML()">XML</span>
                 </div>
                 <md-divider class="wz-margin-top-10"></md-divider>
 
@@ -130,9 +145,9 @@
                         </div>
                     </div>
                     <span flex></span>
-                    <span ng-class="JSONContent ? 'wz-text-active' : ''" class="wz-text-link small" ng-click="getJSON('active-response')">JSON</span>
+                    <span ng-class="JSONContent ? 'wz-text-active' : ''" class="wz-text-link small" ng-click="getJSON()">JSON</span>
                     <span class="small">&nbsp;&centerdot;&nbsp;</span>
-                    <span ng-class="XMLContent ? 'wz-text-active' : ''" class="wz-text-link small" ng-click="getXML('active-response')">XML</span>
+                    <span ng-class="XMLContent ? 'wz-text-active' : ''" class="wz-text-link small" ng-click="getXML()">XML</span>
                 </div>
                 <md-divider class="wz-margin-top-10"></md-divider>
 

@@ -19,9 +19,9 @@
                         </div>
                     </div>
                     <span flex></span>
-                    <span ng-class="JSONContent ? 'wz-text-active' : ''" class="wz-text-link small" ng-click="getJSON('command')">JSON</span>
+                    <span ng-class="JSONContent ? 'wz-text-active' : ''" class="wz-text-link small" ng-click="getJSON()">JSON</span>
                     <span class="small">&nbsp;&centerdot;&nbsp;</span>
-                    <span ng-class="XMLContent ? 'wz-text-active' : ''" class="wz-text-link small" ng-click="getXML('command')">XML</span>
+                    <span ng-class="XMLContent ? 'wz-text-active' : ''" class="wz-text-link small" ng-click="getXML()">XML</span>
                 </div>
                 <md-divider class="wz-margin-top-10"></md-divider>
 
@@ -32,39 +32,39 @@
                     <div flex="30" layout="column">
 
                         <md-list flex="auto" class="wz-item-list">
-                            <md-list-item>Test</md-list-item>
+                            <md-list-item class="wz-text-link" ng-click="updateSelectedItem($index)" ng-repeat="item in currentConfig['analysis-command'].command">{{item.name}}</md-list-item>
                         </md-list>
 
                     </div>
                     <!-- End list container -->
 
                     <!-- Detail container -->
-                    <div flex layout="column">
+                    <div flex layout="column" ng-if="currentConfig['analysis-command'].command.length">
 
                         <div flex="auto" class="wz-item-detail">
                             <wz-config-item
                                 label="Command name"
-                                value="'FOOFOOFOO'"
+                                value="currentConfig['analysis-command'].command[selectedItem].name"
                                 notResponsive="true">
                             </wz-config-item>
                             <wz-config-item
                                 label="Name of executable file"
-                                value="'FOOFOOFOO'"
+                                value="currentConfig['analysis-command'].command[selectedItem].executable"
                                 notResponsive="true">
                             </wz-config-item>
                             <wz-config-item
                                 label="List of expected fields"
-                                value="'FOOFOOFOO'"
+                                value="currentConfig['analysis-command'].command[selectedItem].expect"
                                 notResponsive="true">
                             </wz-config-item>
                             <wz-config-item
                                 label="Extra arguments"
-                                value="'FOOFOOFOO'"
+                                value="currentConfig['analysis-command'].command[selectedItem].extra_args"
                                 notResponsive="true">
                             </wz-config-item>
                             <wz-config-item
                                 label="Allow this command to be reverted"
-                                value="'FOOFOOFOO'"
+                                value="currentConfig['analysis-command'].command[selectedItem].timeout_allowed ? 'yes' : 'no'"
                                 notResponsive="true">
                             </wz-config-item>
                         </div>
