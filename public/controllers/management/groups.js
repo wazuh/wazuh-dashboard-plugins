@@ -65,13 +65,14 @@ app.controller('groupsPreviewController', function(
     try {
       // If come from agents
       if (globalAgent) {
+        const globalGroup = shareAgent.getSelectedGroup();
         // Get ALL groups
         const data = await apiReq.request('GET', '/agents/groups/', {
           limit: 1000
         });
 
         const filtered = data.data.data.items.filter(
-          group => group.name === globalAgent.group
+          group => group.name === globalGroup
         );
 
         if (Array.isArray(filtered) && filtered.length) {
@@ -79,7 +80,7 @@ app.controller('groupsPreviewController', function(
           $scope.loadGroup(filtered[0], true);
           $scope.lookingGroup = true;
         } else {
-          throw Error(`Group ${globalAgent.group} not found`);
+          throw Error(`Group ${globalGroup} not found`);
         }
 
         shareAgent.deleteAgent();

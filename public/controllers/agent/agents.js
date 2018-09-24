@@ -117,7 +117,7 @@ class AgentsController {
         : 'Never connected';
     };
     this.$scope.getAgent = async newAgentId => this.getAgent(newAgentId);
-    this.$scope.goGroups = agent => this.goGroups(agent);
+    this.$scope.goGroups = (agent, group) => this.goGroups(agent, group);
     this.$scope.analyzeAgents = async searchTerm =>
       this.analyzeAgents(searchTerm);
     this.$scope.downloadCsv = async data_path => this.downloadCsv(data_path);
@@ -357,7 +357,7 @@ class AgentsController {
       const id = this.commonData.checkLocationAgentId(newAgentId, globalAgent);
 
       if (this.$scope.tab === 'configuration') {
-        await this.loadSyscollector(id);
+        //await this.loadSyscollector(id);
         return this.$scope.getAgentConfig(id);
       }
 
@@ -386,7 +386,7 @@ class AgentsController {
 
       this.$scope.switchTab(this.$scope.tab, true);
 
-      await this.loadSyscollector(id);
+      //await this.loadSyscollector(id);
 
       this.$scope.load = false;
       if (!this.$scope.$$phase) this.$scope.$digest();
@@ -397,9 +397,9 @@ class AgentsController {
     return;
   }
 
-  goGroups(agent) {
+  goGroups(agent, group) {
     this.visFactoryService.clearAll();
-    this.shareAgent.setAgent(agent);
+    this.shareAgent.setAgent(agent, group);
     this.$location.search('tab', 'groups');
     this.$location.path('/manager');
   }
