@@ -31,7 +31,6 @@
         nav-bar-aria-label="Wazuh management navigation links">
         <md-nav-item class="wz-nav-item" md-nav-click="reloadRuleset()" name="ruleset">Ruleset</md-nav-item>
         <md-nav-item class="wz-nav-item" md-nav-click="reloadGroups()" name="groups">Groups</md-nav-item>
-        <md-nav-item class="wz-nav-item" md-nav-click="switchTab('configuration')" name="configuration">Configuration</md-nav-item>
     </md-nav-bar>
     <!-- End Wazuh management navigation bar -->
 
