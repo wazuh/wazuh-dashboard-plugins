@@ -1,0 +1,65 @@
+<!-- Windows card -->
+<md-card class="wz-md-card" ng-if="!JSONContent && !XMLContent && configurationSubTab === 'fim-windows'">
+    <md-card-content>
+        <div layout="row" layout-align="start center">
+            <div>
+                <span class="font-size-16">Monitored</span>
+                <div class="wz-margin-top-10">
+                    <span class="md-subheader small">A list of registry entries that will be monitored</span>
+                </div>
+            </div>
+            <span flex></span>
+            <span ng-class="JSONContent ? 'wz-text-active' : ''" class="wz-text-link small" ng-click="getJSON('syscheck')">JSON</span>
+            <span class="small">&nbsp;&centerdot;&nbsp;</span>
+            <span ng-class="XMLContent ? 'wz-text-active' : ''" class="wz-text-link small" ng-click="getXML('syscheck')">XML</span>
+        </div>
+        <md-divider class="wz-margin-top-10"></md-divider>
+
+        <!-- Configuration block -->
+        <div class="wz-padding-top-10">
+
+            <table class="table table-striped table-condensed" style="table-layout: fixed !important;">
+                <thead class="wz-text-bold">
+                    <th class="wz-text-left">Test</th>
+                    <th class="wz-text-left">Test</th>
+                </thead>
+                <tbody class="wz-word-wrap">
+                    <tr>
+                        <td>test</td>
+                        <td>test</td>
+                    </tr>
+                </tbody>
+            </table>
+
+        </div>
+        <!-- End configuration block -->
+
+        <div class="wz-margin-top-10">
+            <span class="font-size-16">Ignored</span>
+            <div class="wz-margin-top-10">
+                <span class="md-subheader small">A list of registry entries that will be ignored</span>
+            </div>
+        </div>
+        <md-divider class="wz-margin-top-10"></md-divider>
+
+        <!-- Configuration block -->
+        <div class="wz-padding-top-10">
+
+            <table class="table table-striped table-condensed" style="table-layout: fixed !important;">
+                <thead class="wz-text-bold">
+                    <th class="wz-text-left">Test</th>
+                    <th class="wz-text-left">Test</th>
+                </thead>
+                <tbody class="wz-word-wrap">
+                    <tr>
+                        <td>test</td>
+                        <td>test</td>
+                    </tr>
+                </tbody>
+            </table>
+
+        </div>
+        <!-- End configuration block -->
+    </md-card-content>
+</md-card>
+<!-- End Windows card -->
