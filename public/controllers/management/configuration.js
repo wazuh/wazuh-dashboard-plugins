@@ -10,7 +10,6 @@
  * Find more information about this on the LICENSE file.
  */
 import { uiModules } from 'ui/modules';
-import angular from 'angular';
 import js2xmlparser from 'js2xmlparser';
 import XMLBeautifier from '../../utils/xml-beautifier';
 import beautifier from '../../utils/json-beautifier';
@@ -57,6 +56,7 @@ class NewConfigurationController {
       this.$scope.configurationSubTab = false;
       this.$scope.configurationTab = configurationTab;
       this.$scope.currentConfig = await queryConfig('000', sections, this.apiReq, this.errorHandler);
+      console.log(this.$scope.currentConfig)
       this.$scope.load = false;
       if (!this.$scope.$$phase) this.$scope.$digest();
     } catch (error) {
