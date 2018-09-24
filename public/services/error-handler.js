@@ -100,8 +100,7 @@ export class ErrorHandler {
 
     const message = this.extractMessage(error);
 
-    let text;
-    text = isWarning ? `Warning. ${message}` : `Error. ${message}`;
+    let text = message;
     if (error.extraMessage) text = error.extraMessage;
     text = location ? location + '. ' + text : text;
     if (!silent) {
