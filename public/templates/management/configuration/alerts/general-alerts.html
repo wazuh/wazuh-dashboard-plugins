@@ -19,9 +19,9 @@
                         </div>
                     </div>
                     <span flex></span>
-                    <span ng-class="JSONContent ? 'wz-text-active' : ''" class="wz-text-link small" ng-click="getJSON('alerts')">JSON</span>
+                    <span ng-class="JSONContent ? 'wz-text-active' : ''" class="wz-text-link small" ng-click="getJSON(currentConfig['analysis-alerts'])">JSON</span>
                     <span class="small">&nbsp;&centerdot;&nbsp;</span>
-                    <span ng-class="XMLContent ? 'wz-text-active' : ''" class="wz-text-link small" ng-click="getXML('alerts')">XML</span>
+                    <span ng-class="XMLContent ? 'wz-text-active' : ''" class="wz-text-link small" ng-click="getXML(currentConfig['analysis-alerts'])">XML</span>
                 </div>
                 <md-divider class="wz-margin-top-10"></md-divider>
 
@@ -30,15 +30,15 @@
 
                     <wz-config-item
                         label="Minimum severity level to store the alert"
-                        value="3">
+                        value="currentConfig['analysis-alerts'].alerts.log_alert_level">
                     </wz-config-item>
                     <wz-config-item
                         label="Minimum severity level to send the alert by email"
-                        value="'FOOFOOFOO'">
+                        value="currentConfig['analysis-alerts'].alerts.email_alert_level">
                     </wz-config-item>
                     <wz-config-item
                         label="Enable GeoIP lookups"
-                        value="no">
+                        value="currentConfig['analysis-alerts'].use_geoip || 'no'">
                     </wz-config-item>
 
                 </div>
