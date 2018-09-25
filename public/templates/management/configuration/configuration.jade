@@ -1,22 +1,32 @@
 include ./configuration.head
+
 include ./welcome.html
-include ./agentless/agentless.html
-include ./alerts/alerts.jade
-include ./amazon-s3/amazon-s3.jade
-include ./cis-cat/cis-cat.jade
-include ./cluster/cluster.html
-include ./active-response/active-response.jade
-//- include ./database-output/database-output.html
+
 include ./global-configuration/global-configuration.jade
-include ./integrations/integrations.html
-include ./integrity-monitoring/integrity-monitoring.jade
-include ./inventory/inventory.html
-include ./log-collection/log-collection.jade
-include ./open-scap/open-scap.jade
-include ./osquery/osquery.html
-include ./policy-monitoring/policy-monitoring.jade
+include ./cluster/cluster.html
 include ./registration-service/registration-service.html
 //- include ./ruleset/ruleset.jade
+//- include ./client/client.html
+//- include ./client-buffer/client-buffer.html
+
+include ./alerts/alerts.jade
+include ./integrations/integrations.html
+//- include ./database-output/database-output.html
+
+include ./policy-monitoring/policy-monitoring.jade
+include ./open-scap/open-scap.jade
+include ./cis-cat/cis-cat.jade
+
 include ./vulnerabilities/vulnerabilities.jade
+include ./osquery/osquery.html
+include ./inventory/inventory.html
+include ./active-response/active-response.jade
 include ./wazuh-commands/wazuh-commands.html
+
+include ./log-collection/log-collection.jade
+include ./integrity-monitoring/integrity-monitoring.jade
+include ./agentless/agentless.html
+
+include ./amazon-s3/amazon-s3.jade
+
 include ../../footer.foot
