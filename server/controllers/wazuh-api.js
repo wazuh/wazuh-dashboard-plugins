@@ -585,7 +585,16 @@ export class WazuhApiCtrl {
         !response.body.error &&
         response.body.data
       ) {
+
         // START - Remove keys
+
+        // Remove cluster key
+        if (
+          response.body.data.node_type &&
+          response.body.data.key
+        ) {
+          response.body.data.key = '********'
+        }
 
         // Remove AWS keys
         if (
