@@ -103,11 +103,12 @@ class NewConfigurationController {
         result = this.$scope.currentConfig['wmodules-wmodules'].wmodules.filter(
           item => typeof item[wodleName] !== 'undefined'
         );
-      }
+      } 
 
       if (result.length) {
-        this.$scope.currentConfig = result[0];
+        this.$scope.currentConfig = wodleName === 'command' ? { commands: result.map(item => item.command) } : result[0];
       }
+
       this.$scope.load = false;
       if (!this.$scope.$$phase) this.$scope.$digest();
     } catch (error) {
