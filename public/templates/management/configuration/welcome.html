@@ -1,4 +1,4 @@
-<div flex="auto" layout="column" ng-if="!load && configurationTab === 'welcome'">
+<div flex="auto" layout="column" ng-if="configurationTab === 'welcome'">
 
     <!-- Headline -->
     <div layout="column" layout-padding>
@@ -33,10 +33,22 @@
                                 <p>Availability and scalability enhancement of the Wazuh service</p>
                             </div>
                         </md-list-item>
-                        <md-list-item flex="100" flex-gt-md="50" flex-gt-lg="33" class="md-2-line">
+                        <md-list-item flex="100" flex-gt-md="50" flex-gt-lg="33" class="md-2-line" ng-if="!agent || agent.id === '000'">
                             <div class="md-list-item-text">
                                 <h3 class="wz-text-link" ng-click="switchConfigTab('registration-service', [{component:'auth',configuration:'auth'}])">Registration service</h3>
                                 <p>Automatic agent registration using the <span class="wz-text-monospace">ossec-authd</span> binary</p>
+                            </div>
+                        </md-list-item>
+                        <md-list-item flex="100" flex-gt-md="50" flex-gt-lg="33" class="md-2-line" ng-if="agent && agent.id !== '000'">
+                            <div class="md-list-item-text">
+                                <h3 class="wz-text-link" ng-click="switchConfigTab()">Client configuration</h3>
+                                <p>Configure the connection to the manager</p>
+                            </div>
+                        </md-list-item>
+                        <md-list-item flex="100" flex-gt-md="50" flex-gt-lg="33" class="md-2-line" ng-if="agent && agent.id !== '000'">
+                            <div class="md-list-item-text">
+                                <h3 class="wz-text-link" ng-click="switchConfigTab()">Client buffer configuration</h3>
+                                <p>Agent bucket parameters in order to avoid events flooding</p>
                             </div>
                         </md-list-item>
                         <!-- <md-list-item flex="100" flex-gt-md="50" flex-gt-lg="33" class="md-2-line">
@@ -128,12 +140,6 @@
                         </md-list-item>
                         <md-list-item flex="100" flex-gt-md="50" flex-gt-lg="33" class="md-2-line">
                             <div class="md-list-item-text">
-                                <h3 class="wz-text-link" ng-click="switchConfigTab('commands-active-response',[{component:'analysis',configuration:'command'},{component:'analysis',configuration:'active_response'}])">Active response</h3>
-                                <p>Active threath addressing by inmmediate response</p>
-                            </div>
-                        </md-list-item>
-                        <md-list-item flex="100" flex-gt-md="50" flex-gt-lg="33" class="md-2-line">
-                            <div class="md-list-item-text">
                                 <h3 class="wz-text-link" ng-click="switchWodle('osquery')">Osquery</h3>
                                 <p>Osquery allows to expose an operating system as a high-performance relational database</p>
                             </div>
@@ -146,8 +152,14 @@
                         </md-list-item>
                         <md-list-item flex="100" flex-gt-md="50" flex-gt-lg="33" class="md-2-line">
                             <div class="md-list-item-text">
-                                <h3 class="wz-text-link" ng-click="switchWodle('command')">Wazuh command</h3>
-                                <p>Configuration options of the Command wodle.</p>
+                                <h3 class="wz-text-link" ng-click="switchConfigTab('commands-active-response',[{component:'analysis',configuration:'command'},{component:'analysis',configuration:'active_response'}])">Active response</h3>
+                                <p>Active threath addressing by inmmediate response</p>
+                            </div>
+                        </md-list-item>
+                        <md-list-item flex="100" flex-gt-md="50" flex-gt-lg="33" class="md-2-line">
+                            <div class="md-list-item-text">
+                                <h3 class="wz-text-link" ng-click="switchWodle('command')">Wazuh commands</h3>
+                                <p>Configuration options of the Command wodle</p>
                             </div>
                         </md-list-item>
                     </md-list>
@@ -188,18 +200,30 @@
             <!-- End log data analysis card -->
 
             <!-- Cloud security monitoring card -->
-            <md-card class="wz-md-card">
+            <md-card class="wz-md-card" ng-if="!agent || agent.id==='000'">
                 <md-card-content>
                     <span class="font-size-16">Cloud security monitoring</span>
                     <md-divider class="wz-margin-top-10"></md-divider>
 
                     <md-list layout="row" layout-wrap>
-                        <md-list-item flex="100" flex-gt-md="50" flex-gt-lg="33" class="md-2-line" ng-if="!agent || agent.id==='000'">
+                        <md-list-item flex="100" flex-gt-md="50" flex-gt-lg="33" class="md-2-line">
                             <div class="md-list-item-text">
                                 <h3 class="wz-text-link" ng-click="switchWodle('aws-s3')">Amazon S3</h3>
                                 <p>Security events related to your Amazon AWS services, collected directly via AWS API</p>
                             </div>
                         </md-list-item>
+                        <!-- <md-list-item flex="100" flex-gt-md="50" flex-gt-lg="33" class="md-2-line">
+                            <div class="md-list-item-text">
+                                <h3 class="wz-text-link" ng-click="switchWodle('azure')">Microsoft Azure</h3>
+                                <p>Security events related to your Microsoft Azure instances, collected directly via Azure API</p>
+                            </div>
+                        </md-list-item>
+                        <md-list-item flex="100" flex-gt-md="50" flex-gt-lg="33" class="md-2-line">
+                            <div class="md-list-item-text">
+                                <h3 class="wz-text-link" ng-click="switchWodle('docker')">Docker</h3>
+                                <p>Security events related to your Docker containers, collected directly via Docker API</p>
+                            </div>
+                        </md-list-item> -->
                     </md-list>
 
                 </md-card-content>
