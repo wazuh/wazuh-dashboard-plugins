@@ -30,7 +30,7 @@
             <!-- VirusTotal integration card -->
             <md-card class="wz-md-card" ng-if="!JSONContent && !XMLContent">
                 <md-card-content>
-                    <div layout="row" layout-align="start center">
+                    <div layout="row" layout-align="start center" ng-if="integrations['virustotal']">
                         <div>
                             <span class="font-size-16">VirusTotal</span>
                             <div class="wz-margin-top-10">
@@ -42,15 +42,10 @@
                         <span class="small">&nbsp;&centerdot;&nbsp;</span>
                         <span ng-class="XMLContent ? 'wz-text-active' : ''" class="wz-text-link small" ng-click="getXML()">XML</span>
                     </div>
-                    <md-divider class="wz-margin-top-10"></md-divider>
+                    <md-divider class="wz-margin-top-10" ng-if="integrations['virustotal']"></md-divider>
 
                     <!-- Configuration block -->
-                    <div class="wz-padding-top-10">
-                        <!--{"alert_format":"json","api_key":"VirusTotal_API_Key","group":"syscheck","name":"virustotal","level":0}-->
-                        <wz-config-item
-                            label="API key"
-                            value="integrations['virustotal'].api_key">
-                        </wz-config-item>
+                    <div class="wz-padding-top-10" ng-if="integrations['virustotal']">
                         <wz-config-item
                             label="Filter alerts by this level or above"
                             value="integrations['virustotal'].level">
@@ -75,16 +70,16 @@
                     </div>
                     <!-- End configuration block -->
 
-                    <div class="wz-margin-top-10">
+                    <div class="wz-margin-top-10" ng-if="integrations['slack']">
                         <span class="font-size-16">Slack</span>
                         <div class="wz-margin-top-10">
                             <span class="md-subheader small">Get alerts from your Wazuh server directly on your Slack workspace</span>
                         </div>
                     </div>
-                    <md-divider class="wz-margin-top-10"></md-divider>
+                    <md-divider class="wz-margin-top-10" ng-if="integrations['slack']"></md-divider>
 
                     <!-- Configuration block -->
-                    <div class="wz-padding-top-10">
+                    <div class="wz-padding-top-10" ng-if="integrations['slack']">
 
                         <wz-config-item
                             label="Hook URL"
@@ -114,21 +109,17 @@
                     </div>
                     <!-- End configuration block -->
 
-                    <div class="wz-margin-top-10">
+                    <div class="wz-margin-top-10" ng-if="integrations['pagerduty']">
                         <span class="font-size-16">PagerDuty</span>
                         <div class="wz-margin-top-10">
                             <span class="md-subheader small">Get alerts on this streamlined incident resolution software</span>
                         </div>
                     </div>
-                    <md-divider class="wz-margin-top-10"></md-divider>
+                    <md-divider class="wz-margin-top-10" ng-if="integrations['pagerduty']"></md-divider>
 
                     <!-- Configuration block -->
-                    <div class="wz-padding-top-10">
+                    <div class="wz-padding-top-10" ng-if="integrations['pagerduty']">
 
-                        <wz-config-item
-                            label="API key"
-                            value="integrations['pagerduty'].api_key">
-                        </wz-config-item>
                         <wz-config-item
                             label="Filter alerts by this level or above"
                             value="integrations['pagerduty'].level">

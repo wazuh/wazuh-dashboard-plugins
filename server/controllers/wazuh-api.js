@@ -585,13 +585,30 @@ export class WazuhApiCtrl {
         !response.body.error &&
         response.body.data
       ) {
+        // START - Remove keys
+
+        // Remove AWS keys
         if (
-          path.includes('/manager/configuration') &&
-          response.body.data.cluster &&
-          response.body.data.cluster.key
+          response.body.data.wmodules
         ) {
-          response.body.data.cluster.key = '*************';
+          response.body.data.wmodules.map(item => {
+            if(item['aws-s3'] && item['aws-s3'].buckets) {
+              item['aws-s3'].buckets.map(item => {
+                item.access_key = '********'
+                item.secret_key = '********'
+              })
+            }
+          });          
         }
+
+        // Remove integrations keys
+        if (
+          response.body.data.integration
+        ) {
+          response.body.data.integration.map(item => item.api_key = '********');          
+        }
+        // END - Remove keys
+                
         return reply(response.body);
       }
 
