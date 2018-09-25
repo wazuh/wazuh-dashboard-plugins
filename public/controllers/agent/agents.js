@@ -482,50 +482,6 @@ class AgentsController {
         return;
       }
 
-      const configurationData = await this.apiReq.request(
-        'GET',
-        `/agents/groups/${this.$scope.groupName}/configuration`,
-        {}
-      );
-      this.$scope.groupConfiguration = configurationData.data.data.items[0];
-      this.$scope.rawJSON = beautifier.prettyPrint(
-        configurationData.data.data.items
-      );
-
-      const agentGroups = await Promise.all([
-        this.apiReq.request(
-          'GET',
-          `/agents/groups?search=${this.$scope.groupName}`,
-          {}
-        ),
-        this.apiReq.request(
-          'GET',
-          `/agents/groups/${this.$scope.groupName}`,
-          {}
-        )
-      ]);
-
-      const groupMergedSum = agentGroups[0].data.data.items.filter(
-        item => item.name === this.$scope.groupName
-      );
-      this.$scope.groupMergedSum = groupMergedSum.length
-        ? groupMergedSum[0].mergedSum
-        : 'Unknown';
-
-      const agentMergedSum = agentGroups[1].data.data.items.filter(
-        item => item.id === this.$scope.agent.id
-      );
-      this.$scope.agentMergedSum = agentMergedSum.length
-        ? agentMergedSum[0].mergedSum
-        : 'Unknown';
-
-      this.$scope.isSynchronized =
-        this.$scope.agentMergedSum === this.$scope.groupMergedSum &&
-        ![this.$scope.agentMergedSum, this.$scope.groupMergedSum].includes(
-          'Unknown'
-        )
-          ? true
-          : false;
 
       this.$scope.load = false;
 
