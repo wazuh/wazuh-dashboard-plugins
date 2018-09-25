@@ -11,6 +11,7 @@
 
     <!-- Global configuration navigation bar -->
     <md-nav-bar
+        ng-if="!agent || agent.id === '000'"
         class="wz-nav-bar"
         md-selected-nav-item="configurationSubTab"
         nav-bar-aria-label="Global configuration navigation links">

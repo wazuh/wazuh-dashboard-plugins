@@ -55,5 +55,7 @@ export const TabNames = {
   'cis-cat': 'CIS-CAT',
   'vulnerability-detector': 'Vulnerabilities',
   'aws-s3': 'Amazon S3',
-  'command': 'Wazuh commands'
+  'command': 'Wazuh commands',
+  'client': 'Client configuration',
+  'client-buffer': 'Client buffer configuration'
 };
