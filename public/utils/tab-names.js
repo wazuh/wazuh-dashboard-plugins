@@ -54,5 +54,6 @@ export const TabNames = {
   'open-scap': 'OpenSCAP',
   'cis-cat': 'CIS-CAT',
   'vulnerability-detector': 'Vulnerabilities',
-  'aws-s3': 'Amazon S3'
+  'aws-s3': 'Amazon S3',
+  'command': 'Wazuh commands'
 };
