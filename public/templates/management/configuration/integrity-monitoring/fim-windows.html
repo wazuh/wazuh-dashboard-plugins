@@ -1,5 +1,12 @@
+<!-- No configuration section -->
+<wz-no-config
+  flex
+  error="'not-present'"
+  ng-if="configurationSubTab === 'fim-windows' && currentConfig && currentConfig['syscheck-syscheck'] && currentConfig['syscheck-syscheck'].syscheck && !currentConfig['syscheck-syscheck'].syscheck.registry && !currentConfig['syscheck-syscheck'].syscheck.registry_ignore"></wz-no-config>
+<!-- End no configuration section -->
+
 <!-- Windows card -->
-<md-card class="wz-md-card" ng-if="!JSONContent && !XMLContent && configurationSubTab === 'fim-windows'">
+<md-card class="wz-md-card" ng-if="!JSONContent && !XMLContent && configurationSubTab === 'fim-windows' && currentConfig && currentConfig['syscheck-syscheck'] && currentConfig['syscheck-syscheck'].syscheck && (currentConfig['syscheck-syscheck'].syscheck.registry || currentConfig['syscheck-syscheck'].syscheck.registry_ignore)">
     <md-card-content>
         <div layout="row" layout-align="start center">
             <div>
