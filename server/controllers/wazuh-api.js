@@ -26,6 +26,7 @@ import simpleTail from 'simple-tail';
 import path from 'path';
 import { log } from '../logger';
 import { KeyEquivalenece } from '../../util/csv-key-equivalence';
+import { cleanKeys } from '../../util/remove-key';
 
 export class WazuhApiCtrl {
   constructor(server) {
@@ -585,39 +586,7 @@ export class WazuhApiCtrl {
         !response.body.error &&
         response.body.data
       ) {
-
-        // START - Remove keys
-
-        // Remove cluster key
-        if (
-          response.body.data.node_type &&
-          response.body.data.key
-        ) {
-          response.body.data.key = '********'
-        }
-
-        // Remove AWS keys
-        if (
-          response.body.data.wmodules
-        ) {
-          response.body.data.wmodules.map(item => {
-            if(item['aws-s3'] && item['aws-s3'].buckets) {
-              item['aws-s3'].buckets.map(item => {
-                item.access_key = '********'
-                item.secret_key = '********'
-              })
-            }
-          });          
-        }
-
-        // Remove integrations keys
-        if (
-          response.body.data.integration
-        ) {
-          response.body.data.integration.map(item => item.api_key = '********');          
-        }
-        // END - Remove keys
-                
+        cleanKeys(response);
         return reply(response.body);
       }
 
@@ -666,6 +635,7 @@ export class WazuhApiCtrl {
         !response.body.error &&
         response.body.data
       ) {
+        cleanKeys(response);
         return response.body;
       }
 
