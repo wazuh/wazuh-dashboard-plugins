@@ -1,4 +1,4 @@
-<div flex="auto" layout="column" ng-if="!load && configurationTab === 'commands-active-response'" ng-init="switchConfigurationSubTab('active-response')">
+<div flex="auto" layout="column" ng-if="configurationTab === 'active-response'" ng-init="switchConfigurationSubTab('active-response')">
 
     <!-- Headline -->
     <div layout="column" layout-padding>
@@ -15,6 +15,11 @@
         md-selected-nav-item="configurationSubTab"
         nav-bar-aria-label="Active response navigation links">
         <md-nav-item class="wz-nav-item" md-nav-click="switchConfigurationSubTab('active-response')" name="active-response">Active response</md-nav-item>
-        <md-nav-item class="wz-nav-item" md-nav-click="switchConfigurationSubTab('ar-commands')" name="ar-commands">AR commands</md-nav-item>
+        <md-nav-item class="wz-nav-item" md-nav-click="switchConfigurationSubTab('commands')" name="commands">Commands</md-nav-item>
     </md-nav-bar>
     <!-- End Commands & Active response navigation bar -->
+
+    <!-- Loading ring -->
+    <div class='uil-ring-css' ng-show="load">
+        <div></div>
+    </div>

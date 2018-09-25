@@ -30,8 +30,8 @@
             <!-- VirusTotal integration card -->
             <md-card class="wz-md-card" ng-if="!JSONContent && !XMLContent">
                 <md-card-content>
-                    <div layout="row" layout-align="start center" ng-if="integrations['virustotal']">
-                        <div>
+                    <div layout="row" layout-align="start center">
+                        <div ng-if="integrations['virustotal']">
                             <span class="font-size-16">VirusTotal</span>
                             <div class="wz-margin-top-10">
                                 <span class="md-subheader small">Get notified when malicious software is found</span>
@@ -42,7 +42,7 @@
                         <span class="small">&nbsp;&centerdot;&nbsp;</span>
                         <span ng-class="XMLContent ? 'wz-text-active' : ''" class="wz-text-link small" ng-click="getXML()">XML</span>
                     </div>
-                    <md-divider class="wz-margin-top-10" ng-if="integrations['virustotal']"></md-divider>
+                    <md-divider class="wz-margin-top-10"></md-divider>
 
                     <!-- Configuration block -->
                     <div class="wz-padding-top-10" ng-if="integrations['virustotal']">

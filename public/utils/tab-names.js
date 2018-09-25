@@ -40,7 +40,7 @@ export const TabNames = {
   'registration-service': 'Registration service',
   cluster: 'Cluster',
   'wazuh-modules': 'Wazuh modules',
-  'commands-active-response': 'Commands & Active response',
+  'active-response': 'Active response',
   integrations: 'Integrations',
   'database-output': 'Database output',
   alerts: 'Alerts',
