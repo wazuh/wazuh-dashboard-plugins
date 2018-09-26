@@ -17,7 +17,7 @@
         <md-nav-item ng-if="!agent || agent.id === '000'" class="wz-nav-item" md-nav-click="switchConfigurationSubTab('general-alerts')" name="general-alerts">General</md-nav-item>
         <md-nav-item class="wz-nav-item" md-nav-click="switchConfigurationSubTab('labels')" name="labels">Labels</md-nav-item>
         <md-nav-item ng-if="!agent || agent.id === '000'" class="wz-nav-item" md-nav-click="switchConfigurationSubTab('email-alerts')" name="email-alerts">Email alerts</md-nav-item>
-        <md-nav-item ng-if="!agent || agent.id === '000'" class="wz-nav-item" md-nav-click="switchConfigurationSubTab('reports')" name="reports">Reports</md-nav-item>
+        <!-- <md-nav-item ng-if="!agent || agent.id === '000'" class="wz-nav-item" md-nav-click="switchConfigurationSubTab('reports')" name="reports">Reports</md-nav-item> -->
         <md-nav-item ng-if="!agent || agent.id === '000'" class="wz-nav-item" md-nav-click="switchConfigurationSubTab('syslog')" name="syslog">Syslog output</md-nav-item>
     </md-nav-bar>
     <!-- End Alerts navigation bar -->
