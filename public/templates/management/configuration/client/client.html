@@ -20,21 +20,21 @@
         <!-- No configuration section -->
         <wz-no-config
           flex
-          error="currentConfig['com-cluster']"
-          ng-if="currentConfig['com-cluster'] && isString(currentConfig['com-cluster'])"></wz-no-config>
+          error="currentConfig['agent-client']"
+          ng-if="currentConfig['agent-client'] && isString(currentConfig['agent-client'])"></wz-no-config>
         <!-- End no configuration section -->
 
         <!-- This section is the main content -->
-        <div flex layout="column" ng-if="currentConfig['com-cluster'] && !isString(currentConfig['com-cluster'])">
+        <div flex layout="column" ng-if="currentConfig['agent-client'] && !isString(currentConfig['agent-client'])">
 
             <!-- The main card will all the settings -->
             <md-card class="wz-md-card" ng-if="!JSONContent && !XMLContent">
                 <md-card-content>
                     <div layout="row" layout-align="start center">
                         <div>
-                            <span class="font-size-16">All settings</span>
+                            <span class="font-size-16">Main settings</span>
                             <div class="wz-margin-top-10">
-                                <span class="md-subheader small">These settings apply to the whole Wazuh cluster</span>
+                                <span class="md-subheader small">Basic manager-agent communication settings</span>
                             </div>
                         </div>
                         <span flex></span>
@@ -48,38 +48,58 @@
                     <div class="wz-padding-top-10">
 
                         <wz-config-item
-                            label="Cluster status"
-                            value="currentConfig['com-cluster'].disabled === 'yes'? 'disabled' : 'enabled'">
+                            label="Method used to encrypt communications"
+                            value="currentConfig['agent-client'].client.crypto_method || 'aes'">
                         </wz-config-item>
                         <wz-config-item
-                            label="Cluster name"
-                            value="currentConfig['com-cluster'].name">
+                            label="Auto-restart the agent when receiving valid configuration from manager"
+                            value="currentConfig['agent-client'].client.auto_restart || 'yes'">
                         </wz-config-item>
                         <wz-config-item
-                            label="Node name"
-                            value="currentConfig['com-cluster'].node_name">
+                            label="Time (in seconds) between agent checkings to the manager"
+                            value="currentConfig['agent-client'].client.notify_time || '60'">
                         </wz-config-item>
                         <wz-config-item
-                            label="Node type"
-                            value="currentConfig['com-cluster'].node_type">
+                            label="Time (in seconds) before attempting to reconnect"
+                            value="currentConfig['agent-client'].client['time-reconnect'] || '300'">
                         </wz-config-item>
                         <wz-config-item
-                            is-array="true"
-                            label="Master node IP address"
-                            value="currentConfig['com-cluster'].nodes">
+                            label="Configuration profiles"
+                            value="currentConfig['agent-client'].client['config-profile'] || 'n/a'">
                         </wz-config-item>
                         <wz-config-item
-                            label="Port to listen to cluster communications"
-                            value="currentConfig['com-cluster'].port">
+                            label="IP address used to communicate with the manager"
+                            value="currentConfig['agent-client'].client.local_ip || 'n/a'">
                         </wz-config-item>
-                        <wz-config-item
-                            label="IP address to listen to cluster communications"
-                            value="currentConfig['com-cluster'].bind_addr">
-                        </wz-config-item>
-                        <wz-config-item
-                            label="Hide cluster information in alerts"
-                            value="currentConfig['com-cluster'].hidden">
-                        </wz-config-item>
+
+                    </div>
+                    <!-- End configuration block -->
+
+                    <div ng-if="currentConfig['agent-client'].client.server.length" class="wz-margin-top-10">
+                        <span class="font-size-16">Server settings</span>
+                        <div class="wz-margin-top-10">
+                            <span class="md-subheader small">List of managers to connect</span>
+                        </div>
+                    </div>
+                    <md-divider ng-if="currentConfig['agent-client'].client.server.length" class="wz-margin-top-10"></md-divider>
+
+                    <!-- Configuration block -->
+                    <div ng-if="currentConfig['agent-client'].client.server.length" class="wz-padding-top-10">
+
+                        <table class="table table-striped table-condensed" style="table-layout: fixed !important;">
+                            <thead class="wz-text-bold">
+                                <th class="wz-text-left">Address</th>
+                                <th class="wz-text-left">Port</th>
+                                <th class="wz-text-left">Protocol</th>
+                            </thead>
+                            <tbody class="wz-word-wrap">
+                                <tr ng-repeat="item in currentConfig['agent-client'].client.server">
+                                    <td>{{ item.address || '---' }}</td>
+                                    <td>{{ item.port || '1514' }}</td>
+                                    <td>{{ item.protocol || 'udp' }}</td>
+                                </tr>
+                            </tbody>
+                        </table>
 
                     </div>
                     <!-- End configuration block -->
@@ -148,8 +168,8 @@
             md-is-locked-open="true">
             <md-list>
                 <md-subheader>More info about this section</md-subheader>
-                <md-list-item target="_blank" class="wz-text-link" ng-href="https://documentation.wazuh.com/current/user-manual/manager/wazuh-cluster.html">How to configure the Wazuh cluster</md-list-item>
-                <md-list-item target="_blank" class="wz-text-link" ng-href="https://documentation.wazuh.com/current/user-manual/reference/ossec-conf/cluster.html">Wazuh cluster reference</md-list-item>
+                <md-list-item target="_blank" class="wz-text-link" ng-href="https://documentation.wazuh.com/current/user-manual/agents/agent-connection.html">Checking connection with manager</md-list-item>
+                <md-list-item target="_blank" class="wz-text-link" ng-href="https://documentation.wazuh.com/current/user-manual/reference/ossec-conf/client.html">Client reference</md-list-item>
             </md-list>
         </md-sidenav>
         <!-- End right sidenav section -->
