@@ -4,6 +4,8 @@
     <div layout="column" layout-padding>
         <div>
             <span class="font-size-18">Client buffer configuration</span>
+            <span ng-if="(currentConfig['agent-buffer'] && currentConfig['agent-buffer'].buffer && currentConfig['agent-buffer'].buffer.disabled === 'no') || (currentConfig['agent-buffer'] && currentConfig['agent-buffer'].buffer && !currentConfig['agent-buffer'].buffer.disabled)" class="wz-agent-status-indicator small teal">Enabled</span>
+            <span ng-if="currentConfig['agent-buffer'] && currentConfig['agent-buffer'].buffer && currentConfig['agent-buffer'].buffer.disabled === 'yes'" class="wz-agent-status-indicator small red">Disabled</span>
         </div>
         <span class="md-subheader">Agent bucket parameters in order to avoid events flooding</span>
     </div>
@@ -20,21 +22,25 @@
         <!-- No configuration section -->
         <wz-no-config
           flex
-          error="currentConfig['com-cluster']"
-          ng-if="currentConfig['com-cluster'] && isString(currentConfig['com-cluster'])"></wz-no-config>
+          error="currentConfig['agent-buffer']"
+          ng-if="currentConfig['agent-buffer'] && isString(currentConfig['agent-buffer'])"></wz-no-config>
+        <wz-no-config
+          flex
+          error="'not-present'"
+          ng-if="currentConfig['agent-buffer'] && !isString(currentConfig['agent-buffer']) && !currentConfig['agent-buffer'].buffer"></wz-no-config>
         <!-- End no configuration section -->
 
         <!-- This section is the main content -->
-        <div flex layout="column" ng-if="currentConfig['com-cluster'] && !isString(currentConfig['com-cluster'])">
+        <div flex layout="column" ng-if="currentConfig['agent-buffer'] && !isString(currentConfig['agent-buffer']) && currentConfig['agent-buffer'].buffer">
 
             <!-- The main card will all the settings -->
             <md-card class="wz-md-card" ng-if="!JSONContent && !XMLContent">
                 <md-card-content>
                     <div layout="row" layout-align="start center">
                         <div>
-                            <span class="font-size-16">All settings</span>
+                            <span class="font-size-16">Main settings</span>
                             <div class="wz-margin-top-10">
-                                <span class="md-subheader small">These settings apply to the whole Wazuh cluster</span>
+                                <span class="md-subheader small">These settings determine the events processing capacity for your agent</span>
                             </div>
                         </div>
                         <span flex></span>
@@ -48,37 +54,16 @@
                     <div class="wz-padding-top-10">
 
                         <wz-config-item
-                            label="Cluster status"
-                            value="currentConfig['com-cluster'].disabled === 'yes'? 'disabled' : 'enabled'">
+                            label="Buffer status"
+                            value="currentConfig['agent-buffer'].buffer.disabled === 'yes'? 'disabled' : 'enabled'">
                         </wz-config-item>
                         <wz-config-item
-                            label="Cluster name"
-                            value="currentConfig['com-cluster'].name">
+                            label="Queue size"
+                            value="currentConfig['agent-buffer'].buffer.disabled || '5000'">
                         </wz-config-item>
                         <wz-config-item
                             label="Node name"
-                            value="currentConfig['com-cluster'].node_name">
-                        </wz-config-item>
-                        <wz-config-item
-                            label="Node type"
-                            value="currentConfig['com-cluster'].node_type">
-                        </wz-config-item>
-                        <wz-config-item
-                            is-array="true"
-                            label="Master node IP address"
-                            value="currentConfig['com-cluster'].nodes">
-                        </wz-config-item>
-                        <wz-config-item
-                            label="Port to listen to cluster communications"
-                            value="currentConfig['com-cluster'].port">
-                        </wz-config-item>
-                        <wz-config-item
-                            label="IP address to listen to cluster communications"
-                            value="currentConfig['com-cluster'].bind_addr">
-                        </wz-config-item>
-                        <wz-config-item
-                            label="Hide cluster information in alerts"
-                            value="currentConfig['com-cluster'].hidden">
+                            value="currentConfig['agent-buffer'].buffer.events_per_second || '500'">
                         </wz-config-item>
 
                     </div>
@@ -148,8 +133,8 @@
             md-is-locked-open="true">
             <md-list>
                 <md-subheader>More info about this section</md-subheader>
-                <md-list-item target="_blank" class="wz-text-link" ng-href="https://documentation.wazuh.com/current/user-manual/manager/wazuh-cluster.html">How to configure the Wazuh cluster</md-list-item>
-                <md-list-item target="_blank" class="wz-text-link" ng-href="https://documentation.wazuh.com/current/user-manual/reference/ossec-conf/cluster.html">Wazuh cluster reference</md-list-item>
+                <md-list-item target="_blank" class="wz-text-link" ng-href="https://documentation.wazuh.com/current/user-manual/capabilities/antiflooding.html">Anti-flooding mechanism</md-list-item>
+                <md-list-item target="_blank" class="wz-text-link" ng-href="https://documentation.wazuh.com/current/user-manual/reference/ossec-conf/agent_buffer.html">Client buffer reference</md-list-item>
             </md-list>
         </md-sidenav>
         <!-- End right sidenav section -->
