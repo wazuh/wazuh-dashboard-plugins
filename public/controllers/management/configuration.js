@@ -10,184 +10,39 @@
  * Find more information about this on the LICENSE file.
  */
 import { uiModules } from 'ui/modules';
-import js2xmlparser from 'js2xmlparser';
-import XMLBeautifier from '../../utils/xml-beautifier';
-import beautifier from '../../utils/json-beautifier';
-import { queryConfig } from '../../services/query-config';
-import { objectWithoutProperties } from '../../utils/remove-hash-key.js'
+import { ConfigurationHandler } from '../../utils/config-handler';
+
 const app = uiModules.get('app/wazuh', []);
 
-class NewConfigurationController {
+class ConfigurationController {
   constructor($scope, errorHandler, apiReq) {
     this.$scope = $scope;
     this.errorHandler = errorHandler;
     this.apiReq = apiReq;
     this.$scope.load = false;
     this.$scope.isArray = Array.isArray;
-    this.configRaw = {};
+    this.configurationHandler = new ConfigurationHandler(apiReq, errorHandler);
     this.$scope.currentConfig = null;
-
     this.$scope.configurationTab = '';
     this.$scope.configurationSubTab = '';
-
-    this.$scope.getXML = () => this.getXML();
-    this.$scope.getJSON = () => this.getJSON();
-    this.$scope.isString = item => typeof item === 'string';
-    this.$scope.switchConfigTab = (configurationTab, sections) => this.switchConfigTab(configurationTab, sections);
-    this.$scope.switchWodle = (wodleName) => this.switchWodle(wodleName);
-    this.$scope.switchConfigurationTab = configurationTab => this.switchConfigurationTab(configurationTab);
-    this.$scope.switchConfigurationSubTab = configurationSubTab => this.switchConfigurationSubTab(configurationSubTab);
-
-    this.$scope.selectedItem = 0;
-    this.$scope.updateSelectedItem = i => this.$scope.selectedItem = i;
-    this.$scope.getIntegration = list => this.getIntegration(list);
     this.$scope.integrations = {};
-  }
-
-  buildIntegrations(list) {
-    if(!list || !list.length) return;
-    for(const integration of list) this.$scope.integrations[integration.name] = integration;
-  }
-
-  /**
-   * Switchs between configuration tabs
-   * @param {string} configurationTab The configuration tab to open
-   * @param {Array<object>} sections Array that includes sections to be fetched
-   */
-  async switchConfigTab(configurationTab, sections) {
-    try {
-      this.$scope.load = true;
-      this.$scope.currentConfig = null;
-      this.$scope.XMLContent = false;
-      this.$scope.JSONContent = false;
-      this.$scope.configurationSubTab = false;
-      this.$scope.configurationTab = configurationTab;
-      this.$scope.currentConfig = await queryConfig('000', sections, this.apiReq, this.errorHandler);
-      if(sections[0].component === 'integrator') {
-        this.buildIntegrations(this.$scope.currentConfig['integrator-integration'].integration)
-      } else {
-        this.$scope.integrations = {}
-      }
-      this.$scope.load = false;
-      if (!this.$scope.$$phase) this.$scope.$digest();
-    } catch (error) {
-      this.errorHandler.handle(error, 'Manager');
-      this.$scope.load = false;
-    }
-    return;
-  }
-
-  /**
-   * Switchs to a wodle section
-   * @param {string} wodleName The wodle to open
-   */
-  async switchWodle(wodleName) {
-    try {
-      this.$scope.load = true;
-      this.$scope.currentConfig = null;
-      this.$scope.XMLContent = false;
-      this.$scope.JSONContent = false;
-      this.$scope.configurationSubTab = false;
-      this.$scope.configurationTab = wodleName;
-
-      this.$scope.currentConfig = await queryConfig('000', [{component:'wmodules',configuration:'wmodules'}], this.apiReq, this.errorHandler);
-
-      // Filter by provided wodleName
-      let result = [];
-      if (
-        wodleName &&
-        this.$scope.currentConfig &&
-        this.$scope.currentConfig['wmodules-wmodules'] &&
-        this.$scope.currentConfig['wmodules-wmodules'].wmodules
-      ) {
-        result = this.$scope.currentConfig['wmodules-wmodules'].wmodules.filter(
-          item => typeof item[wodleName] !== 'undefined'
-        );
-      } 
-
-      if (result.length) {
-        this.$scope.currentConfig = wodleName === 'command' ? { commands: result.map(item => item.command) } : result[0];
-      }
-
-      this.$scope.load = false;
-      if (!this.$scope.$$phase) this.$scope.$digest();
-    } catch (error) {
-      this.errorHandler.handle(error, 'Manager');
-      this.$scope.load = false;
-    }
-    return;
-  }
-
-  /**
-   * Switchs between configuration tabs
-   * @param {*} configurationTab
-   */
-  switchConfigurationTab(configurationTab) {
     this.$scope.selectedItem = 0;
-    this.$scope.currentConfig = null;
-    this.$scope.XMLContent = false;
-    this.$scope.JSONContent = false;
-    this.$scope.configurationSubTab = false;
-    this.$scope.configurationTab = configurationTab;
-    if (!this.$scope.$$phase) this.$scope.$digest();
   }
 
-  /**
-   * Switchs between configuration sub-tabs
-   * @param {*} configurationSubTab
-   */
-  switchConfigurationSubTab(configurationSubTab) {
-    this.$scope.selectedItem = 0;
-    this.$scope.XMLContent = false;
-    this.$scope.JSONContent = false;
-    this.$scope.configurationSubTab = configurationSubTab;
-    if (!this.$scope.$$phase) this.$scope.$digest();
-  }
-
-  /**
-   * Assigns XML raw content for specific configuration
-   * @param {object} config Raw content to show in XML
-   */
-  getXML() {
-    const config = {};
-    Object.assign(config,this.$scope.currentConfig)
-    this.$scope.JSONContent = false;
-    if (this.$scope.XMLContent) {
-      this.$scope.XMLContent = false;
-    } else {
-      try {
-        const cleaned = objectWithoutProperties(config)
-        this.$scope.XMLContent = XMLBeautifier(js2xmlparser.parse('configuration', cleaned));
-      } catch (error) {
-        this.$scope.XMLContent = false;
-      }
-    }
-    if (!this.$scope.$$phase) this.$scope.$digest();
-  }
-
-  /**
-   * Assigns JSON raw content for specific configuration
-   * @param {object} config Raw content to show in JSON
-   */
-  getJSON() {
-    const config = {};
-    Object.assign(config,this.$scope.currentConfig)
-    this.$scope.XMLContent = false;
-    if (this.$scope.JSONContent) {
-      this.$scope.JSONContent = false;
-    } else {
-      try {
-        const cleaned = objectWithoutProperties(config)
-        this.$scope.JSONContent = beautifier.prettyPrint(cleaned);
-      } catch (error) {
-        this.$scope.JSONContent = false;
-      }
-    }
-    if (!this.$scope.$$phase) this.$scope.$digest();
+  $onInit() {
+    this.$scope.getXML = () => this.configurationHandler.getXML(this.$scope);
+    this.$scope.getJSON = () => this.configurationHandler.getJSON(this.$scope);
+    this.$scope.isString = item => typeof item === 'string';
+    this.$scope.switchConfigTab = (configurationTab, sections) => this.configurationHandler.switchConfigTab(configurationTab, sections, this.$scope);
+    this.$scope.switchWodle = wodleName => this.configurationHandler.switchWodle(wodleName, this.$scope);
+    this.$scope.switchConfigurationTab = configurationTab => this.configurationHandler.switchConfigurationTab(configurationTab, this.$scope);
+    this.$scope.switchConfigurationSubTab = configurationSubTab => this.configurationHandler.switchConfigurationSubTab(configurationSubTab, this.$scope);
+    this.$scope.updateSelectedItem = i => this.$scope.selectedItem = i;
+    this.$scope.getIntegration = list => this.configurationHandler.getIntegration(list, this.$scope);
   }
 }
 
 app.controller(
-  'managementNewConfigurationController',
-  NewConfigurationController
+  'managementConfigurationController',
+  ConfigurationController
 );
