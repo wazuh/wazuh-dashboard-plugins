@@ -9,13 +9,14 @@
         <!-- Breadcrumbs -->
         <div layout="row" layout-padding ng-if="agent">
             <!-- If you're not on the Welcome tab, show a functional breadcrumb -->
-            <div ng-if="tab !== 'welcome'">
+            <div ng-if="tab !== 'welcome' && tab !== 'configuration'">
                 <a class="wz-text-link cursor-pointer" href="#/agents-preview">Agents</a>
                 <span> / </span>
                 <span class="wz-text-link cursor-pointer" ng-click="switchTab('welcome')">{{agent.name}} ({{agent.id}})</span>
                 <span> / </span>
                 <span>{{ tabNames[tab] }}</span>
             </div>
+
             <!-- If you're on the Welcome tab, show a blank, simple breadcrumb -->
             <div ng-if="tab === 'welcome'">
                 <a class="wz-text-link cursor-pointer" href="#/agents-preview">Agents</a>
@@ -23,6 +24,24 @@
                 <span>{{agent.name}} ({{agent.id}})</span>
                 <span> / </span>
                 <span>Welcome</span>
+            </div>
+
+            <div ng-if="tab === 'configuration' && configurationTab === 'welcome'">
+                <a class="wz-text-link cursor-pointer" href="#/agents-preview">Agents</a>
+                <span> / </span>
+                <span class="wz-text-link cursor-pointer" ng-click="switchTab('welcome')">{{agent.name}} ({{agent.id}})</span>
+                <span> / </span>
+                <span>{{ tabNames[tab] }}</span>
+            </div>
+
+            <div ng-if="tab === 'configuration' && configurationTab !== 'welcome'">
+                <a class="wz-text-link cursor-pointer" href="#/agents-preview">Agents</a>
+                <span> / </span>
+                <span class="wz-text-link cursor-pointer" ng-click="switchTab('welcome')">{{agent.name}} ({{agent.id}})</span>
+                <span> / </span>
+                <span class="wz-text-link cursor-pointer" ng-click="switchConfigurationTab('welcome')">{{ tabNames[tab] }}</span>
+                <span> / </span>
+                <span>{{ tabNames[configurationTab] }}</span>
             </div>
         </div>
         <!-- End breadcrumbs -->
@@ -87,6 +106,13 @@
                 </md-not-found>
             </md-autocomplete>
         </div>
+        <div>
+            <!-- Help button -->
+            <md-button md-no-ink class="md-icon-button small" tooltip="About and help" tooltip-placement="left" ng-href="#/settings/about" aria-label="Link to open app about section">
+                <i class="fa fa-fw fa-question-circle-o" aria-hidden="true"></i>
+            </md-button>
+            <!-- End help button -->
+        </div>
         <!-- End agent autocomplete selector section -->
     </div>
     <!-- End navigation section -->
@@ -100,7 +126,6 @@
         nav-bar-aria-label="Host monitoring navigation links">
         <md-nav-item class="wz-nav-item" md-nav-click="switchTab('general')" name="general">{{ tabNames['general'] }}</md-nav-item>
         <md-nav-item class="wz-nav-item" md-nav-click="switchTab('fim')" name="fim">{{ tabNames['fim'] }}</md-nav-item>
-        <md-nav-item class="wz-nav-item" md-nav-click="switchTab('configuration')" name="configuration">{{ tabNames['configuration'] }}</md-nav-item>
         <md-nav-item class="wz-nav-item" md-nav-click="switchTab('syscollector')" name="syscollector">{{ tabNames['syscollector'] }}</md-nav-item>
     </md-nav-bar>
     <!-- End Host monitoring navigation bar -->
