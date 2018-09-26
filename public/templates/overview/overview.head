@@ -74,6 +74,7 @@
         <md-nav-item class="wz-nav-item" md-nav-click="switchTab('audit')" name="audit">{{ tabNames['audit'] }}</md-nav-item>
         <md-nav-item class="wz-nav-item" md-nav-click="switchTab('oscap')" name="oscap">{{ tabNames['oscap'] }}</md-nav-item>
         <md-nav-item class="wz-nav-item" md-nav-click="switchTab('ciscat')" name="ciscat">{{ tabNames['ciscat'] }}</md-nav-item>
+        <md-nav-item class="wz-nav-item" md-nav-click="switchTab('osquery')" name="osquery">{{ tabNames['osquery'] }}</md-nav-item>
     </md-nav-bar>
     <!-- End System audit navigation bar -->
 
