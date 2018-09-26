@@ -96,8 +96,7 @@ class AgentsController {
     this.$scope.hostMonitoringTabs = [
       'general',
       'fim',
-      'configuration',
-      'syscollector'
+       'syscollector'
     ];
     this.$scope.systemAuditTabs = ['pm', 'audit', 'oscap', 'ciscat'];
     this.$scope.securityTabs = ['vuls', 'virustotal'];
