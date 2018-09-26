@@ -1,5 +1,10 @@
-<div flex="auto" layout="column" ng-if="tab === 'configuration'" ng-init="switchConfigurationTab('welcome')">
+<div flex="auto" layout="column" ng-if="tab === 'configuration' && load">
+    <div layout="row" class="md-padding">
+        <div class='uil-ring-css'><div></div></div>
+    </div>
+</div>
 
+<div flex="auto" layout="column" ng-show="tab === 'configuration' && !load" ng-init="switchConfigurationTab('welcome')">
     <!-- Navigation section (Breadcrumbs, etc) -->
     <div layout="row" layout-align="start center">
         <!-- Breadcrumbs -->
