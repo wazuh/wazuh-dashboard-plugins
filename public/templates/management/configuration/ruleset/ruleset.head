@@ -1,4 +1,4 @@
-<div flex="auto" layout="column" ng-if="!load && configurationTab === 'ruleset'" ng-init="switchConfigurationSubTab('rules')">
+<div flex="auto" layout="column" ng-if="configurationTab === 'ruleset'" ng-init="switchConfigurationSubTab('rules')">
 
     <!-- Headline -->
     <div layout="column" layout-padding>
@@ -20,8 +20,13 @@
     </md-nav-bar>
     <!-- End Ruleset navigation bar -->
 
+    <!-- Loading ring -->
+    <div class='uil-ring-css' ng-show="load">
+        <div></div>
+    </div>
+
     <!-- This section contains the main content and the right sidenav -->
-    <div flex="auto" layout="row">
+    <div flex="auto" layout="row" ng-if="!load">
 
         <!-- This section appears when there's no configuration -->
         <wz-no-config flex ng-if="false"></wz-no-config>

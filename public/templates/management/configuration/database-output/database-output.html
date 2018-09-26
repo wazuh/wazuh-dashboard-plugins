@@ -1,4 +1,4 @@
-<div flex="auto" layout="column" ng-if="!load && configurationTab === 'database-output'">
+<div flex="auto" layout="column" ng-if="configurationTab === 'database-output'">
 
     <!-- Headline -->
     <div layout="column" layout-padding>
@@ -9,8 +9,13 @@
     </div>
     <!-- End headline -->
 
+    <!-- Loading ring -->
+    <div class='uil-ring-css' ng-show="load">
+        <div></div>
+    </div>
+
     <!-- This section contains the main content and the right sidenav -->
-    <div flex="auto" layout="row">
+    <div flex="auto" layout="row" ng-if="!load">
 
         <!-- This section appears when there's no configuration -->
         <wz-no-config flex ng-if="false"></wz-no-config>
@@ -41,23 +46,19 @@
 
                         <wz-config-item
                             label="Database type"
-                            value="mysql">
+                            value="'foo'">
                         </wz-config-item>
                         <wz-config-item
                             label="Database name"
-                            value="Alerts_DB">
+                            value="'foo'">
                         </wz-config-item>
                         <wz-config-item
                             label="Database server IP"
-                            value="192.168.1.122">
+                            value="'foo'">
                         </wz-config-item>
                         <wz-config-item
                             label="Database username"
-                            value="MySQLadmin">
-                        </wz-config-item>
-                        <wz-config-item
-                            label="Database password"
-                            value="secret1234">
+                            value="'foo'">
                         </wz-config-item>
 
                     </div>

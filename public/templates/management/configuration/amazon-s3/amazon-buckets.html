@@ -1,5 +1,12 @@
+<!-- No configuration section -->
+<wz-no-config
+  flex
+  error="'not-present'"
+  ng-if="configurationSubTab === 'amazon-buckets' && currentConfig && currentConfig['aws-s3'] && !currentConfig['aws-s3'].buckets"></wz-no-config>
+<!-- End no configuration section -->
+
 <!-- Buckets card -->
-<md-card flex="auto" class="wz-md-card" ng-if="!JSONContent && !XMLContent && configurationSubTab === 'amazon-buckets'">
+<md-card flex="auto" class="wz-md-card" ng-if="!JSONContent && !XMLContent && configurationSubTab === 'amazon-buckets' && currentConfig && currentConfig['aws-s3'] && currentConfig['aws-s3'].buckets">
     <md-card-content flex layout="column">
         <div layout="row" layout-align="start center">
             <div>

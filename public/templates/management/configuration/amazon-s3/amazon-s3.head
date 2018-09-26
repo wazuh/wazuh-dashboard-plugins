@@ -1,4 +1,4 @@
-<div flex="auto" layout="column" ng-if="!load && configurationTab === 'aws-s3'" ng-init="switchConfigurationSubTab('amazon-general')">
+<div flex="auto" layout="column" ng-if="configurationTab === 'aws-s3'" ng-init="switchConfigurationSubTab('amazon-general')">
 
     <!-- Headline -->
     <div layout="column" layout-padding>
@@ -20,12 +20,24 @@
     </md-nav-bar>
     <!-- End Amazon S3 navigation bar -->
 
-    <!-- This section contains the main content and the right sidenav -->
-    <div flex="auto" layout="row">
+    <!-- Loading ring -->
+    <div class='uil-ring-css' ng-show="load">
+        <div></div>
+    </div>
 
-        <!-- This section appears when there's no configuration -->
-        <wz-no-config flex ng-if="false"></wz-no-config>
+    <!-- This section contains the main content and the right sidenav -->
+    <div flex="auto" layout="row" ng-if="!load">
+
+        <!-- No configuration section -->
+        <wz-no-config
+          flex
+          error="currentConfig['wmodules-wmodules']"
+          ng-if="currentConfig['wmodules-wmodules'] && isString(currentConfig['wmodules-wmodules'])"></wz-no-config>
+        <wz-no-config
+          flex
+          error="'not-present'"
+          ng-if="currentConfig && !currentConfig['aws-s3'] && !isString(currentConfig['wmodules-wmodules'])"></wz-no-config>
         <!-- End no configuration section -->
 
         <!-- This section is the main content -->
-        <div flex layout="column">
+        <div flex layout="column" ng-if="currentConfig && currentConfig['aws-s3']">
