@@ -9,7 +9,7 @@
     <wz-no-config
       flex
       error="currentConfig['com-logging']"
-      ng-if="currentConfig['com-logging'] && isString(currentConfig['com-logging'])"></wz-no-config>
+      ng-if="agent && agent.id !== '000' && currentConfig['com-logging'] && isString(currentConfig['com-logging'])"></wz-no-config>
     <wz-no-config
       flex
       error="'not-present'"
@@ -75,7 +75,6 @@
                         label="File rotation interval"
                         value="currentConfig['analysis-global'].global.rotate_interval">
                     </wz-config-item>
-
 
                 </div>
                 <!-- End configuration block -->

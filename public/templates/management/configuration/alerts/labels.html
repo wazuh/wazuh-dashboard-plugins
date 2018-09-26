@@ -1,12 +1,19 @@
 <!-- This section contains the main content and the right sidenav -->
 <div flex="auto" layout="row" ng-if="!load && configurationSubTab === 'labels'">
 
-    <!-- This section appears when there's no configuration -->
-    <wz-no-config flex ng-if="false"></wz-no-config>
+    <!-- No configuration section -->
+    <wz-no-config
+      flex
+      error="currentConfig[(agent && agent.id !== '000') ? 'agent-labels' : 'analysis-labels']"
+      ng-if="currentConfig[(agent && agent.id !== '000') ? 'agent-labels' : 'analysis-labels'] && isString(currentConfig[(agent && agent.id !== '000') ? 'agent-labels' : 'analysis-labels'])"></wz-no-config>
+    <wz-no-config
+      flex
+      error="'not-present'"
+      ng-if="currentConfig[(agent && agent.id !== '000') ? 'agent-labels' : 'analysis-labels'] && !isString(currentConfig[(agent && agent.id !== '000') ? 'agent-labels' : 'analysis-labels']) && !hasSize(currentConfig[(agent && agent.id !== '000') ? 'agent-labels' : 'analysis-labels'].labels)"></wz-no-config>
     <!-- End no configuration section -->
 
     <!-- This section is the main content -->
-    <div flex layout="column">
+    <div flex layout="column" ng-if="currentConfig[(agent && agent.id !== '000') ? 'agent-labels' : 'analysis-labels'] && !isString(currentConfig[(agent && agent.id !== '000') ? 'agent-labels' : 'analysis-labels']) && hasSize(currentConfig[(agent && agent.id !== '000') ? 'agent-labels' : 'analysis-labels'].labels)">
 
         <!-- The main card will all the settings -->
         <md-card class="wz-md-card" ng-if="!JSONContent && !XMLContent">
@@ -35,8 +42,8 @@
                         </thead>
                         <tbody class="wz-word-wrap">
                             <tr ng-repeat="(key, value) in currentConfig[(agent && agent.id !== '000') ? 'agent-labels' : 'analysis-labels'].labels">
-                                <td>{{key}}</td>
-                                <td>{{value}}</td>
+                                <td>{{ key }}</td>
+                                <td>{{ value }}</td>
                             </tr>
                         </tbody>
                     </table>
