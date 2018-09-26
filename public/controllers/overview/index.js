@@ -64,7 +64,7 @@ app.controller('overviewController', function(
   tabVisualizations.assign('overview');
 
   $scope.hostMonitoringTabs = ['general', 'fim', 'aws'];
-  $scope.systemAuditTabs = ['pm', 'audit', 'oscap', 'ciscat'];
+  $scope.systemAuditTabs = ['pm', 'audit', 'oscap', 'ciscat', 'osquery'];
   $scope.securityTabs = ['vuls', 'virustotal'];
   $scope.complianceTabs = ['pci', 'gdpr'];
 

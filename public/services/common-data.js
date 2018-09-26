@@ -98,19 +98,20 @@ export class CommonData {
         pci: { group: 'pci_dss' },
         gdpr: { group: 'gdpr' },
         aws: { group: 'amazon' },
-        virustotal: { group: 'virustotal' }
+        virustotal: { group: 'virustotal' },
+        osquery: { group: 'osquery' }
       };
 
       const filters = [];
       const isCluster = this.appState.getClusterInfo().status == 'enabled';
-      filters.push(
+      /*filters.push(
         filterHandler.managerQuery(
           isCluster
             ? this.appState.getClusterInfo().cluster
             : this.appState.getClusterInfo().manager,
           isCluster
         )
-      );
+      );*/
 
       if (tab !== 'general') {
         if (tab === 'pci') {

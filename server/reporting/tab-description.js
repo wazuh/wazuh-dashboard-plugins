@@ -74,5 +74,9 @@ export const TabDescription = {
     title: 'Configuration',
     description:
       'Check the current agent configuration remotely applied by its group.'
+  },
+  osquery: {
+    title: 'Osquery',
+    description: 'Osquery can be used to expose an operating system as a high-performance relational database.'
   }
 };
