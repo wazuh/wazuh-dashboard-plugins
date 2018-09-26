@@ -11,314 +11,133 @@
  */
 export default [
   {
-    _id: 'Wazuh-App-Overview-AWS-Metric-Authorize-security',
+    _id: 'Wazuh-App-Overview-AWS-Top-5-instances',
+    _type: 'visualization',
     _source: {
-      title: 'Metric Authorize security',
+      title: 'Top 5 instances',
       visState:
-        '{"title":"Metric Authorize security","type":"metric","params":{"addTooltip":true,"addLegend":false,"type":"metric","metric":{"percentageMode":false,"useRanges":false,"colorSchema":"Green to Red","metricColorMode":"None","colorsRange":[{"from":0,"to":10000}],"labels":{"show":true},"invertColors":false,"style":{"bgFill":"#000","bgColor":false,"labelColor":false,"subText":"","fontSize":20}}},"aggs":[{"id":"1","enabled":true,"type":"count","schema":"metric","params":{"customLabel":"Authorized security groups"}}]}',
+        '{"title":"Top 5 instances","type":"pie","params":{"type":"pie","addTooltip":true,"addLegend":true,"legendPosition":"right","isDonut":true,"labels":{"show":false,"values":true,"last_level":true,"truncate":100}},"aggs":[{"id":"1","enabled":true,"type":"count","schema":"metric","params":{}},{"id":"2","enabled":true,"type":"terms","schema":"segment","params":{"field":"data.aws.resource.instanceDetails.instanceId","size":5,"order":"desc","orderBy":"1","otherBucket":false,"otherBucketLabel":"Other","missingBucket":false,"missingBucketLabel":"Missing"}}]}',
       uiStateJSON: '{}',
       description: '',
       version: 1,
       kibanaSavedObjectMeta: {
-        searchSourceJSON: `{
-                    "index":"wazuh-alerts",
-                    "filter":[
-                        {
-                            "query": {
-                              "regexp": {
-                                "rule.description": {
-                                  "value": ".*AuthorizeSecurity.*"
-                                }
-                              }
-                            },
-                            "meta": {
-                              "negate": false,
-                              "index": "wazuh-alerts",
-                              "disabled": false,
-                              "alias": null,
-                              "type": "custom",
-                              "key": "query",
-                              "value": {"regexp":{"rule.description":".*AuthorizeSecurity.*"}}
-                            },
-                            "$state": {
-                              "store": "appState"
-                            }
-                          }
-                    ],
-                    "query":{"query":"","language":"lucene"}
-                }`
+        searchSourceJSON:
+          '{"index":"wazuh-alerts","query":{"query":"","language":"lucene"},"filter":[]}'
       }
-    },
-    _type: 'visualization'
+    }
   },
   {
-    _id: 'Wazuh-App-Overview-AWS-Metric-Revoke-security',
+    _id: 'Wazuh-App-Overview-AWS-Top-5-rules',
+    _type: 'visualization',
     _source: {
-      title: 'Metric Revoke security',
+      title: 'Top 5 rules',
       visState:
-        '{"title":"Metric Revoke security","type":"metric","params":{"addTooltip":true,"addLegend":false,"type":"metric","metric":{"percentageMode":false,"useRanges":false,"colorSchema":"Green to Red","metricColorMode":"None","colorsRange":[{"from":0,"to":10000}],"labels":{"show":true},"invertColors":false,"style":{"bgFill":"#000","bgColor":false,"labelColor":false,"subText":"","fontSize":20}}},"aggs":[{"id":"1","enabled":true,"type":"count","schema":"metric","params":{"customLabel":"Revoked security groups"}}]}',
-      uiStateJSON: '{}',
-      description: '',
-      version: 1,
-      kibanaSavedObjectMeta: {
-        searchSourceJSON: `{
-                    "index":"wazuh-alerts",
-                    "filter":[
-                        {
-                            "query": {
-                              "regexp": {
-                                "rule.description": {
-                                  "value": ".*RevokeSecurity.*"
-                                }
-                              }
-                            },
-                            "meta": {
-                              "negate": false,
-                              "index": "wazuh-alerts",
-                              "disabled": false,
-                              "alias": null,
-                              "type": "custom",
-                              "key": "query",
-                              "value": {"regexp":{"rule.description":".*RevokeSecurity.*"}}
-                            },
-                            "$state": {
-                              "store": "appState"
-                            }
-                          }
-                    ],
-                    "query":{"query":"","language":"lucene"}
-                }`
-      }
-    },
-    _type: 'visualization'
-  },
-  {
-    _id: 'Wazuh-App-Overview-AWS-Instances',
-    _source: {
-      title: 'Instances',
-      visState:
-        '{"title":"Instances","type":"histogram","params":{"type":"histogram","grid":{"categoryLines":false,"style":{"color":"#eee"}},"categoryAxes":[{"id":"CategoryAxis-1","type":"category","position":"bottom","show":true,"style":{},"scale":{"type":"linear"},"labels":{"show":true,"truncate":100},"title":{}}],"valueAxes":[{"id":"ValueAxis-1","name":"LeftAxis-1","type":"value","position":"left","show":true,"style":{},"scale":{"type":"linear","mode":"normal"},"labels":{"show":true,"rotate":0,"filter":false,"truncate":100},"title":{"text":"Count"}}],"seriesParams":[{"show":"true","type":"histogram","mode":"stacked","data":{"label":"Count","id":"1"},"valueAxis":"ValueAxis-1","drawLinesBetweenPoints":true,"showCircles":true}],"addTooltip":true,"addLegend":false,"legendPosition":"right","times":[],"addTimeMarker":false},"aggs":[{"id":"1","enabled":true,"type":"count","schema":"metric","params":{}},{"id":"2","enabled":true,"type":"terms","schema":"segment","params":{"field":"data.aws.eventName","size":5,"order":"desc","orderBy":"1","customLabel":"Instance state"}}]}',
-      uiStateJSON: '{}',
-      description: '',
-      version: 1,
-      kibanaSavedObjectMeta: {
-        searchSourceJSON: `{
-                    "index":"wazuh-alerts",
-                    "filter":[
-                        {
-                            "query": {
-                              "regexp": {
-                                "data.aws.eventName": {
-                                  "value": ".*Instances.*"
-                                }
-                              }
-                            },
-                            "meta": {
-                              "negate": false,
-                              "index": "wazuh-alerts",
-                              "disabled": false,
-                              "alias": null,
-                              "type": "custom",
-                              "key": "query",
-                              "value": {"regexp":{"data.aws.eventName":".*Instances.*"}}
-                            },
-                            "$state": {
-                              "store": "appState"
-                            }
-                          }
-                    ],
-                    "query":{"query":"","language":"lucene"}
-                }`
-      }
-    },
-    _type: 'visualization'
-  },
-  {
-    _id: 'Wazuh-App-Overview-AWS-Metric-Successful-logins',
-    _source: {
-      title: 'Metric Successful logins',
-      visState:
-        '{"title":"Metric Successful logins","type":"metric","params":{"addTooltip":true,"addLegend":false,"type":"metric","metric":{"percentageMode":false,"useRanges":false,"colorSchema":"Green to Red","metricColorMode":"None","colorsRange":[{"from":0,"to":10000}],"labels":{"show":true},"invertColors":false,"style":{"bgFill":"#000","bgColor":false,"labelColor":false,"subText":"","fontSize":20}}},"aggs":[{"id":"1","enabled":true,"type":"count","schema":"metric","params":{"customLabel":"Successful logins"}}]}',
-      uiStateJSON: '{}',
-      description: '',
-      version: 1,
-      kibanaSavedObjectMeta: {
-        searchSourceJSON: `{
-                    "index":"wazuh-alerts",
-                    "filter":[
-                        {
-                            "query": {
-                              "regexp": {
-                                "rule.description": {
-                                  "value": ".*Login?Success.*"
-                                }
-                              }
-                            },
-                            "meta": {
-                              "negate": false,
-                              "index": "wazuh-alerts",
-                              "disabled": false,
-                              "alias": null,
-                              "type": "custom",
-                              "key": "query",
-                              "value": {"regexp":{"rule.description":".*Login?Success.*"}}
-                            },
-                            "$state": {
-                              "store": "appState"
-                            }
-                          }
-                    ],
-                    "query":{"query":"","language":"lucene"}
-                }`
-      }
-    },
-    _type: 'visualization'
-  },
-  {
-    _id: 'Wazuh-App-Overview-AWS-Most-active-user',
-    _source: {
-      title: 'Most active user',
-      visState:
-        '{"title":"Most active user","type":"table","params":{"perPage":10,"showPartialRows":false,"showMeticsAtAllLevels":false,"sort":{"columnIndex":null,"direction":null},"showTotal":false,"totalFunc":"sum"},"aggs":[{"id":"1","enabled":true,"type":"count","schema":"metric","params":{}},{"id":"2","enabled":true,"type":"terms","schema":"bucket","params":{"field":"data.aws.userIdentity.userName","size":1,"order":"desc","orderBy":"1","customLabel":"User name"}}]}',
+        '{"title":"Top 5 rules","type":"table","params":{"perPage":10,"showPartialRows":false,"showMetricsAtAllLevels":false,"sort":{"columnIndex":null,"direction":null},"showTotal":false,"totalFunc":"sum"},"aggs":[{"id":"1","enabled":true,"type":"count","schema":"metric","params":{}},{"id":"2","enabled":true,"type":"terms","schema":"bucket","params":{"field":"rule.id","size":5,"order":"desc","orderBy":"1","otherBucket":false,"otherBucketLabel":"Other","missingBucket":false,"missingBucketLabel":"Missing","customLabel":"Rule ID"}},{"id":"3","enabled":true,"type":"terms","schema":"bucket","params":{"field":"rule.description","size":1,"order":"desc","orderBy":"1","otherBucket":false,"otherBucketLabel":"Other","missingBucket":false,"missingBucketLabel":"Missing","customLabel":"Description"}}]}',
       uiStateJSON:
         '{"vis":{"params":{"sort":{"columnIndex":null,"direction":null}}}}',
       description: '',
       version: 1,
       kibanaSavedObjectMeta: {
         searchSourceJSON:
-          '{"index":"wazuh-alerts","filter":[],"query":{"query":"","language":"lucene"}}'
+          '{"index":"wazuh-alerts","query":{"query":"","language":"lucene"},"filter":[]}'
       }
-    },
-    _type: 'visualization'
+    }
   },
   {
-    _id: 'Wazuh-App-Overview-AWS-Security-groups-over-time',
-    _source: {
-      title: 'Security groups over time',
-      visState:
-        '{"title":"Security groups over time","type":"area","params":{"type":"area","grid":{"categoryLines":false,"style":{"color":"#eee"}},"categoryAxes":[{"id":"CategoryAxis-1","type":"category","position":"bottom","show":true,"style":{},"scale":{"type":"linear"},"labels":{"show":true,"truncate":100},"title":{}}],"valueAxes":[{"id":"ValueAxis-1","name":"LeftAxis-1","type":"value","position":"left","show":true,"style":{},"scale":{"type":"linear","mode":"normal"},"labels":{"show":true,"rotate":0,"filter":false,"truncate":100},"title":{"text":"Count"}}],"seriesParams":[{"show":"true","type":"area","mode":"stacked","data":{"label":"Count","id":"1"},"drawLinesBetweenPoints":true,"showCircles":true,"interpolate":"linear","valueAxis":"ValueAxis-1"}],"addTooltip":true,"addLegend":true,"legendPosition":"right","times":[],"addTimeMarker":false},"aggs":[{"id":"1","enabled":true,"type":"count","schema":"metric","params":{}},{"id":"3","enabled":true,"type":"terms","schema":"group","params":{"field":"rule.description","size":2,"order":"desc","orderBy":"1"}},{"id":"2","enabled":true,"type":"date_histogram","schema":"segment","params":{"field":"@timestamp","interval":"h","customInterval":"2h","min_doc_count":1,"extended_bounds":{}}}]}',
-      uiStateJSON: '{}',
-      description: '',
-      version: 1,
-      kibanaSavedObjectMeta: {
-        searchSourceJSON: `{
-                    "index":"wazuh-alerts",
-                    "filter":[
-                        {
-                            "query": {
-                              "regexp": {
-                                "rule.description": {
-                                  "value": ".*Security.*"
-                                }
-                              }
-                            },
-                            "meta": {
-                              "negate": false,
-                              "index": "wazuh-alerts",
-                              "disabled": false,
-                              "alias": null,
-                              "type": "custom",
-                              "key": "query",
-                              "value": {"regexp":{"rule.description":".*Security.*"}}
-                            },
-                            "$state": {
-                              "store": "appState"
-                            }
-                          }
-                    ],
-                    "query":{"query":"","language":"lucene"}
-                }`
-      }
-    },
-    _type: 'visualization'
-  },
-  {
-    _id: 'Wazuh-App-Overview-AWS-Success-login-Top-5-countries',
-    _source: {
-      title: 'Success login Top 5 countries',
-      visState:
-        '{"title":"Success login Top 5 countries","type":"pie","params":{"type":"pie","addTooltip":true,"addLegend":true,"legendPosition":"right","isDonut":true,"labels":{"show":false,"values":true,"last_level":true,"truncate":100}},"aggs":[{"id":"1","enabled":true,"type":"count","schema":"metric","params":{}},{"id":"2","enabled":true,"type":"terms","schema":"segment","params":{"field":"GeoLocation.country_name","size":5,"order":"desc","orderBy":"1","customLabel":"Country"}}]}',
-      uiStateJSON: '{}',
-      description: '',
-      version: 1,
-      kibanaSavedObjectMeta: {
-        searchSourceJSON: `{
-                    "index":"wazuh-alerts",
-                    "filter":[
-                        {
-                            "query": {
-                              "regexp": {
-                                "rule.description": {
-                                  "value": ".*Login?Success.*"
-                                }
-                              }
-                            },
-                            "meta": {
-                              "negate": false,
-                              "index": "wazuh-alerts",
-                              "disabled": false,
-                              "alias": null,
-                              "type": "custom",
-                              "key": "query",
-                              "value": {"regexp":{"rule.description":".*Login?Success.*"}}
-                            },
-                            "$state": {
-                              "store": "appState"
-                            }
-                          }
-                    ],
-                    "query":{"query":"","language":"lucene"}
-                }`
-      }
-    },
-    _type: 'visualization'
-  },
-  {
-    _id: 'Wazuh-App-Overview-AWS-Events-over-time',
-    _source: {
-      title: 'Events over time',
-      visState:
-        '{"title":"Events over time","type":"area","params":{"type":"area","grid":{"categoryLines":false,"style":{"color":"#eee"}},"categoryAxes":[{"id":"CategoryAxis-1","type":"category","position":"bottom","show":true,"style":{},"scale":{"type":"linear"},"labels":{"show":true,"truncate":100},"title":{}}],"valueAxes":[{"id":"ValueAxis-1","name":"LeftAxis-1","type":"value","position":"left","show":true,"style":{},"scale":{"type":"linear","mode":"normal"},"labels":{"show":true,"rotate":0,"filter":false,"truncate":100},"title":{"text":"Count"}}],"seriesParams":[{"show":"true","type":"area","mode":"stacked","data":{"label":"Count","id":"1"},"drawLinesBetweenPoints":true,"showCircles":true,"interpolate":"linear","valueAxis":"ValueAxis-1"}],"addTooltip":true,"addLegend":true,"legendPosition":"right","times":[],"addTimeMarker":false},"aggs":[{"id":"1","enabled":true,"type":"count","schema":"metric","params":{}},{"id":"2","enabled":true,"type":"date_histogram","schema":"segment","params":{"field":"@timestamp","interval":"h","customInterval":"2h","min_doc_count":1,"extended_bounds":{}}},{"id":"3","enabled":true,"type":"terms","schema":"group","params":{"field":"data.aws.eventName","size":5,"order":"desc","orderBy":"1","customLabel":"Event name"}}]}',
-      uiStateJSON: '{}',
-      description: '',
-      version: 1,
-      kibanaSavedObjectMeta: {
-        searchSourceJSON:
-          '{"index":"wazuh-alerts","filter":[],"query":{"query":"","language":"lucene"}}'
-      }
-    },
-    _type: 'visualization'
-  },
-  {
-    _id: 'Wazuh-App-Overview-AWS-Event-sources-over-time',
-    _source: {
-      title: 'Event sources over time',
-      visState:
-        '{"title":"Event sources over time","type":"area","params":{"type":"area","grid":{"categoryLines":false,"style":{"color":"#eee"}},"categoryAxes":[{"id":"CategoryAxis-1","type":"category","position":"bottom","show":true,"style":{},"scale":{"type":"linear"},"labels":{"show":true,"truncate":100},"title":{}}],"valueAxes":[{"id":"ValueAxis-1","name":"LeftAxis-1","type":"value","position":"left","show":true,"style":{},"scale":{"type":"linear","mode":"normal"},"labels":{"show":true,"rotate":0,"filter":false,"truncate":100},"title":{"text":"Count"}}],"seriesParams":[{"show":"true","type":"area","mode":"stacked","data":{"label":"Count","id":"1"},"drawLinesBetweenPoints":true,"showCircles":true,"interpolate":"linear","valueAxis":"ValueAxis-1"}],"addTooltip":true,"addLegend":true,"legendPosition":"right","times":[],"addTimeMarker":false},"aggs":[{"id":"1","enabled":true,"type":"count","schema":"metric","params":{}},{"id":"2","enabled":true,"type":"date_histogram","schema":"segment","params":{"field":"@timestamp","interval":"h","customInterval":"2h","min_doc_count":1,"extended_bounds":{}}},{"id":"3","enabled":true,"type":"terms","schema":"group","params":{"field":"data.aws.eventSource","size":5,"order":"desc","orderBy":"1","customLabel":"Event source"}}]}',
-      uiStateJSON: '{}',
-      description: '',
-      version: 1,
-      kibanaSavedObjectMeta: {
-        searchSourceJSON:
-          '{"index":"wazuh-alerts","filter":[],"query":{"query":"","language":"lucene"}}'
-      }
-    },
-    _type: 'visualization'
-  },
-  {
-    _id: 'Wazuh-App-Overview-AWS-Alerts-summary',
+    _id: 'Wazuh-App-Overview-AWS-Alerts-over-time',
     _type: 'visualization',
     _source: {
-      title: 'Alerts summary',
+      title: 'Alerts over time',
       visState:
-        '{"title":"Alerts summary","type":"table","params":{"perPage":10,"showPartialRows":false,"showMeticsAtAllLevels":false,"sort":{"columnIndex":3,"direction":"desc"},"showTotal":false,"totalFunc":"sum"},"aggs":[{"id":"1","enabled":true,"type":"count","schema":"metric","params":{}},{"id":"4","enabled":true,"type":"terms","schema":"bucket","params":{"field":"manager.name","otherBucket":false,"otherBucketLabel":"Other","missingBucket":false,"missingBucketLabel":"Missing","size":50,"order":"desc","orderBy":"1","customLabel":"Manager"}},{"id":"3","enabled":true,"type":"terms","schema":"bucket","params":{"field":"GeoLocation.country_name","otherBucket":false,"otherBucketLabel":"Other","missingBucket":false,"missingBucketLabel":"Missing","size":10,"order":"desc","orderBy":"1","customLabel":"Country"}},{"id":"2","enabled":true,"type":"terms","schema":"bucket","params":{"field":"rule.description","otherBucket":false,"otherBucketLabel":"Other","missingBucket":false,"missingBucketLabel":"Missing","size":10,"order":"desc","orderBy":"1","customLabel":"Description"}}]}',
-      uiStateJSON:
-        '{"vis":{"params":{"sort":{"columnIndex":3,"direction":"desc"}}},"spy":{"mode":{"name":null,"fill":false}}}',
+        '{"title":"Alerts over time","type":"line","params":{"type":"line","grid":{"categoryLines":false,"style":{"color":"#eee"}},"categoryAxes":[{"id":"CategoryAxis-1","type":"category","position":"bottom","show":true,"style":{},"scale":{"type":"linear"},"labels":{"show":true,"truncate":100},"title":{}}],"valueAxes":[{"id":"ValueAxis-1","name":"LeftAxis-1","type":"value","position":"left","show":true,"style":{},"scale":{"type":"linear","mode":"normal"},"labels":{"show":true,"rotate":0,"filter":false,"truncate":100},"title":{"text":"Alerts"}}],"seriesParams":[{"show":"true","type":"area","mode":"normal","data":{"label":"Alerts","id":"1"},"valueAxis":"ValueAxis-1","drawLinesBetweenPoints":true,"showCircles":true}],"addTooltip":true,"addLegend":false,"legendPosition":"right","times":[],"addTimeMarker":false},"aggs":[{"id":"1","enabled":true,"type":"count","schema":"metric","params":{}},{"id":"2","enabled":true,"type":"date_histogram","schema":"segment","params":{"field":"@timestamp","interval":"auto","customInterval":"2h","min_doc_count":1,"extended_bounds":{}}}]}',
+      uiStateJSON: '{}',
       description: '',
       version: 1,
       kibanaSavedObjectMeta: {
         searchSourceJSON:
-          '{"index":"wazuh-alerts","filter":[],"query":{"query":"","language":"lucene"}}'
+          '{"index":"wazuh-alerts","query":{"query":"","language":"lucene"},"filter":[]}'
+      }
+    }
+  },
+  {
+    _id: 'Wazuh-App-Overview-AWS-geo',
+    _type: 'visualization',
+    _source: {
+      title: 'AWS geolocation',
+      visState:
+        '{"title":"AWS geolocation","type":"tile_map","params":{"colorSchema":"Green to Red","mapType":"Shaded Circle Markers","isDesaturated":true,"addTooltip":true,"heatClusterSize":1.5,"legendPosition":"topright","mapZoom":2,"mapCenter":[0,0],"wms":{"enabled":false,"options":{"format":"image/png","transparent":true},"baseLayersAreLoaded":{},"tmsLayers":[{"id":"road_map","url":"https://tiles.maps.elastic.co/v2/default/{z}/{x}/{y}.png?elastic_tile_service_tos=agree&my_app_name=kibana&my_app_version=6.4.0","minZoom":0,"maxZoom":10,"attribution":"<p>&#169; <a href=\\"http://www.openstreetmap.org/copyright\\">OpenStreetMap</a> contributors | <a href=\\"https://www.elastic.co/elastic-maps-service\\">Elastic Maps Service</a></p>&#10;","subdomains":[]}],"selectedTmsLayer":{"id":"road_map","url":"https://tiles.maps.elastic.co/v2/default/{z}/{x}/{y}.png?elastic_tile_service_tos=agree&my_app_name=kibana&my_app_version=6.4.0","minZoom":0,"maxZoom":10,"attribution":"<p>&#169; <a href=\\"http://www.openstreetmap.org/copyright\\">OpenStreetMap</a> contributors | <a href=\\"https://www.elastic.co/elastic-maps-service\\">Elastic Maps Service</a></p>&#10;","subdomains":[]}}},"aggs":[{"id":"1","enabled":true,"type":"count","schema":"metric","params":{"customLabel":""}},{"id":"2","enabled":true,"type":"geohash_grid","schema":"segment","params":{"field":"GeoLocation.location","autoPrecision":true,"isFilteredByCollar":true,"useGeocentroid":true,"mapZoom":2,"mapCenter":[0,0],"precision":2,"customLabel":""}}]}',
+      uiStateJSON:
+        '{"mapZoom":3,"mapCenter":[25.085598897064777,-57.30468750000001]}',
+      description: '',
+      version: 1,
+      kibanaSavedObjectMeta: {
+        searchSourceJSON:
+          '{"index":"wazuh-alerts","query":{"query":"","language":"lucene"},"filter":[]}'
+      }
+    }
+  },
+  {
+    _id: 'Wazuh-App-Overview-AWS-Top-5-sources',
+    _type: 'visualization',
+    _source: {
+      title: 'AWS-Top-5-sources',
+      visState:
+        '{"title":"AWS-Top-5-sources","type":"pie","params":{"type":"pie","addTooltip":true,"addLegend":true,"legendPosition":"right","isDonut":true,"labels":{"show":false,"values":true,"last_level":true,"truncate":100}},"aggs":[{"id":"1","enabled":true,"type":"count","schema":"metric","params":{}},{"id":"2","enabled":true,"type":"terms","schema":"segment","params":{"field":"data.aws.source","size":5,"order":"desc","orderBy":"1","otherBucket":false,"otherBucketLabel":"Other","missingBucket":false,"missingBucketLabel":"Missing"}}]}',
+      uiStateJSON: '{}',
+      description: '',
+      version: 1,
+      kibanaSavedObjectMeta: {
+        searchSourceJSON:
+          '{"index":"wazuh-alerts","query":{"query":"","language":"lucene"},"filter":[]}'
+      }
+    }
+  },
+  {
+    _id: 'Wazuh-App-Overview-AWS-Top-5-buckets',
+    _type: 'visualization',
+    _source: {
+      title: 'AWS-Top-5-Buckets-table',
+      visState:
+        '{"title":"AWS-Top-5-Buckets-table","type":"table","params":{"perPage":10,"showPartialRows":false,"showMetricsAtAllLevels":false,"sort":{"columnIndex":null,"direction":null},"showTotal":false,"totalFunc":"sum"},"aggs":[{"id":"1","enabled":true,"type":"count","schema":"metric","params":{"customLabel":"Alerts"}},{"id":"2","enabled":true,"type":"terms","schema":"bucket","params":{"field":"data.aws.log_info.s3bucket","size":5,"order":"desc","orderBy":"1","otherBucket":false,"otherBucketLabel":"Other","missingBucket":false,"missingBucketLabel":"Missing","customLabel":"Bucket"}}]}',
+      uiStateJSON:
+        '{"vis":{"params":{"sort":{"columnIndex":null,"direction":null}}}}',
+      description: '',
+      version: 1,
+      kibanaSavedObjectMeta: {
+        searchSourceJSON:
+          '{"index":"wazuh-alerts","query":{"query":"","language":"lucene"},"filter":[]}'
+      }
+    }
+  },
+  {
+    _id: 'Wazuh-App-Overview-AWS-Top-5-source-ip',
+    _type: 'visualization',
+    _source: {
+      title: 'Top 5 source IP addresses',
+      visState:
+        '{"title":"Top 5 source IP addresses","type":"pie","params":{"type":"pie","addTooltip":true,"addLegend":true,"legendPosition":"right","isDonut":true,"labels":{"show":false,"values":true,"last_level":true,"truncate":100}},"aggs":[{"id":"1","enabled":true,"type":"count","schema":"metric","params":{}},{"id":"2","enabled":true,"type":"terms","schema":"segment","params":{"field":"data.aws.source_ip_address","size":5,"order":"desc","orderBy":"1","otherBucket":false,"otherBucketLabel":"Other","missingBucket":false,"missingBucketLabel":"Missing"}}]}',
+      uiStateJSON: '{}',
+      description: '',
+      version: 1,
+      kibanaSavedObjectMeta: {
+        searchSourceJSON:
+          '{"index":"wazuh-alerts","query":{"query":"","language":"lucene"},"filter":[]}'
+      }
+    }
+  },
+  {
+    _id: 'Wazuh-App-Overview-AWS-Top-5-event-names',
+    _type: 'visualization',
+    _source: {
+      title: 'Top 5 event names',
+      visState:
+        '{"title":"Top 5 event names","type":"pie","params":{"type":"pie","addTooltip":true,"addLegend":true,"legendPosition":"right","isDonut":true,"labels":{"show":false,"values":true,"last_level":true,"truncate":100}},"aggs":[{"id":"1","enabled":true,"type":"count","schema":"metric","params":{}},{"id":"2","enabled":true,"type":"terms","schema":"segment","params":{"field":"data.aws.eventName","size":5,"order":"desc","orderBy":"1","otherBucket":false,"otherBucketLabel":"Other","missingBucket":false,"missingBucketLabel":"Missing"}}]}',
+      uiStateJSON: '{}',
+      description: '',
+      version: 1,
+      kibanaSavedObjectMeta: {
+        searchSourceJSON:
+          '{"index":"wazuh-alerts","query":{"query":"","language":"lucene"},"filter":[]}'
       }
     }
   }

@@ -150,15 +150,6 @@ app.controller('settingsController', function(
 
     getCurrentAPIIndex();
 
-    if (currentApi && !appState.getExtensions(JSON.parse(currentApi).id)) {
-      appState.setExtensions(
-        $scope.apiEntries[currentApiEntryIndex]._id,
-        $scope.apiEntries[currentApiEntryIndex]._source.extensions
-      );
-    }
-
-    $scope.extensions = appState.getExtensions(JSON.parse(currentApi).id);
-
     if (!$scope.$$phase) $scope.$digest();
     return;
   };
@@ -190,15 +181,6 @@ app.controller('settingsController', function(
       if (!$scope.$$phase) $scope.$digest();
       getCurrentAPIIndex();
       if (!currentApiEntryIndex) return;
-
-      if (currentApi && !appState.getExtensions(JSON.parse(currentApi).id)) {
-        appState.setExtensions(
-          $scope.apiEntries[currentApiEntryIndex]._id,
-          $scope.apiEntries[currentApiEntryIndex]._source.extensions
-        );
-      }
-
-      $scope.extensions = appState.getExtensions(JSON.parse(currentApi).id);
 
       if (!$scope.$$phase) $scope.$digest();
       return;
@@ -273,21 +255,12 @@ app.controller('settingsController', function(
         url: $scope.formData.url,
         port: $scope.formData.port,
         cluster_info: {},
-        insecure: 'true',
-        extensions: {}
+        insecure: 'true'
       };
 
       const config = wazuhConfig.getConfig();
 
       appState.setPatternSelector(config['ip.selector']);
-
-      tmpData.extensions.audit = config['extensions.audit'];
-      tmpData.extensions.pci = config['extensions.pci'];
-      tmpData.extensions.gdpr = config['extensions.gdpr'];
-      tmpData.extensions.oscap = config['extensions.oscap'];
-      tmpData.extensions.ciscat = config['extensions.ciscat'];
-      tmpData.extensions.aws = config['extensions.aws'];
-      tmpData.extensions.virustotal = config['extensions.virustotal'];
 
       const checkData = await testAPI.check(tmpData);
 
@@ -300,7 +273,7 @@ app.controller('settingsController', function(
         '/api/wazuh-api/settings',
         tmpData
       );
-      appState.setExtensions(data.data.response._id, tmpData.extensions);
+
       const newEntry = {
         _id: data.data.response._id,
         _source: {
@@ -308,8 +281,7 @@ app.controller('settingsController', function(
           active: tmpData.active,
           url: tmpData.url,
           api_user: tmpData.user,
-          api_port: tmpData.port,
-          extensions: tmpData.extensions
+          api_port: tmpData.port
         }
       };
       $scope.apiEntries.push(newEntry);
@@ -404,8 +376,7 @@ app.controller('settingsController', function(
         port: $scope.formUpdate.port,
         cluster_info: {},
         insecure: 'true',
-        id: $scope.apiEntries[index]._id,
-        extensions: $scope.apiEntries[index]._source.extensions
+        id: $scope.apiEntries[index]._id
       };
 
       const data = await testAPI.check(tmpData);
@@ -481,23 +452,6 @@ app.controller('settingsController', function(
     }
   };
 
-  // Toggle extension
-  $scope.toggleExtension = (extension, state) => {
-    try {
-      const api = JSON.parse(appState.getCurrentAPI()).id;
-      const currentExtensions = appState.getExtensions(api);
-      currentExtensions[extension] = state;
-      appState.setExtensions(api, currentExtensions);
-      getCurrentAPIIndex();
-      $scope.apiEntries[
-        currentApiEntryIndex
-      ]._source.extensions = currentExtensions;
-      if (!$scope.$$phase) $scope.$digest();
-    } catch (error) {
-      errorHandler.handle(error, 'Settings');
-    }
-  };
-
   $scope.changeIndexPattern = async newIndexPattern => {
     try {
       appState.setCurrentPattern(newIndexPattern);
@@ -562,21 +516,6 @@ app.controller('settingsController', function(
       } else {
         // There's no pattern in the cookies, pick the one in the settings
         $scope.selectedIndexPattern = config['pattern'];
-      }
-
-      if (!appState.getCurrentAPI()) {
-        $scope.extensions = {};
-        $scope.extensions.audit = config['extensions.audit'];
-        $scope.extensions.pci = config['extensions.pci'];
-        $scope.extensions.gdpr = config['extensions.gdpr'];
-        $scope.extensions.oscap = config['extensions.oscap'];
-        $scope.extensions.ciscat = config['extensions.ciscat'];
-        $scope.extensions.aws = config['extensions.aws'];
-        $scope.extensions.virustotal = config['extensions.virustotal'];
-      } else {
-        $scope.extensions = appState.getExtensions(
-          JSON.parse(appState.getCurrentAPI()).id
-        );
       }
 
       if ($scope.tab === 'logs') {

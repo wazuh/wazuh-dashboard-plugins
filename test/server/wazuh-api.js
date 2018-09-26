@@ -71,7 +71,6 @@ describe('wazuh-api', () => {
     res.body.data.password.should.be.a('string');
     res.body.data.url.should.be.a('string');
     res.body.data.port.should.be.a('string');
-    res.body.data.extensions.should.be.a('object');
     res.body.data.cluster_info.should.be.a('object');
   });
 

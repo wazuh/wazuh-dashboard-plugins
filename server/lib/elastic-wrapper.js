@@ -310,7 +310,12 @@ export class ElasticWrapper {
             'index-pattern': {
               fields: currentFieldsString,
               fieldFormatMap:
-                '{"data.virustotal.permalink":{"id":"url"},"data.vulnerability.reference":{"id":"url"},"data.url":{"id":"url"},"rule.id":{"id":"url","params":{"urlTemplate":"/app/wazuh#/manager/?tab=ruleset&ruleid={{value}}","labelTemplate":"{{value}}","openLinkInCurrentTab":true}}}'
+                `{
+                  "data.virustotal.permalink":{"id":"url"},
+                  "data.vulnerability.reference":{"id":"url"},"data.url":{"id":"url"},
+                  "rule.id":{"id":"url","params":{"urlTemplate":"/app/wazuh#/manager/?tab=ruleset&ruleid={{value}}","labelTemplate":"{{value}}","openLinkInCurrentTab":true}},
+                  "agent.id":{"id":"url","params":{"urlTemplate":"/app/wazuh#/agents-preview/?_g=()&agent={{value}}","labelTemplate":"{{value}}","openLinkInCurrentTab":true}}
+                }`
             }
           }
         }
@@ -437,8 +442,7 @@ export class ElasticWrapper {
         url: data._source.url,
         port: data._source.api_port,
         insecure: data._source.insecure,
-        cluster_info: data._source.cluster_info,
-        extensions: data._source.extensions
+        cluster_info: data._source.cluster_info
       };
     } catch (error) {
       return Promise.reject(error);

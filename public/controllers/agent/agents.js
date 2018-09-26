@@ -77,10 +77,6 @@ class AgentsController {
     this.filterHandler = new FilterHandler(this.appState.getCurrentPattern());
     this.visFactoryService.clearAll();
 
-    const currentApi = JSON.parse(this.appState.getCurrentAPI()).id;
-    const extensions = this.appState.getExtensions(currentApi);
-    this.$scope.extensions = extensions;
-
     this.$scope.tabView = this.commonData.checkTabViewLocation();
     this.$scope.tab = this.commonData.checkTabLocation();
 
@@ -131,7 +127,7 @@ class AgentsController {
         : 'Never connected';
     };
     this.$scope.getAgent = async newAgentId => this.getAgent(newAgentId);
-    this.$scope.goGroups = agent => this.goGroups(agent);
+    this.$scope.goGroups = (agent, group) => this.goGroups(agent, group);
     this.$scope.analyzeAgents = async searchTerm =>
       this.analyzeAgents(searchTerm);
     this.$scope.downloadCsv = async data_path => this.downloadCsv(data_path);
@@ -410,9 +406,9 @@ class AgentsController {
     return;
   }
 
-  goGroups(agent) {
+  goGroups(agent, group) {
     this.visFactoryService.clearAll();
-    this.shareAgent.setAgent(agent);
+    this.shareAgent.setAgent(agent, group);
     this.$location.search('tab', 'groups');
     this.$location.path('/manager');
   }
