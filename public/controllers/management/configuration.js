@@ -33,6 +33,7 @@ class ConfigurationController {
     this.$scope.getXML = () => this.configurationHandler.getXML(this.$scope);
     this.$scope.getJSON = () => this.configurationHandler.getJSON(this.$scope);
     this.$scope.isString = item => typeof item === 'string';
+    this.$scope.hasSize = obj => obj && typeof obj === 'object' && Object.keys(obj).length;
     this.$scope.switchConfigTab = (configurationTab, sections) => this.configurationHandler.switchConfigTab(configurationTab, sections, this.$scope);
     this.$scope.switchWodle = wodleName => this.configurationHandler.switchWodle(wodleName, this.$scope);
     this.$scope.switchConfigurationTab = configurationTab => this.configurationHandler.switchConfigurationTab(configurationTab, this.$scope);

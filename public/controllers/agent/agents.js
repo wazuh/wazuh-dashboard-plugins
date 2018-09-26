@@ -172,6 +172,7 @@ class AgentsController {
     this.$scope.getXML = () => this.configurationHandler.getXML(this.$scope);
     this.$scope.getJSON = () => this.configurationHandler.getJSON(this.$scope);
     this.$scope.isString = item => typeof item === 'string';
+    this.$scope.hasSize = obj => obj && typeof obj === 'object' && Object.keys(obj).length;
     this.$scope.switchConfigTab = (configurationTab, sections) => this.configurationHandler.switchConfigTab(configurationTab, sections, this.$scope, this.$scope.agent.id);
     this.$scope.switchWodle = wodleName => this.configurationHandler.switchWodle(wodleName, this.$scope, this.$scope.agent.id);
     this.$scope.switchConfigurationTab = configurationTab => this.configurationHandler.switchConfigurationTab(configurationTab, this.$scope);
@@ -259,6 +260,11 @@ class AgentsController {
 
   // Switch tab
   switchTab(tab, force = false) {
+    if(tab === 'configuration') {
+      this.$scope.switchConfigurationTab('welcome');
+    } else {
+      this.configurationHandler.reset(this.$scope);
+    }
     if (tab !== 'configuration' && tab !== 'welcome' && tab !== 'syscollector')
       this.tabHistory.push(tab);
     if (this.tabHistory.length > 2) this.tabHistory = this.tabHistory.slice(-2);

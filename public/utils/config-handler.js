@@ -180,4 +180,12 @@ export class ConfigurationHandler {
     }
     if (!$scope.$$phase) $scope.$digest();
   }
+
+  reset($scope) {
+    $scope.currentConfig = null;
+    $scope.configurationTab = '';
+    $scope.configurationSubTab = '';
+    $scope.integrations = {};
+    $scope.selectedItem = 0;
+  }
 }
