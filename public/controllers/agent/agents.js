@@ -9,7 +9,6 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import beautifier from '../../utils/json-beautifier';
 import { uiModules } from 'ui/modules';
 import { FilterHandler } from '../../utils/filter-handler';
 import { generateMetric } from '../../utils/generate-metric';
@@ -24,6 +23,8 @@ import {
   metricsCiscat,
   metricsVirustotal
 } from '../../utils/agents-metrics';
+
+import { ConfigurationHandler } from '../../utils/config-handler';
 
 const app = uiModules.get('app/wazuh', []);
 
@@ -56,6 +57,15 @@ class AgentsController {
     this.visFactoryService = visFactoryService;
     this.csvReq = csvReq;
     this.wzTableFilter = wzTableFilter;
+
+    // Config on-demand
+    this.$scope.isArray = Array.isArray;
+    this.configurationHandler = new ConfigurationHandler(apiReq, errorHandler);
+    this.$scope.currentConfig = null;
+    this.$scope.configurationTab = '';
+    this.$scope.configurationSubTab = '';
+    this.$scope.integrations = {};
+    this.$scope.selectedItem = 0;
   }
 
   $onInit() {
@@ -86,8 +96,7 @@ class AgentsController {
     this.$scope.hostMonitoringTabs = [
       'general',
       'fim',
-      'configuration',
-      'syscollector'
+       'syscollector'
     ];
     this.$scope.systemAuditTabs = ['pm', 'audit', 'oscap', 'ciscat'];
     this.$scope.securityTabs = ['vuls', 'virustotal'];
@@ -143,13 +152,6 @@ class AgentsController {
 
     this.$scope.isArray = Array.isArray;
 
-    this.$scope.getAgentConfig = newAgentId => {
-      if (newAgentId) {
-        this.$location.search('agent', newAgentId);
-      }
-      this.firstLoad();
-    };
-
     this.$scope.goGroup = () => {
       this.shareAgent.setAgent(this.$scope.agent);
       this.$location.path('/manager/groups');
@@ -164,6 +166,18 @@ class AgentsController {
         'Agents'
       );
     }
+
+    // Config on demand
+    this.$scope.getXML = () => this.configurationHandler.getXML(this.$scope);
+    this.$scope.getJSON = () => this.configurationHandler.getJSON(this.$scope);
+    this.$scope.isString = item => typeof item === 'string';
+    this.$scope.hasSize = obj => obj && typeof obj === 'object' && Object.keys(obj).length;
+    this.$scope.switchConfigTab = (configurationTab, sections) => this.configurationHandler.switchConfigTab(configurationTab, sections, this.$scope, this.$scope.agent.id);
+    this.$scope.switchWodle = wodleName => this.configurationHandler.switchWodle(wodleName, this.$scope, this.$scope.agent.id);
+    this.$scope.switchConfigurationTab = configurationTab => this.configurationHandler.switchConfigurationTab(configurationTab, this.$scope);
+    this.$scope.switchConfigurationSubTab = configurationSubTab => this.configurationHandler.switchConfigurationSubTab(configurationSubTab, this.$scope);
+    this.$scope.updateSelectedItem = i => this.$scope.selectedItem = i;
+    this.$scope.getIntegration = list => this.configurationHandler.getIntegration(list, this.$scope);
   }
 
   createMetrics(metricsObject) {
@@ -245,6 +259,11 @@ class AgentsController {
 
   // Switch tab
   switchTab(tab, force = false) {
+    if(tab === 'configuration') {
+      this.$scope.switchConfigurationTab('welcome');
+    } else {
+      this.configurationHandler.reset(this.$scope);
+    }
     if (tab !== 'configuration' && tab !== 'welcome' && tab !== 'syscollector')
       this.tabHistory.push(tab);
     if (this.tabHistory.length > 2) this.tabHistory = this.tabHistory.slice(-2);
@@ -356,11 +375,6 @@ class AgentsController {
 
       const id = this.commonData.checkLocationAgentId(newAgentId, globalAgent);
 
-      if (this.$scope.tab === 'configuration') {
-        await this.loadSyscollector(id);
-        return this.$scope.getAgentConfig(id);
-      }
-
       const data = await Promise.all([
         this.apiReq.request('GET', `/agents/${id}`, {}),
         this.apiReq.request('GET', `/syscheck/${id}/last_scan`, {}),
@@ -463,50 +477,6 @@ class AgentsController {
         return;
       }
 
-      const configurationData = await this.apiReq.request(
-        'GET',
-        `/agents/groups/${this.$scope.groupName}/configuration`,
-        {}
-      );
-      this.$scope.groupConfiguration = configurationData.data.data.items[0];
-      this.$scope.rawJSON = beautifier.prettyPrint(
-        configurationData.data.data.items
-      );
-
-      const agentGroups = await Promise.all([
-        this.apiReq.request(
-          'GET',
-          `/agents/groups?search=${this.$scope.groupName}`,
-          {}
-        ),
-        this.apiReq.request(
-          'GET',
-          `/agents/groups/${this.$scope.groupName}`,
-          {}
-        )
-      ]);
-
-      const groupMergedSum = agentGroups[0].data.data.items.filter(
-        item => item.name === this.$scope.groupName
-      );
-      this.$scope.groupMergedSum = groupMergedSum.length
-        ? groupMergedSum[0].mergedSum
-        : 'Unknown';
-
-      const agentMergedSum = agentGroups[1].data.data.items.filter(
-        item => item.id === this.$scope.agent.id
-      );
-      this.$scope.agentMergedSum = agentMergedSum.length
-        ? agentMergedSum[0].mergedSum
-        : 'Unknown';
-
-      this.$scope.isSynchronized =
-        this.$scope.agentMergedSum === this.$scope.groupMergedSum &&
-        ![this.$scope.agentMergedSum, this.$scope.groupMergedSum].includes(
-          'Unknown'
-        )
-          ? true
-          : false;
 
       this.$scope.load = false;
 

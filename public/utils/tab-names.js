@@ -9,6 +9,7 @@
  *
  * Find more information about this on the LICENSE file.
  */
+
 export const TabNames = {
   welcome: 'Welcome',
   general: 'Security events',
@@ -35,5 +36,26 @@ export const TabNames = {
   logs: 'Logs',
   groups: 'Groups',
   monitoring: 'Monitoring',
-  reporting: 'Reporting'
+  reporting: 'Reporting',
+  'registration-service': 'Registration service',
+  cluster: 'Cluster',
+  'wazuh-modules': 'Wazuh modules',
+  'active-response': 'Active response',
+  integrations: 'Integrations',
+  'database-output': 'Database output',
+  alerts: 'Alerts',
+  'global-configuration': 'Global configuration',
+  'integrity-monitoring': 'Integrity monitoring',
+  'policy-monitoring': 'Policy monitoring',
+  'log-collection': 'Log collection',
+  agentless: 'Agentless',
+  inventory: 'Inventory',
+  osquery: 'Osquery',
+  'open-scap': 'OpenSCAP',
+  'cis-cat': 'CIS-CAT',
+  'vulnerability-detector': 'Vulnerabilities',
+  'aws-s3': 'Amazon S3',
+  'command': 'Wazuh commands',
+  'client': 'Client configuration',
+  'client-buffer': 'Client buffer configuration'
 };

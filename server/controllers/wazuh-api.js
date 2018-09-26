@@ -26,6 +26,7 @@ import simpleTail from 'simple-tail';
 import path from 'path';
 import { log } from '../logger';
 import { KeyEquivalenece } from '../../util/csv-key-equivalence';
+import { cleanKeys } from '../../util/remove-key';
 
 export class WazuhApiCtrl {
   constructor(server) {
@@ -585,13 +586,7 @@ export class WazuhApiCtrl {
         !response.body.error &&
         response.body.data
       ) {
-        if (
-          path.includes('/manager/configuration') &&
-          response.body.data.cluster &&
-          response.body.data.cluster.key
-        ) {
-          response.body.data.cluster.key = '*************';
-        }
+        cleanKeys(response);
         return reply(response.body);
       }
 
@@ -640,6 +635,7 @@ export class WazuhApiCtrl {
         !response.body.error &&
         response.body.data
       ) {
+        cleanKeys(response);
         return response.body;
       }
 
