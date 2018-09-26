@@ -24,57 +24,57 @@
                     <span ng-class="XMLContent ? 'wz-text-active' : ''" class="wz-text-link small" ng-click="getXML()">XML</span>
                 </div>
                 <md-divider class="wz-margin-top-10"></md-divider>
-                
+
                 <div flex="auto" layout="row" class="wz-margin-top-10">
 
                     <!-- List container -->
                     <div flex="30" layout="column">
-        
+
                         <md-list flex="auto" class="wz-item-list">
                             <md-list-item class="wz-text-link" ng-click="updateSelectedItem($index)" ng-repeat="item in currentConfig['mail-alerts'].email_alerts">{{item.email_to}}</md-list-item>
                         </md-list>
-        
+
                     </div>
                     <!-- End list container -->
-        
+
                     <!-- Detail container -->
                     <div flex layout="column" ng-if="currentConfig['mail-alerts'].email_alerts.length">
-                        
+
                         <div flex="auto" class="wz-item-detail">
                             <wz-config-item
-                            label="Send alerts to this email address"
-                            value="currentConfig['mail-alerts'].email_alerts[selectedItem].email_to">
-                        </wz-config-item>
-                        <wz-config-item
-                            label="Minimum severity level to send the alert by email"
-                            value="currentConfig['mail-alerts'].email_alerts[selectedItem].level">
-                        </wz-config-item>
-                        <wz-config-item
-                            label="Send only alerts that belong to one of these groups"
-                            value="currentConfig['mail-alerts'].email_alerts[selectedItem].group">
-                        </wz-config-item>
-                        <wz-config-item
-                            label="Send alerts when they match this event location"
-                            value="currentConfig['mail-alerts'].email_alerts[selectedItem].event_location">
-                        </wz-config-item>
-                        <wz-config-item
-                            label="Format for email alerts"
-                            value="currentConfig['mail-alerts'].email_alerts[selectedItem].format">
-                        </wz-config-item>
-                        <wz-config-item
-                            label="Send only alerts that belong to one of these rule IDs"
-                            value="currentConfig['mail-alerts'].email_alerts[selectedItem].rule_id">
-                        </wz-config-item>
-                        <wz-config-item
-                            label="Disable delayed email delivery"
-                            value="currentConfig['mail-alerts'].email_alerts[selectedItem].do_not_delay">
-                        </wz-config-item>
-                        <wz-config-item
-                            label="Disable alerts grouping into the same email"
-                            value="currentConfig['mail-alerts'].email_alerts[selectedItem].do_not_group">
-                        </wz-config-item>
+                                label="Send alerts to this email address"
+                                value="currentConfig['mail-alerts'].email_alerts[selectedItem].email_to">
+                            </wz-config-item>
+                            <wz-config-item
+                                label="Minimum severity level to send the alert by email"
+                                value="currentConfig['mail-alerts'].email_alerts[selectedItem].level">
+                            </wz-config-item>
+                            <wz-config-item
+                                label="Send only alerts that belong to one of these groups"
+                                value="currentConfig['mail-alerts'].email_alerts[selectedItem].group">
+                            </wz-config-item>
+                            <wz-config-item
+                                label="Send alerts when they match this event location"
+                                value="currentConfig['mail-alerts'].email_alerts[selectedItem].event_location">
+                            </wz-config-item>
+                            <wz-config-item
+                                label="Format for email alerts"
+                                value="currentConfig['mail-alerts'].email_alerts[selectedItem].format">
+                            </wz-config-item>
+                            <wz-config-item
+                                label="Send only alerts that belong to one of these rule IDs"
+                                value="currentConfig['mail-alerts'].email_alerts[selectedItem].rule_id">
+                            </wz-config-item>
+                            <wz-config-item
+                                label="Disable delayed email delivery"
+                                value="currentConfig['mail-alerts'].email_alerts[selectedItem].do_not_delay">
+                            </wz-config-item>
+                            <wz-config-item
+                                label="Disable alerts grouping into the same email"
+                                value="currentConfig['mail-alerts'].email_alerts[selectedItem].do_not_group">
+                            </wz-config-item>
                         </div>
-        
+
                     </div>
                     <!-- End detail container -->
                 </div>

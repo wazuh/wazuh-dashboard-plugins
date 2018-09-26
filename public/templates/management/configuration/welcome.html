@@ -80,13 +80,19 @@
                     <md-divider class="wz-margin-top-10"></md-divider>
 
                     <md-list layout="row" layout-wrap>
-                        <md-list-item flex="100" flex-gt-md="50" flex-gt-lg="33" class="md-2-line">
+                        <md-list-item flex="100" flex-gt-md="50" flex-gt-lg="33" class="md-2-line" ng-if="!agent || agent.id === '000'">
                             <div class="md-list-item-text">
-                                <h3 class="wz-text-link" ng-click="switchConfigTab('alerts',[{component:'analysis',configuration:'alerts'},{component:'agent',configuration:'labels'},{component:'mail',configuration:'alerts'}, {component:'csyslog',configuration:'csyslog'}])">Alerts</h3>
+                                <h3 class="wz-text-link" ng-click="switchConfigTab('alerts',[{component:'analysis',configuration:'alerts'},{component:'analysis',configuration:'labels'},{component:'mail',configuration:'alerts'}, {component:'csyslog',configuration:'csyslog'}])">Alerts</h3>
                                 <p>Configure everything related to the alerts and their format</p>
                             </div>
                         </md-list-item>
-                        <md-list-item flex="100" flex-gt-md="50" flex-gt-lg="33" class="md-2-line" ng-if="!agent || agent.id==='000'">
+                        <md-list-item flex="100" flex-gt-md="50" flex-gt-lg="33" class="md-2-line" ng-if="agent && agent.id !== '000'">
+                            <div class="md-list-item-text">
+                                <h3 class="wz-text-link" ng-click="switchConfigTab('alerts',[{component:'agent',configuration:'labels'}])">Alerts</h3>
+                                <p>Configure everything related to the alerts and their format</p>
+                            </div>
+                        </md-list-item>
+                        <md-list-item flex="100" flex-gt-md="50" flex-gt-lg="33" class="md-2-line" ng-if="!agent || agent.id === '000'">
                             <div class="md-list-item-text">
                                 <h3 class="wz-text-link" ng-click="switchConfigTab('integrations',[{component:'integrator',configuration:'integration'}])">Integrations</h3>
                                 <p>Slack, VirusTotal and PagerDuty integrations with external APIs</p>
@@ -142,7 +148,7 @@
                     <md-divider class="wz-margin-top-10"></md-divider>
 
                     <md-list layout="row" layout-wrap>
-                        <md-list-item flex="100" flex-gt-md="50" flex-gt-lg="33" class="md-2-line" ng-if="!agent || agent.id==='000'">
+                        <md-list-item flex="100" flex-gt-md="50" flex-gt-lg="33" class="md-2-line" ng-if="!agent || agent.id === '000'">
                             <div class="md-list-item-text">
                                 <h3 class="wz-text-link" ng-click="switchWodle('vulnerability-detector')">Vulnerabilities</h3>
                                 <p>Discover what applications in your environment are affected by well-known vulnerabilities</p>
@@ -197,7 +203,7 @@
                                 <p>Identification of changes in content, permissions, ownership, and attributes of files</p>
                             </div>
                         </md-list-item>
-                        <md-list-item flex="100" flex-gt-md="50" flex-gt-lg="33" class="md-2-line" ng-if="!agent || agent.id==='000'">
+                        <md-list-item flex="100" flex-gt-md="50" flex-gt-lg="33" class="md-2-line" ng-if="!agent || agent.id === '000'">
                             <div class="md-list-item-text">
                                 <h3 class="wz-text-link" ng-click="switchConfigTab('agentless',[{component:'agentless',configuration:'agentless'}])">Agentless</h3>
                                 <p>Run integrity checks on devices such as routers, firewalls, switches, etc.</p>
@@ -210,7 +216,7 @@
             <!-- End log data analysis card -->
 
             <!-- Cloud security monitoring card -->
-            <md-card class="wz-md-card" ng-if="!agent || agent.id==='000'">
+            <md-card class="wz-md-card" ng-if="!agent || agent.id === '000'">
                 <md-card-content>
                     <span class="font-size-16">Cloud security monitoring</span>
                     <md-divider class="wz-margin-top-10"></md-divider>
