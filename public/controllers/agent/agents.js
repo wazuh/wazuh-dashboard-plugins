@@ -400,7 +400,7 @@ class AgentsController {
 
       this.$scope.switchTab(this.$scope.tab, true);
 
-      //await this.loadSyscollector(id);
+      await this.loadSyscollector(id);
 
       this.$scope.load = false;
       if (!this.$scope.$$phase) this.$scope.$digest();
