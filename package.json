@@ -1,9 +1,9 @@
 {
     "name": "wazuh",
     "version": "3.6.1",
-    "revision": "0411",
+    "revision": "0412",
     "kibana": {
-        "version": "6.4.0"
+        "version": "6.4.1"
     },
     "engines": {
         "node": "8.11.4"
