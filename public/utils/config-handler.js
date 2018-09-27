@@ -112,6 +112,53 @@ export class ConfigurationHandler {
   }
 
   /**
+   * Determines if a wodle is enabled or not
+   * @param {string} wodleName The wodle to check
+   * @param {string} agentId The agent ID
+   */
+  async isWodleEnabled(wodleName, agentId = false) {
+    try {
+      // Get wodles configuration
+      let wodlesConfig = await queryConfig(
+        agentId || '000',
+        [{ component: 'wmodules', configuration: 'wmodules' }],
+        this.apiReq,
+        this.errorHandler
+      );
+
+      // Filter by provided wodleName
+      let result = [];
+      if (
+        wodleName &&
+        (wodleName !== 'command') &&
+        wodlesConfig &&
+        wodlesConfig['wmodules-wmodules'] &&
+        wodlesConfig['wmodules-wmodules'].wmodules
+      ) {
+        result = wodlesConfig['wmodules-wmodules'].wmodules.filter(
+          item => typeof item[wodleName] !== 'undefined'
+        );
+      }
+
+      // Assign results to wodlesConfig
+      if (result.length) {
+        wodlesConfig = result[0];
+      }
+
+      // Check if the selected wodle is enabled or not
+      if (wodlesConfig[wodleName].disabled === 'no') {
+        return true;
+      }
+      else if (wodlesConfig[wodleName].disabled === 'yes' || !wodlesConfig[wodleName].disabled) {
+        return false;
+      }
+    } catch (error) {
+      return false;
+    }
+    return;
+  }
+
+  /**
    * Switchs between configuration tabs
    * @param {*} configurationTab
    */
