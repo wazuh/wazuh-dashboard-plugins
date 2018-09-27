@@ -305,6 +305,15 @@ class AgentsController {
 
   async loadSyscollector(id) {
     try {
+      // Check that Syscollector is enabled before proceeding
+      this.$scope.syscollectorEnabled = await this.configurationHandler.isWodleEnabled('syscollector', id);
+
+      // If Syscollector is disabled, stop loading
+      if (!this.$scope.syscollectorEnabled) {
+        return;
+      }
+
+      // Continue API requests if we do have Syscollector enabled
       const data = await Promise.all([
         this.apiReq.request('GET', `/syscollector/${id}/hardware`, {}),
         this.apiReq.request('GET', `/syscollector/${id}/os`, {}),
