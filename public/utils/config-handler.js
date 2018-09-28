@@ -13,12 +13,12 @@ import js2xmlparser from 'js2xmlparser';
 import XMLBeautifier from './xml-beautifier';
 import beautifier from './json-beautifier';
 import { queryConfig } from '../services/query-config';
-import { objectWithoutProperties } from './remove-hash-key.js'
+import { objectWithoutProperties } from './remove-hash-key.js';
 
 export class ConfigurationHandler {
   constructor(apiReq, errorHandler) {
-      this.apiReq = apiReq;
-      this.errorHandler = errorHandler;
+    this.apiReq = apiReq;
+    this.errorHandler = errorHandler;
   }
 
   buildIntegrations(list, $scope) {
@@ -119,7 +119,7 @@ export class ConfigurationHandler {
   async isWodleEnabled(wodleName, agentId = false) {
     try {
       // Get wodles configuration
-      let wodlesConfig = await queryConfig(
+      const wodlesConfig = await queryConfig(
         agentId || '000',
         [{ component: 'wmodules', configuration: 'wmodules' }],
         this.apiReq,
@@ -130,32 +130,22 @@ export class ConfigurationHandler {
       let result = [];
       if (
         wodleName &&
-        (wodleName !== 'command') &&
+        wodleName !== 'command' &&
         wodlesConfig &&
         wodlesConfig['wmodules-wmodules'] &&
         wodlesConfig['wmodules-wmodules'].wmodules
       ) {
         result = wodlesConfig['wmodules-wmodules'].wmodules.filter(
-          item => typeof item[wodleName] !== 'undefined'
+          item =>
+            typeof item[wodleName] !== 'undefined' &&
+            item[wodleName].disabled === 'no'
         );
       }
 
-      // Assign results to wodlesConfig
-      if (result.length) {
-        wodlesConfig = result[0];
-      }
-
-      // Check if the selected wodle is enabled or not
-      if (wodlesConfig[wodleName].disabled === 'no') {
-        return true;
-      }
-      else if (wodlesConfig[wodleName].disabled === 'yes' || !wodlesConfig[wodleName].disabled) {
-        return false;
-      }
+      return !!result.length;
     } catch (error) {
       return false;
     }
-    return;
   }
 
   /**

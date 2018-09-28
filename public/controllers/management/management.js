@@ -24,10 +24,7 @@ class Management {
     this.$scope.rulesetTab = 'rules';
     this.$scope.tabNames = TabNames;
 
-    this.$scope.wazuhManagementTabs = [
-      'ruleset',
-      'groups'
-    ];
+    this.$scope.wazuhManagementTabs = ['ruleset', 'groups'];
     this.$scope.statusReportsTabs = [
       'status',
       'logs',

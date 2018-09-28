@@ -93,11 +93,7 @@ class AgentsController {
 
     this.tabVisualizations.assign('agents');
 
-    this.$scope.hostMonitoringTabs = [
-      'general',
-      'fim',
-       'syscollector'
-    ];
+    this.$scope.hostMonitoringTabs = ['general', 'fim', 'syscollector'];
     this.$scope.systemAuditTabs = ['pm', 'audit', 'oscap', 'ciscat'];
     this.$scope.securityTabs = ['vuls', 'virustotal'];
     this.$scope.complianceTabs = ['pci', 'gdpr'];
@@ -171,13 +167,34 @@ class AgentsController {
     this.$scope.getXML = () => this.configurationHandler.getXML(this.$scope);
     this.$scope.getJSON = () => this.configurationHandler.getJSON(this.$scope);
     this.$scope.isString = item => typeof item === 'string';
-    this.$scope.hasSize = obj => obj && typeof obj === 'object' && Object.keys(obj).length;
-    this.$scope.switchConfigTab = (configurationTab, sections) => this.configurationHandler.switchConfigTab(configurationTab, sections, this.$scope, this.$scope.agent.id);
-    this.$scope.switchWodle = wodleName => this.configurationHandler.switchWodle(wodleName, this.$scope, this.$scope.agent.id);
-    this.$scope.switchConfigurationTab = configurationTab => this.configurationHandler.switchConfigurationTab(configurationTab, this.$scope);
-    this.$scope.switchConfigurationSubTab = configurationSubTab => this.configurationHandler.switchConfigurationSubTab(configurationSubTab, this.$scope);
-    this.$scope.updateSelectedItem = i => this.$scope.selectedItem = i;
-    this.$scope.getIntegration = list => this.configurationHandler.getIntegration(list, this.$scope);
+    this.$scope.hasSize = obj =>
+      obj && typeof obj === 'object' && Object.keys(obj).length;
+    this.$scope.switchConfigTab = (configurationTab, sections) =>
+      this.configurationHandler.switchConfigTab(
+        configurationTab,
+        sections,
+        this.$scope,
+        this.$scope.agent.id
+      );
+    this.$scope.switchWodle = wodleName =>
+      this.configurationHandler.switchWodle(
+        wodleName,
+        this.$scope,
+        this.$scope.agent.id
+      );
+    this.$scope.switchConfigurationTab = configurationTab =>
+      this.configurationHandler.switchConfigurationTab(
+        configurationTab,
+        this.$scope
+      );
+    this.$scope.switchConfigurationSubTab = configurationSubTab =>
+      this.configurationHandler.switchConfigurationSubTab(
+        configurationSubTab,
+        this.$scope
+      );
+    this.$scope.updateSelectedItem = i => (this.$scope.selectedItem = i);
+    this.$scope.getIntegration = list =>
+      this.configurationHandler.getIntegration(list, this.$scope);
   }
 
   createMetrics(metricsObject) {
@@ -259,7 +276,7 @@ class AgentsController {
 
   // Switch tab
   switchTab(tab, force = false) {
-    if(tab === 'configuration') {
+    if (tab === 'configuration') {
       this.$scope.switchConfigurationTab('welcome');
     } else {
       this.configurationHandler.reset(this.$scope);
@@ -306,7 +323,10 @@ class AgentsController {
   async loadSyscollector(id) {
     try {
       // Check that Syscollector is enabled before proceeding
-      this.$scope.syscollectorEnabled = await this.configurationHandler.isWodleEnabled('syscollector', id);
+      this.$scope.syscollectorEnabled = await this.configurationHandler.isWodleEnabled(
+        'syscollector',
+        id
+      );
 
       // If Syscollector is disabled, stop loading
       if (!this.$scope.syscollectorEnabled) {
@@ -330,7 +350,7 @@ class AgentsController {
         })
       ]);
 
-      // Before proceeding, syscollector data is null
+      // Before proceeding, syscollector data is an empty object
       this.$scope.syscollector = {};
 
       const hardware = {};
@@ -349,7 +369,6 @@ class AgentsController {
         Object.keys(data[0].data.data).length
       ) {
         Object.assign(hardware, data[0].data.data);
-        this.$scope.syscollector.hardware = hardware;
       }
 
       // If there is OS information, add it
@@ -361,39 +380,34 @@ class AgentsController {
         Object.keys(data[1].data.data).length
       ) {
         Object.assign(os, data[1].data.data);
-        this.$scope.syscollector.os = os;
       }
 
       // If there is network information, add it
       if (data[2] && data[2].data && data[2].data.data) {
         Object.assign(netiface, data[2].data.data);
-        this.$scope.syscollector.netiface = netiface;
       }
 
       // If there is ports information, add it
       if (data[3] && data[3].data && data[3].data.data) {
         Object.assign(ports, data[3].data.data);
-        this.$scope.syscollector.ports = ports;
       }
 
       // If there is packages information, add it
       if (data[4] && data[4].data && data[4].data.data) {
         Object.assign(packagesDate, data[4].data.data);
-        this.$scope.syscollector.packagesDate = packagesDate && packagesDate.items && packagesDate.items.length ? packagesDate.items[0].scan_time : 'Unknown';
       }
 
       // If there is processes information, add it
       if (data[5] && data[5].data && data[5].data.data) {
         Object.assign(processesDate, data[5].data.data);
-        this.$scope.syscollector.processesDate = processesDate && processesDate.items && processesDate.items.length ? processesDate.items[0].scan_time : 'Unknown';
       }
 
       // Fill syscollector object
       this.$scope.syscollector = {
-        hardware: hardware,
-        os: os,
-        netiface: netiface,
-        ports: ports,
+        hardware,
+        os,
+        netiface,
+        ports,
         packagesDate:
           packagesDate && packagesDate.items && packagesDate.items.length
             ? packagesDate.items[0].scan_time
@@ -520,7 +534,6 @@ class AgentsController {
         if (!this.$scope.$$phase) this.$scope.$digest();
         return;
       }
-
 
       this.$scope.load = false;
 

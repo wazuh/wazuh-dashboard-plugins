@@ -594,10 +594,15 @@ export class WazuhApiCtrl {
       response.body &&
       response.body.error &&
       response.body.message
-        ? {message:response.body.message, code: response.body.error}
+        ? { message: response.body.message, code: response.body.error }
         : new Error('Unexpected error fetching data from the Wazuh API');
     } catch (error) {
-      return ErrorResponse(error.message || error, `Wazuh API error: ${error.code}` || 3013, 500, reply);
+      return ErrorResponse(
+        error.message || error,
+        `Wazuh API error: ${error.code}` || 3013,
+        500,
+        reply
+      );
     }
   }
 
@@ -643,7 +648,7 @@ export class WazuhApiCtrl {
       response.body &&
       response.body.error &&
       response.body.message
-        ? {message:response.body.message, code: response.body.error}
+        ? { message: response.body.message, code: response.body.error }
         : new Error('Unexpected error fetching data from the Wazuh API');
     } catch (error) {
       return Promise.reject(error);

@@ -48,7 +48,12 @@ export async function queryConfig(agentId, sections, apiReq, errorHandler) {
         );
         result[`${component}-${configuration}`] = partialResult.data.data;
       } catch (error) {
-        result[`${component}-${configuration}`] = errorHandler.handle(error, 'Fetch configuration', false, true);
+        result[`${component}-${configuration}`] = errorHandler.handle(
+          error,
+          'Fetch configuration',
+          false,
+          true
+        );
       }
     }
     return result;
