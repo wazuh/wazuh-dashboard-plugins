@@ -314,6 +314,7 @@ class AgentsController {
       }
 
       // Continue API requests if we do have Syscollector enabled
+      // Fetch Syscollector data
       const data = await Promise.all([
         this.apiReq.request('GET', `/syscollector/${id}/hardware`, {}),
         this.apiReq.request('GET', `/syscollector/${id}/os`, {}),
@@ -328,47 +329,81 @@ class AgentsController {
           select: 'scan_time'
         })
       ]);
+
+      // Before proceeding, syscollector data is null
+      this.$scope.syscollector = {};
+
+      const hardware = {};
+      const os = {};
+      const netiface = {};
+      const ports = {};
+      const packagesDate = {};
+      const processesDate = {};
+
+      // If there is hardware information, add it
       if (
-        !data[0] ||
-        !data[0].data ||
-        !data[0].data.data ||
-        typeof data[0].data.data !== 'object' ||
-        !Object.keys(data[0].data.data).length ||
-        !data[1] ||
-        !data[1].data ||
-        !data[1].data.data ||
-        typeof data[1].data.data !== 'object' ||
-        !Object.keys(data[1].data.data).length
+        data[0] &&
+        data[0].data &&
+        data[0].data.data &&
+        typeof data[0].data.data === 'object' &&
+        Object.keys(data[0].data.data).length
       ) {
-        this.$scope.syscollector = null;
-      } else {
-        const netiface = {};
-        const ports = {};
-        const packagesDate = {};
-        const processesDate = {};
-        if (data[2] && data[2].data && data[2].data.data)
-          Object.assign(netiface, data[2].data.data);
-        if (data[3] && data[3].data && data[3].data.data)
-          Object.assign(ports, data[3].data.data);
-        if (data[4] && data[4].data && data[4].data.data)
-          Object.assign(packagesDate, data[4].data.data);
-        if (data[5] && data[5].data && data[5].data.data)
-          Object.assign(processesDate, data[5].data.data);
-        this.$scope.syscollector = {
-          hardware: data[0].data.data,
-          os: data[1].data.data,
-          netiface: netiface,
-          ports: ports,
-          packagesDate:
-            packagesDate && packagesDate.items && packagesDate.items.length
-              ? packagesDate.items[0].scan_time
-              : 'Unknown',
-          processesDate:
-            processesDate && processesDate.items && processesDate.items.length
-              ? processesDate.items[0].scan_time
-              : 'Unknown'
-        };
+        Object.assign(hardware, data[0].data.data);
+        this.$scope.syscollector.hardware = hardware;
       }
+
+      // If there is OS information, add it
+      if (
+        data[1] &&
+        data[1].data &&
+        data[1].data.data &&
+        typeof data[1].data.data === 'object' &&
+        Object.keys(data[1].data.data).length
+      ) {
+        Object.assign(os, data[1].data.data);
+        this.$scope.syscollector.os = os;
+      }
+
+      // If there is network information, add it
+      if (data[2] && data[2].data && data[2].data.data) {
+        Object.assign(netiface, data[2].data.data);
+        this.$scope.syscollector.netiface = netiface;
+      }
+
+      // If there is ports information, add it
+      if (data[3] && data[3].data && data[3].data.data) {
+        Object.assign(ports, data[3].data.data);
+        this.$scope.syscollector.ports = ports;
+      }
+
+      // If there is packages information, add it
+      if (data[4] && data[4].data && data[4].data.data) {
+        Object.assign(packagesDate, data[4].data.data);
+        this.$scope.syscollector.packagesDate = packagesDate && packagesDate.items && packagesDate.items.length ? packagesDate.items[0].scan_time : 'Unknown';
+      }
+
+      // If there is processes information, add it
+      if (data[5] && data[5].data && data[5].data.data) {
+        Object.assign(processesDate, data[5].data.data);
+        this.$scope.syscollector.processesDate = processesDate && processesDate.items && processesDate.items.length ? processesDate.items[0].scan_time : 'Unknown';
+      }
+
+      // Fill syscollector object
+      this.$scope.syscollector = {
+        hardware: hardware,
+        os: os,
+        netiface: netiface,
+        ports: ports,
+        packagesDate:
+          packagesDate && packagesDate.items && packagesDate.items.length
+            ? packagesDate.items[0].scan_time
+            : 'Unknown',
+        processesDate:
+          processesDate && processesDate.items && processesDate.items.length
+            ? processesDate.items[0].scan_time
+            : 'Unknown'
+      };
+
       return;
     } catch (error) {
       return Promise.reject(error);
