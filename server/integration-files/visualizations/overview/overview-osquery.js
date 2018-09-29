@@ -74,5 +74,20 @@ export default [
           '{"index":"wazuh-alerts","query":{"query":"","language":"lucene"},"filter":[]}'
       }
     }
+  },
+  {
+    _id: 'Wazuh-App-Overview-Osquery-Agents-reporting',
+    _type: 'visualization',
+    _source: {
+      title: 'Agents reporting',
+      "visState": "{\"title\":\"Agents reporting\",\"type\":\"metric\",\"params\":{\"addTooltip\":true,\"addLegend\":false,\"type\":\"metric\",\"metric\":{\"percentageMode\":false,\"useRanges\":false,\"colorSchema\":\"Green to Red\",\"metricColorMode\":\"None\",\"colorsRange\":[{\"from\":0,\"to\":10000}],\"labels\":{\"show\":true},\"invertColors\":false,\"style\":{\"bgFill\":\"#000\",\"bgColor\":false,\"labelColor\":false,\"subText\":\"\",\"fontSize\":60}}},\"aggs\":[{\"id\":\"1\",\"enabled\":true,\"type\":\"cardinality\",\"schema\":\"metric\",\"params\":{\"field\":\"agent.id\"}}]}",
+      uiStateJSON: '{}',
+      description: '',
+      version: 1,
+      kibanaSavedObjectMeta: {
+        searchSourceJSON:
+          '{"index":"wazuh-alerts","query":{"query":"","language":"lucene"},"filter":[]}'
+      }
+    }
   }
 ];

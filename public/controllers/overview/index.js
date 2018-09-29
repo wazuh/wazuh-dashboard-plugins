@@ -21,7 +21,8 @@ import {
   metricsVulnerability,
   metricsScap,
   metricsCiscat,
-  metricsVirustotal
+  metricsVirustotal,
+  metricsOsquery
 } from '../../utils/overview-metrics';
 
 import { queryConfig } from '../../services/query-config';
@@ -97,6 +98,9 @@ app.controller('overviewController', function(
           break;
         case 'virustotal':
           createMetrics(metricsVirustotal);
+          break;
+        case 'osquery':
+          createMetrics(metricsOsquery);
           break;
       }
     }
@@ -253,10 +257,6 @@ app.controller('overviewController', function(
 
       $scope.wzMonitoringEnabled = !!configuration['wazuh.monitoring.enabled'];
 
-      if (!$scope.wzMonitoringEnabled) {
-        await getSummary();
-      }
-
       return;
     } catch (error) {
       $scope.wzMonitoringEnabled = true;
@@ -270,9 +270,7 @@ app.controller('overviewController', function(
 
       $scope.switchTab($scope.tab, true);
 
-      if ($scope.tab && $scope.tab === 'welcome') {
-        await getSummary();
-      }
+      await getSummary();
 
       if (!$scope.$$phase) $scope.$digest();
 

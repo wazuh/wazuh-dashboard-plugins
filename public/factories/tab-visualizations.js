@@ -40,7 +40,7 @@ export class TabVisualizations {
       gdpr: 6,
       aws: 6,
       virustotal: 7,
-      osquery: 4
+      osquery: 5
     };
 
     this.tabVisualizations = {};

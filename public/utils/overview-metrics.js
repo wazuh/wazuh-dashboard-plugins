@@ -69,6 +69,11 @@ const metricsVirustotal = {
   virusTotal: '[vis-id="\'Wazuh-App-Overview-Virustotal-Total\'"]'
 };
 
+// Metrics OSQuery
+const metricsOsquery = {
+  osqueryAgentsReporting:
+    '[vis-id="\'Wazuh-App-Overview-Osquery-Agents-reporting\'"]'
+};
 
 export default {
   metricsGeneral,
@@ -76,5 +81,6 @@ export default {
   metricsVulnerability,
   metricsScap,
   metricsCiscat,
-  metricsVirustotal
+  metricsVirustotal,
+  metricsOsquery
 };
