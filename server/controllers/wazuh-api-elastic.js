@@ -130,7 +130,8 @@ export class WazuhApiElasticCtrl {
       insecure: payload.insecure,
       component: 'API',
       active: payload.active,
-      cluster_info: payload.cluster_info
+      cluster_info: payload.cluster_info,
+      extensions: payload.extensions
     };
   }
 

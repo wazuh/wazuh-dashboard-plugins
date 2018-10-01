@@ -132,39 +132,39 @@
 
     <!-- System audit navigation bar -->
     <md-nav-bar
-        ng-if="inArray(tab, systemAuditTabs)"
+        ng-if="inArray(tab, systemAuditTabs) && (extensions.audit || extensions.oscap || extensions.ciscat)"
         class="wz-nav-bar"
         ng-show="tab !== 'welcome'"
         md-selected-nav-item="tab"
         nav-bar-aria-label="System audit navigation links">
         <md-nav-item class="wz-nav-item" md-nav-click="switchTab('pm')" name="pm">{{ tabNames['pm'] }}</md-nav-item>
-        <md-nav-item class="wz-nav-item" md-nav-click="switchTab('audit')" name="audit">{{ tabNames['audit'] }}</md-nav-item>
-        <md-nav-item class="wz-nav-item" md-nav-click="switchTab('oscap')" name="oscap">{{ tabNames['oscap'] }}</md-nav-item>
-        <md-nav-item class="wz-nav-item" md-nav-click="switchTab('ciscat')" name="ciscat">{{ tabNames['ciscat'] }}</md-nav-item>
+        <md-nav-item ng-show="extensions.audit" class="wz-nav-item" md-nav-click="switchTab('audit')" name="audit">{{ tabNames['audit'] }}</md-nav-item>
+        <md-nav-item ng-show="extensions.oscap" class="wz-nav-item" md-nav-click="switchTab('oscap')" name="oscap">{{ tabNames['oscap'] }}</md-nav-item>
+        <md-nav-item ng-show="extensions.ciscat" class="wz-nav-item" md-nav-click="switchTab('ciscat')" name="ciscat">{{ tabNames['ciscat'] }}</md-nav-item>
     </md-nav-bar>
     <!-- End System audit navigation bar -->
 
     <!-- Security navigation bar -->
     <md-nav-bar
-        ng-if="inArray(tab, securityTabs)"
+        ng-if="inArray(tab, securityTabs) && extensions.virustotal"
         class="wz-nav-bar"
         ng-show="tab !== 'welcome'"
         md-selected-nav-item="tab"
         nav-bar-aria-label="Security navigation links">
         <md-nav-item class="wz-nav-item" md-nav-click="switchTab('vuls')" name="vuls">{{ tabNames['vuls'] }}</md-nav-item>
-        <md-nav-item class="wz-nav-item" md-nav-click="switchTab('virustotal')" name="virustotal">{{ tabNames['virustotal'] }}</md-nav-item>
+        <md-nav-item ng-show="extensions.virustotal" class="wz-nav-item" md-nav-click="switchTab('virustotal')" name="virustotal">{{ tabNames['virustotal'] }}</md-nav-item>
     </md-nav-bar>
     <!-- End Security navigation bar -->
 
     <!-- Compliance navigation bar -->
     <md-nav-bar
-        ng-if="inArray(tab, complianceTabs)"
+        ng-if="inArray(tab, complianceTabs) && extensions.pci && extensions.gdpr"
         class="wz-nav-bar"
         ng-show="tab !== 'welcome'"
         md-selected-nav-item="tab"
         nav-bar-aria-label="Compliance navigation links">
-        <md-nav-item class="wz-nav-item" md-nav-click="switchTab('pci')" name="pci">{{ tabNames['pci'] }}</md-nav-item>
-        <md-nav-item class="wz-nav-item" md-nav-click="switchTab('gdpr')" name="gdpr">{{ tabNames['gdpr'] }}</md-nav-item>
+        <md-nav-item ng-show="extensions.pci" class="wz-nav-item" md-nav-click="switchTab('pci')" name="pci">{{ tabNames['pci'] }}</md-nav-item>
+        <md-nav-item ng-show="extensions.gdpr" class="wz-nav-item" md-nav-click="switchTab('gdpr')" name="gdpr">{{ tabNames['gdpr'] }}</md-nav-item>
     </md-nav-bar>
     <!-- End Compliance navigation bar -->
 

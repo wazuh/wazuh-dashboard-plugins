@@ -49,6 +49,10 @@ app.controller('overviewController', function(
   const filterHandler = new FilterHandler(appState.getCurrentPattern());
   visFactoryService.clearAll();
 
+  const currentApi = JSON.parse(appState.getCurrentAPI()).id;
+  const extensions = appState.getExtensions(currentApi);
+  $scope.extensions = extensions;
+
   $scope.wzMonitoringEnabled = false;
 
   // Tab names

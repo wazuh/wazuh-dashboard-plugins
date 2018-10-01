@@ -38,7 +38,8 @@ describe('wazuh-api-elastic', () => {
         insecure: true,
         component: 'API',
         active: true,
-        cluster_info: {}
+        cluster_info: {},
+        extensions: {}
       },
       headers
     );
@@ -64,7 +65,8 @@ describe('wazuh-api-elastic', () => {
         insecure: true,
         component: 'API',
         active: true,
-        cluster_info: {}
+        cluster_info: {},
+        extensions: {}
       },
       headers
     );
@@ -113,7 +115,8 @@ describe('wazuh-api-elastic', () => {
         insecure: true,
         component: 'API',
         active: true,
-        cluster_info: {}
+        cluster_info: {},
+        extensions: {}
       },
       headers
     );

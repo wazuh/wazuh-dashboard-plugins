@@ -32,6 +32,18 @@
 #checks.api     : true
 #checks.setup   : true
 #
+# --------------------------------- Extensions ---------------------------------
+#
+# Defines which extensions should be activated when you add a new API entry.
+# You can change them after Wazuh app starts.
+# Values must to be true or false.
+#extensions.pci       : true
+#extensions.gdpr      : true
+#extensions.audit     : true
+#extensions.oscap     : true
+#extensions.ciscat    : false
+#extensions.aws       : false
+#extensions.virustotal: false
 #
 # ---------------------------------- Time out ----------------------------------
 #
