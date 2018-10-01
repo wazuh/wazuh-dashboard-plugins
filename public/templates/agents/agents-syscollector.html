@@ -1,19 +1,42 @@
 <md-content layout="column" ng-if="tab === 'syscollector'" ng-show="!load">
-    
-    <div layout="row" layout-align="layout-padding" ng-if="!syscollector">
+
+    <div layout="row" class="layout-padding" ng-if="!syscollectorEnabled">
         <md-card flex class="wz-md-card" flex>
             <md-card-content class="wz-text-center">
-                <i class="fa fa-fw fa-info-circle" aria-hidden="true"></i> <span class="wz-headline-title">Inventory disabled</span>
+                <i class="fa fa-fw fa-info-circle" aria-hidden="true"></i> <span class="wz-headline-title">The inventory is disabled</span>
                 <md-divider class="wz-margin-top-10"></md-divider>
                 <div layout="column" class="wz-padding-top-10">
-                    <p>Inventory (syscollector) is disabled for this agent. Visit the documentation on <a target="_blank" href="https://documentation.wazuh.com/current/user-manual/reference/ossec-conf/wodle-syscollector.html">this link</a> to learn about how to enable it.
-                    </p>
+                    <p>The inventory (<span class="wz-text-monospace">syscollector</span>) is disabled for this agent. Visit the documentation on <a target="_blank" href="https://documentation.wazuh.com/current/user-manual/reference/ossec-conf/wodle-syscollector.html">this link</a> to learn about how to enable it.</p>
                 </div>
             </md-card-content>
         </md-card>
     </div>
 
-    <div layout="row" class="inventory-metrics" ng-if="syscollector">
+    <div layout="row" class="layout-padding" ng-if="syscollectorEnabled && !hasSize(syscollector)">
+        <md-card flex class="wz-md-card" flex>
+            <md-card-content class="wz-text-center">
+                <i class="fa fa-fw fa-info-circle" aria-hidden="true"></i> <span class="wz-headline-title">No scans available</span>
+                <md-divider class="wz-margin-top-10"></md-divider>
+                <div layout="column" class="wz-padding-top-10">
+                    <p>The inventory (<span class="wz-text-monospace">syscollector</span>) is enabled for this agent, but there are no scans yet. Check your agent configuration.</p>
+                </div>
+            </md-card-content>
+        </md-card>
+    </div>
+
+    <div layout="row" class="layout-padding wz-padding-bottom-0" ng-if="syscollectorEnabled && hasSize(syscollector) && (!hasSize(syscollector.hardware) || !hasSize(syscollector.os))">
+        <md-card flex class="wz-md-card" flex>
+            <md-card-content class="wz-text-center">
+                <i class="fa fa-fw fa-info-circle" aria-hidden="true"></i> <span class="wz-headline-title">Not enough Hardware or Operating System information</span>
+                <md-divider class="wz-margin-top-10"></md-divider>
+                <div layout="column" class="wz-padding-top-10">
+                    <p>There's not enough information about the hardware or the Operating System. Check your agent configuration.</p>
+                </div>
+            </md-card-content>
+        </md-card>
+    </div>
+
+    <div layout="row" class="inventory-metrics" ng-if="syscollectorEnabled && hasSize(syscollector) && hasSize(syscollector.hardware) && hasSize(syscollector.os)">
         <md-card flex class="wz-metric-color wz-md-card">
             <md-card-content layout="row" class="wz-padding-metric">
                 <div flex="10">Cores: <span class="wz-text-bold">{{ syscollector.hardware.cpu.cores }}</span></div>
@@ -25,9 +48,16 @@
         </md-card>
     </div>
 
-    <div layout="row" class="layout-padding wz-padding-bottom-0" ng-if="syscollector">
+    <div layout="row" class="layout-padding wz-padding-bottom-0" ng-if="syscollectorEnabled && hasSize(syscollector)">
         <md-card flex class="wz-md-card">
-            <md-card-content>
+            <md-card-content class="wz-text-center" ng-if="syscollector.netiface && !syscollector.netiface.items.length">
+                <i class="fa fa-fw fa-info-circle" aria-hidden="true"></i> <span class="wz-headline-title">No interfaces scan available</span>
+                <md-divider class="wz-margin-top-10"></md-divider>
+                <div layout="column" class="wz-padding-top-10">
+                    <p>The interfaces scan is disabled or not ready yet. Wait a little bit and try refreshing the page.</p>
+                </div>
+            </md-card-content>
+            <md-card-content ng-if="syscollector.netiface && syscollector.netiface.items.length">
                 <span class="wz-headline-title"><i class="fa fa-fw fa-sitemap"></i> Network interfaces</span>
                 <span class="color-grey pull-right">Last scan: {{syscollector.netiface.items[0].scan.time}}</span>
                 <md-divider class="wz-margin-top-10"></md-divider>
@@ -57,7 +87,14 @@
             </md-card-content>
         </md-card>
         <md-card flex class="wz-md-card">
-            <md-card-content class="wz-margin-bottom-40-inv">
+            <md-card-content class="wz-text-center wz-margin-bottom-40-inv" ng-if="syscollector.ports && !syscollector.ports.items.length">
+                <i class="fa fa-fw fa-info-circle" aria-hidden="true"></i> <span class="wz-headline-title">No ports scan available</span>
+                <md-divider class="wz-margin-top-10"></md-divider>
+                <div layout="column" class="wz-padding-top-10">
+                    <p>The ports scan is disabled or not ready yet. Wait a little bit and try refreshing the page.</p>
+                </div>
+            </md-card-content>
+            <md-card-content class="wz-margin-bottom-40-inv" ng-if="syscollector.ports && syscollector.ports.items.length">
                 <span class="wz-headline-title"><i class="fa fa-fw fa-exchange"></i> Network ports</span>
                 <span class="color-grey pull-right">Last scan: {{syscollector.ports.items[0].scan.time}}</span>
                 <md-divider class="wz-margin-top-10"></md-divider>
@@ -66,8 +103,8 @@
             </md-card-content>
         </md-card>
     </div>
-    
-    <div layout="row" class="layout-padding wz-padding-top-0" ng-if="syscollector">
+
+    <div layout="row" class="layout-padding wz-padding-top-0" ng-if="syscollectorEnabled && hasSize(syscollector)">
         <md-card flex class="wz-md-card">
             <md-card-content>
                 <span class="wz-headline-title"><i class="fa fa-fw fa-cubes"></i> Packages</span>
@@ -80,7 +117,7 @@
                         <span class="fa fa-search" aria-hidden="true"></span>
                     </button>
                 </div>
-    
+
                 <div layout="row" ng-if="agent && syscollector && !load" class="wz-margin-top-10 wz-margin-bottom-40-inv">
                     <wz-table flex path="'/syscollector/' + agent.id + '/packages'" row-sizes="[6,4,3,3]" extra-limit="true" keys="[{value:'name',size:2},'architecture','version',{value:'vendor',size:2},{value:'description',size:3}]">
                     </wz-table>
@@ -89,7 +126,7 @@
         </md-card>
     </div>
 
-    <div layout="row" class="layout-padding wz-padding-top-0" ng-if="syscollector && syscollector.processesDate">
+    <div layout="row" class="layout-padding wz-padding-top-0" ng-if="syscollectorEnabled && hasSize(syscollector)">
         <md-card flex class="wz-md-card">
             <md-card-content>
                 <span class="wz-headline-title"><i class="fa fa-fw fa-terminal"></i> Processes</span>

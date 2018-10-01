@@ -69,7 +69,6 @@ const metricsVirustotal = {
   virusTotal: '[vis-id="\'Wazuh-App-Overview-Virustotal-Total\'"]'
 };
 
-
 export default {
   metricsGeneral,
   metricsAudit,
