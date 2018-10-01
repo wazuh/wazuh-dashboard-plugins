@@ -82,7 +82,7 @@ app.controller('settingsController', function(
       }
       await genericReq.request(
         'DELETE',
-        `/api/wazuh-api/apiEntries/${$scope.apiEntries[index]._id}`
+        `/elastic/apis/${$scope.apiEntries[index]._id}`
       );
       $scope.showEditForm[$scope.apiEntries[index]._id] = false;
       $scope.apiEntries.splice(index, 1);
@@ -166,7 +166,7 @@ app.controller('settingsController', function(
   // Get settings function
   const getSettings = async () => {
     try {
-      const patternList = await genericReq.request('GET', '/get-list', {});
+      const patternList = await genericReq.request('GET', '/elastic/index-patterns', {});
       $scope.indexPatterns = patternList.data.data;
 
       if (!patternList.data.data.length) {
@@ -175,7 +175,7 @@ app.controller('settingsController', function(
         $location.path('/blank-screen');
         return;
       }
-      const data = await genericReq.request('GET', '/api/wazuh-api/apiEntries');
+      const data = await genericReq.request('GET', '/elastic/apis');
       for (const entry of data.data) $scope.showEditForm[entry._id] = false;
 
       $scope.apiEntries = data.data.length > 0 ? data.data : [];
@@ -297,7 +297,7 @@ app.controller('settingsController', function(
       // Insert new API entry
       const data = await genericReq.request(
         'PUT',
-        '/api/wazuh-api/settings',
+        '/elastic/api',
         tmpData
       );
       appState.setExtensions(data.data.response._id, tmpData.extensions);
@@ -350,7 +350,7 @@ app.controller('settingsController', function(
       }
 
       try {
-        await genericReq.request('GET', '/api/wazuh-api/fetchAgents');
+        await genericReq.request('GET', '/api/monitoring');
       } catch (error) {
         if (error && error.status && error.status === -1) {
           errorHandler.handle(
@@ -412,7 +412,7 @@ app.controller('settingsController', function(
       tmpData.cluster_info = data.data;
       await genericReq.request(
         'PUT',
-        '/api/wazuh-api/update-settings',
+        '/elastic/api-settings',
         tmpData
       );
       $scope.apiEntries[index]._source.cluster_info = tmpData.cluster_info;
@@ -461,7 +461,7 @@ app.controller('settingsController', function(
       const data = await testAPI.check(tmpData);
       tmpData.cluster_info = data.data;
 
-      const tmpUrl = `/api/wazuh-api/updateApiHostname/${
+      const tmpUrl = `/elastic/api-hostname/${
         $scope.apiEntries[index]._id
       }`;
       await genericReq.request('PUT', tmpUrl, {
@@ -501,7 +501,7 @@ app.controller('settingsController', function(
   $scope.changeIndexPattern = async newIndexPattern => {
     try {
       appState.setCurrentPattern(newIndexPattern);
-      await genericReq.request('GET', `/refresh-fields/${newIndexPattern}`, {});
+      await genericReq.request('GET', `/elastic/known-fields/${newIndexPattern}`, {});
       $scope.$emit('updatePattern', {});
       errorHandler.info(
         'Successfully changed the default index-pattern',
@@ -528,7 +528,7 @@ app.controller('settingsController', function(
   const getAppLogs = async () => {
     try {
       $scope.loadingLogs = true;
-      const logs = await genericReq.request('GET', '/api/wazuh-api/logs', {});
+      const logs = await genericReq.request('GET', '/utils/logs', {});
       $scope.logs = logs.data.lastLogs.map(item => JSON.parse(item));
       $scope.loadingLogs = false;
       if (!$scope.$$phase) $scope.$digest();
@@ -545,7 +545,7 @@ app.controller('settingsController', function(
 
   const getAppInfo = async () => {
     try {
-      const data = await genericReq.request('GET', '/api/wazuh-elastic/setup');
+      const data = await genericReq.request('GET', '/elastic/setup');
       $scope.appInfo = {};
       $scope.appInfo['app-version'] = data.data.data['app-version'];
       $scope.appInfo['installationDate'] = data.data.data['installationDate'];

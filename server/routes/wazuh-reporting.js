@@ -17,7 +17,7 @@ export function WazuhReportingRoutes(server) {
   // Builds a PDF report from multiple PNG images
   server.route({
     method: 'POST',
-    path: '/api/wazuh-reporting/report',
+    path: '/reports',
     handler(req, res) {
       return ctrl.report(req, res);
     }
@@ -26,7 +26,7 @@ export function WazuhReportingRoutes(server) {
   // Fetch specific report
   server.route({
     method: 'GET',
-    path: '/api/wazuh-reporting/report/{name}',
+    path: '/reports/{name}',
     handler(req, res) {
       return ctrl.getReportByName(req, res);
     }
@@ -35,7 +35,7 @@ export function WazuhReportingRoutes(server) {
   // Delete specific report
   server.route({
     method: 'DELETE',
-    path: '/api/wazuh-reporting/report/{name}',
+    path: '/reports/{name}',
     handler(req, res) {
       return ctrl.deleteReportByName(req, res);
     }
@@ -44,7 +44,7 @@ export function WazuhReportingRoutes(server) {
   // Fetch the reports list
   server.route({
     method: 'GET',
-    path: '/api/wazuh-reporting/reports',
+    path: '/reports',
     handler(req, res) {
       return ctrl.getReports(req, res);
     }

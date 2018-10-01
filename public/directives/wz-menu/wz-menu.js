@@ -62,7 +62,7 @@ class WzMenu {
         let filtered = false;
         // If there is no current pattern, fetch it
         if (!appState.getCurrentPattern()) {
-          const currentPattern = await genericReq.request('GET', '/get-list');
+          const currentPattern = await genericReq.request('GET', '/elastic/index-patterns');
           if (!currentPattern.data.data.length) {
             wzMisc.setBlankScr('Sorry but no valid index patterns were found');
             $location.search('tab', null);
@@ -72,7 +72,7 @@ class WzMenu {
           appState.setCurrentPattern(currentPattern.data.data[0].id);
         } else {
           // If there is current pattern, check if there is some pattern
-          const patternList = await genericReq.request('GET', '/get-list');
+          const patternList = await genericReq.request('GET', '/elastic/index-patterns');
 
           if (!patternList.data.data.length) {
             wzMisc.setBlankScr('Sorry but no valid index patterns were found');

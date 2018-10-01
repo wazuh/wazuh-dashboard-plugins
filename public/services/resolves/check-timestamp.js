@@ -13,7 +13,7 @@ export async function checkTimestamp(appState, genericReq, $location, wzMisc) {
   try {
     const data = await genericReq.request(
       'GET',
-      '/api/wazuh-elastic/timestamp'
+      '/elastic/timestamp'
     );
     const current = appState.getCreatedAt();
     if (data && data.data) {

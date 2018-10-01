@@ -19,7 +19,7 @@ export class CSVRequest {
   }
 
   /**
-   * It fetchs data from /api/wazuh-api/csv route using the below parameters.
+   * It fetchs data from /api/csv route using the below parameters.
    * @param {string} path Wazuh API route
    * @param {number|string} id Elasticsearch document ID
    * @param {*} filters Array of Wazuh API filters. Optional
@@ -28,7 +28,7 @@ export class CSVRequest {
     try {
       const output = await this.genericReq.request(
         'POST',
-        '/api/wazuh-api/csv',
+        '/api/csv',
         { path, id, filters }
       );
       return output.data;

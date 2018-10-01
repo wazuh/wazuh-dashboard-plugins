@@ -49,7 +49,7 @@ class ReportingController {
       this.$scope.loading = true;
       await this.genericReq.request(
         'DELETE',
-        '/api/wazuh-reporting/report/' + name,
+        '/reports/' + name,
         {}
       );
       await this.load();
@@ -110,7 +110,7 @@ class ReportingController {
       this.$scope.loading = true;
       const data = await this.genericReq.request(
         'GET',
-        '/api/wazuh-reporting/reports',
+        '/reports',
         {}
       );
       this.items = data.data.list;

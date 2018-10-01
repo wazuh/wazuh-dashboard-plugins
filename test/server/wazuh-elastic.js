@@ -11,8 +11,8 @@ const headers = {
 
 describe('wazuh-elastic', () => {
   describe('Checking index patterns', () => {
-    it('GET /get-list', async () => {
-      const res = await needle('get', `localhost:5601/get-list`, {}, headers);
+    it('GET /elastic/index-patterns', async () => {
+      const res = await needle('get', `localhost:5601/elastic/index-patterns`, {}, headers);
       res.body.data.should.be.a('array');
       res.body.data.length.should.be.gt(0);
       res.body.data[0].should.be.a('object');
@@ -20,10 +20,10 @@ describe('wazuh-elastic', () => {
       res.body.data[0].title.should.be.a('string');
     });
 
-    it('GET /refresh-fields/{pattern}', async () => {
+    it('GET /elastic/known-fields/{pattern}', async () => {
       const res = await needle(
         'get',
-        `localhost:5601/refresh-fields/wazuh-alerts-3.x-*`,
+        `localhost:5601/elastic/known-fields/wazuh-alerts-3.x-*`,
         {},
         headers
       );
@@ -36,10 +36,10 @@ describe('wazuh-elastic', () => {
   });
 
   describe('Checking visualization composers', () => {
-    it('GET /api/wazuh-elastic/create-vis/{tab}/{pattern}', async () => {
+    it('GET /elastic/visualizations/{tab}/{pattern}', async () => {
       const res = await needle(
         'get',
-        `localhost:5601/api/wazuh-elastic/create-vis/overview-general/wazuh-alerts-3.x-*`,
+        `localhost:5601/elastic/visualizations/overview-general/wazuh-alerts-3.x-*`,
         {},
         headers
       );
@@ -51,10 +51,10 @@ describe('wazuh-elastic', () => {
       res.body.raw[0].id.should.be.a('string');
     });
 
-    it('POST /api/wazuh-elastic/create-vis/{tab}/{pattern}', async () => {
+    it('POST /elastic/visualizations/{tab}/{pattern}', async () => {
       const res = await needle(
         'post',
-        `localhost:5601/api/wazuh-elastic/create-vis/cluster-monitoring/wazuh-alerts-3.x-*`,
+        `localhost:5601/elastic/visualizations/cluster-monitoring/wazuh-alerts-3.x-*`,
         { nodes: { items: [], name: 'node01' } },
         headers
       );
@@ -68,10 +68,10 @@ describe('wazuh-elastic', () => {
   });
 
   describe('Checking template and index pattern existance', () => {
-    it('GET /api/wazuh-elastic/template/{pattern}', async () => {
+    it('GET /elastic/template/{pattern}', async () => {
       const res = await needle(
         'get',
-        `localhost:5601/api/wazuh-elastic/template/wazuh-alerts-3.x-*`,
+        `localhost:5601/elastic/template/wazuh-alerts-3.x-*`,
         {},
         headers
       );
@@ -80,10 +80,10 @@ describe('wazuh-elastic', () => {
       res.body.data.should.be.eql('Template found for wazuh-alerts-3.x-*');
     });
 
-    it('GET /api/wazuh-elastic/pattern/{pattern}', async () => {
+    it('GET /elastic/index-patterns/{pattern}', async () => {
       const res = await needle(
         'get',
-        `localhost:5601/api/wazuh-elastic/pattern/wazuh-alerts-3.x-*`,
+        `localhost:5601/elastic/index-patterns/wazuh-alerts-3.x-*`,
         {},
         headers
       );
@@ -93,15 +93,15 @@ describe('wazuh-elastic', () => {
     });
   });
 
-  /*it('GET /api/wazuh-elastic/top/{mode}/{cluster}/{field}/{pattern}', async () => {
+  /*it('GET /elastic/top/{mode}/{cluster}/{field}/{pattern}', async () => {
         throw Error('Test not implemented...')
     })*/
 
   describe('Checking .wazuh-version index', () => {
-    it('GET /api/wazuh-elastic/setup', async () => {
+    it('GET /elastic/setup', async () => {
       const res = await needle(
         'get',
-        `localhost:5601/api/wazuh-elastic/setup`,
+        `localhost:5601/elastic/setup`,
         {},
         headers
       );
@@ -114,10 +114,10 @@ describe('wazuh-elastic', () => {
       res.body.data.lastRestart.should.be.a('string');
     });
 
-    it('GET /api/wazuh-elastic/timestamp', async () => {
+    it('GET /elastic/timestamp', async () => {
       const res = await needle(
         'get',
-        `localhost:5601/api/wazuh-elastic/timestamp`,
+        `localhost:5601/elastic/timestamp`,
         {},
         headers
       );

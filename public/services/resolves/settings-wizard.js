@@ -183,7 +183,7 @@ export function settingsWizard(
       // There's no cookie for current API
       if (!appState.getCurrentAPI()) {
         genericReq
-          .request('GET', '/api/wazuh-api/apiEntries')
+          .request('GET', '/elastic/apis')
           .then(data => {
             if (data.data.length > 0) {
               const apiEntries = data.data;

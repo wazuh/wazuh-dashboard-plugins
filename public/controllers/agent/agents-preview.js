@@ -127,12 +127,12 @@ class AgentsPreviewController {
       const data = await Promise.all([
         this.genericReq.request(
           'GET',
-          '/api/wazuh-api/agents-unique/' + api,
+          '/api/agents-unique/' + api,
           {}
         ),
         this.genericReq.request(
           'GET',
-          `/api/wazuh-elastic/top/${firstUrlParam}/${secondUrlParam}/agent.name/${pattern}`
+          `/elastic/top/${firstUrlParam}/${secondUrlParam}/agent.name/${pattern}`
         )
       ]);
       const [agentsUnique, agentsTop] = data;
@@ -158,7 +158,7 @@ class AgentsPreviewController {
         this.$scope.mostActiveAgent.name = agentsTop.data.data;
         const info = await this.genericReq.request(
           'GET',
-          `/api/wazuh-elastic/top/${firstUrlParam}/${secondUrlParam}/agent.id/${pattern}`
+          `/elastic/top/${firstUrlParam}/${secondUrlParam}/agent.id/${pattern}`
         );
         if (info.data.data === '' && this.$scope.mostActiveAgent.name !== '') {
           this.$scope.mostActiveAgent.id = '000';
