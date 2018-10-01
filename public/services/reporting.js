@@ -72,7 +72,7 @@ export class ReportingService {
 
       await this.genericReq.request(
         'POST',
-        '/api/wazuh-reporting/report',
+        '/reports',
         data
       );
 

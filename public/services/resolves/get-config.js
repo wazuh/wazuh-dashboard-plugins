@@ -41,7 +41,7 @@ export async function getWzConfig($q, genericReq, errorHandler, wazuhConfig) {
   try {
     const config = await genericReq.request(
       'GET',
-      '/api/wazuh-api/configuration',
+      '/utils/configuration',
       {}
     );
 

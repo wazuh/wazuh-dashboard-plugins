@@ -45,7 +45,7 @@ export class ApiTester {
         /** End of checks for outdated cookies */
       } else {
         const result = await this.$http.post(
-          chrome.addBasePath('/api/wazuh-api/checkStoredAPI'),
+          chrome.addBasePath('/api/check-stored-api'),
           data,
           headers
         );
@@ -74,7 +74,7 @@ export class ApiTester {
         timeout: timeout || 8000
       };
 
-      const url = chrome.addBasePath('/api/wazuh-api/checkAPI');
+      const url = chrome.addBasePath('/api/check-api');
       const response = await this.$http.post(url, data, headers);
 
       if (response.error) {

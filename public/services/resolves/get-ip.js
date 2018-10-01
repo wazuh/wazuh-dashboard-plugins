@@ -39,7 +39,7 @@ export function getIp(
 
       const { savedObjects } = savedObjectsData;
 
-      const data = await genericReq.request('GET', '/get-list');
+      const data = await genericReq.request('GET', '/elastic/index-patterns');
 
       let currentPattern = '';
 

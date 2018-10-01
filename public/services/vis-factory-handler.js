@@ -48,7 +48,7 @@ export class VisFactoryService {
     try {
       const data = await this.genericReq.request(
         'GET',
-        `/api/wazuh-elastic/create-vis/overview-${tab}/${this.appState.getCurrentPattern()}`
+        `/elastic/visualizations/overview-${tab}/${this.appState.getCurrentPattern()}`
       );
       this.rawVisualizations.assignItems(data.data.raw);
       this.commonData.assignFilters(filterHandler, tab, localChange);
@@ -64,7 +64,7 @@ export class VisFactoryService {
     try {
       const data = await this.genericReq.request(
         'GET',
-        `/api/wazuh-elastic/create-vis/agents-${tab}/${this.appState.getCurrentPattern()}`
+        `/elastic/visualizations/agents-${tab}/${this.appState.getCurrentPattern()}`
       );
       this.rawVisualizations.assignItems(data.data.raw);
       this.commonData.assignFilters(filterHandler, tab, localChange, id);

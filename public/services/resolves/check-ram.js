@@ -11,7 +11,7 @@
  */
 export async function totalRAM(genericReq, errorHandler) {
   try {
-    const data = await genericReq.request('GET', '/api/wazuh-api/ram');
+    const data = await genericReq.request('GET', '/utils/memory');
     const totalRAM = data.data.ram;
     if (totalRAM < 3072 && totalRAM > 2048) {
       errorHandler.handle(

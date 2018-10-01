@@ -248,7 +248,7 @@ app.controller('clusterController', function(
 
       const visData = await genericReq.request(
         'POST',
-        `/api/wazuh-elastic/create-vis/cluster-monitoring/${appState.getCurrentPattern()}`,
+        `/elastic/visualizations/cluster-monitoring/${appState.getCurrentPattern()}`,
         { nodes }
       );
 

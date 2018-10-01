@@ -157,7 +157,7 @@ export class WazuhApiCtrl {
       }
     } catch (error) {
       if (error.code === 'ECONNREFUSED') {
-        log('POST /api/wazuh-api/checkStoredAPI', error.message || error);
+        log('POST /api/check-stored-api', error.message || error);
         return reply({
           statusCode: 200,
           data: { password: '****', apiIsDown: true }
@@ -203,11 +203,11 @@ export class WazuhApiCtrl {
               } catch (error) {} // eslint-disable-line
             }
           } catch (error) {
-            log('POST /api/wazuh-api/checkStoredAPI', error.message || error);
+            log('POST /api/check-stored-api', error.message || error);
             return ErrorResponse(error.message || error, 3020, 500, reply);
           }
         }
-        log('POST /api/wazuh-api/checkStoredAPI', error.message || error);
+        log('POST /api/check-stored-api', error.message || error);
         return ErrorResponse(error.message || error, 3002, 500, reply);
       }
     }
@@ -362,7 +362,7 @@ export class WazuhApiCtrl {
 
       throw new Error(tmpMsg);
     } catch (error) {
-      log('POST /api/wazuh-api/checkAPI', error.message || error);
+      log('POST /api/check-api', error.message || error);
       return ErrorResponse(error.message || error, 3005, 500, reply);
     }
   }
@@ -714,20 +714,6 @@ export class WazuhApiCtrl {
     }
   }
 
-  getConfigurationFile(req, reply) {
-    try {
-      const configFile = getConfiguration();
-
-      return reply({
-        statusCode: 200,
-        error: 0,
-        data: configFile || {}
-      });
-    } catch (error) {
-      return ErrorResponse(error.message || error, 3019, 500, reply);
-    }
-  }
-
   /**
    * Get full data on CSV format from a list Wazuh API endpoint
    * @param {*} req
@@ -833,16 +819,6 @@ export class WazuhApiCtrl {
       }
     } catch (error) {
       return ErrorResponse(error.message || error, 3034, 500, reply);
-    }
-  }
-
-  async totalRam(req, reply) {
-    try {
-      // RAM in MB
-      const ram = Math.ceil(totalmem() / 1024 / 1024);
-      return reply({ statusCode: 200, error: 0, ram });
-    } catch (error) {
-      return ErrorResponse(error.message || error, 3033, 500, reply);
     }
   }
 
@@ -1007,25 +983,6 @@ export class WazuhApiCtrl {
       return reply({ error: 0, result });
     } catch (error) {
       return ErrorResponse(error.message || error, 3035, 500, reply);
-    }
-  }
-
-  async getAppLogs(req, reply) {
-    try {
-      const lastLogs = await simpleTail(
-        path.join(__dirname, '../../../../optimize/wazuh-logs/wazuhapp.log'),
-        20
-      );
-      return lastLogs && Array.isArray(lastLogs)
-        ? reply({
-            error: 0,
-            lastLogs: lastLogs.filter(
-              item => typeof item === 'string' && item.length
-            )
-          })
-        : reply({ error: 0, lastLogs: [] });
-    } catch (error) {
-      return ErrorResponse(error.message || error, 3036, 500, reply);
     }
   }
 }
