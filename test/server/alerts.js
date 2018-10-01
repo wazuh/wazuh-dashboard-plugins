@@ -1,6 +1,6 @@
 const chai = require('chai');
 const needle = require('needle');
-
+const elasticServer = process.env.WAZUH_ELASTIC_IP || 'localhost';
 chai.should();
 
 const headers = {
@@ -10,8 +10,8 @@ const headers = {
 const date = new Date();
 const day = date.getDate();
 const month = date.getMonth() + 1;
-const index = `wazuh-alerts-3.x-2018.${month > 10 ? month : `0${month}`}.${
-  day > 10 ? day : `0${day}`
+const index = `wazuh-alerts-3.x-2018.${month >= 10 ? month : `0${month}`}.${
+  day >= 10 ? day : `0${day}`
 }`;
 
 const commonFields = sample => {
@@ -32,7 +32,7 @@ const checkRes = res => {
 const syscheck = async agentID => {
   const res = await needle(
     'get',
-    `localhost:9200/${index}/_search`,
+    `${elasticServer}:9200/${index}/_search`,
     {
       query: {
         bool: {
@@ -68,7 +68,7 @@ const syscheck = async agentID => {
 const rootcheck = async agentID => {
   const res = await needle(
     'get',
-    `localhost:9200/${index}/_search`,
+    `${elasticServer}:9200/${index}/_search`,
     {
       query: {
         bool: {
@@ -103,7 +103,7 @@ const rootcheck = async agentID => {
 const vulnerability = async agentID => {
   const res = await needle(
     'get',
-    `localhost:9200/${index}/_search`,
+    `${elasticServer}:9200/${index}/_search`,
     {
       query: {
         bool: {
@@ -149,7 +149,7 @@ const vulnerability = async agentID => {
 const pciDss = async agentID => {
   const res = await needle(
     'get',
-    `localhost:9200/${index}/_search`,
+    `${elasticServer}:9200/${index}/_search`,
     {
       query: {
         bool: {
@@ -183,7 +183,7 @@ const pciDss = async agentID => {
 const gdpr = async agentID => {
   const res = await needle(
     'get',
-    `localhost:9200/${index}/_search`,
+    `${elasticServer}:9200/${index}/_search`,
     {
       query: {
         bool: {
@@ -217,7 +217,7 @@ const gdpr = async agentID => {
 const audit = async agentID => {
   const res = await needle(
     'get',
-    `localhost:9200/${index}/_search`,
+    `${elasticServer}:9200/${index}/_search`,
     {
       query: {
         bool: {
@@ -252,7 +252,7 @@ const audit = async agentID => {
 
 describe('Elasticsearch', () => {
   it('GET /_cat/indices', async () => {
-    const res = await needle('get', `localhost:9200/_cat/indices`, {}, headers);
+    const res = await needle('get', `${elasticServer}:9200/_cat/indices`, {}, headers);
     res.statusCode.should.be.eql(200);
     res.body.should.be.a('string');
   });
@@ -260,7 +260,7 @@ describe('Elasticsearch', () => {
   it(`GET /_cat/indices/${index}`, async () => {
     const res = await needle(
       'get',
-      `localhost:9200/_cat/indices/${index}`,
+      `${elasticServer}:9200/_cat/indices/${index}`,
       {},
       headers
     );
