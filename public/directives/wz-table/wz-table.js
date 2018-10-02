@@ -61,14 +61,31 @@ app
         $scope.keyEquivalence = KeyEquivalenece;
         $scope.totalItems = 0;
 
-        $scope.clickAction = item => {
+        $scope.clickAction = (item, openAction = false) => {
           if (
             instance.path === '/agents' ||
             new RegExp(/^\/agents\/groups\/[a-zA-Z0-9]*$/).test(instance.path)
           ) {
+
             shareAgent.setAgent(item);
-            $location.search('tab', null);
+
+            // If the user clicked on an action, then go to that action
+            if (openAction === 'configuration' || openAction === 'discover') {
+              if(openAction === 'configuration') {
+                $location.search('tab', 'configuration');
+                $location.search('tabView', null);
+              } else {
+                $location.search('tab', 'general');
+                $location.search('tabView', 'discover');
+              }
+
+            } else {
+              shareAgent.setAgent(item);
+              $location.search('tab', null);
+            }
+
             $location.path('/agents');
+
           } else if (instance.path === '/agents/groups') {
             $scope.$emit('wazuhShowGroup', { group: item });
           } else if (
