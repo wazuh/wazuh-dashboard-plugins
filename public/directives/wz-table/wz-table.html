@@ -5,18 +5,19 @@
 <div layout="row" ng-show="!error && !wazuh_table_loading && items.length">
     <table class="table table-striped table-condensed" style="table-layout: fixed !important" id="wz_table">
         <thead class="wz-text-bold">
-            <th ng-repeat="key in keys" class="wz-text-left" 
+            <th ng-repeat="key in keys" class="wz-text-left"
                 ng-class="{ 'cursor-pointer' : !key.nosortable, 'col-lg-1' : !key.size, 'col-lg-{{key.size}}' : key.size }"
                 ng-click="!key.nosortable && sort(key)">
                 {{ keyEquivalence[key.value || key] || key.value || key }}
                 <i ng-if="!key.nosortable" class="fa wz-theader-sort-icon" ng-class="sortValue === (key.value || key) ? (sortDir ? 'fa-sort-asc' : 'fa-sort-desc') : 'fa-sort'"
                     aria-hidden="true"></i>
             </th>
+            <th ng-if="path === '/agents'" class="wz-text-left col-lg-1">Actions</th>
         </thead>
         <tbody>
             <tr ng-class="allowClick ? 'cursor-pointer' : ''" class="wz-word-wrap" ng-repeat="item in pagedItems[currentPage] | filter:{item:'!'}" ng-click="clickAction(item)">
                 <td ng-repeat="key in keys" ng-if="path !== '/decoders' && path !== '/rules'">
-                    {{ 
+                    {{
                         nonDecoderValue(key,item) | limitTo: extraLimit ? 100 : 25
                     }}
                     <span ng-if="nonDecoderValue(key,item).length > (extraLimit ? 100 : 25)">...</span>
@@ -25,15 +26,15 @@
                     </md-tooltip>
                 </td>
                 <td ng-repeat="key in keys" ng-if="path === '/rules'" ng-click="key === 'id' && searchRuleId($event,item.id)">
-                    <span ng-if="key === 'id'" class="wz-text-link" >  
-                        {{ item.id }} 
+                    <span ng-if="key === 'id'" class="wz-text-link" >
+                        {{ item.id }}
                         <md-tooltip ng-if="key === 'id'" md-direction="right" class="wz-tooltip">
                             Filter by rule ID in Discover
                         </md-tooltip>
                     </span>
 
                     <span ng-if="key !== 'id'">
-                        {{ 
+                        {{
                             nonDecoderValue(key,item) | limitTo: extraLimit ? 100 : 25
                         }}
                     </span>
@@ -43,7 +44,7 @@
                     </md-tooltip>
                 </td>
                 <td ng-repeat="key in keys" ng-if="path === '/decoders'">
-                    {{ 
+                    {{
                         decoderValue(key,item) | limitTo: extraLimit ? 100 : 25
                     }}
                     <span ng-if="decoderValue(key,item).length > (extraLimit ? 100 : 25)">...</span>
@@ -51,11 +52,14 @@
                         {{ decoderValue(key,item) }}
                     </md-tooltip>
                 </td>
-                
+                <td ng-if="path === '/agents'" ng-click="$event.stopPropagation()" class="cursor-default">
+                  <i ng-click="clickAction(item, 'discover'); $event.stopPropagation()" class="fa fa-fw fa-compass cursor-pointer" tooltip="Open Discover panel for this agent" tooltip-placement="left" aria-hidden="true"></i>
+                  <i ng-click="clickAction(item, 'configuration'); $event.stopPropagation()" class="fa fa-fw fa-wrench cursor-pointer" tooltip="Open configuration for this agent" tooltip-placement="left" aria-hidden="true"></i>
+                </td>
             </tr>
         </tbody>
         <tfoot >
-            <td colspan="{{keys.length}}">
+            <td colspan="{{ path === '/agents' ? keys.length + 1 : keys.length}}">
                 <span ng-show="!wazuh_table_loading" class="color-grey">{{ totalItems }} items ({{time | number: 2}} seconds)</span>
                 <div ng-show="items.length >= itemsPerPage" class="pagination pull-right" style="margin:0 !important">
                     <ul layout="row">

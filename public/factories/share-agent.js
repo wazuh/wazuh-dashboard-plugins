@@ -1,6 +1,6 @@
 /*
 * Wazuh app - Factory to share an agent between controllers
-* 
+*
 * Copyright (C) 2018 Wazuh, Inc.
 *
 * This program is free software; you can redistribute it and/or modify
@@ -14,6 +14,7 @@ export class ShareAgent {
   constructor() {
     this.agent = null;
     this.selectedGroup = null;
+    this.targetLocation = null;
   }
 
   getAgent() {
@@ -32,5 +33,19 @@ export class ShareAgent {
   deleteAgent() {
     this.agent = null;
     this.selectedGroup = null;
+  }
+
+  getTargetLocation() {
+    return this.targetLocation;
+  }
+
+  setTargetLocation(loc) {
+    if(!loc || typeof loc !== 'object') return;
+    this.targetLocation = {};
+    Object.assign(this.targetLocation, loc);
+  }
+
+  deleteTargetLocation() {
+    this.targetLocation = null;
   }
 }
