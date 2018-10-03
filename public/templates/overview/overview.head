@@ -65,7 +65,7 @@
 
     <!-- System audit navigation bar -->
     <md-nav-bar
-        ng-if="inArray(tab, systemAuditTabs) && (extensions.audit || extensions.oscap || extensions.ciscat)"
+        ng-if="inArray(tab, systemAuditTabs) && (extensions.audit || extensions.oscap || extensions.ciscat || extensions.osquery)"
         class="wz-nav-bar"
         ng-show="tab !== 'welcome'"
         md-selected-nav-item="tab"

@@ -44,6 +44,7 @@
 #extensions.ciscat    : false
 #extensions.aws       : false
 #extensions.virustotal: false
+#extensions.osquery   : false
 #
 # ---------------------------------- Time out ----------------------------------
 #

@@ -76,7 +76,7 @@
                             description="TabDescription.ciscat.description"
                         ></wz-welcome-card>
                         <wz-welcome-card
-                            class="euiFlexItem" logo="'icons/osquery.png'"
+                            ng-if="extensions.osquery" class="euiFlexItem" logo="'icons/osquery.png'"
                             title="'Osquery'" switch-tab="switchTab('osquery')" current-tab="'osquery'"
                             description="TabDescription.osquery.description"
                         ></wz-welcome-card>

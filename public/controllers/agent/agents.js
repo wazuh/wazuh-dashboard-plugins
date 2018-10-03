@@ -98,7 +98,7 @@ class AgentsController {
     this.tabVisualizations.assign('agents');
 
     this.$scope.hostMonitoringTabs = ['general', 'fim', 'syscollector'];
-    this.$scope.systemAuditTabs = ['pm', 'audit', 'oscap', 'ciscat'];
+    this.$scope.systemAuditTabs = ['pm', 'audit', 'oscap', 'ciscat', 'osquery'];
     this.$scope.securityTabs = ['vuls', 'virustotal'];
     this.$scope.complianceTabs = ['pci', 'gdpr'];
 

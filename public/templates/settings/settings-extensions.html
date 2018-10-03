@@ -114,6 +114,26 @@
             </md-card-actions>
         </md-card>
 
+        <!-- Osquery -->
+        <md-card flex="45" layout="column" class="wz-md-card">
+            <md-card-content flex="auto" layout="column">
+                <span class="wz-headline-title"><i class="fa fa-fw fa-rocket" aria-hidden="true"></i> {{ tabNames['osquery'] }}</span>
+                <md-divider class="wz-margin-top-10"></md-divider>
+                <div layout="column">
+                    <p class="md-body-1 wz-padding-top-10">Osquery can be used to expose an operating system as a high-performance relational database. This allows you to write SQL-based queries to explore operating system data.</p>
+                </div>
+                <span flex></span>
+                <div layout="row" class="wz-padding-top-10">
+                    <md-switch class="wz-switch" aria-label="Osquery extension switch" ng-model="extensions.osquery" ng-change="toggleExtension('osquery',extensions.osquery)"></md-switch>
+                </div>
+            </md-card-content>
+            <md-card-actions layout="row" layout-align="end center" class="wz-card-actions">
+                <md-button target="_blank" href="https://documentation.wazuh.com/current/user-manual/capabilities/osquery.html" class="wz-text-link cursor-pointer small" aria-label="Osquery integration documentation">
+                    <i class="fa fa-fw fa-info" aria-hidden="true"></i> More info
+                </md-button>
+            </md-card-actions>
+        </md-card>
+
         <!-- Amazon -->
         <md-card flex="45" layout="column" class="wz-md-card">
             <md-card-content flex="auto" layout="column">
