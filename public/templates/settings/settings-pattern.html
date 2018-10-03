@@ -2,8 +2,8 @@
 
     <!-- Headline -->
     <div layout="column" layout-padding>
-        <span class="font-size-18"><i class="fa fa-fw fa-filter" aria-hidden="true"></i> Pattern selection</span>
-        <span class="md-subheader">Select the index pattern to run search and analytics against</span>
+        <span class="font-size-18"><i class="fa fa-fw fa-filter" aria-hidden="true"></i> Index pattern</span>
+        <span class="md-subheader">Choose and index pattern, so Wazuh can use it to retrieve data from indices for queries and visualizations.</span>
     </div>
     <!-- End headline -->
 
@@ -12,7 +12,7 @@
         <md-card flex class="wz-md-card">
             <md-card-content>
                 <div layout="row">
-                    <p class="md-body-1"><strong>Beware:</strong> the new index-pattern structure must be compatible with Wazuh alerts, otherwise you won't be able to select the pattern on the selector since visualizations would load erroneous data, or no data at all.<p>
+                    <p class="md-body-1"><strong>Note:</strong> The index pattern chosen must use the template for Wazuh alerts, otherwise you won't be able to select it.<p>
                 </div>
                 <div flex="25" layout="column" class="wz-select-input wz-margin-top-10">
                     <select class="kuiSelect wz-border-none cursor-pointer" ng-model="selectedIndexPattern" ng-change="changeIndexPattern(selectedIndexPattern)" aria-label="Select index pattern">
