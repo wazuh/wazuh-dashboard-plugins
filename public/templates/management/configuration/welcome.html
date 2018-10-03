@@ -5,6 +5,8 @@
         <span class="font-size-18">
             <i class="fa fa-fw fa-cog" aria-hidden="true"></i> Configuration</span>
         <span class="md-subheader">Check your Wazuh cluster configuration</span>
+        <span ng-show="agent && agent.id !== '000'" class="md-subheader">Configuration status: <span class="wz-text-bold" tooltip="The current synchronization status" tooltip-placement="right">{{isSynchronized ? 'SYNCHRONIZED' : 'NOT SYNCHRONIZED'}}</span>
+    </span>
     </div>
     <!-- End headline -->
 

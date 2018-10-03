@@ -428,6 +428,7 @@ class AgentsController {
 
   async getAgent(newAgentId) {
     try {
+      this.$scope.isSynchronized = false;
       this.$scope.load = true;
       this.changeAgent = true;
 
@@ -438,7 +439,8 @@ class AgentsController {
       const data = await Promise.all([
         this.apiReq.request('GET', `/agents/${id}`, {}),
         this.apiReq.request('GET', `/syscheck/${id}/last_scan`, {}),
-        this.apiReq.request('GET', `/rootcheck/${id}/last_scan`, {})
+        this.apiReq.request('GET', `/rootcheck/${id}/last_scan`, {}),
+        this.apiReq.request('GET', `/agents/${id}/group/is_sync`, {})
       ]);
 
       // Agent
@@ -457,6 +459,9 @@ class AgentsController {
       // Rootcheck
       this.$scope.agent.rootcheck = data[2].data.data;
       this.validateRootCheck();
+
+      // Configuration synced
+      this.$scope.isSynchronized = data[3] && data[3].data && data[3].data.data && data[3].data.data.synced;
 
       this.$scope.switchTab(this.$scope.tab, true);
 
