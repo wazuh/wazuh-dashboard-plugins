@@ -24,7 +24,8 @@ export class TabVisualizations {
       gdpr: 3,
       pci: 3,
       virustotal: 6,
-      configuration: 0
+      configuration: 0,
+      osquery: 5
     };
 
     this.overview = {
@@ -39,7 +40,8 @@ export class TabVisualizations {
       pci: 6,
       gdpr: 6,
       aws: 6,
-      virustotal: 7
+      virustotal: 7,
+      osquery: 5
     };
 
     this.tabVisualizations = {};

@@ -98,7 +98,8 @@ export class CommonData {
         pci: { group: 'pci_dss' },
         gdpr: { group: 'gdpr' },
         aws: { group: 'amazon' },
-        virustotal: { group: 'virustotal' }
+        virustotal: { group: 'virustotal' },
+        osquery: { group: 'osquery' }
       };
 
       const filters = [];
