@@ -309,8 +309,7 @@ export class ElasticWrapper {
             type: 'index-pattern',
             'index-pattern': {
               fields: currentFieldsString,
-              fieldFormatMap:
-                `{
+              fieldFormatMap: `{
                   "data.virustotal.permalink":{"id":"url"},
                   "data.vulnerability.reference":{"id":"url"},"data.url":{"id":"url"},
                   "rule.id":{"id":"url","params":{"urlTemplate":"/app/wazuh#/manager/?tab=ruleset&ruleid={{value}}","labelTemplate":"{{value}}","openLinkInCurrentTab":true}},
@@ -442,7 +441,8 @@ export class ElasticWrapper {
         url: data._source.url,
         port: data._source.api_port,
         insecure: data._source.insecure,
-        cluster_info: data._source.cluster_info
+        cluster_info: data._source.cluster_info,
+        extensions: data._source.extensions
       };
     } catch (error) {
       return Promise.reject(error);

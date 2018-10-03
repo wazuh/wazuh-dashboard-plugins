@@ -1,0 +1,159 @@
+<div layout="column" layout-align="start stretch" ng-if="tab === 'extensions' && !load">
+
+    <!-- Headline -->
+    <div layout="column" layout-padding>
+        <span class="font-size-18"><i class="fa fa-fw fa-check-square-o" aria-hidden="true"></i> Wazuh extensions</span>
+        <span class="md-subheader">A Wazuh extension is used to enable visualizations and dashboards that are specific to a particular use case.</span>
+    </div>
+    <!-- End headline -->
+
+    <!-- Section cards -->
+    <div layout="row" layout-align="start stretch" layout-wrap>
+
+        <!-- PCI DSS -->
+        <md-card flex="45" layout="column" class="wz-md-card">
+            <md-card-content flex="auto" layout="column">
+                <span class="wz-headline-title"><i class="fa fa-fw fa-credit-card" aria-hidden="true"></i> {{ tabNames['pci'] }}</span>
+                <md-divider class="wz-margin-top-10"></md-divider>
+                <div layout="column">
+                    <p class="md-body-1 wz-padding-top-10">The Payment Card Industry Data Security Standard (PCI DSS) is a proprietary information security standard for organizations that handle branded credit cards from the major card schemes including Visa, MasterCard, American Express, Discover, and JCB.</p>
+                    <p class="md-body-1 wz-padding-top-10">The PCI Standard is mandated by the card brands and administered by the Payment Card Industry Security Standards Council. The standard was created to increase controls around cardholder data to reduce credit card fraud.</p>
+                </div>
+                <span flex></span>
+                <div layout="row" class="wz-padding-top-10">
+                    <md-switch class="wz-switch" aria-label="PCI DSS extension switch" ng-model="extensions.pci" ng-change="toggleExtension('pci',extensions.pci)"></md-switch>
+                </div>
+            </md-card-content>
+            <md-card-actions layout="row" layout-align="end center" class="wz-card-actions">
+                <md-button target="_blank" href="https://documentation.wazuh.com/current/pci-dss/index.html" class="wz-text-link cursor-pointer small" aria-label="Open Wazuh PCI DSS documentation">
+                    <i class="fa fa-fw fa-info" aria-hidden="true"></i> More info
+                </md-button>
+            </md-card-actions>
+        </md-card>
+
+        <!-- GDPR -->
+        <md-card flex="45" layout="column" class="wz-md-card">
+            <md-card-content flex="auto" layout="column">
+                <span class="wz-headline-title"><i class="fa fa-fw fa-list-ol" aria-hidden="true"></i> {{ tabNames['gdpr'] }}</span>
+                <md-divider class="wz-margin-top-10"></md-divider>
+                <div layout="column">
+                    <p class="md-body-1 wz-padding-top-10">The General Data Protection Regulation (GDPR) is a regulation in EU law on data protection and privacy for all individuals within the European Union. It also addresses the export of personal data outside the EU.</p>
+                    <p class="md-body-1 wz-padding-top-10">The GDPR aims primarily to give control to citizens and residents over their personal data and to simplify the regulatory environment for international business by unifying the regulation within the EU.</p>
+                </div>
+                <span flex></span>
+                <div layout="row" class="wz-padding-top-10">
+                    <md-switch class="wz-switch" aria-label="GDPR extension switch" ng-model="extensions.gdpr" ng-change="toggleExtension('gdpr',extensions.gdpr)"></md-switch>
+                </div>
+            </md-card-content>
+            <md-card-actions layout="row" layout-align="end center" class="wz-card-actions">
+                <md-button target="_blank" href="https://documentation.wazuh.com/current/gdpr/index.html" class="wz-text-link cursor-pointer small" aria-label="Open Wazuh GDPR documentation">
+                    <i class="fa fa-fw fa-info" aria-hidden="true"></i> More info
+                </md-button>
+            </md-card-actions>
+        </md-card>
+
+        <!-- Audit -->
+        <md-card flex="45" layout="column" class="wz-md-card">
+            <md-card-content flex="auto" layout="column">
+                <span class="wz-headline-title"><i class="fa fa-fw fa-balance-scale" aria-hidden="true"></i> {{ tabNames['audit'] }}</span>
+                <md-divider class="wz-margin-top-10"></md-divider>
+                <div layout="column">
+                    <p class="md-body-1 wz-padding-top-10">The Linux Audit system provides a way to track security-relevant information on your system.</p>
+                    <p class="md-body-1 wz-padding-top-10">Based on pre-configured rules, Audit generates log entries to record as much information about the events that are happening on your system as possible.</p>
+                </div>
+                <span flex></span>
+                <div layout="row" class="wz-padding-top-10">
+                    <md-switch class="wz-switch" aria-label="Audit extension switch" ng-model="extensions.audit" ng-change="toggleExtension('audit',extensions.audit)"></md-switch>
+                </div>
+            </md-card-content>
+            <md-card-actions layout="row" layout-align="end center" class="wz-card-actions">
+                <md-button target="_blank" href="https://documentation.wazuh.com/current/user-manual/capabilities/system-calls-monitoring/index.html" class="wz-text-link cursor-pointer small" aria-label="Open Audit documentation">
+                    <i class="fa fa-fw fa-info" aria-hidden="true"></i> More info
+                </md-button>
+            </md-card-actions>
+        </md-card>
+
+        <!-- Open SCAP -->
+        <md-card flex="45" layout="column" class="wz-md-card">
+            <md-card-content flex="auto" layout="column">
+                <span class="wz-headline-title"><i class="fa fa-fw fa-search" aria-hidden="true"></i> {{ tabNames['oscap'] }}</span>
+                <md-divider class="wz-margin-top-10"></md-divider>
+                <div layout="column">
+                    <p class="md-body-1 wz-padding-top-10">OpenSCAP is an OVAL (Open Vulnerability Assessment Language) interpreter, that is used for system configuration and vulnerability assessment.</p>
+                    <p class="md-body-1 wz-padding-top-10">Developed and supported by RedHat, it is recognized as a standardized compliance and hardening checking solution for enterprise-level infrastructure.</p>
+                </div>
+                <span flex></span>
+                <div layout="row" class="wz-padding-top-10">
+                    <md-switch class="wz-switch" aria-label="Open SCAP extension switch" ng-model="extensions.oscap" ng-change="toggleExtension('oscap',extensions.oscap)"></md-switch>
+                </div>
+            </md-card-content>
+            <md-card-actions layout="row" layout-align="end center" class="wz-card-actions">
+                <md-button target="_blank" href="https://documentation.wazuh.com/current/user-manual/capabilities/policy-monitoring/openscap/index.html" class="wz-text-link cursor-pointer small" aria-label="Open Open SCAP documentation">
+                    <i class="fa fa-fw fa-info" aria-hidden="true"></i> More info
+                </md-button>
+            </md-card-actions>
+        </md-card>
+
+        <!-- CIS-CAT -->
+        <md-card flex="45" layout="column" class="wz-md-card">
+            <md-card-content flex="auto" layout="column">
+                <span class="wz-headline-title"><i class="fa fa-fw fa-rocket" aria-hidden="true"></i> {{ tabNames['ciscat'] }}</span>
+                <md-divider class="wz-margin-top-10"></md-divider>
+                <div layout="column">
+                    <p class="md-body-1 wz-padding-top-10">CIS (Center for Internet Security) is an entity dedicated to safeguard private and public organizations against cyber threats. This entity provides CIS benchmarks guidelines, which are a recognized global standard and best practices for securing IT systems and data against cyberattacks.</p>
+                </div>
+                <span flex></span>
+                <div layout="row" class="wz-padding-top-10">
+                    <md-switch class="wz-switch" aria-label="CIS-CAT extension switch" ng-model="extensions.ciscat" ng-change="toggleExtension('ciscat',extensions.ciscat)"></md-switch>
+                </div>
+            </md-card-content>
+            <md-card-actions layout="row" layout-align="end center" class="wz-card-actions">
+                <md-button target="_blank" href="https://documentation.wazuh.com/current/user-manual/capabilities/policy-monitoring/ciscat/ciscat.html" class="wz-text-link cursor-pointer small" aria-label="Open CIS-CAT integration documentation">
+                    <i class="fa fa-fw fa-info" aria-hidden="true"></i> More info
+                </md-button>
+            </md-card-actions>
+        </md-card>
+
+        <!-- Amazon -->
+        <md-card flex="45" layout="column" class="wz-md-card">
+            <md-card-content flex="auto" layout="column">
+                <span class="wz-headline-title"><i class="fa fa-fw fa-amazon" aria-hidden="true"></i> {{ tabNames['aws'] }}</span>
+                <md-divider class="wz-margin-top-10"></md-divider>
+                <div layout="column">
+                    <p class="md-body-1 wz-padding-top-10">Wazuh provides an agent module that can be used to retrieve data from S3 buckets. In combination with log analysis rules, this module provides the ability to analyze and alert on AWS Cloudtrail, GuardDuty, Macie, IAM, VPC Flow and other Amazon AWS  services data.</p>
+                </div>
+                <span flex></span>
+                <div layout="row" class="wz-padding-top-10">
+                    <md-switch class="wz-switch" aria-label="AWS extension switch" ng-model="extensions.aws" ng-change="toggleExtension('aws',extensions.aws)"></md-switch>
+                </div>
+            </md-card-content>
+            <md-card-actions layout="row" layout-align="end center" class="wz-card-actions">
+                <md-button target="_blank" href="https://documentation.wazuh.com/current/amazon/index.html" class="wz-text-link cursor-pointer small" aria-label="Open AWS integration documentation">
+                    <i class="fa fa-fw fa-info" aria-hidden="true"></i> More info
+                </md-button>
+            </md-card-actions>
+        </md-card>
+
+        <!-- VirusTotal -->
+        <md-card flex="45" layout="column" class="wz-md-card">
+            <md-card-content flex="auto" layout="column">
+                <span class="wz-headline-title"><i class="fa fa-fw fa-bug" aria-hidden="true"></i> {{ tabNames['virustotal'] }}</span>
+                <md-divider class="wz-margin-top-10"></md-divider>
+                <div layout="column">
+                    <p class="md-body-1 wz-padding-top-10">VirusTotal is an online service that analyzes files and URLs enabling the identification of viruses, worms, trojans, and other kinds of malicious content detected by antivirus engines and website scanners. Virustotal is commonly used as a threat intelligence source to help with security analysis and incident response.</p>
+                </div>
+                <span flex></span>
+                <div layout="row" class="wz-padding-top-10">
+                    <md-switch class="wz-switch" aria-label="VirusTotal extension switch" ng-model="extensions.virustotal" ng-change="toggleExtension('virustotal',extensions.virustotal)"></md-switch>
+                </div>
+            </md-card-content>
+            <md-card-actions layout="row" layout-align="end center" class="wz-card-actions">
+                <md-button target="_blank" href="https://documentation.wazuh.com/current/user-manual/capabilities/virustotal-scan/index.html" class="wz-text-link cursor-pointer small" aria-label="Open VirusTotal integration documentation">
+                    <i class="fa fa-fw fa-info" aria-hidden="true"></i> More info
+                </md-button>
+            </md-card-actions>
+        </md-card>
+    </div>
+    <!-- End section cards -->
+
+</div>

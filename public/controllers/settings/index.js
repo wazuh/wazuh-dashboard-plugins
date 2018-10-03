@@ -82,7 +82,7 @@ app.controller('settingsController', function(
       }
       await genericReq.request(
         'DELETE',
-        `/api/wazuh-api/apiEntries/${$scope.apiEntries[index]._id}`
+        `/elastic/apis/${$scope.apiEntries[index]._id}`
       );
       $scope.showEditForm[$scope.apiEntries[index]._id] = false;
       $scope.apiEntries.splice(index, 1);
@@ -150,6 +150,15 @@ app.controller('settingsController', function(
 
     getCurrentAPIIndex();
 
+    if (currentApi && !appState.getExtensions(JSON.parse(currentApi).id)) {
+      appState.setExtensions(
+        $scope.apiEntries[currentApiEntryIndex]._id,
+        $scope.apiEntries[currentApiEntryIndex]._source.extensions
+      );
+    }
+
+    $scope.extensions = appState.getExtensions(JSON.parse(currentApi).id);
+
     if (!$scope.$$phase) $scope.$digest();
     return;
   };
@@ -157,7 +166,7 @@ app.controller('settingsController', function(
   // Get settings function
   const getSettings = async () => {
     try {
-      const patternList = await genericReq.request('GET', '/get-list', {});
+      const patternList = await genericReq.request('GET', '/elastic/index-patterns', {});
       $scope.indexPatterns = patternList.data.data;
 
       if (!patternList.data.data.length) {
@@ -166,7 +175,7 @@ app.controller('settingsController', function(
         $location.path('/blank-screen');
         return;
       }
-      const data = await genericReq.request('GET', '/api/wazuh-api/apiEntries');
+      const data = await genericReq.request('GET', '/elastic/apis');
       for (const entry of data.data) $scope.showEditForm[entry._id] = false;
 
       $scope.apiEntries = data.data.length > 0 ? data.data : [];
@@ -181,6 +190,15 @@ app.controller('settingsController', function(
       if (!$scope.$$phase) $scope.$digest();
       getCurrentAPIIndex();
       if (!currentApiEntryIndex) return;
+
+      if (currentApi && !appState.getExtensions(JSON.parse(currentApi).id)) {
+        appState.setExtensions(
+          $scope.apiEntries[currentApiEntryIndex]._id,
+          $scope.apiEntries[currentApiEntryIndex]._source.extensions
+        );
+      }
+
+      $scope.extensions = appState.getExtensions(JSON.parse(currentApi).id);
 
       if (!$scope.$$phase) $scope.$digest();
       return;
@@ -255,12 +273,21 @@ app.controller('settingsController', function(
         url: $scope.formData.url,
         port: $scope.formData.port,
         cluster_info: {},
-        insecure: 'true'
+        insecure: 'true',
+        extensions: {}
       };
 
       const config = wazuhConfig.getConfig();
 
       appState.setPatternSelector(config['ip.selector']);
+
+      tmpData.extensions.audit = config['extensions.audit'];
+      tmpData.extensions.pci = config['extensions.pci'];
+      tmpData.extensions.gdpr = config['extensions.gdpr'];
+      tmpData.extensions.oscap = config['extensions.oscap'];
+      tmpData.extensions.ciscat = config['extensions.ciscat'];
+      tmpData.extensions.aws = config['extensions.aws'];
+      tmpData.extensions.virustotal = config['extensions.virustotal'];
 
       const checkData = await testAPI.check(tmpData);
 
@@ -270,10 +297,10 @@ app.controller('settingsController', function(
       // Insert new API entry
       const data = await genericReq.request(
         'PUT',
-        '/api/wazuh-api/settings',
+        '/elastic/api',
         tmpData
       );
-
+      appState.setExtensions(data.data.response._id, tmpData.extensions);
       const newEntry = {
         _id: data.data.response._id,
         _source: {
@@ -281,7 +308,8 @@ app.controller('settingsController', function(
           active: tmpData.active,
           url: tmpData.url,
           api_user: tmpData.user,
-          api_port: tmpData.port
+          api_port: tmpData.port,
+          extensions: tmpData.extensions
         }
       };
       $scope.apiEntries.push(newEntry);
@@ -322,7 +350,7 @@ app.controller('settingsController', function(
       }
 
       try {
-        await genericReq.request('GET', '/api/wazuh-api/fetchAgents');
+        await genericReq.request('GET', '/api/monitoring');
       } catch (error) {
         if (error && error.status && error.status === -1) {
           errorHandler.handle(
@@ -376,14 +404,15 @@ app.controller('settingsController', function(
         port: $scope.formUpdate.port,
         cluster_info: {},
         insecure: 'true',
-        id: $scope.apiEntries[index]._id
+        id: $scope.apiEntries[index]._id,
+        extensions: $scope.apiEntries[index]._source.extensions
       };
 
       const data = await testAPI.check(tmpData);
       tmpData.cluster_info = data.data;
       await genericReq.request(
         'PUT',
-        '/api/wazuh-api/update-settings',
+        '/elastic/api-settings',
         tmpData
       );
       $scope.apiEntries[index]._source.cluster_info = tmpData.cluster_info;
@@ -432,7 +461,7 @@ app.controller('settingsController', function(
       const data = await testAPI.check(tmpData);
       tmpData.cluster_info = data.data;
 
-      const tmpUrl = `/api/wazuh-api/updateApiHostname/${
+      const tmpUrl = `/elastic/api-hostname/${
         $scope.apiEntries[index]._id
       }`;
       await genericReq.request('PUT', tmpUrl, {
@@ -452,10 +481,27 @@ app.controller('settingsController', function(
     }
   };
 
+  // Toggle extension
+  $scope.toggleExtension = (extension, state) => {
+    try {
+      const api = JSON.parse(appState.getCurrentAPI()).id;
+      const currentExtensions = appState.getExtensions(api);
+      currentExtensions[extension] = state;
+      appState.setExtensions(api, currentExtensions);
+      getCurrentAPIIndex();
+      $scope.apiEntries[
+        currentApiEntryIndex
+      ]._source.extensions = currentExtensions;
+      if (!$scope.$$phase) $scope.$digest();
+    } catch (error) {
+      errorHandler.handle(error, 'Settings');
+    }
+  };
+
   $scope.changeIndexPattern = async newIndexPattern => {
     try {
       appState.setCurrentPattern(newIndexPattern);
-      await genericReq.request('GET', `/refresh-fields/${newIndexPattern}`, {});
+      await genericReq.request('GET', `/elastic/known-fields/${newIndexPattern}`, {});
       $scope.$emit('updatePattern', {});
       errorHandler.info(
         'Successfully changed the default index-pattern',
@@ -482,7 +528,7 @@ app.controller('settingsController', function(
   const getAppLogs = async () => {
     try {
       $scope.loadingLogs = true;
-      const logs = await genericReq.request('GET', '/api/wazuh-api/logs', {});
+      const logs = await genericReq.request('GET', '/utils/logs', {});
       $scope.logs = logs.data.lastLogs.map(item => JSON.parse(item));
       $scope.loadingLogs = false;
       if (!$scope.$$phase) $scope.$digest();
@@ -499,7 +545,7 @@ app.controller('settingsController', function(
 
   const getAppInfo = async () => {
     try {
-      const data = await genericReq.request('GET', '/api/wazuh-elastic/setup');
+      const data = await genericReq.request('GET', '/elastic/setup');
       $scope.appInfo = {};
       $scope.appInfo['app-version'] = data.data.data['app-version'];
       $scope.appInfo['installationDate'] = data.data.data['installationDate'];
@@ -516,6 +562,21 @@ app.controller('settingsController', function(
       } else {
         // There's no pattern in the cookies, pick the one in the settings
         $scope.selectedIndexPattern = config['pattern'];
+      }
+
+      if (!appState.getCurrentAPI()) {
+        $scope.extensions = {};
+        $scope.extensions.audit = config['extensions.audit'];
+        $scope.extensions.pci = config['extensions.pci'];
+        $scope.extensions.gdpr = config['extensions.gdpr'];
+        $scope.extensions.oscap = config['extensions.oscap'];
+        $scope.extensions.ciscat = config['extensions.ciscat'];
+        $scope.extensions.aws = config['extensions.aws'];
+        $scope.extensions.virustotal = config['extensions.virustotal'];
+      } else {
+        $scope.extensions = appState.getExtensions(
+          JSON.parse(appState.getCurrentAPI()).id
+        );
       }
 
       if ($scope.tab === 'logs') {

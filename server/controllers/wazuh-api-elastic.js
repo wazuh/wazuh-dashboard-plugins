@@ -49,7 +49,7 @@ export class WazuhApiElasticCtrl {
 
       return reply(result);
     } catch (error) {
-      log('GET /api/wazuh-api/apiEntries', error.message || error);
+      log('GET /elastic/apis', error.message || error);
       return ErrorResponse(error.message || error, 2001, 500, reply);
     }
   }
@@ -60,7 +60,7 @@ export class WazuhApiElasticCtrl {
 
       return reply(data);
     } catch (error) {
-      log('DELETE /api/wazuh-api/apiEntries/{id}', error.message || error);
+      log('DELETE /elastic/apis/{id}', error.message || error);
       return ErrorResponse(error.message || error, 2002, 500, reply);
     }
   }
@@ -82,7 +82,7 @@ export class WazuhApiElasticCtrl {
 
       return reply({ statusCode: 200, message: 'ok' });
     } catch (error) {
-      log('PUT /api/wazuh-api/apiEntries/{id}', error.message || error);
+      log('PUT /elastic/apis/{id}', error.message || error);
       return ErrorResponse(
         `Could not save data in elasticsearch due to ${error.message || error}`,
         2003,
@@ -130,7 +130,8 @@ export class WazuhApiElasticCtrl {
       insecure: payload.insecure,
       component: 'API',
       active: payload.active,
-      cluster_info: payload.cluster_info
+      cluster_info: payload.cluster_info,
+      extensions: payload.extensions
     };
   }
 
@@ -157,7 +158,7 @@ export class WazuhApiElasticCtrl {
 
       return reply({ statusCode: 200, message: 'ok', response });
     } catch (error) {
-      log('PUT /api/wazuh-api/settings', error.message || error);
+      log('PUT /elastic/api', error.message || error);
       return ErrorResponse(
         `Could not save data in elasticsearch due to ${error.message || error}`,
         2011,
@@ -175,7 +176,7 @@ export class WazuhApiElasticCtrl {
 
       return reply({ statusCode: 200, message: 'ok' });
     } catch (error) {
-      log('PUT /api/wazuh-api/updateApiHostname/{id}', error.message || error);
+      log('PUT /elastic/api-hostname/{id}', error.message || error);
       return ErrorResponse(
         `Could not save data in elasticsearch due to ${error.message || error}`,
         2012,
@@ -205,7 +206,7 @@ export class WazuhApiElasticCtrl {
 
       return reply({ statusCode: 200, message: 'ok' });
     } catch (error) {
-      log('PUT /api/wazuh-api/update-settings', error.message || error);
+      log('PUT /elastic/api-settings', error.message || error);
       return ErrorResponse(
         `Could not save data in elasticsearch due to ${error.message || error}`,
         2014,

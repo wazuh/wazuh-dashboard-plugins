@@ -17,7 +17,7 @@ export function WazuhElasticRouter(server) {
   // Get index patterns list
   server.route({
     method: 'GET',
-    path: '/get-list',
+    path: '/elastic/index-patterns',
     handler(req, res) {
       return ctrl.getlist(req, res);
     }
@@ -26,7 +26,7 @@ export function WazuhElasticRouter(server) {
   // Refresh known fields for specific index pattern
   server.route({
     method: 'GET',
-    path: '/refresh-fields/{pattern}',
+    path: '/elastic/known-fields/{pattern}',
     handler(req, res) {
       return ctrl.refreshIndex(req, res);
     }
@@ -35,14 +35,14 @@ export function WazuhElasticRouter(server) {
   // Create visualizations specified in 'tab' parameter and applying to 'pattern'
   server.route({
     method: 'GET',
-    path: '/api/wazuh-elastic/create-vis/{tab}/{pattern}',
+    path: '/elastic/visualizations/{tab}/{pattern}',
     handler(req, res) {
       return ctrl.createVis(req, res);
     }
   });
   server.route({
     method: 'POST',
-    path: '/api/wazuh-elastic/create-vis/{tab}/{pattern}',
+    path: '/elastic/visualizations/{tab}/{pattern}',
     handler(req, res) {
       return ctrl.createClusterVis(req, res);
     }
@@ -51,7 +51,7 @@ export function WazuhElasticRouter(server) {
   // Returns whether a correct template is being applied for the index-pattern
   server.route({
     method: 'GET',
-    path: '/api/wazuh-elastic/template/{pattern}',
+    path: '/elastic/template/{pattern}',
     handler(req, res) {
       return ctrl.getTemplate(req, res);
     }
@@ -60,7 +60,7 @@ export function WazuhElasticRouter(server) {
   // Returns whether the pattern exists or not
   server.route({
     method: 'GET',
-    path: '/api/wazuh-elastic/pattern/{pattern}',
+    path: '/elastic/index-patterns/{pattern}',
     handler(req, res) {
       return ctrl.checkPattern(req, res);
     }
@@ -69,7 +69,7 @@ export function WazuhElasticRouter(server) {
   // Returns the agent with most alerts
   server.route({
     method: 'GET',
-    path: '/api/wazuh-elastic/top/{mode}/{cluster}/{field}/{pattern}',
+    path: '/elastic/top/{mode}/{cluster}/{field}/{pattern}',
     handler(req, res) {
       return ctrl.getFieldTop(req, res);
     }
@@ -78,7 +78,7 @@ export function WazuhElasticRouter(server) {
   // Return Wazuh Appsetup info
   server.route({
     method: 'GET',
-    path: '/api/wazuh-elastic/setup',
+    path: '/elastic/setup',
     handler(req, res) {
       return ctrl.getSetupInfo(req, res);
     }
@@ -87,7 +87,7 @@ export function WazuhElasticRouter(server) {
   // Useful to check cookie consistence
   server.route({
     method: 'GET',
-    path: '/api/wazuh-elastic/timestamp',
+    path: '/elastic/timestamp',
     handler(req, res) {
       return ctrl.getTimeStamp(req, res);
     }

@@ -47,7 +47,7 @@
                                 <td>{{item.size / 1024 | number: 2}}KB</td>
                                 <td>{{item.date.split('T')[0]}} {{item.date.split('T')[1].split('.')[0]}}</td>
                                 <td>
-                                    <a ng-href="/api/wazuh-reporting/report/{{item.name}}" flex class="wz-text-right" target="_blank">
+                                    <a ng-href="/reports/{{item.name}}" flex class="wz-text-right" target="_blank">
                                         <i class="fa fa-fw fa-download"></i>
                                     </a>
                                     <a flex class="wz-text-right cursor-pointer" ng-click="deleteReport(item.name)">

@@ -18,6 +18,13 @@ export async function getWzConfig($q, genericReq, errorHandler, wazuhConfig) {
     'checks.template': true,
     'checks.api': true,
     'checks.setup': true,
+    'extensions.pci': true,
+    'extensions.gdpr': true,
+    'extensions.audit': true,
+    'extensions.oscap': true,
+    'extensions.ciscat': false,
+    'extensions.aws': false,
+    'extensions.virustotal': false,
     timeout: 8000,
     'wazuh.shards': 1,
     'wazuh.replicas': 1,
@@ -34,7 +41,7 @@ export async function getWzConfig($q, genericReq, errorHandler, wazuhConfig) {
   try {
     const config = await genericReq.request(
       'GET',
-      '/api/wazuh-api/configuration',
+      '/utils/configuration',
       {}
     );
 

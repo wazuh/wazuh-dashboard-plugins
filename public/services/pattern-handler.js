@@ -20,7 +20,7 @@ export class PatternHandler {
 
   async getPatternList() {
     try {
-      const patternList = await this.genericReq.request('GET', '/get-list', {});
+      const patternList = await this.genericReq.request('GET', '/elastic/index-patterns', {});
 
       if (!patternList.data.data.length) {
         this.wzMisc.setBlankScr('Sorry but no valid index patterns were found');
@@ -49,7 +49,7 @@ export class PatternHandler {
       this.appState.setCurrentPattern(selectedPattern);
       await this.genericReq.request(
         'GET',
-        `/refresh-fields/${selectedPattern}`,
+        `/elastic/known-fields/${selectedPattern}`,
         {}
       );
       return this.appState.getCurrentPattern();

@@ -16,7 +16,7 @@ describe('wazuh-api', () => {
   before(async () => {
     const res = await needle(
       'get',
-      `localhost:5601/api/wazuh-api/apiEntries`,
+      `localhost:5601/elastic/apis`,
       {},
       {}
     );
@@ -34,20 +34,20 @@ describe('wazuh-api', () => {
     API_USER = res.body[0]._source.api_user;
   });
 
-  it('POST /api/wazuh-api/csv', async () => {
+  it('POST /api/csv', async () => {
     const res = await needle(
       'post',
-      `localhost:5601/api/wazuh-api/csv`,
+      `localhost:5601/api/csv`,
       { path: '/agents', id: API_ID },
       headers
     );
     res.body.should.be.a('string');
   });
 
-  it('POST /api/wazuh-api/checkAPI', async () => {
+  it('POST /api/check-api', async () => {
     const res = await needle(
       'post',
-      `localhost:5601/api/wazuh-api/checkAPI`,
+      `localhost:5601/api/check-api`,
       { user: API_USER, url: API_URL, port: API_PORT, id: API_ID },
       headers
     );
@@ -57,10 +57,10 @@ describe('wazuh-api', () => {
     res.body.status.should.be.a('string');
   });
 
-  it('POST /api/wazuh-api/checkStoredAPI', async () => {
+  it('POST /api/check-stored-api', async () => {
     const res = await needle(
       'post',
-      `localhost:5601/api/wazuh-api/checkStoredAPI`,
+      `localhost:5601/api/check-stored-api`,
       API_ID,
       headers
     );
@@ -71,13 +71,14 @@ describe('wazuh-api', () => {
     res.body.data.password.should.be.a('string');
     res.body.data.url.should.be.a('string');
     res.body.data.port.should.be.a('string');
+    res.body.data.extensions.should.be.a('object');
     res.body.data.cluster_info.should.be.a('object');
   });
 
-  it('POST /api/wazuh-api/request', async () => {
+  it('POST /api/request', async () => {
     const res = await needle(
       'post',
-      `localhost:5601/api/wazuh-api/request`,
+      `localhost:5601/api/request`,
       { method: 'GET', path: '/agents/000', body: {}, id: API_ID },
       headers
     );
@@ -88,10 +89,10 @@ describe('wazuh-api', () => {
     res.body.data.id.should.be.eql('000');
   });
 
-  it('GET /api/wazuh-api/pci/{requirement}', async () => {
+  it('GET /api/pci/{requirement}', async () => {
     const res = await needle(
       'get',
-      `localhost:5601/api/wazuh-api/pci/all`,
+      `localhost:5601/api/pci/all`,
       {},
       {}
     );
@@ -101,10 +102,10 @@ describe('wazuh-api', () => {
     );
   });
 
-  it('GET /api/wazuh-api/gdpr/{requirement}', async () => {
+  it('GET /api/gdpr/{requirement}', async () => {
     const res = await needle(
       'get',
-      `localhost:5601/api/wazuh-api/gdpr/all`,
+      `localhost:5601/api/gdpr/all`,
       {},
       {}
     );
@@ -114,10 +115,10 @@ describe('wazuh-api', () => {
     );
   });
 
-  it('GET /api/wazuh-api/configuration', async () => {
+  it('GET /utils/configuration', async () => {
     const res = await needle(
       'get',
-      `localhost:5601/api/wazuh-api/configuration`,
+      `localhost:5601/utils/configuration`,
       {},
       {}
     );
@@ -127,17 +128,17 @@ describe('wazuh-api', () => {
     res.body.data.should.be.a('object');
   });
 
-  it('GET /api/wazuh-api/ram', async () => {
-    const res = await needle('get', `localhost:5601/api/wazuh-api/ram`, {}, {});
+  it('GET /utils/memory', async () => {
+    const res = await needle('get', `localhost:5601/utils/memory`, {}, {});
     res.body.should.be.a('object');
     res.body.error.should.be.eql(0);
     res.body.ram.should.be.gt(1);
   });
 
-  it('GET /api/wazuh-api/agents-unique/{api}', async () => {
+  it('GET /api/agents-unique/{api}', async () => {
     const res = await needle(
       'get',
-      `localhost:5601/api/wazuh-api/agents-unique/${API_ID}`,
+      `localhost:5601/api/agents-unique/${API_ID}`,
       {},
       {}
     );
@@ -152,10 +153,10 @@ describe('wazuh-api', () => {
     res.body.result.summary.should.be.a('object');
   });
 
-  it('GET /api/wazuh-api/logs', async () => {
+  it('GET /utils/logs', async () => {
     const res = await needle(
       'get',
-      `localhost:5601/api/wazuh-api/logs`,
+      `localhost:5601/utils/logs`,
       {},
       {}
     );

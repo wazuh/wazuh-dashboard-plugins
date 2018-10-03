@@ -40,7 +40,8 @@ class AgentsPreviewController {
   $onInit() {
     this.$scope.init = true;
     const loc = this.$location.search();
-    if(loc && loc.agent && loc.agent !== '000') return this.showAgent({id:loc.agent})
+    if (loc && loc.agent && loc.agent !== '000')
+      return this.showAgent({ id: loc.agent });
 
     this.$scope.search = term => {
       this.$scope.$broadcast('wazuhSearch', { term });
@@ -126,12 +127,12 @@ class AgentsPreviewController {
       const data = await Promise.all([
         this.genericReq.request(
           'GET',
-          '/api/wazuh-api/agents-unique/' + api,
+          '/api/agents-unique/' + api,
           {}
         ),
         this.genericReq.request(
           'GET',
-          `/api/wazuh-elastic/top/${firstUrlParam}/${secondUrlParam}/agent.name/${pattern}`
+          `/elastic/top/${firstUrlParam}/${secondUrlParam}/agent.name/${pattern}`
         )
       ]);
       const [agentsUnique, agentsTop] = data;
@@ -157,7 +158,7 @@ class AgentsPreviewController {
         this.$scope.mostActiveAgent.name = agentsTop.data.data;
         const info = await this.genericReq.request(
           'GET',
-          `/api/wazuh-elastic/top/${firstUrlParam}/${secondUrlParam}/agent.id/${pattern}`
+          `/elastic/top/${firstUrlParam}/${secondUrlParam}/agent.id/${pattern}`
         );
         if (info.data.data === '' && this.$scope.mostActiveAgent.name !== '') {
           this.$scope.mostActiveAgent.id = '000';

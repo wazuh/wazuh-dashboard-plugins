@@ -15,6 +15,21 @@ export class AppState {
     this.$window = $window;
   }
 
+  getExtensions(id) {
+    const current = this.$cookies.getObject('extensions');
+    return current ? current[id] : false;
+  }
+
+  setExtensions(id, extensions) {
+    const current = this.$cookies.getObject('extensions') || {};
+    current[id] = extensions;
+    const exp = new Date();
+    exp.setDate(exp.getDate() + 365);
+    if (extensions) {
+      this.$cookies.putObject('extensions', current, { expires: exp });
+    }
+  }
+
   getClusterInfo() {
     return this.$cookies.getObject('_clusterInfo');
   }

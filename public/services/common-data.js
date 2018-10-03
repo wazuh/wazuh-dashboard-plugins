@@ -146,7 +146,7 @@ export class CommonData {
       const gdprTabs = [];
       const data = await this.genericReq.request(
         'GET',
-        '/api/wazuh-api/gdpr/all'
+        '/api/gdpr/all'
       );
       if (!data.data) return [];
       for (const key in data.data) {
@@ -163,7 +163,7 @@ export class CommonData {
       const pciTabs = [];
       const data = await this.genericReq.request(
         'GET',
-        '/api/wazuh-api/pci/all'
+        '/api/pci/all'
       );
       if (!data.data) return [];
       for (const key in data.data) {

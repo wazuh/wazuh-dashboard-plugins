@@ -13,12 +13,12 @@ import js2xmlparser from 'js2xmlparser';
 import XMLBeautifier from './xml-beautifier';
 import beautifier from './json-beautifier';
 import { queryConfig } from '../services/query-config';
-import { objectWithoutProperties } from './remove-hash-key.js'
+import { objectWithoutProperties } from './remove-hash-key.js';
 
 export class ConfigurationHandler {
   constructor(apiReq, errorHandler) {
-      this.apiReq = apiReq;
-      this.errorHandler = errorHandler;
+    this.apiReq = apiReq;
+    this.errorHandler = errorHandler;
   }
 
   buildIntegrations(list, $scope) {
@@ -109,6 +109,43 @@ export class ConfigurationHandler {
       $scope.load = false;
     }
     return;
+  }
+
+  /**
+   * Determines if a wodle is enabled or not
+   * @param {string} wodleName The wodle to check
+   * @param {string} agentId The agent ID
+   */
+  async isWodleEnabled(wodleName, agentId = false) {
+    try {
+      // Get wodles configuration
+      const wodlesConfig = await queryConfig(
+        agentId || '000',
+        [{ component: 'wmodules', configuration: 'wmodules' }],
+        this.apiReq,
+        this.errorHandler
+      );
+
+      // Filter by provided wodleName
+      let result = [];
+      if (
+        wodleName &&
+        wodleName !== 'command' &&
+        wodlesConfig &&
+        wodlesConfig['wmodules-wmodules'] &&
+        wodlesConfig['wmodules-wmodules'].wmodules
+      ) {
+        result = wodlesConfig['wmodules-wmodules'].wmodules.filter(
+          item =>
+            typeof item[wodleName] !== 'undefined' &&
+            item[wodleName].disabled === 'no'
+        );
+      }
+
+      return !!result.length;
+    } catch (error) {
+      return false;
+    }
   }
 
   /**
