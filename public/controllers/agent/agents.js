@@ -256,8 +256,14 @@ class AgentsController {
       this.$scope.tabView = subtab;
 
       if (
+        ((subtab === 'panels') || 
+        (this.targetLocation &&
+        typeof this.targetLocation === 'object' &&
+        this.targetLocation.subTab === 'discover' &&
+        subtab === 'discover')) &&
         !['configuration', 'welcome', 'syscollector'].includes(this.$scope.tab)
       ) {
+
         const condition =
           !this.changeAgent && (localChange || preserveDiscover);
 
