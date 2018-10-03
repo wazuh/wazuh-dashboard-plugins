@@ -52,9 +52,9 @@
                         {{ decoderValue(key,item) }}
                     </md-tooltip>
                 </td>
-                <td ng-if="path === '/agents'">
-                  <i ng-click="clickAction(item, 'discover')" class="fa fa-fw fa-compass" tooltip="Open Discover panel for this agent" tooltip-placement="left" aria-hidden="true"></i>
-                  <i ng-click="clickAction(item, 'configuration')" class="fa fa-fw fa-wrench" tooltip="Open configuration for this agent" tooltip-placement="left" aria-hidden="true"></i>
+                <td ng-if="path === '/agents'" ng-click="$event.stopPropagation()" class="cursor-default">
+                  <i ng-click="clickAction(item, 'discover'); $event.stopPropagation()" class="fa fa-fw fa-compass cursor-pointer" tooltip="Open Discover panel for this agent" tooltip-placement="left" aria-hidden="true"></i>
+                  <i ng-click="clickAction(item, 'configuration'); $event.stopPropagation()" class="fa fa-fw fa-wrench cursor-pointer" tooltip="Open configuration for this agent" tooltip-placement="left" aria-hidden="true"></i>
                 </td>
             </tr>
         </tbody>

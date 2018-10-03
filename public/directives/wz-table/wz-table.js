@@ -69,19 +69,16 @@ app
 
             shareAgent.setAgent(item);
 
-            // If the user clicked on an action, then go to that action
-            if (openAction === 'configuration' || openAction === 'discover') {
-              if(openAction === 'configuration') {
-                $location.search('tab', 'configuration');
-                $location.search('tabView', null);
-              } else {
-                $location.search('tab', 'general');
-                $location.search('tabView', 'discover');
-              }
-
-            } else {
-              shareAgent.setAgent(item);
-              $location.search('tab', null);
+            // Check location target and go to that path
+            switch(openAction) {
+              case 'configuration':
+                shareAgent.setTargetLocation({'tab': 'configuration', 'subTab': 'panels'});
+                break;
+              case 'discover':
+                shareAgent.setTargetLocation({'tab': 'general', 'subTab': 'discover'});
+                break;
+              default:
+                shareAgent.setTargetLocation({'tab': 'welcome', 'subTab': 'panels'});
             }
 
             $location.path('/agents');
