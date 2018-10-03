@@ -34,7 +34,7 @@
     <div layout="row" layout-padding class="wz-padding-top-0 wz-padding-bottom-0">
         <md-card flex class="wz-metric-color wz-md-card wz-no-padding">
             <md-card-content layout="row" class="wz-padding-metric">
-                <div class="wz-text-truncatable" flex ng-if="agent.group">
+                <div class="wz-word-break" flex ng-if="agent.group">
                     Groups: <span ng-repeat="group in agent.group" class="wz-text-bold wz-text-link" ng-click="goGroups(agent,$index)">{{ group }}&nbsp;</span>
                 </div>
             </md-card-content>
