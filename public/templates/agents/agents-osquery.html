@@ -1,3 +1,46 @@
 <md-content flex layout="column" ng-if="tab === 'osquery' && tabView === 'panels'" ng-class="{'no-opacity': resultState !== 'ready' || !rendered}" layout-align="start">
+    <div layout="row" class="height-300">
+        <md-card flex class="wz-md-card">
+            <md-card-content class="wazuh-column">
+                <span class="wz-headline-title">Most common Osquery packs being used</span>
+                <md-divider class="wz-margin-top-10"></md-divider>
+                <kbn-vis id="Wazuh-App-Agents-Osquery-top-5-packs-being-used" vis-id="'Wazuh-App-Agents-Osquery-top-5-packs-being-used'"></kbn-vis>
+            </md-card-content>
+        </md-card>
+        <md-card flex="70" class="wz-md-card">
+            <md-card-content class="wazuh-column">
+                <span class="wz-headline-title">Evolution of Osquery events per pack over time</span>
+                <md-divider class="wz-margin-top-10"></md-divider>
+                <kbn-vis id="Wazuh-App-Agents-Osquery-events-per-pack-over-time" vis-id="'Wazuh-App-Agents-Osquery-events-per-pack-over-time'"></kbn-vis>
+            </md-card-content>
+        </md-card>
+    </div>
 
+    <div layout="row" class="height-300">
+        <md-card flex class="wz-md-card">
+            <md-card-content class="wazuh-column">
+                <span class="wz-headline-title">Most common Osquery actions</span>
+                <md-divider class="wz-margin-top-10"></md-divider>
+                <kbn-vis id="Wazuh-App-Agents-Osquery-most-common-osquery-actions" vis-id="'Wazuh-App-Agents-Osquery-most-common-osquery-actions'"></kbn-vis>
+            </md-card-content>
+        </md-card>
+
+        <md-card flex="70" class="wz-md-card">
+            <md-card-content class="wazuh-column">
+                <span class="wz-headline-title">Most common rules</span>
+                <md-divider class="wz-margin-top-10"></md-divider>
+                <kbn-vis id="Wazuh-App-Agents-Osquery-monst-common-rules-being-fired" vis-id="'Wazuh-App-Agents-Osquery-monst-common-rules-being-fired'"></kbn-vis>
+            </md-card-content>
+        </md-card>
+    </div>
+
+    <div layout="row" class="height-300">
+        <md-card flex class="wz-md-card">
+            <md-card-content class="wazuh-column">
+                <span class="wz-headline-title">Evolution of Osquery events over time</span>
+                <md-divider class="wz-margin-top-10"></md-divider>
+                <kbn-vis id="Wazuh-App-Agents-Osquery-events-over-time" vis-id="'Wazuh-App-Agents-Osquery-events-over-time'"></kbn-vis>
+            </md-card-content>
+        </md-card>
+    </div>
 </md-content>

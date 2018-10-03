@@ -299,9 +299,7 @@ class AgentsController {
       !force;
     this.$scope.tab = tab;
 
-    if (this.$scope.tab === 'configuration') {
-      this.firstLoad();
-    } else {
+    if (this.$scope.tab !== 'configuration') {
       this.$scope.switchSubtab(
         'panels',
         true,
