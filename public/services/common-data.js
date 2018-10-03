@@ -104,14 +104,14 @@ export class CommonData {
 
       const filters = [];
       const isCluster = this.appState.getClusterInfo().status == 'enabled';
-      /*filters.push(
+      filters.push(
         filterHandler.managerQuery(
           isCluster
             ? this.appState.getClusterInfo().cluster
             : this.appState.getClusterInfo().manager,
           isCluster
         )
-      );*/
+      );
 
       if (tab !== 'general') {
         if (tab === 'pci') {
