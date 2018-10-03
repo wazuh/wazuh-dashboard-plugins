@@ -2,8 +2,13 @@
 
     <!-- Headline -->
     <div layout="column" layout-padding>
-        <span class="font-size-18">
-            <i class="fa fa-fw fa-cog" aria-hidden="true"></i> Configuration</span>
+        <div ng-show="agent && agent.id !== '000'">
+            <span class="font-size-18"> <i class="fa fa-fw fa-cog" aria-hidden="true"></i> Configuration</span>
+            <span ng-if="isSynchronized" class="wz-agent-status-indicator small teal">SYNCHRONIZED</span>
+            <span ng-if="!isSynchronized" class="wz-agent-status-indicator small red">NOT SYNCHRONIZED</span>
+        </div>  
+        <span class="font-size-18" ng-show="!agent || agent.id === '000'">
+                <i class="fa fa-fw fa-cog" aria-hidden="true"></i> Configuration</span>  
         <span class="md-subheader">Check your Wazuh cluster configuration</span>
     </div>
     <!-- End headline -->
