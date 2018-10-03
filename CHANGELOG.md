@@ -2,6 +2,32 @@
 
 All notable changes to the Wazuh app project will be documented in this file.
 
+## Wazuh v3.7.0 - Kibana v6.4.2 - Revision 413
+
+### Added
+
+-   Support for Elastic Stack v6.4.2.
+-   Support for Wazuh v3.7.0
+-   Brand new extension Osquery ([#938](https://github.com/wazuh/wazuh-kibana-app/pull/938)).
+-   Added support to open Discover or Configuration tabs from agents table ([#939](https://github.com/wazuh/wazuh-kibana-app/pull/939)).
+-   Using the new `is_sync` API call ([#940](https://github.com/wazuh/wazuh-kibana-app/pull/940)).
+
+### Changed
+
+-   Redesigned _Management > Configuration_ and _Agent > Configuration_ tabs, now they use our new Wazuh configuration on demand features ([#914](https://github.com/wazuh/wazuh-kibana-app/pull/914)).
+-   Adapted the Wazuh app for multi groups features ([#911](https://github.com/wazuh/wazuh-kibana-app/pull/911)).
+-   Agents > Inventory tab logic reviewed and redesigned ([#924](https://github.com/wazuh/wazuh-kibana-app/pull/924)).
+-   Changed Overview/Agents OpenSCAP visualization titles ([#925](https://github.com/wazuh/wazuh-kibana-app/pull/925)).
+-   Renamed all our server routes ([#932](https://github.com/wazuh/wazuh-kibana-app/pull/932)).
+-   Improved Elasticsearch Mocha tests ([#933](https://github.com/wazuh/wazuh-kibana-app/pull/933)).
+-   Updated Settings tab strings and descriptions ([#934](https://github.com/wazuh/wazuh-kibana-app/pull/934)).
+
+## Wazuh v3.6.1 - Kibana v6.4.1 - Revision 412
+
+### Added
+
+-   Support for Elastic Stack v6.4.1.
+
 ## Wazuh v3.6.1 - Kibana v6.4.0 - Revision 411
 
 ### Added
