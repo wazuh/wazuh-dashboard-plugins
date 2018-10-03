@@ -256,30 +256,12 @@ class AgentsController {
       this.$scope.tabView = subtab;
 
       if (
-        subtab === 'panels' &&
-        this.$scope.tab !== 'configuration' &&
-        this.$scope.tab !== 'welcome' &&
-        this.$scope.tab !== 'syscollector'
-      ) {
-        const condition =
-          (!this.changeAgent && localChange) ||
-          (!this.changeAgent && preserveDiscover);
-        await this.visFactoryService.buildAgentsVisualizations(
-          this.filterHandler,
-          this.$scope.tab,
-          subtab,
-          condition,
-          this.$scope.agent.id
-        );
-        this.changeAgent = false;
-      } else if (
-        this.targetLocation &&
+        ((subtab === 'panels') || 
+        (this.targetLocation &&
         typeof this.targetLocation === 'object' &&
         this.targetLocation.subTab === 'discover' &&
-        subtab === 'discover' &&
-        this.$scope.tab !== 'configuration' &&
-        this.$scope.tab !== 'welcome' &&
-        this.$scope.tab !== 'syscollector'
+        subtab === 'discover')) &&
+        !['configuration', 'welcome', 'syscollector'].includes(this.$scope.tab)
       ) {
         const condition =
           (!this.changeAgent && localChange) ||
