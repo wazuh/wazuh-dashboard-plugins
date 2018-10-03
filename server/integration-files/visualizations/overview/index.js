@@ -20,6 +20,7 @@ import gdpr from './overview-gdpr';
 import pm from './overview-pm';
 import virustotal from './overview-virustotal';
 import vuls from './overview-vuls';
+import osquery from './overview-osquery';
 
 export {
   audit,
@@ -32,5 +33,6 @@ export {
   gdpr,
   pm,
   virustotal,
-  vuls
+  vuls,
+  osquery
 };

@@ -288,6 +288,7 @@ app.controller('settingsController', function(
       tmpData.extensions.ciscat = config['extensions.ciscat'];
       tmpData.extensions.aws = config['extensions.aws'];
       tmpData.extensions.virustotal = config['extensions.virustotal'];
+      tmpData.extensions.osquery = config['extensions.osquery'];
 
       const checkData = await testAPI.check(tmpData);
 
@@ -573,6 +574,7 @@ app.controller('settingsController', function(
         $scope.extensions.ciscat = config['extensions.ciscat'];
         $scope.extensions.aws = config['extensions.aws'];
         $scope.extensions.virustotal = config['extensions.virustotal'];
+        $scope.extensions.osquery = config['extensions.osquery'];
       } else {
         $scope.extensions = appState.getExtensions(
           JSON.parse(appState.getCurrentAPI()).id
