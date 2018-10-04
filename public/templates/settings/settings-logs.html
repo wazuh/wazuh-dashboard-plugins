@@ -26,7 +26,7 @@
             <tbody>
                 <tr class="wz-word-wrap" ng-repeat="item in logs">
                     <td>
-                       {{ item.date }}
+                       {{ item.date | date: "medium" }}
                     </td>
                     <td>
                         {{ item.level.toUpperCase() }}
