@@ -107,8 +107,8 @@ class AgentsController {
     this.tabVisualizations.assign('agents');
 
     this.$scope.hostMonitoringTabs = ['general', 'fim', 'syscollector'];
-    this.$scope.systemAuditTabs = ['pm', 'audit', 'oscap', 'ciscat', 'osquery'];
-    this.$scope.securityTabs = ['vuls', 'virustotal'];
+    this.$scope.systemAuditTabs = ['pm', 'audit', 'oscap', 'ciscat'];
+    this.$scope.securityTabs = ['vuls', 'virustotal', 'osquery'];
     this.$scope.complianceTabs = ['pci', 'gdpr'];
 
     this.$scope.inArray = (item, array) =>
@@ -256,7 +256,7 @@ class AgentsController {
       this.$scope.tabView = subtab;
 
       if (
-        ((subtab === 'panels') || 
+        ((subtab === 'panels') ||
         (this.targetLocation &&
         typeof this.targetLocation === 'object' &&
         this.targetLocation.subTab === 'discover' &&

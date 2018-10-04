@@ -122,11 +122,6 @@
                             title="'CIS-CAT'" switch-tab="switchTab('ciscat')" current-tab="'ciscat'"
                             description="TabDescription.ciscat.description"
                         ></wz-welcome-card>
-                        <wz-welcome-card
-                            ng-if="extensions.osquery" class="euiFlexItem" logo="'icons/osquery.png'"
-                            title="'Osquery'" switch-tab="switchTab('osquery')" current-tab="'osquery'"
-                            description="TabDescription.osquery.description"
-                        ></wz-welcome-card>
                     </div>
                 </div>
             </div>
@@ -150,6 +145,11 @@
                                 ng-if="extensions.virustotal" class="euiFlexItem" logo="'icons/app_saved_objects.svg'"
                                 title="'VirusTotal'" switch-tab="switchTab('virustotal')" current-tab="'virustotal'"
                                 description="TabDescription.virustotal.description"
+                            ></wz-welcome-card>
+                            <wz-welcome-card
+                                ng-if="extensions.osquery" class="euiFlexItem" logo="'icons/osquery.png'"
+                                title="'Osquery'" switch-tab="switchTab('osquery')" current-tab="'osquery'"
+                                description="TabDescription.osquery.description"
                             ></wz-welcome-card>
                         </div>
                     </div>
