@@ -431,6 +431,7 @@ app.controller('settingsController', function(
 
       $scope.apiEntries = $scope.apiEntries.sort(sortByTimestamp);
       $scope.showEditForm[$scope.apiEntries[index]._id] = false;
+      $scope.isEditing = false;
 
       errorHandler.info('The API was updated successfully', 'Settings');
 
