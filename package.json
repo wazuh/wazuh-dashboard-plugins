@@ -3,7 +3,7 @@
     "version": "3.6.1",
     "revision": "0412",
     "kibana": {
-        "version": "6.4.1"
+        "version": "6.4.2"
     },
     "engines": {
         "node": "8.11.4"
