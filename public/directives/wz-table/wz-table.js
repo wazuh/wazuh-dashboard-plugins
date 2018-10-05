@@ -433,6 +433,10 @@ app
         });
 
         $scope.nonDecoderValue = (key, item) => {
+          if ((key === 'description' || key.value && key.value === 'description') && !item.description) {
+            return '---';
+          }
+
           if (key === 'state' && instance.path.includes('processes')) {
             return ProcessEquivalence[item.state] || 'Unknown';
           }
