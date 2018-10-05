@@ -32,6 +32,7 @@ export async function getWzConfig($q, genericReq, errorHandler, wazuhConfig) {
     'wazuh-version.shards': 1,
     'wazuh-version.replicas': 1,
     'ip.selector': true,
+    'ip.ignore': [],
     'xpack.rbac.enabled': true,
     'wazuh.monitoring.enabled': true,
     'wazuh.monitoring.frequency': 3600,

@@ -12,7 +12,7 @@
 import { ElasticWrapper } from '../lib/elastic-wrapper';
 import { ErrorResponse } from './error-response';
 import { log } from '../logger';
-
+import { getConfiguration } from '../lib/get-configuration';
 import {
   AgentsVisualizations,
   OverviewVisualizations,
@@ -27,7 +27,6 @@ export class WazuhElasticCtrl {
   async getTimeStamp(req, reply) {
     try {
       const data = await this.wzWrapper.getWazuhVersionIndexAsSearch();
-
       if (
         data.hits &&
         data.hits.hits[0] &&
@@ -254,6 +253,8 @@ export class WazuhElasticCtrl {
 
   async getlist(req, reply) {
     try {
+      const config = getConfiguration();
+      
       const xpack = await this.wzWrapper.getPlugins();
 
       const isXpackEnabled =
@@ -275,8 +276,10 @@ export class WazuhElasticCtrl {
         throw new Error('There is no index pattern');
 
       if (data && data.hits && data.hits.hits) {
-        const list = this.validateIndexPattern(data.hits.hits);
-
+        let list = this.validateIndexPattern(data.hits.hits);
+        if(config && config['ip.ignore'] && Array.isArray(config['ip.ignore']) && config['ip.ignore'].length){
+          list = list.filter(item => item && item.title && !config['ip.ignore'].includes(item.title));
+        } 
         return reply({
           data:
             isXpackEnabled && !isSuperUser
