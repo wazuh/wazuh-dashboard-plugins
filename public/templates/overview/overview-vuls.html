@@ -1,4 +1,5 @@
-<md-content flex layout="column" ng-if="tab === 'vuls' && tabView === 'panels'" ng-class="{'no-opacity': resultState !== 'ready' || !rendered}" layout-align="start">
+<md-content flex layout="column" ng-if="tab === 'vuls' && tabView === 'panels'" ng-class="{'no-opacity': resultState !== 'ready' || !rendered}"
+    layout-align="start">
 
     <div layout="row">
         <md-card flex class="wz-metric-color wz-md-card">
@@ -19,15 +20,15 @@
     </div>
 
     <div layout="row" layout-align="center stretch" class="height-270">
-            <md-card flex="30" class="wz-md-card">
-                    <md-card-content class="wazuh-column" >
-                        <span class="wz-headline-title">Most affected agents</span>
-                        <md-divider class="wz-margin-top-10"></md-divider>
-                        <kbn-vis id="Wazuh-App-Overview-vulnerability-Most-affected-agents" vis-id="'Wazuh-App-Overview-vulnerability-Most-affected-agents'"></kbn-vis>
-                    </md-card-content>
-                </md-card>
+        <md-card flex="30" class="wz-md-card">
+            <md-card-content class="wazuh-column">
+                <span class="wz-headline-title">Most affected agents</span>
+                <md-divider class="wz-margin-top-10"></md-divider>
+                <kbn-vis id="Wazuh-App-Overview-vulnerability-Most-affected-agents" vis-id="'Wazuh-App-Overview-vulnerability-Most-affected-agents'"></kbn-vis>
+            </md-card-content>
+        </md-card>
         <md-card flex class="wz-md-card">
-            <md-card-content class="wazuh-column" >
+            <md-card-content class="wazuh-column">
                 <span class="wz-headline-title">Alerts evolution over time</span>
                 <md-divider class="wz-margin-top-10"></md-divider>
                 <kbn-vis id="Wazuh-App-Overview-vulnerability-Alerts-evolution-over-time" vis-id="'Wazuh-App-Overview-vulnerability-Alerts-evolution-over-time'"></kbn-vis>
@@ -37,21 +38,21 @@
 
     <div layout="row" layout-align="center stretch" class="height-270">
         <md-card flex="30" class="wz-md-card">
-            <md-card-content class="wazuh-column" >
+            <md-card-content class="wazuh-column">
                 <span class="wz-headline-title">Severity distribution</span>
                 <md-divider class="wz-margin-top-10"></md-divider>
                 <kbn-vis id="Wazuh-App-Overview-vulnerability-Vulnerability-severity-distribution" vis-id="'Wazuh-App-Overview-vulnerability-Vulnerability-severity-distribution'"></kbn-vis>
             </md-card-content>
         </md-card>
         <md-card flex="30" class="wz-md-card">
-            <md-card-content class="wazuh-column" >
+            <md-card-content class="wazuh-column">
                 <span class="wz-headline-title">Commonly affected packages</span>
                 <md-divider class="wz-margin-top-10"></md-divider>
                 <kbn-vis id="Wazuh-App-Overview-vulnerability-Commonly-affected-packages" vis-id="'Wazuh-App-Overview-vulnerability-Commonly-affected-packages'"></kbn-vis>
             </md-card-content>
         </md-card>
         <md-card flex class="wz-md-card">
-            <md-card-content class="wazuh-column" >
+            <md-card-content class="wazuh-column">
                 <span class="wz-headline-title">Most common CVEs</span>
                 <md-divider class="wz-margin-top-10"></md-divider>
                 <kbn-vis id="Wazuh-App-Overview-vulnerability-Most-common-CVEs" vis-id="'Wazuh-App-Overview-vulnerability-Most-common-CVEs'"></kbn-vis>
