@@ -69,6 +69,9 @@
 # Default: true
 #ip.selector: true
 #
+# List of index patterns to be ignored
+#ip.ignore: []
+#
 # -------------------------------- X-Pack RBAC ---------------------------------
 #
 # Custom setting to enable/disable built-in X-Pack RBAC security capabilities.
