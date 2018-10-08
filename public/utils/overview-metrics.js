@@ -31,10 +31,12 @@ const metricsAudit = {
 // Metrics Vulnerability Detector
 const metricsVulnerability = {
   vulnCritical:
-    '[vis-id="\'Wazuh-App-Overview-VULS-Metric-Critical-severity\'"]',
-  vulnHigh: '[vis-id="\'Wazuh-App-Overview-VULS-Metric-High-severity\'"]',
-  vulnMedium: '[vis-id="\'Wazuh-App-Overview-VULS-Metric-Medium-severity\'"]',
-  vulnLow: '[vis-id="\'Wazuh-App-Overview-VULS-Metric-Low-severity\'"]'
+    '[vis-id="\'Wazuh-App-Overview-vulnerability-Metric-Critical-severity\'"]',
+  vulnHigh:
+    '[vis-id="\'Wazuh-App-Overview-vulnerability-Metric-High-severity\'"]',
+  vulnMedium:
+    '[vis-id="\'Wazuh-App-Overview-vulnerability-Metric-Medium-severity\'"]',
+  vulnLow: '[vis-id="\'Wazuh-App-Overview-vulnerability-Metric-Low-severity\'"]'
 };
 
 // Metrics Scap
