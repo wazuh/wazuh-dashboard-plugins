@@ -13,7 +13,7 @@ import './wz-dynamic/wz-dynamic';
 import './wz-enter/wz-enter';
 import './wz-menu/wz-menu';
 import './wz-menu/wz-menu.less';
-import './wz-table/wz-table';
+import './wz-table';
 import './wz-welcome-card/wz-welcome-card';
 import './wz-no-config/wz-no-config';
 import './wz-config-item/wz-config-item';
