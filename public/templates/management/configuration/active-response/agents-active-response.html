@@ -4,25 +4,25 @@
     <!-- No configuration section -->
     <wz-no-config
       flex
-      error="currentConfig['analysis-active_response']"
-      ng-if="currentConfig['analysis-active_response'] && isString(currentConfig['analysis-active_response'])"></wz-no-config>
+      error="currentConfig['com-active-response']"
+      ng-if="currentConfig['com-active-response'] && isString(currentConfig['com-active-response'])"></wz-no-config>
     <wz-no-config
       flex
       error="'not-present'"
-      ng-if="currentConfig['analysis-active_response'] && !isString(currentConfig['analysis-active_response']) && currentConfig['analysis-active_response']['active-response'] && !currentConfig['analysis-active_response']['active-response'].length"></wz-no-config>
+      ng-if="currentConfig['com-active-response'] && !isString(currentConfig['com-active-response']) && !currentConfig['com-active-response']['active-response']"></wz-no-config>
     <!-- End no configuration section -->
 
     <!-- This section is the main content -->
-    <div flex layout="column" ng-if="currentConfig['analysis-active_response'] && !isString(currentConfig['analysis-active_response']) && currentConfig['analysis-active_response']['active-response'] && currentConfig['analysis-active_response']['active-response'].length">
+    <div flex layout="column" ng-if="currentConfig['com-active-response'] && !isString(currentConfig['com-active-response']) && currentConfig['com-active-response']['active-response']">
 
         <!-- The main card will all the settings -->
-        <md-card flex="auto" class="wz-md-card" ng-if="!JSONContent && !XMLContent">
-            <md-card-content flex layout="column">
+        <md-card class="wz-md-card" ng-if="!JSONContent && !XMLContent">
+            <md-card-content>
                 <div layout="row" layout-align="start center">
                     <div>
-                        <span class="font-size-16">Active response definitions</span>
+                        <span class="font-size-16">Active response settings</span>
                         <div class="wz-margin-top-10">
-                            <span class="md-subheader small">Find here all the currently defined Active responses</span>
+                            <span class="md-subheader small">Find here all the Active response settings for this agent</span>
                         </div>
                     </div>
                     <span flex></span>
@@ -32,61 +32,29 @@
                 </div>
                 <md-divider class="wz-margin-top-10"></md-divider>
 
-                <!-- The container for both list and detail -->
-                <div flex="auto" layout="row" class="wz-margin-top-10">
+                <!-- Configuration block -->
+                <div class="wz-padding-top-10">
 
-                    <!-- List container -->
-                    <div flex="30" layout="column">
+                    <wz-config-item
+                        label="Active response status"
+                        value="currentConfig['com-active-response']['active-response'] === 'yes' ? 'disabled' : 'enabled'">
+                    </wz-config-item>
+                    <wz-config-item
+                        label="List of timeouts (in minutes) for repeated offenders"
+                        value="currentConfig['com-active-response']['active-response'].repeated_offenders">
+                    </wz-config-item>
+                    <wz-config-item
+                        is-array="true"
+                        label="Use the following list of root CA certificates"
+                        value="currentConfig['com-active-response']['active-response'].ca_store">
+                    </wz-config-item>
+                    <wz-config-item
+                        label="Validate WPKs using root CA certificate"
+                        value="currentConfig['com-active-response']['active-response'].ca_verification">
+                    </wz-config-item>
 
-                        <md-list flex="auto" class="wz-item-list">
-                            <md-list-item class="wz-text-link" ng-click="updateSelectedItem($index)" ng-repeat="item in currentConfig['analysis-active_response']['active-response']">{{ item.command }}</md-list-item>
-                        </md-list>
-
-                    </div>
-                    <!-- End list container -->
-
-                    <!-- Detail container -->
-                    <div flex layout="column">
-
-                        <div flex="auto" class="wz-item-detail">
-                            <wz-config-item
-                                label="Status of this active response"
-                                value="currentConfig['analysis-active_response']['active-response'][selectedItem].disabled === 'yes' ? 'disabled' : 'enabled'">
-                            </wz-config-item>
-                            <wz-config-item
-                                label="Command to execute"
-                                value="currentConfig['analysis-active_response']['active-response'][selectedItem].command">
-                            </wz-config-item>
-                            <wz-config-item
-                                label="Execute the command on this location"
-                                value="currentConfig['analysis-active_response']['active-response'][selectedItem].location">
-                            </wz-config-item>
-                            <wz-config-item
-                                label="Agent ID on which execute the command"
-                                value="currentConfig['analysis-active_response']['active-response'][selectedItem].agent_id">
-                            </wz-config-item>
-                            <wz-config-item
-                                label="Match to this severity level or above"
-                                value="currentConfig['analysis-active_response']['active-response'][selectedItem].level">
-                            </wz-config-item>
-                            <wz-config-item
-                                label="Match to one of these groups"
-                                value="currentConfig['analysis-active_response']['active-response'][selectedItem].rules_group">
-                            </wz-config-item>
-                            <wz-config-item
-                                label="Match to one of these rule IDs"
-                                value="currentConfig['analysis-active_response']['active-response'][selectedItem].rules_id">
-                            </wz-config-item>
-                            <wz-config-item
-                                label="Timeout (in seconds) before reverting"
-                                value="currentConfig['analysis-active_response']['active-response'][selectedItem].timeout">
-                            </wz-config-item>
-                        </div>
-
-                    </div>
-                    <!-- End detail container -->
                 </div>
-                <!-- End container for both list and detail -->
+                <!-- End configuration block -->
 
             </md-card-content>
         </md-card>
