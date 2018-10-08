@@ -6,9 +6,9 @@
             <span class="font-size-18"> <i class="fa fa-fw fa-cog" aria-hidden="true"></i> Configuration</span>
             <span ng-if="isSynchronized" class="wz-agent-status-indicator small teal">SYNCHRONIZED</span>
             <span ng-if="!isSynchronized" class="wz-agent-status-indicator small red">NOT SYNCHRONIZED</span>
-        </div>  
+        </div>
         <span class="font-size-18" ng-show="!agent || agent.id === '000'">
-                <i class="fa fa-fw fa-cog" aria-hidden="true"></i> Configuration</span>  
+                <i class="fa fa-fw fa-cog" aria-hidden="true"></i> Configuration</span>
         <span class="md-subheader">Check your Wazuh cluster configuration</span>
     </div>
     <!-- End headline -->
@@ -171,9 +171,15 @@
                                 <p>Gather relevant information about your system OS, hardware, packages, etc.</p>
                             </div>
                         </md-list-item>
-                        <md-list-item flex="100" flex-gt-md="50" flex-gt-lg="33" class="md-2-line">
+                        <md-list-item flex="100" flex-gt-md="50" flex-gt-lg="33" class="md-2-line" ng-if="!agent || agent.id === '000'">
                             <div class="md-list-item-text">
                                 <h3 class="wz-text-link" ng-click="switchConfigTab('active-response',[{component:'analysis',configuration:'command'},{component:'analysis',configuration:'active_response'}])">Active response</h3>
+                                <p>Active threath addressing by inmmediate response</p>
+                            </div>
+                        </md-list-item>
+                        <md-list-item flex="100" flex-gt-md="50" flex-gt-lg="33" class="md-2-line" ng-if="agent && agent.id !== '000'">
+                            <div class="md-list-item-text">
+                                <h3 class="wz-text-link" ng-click="switchConfigTab('active-response',[{component:'com',configuration:'active-response'}])">Active response</h3>
                                 <p>Active threath addressing by inmmediate response</p>
                             </div>
                         </md-list-item>
