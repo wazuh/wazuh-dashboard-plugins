@@ -17,9 +17,14 @@ All notable changes to the Wazuh app project will be documented in this file.
     -   Check alerts from Wazuh's Osquery integration.
     -   Check your current Osquery wodle configuration.
     -   More improvements will come for this extension in the future.
+-   New option for Wazuh app configuration file - _Ignore index patterns_ ([#947](https://github.com/wazuh/wazuh-kibana-app/pull/947)):
+    -   Now the user can specify which index patterns can't be selected on the app using the new `ip.ignore` setting on the `config.yml` file.
+    -   The valid format is an array of strings which represents index patterns.
+    -   By default, this list is empty (all index patterns will be available if they use a compatible structure).
 -   Added quick access to _Configuration_ or _Discover_ panels for an agent on the agents list ([#939](https://github.com/wazuh/wazuh-kibana-app/pull/939)).
--   Redesigned the _Overview > Amazon AWS_ tab, using more meaningful visualizations for a better overall view of your agents' status ([#903](https://github.com/wazuh/wazuh-kibana-app/pull/903)).
 -   Now you can click on an agent's ID on the _Discover_ panels to open its details page on the app ([#904](https://github.com/wazuh/wazuh-kibana-app/pull/904)).
+-   Redesigned the _Overview > Amazon AWS_ tab, using more meaningful visualizations for a better overall view of your agents' status ([#903](https://github.com/wazuh/wazuh-kibana-app/pull/903)).
+-   Redesigned the _Overview/Agents > Vulnerabilities_ tab, using more meaningful visualizations for a better overall view of your agents' status ([#954](https://github.com/wazuh/wazuh-kibana-app/pull/954)).
 
 ### Changed
 
@@ -33,11 +38,17 @@ All notable changes to the Wazuh app project will be documented in this file.
 -   All backend routes have been renamed ([#932](https://github.com/wazuh/wazuh-kibana-app/pull/932)).
 -   Several improvements for Elasticsearch tests ([#933](https://github.com/wazuh/wazuh-kibana-app/pull/933)).
 -   Updated some strings and descriptions on the _Settings_ tab ([#934](https://github.com/wazuh/wazuh-kibana-app/pull/934)).
+-   Changed the date format on _Settings > Logs_ to make it more human-readable ([#944](https://github.com/wazuh/wazuh-kibana-app/pull/944)).
+-   Changed some labels to remove the "MD5 sum" expression, it will use "Checksum" instead ([#945](https://github.com/wazuh/wazuh-kibana-app/pull/945)).
+-   Added word wrapping class to group name in _Management > Groups > Group detail_ tab ([#945](https://github.com/wazuh/wazuh-kibana-app/pull/945)).
+-   The `wz-table` directive has been refactored ([#953](https://github.com/wazuh/wazuh-kibana-app/pull/953)).
 
 ### Fixed
 
 -   Several known fields for _Whodata_ functionality have been fixed ([#901](https://github.com/wazuh/wazuh-kibana-app/pull/901)).
 -   Fixed alignment bug with the _Add a filter +_ button on _Discover_ and _Agents_ tabs ([#912](https://github.com/wazuh/wazuh-kibana-app/pull/912)).
+-   Fixed a bug where the `Add API` form on _Settings_ didn't appear when pressing the button after editing an existing API entry ([#944](https://github.com/wazuh/wazuh-kibana-app/pull/944)).
+-   Fixed a bug on _Ruleset_ tab where the "Description" column was showing `0` if the rule doesn't have any description ([#948](https://github.com/wazuh/wazuh-kibana-app/pull/948)).
 
 ## Wazuh v3.6.1 - Kibana v6.4.1/v6.4.2 - Revision 412
 
