@@ -11,7 +11,7 @@
  */
 export default [
   {
-    _id: 'Wazuh-App-Agents-VULS-Alerts-severity-over-time',
+    _id: 'Wazuh-App-Agents-vulnerability-Alerts-severity-over-time',
     _type: 'visualization',
     _source: {
       title: 'Alerts severity over time',
@@ -27,7 +27,7 @@ export default [
     }
   },
   {
-    _id: 'Wazuh-App-Agents-VULS-Alerts-summary',
+    _id: 'Wazuh-App-Agents-vulnerability-Alerts-summary',
     _type: 'visualization',
     _source: {
       title: 'Alerts summary',
@@ -44,7 +44,7 @@ export default [
     }
   },
   {
-    _id: 'Wazuh-App-Agents-VULS-Top-5-affected-packages',
+    _id: 'Wazuh-App-Agents-vulnerability-Top-5-affected-packages',
     _type: 'visualization',
     _source: {
       title: 'Top 5 affected packages',
@@ -60,7 +60,7 @@ export default [
     }
   },
   {
-    _id: 'Wazuh-App-Agents-VULS-Metric-Critical-severity',
+    _id: 'Wazuh-App-Agents-vulnerability-Metric-Critical-severity',
     _type: 'visualization',
     _source: {
       title: 'Metric Critical severity',
@@ -106,7 +106,7 @@ export default [
     }
   },
   {
-    _id: 'Wazuh-App-Agents-VULS-Metric-High-severity',
+    _id: 'Wazuh-App-Agents-vulnerability-Metric-High-severity',
     _type: 'visualization',
     _source: {
       title: 'Metric High severity',
@@ -152,7 +152,7 @@ export default [
     }
   },
   {
-    _id: 'Wazuh-App-Agents-VULS-Metric-Medium-severity',
+    _id: 'Wazuh-App-Agents-vulnerability-Metric-Medium-severity',
     _type: 'visualization',
     _source: {
       title: 'Metric Medium severity',
@@ -198,7 +198,7 @@ export default [
     }
   },
   {
-    _id: 'Wazuh-App-Agents-VULS-Metric-Low-severity',
+    _id: 'Wazuh-App-Agents-vulnerability-Metric-Low-severity',
     _type: 'visualization',
     _source: {
       title: 'Metric Low severity',
@@ -244,7 +244,7 @@ export default [
     }
   },
   {
-    _id: 'Wazuh-App-Agents-VULS-Top-Agents-severity',
+    _id: 'Wazuh-App-Agents-vulnerability-Top-Agents-severity',
     _type: 'visualization',
     _source: {
       title: 'Top Agents severity',
