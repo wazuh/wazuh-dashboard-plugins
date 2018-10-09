@@ -18,9 +18,19 @@
                 </button>
             </div>
         </div>
-        <!-- Daemon selector -->
+
+        <!-- Node selector -->
         <div flex="20" layout="column" layout-align="center" class="height-40 wz-margin-right-15 wz-select-input">
-            <select flex class="kuiSelect wz-border-none cursor-pointer max-height-35" ng-disabled="realtime" id="categoryBox" ng-model="category" ng-change="filter({name:'category',value:category})"
+            <select flex class="kuiSelect wz-border-none cursor-pointer max-height-35" id="categoryBox" ng-model="selectedNode" ng-change="changeNode(selectedNode)"
+            aria-label="Logs category">
+                <option ng-repeat="node in nodeList" value="{{node}}">{{node}}</option>
+            </select>
+        </div>
+        <!-- End node selector -->
+
+        <!-- Daemon selector -->
+        <div flex="20" layout="column"  layout-align="center" class="height-40 wz-margin-right-15 wz-select-input">
+            <select flex class="kuiSelect wz-border-none cursor-pointer max-height-35" ng-disabled="realtime || !daemons.length" id="categoryBox" ng-model="category" ng-change="filter({name:'category',value:category})"
             aria-label="Logs category">
                 <option value="all">All daemons</option>
                 <option ng-repeat="daemon in daemons | orderObjectBy: 'title'" value="{{daemon.title}}">{{daemon.title}}</option>
@@ -57,11 +67,11 @@
     <!-- End Filters and Realtime button section -->
 
     <!-- Logs table section -->
-    <div layout="row" layout-padding>
+    <div layout="row" layout-padding ng-if="logsPath">
         <wz-table
             flex
             extra-limit="true"
-            path="'/manager/logs'"
+            path="logsPath"
             keys="['timestamp',{value:'tag',size:2},'level',{value:'description',size:4,nosortable:true}]"
             row-sizes="[15,13,11]">
         </wz-table>
