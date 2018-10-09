@@ -480,7 +480,10 @@ export class WazuhReportingCtrl {
         if (data && data.name) str[1] = data.name;
         if (data && data.ip) str[2] = data.ip;
         if (data && data.version) str[3] = data.version;
+        // 3.7 <
         if (data && data.manager_host) str[4] = data.manager_host;
+        // 3.7 >=
+        if (data && data.manager) str[4] = data.manager;
         if (data && data.os && data.os.name && data.os.version)
           str[5] = `${data.os.name} ${data.os.version}`;
         rows.push(str);
