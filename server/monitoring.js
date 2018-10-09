@@ -130,7 +130,7 @@ export function Monitoring(server, options) {
 
       return;
     } catch (error) {
-      agentsArray.length = 0;
+      agentsArray = [];
       log('[monitoring][checkStatus]', error.message || error);
       server.log([blueWazuh, 'monitoring', 'error'], error.message || error);
     }
@@ -380,15 +380,14 @@ export function Monitoring(server, options) {
     try {
       let body = '';
       if (agentsArray.length > 0) {
-        const managerName = agentsArray[0].name;
-        for (let element of agentsArray) {
+        for (const element of agentsArray) {
           body +=
             '{ "index":  { "_index": "' +
             todayIndex +
             '", "_type": "wazuh-agent" } }\n';
           let date = new Date(Date.now()).toISOString();
           element['@timestamp'] = date;
-          element.host = managerName;
+          element.host = element.manager;
           element.cluster = { name: clusterName ? clusterName : 'disabled' };
           body += JSON.stringify(element) + '\n';
         }
@@ -396,7 +395,7 @@ export function Monitoring(server, options) {
 
         await wzWrapper.pushBulkAnyIndex(todayIndex, body);
 
-        agentsArray.length = 0;
+        agentsArray = [];
       }
       return;
     } catch (error) {
@@ -547,6 +546,16 @@ export function Monitoring(server, options) {
           'Checking if wazuh-monitoring pattern exists...'
         );
         await wzWrapper.getIndexPatternUsingGet(patternId);
+        server.log(
+          [blueWazuh, 'monitoring', 'info'],
+          'Updating known fields for wazuh-monitoring pattern...'
+        );
+        log(
+          '[monitoring][init]',
+          'Updating known fields for wazuh-monitoring pattern...',
+          'info'
+        );
+        await wzWrapper.updateMonitoringIndexPatternKnownFields(patternId);
       } catch (error) {
         log(
           '[monitoring][init]',
