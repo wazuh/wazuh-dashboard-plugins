@@ -180,17 +180,12 @@ app.directive('kbnVis', function() {
         } %`;
 
         if (currentCompleted >= 100) {
-          if ($scope.visID !== 'Wazuh-App-Overview-General-Agents-status') {
-            const thereIsData = visHandlers.hasData();
-
-            $rootScope.rendered = thereIsData;
-            if (!thereIsData) $rootScope.resultState = 'none';
-            else $rootScope.resultState = 'ready';
-          }
-          // Forcing a digest cycle
-          if (!$rootScope.$$phase) $rootScope.$digest();
-        } else if ($scope.visID !== 'Wazuh-App-Overview-General-Agents-status')
+          $rootScope.rendered = true;
+        } else if ($scope.visID !== 'Wazuh-App-Overview-General-Agents-status') {
           $rootScope.rendered = false;
+        }
+        // Forcing a digest cycle
+        if (!$rootScope.$$phase) $rootScope.$digest();
       };
 
       // Initializing the visualization
