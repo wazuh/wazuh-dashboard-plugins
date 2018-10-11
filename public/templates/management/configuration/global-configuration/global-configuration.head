@@ -5,7 +5,7 @@
         <div>
             <span class="font-size-18">Global configuration</span>
         </div>
-        <span class="md-subheader">Global and remote settings that applies to the whole cluster</span>
+        <span class="md-subheader">Global and remote settings that apply to the whole Wazuh cluster</span>
     </div>
     <!-- End headline -->
 
