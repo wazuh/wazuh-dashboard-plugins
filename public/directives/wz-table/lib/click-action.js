@@ -20,7 +20,7 @@ export function clickAction(
 ) {
   if (
     instance.path === '/agents' ||
-    new RegExp(/^\/agents\/groups\/[a-zA-Z0-9]*$/).test(instance.path)
+    new RegExp(/^\/agents\/groups\/[a-zA-Z0-9_\-\.]*$/).test(instance.path)
   ) {
     shareAgent.setAgent(item);
 
@@ -49,7 +49,7 @@ export function clickAction(
   } else if (instance.path === '/agents/groups') {
     $scope.$emit('wazuhShowGroup', { group: item });
   } else if (
-    new RegExp(/^\/agents\/groups\/[a-zA-Z0-9]*\/files$/).test(instance.path)
+    new RegExp(/^\/agents\/groups\/[a-zA-Z0-9_\-\.]*\/files$/).test(instance.path)
   ) {
     $scope.$emit('wazuhShowGroupFile', {
       groupName: instance.path.split('groups/')[1].split('/files')[0],
