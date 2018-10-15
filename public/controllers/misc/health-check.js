@@ -55,8 +55,7 @@ class HealthCheck {
     this.$scope.totalChecks = 0;
   }
 
-  handleError(error) {
-    this.errorHandler.handle(error, 'Health Check');
+  handleError(error) {    
     this.$scope.errors.push(
       this.errorHandler.handle(error, 'Health Check', false, true)
     );
@@ -222,7 +221,7 @@ class HealthCheck {
       if (!this.$scope.$$phase) this.$scope.$digest();
       return;
     } catch (error) {
-      this.errorHandler.handle(error, 'Health Check');
+      this.handleError(error);
     }
   }
 

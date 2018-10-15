@@ -473,7 +473,7 @@ app.controller('settingsController', function(
       if (!$scope.$$phase) $scope.$digest();
       return;
     } catch (error) {
-      printError(error);
+      if(!wzMisc.getApiIsDown()) printError(error);
     }
   };
 
