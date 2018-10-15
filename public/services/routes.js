@@ -81,6 +81,7 @@ function nestedResolve(
   wzMisc
 ) {
   assignPreviousLocation($rootScope, $location);
+  const location = $location.path();
   return getWzConfig($q, genericReq, errorHandler, wazuhConfig).then(() =>
     settingsWizard(
       $rootScope,
@@ -92,7 +93,8 @@ function nestedResolve(
       genericReq,
       errorHandler,
       wzMisc,
-      wazuhConfig
+      wazuhConfig,
+      location && location.includes('/health-check')
     )
   );
 }

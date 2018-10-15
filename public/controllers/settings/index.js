@@ -166,7 +166,11 @@ app.controller('settingsController', function(
   // Get settings function
   const getSettings = async () => {
     try {
-      const patternList = await genericReq.request('GET', '/elastic/index-patterns', {});
+      const patternList = await genericReq.request(
+        'GET',
+        '/elastic/index-patterns',
+        {}
+      );
       $scope.indexPatterns = patternList.data.data;
 
       if (!patternList.data.data.length) {
@@ -189,7 +193,7 @@ app.controller('settingsController', function(
 
       if (!$scope.$$phase) $scope.$digest();
       getCurrentAPIIndex();
-      if (!currentApiEntryIndex) return;
+      if (!currentApiEntryIndex && currentApiEntryIndex !== 0) return;
 
       if (currentApi && !appState.getExtensions(JSON.parse(currentApi).id)) {
         appState.setExtensions(
@@ -296,11 +300,7 @@ app.controller('settingsController', function(
       tmpData.cluster_info = checkData.data;
 
       // Insert new API entry
-      const data = await genericReq.request(
-        'PUT',
-        '/elastic/api',
-        tmpData
-      );
+      const data = await genericReq.request('PUT', '/elastic/api', tmpData);
       appState.setExtensions(data.data.response._id, tmpData.extensions);
       const newEntry = {
         _id: data.data.response._id,
@@ -411,11 +411,7 @@ app.controller('settingsController', function(
 
       const data = await testAPI.check(tmpData);
       tmpData.cluster_info = data.data;
-      await genericReq.request(
-        'PUT',
-        '/elastic/api-settings',
-        tmpData
-      );
+      await genericReq.request('PUT', '/elastic/api-settings', tmpData);
       $scope.apiEntries[index]._source.cluster_info = tmpData.cluster_info;
 
       wzMisc.setApiIsDown(false);
@@ -446,9 +442,9 @@ app.controller('settingsController', function(
     ($scope.addManagerContainer = !$scope.addManagerContainer);
 
   // Check manager connectivity
-  $scope.checkManager = async item => {
+  $scope.checkManager = async (item, isIndex) => {
     try {
-      const index = $scope.apiEntries.indexOf(item);
+      const index = isIndex ? item : $scope.apiEntries.indexOf(item);
 
       const tmpData = {
         user: $scope.apiEntries[index]._source.api_user,
@@ -463,9 +459,7 @@ app.controller('settingsController', function(
       const data = await testAPI.check(tmpData);
       tmpData.cluster_info = data.data;
 
-      const tmpUrl = `/elastic/api-hostname/${
-        $scope.apiEntries[index]._id
-      }`;
+      const tmpUrl = `/elastic/api-hostname/${$scope.apiEntries[index]._id}`;
       await genericReq.request('PUT', tmpUrl, {
         cluster_info: tmpData.cluster_info
       });
@@ -479,7 +473,7 @@ app.controller('settingsController', function(
       if (!$scope.$$phase) $scope.$digest();
       return;
     } catch (error) {
-      printError(error);
+      if(!wzMisc.getApiIsDown()) printError(error);
     }
   };
 
@@ -503,7 +497,11 @@ app.controller('settingsController', function(
   $scope.changeIndexPattern = async newIndexPattern => {
     try {
       appState.setCurrentPattern(newIndexPattern);
-      await genericReq.request('GET', `/elastic/known-fields/${newIndexPattern}`, {});
+      await genericReq.request(
+        'GET',
+        `/elastic/known-fields/${newIndexPattern}`,
+        {}
+      );
       $scope.$emit('updatePattern', {});
       errorHandler.info(
         'Successfully changed the default index-pattern',
@@ -585,7 +583,10 @@ app.controller('settingsController', function(
       if ($scope.tab === 'logs') {
         getAppLogs();
       }
-
+      getCurrentAPIIndex();
+      if (currentApiEntryIndex || currentApiEntryIndex === 0) {
+        await $scope.checkManager(currentApiEntryIndex, true);
+      }
       if (!$scope.$$phase) $scope.$digest();
       return;
     } catch (error) {

@@ -215,7 +215,8 @@ app.controller('clusterController', function(
       $scope.status = status.data.data.running;
       if ($scope.status === 'no') {
         $scope.isClusterRunning = false;
-        throw new Error('Cluster is not running');
+        $scope.loading = false;
+        return;
       }
 
       const data = await Promise.all([

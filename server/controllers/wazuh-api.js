@@ -21,9 +21,6 @@ import { Monitoring } from '../monitoring';
 import { ErrorResponse } from './error-response';
 import { Parser } from 'json2csv';
 import { getConfiguration } from '../lib/get-configuration';
-import { totalmem } from 'os';
-import simpleTail from 'simple-tail';
-import path from 'path';
 import { log } from '../logger';
 import { KeyEquivalenece } from '../../util/csv-key-equivalence';
 import { cleanKeys } from '../../util/remove-key';
@@ -47,19 +44,19 @@ export class WazuhApiCtrl {
           'Valid credentials not found in Elasticsearch. It seems the credentials were not saved.'
         );
       }
-
+      const credInfo = {
+        headers: {
+          'wazuh-app-version': packageInfo.version
+        },
+        username: wapi_config.user,
+        password: wapi_config.password,
+        rejectUnauthorized: !wapi_config.insecure
+      };
       let response = await needle(
         'get',
         `${wapi_config.url}:${wapi_config.port}/version`,
         {},
-        {
-          headers: {
-            'wazuh-app-version': packageInfo.version
-          },
-          username: wapi_config.user,
-          password: wapi_config.password,
-          rejectUnauthorized: !wapi_config.insecure
-        }
+        credInfo
       );
 
       if (parseInt(response.body.error) === 0 && response.body.data) {
@@ -68,31 +65,36 @@ export class WazuhApiCtrl {
           'get',
           `${wapi_config.url}:${wapi_config.port}/cluster/status`,
           {},
-          {
-            headers: {
-              'wazuh-app-version': packageInfo.version
-            },
-            username: wapi_config.user,
-            password: wapi_config.password,
-            rejectUnauthorized: !wapi_config.insecure
-          }
+          credInfo
         );
 
         if (!response.body.error) {
+          try {
+            const managerInfo = await needle(
+              'get',
+              `${wapi_config.url}:${wapi_config.port}/agents/000`,
+              {},
+              credInfo
+            );
+            const updatedManagerName = managerInfo.body.data.name;
+            wapi_config.cluster_info.manager = updatedManagerName;
+            await this.wzWrapper.updateWazuhIndexDocument(req.payload, {
+              doc: { cluster_info: wapi_config.cluster_info }
+            });
+          } catch (error) {
+            log(
+              'POST /api/check-stored-api :: Error updating Wazuh manager name.',
+              error.message || error
+            );
+          }
+
           // If cluster mode is active
           if (response.body.data.enabled === 'yes') {
             response = await needle(
               'get',
               `${wapi_config.url}:${wapi_config.port}/cluster/node`,
               {},
-              {
-                headers: {
-                  'wazuh-app-version': packageInfo.version
-                },
-                username: wapi_config.user,
-                password: wapi_config.password,
-                rejectUnauthorized: !wapi_config.insecure
-              }
+              credInfo
             );
 
             if (!response.body.error) {
