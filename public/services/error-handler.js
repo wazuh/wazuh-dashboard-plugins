@@ -14,11 +14,9 @@ import { toastNotifications } from 'ui/notify';
 export class ErrorHandler {
   /**
    * Constructor
-   * @param {*} Notifier Useful class to create toasts
    * @param {*} $location Angular.js service to manage URL routing
    */
-  constructor(Notifier, $location) {
-    this.notify = new Notifier();
+  constructor($location) {
     this.$location = $location;
   }
 
@@ -112,7 +110,7 @@ export class ErrorHandler {
       ) {
         toastNotifications.addWarning(text);
       } else {
-        this.notify.error(text);
+        toastNotifications.addDanger(text);
       }
     }
     return text;
