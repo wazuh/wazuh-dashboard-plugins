@@ -26,7 +26,6 @@ export async function searchData(
     wzTableFilter.set(instance.filters);
     await fetch();
     $scope.wazuh_table_loading = false;
-    if (!$scope.$$phase) $scope.$digest();
   } catch (error) {
     $scope.wazuh_table_loading = false;
     $scope.error = `Error searching - ${error.message ||
@@ -36,6 +35,7 @@ export async function searchData(
       'Data factory'
     );
   }
+  if(!$scope.$$phase) $scope.$digest();
   return;
 }
 
@@ -61,7 +61,6 @@ export async function filterData(
     wzTableFilter.set(instance.filters);
     await fetch();
     $scope.wazuh_table_loading = false;
-    if (!$scope.$$phase) $scope.$digest();
   } catch (error) {
     $scope.wazuh_table_loading = false;
     $scope.error = `Error filtering by ${
@@ -74,5 +73,6 @@ export async function filterData(
       'Data factory'
     );
   }
+  if(!$scope.$$phase) $scope.$digest();
   return;
 }
