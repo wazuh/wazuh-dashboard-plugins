@@ -25,6 +25,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 -   Now you can click on an agent's ID on the _Discover_ panels to open its details page on the app ([#904](https://github.com/wazuh/wazuh-kibana-app/pull/904)).
 -   Redesigned the _Overview > Amazon AWS_ tab, using more meaningful visualizations for a better overall view of your agents' status ([#903](https://github.com/wazuh/wazuh-kibana-app/pull/903)).
 -   Redesigned the _Overview/Agents > Vulnerabilities_ tab, using more meaningful visualizations for a better overall view of your agents' status ([#954](https://github.com/wazuh/wazuh-kibana-app/pull/954)).
+-   Now everytime the user enters the _Settings_ tab, the API connection will be automatically checked ([#971](https://github.com/wazuh/wazuh-kibana-app/pull/971)).
 
 ### Changed
 
@@ -49,6 +50,12 @@ All notable changes to the Wazuh app project will be documented in this file.
 -   Fixed alignment bug with the _Add a filter +_ button on _Discover_ and _Agents_ tabs ([#912](https://github.com/wazuh/wazuh-kibana-app/pull/912)).
 -   Fixed a bug where the `Add API` form on _Settings_ didn't appear when pressing the button after editing an existing API entry ([#944](https://github.com/wazuh/wazuh-kibana-app/pull/944)).
 -   Fixed a bug on _Ruleset_ tab where the "Description" column was showing `0` if the rule doesn't have any description ([#948](https://github.com/wazuh/wazuh-kibana-app/pull/948)).
+-   Fixed wrong alignment on related Rules/Decoders tables from _Management > Ruleset_ tab ([#971](https://github.com/wazuh/wazuh-kibana-app/pull/971)).
+-   Fixed a bug where sometimes the error messages appeared duplicated ([#971](https://github.com/wazuh/wazuh-kibana-app/pull/971)).
+
+### Removed
+
+-   On the _Management > Monitoring_ tab, the `Cluster enabled but not running` message won't appear as an error anymore ([#971](https://github.com/wazuh/wazuh-kibana-app/pull/971)).
 
 ## Wazuh v3.6.1 - Kibana v6.4.1/v6.4.2 - Revision 412
 
