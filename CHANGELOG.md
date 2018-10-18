@@ -21,6 +21,7 @@ All notable changes to the Wazuh app project will be documented in this file.
     -   Now the user can specify which index patterns can't be selected on the app using the new `ip.ignore` setting on the `config.yml` file.
     -   The valid format is an array of strings which represents index patterns.
     -   By default, this list is empty (all index patterns will be available if they use a compatible structure).
+-   Added a node selector for _Management > Status_ section when Wazuh cluster is enabled ([#976](https://github.com/wazuh/wazuh-kibana-app/pull/976)).
 -   Added quick access to _Configuration_ or _Discover_ panels for an agent on the agents list ([#939](https://github.com/wazuh/wazuh-kibana-app/pull/939)).
 -   Now you can click on an agent's ID on the _Discover_ panels to open its details page on the app ([#904](https://github.com/wazuh/wazuh-kibana-app/pull/904)).
 -   Redesigned the _Overview > Amazon AWS_ tab, using more meaningful visualizations for a better overall view of your agents' status ([#903](https://github.com/wazuh/wazuh-kibana-app/pull/903)).
