@@ -3,11 +3,11 @@
     <!-- Headline -->
     <div layout="column" layout-padding>
         <div>
-            <span class="font-size-18">Client buffer configuration</span>
+            <span class="font-size-18">Anti-flooding settings</span>
             <span ng-if="(currentConfig['agent-buffer'] && currentConfig['agent-buffer'].buffer && currentConfig['agent-buffer'].buffer.disabled === 'no') || (currentConfig['agent-buffer'] && currentConfig['agent-buffer'].buffer && !currentConfig['agent-buffer'].buffer.disabled)" class="wz-agent-status-indicator small teal">Enabled</span>
             <span ng-if="currentConfig['agent-buffer'] && currentConfig['agent-buffer'].buffer && currentConfig['agent-buffer'].buffer.disabled === 'yes'" class="wz-agent-status-indicator small red">Disabled</span>
         </div>
-        <span class="md-subheader">Agent bucket parameters in order to avoid events flooding</span>
+        <span class="md-subheader">Agent bucket parameters to avoid event flooding</span>
     </div>
     <!-- End headline -->
 
@@ -40,7 +40,7 @@
                         <div>
                             <span class="font-size-16">Main settings</span>
                             <div class="wz-margin-top-10">
-                                <span class="md-subheader small">These settings determine the events processing capacity for your agent</span>
+                                <span class="md-subheader small">These settings determine the event processing rate for your agent</span>
                             </div>
                         </div>
                         <span flex></span>
@@ -59,7 +59,7 @@
                         </wz-config-item>
                         <wz-config-item
                             label="Queue size"
-                            value="currentConfig['agent-buffer'].buffer.disabled || '5000'">
+                            value="currentConfig['agent-buffer'].buffer.queue_size || '5000'">
                         </wz-config-item>
                         <wz-config-item
                             label="Events per second"

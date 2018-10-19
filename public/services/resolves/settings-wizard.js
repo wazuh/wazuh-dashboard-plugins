@@ -23,18 +23,19 @@ export function settingsWizard(
   genericReq,
   errorHandler,
   wzMisc,
-  wazuhConfig
+  wazuhConfig,
+  disableErrors = false
 ) {
   try {
     const deferred = $q.defer();
 
-    !$location.path().includes('health-check') &&
+    !disableErrors &&
       totalRAM(genericReq, errorHandler);
 
     const checkResponse = data => {
       let fromElastic = false;
       if (parseInt(data.data.error) === 2) {
-        errorHandler.handle(
+        !disableErrors && errorHandler.handle(
           'Wazuh App: Please set up Wazuh API credentials.',
           'Routes',
           true
@@ -45,7 +46,7 @@ export function settingsWizard(
         (data && data.data && data.data.data && data.data.data.apiIsDown)
       ) {
         wzMisc.setApiIsDown(true);
-        errorHandler.handle('Wazuh RESTful API seems to be down.', 'Routes');
+        !disableErrors && errorHandler.handle('Wazuh RESTful API seems to be down.', 'Routes');
       } else {
         fromElastic = true;
         wzMisc.setBlankScr(errorHandler.handle(data, 'Routes'));
@@ -67,7 +68,7 @@ export function settingsWizard(
           parseInt(data.data.error) === 7 &&
           data.data.message === '401 Unauthorized'
         ) {
-          errorHandler.handle(
+          !disableErrors && errorHandler.handle(
             'Wrong Wazuh API credentials, please add a new API and/or modify the existing one.',
             'Routes'
           );
@@ -161,8 +162,8 @@ export function settingsWizard(
         .catch(error => {
           appState.removeCurrentAPI();
 
-          errorHandler.handle(error, 'Routes');
-          errorHandler.handle(
+          !disableErrors && errorHandler.handle(error, 'Routes');
+          !disableErrors && errorHandler.handle(
             'Please insert a new Wazuh API or select an existing valid one.',
             'Routes',
             true
@@ -175,7 +176,7 @@ export function settingsWizard(
     };
 
     if (
-      !$location.path().includes('/health-check') &&
+      !disableErrors && 
       healthCheck($window, $rootScope)
     ) {
       $location.path('/health-check');
@@ -213,7 +214,7 @@ export function settingsWizard(
             }
           })
           .catch(error => {
-            errorHandler.handle(error, 'Routes');
+            !disableErrors && errorHandler.handle(error, 'Routes');
             wzMisc.setWizard(true);
             if (!$location.path().includes('/settings')) {
               $location.search('_a', null);
@@ -229,6 +230,6 @@ export function settingsWizard(
 
     return deferred.promise;
   } catch (error) {
-    errorHandler.handle(error, 'Routes');
+    !disableErrors && errorHandler.handle(error, 'Routes');
   }
 }

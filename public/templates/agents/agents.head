@@ -174,7 +174,7 @@
     <!-- End Discover search bar section -->
 
     <!-- Loading status section -->
-    <div layout="column" layout-align="center center" ng-if="(tab !== 'welcome') && (tab !== 'configuration') && tab !== 'syscollector'" ng-show="resultState === 'ready' && tabView === 'panels' && !rendered">
+    <div layout="column" layout-align="center center" ng-if="tab !== 'welcome' && tab !== 'configuration' && tab !== 'syscollector'" ng-show="resultState === 'ready' && tabView === 'panels' && !rendered">
         <div class="percentage"><i class="fa fa-fw fa-spin fa-spinner" aria-hidden="true"></i></div>
         <div class="percentage">{{loadingStatus}}</div>
     </div>
@@ -199,6 +199,6 @@
     <!-- No results section -->
 
     <!-- Loading ring -->
-    <div class='uil-ring-css' ng-show="load && tab !== 'configuration'">
+    <div class='uil-ring-css' ng-show="load && tab !== 'configuration' && tabView === 'panels'">
         <div></div>
     </div>

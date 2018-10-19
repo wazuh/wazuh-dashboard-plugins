@@ -7,7 +7,7 @@
             <span ng-if="currentConfig && currentConfig.osquery && currentConfig.osquery.disabled === 'no'" class="wz-agent-status-indicator small teal">Enabled</span>
             <span ng-if="(currentConfig && currentConfig.osquery && currentConfig.osquery.disabled === 'yes') || (currentConfig && !currentConfig.osquery)" class="wz-agent-status-indicator small red">Disabled</span>
         </div>
-        <span class="md-subheader">Osquery allows to expose an operating system as a high-performance relational database</span>
+        <span class="md-subheader">Expose an operating system as a high-performance relational database</span>
     </div>
     <!-- End headline -->
 
@@ -84,7 +84,7 @@
                     <div ng-if="currentConfig.osquery.packs && isArray(currentConfig.osquery.packs) && currentConfig.osquery.packs.length" class="wz-margin-top-10">
                         <span class="font-size-16">Osquery packs</span>
                         <div class="wz-margin-top-10">
-                            <span class="md-subheader small">A pack contains multiple, related queries to quickly get information</span>
+                            <span class="md-subheader small">A pack contains multiple queries to quickly retrieve system information</span>
                         </div>
                     </div>
                     <md-divider ng-if="currentConfig.osquery.packs && isArray(currentConfig.osquery.packs) && currentConfig.osquery.packs.length" class="wz-margin-top-10"></md-divider>
