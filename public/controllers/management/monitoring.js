@@ -227,30 +227,31 @@ app.controller('clusterController', function(
         apiReq.request('GET', '/cluster/healthcheck', {})
       ]);
 
-      const nodesCount = data[0].data.data.totalItems;
-      $scope.nodesCount = nodesCount;
+      const result = data.map(
+        item => (item && item.data && item.data.data ? item.data.data : false)
+      );
 
-      const configuration = data[1];
-      $scope.configuration = configuration.data.data;
+      const [
+        nodeList,
+        clusterConfig,
+        version,
+        agents,
+        clusterHealthCheck
+      ] = result;
 
-      const version = data[2];
-      $scope.version = version.data.data;
+      $scope.nodesCount = nodeList.totalItems;
+      $scope.configuration = clusterConfig;
+      $scope.version = version;
+      $scope.agentsCount = agents.totalItems - 1;
+      $scope.healthCheck = clusterHealthCheck;
 
-      const agents = data[3];
-      $scope.agentsCount = agents.data.data.totalItems - 1;
-
-      const health = data[4];
-      $scope.healthCheck = health.data.data;
-
-      const nodes = data[0].data.data;
-
-      nodes.name = $scope.configuration.name;
-      nodes.master_node = $scope.configuration.node_name;
+      nodeList.name = $scope.configuration.name;
+      nodeList.master_node = $scope.configuration.node_name;
 
       const visData = await genericReq.request(
         'POST',
         `/elastic/visualizations/cluster-monitoring/${appState.getCurrentPattern()}`,
-        { nodes }
+        { nodes: nodeList }
       );
 
       rawVisualizations.assignItems(visData.data.raw);
