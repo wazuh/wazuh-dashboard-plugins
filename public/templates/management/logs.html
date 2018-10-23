@@ -9,25 +9,6 @@
 
     <!-- Filters and Realtime button section -->
     <div ng-show="!loading" layout="row" layout-align="start center" class="md-padding">
-        <div layout="column" flex="40" class="height-40 wz-margin-right-15">
-            <div layout="row">
-                <input placeholder="Filter logs..." ng-model="custom_search" type="text" class="kuiLocalSearchInput ng-empty ng-pristine ng-scope ng-touched ng-valid"
-                    aria-invalid="false" wz-enter="search(custom_search)">
-                <button type="submit" aria-label="Search" class="kuiLocalSearchButton height-40" ng-click="search(custom_search)">
-                    <span class="fa fa-search" aria-hidden="true"></span>
-                </button>
-            </div>
-        </div>
-
-        <!-- Node selector -->
-        <div flex="20" layout="column" layout-align="center" class="height-40 wz-margin-right-15 wz-select-input">
-            <select flex class="kuiSelect wz-border-none cursor-pointer max-height-35" id="categoryBox" ng-model="selectedNode" ng-change="changeNode(selectedNode)"
-            aria-label="Logs category">
-                <option ng-repeat="node in nodeList" value="{{node}}">{{node}}</option>
-            </select>
-        </div>
-        <!-- End node selector -->
-
         <!-- Daemon selector -->
         <div flex="20" layout="column"  layout-align="center" class="height-40 wz-margin-right-15 wz-select-input">
             <select flex class="kuiSelect wz-border-none cursor-pointer max-height-35" ng-disabled="realtime || !daemons.length" id="categoryBox" ng-model="category" ng-change="filter({name:'category',value:category})"
@@ -39,7 +20,7 @@
         <!-- End daemon selector -->
 
         <!-- Level selector -->
-        <div flex="20" layout="column" layout-align="center" class="height-40 wz-select-input">
+        <div flex="20" layout="column" layout-align="center" class="height-40 wz-select-input wz-margin-right-15">
             <select flex class="kuiSelect wz-border-none cursor-pointer max-height-35" ng-disabled="realtime" id="levelBox" ng-model="type_log" ng-change="filter({name:'type_log',value:type_log})"
             aria-label="Logs level">
                 <option value="all">All log levels</option>
@@ -48,6 +29,13 @@
                 <option value="warning">Warning</option>
                 <option value="critical">Critical</option>
                 <option value="debug">Debug</option>
+            </select>
+        </div>
+
+        <div flex="20" layout="column" ng-show="nodeList" layout-align="center" class="height-40 wz-select-input">
+            <select flex class="kuiSelect wz-border-none cursor-pointer max-height-35" id="categoryBox" ng-model="selectedNode" ng-change="changeNode(selectedNode)"
+            aria-label="Logs category">
+                <option ng-repeat="node in nodeList" value="{{node}}">{{node}}</option>
             </select>
         </div>
         <!-- End Level selector -->
@@ -66,6 +54,14 @@
     </div>
     <!-- End Filters and Realtime button section -->
 
+    <div layout="row" flex class="md-padding" ng-if="logsPath">
+        <input placeholder="Filter logs..." ng-model="custom_search" type="text" class="kuiLocalSearchInput ng-empty ng-pristine ng-scope ng-touched ng-valid"
+            aria-invalid="false" wz-enter="search(custom_search)">
+        <button type="submit" aria-label="Search" class="kuiLocalSearchButton height-40" ng-click="search(custom_search)">
+            <span class="fa fa-search" aria-hidden="true"></span>
+        </button>
+    </div>
+
     <!-- Logs table section -->
     <div layout="row" layout-padding ng-if="logsPath">
         <wz-table
@@ -73,7 +69,7 @@
             extra-limit="true"
             path="logsPath"
             keys="['timestamp',{value:'tag',size:2},'level',{value:'description',size:4,nosortable:true}]"
-            row-sizes="[15,13,11]">
+            row-sizes="[12,10,7]">
         </wz-table>
     </div>
     <!-- End Logs table section -->

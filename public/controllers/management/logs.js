@@ -99,6 +99,8 @@ class Logs {
 
   async changeNode(node) {
     try {
+      this.$scope.type_log = 'all';
+      this.$scope.category = 'all';
       this.$scope.selectedNode = node;
       this.$scope.$broadcast('wazuhUpdateInstancePath', { path: `/cluster/${node}/logs` });
       const summary = await this.apiReq.request(
@@ -106,7 +108,8 @@ class Logs {
         `/cluster/${node}/logs/summary`,
         {}
       )
-      this.$scope.daemons = [];
+      const daemons = summary.data.data;
+      this.$scope.daemons = Object.keys(daemons).map(item => ({ title: item }));
       if (!this.$scope.$$phase) this.$scope.$digest();
     } catch(error) {
       this.errorHandler.handle(error, 'Logs');
@@ -127,7 +130,7 @@ class Logs {
           this.$scope.nodeList = nodeList.data.data.items.map(item => item.name).reverse();
           this.$scope.selectedNode = nodeList.data.data.items.filter(item => item.type === 'master')[0].name
         }
-      }
+      } 
       
       this.$scope.logsPath = clusterEnabled ? `/cluster/${this.$scope.selectedNode}/logs` : '/manager/logs'
       
