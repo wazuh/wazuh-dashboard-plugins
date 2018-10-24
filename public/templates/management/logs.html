@@ -33,7 +33,7 @@
         </div>
 
         <div flex="20" layout="column" ng-show="nodeList" layout-align="center" class="height-40 wz-select-input">
-            <select flex class="kuiSelect wz-border-none cursor-pointer max-height-35" id="categoryBox" ng-model="selectedNode" ng-change="changeNode(selectedNode)"
+            <select flex class="kuiSelect wz-border-none cursor-pointer max-height-35" ng-disabled="realtime" id="categoryBox" ng-model="selectedNode" ng-change="changeNode(selectedNode)"
             aria-label="Logs category">
                 <option ng-repeat="node in nodeList" value="{{node}}">{{node}}</option>
             </select>
@@ -43,11 +43,11 @@
         <!-- White space between filters and Realtime button -->
         <span flex></span>
 
-        <md-button ng-if="!realtime" class="wz-button md-raised md-primary" ng-click="playRealtime()" aria-label="Play realtime button">
+        <md-button ng-if="!realtime" class="wz-button md-raised md-primary no-margin-right" ng-click="playRealtime()" aria-label="Play realtime button">
             <i class="fa fa-play fa-fw" aria-hidden="true"></i>
             Play realtime
         </md-button>
-        <md-button ng-if="realtime" class="wz-button md-raised md-primary" ng-click="stopRealtime()" aria-label="Stop realtime button">
+        <md-button ng-if="realtime" class="wz-button md-raised md-primary no-margin-right" ng-click="stopRealtime()" aria-label="Stop realtime button">
             <i class="fa fa-stop fa-fw" aria-hidden="true"></i>
             Stop realtime
         </md-button>
