@@ -50,15 +50,15 @@ export async function initTable(
     await fetch();
     wzTableFilter.set(instance.filters);
     $scope.wazuh_table_loading = false;
-    if (!$scope.$$phase) $scope.$digest();
   } catch (error) {
     $scope.wazuh_table_loading = false;
     $scope.error = `Error while init table - ${error.message ||
-      error} - Please refresh your browser.`;
+      error}.`;
     errorHandler.handle(
       `Error while init table. ${error.message || error}`,
       'Data factory'
     );
   }
+  if (!$scope.$$phase) $scope.$digest();
   return;
 }
