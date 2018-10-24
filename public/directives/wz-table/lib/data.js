@@ -29,7 +29,7 @@ export async function searchData(
   } catch (error) {
     $scope.wazuh_table_loading = false;
     $scope.error = `Error searching - ${error.message ||
-      error} - Please refresh your browser.`;
+      error}.`;
     errorHandler.handle(
       `Error searching. ${error.message || error}`,
       'Data factory'
@@ -65,7 +65,7 @@ export async function filterData(
     $scope.wazuh_table_loading = false;
     $scope.error = `Error filtering by ${
       filter ? filter.value : 'undefined'
-    } - ${error.message || error} - Please refresh your browser.`;
+    } - ${error.message || error}.`;
     errorHandler.handle(
       `Error filtering by ${
         filter ? filter.value : 'undefined'

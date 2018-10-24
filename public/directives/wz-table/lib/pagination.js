@@ -28,7 +28,7 @@ export async function nextPage(currentPage, $scope, errorHandler, fetch) {
   } catch (error) {
     $scope.wazuh_table_loading = false;
     $scope.error = `Error paginating table - ${error.message ||
-      error} - Please refresh your browser.`;
+      error}.`;
     errorHandler.handle(
       `Error paginating table due to ${error.message || error}`,
       'Data factory'

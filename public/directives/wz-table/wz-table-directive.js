@@ -95,6 +95,9 @@ app.directive('wzTable', function() {
           $scope.searchTable();
           return;
         } catch (error) {
+          if(error && !error.data && error.status === -1 && error.xhrStatus === 'abort') {
+            return Promise.reject('Request took too long, aborted')
+          }
           return Promise.reject(error);
         }
       };
@@ -134,7 +137,7 @@ app.directive('wzTable', function() {
         } catch (error) {
           realTime = false;
           $scope.error = `Real time feature aborted - ${error.message ||
-            error} - Please refresh your browser.`;
+            error}.`;
           errorHandler.handle(
             `Real time feature aborted. ${error.message || error}`,
             'Data factory'
