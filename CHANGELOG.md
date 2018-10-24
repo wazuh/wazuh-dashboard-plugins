@@ -27,7 +27,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 -   Redesigned the _Overview > Amazon AWS_ tab, using more meaningful visualizations for a better overall view of your agents' status ([#903](https://github.com/wazuh/wazuh-kibana-app/pull/903)).
 -   Redesigned the _Overview/Agents > Vulnerabilities_ tab, using more meaningful visualizations for a better overall view of your agents' status ([#954](https://github.com/wazuh/wazuh-kibana-app/pull/954)).
 -   Now everytime the user enters the _Settings_ tab, the API connection will be automatically checked ([#971](https://github.com/wazuh/wazuh-kibana-app/pull/971)).
--   Added a node selector for _Management > Logs_ section when Wazuh cluster is enabled ([]()).
+-   Added a node selector for _Management > Logs_ section when Wazuh cluster is enabled ([#980](https://github.com/wazuh/wazuh-kibana-app/pull/980)).
 
 ### Changed
 
@@ -45,7 +45,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 -   Changed some labels to remove the "MD5 sum" expression, it will use "Checksum" instead ([#945](https://github.com/wazuh/wazuh-kibana-app/pull/945)).
 -   Added word wrapping class to group name in _Management > Groups > Group detail_ tab ([#945](https://github.com/wazuh/wazuh-kibana-app/pull/945)).
 -   The `wz-table` directive has been refactored ([#953](https://github.com/wazuh/wazuh-kibana-app/pull/953)).
--   The `wz-table` directive now checks if a request is aborted ([]()).
+-   The `wz-table` directive now checks if a request is aborted ([#979](https://github.com/wazuh/wazuh-kibana-app/pull/979)).
 
 ### Fixed
 
