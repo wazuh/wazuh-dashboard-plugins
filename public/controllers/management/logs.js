@@ -11,7 +11,7 @@
  */
 import { uiModules } from 'ui/modules';
 import * as FileSaver from '../../services/file-saver';
-
+import $ from 'jquery';
 const app = uiModules.get('app/wazuh', []);
 
 class Logs {
@@ -25,6 +25,7 @@ class Logs {
     this.$scope.nodeList = false;
     this.$scope.type_log = 'all';
     this.$scope.category = 'all';
+    this.$scope.custom_search = '';
   }
 
   /**
@@ -44,8 +45,8 @@ class Logs {
    * Event handler for the search bar.
    * @param {string} term Term(s) to be searched
    */
-  search(term) {
-    this.$scope.$broadcast('wazuhSearch', { term });
+  search() {
+    this.$scope.$broadcast('wazuhSearch', { term: this.$scope.custom_search });
   }
 
   /**
@@ -98,7 +99,9 @@ class Logs {
   }
 
   async changeNode(node) {
-    try {
+    try {    
+      this.$scope.custom_search = '';
+      $('#logsSearchBar').val('')
       this.$scope.type_log = 'all';
       this.$scope.category = 'all';
       this.$scope.selectedNode = node;
@@ -106,14 +109,14 @@ class Logs {
       const summary = await this.apiReq.request(
         'GET',
         `/cluster/${node}/logs/summary`,
-        {}
+         {}
       )
       const daemons = summary.data.data;
       this.$scope.daemons = Object.keys(daemons).map(item => ({ title: item }));
-      if (!this.$scope.$$phase) this.$scope.$digest();
     } catch(error) {
       this.errorHandler.handle(error, 'Logs');
     }
+    if (!this.$scope.$$phase) this.$scope.$digest();
   }
 
   /**
