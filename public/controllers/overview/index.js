@@ -222,10 +222,10 @@ app.controller('overviewController', function(
         commonData.getPCI(),
         commonData.getGDPR()
       ]);
-
-      $scope.pciTabs = data[0];
+      const [pciTabs, gdprTabs] = data;
+      $scope.pciTabs = pciTabs;
       $scope.selectedPciIndex = 0;
-      $scope.gdprTabs = data[1];
+      $scope.gdprTabs = gdprTabs;
       $scope.selectedGdprIndex = 0;
 
       return;

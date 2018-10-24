@@ -842,24 +842,24 @@ export class WazuhApiCtrl {
         rejectUnauthorized: !config.insecure
       };
 
-      const distinctUrl = '/agents/stats/distinct';
+      const distinctUrl = `${config.url}:${config.port}/agents/stats/distinct`;
 
       const data = await Promise.all([
         needle(
           'get',
-          `${config.url}:${config.port}${distinctUrl}`,
+          distinctUrl,
           { fields: 'node_name', select: 'node_name' },
           headers
         ),
         needle(
           'get',
-          `${config.url}:${config.port}${distinctUrl}`,
+          distinctUrl,
           { fields: 'group', select: 'group' },
           headers
         ),
         needle(
           'get',
-          `${config.url}:${config.port}${distinctUrl}`,
+          distinctUrl,
           {
             fields: 'os.name,os.platform,os.version',
             select: 'os.name,os.platform,os.version'
@@ -868,7 +868,7 @@ export class WazuhApiCtrl {
         ),
         needle(
           'get',
-          `${config.url}:${config.port}${distinctUrl}`,
+          distinctUrl,
           { fields: 'version', select: 'version' },
           headers
         ),
@@ -886,6 +886,22 @@ export class WazuhApiCtrl {
         )
       ]);
 
+      const parsedResponses = data.map(
+        item =>
+          item && item.body && item.body.data && !item.body.error
+            ? item.body.data
+            : false
+      );
+
+      const [
+        nodes,
+        groups,
+        osPlatforms,
+        versions,
+        summary,
+        lastAgent
+      ] = parsedResponses;
+
       const result = {
         groups: [],
         nodes: [],
@@ -901,41 +917,20 @@ export class WazuhApiCtrl {
         }
       };
 
-      if (
-        data &&
-        data[0] &&
-        data[0].body &&
-        data[0].body.data &&
-        !data[0].body.error &&
-        data[0].body.data.items
-      ) {
-        result.nodes = data[0].body.data.items
+      if (nodes && nodes.items) {
+        result.nodes = nodes.items
           .filter(item => !!item.node_name)
           .map(item => item.node_name);
       }
 
-      if (
-        data &&
-        data[1] &&
-        data[1].body &&
-        data[1].body.data &&
-        !data[1].body.error &&
-        data[1].body.data.items
-      ) {
-        result.groups = data[1].body.data.items
+      if (groups && groups.items) {
+        result.groups = groups.items
           .filter(item => !!item.group)
           .map(item => item.group);
       }
 
-      if (
-        data &&
-        data[2] &&
-        data[2].body &&
-        data[2].body.data &&
-        !data[2].body.error &&
-        data[1].body.data.items
-      ) {
-        result.osPlatforms = data[2].body.data.items
+      if (osPlatforms && osPlatforms.items) {
+        result.osPlatforms = osPlatforms.items
           .filter(
             item =>
               !!item.os && item.os.platform && item.os.name && item.os.version
@@ -943,43 +938,27 @@ export class WazuhApiCtrl {
           .map(item => item.os);
       }
 
-      if (
-        data &&
-        data[3] &&
-        data[3].body &&
-        data[3].body.data &&
-        !data[3].body.error &&
-        data[3].body.data.items
-      ) {
-        result.versions = data[3].body.data.items
+      if (versions && versions.items) {
+        result.versions = versions.items
           .filter(item => !!item.version)
           .map(item => item.version);
       }
 
-      if (data[4] && data[4].body && !data[4].body.error && data[4].body.data) {
+      if (summary) {
         Object.assign(result.summary, {
-          agentsCountActive: data[4].body.data.Active - 1,
-          agentsCountDisconnected: data[4].body.data.Disconnected,
-          agentsCountNeverConnected: data[4].body.data['Never connected'],
-          agentsCountTotal: data[4].body.data.Total - 1,
+          agentsCountActive: summary.Active - 1,
+          agentsCountDisconnected: summary.Disconnected,
+          agentsCountNeverConnected: summary['Never connected'],
+          agentsCountTotal: summary.Total - 1,
           agentsCoverity:
-            data[4].body.data.Total - 1
-              ? ((data[4].body.data.Active - 1) /
-                  (data[4].body.data.Total - 1)) *
-                100
+            summary.Total - 1
+              ? ((summary.Active - 1) / (summary.Total - 1)) * 100
               : 0
         });
       }
 
-      if (
-        data[5] &&
-        data[5].body &&
-        !data[5].body.error &&
-        data[5].body.data &&
-        data[5].body.data.items &&
-        data[5].body.data.items.length
-      ) {
-        Object.assign(result.lastAgent, data[5].body.data.items[0]);
+      if (lastAgent && lastAgent.items && lastAgent.items.length) {
+        Object.assign(result.lastAgent, lastAgent.items[0]);
       }
 
       return reply({ error: 0, result });

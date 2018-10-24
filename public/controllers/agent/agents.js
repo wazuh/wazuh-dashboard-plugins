@@ -152,9 +152,10 @@ class AgentsController {
     // PCI and GDPR requirements
     Promise.all([this.commonData.getPCI(), this.commonData.getGDPR()])
       .then(data => {
-        this.$scope.pciTabs = data[0];
+        const [pciTabs, gdprTabs] = data;
+        this.$scope.pciTabs = pciTabs;
         this.$scope.selectedPciIndex = 0;
-        this.$scope.gdprTabs = data[1];
+        this.$scope.gdprTabs = gdprTabs;
         this.$scope.selectedGdprIndex = 0;
       })
       .catch(error => this.errorHandler.handle(error, 'Agents'));
@@ -256,14 +257,13 @@ class AgentsController {
       this.$scope.tabView = subtab;
 
       if (
-        ((subtab === 'panels') ||
-        (this.targetLocation &&
-        typeof this.targetLocation === 'object' &&
-        this.targetLocation.subTab === 'discover' &&
-        subtab === 'discover')) &&
+        (subtab === 'panels' ||
+          (this.targetLocation &&
+            typeof this.targetLocation === 'object' &&
+            this.targetLocation.subTab === 'discover' &&
+            subtab === 'discover')) &&
         !['configuration', 'welcome', 'syscollector'].includes(this.$scope.tab)
       ) {
-
         const condition =
           !this.changeAgent && (localChange || preserveDiscover);
 
@@ -373,64 +373,41 @@ class AgentsController {
         })
       ]);
 
+      const result = data.map(
+        item => (item && item.data && item.data.data ? item.data.data : false)
+      );
+      const [
+        hardwareResponse,
+        osResponse,
+        netifaceResponse,
+        portsResponse,
+        packagesDateResponse,
+        processesDateResponse
+      ] = result;
+
       // Before proceeding, syscollector data is an empty object
       this.$scope.syscollector = {};
 
-      const hardware = {};
-      const os = {};
-      const netiface = {};
-      const ports = {};
-      const packagesDate = {};
-      const processesDate = {};
-
-      // If there is hardware information, add it
-      if (
-        data[0] &&
-        data[0].data &&
-        data[0].data.data &&
-        typeof data[0].data.data === 'object' &&
-        Object.keys(data[0].data.data).length
-      ) {
-        Object.assign(hardware, data[0].data.data);
-      }
-
-      // If there is OS information, add it
-      if (
-        data[1] &&
-        data[1].data &&
-        data[1].data.data &&
-        typeof data[1].data.data === 'object' &&
-        Object.keys(data[1].data.data).length
-      ) {
-        Object.assign(os, data[1].data.data);
-      }
-
-      // If there is network information, add it
-      if (data[2] && data[2].data && data[2].data.data) {
-        Object.assign(netiface, data[2].data.data);
-      }
-
-      // If there is ports information, add it
-      if (data[3] && data[3].data && data[3].data.data) {
-        Object.assign(ports, data[3].data.data);
-      }
-
-      // If there is packages information, add it
-      if (data[4] && data[4].data && data[4].data.data) {
-        Object.assign(packagesDate, data[4].data.data);
-      }
-
-      // If there is processes information, add it
-      if (data[5] && data[5].data && data[5].data.data) {
-        Object.assign(processesDate, data[5].data.data);
-      }
+      const packagesDate = packagesDateResponse
+        ? { ...packagesDateResponse }
+        : false;
+      const processesDate = processesDateResponse
+        ? { ...processesDateResponse }
+        : false;
 
       // Fill syscollector object
       this.$scope.syscollector = {
-        hardware,
-        os,
-        netiface,
-        ports,
+        hardware:
+          typeof hardwareResponse === 'object' &&
+          Object.keys(hardwareResponse).length
+            ? { ...hardwareResponse }
+            : false,
+        os:
+          typeof osResponse === 'object' && Object.keys(osResponse).length
+            ? { ...osResponse }
+            : false,
+        netiface: netifaceResponse ? { ...netifaceResponse } : false,
+        ports: portsResponse ? { ...portsResponse } : false,
         packagesDate:
           packagesDate && packagesDate.items && packagesDate.items.length
             ? packagesDate.items[0].scan_time
@@ -464,8 +441,19 @@ class AgentsController {
         this.apiReq.request('GET', `/agents/${id}/group/is_sync`, {})
       ]);
 
+      const result = data.map(
+        item => (item && item.data && item.data.data ? item.data.data : false)
+      );
+      
+      const [
+        agentInfo,
+        syscheckLastScan,
+        rootcheckLastScan,
+        isSync
+      ] = result;
+
       // Agent
-      this.$scope.agent = data[0].data.data;
+      this.$scope.agent = agentInfo;
       if (this.$scope.agent.os) {
         this.$scope.agentOS =
           this.$scope.agent.os.name + ' ' + this.$scope.agent.os.version;
@@ -474,15 +462,15 @@ class AgentsController {
       }
 
       // Syscheck
-      this.$scope.agent.syscheck = data[1].data.data;
+      this.$scope.agent.syscheck = syscheckLastScan;
       this.validateSysCheck();
 
       // Rootcheck
-      this.$scope.agent.rootcheck = data[2].data.data;
+      this.$scope.agent.rootcheck = rootcheckLastScan;
       this.validateRootCheck();
 
       // Configuration synced
-      this.$scope.isSynchronized = data[3] && data[3].data && data[3].data.data && data[3].data.data.synced;
+      this.$scope.isSynchronized = isSync && isSync.synced;
 
       this.$scope.switchTab(this.$scope.tab, true);
 

@@ -55,7 +55,9 @@ class StatusController {
         this.apiReq.request('GET', '/decoders', { offset: 0, limit: 1 })
       ]);
 
-      const parsedData = data.map(item => item.data.data);
+      const parsedData = data.map(
+        item => (item && item.data && item.data.data ? item.data.data : false)
+      );
       const [
         stats,
         clusterStatus,
