@@ -27,6 +27,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 -   Redesigned the _Overview > Amazon AWS_ tab, using more meaningful visualizations for a better overall view of your agents' status ([#903](https://github.com/wazuh/wazuh-kibana-app/pull/903)).
 -   Redesigned the _Overview/Agents > Vulnerabilities_ tab, using more meaningful visualizations for a better overall view of your agents' status ([#954](https://github.com/wazuh/wazuh-kibana-app/pull/954)).
 -   Now everytime the user enters the _Settings_ tab, the API connection will be automatically checked ([#971](https://github.com/wazuh/wazuh-kibana-app/pull/971)).
+-   Added a new Angular.js directive named `wz-config-viewer` for viewing JSON/XML content ([]()).
 
 ### Changed
 
