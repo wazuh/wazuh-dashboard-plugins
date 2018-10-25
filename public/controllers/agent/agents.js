@@ -149,17 +149,6 @@ class AgentsController {
       this.visFactoryService.clearAll();
     });
 
-    // PCI and GDPR requirements
-    Promise.all([this.commonData.getPCI(), this.commonData.getGDPR()])
-      .then(data => {
-        const [pciTabs, gdprTabs] = data;
-        this.$scope.pciTabs = pciTabs;
-        this.$scope.selectedPciIndex = 0;
-        this.$scope.gdprTabs = gdprTabs;
-        this.$scope.selectedGdprIndex = 0;
-      })
-      .catch(error => this.errorHandler.handle(error, 'Agents'));
-
     this.$scope.isArray = Array.isArray;
 
     this.$scope.goGroup = () => {
@@ -292,43 +281,73 @@ class AgentsController {
   }
 
   // Switch tab
-  switchTab(tab, force = false) {
-    if (tab === 'configuration') {
-      this.$scope.switchConfigurationTab('welcome');
-    } else {
-      this.configurationHandler.reset(this.$scope);
+  async switchTab(tab, force = false) {
+    try {
+      if (tab === 'pci') {
+        const pciTabs = await this.commonData.getPCI();
+        this.$scope.pciTabs = pciTabs;
+        this.$scope.selectedPciIndex = 0;
+      }
+      if (tab === 'gdpr') {
+        const gdprTabs = await this.commonData.getPCI();
+        this.$scope.gdprTabs = gdprTabs;
+        this.$scope.selectedGdprIndex = 0;
+      }
+      if (tab === 'syscollector')
+        await this.loadSyscollector(this.$scope.agent.id);
+      if (tab === 'configuration') {
+        const isSync = await this.apiReq.request(
+          'GET',
+          `/agents/${this.$scope.agent.id}/group/is_sync`,
+          {}
+        );
+        // Configuration synced
+        this.$scope.isSynchronized =
+          isSync && isSync.data && isSync.data.data && isSync.data.data.synced;
+        this.$scope.switchConfigurationTab('welcome');
+      } else {
+        this.configurationHandler.reset(this.$scope);
+      }
+      if (
+        tab !== 'configuration' &&
+        tab !== 'welcome' &&
+        tab !== 'syscollector'
+      )
+        this.tabHistory.push(tab);
+      if (this.tabHistory.length > 2)
+        this.tabHistory = this.tabHistory.slice(-2);
+      this.tabVisualizations.setTab(tab);
+      if (this.$scope.tab === tab && !force) return;
+      const onlyAgent = this.$scope.tab === tab && force;
+      const sameTab = this.$scope.tab === tab;
+      this.$location.search('tab', tab);
+      const preserveDiscover =
+        this.tabHistory.length === 2 &&
+        this.tabHistory[0] === this.tabHistory[1] &&
+        !force;
+      this.$scope.tab = tab;
+
+      const targetSubTab =
+        this.targetLocation && typeof this.targetLocation === 'object'
+          ? this.targetLocation.subTab
+          : 'panels';
+
+      if (this.$scope.tab !== 'configuration') {
+        this.$scope.switchSubtab(
+          targetSubTab,
+          true,
+          onlyAgent,
+          sameTab,
+          preserveDiscover
+        );
+      }
+
+      this.shareAgent.deleteTargetLocation();
+      this.targetLocation = null;
+    } catch (error) {
+      return Promise.reject(error);
     }
-    if (tab !== 'configuration' && tab !== 'welcome' && tab !== 'syscollector')
-      this.tabHistory.push(tab);
-    if (this.tabHistory.length > 2) this.tabHistory = this.tabHistory.slice(-2);
-    this.tabVisualizations.setTab(tab);
-    if (this.$scope.tab === tab && !force) return;
-    const onlyAgent = this.$scope.tab === tab && force;
-    const sameTab = this.$scope.tab === tab;
-    this.$location.search('tab', tab);
-    const preserveDiscover =
-      this.tabHistory.length === 2 &&
-      this.tabHistory[0] === this.tabHistory[1] &&
-      !force;
-    this.$scope.tab = tab;
-
-    const targetSubTab =
-      this.targetLocation && typeof this.targetLocation === 'object'
-        ? this.targetLocation.subTab
-        : 'panels';
-
-    if (this.$scope.tab !== 'configuration') {
-      this.$scope.switchSubtab(
-        targetSubTab,
-        true,
-        onlyAgent,
-        sameTab,
-        preserveDiscover
-      );
-    }
-
-    this.shareAgent.deleteTargetLocation();
-    this.targetLocation = null;
+    if (!this.$scope.$$phase) this.$scope.$digest();
   }
 
   // Agent data
@@ -437,20 +456,14 @@ class AgentsController {
       const data = await Promise.all([
         this.apiReq.request('GET', `/agents/${id}`, {}),
         this.apiReq.request('GET', `/syscheck/${id}/last_scan`, {}),
-        this.apiReq.request('GET', `/rootcheck/${id}/last_scan`, {}),
-        this.apiReq.request('GET', `/agents/${id}/group/is_sync`, {})
+        this.apiReq.request('GET', `/rootcheck/${id}/last_scan`, {})
       ]);
 
       const result = data.map(
         item => (item && item.data && item.data.data ? item.data.data : false)
       );
-      
-      const [
-        agentInfo,
-        syscheckLastScan,
-        rootcheckLastScan,
-        isSync
-      ] = result;
+
+      const [agentInfo, syscheckLastScan, rootcheckLastScan] = result;
 
       // Agent
       this.$scope.agent = agentInfo;
@@ -469,12 +482,7 @@ class AgentsController {
       this.$scope.agent.rootcheck = rootcheckLastScan;
       this.validateRootCheck();
 
-      // Configuration synced
-      this.$scope.isSynchronized = isSync && isSync.synced;
-
-      this.$scope.switchTab(this.$scope.tab, true);
-
-      await this.loadSyscollector(id);
+      await this.$scope.switchTab(this.$scope.tab, true);
 
       this.$scope.load = false;
       if (!this.$scope.$$phase) this.$scope.$digest();
@@ -554,7 +562,7 @@ class AgentsController {
       this.$scope.load = false;
 
       if (this.$scope.tab !== 'configuration')
-        this.$scope.switchTab(this.$scope.tab, true);
+        await this.$scope.switchTab(this.$scope.tab, true);
 
       if (!this.$scope.$$phase) this.$scope.$digest();
       return;
