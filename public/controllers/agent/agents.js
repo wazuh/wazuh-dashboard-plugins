@@ -149,17 +149,6 @@ class AgentsController {
       this.visFactoryService.clearAll();
     });
 
-    // PCI and GDPR requirements
-    Promise.all([this.commonData.getPCI(), this.commonData.getGDPR()])
-      .then(data => {
-        const [pciTabs, gdprTabs] = data;
-        this.$scope.pciTabs = pciTabs;
-        this.$scope.selectedPciIndex = 0;
-        this.$scope.gdprTabs = gdprTabs;
-        this.$scope.selectedGdprIndex = 0;
-      })
-      .catch(error => this.errorHandler.handle(error, 'Agents'));
-
     this.$scope.isArray = Array.isArray;
 
     this.$scope.goGroup = () => {
@@ -294,6 +283,16 @@ class AgentsController {
   // Switch tab
   async switchTab(tab, force = false) {
     try {
+      if(tab === 'pci') {
+        const pciTabs = await this.commonData.getPCI();
+        this.$scope.pciTabs = pciTabs;
+        this.$scope.selectedPciIndex = 0;
+      }
+      if(tab === 'gdpr') {
+        const gdprTabs = await this.commonData.getPCI();
+        this.$scope.gdprTabs = gdprTabs;
+        this.$scope.selectedGdprIndex = 0;
+      }
       if(tab === 'syscollector') await this.loadSyscollector(this.$scope.agent.id);
       if (tab === 'configuration') {
         const isSync = await this.apiReq.request('GET', `/agents/${this.$scope.agent.id}/group/is_sync`, {})
