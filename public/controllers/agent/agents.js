@@ -292,43 +292,48 @@ class AgentsController {
   }
 
   // Switch tab
-  switchTab(tab, force = false) {
-    if (tab === 'configuration') {
-      this.$scope.switchConfigurationTab('welcome');
-    } else {
-      this.configurationHandler.reset(this.$scope);
+  async switchTab(tab, force = false) {
+    try {
+      if(tab === 'syscollector') await this.loadSyscollector(this.$scope.agent.id);
+      if (tab === 'configuration') {
+        this.$scope.switchConfigurationTab('welcome');
+      } else {
+        this.configurationHandler.reset(this.$scope);
+      }
+      if (tab !== 'configuration' && tab !== 'welcome' && tab !== 'syscollector')
+        this.tabHistory.push(tab);
+      if (this.tabHistory.length > 2) this.tabHistory = this.tabHistory.slice(-2);
+      this.tabVisualizations.setTab(tab);
+      if (this.$scope.tab === tab && !force) return;
+      const onlyAgent = this.$scope.tab === tab && force;
+      const sameTab = this.$scope.tab === tab;
+      this.$location.search('tab', tab);
+      const preserveDiscover =
+        this.tabHistory.length === 2 &&
+        this.tabHistory[0] === this.tabHistory[1] &&
+        !force;
+      this.$scope.tab = tab;
+
+      const targetSubTab =
+        this.targetLocation && typeof this.targetLocation === 'object'
+          ? this.targetLocation.subTab
+          : 'panels';
+
+      if (this.$scope.tab !== 'configuration') {
+        this.$scope.switchSubtab(
+          targetSubTab,
+          true,
+          onlyAgent,
+          sameTab,
+          preserveDiscover
+        );
+      }
+
+      this.shareAgent.deleteTargetLocation();
+      this.targetLocation = null;
+    } catch(error) {
+      return Promise.reject(error)
     }
-    if (tab !== 'configuration' && tab !== 'welcome' && tab !== 'syscollector')
-      this.tabHistory.push(tab);
-    if (this.tabHistory.length > 2) this.tabHistory = this.tabHistory.slice(-2);
-    this.tabVisualizations.setTab(tab);
-    if (this.$scope.tab === tab && !force) return;
-    const onlyAgent = this.$scope.tab === tab && force;
-    const sameTab = this.$scope.tab === tab;
-    this.$location.search('tab', tab);
-    const preserveDiscover =
-      this.tabHistory.length === 2 &&
-      this.tabHistory[0] === this.tabHistory[1] &&
-      !force;
-    this.$scope.tab = tab;
-
-    const targetSubTab =
-      this.targetLocation && typeof this.targetLocation === 'object'
-        ? this.targetLocation.subTab
-        : 'panels';
-
-    if (this.$scope.tab !== 'configuration') {
-      this.$scope.switchSubtab(
-        targetSubTab,
-        true,
-        onlyAgent,
-        sameTab,
-        preserveDiscover
-      );
-    }
-
-    this.shareAgent.deleteTargetLocation();
-    this.targetLocation = null;
   }
 
   // Agent data
@@ -472,9 +477,9 @@ class AgentsController {
       // Configuration synced
       this.$scope.isSynchronized = isSync && isSync.synced;
 
-      this.$scope.switchTab(this.$scope.tab, true);
+      await this.$scope.switchTab(this.$scope.tab, true);
 
-      await this.loadSyscollector(id);
+      if(this.$scope.tab === 'syscollector') await this.loadSyscollector(id);
 
       this.$scope.load = false;
       if (!this.$scope.$$phase) this.$scope.$digest();
@@ -554,7 +559,7 @@ class AgentsController {
       this.$scope.load = false;
 
       if (this.$scope.tab !== 'configuration')
-        this.$scope.switchTab(this.$scope.tab, true);
+        await this.$scope.switchTab(this.$scope.tab, true);
 
       if (!this.$scope.$$phase) this.$scope.$digest();
       return;
