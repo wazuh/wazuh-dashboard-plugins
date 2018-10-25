@@ -296,6 +296,9 @@ class AgentsController {
     try {
       if(tab === 'syscollector') await this.loadSyscollector(this.$scope.agent.id);
       if (tab === 'configuration') {
+        const isSync = await this.apiReq.request('GET', `/agents/${this.$scope.agent.id}/group/is_sync`, {})
+        // Configuration synced
+        this.$scope.isSynchronized = isSync && isSync.data && isSync.data.data && isSync.data.data.synced;
         this.$scope.switchConfigurationTab('welcome');
       } else {
         this.configurationHandler.reset(this.$scope);
@@ -334,6 +337,7 @@ class AgentsController {
     } catch(error) {
       return Promise.reject(error)
     }
+    if (!this.$scope.$$phase) this.$scope.$digest();
   }
 
   // Agent data
@@ -442,8 +446,7 @@ class AgentsController {
       const data = await Promise.all([
         this.apiReq.request('GET', `/agents/${id}`, {}),
         this.apiReq.request('GET', `/syscheck/${id}/last_scan`, {}),
-        this.apiReq.request('GET', `/rootcheck/${id}/last_scan`, {}),
-        this.apiReq.request('GET', `/agents/${id}/group/is_sync`, {})
+        this.apiReq.request('GET', `/rootcheck/${id}/last_scan`, {})
       ]);
 
       const result = data.map(
@@ -453,8 +456,7 @@ class AgentsController {
       const [
         agentInfo,
         syscheckLastScan,
-        rootcheckLastScan,
-        isSync
+        rootcheckLastScan
       ] = result;
 
       // Agent
@@ -474,12 +476,7 @@ class AgentsController {
       this.$scope.agent.rootcheck = rootcheckLastScan;
       this.validateRootCheck();
 
-      // Configuration synced
-      this.$scope.isSynchronized = isSync && isSync.synced;
-
       await this.$scope.switchTab(this.$scope.tab, true);
-
-      if(this.$scope.tab === 'syscollector') await this.loadSyscollector(id);
 
       this.$scope.load = false;
       if (!this.$scope.$$phase) this.$scope.$digest();
