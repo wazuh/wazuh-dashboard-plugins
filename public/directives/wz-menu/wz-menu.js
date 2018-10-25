@@ -69,8 +69,7 @@ class WzMenu {
           filtered = list.filter(item =>
             item.id.includes(appState.getCurrentPattern())
           );
-          if (!filtered.length)
-            appState.setCurrentPattern(list[0].id);
+          if (!filtered.length) appState.setCurrentPattern(list[0].id);
         }
 
         const data = filtered
@@ -78,7 +77,6 @@ class WzMenu {
           : await indexPatterns.get(appState.getCurrentPattern());
         $scope.theresPattern = true;
         $scope.currentPattern = data.title;
-        
 
         // Getting the list of index patterns
         if (list) {

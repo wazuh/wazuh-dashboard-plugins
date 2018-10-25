@@ -283,28 +283,39 @@ class AgentsController {
   // Switch tab
   async switchTab(tab, force = false) {
     try {
-      if(tab === 'pci') {
+      if (tab === 'pci') {
         const pciTabs = await this.commonData.getPCI();
         this.$scope.pciTabs = pciTabs;
         this.$scope.selectedPciIndex = 0;
       }
-      if(tab === 'gdpr') {
+      if (tab === 'gdpr') {
         const gdprTabs = await this.commonData.getPCI();
         this.$scope.gdprTabs = gdprTabs;
         this.$scope.selectedGdprIndex = 0;
       }
-      if(tab === 'syscollector') await this.loadSyscollector(this.$scope.agent.id);
+      if (tab === 'syscollector')
+        await this.loadSyscollector(this.$scope.agent.id);
       if (tab === 'configuration') {
-        const isSync = await this.apiReq.request('GET', `/agents/${this.$scope.agent.id}/group/is_sync`, {})
+        const isSync = await this.apiReq.request(
+          'GET',
+          `/agents/${this.$scope.agent.id}/group/is_sync`,
+          {}
+        );
         // Configuration synced
-        this.$scope.isSynchronized = isSync && isSync.data && isSync.data.data && isSync.data.data.synced;
+        this.$scope.isSynchronized =
+          isSync && isSync.data && isSync.data.data && isSync.data.data.synced;
         this.$scope.switchConfigurationTab('welcome');
       } else {
         this.configurationHandler.reset(this.$scope);
       }
-      if (tab !== 'configuration' && tab !== 'welcome' && tab !== 'syscollector')
+      if (
+        tab !== 'configuration' &&
+        tab !== 'welcome' &&
+        tab !== 'syscollector'
+      )
         this.tabHistory.push(tab);
-      if (this.tabHistory.length > 2) this.tabHistory = this.tabHistory.slice(-2);
+      if (this.tabHistory.length > 2)
+        this.tabHistory = this.tabHistory.slice(-2);
       this.tabVisualizations.setTab(tab);
       if (this.$scope.tab === tab && !force) return;
       const onlyAgent = this.$scope.tab === tab && force;
@@ -333,8 +344,8 @@ class AgentsController {
 
       this.shareAgent.deleteTargetLocation();
       this.targetLocation = null;
-    } catch(error) {
-      return Promise.reject(error)
+    } catch (error) {
+      return Promise.reject(error);
     }
     if (!this.$scope.$$phase) this.$scope.$digest();
   }
@@ -451,12 +462,8 @@ class AgentsController {
       const result = data.map(
         item => (item && item.data && item.data.data ? item.data.data : false)
       );
-      
-      const [
-        agentInfo,
-        syscheckLastScan,
-        rootcheckLastScan
-      ] = result;
+
+      const [agentInfo, syscheckLastScan, rootcheckLastScan] = result;
 
       // Agent
       this.$scope.agent = agentInfo;

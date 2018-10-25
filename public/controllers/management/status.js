@@ -56,11 +56,7 @@ class StatusController {
       const parsedData = data.map(
         item => (item && item.data && item.data.data ? item.data.data : false)
       );
-      const [
-        stats,
-        clusterStatus,
-        managerInfo
-      ] = parsedData;
+      const [stats, clusterStatus, managerInfo] = parsedData;
 
       // Once Wazuh core fixes agent 000 issues, this should be adjusted
       const active = stats.Active - 1;
