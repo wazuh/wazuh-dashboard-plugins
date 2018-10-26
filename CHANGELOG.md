@@ -28,6 +28,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 -   Redesigned the _Overview/Agents > Vulnerabilities_ tab, using more meaningful visualizations for a better overall view of your agents' status ([#954](https://github.com/wazuh/wazuh-kibana-app/pull/954)).
 -   Now everytime the user enters the _Settings_ tab, the API connection will be automatically checked ([#971](https://github.com/wazuh/wazuh-kibana-app/pull/971)).
 -   Added a node selector for _Management > Logs_ section when Wazuh cluster is enabled ([#980](https://github.com/wazuh/wazuh-kibana-app/pull/980)).
+-   Added a group selector for _Agents_ section ([#995](https://github.com/wazuh/wazuh-kibana-app/pull/995)).
 
 ### Changed
 
