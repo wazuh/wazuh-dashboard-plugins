@@ -64,6 +64,7 @@ class AgentsPreviewController {
     this.$scope.groups = [];
     this.$scope.nodes = [];
     this.$scope.node_name = 'all';
+    this.$scope.selectedGroup = 'all'
     this.$scope.mostActiveAgent = {
       name: '',
       id: ''
