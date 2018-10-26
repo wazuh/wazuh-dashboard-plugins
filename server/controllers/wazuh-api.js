@@ -853,8 +853,8 @@ export class WazuhApiCtrl {
         ),
         needle(
           'get',
-          distinctUrl,
-          { fields: 'group', select: 'group' },
+          `${config.url}:${config.port}/agents/groups`,
+          {},
           headers
         ),
         needle(
@@ -924,9 +924,7 @@ export class WazuhApiCtrl {
       }
 
       if (groups && groups.items) {
-        result.groups = groups.items
-          .filter(item => !!item.group)
-          .map(item => item.group);
+        result.groups = groups.items.map(item => item.name);
       }
 
       if (osPlatforms && osPlatforms.items) {
