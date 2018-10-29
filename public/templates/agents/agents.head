@@ -4,7 +4,7 @@
     <wz-menu ng-init="menuNavItem = 'agents'"></wz-menu>
     <!-- End top navbar section -->
 
-    <!-- Navigation section (Breadcrumbs, Discover, etc) -->
+    <!-- Navigation section -->
     <div layout="row" layout-align="start center">
         <!-- Breadcrumbs -->
         <div layout="row" layout-padding ng-if="agent">
@@ -41,7 +41,7 @@
                 <span> / </span>
                 <span class="wz-text-link cursor-pointer" ng-click="switchConfigurationTab('welcome')">{{ tabNames[tab] }}</span>
                 <span> / </span>
-                <span>{{ tabNames[configurationTab] }}</span>
+                <span>{{ tabNames[configurationTab] === 'Alerts' ? 'Labels' : tabNames[configurationTab] }}</span>
             </div>
         </div>
         <!-- End breadcrumbs -->

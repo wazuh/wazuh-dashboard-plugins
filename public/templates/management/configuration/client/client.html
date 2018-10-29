@@ -5,7 +5,7 @@
         <div>
             <span class="font-size-18">Client configuration</span>
         </div>
-        <span class="md-subheader">Configure the connection with the manager</span>
+        <span class="md-subheader">Settings related to the connection with the manager</span>
     </div>
     <!-- End headline -->
 
@@ -65,11 +65,12 @@
                         </wz-config-item>
                         <wz-config-item
                             label="Configuration profiles"
-                            value="currentConfig['agent-client'].client['config-profile'] || 'n/a'">
+                            value="currentConfig['agent-client'].client['config-profile'] || '-'">
                         </wz-config-item>
                         <wz-config-item
-                            label="IP address used to communicate with the manager"
-                            value="currentConfig['agent-client'].client.local_ip || 'n/a'">
+                            ng-if="currentConfig['agent-client'].client.local_ip"
+                            label="IP address used when the agent has multiple network interfaces"
+                            value="currentConfig['agent-client'].client.local_ip">
                         </wz-config-item>
 
                     </div>
@@ -94,7 +95,7 @@
                             </thead>
                             <tbody class="wz-word-wrap">
                                 <tr ng-repeat="item in currentConfig['agent-client'].client.server">
-                                    <td>{{ item.address || '---' }}</td>
+                                    <td>{{ item.address || '-' }}</td>
                                     <td>{{ item.port || '1514' }}</td>
                                     <td>{{ item.protocol || 'udp' }}</td>
                                 </tr>

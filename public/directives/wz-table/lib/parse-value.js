@@ -34,7 +34,7 @@ export function parseValue(key, item, instancePath) {
     (key === 'description' || (key.value && key.value === 'description')) &&
     !item.description
   ) {
-    return '---';
+    return '-';
   }
   const isComposedString = typeof key === 'string' && key.includes('.');
   const isComposedObject =
@@ -42,8 +42,8 @@ export function parseValue(key, item, instancePath) {
   if (isComposedString || isComposedObject) {
     const split = isComposedString ? key.split('.') : key.value.split('.');
     const [first, second] = split;
-    return item[first] && item[first][second] ? item[first][second] : '---';
+    return item[first] && item[first][second] ? item[first][second] : '-';
   } else {
-    return checkIfArray(item[key.value || key]) || '---';
+    return checkIfArray(item[key.value || key]) || '-';
   }
 }

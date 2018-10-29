@@ -71,7 +71,7 @@
             <div></div>
         </div>
 
-        <!-- Navigation section (Breadcrumbs, etc) -->
+        <!-- Navigation section -->
         <div layout="row" layout-align="start center" ng-if="!loading">
             <div layout="row" layout-padding>
                 <div ng-if="!showConfig && !showNodes">

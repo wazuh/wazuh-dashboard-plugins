@@ -32,7 +32,7 @@
             </wz-config-item>
             <wz-config-item
                 label="Remove bucket logs after being read"
-                value="'n/a'">
+                value="currentConfig['aws-s3'].remove_from_bucket || 'yes'">
             </wz-config-item>
             <wz-config-item
                 label="Skip logs that can't be processed"

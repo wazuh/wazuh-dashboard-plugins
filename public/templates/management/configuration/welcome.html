@@ -9,7 +9,6 @@
         </div>
         <span class="font-size-18" ng-show="!agent || agent.id === '000'">
                 <i class="fa fa-fw fa-cog" aria-hidden="true"></i> Configuration</span>
-        <span class="md-subheader">Check your Wazuh cluster configuration</span>
     </div>
     <!-- End headline -->
 
@@ -30,19 +29,19 @@
                         <md-list-item flex="100" flex-gt-md="50" flex-gt-lg="33" class="md-2-line" ng-if="!agent || agent.id === '000'">
                             <div class="md-list-item-text">
                                 <h3 class="wz-text-link" ng-click="switchConfigTab('global-configuration', [{component:'analysis',configuration:'global'},{component:'request',configuration:'remote'},{component:'com',configuration:'logging'}])">Global configuration</h3>
-                                <p>Global and remote settings that apply to the whole Wazuh cluster</p>
+                                <p>Global and remote settings</p>
                             </div>
                         </md-list-item>
                         <md-list-item flex="100" flex-gt-md="50" flex-gt-lg="33" class="md-2-line" ng-if="!agent || agent.id === '000'">
                             <div class="md-list-item-text">
                                 <h3 class="wz-text-link" ng-click="switchConfigTab('cluster', [{component:'com',configuration:'cluster'}])">Cluster</h3>
-                                <p>Availability and scalability enhancement of the Wazuh service</p>
+                                <p>Master node configuration</p>
                             </div>
                         </md-list-item>
                         <md-list-item flex="100" flex-gt-md="50" flex-gt-lg="33" class="md-2-line" ng-if="!agent || agent.id === '000'">
                             <div class="md-list-item-text">
                                 <h3 class="wz-text-link" ng-click="switchConfigTab('registration-service', [{component:'auth',configuration:'auth'}])">Registration service</h3>
-                                <p>Automatic agent registration using the <span class="wz-text-monospace">ossec-authd</span> binary</p>
+                                <p>Automatic agent registration service</p>
                             </div>
                         </md-list-item>
                         <!-- <md-list-item flex="100" flex-gt-md="50" flex-gt-lg="33" class="md-2-line">
@@ -62,13 +61,19 @@
                         <md-list-item flex="100" flex-gt-md="50" flex-gt-lg="33" class="md-2-line" ng-if="agent && agent.id !== '000'">
                             <div class="md-list-item-text">
                                 <h3 class="wz-text-link" ng-click="switchConfigTab('client', [{component:'agent',configuration:'client'}])">Client configuration</h3>
-                                <p>Configure the connection with the manager</p>
+                                <p>Settings related to the connection with the manager</p>
                             </div>
                         </md-list-item>
                         <md-list-item flex="100" flex-gt-md="50" flex-gt-lg="33" class="md-2-line" ng-if="agent && agent.id !== '000'">
                             <div class="md-list-item-text">
                                 <h3 class="wz-text-link" ng-click="switchConfigTab('client-buffer', [{component:'agent',configuration:'buffer'}])">Anti-flooding settings</h3>
                                 <p>Agent bucket parameters to avoid event flooding</p>
+                            </div>
+                        </md-list-item>
+                        <md-list-item flex="100" flex-gt-md="50" flex-gt-lg="33" class="md-2-line" ng-if="agent && agent.id !== '000'">
+                            <div class="md-list-item-text">
+                                <h3 class="wz-text-link" ng-click="switchConfigTab('alerts',[{component:'agent',configuration:'labels'}])">Labels</h3>
+                                <p>User-defined information about the agent included in alerts</p>
                             </div>
                         </md-list-item>
                         <!-- End agent sections -->
@@ -79,22 +84,16 @@
             <!-- End main configurations card -->
 
             <!-- Alerts and output management card -->
-            <md-card class="wz-md-card">
+            <md-card class="wz-md-card" ng-if="!agent || agent.id === '000'">
                 <md-card-content>
-                    <span class="font-size-16">Alerts and output management</span>
-                    <md-divider class="wz-margin-top-10"></md-divider>
+                    <span class="font-size-16" ng-if="!agent || agent.id === '000'">Alerts and output management</span>
+                      <md-divider class="wz-margin-top-10"></md-divider>
 
                     <md-list layout="row" layout-wrap>
                         <md-list-item flex="100" flex-gt-md="50" flex-gt-lg="33" class="md-2-line" ng-if="!agent || agent.id === '000'">
                             <div class="md-list-item-text">
                                 <h3 class="wz-text-link" ng-click="switchConfigTab('alerts',[{component:'analysis',configuration:'alerts'},{component:'analysis',configuration:'labels'},{component:'mail',configuration:'alerts'},{component:'monitor',configuration:'reports'}, {component:'csyslog',configuration:'csyslog'}])">Alerts</h3>
-                                <p>Configure everything related to the alerts and their format</p>
-                            </div>
-                        </md-list-item>
-                        <md-list-item flex="100" flex-gt-md="50" flex-gt-lg="33" class="md-2-line" ng-if="agent && agent.id !== '000'">
-                            <div class="md-list-item-text">
-                                <h3 class="wz-text-link" ng-click="switchConfigTab('alerts',[{component:'agent',configuration:'labels'}])">Alerts</h3>
-                                <p>Configure everything related to the alerts and their format</p>
+                                <p>Settings related to the alerts and their format</p>
                             </div>
                         </md-list-item>
                         <md-list-item flex="100" flex-gt-md="50" flex-gt-lg="33" class="md-2-line" ng-if="!agent || agent.id === '000'">
@@ -125,7 +124,7 @@
                         <md-list-item flex="100" flex-gt-md="50" flex-gt-lg="33" class="md-2-line">
                             <div class="md-list-item-text">
                                 <h3 class="wz-text-link" ng-click="switchConfigTab('policy-monitoring', [{component:'syscheck',configuration:'rootcheck'}])">Policy monitoring</h3>
-                                <p>Verify that your systems are configured according to your security policies baseline</p>
+                                <p>Configuration to ensure compliance with security policies, standards and hardening guides</p>
                             </div>
                         </md-list-item>
                         <md-list-item flex="100" flex-gt-md="50" flex-gt-lg="33" class="md-2-line">
@@ -156,7 +155,7 @@
                         <md-list-item flex="100" flex-gt-md="50" flex-gt-lg="33" class="md-2-line" ng-if="!agent || agent.id === '000'">
                             <div class="md-list-item-text">
                                 <h3 class="wz-text-link" ng-click="switchWodle('vulnerability-detector')">Vulnerabilities</h3>
-                                <p>Discover what applications in your environment are affected by well-known vulnerabilities</p>
+                                <p>Discover what applications are affected by well-known vulnerabilities</p>
                             </div>
                         </md-list-item>
                         <md-list-item flex="100" flex-gt-md="50" flex-gt-lg="33" class="md-2-line">
@@ -168,7 +167,7 @@
                         <md-list-item flex="100" flex-gt-md="50" flex-gt-lg="33" class="md-2-line">
                             <div class="md-list-item-text">
                                 <h3 class="wz-text-link" ng-click="switchWodle('syscollector')">Inventory data</h3>
-                                <p>Gather relevant information about your system OS, hardware, packages, etc.</p>
+                                <p>Gather relevant information about system OS, hardware, networking and packages</p>
                             </div>
                         </md-list-item>
                         <md-list-item flex="100" flex-gt-md="50" flex-gt-lg="33" class="md-2-line" ng-if="!agent || agent.id === '000'">
@@ -185,7 +184,7 @@
                         </md-list-item>
                         <md-list-item flex="100" flex-gt-md="50" flex-gt-lg="33" class="md-2-line">
                             <div class="md-list-item-text">
-                                <h3 class="wz-text-link" ng-click="switchWodle('command')">Wazuh commands</h3>
+                                <h3 class="wz-text-link" ng-click="switchWodle('command')">Commands</h3>
                                 <p>Configuration options of the Command wodle</p>
                             </div>
                         </md-list-item>
@@ -217,7 +216,7 @@
                         <md-list-item flex="100" flex-gt-md="50" flex-gt-lg="33" class="md-2-line" ng-if="!agent || agent.id === '000'">
                             <div class="md-list-item-text">
                                 <h3 class="wz-text-link" ng-click="switchConfigTab('agentless',[{component:'agentless',configuration:'agentless'}])">Agentless</h3>
-                                <p>Run integrity checks on devices such as routers, firewalls, switches, etc.</p>
+                                <p>Run integrity checks on devices such as routers, firewalls and switches</p>
                             </div>
                         </md-list-item>
                     </md-list>
@@ -236,7 +235,7 @@
                         <md-list-item flex="100" flex-gt-md="50" flex-gt-lg="33" class="md-2-line">
                             <div class="md-list-item-text">
                                 <h3 class="wz-text-link" ng-click="switchWodle('aws-s3')">Amazon S3</h3>
-                                <p>Security events related to your Amazon AWS services, collected directly via AWS API</p>
+                                <p>Security events related to Amazon AWS services, collected directly via AWS API</p>
                             </div>
                         </md-list-item>
                     </md-list>

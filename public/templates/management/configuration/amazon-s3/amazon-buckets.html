@@ -71,6 +71,10 @@
                         value="currentConfig['aws-s3'].buckets[selectedItem].only_logs_after">
                     </wz-config-item>
                     <wz-config-item
+                        label="Remove bucket logs after being read"
+                        value="currentConfig['aws-s3'].buckets[selectedItem].remove_from_bucket || 'yes'">
+                    </wz-config-item>
+                    <wz-config-item
                         label="Limit log parsing to these regions"
                         value="currentConfig['aws-s3'].buckets[selectedItem].regions">
                     </wz-config-item>
