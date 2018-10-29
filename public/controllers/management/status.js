@@ -108,13 +108,8 @@ class StatusController {
         sort: '-dateAdd'
       });
       const [lastAgent] = lastAgentRaw.data.data.items;
-      const agentInfo = await this.apiReq.request(
-        'GET',
-        `/agents/${lastAgent.id}`,
-        {}
-      );
 
-      this.$scope.agentInfo = agentInfo.data.data;
+      this.$scope.agentInfo = lastAgent;
       this.$scope.load = false;
 
       if (!this.$scope.$$phase) this.$scope.$digest();
