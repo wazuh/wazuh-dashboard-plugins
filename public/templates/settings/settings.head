@@ -10,7 +10,7 @@
     </div>
     <!-- End loading ring -->
 
-    <!-- Navigation section (Breadcrumbs, etc) -->
+    <!-- Navigation section -->
     <div layout="row" layout-align="start center" ng-if="!load">
         <!-- Breadcrumbs -->
         <div layout="row" layout-padding>

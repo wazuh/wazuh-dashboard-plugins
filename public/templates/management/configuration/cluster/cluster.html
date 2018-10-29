@@ -7,7 +7,6 @@
             <span ng-if="currentConfig['com-cluster'] && currentConfig['com-cluster'].disabled === 'no'" class="wz-agent-status-indicator small teal">Enabled</span>
             <span ng-if="currentConfig['com-cluster'] && isString(currentConfig['com-cluster'])" class="wz-agent-status-indicator small red">Disabled</span>
         </div>
-        <span class="md-subheader">Availability and scalability enhancement of the Wazuh service</span>
     </div>
     <!-- End headline -->
 
@@ -34,10 +33,7 @@
                 <md-card-content>
                     <div layout="row" layout-align="start center">
                         <div>
-                            <span class="font-size-16">All settings</span>
-                            <div class="wz-margin-top-10">
-                                <span class="md-subheader small">These settings apply to the whole Wazuh cluster</span>
-                            </div>
+                            <span class="font-size-16">Master node settings</span>
                         </div>
                         <span flex></span>
                         <span ng-class="JSONContent ? 'wz-text-active' : ''" class="wz-text-link small" ng-click="getJSON()">JSON</span>

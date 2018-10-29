@@ -10,16 +10,16 @@
         <md-card flex class="wz-metric-color wz-md-card wz-no-padding">
             <md-card-content layout="row" class="wz-padding-metric">
                 <div class="wz-text-truncatable" flex>
-                    Total agents: <span class="wz-text-bold">{{agentsCountTotal >= 0 ? agentsCountTotal : '---'}}</span>
+                    Total agents: <span class="wz-text-bold">{{agentsCountTotal >= 0 ? agentsCountTotal : '-'}}</span>
                 </div>
                 <div class="wz-text-truncatable" flex>
-                    Active agents: <span class="wz-text-bold">{{agentsCountActive >= 0 ? agentsCountActive : '---'}}</span>
+                    Active agents: <span class="wz-text-bold">{{agentsCountActive >= 0 ? agentsCountActive : '-'}}</span>
                 </div>
                 <div class="wz-text-truncatable" flex>
-                    Disconnected agents: <span class="wz-text-bold">{{agentsCountDisconnected >= 0 ? agentsCountDisconnected : '---'}}</span>
+                    Disconnected agents: <span class="wz-text-bold">{{agentsCountDisconnected >= 0 ? agentsCountDisconnected : '-'}}</span>
                 </div>
                 <div class="wz-text-truncatable" flex>
-                    Never connected agents: <span class="wz-text-bold">{{agentsCountNeverConnected >= 0 ? agentsCountNeverConnected : '---'}}</span>
+                    Never connected agents: <span class="wz-text-bold">{{agentsCountNeverConnected >= 0 ? agentsCountNeverConnected : '-'}}</span>
                 </div>
             </md-card-content>
         </md-card>

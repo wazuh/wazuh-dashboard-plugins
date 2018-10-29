@@ -48,21 +48,21 @@
                         </thead>
                         <tbody class="wz-word-wrap">
                             <tr ng-repeat="item in currentConfig['request-remote'].remote">
-                                <td>{{ item.connection || '---' }}</td>
-                                <td>{{ item.port || '---' }}</td>
+                                <td>{{ item.connection || '-' }}</td>
+                                <td>{{ item.port || '-' }}</td>
                                 <td>{{ item.protocol || 'udp' }}</td>
-                                <td>{{ item.ipv6 || 'n/a' }}</td>
+                                <td>{{ item.ipv6 || '-' }}</td>
                                 <td>
                                   <ul ng-if="item['allowed-ips']">
                                     <li ng-repeat="ip in item['allowed-ips']">{{ ip }}</li>
                                   </ul>
-                                  <span ng-if="!item['allowed-ips']">n/a</span>
+                                  <span ng-if="!item['allowed-ips']">-</span>
                                 </td>
                                 <td>
                                   <ul ng-if="item['denied-ips']">
                                     <li ng-repeat="ip in item['denied-ips']">{{ ip }}</li>
                                   </ul>
-                                  <span ng-if="!item['denied-ips']">n/a</span>
+                                  <span ng-if="!item['denied-ips']">-</span>
                                 </td>
                                 <td>{{ item.local_ip || 'All interfaces' }}</td>
                                 <td>{{ item.queue_size || '16384' }}</td>

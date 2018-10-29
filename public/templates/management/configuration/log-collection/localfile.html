@@ -20,7 +20,7 @@
             <md-card-content flex layout="column">
                 <div layout="row" layout-align="start center">
                     <div>
-                        <span class="font-size-16">Collected log files</span>
+                        <span class="font-size-16">Logs files and command monitoring</span>
                         <div class="wz-margin-top-10">
                             <span class="md-subheader small">List of log files that will be analyzed</span>
                         </div>
@@ -50,41 +50,41 @@
 
                         <div flex="auto" class="wz-item-detail">
                             <wz-config-item
+                                label="Log format"
+                                value="currentConfig['logcollector-localfile'].localfile[selectedItem].logformat">
+                            </wz-config-item>
+                            <wz-config-item
                                 label="Log location"
-                                value="currentConfig['logcollector-localfile'].localfile[selectedItem].file || 'n/a'">
+                                value="currentConfig['logcollector-localfile'].localfile[selectedItem].file || '-'">
                             </wz-config-item>
                             <wz-config-item
                                 label="Run this command"
-                                value="currentConfig['logcollector-localfile'].localfile[selectedItem].command || 'n/a'">
+                                value="currentConfig['logcollector-localfile'].localfile[selectedItem].command || '-'">
                             </wz-config-item>
                             <wz-config-item
                                 label="Command alias"
-                                value="currentConfig['logcollector-localfile'].localfile[selectedItem].alias || 'n/a'">
+                                value="currentConfig['logcollector-localfile'].localfile[selectedItem].alias || '-'">
                             </wz-config-item>
                             <wz-config-item
                                 label="Interval between command executions"
-                                value="currentConfig['logcollector-localfile'].localfile[selectedItem].frequency || 'n/a'">
+                                value="currentConfig['logcollector-localfile'].localfile[selectedItem].frequency || '-'">
                             </wz-config-item>
                             <wz-config-item
                                 label="Only receive logs occured after start"
-                                value="currentConfig['logcollector-localfile'].localfile[selectedItem]['only-future-events'] || 'n/a'">
+                                value="currentConfig['logcollector-localfile'].localfile[selectedItem]['only-future-events'] || '-'">
                             </wz-config-item>
                             <wz-config-item
                                 label="Filter logs using this XPATH query"
-                                value="currentConfig['logcollector-localfile'].localfile[selectedItem].query || 'n/a'">
+                                value="currentConfig['logcollector-localfile'].localfile[selectedItem].query || '-'">
                             </wz-config-item>
                             <wz-config-item
                                 label="Log labels"
-                                value="currentConfig['logcollector-localfile'].localfile[selectedItem].labels || 'n/a'">
+                                value="currentConfig['logcollector-localfile'].localfile[selectedItem].labels || '-'">
                             </wz-config-item>
                             <wz-config-item
                                 is-array="true"
                                 label="Redirect output to this socket"
                                 value="currentConfig['logcollector-localfile'].localfile[selectedItem].target || 'agent'">
-                            </wz-config-item>
-                            <wz-config-item
-                                label="Log format"
-                                value="currentConfig['logcollector-localfile'].localfile[selectedItem].log_format || 'n/a'">
                             </wz-config-item>
                             <wz-config-item
                                 is-array="true"
