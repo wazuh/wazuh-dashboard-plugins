@@ -7,7 +7,7 @@
             <span ng-if="currentConfig && currentConfig['vulnerability-detector'] && currentConfig['vulnerability-detector'].disabled === 'no'" class="wz-agent-status-indicator small teal">Enabled</span>
             <span ng-if="(currentConfig && currentConfig['vulnerability-detector'] && currentConfig['vulnerability-detector'].disabled === 'yes') || (currentConfig && !currentConfig['vulnerability-detector'])" class="wz-agent-status-indicator small red">Disabled</span>
         </div>
-        <span class="md-subheader">Discover what applications in your environment are affected by well-known vulnerabilities</span>
+        <span class="md-subheader">Discover what applications are affected by well-known vulnerabilities</span>
     </div>
     <!-- End headline -->
 

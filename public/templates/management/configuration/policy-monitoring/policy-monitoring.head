@@ -19,7 +19,7 @@
               (currentConfig['syscheck-rootcheck']
               && isString(currentConfig['syscheck-rootcheck']))" class="wz-agent-status-indicator small red">Disabled</span>
         </div>
-        <span class="md-subheader">Verify that your systems are configured according to your security policies baseline</span>
+        <span class="md-subheader">Configuration to ensure compliance with security policies, standards and hardening guides</span>
     </div>
     <!-- End headline -->
 
