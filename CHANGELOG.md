@@ -47,6 +47,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 -   Added word wrapping class to group name in _Management > Groups > Group detail_ tab ([#945](https://github.com/wazuh/wazuh-kibana-app/pull/945)).
 -   The `wz-table` directive has been refactored ([#953](https://github.com/wazuh/wazuh-kibana-app/pull/953)).
 -   The `wz-table` directive now checks if a request is aborted ([#979](https://github.com/wazuh/wazuh-kibana-app/pull/979)).
+-   Several performance improvements ([#985](https://github.com/wazuh/wazuh-kibana-app/pull/985), [#997](https://github.com/wazuh/wazuh-kibana-app/pull/997), [#1000](https://github.com/wazuh/wazuh-kibana-app/pull/1000)).
 
 ### Fixed
 
