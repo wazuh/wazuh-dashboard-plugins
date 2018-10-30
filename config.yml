@@ -94,3 +94,6 @@
 # Configure wazuh-monitoring-3.x-* indices shards and replicas.
 #wazuh.monitoring.shards: 5
 #wazuh.monitoring.replicas: 1
+#
+# ------------------------------- App privileges --------------------------------
+#admin: false
