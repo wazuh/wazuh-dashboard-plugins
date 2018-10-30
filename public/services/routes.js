@@ -177,11 +177,11 @@ routes
   })
   .when('/context/:pattern?/:type?/:id?', {
     redirectTo: function() {},
-    resolve: { wzConfig, wzKibana }
+    resolve: { wzKibana }
   })
   .when('/doc/:pattern?/:index?/:type?/:id?', {
     redirectTo: function() {},
-    resolve: { wzConfig, wzKibana }
+    resolve: { wzKibana }
   })
   .when('/wazuh-dev', {
     template: devToolsTemplate,
