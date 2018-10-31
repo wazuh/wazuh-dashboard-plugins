@@ -14,7 +14,6 @@ import { healthCheck } from './health-check';
 import { totalRAM } from './check-ram';
 
 export function settingsWizard(
-  $rootScope,
   $location,
   $q,
   $window,
@@ -29,24 +28,25 @@ export function settingsWizard(
   try {
     const deferred = $q.defer();
 
-    !disableErrors &&
-      totalRAM(genericReq, errorHandler);
+    !disableErrors && totalRAM(genericReq, errorHandler);
 
     const checkResponse = data => {
       let fromElastic = false;
       if (parseInt(data.data.error) === 2) {
-        !disableErrors && errorHandler.handle(
-          'Wazuh App: Please set up Wazuh API credentials.',
-          'Routes',
-          true
-        );
+        !disableErrors &&
+          errorHandler.handle(
+            'Wazuh App: Please set up Wazuh API credentials.',
+            'Routes',
+            true
+          );
       } else if (
         JSON.stringify(data).includes('socket hang up') ||
         (data && data.data && data.data.apiIsDown) ||
         (data && data.data && data.data.data && data.data.data.apiIsDown)
       ) {
         wzMisc.setApiIsDown(true);
-        !disableErrors && errorHandler.handle('Wazuh RESTful API seems to be down.', 'Routes');
+        !disableErrors &&
+          errorHandler.handle('Wazuh RESTful API seems to be down.', 'Routes');
       } else {
         fromElastic = true;
         wzMisc.setBlankScr(errorHandler.handle(data, 'Routes'));
@@ -68,10 +68,11 @@ export function settingsWizard(
           parseInt(data.data.error) === 7 &&
           data.data.message === '401 Unauthorized'
         ) {
-          !disableErrors && errorHandler.handle(
-            'Wrong Wazuh API credentials, please add a new API and/or modify the existing one.',
-            'Routes'
-          );
+          !disableErrors &&
+            errorHandler.handle(
+              'Wrong Wazuh API credentials, please add a new API and/or modify the existing one.',
+              'Routes'
+            );
           $location.search('_a', null);
           $location.search('tab', 'api');
           $location.path('/settings');
@@ -163,21 +164,23 @@ export function settingsWizard(
           appState.removeCurrentAPI();
 
           !disableErrors && errorHandler.handle(error, 'Routes');
-          !disableErrors && errorHandler.handle(
-            'Please insert a new Wazuh API or select an existing valid one.',
-            'Routes',
-            true
-          );
+          !disableErrors &&
+            errorHandler.handle(
+              'Please insert a new Wazuh API or select an existing valid one.',
+              'Routes',
+              true
+            );
 
           $location.search('_a', null);
           $location.search('tab', 'api');
           $location.path('/settings');
         });
     };
-
+    const currentLocation = $location.path();
     if (
-      !disableErrors && 
-      healthCheck($window, $rootScope)
+      !currentLocation.includes('agents-preview') &&
+      !disableErrors &&
+      healthCheck($window)
     ) {
       $location.path('/health-check');
       deferred.reject();

@@ -25,7 +25,7 @@ import {
 } from '../../utils/agents-metrics';
 
 import { ConfigurationHandler } from '../../utils/config-handler';
-
+import { timefilter } from 'ui/timefilter';
 const app = uiModules.get('app/wazuh', []);
 
 class AgentsController {
@@ -67,6 +67,7 @@ class AgentsController {
     this.$scope.integrations = {};
     this.$scope.selectedItem = 0;
     this.targetLocation = null;
+    this.ignoredTabs = ['syscollector', 'welcome', 'configuration'];
   }
 
   $onInit() {
@@ -94,11 +95,7 @@ class AgentsController {
     }
 
     this.tabHistory = [];
-    if (
-      this.$scope.tab !== 'configuration' &&
-      this.$scope.tab !== 'welcome' &&
-      this.$scope.tab !== 'syscollector'
-    )
+    if (!this.ignoredTabs.includes(this.$scope.tab))
       this.tabHistory.push(this.$scope.tab);
 
     // Tab names
@@ -251,7 +248,7 @@ class AgentsController {
             typeof this.targetLocation === 'object' &&
             this.targetLocation.subTab === 'discover' &&
             subtab === 'discover')) &&
-        !['configuration', 'welcome', 'syscollector'].includes(this.$scope.tab)
+        !this.ignoredTabs.includes(this.$scope.tab)
       ) {
         const condition =
           !this.changeAgent && (localChange || preserveDiscover);
@@ -282,6 +279,15 @@ class AgentsController {
 
   // Switch tab
   async switchTab(tab, force = false) {
+    if (this.ignoredTabs.includes(tab)) {
+      const timeFilterRefreshStatus = timefilter.getRefreshInterval();
+      const toggle =
+        timeFilterRefreshStatus &&
+        timeFilterRefreshStatus.value &&
+        !timeFilterRefreshStatus.pause;
+      if (toggle) timefilter.toggleRefresh();
+    }
+
     try {
       if (tab === 'pci') {
         const pciTabs = await this.commonData.getPCI();
@@ -308,12 +314,7 @@ class AgentsController {
       } else {
         this.configurationHandler.reset(this.$scope);
       }
-      if (
-        tab !== 'configuration' &&
-        tab !== 'welcome' &&
-        tab !== 'syscollector'
-      )
-        this.tabHistory.push(tab);
+      if (!this.ignoredTabs.includes(tab)) this.tabHistory.push(tab);
       if (this.tabHistory.length > 2)
         this.tabHistory = this.tabHistory.slice(-2);
       this.tabVisualizations.setTab(tab);
@@ -332,7 +333,7 @@ class AgentsController {
           ? this.targetLocation.subTab
           : 'panels';
 
-      if (this.$scope.tab !== 'configuration') {
+      if (!this.ignoredTabs.includes(this.$scope.tab)) {
         this.$scope.switchSubtab(
           targetSubTab,
           true,
