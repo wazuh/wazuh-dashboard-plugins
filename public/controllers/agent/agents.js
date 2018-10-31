@@ -67,6 +67,8 @@ class AgentsController {
     this.$scope.integrations = {};
     this.$scope.selectedItem = 0;
     this.targetLocation = null;
+
+    this.ignoredTabs = ['configuration', 'welcome', 'syscollector'];
   }
 
   $onInit() {
@@ -94,11 +96,7 @@ class AgentsController {
     }
 
     this.tabHistory = [];
-    if (
-      this.$scope.tab !== 'configuration' &&
-      this.$scope.tab !== 'welcome' &&
-      this.$scope.tab !== 'syscollector'
-    )
+    if (!this.ignoredTabs.includes(this.$scope.tab))
       this.tabHistory.push(this.$scope.tab);
 
     // Tab names
@@ -251,7 +249,7 @@ class AgentsController {
             typeof this.targetLocation === 'object' &&
             this.targetLocation.subTab === 'discover' &&
             subtab === 'discover')) &&
-        !['configuration', 'welcome', 'syscollector'].includes(this.$scope.tab)
+        !this.ignoredTabs.includes(this.$scope.tab)
       ) {
         const condition =
           !this.changeAgent && (localChange || preserveDiscover);
@@ -308,12 +306,7 @@ class AgentsController {
       } else {
         this.configurationHandler.reset(this.$scope);
       }
-      if (
-        tab !== 'configuration' &&
-        tab !== 'welcome' &&
-        tab !== 'syscollector'
-      )
-        this.tabHistory.push(tab);
+      if (!this.ignoredTabs.includes(tab)) this.tabHistory.push(tab);
       if (this.tabHistory.length > 2)
         this.tabHistory = this.tabHistory.slice(-2);
       this.tabVisualizations.setTab(tab);
