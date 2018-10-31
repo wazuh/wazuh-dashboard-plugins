@@ -40,9 +40,9 @@
                 </div>
                 <div layout="row" class="wz-padding-top-10">
                     <p flex="35" class="manager-status-subtitle">Higher activity</p>
-                    <p ng-if="mostActiveAgent.id !== '000'" class="wz-text-right wz-text-link" tooltip="Click to open this agent" tooltip-placement="right"
+                    <p ng-show="mostActiveAgent.id !== '000'" class="wz-text-right wz-text-link" tooltip="Click to open this agent" tooltip-placement="right"
                         ng-click="showAgent(mostActiveAgent)">{{mostActiveAgent.name}}</p>
-                    <p ng-if="mostActiveAgent.id === '000'" class="wz-text-right" tooltip-placement="right">{{mostActiveAgent.name}} (manager)</p>
+                    <p ng-show="mostActiveAgent.id === '000'" class="wz-text-right" tooltip-placement="right">{{mostActiveAgent.name}}</p>
                 </div>
             </md-card-content>
         </md-card>
