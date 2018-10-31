@@ -14,7 +14,6 @@ import { healthCheck } from './health-check';
 import { totalRAM } from './check-ram';
 
 export function settingsWizard(
-  $rootScope,
   $location,
   $q,
   $window,
@@ -174,10 +173,11 @@ export function settingsWizard(
           $location.path('/settings');
         });
     };
-
+    const currentLocation = $location.path();
     if (
+      !currentLocation.includes('agents-preview') &&
       !disableErrors && 
-      healthCheck($window, $rootScope)
+      healthCheck($window)
     ) {
       $location.path('/health-check');
       deferred.reject();
