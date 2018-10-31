@@ -83,8 +83,12 @@ export function getIp(
     }
   };
 
-  const currentLocation = $location.path();
-  if (!currentLocation.includes('agents-preview') && healthCheck($window)) {
+  const currentParams = $location.search();
+  const targetedAgent =
+    currentParams && (currentParams.agent || currentParams.agent === '000');
+  const targetedRule =
+    currentParams && currentParams.tab === 'ruleset' && currentParams.ruleid;
+  if (!targetedAgent && !targetedRule && healthCheck($window)) {
     deferred.reject();
     $location.path('/health-check');
   } else {

@@ -176,9 +176,15 @@ export function settingsWizard(
           $location.path('/settings');
         });
     };
-    const currentLocation = $location.path();
+
+    const currentParams = $location.search();
+    const targetedAgent =
+      currentParams && (currentParams.agent || currentParams.agent === '000');
+    const targetedRule =
+      currentParams && currentParams.tab === 'ruleset' && currentParams.ruleid;
     if (
-      !currentLocation.includes('agents-preview') &&
+      !targetedAgent &&
+      !targetedRule &&
       !disableErrors &&
       healthCheck($window)
     ) {

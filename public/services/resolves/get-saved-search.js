@@ -14,11 +14,16 @@ import { recentlyAccessed } from 'ui/persisted_log';
 export function getSavedSearch(
   redirectWhenMissing,
   $location,
-  $window,  
+  $window,
   savedSearches,
   $route
 ) {
-  if (healthCheck($window)) {
+  const currentParams = $location.search();
+  const targetedAgent =
+    currentParams && (currentParams.agent || currentParams.agent === '000');
+  const targetedRule =
+    currentParams && currentParams.tab === 'ruleset' && currentParams.ruleid;
+  if (!targetedAgent && !targetedRule && healthCheck($window)) {
     $location.path('/health-check');
     return Promise.reject();
   } else {
