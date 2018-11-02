@@ -1,20 +1,20 @@
-<div flex="auto" layout="column" ng-cloak ng-controller="managementController">
+<div flex="auto" layout="column" ng-cloak ng-controller="managementController as mctrl">
 
     <!-- Top navbar section -->
     <wz-menu ng-init="menuNavItem = 'manager'"></wz-menu>
     <!-- End top navbar section -->
 
     <!-- Navigation section -->
-    <div layout="row" layout-align="start center" ng-if="tab !== 'monitoring' && tab !== 'configuration'">
+    <div layout="row" layout-align="start center" ng-if="mctrl.tab !== 'monitoring' && mctrl.tab !== 'configuration'">
         <!-- Breadcrumbs -->
         <div layout="row" layout-padding>
             <!-- If you're not on the Welcome tab, show a functional breadcrumb -->
-            <div ng-if="tab !== 'welcome'">
-                <span class="wz-text-link cursor-pointer" ng-click="switchTab('welcome')">Management</span>
-                <span> / {{ tabNames[tab] }}</span>
+            <div ng-if="mctrl.tab !== 'welcome'">
+                <span class="wz-text-link cursor-pointer" ng-click="mctrl.switchTab('welcome')">Management</span>
+                <span> / {{ mctrl.tabNames[mctrl.tab] }}</span>
             </div>
             <!-- If you're on the Welcome tab, show a blank, simple breadcrumb -->
-            <div ng-if="tab === 'welcome'">
+            <div ng-if="mctrl.tab === 'welcome'">
                 <span>Management / Welcome</span>
             </div>
         </div>
@@ -24,26 +24,25 @@
 
     <!-- Wazuh management navigation bar -->
     <md-nav-bar
-        ng-if="!load && inArray(tab, wazuhManagementTabs)"
+        ng-if="!mctrl.load && mctrl.inArray(mctrl.tab, mctrl.wazuhManagementTabs)"
         class="wz-nav-bar"
-        ng-show="tab !== 'welcome'"
-        md-selected-nav-item="tab"
+        ng-show="mctrl.tab !== 'welcome'"
+        md-selected-nav-item="mctrl.tab"
         nav-bar-aria-label="Wazuh management navigation links">
-        <md-nav-item class="wz-nav-item" md-nav-click="reloadRuleset()" name="ruleset">Ruleset</md-nav-item>
-        <md-nav-item class="wz-nav-item" md-nav-click="reloadGroups()" name="groups">Groups</md-nav-item>
+        <md-nav-item class="wz-nav-item" md-nav-click="mctrl.switchTab('ruleset')" name="ruleset">Ruleset</md-nav-item>
+        <md-nav-item class="wz-nav-item" md-nav-click="mctrl.switchTab('groups')" name="groups">Groups</md-nav-item>
     </md-nav-bar>
     <!-- End Wazuh management navigation bar -->
 
     <!-- Status and reports navigation bar -->
     <md-nav-bar
-        ng-if="!load && inArray(tab, statusReportsTabs) && tab !== 'monitoring'"
+        ng-if="!mctrl.load && mctrl.inArray(mctrl.tab, mctrl.statusReportsTabs) && mctrl.tab !== 'monitoring'"
         class="wz-nav-bar"
-        ng-show="tab !== 'welcome'"
-        md-selected-nav-item="tab"
+        ng-show="mctrl.tab !== 'welcome'"
+        md-selected-nav-item="mctrl.tab"
         nav-bar-aria-label="Status and reports navigation links">
-        <md-nav-item class="wz-nav-item" md-nav-click="switchTab('status')" name="status">Status</md-nav-item>
-        <md-nav-item class="wz-nav-item" md-nav-click="switchTab('logs')" name="logs">Logs</md-nav-item>
-        <md-nav-item class="wz-nav-item" md-nav-click="switchTab('monitoring')" name="monitoring">Monitoring</md-nav-item>
-        <md-nav-item class="wz-nav-item" md-nav-click="switchTab('reporting')" name="reporting">Reporting</md-nav-item>
+        <md-nav-item class="wz-nav-item" md-nav-click="mctrl.switchTab('status')" name="status">Status</md-nav-item>
+        <md-nav-item class="wz-nav-item" md-nav-click="mctrl.switchTab('logs')" name="logs">Logs</md-nav-item>
+        <md-nav-item class="wz-nav-item" md-nav-click="mctrl.switchTab('reporting')" name="reporting">Reporting</md-nav-item>
     </md-nav-bar>
     <!-- End Status and reports navigation bar -->
