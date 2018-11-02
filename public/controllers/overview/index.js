@@ -93,7 +93,7 @@ class OverviewController {
     this.init();
 
     this.$scope.$on('$destroy', () => {
-      this.this.visFactoryService.clearAll();
+      this.visFactoryService.clearAll();
     });
   }
 
@@ -214,18 +214,23 @@ class OverviewController {
   // Switch tab
   async switchTab(newTab, force = false) {
     try {
-      console.log(newTab)
       if (newTab !== 'welcome') {
         await this.fetchWodles();
       }
-      if (newTab === 'welcome' && typeof this.agentsCountTotal === 'undefined') {
+
+      if (
+        newTab === 'welcome' &&
+        typeof this.agentsCountTotal === 'undefined'
+      ) {
         await this.getSummary();
       }
+
       if (newTab === 'pci') {
         const pciTabs = await this.commonData.getPCI();
         this.pciTabs = pciTabs;
         this.selectedPciIndex = 0;
       }
+
       if (newTab === 'gdpr') {
         const gdprTabs = await this.commonData.getGDPR();
         this.gdprTabs = gdprTabs;
@@ -233,23 +238,31 @@ class OverviewController {
       }
 
       this.filterWodle(newTab);
+
       if (newTab !== 'welcome') this.tabHistory.push(newTab);
+
       if (this.tabHistory.length > 2)
         this.tabHistory = this.tabHistory.slice(-2);
+
       this.tabVisualizations.setTab(newTab);
-      console.log(this.tab,newTab)
+
       if (this.tab === newTab && !force) return;
-      const sameTab = this.tab === newTab;
-      
+
+      const sameTab = this.tab === newTab && force !== 'nav';
+
+      // Restore force value if we come from md-nav action
+      if (force === 'nav') force = false;
+
       this.$location.search('tab', newTab);
+
       const preserveDiscover =
         this.tabHistory.length === 2 &&
         this.tabHistory[0] === this.tabHistory[1];
+
       this.tab = newTab;
-      
+
       await this.switchSubtab('panels', true, sameTab, preserveDiscover);
     } catch (error) {
-      console.log(error)
       this.errorHandler.handle(error, 'Overview');
     }
     if (!this.$scope.$$phase) this.$scope.$digest();
@@ -263,13 +276,13 @@ class OverviewController {
   async getSummary() {
     try {
       const data = await this.apiReq.request('GET', '/agents/summary', {});
-
-      if (data && data.data && data.data.data) {
-        const active = data.data.data.Active - 1;
-        const total = data.data.data.Total - 1;
+      const result = data && data.data && data.data.data ? data.data.data : false;
+      if (result) {
+        const active = result.Active - 1;
+        const total = result.Total - 1;
         this.agentsCountActive = active;
-        this.agentsCountDisconnected = data.data.data.Disconnected;
-        this.agentsCountNeverConnected = data.data.data['Never connected'];
+        this.agentsCountDisconnected = result.Disconnected;
+        this.agentsCountNeverConnected = result['Never connected'];
         this.agentsCountTotal = total;
         this.agentsCoverity = total ? (active / total) * 100 : 0;
       } else {
