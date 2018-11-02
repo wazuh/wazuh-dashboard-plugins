@@ -39,7 +39,7 @@ class HealthCheck {
     this.errorHandler = errorHandler;
     this.wazuhConfig = wazuhConfig;
     this.$window = $window;
-    this.$scope.results = [];
+    this.results = [];
 
     this.savedObjectsClient = Private(SavedObjectsClientProvider);
 
@@ -50,13 +50,17 @@ class HealthCheck {
       template: true
     };
 
-    this.$scope.errors = [];
-    this.$scope.processedChecks = 0;
-    this.$scope.totalChecks = 0;
+    this.errors = [];
+    this.processedChecks = 0;
+    this.totalChecks = 0;
+  }
+
+  $onInit() {
+    this.load();
   }
 
   handleError(error) {
-    this.$scope.errors.push(
+    this.errors.push(
       this.errorHandler.handle(error, 'Health Check', false, true)
     );
   }
@@ -70,34 +74,34 @@ class HealthCheck {
       const patternTitle = data.attributes.title;
 
       if (this.checks.pattern) {
-        const i = this.$scope.results.map(item => item.id).indexOf(2);
+        const i = this.results.map(item => item.id).indexOf(2);
         const patternData = await this.genericReq.request(
           'GET',
           `/elastic/index-patterns/${patternTitle}`
         );
         if (!patternData.data.status) {
-          this.$scope.errors.push('The selected index-pattern is not present.');
-          this.$scope.results[i].status = 'Error';
+          this.errors.push('The selected index-pattern is not present.');
+          this.results[i].status = 'Error';
         } else {
-          this.$scope.processedChecks++;
-          this.$scope.results[i].status = 'Ready';
+          this.processedChecks++;
+          this.results[i].status = 'Ready';
         }
       }
 
       if (this.checks.template) {
-        const i = this.$scope.results.map(item => item.id).indexOf(3);
+        const i = this.results.map(item => item.id).indexOf(3);
         const templateData = await this.genericReq.request(
           'GET',
           `/elastic/template/${patternTitle}`
         );
         if (!templateData.data.status) {
-          this.$scope.errors.push(
+          this.errors.push(
             'No template found for the selected index-pattern.'
           );
-          this.$scope.results[i].status = 'Error';
+          this.results[i].status = 'Error';
         } else {
-          this.$scope.processedChecks++;
-          this.$scope.results[i].status = 'Ready';
+          this.processedChecks++;
+          this.results[i].status = 'Ready';
         }
       }
       if (!this.$scope.$$phase) this.$scope.$digest();
@@ -119,13 +123,13 @@ class HealthCheck {
             JSON.stringify({ name: apiRaw.name, id: data.data.idChanged })
           );
         }
-        const i = this.$scope.results.map(item => item.id).indexOf(0);
+        const i = this.results.map(item => item.id).indexOf(0);
         if (data.data.error || data.data.data.apiIsDown) {
-          this.$scope.errors.push('Error connecting to the API.');
-          this.$scope.results[i].status = 'Error';
+          this.errors.push('Error connecting to the API.');
+          this.results[i].status = 'Error';
         } else {
-          this.$scope.processedChecks++;
-          this.$scope.results[i].status = 'Ready';
+          this.processedChecks++;
+          this.results[i].status = 'Ready';
           if (this.checks.setup) {
             const versionData = await this.apiReq.request(
               'GET',
@@ -142,26 +146,26 @@ class HealthCheck {
                 'Error fetching app version or API version',
                 'Health Check'
               );
-              this.$scope.errors.push('Error fetching version');
+              this.errors.push('Error fetching version');
             }
             const apiSplit = apiVersion.split('v')[1].split('.');
             const appSplit = setupData.data.data['app-version'].split('.');
 
-            const i = this.$scope.results.map(item => item.id).indexOf(1);
+            const i = this.results.map(item => item.id).indexOf(1);
             if (apiSplit[0] !== appSplit[0] || apiSplit[1] !== appSplit[1]) {
-              this.$scope.errors.push(
+              this.errors.push(
                 'API version mismatch. Expected v' +
                   setupData.data.data['app-version']
               );
-              this.$scope.results[i].status = 'Error';
+              this.results[i].status = 'Error';
             } else {
-              this.$scope.processedChecks++;
-              this.$scope.results[i].status = 'Ready';
+              this.processedChecks++;
+              this.results[i].status = 'Ready';
             }
           }
         }
       } else {
-        if (this.checks.setup) this.$scope.processedChecks++;
+        if (this.checks.setup) this.processedChecks++;
       }
       if (!this.$scope.$$phase) this.$scope.$digest();
       return;
@@ -181,36 +185,33 @@ class HealthCheck {
       this.checks.api = configuration['checks.api'];
       this.checks.setup = configuration['checks.setup'];
 
-      this.$scope.results.push({
+      this.results.push({
         id: 0,
         description: 'Check Wazuh API connection',
         status: this.checks.api ? 'Checking...' : 'disabled'
-      });
-      this.$scope.results.push({
+      },{
         id: 1,
         description: 'Check for Wazuh API version',
         status: this.checks.setup ? 'Checking...' : 'disabled'
-      });
-      this.$scope.results.push({
+      },{
         id: 2,
         description: 'Check Elasticsearch index pattern',
         status: this.checks.pattern ? 'Checking...' : 'disabled'
-      });
-      this.$scope.results.push({
+      },{
         id: 3,
         description: 'Check Elasticsearch template',
         status: this.checks.template ? 'Checking...' : 'disabled'
       });
 
       for (let key in this.checks)
-        this.$scope.totalChecks += this.checks[key] ? 1 : 0;
+        this.totalChecks += this.checks[key] ? 1 : 0;
 
-      if (this.$scope.totalChecks == 0) this.$scope.zeroChecks = true;
+      if (this.totalChecks == 0) this.zeroChecks = true;
 
       await Promise.all([this.checkPatterns(), this.checkApiConnection()]);
 
-      this.$scope.checksDone = true;
-      if (!this.$scope.errors || !this.$scope.errors.length) {
+      this.checksDone = true;
+      if (!this.errors || !this.errors.length) {
         await this.$timeout(800);
         this.$window.location.assign(
           '/app/wazuh#' + this.$rootScope.previousLocation || ''
@@ -225,12 +226,10 @@ class HealthCheck {
     }
   }
 
-  $onInit() {
-    this.$scope.goApp = () =>
-      this.$window.location.assign(
-        '/app/wazuh#' + this.$rootScope.previousLocation || ''
-      );
-    this.load();
+  goApp () {
+    this.$window.location.assign(
+      '/app/wazuh#' + this.$rootScope.previousLocation || ''
+    );
   }
 }
 
