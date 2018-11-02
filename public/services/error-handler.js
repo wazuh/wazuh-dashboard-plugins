@@ -14,11 +14,8 @@ import { toastNotifications } from 'ui/notify';
 export class ErrorHandler {
   /**
    * Constructor
-   * @param {*} $location Angular.js service to manage URL routing
    */
-  constructor($location) {
-    this.$location = $location;
-  }
+  constructor() { }
 
   /**
    * Extracts error message string from any kind of error.
@@ -57,20 +54,6 @@ export class ErrorHandler {
   }
 
   /**
-   * Returns true/false depending on the error content. It looks for unauthorized error.
-   * @param {*} error
-   */
-  isAPIUnauthorized(error) {
-    return (
-      error &&
-      error.data &&
-      parseInt(error.data.statusCode) === 500 &&
-      parseInt(error.data.error) === 7 &&
-      error.data.message === '401 Unauthorized'
-    );
-  }
-
-  /**
    * Fires a green toast (success toast) using given message
    * @param {string} message The message to be shown
    * @param {string} location Usually means the file where this method was called
@@ -91,11 +74,6 @@ export class ErrorHandler {
    * @param {boolean} silent If true, no message is shown
    */
   handle(error, location, isWarning, silent) {
-    if (this.isAPIUnauthorized(error)) {
-      this.$location.path('/settings');
-      return;
-    }
-
     const message = this.extractMessage(error);
 
     let text = message;
