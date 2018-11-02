@@ -9,7 +9,6 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import { uiModules } from 'ui/modules';
 import * as FileSaver from '../../services/file-saver';
 
 const colors = [
@@ -45,9 +44,7 @@ const colors = [
   'E045E5'
 ];
 
-const app = uiModules.get('app/wazuh', []);
-
-class DecodersController {
+export class DecodersController {
   constructor($scope, $sce, errorHandler, appState, csvReq, wzTableFilter) {
     this.$scope = $scope;
     this.$sce = $sce;
@@ -203,5 +200,3 @@ class DecodersController {
     if (!this.$scope.$$phase) this.$scope.$digest();
   }
 }
-
-app.controller('decodersController', DecodersController);

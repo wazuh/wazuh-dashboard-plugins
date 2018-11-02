@@ -9,12 +9,9 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import { uiModules } from 'ui/modules';
 import * as FileSaver from '../../services/file-saver';
 
-const app = uiModules.get('app/wazuh', []);
-
-class Logs {
+export class LogsController {
   constructor($scope, apiReq, errorHandler, csvReq, appState, wzTableFilter) {
     this.$scope = $scope;
     this.apiReq = apiReq;
@@ -169,6 +166,3 @@ class Logs {
     return;
   }
 }
-
-// Logs controller
-app.controller('managerLogController', Logs);

@@ -9,7 +9,6 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import { uiModules } from 'ui/modules';
 import * as FileSaver from '../../services/file-saver';
 
 const colors = [
@@ -45,9 +44,7 @@ const colors = [
   'E045E5'
 ];
 
-const app = uiModules.get('app/wazuh', []);
-
-app.controller('rulesController', function(
+export function RulesController(
   $scope,
   $sce,
   errorHandler,
@@ -240,4 +237,4 @@ app.controller('rulesController', function(
         )
       );
   }
-});
+}

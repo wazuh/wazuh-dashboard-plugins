@@ -9,11 +9,7 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import { uiModules } from 'ui/modules';
-
-const app = uiModules.get('app/wazuh', []);
-
-class StatusController {
+export class StatusController {
   constructor($scope, errorHandler, apiReq) {
     this.$scope = $scope;
     this.errorHandler = errorHandler;
@@ -147,5 +143,3 @@ class StatusController {
     return;
   }
 }
-
-app.controller('managerStatusController', StatusController);

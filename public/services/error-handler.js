@@ -15,7 +15,7 @@ export class ErrorHandler {
   /**
    * Constructor
    */
-  constructor() { }
+  constructor() {}
 
   /**
    * Extracts error message string from any kind of error.

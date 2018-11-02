@@ -9,12 +9,9 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import { uiModules } from 'ui/modules';
 import { TabNames } from '../../utils/tab-names';
 
-const app = uiModules.get('app/wazuh', []);
-
-class Management {
+export class ManagementController {
   constructor($scope, $location) {
     this.$scope = $scope;
     this.$location = $location;
@@ -61,5 +58,3 @@ class Management {
     this.globalRulesetTab = this.rulesetTab;
   }
 }
-
-app.controller('managementController', Management);

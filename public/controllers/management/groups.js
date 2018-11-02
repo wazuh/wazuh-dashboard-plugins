@@ -10,13 +10,9 @@
  * Find more information about this on the LICENSE file.
  */
 import beautifier from '../../utils/json-beautifier';
-import { uiModules } from 'ui/modules';
 import * as FileSaver from '../../services/file-saver';
 
-const app = uiModules.get('app/wazuh', []);
-
-// Groups preview controller
-app.controller('groupsPreviewController', function(
+export function GroupsController(
   $scope,
   $location,
   apiReq,
@@ -179,4 +175,4 @@ app.controller('groupsPreviewController', function(
       $scope.filename = false;
     }
   });
-});
+}

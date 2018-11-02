@@ -31,10 +31,10 @@ class BlankScreenController {
       this.errorToShow = parsed || catchedError;
       this.wzMisc.setBlankScr(false);
       if (!this.$scope.$$phase) this.$scope.$digest();
-    }    
+    }
   }
-  
-  goOverview () {
+
+  goOverview() {
     this.$location.path('/overview');
   }
 }

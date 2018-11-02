@@ -95,9 +95,7 @@ class HealthCheck {
           `/elastic/template/${patternTitle}`
         );
         if (!templateData.data.status) {
-          this.errors.push(
-            'No template found for the selected index-pattern.'
-          );
+          this.errors.push('No template found for the selected index-pattern.');
           this.results[i].status = 'Error';
         } else {
           this.processedChecks++;
@@ -185,26 +183,30 @@ class HealthCheck {
       this.checks.api = configuration['checks.api'];
       this.checks.setup = configuration['checks.setup'];
 
-      this.results.push({
-        id: 0,
-        description: 'Check Wazuh API connection',
-        status: this.checks.api ? 'Checking...' : 'disabled'
-      },{
-        id: 1,
-        description: 'Check for Wazuh API version',
-        status: this.checks.setup ? 'Checking...' : 'disabled'
-      },{
-        id: 2,
-        description: 'Check Elasticsearch index pattern',
-        status: this.checks.pattern ? 'Checking...' : 'disabled'
-      },{
-        id: 3,
-        description: 'Check Elasticsearch template',
-        status: this.checks.template ? 'Checking...' : 'disabled'
-      });
+      this.results.push(
+        {
+          id: 0,
+          description: 'Check Wazuh API connection',
+          status: this.checks.api ? 'Checking...' : 'disabled'
+        },
+        {
+          id: 1,
+          description: 'Check for Wazuh API version',
+          status: this.checks.setup ? 'Checking...' : 'disabled'
+        },
+        {
+          id: 2,
+          description: 'Check Elasticsearch index pattern',
+          status: this.checks.pattern ? 'Checking...' : 'disabled'
+        },
+        {
+          id: 3,
+          description: 'Check Elasticsearch template',
+          status: this.checks.template ? 'Checking...' : 'disabled'
+        }
+      );
 
-      for (let key in this.checks)
-        this.totalChecks += this.checks[key] ? 1 : 0;
+      for (let key in this.checks) this.totalChecks += this.checks[key] ? 1 : 0;
 
       if (this.totalChecks == 0) this.zeroChecks = true;
 
@@ -226,7 +228,7 @@ class HealthCheck {
     }
   }
 
-  goApp () {
+  goApp() {
     this.$window.location.assign(
       '/app/wazuh#' + this.$rootScope.previousLocation || ''
     );
