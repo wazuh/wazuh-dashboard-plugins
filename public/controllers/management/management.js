@@ -62,6 +62,7 @@ class Management {
 
   setRulesTab(tab) {
     this.rulesetTab = tab;
+    this.globalRulesetTab = this.rulesetTab;
   }
 
 }
