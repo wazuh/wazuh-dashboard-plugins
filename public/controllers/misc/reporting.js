@@ -1,5 +1,5 @@
 /*
- * Wazuh app - Cluster monitoring controller
+ * Wazuh app - Reporting controller
  * Copyright (C) 2018 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -116,5 +116,5 @@ class ReportingController {
   }
 }
 
-// Logs controller
+// Reporting controller
 app.controller('reportingController', ReportingController);
