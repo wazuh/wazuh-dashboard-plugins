@@ -22,9 +22,9 @@ class Logs {
     this.csvReq = csvReq;
     this.appState = appState;
     this.wzTableFilter = wzTableFilter;
-    this.$scope.nodeList = false;
-    this.$scope.type_log = 'all';
-    this.$scope.category = 'all';
+    this.nodeList = false;
+    this.type_log = 'all';
+    this.category = 'all';
   }
 
   /**
@@ -32,12 +32,6 @@ class Logs {
    */
   $onInit() {
     this.initialize();
-    this.$scope.search = term => this.search(term);
-    this.$scope.filter = filter => this.filter(filter);
-    this.$scope.playRealtime = () => this.playRealtime();
-    this.$scope.stopRealtime = () => this.stopRealtime();
-    this.$scope.downloadCsv = () => this.downloadCsv();
-    this.$scope.changeNode = node => this.changeNode(node);
   }
 
   /**
@@ -60,7 +54,7 @@ class Logs {
    * Starts real time mode
    */
   playRealtime() {
-    this.$scope.realtime = true;
+    this.realtime = true;
     this.$scope.$broadcast('wazuhPlayRealTime');
   }
 
@@ -68,7 +62,7 @@ class Logs {
    * Stops real time mode
    */
   stopRealtime() {
-    this.$scope.realtime = false;
+    this.realtime = false;
     this.$scope.$broadcast('wazuhStopRealTime');
   }
 
@@ -82,7 +76,7 @@ class Logs {
         'CSV'
       );
       const currentApi = JSON.parse(this.appState.getCurrentAPI()).id;
-      const path = this.$scope.selectedNode ? `/cluster/${this.$scope.selectedNode}/logs` : '/manager/logs';
+      const path = this.selectedNode ? `/cluster/${this.selectedNode}/logs` : '/manager/logs';
       const output = await this.csvReq.fetch(
         path,
         currentApi,
@@ -99,9 +93,9 @@ class Logs {
 
   async changeNode(node) {
     try {
-      this.$scope.type_log = 'all';
-      this.$scope.category = 'all';
-      this.$scope.selectedNode = node;
+      this.type_log = 'all';
+      this.category = 'all';
+      this.selectedNode = node;
       this.$scope.$broadcast('wazuhUpdateInstancePath', { path: `/cluster/${node}/logs` });
       const summary = await this.apiReq.request(
         'GET',
@@ -109,7 +103,7 @@ class Logs {
         {}
       )
       const daemons = summary.data.data;
-      this.$scope.daemons = Object.keys(daemons).map(item => ({ title: item }));
+      this.daemons = Object.keys(daemons).map(item => ({ title: item }));
       if (!this.$scope.$$phase) this.$scope.$digest();
     } catch(error) {
       this.errorHandler.handle(error, 'Logs');
@@ -127,17 +121,17 @@ class Logs {
       if(clusterEnabled) {
         const nodeList = await this.apiReq.request('GET','/cluster/nodes',{});
         if(nodeList && nodeList.data && nodeList.data.data && Array.isArray(nodeList.data.data.items)){
-          this.$scope.nodeList = nodeList.data.data.items.map(item => item.name).reverse();
-          this.$scope.selectedNode = nodeList.data.data.items.filter(item => item.type === 'master')[0].name
+          this.nodeList = nodeList.data.data.items.map(item => item.name).reverse();
+          this.selectedNode = nodeList.data.data.items.filter(item => item.type === 'master')[0].name
         }
       } 
       
-      this.$scope.logsPath = clusterEnabled ? `/cluster/${this.$scope.selectedNode}/logs` : '/manager/logs'
+      this.logsPath = clusterEnabled ? `/cluster/${this.selectedNode}/logs` : '/manager/logs'
       
       const data = clusterEnabled ?
       await this.apiReq.request(
         'GET',
-        `/cluster/${this.$scope.selectedNode}/logs/summary`,
+        `/cluster/${this.selectedNode}/logs/summary`,
         {}
       ):
       await this.apiReq.request(
@@ -146,7 +140,7 @@ class Logs {
         {}
       );
       const daemons = data.data.data;
-      this.$scope.daemons = Object.keys(daemons).map(item => ({ title: item }));
+      this.daemons = Object.keys(daemons).map(item => ({ title: item }));
       if (!this.$scope.$$phase) this.$scope.$digest();
       return;
     } catch (error) {
