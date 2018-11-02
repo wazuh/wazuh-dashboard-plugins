@@ -36,6 +36,10 @@ class Management {
       this.tab = this.$routeParams.tab;
       this.switchTab(this.tab)
     }
+    this.$scope.$on('$destroy',() => {
+      delete this.$rootScope.globalRuleSet;
+      delete this.$rootScope.globalRulesetTab;
+    })
   }
 
   inArray(item, array) {
