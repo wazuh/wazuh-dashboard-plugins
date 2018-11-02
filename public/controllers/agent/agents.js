@@ -9,7 +9,6 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import { uiModules } from 'ui/modules';
 import { FilterHandler } from '../../utils/filter-handler';
 import { generateMetric } from '../../utils/generate-metric';
 import { TabNames } from '../../utils/tab-names';
@@ -26,9 +25,8 @@ import {
 
 import { ConfigurationHandler } from '../../utils/config-handler';
 import { timefilter } from 'ui/timefilter';
-const app = uiModules.get('app/wazuh', []);
 
-class AgentsController {
+export class AgentsController {
   constructor(
     $scope,
     $location,
@@ -598,5 +596,3 @@ class AgentsController {
     );
   }
 }
-
-app.controller('agentsController', AgentsController);

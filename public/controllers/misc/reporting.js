@@ -9,11 +9,7 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import { uiModules } from 'ui/modules';
-
-const app = uiModules.get('app/wazuh', []);
-
-class ReportingController {
+export class ReportingController {
   constructor($scope, errorHandler, genericReq) {
     this.$scope = $scope;
     this.errorHandler = errorHandler;
@@ -115,6 +111,3 @@ class ReportingController {
     }
   }
 }
-
-// Reporting controller
-app.controller('reportingController', ReportingController);

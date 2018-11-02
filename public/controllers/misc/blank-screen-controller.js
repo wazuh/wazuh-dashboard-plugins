@@ -9,11 +9,7 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import { uiModules } from 'ui/modules';
-
-const app = uiModules.get('app/wazuh', []);
-
-class BlankScreenController {
+export class BlankScreenController {
   constructor($scope, $location, errorHandler, wzMisc) {
     this.$scope = $scope;
     this.$location = $location;
@@ -38,5 +34,3 @@ class BlankScreenController {
     this.$location.path('/overview');
   }
 }
-
-app.controller('blankScreenController', BlankScreenController);

@@ -1,5 +1,5 @@
 /*
- * Wazuh app - Heakthcheck controller
+ * Wazuh app - Health check controller
  * Copyright (C) 2018 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -9,11 +9,9 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import { uiModules } from 'ui/modules';
 import { SavedObjectsClientProvider } from 'ui/saved_objects';
-const app = uiModules.get('app/wazuh', []);
 
-class HealthCheck {
+export class HealthCheck {
   constructor(
     $scope,
     $rootScope,
@@ -234,5 +232,3 @@ class HealthCheck {
     );
   }
 }
-
-app.controller('healthCheck', HealthCheck);

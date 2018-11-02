@@ -9,12 +9,9 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import { uiModules } from 'ui/modules';
 import * as FileSaver from '../../services/file-saver';
 
-const app = uiModules.get('app/wazuh', []);
-
-class AgentsPreviewController {
+export class AgentsPreviewController {
   constructor(
     $scope,
     genericReq,
@@ -167,5 +164,3 @@ class AgentsPreviewController {
     return;
   }
 }
-
-app.controller('agentsPreviewController', AgentsPreviewController);

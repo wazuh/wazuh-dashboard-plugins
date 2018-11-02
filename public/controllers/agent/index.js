@@ -10,8 +10,11 @@
  * Find more information about this on the LICENSE file.
  */
 import { uiModules } from 'ui/modules';
-import { ClusterController } from './monitoring';
+import { AgentsPreviewController } from './agents-preview';
+import { AgentsController } from './agents';
 
 const app = uiModules.get('app/wazuh', []);
 
-app.controller('clusterController', ClusterController);
+app
+  .controller('agentsController', AgentsController)
+  .controller('agentsPreviewController', AgentsPreviewController);
