@@ -86,5 +86,4 @@ export function WazuhApiRoutes(server) {
       return ctrl.getAgentsFieldsUniqueCount(req, res);
     }
   });
-
 }

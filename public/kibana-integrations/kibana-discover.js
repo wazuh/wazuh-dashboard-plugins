@@ -583,11 +583,11 @@ function discoverController(
       if (!filters || !filters.length) return false;
     }
     return true;
-  }
+  };
 
   $scope.opts.fetch = $scope.fetch = function() {
     // Wazuh filters are not ready yet
-    if(!filtersAreReady()) return;
+    if (!filtersAreReady()) return;
 
     // ignore requests to fetch before the app inits
     if (!init.complete) return;
@@ -615,8 +615,8 @@ function discoverController(
       $state.filters = [];
     }*/
     // Wazuh filters are not ready yet
-    if(!filtersAreReady()) return;
-    
+    if (!filtersAreReady()) return;
+
     discoverPendingUpdates.removeAll();
     discoverPendingUpdates.addItem($state.query, queryFilter.getFilters());
     $rootScope.$broadcast('updateVis');

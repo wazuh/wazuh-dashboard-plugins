@@ -13,7 +13,11 @@
 export async function nextPage(currentPage, $scope, errorHandler, fetch) {
   try {
     $scope.error = false;
-    if (!currentPage && currentPage !== 0  && $scope.currentPage < $scope.pagedItems.length - 1) {
+    if (
+      !currentPage &&
+      currentPage !== 0 &&
+      $scope.currentPage < $scope.pagedItems.length - 1
+    ) {
       $scope.currentPage++;
     }
     if ($scope.pagedItems[currentPage || $scope.currentPage].includes(null)) {
@@ -27,8 +31,7 @@ export async function nextPage(currentPage, $scope, errorHandler, fetch) {
     }
   } catch (error) {
     $scope.wazuh_table_loading = false;
-    $scope.error = `Error paginating table - ${error.message ||
-      error}.`;
+    $scope.error = `Error paginating table - ${error.message || error}.`;
     errorHandler.handle(
       `Error paginating table due to ${error.message || error}`,
       'Data factory'

@@ -32,7 +32,7 @@ import discoverTemplate from '../templates/discover/discover.jade';
 import settingsTemplate from '../templates/settings/settings.jade';
 import blankScreenTemplate from '../templates/error-handler/blank-screen.html';
 import devToolsTemplate from '../templates/dev-tools/dev-tools.html';
-import monitoringTemplate from '../templates/monitoring/monitoring.jade'
+import monitoringTemplate from '../templates/monitoring/monitoring.jade';
 
 const assignPreviousLocation = ($rootScope, $location) => {
   const path = $location.path();
@@ -83,7 +83,7 @@ function nestedResolve(
   assignPreviousLocation($rootScope, $location);
   const location = $location.path();
   return getWzConfig($q, genericReq, errorHandler, wazuhConfig).then(() =>
-    settingsWizard(      
+    settingsWizard(
       $location,
       $q,
       $window,
@@ -110,7 +110,7 @@ function savedSearch(
   return getSavedSearch(
     redirectWhenMissing,
     $location,
-    $window,    
+    $window,
     savedSearches,
     $route
   );

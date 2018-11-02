@@ -11,12 +11,7 @@ let API_ID = null;
 
 describe('wazuh-api-elastic', () => {
   before(async () => {
-    const res = await needle(
-      'get',
-      `localhost:5601/elastic/apis`,
-      {},
-      {}
-    );
+    const res = await needle('get', `localhost:5601/elastic/apis`, {}, {});
     if (!res.body || !res.body.length) {
       /* eslint-disable */
       console.log('There are no APIs stored in Elasticsearch, exiting...');
@@ -93,12 +88,7 @@ describe('wazuh-api-elastic', () => {
   });
 
   it('GET /elastic/apis', async () => {
-    const res = await needle(
-      'get',
-      `localhost:5601/elastic/apis`,
-      {},
-      headers
-    );
+    const res = await needle('get', `localhost:5601/elastic/apis`, {}, headers);
     res.body.should.be.a('array');
     res.body.length.should.be.gt(0);
   });

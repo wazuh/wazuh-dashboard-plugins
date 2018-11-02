@@ -17,4 +17,4 @@ import './agent/agents';
 import './settings';
 import './dev-tools';
 import './misc';
-import './monitoring'
+import './monitoring';

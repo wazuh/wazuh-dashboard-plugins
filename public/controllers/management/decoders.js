@@ -48,14 +48,7 @@ const colors = [
 const app = uiModules.get('app/wazuh', []);
 
 class DecodersController {
-  constructor(
-    $scope,
-    $sce,
-    errorHandler,
-    appState,
-    csvReq,
-    wzTableFilter
-  ) {
+  constructor($scope, $sce, errorHandler, appState, csvReq, wzTableFilter) {
     this.$scope = $scope;
     this.$sce = $sce;
     this.errorHandler = errorHandler;
@@ -72,7 +65,7 @@ class DecodersController {
     this.viewingDetail = false;
     this.typeFilter = 'all';
     this.isArray = Array.isArray;
-    
+
     // Reloading event listener
     this.$scope.$on('rulesetIsReloaded', () => {
       this.viewingDetail = false;

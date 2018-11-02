@@ -276,7 +276,8 @@ class OverviewController {
   async getSummary() {
     try {
       const data = await this.apiReq.request('GET', '/agents/summary', {});
-      const result = data && data.data && data.data.data ? data.data.data : false;
+      const result =
+        data && data.data && data.data.data ? data.data.data : false;
       if (result) {
         const active = result.Active - 1;
         const total = result.Total - 1;

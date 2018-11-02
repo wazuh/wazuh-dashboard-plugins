@@ -22,18 +22,14 @@ class Management {
     this.rulesetTab = 'rules';
     this.tabNames = TabNames;
     this.wazuhManagementTabs = ['ruleset', 'groups'];
-    this.statusReportsTabs = [
-      'status',
-      'logs',
-      'reporting'
-    ];
+    this.statusReportsTabs = ['status', 'logs', 'reporting'];
   }
 
   $onInit() {
     const location = this.$location.search();
     if (location && location.tab) {
       this.tab = location.tab;
-      this.switchTab(this.tab)
+      this.switchTab(this.tab);
     }
   }
 
@@ -43,12 +39,12 @@ class Management {
 
   switchTab(tab) {
     this.tab = tab;
-    
-    if(this.tab === 'groups') {
+
+    if (this.tab === 'groups') {
       this.$scope.$broadcast('groupsIsReloaded');
     }
-    
-    if(this.tab === 'ruleset') {
+
+    if (this.tab === 'ruleset') {
       this.$scope.$broadcast('rulesetIsReloaded');
       this.globalRuleSet = 'ruleset';
       this.globalRulesetTab = this.rulesetTab;
@@ -64,7 +60,6 @@ class Management {
     this.rulesetTab = tab;
     this.globalRulesetTab = this.rulesetTab;
   }
-
 }
 
 app.controller('managementController', Management);

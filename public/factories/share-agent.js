@@ -40,7 +40,7 @@ export class ShareAgent {
   }
 
   setTargetLocation(loc) {
-    if(!loc || typeof loc !== 'object') return;
+    if (!loc || typeof loc !== 'object') return;
     this.targetLocation = {};
     Object.assign(this.targetLocation, loc);
   }

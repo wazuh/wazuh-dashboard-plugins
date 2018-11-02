@@ -12,7 +12,12 @@ const headers = {
 describe('wazuh-elastic', () => {
   describe('Checking index patterns', () => {
     it('GET /elastic/index-patterns', async () => {
-      const res = await needle('get', `localhost:5601/elastic/index-patterns`, {}, headers);
+      const res = await needle(
+        'get',
+        `localhost:5601/elastic/index-patterns`,
+        {},
+        headers
+      );
       res.body.data.should.be.a('array');
       res.body.data.length.should.be.gt(0);
       res.body.data[0].should.be.a('object');

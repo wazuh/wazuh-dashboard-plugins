@@ -76,7 +76,9 @@ class Logs {
         'CSV'
       );
       const currentApi = JSON.parse(this.appState.getCurrentAPI()).id;
-      const path = this.selectedNode ? `/cluster/${this.selectedNode}/logs` : '/manager/logs';
+      const path = this.selectedNode
+        ? `/cluster/${this.selectedNode}/logs`
+        : '/manager/logs';
       const output = await this.csvReq.fetch(
         path,
         currentApi,
@@ -96,16 +98,18 @@ class Logs {
       this.type_log = 'all';
       this.category = 'all';
       this.selectedNode = node;
-      this.$scope.$broadcast('wazuhUpdateInstancePath', { path: `/cluster/${node}/logs` });
+      this.$scope.$broadcast('wazuhUpdateInstancePath', {
+        path: `/cluster/${node}/logs`
+      });
       const summary = await this.apiReq.request(
         'GET',
         `/cluster/${node}/logs/summary`,
         {}
-      )
+      );
       const daemons = summary.data.data;
       this.daemons = Object.keys(daemons).map(item => ({ title: item }));
       if (!this.$scope.$$phase) this.$scope.$digest();
-    } catch(error) {
+    } catch (error) {
       this.errorHandler.handle(error, 'Logs');
     }
   }
@@ -115,30 +119,46 @@ class Logs {
    */
   async initialize() {
     try {
-      const clusterStatus = await this.apiReq.request('GET','/cluster/status',{});
-      const clusterEnabled = clusterStatus && clusterStatus.data && clusterStatus.data.data && clusterStatus.data.data.running === 'yes' && clusterStatus.data.data.enabled === 'yes'
-      
-      if(clusterEnabled) {
-        const nodeList = await this.apiReq.request('GET','/cluster/nodes',{});
-        if(nodeList && nodeList.data && nodeList.data.data && Array.isArray(nodeList.data.data.items)){
-          this.nodeList = nodeList.data.data.items.map(item => item.name).reverse();
-          this.selectedNode = nodeList.data.data.items.filter(item => item.type === 'master')[0].name
-        }
-      } 
-      
-      this.logsPath = clusterEnabled ? `/cluster/${this.selectedNode}/logs` : '/manager/logs'
-      
-      const data = clusterEnabled ?
-      await this.apiReq.request(
+      const clusterStatus = await this.apiReq.request(
         'GET',
-        `/cluster/${this.selectedNode}/logs/summary`,
-        {}
-      ):
-      await this.apiReq.request(
-        'GET',
-        '/manager/logs/summary',
+        '/cluster/status',
         {}
       );
+      const clusterEnabled =
+        clusterStatus &&
+        clusterStatus.data &&
+        clusterStatus.data.data &&
+        clusterStatus.data.data.running === 'yes' &&
+        clusterStatus.data.data.enabled === 'yes';
+
+      if (clusterEnabled) {
+        const nodeList = await this.apiReq.request('GET', '/cluster/nodes', {});
+        if (
+          nodeList &&
+          nodeList.data &&
+          nodeList.data.data &&
+          Array.isArray(nodeList.data.data.items)
+        ) {
+          this.nodeList = nodeList.data.data.items
+            .map(item => item.name)
+            .reverse();
+          this.selectedNode = nodeList.data.data.items.filter(
+            item => item.type === 'master'
+          )[0].name;
+        }
+      }
+
+      this.logsPath = clusterEnabled
+        ? `/cluster/${this.selectedNode}/logs`
+        : '/manager/logs';
+
+      const data = clusterEnabled
+        ? await this.apiReq.request(
+            'GET',
+            `/cluster/${this.selectedNode}/logs/summary`,
+            {}
+          )
+        : await this.apiReq.request('GET', '/manager/logs/summary', {});
       const daemons = data.data.data;
       this.daemons = Object.keys(daemons).map(item => ({ title: item }));
       if (!this.$scope.$$phase) this.$scope.$digest();

@@ -14,12 +14,7 @@ let API_USER = null;
 
 describe('wazuh-api', () => {
   before(async () => {
-    const res = await needle(
-      'get',
-      `localhost:5601/elastic/apis`,
-      {},
-      {}
-    );
+    const res = await needle('get', `localhost:5601/elastic/apis`, {}, {});
 
     /* eslint-disable */
     if (!res.body || !res.body.length) {
@@ -90,12 +85,7 @@ describe('wazuh-api', () => {
   });
 
   it('GET /api/pci/{requirement}', async () => {
-    const res = await needle(
-      'get',
-      `localhost:5601/api/pci/all`,
-      {},
-      {}
-    );
+    const res = await needle('get', `localhost:5601/api/pci/all`, {}, {});
     res.body.should.be.a('object');
     res.body['1.1.1'].should.be.eql(
       'A formal process for approving and testing all network connections and changes to the firewall and router configurations'
@@ -103,12 +93,7 @@ describe('wazuh-api', () => {
   });
 
   it('GET /api/gdpr/{requirement}', async () => {
-    const res = await needle(
-      'get',
-      `localhost:5601/api/gdpr/all`,
-      {},
-      {}
-    );
+    const res = await needle('get', `localhost:5601/api/gdpr/all`, {}, {});
     res.body.should.be.a('object');
     res.body['II_5.1.f'].should.be.eql(
       'Ensure the ongoing confidentiality, integrity, availability and resilience of processing systems and services, verifying its modifications, accesses, locations and guarantee the safety of them.<br>File sharing protection and file sharing technologies that meet the requirements of data protection.'
@@ -154,12 +139,7 @@ describe('wazuh-api', () => {
   });
 
   it('GET /utils/logs', async () => {
-    const res = await needle(
-      'get',
-      `localhost:5601/utils/logs`,
-      {},
-      {}
-    );
+    const res = await needle('get', `localhost:5601/utils/logs`, {}, {});
     res.body.should.be.a('object');
     res.body.lastLogs.should.be.a('array');
     res.body.error.should.be.eql(0);

@@ -70,11 +70,7 @@ export class ReportingService {
         isAgents
       };
 
-      await this.genericReq.request(
-        'POST',
-        '/reports',
-        data
-      );
+      await this.genericReq.request('POST', '/reports', data);
 
       this.$rootScope.reportBusy = false;
       this.$rootScope.reportStatus = false;

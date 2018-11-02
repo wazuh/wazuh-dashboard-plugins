@@ -55,7 +55,7 @@ class HealthCheck {
     this.$scope.totalChecks = 0;
   }
 
-  handleError(error) {    
+  handleError(error) {
     this.$scope.errors.push(
       this.errorHandler.handle(error, 'Health Check', false, true)
     );

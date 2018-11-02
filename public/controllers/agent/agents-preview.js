@@ -54,7 +54,7 @@ class AgentsPreviewController {
     this.groups = [];
     this.nodes = [];
     this.node_name = 'all';
-    this.selectedGroup = 'all'
+    this.selectedGroup = 'all';
     this.mostActiveAgent = {
       name: '',
       id: ''
@@ -75,7 +75,7 @@ class AgentsPreviewController {
     this.load();
   }
 
-  search (term) {
+  search(term) {
     this.$scope.$broadcast('wazuhSearch', { term });
   }
 
@@ -122,11 +122,7 @@ class AgentsPreviewController {
       const pattern = this.appState.getCurrentPattern();
 
       const data = await Promise.all([
-        this.genericReq.request(
-          'GET',
-          '/api/agents-unique/' + api,
-          {}
-        ),
+        this.genericReq.request('GET', '/api/agents-unique/' + api, {}),
         this.genericReq.request(
           'GET',
           `/elastic/top/${firstUrlParam}/${secondUrlParam}/agent.name/${pattern}`
@@ -141,10 +137,8 @@ class AgentsPreviewController {
       this.osPlatforms = unique.osPlatforms;
       this.lastAgent = unique.lastAgent;
       this.agentsCountActive = unique.summary.agentsCountActive;
-      this.agentsCountDisconnected =
-        unique.summary.agentsCountDisconnected;
-      this.agentsCountNeverConnected =
-        unique.summary.agentsCountNeverConnected;
+      this.agentsCountDisconnected = unique.summary.agentsCountDisconnected;
+      this.agentsCountNeverConnected = unique.summary.agentsCountNeverConnected;
       this.agentsCountTotal = unique.summary.agentsCountTotal;
       this.agentsCoverity = unique.summary.agentsCoverity;
 
