@@ -17,7 +17,6 @@ const app = uiModules.get('app/wazuh', []);
 class AgentsPreviewController {
   constructor(
     $scope,
-    $routeParams,
     genericReq,
     appState,
     $location,
@@ -27,7 +26,6 @@ class AgentsPreviewController {
     wzTableFilter
   ) {
     this.$scope = $scope;
-    this.$routeParams = $routeParams;
     this.genericReq = genericReq;
     this.appState = appState;
     this.$location = $location;
@@ -63,8 +61,8 @@ class AgentsPreviewController {
     };
 
     // Load URL params
-    if (this.$routeParams.tab) {
-      this.submenuNavItem = this.$routeParams.tab;
+    if (loc && loc.tab) {
+      this.submenuNavItem = loc.tab;
     }
 
     // Watcher for URL params

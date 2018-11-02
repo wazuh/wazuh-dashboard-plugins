@@ -17,7 +17,6 @@ const app = uiModules.get('app/wazuh', []);
 
 app.controller('settingsController', function(
   $scope,
-  $routeParams,
   $window,
   $location,
   testAPI,
@@ -58,8 +57,9 @@ app.controller('settingsController', function(
   $scope.indexPatterns = [];
   $scope.apiEntries = [];
 
-  if ($routeParams.tab) {
-    $scope.tab = $routeParams.tab;
+  const location = $location.search();
+  if (location && location.tab) {
+    $scope.tab = location.tab;
   }
 
   $scope.switchTab = tab => {

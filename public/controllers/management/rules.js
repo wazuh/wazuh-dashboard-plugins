@@ -49,7 +49,6 @@ const app = uiModules.get('app/wazuh', []);
 
 app.controller('rulesController', function(
   $scope,
-  $rootScope,
   $sce,
   errorHandler,
   appState,
@@ -138,12 +137,9 @@ app.controller('rulesController', function(
     return $scope.$broadcast('wazuhRemoveFilter', { filterName });
   };
 
-  $scope.setRulesTab = tab => ($rootScope.globalRulesetTab = tab);
-
   //Initialization
   $scope.searchTerm = '';
   $scope.viewingDetail = false;
-  $scope.setRulesTab('rules');
   $scope.isArray = Array.isArray;
 
   $scope.colorRuleArg = ruleArg => {

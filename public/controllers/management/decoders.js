@@ -50,7 +50,6 @@ const app = uiModules.get('app/wazuh', []);
 class DecodersController {
   constructor(
     $scope,
-    $rootScope,
     $sce,
     errorHandler,
     appState,
@@ -58,7 +57,6 @@ class DecodersController {
     wzTableFilter
   ) {
     this.$scope = $scope;
-    this.$rootScope = $rootScope;
     this.$sce = $sce;
     this.errorHandler = errorHandler;
     this.appState = appState;
@@ -73,7 +71,6 @@ class DecodersController {
     this.searchTerm = '';
     this.viewingDetail = false;
     this.typeFilter = 'all';
-    this.setRulesTab('decoders');
     this.isArray = Array.isArray;
     
     // Reloading event listener
@@ -87,10 +84,6 @@ class DecodersController {
       this.viewingDetail = true;
       if (!this.$scope.$$phase) this.$scope.$digest();
     });
-  }
-
-  setRulesTab(tab) {
-    this.$rootScope.globalRulesetTab = tab;
   }
 
   includesFilter(filterName) {

@@ -15,10 +15,8 @@ import { TabNames } from '../../utils/tab-names';
 const app = uiModules.get('app/wazuh', []);
 
 class Management {
-  constructor($scope, $rootScope, $routeParams, $location) {
+  constructor($scope, $location) {
     this.$scope = $scope;
-    this.$rootScope = $rootScope;
-    this.$routeParams = $routeParams;
     this.$location = $location;
     this.tab = 'welcome';
     this.rulesetTab = 'rules';
@@ -32,14 +30,11 @@ class Management {
   }
 
   $onInit() {
-    if (this.$routeParams.tab) {
-      this.tab = this.$routeParams.tab;
+    const location = this.$location.search();
+    if (location && location.tab) {
+      this.tab = location.tab;
       this.switchTab(this.tab)
     }
-    this.$scope.$on('$destroy',() => {
-      delete this.$rootScope.globalRuleSet;
-      delete this.$rootScope.globalRulesetTab;
-    })
   }
 
   inArray(item, array) {
@@ -55,11 +50,11 @@ class Management {
     
     if(this.tab === 'ruleset') {
       this.$scope.$broadcast('rulesetIsReloaded');
-      this.$rootScope.globalRuleSet = 'ruleset';
-      this.$rootScope.globalRulesetTab = this.rulesetTab;
+      this.globalRuleSet = 'ruleset';
+      this.globalRulesetTab = this.rulesetTab;
     } else {
-      delete this.$rootScope.globalRuleSet;
-      delete this.$rootScope.globalRulesetTab;
+      this.globalRuleSet = false;
+      this.globalRulesetTab = false;
     }
 
     this.$location.search('tab', this.tab);
