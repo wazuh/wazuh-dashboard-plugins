@@ -32,6 +32,7 @@ import discoverTemplate from '../templates/discover/discover.jade';
 import settingsTemplate from '../templates/settings/settings.jade';
 import blankScreenTemplate from '../templates/error-handler/blank-screen.html';
 import devToolsTemplate from '../templates/dev-tools/dev-tools.html';
+import monitoringTemplate from '../templates/monitoring/monitoring.jade'
 
 const assignPreviousLocation = ($rootScope, $location) => {
   const path = $location.path();
@@ -154,6 +155,10 @@ routes
   })
   .when('/manager/:tab?/', {
     template: managementTemplate,
+    resolve: { nestedResolve, ip, savedSearch, clearRuleId }
+  })
+  .when('/wazuh-monitoring', {
+    template: monitoringTemplate,
     resolve: { nestedResolve, ip, savedSearch, clearRuleId }
   })
   .when('/overview/', {

@@ -57,9 +57,9 @@
         ng-show="octrl.tab !== 'welcome'"
         md-selected-nav-item="octrl.tab"
         nav-bar-aria-label="Host monitoring navigation links">
-        <md-nav-item class="wz-nav-item" md-nav-click="octrl.switchTab('general',true)" name="general">{{ octrl.tabNames['general'] }}</md-nav-item>
-        <md-nav-item class="wz-nav-item" md-nav-click="octrl.switchTab('fim',true)" name="fim">{{ octrl.tabNames['fim'] }}</md-nav-item>
-        <md-nav-item ng-show="octrl.extensions.aws" class="wz-nav-item" md-nav-click="octrl.switchTab('aws',true)" name="aws">{{ octrl.tabNames['aws'] }}</md-nav-item>
+        <md-nav-item class="wz-nav-item" md-nav-click="octrl.switchTab('general','nav')" name="general">{{ octrl.tabNames['general'] }}</md-nav-item>
+        <md-nav-item class="wz-nav-item" md-nav-click="octrl.switchTab('fim','nav')" name="fim">{{ octrl.tabNames['fim'] }}</md-nav-item>
+        <md-nav-item ng-show="octrl.extensions.aws" class="wz-nav-item" md-nav-click="octrl.switchTab('aws','nav')" name="aws">{{ octrl.tabNames['aws'] }}</md-nav-item>
     </md-nav-bar>
     <!-- End Host monitoring navigation bar -->
 
@@ -70,10 +70,10 @@
         ng-show="octrl.tab !== 'welcome'"
         md-selected-nav-item="octrl.tab"
         nav-bar-aria-label="System audit navigation links">
-        <md-nav-item class="wz-nav-item" md-nav-click="octrl.switchTab('pm',true)" name="pm">{{ octrl.tabNames['pm'] }}</md-nav-item>
-        <md-nav-item ng-show="octrl.extensions.audit" class="wz-nav-item" md-nav-click="octrl.switchTab('audit',true)" name="audit">{{ octrl.tabNames['audit'] }}</md-nav-item>
-        <md-nav-item ng-show="octrl.extensions.oscap" class="wz-nav-item" md-nav-click="octrl.switchTab('oscap',true)" name="oscap">{{ octrl.tabNames['oscap'] }}</md-nav-item>
-        <md-nav-item ng-show="octrl.extensions.ciscat" class="wz-nav-item" md-nav-click="octrl.switchTab('ciscat',true)" name="ciscat">{{ octrl.tabNames['ciscat'] }}</md-nav-item>
+        <md-nav-item class="wz-nav-item" md-nav-click="octrl.switchTab('pm','nav')" name="pm">{{ octrl.tabNames['pm'] }}</md-nav-item>
+        <md-nav-item ng-show="octrl.extensions.audit" class="wz-nav-item" md-nav-click="octrl.switchTab('audit','nav')" name="audit">{{ octrl.tabNames['audit'] }}</md-nav-item>
+        <md-nav-item ng-show="octrl.extensions.oscap" class="wz-nav-item" md-nav-click="octrl.switchTab('oscap','nav')" name="oscap">{{ octrl.tabNames['oscap'] }}</md-nav-item>
+        <md-nav-item ng-show="octrl.extensions.ciscat" class="wz-nav-item" md-nav-click="octrl.switchTab('ciscat','nav')" name="ciscat">{{ octrl.tabNames['ciscat'] }}</md-nav-item>
     </md-nav-bar>
     <!-- End System audit navigation bar -->
 
@@ -84,9 +84,9 @@
         ng-show="octrl.tab !== 'welcome'"
         md-selected-nav-item="octrl.tab"
         nav-bar-aria-label="Security navigation links">
-        <md-nav-item class="wz-nav-item" md-nav-click="octrl.switchTab('vuls',true)" name="vuls">{{ octrl.tabNames['vuls'] }}</md-nav-item>
-        <md-nav-item ng-show="octrl.extensions.virustotal" class="wz-nav-item" md-nav-click="octrl.switchTab('virustotal',true)" name="virustotal">{{ octrl.tabNames['virustotal'] }}</md-nav-item>
-        <md-nav-item ng-show="octrl.extensions.osquery" class="wz-nav-item" md-nav-click="octrl.switchTab('osquery',true)" name="osquery">{{ octrl.tabNames['osquery'] }}</md-nav-item>
+        <md-nav-item class="wz-nav-item" md-nav-click="octrl.switchTab('vuls','nav')" name="vuls">{{ octrl.tabNames['vuls'] }}</md-nav-item>
+        <md-nav-item ng-show="octrl.extensions.virustotal" class="wz-nav-item" md-nav-click="octrl.switchTab('virustotal','nav')" name="virustotal">{{ octrl.tabNames['virustotal'] }}</md-nav-item>
+        <md-nav-item ng-show="octrl.extensions.osquery" class="wz-nav-item" md-nav-click="octrl.switchTab('osquery','nav')" name="osquery">{{ octrl.tabNames['osquery'] }}</md-nav-item>
     </md-nav-bar>
     <!-- End Security navigation bar -->
 
@@ -97,8 +97,8 @@
         ng-show="octrl.tab !== 'welcome'"
         md-selected-nav-item="octrl.tab"
         nav-bar-aria-label="Compliance navigation links">
-        <md-nav-item ng-show="octrl.extensions.pci" class="wz-nav-item" md-nav-click="octrl.switchTab('pci',true)" name="pci">{{ octrl.tabNames['pci'] }}</md-nav-item>
-        <md-nav-item ng-show="octrl.extensions.gdpr" class="wz-nav-item" md-nav-click="octrl.switchTab('gdpr',true)" name="gdpr">{{ octrl.tabNames['gdpr'] }}</md-nav-item>
+        <md-nav-item ng-show="octrl.extensions.pci" class="wz-nav-item" md-nav-click="octrl.switchTab('pci','nav')" name="pci">{{ octrl.tabNames['pci'] }}</md-nav-item>
+        <md-nav-item ng-show="octrl.extensions.gdpr" class="wz-nav-item" md-nav-click="octrl.switchTab('gdpr','nav')" name="gdpr">{{ octrl.tabNames['gdpr'] }}</md-nav-item>
     </md-nav-bar>
     <!-- End Compliance navigation bar -->
 

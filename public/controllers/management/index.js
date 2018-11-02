@@ -16,4 +16,3 @@ import './logs';
 import './groups';
 import './rules';
 import './decoders';
-import './monitoring';
