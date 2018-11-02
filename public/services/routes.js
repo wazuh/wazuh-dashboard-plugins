@@ -155,7 +155,7 @@ routes
   })
   .when('/manager/:tab?/', {
     template: managementTemplate,
-    resolve: { nestedResolve, ip, savedSearch, clearRuleId }
+    resolve: { nestedResolve }
   })
   .when('/wazuh-monitoring', {
     template: monitoringTemplate,
