@@ -38,53 +38,51 @@ class AgentsPreviewController {
   }
 
   $onInit() {
-    this.$scope.init = true;
+    this.init = true;
     const loc = this.$location.search();
     if (loc && loc.agent && loc.agent !== '000')
       return this.showAgent({ id: loc.agent });
 
-    this.$scope.search = term => {
-      this.$scope.$broadcast('wazuhSearch', { term });
-    };
-
-    this.$scope.filter = filter => {
-      this.$scope.$broadcast('wazuhFilter', { filter });
-    };
-
-    this.$scope.isClusterEnabled =
+    this.isClusterEnabled =
       this.appState.getClusterInfo() &&
       this.appState.getClusterInfo().status === 'enabled';
 
-    this.$scope.loading = true;
-    this.$scope.status = 'all';
-    this.$scope.osPlatform = 'all';
-    this.$scope.version = 'all';
-    this.$scope.osPlatforms = [];
-    this.$scope.versions = [];
-    this.$scope.groups = [];
-    this.$scope.nodes = [];
-    this.$scope.node_name = 'all';
-    this.$scope.selectedGroup = 'all'
-    this.$scope.mostActiveAgent = {
+    this.loading = true;
+    this.status = 'all';
+    this.osPlatform = 'all';
+    this.version = 'all';
+    this.osPlatforms = [];
+    this.versions = [];
+    this.groups = [];
+    this.nodes = [];
+    this.node_name = 'all';
+    this.selectedGroup = 'all'
+    this.mostActiveAgent = {
       name: '',
       id: ''
     };
 
     // Load URL params
     if (this.$routeParams.tab) {
-      this.$scope.submenuNavItem = this.$routeParams.tab;
+      this.submenuNavItem = this.$routeParams.tab;
     }
 
     // Watcher for URL params
     this.$scope.$watch('submenuNavItem', () => {
-      this.$location.search('tab', this.$scope.submenuNavItem);
+      this.$location.search('tab', this.submenuNavItem);
     });
 
-    this.$scope.downloadCsv = async () => this.downloadCsv();
-    this.$scope.showAgent = agent => this.showAgent(agent);
-    this.$scope.init = false;
+    this.init = false;
     //Load
     this.load();
+  }
+
+  search (term) {
+    this.$scope.$broadcast('wazuhSearch', { term });
+  }
+
+  filter(filter) {
+    this.$scope.$broadcast('wazuhFilter', { filter });
   }
 
   showAgent(agent) {
@@ -139,36 +137,36 @@ class AgentsPreviewController {
       const [agentsUnique, agentsTop] = data;
       const unique = agentsUnique.data.result;
 
-      this.$scope.groups = unique.groups;
-      this.$scope.nodes = unique.nodes.map(item => ({ id: item }));
-      this.$scope.versions = unique.versions.map(item => ({ id: item }));
-      this.$scope.osPlatforms = unique.osPlatforms;
-      this.$scope.lastAgent = unique.lastAgent;
-      this.$scope.agentsCountActive = unique.summary.agentsCountActive;
-      this.$scope.agentsCountDisconnected =
+      this.groups = unique.groups;
+      this.nodes = unique.nodes.map(item => ({ id: item }));
+      this.versions = unique.versions.map(item => ({ id: item }));
+      this.osPlatforms = unique.osPlatforms;
+      this.lastAgent = unique.lastAgent;
+      this.agentsCountActive = unique.summary.agentsCountActive;
+      this.agentsCountDisconnected =
         unique.summary.agentsCountDisconnected;
-      this.$scope.agentsCountNeverConnected =
+      this.agentsCountNeverConnected =
         unique.summary.agentsCountNeverConnected;
-      this.$scope.agentsCountTotal = unique.summary.agentsCountTotal;
-      this.$scope.agentsCoverity = unique.summary.agentsCoverity;
+      this.agentsCountTotal = unique.summary.agentsCountTotal;
+      this.agentsCoverity = unique.summary.agentsCoverity;
 
       if (agentsTop.data.data === '') {
-        this.$scope.mostActiveAgent.name = this.appState.getClusterInfo().manager;
-        this.$scope.mostActiveAgent.id = '000';
+        this.mostActiveAgent.name = this.appState.getClusterInfo().manager;
+        this.mostActiveAgent.id = '000';
       } else {
-        this.$scope.mostActiveAgent.name = agentsTop.data.data;
+        this.mostActiveAgent.name = agentsTop.data.data;
         const info = await this.genericReq.request(
           'GET',
           `/elastic/top/${firstUrlParam}/${secondUrlParam}/agent.id/${pattern}`
         );
-        if (info.data.data === '' && this.$scope.mostActiveAgent.name !== '') {
-          this.$scope.mostActiveAgent.id = '000';
+        if (info.data.data === '' && this.mostActiveAgent.name !== '') {
+          this.mostActiveAgent.id = '000';
         } else {
-          this.$scope.mostActiveAgent.id = info.data.data;
+          this.mostActiveAgent.id = info.data.data;
         }
       }
 
-      this.$scope.loading = false;
+      this.loading = false;
       if (!this.$scope.$$phase) this.$scope.$digest();
       return;
     } catch (error) {
