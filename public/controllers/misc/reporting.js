@@ -18,40 +18,28 @@ class ReportingController {
     this.$scope = $scope;
     this.errorHandler = errorHandler;
     this.genericReq = genericReq;
-    this.$scope.loading = true;
-    this.$scope.itemsPerPage = 15;
-    this.$scope.pagedItems = [];
-    this.$scope.currentPage = 0;
+    this.loading = true;
+    this.itemsPerPage = 15;
+    this.pagedItems = [];
+    this.currentPage = 0;
     this.items = [];
-    this.$scope.gap = 0;
+    this.gap = 0;
   }
 
   $onInit() {
     this.load();
-    this.$scope.refresh = () => this.load();
-    this.$scope.deleteReport = async name => this.deleteReport(name);
-    this.$scope.search = () => this.search();
-    this.$scope.groupToPages = () => this.groupToPages();
-    this.$scope.range = (size, start, end) => this.range(size, start, end);
-    this.$scope.prevPage = () => this.prevPage();
-    this.$scope.nextPage = () => this.nextPage();
-    this.$scope.setPage = () => this.setPage();
   }
 
   search() {
-    this.$scope.filteredItems = this.items;
-    this.$scope.currentPage = 0;
-    this.$scope.groupToPages();
+    this.filteredItems = this.items;
+    this.currentPage = 0;
+    this.groupToPages();
   }
 
   async deleteReport(name) {
     try {
-      this.$scope.loading = true;
-      await this.genericReq.request(
-        'DELETE',
-        '/reports/' + name,
-        {}
-      );
+      this.loading = true;
+      await this.genericReq.request('DELETE', '/reports/' + name, {});
       await this.load();
       this.errorHandler.info('Success', 'Reporting');
     } catch (error) {
@@ -61,16 +49,16 @@ class ReportingController {
 
   // calculate page in place
   groupToPages() {
-    this.$scope.pagedItems = [];
+    this.pagedItems = [];
 
-    for (let i = 0; i < this.$scope.filteredItems.length; i++) {
-      if (i % this.$scope.itemsPerPage === 0) {
-        this.$scope.pagedItems[Math.floor(i / this.$scope.itemsPerPage)] = [
-          this.$scope.filteredItems[i]
+    for (let i = 0; i < this.filteredItems.length; i++) {
+      if (i % this.itemsPerPage === 0) {
+        this.pagedItems[Math.floor(i / this.itemsPerPage)] = [
+          this.filteredItems[i]
         ];
       } else {
-        this.$scope.pagedItems[Math.floor(i / this.$scope.itemsPerPage)].push(
-          this.$scope.filteredItems[i]
+        this.pagedItems[Math.floor(i / this.itemsPerPage)].push(
+          this.filteredItems[i]
         );
       }
     }
@@ -81,48 +69,46 @@ class ReportingController {
 
     if (size < end) {
       end = size;
-      start = size - this.$scope.gap;
+      start = size - this.gap;
     }
     for (let i = start; i < end; i++) {
       ret.push(i);
     }
+
     return ret;
   }
 
   prevPage() {
-    if (this.$scope.currentPage > 0) {
-      this.$scope.currentPage--;
+    if (this.currentPage > 0) {
+      this.currentPage--;
     }
   }
 
-  nextPage() {
-    if (this.$scope.currentPage < this.$scope.pagedItems.length - 1) {
-      this.$scope.currentPage++;
+  nextPage(n) {
+    if (!n && n !== 0 && this.currentPage < this.pagedItems.length - 1) {
+      this.currentPage++;
     }
   }
 
-  setPage() {
-    this.$scope.currentPage = this.n;
+  setPage(n) {
+    this.currentPage = n;
+    this.nextPage(n);
   }
 
   async load() {
     try {
-      this.$scope.loading = true;
-      const data = await this.genericReq.request(
-        'GET',
-        '/reports',
-        {}
-      );
+      this.loading = true;
+      const data = await this.genericReq.request('GET', '/reports', {});
       this.items = data.data.list;
       const gap = this.items.length / 15;
       const gapInteger = parseInt(this.items.length / 15);
-      this.$scope.gap =
+      this.gap =
         gap - parseInt(this.items.length / 15) > 0
           ? gapInteger + 1
           : gapInteger;
-      if (this.$scope.gap > 5) this.$scope.gap = 5;
-      this.$scope.search();
-      this.$scope.loading = false;
+      if (this.gap > 5) this.gap = 5;
+      this.search();
+      this.loading = false;
       if (!this.$scope.$$phase) this.$scope.$digest();
     } catch (error) {
       this.errorHandler.handle(error, 'Reporting');
