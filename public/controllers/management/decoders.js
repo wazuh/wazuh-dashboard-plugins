@@ -47,44 +47,71 @@ const colors = [
 
 const app = uiModules.get('app/wazuh', []);
 
-app.controller('decodersController', function(
-  $scope,
-  $rootScope,
-  $sce,
-  errorHandler,
-  appState,
-  csvReq,
-  wzTableFilter
-) {
-  $scope.setRulesTab = tab => ($rootScope.globalRulesetTab = tab);
+class DecodersController {
+  constructor(
+    $scope,
+    $rootScope,
+    $sce,
+    errorHandler,
+    appState,
+    csvReq,
+    wzTableFilter
+  ) {
+    this.$scope = $scope;
+    this.$rootScope = $rootScope;
+    this.$sce = $sce;
+    this.errorHandler = errorHandler;
+    this.appState = appState;
+    this.csvReq = csvReq;
+    this.wzTableFilter = wzTableFilter;
+  }
 
-  $scope.appliedFilters = [];
+  $onInit() {
+    this.appliedFilters = [];
 
-  //Initialization
-  $scope.searchTerm = '';
-  $scope.viewingDetail = false;
-  $scope.typeFilter = 'all';
-  $scope.setRulesTab('decoders');
-  $scope.isArray = Array.isArray;
+    //Initialization
+    this.searchTerm = '';
+    this.viewingDetail = false;
+    this.typeFilter = 'all';
+    this.setRulesTab('decoders');
+    this.isArray = Array.isArray;
+    
+    // Reloading event listener
+    this.$scope.$on('rulesetIsReloaded', () => {
+      this.viewingDetail = false;
+      if (!this.$scope.$$phase) this.$scope.$digest();
+    });
 
-  $scope.includesFilter = filterName =>
-    $scope.appliedFilters.map(item => item.name).includes(filterName);
+    this.$scope.$on('wazuhShowDecoder', (event, parameters) => {
+      this.currentDecoder = parameters.decoder;
+      this.viewingDetail = true;
+      if (!this.$scope.$$phase) this.$scope.$digest();
+    });
+  }
 
-  $scope.getFilter = filterName => {
-    const filtered = $scope.appliedFilters.filter(
+  setRulesTab(tab) {
+    this.$rootScope.globalRulesetTab = tab;
+  }
+
+  includesFilter(filterName) {
+    return this.appliedFilters.map(item => item.name).includes(filterName);
+  }
+
+  getFilter(filterName) {
+    const filtered = this.appliedFilters.filter(
       item => item.name === filterName
     );
     return filtered.length ? filtered[0].value : '';
-  };
+  }
 
-  $scope.removeFilter = filterName => {
-    $scope.appliedFilters = $scope.appliedFilters.filter(
+  removeFilter(filterName) {
+    this.appliedFilters = this.appliedFilters.filter(
       item => item.name !== filterName
     );
-    return $scope.$broadcast('wazuhRemoveFilter', { filterName });
-  };
+    return this.$scope.$broadcast('wazuhRemoveFilter', { filterName });
+  }
 
-  $scope.colorRegex = regex => {
+  colorRegex(regex) {
     regex = regex.toString();
     let valuesArray = regex.match(/\(((?!<\/span>).)*?\)(?!<\/span>)/gim);
     let coloredString = regex;
@@ -94,10 +121,10 @@ app.controller('decodersController', function(
         '<span style="color: ' + colors[i] + ' ">' + valuesArray[i] + '</span>'
       );
     }
-    return $sce.trustAsHtml(coloredString);
-  };
+    return this.$sce.trustAsHtml(coloredString);
+  }
 
-  $scope.colorOrder = order => {
+  colorOrder(order) {
     order = order.toString();
     let valuesArray = order.split(',');
     let coloredString = order;
@@ -107,58 +134,52 @@ app.controller('decodersController', function(
         '<span style="color: ' + colors[i] + ' ">' + valuesArray[i] + '</span>'
       );
     }
-    return $sce.trustAsHtml(coloredString);
-  };
+    return this.$sce.trustAsHtml(coloredString);
+  }
 
-  // Reloading event listener
-  $scope.$on('rulesetIsReloaded', () => {
-    $scope.viewingDetail = false;
-    if (!$scope.$$phase) $scope.$digest();
-  });
-
-  $scope.search = term => {
+  search(term) {
     if (term && term.startsWith('path:') && term.split('path:')[1].trim()) {
-      $scope.custom_search = '';
+      this.custom_search = '';
       const filter = { name: 'path', value: term.split('path:')[1].trim() };
-      $scope.appliedFilters = $scope.appliedFilters.filter(
+      this.appliedFilters = this.appliedFilters.filter(
         item => item.name !== 'path'
       );
-      $scope.appliedFilters.push(filter);
-      $scope.$broadcast('wazuhFilter', { filter });
+      this.appliedFilters.push(filter);
+      this.$scope.$broadcast('wazuhFilter', { filter });
     } else if (
       term &&
       term.startsWith('file:') &&
       term.split('file:')[1].trim()
     ) {
-      $scope.custom_search = '';
+      this.custom_search = '';
       const filter = { name: 'file', value: term.split('file:')[1].trim() };
-      $scope.appliedFilters = $scope.appliedFilters.filter(
+      this.appliedFilters = this.appliedFilters.filter(
         item => item.name !== 'file'
       );
-      $scope.appliedFilters.push(filter);
-      $scope.$broadcast('wazuhFilter', { filter });
+      this.appliedFilters.push(filter);
+      this.$scope.$broadcast('wazuhFilter', { filter });
     } else {
-      $scope.$broadcast('wazuhSearch', { term, removeFilters: true });
+      this.$scope.$broadcast('wazuhSearch', { term, removeFilters: true });
     }
-  };
+  }
 
-  $scope.onlyParents = typeFilter => {
-    $scope.appliedFilters = [];
+  onlyParents(typeFilter) {
+    this.appliedFilters = [];
     if (typeFilter === 'all')
-      $scope.$broadcast('wazuhUpdateInstancePath', { path: '/decoders' });
+      this.$scope.$broadcast('wazuhUpdateInstancePath', { path: '/decoders' });
     else
-      $scope.$broadcast('wazuhUpdateInstancePath', {
+      this.$scope.$broadcast('wazuhUpdateInstancePath', {
         path: '/decoders/parents'
       });
-  };
+  }
 
-  $scope.downloadCsv = async () => {
+  async downloadCsv() {
     try {
-      const currentApi = JSON.parse(appState.getCurrentAPI()).id;
-      const output = await csvReq.fetch(
+      const currentApi = JSON.parse(this.appState.getCurrentAPI()).id;
+      const output = await this.csvReq.fetch(
         '/decoders',
         currentApi,
-        wzTableFilter.get()
+        this.wzTableFilter.get()
       );
       const blob = new Blob([output], { type: 'text/csv' }); // eslint-disable-line
 
@@ -166,39 +187,35 @@ app.controller('decodersController', function(
 
       return;
     } catch (error) {
-      errorHandler.handle(error, 'Download CSV');
+      this.errorHandler.handle(error, 'Download CSV');
     }
     return;
-  };
+  }
 
   /**
    * This function takes back to the list but adding a filter from the detail view
    */
-  $scope.addDetailFilter = (name, value) => {
-    $scope.appliedFilters.push({ name, value });
+  addDetailFilter(name, value) {
+    this.appliedFilters.push({ name, value });
     // Clear the autocomplete component
-    $scope.searchTerm = '';
+    this.searchTerm = '';
     // Go back to the list
-    $scope.closeDetailView();
-  };
-
-  $scope.$on('wazuhShowDecoder', (event, parameters) => {
-    $scope.currentDecoder = parameters.decoder;
-    $scope.viewingDetail = true;
-    if (!$scope.$$phase) $scope.$digest();
-  });
+    this.closeDetailView();
+  }
 
   /**
    * This function changes to the decoders list view
    */
-  $scope.closeDetailView = clear => {
+  closeDetailView(clear) {
     if (clear)
-      $scope.appliedFilters = $scope.appliedFilters.slice(
+      this.appliedFilters = this.appliedFilters.slice(
         0,
-        $scope.appliedFilters.length - 1
+        this.appliedFilters.length - 1
       );
-    $scope.viewingDetail = false;
-    $scope.currentDecoder = false;
-    if (!$scope.$$phase) $scope.$digest();
-  };
-});
+    this.viewingDetail = false;
+    this.currentDecoder = false;
+    if (!this.$scope.$$phase) this.$scope.$digest();
+  }
+}
+
+app.controller('decodersController', DecodersController);
