@@ -29,217 +29,249 @@ import { queryConfig } from '../../services/query-config';
 
 const app = uiModules.get('app/wazuh', []);
 
-app.controller('overviewController', function(
-  $scope,
-  $location,
-  $rootScope,
-  appState,
-  errorHandler,
-  apiReq,
-  tabVisualizations,
-  commonData,
-  reportingService,
-  visFactoryService,
-  wazuhConfig
-) {
-  $scope.wodlesConfiguration = false;
-  $scope.TabDescription = TabDescription;
-  $rootScope.reportStatus = false;
+class OverviewController {
+  constructor(
+    $scope,
+    $location,
+    $rootScope,
+    appState,
+    errorHandler,
+    apiReq,
+    tabVisualizations,
+    commonData,
+    reportingService,
+    visFactoryService,
+    wazuhConfig
+  ) {
+    this.$scope = $scope;
+    this.$location = $location;
+    this.$rootScope = $rootScope;
+    this.appState = appState;
+    this.errorHandler = errorHandler;
+    this.apiReq = apiReq;
+    this.tabVisualizations = tabVisualizations;
+    this.commonData = commonData;
+    this.reportingService = reportingService;
+    this.visFactoryService = visFactoryService;
+    this.wazuhConfig = wazuhConfig;
+  }
 
-  $location.search('_a', null);
-  const filterHandler = new FilterHandler(appState.getCurrentPattern());
-  visFactoryService.clearAll();
+  $onInit() {
+    this.wodlesConfiguration = false;
+    this.TabDescription = TabDescription;
+    this.$rootScope.reportStatus = false;
 
-  const currentApi = JSON.parse(appState.getCurrentAPI()).id;
-  const extensions = appState.getExtensions(currentApi);
-  $scope.extensions = extensions;
+    this.$location.search('_a', null);
+    this.filterHandler = new FilterHandler(this.appState.getCurrentPattern());
+    this.visFactoryService.clearAll();
 
-  $scope.wzMonitoringEnabled = false;
+    const currentApi = JSON.parse(this.appState.getCurrentAPI()).id;
+    const extensions = this.appState.getExtensions(currentApi);
+    this.extensions = extensions;
 
-  // Tab names
-  $scope.tabNames = TabNames;
+    this.wzMonitoringEnabled = false;
 
-  $scope.tabView = commonData.checkTabViewLocation();
-  $scope.tab = commonData.checkTabLocation();
+    // Tab names
+    this.tabNames = TabNames;
 
-  let tabHistory = [];
-  if ($scope.tab !== 'welcome') tabHistory.push($scope.tab);
+    this.tabView = this.commonData.checkTabViewLocation();
+    this.tab = this.commonData.checkTabLocation();
 
-  // This object represents the number of visualizations per tab; used to show a progress bar
-  tabVisualizations.assign('overview');
+    this.tabHistory = [];
+    if (this.tab !== 'welcome') this.tabHistory.push(this.tab);
 
-  $scope.hostMonitoringTabs = ['general', 'fim', 'aws'];
-  $scope.systemAuditTabs = ['pm', 'audit', 'oscap', 'ciscat'];
-  $scope.securityTabs = ['vuls', 'virustotal', 'osquery'];
-  $scope.complianceTabs = ['pci', 'gdpr'];
+    // This object represents the number of visualizations per tab; used to show a progress bar
+    this.tabVisualizations.assign('overview');
 
-  $scope.inArray = (item, array) =>
-    item && Array.isArray(array) && array.includes(item);
+    this.hostMonitoringTabs = ['general', 'fim', 'aws'];
+    this.systemAuditTabs = ['pm', 'audit', 'oscap', 'ciscat'];
+    this.securityTabs = ['vuls', 'virustotal', 'osquery'];
+    this.complianceTabs = ['pci', 'gdpr'];
 
-  const createMetrics = metricsObject => {
-    for (let key in metricsObject) {
-      $scope[key] = () => generateMetric(metricsObject[key]);
+    this.wodlesConfiguration = null;
+
+    this.init();
+
+    this.$scope.$on('$destroy', () => {
+      this.this.visFactoryService.clearAll();
+    });
+  }
+
+  inArray(item, array) {
+    return item && Array.isArray(array) && array.includes(item);
+  }
+
+  createMetrics(metricsObject) {
+    for (const key in metricsObject) {
+      this[key] = () => generateMetric(metricsObject[key]);
     }
-  };
+  }
 
-  const checkMetrics = (tab, subtab) => {
+  checkMetrics(tab, subtab) {
     if (subtab === 'panels') {
       switch (tab) {
         case 'general':
-          createMetrics(metricsGeneral);
+          this.createMetrics(metricsGeneral);
           break;
         case 'audit':
-          createMetrics(metricsAudit);
+          this.createMetrics(metricsAudit);
           break;
         case 'vuls':
-          createMetrics(metricsVulnerability);
+          this.createMetrics(metricsVulnerability);
           break;
         case 'oscap':
-          createMetrics(metricsScap);
+          this.createMetrics(metricsScap);
           break;
         case 'ciscat':
-          createMetrics(metricsCiscat);
+          this.createMetrics(metricsCiscat);
           break;
         case 'virustotal':
-          createMetrics(metricsVirustotal);
+          this.createMetrics(metricsVirustotal);
           break;
         case 'osquery':
-          createMetrics(metricsOsquery);
+          this.createMetrics(metricsOsquery);
           break;
       }
     }
-  };
+  }
 
   // Switch subtab
-  $scope.switchSubtab = async (
+  async switchSubtab(
     subtab,
     force = false,
     sameTab = true,
     preserveDiscover = false
-  ) => {
+  ) {
     try {
-      if ($scope.tabView === subtab && !force) return;
+      if (this.tabView === subtab && !force) return;
 
-      visFactoryService.clear();
-      $location.search('tabView', subtab);
+      this.visFactoryService.clear();
+      this.$location.search('tabView', subtab);
       const localChange =
-        subtab === 'panels' && $scope.tabView === 'discover' && sameTab;
-      $scope.tabView = subtab;
+        subtab === 'panels' && this.tabView === 'discover' && sameTab;
+      this.tabView = subtab;
 
-      if (subtab === 'panels' && $scope.tab !== 'welcome') {
-        await visFactoryService.buildOverviewVisualizations(
-          filterHandler,
-          $scope.tab,
+      if (subtab === 'panels' && this.tab !== 'welcome') {
+        await this.visFactoryService.buildOverviewVisualizations(
+          this.filterHandler,
+          this.tab,
           subtab,
           localChange || preserveDiscover
         );
       } else {
-        $rootScope.$emit('changeTabView', { tabView: $scope.tabView });
+        this.$rootScope.$emit('changeTabView', { tabView: this.tabView });
       }
 
-      checkMetrics($scope.tab, subtab);
+      this.checkMetrics(this.tab, subtab);
     } catch (error) {
-      errorHandler.handle(error, 'Overview');
+      this.errorHandler.handle(error, 'Overview');
     }
-    if (!$scope.$$phase) $scope.$digest();
+    if (!this.$scope.$$phase) this.$scope.$digest();
     return;
-  };
+  }
 
-  let wodlesConfiguration;
-
-  const calculateWodleTagFromTab = tab => {
+  calculateWodleTagFromTab(tab) {
     if (tab === 'aws') return 'aws-s3';
     return false;
-  };
+  }
 
-  const filterWodle = tab => {
+  filterWodle(tab) {
     try {
-      $scope.wodlesConfiguration = false;
-      const tag = calculateWodleTagFromTab(tab);
+      this.wodlesConfiguration = false;
+      const tag = this.calculateWodleTagFromTab(tab);
       let result = [];
       if (
         tag &&
-        wodlesConfiguration &&
-        wodlesConfiguration['wmodules-wmodules'] &&
-        wodlesConfiguration['wmodules-wmodules'].wmodules
+        this.wodlesConfiguration &&
+        this.wodlesConfiguration['wmodules-wmodules'] &&
+        this.wodlesConfiguration['wmodules-wmodules'].wmodules
       ) {
-        result = wodlesConfiguration['wmodules-wmodules'].wmodules.filter(
+        result = this.wodlesConfiguration['wmodules-wmodules'].wmodules.filter(
           item => typeof item[tag] !== 'undefined'
         );
       }
       if (result.length) {
-        $scope.wodlesConfiguration = result[0];
+        this.wodlesConfiguration = result[0];
       }
     } catch (error) {} // eslint-disable-line
 
-    if (!$scope.$$phase) $scope.$digest();
-  };
+    if (!this.$scope.$$phase) this.$scope.$digest();
+  }
 
-  const fetchWodles = async () => {
+  async fetchWodles() {
     try {
-      wodlesConfiguration = await queryConfig(
+      this.wodlesConfiguration = await queryConfig(
         '000',
         [{ component: 'wmodules', configuration: 'wmodules' }],
-        apiReq
+        this.apiReq
       );
     } catch (error) {
-      wodlesConfiguration = false;
+      this.wodlesConfiguration = false;
     }
     return;
-  };
+  }
 
   // Switch tab
-  $scope.switchTab = async (tab, force = false) => {
+  async switchTab(newTab, force = false) {
     try {
-      if (tab !== 'welcome') {
-        await fetchWodles();
+      console.log(newTab)
+      if (newTab !== 'welcome') {
+        await this.fetchWodles();
       }
-      if (tab === 'welcome' && typeof $scope.agentsCountTotal === 'undefined') {
-        await getSummary();
+      if (newTab === 'welcome' && typeof this.agentsCountTotal === 'undefined') {
+        await this.getSummary();
       }
-      if (tab === 'pci') {
-        const pciTabs = await commonData.getPCI();
-        $scope.pciTabs = pciTabs;
-        $scope.selectedPciIndex = 0;
+      if (newTab === 'pci') {
+        const pciTabs = await this.commonData.getPCI();
+        this.pciTabs = pciTabs;
+        this.selectedPciIndex = 0;
       }
-      if (tab === 'gdpr') {
-        const gdprTabs = await commonData.getGDPR();
-        $scope.gdprTabs = gdprTabs;
-        $scope.selectedGdprIndex = 0;
+      if (newTab === 'gdpr') {
+        const gdprTabs = await this.commonData.getGDPR();
+        this.gdprTabs = gdprTabs;
+        this.selectedGdprIndex = 0;
       }
-      filterWodle(tab);
-      if (tab !== 'welcome') tabHistory.push(tab);
-      if (tabHistory.length > 2) tabHistory = tabHistory.slice(-2);
-      tabVisualizations.setTab(tab);
-      if ($scope.tab === tab && !force) return;
-      const sameTab = $scope.tab === tab;
-      $location.search('tab', tab);
+
+      this.filterWodle(newTab);
+      if (newTab !== 'welcome') this.tabHistory.push(newTab);
+      if (this.tabHistory.length > 2)
+        this.tabHistory = this.tabHistory.slice(-2);
+      this.tabVisualizations.setTab(newTab);
+      console.log(this.tab,newTab)
+      if (this.tab === newTab && !force) return;
+      const sameTab = this.tab === newTab;
+      
+      this.$location.search('tab', newTab);
       const preserveDiscover =
-        tabHistory.length === 2 && tabHistory[0] === tabHistory[1];
-      $scope.tab = tab;
-
-      await $scope.switchSubtab('panels', true, sameTab, preserveDiscover);
+        this.tabHistory.length === 2 &&
+        this.tabHistory[0] === this.tabHistory[1];
+      this.tab = newTab;
+      
+      await this.switchSubtab('panels', true, sameTab, preserveDiscover);
     } catch (error) {
-      errorHandler.handle(error, 'Overview');
+      console.log(error)
+      this.errorHandler.handle(error, 'Overview');
     }
-    if (!$scope.$$phase) $scope.$digest();
+    if (!this.$scope.$$phase) this.$scope.$digest();
     return;
-  };
+  }
 
-  $scope.startVis2Png = () => reportingService.startVis2Png($scope.tab);
+  startVis2Png() {
+    return this.reportingService.startVis2Png(this.tab);
+  }
 
-  const getSummary = async () => {
+  async getSummary() {
     try {
-      const data = await apiReq.request('GET', '/agents/summary', {});
+      const data = await this.apiReq.request('GET', '/agents/summary', {});
 
       if (data && data.data && data.data.data) {
         const active = data.data.data.Active - 1;
         const total = data.data.data.Total - 1;
-        $scope.agentsCountActive = active;
-        $scope.agentsCountDisconnected = data.data.data.Disconnected;
-        $scope.agentsCountNeverConnected = data.data.data['Never connected'];
-        $scope.agentsCountTotal = total;
-        $scope.agentsCoverity = total ? (active / total) * 100 : 0;
+        this.agentsCountActive = active;
+        this.agentsCountDisconnected = data.data.data.Disconnected;
+        this.agentsCountNeverConnected = data.data.data['Never connected'];
+        this.agentsCountTotal = total;
+        this.agentsCoverity = total ? (active / total) * 100 : 0;
       } else {
         throw new Error('Error fetching /agents/summary from Wazuh API');
       }
@@ -247,35 +279,31 @@ app.controller('overviewController', function(
     } catch (error) {
       return Promise.reject(error);
     }
-  };
+  }
 
-  const loadConfiguration = async () => {
+  async loadConfiguration() {
     try {
-      const configuration = wazuhConfig.getConfig();
+      const configuration = this.wazuhConfig.getConfig();
 
-      $scope.wzMonitoringEnabled = !!configuration['wazuh.monitoring.enabled'];
+      this.wzMonitoringEnabled = !!configuration['wazuh.monitoring.enabled'];
 
       return;
     } catch (error) {
-      $scope.wzMonitoringEnabled = true;
+      this.wzMonitoringEnabled = true;
       return Promise.reject(error);
     }
-  };
+  }
 
-  const init = async () => {
+  async init() {
     try {
-      await loadConfiguration();
-      await $scope.switchTab($scope.tab, true);
+      await this.loadConfiguration();
+      await this.switchTab(this.tab, true);
     } catch (error) {
-      errorHandler.handle(error, 'Overview (init)');
+      this.errorHandler.handle(error, 'Overview (init)');
     }
-    if (!$scope.$$phase) $scope.$digest();
+    if (!this.$scope.$$phase) this.$scope.$digest();
     return;
-  };
+  }
+}
 
-  init();
-
-  $scope.$on('$destroy', () => {
-    visFactoryService.clearAll();
-  });
-});
+app.controller('overviewController', OverviewController);

@@ -1,9 +1,9 @@
-<md-content flex layout="column" ng-if="tab === 'gdpr' && tabView === 'panels'" ng-class="{'no-opacity': resultState !== 'ready' || !rendered}" layout-align="start">
+<md-content flex layout="column" ng-if="octrl.tab === 'gdpr' && octrl.tabView === 'panels'" ng-class="{'no-opacity': resultState !== 'ready' || !rendered}" layout-align="start">
 
     <div layout="row" layout-align="center stretch" ng-show="gdprTabs.length">
         <md-card flex class="wz-md-card">
             <md-tabs md-selected="selectedGdprIndex" class="wz-md-tab" md-border-bottom md-dynamic-height id="gdprReq_tab">
-                <md-tab ng-repeat="tab in gdprTabs" ng-disabled="tab.disabled" label="{{tab.title}}">
+                <md-tab ng-repeat="tab in octrl.gdprTabs" ng-disabled="tab.disabled" label="{{tab.title}}">
                     <div class="md-padding">
                         <span class="wz-headline-title">GDPR Requirement: {{tab.title}}</span>
                         <md-divider class="wz-margin-top-10"></md-divider>
