@@ -1,4 +1,4 @@
-<div layout="column" layout-align="start stretch" ng-if="tab === 'api' && !load">
+<div layout="column" layout-align="start stretch" ng-if="ctrl.tab === 'api' && !ctrl.load">
 
     <!-- Headline -->
     <div layout="column" layout-padding>
@@ -23,30 +23,30 @@
                 <!-- End API entries headings section -->
 
                 <!-- API entries list section -->
-                <div ng-repeat="entry in apiEntries">
+                <div ng-repeat="entry in ctrl.apiEntries">
                     <!-- API entry -->
                     <div layout="row" layout-align="space-between center" class="wz-padding-top-10 wz-padding-bottom-14">
                         <p flex="15">
-                            <i ng-show="(entry._id === currentDefault)" tooltip="This is the default Manager" tooltip-placement="right" class="fa fa-star wz-color-orange" aria-hidden="true"></i> {{entry._source.cluster_info.cluster}}</p>
+                            <i ng-show="(entry._id === ctrl.currentDefault)" tooltip="This is the default Manager" tooltip-placement="right" class="fa fa-star wz-color-orange" aria-hidden="true"></i> {{entry._source.cluster_info.cluster}}</p>
                         <p flex="20">{{entry._source.cluster_info.manager}}</p>
                         <p flex="15">{{entry._source.url}}</p>
                         <p flex="15">{{entry._source.api_port}}</p>
                         <p flex="15">{{entry._source.api_user}}</p>
                         <p flex="20">
-                            <i ng-click="setDefault(entry)" tooltip="Set as default Manager" class="fa fa-star font-size-18 cursor-pointer" aria-hidden="true"></i>
-                            <i ng-click="removeManager(entry)" tooltip="Remove manager" class="fa fa-trash wz-margin-left-7 cursor-pointer" aria-hidden="true"></i>
-                            <i ng-click="checkManager(entry)" tooltip="Check connection" class="fa fa-refresh wz-margin-left-7 cursor-pointer" aria-hidden="true"></i>
-                            <i ng-click="toggleEditor(entry)" tooltip="Edit" class="fa fa-pencil wz-margin-left-7 cursor-pointer" aria-hidden="true"></i>
+                            <i ng-click="ctrl.setDefault(entry)" tooltip="Set as default Manager" class="fa fa-star font-size-18 cursor-pointer" aria-hidden="true"></i>
+                            <i ng-click="ctrl.removeManager(entry)" tooltip="Remove manager" class="fa fa-trash wz-margin-left-7 cursor-pointer" aria-hidden="true"></i>
+                            <i ng-click="ctrl.checkManager(entry)" tooltip="Check connection" class="fa fa-refresh wz-margin-left-7 cursor-pointer" aria-hidden="true"></i>
+                            <i ng-click="ctrl.toggleEditor(entry)" tooltip="Edit" class="fa fa-pencil wz-margin-left-7 cursor-pointer" aria-hidden="true"></i>
                         </p>
                     </div>
                     <!-- End API entry -->
                     <!-- Edit API form -->
-                    <div layout="row" layout-align="space-between center" ng-if="showEditForm[entry._id] && isEditing">
-                        <form flex ng-submit="updateSettings(entry)" layout="column" layout-align="start stretch" class="margin-top-30">
+                    <div layout="row" layout-align="space-between center" ng-if="ctrl.showEditForm[entry._id] && ctrl.isEditing">
+                        <form flex ng-submit="ctrl.updateSettings(entry)" layout="column" layout-align="start stretch" class="margin-top-30">
                             <!-- Input section -->
                             <md-input-container class="wz-input-container">
                                 <label>Username</label>
-                                <input ng-model="formUpdate.user" ng-init="formUpdate.user=entry._source.api_user" type="text" placeholder="" aria-label="username"
+                                <input ng-model="ctrl.formUpdate.user" ng-init="formUpdate.user=entry._source.api_user" type="text" placeholder="" aria-label="username"
                                     required/>
                             </md-input-container>
                             <md-input-container class="wz-input-container">

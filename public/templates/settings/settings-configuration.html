@@ -1,17 +1,17 @@
-<div layout="column" layout-align="start stretch" ng-if="tab === 'configuration' && !load">
+<div layout="column" layout-align="start stretch" ng-if="ctrl.tab === 'configuration' && !ctrl.load">
     <!-- Headline -->
     <div layout="column" layout-padding>
         <span class="font-size-18"><i class="fa fa-fw fa-wrench" aria-hidden="true"></i> Wazuh Kibana plugin configuration settings</span>
         <span class="md-subheader">Configuration file located at <span class="wz-text-monospace">/usr/share/kibana/plugins/wazuh/config.yml</span></span>
     </div>
     <!-- End headline -->
-    <div layout="row" layout-align="start center" ng-if="!load">
+    <div layout="row" layout-align="start center" ng-if="!ctrl.load">
         <md-card flex class="wz-md-card">
             <md-card-content>
                 <i class="fa fa-fw fa-file-o" aria-hidden="true"></i>
                 <span class="wz-headline-title">Current configuration</span>
                 <md-divider class="wz-margin-top-10"></md-divider>
-                <div layout="row" class="wz-padding-top-10" ng-repeat="(key,value) in configuration">
+                <div layout="row" class="wz-padding-top-10" ng-repeat="(key,value) in ctrl.configuration">
                     <span flex="25">{{key}}</span>
                     <span class="wz-text-right color-grey">{{value}}</span>
                 </div>

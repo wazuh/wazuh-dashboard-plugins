@@ -12,226 +12,246 @@
 import { base64 } from '../../utils/base64';
 import { TabNames } from '../../utils/tab-names';
 
-export function SettingsController(
-  $scope,
-  $window,
-  $location,
-  testAPI,
-  appState,
-  genericReq,
-  errorHandler,
-  wzMisc,
-  wazuhConfig
-) {
-  if (wzMisc.getWizard()) {
-    $window.sessionStorage.removeItem('healthCheck');
-    wzMisc.setWizard(false);
+export class SettingsController {
+  constructor(
+    $scope,
+    $window,
+    $location,
+    testAPI,
+    appState,
+    genericReq,
+    errorHandler,
+    wzMisc,
+    wazuhConfig
+  ) {
+    this.$scope = $scope;
+    this.$window = $window;
+    this.$location = $location;
+    this.testAPI = testAPI;
+    this.appState = appState;
+    this.genericReq = genericReq;
+    this.errorHandler = errorHandler;
+    this.wzMisc = wzMisc;
+    this.wazuhConfig = wazuhConfig;
+
+    if (this.wzMisc.getWizard()) {
+      $window.sessionStorage.removeItem('healthCheck');
+      this.wzMisc.setWizard(false);
+    }
+
+    this.apiIsDown = this.wzMisc.getApiIsDown();
+
+    // Initialize
+    this.currentApiEntryIndex = false;
+    this.formData = {};
+    this.tab = 'api';
+    this.load = true;
+    this.loadingLogs = true;
+    this.addManagerContainer = false;
+    this.showEditForm = {};
+    this.formUpdate = {};
+
+    this.userRegEx = new RegExp(/^.{3,100}$/);
+    this.passRegEx = new RegExp(/^.{3,100}$/);
+    this.urlRegEx = new RegExp(/^https?:\/\/[a-zA-Z0-9-.]{1,300}$/);
+    this.urlRegExIP = new RegExp(
+      /^https?:\/\/[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$/
+    );
+    this.portRegEx = new RegExp(/^[0-9]{2,5}$/);
+
+    // Tab names
+    this.tabNames = TabNames;
+    this.configuration = wazuhConfig.getConfig();
+    this.indexPatterns = [];
+    this.apiEntries = [];
+
+    const location = this.$location.search();
+    if (location && location.tab) {
+      this.tab = location.tab;
+    }
   }
 
-  $scope.apiIsDown = wzMisc.getApiIsDown();
-
-  // Initialize
-  let currentApiEntryIndex;
-  $scope.formData = {};
-  $scope.tab = 'api';
-  $scope.load = true;
-  $scope.loadingLogs = true;
-  $scope.addManagerContainer = false;
-  $scope.showEditForm = {};
-  $scope.formUpdate = {};
-
-  const userRegEx = new RegExp(/^.{3,100}$/);
-  const passRegEx = new RegExp(/^.{3,100}$/);
-  const urlRegEx = new RegExp(/^https?:\/\/[a-zA-Z0-9-.]{1,300}$/);
-  const urlRegExIP = new RegExp(
-    /^https?:\/\/[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$/
-  );
-  const portRegEx = new RegExp(/^[0-9]{2,5}$/);
-
-  // Tab names
-  $scope.tabNames = TabNames;
-  $scope.configuration = wazuhConfig.getConfig();
-  $scope.indexPatterns = [];
-  $scope.apiEntries = [];
-
-  const location = $location.search();
-  if (location && location.tab) {
-    $scope.tab = location.tab;
+  $onInit() {
+    // Loading data
+    this.getSettings().then(() => this.getAppInfo());
   }
 
-  $scope.switchTab = tab => {
-    $scope.tab = tab;
-    $location.search('tab', $scope.tab);
-  };
+  switchTab(tab) {
+    this.tab = tab;
+    this.$location.search('tab', this.tab);
+  }
 
   // Remove API entry
-  $scope.removeManager = async item => {
+  async removeManager(item) {
     try {
-      let index = $scope.apiEntries.indexOf(item);
-      if (appState.getCurrentAPI()) {
+      let index = this.apiEntries.indexOf(item);
+      if (this.appState.getCurrentAPI()) {
         if (
-          $scope.apiEntries[index]._id ===
-          JSON.parse(appState.getCurrentAPI()).id
+          this.apiEntries[index]._id ===
+          JSON.parse(this.appState.getCurrentAPI()).id
         ) {
           // We are trying to remove the one selected as default
-          appState.removeCurrentAPI();
+          this.appState.removeCurrentAPI();
         }
       }
-      await genericReq.request(
+      await this.genericReq.request(
         'DELETE',
-        `/elastic/apis/${$scope.apiEntries[index]._id}`
+        `/elastic/apis/${this.apiEntries[index]._id}`
       );
-      $scope.showEditForm[$scope.apiEntries[index]._id] = false;
-      $scope.apiEntries.splice(index, 1);
-      wzMisc.setApiIsDown(false);
-      $scope.apiIsDown = false;
-      $scope.isEditing = false;
-      for (const key in $scope.showEditForm) $scope.showEditForm[key] = false;
-      $scope.$emit('updateAPI', {});
-      errorHandler.info('The API was removed successfully', 'Settings');
-      if (!$scope.$$phase) $scope.$digest();
+      this.showEditForm[this.apiEntries[index]._id] = false;
+      this.apiEntries.splice(index, 1);
+      this.wzMisc.setApiIsDown(false);
+      this.apiIsDown = false;
+      this.isEditing = false;
+      for (const key in this.showEditForm) this.showEditForm[key] = false;
+      this.$scope.$emit('updateAPI', {});
+      this.errorHandler.info('The API was removed successfully', 'Settings');
+      if (!this.$scope.$$phase) this.$scope.$digest();
       return;
     } catch (error) {
-      errorHandler.handle('Could not remove the API', 'Settings');
+      this.errorHandler.handle('Could not remove the API', 'Settings');
     }
     return;
-  };
+  }
 
   // Get current API index
-  const getCurrentAPIIndex = () => {
+  getCurrentAPIIndex() {
     // eslint-disable-next-line
-    $scope.apiEntries.map((entry, index, array) => {
-      if (entry._id === $scope.currentDefault) currentApiEntryIndex = index;
+    this.apiEntries.map((entry, index, array) => {
+      if (entry._id === this.currentDefault) this.currentApiEntryIndex = index;
     });
-  };
+  }
 
-  const sortByTimestamp = (a, b) => {
+  sortByTimestamp(a, b) {
     const intA = parseInt(a._id);
     const intB = parseInt(b._id);
     return intA > intB ? -1 : intA < intB ? 1 : 0;
-  };
+  }
 
   // Set default API
-  $scope.setDefault = item => {
-    const index = $scope.apiEntries.indexOf(item);
+  setDefault(item) {
+    const index = this.apiEntries.indexOf(item);
 
-    appState.setClusterInfo($scope.apiEntries[index]._source.cluster_info);
+    this.appState.setClusterInfo(this.apiEntries[index]._source.cluster_info);
 
-    if ($scope.apiEntries[index]._source.cluster_info.status == 'disabled') {
-      appState.setCurrentAPI(
+    if (this.apiEntries[index]._source.cluster_info.status == 'disabled') {
+      this.appState.setCurrentAPI(
         JSON.stringify({
-          name: $scope.apiEntries[index]._source.cluster_info.manager,
-          id: $scope.apiEntries[index]._id
+          name: this.apiEntries[index]._source.cluster_info.manager,
+          id: this.apiEntries[index]._id
         })
       );
     } else {
-      appState.setCurrentAPI(
+      this.appState.setCurrentAPI(
         JSON.stringify({
-          name: $scope.apiEntries[index]._source.cluster_info.cluster,
-          id: $scope.apiEntries[index]._id
+          name: this.apiEntries[index]._source.cluster_info.cluster,
+          id: this.apiEntries[index]._id
         })
       );
     }
 
-    $scope.$emit('updateAPI', {});
+    this.$scope.$emit('updateAPI', {});
 
-    const currentApi = appState.getCurrentAPI();
-    $scope.currentDefault = JSON.parse(currentApi).id;
+    const currentApi = this.appState.getCurrentAPI();
+    this.currentDefault = JSON.parse(currentApi).id;
 
-    errorHandler.info(
+    this.errorHandler.info(
       `API ${
-        $scope.apiEntries[index]._source.cluster_info.manager
+        this.apiEntries[index]._source.cluster_info.manager
       } set as default`,
       'Settings'
     );
 
-    getCurrentAPIIndex();
+    this.getCurrentAPIIndex();
 
-    if (currentApi && !appState.getExtensions(JSON.parse(currentApi).id)) {
-      appState.setExtensions(
-        $scope.apiEntries[currentApiEntryIndex]._id,
-        $scope.apiEntries[currentApiEntryIndex]._source.extensions
+    if (currentApi && !this.appState.getExtensions(JSON.parse(currentApi).id)) {
+      this.appState.setExtensions(
+        this.apiEntries[this.currentApiEntryIndex]._id,
+        this.apiEntries[this.currentApiEntryIndex]._source.extensions
       );
     }
 
-    $scope.extensions = appState.getExtensions(JSON.parse(currentApi).id);
+    this.extensions = this.appState.getExtensions(JSON.parse(currentApi).id);
 
-    if (!$scope.$$phase) $scope.$digest();
+    if (!this.$scope.$$phase) this.$scope.$digest();
     return;
-  };
+  }
 
   // Get settings function
-  const getSettings = async () => {
+  async getSettings() {
     try {
-      const patternList = await genericReq.request(
+      const patternList = await this.genericReq.request(
         'GET',
         '/elastic/index-patterns',
         {}
       );
-      $scope.indexPatterns = patternList.data.data;
+      this.indexPatterns = patternList.data.data;
 
       if (!patternList.data.data.length) {
-        wzMisc.setBlankScr('Sorry but no valid index patterns were found');
-        $location.search('tab', null);
-        $location.path('/blank-screen');
+        this.wzMisc.setBlankScr('Sorry but no valid index patterns were found');
+        this.$location.search('tab', null);
+        this.$location.path('/blank-screen');
         return;
       }
-      const data = await genericReq.request('GET', '/elastic/apis');
-      for (const entry of data.data) $scope.showEditForm[entry._id] = false;
+      const data = await this.genericReq.request('GET', '/elastic/apis');
+      for (const entry of data.data) this.showEditForm[entry._id] = false;
 
-      $scope.apiEntries = data.data.length > 0 ? data.data : [];
-      $scope.apiEntries = $scope.apiEntries.sort(sortByTimestamp);
+      this.apiEntries = data.data.length > 0 ? data.data : [];
+      this.apiEntries = this.apiEntries.sort(this.sortByTimestamp);
 
-      const currentApi = appState.getCurrentAPI();
+      const currentApi = this.appState.getCurrentAPI();
 
       if (currentApi) {
-        $scope.currentDefault = JSON.parse(currentApi).id;
+        this.currentDefault = JSON.parse(currentApi).id;
       }
 
-      if (!$scope.$$phase) $scope.$digest();
-      getCurrentAPIIndex();
-      if (!currentApiEntryIndex && currentApiEntryIndex !== 0) return;
+      if (!this.$scope.$$phase) this.$scope.$digest();
+      this.getCurrentAPIIndex();
+      if (!this.currentApiEntryIndex && this.currentApiEntryIndex !== 0) return;
 
-      if (currentApi && !appState.getExtensions(JSON.parse(currentApi).id)) {
-        appState.setExtensions(
-          $scope.apiEntries[currentApiEntryIndex]._id,
-          $scope.apiEntries[currentApiEntryIndex]._source.extensions
+      if (
+        currentApi &&
+        !this.appState.getExtensions(JSON.parse(currentApi).id)
+      ) {
+        this.appState.setExtensions(
+          this.apiEntries[this.currentApiEntryIndex]._id,
+          this.apiEntries[this.currentApiEntryIndex]._source.extensions
         );
       }
 
-      $scope.extensions = appState.getExtensions(JSON.parse(currentApi).id);
+      this.extensions = this.appState.getExtensions(JSON.parse(currentApi).id);
 
-      if (!$scope.$$phase) $scope.$digest();
+      if (!this.$scope.$$phase) this.$scope.$digest();
       return;
     } catch (error) {
-      errorHandler.handle('Error getting API entries', 'Settings');
+      this.errorHandler.handle('Error getting API entries', 'Settings');
     }
     return;
-  };
+  }
 
-  const validator = formName => {
+  validator(formName) {
     // Validate user
-    if (!userRegEx.test($scope[formName].user)) {
+    if (!this.userRegEx.test(this[formName].user)) {
       return 'Invalid user field';
     }
 
     // Validate password
-    if (!passRegEx.test($scope[formName].password)) {
+    if (!this.passRegEx.test(this[formName].password)) {
       return 'Invalid password field';
     }
 
     // Validate url
     if (
-      !urlRegEx.test($scope[formName].url) &&
-      !urlRegExIP.test($scope[formName].url)
+      !this.urlRegEx.test(this[formName].url) &&
+      !this.urlRegExIP.test(this[formName].url)
     ) {
       return 'Invalid url field';
     }
 
     // Validate port
-    const validatePort = parseInt($scope[formName].port);
+    const validatePort = parseInt(this[formName].port);
     if (
-      !portRegEx.test($scope[formName].port) ||
+      !this.portRegEx.test(this[formName].port) ||
       validatePort <= 0 ||
       validatePort >= 99999
     ) {
@@ -239,48 +259,48 @@ export function SettingsController(
     }
 
     return false;
-  };
+  }
 
-  $scope.toggleEditor = entry => {
-    if ($scope.formUpdate && $scope.formUpdate.password) {
-      $scope.formUpdate.password = '';
+  toggleEditor(entry) {
+    if (this.formUpdate && this.formUpdate.password) {
+      this.formUpdate.password = '';
     }
-    for (const key in $scope.showEditForm) {
+    for (const key in this.showEditForm) {
       if (entry && entry._id === key) continue;
-      $scope.showEditForm[key] = false;
+      this.showEditForm[key] = false;
     }
-    $scope.showEditForm[entry._id] = !$scope.showEditForm[entry._id];
-    $scope.isEditing = $scope.showEditForm[entry._id];
-    $scope.addManagerContainer = false;
-    if (!$scope.$$phase) $scope.$digest();
-  };
+    this.showEditForm[entry._id] = !this.showEditForm[entry._id];
+    this.isEditing = this.showEditForm[entry._id];
+    this.addManagerContainer = false;
+    if (!this.$scope.$$phase) this.$scope.$digest();
+  }
 
   // Save settings function
-  $scope.saveSettings = async () => {
+  async saveSettings() {
     try {
-      $scope.messageError = '';
-      $scope.isEditing = false;
-      const invalid = validator('formData');
+      this.messageError = '';
+      this.isEditing = false;
+      const invalid = this.validator('formData');
 
       if (invalid) {
-        $scope.messageError = invalid;
-        errorHandler.handle(invalid, 'Settings');
+        this.messageError = invalid;
+        this.errorHandler.handle(invalid, 'Settings');
         return;
       }
 
       const tmpData = {
-        user: $scope.formData.user,
-        password: base64.encode($scope.formData.password),
-        url: $scope.formData.url,
-        port: $scope.formData.port,
+        user: this.formData.user,
+        password: base64.encode(this.formData.password),
+        url: this.formData.url,
+        port: this.formData.port,
         cluster_info: {},
         insecure: 'true',
         extensions: {}
       };
 
-      const config = wazuhConfig.getConfig();
+      const config = this.wazuhConfig.getConfig();
 
-      appState.setPatternSelector(config['ip.selector']);
+      this.appState.setPatternSelector(config['ip.selector']);
 
       tmpData.extensions.audit = config['extensions.audit'];
       tmpData.extensions.pci = config['extensions.pci'];
@@ -291,14 +311,18 @@ export function SettingsController(
       tmpData.extensions.virustotal = config['extensions.virustotal'];
       tmpData.extensions.osquery = config['extensions.osquery'];
 
-      const checkData = await testAPI.check(tmpData);
+      const checkData = await this.testAPI.check(tmpData);
 
       // API Check correct. Get Cluster info
       tmpData.cluster_info = checkData.data;
 
       // Insert new API entry
-      const data = await genericReq.request('PUT', '/elastic/api', tmpData);
-      appState.setExtensions(data.data.response._id, tmpData.extensions);
+      const data = await this.genericReq.request(
+        'PUT',
+        '/elastic/api',
+        tmpData
+      );
+      this.appState.setExtensions(data.data.response._id, tmpData.extensions);
       const newEntry = {
         _id: data.data.response._id,
         _source: {
@@ -310,227 +334,226 @@ export function SettingsController(
           extensions: tmpData.extensions
         }
       };
-      $scope.apiEntries.push(newEntry);
-      $scope.apiEntries = $scope.apiEntries.sort(sortByTimestamp);
+      this.apiEntries.push(newEntry);
+      this.apiEntries = this.apiEntries.sort(this.sortByTimestamp);
 
-      errorHandler.info('Wazuh API successfully added', 'Settings');
-      $scope.addManagerContainer = false;
+      this.errorHandler.info('Wazuh API successfully added', 'Settings');
+      this.addManagerContainer = false;
 
-      $scope.formData = {};
+      this.formData = {};
 
       // Setting current API as default if no one is in the cookies
-      if (!appState.getCurrentAPI()) {
+      if (!this.appState.getCurrentAPI()) {
         // No cookie
         if (
-          $scope.apiEntries[$scope.apiEntries.length - 1]._source.cluster_info
+          this.apiEntries[this.apiEntries.length - 1]._source.cluster_info
             .status === 'disabled'
         ) {
-          appState.setCurrentAPI(
+          this.appState.setCurrentAPI(
             JSON.stringify({
-              name:
-                $scope.apiEntries[$scope.apiEntries.length - 1]._source
-                  .cluster_info.manager,
-              id: $scope.apiEntries[$scope.apiEntries.length - 1]._id
+              name: this.apiEntries[this.apiEntries.length - 1]._source
+                .cluster_info.manager,
+              id: this.apiEntries[this.apiEntries.length - 1]._id
             })
           );
         } else {
-          appState.setCurrentAPI(
+          this.appState.setCurrentAPI(
             JSON.stringify({
-              name:
-                $scope.apiEntries[$scope.apiEntries.length - 1]._source
-                  .cluster_info.cluster,
-              id: $scope.apiEntries[$scope.apiEntries.length - 1]._id
+              name: this.apiEntries[this.apiEntries.length - 1]._source
+                .cluster_info.cluster,
+              id: this.apiEntries[this.apiEntries.length - 1]._id
             })
           );
         }
-        $scope.$emit('updateAPI', {});
-        $scope.currentDefault = JSON.parse(appState.getCurrentAPI()).id;
+        this.$scope.$emit('updateAPI', {});
+        this.currentDefault = JSON.parse(this.appState.getCurrentAPI()).id;
       }
 
       try {
-        await genericReq.request('GET', '/api/monitoring');
+        await this.genericReq.request('GET', '/api/monitoring');
       } catch (error) {
         if (error && error.status && error.status === -1) {
-          errorHandler.handle(
+          this.errorHandler.handle(
             'Wazuh API was inserted correctly, but something happened while fetching agents data.',
             'Fetch agents',
             true
           );
         } else {
-          errorHandler.handle(error, 'Fetch agents');
+          this.errorHandler.handle(error, 'Fetch agents');
         }
       }
 
-      await getSettings();
+      await this.getSettings();
 
-      if (!$scope.$$phase) $scope.$digest();
+      if (!this.$scope.$$phase) this.$scope.$digest();
       return;
     } catch (error) {
       if (error.status === 400) {
         error.message =
           'Please, fill all the fields in order to connect with Wazuh RESTful API.';
       }
-      printError(error);
+      this.printError(error);
     }
-  };
+  }
 
-  $scope.isUpdating = () => {
-    for (let key in $scope.showEditForm) {
-      if ($scope.showEditForm[key]) return true;
+  isUpdating() {
+    for (let key in this.showEditForm) {
+      if (this.showEditForm[key]) return true;
     }
     return false;
-  };
+  }
 
   // Update settings function
-  $scope.updateSettings = async item => {
+  async updateSettings(item) {
     try {
-      $scope.messageErrorUpdate = '';
+      this.messageErrorUpdate = '';
 
-      const invalid = validator('formUpdate');
+      const invalid = this.validator('formUpdate');
       if (invalid) {
-        $scope.messageErrorUpdate = invalid;
-        errorHandler.handle(invalid, 'Settings');
+        this.messageErrorUpdate = invalid;
+        this.errorHandler.handle(invalid, 'Settings');
         return;
       }
 
-      const index = $scope.apiEntries.indexOf(item);
+      const index = this.apiEntries.indexOf(item);
 
       const tmpData = {
-        user: $scope.formUpdate.user,
-        password: base64.encode($scope.formUpdate.password),
-        url: $scope.formUpdate.url,
-        port: $scope.formUpdate.port,
+        user: this.formUpdate.user,
+        password: base64.encode(this.formUpdate.password),
+        url: this.formUpdate.url,
+        port: this.formUpdate.port,
         cluster_info: {},
         insecure: 'true',
-        id: $scope.apiEntries[index]._id,
-        extensions: $scope.apiEntries[index]._source.extensions
+        id: this.apiEntries[index]._id,
+        extensions: this.apiEntries[index]._source.extensions
       };
 
-      const data = await testAPI.check(tmpData);
+      const data = await this.testAPI.check(tmpData);
       tmpData.cluster_info = data.data;
-      await genericReq.request('PUT', '/elastic/api-settings', tmpData);
-      $scope.apiEntries[index]._source.cluster_info = tmpData.cluster_info;
+      await this.genericReq.request('PUT', '/elastic/api-settings', tmpData);
+      this.apiEntries[index]._source.cluster_info = tmpData.cluster_info;
 
-      wzMisc.setApiIsDown(false);
-      $scope.apiIsDown = false;
+      this.wzMisc.setApiIsDown(false);
+      this.apiIsDown = false;
 
-      $scope.apiEntries[index]._source.cluster_info.cluster =
+      this.apiEntries[index]._source.cluster_info.cluster =
         tmpData.cluster_info.cluster;
-      $scope.apiEntries[index]._source.cluster_info.manager =
+      this.apiEntries[index]._source.cluster_info.manager =
         tmpData.cluster_info.manager;
-      $scope.apiEntries[index]._source.url = tmpData.url;
-      $scope.apiEntries[index]._source.api_port = tmpData.port;
-      $scope.apiEntries[index]._source.api_user = tmpData.user;
+      this.apiEntries[index]._source.url = tmpData.url;
+      this.apiEntries[index]._source.api_port = tmpData.port;
+      this.apiEntries[index]._source.api_user = tmpData.user;
 
-      $scope.apiEntries = $scope.apiEntries.sort(sortByTimestamp);
-      $scope.showEditForm[$scope.apiEntries[index]._id] = false;
-      $scope.isEditing = false;
+      this.apiEntries = this.apiEntries.sort(this.sortByTimestamp);
+      this.showEditForm[this.apiEntries[index]._id] = false;
+      this.isEditing = false;
 
-      errorHandler.info('The API was updated successfully', 'Settings');
+      this.errorHandler.info('The API was updated successfully', 'Settings');
 
-      if (!$scope.$$phase) $scope.$digest();
+      if (!this.$scope.$$phase) this.$scope.$digest();
       return;
     } catch (error) {
-      printError(error, true);
+      this.printError(error, true);
     }
-  };
+  }
 
-  $scope.switch = () =>
-    ($scope.addManagerContainer = !$scope.addManagerContainer);
+  switch() {
+    this.addManagerContainer = !this.addManagerContainer;
+  }
 
   // Check manager connectivity
-  $scope.checkManager = async (item, isIndex) => {
+  async checkManager(item, isIndex) {
     try {
-      const index = isIndex ? item : $scope.apiEntries.indexOf(item);
+      const index = isIndex ? item : this.apiEntries.indexOf(item);
 
       const tmpData = {
-        user: $scope.apiEntries[index]._source.api_user,
-        //password    : $scope.apiEntries[index]._source.api_password,
-        url: $scope.apiEntries[index]._source.url,
-        port: $scope.apiEntries[index]._source.api_port,
+        user: this.apiEntries[index]._source.api_user,
+        //password    : this.apiEntries[index]._source.api_password,
+        url: this.apiEntries[index]._source.url,
+        port: this.apiEntries[index]._source.api_port,
         cluster_info: {},
         insecure: 'true',
-        id: $scope.apiEntries[index]._id
+        id: this.apiEntries[index]._id
       };
 
-      const data = await testAPI.check(tmpData);
+      const data = await this.testAPI.check(tmpData);
       tmpData.cluster_info = data.data;
 
-      const tmpUrl = `/elastic/api-hostname/${$scope.apiEntries[index]._id}`;
-      await genericReq.request('PUT', tmpUrl, {
+      const tmpUrl = `/elastic/api-hostname/${this.apiEntries[index]._id}`;
+      await this.genericReq.request('PUT', tmpUrl, {
         cluster_info: tmpData.cluster_info
       });
       // Emit updateAPI event cause the cluster info could had been changed
-      $scope.$emit('updateAPI', { cluster_info: tmpData.cluster_info });
-      $scope.apiEntries[index]._source.cluster_info = tmpData.cluster_info;
-      wzMisc.setApiIsDown(false);
-      $scope.apiIsDown = false;
-      errorHandler.info('Connection success', 'Settings');
+      this.$scope.$emit('updateAPI', { cluster_info: tmpData.cluster_info });
+      this.apiEntries[index]._source.cluster_info = tmpData.cluster_info;
+      this.wzMisc.setApiIsDown(false);
+      this.apiIsDown = false;
+      this.errorHandler.info('Connection success', 'Settings');
 
-      if (!$scope.$$phase) $scope.$digest();
+      if (!this.$scope.$$phase) this.$scope.$digest();
       return;
     } catch (error) {
-      if (!wzMisc.getApiIsDown()) printError(error);
+      if (!this.wzMisc.getApiIsDown()) this.printError(error);
     }
-  };
+  }
 
   // Toggle extension
-  $scope.toggleExtension = (extension, state) => {
+  toggleExtension(extension, state) {
     try {
-      const api = JSON.parse(appState.getCurrentAPI()).id;
-      const currentExtensions = appState.getExtensions(api);
+      const api = JSON.parse(this.appState.getCurrentAPI()).id;
+      const currentExtensions = this.appState.getExtensions(api);
       currentExtensions[extension] = state;
-      appState.setExtensions(api, currentExtensions);
-      getCurrentAPIIndex();
-      $scope.apiEntries[
-        currentApiEntryIndex
+      this.appState.setExtensions(api, currentExtensions);
+      this.getCurrentAPIIndex();
+      this.apiEntries[
+        this.currentApiEntryIndex
       ]._source.extensions = currentExtensions;
-      if (!$scope.$$phase) $scope.$digest();
+      if (!this.$scope.$$phase) this.$scope.$digest();
     } catch (error) {
-      errorHandler.handle(error, 'Settings');
+      this.errorHandler.handle(error, 'Settings');
     }
-  };
+  }
 
-  $scope.changeIndexPattern = async newIndexPattern => {
+  async changeIndexPattern(newIndexPattern) {
     try {
-      appState.setCurrentPattern(newIndexPattern);
-      await genericReq.request(
+      this.appState.setCurrentPattern(newIndexPattern);
+      await this.genericReq.request(
         'GET',
         `/elastic/known-fields/${newIndexPattern}`,
         {}
       );
-      $scope.$emit('updatePattern', {});
-      errorHandler.info(
+      this.$scope.$emit('updatePattern', {});
+      this.errorHandler.info(
         'Successfully changed the default index-pattern',
         'Settings'
       );
-      $scope.selectedIndexPattern = newIndexPattern;
-      if (!$scope.$$phase) $scope.$digest();
+      this.selectedIndexPattern = newIndexPattern;
+      if (!this.$scope.$$phase) this.$scope.$digest();
       return;
     } catch (error) {
-      errorHandler.handle(
+      this.errorHandler.handle(
         'Error while changing the default index-pattern',
         'Settings'
       );
     }
     return;
-  };
+  }
 
-  const printError = (error, updating) => {
-    const text = errorHandler.handle(error, 'Settings');
-    if (!updating) $scope.messageError = text;
-    else $scope.messageErrorUpdate = text;
-  };
+  printError(error, updating) {
+    const text = this.errorHandler.handle(error, 'Settings');
+    if (!updating) this.messageError = text;
+    else this.messageErrorUpdate = text;
+  }
 
-  const getAppLogs = async () => {
+  async getAppLogs() {
     try {
-      $scope.loadingLogs = true;
-      const logs = await genericReq.request('GET', '/utils/logs', {});
-      $scope.logs = logs.data.lastLogs.map(item => JSON.parse(item));
-      $scope.loadingLogs = false;
-      if (!$scope.$$phase) $scope.$digest();
+      this.loadingLogs = true;
+      const logs = await this.genericReq.request('GET', '/utils/logs', {});
+      this.logs = logs.data.lastLogs.map(item => JSON.parse(item));
+      this.loadingLogs = false;
+      if (!this.$scope.$$phase) this.$scope.$digest();
     } catch (error) {
-      $scope.logs = [
+      this.logs = [
         {
           date: new Date(),
           level: 'error',
@@ -538,62 +561,64 @@ export function SettingsController(
         }
       ];
     }
-  };
+  }
 
-  const getAppInfo = async () => {
+  async getAppInfo() {
     try {
-      const data = await genericReq.request('GET', '/elastic/setup');
-      $scope.appInfo = {};
-      $scope.appInfo['app-version'] = data.data.data['app-version'];
-      $scope.appInfo['installationDate'] = data.data.data['installationDate'];
-      $scope.appInfo['revision'] = data.data.data['revision'];
-      $scope.load = false;
-      const config = wazuhConfig.getConfig();
-      appState.setPatternSelector(config['ip.selector']);
+      const data = await this.genericReq.request('GET', '/elastic/setup');
+      this.appInfo = {};
+      this.appInfo['app-version'] = data.data.data['app-version'];
+      this.appInfo['installationDate'] = data.data.data['installationDate'];
+      this.appInfo['revision'] = data.data.data['revision'];
+      this.load = false;
+      const config = this.wazuhConfig.getConfig();
+      this.appState.setPatternSelector(config['ip.selector']);
       if (
-        appState.getCurrentPattern() !== undefined &&
-        appState.getCurrentPattern() !== null
+        this.appState.getCurrentPattern() !== undefined &&
+        this.appState.getCurrentPattern() !== null
       ) {
         // There's a pattern in the cookies
-        $scope.selectedIndexPattern = appState.getCurrentPattern();
+        this.selectedIndexPattern = this.appState.getCurrentPattern();
       } else {
         // There's no pattern in the cookies, pick the one in the settings
-        $scope.selectedIndexPattern = config['pattern'];
+        this.selectedIndexPattern = config['pattern'];
       }
 
-      if (!appState.getCurrentAPI()) {
-        $scope.extensions = {};
-        $scope.extensions.audit = config['extensions.audit'];
-        $scope.extensions.pci = config['extensions.pci'];
-        $scope.extensions.gdpr = config['extensions.gdpr'];
-        $scope.extensions.oscap = config['extensions.oscap'];
-        $scope.extensions.ciscat = config['extensions.ciscat'];
-        $scope.extensions.aws = config['extensions.aws'];
-        $scope.extensions.virustotal = config['extensions.virustotal'];
-        $scope.extensions.osquery = config['extensions.osquery'];
+      if (!this.appState.getCurrentAPI()) {
+        this.extensions = {};
+        this.extensions.audit = config['extensions.audit'];
+        this.extensions.pci = config['extensions.pci'];
+        this.extensions.gdpr = config['extensions.gdpr'];
+        this.extensions.oscap = config['extensions.oscap'];
+        this.extensions.ciscat = config['extensions.ciscat'];
+        this.extensions.aws = config['extensions.aws'];
+        this.extensions.virustotal = config['extensions.virustotal'];
+        this.extensions.osquery = config['extensions.osquery'];
       } else {
-        $scope.extensions = appState.getExtensions(
-          JSON.parse(appState.getCurrentAPI()).id
+        this.extensions = this.appState.getExtensions(
+          JSON.parse(this.appState.getCurrentAPI()).id
         );
       }
 
-      if ($scope.tab === 'logs') {
-        getAppLogs();
+      if (this.tab === 'logs') {
+        this.getAppLogs();
       }
-      getCurrentAPIIndex();
-      if (currentApiEntryIndex || currentApiEntryIndex === 0) {
-        await $scope.checkManager(currentApiEntryIndex, true);
+      this.getCurrentAPIIndex();
+      if (this.currentApiEntryIndex || this.currentApiEntryIndex === 0) {
+        await this.checkManager(this.currentApiEntryIndex, true);
       }
-      if (!$scope.$$phase) $scope.$digest();
+      if (!this.$scope.$$phase) this.$scope.$digest();
       return;
     } catch (error) {
-      errorHandler.handle('Error when loading Wazuh setup info', 'Settings');
+      this.errorHandler.handle(
+        'Error when loading Wazuh setup info',
+        'Settings'
+      );
     }
     return;
-  };
+  }
 
-  // Loading data
-  getSettings().then(getAppInfo);
-
-  $scope.refreshLogs = () => getAppLogs();
+  refreshLogs() {
+    return this.getAppLogs();
+  }
 }
