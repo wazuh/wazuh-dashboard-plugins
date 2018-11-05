@@ -12,9 +12,10 @@
 import { TabNames } from '../../utils/tab-names';
 
 export class ManagementController {
-  constructor($scope, $location) {
+  constructor($scope, $location, shareAgent) {
     this.$scope = $scope;
     this.$location = $location;
+    this.shareAgent = shareAgent;
     this.tab = 'welcome';
     this.rulesetTab = 'rules';
     this.tabNames = TabNames;
@@ -23,6 +24,11 @@ export class ManagementController {
   }
 
   $onInit() {
+    if (this.shareAgent.getAgent() && this.shareAgent.getSelectedGroup()) {
+      this.tab = 'groups';
+      this.switchTab(this.tab);
+      return;
+    }
     const location = this.$location.search();
     if (location && location.tab) {
       this.tab = location.tab;

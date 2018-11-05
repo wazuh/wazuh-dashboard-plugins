@@ -22,7 +22,10 @@ export class ShareAgent {
   }
 
   getSelectedGroup() {
-    return this.agent.group[this.selectedGroup];
+    if (this.agent && this.agent.group && this.selectedGroup) {
+      return this.agent.group[this.selectedGroup];
+    }
+    return null;
   }
 
   setAgent(ag, group) {
