@@ -2,11 +2,11 @@
 
 All notable changes to the Wazuh app project will be documented in this file.
 
-## Wazuh v3.6.1 - Kibana v6.4.1 / v6.4.2 - Revision 412
+## Wazuh v3.6.1 - Kibana v6.4.1 / v6.4.2 / v6.4.3 - Revision 412
 
 ### Added
 
--   Support for Elastic Stack v6.4.1 / v6.4.2.
+-   Support for Elastic Stack v6.4.1 / v6.4.2 / v6.4.3.
 
 ## Wazuh v3.6.1 - Kibana v6.4.0 - Revision 411
 
