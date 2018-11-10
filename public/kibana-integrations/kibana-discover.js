@@ -567,7 +567,28 @@ function discoverController(
       .catch(notify.error);
   };
 
+  const filtersAreReady = () => {
+    const currentUrlPath = $location.path();
+    if (currentUrlPath && !currentUrlPath.includes('wazuh-discover')) {
+      let filters = queryFilter.getFilters();
+      filters = Array.isArray(filters)
+        ? filters.filter(
+            item =>
+              item &&
+              item.$state &&
+              item.$state.store &&
+              item.$state.store === 'appState'
+          )
+        : [];
+      if (!filters || !filters.length) return false;
+    }
+    return true;
+  }
+
   $scope.opts.fetch = $scope.fetch = function() {
+    // Wazuh filters are not ready yet
+    if(!filtersAreReady()) return;
+
     // ignore requests to fetch before the app inits
     if (!init.complete) return;
 
@@ -593,20 +614,9 @@ function discoverController(
     /*if ($state.query.language && $state.query.language !== query.language) {
       $state.filters = [];
     }*/
-    const currentUrlPath = $location.path();
-    if (currentUrlPath && !currentUrlPath.includes('wazuh-discover')) {
-      let filters = queryFilter.getFilters();
-      filters = Array.isArray(filters)
-        ? filters.filter(
-            item =>
-              item &&
-              item.$state &&
-              item.$state.store &&
-              item.$state.store === 'appState'
-          )
-        : [];
-      if (!filters || !filters.length) return;
-    }
+    // Wazuh filters are not ready yet
+    if(!filtersAreReady()) return;
+    
     discoverPendingUpdates.removeAll();
     discoverPendingUpdates.addItem($state.query, queryFilter.getFilters());
     $rootScope.$broadcast('updateVis');

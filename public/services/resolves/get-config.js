@@ -25,12 +25,14 @@ export async function getWzConfig($q, genericReq, errorHandler, wazuhConfig) {
     'extensions.ciscat': false,
     'extensions.aws': false,
     'extensions.virustotal': false,
+    'extensions.osquery': false,
     timeout: 8000,
     'wazuh.shards': 1,
     'wazuh.replicas': 1,
     'wazuh-version.shards': 1,
     'wazuh-version.replicas': 1,
     'ip.selector': true,
+    'ip.ignore': [],
     'xpack.rbac.enabled': true,
     'wazuh.monitoring.enabled': true,
     'wazuh.monitoring.frequency': 3600,
@@ -41,7 +43,7 @@ export async function getWzConfig($q, genericReq, errorHandler, wazuhConfig) {
   try {
     const config = await genericReq.request(
       'GET',
-      '/api/wazuh-api/configuration',
+      '/utils/configuration',
       {}
     );
 

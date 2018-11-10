@@ -1,0 +1,7 @@
+<div flex="auto" layout="column" ng-if="tab === 'configuration' && load">
+    <div layout="row" class="md-padding">
+        <div class='uil-ring-css'><div></div></div>
+    </div>
+</div>
+
+<div flex="auto" layout="column" ng-show="tab === 'configuration' && !load">

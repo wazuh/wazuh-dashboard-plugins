@@ -2,6 +2,6 @@
 
     <wz-menu ng-init="menuNavItem = 'agents'"></wz-menu>
 
-    <div class='uil-ring-css' ng-show="loading">
+    <div class='uil-ring-css' ng-show="init || loading">
         <div></div>
     </div>

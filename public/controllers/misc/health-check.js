@@ -55,8 +55,7 @@ class HealthCheck {
     this.$scope.totalChecks = 0;
   }
 
-  handleError(error) {
-    this.errorHandler.handle(error, 'Health Check');
+  handleError(error) {    
     this.$scope.errors.push(
       this.errorHandler.handle(error, 'Health Check', false, true)
     );
@@ -74,7 +73,7 @@ class HealthCheck {
         const i = this.$scope.results.map(item => item.id).indexOf(2);
         const patternData = await this.genericReq.request(
           'GET',
-          `/api/wazuh-elastic/pattern/${patternTitle}`
+          `/elastic/index-patterns/${patternTitle}`
         );
         if (!patternData.data.status) {
           this.$scope.errors.push('The selected index-pattern is not present.');
@@ -89,7 +88,7 @@ class HealthCheck {
         const i = this.$scope.results.map(item => item.id).indexOf(3);
         const templateData = await this.genericReq.request(
           'GET',
-          `/api/wazuh-elastic/template/${patternTitle}`
+          `/elastic/template/${patternTitle}`
         );
         if (!templateData.data.status) {
           this.$scope.errors.push(
@@ -136,7 +135,7 @@ class HealthCheck {
             const apiVersion = versionData.data.data;
             const setupData = await this.genericReq.request(
               'GET',
-              '/api/wazuh-elastic/setup'
+              '/elastic/setup'
             );
             if (!setupData.data.data['app-version'] || !apiVersion) {
               this.errorHandler.handle(
@@ -222,7 +221,7 @@ class HealthCheck {
       if (!this.$scope.$$phase) this.$scope.$digest();
       return;
     } catch (error) {
-      this.errorHandler.handle(error, 'Health Check');
+      this.handleError(error);
     }
   }
 

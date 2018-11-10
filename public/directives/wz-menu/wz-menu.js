@@ -50,6 +50,7 @@ class WzMenu {
 
     const load = async () => {
       try {
+        const list = await patternHandler.getPatternList();
         // Get the configuration to check if pattern selector is enabled
         const config = wazuhConfig.getConfig();
         appState.setPatternSelector(config['ip.selector']);
@@ -62,31 +63,13 @@ class WzMenu {
         let filtered = false;
         // If there is no current pattern, fetch it
         if (!appState.getCurrentPattern()) {
-          const currentPattern = await genericReq.request('GET', '/get-list');
-          if (!currentPattern.data.data.length) {
-            wzMisc.setBlankScr('Sorry but no valid index patterns were found');
-            $location.search('tab', null);
-            $location.path('/blank-screen');
-            return;
-          }
-          appState.setCurrentPattern(currentPattern.data.data[0].id);
+          appState.setCurrentPattern(list[0].id);
         } else {
-          // If there is current pattern, check if there is some pattern
-          const patternList = await genericReq.request('GET', '/get-list');
-
-          if (!patternList.data.data.length) {
-            wzMisc.setBlankScr('Sorry but no valid index patterns were found');
-            $location.search('tab', null);
-            $location.path('/blank-screen');
-            return;
-          }
-
           // Check if the current pattern cookie is valid
-          filtered = patternList.data.data.filter(item =>
+          filtered = list.filter(item =>
             item.id.includes(appState.getCurrentPattern())
           );
-          if (!filtered.length)
-            appState.setCurrentPattern(patternList.data.data[0].id);
+          if (!filtered.length) appState.setCurrentPattern(list[0].id);
         }
 
         const data = filtered
@@ -94,7 +77,6 @@ class WzMenu {
           : await indexPatterns.get(appState.getCurrentPattern());
         $scope.theresPattern = true;
         $scope.currentPattern = data.title;
-        const list = await patternHandler.getPatternList();
 
         // Getting the list of index patterns
         if (list) {

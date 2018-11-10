@@ -4,18 +4,19 @@
     <wz-menu ng-init="menuNavItem = 'agents'"></wz-menu>
     <!-- End top navbar section -->
 
-    <!-- Navigation section (Breadcrumbs, Discover, etc) -->
+    <!-- Navigation section -->
     <div layout="row" layout-align="start center">
         <!-- Breadcrumbs -->
         <div layout="row" layout-padding ng-if="agent">
             <!-- If you're not on the Welcome tab, show a functional breadcrumb -->
-            <div ng-if="tab !== 'welcome'">
+            <div ng-if="tab !== 'welcome' && tab !== 'configuration'">
                 <a class="wz-text-link cursor-pointer" href="#/agents-preview">Agents</a>
                 <span> / </span>
                 <span class="wz-text-link cursor-pointer" ng-click="switchTab('welcome')">{{agent.name}} ({{agent.id}})</span>
                 <span> / </span>
                 <span>{{ tabNames[tab] }}</span>
             </div>
+
             <!-- If you're on the Welcome tab, show a blank, simple breadcrumb -->
             <div ng-if="tab === 'welcome'">
                 <a class="wz-text-link cursor-pointer" href="#/agents-preview">Agents</a>
@@ -23,6 +24,24 @@
                 <span>{{agent.name}} ({{agent.id}})</span>
                 <span> / </span>
                 <span>Welcome</span>
+            </div>
+
+            <div ng-if="tab === 'configuration' && configurationTab === 'welcome'">
+                <a class="wz-text-link cursor-pointer" href="#/agents-preview">Agents</a>
+                <span> / </span>
+                <span class="wz-text-link cursor-pointer" ng-click="switchTab('welcome')">{{agent.name}} ({{agent.id}})</span>
+                <span> / </span>
+                <span>{{ tabNames[tab] }}</span>
+            </div>
+
+            <div ng-if="tab === 'configuration' && configurationTab !== 'welcome'">
+                <a class="wz-text-link cursor-pointer" href="#/agents-preview">Agents</a>
+                <span> / </span>
+                <span class="wz-text-link cursor-pointer" ng-click="switchTab('welcome')">{{agent.name}} ({{agent.id}})</span>
+                <span> / </span>
+                <span class="wz-text-link cursor-pointer" ng-click="switchConfigurationTab('welcome')">{{ tabNames[tab] }}</span>
+                <span> / </span>
+                <span>{{ tabNames[configurationTab] === 'Alerts' ? 'Labels' : tabNames[configurationTab] }}</span>
             </div>
         </div>
         <!-- End breadcrumbs -->
@@ -88,6 +107,13 @@
             </md-autocomplete>
         </div>
         <!-- End agent autocomplete selector section -->
+
+        <!-- Help button -->
+        <md-button md-no-ink class="md-icon-button small" tooltip="About and help" tooltip-placement="left" ng-href="#/settings/about" aria-label="Link to open app about section">
+            <i class="fa fa-fw fa-question-circle-o" aria-hidden="true"></i>
+        </md-button>
+        <!-- End help button -->
+
     </div>
     <!-- End navigation section -->
 
@@ -100,7 +126,6 @@
         nav-bar-aria-label="Host monitoring navigation links">
         <md-nav-item class="wz-nav-item" md-nav-click="switchTab('general')" name="general">{{ tabNames['general'] }}</md-nav-item>
         <md-nav-item class="wz-nav-item" md-nav-click="switchTab('fim')" name="fim">{{ tabNames['fim'] }}</md-nav-item>
-        <md-nav-item class="wz-nav-item" md-nav-click="switchTab('configuration')" name="configuration">{{ tabNames['configuration'] }}</md-nav-item>
         <md-nav-item class="wz-nav-item" md-nav-click="switchTab('syscollector')" name="syscollector">{{ tabNames['syscollector'] }}</md-nav-item>
     </md-nav-bar>
     <!-- End Host monitoring navigation bar -->
@@ -116,18 +141,19 @@
         <md-nav-item ng-show="extensions.audit" class="wz-nav-item" md-nav-click="switchTab('audit')" name="audit">{{ tabNames['audit'] }}</md-nav-item>
         <md-nav-item ng-show="extensions.oscap" class="wz-nav-item" md-nav-click="switchTab('oscap')" name="oscap">{{ tabNames['oscap'] }}</md-nav-item>
         <md-nav-item ng-show="extensions.ciscat" class="wz-nav-item" md-nav-click="switchTab('ciscat')" name="ciscat">{{ tabNames['ciscat'] }}</md-nav-item>
-    </md-nav-bar>
+      </md-nav-bar>
     <!-- End System audit navigation bar -->
 
     <!-- Security navigation bar -->
     <md-nav-bar
-        ng-if="inArray(tab, securityTabs) && extensions.virustotal"
+        ng-if="inArray(tab, securityTabs) && (extensions.virustotal || extensions.osquery)"
         class="wz-nav-bar"
         ng-show="tab !== 'welcome'"
         md-selected-nav-item="tab"
         nav-bar-aria-label="Security navigation links">
         <md-nav-item class="wz-nav-item" md-nav-click="switchTab('vuls')" name="vuls">{{ tabNames['vuls'] }}</md-nav-item>
         <md-nav-item ng-show="extensions.virustotal" class="wz-nav-item" md-nav-click="switchTab('virustotal')" name="virustotal">{{ tabNames['virustotal'] }}</md-nav-item>
+        <md-nav-item ng-show="extensions.osquery" class="wz-nav-item" md-nav-click="switchTab('osquery')" name="osquery">{{ tabNames['osquery'] }}</md-nav-item>
     </md-nav-bar>
     <!-- End Security navigation bar -->
 
@@ -148,7 +174,7 @@
     <!-- End Discover search bar section -->
 
     <!-- Loading status section -->
-    <div layout="column" layout-align="center center" ng-if="(tab !== 'welcome') && (tab !== 'configuration') && tab !== 'syscollector'" ng-show="resultState === 'ready' && tabView === 'panels' && !rendered">
+    <div layout="column" layout-align="center center" ng-if="tab !== 'welcome' && tab !== 'configuration' && tab !== 'syscollector'" ng-show="resultState === 'ready' && tabView === 'panels' && !rendered">
         <div class="percentage"><i class="fa fa-fw fa-spin fa-spinner" aria-hidden="true"></i></div>
         <div class="percentage">{{loadingStatus}}</div>
     </div>
@@ -173,6 +199,6 @@
     <!-- No results section -->
 
     <!-- Loading ring -->
-    <div class='uil-ring-css' ng-show="load">
+    <div class='uil-ring-css' ng-show="load && tab !== 'configuration' && tabView === 'panels'">
         <div></div>
     </div>

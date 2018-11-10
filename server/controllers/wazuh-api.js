@@ -21,11 +21,9 @@ import { Monitoring } from '../monitoring';
 import { ErrorResponse } from './error-response';
 import { Parser } from 'json2csv';
 import { getConfiguration } from '../lib/get-configuration';
-import { totalmem } from 'os';
-import simpleTail from 'simple-tail';
-import path from 'path';
 import { log } from '../logger';
 import { KeyEquivalenece } from '../../util/csv-key-equivalence';
+import { cleanKeys } from '../../util/remove-key';
 
 export class WazuhApiCtrl {
   constructor(server) {
@@ -46,19 +44,19 @@ export class WazuhApiCtrl {
           'Valid credentials not found in Elasticsearch. It seems the credentials were not saved.'
         );
       }
-
+      const credInfo = {
+        headers: {
+          'wazuh-app-version': packageInfo.version
+        },
+        username: wapi_config.user,
+        password: wapi_config.password,
+        rejectUnauthorized: !wapi_config.insecure
+      };
       let response = await needle(
         'get',
         `${wapi_config.url}:${wapi_config.port}/version`,
         {},
-        {
-          headers: {
-            'wazuh-app-version': packageInfo.version
-          },
-          username: wapi_config.user,
-          password: wapi_config.password,
-          rejectUnauthorized: !wapi_config.insecure
-        }
+        credInfo
       );
 
       if (parseInt(response.body.error) === 0 && response.body.data) {
@@ -67,31 +65,36 @@ export class WazuhApiCtrl {
           'get',
           `${wapi_config.url}:${wapi_config.port}/cluster/status`,
           {},
-          {
-            headers: {
-              'wazuh-app-version': packageInfo.version
-            },
-            username: wapi_config.user,
-            password: wapi_config.password,
-            rejectUnauthorized: !wapi_config.insecure
-          }
+          credInfo
         );
 
         if (!response.body.error) {
+          try {
+            const managerInfo = await needle(
+              'get',
+              `${wapi_config.url}:${wapi_config.port}/agents/000`,
+              {},
+              credInfo
+            );
+            const updatedManagerName = managerInfo.body.data.name;
+            wapi_config.cluster_info.manager = updatedManagerName;
+            await this.wzWrapper.updateWazuhIndexDocument(req.payload, {
+              doc: { cluster_info: wapi_config.cluster_info }
+            });
+          } catch (error) {
+            log(
+              'POST /api/check-stored-api :: Error updating Wazuh manager name.',
+              error.message || error
+            );
+          }
+
           // If cluster mode is active
           if (response.body.data.enabled === 'yes') {
             response = await needle(
               'get',
               `${wapi_config.url}:${wapi_config.port}/cluster/node`,
               {},
-              {
-                headers: {
-                  'wazuh-app-version': packageInfo.version
-                },
-                username: wapi_config.user,
-                password: wapi_config.password,
-                rejectUnauthorized: !wapi_config.insecure
-              }
+              credInfo
             );
 
             if (!response.body.error) {
@@ -156,7 +159,7 @@ export class WazuhApiCtrl {
       }
     } catch (error) {
       if (error.code === 'ECONNREFUSED') {
-        log('POST /api/wazuh-api/checkStoredAPI', error.message || error);
+        log('POST /api/check-stored-api', error.message || error);
         return reply({
           statusCode: 200,
           data: { password: '****', apiIsDown: true }
@@ -202,11 +205,11 @@ export class WazuhApiCtrl {
               } catch (error) {} // eslint-disable-line
             }
           } catch (error) {
-            log('POST /api/wazuh-api/checkStoredAPI', error.message || error);
+            log('POST /api/check-stored-api', error.message || error);
             return ErrorResponse(error.message || error, 3020, 500, reply);
           }
         }
-        log('POST /api/wazuh-api/checkStoredAPI', error.message || error);
+        log('POST /api/check-stored-api', error.message || error);
         return ErrorResponse(error.message || error, 3002, 500, reply);
       }
     }
@@ -361,7 +364,7 @@ export class WazuhApiCtrl {
 
       throw new Error(tmpMsg);
     } catch (error) {
-      log('POST /api/wazuh-api/checkAPI', error.message || error);
+      log('POST /api/check-api', error.message || error);
       return ErrorResponse(error.message || error, 3005, 500, reply);
     }
   }
@@ -585,13 +588,7 @@ export class WazuhApiCtrl {
         !response.body.error &&
         response.body.data
       ) {
-        if (
-          path.includes('/manager/configuration') &&
-          response.body.data.cluster &&
-          response.body.data.cluster.key
-        ) {
-          response.body.data.cluster.key = '*************';
-        }
+        cleanKeys(response);
         return reply(response.body);
       }
 
@@ -599,10 +596,15 @@ export class WazuhApiCtrl {
       response.body &&
       response.body.error &&
       response.body.message
-        ? new Error(response.body.message)
+        ? { message: response.body.message, code: response.body.error }
         : new Error('Unexpected error fetching data from the Wazuh API');
     } catch (error) {
-      return ErrorResponse(error.message || error, 3013, 500, reply);
+      return ErrorResponse(
+        error.message || error,
+        `Wazuh API error: ${error.code}` || 3013,
+        500,
+        reply
+      );
     }
   }
 
@@ -640,6 +642,7 @@ export class WazuhApiCtrl {
         !response.body.error &&
         response.body.data
       ) {
+        cleanKeys(response);
         return response.body;
       }
 
@@ -647,7 +650,7 @@ export class WazuhApiCtrl {
       response.body &&
       response.body.error &&
       response.body.message
-        ? new Error(response.body.message)
+        ? { message: response.body.message, code: response.body.error }
         : new Error('Unexpected error fetching data from the Wazuh API');
     } catch (error) {
       return Promise.reject(error);
@@ -710,20 +713,6 @@ export class WazuhApiCtrl {
       });
     } catch (error) {
       return ErrorResponse(error.message || error, 3018, 500, reply);
-    }
-  }
-
-  getConfigurationFile(req, reply) {
-    try {
-      const configFile = getConfiguration();
-
-      return reply({
-        statusCode: 200,
-        error: 0,
-        data: configFile || {}
-      });
-    } catch (error) {
-      return ErrorResponse(error.message || error, 3019, 500, reply);
     }
   }
 
@@ -835,16 +824,6 @@ export class WazuhApiCtrl {
     }
   }
 
-  async totalRam(req, reply) {
-    try {
-      // RAM in MB
-      const ram = Math.ceil(totalmem() / 1024 / 1024);
-      return reply({ statusCode: 200, error: 0, ram });
-    } catch (error) {
-      return ErrorResponse(error.message || error, 3033, 500, reply);
-    }
-  }
-
   async getAgentsFieldsUniqueCount(req, reply) {
     try {
       if (!req.params || !req.params.api)
@@ -863,24 +842,24 @@ export class WazuhApiCtrl {
         rejectUnauthorized: !config.insecure
       };
 
-      const distinctUrl = '/agents/stats/distinct';
+      const distinctUrl = `${config.url}:${config.port}/agents/stats/distinct`;
 
       const data = await Promise.all([
         needle(
           'get',
-          `${config.url}:${config.port}${distinctUrl}`,
+          distinctUrl,
           { fields: 'node_name', select: 'node_name' },
           headers
         ),
         needle(
           'get',
-          `${config.url}:${config.port}${distinctUrl}`,
-          { fields: 'group', select: 'group' },
+          `${config.url}:${config.port}/agents/groups`,
+          {},
           headers
         ),
         needle(
           'get',
-          `${config.url}:${config.port}${distinctUrl}`,
+          distinctUrl,
           {
             fields: 'os.name,os.platform,os.version',
             select: 'os.name,os.platform,os.version'
@@ -889,7 +868,7 @@ export class WazuhApiCtrl {
         ),
         needle(
           'get',
-          `${config.url}:${config.port}${distinctUrl}`,
+          distinctUrl,
           { fields: 'version', select: 'version' },
           headers
         ),
@@ -907,6 +886,22 @@ export class WazuhApiCtrl {
         )
       ]);
 
+      const parsedResponses = data.map(
+        item =>
+          item && item.body && item.body.data && !item.body.error
+            ? item.body.data
+            : false
+      );
+
+      const [
+        nodes,
+        groups,
+        osPlatforms,
+        versions,
+        summary,
+        lastAgent
+      ] = parsedResponses;
+
       const result = {
         groups: [],
         nodes: [],
@@ -922,41 +917,18 @@ export class WazuhApiCtrl {
         }
       };
 
-      if (
-        data &&
-        data[0] &&
-        data[0].body &&
-        data[0].body.data &&
-        !data[0].body.error &&
-        data[0].body.data.items
-      ) {
-        result.nodes = data[0].body.data.items
+      if (nodes && nodes.items) {
+        result.nodes = nodes.items
           .filter(item => !!item.node_name)
           .map(item => item.node_name);
       }
 
-      if (
-        data &&
-        data[1] &&
-        data[1].body &&
-        data[1].body.data &&
-        !data[1].body.error &&
-        data[1].body.data.items
-      ) {
-        result.groups = data[1].body.data.items
-          .filter(item => !!item.group)
-          .map(item => item.group);
+      if (groups && groups.items) {
+        result.groups = groups.items.map(item => item.name);
       }
 
-      if (
-        data &&
-        data[2] &&
-        data[2].body &&
-        data[2].body.data &&
-        !data[2].body.error &&
-        data[1].body.data.items
-      ) {
-        result.osPlatforms = data[2].body.data.items
+      if (osPlatforms && osPlatforms.items) {
+        result.osPlatforms = osPlatforms.items
           .filter(
             item =>
               !!item.os && item.os.platform && item.os.name && item.os.version
@@ -964,67 +936,32 @@ export class WazuhApiCtrl {
           .map(item => item.os);
       }
 
-      if (
-        data &&
-        data[3] &&
-        data[3].body &&
-        data[3].body.data &&
-        !data[3].body.error &&
-        data[3].body.data.items
-      ) {
-        result.versions = data[3].body.data.items
+      if (versions && versions.items) {
+        result.versions = versions.items
           .filter(item => !!item.version)
           .map(item => item.version);
       }
 
-      if (data[4] && data[4].body && !data[4].body.error && data[4].body.data) {
+      if (summary) {
         Object.assign(result.summary, {
-          agentsCountActive: data[4].body.data.Active - 1,
-          agentsCountDisconnected: data[4].body.data.Disconnected,
-          agentsCountNeverConnected: data[4].body.data['Never connected'],
-          agentsCountTotal: data[4].body.data.Total - 1,
+          agentsCountActive: summary.Active - 1,
+          agentsCountDisconnected: summary.Disconnected,
+          agentsCountNeverConnected: summary['Never connected'],
+          agentsCountTotal: summary.Total - 1,
           agentsCoverity:
-            data[4].body.data.Total - 1
-              ? ((data[4].body.data.Active - 1) /
-                  (data[4].body.data.Total - 1)) *
-                100
+            summary.Total - 1
+              ? ((summary.Active - 1) / (summary.Total - 1)) * 100
               : 0
         });
       }
 
-      if (
-        data[5] &&
-        data[5].body &&
-        !data[5].body.error &&
-        data[5].body.data &&
-        data[5].body.data.items &&
-        data[5].body.data.items.length
-      ) {
-        Object.assign(result.lastAgent, data[5].body.data.items[0]);
+      if (lastAgent && lastAgent.items && lastAgent.items.length) {
+        Object.assign(result.lastAgent, lastAgent.items[0]);
       }
 
       return reply({ error: 0, result });
     } catch (error) {
       return ErrorResponse(error.message || error, 3035, 500, reply);
-    }
-  }
-
-  async getAppLogs(req, reply) {
-    try {
-      const lastLogs = await simpleTail(
-        path.join(__dirname, '../../../../optimize/wazuh-logs/wazuhapp.log'),
-        20
-      );
-      return lastLogs && Array.isArray(lastLogs)
-        ? reply({
-            error: 0,
-            lastLogs: lastLogs.filter(
-              item => typeof item === 'string' && item.length
-            )
-          })
-        : reply({ error: 0, lastLogs: [] });
-    } catch (error) {
-      return ErrorResponse(error.message || error, 3036, 500, reply);
     }
   }
 }

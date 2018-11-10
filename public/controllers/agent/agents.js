@@ -9,7 +9,6 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import beautifier from '../../utils/json-beautifier';
 import { uiModules } from 'ui/modules';
 import { FilterHandler } from '../../utils/filter-handler';
 import { generateMetric } from '../../utils/generate-metric';
@@ -25,6 +24,8 @@ import {
   metricsVirustotal
 } from '../../utils/agents-metrics';
 
+import { ConfigurationHandler } from '../../utils/config-handler';
+import { timefilter } from 'ui/timefilter';
 const app = uiModules.get('app/wazuh', []);
 
 class AgentsController {
@@ -56,6 +57,17 @@ class AgentsController {
     this.visFactoryService = visFactoryService;
     this.csvReq = csvReq;
     this.wzTableFilter = wzTableFilter;
+
+    // Config on-demand
+    this.$scope.isArray = Array.isArray;
+    this.configurationHandler = new ConfigurationHandler(apiReq, errorHandler);
+    this.$scope.currentConfig = null;
+    this.$scope.configurationTab = '';
+    this.$scope.configurationSubTab = '';
+    this.$scope.integrations = {};
+    this.$scope.selectedItem = 0;
+    this.targetLocation = null;
+    this.ignoredTabs = ['syscollector', 'welcome', 'configuration'];
   }
 
   $onInit() {
@@ -71,15 +83,19 @@ class AgentsController {
     const extensions = this.appState.getExtensions(currentApi);
     this.$scope.extensions = extensions;
 
-    this.$scope.tabView = this.commonData.checkTabViewLocation();
-    this.$scope.tab = this.commonData.checkTabLocation();
+    // Getting possible target location
+    this.targetLocation = this.shareAgent.getTargetLocation();
+
+    if (this.targetLocation && typeof this.targetLocation === 'object') {
+      this.$scope.tabView = this.targetLocation.subTab;
+      this.$scope.tab = this.targetLocation.tab;
+    } else {
+      this.$scope.tabView = this.commonData.checkTabViewLocation();
+      this.$scope.tab = this.commonData.checkTabLocation();
+    }
 
     this.tabHistory = [];
-    if (
-      this.$scope.tab !== 'configuration' &&
-      this.$scope.tab !== 'welcome' &&
-      this.$scope.tab !== 'syscollector'
-    )
+    if (!this.ignoredTabs.includes(this.$scope.tab))
       this.tabHistory.push(this.$scope.tab);
 
     // Tab names
@@ -87,14 +103,9 @@ class AgentsController {
 
     this.tabVisualizations.assign('agents');
 
-    this.$scope.hostMonitoringTabs = [
-      'general',
-      'fim',
-      'configuration',
-      'syscollector'
-    ];
+    this.$scope.hostMonitoringTabs = ['general', 'fim', 'syscollector'];
     this.$scope.systemAuditTabs = ['pm', 'audit', 'oscap', 'ciscat'];
-    this.$scope.securityTabs = ['vuls', 'virustotal'];
+    this.$scope.securityTabs = ['vuls', 'virustotal', 'osquery'];
     this.$scope.complianceTabs = ['pci', 'gdpr'];
 
     this.$scope.inArray = (item, array) =>
@@ -121,7 +132,7 @@ class AgentsController {
         : 'Never connected';
     };
     this.$scope.getAgent = async newAgentId => this.getAgent(newAgentId);
-    this.$scope.goGroups = agent => this.goGroups(agent);
+    this.$scope.goGroups = (agent, group) => this.goGroups(agent, group);
     this.$scope.analyzeAgents = async searchTerm =>
       this.analyzeAgents(searchTerm);
     this.$scope.downloadCsv = async data_path => this.downloadCsv(data_path);
@@ -135,24 +146,7 @@ class AgentsController {
       this.visFactoryService.clearAll();
     });
 
-    // PCI and GDPR requirements
-    Promise.all([this.commonData.getPCI(), this.commonData.getGDPR()])
-      .then(data => {
-        this.$scope.pciTabs = data[0];
-        this.$scope.selectedPciIndex = 0;
-        this.$scope.gdprTabs = data[1];
-        this.$scope.selectedGdprIndex = 0;
-      })
-      .catch(error => this.errorHandler.handle(error, 'Agents'));
-
     this.$scope.isArray = Array.isArray;
-
-    this.$scope.getAgentConfig = newAgentId => {
-      if (newAgentId) {
-        this.$location.search('agent', newAgentId);
-      }
-      this.firstLoad();
-    };
 
     this.$scope.goGroup = () => {
       this.shareAgent.setAgent(this.$scope.agent);
@@ -168,6 +162,39 @@ class AgentsController {
         'Agents'
       );
     }
+
+    // Config on demand
+    this.$scope.getXML = () => this.configurationHandler.getXML(this.$scope);
+    this.$scope.getJSON = () => this.configurationHandler.getJSON(this.$scope);
+    this.$scope.isString = item => typeof item === 'string';
+    this.$scope.hasSize = obj =>
+      obj && typeof obj === 'object' && Object.keys(obj).length;
+    this.$scope.switchConfigTab = (configurationTab, sections) =>
+      this.configurationHandler.switchConfigTab(
+        configurationTab,
+        sections,
+        this.$scope,
+        this.$scope.agent.id
+      );
+    this.$scope.switchWodle = wodleName =>
+      this.configurationHandler.switchWodle(
+        wodleName,
+        this.$scope,
+        this.$scope.agent.id
+      );
+    this.$scope.switchConfigurationTab = configurationTab =>
+      this.configurationHandler.switchConfigurationTab(
+        configurationTab,
+        this.$scope
+      );
+    this.$scope.switchConfigurationSubTab = configurationSubTab =>
+      this.configurationHandler.switchConfigurationSubTab(
+        configurationSubTab,
+        this.$scope
+      );
+    this.$scope.updateSelectedItem = i => (this.$scope.selectedItem = i);
+    this.$scope.getIntegration = list =>
+      this.configurationHandler.getIntegration(list, this.$scope);
   }
 
   createMetrics(metricsObject) {
@@ -216,14 +243,16 @@ class AgentsController {
       this.$scope.tabView = subtab;
 
       if (
-        subtab === 'panels' &&
-        this.$scope.tab !== 'configuration' &&
-        this.$scope.tab !== 'welcome' &&
-        this.$scope.tab !== 'syscollector'
+        (subtab === 'panels' ||
+          (this.targetLocation &&
+            typeof this.targetLocation === 'object' &&
+            this.targetLocation.subTab === 'discover' &&
+            subtab === 'discover')) &&
+        !this.ignoredTabs.includes(this.$scope.tab)
       ) {
         const condition =
-          (!this.changeAgent && localChange) ||
-          (!this.changeAgent && preserveDiscover);
+          !this.changeAgent && (localChange || preserveDiscover);
+
         await this.visFactoryService.buildAgentsVisualizations(
           this.filterHandler,
           this.$scope.tab,
@@ -231,6 +260,7 @@ class AgentsController {
           condition,
           this.$scope.agent.id
         );
+
         this.changeAgent = false;
       } else {
         this.$rootScope.$emit('changeTabView', {
@@ -248,32 +278,77 @@ class AgentsController {
   }
 
   // Switch tab
-  switchTab(tab, force = false) {
-    if (tab !== 'configuration' && tab !== 'welcome' && tab !== 'syscollector')
-      this.tabHistory.push(tab);
-    if (this.tabHistory.length > 2) this.tabHistory = this.tabHistory.slice(-2);
-    this.tabVisualizations.setTab(tab);
-    if (this.$scope.tab === tab && !force) return;
-    const onlyAgent = this.$scope.tab === tab && force;
-    const sameTab = this.$scope.tab === tab;
-    this.$location.search('tab', tab);
-    const preserveDiscover =
-      this.tabHistory.length === 2 &&
-      this.tabHistory[0] === this.tabHistory[1] &&
-      !force;
-    this.$scope.tab = tab;
-
-    if (this.$scope.tab === 'configuration') {
-      this.firstLoad();
-    } else {
-      this.$scope.switchSubtab(
-        'panels',
-        true,
-        onlyAgent,
-        sameTab,
-        preserveDiscover
-      );
+  async switchTab(tab, force = false) {
+    if (this.ignoredTabs.includes(tab)) {
+      const timeFilterRefreshStatus = timefilter.getRefreshInterval();
+      const toggle =
+        timeFilterRefreshStatus &&
+        timeFilterRefreshStatus.value &&
+        !timeFilterRefreshStatus.pause;
+      if (toggle) timefilter.toggleRefresh();
     }
+
+    try {
+      if (tab === 'pci') {
+        const pciTabs = await this.commonData.getPCI();
+        this.$scope.pciTabs = pciTabs;
+        this.$scope.selectedPciIndex = 0;
+      }
+      if (tab === 'gdpr') {
+        const gdprTabs = await this.commonData.getPCI();
+        this.$scope.gdprTabs = gdprTabs;
+        this.$scope.selectedGdprIndex = 0;
+      }
+      if (tab === 'syscollector')
+        await this.loadSyscollector(this.$scope.agent.id);
+      if (tab === 'configuration') {
+        const isSync = await this.apiReq.request(
+          'GET',
+          `/agents/${this.$scope.agent.id}/group/is_sync`,
+          {}
+        );
+        // Configuration synced
+        this.$scope.isSynchronized =
+          isSync && isSync.data && isSync.data.data && isSync.data.data.synced;
+        this.$scope.switchConfigurationTab('welcome');
+      } else {
+        this.configurationHandler.reset(this.$scope);
+      }
+      if (!this.ignoredTabs.includes(tab)) this.tabHistory.push(tab);
+      if (this.tabHistory.length > 2)
+        this.tabHistory = this.tabHistory.slice(-2);
+      this.tabVisualizations.setTab(tab);
+      if (this.$scope.tab === tab && !force) return;
+      const onlyAgent = this.$scope.tab === tab && force;
+      const sameTab = this.$scope.tab === tab;
+      this.$location.search('tab', tab);
+      const preserveDiscover =
+        this.tabHistory.length === 2 &&
+        this.tabHistory[0] === this.tabHistory[1] &&
+        !force;
+      this.$scope.tab = tab;
+
+      const targetSubTab =
+        this.targetLocation && typeof this.targetLocation === 'object'
+          ? this.targetLocation.subTab
+          : 'panels';
+
+      if (!this.ignoredTabs.includes(this.$scope.tab)) {
+        this.$scope.switchSubtab(
+          targetSubTab,
+          true,
+          onlyAgent,
+          sameTab,
+          preserveDiscover
+        );
+      }
+
+      this.shareAgent.deleteTargetLocation();
+      this.targetLocation = null;
+    } catch (error) {
+      return Promise.reject(error);
+    }
+    if (!this.$scope.$$phase) this.$scope.$digest();
   }
 
   // Agent data
@@ -290,6 +365,19 @@ class AgentsController {
 
   async loadSyscollector(id) {
     try {
+      // Check that Syscollector is enabled before proceeding
+      this.$scope.syscollectorEnabled = await this.configurationHandler.isWodleEnabled(
+        'syscollector',
+        id
+      );
+
+      // If Syscollector is disabled, stop loading
+      if (!this.$scope.syscollectorEnabled) {
+        return;
+      }
+
+      // Continue API requests if we do have Syscollector enabled
+      // Fetch Syscollector data
       const data = await Promise.all([
         this.apiReq.request('GET', `/syscollector/${id}/hardware`, {}),
         this.apiReq.request('GET', `/syscollector/${id}/os`, {}),
@@ -304,47 +392,52 @@ class AgentsController {
           select: 'scan_time'
         })
       ]);
-      if (
-        !data[0] ||
-        !data[0].data ||
-        !data[0].data.data ||
-        typeof data[0].data.data !== 'object' ||
-        !Object.keys(data[0].data.data).length ||
-        !data[1] ||
-        !data[1].data ||
-        !data[1].data.data ||
-        typeof data[1].data.data !== 'object' ||
-        !Object.keys(data[1].data.data).length
-      ) {
-        this.$scope.syscollector = null;
-      } else {
-        const netiface = {};
-        const ports = {};
-        const packagesDate = {};
-        const processesDate = {};
-        if (data[2] && data[2].data && data[2].data.data)
-          Object.assign(netiface, data[2].data.data);
-        if (data[3] && data[3].data && data[3].data.data)
-          Object.assign(ports, data[3].data.data);
-        if (data[4] && data[4].data && data[4].data.data)
-          Object.assign(packagesDate, data[4].data.data);
-        if (data[5] && data[5].data && data[5].data.data)
-          Object.assign(processesDate, data[5].data.data);
-        this.$scope.syscollector = {
-          hardware: data[0].data.data,
-          os: data[1].data.data,
-          netiface: netiface,
-          ports: ports,
-          packagesDate:
-            packagesDate && packagesDate.items && packagesDate.items.length
-              ? packagesDate.items[0].scan_time
-              : 'Unknown',
-          processesDate:
+
+      const result = data.map(
+        item => (item && item.data && item.data.data ? item.data.data : false)
+      );
+      const [
+        hardwareResponse,
+        osResponse,
+        netifaceResponse,
+        portsResponse,
+        packagesDateResponse,
+        processesDateResponse
+      ] = result;
+
+      // Before proceeding, syscollector data is an empty object
+      this.$scope.syscollector = {};
+
+      const packagesDate = packagesDateResponse
+        ? { ...packagesDateResponse }
+        : false;
+      const processesDate = processesDateResponse
+        ? { ...processesDateResponse }
+        : false;
+
+      // Fill syscollector object
+      this.$scope.syscollector = {
+        hardware:
+          typeof hardwareResponse === 'object' &&
+          Object.keys(hardwareResponse).length
+            ? { ...hardwareResponse }
+            : false,
+        os:
+          typeof osResponse === 'object' && Object.keys(osResponse).length
+            ? { ...osResponse }
+            : false,
+        netiface: netifaceResponse ? { ...netifaceResponse } : false,
+        ports: portsResponse ? { ...portsResponse } : false,
+        packagesDate:
+          packagesDate && packagesDate.items && packagesDate.items.length
+            ? packagesDate.items[0].scan_time
+            : 'Unknown',
+        processesDate:
           processesDate && processesDate.items && processesDate.items.length
-              ? processesDate.items[0].scan_time
-              : 'Unknown'
-        };
-      }
+            ? processesDate.items[0].scan_time
+            : 'Unknown'
+      };
+
       return;
     } catch (error) {
       return Promise.reject(error);
@@ -353,6 +446,7 @@ class AgentsController {
 
   async getAgent(newAgentId) {
     try {
+      this.$scope.isSynchronized = false;
       this.$scope.load = true;
       this.changeAgent = true;
 
@@ -360,19 +454,20 @@ class AgentsController {
 
       const id = this.commonData.checkLocationAgentId(newAgentId, globalAgent);
 
-      if (this.$scope.tab === 'configuration') {
-        await this.loadSyscollector(id);
-        return this.$scope.getAgentConfig(id);
-      }
-
       const data = await Promise.all([
         this.apiReq.request('GET', `/agents/${id}`, {}),
         this.apiReq.request('GET', `/syscheck/${id}/last_scan`, {}),
         this.apiReq.request('GET', `/rootcheck/${id}/last_scan`, {})
       ]);
 
+      const result = data.map(
+        item => (item && item.data && item.data.data ? item.data.data : false)
+      );
+
+      const [agentInfo, syscheckLastScan, rootcheckLastScan] = result;
+
       // Agent
-      this.$scope.agent = data[0].data.data;
+      this.$scope.agent = agentInfo;
       if (this.$scope.agent.os) {
         this.$scope.agentOS =
           this.$scope.agent.os.name + ' ' + this.$scope.agent.os.version;
@@ -381,16 +476,14 @@ class AgentsController {
       }
 
       // Syscheck
-      this.$scope.agent.syscheck = data[1].data.data;
+      this.$scope.agent.syscheck = syscheckLastScan;
       this.validateSysCheck();
 
       // Rootcheck
-      this.$scope.agent.rootcheck = data[2].data.data;
+      this.$scope.agent.rootcheck = rootcheckLastScan;
       this.validateRootCheck();
 
-      this.$scope.switchTab(this.$scope.tab, true);
-
-      await this.loadSyscollector(id);
+      await this.$scope.switchTab(this.$scope.tab, true);
 
       this.$scope.load = false;
       if (!this.$scope.$$phase) this.$scope.$digest();
@@ -401,9 +494,9 @@ class AgentsController {
     return;
   }
 
-  goGroups(agent) {
+  goGroups(agent, group) {
     this.visFactoryService.clearAll();
-    this.shareAgent.setAgent(agent);
+    this.shareAgent.setAgent(agent, group);
     this.$location.search('tab', 'groups');
     this.$location.path('/manager');
   }
@@ -467,55 +560,10 @@ class AgentsController {
         return;
       }
 
-      const configurationData = await this.apiReq.request(
-        'GET',
-        `/agents/groups/${this.$scope.groupName}/configuration`,
-        {}
-      );
-      this.$scope.groupConfiguration = configurationData.data.data.items[0];
-      this.$scope.rawJSON = beautifier.prettyPrint(
-        configurationData.data.data.items
-      );
-
-      const agentGroups = await Promise.all([
-        this.apiReq.request(
-          'GET',
-          `/agents/groups?search=${this.$scope.groupName}`,
-          {}
-        ),
-        this.apiReq.request(
-          'GET',
-          `/agents/groups/${this.$scope.groupName}`,
-          {}
-        )
-      ]);
-
-      const groupMergedSum = agentGroups[0].data.data.items.filter(
-        item => item.name === this.$scope.groupName
-      );
-      this.$scope.groupMergedSum = groupMergedSum.length
-        ? groupMergedSum[0].mergedSum
-        : 'Unknown';
-
-      const agentMergedSum = agentGroups[1].data.data.items.filter(
-        item => item.id === this.$scope.agent.id
-      );
-      this.$scope.agentMergedSum = agentMergedSum.length
-        ? agentMergedSum[0].mergedSum
-        : 'Unknown';
-
-      this.$scope.isSynchronized =
-        this.$scope.agentMergedSum === this.$scope.groupMergedSum &&
-        ![this.$scope.agentMergedSum, this.$scope.groupMergedSum].includes(
-          'Unknown'
-        )
-          ? true
-          : false;
-
       this.$scope.load = false;
 
       if (this.$scope.tab !== 'configuration')
-        this.$scope.switchTab(this.$scope.tab, true);
+        await this.$scope.switchTab(this.$scope.tab, true);
 
       if (!this.$scope.$$phase) this.$scope.$digest();
       return;

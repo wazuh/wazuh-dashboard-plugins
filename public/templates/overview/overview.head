@@ -4,7 +4,7 @@
     <wz-menu ng-init="menuNavItem = 'overview'"></wz-menu>
     <!-- End top navbar section -->
 
-    <!-- Navigation section (Breadcrumbs, Discover, etc) -->
+    <!-- Navigation section -->
     <div layout="row" layout-align="start center">
         <!-- Breadcrumbs -->
         <div layout="row" layout-padding>
@@ -79,13 +79,14 @@
 
     <!-- Security navigation bar -->
     <md-nav-bar
-        ng-if="inArray(tab, securityTabs) && extensions.virustotal"
+        ng-if="inArray(tab, securityTabs) && (extensions.virustotal || extensions.osquery)"
         class="wz-nav-bar"
         ng-show="tab !== 'welcome'"
         md-selected-nav-item="tab"
         nav-bar-aria-label="Security navigation links">
         <md-nav-item class="wz-nav-item" md-nav-click="switchTab('vuls')" name="vuls">{{ tabNames['vuls'] }}</md-nav-item>
         <md-nav-item ng-show="extensions.virustotal" class="wz-nav-item" md-nav-click="switchTab('virustotal')" name="virustotal">{{ tabNames['virustotal'] }}</md-nav-item>
+        <md-nav-item ng-show="extensions.osquery" class="wz-nav-item" md-nav-click="switchTab('osquery')" name="osquery">{{ tabNames['osquery'] }}</md-nav-item>
     </md-nav-bar>
     <!-- End Security navigation bar -->
 

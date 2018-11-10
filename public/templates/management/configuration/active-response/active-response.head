@@ -1,0 +1,26 @@
+<div flex="auto" layout="column" ng-if="configurationTab === 'active-response'" ng-init="switchConfigurationSubTab('active-response')">
+
+    <!-- Headline -->
+    <div layout="column" layout-padding>
+        <div>
+            <span class="font-size-18">Active response</span>
+        </div>
+        <span class="md-subheader">Active threat addressing by inmmediate response</span>
+    </div>
+    <!-- End headline -->
+
+    <!-- Commands & Active response navigation bar -->
+    <md-nav-bar
+        ng-if="!agent || agent.id === '000'"
+        class="wz-nav-bar"
+        md-selected-nav-item="configurationSubTab"
+        nav-bar-aria-label="Active response navigation links">
+        <md-nav-item class="wz-nav-item" md-nav-click="switchConfigurationSubTab('active-response')" name="active-response">Active response</md-nav-item>
+        <md-nav-item class="wz-nav-item" md-nav-click="switchConfigurationSubTab('commands')" name="commands">Commands</md-nav-item>
+    </md-nav-bar>
+    <!-- End Commands & Active response navigation bar -->
+
+    <!-- Loading ring -->
+    <div class='uil-ring-css' ng-show="load">
+        <div></div>
+    </div>

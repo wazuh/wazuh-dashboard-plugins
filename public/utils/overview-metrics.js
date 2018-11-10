@@ -31,10 +31,12 @@ const metricsAudit = {
 // Metrics Vulnerability Detector
 const metricsVulnerability = {
   vulnCritical:
-    '[vis-id="\'Wazuh-App-Overview-VULS-Metric-Critical-severity\'"]',
-  vulnHigh: '[vis-id="\'Wazuh-App-Overview-VULS-Metric-High-severity\'"]',
-  vulnMedium: '[vis-id="\'Wazuh-App-Overview-VULS-Metric-Medium-severity\'"]',
-  vulnLow: '[vis-id="\'Wazuh-App-Overview-VULS-Metric-Low-severity\'"]'
+    '[vis-id="\'Wazuh-App-Overview-vulnerability-Metric-Critical-severity\'"]',
+  vulnHigh:
+    '[vis-id="\'Wazuh-App-Overview-vulnerability-Metric-High-severity\'"]',
+  vulnMedium:
+    '[vis-id="\'Wazuh-App-Overview-vulnerability-Metric-Medium-severity\'"]',
+  vulnLow: '[vis-id="\'Wazuh-App-Overview-vulnerability-Metric-Low-severity\'"]'
 };
 
 // Metrics Scap
@@ -69,21 +71,18 @@ const metricsVirustotal = {
   virusTotal: '[vis-id="\'Wazuh-App-Overview-Virustotal-Total\'"]'
 };
 
-// Metrics AWS
-const metricsAws = {
-  awsLogins: '[vis-id="\'Wazuh-App-Overview-AWS-Metric-Successful-logins\'"]',
-  awsMostActiveUser: '[vis-id="\'Wazuh-App-Overview-AWS-Most-active-user\'"]',
-  awsAuthorized:
-    '[vis-id="\'Wazuh-App-Overview-AWS-Metric-Authorize-security\'"]',
-  awsRevoked: '[vis-id="\'Wazuh-App-Overview-AWS-Metric-Revoke-security\'"]'
+// Metrics OSQuery
+const metricsOsquery = {
+  osqueryAgentsReporting:
+    '[vis-id="\'Wazuh-App-Overview-Osquery-Agents-reporting\'"]'
 };
 
 export default {
-  metricsGeneral,  
+  metricsGeneral,
   metricsAudit,
   metricsVulnerability,
   metricsScap,
   metricsCiscat,
   metricsVirustotal,
-  metricsAws
+  metricsOsquery
 };

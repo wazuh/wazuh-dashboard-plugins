@@ -44,6 +44,7 @@
 #extensions.ciscat    : false
 #extensions.aws       : false
 #extensions.virustotal: false
+#extensions.osquery   : false
 #
 # ---------------------------------- Time out ----------------------------------
 #
@@ -67,6 +68,9 @@
 # index pattern directly from the Wazuh app top menu.
 # Default: true
 #ip.selector: true
+#
+# List of index patterns to be ignored
+#ip.ignore: []
 #
 # -------------------------------- X-Pack RBAC ---------------------------------
 #

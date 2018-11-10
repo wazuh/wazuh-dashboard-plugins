@@ -31,7 +31,7 @@ export class ApiRequest {
 
       const data = await this.genericReq.request(
         'POST',
-        '/api/wazuh-api/request',
+        '/api/request',
         requestData
       );
 

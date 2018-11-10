@@ -2,8 +2,8 @@
 
     <!-- Headline -->
     <div layout="column" layout-padding>
-        <span class="font-size-18"><i class="fa fa-fw fa-check-square-o" aria-hidden="true"></i> App extensions</span>
-        <span class="md-subheader">Enable or disable extensions for the Overview and Agents tabs</span>
+        <span class="font-size-18"><i class="fa fa-fw fa-check-square-o" aria-hidden="true"></i> Wazuh extensions</span>
+        <span class="md-subheader">A Wazuh extension is used to enable visualizations and dashboards that are specific to a particular use case.</span>
     </div>
     <!-- End headline -->
 
@@ -79,8 +79,8 @@
                 <span class="wz-headline-title"><i class="fa fa-fw fa-search" aria-hidden="true"></i> {{ tabNames['oscap'] }}</span>
                 <md-divider class="wz-margin-top-10"></md-divider>
                 <div layout="column">
-                    <p class="md-body-1 wz-padding-top-10">OVAL (Open Vulnerability Assessment Language) interpreter used to check system configuration and detect vulnerable applications.</p>
-                    <p class="md-body-1 wz-padding-top-10">It is recognized as a standardized compliance and hardening checking solution for enterprise-level infrastructure.</p>
+                    <p class="md-body-1 wz-padding-top-10">OpenSCAP is an OVAL (Open Vulnerability Assessment Language) interpreter, that is used for system configuration and vulnerability assessment.</p>
+                    <p class="md-body-1 wz-padding-top-10">Developed and supported by RedHat, it is recognized as a standardized compliance and hardening checking solution for enterprise-level infrastructure.</p>
                 </div>
                 <span flex></span>
                 <div layout="row" class="wz-padding-top-10">
@@ -114,14 +114,33 @@
             </md-card-actions>
         </md-card>
 
+        <!-- Osquery -->
+        <md-card flex="45" layout="column" class="wz-md-card">
+            <md-card-content flex="auto" layout="column">
+                <span class="wz-headline-title"><i class="fa fa-fw fa-rocket" aria-hidden="true"></i> {{ tabNames['osquery'] }}</span>
+                <md-divider class="wz-margin-top-10"></md-divider>
+                <div layout="column">
+                    <p class="md-body-1 wz-padding-top-10">Osquery can be used to expose an operating system as a high-performance relational database. This allows you to write SQL-based queries to explore operating system data.</p>
+                </div>
+                <span flex></span>
+                <div layout="row" class="wz-padding-top-10">
+                    <md-switch class="wz-switch" aria-label="Osquery extension switch" ng-model="extensions.osquery" ng-change="toggleExtension('osquery',extensions.osquery)"></md-switch>
+                </div>
+            </md-card-content>
+            <md-card-actions layout="row" layout-align="end center" class="wz-card-actions">
+                <md-button target="_blank" href="https://documentation.wazuh.com/current/user-manual/capabilities/osquery.html" class="wz-text-link cursor-pointer small" aria-label="Osquery integration documentation">
+                    <i class="fa fa-fw fa-info" aria-hidden="true"></i> More info
+                </md-button>
+            </md-card-actions>
+        </md-card>
+
         <!-- Amazon -->
         <md-card flex="45" layout="column" class="wz-md-card">
             <md-card-content flex="auto" layout="column">
                 <span class="wz-headline-title"><i class="fa fa-fw fa-amazon" aria-hidden="true"></i> {{ tabNames['aws'] }}</span>
                 <md-divider class="wz-margin-top-10"></md-divider>
                 <div layout="column">
-                    <p class="md-body-1 wz-padding-top-10">Wazuh provides a way to collect alerts from your AWS machines and store them to an agent. Once the agent reads the message, it sends it to the Wazuh manager which analyses it with decoders and rules.</p>
-                    <p class="md-body-1 wz-padding-top-10">When a rule matches, an alert is triggered if the rule severity is high enough. Wazuh can be used to alert on specific events from IAM, EC2 and VPC.</p>
+                    <p class="md-body-1 wz-padding-top-10">Wazuh provides an agent module that can be used to retrieve data from S3 buckets. In combination with log analysis rules, this module provides the ability to analyze and alert on AWS Cloudtrail, GuardDuty, Macie, IAM, VPC Flow and other Amazon AWS  services data.</p>
                 </div>
                 <span flex></span>
                 <div layout="row" class="wz-padding-top-10">
@@ -141,7 +160,7 @@
                 <span class="wz-headline-title"><i class="fa fa-fw fa-bug" aria-hidden="true"></i> {{ tabNames['virustotal'] }}</span>
                 <md-divider class="wz-margin-top-10"></md-divider>
                 <div layout="column">
-                    <p class="md-body-1 wz-padding-top-10">VirusTotal is an online service that analyzes files and URLs enabling the detection of viruses, worms, trojans and other kinds of malicious content using antivirus engines and website scanners. It also can be used to detect false positives.</p>
+                    <p class="md-body-1 wz-padding-top-10">VirusTotal is an online service that analyzes files and URLs enabling the identification of viruses, worms, trojans, and other kinds of malicious content detected by antivirus engines and website scanners. Virustotal is commonly used as a threat intelligence source to help with security analysis and incident response.</p>
                 </div>
                 <span flex></span>
                 <div layout="row" class="wz-padding-top-10">

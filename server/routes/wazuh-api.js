@@ -17,7 +17,7 @@ export function WazuhApiRoutes(server) {
   // Returns if the wazuh-api configuration is working
   server.route({
     method: 'POST',
-    path: '/api/wazuh-api/checkStoredAPI',
+    path: '/api/check-stored-api',
     handler(req, reply) {
       return ctrl.checkStoredAPI(req, reply);
     }
@@ -27,7 +27,7 @@ export function WazuhApiRoutes(server) {
   // Returns if the wazuh-api configuration received in the POST body will work
   server.route({
     method: 'POST',
-    path: '/api/wazuh-api/checkAPI',
+    path: '/api/check-api',
     handler(req, reply) {
       return ctrl.checkAPI(req, reply);
     }
@@ -36,7 +36,7 @@ export function WazuhApiRoutes(server) {
   // Returns the request result (With error control)
   server.route({
     method: 'POST',
-    path: '/api/wazuh-api/request',
+    path: '/api/request',
     handler(req, reply) {
       return ctrl.requestApi(req, reply);
     }
@@ -45,7 +45,7 @@ export function WazuhApiRoutes(server) {
   // Return a PCI requirement description
   server.route({
     method: 'GET',
-    path: '/api/wazuh-api/pci/{requirement}',
+    path: '/api/pci/{requirement}',
     handler(req, reply) {
       return ctrl.getPciRequirement(req, reply);
     }
@@ -54,7 +54,7 @@ export function WazuhApiRoutes(server) {
   // Return a GDPR requirement description
   server.route({
     method: 'GET',
-    path: '/api/wazuh-api/gdpr/{requirement}',
+    path: '/api/gdpr/{requirement}',
     handler(req, reply) {
       return ctrl.getGdprRequirement(req, reply);
     }
@@ -63,54 +63,28 @@ export function WazuhApiRoutes(server) {
   // Force fetch data to be inserted on wazuh-monitoring indices
   server.route({
     method: 'GET',
-    path: '/api/wazuh-api/fetchAgents',
+    path: '/api/monitoring',
     handler(req, reply) {
       return ctrl.fetchAgents(req, reply);
-    }
-  });
-
-  // Returns the config.yml file parsed
-  server.route({
-    method: 'GET',
-    path: '/api/wazuh-api/configuration',
-    handler(req, reply) {
-      return ctrl.getConfigurationFile(req, reply);
     }
   });
 
   // Returns data from the Wazuh API on CSV readable format
   server.route({
     method: 'POST',
-    path: '/api/wazuh-api/csv',
+    path: '/api/csv',
     handler(req, res) {
       return ctrl.csv(req, res);
-    }
-  });
-
-  // Returns total RAM available from the current machine where Kibana is being executed
-  server.route({
-    method: 'GET',
-    path: '/api/wazuh-api/ram',
-    handler(req, res) {
-      return ctrl.totalRam(req, res);
     }
   });
 
   // Returns unique fields from the agents such OS, agent version ...
   server.route({
     method: 'GET',
-    path: '/api/wazuh-api/agents-unique/{api}',
+    path: '/api/agents-unique/{api}',
     handler(req, res) {
       return ctrl.getAgentsFieldsUniqueCount(req, res);
     }
   });
 
-  // Returns Wazuh app logs ...
-  server.route({
-    method: 'GET',
-    path: '/api/wazuh-api/logs',
-    handler(req, res) {
-      return ctrl.getAppLogs(req, res);
-    }
-  });
 }

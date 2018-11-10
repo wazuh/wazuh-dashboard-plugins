@@ -16,14 +16,16 @@ import { TabNames } from '../../utils/tab-names';
 import { TabDescription } from '../../../server/reporting/tab-description';
 
 import {
-  metricsGeneral,  
+  metricsGeneral,
   metricsAudit,
   metricsVulnerability,
   metricsScap,
   metricsCiscat,
   metricsVirustotal,
-  metricsAws
+  metricsOsquery
 } from '../../utils/overview-metrics';
+
+import { queryConfig } from '../../services/query-config';
 
 const app = uiModules.get('app/wazuh', []);
 
@@ -40,6 +42,7 @@ app.controller('overviewController', function(
   visFactoryService,
   wazuhConfig
 ) {
+  $scope.wodlesConfiguration = false;
   $scope.TabDescription = TabDescription;
   $rootScope.reportStatus = false;
 
@@ -67,7 +70,7 @@ app.controller('overviewController', function(
 
   $scope.hostMonitoringTabs = ['general', 'fim', 'aws'];
   $scope.systemAuditTabs = ['pm', 'audit', 'oscap', 'ciscat'];
-  $scope.securityTabs = ['vuls', 'virustotal'];
+  $scope.securityTabs = ['vuls', 'virustotal', 'osquery'];
   $scope.complianceTabs = ['pci', 'gdpr'];
 
   $scope.inArray = (item, array) =>
@@ -100,8 +103,8 @@ app.controller('overviewController', function(
         case 'virustotal':
           createMetrics(metricsVirustotal);
           break;
-        case 'aws':
-          createMetrics(metricsAws);
+        case 'osquery':
+          createMetrics(metricsOsquery);
           break;
       }
     }
@@ -115,14 +118,6 @@ app.controller('overviewController', function(
     preserveDiscover = false
   ) => {
     try {
-      if (
-        $scope.tab &&
-        $scope.tab === 'welcome' &&
-        typeof $scope.agentsCountTotal === 'undefined'
-      ) {
-        await getSummary();
-      }
-
       if ($scope.tabView === subtab && !force) return;
 
       visFactoryService.clear();
@@ -143,49 +138,95 @@ app.controller('overviewController', function(
       }
 
       checkMetrics($scope.tab, subtab);
-
-      return;
     } catch (error) {
       errorHandler.handle(error, 'Overview');
-      return;
     }
+    if (!$scope.$$phase) $scope.$digest();
+    return;
+  };
+
+  let wodlesConfiguration;
+
+  const calculateWodleTagFromTab = tab => {
+    if (tab === 'aws') return 'aws-s3';
+    return false;
+  };
+
+  const filterWodle = tab => {
+    try {
+      $scope.wodlesConfiguration = false;
+      const tag = calculateWodleTagFromTab(tab);
+      let result = [];
+      if (
+        tag &&
+        wodlesConfiguration &&
+        wodlesConfiguration['wmodules-wmodules'] &&
+        wodlesConfiguration['wmodules-wmodules'].wmodules
+      ) {
+        result = wodlesConfiguration['wmodules-wmodules'].wmodules.filter(
+          item => typeof item[tag] !== 'undefined'
+        );
+      }
+      if (result.length) {
+        $scope.wodlesConfiguration = result[0];
+      }
+    } catch (error) {} // eslint-disable-line
+
+    if (!$scope.$$phase) $scope.$digest();
+  };
+
+  const fetchWodles = async () => {
+    try {
+      wodlesConfiguration = await queryConfig(
+        '000',
+        [{ component: 'wmodules', configuration: 'wmodules' }],
+        apiReq
+      );
+    } catch (error) {
+      wodlesConfiguration = false;
+    }
+    return;
   };
 
   // Switch tab
-  $scope.switchTab = (tab, force = false) => {
-    if (tab !== 'welcome') tabHistory.push(tab);
-    if (tabHistory.length > 2) tabHistory = tabHistory.slice(-2);
-    tabVisualizations.setTab(tab);
-    if ($scope.tab === tab && !force) return;
-    const sameTab = $scope.tab === tab;
-    $location.search('tab', tab);
-    const preserveDiscover =
-      tabHistory.length === 2 && tabHistory[0] === tabHistory[1];
-    $scope.tab = tab;
+  $scope.switchTab = async (tab, force = false) => {
+    try {
+      if (tab !== 'welcome') {
+        await fetchWodles();
+      }
+      if (tab === 'welcome' && typeof $scope.agentsCountTotal === 'undefined') {
+        await getSummary();
+      }
+      if (tab === 'pci') {
+        const pciTabs = await commonData.getPCI();
+        $scope.pciTabs = pciTabs;
+        $scope.selectedPciIndex = 0;
+      }
+      if (tab === 'gdpr') {
+        const gdprTabs = await commonData.getGDPR();
+        $scope.gdprTabs = gdprTabs;
+        $scope.selectedGdprIndex = 0;
+      }
+      filterWodle(tab);
+      if (tab !== 'welcome') tabHistory.push(tab);
+      if (tabHistory.length > 2) tabHistory = tabHistory.slice(-2);
+      tabVisualizations.setTab(tab);
+      if ($scope.tab === tab && !force) return;
+      const sameTab = $scope.tab === tab;
+      $location.search('tab', tab);
+      const preserveDiscover =
+        tabHistory.length === 2 && tabHistory[0] === tabHistory[1];
+      $scope.tab = tab;
 
-    $scope.switchSubtab('panels', true, sameTab, preserveDiscover);
+      await $scope.switchSubtab('panels', true, sameTab, preserveDiscover);
+    } catch (error) {
+      errorHandler.handle(error, 'Overview');
+    }
+    if (!$scope.$$phase) $scope.$digest();
+    return;
   };
 
   $scope.startVis2Png = () => reportingService.startVis2Png($scope.tab);
-
-  // PCI and GDPR requirements
-  const loadPciAndGDPR = async () => {
-    try {
-      const data = await Promise.all([
-        commonData.getPCI(),
-        commonData.getGDPR()
-      ]);
-
-      $scope.pciTabs = data[0];
-      $scope.selectedPciIndex = 0;
-      $scope.gdprTabs = data[1];
-      $scope.selectedGdprIndex = 0;
-
-      return;
-    } catch (error) {
-      return Promise.reject(error);
-    }
-  };
 
   const getSummary = async () => {
     try {
@@ -214,10 +255,6 @@ app.controller('overviewController', function(
 
       $scope.wzMonitoringEnabled = !!configuration['wazuh.monitoring.enabled'];
 
-      if (!$scope.wzMonitoringEnabled) {
-        await getSummary();
-      }
-
       return;
     } catch (error) {
       $scope.wzMonitoringEnabled = true;
@@ -227,21 +264,13 @@ app.controller('overviewController', function(
 
   const init = async () => {
     try {
-      await Promise.all([loadPciAndGDPR(), loadConfiguration()]);
-
-      $scope.switchTab($scope.tab, true);
-
-      if ($scope.tab && $scope.tab === 'welcome') {
-        await getSummary();
-      }
-
-      if (!$scope.$$phase) $scope.$digest();
-
-      return;
+      await loadConfiguration();
+      await $scope.switchTab($scope.tab, true);
     } catch (error) {
       errorHandler.handle(error, 'Overview (init)');
-      return;
     }
+    if (!$scope.$$phase) $scope.$digest();
+    return;
   };
 
   init();

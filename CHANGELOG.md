@@ -2,6 +2,66 @@
 
 All notable changes to the Wazuh app project will be documented in this file.
 
+## Wazuh v3.7.0 - Kibana v6.4.2 / v6.4.3 - Revision 413
+
+### Added
+
+-   Support for Wazuh v3.7.0.
+-   Support for Elastic Stack v6.4.2 / v6.4.3.
+-   Brand-new interface for _Configuration_ (on both _Management_ and _Agents_ tabs) ([#914](https://github.com/wazuh/wazuh-kibana-app/pull/914)):
+    -   Now you can check current and real agent and manager configuration.
+    -   A new interface design, with more useful information and easy to understand descriptions.
+    -   New and more responsive JSON/XML viewers to show the configuration in raw mode.
+-   Brand-new extension - Osquery ([#938](https://github.com/wazuh/wazuh-kibana-app/pull/938)):
+    -   A new extension, disabled by default.
+    -   Check alerts from Wazuh's Osquery integration.
+    -   Check your current Osquery wodle configuration.
+    -   More improvements will come for this extension in the future.
+-   New option for Wazuh app configuration file - _Ignore index patterns_ ([#947](https://github.com/wazuh/wazuh-kibana-app/pull/947)):
+    -   Now the user can specify which index patterns can't be selected on the app using the new `ip.ignore` setting on the `config.yml` file.
+    -   The valid format is an array of strings which represents index patterns.
+    -   By default, this list is empty (all index patterns will be available if they use a compatible structure).
+-   Added a node selector for _Management > Status_ section when Wazuh cluster is enabled ([#976](https://github.com/wazuh/wazuh-kibana-app/pull/976)).
+-   Added quick access to _Configuration_ or _Discover_ panels for an agent on the agents list ([#939](https://github.com/wazuh/wazuh-kibana-app/pull/939)).
+-   Now you can click on an agent's ID on the _Discover_ panels to open its details page on the app ([#904](https://github.com/wazuh/wazuh-kibana-app/pull/904)).
+-   Redesigned the _Overview > Amazon AWS_ tab, using more meaningful visualizations for a better overall view of your agents' status ([#903](https://github.com/wazuh/wazuh-kibana-app/pull/903)).
+-   Redesigned the _Overview/Agents > Vulnerabilities_ tab, using more meaningful visualizations for a better overall view of your agents' status ([#954](https://github.com/wazuh/wazuh-kibana-app/pull/954)).
+-   Now everytime the user enters the _Settings_ tab, the API connection will be automatically checked ([#971](https://github.com/wazuh/wazuh-kibana-app/pull/971)).
+-   Added a node selector for _Management > Logs_ section when Wazuh cluster is enabled ([#980](https://github.com/wazuh/wazuh-kibana-app/pull/980)).
+-   Added a group selector for _Agents_ section ([#995](https://github.com/wazuh/wazuh-kibana-app/pull/995)).
+
+### Changed
+
+-   Interface refactoring for the _Agents > Inventory data_ tab ([#924](https://github.com/wazuh/wazuh-kibana-app/pull/924)):
+    -   Now the tab won't be available if your agent doesn't have Syscollector enabled, and each card will be enabled or disabled depending on the current Syscollector scans configuration.
+    -   This will prevent situations where the user couldn't check the inventory although there was actual scan data to show on some sections.
+-   Added support for new multigroups feature ([#911](https://github.com/wazuh/wazuh-kibana-app/pull/911)):
+    -   Now the information bars on _Agents_ will show all the groups an agent belongs to.
+-   Now the result pane on the _Dev tools_ tab will show the error code coming from the Wazuh API ([#909](https://github.com/wazuh/wazuh-kibana-app/pull/909)).
+-   Changed some visualizations titles for _Overview/Agents > OpenSCAP_ tab ([#925](https://github.com/wazuh/wazuh-kibana-app/pull/925)).
+-   All backend routes have been renamed ([#932](https://github.com/wazuh/wazuh-kibana-app/pull/932)).
+-   Several improvements for Elasticsearch tests ([#933](https://github.com/wazuh/wazuh-kibana-app/pull/933)).
+-   Updated some strings and descriptions on the _Settings_ tab ([#934](https://github.com/wazuh/wazuh-kibana-app/pull/934)).
+-   Changed the date format on _Settings > Logs_ to make it more human-readable ([#944](https://github.com/wazuh/wazuh-kibana-app/pull/944)).
+-   Changed some labels to remove the "MD5 sum" expression, it will use "Checksum" instead ([#945](https://github.com/wazuh/wazuh-kibana-app/pull/945)).
+-   Added word wrapping class to group name in _Management > Groups > Group detail_ tab ([#945](https://github.com/wazuh/wazuh-kibana-app/pull/945)).
+-   The `wz-table` directive has been refactored ([#953](https://github.com/wazuh/wazuh-kibana-app/pull/953)).
+-   The `wz-table` directive now checks if a request is aborted ([#979](https://github.com/wazuh/wazuh-kibana-app/pull/979)).
+-   Several performance improvements ([#985](https://github.com/wazuh/wazuh-kibana-app/pull/985), [#997](https://github.com/wazuh/wazuh-kibana-app/pull/997), [#1000](https://github.com/wazuh/wazuh-kibana-app/pull/1000)).
+
+### Fixed
+
+-   Several known fields for _Whodata_ functionality have been fixed ([#901](https://github.com/wazuh/wazuh-kibana-app/pull/901)).
+-   Fixed alignment bug with the _Add a filter +_ button on _Discover_ and _Agents_ tabs ([#912](https://github.com/wazuh/wazuh-kibana-app/pull/912)).
+-   Fixed a bug where the `Add API` form on _Settings_ didn't appear when pressing the button after editing an existing API entry ([#944](https://github.com/wazuh/wazuh-kibana-app/pull/944)).
+-   Fixed a bug on _Ruleset_ tab where the "Description" column was showing `0` if the rule doesn't have any description ([#948](https://github.com/wazuh/wazuh-kibana-app/pull/948)).
+-   Fixed wrong alignment on related Rules/Decoders tables from _Management > Ruleset_ tab ([#971](https://github.com/wazuh/wazuh-kibana-app/pull/971)).
+-   Fixed a bug where sometimes the error messages appeared duplicated ([#971](https://github.com/wazuh/wazuh-kibana-app/pull/971)).
+
+### Removed
+
+-   On the _Management > Monitoring_ tab, the `Cluster enabled but not running` message won't appear as an error anymore ([#971](https://github.com/wazuh/wazuh-kibana-app/pull/971)).
+
 ## Wazuh v3.6.1 - Kibana v6.4.1 / v6.4.2 / v6.4.3 - Revision 412
 
 ### Added

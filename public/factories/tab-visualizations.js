@@ -17,14 +17,15 @@ export class TabVisualizations {
       general: 7,
       fim: 7,
       pm: 4,
-      vuls: 7,
+      vuls: 10,
       oscap: 13,
       ciscat: 11,
       audit: 15,
       gdpr: 3,
       pci: 3,
       virustotal: 6,
-      configuration: 0
+      configuration: 0,
+      osquery: 5
     };
 
     this.overview = {
@@ -32,14 +33,15 @@ export class TabVisualizations {
       general: 11,
       fim: 8,
       pm: 5,
-      vuls: 8,
+      vuls: 10,
       oscap: 11,
       ciscat: 11,
       audit: 15,
       pci: 6,
       gdpr: 6,
-      aws: 10,
-      virustotal: 7
+      aws: 6,
+      virustotal: 7,
+      osquery: 5
     };
 
     this.tabVisualizations = {};

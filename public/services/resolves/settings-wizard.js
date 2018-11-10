@@ -14,7 +14,6 @@ import { healthCheck } from './health-check';
 import { totalRAM } from './check-ram';
 
 export function settingsWizard(
-  $rootScope,
   $location,
   $q,
   $window,
@@ -23,29 +22,31 @@ export function settingsWizard(
   genericReq,
   errorHandler,
   wzMisc,
-  wazuhConfig
+  wazuhConfig,
+  disableErrors = false
 ) {
   try {
     const deferred = $q.defer();
 
-    !$location.path().includes('health-check') &&
-      totalRAM(genericReq, errorHandler);
+    !disableErrors && totalRAM(genericReq, errorHandler);
 
     const checkResponse = data => {
       let fromElastic = false;
       if (parseInt(data.data.error) === 2) {
-        errorHandler.handle(
-          'Wazuh App: Please set up Wazuh API credentials.',
-          'Routes',
-          true
-        );
+        !disableErrors &&
+          errorHandler.handle(
+            'Wazuh App: Please set up Wazuh API credentials.',
+            'Routes',
+            true
+          );
       } else if (
         JSON.stringify(data).includes('socket hang up') ||
         (data && data.data && data.data.apiIsDown) ||
         (data && data.data && data.data.data && data.data.data.apiIsDown)
       ) {
         wzMisc.setApiIsDown(true);
-        errorHandler.handle('Wazuh RESTful API seems to be down.', 'Routes');
+        !disableErrors &&
+          errorHandler.handle('Wazuh RESTful API seems to be down.', 'Routes');
       } else {
         fromElastic = true;
         wzMisc.setBlankScr(errorHandler.handle(data, 'Routes'));
@@ -67,10 +68,11 @@ export function settingsWizard(
           parseInt(data.data.error) === 7 &&
           data.data.message === '401 Unauthorized'
         ) {
-          errorHandler.handle(
-            'Wrong Wazuh API credentials, please add a new API and/or modify the existing one.',
-            'Routes'
-          );
+          !disableErrors &&
+            errorHandler.handle(
+              'Wrong Wazuh API credentials, please add a new API and/or modify the existing one.',
+              'Routes'
+            );
           $location.search('_a', null);
           $location.search('tab', 'api');
           $location.path('/settings');
@@ -122,7 +124,8 @@ export function settingsWizard(
           oscap: config['extensions.oscap'],
           ciscat: config['extensions.ciscat'],
           aws: config['extensions.aws'],
-          virustotal: config['extensions.virustotal']
+          virustotal: config['extensions.virustotal'],
+          osquery: config['extensions.osquery']
         };
         appState.setExtensions(currentApi, extensions);
       }
@@ -160,12 +163,13 @@ export function settingsWizard(
         .catch(error => {
           appState.removeCurrentAPI();
 
-          errorHandler.handle(error, 'Routes');
-          errorHandler.handle(
-            'Please insert a new Wazuh API or select an existing valid one.',
-            'Routes',
-            true
-          );
+          !disableErrors && errorHandler.handle(error, 'Routes');
+          !disableErrors &&
+            errorHandler.handle(
+              'Please insert a new Wazuh API or select an existing valid one.',
+              'Routes',
+              true
+            );
 
           $location.search('_a', null);
           $location.search('tab', 'api');
@@ -173,9 +177,16 @@ export function settingsWizard(
         });
     };
 
+    const currentParams = $location.search();
+    const targetedAgent =
+      currentParams && (currentParams.agent || currentParams.agent === '000');
+    const targetedRule =
+      currentParams && currentParams.tab === 'ruleset' && currentParams.ruleid;
     if (
-      !$location.path().includes('/health-check') &&
-      healthCheck($window, $rootScope)
+      !targetedAgent &&
+      !targetedRule &&
+      !disableErrors &&
+      healthCheck($window)
     ) {
       $location.path('/health-check');
       deferred.reject();
@@ -183,7 +194,7 @@ export function settingsWizard(
       // There's no cookie for current API
       if (!appState.getCurrentAPI()) {
         genericReq
-          .request('GET', '/api/wazuh-api/apiEntries')
+          .request('GET', '/elastic/apis')
           .then(data => {
             if (data.data.length > 0) {
               const apiEntries = data.data;
@@ -212,7 +223,7 @@ export function settingsWizard(
             }
           })
           .catch(error => {
-            errorHandler.handle(error, 'Routes');
+            !disableErrors && errorHandler.handle(error, 'Routes');
             wzMisc.setWizard(true);
             if (!$location.path().includes('/settings')) {
               $location.search('_a', null);
@@ -228,6 +239,6 @@ export function settingsWizard(
 
     return deferred.promise;
   } catch (error) {
-    errorHandler.handle(error, 'Routes');
+    !disableErrors && errorHandler.handle(error, 'Routes');
   }
 }

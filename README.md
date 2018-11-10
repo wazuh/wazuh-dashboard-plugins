@@ -25,8 +25,8 @@ Visualize and analyze Wazuh alerts stored in Elasticsearch using our Kibana app 
 
 ## Requisites
 
-- Wazuh HIDS 3.6.1
-- Wazuh RESTful API 3.6.1
+- Wazuh HIDS 3.7.0
+- Wazuh RESTful API 3.7.0
 - Kibana 6.4.3
 - Elasticsearch 6.4.3
 
@@ -35,7 +35,7 @@ Visualize and analyze Wazuh alerts stored in Elasticsearch using our Kibana app 
 Install the app
 
 ```
-/usr/share/kibana/bin/kibana-plugin install https://packages.wazuh.com/wazuhapp/wazuhapp-3.6.1_6.4.3.zip
+sudo -u kibana NODE_OPTIONS="--max-old-space-size=3072" /usr/share/kibana/bin/kibana-plugin install https://packages.wazuh.com/wazuhapp/wazuhapp-3.7.0_6.4.3.zip
 ```
 
 Restart Kibana
@@ -80,10 +80,17 @@ Remove generated bundles
 rm -rf /usr/share/kibana/optimize/bundles
 ```
 
+Update file permissions. This will avoid several errors prior to updating the app:
+
+```
+chown -R kibana:kibana /usr/share/kibana/optimize
+chown -R kibana:kibana /usr/share/kibana/plugins
+```
+
 Install the app
 
 ```
-/usr/share/kibana/bin/kibana-plugin install https://packages.wazuh.com/wazuhapp/wazuhapp-3.6.1_6.4.3.zip
+sudo -u kibana NODE_OPTIONS="--max-old-space-size=3072" /usr/share/kibana/bin/kibana-plugin install https://packages.wazuh.com/wazuhapp/wazuhapp-3.7.0_6.4.3.zip
 ```
 
 Restart Kibana
@@ -140,6 +147,9 @@ service kibana restart
 |      6.4.1     |       3.6.1       | /usr/share/kibana/bin/kibana-plugin install <https://packages.wazuh.com/wazuhapp/wazuhapp-3.6.1_6.4.1.zip> |
 |      6.4.2     |       3.6.1       | /usr/share/kibana/bin/kibana-plugin install <https://packages.wazuh.com/wazuhapp/wazuhapp-3.6.1_6.4.2.zip> |
 |      6.4.3     |       3.6.1       | /usr/share/kibana/bin/kibana-plugin install <https://packages.wazuh.com/wazuhapp/wazuhapp-3.6.1_6.4.3.zip> |
+|      6.4.2     |       3.7.0       | /usr/share/kibana/bin/kibana-plugin install <https://packages.wazuh.com/wazuhapp/wazuhapp-3.7.0_6.4.2.zip> |
+|      6.4.3     |       3.7.0       | /usr/share/kibana/bin/kibana-plugin install <https://packages.wazuh.com/wazuhapp/wazuhapp-3.7.0_6.4.3.zip> |
+
 
 ## Contribute
 

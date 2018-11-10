@@ -17,6 +17,7 @@ import { WazuhApiElasticRoutes } from './server/routes/wazuh-api-elastic';
 import { Monitoring } from './server/monitoring';
 import { WazuhApiRoutes } from './server/routes/wazuh-api';
 import { WazuhReportingRoutes } from './server/routes/wazuh-reporting';
+import { WazuhUtilsRoutes } from './server/routes/wazuh-utils';
 
 export function initApp(server) {
   Initialize(server);
@@ -25,4 +26,5 @@ export function initApp(server) {
   Monitoring(server, false);
   WazuhApiRoutes(server);
   WazuhReportingRoutes(server);
+  WazuhUtilsRoutes(server);
 }

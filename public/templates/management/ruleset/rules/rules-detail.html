@@ -11,7 +11,7 @@
     <!-- End back button, title and status indicator -->
 
     <!-- Rule information ribbon -->
-    <div layout="row">
+    <div layout="row" class="wz-padding-left-16">
         <md-card flex class="wz-metric-color wz-md-card">
             <md-card-content layout="row" class="wz-padding-metric">
                 <div flex="15" ng-if="currentRule.id" class="wz-text-truncatable">ID: <span class="wz-text-bold">{{currentRule.id}}</span></div>
@@ -27,7 +27,7 @@
     <!-- Rest of rule information -->
     <div layout="column" layout-align="start">
 
-        <div layout="row" layout-align="start stretch">
+        <div layout="row" class="wz-padding-left-16" layout-align="start stretch">
 
             <!-- Groups section -->
             <md-card ng-if="currentRule.groups.length > 0" flex class="wz-md-card">
@@ -122,7 +122,7 @@
 
         </div>
 
-        <div layout="row" layout-align="start stretch" ng-if="currentRule.pci.length > 0 || currentRule.gdpr.length > 0">
+        <div layout="row" class="wz-padding-left-16" layout-align="start stretch" ng-if="currentRule.pci.length > 0 || currentRule.gdpr.length > 0">
 
             <!-- PCI section -->
             <md-card ng-if="currentRule.pci.length > 0" flex class="wz-md-card">
@@ -154,7 +154,7 @@
 
         </div>
 
-        <div layout="row" layout-align="start stretch" ng-if="isArray(currentRule.details.regex) || isArray(currentRule.details.match) || isArray(currentRule.details.prematch)">
+        <div layout="row" class="wz-padding-left-16" layout-align="start stretch" ng-if="isArray(currentRule.details.regex) || isArray(currentRule.details.match) || isArray(currentRule.details.prematch)">
 
             <!-- Regex section -->
             <md-card flex class="wz-md-card" ng-if="isArray(currentRule.details.regex)">
@@ -201,7 +201,7 @@
         </div>
 
         <!-- Related rules section -->
-        <div layout="row" ng-if="currentRule">
+        <div layout="row" class="wz-padding-left-16" ng-if="currentRule">
             <h1 class="md-headline wz-headline"><i class="fa fa-fw fa-link" aria-hidden="true"></i> Related rules</h1>
         </div>
         <div layout="row" ng-if="currentRule" class="md-padding">

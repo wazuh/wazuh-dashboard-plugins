@@ -1183,6 +1183,15 @@ export const knownFields = [
     readFromDocValues: true
   },
   {
+    name: 'data.aws.requestParameters.instanceId',
+    type: 'string',
+    count: 0,
+    scripted: false,
+    searchable: true,
+    aggregatable: true,
+    readFromDocValues: true
+  },
+  {
     name: 'data.aws.requestParameters.instanceType',
     type: 'string',
     count: 0,
@@ -4857,7 +4866,7 @@ export const knownFields = [
     readFromDocValues: true
   },
   {
-    name: 'syscheck.audit.proccess.id',
+    name: 'syscheck.audit.process.id',
     type: 'string',
     count: 0,
     scripted: false,
@@ -4893,7 +4902,7 @@ export const knownFields = [
     readFromDocValues: true
   },
   {
-    name: 'syscheck.audit.proccess.name',
+    name: 'syscheck.audit.process.name',
     type: 'string',
     count: 0,
     scripted: false,
@@ -4902,7 +4911,7 @@ export const knownFields = [
     readFromDocValues: true
   },
   {
-    name: 'syscheck.audit.proccess.ppid',
+    name: 'syscheck.audit.process.ppid',
     type: 'string',
     count: 0,
     scripted: false,
@@ -5137,6 +5146,24 @@ export const knownFields = [
   },
   {
     name: 'data.type',
+    type: 'string',
+    count: 0,
+    scripted: false,
+    searchable: true,
+    aggregatable: true,
+    readFromDocValues: true
+  },
+  {
+    name: 'data.osquery.pack',
+    type: 'string',
+    count: 0,
+    scripted: false,
+    searchable: true,
+    aggregatable: true,
+    readFromDocValues: true
+  },
+  {
+    name: 'data.osquery.action',
     type: 'string',
     count: 0,
     scripted: false,

@@ -17,7 +17,7 @@ export function WazuhApiElasticRoutes(server) {
   // Save the given API into elasticsearch
   server.route({
     method: 'PUT',
-    path: '/api/wazuh-api/settings',
+    path: '/elastic/api',
     handler(req, reply) {
       return ctrl.saveAPI(req, reply);
     }
@@ -26,7 +26,7 @@ export function WazuhApiElasticRoutes(server) {
   // Update the given API into elasticsearch
   server.route({
     method: 'PUT',
-    path: '/api/wazuh-api/update-settings',
+    path: '/elastic/api-settings',
     handler(req, reply) {
       return ctrl.updateFullAPI(req, reply);
     }
@@ -35,7 +35,7 @@ export function WazuhApiElasticRoutes(server) {
   // Get Wazuh-API entries list (Multimanager) from elasticsearch index
   server.route({
     method: 'GET',
-    path: '/api/wazuh-api/apiEntries',
+    path: '/elastic/apis',
     handler(req, reply) {
       return ctrl.getAPIEntries(req, reply);
     }
@@ -44,7 +44,7 @@ export function WazuhApiElasticRoutes(server) {
   // Delete Wazuh-API entry (multimanager) from elasticsearch index
   server.route({
     method: 'DELETE',
-    path: '/api/wazuh-api/apiEntries/{id}',
+    path: '/elastic/apis/{id}',
     handler(req, reply) {
       return ctrl.deleteAPIEntries(req, reply);
     }
@@ -53,7 +53,7 @@ export function WazuhApiElasticRoutes(server) {
   // Set Wazuh-API as default (multimanager) on elasticsearch index
   server.route({
     method: 'PUT',
-    path: '/api/wazuh-api/apiEntries/{id}',
+    path: '/elastic/apis/{id}',
     handler(req, reply) {
       return ctrl.setAPIEntryDefault(req, reply);
     }
@@ -62,7 +62,7 @@ export function WazuhApiElasticRoutes(server) {
   // Update the API hostname
   server.route({
     method: 'PUT',
-    path: '/api/wazuh-api/updateApiHostname/{id}',
+    path: '/elastic/api-hostname/{id}',
     handler(req, reply) {
       return ctrl.updateAPIHostname(req, reply);
     }

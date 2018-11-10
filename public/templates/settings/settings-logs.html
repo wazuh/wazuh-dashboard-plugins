@@ -1,8 +1,8 @@
 <div layout="column" layout-align="start stretch" ng-if="tab === 'logs' && !load">
     <!-- Headline -->
     <div layout="column" layout-padding>
-        <span class="font-size-18"><i class="fa fa-fw fa-file-text-o" aria-hidden="true"></i> Last 20 Wazuh app logs</span>
-        <span class="md-subheader">Logs located at /usr/share/kibana/optimize/wazuh-logs/wazuhapp.log</span>
+        <span class="font-size-18"><i class="fa fa-fw fa-file-text-o" aria-hidden="true"></i> Wazuh Kibana plugin log messages</span>
+        <span class="md-subheader">Log file located at <span class="wz-text-monospace">/usr/share/kibana/optimize/wazuh-logs/wazuhapp.log</span></span>
     </div>
     <!-- End headline -->
 
@@ -26,7 +26,7 @@
             <tbody>
                 <tr class="wz-word-wrap" ng-repeat="item in logs">
                     <td>
-                       {{ item.date }}
+                       {{ item.date | date: "medium" }}
                     </td>
                     <td>
                         {{ item.level.toUpperCase() }}

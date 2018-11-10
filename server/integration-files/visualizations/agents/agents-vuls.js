@@ -11,7 +11,7 @@
  */
 export default [
   {
-    _id: 'Wazuh-App-Agents-VULS-Alerts-severity-over-time',
+    _id: 'Wazuh-App-Agents-vulnerability-Alerts-severity-over-time',
     _type: 'visualization',
     _source: {
       title: 'Alerts severity over time',
@@ -27,7 +27,7 @@ export default [
     }
   },
   {
-    _id: 'Wazuh-App-Agents-VULS-Alerts-summary',
+    _id: 'Wazuh-App-Agents-vulnerability-Alert-summary',
     _type: 'visualization',
     _source: {
       title: 'Alerts summary',
@@ -44,7 +44,7 @@ export default [
     }
   },
   {
-    _id: 'Wazuh-App-Agents-VULS-Top-5-affected-packages',
+    _id: 'Wazuh-App-Agents-vulnerability-Commonly-affected-packages',
     _type: 'visualization',
     _source: {
       title: 'Top 5 affected packages',
@@ -60,7 +60,7 @@ export default [
     }
   },
   {
-    _id: 'Wazuh-App-Agents-VULS-Metric-Critical-severity',
+    _id: 'Wazuh-App-Agents-vulnerability-Metric-Critical-severity',
     _type: 'visualization',
     _source: {
       title: 'Metric Critical severity',
@@ -106,7 +106,7 @@ export default [
     }
   },
   {
-    _id: 'Wazuh-App-Agents-VULS-Metric-High-severity',
+    _id: 'Wazuh-App-Agents-vulnerability-Metric-High-severity',
     _type: 'visualization',
     _source: {
       title: 'Metric High severity',
@@ -152,7 +152,7 @@ export default [
     }
   },
   {
-    _id: 'Wazuh-App-Agents-VULS-Metric-Medium-severity',
+    _id: 'Wazuh-App-Agents-vulnerability-Metric-Medium-severity',
     _type: 'visualization',
     _source: {
       title: 'Metric Medium severity',
@@ -198,7 +198,7 @@ export default [
     }
   },
   {
-    _id: 'Wazuh-App-Agents-VULS-Metric-Low-severity',
+    _id: 'Wazuh-App-Agents-vulnerability-Metric-Low-severity',
     _type: 'visualization',
     _source: {
       title: 'Metric Low severity',
@@ -244,12 +244,61 @@ export default [
     }
   },
   {
-    _id: 'Wazuh-App-Agents-VULS-Top-Agents-severity',
+    _id: 'Wazuh-App-Agents-vulnerability-Top-Agents-severity',
     _type: 'visualization',
     _source: {
       title: 'Top Agents severity',
       visState:
         '{"title":"Top Agents severity","type":"histogram","params":{"type":"histogram","grid":{"categoryLines":false,"style":{"color":"#eee"}},"categoryAxes":[{"id":"CategoryAxis-1","type":"category","position":"bottom","show":true,"style":{},"scale":{"type":"linear"},"labels":{"show":true,"truncate":100},"title":{}}],"valueAxes":[{"id":"ValueAxis-1","name":"LeftAxis-1","type":"value","position":"left","show":true,"style":{},"scale":{"type":"linear","mode":"normal"},"labels":{"show":true,"rotate":0,"filter":false,"truncate":100},"title":{"text":"Count"}}],"seriesParams":[{"show":"true","type":"histogram","mode":"stacked","data":{"label":"Count","id":"1"},"valueAxis":"ValueAxis-1","drawLinesBetweenPoints":true,"showCircles":true}],"addTooltip":true,"addLegend":true,"legendPosition":"right","times":[],"addTimeMarker":false},"aggs":[{"id":"1","enabled":true,"type":"count","schema":"metric","params":{}},{"id":"2","enabled":true,"type":"terms","schema":"segment","params":{"field":"agent.name","size":5,"order":"desc","orderBy":"1","customLabel":"Agent name"}},{"id":"3","enabled":true,"type":"terms","schema":"group","params":{"field":"data.vulnerability.severity","size":5,"order":"desc","orderBy":"1","customLabel":"Severity"}}]}',
+      uiStateJSON: '{}',
+      description: '',
+      version: 1,
+      kibanaSavedObjectMeta: {
+        searchSourceJSON:
+          '{"index":"wazuh-alerts","filter":[],"query":{"query":"","language":"lucene"}}'
+      }
+    }
+  },
+  {
+    _id: 'Wazuh-App-Agents-vulnerability-Most-common-rules',
+    _type: 'visualization',
+    _source: {
+      title: 'Most common rules',
+      visState:
+        '{"title":"Most common rules","type":"table","params":{"perPage":10,"showPartialRows":false,"showMetricsAtAllLevels":false,"sort":{"columnIndex":null,"direction":null},"showTotal":false,"totalFunc":"sum"},"aggs":[{"id":"1","enabled":true,"type":"count","schema":"metric","params":{}},{"id":"2","enabled":true,"type":"terms","schema":"bucket","params":{"field":"rule.id","size":5,"order":"desc","orderBy":"1","otherBucket":false,"otherBucketLabel":"Other","missingBucket":false,"missingBucketLabel":"Missing","customLabel":"Rule ID"}},{"id":"3","enabled":true,"type":"terms","schema":"bucket","params":{"field":"rule.description","size":1,"order":"desc","orderBy":"1","otherBucket":false,"otherBucketLabel":"Other","missingBucket":false,"missingBucketLabel":"Missing","customLabel":"Description"}}]}',
+      uiStateJSON:
+        '{"vis":{"params":{"sort":{"columnIndex":null,"direction":null}}}}',
+      description: '',
+      version: 1,
+      kibanaSavedObjectMeta: {
+        searchSourceJSON:
+          '{"index":"wazuh-alerts","filter":[],"query":{"query":"","language":"lucene"}}'
+      }
+    }
+  },
+  {
+    _id: 'Wazuh-App-Agents-vulnerability-Vulnerability-severity-distribution',
+    _type: 'visualization',
+    _source: {
+      title: 'Severity distribution',
+      visState:
+        '{"title":"Severity distribution","type":"pie","params":{"type":"pie","addTooltip":true,"addLegend":true,"legendPosition":"right","isDonut":true,"labels":{"show":false,"values":true,"last_level":true,"truncate":100}},"aggs":[{"id":"1","enabled":true,"type":"count","schema":"metric","params":{}},{"id":"2","enabled":true,"type":"terms","schema":"segment","params":{"field":"data.vulnerability.severity","size":5,"order":"desc","orderBy":"1","customLabel":"Severity"}}]}',
+      uiStateJSON: '{}',
+      description: '',
+      version: 1,
+      kibanaSavedObjectMeta: {
+        searchSourceJSON:
+          '{"index":"wazuh-alerts","filter":[],"query":{"query":"","language":"lucene"}}'
+      }
+    }
+  },
+  {
+    _id: 'Wazuh-App-Agents-vulnerability-Vulnerability-Most-common-CVEs',
+    _type: 'visualization',
+    _source: {
+      title: 'Most common CVEs',
+      visState:
+        '{"title":"Most common CVEs","type":"pie","params":{"type":"pie","addTooltip":true,"addLegend":true,"legendPosition":"right","isDonut":true,"labels":{"show":false,"values":true,"last_level":true,"truncate":100}},"aggs":[{"id":"1","enabled":true,"type":"count","schema":"metric","params":{}},{"id":"2","enabled":true,"type":"terms","schema":"segment","params":{"field":"data.vulnerability.cve","size":5,"order":"desc","orderBy":"1","customLabel":"CVE"}}]}',
       uiStateJSON: '{}',
       description: '',
       version: 1,

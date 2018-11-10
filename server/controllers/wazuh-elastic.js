@@ -12,7 +12,7 @@
 import { ElasticWrapper } from '../lib/elastic-wrapper';
 import { ErrorResponse } from './error-response';
 import { log } from '../logger';
-
+import { getConfiguration } from '../lib/get-configuration';
 import {
   AgentsVisualizations,
   OverviewVisualizations,
@@ -27,7 +27,6 @@ export class WazuhElasticCtrl {
   async getTimeStamp(req, reply) {
     try {
       const data = await this.wzWrapper.getWazuhVersionIndexAsSearch();
-
       if (
         data.hits &&
         data.hits.hits[0] &&
@@ -74,7 +73,12 @@ export class WazuhElasticCtrl {
         .filter(item => item.includes('[') && item.includes(']'));
       const pattern =
         lastChar === '*' ? req.params.pattern.slice(0, -1) : req.params.pattern;
-      const isIncluded = array.filter(item => item.includes(pattern));
+      const isIncluded = array.filter(item => {
+        item = item.slice(1, -1);
+        const lastChar = item[item.length - 1];
+        item = lastChar === '*' ? item.slice(0, -1) : item;
+        return item.includes(pattern) || pattern.includes(item);
+      });
 
       return isIncluded && Array.isArray(isIncluded) && isIncluded.length
         ? reply({
@@ -88,7 +92,7 @@ export class WazuhElasticCtrl {
             data: `No template found for ${req.params.pattern}`
           });
     } catch (error) {
-      log('GET /api/wazuh-elastic/template/{pattern}', error.message || error);
+      log('GET /elastic/template/{pattern}', error.message || error);
       return ErrorResponse(
         `Could not retrieve templates from Elasticsearch due to ${error.message ||
           error}`,
@@ -116,7 +120,7 @@ export class WazuhElasticCtrl {
             message: 'Index pattern not found'
           });
     } catch (error) {
-      log('GET /api/wazuh-elastic/pattern/{pattern}', error.message || error);
+      log('GET /elastic/index-patterns/{pattern}', error.message || error);
       return ErrorResponse(
         `Something went wrong retrieving index-patterns from Elasticsearch due to ${error.message ||
           error}`,
@@ -186,7 +190,7 @@ export class WazuhElasticCtrl {
         ? reply({ statusCode: 200, data: '' })
         : reply({ statusCode: 200, data: data.hits.hits[0]._source });
     } catch (error) {
-      log('GET /api/wazuh-elastic/setup', error.message || error);
+      log('GET /elastic/setup', error.message || error);
       return ErrorResponse(
         `Could not get data from elasticsearch due to ${error.message ||
           error}`,
@@ -254,6 +258,8 @@ export class WazuhElasticCtrl {
 
   async getlist(req, reply) {
     try {
+      const config = getConfiguration();
+
       const xpack = await this.wzWrapper.getPlugins();
 
       const isXpackEnabled =
@@ -275,8 +281,18 @@ export class WazuhElasticCtrl {
         throw new Error('There is no index pattern');
 
       if (data && data.hits && data.hits.hits) {
-        const list = this.validateIndexPattern(data.hits.hits);
-
+        let list = this.validateIndexPattern(data.hits.hits);
+        if (
+          config &&
+          config['ip.ignore'] &&
+          Array.isArray(config['ip.ignore']) &&
+          config['ip.ignore'].length
+        ) {
+          list = list.filter(
+            item =>
+              item && item.title && !config['ip.ignore'].includes(item.title)
+          );
+        }
         return reply({
           data:
             isXpackEnabled && !isSuperUser
@@ -289,7 +305,7 @@ export class WazuhElasticCtrl {
         "The Elasticsearch request didn't fetch the expected data"
       );
     } catch (error) {
-      log('GET /get-list', error.message || error);
+      log('GET /elastic/index-patterns', error.message || error);
       return ErrorResponse(error.message || error, 4006, 500, reply);
     }
   }
@@ -470,7 +486,7 @@ export class WazuhElasticCtrl {
 
       return reply({ acknowledge: true, output: output });
     } catch (error) {
-      log('GET /refresh-fields/{pattern}', error.message || error);
+      log('GET /elastic/known-fields/{pattern}', error.message || error);
       return ErrorResponse(error.message || error, 4008, 500, reply);
     }
   }

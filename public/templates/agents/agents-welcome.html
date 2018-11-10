@@ -19,9 +19,6 @@
                 <div class="wz-text-truncatable" flex>
                     IP: <span class="wz-text-bold">{{ agent.ip }}</span>
                 </div>
-                <div class="wz-text-truncatable" flex ng-if="agent.group">
-                    Group: <span class="wz-text-bold wz-text-link" ng-click="goGroups(agent)">{{ agent.group }}</span>
-                </div>
                 <div class="wz-text-truncatable" flex ng-if="agent.version">
                     Version: <span class="wz-text-bold">{{ agent.version }}</span>
                 </div>
@@ -30,6 +27,15 @@
                     <md-tooltip ng-if="agentOS.length > 25" md-direction="bottom" class="wz-tooltip">
                         Full OS name: {{ agentOS }}
                     </md-tooltip>
+                </div>
+            </md-card-content>
+        </md-card>
+    </div>
+    <div layout="row" layout-padding class="wz-padding-top-0 wz-padding-bottom-0">
+        <md-card flex class="wz-metric-color wz-md-card wz-no-padding">
+            <md-card-content layout="row" class="wz-padding-metric">
+                <div class="wz-word-break" flex ng-if="agent.group">
+                    Groups: <span ng-repeat="group in agent.group" class="wz-text-bold wz-text-link" ng-click="goGroups(agent,$index)">{{ group }}&nbsp;</span>
                 </div>
             </md-card-content>
         </md-card>
@@ -139,6 +145,11 @@
                                 ng-if="extensions.virustotal" class="euiFlexItem" logo="'icons/app_saved_objects.svg'"
                                 title="'VirusTotal'" switch-tab="switchTab('virustotal')" current-tab="'virustotal'"
                                 description="TabDescription.virustotal.description"
+                            ></wz-welcome-card>
+                            <wz-welcome-card
+                                ng-if="extensions.osquery" class="euiFlexItem" logo="'icons/osquery.png'"
+                                title="'Osquery'" switch-tab="switchTab('osquery')" current-tab="'osquery'"
+                                description="TabDescription.osquery.description"
                             ></wz-welcome-card>
                         </div>
                     </div>
