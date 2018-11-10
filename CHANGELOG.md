@@ -2,12 +2,12 @@
 
 All notable changes to the Wazuh app project will be documented in this file.
 
-## Wazuh v3.7.0 - Kibana v6.4.3 - Revision 413
+## Wazuh v3.7.0 - Kibana v6.4.2 / v6.4.3 - Revision 413
 
 ### Added
 
 -   Support for Wazuh v3.7.0.
--   Support for Elastic Stack v6.4.3.
+-   Support for Elastic Stack v6.4.2 / v6.4.3.
 -   Brand-new interface for _Configuration_ (on both _Management_ and _Agents_ tabs) ([#914](https://github.com/wazuh/wazuh-kibana-app/pull/914)):
     -   Now you can check current and real agent and manager configuration.
     -   A new interface design, with more useful information and easy to understand descriptions.
