@@ -36,10 +36,10 @@
 
   <main class="container-fluid" ng-show="tabView !== 'cluster-monitoring'">
     <div class="row">
-      <filter-bar
+      <filter-bar-w
         state="state"
         index-patterns="[indexPattern]"
-      ></filter-bar>
+      ></filter-bar-w>
     </div>
     <div class="row" ng-if="tabView === 'discover'">
       <div class="col-md-2 sidebar-container collapsible-sidebar" id="discover-sidebar">
