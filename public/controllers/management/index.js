@@ -18,6 +18,7 @@ import { LogsController } from './logs';
 import { ManagementController } from './management';
 import { RulesController } from './rules';
 import { StatusController } from './status';
+import { ClusterController } from './monitoring';
 
 const app = uiModules.get('app/wazuh', []);
 
@@ -28,4 +29,5 @@ app
   .controller('groupsPreviewController', GroupsController)
   .controller('managerLogController', LogsController)
   .controller('rulesController', RulesController)
-  .controller('managerStatusController', StatusController);
+  .controller('managerStatusController', StatusController)
+  .controller('monitoringController', ClusterController);
