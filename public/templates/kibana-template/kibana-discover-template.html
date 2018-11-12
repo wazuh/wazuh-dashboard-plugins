@@ -5,7 +5,7 @@
     <div data-transclude-slots>
       <!-- Breadcrumbs. -->
       <div data-transclude-slot="topLeftCorner" class="kuiLocalBreadcrumbs">
-        <h1 tabindex="0" id="kui_local_breadcrumb" class="kuiLocalBreadcrumb">
+        <h1 tabindex="0" id="kui_local_breadcrumb" class="kuiLocalBreadcrumb" ng-show="tabView === 'discover'">
           <span ng-show="opts.savedSearch.id" class="kuiLocalBreadcrumb__emphasis">
             <span data-test-subj="discoverCurrentQuery" ng-bind="opts.savedSearch.lastSavedTitle"></span>
             <span
@@ -23,7 +23,7 @@
       </div>
 
       <!-- Search. -->
-      <div data-transclude-slot="bottomRow" class="fullWidth">
+      <div data-transclude-slot="bottomRow" class="fullWidth" ng-show="tabView !== 'cluster-monitoring'">
         <query-bar
           query="state.query"
           on-submit="updateQueryAndFetch"
@@ -34,14 +34,14 @@
     </div>
   </wz-kbn-top-nav>
 
-  <main class="container-fluid">
+  <main class="container-fluid" ng-show="tabView !== 'cluster-monitoring'">
     <div class="row">
       <filter-bar
         state="state"
         index-patterns="[indexPattern]"
       ></filter-bar>
     </div>
-    <div class="row">
+    <div class="row" ng-if="tabView === 'discover'">
       <div class="col-md-2 sidebar-container collapsible-sidebar" id="discover-sidebar">
         <disc-field-chooser
           class="dscFieldChooser"
