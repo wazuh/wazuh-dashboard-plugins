@@ -43,11 +43,11 @@
         <!-- White space between filters and Realtime button -->
         <span flex></span>
 
-        <md-button ng-if="!realtime" class="wz-button md-raised md-primary no-margin-right" ng-click="ctrl.playRealtime()" aria-label="Play realtime button">
+        <md-button ng-if="!ctrl.realtime" class="wz-button md-raised md-primary no-margin-right" ng-click="ctrl.playRealtime()" aria-label="Play realtime button">
             <i class="fa fa-play fa-fw" aria-hidden="true"></i>
             Play realtime
         </md-button>
-        <md-button ng-if="realtime" class="wz-button md-raised md-primary no-margin-right" ng-click="ctrl.stopRealtime()" aria-label="Stop realtime button">
+        <md-button ng-if="ctrl.realtime" class="wz-button md-raised md-primary no-margin-right" ng-click="ctrl.stopRealtime()" aria-label="Stop realtime button">
             <i class="fa fa-stop fa-fw" aria-hidden="true"></i>
             Stop realtime
         </md-button>

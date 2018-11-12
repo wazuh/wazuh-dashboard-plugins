@@ -16,7 +16,7 @@
         <md-button class="wz-report-refresh-btn" ng-click="ctrl.refreshLogs()"><i class="fa fa-fw fa-refresh"></i> Refresh</md-button>
     </div>
 
-    <div layout="row" class="md-padding" ng-show="!loadingLogs">
+    <div layout="row" class="md-padding" ng-show="!ctrl.loadingLogs">
         <table class="table table-striped table-condensed" style="table-layout: fixed !important" id="wz_table">
             <thead class="wz-text-bold">
                 <th class="wz-text-left col-lg-2"  >Date</th>
