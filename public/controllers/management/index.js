@@ -30,4 +30,4 @@ app
   .controller('managerLogController', LogsController)
   .controller('rulesController', RulesController)
   .controller('managerStatusController', StatusController)
-  .controller('monitoringController', ClusterController);
+  .controller('clusterController', ClusterController);
