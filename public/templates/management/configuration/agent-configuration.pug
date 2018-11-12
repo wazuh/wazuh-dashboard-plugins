@@ -1,32 +1,19 @@
-//-include ./agent-configuration.head
-
+include ./agent-configuration.head
 include ./welcome.html
-
 include ./global-configuration/global-configuration.pug
-//- include ./cluster/cluster.html
-//- include ./registration-service/registration-service.html
-//- include ./ruleset/ruleset.pug
 include ./client/client.html
 include ./client-buffer/client-buffer.html
 
 include ./alerts/alerts.pug
-//- include ./integrations/integrations.html
-//- include ./database-output/database-output.html
 
 include ./policy-monitoring/policy-monitoring.pug
 include ./open-scap/open-scap.pug
 include ./cis-cat/cis-cat.pug
-
-//- include ./vulnerabilities/vulnerabilities.pug
 include ./osquery/osquery.html
 include ./inventory/inventory.html
 include ./active-response/agents-active-response.pug
 include ./wazuh-commands/wazuh-commands.html
-
 include ./integrity-monitoring/integrity-monitoring.pug
 include ./log-collection/log-collection.pug
-//- include ./agentless/agentless.html
-
-//- include ./amazon-s3/amazon-s3.pug
 
 include ../../footer.foot
