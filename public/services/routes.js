@@ -23,16 +23,16 @@ import {
 } from './resolves';
 
 // HTML templates
-import healthCheckTemplate from 'pug-loader!../templates/health-check/health-check.html';
-import agentsTemplate from 'pug-loader!../templates/agents/agents.jade';
-import agentsPrevTemplate from 'pug-loader!../templates/agents-prev/agents-prev.jade';
-import managementTemplate from 'pug-loader!../templates/management/management.jade';
-import overviewTemplate from 'pug-loader!../templates/overview/overview.jade';
-import discoverTemplate from 'pug-loader!../templates/discover/discover.jade';
-import settingsTemplate from 'pug-loader!../templates/settings/settings.jade';
-import blankScreenTemplate from 'pug-loader!../templates/error-handler/blank-screen.html';
-import devToolsTemplate from 'pug-loader!../templates/dev-tools/dev-tools.html';
-import monitoringTemplate from 'pug-loader!../templates/monitoring/monitoring.jade';
+import healthCheckTemplate from '../templates/health-check/health-check.html';
+import agentsTemplate from '../templates/agents/agents.pug';
+import agentsPrevTemplate from '../templates/agents-prev/agents-prev.pug';
+import managementTemplate from '../templates/management/management.pug';
+import overviewTemplate from '../templates/overview/overview.pug';
+import discoverTemplate from '../templates/discover/discover.pug';
+import settingsTemplate from '../templates/settings/settings.pug';
+import blankScreenTemplate from '../templates/error-handler/blank-screen.html';
+import devToolsTemplate from '../templates/dev-tools/dev-tools.html';
+import monitoringTemplate from '../templates/monitoring/monitoring.pug';
 
 const assignPreviousLocation = ($rootScope, $location) => {
   const path = $location.path();
