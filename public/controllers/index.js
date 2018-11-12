@@ -16,4 +16,3 @@ import './agent';
 import './settings';
 import './dev-tools';
 import './misc';
-import './monitoring';

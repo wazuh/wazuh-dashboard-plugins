@@ -1,8 +1,26 @@
-<div layout="column" ng-controller="clusterController">
-
-    <wz-menu ng-init="menuNavItem = 'wazuh-monitoring'"></wz-menu>
-
+<div layout="column" ng-controller="clusterController" ng-if="tab === 'monitoring'">
     <div flex layout="column" ng-show="!isClusterEnabled || !isClusterRunning">
+
+        <!-- Cluster disabled breadcrumbs -->
+        <div layout="row" layout-align="start center">
+            <div layout="row" layout-padding>
+                <div>
+                    <span class="wz-text-link cursor-pointer" ng-click="switchTab('welcome')">Management</span>
+                    <span> / </span>
+                    <span>{{ tabNames[tab] }}</span>
+                </div>
+            </div>
+        </div>
+        <!-- End cluster disabled breadcrumbs -->
+
+        <!-- Status and reports navigation bar -->
+        <md-nav-bar class="wz-nav-bar" ng-show="tab !== 'welcome'" md-selected-nav-item="tab" nav-bar-aria-label="Status and reports navigation links">
+            <md-nav-item class="wz-nav-item" md-nav-click="switchTab('status')" name="status">Status</md-nav-item>
+            <md-nav-item class="wz-nav-item" md-nav-click="switchTab('logs')" name="logs">Logs</md-nav-item>
+            <md-nav-item class="wz-nav-item" md-nav-click="switchTab('monitoring')" name="monitoring">Monitoring</md-nav-item>
+            <md-nav-item class="wz-nav-item" md-nav-click="switchTab('reporting')" name="reporting">Reporting</md-nav-item>
+        </md-nav-bar>
+        <!-- End status and reports navigation bar -->
 
         <!-- Headline -->
         <div layout="column" layout-padding>
@@ -57,25 +75,33 @@
         <div layout="row" layout-align="start center" ng-if="!loading">
             <div layout="row" layout-padding>
                 <div ng-if="!showConfig && !showNodes">
-                    <span class="wz-text-link cursor-pointer" ng-click="goBack()">Monitoring</span>
+                    <span class="wz-text-link cursor-pointer" ng-click="switchTab('welcome')">Management</span>
+                    <span> / </span>
+                    <span>{{ tabNames[tab] }}</span>
                     <span> / </span>
                     <span>{{ currentAPI }}</span>
                 </div>
                 <div ng-if="showConfig">
-                    <span class="wz-text-link cursor-pointer" ng-click="goBack()">Monitoring</span>
+                    <span class="wz-text-link cursor-pointer" ng-click="switchTab('welcome')">Management</span>
+                    <span> / </span>
+                    <span class="wz-text-link cursor-pointer" ng-click="goBack()">{{ tabNames[tab] }}</span>
                     <span> / </span>
                     <span class="wz-text-link cursor-pointer" ng-click="goBack()">{{ currentAPI }}</span>
                     <span> / Overview</span>
                 </div>
                 <div ng-if="showNodes && !currentNode">
-                    <span class="wz-text-link cursor-pointer" ng-click="goBack()">Monitoring</span>
+                    <span class="wz-text-link cursor-pointer" ng-click="switchTab('welcome')">Management</span>
+                    <span> / </span>
+                    <span class="wz-text-link cursor-pointer" ng-click="goBack()">{{ tabNames[tab] }}</span>
                     <span> / </span>
                     <span class="wz-text-link cursor-pointer" ng-click="goBack()">{{ currentAPI }}</span>
                     <span> / </span>
                     <span>Nodes</span>
                 </div>
                 <div ng-if="currentNode">
-                    <span class="wz-text-link cursor-pointer" ng-click="goBack()">Monitoring</span>
+                    <span class="wz-text-link cursor-pointer" ng-click="switchTab('welcome')">Management</span>
+                    <span> / </span>
+                    <span class="wz-text-link cursor-pointer" ng-click="goBack()">{{ tabNames[tab] }}</span>
                     <span> / </span>
                     <span class="wz-text-link cursor-pointer" ng-click="goBack()">{{ currentAPI }}</span>
                     <span> / </span>
@@ -86,6 +112,16 @@
             </div>
         </div>
         <!-- End navigation section -->
+
+        <!-- Status and reports navigation bar -->
+        <md-nav-bar ng-if="!loading" class="wz-nav-bar" ng-show="tab !== 'welcome'" md-selected-nav-item="tab"
+            nav-bar-aria-label="Status and reports navigation links">
+            <md-nav-item class="wz-nav-item" md-nav-click="switchTab('status')" name="status">Status</md-nav-item>
+            <md-nav-item class="wz-nav-item" md-nav-click="switchTab('logs')" name="logs">Logs</md-nav-item>
+            <md-nav-item class="wz-nav-item" md-nav-click="switchTab('monitoring')" name="monitoring">Monitoring</md-nav-item>
+            <md-nav-item class="wz-nav-item" md-nav-click="switchTab('reporting')" name="reporting">Reporting</md-nav-item>
+        </md-nav-bar>
+        <!-- End status and reports navigation bar -->
 
         <!-- Headline -->
         <div ng-show="!loading" layout="column" layout-padding>
