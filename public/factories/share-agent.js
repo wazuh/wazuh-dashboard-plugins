@@ -22,7 +22,7 @@ export class ShareAgent {
   }
 
   getSelectedGroup() {
-    if (this.agent && this.agent.group && this.selectedGroup) {
+    if (this.agent && this.agent.group && (this.selectedGroup || this.selectedGroup === 0)) {
       return this.agent.group[this.selectedGroup];
     }
     return null;
