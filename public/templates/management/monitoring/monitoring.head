@@ -5,26 +5,26 @@
         <div layout="row" layout-align="start center">
             <div layout="row" layout-padding>
                 <div>
-                    <span class="wz-text-link cursor-pointer" ng-click="switchTab('welcome')">Management</span>
+                    <span class="wz-text-link cursor-pointer" ng-click="mctrl.switchTab('welcome')">Management</span>
                     <span> / </span>
-                    <span>{{ tabNames[tab] }}</span>
+                    <span>{{ mctrl.tabNames[tab] }}</span>
                 </div>
             </div>
         </div>
         <!-- End cluster disabled breadcrumbs -->
 
         <!-- Status and reports navigation bar -->
-        <md-nav-bar class="wz-nav-bar" ng-show="tab !== 'welcome'" md-selected-nav-item="tab" nav-bar-aria-label="Status and reports navigation links">
-            <md-nav-item class="wz-nav-item" md-nav-click="switchTab('status')" name="status">Status</md-nav-item>
-            <md-nav-item class="wz-nav-item" md-nav-click="switchTab('logs')" name="logs">Logs</md-nav-item>
-            <md-nav-item class="wz-nav-item" md-nav-click="switchTab('monitoring')" name="monitoring">Monitoring</md-nav-item>
-            <md-nav-item class="wz-nav-item" md-nav-click="switchTab('reporting')" name="reporting">Reporting</md-nav-item>
+        <md-nav-bar class="wz-nav-bar" ng-show="mctrl.tab !== 'welcome'" md-selected-nav-item="mctrl.tab" nav-bar-aria-label="Status and reports navigation links">
+            <md-nav-item class="wz-nav-item" md-nav-click="mctrl.switchTab('status')" name="status">Status</md-nav-item>
+            <md-nav-item class="wz-nav-item" md-nav-click="mctrl.switchTab('logs')" name="logs">Logs</md-nav-item>
+            <md-nav-item class="wz-nav-item" md-nav-click="mctrl.switchTab('monitoring')" name="monitoring">Cluster</md-nav-item>
+            <md-nav-item class="wz-nav-item" md-nav-click="mctrl.switchTab('reporting')" name="reporting">Reporting</md-nav-item>
         </md-nav-bar>
         <!-- End status and reports navigation bar -->
 
         <!-- Headline -->
         <div layout="column" layout-padding>
-            <span class="font-size-18"><i class="fa fa-fw fa-search" aria-hidden="true"></i> Monitoring</span>
+            <span class="font-size-18"><i class="fa fa-fw fa-search" aria-hidden="true"></i> Cluster</span>
             <span class="md-subheader">Visualize your Wazuh cluster nodes and its agents</span>
         </div>
         <!-- End headline -->
@@ -75,33 +75,33 @@
         <div layout="row" layout-align="start center" ng-if="!loading">
             <div layout="row" layout-padding>
                 <div ng-if="!showConfig && !showNodes">
-                    <span class="wz-text-link cursor-pointer" ng-click="switchTab('welcome')">Management</span>
+                    <span class="wz-text-link cursor-pointer" ng-click="mctrl.switchTab('welcome')">Management</span>
                     <span> / </span>
-                    <span>{{ tabNames[tab] }}</span>
+                    <span>{{ mctrl.tabNames[mctrl.tab] }}</span>
                     <span> / </span>
                     <span>{{ currentAPI }}</span>
                 </div>
                 <div ng-if="showConfig">
-                    <span class="wz-text-link cursor-pointer" ng-click="switchTab('welcome')">Management</span>
+                    <span class="wz-text-link cursor-pointer" ng-click="mctrl.switchTab('welcome')">Management</span>
                     <span> / </span>
-                    <span class="wz-text-link cursor-pointer" ng-click="goBack()">{{ tabNames[tab] }}</span>
+                    <span class="wz-text-link cursor-pointer" ng-click="goBack()">{{ mctrl.tabNames[mctrl.tab] }}</span>
                     <span> / </span>
                     <span class="wz-text-link cursor-pointer" ng-click="goBack()">{{ currentAPI }}</span>
                     <span> / Overview</span>
                 </div>
                 <div ng-if="showNodes && !currentNode">
-                    <span class="wz-text-link cursor-pointer" ng-click="switchTab('welcome')">Management</span>
+                    <span class="wz-text-link cursor-pointer" ng-click="mctrl.switchTab('welcome')">Management</span>
                     <span> / </span>
-                    <span class="wz-text-link cursor-pointer" ng-click="goBack()">{{ tabNames[tab] }}</span>
+                    <span class="wz-text-link cursor-pointer" ng-click="goBack()">{{ mctrl.tabNames[mctrl.tab] }}</span>
                     <span> / </span>
                     <span class="wz-text-link cursor-pointer" ng-click="goBack()">{{ currentAPI }}</span>
                     <span> / </span>
                     <span>Nodes</span>
                 </div>
                 <div ng-if="currentNode">
-                    <span class="wz-text-link cursor-pointer" ng-click="switchTab('welcome')">Management</span>
+                    <span class="wz-text-link cursor-pointer" ng-click="mctrl.switchTab('welcome')">Management</span>
                     <span> / </span>
-                    <span class="wz-text-link cursor-pointer" ng-click="goBack()">{{ tabNames[tab] }}</span>
+                    <span class="wz-text-link cursor-pointer" ng-click="goBack()">{{ mctrl.tabNames[mctrl.tab] }}</span>
                     <span> / </span>
                     <span class="wz-text-link cursor-pointer" ng-click="goBack()">{{ currentAPI }}</span>
                     <span> / </span>
@@ -114,18 +114,18 @@
         <!-- End navigation section -->
 
         <!-- Status and reports navigation bar -->
-        <md-nav-bar ng-if="!loading" class="wz-nav-bar" ng-show="tab !== 'welcome'" md-selected-nav-item="tab"
+        <md-nav-bar ng-if="!loading" class="wz-nav-bar" ng-show="mctrl.tab !== 'welcome'" md-selected-nav-item="mctrl.tab"
             nav-bar-aria-label="Status and reports navigation links">
-            <md-nav-item class="wz-nav-item" md-nav-click="switchTab('status')" name="status">Status</md-nav-item>
-            <md-nav-item class="wz-nav-item" md-nav-click="switchTab('logs')" name="logs">Logs</md-nav-item>
-            <md-nav-item class="wz-nav-item" md-nav-click="switchTab('monitoring')" name="monitoring">Monitoring</md-nav-item>
-            <md-nav-item class="wz-nav-item" md-nav-click="switchTab('reporting')" name="reporting">Reporting</md-nav-item>
+            <md-nav-item class="wz-nav-item" md-nav-click="mctrl.switchTab('status')" name="status">Status</md-nav-item>
+            <md-nav-item class="wz-nav-item" md-nav-click="mctrl.switchTab('logs')" name="logs">Logs</md-nav-item>
+            <md-nav-item class="wz-nav-item" md-nav-click="mctrl.switchTab('monitoring')" name="monitoring">Cluster</md-nav-item>
+            <md-nav-item class="wz-nav-item" md-nav-click="mctrl.switchTab('reporting')" name="reporting">Reporting</md-nav-item>
         </md-nav-bar>
         <!-- End status and reports navigation bar -->
 
         <!-- Headline -->
         <div ng-show="!loading" layout="column" layout-padding>
-            <span class="font-size-18"><i class="fa fa-fw fa-search" aria-hidden="true"></i> Monitoring</span>
+            <span class="font-size-18"><i class="fa fa-fw fa-search" aria-hidden="true"></i> Cluster</span>
             <span class="md-subheader">Visualize your Wazuh cluster nodes and its agents</span>
         </div>
         <!-- End headline -->

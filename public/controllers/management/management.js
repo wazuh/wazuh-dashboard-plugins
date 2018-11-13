@@ -20,7 +20,7 @@ export class ManagementController {
     this.rulesetTab = 'rules';
     this.tabNames = TabNames;
     this.wazuhManagementTabs = ['ruleset', 'groups'];
-    this.statusReportsTabs = ['status', 'logs', 'reporting'];
+    this.statusReportsTabs = ['status', 'logs', 'reporting', 'monitoring'];
   }
 
   $onInit() {

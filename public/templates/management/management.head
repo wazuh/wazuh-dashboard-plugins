@@ -43,6 +43,7 @@
         nav-bar-aria-label="Status and reports navigation links">
         <md-nav-item class="wz-nav-item" md-nav-click="mctrl.switchTab('status')" name="status">Status</md-nav-item>
         <md-nav-item class="wz-nav-item" md-nav-click="mctrl.switchTab('logs')" name="logs">Logs</md-nav-item>
+        <md-nav-item class="wz-nav-item" md-nav-click="mctrl.switchTab('monitoring')" name="monitoring">Cluster</md-nav-item>
         <md-nav-item class="wz-nav-item" md-nav-click="mctrl.switchTab('reporting')" name="reporting">Reporting</md-nav-item>
     </md-nav-bar>
     <!-- End Status and reports navigation bar -->
