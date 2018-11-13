@@ -258,15 +258,15 @@ export class WazuhElasticCtrl {
 
   async getlist(req, reply) {
     try {
+      const plugins = await this.wzWrapper.getPlugins();
       const config = getConfiguration();
 
-      const xpack = await this.wzWrapper.getPlugins();
-
       const isXpackEnabled =
-        typeof XPACK_RBAC_ENABLED !== 'undefined' &&
-        XPACK_RBAC_ENABLED &&
-        typeof xpack === 'string' &&
-        xpack.includes('x-pack');
+        (typeof XPACK_RBAC_ENABLED !== 'undefined' &&
+          XPACK_RBAC_ENABLED &&
+          typeof plugins === 'string' &&
+          plugins.includes('x-pack')) ||
+        (typeof plugins === 'string' && plugins.includes('search-guard'));
 
       const isSuperUser =
         isXpackEnabled &&
