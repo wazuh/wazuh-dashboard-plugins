@@ -16,7 +16,6 @@ import { healthCheck } from './health-check';
 export function getIp(
   indexPatterns,
   $q,
-  $rootScope,
   $window,
   $location,
   Private,
@@ -84,7 +83,12 @@ export function getIp(
     }
   };
 
-  if (healthCheck($window, $rootScope)) {
+  const currentParams = $location.search();
+  const targetedAgent =
+    currentParams && (currentParams.agent || currentParams.agent === '000');
+  const targetedRule =
+    currentParams && currentParams.tab === 'ruleset' && currentParams.ruleid;
+  if (!targetedAgent && !targetedRule && healthCheck($window)) {
     deferred.reject();
     $location.path('/health-check');
   } else {

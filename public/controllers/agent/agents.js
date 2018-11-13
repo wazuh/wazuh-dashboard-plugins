@@ -25,7 +25,7 @@ import {
 } from '../../utils/agents-metrics';
 
 import { ConfigurationHandler } from '../../utils/config-handler';
-
+import { timefilter } from 'ui/timefilter';
 const app = uiModules.get('app/wazuh', []);
 
 class AgentsController {
@@ -67,8 +67,7 @@ class AgentsController {
     this.$scope.integrations = {};
     this.$scope.selectedItem = 0;
     this.targetLocation = null;
-
-    this.ignoredTabs = ['configuration', 'welcome', 'syscollector'];
+    this.ignoredTabs = ['syscollector', 'welcome', 'configuration'];
   }
 
   $onInit() {
@@ -280,6 +279,15 @@ class AgentsController {
 
   // Switch tab
   async switchTab(tab, force = false) {
+    if (this.ignoredTabs.includes(tab)) {
+      const timeFilterRefreshStatus = timefilter.getRefreshInterval();
+      const toggle =
+        timeFilterRefreshStatus &&
+        timeFilterRefreshStatus.value &&
+        !timeFilterRefreshStatus.pause;
+      if (toggle) timefilter.toggleRefresh();
+    }
+
     try {
       if (tab === 'pci') {
         const pciTabs = await this.commonData.getPCI();
@@ -325,7 +333,7 @@ class AgentsController {
           ? this.targetLocation.subTab
           : 'panels';
 
-      if (this.$scope.tab !== 'configuration') {
+      if (!this.ignoredTabs.includes(this.$scope.tab)) {
         this.$scope.switchSubtab(
           targetSubTab,
           true,
