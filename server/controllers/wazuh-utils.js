@@ -18,8 +18,7 @@ import simpleTail from 'simple-tail';
 import path from 'path';
 
 export class WazuhUtilsCtrl {
-  constructor() {
-  }
+  constructor() {}
 
   getConfigurationFile(req, reply) {
     try {

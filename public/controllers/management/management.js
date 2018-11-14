@@ -9,54 +9,31 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import { uiModules } from 'ui/modules';
 import { TabNames } from '../../utils/tab-names';
 
-const app = uiModules.get('app/wazuh', []);
-
-class Management {
-  constructor($scope, $rootScope, $routeParams, $location) {
+export class ManagementController {
+  constructor($scope, $location, shareAgent) {
     this.$scope = $scope;
-    this.$rootScope = $rootScope;
-    this.$routeParams = $routeParams;
     this.$location = $location;
-    this.$scope.tab = 'welcome';
-    this.$scope.rulesetTab = 'rules';
-    this.$scope.tabNames = TabNames;
-
-    this.$scope.wazuhManagementTabs = ['ruleset', 'groups'];
-    this.$scope.statusReportsTabs = [
-      'status',
-      'logs',
-      'monitoring',
-      'reporting'
-    ];
+    this.shareAgent = shareAgent;
+    this.tab = 'welcome';
+    this.rulesetTab = 'rules';
+    this.tabNames = TabNames;
+    this.wazuhManagementTabs = ['ruleset', 'groups'];
+    this.statusReportsTabs = ['status', 'logs', 'reporting', 'monitoring'];
   }
 
   $onInit() {
-    if (this.$routeParams.tab) {
-      this.$scope.tab = this.$routeParams.tab;
+    if (this.shareAgent.getAgent() && this.shareAgent.getSelectedGroup()) {
+      this.tab = 'groups';
+      this.switchTab(this.tab);
+      return;
     }
-
-    this.$scope.reloadGroups = () => this.reloadGroups();
-    this.$scope.reloadRuleset = () => this.reloadRuleset();
-
-    this.$scope.inArray = (item, array) => this.inArray(item, array);
-
-    this.$scope.switchTab = tab => this.switchTab(tab);
-    this.$scope.setRulesTab = tab => this.setRulesTab(tab);
-
-    this.$scope.$watch('tab', () => this.watchTab());
-  }
-
-  reloadGroups() {
-    this.$scope.tab = 'groups';
-    this.$scope.$broadcast('groupsIsReloaded');
-  }
-
-  reloadRuleset() {
-    this.$scope.tab = 'ruleset';
-    this.$scope.$broadcast('rulesetIsReloaded');
+    const location = this.$location.search();
+    if (location && location.tab) {
+      this.tab = location.tab;
+      this.switchTab(this.tab);
+    }
   }
 
   inArray(item, array) {
@@ -64,23 +41,26 @@ class Management {
   }
 
   switchTab(tab) {
-    this.$scope.tab = tab;
+    this.tab = tab;
+
+    if (this.tab === 'groups') {
+      this.$scope.$broadcast('groupsIsReloaded');
+    }
+
+    if (this.tab === 'ruleset') {
+      this.$scope.$broadcast('rulesetIsReloaded');
+      this.globalRuleSet = 'ruleset';
+      this.globalRulesetTab = this.rulesetTab;
+    } else {
+      this.globalRuleSet = false;
+      this.globalRulesetTab = false;
+    }
+
+    this.$location.search('tab', this.tab);
   }
 
   setRulesTab(tab) {
-    this.$scope.rulesetTab = tab;
-  }
-
-  watchTab() {
-    if (this.$scope.tab === 'ruleset') {
-      this.$rootScope.globalRuleSet = 'ruleset';
-      this.$rootScope.globalRulesetTab = this.$scope.rulesetTab;
-    } else {
-      delete this.$rootScope.globalRuleSet;
-      delete this.$rootScope.globalRulesetTab;
-    }
-    this.$location.search('tab', this.$scope.tab);
+    this.rulesetTab = tab;
+    this.globalRulesetTab = this.rulesetTab;
   }
 }
-
-app.controller('managementController', Management);

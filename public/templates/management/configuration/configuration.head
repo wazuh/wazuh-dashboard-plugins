@@ -1,4 +1,4 @@
-<div flex="auto" layout="column" ng-controller="managementConfigurationController" ng-if="tab === 'configuration'" ng-init="switchConfigurationTab('welcome')">
+<div flex="auto" layout="column" ng-controller="managementConfigurationController" ng-if="mctrl.tab === 'configuration'" ng-init="switchConfigurationTab('welcome')">
 
     <!-- Navigation section -->
     <div layout="row" layout-align="start center">
@@ -6,17 +6,17 @@
         <div layout="row" layout-padding>
             <!-- Welcome section -->
             <div ng-if="configurationTab === 'welcome'">
-                <span class="wz-text-link cursor-pointer" ng-click="switchTab('welcome')">Management</span>
+                <span class="wz-text-link cursor-pointer" ng-click="mctrl.switchTab('welcome')">Management</span>
                 <span> / </span>
-                <span>{{ tabNames[tab] }}</span>
+                <span>{{ mctrl.tabNames[mctrl.tab] }}</span>
             </div>
             <!-- First-level section -->
             <div ng-if="configurationTab !== 'welcome'">
-                <span class="wz-text-link cursor-pointer" ng-click="switchTab('welcome')">Management</span>
+                <span class="wz-text-link cursor-pointer" ng-click="mctrl.switchTab('welcome')">Management</span>
                 <span> / </span>
-                <span class="wz-text-link cursor-pointer" ng-click="switchConfigurationTab('welcome')">{{ tabNames[tab] }}</span>
+                <span class="wz-text-link cursor-pointer" ng-click="switchConfigurationTab('welcome')">{{ mctrl.tabNames[mctrl.tab] }}</span>
                 <span> / </span>
-                <span>{{ tabNames[configurationTab] }}</span>
+                <span>{{ mctrl.tabNames[configurationTab] }}</span>
             </div>
         </div>
         <!-- End breadcrumbs -->

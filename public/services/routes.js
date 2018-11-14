@@ -24,12 +24,12 @@ import {
 
 // HTML templates
 import healthCheckTemplate from '../templates/health-check/health-check.html';
-import agentsTemplate from '../templates/agents/agents.jade';
-import agentsPrevTemplate from '../templates/agents-prev/agents-prev.jade';
-import managementTemplate from '../templates/management/management.jade';
-import overviewTemplate from '../templates/overview/overview.jade';
-import discoverTemplate from '../templates/discover/discover.jade';
-import settingsTemplate from '../templates/settings/settings.jade';
+import agentsTemplate from '../templates/agents/agents.pug';
+import agentsPrevTemplate from '../templates/agents-prev/agents-prev.pug';
+import managementTemplate from '../templates/management/management.pug';
+import overviewTemplate from '../templates/overview/overview.pug';
+import discoverTemplate from '../templates/discover/discover.pug';
+import settingsTemplate from '../templates/settings/settings.pug';
 import blankScreenTemplate from '../templates/error-handler/blank-screen.html';
 import devToolsTemplate from '../templates/dev-tools/dev-tools.html';
 
@@ -82,7 +82,7 @@ function nestedResolve(
   assignPreviousLocation($rootScope, $location);
   const location = $location.path();
   return getWzConfig($q, genericReq, errorHandler, wazuhConfig).then(() =>
-    settingsWizard(      
+    settingsWizard(
       $location,
       $q,
       $window,
@@ -109,7 +109,7 @@ function savedSearch(
   return getSavedSearch(
     redirectWhenMissing,
     $location,
-    $window,    
+    $window,
     savedSearches,
     $route
   );

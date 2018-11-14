@@ -22,7 +22,10 @@ export class ShareAgent {
   }
 
   getSelectedGroup() {
-    return this.agent.group[this.selectedGroup];
+    if (this.agent && this.agent.group && (this.selectedGroup || this.selectedGroup === 0)) {
+      return this.agent.group[this.selectedGroup];
+    }
+    return null;
   }
 
   setAgent(ag, group) {
@@ -40,7 +43,7 @@ export class ShareAgent {
   }
 
   setTargetLocation(loc) {
-    if(!loc || typeof loc !== 'object') return;
+    if (!loc || typeof loc !== 'object') return;
     this.targetLocation = {};
     Object.assign(this.targetLocation, loc);
   }

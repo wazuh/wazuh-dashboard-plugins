@@ -9,11 +9,25 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import './management';
-import './configuration';
-import './status';
-import './logs';
-import './groups';
-import './rules';
-import './decoders';
-import './monitoring';
+
+import { uiModules } from 'ui/modules';
+import { GroupsController } from './groups';
+import { ConfigurationController } from './configuration';
+import { DecodersController } from './decoders';
+import { LogsController } from './logs';
+import { ManagementController } from './management';
+import { RulesController } from './rules';
+import { StatusController } from './status';
+import { ClusterController } from './monitoring';
+
+const app = uiModules.get('app/wazuh', []);
+
+app
+  .controller('managementController', ManagementController)
+  .controller('managementConfigurationController', ConfigurationController)
+  .controller('decodersController', DecodersController)
+  .controller('groupsPreviewController', GroupsController)
+  .controller('managerLogController', LogsController)
+  .controller('rulesController', RulesController)
+  .controller('managerStatusController', StatusController)
+  .controller('clusterController', ClusterController);

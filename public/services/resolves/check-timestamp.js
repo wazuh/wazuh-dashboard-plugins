@@ -11,10 +11,7 @@
  */
 export async function checkTimestamp(appState, genericReq, $location, wzMisc) {
   try {
-    const data = await genericReq.request(
-      'GET',
-      '/elastic/timestamp'
-    );
+    const data = await genericReq.request('GET', '/elastic/timestamp');
     const current = appState.getCreatedAt();
     if (data && data.data) {
       if (!current) appState.setCreatedAt(data.data.lastRestart);

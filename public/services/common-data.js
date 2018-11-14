@@ -144,10 +144,7 @@ export class CommonData {
   async getGDPR() {
     try {
       const gdprTabs = [];
-      const data = await this.genericReq.request(
-        'GET',
-        '/api/gdpr/all'
-      );
+      const data = await this.genericReq.request('GET', '/api/gdpr/all');
       if (!data.data) return [];
       for (const key in data.data) {
         gdprTabs.push({ title: key, content: data.data[key] });
@@ -161,10 +158,7 @@ export class CommonData {
   async getPCI() {
     try {
       const pciTabs = [];
-      const data = await this.genericReq.request(
-        'GET',
-        '/api/pci/all'
-      );
+      const data = await this.genericReq.request('GET', '/api/pci/all');
       if (!data.data) return [];
       for (const key in data.data) {
         pciTabs.push({ title: key, content: data.data[key] });

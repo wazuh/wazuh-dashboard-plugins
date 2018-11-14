@@ -9,12 +9,9 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import { uiModules } from 'ui/modules';
 import * as FileSaver from '../../services/file-saver';
 
-const app = uiModules.get('app/wazuh', []);
-
-class Logs {
+export class LogsController {
   constructor($scope, apiReq, errorHandler, csvReq, appState, wzTableFilter) {
     this.$scope = $scope;
     this.apiReq = apiReq;
@@ -22,9 +19,9 @@ class Logs {
     this.csvReq = csvReq;
     this.appState = appState;
     this.wzTableFilter = wzTableFilter;
-    this.$scope.nodeList = false;
-    this.$scope.type_log = 'all';
-    this.$scope.category = 'all';
+    this.nodeList = false;
+    this.type_log = 'all';
+    this.category = 'all';
   }
 
   /**
@@ -32,12 +29,6 @@ class Logs {
    */
   $onInit() {
     this.initialize();
-    this.$scope.search = term => this.search(term);
-    this.$scope.filter = filter => this.filter(filter);
-    this.$scope.playRealtime = () => this.playRealtime();
-    this.$scope.stopRealtime = () => this.stopRealtime();
-    this.$scope.downloadCsv = () => this.downloadCsv();
-    this.$scope.changeNode = node => this.changeNode(node);
   }
 
   /**
@@ -60,7 +51,7 @@ class Logs {
    * Starts real time mode
    */
   playRealtime() {
-    this.$scope.realtime = true;
+    this.realtime = true;
     this.$scope.$broadcast('wazuhPlayRealTime');
   }
 
@@ -68,7 +59,7 @@ class Logs {
    * Stops real time mode
    */
   stopRealtime() {
-    this.$scope.realtime = false;
+    this.realtime = false;
     this.$scope.$broadcast('wazuhStopRealTime');
   }
 
@@ -82,7 +73,9 @@ class Logs {
         'CSV'
       );
       const currentApi = JSON.parse(this.appState.getCurrentAPI()).id;
-      const path = this.$scope.selectedNode ? `/cluster/${this.$scope.selectedNode}/logs` : '/manager/logs';
+      const path = this.selectedNode
+        ? `/cluster/${this.selectedNode}/logs`
+        : '/manager/logs';
       const output = await this.csvReq.fetch(
         path,
         currentApi,
@@ -99,19 +92,21 @@ class Logs {
 
   async changeNode(node) {
     try {
-      this.$scope.type_log = 'all';
-      this.$scope.category = 'all';
-      this.$scope.selectedNode = node;
-      this.$scope.$broadcast('wazuhUpdateInstancePath', { path: `/cluster/${node}/logs` });
+      this.type_log = 'all';
+      this.category = 'all';
+      this.selectedNode = node;
+      this.$scope.$broadcast('wazuhUpdateInstancePath', {
+        path: `/cluster/${node}/logs`
+      });
       const summary = await this.apiReq.request(
         'GET',
         `/cluster/${node}/logs/summary`,
         {}
-      )
+      );
       const daemons = summary.data.data;
-      this.$scope.daemons = Object.keys(daemons).map(item => ({ title: item }));
+      this.daemons = Object.keys(daemons).map(item => ({ title: item }));
       if (!this.$scope.$$phase) this.$scope.$digest();
-    } catch(error) {
+    } catch (error) {
       this.errorHandler.handle(error, 'Logs');
     }
   }
@@ -121,32 +116,48 @@ class Logs {
    */
   async initialize() {
     try {
-      const clusterStatus = await this.apiReq.request('GET','/cluster/status',{});
-      const clusterEnabled = clusterStatus && clusterStatus.data && clusterStatus.data.data && clusterStatus.data.data.running === 'yes' && clusterStatus.data.data.enabled === 'yes'
-      
-      if(clusterEnabled) {
-        const nodeList = await this.apiReq.request('GET','/cluster/nodes',{});
-        if(nodeList && nodeList.data && nodeList.data.data && Array.isArray(nodeList.data.data.items)){
-          this.$scope.nodeList = nodeList.data.data.items.map(item => item.name).reverse();
-          this.$scope.selectedNode = nodeList.data.data.items.filter(item => item.type === 'master')[0].name
-        }
-      } 
-      
-      this.$scope.logsPath = clusterEnabled ? `/cluster/${this.$scope.selectedNode}/logs` : '/manager/logs'
-      
-      const data = clusterEnabled ?
-      await this.apiReq.request(
+      const clusterStatus = await this.apiReq.request(
         'GET',
-        `/cluster/${this.$scope.selectedNode}/logs/summary`,
-        {}
-      ):
-      await this.apiReq.request(
-        'GET',
-        '/manager/logs/summary',
+        '/cluster/status',
         {}
       );
+      const clusterEnabled =
+        clusterStatus &&
+        clusterStatus.data &&
+        clusterStatus.data.data &&
+        clusterStatus.data.data.running === 'yes' &&
+        clusterStatus.data.data.enabled === 'yes';
+
+      if (clusterEnabled) {
+        const nodeList = await this.apiReq.request('GET', '/cluster/nodes', {});
+        if (
+          nodeList &&
+          nodeList.data &&
+          nodeList.data.data &&
+          Array.isArray(nodeList.data.data.items)
+        ) {
+          this.nodeList = nodeList.data.data.items
+            .map(item => item.name)
+            .reverse();
+          this.selectedNode = nodeList.data.data.items.filter(
+            item => item.type === 'master'
+          )[0].name;
+        }
+      }
+
+      this.logsPath = clusterEnabled
+        ? `/cluster/${this.selectedNode}/logs`
+        : '/manager/logs';
+
+      const data = clusterEnabled
+        ? await this.apiReq.request(
+            'GET',
+            `/cluster/${this.selectedNode}/logs/summary`,
+            {}
+          )
+        : await this.apiReq.request('GET', '/manager/logs/summary', {});
       const daemons = data.data.data;
-      this.$scope.daemons = Object.keys(daemons).map(item => ({ title: item }));
+      this.daemons = Object.keys(daemons).map(item => ({ title: item }));
       if (!this.$scope.$$phase) this.$scope.$digest();
       return;
     } catch (error) {
@@ -155,6 +166,3 @@ class Logs {
     return;
   }
 }
-
-// Logs controller
-app.controller('managerLogController', Logs);

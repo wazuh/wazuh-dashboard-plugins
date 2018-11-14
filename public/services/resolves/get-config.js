@@ -41,11 +41,7 @@ export async function getWzConfig($q, genericReq, errorHandler, wazuhConfig) {
   };
 
   try {
-    const config = await genericReq.request(
-      'GET',
-      '/utils/configuration',
-      {}
-    );
+    const config = await genericReq.request('GET', '/utils/configuration', {});
 
     if (!config || !config.data || !config.data.data)
       throw new Error('No config available');

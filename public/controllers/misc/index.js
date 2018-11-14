@@ -9,6 +9,14 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import './blank-screen-controller';
-import './health-check';
-import './reporting';
+import { uiModules } from 'ui/modules';
+import { ReportingController } from './reporting';
+import { HealthCheck } from './health-check';
+import { BlankScreenController } from './blank-screen-controller';
+
+const app = uiModules.get('app/wazuh', []);
+
+app
+  .controller('reportingController', ReportingController)
+  .controller('healthCheck', HealthCheck)
+  .controller('blankScreenController', BlankScreenController);

@@ -181,7 +181,9 @@ app.directive('kbnVis', function() {
 
         if (currentCompleted >= 100) {
           $rootScope.rendered = true;
-        } else if ($scope.visID !== 'Wazuh-App-Overview-General-Agents-status') {
+        } else if (
+          $scope.visID !== 'Wazuh-App-Overview-General-Agents-status'
+        ) {
           $rootScope.rendered = false;
         }
         // Forcing a digest cycle

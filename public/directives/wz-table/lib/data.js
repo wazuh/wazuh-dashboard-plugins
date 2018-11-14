@@ -28,14 +28,13 @@ export async function searchData(
     $scope.wazuh_table_loading = false;
   } catch (error) {
     $scope.wazuh_table_loading = false;
-    $scope.error = `Error searching - ${error.message ||
-      error}.`;
+    $scope.error = `Error searching - ${error.message || error}.`;
     errorHandler.handle(
       `Error searching. ${error.message || error}`,
       'Data factory'
     );
   }
-  if(!$scope.$$phase) $scope.$digest();
+  if (!$scope.$$phase) $scope.$digest();
   return;
 }
 
@@ -73,6 +72,6 @@ export async function filterData(
       'Data factory'
     );
   }
-  if(!$scope.$$phase) $scope.$digest();
+  if (!$scope.$$phase) $scope.$digest();
   return;
 }
