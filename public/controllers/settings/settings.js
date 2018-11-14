@@ -69,6 +69,8 @@ export class SettingsController {
     if (location && location.tab) {
       this.tab = location.tab;
     }
+
+    this.savingApi = false;
   }
 
   $onInit() {
@@ -278,6 +280,11 @@ export class SettingsController {
   // Save settings function
   async saveSettings() {
     try {
+      if(this.savingApi) {
+        this.errorHandler.info('Please, wait for success message', 'Settings');
+        return;
+      }
+      this.savingApi = true;
       this.messageError = '';
       this.isEditing = false;
       const invalid = this.validator('formData');
@@ -285,6 +292,7 @@ export class SettingsController {
       if (invalid) {
         this.messageError = invalid;
         this.errorHandler.handle(invalid, 'Settings');
+        this.savingApi = false;
         return;
       }
 
@@ -385,8 +393,6 @@ export class SettingsController {
 
       await this.getSettings();
 
-      if (!this.$scope.$$phase) this.$scope.$digest();
-      return;
     } catch (error) {
       if (error.status === 400) {
         error.message =
@@ -394,6 +400,9 @@ export class SettingsController {
       }
       this.printError(error);
     }
+    this.savingApi = false;
+    if (!this.$scope.$$phase) this.$scope.$digest();
+    return;
   }
 
   isUpdating() {
@@ -406,12 +415,18 @@ export class SettingsController {
   // Update settings function
   async updateSettings(item) {
     try {
+      if(this.savingApi) {
+        this.errorHandler.info('Please, wait for success message', 'Settings');
+        return;
+      }
+      this.savingApi = true;
       this.messageErrorUpdate = '';
 
       const invalid = this.validator('formUpdate');
       if (invalid) {
         this.messageErrorUpdate = invalid;
         this.errorHandler.handle(invalid, 'Settings');
+        this.savingApi = false;
         return;
       }
 
@@ -450,11 +465,12 @@ export class SettingsController {
 
       this.errorHandler.info('The API was updated successfully', 'Settings');
 
-      if (!this.$scope.$$phase) this.$scope.$digest();
-      return;
     } catch (error) {
       this.printError(error, true);
     }
+    this.savingApi = false;
+    if (!this.$scope.$$phase) this.$scope.$digest();
+    return;
   }
 
   switch() {
