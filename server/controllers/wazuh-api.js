@@ -659,7 +659,8 @@ export class WazuhApiCtrl {
 
   requestApi(req, reply) {
     const configuration = getConfiguration();
-    const adminMode = configuration && configuration.admin;
+    const adminMode = !(configuration && typeof configuration.admin !== 'undefined' && !configuration.admin);
+
     if (!req.payload.method) {
       return ErrorResponse('Missing param: method', 3015, 400, reply);
     } else if (!req.payload.path) {

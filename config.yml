@@ -96,4 +96,4 @@
 #wazuh.monitoring.replicas: 1
 #
 # ------------------------------- App privileges --------------------------------
-#admin: false
+#admin: true
