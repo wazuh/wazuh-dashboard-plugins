@@ -2,6 +2,20 @@
 
 All notable changes to the Wazuh app project will be documented in this file.
 
+## Wazuh v3.7.0 - Kibana v6.5.0 - Revision 414
+
+### Added
+
+-   Support for Elastic Stack v6.5.0 ([#1023](https://github.com/wazuh/wazuh-kibana-app/pull/1023)).
+-   Agent groups bar is now visible on the agent configuration section ([#1023](https://github.com/wazuh/wazuh-kibana-app/pull/1023)).
+-   Added a new setting for the `config.yml` file for enable/disable administrator mode ([#1019](https://github.com/wazuh/wazuh-kibana-app/pull/1019)).
+    - This allows the user to perform PUT, POST, DELETE methods in our Dev Tools.
+
+### Changed
+
+-   Refactored most front-end controllers ([#1023](https://github.com/wazuh/wazuh-kibana-app/pull/1023)).
+
+
 ## Wazuh v3.7.0 - Kibana v6.4.2 / v6.4.3 - Revision 413
 
 ### Added
