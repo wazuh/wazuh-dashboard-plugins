@@ -37,7 +37,8 @@ export async function getWzConfig($q, genericReq, errorHandler, wazuhConfig) {
     'wazuh.monitoring.enabled': true,
     'wazuh.monitoring.frequency': 3600,
     'wazuh.monitoring.shards': 5,
-    'wazuh.monitoring.replicas': 1
+    'wazuh.monitoring.replicas': 1,
+    'admin': true
   };
 
   try {
