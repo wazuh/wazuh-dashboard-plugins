@@ -10,3 +10,8 @@ import './foldcode.js';
 import './foldgutter.js';
 import './search-cursor.js';
 import './mark-selection.js';
+
+import './show-hint.js';
+//import './javascript-hint.js';
+import './show-hint.css';
+//import './anyword-hint.js';
