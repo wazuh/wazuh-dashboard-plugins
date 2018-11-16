@@ -243,10 +243,8 @@ class DevToolsController {
 
   async getAvailableMethods() {
     try {
-      var response = await this.genericReq.request("GET", "/api/getRequestList", {});
-      if (!response.error) {
-        this.apiInputBox.model = response.data;
-      };
+      const response = await this.genericReq.request('GET', '/api/getRequestList', {});
+      this.apiInputBox.model = !response.error ? response.data : [];
     } catch (error) {
       this.apiInputBox.model = [];
     }
@@ -254,18 +252,18 @@ class DevToolsController {
 
   init() {
     this.apiInputBox.setSize('auto', '100%');
-    var ExcludedIntelliSenseTriggerKeys = {
-      "9": "tab", "13": "enter", "16": "shift", "17": "ctrl", "18": "alt", "19": "pause", "20": "capslock",
-      "27": "escape", "33": "pageup", "34": "pagedown", "35": "end", "36": "home", "37": "left", "38": "up",
-      "39": "right", "40": "down", "45": "insert", "91": "left window key", "92": "right window key", "93": "select",
-      "112": "f1", "113": "f2", "114": "f3", "115": "f4", "116": "f5", "117": "f6", "118": "f7", "119": "f8",
-      "120": "f9", "121": "f10", "122": "f11", "123": "f12", "144": "numlock", "145": "scrolllock"
+    const ExcludedIntelliSenseTriggerKeys = {
+      '9': 'tab', '13': 'enter', '16': 'shift', '17': 'ctrl', '18': 'alt', '19': 'pause', '20': 'capslock',
+      '27': 'escape', '33': 'pageup', '34': 'pagedown', '35': 'end', '36': 'home', '37': 'left', '38': 'up',
+      '39': 'right', '40': 'down', '45': 'insert', '91': 'left window key', '92': 'right window key', '93': 'select',
+      '112': 'f1', '113': 'f2', '114': 'f3', '115': 'f4', '116': 'f5', '117': 'f6', '118': 'f7', '119': 'f8',
+      '120': 'f9', '121': 'f10', '122': 'f11', '123': 'f12', '144': 'numlock', '145': 'scrolllock'
     };
     this.apiInputBox.model = [];
     this.getAvailableMethods();
-    this.apiInputBox.on("keyup", function (cm, e) {
+    this.apiInputBox.on('keyup', function (cm, e) {
       if (!ExcludedIntelliSenseTriggerKeys[(e.keyCode || e.which).toString()]) {
-        cm.execCommand("autocomplete", null, {
+        cm.execCommand('autocomplete', null, {
           completeSingle: false
         });
       }
@@ -289,29 +287,29 @@ class DevToolsController {
     CodeMirror.registerHelper('hint', 'dictionaryHint', function (editor) {
       const model = editor.model;
       function getDictionary(line, word) {
-        var hints = {};
-        var exp = line.split(/\s+/g);
+        let hints = {};
+        const exp = line.split(/\s+/g);
         if (exp[0] && exp[0].match(/^(?:GET|PUT|POST|DELETE).*$/)) {
-          var method = model.find(function (item) {
-            return item.method == exp[0]
+          let method = model.find(function (item) {
+            return item.method === exp[0]
           });
           if (method) {
             method.endpoints.forEach(function (endpoint) {
               endpoint.path = endpoint.name;
               if (endpoint.args && endpoint.args.length > 0) {
-                var argSubs = [];
+                let argSubs = [];
                 endpoint.args.forEach(function (arg) {
-                  var pathSplitted = endpoint.name.split("/");
-                  var arrayIdx = pathSplitted.indexOf(arg.name);
-                  var wordSplitted = word.split("/");
+                  const pathSplitted = endpoint.name.split('/');
+                  const arrayIdx = pathSplitted.indexOf(arg.name);
+                  const wordSplitted = word.split('/');
                   if (wordSplitted[arrayIdx] && wordSplitted[arrayIdx] != '') {
                     argSubs.push({
-                      "id": arg.name,
-                      "value": wordSplitted[arrayIdx]
+                      'id': arg.name,
+                      'value': wordSplitted[arrayIdx]
                     });
                   }
                 });
-                var auxPath = endpoint.name;
+                let auxPath = endpoint.name;
                 argSubs.forEach(function (arg) {
                   auxPath = auxPath.replace(arg.id, arg.value);
                 });
@@ -331,18 +329,17 @@ class DevToolsController {
         return hints.map(a => a);
       }
 
-      var cur = editor.getCursor();
-      var curLine = editor.getLine(cur.line);
-      var start = cur.ch;
-      var end = start;
-      while (end < curLine.length && !/\s/.test(curLine.charAt(end)))++end;
-      while (start && !/\s/.test(curLine.charAt(start - 1)))--start;
-      var curWord = start !== end && curLine.slice(start, end);
-      //var regex = new RegExp(curWord, 'i');
+      const cur = editor.getCursor();
+      const curLine = editor.getLine(cur.line);
+      let start = cur.ch;
+      let end = start;
+      const whiteSpace = /\s/;
+      while (end < curLine.length && !whiteSpace.test(curLine.charAt(end)))++end;
+      while (start && !whiteSpace.test(curLine.charAt(start - 1)))--start;
+      const curWord = start !== end && curLine.slice(start, end);
       return {
         list: (!curWord ? [] : getDictionary(curLine, curWord).filter(function (item) {
           return item.toUpperCase().includes(curWord.toUpperCase());
-          //return item.match(regex);
         })).sort(),
         from: CodeMirror.Pos(cur.line, start),
         to: CodeMirror.Pos(cur.line, end)
