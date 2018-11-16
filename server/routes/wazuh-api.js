@@ -87,4 +87,13 @@ export function WazuhApiRoutes(server) {
     }
   });
 
+  // Returns unique fields from the agents such OS, agent version ...
+  server.route({
+    method: 'GET',
+    path: '/api/getRequestList',
+    handler(req, res) {
+      return ctrl.getRequestList(req, res);
+    }
+  });
+
 }

@@ -18,9 +18,10 @@ import $ from 'jquery';
 const app = uiModules.get('app/wazuh', []);
 
 class DevToolsController {
-  constructor($scope, apiReq, $window, appState, errorHandler, $document) {
+  constructor($scope, apiReq, genericReq, $window, appState, errorHandler, $document) {
     this.$scope = $scope;
     this.apiReq = apiReq;
+    this.genericReq = genericReq;
     this.$window = $window;
     this.appState = appState;
     this.errorHandler = errorHandler;
@@ -28,12 +29,9 @@ class DevToolsController {
     this.groups = [];
     this.linesWithClass = [];
     this.widgets = [];
-    this.apiModel = {};
   }
 
   $onInit() {
-
-
     this.apiInputBox = CodeMirror.fromTextArea(
       this.$document[0].getElementById('api_input'),
       {
@@ -243,6 +241,17 @@ class DevToolsController {
     return affectedGroups;
   }
 
+  async getAvailableMethods() {
+    try {
+      var response = await this.genericReq.request("GET", "/api/getRequestList", {});
+      if (!response.error) {
+        this.apiInputBox.model = response.data;
+      };
+    } catch (error) {
+      this.apiInputBox.model = [];
+    }
+  }
+
   init() {
     this.apiInputBox.setSize('auto', '100%');
     var ExcludedIntelliSenseTriggerKeys = {
@@ -252,6 +261,8 @@ class DevToolsController {
       "112": "f1", "113": "f2", "114": "f3", "115": "f4", "116": "f5", "117": "f6", "118": "f7", "119": "f8",
       "120": "f9", "121": "f10", "122": "f11", "123": "f12", "144": "numlock", "145": "scrolllock"
     };
+    this.apiInputBox.model = [];
+    this.getAvailableMethods();
     this.apiInputBox.on("keyup", function (cm, e) {
       if (!ExcludedIntelliSenseTriggerKeys[(e.keyCode || e.which).toString()]) {
         cm.execCommand("autocomplete", null, {
@@ -276,8 +287,7 @@ class DevToolsController {
 
     // Register our custom Codemirror hint plugin.
     CodeMirror.registerHelper('hint', 'dictionaryHint', function (editor) {
-       var model = [{"method":"GET","endpoints":[{"name":"/agents","args":[]},{"name":"/agents/:agent_id","args":[{"name":":agent_id"}]},{"name":"/agents/:agent_id/config/:component/:configuration","args":[{"name":":agent_id"},{"name":":component"},{"name":":configuration"}]},{"name":"/agents/:agent_id/group/is_sync","args":[{"name":":agent_id"}]},{"name":"/agents/:agent_id/key","args":[{"name":":agent_id"}]},{"name":"/agents/:agent_id/upgrade_result","args":[{"name":":agent_id"}]},{"name":"/agents/groups","args":[]},{"name":"/agents/groups/:group_id","args":[{"name":":group_id"}]},{"name":"/agents/groups/:group_id/configuration","args":[{"name":":group_id"}]},{"name":"/agents/groups/:group_id/files","args":[{"name":":group_id"}]},{"name":"/agents/groups/:group_id/files/:filename","args":[{"name":":group_id"},{"name":":filename"}]},{"name":"/agents/name/:agent_name","args":[{"name":":agent_name"}]},{"name":"/agents/no_group","args":[]},{"name":"/agents/outdated","args":[]},{"name":"/agents/stats/distinct","args":[]},{"name":"/agents/summary","args":[]},{"name":"/agents/summary/os","args":[]},{"name":"/cache","args":[]},{"name":"/cache/config","args":[]},{"name":"/ciscat/:agent_id/results","args":[{"name":":agent_id"}]},{"name":"/cluster/:node_id/configuration","args":[{"name":":node_id"}]},{"name":"/cluster/:node_id/info","args":[{"name":":node_id"}]},{"name":"/cluster/:node_id/logs","args":[{"name":":node_id"}]},{"name":"/cluster/:node_id/logs/summary","args":[{"name":":node_id"}]},{"name":"/cluster/:node_id/stats","args":[{"name":":node_id"}]},{"name":"/cluster/:node_id/stats/hourly","args":[{"name":":node_id"}]},{"name":"/cluster/:node_id/stats/weekly","args":[{"name":":node_id"}]},{"name":"/cluster/:node_id/status","args":[{"name":":node_id"}]},{"name":"/cluster/config","args":[]},{"name":"/cluster/healthcheck","args":[]},{"name":"/cluster/node","args":[]},{"name":"/cluster/nodes","args":[]},{"name":"/cluster/nodes/:node_name","args":[{"name":":node_name"}]},{"name":"/cluster/status","args":[]},{"name":"/decoders","args":[]},{"name":"/decoders/:decoder_name","args":[{"name":":decoder_name"}]},{"name":"/decoders/files","args":[]},{"name":"/decoders/parents","args":[]},{"name":"/experimental/ciscat/results","args":[]},{"name":"/experimental/syscollector/hardware","args":[]},{"name":"/experimental/syscollector/netaddr","args":[]},{"name":"/experimental/syscollector/netiface","args":[]},{"name":"/experimental/syscollector/netproto","args":[]},{"name":"/experimental/syscollector/os","args":[]},{"name":"/experimental/syscollector/packages","args":[]},{"name":"/experimental/syscollector/ports","args":[]},{"name":"/experimental/syscollector/processes","args":[]},{"name":"/manager/configuration","args":[]},{"name":"/manager/info","args":[]},{"name":"/manager/logs","args":[]},{"name":"/manager/logs/summary","args":[]},{"name":"/manager/stats","args":[]},{"name":"/manager/stats/analysisd","args":[]},{"name":"/manager/stats/hourly","args":[]},{"name":"/manager/stats/remoted","args":[]},{"name":"/manager/stats/weekly","args":[]},{"name":"/manager/status","args":[]},{"name":"/rootcheck/:agent_id","args":[{"name":":agent_id"}]},{"name":"/rootcheck/:agent_id/cis","args":[{"name":":agent_id"}]},{"name":"/rootcheck/:agent_id/last_scan","args":[{"name":":agent_id"}]},{"name":"/rootcheck/:agent_id/pci","args":[{"name":":agent_id"}]},{"name":"/rules","args":[]},{"name":"/rules/:rule_id","args":[{"name":":rule_id"}]},{"name":"/rules/files","args":[]},{"name":"/rules/gdpr","args":[]},{"name":"/rules/groups","args":[]},{"name":"/rules/pci","args":[]},{"name":"/syscheck/:agent_id","args":[{"name":":agent_id"}]},{"name":"/syscheck/:agent_id/last_scan","args":[{"name":":agent_id"}]},{"name":"/syscollector/:agent_id/hardware","args":[{"name":":agent_id"}]},{"name":"/syscollector/:agent_id/netaddr","args":[{"name":":agent_id"}]},{"name":"/syscollector/:agent_id/netiface","args":[{"name":":agent_id"}]},{"name":"/syscollector/:agent_id/netproto","args":[{"name":":agent_id"}]},{"name":"/syscollector/:agent_id/os","args":[{"name":":agent_id"}]},{"name":"/syscollector/:agent_id/packages","args":[{"name":":agent_id"}]},{"name":"/syscollector/:agent_id/ports","args":[{"name":":agent_id"}]},{"name":"/syscollector/:agent_id/processes","args":[{"name":":agent_id"}]}]}];
-
+      const model = editor.model;
       function getDictionary(line, word) {
         var hints = {};
         var exp = line.split(/\s+/g);
