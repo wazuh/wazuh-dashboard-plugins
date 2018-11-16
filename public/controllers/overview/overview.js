@@ -245,7 +245,11 @@ export class OverviewController {
 
       if (this.tab === newTab && !force) return;
 
-      const sameTab = this.tab === newTab && force !== 'nav';
+      const sameTab =
+        ((this.tab === newTab && this.tabHistory.length < 2) ||
+          (this.tabHistory.length === 2 &&
+            this.tabHistory[0] === this.tabHistory[1])) &&
+        force !== 'nav';
 
       // Restore force value if we come from md-nav action
       if (force === 'nav') force = false;
