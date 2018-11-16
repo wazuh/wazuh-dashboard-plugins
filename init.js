@@ -18,13 +18,32 @@ import { Monitoring } from './server/monitoring';
 import { WazuhApiRoutes } from './server/routes/wazuh-api';
 import { WazuhReportingRoutes } from './server/routes/wazuh-reporting';
 import { WazuhUtilsRoutes } from './server/routes/wazuh-utils';
+import { log } from './server/logger';
 
 export function initApp(server) {
-  Initialize(server);
-  WazuhElasticRouter(server);
-  WazuhApiElasticRoutes(server);
-  Monitoring(server, false);
-  WazuhApiRoutes(server);
-  WazuhReportingRoutes(server);
-  WazuhUtilsRoutes(server);
+  log(
+    '[initApp]',
+    `Waiting for awaitMigration()`,
+    'info'
+  );
+  server.kibanaMigrator.awaitMigration()
+  .then(() => {
+    log(
+      '[initApp]',
+      `awaitMigration() has been executed successfully`,
+      'info'
+    );
+    Initialize(server);
+    WazuhElasticRouter(server);
+    WazuhApiElasticRoutes(server);
+    Monitoring(server, false);
+    WazuhApiRoutes(server);
+    WazuhReportingRoutes(server);
+    WazuhUtilsRoutes(server);
+  }).catch(error => {
+    log(
+      '[initApp]',
+      `initApp function failed due to: ${error.message || error}`
+    );
+  })
 }

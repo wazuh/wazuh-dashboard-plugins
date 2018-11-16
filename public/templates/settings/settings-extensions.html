@@ -1,4 +1,4 @@
-<div layout="column" layout-align="start stretch" ng-if="tab === 'extensions' && !load">
+<div layout="column" layout-align="start stretch" ng-if="ctrl.tab === 'extensions' && !ctrl.load">
 
     <!-- Headline -->
     <div layout="column" layout-padding>
@@ -13,7 +13,7 @@
         <!-- PCI DSS -->
         <md-card flex="45" layout="column" class="wz-md-card">
             <md-card-content flex="auto" layout="column">
-                <span class="wz-headline-title"><i class="fa fa-fw fa-credit-card" aria-hidden="true"></i> {{ tabNames['pci'] }}</span>
+                <span class="wz-headline-title"><i class="fa fa-fw fa-credit-card" aria-hidden="true"></i> {{ ctrl.tabNames['pci'] }}</span>
                 <md-divider class="wz-margin-top-10"></md-divider>
                 <div layout="column">
                     <p class="md-body-1 wz-padding-top-10">The Payment Card Industry Data Security Standard (PCI DSS) is a proprietary information security standard for organizations that handle branded credit cards from the major card schemes including Visa, MasterCard, American Express, Discover, and JCB.</p>
@@ -21,7 +21,7 @@
                 </div>
                 <span flex></span>
                 <div layout="row" class="wz-padding-top-10">
-                    <md-switch class="wz-switch" aria-label="PCI DSS extension switch" ng-model="extensions.pci" ng-change="toggleExtension('pci',extensions.pci)"></md-switch>
+                    <md-switch class="wz-switch" aria-label="PCI DSS extension switch" ng-model="ctrl.extensions.pci" ng-change="ctrl.toggleExtension('pci',ctrl.extensions.pci)"></md-switch>
                 </div>
             </md-card-content>
             <md-card-actions layout="row" layout-align="end center" class="wz-card-actions">
@@ -34,7 +34,7 @@
         <!-- GDPR -->
         <md-card flex="45" layout="column" class="wz-md-card">
             <md-card-content flex="auto" layout="column">
-                <span class="wz-headline-title"><i class="fa fa-fw fa-list-ol" aria-hidden="true"></i> {{ tabNames['gdpr'] }}</span>
+                <span class="wz-headline-title"><i class="fa fa-fw fa-list-ol" aria-hidden="true"></i> {{ ctrl.tabNames['gdpr'] }}</span>
                 <md-divider class="wz-margin-top-10"></md-divider>
                 <div layout="column">
                     <p class="md-body-1 wz-padding-top-10">The General Data Protection Regulation (GDPR) is a regulation in EU law on data protection and privacy for all individuals within the European Union. It also addresses the export of personal data outside the EU.</p>
@@ -42,7 +42,7 @@
                 </div>
                 <span flex></span>
                 <div layout="row" class="wz-padding-top-10">
-                    <md-switch class="wz-switch" aria-label="GDPR extension switch" ng-model="extensions.gdpr" ng-change="toggleExtension('gdpr',extensions.gdpr)"></md-switch>
+                    <md-switch class="wz-switch" aria-label="GDPR extension switch" ng-model="ctrl.extensions.gdpr" ng-change="ctrl.toggleExtension('gdpr',ctrl.extensions.gdpr)"></md-switch>
                 </div>
             </md-card-content>
             <md-card-actions layout="row" layout-align="end center" class="wz-card-actions">
@@ -55,7 +55,7 @@
         <!-- Audit -->
         <md-card flex="45" layout="column" class="wz-md-card">
             <md-card-content flex="auto" layout="column">
-                <span class="wz-headline-title"><i class="fa fa-fw fa-balance-scale" aria-hidden="true"></i> {{ tabNames['audit'] }}</span>
+                <span class="wz-headline-title"><i class="fa fa-fw fa-balance-scale" aria-hidden="true"></i> {{ ctrl.tabNames['audit'] }}</span>
                 <md-divider class="wz-margin-top-10"></md-divider>
                 <div layout="column">
                     <p class="md-body-1 wz-padding-top-10">The Linux Audit system provides a way to track security-relevant information on your system.</p>
@@ -63,7 +63,7 @@
                 </div>
                 <span flex></span>
                 <div layout="row" class="wz-padding-top-10">
-                    <md-switch class="wz-switch" aria-label="Audit extension switch" ng-model="extensions.audit" ng-change="toggleExtension('audit',extensions.audit)"></md-switch>
+                    <md-switch class="wz-switch" aria-label="Audit extension switch" ng-model="ctrl.extensions.audit" ng-change="ctrl.toggleExtension('audit',ctrl.extensions.audit)"></md-switch>
                 </div>
             </md-card-content>
             <md-card-actions layout="row" layout-align="end center" class="wz-card-actions">
@@ -76,7 +76,7 @@
         <!-- Open SCAP -->
         <md-card flex="45" layout="column" class="wz-md-card">
             <md-card-content flex="auto" layout="column">
-                <span class="wz-headline-title"><i class="fa fa-fw fa-search" aria-hidden="true"></i> {{ tabNames['oscap'] }}</span>
+                <span class="wz-headline-title"><i class="fa fa-fw fa-search" aria-hidden="true"></i> {{ ctrl.tabNames['oscap'] }}</span>
                 <md-divider class="wz-margin-top-10"></md-divider>
                 <div layout="column">
                     <p class="md-body-1 wz-padding-top-10">OpenSCAP is an OVAL (Open Vulnerability Assessment Language) interpreter, that is used for system configuration and vulnerability assessment.</p>
@@ -84,7 +84,7 @@
                 </div>
                 <span flex></span>
                 <div layout="row" class="wz-padding-top-10">
-                    <md-switch class="wz-switch" aria-label="Open SCAP extension switch" ng-model="extensions.oscap" ng-change="toggleExtension('oscap',extensions.oscap)"></md-switch>
+                    <md-switch class="wz-switch" aria-label="Open SCAP extension switch" ng-model="ctrl.extensions.oscap" ng-change="ctrl.toggleExtension('oscap',ctrl.extensions.oscap)"></md-switch>
                 </div>
             </md-card-content>
             <md-card-actions layout="row" layout-align="end center" class="wz-card-actions">
@@ -97,14 +97,14 @@
         <!-- CIS-CAT -->
         <md-card flex="45" layout="column" class="wz-md-card">
             <md-card-content flex="auto" layout="column">
-                <span class="wz-headline-title"><i class="fa fa-fw fa-rocket" aria-hidden="true"></i> {{ tabNames['ciscat'] }}</span>
+                <span class="wz-headline-title"><i class="fa fa-fw fa-rocket" aria-hidden="true"></i> {{ ctrl.tabNames['ciscat'] }}</span>
                 <md-divider class="wz-margin-top-10"></md-divider>
                 <div layout="column">
                     <p class="md-body-1 wz-padding-top-10">CIS (Center for Internet Security) is an entity dedicated to safeguard private and public organizations against cyber threats. This entity provides CIS benchmarks guidelines, which are a recognized global standard and best practices for securing IT systems and data against cyberattacks.</p>
                 </div>
                 <span flex></span>
                 <div layout="row" class="wz-padding-top-10">
-                    <md-switch class="wz-switch" aria-label="CIS-CAT extension switch" ng-model="extensions.ciscat" ng-change="toggleExtension('ciscat',extensions.ciscat)"></md-switch>
+                    <md-switch class="wz-switch" aria-label="CIS-CAT extension switch" ng-model="ctrl.extensions.ciscat" ng-change="ctrl.toggleExtension('ciscat',ctrl.extensions.ciscat)"></md-switch>
                 </div>
             </md-card-content>
             <md-card-actions layout="row" layout-align="end center" class="wz-card-actions">
@@ -117,14 +117,14 @@
         <!-- Osquery -->
         <md-card flex="45" layout="column" class="wz-md-card">
             <md-card-content flex="auto" layout="column">
-                <span class="wz-headline-title"><i class="fa fa-fw fa-rocket" aria-hidden="true"></i> {{ tabNames['osquery'] }}</span>
+                <span class="wz-headline-title"><i class="fa fa-fw fa-rocket" aria-hidden="true"></i> {{ ctrl.tabNames['osquery'] }}</span>
                 <md-divider class="wz-margin-top-10"></md-divider>
                 <div layout="column">
                     <p class="md-body-1 wz-padding-top-10">Osquery can be used to expose an operating system as a high-performance relational database. This allows you to write SQL-based queries to explore operating system data.</p>
                 </div>
                 <span flex></span>
                 <div layout="row" class="wz-padding-top-10">
-                    <md-switch class="wz-switch" aria-label="Osquery extension switch" ng-model="extensions.osquery" ng-change="toggleExtension('osquery',extensions.osquery)"></md-switch>
+                    <md-switch class="wz-switch" aria-label="Osquery extension switch" ng-model="ctrl.extensions.osquery" ng-change="ctrl.toggleExtension('osquery',ctrl.extensions.osquery)"></md-switch>
                 </div>
             </md-card-content>
             <md-card-actions layout="row" layout-align="end center" class="wz-card-actions">
@@ -137,14 +137,14 @@
         <!-- Amazon -->
         <md-card flex="45" layout="column" class="wz-md-card">
             <md-card-content flex="auto" layout="column">
-                <span class="wz-headline-title"><i class="fa fa-fw fa-amazon" aria-hidden="true"></i> {{ tabNames['aws'] }}</span>
+                <span class="wz-headline-title"><i class="fa fa-fw fa-amazon" aria-hidden="true"></i> {{ ctrl.tabNames['aws'] }}</span>
                 <md-divider class="wz-margin-top-10"></md-divider>
                 <div layout="column">
                     <p class="md-body-1 wz-padding-top-10">Wazuh provides an agent module that can be used to retrieve data from S3 buckets. In combination with log analysis rules, this module provides the ability to analyze and alert on AWS Cloudtrail, GuardDuty, Macie, IAM, VPC Flow and other Amazon AWS  services data.</p>
                 </div>
                 <span flex></span>
                 <div layout="row" class="wz-padding-top-10">
-                    <md-switch class="wz-switch" aria-label="AWS extension switch" ng-model="extensions.aws" ng-change="toggleExtension('aws',extensions.aws)"></md-switch>
+                    <md-switch class="wz-switch" aria-label="AWS extension switch" ng-model="ctrl.extensions.aws" ng-change="ctrl.toggleExtension('aws',ctrl.extensions.aws)"></md-switch>
                 </div>
             </md-card-content>
             <md-card-actions layout="row" layout-align="end center" class="wz-card-actions">
@@ -157,14 +157,14 @@
         <!-- VirusTotal -->
         <md-card flex="45" layout="column" class="wz-md-card">
             <md-card-content flex="auto" layout="column">
-                <span class="wz-headline-title"><i class="fa fa-fw fa-bug" aria-hidden="true"></i> {{ tabNames['virustotal'] }}</span>
+                <span class="wz-headline-title"><i class="fa fa-fw fa-bug" aria-hidden="true"></i> {{ ctrl.tabNames['virustotal'] }}</span>
                 <md-divider class="wz-margin-top-10"></md-divider>
                 <div layout="column">
                     <p class="md-body-1 wz-padding-top-10">VirusTotal is an online service that analyzes files and URLs enabling the identification of viruses, worms, trojans, and other kinds of malicious content detected by antivirus engines and website scanners. Virustotal is commonly used as a threat intelligence source to help with security analysis and incident response.</p>
                 </div>
                 <span flex></span>
                 <div layout="row" class="wz-padding-top-10">
-                    <md-switch class="wz-switch" aria-label="VirusTotal extension switch" ng-model="extensions.virustotal" ng-change="toggleExtension('virustotal',extensions.virustotal)"></md-switch>
+                    <md-switch class="wz-switch" aria-label="VirusTotal extension switch" ng-model="ctrl.extensions.virustotal" ng-change="ctrl.toggleExtension('virustotal',ctrl.extensions.virustotal)"></md-switch>
                 </div>
             </md-card-content>
             <md-card-actions layout="row" layout-align="end center" class="wz-card-actions">

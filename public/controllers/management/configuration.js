@@ -9,12 +9,9 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import { uiModules } from 'ui/modules';
 import { ConfigurationHandler } from '../../utils/config-handler';
 
-const app = uiModules.get('app/wazuh', []);
-
-class ConfigurationController {
+export class ConfigurationController {
   constructor($scope, errorHandler, apiReq) {
     this.$scope = $scope;
     this.errorHandler = errorHandler;
@@ -58,5 +55,3 @@ class ConfigurationController {
       this.configurationHandler.getIntegration(list, this.$scope);
   }
 }
-
-app.controller('managementConfigurationController', ConfigurationController);

@@ -12,6 +12,7 @@
 
 // Imports the init module
 import { initApp } from './init';
+import { resolve } from 'path';
 
 export default kibana =>
   new kibana.Plugin({
@@ -25,6 +26,14 @@ export default kibana =>
         description: 'Wazuh app for Kibana',
         icon: 'plugins/wazuh/img/icon.png',
         main: 'plugins/wazuh/app'
+      },
+      __bundleProvider__(kbnServer) {
+        kbnServer.uiBundles.addPostLoader({
+          test: /\.pug$/,
+          include: resolve(__dirname, 'public'),
+          loader: require.resolve('pug-loader'),
+          enforce: undefined
+        });
       }
     },
     init(server, options) {

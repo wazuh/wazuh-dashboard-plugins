@@ -35,7 +35,7 @@ export const TabNames = {
   decoders: 'Decoders',
   logs: 'Logs',
   groups: 'Groups',
-  monitoring: 'Monitoring',
+  monitoring: 'Cluster',
   reporting: 'Reporting',
   'registration-service': 'Registration service',
   cluster: 'Cluster',

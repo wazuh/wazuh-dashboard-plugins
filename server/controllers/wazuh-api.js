@@ -658,6 +658,9 @@ export class WazuhApiCtrl {
   }
 
   requestApi(req, reply) {
+    const configuration = getConfiguration();
+    const adminMode = !(configuration && typeof configuration.admin !== 'undefined' && !configuration.admin);
+
     if (!req.payload.method) {
       return ErrorResponse('Missing param: method', 3015, 400, reply);
     } else if (!req.payload.path) {
@@ -668,11 +671,7 @@ export class WazuhApiCtrl {
         req.payload.body &&
         req.payload.body.devTools
       ) {
-        const configuration = getConfiguration();
-        if (
-          !configuration ||
-          (configuration && !configuration['devtools.allowall'])
-        ) {
+        if (!adminMode) {
           return ErrorResponse('Allowed method: [GET]', 3029, 400, reply);
         }
       }
@@ -681,7 +680,8 @@ export class WazuhApiCtrl {
         const keyRegex = new RegExp(/.*agents\/\d*\/key.*/);
         if (
           typeof req.payload.path === 'string' &&
-          keyRegex.test(req.payload.path)
+          keyRegex.test(req.payload.path) &&
+          !adminMode
         ) {
           return ErrorResponse(
             'Forbidden route /agents/<id>/key',

@@ -28,9 +28,6 @@ class WzMenu {
     patternHandler,
     indexPatterns,
     errorHandler,
-    genericReq,
-    $location,
-    wzMisc,
     wazuhConfig
   ) {
     $rootScope.showSelector = appState.getPatternSelector();

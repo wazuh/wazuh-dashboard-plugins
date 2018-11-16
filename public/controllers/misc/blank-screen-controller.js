@@ -9,11 +9,7 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import { uiModules } from 'ui/modules';
-
-const app = uiModules.get('app/wazuh', []);
-
-class BlankScreenController {
+export class BlankScreenController {
   constructor($scope, $location, errorHandler, wzMisc) {
     this.$scope = $scope;
     this.$location = $location;
@@ -28,14 +24,13 @@ class BlankScreenController {
       try {
         parsed = this.errorHandler.handle(catchedError, '', false, true);
       } catch (error) {} // eslint-disable-line
-      this.$scope.errorToShow = parsed || catchedError;
+      this.errorToShow = parsed || catchedError;
       this.wzMisc.setBlankScr(false);
       if (!this.$scope.$$phase) this.$scope.$digest();
     }
-    this.$scope.goOverview = () => {
-      this.$location.path('/overview');
-    };
+  }
+
+  goOverview() {
+    this.$location.path('/overview');
   }
 }
-
-app.controller('blankScreenController', BlankScreenController);

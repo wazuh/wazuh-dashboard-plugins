@@ -95,8 +95,13 @@ app.directive('wzTable', function() {
           $scope.searchTable();
           return;
         } catch (error) {
-          if(error && !error.data && error.status === -1 && error.xhrStatus === 'abort') {
-            return Promise.reject('Request took too long, aborted')
+          if (
+            error &&
+            !error.data &&
+            error.status === -1 &&
+            error.xhrStatus === 'abort'
+          ) {
+            return Promise.reject('Request took too long, aborted');
           }
           return Promise.reject(error);
         }

@@ -1,5 +1,5 @@
 /*
- * Wazuh app - Cluster monitoring controller
+ * Wazuh app - Reporting controller
  * Copyright (C) 2018 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -9,11 +9,7 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import { uiModules } from 'ui/modules';
-
-const app = uiModules.get('app/wazuh', []);
-
-class ReportingController {
+export class ReportingController {
   constructor($scope, errorHandler, genericReq) {
     this.$scope = $scope;
     this.errorHandler = errorHandler;
@@ -115,6 +111,3 @@ class ReportingController {
     }
   }
 }
-
-// Logs controller
-app.controller('reportingController', ReportingController);

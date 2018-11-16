@@ -252,7 +252,12 @@ const audit = async agentID => {
 
 describe('Elasticsearch', () => {
   it('GET /_cat/indices', async () => {
-    const res = await needle('get', `${elasticServer}:9200/_cat/indices`, {}, headers);
+    const res = await needle(
+      'get',
+      `${elasticServer}:9200/_cat/indices`,
+      {},
+      headers
+    );
     res.statusCode.should.be.eql(200);
     res.body.should.be.a('string');
   });

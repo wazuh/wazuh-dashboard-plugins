@@ -3,6 +3,7 @@ import { VisTypesRegistryProvider } from 'ui/registry/vis_types';
 import { uiModules } from 'ui/modules';
 import { SavedObjectLoader } from './saved-object-loader';
 import { savedObjectManagementRegistry } from 'plugins/kibana/management/saved_object_registry';
+import { SavedObjectsClientProvider } from 'ui/saved_objects';
 
 const app = uiModules.get('app/visualize');
 
@@ -24,12 +25,14 @@ app.service('wzsavedVisualizations', function(
 ) {
   const visTypes = Private(VisTypesRegistryProvider);
 
+  const savedObjectClient = Private(SavedObjectsClientProvider);
   const saveVisualizationLoader = new SavedObjectLoader(
     SavedVis,
     kbnIndex,
     kbnUrl,
     $http,
-    chrome
+    chrome,
+    savedObjectClient
   );
 
   saveVisualizationLoader.mapHitSource = function(source, id) {

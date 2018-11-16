@@ -19,18 +19,19 @@
 
 import { EventEmitter } from 'events';
 import { debounce } from 'lodash';
-import { Inspector } from 'ui/inspector';
+import * as Rx from 'rxjs';
+import { share } from 'rxjs/operators';
 
+import { Inspector } from 'ui/inspector';
 import { PersistedState } from 'ui/persisted_state';
 import { IPrivate } from 'ui/private';
 import { RenderCompleteHelper } from 'ui/render_complete';
 import { AppState } from 'ui/state_management/app_state';
 import { timefilter } from 'ui/timefilter';
 import { RequestHandlerParams, Vis } from 'ui/vis';
+import { VisSavedObject, VisualizeLoaderParams, VisualizeUpdateParams } from './types';
 import { visualizationLoader } from './visualization_loader';
 import { VisualizeDataLoader } from './visualize_data_loader';
-
-import { VisSavedObject, VisualizeLoaderParams, VisualizeUpdateParams } from './types';
 
 interface EmbeddedVisualizeHandlerParams extends VisualizeLoaderParams {
   Private: IPrivate;
@@ -38,12 +39,14 @@ interface EmbeddedVisualizeHandlerParams extends VisualizeLoaderParams {
 }
 
 const RENDER_COMPLETE_EVENT = 'render_complete';
+const LOADING_ATTRIBUTE = 'data-loading';
 
 /**
  * A handler to the embedded visualization. It offers several methods to interact
  * with the visualization.
  */
 export class EmbeddedVisualizeHandler {
+  public readonly data$: Rx.Observable<any>;
   private vis: Vis;
   private loaded: boolean = false;
   private destroyed: boolean = false;
@@ -51,7 +54,7 @@ export class EmbeddedVisualizeHandler {
   private listeners = new EventEmitter();
   private firstRenderComplete: Promise<void>;
   private renderCompleteHelper: RenderCompleteHelper;
-  private onRenderCompleteListener: () => void;
+  //private onRenderCompleteListener: () => void;
   private shouldForceNextFetch: boolean = false;
   private debouncedFetchAndRender = debounce(() => {
     if (this.destroyed) {
@@ -64,9 +67,11 @@ export class EmbeddedVisualizeHandler {
   }, 100);
 
   private dataLoaderParams: RequestHandlerParams;
-  private appState: AppState;
+  private readonly appState?: AppState;
   private uiState: PersistedState;
   private dataLoader: VisualizeDataLoader;
+
+  private dataSubject: Rx.Subject<any>;
 
   constructor(
     private readonly element: HTMLElement,
@@ -93,10 +98,7 @@ export class EmbeddedVisualizeHandler {
       this.listeners.once(RENDER_COMPLETE_EVENT, resolve);
     });
 
-    this.onRenderCompleteListener = () => {
-      this.listeners.emit(RENDER_COMPLETE_EVENT);
-    };
-
+    element.setAttribute(LOADING_ATTRIBUTE, '');
     element.addEventListener('renderComplete', this.onRenderCompleteListener);
 
     this.appState = appState;
@@ -113,6 +115,9 @@ export class EmbeddedVisualizeHandler {
 
     this.dataLoader = new VisualizeDataLoader(vis, Private);
     this.renderCompleteHelper = new RenderCompleteHelper(element);
+
+    this.dataSubject = new Rx.Subject();
+    this.data$ = this.dataSubject.asObservable().pipe(share());
 
     this.render();
   }
@@ -224,6 +229,11 @@ export class EmbeddedVisualizeHandler {
     this.listeners.removeListener(RENDER_COMPLETE_EVENT, listener);
   }
 
+  private onRenderCompleteListener = () => {
+    this.listeners.emit(RENDER_COMPLETE_EVENT);
+    this.element.removeAttribute(LOADING_ATTRIBUTE);
+  };
+
   private onUiStateChange = () => {
     this.fetchAndRender();
   };
@@ -240,6 +250,7 @@ export class EmbeddedVisualizeHandler {
    */
   private fetchAndRender = (forceFetch = false): void => {
     this.shouldForceNextFetch = forceFetch || this.shouldForceNextFetch;
+    this.element.setAttribute(LOADING_ATTRIBUTE, '');
     this.debouncedFetchAndRender();
   };
 
@@ -263,7 +274,10 @@ export class EmbeddedVisualizeHandler {
     this.dataLoaderParams.aggs = this.vis.getAggConfig();
     this.dataLoaderParams.forceFetch = forceFetch;
 
-    return this.dataLoader.fetch(this.dataLoaderParams);
+    return this.dataLoader.fetch(this.dataLoaderParams).then(data => {
+      this.dataSubject.next(data);
+      return data;
+    });
   };
 
   private render = (visData: any = null) => {

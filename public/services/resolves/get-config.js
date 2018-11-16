@@ -37,15 +37,12 @@ export async function getWzConfig($q, genericReq, errorHandler, wazuhConfig) {
     'wazuh.monitoring.enabled': true,
     'wazuh.monitoring.frequency': 3600,
     'wazuh.monitoring.shards': 5,
-    'wazuh.monitoring.replicas': 1
+    'wazuh.monitoring.replicas': 1,
+    'admin': true
   };
 
   try {
-    const config = await genericReq.request(
-      'GET',
-      '/utils/configuration',
-      {}
-    );
+    const config = await genericReq.request('GET', '/utils/configuration', {});
 
     if (!config || !config.data || !config.data.data)
       throw new Error('No config available');

@@ -24,16 +24,10 @@ const module = uiModules.get('kibana');
 
 module
   .directive('filterBarW', function(Private, Promise, getAppState) {
-    const mapAndFlattenFilters = Private(
-      FilterBarLibMapAndFlattenFiltersProvider
-    );
-    const mapFlattenAndWrapFilters = Private(
-      FilterBarLibMapFlattenAndWrapFiltersProvider
-    );
+    const mapAndFlattenFilters = Private(FilterBarLibMapAndFlattenFiltersProvider);
+    const mapFlattenAndWrapFilters = Private(FilterBarLibMapFlattenAndWrapFiltersProvider);
     const extractTimeFilter = Private(FilterBarLibExtractTimeFilterProvider);
-    const filterOutTimeBasedFilter = Private(
-      FilterBarLibFilterOutTimeBasedFilterProvider
-    );
+    const filterOutTimeBasedFilter = Private(FilterBarLibFilterOutTimeBasedFilterProvider);
     const queryFilter = Private(FilterBarQueryFilterProvider);
 
     return {
@@ -55,7 +49,7 @@ module
           'invertAll',
           'removeFilter',
           'removeAll'
-        ].forEach(function(method) {
+        ].forEach(function (method) {
           $scope[method] = queryFilter[method];
         });
 
