@@ -138,6 +138,9 @@ export class AgentsController {
     this.$scope.search = (term, specificPath) =>
       this.$scope.$broadcast('wazuhSearch', { term, specificPath });
 
+    this.$scope.searchSyscheckFile = (term) =>
+      this.$scope.$broadcast('wazuhSearch', { term, removeFilters: true });
+
     this.$scope.startVis2Png = () => this.startVis2Png();
 
     this.$scope.$on('$destroy', () => {
@@ -193,6 +196,27 @@ export class AgentsController {
     this.$scope.updateSelectedItem = i => (this.$scope.selectedItem = i);
     this.$scope.getIntegration = list =>
       this.configurationHandler.getIntegration(list, this.$scope);
+
+
+    this.$scope.downloadCsv = async data_path => {
+      try {
+        this.errorHandler.info('Your download should begin automatically...', 'CSV');
+        const currentApi = JSON.parse(this.appState.getCurrentAPI()).id;
+        const output = await this.csvReq.fetch(
+          data_path,
+          currentApi,
+          this.wzTableFilter.get()
+        );
+        const blob = new Blob([output], { type: 'text/csv' }); // eslint-disable-line
+
+        FileSaver.saveAs(blob, 'files.csv');
+
+        return;
+      } catch (error) {
+        this.errorHandler.handle(error, 'Download CSV');
+      }
+      return;
+    };
   }
 
   createMetrics(metricsObject) {
@@ -417,7 +441,7 @@ export class AgentsController {
       this.$scope.syscollector = {
         hardware:
           typeof hardwareResponse === 'object' &&
-          Object.keys(hardwareResponse).length
+            Object.keys(hardwareResponse).length
             ? { ...hardwareResponse }
             : false,
         os:

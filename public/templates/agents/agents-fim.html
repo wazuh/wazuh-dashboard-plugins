@@ -66,7 +66,30 @@
                 </md-card-content>
             </md-card>
        </div>
-
-
-
+       
+    <div layout="row" class="wz-padding-top-0">
+        <md-card flex="" class="wz-md-card _md flex">
+            <md-card-content>
+                <span class="wz-headline-title"><i class="fa fa-fw fa-file"></i> Files</span>
+                <md-divider class="wz-margin-top-10"></md-divider>
+                <div layout="row" class="wz-margin-top-10">
+                    <input placeholder="Filter files..." ng-model="filesSearch" type="text" class="kuiLocalSearchInput ng-empty ng-pristine ng-scope ng-touched ng-valid height-30"
+                        aria-invalid="false" wz-enter="searchSyscheckFile(filesSearch)">
+                    <button type="submit" aria-label="Search" class="kuiLocalSearchButton height-30" ng-click="searchSyscheckFile(filesSearch)">
+                        <span class="fa fa-search" aria-hidden="true"></span>
+                    </button>
+                </div>
+                <div layout="row" ng-if="agent && !load" class="wz-margin-top-10 wz-margin-bottom-40-inv">
+                    <wz-table flex path="'/syscheck/' + agent.id" row-sizes="[9,3]" extra-limit="true" keys="['file','size']">
+                    </wz-table>
+                </div>
+                <div layout="row" class="wz-margin-top-10 wz-padding-top-10">Export:&nbsp;
+                    <a class="small" id="btnDownload" ng-click="downloadCsv('/syscheck/' + agent.id)">Formatted
+                        <i aria-hidden="true" class="fa fa-download"></i>
+                    </a>
+                    <span flex></span>
+                </div>
+            </md-card-content>
+        </md-card>
+    </div>
 </md-content>
