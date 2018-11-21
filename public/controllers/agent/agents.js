@@ -167,29 +167,59 @@ export class AgentsController {
     this.$scope.isString = item => typeof item === 'string';
     this.$scope.hasSize = obj =>
       obj && typeof obj === 'object' && Object.keys(obj).length;
-    this.$scope.switchConfigTab = (configurationTab, sections) =>
+    this.$scope.switchConfigTab = (configurationTab, sections, navigate = true) => {
+      this.$scope.navigate = navigate;
+      this.$scope.configSubTab = JSON.stringify({ 'configurationTab': configurationTab, 'sections': sections });
+      if (!this.$location.search().configSubTab) {
+        this.$location.search('configSubTab', this.$scope.configSubTab);
+      }
       this.configurationHandler.switchConfigTab(
         configurationTab,
         sections,
         this.$scope,
         this.$scope.agent.id
       );
-    this.$scope.switchWodle = wodleName =>
+    }
+    this.$scope.switchWodle = (wodleName, navigate = true) => {
+      this.$scope.navigate = navigate;
+      this.$scope.configWodle = wodleName;
+      if (!this.$location.search().configWodle) {
+        this.$location.search('configWodle', this.$scope.configWodle);
+      }
       this.configurationHandler.switchWodle(
         wodleName,
         this.$scope,
         this.$scope.agent.id
-      );
-    this.$scope.switchConfigurationTab = configurationTab =>
+      )
+    };
+    this.$scope.switchConfigurationTab = (configurationTab, navigate) => {
+      this.$scope.navigate = navigate;
       this.configurationHandler.switchConfigurationTab(
         configurationTab,
         this.$scope
       );
-    this.$scope.switchConfigurationSubTab = configurationSubTab =>
+      if (!this.$scope.navigate) {
+        let configSubTab = this.$location.search().configSubTab;
+        if (configSubTab) {
+          const configSubTabObj = JSON.parse(configSubTab);
+          this.$scope.switchConfigTab(configSubTabObj.configurationTab, configSubTabObj.sections, false);
+        }else{
+          let configWodle = this.$location.search().configWodle;
+          if (configWodle) {
+            this.$scope.switchWodle(configWodle, false);
+          }
+        }
+      } else {
+        this.$location.search('configSubTab', null);
+        this.$location.search('configWodle', null);
+      }
+    }
+    this.$scope.switchConfigurationSubTab = configurationSubTab => {
       this.configurationHandler.switchConfigurationSubTab(
         configurationSubTab,
         this.$scope
       );
+    }
     this.$scope.updateSelectedItem = i => (this.$scope.selectedItem = i);
     this.$scope.getIntegration = list =>
       this.configurationHandler.getIntegration(list, this.$scope);
@@ -417,7 +447,7 @@ export class AgentsController {
       this.$scope.syscollector = {
         hardware:
           typeof hardwareResponse === 'object' &&
-          Object.keys(hardwareResponse).length
+            Object.keys(hardwareResponse).length
             ? { ...hardwareResponse }
             : false,
         os:

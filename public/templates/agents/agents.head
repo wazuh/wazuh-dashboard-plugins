@@ -39,7 +39,7 @@
                 <span> / </span>
                 <span class="wz-text-link cursor-pointer" ng-click="switchTab('welcome')">{{agent.name}} ({{agent.id}})</span>
                 <span> / </span>
-                <span class="wz-text-link cursor-pointer" ng-click="switchConfigurationTab('welcome')">{{ tabNames[tab] }}</span>
+                <span class="wz-text-link cursor-pointer" ng-click="switchConfigurationTab('welcome', true)">{{ tabNames[tab] }}</span>
                 <span> / </span>
                 <span>{{ tabNames[configurationTab] === 'Alerts' ? 'Labels' : tabNames[configurationTab] }}</span>
             </div>
