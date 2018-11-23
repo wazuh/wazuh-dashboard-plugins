@@ -1,0 +1,92 @@
+/*
+ * Wazuh app - Search and filter by tags bar stylesheet
+ * Copyright (C) 2018 Wazuh, Inc.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * Find more information about this on the LICENSE file.
+ */
+
+/* -------------------------------------------------------------------------- */
+/* ----------- Wazuh search and filter by tags bar stylesheet --------------- */
+/* -------------------------------------------------------------------------- */
+
+.wz-search-filter-bar {
+    padding: 8px;
+    margin-top: 15px;
+}
+
+.wz-search-filter-bar .fa-search{
+    padding: 5px;
+    float: left;
+    opacity: .5;
+}
+
+.wz-tags {
+    height: 30px;
+}
+
+.wz-tag-item {
+    color: white;
+    border-radius: 3px;
+    float: left;
+    padding: 3px 5px;
+    background: #0079a5;
+    margin: 1px 3px;
+}
+
+.wz-tag-remove-button{
+    color: #005571;
+}
+.wz-search-filter-bar-input{
+    border: none;
+    padding: 5px;
+    width: auto;
+    margin-left: 5px;
+}
+
+.wz-search-filter-bar-autocomplete{
+    min-width: 200px;
+    background: #000000d9;
+    position: absolute;
+    border: 1px solid black;
+    border-radius: 5px;
+    padding: 10px 0;
+}
+
+.wz-search-filter-bar-autocomplete p b{
+    color: white;
+    font-weight: 700;
+    padding: 10px;
+}
+.wz-search-filter-bar-autocomplete ul li{
+    color: white;
+    padding: 0 10px;
+}
+
+.wz-search-filter-bar-autocomplete ul li span{
+    padding-left: 5px;
+}
+
+.wz-search-filter-bar-autocomplete ul li:hover{
+    background: black;
+    color:#0079a5;
+    cursor: pointer;
+}
+/* @media (min-width: 1280px) {
+    .wz-configuration-item {
+        padding: 5px 0;
+    }
+
+    .wz-configuration-label {
+        text-align: right;
+    }
+
+    .wz-configuration-value {
+        margin: 0 0 0 30px;
+    }
+}
+ */
