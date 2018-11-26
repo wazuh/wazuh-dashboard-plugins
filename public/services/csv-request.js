@@ -26,11 +26,11 @@ export class CSVRequest {
    */
   async fetch(path, id, filters = null) {
     try {
-      const output = await this.genericReq.request(
-        'POST',
-        '/api/csv',
-        { path, id, filters }
-      );
+      const output = await this.genericReq.request('POST', '/api/csv', {
+        path,
+        id,
+        filters
+      });
       return output.data;
     } catch (error) {
       return Promise.reject(error);

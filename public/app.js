@@ -9,6 +9,7 @@
  *
  * Find more information about this on the LICENSE file.
  */
+import 'ui/autoload/styles';
 import 'uiExports/visTypes';
 import 'uiExports/visResponseHandlers';
 import 'uiExports/visRequestHandlers';

@@ -77,6 +77,7 @@ export const TabDescription = {
   },
   osquery: {
     title: 'Osquery',
-    description: 'Osquery can be used to expose an operating system as a high-performance relational database.'
+    description:
+      'Osquery can be used to expose an operating system as a high-performance relational database.'
   }
 };

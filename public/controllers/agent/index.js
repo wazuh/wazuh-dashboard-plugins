@@ -9,10 +9,12 @@
  *
  * Find more information about this on the LICENSE file.
  */
+import { uiModules } from 'ui/modules';
+import { AgentsPreviewController } from './agents-preview';
+import { AgentsController } from './agents';
 
-import './overview';
-import './management';
-import './agent';
-import './settings';
-import './dev-tools';
-import './misc';
+const app = uiModules.get('app/wazuh', []);
+
+app
+  .controller('agentsController', AgentsController)
+  .controller('agentsPreviewController', AgentsPreviewController);

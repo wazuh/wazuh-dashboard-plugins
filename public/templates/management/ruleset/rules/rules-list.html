@@ -7,12 +7,12 @@
             <span class="fa fa-search" aria-hidden="true"></span>
         </button>
 
-        <md-button ng-class="(globalRulesetTab == 'rules') ? 'active' : ''"
-            ng-click="setRulesTab('rules')" class="wz-button md-raised md-primary manager-ruleset-btn" aria-label="Ruleset rules button">
+        <md-button ng-class="(mctrl.globalRulesetTab == 'rules') ? 'active' : ''"
+            ng-click="mctrl.setRulesTab('rules')" class="wz-button md-raised md-primary manager-ruleset-btn" aria-label="Ruleset rules button">
             <i class="fa fa-fw fa-file-text-o" aria-hidden="true"></i> Rules
         </md-button>
-        <md-button ng-class="(globalRulesetTab == 'decoders') ? 'active' : ''"
-            ng-click="setRulesTab('decoders')" class="wz-button md-raised md-primary manager-ruleset-btn" aria-label="Ruleset decoders button">
+        <md-button ng-class="(mctrl.globalRulesetTab == 'decoders') ? 'active' : ''"
+            ng-click="mctrl.setRulesTab('decoders')" class="wz-button md-raised md-primary manager-ruleset-btn" aria-label="Ruleset decoders button">
             <i class="fa fa-fw fa-search" aria-hidden="true"></i> Decoders
         </md-button>
     </div>

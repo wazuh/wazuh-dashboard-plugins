@@ -21,4 +21,16 @@ import virustotal from './agents-virustotal';
 import vuls from './agents-vuls';
 import osquery from './agents-osquery';
 
-export { audit, fim, general, oscap, ciscat, pci, gdpr, pm, virustotal, vuls, osquery };
+export {
+  audit,
+  fim,
+  general,
+  oscap,
+  ciscat,
+  pci,
+  gdpr,
+  pm,
+  virustotal,
+  vuls,
+  osquery
+};

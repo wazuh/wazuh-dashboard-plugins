@@ -1,4 +1,4 @@
-<div layout="column" layout-align="start stretch" ng-if="tab === 'pattern' && !load">
+<div layout="column" layout-align="start stretch" ng-if="ctrl.tab === 'pattern' && !ctrl.load">
 
     <!-- Headline -->
     <div layout="column" layout-padding>
@@ -15,8 +15,8 @@
                     <p class="md-body-1"><strong>Note:</strong> The chosen index pattern must use the template for Wazuh alerts, otherwise, you won't be able to select it.</p>
                 </div>
                 <div flex="25" layout="column" class="wz-select-input wz-margin-top-10">
-                    <select class="kuiSelect wz-border-none cursor-pointer" ng-model="selectedIndexPattern" ng-change="changeIndexPattern(selectedIndexPattern)" aria-label="Select index pattern">
-                        <option ng-repeat="indexPattern in indexPatterns | orderObjectBy:'title'" value="{{indexPattern.id}}">{{indexPattern.title}}</option>
+                    <select class="kuiSelect wz-border-none cursor-pointer" ng-model="ctrl.selectedIndexPattern" ng-change="ctrl.changeIndexPattern(ctrl.selectedIndexPattern)" aria-label="Select index pattern">
+                        <option ng-repeat="indexPattern in ctrl.indexPatterns | orderObjectBy:'title'" value="{{indexPattern.id}}">{{indexPattern.title}}</option>
                     </select>
                 </div>
             </md-card-content>

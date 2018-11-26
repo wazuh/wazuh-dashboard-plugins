@@ -9,47 +9,12 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import { uiModules } from 'ui/modules';
 import * as FileSaver from '../../services/file-saver';
 
-const colors = [
-  '#004A65',
-  '#00665F',
-  '#BF4B45',
-  '#BF9037',
-  '#1D8C2E',
-  'BB3ABF',
-  '#00B1F1',
-  '#00F2E2',
-  '#7F322E',
-  '#7F6025',
-  '#104C19',
-  '7C267F',
-  '#0079A5',
-  '#00A69B',
-  '#FF645C',
-  '#FFC04A',
-  '#2ACC43',
-  'F94DFF',
-  '#0082B2',
-  '#00B3A7',
-  '#401917',
-  '#403012',
-  '#2DD947',
-  '3E1340',
-  '#00668B',
-  '#008C83',
-  '#E55A53',
-  '#E5AD43',
-  '#25B23B',
-  'E045E5'
-];
+import { colors } from './colors';
 
-const app = uiModules.get('app/wazuh', []);
-
-app.controller('rulesController', function(
+export function RulesController(
   $scope,
-  $rootScope,
   $sce,
   errorHandler,
   appState,
@@ -138,12 +103,9 @@ app.controller('rulesController', function(
     return $scope.$broadcast('wazuhRemoveFilter', { filterName });
   };
 
-  $scope.setRulesTab = tab => ($rootScope.globalRulesetTab = tab);
-
   //Initialization
   $scope.searchTerm = '';
   $scope.viewingDetail = false;
-  $scope.setRulesTab('rules');
   $scope.isArray = Array.isArray;
 
   $scope.colorRuleArg = ruleArg => {
@@ -244,4 +206,4 @@ app.controller('rulesController', function(
         )
       );
   }
-});
+}
