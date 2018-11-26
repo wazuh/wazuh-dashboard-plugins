@@ -66,11 +66,12 @@
                 </md-card-content>
             </md-card>
        </div>
-       
-    <div layout="row" class="wz-padding-top-0">
+</md-content>
+
+<div layout="row" class="wz-padding-top-0">
         <md-card flex="" class="wz-md-card _md flex">
             <md-card-content>
-                <span class="wz-headline-title"><i class="fa fa-fw fa-file"></i> Files</span>
+                <span class="wz-headline-title"><i class="fa fa-fw fa-file"></i> Syscheck files</span>
                 <md-divider class="wz-margin-top-10"></md-divider>
                 <div layout="row" class="wz-margin-top-10">
                     <input placeholder="Filter files..." ng-model="filesSearch" type="text" class="kuiLocalSearchInput ng-empty ng-pristine ng-scope ng-touched ng-valid height-30"
@@ -84,7 +85,7 @@
                     </wz-table>
                 </div>
                 <div layout="row" class="wz-margin-top-10 wz-padding-top-10">Export:&nbsp;
-                    <a class="small" id="btnDownload" ng-click="downloadCsv('/syscheck/' + agent.id)">Formatted
+                    <a class="small" id="btnDownload" ng-click="downloadCsv('/syscheck/' + agent.id, 'files.csv')">Formatted
                         <i aria-hidden="true" class="fa fa-download"></i>
                     </a>
                     <span flex></span>
@@ -92,4 +93,3 @@
             </md-card-content>
         </md-card>
     </div>
-</md-content>

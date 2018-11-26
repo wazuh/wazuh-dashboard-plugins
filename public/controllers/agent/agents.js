@@ -133,7 +133,7 @@ export class AgentsController {
     this.$scope.goGroups = (agent, group) => this.goGroups(agent, group);
     this.$scope.analyzeAgents = async searchTerm =>
       this.analyzeAgents(searchTerm);
-    this.$scope.downloadCsv = async data_path => this.downloadCsv(data_path);
+    this.$scope.downloadCsv = async (data_path, fileName) => this.downloadCsv(data_path, fileName);
 
     this.$scope.search = (term, specificPath) =>
       this.$scope.$broadcast('wazuhSearch', { term, specificPath });
@@ -196,27 +196,6 @@ export class AgentsController {
     this.$scope.updateSelectedItem = i => (this.$scope.selectedItem = i);
     this.$scope.getIntegration = list =>
       this.configurationHandler.getIntegration(list, this.$scope);
-
-
-    this.$scope.downloadCsv = async data_path => {
-      try {
-        this.errorHandler.info('Your download should begin automatically...', 'CSV');
-        const currentApi = JSON.parse(this.appState.getCurrentAPI()).id;
-        const output = await this.csvReq.fetch(
-          data_path,
-          currentApi,
-          this.wzTableFilter.get()
-        );
-        const blob = new Blob([output], { type: 'text/csv' }); // eslint-disable-line
-
-        FileSaver.saveAs(blob, 'files.csv');
-
-        return;
-      } catch (error) {
-        this.errorHandler.handle(error, 'Download CSV');
-      }
-      return;
-    };
   }
 
   createMetrics(metricsObject) {
@@ -540,7 +519,7 @@ export class AgentsController {
     return;
   }
 
-  async downloadCsv(data_path) {
+  async downloadCsv(data_path, fileName) {
     try {
       this.errorHandler.info(
         'Your download should begin automatically...',
@@ -554,7 +533,7 @@ export class AgentsController {
       );
       const blob = new Blob([output], { type: 'text/csv' }); // eslint-disable-line
 
-      FileSaver.saveAs(blob, 'packages.csv');
+      FileSaver.saveAs(blob, fileName);
 
       return;
     } catch (error) {
