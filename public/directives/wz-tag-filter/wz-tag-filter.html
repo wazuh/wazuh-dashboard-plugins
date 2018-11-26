@@ -1,22 +1,23 @@
 <div class='kuiLocalSearchInput wz-search-filter-bar'>
     <span class='fa fa-search' aria-hidden='true'></span>
-    <div class='tags' ng-class='{focused: hasFocus}'>
+    <div class='wz-tags' ng-class='{focused: hasFocus}'>
         <ul class='tag-list'>
             <li ng-repeat='tag in tagList track by $index' ng-click='eventHandlers.tag.click(tag)'>
                 <div class='wz-tag-item'>
-                    <span class=''>{{tag}}</span>
+                    <span class='wz-tag-remove-button fa' ng-class="(tag.type === 'filter') ? 'fa-filter' : 'fa-search'"></span>
+                    <span class=''>{{tag.value}}</span>
                     <a class='wz-tag-remove-button' ng-click='removeTag($index)'>×</a>
                 </div>
             </li>
         </ul>
         <input id='wz-search-filter-bar-input' class='wz-search-filter-bar-input input' type='text' ng-model='newTag'
             ng-focus='showAutocomplete(true)' ng-blur='showAutocomplete(false)' ng-class='{"invalid-tag": newTag.invalid}'
-            placeholder='Add filter' ng-keyup='$event.keyCode == 13 ? addTag(true) : addSearchKey($event)' />
-        <div id='wz-search-filter-bar-autocomplete' class='wz-search-filter-bar-autocomplete' ng-show='isAutocomplete'>
+            placeholder='Add filter or search' ng-keyup='$event.keyCode == 13 ? addTag(true) : addSearchKey($event)' />
+        <div id='wz-search-filter-bar-autocomplete' class='wz-search-filter-bar-autocomplete' ng-show='isAutocomplete && autocompleteContent.list.length > 0'>
             <p><b>{{autocompleteContent.title}}</b></p>
             <ul>
                 <li ng-repeat='element in autocompleteContent.list' ng-mousedown='autocompleteContent.isKey ? addTagKey(element) : addTagValue(element)'>
-                    <span>{{element}}</span>
+                    <span ng-if="element">{{element}}</span>
                 </li>
             </ul>
         </div>

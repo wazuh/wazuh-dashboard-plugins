@@ -22,7 +22,8 @@ app.directive('wzTagFilter', function () {
     scope: {
       path: '=path',
       keys: '=keys',
-      callback: '&'
+      search: '&',
+      filter: '&'
     },
     controller(
       $scope,
@@ -43,12 +44,18 @@ app.directive('wzTagFilter', function () {
       $scope.addTag = (flag = false) => {
         var input = document.getElementById('wz-search-filter-bar-input');
         input.blur();
-        $scope.tagList.push($scope.newTag);
-
-        $scope.showAutocomplete(flag);
         const term = $scope.newTag.split(':');
-        const filter = { name: term[0], value: term[1] };
-        $scope.callback({ 'filter': filter });
+        const obj = { name: term[0], value: term[1] };
+        const isFilter = obj.value;
+        const tag = {
+          'value': $scope.newTag,
+          'type': isFilter ? 'filter' : 'search'
+        };
+        const idxSearch = $scope.tagList.map(function (x) { return x.type; }).indexOf('search');
+        if (!isFilter && idxSearch !== -1) { $scope.removeTag(idxSearch) };
+        $scope.tagList.push(tag);
+        $scope.showAutocomplete(flag);
+        isFilter ? $scope.filter({ 'filter': obj }) : $scope.search({ 'search': obj.name });
         $scope.newTag = '';
       };
 
@@ -58,14 +65,15 @@ app.directive('wzTagFilter', function () {
       };
 
       $scope.addTagValue = (value) => {
+        $scope.newTag = $scope.newTag.substring(0, $scope.newTag.indexOf(':') + 1);
         $scope.newTag += value;
         $scope.addTag();
       };
 
       $scope.removeTag = (idx) => {
-        const term = $scope.tagList[idx].split(':');
-        const filter = { name: term[0], value: 'all' };
-        $scope.callback({ 'filter': filter });
+        const term = $scope.tagList[idx].value.split(':');
+        const obj = term[1] ? { name: term[0], value: 'all' } : '';
+        obj.value ? $scope.filter({ 'filter': obj }) : $scope.search({ 'search': obj.name });
         $scope.tagList.splice(idx, 1);
         $scope.showAutocomplete(false);
       };
@@ -79,25 +87,30 @@ app.directive('wzTagFilter', function () {
       };
 
       $scope.getAutocompleteContent = () => {
-        const isKey = $scope.newTag.indexOf(':') === -1;
+        const term = $scope.newTag.split(':');
+        const isKey = !term[1] && $scope.newTag.indexOf(':') === -1;
         $scope.autocompleteContent = { 'title': '', 'isKey': isKey, 'list': [] };
-        $scope.autocompleteContent.title = isKey ? 'Tag keys' : 'Values';
+        $scope.autocompleteContent.title = isKey ? 'Filter keys' : 'Values';
         if (isKey) {
+          const regex = new RegExp('^' + term[0], 'i');
           $scope.keys.forEach(function (key) {
-            $scope.autocompleteContent.list.push(key);
+            if (regex.test(key)) {
+              $scope.autocompleteContent.list.push(key);
+            }
           });
         } else {
+          const regex = new RegExp('^' + term[1], 'i');
           const model = $scope.dataModel.find(function (x) { return x.key === $scope.newTag.split(':')[0] })
           if (model) {
-            $scope.autocompleteContent.list = model.list;
+            model.list = Array.isArray(model.list[0]) ? model.list[0] : model.list;
+            $scope.autocompleteContent.list = model.list.filter(function (x) { return regex.test(x) });
           }
         }
+
       };
 
       $scope.addSearchKey = (e) => {
-        if (e.key === ':') {
-          $scope.getAutocompleteContent();
-        }
+        $scope.getAutocompleteContent();
       };
 
       function index_autocomplete(flag = true) {
@@ -115,7 +128,7 @@ app.directive('wzTagFilter', function () {
         try {
           const result = await instance.fetch();
           $scope.keys.forEach(function (key) {
-            $scope.dataModel.push({ 'key': key, 'list': result.items.map(function (x) { return x[key] }) });
+            $scope.dataModel.push({ 'key': key, 'list': result.items.map(function (x) { return key.split('.').reduce((a, b) => a ? a[b] : '', x) }) });
           });
           return;
         } catch (error) {
