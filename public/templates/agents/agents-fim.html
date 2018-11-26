@@ -1,95 +1,96 @@
-<md-content flex layout="column" ng-if="tab === 'fim' && tabView === 'panels'" ng-class="{'no-opacity': resultState !== 'ready' || !rendered}" layout-align="start">
+<md-content flex layout="column" ng-if="tab === 'fim' && tabView === 'panels'" ng-class="{'no-opacity': resultState !== 'ready' || !rendered}"
+    layout-align="start">
 
     <!-- View: Panels -->
 
 
-        <div layout="row" class="height-230">
-            <div layout="column" flex>
-                <div layout="row" class="height-230">
-                    <md-card flex class="wz-md-card">
-                        <md-card-content class="wazuh-column">
-                            <span class="wz-headline-title">Users</span>
-                            <md-divider class="wz-margin-top-10"></md-divider>
-                            <kbn-vis id="Wazuh-App-Agents-FIM-Users" vis-id="'Wazuh-App-Agents-FIM-Users'">
-                        </md-card-content>
-                    </md-card>
-                    <md-card flex class="wz-md-card">
-                        <md-card-content class="wazuh-column">
-                            <span class="wz-headline-title">Permissions</span>
-                            <md-divider class="wz-margin-top-10"></md-divider>
-                            <kbn-vis id="Wazuh-App-Agents-FIM-Permissions" vis-id="'Wazuh-App-Agents-FIM-Permissions'">
-                        </md-card-content>
-                    </md-card>
-                </div>
-            </div>
-            <div layout="column" flex>
+    <div layout="row" class="height-230">
+        <div layout="column" flex>
+            <div layout="row" class="height-230">
                 <md-card flex class="wz-md-card">
                     <md-card-content class="wazuh-column">
-                        <span class="wz-headline-title">Events</span>
+                        <span class="wz-headline-title">Users</span>
                         <md-divider class="wz-margin-top-10"></md-divider>
-                        <kbn-vis id="Wazuh-App-Agents-FIM-Events" vis-id="'Wazuh-App-Agents-FIM-Events'"></kbn-vis>
+                        <kbn-vis id="Wazuh-App-Agents-FIM-Users" vis-id="'Wazuh-App-Agents-FIM-Users'">
+                    </md-card-content>
+                </md-card>
+                <md-card flex class="wz-md-card">
+                    <md-card-content class="wazuh-column">
+                        <span class="wz-headline-title">Permissions</span>
+                        <md-divider class="wz-margin-top-10"></md-divider>
+                        <kbn-vis id="Wazuh-App-Agents-FIM-Permissions" vis-id="'Wazuh-App-Agents-FIM-Permissions'">
                     </md-card-content>
                 </md-card>
             </div>
         </div>
-
-        <div layout="row" class="height-230">
-            <md-card flex="33" class="wz-md-card">
+        <div layout="column" flex>
+            <md-card flex class="wz-md-card">
                 <md-card-content class="wazuh-column">
-                    <span class="wz-headline-title">Files added</span>
+                    <span class="wz-headline-title">Events</span>
                     <md-divider class="wz-margin-top-10"></md-divider>
-                    <kbn-vis id="Wazuh-App-Agents-FIM-Files-added" vis-id="'Wazuh-App-Agents-FIM-Files-added'"></kbn-vis>
-                </md-card-content>
-            </md-card>
-            <md-card flex="33" class="wz-md-card">
-                <md-card-content class="wazuh-column">
-                    <span class="wz-headline-title">Files modified</span>
-                    <md-divider class="wz-margin-top-10"></md-divider>
-                    <kbn-vis id="Wazuh-App-Agents-FIM-Files-modified" vis-id="'Wazuh-App-Agents-FIM-Files-modified'"></kbn-vis>
-                </md-card-content>
-            </md-card>
-            <md-card flex="33" class="wz-md-card">
-                <md-card-content class="wazuh-column">
-                    <span class="wz-headline-title">Files deleted</span>
-                    <md-divider class="wz-margin-top-10"></md-divider>
-                    <kbn-vis id="Wazuh-App-Agents-FIM-Files-deleted" vis-id="'Wazuh-App-Agents-FIM-Files-deleted'"></kbn-vis>
+                    <kbn-vis id="Wazuh-App-Agents-FIM-Events" vis-id="'Wazuh-App-Agents-FIM-Events'"></kbn-vis>
                 </md-card-content>
             </md-card>
         </div>
+    </div>
 
-        <div layout="row" layout-align="space-between stretch" class="height-570">
-            <md-card flex class="wz-md-card">
-                <md-card-content class="wazuh-column">
-                    <span class="wz-headline-title">Alerts summary</span>
-                    <md-divider class="wz-margin-top-10"></md-divider>
-                    <kbn-vis vis-id="'Wazuh-App-Agents-FIM-Alerts-summary'"></kbn-vis>
-                </md-card-content>
-            </md-card>
-       </div>
-</md-content>
-
-<div layout="row" class="wz-padding-top-0">
-        <md-card flex="" class="wz-md-card _md flex">
-            <md-card-content>
-                <span class="wz-headline-title"><i class="fa fa-fw fa-file"></i> Syscheck files</span>
+    <div layout="row" class="height-230">
+        <md-card flex="33" class="wz-md-card">
+            <md-card-content class="wazuh-column">
+                <span class="wz-headline-title">Files added</span>
                 <md-divider class="wz-margin-top-10"></md-divider>
-                <div layout="row" class="wz-margin-top-10">
-                    <input placeholder="Filter files..." ng-model="filesSearch" type="text" class="kuiLocalSearchInput ng-empty ng-pristine ng-scope ng-touched ng-valid height-30"
-                        aria-invalid="false" wz-enter="searchSyscheckFile(filesSearch)">
-                    <button type="submit" aria-label="Search" class="kuiLocalSearchButton height-30" ng-click="searchSyscheckFile(filesSearch)">
-                        <span class="fa fa-search" aria-hidden="true"></span>
-                    </button>
-                </div>
-                <div layout="row" ng-if="agent && !load" class="wz-margin-top-10 wz-margin-bottom-40-inv">
-                    <wz-table flex path="'/syscheck/' + agent.id" row-sizes="[9,3]" extra-limit="true" keys="['file','size']">
-                    </wz-table>
-                </div>
-                <div layout="row" class="wz-margin-top-10 wz-padding-top-10">Export:&nbsp;
-                    <a class="small" id="btnDownload" ng-click="downloadCsv('/syscheck/' + agent.id, 'files.csv')">Formatted
-                        <i aria-hidden="true" class="fa fa-download"></i>
-                    </a>
-                    <span flex></span>
-                </div>
+                <kbn-vis id="Wazuh-App-Agents-FIM-Files-added" vis-id="'Wazuh-App-Agents-FIM-Files-added'"></kbn-vis>
+            </md-card-content>
+        </md-card>
+        <md-card flex="33" class="wz-md-card">
+            <md-card-content class="wazuh-column">
+                <span class="wz-headline-title">Files modified</span>
+                <md-divider class="wz-margin-top-10"></md-divider>
+                <kbn-vis id="Wazuh-App-Agents-FIM-Files-modified" vis-id="'Wazuh-App-Agents-FIM-Files-modified'"></kbn-vis>
+            </md-card-content>
+        </md-card>
+        <md-card flex="33" class="wz-md-card">
+            <md-card-content class="wazuh-column">
+                <span class="wz-headline-title">Files deleted</span>
+                <md-divider class="wz-margin-top-10"></md-divider>
+                <kbn-vis id="Wazuh-App-Agents-FIM-Files-deleted" vis-id="'Wazuh-App-Agents-FIM-Files-deleted'"></kbn-vis>
             </md-card-content>
         </md-card>
     </div>
+
+    <div layout="row" layout-align="space-between stretch" class="height-570">
+        <md-card flex class="wz-md-card">
+            <md-card-content class="wazuh-column">
+                <span class="wz-headline-title">Alerts summary</span>
+                <md-divider class="wz-margin-top-10"></md-divider>
+                <kbn-vis vis-id="'Wazuh-App-Agents-FIM-Alerts-summary'"></kbn-vis>
+            </md-card-content>
+        </md-card>
+    </div>
+</md-content>
+
+<div layout="row" class="wz-padding-top-0">
+    <md-card flex="" class="wz-md-card _md flex">
+        <md-card-content>
+            <span class="wz-headline-title"><i class="fa fa-fw fa-file"></i> Syscheck files</span>
+            <md-divider class="wz-margin-top-10"></md-divider>
+            <div layout="row" class="wz-margin-top-10">
+                <input placeholder="Filter files..." ng-model="filesSearch" type="text" class="kuiLocalSearchInput ng-empty ng-pristine ng-scope ng-touched ng-valid height-30"
+                    aria-invalid="false" wz-enter="searchSyscheckFile(filesSearch)">
+                <button type="submit" aria-label="Search" class="kuiLocalSearchButton height-30" ng-click="searchSyscheckFile(filesSearch)">
+                    <span class="fa fa-search" aria-hidden="true"></span>
+                </button>
+            </div>
+            <div layout="row" ng-if="agent && !load" class="wz-margin-top-10 wz-margin-bottom-40-inv">
+                <wz-table flex path="'/syscheck/' + agent.id" row-sizes="[10,8,6,3]" extra-limit="true" keys="['file','size', 'perm', 'date']">
+                </wz-table>
+            </div>
+            <div layout="row" class="wz-margin-top-10 wz-padding-top-10">Export:&nbsp;
+                <a class="small" id="btnDownload" ng-click="downloadCsv('/syscheck/' + agent.id, 'files.csv')">Formatted
+                    <i aria-hidden="true" class="fa fa-download"></i>
+                </a>
+                <span flex></span>
+            </div>
+        </md-card-content>
+    </md-card>
+</div>

@@ -139,7 +139,7 @@ export class AgentsController {
       this.$scope.$broadcast('wazuhSearch', { term, specificPath });
 
     this.$scope.searchSyscheckFile = (term) =>
-      this.$scope.$broadcast('wazuhSearch', { term, removeFilters: true });
+      this.$scope.$broadcast('wazuhSearch', { term });
 
     this.$scope.startVis2Png = () => this.startVis2Png();
 
