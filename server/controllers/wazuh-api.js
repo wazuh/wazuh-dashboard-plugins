@@ -24,7 +24,7 @@ import { getConfiguration } from '../lib/get-configuration';
 import { log } from '../logger';
 import { KeyEquivalenece } from '../../util/csv-key-equivalence';
 import { cleanKeys } from '../../util/remove-key';
-import { getApiRequestJsonModel } from '../../util/api-request-list-json';
+import { apiRequestList } from '../../util/api-request-list'
 
 export class WazuhApiCtrl {
   constructor(server) {
@@ -967,8 +967,8 @@ export class WazuhApiCtrl {
   }
 
   // Get de list of available requests in the API
-  async getRequestList(req, reply) {
+  getRequestList(req, reply) {
     //Read a static JSON until the api call has implemented
-    return reply(getApiRequestJsonModel()).type('text');
+    return reply(apiRequestList);
   }
 }
