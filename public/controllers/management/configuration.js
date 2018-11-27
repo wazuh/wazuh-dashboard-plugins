@@ -36,10 +36,14 @@ export class ConfigurationController {
       obj && typeof obj === 'object' && Object.keys(obj).length;
     this.$scope.switchConfigTab = (configurationTab, sections, navigate = true) => {
       this.$scope.navigate = navigate;
-      this.$scope.configSubTab = JSON.stringify({ 'configurationTab': configurationTab, 'sections': sections });
-      if (!this.$location.search().configSubTab) {
-        this.appState.setSessionStorageItem('configSubTab', this.$scope.configSubTab);
-        this.$location.search('configSubTab', true);
+      try {
+        this.$scope.configSubTab = JSON.stringify({ 'configurationTab': configurationTab, 'sections': sections });
+        if (!this.$location.search().configSubTab) {
+          this.appState.setSessionStorageItem('configSubTab', this.$scope.configSubTab);
+          this.$location.search('configSubTab', true);
+        }
+      } catch (error) {
+        this.errorHandler.handle(error, 'Set configuration path');
       }
       this.configurationHandler.switchConfigTab(
         configurationTab,
@@ -65,9 +69,13 @@ export class ConfigurationController {
       if (!this.$scope.navigate) {
         let configSubTab = this.$location.search().configSubTab;
         if (configSubTab) {
-          const config = this.appState.getSessionStorageItem('configSubTab');
-          const configSubTabObj = JSON.parse(config);
-          this.$scope.switchConfigTab(configSubTabObj.configurationTab, configSubTabObj.sections, false);
+          try {
+            const config = this.appState.getSessionStorageItem('configSubTab');
+            const configSubTabObj = JSON.parse(config);
+            this.$scope.switchConfigTab(configSubTabObj.configurationTab, configSubTabObj.sections, false);
+          } catch (error) {
+            this.errorHandler.handle(error, 'Get configuration path');
+          }
         } else {
           let configWodle = this.$location.search().configWodle;
           if (configWodle) {
