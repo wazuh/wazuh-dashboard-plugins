@@ -37,7 +37,8 @@ export class ConfigurationController {
       this.$scope.navigate = navigate;
       this.$scope.configSubTab = JSON.stringify({ 'configurationTab': configurationTab, 'sections': sections });
       if (!this.$location.search().configSubTab) {
-        this.$location.search('configSubTab', this.$scope.configSubTab);
+        sessionStorage.setItem("configSubTab", this.$scope.configSubTab);
+        this.$location.search('configSubTab', true);
       }
       this.configurationHandler.switchConfigTab(
         configurationTab,
@@ -53,7 +54,7 @@ export class ConfigurationController {
       }
       this.configurationHandler.switchWodle(wodleName, this.$scope);
     }
-      
+
     this.$scope.switchConfigurationTab = (configurationTab, navigate) => {
       this.$scope.navigate = navigate;
       this.configurationHandler.switchConfigurationTab(
@@ -63,9 +64,10 @@ export class ConfigurationController {
       if (!this.$scope.navigate) {
         let configSubTab = this.$location.search().configSubTab;
         if (configSubTab) {
-          const configSubTabObj = JSON.parse(configSubTab);
+          const config = sessionStorage.getItem("configSubTab");
+          const configSubTabObj = JSON.parse(config);
           this.$scope.switchConfigTab(configSubTabObj.configurationTab, configSubTabObj.sections, false);
-        }else{
+        } else {
           let configWodle = this.$location.search().configWodle;
           if (configWodle) {
             this.$scope.switchWodle(configWodle, false);
@@ -73,6 +75,7 @@ export class ConfigurationController {
         }
       } else {
         this.$location.search('configSubTab', null);
+        sessionStorage.removeItem('configSubTab');
         this.$location.search('configWodle', null);
       }
     };

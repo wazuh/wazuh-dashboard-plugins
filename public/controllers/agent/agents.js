@@ -171,7 +171,8 @@ export class AgentsController {
       this.$scope.navigate = navigate;
       this.$scope.configSubTab = JSON.stringify({ 'configurationTab': configurationTab, 'sections': sections });
       if (!this.$location.search().configSubTab) {
-        this.$location.search('configSubTab', this.$scope.configSubTab);
+        sessionStorage.setItem("configSubTab", this.$scope.configSubTab);
+        this.$location.search('configSubTab', true);
       }
       this.configurationHandler.switchConfigTab(
         configurationTab,
@@ -199,18 +200,20 @@ export class AgentsController {
         this.$scope
       );
       if (!this.$scope.navigate) {
-        let configSubTab = this.$location.search().configSubTab;
+        const configSubTab = this.$location.search().configSubTab;
         if (configSubTab) {
-          const configSubTabObj = JSON.parse(configSubTab);
+          const config = sessionStorage.getItem("configSubTab");
+          const configSubTabObj = JSON.parse(config);
           this.$scope.switchConfigTab(configSubTabObj.configurationTab, configSubTabObj.sections, false);
-        }else{
-          let configWodle = this.$location.search().configWodle;
+        } else {
+          const configWodle = this.$location.search().configWodle;
           if (configWodle) {
             this.$scope.switchWodle(configWodle, false);
           }
         }
       } else {
         this.$location.search('configSubTab', null);
+        sessionStorage.removeItem('configSubTab');
         this.$location.search('configWodle', null);
       }
     }
