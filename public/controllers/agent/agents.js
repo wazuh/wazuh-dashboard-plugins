@@ -133,7 +133,7 @@ export class AgentsController {
     this.$scope.goGroups = (agent, group) => this.goGroups(agent, group);
     this.$scope.analyzeAgents = async searchTerm =>
       this.analyzeAgents(searchTerm);
-    this.$scope.downloadCsv = async (data_path, fileName) => this.downloadCsv(data_path, fileName);
+    this.$scope.downloadCsv = async (path, fileName) => this.downloadCsv(path, fileName);
 
     this.$scope.search = (term, specificPath) =>
       this.$scope.$broadcast('wazuhSearch', { term, specificPath });
@@ -519,7 +519,7 @@ export class AgentsController {
     return;
   }
 
-  async downloadCsv(data_path, fileName) {
+  async downloadCsv(path, fileName) {
     try {
       this.errorHandler.info(
         'Your download should begin automatically...',
@@ -527,7 +527,7 @@ export class AgentsController {
       );
       const currentApi = JSON.parse(this.appState.getCurrentAPI()).id;
       const output = await this.csvReq.fetch(
-        data_path,
+        path,
         currentApi,
         this.wzTableFilter.get()
       );
@@ -535,7 +535,6 @@ export class AgentsController {
 
       FileSaver.saveAs(blob, fileName);
 
-      return;
     } catch (error) {
       this.errorHandler.handle(error, 'Download CSV');
     }
