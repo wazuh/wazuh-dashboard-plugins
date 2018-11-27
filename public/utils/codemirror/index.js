@@ -10,3 +10,5 @@ import './foldcode.js';
 import './foldgutter.js';
 import './search-cursor.js';
 import './mark-selection.js';
+import './show-hint.js';
+import './show-hint.css';
