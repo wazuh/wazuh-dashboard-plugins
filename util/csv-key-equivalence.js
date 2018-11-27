@@ -68,6 +68,7 @@ export const KeyEquivalenece = {
   euser: 'Effective user',
   nice: 'Priority',
   size: 'Size',
-  perm: 'Permissions',
-  date: 'Date'
+  uname: 'User',
+  gname: 'Group',
+  perm: 'Permissions'
 };

@@ -69,7 +69,7 @@
     </div>
 </md-content>
 
-<div layout="row" class="wz-padding-top-0">
+<div layout="row" class="wz-padding-top-0" ng-if="tab === 'fim' && tabView === 'panels'">
     <md-card flex="" class="wz-md-card _md flex">
         <md-card-content>
             <span class="wz-headline-title"><i class="fa fa-fw fa-file"></i> Syscheck files</span>
@@ -82,7 +82,7 @@
                 </button>
             </div>
             <div layout="row" ng-if="agent && !load" class="wz-margin-top-10 wz-margin-bottom-40-inv">
-                <wz-table flex path="'/syscheck/' + agent.id" row-sizes="[10,8,6,3]" extra-limit="true" keys="['file','size', 'perm', 'date']">
+                <wz-table flex path="'/syscheck/' + agent.id" row-sizes="[10,8,6,3]" extra-limit="true" keys="['file','size','gname','uname','perm']">
                 </wz-table>
             </div>
             <div layout="row" class="wz-margin-top-10 wz-padding-top-10">Export:&nbsp;
