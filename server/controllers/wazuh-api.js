@@ -798,7 +798,21 @@ export class WazuhApiCtrl {
         output.body.data &&
         output.body.data.totalItems
       ) {
-        const fields = Object.keys(output.body.data.items[0]);
+        const fields = req.payload.path.includes('/agents')
+          ? [
+              'id',
+              'status',
+              'name',
+              'ip',
+              'group',
+              'manager',
+              'node_name',
+              'dateAdd',
+              'version',
+              'lastKeepAlive',
+              'os'
+            ]
+          : Object.keys(output.body.data.items[0]);
 
         const json2csvParser = new Parser({ fields });
         let csv = json2csvParser.parse(itemsArray);
@@ -889,9 +903,9 @@ export class WazuhApiCtrl {
 
       const parsedResponses = data.map(
         item =>
-          item && item.body && item.body.data && !item.body.error
-            ? item.body.data
-            : false
+        item && item.body && item.body.data && !item.body.error
+          ? item.body.data
+          : false
       );
 
       const [
