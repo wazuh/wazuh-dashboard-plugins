@@ -98,7 +98,7 @@
                 <span class="wz-headline-title"><i class="fa fa-fw fa-exchange"></i> Network ports</span>
                 <span class="color-grey pull-right">Last scan: {{syscollector.ports.items[0].scan.time}}</span>
                 <md-divider class="wz-margin-top-10"></md-divider>
-                <wz-table flex path="'/syscollector/' + agent.id + '/ports'" row-sizes="[4]" keys="[{value:'local.ip',nosortable:true},{value:'remote.ip',nosortable:true},'state','protocol']">
+                <wz-table flex path="'/syscollector/' + agent.id + '/ports'" row-sizes="[4]" keys="[{value:'local.ip',nosortable:true}, {value:'local.port',nosortable:true},{value:'remote.ip',nosortable:true},{value:'remote.port',nosortable:true},'state','protocol']">
                 </wz-table>
             </md-card-content>
         </md-card>
@@ -119,7 +119,7 @@
                 </div>
 
                 <div layout="row" ng-if="agent && syscollector && !load" class="wz-margin-top-10 wz-margin-bottom-40-inv">
-                    <wz-table flex path="'/syscollector/' + agent.id + '/packages'" row-sizes="[6,4,3,3]" extra-limit="true" keys="[{value:'name',size:2},'architecture','version',{value:'vendor',size:2},{value:'description',size:3}]">
+                    <wz-table flex path="'/syscollector/' + agent.id + '/packages'" row-sizes="[10,8,6]" extra-limit="true" keys="[{value:'name',size:2},'architecture','version',{value:'vendor',size:2},{value:'description',size:3}]">
                     </wz-table>
                 </div>
             </md-card-content>
@@ -140,7 +140,7 @@
                     </button>
                 </div>
                 <div layout="row" ng-if="agent && syscollector && !load" class="wz-margin-top-10 wz-margin-bottom-40-inv">
-                    <wz-table flex path="'/syscollector/' + agent.id + '/processes'" row-sizes="[6,4,3,3]" extra-limit="true" keys="['name','euser','nice','state']">
+                    <wz-table flex path="'/syscollector/' + agent.id + '/processes'" row-sizes="[10,8,6]" extra-limit="true" keys="['name','euser','nice','state']">
                     </wz-table>
                 </div>
             </md-card-content>
