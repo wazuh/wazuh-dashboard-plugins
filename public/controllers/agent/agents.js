@@ -66,6 +66,8 @@ export class AgentsController {
     this.$scope.selectedItem = 0;
     this.targetLocation = null;
     this.ignoredTabs = ['syscollector', 'welcome', 'configuration'];
+
+    this.$scope.showSyscheckFiles = false;
   }
 
   $onInit() {
@@ -196,6 +198,11 @@ export class AgentsController {
     this.$scope.updateSelectedItem = i => (this.$scope.selectedItem = i);
     this.$scope.getIntegration = list =>
       this.configurationHandler.getIntegration(list, this.$scope);
+  
+    this.$scope.switchSyscheckFiles = () => {
+      this.$scope.showSyscheckFiles = !this.$scope.showSyscheckFiles;
+      if(!this.$scope.$$phase) this.$scope.$digest();
+    }
   }
 
   createMetrics(metricsObject) {
@@ -290,6 +297,7 @@ export class AgentsController {
     }
 
     try {
+      this.$scope.showSyscheckFiles = false;
       if (tab === 'pci') {
         const pciTabs = await this.commonData.getPCI();
         this.$scope.pciTabs = pciTabs;

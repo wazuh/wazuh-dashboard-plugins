@@ -196,6 +196,10 @@
             </div>
         </div>
     </div>
+    <div layout="row" ng-if="!showSyscheckFiles && tab === 'fim' && resultState === 'none' && tabView === 'panels'" layout-padding class="wz-padding-top-0">
+        <span flex></span>
+        <span ng-click="switchSyscheckFiles()" class="wz-text-link cursor-pointer">Show files</span>
+    </div> 
     <!-- No results section -->
 
     <!-- Loading ring -->

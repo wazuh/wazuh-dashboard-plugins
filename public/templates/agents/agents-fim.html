@@ -1,9 +1,9 @@
-<md-content flex layout="column" ng-if="tab === 'fim' && tabView === 'panels'" ng-class="{'no-opacity': resultState !== 'ready' || !rendered}"
-    layout-align="start">
-
+<md-content flex layout="column" ng-if="tab === 'fim' && tabView === 'panels'" ng-show="!showSyscheckFiles" ng-class="{'no-opacity': resultState !== 'ready' || !rendered}" layout-align="start">
+    <div layout="row" layout-padding class="wz-padding-top-0">
+        <span flex></span>
+        <span ng-click="switchSyscheckFiles()" class="wz-text-link cursor-pointer">Show files</span>
+    </div>
     <!-- View: Panels -->
-
-
     <div layout="row" class="height-230">
         <div layout="column" flex>
             <div layout="row" class="height-230">
@@ -69,28 +69,31 @@
     </div>
 </md-content>
 
-<div layout="row" class="wz-padding-top-0" ng-if="tab === 'fim' && tabView === 'panels'">
-    <md-card flex="" class="wz-md-card _md flex">
-        <md-card-content>
-            <span class="wz-headline-title"><i class="fa fa-fw fa-file"></i> Syscheck files</span>
-            <md-divider class="wz-margin-top-10"></md-divider>
-            <div layout="row" class="wz-margin-top-10">
-                <input placeholder="Filter files..." ng-model="filesSearch" type="text" class="kuiLocalSearchInput ng-empty ng-pristine ng-scope ng-touched ng-valid height-30"
-                    aria-invalid="false" wz-enter="searchSyscheckFile(filesSearch)">
-                <button type="submit" aria-label="Search" class="kuiLocalSearchButton height-30" ng-click="searchSyscheckFile(filesSearch)">
-                    <span class="fa fa-search" aria-hidden="true"></span>
-                </button>
-            </div>
-            <div layout="row" ng-if="agent && !load" class="wz-margin-top-10 wz-margin-bottom-40-inv">
-                <wz-table flex path="'/syscheck/' + agent.id" row-sizes="[10,8,6,3]" extra-limit="true" keys="['file','size','gname','uname','perm']">
-                </wz-table>
-            </div>
-            <div layout="row" class="wz-margin-top-10 wz-padding-top-10">Export:&nbsp;
-                <a class="small" id="btnDownload" ng-click="downloadCsv('/syscheck/' + agent.id, 'files.csv')">Formatted
-                    <i aria-hidden="true" class="fa fa-download"></i>
-                </a>
-                <span flex></span>
-            </div>
-        </md-card-content>
-    </md-card>
-</div>
+<md-content flex layout="column" ng-if="tab === 'fim' && tabView === 'panels' && showSyscheckFiles" layout-align="start">
+    <div layout="row" layout-padding class="wz-padding-top-0">
+        <span flex></span>
+        <span ng-click="switchSyscheckFiles()" class="wz-text-link cursor-pointer">Show alerts</span>
+    </div>
+
+    <div layout="row" class="wz-padding-top-0">
+        <md-card flex="" class="wz-md-card _md flex">
+            <md-card-content>
+                <div layout="row" class="wz-margin-top-10">
+                    <input placeholder="Filter files..." ng-model="filesSearch" type="text" class="kuiLocalSearchInput ng-empty ng-pristine ng-scope ng-touched ng-valid height-30"
+                        aria-invalid="false" wz-enter="searchSyscheckFile(filesSearch)">
+                    <button type="submit" aria-label="Search" class="kuiLocalSearchButton height-30" ng-click="searchSyscheckFile(filesSearch)">
+                        <span class="fa fa-search" aria-hidden="true"></span>
+                    </button>
+                </div>
+                <div layout="row" ng-if="agent && !load" class="wz-margin-top-10 wz-margin-bottom-40-inv">
+                    <wz-table flex path="'/syscheck/' + agent.id" row-sizes="[12,10,8]" extra-limit="true" keys="['file','size','gname','uname','perm']">
+                    </wz-table>
+                </div>
+                <div layout="row" layout-padding>
+                    <span flex></span>
+                    <a class="small" id="btnDownload" ng-click="ctrl.downloadCsv()">Formatted <i aria-hidden="true" class="fa fa-fw fa-download"></i></a>
+                </div>
+            </md-card-content>
+        </md-card>
+    </div>
+</md-content>
