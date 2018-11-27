@@ -284,7 +284,8 @@ export class DevToolsController {
           let method = model.find(function (item) {
             return item.method === exp[0]
           });
-          if (method && !exp[2]) {
+          const forbidChars = /^[^?{]+$/;
+          if (method && !exp[2] && forbidChars.test(word)) {
             method.endpoints.forEach(function (endpoint) {
               endpoint.path = endpoint.name;
               if (endpoint.args && endpoint.args.length > 0) {
