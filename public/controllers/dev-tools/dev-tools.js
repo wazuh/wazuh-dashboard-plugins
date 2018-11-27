@@ -11,7 +11,7 @@
  */
 import CodeMirror from '../../utils/codemirror/lib/codemirror';
 import jsonLint from '../../utils/codemirror/json-lint';
-import { ExcludedIntelliSenseTriggerKeys } from '../../util/excluded-devtools-autocomplete-keys';
+import { ExcludedIntelliSenseTriggerKeys } from '../../../util/excluded-devtools-autocomplete-keys';
 import queryString from 'querystring-browser';
 import $ from 'jquery';
 
@@ -278,13 +278,13 @@ export class DevToolsController {
     CodeMirror.registerHelper('hint', 'dictionaryHint', function (editor) {
       const model = editor.model;
       function getDictionary(line, word) {
-        let hints = {};
+        let hints = [];
         const exp = line.split(/\s+/g);
         if (exp[0] && exp[0].match(/^(?:GET|PUT|POST|DELETE).*$/)) {
           let method = model.find(function (item) {
             return item.method === exp[0]
           });
-          if (method) {
+          if (method && !exp[2]) {
             method.endpoints.forEach(function (endpoint) {
               endpoint.path = endpoint.name;
               if (endpoint.args && endpoint.args.length > 0) {
@@ -308,16 +308,11 @@ export class DevToolsController {
               }
             });
             hints = method.endpoints.map(a => a.path);
-          } else {
-            hints = [];
-          }
-          if (exp[2]) {
-            hints = [];
           }
         } else {
           hints = model.map(a => a.method);
         }
-        return hints.map(a => a);
+        return hints;
       }
 
       const cur = editor.getCursor();
