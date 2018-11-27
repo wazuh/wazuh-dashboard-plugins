@@ -61,10 +61,10 @@ export const KeyEquivalenece = {
   proto: 'Protocol',
   address: 'Address',
   protocol: 'Protocol',
-  'local.ip': 'Local',
-  'remote.ip': 'Remote',
-  'local.port': 'Port',
-  'remote.port': 'Port',
+  'local.ip': 'Local IP',
+  'remote.ip': 'Remote IP',
+  'local.port': 'Local port',
+  'remote.port': 'Remote port',
   euser: 'Effective user',
   nice: 'Priority'
 };
