@@ -1,6 +1,6 @@
 <div flex="auto" layout="column" ng-controller="managementConfigurationController" ng-if="tab === 'configuration'" ng-init="switchConfigurationTab('welcome')">
 
-    <!-- Navigation section (Breadcrumbs, etc) -->
+    <!-- Navigation section -->
     <div layout="row" layout-align="start center">
         <!-- Breadcrumbs -->
         <div layout="row" layout-padding>

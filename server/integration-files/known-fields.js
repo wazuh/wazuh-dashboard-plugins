@@ -1183,6 +1183,15 @@ export const knownFields = [
     readFromDocValues: true
   },
   {
+    name: 'data.aws.requestParameters.instanceId',
+    type: 'string',
+    count: 0,
+    scripted: false,
+    searchable: true,
+    aggregatable: true,
+    readFromDocValues: true
+  },
+  {
     name: 'data.aws.requestParameters.instanceType',
     type: 'string',
     count: 0,

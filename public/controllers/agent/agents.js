@@ -25,7 +25,7 @@ import {
 } from '../../utils/agents-metrics';
 
 import { ConfigurationHandler } from '../../utils/config-handler';
-
+import { timefilter } from 'ui/timefilter';
 const app = uiModules.get('app/wazuh', []);
 
 class AgentsController {
@@ -67,6 +67,7 @@ class AgentsController {
     this.$scope.integrations = {};
     this.$scope.selectedItem = 0;
     this.targetLocation = null;
+    this.ignoredTabs = ['syscollector', 'welcome', 'configuration'];
   }
 
   $onInit() {
@@ -94,11 +95,7 @@ class AgentsController {
     }
 
     this.tabHistory = [];
-    if (
-      this.$scope.tab !== 'configuration' &&
-      this.$scope.tab !== 'welcome' &&
-      this.$scope.tab !== 'syscollector'
-    )
+    if (!this.ignoredTabs.includes(this.$scope.tab))
       this.tabHistory.push(this.$scope.tab);
 
     // Tab names
@@ -148,16 +145,6 @@ class AgentsController {
     this.$scope.$on('$destroy', () => {
       this.visFactoryService.clearAll();
     });
-
-    // PCI and GDPR requirements
-    Promise.all([this.commonData.getPCI(), this.commonData.getGDPR()])
-      .then(data => {
-        this.$scope.pciTabs = data[0];
-        this.$scope.selectedPciIndex = 0;
-        this.$scope.gdprTabs = data[1];
-        this.$scope.selectedGdprIndex = 0;
-      })
-      .catch(error => this.errorHandler.handle(error, 'Agents'));
 
     this.$scope.isArray = Array.isArray;
 
@@ -256,14 +243,13 @@ class AgentsController {
       this.$scope.tabView = subtab;
 
       if (
-        ((subtab === 'panels') ||
-        (this.targetLocation &&
-        typeof this.targetLocation === 'object' &&
-        this.targetLocation.subTab === 'discover' &&
-        subtab === 'discover')) &&
-        !['configuration', 'welcome', 'syscollector'].includes(this.$scope.tab)
+        (subtab === 'panels' ||
+          (this.targetLocation &&
+            typeof this.targetLocation === 'object' &&
+            this.targetLocation.subTab === 'discover' &&
+            subtab === 'discover')) &&
+        !this.ignoredTabs.includes(this.$scope.tab)
       ) {
-
         const condition =
           !this.changeAgent && (localChange || preserveDiscover);
 
@@ -292,43 +278,77 @@ class AgentsController {
   }
 
   // Switch tab
-  switchTab(tab, force = false) {
-    if (tab === 'configuration') {
-      this.$scope.switchConfigurationTab('welcome');
-    } else {
-      this.configurationHandler.reset(this.$scope);
-    }
-    if (tab !== 'configuration' && tab !== 'welcome' && tab !== 'syscollector')
-      this.tabHistory.push(tab);
-    if (this.tabHistory.length > 2) this.tabHistory = this.tabHistory.slice(-2);
-    this.tabVisualizations.setTab(tab);
-    if (this.$scope.tab === tab && !force) return;
-    const onlyAgent = this.$scope.tab === tab && force;
-    const sameTab = this.$scope.tab === tab;
-    this.$location.search('tab', tab);
-    const preserveDiscover =
-      this.tabHistory.length === 2 &&
-      this.tabHistory[0] === this.tabHistory[1] &&
-      !force;
-    this.$scope.tab = tab;
-
-    const targetSubTab =
-      this.targetLocation && typeof this.targetLocation === 'object'
-        ? this.targetLocation.subTab
-        : 'panels';
-
-    if (this.$scope.tab !== 'configuration') {
-      this.$scope.switchSubtab(
-        targetSubTab,
-        true,
-        onlyAgent,
-        sameTab,
-        preserveDiscover
-      );
+  async switchTab(tab, force = false) {
+    if (this.ignoredTabs.includes(tab)) {
+      const timeFilterRefreshStatus = timefilter.getRefreshInterval();
+      const toggle =
+        timeFilterRefreshStatus &&
+        timeFilterRefreshStatus.value &&
+        !timeFilterRefreshStatus.pause;
+      if (toggle) timefilter.toggleRefresh();
     }
 
-    this.shareAgent.deleteTargetLocation();
-    this.targetLocation = null;
+    try {
+      if (tab === 'pci') {
+        const pciTabs = await this.commonData.getPCI();
+        this.$scope.pciTabs = pciTabs;
+        this.$scope.selectedPciIndex = 0;
+      }
+      if (tab === 'gdpr') {
+        const gdprTabs = await this.commonData.getPCI();
+        this.$scope.gdprTabs = gdprTabs;
+        this.$scope.selectedGdprIndex = 0;
+      }
+      if (tab === 'syscollector')
+        await this.loadSyscollector(this.$scope.agent.id);
+      if (tab === 'configuration') {
+        const isSync = await this.apiReq.request(
+          'GET',
+          `/agents/${this.$scope.agent.id}/group/is_sync`,
+          {}
+        );
+        // Configuration synced
+        this.$scope.isSynchronized =
+          isSync && isSync.data && isSync.data.data && isSync.data.data.synced;
+        this.$scope.switchConfigurationTab('welcome');
+      } else {
+        this.configurationHandler.reset(this.$scope);
+      }
+      if (!this.ignoredTabs.includes(tab)) this.tabHistory.push(tab);
+      if (this.tabHistory.length > 2)
+        this.tabHistory = this.tabHistory.slice(-2);
+      this.tabVisualizations.setTab(tab);
+      if (this.$scope.tab === tab && !force) return;
+      const onlyAgent = this.$scope.tab === tab && force;
+      const sameTab = this.$scope.tab === tab;
+      this.$location.search('tab', tab);
+      const preserveDiscover =
+        this.tabHistory.length === 2 &&
+        this.tabHistory[0] === this.tabHistory[1] &&
+        !force;
+      this.$scope.tab = tab;
+
+      const targetSubTab =
+        this.targetLocation && typeof this.targetLocation === 'object'
+          ? this.targetLocation.subTab
+          : 'panels';
+
+      if (!this.ignoredTabs.includes(this.$scope.tab)) {
+        this.$scope.switchSubtab(
+          targetSubTab,
+          true,
+          onlyAgent,
+          sameTab,
+          preserveDiscover
+        );
+      }
+
+      this.shareAgent.deleteTargetLocation();
+      this.targetLocation = null;
+    } catch (error) {
+      return Promise.reject(error);
+    }
+    if (!this.$scope.$$phase) this.$scope.$digest();
   }
 
   // Agent data
@@ -373,64 +393,41 @@ class AgentsController {
         })
       ]);
 
+      const result = data.map(
+        item => (item && item.data && item.data.data ? item.data.data : false)
+      );
+      const [
+        hardwareResponse,
+        osResponse,
+        netifaceResponse,
+        portsResponse,
+        packagesDateResponse,
+        processesDateResponse
+      ] = result;
+
       // Before proceeding, syscollector data is an empty object
       this.$scope.syscollector = {};
 
-      const hardware = {};
-      const os = {};
-      const netiface = {};
-      const ports = {};
-      const packagesDate = {};
-      const processesDate = {};
-
-      // If there is hardware information, add it
-      if (
-        data[0] &&
-        data[0].data &&
-        data[0].data.data &&
-        typeof data[0].data.data === 'object' &&
-        Object.keys(data[0].data.data).length
-      ) {
-        Object.assign(hardware, data[0].data.data);
-      }
-
-      // If there is OS information, add it
-      if (
-        data[1] &&
-        data[1].data &&
-        data[1].data.data &&
-        typeof data[1].data.data === 'object' &&
-        Object.keys(data[1].data.data).length
-      ) {
-        Object.assign(os, data[1].data.data);
-      }
-
-      // If there is network information, add it
-      if (data[2] && data[2].data && data[2].data.data) {
-        Object.assign(netiface, data[2].data.data);
-      }
-
-      // If there is ports information, add it
-      if (data[3] && data[3].data && data[3].data.data) {
-        Object.assign(ports, data[3].data.data);
-      }
-
-      // If there is packages information, add it
-      if (data[4] && data[4].data && data[4].data.data) {
-        Object.assign(packagesDate, data[4].data.data);
-      }
-
-      // If there is processes information, add it
-      if (data[5] && data[5].data && data[5].data.data) {
-        Object.assign(processesDate, data[5].data.data);
-      }
+      const packagesDate = packagesDateResponse
+        ? { ...packagesDateResponse }
+        : false;
+      const processesDate = processesDateResponse
+        ? { ...processesDateResponse }
+        : false;
 
       // Fill syscollector object
       this.$scope.syscollector = {
-        hardware,
-        os,
-        netiface,
-        ports,
+        hardware:
+          typeof hardwareResponse === 'object' &&
+          Object.keys(hardwareResponse).length
+            ? { ...hardwareResponse }
+            : false,
+        os:
+          typeof osResponse === 'object' && Object.keys(osResponse).length
+            ? { ...osResponse }
+            : false,
+        netiface: netifaceResponse ? { ...netifaceResponse } : false,
+        ports: portsResponse ? { ...portsResponse } : false,
         packagesDate:
           packagesDate && packagesDate.items && packagesDate.items.length
             ? packagesDate.items[0].scan_time
@@ -460,12 +457,17 @@ class AgentsController {
       const data = await Promise.all([
         this.apiReq.request('GET', `/agents/${id}`, {}),
         this.apiReq.request('GET', `/syscheck/${id}/last_scan`, {}),
-        this.apiReq.request('GET', `/rootcheck/${id}/last_scan`, {}),
-        this.apiReq.request('GET', `/agents/${id}/group/is_sync`, {})
+        this.apiReq.request('GET', `/rootcheck/${id}/last_scan`, {})
       ]);
 
+      const result = data.map(
+        item => (item && item.data && item.data.data ? item.data.data : false)
+      );
+
+      const [agentInfo, syscheckLastScan, rootcheckLastScan] = result;
+
       // Agent
-      this.$scope.agent = data[0].data.data;
+      this.$scope.agent = agentInfo;
       if (this.$scope.agent.os) {
         this.$scope.agentOS =
           this.$scope.agent.os.name + ' ' + this.$scope.agent.os.version;
@@ -474,19 +476,14 @@ class AgentsController {
       }
 
       // Syscheck
-      this.$scope.agent.syscheck = data[1].data.data;
+      this.$scope.agent.syscheck = syscheckLastScan;
       this.validateSysCheck();
 
       // Rootcheck
-      this.$scope.agent.rootcheck = data[2].data.data;
+      this.$scope.agent.rootcheck = rootcheckLastScan;
       this.validateRootCheck();
 
-      // Configuration synced
-      this.$scope.isSynchronized = data[3] && data[3].data && data[3].data.data && data[3].data.data.synced;
-
-      this.$scope.switchTab(this.$scope.tab, true);
-
-      await this.loadSyscollector(id);
+      await this.$scope.switchTab(this.$scope.tab, true);
 
       this.$scope.load = false;
       if (!this.$scope.$$phase) this.$scope.$digest();
@@ -566,7 +563,7 @@ class AgentsController {
       this.$scope.load = false;
 
       if (this.$scope.tab !== 'configuration')
-        this.$scope.switchTab(this.$scope.tab, true);
+        await this.$scope.switchTab(this.$scope.tab, true);
 
       if (!this.$scope.$$phase) this.$scope.$digest();
       return;

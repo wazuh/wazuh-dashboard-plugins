@@ -475,7 +475,7 @@ export class WazuhReportingCtrl {
         } catch (error) {
           continue;
         }
-        const str = Array(6).fill('---');
+        const str = Array(6).fill('-');
         str[0] = item;
         if (data && data.name) str[1] = data.name;
         if (data && data.ip) str[2] = data.ip;

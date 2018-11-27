@@ -57,7 +57,6 @@ function ip(
   return getIp(
     indexPatterns,
     $q,
-    $rootScope,
     $window,
     $location,
     Private,
@@ -83,8 +82,7 @@ function nestedResolve(
   assignPreviousLocation($rootScope, $location);
   const location = $location.path();
   return getWzConfig($q, genericReq, errorHandler, wazuhConfig).then(() =>
-    settingsWizard(
-      $rootScope,
+    settingsWizard(      
       $location,
       $q,
       $window,
@@ -111,8 +109,7 @@ function savedSearch(
   return getSavedSearch(
     redirectWhenMissing,
     $location,
-    $window,
-    $rootScope,
+    $window,    
     savedSearches,
     $route
   );
@@ -177,11 +174,11 @@ routes
   })
   .when('/context/:pattern?/:type?/:id?', {
     redirectTo: function() {},
-    resolve: { wzConfig, wzKibana }
+    resolve: { wzKibana }
   })
   .when('/doc/:pattern?/:index?/:type?/:id?', {
     redirectTo: function() {},
-    resolve: { wzConfig, wzKibana }
+    resolve: { wzKibana }
   })
   .when('/wazuh-dev', {
     template: devToolsTemplate,

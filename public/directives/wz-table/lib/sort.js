@@ -19,12 +19,11 @@ export async function sort(field, $scope, instance, fetch, errorHandler) {
     $scope.sortDir = instance.sortDir;
     await fetch();
     $scope.wazuh_table_loading = false;
-    if (!$scope.$$phase) $scope.$digest();
   } catch (error) {
     $scope.wazuh_table_loading = false;
     $scope.error = `Error sorting table by ${
       field ? field.value : 'undefined'
-    } - ${error.message || error} - Please refresh your browser.`;
+    } - ${error.message || error}.`;
     errorHandler.handle(
       `Error sorting table by ${
         field ? field.value : 'undefined'
@@ -32,5 +31,6 @@ export async function sort(field, $scope, instance, fetch, errorHandler) {
       'Data factory'
     );
   }
+  if (!$scope.$$phase) $scope.$digest();
   return;
 }

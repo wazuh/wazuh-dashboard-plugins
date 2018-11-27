@@ -41,7 +41,7 @@ export default (document, items, columns, keys, title, givenRows = false) => {
   const modifiedRows = [];
   if (!givenRows) {
     for (const item of items) {
-      const str = new Array(rowSize).fill('---');
+      const str = new Array(rowSize).fill('-');
       for (let i = 0; i < keys.length; i++) {
         if (keys[i].includes('.')) {
           const parent = keys[i].split('.')[0];

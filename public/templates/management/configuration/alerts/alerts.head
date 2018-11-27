@@ -3,9 +3,11 @@
     <!-- Headline -->
     <div layout="column" layout-padding>
         <div>
-            <span class="font-size-18">Alerts</span>
+            <span ng-if="!agent || agent.id === '000'" class="font-size-18">Alerts</span>
+            <span ng-if="agent && agent.id !== '000'" class="font-size-18">Labels</span>
         </div>
-        <span class="md-subheader">Configure everything related to the alerts and their format</span>
+        <span ng-if="!agent || agent.id === '000'" class="md-subheader">Settings related to the alerts and their format</span>
+        <span ng-if="agent && agent.id !== '000'" class="md-subheader">User-defined information about the agent included in alerts</span>
     </div>
     <!-- End headline -->
 

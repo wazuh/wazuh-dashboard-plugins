@@ -16,7 +16,6 @@ import { healthCheck } from './health-check';
 export function getIp(
   indexPatterns,
   $q,
-  $rootScope,
   $window,
   $location,
   Private,
@@ -39,14 +38,14 @@ export function getIp(
 
       const { savedObjects } = savedObjectsData;
 
-      const data = await genericReq.request('GET', '/elastic/index-patterns');
-
       let currentPattern = '';
 
       if (appState.getCurrentPattern()) {
         // There's cookie for the pattern
         currentPattern = appState.getCurrentPattern();
       } else {
+        const data = await genericReq.request('GET', '/elastic/index-patterns');
+
         if (!data || !data.data || !data.data.data || !data.data.data.length) {
           wzMisc.setBlankScr('Sorry but no valid index patterns were found');
           $location.search('tab', null);
@@ -84,7 +83,12 @@ export function getIp(
     }
   };
 
-  if (healthCheck($window, $rootScope)) {
+  const currentParams = $location.search();
+  const targetedAgent =
+    currentParams && (currentParams.agent || currentParams.agent === '000');
+  const targetedRule =
+    currentParams && currentParams.tab === 'ruleset' && currentParams.ruleid;
+  if (!targetedAgent && !targetedRule && healthCheck($window)) {
     deferred.reject();
     $location.path('/health-check');
   } else {

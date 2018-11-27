@@ -2,12 +2,12 @@
 
 All notable changes to the Wazuh app project will be documented in this file.
 
-## Wazuh v3.7.0 - Kibana v6.4.2 - Revision 413
+## Wazuh v3.7.0 - Kibana v6.4.2 / v6.4.3 - Revision 413
 
 ### Added
 
 -   Support for Wazuh v3.7.0.
--   Support for Elastic Stack v6.4.2.
+-   Support for Elastic Stack v6.4.2 / v6.4.3.
 -   Brand-new interface for _Configuration_ (on both _Management_ and _Agents_ tabs) ([#914](https://github.com/wazuh/wazuh-kibana-app/pull/914)):
     -   Now you can check current and real agent and manager configuration.
     -   A new interface design, with more useful information and easy to understand descriptions.
@@ -27,7 +27,8 @@ All notable changes to the Wazuh app project will be documented in this file.
 -   Redesigned the _Overview > Amazon AWS_ tab, using more meaningful visualizations for a better overall view of your agents' status ([#903](https://github.com/wazuh/wazuh-kibana-app/pull/903)).
 -   Redesigned the _Overview/Agents > Vulnerabilities_ tab, using more meaningful visualizations for a better overall view of your agents' status ([#954](https://github.com/wazuh/wazuh-kibana-app/pull/954)).
 -   Now everytime the user enters the _Settings_ tab, the API connection will be automatically checked ([#971](https://github.com/wazuh/wazuh-kibana-app/pull/971)).
--   Added a new Angular.js directive named `wz-config-viewer` for viewing JSON/XML content ([]()).
+-   Added a node selector for _Management > Logs_ section when Wazuh cluster is enabled ([#980](https://github.com/wazuh/wazuh-kibana-app/pull/980)).
+-   Added a group selector for _Agents_ section ([#995](https://github.com/wazuh/wazuh-kibana-app/pull/995)).
 
 ### Changed
 
@@ -45,6 +46,8 @@ All notable changes to the Wazuh app project will be documented in this file.
 -   Changed some labels to remove the "MD5 sum" expression, it will use "Checksum" instead ([#945](https://github.com/wazuh/wazuh-kibana-app/pull/945)).
 -   Added word wrapping class to group name in _Management > Groups > Group detail_ tab ([#945](https://github.com/wazuh/wazuh-kibana-app/pull/945)).
 -   The `wz-table` directive has been refactored ([#953](https://github.com/wazuh/wazuh-kibana-app/pull/953)).
+-   The `wz-table` directive now checks if a request is aborted ([#979](https://github.com/wazuh/wazuh-kibana-app/pull/979)).
+-   Several performance improvements ([#985](https://github.com/wazuh/wazuh-kibana-app/pull/985), [#997](https://github.com/wazuh/wazuh-kibana-app/pull/997), [#1000](https://github.com/wazuh/wazuh-kibana-app/pull/1000)).
 
 ### Fixed
 
@@ -59,11 +62,11 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 -   On the _Management > Monitoring_ tab, the `Cluster enabled but not running` message won't appear as an error anymore ([#971](https://github.com/wazuh/wazuh-kibana-app/pull/971)).
 
-## Wazuh v3.6.1 - Kibana v6.4.1/v6.4.2 - Revision 412
+## Wazuh v3.6.1 - Kibana v6.4.1 / v6.4.2 / v6.4.3 - Revision 412
 
 ### Added
 
--   Support for Elastic Stack v6.4.1/v6.4.2.
+-   Support for Elastic Stack v6.4.1 / v6.4.2 / v6.4.3.
 
 ## Wazuh v3.6.1 - Kibana v6.4.0 - Revision 411
 

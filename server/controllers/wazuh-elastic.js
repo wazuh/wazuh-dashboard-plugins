@@ -73,7 +73,12 @@ export class WazuhElasticCtrl {
         .filter(item => item.includes('[') && item.includes(']'));
       const pattern =
         lastChar === '*' ? req.params.pattern.slice(0, -1) : req.params.pattern;
-      const isIncluded = array.filter(item => item.includes(pattern));
+      const isIncluded = array.filter(item => {
+        item = item.slice(1, -1);
+        const lastChar = item[item.length - 1];
+        item = lastChar === '*' ? item.slice(0, -1) : item;
+        return item.includes(pattern) || pattern.includes(item);
+      });
 
       return isIncluded && Array.isArray(isIncluded) && isIncluded.length
         ? reply({
@@ -254,7 +259,7 @@ export class WazuhElasticCtrl {
   async getlist(req, reply) {
     try {
       const config = getConfiguration();
-      
+
       const xpack = await this.wzWrapper.getPlugins();
 
       const isXpackEnabled =
@@ -277,9 +282,17 @@ export class WazuhElasticCtrl {
 
       if (data && data.hits && data.hits.hits) {
         let list = this.validateIndexPattern(data.hits.hits);
-        if(config && config['ip.ignore'] && Array.isArray(config['ip.ignore']) && config['ip.ignore'].length){
-          list = list.filter(item => item && item.title && !config['ip.ignore'].includes(item.title));
-        } 
+        if (
+          config &&
+          config['ip.ignore'] &&
+          Array.isArray(config['ip.ignore']) &&
+          config['ip.ignore'].length
+        ) {
+          list = list.filter(
+            item =>
+              item && item.title && !config['ip.ignore'].includes(item.title)
+          );
+        }
         return reply({
           data:
             isXpackEnabled && !isSuperUser

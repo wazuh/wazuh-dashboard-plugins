@@ -15,11 +15,15 @@ export function getSavedSearch(
   redirectWhenMissing,
   $location,
   $window,
-  $rootScope,
   savedSearches,
   $route
 ) {
-  if (healthCheck($window, $rootScope)) {
+  const currentParams = $location.search();
+  const targetedAgent =
+    currentParams && (currentParams.agent || currentParams.agent === '000');
+  const targetedRule =
+    currentParams && currentParams.tab === 'ruleset' && currentParams.ruleid;
+  if (!targetedAgent && !targetedRule && healthCheck($window)) {
     $location.path('/health-check');
     return Promise.reject();
   } else {

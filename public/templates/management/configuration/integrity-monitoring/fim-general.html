@@ -5,7 +5,7 @@
             <div>
                 <span class="font-size-16">General</span>
                 <div class="wz-margin-top-10">
-                    <span class="md-subheader small">These settings are global to the whole section</span>
+                    <span class="md-subheader small">The settings shown below are applied globally</span>
                 </div>
             </div>
             <span flex></span>
@@ -28,11 +28,11 @@
             </wz-config-item>
             <wz-config-item
                 label="Time of day to run integrity scans"
-                value="currentConfig['syscheck-syscheck'].syscheck.scan_time || 'n/a'">
+                value="currentConfig['syscheck-syscheck'].syscheck.scan_time || '-'">
             </wz-config-item>
             <wz-config-item
                 label="Day of the week to run integrity scans"
-                value="currentConfig['syscheck-syscheck'].syscheck.scan_day || 'n/a'">
+                value="currentConfig['syscheck-syscheck'].syscheck.scan_day || '-'">
             </wz-config-item>
             <wz-config-item
                 ng-if="!agent || agent.id === '000'"
@@ -65,7 +65,7 @@
             </wz-config-item>
             <wz-config-item
                 label="Command to prevent prelinking"
-                value="currentConfig['syscheck-syscheck'].syscheck.prefilter_cmd || 'n/a'">
+                value="currentConfig['syscheck-syscheck'].syscheck.prefilter_cmd || '-'">
             </wz-config-item>
 
         </div>

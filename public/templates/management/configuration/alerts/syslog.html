@@ -48,14 +48,14 @@
                         </thead>
                         <tbody class="wz-word-wrap">
                             <tr ng-repeat="item in currentConfig['csyslog-csyslog'].syslog_output">
-                                <td>{{ item.server || 'n/a' }}</td>
-                                <td>{{ item.port || '514' }}</td>
+                                <td>{{ item.server }}</td>
+                                <td>{{ item.port }}</td>
                                 <td>{{ item.level }}</td>
                                 <td>{{ item.format || 'default' }}</td>
                                 <td>{{ item.use_fqdn || 'no' }}</td>
-                                <td>{{ item.rule_id || 'n/a' }}</td>
-                                <td>{{ item.group || 'n/a' }}</td>
-                                <td>{{ item.location || 'n/a' }}</td>
+                                <td>{{ item.rule_id || 'all' }}</td>
+                                <td>{{ item.group || 'all' }}</td>
+                                <td>{{ item.location || 'all' }}</td>
                             </tr>
                         </tbody>
                     </table>

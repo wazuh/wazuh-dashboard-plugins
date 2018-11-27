@@ -60,11 +60,11 @@
                         value="currentConfig['analysis-global'].global.custom_alert_output">
                     </wz-config-item>
                     <wz-config-item
-                        label="Write Wazuh internal logs in plain text"
+                        label="Write internal logs in plain text"
                         value="currentConfig['com-logging'].logging.plain">
                     </wz-config-item>
                     <wz-config-item
-                        label="Write Wazuh internal logs in JSON format"
+                        label="Write internal logs in JSON format"
                         value="currentConfig['com-logging'].logging.json">
                     </wz-config-item>
                     <wz-config-item
@@ -164,9 +164,6 @@
 
                 <div ng-if="!agent || agent.id === '000'" class="wz-margin-top-10">
                     <span class="font-size-16">Prelude and ZeroMQ output</span>
-                    <div class="wz-margin-top-10">
-                        <span class="md-subheader small">Configure custom Prelude or ZeroMQ outputs</span>
-                    </div>
                 </div>
                 <md-divider ng-if="!agent || agent.id === '000'" class="wz-margin-top-10"></md-divider>
 

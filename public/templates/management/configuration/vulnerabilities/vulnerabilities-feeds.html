@@ -36,12 +36,12 @@
                 </thead>
                 <tbody class="wz-word-wrap">
                     <tr ng-repeat="item in currentConfig['vulnerability-detector'].feeds">
-                        <td>{{ item.name || '---' }}</td>
-                        <td>{{ item.version || '---' }}</td>
-                        <td>{{ item.interval || '---' }}</td>
-                        <td>{{ item.path || '---' }}</td>
-                        <td>{{ item.alternative.url || '---' }}</td>
-                        <td>{{ item.alternative.port || '---' }}</td>
+                        <td>{{ item.name || '-' }}</td>
+                        <td>{{ item.version || '-' }}</td>
+                        <td>{{ item.interval || '-' }}</td>
+                        <td>{{ item.path || '-' }}</td>
+                        <td>{{ item.alternative.url || '-' }}</td>
+                        <td>{{ item.alternative.port || '-' }}</td>
                     </tr>
                 </tbody>
             </table>
