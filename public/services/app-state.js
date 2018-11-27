@@ -109,14 +109,14 @@ export class AppState {
   }
 
   setSessionStorageItem(key, value) {
-    sessionStorage.setItem(key, value);
+    this.$window.sessionStorage.setItem(key, value);
   }
 
   getSessionStorageItem(key) {
-    return sessionStorage.getItem(key);
+    return this.$window.sessionStorage.getItem(key);
   }
 
   removeSessionStorageItem(key) {
-    sessionStorage.removeItem(key);
+    this.$window.sessionStorage.removeItem(key);
   }
 }
