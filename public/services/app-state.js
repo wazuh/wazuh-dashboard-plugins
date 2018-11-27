@@ -107,4 +107,16 @@ export class AppState {
   getCurrentDevTools() {
     return this.$window.localStorage.getItem('currentDevTools');
   }
+
+  setSessionStorageItem(key, value) {
+    sessionStorage.setItem(key, value);
+  }
+
+  getSessionStorageItem(key) {
+    return sessionStorage.getItem(key);
+  }
+
+  removeSessionStorageItem(key) {
+    sessionStorage.removeItem(key);
+  }
 }

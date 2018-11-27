@@ -171,7 +171,7 @@ export class AgentsController {
       this.$scope.navigate = navigate;
       this.$scope.configSubTab = JSON.stringify({ 'configurationTab': configurationTab, 'sections': sections });
       if (!this.$location.search().configSubTab) {
-        sessionStorage.setItem("configSubTab", this.$scope.configSubTab);
+        this.appState.setSessionStorageItem('configSubTab', this.$scope.configSubTab);
         this.$location.search('configSubTab', true);
       }
       this.configurationHandler.switchConfigTab(
@@ -202,7 +202,7 @@ export class AgentsController {
       if (!this.$scope.navigate) {
         const configSubTab = this.$location.search().configSubTab;
         if (configSubTab) {
-          const config = sessionStorage.getItem("configSubTab");
+          const config = this.appState.getSessionStorageItem('configSubTab');
           const configSubTabObj = JSON.parse(config);
           this.$scope.switchConfigTab(configSubTabObj.configurationTab, configSubTabObj.sections, false);
         } else {
@@ -213,7 +213,7 @@ export class AgentsController {
         }
       } else {
         this.$location.search('configSubTab', null);
-        sessionStorage.removeItem('configSubTab');
+        this.appState.removeSessionStorageItem('configSubTab');
         this.$location.search('configWodle', null);
       }
     }
@@ -226,6 +226,8 @@ export class AgentsController {
     this.$scope.updateSelectedItem = i => (this.$scope.selectedItem = i);
     this.$scope.getIntegration = list =>
       this.configurationHandler.getIntegration(list, this.$scope);
+
+    this.$scope.$on('$routeChangeStart', () => this.appState.removeSessionStorageItem('configSubTab'));
   }
 
   createMetrics(metricsObject) {

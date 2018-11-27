@@ -12,10 +12,11 @@
 import { ConfigurationHandler } from '../../utils/config-handler';
 
 export class ConfigurationController {
-  constructor($scope, $location, errorHandler, apiReq) {
+  constructor($scope, $location, errorHandler, apiReq, appState) {
     this.$scope = $scope;
     this.errorHandler = errorHandler;
     this.apiReq = apiReq;
+    this.appState = appState;
     this.$location = $location;
     this.$scope.load = false;
     this.$scope.isArray = Array.isArray;
@@ -37,7 +38,7 @@ export class ConfigurationController {
       this.$scope.navigate = navigate;
       this.$scope.configSubTab = JSON.stringify({ 'configurationTab': configurationTab, 'sections': sections });
       if (!this.$location.search().configSubTab) {
-        sessionStorage.setItem("configSubTab", this.$scope.configSubTab);
+        this.appState.setSessionStorageItem('configSubTab', this.$scope.configSubTab);
         this.$location.search('configSubTab', true);
       }
       this.configurationHandler.switchConfigTab(
@@ -64,7 +65,7 @@ export class ConfigurationController {
       if (!this.$scope.navigate) {
         let configSubTab = this.$location.search().configSubTab;
         if (configSubTab) {
-          const config = sessionStorage.getItem("configSubTab");
+          const config = this.appState.getSessionStorageItem('configSubTab');
           const configSubTabObj = JSON.parse(config);
           this.$scope.switchConfigTab(configSubTabObj.configurationTab, configSubTabObj.sections, false);
         } else {
@@ -75,7 +76,7 @@ export class ConfigurationController {
         }
       } else {
         this.$location.search('configSubTab', null);
-        sessionStorage.removeItem('configSubTab');
+        this.appState.removeSessionStorageItem('configSubTab');
         this.$location.search('configWodle', null);
       }
     };
@@ -87,5 +88,7 @@ export class ConfigurationController {
     this.$scope.updateSelectedItem = i => (this.$scope.selectedItem = i);
     this.$scope.getIntegration = list =>
       this.configurationHandler.getIntegration(list, this.$scope);
+
+    this.$scope.$on('$routeChangeStart', () => this.appState.removeSessionStorageItem('configSubTab'));
   }
 }
