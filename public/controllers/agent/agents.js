@@ -201,6 +201,11 @@ export class AgentsController {
   
     this.$scope.switchSyscheckFiles = () => {
       this.$scope.showSyscheckFiles = !this.$scope.showSyscheckFiles;
+      if(!this.$scope.showSyscheckFiles) {
+        this.$rootScope.$emit('changeTabView', {
+          tabView: this.$scope.tabView
+        });
+      }
       if(!this.$scope.$$phase) this.$scope.$digest();
     }
   }
