@@ -48,7 +48,8 @@ export class ConfigurationHandler {
       );
       if (sections[0].component === 'integrator') {
         this.buildIntegrations(
-          $scope.currentConfig['integrator-integration'].integration
+          $scope.currentConfig['integrator-integration'].integration,
+          $scope
         );
       } else {
         $scope.integrations = {};
