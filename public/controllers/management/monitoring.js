@@ -10,6 +10,7 @@
  * Find more information about this on the LICENSE file.
  */
 import { FilterHandler } from '../../utils/filter-handler';
+import { timefilter } from 'ui/timefilter';
 
 export function ClusterController(
   $scope,
@@ -27,6 +28,7 @@ export function ClusterController(
   appState,
   genericReq
 ) {
+  timefilter.setRefreshInterval({pause:true,value:0})
   $scope.search = term => {
     $scope.$broadcast('wazuhSearch', { term });
   };

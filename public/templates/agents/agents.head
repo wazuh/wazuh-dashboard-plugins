@@ -39,7 +39,7 @@
                 <span> / </span>
                 <span class="wz-text-link cursor-pointer" ng-click="switchTab('welcome')">{{agent.name}} ({{agent.id}})</span>
                 <span> / </span>
-                <span class="wz-text-link cursor-pointer" ng-click="switchConfigurationTab('welcome')">{{ tabNames[tab] }}</span>
+                <span class="wz-text-link cursor-pointer" ng-click="switchConfigurationTab('welcome', true)">{{ tabNames[tab] }}</span>
                 <span> / </span>
                 <span>{{ tabNames[configurationTab] === 'Alerts' ? 'Labels' : tabNames[configurationTab] }}</span>
             </div>
@@ -57,7 +57,7 @@
         <!-- End separator -->
 
         <!-- Reporting button section -->
-        <div ng-show="tab !== 'welcome' && tab !== 'configuration'">
+        <div ng-show="tab !== 'welcome' && tab !== 'configuration' && tabView === 'panels'">
             <!-- Report button -->
             <md-button md-no-ink class="md-icon-button small wz-no-margin-padding" tooltip="Generate report" tooltip-placement="bottom" ng-disabled="(!rendered || loading || resultState !== 'ready') && tab !== 'syscollector'" ng-click="startVis2Png()" aria-label="Generate report button">
                 <i class="fa fa-fw fa-print" aria-hidden="true"></i>

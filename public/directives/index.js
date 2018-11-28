@@ -18,3 +18,4 @@ import './wz-welcome-card/wz-welcome-card';
 import './wz-no-config/wz-no-config';
 import './wz-config-item/wz-config-item';
 import './wz-config-item/wz-config-item.less';
+import './wz-config-viewer/wz-config-viewer';
