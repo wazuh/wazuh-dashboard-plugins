@@ -86,7 +86,7 @@
                     </button>
                 </div>
                 <div layout="row" ng-if="agent && !load" class="wz-margin-top-10 wz-margin-bottom-40-inv">
-                    <wz-table flex path="'/syscheck/' + agent.id" row-sizes="[12,10,8]" extra-limit="true" keys="['file','size','gname','uname','perm']">
+                    <wz-table flex path="'/syscheck/' + agent.id" row-sizes="[12,10,8]" extra-limit="true" keys="['file','size','inode','gname','uname','perm','sha1','sha256','uid','gid','mtime','md5']">
                     </wz-table>
                 </div>
                 <div layout="row" layout-padding>

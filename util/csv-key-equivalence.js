@@ -70,5 +70,9 @@ export const KeyEquivalenece = {
   size: 'Size',
   uname: 'User',
   gname: 'Group',
-  perm: 'Permissions'
+  perm: 'Permissions',
+  inode: 'Inode',
+  uid: 'User ID',
+  gid: 'Group ID',
+  mtime: 'Last modified'
 };
