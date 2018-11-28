@@ -11,6 +11,7 @@
  */
 import { base64 } from '../../utils/base64';
 import { TabNames } from '../../utils/tab-names';
+import { configEquivalences } from '../../utils/config-equivalences';
 
 export class SettingsController {
   constructor(
@@ -636,5 +637,9 @@ export class SettingsController {
 
   refreshLogs() {
     return this.getAppLogs();
+  }
+
+  configEquivalence(key) {
+    return configEquivalences[key] || '-';
   }
 }
