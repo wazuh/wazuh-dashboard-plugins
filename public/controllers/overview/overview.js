@@ -25,6 +25,7 @@ import {
 } from '../../utils/overview-metrics';
 
 import { queryConfig } from '../../services/query-config';
+import { timefilter } from 'ui/timefilter';
 
 export class OverviewController {
   constructor(
@@ -54,6 +55,7 @@ export class OverviewController {
   }
 
   $onInit() {
+    timefilter.setRefreshInterval({pause:true,value:0})
     this.wodlesConfiguration = false;
     this.TabDescription = TabDescription;
     this.$rootScope.reportStatus = false;
@@ -211,6 +213,10 @@ export class OverviewController {
   // Switch tab
   async switchTab(newTab, force = false) {
     try {
+      if(newTab === 'welcome') {
+        timefilter.setRefreshInterval({pause:true,value:0})
+      }
+
       if (newTab !== 'welcome') {
         await this.fetchWodles();
       }

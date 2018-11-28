@@ -71,6 +71,7 @@ export class AgentsController {
   }
 
   $onInit() {
+    timefilter.setRefreshInterval({pause:true,value:0})
     this.$scope.TabDescription = TabDescription;
 
     this.$rootScope.reportStatus = false;
@@ -172,29 +173,70 @@ export class AgentsController {
     this.$scope.isString = item => typeof item === 'string';
     this.$scope.hasSize = obj =>
       obj && typeof obj === 'object' && Object.keys(obj).length;
-    this.$scope.switchConfigTab = (configurationTab, sections) =>
+    this.$scope.switchConfigTab = (configurationTab, sections, navigate = true) => {
+      this.$scope.navigate = navigate;
+      try {
+        this.$scope.configSubTab = JSON.stringify({ 'configurationTab': configurationTab, 'sections': sections });
+        if (!this.$location.search().configSubTab) {
+          this.appState.setSessionStorageItem('configSubTab', this.$scope.configSubTab);
+          this.$location.search('configSubTab', true);
+        }
+      } catch (error) {
+        this.errorHandler.handle(error, 'Set configuration path');
+      }
       this.configurationHandler.switchConfigTab(
         configurationTab,
         sections,
         this.$scope,
         this.$scope.agent.id
       );
-    this.$scope.switchWodle = wodleName =>
+    }
+    this.$scope.switchWodle = (wodleName, navigate = true) => {
+      this.$scope.navigate = navigate;
+      this.$scope.configWodle = wodleName;
+      if (!this.$location.search().configWodle) {
+        this.$location.search('configWodle', this.$scope.configWodle);
+      }
       this.configurationHandler.switchWodle(
         wodleName,
         this.$scope,
         this.$scope.agent.id
-      );
-    this.$scope.switchConfigurationTab = configurationTab =>
+      )
+    };
+    this.$scope.switchConfigurationTab = (configurationTab, navigate) => {
+      this.$scope.navigate = navigate;
       this.configurationHandler.switchConfigurationTab(
         configurationTab,
         this.$scope
       );
-    this.$scope.switchConfigurationSubTab = configurationSubTab =>
+      if (!this.$scope.navigate) {
+        const configSubTab = this.$location.search().configSubTab;
+        if (configSubTab) {
+          try {
+            const config = this.appState.getSessionStorageItem('configSubTab');
+            const configSubTabObj = JSON.parse(config);
+            this.$scope.switchConfigTab(configSubTabObj.configurationTab, configSubTabObj.sections, false);
+          } catch (error) {
+            this.errorHandler.handle(error, 'Get configuration path');
+          }
+        } else {
+          const configWodle = this.$location.search().configWodle;
+          if (configWodle) {
+            this.$scope.switchWodle(configWodle, false);
+          }
+        }
+      } else {
+        this.$location.search('configSubTab', null);
+        this.appState.removeSessionStorageItem('configSubTab');
+        this.$location.search('configWodle', null);
+      }
+    }
+    this.$scope.switchConfigurationSubTab = configurationSubTab => {
       this.configurationHandler.switchConfigurationSubTab(
         configurationSubTab,
         this.$scope
       );
+    }
     this.$scope.updateSelectedItem = i => (this.$scope.selectedItem = i);
     this.$scope.getIntegration = list =>
       this.configurationHandler.getIntegration(list, this.$scope);
@@ -208,6 +250,9 @@ export class AgentsController {
       }
       if(!this.$scope.$$phase) this.$scope.$digest();
     }
+
+    this.$scope.$on('$routeChangeStart', () => this.appState.removeSessionStorageItem('configSubTab'));
+
   }
 
   createMetrics(metricsObject) {
@@ -293,12 +338,7 @@ export class AgentsController {
   // Switch tab
   async switchTab(tab, force = false) {
     if (this.ignoredTabs.includes(tab)) {
-      const timeFilterRefreshStatus = timefilter.getRefreshInterval();
-      const toggle =
-        timeFilterRefreshStatus &&
-        timeFilterRefreshStatus.value &&
-        !timeFilterRefreshStatus.pause;
-      if (toggle) timefilter.toggleRefresh();
+      timefilter.setRefreshInterval({pause:true,value:0})
     }
 
     try {
