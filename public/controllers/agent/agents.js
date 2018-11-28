@@ -69,6 +69,7 @@ export class AgentsController {
   }
 
   $onInit() {
+    timefilter.setRefreshInterval({pause:true,value:0})
     this.$scope.TabDescription = TabDescription;
 
     this.$rootScope.reportStatus = false;
@@ -321,12 +322,7 @@ export class AgentsController {
   // Switch tab
   async switchTab(tab, force = false) {
     if (this.ignoredTabs.includes(tab)) {
-      const timeFilterRefreshStatus = timefilter.getRefreshInterval();
-      const toggle =
-        timeFilterRefreshStatus &&
-        timeFilterRefreshStatus.value &&
-        !timeFilterRefreshStatus.pause;
-      if (toggle) timefilter.toggleRefresh();
+      timefilter.setRefreshInterval({pause:true,value:0})
     }
 
     try {
