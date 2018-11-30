@@ -190,7 +190,7 @@
     <!-- No results section -->
     <div layout="row" ng-if="!showSyscheckFiles && tab === 'fim' && resultState === 'none' && tabView === 'panels'" layout-padding class="wz-padding-top-0">
         <span flex></span>
-        <span ng-click="switchSyscheckFiles()" class="wz-text-link cursor-pointer">Show files</span>
+        <span ng-click="switchSyscheckFiles()" class="btn pull-right btn-primary">Show files</span>
     </div> 
     <div layout="row" class="wz-margin-top-10 wz-margin-right-8 wz-margin-left-8" ng-if="!showSyscheckFiles && tab !== 'welcome' && tab !== 'configuration' && tab !== 'syscollector'" ng-show="resultState === 'none' && tabView === 'panels'">
         <div flex class="euiCallOut euiCallOut--warning">

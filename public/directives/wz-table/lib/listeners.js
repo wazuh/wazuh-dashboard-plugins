@@ -22,15 +22,21 @@ export function wazuhFilter(parameters, filter) {
 
 export function wazuhSearch(parameters, instance, search) {
   try {
-    if (parameters && parameters.specificPath) {
-      if (
-        !instance.path.includes(parameters.specificPath) ||
-        !instance.filters.filter(
-          filter => filter.value === parameters.specificFilter.value
-        ).length
-      ) {
-        return;
-      }
+    const matchesSpecificPath =
+      parameters &&
+      parameters.specificPath &&
+      !instance.path.includes(parameters.specificPath);
+    const matchesSpecificFilter =
+      parameters &&
+      parameters.specificFilter &&
+      !instance.filters.filter(
+        filter =>
+          filter.name === parameters.specificFilter.name &&
+          filter.value === parameters.specificFilter.value
+      ).length;
+
+    if (matchesSpecificPath || matchesSpecificFilter) {
+      return;
     }
     return search(parameters.term, parameters.removeFilters);
   } catch (error) {

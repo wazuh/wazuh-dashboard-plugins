@@ -1,7 +1,7 @@
 <md-content flex layout="column" ng-if="tab === 'fim' && tabView === 'panels'" ng-show="!showSyscheckFiles" ng-class="{'no-opacity': resultState !== 'ready' || !rendered}" layout-align="start">
     <div layout="row" layout-padding class="wz-padding-top-0">
         <span flex></span>
-        <span ng-click="switchSyscheckFiles()" class="wz-text-link cursor-pointer">Show files</span>
+        <span ng-click="switchSyscheckFiles()" class="btn pull-right btn-primary">Show files</span>
     </div>
     <!-- View: Panels -->
     <div layout="row" class="height-230">
@@ -72,7 +72,7 @@
 <md-content flex layout="column" ng-if="tab === 'fim' && tabView === 'panels' && showSyscheckFiles" layout-align="start">
     <div layout="row" layout-padding class="wz-padding-top-0">
         <span flex></span>
-        <span ng-click="switchSyscheckFiles()" class="wz-text-link cursor-pointer">Show alerts</span>
+        <span ng-click="switchSyscheckFiles()" class="btn pull-right btn-primary">Show alerts</span>
     </div>
     <div layout="row" class="wz-padding-top-0" ng-if="agent && agent.os && agent.os.platform === 'windows'">
         <md-card flex="" class="wz-md-card _md flex">
@@ -82,7 +82,7 @@
                 <div layout="row" class="wz-margin-top-10">
                     <input placeholder="Filter registry..." ng-model="registrySearch" type="text" class="kuiLocalSearchInput ng-empty ng-pristine ng-scope ng-touched ng-valid height-30"
                         aria-invalid="false" wz-enter="searchSyscheckFile(registrySearch,{name:'type',value:'registry'})">
-                    <button type="submit" aria-label="Search" class="kuiLocalSearchButton height-30" ng-click="searchSyscheckFile(registrySearch)">
+                    <button type="submit" aria-label="Search" class="kuiLocalSearchButton height-30" ng-click="searchSyscheckFile(registrySearch,{name:'type',value:'registry'})">
                         <span class="fa fa-search" aria-hidden="true"></span>
                     </button>
                 </div>
@@ -92,7 +92,7 @@
                 </div>
                 <div layout="row" layout-padding>
                     <span flex></span>
-                    <a class="small" id="btnDownload" ng-click="ctrl.downloadCsv()">Formatted <i aria-hidden="true" class="fa fa-fw fa-download"></i></a>
+                    <a class="small" id="btnDownload" ng-click="downloadCsv('/syscheck/' + agent.id, 'fim-registry.csv', [{name:'type',value:'registry'}])">Formatted <i aria-hidden="true" class="fa fa-fw fa-download"></i></a>
                 </div>
             </md-card-content>
         </md-card>
@@ -106,7 +106,7 @@
                 <div layout="row" class="wz-margin-top-10">
                     <input placeholder="Filter files..." ng-model="filesSearch" type="text" class="kuiLocalSearchInput ng-empty ng-pristine ng-scope ng-touched ng-valid height-30"
                         aria-invalid="false" wz-enter="searchSyscheckFile(filesSearch,{name:'type',value:'file'})">
-                    <button type="submit" aria-label="Search" class="kuiLocalSearchButton height-30" ng-click="searchSyscheckFile(filesSearch)">
+                    <button type="submit" aria-label="Search" class="kuiLocalSearchButton height-30" ng-click="searchSyscheckFile(filesSearch,{name:'type',value:'file'})">
                         <span class="fa fa-search" aria-hidden="true"></span>
                     </button>
                 </div>
@@ -116,7 +116,7 @@
                 </div>
                 <div layout="row" layout-padding>
                     <span flex></span>
-                    <a class="small" id="btnDownload" ng-click="ctrl.downloadCsv()">Formatted <i aria-hidden="true" class="fa fa-fw fa-download"></i></a>
+                    <a class="small" id="btnDownload" ng-click="downloadCsv('/syscheck/' + agent.id, 'fim-files.csv', [{name:'type',value:'file'}])">Formatted <i aria-hidden="true" class="fa fa-fw fa-download"></i></a>
                 </div>
             </md-card-content>
         </md-card>
@@ -138,7 +138,7 @@
                 </div>
                 <div layout="row" layout-padding>
                     <span flex></span>
-                    <a class="small" id="btnDownload" ng-click="ctrl.downloadCsv()">Formatted <i aria-hidden="true" class="fa fa-fw fa-download"></i></a>
+                    <a class="small" id="btnDownload" ng-click="downloadCsv('/syscheck/' + agent.id, 'fim-files.csv')">Formatted <i aria-hidden="true" class="fa fa-fw fa-download"></i></a>
                 </div>
             </md-card-content>
         </md-card>
