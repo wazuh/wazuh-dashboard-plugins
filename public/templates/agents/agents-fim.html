@@ -77,7 +77,7 @@
     <div layout="row" class="wz-padding-top-0" ng-if="agent && agent.os && agent.os.platform === 'windows'">
         <md-card flex="" class="wz-md-card _md flex">
             <md-card-content>
-                <span class="wz-headline-title">Windows registry</span>
+                <span class="wz-headline-title"><i class="fa fa-fw fa-windows"></i> Windows registry</span>
                 <md-divider class="wz-margin-top-10"></md-divider>
                 <div layout="row" class="wz-margin-top-10">
                     <input placeholder="Filter registry..." ng-model="registrySearch" type="text" class="kuiLocalSearchInput ng-empty ng-pristine ng-scope ng-touched ng-valid height-30"
@@ -101,7 +101,7 @@
     <div layout="row" class="wz-padding-top-0" ng-if="agent && agent.os && agent.os.platform === 'windows'">
         <md-card flex="" class="wz-md-card _md flex">
             <md-card-content>
-                <span class="wz-headline-title">Files</span>
+                <span class="wz-headline-title"><i class="fa fa-fw fa-file-o"></i> Files</span>
                 <md-divider class="wz-margin-top-10"></md-divider>
                 <div layout="row" class="wz-margin-top-10">
                     <input placeholder="Filter files..." ng-model="filesSearch" type="text" class="kuiLocalSearchInput ng-empty ng-pristine ng-scope ng-touched ng-valid height-30"
@@ -125,6 +125,8 @@
     <div layout="row" class="wz-padding-top-0" ng-if="agent && agent.os && agent.os.platform !== 'windows'">
         <md-card flex="" class="wz-md-card _md flex">
             <md-card-content>
+                <span class="wz-headline-title"><i class="fa fa-fw fa-file-o"></i> Files</span>
+                <md-divider class="wz-margin-top-10"></md-divider>
                 <div layout="row" class="wz-margin-top-10">
                     <input placeholder="Filter files..." ng-model="filesSearch" type="text" class="kuiLocalSearchInput ng-empty ng-pristine ng-scope ng-touched ng-valid height-30"
                         aria-invalid="false" wz-enter="searchSyscheckFile(filesSearch)">
