@@ -21,14 +21,27 @@ export function wazuhFilter(parameters, filter) {
 }
 
 export function wazuhSearch(parameters, instance, search) {
-  if (
-    parameters &&
-    parameters.specificPath &&
-    !instance.path.includes(parameters.specificPath)
-  ) {
+  try {
+    const matchesSpecificPath =
+      parameters &&
+      parameters.specificPath &&
+      !instance.path.includes(parameters.specificPath);
+    const matchesSpecificFilter =
+      parameters &&
+      parameters.specificFilter &&
+      !instance.filters.filter(
+        filter =>
+          filter.name === parameters.specificFilter.name &&
+          filter.value === parameters.specificFilter.value
+      ).length;
+
+    if (matchesSpecificPath || matchesSpecificFilter) {
+      return;
+    }
+    return search(parameters.term, parameters.removeFilters);
+  } catch (error) {
     return;
   }
-  return search(parameters.term, parameters.removeFilters);
 }
 
 export function wazuhRemoveFilter(parameters, instance, wzTableFilter, init) {
