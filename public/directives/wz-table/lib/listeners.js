@@ -21,14 +21,21 @@ export function wazuhFilter(parameters, filter) {
 }
 
 export function wazuhSearch(parameters, instance, search) {
-  if (
-    parameters &&
-    parameters.specificPath &&
-    !instance.path.includes(parameters.specificPath)
-  ) {
+  try {
+    if (parameters && parameters.specificPath) {
+      if (
+        !instance.path.includes(parameters.specificPath) ||
+        !instance.filters.filter(
+          filter => filter.value === parameters.specificFilter.value
+        ).length
+      ) {
+        return;
+      }
+    }
+    return search(parameters.term, parameters.removeFilters);
+  } catch (error) {
     return;
   }
-  return search(parameters.term, parameters.removeFilters);
 }
 
 export function wazuhRemoveFilter(parameters, instance, wzTableFilter, init) {

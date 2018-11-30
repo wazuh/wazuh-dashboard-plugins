@@ -71,7 +71,7 @@ export class AgentsController {
   }
 
   $onInit() {
-    timefilter.setRefreshInterval({pause:true,value:0})
+    timefilter.setRefreshInterval({ pause: true, value: 0 });
     this.$scope.TabDescription = TabDescription;
 
     this.$rootScope.reportStatus = false;
@@ -136,13 +136,14 @@ export class AgentsController {
     this.$scope.goGroups = (agent, group) => this.goGroups(agent, group);
     this.$scope.analyzeAgents = async searchTerm =>
       this.analyzeAgents(searchTerm);
-    this.$scope.downloadCsv = async (path, fileName) => this.downloadCsv(path, fileName);
+    this.$scope.downloadCsv = async (path, fileName) =>
+      this.downloadCsv(path, fileName);
 
     this.$scope.search = (term, specificPath) =>
       this.$scope.$broadcast('wazuhSearch', { term, specificPath });
 
-    this.$scope.searchSyscheckFile = (term) =>
-      this.$scope.$broadcast('wazuhSearch', { term });
+    this.$scope.searchSyscheckFile = (term, specificFilter) =>
+      this.$scope.$broadcast('wazuhSearch', { term, specificFilter });
 
     this.$scope.startVis2Png = () => this.startVis2Png();
 
@@ -173,12 +174,22 @@ export class AgentsController {
     this.$scope.isString = item => typeof item === 'string';
     this.$scope.hasSize = obj =>
       obj && typeof obj === 'object' && Object.keys(obj).length;
-    this.$scope.switchConfigTab = (configurationTab, sections, navigate = true) => {
+    this.$scope.switchConfigTab = (
+      configurationTab,
+      sections,
+      navigate = true
+    ) => {
       this.$scope.navigate = navigate;
       try {
-        this.$scope.configSubTab = JSON.stringify({ 'configurationTab': configurationTab, 'sections': sections });
+        this.$scope.configSubTab = JSON.stringify({
+          configurationTab: configurationTab,
+          sections: sections
+        });
         if (!this.$location.search().configSubTab) {
-          this.appState.setSessionStorageItem('configSubTab', this.$scope.configSubTab);
+          this.appState.setSessionStorageItem(
+            'configSubTab',
+            this.$scope.configSubTab
+          );
           this.$location.search('configSubTab', true);
         }
       } catch (error) {
@@ -190,7 +201,7 @@ export class AgentsController {
         this.$scope,
         this.$scope.agent.id
       );
-    }
+    };
     this.$scope.switchWodle = (wodleName, navigate = true) => {
       this.$scope.navigate = navigate;
       this.$scope.configWodle = wodleName;
@@ -201,7 +212,7 @@ export class AgentsController {
         wodleName,
         this.$scope,
         this.$scope.agent.id
-      )
+      );
     };
     this.$scope.switchConfigurationTab = (configurationTab, navigate) => {
       this.$scope.navigate = navigate;
@@ -215,7 +226,11 @@ export class AgentsController {
           try {
             const config = this.appState.getSessionStorageItem('configSubTab');
             const configSubTabObj = JSON.parse(config);
-            this.$scope.switchConfigTab(configSubTabObj.configurationTab, configSubTabObj.sections, false);
+            this.$scope.switchConfigTab(
+              configSubTabObj.configurationTab,
+              configSubTabObj.sections,
+              false
+            );
           } catch (error) {
             this.errorHandler.handle(error, 'Get configuration path');
           }
@@ -230,29 +245,30 @@ export class AgentsController {
         this.appState.removeSessionStorageItem('configSubTab');
         this.$location.search('configWodle', null);
       }
-    }
+    };
     this.$scope.switchConfigurationSubTab = configurationSubTab => {
       this.configurationHandler.switchConfigurationSubTab(
         configurationSubTab,
         this.$scope
       );
-    }
+    };
     this.$scope.updateSelectedItem = i => (this.$scope.selectedItem = i);
     this.$scope.getIntegration = list =>
       this.configurationHandler.getIntegration(list, this.$scope);
-  
+
     this.$scope.switchSyscheckFiles = () => {
       this.$scope.showSyscheckFiles = !this.$scope.showSyscheckFiles;
-      if(!this.$scope.showSyscheckFiles) {
+      if (!this.$scope.showSyscheckFiles) {
         this.$rootScope.$emit('changeTabView', {
           tabView: this.$scope.tabView
         });
       }
-      if(!this.$scope.$$phase) this.$scope.$digest();
-    }
+      if (!this.$scope.$$phase) this.$scope.$digest();
+    };
 
-    this.$scope.$on('$routeChangeStart', () => this.appState.removeSessionStorageItem('configSubTab'));
-
+    this.$scope.$on('$routeChangeStart', () =>
+      this.appState.removeSessionStorageItem('configSubTab')
+    );
   }
 
   createMetrics(metricsObject) {
@@ -338,7 +354,7 @@ export class AgentsController {
   // Switch tab
   async switchTab(tab, force = false) {
     if (this.ignoredTabs.includes(tab)) {
-      timefilter.setRefreshInterval({pause:true,value:0})
+      timefilter.setRefreshInterval({ pause: true, value: 0 });
     }
 
     try {
@@ -447,8 +463,8 @@ export class AgentsController {
         })
       ]);
 
-      const result = data.map(
-        item => (item && item.data && item.data.data ? item.data.data : false)
+      const result = data.map(item =>
+        item && item.data && item.data.data ? item.data.data : false
       );
       const [
         hardwareResponse,
@@ -473,7 +489,7 @@ export class AgentsController {
       this.$scope.syscollector = {
         hardware:
           typeof hardwareResponse === 'object' &&
-            Object.keys(hardwareResponse).length
+          Object.keys(hardwareResponse).length
             ? { ...hardwareResponse }
             : false,
         os:
@@ -514,8 +530,8 @@ export class AgentsController {
         this.apiReq.request('GET', `/rootcheck/${id}/last_scan`, {})
       ]);
 
-      const result = data.map(
-        item => (item && item.data && item.data.data ? item.data.data : false)
+      const result = data.map(item =>
+        item && item.data && item.data.data ? item.data.data : false
       );
 
       const [agentInfo, syscheckLastScan, rootcheckLastScan] = result;
@@ -587,7 +603,6 @@ export class AgentsController {
       const blob = new Blob([output], { type: 'text/csv' }); // eslint-disable-line
 
       FileSaver.saveAs(blob, fileName);
-
     } catch (error) {
       this.errorHandler.handle(error, 'Download CSV');
     }
