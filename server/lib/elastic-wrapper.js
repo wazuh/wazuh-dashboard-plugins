@@ -261,6 +261,15 @@ export class ElasticWrapper {
         currentFields = JSON.parse(pattern._source['index-pattern'].fields);
 
         if (Array.isArray(currentFields) && Array.isArray(knownFields)) {
+          currentFields = currentFields.filter(
+            item =>
+              item.name &&
+              item.name !==
+                'data.aws.service.action.networkConnectionAction.remoteIpDetails.geoLocation.lat' &&
+              item.name !==
+                'data.aws.service.action.networkConnectionAction.remoteIpDetails.geoLocation.lon'
+          );
+
           for (const field of knownFields) {
             // It has this field?
             const index = currentFields
