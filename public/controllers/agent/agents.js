@@ -560,6 +560,10 @@ export class AgentsController {
       return;
     } catch (error) {
       this.errorHandler.handle(error, 'Agents');
+      if(error && typeof error === 'string' && error.includes('Agent does not exist')) {
+        this.$location.search('agent',null)
+        this.$location.path('/agents-preview')
+      }
     }
     return;
   }
