@@ -19,6 +19,8 @@ import {
   ClusterVisualizations
 } from '../integration-files/visualizations';
 
+import { Base } from '../reporting/base-query';
+
 export class WazuhElasticCtrl {
   constructor(server) {
     this.wzWrapper = new ElasticWrapper(server);
@@ -492,7 +494,7 @@ export class WazuhElasticCtrl {
   }
 
   /**
-   * @param {*} req 
+   * @param {*} req
    * POST /elastic/alerts
    * {
    *   "agent.id": 100 ,
@@ -502,13 +504,48 @@ export class WazuhElasticCtrl {
    *   "rule.group": ["onegroup", "anothergroup"] // Or empty array [ ]
    *   "size": 5 // Optional parameter
    * }
-   * 
-   * @param {*} reply 
-   * {alerts: [...]} or ErrorResponse 
+   *
+   * @param {*} reply
+   * {alerts: [...]} or ErrorResponse
    */
-  async alerts(req,reply) {
+  async alerts(req, reply) {
     try {
-      return reply({ alerts: [] });
+      const pattern = req.payload.pattern || 'wazuh-alerts-3.x-*';
+      const from = req.payload.from || 'now-1d';
+      const to = req.payload.to || 'now';
+      const size = req.payload.size || 10;
+      const payload = Base(pattern, [], from, to);
+
+      payload.query = { bool: { must: [] } };
+
+      const agent = req.payload['agent.id'];
+      const manager = req.payload['manager.name'];
+      const cluster = req.payload['cluster.name'];
+      if (agent)
+        payload.query.bool.must.push({
+          match: { 'agent.id': agent }
+        });
+      if (cluster)
+        payload.query.bool.must.push({
+          match: { 'cluster.name': cluster }
+        });
+      if (manager)
+        payload.query.bool.must.push({
+          match: { 'manager.name': manager }
+        });
+
+      payload.size = size;
+      payload.docvalue_fields = [
+        '@timestamp',
+        'cluster.name',
+        'manager.name',
+        'agent.id',
+        'rule.id',
+        'rule.group',
+        'rule.description'
+      ];
+      const data = await this.wzWrapper.searchWazuhAlertsWithPayload(payload);
+      return reply({ alerts: data.hits.hits });
     } catch (error) {
       log('POST /elastic/alerts', error.message || error);
       return ErrorResponse(error.message || error, 4010, 500, reply);
