@@ -490,4 +490,28 @@ export class WazuhElasticCtrl {
       return ErrorResponse(error.message || error, 4008, 500, reply);
     }
   }
+
+  /**
+   * @param {*} req 
+   * POST /elastic/alerts
+   * {
+   *   "agent.id": 100 ,
+   *   "cluster.name": "wazuh",
+   *   "date.from": "now-1d/timestamp/standard date", // Like Elasticsearch does
+   *   "date.to": "now/timestamp/standard date", // Like Elasticsearch does
+   *   "rule.group": ["onegroup", "anothergroup"] // Or empty array [ ]
+   *   "size": 5 // Optional parameter
+   * }
+   * 
+   * @param {*} reply 
+   * {alerts: [...]} or ErrorResponse 
+   */
+  async alerts(req,reply) {
+    try {
+      return reply({ alerts: [] });
+    } catch (error) {
+      log('POST /elastic/alerts', error.message || error);
+      return ErrorResponse(error.message || error, 4010, 500, reply);
+    }
+  }
 }
