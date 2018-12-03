@@ -266,6 +266,8 @@ export class AgentsController {
       if (!this.$scope.$$phase) this.$scope.$digest();
     };
 
+    this.$scope.goDiscover = () => this.goDiscover();
+
     this.$scope.$on('$routeChangeStart', () =>
       this.appState.removeSessionStorageItem('configSubTab')
     );
@@ -419,6 +421,14 @@ export class AgentsController {
       return Promise.reject(error);
     }
     if (!this.$scope.$$phase) this.$scope.$digest();
+  }
+
+  goDiscover() {
+    this.targetLocation = {
+      tab: 'general',
+      subTab: 'discover'
+    };
+    return this.switchTab('general')
   }
 
   // Agent data
