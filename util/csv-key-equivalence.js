@@ -61,8 +61,18 @@ export const KeyEquivalenece = {
   proto: 'Protocol',
   address: 'Address',
   protocol: 'Protocol',
-  'local.ip': 'Local',
-  'remote.ip': 'Remote',
+  'local.ip': 'Local IP',
+  'remote.ip': 'Remote IP',
+  'local.port': 'Local port',
+  'remote.port': 'Remote port',
   euser: 'Effective user',
-  nice: 'Priority'
+  nice: 'Priority',
+  size: 'Size',
+  uname: 'User',
+  gname: 'Group',
+  perm: 'Permissions',
+  inode: 'Inode',
+  uid: 'User ID',
+  gid: 'Group ID',
+  mtime: 'Last modified'
 };

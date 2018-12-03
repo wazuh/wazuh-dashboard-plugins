@@ -26,7 +26,7 @@
         <!-- End separator -->
 
         <!-- Reporting button section -->
-        <div ng-show="octrl.tab !== 'welcome'">
+        <div ng-show="octrl.tab !== 'welcome' && octrl.tabView === 'panels'">
             <!-- Report button -->
             <md-button md-no-ink class="md-icon-button small wz-no-margin-padding" tooltip="Generate report" tooltip-placement="bottom" ng-disabled="!rendered || loading || resultState !== 'ready'" ng-click="octrl.startVis2Png()" aria-label="Generate report button">
                 <i class="fa fa-fw fa-print" aria-hidden="true"></i>

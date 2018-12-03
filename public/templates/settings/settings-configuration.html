@@ -8,12 +8,30 @@
     <div layout="row" layout-align="start center" ng-if="!ctrl.load">
         <md-card flex class="wz-md-card">
             <md-card-content>
-                <i class="fa fa-fw fa-file-o" aria-hidden="true"></i>
+                <div layout="row">
+                    <i class="fa fa-fw fa-file-o" aria-hidden="true"></i>
                 <span class="wz-headline-title">Current configuration</span>
+                <span flex></span>
+                <a tooltip="About and help" target="_blank" tooltip-placement="left" href="https://documentation.wazuh.com/current/user-manual/kibana-app/reference/config-file.html" aria-label="Link to open app about section">
+                    <i class="fa fa-fw fa-question-circle-o ng-scope" aria-hidden="true"></i>
+                </a>
+                </div>
                 <md-divider class="wz-margin-top-10"></md-divider>
-                <div layout="row" class="wz-padding-top-10" ng-repeat="(key,value) in ctrl.configuration">
-                    <span flex="25">{{key}}</span>
-                    <span class="wz-text-right color-grey">{{value}}</span>
+                <div layout="row" class="wz-padding-top-10" >
+                    <table class="table table-striped table-condensed table-layout-fixed">
+                        <thead class="wz-text-bold">
+                            <th class="wz-text-left col-lg-2">Setting</th>
+                            <th class="wz-text-left col-lg-2">Value</th>
+                            <th class="wz-text-left">Description</th>
+                        </thead>
+                        <tbody>
+                            <tr class="wz-word-wrap" ng-repeat="(key,value) in ctrl.configuration">
+                                <td>{{key}}</td>
+                                <td>{{value}}</td>
+                                <td>{{ctrl.configEquivalence(key)}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
             </md-card-content>
         </md-card>

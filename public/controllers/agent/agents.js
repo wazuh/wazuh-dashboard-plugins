@@ -66,9 +66,12 @@ export class AgentsController {
     this.$scope.selectedItem = 0;
     this.targetLocation = null;
     this.ignoredTabs = ['syscollector', 'welcome', 'configuration'];
+
+    this.$scope.showSyscheckFiles = false;
   }
 
   $onInit() {
+    timefilter.setRefreshInterval({ pause: true, value: 0 });
     this.$scope.TabDescription = TabDescription;
 
     this.$rootScope.reportStatus = false;
@@ -133,10 +136,14 @@ export class AgentsController {
     this.$scope.goGroups = (agent, group) => this.goGroups(agent, group);
     this.$scope.analyzeAgents = async searchTerm =>
       this.analyzeAgents(searchTerm);
-    this.$scope.downloadCsv = async data_path => this.downloadCsv(data_path);
+    this.$scope.downloadCsv = async (path, fileName, filters = []) =>
+      this.downloadCsv(path, fileName, filters);
 
     this.$scope.search = (term, specificPath) =>
       this.$scope.$broadcast('wazuhSearch', { term, specificPath });
+
+    this.$scope.searchSyscheckFile = (term, specificFilter) =>
+      this.$scope.$broadcast('wazuhSearch', { term, specificFilter });
 
     this.$scope.startVis2Png = () => this.startVis2Png();
 
@@ -167,32 +174,101 @@ export class AgentsController {
     this.$scope.isString = item => typeof item === 'string';
     this.$scope.hasSize = obj =>
       obj && typeof obj === 'object' && Object.keys(obj).length;
-    this.$scope.switchConfigTab = (configurationTab, sections) =>
+    this.$scope.switchConfigTab = (
+      configurationTab,
+      sections,
+      navigate = true
+    ) => {
+      this.$scope.navigate = navigate;
+      try {
+        this.$scope.configSubTab = JSON.stringify({
+          configurationTab: configurationTab,
+          sections: sections
+        });
+        if (!this.$location.search().configSubTab) {
+          this.appState.setSessionStorageItem(
+            'configSubTab',
+            this.$scope.configSubTab
+          );
+          this.$location.search('configSubTab', true);
+        }
+      } catch (error) {
+        this.errorHandler.handle(error, 'Set configuration path');
+      }
       this.configurationHandler.switchConfigTab(
         configurationTab,
         sections,
         this.$scope,
         this.$scope.agent.id
       );
-    this.$scope.switchWodle = wodleName =>
+    };
+    this.$scope.switchWodle = (wodleName, navigate = true) => {
+      this.$scope.navigate = navigate;
+      this.$scope.configWodle = wodleName;
+      if (!this.$location.search().configWodle) {
+        this.$location.search('configWodle', this.$scope.configWodle);
+      }
       this.configurationHandler.switchWodle(
         wodleName,
         this.$scope,
         this.$scope.agent.id
       );
-    this.$scope.switchConfigurationTab = configurationTab =>
+    };
+    this.$scope.switchConfigurationTab = (configurationTab, navigate) => {
+      this.$scope.navigate = navigate;
       this.configurationHandler.switchConfigurationTab(
         configurationTab,
         this.$scope
       );
-    this.$scope.switchConfigurationSubTab = configurationSubTab =>
+      if (!this.$scope.navigate) {
+        const configSubTab = this.$location.search().configSubTab;
+        if (configSubTab) {
+          try {
+            const config = this.appState.getSessionStorageItem('configSubTab');
+            const configSubTabObj = JSON.parse(config);
+            this.$scope.switchConfigTab(
+              configSubTabObj.configurationTab,
+              configSubTabObj.sections,
+              false
+            );
+          } catch (error) {
+            this.errorHandler.handle(error, 'Get configuration path');
+          }
+        } else {
+          const configWodle = this.$location.search().configWodle;
+          if (configWodle) {
+            this.$scope.switchWodle(configWodle, false);
+          }
+        }
+      } else {
+        this.$location.search('configSubTab', null);
+        this.appState.removeSessionStorageItem('configSubTab');
+        this.$location.search('configWodle', null);
+      }
+    };
+    this.$scope.switchConfigurationSubTab = configurationSubTab => {
       this.configurationHandler.switchConfigurationSubTab(
         configurationSubTab,
         this.$scope
       );
+    };
     this.$scope.updateSelectedItem = i => (this.$scope.selectedItem = i);
     this.$scope.getIntegration = list =>
       this.configurationHandler.getIntegration(list, this.$scope);
+
+    this.$scope.switchSyscheckFiles = () => {
+      this.$scope.showSyscheckFiles = !this.$scope.showSyscheckFiles;
+      if (!this.$scope.showSyscheckFiles) {
+        this.$rootScope.$emit('changeTabView', {
+          tabView: this.$scope.tabView
+        });
+      }
+      if (!this.$scope.$$phase) this.$scope.$digest();
+    };
+
+    this.$scope.$on('$routeChangeStart', () =>
+      this.appState.removeSessionStorageItem('configSubTab')
+    );
   }
 
   createMetrics(metricsObject) {
@@ -278,15 +354,11 @@ export class AgentsController {
   // Switch tab
   async switchTab(tab, force = false) {
     if (this.ignoredTabs.includes(tab)) {
-      const timeFilterRefreshStatus = timefilter.getRefreshInterval();
-      const toggle =
-        timeFilterRefreshStatus &&
-        timeFilterRefreshStatus.value &&
-        !timeFilterRefreshStatus.pause;
-      if (toggle) timefilter.toggleRefresh();
+      timefilter.setRefreshInterval({ pause: true, value: 0 });
     }
 
     try {
+      this.$scope.showSyscheckFiles = false;
       if (tab === 'pci') {
         const pciTabs = await this.commonData.getPCI();
         this.$scope.pciTabs = pciTabs;
@@ -391,8 +463,8 @@ export class AgentsController {
         })
       ]);
 
-      const result = data.map(
-        item => (item && item.data && item.data.data ? item.data.data : false)
+      const result = data.map(item =>
+        item && item.data && item.data.data ? item.data.data : false
       );
       const [
         hardwareResponse,
@@ -458,8 +530,8 @@ export class AgentsController {
         this.apiReq.request('GET', `/rootcheck/${id}/last_scan`, {})
       ]);
 
-      const result = data.map(
-        item => (item && item.data && item.data.data ? item.data.data : false)
+      const result = data.map(item =>
+        item && item.data && item.data.data ? item.data.data : false
       );
 
       const [agentInfo, syscheckLastScan, rootcheckLastScan] = result;
@@ -516,23 +588,17 @@ export class AgentsController {
     return;
   }
 
-  async downloadCsv(data_path) {
+  async downloadCsv(path, fileName, filters = []) {
     try {
       this.errorHandler.info(
         'Your download should begin automatically...',
         'CSV'
       );
       const currentApi = JSON.parse(this.appState.getCurrentAPI()).id;
-      const output = await this.csvReq.fetch(
-        data_path,
-        currentApi,
-        this.wzTableFilter.get()
-      );
+      const output = await this.csvReq.fetch(path, currentApi, filters);
       const blob = new Blob([output], { type: 'text/csv' }); // eslint-disable-line
 
-      FileSaver.saveAs(blob, 'packages.csv');
-
-      return;
+      FileSaver.saveAs(blob, fileName);
     } catch (error) {
       this.errorHandler.handle(error, 'Download CSV');
     }

@@ -127,9 +127,10 @@ export class DecodersController {
 
   async downloadCsv() {
     try {
+      const path = this.typeFilter === 'parents' ? '/decoders/parents' : '/decoders';
       const currentApi = JSON.parse(this.appState.getCurrentAPI()).id;
       const output = await this.csvReq.fetch(
-        '/decoders',
+        path,
         currentApi,
         this.wzTableFilter.get()
       );
