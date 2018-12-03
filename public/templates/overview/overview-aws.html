@@ -1,4 +1,4 @@
-<md-content flex layout="column" ng-if="octrl.tab === 'aws' && octrl.tabView === 'panels'" ng-class="{'no-opacity': resultState !== 'ready' || !rendered}" layout-align="start">
+<md-content flex layout="column" ng-if="octrl.tab === 'aws' && octrl.tabView === 'panels'" layout-align="start">
 
     <div layout="row" ng-if="octrl.wodlesConfiguration && octrl.wodlesConfiguration['aws-s3']">
         <md-card flex class="wz-metric-color wz-md-card">
@@ -21,43 +21,54 @@
         </md-card>
     </div>
 
+    <div layout="row" class="height-100">
+        <kbn-vis id="Wazuh-App-Overview-AWS-Service-selector" vis-id="'Wazuh-App-Overview-AWS-Service-selector'"></kbn-vis>
+    </div>
+
     <div layout="row" class="height-300">
-        <md-card flex="70" class="wz-md-card">
+        <md-card flex="50" class="wz-md-card">
             <md-card-content class="wazuh-column">
-                <span class="wz-headline-title">Alerts over time</span>
+                <span class="wz-headline-title">Events by instance ID over time</span>
                 <md-divider class="wz-margin-top-10"></md-divider>
-                <kbn-vis id="Wazuh-App-Overview-AWS-Alerts-over-time" vis-id="'Wazuh-App-Overview-AWS-Alerts-over-time'"></kbn-vis>
+                <kbn-vis id="Wazuh-App-Overview-AWS-Events-by-instance" vis-id="'Wazuh-App-Overview-AWS-Events-by-instance'"></kbn-vis>
             </md-card-content>
         </md-card>
-        <md-card flex class="wz-md-card">
+        <md-card flex="50" class="wz-md-card">
             <md-card-content class="wazuh-column">
-                <span class="wz-headline-title">Most common events</span>
+                <span class="wz-headline-title">Events by region over time</span>
                 <md-divider class="wz-margin-top-10"></md-divider>
-                <kbn-vis id="Wazuh-App-Overview-AWS-Top-5-event-names" vis-id="'Wazuh-App-Overview-AWS-Top-5-event-names'"></kbn-vis>
+                <kbn-vis id=" Wazuh-App-Overview-AWS-Events-by-region" vis-id="'Wazuh-App-Overview-AWS-Events-by-region'"></kbn-vis>
             </md-card-content>
         </md-card>
     </div>
 
-    <div layout="row" class="height-225">
+    <div layout="row" class="height-300">
         <md-card flex class="wz-md-card">
             <md-card-content class="wazuh-column">
-                <span class="wz-headline-title">Top 5 instances</span>
+                <span class="wz-headline-title">Top events by service name</span>
                 <md-divider class="wz-margin-top-10"></md-divider>
-                <kbn-vis id="Wazuh-App-Overview-AWS-Top-5-instances" vis-id="'Wazuh-App-Overview-AWS-Top-5-instances'"></kbn-vis>
+                <kbn-vis id="Wazuh-App-Overview-AWS-Top-events-by-service" vis-id="'Wazuh-App-Overview-AWS-Top-events-by-service'"></kbn-vis>
             </md-card-content>
         </md-card>
         <md-card flex class="wz-md-card">
             <md-card-content class="wazuh-column">
-                <span class="wz-headline-title">Top 5 source IP addresses</span>
+                <span class="wz-headline-title">Top events by instance ID</span>
                 <md-divider class="wz-margin-top-10"></md-divider>
-                <kbn-vis id="Wazuh-App-Overview-AWS-Top-5-source-ip" vis-id="'Wazuh-App-Overview-AWS-Top-5-source-ip'"></kbn-vis>
+                <kbn-vis id="Wazuh-App-Overview-AWS-Top-events-by-instance" vis-id="'Wazuh-App-Overview-AWS-Top-events-by-instance'"></kbn-vis>
             </md-card-content>
         </md-card>
         <md-card flex class="wz-md-card">
             <md-card-content class="wazuh-column">
-                <span class="wz-headline-title">Top 5 sources</span>
+                <span class="wz-headline-title">Top events by resource type</span>
                 <md-divider class="wz-margin-top-10"></md-divider>
-                <kbn-vis id="Wazuh-App-Overview-AWS-Top-5-sources" vis-id="'Wazuh-App-Overview-AWS-Top-5-sources'"></kbn-vis>
+                <kbn-vis id="Wazuh-App-Overview-AWS-Top-events-by-resource" vis-id="'Wazuh-App-Overview-AWS-Top-events-by-resource'"></kbn-vis>
+            </md-card-content>
+        </md-card>
+        <md-card flex class="wz-md-card">
+            <md-card-content class="wazuh-column">
+                <span class="wz-headline-title">Top events by region</span>
+                <md-divider class="wz-margin-top-10"></md-divider>
+                <kbn-vis id="Wazuh-App-Overview-AWS-Top-events-by-region" vis-id="'Wazuh-App-Overview-AWS-Top-events-by-region'"></kbn-vis>
             </md-card-content>
         </md-card>
     </div>
