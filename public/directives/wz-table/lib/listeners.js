@@ -20,6 +20,10 @@ export function wazuhFilter(parameters, filter) {
   return filter(parameters.filter);
 }
 
+export function wazuhQuery(parameters, query) {
+  return query(parameters.query);
+}
+
 export function wazuhSearch(parameters, instance, search) {
   try {
     const matchesSpecificPath =

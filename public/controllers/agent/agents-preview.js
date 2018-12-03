@@ -80,6 +80,10 @@ export class AgentsPreviewController {
     this.$scope.$broadcast('wazuhFilter', { filter });
   }
 
+  query(query) {
+    this.$scope.$broadcast('wazuhQuery', { query });
+  }
+
   showAgent(agent) {
     this.shareAgent.setAgent(agent);
     this.$location.path('/agents');

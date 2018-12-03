@@ -19,14 +19,14 @@ import { parseValue } from './lib/parse-value';
 import * as pagination from './lib/pagination';
 import { sort } from './lib/sort';
 import * as listeners from './lib/listeners';
-import { searchData, filterData } from './lib/data';
+import { searchData, filterData, queryData } from './lib/data';
 import { clickAction } from './lib/click-action';
 import { initTable } from './lib/init';
 import { checkGap } from './lib/check-gap';
 
 const app = uiModules.get('app/wazuh', []);
 
-app.directive('wzTable', function() {
+app.directive('wzTable', function () {
   return {
     restrict: 'E',
     scope: {
@@ -131,6 +131,14 @@ app.directive('wzTable', function() {
           errorHandler
         );
 
+        const query = async query =>
+        queryData(
+          query,
+          $scope,
+          fetch,
+          errorHandler
+        );
+
       const realTimeFunction = async () => {
         try {
           $scope.error = false;
@@ -180,7 +188,7 @@ app.directive('wzTable', function() {
       $scope.prevPage = () => pagination.prevPage($scope);
       $scope.nextPage = async currentPage =>
         pagination.nextPage(currentPage, $scope, errorHandler, fetch);
-      $scope.setPage = function() {
+      $scope.setPage = function () {
         $scope.currentPage = this.n;
         $scope.nextPage(this.n);
       };
@@ -198,6 +206,10 @@ app.directive('wzTable', function() {
 
       $scope.$on('wazuhSearch', (event, parameters) =>
         listeners.wazuhSearch(parameters, instance, search)
+      );
+
+      $scope.$on('wazuhQuery', (event, parameters) =>
+        listeners.wazuhQuery(parameters, query)
       );
 
       $scope.$on('wazuhRemoveFilter', (event, parameters) =>

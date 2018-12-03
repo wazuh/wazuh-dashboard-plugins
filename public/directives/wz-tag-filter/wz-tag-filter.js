@@ -23,7 +23,8 @@ app.directive('wzTagFilter', function () {
       path: '=path',
       keys: '=keys',
       search: '&',
-      filter: '&'
+      filter: '&',
+      query: '&'
     },
     controller(
       $scope,
@@ -37,6 +38,7 @@ app.directive('wzTagFilter', function () {
       );
 
       $scope.tagList = [];
+      $scope.groupedTagList = [];
       $scope.newTag = '';
       $scope.isAutocomplete = false;
       $scope.dataModel = [];
@@ -48,16 +50,56 @@ app.directive('wzTagFilter', function () {
         const obj = { name: term[0], value: term[1] };
         const isFilter = obj.value;
         const tag = {
-          'value': $scope.newTag,
+          'id': generateUID(),
+          'key': obj.name,
+          'value': obj,
           'type': isFilter ? 'filter' : 'search'
         };
-        const idxSearch = $scope.tagList.map(function (x) { return x.type; }).indexOf('search');
-        if (!isFilter && idxSearch !== -1) { $scope.removeTag(idxSearch) };
-        $scope.tagList.push(tag);
+        const idxSearch = $scope.tagList.find(function (x) { return x.type === 'search' });
+        if (!isFilter && idxSearch) { $scope.removeTag(idxSearch.id) };
+        if (!$scope.tagList.find(function (x) { return x.type === 'filter' && x.key === tag.key && x.value.value === tag.value.value })) {
+          $scope.tagList.push(tag);
+          $scope.groupedTagList = groupBy($scope.tagList, 'key');
+          isFilter ? $scope.query({ 'query': buildQuery($scope.groupedTagList) }) : $scope.search({ 'search': obj.name });
+        }
         $scope.showAutocomplete(flag);
-        isFilter ? $scope.filter({ 'filter': obj }) : $scope.search({ 'search': obj.name });
         $scope.newTag = '';
       };
+
+      function buildQuery(groups, idx1) {
+        let queryString = "?search=''&q=";
+        groups.forEach(function (group) {
+          queryString += "("
+          group.forEach(function (tag, idx2) {
+            queryString += tag.key + ":" + tag.value.value;
+            if (idx2 != group.length - 1) {
+              queryString += ",";
+            }
+          });
+          queryString += ")"
+          if (idx1 != groups.length - 1) {
+            queryString += ";";
+          }
+        });
+        console.log(queryString);
+        return queryString;
+      }
+
+      function groupBy(collection, property) {
+        var i = 0, val, index,
+          values = [], result = [];
+        for (; i < collection.length; i++) {
+          val = collection[i][property];
+          index = values.indexOf(val);
+          if (index > -1)
+            result[index].push(collection[i]);
+          else {
+            values.push(val);
+            result.push([collection[i]]);
+          }
+        }
+        return result;
+      }
 
       $scope.addTagKey = (key) => {
         $scope.newTag = key + ':';
@@ -70,11 +112,11 @@ app.directive('wzTagFilter', function () {
         $scope.addTag();
       };
 
-      $scope.removeTag = (idx) => {
-        const term = $scope.tagList[idx].value.split(':');
-        const obj = term[1] ? { name: term[0], value: 'all' } : '';
-        obj.value ? $scope.filter({ 'filter': obj }) : $scope.search({ 'search': obj.name });
-        $scope.tagList.splice(idx, 1);
+      $scope.removeTag = (id) => {
+        const term = $scope.tagList.find(function (x) { return x.id === id });
+        term.type === 'filter' ? $scope.filter({ 'filter': { name: term.key, value: 'all' } }) : $scope.search({ 'search': '' });
+        $scope.tagList.splice($scope.tagList.findIndex(function (x) { return x.id === id }), 1);
+        $scope.groupedTagList = groupBy($scope.tagList, 'key');
         $scope.showAutocomplete(false);
       };
 
@@ -103,10 +145,9 @@ app.directive('wzTagFilter', function () {
           const model = $scope.dataModel.find(function (x) { return x.key === $scope.newTag.split(':')[0] })
           if (model) {
             model.list = Array.isArray(model.list[0]) ? model.list[0] : model.list;
-            $scope.autocompleteContent.list = model.list.filter(function (x) { return regex.test(x) });
+            $scope.autocompleteContent.list = [...new Set(model.list.filter(function (x) { return regex.test(x) }))];
           }
         }
-
       };
 
       $scope.addSearchKey = (e) => {
@@ -136,6 +177,45 @@ app.directive('wzTagFilter', function () {
         }
       };
 
+      function generateUID() {
+        // I generate the UID from two parts here 
+        // to ensure the random number provide enough bits.
+        var firstPart = (Math.random() * 46656) | 0;
+        var secondPart = (Math.random() * 46656) | 0;
+        firstPart = ("000" + firstPart.toString(36)).slice(-3);
+        secondPart = ("000" + secondPart.toString(36)).slice(-3);
+        return firstPart + secondPart;
+      }
+
+      $('#wz-search-filter-bar-input').bind('keydown', function (e) {
+        //let liSelected = document.getElementById('wz-search-filter-bar-autocomplete-list li.selected');
+        let liSelected = $('#wz-search-filter-bar-autocomplete-list li.selected');
+        if (e.which === 40) {
+          if (liSelected != 0) {
+            liSelected.removeClass('selected');
+            next = liSelected.next();
+            if (next.length > 0) {
+              liSelected = next.addClass('selected');
+            } else {
+              liSelected = li.eq(0).addClass('selected');
+            }
+          } else {
+            liSelected = li.eq(0).addClass('selected');
+          }
+        } else if (e.which === 38) {
+          if (liSelected) {
+            liSelected.removeClass('selected');
+            next = liSelected.prev();
+            if (next.length > 0) {
+              liSelected = next.addClass('selected');
+            } else {
+              liSelected = li.last().addClass('selected');
+            }
+          } else {
+            liSelected = li.last().addClass('selected');
+          }
+        }
+      });
       load();
     },
     template

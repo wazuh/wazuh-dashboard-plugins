@@ -39,6 +39,16 @@
 
 .wz-tags > ul li{
     white-space: nowrap;
+    display: flex;
+}
+
+.wz-tags > ul li .grouped{
+    background: #d9d9d9;
+    border-radius: 3px;
+    padding: 3px;
+    height: 36px;
+    margin-top: -3px;
+    display: flex;
 }
 
 .wz-tag-item {
@@ -48,6 +58,14 @@
     padding: 3px 5px;
     background: #0079a5;
     margin: 1px 3px;
+}
+
+.wz-tag-item-connector {
+    font-size: 10px;
+    line-height: 30px;
+    color: #005571;
+    font-weight: bold;
+    padding: 0px 5px;
 }
 
 .wz-tag-remove-button{
@@ -86,7 +104,7 @@
     padding-left: 5px;
 }
 
-.wz-search-filter-bar-autocomplete ul li:hover{
+.wz-search-filter-bar-autocomplete ul li:hover, .wz-search-filter-bar-autocomplete ul li.selected{
     background: black;
     color:#0079a5;
     cursor: pointer;

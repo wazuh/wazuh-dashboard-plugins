@@ -50,7 +50,7 @@
     </div>
 
     <wz-tag-filter path="'/agents'" keys="['name','ip','status', 'manager', 'group','os.name','os.version','os.platform', 'version', 'node_name']"
-        search="ctrl.search(search)" filter="ctrl.filter(filter)"></wz-tag-filter>
+        search="ctrl.search(search)" filter="ctrl.filter(filter)" query="ctrl.query(query)"></wz-tag-filter>
 
     <div layout="row" class="margin-top-30">
         <wz-table flex path="'/agents'" keys="['id',{value:'name',size:2},'ip','status','group','os.name','os.version','version']"
