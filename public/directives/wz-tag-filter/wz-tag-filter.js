@@ -158,7 +158,7 @@ app.directive('wzTagFilter', function () {
         $scope.autocompleteContent.title = isKey ? 'Filter keys' : 'Values';
         if (isKey) {
           const regex = new RegExp('^' + term[0], 'i');
-          for (var key in $scope.fieldsModel) {
+          for (let key in $scope.fieldsModel) {
             if (regex.test(key)) {
               $scope.autocompleteContent.list.push(key);
             }
