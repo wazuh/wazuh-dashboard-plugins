@@ -77,20 +77,20 @@ app.directive('wzTagFilter', function () {
           }
           else {
             if (!first) {
-              queryObj.query += ";";
+              queryObj.query += ';';
             }
             const twoOrMoreElements = group.length > 1;
             if (twoOrMoreElements) {
-              queryObj.query += "("
+              queryObj.query += '('
             }
             group.filter(function (x) { return x.type === 'filter' }).forEach(function (tag, idx2) {
-              queryObj.query += tag.key + "=" + tag.value.value;
+              queryObj.query += tag.key + '=' + tag.value.value;
               if (idx2 != group.length - 1) {
-                queryObj.query += ",";
+                queryObj.query += ',';
               }
             });
             if (twoOrMoreElements) {
-              queryObj.query += ")"
+              queryObj.query += ')'
             }
             first = false;
           }
@@ -163,6 +163,9 @@ app.directive('wzTagFilter', function () {
       };
 
       $scope.addSearchKey = (e) => {
+        if ($scope.autocompleteEnter) {
+          $scope.autocompleteEnter = false;
+        }
         $scope.getAutocompleteContent();
       };
 
@@ -174,6 +177,7 @@ app.directive('wzTagFilter', function () {
           if (flag) {
             input.focus();
           }
+          $('#wz-search-filter-bar-autocomplete-list li').removeClass('selected');
         }, 100);
       }
 
@@ -194,37 +198,35 @@ app.directive('wzTagFilter', function () {
         // to ensure the random number provide enough bits.
         var firstPart = (Math.random() * 46656) | 0;
         var secondPart = (Math.random() * 46656) | 0;
-        firstPart = ("000" + firstPart.toString(36)).slice(-3);
-        secondPart = ("000" + secondPart.toString(36)).slice(-3);
+        firstPart = ('000' + firstPart.toString(36)).slice(-3);
+        secondPart = ('000' + secondPart.toString(36)).slice(-3);
         return firstPart + secondPart;
       }
 
       $('#wz-search-filter-bar-input').bind('keydown', function (e) {
-        //let liSelected = document.getElementById('wz-search-filter-bar-autocomplete-list li.selected');
-        let liSelected = $('#wz-search-filter-bar-autocomplete-list li.selected');
-        if (e.which === 40) {
-          if (liSelected != 0) {
-            liSelected.removeClass('selected');
-            next = liSelected.next();
-            if (next.length > 0) {
-              liSelected = next.addClass('selected');
-            } else {
-              liSelected = li.eq(0).addClass('selected');
-            }
-          } else {
-            liSelected = li.eq(0).addClass('selected');
+        let $current = $('#wz-search-filter-bar-autocomplete-list li.selected');
+        if ($current.length === 0) {
+          $('#wz-search-filter-bar-autocomplete-list li').first().addClass('selected');
+          $current = $('#wz-search-filter-bar-autocomplete-list li.selected');
+        } else {
+          var $next;
+          switch (e.keyCode) {
+            case 13: // enter
+              $scope.autocompleteEnter = true;
+              $scope.autocompleteContent.isKey ? $scope.addTagKey($current.text().trim()) : $scope.addTagValue($current.text().trim());
+              break;
+            case 38: // if the UP key is pressed
+              $next = $current.prev();
+              break;
+            case 40: // if the DOWN key is pressed
+              $next = $current.next();
+              break;
           }
-        } else if (e.which === 38) {
-          if (liSelected) {
-            liSelected.removeClass('selected');
-            next = liSelected.prev();
-            if (next.length > 0) {
-              liSelected = next.addClass('selected');
-            } else {
-              liSelected = li.last().addClass('selected');
-            }
-          } else {
-            liSelected = li.last().addClass('selected');
+          if ($next && $next.length > 0 && (e.keyCode === 38 || e.keyCode === 40)) {
+            var input = document.getElementById('wz-search-filter-bar-input');
+            input.focus();
+            $('#wz-search-filter-bar-autocomplete-list li').removeClass('selected');
+            $next.addClass('selected');
           }
         }
       });
