@@ -21,8 +21,9 @@ app.directive('wzTagFilter', function () {
     restrict: 'E',
     scope: {
       path: '=path',
-      keys: '=keys',
-      queryFn: '&'
+      //keys: '=keys',
+      queryFn: '&',
+      fieldsModel: '='
     },
     controller(
       $scope,
@@ -157,16 +158,16 @@ app.directive('wzTagFilter', function () {
         $scope.autocompleteContent.title = isKey ? 'Filter keys' : 'Values';
         if (isKey) {
           const regex = new RegExp('^' + term[0], 'i');
-          $scope.keys.forEach(function (key) {
+          for (var key in $scope.fieldsModel) {
             if (regex.test(key)) {
               $scope.autocompleteContent.list.push(key);
             }
-          });
+          }
         } else {
           const regex = new RegExp('^' + term[1], 'i');
           const model = $scope.dataModel.find(function (x) { return x.key === $scope.newTag.split(':')[0] })
           if (model) {
-            model.list = Array.isArray(model.list[0]) ? model.list[0] : model.list;
+            //model.list = Array.isArray(model.list[0]) ? model.list[0] : model.list;
             $scope.autocompleteContent.list = [...new Set(model.list.filter(function (x) { return regex.test(x) }))];
           }
         }
@@ -195,8 +196,8 @@ app.directive('wzTagFilter', function () {
       const load = async () => {
         try {
           const result = await instance.fetch();
-          $scope.keys.forEach(function (key) {
-            $scope.dataModel.push({ 'key': key, 'list': result.items.map(function (x) { return key.split('.').reduce((a, b) => a ? a[b] : '', x) }) });
+          Object.keys($scope.fieldsModel).forEach(function(key) {
+            $scope.dataModel.push({ 'key': key, 'list': $scope.fieldsModel[key]});
           });
           return;
         } catch (error) {
