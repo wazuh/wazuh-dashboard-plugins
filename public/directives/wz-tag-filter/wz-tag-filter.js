@@ -21,7 +21,6 @@ app.directive('wzTagFilter', function () {
     restrict: 'E',
     scope: {
       path: '=path',
-      //keys: '=keys',
       queryFn: '&',
       fieldsModel: '='
     },
@@ -167,7 +166,6 @@ app.directive('wzTagFilter', function () {
           const regex = new RegExp('^' + term[1], 'i');
           const model = $scope.dataModel.find(function (x) { return x.key === $scope.newTag.split(':')[0] })
           if (model) {
-            //model.list = Array.isArray(model.list[0]) ? model.list[0] : model.list;
             $scope.autocompleteContent.list = [...new Set(model.list.filter(function (x) { return regex.test(x) }))];
           }
         }
