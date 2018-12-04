@@ -521,6 +521,7 @@ export class WazuhElasticCtrl {
       const agent = req.payload['agent.id'];
       const manager = req.payload['manager.name'];
       const cluster = req.payload['cluster.name'];
+      const rulegGroups = req.payload['rule.groups'];
       if (agent)
         payload.query.bool.must.push({
           match: { 'agent.id': agent }
@@ -532,6 +533,10 @@ export class WazuhElasticCtrl {
       if (manager)
         payload.query.bool.must.push({
           match: { 'manager.name': manager }
+        });
+      if (rulegGroups)
+        payload.query.bool.must.push({
+          match: { 'rule.groups': rulegGroups }
         });
 
       payload.size = size;
