@@ -322,11 +322,18 @@ export class WazuhElasticCtrl {
       const visArray = [];
       let aux_source, bulk_content;
       for (let element of app_objects) {
-        // Stringify and replace index-pattern for visualizations
-        aux_source = JSON.stringify(element._source);
-        aux_source = aux_source.replace('wazuh-alerts', id);
-        aux_source = JSON.parse(aux_source);
+        aux_source = JSON.parse(JSON.stringify(element._source))
+        
+        // Replace index-pattern for visualizations
+        if(aux_source && aux_source.kibanaSavedObjectMeta && aux_source.kibanaSavedObjectMeta.searchSourceJSON && typeof aux_source.kibanaSavedObjectMeta.searchSourceJSON === 'string'){
+          aux_source.kibanaSavedObjectMeta.searchSourceJSON = aux_source.kibanaSavedObjectMeta.searchSourceJSON.replace('wazuh-alerts',id);
+        }
 
+        // Replace index-pattern for selector visualizations
+        if(aux_source && aux_source.visState && aux_source.visState && typeof aux_source.visState === 'string'){
+          aux_source.visState = aux_source.visState.replace('wazuh-alerts',id)
+        }
+        
         // Bulk source
         bulk_content = {};
         bulk_content[element._type] = aux_source;
