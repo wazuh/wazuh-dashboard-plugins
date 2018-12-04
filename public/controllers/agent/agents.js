@@ -71,7 +71,14 @@ export class AgentsController {
   }
 
   $onInit() {
-    timefilter.setRefreshInterval({ pause: true, value: 0 });
+    const savedTimefilter = this.commonData.getTimefilter();
+    if (savedTimefilter) {
+      timefilter.setTime(savedTimefilter);
+      this.commonData.removeTimefilter();
+    } else {
+      timefilter.setRefreshInterval({ pause: true, value: 0 });
+    }
+
     this.$scope.TabDescription = TabDescription;
 
     this.$rootScope.reportStatus = false;
@@ -428,7 +435,7 @@ export class AgentsController {
       tab: 'general',
       subTab: 'discover'
     };
-    return this.switchTab('general')
+    return this.switchTab('general');
   }
 
   // Agent data
@@ -570,9 +577,13 @@ export class AgentsController {
       return;
     } catch (error) {
       this.errorHandler.handle(error, 'Agents');
-      if(error && typeof error === 'string' && error.includes('Agent does not exist')) {
-        this.$location.search('agent',null)
-        this.$location.path('/agents-preview')
+      if (
+        error &&
+        typeof error === 'string' &&
+        error.includes('Agent does not exist')
+      ) {
+        this.$location.search('agent', null);
+        this.$location.path('/agents-preview');
       }
     }
     return;

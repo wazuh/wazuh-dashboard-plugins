@@ -28,6 +28,7 @@ export class CommonData {
     this.$location = $location;
     this.shareAgent = shareAgent;
     this.globalState = globalState;
+    this.savedTimefilter = null;
   }
 
   removeRuleId() {
@@ -224,5 +225,17 @@ export class CommonData {
         return globalAgent.id;
       }
     }
+  }
+
+  setTimefilter(time) {
+    if (time) this.savedTimefilter = time;
+  }
+
+  removeTimefilter() {
+    this.savedTimefilter = null;
+  }
+
+  getTimefilter() {
+    return this.savedTimefilter;
   }
 }
