@@ -27,7 +27,9 @@ app.directive('wzTagFilter', function () {
     controller(
       $scope,
       $timeout,
-      apiReq
+      apiReq,
+      $document,
+      errorHandler
     ) {
       const instance = new DataFactory(
         apiReq,
@@ -42,64 +44,72 @@ app.directive('wzTagFilter', function () {
       $scope.dataModel = [];
 
       $scope.addTag = (flag = false) => {
-        var input = document.getElementById('wz-search-filter-bar-input');
-        input.blur();
-        const term = $scope.newTag.split(':');
-        const obj = { name: term[0], value: term[1] };
-        const isFilter = obj.value;
-        const tag = {
-          'id': generateUID(),
-          'key': obj.name,
-          'value': obj,
-          'type': isFilter ? 'filter' : 'search'
-        };
-        const idxSearch = $scope.tagList.find(function (x) { return x.type === 'search' });
-        if (!isFilter && idxSearch) { $scope.removeTag(idxSearch.id) };
-        if (!$scope.tagList.find(function (x) { return x.type === 'filter' && x.key === tag.key && x.value.value === tag.value.value })) {
-          $scope.tagList.push(tag);
-          $scope.groupedTagList = groupBy($scope.tagList, 'key');
-          buildQuery($scope.groupedTagList);
+        try {
+          const input = $document[0].getElementById('wz-search-filter-bar-input');
+          input.blur();
+          const term = $scope.newTag.split(':');
+          const obj = { name: term[0], value: term[1] };
+          const isFilter = obj.value;
+          const tag = {
+            'id': generateUID(),
+            'key': obj.name,
+            'value': obj,
+            'type': isFilter ? 'filter' : 'search'
+          };
+          const idxSearch = $scope.tagList.find(function (x) { return x.type === 'search' });
+          if (!isFilter && idxSearch) { $scope.removeTag(idxSearch.id) };
+          if (!$scope.tagList.find(function (x) { return x.type === 'filter' && x.key === tag.key && x.value.value === tag.value.value })) {
+            $scope.tagList.push(tag);
+            $scope.groupedTagList = groupBy($scope.tagList, 'key');
+            buildQuery($scope.groupedTagList);
+          }
+          $scope.showAutocomplete(flag);
+          $scope.newTag = '';
+        } catch (error) {
+          errorHandler.handle(error, 'Add filter');
         }
-        $scope.showAutocomplete(flag);
-        $scope.newTag = '';
       };
 
-      function buildQuery(groups) {
-        let queryObj = {
-          'query': '',
-          'search': ''
-        };
-        let first = true;
-        groups.forEach(function (group, idx1) {
-          const search = group.find(function (x) { return x.type === 'search' });
-          if (search) {
-            queryObj.search = search.value.name;
-          }
-          else {
-            if (!first) {
-              queryObj.query += ';';
+      const buildQuery = groups => {
+        try {
+          let queryObj = {
+            'query': '',
+            'search': ''
+          };
+          let first = true;
+          groups.forEach(function (group, idx1) {
+            const search = group.find(function (x) { return x.type === 'search' });
+            if (search) {
+              queryObj.search = search.value.name;
             }
-            const twoOrMoreElements = group.length > 1;
-            if (twoOrMoreElements) {
-              queryObj.query += '('
-            }
-            group.filter(function (x) { return x.type === 'filter' }).forEach(function (tag, idx2) {
-              queryObj.query += tag.key + '=' + tag.value.value;
-              if (idx2 != group.length - 1) {
-                queryObj.query += ',';
+            else {
+              if (!first) {
+                queryObj.query += ';';
               }
-            });
-            if (twoOrMoreElements) {
-              queryObj.query += ')'
+              const twoOrMoreElements = group.length > 1;
+              if (twoOrMoreElements) {
+                queryObj.query += '('
+              }
+              group.filter(function (x) { return x.type === 'filter' }).forEach(function (tag, idx2) {
+                queryObj.query += tag.key + '=' + tag.value.value;
+                if (idx2 != group.length - 1) {
+                  queryObj.query += ',';
+                }
+              });
+              if (twoOrMoreElements) {
+                queryObj.query += ')'
+              }
+              first = false;
             }
-            first = false;
-          }
-        });
-        $scope.queryFn({ 'q': queryObj.query, 'search': queryObj.search });
+          });
+          $scope.queryFn({ 'q': queryObj.query, 'search': queryObj.search });
+        } catch (error) {
+          errorHandler.handle(error, 'Query filter request');
+        }
       }
 
-      function groupBy(collection, property) {
-        var i = 0, val, index,
+      const groupBy = (collection, property) => {
+        let i = 0, val, index,
           values = [], result = [];
         for (; i < collection.length; i++) {
           val = collection[i][property];
@@ -137,7 +147,7 @@ app.directive('wzTagFilter', function () {
           $scope.getAutocompleteContent();
         }
         $scope.isAutocomplete = flag;
-        index_autocomplete(flag);
+        indexAutocomplete(flag);
       };
 
       $scope.getAutocompleteContent = () => {
@@ -169,11 +179,11 @@ app.directive('wzTagFilter', function () {
         $scope.getAutocompleteContent();
       };
 
-      function index_autocomplete(flag = true) {
+      const indexAutocomplete = (flag = true) => {
         $timeout(function () {
-          var bar = document.getElementById('wz-search-filter-bar');
-          var autocomplete = document.getElementById('wz-search-filter-bar-autocomplete');
-          var input = document.getElementById('wz-search-filter-bar-input');
+          const bar = $document[0].getElementById('wz-search-filter-bar');
+          const autocomplete = $document[0].getElementById('wz-search-filter-bar-autocomplete');
+          const input = $document[0].getElementById('wz-search-filter-bar-input');
           autocomplete.style.left = input.offsetLeft - bar.scrollLeft + 'px';
           if (flag) {
             input.focus();
@@ -194,11 +204,11 @@ app.directive('wzTagFilter', function () {
         }
       };
 
-      function generateUID() {
+      const generateUID = () => {
         // I generate the UID from two parts here 
         // to ensure the random number provide enough bits.
-        var firstPart = (Math.random() * 46656) | 0;
-        var secondPart = (Math.random() * 46656) | 0;
+        let firstPart = (Math.random() * 46656) | 0;
+        let secondPart = (Math.random() * 46656) | 0;
         firstPart = ('000' + firstPart.toString(36)).slice(-3);
         secondPart = ('000' + secondPart.toString(36)).slice(-3);
         return firstPart + secondPart;
@@ -210,7 +220,7 @@ app.directive('wzTagFilter', function () {
           $('#wz-search-filter-bar-autocomplete-list li').first().addClass('selected');
           $current = $('#wz-search-filter-bar-autocomplete-list li.selected');
         } else {
-          var $next;
+          let $next;
           switch (e.keyCode) {
             case 13: // enter
               $scope.autocompleteEnter = true;
@@ -224,7 +234,7 @@ app.directive('wzTagFilter', function () {
               break;
           }
           if ($next && $next.length > 0 && (e.keyCode === 38 || e.keyCode === 40)) {
-            var input = document.getElementById('wz-search-filter-bar-input');
+            const input = $document[0].getElementById('wz-search-filter-bar-input');
             input.focus();
             $('#wz-search-filter-bar-autocomplete-list li').removeClass('selected');
             $next.addClass('selected');

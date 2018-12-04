@@ -72,14 +72,6 @@ export class AgentsPreviewController {
     this.load();
   }
 
-  search(term) {
-    this.$scope.$broadcast('wazuhSearch', { term });
-  }
-
-  filter(filter) {
-    this.$scope.$broadcast('wazuhFilter', { filter });
-  }
-
   query(query, search) {
     this.$scope.$broadcast('wazuhQuery', { query, search });
   }
