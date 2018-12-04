@@ -176,7 +176,6 @@ export class OverviewController {
 
   filterWodle(tab) {
     try {
-      this.wodlesConfiguration = false;
       const tag = this.calculateWodleTagFromTab(tab);
       let result = [];
       if (
@@ -191,6 +190,8 @@ export class OverviewController {
       }
       if (result.length) {
         this.wodlesConfiguration = result[0];
+      } else {
+        this.wodlesConfiguration = false;
       }
     } catch (error) {} // eslint-disable-line
 
