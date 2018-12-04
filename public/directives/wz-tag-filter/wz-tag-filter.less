@@ -14,12 +14,13 @@
 /* ----------- Wazuh search and filter by tags bar stylesheet --------------- */
 /* -------------------------------------------------------------------------- */
 
-.wz-search-filter-bar {
+#wz-search-filter-bar {
     padding: 8px;
     margin-top: 15px;
+    overflow: auto;
 }
 
-.wz-search-filter-bar > .fa-search{
+#wz-search-filter-bar > .fa-search{
     padding: 8px 3px;
     float: left;
     opacity: .5;
@@ -54,7 +55,7 @@
 .wz-tag-item {
     color: white;
     border-radius: 3px;
-    float: left;
+    display: inline-block;
     padding: 3px 5px;
     background: #0079a5;
     margin: 1px 3px;
@@ -76,6 +77,7 @@
     padding: 5px;
     width: auto;
     margin-left: 5px;
+    min-width: 225px;
     flex: 1;
 }
 
@@ -109,17 +111,3 @@
     color:#0079a5;
     cursor: pointer;
 }
-/* @media (min-width: 1280px) {
-    .wz-configuration-item {
-        padding: 5px 0;
-    }
-
-    .wz-configuration-label {
-        text-align: right;
-    }
-
-    .wz-configuration-value {
-        margin: 0 0 0 30px;
-    }
-}
- */

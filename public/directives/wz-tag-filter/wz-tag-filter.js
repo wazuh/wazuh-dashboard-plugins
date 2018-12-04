@@ -171,9 +171,10 @@ app.directive('wzTagFilter', function () {
 
       function index_autocomplete(flag = true) {
         $timeout(function () {
+          var bar = document.getElementById('wz-search-filter-bar');
           var autocomplete = document.getElementById('wz-search-filter-bar-autocomplete');
           var input = document.getElementById('wz-search-filter-bar-input');
-          autocomplete.style.left = input.offsetLeft + 'px';
+          autocomplete.style.left = input.offsetLeft - bar.scrollLeft + 'px';
           if (flag) {
             input.focus();
           }
