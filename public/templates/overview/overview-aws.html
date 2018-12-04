@@ -24,7 +24,13 @@
     <div layout="row" class="height-100">
         <kbn-vis vis-id="'Wazuh-App-Overview-AWS-Service-selector'"></kbn-vis>
     </div>
+    <div layout="column" layout-align="center center" ng-if="octrl.tab === 'aws'" ng-show="resultState === 'ready' && octrl.tabView === 'panels' && !rendered">
+        <div class="percentage"><i class="fa fa-fw fa-spin fa-spinner" aria-hidden="true"></i></div>
+        <div class="percentage">{{loadingStatus}}</div>
+    </div>
+</md-content>
 
+<md-content flex layout="column" ng-if="octrl.tab === 'aws' && octrl.tabView === 'panels'" ng-class="{'no-opacity': resultState !== 'ready' || !rendered}" layout-align="start">
     <div layout="row" class="height-300">
         <md-card flex="50" class="wz-md-card">
             <md-card-content class="wazuh-column">
