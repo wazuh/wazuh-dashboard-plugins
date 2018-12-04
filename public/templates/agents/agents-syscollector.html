@@ -119,8 +119,20 @@
                 </div>
 
                 <div layout="row" ng-if="agent && syscollector && !load" class="wz-margin-top-10 wz-margin-bottom-40-inv">
-                    <wz-table flex path="'/syscollector/' + agent.id + '/packages'" row-sizes="[10,8,6]" extra-limit="true" keys="[{value:'name',size:2},'architecture','version',{value:'vendor',size:2},{value:'description',size:3}]">
-                    </wz-table>
+                    <wz-table flex 
+                        ng-if="agent && agent.os && agent.os.platform !== 'windows'"
+                        path="'/syscollector/' + agent.id + '/packages'" 
+                        row-sizes="[10,8,6]" 
+                        extra-limit="true" 
+                        keys="[{value:'name',size:2},'architecture','version',{value:'vendor',size:2},{value:'description',size:3}]"
+                    />
+                    <wz-table flex 
+                        ng-if="agent && agent.os && agent.os.platform === 'windows'"
+                        path="'/syscollector/' + agent.id + '/packages'" 
+                        row-sizes="[10,8,6]" 
+                        extra-limit="true" 
+                        keys="[{value:'name',size:3},'architecture','version',{value:'vendor',size:2}]"
+                    />
                 </div>
             </md-card-content>
         </md-card>
@@ -140,8 +152,20 @@
                     </button>
                 </div>
                 <div layout="row" ng-if="agent && syscollector && !load" class="wz-margin-top-10 wz-margin-bottom-40-inv">
-                    <wz-table flex path="'/syscollector/' + agent.id + '/processes'" row-sizes="[10,8,6]" extra-limit="true" keys="['name','euser','nice','state']">
-                    </wz-table>
+                    <wz-table flex 
+                        ng-if="agent && agent.os && agent.os.platform === 'windows'"
+                        path="'/syscollector/' + agent.id + '/processes'" 
+                        row-sizes="[10,8,6]" 
+                        extra-limit="true" 
+                        keys="['name','cmd','priority','nlwp']"
+                        />
+                    <wz-table flex 
+                        ng-if="agent && agent.os && agent.os.platform !== 'windows'"
+                        path="'/syscollector/' + agent.id + '/processes'" 
+                        row-sizes="[10,8,6]" 
+                        extra-limit="true" 
+                        keys="['name','euser','nice','state']"
+                        />
                 </div>
             </md-card-content>
         </md-card>

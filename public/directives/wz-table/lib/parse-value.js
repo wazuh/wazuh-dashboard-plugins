@@ -23,7 +23,7 @@ const splitArray = array => {
 };
 
 const checkIfArray = item => {
-  return typeof item === 'object' ? splitArray(item) : item == 0 ? '0' : item;
+  return typeof item === 'object' ? splitArray(item) : item === 0 ? '0' : item;
 };
 
 export function parseValue(key, item, instancePath) {

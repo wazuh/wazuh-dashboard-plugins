@@ -74,5 +74,8 @@ export const KeyEquivalenece = {
   inode: 'Inode',
   uid: 'User ID',
   gid: 'Group ID',
-  mtime: 'Last modified'
+  mtime: 'Last modified',
+  priority: 'Priority',
+  cmd: 'CMD',
+  nlwp: 'NLWP'
 };
