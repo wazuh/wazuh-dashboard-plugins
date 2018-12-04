@@ -22,7 +22,7 @@ app.directive('wzTagFilter', function () {
     scope: {
       path: '=path',
       keys: '=keys',
-      query: '&'
+      queryFn: '&'
     },
     controller(
       $scope,
@@ -95,7 +95,7 @@ app.directive('wzTagFilter', function () {
             first = false;
           }
         });
-        $scope.query({ 'query': queryObj.query, 'search': queryObj.search });
+        $scope.queryFn({ 'q': queryObj.query, 'search': queryObj.search });
       }
 
       function groupBy(collection, property) {
