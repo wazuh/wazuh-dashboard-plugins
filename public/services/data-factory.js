@@ -67,10 +67,9 @@ export class DataFactory {
       this.serializeFilters(parameters);
 
       // Fetch next <limit> items
-      const path = !options.query ? this.path : this.path + options.query;
       const firstPage = await this.httpClient.request(
         'GET',
-        path,
+        this.path,
         parameters
       );
       this.items = this.items.filter(item => !!item);

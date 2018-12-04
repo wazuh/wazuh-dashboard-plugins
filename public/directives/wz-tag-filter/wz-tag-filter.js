@@ -22,8 +22,6 @@ app.directive('wzTagFilter', function () {
     scope: {
       path: '=path',
       keys: '=keys',
-      search: '&',
-      filter: '&',
       query: '&'
     },
     controller(
@@ -60,29 +58,44 @@ app.directive('wzTagFilter', function () {
         if (!$scope.tagList.find(function (x) { return x.type === 'filter' && x.key === tag.key && x.value.value === tag.value.value })) {
           $scope.tagList.push(tag);
           $scope.groupedTagList = groupBy($scope.tagList, 'key');
-          isFilter ? $scope.query({ 'query': buildQuery($scope.groupedTagList) }) : $scope.search({ 'search': obj.name });
+          buildQuery($scope.groupedTagList);
         }
         $scope.showAutocomplete(flag);
         $scope.newTag = '';
       };
 
-      function buildQuery(groups, idx1) {
-        let queryString = "?search=''&q=";
-        groups.forEach(function (group) {
-          queryString += "("
-          group.forEach(function (tag, idx2) {
-            queryString += tag.key + ":" + tag.value.value;
-            if (idx2 != group.length - 1) {
-              queryString += ",";
+      function buildQuery(groups) {
+        let queryObj = {
+          'query': '',
+          'search': ''
+        };
+        let first = true;
+        groups.forEach(function (group, idx1) {
+          const search = group.find(function (x) { return x.type === 'search' });
+          if (search) {
+            queryObj.search = search.value.name;
+          }
+          else {
+            if (!first) {
+              queryObj.query += ";";
             }
-          });
-          queryString += ")"
-          if (idx1 != groups.length - 1) {
-            queryString += ";";
+            const twoOrMoreElements = group.length > 1;
+            if (twoOrMoreElements) {
+              queryObj.query += "("
+            }
+            group.filter(function (x) { return x.type === 'filter' }).forEach(function (tag, idx2) {
+              queryObj.query += tag.key + "=" + tag.value.value;
+              if (idx2 != group.length - 1) {
+                queryObj.query += ",";
+              }
+            });
+            if (twoOrMoreElements) {
+              queryObj.query += ")"
+            }
+            first = false;
           }
         });
-        console.log(queryString);
-        return queryString;
+        $scope.query({ 'query': queryObj.query, 'search': queryObj.search });
       }
 
       function groupBy(collection, property) {
@@ -113,10 +126,9 @@ app.directive('wzTagFilter', function () {
       };
 
       $scope.removeTag = (id) => {
-        const term = $scope.tagList.find(function (x) { return x.id === id });
-        term.type === 'filter' ? $scope.filter({ 'filter': { name: term.key, value: 'all' } }) : $scope.search({ 'search': '' });
         $scope.tagList.splice($scope.tagList.findIndex(function (x) { return x.id === id }), 1);
         $scope.groupedTagList = groupBy($scope.tagList, 'key');
+        buildQuery($scope.groupedTagList);
         $scope.showAutocomplete(false);
       };
 

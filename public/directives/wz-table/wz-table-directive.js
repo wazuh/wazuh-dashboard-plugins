@@ -131,9 +131,12 @@ app.directive('wzTable', function () {
           errorHandler
         );
 
-        const query = async query =>
+        const query = async (query, search) =>
         queryData(
           query,
+          search,
+          instance,
+          wzTableFilter,
           $scope,
           fetch,
           errorHandler

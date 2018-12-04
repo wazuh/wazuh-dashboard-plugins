@@ -78,6 +78,9 @@ export async function filterData(
 
 export async function queryData(
   query,
+  term,
+  instance,
+  wzTableFilter,
   $scope,
   fetch,
   errorHandler
@@ -85,7 +88,15 @@ export async function queryData(
   try {
     $scope.error = false;
     $scope.wazuh_table_loading = true;
-    await fetch({ 'query': query });
+    instance.removeFilters();
+    if (term) {
+      instance.addFilter('search', term);
+    }
+    if (query) {
+      instance.addFilter('q', query);
+    }
+    wzTableFilter.set(instance.filters);
+    await fetch();
     $scope.wazuh_table_loading = false;
   } catch (error) {
     $scope.wazuh_table_loading = false;

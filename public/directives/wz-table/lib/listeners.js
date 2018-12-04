@@ -21,7 +21,7 @@ export function wazuhFilter(parameters, filter) {
 }
 
 export function wazuhQuery(parameters, query) {
-  return query(parameters.query);
+  return query(parameters.query, parameters.search);
 }
 
 export function wazuhSearch(parameters, instance, search) {
