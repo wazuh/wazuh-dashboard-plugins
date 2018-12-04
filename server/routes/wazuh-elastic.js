@@ -92,4 +92,13 @@ export function WazuhElasticRouter(server) {
       return ctrl.getTimeStamp(req, res);
     }
   });
+
+  // Fetch alerts directly from Elasticsearch
+  server.route({
+    method: 'POST',
+    path: '/elastic/alerts',
+    handler(req, res) {
+      return ctrl.alerts(req, res);
+    }
+  });
 }

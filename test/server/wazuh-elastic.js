@@ -3,6 +3,8 @@ const needle = require('needle');
 
 const { version, revision } = require('../../package.json');
 
+const kibanaServer = process.env.KIBANA_IP || 'localhost';
+
 chai.should();
 
 const headers = {
@@ -14,7 +16,7 @@ describe('wazuh-elastic', () => {
     it('GET /elastic/index-patterns', async () => {
       const res = await needle(
         'get',
-        `localhost:5601/elastic/index-patterns`,
+        `${kibanaServer}:5601/elastic/index-patterns`,
         {},
         headers
       );
@@ -28,13 +30,13 @@ describe('wazuh-elastic', () => {
     it('GET /elastic/known-fields/{pattern}', async () => {
       const res = await needle(
         'get',
-        `localhost:5601/elastic/known-fields/wazuh-alerts-3.x-*`,
+        `${kibanaServer}:5601/elastic/known-fields/wazuh-alerts-3.x-*`,
         {},
         headers
       );
       res.body.acknowledge.should.be.eql(true);
       res.body.output.should.be.a('object');
-      res.body.output._index.should.be.eql('.kibana');
+      //res.body.output._index.should.be.eql('.kibana');
       res.body.output._type.should.be.eql('doc');
       res.body.output._id.should.be.eql('index-pattern:wazuh-alerts-3.x-*');
     });
@@ -44,7 +46,7 @@ describe('wazuh-elastic', () => {
     it('GET /elastic/visualizations/{tab}/{pattern}', async () => {
       const res = await needle(
         'get',
-        `localhost:5601/elastic/visualizations/overview-general/wazuh-alerts-3.x-*`,
+        `${kibanaServer}:5601/elastic/visualizations/overview-general/wazuh-alerts-3.x-*`,
         {},
         headers
       );
@@ -59,7 +61,7 @@ describe('wazuh-elastic', () => {
     it('POST /elastic/visualizations/{tab}/{pattern}', async () => {
       const res = await needle(
         'post',
-        `localhost:5601/elastic/visualizations/cluster-monitoring/wazuh-alerts-3.x-*`,
+        `${kibanaServer}:5601/elastic/visualizations/cluster-monitoring/wazuh-alerts-3.x-*`,
         { nodes: { items: [], name: 'node01' } },
         headers
       );
@@ -76,7 +78,7 @@ describe('wazuh-elastic', () => {
     it('GET /elastic/template/{pattern}', async () => {
       const res = await needle(
         'get',
-        `localhost:5601/elastic/template/wazuh-alerts-3.x-*`,
+        `${kibanaServer}:5601/elastic/template/wazuh-alerts-3.x-*`,
         {},
         headers
       );
@@ -88,7 +90,7 @@ describe('wazuh-elastic', () => {
     it('GET /elastic/index-patterns/{pattern}', async () => {
       const res = await needle(
         'get',
-        `localhost:5601/elastic/index-patterns/wazuh-alerts-3.x-*`,
+        `${kibanaServer}:5601/elastic/index-patterns/wazuh-alerts-3.x-*`,
         {},
         headers
       );
@@ -106,7 +108,7 @@ describe('wazuh-elastic', () => {
     it('GET /elastic/setup', async () => {
       const res = await needle(
         'get',
-        `localhost:5601/elastic/setup`,
+        `${kibanaServer}:5601/elastic/setup`,
         {},
         headers
       );
@@ -122,12 +124,47 @@ describe('wazuh-elastic', () => {
     it('GET /elastic/timestamp', async () => {
       const res = await needle(
         'get',
-        `localhost:5601/elastic/timestamp`,
+        `${kibanaServer}:5601/elastic/timestamp`,
         {},
         headers
       );
       res.body.installationDate.should.be.a('string');
       res.body.lastRestart.should.be.a('string');
+    });
+
+
+    it('POST /elastic/alerts full parameters', async () => {
+      const res = await needle(
+        'POST',
+        `${kibanaServer}:5601/elastic/alerts`,
+        {
+          pattern: 'wazuh-alerts-3.x-*',
+          'agent.id': '000',
+          'rule.groups': 'ossec',
+          'manager.name': 'master',
+          'cluster.name': 'wazuh',
+          size: 1
+        },
+        headers
+      );
+      const alerts = res.body.alerts;
+      alerts.should.be.a('array')
+      alerts.length.should.be.eql(1)
+      alerts[0].agent.id.should.be.eql('000')
+      alerts[0].rule.groups.includes('ossec').should.be.eql(true)
+      alerts[0].manager.name.should.be.eql('master')
+      alerts[0].cluster.name.should.be.eql('wazuh')
+    });
+
+    it('POST /elastic/alerts no parameters', async () => {
+      const res = await needle(
+        'POST',
+        `${kibanaServer}:5601/elastic/alerts`,
+        {},
+        headers
+      );
+      res.body.alerts.should.be.a('array')
+      res.body.alerts.length.should.be.eql(10)
     });
   });
 });

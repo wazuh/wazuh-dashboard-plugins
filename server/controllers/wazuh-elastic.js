@@ -19,6 +19,8 @@ import {
   ClusterVisualizations
 } from '../integration-files/visualizations';
 
+import { Base } from '../reporting/base-query';
+
 export class WazuhElasticCtrl {
   constructor(server) {
     this.wzWrapper = new ElasticWrapper(server);
@@ -488,6 +490,70 @@ export class WazuhElasticCtrl {
     } catch (error) {
       log('GET /elastic/known-fields/{pattern}', error.message || error);
       return ErrorResponse(error.message || error, 4008, 500, reply);
+    }
+  }
+
+  /**
+   * @param {*} req
+   * POST /elastic/alerts
+   * {
+   *   "agent.id": 100 ,
+   *   "cluster.name": "wazuh",
+   *   "date.from": "now-1d/timestamp/standard date", // Like Elasticsearch does
+   *   "date.to": "now/timestamp/standard date", // Like Elasticsearch does
+   *   "rule.group": ["onegroup", "anothergroup"] // Or empty array [ ]
+   *   "size": 5 // Optional parameter
+   * }
+   *
+   * @param {*} reply
+   * {alerts: [...]} or ErrorResponse
+   */
+  async alerts(req, reply) {
+    try {
+      const pattern = req.payload.pattern || 'wazuh-alerts-3.x-*';
+      const from = req.payload.from || 'now-1d';
+      const to = req.payload.to || 'now';
+      const size = req.payload.size || 10;
+      const payload = Base(pattern, [], from, to);
+
+      payload.query = { bool: { must: [] } };
+
+      const agent = req.payload['agent.id'];
+      const manager = req.payload['manager.name'];
+      const cluster = req.payload['cluster.name'];
+      const rulegGroups = req.payload['rule.groups'];
+      if (agent)
+        payload.query.bool.must.push({
+          match: { 'agent.id': agent }
+        });
+      if (cluster)
+        payload.query.bool.must.push({
+          match: { 'cluster.name': cluster }
+        });
+      if (manager)
+        payload.query.bool.must.push({
+          match: { 'manager.name': manager }
+        });
+      if (rulegGroups)
+        payload.query.bool.must.push({
+          match: { 'rule.groups': rulegGroups }
+        });
+
+      payload.size = size;
+      payload.docvalue_fields = [
+        '@timestamp',
+        'cluster.name',
+        'manager.name',
+        'agent.id',
+        'rule.id',
+        'rule.group',
+        'rule.description'
+      ];
+      const data = await this.wzWrapper.searchWazuhAlertsWithPayload(payload);
+      return reply({ alerts: data.hits.hits });
+    } catch (error) {
+      log('POST /elastic/alerts', error.message || error);
+      return ErrorResponse(error.message || error, 4010, 500, reply);
     }
   }
 }
