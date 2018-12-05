@@ -49,22 +49,30 @@ app.directive('wzTagFilter', function () {
           input.blur();
           const term = $scope.newTag.split(':');
           const obj = { name: term[0], value: term[1] };
+          const onlyCharsNums = /[^A-Za-z0-9]+/;
           const isFilter = obj.value;
-          const tag = {
-            'id': generateUID(),
-            'key': obj.name,
-            'value': obj,
-            'type': isFilter ? 'filter' : 'search'
-          };
-          const idxSearch = $scope.tagList.find(function (x) { return x.type === 'search' });
-          if (!isFilter && idxSearch) { $scope.removeTag(idxSearch.id, false) };
-          if (!$scope.tagList.find(function (x) { return x.type === 'filter' && x.key === tag.key && x.value.value === tag.value.value })) {
-            $scope.tagList.push(tag);
-            $scope.groupedTagList = groupBy($scope.tagList, 'key');
-            buildQuery($scope.groupedTagList);
+          if ((isFilter && Object.keys($scope.fieldsModel).indexOf(obj.name) === -1) ||
+            (isFilter && onlyCharsNums.test(obj.value)) ||
+            (!isFilter && onlyCharsNums.test(obj.name))) {
+            $scope.showAutocomplete(flag);
+            $scope.newTag = '';
+          } else {
+            const tag = {
+              'id': generateUID(),
+              'key': obj.name,
+              'value': obj,
+              'type': isFilter ? 'filter' : 'search'
+            };
+            const idxSearch = $scope.tagList.find(function (x) { return x.type === 'search' });
+            if (!isFilter && idxSearch) { $scope.removeTag(idxSearch.id, false) };
+            if (!$scope.tagList.find(function (x) { return x.type === 'filter' && x.key === tag.key && x.value.value === tag.value.value })) {
+              $scope.tagList.push(tag);
+              $scope.groupedTagList = groupBy($scope.tagList, 'key');
+              buildQuery($scope.groupedTagList);
+            }
+            $scope.showAutocomplete(flag);
+            $scope.newTag = '';
           }
-          $scope.showAutocomplete(flag);
-          $scope.newTag = '';
         } catch (error) {
           errorHandler.handle(error, 'Add filter');
         }
@@ -160,17 +168,15 @@ app.directive('wzTagFilter', function () {
         $scope.autocompleteContent = { 'title': '', 'isKey': isKey, 'list': [] };
         $scope.autocompleteContent.title = isKey ? 'Filter keys' : 'Values';
         if (isKey) {
-          const regex = new RegExp('^' + term[0], 'i');
           for (let key in $scope.fieldsModel) {
-            if (regex.test(key)) {
+            if (key.toUpperCase().includes(term[0].toUpperCase())) {
               $scope.autocompleteContent.list.push(key);
             }
           }
         } else {
-          const regex = new RegExp('^' + term[1], 'i');
           const model = $scope.dataModel.find(function (x) { return x.key === $scope.newTag.split(':')[0] })
           if (model) {
-            $scope.autocompleteContent.list = [...new Set(model.list.filter(function (x) { return regex.test(x) }))];
+            $scope.autocompleteContent.list = [...new Set(model.list.filter(function (x) { return x.toUpperCase().includes(term[1].toUpperCase()); }))];
           }
         }
       };

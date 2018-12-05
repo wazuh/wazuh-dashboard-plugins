@@ -13,7 +13,7 @@
                         </div>
                         <span class='wz-tag-item-connector' ng-show='$index != group.length - 1'>OR</span>
                     </div>
-                    <a class='wz-tag-remove-button-group' ng-click='removeTag(group[0].key, true)'>×</a>
+                    <a ng-show='group.length > 1' class='wz-tag-remove-button-group' ng-click='removeTag(group[0].key, true)'>×</a>
                 </div>
                 <span class='wz-tag-item-connector' ng-show='$index != groupedTagList.length - 1'> AND </span>
             </li>
