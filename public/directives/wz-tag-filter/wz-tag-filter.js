@@ -49,11 +49,12 @@ app.directive('wzTagFilter', function () {
           input.blur();
           const term = $scope.newTag.split(':');
           const obj = { name: term[0], value: term[1] };
-          const onlyCharsNums = /[^A-Za-z0-9]+/;
+          const onlyCharsNums = /[^A-Za-z0-9 .-]+/;
           const isFilter = obj.value;
           if ((isFilter && Object.keys($scope.fieldsModel).indexOf(obj.name) === -1) ||
             (isFilter && onlyCharsNums.test(obj.value)) ||
-            (!isFilter && onlyCharsNums.test(obj.name))) {
+            (!isFilter && onlyCharsNums.test(obj.name)) ||
+            (!isFilter && (!obj.name || /^\s*$/.test(obj.name)))) {
             $scope.showAutocomplete(flag);
             $scope.newTag = '';
           } else {
@@ -122,7 +123,7 @@ app.directive('wzTagFilter', function () {
         for (; i < collection.length; i++) {
           val = collection[i][property];
           index = values.indexOf(val);
-          if (index > -1)
+          if (index > -1 && collection[i].type === 'filter')
             result[index].push(collection[i]);
           else {
             values.push(val);
@@ -225,15 +226,17 @@ app.directive('wzTagFilter', function () {
 
       $('#wz-search-filter-bar-input').bind('keydown', function (e) {
         let $current = $('#wz-search-filter-bar-autocomplete-list li.selected');
-        if ($current.length === 0) {
+        if ($current.length === 0 && (e.keyCode === 38 || e.keyCode === 40)) {
           $('#wz-search-filter-bar-autocomplete-list li').first().addClass('selected');
           $current = $('#wz-search-filter-bar-autocomplete-list li.selected');
         } else {
           let $next;
           switch (e.keyCode) {
             case 13: // enter
-              $scope.autocompleteEnter = true;
-              $scope.autocompleteContent.isKey ? $scope.addTagKey($current.text().trim()) : $scope.addTagValue($current.text().trim());
+              if ($current.text().trim() && !/^\s*$/.test($current.text().trim())) {
+                $scope.autocompleteEnter = true;
+                $scope.autocompleteContent.isKey ? $scope.addTagKey($current.text().trim()) : $scope.addTagValue($current.text().trim());
+              }
               break;
             case 38: // if the UP key is pressed
               $next = $current.prev();
