@@ -72,7 +72,7 @@ app.directive('wzTagFilter', function () {
             $scope.newTag = '';
           }
         } catch (error) {
-          errorHandler.handle(error, 'Add filter');
+          errorHandler.handle(error, 'Error adding filter');
         }
       };
 
@@ -110,7 +110,7 @@ app.directive('wzTagFilter', function () {
           });
           $scope.queryFn({ 'q': queryObj.query, 'search': queryObj.search });
         } catch (error) {
-          errorHandler.handle(error, 'Query filter request');
+          errorHandler.handle(error, 'Error in query request');
         }
       }
 
