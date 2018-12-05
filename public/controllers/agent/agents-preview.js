@@ -125,6 +125,7 @@ export class AgentsPreviewController {
       const unique = agentsUnique.data.result;
 
       this.searchBarModel = {
+        'status': ['Active', 'Disconnected', 'Never connected'],
         'group': unique.groups,
         'node_name': unique.nodes,
         'version': unique.versions,

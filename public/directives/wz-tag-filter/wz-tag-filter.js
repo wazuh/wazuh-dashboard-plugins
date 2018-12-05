@@ -57,7 +57,7 @@ app.directive('wzTagFilter', function () {
             'type': isFilter ? 'filter' : 'search'
           };
           const idxSearch = $scope.tagList.find(function (x) { return x.type === 'search' });
-          if (!isFilter && idxSearch) { $scope.removeTag(idxSearch.id) };
+          if (!isFilter && idxSearch) { $scope.removeTag(idxSearch.id, false) };
           if (!$scope.tagList.find(function (x) { return x.type === 'filter' && x.key === tag.key && x.value.value === tag.value.value })) {
             $scope.tagList.push(tag);
             $scope.groupedTagList = groupBy($scope.tagList, 'key');
@@ -135,8 +135,12 @@ app.directive('wzTagFilter', function () {
         $scope.addTag();
       };
 
-      $scope.removeTag = (id) => {
-        $scope.tagList.splice($scope.tagList.findIndex(function (x) { return x.id === id }), 1);
+      $scope.removeTag = (id, deleteGroup) => {
+        if (deleteGroup) {
+          $scope.tagList = $scope.tagList.filter(function (x) { return x.key !== id });
+        } else {
+          $scope.tagList.splice($scope.tagList.findIndex(function (x) { return x.id === id }), 1);
+        }
         $scope.groupedTagList = groupBy($scope.tagList, 'key');
         buildQuery($scope.groupedTagList);
         $scope.showAutocomplete(false);
@@ -194,8 +198,8 @@ app.directive('wzTagFilter', function () {
       const load = async () => {
         try {
           const result = await instance.fetch();
-          Object.keys($scope.fieldsModel).forEach(function(key) {
-            $scope.dataModel.push({ 'key': key, 'list': $scope.fieldsModel[key]});
+          Object.keys($scope.fieldsModel).forEach(function (key) {
+            $scope.dataModel.push({ 'key': key, 'list': $scope.fieldsModel[key] });
           });
           return;
         } catch (error) {
