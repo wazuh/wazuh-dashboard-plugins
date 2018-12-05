@@ -49,11 +49,8 @@ app.directive('wzTagFilter', function () {
           input.blur();
           const term = $scope.newTag.split(':');
           const obj = { name: term[0], value: term[1] };
-          const onlyCharsNums = /[^A-Za-z0-9 .-]+/;
           const isFilter = obj.value;
           if ((isFilter && Object.keys($scope.fieldsModel).indexOf(obj.name) === -1) ||
-            (isFilter && onlyCharsNums.test(obj.value)) ||
-            (!isFilter && onlyCharsNums.test(obj.name)) ||
             (!isFilter && (!obj.name || /^\s*$/.test(obj.name)))) {
             $scope.showAutocomplete(flag);
             $scope.newTag = '';
