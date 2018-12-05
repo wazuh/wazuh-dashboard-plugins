@@ -68,12 +68,16 @@ app.directive('wzTable', function() {
        */
       const rowSizes = $scope.rowSizes || [15, 13, 11];
       let doit;
+      // Prevents duplicated rows when resizing
+      let resizing = false;
       $window.onresize = () => {
+        if(resizing) return;
+        resizing = true;
         clearTimeout(doit);
         doit = setTimeout(() => {
           $scope.rowsPerPage = calcTableRows($window.innerHeight, rowSizes);
           $scope.itemsPerPage = $scope.rowsPerPage;
-          init();
+          init().then(() => resizing = false).catch(() => resizing = false);
         }, 150);
       };
       $scope.rowsPerPage = calcTableRows($window.innerHeight, rowSizes);
