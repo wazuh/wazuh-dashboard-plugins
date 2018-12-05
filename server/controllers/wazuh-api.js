@@ -24,6 +24,7 @@ import { getConfiguration } from '../lib/get-configuration';
 import { log } from '../logger';
 import { KeyEquivalenece } from '../../util/csv-key-equivalence';
 import { cleanKeys } from '../../util/remove-key';
+import { apiRequestList } from '../../util/api-request-list'
 
 export class WazuhApiCtrl {
   constructor(server) {
@@ -202,7 +203,7 @@ export class WazuhApiCtrl {
                   req.idChanged = api._id;
                   return this.checkStoredAPI(req, reply);
                 }
-              } catch (error) {} // eslint-disable-line
+              } catch (error) { } // eslint-disable-line
             }
           } catch (error) {
             log('POST /api/check-stored-api', error.message || error);
@@ -593,9 +594,9 @@ export class WazuhApiCtrl {
       }
 
       throw response &&
-      response.body &&
-      response.body.error &&
-      response.body.message
+        response.body &&
+        response.body.error &&
+        response.body.message
         ? { message: response.body.message, code: response.body.error }
         : new Error('Unexpected error fetching data from the Wazuh API');
     } catch (error) {
@@ -647,9 +648,9 @@ export class WazuhApiCtrl {
       }
 
       throw response &&
-      response.body &&
-      response.body.error &&
-      response.body.message
+        response.body &&
+        response.body.error &&
+        response.body.message
         ? { message: response.body.message, code: response.body.error }
         : new Error('Unexpected error fetching data from the Wazuh API');
     } catch (error) {
@@ -797,7 +798,21 @@ export class WazuhApiCtrl {
         output.body.data &&
         output.body.data.totalItems
       ) {
-        const fields = Object.keys(output.body.data.items[0]);
+        const fields = req.payload.path.includes('/agents')
+          ? [
+              'id',
+              'status',
+              'name',
+              'ip',
+              'group',
+              'manager',
+              'node_name',
+              'dateAdd',
+              'version',
+              'lastKeepAlive',
+              'os'
+            ]
+          : Object.keys(output.body.data.items[0]);
 
         const json2csvParser = new Parser({ fields });
         let csv = json2csvParser.parse(itemsArray);
@@ -888,9 +903,9 @@ export class WazuhApiCtrl {
 
       const parsedResponses = data.map(
         item =>
-          item && item.body && item.body.data && !item.body.error
-            ? item.body.data
-            : false
+        item && item.body && item.body.data && !item.body.error
+          ? item.body.data
+          : false
       );
 
       const [
@@ -963,5 +978,11 @@ export class WazuhApiCtrl {
     } catch (error) {
       return ErrorResponse(error.message || error, 3035, 500, reply);
     }
+  }
+
+  // Get de list of available requests in the API
+  getRequestList(req, reply) {
+    //Read a static JSON until the api call has implemented
+    return reply(apiRequestList);
   }
 }

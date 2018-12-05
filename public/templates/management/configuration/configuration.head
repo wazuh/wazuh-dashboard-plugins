@@ -1,4 +1,4 @@
-<div flex="auto" layout="column" ng-controller="managementConfigurationController" ng-if="mctrl.tab === 'configuration'" ng-init="switchConfigurationTab('welcome')">
+<div flex="auto" layout="column" ng-controller="managementConfigurationController" ng-if="mctrl.tab === 'configuration'" ng-init="switchConfigurationTab('welcome', false)">
 
     <!-- Navigation section -->
     <div layout="row" layout-align="start center">
@@ -14,7 +14,7 @@
             <div ng-if="configurationTab !== 'welcome'">
                 <span class="wz-text-link cursor-pointer" ng-click="mctrl.switchTab('welcome')">Management</span>
                 <span> / </span>
-                <span class="wz-text-link cursor-pointer" ng-click="switchConfigurationTab('welcome')">{{ mctrl.tabNames[mctrl.tab] }}</span>
+                <span class="wz-text-link cursor-pointer" ng-click="switchConfigurationTab('welcome', true)">{{ mctrl.tabNames[mctrl.tab] }}</span>
                 <span> / </span>
                 <span>{{ mctrl.tabNames[configurationTab] }}</span>
             </div>

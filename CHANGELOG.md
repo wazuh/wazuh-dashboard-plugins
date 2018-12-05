@@ -2,6 +2,25 @@
 
 All notable changes to the Wazuh app project will be documented in this file.
 
+## Wazuh v3.7.1 - Kibana v6.5.1 - Revision 415
+
+### Added
+
+- Support for Wazuh v3.7.1.
+- Dev Tools module now autocompletes API endpoints ([#1030](https://github.com/wazuh/wazuh-kibana-app/pull/1030)).
+
+### Changed
+
+- Increased number of rows for syscollector tables ([#1033](https://github.com/wazuh/wazuh-kibana-app/pull/1033)).
+- Modularized JSON/XML viewers for the configuration section ([#982](https://github.com/wazuh/wazuh-kibana-app/pull/982)).
+
+### Fixed
+
+- Added missing fields for syscollector network tables ([#1036](https://github.com/wazuh/wazuh-kibana-app/pull/1036)).
+- Using the right API path when downloading CSV for decoders list ([#1045](https://github.com/wazuh/wazuh-kibana-app/pull/1045)).
+- Including group field when downloading CSV for agents list ([#1044](https://github.com/wazuh/wazuh-kibana-app/pull/1044)).
+- Preserve active tab in configuration section when refreshing the page ([#1037](https://github.com/wazuh/wazuh-kibana-app/pull/1037)).
+
 ## Wazuh v3.7.0 - Kibana v6.5.0 / v6.5.1 - Revision 414
 
 ### Added

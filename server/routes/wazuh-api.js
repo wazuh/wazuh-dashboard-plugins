@@ -86,4 +86,14 @@ export function WazuhApiRoutes(server) {
       return ctrl.getAgentsFieldsUniqueCount(req, res);
     }
   });
+
+  // Returns unique fields from the agents such OS, agent version ...
+  server.route({
+    method: 'GET',
+    path: '/api/routes',
+    handler(req, res) {
+      return ctrl.getRequestList(req, res);
+    }
+  });
+
 }
