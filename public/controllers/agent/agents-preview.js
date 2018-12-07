@@ -110,6 +110,11 @@ export class AgentsPreviewController {
 
   async load() {
     try {
+
+      this.tableData = [{'name': 'john', 'age': 36},{'name': 'mary', 'age': 18},{'name': 'john', 'age': 36},{'name': 'mary', 'age': 18},{'name': 'john', 'age': 36},{'name': 'mary', 'age': 18},{'name': 'john', 'age': 36},{'name': 'mary', 'age': 18},{'name': 'john', 'age': 36},{'name': 'mary', 'age': 18},{'name': 'john', 'age': 36},{'name': 'mary', 'age': 18},{'name': 'john', 'age': 36},{'name': 'mary', 'age': 18},{'name': 'john', 'age': 36},{'name': 'mary', 'age': 18},{'name': 'john', 'age': 36},{'name': 'mary', 'age': 18},{'name': 'john', 'age': 36},{'name': 'mary', 'age': 18},{'name': 'john', 'age': 36},{'name': 'mary', 'age': 18},{'name': 'john', 'age': 36},{'name': 'mary', 'age': 18},{'name': 'john', 'age': 36},{'name': 'mary', 'age': 18},{'name': 'john', 'age': 36},{'name': 'mary', 'age': 18},{'name': 'john', 'age': 36},{'name': 'mary', 'age': 18},{'name': 'john', 'age': 36},{'name': 'mary', 'age': 18},{'name': 'john', 'age': 36},{'name': 'mary', 'age': 18}];
+
+
+
       const api = JSON.parse(this.appState.getCurrentAPI()).id;
       const clusterInfo = this.appState.getClusterInfo();
       const firstUrlParam =
