@@ -1,5 +1,5 @@
 /*
- * Wazuh app - Wazuh table directive
+ * Wazuh app - Wazuh table with data as input parameter directive
  * Copyright (C) 2018 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -63,7 +63,7 @@ app.directive('wzDataTable', function () {
       /*       $scope.clickAction = (item, openAction = false) =>
               clickAction(item, openAction, instance, shareAgent, $location, $scope);
       */
-      const fetch = async (options = {}) => {
+      const fetch = () => {
         try {
           items = $scope.data;
           $scope.totalItems = items.length;
@@ -73,21 +73,14 @@ app.directive('wzDataTable', function () {
           $scope.searchTable();
           return;
         } catch (error) {
-          if (
-            error &&
-            !error.data &&
-            error.status === -1 &&
-            error.xhrStatus === 'abort'
-          ) {
-            return Promise.reject('Request took too long, aborted');
-          }
-          return Promise.reject(error);
+          this.errorHandler.handle(error, 'Error loading table');
         }
+        return;
       };
 
-      $scope.sortValue = ''; // set the default sort type
-      $scope.sortReverse = false;  // set the default sort order
-      $scope.searchTerm = '';     // set the default search term
+      $scope.sortValue = '';
+      $scope.sortReverse = false;
+      $scope.searchTerm = '';
       $scope.sort = key => {
         $scope.sortValue = key;
         $scope.sortReverse = !$scope.sortReverse;
