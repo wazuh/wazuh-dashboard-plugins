@@ -28,6 +28,7 @@ app.directive('wzDataTable', function () {
     },
     controller(
       $scope,
+      $filter,
       errorHandler,
       $window,
     ) {
@@ -65,15 +66,11 @@ app.directive('wzDataTable', function () {
       */
       const fetch = () => {
         try {
-          items = $scope.data;
-          $scope.totalItems = items.length;
-          $scope.items = items;
+          $scope.filterTable();
           $scope.keys = Object.keys(items[0]);
-          checkGap($scope, items);
-          $scope.searchTable();
           return;
         } catch (error) {
-          this.errorHandler.handle(error, 'Error loading table');
+          errorHandler.handle(error, 'Error loading table');
         }
         return;
       };
@@ -82,8 +79,20 @@ app.directive('wzDataTable', function () {
       $scope.sortReverse = false;
       $scope.searchTerm = '';
       $scope.sort = key => {
+        if (key !== $scope.sortValue) {
+          $scope.sortReverse = false;
+        }
         $scope.sortValue = key;
         $scope.sortReverse = !$scope.sortReverse;
+        $scope.filterTable();
+      }
+
+      $scope.filterTable = () => {
+        items = $filter('orderBy')($filter('filter')($scope.data, $scope.searchTerm), $scope.sortValue, $scope.sortReverse);
+        $scope.totalItems = items.length;
+        $scope.items = items;
+        checkGap($scope, items);
+        $scope.searchTable();
       }
 
       const init = async () => {
