@@ -58,12 +58,6 @@ app.directive('wzDataTable', function () {
       };
       $scope.rowsPerPage = calcTableRows($window.innerHeight, rowSizes);
 
-      /**
-       * Common functions
-       */
-      /*       $scope.clickAction = (item, openAction = false) =>
-              clickAction(item, openAction, instance, shareAgent, $location, $scope);
-      */
       const fetch = () => {
         try {
           $scope.filterTable();

@@ -8,7 +8,7 @@
     <button class="kuiLocalSearchButton height-40"><span class="fa fa-search" aria-hidden="true"></span> </button>
 </div>
 <div ng-show="!error && !wazuh_table_loading && items.length">
-    <table class="table table-striped table-condensed  wz-margin-top-17" style="table-layout: fixed !important" id="wz_table">
+    <table class="table table-striped table-condensed wz-margin-top-17" style="table-layout: fixed !important" id="wz_table">
         <thead class="wz-text-bold">
             <th ng-repeat="key in keys" class="wz-text-left" ng-class="{ 'cursor-pointer' : !key.nosortable, 'col-lg-1' : !key.size, 'col-lg-{{key.size}}' : key.size }"
                 ng-click="!key.nosortable && sort(key)">
@@ -50,7 +50,7 @@
 </div>
 
 <div layout="row" ng-if="!error && !wazuh_table_loading && !totalItems">
-    <div flex class="euiCallOut euiCallOut--warning">
+    <div flex class="euiCallOut euiCallOut--warning wz-margin-top-17">
         <div class="euiCallOutHeader">
             <svg class="euiIcon euiIcon--medium euiCallOutHeader__icon" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
                 xmlns:xlink="http://www.w3.org/1999/xlink" width="16" height="16" viewBox="0 0 16 16">
@@ -65,7 +65,7 @@
 </div>
 
 <div layout="row" ng-if="error" class="wz-margin-bottom-45">
-    <div flex class="euiCallOut euiCallOut--warning">
+    <div flex class="euiCallOut euiCallOut--warning wz-margin-top-17">
         <div class="euiCallOutHeader">
             <svg class="euiIcon euiIcon--medium euiCallOutHeader__icon" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
                 xmlns:xlink="http://www.w3.org/1999/xlink" width="16" height="16" viewBox="0 0 16 16">
