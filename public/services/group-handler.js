@@ -16,7 +16,8 @@ export class GroupHandler {
 
   async removeAgentFromGroup(group, agentId) {
     try {
-      throw new Error('Not yet implemented');
+      const result = await this.apiReq.request('DELETE',`/agents/${agentId}/group/${group}`,{})
+      return result;
     } catch (error) {
       return Promise.reject(error);
     }
@@ -24,7 +25,8 @@ export class GroupHandler {
 
   async addAgentToGroup(group, agentId) {
     try {
-      throw new Error('Not yet implemented');
+      const result = await this.apiReq.request('PUT',`/agents/${agentId}/group/${group}`,{})
+      return result;
     } catch (error) {
       return Promise.reject(error);
     }

@@ -22,8 +22,6 @@ export function clickAction(
     instance.path === '/agents' ||
     new RegExp(/^\/agents\/groups\/[a-zA-Z0-9_\-\.]*$/).test(instance.path)
   ) {
-    if (openAction === 'removeAgentFromGroup') {
-    } else {
       shareAgent.setAgent(item);
 
       // Check location target and go to that path
@@ -48,7 +46,7 @@ export function clickAction(
       }
 
       $location.path('/agents');
-    }
+    
   } else if (instance.path === '/agents/groups') {
     $scope.$emit('wazuhShowGroup', { group: item });
   } else if (
