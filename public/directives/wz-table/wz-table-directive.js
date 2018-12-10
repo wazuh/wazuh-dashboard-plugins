@@ -26,7 +26,7 @@ import { checkGap } from './lib/check-gap';
 
 const app = uiModules.get('app/wazuh', []);
 
-app.directive('wzTable', function () {
+app.directive('wzTable', function() {
   return {
     restrict: 'E',
     scope: {
@@ -71,13 +71,15 @@ app.directive('wzTable', function () {
       // Prevents duplicated rows when resizing
       let resizing = false;
       $window.onresize = () => {
-        if(resizing) return;
+        if (resizing) return;
         resizing = true;
         clearTimeout(doit);
         doit = setTimeout(() => {
           $scope.rowsPerPage = calcTableRows($window.innerHeight, rowSizes);
           $scope.itemsPerPage = $scope.rowsPerPage;
-          init().then(() => resizing = false).catch(() => resizing = false);
+          init()
+            .then(() => (resizing = false))
+            .catch(() => (resizing = false));
         }, 150);
       };
       $scope.rowsPerPage = calcTableRows($window.innerHeight, rowSizes);
@@ -135,7 +137,7 @@ app.directive('wzTable', function () {
           errorHandler
         );
 
-        const query = async (query, search) =>
+      const query = async (query, search) =>
         queryData(
           query,
           search,
@@ -195,7 +197,7 @@ app.directive('wzTable', function () {
       $scope.prevPage = () => pagination.prevPage($scope);
       $scope.nextPage = async currentPage =>
         pagination.nextPage(currentPage, $scope, errorHandler, fetch);
-      $scope.setPage = function () {
+      $scope.setPage = function() {
         $scope.currentPage = this.n;
         $scope.nextPage(this.n);
       };
@@ -240,6 +242,15 @@ app.directive('wzTable', function () {
       });
 
       init();
+
+      $scope.isLookingGroup = () => {
+        try {
+          const regexp = new RegExp(/^\/agents\/groups\/[a-zA-Z0-9_\-.]*$/);
+          return regexp.test(instance.path);
+        } catch (error) {
+          return false;
+        }
+      };
     },
     template
   };
