@@ -256,21 +256,29 @@ app.directive('wzTable', function() {
 
       $scope.showConfirm = function(ev, agent) {
         const group = instance.path.split('/').pop();
-        // Appending dialog to document.body to cover sidenav in docs app
-        var confirm = $mdDialog.confirm()
-              .title(`Delete agent ${agent.id} from group ${group}?`)
-              .targetEvent(ev)
-              .ok('Agree')
-              .cancel('Cancel');
-    
-        $mdDialog.show(confirm).then(() => {
-          groupHandler.removeAgentFromGroup(group, agent.id).then(()=> init()).catch(error => errorHandler.handle(
-            error.message || error,
-            'Error removing agent from group'
-          ))
-        }, () => {
-          
-        });
+
+        const confirm = $mdDialog
+          .confirm()
+          .title(`Delete agent ${agent.id} from group ${group}?`)
+          .targetEvent(ev)
+          .ok('Agree')
+          .cancel('Cancel');
+
+        $mdDialog.show(confirm).then(
+          () => {
+            groupHandler
+              .removeAgentFromGroup(group, agent.id)
+              .then(() => init())
+              .then(() => $scope.$emit('updateGroupInformation', { group }))
+              .catch(error =>
+                errorHandler.handle(
+                  error.message || error,
+                  'Error removing agent from group'
+                )
+              );
+          },
+          () => {}
+        );
       };
     },
     template

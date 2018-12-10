@@ -128,6 +128,10 @@ export function GroupsController(
     return $scope.showFile(parameters.groupName, parameters.fileName);
   });
 
+  $scope.$on('updateGroupInformation', (event, parameters) => {
+    console.log('Event updateGroupInformation received');
+  });
+
   $scope.goBackToAgents = () => {
     $scope.groupsSelectedTab = 'agents';
     $scope.file = false;
