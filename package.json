@@ -4,7 +4,7 @@
     "revision": "0415",
     "code": "0415-2",
     "kibana": {
-        "version": "6.5.1"
+        "version": "6.5.2"
     },
     "engines": {
         "node": "8.11.4"
