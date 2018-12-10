@@ -128,8 +128,19 @@ export function GroupsController(
     return $scope.showFile(parameters.groupName, parameters.fileName);
   });
 
-  $scope.$on('updateGroupInformation', (event, parameters) => {
-    console.log('Event updateGroupInformation received');
+  $scope.$on('updateGroupInformation', async (event, parameters) => {
+    try {
+      const result = await apiReq.request(
+        'GET',
+        `/agents/groups/${parameters.group}`,
+        { limit: 1 }
+      );
+      $scope.currentGroup.count = result.data.data.totalItems;
+    } catch(error) {
+      errorHandler.handle(error, 'Groups');
+    }
+    if (!$scope.$$phase) $scope.$digest();
+    return;
   });
 
   $scope.goBackToAgents = () => {
