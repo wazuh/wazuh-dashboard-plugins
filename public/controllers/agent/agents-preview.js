@@ -72,12 +72,8 @@ export class AgentsPreviewController {
     this.load();
   }
 
-  search(term) {
-    this.$scope.$broadcast('wazuhSearch', { term });
-  }
-
-  filter(filter) {
-    this.$scope.$broadcast('wazuhFilter', { filter });
+  query(query, search) {
+    this.$scope.$broadcast('wazuhQuery', { query, search });
   }
 
   showAgent(agent) {
@@ -127,6 +123,19 @@ export class AgentsPreviewController {
       ]);
       const [agentsUnique, agentsTop] = data;
       const unique = agentsUnique.data.result;
+
+      this.searchBarModel = {
+        'status': ['Active', 'Disconnected', 'Never connected'],
+        'group': unique.groups,
+        'node_name': unique.nodes,
+        'version': unique.versions,
+        'os.platform': unique.osPlatforms.map(x => x.platform),
+        'os.version': unique.osPlatforms.map(x => x.version),
+        'os.name': unique.osPlatforms.map(x => x.name),
+      };
+      this.searchBarModel['os.name'] = Array.from(new Set(this.searchBarModel['os.name']));
+      this.searchBarModel['os.version'] = Array.from(new Set(this.searchBarModel['os.version']));
+      this.searchBarModel['os.platform'] = Array.from(new Set(this.searchBarModel['os.platform']));
 
       this.groups = unique.groups;
       this.nodes = unique.nodes.map(item => ({ id: item }));
