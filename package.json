@@ -4,10 +4,10 @@
     "revision": "0415",
     "code": "0415-0",
     "kibana": {
-        "version": "6.5.1"
+        "version": "6.5.2"
     },
     "engines": {
-        "node": "8.11.4"
+        "node": "8.14.0"
     },
     "description": "Wazuh app",
     "main": "index.js",
