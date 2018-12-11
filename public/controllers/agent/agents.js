@@ -541,8 +541,10 @@ export class AgentsController {
       if (this.$scope.agent.os) {
         this.$scope.agentOS =
           this.$scope.agent.os.name + ' ' + this.$scope.agent.os.version;
+          this.$scope.agent.isLinuxOS = this.$scope.agent.os.uname.includes('Linux');
       } else {
         this.$scope.agentOS = 'Unknown';
+        this.$scope.agent.isLinuxOS = false;
       }
 
       // Syscheck

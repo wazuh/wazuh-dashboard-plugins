@@ -39,7 +39,9 @@
                     <div flex="30" layout="column">
 
                         <md-list flex="auto" class="wz-item-list">
-                            <md-list-item class="wz-text-link" ng-click="updateSelectedItem($index)" ng-repeat="item in currentConfig['logcollector-localfile'].localfile">{{ item.file || item.alias || item.command }}</md-list-item>
+                            <md-list-item class="wz-text-link" ng-click="updateSelectedItem($index)" ng-repeat="item in currentConfig['logcollector-localfile'].localfile">
+                                <span ng-if='item.file || item.alias || item.command'>{{ item.file || item.alias || item.command }}</span>
+                                <span ng-if='!item.file && !item.alias && !item.command'>{{ item.logformat }} - {{ item.targetStr }}</span></md-list-item>
                         </md-list>
 
                     </div>
