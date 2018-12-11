@@ -589,15 +589,28 @@ export class ElasticWrapper {
 
   /**
    * Updates the a document from the .wazuh index using id and doc content
-   * @param {*} id
-   * @param {*} doc
+   * @param {*} req. Optional parameter to pass an incoming request (X-Pack related)
+   * @param {*} id. Wazuh API entry ID (Elasticsearch ID)
+   * @param {*} doc. The content to be used for updating the document.
    */
-  async updateWazuhIndexDocument(req, doc) {
+  async updateWazuhIndexDocument(req, id, doc) {
     try {
-      const id = typeof req === 'object' && req.payload ? req.payload.id : req;
+      console.log('-----------------------------')
+      console.log(req)
+      console.log(id)
+      console.log(doc)
+      console.log('-----------------------------')
       if (!id || !doc) throw new Error('No valid parameters given');
 
-      const data = await this.elasticRequest.callWithInternalUser('update', {
+      const data = 
+      req ?
+      await this.elasticRequest.callWithRequest(req, 'update', {
+        index: '.wazuh',
+        type: 'wazuh-configuration',
+        id: id,
+        body: doc
+      }) :
+      await this.elasticRequest.callWithInternalUser('update', {
         index: '.wazuh',
         type: 'wazuh-configuration',
         id: id,

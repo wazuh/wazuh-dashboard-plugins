@@ -348,7 +348,7 @@ export function Initialize(server) {
             }
           }
           try {
-            await wzWrapper.updateWazuhIndexDocument(item._id, {
+            await wzWrapper.updateWazuhIndexDocument(null, item._id, {
               doc: { extensions: item._source.extensions }
             });
             log(
@@ -669,7 +669,7 @@ export function Initialize(server) {
 
   const updateClusterInformation = async config => {
     try {
-      await wzWrapper.updateWazuhIndexDocument(config.id, {
+      await wzWrapper.updateWazuhIndexDocument(null, config.id, {
         doc: {
           api_user: config.api_user,
           api_password: config.api_password,
@@ -709,7 +709,7 @@ export function Initialize(server) {
 
   const updateSingleHostInformation = async config => {
     try {
-      await wzWrapper.updateWazuhIndexDocument(config.id, {
+      await wzWrapper.updateWazuhIndexDocument(null, config.id, {
         doc: {
           api_user: config.api_user,
           api_password: config.api_password,

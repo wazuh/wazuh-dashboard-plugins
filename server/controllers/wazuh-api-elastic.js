@@ -65,33 +65,6 @@ export class WazuhApiElasticCtrl {
     }
   }
 
-  async setAPIEntryDefault(req, reply) {
-    try {
-      // Searching for previous default
-      const data = await this.wzWrapper.searchActiveDocumentsWazuhIndex(req);
-
-      if (data.hits.total === 1) {
-        await this.wzWrapper.updateWazuhIndexDocument(data.hits.hits[0]._id, {
-          doc: { active: 'false' }
-        });
-      }
-
-      await this.wzWrapper.updateWazuhIndexDocument(req.params.id, {
-        doc: { active: 'true' }
-      });
-
-      return reply({ statusCode: 200, message: 'ok' });
-    } catch (error) {
-      log('PUT /elastic/apis/{id}', error.message || error);
-      return ErrorResponse(
-        `Could not save data in elasticsearch due to ${error.message || error}`,
-        2003,
-        500,
-        reply
-      );
-    }
-  }
-
   validateData(payload) {
     // Validate user
     if (!userRegEx.test(payload.user)) {
@@ -170,7 +143,7 @@ export class WazuhApiElasticCtrl {
 
   async updateAPIHostname(req, reply) {
     try {
-      await this.wzWrapper.updateWazuhIndexDocument(req.params.id, {
+      await this.wzWrapper.updateWazuhIndexDocument(null, req.params.id, {
         doc: { cluster_info: req.payload.cluster_info }
       });
 
@@ -202,7 +175,7 @@ export class WazuhApiElasticCtrl {
 
       const settings = this.buildSettingsObject(req.payload);
 
-      await this.wzWrapper.updateWazuhIndexDocument(req, { doc: settings });
+      await this.wzWrapper.updateWazuhIndexDocument(req, req.payload.id, { doc: settings });
 
       return reply({ statusCode: 200, message: 'ok' });
     } catch (error) {
