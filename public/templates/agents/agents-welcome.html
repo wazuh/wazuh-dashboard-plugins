@@ -31,10 +31,10 @@
             </md-card-content>
         </md-card>
     </div>
-    <div layout="row" layout-padding class="wz-padding-top-0 wz-padding-bottom-0">
+    <div layout="row" layout-padding class="wz-padding-top-0 wz-padding-bottom-0" ng-if="agent.group">
         <md-card flex class="wz-metric-color wz-md-card wz-no-padding">
             <md-card-content layout="row" class="wz-padding-metric">
-                <div class="layout-row wz-word-break" flex ng-if="agent.group">
+                <div class="layout-row wz-word-break" flex>
                     Groups:&nbsp;<span ng-repeat="group in agent.group" class="wz-text-bold wz-text-link" ng-click="goGroups(agent,$index)">{{ group }}&nbsp;</span>
                     <span flex></span>
                     <span ng-if="!editGroup" class="wz-text-link" ng-click="switchGroupEdit()"><i class="fa fa-fw fa-plus"></i></span>
