@@ -607,39 +607,6 @@ export class AgentsController {
     return;
   }
 
-  async firstLoad() {
-    try {
-      const globalAgent = this.shareAgent.getAgent();
-      this.$scope.configurationError = false;
-      this.$scope.load = true;
-
-      const id = this.commonData.checkLocationAgentId(false, globalAgent);
-
-      const data = await this.apiReq.request('GET', `/agents/${id}`, {});
-      this.$scope.agent = data.data.data;
-      this.$scope.groupName = this.$scope.agent.group;
-
-      if (!this.$scope.groupName) {
-        this.$scope.configurationError = true;
-        this.$scope.load = false;
-        if (!this.$scope.$$phase) this.$scope.$digest();
-        return;
-      }
-
-      this.$scope.load = false;
-
-      if (this.$scope.tab !== 'configuration')
-        await this.$scope.switchTab(this.$scope.tab, true);
-
-      if (!this.$scope.$$phase) this.$scope.$digest();
-      return;
-    } catch (error) {
-      this.errorHandler.handle(error, 'Agents');
-    }
-    return;
-  }
-  /** End of agent configuration */
-
   startVis2Png() {
     const syscollectorFilters = [];
     if (
