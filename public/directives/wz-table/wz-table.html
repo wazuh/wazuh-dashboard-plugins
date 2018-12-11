@@ -62,7 +62,7 @@
             </tr>
         </tbody>
         <tfoot >
-            <td colspan="{{ path === '/agents' ? keys.length + 1 : keys.length}}">
+            <td colspan="{{ path === '/agents' || isLookingGroup() ? keys.length + 1 : keys.length}}">
                 <span ng-show="!wazuh_table_loading" class="color-grey">{{ totalItems }} items ({{time | number: 2}} seconds)</span>
                 <div ng-show="items.length >= itemsPerPage" class="pagination pull-right" style="margin:0 !important">
                     <ul layout="row">

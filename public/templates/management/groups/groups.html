@@ -89,8 +89,7 @@
             <!-- Group agents table -->
             <div layout="row" ng-if="lookingGroup && groupsSelectedTab==='agents' && currentGroup" class="md-padding">
                 <wz-table flex path="'/agents/groups/' + currentGroup.name" keys="['id','name','ip','status','os.name','os.version','version']"
-                    allow-click="true" row-sizes="[14,12,10]">
-                </wz-table>
+                    allow-click="true" row-sizes="[14,12,10]"/>
             </div>
             <!-- End Group agents table -->
 
