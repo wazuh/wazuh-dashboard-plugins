@@ -28,7 +28,7 @@ class WzConfigViewer {
     this.template = template;
   }
 
-  link(scope, elm, attrs) {
+  link(scope) {
     scope.callgetjson = () => {
       scope.getjson();
     };

@@ -18,8 +18,17 @@ import simpleTail from 'simple-tail';
 import path from 'path';
 
 export class WazuhUtilsCtrl {
+  /**
+   * Constructor
+   */
   constructor() {}
 
+  /**
+   * Returns the config.yml file parsed
+   * @param {Object} req 
+   * @param {Object} reply 
+   * Configuration File or ErrorResponse
+   */
   getConfigurationFile(req, reply) {
     try {
       const configFile = getConfiguration();
@@ -34,6 +43,12 @@ export class WazuhUtilsCtrl {
     }
   }
 
+  /**
+   * Returns total RAM available from the current machine where Kibana is being executed
+   * @param {Object} req 
+   * @param {Object} reply 
+   * total ram or ErrorResponse
+   */
   async totalRam(req, reply) {
     try {
       // RAM in MB
@@ -44,6 +59,12 @@ export class WazuhUtilsCtrl {
     }
   }
 
+  /**
+   * Returns Wazuh app logs
+   * @param {Object} req 
+   * @param {Object} reply 
+   * app logos or ErrorResponse
+   */
   async getAppLogs(req, reply) {
     try {
       const lastLogs = await simpleTail(

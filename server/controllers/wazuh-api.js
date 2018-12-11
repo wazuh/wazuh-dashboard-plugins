@@ -27,11 +27,21 @@ import { cleanKeys } from '../../util/remove-key';
 import { apiRequestList } from '../../util/api-request-list'
 
 export class WazuhApiCtrl {
+  /**
+ * Constructor
+ * @param {*} server
+ */
   constructor(server) {
     this.wzWrapper = new ElasticWrapper(server);
     this.fetchAgentsExternal = Monitoring(server, { disableCron: true });
   }
 
+  /**
+   * Returns if the wazuh-api configuration is working
+   * @param {Object} req 
+   * @param {Object} reply 
+   * status obj or ErrorResponse
+   */
   async checkStoredAPI(req, reply) {
     try {
       // Get config from elasticsearch
@@ -216,6 +226,10 @@ export class WazuhApiCtrl {
     }
   }
 
+  /**
+   * This perfoms a validation of API params
+   * @param {Object} payload API params
+   */
   validateCheckApiParams(payload) {
     if (!('user' in payload)) {
       return 'Missing param: API USER';
@@ -240,6 +254,12 @@ export class WazuhApiCtrl {
     return false;
   }
 
+  /**
+   * This check the wazuh-api configuration received in the POST body will work
+   * @param {Object} req 
+   * @param {Object} reply 
+   * status obj or ErrorResponse
+   */
   async checkAPI(req, reply) {
     try {
       let apiAvailable = null;
@@ -370,6 +390,12 @@ export class WazuhApiCtrl {
     }
   }
 
+  /**
+   * This get PCI requirements
+   * @param {Object} req 
+   * @param {Object} reply 
+   * requirements or ErrorResponse
+   */
   async getPciRequirement(req, reply) {
     try {
       let pci_description = '';
@@ -443,6 +469,12 @@ export class WazuhApiCtrl {
     }
   }
 
+  /**
+   * This get GDPR Requirements
+   * @param {Object} req 
+   * @param {Object} reply 
+   * requirements or ErrorResponse
+   */
   async getGdprRequirement(req, reply) {
     try {
       let gdpr_description = '';
@@ -550,6 +582,15 @@ export class WazuhApiCtrl {
     }
   }
 
+  /**
+   * This performs a request over Wazuh API and returs its response
+   * @param {String} method Method: GET, PUT, POST, DELETE
+   * @param {String} path API route
+   * @param {Object} data data and params to perform the request
+   * @param {String} id API id
+   * @param {Object} reply 
+   * API response or ErrorResponse
+   */
   async makeRequest(method, path, data, id, reply) {
     try {
       const wapi_config = await this.wzWrapper.getWazuhConfigurationById(id);
@@ -609,6 +650,13 @@ export class WazuhApiCtrl {
     }
   }
 
+  /**
+   * This performs a generic request and returs its response
+   * @param {String} method Method: GET, PUT, POST, DELETE
+   * @param {String} path API route
+   * @param {Object} data data and params to perform the request
+   * @param {String} id API id
+   */
   async makeGenericRequest(method, path, data, id) {
     try {
       const wapi_config = await this.wzWrapper.getWazuhConfigurationById(id);
@@ -658,6 +706,12 @@ export class WazuhApiCtrl {
     }
   }
 
+  /**
+   * This make a request to API
+   * @param {Object} req 
+   * @param {Object} reply 
+   * api response or ErrorResponse
+   */
   requestApi(req, reply) {
     const configuration = getConfiguration();
     const adminMode = !(configuration && typeof configuration.admin !== 'undefined' && !configuration.admin);
@@ -703,6 +757,12 @@ export class WazuhApiCtrl {
   }
 
   // Fetch agent status and insert it directly on demand
+  /**
+   * 
+   * @param {Object} req 
+   * @param {Object} reply 
+   * status obj or ErrorResponse
+   */
   async fetchAgents(req, reply) {
     try {
       const output = await this.fetchAgentsExternal();
@@ -719,8 +779,9 @@ export class WazuhApiCtrl {
 
   /**
    * Get full data on CSV format from a list Wazuh API endpoint
-   * @param {*} req
-   * @param {*} res
+   * @param {Object} req
+   * @param {Object} res
+   * csv or ErrorResponse
    */
   async csv(req, reply) {
     try {
@@ -800,18 +861,18 @@ export class WazuhApiCtrl {
       ) {
         const fields = req.payload.path.includes('/agents')
           ? [
-              'id',
-              'status',
-              'name',
-              'ip',
-              'group',
-              'manager',
-              'node_name',
-              'dateAdd',
-              'version',
-              'lastKeepAlive',
-              'os'
-            ]
+            'id',
+            'status',
+            'name',
+            'ip',
+            'group',
+            'manager',
+            'node_name',
+            'dateAdd',
+            'version',
+            'lastKeepAlive',
+            'os'
+          ]
           : Object.keys(output.body.data.items[0]);
 
         const json2csvParser = new Parser({ fields });
@@ -839,6 +900,12 @@ export class WazuhApiCtrl {
     }
   }
 
+  /**
+   * Get the each filed unique values of agents
+   * @param {Object} req 
+   * @param {Object} reply 
+   * unique fileds or ErrorResponse
+   */
   async getAgentsFieldsUniqueCount(req, reply) {
     try {
       if (!req.params || !req.params.api)
@@ -903,9 +970,9 @@ export class WazuhApiCtrl {
 
       const parsedResponses = data.map(
         item =>
-        item && item.body && item.body.data && !item.body.error
-          ? item.body.data
-          : false
+          item && item.body && item.body.data && !item.body.error
+            ? item.body.data
+            : false
       );
 
       const [

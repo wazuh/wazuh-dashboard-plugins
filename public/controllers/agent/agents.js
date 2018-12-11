@@ -27,6 +27,22 @@ import { ConfigurationHandler } from '../../utils/config-handler';
 import { timefilter } from 'ui/timefilter';
 
 export class AgentsController {
+    /**
+     * Class constructor
+     * @param {Object} $scope
+     * @param {Object} $location
+     * @param {Object} $rootScope
+     * @param {Object} appState
+     * @param {Object} apiReq 
+     * @param {Object} errorHandler
+     * @param {Object} tabVisualizations
+     * @param {Object} shareAgent
+     * @param {Object} commonData
+     * @param {Object} reportingService
+     * @param {Object} visFactoryService
+     * @param {Object} csvReq
+     * @param {Object} wzTableFilter
+     */
   constructor(
     $scope,
     $location,
@@ -70,6 +86,9 @@ export class AgentsController {
     this.$scope.showSyscheckFiles = false;
   }
 
+  /*   
+    On controller loads
+    */
   $onInit() {
     timefilter.setRefreshInterval({ pause: true, value: 0 });
     this.$scope.TabDescription = TabDescription;
@@ -202,6 +221,7 @@ export class AgentsController {
         this.$scope.agent.id
       );
     };
+
     this.$scope.switchWodle = (wodleName, navigate = true) => {
       this.$scope.navigate = navigate;
       this.$scope.configWodle = wodleName;
@@ -214,6 +234,7 @@ export class AgentsController {
         this.$scope.agent.id
       );
     };
+    
     this.$scope.switchConfigurationTab = (configurationTab, navigate) => {
       this.$scope.navigate = navigate;
       this.configurationHandler.switchConfigurationTab(

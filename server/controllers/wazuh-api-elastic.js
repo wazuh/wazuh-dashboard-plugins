@@ -23,10 +23,20 @@ const urlRegExIP = new RegExp(
 const portRegEx = new RegExp(/^[0-9]{2,5}$/);
 
 export class WazuhApiElasticCtrl {
+  /**
+ * Constructor
+ * @param {*} server
+ */
   constructor(server) {
     this.wzWrapper = new ElasticWrapper(server);
   }
 
+  /* This get all API entries */
+  /**
+   * 
+   * @param {Object} req 
+   * @param {Object} reply 
+   */
   async getAPIEntries(req, reply) {
     try {
       const data = await this.wzWrapper.getWazuhAPIEntries();
@@ -54,6 +64,12 @@ export class WazuhApiElasticCtrl {
     }
   }
 
+  /* This remove an API entry */
+  /**
+   * 
+   * @param {Object} req 
+   * @param {Object} reply 
+   */
   async deleteAPIEntries(req, reply) {
     try {
       const data = await this.wzWrapper.deleteWazuhAPIEntriesWithRequest(req);
@@ -65,6 +81,12 @@ export class WazuhApiElasticCtrl {
     }
   }
 
+  /* This set an API entry as default*/
+  /**
+   * 
+   * @param {Object} req 
+   * @param {Object} reply 
+   */
   async setAPIEntryDefault(req, reply) {
     try {
       // Searching for previous default
@@ -92,6 +114,11 @@ export class WazuhApiElasticCtrl {
     }
   }
 
+  /* This check if connection and auth on an API is correct */
+  /**
+   * 
+   * @param {Object} payload 
+   */
   validateData(payload) {
     // Validate user
     if (!userRegEx.test(payload.user)) {
@@ -121,6 +148,11 @@ export class WazuhApiElasticCtrl {
     return false;
   }
 
+  /* This build an setting API obect */
+  /**
+   * 
+   * @param {Object} payload 
+   */
   buildSettingsObject(payload) {
     return {
       api_user: payload.user,
@@ -135,6 +167,12 @@ export class WazuhApiElasticCtrl {
     };
   }
 
+  /* This saves a new API entry */
+  /**
+   * 
+   * @param {Object} req 
+   * @param {Object} reply 
+   */
   async saveAPI(req, reply) {
     try {
       if (
@@ -168,6 +206,12 @@ export class WazuhApiElasticCtrl {
     }
   }
 
+  /* This update an API hostname */
+  /**
+   * 
+   * @param {Object} req 
+   * @param {Object} reply 
+   */
   async updateAPIHostname(req, reply) {
     try {
       await this.wzWrapper.updateWazuhIndexDocument(req.params.id, {
@@ -186,6 +230,12 @@ export class WazuhApiElasticCtrl {
     }
   }
 
+  /* This update an API full settings */
+  /**
+   * 
+   * @param {Object} req 
+   * @param {Object} reply 
+   */
   async updateFullAPI(req, reply) {
     try {
       if (

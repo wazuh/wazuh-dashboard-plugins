@@ -38,6 +38,10 @@ import {
 const REPORTING_PATH = '../../../../optimize/wazuh-reporting';
 
 export class WazuhReportingCtrl {
+  /**
+* Constructor
+* @param {*} server
+*/
   constructor(server) {
     this.server = server;
     this.fonts = {
@@ -163,6 +167,10 @@ export class WazuhReportingCtrl {
     this.apiRequest = new WazuhApiCtrl(server);
   }
 
+  /**
+   * This performs the rendering of tables
+   * @param {Array<Object>} tables 
+   */
   renderTables(tables) {
     for (const table of tables) {
       const rowsparsed = rawParser(table.rawResponse, table.columns);
@@ -222,6 +230,12 @@ export class WazuhReportingCtrl {
     }
   }
 
+  /**
+   * This performs the rendering of time range and filters
+   * @param {Number} from Timestamp (ms) from
+   * @param {Number} to Timestamp (ms) to
+   * @param {String} filters E.g: cluster.name: wazuh AND rule.groups: vulnerability
+   */
   renderTimeRangeAndFilters(from, to, filters) {
     const str = `${from} to ${to}`;
 
@@ -277,6 +291,11 @@ export class WazuhReportingCtrl {
     this.dd.content.push({ text: '\n' });
   }
 
+  /**
+   * This do format to filters
+   * @param {String} filters E.g: cluster.name: wazuh AND rule.groups: vulnerability
+   * @param {String} searchBar 
+   */
   sanitizeFilters(filters, searchBar) {
     let str = '';
 
@@ -287,14 +306,14 @@ export class WazuhReportingCtrl {
       str +=
         i === len - 1
           ? (filter.meta.negate ? 'NOT ' : '') +
-            filter.meta.key +
-            ': ' +
-            filter.meta.value
+          filter.meta.key +
+          ': ' +
+          filter.meta.value
           : (filter.meta.negate ? 'NOT ' : '') +
-            filter.meta.key +
-            ': ' +
-            filter.meta.value +
-            ' AND ';
+          filter.meta.key +
+          ': ' +
+          filter.meta.value +
+          ' AND ';
     }
 
     if (searchBar) {
@@ -304,6 +323,13 @@ export class WazuhReportingCtrl {
     return str;
   }
 
+  /**
+   * This performs the rendering of header
+   * @param {String} section 
+   * @param {Object} tab 
+   * @param {Boolean} isAgents 
+   * @param {String} apiId 
+   */
   async renderHeader(section, tab, isAgents, apiId) {
     try {
       if (section && typeof section === 'string') {
@@ -378,6 +404,12 @@ export class WazuhReportingCtrl {
     }
   }
 
+  /**
+   * This check if title is suitable
+   * @param {Object} item 
+   * @param {Boolean} isAgents 
+   * @param {Object} tab 
+   */
   checkTitle(item, isAgents, tab) {
     const title = isAgents
       ? AgentsVisualizations[tab].filter(v => v._id === item.id)
@@ -385,6 +417,12 @@ export class WazuhReportingCtrl {
     return title;
   }
 
+  /**
+   * This performs the rendering of the visualizations
+   * @param {Array<Objecys>} array 
+   * @param {Boolean} isAgents 
+   * @param {Object} tab 
+   */
   renderVisualizations(array, isAgents, tab) {
     const single_vis = array.filter(item => item.width >= 600);
     const double_vis = array.filter(item => item.width < 600);
@@ -455,6 +493,11 @@ export class WazuhReportingCtrl {
     }
   }
 
+  /**
+   * This build the agents table
+   * @param {Array<Strings>} ids 
+   * @param {String} apiId 
+   */
   async buildAgentsTable(ids, apiId) {
     if (!ids || !ids.length) return;
     try {
@@ -504,6 +547,17 @@ export class WazuhReportingCtrl {
     }
   }
 
+  /**
+   * This load more infomration
+   * @param {String} section 
+   * @param {Object} tab 
+   * @param {String} apiId 
+   * @param {Number} from Timestamp (ms) from
+   * @param {Number} to Timestamp (ms) to
+   * @param {String} filters E.g: cluster.name: wazuh AND rule.groups: vulnerability
+   * @param {String} pattern 
+   * @param {Object} agent 
+   */
   async extendedInformation(
     section,
     tab,
@@ -961,14 +1015,14 @@ export class WazuhReportingCtrl {
             this.dd.content.push({
               text: `Last policy monitoring scan was executed from ${
                 lastScan.data.start
-              } to ${lastScan.data.end}.`,
+                } to ${lastScan.data.end}.`,
               style: 'standard'
             });
           } else if (lastScan.data.start) {
             this.dd.content.push({
               text: `Policy monitoring scan is currently in progress for this agent (started on ${
                 lastScan.data.start
-              }).`,
+                }).`,
               style: 'standard'
             });
           } else {
@@ -1088,13 +1142,13 @@ export class WazuhReportingCtrl {
             this.dd.content.push({
               text: `Last file integrity monitoring scan was executed from ${
                 lastScan.data.start
-              } to ${lastScan.data.end}.`
+                } to ${lastScan.data.end}.`
             });
           } else if (lastScan.data.start) {
             this.dd.content.push({
               text: `File integrity monitoring scan is currently in progress for this agent (started on ${
                 lastScan.data.start
-              }).`
+                }).`
             });
           } else {
             this.dd.content.push({
@@ -1294,6 +1348,12 @@ export class WazuhReportingCtrl {
     }
   }
 
+  /**
+   * Builds a PDF report from multiple PNG images
+   * @param {Object} req 
+   * @param {Object} reply 
+   * pdf or ErrorResponse
+   */
   async report(req, reply) {
     try {
       // Init
@@ -1398,6 +1458,12 @@ export class WazuhReportingCtrl {
     }
   }
 
+  /**
+   * Fetch the reports list
+   * @param {Object} req 
+   * @param {Object} reply 
+   * reports list or ErrorResponse
+   */
   async getReports(req, reply) {
     try {
       if (!fs.existsSync(path.join(__dirname, REPORTING_PATH))) {
@@ -1423,6 +1489,12 @@ export class WazuhReportingCtrl {
     }
   }
 
+  /**
+ * Fetch specific report
+ * @param {Object} req 
+ * @param {Object} reply 
+ * report or ErrorResponse
+ */
   async getReportByName(req, reply) {
     try {
       if (!req.params || !req.params.name) throw new Error('Invalid file name');
@@ -1434,6 +1506,12 @@ export class WazuhReportingCtrl {
     }
   }
 
+  /**
+ * Delete specific report
+ * @param {Object} req 
+ * @param {Object} reply 
+ * status obj or ErrorResponse
+ */
   async deleteReportByName(req, reply) {
     try {
       if (!req.params || !req.params.name) throw new Error('Invalid file name');

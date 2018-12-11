@@ -11,7 +11,7 @@
  */
 
 import template from './wz-tag-filter.html';
-import { DataFactory } from '../../services/data-factory';
+//import { DataFactory } from '../../services/data-factory';
 import { uiModules } from 'ui/modules';
 
 const app = uiModules.get('app/wazuh', []);
@@ -31,11 +31,12 @@ app.directive('wzTagFilter', function () {
       $document,
       errorHandler
     ) {
-      const instance = new DataFactory(
+      //Use when api call be implemented
+      /* const instance = new DataFactory(
         apiReq,
         $scope.path,
         {}
-      );
+      ); */
 
       $scope.tagList = [];
       $scope.groupedTagList = [];
@@ -62,7 +63,9 @@ app.directive('wzTagFilter', function () {
               'type': isFilter ? 'filter' : 'search'
             };
             const idxSearch = $scope.tagList.find(function (x) { return x.type === 'search' });
-            if (!isFilter && idxSearch) { $scope.removeTag(idxSearch.id, false) };
+            if (!isFilter && idxSearch) {
+              $scope.removeTag(idxSearch.id, false)
+            }
             if (!$scope.tagList.find(function (x) { return x.type === 'filter' && x.key === tag.key && x.value.value === tag.value.value })) {
               $scope.tagList.push(tag);
               $scope.groupedTagList = groupBy($scope.tagList, 'key');
@@ -83,7 +86,7 @@ app.directive('wzTagFilter', function () {
             'search': ''
           };
           let first = true;
-          groups.forEach(function (group, idx1) {
+          groups.forEach(function (group) {
             const search = group.find(function (x) { return x.type === 'search' });
             if (search) {
               queryObj.search = search.value.name;
@@ -179,7 +182,7 @@ app.directive('wzTagFilter', function () {
         }
       };
 
-      $scope.addSearchKey = (e) => {
+      $scope.addSearchKey = () => {
         if ($scope.autocompleteEnter) {
           $scope.autocompleteEnter = false;
         }
@@ -201,7 +204,8 @@ app.directive('wzTagFilter', function () {
 
       const load = async () => {
         try {
-          const result = await instance.fetch();
+          //Use when api call be implemented
+          //const result = await instance.fetch();
           Object.keys($scope.fieldsModel).forEach(function (key) {
             $scope.dataModel.push({ 'key': key, 'list': $scope.fieldsModel[key] });
           });
