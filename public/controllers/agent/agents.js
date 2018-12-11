@@ -40,7 +40,9 @@ export class AgentsController {
     reportingService,
     visFactoryService,
     csvReq,
-    wzTableFilter
+    wzTableFilter,
+    $mdDialog,
+    groupHandler
   ) {
     this.$scope = $scope;
     this.$location = $location;
@@ -55,6 +57,8 @@ export class AgentsController {
     this.visFactoryService = visFactoryService;
     this.csvReq = csvReq;
     this.wzTableFilter = wzTableFilter;
+    this.$mdDialog = $mdDialog;
+    this.groupHandler = groupHandler;
 
     // Config on-demand
     this.$scope.isArray = Array.isArray;
@@ -68,6 +72,7 @@ export class AgentsController {
     this.ignoredTabs = ['syscollector', 'welcome', 'configuration'];
 
     this.$scope.showSyscheckFiles = false;
+    this.$scope.editGroup = false;
   }
 
   $onInit() {
@@ -269,6 +274,37 @@ export class AgentsController {
     this.$scope.$on('$routeChangeStart', () =>
       this.appState.removeSessionStorageItem('configSubTab')
     );
+
+    this.$scope.switchGroupEdit = () => this.switchGroupEdit();
+
+    this.$scope.showConfirm = (ev, group) => {
+      
+      const confirm = this.$mdDialog
+        .confirm()
+        .title(`Add group "${group}" to agent "${this.$scope.agent.id}"?`)
+        .targetEvent(ev)
+        .ok('Agree')
+        .cancel('Cancel');
+
+        this.$mdDialog.show(confirm).then(
+        () => {
+          this.groupHandler.addAgentToGroup(group,this.$scope.agent.id)
+          .then(() => this.apiReq.request('GET',`/agents/${this.$scope.agent.id}`,{}))
+          .then(agent => {
+            this.$scope.agent.group = agent.data.data.group;
+            this.$scope.groups = this.$scope.groups.filter(item => !agent.data.data.group.includes(item));
+            if(!this.$scope.$$phase) this.$scope.$digest()
+          })
+          .catch(error =>
+            this.errorHandler.handle(
+              error.message || error,
+              'Error adding group to agent'
+            )
+          );
+        },
+        () => {}
+      );
+    };
   }
 
   createMetrics(metricsObject) {
@@ -555,6 +591,9 @@ export class AgentsController {
 
       await this.$scope.switchTab(this.$scope.tab, true);
 
+      const groups = await this.apiReq.request('GET','/agents/groups',{});
+      this.$scope.groups = groups.data.data.items.map(item => item.name).filter(item => !this.$scope.agent.group.includes(item));
+      
       this.$scope.load = false;
       if (!this.$scope.$$phase) this.$scope.$digest();
       return;
@@ -562,6 +601,11 @@ export class AgentsController {
       this.errorHandler.handle(error, 'Agents');
     }
     return;
+  }
+
+  switchGroupEdit() {
+    this.$scope.editGroup = !!!this.$scope.editGroup;
+    if(!this.$scope.$$phase) this.$scope.$digest();
   }
 
   goGroups(agent, group) {
