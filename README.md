@@ -98,13 +98,13 @@ Restart Kibana
 - Systemd:
 
 ```
-systemctl restart kibana
+systemctl start kibana
 ```
 
 - SysV Init:
 
 ```
-service kibana restart
+service kibana start
 ```
 
 ## Older packages
