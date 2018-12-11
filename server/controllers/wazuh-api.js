@@ -24,7 +24,7 @@ import { getConfiguration } from '../lib/get-configuration';
 import { log } from '../logger';
 import { KeyEquivalenece } from '../../util/csv-key-equivalence';
 import { cleanKeys } from '../../util/remove-key';
-import { apiRequestList } from '../../util/api-request-list'
+import { apiRequestList } from '../../util/api-request-list';
 
 export class WazuhApiCtrl {
   constructor(server) {
@@ -594,9 +594,9 @@ export class WazuhApiCtrl {
       }
 
       throw response &&
-        response.body &&
-        response.body.error &&
-        response.body.message
+      response.body &&
+      response.body.error &&
+      response.body.message
         ? { message: response.body.message, code: response.body.error }
         : new Error('Unexpected error fetching data from the Wazuh API');
     } catch (error) {
@@ -648,9 +648,9 @@ export class WazuhApiCtrl {
       }
 
       throw response &&
-        response.body &&
-        response.body.error &&
-        response.body.message
+      response.body &&
+      response.body.error &&
+      response.body.message
         ? { message: response.body.message, code: response.body.error }
         : new Error('Unexpected error fetching data from the Wazuh API');
     } catch (error) {
@@ -660,21 +660,26 @@ export class WazuhApiCtrl {
 
   requestApi(req, reply) {
     const configuration = getConfiguration();
-    const adminMode = !(configuration && typeof configuration.admin !== 'undefined' && !configuration.admin);
+    const adminMode = !(
+      configuration &&
+      typeof configuration.admin !== 'undefined' &&
+      !configuration.admin
+    );
 
     if (!req.payload.method) {
       return ErrorResponse('Missing param: method', 3015, 400, reply);
     } else if (!req.payload.path) {
       return ErrorResponse('Missing param: path', 3016, 400, reply);
     } else {
-      if (
-        req.payload.method !== 'GET' &&
-        req.payload.body &&
-        req.payload.body.devTools
-      ) {
-        if (!adminMode) {
-          return ErrorResponse('Allowed method: [GET]', 3029, 400, reply);
-        }
+      if (req.payload.method !== 'GET' && !adminMode) {
+        return ErrorResponse(
+          req.payload.body && req.payload.body.devTools
+            ? 'Allowed method: [GET]'
+            : `Forbidden (${req.payload.method} ${req.payload.path}`,
+          3029,
+          400,
+          reply
+        );
       }
       if (req.payload.body.devTools) {
         delete req.payload.body.devTools;
@@ -901,8 +906,7 @@ export class WazuhApiCtrl {
         )
       ]);
 
-      const parsedResponses = data.map(
-        item =>
+      const parsedResponses = data.map(item =>
         item && item.body && item.body.data && !item.body.error
           ? item.body.data
           : false
