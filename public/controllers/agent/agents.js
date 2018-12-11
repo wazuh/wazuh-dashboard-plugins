@@ -592,7 +592,7 @@ export class AgentsController {
       await this.$scope.switchTab(this.$scope.tab, true);
 
       const groups = await this.apiReq.request('GET','/agents/groups',{});
-      this.$scope.groups = groups.data.data.items.map(item => item.name).filter(item => !this.$scope.agent.group.includes(item));
+      this.$scope.groups = groups.data.data.items.map(item => item.name).filter(item => this.$scope.agent.group && !this.$scope.agent.group.includes(item));
       
       this.$scope.load = false;
       if (!this.$scope.$$phase) this.$scope.$digest();
