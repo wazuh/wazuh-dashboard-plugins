@@ -595,11 +595,6 @@ export class ElasticWrapper {
    */
   async updateWazuhIndexDocument(req, id, doc) {
     try {
-      console.log('-----------------------------')
-      console.log(req)
-      console.log(id)
-      console.log(doc)
-      console.log('-----------------------------')
       if (!id || !doc) throw new Error('No valid parameters given');
 
       const data = 
