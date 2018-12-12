@@ -29,6 +29,7 @@ export class CommonData {
     this.shareAgent = shareAgent;
     this.globalState = globalState;
     this.savedTimefilter = null;
+    this.refreshInterval = { pause: true, value: 0 }
   }
 
   removeRuleId() {
@@ -237,5 +238,13 @@ export class CommonData {
 
   getTimefilter() {
     return this.savedTimefilter;
+  }
+
+  setRefreshInterval(interval) {
+    if (interval) Object.assign(this.refreshInterval,interval)
+  }
+
+  getRefreshInterval() {
+    return this.refreshInterval;
   }
 }

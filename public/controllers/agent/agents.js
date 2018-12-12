@@ -68,7 +68,6 @@ export class AgentsController {
     this.ignoredTabs = ['syscollector', 'welcome', 'configuration'];
 
     this.$scope.showSyscheckFiles = false;
-    this.refreshInterval = { pause: true, value: 0 };
   }
 
   $onInit() {
@@ -77,8 +76,6 @@ export class AgentsController {
       timefilter.setTime(savedTimefilter);
       this.commonData.removeTimefilter();
     } 
-
-    this.refreshInterval = timefilter.getRefreshInterval();
 
     this.$scope.TabDescription = TabDescription;
 
@@ -363,11 +360,12 @@ export class AgentsController {
 
   // Switch tab
   async switchTab(tab, force = false) {
-    if (this.ignoredTabs.includes(tab)) {
-      this.refreshInterval = timefilter.getRefreshInterval();
-      timefilter.setRefreshInterval({ pause: true, value: 0 });
-    } else {
-      timefilter.setRefreshInterval(this.refreshInterval)
+    
+    if(this.ignoredTabs.includes(tab)) {    
+      this.commonData.setRefreshInterval(timefilter.getRefreshInterval());    
+      timefilter.setRefreshInterval({pause:true,value:0})
+    } else if(this.ignoredTabs.includes(this.$scope.tab)) {
+      timefilter.setRefreshInterval(this.commonData.getRefreshInterval())
     }
 
     try {

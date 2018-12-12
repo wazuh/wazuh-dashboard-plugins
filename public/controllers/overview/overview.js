@@ -52,12 +52,10 @@ export class OverviewController {
     this.reportingService = reportingService;
     this.visFactoryService = visFactoryService;
     this.wazuhConfig = wazuhConfig;
-    this.refreshInterval = {pasue: false, value: 0}
   }
 
   $onInit() {
-    this.refreshInterval = timefilter.getRefreshInterval();
-    
+  
     this.wodlesConfiguration = false;
     this.TabDescription = TabDescription;
     this.$rootScope.reportStatus = false;
@@ -226,11 +224,11 @@ export class OverviewController {
   // Switch tab
   async switchTab(newTab, force = false) {
     try {
-      if(newTab === 'welcome') {
-        this.refreshInterval = timefilter.getRefreshInterval();
+      if(newTab === 'welcome') {    
+        this.commonData.setRefreshInterval(timefilter.getRefreshInterval());    
         timefilter.setRefreshInterval({pause:true,value:0})
-      } else {
-        timefilter.setRefreshInterval(this.refreshInterval)
+      } else if(this.tab === 'welcome') {
+        timefilter.setRefreshInterval(this.commonData.getRefreshInterval())
       }
 
       if (newTab !== 'welcome') {
