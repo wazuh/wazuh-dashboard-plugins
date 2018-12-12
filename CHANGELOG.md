@@ -21,7 +21,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 ### Fixed
 
-- Avoid fetching twice the same data ([#1061](https://github.com/wazuh/wazuh-kibana-app/pull/1072, https://github.com/wazuh/wazuh-kibana-app/pull/1061)).
+- Avoid fetching twice the same data ([#1072](https://github.com/wazuh/wazuh-kibana-app/pull/1072), [#1061](https://github.com/wazuh/wazuh-kibana-app/pull/1061)).
 - Wazuh logo adapted to low resolutions ([#1074](https://github.com/wazuh/wazuh-kibana-app/pull/1074)).
 - Hide Audit, OpenSCAP tabs for non-linux agents. Fixed empty Windows events under Configuration > Log collection section. OSQuery logo has been standardized ([#1072](https://github.com/wazuh/wazuh-kibana-app/pull/1072), [#1076](https://github.com/wazuh/wazuh-kibana-app/pull/1076)).
 
