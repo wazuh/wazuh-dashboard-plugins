@@ -18,6 +18,13 @@
  * wazuh-reporting   50XX
  * unknown           1000
  */
+ /**
+   * Returns a suitable error message
+   * @param {String} message Error message
+   * @param {Number} code Error code
+   * @param {Number} statusCode Error status code
+   * @returns {Object} Error response object
+   */
 export function ErrorResponse(
   message = null,
   code = null,

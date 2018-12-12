@@ -10,6 +10,12 @@
  * Find more information about this on the LICENSE file.
  */
 export class ReportingController {
+  /**
+   * Class controller
+   * @param {*} $scope 
+   * @param {*} errorHandler 
+   * @param {*} genericReq 
+   */
   constructor($scope, errorHandler, genericReq) {
     this.$scope = $scope;
     this.errorHandler = errorHandler;
@@ -22,16 +28,25 @@ export class ReportingController {
     this.gap = 0;
   }
 
+  /**
+   * On controller loads
+   */
   $onInit() {
     this.load();
   }
 
+  /**
+   * This performs a search
+   */
   search() {
     this.filteredItems = this.items;
     this.currentPage = 0;
     this.groupToPages();
   }
 
+  /**
+   * This delete a report with a given name
+   */
   async deleteReport(name) {
     try {
       this.loading = true;
@@ -60,6 +75,12 @@ export class ReportingController {
     }
   }
 
+  /**
+   * This organize in pages of given size the items
+   * @param {*} size 
+   * @param {*} start 
+   * @param {*} end 
+   */
   range(size, start, end) {
     const ret = [];
 
@@ -74,23 +95,35 @@ export class ReportingController {
     return ret;
   }
 
+  /**
+   * This navigates to the prevoous page
+   */
   prevPage() {
     if (this.currentPage > 0) {
       this.currentPage--;
     }
   }
 
+  /**
+ * This navigates to the next page
+ */
   nextPage(n) {
     if (!n && n !== 0 && this.currentPage < this.pagedItems.length - 1) {
       this.currentPage++;
     }
   }
 
+  /**
+   * This navigates to a given page
+   */
   setPage(n) {
     this.currentPage = n;
     this.nextPage(n);
   }
 
+  /**
+   * On controller loads
+   */
   async load() {
     try {
       this.loading = true;

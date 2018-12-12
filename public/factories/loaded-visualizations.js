@@ -11,18 +11,31 @@
  * Find more information about this on the LICENSE file.
  */
 export class LoadedVisualizations {
+  /**
+   * Class constructor
+   */
   constructor() {
     this.list = [];
   }
 
+  /**
+   * Add new item to the loaded visualizations list
+   * @param {Object} item 
+   */
   addItem(item) {
     this.list.push(item);
   }
 
+  /**
+   * Get the loaded visualizations list
+   */
   getList() {
     return this.list;
   }
 
+  /**
+   * Remove all loaded visualizations list
+   */
   removeAll() {
     this.list = [];
   }

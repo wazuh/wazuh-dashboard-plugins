@@ -28,6 +28,20 @@ import { queryConfig } from '../../services/query-config';
 import { timefilter } from 'ui/timefilter';
 
 export class OverviewController {
+  /**
+   * Class constructor
+   * @param {*} $scope 
+   * @param {*} $location 
+   * @param {*} $rootScope 
+   * @param {*} appState 
+   * @param {*} errorHandler 
+   * @param {*} apiReq 
+   * @param {*} tabVisualizations 
+   * @param {*} commonData 
+   * @param {*} reportingService 
+   * @param {*} visFactoryService 
+   * @param {*} wazuhConfig 
+   */
   constructor(
     $scope,
     $location,
@@ -54,8 +68,11 @@ export class OverviewController {
     this.wazuhConfig = wazuhConfig;
   }
 
+  /**
+   * On controller loads
+   */
   $onInit() {
-    timefilter.setRefreshInterval({pause:true,value:0})
+    timefilter.setRefreshInterval({ pause: true, value: 0 })
     this.wodlesConfiguration = false;
     this.TabDescription = TabDescription;
     this.$rootScope.reportStatus = false;
@@ -96,16 +113,30 @@ export class OverviewController {
     });
   }
 
+  /**
+ * This check if given array of items contais a single given item
+ * @param {Object} item 
+ * @param {Array<Object>} array 
+ */
   inArray(item, array) {
     return item && Array.isArray(array) && array.includes(item);
   }
 
+  /**
+ * Create metric for given object
+ * @param {*} metricsObject 
+ */
   createMetrics(metricsObject) {
     for (const key in metricsObject) {
       this[key] = () => generateMetric(metricsObject[key]);
     }
   }
 
+  /**
+ * Classify metrics for create the suitable one
+ * @param {*} tab 
+ * @param {*} subtab 
+ */
   checkMetrics(tab, subtab) {
     if (subtab === 'panels') {
       switch (tab) {
@@ -169,11 +200,19 @@ export class OverviewController {
     return;
   }
 
+  /**
+   * Calculate woodle depending on given tab
+   * @param {*} tab 
+   */
   calculateWodleTagFromTab(tab) {
     if (tab === 'aws') return 'aws-s3';
     return false;
   }
 
+  /**
+ * Classify woodle depending on given tab
+ * @param {*} tab 
+ */
   filterWodle(tab) {
     try {
       const tag = this.calculateWodleTagFromTab(tab);
@@ -190,10 +229,10 @@ export class OverviewController {
       }
       if (result.length) {
         this.wodlesConfiguration = result[0];
-        if(tab === 'aws') {
+        if (tab === 'aws') {
           this.awsRegions = [];
-          for(const bucket of this.wodlesConfiguration['aws-s3'].buckets){
-            if(bucket.regions){
+          for (const bucket of this.wodlesConfiguration['aws-s3'].buckets) {
+            if (bucket.regions) {
               const regions = bucket.regions.split(',');
               this.awsRegions.push(...regions);
             }
@@ -203,11 +242,14 @@ export class OverviewController {
       } else {
         this.wodlesConfiguration = false;
       }
-    } catch (error) {} // eslint-disable-line
+    } catch (error) { } // eslint-disable-line
 
     if (!this.$scope.$$phase) this.$scope.$digest();
   }
 
+  /**
+   * This get all available woodles
+   */
   async fetchWodles() {
     try {
       this.wodlesConfiguration = await queryConfig(
@@ -224,8 +266,8 @@ export class OverviewController {
   // Switch tab
   async switchTab(newTab, force = false) {
     try {
-      if(newTab === 'welcome') {
-        timefilter.setRefreshInterval({pause:true,value:0})
+      if (newTab === 'welcome') {
+        timefilter.setRefreshInterval({ pause: true, value: 0 })
       }
 
       if (newTab !== 'welcome') {
@@ -287,10 +329,16 @@ export class OverviewController {
     return;
   }
 
+  /**
+ * Transform a visualization into an image
+ */
   startVis2Png() {
     return this.reportingService.startVis2Png(this.tab);
   }
 
+  /**
+   * This fetch de agents summary
+   */
   async getSummary() {
     try {
       const data = await this.apiReq.request('GET', '/agents/summary', {});
@@ -313,6 +361,9 @@ export class OverviewController {
     }
   }
 
+  /**
+   * This load the configuration settings
+   */
   async loadConfiguration() {
     try {
       const configuration = this.wazuhConfig.getConfig();
@@ -326,6 +377,9 @@ export class OverviewController {
     }
   }
 
+  /**
+   * On controller loads
+   */
   async init() {
     try {
       await this.loadConfiguration();

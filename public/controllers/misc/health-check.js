@@ -12,6 +12,21 @@
 import { SavedObjectsClientProvider } from 'ui/saved_objects';
 
 export class HealthCheck {
+  /**
+   * Class constructor
+   * @param {*} $scope 
+   * @param {*} $rootScope 
+   * @param {*} $timeout 
+   * @param {*} $location 
+   * @param {*} genericReq 
+   * @param {*} apiReq 
+   * @param {*} appState 
+   * @param {*} testAPI 
+   * @param {*} errorHandler 
+   * @param {*} wazuhConfig 
+   * @param {*} Private 
+   * @param {*} $window 
+   */
   constructor(
     $scope,
     $rootScope,
@@ -53,16 +68,25 @@ export class HealthCheck {
     this.totalChecks = 0;
   }
 
+  /**
+ * When controller loads
+ */
   $onInit() {
     this.load();
   }
 
+  /**
+ * Manage an error
+ */
   handleError(error) {
     this.errors.push(
       this.errorHandler.handle(error, 'Health Check', false, true)
     );
   }
 
+  /**
+   * This validates a pattern
+   */
   async checkPatterns() {
     try {
       const data = await this.savedObjectsClient.get(
@@ -107,6 +131,9 @@ export class HealthCheck {
     }
   }
 
+  /**
+   * This attempts to connect with API
+   */
   async checkApiConnection() {
     try {
       if (this.checks.api) {
@@ -151,7 +178,7 @@ export class HealthCheck {
             if (apiSplit[0] !== appSplit[0] || apiSplit[1] !== appSplit[1]) {
               this.errors.push(
                 'API version mismatch. Expected v' +
-                  setupData.data.data['app-version']
+                setupData.data.data['app-version']
               );
               this.results[i].status = 'Error';
             } else {
@@ -170,6 +197,9 @@ export class HealthCheck {
     }
   }
 
+  /**
+   * On controller loads
+   */
   async load() {
     try {
       const configuration = this.wazuhConfig.getConfig();
@@ -226,6 +256,9 @@ export class HealthCheck {
     }
   }
 
+  /**
+   * This navigates to app root path or an a previous stored location
+   */
   goApp() {
     this.$window.location.assign(
       '/app/wazuh#' + this.$rootScope.previousLocation || ''

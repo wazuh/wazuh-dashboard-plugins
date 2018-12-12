@@ -12,6 +12,15 @@
 import * as FileSaver from '../../services/file-saver';
 
 export class LogsController {
+  /**
+   * Class constructor
+   * @param {*} $scope 
+   * @param {*} apiReq 
+   * @param {*} errorHandler 
+   * @param {*} csvReq 
+   * @param {*} appState 
+   * @param {*} wzTableFilter 
+   */
   constructor($scope, apiReq, errorHandler, csvReq, appState, wzTableFilter) {
     this.$scope = $scope;
     this.apiReq = apiReq;
@@ -90,6 +99,10 @@ export class LogsController {
     return;
   }
 
+  /**
+   * This change to a selected node
+   * @param {String} node 
+   */
   async changeNode(node) {
     try {
       this.type_log = 'all';
