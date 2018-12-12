@@ -86,9 +86,9 @@ export class AgentsController {
     this.$scope.showSyscheckFiles = false;
   }
 
-  /*   
-    On controller loads
-    */
+  /**
+   * On controller loads
+   */
   $onInit() {
     timefilter.setRefreshInterval({ pause: true, value: 0 });
     this.$scope.TabDescription = TabDescription;

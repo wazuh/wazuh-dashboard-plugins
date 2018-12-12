@@ -86,9 +86,9 @@ export class SettingsController {
     this.savingApi = false;
   }
 
-  /*   
-On controller loads
-*/
+  /**
+   * On controller loads
+   */
   $onInit() {
     // Loading data
     this.getSettings().then(() => this.getAppInfo());
@@ -103,7 +103,10 @@ On controller loads
     this.$location.search('tab', this.tab);
   }
 
-  // Remove API entry
+  /**
+   * Remove a Wazuh API entry
+   * @param {*} item 
+   */
   async removeManager(item) {
     try {
       let index = this.apiEntries.indexOf(item);

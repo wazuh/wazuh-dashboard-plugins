@@ -197,9 +197,9 @@ export class HealthCheck {
     }
   }
 
-  /*   
-On controller loads
-*/
+  /**
+   * On controller loads
+   */
   async load() {
     try {
       const configuration = this.wazuhConfig.getConfig();

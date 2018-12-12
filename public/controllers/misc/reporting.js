@@ -28,9 +28,9 @@ export class ReportingController {
     this.gap = 0;
   }
 
-  /*   
-On controller loads
-*/
+  /**
+   * On controller loads
+   */
   $onInit() {
     this.load();
   }
@@ -114,16 +114,16 @@ On controller loads
   }
 
   /**
- * This navigates to a given page
- */
+   * This navigates to a given page
+   */
   setPage(n) {
     this.currentPage = n;
     this.nextPage(n);
   }
 
-  /*   
-On controller loads
-*/
+  /**
+   * On controller loads
+   */
   async load() {
     try {
       this.loading = true;

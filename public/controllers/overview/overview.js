@@ -68,9 +68,9 @@ export class OverviewController {
     this.wazuhConfig = wazuhConfig;
   }
 
-  /*   
-On controller loads
-*/
+  /**
+   * On controller loads
+   */
   $onInit() {
     timefilter.setRefreshInterval({ pause: true, value: 0 })
     this.wodlesConfiguration = false;
@@ -377,9 +377,9 @@ On controller loads
     }
   }
 
-  /*   
-On controller loads
-*/
+  /**
+   * On controller loads
+   */
   async init() {
     try {
       await this.loadConfiguration();

@@ -43,9 +43,9 @@ export class AgentsPreviewController {
     this.wzTableFilter = wzTableFilter;
   }
 
-  /*   
-    On controller loads
-    */
+  /**
+   * On controller loads
+   */
   $onInit() {
     this.init = true;
     const loc = this.$location.search();
@@ -125,9 +125,9 @@ export class AgentsPreviewController {
     return;
   }
 
-  /*   
-  On controller loads
-  */
+  /**
+   * On controller loads
+   */
   async load() {
     try {
       const api = JSON.parse(this.appState.getCurrentAPI()).id;
