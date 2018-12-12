@@ -176,7 +176,6 @@ export class OverviewController {
 
   filterWodle(tab) {
     try {
-      this.wodlesConfiguration = false;
       const tag = this.calculateWodleTagFromTab(tab);
       let result = [];
       if (
@@ -191,6 +190,18 @@ export class OverviewController {
       }
       if (result.length) {
         this.wodlesConfiguration = result[0];
+        if(tab === 'aws') {
+          this.awsRegions = [];
+          for(const bucket of this.wodlesConfiguration['aws-s3'].buckets){
+            if(bucket.regions){
+              const regions = bucket.regions.split(',');
+              this.awsRegions.push(...regions);
+            }
+          }
+          this.awsRegions = [...new Set(this.awsRegions)];
+        }
+      } else {
+        this.wodlesConfiguration = false;
       }
     } catch (error) {} // eslint-disable-line
 

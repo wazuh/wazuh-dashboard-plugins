@@ -16,7 +16,15 @@ import queryString from 'querystring-browser';
 import $ from 'jquery';
 
 export class DevToolsController {
-  constructor($scope, apiReq, genericReq, $window, appState, errorHandler, $document) {
+  constructor(
+    $scope,
+    apiReq,
+    genericReq,
+    $window,
+    appState,
+    errorHandler,
+    $document
+  ) {
     this.$scope = $scope;
     this.apiReq = apiReq;
     this.genericReq = genericReq;
@@ -42,7 +50,7 @@ export class DevToolsController {
         gutters: ['CodeMirror-foldgutter']
       }
     );
-    CodeMirror.commands.autocomplete = function (cm) {
+    CodeMirror.commands.autocomplete = function(cm) {
       CodeMirror.showHint(cm, CodeMirror.hint.dictionaryHint, {
         completeSingle: false
       });
@@ -252,7 +260,7 @@ export class DevToolsController {
     this.apiInputBox.setSize('auto', '100%');
     this.apiInputBox.model = [];
     this.getAvailableMethods();
-    this.apiInputBox.on('keyup', function (cm, e) {
+    this.apiInputBox.on('keyup', function(cm, e) {
       if (!ExcludedIntelliSenseTriggerKeys[(e.keyCode || e.which).toString()]) {
         cm.execCommand('autocomplete', null, {
           completeSingle: false
@@ -263,8 +271,9 @@ export class DevToolsController {
     const currentState = this.appState.getCurrentDevTools();
     if (!currentState) {
       const demoStr =
-        'GET /\n\n# Comment here\nGET /agents\n' +
-        JSON.stringify({ limit: 1 }, null, 2);
+        'GET /agents?status=Active\n\n#Example comment\nGET /manager/info\n\nGET /syscollector/000/packages?search=ssh\n' +
+        JSON.stringify({ limit: 5 }, null, 2);
+
       this.appState.setCurrentDevTools(demoStr);
       this.apiInputBox.getDoc().setValue(demoStr);
     } else {
@@ -275,34 +284,34 @@ export class DevToolsController {
     this.highlightGroup(currentGroup);
 
     // Register our custom Codemirror hint plugin.
-    CodeMirror.registerHelper('hint', 'dictionaryHint', function (editor) {
+    CodeMirror.registerHelper('hint', 'dictionaryHint', function(editor) {
       const model = editor.model;
       function getDictionary(line, word) {
         let hints = [];
         const exp = line.split(/\s+/g);
         if (exp[0] && exp[0].match(/^(?:GET|PUT|POST|DELETE).*$/)) {
-          let method = model.find(function (item) {
-            return item.method === exp[0]
+          let method = model.find(function(item) {
+            return item.method === exp[0];
           });
           const forbidChars = /^[^?{]+$/;
           if (method && !exp[2] && forbidChars.test(word)) {
-            method.endpoints.forEach(function (endpoint) {
+            method.endpoints.forEach(function(endpoint) {
               endpoint.path = endpoint.name;
               if (endpoint.args && endpoint.args.length > 0) {
                 let argSubs = [];
-                endpoint.args.forEach(function (arg) {
+                endpoint.args.forEach(function(arg) {
                   const pathSplitted = endpoint.name.split('/');
                   const arrayIdx = pathSplitted.indexOf(arg.name);
                   const wordSplitted = word.split('/');
                   if (wordSplitted[arrayIdx] && wordSplitted[arrayIdx] != '') {
                     argSubs.push({
-                      'id': arg.name,
-                      'value': wordSplitted[arrayIdx]
+                      id: arg.name,
+                      value: wordSplitted[arrayIdx]
                     });
                   }
                 });
                 let auxPath = endpoint.name;
-                argSubs.forEach(function (arg) {
+                argSubs.forEach(function(arg) {
                   auxPath = auxPath.replace(arg.id, arg.value);
                 });
                 endpoint.path = auxPath;
@@ -321,16 +330,20 @@ export class DevToolsController {
       let start = cur.ch;
       let end = start;
       const whiteSpace = /\s/;
-      while (end < curLine.length && !whiteSpace.test(curLine.charAt(end)))++end;
-      while (start && !whiteSpace.test(curLine.charAt(start - 1)))--start;
+      while (end < curLine.length && !whiteSpace.test(curLine.charAt(end)))
+        ++end;
+      while (start && !whiteSpace.test(curLine.charAt(start - 1))) --start;
       const curWord = start !== end && curLine.slice(start, end);
       return {
-        list: (!curWord ? [] : getDictionary(curLine, curWord).filter(function (item) {
-          return item.toUpperCase().includes(curWord.toUpperCase());
-        })).sort(),
+        list: (!curWord
+          ? []
+          : getDictionary(curLine, curWord).filter(function(item) {
+              return item.toUpperCase().includes(curWord.toUpperCase());
+            })
+        ).sort(),
         from: CodeMirror.Pos(cur.line, start),
         to: CodeMirror.Pos(cur.line, end)
-      }
+      };
     });
   }
 
@@ -341,10 +354,10 @@ export class DevToolsController {
       const desiredGroup = firstTime
         ? this.groups.filter(item => item.requestText)
         : this.groups.filter(
-          item =>
-            item.requestText &&
-            (item.end >= selection.line && item.start <= selection.line)
-        );
+            item =>
+              item.requestText &&
+              (item.end >= selection.line && item.start <= selection.line)
+          );
 
       // Place play button at first line from the selected group
       const cords = this.apiInputBox.cursorCoords({
@@ -396,12 +409,12 @@ export class DevToolsController {
         const method = desiredGroup.requestText.startsWith('GET')
           ? 'GET'
           : desiredGroup.requestText.startsWith('POST')
-            ? 'POST'
-            : desiredGroup.requestText.startsWith('PUT')
-              ? 'PUT'
-              : desiredGroup.requestText.startsWith('DELETE')
-                ? 'DELETE'
-                : 'GET';
+          ? 'POST'
+          : desiredGroup.requestText.startsWith('PUT')
+          ? 'PUT'
+          : desiredGroup.requestText.startsWith('DELETE')
+          ? 'DELETE'
+          : 'GET';
 
         const requestCopy = desiredGroup.requestText.includes(method)
           ? desiredGroup.requestText.split(method)[1].trim()

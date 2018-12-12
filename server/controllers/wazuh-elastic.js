@@ -19,6 +19,8 @@ import {
   ClusterVisualizations
 } from '../integration-files/visualizations';
 
+import { Base } from '../reporting/base-query';
+
 export class WazuhElasticCtrl {
   constructor(server) {
     this.wzWrapper = new ElasticWrapper(server);
@@ -260,13 +262,12 @@ export class WazuhElasticCtrl {
     try {
       const config = getConfiguration();
 
-      const xpack = await this.wzWrapper.getPlugins();
+      const usingCredentials = await this.wzWrapper.usingCredentials();
 
       const isXpackEnabled =
         typeof XPACK_RBAC_ENABLED !== 'undefined' &&
         XPACK_RBAC_ENABLED &&
-        typeof xpack === 'string' &&
-        xpack.includes('x-pack');
+        usingCredentials;
 
       const isSuperUser =
         isXpackEnabled &&
@@ -320,11 +321,18 @@ export class WazuhElasticCtrl {
       const visArray = [];
       let aux_source, bulk_content;
       for (let element of app_objects) {
-        // Stringify and replace index-pattern for visualizations
-        aux_source = JSON.stringify(element._source);
-        aux_source = aux_source.replace('wazuh-alerts', id);
-        aux_source = JSON.parse(aux_source);
+        aux_source = JSON.parse(JSON.stringify(element._source))
+        
+        // Replace index-pattern for visualizations
+        if(aux_source && aux_source.kibanaSavedObjectMeta && aux_source.kibanaSavedObjectMeta.searchSourceJSON && typeof aux_source.kibanaSavedObjectMeta.searchSourceJSON === 'string'){
+          aux_source.kibanaSavedObjectMeta.searchSourceJSON = aux_source.kibanaSavedObjectMeta.searchSourceJSON.replace('wazuh-alerts',id);
+        }
 
+        // Replace index-pattern for selector visualizations
+        if(aux_source && aux_source.visState && aux_source.visState && typeof aux_source.visState === 'string'){
+          aux_source.visState = aux_source.visState.replace('wazuh-alerts',id)
+        }
+        
         // Bulk source
         bulk_content = {};
         bulk_content[element._type] = aux_source;
@@ -488,6 +496,70 @@ export class WazuhElasticCtrl {
     } catch (error) {
       log('GET /elastic/known-fields/{pattern}', error.message || error);
       return ErrorResponse(error.message || error, 4008, 500, reply);
+    }
+  }
+
+  /**
+   * @param {*} req
+   * POST /elastic/alerts
+   * {
+   *   "agent.id": 100 ,
+   *   "cluster.name": "wazuh",
+   *   "date.from": "now-1d/timestamp/standard date", // Like Elasticsearch does
+   *   "date.to": "now/timestamp/standard date", // Like Elasticsearch does
+   *   "rule.group": ["onegroup", "anothergroup"] // Or empty array [ ]
+   *   "size": 5 // Optional parameter
+   * }
+   *
+   * @param {*} reply
+   * {alerts: [...]} or ErrorResponse
+   */
+  async alerts(req, reply) {
+    try {
+      const pattern = req.payload.pattern || 'wazuh-alerts-3.x-*';
+      const from = req.payload.from || 'now-1d';
+      const to = req.payload.to || 'now';
+      const size = req.payload.size || 10;
+      const payload = Base(pattern, [], from, to);
+
+      payload.query = { bool: { must: [] } };
+
+      const agent = req.payload['agent.id'];
+      const manager = req.payload['manager.name'];
+      const cluster = req.payload['cluster.name'];
+      const rulegGroups = req.payload['rule.groups'];
+      if (agent)
+        payload.query.bool.must.push({
+          match: { 'agent.id': agent }
+        });
+      if (cluster)
+        payload.query.bool.must.push({
+          match: { 'cluster.name': cluster }
+        });
+      if (manager)
+        payload.query.bool.must.push({
+          match: { 'manager.name': manager }
+        });
+      if (rulegGroups)
+        payload.query.bool.must.push({
+          match: { 'rule.groups': rulegGroups }
+        });
+
+      payload.size = size;
+      payload.docvalue_fields = [
+        '@timestamp',
+        'cluster.name',
+        'manager.name',
+        'agent.id',
+        'rule.id',
+        'rule.group',
+        'rule.description'
+      ];
+      const data = await this.wzWrapper.searchWazuhAlertsWithPayload(payload);
+      return reply({ alerts: data.hits.hits });
+    } catch (error) {
+      log('POST /elastic/alerts', error.message || error);
+      return ErrorResponse(error.message || error, 4010, 500, reply);
     }
   }
 }

@@ -111,12 +111,12 @@
                             description="TabDescription.pm.description"
                         ></wz-welcome-card>
                         <wz-welcome-card
-                            ng-if="extensions.audit" class="euiFlexItem" logo="'icons/app_monitoring.svg'"
+                            ng-if="extensions.audit && agent.isLinuxOS" class="euiFlexItem" logo="'icons/app_monitoring.svg'"
                             title="'System auditing'" switch-tab="switchTab('audit')" current-tab="'audit'"
                             description="TabDescription.audit.description"
                         ></wz-welcome-card>
                         <wz-welcome-card
-                            ng-if="extensions.oscap" class="euiFlexItem" logo="'icons/app_discover.svg'"
+                            ng-if="extensions.oscap && agent.isLinuxOS" class="euiFlexItem" logo="'icons/app_discover.svg'"
                             title="'OpenSCAP'" switch-tab="switchTab('oscap')" current-tab="'oscap'"
                             description="TabDescription.oscap.description"
                         ></wz-welcome-card>
@@ -150,7 +150,7 @@
                                 description="TabDescription.virustotal.description"
                             ></wz-welcome-card>
                             <wz-welcome-card
-                                ng-if="extensions.osquery" class="euiFlexItem" logo="'icons/osquery.png'"
+                                ng-if="extensions.osquery" class="euiFlexItem" logo="'icons/osquery.svg'"
                                 title="'Osquery'" switch-tab="switchTab('osquery')" current-tab="'osquery'"
                                 description="TabDescription.osquery.description"
                             ></wz-welcome-card>

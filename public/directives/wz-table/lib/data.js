@@ -64,10 +64,48 @@ export async function filterData(
     $scope.wazuh_table_loading = false;
     $scope.error = `Error filtering by ${
       filter ? filter.value : 'undefined'
-    } - ${error.message || error}.`;
+      } - ${error.message || error}.`;
     errorHandler.handle(
       `Error filtering by ${
-        filter ? filter.value : 'undefined'
+      filter ? filter.value : 'undefined'
+      }. ${error.message || error}`,
+      'Data factory'
+    );
+  }
+  if (!$scope.$$phase) $scope.$digest();
+  return;
+}
+
+export async function queryData(
+  query,
+  term,
+  instance,
+  wzTableFilter,
+  $scope,
+  fetch,
+  errorHandler
+) {
+  try {
+    $scope.error = false;
+    $scope.wazuh_table_loading = true;
+    instance.removeFilters();
+    if (term) {
+      instance.addFilter('search', term);
+    }
+    if (query) {
+      instance.addFilter('q', query);
+    }
+    wzTableFilter.set(instance.filters);
+    await fetch();
+    $scope.wazuh_table_loading = false;
+  } catch (error) {
+    $scope.wazuh_table_loading = false;
+    $scope.error = `Query error ${
+      query ? query.value : 'undefined'
+      } - ${error.message || error}.`;
+    errorHandler.handle(
+      `Query error ${
+      query ? query.value : 'undefined'
       }. ${error.message || error}`,
       'Data factory'
     );

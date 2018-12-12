@@ -48,10 +48,25 @@ export class ConfigurationHandler {
       );
       if (sections[0].component === 'integrator') {
         this.buildIntegrations(
-          $scope.currentConfig['integrator-integration'].integration
+          $scope.currentConfig['integrator-integration'].integration,
+          $scope
         );
       } else {
         $scope.integrations = {};
+      }
+
+      if ($scope.currentConfig['logcollector-localfile'] && $scope.currentConfig['logcollector-localfile'].localfile) {
+        $scope.currentConfig['logcollector-localfile'].localfile.forEach(function (file) {
+          if (file.target) {
+            file.targetStr = '';
+            file.target.forEach(function (target, idx) {
+              file.targetStr = file.targetStr.concat(target);
+              if (idx != file.target.length - 1) {
+                file.targetStr = file.targetStr.concat(', ');
+              }
+            });
+          }
+        });
       }
       $scope.load = false;
       if (!$scope.$$phase) $scope.$digest();
