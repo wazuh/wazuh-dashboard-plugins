@@ -13,6 +13,17 @@ import * as FileSaver from '../../services/file-saver';
 import { timefilter } from 'ui/timefilter';
 
 export class AgentsPreviewController {
+  /**
+     * Class constructor
+     * @param {Object} $scope
+     * @param {Object} genericReq
+     * @param {Object} appState
+     * @param {Object} $location
+     * @param {Object} errorHandler
+     * @param {Object} csvReq
+     * @param {Object} shareAgent
+     * @param {Object} wzTableFilter
+     */
   constructor(
     $scope,
     genericReq,
@@ -35,6 +46,9 @@ export class AgentsPreviewController {
     this.commonData = commonData;
   }
 
+  /**
+   * On controller loads
+   */
   $onInit() {
     this.init = true;
     const loc = this.$location.search();
@@ -48,15 +62,10 @@ export class AgentsPreviewController {
       this.appState.getClusterInfo().status === 'enabled';
 
     this.loading = true;
-    this.status = 'all';
-    this.osPlatform = 'all';
-    this.version = 'all';
     this.osPlatforms = [];
     this.versions = [];
     this.groups = [];
     this.nodes = [];
-    this.node_name = 'all';
-    this.selectedGroup = 'all';
     this.mostActiveAgent = {
       name: '',
       id: ''
@@ -77,15 +86,27 @@ export class AgentsPreviewController {
     this.load();
   }
 
+  /**
+ * Searches by a query and term
+ * @param {String} query 
+ * @param {String} search
+ */
   query(query, search) {
     this.$scope.$broadcast('wazuhQuery', { query, search });
   }
 
+  /**
+       * Selects an agent
+       * @param {String} agent
+       */
   showAgent(agent) {
     this.shareAgent.setAgent(agent);
     this.$location.path('/agents');
   }
 
+  /**
+     * Exports the table in CSV format
+     */
   async downloadCsv() {
     try {
       this.errorHandler.info(
@@ -109,6 +130,9 @@ export class AgentsPreviewController {
     return;
   }
 
+  /**
+   * On controller loads
+   */
   async load() {
     try {
       const api = JSON.parse(this.appState.getCurrentAPI()).id;

@@ -10,6 +10,17 @@
  * Find more information about this on the LICENSE file.
  */
 export class CommonData {
+  /**
+   * Class constructor
+   * @param {*} $rootScope 
+   * @param {*} $timeout 
+   * @param {*} genericReq 
+   * @param {*} appState 
+   * @param {*} errorHandler 
+   * @param {*} $location 
+   * @param {*} shareAgent 
+   * @param {*} globalState 
+   */
   constructor(
     $rootScope,
     $timeout,
@@ -32,6 +43,9 @@ export class CommonData {
     this.refreshInterval = { pause: true, value: 0 }
   }
 
+  /**
+   * Remove rule id
+   */
   removeRuleId() {
     if (!this.globalState || !this.globalState.filters) return;
     const arr = [];
@@ -49,6 +63,10 @@ export class CommonData {
     this.globalState.filters = arr;
   }
 
+  /**
+   * Remove duplicate rule for a given group
+   * @param {String} group 
+   */
   removeDuplicateRuleGroups(group) {
     if (!this.globalState || !this.globalState.filters) return;
     const globalRuleGroupFilters = this.globalState.filters.map(item => {
@@ -69,6 +87,10 @@ export class CommonData {
     }
   }
 
+  /**
+   * Remove duplicates if exists
+   * @param {String} condition 
+   */
   removeDuplicateExists(condition) {
     if (!this.globalState || !this.globalState.filters) return;
     const globalRuleExistsFilters = this.globalState.filters.map(item => {
@@ -87,6 +109,13 @@ export class CommonData {
     }
   }
 
+  /**
+   * After filter manage
+   * @param {*} filterHandler 
+   * @param {*} tab 
+   * @param {*} localChange 
+   * @param {*} agent 
+   */
   af(filterHandler, tab, localChange, agent) {
     try {
       const tabFilters = {
@@ -143,6 +172,9 @@ export class CommonData {
     }
   }
 
+  /**
+   * Get GDPR
+   */
   async getGDPR() {
     try {
       const gdprTabs = [];
@@ -157,6 +189,9 @@ export class CommonData {
     }
   }
 
+  /**
+   * GET PCI
+   */
   async getPCI() {
     try {
       const pciTabs = [];
@@ -171,10 +206,21 @@ export class CommonData {
     }
   }
 
+  /**
+   * Assign given filter
+   * @param {Object} filterHandler 
+   * @param {Object} tab 
+   * @param {Object} localChange 
+   * @param {Object} agent 
+   */
   assignFilters(filterHandler, tab, localChange, agent) {
     return this.af(filterHandler, tab, localChange, agent);
   }
 
+  /**
+   * Validate range of given data
+   * @param {Object} data 
+   */
   validateRange(data) {
     const result = {
       duration: 'Unknown',
@@ -194,6 +240,9 @@ export class CommonData {
     return result;
   }
 
+  /**
+   * Check the tab location
+   */
   checkTabLocation() {
     if (this.$location.search().tab) {
       return this.$location.search().tab;
@@ -203,6 +252,9 @@ export class CommonData {
     }
   }
 
+  /**
+ * Check the tab view location
+ */
   checkTabViewLocation() {
     if (this.$location.search().tabView) {
       return this.$location.search().tabView;
@@ -212,6 +264,11 @@ export class CommonData {
     }
   }
 
+  /**
+   * Check the location of a given agent
+   * @param {String} newAgentId 
+   * @param {Boolean} globalAgent 
+   */
   checkLocationAgentId(newAgentId, globalAgent) {
     if (newAgentId) {
       this.$location.search('agent', newAgentId);

@@ -58,6 +58,9 @@ app.directive('wzDataTable', function () {
       };
       $scope.rowsPerPage = calcTableRows($window.innerHeight, rowSizes);
 
+      /**
+       * This loads data for table, that has been provided by parameter 
+       */
       const fetch = () => {
         try {
           $scope.filterTable();
@@ -81,6 +84,9 @@ app.directive('wzDataTable', function () {
         $scope.filterTable();
       }
 
+      /**
+       * This apply filter and sorting to table data
+       */
       $scope.filterTable = () => {
         items = $filter('orderBy')($filter('filter')($scope.data, $scope.searchTerm), $scope.sortValue, $scope.sortReverse);
         $scope.totalItems = items.length;
@@ -89,6 +95,9 @@ app.directive('wzDataTable', function () {
         $scope.searchTable();
       }
 
+      /**
+       * On controller loads
+       */
       const init = async () => {
         $scope.error = false;
         $scope.wazuh_table_loading = true;

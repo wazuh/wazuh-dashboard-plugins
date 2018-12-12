@@ -10,6 +10,13 @@
  * Find more information about this on the LICENSE file.
  */
 export class BlankScreenController {
+  /**
+   * Class constructor
+   * @param {*} $scope 
+   * @param {*} $location 
+   * @param {*} errorHandler 
+   * @param {*} wzMisc 
+   */
   constructor($scope, $location, errorHandler, wzMisc) {
     this.$scope = $scope;
     this.$location = $location;
@@ -17,19 +24,25 @@ export class BlankScreenController {
     this.wzMisc = wzMisc;
   }
 
+  /**
+ * When controller loads
+ */
   $onInit() {
     const catchedError = this.wzMisc.getBlankScr();
     if (catchedError) {
       let parsed = null;
       try {
         parsed = this.errorHandler.handle(catchedError, '', false, true);
-      } catch (error) {} // eslint-disable-line
+      } catch (error) { } // eslint-disable-line
       this.errorToShow = parsed || catchedError;
       this.wzMisc.setBlankScr(false);
       if (!this.$scope.$$phase) this.$scope.$digest();
     }
   }
 
+  /**
+   * This navigate to overview
+   */
   goOverview() {
     this.$location.path('/overview');
   }

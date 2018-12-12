@@ -11,7 +11,7 @@
  */
 
 import template from './wz-tag-filter.html';
-import { DataFactory } from '../../services/data-factory';
+//import { DataFactory } from '../../services/data-factory';
 import { uiModules } from 'ui/modules';
 
 const app = uiModules.get('app/wazuh', []);
@@ -31,11 +31,12 @@ app.directive('wzTagFilter', function () {
       $document,
       errorHandler
     ) {
-      const instance = new DataFactory(
+      //Use when api call be implemented
+      /* const instance = new DataFactory(
         apiReq,
         $scope.path,
         {}
-      );
+      ); */
 
       $scope.tagList = [];
       $scope.groupedTagList = [];
@@ -43,6 +44,9 @@ app.directive('wzTagFilter', function () {
       $scope.isAutocomplete = false;
       $scope.dataModel = [];
 
+      /**
+       * This add new tag to bar
+       */
       $scope.addTag = (flag = false) => {
         try {
           const input = $document[0].getElementById('wz-search-filter-bar-input');
@@ -62,7 +66,9 @@ app.directive('wzTagFilter', function () {
               'type': isFilter ? 'filter' : 'search'
             };
             const idxSearch = $scope.tagList.find(function (x) { return x.type === 'search' });
-            if (!isFilter && idxSearch) { $scope.removeTag(idxSearch.id, false) };
+            if (!isFilter && idxSearch) {
+              $scope.removeTag(idxSearch.id, false)
+            }
             if (!$scope.tagList.find(function (x) { return x.type === 'filter' && x.key === tag.key && x.value.value === tag.value.value })) {
               $scope.tagList.push(tag);
               $scope.groupedTagList = groupBy($scope.tagList, 'key');
@@ -76,6 +82,10 @@ app.directive('wzTagFilter', function () {
         }
       };
 
+      /**
+       * This build the q string with given groups of tags for performs the q search
+       * @param {Array<Objects>} groups 
+       */
       const buildQuery = groups => {
         try {
           let queryObj = {
@@ -83,7 +93,7 @@ app.directive('wzTagFilter', function () {
             'search': ''
           };
           let first = true;
-          groups.forEach(function (group, idx1) {
+          groups.forEach(function (group) {
             const search = group.find(function (x) { return x.type === 'search' });
             if (search) {
               queryObj.search = search.value.name;
@@ -114,6 +124,11 @@ app.directive('wzTagFilter', function () {
         }
       }
 
+      /**
+       * This group tags by type (filter or search), and for filter key
+       * @param {Array<Objects>} collection 
+       * @param {Object} property 
+       */
       const groupBy = (collection, property) => {
         let i = 0, val, index,
           values = [], result = [];
@@ -130,17 +145,26 @@ app.directive('wzTagFilter', function () {
         return result;
       }
 
+      /**
+       * Add key part of filter to search bar
+       */
       $scope.addTagKey = (key) => {
         $scope.newTag = key + ':';
         $scope.showAutocomplete(true);
       };
 
+      /**
+ * Add value part of filter to search bar, and add complete tag
+ */
       $scope.addTagValue = (value) => {
         $scope.newTag = $scope.newTag.substring(0, $scope.newTag.indexOf(':') + 1);
         $scope.newTag += value;
         $scope.addTag();
       };
 
+      /**
+       * This remove tag from search bar
+       */
       $scope.removeTag = (id, deleteGroup) => {
         if (deleteGroup) {
           $scope.tagList = $scope.tagList.filter(function (x) { return x.key !== id });
@@ -152,6 +176,9 @@ app.directive('wzTagFilter', function () {
         $scope.showAutocomplete(false);
       };
 
+      /**
+       * This show us the available filters in an autocomplete
+       */
       $scope.showAutocomplete = (flag) => {
         if (flag) {
           $scope.getAutocompleteContent();
@@ -160,6 +187,9 @@ app.directive('wzTagFilter', function () {
         indexAutocomplete(flag);
       };
 
+      /**
+       * This calculate the autocpmplete content (filter keys or filter values) 
+       * */
       $scope.getAutocompleteContent = () => {
         const term = $scope.newTag.split(':');
         const isKey = !term[1] && $scope.newTag.indexOf(':') === -1;
@@ -179,13 +209,20 @@ app.directive('wzTagFilter', function () {
         }
       };
 
-      $scope.addSearchKey = (e) => {
+      /**
+       * This force autocomplete refresh for every key pressed in search bar
+       */
+      $scope.addSearchKey = () => {
         if ($scope.autocompleteEnter) {
           $scope.autocompleteEnter = false;
         }
         $scope.getAutocompleteContent();
       };
 
+      /**
+       * This apply som style to autocomplete, to be displayed exactly below the input
+       * @param {Boolean} flag Indicate if after apply style the autocomplete have to be shown
+       */
       const indexAutocomplete = (flag = true) => {
         $timeout(function () {
           const bar = $document[0].getElementById('wz-search-filter-bar');
@@ -199,9 +236,13 @@ app.directive('wzTagFilter', function () {
         }, 100);
       }
 
+      /**
+       * When controllers load
+       */
       const load = async () => {
         try {
-          const result = await instance.fetch();
+          //Use when api call be implemented
+          //const result = await instance.fetch();
           Object.keys($scope.fieldsModel).forEach(function (key) {
             $scope.dataModel.push({ 'key': key, 'list': $scope.fieldsModel[key] });
           });
@@ -211,6 +252,9 @@ app.directive('wzTagFilter', function () {
         }
       };
 
+      /**
+       * Generate a random id for a tag
+       */
       const generateUID = () => {
         // I generate the UID from two parts here 
         // to ensure the random number provide enough bits.
@@ -221,6 +265,9 @@ app.directive('wzTagFilter', function () {
         return firstPart + secondPart;
       }
 
+      /**
+       * This set to bar a keydown listener to show the autocomplete
+       */
       $('#wz-search-filter-bar-input').bind('keydown', function (e) {
         let $current = $('#wz-search-filter-bar-autocomplete-list li.selected');
         if ($current.length === 0 && (e.keyCode === 38 || e.keyCode === 40)) {

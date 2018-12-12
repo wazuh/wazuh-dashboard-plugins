@@ -11,6 +11,9 @@
  * Find more information about this on the LICENSE file.
  */
 export class WzMisc {
+  /**
+   * Class constructor
+   */
   constructor() {
     this.state = {
       apiIsDown: false,
@@ -20,34 +23,62 @@ export class WzMisc {
     };
   }
 
+  /**
+   * Set if api is down
+   * @param {String} value 
+   */
   setApiIsDown(value) {
     this.state.apiIsDown = value;
   }
 
+  /**
+ * Get if api is down
+ */
   getApiIsDown() {
     return this.state.apiIsDown;
   }
 
+  /**
+   * Set wizard
+   * @param {String} value 
+   */
   setWizard(value) {
     this.state.comeFromWizard = value;
   }
 
+  /**
+   * Get wizard
+   */
   getWizard() {
     return this.state.comeFromWizard;
   }
 
+  /**
+ * Set blank screen
+ * @param {String} value 
+ */
   setBlankScr(value) {
     this.state.blankScreenError = value;
   }
 
+  /**
+   * Get blank screen
+   */
   getBlankScr() {
     return this.state.blankScreenError;
   }
 
+  /**
+* Set last restart
+* @param {String} value 
+*/
   setLastRestart(value) {
     this.state.lastRestart = value;
   }
 
+  /**
+   * Get last restart
+   */
   getLastRestart() {
     return this.state.lastRestart;
   }

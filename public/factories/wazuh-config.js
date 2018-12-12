@@ -10,14 +10,23 @@
  * Find more information about this on the LICENSE file.
  */
 export class WazuhConfig {
+  /**
+   * Class constructor
+   */
   constructor() {
     this.config = {};
   }
-
+/**
+ * Set given configuration
+ * @param {Object} cfg 
+ */
   setConfig(cfg) {
     Object.assign(this.config, cfg);
   }
 
+  /**
+   * Get configuration
+   */
   getConfig() {
     return this.config;
   }

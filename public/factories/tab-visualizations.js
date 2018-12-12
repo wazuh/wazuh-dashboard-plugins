@@ -11,6 +11,9 @@
  * Find more information about this on the LICENSE file.
  */
 export class TabVisualizations {
+  /**
+   * Class constructor
+   */
   constructor() {
     this.agents = {
       welcome: 0,
@@ -48,18 +51,33 @@ export class TabVisualizations {
     this.currentTab = '';
   }
 
+  /**
+   * Set given tab as current
+   * @param {Object} tab 
+   */
   setTab(tab) {
     this.currentTab = tab;
   }
 
+  /**
+   * Get current tab
+   */
   getTab() {
     return this.currentTab;
   }
 
+  /**
+   * Get given item
+   * @param {String} item 
+   */
   getItem(item) {
     return this.tabVisualizations[item];
   }
 
+  /**
+   * Assign tab visualization with given tabs
+   * @param {Object} tabs 
+   */
   assign(tabs) {
     if (typeof tabs === 'object') {
       this.tabVisualizations = tabs;
@@ -69,6 +87,9 @@ export class TabVisualizations {
     }
   }
 
+  /**
+   * Remove all tab Visualizations
+   */
   removeAll() {
     this.tabVisualizations = {};
   }

@@ -114,6 +114,10 @@ export class StatusController {
     }
   }
 
+  /**
+ * This change to a selected node
+ * @param {String} node 
+ */
   async changeNode(node) {
     try {
       this.clusterError = false;
