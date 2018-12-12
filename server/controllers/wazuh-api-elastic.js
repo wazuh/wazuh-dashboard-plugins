@@ -143,7 +143,7 @@ export class WazuhApiElasticCtrl {
 
   async updateAPIHostname(req, reply) {
     try {
-      await this.wzWrapper.updateWazuhIndexDocument(null, req.params.id, {
+      await this.wzWrapper.updateWazuhIndexDocument(req, req.params.id, {
         doc: { cluster_info: req.payload.cluster_info }
       });
 
