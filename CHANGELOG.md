@@ -6,24 +6,24 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 ### Added
 
-- New directive for tables that don't need external data sources (https://github.com/wazuh/wazuh-kibana-app/pull/1067).
-- New search bar directive with interactive filters and suggestions (https://github.com/wazuh/wazuh-kibana-app/pull/1058).
-- New server route `/elastic/alerts` for fetching alerts using custom parameters(https://github.com/wazuh/wazuh-kibana-app/pull/1056).
-- New table for an agent FIM monitored files, if the agent OS platform is Windows it will show two tables: files and registry (https://github.com/wazuh/wazuh-kibana-app/pull/1032).
-- Added description to each setting under Settings > Configuration (https://github.com/wazuh/wazuh-kibana-app/pull/1048).
+- New directive for tables that don't need external data sources ([#1067](https://github.com/wazuh/wazuh-kibana-app/pull/1067)).
+- New search bar directive with interactive filters and suggestions ([#1058](https://github.com/wazuh/wazuh-kibana-app/pull/1058)).
+- New server route `/elastic/alerts` for fetching alerts using custom parameters([#1056](https://github.com/wazuh/wazuh-kibana-app/pull/1056)).
+- New table for an agent FIM monitored files, if the agent OS platform is Windows it will show two tables: files and registry ([#1032](https://github.com/wazuh/wazuh-kibana-app/pull/1032)).
+- Added description to each setting under Settings > Configuration ([#1048](https://github.com/wazuh/wazuh-kibana-app/pull/1048)).
 
 
 ### Changed
 
-- Changed Inventory tables. Now the app looks for the OS platform and it shows different tables depending on the OS platform. In addition the process state codes has been replaced to be more meaningful (https://github.com/wazuh/wazuh-kibana-app/pull/1059).
-- Full rework for the AWS tab including service selector, applied configuration, bucket selector, improved visualizations (https://github.com/wazuh/wazuh-kibana-app/pull/1057).
-- "Report" button is hidden on Discover panel (https://github.com/wazuh/wazuh-kibana-app/pull/1047).
+- Changed Inventory tables. Now the app looks for the OS platform and it shows different tables depending on the OS platform. In addition the process state codes has been replaced to be more meaningful ([#1059](https://github.com/wazuh/wazuh-kibana-app/pull/1059)).
+- Full rework for the AWS tab including service selector, applied configuration, bucket selector, improved visualizations ([#1057](https://github.com/wazuh/wazuh-kibana-app/pull/1057)).
+- "Report" button is hidden on Discover panel ([#1047](https://github.com/wazuh/wazuh-kibana-app/pull/1047)).
 
 ### Fixed
 
-- Avoid fetching twice the same data (https://github.com/wazuh/wazuh-kibana-app/pull/1072, https://github.com/wazuh/wazuh-kibana-app/pull/1061).
-- Wazuh logo adapted to low resolutions (https://github.com/wazuh/wazuh-kibana-app/pull/1074)
-- Hide Audit, OpenSCAP tabs for non-linux agents. Fixed empty Windows events under Configuration > Log collection section. OSQuery logo has been standardized (https://github.com/wazuh/wazuh-kibana-app/pull/1072, https://github.com/wazuh/wazuh-kibana-app/pull/1076)
+- Avoid fetching twice the same data ([#1061](https://github.com/wazuh/wazuh-kibana-app/pull/1072, https://github.com/wazuh/wazuh-kibana-app/pull/1061)).
+- Wazuh logo adapted to low resolutions ([#1074](https://github.com/wazuh/wazuh-kibana-app/pull/1074)).
+- Hide Audit, OpenSCAP tabs for non-linux agents. Fixed empty Windows events under Configuration > Log collection section. OSQuery logo has been standardized ([#1072](https://github.com/wazuh/wazuh-kibana-app/pull/1072), [#1076](https://github.com/wazuh/wazuh-kibana-app/pull/1076)).
 
 ## Wazuh v3.7.1 - Kibana v6.5.1 / v6.5.2 - Revision 415
 
