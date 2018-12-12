@@ -589,15 +589,23 @@ export class ElasticWrapper {
 
   /**
    * Updates the a document from the .wazuh index using id and doc content
-   * @param {*} id
-   * @param {*} doc
+   * @param {*} req. Optional parameter to pass an incoming request (X-Pack related)
+   * @param {*} id. Wazuh API entry ID (Elasticsearch ID)
+   * @param {*} doc. The content to be used for updating the document.
    */
-  async updateWazuhIndexDocument(req, doc) {
+  async updateWazuhIndexDocument(req, id, doc) {
     try {
-      const id = typeof req === 'object' && req.payload ? req.payload.id : req;
       if (!id || !doc) throw new Error('No valid parameters given');
 
-      const data = await this.elasticRequest.callWithInternalUser('update', {
+      const data = 
+      req ?
+      await this.elasticRequest.callWithRequest(req, 'update', {
+        index: '.wazuh',
+        type: 'wazuh-configuration',
+        id: id,
+        body: doc
+      }) :
+      await this.elasticRequest.callWithInternalUser('update', {
         index: '.wazuh',
         type: 'wazuh-configuration',
         id: id,
@@ -667,23 +675,6 @@ export class ElasticWrapper {
     }
   }
 
-  /**
-   * Same as curling the plugins from Elasticsearch
-   */
-  async getPlugins() {
-    try {
-      const data = await this.elasticRequest.callWithInternalUser(
-        'cat.plugins',
-        {}
-      );
-      const usingCredentials = await this.usingCredentials();
-
-      return usingCredentials ? data : false;
-    } catch (error) {
-      return Promise.reject(error);
-    }
-  }
-
   async usingCredentials() {
     try {
       const data = await this.elasticRequest.callWithInternalUser(
@@ -696,7 +687,7 @@ export class ElasticWrapper {
         data.defaults &&
         data.defaults.xpack &&
         data.defaults.xpack.security &&
-        data.defaults.xpack.security.enabled
+        data.defaults.xpack.security.enabled == 'true'
       );
     } catch (error) {
       return Promise.reject(error);

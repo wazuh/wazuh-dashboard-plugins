@@ -50,15 +50,6 @@ export function WazuhApiElasticRoutes(server) {
     }
   });
 
-  // Set Wazuh-API as default (multimanager) on elasticsearch index
-  server.route({
-    method: 'PUT',
-    path: '/elastic/apis/{id}',
-    handler(req, reply) {
-      return ctrl.setAPIEntryDefault(req, reply);
-    }
-  });
-
   // Update the API hostname
   server.route({
     method: 'PUT',
