@@ -303,13 +303,12 @@ export class WazuhElasticCtrl {
     try {
       const config = getConfiguration();
 
-      const xpack = await this.wzWrapper.getPlugins();
+      const usingCredentials = await this.wzWrapper.usingCredentials();
 
       const isXpackEnabled =
         typeof XPACK_RBAC_ENABLED !== 'undefined' &&
         XPACK_RBAC_ENABLED &&
-        typeof xpack === 'string' &&
-        xpack.includes('x-pack');
+        usingCredentials;
 
       const isSuperUser =
         isXpackEnabled &&

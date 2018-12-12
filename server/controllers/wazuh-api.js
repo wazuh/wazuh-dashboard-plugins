@@ -89,7 +89,7 @@ export class WazuhApiCtrl {
             );
             const updatedManagerName = managerInfo.body.data.name;
             wapi_config.cluster_info.manager = updatedManagerName;
-            await this.wzWrapper.updateWazuhIndexDocument(req.payload, {
+            await this.wzWrapper.updateWazuhIndexDocument(null, req.payload, {
               doc: { cluster_info: wapi_config.cluster_info }
             });
           } catch (error) {
