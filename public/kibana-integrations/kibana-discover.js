@@ -850,7 +850,8 @@ function discoverController(
 
   // TODO: On array fields, negating does not negate the combination, rather all terms
   $scope.filterQuery = function(field, values, operation) {
-    $scope.indexPattern.popularizeField(field, 1);
+    // Commented due to https://github.com/elastic/kibana/issues/22426
+    //$scope.indexPattern.popularizeField(field, 1);
     filterActions.addFilter(
       field,
       values,
@@ -862,12 +863,14 @@ function discoverController(
   };
 
   $scope.addColumn = function addColumn(columnName) {
-    $scope.indexPattern.popularizeField(columnName, 1);
+    // Commented due to https://github.com/elastic/kibana/issues/22426
+    //$scope.indexPattern.popularizeField(columnName, 1);
     columnActions.addColumn($scope.state.columns, columnName);
   };
 
   $scope.removeColumn = function removeColumn(columnName) {
-    $scope.indexPattern.popularizeField(columnName, 1);
+    // Commented due to https://github.com/elastic/kibana/issues/22426
+    //$scope.indexPattern.popularizeField(columnName, 1);
     columnActions.removeColumn($scope.state.columns, columnName);
   };
 
