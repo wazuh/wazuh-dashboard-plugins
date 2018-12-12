@@ -67,21 +67,11 @@ export function Initialize(server) {
    */
   const checkKnownFields = async () => {
     try {
-      const xpack = await wzWrapper.getPlugins();
-
-      log(
-        '[initialize][checkKnownFields]',
-        `x-pack enabled: ${
-          typeof xpack === 'string' && xpack.includes('x-pack') ? 'yes' : 'no'
-        }`,
-        'info'
-      );
-      server.log(
-        [blueWazuh, 'initialize', 'info'],
-        `x-pack enabled: ${
-          typeof xpack === 'string' && xpack.includes('x-pack') ? 'yes' : 'no'
-        }`
-      );
+      const usingCredentials = await wzWrapper.usingCredentials();
+      const msg = `x-pack security enabled: ${usingCredentials ? 'yes' : 'no' }`
+      
+      log('[initialize][checkKnownFields]', msg, 'info');
+      server.log([blueWazuh, 'initialize', 'info'], msg);
 
       const indexPatternList = await wzWrapper.getAllIndexPatterns();
 
