@@ -10,6 +10,7 @@
  * Find more information about this on the LICENSE file.
  */
 import * as FileSaver from '../../services/file-saver';
+import { timefilter } from 'ui/timefilter';
 
 export class AgentsPreviewController {
   /**
@@ -31,7 +32,8 @@ export class AgentsPreviewController {
     errorHandler,
     csvReq,
     shareAgent,
-    wzTableFilter
+    wzTableFilter,
+    commonData
   ) {
     this.$scope = $scope;
     this.genericReq = genericReq;
@@ -41,6 +43,7 @@ export class AgentsPreviewController {
     this.csvReq = csvReq;
     this.shareAgent = shareAgent;
     this.wzTableFilter = wzTableFilter;
+    this.commonData = commonData;
   }
 
   /**
@@ -49,8 +52,10 @@ export class AgentsPreviewController {
   $onInit() {
     this.init = true;
     const loc = this.$location.search();
-    if (loc && loc.agent && loc.agent !== '000')
+    if (loc && loc.agent && loc.agent !== '000') {
+      this.commonData.setTimefilter(timefilter.getTime());
       return this.showAgent({ id: loc.agent });
+    }
 
     this.isClusterEnabled =
       this.appState.getClusterInfo() &&

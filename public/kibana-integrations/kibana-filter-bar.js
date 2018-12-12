@@ -192,7 +192,21 @@ module
         }
 
         function updateFilters() {
-          const filters = queryFilter.getFilters();
+          let filters = queryFilter.getFilters();
+          
+          // Kibana filter pills should not alter their order when switching between Dashboard and Discover sub-tabs
+          // https://github.com/wazuh/wazuh-kibana-app/issues/1051
+          if(filters && Array.isArray(filters)){
+            const nonRemovable = filters.filter(item => item && item.meta && typeof item.meta.removable !== 'undefined' && !item.meta.removable);
+            const globalState  = filters.filter(item => item && item.$state && item.$state.store === 'globalState');
+            const other        = filters.filter(item =>  item && !(item.meta && typeof item.meta.removable !== 'undefined' && !item.meta.removable) && !(item.$state && item.$state.store === 'globalState'));
+            const newFilters = [];
+            if(nonRemovable.length) newFilters.push(...nonRemovable)
+            if(globalState.length) newFilters.push(...globalState)
+            if(other.length) newFilters.push(...other)
+            filters = newFilters;
+          }
+          
           mapAndFlattenFilters(filters).then(function(results) {
             // used to display the current filters in the state
             $scope.filters = _.sortBy(results, function(filter) {

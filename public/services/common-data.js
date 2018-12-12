@@ -39,6 +39,8 @@ export class CommonData {
     this.$location = $location;
     this.shareAgent = shareAgent;
     this.globalState = globalState;
+    this.savedTimefilter = null;
+    this.refreshInterval = { pause: true, value: 0 }
   }
 
   /**
@@ -281,5 +283,25 @@ export class CommonData {
         return globalAgent.id;
       }
     }
+  }
+
+  setTimefilter(time) {
+    if (time) this.savedTimefilter = time;
+  }
+
+  removeTimefilter() {
+    this.savedTimefilter = null;
+  }
+
+  getTimefilter() {
+    return this.savedTimefilter;
+  }
+
+  setRefreshInterval(interval) {
+    if (interval) Object.assign(this.refreshInterval,interval)
+  }
+
+  getRefreshInterval() {
+    return this.refreshInterval;
   }
 }

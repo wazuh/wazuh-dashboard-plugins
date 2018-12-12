@@ -90,7 +90,12 @@ export class AgentsController {
    * On controller loads
    */
   $onInit() {
-    timefilter.setRefreshInterval({ pause: true, value: 0 });
+    const savedTimefilter = this.commonData.getTimefilter();
+    if (savedTimefilter) {
+      timefilter.setTime(savedTimefilter);
+      this.commonData.removeTimefilter();
+    } 
+
     this.$scope.TabDescription = TabDescription;
 
     this.$rootScope.reportStatus = false;
@@ -292,6 +297,8 @@ export class AgentsController {
       if (!this.$scope.$$phase) this.$scope.$digest();
     };
 
+    this.$scope.goDiscover = () => this.goDiscover();
+
     this.$scope.$on('$routeChangeStart', () =>
       this.appState.removeSessionStorageItem('configSubTab')
     );
@@ -391,8 +398,12 @@ export class AgentsController {
    * @param {*} force 
    */
   async switchTab(tab, force = false) {
-    if (this.ignoredTabs.includes(tab)) {
-      timefilter.setRefreshInterval({ pause: true, value: 0 });
+    
+    if(this.ignoredTabs.includes(tab)) {    
+      this.commonData.setRefreshInterval(timefilter.getRefreshInterval());    
+      timefilter.setRefreshInterval({pause:true,value:0})
+    } else if(this.ignoredTabs.includes(this.$scope.tab)) {
+      timefilter.setRefreshInterval(this.commonData.getRefreshInterval())
     }
 
     try {
@@ -457,6 +468,14 @@ export class AgentsController {
       return Promise.reject(error);
     }
     if (!this.$scope.$$phase) this.$scope.$digest();
+  }
+
+  goDiscover() {
+    this.targetLocation = {
+      tab: 'general',
+      subTab: 'discover'
+    };
+    return this.switchTab('general');
   }
 
   // Agent data
@@ -614,6 +633,14 @@ export class AgentsController {
       return;
     } catch (error) {
       this.errorHandler.handle(error, 'Agents');
+      if (
+        error &&
+        typeof error === 'string' &&
+        error.includes('Agent does not exist')
+      ) {
+        this.$location.search('agent', null);
+        this.$location.path('/agents-preview');
+      }
     }
     return;
   }

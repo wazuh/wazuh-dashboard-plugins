@@ -72,7 +72,6 @@ export class OverviewController {
    * On controller loads
    */
   $onInit() {
-    timefilter.setRefreshInterval({ pause: true, value: 0 })
     this.wodlesConfiguration = false;
     this.TabDescription = TabDescription;
     this.$rootScope.reportStatus = false;
@@ -266,8 +265,11 @@ export class OverviewController {
   // Switch tab
   async switchTab(newTab, force = false) {
     try {
-      if (newTab === 'welcome') {
-        timefilter.setRefreshInterval({ pause: true, value: 0 })
+      if(newTab === 'welcome') {    
+        this.commonData.setRefreshInterval(timefilter.getRefreshInterval());    
+        timefilter.setRefreshInterval({pause:true,value:0})
+      } else if(this.tab === 'welcome') {
+        timefilter.setRefreshInterval(this.commonData.getRefreshInterval())
       }
 
       if (newTab !== 'welcome') {
