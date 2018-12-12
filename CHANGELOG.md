@@ -18,9 +18,12 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Changed Inventory tables. Now the app looks for the OS platform and it shows different tables depending on the OS platform. In addition the process state codes has been replaced to be more meaningful ([#1059](https://github.com/wazuh/wazuh-kibana-app/pull/1059)).
 - Full rework for the AWS tab including service selector, applied configuration, bucket selector, improved visualizations ([#1057](https://github.com/wazuh/wazuh-kibana-app/pull/1057)).
 - "Report" button is hidden on Discover panel ([#1047](https://github.com/wazuh/wazuh-kibana-app/pull/1047)).
+- Visualizations, filters and Discover improved ([#1083](https://github.com/wazuh/wazuh-kibana-app/pull/1083)).
+- Removed `popularizeField` function until https://github.com/elastic/kibana/issues/22426 is solved in order to avoid `Unable to write index pattern!` error on Discover tab ([#1085](https://github.com/wazuh/wazuh-kibana-app/pull/1085)).
 
 ### Fixed
 
+- Restored X-Pack security logic for the .wazuh index, now it's not bypassing the X-Pack roles ([#1081](https://github.com/wazuh/wazuh-kibana-app/pull/1081))
 - Avoid fetching twice the same data ([#1072](https://github.com/wazuh/wazuh-kibana-app/pull/1072), [#1061](https://github.com/wazuh/wazuh-kibana-app/pull/1061)).
 - Wazuh logo adapted to low resolutions ([#1074](https://github.com/wazuh/wazuh-kibana-app/pull/1074)).
 - Hide Audit, OpenSCAP tabs for non-linux agents. Fixed empty Windows events under Configuration > Log collection section. OSQuery logo has been standardized ([#1072](https://github.com/wazuh/wazuh-kibana-app/pull/1072), [#1076](https://github.com/wazuh/wazuh-kibana-app/pull/1076)).
