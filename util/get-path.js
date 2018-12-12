@@ -9,6 +9,10 @@
  *
  * Find more information about this on the LICENSE file.
  */
+/**
+ * Gets the correct path of given url
+ * @param {*} config 
+ */
 export function getPath(config) {
   let path = config.url;
   let protocol;

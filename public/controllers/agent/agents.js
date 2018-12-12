@@ -27,22 +27,22 @@ import { ConfigurationHandler } from '../../utils/config-handler';
 import { timefilter } from 'ui/timefilter';
 
 export class AgentsController {
-    /**
-     * Class constructor
-     * @param {Object} $scope
-     * @param {Object} $location
-     * @param {Object} $rootScope
-     * @param {Object} appState
-     * @param {Object} apiReq 
-     * @param {Object} errorHandler
-     * @param {Object} tabVisualizations
-     * @param {Object} shareAgent
-     * @param {Object} commonData
-     * @param {Object} reportingService
-     * @param {Object} visFactoryService
-     * @param {Object} csvReq
-     * @param {Object} wzTableFilter
-     */
+  /**
+   * Class constructor
+   * @param {Object} $scope
+   * @param {Object} $location
+   * @param {Object} $rootScope
+   * @param {Object} appState
+   * @param {Object} apiReq 
+   * @param {Object} errorHandler
+   * @param {Object} tabVisualizations
+   * @param {Object} shareAgent
+   * @param {Object} commonData
+   * @param {Object} reportingService
+   * @param {Object} visFactoryService
+   * @param {Object} csvReq
+   * @param {Object} wzTableFilter
+   */
   constructor(
     $scope,
     $location,
@@ -128,6 +128,11 @@ export class AgentsController {
     this.$scope.securityTabs = ['vuls', 'virustotal', 'osquery'];
     this.$scope.complianceTabs = ['pci', 'gdpr'];
 
+    /**
+ * This check if given array of items contais a single given item
+ * @param {Object} item 
+ * @param {Array<Object>} array 
+ */
     this.$scope.inArray = (item, array) =>
       item && Array.isArray(array) && array.includes(item);
 
@@ -234,7 +239,7 @@ export class AgentsController {
         this.$scope.agent.id
       );
     };
-    
+
     this.$scope.switchConfigurationTab = (configurationTab, navigate) => {
       this.$scope.navigate = navigate;
       this.configurationHandler.switchConfigurationTab(
@@ -291,13 +296,21 @@ export class AgentsController {
       this.appState.removeSessionStorageItem('configSubTab')
     );
   }
-
+  /**
+   * Create metric for given object
+   * @param {*} metricsObject 
+   */
   createMetrics(metricsObject) {
     for (let key in metricsObject) {
       this.$scope[key] = () => generateMetric(metricsObject[key]);
     }
   }
 
+  /**
+   * Classify metrics for create the suitable one
+   * @param {*} tab 
+   * @param {*} subtab 
+   */
   checkMetrics(tab, subtab) {
     if (subtab === 'panels') {
       switch (tab) {
@@ -372,7 +385,11 @@ export class AgentsController {
     }
   }
 
-  // Switch tab
+  /**
+   * Switch tab
+   * @param {*} tab 
+   * @param {*} force 
+   */
   async switchTab(tab, force = false) {
     if (this.ignoredTabs.includes(tab)) {
       timefilter.setRefreshInterval({ pause: true, value: 0 });
@@ -444,16 +461,26 @@ export class AgentsController {
 
   // Agent data
 
+  /**
+   * Checks rootcheck of selected agent
+   */
   validateRootCheck() {
     const result = this.commonData.validateRange(this.$scope.agent.rootcheck);
     this.$scope.agent.rootcheck = result;
   }
 
+  /**
+   * Checks syscheck of selected agent
+   */
   validateSysCheck() {
     const result = this.commonData.validateRange(this.$scope.agent.syscheck);
     this.$scope.agent.syscheck = result;
   }
 
+  /**
+   * Get the needed data for load syscollector
+   * @param {*} id 
+   */
   async loadSyscollector(id) {
     try {
       // Check that Syscollector is enabled before proceeding
@@ -510,7 +537,7 @@ export class AgentsController {
       this.$scope.syscollector = {
         hardware:
           typeof hardwareResponse === 'object' &&
-          Object.keys(hardwareResponse).length
+            Object.keys(hardwareResponse).length
             ? { ...hardwareResponse }
             : false,
         os:
@@ -535,6 +562,10 @@ export class AgentsController {
     }
   }
 
+  /**
+   * Get all data from agent
+   * @param {*} newAgentId 
+   */
   async getAgent(newAgentId) {
     try {
       this.$scope.isSynchronized = false;
@@ -585,6 +616,11 @@ export class AgentsController {
     return;
   }
 
+  /**
+   * Navigate to the groups of an agent
+   * @param {*} agent 
+   * @param {*} group 
+   */
   goGroups(agent, group) {
     this.visFactoryService.clearAll();
     this.shareAgent.setAgent(agent, group);
@@ -592,6 +628,10 @@ export class AgentsController {
     this.$location.path('/manager');
   }
 
+  /**
+   * Look for agents that satisfy search term, hidding master
+   * @param {*} searchTerm 
+   */
   async analyzeAgents(searchTerm) {
     try {
       if (searchTerm) {
@@ -609,6 +649,12 @@ export class AgentsController {
     return;
   }
 
+  /**
+   * Get full data on CSV format from a path
+   * @param {*} path path with data to convert
+   * @param {*} fileName Output file name
+   * @param {*} filters Filters to apply
+   */
   async downloadCsv(path, fileName, filters = []) {
     try {
       this.errorHandler.info(
@@ -626,6 +672,9 @@ export class AgentsController {
     return;
   }
 
+  /**
+   * When controller loads
+   */
   async firstLoad() {
     try {
       const globalAgent = this.shareAgent.getAgent();
@@ -659,6 +708,9 @@ export class AgentsController {
   }
   /** End of agent configuration */
 
+  /**
+   * Transform a visualization into an image
+   */
   startVis2Png() {
     const syscollectorFilters = [];
     if (

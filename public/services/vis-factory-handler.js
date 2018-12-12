@@ -10,6 +10,18 @@
  * Find more information about this on the LICENSE file.
  */
 export class VisFactoryService {
+  /**
+   * Class Constructor
+   * @param {*} $rootScope 
+   * @param {*} appState 
+   * @param {*} genericReq 
+   * @param {*} discoverPendingUpdates 
+   * @param {*} rawVisualizations 
+   * @param {*} tabVisualizations 
+   * @param {*} loadedVisualizations 
+   * @param {*} commonData 
+   * @param {*} visHandlers 
+   */
   constructor(
     $rootScope,
     appState,
@@ -32,6 +44,10 @@ export class VisFactoryService {
     this.visHandlers = visHandlers;
   }
 
+  /**
+   * Remove visualizations data
+   * @param {Boolean} onlyAgent 
+   */
   clear(onlyAgent = false) {
     if (!onlyAgent) this.visHandlers.removeAll();
     this.discoverPendingUpdates.removeAll();
@@ -39,11 +55,22 @@ export class VisFactoryService {
     this.loadedVisualizations.removeAll();
   }
 
+  /**
+ * Remove all visualizations data
+ * @param {Boolean} onlyAgent 
+ */
   clearAll() {
     this.clear();
     this.tabVisualizations.removeAll();
   }
 
+  /**
+   * Build the overview section visualizations
+   * @param {*} filterHandler 
+   * @param {*} tab 
+   * @param {*} subtab 
+   * @param {*} localChange 
+   */
   async buildOverviewVisualizations(filterHandler, tab, subtab, localChange) {
     try {
       const data = await this.genericReq.request(
@@ -60,6 +87,14 @@ export class VisFactoryService {
     }
   }
 
+  /**
+   * BUild the agents section visualizations
+   * @param {*} filterHandler 
+   * @param {*} tab 
+   * @param {*} subtab 
+   * @param {*} localChange 
+   * @param {*} id 
+   */
   async buildAgentsVisualizations(filterHandler, tab, subtab, localChange, id) {
     try {
       const data = await this.genericReq.request(

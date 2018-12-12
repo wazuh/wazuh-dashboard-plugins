@@ -12,6 +12,14 @@
 import { ConfigurationHandler } from '../../utils/config-handler';
 
 export class ConfigurationController {
+  /**
+   * Constructor
+   * @param {*} $scope 
+   * @param {*} $location 
+   * @param {*} errorHandler 
+   * @param {*} apiReq 
+   * @param {*} appState 
+   */
   constructor($scope, $location, errorHandler, apiReq, appState) {
     this.$scope = $scope;
     this.errorHandler = errorHandler;
@@ -28,6 +36,9 @@ export class ConfigurationController {
     this.$scope.selectedItem = 0;
   }
 
+  /**
+   * When controller loads
+   */
   $onInit() {
     this.$scope.getXML = () => this.configurationHandler.getXML(this.$scope);
     this.$scope.getJSON = () => this.configurationHandler.getJSON(this.$scope);
@@ -51,6 +62,10 @@ export class ConfigurationController {
         this.$scope
       )
     };
+
+    /**
+     * Navigate to woodle
+     */
     this.$scope.switchWodle = (wodleName, navigate = true) => {
       this.$scope.navigate = navigate;
       this.$scope.configWodle = wodleName;
@@ -60,6 +75,9 @@ export class ConfigurationController {
       this.configurationHandler.switchWodle(wodleName, this.$scope);
     }
 
+    /**
+     * Navigate to configuration
+     */
     this.$scope.switchConfigurationTab = (configurationTab, navigate) => {
       this.$scope.navigate = navigate;
       this.configurationHandler.switchConfigurationTab(
@@ -88,6 +106,10 @@ export class ConfigurationController {
         this.$location.search('configWodle', null);
       }
     };
+
+    /**
+     * Navigate to configuration sub tab
+     */
     this.$scope.switchConfigurationSubTab = configurationSubTab =>
       this.configurationHandler.switchConfigurationSubTab(
         configurationSubTab,

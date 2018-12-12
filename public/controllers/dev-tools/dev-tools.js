@@ -16,6 +16,16 @@ import queryString from 'querystring-browser';
 import $ from 'jquery';
 
 export class DevToolsController {
+  /**
+   * Constructor
+   * @param {*} $scope 
+   * @param {*} apiReq 
+   * @param {*} genericReq 
+   * @param {*} $window 
+   * @param {*} appState 
+   * @param {*} errorHandler 
+   * @param {*} $document 
+   */
   constructor(
     $scope,
     apiReq,
@@ -37,6 +47,9 @@ export class DevToolsController {
     this.widgets = [];
   }
 
+  /**
+   * When controller loads
+   */
   $onInit() {
     this.apiInputBox = CodeMirror.fromTextArea(
       this.$document[0].getElementById('api_input'),
@@ -50,6 +63,7 @@ export class DevToolsController {
         gutters: ['CodeMirror-foldgutter']
       }
     );
+    // Register plugin for code mirror
     CodeMirror.commands.autocomplete = function(cm) {
       CodeMirror.showHint(cm, CodeMirror.hint.dictionaryHint, {
         completeSingle: false
@@ -103,6 +117,9 @@ export class DevToolsController {
     this.$scope.send(true);
   }
 
+  /**
+   * Detect de groups of instructions 
+   */
   analyzeGroups() {
     try {
       const currentState = this.apiInputBox.getValue().toString();
@@ -171,6 +188,10 @@ export class DevToolsController {
     }
   }
 
+  /**
+   * This seta group as active, and highlight it
+   * @param {Object} group 
+   */
   highlightGroup(group) {
     for (const line of this.linesWithClass) {
       this.apiInputBox.removeLineClass(
@@ -203,6 +224,9 @@ export class DevToolsController {
     }
   }
 
+  /**
+   * This validate fromat of JSON group
+   */
   checkJsonParseError() {
     const affectedGroups = [];
     for (const widget of this.widgets) {
@@ -247,6 +271,9 @@ export class DevToolsController {
     return affectedGroups;
   }
 
+  /**
+   * This loads all available paths of the API to show them in the autocomplete
+   */
   async getAvailableMethods() {
     try {
       const response = await this.genericReq.request('GET', '/api/routes', {});
@@ -256,6 +283,9 @@ export class DevToolsController {
     }
   }
 
+  /**
+   * This set some required settings at init
+   */
   init() {
     this.apiInputBox.setSize('auto', '100%');
     this.apiInputBox.model = [];
@@ -347,6 +377,10 @@ export class DevToolsController {
     });
   }
 
+  /**
+   * This method highlights one of the groups the first time
+   * @param {Boolean} firstTime 
+   */
   calculateWhichGroup(firstTime) {
     try {
       const selection = this.apiInputBox.getCursor();
@@ -378,6 +412,10 @@ export class DevToolsController {
     }
   }
 
+  /**
+   * This perfoms the typed request to API
+   * @param {Boolean} firstTime 
+   */
   async send(firstTime) {
     try {
       this.groups = this.analyzeGroups();

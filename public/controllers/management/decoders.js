@@ -14,6 +14,15 @@ import * as FileSaver from '../../services/file-saver';
 import { colors } from './colors';
 
 export class DecodersController {
+  /**
+   * Class Constructor
+   * @param {*} $scope 
+   * @param {*} $sce 
+   * @param {*} errorHandler 
+   * @param {*} appState 
+   * @param {*} csvReq 
+   * @param {*} wzTableFilter 
+   */
   constructor($scope, $sce, errorHandler, appState, csvReq, wzTableFilter) {
     this.$scope = $scope;
     this.$sce = $sce;
@@ -23,6 +32,9 @@ export class DecodersController {
     this.wzTableFilter = wzTableFilter;
   }
 
+  /**
+ * When controller loads
+ */
   $onInit() {
     this.appliedFilters = [];
 
@@ -45,10 +57,18 @@ export class DecodersController {
     });
   }
 
+  /**
+   * This show us if new filter is already included in filters
+   * @param {String} filterName 
+   */
   includesFilter(filterName) {
     return this.appliedFilters.map(item => item.name).includes(filterName);
   }
 
+  /**
+   * Get a filter given its name
+   * @param {String} filterName 
+   */
   getFilter(filterName) {
     const filtered = this.appliedFilters.filter(
       item => item.name === filterName
@@ -56,6 +76,10 @@ export class DecodersController {
     return filtered.length ? filtered[0].value : '';
   }
 
+  /**
+   * This a the filter given its name 
+   * @param {String} filterName 
+   */
   removeFilter(filterName) {
     this.appliedFilters = this.appliedFilters.filter(
       item => item.name !== filterName
@@ -63,6 +87,10 @@ export class DecodersController {
     return this.$scope.$broadcast('wazuhRemoveFilter', { filterName });
   }
 
+  /**
+   * This set a color to a given regex
+   * @param {String} regex 
+   */
   colorRegex(regex) {
     regex = regex.toString();
     let valuesArray = regex.match(/\(((?!<\/span>).)*?\)(?!<\/span>)/gim);
@@ -76,6 +104,10 @@ export class DecodersController {
     return this.$sce.trustAsHtml(coloredString);
   }
 
+  /**
+   * This set a color to a given order
+   * @param {String} order 
+   */
   colorOrder(order) {
     order = order.toString();
     let valuesArray = order.split(',');
@@ -89,6 +121,10 @@ export class DecodersController {
     return this.$sce.trustAsHtml(coloredString);
   }
 
+  /**
+   * This perfoms a search by a given term
+   * @param {String} term 
+   */
   search(term) {
     if (term && term.startsWith('path:') && term.split('path:')[1].trim()) {
       this.custom_search = '';
@@ -115,6 +151,10 @@ export class DecodersController {
     }
   }
 
+  /**
+   * Return only the parents decoder if type is distinct to all
+   * @param {String} typeFilter 
+   */
   onlyParents(typeFilter) {
     this.appliedFilters = [];
     if (typeFilter === 'all')
@@ -125,6 +165,9 @@ export class DecodersController {
       });
   }
 
+  /**
+ * Get full decoders data on CSV format
+ */
   async downloadCsv() {
     try {
       const path = this.typeFilter === 'parents' ? '/decoders/parents' : '/decoders';

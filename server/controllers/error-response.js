@@ -23,7 +23,7 @@
    * @param {String} message Error message
    * @param {Number} code Error code
    * @param {Number} statusCode Error status code
-   * @returns {Object}
+   * @returns {Object} Error response object
    */
 export function ErrorResponse(
   message = null,

@@ -34,7 +34,7 @@ export class WazuhElasticCtrl {
  * This get the timestamp field
  * @param {Object} req 
  * @param {Object} reply 
- * timestamp field or ErrorResponse
+ * @returns {Object} timestamp field or ErrorResponse
  */
   async getTimeStamp(req, reply) {
     try {
@@ -67,7 +67,7 @@ export class WazuhElasticCtrl {
  * This retrieve a template from Elasticsearch
  * @param {Object} req 
  * @param {Object} reply 
- * template or ErrorResponse
+ * @returns {Object} template or ErrorResponse
  */
   async getTemplate(req, reply) {
     try {
@@ -125,7 +125,7 @@ export class WazuhElasticCtrl {
  * This check index-pattern
  * @param {Object} req 
  * @param {Object} reply 
- * status obj or ErrorResponse
+ * @returns {Object} status obj or ErrorResponse
  */
   async checkPattern(req, reply) {
     try {
@@ -159,7 +159,7 @@ export class WazuhElasticCtrl {
    * This get the fields keys
    * @param {Object} req 
    * @param {Object} reply 
-   * fields or ErrorResponse
+   * @returns {Array<Object>} fields or ErrorResponse
    */
   async getFieldTop(req, reply) {
     try {
@@ -216,7 +216,7 @@ export class WazuhElasticCtrl {
    * This get the elastic setup settings
    * @param {Object} req 
    * @param {Object} reply 
-   * setup info or ErrorResponse
+   * @returns {Object} setup info or ErrorResponse
    */
   async getSetupInfo(req, reply) {
     try {
@@ -242,6 +242,7 @@ export class WazuhElasticCtrl {
    * an index pattern from the list.
    * @param {Array<Object>} list List of index patterns
    * @param {Object} req
+   * @returns {Array<Object>} List of allowed index
    */
   async filterAllowedIndexPatternList(list, req) {
     let finalList = [];
@@ -296,7 +297,7 @@ export class WazuhElasticCtrl {
    * This get the list of index-patterns
    * @param {Object} req 
    * @param {Object} reply 
-   * list of index-patterns or ErrorResponse
+   * @returns {Array<Object>} list of index-patterns or ErrorResponse
    */
   async getlist(req, reply) {
     try {
@@ -459,7 +460,7 @@ export class WazuhElasticCtrl {
    * This creates a visualization of data in req
    * @param {Object} req 
    * @param {Object} reply 
-   * vis obj or ErrorResponse
+   * @returns {Object} vis obj or ErrorResponse
    */
   async createVis(req, reply) {
     try {
@@ -496,7 +497,7 @@ export class WazuhElasticCtrl {
  * This creates a visualization of cluster
  * @param {Object} req 
  * @param {Object} reply 
- * vis obj or ErrorResponse
+ * @returns {Object} vis obj or ErrorResponse
  */
   async createClusterVis(req, reply) {
     try {
@@ -541,7 +542,7 @@ export class WazuhElasticCtrl {
    * Reload elastic index
    * @param {Object} req 
    * @param {Object} reply 
-   * status obj or ErrorResponse
+   * @returns {Object} status obj or ErrorResponse
    */
   async refreshIndex(req, reply) {
     try {

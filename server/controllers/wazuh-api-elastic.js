@@ -31,11 +31,11 @@ export class WazuhApiElasticCtrl {
     this.wzWrapper = new ElasticWrapper(server);
   }
 
-  /* This get all API entries */
   /**
-   * 
+   * This get all API entries
    * @param {Object} req 
    * @param {Object} reply 
+   * API entries or ErrorResponse
    */
   async getAPIEntries(req, reply) {
     try {
@@ -64,11 +64,11 @@ export class WazuhApiElasticCtrl {
     }
   }
 
-  /* This remove an API entry */
   /**
-   * 
+   * This remove an API entry
    * @param {Object} req 
    * @param {Object} reply 
+   * Request response or ErrorResponse
    */
   async deleteAPIEntries(req, reply) {
     try {
@@ -81,11 +81,11 @@ export class WazuhApiElasticCtrl {
     }
   }
 
-  /* This set an API entry as default*/
   /**
-   * 
+   * This set an API entry as default
    * @param {Object} req 
    * @param {Object} reply 
+   * Request response or ErrorResponse
    */
   async setAPIEntryDefault(req, reply) {
     try {
@@ -114,9 +114,8 @@ export class WazuhApiElasticCtrl {
     }
   }
 
-  /* This check if connection and auth on an API is correct */
   /**
-   * 
+   * This check if connection and auth on an API is correct
    * @param {Object} payload 
    */
   validateData(payload) {
@@ -148,9 +147,8 @@ export class WazuhApiElasticCtrl {
     return false;
   }
 
-  /* This build an setting API obect */
   /**
-   * 
+   * This build an setting API obect
    * @param {Object} payload 
    */
   buildSettingsObject(payload) {
@@ -167,11 +165,11 @@ export class WazuhApiElasticCtrl {
     };
   }
 
-  /* This saves a new API entry */
   /**
-   * 
+   * This saves a new API entry
    * @param {Object} req 
    * @param {Object} reply 
+   * Status response or ErrorResponse
    */
   async saveAPI(req, reply) {
     try {
@@ -206,11 +204,11 @@ export class WazuhApiElasticCtrl {
     }
   }
 
-  /* This update an API hostname */
   /**
-   * 
+   * This update an API hostname
    * @param {Object} req 
    * @param {Object} reply 
+   * Status response or ErrorResponse
    */
   async updateAPIHostname(req, reply) {
     try {
@@ -230,11 +228,11 @@ export class WazuhApiElasticCtrl {
     }
   }
 
-  /* This update an API full settings */
   /**
-   * 
+   * This update an API settings into elasticsearch
    * @param {Object} req 
    * @param {Object} reply 
+   * Status response or ErrorResponse
    */
   async updateFullAPI(req, reply) {
     try {

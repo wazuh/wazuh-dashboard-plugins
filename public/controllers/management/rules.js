@@ -24,6 +24,9 @@ export function RulesController(
   apiReq
 ) {
   $scope.appliedFilters = [];
+  /**
+   * This performs a search with a given term
+   */
   $scope.search = term => {
     if (term && term.startsWith('group:') && term.split('group:')[1].trim()) {
       $scope.custom_search = '';
@@ -86,9 +89,17 @@ export function RulesController(
     }
   };
 
+  /**
+ * This show us if new filter is already included in filters
+ * @param {String} filterName 
+ */
   $scope.includesFilter = filterName =>
     $scope.appliedFilters.map(item => item.name).includes(filterName);
 
+  /**
+* Get a filter given its name
+* @param {String} filterName 
+*/
   $scope.getFilter = filterName => {
     const filtered = $scope.appliedFilters.filter(
       item => item.name === filterName
@@ -96,6 +107,10 @@ export function RulesController(
     return filtered.length ? filtered[0].value : '';
   };
 
+  /**
+ * This a the filter given its name 
+ * @param {String} filterName 
+ */
   $scope.removeFilter = filterName => {
     $scope.appliedFilters = $scope.appliedFilters.filter(
       item => item.name !== filterName
@@ -108,6 +123,9 @@ export function RulesController(
   $scope.viewingDetail = false;
   $scope.isArray = Array.isArray;
 
+  /**
+   * This set color to a given rule argument
+   */
   $scope.colorRuleArg = ruleArg => {
     ruleArg = ruleArg.toString();
     let valuesArray = ruleArg.match(/\$\(((?!<\/span>).)*?\)(?!<\/span>)/gim);
@@ -121,10 +139,10 @@ export function RulesController(
         coloredString = coloredString.replace(
           /\$\(((?!<\/span>).)*?\)(?!<\/span>)/im,
           '<span style="color: ' +
-            colors[i] +
-            ' ">' +
-            valuesArray[i] +
-            '</span>'
+          colors[i] +
+          ' ">' +
+          valuesArray[i] +
+          '</span>'
         );
       }
     }
@@ -138,6 +156,9 @@ export function RulesController(
     if (!$scope.$$phase) $scope.$digest();
   });
 
+  /**
+* Get full data on CSV format
+*/
   $scope.downloadCsv = async () => {
     try {
       errorHandler.info('Your download should begin automatically...', 'CSV');
@@ -169,6 +190,7 @@ export function RulesController(
     $scope.closeDetailView();
   };
 
+  //listeners
   $scope.$on('wazuhShowRule', (event, parameters) => {
     $scope.currentRule = parameters.rule;
     $scope.viewingDetail = true;

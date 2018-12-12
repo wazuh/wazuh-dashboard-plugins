@@ -16,6 +16,9 @@ import { uiModules } from 'ui/modules';
 const app = uiModules.get('app/wazuh', []);
 
 class WzMenu {
+  /**
+   * Class constructor
+   */
   constructor() {
     this.template = menuTemplate;
   }
@@ -45,6 +48,9 @@ class WzMenu {
       $window.location.href = path;
     };
 
+    /**
+     * When controller loads
+     */
     const load = async () => {
       try {
         const list = await patternHandler.getPatternList();
@@ -106,6 +112,7 @@ class WzMenu {
       }
     };
 
+    //listeners
     $scope.$on('updateAPI', (evt, params) => {
       const current = appState.getCurrentAPI();
       if (current) {

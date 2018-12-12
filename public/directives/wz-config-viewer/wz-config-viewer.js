@@ -16,6 +16,9 @@ import { uiModules } from 'ui/modules';
 const app = uiModules.get('app/wazuh', []);
 
 class WzConfigViewer {
+  /**
+   * Class constructor
+   */
   constructor() {
     this.restrict = 'E';
     this.scope = {

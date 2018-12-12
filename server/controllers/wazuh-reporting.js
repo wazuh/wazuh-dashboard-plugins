@@ -168,8 +168,8 @@ export class WazuhReportingCtrl {
   }
 
   /**
-   * This performs the rendering of tables
-   * @param {Array<Object>} tables 
+   * This performs the rendering of given tables
+   * @param {Array<Object>} tables tables to render
    */
   renderTables(tables) {
     for (const table of tables) {
@@ -231,7 +231,7 @@ export class WazuhReportingCtrl {
   }
 
   /**
-   * This performs the rendering of time range and filters
+   * This performs the rendering of given time range and filters
    * @param {Number} from Timestamp (ms) from
    * @param {Number} to Timestamp (ms) to
    * @param {String} filters E.g: cluster.name: wazuh AND rule.groups: vulnerability
@@ -294,7 +294,7 @@ export class WazuhReportingCtrl {
   /**
    * This do format to filters
    * @param {String} filters E.g: cluster.name: wazuh AND rule.groups: vulnerability
-   * @param {String} searchBar 
+   * @param {String} searchBar search term
    */
   sanitizeFilters(filters, searchBar) {
     let str = '';
@@ -324,11 +324,11 @@ export class WazuhReportingCtrl {
   }
 
   /**
-   * This performs the rendering of header
-   * @param {String} section 
-   * @param {Object} tab 
-   * @param {Boolean} isAgents 
-   * @param {String} apiId 
+   * This performs the rendering of given header
+   * @param {String} section section target 
+   * @param {Object} tab tab target
+   * @param {Boolean} isAgents is agents section
+   * @param {String} apiId ID of API
    */
   async renderHeader(section, tab, isAgents, apiId) {
     try {
@@ -406,9 +406,9 @@ export class WazuhReportingCtrl {
 
   /**
    * This check if title is suitable
-   * @param {Object} item 
-   * @param {Boolean} isAgents 
-   * @param {Object} tab 
+   * @param {Object} item item of the title
+   * @param {Boolean} isAgents is agents section
+   * @param {Object} tab tab target
    */
   checkTitle(item, isAgents, tab) {
     const title = isAgents
@@ -418,10 +418,10 @@ export class WazuhReportingCtrl {
   }
 
   /**
-   * This performs the rendering of the visualizations
-   * @param {Array<Objecys>} array 
-   * @param {Boolean} isAgents 
-   * @param {Object} tab 
+   * This performs the rendering of given visualizations
+   * @param {Array<Objecys>} array Array of visualizations
+   * @param {Boolean} isAgents is agents section
+   * @param {Object} tab tab target
    */
   renderVisualizations(array, isAgents, tab) {
     const single_vis = array.filter(item => item.width >= 600);
@@ -495,8 +495,8 @@ export class WazuhReportingCtrl {
 
   /**
    * This build the agents table
-   * @param {Array<Strings>} ids 
-   * @param {String} apiId 
+   * @param {Array<Strings>} ids ids of agents
+   * @param {String} apiId API id
    */
   async buildAgentsTable(ids, apiId) {
     if (!ids || !ids.length) return;
@@ -548,15 +548,16 @@ export class WazuhReportingCtrl {
   }
 
   /**
-   * This load more infomration
-   * @param {String} section 
-   * @param {Object} tab 
-   * @param {String} apiId 
+   * This load more information
+   * @param {String} section section target 
+   * @param {Object} tab tab target
+   * @param {String} apiId ID of API
    * @param {Number} from Timestamp (ms) from
    * @param {Number} to Timestamp (ms) to
    * @param {String} filters E.g: cluster.name: wazuh AND rule.groups: vulnerability
    * @param {String} pattern 
-   * @param {Object} agent 
+   * @param {Object} agent agent target
+   * @returns {Object} Extended information
    */
   async extendedInformation(
     section,
@@ -1352,7 +1353,7 @@ export class WazuhReportingCtrl {
    * Builds a PDF report from multiple PNG images
    * @param {Object} req 
    * @param {Object} reply 
-   * pdf or ErrorResponse
+   * @returns {Object} pdf or ErrorResponse
    */
   async report(req, reply) {
     try {
@@ -1462,7 +1463,7 @@ export class WazuhReportingCtrl {
    * Fetch the reports list
    * @param {Object} req 
    * @param {Object} reply 
-   * reports list or ErrorResponse
+   * @returns {Array<Object>}reports list or ErrorResponse
    */
   async getReports(req, reply) {
     try {
@@ -1493,7 +1494,7 @@ export class WazuhReportingCtrl {
  * Fetch specific report
  * @param {Object} req 
  * @param {Object} reply 
- * report or ErrorResponse
+ * @returns {Object} report or ErrorResponse
  */
   async getReportByName(req, reply) {
     try {
@@ -1510,7 +1511,7 @@ export class WazuhReportingCtrl {
  * Delete specific report
  * @param {Object} req 
  * @param {Object} reply 
- * status obj or ErrorResponse
+ * @returns {Object} status obj or ErrorResponse
  */
   async deleteReportByName(req, reply) {
     try {

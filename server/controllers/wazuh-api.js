@@ -40,7 +40,7 @@ export class WazuhApiCtrl {
    * Returns if the wazuh-api configuration is working
    * @param {Object} req 
    * @param {Object} reply 
-   * status obj or ErrorResponse
+   * @returns {Object} status obj or ErrorResponse
    */
   async checkStoredAPI(req, reply) {
     try {
@@ -258,7 +258,7 @@ export class WazuhApiCtrl {
    * This check the wazuh-api configuration received in the POST body will work
    * @param {Object} req 
    * @param {Object} reply 
-   * status obj or ErrorResponse
+   * @returns {Object} status obj or ErrorResponse
    */
   async checkAPI(req, reply) {
     try {
@@ -394,7 +394,7 @@ export class WazuhApiCtrl {
    * This get PCI requirements
    * @param {Object} req 
    * @param {Object} reply 
-   * requirements or ErrorResponse
+   * @returns {Array<Object>} requirements or ErrorResponse
    */
   async getPciRequirement(req, reply) {
     try {
@@ -473,7 +473,7 @@ export class WazuhApiCtrl {
    * This get GDPR Requirements
    * @param {Object} req 
    * @param {Object} reply 
-   * requirements or ErrorResponse
+   * @returns {Array<Object>} requirements or ErrorResponse
    */
   async getGdprRequirement(req, reply) {
     try {
@@ -589,7 +589,7 @@ export class WazuhApiCtrl {
    * @param {Object} data data and params to perform the request
    * @param {String} id API id
    * @param {Object} reply 
-   * API response or ErrorResponse
+   * @returns {Object} API response or ErrorResponse
    */
   async makeRequest(method, path, data, id, reply) {
     try {
@@ -710,7 +710,7 @@ export class WazuhApiCtrl {
    * This make a request to API
    * @param {Object} req 
    * @param {Object} reply 
-   * api response or ErrorResponse
+   * @returns {Object} api response or ErrorResponse
    */
   requestApi(req, reply) {
     const configuration = getConfiguration();
@@ -761,7 +761,7 @@ export class WazuhApiCtrl {
    * 
    * @param {Object} req 
    * @param {Object} reply 
-   * status obj or ErrorResponse
+   * @returns {Object} status obj or ErrorResponse
    */
   async fetchAgents(req, reply) {
     try {
@@ -781,7 +781,7 @@ export class WazuhApiCtrl {
    * Get full data on CSV format from a list Wazuh API endpoint
    * @param {Object} req
    * @param {Object} res
-   * csv or ErrorResponse
+   * @returns {Object} csv or ErrorResponse
    */
   async csv(req, reply) {
     try {
@@ -904,7 +904,7 @@ export class WazuhApiCtrl {
    * Get the each filed unique values of agents
    * @param {Object} req 
    * @param {Object} reply 
-   * unique fileds or ErrorResponse
+   * @returns {Array<Object>} unique fileds or ErrorResponse
    */
   async getAgentsFieldsUniqueCount(req, reply) {
     try {
