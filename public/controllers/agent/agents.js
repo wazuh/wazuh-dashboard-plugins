@@ -33,7 +33,7 @@ export class AgentsController {
    * @param {Object} $location
    * @param {Object} $rootScope
    * @param {Object} appState
-   * @param {Object} apiReq 
+   * @param {Object} apiReq
    * @param {Object} errorHandler
    * @param {Object} tabVisualizations
    * @param {Object} shareAgent
@@ -94,7 +94,7 @@ export class AgentsController {
     if (savedTimefilter) {
       timefilter.setTime(savedTimefilter);
       this.commonData.removeTimefilter();
-    } 
+    }
 
     this.$scope.TabDescription = TabDescription;
 
@@ -134,10 +134,10 @@ export class AgentsController {
     this.$scope.complianceTabs = ['pci', 'gdpr'];
 
     /**
- * This check if given array of items contais a single given item
- * @param {Object} item 
- * @param {Array<Object>} array 
- */
+     * This check if given array of items contais a single given item
+     * @param {Object} item
+     * @param {Array<Object>} array
+     */
     this.$scope.inArray = (item, array) =>
       item && Array.isArray(array) && array.includes(item);
 
@@ -305,7 +305,7 @@ export class AgentsController {
   }
   /**
    * Create metric for given object
-   * @param {*} metricsObject 
+   * @param {*} metricsObject
    */
   createMetrics(metricsObject) {
     for (let key in metricsObject) {
@@ -315,8 +315,8 @@ export class AgentsController {
 
   /**
    * Classify metrics for create the suitable one
-   * @param {*} tab 
-   * @param {*} subtab 
+   * @param {*} tab
+   * @param {*} subtab
    */
   checkMetrics(tab, subtab) {
     if (subtab === 'panels') {
@@ -394,16 +394,15 @@ export class AgentsController {
 
   /**
    * Switch tab
-   * @param {*} tab 
-   * @param {*} force 
+   * @param {*} tab
+   * @param {*} force
    */
   async switchTab(tab, force = false) {
-    
-    if(this.ignoredTabs.includes(tab)) {    
-      this.commonData.setRefreshInterval(timefilter.getRefreshInterval());    
-      timefilter.setRefreshInterval({pause:true,value:0})
-    } else if(this.ignoredTabs.includes(this.$scope.tab)) {
-      timefilter.setRefreshInterval(this.commonData.getRefreshInterval())
+    if (this.ignoredTabs.includes(tab)) {
+      this.commonData.setRefreshInterval(timefilter.getRefreshInterval());
+      timefilter.setRefreshInterval({ pause: true, value: 0 });
+    } else if (this.ignoredTabs.includes(this.$scope.tab)) {
+      timefilter.setRefreshInterval(this.commonData.getRefreshInterval());
     }
 
     try {
@@ -498,7 +497,7 @@ export class AgentsController {
 
   /**
    * Get the needed data for load syscollector
-   * @param {*} id 
+   * @param {*} id
    */
   async loadSyscollector(id) {
     try {
@@ -556,7 +555,7 @@ export class AgentsController {
       this.$scope.syscollector = {
         hardware:
           typeof hardwareResponse === 'object' &&
-            Object.keys(hardwareResponse).length
+          Object.keys(hardwareResponse).length
             ? { ...hardwareResponse }
             : false,
         os:
@@ -583,7 +582,7 @@ export class AgentsController {
 
   /**
    * Get all data from agent
-   * @param {*} newAgentId 
+   * @param {*} newAgentId
    */
   async getAgent(newAgentId) {
     try {
@@ -612,7 +611,9 @@ export class AgentsController {
       if (this.$scope.agent.os) {
         this.$scope.agentOS =
           this.$scope.agent.os.name + ' ' + this.$scope.agent.os.version;
-          this.$scope.agent.isLinuxOS = this.$scope.agent.os.uname.includes('Linux');
+        this.$scope.agent.isLinuxOS = this.$scope.agent.os.uname.includes(
+          'Linux'
+        );
       } else {
         this.$scope.agentOS = 'Unknown';
         this.$scope.agent.isLinuxOS = false;
@@ -647,8 +648,8 @@ export class AgentsController {
 
   /**
    * Navigate to the groups of an agent
-   * @param {*} agent 
-   * @param {*} group 
+   * @param {*} agent
+   * @param {*} group
    */
   goGroups(agent, group) {
     this.visFactoryService.clearAll();
@@ -659,7 +660,7 @@ export class AgentsController {
 
   /**
    * Look for agents that satisfy search term, hidding master
-   * @param {*} searchTerm 
+   * @param {*} searchTerm
    */
   async analyzeAgents(searchTerm) {
     try {
@@ -700,7 +701,6 @@ export class AgentsController {
     }
     return;
   }
-
 
   /**
    * Transform a visualization into an image

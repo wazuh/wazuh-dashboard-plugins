@@ -13,9 +13,9 @@
 export class DataFactory {
   /**
    * Class constructor
-   * @param {*} httpClient 
-   * @param {*} path 
-   * @param {*} implicitFilter 
+   * @param {*} httpClient
+   * @param {*} path
+   * @param {*} implicitFilter
    */
   constructor(httpClient, path, implicitFilter) {
     this.implicitFilter = implicitFilter || false;
@@ -32,7 +32,7 @@ export class DataFactory {
 
   /**
    * Add sort value
-   * @param {String} value 
+   * @param {String} value
    */
   addSorting(value) {
     this.sortValue = value;
@@ -49,7 +49,7 @@ export class DataFactory {
 
   /**
    * Serialize filters
-   * @param {Object} parameters 
+   * @param {Object} parameters
    */
   serializeFilters(parameters) {
     if (this.sortValue) {
@@ -63,8 +63,8 @@ export class DataFactory {
 
   /**
    * Add new filter with a given name and value
-   * @param {String} filterName 
-   * @param {String} value 
+   * @param {String} filterName
+   * @param {String} value
    */
   addFilter(filterName, value) {
     this.filters = this.filters.filter(filter => filter.name !== filterName);
@@ -79,11 +79,11 @@ export class DataFactory {
 
   /**
    * Get data
-   * @param {Object} options 
+   * @param {Object} options
    */
   async fetch(options = {}) {
     try {
-      if(this.busy) return { items: this.items, time: 0 };
+      if (this.busy) return { items: this.items, time: 0 };
       this.busy = true;
       const start = new Date();
 

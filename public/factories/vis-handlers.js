@@ -1,6 +1,6 @@
 /*
  * Wazuh app - Factory to store visualizations handlers
- * 
+ *
  * Copyright (C) 2018 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -22,7 +22,7 @@ export class VisHandlers {
 
   /**
    * Add given item
-   * @param {Object} item 
+   * @param {Object} item
    */
   addItem(item) {
     this.list.push(item);
@@ -37,7 +37,7 @@ export class VisHandlers {
 
   /**
    * Get all applied filters
-   * @param {*} syscollector 
+   * @param {*} syscollector
    */
   getAppliedFilters(syscollector) {
     const appliedFilters = {};

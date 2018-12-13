@@ -18,13 +18,13 @@ import $ from 'jquery';
 export class DevToolsController {
   /**
    * Constructor
-   * @param {*} $scope 
-   * @param {*} apiReq 
-   * @param {*} genericReq 
-   * @param {*} $window 
-   * @param {*} appState 
-   * @param {*} errorHandler 
-   * @param {*} $document 
+   * @param {*} $scope
+   * @param {*} apiReq
+   * @param {*} genericReq
+   * @param {*} $window
+   * @param {*} appState
+   * @param {*} errorHandler
+   * @param {*} $document
    */
   constructor(
     $scope,
@@ -118,7 +118,7 @@ export class DevToolsController {
   }
 
   /**
-   * Detect de groups of instructions 
+   * Detect de groups of instructions
    */
   analyzeGroups() {
     try {
@@ -190,7 +190,7 @@ export class DevToolsController {
 
   /**
    * This seta group as active, and highlight it
-   * @param {Object} group 
+   * @param {Object} group
    */
   highlightGroup(group) {
     for (const line of this.linesWithClass) {
@@ -379,7 +379,7 @@ export class DevToolsController {
 
   /**
    * This method highlights one of the groups the first time
-   * @param {Boolean} firstTime 
+   * @param {Boolean} firstTime
    */
   calculateWhichGroup(firstTime) {
     try {
@@ -414,7 +414,7 @@ export class DevToolsController {
 
   /**
    * This perfoms the typed request to API
-   * @param {Boolean} firstTime 
+   * @param {Boolean} firstTime
    */
   async send(firstTime) {
     try {

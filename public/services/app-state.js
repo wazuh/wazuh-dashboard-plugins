@@ -12,15 +12,15 @@
 export class AppState {
   /**
    * Class constructor
-   * @param {*} $cookies 
-   * @param {*} $window 
+   * @param {*} $cookies
+   * @param {*} $window
    */
   constructor($cookies, $window) {
     this.$cookies = $cookies;
     this.$window = $window;
   }
 
-  //Extensions setters and getters 
+  //Extensions setters and getters
   getExtensions(id) {
     const current = this.$cookies.getObject('extensions');
     return current ? current[id] : false;
@@ -36,8 +36,7 @@ export class AppState {
     }
   }
 
-
-  //Cluster setters and getters 
+  //Cluster setters and getters
   getClusterInfo() {
     return this.$cookies.getObject('_clusterInfo');
   }
@@ -54,7 +53,7 @@ export class AppState {
     }
   }
 
-  //CreatedAt setters and getters 
+  //CreatedAt setters and getters
 
   setCreatedAt(date) {
     const exp = new Date();
@@ -70,7 +69,7 @@ export class AppState {
     return this.$cookies.remove('_createdAt');
   }
 
-  //Current api setters and getters 
+  //Current api setters and getters
 
   getCurrentAPI() {
     return this.$cookies.getObject('API');
@@ -88,7 +87,7 @@ export class AppState {
     }
   }
 
-  //Patterns setters and getters 
+  //Patterns setters and getters
   getPatternSelector() {
     return this.$cookies.getObject('patternSelector');
   }
@@ -113,7 +112,7 @@ export class AppState {
     return this.$cookies.remove('_currentPattern');
   }
 
-  //Dev tools setters and getters 
+  //Dev tools setters and getters
 
   setCurrentDevTools(current) {
     this.$window.localStorage.setItem('currentDevTools', current);
@@ -123,7 +122,7 @@ export class AppState {
     return this.$window.localStorage.getItem('currentDevTools');
   }
 
-  //Session storage setters and getters 
+  //Session storage setters and getters
   setSessionStorageItem(key, value) {
     this.$window.sessionStorage.setItem(key, value);
   }

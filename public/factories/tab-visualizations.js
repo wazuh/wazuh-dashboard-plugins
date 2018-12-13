@@ -53,7 +53,7 @@ export class TabVisualizations {
 
   /**
    * Set given tab as current
-   * @param {Object} tab 
+   * @param {Object} tab
    */
   setTab(tab) {
     this.currentTab = tab;
@@ -68,7 +68,7 @@ export class TabVisualizations {
 
   /**
    * Get given item
-   * @param {String} item 
+   * @param {String} item
    */
   getItem(item) {
     return this.tabVisualizations[item];
@@ -76,7 +76,7 @@ export class TabVisualizations {
 
   /**
    * Assign tab visualization with given tabs
-   * @param {Object} tabs 
+   * @param {Object} tabs
    */
   assign(tabs) {
     if (typeof tabs === 'object') {

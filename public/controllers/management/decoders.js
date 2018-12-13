@@ -16,12 +16,12 @@ import { colors } from './colors';
 export class DecodersController {
   /**
    * Class Constructor
-   * @param {*} $scope 
-   * @param {*} $sce 
-   * @param {*} errorHandler 
-   * @param {*} appState 
-   * @param {*} csvReq 
-   * @param {*} wzTableFilter 
+   * @param {*} $scope
+   * @param {*} $sce
+   * @param {*} errorHandler
+   * @param {*} appState
+   * @param {*} csvReq
+   * @param {*} wzTableFilter
    */
   constructor($scope, $sce, errorHandler, appState, csvReq, wzTableFilter) {
     this.$scope = $scope;
@@ -33,8 +33,8 @@ export class DecodersController {
   }
 
   /**
- * When controller loads
- */
+   * When controller loads
+   */
   $onInit() {
     this.appliedFilters = [];
 
@@ -59,7 +59,7 @@ export class DecodersController {
 
   /**
    * This show us if new filter is already included in filters
-   * @param {String} filterName 
+   * @param {String} filterName
    */
   includesFilter(filterName) {
     return this.appliedFilters.map(item => item.name).includes(filterName);
@@ -67,7 +67,7 @@ export class DecodersController {
 
   /**
    * Get a filter given its name
-   * @param {String} filterName 
+   * @param {String} filterName
    */
   getFilter(filterName) {
     const filtered = this.appliedFilters.filter(
@@ -77,8 +77,8 @@ export class DecodersController {
   }
 
   /**
-   * This a the filter given its name 
-   * @param {String} filterName 
+   * This a the filter given its name
+   * @param {String} filterName
    */
   removeFilter(filterName) {
     this.appliedFilters = this.appliedFilters.filter(
@@ -89,7 +89,7 @@ export class DecodersController {
 
   /**
    * This set a color to a given regex
-   * @param {String} regex 
+   * @param {String} regex
    */
   colorRegex(regex) {
     regex = regex.toString();
@@ -106,7 +106,7 @@ export class DecodersController {
 
   /**
    * This set a color to a given order
-   * @param {String} order 
+   * @param {String} order
    */
   colorOrder(order) {
     order = order.toString();
@@ -123,7 +123,7 @@ export class DecodersController {
 
   /**
    * This perfoms a search by a given term
-   * @param {String} term 
+   * @param {String} term
    */
   search(term) {
     if (term && term.startsWith('path:') && term.split('path:')[1].trim()) {
@@ -153,7 +153,7 @@ export class DecodersController {
 
   /**
    * Return only the parents decoder if type is distinct to all
-   * @param {String} typeFilter 
+   * @param {String} typeFilter
    */
   onlyParents(typeFilter) {
     this.appliedFilters = [];
@@ -166,11 +166,12 @@ export class DecodersController {
   }
 
   /**
- * Get full decoders data on CSV format
- */
+   * Get full decoders data on CSV format
+   */
   async downloadCsv() {
     try {
-      const path = this.typeFilter === 'parents' ? '/decoders/parents' : '/decoders';
+      const path =
+        this.typeFilter === 'parents' ? '/decoders/parents' : '/decoders';
       const currentApi = JSON.parse(this.appState.getCurrentAPI()).id;
       const output = await this.csvReq.fetch(
         path,

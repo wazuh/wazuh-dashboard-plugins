@@ -318,8 +318,8 @@
         var combinator = cc.length
           ? cc.pop()
           : jsonMode
-            ? expression
-            : statement;
+          ? expression
+          : statement;
         if (combinator(type, content)) {
           while (cc.length && cc[cc.length - 1].lex) cc.pop()();
           if (cx.marked) return cx.marked;

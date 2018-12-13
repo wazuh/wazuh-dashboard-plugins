@@ -24,17 +24,17 @@ const portRegEx = new RegExp(/^[0-9]{2,5}$/);
 
 export class WazuhApiElasticCtrl {
   /**
- * Constructor
- * @param {*} server
- */
+   * Constructor
+   * @param {*} server
+   */
   constructor(server) {
     this.wzWrapper = new ElasticWrapper(server);
   }
 
   /**
    * This get all API entries
-   * @param {Object} req 
-   * @param {Object} reply 
+   * @param {Object} req
+   * @param {Object} reply
    * API entries or ErrorResponse
    */
   async getAPIEntries(req, reply) {
@@ -66,8 +66,8 @@ export class WazuhApiElasticCtrl {
 
   /**
    * This remove an API entry
-   * @param {Object} req 
-   * @param {Object} reply 
+   * @param {Object} req
+   * @param {Object} reply
    * Request response or ErrorResponse
    */
   async deleteAPIEntries(req, reply) {
@@ -83,7 +83,7 @@ export class WazuhApiElasticCtrl {
 
   /**
    * This check if connection and auth on an API is correct
-   * @param {Object} payload 
+   * @param {Object} payload
    */
   validateData(payload) {
     // Validate user
@@ -116,7 +116,7 @@ export class WazuhApiElasticCtrl {
 
   /**
    * This build an setting API obect
-   * @param {Object} payload 
+   * @param {Object} payload
    */
   buildSettingsObject(payload) {
     return {
@@ -134,8 +134,8 @@ export class WazuhApiElasticCtrl {
 
   /**
    * This saves a new API entry
-   * @param {Object} req 
-   * @param {Object} reply 
+   * @param {Object} req
+   * @param {Object} reply
    * Status response or ErrorResponse
    */
   async saveAPI(req, reply) {
@@ -173,8 +173,8 @@ export class WazuhApiElasticCtrl {
 
   /**
    * This update an API hostname
-   * @param {Object} req 
-   * @param {Object} reply 
+   * @param {Object} req
+   * @param {Object} reply
    * Status response or ErrorResponse
    */
   async updateAPIHostname(req, reply) {
@@ -197,8 +197,8 @@ export class WazuhApiElasticCtrl {
 
   /**
    * This update an API settings into elasticsearch
-   * @param {Object} req 
-   * @param {Object} reply 
+   * @param {Object} req
+   * @param {Object} reply
    * Status response or ErrorResponse
    */
   async updateFullAPI(req, reply) {
@@ -217,7 +217,9 @@ export class WazuhApiElasticCtrl {
 
       const settings = this.buildSettingsObject(req.payload);
 
-      await this.wzWrapper.updateWazuhIndexDocument(req, req.payload.id, { doc: settings });
+      await this.wzWrapper.updateWazuhIndexDocument(req, req.payload.id, {
+        doc: settings
+      });
 
       return reply({ statusCode: 200, message: 'ok' });
     } catch (error) {

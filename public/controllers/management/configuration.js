@@ -14,11 +14,11 @@ import { ConfigurationHandler } from '../../utils/config-handler';
 export class ConfigurationController {
   /**
    * Constructor
-   * @param {*} $scope 
-   * @param {*} $location 
-   * @param {*} errorHandler 
-   * @param {*} apiReq 
-   * @param {*} appState 
+   * @param {*} $scope
+   * @param {*} $location
+   * @param {*} errorHandler
+   * @param {*} apiReq
+   * @param {*} appState
    */
   constructor($scope, $location, errorHandler, apiReq, appState) {
     this.$scope = $scope;
@@ -45,12 +45,22 @@ export class ConfigurationController {
     this.$scope.isString = item => typeof item === 'string';
     this.$scope.hasSize = obj =>
       obj && typeof obj === 'object' && Object.keys(obj).length;
-    this.$scope.switchConfigTab = (configurationTab, sections, navigate = true) => {
+    this.$scope.switchConfigTab = (
+      configurationTab,
+      sections,
+      navigate = true
+    ) => {
       this.$scope.navigate = navigate;
       try {
-        this.$scope.configSubTab = JSON.stringify({ 'configurationTab': configurationTab, 'sections': sections });
+        this.$scope.configSubTab = JSON.stringify({
+          configurationTab: configurationTab,
+          sections: sections
+        });
         if (!this.$location.search().configSubTab) {
-          this.appState.setSessionStorageItem('configSubTab', this.$scope.configSubTab);
+          this.appState.setSessionStorageItem(
+            'configSubTab',
+            this.$scope.configSubTab
+          );
           this.$location.search('configSubTab', true);
         }
       } catch (error) {
@@ -60,7 +70,7 @@ export class ConfigurationController {
         configurationTab,
         sections,
         this.$scope
-      )
+      );
     };
 
     /**
@@ -73,7 +83,7 @@ export class ConfigurationController {
         this.$location.search('configWodle', this.$scope.configWodle);
       }
       this.configurationHandler.switchWodle(wodleName, this.$scope);
-    }
+    };
 
     /**
      * Navigate to configuration
@@ -83,14 +93,18 @@ export class ConfigurationController {
       this.configurationHandler.switchConfigurationTab(
         configurationTab,
         this.$scope
-      )
+      );
       if (!this.$scope.navigate) {
         let configSubTab = this.$location.search().configSubTab;
         if (configSubTab) {
           try {
             const config = this.appState.getSessionStorageItem('configSubTab');
             const configSubTabObj = JSON.parse(config);
-            this.$scope.switchConfigTab(configSubTabObj.configurationTab, configSubTabObj.sections, false);
+            this.$scope.switchConfigTab(
+              configSubTabObj.configurationTab,
+              configSubTabObj.sections,
+              false
+            );
           } catch (error) {
             this.errorHandler.handle(error, 'Get configuration path');
           }
@@ -119,6 +133,8 @@ export class ConfigurationController {
     this.$scope.getIntegration = list =>
       this.configurationHandler.getIntegration(list, this.$scope);
 
-    this.$scope.$on('$routeChangeStart', () => this.appState.removeSessionStorageItem('configSubTab'));
+    this.$scope.$on('$routeChangeStart', () =>
+      this.appState.removeSessionStorageItem('configSubTab')
+    );
   }
 }

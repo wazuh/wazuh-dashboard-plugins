@@ -26,7 +26,7 @@ import { checkGap } from './lib/check-gap';
 
 const app = uiModules.get('app/wazuh', []);
 
-app.directive('wzTable', function () {
+app.directive('wzTable', function() {
   return {
     restrict: 'E',
     scope: {
@@ -77,7 +77,9 @@ app.directive('wzTable', function () {
         doit = setTimeout(() => {
           $scope.rowsPerPage = calcTableRows($window.innerHeight, rowSizes);
           $scope.itemsPerPage = $scope.rowsPerPage;
-          init().then(() => resizing = false).catch(() => resizing = false);
+          init()
+            .then(() => (resizing = false))
+            .catch(() => (resizing = false));
         }, 150);
       };
       $scope.rowsPerPage = calcTableRows($window.innerHeight, rowSizes);
@@ -132,8 +134,8 @@ app.directive('wzTable', function () {
         );
 
       /**
-       * This filter table with a given filter 
-       * @param {Object} filter 
+       * This filter table with a given filter
+       * @param {Object} filter
        */
       const filter = async filter =>
         filterData(
@@ -145,9 +147,9 @@ app.directive('wzTable', function () {
           errorHandler
         );
 
-       /**
-       * This filter table with using a q search 
-       * @param {Object} filter 
+      /**
+       * This filter table with using a q search
+       * @param {Object} filter
        */
       const query = async (query, search) =>
         queryData(
@@ -160,9 +162,9 @@ app.directive('wzTable', function () {
           errorHandler
         );
 
-        /**
-         * This refresh data every second
-         */
+      /**
+       * This refresh data every second
+       */
       const realTimeFunction = async () => {
         try {
           $scope.error = false;
@@ -215,7 +217,7 @@ app.directive('wzTable', function () {
       $scope.prevPage = () => pagination.prevPage($scope);
       $scope.nextPage = async currentPage =>
         pagination.nextPage(currentPage, $scope, errorHandler, fetch);
-      $scope.setPage = function () {
+      $scope.setPage = function() {
         $scope.currentPage = this.n;
         $scope.nextPage(this.n);
       };

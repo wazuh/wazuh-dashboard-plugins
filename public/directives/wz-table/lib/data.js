@@ -64,10 +64,10 @@ export async function filterData(
     $scope.wazuh_table_loading = false;
     $scope.error = `Error filtering by ${
       filter ? filter.value : 'undefined'
-      } - ${error.message || error}.`;
+    } - ${error.message || error}.`;
     errorHandler.handle(
       `Error filtering by ${
-      filter ? filter.value : 'undefined'
+        filter ? filter.value : 'undefined'
       }. ${error.message || error}`,
       'Data factory'
     );
@@ -102,11 +102,10 @@ export async function queryData(
     $scope.wazuh_table_loading = false;
     $scope.error = `Query error ${
       query ? query.value : 'undefined'
-      } - ${error.message || error}.`;
+    } - ${error.message || error}.`;
     errorHandler.handle(
-      `Query error ${
-      query ? query.value : 'undefined'
-      }. ${error.message || error}`,
+      `Query error ${query ? query.value : 'undefined'}. ${error.message ||
+        error}`,
       'Data factory'
     );
   }

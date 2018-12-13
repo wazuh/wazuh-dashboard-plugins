@@ -68,8 +68,8 @@ export function Initialize(server) {
   const checkKnownFields = async () => {
     try {
       const usingCredentials = await wzWrapper.usingCredentials();
-      const msg = `x-pack security enabled: ${usingCredentials ? 'yes' : 'no' }`
-      
+      const msg = `x-pack security enabled: ${usingCredentials ? 'yes' : 'no'}`;
+
       log('[initialize][checkKnownFields]', msg, 'info');
       server.log([blueWazuh, 'initialize', 'info'], msg);
 

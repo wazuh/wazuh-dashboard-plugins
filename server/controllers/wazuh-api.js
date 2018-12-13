@@ -24,13 +24,13 @@ import { getConfiguration } from '../lib/get-configuration';
 import { log } from '../logger';
 import { KeyEquivalenece } from '../../util/csv-key-equivalence';
 import { cleanKeys } from '../../util/remove-key';
-import { apiRequestList } from '../../util/api-request-list'
+import { apiRequestList } from '../../util/api-request-list';
 
 export class WazuhApiCtrl {
   /**
- * Constructor
- * @param {*} server
- */
+   * Constructor
+   * @param {*} server
+   */
   constructor(server) {
     this.wzWrapper = new ElasticWrapper(server);
     this.fetchAgentsExternal = Monitoring(server, { disableCron: true });
@@ -38,8 +38,8 @@ export class WazuhApiCtrl {
 
   /**
    * Returns if the wazuh-api configuration is working
-   * @param {Object} req 
-   * @param {Object} reply 
+   * @param {Object} req
+   * @param {Object} reply
    * @returns {Object} status obj or ErrorResponse
    */
   async checkStoredAPI(req, reply) {
@@ -213,7 +213,7 @@ export class WazuhApiCtrl {
                   req.idChanged = api._id;
                   return this.checkStoredAPI(req, reply);
                 }
-              } catch (error) { } // eslint-disable-line
+              } catch (error) {} // eslint-disable-line
             }
           } catch (error) {
             log('POST /api/check-stored-api', error.message || error);
@@ -256,8 +256,8 @@ export class WazuhApiCtrl {
 
   /**
    * This check the wazuh-api configuration received in the POST body will work
-   * @param {Object} req 
-   * @param {Object} reply 
+   * @param {Object} req
+   * @param {Object} reply
    * @returns {Object} status obj or ErrorResponse
    */
   async checkAPI(req, reply) {
@@ -392,8 +392,8 @@ export class WazuhApiCtrl {
 
   /**
    * This get PCI requirements
-   * @param {Object} req 
-   * @param {Object} reply 
+   * @param {Object} req
+   * @param {Object} reply
    * @returns {Array<Object>} requirements or ErrorResponse
    */
   async getPciRequirement(req, reply) {
@@ -471,8 +471,8 @@ export class WazuhApiCtrl {
 
   /**
    * This get GDPR Requirements
-   * @param {Object} req 
-   * @param {Object} reply 
+   * @param {Object} req
+   * @param {Object} reply
    * @returns {Array<Object>} requirements or ErrorResponse
    */
   async getGdprRequirement(req, reply) {
@@ -588,7 +588,7 @@ export class WazuhApiCtrl {
    * @param {String} path API route
    * @param {Object} data data and params to perform the request
    * @param {String} id API id
-   * @param {Object} reply 
+   * @param {Object} reply
    * @returns {Object} API response or ErrorResponse
    */
   async makeRequest(method, path, data, id, reply) {
@@ -635,9 +635,9 @@ export class WazuhApiCtrl {
       }
 
       throw response &&
-        response.body &&
-        response.body.error &&
-        response.body.message
+      response.body &&
+      response.body.error &&
+      response.body.message
         ? { message: response.body.message, code: response.body.error }
         : new Error('Unexpected error fetching data from the Wazuh API');
     } catch (error) {
@@ -696,9 +696,9 @@ export class WazuhApiCtrl {
       }
 
       throw response &&
-        response.body &&
-        response.body.error &&
-        response.body.message
+      response.body &&
+      response.body.error &&
+      response.body.message
         ? { message: response.body.message, code: response.body.error }
         : new Error('Unexpected error fetching data from the Wazuh API');
     } catch (error) {
@@ -708,13 +708,17 @@ export class WazuhApiCtrl {
 
   /**
    * This make a request to API
-   * @param {Object} req 
-   * @param {Object} reply 
+   * @param {Object} req
+   * @param {Object} reply
    * @returns {Object} api response or ErrorResponse
    */
   requestApi(req, reply) {
     const configuration = getConfiguration();
-    const adminMode = !(configuration && typeof configuration.admin !== 'undefined' && !configuration.admin);
+    const adminMode = !(
+      configuration &&
+      typeof configuration.admin !== 'undefined' &&
+      !configuration.admin
+    );
 
     if (!req.payload.method) {
       return ErrorResponse('Missing param: method', 3015, 400, reply);
@@ -758,9 +762,9 @@ export class WazuhApiCtrl {
 
   // Fetch agent status and insert it directly on demand
   /**
-   * 
-   * @param {Object} req 
-   * @param {Object} reply 
+   *
+   * @param {Object} req
+   * @param {Object} reply
    * @returns {Object} status obj or ErrorResponse
    */
   async fetchAgents(req, reply) {
@@ -861,18 +865,18 @@ export class WazuhApiCtrl {
       ) {
         const fields = req.payload.path.includes('/agents')
           ? [
-            'id',
-            'status',
-            'name',
-            'ip',
-            'group',
-            'manager',
-            'node_name',
-            'dateAdd',
-            'version',
-            'lastKeepAlive',
-            'os'
-          ]
+              'id',
+              'status',
+              'name',
+              'ip',
+              'group',
+              'manager',
+              'node_name',
+              'dateAdd',
+              'version',
+              'lastKeepAlive',
+              'os'
+            ]
           : Object.keys(output.body.data.items[0]);
 
         const json2csvParser = new Parser({ fields });
@@ -902,8 +906,8 @@ export class WazuhApiCtrl {
 
   /**
    * Get the each filed unique values of agents
-   * @param {Object} req 
-   * @param {Object} reply 
+   * @param {Object} req
+   * @param {Object} reply
    * @returns {Array<Object>} unique fileds or ErrorResponse
    */
   async getAgentsFieldsUniqueCount(req, reply) {
@@ -968,11 +972,10 @@ export class WazuhApiCtrl {
         )
       ]);
 
-      const parsedResponses = data.map(
-        item =>
-          item && item.body && item.body.data && !item.body.error
-            ? item.body.data
-            : false
+      const parsedResponses = data.map(item =>
+        item && item.body && item.body.data && !item.body.error
+          ? item.body.data
+          : false
       );
 
       const [

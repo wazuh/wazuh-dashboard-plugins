@@ -14,10 +14,10 @@ import chrome from 'ui/chrome';
 export class GenericRequest {
   /**
    * Class constructor
-   * @param {*} $q 
-   * @param {*} $http 
-   * @param {*} appState 
-   * @param {*} wazuhConfig 
+   * @param {*} $q
+   * @param {*} $http
+   * @param {*} appState
+   * @param {*} wazuhConfig
    */
   constructor($q, $http, appState, wazuhConfig) {
     this.$q = $q;

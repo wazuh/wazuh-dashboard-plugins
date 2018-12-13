@@ -12,15 +12,15 @@
 export class VisFactoryService {
   /**
    * Class Constructor
-   * @param {*} $rootScope 
-   * @param {*} appState 
-   * @param {*} genericReq 
-   * @param {*} discoverPendingUpdates 
-   * @param {*} rawVisualizations 
-   * @param {*} tabVisualizations 
-   * @param {*} loadedVisualizations 
-   * @param {*} commonData 
-   * @param {*} visHandlers 
+   * @param {*} $rootScope
+   * @param {*} appState
+   * @param {*} genericReq
+   * @param {*} discoverPendingUpdates
+   * @param {*} rawVisualizations
+   * @param {*} tabVisualizations
+   * @param {*} loadedVisualizations
+   * @param {*} commonData
+   * @param {*} visHandlers
    */
   constructor(
     $rootScope,
@@ -46,7 +46,7 @@ export class VisFactoryService {
 
   /**
    * Remove visualizations data
-   * @param {Boolean} onlyAgent 
+   * @param {Boolean} onlyAgent
    */
   clear(onlyAgent = false) {
     if (!onlyAgent) this.visHandlers.removeAll();
@@ -56,9 +56,9 @@ export class VisFactoryService {
   }
 
   /**
- * Remove all visualizations data
- * @param {Boolean} onlyAgent 
- */
+   * Remove all visualizations data
+   * @param {Boolean} onlyAgent
+   */
   clearAll() {
     this.clear();
     this.tabVisualizations.removeAll();
@@ -66,10 +66,10 @@ export class VisFactoryService {
 
   /**
    * Build the overview section visualizations
-   * @param {*} filterHandler 
-   * @param {*} tab 
-   * @param {*} subtab 
-   * @param {*} localChange 
+   * @param {*} filterHandler
+   * @param {*} tab
+   * @param {*} subtab
+   * @param {*} localChange
    */
   async buildOverviewVisualizations(filterHandler, tab, subtab, localChange) {
     try {
@@ -89,11 +89,11 @@ export class VisFactoryService {
 
   /**
    * BUild the agents section visualizations
-   * @param {*} filterHandler 
-   * @param {*} tab 
-   * @param {*} subtab 
-   * @param {*} localChange 
-   * @param {*} id 
+   * @param {*} filterHandler
+   * @param {*} tab
+   * @param {*} subtab
+   * @param {*} localChange
+   * @param {*} id
    */
   async buildAgentsVisualizations(filterHandler, tab, subtab, localChange, id) {
     try {

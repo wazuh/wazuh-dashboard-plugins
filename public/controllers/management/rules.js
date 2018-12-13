@@ -90,16 +90,16 @@ export function RulesController(
   };
 
   /**
- * This show us if new filter is already included in filters
- * @param {String} filterName 
- */
+   * This show us if new filter is already included in filters
+   * @param {String} filterName
+   */
   $scope.includesFilter = filterName =>
     $scope.appliedFilters.map(item => item.name).includes(filterName);
 
   /**
-* Get a filter given its name
-* @param {String} filterName 
-*/
+   * Get a filter given its name
+   * @param {String} filterName
+   */
   $scope.getFilter = filterName => {
     const filtered = $scope.appliedFilters.filter(
       item => item.name === filterName
@@ -108,9 +108,9 @@ export function RulesController(
   };
 
   /**
- * This a the filter given its name 
- * @param {String} filterName 
- */
+   * This a the filter given its name
+   * @param {String} filterName
+   */
   $scope.removeFilter = filterName => {
     $scope.appliedFilters = $scope.appliedFilters.filter(
       item => item.name !== filterName
@@ -139,10 +139,10 @@ export function RulesController(
         coloredString = coloredString.replace(
           /\$\(((?!<\/span>).)*?\)(?!<\/span>)/im,
           '<span style="color: ' +
-          colors[i] +
-          ' ">' +
-          valuesArray[i] +
-          '</span>'
+            colors[i] +
+            ' ">' +
+            valuesArray[i] +
+            '</span>'
         );
       }
     }
@@ -157,8 +157,8 @@ export function RulesController(
   });
 
   /**
-* Get full data on CSV format
-*/
+   * Get full data on CSV format
+   */
   $scope.downloadCsv = async () => {
     try {
       errorHandler.info('Your download should begin automatically...', 'CSV');

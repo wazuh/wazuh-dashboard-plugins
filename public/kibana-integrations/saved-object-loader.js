@@ -3,7 +3,14 @@ import { Scanner } from 'ui/utils/scanner';
 import { StringUtils } from 'ui/utils/string_utils';
 
 export class SavedObjectLoader {
-  constructor(SavedObjectClass, kbnIndex, kbnUrl, $http, chrome, savedObjectsClient) {
+  constructor(
+    SavedObjectClass,
+    kbnIndex,
+    kbnUrl,
+    $http,
+    chrome,
+    savedObjectsClient
+  ) {
     this.type = SavedObjectClass.type;
     this.Class = SavedObjectClass;
     this.lowercaseType = this.type.toLowerCase();

@@ -95,5 +95,4 @@ export function WazuhApiRoutes(server) {
       return ctrl.getRequestList(req, res);
     }
   });
-
 }

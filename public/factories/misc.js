@@ -1,6 +1,6 @@
 /*
  * Wazuh app - Factory to share common variables between controllers
- * 
+ *
  * Copyright (C) 2018 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -25,22 +25,22 @@ export class WzMisc {
 
   /**
    * Set if api is down
-   * @param {String} value 
+   * @param {String} value
    */
   setApiIsDown(value) {
     this.state.apiIsDown = value;
   }
 
   /**
- * Get if api is down
- */
+   * Get if api is down
+   */
   getApiIsDown() {
     return this.state.apiIsDown;
   }
 
   /**
    * Set wizard
-   * @param {String} value 
+   * @param {String} value
    */
   setWizard(value) {
     this.state.comeFromWizard = value;
@@ -54,9 +54,9 @@ export class WzMisc {
   }
 
   /**
- * Set blank screen
- * @param {String} value 
- */
+   * Set blank screen
+   * @param {String} value
+   */
   setBlankScr(value) {
     this.state.blankScreenError = value;
   }
@@ -69,9 +69,9 @@ export class WzMisc {
   }
 
   /**
-* Set last restart
-* @param {String} value 
-*/
+   * Set last restart
+   * @param {String} value
+   */
   setLastRestart(value) {
     this.state.lastRestart = value;
   }

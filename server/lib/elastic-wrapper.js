@@ -597,20 +597,19 @@ export class ElasticWrapper {
     try {
       if (!id || !doc) throw new Error('No valid parameters given');
 
-      const data = 
-      req ?
-      await this.elasticRequest.callWithRequest(req, 'update', {
-        index: '.wazuh',
-        type: 'wazuh-configuration',
-        id: id,
-        body: doc
-      }) :
-      await this.elasticRequest.callWithInternalUser('update', {
-        index: '.wazuh',
-        type: 'wazuh-configuration',
-        id: id,
-        body: doc
-      });
+      const data = req
+        ? await this.elasticRequest.callWithRequest(req, 'update', {
+            index: '.wazuh',
+            type: 'wazuh-configuration',
+            id: id,
+            body: doc
+          })
+        : await this.elasticRequest.callWithInternalUser('update', {
+            index: '.wazuh',
+            type: 'wazuh-configuration',
+            id: id,
+            body: doc
+          });
 
       return data;
     } catch (error) {

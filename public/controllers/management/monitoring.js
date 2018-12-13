@@ -28,7 +28,7 @@ export function ClusterController(
   appState,
   genericReq
 ) {
-  timefilter.setRefreshInterval({ pause: true, value: 0 })
+  timefilter.setRefreshInterval({ pause: true, value: 0 });
   $scope.search = term => {
     $scope.$broadcast('wazuhSearch', { term });
   };
@@ -58,7 +58,7 @@ export function ClusterController(
 
   /**
    * This set default boolean flags for a given component
-   * @param {String} component 
+   * @param {String} component
    */
   const setBooleans = component => {
     $scope.showConfig = component === 'showConfig';
@@ -86,8 +86,8 @@ export function ClusterController(
   };
 
   /**
- * This navigates to nodes
- */
+   * This navigates to nodes
+   */
   $scope.goNodes = () => {
     setBooleans('showNodes');
     tabVisualizations.assign({
@@ -98,8 +98,8 @@ export function ClusterController(
   };
 
   /**
- * This navigates back
- */
+   * This navigates back
+   */
   $scope.goBack = () => {
     setBooleans(null);
     tabVisualizations.assign({
@@ -198,7 +198,7 @@ export function ClusterController(
   let filters = [];
   /**
    * This creatie custom filters for visualizations for a given node
-   * @param {Object} node 
+   * @param {Object} node
    */
   const assignFilters = (node = false) => {
     try {
@@ -249,8 +249,8 @@ export function ClusterController(
         apiReq.request('GET', '/cluster/healthcheck', {})
       ]);
 
-      const result = data.map(
-        item => (item && item.data && item.data.data ? item.data.data : false)
+      const result = data.map(item =>
+        item && item.data && item.data.data ? item.data.data : false
       );
 
       const [
@@ -290,7 +290,6 @@ export function ClusterController(
   };
 
   if (clusterEnabled) load();
-
 
   //listeners
   $scope.$on('$destroy', () => {

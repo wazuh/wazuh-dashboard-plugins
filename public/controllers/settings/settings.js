@@ -16,15 +16,15 @@ import { configEquivalences } from '../../utils/config-equivalences';
 export class SettingsController {
   /**
    * Class constructor
-   * @param {*} $scope 
-   * @param {*} $window 
-   * @param {*} $location 
-   * @param {*} testAPI 
-   * @param {*} appState 
-   * @param {*} genericReq 
-   * @param {*} errorHandler 
-   * @param {*} wzMisc 
-   * @param {*} wazuhConfig 
+   * @param {*} $scope
+   * @param {*} $window
+   * @param {*} $location
+   * @param {*} testAPI
+   * @param {*} appState
+   * @param {*} genericReq
+   * @param {*} errorHandler
+   * @param {*} wzMisc
+   * @param {*} wazuhConfig
    */
   constructor(
     $scope,
@@ -96,7 +96,7 @@ export class SettingsController {
 
   /**
    * This switch to a selected tab
-   * @param {Object} tab 
+   * @param {Object} tab
    */
   switchTab(tab) {
     this.tab = tab;
@@ -105,7 +105,7 @@ export class SettingsController {
 
   /**
    * Remove a Wazuh API entry
-   * @param {*} item 
+   * @param {*} item
    */
   async removeManager(item) {
     try {
@@ -149,8 +149,8 @@ export class SettingsController {
 
   /**
    * This sort by timestamp two given objects
-   * @param {Object} a 
-   * @param {Object} b 
+   * @param {Object} a
+   * @param {Object} b
    */
   sortByTimestamp(a, b) {
     const intA = parseInt(a._id);
@@ -187,7 +187,7 @@ export class SettingsController {
 
     this.errorHandler.info(
       `API ${
-      this.apiEntries[index]._source.cluster_info.manager
+        this.apiEntries[index]._source.cluster_info.manager
       } set as default`,
       'Settings'
     );
@@ -261,7 +261,7 @@ export class SettingsController {
 
   /**
    * This validate format of fileds in a given api connection form
-   * @param {Object} formName 
+   * @param {Object} formName
    */
   validator(formName) {
     // Validate user
@@ -297,7 +297,7 @@ export class SettingsController {
 
   /**
    * This toggle to a given entry
-   * @param {Object} entry 
+   * @param {Object} entry
    */
   toggleEditor(entry) {
     if (this.formUpdate && this.formUpdate.password) {
@@ -428,7 +428,6 @@ export class SettingsController {
       }
 
       await this.getSettings();
-
     } catch (error) {
       if (error.status === 400) {
         error.message =
@@ -503,7 +502,6 @@ export class SettingsController {
       this.isEditing = false;
 
       this.errorHandler.info('The API was updated successfully', 'Settings');
-
     } catch (error) {
       this.printError(error, true);
     }
@@ -574,7 +572,7 @@ export class SettingsController {
 
   /**
    * This change to a given index pattern
-   * @param {} newIndexPattern 
+   * @param {} newIndexPattern
    */
   async changeIndexPattern(newIndexPattern) {
     try {
@@ -603,8 +601,8 @@ export class SettingsController {
 
   /**
    * This set the error, and checks if is updating
-   * @param {*} error 
-   * @param {*} updating 
+   * @param {*} error
+   * @param {*} updating
    */
   printError(error, updating) {
     const text = this.errorHandler.handle(error, 'Settings');
@@ -613,8 +611,8 @@ export class SettingsController {
   }
 
   /**
- * Returns Wazuh app logs
- */
+   * Returns Wazuh app logs
+   */
   async getAppLogs() {
     try {
       this.loadingLogs = true;
@@ -634,8 +632,8 @@ export class SettingsController {
   }
 
   /**
-* Returns Wazuh app info
-*/
+   * Returns Wazuh app info
+   */
   async getAppInfo() {
     try {
       const data = await this.genericReq.request('GET', '/elastic/setup');
@@ -700,7 +698,7 @@ export class SettingsController {
 
   /**
    * This get the string equivalence for a given key
-   * @param {String} key 
+   * @param {String} key
    */
   configEquivalence(key) {
     return configEquivalences[key] || '-';

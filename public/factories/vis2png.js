@@ -15,7 +15,7 @@ import domtoimage from 'dom-to-image';
 export class Vis2PNG {
   /**
    * Class constructor
-   * @param {*} $rootScope 
+   * @param {*} $rootScope
    */
   constructor($rootScope) {
     this.$rootScope = $rootScope;
@@ -26,7 +26,7 @@ export class Vis2PNG {
 
   /**
    * Validate a visualizations array
-   * @param {Array<Object>} visArray 
+   * @param {Array<Object>} visArray
    */
   async checkArray(visArray) {
     try {
@@ -79,8 +79,8 @@ export class Vis2PNG {
 
   /**
    * Set content to a given html item
-   * @param {String} id 
-   * @param {Object} content 
+   * @param {String} id
+   * @param {Object} content
    */
   assignHTMLItem(id, content) {
     this.htmlObject[id] = content;

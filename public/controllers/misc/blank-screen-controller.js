@@ -12,10 +12,10 @@
 export class BlankScreenController {
   /**
    * Class constructor
-   * @param {*} $scope 
-   * @param {*} $location 
-   * @param {*} errorHandler 
-   * @param {*} wzMisc 
+   * @param {*} $scope
+   * @param {*} $location
+   * @param {*} errorHandler
+   * @param {*} wzMisc
    */
   constructor($scope, $location, errorHandler, wzMisc) {
     this.$scope = $scope;
@@ -25,15 +25,15 @@ export class BlankScreenController {
   }
 
   /**
- * When controller loads
- */
+   * When controller loads
+   */
   $onInit() {
     const catchedError = this.wzMisc.getBlankScr();
     if (catchedError) {
       let parsed = null;
       try {
         parsed = this.errorHandler.handle(catchedError, '', false, true);
-      } catch (error) { } // eslint-disable-line
+      } catch (error) {} // eslint-disable-line
       this.errorToShow = parsed || catchedError;
       this.wzMisc.setBlankScr(false);
       if (!this.$scope.$$phase) this.$scope.$digest();

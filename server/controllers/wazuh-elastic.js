@@ -23,19 +23,19 @@ import { Base } from '../reporting/base-query';
 
 export class WazuhElasticCtrl {
   /**
-* Constructor
-* @param {*} server
-*/
+   * Constructor
+   * @param {*} server
+   */
   constructor(server) {
     this.wzWrapper = new ElasticWrapper(server);
   }
 
   /**
- * This get the timestamp field
- * @param {Object} req 
- * @param {Object} reply 
- * @returns {Object} timestamp field or ErrorResponse
- */
+   * This get the timestamp field
+   * @param {Object} req
+   * @param {Object} reply
+   * @returns {Object} timestamp field or ErrorResponse
+   */
   async getTimeStamp(req, reply) {
     try {
       const data = await this.wzWrapper.getWazuhVersionIndexAsSearch();
@@ -64,11 +64,11 @@ export class WazuhElasticCtrl {
   }
 
   /**
- * This retrieve a template from Elasticsearch
- * @param {Object} req 
- * @param {Object} reply 
- * @returns {Object} template or ErrorResponse
- */
+   * This retrieve a template from Elasticsearch
+   * @param {Object} req
+   * @param {Object} reply
+   * @returns {Object} template or ErrorResponse
+   */
   async getTemplate(req, reply) {
     try {
       if (!req.params || !req.params.pattern) {
@@ -100,20 +100,20 @@ export class WazuhElasticCtrl {
 
       return isIncluded && Array.isArray(isIncluded) && isIncluded.length
         ? reply({
-          statusCode: 200,
-          status: true,
-          data: `Template found for ${req.params.pattern}`
-        })
+            statusCode: 200,
+            status: true,
+            data: `Template found for ${req.params.pattern}`
+          })
         : reply({
-          statusCode: 200,
-          status: false,
-          data: `No template found for ${req.params.pattern}`
-        });
+            statusCode: 200,
+            status: false,
+            data: `No template found for ${req.params.pattern}`
+          });
     } catch (error) {
       log('GET /elastic/template/{pattern}', error.message || error);
       return ErrorResponse(
         `Could not retrieve templates from Elasticsearch due to ${error.message ||
-        error}`,
+          error}`,
         4002,
         500,
         reply
@@ -122,11 +122,11 @@ export class WazuhElasticCtrl {
   }
 
   /**
- * This check index-pattern
- * @param {Object} req 
- * @param {Object} reply 
- * @returns {Object} status obj or ErrorResponse
- */
+   * This check index-pattern
+   * @param {Object} req
+   * @param {Object} reply
+   * @returns {Object} status obj or ErrorResponse
+   */
   async checkPattern(req, reply) {
     try {
       const response = await this.wzWrapper.getAllIndexPatterns();
@@ -138,16 +138,16 @@ export class WazuhElasticCtrl {
       return filtered.length >= 1
         ? reply({ statusCode: 200, status: true, data: 'Index pattern found' })
         : reply({
-          statusCode: 500,
-          status: false,
-          error: 10020,
-          message: 'Index pattern not found'
-        });
+            statusCode: 500,
+            status: false,
+            error: 10020,
+            message: 'Index pattern not found'
+          });
     } catch (error) {
       log('GET /elastic/index-patterns/{pattern}', error.message || error);
       return ErrorResponse(
         `Something went wrong retrieving index-patterns from Elasticsearch due to ${error.message ||
-        error}`,
+          error}`,
         4003,
         500,
         reply
@@ -157,8 +157,8 @@ export class WazuhElasticCtrl {
 
   /**
    * This get the fields keys
-   * @param {Object} req 
-   * @param {Object} reply 
+   * @param {Object} req
+   * @param {Object} reply
    * @returns {Array<Object>} fields or ErrorResponse
    */
   async getFieldTop(req, reply) {
@@ -204,9 +204,9 @@ export class WazuhElasticCtrl {
         typeof data.aggregations['2'].buckets[0] === 'undefined'
         ? reply({ statusCode: 200, data: '' })
         : reply({
-          statusCode: 200,
-          data: data.aggregations['2'].buckets[0].key
-        });
+            statusCode: 200,
+            data: data.aggregations['2'].buckets[0].key
+          });
     } catch (error) {
       return ErrorResponse(error.message || error, 4004, 500, reply);
     }
@@ -214,8 +214,8 @@ export class WazuhElasticCtrl {
 
   /**
    * This get the elastic setup settings
-   * @param {Object} req 
-   * @param {Object} reply 
+   * @param {Object} req
+   * @param {Object} reply
    * @returns {Object} setup info or ErrorResponse
    */
   async getSetupInfo(req, reply) {
@@ -229,7 +229,7 @@ export class WazuhElasticCtrl {
       log('GET /elastic/setup', error.message || error);
       return ErrorResponse(
         `Could not get data from elasticsearch due to ${error.message ||
-        error}`,
+          error}`,
         4005,
         500,
         reply
@@ -295,8 +295,8 @@ export class WazuhElasticCtrl {
 
   /**
    * This get the list of index-patterns
-   * @param {Object} req 
-   * @param {Object} reply 
+   * @param {Object} req
+   * @param {Object} reply
    * @returns {Array<Object>} list of index-patterns or ErrorResponse
    */
   async getlist(req, reply) {
@@ -362,16 +362,29 @@ export class WazuhElasticCtrl {
       const visArray = [];
       let aux_source, bulk_content;
       for (let element of app_objects) {
-        aux_source = JSON.parse(JSON.stringify(element._source))
+        aux_source = JSON.parse(JSON.stringify(element._source));
 
         // Replace index-pattern for visualizations
-        if (aux_source && aux_source.kibanaSavedObjectMeta && aux_source.kibanaSavedObjectMeta.searchSourceJSON && typeof aux_source.kibanaSavedObjectMeta.searchSourceJSON === 'string') {
-          aux_source.kibanaSavedObjectMeta.searchSourceJSON = aux_source.kibanaSavedObjectMeta.searchSourceJSON.replace('wazuh-alerts', id);
+        if (
+          aux_source &&
+          aux_source.kibanaSavedObjectMeta &&
+          aux_source.kibanaSavedObjectMeta.searchSourceJSON &&
+          typeof aux_source.kibanaSavedObjectMeta.searchSourceJSON === 'string'
+        ) {
+          aux_source.kibanaSavedObjectMeta.searchSourceJSON = aux_source.kibanaSavedObjectMeta.searchSourceJSON.replace(
+            'wazuh-alerts',
+            id
+          );
         }
 
         // Replace index-pattern for selector visualizations
-        if (aux_source && aux_source.visState && aux_source.visState && typeof aux_source.visState === 'string') {
-          aux_source.visState = aux_source.visState.replace('wazuh-alerts', id)
+        if (
+          aux_source &&
+          aux_source.visState &&
+          aux_source.visState &&
+          typeof aux_source.visState === 'string'
+        ) {
+          aux_source.visState = aux_source.visState.replace('wazuh-alerts', id);
         }
 
         // Bulk source
@@ -430,7 +443,7 @@ export class WazuhElasticCtrl {
             for (const node of nodes) {
               query += `.es(index=${pattern_name},q="cluster.name: ${name} AND cluster.node: ${
                 node.name
-                }").label("${node.name}"),`;
+              }").label("${node.name}"),`;
             }
             query = query.substring(0, query.length - 1);
           } else if (title === 'Wazuh App Cluster Overview Manager') {
@@ -457,8 +470,8 @@ export class WazuhElasticCtrl {
 
   /**
    * This creates a visualization of data in req
-   * @param {Object} req 
-   * @param {Object} reply 
+   * @param {Object} req
+   * @param {Object} reply
    * @returns {Object} vis obj or ErrorResponse
    */
   async createVis(req, reply) {
@@ -493,11 +506,11 @@ export class WazuhElasticCtrl {
   }
 
   /**
- * This creates a visualization of cluster
- * @param {Object} req 
- * @param {Object} reply 
- * @returns {Object} vis obj or ErrorResponse
- */
+   * This creates a visualization of cluster
+   * @param {Object} req
+   * @param {Object} reply
+   * @returns {Object} vis obj or ErrorResponse
+   */
   async createClusterVis(req, reply) {
     try {
       if (
@@ -539,8 +552,8 @@ export class WazuhElasticCtrl {
 
   /**
    * Reload elastic index
-   * @param {Object} req 
-   * @param {Object} reply 
+   * @param {Object} req
+   * @param {Object} reply
    * @returns {Object} status obj or ErrorResponse
    */
   async refreshIndex(req, reply) {

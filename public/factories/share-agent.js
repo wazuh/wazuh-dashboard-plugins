@@ -1,15 +1,15 @@
 /*
-* Wazuh app - Factory to share an agent between controllers
-*
-* Copyright (C) 2018 Wazuh, Inc.
-*
-* This program is free software; you can redistribute it and/or modify
-* it under the terms of the GNU General Public License as published by
-* the Free Software Foundation; either version 2 of the License, or
-* (at your option) any later version.
-*
-* Find more information about this on the LICENSE file.
-*/
+ * Wazuh app - Factory to share an agent between controllers
+ *
+ * Copyright (C) 2018 Wazuh, Inc.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * Find more information about this on the LICENSE file.
+ */
 export class ShareAgent {
   /**
    * Class constructor
@@ -31,7 +31,11 @@ export class ShareAgent {
    * Get selected group
    */
   getSelectedGroup() {
-    if (this.agent && this.agent.group && (this.selectedGroup || this.selectedGroup === 0)) {
+    if (
+      this.agent &&
+      this.agent.group &&
+      (this.selectedGroup || this.selectedGroup === 0)
+    ) {
       return this.agent.group[this.selectedGroup];
     }
     return null;
@@ -39,8 +43,8 @@ export class ShareAgent {
 
   /**
    * Set a given agent and group as current
-   * @param {*} ag 
-   * @param {*} group 
+   * @param {*} ag
+   * @param {*} group
    */
   setAgent(ag, group) {
     this.agent = ag;
@@ -64,7 +68,7 @@ export class ShareAgent {
 
   /**
    * Set Target location
-   * @param {Object} loc 
+   * @param {Object} loc
    */
   setTargetLocation(loc) {
     if (!loc || typeof loc !== 'object') return;

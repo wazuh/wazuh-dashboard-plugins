@@ -12,14 +12,14 @@
 export class CommonData {
   /**
    * Class constructor
-   * @param {*} $rootScope 
-   * @param {*} $timeout 
-   * @param {*} genericReq 
-   * @param {*} appState 
-   * @param {*} errorHandler 
-   * @param {*} $location 
-   * @param {*} shareAgent 
-   * @param {*} globalState 
+   * @param {*} $rootScope
+   * @param {*} $timeout
+   * @param {*} genericReq
+   * @param {*} appState
+   * @param {*} errorHandler
+   * @param {*} $location
+   * @param {*} shareAgent
+   * @param {*} globalState
    */
   constructor(
     $rootScope,
@@ -40,7 +40,7 @@ export class CommonData {
     this.shareAgent = shareAgent;
     this.globalState = globalState;
     this.savedTimefilter = null;
-    this.refreshInterval = { pause: true, value: 0 }
+    this.refreshInterval = { pause: true, value: 0 };
   }
 
   /**
@@ -65,7 +65,7 @@ export class CommonData {
 
   /**
    * Remove duplicate rule for a given group
-   * @param {String} group 
+   * @param {String} group
    */
   removeDuplicateRuleGroups(group) {
     if (!this.globalState || !this.globalState.filters) return;
@@ -89,7 +89,7 @@ export class CommonData {
 
   /**
    * Remove duplicates if exists
-   * @param {String} condition 
+   * @param {String} condition
    */
   removeDuplicateExists(condition) {
     if (!this.globalState || !this.globalState.filters) return;
@@ -111,10 +111,10 @@ export class CommonData {
 
   /**
    * After filter manage
-   * @param {*} filterHandler 
-   * @param {*} tab 
-   * @param {*} localChange 
-   * @param {*} agent 
+   * @param {*} filterHandler
+   * @param {*} tab
+   * @param {*} localChange
+   * @param {*} agent
    */
   af(filterHandler, tab, localChange, agent) {
     try {
@@ -208,10 +208,10 @@ export class CommonData {
 
   /**
    * Assign given filter
-   * @param {Object} filterHandler 
-   * @param {Object} tab 
-   * @param {Object} localChange 
-   * @param {Object} agent 
+   * @param {Object} filterHandler
+   * @param {Object} tab
+   * @param {Object} localChange
+   * @param {Object} agent
    */
   assignFilters(filterHandler, tab, localChange, agent) {
     return this.af(filterHandler, tab, localChange, agent);
@@ -219,7 +219,7 @@ export class CommonData {
 
   /**
    * Validate range of given data
-   * @param {Object} data 
+   * @param {Object} data
    */
   validateRange(data) {
     const result = {
@@ -253,8 +253,8 @@ export class CommonData {
   }
 
   /**
- * Check the tab view location
- */
+   * Check the tab view location
+   */
   checkTabViewLocation() {
     if (this.$location.search().tabView) {
       return this.$location.search().tabView;
@@ -266,8 +266,8 @@ export class CommonData {
 
   /**
    * Check the location of a given agent
-   * @param {String} newAgentId 
-   * @param {Boolean} globalAgent 
+   * @param {String} newAgentId
+   * @param {Boolean} globalAgent
    */
   checkLocationAgentId(newAgentId, globalAgent) {
     if (newAgentId) {
@@ -298,7 +298,7 @@ export class CommonData {
   }
 
   setRefreshInterval(interval) {
-    if (interval) Object.assign(this.refreshInterval,interval)
+    if (interval) Object.assign(this.refreshInterval, interval);
   }
 
   getRefreshInterval() {

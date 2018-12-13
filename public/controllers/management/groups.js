@@ -31,9 +31,9 @@ export function GroupsController(
   $scope.load = true;
 
   /**
- * Get full data on CSV format from a path
- * @param {String} data_path path with data to convert
- */
+   * Get full data on CSV format from a path
+   * @param {String} data_path path with data to convert
+   */
   $scope.downloadCsv = async data_path => {
     try {
       errorHandler.info('Your download should begin automatically...', 'CSV');
@@ -55,9 +55,9 @@ export function GroupsController(
   };
 
   /**
- * This perfoms a search by a given term
- * @param {String} term 
- */
+   * This perfoms a search by a given term
+   * @param {String} term
+   */
   $scope.search = term => {
     $scope.$broadcast('wazuhSearch', { term });
   };
@@ -65,9 +65,8 @@ export function GroupsController(
   // Store a boolean variable to check if come from agents
   const globalAgent = shareAgent.getAgent();
 
-
   /**
-   * This load at init some required data 
+   * This load at init some required data
    */
   const load = async () => {
     try {
@@ -158,8 +157,8 @@ export function GroupsController(
   };
 
   /**
- * This navigate back to files
- */
+   * This navigate back to files
+   */
   $scope.goBackFiles = () => {
     $scope.groupsSelectedTab = 'files';
     $scope.file = false;
@@ -169,8 +168,8 @@ export function GroupsController(
   };
 
   /**
- * This navigate back to groups
- */
+   * This navigate back to groups
+   */
   $scope.goBackGroups = () => {
     $scope.currentGroup = false;
     $scope.lookingGroup = false;
@@ -198,7 +197,7 @@ export function GroupsController(
   };
 
   // Resetting the factory configuration
-  $scope.$on('$destroy', () => { });
+  $scope.$on('$destroy', () => {});
 
   $scope.$watch('lookingGroup', value => {
     if (!value) {

@@ -25,8 +25,8 @@ export class WazuhUtilsCtrl {
 
   /**
    * Returns the config.yml file parsed
-   * @param {Object} req 
-   * @param {Object} reply 
+   * @param {Object} req
+   * @param {Object} reply
    * @returns {Object} Configuration File or ErrorResponse
    */
   getConfigurationFile(req, reply) {
@@ -45,8 +45,8 @@ export class WazuhUtilsCtrl {
 
   /**
    * Returns total RAM available from the current machine where Kibana is being executed
-   * @param {Object} req 
-   * @param {Object} reply 
+   * @param {Object} req
+   * @param {Object} reply
    * @returns {Number} total ram or ErrorResponse
    */
   async totalRam(req, reply) {
@@ -61,8 +61,8 @@ export class WazuhUtilsCtrl {
 
   /**
    * Returns Wazuh app logs
-   * @param {Object} req 
-   * @param {Object} reply 
+   * @param {Object} req
+   * @param {Object} reply
    * @returns {Array<String>} app logs or ErrorResponse
    */
   async getAppLogs(req, reply) {

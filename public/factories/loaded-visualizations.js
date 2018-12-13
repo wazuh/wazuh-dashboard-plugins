@@ -1,6 +1,6 @@
 /*
  * Wazuh app - Factory to store loaded visualizations
- * 
+ *
  * Copyright (C) 2018 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -20,7 +20,7 @@ export class LoadedVisualizations {
 
   /**
    * Add new item to the loaded visualizations list
-   * @param {Object} item 
+   * @param {Object} item
    */
   addItem(item) {
     this.list.push(item);

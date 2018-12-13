@@ -14,9 +14,9 @@ import { TabNames } from '../../utils/tab-names';
 export class ManagementController {
   /**
    * Class constructor
-   * @param {*} $scope 
-   * @param {*} $location 
-   * @param {*} shareAgent 
+   * @param {*} $scope
+   * @param {*} $location
+   * @param {*} shareAgent
    */
   constructor($scope, $location, shareAgent) {
     this.$scope = $scope;
@@ -47,8 +47,8 @@ export class ManagementController {
 
   /**
    * This check if given array of items contais a single given item
-   * @param {Object} item 
-   * @param {Array<Object>} array 
+   * @param {Object} item
+   * @param {Array<Object>} array
    */
   inArray(item, array) {
     return item && Array.isArray(array) && array.includes(item);
@@ -56,7 +56,7 @@ export class ManagementController {
 
   /**
    * This switch to a selected tab
-   * @param {String} tab 
+   * @param {String} tab
    */
   switchTab(tab) {
     this.tab = tab;
@@ -77,9 +77,9 @@ export class ManagementController {
     this.$location.search('tab', this.tab);
   }
 
-    /**
+  /**
    * This set the rules tab
-   * @param {String} tab 
+   * @param {String} tab
    */
   setRulesTab(tab) {
     this.rulesetTab = tab;

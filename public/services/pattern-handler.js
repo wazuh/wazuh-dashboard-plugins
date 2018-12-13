@@ -12,11 +12,11 @@
 export class PatternHandler {
   /**
    * Class constructor
-   * @param {*} $location 
-   * @param {*} genericReq 
-   * @param {*} appState 
-   * @param {*} errorHandler 
-   * @param {*} wzMisc 
+   * @param {*} $location
+   * @param {*} genericReq
+   * @param {*} appState
+   * @param {*} errorHandler
+   * @param {*} wzMisc
    */
   constructor($location, genericReq, appState, errorHandler, wzMisc) {
     this.$location = $location;
@@ -61,7 +61,7 @@ export class PatternHandler {
 
   /**
    * Change current pattern for the given pattern
-   * @param {String} selectedPattern 
+   * @param {String} selectedPattern
    */
   async changePattern(selectedPattern) {
     try {

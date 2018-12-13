@@ -30,17 +30,17 @@ import { timefilter } from 'ui/timefilter';
 export class OverviewController {
   /**
    * Class constructor
-   * @param {*} $scope 
-   * @param {*} $location 
-   * @param {*} $rootScope 
-   * @param {*} appState 
-   * @param {*} errorHandler 
-   * @param {*} apiReq 
-   * @param {*} tabVisualizations 
-   * @param {*} commonData 
-   * @param {*} reportingService 
-   * @param {*} visFactoryService 
-   * @param {*} wazuhConfig 
+   * @param {*} $scope
+   * @param {*} $location
+   * @param {*} $rootScope
+   * @param {*} appState
+   * @param {*} errorHandler
+   * @param {*} apiReq
+   * @param {*} tabVisualizations
+   * @param {*} commonData
+   * @param {*} reportingService
+   * @param {*} visFactoryService
+   * @param {*} wazuhConfig
    */
   constructor(
     $scope,
@@ -113,18 +113,18 @@ export class OverviewController {
   }
 
   /**
- * This check if given array of items contais a single given item
- * @param {Object} item 
- * @param {Array<Object>} array 
- */
+   * This check if given array of items contais a single given item
+   * @param {Object} item
+   * @param {Array<Object>} array
+   */
   inArray(item, array) {
     return item && Array.isArray(array) && array.includes(item);
   }
 
   /**
- * Create metric for given object
- * @param {*} metricsObject 
- */
+   * Create metric for given object
+   * @param {*} metricsObject
+   */
   createMetrics(metricsObject) {
     for (const key in metricsObject) {
       this[key] = () => generateMetric(metricsObject[key]);
@@ -132,10 +132,10 @@ export class OverviewController {
   }
 
   /**
- * Classify metrics for create the suitable one
- * @param {*} tab 
- * @param {*} subtab 
- */
+   * Classify metrics for create the suitable one
+   * @param {*} tab
+   * @param {*} subtab
+   */
   checkMetrics(tab, subtab) {
     if (subtab === 'panels') {
       switch (tab) {
@@ -201,7 +201,7 @@ export class OverviewController {
 
   /**
    * Calculate woodle depending on given tab
-   * @param {*} tab 
+   * @param {*} tab
    */
   calculateWodleTagFromTab(tab) {
     if (tab === 'aws') return 'aws-s3';
@@ -209,9 +209,9 @@ export class OverviewController {
   }
 
   /**
- * Classify woodle depending on given tab
- * @param {*} tab 
- */
+   * Classify woodle depending on given tab
+   * @param {*} tab
+   */
   filterWodle(tab) {
     try {
       const tag = this.calculateWodleTagFromTab(tab);
@@ -241,7 +241,7 @@ export class OverviewController {
       } else {
         this.wodlesConfiguration = false;
       }
-    } catch (error) { } // eslint-disable-line
+    } catch (error) {} // eslint-disable-line
 
     if (!this.$scope.$$phase) this.$scope.$digest();
   }
@@ -265,11 +265,11 @@ export class OverviewController {
   // Switch tab
   async switchTab(newTab, force = false) {
     try {
-      if(newTab === 'welcome') {    
-        this.commonData.setRefreshInterval(timefilter.getRefreshInterval());    
-        timefilter.setRefreshInterval({pause:true,value:0})
-      } else if(this.tab === 'welcome') {
-        timefilter.setRefreshInterval(this.commonData.getRefreshInterval())
+      if (newTab === 'welcome') {
+        this.commonData.setRefreshInterval(timefilter.getRefreshInterval());
+        timefilter.setRefreshInterval({ pause: true, value: 0 });
+      } else if (this.tab === 'welcome') {
+        timefilter.setRefreshInterval(this.commonData.getRefreshInterval());
       }
 
       if (newTab !== 'welcome') {
@@ -332,8 +332,8 @@ export class OverviewController {
   }
 
   /**
- * Transform a visualization into an image
- */
+   * Transform a visualization into an image
+   */
   startVis2Png() {
     return this.reportingService.startVis2Png(this.tab);
   }

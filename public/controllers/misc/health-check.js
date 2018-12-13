@@ -14,18 +14,18 @@ import { SavedObjectsClientProvider } from 'ui/saved_objects';
 export class HealthCheck {
   /**
    * Class constructor
-   * @param {*} $scope 
-   * @param {*} $rootScope 
-   * @param {*} $timeout 
-   * @param {*} $location 
-   * @param {*} genericReq 
-   * @param {*} apiReq 
-   * @param {*} appState 
-   * @param {*} testAPI 
-   * @param {*} errorHandler 
-   * @param {*} wazuhConfig 
-   * @param {*} Private 
-   * @param {*} $window 
+   * @param {*} $scope
+   * @param {*} $rootScope
+   * @param {*} $timeout
+   * @param {*} $location
+   * @param {*} genericReq
+   * @param {*} apiReq
+   * @param {*} appState
+   * @param {*} testAPI
+   * @param {*} errorHandler
+   * @param {*} wazuhConfig
+   * @param {*} Private
+   * @param {*} $window
    */
   constructor(
     $scope,
@@ -69,15 +69,15 @@ export class HealthCheck {
   }
 
   /**
- * When controller loads
- */
+   * When controller loads
+   */
   $onInit() {
     this.load();
   }
 
   /**
- * Manage an error
- */
+   * Manage an error
+   */
   handleError(error) {
     this.errors.push(
       this.errorHandler.handle(error, 'Health Check', false, true)
@@ -178,7 +178,7 @@ export class HealthCheck {
             if (apiSplit[0] !== appSplit[0] || apiSplit[1] !== appSplit[1]) {
               this.errors.push(
                 'API version mismatch. Expected v' +
-                setupData.data.data['app-version']
+                  setupData.data.data['app-version']
               );
               this.results[i].status = 'Error';
             } else {

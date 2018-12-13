@@ -39,9 +39,9 @@ const REPORTING_PATH = '../../../../optimize/wazuh-reporting';
 
 export class WazuhReportingCtrl {
   /**
-* Constructor
-* @param {*} server
-*/
+   * Constructor
+   * @param {*} server
+   */
   constructor(server) {
     this.server = server;
     this.fonts = {
@@ -188,8 +188,8 @@ export class WazuhReportingCtrl {
           parseInt(a[a.length - 1]) < parseInt(b[b.length - 1])
             ? 1
             : parseInt(a[a.length - 1]) > parseInt(b[b.length - 1])
-              ? -1
-              : 0;
+            ? -1
+            : 0;
 
         TimSort.sort(rows, sortFunction);
 
@@ -306,14 +306,14 @@ export class WazuhReportingCtrl {
       str +=
         i === len - 1
           ? (filter.meta.negate ? 'NOT ' : '') +
-          filter.meta.key +
-          ': ' +
-          filter.meta.value
+            filter.meta.key +
+            ': ' +
+            filter.meta.value
           : (filter.meta.negate ? 'NOT ' : '') +
-          filter.meta.key +
-          ': ' +
-          filter.meta.value +
-          ' AND ';
+            filter.meta.key +
+            ': ' +
+            filter.meta.value +
+            ' AND ';
     }
 
     if (searchBar) {
@@ -325,7 +325,7 @@ export class WazuhReportingCtrl {
 
   /**
    * This performs the rendering of given header
-   * @param {String} section section target 
+   * @param {String} section section target
    * @param {Object} tab tab target
    * @param {Boolean} isAgents is agents section
    * @param {String} apiId ID of API
@@ -549,13 +549,13 @@ export class WazuhReportingCtrl {
 
   /**
    * This load more information
-   * @param {String} section section target 
+   * @param {String} section section target
    * @param {Object} tab tab target
    * @param {String} apiId ID of API
    * @param {Number} from Timestamp (ms) from
    * @param {Number} to Timestamp (ms) to
    * @param {String} filters E.g: cluster.name: wazuh AND rule.groups: vulnerability
-   * @param {String} pattern 
+   * @param {String} pattern
    * @param {Object} agent agent target
    * @returns {Object} Extended information
    */
@@ -1016,14 +1016,14 @@ export class WazuhReportingCtrl {
             this.dd.content.push({
               text: `Last policy monitoring scan was executed from ${
                 lastScan.data.start
-                } to ${lastScan.data.end}.`,
+              } to ${lastScan.data.end}.`,
               style: 'standard'
             });
           } else if (lastScan.data.start) {
             this.dd.content.push({
               text: `Policy monitoring scan is currently in progress for this agent (started on ${
                 lastScan.data.start
-                }).`,
+              }).`,
               style: 'standard'
             });
           } else {
@@ -1143,13 +1143,13 @@ export class WazuhReportingCtrl {
             this.dd.content.push({
               text: `Last file integrity monitoring scan was executed from ${
                 lastScan.data.start
-                } to ${lastScan.data.end}.`
+              } to ${lastScan.data.end}.`
             });
           } else if (lastScan.data.start) {
             this.dd.content.push({
               text: `File integrity monitoring scan is currently in progress for this agent (started on ${
                 lastScan.data.start
-                }).`
+              }).`
             });
           } else {
             this.dd.content.push({
@@ -1351,8 +1351,8 @@ export class WazuhReportingCtrl {
 
   /**
    * Builds a PDF report from multiple PNG images
-   * @param {Object} req 
-   * @param {Object} reply 
+   * @param {Object} req
+   * @param {Object} reply
    * @returns {Object} pdf or ErrorResponse
    */
   async report(req, reply) {
@@ -1461,8 +1461,8 @@ export class WazuhReportingCtrl {
 
   /**
    * Fetch the reports list
-   * @param {Object} req 
-   * @param {Object} reply 
+   * @param {Object} req
+   * @param {Object} reply
    * @returns {Array<Object>}reports list or ErrorResponse
    */
   async getReports(req, reply) {
@@ -1491,11 +1491,11 @@ export class WazuhReportingCtrl {
   }
 
   /**
- * Fetch specific report
- * @param {Object} req 
- * @param {Object} reply 
- * @returns {Object} report or ErrorResponse
- */
+   * Fetch specific report
+   * @param {Object} req
+   * @param {Object} reply
+   * @returns {Object} report or ErrorResponse
+   */
   async getReportByName(req, reply) {
     try {
       if (!req.params || !req.params.name) throw new Error('Invalid file name');
@@ -1508,11 +1508,11 @@ export class WazuhReportingCtrl {
   }
 
   /**
- * Delete specific report
- * @param {Object} req 
- * @param {Object} reply 
- * @returns {Object} status obj or ErrorResponse
- */
+   * Delete specific report
+   * @param {Object} req
+   * @param {Object} reply
+   * @returns {Object} status obj or ErrorResponse
+   */
   async deleteReportByName(req, reply) {
     try {
       if (!req.params || !req.params.name) throw new Error('Invalid file name');

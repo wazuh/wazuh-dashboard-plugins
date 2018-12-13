@@ -18,13 +18,13 @@
  * wazuh-reporting   50XX
  * unknown           1000
  */
- /**
-   * Returns a suitable error message
-   * @param {String} message Error message
-   * @param {Number} code Error code
-   * @param {Number} statusCode Error status code
-   * @returns {Object} Error response object
-   */
+/**
+ * Returns a suitable error message
+ * @param {String} message Error message
+ * @param {Number} code Error code
+ * @param {Number} statusCode Error status code
+ * @returns {Object} Error response object
+ */
 export function ErrorResponse(
   message = null,
   code = null,
@@ -70,8 +70,8 @@ export function ErrorResponse(
     message: filteredMessage
       ? `${code ? code : 1000} - ${filteredMessage}`
       : typeof message === 'string'
-        ? `${code ? code : 1000} - ${message}`
-        : `${code ? code : 1000} - Unexpected error`,
+      ? `${code ? code : 1000} - ${message}`
+      : `${code ? code : 1000} - Unexpected error`,
     code: code ? code : 1000,
     statusCode: statusCode ? statusCode : 500
   }).code(statusCode ? statusCode : 500);

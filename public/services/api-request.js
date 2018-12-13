@@ -12,9 +12,9 @@
 export class ApiRequest {
   /**
    * Class constructor
-   * @param {*} $q 
-   * @param {*} genericReq 
-   * @param {*} appState 
+   * @param {*} $q
+   * @param {*} genericReq
+   * @param {*} appState
    */
   constructor($q, genericReq, appState) {
     this.$q = $q;

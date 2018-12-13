@@ -132,7 +132,6 @@ describe('wazuh-elastic', () => {
       res.body.lastRestart.should.be.a('string');
     });
 
-
     it('POST /elastic/alerts full parameters', async () => {
       const res = await needle(
         'POST',
@@ -148,12 +147,12 @@ describe('wazuh-elastic', () => {
         headers
       );
       const alerts = res.body.alerts;
-      alerts.should.be.a('array')
-      alerts.length.should.be.eql(1)
-      alerts[0].agent.id.should.be.eql('000')
-      alerts[0].rule.groups.includes('ossec').should.be.eql(true)
-      alerts[0].manager.name.should.be.eql('master')
-      alerts[0].cluster.name.should.be.eql('wazuh')
+      alerts.should.be.a('array');
+      alerts.length.should.be.eql(1);
+      alerts[0].agent.id.should.be.eql('000');
+      alerts[0].rule.groups.includes('ossec').should.be.eql(true);
+      alerts[0].manager.name.should.be.eql('master');
+      alerts[0].cluster.name.should.be.eql('wazuh');
     });
 
     it('POST /elastic/alerts no parameters', async () => {
@@ -163,8 +162,8 @@ describe('wazuh-elastic', () => {
         {},
         headers
       );
-      res.body.alerts.should.be.a('array')
-      res.body.alerts.length.should.be.eql(10)
+      res.body.alerts.should.be.a('array');
+      res.body.alerts.length.should.be.eql(10);
     });
   });
 });

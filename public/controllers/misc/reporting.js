@@ -12,9 +12,9 @@
 export class ReportingController {
   /**
    * Class controller
-   * @param {*} $scope 
-   * @param {*} errorHandler 
-   * @param {*} genericReq 
+   * @param {*} $scope
+   * @param {*} errorHandler
+   * @param {*} genericReq
    */
   constructor($scope, errorHandler, genericReq) {
     this.$scope = $scope;
@@ -77,9 +77,9 @@ export class ReportingController {
 
   /**
    * This organize in pages of given size the items
-   * @param {*} size 
-   * @param {*} start 
-   * @param {*} end 
+   * @param {*} size
+   * @param {*} start
+   * @param {*} end
    */
   range(size, start, end) {
     const ret = [];
@@ -105,8 +105,8 @@ export class ReportingController {
   }
 
   /**
- * This navigates to the next page
- */
+   * This navigates to the next page
+   */
   nextPage(n) {
     if (!n && n !== 0 && this.currentPage < this.pagedItems.length - 1) {
       this.currentPage++;

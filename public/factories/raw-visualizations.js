@@ -19,14 +19,14 @@ export class RawVisualizations {
 
   /**
    * Add item to raw visualizations
-   * @param {Object} item 
+   * @param {Object} item
    */
   addItem(item) {
     this.list.push(item);
   }
   /**
    * Set raw raw visualizations with given items
-   * @param {Array<Object>} items 
+   * @param {Array<Object>} items
    */
   assignItems(items) {
     this.list = Array.isArray(items) ? items : [];

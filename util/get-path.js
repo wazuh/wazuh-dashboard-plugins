@@ -11,7 +11,7 @@
  */
 /**
  * Gets the correct path of given url
- * @param {*} config 
+ * @param {*} config
  */
 export function getPath(config) {
   let path = config.url;
