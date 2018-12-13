@@ -11,6 +11,7 @@
  */
 import beautifier from '../../utils/json-beautifier';
 import * as FileSaver from '../../services/file-saver';
+import CodeMirror from '../../utils/codemirror/lib/codemirror';
 
 export function GroupsController(
   $scope,
@@ -20,7 +21,9 @@ export function GroupsController(
   csvReq,
   appState,
   shareAgent,
-  wzTableFilter
+  $document,
+  wzTableFilter,
+  $timeout
 ) {
   $scope.$on('groupsIsReloaded', () => {
     $scope.currentGroup = false;
@@ -58,6 +61,19 @@ export function GroupsController(
   const globalAgent = shareAgent.getAgent();
 
   const load = async () => {
+    $scope.xmlCodeBox = CodeMirror.fromTextArea(
+      $document[0].getElementById('xml_box'),
+      {
+        lineNumbers: true,
+        matchClosing: true,
+        matchBrackets: true,
+        mode: 'text/xml',
+        theme: 'ttcn',
+        foldGutter: true,
+        styleSelectedText: true,
+        gutters: ['CodeMirror-foldgutter']
+      }
+    );
     try {
       // If come from agents
       if (globalAgent) {
@@ -136,7 +152,7 @@ export function GroupsController(
         { limit: 1 }
       );
       $scope.currentGroup.count = result.data.data.totalItems;
-    } catch(error) {
+    } catch (error) {
       errorHandler.handle(error, 'Groups');
     }
     if (!$scope.$$phase) $scope.$digest();
@@ -181,8 +197,31 @@ export function GroupsController(
     return;
   };
 
+  const autoFormat = () => {
+    var totalLines = $scope.xmlCodeBox.lineCount();
+    var totalChars = $scope.xmlCodeBox.getTextArea().value.length;
+    $scope.xmlCodeBox.autoFormatRange({ line: 0, ch: 0 }, { line: totalLines, ch: totalChars });
+  }
+
+  $scope.editGroupAgentConfig = (group, params) => {
+    $timeout(function () { $scope.xmlCodeBox.refresh() });
+    $scope.editingGroupAgentConfig = true;
+    $scope.editingGroupAgentConfigItem = params.group;
+    try {
+      const xml = "<bookstore>\n<book>\n" +
+        "<title>Everyday Italian</title>\n" +
+        "<author>Giada De Laurentiis</author>\n" +
+        "<year>2005</year>\n" +
+        "</book>\n</bookstore>";
+      $scope.xmlCodeBox.setValue(xml);
+      autoFormat();
+    } catch (error) {
+      return false;
+    }
+  };
+  $scope.$on('editGroupAgentConfig', (group, params) => $scope.editGroupAgentConfig(group, params));
   // Resetting the factory configuration
-  $scope.$on('$destroy', () => {});
+  $scope.$on('$destroy', () => { });
 
   $scope.$watch('lookingGroup', value => {
     if (!value) {
