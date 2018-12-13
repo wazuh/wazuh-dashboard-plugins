@@ -2,7 +2,7 @@
 
 All notable changes to the Wazuh app project will be documented in this file.
 
-## Wazuh v3.8.0 - Kibana v6.5.2 - Revision 416
+## Wazuh v3.8.0 - Kibana v6.5.3 - Revision 416
 
 ### Added
 
@@ -28,11 +28,11 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Wazuh logo adapted to low resolutions ([#1074](https://github.com/wazuh/wazuh-kibana-app/pull/1074)).
 - Hide Audit, OpenSCAP tabs for non-linux agents. Fixed empty Windows events under Configuration > Log collection section. OSQuery logo has been standardized ([#1072](https://github.com/wazuh/wazuh-kibana-app/pull/1072), [#1076](https://github.com/wazuh/wazuh-kibana-app/pull/1076)).
 
-## Wazuh v3.7.1 - Kibana v6.5.1 / v6.5.2 - Revision 415
+## Wazuh v3.7.1 - Kibana v6.5.1 / v6.5.2 / v6.5.3 - Revision 415
 
 ### Added
 
-- Support for Elastic stack v6.5.2.
+- Support for Elastic stack v6.5.2 / v6.5.3.
 - Support for Wazuh v3.7.1.
 - Dev Tools module now autocompletes API endpoints ([#1030](https://github.com/wazuh/wazuh-kibana-app/pull/1030)).
 
