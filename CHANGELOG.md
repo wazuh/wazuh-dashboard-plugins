@@ -2,11 +2,11 @@
 
 All notable changes to the Wazuh app project will be documented in this file.
 
-## Wazuh v3.7.1 - Kibana v6.5.1 / v6.5.2 - Revision 415
+## Wazuh v3.7.1 - Kibana v6.5.1 / v6.5.2 / v6.5.3 - Revision 415
 
 ### Added
 
-- Support for Elastic stack v6.5.2.
+- Support for Elastic stack v6.5.2 / v6.5.3.
 - Support for Wazuh v3.7.1.
 - Dev Tools module now autocompletes API endpoints ([#1030](https://github.com/wazuh/wazuh-kibana-app/pull/1030)).
 
