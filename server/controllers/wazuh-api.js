@@ -33,7 +33,7 @@ export class WazuhApiCtrl {
    */
   constructor(server) {
     this.wzWrapper = new ElasticWrapper(server);
-    this.fetchAgentsExternal = Monitoring(server, { disableCron: true });
+    this.monitoringInstance = new Monitoring(server);
   }
 
   /**
@@ -760,16 +760,15 @@ export class WazuhApiCtrl {
     }
   }
 
-  // Fetch agent status and insert it directly on demand
   /**
-   *
+   * Fetch agent status and insert it directly on demand
    * @param {Object} req
    * @param {Object} reply
    * @returns {Object} status obj or ErrorResponse
    */
   async fetchAgents(req, reply) {
     try {
-      const output = await this.fetchAgentsExternal();
+      const output = await this.monitoringInstance.fetchAgentsExternal();
       return reply({
         statusCode: 200,
         error: '0',

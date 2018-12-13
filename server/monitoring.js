@@ -20,78 +20,80 @@ import packageJSON from '../package.json';
 import { getConfiguration } from './lib/get-configuration';
 import { parseCron } from './lib/parse-cron';
 import { BuildBody } from './lib/replicas-shards-helper';
+const blueWazuh = colors.blue('wazuh');
 
-export function Monitoring(server, options) {
-  const blueWazuh = colors.blue('wazuh');
-
-  let ENABLED = true;
-  let FREQUENCY = 3600;
-  let CRON_FREQ = '0 1 * * * *';
-  try {
-    const configFile = getConfiguration();
-
-    ENABLED =
-      configFile &&
-      typeof configFile['wazuh.monitoring.enabled'] !== 'undefined'
-        ? configFile['wazuh.monitoring.enabled'] &&
-          configFile['wazuh.monitoring.enabled'] !== 'worker'
-        : ENABLED;
-    FREQUENCY =
-      configFile &&
-      typeof configFile['wazuh.monitoring.frequency'] !== 'undefined'
-        ? configFile['wazuh.monitoring.frequency']
-        : FREQUENCY;
-
-    CRON_FREQ = parseCron(FREQUENCY);
-
-    !options &&
-      log(
-        '[monitoring][configuration]',
-        `wazuh.monitoring.enabled: ${ENABLED}`,
-        'info'
-      );
-    !options &&
-      server.log(
-        [blueWazuh, 'monitoring', 'info'],
-        `wazuh.monitoring.enabled: ${ENABLED}`
-      );
-
-    !options &&
-      log(
-        '[monitoring][configuration]',
-        `wazuh.monitoring.frequency: ${FREQUENCY} (${CRON_FREQ}) `,
-        'info'
-      );
-    !options &&
-      server.log(
-        [blueWazuh, 'monitoring', 'info'],
-        `wazuh.monitoring.frequency: ${FREQUENCY} (${CRON_FREQ})`
-      );
-  } catch (error) {
-    log('[monitoring][configuration]', error.message || error);
-    server.log([blueWazuh, 'monitoring', 'error'], error.message || error);
+export class Monitoring {
+  constructor(server) {
+    this.server = server;
+    this.ENABLED = true;
+    this.FREQUENCY = 3600;
+    this.CRON_FREQ = '0 1 * * * *';
+    this.index_pattern = 'wazuh-monitoring-3.x-*';
+    this.index_prefix = 'wazuh-monitoring-3.x-';
+    this.wzWrapper = new ElasticWrapper(server);
+    this.agentsArray = [];
+    this.todayIndex =
+      this.index_prefix +
+      new Date()
+        .toISOString()
+        .replace(/T/, '-')
+        .replace(/\..+/, '')
+        .replace(/-/g, '.')
+        .replace(/:/g, '')
+        .slice(0, -7);
+    this.initVariables();
   }
 
-  const index_pattern = 'wazuh-monitoring-3.x-*';
-  const index_prefix = 'wazuh-monitoring-3.x-';
+  initVariables() {
+    try {
+      const configFile = getConfiguration();
 
-  // Elastic JS Client
-  const wzWrapper = new ElasticWrapper(server);
+      this.ENABLED =
+        configFile &&
+        typeof configFile['wazuh.monitoring.enabled'] !== 'undefined'
+          ? configFile['wazuh.monitoring.enabled'] &&
+            configFile['wazuh.monitoring.enabled'] !== 'worker'
+          : this.ENABLED;
+      this.FREQUENCY =
+        configFile &&
+        typeof configFile['wazuh.monitoring.frequency'] !== 'undefined'
+          ? configFile['wazuh.monitoring.frequency']
+          : this.FREQUENCY;
 
-  // Initialize
-  let agentsArray = [];
+      this.CRON_FREQ = parseCron(this.FREQUENCY);
 
-  let fDate = new Date()
-    .toISOString()
-    .replace(/T/, '-')
-    .replace(/\..+/, '')
-    .replace(/-/g, '.')
-    .replace(/:/g, '')
-    .slice(0, -7);
-  let todayIndex = index_prefix + fDate;
+      log(
+        '[monitoring][configuration]',
+        `wazuh.monitoring.enabled: ${this.ENABLED}`,
+        'info'
+      );
+
+      this.server.log(
+        [blueWazuh, 'monitoring', 'info'],
+        `wazuh.monitoring.enabled: ${this.ENABLED}`
+      );
+
+      log(
+        '[monitoring][configuration]',
+        `wazuh.monitoring.frequency: ${this.FREQUENCY} (${this.CRON_FREQ}) `,
+        'info'
+      );
+
+      this.server.log(
+        [blueWazuh, 'monitoring', 'info'],
+        `wazuh.monitoring.frequency: ${this.FREQUENCY} (${this.CRON_FREQ})`
+      );
+    } catch (error) {
+      log('[monitoring][configuration]', error.message || error);
+      this.server.log(
+        [blueWazuh, 'monitoring', 'error'],
+        error.message || error
+      );
+    }
+  }
 
   // Check status and get agent status array
-  const checkStatus = async (apiEntry, maxSize) => {
+  async checkStatus(apiEntry, maxSize) {
     try {
       if (!maxSize) {
         throw new Error('You must provide a max size');
@@ -111,7 +113,7 @@ export function Monitoring(server, options) {
         rejectUnauthorized: !apiEntry.insecure
       };
 
-      while (agentsArray.length < maxSize) {
+      while (this.agentsArray.length < maxSize) {
         const response = await needle(
           'get',
           `${getPath(apiEntry)}/agents`,
@@ -119,25 +121,28 @@ export function Monitoring(server, options) {
           options
         );
         if (!response.error && response.body.data.items) {
-          agentsArray = agentsArray.concat(response.body.data.items);
+          this.agentsArray = this.agentsArray.concat(response.body.data.items);
           payload.offset += payload.limit;
         } else {
           throw new Error('Can not access Wazuh API');
         }
       }
 
-      await saveStatus(apiEntry.clusterName);
+      await this.saveStatus(apiEntry.clusterName);
 
       return;
     } catch (error) {
-      agentsArray = [];
+      this.agentsArray = [];
       log('[monitoring][checkStatus]', error.message || error);
-      server.log([blueWazuh, 'monitoring', 'error'], error.message || error);
+      this.server.log(
+        [blueWazuh, 'monitoring', 'error'],
+        error.message || error
+      );
     }
-  };
+  }
 
   // Check API status twice and get agents total items
-  const checkAndSaveStatus = async apiEntry => {
+  async checkAndSaveStatus(apiEntry) {
     try {
       const payload = {
         offset: 0,
@@ -192,13 +197,13 @@ export function Monitoring(server, options) {
         response.body.data &&
         response.body.data.totalItems
       ) {
-        await checkStatus(apiEntry, response.body.data.totalItems);
+        await this.checkStatus(apiEntry, response.body.data.totalItems);
       } else {
         log(
           '[monitoring][checkAndSaveStatus]',
           'Wazuh API credentials not found or are not correct. Open the app in your browser and configure it to start monitoring agents.'
         );
-        server.log(
+        this.server.log(
           [blueWazuh, 'monitoring', 'error'],
           'Wazuh API credentials not found or are not correct. Open the app in your browser and configure it to start monitoring agents.'
         );
@@ -206,12 +211,14 @@ export function Monitoring(server, options) {
       return;
     } catch (error) {
       log('[monitoring][checkAndSaveStatus]', error.message || error);
-      server.log([blueWazuh, 'monitoring', 'error'], error.message || error);
+      this.server.log(
+        [blueWazuh, 'monitoring', 'error'],
+        error.message || error
+      );
     }
-  };
-
+  }
   // Load Wazuh API credentials from Elasticsearch document
-  const loadCredentials = async apiEntries => {
+  async loadCredentials(apiEntries) {
     try {
       if (typeof apiEntries === 'undefined' || !('hits' in apiEntries)) return;
 
@@ -239,20 +246,23 @@ export function Monitoring(server, options) {
           insecure: element._source.insecure
         };
 
-        await checkAndSaveStatus(apiEntry);
+        await this.checkAndSaveStatus(apiEntry);
       }
 
       return { result: 'ok' };
     } catch (error) {
       log('[monitoring][loadCredentials]', error.message || error);
-      server.log([blueWazuh, 'monitoring', 'error'], error.message || error);
+      this.server.log(
+        [blueWazuh, 'monitoring', 'error'],
+        error.message || error
+      );
     }
-  };
+  }
 
   // Get API configuration from elastic and callback to loadCredentials
-  const getConfig = async () => {
+  async getConfig() {
     try {
-      const data = await wzWrapper.getWazuhAPIEntries();
+      const data = await this.wzWrapper.getWazuhAPIEntries();
 
       if (data.hits.total > 0) {
         return data.hits;
@@ -274,57 +284,57 @@ export function Monitoring(server, options) {
         error_code: 2
       };
     }
-  };
+  }
 
   // fetchAgents on demand
-  const fetchAgentsExternal = async () => {
+  async fetchAgentsExternal() {
     try {
-      const data = await getConfig();
-      return loadCredentials(data);
+      const data = await this.getConfig();
+      return this.loadCredentials(data);
     } catch (error) {
       return Promise.reject(error);
     }
-  };
+  }
 
   // Configure Kibana patterns.
-  const configureKibana = async () => {
+  async configureKibana() {
     try {
       log(
         '[monitoring][configureKibana]',
-        `Creating index pattern: ${index_pattern}`,
+        `Creating index pattern: ${this.index_pattern}`,
         'info'
       );
-      server.log(
+      this.server.log(
         [blueWazuh, 'monitoring', 'info'],
-        `Creating index pattern: ${index_pattern}`
+        `Creating index pattern: ${this.index_pattern}`
       );
 
-      await wzWrapper.createMonitoringIndexPattern(index_pattern);
+      await this.wzWrapper.createMonitoringIndexPattern(this.index_pattern);
 
       log(
         '[monitoring][configureKibana]',
-        `Created index pattern: ${index_pattern}`,
+        `Created index pattern: ${this.index_pattern}`,
         'info'
       );
-      server.log(
+      this.server.log(
         [blueWazuh, 'monitoring', 'info'],
-        `Created index pattern: ${index_pattern}`
+        `Created index pattern: ${this.index_pattern}`
       );
 
       return;
     } catch (error) {
       log('[monitoring][configureKibana]', error.message || error);
-      server.log(
+      this.server.log(
         [blueWazuh, 'monitoring', 'error'],
         'Error creating index-pattern due to ' + error
       );
     }
-  };
+  }
 
   // Creating wazuh-monitoring index
-  const createIndex = async (todayIndex, clusterName) => {
+  async createIndex(todayIndex, clusterName) {
     try {
-      if (!ENABLED) return;
+      if (!this.ENABLED) return;
       const configFile = getConfiguration();
 
       const shards =
@@ -348,18 +358,18 @@ export function Monitoring(server, options) {
         }
       };
 
-      await wzWrapper.createIndexByName(todayIndex, configuration);
+      await this.wzWrapper.createIndexByName(todayIndex, configuration);
 
       log(
         '[monitoring][createIndex]',
         'Successfully created today index.',
         'info'
       );
-      server.log(
+      this.server.log(
         [blueWazuh, 'monitoring', 'info'],
         'Successfully created today index.'
       );
-      await insertDocument(todayIndex, clusterName);
+      await this.insertDocument(todayIndex, clusterName);
       return;
     } catch (error) {
       log(
@@ -367,20 +377,20 @@ export function Monitoring(server, options) {
         `Could not create ${todayIndex} index on elasticsearch due to ${error.message ||
           error}`
       );
-      server.log(
+      this.server.log(
         [blueWazuh, 'monitoring', 'error'],
         `Could not create ${todayIndex} index on elasticsearch due to ${error.message ||
           error}`
       );
     }
-  };
+  }
 
   // Inserting one document per agent into Elastic. Bulk.
-  const insertDocument = async (todayIndex, clusterName) => {
+  async insertDocument(todayIndex, clusterName) {
     try {
       let body = '';
-      if (agentsArray.length > 0) {
-        for (const element of agentsArray) {
+      if (this.agentsArray.length > 0) {
+        for (const element of this.agentsArray) {
           body +=
             '{ "index":  { "_index": "' +
             todayIndex +
@@ -393,9 +403,9 @@ export function Monitoring(server, options) {
         }
         if (body === '') return;
 
-        await wzWrapper.pushBulkAnyIndex(todayIndex, body);
+        await this.wzWrapper.pushBulkAnyIndex(todayIndex, body);
 
-        agentsArray = [];
+        this.agentsArray = [];
       }
       return;
     } catch (error) {
@@ -404,28 +414,30 @@ export function Monitoring(server, options) {
         `Error inserting agent data into elasticsearch. Bulk request failed due to ${error.message ||
           error}`
       );
-      server.log(
+      this.server.log(
         [blueWazuh, 'monitoring', 'error'],
         `Error inserting agent data into elasticsearch. Bulk request failed due to ${error.message ||
           error}`
       );
     }
-  };
+  }
 
   // Save agent status into elasticsearch, create index and/or insert document
-  const saveStatus = async clusterName => {
+  async saveStatus(clusterName) {
     try {
-      if (!ENABLED) return;
-      fDate = new Date()
-        .toISOString()
-        .replace(/T/, '-')
-        .replace(/\..+/, '')
-        .replace(/-/g, '.')
-        .replace(/:/g, '')
-        .slice(0, -7);
-      todayIndex = index_prefix + fDate;
+      if (!this.ENABLED) return;
 
-      const result = await wzWrapper.checkIfIndexExists(todayIndex);
+      this.todayIndex =
+        this.index_prefix +
+        new Date()
+          .toISOString()
+          .replace(/T/, '-')
+          .replace(/\..+/, '')
+          .replace(/-/g, '.')
+          .replace(/:/g, '')
+          .slice(0, -7);
+
+      const result = await this.wzWrapper.checkIfIndexExists(this.todayIndex);
 
       if (result) {
         const configurationFile = getConfiguration();
@@ -435,38 +447,43 @@ export function Monitoring(server, options) {
           5,
           1
         );
-        await wzWrapper.updateIndexSettings(todayIndex, shardConfiguration);
-        await insertDocument(todayIndex, clusterName);
+        await this.wzWrapper.updateIndexSettings(
+          this.todayIndex,
+          shardConfiguration
+        );
+        await this.insertDocument(this.todayIndex, clusterName);
       } else {
-        await createIndex(todayIndex, clusterName);
+        await this.createIndex(this.todayIndex, clusterName);
       }
 
       return;
     } catch (error) {
       log(
         '[monitoring][saveStatus]',
-        `Could not check if the index ${todayIndex} exists due to ${error.message ||
-          error}`
+        `Could not check if the index ${
+          this.todayIndex
+        } exists due to ${error.message || error}`
       );
-      server.log(
+      this.server.log(
         [blueWazuh, 'monitoring', 'error'],
-        `Could not check if the index ${todayIndex} exists due to ${error.message ||
-          error}`
+        `Could not check if the index ${
+          this.todayIndex
+        } exists due to ${error.message || error}`
       );
     }
-  };
+  }
 
-  const createWazuhMonitoring = async () => {
+  async createWazuhMonitoring() {
     try {
       try {
-        await wzWrapper.deleteMonitoring();
+        await this.wzWrapper.deleteMonitoring();
 
         log(
           '[monitoring][createWazuhMonitoring]',
           'Successfully deleted old wazuh-monitoring pattern.',
           'info'
         );
-        server.log(
+        this.server.log(
           [blueWazuh, 'monitoring', 'info'],
           'Successfully deleted old wazuh-monitoring pattern.'
         );
@@ -476,31 +493,31 @@ export function Monitoring(server, options) {
           'No need to delete old wazuh-monitoring pattern.',
           'info'
         );
-        server.log(
+        this.server.log(
           [blueWazuh, 'monitoring', 'info'],
           'No need to delete  old wazuh-monitoring pattern.'
         );
       }
 
-      await configureKibana();
+      await this.configureKibana();
       return;
     } catch (error) {
       return Promise.reject(error);
     }
-  };
+  }
 
-  const checkTemplate = async () => {
+  async checkTemplate() {
     try {
       log(
         '[monitoring][checkTemplate]',
         'Updating wazuh-monitoring template...',
         'info'
       );
-      server.log(
+      this.server.log(
         [blueWazuh, 'monitoring', 'info'],
         'Updating wazuh-monitoring template...'
       );
-      await wzWrapper.putMonitoringTemplate(monitoringTemplate);
+      await this.wzWrapper.putMonitoringTemplate(monitoringTemplate);
       return;
     } catch (error) {
       log(
@@ -508,31 +525,34 @@ export function Monitoring(server, options) {
         `Something went wrong updating wazuh-monitoring template... ${error.message ||
           error}`
       );
-      server.log(
+      this.server.log(
         [blueWazuh, 'monitoring', 'error'],
         `Something went wrong updating wazuh-monitoring template... ${error.message ||
           error}`
       );
       return Promise.reject(error);
     }
-  };
+  }
 
   // Main. First execution when installing / loading App.
-  const init = async () => {
+  async init() {
     try {
       log(
         '[monitoring][init]',
         'Creating/Updating wazuh-agent template...',
         'info'
       );
-      await checkTemplate();
+      await this.checkTemplate();
 
       log('[monitoring][init]', 'Creating today index...', 'info');
-      server.log([blueWazuh, 'monitoring', 'info'], 'Creating today index...');
+      this.server.log(
+        [blueWazuh, 'monitoring', 'info'],
+        'Creating today index...'
+      );
 
-      await saveStatus();
+      await this.saveStatus();
 
-      const patternId = 'index-pattern:' + index_pattern;
+      const patternId = 'index-pattern:' + this.index_pattern;
 
       // Checks if wazuh-monitoring index pattern is already created, if it fails create it
       try {
@@ -541,12 +561,12 @@ export function Monitoring(server, options) {
           'Checking if wazuh-monitoring pattern exists...',
           'info'
         );
-        server.log(
+        this.server.log(
           [blueWazuh, 'monitoring', 'info'],
           'Checking if wazuh-monitoring pattern exists...'
         );
-        await wzWrapper.getIndexPatternUsingGet(patternId);
-        server.log(
+        await this.wzWrapper.getIndexPatternUsingGet(patternId);
+        this.server.log(
           [blueWazuh, 'monitoring', 'info'],
           'Updating known fields for wazuh-monitoring pattern...'
         );
@@ -555,18 +575,18 @@ export function Monitoring(server, options) {
           'Updating known fields for wazuh-monitoring pattern...',
           'info'
         );
-        await wzWrapper.updateMonitoringIndexPatternKnownFields(patternId);
+        await this.wzWrapper.updateMonitoringIndexPatternKnownFields(patternId);
       } catch (error) {
         log(
           '[monitoring][init]',
           "Didn't find wazuh-monitoring pattern for Kibana v6.x. Proceeding to create it...",
           'info'
         );
-        server.log(
+        this.server.log(
           [blueWazuh, 'monitoring', 'info'],
           "Didn't find wazuh-monitoring pattern for Kibana v6.x. Proceeding to create it..."
         );
-        return createWazuhMonitoring();
+        return this.createWazuhMonitoring();
       }
 
       log(
@@ -574,28 +594,31 @@ export function Monitoring(server, options) {
         'Skipping wazuh-monitoring pattern creation. Already exists.',
         'info'
       );
-      server.log(
+      this.server.log(
         [blueWazuh, 'monitoring', 'info'],
         'Skipping wazuh-monitoring creation. Already exists.'
       );
 
       return;
     } catch (error) {
-      server.log([blueWazuh, 'monitoring', 'error'], error.message || error);
+      this.server.log(
+        [blueWazuh, 'monitoring', 'error'],
+        error.message || error
+      );
       log('[monitoring][init]', error.message || error);
       return;
     }
-  };
+  }
 
   // Check Elasticsearch Server status and Kibana index presence
-  const checkElasticsearchServer = async () => {
+  async checkElasticsearchServer() {
     try {
-      const data = await wzWrapper.checkIfIndexExists(
-        wzWrapper.WZ_KIBANA_INDEX
+      const data = await this.wzWrapper.checkIfIndexExists(
+        this.wzWrapper.WZ_KIBANA_INDEX
       );
 
       if (data) {
-        const pluginsData = await server.plugins.elasticsearch.waitUntilReady();
+        const pluginsData = await this.server.plugins.elasticsearch.waitUntilReady();
         return pluginsData;
       }
       return Promise.reject(data);
@@ -603,22 +626,22 @@ export function Monitoring(server, options) {
       log('[monitoring][checkElasticsearchServer]', error.message || error);
       return Promise.reject(error);
     }
-  };
+  }
 
   // Wait until Kibana server is ready
-  const checkKibanaStatus = async () => {
+  async checkKibanaStatus() {
     try {
       log(
         '[monitoring][checkKibanaStatus]',
         'Waiting for Kibana and Elasticsearch servers to be ready...',
         'info'
       );
-      server.log(
+      this.server.log(
         [blueWazuh, 'monitoring', 'info'],
         'Waiting for Kibana and Elasticsearch servers to be ready...'
       );
-      await checkElasticsearchServer();
-      await init();
+      await this.checkElasticsearchServer();
+      await this.init();
       return;
     } catch (error) {
       log(
@@ -626,21 +649,18 @@ export function Monitoring(server, options) {
         'Waiting for Kibana and Elasticsearch servers to be ready...',
         'info'
       );
-      server.log(
+      this.server.log(
         [blueWazuh, 'monitoring', 'info'],
         'Waiting for Kibana and Elasticsearch servers to be ready...',
         'info'
       );
-      setTimeout(() => checkKibanaStatus(), 3000);
+      setTimeout(() => this.checkKibanaStatus(), 3000);
     }
-  };
+  }
 
-  // Check Kibana index and if it is prepared, start the initialization of Wazuh App.
-  if (!options) checkKibanaStatus();
-
-  const cronTask = async () => {
+  async cronTask() {
     try {
-      const template = await wzWrapper.getTemplateByName('wazuh-agent');
+      const template = await this.wzWrapper.getTemplateByName('wazuh-agent');
 
       // Prevents to insert monitoring indices without the proper template inserted
       if (
@@ -648,16 +668,16 @@ export function Monitoring(server, options) {
         typeof template['wazuh-agent'] !== 'undefined' &&
         typeof template['wazuh-agent'].index_patterns !== 'undefined'
       ) {
-        agentsArray = [];
-        const data = await getConfig();
-        await loadCredentials(data);
+        this.agentsArray = [];
+        const data = await this.getConfig();
+        await this.loadCredentials(data);
       } else {
         log(
           '[monitoring][cronTask]',
           'No wazuh-agent template found, not inserting monitoring data',
           'info'
         );
-        server.log(
+        this.server.log(
           [blueWazuh, 'monitoring [cronTask]', 'info'],
           'No wazuh-agent template found, not inserting monitoring data'
         );
@@ -666,14 +686,21 @@ export function Monitoring(server, options) {
       return;
     } catch (error) {
       log('[monitoring][cronTask]', error.message || error);
-      server.log(
+      this.server.log(
         [blueWazuh, 'monitoring [cronTask]', 'error'],
         error.message || error
       );
     }
-  };
-  if (!options && ENABLED) cronTask();
-  // Cron tab for getting agent status.
-  if (!options && ENABLED) cron.schedule(CRON_FREQ, cronTask, true);
-  return fetchAgentsExternal;
+  }
+
+  run() {
+    // Check Kibana index and if it is prepared, start the initialization of Wazuh App.
+    this.checkKibanaStatus();
+
+    // Run the cron job only it it's enabled
+    if (this.ENABLED) {
+      this.cronTask();
+      cron.schedule(this.CRON_FREQ, this.cronTask, true);
+    }
+  }
 }
