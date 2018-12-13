@@ -6,6 +6,7 @@ import './foldgutter.css';
 import './ttcn.css';
 import './javascript.js';
 import './xml.js';
+import './formatting.js';
 import './brace-fold.js';
 import './foldcode.js';
 import './foldgutter.js';

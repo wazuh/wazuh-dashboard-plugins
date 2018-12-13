@@ -38,6 +38,7 @@ app.directive('wzTable', function () {
       extraLimit: '=extraLimit'
     },
     controller(
+      $rootScope,
       $scope,
       apiReq,
       $timeout,
@@ -255,7 +256,7 @@ app.directive('wzTable', function () {
       };
 
       $scope.editGroupAgentConfig = (ev, group) => {
-        $scope.$emit('editGroupAgentConfig', { group });
+        $rootScope.$emit('editXmlFile', { 'target' : group });
       };
 
       $scope.showConfirm = function (ev, agent) {

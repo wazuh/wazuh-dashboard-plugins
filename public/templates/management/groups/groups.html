@@ -90,18 +90,10 @@
             <!-- End CSV Download button section for groups -->
 
             <!-- XML editor for group agents -->
-            <div class="wzEmbedDialog" ng-show="!lookingGroup && editingGroupAgentConfig" >
-                <div class="wzEmbedDialogHeader">
-                    <span>Edit <b>agent.conf</b> of {{editingGroupAgentConfigItem.name}}</span>
-                    <i aria-hidden="true" class="fa fa-fw fa-times cursor-pointer" ng-click="editingGroupAgentConfig = false"></i>
-                </div>
-                <textarea id="xml_box"></textarea>
-                <div class="wzEmbedDialogFooter">
-                    <span ng-click="saveGroupAgentConfig()" class="btn btn-primary"><i aria-hidden="true" class="fa fa-fw fa-save"></i> Save file</span>
-                </div>
-            </div>
+            <wz-xml-file-editor file-name='agents.conf' load-path='hola' update-path='adios'>
+            </wz-xml-file-editor>
             <!-- XML editor for group agents -->
-            
+
             <!-- Group agents table -->
             <div layout="row" ng-if="lookingGroup && groupsSelectedTab==='agents' && currentGroup" class="md-padding">
                 <wz-table flex path="'/agents/groups/' + currentGroup.name" keys="['id','name','ip','status','os.name','os.version','version']"
