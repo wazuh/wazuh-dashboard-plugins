@@ -122,6 +122,7 @@ app.directive('wzXmlFileEditor', function () {
         }
       };
       $rootScope.$on('editXmlFile', (item, params) => $scope.editXmlFile(item, params));
+      $rootScope.$on('closeEditXmlFile', () => $scope.editingFile = false);
     },
     template
   };

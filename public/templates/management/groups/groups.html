@@ -90,8 +90,10 @@
             <!-- End CSV Download button section for groups -->
 
             <!-- XML editor for group agents -->
-            <wz-xml-file-editor file-name='agents.conf' load-path='hola' update-path='adios'>
-            </wz-xml-file-editor>
+            <div ng-if="!lookingGroup">
+                <wz-xml-file-editor file-name='agents.conf' load-path='load' update-path='update'>
+                </wz-xml-file-editor>
+            </div>
             <!-- XML editor for group agents -->
 
             <!-- Group agents table -->

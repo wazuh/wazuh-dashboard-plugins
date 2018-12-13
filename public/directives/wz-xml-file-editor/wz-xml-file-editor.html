@@ -1,12 +1,17 @@
-<div class='wzEmbedDialog' ng-show='!lookingGroup && editingFile'>
-    <div class='wzEmbedDialogHeader'>
+<div class='wzXmlEditor' ng-show='editingFile'>
+    <div class='wzXmlEditorHeader'>
         <span>Edit <b>{{fileName}}</b> of <b>{{targetName}}</b></span>
         <i aria-hidden='true' class='fa fa-fw fa-times cursor-pointer' ng-click='editingFile = false'></i>
     </div>
-    <div ng-show='!loadingFile'>
-        <textarea id='xml_box'></textarea>
+    <div class='wzXmlEditorBody'>
+        <div class='uil-ring-css' ng-show="loadingFile">
+            <div></div>
+        </div>
+        <div ng-show='!loadingFile'>
+            <textarea id='xml_box'></textarea>
+        </div>
     </div>
-    <div class='wzEmbedDialogFooter'>
+    <div class='wzXmlEditorFooter'>
         <span ng-disabled='xmlHasErrors' ng-click='saveFile()' class='btn btn-primary'><i aria-hidden='true' class='fa fa-fw fa-save'></i>
             Save file</span>
         <span ng-show='xmlHasErrors' class='btn-danger'><i aria-hidden='true' class='fa fa-fw fa-exclamation-triangle'></i>

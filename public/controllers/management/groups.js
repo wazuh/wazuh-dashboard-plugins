@@ -13,6 +13,7 @@ import beautifier from '../../utils/json-beautifier';
 import * as FileSaver from '../../services/file-saver';
 
 export function GroupsController(
+  $rootScope,
   $scope,
   $location,
   apiReq,
@@ -185,7 +186,8 @@ export function GroupsController(
   // Resetting the factory configuration
   $scope.$on('$destroy', () => { });
 
-    $scope.$watch('lookingGroup', value => {
+  $scope.$watch('lookingGroup', value => {
+    $rootScope.$emit('closeEditXmlFile', {});
     if (!value) {
       $scope.file = false;
       $scope.filename = false;
