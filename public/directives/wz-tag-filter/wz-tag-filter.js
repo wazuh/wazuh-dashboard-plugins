@@ -48,7 +48,7 @@ app.directive('wzTagFilter', function() {
           );
           input.blur();
           const term = $scope.newTag.split(':');
-          const obj = { name: term[0], value: term[1] };
+          const obj = { name: term[0].trim(), value: term[1].trim() };
           const isFilter = obj.value;
           if (
             (isFilter &&
@@ -75,7 +75,7 @@ app.directive('wzTagFilter', function() {
                 return (
                   x.type === 'filter' &&
                   x.key === tag.key &&
-                  x.value.value === tag.value.value
+                  x.value.value.toUpperCase() === tag.value.value.toUpperCase()
                 );
               })
             ) {
