@@ -276,10 +276,7 @@ export class OverviewController {
         await this.fetchWodles();
       }
 
-      if (
-        newTab === 'welcome' &&
-        typeof this.agentsCountTotal === 'undefined'
-      ) {
+      if (typeof this.agentsCountTotal === 'undefined') {    
         await this.getSummary();
       }
 
