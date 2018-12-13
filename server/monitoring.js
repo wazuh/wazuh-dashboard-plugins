@@ -308,7 +308,7 @@ export class Monitoring {
           `Created index pattern: ${this.index_pattern}`,
           'info'
         );
-      this.server.log(
+      !this.quiet && this.server.log(
         [blueWazuh, 'monitoring', 'info'],
         `Created index pattern: ${this.index_pattern}`
       );
@@ -465,7 +465,7 @@ export class Monitoring {
             this.todayIndex
           } exists due to ${error.message || error}`
         );
-      this.server.log(
+      !this.quiet && this.server.log(
         [blueWazuh, 'monitoring', 'error'],
         `Could not check if the index ${
           this.todayIndex
@@ -485,7 +485,7 @@ export class Monitoring {
             'Successfully deleted old wazuh-monitoring pattern.',
             'info'
           );
-        this.server.log(
+        !this.quiet && this.server.log(
           [blueWazuh, 'monitoring', 'info'],
           'Successfully deleted old wazuh-monitoring pattern.'
         );
