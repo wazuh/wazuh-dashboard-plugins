@@ -224,19 +224,19 @@ app.directive('wzTagFilter', function() {
         $scope.autocompleteContent.title = isKey ? 'Filter keys' : 'Values';
         if (isKey) {
           for (let key in $scope.fieldsModel) {
-            if (key.toUpperCase().includes(term[0].toUpperCase())) {
+            if (key.toUpperCase().includes(term[0].trim().toUpperCase())) {
               $scope.autocompleteContent.list.push(key);
             }
           }
         } else {
           const model = $scope.dataModel.find(function(x) {
-            return x.key === $scope.newTag.split(':')[0];
+            return x.key === $scope.newTag.split(':')[0].trim();
           });
           if (model) {
             $scope.autocompleteContent.list = [
               ...new Set(
                 model.list.filter(function(x) {
-                  return x.toUpperCase().includes(term[1].toUpperCase());
+                  return x.toUpperCase().includes(term[1].trim().toUpperCase());
                 })
               )
             ];
