@@ -113,7 +113,7 @@ export class Monitoring {
         limit: 500
       };
 
-      this.agentsArray = ApiHelper.fetchAllAgents(
+      this.agentsArray = await ApiHelper.fetchAllAgents(
         api,
         maxSize,
         payload,
