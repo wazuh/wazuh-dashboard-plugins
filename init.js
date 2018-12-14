@@ -21,6 +21,7 @@ import { WazuhUtilsRoutes } from './server/routes/wazuh-utils';
 import { log } from './server/logger';
 
 export function initApp(server) {
+  const monitoringInstance = new Monitoring(server);
   log('[initApp]', `Waiting for awaitMigration()`, 'info');
   server.kibanaMigrator
     .awaitMigration()
@@ -33,7 +34,7 @@ export function initApp(server) {
       Initialize(server);
       WazuhElasticRouter(server);
       WazuhApiElasticRoutes(server);
-      Monitoring(server, false);
+      monitoringInstance.run();
       WazuhApiRoutes(server);
       WazuhReportingRoutes(server);
       WazuhUtilsRoutes(server);
