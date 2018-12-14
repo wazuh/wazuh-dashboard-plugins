@@ -24,6 +24,10 @@ import * as ApiHelper from './lib/api-helper';
 const blueWazuh = colors.blue('wazuh');
 
 export class Monitoring {
+  /**
+   * @param {Object} server Hapi.js server object provided by Kibana
+   * @param {Boolean} quite Boolean value used to show/don't show logs and stdout messages
+   */
   constructor(server, quiet = false) {
     this.server = server;
     this.ENABLED = true;
@@ -46,6 +50,9 @@ export class Monitoring {
     this.quiet = quiet;
   }
 
+  /**
+   * Fill the value of ENABLED, FREQUENCY and CRON_FREQ depending on the user configuration.
+   */
   initVariables() {
     try {
       const configFile = getConfiguration();
@@ -99,7 +106,11 @@ export class Monitoring {
     }
   }
 
-  // Check status and get agent status array
+  /**
+   * Check status and get agent status array
+   * @param {Object} api Wazuh API entry from Elasticsearch.
+   * @param {Number} maxSize Fetching agent purposes.
+   */
   async checkStatus(api, maxSize) {
     try {
       if (!maxSize) {
@@ -134,7 +145,10 @@ export class Monitoring {
     }
   }
 
-  // Check API status twice and get agents total items
+  /**
+   * Check API status twice and get agents total items
+   * @param {Object} api Wazuh API entry from Elasticsearch.
+   */
   async checkAndSaveStatus(api) {
     try {
       const payload = {
@@ -203,7 +217,11 @@ export class Monitoring {
         );
     }
   }
-  // Load Wazuh API credentials from Elasticsearch document
+
+  /**
+   * Iterates over all the Wazuh API entries, then it sends each API entry to the fetching function.
+   * @param {Array<Object>} apiEntries List of Wazuh API entries from Elasticsearch.
+   */
   async loadCredentials(apiEntries) {
     try {
       if (typeof apiEntries === 'undefined' || !('hits' in apiEntries)) return;
@@ -247,7 +265,9 @@ export class Monitoring {
     }
   }
 
-  // Get API configuration from elastic and callback to loadCredentials
+  /**
+   * Get API configuration from elastic and callback to loadCredentials
+   */
   async getConfig() {
     try {
       const data = await this.wzWrapper.getWazuhAPIEntries();
@@ -275,7 +295,9 @@ export class Monitoring {
     }
   }
 
-  // fetchAgents on demand
+  /**
+   * Fetch agents on demand
+   */
   async fetchAgentsExternal() {
     try {
       const data = await this.getConfig();
@@ -285,7 +307,9 @@ export class Monitoring {
     }
   }
 
-  // Configure Kibana patterns.
+  /**
+   * Configure Kibana patterns
+   */
   async configureKibana() {
     try {
       !this.quiet &&
@@ -325,7 +349,11 @@ export class Monitoring {
     }
   }
 
-  // Creating wazuh-monitoring index
+  /**
+   * Creating wazuh-monitoring index
+   * @param {String} todayIndex The name for the today's index (wazuh-monitoring-3.x-YYYY.MM.DD)
+   * @param {String} clusterName Wazuh cluster name.
+   */
   async createIndex(todayIndex, clusterName) {
     try {
       if (!this.ENABLED) return;
@@ -383,7 +411,11 @@ export class Monitoring {
     }
   }
 
-  // Inserting one document per agent into Elastic. Bulk.
+  /**
+   * Inserting one document per agent into Elastic. Bulk.
+   * @param {String} todayIndex The name for the today's index (wazuh-monitoring-3.x-YYYY.MM.DD)
+   * @param {String} clusterName Wazuh cluster name.
+   */
   async insertDocument(todayIndex, clusterName) {
     try {
       let body = '';
@@ -422,7 +454,10 @@ export class Monitoring {
     }
   }
 
-  // Save agent status into elasticsearch, create index and/or insert document
+  /**
+   * Save agent status into elasticsearch, create index and/or insert document
+   * @param {String} clusterName Wazuh cluster name.
+   */
   async saveStatus(clusterName) {
     try {
       if (!this.ENABLED) return;
@@ -474,6 +509,9 @@ export class Monitoring {
     }
   }
 
+  /**
+   * Removes the existing one index pattern, then it recreates the pattern with the new format.
+   */
   async createWazuhMonitoring() {
     try {
       try {
@@ -510,6 +548,9 @@ export class Monitoring {
     }
   }
 
+  /**
+   * Verify wazuh-agent template
+   */
   async checkTemplate() {
     try {
       !this.quiet &&
@@ -542,7 +583,9 @@ export class Monitoring {
     }
   }
 
-  // Main. First execution when installing / loading App.
+  /**
+   * Main. First execution when installing / loading App.
+   */
   async init() {
     try {
       !this.quiet &&
@@ -630,7 +673,9 @@ export class Monitoring {
     }
   }
 
-  // Check Elasticsearch Server status and Kibana index presence
+  /**
+   * Check Elasticsearch Server status and Kibana index presence
+   */
   async checkElasticsearchServer() {
     try {
       const data = await this.wzWrapper.checkIfIndexExists(
@@ -649,7 +694,9 @@ export class Monitoring {
     }
   }
 
-  // Wait until Kibana server is ready
+  /**
+   * Wait until Kibana server is ready
+   */
   async checkKibanaStatus() {
     try {
       !this.quiet &&
@@ -683,6 +730,9 @@ export class Monitoring {
     }
   }
 
+  /**
+   * Task used by the cron job.
+   */
   async cronTask() {
     try {
       const template = await this.wzWrapper.getTemplateByName('wazuh-agent');
@@ -721,6 +771,9 @@ export class Monitoring {
     }
   }
 
+  /**
+   * Function to start the cron job
+   */
   run() {
     // Check Kibana index and if it is prepared, start the initialization of Wazuh App.
     this.checkKibanaStatus();
