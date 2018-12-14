@@ -17,11 +17,13 @@ export function GroupsController(
   $scope,
   $location,
   apiReq,
+  genericReq,
   errorHandler,
   csvReq,
   appState,
   shareAgent,
   $document,
+  $timeout,
   wzTableFilter
 ) {
   $scope.$on('groupsIsReloaded', () => {
@@ -77,6 +79,10 @@ export function GroupsController(
           // Load that our group
           $scope.loadGroup(filtered[0], true);
           $scope.lookingGroup = true;
+          $scope.addingAgents = false;
+          $scope.availableAgents = { 'loaded': false, 'data': [], 'offset': 0 };
+          $scope.selectedAgents = { 'loaded': false, 'data': [], 'offset': 0 };
+          $scope.searchBarModel = [];
         } else {
           throw Error(`Group ${globalGroup} not found`);
         }
@@ -138,6 +144,7 @@ export function GroupsController(
         { limit: 1 }
       );
       $scope.currentGroup.count = result.data.data.totalItems;
+      $scope.currentGroup.agents = result.data.data.items;
     } catch (error) {
       errorHandler.handle(error, 'Groups');
     }
@@ -183,10 +190,105 @@ export function GroupsController(
     return;
   };
 
+  $scope.loadSearchBarModel = async () => {
+    const api = JSON.parse(appState.getCurrentAPI()).id;
+    const clusterInfo = appState.getClusterInfo();
+    const firstUrlParam =
+      clusterInfo.status === 'enabled' ? 'cluster' : 'manager';
+    const secondUrlParam = clusterInfo[firstUrlParam];
+
+    const pattern = appState.getCurrentPattern();
+
+    const data = await Promise.all([
+      genericReq.request('GET', '/api/agents-unique/' + api, {}),
+      genericReq.request(
+        'GET',
+        `/elastic/top/${firstUrlParam}/${secondUrlParam}/agent.name/${pattern}`
+      )
+    ]);
+    const unique = data[0].data.result;
+    $scope.searchBarModel = {
+      'status': ['Active', 'Disconnected', 'Never connected'],
+      'group': unique.groups,
+      'node_name': unique.nodes,
+      'version': unique.versions,
+      'os.platform': unique.osPlatforms.map(x => x.platform),
+      'os.version': unique.osPlatforms.map(x => x.version),
+      'os.name': unique.osPlatforms.map(x => x.name),
+    };
+    $scope.searchBarModel['os.name'] = Array.from(new Set($scope.searchBarModel['os.name']));
+    $scope.searchBarModel['os.version'] = Array.from(new Set($scope.searchBarModel['os.version']));
+    $scope.searchBarModel['os.platform'] = Array.from(new Set($scope.searchBarModel['os.platform']));
+  }
+
+  $scope.reload = async (element, addOffset) => {
+    $scope.multipleSelectorLoading = true;
+    if (element === 'left') {
+      $scope.availableAgents.offset += addOffset + 1;
+      await $scope.loadAllAgents();
+    } else {
+      $scope.selectedAgents.offset += addOffset + 1;
+      await $scope.loadSelectedAgents();
+    }
+    $timeout(function () {
+      $scope.multipleSelectorLoading = false;
+    }, 100);
+  }
+
+  $scope.loadSelectedAgents = async () => {
+    try {
+      const result = await apiReq.request('GET', `/agents/groups/${$scope.currentGroup.name}`, { offset: $scope.selectedAgents.offset });
+      const mapped = result.data.data.items.map(function (item) {
+        return { 'key': item.id, 'value': item.name };
+      });
+      $scope.selectedAgents.data = $scope.selectedAgents.data.concat(mapped);
+    } catch (error) {
+      errorHandler.handle(error, 'Error fetching group agents');
+    }
+    $scope.selectedAgents.loaded = true;
+  }
+
+  $scope.loadAllAgents = async () => {
+    try {
+      const req = await apiReq.request('GET', '/agents/', { offset: $scope.availableAgents.offset });
+      const mapped = req.data.data.items.filter(function (item) {
+        return $scope.selectedAgents.data.filter(function (selected) {
+          return selected.key == item.id;
+        }).length == 0 && item.id !== '000';
+      }).map(function (item) {
+        return { 'key': item.id, 'value': item.name };
+      });
+      $scope.availableAgents.data = $scope.availableAgents.data.concat(mapped);
+    } catch (error) {
+      errorHandler.handle(error, 'Error fetching all available agents');
+    }
+    $scope.availableAgents.loaded = true;
+  }
+
+  $scope.addMultipleAgents = async (toggle) => {
+    $scope.addingAgents = toggle;
+    if (toggle && !$scope.availableAgents.loaded) {
+      //await $scope.loadSearchBarModel();
+      $scope.multipleSelectorLoading = true;
+      await $scope.loadSelectedAgents();
+      await $scope.loadAllAgents();
+      $timeout(function () {
+        $scope.multipleSelectorLoading = false;
+      }, 100);
+    }
+  };
+
+  $scope.saveAddAgents = async (agents) => {
+    alert('saved ' + agents);
+  }
+
   // Resetting the factory configuration
   $scope.$on('$destroy', () => { });
 
   $scope.$watch('lookingGroup', value => {
+    $scope.availableAgents = { 'loaded': false, 'data': [], 'offset': 0 };
+    $scope.selectedAgents = { 'loaded': false, 'data': [], 'offset': 0 };
+    $scope.addMultipleAgents(false);
     $rootScope.$emit('closeEditXmlFile', {});
     if (!value) {
       $scope.file = false;

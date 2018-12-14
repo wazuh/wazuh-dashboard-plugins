@@ -62,8 +62,22 @@
             </div>
             <!-- End MD5 Sums and Details cards -->
 
+            <!-- Group actions -->
+            <div layout="row" class="md-padding" ng-if="lookingGroup && currentGroup && !addingAgents">
+                <span ng-click='addMultipleAgents(true)' class='btn btn-primary'><i aria-hidden='true' class='fa fa-fw fa-plus'></i>
+                    Add agents</span>
+            </div>
+            <div layout="row" class="md-padding" ng-if="lookingGroup && currentGroup && addingAgents">
+                <span ng-click='addMultipleAgents(false)' class='btn btn-info'>
+                    Cancel</span>
+                <span ng-click='saveAddAgents(selectedAgents.data)' class='btn btn-primary wz-margin-left-8'><i
+                        aria-hidden='true' class='fa fa-fw fa-save'></i>
+                    Apply changes</span>
+            </div>
+            <!-- End group actions -->
+
             <!-- Search bar -->
-            <div layout="row" class="md-padding">
+            <div layout="row" class="md-padding" ng-if="!addingAgents">
                 <input placeholder="Filter..." ng-model="custom_search" type="text" class="kuiLocalSearchInput ng-empty ng-pristine ng-scope ng-touched ng-valid"
                     aria-invalid="false" wz-enter="search(custom_search)">
                 <button type="submit" aria-label="Search" class="kuiLocalSearchButton height-40" ng-click="search(custom_search)">
@@ -96,54 +110,62 @@
             </div>
             <!-- XML editor for group agents -->
 
-            <!-- Group agents table -->
-            <div layout="row" ng-if="lookingGroup && groupsSelectedTab==='agents' && currentGroup" class="md-padding">
-                <wz-table flex path="'/agents/groups/' + currentGroup.name" keys="['id','name','ip','status','os.name','os.version','version']"
-                    allow-click="true" row-sizes="[14,12,10]" />
-            </div>
-            <!-- End Group agents table -->
+            <div ng-if='!addingAgents'>
+                <!-- Group agents table -->
+                <div layout="row" ng-if="lookingGroup && groupsSelectedTab==='agents' && currentGroup" class="md-padding">
+                    <wz-table flex path="'/agents/groups/' + currentGroup.name" keys="['id','name','ip','status','os.name','os.version','version']"
+                        allow-click="true" row-sizes="[14,12,10]" />
+                </div>
+                <!-- End Group agents table -->
 
-            <!-- CSV Download button section for group agents -->
-            <div layout="row" class="md-padding" ng-if="lookingGroup && groupsSelectedTab==='agents'">
-                <span flex></span>
-                <a class="small" id="btnDownload" ng-click="downloadCsv('/agents/groups/' + currentGroup.name)">Formatted
-                    <i aria-hidden="true" class="fa fa-fw fa-download"></i>
-                </a>
-            </div>
-            <!-- End CSV Download button section for group agents -->
+                <!-- CSV Download button section for group agents -->
+                <div layout="row" class="md-padding" ng-if="lookingGroup && groupsSelectedTab==='agents'">
+                    <span flex></span>
+                    <a class="small" id="btnDownload" ng-click="downloadCsv('/agents/groups/' + currentGroup.name)">Formatted
+                        <i aria-hidden="true" class="fa fa-fw fa-download"></i>
+                    </a>
+                </div>
+                <!-- End CSV Download button section for group agents -->
 
-            <!-- Group files table -->
-            <div layout="row" ng-if="lookingGroup && groupsSelectedTab==='files' && !fileViewer && currentGroup" class="md-padding">
-                <wz-table extra-limit="true" flex path="'/agents/groups/' + currentGroup.name + '/files'" keys="[{value:'filename',size:2},{value:'hash',size:6}]"
-                    allow-click="true" row-sizes="[10,8,6,4]">
-                </wz-table>
-            </div>
-            <!-- End Group files table -->
+                <!-- Group files table -->
+                <div layout="row" ng-if="lookingGroup && groupsSelectedTab==='files' && !fileViewer && currentGroup"
+                    class="md-padding">
+                    <wz-table extra-limit="true" flex path="'/agents/groups/' + currentGroup.name + '/files'" keys="[{value:'filename',size:2},{value:'hash',size:6}]"
+                        allow-click="true" row-sizes="[10,8,6,4]">
+                    </wz-table>
+                </div>
+                <!-- End Group files table -->
 
-            <!-- CSV Download button section for group files-->
-            <div layout="row" class="md-padding" ng-if="lookingGroup && groupsSelectedTab==='files' && !file">
-                <span flex></span>
-                <a class="small" id="btnDownload" ng-click="downloadCsv('/agents/groups/' + currentGroup.name + '/files')">Formatted
-                    <i aria-hidden="true" class="fa fa-fw fa-download"></i>
-                </a>
-            </div>
-            <!-- End CSV Download button section for group files -->
+                <!-- CSV Download button section for group files-->
+                <div layout="row" class="md-padding" ng-if="lookingGroup && groupsSelectedTab==='files' && !file">
+                    <span flex></span>
+                    <a class="small" id="btnDownload" ng-click="downloadCsv('/agents/groups/' + currentGroup.name + '/files')">Formatted
+                        <i aria-hidden="true" class="fa fa-fw fa-download"></i>
+                    </a>
+                </div>
+                <!-- End CSV Download button section for group files -->
 
-            <!-- File JSON viewer section -->
-            <div flex layout="column" class="md-padding" ng-if="lookingGroup && groupsSelectedTab==='files' && file">
-                <div flex layout="column">
-                    <div layout="row" class="wz-padding-bottom-14">
-                        <span flex class="wz-headline-title">{{ filename }}</span>
-                        <span flex class="wz-text-right cursor-pointer color-grey" ng-click="goBackFiles()">close</span>
-                    </div>
+                <!-- File JSON viewer section -->
+                <div flex layout="column" class="md-padding" ng-if="lookingGroup && groupsSelectedTab==='files' && file">
                     <div flex layout="column">
-                        <pre flex class="wz-pre json-beautifier jsonbeauty2 wz-overflow-y-auto"><code wz-dynamic="file"></code></pre>
+                        <div layout="row" class="wz-padding-bottom-14">
+                            <span flex class="wz-headline-title">{{ filename }}</span>
+                            <span flex class="wz-text-right cursor-pointer color-grey" ng-click="goBackFiles()">close</span>
+                        </div>
+                        <div flex layout="column">
+                            <pre flex class="wz-pre json-beautifier jsonbeauty2 wz-overflow-y-auto"><code wz-dynamic="file"></code></pre>
+                        </div>
                     </div>
                 </div>
+                <!-- End File JSON viewer section -->
             </div>
-            <!-- End File JSON viewer section -->
 
-
+            <div layout="row" class="md-padding" ng-if="addingAgents">
+                <wz-multiple-selector class='wzMultipleSelector' available-items="availableAgents.data" selected-items="selectedAgents.data"
+                    loading="multipleSelectorLoading" title-available-items="Available agents" title-selected-items="Selected agents"
+                    reload-scroll='reload(element, 499 )'>
+                </wz-multiple-selector>
+            </div>
         </div>
     </md-content>
 </div>

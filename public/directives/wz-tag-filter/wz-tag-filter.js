@@ -50,7 +50,7 @@ app.directive('wzTagFilter', function () {
           const term = $scope.newTag.split(':');
           const obj = { name: term[0], value: term[1] };
           const isFilter = obj.value;
-          if ((isFilter && Object.keys($scope.fieldsModel).indexOf(obj.name) === -1) ||
+          if ((isFilter && $scope.fieldsModel && Object.keys($scope.fieldsModel).indexOf(obj.name) === -1) ||
             (!isFilter && (!obj.name || /^\s*$/.test(obj.name)))) {
             $scope.showAutocomplete(flag);
             $scope.newTag = '';
@@ -165,7 +165,7 @@ app.directive('wzTagFilter', function () {
         const isKey = !term[1] && $scope.newTag.indexOf(':') === -1;
         $scope.autocompleteContent = { 'title': '', 'isKey': isKey, 'list': [] };
         $scope.autocompleteContent.title = isKey ? 'Filter keys' : 'Values';
-        if (isKey) {
+        if (isKey && $scope.fieldsModel) {
           for (let key in $scope.fieldsModel) {
             if (key.toUpperCase().includes(term[0].toUpperCase())) {
               $scope.autocompleteContent.list.push(key);
@@ -202,9 +202,11 @@ app.directive('wzTagFilter', function () {
       const load = async () => {
         try {
           const result = await instance.fetch();
-          Object.keys($scope.fieldsModel).forEach(function (key) {
-            $scope.dataModel.push({ 'key': key, 'list': $scope.fieldsModel[key] });
-          });
+          if ($scope.fieldsModel) {
+            Object.keys($scope.fieldsModel).forEach(function (key) {
+              $scope.dataModel.push({ 'key': key, 'list': $scope.fieldsModel[key] });
+            });
+          }
           return;
         } catch (error) {
           return Promise.reject(error);

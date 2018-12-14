@@ -24,3 +24,5 @@ import './wz-tag-filter/wz-tag-filter.less';
 import './wz-config-viewer/wz-config-viewer';
 import './wz-xml-file-editor/wz-xml-file-editor';
 import './wz-xml-file-editor/wz-xml-file-editor.less';
+import './wz-multiple-selector/wz-multiple-selector';
+import './wz-multiple-selector/wz-multiple-selector.less';
