@@ -284,8 +284,11 @@ app.directive('wzTable', function() {
 
         const confirm = $mdDialog
           .confirm()
-          .title(`Delete agent "${agent.id}" from group "${group}"?`)
+          .title("Remove agent from group?")
+          .textContent(`The agent '${agent.id}' will be removed from group '${group}'.`)
           .targetEvent(ev)
+          .clickOutsideToClose(false)
+          .escapeToClose(false)
           .ok('Agree')
           .cancel('Cancel');
 
