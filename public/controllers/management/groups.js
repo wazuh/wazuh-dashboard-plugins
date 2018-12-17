@@ -167,9 +167,9 @@ export function GroupsController(
     return;
   });
 
-    /**
-   * This navigate back to agents overview
-   */
+  /**
+ * This navigate back to agents overview
+ */
   $scope.goBackToAgents = () => {
     $scope.groupsSelectedTab = 'agents';
     $scope.file = false;
@@ -254,6 +254,7 @@ export function GroupsController(
       });
       if (searchTerm) {
         $scope.selectedAgents.data = mapped;
+        $scope.selectedAgents.loadedAll = true;
       } else {
         $scope.selectedAgents.data = $scope.selectedAgents.data.concat(mapped);
       }
@@ -266,7 +267,7 @@ export function GroupsController(
     $scope.selectedAgents.loaded = true;
   }
 
-  $scope.loadAllAgents = async (searchTerm) => {
+  $scope.loadAllAgents = async (searchTerm, start) => {
     try {
       let params = { 'offset': !searchTerm ? $scope.availableAgents.offset : 0 };
       if (searchTerm) {
@@ -284,7 +285,7 @@ export function GroupsController(
       }).map(function (item) {
         return { 'key': item.id, 'value': item.name };
       });
-      if (searchTerm) {
+      if (searchTerm || start) {
         $scope.availableAgents.data = mapped;
       } else {
         $scope.availableAgents.data = $scope.availableAgents.data.concat(mapped);

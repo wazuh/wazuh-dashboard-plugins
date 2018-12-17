@@ -56,17 +56,17 @@
                         {{ parseValue(key,item) }}
                     </md-tooltip>
                 </td>
-                <td ng-if="path === '/agents'" ng-click="$event.stopPropagation()" class="cursor-default">
+                <td ng-if="path === '/agents'" ng-click="$event.stopPropagation()" class="cursor-default action-btn-td">
                     <i ng-click="clickAction(item, 'discover'); $event.stopPropagation()" class="fa fa-fw fa-compass cursor-pointer"
                         tooltip="Open Discover panel for this agent" tooltip-placement="left" aria-hidden="true"></i>
                     <i ng-click="clickAction(item, 'configuration'); $event.stopPropagation()" class="fa fa-fw fa-wrench cursor-pointer"
                         tooltip="Open configuration for this agent" tooltip-placement="left" aria-hidden="true"></i>
                 </td>
-                <td ng-if="path === '/agents/groups'" ng-click="$event.stopPropagation()" class="cursor-default">
-                    <i ng-click="editGroupAgentConfig($event, item); $event.stopPropagation()" class="fa fa-fw fa-edit cursor-pointer"
+                <td ng-if="path === '/agents/groups'" ng-click="$event.stopPropagation()" class="cursor-default action-btn-td">
+                    <i ng-click="editGroupAgentConfig($event, item); $event.stopPropagation()" class="fa fa-fw fa-file-code-o cursor-pointer"
                         tooltip="Edit this group agent.conf file" tooltip-placement="left" aria-hidden="true"></i>
                 </td>
-                <td ng-if="isLookingGroup()" ng-click="$event.stopPropagation()" class="cursor-default">
+                <td ng-if="isLookingGroup()" ng-click="$event.stopPropagation()" class="cursor-default action-btn-td">
                     <i ng-click="showConfirm($event, item); $event.stopPropagation()" class="fa fa-fw fa-remove cursor-pointer"
                         tooltip="Remove this agent from the group" tooltip-placement="left" aria-hidden="true"></i>
                 </td>
