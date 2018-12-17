@@ -27,6 +27,22 @@ import { ConfigurationHandler } from '../../utils/config-handler';
 import { timefilter } from 'ui/timefilter';
 
 export class AgentsController {
+  /**
+   * Class constructor
+   * @param {Object} $scope
+   * @param {Object} $location
+   * @param {Object} $rootScope
+   * @param {Object} appState
+   * @param {Object} apiReq
+   * @param {Object} errorHandler
+   * @param {Object} tabVisualizations
+   * @param {Object} shareAgent
+   * @param {Object} commonData
+   * @param {Object} reportingService
+   * @param {Object} visFactoryService
+   * @param {Object} csvReq
+   * @param {Object} wzTableFilter
+   */
   constructor(
     $scope,
     $location,
@@ -75,8 +91,16 @@ export class AgentsController {
     this.$scope.editGroup = false;
   }
 
+  /**
+   * On controller loads
+   */
   $onInit() {
-    timefilter.setRefreshInterval({ pause: true, value: 0 });
+    const savedTimefilter = this.commonData.getTimefilter();
+    if (savedTimefilter) {
+      timefilter.setTime(savedTimefilter);
+      this.commonData.removeTimefilter();
+    }
+
     this.$scope.TabDescription = TabDescription;
 
     this.$rootScope.reportStatus = false;
@@ -114,6 +138,11 @@ export class AgentsController {
     this.$scope.securityTabs = ['vuls', 'virustotal', 'osquery'];
     this.$scope.complianceTabs = ['pci', 'gdpr'];
 
+    /**
+     * This check if given array of items contais a single given item
+     * @param {Object} item
+     * @param {Array<Object>} array
+     */
     this.$scope.inArray = (item, array) =>
       item && Array.isArray(array) && array.includes(item);
 
@@ -207,6 +236,7 @@ export class AgentsController {
         this.$scope.agent.id
       );
     };
+
     this.$scope.switchWodle = (wodleName, navigate = true) => {
       this.$scope.navigate = navigate;
       this.$scope.configWodle = wodleName;
@@ -219,6 +249,7 @@ export class AgentsController {
         this.$scope.agent.id
       );
     };
+
     this.$scope.switchConfigurationTab = (configurationTab, navigate) => {
       this.$scope.navigate = navigate;
       this.configurationHandler.switchConfigurationTab(
@@ -271,6 +302,8 @@ export class AgentsController {
       if (!this.$scope.$$phase) this.$scope.$digest();
     };
 
+    this.$scope.goDiscover = () => this.goDiscover();
+
     this.$scope.$on('$routeChangeStart', () =>
       this.appState.removeSessionStorageItem('configSubTab')
     );
@@ -306,13 +339,21 @@ export class AgentsController {
       );
     };
   }
-
+  /**
+   * Create metric for given object
+   * @param {*} metricsObject
+   */
   createMetrics(metricsObject) {
     for (let key in metricsObject) {
       this.$scope[key] = () => generateMetric(metricsObject[key]);
     }
   }
 
+  /**
+   * Classify metrics for create the suitable one
+   * @param {*} tab
+   * @param {*} subtab
+   */
   checkMetrics(tab, subtab) {
     if (subtab === 'panels') {
       switch (tab) {
@@ -387,10 +428,17 @@ export class AgentsController {
     }
   }
 
-  // Switch tab
+  /**
+   * Switch tab
+   * @param {*} tab
+   * @param {*} force
+   */
   async switchTab(tab, force = false) {
     if (this.ignoredTabs.includes(tab)) {
+      this.commonData.setRefreshInterval(timefilter.getRefreshInterval());
       timefilter.setRefreshInterval({ pause: true, value: 0 });
+    } else if (this.ignoredTabs.includes(this.$scope.tab)) {
+      timefilter.setRefreshInterval(this.commonData.getRefreshInterval());
     }
 
     try {
@@ -457,18 +505,36 @@ export class AgentsController {
     if (!this.$scope.$$phase) this.$scope.$digest();
   }
 
+  goDiscover() {
+    this.targetLocation = {
+      tab: 'general',
+      subTab: 'discover'
+    };
+    return this.switchTab('general');
+  }
+
   // Agent data
 
+  /**
+   * Checks rootcheck of selected agent
+   */
   validateRootCheck() {
     const result = this.commonData.validateRange(this.$scope.agent.rootcheck);
     this.$scope.agent.rootcheck = result;
   }
 
+  /**
+   * Checks syscheck of selected agent
+   */
   validateSysCheck() {
     const result = this.commonData.validateRange(this.$scope.agent.syscheck);
     this.$scope.agent.syscheck = result;
   }
 
+  /**
+   * Get the needed data for load syscollector
+   * @param {*} id
+   */
   async loadSyscollector(id) {
     try {
       // Check that Syscollector is enabled before proceeding
@@ -550,6 +616,10 @@ export class AgentsController {
     }
   }
 
+  /**
+   * Get all data from agent
+   * @param {*} newAgentId
+   */
   async getAgent(newAgentId) {
     try {
       this.$scope.isSynchronized = false;
@@ -577,8 +647,12 @@ export class AgentsController {
       if (this.$scope.agent.os) {
         this.$scope.agentOS =
           this.$scope.agent.os.name + ' ' + this.$scope.agent.os.version;
+        this.$scope.agent.isLinuxOS = this.$scope.agent.os.uname.includes(
+          'Linux'
+        );
       } else {
         this.$scope.agentOS = 'Unknown';
+        this.$scope.agent.isLinuxOS = false;
       }
 
       // Syscheck
@@ -599,6 +673,14 @@ export class AgentsController {
       return;
     } catch (error) {
       this.errorHandler.handle(error, 'Agents');
+      if (
+        error &&
+        typeof error === 'string' &&
+        error.includes('Agent does not exist')
+      ) {
+        this.$location.search('agent', null);
+        this.$location.path('/agents-preview');
+      }
     }
     return;
   }
@@ -607,7 +689,11 @@ export class AgentsController {
     this.$scope.editGroup = !!!this.$scope.editGroup;
     if(!this.$scope.$$phase) this.$scope.$digest();
   }
-
+  /**
+   * Navigate to the groups of an agent
+   * @param {*} agent
+   * @param {*} group
+   */
   goGroups(agent, group) {
     this.visFactoryService.clearAll();
     this.shareAgent.setAgent(agent, group);
@@ -615,6 +701,10 @@ export class AgentsController {
     this.$location.path('/manager');
   }
 
+  /**
+   * Look for agents that satisfy search term, hidding master
+   * @param {*} searchTerm
+   */
   async analyzeAgents(searchTerm) {
     try {
       if (searchTerm) {
@@ -632,6 +722,12 @@ export class AgentsController {
     return;
   }
 
+  /**
+   * Get full data on CSV format from a path
+   * @param {*} path path with data to convert
+   * @param {*} fileName Output file name
+   * @param {*} filters Filters to apply
+   */
   async downloadCsv(path, fileName, filters = []) {
     try {
       this.errorHandler.info(
@@ -649,39 +745,9 @@ export class AgentsController {
     return;
   }
 
-  async firstLoad() {
-    try {
-      const globalAgent = this.shareAgent.getAgent();
-      this.$scope.configurationError = false;
-      this.$scope.load = true;
-
-      const id = this.commonData.checkLocationAgentId(false, globalAgent);
-
-      const data = await this.apiReq.request('GET', `/agents/${id}`, {});
-      this.$scope.agent = data.data.data;
-      this.$scope.groupName = this.$scope.agent.group;
-
-      if (!this.$scope.groupName) {
-        this.$scope.configurationError = true;
-        this.$scope.load = false;
-        if (!this.$scope.$$phase) this.$scope.$digest();
-        return;
-      }
-
-      this.$scope.load = false;
-
-      if (this.$scope.tab !== 'configuration')
-        await this.$scope.switchTab(this.$scope.tab, true);
-
-      if (!this.$scope.$$phase) this.$scope.$digest();
-      return;
-    } catch (error) {
-      this.errorHandler.handle(error, 'Agents');
-    }
-    return;
-  }
-  /** End of agent configuration */
-
+  /**
+   * Transform a visualization into an image
+   */
   startVis2Png() {
     const syscollectorFilters = [];
     if (

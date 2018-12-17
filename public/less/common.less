@@ -438,6 +438,24 @@ md-sidenav {
     height: auto;
 }
 
+@media (min-width: 1060px) {      
+    .wz-logo{        
+        content: url("/plugins/wazuh/img/new_logo_white.png");
+    } 
+}
+@media (max-width: 1059px) {    
+    .wz-logo{         
+       content: url("/plugins/wazuh/img/new_logo_white_wolf.png");
+       max-height: 45px;
+       max-width: 28px;
+   } 
+   .wz-logo-container {
+        min-width: 20px!important;
+        max-width: 30px!important;
+        margin-right: 5px!important;
+    }
+}
+
 /* Class for define Wazuh logo width */
 .wz-logo-container {
     width: 150px;
@@ -491,6 +509,10 @@ md-sidenav {
 
 .wzEuiTitle {
     font-size: 20px !important;
+}
+
+.synopsisIcon{
+    max-width: 32px;
 }
 
 .legend-value-truncate {

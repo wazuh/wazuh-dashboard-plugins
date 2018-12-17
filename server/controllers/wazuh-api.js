@@ -16,7 +16,6 @@ import { pciRequirementsFile } from '../integration-files/pci-requirements';
 import { gdprRequirementsFile } from '../integration-files/gdpr-requirements';
 import { ElasticWrapper } from '../lib/elastic-wrapper';
 import { getPath } from '../../util/get-path';
-import packageInfo from '../../package.json';
 import { Monitoring } from '../monitoring';
 import { ErrorResponse } from './error-response';
 import { Parser } from 'json2csv';
@@ -25,37 +24,41 @@ import { log } from '../logger';
 import { KeyEquivalenece } from '../../util/csv-key-equivalence';
 import { cleanKeys } from '../../util/remove-key';
 import { apiRequestList } from '../../util/api-request-list';
+import * as ApiHelper from '../lib/api-helper';
 
 export class WazuhApiCtrl {
+  /**
+   * Constructor
+   * @param {*} server
+   */
   constructor(server) {
     this.wzWrapper = new ElasticWrapper(server);
-    this.fetchAgentsExternal = Monitoring(server, { disableCron: true });
+    this.monitoringInstance = new Monitoring(server, true);
   }
 
+  /**
+   * Returns if the wazuh-api configuration is working
+   * @param {Object} req
+   * @param {Object} reply
+   * @returns {Object} status obj or ErrorResponse
+   */
   async checkStoredAPI(req, reply) {
     try {
       // Get config from elasticsearch
-      const wapi_config = await this.wzWrapper.getWazuhConfigurationById(
-        req.payload
-      );
-      if (wapi_config.error_code > 1) {
+      const api = await this.wzWrapper.getWazuhConfigurationById(req.payload);
+      if (api.error_code > 1) {
         throw new Error(`Could not find Wazuh API entry on Elasticsearch.`);
-      } else if (wapi_config.error_code > 0) {
+      } else if (api.error_code > 0) {
         throw new Error(
           'Valid credentials not found in Elasticsearch. It seems the credentials were not saved.'
         );
       }
-      const credInfo = {
-        headers: {
-          'wazuh-app-version': packageInfo.version
-        },
-        username: wapi_config.user,
-        password: wapi_config.password,
-        rejectUnauthorized: !wapi_config.insecure
-      };
+
+      const credInfo = ApiHelper.buildOptionsObject(api);
+
       let response = await needle(
         'get',
-        `${wapi_config.url}:${wapi_config.port}/version`,
+        `${api.url}:${api.port}/version`,
         {},
         credInfo
       );
@@ -64,7 +67,7 @@ export class WazuhApiCtrl {
         // Checking the cluster status
         response = await needle(
           'get',
-          `${wapi_config.url}:${wapi_config.port}/cluster/status`,
+          `${api.url}:${api.port}/cluster/status`,
           {},
           credInfo
         );
@@ -73,14 +76,14 @@ export class WazuhApiCtrl {
           try {
             const managerInfo = await needle(
               'get',
-              `${wapi_config.url}:${wapi_config.port}/agents/000`,
+              `${api.url}:${api.port}/agents/000`,
               {},
               credInfo
             );
             const updatedManagerName = managerInfo.body.data.name;
-            wapi_config.cluster_info.manager = updatedManagerName;
-            await this.wzWrapper.updateWazuhIndexDocument(req.payload, {
-              doc: { cluster_info: wapi_config.cluster_info }
+            api.cluster_info.manager = updatedManagerName;
+            await this.wzWrapper.updateWazuhIndexDocument(null, req.payload, {
+              doc: { cluster_info: api.cluster_info }
             });
           } catch (error) {
             log(
@@ -93,23 +96,23 @@ export class WazuhApiCtrl {
           if (response.body.data.enabled === 'yes') {
             response = await needle(
               'get',
-              `${wapi_config.url}:${wapi_config.port}/cluster/node`,
+              `${api.url}:${api.port}/cluster/node`,
               {},
               credInfo
             );
 
             if (!response.body.error) {
-              let managerName = wapi_config.cluster_info.manager;
-              delete wapi_config.cluster_info;
-              wapi_config.cluster_info = {};
-              wapi_config.cluster_info.status = 'enabled';
-              wapi_config.cluster_info.manager = managerName;
-              wapi_config.cluster_info.node = response.body.data.node;
-              wapi_config.cluster_info.cluster = response.body.data.cluster;
-              wapi_config.password = '****';
+              let managerName = api.cluster_info.manager;
+              delete api.cluster_info;
+              api.cluster_info = {};
+              api.cluster_info.status = 'enabled';
+              api.cluster_info.manager = managerName;
+              api.cluster_info.node = response.body.data.node;
+              api.cluster_info.cluster = response.body.data.cluster;
+              api.password = '****';
               return reply({
                 statusCode: 200,
-                data: wapi_config,
+                data: api,
                 idChanged: req.idChanged || null
               });
             } else if (response.body.error) {
@@ -122,17 +125,17 @@ export class WazuhApiCtrl {
             }
           } else {
             // Cluster mode is not active
-            let managerName = wapi_config.cluster_info.manager;
-            delete wapi_config.cluster_info;
-            wapi_config.cluster_info = {};
-            wapi_config.cluster_info.status = 'disabled';
-            wapi_config.cluster_info.cluster = 'Disabled';
-            wapi_config.cluster_info.manager = managerName;
-            wapi_config.password = '****';
+            let managerName = api.cluster_info.manager;
+            delete api.cluster_info;
+            api.cluster_info = {};
+            api.cluster_info.status = 'disabled';
+            api.cluster_info.cluster = 'Disabled';
+            api.cluster_info.manager = managerName;
+            api.password = '****';
 
             return reply({
               statusCode: 200,
-              data: wapi_config,
+              data: api,
               idChanged: req.idChanged || null
             });
           }
@@ -154,9 +157,7 @@ export class WazuhApiCtrl {
           throw new Error(response.body.message);
         }
 
-        throw new Error(
-          `${wapi_config.url}:${wapi_config.port}/version is unreachable`
-        );
+        throw new Error(`${api.url}:${api.port}/version is unreachable`);
       }
     } catch (error) {
       if (error.code === 'ECONNREFUSED') {
@@ -177,21 +178,18 @@ export class WazuhApiCtrl {
             const apis = await this.wzWrapper.getWazuhAPIEntries();
             for (const api of apis.hits.hits) {
               try {
+                const options = ApiHelper.buildOptionsObject(api);
+
+                options.password = Buffer.from(
+                  api._source.api_password,
+                  'base64'
+                ).toString('ascii');
+
                 const response = await needle(
                   'get',
                   `${api._source.url}:${api._source.api_port}/version`,
                   {},
-                  {
-                    headers: {
-                      'wazuh-app-version': packageInfo.version
-                    },
-                    username: api._source.api_user,
-                    password: Buffer.from(
-                      api._source.api_password,
-                      'base64'
-                    ).toString('ascii'),
-                    rejectUnauthorized: !api._source.insecure
-                  }
+                  options
                 );
                 if (
                   response &&
@@ -203,7 +201,7 @@ export class WazuhApiCtrl {
                   req.idChanged = api._id;
                   return this.checkStoredAPI(req, reply);
                 }
-              } catch (error) { } // eslint-disable-line
+              } catch (error) {} // eslint-disable-line
             }
           } catch (error) {
             log('POST /api/check-stored-api', error.message || error);
@@ -216,6 +214,10 @@ export class WazuhApiCtrl {
     }
   }
 
+  /**
+   * This perfoms a validation of API params
+   * @param {Object} payload API params
+   */
   validateCheckApiParams(payload) {
     if (!('user' in payload)) {
       return 'Missing param: API USER';
@@ -240,6 +242,12 @@ export class WazuhApiCtrl {
     return false;
   }
 
+  /**
+   * This check the wazuh-api configuration received in the POST body will work
+   * @param {Object} req
+   * @param {Object} reply
+   * @returns {Object} status obj or ErrorResponse
+   */
   async checkAPI(req, reply) {
     try {
       let apiAvailable = null;
@@ -274,14 +282,7 @@ export class WazuhApiCtrl {
         'get',
         `${apiAvailable.url}:${apiAvailable.port}/version`,
         {},
-        {
-          headers: {
-            'wazuh-app-version': packageInfo.version
-          },
-          username: apiAvailable.user,
-          password: apiAvailable.password,
-          rejectUnauthorized: !apiAvailable.insecure
-        }
+        ApiHelper.buildOptionsObject(apiAvailable)
       );
 
       // Check wrong credentials
@@ -294,14 +295,7 @@ export class WazuhApiCtrl {
           'get',
           `${apiAvailable.url}:${apiAvailable.port}/agents/000`,
           {},
-          {
-            headers: {
-              'wazuh-app-version': packageInfo.version
-            },
-            username: apiAvailable.user,
-            password: apiAvailable.password,
-            rejectUnauthorized: !apiAvailable.insecure
-          }
+          ApiHelper.buildOptionsObject(apiAvailable)
         );
 
         if (!response.body.error) {
@@ -311,15 +305,7 @@ export class WazuhApiCtrl {
             'get',
             `${apiAvailable.url}:${apiAvailable.port}/cluster/status`,
             {},
-            {
-              // Checking the cluster status
-              headers: {
-                'wazuh-app-version': packageInfo.version
-              },
-              username: apiAvailable.user,
-              password: apiAvailable.password,
-              rejectUnauthorized: !apiAvailable.insecure
-            }
+            ApiHelper.buildOptionsObject(apiAvailable)
           );
 
           if (!response.body.error) {
@@ -329,14 +315,7 @@ export class WazuhApiCtrl {
                 'get',
                 `${apiAvailable.url}:${apiAvailable.port}/cluster/node`,
                 {},
-                {
-                  headers: {
-                    'wazuh-app-version': packageInfo.version
-                  },
-                  username: apiAvailable.user,
-                  password: apiAvailable.password,
-                  rejectUnauthorized: !apiAvailable.insecure
-                }
+                ApiHelper.buildOptionsObject(apiAvailable)
               );
 
               if (!response.body.error) {
@@ -370,6 +349,12 @@ export class WazuhApiCtrl {
     }
   }
 
+  /**
+   * This get PCI requirements
+   * @param {Object} req
+   * @param {Object} reply
+   * @returns {Array<Object>} requirements or ErrorResponse
+   */
   async getPciRequirement(req, reply) {
     try {
       let pci_description = '';
@@ -378,11 +363,11 @@ export class WazuhApiCtrl {
         if (!req.headers.id) {
           return reply(pciRequirementsFile);
         }
-        let wapi_config = await this.wzWrapper.getWazuhConfigurationById(
+        let api = await this.wzWrapper.getWazuhConfigurationById(
           req.headers.id
         );
 
-        if (wapi_config.error_code > 1) {
+        if (api.error_code > 1) {
           // Can not connect to elasticsearch
           return ErrorResponse(
             'Elasticsearch unexpected error or cannot connect',
@@ -390,23 +375,16 @@ export class WazuhApiCtrl {
             400,
             reply
           );
-        } else if (wapi_config.error_code > 0) {
+        } else if (api.error_code > 0) {
           // Credentials not found
           return ErrorResponse('Credentials does not exists', 3008, 400, reply);
         }
 
         const response = await needle(
           'get',
-          `${wapi_config.url}:${wapi_config.port}/rules/pci`,
+          `${api.url}:${api.port}/rules/pci`,
           {},
-          {
-            headers: {
-              'wazuh-app-version': packageInfo.version
-            },
-            username: wapi_config.user,
-            password: wapi_config.password,
-            rejectUnauthorized: !wapi_config.insecure
-          }
+          ApiHelper.buildOptionsObject(api)
         );
 
         if (response.body.data && response.body.data.items) {
@@ -443,6 +421,12 @@ export class WazuhApiCtrl {
     }
   }
 
+  /**
+   * This get GDPR Requirements
+   * @param {Object} req
+   * @param {Object} reply
+   * @returns {Array<Object>} requirements or ErrorResponse
+   */
   async getGdprRequirement(req, reply) {
     try {
       let gdpr_description = '';
@@ -451,23 +435,16 @@ export class WazuhApiCtrl {
         if (!req.headers.id) {
           return reply(gdprRequirementsFile);
         }
-        const wapi_config = await this.wzWrapper.getWazuhConfigurationById(
+        const api = await this.wzWrapper.getWazuhConfigurationById(
           req.headers.id
         );
 
         // Checking for GDPR
         const version = await needle(
           'get',
-          `${wapi_config.url}:${wapi_config.port}/version`,
+          `${api.url}:${api.port}/version`,
           {},
-          {
-            headers: {
-              'wazuh-app-version': packageInfo.version
-            },
-            username: wapi_config.user,
-            password: wapi_config.password,
-            rejectUnauthorized: !wapi_config.insecure
-          }
+          ApiHelper.buildOptionsObject(api)
         );
 
         const number = version.body.data;
@@ -489,7 +466,7 @@ export class WazuhApiCtrl {
           return reply({});
         }
 
-        if (wapi_config.error_code > 1) {
+        if (api.error_code > 1) {
           // Can not connect to elasticsearch
           return ErrorResponse(
             'Elasticsearch unexpected error or cannot connect',
@@ -497,23 +474,16 @@ export class WazuhApiCtrl {
             400,
             reply
           );
-        } else if (wapi_config.error_code > 0) {
+        } else if (api.error_code > 0) {
           // Credentials not found
           return ErrorResponse('Credentials does not exists', 3025, 400, reply);
         }
 
         const response = await needle(
           'get',
-          `${wapi_config.url}:${wapi_config.port}/rules/gdpr`,
+          `${api.url}:${api.port}/rules/gdpr`,
           {},
-          {
-            headers: {
-              'wazuh-app-version': packageInfo.version
-            },
-            username: wapi_config.user,
-            password: wapi_config.password,
-            rejectUnauthorized: !wapi_config.insecure
-          }
+          ApiHelper.buildOptionsObject(api)
         );
 
         if (response.body.data && response.body.data.items) {
@@ -550,11 +520,20 @@ export class WazuhApiCtrl {
     }
   }
 
+  /**
+   * This performs a request over Wazuh API and returs its response
+   * @param {String} method Method: GET, PUT, POST, DELETE
+   * @param {String} path API route
+   * @param {Object} data data and params to perform the request
+   * @param {String} id API id
+   * @param {Object} reply
+   * @returns {Object} API response or ErrorResponse
+   */
   async makeRequest(method, path, data, id, reply) {
     try {
-      const wapi_config = await this.wzWrapper.getWazuhConfigurationById(id);
+      const api = await this.wzWrapper.getWazuhConfigurationById(id);
 
-      if (wapi_config.error_code > 1) {
+      if (api.error_code > 1) {
         //Can not connect to elasticsearch
         return ErrorResponse(
           'Could not connect with elasticsearch',
@@ -562,7 +541,7 @@ export class WazuhApiCtrl {
           404,
           reply
         );
-      } else if (wapi_config.error_code > 0) {
+      } else if (api.error_code > 0) {
         //Credentials not found
         return ErrorResponse('Credentials does not exists', 3012, 404, reply);
       }
@@ -571,16 +550,9 @@ export class WazuhApiCtrl {
         data = {};
       }
 
-      const options = {
-        headers: {
-          'wazuh-app-version': packageInfo.version
-        },
-        username: wapi_config.user,
-        password: wapi_config.password,
-        rejectUnauthorized: !wapi_config.insecure
-      };
+      const options = ApiHelper.buildOptionsObject(api);
 
-      const fullUrl = getPath(wapi_config) + path;
+      const fullUrl = getPath(api) + path;
       const response = await needle(method, fullUrl, data, options);
 
       if (
@@ -609,14 +581,21 @@ export class WazuhApiCtrl {
     }
   }
 
+  /**
+   * This performs a generic request and returs its response
+   * @param {String} method Method: GET, PUT, POST, DELETE
+   * @param {String} path API route
+   * @param {Object} data data and params to perform the request
+   * @param {String} id API id
+   */
   async makeGenericRequest(method, path, data, id) {
     try {
-      const wapi_config = await this.wzWrapper.getWazuhConfigurationById(id);
+      const api = await this.wzWrapper.getWazuhConfigurationById(id);
 
-      if (wapi_config.error_code > 1) {
+      if (api.error_code > 1) {
         //Can not connect to elasticsearch
         throw new Error('Could not connect with elasticsearch');
-      } else if (wapi_config.error_code > 0) {
+      } else if (api.error_code > 0) {
         //Credentials not found
         throw new Error('Credentials does not exists');
       }
@@ -625,16 +604,9 @@ export class WazuhApiCtrl {
         data = {};
       }
 
-      const options = {
-        headers: {
-          'wazuh-app-version': packageInfo.version
-        },
-        username: wapi_config.user,
-        password: wapi_config.password,
-        rejectUnauthorized: !wapi_config.insecure
-      };
+      const options = ApiHelper.buildOptionsObject(api);
 
-      const fullUrl = getPath(wapi_config) + path;
+      const fullUrl = getPath(api) + path;
       const response = await needle(method, fullUrl, data, options);
 
       if (
@@ -658,6 +630,12 @@ export class WazuhApiCtrl {
     }
   }
 
+  /**
+   * This make a request to API
+   * @param {Object} req
+   * @param {Object} reply
+   * @returns {Object} api response or ErrorResponse
+   */
   requestApi(req, reply) {
     const configuration = getConfiguration();
     const adminMode = !(
@@ -707,10 +685,15 @@ export class WazuhApiCtrl {
     }
   }
 
-  // Fetch agent status and insert it directly on demand
+  /**
+   * Fetch agent status and insert it directly on demand
+   * @param {Object} req
+   * @param {Object} reply
+   * @returns {Object} status obj or ErrorResponse
+   */
   async fetchAgents(req, reply) {
     try {
-      const output = await this.fetchAgentsExternal();
+      const output = await this.monitoringInstance.fetchAgentsExternal();
       return reply({
         statusCode: 200,
         error: '0',
@@ -724,8 +707,9 @@ export class WazuhApiCtrl {
 
   /**
    * Get full data on CSV format from a list Wazuh API endpoint
-   * @param {*} req
-   * @param {*} res
+   * @param {Object} req
+   * @param {Object} res
+   * @returns {Object} csv or ErrorResponse
    */
   async csv(req, reply) {
     try {
@@ -760,14 +744,7 @@ export class WazuhApiCtrl {
         }
       }
 
-      const cred = {
-        headers: {
-          'wazuh-app-version': packageInfo.version
-        },
-        username: config.user,
-        password: config.password,
-        rejectUnauthorized: !config.insecure
-      };
+      const cred = ApiHelper.buildOptionsObject(config);
 
       const itemsArray = [];
       const output = await needle(
@@ -844,6 +821,12 @@ export class WazuhApiCtrl {
     }
   }
 
+  /**
+   * Get the each filed unique values of agents
+   * @param {Object} req
+   * @param {Object} reply
+   * @returns {Array<Object>} unique fileds or ErrorResponse
+   */
   async getAgentsFieldsUniqueCount(req, reply) {
     try {
       if (!req.params || !req.params.api)
@@ -853,14 +836,7 @@ export class WazuhApiCtrl {
         req.params.api
       );
 
-      const headers = {
-        headers: {
-          'wazuh-app-version': packageInfo.version
-        },
-        username: config.user,
-        password: config.password,
-        rejectUnauthorized: !config.insecure
-      };
+      const headers = ApiHelper.buildOptionsObject(config);
 
       const distinctUrl = `${config.url}:${config.port}/agents/stats/distinct`;
 

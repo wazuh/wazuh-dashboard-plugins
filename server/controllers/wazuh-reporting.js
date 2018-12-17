@@ -38,6 +38,10 @@ import {
 const REPORTING_PATH = '../../../../optimize/wazuh-reporting';
 
 export class WazuhReportingCtrl {
+  /**
+   * Constructor
+   * @param {*} server
+   */
   constructor(server) {
     this.server = server;
     this.fonts = {
@@ -163,6 +167,10 @@ export class WazuhReportingCtrl {
     this.apiRequest = new WazuhApiCtrl(server);
   }
 
+  /**
+   * This performs the rendering of given tables
+   * @param {Array<Object>} tables tables to render
+   */
   renderTables(tables) {
     for (const table of tables) {
       const rowsparsed = rawParser(table.rawResponse, table.columns);
@@ -180,8 +188,8 @@ export class WazuhReportingCtrl {
           parseInt(a[a.length - 1]) < parseInt(b[b.length - 1])
             ? 1
             : parseInt(a[a.length - 1]) > parseInt(b[b.length - 1])
-              ? -1
-              : 0;
+            ? -1
+            : 0;
 
         TimSort.sort(rows, sortFunction);
 
@@ -222,6 +230,12 @@ export class WazuhReportingCtrl {
     }
   }
 
+  /**
+   * This performs the rendering of given time range and filters
+   * @param {Number} from Timestamp (ms) from
+   * @param {Number} to Timestamp (ms) to
+   * @param {String} filters E.g: cluster.name: wazuh AND rule.groups: vulnerability
+   */
   renderTimeRangeAndFilters(from, to, filters) {
     const str = `${from} to ${to}`;
 
@@ -277,6 +291,11 @@ export class WazuhReportingCtrl {
     this.dd.content.push({ text: '\n' });
   }
 
+  /**
+   * This do format to filters
+   * @param {String} filters E.g: cluster.name: wazuh AND rule.groups: vulnerability
+   * @param {String} searchBar search term
+   */
   sanitizeFilters(filters, searchBar) {
     let str = '';
 
@@ -304,6 +323,13 @@ export class WazuhReportingCtrl {
     return str;
   }
 
+  /**
+   * This performs the rendering of given header
+   * @param {String} section section target
+   * @param {Object} tab tab target
+   * @param {Boolean} isAgents is agents section
+   * @param {String} apiId ID of API
+   */
   async renderHeader(section, tab, isAgents, apiId) {
     try {
       if (section && typeof section === 'string') {
@@ -378,6 +404,12 @@ export class WazuhReportingCtrl {
     }
   }
 
+  /**
+   * This check if title is suitable
+   * @param {Object} item item of the title
+   * @param {Boolean} isAgents is agents section
+   * @param {Object} tab tab target
+   */
   checkTitle(item, isAgents, tab) {
     const title = isAgents
       ? AgentsVisualizations[tab].filter(v => v._id === item.id)
@@ -385,6 +417,12 @@ export class WazuhReportingCtrl {
     return title;
   }
 
+  /**
+   * This performs the rendering of given visualizations
+   * @param {Array<Objecys>} array Array of visualizations
+   * @param {Boolean} isAgents is agents section
+   * @param {Object} tab tab target
+   */
   renderVisualizations(array, isAgents, tab) {
     const single_vis = array.filter(item => item.width >= 600);
     const double_vis = array.filter(item => item.width < 600);
@@ -455,6 +493,11 @@ export class WazuhReportingCtrl {
     }
   }
 
+  /**
+   * This build the agents table
+   * @param {Array<Strings>} ids ids of agents
+   * @param {String} apiId API id
+   */
   async buildAgentsTable(ids, apiId) {
     if (!ids || !ids.length) return;
     try {
@@ -504,6 +547,18 @@ export class WazuhReportingCtrl {
     }
   }
 
+  /**
+   * This load more information
+   * @param {String} section section target
+   * @param {Object} tab tab target
+   * @param {String} apiId ID of API
+   * @param {Number} from Timestamp (ms) from
+   * @param {Number} to Timestamp (ms) to
+   * @param {String} filters E.g: cluster.name: wazuh AND rule.groups: vulnerability
+   * @param {String} pattern
+   * @param {Object} agent agent target
+   * @returns {Object} Extended information
+   */
   async extendedInformation(
     section,
     tab,
@@ -1294,6 +1349,12 @@ export class WazuhReportingCtrl {
     }
   }
 
+  /**
+   * Builds a PDF report from multiple PNG images
+   * @param {Object} req
+   * @param {Object} reply
+   * @returns {Object} pdf or ErrorResponse
+   */
   async report(req, reply) {
     try {
       // Init
@@ -1398,6 +1459,12 @@ export class WazuhReportingCtrl {
     }
   }
 
+  /**
+   * Fetch the reports list
+   * @param {Object} req
+   * @param {Object} reply
+   * @returns {Array<Object>}reports list or ErrorResponse
+   */
   async getReports(req, reply) {
     try {
       if (!fs.existsSync(path.join(__dirname, REPORTING_PATH))) {
@@ -1423,6 +1490,12 @@ export class WazuhReportingCtrl {
     }
   }
 
+  /**
+   * Fetch specific report
+   * @param {Object} req
+   * @param {Object} reply
+   * @returns {Object} report or ErrorResponse
+   */
   async getReportByName(req, reply) {
     try {
       if (!req.params || !req.params.name) throw new Error('Invalid file name');
@@ -1434,6 +1507,12 @@ export class WazuhReportingCtrl {
     }
   }
 
+  /**
+   * Delete specific report
+   * @param {Object} req
+   * @param {Object} reply
+   * @returns {Object} status obj or ErrorResponse
+   */
   async deleteReportByName(req, reply) {
     try {
       if (!req.params || !req.params.name) throw new Error('Invalid file name');

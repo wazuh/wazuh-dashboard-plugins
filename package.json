@@ -1,10 +1,10 @@
 {
     "name": "wazuh",
-    "version": "3.7.1",
-    "revision": "0415",
-    "code": "0415-3",
+    "version": "3.8.0",
+    "revision": "0416",
+    "code": "0416-0",
     "kibana": {
-        "version": "6.5.2"
+        "version": "6.5.3"
     },
     "engines": {
         "node": "8.14.0"
@@ -55,7 +55,7 @@
         "@elastic/plugin-helpers": "^7.1.8",
         "babel-eslint": "^8.2.6",
         "chai": "^4.1.2",
-        "eslint": "^5.4.0",
+        "eslint": "^5.10.0",
         "eslint-plugin-async-await": "^0.0.0",
         "eslint-plugin-import": "^2.14.0",
         "eslint-plugin-node": "^7.0.1",

@@ -136,7 +136,7 @@ export const knownFields = [
     searchable: true,
     aggregatable: true,
     readFromDocValues: true
-  },  
+  },
   {
     name: 'GeoLocation.longitude',
     type: 'number',
@@ -2234,7 +2234,8 @@ export const knownFields = [
     readFromDocValues: true
   },
   {
-    name: 'data.aws.service.action.networkConnectionAction.remoteIpDetails.geoLocation',
+    name:
+      'data.aws.service.action.networkConnectionAction.remoteIpDetails.geoLocation',
     type: 'geo_point',
     count: 0,
     scripted: false,

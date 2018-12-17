@@ -22,10 +22,20 @@ import {
 import { Base } from '../reporting/base-query';
 
 export class WazuhElasticCtrl {
+  /**
+   * Constructor
+   * @param {*} server
+   */
   constructor(server) {
     this.wzWrapper = new ElasticWrapper(server);
   }
 
+  /**
+   * This get the timestamp field
+   * @param {Object} req
+   * @param {Object} reply
+   * @returns {Object} timestamp field or ErrorResponse
+   */
   async getTimeStamp(req, reply) {
     try {
       const data = await this.wzWrapper.getWazuhVersionIndexAsSearch();
@@ -53,6 +63,12 @@ export class WazuhElasticCtrl {
     }
   }
 
+  /**
+   * This retrieve a template from Elasticsearch
+   * @param {Object} req
+   * @param {Object} reply
+   * @returns {Object} template or ErrorResponse
+   */
   async getTemplate(req, reply) {
     try {
       if (!req.params || !req.params.pattern) {
@@ -105,6 +121,12 @@ export class WazuhElasticCtrl {
     }
   }
 
+  /**
+   * This check index-pattern
+   * @param {Object} req
+   * @param {Object} reply
+   * @returns {Object} status obj or ErrorResponse
+   */
   async checkPattern(req, reply) {
     try {
       const response = await this.wzWrapper.getAllIndexPatterns();
@@ -133,6 +155,12 @@ export class WazuhElasticCtrl {
     }
   }
 
+  /**
+   * This get the fields keys
+   * @param {Object} req
+   * @param {Object} reply
+   * @returns {Array<Object>} fields or ErrorResponse
+   */
   async getFieldTop(req, reply) {
     try {
       // Top field payload
@@ -184,6 +212,12 @@ export class WazuhElasticCtrl {
     }
   }
 
+  /**
+   * This get the elastic setup settings
+   * @param {Object} req
+   * @param {Object} reply
+   * @returns {Object} setup info or ErrorResponse
+   */
   async getSetupInfo(req, reply) {
     try {
       const data = await this.wzWrapper.getWazuhVersionIndexAsSearch();
@@ -207,7 +241,8 @@ export class WazuhElasticCtrl {
    * Checks one by one if the requesting user has enough privileges to use
    * an index pattern from the list.
    * @param {Array<Object>} list List of index patterns
-   * @param {*} req
+   * @param {Object} req
+   * @returns {Array<Object>} List of allowed index
    */
   async filterAllowedIndexPatternList(list, req) {
     let finalList = [];
@@ -258,17 +293,22 @@ export class WazuhElasticCtrl {
     return list;
   }
 
+  /**
+   * This get the list of index-patterns
+   * @param {Object} req
+   * @param {Object} reply
+   * @returns {Array<Object>} list of index-patterns or ErrorResponse
+   */
   async getlist(req, reply) {
     try {
       const config = getConfiguration();
 
-      const xpack = await this.wzWrapper.getPlugins();
+      const usingCredentials = await this.wzWrapper.usingCredentials();
 
       const isXpackEnabled =
         typeof XPACK_RBAC_ENABLED !== 'undefined' &&
         XPACK_RBAC_ENABLED &&
-        typeof xpack === 'string' &&
-        xpack.includes('x-pack');
+        usingCredentials;
 
       const isSuperUser =
         isXpackEnabled &&
@@ -319,21 +359,47 @@ export class WazuhElasticCtrl {
    */
   buildVisualizationsRaw(app_objects, id) {
     try {
+      const config = getConfiguration();
+      const monitoringPattern =
+        (config || {})['wazuh.monitoring.pattern'] || 'wazuh-monitoring-3.x-*';
+
       const visArray = [];
       let aux_source, bulk_content;
       for (let element of app_objects) {
-        aux_source = JSON.parse(JSON.stringify(element._source))
-        
+        aux_source = JSON.parse(JSON.stringify(element._source));
+
         // Replace index-pattern for visualizations
-        if(aux_source && aux_source.kibanaSavedObjectMeta && aux_source.kibanaSavedObjectMeta.searchSourceJSON && typeof aux_source.kibanaSavedObjectMeta.searchSourceJSON === 'string'){
-          aux_source.kibanaSavedObjectMeta.searchSourceJSON = aux_source.kibanaSavedObjectMeta.searchSourceJSON.replace('wazuh-alerts',id);
+        if (
+          aux_source &&
+          aux_source.kibanaSavedObjectMeta &&
+          aux_source.kibanaSavedObjectMeta.searchSourceJSON &&
+          typeof aux_source.kibanaSavedObjectMeta.searchSourceJSON === 'string'
+        ) {
+          const defaultStr = aux_source.kibanaSavedObjectMeta.searchSourceJSON;
+
+          defaultStr.includes('wazuh-monitoring')
+            ? (aux_source.kibanaSavedObjectMeta.searchSourceJSON = defaultStr.replace(
+                'wazuh-monitoring',
+                monitoringPattern[monitoringPattern.length - 1] === '*'
+                  ? monitoringPattern
+                  : monitoringPattern + '*'
+              ))
+            : (aux_source.kibanaSavedObjectMeta.searchSourceJSON = defaultStr.replace(
+                'wazuh-alerts',
+                id
+              ));
         }
 
         // Replace index-pattern for selector visualizations
-        if(aux_source && aux_source.visState && aux_source.visState && typeof aux_source.visState === 'string'){
-          aux_source.visState = aux_source.visState.replace('wazuh-alerts',id)
+        if (
+          aux_source &&
+          aux_source.visState &&
+          aux_source.visState &&
+          typeof aux_source.visState === 'string'
+        ) {
+          aux_source.visState = aux_source.visState.replace('wazuh-alerts', id);
         }
-        
+
         // Bulk source
         bulk_content = {};
         bulk_content[element._type] = aux_source;
@@ -415,6 +481,12 @@ export class WazuhElasticCtrl {
     }
   }
 
+  /**
+   * This creates a visualization of data in req
+   * @param {Object} req
+   * @param {Object} reply
+   * @returns {Object} vis obj or ErrorResponse
+   */
   async createVis(req, reply) {
     try {
       if (
@@ -446,6 +518,12 @@ export class WazuhElasticCtrl {
     }
   }
 
+  /**
+   * This creates a visualization of cluster
+   * @param {Object} req
+   * @param {Object} reply
+   * @returns {Object} vis obj or ErrorResponse
+   */
   async createClusterVis(req, reply) {
     try {
       if (
@@ -485,6 +563,12 @@ export class WazuhElasticCtrl {
     }
   }
 
+  /**
+   * Reload elastic index
+   * @param {Object} req
+   * @param {Object} reply
+   * @returns {Object} status obj or ErrorResponse
+   */
   async refreshIndex(req, reply) {
     try {
       if (!req.params.pattern) throw new Error('Missing parameters');
@@ -501,6 +585,7 @@ export class WazuhElasticCtrl {
   }
 
   /**
+   * This returns de the alerts of an angent
    * @param {*} req
    * POST /elastic/alerts
    * {

@@ -12,6 +12,12 @@
 import { TabNames } from '../../utils/tab-names';
 
 export class ManagementController {
+  /**
+   * Class constructor
+   * @param {*} $scope
+   * @param {*} $location
+   * @param {*} shareAgent
+   */
   constructor($scope, $location, shareAgent) {
     this.$scope = $scope;
     this.$location = $location;
@@ -23,6 +29,9 @@ export class ManagementController {
     this.statusReportsTabs = ['status', 'logs', 'reporting', 'monitoring'];
   }
 
+  /**
+   * When controller loads
+   */
   $onInit() {
     if (this.shareAgent.getAgent() && this.shareAgent.getSelectedGroup()) {
       this.tab = 'groups';
@@ -36,10 +45,19 @@ export class ManagementController {
     }
   }
 
+  /**
+   * This check if given array of items contais a single given item
+   * @param {Object} item
+   * @param {Array<Object>} array
+   */
   inArray(item, array) {
     return item && Array.isArray(array) && array.includes(item);
   }
 
+  /**
+   * This switch to a selected tab
+   * @param {String} tab
+   */
   switchTab(tab) {
     this.tab = tab;
 
@@ -59,6 +77,10 @@ export class ManagementController {
     this.$location.search('tab', this.tab);
   }
 
+  /**
+   * This set the rules tab
+   * @param {String} tab
+   */
   setRulesTab(tab) {
     this.rulesetTab = tab;
     this.globalRulesetTab = this.rulesetTab;

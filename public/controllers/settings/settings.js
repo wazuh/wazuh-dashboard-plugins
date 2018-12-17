@@ -14,6 +14,18 @@ import { TabNames } from '../../utils/tab-names';
 import { configEquivalences } from '../../utils/config-equivalences';
 
 export class SettingsController {
+  /**
+   * Class constructor
+   * @param {*} $scope
+   * @param {*} $window
+   * @param {*} $location
+   * @param {*} testAPI
+   * @param {*} appState
+   * @param {*} genericReq
+   * @param {*} errorHandler
+   * @param {*} wzMisc
+   * @param {*} wazuhConfig
+   */
   constructor(
     $scope,
     $window,
@@ -74,17 +86,27 @@ export class SettingsController {
     this.savingApi = false;
   }
 
+  /**
+   * On controller loads
+   */
   $onInit() {
     // Loading data
     this.getSettings().then(() => this.getAppInfo());
   }
 
+  /**
+   * This switch to a selected tab
+   * @param {Object} tab
+   */
   switchTab(tab) {
     this.tab = tab;
     this.$location.search('tab', this.tab);
   }
 
-  // Remove API entry
+  /**
+   * Remove a Wazuh API entry
+   * @param {*} item
+   */
   async removeManager(item) {
     try {
       let index = this.apiEntries.indexOf(item);
@@ -125,6 +147,11 @@ export class SettingsController {
     });
   }
 
+  /**
+   * This sort by timestamp two given objects
+   * @param {Object} a
+   * @param {Object} b
+   */
   sortByTimestamp(a, b) {
     const intA = parseInt(a._id);
     const intB = parseInt(b._id);
@@ -232,6 +259,10 @@ export class SettingsController {
     return;
   }
 
+  /**
+   * This validate format of fileds in a given api connection form
+   * @param {Object} formName
+   */
   validator(formName) {
     // Validate user
     if (!this.userRegEx.test(this[formName].user)) {
@@ -264,6 +295,10 @@ export class SettingsController {
     return false;
   }
 
+  /**
+   * This toggle to a given entry
+   * @param {Object} entry
+   */
   toggleEditor(entry) {
     if (this.formUpdate && this.formUpdate.password) {
       this.formUpdate.password = '';
@@ -281,7 +316,7 @@ export class SettingsController {
   // Save settings function
   async saveSettings() {
     try {
-      if(this.savingApi) {
+      if (this.savingApi) {
         this.errorHandler.info('Please, wait for success message', 'Settings');
         return;
       }
@@ -393,7 +428,6 @@ export class SettingsController {
       }
 
       await this.getSettings();
-
     } catch (error) {
       if (error.status === 400) {
         error.message =
@@ -406,6 +440,9 @@ export class SettingsController {
     return;
   }
 
+  /**
+   * This show us if editor is updating
+   */
   isUpdating() {
     for (let key in this.showEditForm) {
       if (this.showEditForm[key]) return true;
@@ -416,7 +453,7 @@ export class SettingsController {
   // Update settings function
   async updateSettings(item) {
     try {
-      if(this.savingApi) {
+      if (this.savingApi) {
         this.errorHandler.info('Please, wait for success message', 'Settings');
         return;
       }
@@ -465,7 +502,6 @@ export class SettingsController {
       this.isEditing = false;
 
       this.errorHandler.info('The API was updated successfully', 'Settings');
-
     } catch (error) {
       this.printError(error, true);
     }
@@ -474,6 +510,9 @@ export class SettingsController {
     return;
   }
 
+  /**
+   * This toggle the addManagerContainer flag
+   */
   switch() {
     this.addManagerContainer = !this.addManagerContainer;
   }
@@ -531,6 +570,10 @@ export class SettingsController {
     }
   }
 
+  /**
+   * This change to a given index pattern
+   * @param {} newIndexPattern
+   */
   async changeIndexPattern(newIndexPattern) {
     try {
       this.appState.setCurrentPattern(newIndexPattern);
@@ -556,12 +599,20 @@ export class SettingsController {
     return;
   }
 
+  /**
+   * This set the error, and checks if is updating
+   * @param {*} error
+   * @param {*} updating
+   */
   printError(error, updating) {
     const text = this.errorHandler.handle(error, 'Settings');
     if (!updating) this.messageError = text;
     else this.messageErrorUpdate = text;
   }
 
+  /**
+   * Returns Wazuh app logs
+   */
   async getAppLogs() {
     try {
       this.loadingLogs = true;
@@ -580,6 +631,9 @@ export class SettingsController {
     }
   }
 
+  /**
+   * Returns Wazuh app info
+   */
   async getAppInfo() {
     try {
       const data = await this.genericReq.request('GET', '/elastic/setup');
@@ -635,10 +689,17 @@ export class SettingsController {
     return;
   }
 
+  /**
+   * This ask again for wazuh logs
+   */
   refreshLogs() {
     return this.getAppLogs();
   }
 
+  /**
+   * This get the string equivalence for a given key
+   * @param {String} key
+   */
   configEquivalence(key) {
     return configEquivalences[key] || '-';
   }

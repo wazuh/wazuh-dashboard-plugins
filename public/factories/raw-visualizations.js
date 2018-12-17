@@ -10,22 +10,38 @@
  * Find more information about this on the LICENSE file.
  */
 export class RawVisualizations {
+  /**
+   * Class constructor
+   */
   constructor() {
     this.list = [];
   }
 
+  /**
+   * Add item to raw visualizations
+   * @param {Object} item
+   */
   addItem(item) {
     this.list.push(item);
   }
-
+  /**
+   * Set raw raw visualizations with given items
+   * @param {Array<Object>} items
+   */
   assignItems(items) {
     this.list = Array.isArray(items) ? items : [];
   }
 
+  /**
+   * Get raw visualizations
+   */
   getList() {
     return this.list;
   }
 
+  /**
+   * Remove all raw visualizations
+   */
   removeAll() {
     this.list = [];
   }

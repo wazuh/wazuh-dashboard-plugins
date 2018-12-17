@@ -10,6 +10,13 @@
  * Find more information about this on the LICENSE file.
  */
 export class BlankScreenController {
+  /**
+   * Class constructor
+   * @param {*} $scope
+   * @param {*} $location
+   * @param {*} errorHandler
+   * @param {*} wzMisc
+   */
   constructor($scope, $location, errorHandler, wzMisc) {
     this.$scope = $scope;
     this.$location = $location;
@@ -17,6 +24,9 @@ export class BlankScreenController {
     this.wzMisc = wzMisc;
   }
 
+  /**
+   * When controller loads
+   */
   $onInit() {
     const catchedError = this.wzMisc.getBlankScr();
     if (catchedError) {
@@ -30,6 +40,9 @@ export class BlankScreenController {
     }
   }
 
+  /**
+   * This navigate to overview
+   */
   goOverview() {
     this.$location.path('/overview');
   }

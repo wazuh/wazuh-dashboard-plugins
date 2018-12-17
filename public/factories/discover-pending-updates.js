@@ -1,6 +1,6 @@
 /*
  * Wazuh app - Factory to store pending updates from Discover
- * 
+ *
  * Copyright (C) 2018 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -11,18 +11,32 @@
  * Find more information about this on the LICENSE file.
  */
 export class DiscoverPendingUpdates {
+  /**
+   * Class constructor
+   */
   constructor() {
     this.pendingUpdates = [];
   }
 
+  /**
+   * Add new pending update
+   * @param {Object} query
+   * @param {Object} filters
+   */
   addItem(query, filters) {
     this.pendingUpdates.push(query, filters);
   }
 
+  /**
+   * Get the list of pending updates
+   */
   getList() {
     return this.pendingUpdates;
   }
 
+  /**
+   * Remove all pending updates
+   */
   removeAll() {
     this.pendingUpdates = [];
   }

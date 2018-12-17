@@ -12,6 +12,13 @@
 import chrome from 'ui/chrome';
 
 export class ApiTester {
+  /**
+   * Class constructor
+   * @param {*} $http
+   * @param {*} appState
+   * @param {*} wzMisc
+   * @param {*} wazuhConfig
+   */
   constructor($http, appState, wzMisc, wazuhConfig) {
     this.$http = $http;
     this.appState = appState;

@@ -95,5 +95,9 @@
 #wazuh.monitoring.shards: 5
 #wazuh.monitoring.replicas: 1
 #
+# Default index pattern to use for Wazuh monitoring
+#wazuh.monitoring.pattern: wazuh-monitoring-3.x-*
+#
+#
 # ------------------------------- App privileges --------------------------------
 #admin: true

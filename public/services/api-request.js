@@ -10,12 +10,24 @@
  * Find more information about this on the LICENSE file.
  */
 export class ApiRequest {
+  /**
+   * Class constructor
+   * @param {*} $q
+   * @param {*} genericReq
+   * @param {*} appState
+   */
   constructor($q, genericReq, appState) {
     this.$q = $q;
     this.genericReq = genericReq;
     this.appState = appState;
   }
 
+  /**
+   * Perform an API request
+   * @param {String} method Eg. GET, PUT
+   * @param {String} path API route
+   * @param {Object} body Request body
+   */
   async request(method, path, body) {
     try {
       if (!method || !path || !body) {

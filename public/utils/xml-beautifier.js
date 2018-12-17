@@ -55,10 +55,10 @@ export default xml => {
     const type = single
       ? 'single'
       : closing
-        ? 'closing'
-        : opening
-          ? 'opening'
-          : 'other';
+      ? 'closing'
+      : opening
+      ? 'opening'
+      : 'other';
     const fromTo = lastType + '->' + type;
     lastType = type;
     let padding = '';

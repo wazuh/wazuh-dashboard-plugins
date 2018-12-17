@@ -46,8 +46,8 @@ export class StatusController {
         this.apiReq.request('GET', '/manager/info', {})
       ]);
 
-      const parsedData = data.map(
-        item => (item && item.data && item.data.data ? item.data.data : false)
+      const parsedData = data.map(item =>
+        item && item.data && item.data.data ? item.data.data : false
       );
       const [stats, clusterStatus, managerInfo] = parsedData;
 
@@ -114,6 +114,10 @@ export class StatusController {
     }
   }
 
+  /**
+   * This change to a selected node
+   * @param {String} node
+   */
   async changeNode(node) {
     try {
       this.clusterError = false;

@@ -34,6 +34,10 @@ export function GroupsController(
 
   $scope.load = true;
 
+  /**
+   * Get full data on CSV format from a path
+   * @param {String} data_path path with data to convert
+   */
   $scope.downloadCsv = async data_path => {
     try {
       errorHandler.info('Your download should begin automatically...', 'CSV');
@@ -54,6 +58,10 @@ export function GroupsController(
     return;
   };
 
+  /**
+   * This perfoms a search by a given term
+   * @param {String} term
+   */
   $scope.search = term => {
     $scope.$broadcast('wazuhSearch', { term });
   };
@@ -61,6 +69,9 @@ export function GroupsController(
   // Store a boolean variable to check if come from agents
   const globalAgent = shareAgent.getAgent();
 
+  /**
+   * This load at init some required data
+   */
   const load = async () => {
     try {
       // If come from agents
@@ -100,12 +111,18 @@ export function GroupsController(
 
   $scope.toggle = () => ($scope.lookingGroup = true);
 
+  /**
+   * This navigate to a selected agent
+   */
   $scope.showAgent = agent => {
     shareAgent.setAgent(agent);
     $location.search('tab', null);
     $location.path('/agents');
   };
 
+  /**
+   * This load the group information to a given agent
+   */
   $scope.loadGroup = async (group, firstTime) => {
     try {
       if (!firstTime) $scope.lookingGroup = true;
@@ -125,6 +142,7 @@ export function GroupsController(
     return;
   };
 
+  //listeners
   $scope.$on('wazuhShowGroup', (event, parameters) => {
     return $scope.loadGroup(parameters.group);
   });
@@ -149,6 +167,9 @@ export function GroupsController(
     return;
   });
 
+    /**
+   * This navigate back to agents overview
+   */
   $scope.goBackToAgents = () => {
     $scope.groupsSelectedTab = 'agents';
     $scope.file = false;
@@ -156,6 +177,9 @@ export function GroupsController(
     if (!$scope.$$phase) $scope.$digest();
   };
 
+  /**
+   * This navigate back to files
+   */
   $scope.goBackFiles = () => {
     $scope.groupsSelectedTab = 'files';
     $scope.file = false;
@@ -164,12 +188,18 @@ export function GroupsController(
     if (!$scope.$$phase) $scope.$digest();
   };
 
+  /**
+   * This navigate back to groups
+   */
   $scope.goBackGroups = () => {
     $scope.currentGroup = false;
     $scope.lookingGroup = false;
     if (!$scope.$$phase) $scope.$digest();
   };
 
+  /**
+   * This show us a group file, for a given group and file
+   */
   $scope.showFile = async (groupName, fileName) => {
     try {
       if ($scope.filename) $scope.filename = '';

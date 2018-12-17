@@ -10,6 +10,14 @@
  * Find more information about this on the LICENSE file.
  */
 export class PatternHandler {
+  /**
+   * Class constructor
+   * @param {*} $location
+   * @param {*} genericReq
+   * @param {*} appState
+   * @param {*} errorHandler
+   * @param {*} wzMisc
+   */
   constructor($location, genericReq, appState, errorHandler, wzMisc) {
     this.$location = $location;
     this.genericReq = genericReq;
@@ -18,6 +26,9 @@ export class PatternHandler {
     this.wzMisc = wzMisc;
   }
 
+  /**
+   * Get the available pattern list
+   */
   async getPatternList() {
     try {
       const patternList = await this.genericReq.request(
@@ -48,6 +59,10 @@ export class PatternHandler {
     return;
   }
 
+  /**
+   * Change current pattern for the given pattern
+   * @param {String} selectedPattern
+   */
   async changePattern(selectedPattern) {
     try {
       this.appState.setCurrentPattern(selectedPattern);

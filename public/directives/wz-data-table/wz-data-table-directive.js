@@ -19,19 +19,14 @@ import { checkGap } from '../wz-table/lib/check-gap';
 
 const app = uiModules.get('app/wazuh', []);
 
-app.directive('wzDataTable', function () {
+app.directive('wzDataTable', function() {
   return {
     restrict: 'E',
     scope: {
       rowSizes: '=rowSizes',
       data: '='
     },
-    controller(
-      $scope,
-      $filter,
-      errorHandler,
-      $window,
-    ) {
+    controller($scope, $filter, errorHandler, $window) {
       /**
        * Init variables
        */
@@ -53,11 +48,16 @@ app.directive('wzDataTable', function () {
         doit = setTimeout(() => {
           $scope.rowsPerPage = calcTableRows($window.innerHeight, rowSizes);
           $scope.itemsPerPage = $scope.rowsPerPage;
-          init().then(() => resizing = false).catch(() => resizing = false);
+          init()
+            .then(() => (resizing = false))
+            .catch(() => (resizing = false));
         }, 150);
       };
       $scope.rowsPerPage = calcTableRows($window.innerHeight, rowSizes);
 
+      /**
+       * This loads data for table, that has been provided by parameter
+       */
       const fetch = () => {
         try {
           $scope.filterTable();
@@ -79,22 +79,32 @@ app.directive('wzDataTable', function () {
         $scope.sortValue = key;
         $scope.sortReverse = !$scope.sortReverse;
         $scope.filterTable();
-      }
+      };
 
+      /**
+       * This apply filter and sorting to table data
+       */
       $scope.filterTable = () => {
-        items = $filter('orderBy')($filter('filter')($scope.data, $scope.searchTerm), $scope.sortValue, $scope.sortReverse);
+        items = $filter('orderBy')(
+          $filter('filter')($scope.data, $scope.searchTerm),
+          $scope.sortValue,
+          $scope.sortReverse
+        );
         $scope.totalItems = items.length;
         $scope.items = items;
         checkGap($scope, items);
         $scope.searchTable();
-      }
+      };
 
+      /**
+       * On controller loads
+       */
       const init = async () => {
         $scope.error = false;
         $scope.wazuh_table_loading = true;
         await fetch();
         $scope.wazuh_table_loading = false;
-      }
+      };
 
       /**
        * Pagination variables and functions
@@ -111,7 +121,7 @@ app.directive('wzDataTable', function () {
       $scope.prevPage = () => pagination.prevPage($scope);
       $scope.nextPage = async currentPage =>
         pagination.nextPage(currentPage, $scope, errorHandler, fetch);
-      $scope.setPage = function () {
+      $scope.setPage = function() {
         $scope.currentPage = this.n;
         $scope.nextPage(this.n);
       };
