@@ -80,9 +80,6 @@ export function GroupsController(
           $scope.loadGroup(filtered[0], true);
           $scope.lookingGroup = true;
           $scope.addingAgents = false;
-          $scope.availableAgents = { 'loaded': false, 'data': [], 'offset': 0 };
-          $scope.selectedAgents = { 'loaded': false, 'data': [], 'offset': 0 };
-          $scope.searchBarModel = [];
         } else {
           throw Error(`Group ${globalGroup} not found`);
         }
@@ -190,67 +187,66 @@ export function GroupsController(
     return;
   };
 
-  $scope.loadSearchBarModel = async () => {
-    const api = JSON.parse(appState.getCurrentAPI()).id;
-    const clusterInfo = appState.getClusterInfo();
-    const firstUrlParam =
-      clusterInfo.status === 'enabled' ? 'cluster' : 'manager';
-    const secondUrlParam = clusterInfo[firstUrlParam];
-
-    const pattern = appState.getCurrentPattern();
-
-    const data = await Promise.all([
-      genericReq.request('GET', '/api/agents-unique/' + api, {}),
-      genericReq.request(
-        'GET',
-        `/elastic/top/${firstUrlParam}/${secondUrlParam}/agent.name/${pattern}`
-      )
-    ]);
-    const unique = data[0].data.result;
-    $scope.searchBarModel = {
-      'status': ['Active', 'Disconnected', 'Never connected'],
-      'group': unique.groups,
-      'node_name': unique.nodes,
-      'version': unique.versions,
-      'os.platform': unique.osPlatforms.map(x => x.platform),
-      'os.version': unique.osPlatforms.map(x => x.version),
-      'os.name': unique.osPlatforms.map(x => x.name),
-    };
-    $scope.searchBarModel['os.name'] = Array.from(new Set($scope.searchBarModel['os.name']));
-    $scope.searchBarModel['os.version'] = Array.from(new Set($scope.searchBarModel['os.version']));
-    $scope.searchBarModel['os.platform'] = Array.from(new Set($scope.searchBarModel['os.platform']));
-  }
-
-  $scope.reload = async (element, addOffset) => {
-    $scope.multipleSelectorLoading = true;
+  $scope.reload = async (element, searchTerm, addOffset, start) => {
     if (element === 'left') {
-      $scope.availableAgents.offset += addOffset + 1;
-      await $scope.loadAllAgents();
+      if (!$scope.availableAgents.loadedAll) {
+        $scope.multipleSelectorLoading = true;
+        if (start) {
+          $scope.selectedAgents.offset = 0;
+        } else {
+          $scope.availableAgents.offset += addOffset + 1;
+        }
+        await $scope.loadAllAgents(searchTerm, start);
+      }
     } else {
-      $scope.selectedAgents.offset += addOffset + 1;
-      await $scope.loadSelectedAgents();
+      if (!$scope.selectedAgents.loadedAll) {
+        $scope.multipleSelectorLoading = true;
+        $scope.selectedAgents.offset += addOffset + 1;
+        await $scope.loadSelectedAgents(searchTerm);
+      }
     }
     $timeout(function () {
       $scope.multipleSelectorLoading = false;
     }, 100);
   }
 
-  $scope.loadSelectedAgents = async () => {
+  $scope.loadSelectedAgents = async (searchTerm) => {
     try {
-      const result = await apiReq.request('GET', `/agents/groups/${$scope.currentGroup.name}`, { offset: $scope.selectedAgents.offset });
+      let params = { 'offset': !searchTerm ? $scope.selectedAgents.offset : 0 };
+      if (searchTerm) {
+        params.search = searchTerm;
+      }
+      const result = await apiReq.request('GET',
+        `/agents/groups/${$scope.currentGroup.name}`,
+        params);
       const mapped = result.data.data.items.map(function (item) {
         return { 'key': item.id, 'value': item.name };
       });
-      $scope.selectedAgents.data = $scope.selectedAgents.data.concat(mapped);
+      if (searchTerm) {
+        $scope.selectedAgents.data = mapped;
+      } else {
+        $scope.selectedAgents.data = $scope.selectedAgents.data.concat(mapped);
+      }
+      if ($scope.selectedAgents.data.length === 0 || $scope.selectedAgents.data.length < 500) {
+        $scope.selectedAgents.loadedAll = true;
+      }
     } catch (error) {
       errorHandler.handle(error, 'Error fetching group agents');
     }
     $scope.selectedAgents.loaded = true;
   }
 
-  $scope.loadAllAgents = async () => {
+  $scope.loadAllAgents = async (searchTerm) => {
     try {
-      const req = await apiReq.request('GET', '/agents/', { offset: $scope.availableAgents.offset });
+      let params = { 'offset': !searchTerm ? $scope.availableAgents.offset : 0 };
+      if (searchTerm) {
+        params.search = searchTerm;
+        $scope.availableAgents.offset = 0;
+      }
+      const req = await apiReq.request('GET',
+        '/agents/',
+        params);
+      $scope.totalAgents = req.data.data.totalItems;
       const mapped = req.data.data.items.filter(function (item) {
         return $scope.selectedAgents.data.filter(function (selected) {
           return selected.key == item.id;
@@ -258,19 +254,36 @@ export function GroupsController(
       }).map(function (item) {
         return { 'key': item.id, 'value': item.name };
       });
-      $scope.availableAgents.data = $scope.availableAgents.data.concat(mapped);
+      if (searchTerm) {
+        $scope.availableAgents.data = mapped;
+      } else {
+        $scope.availableAgents.data = $scope.availableAgents.data.concat(mapped);
+      }
+      if ($scope.availableAgents.data.length === 0 && !searchTerm) {
+        if ($scope.availableAgents.offset >= $scope.totalAgents) {
+          $scope.availableAgents.loadedAll = true;
+        }
+        if (!$scope.availableAgents.loadedAll) {
+          $scope.availableAgents.offset += 499;
+          await $scope.loadAllAgents();
+        }
+      }
     } catch (error) {
       errorHandler.handle(error, 'Error fetching all available agents');
     }
-    $scope.availableAgents.loaded = true;
   }
 
   $scope.addMultipleAgents = async (toggle) => {
     $scope.addingAgents = toggle;
     if (toggle && !$scope.availableAgents.loaded) {
-      //await $scope.loadSearchBarModel();
+      $scope.availableAgents = { 'loaded': false, 'data': [], 'offset': 0, 'loadedAll': false };
+      $scope.selectedAgents = { 'loaded': false, 'data': [], 'offset': 0, 'loadedAll': false };
       $scope.multipleSelectorLoading = true;
-      await $scope.loadSelectedAgents();
+      while (!$scope.selectedAgents.loadedAll) {
+        await $scope.loadSelectedAgents();
+        $scope.selectedAgents.offset += 499;
+      }
+      $scope.firstSelectedList = [...$scope.selectedAgents.data];
       await $scope.loadAllAgents();
       $timeout(function () {
         $scope.multipleSelectorLoading = false;
@@ -279,15 +292,31 @@ export function GroupsController(
   };
 
   $scope.saveAddAgents = async (agents) => {
-    alert('saved ' + agents);
+    const original = $scope.firstSelectedList;
+    const modified = agents;
+    $scope.deletedAgents = [];
+    $scope.addedAgents = [];
+
+    modified.forEach(function (mod) {
+      if (original.filter(e => e.key === mod.key).length === 0) {
+        $scope.addedAgents.push(mod);
+      }
+    });
+    original.forEach(function (orig) {
+      if (modified.filter(e => e.key === orig.key).length === 0) {
+        $scope.deletedAgents.push(orig);
+      }
+    });
+
+    console.log('Added: ' + $scope.addedAgents.map(x => x.key) + " - Deleted: " + $scope.deletedAgents.map(x => x.key));
   }
 
   // Resetting the factory configuration
   $scope.$on('$destroy', () => { });
 
   $scope.$watch('lookingGroup', value => {
-    $scope.availableAgents = { 'loaded': false, 'data': [], 'offset': 0 };
-    $scope.selectedAgents = { 'loaded': false, 'data': [], 'offset': 0 };
+    $scope.availableAgents = { 'loaded': false, 'data': [], 'offset': 0, 'loadedAll': false };
+    $scope.selectedAgents = { 'loaded': false, 'data': [], 'offset': 0, 'loadedAll': false };
     $scope.addMultipleAgents(false);
     $rootScope.$emit('closeEditXmlFile', {});
     if (!value) {

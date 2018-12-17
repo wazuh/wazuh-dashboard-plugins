@@ -163,7 +163,7 @@
             <div layout="row" class="md-padding" ng-if="addingAgents">
                 <wz-multiple-selector class='wzMultipleSelector' available-items="availableAgents.data" selected-items="selectedAgents.data"
                     loading="multipleSelectorLoading" title-available-items="Available agents" title-selected-items="Selected agents"
-                    reload-scroll='reload(element, 499 )'>
+                    reload-scroll='reload(element, searchTerm, 499, start)'>
                 </wz-multiple-selector>
             </div>
         </div>

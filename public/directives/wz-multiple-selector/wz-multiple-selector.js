@@ -17,14 +17,14 @@ const app = uiModules.get('app/wazuh', []);
 
 app.directive('wzMultipleSelector', function () {
   return {
-    restrict: "E",
+    restrict: 'E',
     scope: {
-      availableItems: "=",
-      selectedItems: "=",
-      limit: "=",
-      loading: "=",
-      titleSelectedItems: "@",
-      titleAvailableItems: "@",
+      availableItems: '=',
+      selectedItems: '=',
+      limit: '=',
+      loading: '=',
+      titleSelectedItems: '@',
+      titleAvailableItems: '@',
       reloadScroll: '&'
     },
     controller(
@@ -62,12 +62,16 @@ app.directive('wzMultipleSelector', function () {
         from.length = 0;
       };
 
-      $("#wzMultipleSelector select").scroll(function (ev) {
+      $scope.sort = (a, b) => {
+        return a - b;
+      }
+
+      $('#wzMultipleSelector select').scroll(function (ev) {
         $scope.scrollList(ev.currentTarget);
       });
 
-      $scope.doReload = (side) => {
-        $scope.reloadScroll({ 'element': side });
+      $scope.doReload = (side, term, fromStart = false) => {
+        $scope.reloadScroll({ 'element': side, 'searchTerm': term , 'start': fromStart});
       }
       $scope.scrollList = (target) => {
         let pos = target.scrollTop + target.offsetHeight;
