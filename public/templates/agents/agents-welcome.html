@@ -34,7 +34,6 @@
             </md-card-content>
         </md-card>
     </div>
-<<<<<<< HEAD
     <div layout="row" layout-padding class="wz-padding-top-0 wz-padding-bottom-0" ng-if="agent.group">
         <md-card flex class="wz-metric-color wz-md-card wz-no-padding">
             <md-card-content layout="row" class="wz-padding-metric">
@@ -54,13 +53,6 @@
                 </div>
                 <div class="wz-word-break" flex ng-if="!groups || !groups.length">
                     There are no more groups available.
-=======
-    <div layout="row" layout-padding class="wz-padding-top-0 wz-padding-bottom-0" ng-if="agent.group && agent.group.length">
-        <md-card flex class="wz-metric-color wz-md-card wz-no-padding">
-            <md-card-content layout="row" class="wz-padding-metric">
-                <div class="wz-word-break" flex >
-                    Groups: <span ng-repeat="group in agent.group" class="wz-text-bold wz-text-link" ng-click="goGroups(agent,$index)">{{ group }}&nbsp;</span>
->>>>>>> 40f3ce71aa7e668abfa1908c038c08a77c84e5ea
                 </div>
                 <span flex></span>
                 <span class="wz-text-link" ng-click="switchGroupEdit()">Close</span>
