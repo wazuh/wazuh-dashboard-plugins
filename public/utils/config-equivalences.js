@@ -43,7 +43,8 @@ export const configEquivalences = {
     'Define the number of shards to use for the wazuh-monitoring-3.x-* indices.',
   'wazuh.monitoring.replicas':
     'Define the number of replicas to use for the wazuh-monitoring-3.x-* indices.',
-  'wazuh.monitoring.pattern': 'Default index pattern to use on the app for Wazuh monitoring.',
+  'wazuh.monitoring.pattern':
+    'Default index pattern to use on the app for Wazuh monitoring.',
   admin:
     'Enable or disable administrator requests to the Wazuh API when using the app.'
 };
