@@ -359,6 +359,10 @@ export class WazuhElasticCtrl {
    */
   buildVisualizationsRaw(app_objects, id) {
     try {
+      const config = getConfiguration();
+      const monitoringPattern =
+        (config || {})['wazuh.monitoring.pattern'] || 'wazuh-monitoring-3.x-*';
+
       const visArray = [];
       let aux_source, bulk_content;
       for (let element of app_objects) {
@@ -371,10 +375,19 @@ export class WazuhElasticCtrl {
           aux_source.kibanaSavedObjectMeta.searchSourceJSON &&
           typeof aux_source.kibanaSavedObjectMeta.searchSourceJSON === 'string'
         ) {
-          aux_source.kibanaSavedObjectMeta.searchSourceJSON = aux_source.kibanaSavedObjectMeta.searchSourceJSON.replace(
-            'wazuh-alerts',
-            id
-          );
+          const defaultStr = aux_source.kibanaSavedObjectMeta.searchSourceJSON;
+
+          defaultStr.includes('wazuh-monitoring')
+            ? (aux_source.kibanaSavedObjectMeta.searchSourceJSON = defaultStr.replace(
+                'wazuh-monitoring',
+                monitoringPattern[monitoringPattern.length - 1] === '*'
+                  ? monitoringPattern
+                  : monitoringPattern + '*'
+              ))
+            : (aux_source.kibanaSavedObjectMeta.searchSourceJSON = defaultStr.replace(
+                'wazuh-alerts',
+                id
+              ));
         }
 
         // Replace index-pattern for selector visualizations

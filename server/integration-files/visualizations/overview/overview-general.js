@@ -22,7 +22,7 @@ export default [
       version: 1,
       kibanaSavedObjectMeta: {
         searchSourceJSON:
-          '{"index":"wazuh-monitoring-3.x-*","filter":[],"query":{"query":"","language":"lucene"}}'
+          '{"index":"wazuh-monitoring","filter":[],"query":{"query":"","language":"lucene"}}'
       }
     },
     _type: 'visualization'
