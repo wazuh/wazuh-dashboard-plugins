@@ -71,12 +71,21 @@ export class Monitoring {
 
       this.CRON_FREQ = parseCron(this.FREQUENCY);
 
-      this.index_pattern = configFile && typeof configFile['wazuh.monitoring.pattern'] !== 'undefined' ? configFile['wazuh.monitoring.pattern'] : this.index_pattern;
-      const lastCharFromPattern = this.index_pattern[this.index_pattern.length -1];
-      if(lastCharFromPattern !== '*') {
-        this.index_pattern += '*'
+      this.index_pattern =
+        configFile &&
+        typeof configFile['wazuh.monitoring.pattern'] !== 'undefined'
+          ? configFile['wazuh.monitoring.pattern']
+          : this.index_pattern;
+      const lastCharFromPattern = this.index_pattern[
+        this.index_pattern.length - 1
+      ];
+      if (lastCharFromPattern !== '*') {
+        this.index_pattern += '*';
       }
-      this.index_prefix = this.index_pattern.slice(0,this.index_pattern.length - 1);
+      this.index_prefix = this.index_pattern.slice(
+        0,
+        this.index_pattern.length - 1
+      );
 
       !this.quiet &&
         log(
@@ -107,14 +116,18 @@ export class Monitoring {
       !this.quiet &&
         log(
           '[monitoring][configuration]',
-          `wazuh.monitoring.pattern: ${this.index_pattern} (index prefix: ${this.index_prefix})`,
+          `wazuh.monitoring.pattern: ${this.index_pattern} (index prefix: ${
+            this.index_prefix
+          })`,
           'info'
         );
 
       !this.quiet &&
         this.server.log(
           [blueWazuh, 'monitoring', 'info'],
-          `wazuh.monitoring.pattern: ${this.index_pattern} (index prefix: ${this.index_prefix})`
+          `wazuh.monitoring.pattern: ${this.index_pattern} (index prefix: ${
+            this.index_prefix
+          })`
         );
     } catch (error) {
       !this.quiet && log('[monitoring][configuration]', error.message || error);
@@ -352,10 +365,11 @@ export class Monitoring {
           `Created index pattern: ${this.index_pattern}`,
           'info'
         );
-      !this.quiet && this.server.log(
-        [blueWazuh, 'monitoring', 'info'],
-        `Created index pattern: ${this.index_pattern}`
-      );
+      !this.quiet &&
+        this.server.log(
+          [blueWazuh, 'monitoring', 'info'],
+          `Created index pattern: ${this.index_pattern}`
+        );
 
       return;
     } catch (error) {
@@ -520,12 +534,13 @@ export class Monitoring {
             this.todayIndex
           } exists due to ${error.message || error}`
         );
-      !this.quiet && this.server.log(
-        [blueWazuh, 'monitoring', 'error'],
-        `Could not check if the index ${
-          this.todayIndex
-        } exists due to ${error.message || error}`
-      );
+      !this.quiet &&
+        this.server.log(
+          [blueWazuh, 'monitoring', 'error'],
+          `Could not check if the index ${
+            this.todayIndex
+          } exists due to ${error.message || error}`
+        );
     }
   }
 
@@ -543,10 +558,11 @@ export class Monitoring {
             'Successfully deleted old wazuh-monitoring pattern.',
             'info'
           );
-        !this.quiet && this.server.log(
-          [blueWazuh, 'monitoring', 'info'],
-          'Successfully deleted old wazuh-monitoring pattern.'
-        );
+        !this.quiet &&
+          this.server.log(
+            [blueWazuh, 'monitoring', 'info'],
+            'Successfully deleted old wazuh-monitoring pattern.'
+          );
       } catch (error) {
         !this.quiet &&
           log(
@@ -585,21 +601,24 @@ export class Monitoring {
           'Updating wazuh-monitoring template...'
         );
 
-      try{
+      try {
         // Check if the template already exists
-        const currentTemplate = await this.wzWrapper.getTemplateByName('wazuh-agent');
+        const currentTemplate = await this.wzWrapper.getTemplateByName(
+          'wazuh-agent'
+        );
         // Copy already created index patterns
-        monitoringTemplate.index_patterns = currentTemplate['wazuh-agent'].index_patterns;
+        monitoringTemplate.index_patterns =
+          currentTemplate['wazuh-agent'].index_patterns;
       } catch (error) {
         // Init with the default index pattern
         monitoringTemplate.index_patterns = ['wazuh-monitoring-3.x-*'];
       }
 
       // Check if the user is using a custom pattern
-      if(!monitoringTemplate.index_patterns.includes(this.index_pattern)) {
+      if (!monitoringTemplate.index_patterns.includes(this.index_pattern)) {
         monitoringTemplate.index_patterns.push(this.index_pattern);
       }
-     
+
       await this.wzWrapper.putMonitoringTemplate(monitoringTemplate);
       return;
     } catch (error) {
