@@ -130,7 +130,7 @@ export class DevToolsController {
       const splitted = currentState
         .split(/[\r\n]+(?=(?:GET|PUT|POST|DELETE|#)\b)/gm)
         .filter(item => item.replace(/\s/g, '').length);
- 
+
       let start = 0;
       let end = 0;
 
@@ -377,6 +377,24 @@ export class DevToolsController {
         to: CodeMirror.Pos(cur.line, end)
       };
     });
+    $('.wz-dev-column-separator').mousedown(function (e) {
+      e.preventDefault();
+      const leftOrigWidth = $('#wz-dev-left-column').width();
+      const rightOrigWidth = $('#wz-dev-right-column').width();
+      $(document).mousemove(function (e) {
+        const leftWidth = e.pageX - 215 + 14;
+        let rightWidth = leftOrigWidth - leftWidth;
+        $('#wz-dev-left-column').css("width", leftWidth);
+        $('#wz-dev-right-column').css("width", rightOrigWidth + rightWidth);
+      })
+    });
+    $(document).mouseup(function () {
+      $(document).unbind('mousemove');
+    });
+    this.$window.onresize = () => {
+      $('#wz-dev-left-column').attr('style', 'width: calc(30% - 7px); !important');
+      $('#wz-dev-right-column').attr('style', 'width: calc(70% - 7px); !important');
+    };
   }
 
   /**
