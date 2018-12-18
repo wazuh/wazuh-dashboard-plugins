@@ -258,8 +258,8 @@ export class WazuhElasticCtrl {
         forbidden = true;
       }
       if (
-        (results && results.hits && results.hits.total >= 1) ||
-        (!forbidden && results && results.hits && results.hits.total === 0)
+        ((results || {}).hits || {}).total >= 1 ||
+        (!forbidden && ((results || {}).hits || {}).total === 0)
       ) {
         finalList.push(item);
       }
@@ -319,10 +319,10 @@ export class WazuhElasticCtrl {
 
       const data = await this.wzWrapper.getAllIndexPatterns();
 
-      if (data && data.hits && data.hits.hits.length === 0)
+      if ((((data || {}).hits || {}).hits || []).length === 0)
         throw new Error('There is no index pattern');
 
-      if (data && data.hits && data.hits.hits) {
+      if (((data || {}).hits || {}).hits) {
         let list = this.validateIndexPattern(data.hits.hits);
         if (
           config &&

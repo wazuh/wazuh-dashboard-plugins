@@ -41,8 +41,8 @@ export function settingsWizard(
           );
       } else if (
         JSON.stringify(data).includes('socket hang up') ||
-        (data && data.data && data.data.apiIsDown) ||
-        (data && data.data && data.data.data && data.data.data.apiIsDown)
+        ((data || {}).data || {}).apiIsDown ||
+        (((data || {}).data || {}).data || {}).apiIsDown
       ) {
         wzMisc.setApiIsDown(true);
         !disableErrors &&
@@ -62,11 +62,9 @@ export function settingsWizard(
         }
       } else {
         if (
-          data &&
-          data.data &&
-          parseInt(data.data.statusCode) === 500 &&
-          parseInt(data.data.error) === 7 &&
-          data.data.message === '401 Unauthorized'
+          parseInt(((data || {}).data || {}).statusCode) === 500 &&
+          parseInt(((data || {}).data || {}).error) === 7 &&
+          ((data || {}).data || {}).message === '401 Unauthorized'
         ) {
           !disableErrors &&
             errorHandler.handle(
@@ -140,7 +138,7 @@ export function settingsWizard(
             if (data.data.error || data.data.data.apiIsDown) {
               checkResponse(data);
             } else {
-              if (data && data.data && data.data.idChanged) {
+              if (((data || {}).data || {}).idChanged) {
                 let apiRaw = false;
                 try {
                   apiRaw = JSON.parse(appState.getCurrentAPI());

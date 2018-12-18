@@ -310,7 +310,7 @@ export function Initialize(server) {
       const apiEntries = await wzWrapper.getWazuhAPIEntries();
       const configFile = await getConfiguration();
 
-      if (apiEntries && apiEntries.hits && apiEntries.hits.total > 0) {
+      if (((apiEntries || {}).hits || {}).total > 0) {
         const currentExtensions = !configFile ? defaultExt : {};
 
         if (configFile) {

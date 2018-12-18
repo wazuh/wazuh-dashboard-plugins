@@ -43,14 +43,9 @@ export class WazuhApiElasticCtrl {
 
       // Replacing password by ****
       const result = [];
-      if (
-        data &&
-        data.hits &&
-        data.hits.hits &&
-        Array.isArray(data.hits.hits)
-      ) {
+      if (Array.isArray(((data || {}).hits || {}).hits)) {
         for (const entry of data.hits.hits) {
-          if (entry && entry._source && entry._source.api_password) {
+          if (((entry || {})._source || {}).api_password) {
             entry._source.api_password = '****';
           }
           result.push(entry);
