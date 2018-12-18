@@ -348,10 +348,8 @@ export class WazuhReportingCtrl {
           apiId
         );
         if (
-          agent &&
-          agent.data &&
-          typeof agent.data.status === 'string' &&
-          agent.data.status !== 'Active'
+          typeof ((agent || {}).data || {}).status === 'string' &&
+          ((agent || {}).data || {}).status !== 'Active'
         ) {
           this.dd.content.push({
             text: `Warning. Agent is ${agent.data.status.toLowerCase()}`,
@@ -362,12 +360,12 @@ export class WazuhReportingCtrl {
         await this.buildAgentsTable([isAgents], apiId);
 
         let dateAddStr = '';
-        if (agent && agent.data && agent.data.dateAdd) {
+        if (((agent || {}).data || {}).dateAdd) {
           dateAddStr = `Registration date: ${agent.data.dateAdd}.`;
         }
 
         let dateLastKeepAlive = '';
-        if (agent && agent.data && agent.data.lastKeepAlive) {
+        if (((agent || {}).data || {}).lastKeepAlive) {
           dateLastKeepAlive += `Last keep alive: ${agent.data.lastKeepAlive}.`;
         }
 
@@ -381,7 +379,7 @@ export class WazuhReportingCtrl {
           this.dd.content.push('\n');
         }
 
-        if (agent && agent.data && agent.data.group) {
+        if (((agent || {}).data || {}).group) {
           this.dd.content.push({
             text: `Group: ${agent.data.group}`,
             style: 'standard'
@@ -520,14 +518,14 @@ export class WazuhReportingCtrl {
         }
         const str = Array(6).fill('-');
         str[0] = item;
-        if (data && data.name) str[1] = data.name;
-        if (data && data.ip) str[2] = data.ip;
-        if (data && data.version) str[3] = data.version;
+        if ((data || {}).name) str[1] = data.name;
+        if ((data || {}).ip) str[2] = data.ip;
+        if ((data || {}).version) str[3] = data.version;
         // 3.7 <
-        if (data && data.manager_host) str[4] = data.manager_host;
+        if ((data || {}).manager_host) str[4] = data.manager_host;
         // 3.7 >=
-        if (data && data.manager) str[4] = data.manager;
-        if (data && data.os && data.os.name && data.os.version)
+        if ((data || {}).manager) str[4] = data.manager;
+        if ((data || {}).os && data.os.name && data.os.version)
           str[5] = `${data.os.name} ${data.os.version}`;
         rows.push(str);
       }
@@ -1035,7 +1033,7 @@ export class WazuhReportingCtrl {
           this.dd.content.push('\n');
         }
 
-        if (database && database.data && database.data.items) {
+        if (((database || {}).data || {}).items) {
           PdfTable(
             this.dd,
             database.data.items,
@@ -1046,7 +1044,7 @@ export class WazuhReportingCtrl {
           this.dd.content.push('\n');
         }
 
-        if (pci && pci.data && pci.data.items) {
+        if (((pci || {}).data || {}).items) {
           this.dd.content.push({
             text: 'Fired rules due to PCI requirements',
             style: 'h2',

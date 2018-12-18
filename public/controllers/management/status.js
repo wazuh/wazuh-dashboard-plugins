@@ -46,8 +46,8 @@ export class StatusController {
         this.apiReq.request('GET', '/manager/info', {})
       ]);
 
-      const parsedData = data.map(item =>
-        item && item.data && item.data.data ? item.data.data : false
+      const parsedData = data.map(
+        item => ((item || {}).data || {}).data || false
       );
       const [stats, clusterStatus, managerInfo] = parsedData;
 

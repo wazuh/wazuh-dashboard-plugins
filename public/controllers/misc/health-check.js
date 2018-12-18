@@ -140,7 +140,7 @@ export class HealthCheck {
         const data = await this.testAPI.checkStored(
           JSON.parse(this.appState.getCurrentAPI()).id
         );
-        if (data && data.data && data.data.idChanged) {
+        if (((data || {}).data || {}).idChanged) {
           const apiRaw = JSON.parse(this.appState.getCurrentAPI());
           this.appState.setCurrentAPI(
             JSON.stringify({ name: apiRaw.name, id: data.data.idChanged })

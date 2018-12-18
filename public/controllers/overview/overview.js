@@ -276,7 +276,7 @@ export class OverviewController {
         await this.fetchWodles();
       }
 
-      if (typeof this.agentsCountTotal === 'undefined') {    
+      if (typeof this.agentsCountTotal === 'undefined') {
         await this.getSummary();
       }
 
@@ -341,8 +341,9 @@ export class OverviewController {
   async getSummary() {
     try {
       const data = await this.apiReq.request('GET', '/agents/summary', {});
-      const result =
-        data && data.data && data.data.data ? data.data.data : false;
+
+      const result = ((data || {}).data || {}).data || false;
+
       if (result) {
         const active = result.Active - 1;
         const total = result.Total - 1;

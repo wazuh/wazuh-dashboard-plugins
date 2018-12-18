@@ -22,32 +22,21 @@ export class ErrorHandler {
    * @param {*} error
    */
   extractMessage(error) {
-    if (error && error.status && error.status === -1)
-      return 'Server did not respond';
-    if (error.data && error.data.errorData && error.data.errorData.message)
+    if ((error || {}).status === -1) return 'Server did not respond';
+    if ((((error || {}).data || {}).errorData || {}).message)
       return error.data.errorData.message;
-    if (error.errorData && error.errorData.message)
-      return error.errorData.message;
-    if (error.data && typeof error.data === 'string') return error.data;
-    if (error.data && error.data.error && typeof error.data.error === 'string')
+    if (((error || {}).errorData || {}).message) return error.errorData.message;
+    if (typeof (error || {}).data === 'string') return error.data;
+    if (typeof ((error || {}).data || {}).error === 'string')
       return error.data.error;
-    if (
-      error.data &&
-      error.data.message &&
-      typeof error.data.message === 'string'
-    )
+    if (typeof ((error || {}).data || {}).message === 'string')
       return error.data.message;
-    if (
-      error.data &&
-      error.data.message &&
-      error.data.message.msg &&
-      typeof error.data.message.msg === 'string'
-    )
+    if (typeof (((error || {}).data || {}).message || {}).msg === 'string')
       return error.data.message.msg;
-    if (error.data && error.data.data && typeof error.data.data === 'string')
+    if (typeof ((error || {}).data || {}).data === 'string')
       return error.data.data;
     if (typeof error.message === 'string') return error.message;
-    if (error.message && error.message.msg) return error.message.msg;
+    if (((error || {}).message || {}).msg) return error.message.msg;
     if (typeof error === 'string') return error;
     if (typeof error === 'object') return JSON.stringify(error);
     return error || 'Unexpected error';

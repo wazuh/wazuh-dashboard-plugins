@@ -64,11 +64,13 @@ export class Monitoring {
             configFile['wazuh.monitoring.enabled'] !== 'worker'
           : this.ENABLED;
 
-      this.FREQUENCY = (configFile || {})['wazuh.monitoring.frequency'] || this.FREQUENCY;
+      this.FREQUENCY =
+        (configFile || {})['wazuh.monitoring.frequency'] || this.FREQUENCY;
 
       this.CRON_FREQ = parseCron(this.FREQUENCY);
 
-      this.index_pattern = (configFile || {})['wazuh.monitoring.pattern'] || this.index_pattern;
+      this.index_pattern =
+        (configFile || {})['wazuh.monitoring.pattern'] || this.index_pattern;
 
       const lastCharFromPattern = this.index_pattern[
         this.index_pattern.length - 1
@@ -199,16 +201,15 @@ export class Monitoring {
         options
       );
 
-      const clusterName = (((isCluster || {}).body || {}).data || {}).enabled === 'yes'
+      const clusterName =
+        (((isCluster || {}).body || {}).data || {}).enabled === 'yes'
           ? await needle('get', `${getPath(api)}/cluster/node`, {}, options)
           : false;
 
-      api.clusterName = (((clusterName || {}).body || {}).data || {}).cluster || false;
+      api.clusterName =
+        (((clusterName || {}).body || {}).data || {}).cluster || false;
 
-      if (
-        !response.error &&
-        ((response.body || {}).data || {}).totalItems
-      ) {
+      if (!response.error && ((response.body || {}).data || {}).totalItems) {
         await this.checkStatus(api, response.body.data.totalItems);
       } else {
         !this.quiet &&
@@ -774,9 +775,7 @@ export class Monitoring {
       const template = await this.wzWrapper.getTemplateByName('wazuh-agent');
 
       // Prevents to insert monitoring indices without the proper template inserted
-      if (
-        ((template || {})['wazuh-agent'] || {}).index_patterns
-      ) {
+      if (((template || {})['wazuh-agent'] || {}).index_patterns) {
         this.agentsArray = [];
         const data = await this.getConfig();
         await this.loadCredentials(data);
