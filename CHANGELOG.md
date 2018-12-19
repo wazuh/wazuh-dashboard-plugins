@@ -36,6 +36,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fix overlapped play button in Dev-tools when the input box has a scrollbar ([#1102](https://github.com/wazuh/wazuh-kibana-app/pull/1102)).
 - Fix Dev-tools behavior when parse json invalid blocks ([#1102](https://github.com/wazuh/wazuh-kibana-app/pull/1102)).
 - Fixed Management > Monitoring tab frustration adding back buttons ([#1102](https://github.com/wazuh/wazuh-kibana-app/pull/1102)).
+- Fix template checking when using more than one pattern ([#1104](https://github.com/wazuh/wazuh-kibana-app/pull/1104)).
 
 ## Wazuh v3.7.1 - Kibana v6.5.1 / v6.5.2 / v6.5.3 - Revision 415
 
