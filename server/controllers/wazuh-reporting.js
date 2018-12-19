@@ -1442,9 +1442,7 @@ export class WazuhReportingCtrl {
     } catch (error) {
       // Delete generated file if an error occurred
       if (
-        req &&
-        req.payload &&
-        req.payload.name &&
+        ((req || {}).payload || {}).name &&
         fs.existsSync(
           path.join(__dirname, REPORTING_PATH + '/' + req.payload.name)
         )

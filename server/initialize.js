@@ -84,12 +84,8 @@ export function Initialize(server) {
         [blueWazuh, 'initialize', 'info'],
         `Found ${indexPatternList.hits.total} index patterns`
       );
-      let list = [];
-      if (
-        indexPatternList &&
-        indexPatternList.hits &&
-        indexPatternList.hits.hits
-      ) {
+      const list = [];
+      if (((indexPatternList || {}).hits || {}).hits) {
         const minimum = ['@timestamp', 'full_log', 'manager.name', 'agent.id'];
 
         if (indexPatternList.hits.hits.length > 0) {
@@ -324,15 +320,10 @@ export function Initialize(server) {
 
         for (const item of apiEntries.hits.hits) {
           for (const key in currentExtensions) {
-            if (
-              item &&
-              item._source &&
-              item._source.extensions &&
-              typeof item._source.extensions[key] !== 'undefined'
-            ) {
+            if ((((item || {})._source || {}).extensions || {})[key]) {
               continue;
             } else {
-              if (item._source && item._source.extensions) {
+              if (((item || {})._source || {}).extensions) {
                 item._source.extensions[key] = currentExtensions[key];
               }
             }

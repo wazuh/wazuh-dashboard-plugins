@@ -39,13 +39,9 @@ export class WazuhElasticCtrl {
   async getTimeStamp(req, reply) {
     try {
       const data = await this.wzWrapper.getWazuhVersionIndexAsSearch();
-      if (
-        data.hits &&
-        data.hits.hits[0] &&
-        data.hits.hits[0]._source &&
-        data.hits.hits[0]._source.installationDate &&
-        data.hits.hits[0]._source.lastRestart
-      ) {
+      const source = ((((data || {}).hits || {}).hits || [])[0] || {})._source || {};
+
+      if (source.installationDate && source.lastRestart) {
         return reply({
           installationDate: data.hits.hits[0]._source.installationDate,
           lastRestart: data.hits.hits[0]._source.lastRestart
