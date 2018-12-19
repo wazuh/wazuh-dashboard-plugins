@@ -15,7 +15,9 @@ import { monitoringKnownFields } from '../integration-files/monitoring-known-fie
 export class ElasticWrapper {
   constructor(server) {
     this.elasticRequest = server.plugins.elasticsearch.getCluster('data');
-    this.WZ_KIBANA_INDEX = ((((server || {}).registrations || {}).kibana || {}).options || {}).index || '.kibana';
+    this.WZ_KIBANA_INDEX =
+      ((((server || {}).registrations || {}).kibana || {}).options || {})
+        .index || '.kibana';
   }
 
   /**
@@ -480,7 +482,9 @@ export class ElasticWrapper {
       delete payload.pattern;
       const fullPattern = await this.getIndexPatternUsingGet(pattern);
 
-      const title = (((fullPattern || {})._source || {})['index-pattern'] || {}).title || false;
+      const title =
+        (((fullPattern || {})._source || {})['index-pattern'] || {}).title ||
+        false;
 
       const data = await this.elasticRequest.callWithInternalUser('search', {
         index: title || 'wazuh-alerts-3.x-*',
@@ -658,8 +662,10 @@ export class ElasticWrapper {
         { includeDefaults: true }
       );
 
-      return ((((data || {}).defaults || {}).xpack || {}).security || {}).enabled == 'true'
-      
+      return (
+        ((((data || {}).defaults || {}).xpack || {}).security || {}).enabled ==
+        'true'
+      );
     } catch (error) {
       return Promise.reject(error);
     }
@@ -939,7 +945,9 @@ export class ElasticWrapper {
       if (!configuration) throw new Error('No valid configuration given');
 
       // Number of shards is not dynamic so delete that setting if it's given
-      if ((((configuration || {}).settings || {}).index || {}).number_of_shards) {
+      if (
+        (((configuration || {}).settings || {}).index || {}).number_of_shards
+      ) {
         delete configuration.settings.index.number_of_shards;
       }
 

@@ -39,7 +39,8 @@ export class WazuhElasticCtrl {
   async getTimeStamp(req, reply) {
     try {
       const data = await this.wzWrapper.getWazuhVersionIndexAsSearch();
-      const source = ((((data || {}).hits || {}).hits || [])[0] || {})._source || {};
+      const source =
+        ((((data || {}).hits || {}).hits || [])[0] || {})._source || {};
 
       if (source.installationDate && source.lastRestart) {
         return reply({
@@ -82,25 +83,27 @@ export class WazuhElasticCtrl {
       }
 
       const lastChar = req.params.pattern[req.params.pattern.length - 1];
-      
-      // Split into separate patterns 
+
+      // Split into separate patterns
       const tmpdata = data.match(/\[.*\]/g);
       const tmparray = [];
-      for(let item of tmpdata) {
+      for (let item of tmpdata) {
         // A template might use more than one pattern
-        if(item.includes(',')) {
+        if (item.includes(',')) {
           item = item.substr(1).slice(0, -1);
-          const subItems = item.split(',')
-          for(const subitem of subItems) {
-            tmparray.push(`[${subitem.trim()}]`)
+          const subItems = item.split(',');
+          for (const subitem of subItems) {
+            tmparray.push(`[${subitem.trim()}]`);
           }
         } else {
-          tmparray.push(item)
+          tmparray.push(item);
         }
       }
-      
+
       // Ensure we are handling just patterns
-      const array = tmparray.filter(item => item.includes('[') && item.includes(']'));
+      const array = tmparray.filter(
+        item => item.includes('[') && item.includes(']')
+      );
 
       const pattern =
         lastChar === '*' ? req.params.pattern.slice(0, -1) : req.params.pattern;
