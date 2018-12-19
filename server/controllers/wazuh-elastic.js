@@ -86,9 +86,26 @@ export class WazuhElasticCtrl {
       }
 
       const lastChar = req.params.pattern[req.params.pattern.length - 1];
-      const array = data
-        .match(/[^\s]+/g)
-        .filter(item => item.includes('[') && item.includes(']'));
+      
+      // Split into separate patterns 
+      const tmpdata = data.match(/\[.*\]/g);
+      const tmparray = [];
+      for(let item of tmpdata) {
+        // A template might use more than one pattern
+        if(item.includes(',')) {
+          item = item.substr(1).slice(0, -1);
+          const subItems = item.split(',')
+          for(const subitem of subItems) {
+            tmparray.push(`[${subitem.trim()}]`)
+          }
+        } else {
+          tmparray.push(item)
+        }
+      }
+      
+      // Ensure we are handling just patterns
+      const array = tmparray.filter(item => item.includes('[') && item.includes(']'));
+
       const pattern =
         lastChar === '*' ? req.params.pattern.slice(0, -1) : req.params.pattern;
       const isIncluded = array.filter(item => {
