@@ -12,6 +12,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - New table for an agent FIM monitored files, if the agent OS platform is Windows it will show two tables: files and registry ([#1032](https://github.com/wazuh/wazuh-kibana-app/pull/1032)).
 - Added description to each setting under Settings > Configuration ([#1048](https://github.com/wazuh/wazuh-kibana-app/pull/1048)).
 - Added a new setting to `config.yml` related to Wazuh monitoring and its index pattern ([#1095](https://github.com/wazuh/wazuh-kibana-app/pull/1095)).
+- Resizable columns by dragging in Dev-tools ([#1102](https://github.com/wazuh/wazuh-kibana-app/pull/1102)).
 
 ### Changed
 
@@ -21,6 +22,9 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Visualizations, filters and Discover improved ([#1083](https://github.com/wazuh/wazuh-kibana-app/pull/1083)).
 - Removed `popularizeField` function until https://github.com/elastic/kibana/issues/22426 is solved in order to avoid `Unable to write index pattern!` error on Discover tab ([#1085](https://github.com/wazuh/wazuh-kibana-app/pull/1085)).
 - Improved Wazuh monitoring module ([#1094](https://github.com/wazuh/wazuh-kibana-app/pull/1094)).
+- Added "Registered date" and "Last keep alive" in agents table allowing you to sort by these fields ([#1102](https://github.com/wazuh/wazuh-kibana-app/pull/1102)).
+- Improved code quality in sections such as Ruleset > Rule and Decoder detail view simplify conditions ([#1102](https://github.com/wazuh/wazuh-kibana-app/pull/1102)).
+- Replaced reporting success message ([#1102](https://github.com/wazuh/wazuh-kibana-app/pull/1102)).
 
 ### Fixed
 
@@ -29,6 +33,9 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Wazuh logo adapted to low resolutions ([#1074](https://github.com/wazuh/wazuh-kibana-app/pull/1074)).
 - Hide Audit, OpenSCAP tabs for non-linux agents. Fixed empty Windows events under Configuration > Log collection section. OSQuery logo has been standardized ([#1072](https://github.com/wazuh/wazuh-kibana-app/pull/1072), [#1076](https://github.com/wazuh/wazuh-kibana-app/pull/1076)).
 - Fix empty values on _Overview > Security events_ when Wazuh monitoring is disabled ([#1091](https://github.com/wazuh/wazuh-kibana-app/pull/1091)).
+- Fix overlapped play button in Dev-tools when the input box has a scrollbar ([#1102](https://github.com/wazuh/wazuh-kibana-app/pull/1102)).
+- Fix Dev-tools behavior when parse json invalid blocks ([#1102](https://github.com/wazuh/wazuh-kibana-app/pull/1102)).
+- Fixed Management > Monitoring tab frustration adding back buttons ([#1102](https://github.com/wazuh/wazuh-kibana-app/pull/1102)).
 
 ## Wazuh v3.7.1 - Kibana v6.5.1 / v6.5.2 / v6.5.3 - Revision 415
 

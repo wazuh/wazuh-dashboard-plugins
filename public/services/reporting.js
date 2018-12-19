@@ -76,7 +76,7 @@ export class ReportingService {
       this.$rootScope.reportStatus = false;
       if (!this.$rootScope.$$phase) this.$rootScope.$digest();
       this.errorHandler.info(
-        'Success. Go to Management -> Reporting',
+        'Success. Go to Wazuh > Management > Reporting',
         'Reporting'
       );
 
