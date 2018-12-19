@@ -377,20 +377,23 @@ export class DevToolsController {
         to: CodeMirror.Pos(cur.line, end)
       };
     });
+    const evtDocument = this.$document[0];
     $('.wz-dev-column-separator').mousedown(function(e) {
       e.preventDefault();
       const leftOrigWidth = $('#wz-dev-left-column').width();
       const rightOrigWidth = $('#wz-dev-right-column').width();
-      $(document).mousemove(function(e) {
+      $(evtDocument).mousemove(function(e) {
         const leftWidth = e.pageX - 215 + 14;
         let rightWidth = leftOrigWidth - leftWidth;
         $('#wz-dev-left-column').css('width', leftWidth);
         $('#wz-dev-right-column').css('width', rightOrigWidth + rightWidth);
       });
     });
-    $(document).mouseup(function() {
-      $(document).unbind('mousemove');
+
+    $(evtDocument).mouseup(function() {
+      $(evtDocument).unbind('mousemove');
     });
+
     this.$window.onresize = () => {
       $('#wz-dev-left-column').attr(
         'style',
