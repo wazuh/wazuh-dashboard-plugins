@@ -53,7 +53,6 @@ export class WazuhUtilsCtrl {
   updateConfigurationFile(req, reply) {
     try {
       const configFile = updateConfigurationFile(req);
-
       return reply({
         statusCode: 200,
         error: 0,

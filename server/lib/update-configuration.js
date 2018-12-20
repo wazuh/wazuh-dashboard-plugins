@@ -37,6 +37,16 @@ export function updateConfigurationFile(req) {
           }
         })
       } else {
+        let currentValue = findedLine.split(':');
+        if (currentValue[1]) {
+          currentValue = currentValue[1].trim();
+          if (currentValue === 'true' || currentValue === 'false') {
+            currentValue = currentValue === 'true';
+          }
+          if (typeof req.payload.value != typeof currentValue) {
+            return false;
+          }
+        }
         const result = raw.replace(findedLine, req.payload.key + ' : ' + req.payload.value);
         fs.writeFile(customPath, result, 'utf8', function (err) {
           if (err) {
@@ -47,7 +57,7 @@ export function updateConfigurationFile(req) {
     });
     return true;
   } catch (error) {
-    return false;
+    return error;
   }
 
 }

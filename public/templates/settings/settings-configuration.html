@@ -28,25 +28,30 @@
                             <th class="wz-text-left">Actions</th>
                         </thead>
                         <tbody>
-                            <tr class="wz-word-wrap" ng-repeat="(key,value) in ctrl.configuration" ng-style="ctrl.editingKey === key && {'background': '#e2f7ff'}">
+                            <tr class="wz-word-wrap" ng-repeat="(key,value) in ctrl.configuration track by $index"
+                                ng-style="ctrl.editingKey === key && {'background': '#e2f7ff'}">
                                 <td>{{key}}</td>
                                 <td>
-                                    <input id="input-{{key}}" class="wz-input-text" ng-show="ctrl.editingKey === key && ctrl.configurationTypes[key] === 'string'"
-                                        ng-model="newValue" ng-init="newValue = value"></input>
-<!--                                     <input id="input-{{key}}" type="number" class="wz-input-text" ng-show="ctrl.editingKey === key && ctrl.configurationTypes[key] === 'number'"
-                                        ng-model="newValue" ng-init="newValue = value" min=0></input> -->
-                                    <select id="input-{{key}}" class="wz-input-text wz-width-100" ng-show="ctrl.editingKey === key && ctrl.configurationTypes[key] === 'boolean'"
-                                        ng-model="newValue" ng-init="newValue = value" ng-options="o as o for o in [true, false]"></select>
+                                    <input ng-if="ctrl.editingKey === key && ctrl.configurationTypes[key] === 'string'"
+                                        id="input-{{key}}" type="text" class="wz-input-text" ng-model="ctrl.editingNewValue"></input>
+                                    <input ng-if="ctrl.editingKey === key && ctrl.configurationTypes[key] === 'number'"
+                                        id="input-{{key}}" type="number" class="wz-input-text" ng-model="ctrl.editingNewValue"
+                                        min=0></input>
+                                    <select ng-if="ctrl.editingKey === key && ctrl.configurationTypes[key] === 'boolean'"
+                                        id="input-{{key}}" class="wz-input-text wz-width-100" ng-model="ctrl.editingNewValue"
+                                        ng-options="o as o for o in [true, false]"></select>
+                                    <textarea ng-if="ctrl.editingKey === key && ctrl.configurationTypes[key] === 'object'"
+                                        id="input-{{key}}" class="wz-input-text wz-width-100" ng-model="ctrl.editingNewValue"></textarea>
                                     <span ng-show="!ctrl.editingKey || ctrl.editingKey !== key">{{value}}</span>
                                 </td>
                                 <td>{{ctrl.configEquivalence(key)}}</td>
                                 <td>
-                                    <span ng-show="!ctrl.editingKey || ctrl.editingKey !== key" tooltip="Edit" ng-click="ctrl.editingKey = key; ctrl.focusOnKey(key)"
+                                    <span ng-show="!ctrl.editingKey || ctrl.editingKey !== key" tooltip="Edit" ng-click="ctrl.setEditingKey(key, value)"
                                         class="fa fa-fw fa-pencil cursor-pointer"></span>
                                     <span ng-show="ctrl.editingKey === key" tooltip="Cancel" class="fa fa-fw fa-times cursor-pointer"
-                                        ng-click="ctrl.cancelEditKey(); newValue = value"></span>
-                                    <span ng-show="ctrl.editingKey === key" tooltip="Apply" class="fa fa-fw fa-success cursor-pointer"
-                                        ng-click="ctrl.editKey(key, newValue)"></span>
+                                        ng-click="ctrl.cancelEditingKey()"></span>
+                                    <span ng-show="ctrl.editingKey === key && ctrl.editingNewValue !== ''" tooltip="Apply"
+                                        class="fa fa-fw fa-success cursor-pointer" ng-click="ctrl.editKey(key, ctrl.editingNewValue)"></span>
                                 </td>
                             </tr>
                         </tbody>

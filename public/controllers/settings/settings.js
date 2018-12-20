@@ -727,8 +727,28 @@ export class SettingsController {
   /**
    * Cancel edition of a configuration entry
    */
-  cancelEditKey() {
-    this.editingKey = { 'key': false, 'type': '' };
+  cancelEditingKey() {
+    this.editingKey = false;
+    this.editingNewValue = '';
+  }
+
+  /**
+   * Enable edition for a given key
+   * @param {String} key Configuration key
+   */
+  setEditingKey(key, value) {
+    if (typeof value === 'object') {
+      try {
+        value = JSON.stringify(value);
+      } catch (err) {
+        this.errorHandler.handle(
+          'Error parsing value',
+          key
+        );
+      }
+    }
+    this.editingKey = key;
+    this.editingNewValue = value;
   }
 
   /**
@@ -737,12 +757,11 @@ export class SettingsController {
    * @param {String} newValue new configuration value for key
    */
   editKey(key, newValue) {
-    this.setValueConfigurationFile(key, newValue).then(response => this.configurationFile = response.data);
-    //this.setValueConfigurationFile(key, newValue);
+    this.setValueConfigurationFile(key, newValue);
     this.errorHandler.handle(
       'You must restart kibana for the changes to take effect', '', true
     );
     this.configuration[key] = newValue;
-    this.editingKey = { 'key': false, 'type': '' };
+    this.cancelEditingKey();
   }
 }
