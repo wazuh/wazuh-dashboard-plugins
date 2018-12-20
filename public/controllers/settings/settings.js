@@ -63,7 +63,7 @@ export class SettingsController {
     this.addManagerContainer = false;
     this.showEditForm = {};
     this.formUpdate = {};
-    this.editingKey = { 'key': false, 'type': '' };
+    this.editingKey = false;
 
     this.userRegEx = new RegExp(/^.{3,100}$/);
     this.passRegEx = new RegExp(/^.{3,100}$/);
