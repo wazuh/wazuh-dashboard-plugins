@@ -16,13 +16,13 @@
 
         <div flex layout="column" layout-align="start stretch" ng-show="!load" ng-init="groupsSelectedTab='agents'">
             <!-- MD5 Sums and Details cards -->
-            <md-button class="md-icon-button" ng-if="lookingGroup" aria-label="Back" tooltip="Go back"
-                tooltip-placement="bottom" ng-click="goBackGroups()"><i class="fa fa-fw fa-arrow-left" aria-hidden="true"></i></md-button>
-            <div layout="row" class="md-padding" ng-if="lookingGroup">
+            <div layout="row" class="md-padding-h" ng-if="lookingGroup">
+                <md-button class="md-icon-button wz-circle-back-button" ng-if="lookingGroup" aria-label="Back" tooltip="Go back"
+                    tooltip-placement="bottom" ng-click="goBackGroups()"><i class="fa fa-fw fa-arrow-left" aria-hidden="true"></i></md-button>
                 <!-- Group MD5 sums section -->
                 <md-card flex class="no-margin-left wz-md-card">
                     <md-card-content>
-                        <span class="wz-headline-title wz-word-wrap">{{ currentGroup.name }}</span>
+                        <span class="wz-headline-title wz-word-wrap wz-text-bold">{{ currentGroup.name }}</span>
                         <i ng-click="editGroupAgentConfig(currentGroup); $event.stopPropagation()" class="fa fa-fw fa-file-code-o cursor-pointer action-btn-td pull-right"
                             tooltip="Edit this group agent.conf file" tooltip-placement="left" aria-hidden="true"></i>
                         <md-divider class="wz-margin-top-10"></md-divider>
@@ -66,7 +66,7 @@
             <!-- End MD5 Sums and Details cards -->
 
             <!-- Group actions -->
-            <div layout="row" class="md-padding" ng-if="lookingGroup && currentGroup && !addingAgents">
+            <div layout="row" class="md-padding-h md-padding-top-10" ng-if="lookingGroup && currentGroup && !addingAgents && groupsSelectedTab==='agents'">
                 <span ng-click='addMultipleAgents(true)' class='btn btn-primary'><i aria-hidden='true' class='fa fa-fw fa-plus'></i>
                     Add agents</span>
             </div>
