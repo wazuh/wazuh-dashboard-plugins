@@ -63,6 +63,7 @@ export class SettingsController {
     this.addManagerContainer = false;
     this.showEditForm = {};
     this.formUpdate = {};
+    this.editingKey = { 'key': false, 'type': '' };
 
     this.userRegEx = new RegExp(/^.{3,100}$/);
     this.passRegEx = new RegExp(/^.{3,100}$/);
@@ -75,6 +76,10 @@ export class SettingsController {
     // Tab names
     this.tabNames = TabNames;
     this.configuration = wazuhConfig.getConfig();
+    this.configurationTypes = [];
+    for (var key in this.configuration) {
+      this.configurationTypes[key] = typeof (this.configuration[key])
+    }
     this.indexPatterns = [];
     this.apiEntries = [];
 
@@ -187,7 +192,7 @@ export class SettingsController {
 
     this.errorHandler.info(
       `API ${
-        this.apiEntries[index]._source.cluster_info.manager
+      this.apiEntries[index]._source.cluster_info.manager
       } set as default`,
       'Settings'
     );
@@ -204,6 +209,21 @@ export class SettingsController {
     this.extensions = this.appState.getExtensions(JSON.parse(currentApi).id);
 
     if (!this.$scope.$$phase) this.$scope.$digest();
+    return;
+  }
+
+  // Get configuration file
+  async setValueConfigurationFile(key, value) {
+    const data = {
+      key: key,
+      value: value
+    };
+    try {
+      const config = await this.genericReq.request('PUT', '/utils/updateconfiguration', data);
+      return config;
+    } catch (error) {
+      this.errorHandler.handle('Error fetching configuration file');
+    }
     return;
   }
 
@@ -702,5 +722,27 @@ export class SettingsController {
    */
   configEquivalence(key) {
     return configEquivalences[key] || '-';
+  }
+
+  /**
+   * Cancel edition of a configuration entry
+   */
+  cancelEditKey() {
+    this.editingKey = { 'key': false, 'type': '' };
+  }
+
+  /**
+   * Change value for a given configuration key
+   * @param {String} key Configuration key
+   * @param {String} newValue new configuration value for key
+   */
+  editKey(key, newValue) {
+    this.setValueConfigurationFile(key, newValue).then(response => this.configurationFile = response.data);
+    //this.setValueConfigurationFile(key, newValue);
+    this.errorHandler.handle(
+      'You must restart kibana for the changes to take effect', '', true
+    );
+    this.configuration[key] = newValue;
+    this.editingKey = { 'key': false, 'type': '' };
   }
 }

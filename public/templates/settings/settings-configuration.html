@@ -1,7 +1,8 @@
 <div layout="column" layout-align="start stretch" ng-if="ctrl.tab === 'configuration' && !ctrl.load">
     <!-- Headline -->
     <div layout="column" layout-padding>
-        <span class="font-size-18"><i class="fa fa-fw fa-wrench" aria-hidden="true"></i> Wazuh Kibana plugin configuration settings</span>
+        <span class="font-size-18"><i class="fa fa-fw fa-wrench" aria-hidden="true"></i> Wazuh Kibana plugin
+            configuration settings</span>
         <span class="md-subheader">Configuration file located at <span class="wz-text-monospace">/usr/share/kibana/plugins/wazuh/config.yml</span></span>
     </div>
     <!-- End headline -->
@@ -10,25 +11,43 @@
             <md-card-content>
                 <div layout="row">
                     <i class="fa fa-fw fa-file-o" aria-hidden="true"></i>
-                <span class="wz-headline-title">Current configuration</span>
-                <span flex></span>
-                <a tooltip="About and help" target="_blank" tooltip-placement="left" href="https://documentation.wazuh.com/current/user-manual/kibana-app/reference/config-file.html" aria-label="Link to open app about section">
-                    <i class="fa fa-fw fa-question-circle-o ng-scope" aria-hidden="true"></i>
-                </a>
+                    <span class="wz-headline-title">Current configuration</span>
+                    <span flex></span>
+                    <a tooltip="About and help" target="_blank" tooltip-placement="left" href="https://documentation.wazuh.com/current/user-manual/kibana-app/reference/config-file.html"
+                        aria-label="Link to open app about section">
+                        <i class="fa fa-fw fa-question-circle-o ng-scope" aria-hidden="true"></i>
+                    </a>
                 </div>
                 <md-divider class="wz-margin-top-10"></md-divider>
-                <div layout="row" class="wz-padding-top-10" >
-                    <table class="table table-striped table-condensed table-layout-fixed">
+                <div layout="row" class="wz-padding-top-10">
+                    <table class="table table-striped table-condensed table-layout-fixed table-vertical-align-middle">
                         <thead class="wz-text-bold">
                             <th class="wz-text-left col-lg-2">Setting</th>
                             <th class="wz-text-left col-lg-2">Value</th>
                             <th class="wz-text-left">Description</th>
+                            <th class="wz-text-left">Actions</th>
                         </thead>
                         <tbody>
-                            <tr class="wz-word-wrap" ng-repeat="(key,value) in ctrl.configuration">
+                            <tr class="wz-word-wrap" ng-repeat="(key,value) in ctrl.configuration" ng-style="ctrl.editingKey === key && {'background': '#e2f7ff'}">
                                 <td>{{key}}</td>
-                                <td>{{value}}</td>
+                                <td>
+                                    <input id="input-{{key}}" class="wz-input-text" ng-show="ctrl.editingKey === key && ctrl.configurationTypes[key] === 'string'"
+                                        ng-model="newValue" ng-init="newValue = value"></input>
+<!--                                     <input id="input-{{key}}" type="number" class="wz-input-text" ng-show="ctrl.editingKey === key && ctrl.configurationTypes[key] === 'number'"
+                                        ng-model="newValue" ng-init="newValue = value" min=0></input> -->
+                                    <select id="input-{{key}}" class="wz-input-text wz-width-100" ng-show="ctrl.editingKey === key && ctrl.configurationTypes[key] === 'boolean'"
+                                        ng-model="newValue" ng-init="newValue = value" ng-options="o as o for o in [true, false]"></select>
+                                    <span ng-show="!ctrl.editingKey || ctrl.editingKey !== key">{{value}}</span>
+                                </td>
                                 <td>{{ctrl.configEquivalence(key)}}</td>
+                                <td>
+                                    <span ng-show="!ctrl.editingKey || ctrl.editingKey !== key" tooltip="Edit" ng-click="ctrl.editingKey = key; ctrl.focusOnKey(key)"
+                                        class="fa fa-fw fa-pencil cursor-pointer"></span>
+                                    <span ng-show="ctrl.editingKey === key" tooltip="Cancel" class="fa fa-fw fa-times cursor-pointer"
+                                        ng-click="ctrl.cancelEditKey(); newValue = value"></span>
+                                    <span ng-show="ctrl.editingKey === key" tooltip="Apply" class="fa fa-fw fa-success cursor-pointer"
+                                        ng-click="ctrl.editKey(key, newValue)"></span>
+                                </td>
                             </tr>
                         </tbody>
                     </table>

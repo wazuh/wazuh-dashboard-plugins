@@ -12,7 +12,8 @@
 
 // Require some libraries
 import { ErrorResponse } from './error-response';
-import { getConfiguration } from '../lib/get-configuration';
+import { getConfiguration} from '../lib/get-configuration';
+import { updateConfigurationFile} from '../lib/update-configuration';
 import { totalmem } from 'os';
 import simpleTail from 'simple-tail';
 import path from 'path';
@@ -32,6 +33,26 @@ export class WazuhUtilsCtrl {
   getConfigurationFile(req, reply) {
     try {
       const configFile = getConfiguration();
+
+      return reply({
+        statusCode: 200,
+        error: 0,
+        data: configFile || {}
+      });
+    } catch (error) {
+      return ErrorResponse(error.message || error, 3019, 500, reply);
+    }
+  }
+
+    /**
+   * Returns the config.yml file in raw
+   * @param {Object} req
+   * @param {Object} reply
+   * @returns {Object} Configuration File or ErrorResponse
+   */
+  updateConfigurationFile(req, reply) {
+    try {
+      const configFile = updateConfigurationFile(req);
 
       return reply({
         statusCode: 200,
