@@ -219,8 +219,7 @@ export class SettingsController {
       value: value
     };
     try {
-      const config = await this.genericReq.request('PUT', '/utils/updateconfiguration', data);
-      return config;
+      await this.genericReq.request('PUT', '/utils/updateconfiguration', data);
     } catch (error) {
       this.errorHandler.handle('Error fetching configuration file');
     }
