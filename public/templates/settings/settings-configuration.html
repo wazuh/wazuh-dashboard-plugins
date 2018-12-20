@@ -20,7 +20,7 @@
                 </div>
                 <md-divider class="wz-margin-top-10"></md-divider>
                 <div layout="row" class="wz-padding-top-10">
-                    <table class="table table-striped table-condensed table-layout-fixed table-vertical-align-middle">
+                    <table class="table table-striped table-condensed table-layout-fixed table-hover table-vertical-align-middle">
                         <thead class="wz-text-bold">
                             <th class="wz-text-left col-lg-2">Setting</th>
                             <th class="wz-text-left col-lg-2">Value</th>
@@ -45,7 +45,7 @@
                                     <span ng-show="!ctrl.editingKey || ctrl.editingKey !== key">{{value}}</span>
                                 </td>
                                 <td>{{ctrl.configEquivalence(key)}}</td>
-                                <td>
+                                <td class="action-btn-td">
                                     <span ng-show="!ctrl.editingKey || ctrl.editingKey !== key" tooltip="Edit" ng-click="ctrl.setEditingKey(key, value)"
                                         class="fa fa-fw fa-pencil cursor-pointer"></span>
                                     <span ng-show="ctrl.editingKey === key" tooltip="Cancel" class="fa fa-fw fa-times cursor-pointer"
