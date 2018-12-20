@@ -22,6 +22,8 @@
                 <md-card flex class="no-margin-left wz-md-card">
                     <md-card-content>
                         <span class="wz-headline-title wz-word-wrap">{{ currentGroup.name }}</span>
+                        <i ng-click="editGroupAgentConfig(currentGroup); $event.stopPropagation()" class="fa fa-fw fa-file-code-o cursor-pointer action-btn-td pull-right"
+                            tooltip="Edit this group agent.conf file" tooltip-placement="left" aria-hidden="true"></i>
                         <md-divider class="wz-margin-top-10"></md-divider>
 
                         <div layout="row" class="wz-padding-top-10">
@@ -104,7 +106,7 @@
             <!-- End CSV Download button section for groups -->
 
             <!-- XML editor for group agents -->
-            <div ng-if="!lookingGroup">
+            <div ng-if="!lookingGroup || (lookingGroup && currentGroup)">
                 <wz-xml-file-editor file-name='agents.conf' load-path='load' update-path='update'>
                 </wz-xml-file-editor>
             </div>

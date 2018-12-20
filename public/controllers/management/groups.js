@@ -217,6 +217,10 @@ export function GroupsController(
     return;
   };
 
+  $scope.editGroupAgentConfig = (group) => {
+    $rootScope.$emit('editXmlFile', { 'target': group });
+  };
+
   $scope.reload = async (element, searchTerm, addOffset, start) => {
     if (element === 'left') {
       if (!$scope.availableAgents.loadedAll) {

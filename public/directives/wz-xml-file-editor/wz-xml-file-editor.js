@@ -32,7 +32,7 @@ app.directive('wzXmlFileEditor', function () {
       $document,
       errorHandler
     ) {
-      $(document).ready(function () {
+      $($document[0]).ready(function () {
         $scope.xmlCodeBox = CodeMirror.fromTextArea(
           $document[0].getElementById('xml_box'),
           {
@@ -91,7 +91,7 @@ app.directive('wzXmlFileEditor', function () {
 
       const fetchFile = async () => {
         try {
-          /*const xml = = await this.apiReq.request(
+          /*const xml = await this.apiReq.request(
             'GET',
             $scope.loadPath,
             {}
