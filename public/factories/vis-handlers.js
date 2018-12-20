@@ -57,18 +57,14 @@ export class VisHandlers {
 
     // Check raw response from all rendered tables
     const tables = this.list
-      .filter(
-        item => item.vis && item.vis._state && item.vis._state.type === 'table'
-      )
+      .filter(item => (((item || {}).vis || {})._state || {}).type === 'table')
       .map(item => {
         const columns = [];
         for (const table of item.dataLoader.visData.tables) {
           columns.push(...table.columns.map(t => t.title));
         }
 
-        return item.vis &&
-          item.vis.searchSource &&
-          item.vis.searchSource.rawResponse
+        return !!(((item || {}).vis || {}).searchSource || {}).rawResponse
           ? {
               rawResponse: item.vis.searchSource.rawResponse,
               title: item.vis.title || 'Table',

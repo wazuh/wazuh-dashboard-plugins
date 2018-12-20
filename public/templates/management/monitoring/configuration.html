@@ -1,6 +1,8 @@
 <!-- Cards for overview monitoring section -->
 <div layout="row" layout-align="start stretch" class="wz-timelions" ng-show="showConfig">
-
+    <!-- Back button -->
+    <md-button class="md-icon-button wz-back-btn-absolute" aria-label="Back" tooltip="Go back" tooltip-placement="bottom" ng-click="goBack()"><i
+        class="fa fa-fw fa-arrow-left" aria-hidden="true"></i></md-button>
     <!-- Overview visualization card -->
     <md-card class="wz-md-card" ng-class="{'no-opacity-overview-monitoring': resultState !== 'ready' || !rendered,'flex-30': resultState === 'ready' && rendered}">
         <md-card-content class="wazuh-column">

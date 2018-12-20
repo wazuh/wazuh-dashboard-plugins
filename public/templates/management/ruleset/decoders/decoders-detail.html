@@ -3,7 +3,8 @@
     <!-- Back button and title -->
     <div layout="row" layout-align="start center">
         <!-- Back button -->
-        <md-button class="md-icon-button" aria-label="Back to decoders list" tooltip="Back" tooltip-placement="bottom" ng-click="dctrl.closeDetailView()"><i class="fa fa-fw fa-arrow-left" aria-hidden="true"></i></md-button>
+        <md-button class="md-icon-button" aria-label="Back to decoders list" tooltip="Back" tooltip-placement="bottom"
+            ng-click="dctrl.closeDetailView()"><i class="fa fa-fw fa-arrow-left" aria-hidden="true"></i></md-button>
         <!-- Decoder title -->
         <h1 class="md-headline wz-headline">{{currentDecoder.name}}</h1>
     </div>
@@ -13,9 +14,14 @@
     <div layout="row" class="wz-padding-left-16">
         <md-card flex class="wz-metric-color wz-md-card">
             <md-card-content layout="row" class="wz-padding-metric">
-                <div flex="20" ng-if="dctrl.currentDecoder.position || dctrl.currentDecoder.position == 0" class="wz-text-truncatable">Position: <span class="wz-text-bold">{{dctrl.currentDecoder.position}}</span></div>
-                <div flex="40" ng-if="dctrl.currentDecoder.file" class="wz-text-truncatable">File: <span class="wz-text-bold wz-text-link" ng-click="dctrl.addDetailFilter('file', dctrl.currentDecoder.file)" tooltip="Filter by this file" tooltip-placement="bottom">{{dctrl.currentDecoder.file}}</span></div>
-                <div flex="40" ng-if="dctrl.currentDecoder.path" class="wz-text-truncatable">Path: <span class="wz-text-bold wz-text-link" ng-click="dctrl.addDetailFilter('path', dctrl.currentDecoder.path)" tooltip="Filter by this path" tooltip-placement="bottom">{{dctrl.currentDecoder.path}}</span></div>
+                <div flex="20" ng-if="dctrl.currentDecoder.position || dctrl.currentDecoder.position == 0" class="wz-text-truncatable">Position:
+                    <span class="wz-text-bold">{{dctrl.currentDecoder.position}}</span></div>
+                <div flex="40" ng-if="dctrl.currentDecoder.file" class="wz-text-truncatable">File: <span class="wz-text-bold wz-text-link"
+                        ng-click="dctrl.addDetailFilter('file', dctrl.currentDecoder.file)" tooltip="Filter by this file"
+                        tooltip-placement="bottom">{{dctrl.currentDecoder.file}}</span></div>
+                <div flex="40" ng-if="dctrl.currentDecoder.path" class="wz-text-truncatable">Path: <span class="wz-text-bold wz-text-link"
+                        ng-click="dctrl.addDetailFilter('path', dctrl.currentDecoder.path)" tooltip="Filter by this path"
+                        tooltip-placement="bottom">{{dctrl.currentDecoder.path}}</span></div>
             </md-card-content>
         </md-card>
     </div>
@@ -31,81 +37,12 @@
                 <md-card-content>
                     <span class="wz-headline-title"><i class="fa fa-fw fa-info" aria-hidden="true"></i> Details</span>
                     <md-divider class="wz-margin-top-10"></md-divider>
-                    <div ng-if="dctrl.currentDecoder.details.status" layout="row" layout-wrap class="wz-padding-top-10">
-                        <span flex="20">Status</span>
-                        <span class="wz-text-right color-grey">{{dctrl.currentDecoder.details.status}}</span>
-                    </div>
-                    <div ng-if="dctrl.currentDecoder.details.program_name" layout="row" layout-wrap class="wz-padding-top-10">
-                        <span flex="20">Program name</span>
-                        <span class="wz-text-right color-grey">{{dctrl.currentDecoder.details.program_name}}</span>
-                    </div>
-                    <div ng-if="dctrl.currentDecoder.details.category" layout="row" layout-wrap class="wz-padding-top-10">
-                        <span flex="20">Category</span>
-                        <span class="wz-text-right color-grey">{{dctrl.currentDecoder.details.category}}</span>
-                    </div>
-                    <div ng-if="dctrl.currentDecoder.details.noalert" layout="row" layout-wrap class="wz-padding-top-10">
-                        <span flex="20">No alert</span>
-                        <span class="wz-text-right color-grey">{{dctrl.currentDecoder.details.noalert}}</span>
-                    </div>
-                    <div ng-if="dctrl.currentDecoder.details.regex && !dctrl.isArray(dctrl.currentDecoder.details.regex)" layout="row" layout-wrap class="wz-padding-top-10">
-                        <span flex="20">Regex</span>
-                        <span class="wz-text-right color-grey" ng-bind-html="dctrl.colorRegex(dctrl.currentDecoder.details.regex)"></span>
-                    </div>
-                    <div ng-if="dctrl.currentDecoder.details.order" layout="row" layout-wrap class="wz-padding-top-10">
-                        <span flex="20">Order</span>
-                        <span class="wz-text-right color-grey" ng-bind-html="dctrl.colorOrder(dctrl.currentDecoder.details.order)"></span>
-                    </div>
-                    <div ng-if="dctrl.currentDecoder.details.parent" layout="row" layout-wrap class="wz-padding-top-10">
-                        <span flex="20">Parent</span>
-                        <span class="wz-text-right color-grey">{{dctrl.currentDecoder.details.parent}}</span>
-                    </div>
-                    <div ng-if="dctrl.currentDecoder.details.frequency" layout="row" layout-wrap class="wz-padding-top-10">
-                        <span flex="20">Frequency</span>
-                        <span class="wz-text-right color-grey">{{dctrl.currentDecoder.details.frequency}}</span>
-                    </div>
-                    <div ng-if="dctrl.currentDecoder.details.ignore" layout="row" layout-wrap class="wz-padding-top-10">
-                        <span flex="20">Ignore</span>
-                        <span class="wz-text-right color-grey">{{dctrl.currentDecoder.details.ignore}}</span>
-                    </div>
-                    <div ng-if="dctrl.currentDecoder.details.info" layout="row" layout-wrap class="wz-padding-top-10">
-                        <span flex="20">Info</span>
-                        <span class="wz-text-right color-grey">{{dctrl.currentDecoder.details.info}}</span>
-                    </div>
-                    <div ng-if="dctrl.currentDecoder.details.timeframe" layout="row" layout-wrap class="wz-padding-top-10">
-                        <span flex="20">Timeframe</span>
-                        <span class="wz-text-right color-grey">{{dctrl.currentDecoder.details.timeframe}}</span>
-                    </div>
-                    <div ng-if="dctrl.currentDecoder.details.options" layout="row" layout-wrap class="wz-padding-top-10">
-                        <span flex="20">Options</span>
-                        <span class="wz-text-right color-grey">{{dctrl.currentDecoder.details.options}}</span>
-                    </div>
-                    <div ng-if="dctrl.currentDecoder.details.type" layout="row" layout-wrap class="wz-padding-top-10">
-                        <span flex="20">Type</span>
-                        <span class="wz-text-right color-grey">{{dctrl.currentDecoder.details.type}}</span>
-                    </div>
-                    <div ng-if="dctrl.currentDecoder.details.if_sid" layout="row" layout-wrap class="wz-padding-top-10">
-                        <span flex="20">If SID</span>
-                        <span class="wz-text-right color-grey">{{dctrl.currentDecoder.details.if_sid}}</span>
-                    </div>
-                    <div ng-if="dctrl.currentDecoder.details.if_matched_sid" layout="row" layout-wrap class="wz-padding-top-10">
-                        <span flex="20">If matched SID</span>
-                        <span class="wz-text-right color-grey">{{dctrl.currentDecoder.details.if_matched_sid}}</span>
-                    </div>
-                    <div ng-if="dctrl.currentDecoder.details.id" layout="row" layout-wrap class="wz-padding-top-10">
-                        <span flex="20">ID</span>
-                        <span class="wz-text-right color-grey">{{dctrl.currentDecoder.details.id}}</span>
-                    </div>
-                    <div ng-if="dctrl.currentDecoder.details.match && !dctrl.isArray(dctrl.currentDecoder.details.match)" layout="row" layout-wrap class="wz-padding-top-10">
-                        <span flex="20">Match</span>
-                        <span class="wz-text-right color-grey">{{dctrl.currentDecoder.details.match}}</span>
-                    </div>
-                    <div ng-if="dctrl.currentDecoder.details.prematch && !dctrl.isArray(dctrl.currentDecoder.details.prematch)" layout="row" layout-wrap class="wz-padding-top-10">
-                        <span flex="20">Prematch</span>
-                        <span class="wz-text-right color-grey">{{dctrl.currentDecoder.details.prematch}}</span>
-                    </div>
-                    <div ng-if="dctrl.currentDecoder.details.decoded_as" layout="row" layout-wrap class="wz-padding-top-10">
-                        <span flex="20">Decoded as</span>
-                        <span class="wz-text-right color-grey">{{dctrl.currentDecoder.details.decoded_as}}</span>
+                    <div layout="row" layout-wrap class="wz-padding-top-10" ng-repeat="(key, value) in dctrl.currentDecoder.details"
+                        ng-if="!dctrl.isArray(value)">
+                        <span flex="20">{{key}}</span>
+                        <span class="wz-text-right color-grey" ng-if="key !== 'regex' && key !== 'order'">{{value}}</span>
+                        <span class="wz-text-right color-grey" ng-if="key == 'regex'" ng-bind-html="dctrl.colorRegex(value)"></span>
+                        <span class="wz-text-right color-grey" ng-if="key == 'order'" ng-bind-html="dctrl.colorOrder(value)"></span>
                     </div>
                 </md-card-content>
             </md-card>
@@ -164,13 +101,8 @@
             <h1 class="md-headline wz-headline"><i class="fa fa-fw fa-link" aria-hidden="true"></i> Related decoders</h1>
         </div>
         <div layout="row" ng-if="dctrl.currentDecoder" class="md-padding">
-            <wz-table
-                flex
-                path="'/decoders'"
-                implicit-filter="[{ name:'file',value: dctrl.currentDecoder.file}]"
-                keys="['name',{value:'details.program_name',size:2,nosortable:true},{value:'details.order',size:2,nosortable:true},'file']"
-                allow-click="true"
-            />
+            <wz-table flex path="'/decoders'" implicit-filter="[{ name:'file',value: dctrl.currentDecoder.file}]" keys="['name',{value:'details.program_name',size:2,nosortable:true},{value:'details.order',size:2,nosortable:true},'file']"
+                allow-click="true" />
         </div>
         <!-- End related decoders section -->
 

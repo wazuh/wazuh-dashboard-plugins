@@ -416,7 +416,7 @@ export class SettingsController {
       try {
         await this.genericReq.request('GET', '/api/monitoring');
       } catch (error) {
-        if (error && error.status && error.status === -1) {
+        if ((error || {}).status === -1) {
           this.errorHandler.handle(
             'Wazuh API was inserted correctly, but something happened while fetching agents data.',
             'Fetch agents',

@@ -463,7 +463,7 @@ export class AgentsController {
         );
         // Configuration synced
         this.$scope.isSynchronized =
-          isSync && isSync.data && isSync.data.data && isSync.data.data.synced;
+          (((isSync || {}).data || {}).data || {}).synced || false;
         this.$scope.switchConfigurationTab('welcome');
       } else {
         this.configurationHandler.reset(this.$scope);
@@ -565,9 +565,8 @@ export class AgentsController {
         })
       ]);
 
-      const result = data.map(item =>
-        item && item.data && item.data.data ? item.data.data : false
-      );
+      const result = data.map(item => ((item || {}).data || {}).data || false);
+
       const [
         hardwareResponse,
         osResponse,
@@ -600,14 +599,12 @@ export class AgentsController {
             : false,
         netiface: netifaceResponse ? { ...netifaceResponse } : false,
         ports: portsResponse ? { ...portsResponse } : false,
-        packagesDate:
-          packagesDate && packagesDate.items && packagesDate.items.length
-            ? packagesDate.items[0].scan_time
-            : 'Unknown',
-        processesDate:
-          processesDate && processesDate.items && processesDate.items.length
-            ? processesDate.items[0].scan_time
-            : 'Unknown'
+        packagesDate: ((packagesDate || {}).items || []).length
+          ? packagesDate.items[0].scan_time
+          : 'Unknown',
+        processesDate: ((processesDate || {}).items || []).length
+          ? processesDate.items[0].scan_time
+          : 'Unknown'
       };
 
       return;
@@ -636,9 +633,7 @@ export class AgentsController {
         this.apiReq.request('GET', `/rootcheck/${id}/last_scan`, {})
       ]);
 
-      const result = data.map(item =>
-        item && item.data && item.data.data ? item.data.data : false
-      );
+      const result = data.map(item => ((item || {}).data || {}).data || false);
 
       const [agentInfo, syscheckLastScan, rootcheckLastScan] = result;
 
@@ -750,11 +745,7 @@ export class AgentsController {
    */
   startVis2Png() {
     const syscollectorFilters = [];
-    if (
-      this.$scope.tab === 'syscollector' &&
-      this.$scope.agent &&
-      this.$scope.agent.id
-    ) {
+    if (this.$scope.tab === 'syscollector' && (this.$scope.agent || {}).id) {
       syscollectorFilters.push(
         this.filterHandler.managerQuery(
           this.appState.getClusterInfo().cluster,
@@ -767,7 +758,7 @@ export class AgentsController {
     }
     this.reportingService.startVis2Png(
       this.$scope.tab,
-      this.$scope.agent && this.$scope.agent.id ? this.$scope.agent.id : true,
+      (this.$scope.agent || {}).id || true,
       syscollectorFilters.length ? syscollectorFilters : null
     );
   }

@@ -53,7 +53,7 @@ export class ApiRequest {
 
       return this.$q.resolve(data);
     } catch (error) {
-      return error && error.data && error.data.message
+      return ((error || {}).data || {}).message || false
         ? this.$q.reject(error.data.message)
         : this.$q.reject(error.message || error);
     }

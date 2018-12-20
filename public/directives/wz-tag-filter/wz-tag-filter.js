@@ -48,7 +48,10 @@ app.directive('wzTagFilter', function() {
           );
           input.blur();
           const term = $scope.newTag.split(':');
-          const obj = { name: term[0].trim(), value: term[1].trim() };
+          const obj = {
+            name: term[0].trim(),
+            value: term[1] ? term[1].trim() : ''
+          };
           const isFilter = obj.value;
           if ((isFilter && $scope.fieldsModel && Object.keys($scope.fieldsModel).indexOf(obj.name) === -1) ||
             (!isFilter && (!obj.name || /^\s*$/.test(obj.name)))) {

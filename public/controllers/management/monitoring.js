@@ -249,9 +249,7 @@ export function ClusterController(
         apiReq.request('GET', '/cluster/healthcheck', {})
       ]);
 
-      const result = data.map(item =>
-        item && item.data && item.data.data ? item.data.data : false
-      );
+      const result = data.map(item => ((item || {}).data || {}).data || false);
 
       const [
         nodeList,

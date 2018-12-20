@@ -15,8 +15,9 @@
         <!-- End headline -->
 
         <div flex layout="column" layout-align="start stretch" ng-show="!load" ng-init="groupsSelectedTab='agents'">
-
             <!-- MD5 Sums and Details cards -->
+            <md-button class="md-icon-button" ng-if="lookingGroup" aria-label="Back" tooltip="Go back"
+                tooltip-placement="bottom" ng-click="goBackGroups()"><i class="fa fa-fw fa-arrow-left" aria-hidden="true"></i></md-button>
             <div layout="row" class="md-padding" ng-if="lookingGroup">
                 <!-- Group MD5 sums section -->
                 <md-card flex class="no-margin-left wz-md-card">

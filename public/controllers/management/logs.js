@@ -135,20 +135,12 @@ export class LogsController {
         {}
       );
       const clusterEnabled =
-        clusterStatus &&
-        clusterStatus.data &&
-        clusterStatus.data.data &&
-        clusterStatus.data.data.running === 'yes' &&
-        clusterStatus.data.data.enabled === 'yes';
+        (((clusterStatus || {}).data || {}).data || {}).running === 'yes' &&
+        (((clusterStatus || {}).data || {}).data || {}).enabled === 'yes';
 
       if (clusterEnabled) {
         const nodeList = await this.apiReq.request('GET', '/cluster/nodes', {});
-        if (
-          nodeList &&
-          nodeList.data &&
-          nodeList.data.data &&
-          Array.isArray(nodeList.data.data.items)
-        ) {
+        if (Array.isArray((((nodeList || {}).data || {}).data || {}).items)) {
           this.nodeList = nodeList.data.data.items
             .map(item => item.name)
             .reverse();

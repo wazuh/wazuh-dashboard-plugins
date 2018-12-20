@@ -52,7 +52,7 @@ export class AgentsPreviewController {
   $onInit() {
     this.init = true;
     const loc = this.$location.search();
-    if (loc && loc.agent && loc.agent !== '000') {
+    if ((loc || {}).agent && (loc || {}).agent !== '000') {
       this.commonData.setTimefilter(timefilter.getTime());
       return this.showAgent({ id: loc.agent });
     }

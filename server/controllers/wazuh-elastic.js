@@ -39,13 +39,10 @@ export class WazuhElasticCtrl {
   async getTimeStamp(req, reply) {
     try {
       const data = await this.wzWrapper.getWazuhVersionIndexAsSearch();
-      if (
-        data.hits &&
-        data.hits.hits[0] &&
-        data.hits.hits[0]._source &&
-        data.hits.hits[0]._source.installationDate &&
-        data.hits.hits[0]._source.lastRestart
-      ) {
+      const source =
+        ((((data || {}).hits || {}).hits || [])[0] || {})._source || {};
+
+      if (source.installationDate && source.lastRestart) {
         return reply({
           installationDate: data.hits.hits[0]._source.installationDate,
           lastRestart: data.hits.hits[0]._source.lastRestart
@@ -86,9 +83,28 @@ export class WazuhElasticCtrl {
       }
 
       const lastChar = req.params.pattern[req.params.pattern.length - 1];
-      const array = data
-        .match(/[^\s]+/g)
-        .filter(item => item.includes('[') && item.includes(']'));
+
+      // Split into separate patterns
+      const tmpdata = data.match(/\[.*\]/g);
+      const tmparray = [];
+      for (let item of tmpdata) {
+        // A template might use more than one pattern
+        if (item.includes(',')) {
+          item = item.substr(1).slice(0, -1);
+          const subItems = item.split(',');
+          for (const subitem of subItems) {
+            tmparray.push(`[${subitem.trim()}]`);
+          }
+        } else {
+          tmparray.push(item);
+        }
+      }
+
+      // Ensure we are handling just patterns
+      const array = tmparray.filter(
+        item => item.includes('[') && item.includes(']')
+      );
+
       const pattern =
         lastChar === '*' ? req.params.pattern.slice(0, -1) : req.params.pattern;
       const isIncluded = array.filter(item => {
@@ -258,8 +274,8 @@ export class WazuhElasticCtrl {
         forbidden = true;
       }
       if (
-        (results && results.hits && results.hits.total >= 1) ||
-        (!forbidden && results && results.hits && results.hits.total === 0)
+        ((results || {}).hits || {}).total >= 1 ||
+        (!forbidden && ((results || {}).hits || {}).total === 0)
       ) {
         finalList.push(item);
       }
@@ -319,10 +335,10 @@ export class WazuhElasticCtrl {
 
       const data = await this.wzWrapper.getAllIndexPatterns();
 
-      if (data && data.hits && data.hits.hits.length === 0)
+      if ((((data || {}).hits || {}).hits || []).length === 0)
         throw new Error('There is no index pattern');
 
-      if (data && data.hits && data.hits.hits) {
+      if (((data || {}).hits || {}).hits) {
         let list = this.validateIndexPattern(data.hits.hits);
         if (
           config &&

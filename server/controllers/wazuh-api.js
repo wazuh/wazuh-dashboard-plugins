@@ -117,10 +117,8 @@ export class WazuhApiCtrl {
               });
             } else if (response.body.error) {
               const tmpMsg =
-                response && response.body && response.body.message
-                  ? response.body.message
-                  : 'Unexpected error from /cluster/node';
-
+                ((response || {}).body || {}).message ||
+                'Unexpected error from /cluster/node';
               throw new Error(tmpMsg);
             }
           } else {
@@ -141,19 +139,13 @@ export class WazuhApiCtrl {
           }
         } else {
           const tmpMsg =
-            response && response.body && response.body.message
-              ? response.body.message
-              : 'Unexpected error from /cluster/status';
+            ((response || {}).body || {}).message ||
+            'Unexpected error from /cluster/status';
 
           throw new Error(tmpMsg);
         }
       } else {
-        if (
-          response &&
-          response.body &&
-          response.body.error &&
-          response.body.message
-        ) {
+        if (((response || {}).body || {}).message) {
           throw new Error(response.body.message);
         }
 
@@ -717,10 +709,9 @@ export class WazuhApiCtrl {
         throw new Error('Field path is required');
       if (!req.payload.id) throw new Error('Field id is required');
 
-      const filters =
-        req.payload && req.payload.filters && Array.isArray(req.payload.filters)
-          ? req.payload.filters
-          : [];
+      const filters = Array.isArray(((req || {}).payload || {}).filters)
+        ? req.payload.filters
+        : [];
 
       const config = await this.wzWrapper.getWazuhConfigurationById(
         req.payload.id
