@@ -357,10 +357,10 @@ export function GroupsController(
         }
       }
       if (deletedIds.length) {
-        /* const deleteResponse = await apiReq.request('DELETE', `/agents/group/${$scope.currentGroup.name}`, { 'ids': deletedIds });
-        if(deleteResponse.data.data.failed_ids){
+        const deleteResponse = await apiReq.request('DELETE', `/agents/group/${$scope.currentGroup.name}`, { 'ids': deletedIds });
+        if (deleteResponse.data.data.failed_ids) {
           failedIds.push(...deleteResponse.data.data.failed_ids)
-        } */
+        }
       }
 
       if (failedIds.length) {
@@ -381,7 +381,6 @@ export function GroupsController(
     $timeout(() => {
       $scope.multipleSelectorLoading = false;
     }, 100);
-    console.log('Added: ' + $scope.addedAgents.map(x => x.key) + " - Deleted: " + $scope.deletedAgents.map(x => x.key));
   }
 
   // Resetting the factory configuration
