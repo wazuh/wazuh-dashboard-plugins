@@ -13,10 +13,11 @@
 // Require some libraries
 import { ErrorResponse } from './error-response';
 import { getConfiguration } from '../lib/get-configuration';
-import { updateConfiguration } from '../lib/update-configuration';
 import { totalmem } from 'os';
 import simpleTail from 'simple-tail';
 import path from 'path';
+import { UpdateConfigurationFile } from '../lib/update-configuration';
+const updateConfigurationFile = new UpdateConfigurationFile();
 
 export class WazuhUtilsCtrl {
   /**
@@ -52,15 +53,16 @@ export class WazuhUtilsCtrl {
  */
   async updateConfigurationFile(req, reply) {
     try {
-      await updateConfiguration(req);
+      const response = await updateConfigurationFile.updateConfiguration(req);
       return reply({
         statusCode: 200,
-        error: 0
+        error: 0,
+        data: response.needRestart
       });
     } catch (error) {
       return ErrorResponse(
         `Could not save value in file due to ${error.message || error}`,
-        3019,
+        3021,
         500,
         reply
       );

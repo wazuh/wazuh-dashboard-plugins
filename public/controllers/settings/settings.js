@@ -215,11 +215,10 @@ export class SettingsController {
   // Get configuration file
   async setValueConfigurationFile(key, value) {
     try {
-      await this.genericReq.request('PUT', '/utils/configuration', { key, value });
+      return await this.genericReq.request('PUT', '/utils/configuration', { key, value });
     } catch (error) {
-      this.errorHandler.handle('Error fetching configuration file');
+      throw new Error(error.data.message);
     }
-    return;
   }
 
   // Get settings function
@@ -754,20 +753,23 @@ export class SettingsController {
   async editKey(key, newValue) {
     try {
       this.loadingChange = true;
-      await this.setValueConfigurationFile(key, newValue);
-      this.errorHandler.handle(
-        'You must restart Kibana for the changes to take effect', '', true
-      );
+      const response = await this.setValueConfigurationFile(key, newValue);
+      if (response.data.data) {
+        this.errorHandler.handle(
+          'You must restart Kibana for the changes to take effect', '', true
+        );
+      } else {
+        this.errorHandler.info(
+          'Success. The configuration has been successfully updated'
+        );
+      }
       this.configuration[key] = newValue;
       this.cancelEditingKey();
       this.loadingChange = false;
     } catch (error) {
       this.cancelEditingKey();
       this.loadingChange = false;
-      this.errorHandler.handle(
-        'Error editing key',
-        key
-      );
+      this.errorHandler.handle(error);
     }
   }
 }
