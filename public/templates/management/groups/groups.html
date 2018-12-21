@@ -67,8 +67,8 @@
 
             <!-- Group actions -->
             <div layout="row" class="md-padding-h md-padding-top-10" ng-if="lookingGroup && currentGroup && !addingAgents && groupsSelectedTab==='agents'">
-                <span ng-click='addMultipleAgents(true)' class='btn btn-primary'><i aria-hidden='true' class='fa fa-fw fa-plus'></i>
-                    Add agents</span>
+                <span ng-click='addMultipleAgents(true)' class='btn btn-primary'><i aria-hidden='true' class='fa fa-fw fa-pencil'></i>
+                    Add or remove multiple agents</span>
             </div>
             <div layout="row" class="md-padding" ng-if="lookingGroup && currentGroup && addingAgents">
                 <span ng-click='addMultipleAgents(false)' class='btn btn-info'>

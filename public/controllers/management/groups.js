@@ -344,6 +344,21 @@ export function GroupsController(
       }
     });
 
+    try {
+      $scope.multipleSelectorLoading = true;
+      await apiReq.request('POST', `/agents/group/${$scope.currentGroup.name}`, { 'ids': $scope.addedAgents.map(x => x.key) });
+      //await apiReq.request('DELETE', `/agents/group/${$scope.currentGroup.name}`, { 'ids': $scope.deletedAgents.map(x => x.key) });      
+      errorHandler.info(
+        'Success. Group has been updated',
+        ''
+      );
+      $scope.addMultipleAgents(false);
+    } catch (err) {
+      errorHandler.handle(err, 'Error applying changes');
+    }
+    $timeout(function () {
+      $scope.multipleSelectorLoading = false;
+    }, 100);
     console.log('Added: ' + $scope.addedAgents.map(x => x.key) + " - Deleted: " + $scope.deletedAgents.map(x => x.key));
   }
 
