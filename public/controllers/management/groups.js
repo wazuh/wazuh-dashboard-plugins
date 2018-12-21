@@ -346,19 +346,34 @@ export function GroupsController(
 
     const addedIds = $scope.addedAgents.map(x => x.key);
     const deletedIds = $scope.deletedAgents.map(x => x.key);
+    const failedIds = [];
+
     try {
       $scope.multipleSelectorLoading = true;
       if (addedIds.length) {
-        await apiReq.request('POST', `/agents/group/${$scope.currentGroup.name}`, { 'ids': addedIds });
+        const addResponse = await apiReq.request('POST', `/agents/group/${$scope.currentGroup.name}`, { 'ids': addedIds });
+        if (addResponse.data.failed_ids) {
+          failedIds.push(...addResponse.data.data.failed_ids)
+        }
       }
       if (deletedIds.length) {
-        //await apiReq.request('DELETE', `/agents/group/${$scope.currentGroup.name}`, { 'ids': deletedIds });
+        /* const deleteResponse = await apiReq.request('DELETE', `/agents/group/${$scope.currentGroup.name}`, { 'ids': deletedIds });
+        if(deleteResponse.data.failed_ids){
+          failedIds.push(...deleteResponse.data.data.failed_ids)
+        } */
       }
 
-      errorHandler.info(
-        'Success. Group has been updated',
-        ''
-      );
+      if (failedIds.length) {
+        errorHandler.info(
+          `Warning. Group has been updated but an error has occurred with the following agents ${failedIds}`,
+          '', true
+        );
+      } else {
+        errorHandler.info(
+          'Success. Group has been updated',
+          ''
+        );
+      }
       $scope.addMultipleAgents(false);
     } catch (err) {
       errorHandler.handle(err, 'Error applying changes');
