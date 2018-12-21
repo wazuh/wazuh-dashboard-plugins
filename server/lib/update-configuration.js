@@ -13,7 +13,7 @@ import fs from 'fs';
 import readline from 'readline';
 import path from 'path';
 
-export function updateConfigurationFile(req) {
+export async function updateConfiguration(req) {
   try {
     const customPath = path.join(__dirname, '../../config.yml');
     const data = fs.createReadStream(customPath);
@@ -33,7 +33,7 @@ export function updateConfigurationFile(req) {
       if (notFound) {
         fs.appendFile(customPath, '\r\n' + req.payload.key + ':' + req.payload.value, function (err) {
           if (err) {
-            return false;
+            throw new Error(err);
           }
         })
       } else {
@@ -44,20 +44,20 @@ export function updateConfigurationFile(req) {
             currentValue = currentValue === 'true';
           }
           if (typeof req.payload.value != typeof currentValue) {
-            return false;
+            throw new Error(`Format error of ${req.payload.key}`);
           }
         }
         const result = raw.replace(findedLine, req.payload.key + ' : ' + req.payload.value);
         fs.writeFile(customPath, result, 'utf8', function (err) {
           if (err) {
-            return false;
+            throw new Error(err);
           }
         });
       }
     });
     return true;
   } catch (error) {
-    return error;
+    return Promise.reject(error);
   }
 
 }

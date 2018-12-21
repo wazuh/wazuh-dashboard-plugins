@@ -33,25 +33,28 @@
                                 <td>{{key}}</td>
                                 <td>
                                     <input ng-if="ctrl.editingKey === key && ctrl.configurationTypes[key] === 'string'"
-                                        id="input-{{key}}" type="text" class="wz-input-text" ng-model="ctrl.editingNewValue"></input>
+                                        ng-disabled="ctrl.loadingChange" id="input-{{key}}" type="text" class="wz-input-text"
+                                        ng-model="ctrl.editingNewValue"></input>
                                     <input ng-if="ctrl.editingKey === key && ctrl.configurationTypes[key] === 'number'"
-                                        id="input-{{key}}" type="number" class="wz-input-text" ng-model="ctrl.editingNewValue"
-                                        min=0></input>
+                                        ng-disabled="ctrl.loadingChange" id="input-{{key}}" type="number" class="wz-input-text"
+                                        ng-model="ctrl.editingNewValue" min=0></input>
                                     <select ng-if="ctrl.editingKey === key && ctrl.configurationTypes[key] === 'boolean'"
-                                        id="input-{{key}}" class="wz-input-text wz-width-100" ng-model="ctrl.editingNewValue"
-                                        ng-options="o as o for o in [true, false]"></select>
+                                        ng-disabled="ctrl.loadingChange" id="input-{{key}}" class="wz-input-text wz-width-100"
+                                        ng-model="ctrl.editingNewValue" ng-options="o as o for o in [true, false]"></select>
                                     <textarea ng-if="ctrl.editingKey === key && ctrl.configurationTypes[key] === 'object'"
-                                        id="input-{{key}}" class="wz-input-text wz-width-100" ng-model="ctrl.editingNewValue"></textarea>
+                                        ng-disabled="ctrl.loadingChange" id="input-{{key}}" class="wz-input-text wz-width-100"
+                                        ng-model="ctrl.editingNewValue"></textarea>
                                     <span ng-show="!ctrl.editingKey || ctrl.editingKey !== key">{{value}}</span>
                                 </td>
                                 <td>{{ctrl.configEquivalence(key)}}</td>
                                 <td class="action-btn-td">
                                     <span ng-show="!ctrl.editingKey || ctrl.editingKey !== key" tooltip="Edit" ng-click="ctrl.setEditingKey(key, value)"
                                         class="fa fa-fw fa-pencil cursor-pointer"></span>
-                                    <span ng-show="ctrl.editingKey === key" tooltip="Cancel" class="fa fa-fw fa-times cursor-pointer"
-                                        ng-click="ctrl.cancelEditingKey()"></span>
-                                    <span ng-show="ctrl.editingKey === key && ctrl.editingNewValue !== ''" tooltip="Apply"
-                                        class="fa fa-fw fa-success cursor-pointer" ng-click="ctrl.editKey(key, ctrl.editingNewValue)"></span>
+                                    <span ng-show="ctrl.editingKey === key && !ctrl.loadingChange" tooltip="Cancel"
+                                        class="fa fa-fw fa-times cursor-pointer" ng-click="ctrl.cancelEditingKey()"></span>
+                                    <span ng-show="ctrl.editingKey === key && ctrl.editingNewValue !== '' && !ctrl.loadingChange"
+                                        tooltip="Apply" class="fa fa-fw fa-success cursor-pointer" ng-click="ctrl.editKey(key, ctrl.editingNewValue)"></span>
+                                    <span ng-show="ctrl.editingKey === key && ctrl.loadingChange"><i class="fa fa-fw fa-spin fa-spinner"></i></span>
                                 </td>
                             </tr>
                         </tbody>

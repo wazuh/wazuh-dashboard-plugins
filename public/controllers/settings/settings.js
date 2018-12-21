@@ -77,7 +77,7 @@ export class SettingsController {
     this.tabNames = TabNames;
     this.configuration = wazuhConfig.getConfig();
     this.configurationTypes = [];
-    for (var key in this.configuration) {
+    for (const key in this.configuration) {
       this.configurationTypes[key] = typeof (this.configuration[key])
     }
     this.indexPatterns = [];
@@ -214,12 +214,8 @@ export class SettingsController {
 
   // Get configuration file
   async setValueConfigurationFile(key, value) {
-    const data = {
-      key: key,
-      value: value
-    };
     try {
-      await this.genericReq.request('PUT', '/utils/updateconfiguration', data);
+      await this.genericReq.request('PUT', '/utils/configuration', { key, value });
     } catch (error) {
       this.errorHandler.handle('Error fetching configuration file');
     }
@@ -755,12 +751,23 @@ export class SettingsController {
    * @param {String} key Configuration key
    * @param {String} newValue new configuration value for key
    */
-  editKey(key, newValue) {
-    this.setValueConfigurationFile(key, newValue);
-    this.errorHandler.handle(
-      'You must restart kibana for the changes to take effect', '', true
-    );
-    this.configuration[key] = newValue;
-    this.cancelEditingKey();
+  async editKey(key, newValue) {
+    try {
+      this.loadingChange = true;
+      await this.setValueConfigurationFile(key, newValue);
+      this.errorHandler.handle(
+        'You must restart Kibana for the changes to take effect', '', true
+      );
+      this.configuration[key] = newValue;
+      this.cancelEditingKey();
+      this.loadingChange = false;
+    } catch (error) {
+      this.cancelEditingKey();
+      this.loadingChange = false;
+      this.errorHandler.handle(
+        'Error editing key',
+        key
+      );
+    }
   }
 }

@@ -26,7 +26,7 @@ export function WazuhUtilsRoutes(server) {
   // Returns the config.yml file in raw
   server.route({
     method: 'PUT',
-    path: '/utils/updateconfiguration',
+    path: '/utils/configuration',
     handler(req, reply) {
       return ctrl.updateConfigurationFile(req, reply);
     }
