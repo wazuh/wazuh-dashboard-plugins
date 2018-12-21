@@ -240,7 +240,7 @@ export function GroupsController(
         await $scope.loadSelectedAgents(searchTerm);
       }
     }
-    $timeout(function () {
+    $timeout(() => {
       $scope.multipleSelectorLoading = false;
     }, 100);
   }
@@ -254,7 +254,7 @@ export function GroupsController(
       const result = await apiReq.request('GET',
         `/agents/groups/${$scope.currentGroup.name}`,
         params);
-      const mapped = result.data.data.items.map(function (item) {
+      const mapped = result.data.data.items.map((item) => {
         return { 'key': item.id, 'value': item.name };
       });
       if (searchTerm) {
@@ -283,11 +283,11 @@ export function GroupsController(
         '/agents/',
         params);
       $scope.totalAgents = req.data.data.totalItems;
-      const mapped = req.data.data.items.filter(function (item) {
-        return $scope.selectedAgents.data.filter(function (selected) {
+      const mapped = req.data.data.items.filter((item) => {
+        return $scope.selectedAgents.data.filter((selected) => {
           return selected.key == item.id;
         }).length == 0 && item.id !== '000';
-      }).map(function (item) {
+      }).map((item) => {
         return { 'key': item.id, 'value': item.name };
       });
       if (searchTerm || start) {
@@ -321,7 +321,7 @@ export function GroupsController(
       }
       $scope.firstSelectedList = [...$scope.selectedAgents.data];
       await $scope.loadAllAgents();
-      $timeout(function () {
+      $timeout(() => {
         $scope.multipleSelectorLoading = false;
       }, 100);
     }
@@ -333,12 +333,12 @@ export function GroupsController(
     $scope.deletedAgents = [];
     $scope.addedAgents = [];
 
-    modified.forEach(function (mod) {
+    modified.forEach((mod) => {
       if (original.filter(e => e.key === mod.key).length === 0) {
         $scope.addedAgents.push(mod);
       }
     });
-    original.forEach(function (orig) {
+    original.forEach((orig) => {
       if (modified.filter(e => e.key === orig.key).length === 0) {
         $scope.deletedAgents.push(orig);
       }
@@ -378,7 +378,7 @@ export function GroupsController(
     } catch (err) {
       errorHandler.handle(err, 'Error applying changes');
     }
-    $timeout(function () {
+    $timeout(() => {
       $scope.multipleSelectorLoading = false;
     }, 100);
     console.log('Added: ' + $scope.addedAgents.map(x => x.key) + " - Deleted: " + $scope.deletedAgents.map(x => x.key));
