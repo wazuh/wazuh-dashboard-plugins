@@ -344,10 +344,17 @@ export function GroupsController(
       }
     });
 
+    const addedIds = $scope.addedAgents.map(x => x.key);
+    const deletedIds = $scope.deletedAgents.map(x => x.key);
     try {
       $scope.multipleSelectorLoading = true;
-      await apiReq.request('POST', `/agents/group/${$scope.currentGroup.name}`, { 'ids': $scope.addedAgents.map(x => x.key) });
-      //await apiReq.request('DELETE', `/agents/group/${$scope.currentGroup.name}`, { 'ids': $scope.deletedAgents.map(x => x.key) });      
+      if (addedIds.length) {
+        await apiReq.request('POST', `/agents/group/${$scope.currentGroup.name}`, { 'ids': addedIds });
+      }
+      if (deletedIds.length) {
+        //await apiReq.request('DELETE', `/agents/group/${$scope.currentGroup.name}`, { 'ids': deletedIds });
+      }
+
       errorHandler.info(
         'Success. Group has been updated',
         ''
