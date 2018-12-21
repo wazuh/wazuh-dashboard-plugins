@@ -352,13 +352,13 @@ export function GroupsController(
       $scope.multipleSelectorLoading = true;
       if (addedIds.length) {
         const addResponse = await apiReq.request('POST', `/agents/group/${$scope.currentGroup.name}`, { 'ids': addedIds });
-        if (addResponse.data.failed_ids) {
+        if (addResponse.data.data.failed_ids) {
           failedIds.push(...addResponse.data.data.failed_ids)
         }
       }
       if (deletedIds.length) {
         /* const deleteResponse = await apiReq.request('DELETE', `/agents/group/${$scope.currentGroup.name}`, { 'ids': deletedIds });
-        if(deleteResponse.data.failed_ids){
+        if(deleteResponse.data.data.failed_ids){
           failedIds.push(...deleteResponse.data.data.failed_ids)
         } */
       }
