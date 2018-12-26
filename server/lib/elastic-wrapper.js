@@ -662,10 +662,11 @@ export class ElasticWrapper {
         'cluster.getSettings',
         { includeDefaults: true }
       );
-      
-      return this.usingSearchGuard || (
+
+      return (
+        this.usingSearchGuard ||
         ((((data || {}).defaults || {}).xpack || {}).security || {}).enabled ==
-        'true'
+          'true'
       );
     } catch (error) {
       return Promise.reject(error);
