@@ -61,6 +61,7 @@ export const KeyEquivalenece = {
   proto: 'Protocol',
   address: 'Address',
   protocol: 'Protocol',
+  netmask: 'Netmask',
   'local.ip': 'Local IP',
   'remote.ip': 'Remote IP',
   'local.port': 'Local port',
