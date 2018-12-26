@@ -20,8 +20,8 @@
 export function BuildBody(
   file,
   indexName,
-  defaultShards = 5,
-  defaulReplicas = 1
+  defaultShards = 1,
+  defaulReplicas = 0
 ) {
   if (indexName) {
     const shards =
