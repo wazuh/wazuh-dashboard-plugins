@@ -10,68 +10,54 @@
  * Find more information about this on the LICENSE file.
  */
 import fs from 'fs';
-import readline from 'readline';
 import path from 'path';
+import { getConfiguration } from './get-configuration';
 
-const needRestartFields = ['checks.pattern', 'checks.api']
+const needRestartFields = ['checks.pattern', 'checks.api'];
 export class UpdateConfigurationFile {
   constructor() {
     this.busy = false;
   }
 
-  async updateConfiguration(req) {
+  /**
+   * Add or replace specific setting from config.yml
+   * @param {String} key The setting name.
+   * @param {String} value New value for the setting.
+   * @param {Boolean} exists If true, it just replaces the value for that key.
+   */
+  updateLine(key, value, exists = false) {
+    try {
+      const file = path.join(__dirname, '../../config.yml');
+      const data = fs.readFileSync(file, { encoding: 'utf-8' });
+      const re = new RegExp(`^${key}\\s{0,}:\\s{1,}.*`, 'gm');
+      const result = exists
+        ? data.replace(re, `${key}: ${value}`)
+        : `${data}\n${key}: ${value}`;
+      fs.writeFileSync(file, result, 'utf8');
+      return true;
+    } catch (error) {
+      throw error;
+    }
+  }
+
+  /**
+   * Updates config.yml file. If it fails, it throws the error to the next function.
+   * @param {Object} input 
+   */
+  async updateConfiguration(input) {
     try {
       if (this.busy) {
-        throw new Error("Another process is updating the configuration file");
+        throw new Error('Another process is updating the configuration file');
       }
       this.busy = true;
-      const customPath = path.join(__dirname, '../../config.yml');
-      const data = fs.createReadStream(customPath);
-      const raw = fs.readFileSync(customPath, { encoding: 'utf-8' });
-      const rd = readline.createInterface({ input: data, console: false });
-      let notFound = true;
-      let findedLine = '';
-      rd.on('line', function (line) {
-        const trimLine = line.replace(/ /g, '');
-        if ((trimLine.indexOf(req.payload.key + ':') >= 0
-          || trimLine.indexOf('#' + req.payload.key + ':') >= 0)
-          && trimLine.indexOf('.' + req.payload.key + ':') === -1) {
-          notFound = false;
-          findedLine = line.replace(/(\r\n\t|\n|\r\t)/gm, '').trim();
-        }
-      }).on('close', () => {
-        if (notFound) {
-          fs.appendFile(customPath, '\r\n' + req.payload.key + ':' + req.payload.value, function (err) {
-            if (err) {
-              throw new Error(err);
-            }
-          })
-        } else {
-          let currentValue = findedLine.split(':');
-          if (currentValue[1]) {
-            currentValue = currentValue[1].trim();
-            if (currentValue === 'true' || currentValue === 'false') {
-              currentValue = currentValue === 'true';
-            }
-            if (typeof req.payload.value != typeof currentValue) {
-              throw new Error(`Format error of ${req.payload.key}`);
-            }
-          }
-          const result = raw.replace(findedLine, req.payload.key + ' : ' + req.payload.value);
-          fs.writeFile(customPath, result, 'utf8', function (err) {
-            if (err) {
-              throw new Error(err);
-            }
-          });
-        }
-        //Test mutex
-        //setTimeout(() => { this.busy = false }, 10000);
-        this.busy = false
-      });
-      return { needRestart: needRestartFields.indexOf(req.payload.key) !== -1 };
+      const configuration = getConfiguration() || {};
+      const { key, value } = (input || {}).payload || {};
+      this.updateLine(key, value, typeof configuration[key] !== 'undefined');
+      this.busy = false;
+      return { needRestart: needRestartFields.includes(key) };      
     } catch (error) {
-      return Promise.reject(error);
+      this.busy = false;
+      throw error;
     }
-
   }
 }

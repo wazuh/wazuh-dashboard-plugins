@@ -78,7 +78,7 @@ export class SettingsController {
     this.configuration = wazuhConfig.getConfig();
     this.configurationTypes = [];
     for (const key in this.configuration) {
-      this.configurationTypes[key] = typeof (this.configuration[key])
+      this.configurationTypes[key] = typeof this.configuration[key];
     }
     this.indexPatterns = [];
     this.apiEntries = [];
@@ -192,7 +192,7 @@ export class SettingsController {
 
     this.errorHandler.info(
       `API ${
-      this.apiEntries[index]._source.cluster_info.manager
+        this.apiEntries[index]._source.cluster_info.manager
       } set as default`,
       'Settings'
     );
@@ -215,7 +215,10 @@ export class SettingsController {
   // Get configuration file
   async setValueConfigurationFile(key, value) {
     try {
-      return await this.genericReq.request('PUT', '/utils/configuration', { key, value });
+      return await this.genericReq.request('PUT', '/utils/configuration', {
+        key,
+        value
+      });
     } catch (error) {
       throw new Error(error.data.message);
     }
@@ -735,10 +738,7 @@ export class SettingsController {
       try {
         value = JSON.stringify(value);
       } catch (err) {
-        this.errorHandler.handle(
-          'Error parsing value',
-          key
-        );
+        this.errorHandler.handle('Error parsing value', key);
       }
     }
     this.editingKey = key;
@@ -756,7 +756,9 @@ export class SettingsController {
       const response = await this.setValueConfigurationFile(key, newValue);
       if (response.data.data) {
         this.errorHandler.handle(
-          'You must restart Kibana for the changes to take effect', '', true
+          'You must restart Kibana for the changes to take effect',
+          '',
+          true
         );
       } else {
         this.errorHandler.info(

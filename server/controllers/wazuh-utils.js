@@ -23,7 +23,7 @@ export class WazuhUtilsCtrl {
   /**
    * Constructor
    */
-  constructor() { }
+  constructor() {}
 
   /**
    * Returns the config.yml file parsed
@@ -46,26 +46,21 @@ export class WazuhUtilsCtrl {
   }
 
   /**
- * Returns the config.yml file in raw
- * @param {Object} req
- * @param {Object} reply
- * @returns {Object} Configuration File or ErrorResponse
- */
+   * Returns the config.yml file in raw
+   * @param {Object} req
+   * @param {Object} reply
+   * @returns {Object} Configuration File or ErrorResponse
+   */
   async updateConfigurationFile(req, reply) {
     try {
-      const response = await updateConfigurationFile.updateConfiguration(req);
+      const result = updateConfigurationFile.updateConfiguration(req);
       return reply({
         statusCode: 200,
         error: 0,
-        data: response.needRestart
+        data: result.needRestart
       });
     } catch (error) {
-      return ErrorResponse(
-        `Could not save value in file due to ${error.message || error}`,
-        3021,
-        500,
-        reply
-      );
+      return ErrorResponse(error.message || error, 3021, 500, reply);
     }
   }
 
@@ -99,11 +94,11 @@ export class WazuhUtilsCtrl {
       );
       return lastLogs && Array.isArray(lastLogs)
         ? reply({
-          error: 0,
-          lastLogs: lastLogs.filter(
-            item => typeof item === 'string' && item.length
-          )
-        })
+            error: 0,
+            lastLogs: lastLogs.filter(
+              item => typeof item === 'string' && item.length
+            )
+          })
         : reply({ error: 0, lastLogs: [] });
     } catch (error) {
       return ErrorResponse(error.message || error, 3036, 500, reply);
