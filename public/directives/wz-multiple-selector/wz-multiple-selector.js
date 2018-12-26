@@ -62,8 +62,8 @@ app.directive('wzMultipleSelector', function () {
         from.length = 0;
       };
 
-      $scope.sort = (a, b) => {
-        return a - b;
+      $scope.sort = (a) => {
+        return parseInt(a.key);
       }
 
       $('#wzMultipleSelector select').scroll(function (ev) {
@@ -71,7 +71,7 @@ app.directive('wzMultipleSelector', function () {
       });
 
       $scope.doReload = (side, term, fromStart = false) => {
-        $scope.reloadScroll({ 'element': side, 'searchTerm': term , 'start': fromStart});
+        $scope.reloadScroll({ 'element': side, 'searchTerm': term, 'start': fromStart });
       }
       $scope.scrollList = (target) => {
         let pos = target.scrollTop + target.offsetHeight;

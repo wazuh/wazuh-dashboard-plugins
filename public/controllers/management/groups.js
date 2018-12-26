@@ -345,8 +345,8 @@ export function GroupsController(
       }
     });
 
-    const addedIds = $scope.addedAgents.map(x => x.key);
-    const deletedIds = $scope.deletedAgents.map(x => x.key);
+    const addedIds = [...new Set($scope.addedAgents.map(x => x.key))];
+    const deletedIds = [...new Set($scope.deletedAgents.map(x => x.key))];
     const failedIds = [];
 
     try {

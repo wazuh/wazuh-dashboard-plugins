@@ -15,7 +15,7 @@
                             <span class='fa fa-search' aria-hidden='true'></span>
                         </button>
                     </div>
-                    <select size='10' multiple ng-model='availableItem' ng-options='item as item.key + " - "  + item.value for item in availableItems | orderBy:sort()'
+                    <select size='10' multiple ng-model='availableItem' ng-options='item as item.key + " - "  + item.value for item in availableItems | orderBy:sort'
                         ng-change='selectedElement=null' class='width-100' ng-dblclick='moveItem(availableItem, availableItems, selectedItems);availableItem=null'></select>
                 </div>
             </div>
@@ -44,7 +44,7 @@
                 <div class='panel-body'>
                     <input placeholder='Filter...' ng-model='selectedFilter' type='text' class='kuiLocalSearchInput'
                         ng-change='selectedElement=null' style='padding: 8px 15px'>
-                    <select size='10' multiple ng-model='selectedElement' ng-options='item as item.key + " - "  + item.value for item in selectedItems | filter: selectedFilter | orderBy:sort()'
+                    <select size='10' multiple ng-model='selectedElement' ng-options='item as item.key + " - "  + item.value for item in selectedItems | filter: selectedFilter | orderBy:sort'
                         ng-change='availableItem=null' class='width-100' ng-dblclick='moveItem(selectedElement, selectedItems, availableItems);selectedElement=null'></select>
                 </div>
             </div>
