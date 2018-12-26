@@ -247,13 +247,14 @@ export function GroupsController(
 
   $scope.loadSelectedAgents = async (searchTerm) => {
     try {
-      let params = { 'offset': !searchTerm ? $scope.selectedAgents.offset : 0 };
+      let params = { 'offset': !searchTerm ? $scope.selectedAgents.offset : 0, 'select': ["id", "name"] };
       if (searchTerm) {
         params.search = searchTerm;
       }
       const result = await apiReq.request('GET',
         `/agents/groups/${$scope.currentGroup.name}`,
         params);
+      $scope.totalSelectedAgents = result.data.data.totalItems;
       const mapped = result.data.data.items.map((item) => {
         return { 'key': item.id, 'value': item.name };
       });
@@ -263,7 +264,7 @@ export function GroupsController(
       } else {
         $scope.selectedAgents.data = $scope.selectedAgents.data.concat(mapped);
       }
-      if ($scope.selectedAgents.data.length === 0 || $scope.selectedAgents.data.length < 500) {
+      if ($scope.selectedAgents.data.length === 0 || $scope.selectedAgents.data.length < 500 || $scope.selectedAgents.offset >= $scope.totalSelectedAgents) {
         $scope.selectedAgents.loadedAll = true;
       }
     } catch (error) {
@@ -274,7 +275,7 @@ export function GroupsController(
 
   $scope.loadAllAgents = async (searchTerm, start) => {
     try {
-      let params = { 'offset': !searchTerm ? $scope.availableAgents.offset : 0 };
+      let params = { 'offset': !searchTerm ? $scope.availableAgents.offset : 0, 'select': ["id", "name"] };
       if (searchTerm) {
         params.search = searchTerm;
         $scope.availableAgents.offset = 0;
