@@ -26,6 +26,8 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Added "Registered date" and "Last keep alive" in agents table allowing you to sort by these fields ([#1102](https://github.com/wazuh/wazuh-kibana-app/pull/1102)).
 - Improved code quality in sections such as Ruleset > Rule and Decoder detail view simplify conditions ([#1102](https://github.com/wazuh/wazuh-kibana-app/pull/1102)).
 - Replaced reporting success message ([#1102](https://github.com/wazuh/wazuh-kibana-app/pull/1102)).
+- Reduced the default number of shards and the default number of replicas for the app indices ([#1113](https://github.com/wazuh/wazuh-kibana-app/pull/1113)).
+
 
 ### Fixed
 
@@ -39,12 +41,12 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed Management > Monitoring tab frustration adding back buttons ([#1102](https://github.com/wazuh/wazuh-kibana-app/pull/1102)).
 - Fix template checking when using more than one pattern ([#1104](https://github.com/wazuh/wazuh-kibana-app/pull/1104)).
 
-## Wazuh v3.7.1 - Kibana v6.5.1 / v6.5.2 / v6.5.3 - Revision 415
+## Wazuh v3.7.1 / v3.7.2 - Kibana v6.5.1 / v6.5.2 / v6.5.3 / v6.5.4 - Revision 415
 
 ### Added
 
-- Support for Elastic stack v6.5.2 / v6.5.3.
-- Support for Wazuh v3.7.1.
+- Support for Elastic stack v6.5.2 / v6.5.3 / v6.5.4.
+- Support for Wazuh v3.7.1 / v3.7.2.
 - Dev Tools module now autocompletes API endpoints ([#1030](https://github.com/wazuh/wazuh-kibana-app/pull/1030)).
 
 ### Changed

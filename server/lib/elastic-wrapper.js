@@ -14,6 +14,7 @@ import { monitoringKnownFields } from '../integration-files/monitoring-known-fie
 
 export class ElasticWrapper {
   constructor(server) {
+    this.usingSearchGuard = ((server || {}).plugins || {}).searchguard || false;
     this.elasticRequest = server.plugins.elasticsearch.getCluster('data');
     this.WZ_KIBANA_INDEX =
       ((((server || {}).registrations || {}).kibana || {}).options || {})
@@ -663,8 +664,9 @@ export class ElasticWrapper {
       );
 
       return (
+        this.usingSearchGuard ||
         ((((data || {}).defaults || {}).xpack || {}).security || {}).enabled ==
-        'true'
+          'true'
       );
     } catch (error) {
       return Promise.reject(error);

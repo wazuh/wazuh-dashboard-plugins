@@ -157,10 +157,6 @@ export const apiRequestList = [
         args: []
       },
       {
-        name: '/experimental/syscheck',
-        args: []
-      },
-      {
         name: '/rootcheck',
         args: []
       },
@@ -429,43 +425,7 @@ export const apiRequestList = [
       {
         name: '/decoders/parents',
         args: []
-      },
-      {
-        name: '/experimental/ciscat/results',
-        args: []
-      },
-      {
-        name: '/experimental/syscollector/hardware',
-        args: []
-      },
-      {
-        name: '/experimental/syscollector/netaddr',
-        args: []
-      },
-      {
-        name: '/experimental/syscollector/netiface',
-        args: []
-      },
-      {
-        name: '/experimental/syscollector/netproto',
-        args: []
-      },
-      {
-        name: '/experimental/syscollector/os',
-        args: []
-      },
-      {
-        name: '/experimental/syscollector/packages',
-        args: []
-      },
-      {
-        name: '/experimental/syscollector/ports',
-        args: []
-      },
-      {
-        name: '/experimental/syscollector/processes',
-        args: []
-      },
+      },      
       {
         name: '/manager/configuration',
         args: []
