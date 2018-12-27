@@ -13,13 +13,13 @@ export async function totalRAM(genericReq, errorHandler) {
   try {
     const data = await genericReq.request('GET', '/utils/memory');
     const totalRAM = data.data.ram;
-    if (totalRAM < 3072 && totalRAM > 2048) {
+    if (totalRAM < 1600 && totalRAM > 1024) {
       errorHandler.handle(
         `Kibana server has ${totalRAM}MB of RAM, performance will suffer. Please increase it.`,
         'RAM',
         true
       );
-    } else if (totalRAM <= 2048) {
+    } else if (totalRAM <= 1024) {
       errorHandler.handle(
         `Kibana server has ${totalRAM}MB of RAM, performance will suffer. Please increase it.`,
         'RAM'
