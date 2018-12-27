@@ -73,9 +73,11 @@
             <div layout="row" class="md-padding" ng-if="lookingGroup && currentGroup && addingAgents">
                 <span ng-click='addMultipleAgents(false)' class='btn btn-info'>
                     Cancel</span>
-                <span ng-click='saveAddAgents(selectedAgents.data)' class='btn btn-primary wz-margin-left-8'><i
+                <span ng-hide='moreThan1000' ng-click='saveAddAgents()' class='btn btn-primary wz-margin-left-8'><i
                         aria-hidden='true' class='fa fa-fw fa-save'></i>
                     Apply changes</span>
+                <span class='error-msg' ng-show='moreThan1000'><i class="fa fa-exclamation-triangle"></i> It is not
+                    possible to apply changes of more than 1000 additions or deletions</span>
             </div>
             <!-- End group actions -->
 
@@ -164,9 +166,12 @@
             </div>
 
             <div layout="row" class="md-padding" ng-if="addingAgents">
+                <span ng-show='!multipleSelectorLoading' class="wzMultipleSelectorCounter"><span style='color:green'>+{{currentAdding}}</span>&nbsp;<span
+                        style='color:red'>-{{currentDeleting}}</span></span>
                 <wz-multiple-selector class='wzMultipleSelector' available-items="availableAgents.data" selected-items="selectedAgents.data"
                     loading="multipleSelectorLoading" title-available-items="All available agents" title-selected-items="Current agents in the group"
-                    reload-scroll='reload(element, searchTerm, 499, start)'>
+                    total-available-items="totalAgents" total-selected-items="totalSelectedAgents" reload-scroll='reload(element, searchTerm, 499, start)'
+                    limit="checkLimit()">
                 </wz-multiple-selector>
             </div>
         </div>

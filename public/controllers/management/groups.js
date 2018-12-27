@@ -328,9 +328,9 @@ export function GroupsController(
     }
   };
 
-  $scope.saveAddAgents = async (agents) => {
+  $scope.getItemsToSave = () => {
     const original = $scope.firstSelectedList;
-    const modified = agents;
+    const modified = $scope.selectedAgents.data;
     $scope.deletedAgents = [];
     $scope.addedAgents = [];
 
@@ -345,20 +345,23 @@ export function GroupsController(
       }
     });
 
-    const addedIds = [...new Set($scope.addedAgents.map(x => x.key))];
-    const deletedIds = [...new Set($scope.deletedAgents.map(x => x.key))];
+    return { 'addedIds': [...new Set($scope.addedAgents.map(x => x.key))], 'deletedIds': [...new Set($scope.deletedAgents.map(x => x.key))] }
+  }
+
+  $scope.saveAddAgents = async () => {
+    const itemsToSave = $scope.getItemsToSave();
     const failedIds = [];
 
     try {
       $scope.multipleSelectorLoading = true;
-      if (addedIds.length) {
-        const addResponse = await apiReq.request('POST', `/agents/group/${$scope.currentGroup.name}`, { 'ids': addedIds });
+      if (itemsToSave.addedIds.length) {
+        const addResponse = await apiReq.request('POST', `/agents/group/${$scope.currentGroup.name}`, { 'ids': itemsToSave.addedIds });
         if (addResponse.data.data.failed_ids) {
           failedIds.push(...addResponse.data.data.failed_ids)
         }
       }
-      if (deletedIds.length) {
-        const deleteResponse = await apiReq.request('DELETE', `/agents/group/${$scope.currentGroup.name}`, { 'ids': deletedIds });
+      if (itemsToSave.deletedIds.length) {
+        const deleteResponse = await apiReq.request('DELETE', `/agents/group/${$scope.currentGroup.name}`, { 'ids': itemsToSave.deletedIds });
         if (deleteResponse.data.data.failed_ids) {
           failedIds.push(...deleteResponse.data.data.failed_ids)
         }
@@ -381,8 +384,18 @@ export function GroupsController(
     }
     $timeout(() => {
       $scope.multipleSelectorLoading = false;
+      $scope.$emit('updateGroupInformation', { 'group': $scope.currentGroup.name });
     }, 100);
   }
+
+  $scope.checkLimit = () => {
+    if ($scope.firstSelectedList) {
+      const itemsToSave = $scope.getItemsToSave();
+      $scope.currentAdding = itemsToSave.addedIds.length;
+      $scope.currentDeleting = itemsToSave.deletedIds.length;
+      $scope.moreThan1000 = $scope.currentAdding > 1000 || $scope.currentDeleting > 1000;
+    }
+  };
 
   // Resetting the factory configuration
   $scope.$on('$destroy', () => { });

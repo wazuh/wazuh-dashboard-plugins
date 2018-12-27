@@ -25,42 +25,40 @@ app.directive('wzMultipleSelector', function () {
       loading: '=',
       titleSelectedItems: '@',
       titleAvailableItems: '@',
+      totalSelectedItems: '=',
+      totalAvailableItems: '=',
       reloadScroll: '&'
     },
     controller(
       $scope
     ) {
-      $scope.moveItem = function (item, from, to) {
+      $scope.moveItem = function (item, from, to, type) {
         if (item.length > 0) {
           item.forEach(function (elem) {
-            $scope.moveItem(elem, from, to);
+            $scope.moveItem(elem, from, to, type);
           });
         } else {
-          var idx = from.indexOf(item);
+          var idx = from.findIndex((x) => x.key === item.key);
           if (idx !== -1) {
             from.splice(idx, 1);
+            item.type = !item.type ? type : '';
             to.push(item);
           }
         }
       };
-      $scope.removeItem = function (item, from) {
-        if (item.length > 0) {
-          item.forEach(function (elem) {
-            $scope.removeItem(elem, from);
-          });
-        } else {
-          var idx = from.indexOf(item);
-          if (idx !== -1) {
-            from.splice(idx, 1);
-          }
-        }
-      };
-      $scope.moveAll = function (from, to) {
+      $scope.moveAll = function (from, to, type) {
         from.forEach(function (item) {
+          item.type = !item.type ? type : '';
           to.push(item);
         });
         from.length = 0;
       };
+
+      $scope.doCheckLimit = () => {
+        if ($scope.checkLimit) {
+          $scope.checkLimit();
+        }
+      }
 
       $scope.sort = (a) => {
         return parseInt(a.key);
