@@ -518,8 +518,8 @@ export class AgentsController {
         this.apiReq.request('GET', `/syscollector/${id}/hardware`, {}),
         this.apiReq.request('GET', `/syscollector/${id}/os`, {}),
         this.apiReq.request('GET', `/syscollector/${id}/netiface`, {}),
-        this.apiReq.request('GET', `/syscollector/${id}/ports`, {}),
-        this.apiReq.request('GET', `/syscollector/${id}/netaddr`, {}),
+        this.apiReq.request('GET', `/syscollector/${id}/ports`, {limit:1}),
+        this.apiReq.request('GET', `/syscollector/${id}/netaddr`, {limit:1}),
         this.apiReq.request('GET', `/syscollector/${id}/packages`, {
           limit: 1,
           select: 'scan_time'
