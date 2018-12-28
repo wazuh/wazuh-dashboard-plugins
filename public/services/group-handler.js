@@ -16,7 +16,11 @@ export class GroupHandler {
 
   async removeAgentFromGroup(group, agentId) {
     try {
-      const result = await this.apiReq.request('DELETE',`/agents/${agentId}/group/${group}`,{})
+      const result = await this.apiReq.request(
+        'DELETE',
+        `/agents/${agentId}/group/${group}`,
+        {}
+      );
       return result;
     } catch (error) {
       return Promise.reject(error);
@@ -25,7 +29,11 @@ export class GroupHandler {
 
   async addAgentToGroup(group, agentId) {
     try {
-      const result = await this.apiReq.request('PUT',`/agents/${agentId}/group/${group}`,{})
+      const result = await this.apiReq.request(
+        'PUT',
+        `/agents/${agentId}/group/${group}`,
+        {}
+      );
       return result;
     } catch (error) {
       return Promise.reject(error);

@@ -38,7 +38,6 @@ app.directive('wzTable', function() {
       extraLimit: '=extraLimit'
     },
     controller(
-      $rootScope,
       $scope,
       apiReq,
       $timeout,
@@ -276,16 +275,18 @@ app.directive('wzTable', function() {
       };
 
       $scope.editGroupAgentConfig = (ev, group) => {
-        $rootScope.$emit('editXmlFile', { 'target' : group });
+        $scope.$broadcast('editXmlFile', { target: group });
       };
 
-      $scope.showConfirm = function (ev, agent) {
+      $scope.showConfirm = function(ev, agent) {
         const group = instance.path.split('/').pop();
 
         const confirm = $mdDialog
           .confirm()
-          .title("Remove agent from group?")
-          .textContent(`The agent '${agent.id}' will be removed from group '${group}'.`)
+          .title('Remove agent from group?')
+          .textContent(
+            `The agent '${agent.id}' will be removed from group '${group}'.`
+          )
           .targetEvent(ev)
           .clickOutsideToClose(false)
           .escapeToClose(false)
@@ -305,7 +306,7 @@ app.directive('wzTable', function() {
                 )
               );
           },
-          () => { }
+          () => {}
         );
       };
     },

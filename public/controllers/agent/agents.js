@@ -311,7 +311,6 @@ export class AgentsController {
     this.$scope.switchGroupEdit = () => this.switchGroupEdit();
 
     this.$scope.showConfirm = (ev, group) => {
-      
       const confirm = this.$mdDialog
         .confirm()
         .title(`Add group "${group}" to agent "${this.$scope.agent.id}"?`)
@@ -319,21 +318,26 @@ export class AgentsController {
         .ok('Agree')
         .cancel('Cancel');
 
-        this.$mdDialog.show(confirm).then(
+      this.$mdDialog.show(confirm).then(
         () => {
-          this.groupHandler.addAgentToGroup(group,this.$scope.agent.id)
-          .then(() => this.apiReq.request('GET',`/agents/${this.$scope.agent.id}`,{}))
-          .then(agent => {
-            this.$scope.agent.group = agent.data.data.group;
-            this.$scope.groups = this.$scope.groups.filter(item => !agent.data.data.group.includes(item));
-            if(!this.$scope.$$phase) this.$scope.$digest()
-          })
-          .catch(error =>
-            this.errorHandler.handle(
-              error.message || error,
-              'Error adding group to agent'
+          this.groupHandler
+            .addAgentToGroup(group, this.$scope.agent.id)
+            .then(() =>
+              this.apiReq.request('GET', `/agents/${this.$scope.agent.id}`, {})
             )
-          );
+            .then(agent => {
+              this.$scope.agent.group = agent.data.data.group;
+              this.$scope.groups = this.$scope.groups.filter(
+                item => !agent.data.data.group.includes(item)
+              );
+              if (!this.$scope.$$phase) this.$scope.$digest();
+            })
+            .catch(error =>
+              this.errorHandler.handle(
+                error.message || error,
+                'Error adding group to agent'
+              )
+            );
         },
         () => {}
       );
@@ -554,8 +558,8 @@ export class AgentsController {
         this.apiReq.request('GET', `/syscollector/${id}/hardware`, {}),
         this.apiReq.request('GET', `/syscollector/${id}/os`, {}),
         this.apiReq.request('GET', `/syscollector/${id}/netiface`, {}),
-        this.apiReq.request('GET', `/syscollector/${id}/ports`, {limit:1}),
-        this.apiReq.request('GET', `/syscollector/${id}/netaddr`, {limit:1}),
+        this.apiReq.request('GET', `/syscollector/${id}/ports`, { limit: 1 }),
+        this.apiReq.request('GET', `/syscollector/${id}/netaddr`, { limit: 1 }),
         this.apiReq.request('GET', `/syscollector/${id}/packages`, {
           limit: 1,
           select: 'scan_time'
@@ -663,9 +667,14 @@ export class AgentsController {
 
       await this.$scope.switchTab(this.$scope.tab, true);
 
-      const groups = await this.apiReq.request('GET','/agents/groups',{});
-      this.$scope.groups = groups.data.data.items.map(item => item.name).filter(item => this.$scope.agent.group && !this.$scope.agent.group.includes(item));
-      
+      const groups = await this.apiReq.request('GET', '/agents/groups', {});
+      this.$scope.groups = groups.data.data.items
+        .map(item => item.name)
+        .filter(
+          item =>
+            this.$scope.agent.group && !this.$scope.agent.group.includes(item)
+        );
+
       this.$scope.load = false;
       if (!this.$scope.$$phase) this.$scope.$digest();
       return;
@@ -685,7 +694,7 @@ export class AgentsController {
 
   switchGroupEdit() {
     this.$scope.editGroup = !!!this.$scope.editGroup;
-    if(!this.$scope.$$phase) this.$scope.$digest();
+    if (!this.$scope.$$phase) this.$scope.$digest();
   }
   /**
    * Navigate to the groups of an agent

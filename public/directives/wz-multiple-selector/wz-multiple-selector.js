@@ -15,7 +15,7 @@ import { uiModules } from 'ui/modules';
 
 const app = uiModules.get('app/wazuh', []);
 
-app.directive('wzMultipleSelector', function () {
+app.directive('wzMultipleSelector', function() {
   return {
     restrict: 'E',
     scope: {
@@ -29,16 +29,12 @@ app.directive('wzMultipleSelector', function () {
       totalAvailableItems: '=',
       reloadScroll: '&'
     },
-    controller(
-      $scope
-    ) {
-      $scope.moveItem = function (item, from, to, type) {
-        if (item.length > 0) {
-          item.forEach(function (elem) {
-            $scope.moveItem(elem, from, to, type);
-          });
+    controller($scope) {
+      $scope.moveItem = (item, from, to, type) => {
+        if (item.length) {
+          item.forEach(elem => $scope.moveItem(elem, from, to, type));
         } else {
-          var idx = from.findIndex((x) => x.key === item.key);
+          const idx = from.findIndex(x => x.key === item.key);
           if (idx !== -1) {
             from.splice(idx, 1);
             item.type = !item.type ? type : '';
@@ -46,8 +42,9 @@ app.directive('wzMultipleSelector', function () {
           }
         }
       };
-      $scope.moveAll = function (from, to, type) {
-        from.forEach(function (item) {
+
+      $scope.moveAll = (from, to, type) => {
+        from.forEach(item => {
           item.type = !item.type ? type : '';
           to.push(item);
         });
@@ -58,32 +55,31 @@ app.directive('wzMultipleSelector', function () {
         if ($scope.checkLimit) {
           $scope.checkLimit();
         }
-      }
+      };
 
-      $scope.sort = (a) => {
+      $scope.sort = a => {
         return parseInt(a.key);
-      }
+      };
 
-      $('#wzMultipleSelector select').scroll(function (ev) {
-        $scope.scrollList(ev.currentTarget);
+      $('#wzMultipleSelector select').scroll(function(ev) {
+        scrollList(ev.currentTarget);
       });
 
-      $scope.doReload = (side, term, fromStart = false) => {
-        $scope.reloadScroll({ 'element': side, 'searchTerm': term, 'start': fromStart });
-      }
-      $scope.scrollList = (target) => {
-        let pos = target.scrollTop + target.offsetHeight;
-        let max = target.scrollHeight;
+      $scope.doReload = (element, searchTerm, start = false) => {
+        $scope.reloadScroll({ element, searchTerm, start });
+      };
+
+      const scrollList = target => {
+        const pos = target.scrollTop + target.offsetHeight;
+        const max = target.scrollHeight;
         if (pos >= max) {
-          target.parentElement.parentElement.parentElement.className === 'wzMultipleSelectorLeft' ? $scope.doReload('left') : $scope.doReload('right');
+          target.parentElement.parentElement.parentElement.className ===
+          'wzMultipleSelectorLeft'
+            ? $scope.doReload('left')
+            : $scope.doReload('right');
         }
-      }
+      };
     },
     template
   };
 });
-
-
-
-
-
