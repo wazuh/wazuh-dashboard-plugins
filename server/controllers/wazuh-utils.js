@@ -53,7 +53,7 @@ export class WazuhUtilsCtrl {
    */
   async updateConfigurationFile(req, reply) {
     try {
-      const result = await updateConfigurationFile.updateConfiguration(req);
+      const result = updateConfigurationFile.updateConfiguration(req);
       return reply({
         statusCode: 200,
         error: 0,

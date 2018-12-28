@@ -15,7 +15,16 @@ import { getConfiguration } from './get-configuration';
 
 const needRestartFields = [
   'pattern',
-  'xpack.rbac.enabled'];
+  'wazuh.shards',
+  'wazuh.replicas',
+  'wazuh-version.shards',
+  'wazuh-version.replicas',
+  'wazuh.monitoring.enabled',
+  'wazuh.monitoring.frequency',
+  'wazuh.monitoring.shards',
+  'wazuh.monitoring.replicas',
+  'wazuh.monitoring.pattern'
+];
 export class UpdateConfigurationFile {
   constructor() {
     this.busy = false;
@@ -53,6 +62,9 @@ export class UpdateConfigurationFile {
       }
       this.busy = true;
       const configuration = getConfiguration() || {};
+      if (configuration['admin'] === false) {
+        throw new Error('You are not authorized to update the configuration');
+      }
       const { key, value } = (input || {}).payload || {};
       this.updateLine(key, value, typeof configuration[key] !== 'undefined');
       this.busy = false;
