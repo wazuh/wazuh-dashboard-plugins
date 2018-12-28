@@ -53,7 +53,7 @@ export class UpdateConfigurationFile {
 
   /**
    * Updates config.yml file. If it fails, it throws the error to the next function.
-   * @param {Object} input 
+   * @param {Object} input
    */
   updateConfiguration(input) {
     try {

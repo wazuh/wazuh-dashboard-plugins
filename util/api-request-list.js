@@ -425,7 +425,7 @@ export const apiRequestList = [
       {
         name: '/decoders/parents',
         args: []
-      },      
+      },
       {
         name: '/manager/configuration',
         args: []
