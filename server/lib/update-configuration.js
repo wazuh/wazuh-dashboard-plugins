@@ -13,7 +13,9 @@ import fs from 'fs';
 import path from 'path';
 import { getConfiguration } from './get-configuration';
 
-const needRestartFields = ['checks.pattern', 'checks.api'];
+const needRestartFields = [
+  'pattern',
+  'xpack.rbac.enabled'];
 export class UpdateConfigurationFile {
   constructor() {
     this.busy = false;
@@ -44,7 +46,7 @@ export class UpdateConfigurationFile {
    * Updates config.yml file. If it fails, it throws the error to the next function.
    * @param {Object} input 
    */
-  async updateConfiguration(input) {
+  updateConfiguration(input) {
     try {
       if (this.busy) {
         throw new Error('Another process is updating the configuration file');
@@ -54,7 +56,7 @@ export class UpdateConfigurationFile {
       const { key, value } = (input || {}).payload || {};
       this.updateLine(key, value, typeof configuration[key] !== 'undefined');
       this.busy = false;
-      return { needRestart: needRestartFields.includes(key) };      
+      return { needRestart: needRestartFields.includes(key) };
     } catch (error) {
       this.busy = false;
       throw error;

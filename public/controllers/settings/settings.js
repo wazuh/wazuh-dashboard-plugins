@@ -746,7 +746,7 @@ export class SettingsController {
         '/utils/configuration',
         {
           key,
-          newValue
+          'value': newValue
         }
       );
       if (response.data.data) {
