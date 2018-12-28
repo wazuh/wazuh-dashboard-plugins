@@ -212,18 +212,6 @@ export class SettingsController {
     return;
   }
 
-  // Get configuration file
-  async setValueConfigurationFile(key, value) {
-    try {
-      return await this.genericReq.request('PUT', '/utils/configuration', {
-        key,
-        value
-      });
-    } catch (error) {
-      throw new Error(error.data.message);
-    }
-  }
-
   // Get settings function
   async getSettings() {
     try {
@@ -753,7 +741,14 @@ export class SettingsController {
   async editKey(key, newValue) {
     try {
       this.loadingChange = true;
-      const response = await this.setValueConfigurationFile(key, newValue);
+      const response = await this.genericReq.request(
+        'PUT',
+        '/utils/configuration',
+        {
+          key,
+          newValue
+        }
+      );
       if (response.data.data) {
         this.errorHandler.handle(
           'You must restart Kibana for the changes to take effect',
