@@ -26,7 +26,7 @@ import { checkGap } from './lib/check-gap';
 
 const app = uiModules.get('app/wazuh', []);
 
-app.directive('wzTable', function() {
+app.directive('wzTable', function () {
   return {
     restrict: 'E',
     scope: {
@@ -49,7 +49,8 @@ app.directive('wzTable', function() {
       appState,
       globalState,
       $mdDialog,
-      groupHandler
+      groupHandler,
+      $rootScope
     ) {
       /**
        * Init variables
@@ -219,7 +220,7 @@ app.directive('wzTable', function() {
       $scope.prevPage = () => pagination.prevPage($scope);
       $scope.nextPage = async currentPage =>
         pagination.nextPage(currentPage, $scope, errorHandler, fetch);
-      $scope.setPage = function() {
+      $scope.setPage = function () {
         $scope.currentPage = this.n;
         $scope.nextPage(this.n);
       };
@@ -257,6 +258,10 @@ app.directive('wzTable', function() {
         return init();
       });
 
+      $scope.editGroupAgentConfig = (ev, group) => {
+        $rootScope.$broadcast('editXmlFile', { 'target': group });
+      };
+
       $scope.$on('$destroy', () => {
         $window.onresize = null;
         realTime = null;
@@ -274,11 +279,7 @@ app.directive('wzTable', function() {
         }
       };
 
-      $scope.editGroupAgentConfig = (ev, group) => {
-        $scope.$broadcast('editXmlFile', { target: group });
-      };
-
-      $scope.showConfirm = function(ev, agent) {
+      $scope.showConfirm = function (ev, agent) {
         const group = instance.path.split('/').pop();
 
         const confirm = $mdDialog
@@ -306,7 +307,7 @@ app.directive('wzTable', function() {
                 )
               );
           },
-          () => {}
+          () => { }
         );
       };
     },

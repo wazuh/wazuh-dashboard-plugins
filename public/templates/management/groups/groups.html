@@ -67,9 +67,11 @@
 
             <!-- Group actions -->
             <div layout="row" class="md-padding-h md-padding-top-10" ng-if="lookingGroup && currentGroup && !addingAgents && groupsSelectedTab==='agents'">
-                <span ng-click='addMultipleAgents(true)' class='btn btn-primary'><i aria-hidden='true' class='fa fa-fw fa-pencil'></i>
-                    Add or remove multiple agents</span>
+                <span ng-disabled="currentGroup.name === 'default'" ng-click='addMultipleAgents(true)' class='btn btn-primary'><i aria-hidden='true' class='fa fa-fw fa-pencil'></i>
+                    Add or remove multiple agents</span>            
+                    <span class="small-text" ng-show="currentGroup.name === 'default'">* Agents of default group cannot be managed</span>
             </div>
+
             <div layout="row" class="md-padding" ng-if="lookingGroup && currentGroup && addingAgents">
                 <span ng-click='addMultipleAgents(false)' class='btn btn-info'>
                     Cancel</span>
