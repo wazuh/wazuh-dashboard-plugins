@@ -23,6 +23,15 @@ export function WazuhUtilsRoutes(server) {
     }
   });
 
+  // Returns the config.yml file in raw
+  server.route({
+    method: 'PUT',
+    path: '/utils/configuration',
+    handler(req, reply) {
+      return ctrl.updateConfigurationFile(req, reply);
+    }
+  });
+
   // Returns total RAM available from the current machine where Kibana is being executed
   server.route({
     method: 'GET',

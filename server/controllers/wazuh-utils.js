@@ -16,6 +16,8 @@ import { getConfiguration } from '../lib/get-configuration';
 import { totalmem } from 'os';
 import simpleTail from 'simple-tail';
 import path from 'path';
+import { UpdateConfigurationFile } from '../lib/update-configuration';
+const updateConfigurationFile = new UpdateConfigurationFile();
 
 export class WazuhUtilsCtrl {
   /**
@@ -40,6 +42,25 @@ export class WazuhUtilsCtrl {
       });
     } catch (error) {
       return ErrorResponse(error.message || error, 3019, 500, reply);
+    }
+  }
+
+  /**
+   * Returns the config.yml file in raw
+   * @param {Object} req
+   * @param {Object} reply
+   * @returns {Object} Configuration File or ErrorResponse
+   */
+  async updateConfigurationFile(req, reply) {
+    try {
+      const result = updateConfigurationFile.updateConfiguration(req);
+      return reply({
+        statusCode: 200,
+        error: 0,
+        data: result.needRestart
+      });
+    } catch (error) {
+      return ErrorResponse(error.message || error, 3021, 500, reply);
     }
   }
 
