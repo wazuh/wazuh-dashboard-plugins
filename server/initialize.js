@@ -68,7 +68,7 @@ export function Initialize(server) {
   const checkKnownFields = async () => {
     try {
       const usingCredentials = await wzWrapper.usingCredentials();
-      const msg = `x-pack security enabled: ${usingCredentials ? 'yes' : 'no'}`;
+      const msg = `Security enabled: ${usingCredentials ? 'yes' : 'no'}`;
 
       log('[initialize][checkKnownFields]', msg, 'info');
       server.log([blueWazuh, 'initialize', 'info'], msg);
@@ -236,12 +236,7 @@ export function Initialize(server) {
   // Save Wazuh App setup
   const saveConfiguration = async () => {
     try {
-      const shardConfiguration = BuildBody(
-        configurationFile,
-        'wazuh-version',
-        1,
-        1
-      );
+      const shardConfiguration = BuildBody(configurationFile, 'wazuh-version');
 
       await wzWrapper.createWazuhVersionIndex(shardConfiguration);
 
@@ -381,7 +376,7 @@ export function Initialize(server) {
 
       const result = await wzWrapper.checkIfIndexExists('.wazuh');
 
-      const shardConfiguration = BuildBody(configurationFile, 'wazuh', 1, 1);
+      const shardConfiguration = BuildBody(configurationFile, 'wazuh');
 
       if (!result) {
         try {
@@ -436,9 +431,7 @@ export function Initialize(server) {
         await wzWrapper.getWazuhVersionIndex();
         const shardConfiguration = BuildBody(
           configurationFile,
-          'wazuh-version',
-          1,
-          1
+          'wazuh-version'
         );
         await wzWrapper.updateIndexSettings(
           '.wazuh-version',

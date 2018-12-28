@@ -380,12 +380,12 @@ export class Monitoring {
       const shards =
         typeof (configFile || {})['wazuh.monitoring.shards'] !== 'undefined'
           ? configFile['wazuh.monitoring.shards']
-          : 5;
+          : 2;
 
       const replicas =
         typeof (configFile || {})['wazuh.monitoring.replicas'] !== 'undefined'
           ? configFile['wazuh.monitoring.replicas']
-          : 1;
+          : 0;
 
       const configuration = {
         settings: {
@@ -495,8 +495,7 @@ export class Monitoring {
         const shardConfiguration = BuildBody(
           configurationFile,
           'wazuh.monitoring',
-          5,
-          1
+          2
         );
         await this.wzWrapper.updateIndexSettings(
           this.todayIndex,
