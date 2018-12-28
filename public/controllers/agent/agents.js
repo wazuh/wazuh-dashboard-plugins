@@ -518,7 +518,8 @@ export class AgentsController {
         this.apiReq.request('GET', `/syscollector/${id}/hardware`, {}),
         this.apiReq.request('GET', `/syscollector/${id}/os`, {}),
         this.apiReq.request('GET', `/syscollector/${id}/netiface`, {}),
-        this.apiReq.request('GET', `/syscollector/${id}/ports`, {}),
+        this.apiReq.request('GET', `/syscollector/${id}/ports`, {limit:1}),
+        this.apiReq.request('GET', `/syscollector/${id}/netaddr`, {limit:1}),
         this.apiReq.request('GET', `/syscollector/${id}/packages`, {
           limit: 1,
           select: 'scan_time'
@@ -536,6 +537,7 @@ export class AgentsController {
         osResponse,
         netifaceResponse,
         portsResponse,
+        netaddrResponse,
         packagesDateResponse,
         processesDateResponse
       ] = result;
@@ -563,6 +565,7 @@ export class AgentsController {
             : false,
         netiface: netifaceResponse ? { ...netifaceResponse } : false,
         ports: portsResponse ? { ...portsResponse } : false,
+        netaddr: netaddrResponse ? { ...netaddrResponse } : false,
         packagesDate: ((packagesDate || {}).items || []).length
           ? packagesDate.items[0].scan_time
           : 'Unknown',

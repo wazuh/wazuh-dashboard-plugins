@@ -104,6 +104,24 @@
         </md-card>
     </div>
 
+    <div layout="row" class="layout-padding wz-padding-bottom-0" ng-if="syscollectorEnabled && hasSize(syscollector)">
+        <md-card flex class="wz-md-card">
+            <md-card-content class="wz-text-center wz-margin-bottom-40-inv" ng-if="syscollector.netaddr && !syscollector.netaddr.items.length">
+                <i class="fa fa-fw fa-info-circle" aria-hidden="true"></i> <span class="wz-headline-title">No network addresses scan available</span>
+                <md-divider class="wz-margin-top-10"></md-divider>
+                <div layout="column" class="wz-padding-top-10">
+                    <p>The network addresses scan is disabled or not ready yet. Wait a little bit and try refreshing the page.</p>
+                </div>
+            </md-card-content>
+            <md-card-content class="wz-margin-bottom-40-inv" ng-if="syscollector.netaddr && syscollector.netaddr.items.length">
+                <span class="wz-headline-title"><i class="fa fa-fw fa-exchange"></i> Network addresses</span>
+                <md-divider class="wz-margin-top-10"></md-divider>
+                <wz-table flex path="'/syscollector/' + agent.id + '/netaddr'" row-sizes="[4]" keys="['address', 'netmask', 'proto', 'broadcast']">
+                </wz-table>
+            </md-card-content>
+        </md-card>
+    </div>
+
     <div layout="row" class="layout-padding wz-padding-top-0" ng-if="syscollectorEnabled && hasSize(syscollector)">
         <md-card flex class="wz-md-card">
             <md-card-content>
