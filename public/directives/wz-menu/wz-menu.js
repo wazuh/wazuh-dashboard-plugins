@@ -54,6 +54,8 @@ class WzMenu {
     const load = async () => {
       try {
         const list = await patternHandler.getPatternList();
+        if(!list) return;
+        
         // Get the configuration to check if pattern selector is enabled
         const config = wazuhConfig.getConfig();
         appState.setPatternSelector(config['ip.selector']);
