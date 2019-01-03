@@ -184,10 +184,8 @@ export class WazuhApiCtrl {
                   options
                 );
                 if (
-                  response &&
-                  response.body &&
-                  response.body.error === 0 &&
-                  response.body.data
+                  ((response || {}).body || {}).error === 0 &&
+                  ((response || {}).body || {}).data
                 ) {
                   req.payload = api._id;
                   req.idChanged = api._id;
@@ -329,10 +327,10 @@ export class WazuhApiCtrl {
           }
         }
       }
+
       const tmpMsg =
-        response.body && response.body.message
-          ? response.body.message
-          : 'Unexpected error checking the Wazuh API';
+        ((response || {}).body || {}).message ||
+        'Unexpected error checking the Wazuh API';
 
       throw new Error(tmpMsg);
     } catch (error) {
@@ -379,9 +377,9 @@ export class WazuhApiCtrl {
           ApiHelper.buildOptionsObject(api)
         );
 
-        if (response.body.data && response.body.data.items) {
+        if ((((response || {}).body || {}).data || {}).items) {
           let PCIobject = {};
-          for (let item of response.body.data.items) {
+          for (const item of response.body.data.items) {
             if (typeof pciRequirementsFile[item] !== 'undefined')
               PCIobject[item] = pciRequirementsFile[item];
           }
@@ -478,9 +476,9 @@ export class WazuhApiCtrl {
           ApiHelper.buildOptionsObject(api)
         );
 
-        if (response.body.data && response.body.data.items) {
+        if ((((response || {}).body || {}).data || {}).items) {
           let GDPRobject = {};
-          for (let item of response.body.data.items) {
+          for (const item of response.body.data.items) {
             if (typeof gdprRequirementsFile[item] !== 'undefined')
               GDPRobject[item] = gdprRequirementsFile[item];
           }
@@ -557,10 +555,8 @@ export class WazuhApiCtrl {
         return reply(response.body);
       }
 
-      throw response &&
-      response.body &&
-      response.body.error &&
-      response.body.message
+      throw ((response || {}).body || {}).error &&
+      ((response || {}).body || {}).message
         ? { message: response.body.message, code: response.body.error }
         : new Error('Unexpected error fetching data from the Wazuh API');
     } catch (error) {
@@ -611,10 +607,8 @@ export class WazuhApiCtrl {
         return response.body;
       }
 
-      throw response &&
-      response.body &&
-      response.body.error &&
-      response.body.message
+      throw ((response || {}).body || {}).error &&
+      ((response || {}).body || {}).message
         ? { message: response.body.message, code: response.body.error }
         : new Error('Unexpected error fetching data from the Wazuh API');
     } catch (error) {
@@ -744,12 +738,7 @@ export class WazuhApiCtrl {
         params,
         cred
       );
-      if (
-        output &&
-        output.body &&
-        output.body.data &&
-        output.body.data.totalItems
-      ) {
+      if ((((output || {}).body || {}).data || {}).totalItems) {
         params.offset = 0;
         const { totalItems } = output.body.data;
         itemsArray.push(...output.body.data.items);
@@ -765,12 +754,7 @@ export class WazuhApiCtrl {
         }
       }
 
-      if (
-        output &&
-        output.body &&
-        output.body.data &&
-        output.body.data.totalItems
-      ) {
+      if ((((output || {}).body || {}).data || {}).totalItems) {
         const fields = req.payload.path.includes('/agents')
           ? [
               'id',

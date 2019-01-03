@@ -63,6 +63,7 @@ export class SettingsController {
     this.addManagerContainer = false;
     this.showEditForm = {};
     this.formUpdate = {};
+    this.editingKey = false;
 
     this.userRegEx = new RegExp(/^.{3,100}$/);
     this.passRegEx = new RegExp(/^.{3,100}$/);
@@ -75,6 +76,10 @@ export class SettingsController {
     // Tab names
     this.tabNames = TabNames;
     this.configuration = wazuhConfig.getConfig();
+    this.configurationTypes = [];
+    for (const key in this.configuration) {
+      this.configurationTypes[key] = typeof this.configuration[key];
+    }
     this.indexPatterns = [];
     this.apiEntries = [];
 
@@ -702,5 +707,66 @@ export class SettingsController {
    */
   configEquivalence(key) {
     return configEquivalences[key] || '-';
+  }
+
+  /**
+   * Cancel edition of a configuration entry
+   */
+  cancelEditingKey() {
+    this.editingKey = false;
+    this.editingNewValue = '';
+  }
+
+  /**
+   * Enable edition for a given key
+   * @param {String} key Configuration key
+   */
+  setEditingKey(key, value) {
+    if (typeof value === 'object') {
+      try {
+        value = JSON.stringify(value);
+      } catch (err) {
+        this.errorHandler.handle('Error parsing value', key);
+      }
+    }
+    this.editingKey = key;
+    this.editingNewValue = value;
+  }
+
+  /**
+   * Change value for a given configuration key
+   * @param {String} key Configuration key
+   * @param {String} newValue new configuration value for key
+   */
+  async editKey(key, newValue) {
+    try {
+      this.loadingChange = true;
+      const response = await this.genericReq.request(
+        'PUT',
+        '/utils/configuration',
+        {
+          key,
+          value: newValue
+        }
+      );
+      if (response.data.data) {
+        this.errorHandler.handle(
+          'You must restart Kibana for the changes to take effect',
+          '',
+          true
+        );
+      } else {
+        this.errorHandler.info(
+          'Success. The configuration has been successfully updated'
+        );
+      }
+      this.configuration[key] = newValue;
+      this.cancelEditingKey();
+      this.loadingChange = false;
+    } catch (error) {
+      this.cancelEditingKey();
+      this.loadingChange = false;
+      this.errorHandler.handle(error);
+    }
   }
 }

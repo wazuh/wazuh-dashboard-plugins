@@ -13,6 +13,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Added description to each setting under Settings > Configuration ([#1048](https://github.com/wazuh/wazuh-kibana-app/pull/1048)).
 - Added a new setting to `config.yml` related to Wazuh monitoring and its index pattern ([#1095](https://github.com/wazuh/wazuh-kibana-app/pull/1095)).
 - Resizable columns by dragging in Dev-tools ([#1102](https://github.com/wazuh/wazuh-kibana-app/pull/1102)).
+- New feature to be able to edit config.yml file from the Settings > Configuration section view ([#1105](https://github.com/wazuh/wazuh-kibana-app/pull/1105)).
 - Added a new table (network addresses) for agent inventory tab ([#1111](https://github.com/wazuh/wazuh-kibana-app/pull/1111)).
 
 ### Changed
@@ -27,6 +28,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Improved code quality in sections such as Ruleset > Rule and Decoder detail view simplify conditions ([#1102](https://github.com/wazuh/wazuh-kibana-app/pull/1102)).
 - Replaced reporting success message ([#1102](https://github.com/wazuh/wazuh-kibana-app/pull/1102)).
 - Reduced the default number of shards and the default number of replicas for the app indices ([#1113](https://github.com/wazuh/wazuh-kibana-app/pull/1113)).
+- Refreshing index pattern known fields on health check controller ([#1119](https://github.com/wazuh/wazuh-kibana-app/pull/1119)).
 
 
 ### Fixed
