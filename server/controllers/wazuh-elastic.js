@@ -20,7 +20,7 @@ import {
 } from '../integration-files/visualizations';
 
 import { Base } from '../reporting/base-query';
-
+import { checkKnownFields } from '../lib/refresh-known-fields';
 export class WazuhElasticCtrl {
   /**
    * Constructor
@@ -589,9 +589,12 @@ export class WazuhElasticCtrl {
     try {
       if (!req.params.pattern) throw new Error('Missing parameters');
 
-      const output = await this.wzWrapper.updateIndexPatternKnownFields(
-        req.params.pattern
-      );
+      const output =
+        ((req || {}).params || {}).pattern === 'all'
+          ? await checkKnownFields(this.wzWrapper, false, false, false, true)
+          : await this.wzWrapper.updateIndexPatternKnownFields(
+              req.params.pattern
+            );
 
       return reply({ acknowledge: true, output: output });
     } catch (error) {
