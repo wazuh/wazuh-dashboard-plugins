@@ -87,7 +87,7 @@ export function WazuhApiRoutes(server) {
     }
   });
 
-  // Returns unique fields from the agents such OS, agent version ...
+  // Returns a route list used by the Dev Tools
   server.route({
     method: 'GET',
     path: '/api/routes',

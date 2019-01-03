@@ -15,11 +15,11 @@
         </div>
         <div class='wzXmlEditorFooter'>
             <span ng-click='editingFile = false' class='btn btn-info'>Cancel</span>
-            <span ng-disabled='xmlHasErrors' ng-click='saveFile()' class='btn btn-primary pull-right'>
+            <button ng-disabled='xmlHasErrors' ng-click='saveFile()' class='btn btn-primary pull-right'>
                 <span ng-show='!xmlHasErrors'><i aria-hidden='true' class='fa fa-fw fa-save'></i>Save file</span>
                 <span ng-show='xmlHasErrors' class='btn-danger'><i aria-hidden='true' class='fa fa-fw fa-exclamation-triangle'></i>
                     XML format error</span>
-            </span>
+            </button>
         </div>
     </div>
 </div>

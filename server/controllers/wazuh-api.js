@@ -542,6 +542,15 @@ export class WazuhApiCtrl {
 
       const options = ApiHelper.buildOptionsObject(api);
 
+      // Set content type application/xml if needed
+      if (
+        typeof (data || {}).content === 'string' &&
+        (data || {}).origin === 'xmleditor'
+      ) {
+        options.content_type = 'application/xml';
+        data = data.content.replace(new RegExp('\\n', 'g'), '');
+      }
+
       const fullUrl = getPath(api) + path;
       const response = await needle(method, fullUrl, data, options);
 

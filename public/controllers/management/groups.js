@@ -13,16 +13,13 @@ import beautifier from '../../utils/json-beautifier';
 import * as FileSaver from '../../services/file-saver';
 
 export function GroupsController(
-  $rootScope,
   $scope,
   $location,
   apiReq,
-  genericReq,
   errorHandler,
   csvReq,
   appState,
   shareAgent,
-  $document,
   $timeout,
   wzTableFilter
 ) {
@@ -284,7 +281,8 @@ export function GroupsController(
 
   $scope.loadAllAgents = async (searchTerm, start) => {
     try {
-      let params = {
+      const params = {
+        q: 'id!=000',
         offset: !searchTerm ? $scope.availableAgents.offset : 0,
         select: ['id', 'name']
       };
@@ -327,31 +325,35 @@ export function GroupsController(
   };
 
   $scope.addMultipleAgents = async toggle => {
-    $scope.addingAgents = toggle;
-    if (toggle && !$scope.availableAgents.loaded) {
-      $scope.availableAgents = {
-        loaded: false,
-        data: [],
-        offset: 0,
-        loadedAll: false
-      };
-      $scope.selectedAgents = {
-        loaded: false,
-        data: [],
-        offset: 0,
-        loadedAll: false
-      };
-      $scope.multipleSelectorLoading = true;
-      while (!$scope.selectedAgents.loadedAll) {
-        await $scope.loadSelectedAgents();
-        $scope.selectedAgents.offset += 499;
-      }
-      $scope.firstSelectedList = [...$scope.selectedAgents.data];
-      await $scope.loadAllAgents();
-      $timeout(() => {
+    try {
+      $scope.addingAgents = toggle;
+      if (toggle && !$scope.availableAgents.loaded) {
+        $scope.availableAgents = {
+          loaded: false,
+          data: [],
+          offset: 0,
+          loadedAll: false
+        };
+        $scope.selectedAgents = {
+          loaded: false,
+          data: [],
+          offset: 0,
+          loadedAll: false
+        };
+        $scope.multipleSelectorLoading = true;
+        while (!$scope.selectedAgents.loadedAll) {
+          await $scope.loadSelectedAgents();
+          $scope.selectedAgents.offset += 499;
+        }
+        $scope.firstSelectedList = [...$scope.selectedAgents.data];
+        await $scope.loadAllAgents();
         $scope.multipleSelectorLoading = false;
-      }, 100);
+      }
+    } catch (error) {
+      errorHandler.handle(error, 'Error adding agents');
     }
+    if (!$scope.$$phase) $scope.$digest();
+    return;
   };
 
   $scope.getItemsToSave = () => {

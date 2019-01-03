@@ -39,12 +39,4 @@ export class GroupHandler {
       return Promise.reject(error);
     }
   }
-
-  async modifyGroup(group, content) {
-    try {
-      throw new Error('Not yet implemented');
-    } catch (error) {
-      return Promise.reject(error);
-    }
-  }
 }

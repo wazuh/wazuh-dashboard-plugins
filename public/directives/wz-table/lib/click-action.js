@@ -22,31 +22,30 @@ export function clickAction(
     instance.path === '/agents' ||
     new RegExp(/^\/agents\/groups\/[a-zA-Z0-9_\-.]*$/).test(instance.path)
   ) {
-      shareAgent.setAgent(item);
+    shareAgent.setAgent(item);
 
-      // Check location target and go to that path
-      switch (openAction) {
-        case 'configuration':
-          shareAgent.setTargetLocation({
-            tab: 'configuration',
-            subTab: 'panels'
-          });
-          break;
-        case 'discover':
-          shareAgent.setTargetLocation({
-            tab: 'general',
-            subTab: 'discover'
-          });
-          break;
-        default:
-          shareAgent.setTargetLocation({
-            tab: 'welcome',
-            subTab: 'panels'
-          });
-      }
+    // Check location target and go to that path
+    switch (openAction) {
+      case 'configuration':
+        shareAgent.setTargetLocation({
+          tab: 'configuration',
+          subTab: 'panels'
+        });
+        break;
+      case 'discover':
+        shareAgent.setTargetLocation({
+          tab: 'general',
+          subTab: 'discover'
+        });
+        break;
+      default:
+        shareAgent.setTargetLocation({
+          tab: 'welcome',
+          subTab: 'panels'
+        });
+    }
 
-      $location.path('/agents');
-    
+    $location.path('/agents');
   } else if (instance.path === '/agents/groups') {
     $scope.$emit('wazuhShowGroup', { group: item });
   } else if (

@@ -20,11 +20,10 @@ app.directive('wzXmlFileEditor', function() {
   return {
     restrict: 'E',
     scope: {
-      loadPath: '=loadPath',
-      updatePath: '=updatePath',
       fileName: '@fileName'
     },
     controller($scope, $timeout, apiReq, $document, errorHandler) {
+      let fetchedXML = null;
       $($document[0]).ready(function() {
         $scope.xmlCodeBox = CodeMirror.fromTextArea(
           $document[0].getElementById('xml_box'),
@@ -71,24 +70,28 @@ app.directive('wzXmlFileEditor', function() {
 
       $scope.saveFile = async () => {
         try {
-          /*const response = await this.apiReq.request(
-            'PUT',
-            $scope.updatePath,
-            {}
-          );*/
-          const response = '';
-          return response;
+          const content = $scope.xmlCodeBox.getValue();
+          await apiReq.request(
+            'POST',
+            `/agents/groups/${$scope.targetName}/configuration`,
+            { content, origin: 'xmleditor' }
+          );
+
+          await $timeout(500);
         } catch (error) {
-          this.apiInputBox.model = [];
+          errorHandler.handle(error, 'Send file error');
         }
+        $scope.editingFile = false;
+        if (!$scope.$$phase) $scope.$digest();
+        return;
       };
 
       const fetchFile = async () => {
         try {
           /*const xml = await this.apiReq.request(
             'GET',
-            $scope.loadPath,
-            {}
+            `/agents/groups/${$scope.targetName}/configuration`,
+            {format: 'xml'}
           );*/
           const xml =
             '<agent_config>' +
@@ -98,7 +101,7 @@ app.directive('wzXmlFileEditor', function() {
             '</agent_config>';
           return xml;
         } catch (error) {
-          errorHandler.handle(error, 'Fetch file error');
+          return Promise.reject(error);
         }
       };
 
@@ -107,16 +110,16 @@ app.directive('wzXmlFileEditor', function() {
         $scope.loadingFile = true;
         $scope.targetName = params.target.name;
         try {
-          const xml = await fetchFile();
-          $scope.xmlCodeBox.setValue(xml);
+          fetchedXML = await fetchFile();
+          $scope.xmlCodeBox.setValue(fetchedXML);
           autoFormat();
-          $scope.loadingFile = false;
           $timeout(function() {
             $scope.xmlCodeBox.refresh();
           }, 100);
         } catch (error) {
           errorHandler.handle(error, 'Fetch file error');
         }
+        $scope.loadingFile = false;
       };
       $scope.$on('editXmlFile', (item, params) =>
         $scope.editXmlFile(item, params)

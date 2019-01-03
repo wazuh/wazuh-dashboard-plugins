@@ -104,7 +104,7 @@ app.directive('wzTagFilter', function() {
             search: ''
           };
           let first = true;
-          for(const group of groups) {
+          for (const group of groups) {
             const search = group.find(x => x.type === 'search');
             if (search) {
               queryObj.search = search.value.name;
@@ -144,11 +144,10 @@ app.directive('wzTagFilter', function() {
       const groupBy = (collection, property) => {
         const values = [];
         const result = [];
-        
+
         for (const item of collection) {
           const index = values.indexOf(item[property]);
-          if (index > -1 && item.type === 'filter')
-            result[index].push(item);
+          if (index > -1 && item.type === 'filter') result[index].push(item);
           else {
             values.push(item[property]);
             result.push([item]);
@@ -184,10 +183,7 @@ app.directive('wzTagFilter', function() {
         if (deleteGroup) {
           $scope.tagList = $scope.tagList.filter(x => x.key !== id);
         } else {
-          $scope.tagList.splice(
-            $scope.tagList.findIndex(x => x.id === id),
-            1
-          );
+          $scope.tagList.splice($scope.tagList.findIndex(x => x.id === id), 1);
         }
         $scope.groupedTagList = groupBy($scope.tagList, 'key');
         buildQuery($scope.groupedTagList);
@@ -220,11 +216,15 @@ app.directive('wzTagFilter', function() {
             }
           }
         } else {
-          const model = $scope.dataModel.find(x => x.key === $scope.newTag.split(':')[0].trim());
+          const model = $scope.dataModel.find(
+            x => x.key === $scope.newTag.split(':')[0].trim()
+          );
           if (model) {
             $scope.autocompleteContent.list = [
               ...new Set(
-                model.list.filter(x => x.toUpperCase().includes(term[1].trim().toUpperCase()))
+                model.list.filter(x =>
+                  x.toUpperCase().includes(term[1].trim().toUpperCase())
+                )
               )
             ];
           }
