@@ -212,15 +212,18 @@ export class Monitoring {
       if (!response.error && ((response.body || {}).data || {}).totalItems) {
         await this.checkStatus(api, response.body.data.totalItems);
       } else {
+        const msg = ((response || {}).body || {}).message || false;
         !this.quiet &&
           log(
             '[monitoring][checkAndSaveStatus]',
-            'Wazuh API credentials not found or are not correct. Open the app in your browser and configure it to start monitoring agents.'
+            msg ||
+              'Wazuh API credentials not found or are not correct. Open the app in your browser and configure it to start monitoring agents.'
           );
         !this.quiet &&
           this.server.log(
             [blueWazuh, 'monitoring', 'error'],
-            'Wazuh API credentials not found or are not correct. Open the app in your browser and configure it to start monitoring agents.'
+            msg ||
+              'Wazuh API credentials not found or are not correct. Open the app in your browser and configure it to start monitoring agents.'
           );
       }
       return;
