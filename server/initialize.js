@@ -18,6 +18,7 @@ import { kibanaTemplate } from './integration-files/kibana-template';
 import { getConfiguration } from './lib/get-configuration';
 import { defaultExt } from './lib/default-ext';
 import { BuildBody } from './lib/replicas-shards-helper';
+import { checkKnownFields } from './lib/refresh-known-fields';
 
 export function Initialize(server) {
   const blueWazuh = colors.blue('wazuh');
@@ -60,178 +61,6 @@ export function Initialize(server) {
   }
 
   const defaultIndexPattern = pattern || 'wazuh-alerts-3.x-*';
-
-  /**
-   * Refresh known fields for all valid index patterns.
-   * Optionally forces the wazuh-alerts-3.x-* creation.
-   */
-  const checkKnownFields = async () => {
-    try {
-      const usingCredentials = await wzWrapper.usingCredentials();
-      const msg = `Security enabled: ${usingCredentials ? 'yes' : 'no'}`;
-
-      log('[initialize][checkKnownFields]', msg, 'info');
-      server.log([blueWazuh, 'initialize', 'info'], msg);
-
-      const indexPatternList = await wzWrapper.getAllIndexPatterns();
-
-      log(
-        '[initialize][checkKnownFields]',
-        `Found ${indexPatternList.hits.total} index patterns`,
-        'info'
-      );
-      server.log(
-        [blueWazuh, 'initialize', 'info'],
-        `Found ${indexPatternList.hits.total} index patterns`
-      );
-      const list = [];
-      if (((indexPatternList || {}).hits || {}).hits) {
-        const minimum = ['@timestamp', 'full_log', 'manager.name', 'agent.id'];
-
-        if (indexPatternList.hits.hits.length > 0) {
-          for (const index of indexPatternList.hits.hits) {
-            let valid, parsed;
-            try {
-              parsed = JSON.parse(index._source['index-pattern'].fields);
-            } catch (error) {
-              continue;
-            }
-            valid = parsed.filter(item => minimum.includes(item.name));
-
-            if (valid.length === 4) {
-              list.push({
-                id: index._id.split('index-pattern:')[1],
-                title: index._source['index-pattern'].title
-              });
-            }
-          }
-        }
-      }
-      log(
-        '[initialize][checkKnownFields]',
-        `Found ${list.length} valid index patterns for Wazuh alerts`,
-        'info'
-      );
-      server.log(
-        [blueWazuh, 'initialize', 'info'],
-        `Found ${list.length} valid index patterns for Wazuh alerts`
-      );
-      const defaultExists = list.filter(
-        item => item.title === defaultIndexPattern
-      );
-
-      if (defaultExists.length === 0) {
-        log(
-          '[initialize][checkKnownFields]',
-          `Default index pattern not found, creating it...`,
-          'info'
-        );
-        server.log(
-          [blueWazuh, 'initialize', 'info'],
-          `Default index pattern not found, creating it...`
-        );
-        await createIndexPattern();
-        log(
-          '[initialize][checkKnownFields]',
-          'Waiting for default index pattern creation to complete...',
-          'info'
-        );
-        server.log(
-          [blueWazuh, 'initialize', 'info'],
-          'Waiting for default index pattern creation to complete...'
-        );
-        let waitTill = new Date(new Date().getTime() + 0.5 * 1000);
-        let tmplist = null;
-        while (waitTill > new Date()) {
-          tmplist = await wzWrapper.searchIndexPatternById(defaultIndexPattern);
-          if (tmplist.hits.total >= 1) break;
-          else waitTill = new Date(new Date().getTime() + 0.5 * 1000);
-        }
-        server.log(
-          [blueWazuh, 'initialize', 'info'],
-          'Index pattern created...'
-        );
-        list.push({
-          id: tmplist.hits.hits[0]._id.split('index-pattern:')[1],
-          title: tmplist.hits.hits[0]._source['index-pattern'].title
-        });
-      } else {
-        log(
-          '[initialize][checkKnownFields]',
-          `Default index pattern found`,
-          'info'
-        );
-        server.log(
-          [blueWazuh, 'initialize', 'info'],
-          `Default index pattern found`
-        );
-      }
-
-      for (const item of list) {
-        if (
-          item.title.includes('wazuh-monitoring-*') ||
-          item.id.includes('wazuh-monitoring-*')
-        )
-          continue;
-        log(
-          '[initialize][checkKnownFields]',
-          `Refreshing known fields for "index-pattern:${item.title}"`,
-          'info'
-        );
-        server.log(
-          [blueWazuh, 'initialize', 'info'],
-          `Refreshing known fields for "index-pattern:${item.title}"`
-        );
-        await wzWrapper.updateIndexPatternKnownFields(
-          'index-pattern:' + item.id
-        );
-      }
-
-      log('[initialize][checkKnownFields]', 'App ready to be used.', 'info');
-      server.log([blueWazuh, 'initialize', 'info'], 'App ready to be used.');
-
-      return;
-    } catch (error) {
-      log('[initialize][checkKnownFields]', error.message || error);
-      server.log(
-        [blueWazuh, 'server', 'error'],
-        'Error importing objects into elasticsearch.' + error.message || error
-      );
-    }
-  };
-
-  // Creates the default index pattern
-  const createIndexPattern = async () => {
-    try {
-      log(
-        '[initialize][createIndexPattern]',
-        `Creating index pattern: ${defaultIndexPattern}`,
-        'info'
-      );
-      server.log(
-        [blueWazuh, 'initialize', 'info'],
-        `Creating index pattern: ${defaultIndexPattern}`
-      );
-
-      await wzWrapper.createIndexPattern(defaultIndexPattern);
-
-      log(
-        '[initialize][createIndexPattern]',
-        `Created index pattern: ${defaultIndexPattern}`,
-        'info'
-      );
-      server.log(
-        [blueWazuh, 'initialize', 'info'],
-        'Created index pattern: ' + defaultIndexPattern
-      );
-    } catch (error) {
-      log('[initialize][createIndexPattern]', error.message || error);
-      server.log(
-        [blueWazuh, 'initialize', 'error'],
-        'Error creating index-pattern.'
-      );
-    }
-  };
 
   // Save Wazuh App setup
   const saveConfiguration = async () => {
@@ -477,7 +306,7 @@ export function Initialize(server) {
       await Promise.all([
         checkWazuhIndex(),
         checkWazuhVersionIndex(),
-        checkKnownFields()
+        checkKnownFields(wzWrapper, log, server, defaultIndexPattern)
       ]);
     } catch (error) {
       log('[initialize][init]', error.message || error);
