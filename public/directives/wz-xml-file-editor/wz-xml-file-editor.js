@@ -76,7 +76,9 @@ app.directive('wzXmlFileEditor', function() {
             `/agents/groups/${$scope.targetName}/configuration`,
             { content, origin: 'xmleditor' }
           );
-
+          $scope.$emit('updateGroupInformation', {
+            group: $scope.targetName
+          });
           await $timeout(500);
         } catch (error) {
           errorHandler.handle(error, 'Send file error');
