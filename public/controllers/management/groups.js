@@ -150,12 +150,29 @@ export function GroupsController(
 
   $scope.$on('updateGroupInformation', async (event, parameters) => {
     try {
-      const result = await apiReq.request(
-        'GET',
-        `/agents/groups/${parameters.group}`,
-        { limit: 1 }
-      );
-      $scope.currentGroup.count = result.data.data.totalItems;
+      if ($scope.currentGroup) {
+        const result = await Promise.all([
+          await apiReq.request('GET', `/agents/groups/${parameters.group}`, {
+            limit: 1
+          }),
+          await apiReq.request('GET', `/agents/groups`, {
+            search: parameters.group
+          })
+        ]);
+
+        const [count, sums] = result.map(
+          item => ((item || {}).data || {}).data || false
+        );
+        const updatedGroup = ((sums || {}).items || []).find(
+          item => item.name === parameters.group
+        );
+
+        $scope.currentGroup.count = (count || {}).totalItems || 0;
+        if (updatedGroup) {
+          $scope.currentGroup.configSum = updatedGroup.configSum;
+          $scope.currentGroup.mergedSum = updatedGroup.mergedSum;
+        }
+      }
     } catch (error) {
       errorHandler.handle(error, 'Groups');
     }
