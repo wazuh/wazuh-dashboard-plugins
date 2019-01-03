@@ -156,7 +156,6 @@ export function GroupsController(
         { limit: 1 }
       );
       $scope.currentGroup.count = result.data.data.totalItems;
-      $scope.currentGroup.agents = result.data.data.items;
     } catch (error) {
       errorHandler.handle(error, 'Groups');
     }
