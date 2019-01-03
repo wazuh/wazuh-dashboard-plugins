@@ -231,6 +231,11 @@ export class HealthCheck {
           id: 3,
           description: 'Check Elasticsearch template',
           status: this.checks.template ? 'Checking...' : 'disabled'
+        },
+        {
+          id: 4,
+          description: 'Check index pattern known fields',
+          status: 'Checking...'
         }
       );
 
@@ -241,6 +246,15 @@ export class HealthCheck {
       await Promise.all([this.checkPatterns(), this.checkApiConnection()]);
 
       this.checksDone = true;
+
+      try {
+        await this.genericReq.request('GET', '/elastic/known-fields/all', {});
+        this.results[this.results.length - 1].status = 'Ready';
+      } catch (error) {
+        this.results[this.results.length - 1].status = 'Error';
+        this.handleError(error);
+      }
+
       if (!this.errors || !this.errors.length) {
         await this.$timeout(800);
         this.$window.location.assign(
