@@ -1,0 +1,41 @@
+<!-- No configuration section -->
+<wz-no-config
+  flex
+  error="'not-present'"
+  ng-if="configurationSubTab === 'fim-whodata' && currentConfig && currentConfig['syscheck-syscheck'] && currentConfig['syscheck-syscheck'].syscheck && !currentConfig['syscheck-syscheck'].syscheck.ignore"></wz-no-config>
+<!-- End no configuration section -->
+
+<!-- Who-data card -->
+<md-card class="wz-md-card" ng-if="!JSONContent && !XMLContent && configurationSubTab === 'fim-whodata' && currentConfig && currentConfig['syscheck-syscheck'] && currentConfig['syscheck-syscheck'].syscheck && currentConfig['syscheck-syscheck'].syscheck.ignore">
+    <md-card-content>
+        <div layout="row" layout-align="start center">
+            <span flex></span>
+            <span ng-class="JSONContent ? 'wz-text-active' : ''" class="wz-text-link small" ng-click="getJSON()">JSON</span>
+            <span class="small">&nbsp;&centerdot;&nbsp;</span>
+            <span ng-class="XMLContent ? 'wz-text-active' : ''" class="wz-text-link small" ng-click="getXML()">XML</span>
+        </div>
+        <md-divider class="wz-margin-top-10"></md-divider>
+
+        <!-- Configuration block -->
+        <div class="wz-padding-top-10">
+
+            <table ng-if="currentConfig['syscheck-syscheck'].syscheck.whodata" class="table table-striped table-condensed" style="table-layout: fixed !important;">
+                <thead class="wz-text-bold">
+                    <th class="wz-text-left">Audit keys</th>
+                </thead>
+                <tbody class="wz-word-wrap">
+                    <tr ng-repeat="auditkey in currentConfig['syscheck-syscheck'].syscheck.whodata.audit_key">
+                        <td>{{auditkey}}</td>
+                    </tr>
+                </tbody>
+            </table>
+
+	<div ng-id="!currentConfig['syscheck-syscheck'].syscheck.whodata">
+                <span class="font-size-16">There are no audit keys configured <br><br> More info about this:  </span> <ng-href="https://documentation.wazuh.com/current/user-manual/reference/ossec-conf/syscheck.html?highlight=audit_key#whodata">Who-data audit keys</ng-href>
+            </div>
+
+        </div>
+        <!-- End configuration block -->
+    </md-card-content>
+</md-card>
+<!-- End auditkeys card -->
