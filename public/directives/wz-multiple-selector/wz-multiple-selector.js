@@ -26,7 +26,6 @@ app.directive('wzMultipleSelector', function() {
       titleSelectedItems: '@',
       titleAvailableItems: '@',
       totalSelectedItems: '=',
-      totalAvailableItems: '=',
       reloadScroll: '&'
     },
     controller($scope) {
