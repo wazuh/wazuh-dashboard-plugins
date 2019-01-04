@@ -229,14 +229,13 @@ export class OverviewController {
       if (result.length) {
         this.wodlesConfiguration = result[0];
         if (tab === 'aws') {
-          this.awsRegions = [];
-          for (const bucket of this.wodlesConfiguration['aws-s3'].buckets) {
-            if (bucket.regions) {
-              const regions = bucket.regions.split(',');
-              this.awsRegions.push(...regions);
-            }
-          }
-          this.awsRegions = [...new Set(this.awsRegions)];
+          this.selectedBucket = 'all'
+          // Buckets + services
+          this.s3services = [];
+          const buckets = (this.wodlesConfiguration['aws-s3'] || {}).buckets || [];
+          const services = (this.wodlesConfiguration['aws-s3'] || {}).services || [];
+          if(buckets.length) this.s3services.push(...buckets)
+          if(services.length) this.s3services.push(...services)
         }
       } else {
         this.wodlesConfiguration = false;
