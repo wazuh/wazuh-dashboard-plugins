@@ -23,7 +23,6 @@ app.directive('wzXmlFileEditor', function() {
       fileName: '@fileName'
     },
     controller($scope, $timeout, apiReq, $document, errorHandler) {
-      let fetchedXML = null;
       $($document[0]).ready(function() {
         $scope.xmlCodeBox = CodeMirror.fromTextArea(
           $document[0].getElementById('xml_box'),
@@ -48,10 +47,7 @@ app.directive('wzXmlFileEditor', function() {
             const xml = $scope.xmlCodeBox.getValue();
             const xmlDoc = parser.parseFromString(xml, 'text/xml');
             $timeout(function() {
-              $scope.xmlHasErrors =
-                xmlDoc.getElementsByTagName('parsererror').length > 0
-                  ? true
-                  : false;
+              $scope.xmlHasErrors = !!xmlDoc.getElementsByTagName('parsererror').length
             }, 50);
           } catch (error) {
             errorHandler.handle(error, 'Error validating XML');
@@ -70,7 +66,9 @@ app.directive('wzXmlFileEditor', function() {
 
       $scope.saveFile = async () => {
         try {
-          const content = $scope.xmlCodeBox.getValue();
+          autoFormat()
+          const content = $scope.xmlCodeBox.getValue().trim();
+   
           await apiReq.request(
             'POST',
             `/agents/groups/${$scope.targetName}/configuration`,
@@ -90,17 +88,16 @@ app.directive('wzXmlFileEditor', function() {
 
       const fetchFile = async () => {
         try {
-          /*const xml = await this.apiReq.request(
+          const data = await apiReq.request(
             'GET',
-            `/agents/groups/${$scope.targetName}/configuration`,
+            `/agents/groups/${$scope.targetName}/files/agent.conf`,
             {format: 'xml'}
-          );*/
-          const xml =
-            '<agent_config>' +
-            '\n' +
-            '<!-- Shared agent configuration here -->\n' +
-            '\n' +
-            '</agent_config>';
+          );
+
+          const xml = ((data || {}).data || {}).data || false;
+          if(!xml) {
+            throw new Error('Could not fetch agent.conf file')
+          }
           return xml;
         } catch (error) {
           return Promise.reject(error);
@@ -112,7 +109,7 @@ app.directive('wzXmlFileEditor', function() {
         $scope.loadingFile = true;
         $scope.targetName = params.target.name;
         try {
-          fetchedXML = await fetchFile();
+          const fetchedXML = await fetchFile();
           $scope.xmlCodeBox.setValue(fetchedXML);
           autoFormat();
           $timeout(function() {
