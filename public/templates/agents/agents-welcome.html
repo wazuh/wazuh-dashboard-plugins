@@ -46,15 +46,20 @@
     </div>
     <div layout="row" layout-padding class="wz-padding-top-0 wz-padding-bottom-0" ng-if="editGroup">
         <md-card flex class="wz-metric-color wz-md-card wz-no-padding">
-            <md-card-content layout="row" class="wz-padding-metric">
+            <md-card-content layout="column" class="wz-padding-metric">
+                <div layout="row">
                 <div class="wz-word-break" flex ng-if="groups && groups.length">
-                    Available groups: <span ng-repeat="group in groups" class="wz-text-bold wz-text-link" ng-click="showConfirm($event,group)">{{ group }}&nbsp;</span>
+                    Available groups: 
                 </div>
                 <div class="wz-word-break" flex ng-if="!groups || !groups.length">
                     There are no more groups available.
                 </div>
                 <span flex></span>
                 <span class="wz-text-link" ng-click="switchGroupEdit()">Close</span>
+            </div>
+            <div >
+                <span ng-repeat="group in groups" class="wz-text-bold wz-text-link" ng-click="showConfirm($event,group)">{{ group }}&nbsp;</span>
+            </div>
             </md-card-content>
         </md-card>
     </div>
