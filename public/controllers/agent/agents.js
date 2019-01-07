@@ -418,7 +418,9 @@ export class AgentsController {
         this.$scope.selectedGdprIndex = 0;
       }
       if (tab === 'syscollector')
-        await this.loadSyscollector(this.$scope.agent.id);
+        try {
+          await this.loadSyscollector(this.$scope.agent.id);
+        } catch (error) {} // eslint-disable-line
       if (tab === 'configuration') {
         const isSync = await this.apiReq.request(
           'GET',
@@ -501,17 +503,6 @@ export class AgentsController {
    */
   async loadSyscollector(id) {
     try {
-      // Check that Syscollector is enabled before proceeding
-      this.$scope.syscollectorEnabled = await this.configurationHandler.isWodleEnabled(
-        'syscollector',
-        id
-      );
-
-      // If Syscollector is disabled, stop loading
-      if (!this.$scope.syscollectorEnabled) {
-        return;
-      }
-
       // Continue API requests if we do have Syscollector enabled
       // Fetch Syscollector data
       const data = await Promise.all([
