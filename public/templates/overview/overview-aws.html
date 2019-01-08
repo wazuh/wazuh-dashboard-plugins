@@ -1,15 +1,4 @@
 <md-content flex layout="column" ng-if="octrl.tab === 'aws' && octrl.tabView === 'panels'" layout-align="start">
-
-    <div layout="row" class="wz-margin-left-8 wz-margin-right-8" ng-if="octrl.s3services">
-            <div flex="20" layout="column"  layout-align="center" class="height-40 wz-margin-right-15 wz-select-input">
-        <select class="kuiSelect wz-border-none cursor-pointer" ng-model="octrl.selectedBucket" aria-label="Select service">
-            <option ng-repeat="service in octrl.s3services" value="{{service.name}}">
-                <span class="md-subheader">{{service.type || '*'}}</span> - {{service.name || '*'}} / {{service.path || '*'}}
-            </option>
-        </select>
-        </div>
-    </div>
-
     <div layout="column" layout-align="center center" ng-if="octrl.tab === 'aws'" ng-show="resultState === 'ready' && octrl.tabView === 'panels' && !rendered">
         <div class="percentage"><i class="fa fa-fw fa-spin fa-spinner" aria-hidden="true"></i></div>
         <div class="percentage">{{loadingStatus}}</div>
