@@ -407,7 +407,10 @@ export class AgentsController {
 
     // update agent status
     try {
-      this.$scope.agent.status = (await this.apiReq.request('GET',`/agents/${this.$scope.agent.id}`,{})).data.data.status
+      const agentInfo = (await this.apiReq.request('GET',`/agents/${this.$scope.agent.id}`,{}));
+      if(this.$scope.agent && agentInfo.data.data){
+        this.$scope.agent.status = agentInfo.data.data.status;
+      }
     }catch (error){
       this.errorHandler.handle(error, 'Agents');
     }
