@@ -16,14 +16,16 @@ import { uiModules } from 'ui/modules';
 
 const app = uiModules.get('app/wazuh', []);
 
-app.directive('wzXmlFileEditor', function() {
+app.directive('wzXmlFileEditor', function () {
   return {
     restrict: 'E',
     scope: {
-      fileName: '@fileName'
+      fileName: '@fileName',
+      validFn: '&',
+      saveFn: '&'
     },
     controller($scope, $timeout, apiReq, $document, errorHandler) {
-      $($document[0]).ready(function() {
+      $($document[0]).ready(function () {
         $scope.xmlCodeBox = CodeMirror.fromTextArea(
           $document[0].getElementById('xml_box'),
           {
@@ -37,7 +39,6 @@ app.directive('wzXmlFileEditor', function() {
             gutters: ['CodeMirror-foldgutter']
           }
         );
-        $scope.xmlHasErrors = false;
         $scope.xmlCodeBox.on('change', () => {
           checkXmlParseError();
         });
@@ -46,8 +47,8 @@ app.directive('wzXmlFileEditor', function() {
             const parser = new DOMParser(); // eslint-disable-line
             const xml = $scope.xmlCodeBox.getValue();
             const xmlDoc = parser.parseFromString(xml, 'text/xml');
-            $timeout(function() {
-              $scope.xmlHasErrors = !!xmlDoc.getElementsByTagName('parsererror').length
+            $timeout(function () {
+              $scope.validFn({ valid: !!xmlDoc.getElementsByTagName('parsererror').length })
             }, 50);
           } catch (error) {
             errorHandler.handle(error, 'Error validating XML');
@@ -64,66 +65,31 @@ app.directive('wzXmlFileEditor', function() {
         $scope.xmlCodeBox.setCursor(0);
       };
 
-      $scope.saveFile = async () => {
+      const saveFile = () => {
         try {
-          autoFormat()
+          autoFormat();
           const content = $scope.xmlCodeBox.getValue().trim();
-   
-          await apiReq.request(
-            'POST',
-            `/agents/groups/${$scope.targetName}/configuration`,
-            { content, origin: 'xmleditor' }
-          );
-          $scope.$emit('updateGroupInformation', {
-            group: $scope.targetName
-          });
-          await $timeout(500);
+          $scope.saveFn({ content: content });
         } catch (error) {
           errorHandler.handle(error, 'Send file error');
         }
-        $scope.editingFile = false;
         if (!$scope.$$phase) $scope.$digest();
         return;
       };
 
-      const fetchFile = async () => {
-        try {
-          const data = await apiReq.request(
-            'GET',
-            `/agents/groups/${$scope.targetName}/files/agent.conf`,
-            {format: 'xml'}
-          );
-
-          const xml = ((data || {}).data || {}).data || false;
-          if(!xml) {
-            throw new Error('Could not fetch agent.conf file')
-          }
-          return xml;
-        } catch (error) {
-          return Promise.reject(error);
-        }
-      };
-
-      $scope.editXmlFile = async (item, params) => {
-        $scope.editingFile = true;
-        $scope.loadingFile = true;
+      const editXmlFile = async (item, params) => {
         $scope.targetName = params.target.name;
-        try {
-          const fetchedXML = await fetchFile();
-          $scope.xmlCodeBox.setValue(fetchedXML);
-          autoFormat();
-          $timeout(function() {
-            $scope.xmlCodeBox.refresh();
-          }, 100);
-        } catch (error) {
-          errorHandler.handle(error, 'Fetch file error');
-        }
-        $scope.loadingFile = false;
+        $scope.xmlCodeBox.setValue(params.data);
+        $scope.xmlCodeBox.refresh();
+        autoFormat();
+        if (!$scope.$$phase) $scope.$digest();
       };
       $scope.$on('editXmlFile', (item, params) =>
-        $scope.editXmlFile(item, params)
+        editXmlFile(item, params)
       );
-      $scope.$on('closeEditXmlFile', () => ($scope.editingFile = false));
+      $scope.$on('saveXmlFile', () =>
+        saveFile()
+      );
     },
     template
   };

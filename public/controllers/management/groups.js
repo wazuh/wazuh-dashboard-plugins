@@ -208,6 +208,7 @@ export function GroupsController(
   $scope.goBackGroups = () => {
     $scope.currentGroup = false;
     $scope.lookingGroup = false;
+    $scope.editingFile = false;
     if (!$scope.$$phase) $scope.$digest();
   };
 
@@ -231,8 +232,65 @@ export function GroupsController(
     return;
   };
 
-  $scope.editGroupAgentConfig = group => {
-    $scope.$broadcast('editXmlFile', { target: group });
+  const fetchFile = async () => {
+    try {
+      const data = await apiReq.request(
+        'GET',
+        `/agents/groups/${$scope.targetName}/files/agent.conf`,
+        { format: 'xml' }
+      );
+      const xml = ((data || {}).data || {}).data || false;
+      if (!xml) {
+        throw new Error('Could not fetch agent.conf file')
+      }
+      return xml;
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  };
+
+  $scope.editGroupAgentConfig = async (group) => {
+    $scope.editingFile = true;
+    $scope.loadingFile = true;
+    try {
+      const fetchedXML = await fetchFile();
+      $scope.$broadcast('editXmlFile', { target: group, data: fetchedXML });
+    } catch (error) {
+      errorHandler.handle(error, 'Fetch file error');
+    }
+    $scope.loadingFile = false;
+    if (!$scope.$$phase) $scope.$digest();
+  };
+
+  $scope.closeEditingFile = () => {
+    $scope.editingFile = false;
+    $scope.$broadcast('closeEditXmlFile', {});
+  }
+
+  $scope.xmlIsValid = (valid) => {
+    $scope.xmlHasErrors = valid;
+  }
+
+  $scope.doSaveGroupAgentConfig = () => {
+    $scope.$broadcast('saveXmlFile', {});
+  }
+  $scope.saveGroupAgentConfig = async (content) => {
+    try {
+      await apiReq.request(
+        'POST',
+        `/agents/groups/${$scope.currentGroup.name}/configuration`,
+        { content, origin: 'xmleditor' }
+      );
+      $scope.$emit('updateGroupInformation', {
+        group: $scope.currentGroup.name
+      });
+      await $timeout(500);
+    } catch (error) {
+      errorHandler.handle(error, 'Send file error');
+    }
+    $scope.editingFile = false;
+    if (!$scope.$$phase) $scope.$digest();
+    return;
   };
 
   $scope.reload = async (element, searchTerm, addOffset, start) => {
@@ -454,7 +512,7 @@ export function GroupsController(
   };
 
   // Resetting the factory configuration
-  $scope.$on('$destroy', () => {});
+  $scope.$on('$destroy', () => { });
 
   $scope.$watch('lookingGroup', value => {
     $scope.availableAgents = {
@@ -470,7 +528,6 @@ export function GroupsController(
       loadedAll: false
     };
     $scope.addMultipleAgents(false);
-    $scope.$broadcast('closeEditXmlFile', {});
     if (!value) {
       $scope.file = false;
       $scope.filename = false;
