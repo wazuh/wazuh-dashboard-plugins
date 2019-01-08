@@ -405,6 +405,14 @@ export class AgentsController {
       timefilter.setRefreshInterval(this.commonData.getRefreshInterval());
     }
 
+    // update agent status
+    try {
+      this.$scope.agent.status = (await this.apiReq.request('GET',`/agents/${this.$scope.agent.id}`,{})).data.data.status
+    }catch (error){
+      this.errorHandler.handle(error, 'Agents');
+    }
+     
+
     try {
       this.$scope.showSyscheckFiles = false;
       if (tab === 'pci') {
