@@ -405,6 +405,14 @@ export class AgentsController {
       timefilter.setRefreshInterval(this.commonData.getRefreshInterval());
     }
 
+    // Update agent status
+    try {
+      if((this.$scope || {}).agent || false){
+        const agentInfo = await this.apiReq.request('GET',`/agents/${this.$scope.agent.id}`,{select:'status'});
+        this.$scope.agent.status = (((agentInfo || {}).data || {}).data || {}).status || this.$scope.agent.status;
+      }
+    }catch (error){ } // eslint-disable-line
+     
     try {
       this.$scope.showSyscheckFiles = false;
       if (tab === 'pci') {
