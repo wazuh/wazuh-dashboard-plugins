@@ -30,7 +30,8 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Replaced reporting success message ([#1102](https://github.com/wazuh/wazuh-kibana-app/pull/1102)).
 - Reduced the default number of shards and the default number of replicas for the app indices ([#1113](https://github.com/wazuh/wazuh-kibana-app/pull/1113)).
 - Refreshing index pattern known fields on health check controller ([#1119](https://github.com/wazuh/wazuh-kibana-app/pull/1119)).
-
+- Less strict memory check ([786c764](https://github.com/wazuh/wazuh-kibana-app/commit/786c7642cd88083f9a77c57ed204488ecf5b710a)).
+- Checking message origin in error handler ([dfec368](https://github.com/wazuh/wazuh-kibana-app/commit/dfec368d22a148b2e4437db92d71294900241961)).
 
 ### Fixed
 
