@@ -55,6 +55,7 @@ app.directive('wzTagFilter', function() {
           const isFilter = obj.value;
           if (
             (isFilter &&
+              $scope.fieldsModel &&
               Object.keys($scope.fieldsModel).indexOf(obj.name) === -1) ||
             (!isFilter && (!obj.name || /^\s*$/.test(obj.name)))
           ) {
@@ -67,14 +68,12 @@ app.directive('wzTagFilter', function() {
               value: obj,
               type: isFilter ? 'filter' : 'search'
             };
-            const idxSearch = $scope.tagList.find(function(x) {
-              return x.type === 'search';
-            });
+            const idxSearch = $scope.tagList.find(x => x.type === 'search');
             if (!isFilter && idxSearch) {
               $scope.removeTag(idxSearch.id, false);
             }
             if (
-              !$scope.tagList.find(function(x) {
+              !$scope.tagList.find(x => {
                 return (
                   x.type === 'filter' &&
                   x.key === tag.key &&
@@ -100,15 +99,13 @@ app.directive('wzTagFilter', function() {
        */
       const buildQuery = groups => {
         try {
-          let queryObj = {
+          const queryObj = {
             query: '',
             search: ''
           };
           let first = true;
-          groups.forEach(function(group) {
-            const search = group.find(function(x) {
-              return x.type === 'search';
-            });
+          for (const group of groups) {
+            const search = group.find(x => x.type === 'search');
             if (search) {
               queryObj.search = search.value.name;
             } else {
@@ -120,10 +117,8 @@ app.directive('wzTagFilter', function() {
                 queryObj.query += '(';
               }
               group
-                .filter(function(x) {
-                  return x.type === 'filter';
-                })
-                .forEach(function(tag, idx2) {
+                .filter(x => x.type === 'filter')
+                .forEach((tag, idx2) => {
                   queryObj.query += tag.key + '=' + tag.value.value;
                   if (idx2 != group.length - 1) {
                     queryObj.query += ',';
@@ -134,7 +129,7 @@ app.directive('wzTagFilter', function() {
               }
               first = false;
             }
-          });
+          }
           $scope.queryFn({ q: queryObj.query, search: queryObj.search });
         } catch (error) {
           errorHandler.handle(error, 'Error in query request');
@@ -147,19 +142,15 @@ app.directive('wzTagFilter', function() {
        * @param {Object} property
        */
       const groupBy = (collection, property) => {
-        let i = 0,
-          val,
-          index,
-          values = [],
-          result = [];
-        for (; i < collection.length; i++) {
-          val = collection[i][property];
-          index = values.indexOf(val);
-          if (index > -1 && collection[i].type === 'filter')
-            result[index].push(collection[i]);
+        const values = [];
+        const result = [];
+
+        for (const item of collection) {
+          const index = values.indexOf(item[property]);
+          if (index > -1 && item.type === 'filter') result[index].push(item);
           else {
-            values.push(val);
-            result.push([collection[i]]);
+            values.push(item[property]);
+            result.push([item]);
           }
         }
         return result;
@@ -190,16 +181,9 @@ app.directive('wzTagFilter', function() {
        */
       $scope.removeTag = (id, deleteGroup) => {
         if (deleteGroup) {
-          $scope.tagList = $scope.tagList.filter(function(x) {
-            return x.key !== id;
-          });
+          $scope.tagList = $scope.tagList.filter(x => x.key !== id);
         } else {
-          $scope.tagList.splice(
-            $scope.tagList.findIndex(function(x) {
-              return x.id === id;
-            }),
-            1
-          );
+          $scope.tagList.splice($scope.tagList.findIndex(x => x.id === id), 1);
         }
         $scope.groupedTagList = groupBy($scope.tagList, 'key');
         buildQuery($scope.groupedTagList);
@@ -225,22 +209,22 @@ app.directive('wzTagFilter', function() {
         const isKey = !term[1] && $scope.newTag.indexOf(':') === -1;
         $scope.autocompleteContent = { title: '', isKey: isKey, list: [] };
         $scope.autocompleteContent.title = isKey ? 'Filter keys' : 'Values';
-        if (isKey) {
-          for (let key in $scope.fieldsModel) {
+        if (isKey && $scope.fieldsModel) {
+          for (const key in $scope.fieldsModel) {
             if (key.toUpperCase().includes(term[0].trim().toUpperCase())) {
               $scope.autocompleteContent.list.push(key);
             }
           }
         } else {
-          const model = $scope.dataModel.find(function(x) {
-            return x.key === $scope.newTag.split(':')[0].trim();
-          });
+          const model = $scope.dataModel.find(
+            x => x.key === $scope.newTag.split(':')[0].trim()
+          );
           if (model) {
             $scope.autocompleteContent.list = [
               ...new Set(
-                model.list.filter(function(x) {
-                  return x.toUpperCase().includes(term[1].trim().toUpperCase());
-                })
+                model.list.filter(x =>
+                  x.toUpperCase().includes(term[1].trim().toUpperCase())
+                )
               )
             ];
           }
@@ -262,7 +246,7 @@ app.directive('wzTagFilter', function() {
        * @param {Boolean} flag Indicate if after apply style the autocomplete have to be shown
        */
       const indexAutocomplete = (flag = true) => {
-        $timeout(function() {
+        $timeout(() => {
           const bar = $document[0].getElementById('wz-search-filter-bar');
           const autocomplete = $document[0].getElementById(
             'wz-search-filter-bar-autocomplete'
@@ -287,9 +271,12 @@ app.directive('wzTagFilter', function() {
         try {
           //Use when api call be implemented
           //const result = await instance.fetch();
-          Object.keys($scope.fieldsModel).forEach(function(key) {
-            $scope.dataModel.push({ key: key, list: $scope.fieldsModel[key] });
-          });
+          if ($scope.fieldsModel) {
+            Object.keys($scope.fieldsModel).forEach(key => {
+              const list = $scope.fieldsModel[key];
+              $scope.dataModel.push({ key, list });
+            });
+          }
           return;
         } catch (error) {
           return Promise.reject(error);

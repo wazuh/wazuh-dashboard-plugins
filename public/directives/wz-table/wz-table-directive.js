@@ -47,7 +47,9 @@ app.directive('wzTable', function() {
       wzTableFilter,
       $window,
       appState,
-      globalState
+      globalState,
+      $mdDialog,
+      groupHandler
     ) {
       /**
        * Init variables
@@ -255,6 +257,10 @@ app.directive('wzTable', function() {
         return init();
       });
 
+      /*$scope.editGroupAgentConfig = (ev, group) => {
+        $rootScope.$broadcast('editXmlFile', { target: group });
+      };*/
+
       $scope.$on('$destroy', () => {
         $window.onresize = null;
         realTime = null;
@@ -262,6 +268,65 @@ app.directive('wzTable', function() {
       });
 
       init();
+
+      $scope.isLookingGroup = () => {
+        try {
+          const regexp = new RegExp(/^\/agents\/groups\/[a-zA-Z0-9_\-.]*$/);
+          $scope.isLookingDefaultGroup =
+            instance.path.split('/').pop() === 'default';
+          return regexp.test(instance.path);
+        } catch (error) {
+          return false;
+        }
+      };
+
+      $scope.showConfirm = function(ev, agent) {
+        const group = instance.path.split('/').pop();
+
+        const confirm = $mdDialog.confirm({
+          controller: function($scope, $mdDialog) {
+            $scope.closeDialog = function() {
+              $mdDialog.hide();
+            };
+            $scope.confirmDialog = function() {
+              groupHandler
+                .removeAgentFromGroup(group, agent.id)
+                .then(() => {
+                  $mdDialog.hide();
+                  init();
+                })
+                .then(() => $scope.$emit('updateGroupInformation', { group }))
+                .catch(error =>
+                  errorHandler.handle(
+                    error.message || error,
+                    'Error removing agent from group'
+                  )
+                );
+            };
+          },
+          template:
+            '<md-dialog class="modalTheme euiToast euiToast--danger euiGlobalToastListItem">' +
+            '<md-dialog-content>' +
+            '<div class="euiToastHeader">' +
+            '<i class="fa fa-exclamation-triangle"></i>' +
+            '<span class="euiToastHeader__title">The agent ' +
+            `${agent.id}` +
+            ' will be removed from group ' +
+            `${group}` +
+            '.</span>' +
+            '</div>' +
+            '</md-dialog-content>' +
+            '<md-dialog-actions>' +
+            '<button class="md-primary md-cancel-button md-button ng-scope md-default-theme md-ink-ripple" type="button" ng-click="closeDialog()">Cancel</button>' +
+            '<button class="md-primary md-confirm-button md-button md-ink-ripple md-default-theme" type="button" ng-click="confirmDialog()">Agree</button>' +
+            '</md-dialog-actions>' +
+            '</md-dialog>',
+          targetEvent: ev,
+          hasBackdrop: false,
+          clickOutsideToClose: true
+        });
+        $mdDialog.show(confirm);
+      };
     },
     template
   };

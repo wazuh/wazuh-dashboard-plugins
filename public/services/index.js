@@ -24,6 +24,7 @@ import { VisFactoryService } from './vis-factory-handler';
 import './region-maps';
 import './order-object-by';
 import { uiModules } from 'ui/modules';
+import { GroupHandler } from './group-handler';
 
 const app = uiModules.get('app/wazuh', []);
 
@@ -37,4 +38,5 @@ app
   .service('csvReq', CSVRequest)
   .service('commonData', CommonData)
   .service('reportingService', ReportingService)
-  .service('visFactoryService', VisFactoryService);
+  .service('visFactoryService', VisFactoryService)
+  .service('groupHandler', GroupHandler);

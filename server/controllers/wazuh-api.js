@@ -542,6 +542,15 @@ export class WazuhApiCtrl {
 
       const options = ApiHelper.buildOptionsObject(api);
 
+      // Set content type application/xml if needed
+      if (
+        typeof (data || {}).content === 'string' &&
+        (data || {}).origin === 'xmleditor'
+      ) {
+        options.content_type = 'application/xml';
+        data = data.content.replace(new RegExp('\\n', 'g'), '');
+      }
+
       const fullUrl = getPath(api) + path;
       const response = await needle(method, fullUrl, data, options);
 
@@ -635,14 +644,15 @@ export class WazuhApiCtrl {
     } else if (!req.payload.path) {
       return ErrorResponse('Missing param: path', 3016, 400, reply);
     } else {
-      if (
-        req.payload.method !== 'GET' &&
-        req.payload.body &&
-        req.payload.body.devTools
-      ) {
-        if (!adminMode) {
-          return ErrorResponse('Allowed method: [GET]', 3029, 400, reply);
-        }
+      if (req.payload.method !== 'GET' && !adminMode) {
+        return ErrorResponse(
+          req.payload.body && req.payload.body.devTools
+            ? 'Allowed method: [GET]'
+            : `Forbidden (${req.payload.method} ${req.payload.path}`,
+          3029,
+          400,
+          reply
+        );
       }
       if (req.payload.body.devTools) {
         delete req.payload.body.devTools;
