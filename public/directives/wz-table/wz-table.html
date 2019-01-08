@@ -63,11 +63,11 @@
                         tooltip="Open configuration for this agent" tooltip-placement="left" aria-hidden="true"></i>
                 </td>
                 <td ng-if="path === '/agents/groups'" ng-click="$event.stopPropagation()" class="cursor-default action-btn-td">
-                    <i ng-click="editGroupAgentConfig($event, item); $event.stopPropagation()" class="fa fa-fw fa-file-code-o cursor-pointer"
-                        tooltip="Edit this group agent.conf file" tooltip-placement="left" aria-hidden="true"></i>
+<!--                     <i ng-click="editGroupAgentConfig($event, item); $event.stopPropagation()" class="fa fa-fw fa-file-code-o cursor-pointer"
+                        tooltip="Edit this group agent.conf file" tooltip-placement="left" aria-hidden="true"></i> -->
                 </td>
                 <td ng-if="isLookingGroup()" ng-click="$event.stopPropagation()" class="cursor-default action-btn-td">
-                    <i ng-click="showConfirm($event, item); $event.stopPropagation()" class="fa fa-fw fa-remove cursor-pointer"
+                    <i ng-show="!isLookingDefaultGroup" ng-click="showConfirm($event, item); $event.stopPropagation()" class="fa fa-fw fa-remove cursor-pointer"
                         tooltip="Remove this agent from the group" tooltip-placement="left" aria-hidden="true"></i>
                 </td>
             </tr>

@@ -26,7 +26,7 @@ import { checkGap } from './lib/check-gap';
 
 const app = uiModules.get('app/wazuh', []);
 
-app.directive('wzTable', function() {
+app.directive('wzTable', function () {
   return {
     restrict: 'E',
     scope: {
@@ -220,7 +220,7 @@ app.directive('wzTable', function() {
       $scope.prevPage = () => pagination.prevPage($scope);
       $scope.nextPage = async currentPage =>
         pagination.nextPage(currentPage, $scope, errorHandler, fetch);
-      $scope.setPage = function() {
+      $scope.setPage = function () {
         $scope.currentPage = this.n;
         $scope.nextPage(this.n);
       };
@@ -273,44 +273,58 @@ app.directive('wzTable', function() {
       $scope.isLookingGroup = () => {
         try {
           const regexp = new RegExp(/^\/agents\/groups\/[a-zA-Z0-9_\-.]*$/);
+          $scope.isLookingDefaultGroup = instance.path.split('/').pop() === 'default';
           return regexp.test(instance.path);
         } catch (error) {
           return false;
         }
       };
 
-      $scope.showConfirm = function(ev, agent) {
+      $scope.showConfirm = function (ev, agent) {
         const group = instance.path.split('/').pop();
 
-        const confirm = $mdDialog
-          .confirm()
-          .title('Remove agent from group?')
-          .textContent(
-            `The agent '${agent.id}' will be removed from group '${group}'.`
-          )
-          .targetEvent(ev)
-          .clickOutsideToClose(false)
-          .escapeToClose(false)
-          .ok('Agree')
-          .cancel('Cancel');
-
-        $mdDialog.show(confirm).then(
-          () => {
-            groupHandler
-              .removeAgentFromGroup(group, agent.id)
-              .then(() => init())
-              .then(() => $scope.$emit('updateGroupInformation', { group }))
-              .catch(error =>
-                errorHandler.handle(
-                  error.message || error,
-                  'Error removing agent from group'
-                )
-              );
+        const confirm = $mdDialog.confirm({
+          controller: function ($scope, $mdDialog) {
+            $scope.closeDialog = function () {
+              $mdDialog.hide()
+            }
+            $scope.confirmDialog = function () {
+              groupHandler
+                .removeAgentFromGroup(group, agent.id)
+                .then(() => {
+                  $mdDialog.hide();
+                  init();
+                })
+                .then(() => $scope.$emit('updateGroupInformation', { group }))
+                .catch(error =>
+                  errorHandler.handle(
+                    error.message || error,
+                    'Error removing agent from group'
+                  )
+                );
+            }
           },
-          () => {}
-        );
+          template: '<md-dialog class="modalTheme euiToast euiToast--danger euiGlobalToastListItem">' +
+            '<md-dialog-content>' +
+            '<div class="euiToastHeader">' +
+            '<i class="fa fa-exclamation-triangle"></i>' +
+            '<span class="euiToastHeader__title">The agent ' + `${agent.id}` + ' will be removed from group ' + `${group}` + '.</span>' +
+            '</div>' +
+            '</md-dialog-content>' +
+            '<md-dialog-actions>' +
+            '<button class="md-primary md-cancel-button md-button ng-scope md-default-theme md-ink-ripple" type="button" ng-click="closeDialog()">Cancel</button>' +
+            '<button class="md-primary md-confirm-button md-button md-ink-ripple md-default-theme" type="button" ng-click="confirmDialog()">Agree</button>' +
+            '</md-dialog-actions>' +
+            '</md-dialog>',
+          targetEvent: ev,
+          hasBackdrop: false,
+          clickOutsideToClose: true
+        });
+        $mdDialog.show(confirm);
       };
     },
     template
   };
 });
+
+

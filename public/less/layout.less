@@ -241,7 +241,7 @@ md-backdrop.md-opaque.ng-leave {
 md-dialog.md-transition-in {
     transition: 150ms ease-in!important;
     transform: none!important;
-    animation: 350ms cubic-bezier(0.34, 1.61, 0.7, 1)!important;
+    animation: 350ms cubic-bezier(0.34, 1.61, 0.7, 1);
 }
 
 md-dialog.md-transition-out {
@@ -259,7 +259,7 @@ md-dialog .md-dialog-content {
 }
 
 md-dialog{
-    animation: 350ms cubic-bezier(0.34, 1.61, 0.7, 1)!important;
+    animation: 350ms cubic-bezier(0.34, 1.61, 0.7, 1);
     border: 1px solid #D9D9D9;
     border-color: #c4cace;
     border-top-color: #e2e5e7;
@@ -312,4 +312,18 @@ md-dialog .md-button.md-primary:not(.md-cancel-button){
 md-dialog .md-button.md-primary:not(.md-cancel-button):hover{
     background-color: #005472!important;
     border-color: #004c68!important;
+}
+
+md-dialog.modalTheme {
+    animation: none!important;
+    transition: none!important;
+    transform: none!important;
+    bottom: 0;
+    right: 0;
+    position: absolute;
+    width: 350px;
+}
+
+md-dialog.modalTheme .md-button{
+    margin-bottom: 0;
 }

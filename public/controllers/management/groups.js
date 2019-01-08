@@ -302,7 +302,11 @@ export function GroupsController(
         } else {
           $scope.availableAgents.offset += addOffset + 1;
         }
-        await $scope.loadAllAgents(searchTerm, start);
+        try {
+          await $scope.loadAllAgents(searchTerm, start);
+        } catch (error) {
+          errorHandler.handle(error, 'Error fetching all available agents');
+        }
       }
     } else {
       if (!$scope.selectedAgents.loadedAll) {
