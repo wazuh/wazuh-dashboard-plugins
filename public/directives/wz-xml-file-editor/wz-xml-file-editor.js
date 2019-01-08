@@ -26,46 +26,20 @@ app.directive('wzXmlFileEditor', function() {
       targetName: '=targetName'
     },
     controller($scope, $document, errorHandler, groupHandler) {
-      $($document[0]).ready(function() {
-        $scope.xmlCodeBox = CodeMirror.fromTextArea(
-          $document[0].getElementById('xml_box'),
-          {
-            lineNumbers: true,
-            matchClosing: true,
-            matchBrackets: true,
-            mode: 'text/xml',
-            theme: 'ttcn',
-            foldGutter: true,
-            styleSelectedText: true,
-            gutters: ['CodeMirror-foldgutter']
-          }
-        );
+      const checkXmlParseError = () => {
         try {
-          $scope.xmlCodeBox.setValue($scope.data);
-          $scope.xmlCodeBox.refresh();
-          autoFormat();
+          const parser = new DOMParser(); // eslint-disable-line
+          const xml = $scope.xmlCodeBox.getValue();
+          const xmlDoc = parser.parseFromString(xml, 'text/xml');
+          $scope.validFn({
+            valid: !!xmlDoc.getElementsByTagName('parsererror').length
+          });
         } catch (error) {
-          errorHandler.handle(error, 'Fetching original file');
+          errorHandler.handle(error, 'Error validating XML');
         }
-
-        $scope.xmlCodeBox.on('change', () => {
-          checkXmlParseError();
-        });
-        const checkXmlParseError = () => {
-          try {
-            const parser = new DOMParser(); // eslint-disable-line
-            const xml = $scope.xmlCodeBox.getValue();
-            const xmlDoc = parser.parseFromString(xml, 'text/xml');
-            $scope.validFn({
-              valid: !!xmlDoc.getElementsByTagName('parsererror').length
-            });
-          } catch (error) {
-            errorHandler.handle(error, 'Error validating XML');
-          }
-          if (!$scope.$$phase) $scope.$digest();
-          return;
-        };
-      });
+        if (!$scope.$$phase) $scope.$digest();
+        return;
+      };
 
       const autoFormat = () => {
         const totalLines = $scope.xmlCodeBox.lineCount();
@@ -85,6 +59,30 @@ app.directive('wzXmlFileEditor', function() {
         }
         return;
       };
+      $scope.xmlCodeBox = CodeMirror.fromTextArea(
+        $document[0].getElementById('xml_box'),
+        {
+          lineNumbers: true,
+          matchClosing: true,
+          matchBrackets: true,
+          mode: 'text/xml',
+          theme: 'ttcn',
+          foldGutter: true,
+          styleSelectedText: true,
+          gutters: ['CodeMirror-foldgutter']
+        }
+      );
+      try {
+        $scope.xmlCodeBox.setValue($scope.data);
+        $scope.xmlCodeBox.refresh();
+        autoFormat();
+      } catch (error) {
+        errorHandler.handle(error, 'Fetching original file');
+      }
+
+      $scope.xmlCodeBox.on('change', () => {
+        checkXmlParseError();
+      });
 
       $scope.$on('saveXmlFile', (ev, params) => saveFile(params));
     },
