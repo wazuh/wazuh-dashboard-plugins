@@ -12,7 +12,7 @@
                 <i ng-if="!key.nosortable" class="fa wz-theader-sort-icon" ng-class="sortValue === (key.value || key) ? (sortDir ? 'fa-sort-asc' : 'fa-sort-desc') : 'fa-sort'"
                     aria-hidden="true"></i>
             </th>
-            <th ng-if="path === '/agents' || path === '/agents/groups' || isLookingGroup()" class="wz-text-left col-lg-1">Actions</th>
+            <th ng-if="path === '/agents' || isLookingGroup()" class="wz-text-left col-lg-1">Actions</th>
         </thead>
         <tbody>
             <tr ng-class="allowClick ? 'cursor-pointer' : ''" class="wz-word-wrap" ng-repeat="item in pagedItems[currentPage] | filter:{item:'!'}"
@@ -62,10 +62,10 @@
                     <i ng-click="clickAction(item, 'configuration'); $event.stopPropagation()" class="fa fa-fw fa-wrench cursor-pointer"
                         tooltip="Open configuration for this agent" tooltip-placement="left" aria-hidden="true"></i>
                 </td>
-                <td ng-if="path === '/agents/groups'" ng-click="$event.stopPropagation()" class="cursor-default action-btn-td">
-<!--                     <i ng-click="editGroupAgentConfig($event, item); $event.stopPropagation()" class="fa fa-fw fa-file-code-o cursor-pointer"
-                        tooltip="Edit this group agent.conf file" tooltip-placement="left" aria-hidden="true"></i> -->
-                </td>
+                <!--<td ng-if="path === '/agents/groups'" ng-click="$event.stopPropagation()" class="cursor-default action-btn-td">
+                     <i ng-click="editGroupAgentConfig($event, item); $event.stopPropagation()" class="fa fa-fw fa-file-code-o cursor-pointer"
+                        tooltip="Edit this group agent.conf file" tooltip-placement="left" aria-hidden="true"></i> 
+                </td>-->
                 <td ng-if="isLookingGroup()" ng-click="$event.stopPropagation()" class="cursor-default action-btn-td">
                     <i ng-show="!isLookingDefaultGroup" ng-click="showConfirm($event, item); $event.stopPropagation()" class="fa fa-fw fa-remove cursor-pointer"
                         tooltip="Remove this agent from the group" tooltip-placement="left" aria-hidden="true"></i>
@@ -73,7 +73,7 @@
             </tr>
         </tbody>
         <tfoot>
-            <td colspan="{{ path === '/agents' || path === '/agents/groups' || isLookingGroup() ? keys.length + 1 : keys.length}}">
+            <td colspan="{{ path === '/agents' || isLookingGroup() ? keys.length + 1 : keys.length}}">
                 <span ng-show="!wazuh_table_loading" class="color-grey">{{ totalItems }} items ({{time | number: 2}}
                     seconds)</span>
                 <div ng-show="items.length >= itemsPerPage" class="pagination pull-right" style="margin:0 !important">

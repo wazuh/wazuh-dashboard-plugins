@@ -26,7 +26,7 @@ import { checkGap } from './lib/check-gap';
 
 const app = uiModules.get('app/wazuh', []);
 
-app.directive('wzTable', function () {
+app.directive('wzTable', function() {
   return {
     restrict: 'E',
     scope: {
@@ -49,8 +49,7 @@ app.directive('wzTable', function () {
       appState,
       globalState,
       $mdDialog,
-      groupHandler,
-      $rootScope
+      groupHandler
     ) {
       /**
        * Init variables
@@ -220,7 +219,7 @@ app.directive('wzTable', function () {
       $scope.prevPage = () => pagination.prevPage($scope);
       $scope.nextPage = async currentPage =>
         pagination.nextPage(currentPage, $scope, errorHandler, fetch);
-      $scope.setPage = function () {
+      $scope.setPage = function() {
         $scope.currentPage = this.n;
         $scope.nextPage(this.n);
       };
@@ -258,9 +257,9 @@ app.directive('wzTable', function () {
         return init();
       });
 
-      $scope.editGroupAgentConfig = (ev, group) => {
+      /*$scope.editGroupAgentConfig = (ev, group) => {
         $rootScope.$broadcast('editXmlFile', { target: group });
-      };
+      };*/
 
       $scope.$on('$destroy', () => {
         $window.onresize = null;
@@ -273,22 +272,23 @@ app.directive('wzTable', function () {
       $scope.isLookingGroup = () => {
         try {
           const regexp = new RegExp(/^\/agents\/groups\/[a-zA-Z0-9_\-.]*$/);
-          $scope.isLookingDefaultGroup = instance.path.split('/').pop() === 'default';
+          $scope.isLookingDefaultGroup =
+            instance.path.split('/').pop() === 'default';
           return regexp.test(instance.path);
         } catch (error) {
           return false;
         }
       };
 
-      $scope.showConfirm = function (ev, agent) {
+      $scope.showConfirm = function(ev, agent) {
         const group = instance.path.split('/').pop();
 
         const confirm = $mdDialog.confirm({
-          controller: function ($scope, $mdDialog) {
-            $scope.closeDialog = function () {
-              $mdDialog.hide()
-            }
-            $scope.confirmDialog = function () {
+          controller: function($scope, $mdDialog) {
+            $scope.closeDialog = function() {
+              $mdDialog.hide();
+            };
+            $scope.confirmDialog = function() {
               groupHandler
                 .removeAgentFromGroup(group, agent.id)
                 .then(() => {
@@ -302,13 +302,18 @@ app.directive('wzTable', function () {
                     'Error removing agent from group'
                   )
                 );
-            }
+            };
           },
-          template: '<md-dialog class="modalTheme euiToast euiToast--danger euiGlobalToastListItem">' +
+          template:
+            '<md-dialog class="modalTheme euiToast euiToast--danger euiGlobalToastListItem">' +
             '<md-dialog-content>' +
             '<div class="euiToastHeader">' +
             '<i class="fa fa-exclamation-triangle"></i>' +
-            '<span class="euiToastHeader__title">The agent ' + `${agent.id}` + ' will be removed from group ' + `${group}` + '.</span>' +
+            '<span class="euiToastHeader__title">The agent ' +
+            `${agent.id}` +
+            ' will be removed from group ' +
+            `${group}` +
+            '.</span>' +
             '</div>' +
             '</md-dialog-content>' +
             '<md-dialog-actions>' +
@@ -326,5 +331,3 @@ app.directive('wzTable', function () {
     template
   };
 });
-
-

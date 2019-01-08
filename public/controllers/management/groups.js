@@ -148,7 +148,7 @@ export function GroupsController(
     return $scope.showFile(parameters.groupName, parameters.fileName);
   });
 
-  $scope.$on('updateGroupInformation', async (event, parameters) => {
+  const updateGroupInformation = async (event, parameters) => {
     try {
       if ($scope.currentGroup) {
         const result = await Promise.all([
@@ -178,7 +178,9 @@ export function GroupsController(
     }
     if (!$scope.$$phase) $scope.$digest();
     return;
-  });
+  };
+
+  $scope.$on('updateGroupInformation', updateGroupInformation);
 
   /**
    * This navigate back to agents overview
@@ -236,12 +238,13 @@ export function GroupsController(
     try {
       const data = await apiReq.request(
         'GET',
-        `/agents/groups/${$scope.targetName}/files/agent.conf`,
+        `/agents/groups/${$scope.currentGroup.name}/files/agent.conf`,
         { format: 'xml' }
       );
       const xml = ((data || {}).data || {}).data || false;
+
       if (!xml) {
-        throw new Error('Could not fetch agent.conf file')
+        throw new Error('Could not fetch agent.conf file');
       }
       return xml;
     } catch (error) {
@@ -249,48 +252,28 @@ export function GroupsController(
     }
   };
 
-  $scope.editGroupAgentConfig = async (group) => {
+  $scope.editGroupAgentConfig = async () => {
     $scope.editingFile = true;
-    $scope.loadingFile = true;
     try {
-      const fetchedXML = await fetchFile();
-      $scope.$broadcast('editXmlFile', { target: group, data: fetchedXML });
+      $scope.fetchedXML = await fetchFile();
     } catch (error) {
+      $scope.fetchedXML = null;
       errorHandler.handle(error, 'Fetch file error');
     }
-    $scope.loadingFile = false;
     if (!$scope.$$phase) $scope.$digest();
   };
 
   $scope.closeEditingFile = () => {
     $scope.editingFile = false;
     $scope.$broadcast('closeEditXmlFile', {});
-  }
+  };
 
-  $scope.xmlIsValid = (valid) => {
+  $scope.xmlIsValid = valid => {
     $scope.xmlHasErrors = valid;
-  }
+  };
 
   $scope.doSaveGroupAgentConfig = () => {
-    $scope.$broadcast('saveXmlFile', {});
-  }
-  $scope.saveGroupAgentConfig = async (content) => {
-    try {
-      await apiReq.request(
-        'POST',
-        `/agents/groups/${$scope.currentGroup.name}/configuration`,
-        { content, origin: 'xmleditor' }
-      );
-      $scope.$emit('updateGroupInformation', {
-        group: $scope.currentGroup.name
-      });
-      await $timeout(500);
-    } catch (error) {
-      errorHandler.handle(error, 'Send file error');
-    }
-    $scope.editingFile = false;
-    if (!$scope.$$phase) $scope.$digest();
-    return;
+    $scope.$broadcast('saveXmlFile', { group: $scope.currentGroup.name });
   };
 
   $scope.reload = async (element, searchTerm, addOffset, start) => {
@@ -494,15 +477,16 @@ export function GroupsController(
         errorHandler.info('Success. Group has been updated', '');
       }
       $scope.addMultipleAgents(false);
-    } catch (err) {
-      errorHandler.handle(err, 'Error applying changes');
-    }
-    $timeout(() => {
       $scope.multipleSelectorLoading = false;
-      $scope.$emit('updateGroupInformation', {
+      await this.updateGroupInformation(null, {
         group: $scope.currentGroup.name
       });
-    }, 100);
+    } catch (err) {
+      $scope.multipleSelectorLoading = false;
+      errorHandler.handle(err, 'Error applying changes');
+    }
+    if (!$scope.$$phase) $scope.$digest();
+    return;
   };
 
   $scope.checkLimit = () => {
@@ -516,7 +500,7 @@ export function GroupsController(
   };
 
   // Resetting the factory configuration
-  $scope.$on('$destroy', () => { });
+  $scope.$on('$destroy', () => {});
 
   $scope.$watch('lookingGroup', value => {
     $scope.availableAgents = {

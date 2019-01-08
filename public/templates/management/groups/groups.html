@@ -86,11 +86,8 @@
                             XML format error</span>
                     </button>
                 </div>
-                <div class='uil-ring-css' ng-show="loadingFile">
-                    <div></div>
-                </div>
-                <div class="md-padding md-padding-top-10" ng-show="!loadingFile">
-                    <wz-xml-file-editor file-name='agent.conf' valid-fn='xmlIsValid(valid)' save-fn='saveGroupAgentConfig(content)'>
+                <div class="md-padding md-padding-top-10" ng-if="fetchedXML">
+                    <wz-xml-file-editor file-name='agent.conf' data="fetchedXML" target-name="currentGroup.name" valid-fn='xmlIsValid(valid)'>
                     </wz-xml-file-editor>
                 </div>
             </div>
@@ -120,7 +117,7 @@
 
                 <!-- Groups table -->
                 <div layout="row" ng-if="!lookingGroup" class="md-padding">
-                    <wz-table flex extra-limit="true" path="'/agents/groups'" keys="['name',{value:'count',size:1},{value:'mergedSum',size:3}]"
+                    <wz-table flex extra-limit="true" path="'/agents/groups'" keys="['name','count','mergedSum']"
                         allow-click="true" row-sizes="[14,12,10]">
                     </wz-table>
                 </div>

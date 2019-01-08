@@ -39,4 +39,17 @@ export class GroupHandler {
       return Promise.reject(error);
     }
   }
+
+  async sendConfiguration(group, content) {
+    try {
+      const result = await this.apiReq.request(
+        'POST',
+        `/agents/groups/${group}/configuration`,
+        { content, origin: 'xmleditor' }
+      );
+      return result;
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  }
 }

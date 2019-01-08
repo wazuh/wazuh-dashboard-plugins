@@ -16,16 +16,17 @@ import { uiModules } from 'ui/modules';
 
 const app = uiModules.get('app/wazuh', []);
 
-app.directive('wzXmlFileEditor', function () {
+app.directive('wzXmlFileEditor', function() {
   return {
     restrict: 'E',
     scope: {
       fileName: '@fileName',
       validFn: '&',
-      saveFn: '&'
+      data: '=data',
+      targetName: '=targetName'
     },
-    controller($scope, $timeout, apiReq, $document, errorHandler) {
-      $($document[0]).ready(function () {
+    controller($scope, $document, errorHandler, groupHandler) {
+      $($document[0]).ready(function() {
         $scope.xmlCodeBox = CodeMirror.fromTextArea(
           $document[0].getElementById('xml_box'),
           {
@@ -39,6 +40,14 @@ app.directive('wzXmlFileEditor', function () {
             gutters: ['CodeMirror-foldgutter']
           }
         );
+        try {
+          $scope.xmlCodeBox.setValue($scope.data);
+          $scope.xmlCodeBox.refresh();
+          autoFormat();
+        } catch (error) {
+          errorHandler.handle(error, 'Fetching original file');
+        }
+
         $scope.xmlCodeBox.on('change', () => {
           checkXmlParseError();
         });
@@ -47,12 +56,14 @@ app.directive('wzXmlFileEditor', function () {
             const parser = new DOMParser(); // eslint-disable-line
             const xml = $scope.xmlCodeBox.getValue();
             const xmlDoc = parser.parseFromString(xml, 'text/xml');
-            $timeout(function () {
-              $scope.validFn({ valid: !!xmlDoc.getElementsByTagName('parsererror').length })
-            }, 50);
+            $scope.validFn({
+              valid: !!xmlDoc.getElementsByTagName('parsererror').length
+            });
           } catch (error) {
             errorHandler.handle(error, 'Error validating XML');
           }
+          if (!$scope.$$phase) $scope.$digest();
+          return;
         };
       });
 
@@ -65,31 +76,17 @@ app.directive('wzXmlFileEditor', function () {
         $scope.xmlCodeBox.setCursor(0);
       };
 
-      const saveFile = () => {
+      const saveFile = async params => {
         try {
-          autoFormat();
           const content = $scope.xmlCodeBox.getValue().trim();
-          $scope.saveFn({ content: content });
+          await groupHandler.sendConfiguration(params.group, content);
         } catch (error) {
-          errorHandler.handle(error, 'Send file error');
+          errorHandler.handle(error, 'Send file error DEBUG 1');
         }
-        if (!$scope.$$phase) $scope.$digest();
         return;
       };
 
-      const editXmlFile = async (item, params) => {
-        $scope.targetName = params.target.name;
-        $scope.xmlCodeBox.setValue(params.data);
-        $scope.xmlCodeBox.refresh();
-        autoFormat();
-        if (!$scope.$$phase) $scope.$digest();
-      };
-      $scope.$on('editXmlFile', (item, params) =>
-        editXmlFile(item, params)
-      );
-      $scope.$on('saveXmlFile', () =>
-        saveFile()
-      );
+      $scope.$on('saveXmlFile', (ev, params) => saveFile(params));
     },
     template
   };
