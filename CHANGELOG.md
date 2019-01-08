@@ -15,11 +15,12 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Resizable columns by dragging in Dev-tools ([#1102](https://github.com/wazuh/wazuh-kibana-app/pull/1102)).
 - New feature to be able to edit config.yml file from the Settings > Configuration section view ([#1105](https://github.com/wazuh/wazuh-kibana-app/pull/1105)).
 - Added a new table (network addresses) for agent inventory tab ([#1111](https://github.com/wazuh/wazuh-kibana-app/pull/1111)).
+- Added `audit_key` (Who-data Audit keys) for configuration tab ([#1123](https://github.com/wazuh/wazuh-kibana-app/pull/1123)).
 
 ### Changed
 
 - Changed Inventory tables. Now the app looks for the OS platform and it shows different tables depending on the OS platform. In addition the process state codes has been replaced to be more meaningful ([#1059](https://github.com/wazuh/wazuh-kibana-app/pull/1059)).
-- Full rework for the AWS tab including service selector, applied configuration, bucket selector, improved visualizations ([#1057](https://github.com/wazuh/wazuh-kibana-app/pull/1057)).
+- Tiny rework for the AWS tab including.
 - "Report" button is hidden on Discover panel ([#1047](https://github.com/wazuh/wazuh-kibana-app/pull/1047)).
 - Visualizations, filters and Discover improved ([#1083](https://github.com/wazuh/wazuh-kibana-app/pull/1083)).
 - Removed `popularizeField` function until https://github.com/elastic/kibana/issues/22426 is solved in order to avoid `Unable to write index pattern!` error on Discover tab ([#1085](https://github.com/wazuh/wazuh-kibana-app/pull/1085)).

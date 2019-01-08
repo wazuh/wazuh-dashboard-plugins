@@ -22,7 +22,12 @@ export class ErrorHandler {
    * @param {*} error
    */
   extractMessage(error) {
-    if ((error || {}).status === -1) return 'Server did not respond';
+    if ((error || {}).status === -1) {
+      const isFromAPI = ((error || {}).config || {}).url === '/api/request';
+      return isFromAPI
+        ? 'Wazuh API don\'t reachable. Reason: timeout.'
+        : 'Server did not respond';
+    }
     if ((((error || {}).data || {}).errorData || {}).message)
       return error.data.errorData.message;
     if (((error || {}).errorData || {}).message) return error.errorData.message;
