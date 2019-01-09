@@ -26,13 +26,14 @@ app.directive('wzXmlFileEditor', function () {
       targetName: '=targetName'
     },
     controller($scope, $document, errorHandler, groupHandler) {
+      let firstTime = true;
       const checkXmlParseError = () => {
         try {
           const parser = new DOMParser(); // eslint-disable-line
           const xml = $scope.xmlCodeBox.getValue();
           const xmlDoc = parser.parseFromString('<file>' + xml + '</file>', 'text/xml');
           $scope.validFn({
-            valid: !!xmlDoc.getElementsByTagName('parsererror').length
+            valid: !!xmlDoc.getElementsByTagName('parsererror').length || !xml || !xml.length
           });
         } catch (error) {
           errorHandler.handle(error, 'Error validating XML');
@@ -73,13 +74,26 @@ app.directive('wzXmlFileEditor', function () {
           gutters: ['CodeMirror-foldgutter']
         }
       );
-      try {
-        $scope.xmlCodeBox.setValue($scope.data);
-        $scope.xmlCodeBox.refresh();
-        autoFormat();
-      } catch (error) {
-        errorHandler.handle(error, 'Fetching original file');
+
+      const init = (data = false) => {
+        try {
+          $scope.xmlCodeBox.setValue(data || $scope.data);
+          firstTime = false;
+          $scope.xmlCodeBox.refresh();
+          autoFormat();
+        } catch (error) {
+          errorHandler.handle(error, 'Fetching original file');
+        }
       }
+
+      init();
+
+      // Refresh content if it's not the very first time we are loading data
+      $scope.$on('fetchedFile',(ev,params) => {
+        if(!firstTime) {
+          init(params.data);
+        }
+      })
 
       $scope.xmlCodeBox.on('change', () => {
         checkXmlParseError();
