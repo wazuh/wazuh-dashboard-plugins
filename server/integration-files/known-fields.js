@@ -3452,6 +3452,105 @@ export const knownFields = [
     readFromDocValues: true
   },
   {
+    name: 'data.aws.requestParameters.keySpec',
+    type: 'string',
+    count: 0,
+    scripted: false,
+    searchable: true,
+    aggregatable: true,
+    readFromDocValues: true
+  },
+  {
+    name: 'data.aws.requestParameters.keyId',
+    type: 'string',
+    count: 0,
+    scripted: false,
+    searchable: true,
+    aggregatable: true,
+    readFromDocValues: true
+  },
+  {
+    name: 'data.aws.requestParameters.encryptionContext.aws:s3:arn',
+    type: 'string',
+    count: 0,
+    scripted: false,
+    searchable: true,
+    aggregatable: true,
+    readFromDocValues: true
+  },
+  {
+    name: 'data.aws.resources.accountId',
+    type: 'string',
+    count: 0,
+    scripted: false,
+    searchable: true,
+    aggregatable: true,
+    readFromDocValues: true
+  },
+  {
+    name: 'data.aws.resources.ARN',
+    type: 'string',
+    count: 0,
+    scripted: false,
+    searchable: true,
+    aggregatable: true,
+    readFromDocValues: true
+  },
+  {
+    name: 'data.aws.userIdentity.sessionContext.sessionIssuer.userName',
+    type: 'string',
+    count: 0,
+    scripted: false,
+    searchable: true,
+    aggregatable: true,
+    readFromDocValues: true
+  },
+  {
+    name: 'data.aws.userIdentity.sessionContext.sessionIssuer.type',
+    type: 'string',
+    count: 0,
+    scripted: false,
+    searchable: true,
+    aggregatable: true,
+    readFromDocValues: true
+  },
+  {
+    name: 'data.aws.userIdentity.sessionContext.sessionIssuer.principalId',
+    type: 'string',
+    count: 0,
+    scripted: false,
+    searchable: true,
+    aggregatable: true,
+    readFromDocValues: true
+  },
+  {
+    name: 'data.aws.userIdentity.sessionContext.sessionIssuer.arn',
+    type: 'string',
+    count: 0,
+    scripted: false,
+    searchable: true,
+    aggregatable: true,
+    readFromDocValues: true
+  },
+  {
+    name: 'data.aws.userIdentity.sessionContext.sessionIssuer.accountId',
+    type: 'string',
+    count: 0,
+    scripted: false,
+    searchable: true,
+    aggregatable: true,
+    readFromDocValues: true
+  },
+  {
+    name: 'data.aws.resources.type',
+    type: 'string',
+    count: 0,
+    scripted: false,
+    searchable: true,
+    aggregatable: true,
+    readFromDocValues: true
+  },
+  {
     name: 'data.calendarTime',
     type: 'string',
     count: 0,

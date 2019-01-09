@@ -24,7 +24,6 @@ import {
   metricsOsquery
 } from '../../utils/overview-metrics';
 
-import { queryConfig } from '../../services/query-config';
 import { timefilter } from 'ui/timefilter';
 
 export class OverviewController {
@@ -208,60 +207,6 @@ export class OverviewController {
     return false;
   }
 
-  /**
-   * Classify woodle depending on given tab
-   * @param {*} tab
-   */
-  filterWodle(tab) {
-    try {
-      const tag = this.calculateWodleTagFromTab(tab);
-      let result = [];
-      if (
-        tag &&
-        this.wodlesConfiguration &&
-        this.wodlesConfiguration['wmodules-wmodules'] &&
-        this.wodlesConfiguration['wmodules-wmodules'].wmodules
-      ) {
-        result = this.wodlesConfiguration['wmodules-wmodules'].wmodules.filter(
-          item => typeof item[tag] !== 'undefined'
-        );
-      }
-      if (result.length) {
-        this.wodlesConfiguration = result[0];
-        if (tab === 'aws') {
-          this.awsRegions = [];
-          for (const bucket of this.wodlesConfiguration['aws-s3'].buckets) {
-            if (bucket.regions) {
-              const regions = bucket.regions.split(',');
-              this.awsRegions.push(...regions);
-            }
-          }
-          this.awsRegions = [...new Set(this.awsRegions)];
-        }
-      } else {
-        this.wodlesConfiguration = false;
-      }
-    } catch (error) {} // eslint-disable-line
-
-    if (!this.$scope.$$phase) this.$scope.$digest();
-  }
-
-  /**
-   * This get all available woodles
-   */
-  async fetchWodles() {
-    try {
-      this.wodlesConfiguration = await queryConfig(
-        '000',
-        [{ component: 'wmodules', configuration: 'wmodules' }],
-        this.apiReq
-      );
-    } catch (error) {
-      this.wodlesConfiguration = false;
-    }
-    return;
-  }
-
   // Switch tab
   async switchTab(newTab, force = false) {
     try {
@@ -270,10 +215,6 @@ export class OverviewController {
         timefilter.setRefreshInterval({ pause: true, value: 0 });
       } else if (this.tab === 'welcome') {
         timefilter.setRefreshInterval(this.commonData.getRefreshInterval());
-      }
-
-      if (newTab !== 'welcome') {
-        await this.fetchWodles();
       }
 
       if (typeof this.agentsCountTotal === 'undefined') {
@@ -291,8 +232,6 @@ export class OverviewController {
         this.gdprTabs = gdprTabs;
         this.selectedGdprIndex = 0;
       }
-
-      this.filterWodle(newTab);
 
       if (newTab !== 'welcome') this.tabHistory.push(newTab);
 

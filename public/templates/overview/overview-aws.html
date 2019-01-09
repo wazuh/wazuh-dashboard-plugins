@@ -1,41 +1,4 @@
 <md-content flex layout="column" ng-if="octrl.tab === 'aws' && octrl.tabView === 'panels'" layout-align="start">
-
-    <div layout="row" ng-if="octrl.wodlesConfiguration && octrl.wodlesConfiguration['aws-s3']">
-        <md-card flex class="wz-metric-color wz-md-card">
-            <md-card-content layout="row" class="wz-padding-metric">
-                <div class="wz-text-truncatable" flex>Enabled: <span class="wz-text-bold">{{octrl.wodlesConfiguration['aws-s3'].disabled
-                        === 'no' ? 'yes' : 'no'}}</span></div>
-                <div class="wz-text-truncatable" flex>Scan interval: <span class="wz-text-bold">{{octrl.wodlesConfiguration['aws-s3'].interval}}</span></div>
-                <div class="wz-text-truncatable" flex>Run on start: <span class="wz-text-bold">{{octrl.wodlesConfiguration['aws-s3'].run_on_start}}</span></div>
-                <div class="wz-text-truncatable" flex>Skip on error: <span class="wz-text-bold">{{octrl.wodlesConfiguration['aws-s3'].skip_on_error}}</span></div>
-                <div class="wz-text-truncatable" flex></div>
-            </md-card-content>
-        </md-card>
-    </div>
-
-    <div layout="row" ng-if="octrl.wodlesConfiguration && octrl.wodlesConfiguration['aws-s3'] && octrl.wodlesConfiguration['aws-s3'].buckets">
-        <md-card flex class="wz-metric-color wz-md-card">
-            <md-card-content layout="row" class="wz-padding-metric">
-                <div flex>Buckets: <span ng-repeat="bucket in octrl.wodlesConfiguration['aws-s3'].buckets" class="wz-text-bold">{{bucket.name}}&nbsp;&nbsp;&nbsp;</span></div>
-            </md-card-content>
-        </md-card>
-        <md-card flex class="wz-metric-color wz-md-card">
-            <md-card-content layout="row" class="wz-padding-metric">
-                <div flex>Accounts in use: <span ng-repeat="bucket in octrl.wodlesConfiguration['aws-s3'].buckets" class="wz-text-bold">{{bucket.aws_account_alias}}&nbsp;&nbsp;&nbsp;</span></div>
-            </md-card-content>
-        </md-card>
-    </div>
-    <div layout="row" ng-if="octrl.wodlesConfiguration && octrl.wodlesConfiguration['aws-s3'] && octrl.wodlesConfiguration['aws-s3'].buckets">
-        <md-card flex class="wz-metric-color wz-md-card">
-            <md-card-content layout="row" class="wz-padding-metric">
-                <div flex>Regions in use: <span ng-repeat="region in octrl.awsRegions" class="wz-text-bold">{{region}}&nbsp;&nbsp;&nbsp;</span></div>
-            </md-card-content>
-        </md-card>
-    </div>
-
-    <div layout="row" class="height-100">
-        <kbn-vis vis-id="'Wazuh-App-Overview-AWS-Service-selector'"></kbn-vis>
-    </div>
     <div layout="column" layout-align="center center" ng-if="octrl.tab === 'aws'" ng-show="resultState === 'ready' && octrl.tabView === 'panels' && !rendered">
         <div class="percentage"><i class="fa fa-fw fa-spin fa-spinner" aria-hidden="true"></i></div>
         <div class="percentage">{{loadingStatus}}</div>
@@ -43,60 +6,50 @@
 </md-content>
 
 <md-content flex layout="column" ng-if="octrl.tab === 'aws' && octrl.tabView === 'panels'" ng-class="{'no-opacity': resultState !== 'ready' || !rendered}" layout-align="start">
-    <div layout="row" class="height-300">
-        <md-card flex="50" class="wz-md-card">
+    <div layout="row" class="height-250">
+        <md-card flex class="wz-md-card">
             <md-card-content class="wazuh-column">
-                <span class="wz-headline-title">Events by instance ID over time</span>
+                <span class="wz-headline-title">Sources</span>
                 <md-divider class="wz-margin-top-10"></md-divider>
-                <kbn-vis id="Wazuh-App-Overview-AWS-Events-by-instance" vis-id="'Wazuh-App-Overview-AWS-Events-by-instance'"></kbn-vis>
+                <kbn-vis id="Wazuh-App-Overview-AWS-Top-sources" vis-id="'Wazuh-App-Overview-AWS-Top-sources'"></kbn-vis>
             </md-card-content>
         </md-card>
-        <md-card flex="50" class="wz-md-card">
+        <md-card flex class="wz-md-card">
             <md-card-content class="wazuh-column">
-                <span class="wz-headline-title">Events by region over time</span>
+                <span class="wz-headline-title">Accounts</span>
                 <md-divider class="wz-margin-top-10"></md-divider>
-                <kbn-vis id=" Wazuh-App-Overview-AWS-Events-by-region" vis-id="'Wazuh-App-Overview-AWS-Events-by-region'"></kbn-vis>
+                <kbn-vis id="Wazuh-App-Overview-AWS-Top-accounts" vis-id="'Wazuh-App-Overview-AWS-Top-accounts'"></kbn-vis>
+            </md-card-content>
+        </md-card>
+        <md-card flex class="wz-md-card">
+            <md-card-content class="wazuh-column">
+                <span class="wz-headline-title">S3 buckets</span>
+                <md-divider class="wz-margin-top-10"></md-divider>
+                <kbn-vis id="Wazuh-App-Overview-AWS-Top-buckets" vis-id="'Wazuh-App-Overview-AWS-Top-buckets'"></kbn-vis>
+            </md-card-content>
+        </md-card>
+        <md-card flex class="wz-md-card">
+            <md-card-content class="wazuh-column">
+                <span class="wz-headline-title">Regions</span>
+                <md-divider class="wz-margin-top-10"></md-divider>
+                <kbn-vis id="Wazuh-App-Overview-AWS-Top-regions" vis-id="'Wazuh-App-Overview-AWS-Top-regions'"></kbn-vis>
             </md-card-content>
         </md-card>
     </div>
-
+    
     <div layout="row" class="height-300">
-        <md-card flex class="wz-md-card">
+        <md-card flex="50" class="wz-md-card">
             <md-card-content class="wazuh-column">
-                <span class="wz-headline-title">Top events by service name</span>
+                <span class="wz-headline-title">Events by source over time</span>
                 <md-divider class="wz-margin-top-10"></md-divider>
-                <kbn-vis id="Wazuh-App-Overview-AWS-Top-events-by-service" vis-id="'Wazuh-App-Overview-AWS-Top-events-by-service'"></kbn-vis>
+                <kbn-vis id="Wazuh-App-Overview-AWS-Events-by-source" vis-id="'Wazuh-App-Overview-AWS-Events-by-source'"></kbn-vis>
             </md-card-content>
         </md-card>
-        <md-card flex class="wz-md-card">
+        <md-card flex="50" class="wz-md-card">
             <md-card-content class="wazuh-column">
-                <span class="wz-headline-title">Top events by instance ID</span>
+                <span class="wz-headline-title">Events by S3 bucket over time</span>
                 <md-divider class="wz-margin-top-10"></md-divider>
-                <kbn-vis id="Wazuh-App-Overview-AWS-Top-events-by-instance" vis-id="'Wazuh-App-Overview-AWS-Top-events-by-instance'"></kbn-vis>
-            </md-card-content>
-        </md-card>
-        <md-card flex class="wz-md-card">
-            <md-card-content class="wazuh-column">
-                <span class="wz-headline-title">Top events by resource type</span>
-                <md-divider class="wz-margin-top-10"></md-divider>
-                <kbn-vis id="Wazuh-App-Overview-AWS-Top-events-by-resource" vis-id="'Wazuh-App-Overview-AWS-Top-events-by-resource'"></kbn-vis>
-            </md-card-content>
-        </md-card>
-        <md-card flex class="wz-md-card">
-            <md-card-content class="wazuh-column">
-                <span class="wz-headline-title">Top events by region</span>
-                <md-divider class="wz-margin-top-10"></md-divider>
-                <kbn-vis id="Wazuh-App-Overview-AWS-Top-events-by-region" vis-id="'Wazuh-App-Overview-AWS-Top-events-by-region'"></kbn-vis>
-            </md-card-content>
-        </md-card>
-    </div>
-
-    <div layout="row" class="height-400">
-        <md-card flex class="wz-md-card">
-            <md-card-content class="wazuh-column">
-                <span class="wz-headline-title">Geolocation</span>
-                <md-divider class="wz-margin-top-10"></md-divider>
-                <kbn-vis id="Wazuh-App-Overview-AWS-geo" vis-id="'Wazuh-App-Overview-AWS-geo'"></kbn-vis>
+                <kbn-vis id=" Wazuh-App-Overview-AWS-Events-by-s3-bucket" vis-id="'Wazuh-App-Overview-AWS-Events-by-s3-bucket'"></kbn-vis>
             </md-card-content>
         </md-card>
     </div>
