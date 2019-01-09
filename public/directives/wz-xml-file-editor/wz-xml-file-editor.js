@@ -16,7 +16,7 @@ import { uiModules } from 'ui/modules';
 
 const app = uiModules.get('app/wazuh', []);
 
-app.directive('wzXmlFileEditor', function () {
+app.directive('wzXmlFileEditor', function() {
   return {
     restrict: 'E',
     scope: {
@@ -31,9 +31,15 @@ app.directive('wzXmlFileEditor', function () {
         try {
           const parser = new DOMParser(); // eslint-disable-line
           const xml = $scope.xmlCodeBox.getValue();
-          const xmlDoc = parser.parseFromString('<file>' + xml + '</file>', 'text/xml');
+          const xmlDoc = parser.parseFromString(
+            '<file>' + xml + '</file>',
+            'text/xml'
+          );
           $scope.validFn({
-            valid: !!xmlDoc.getElementsByTagName('parsererror').length || !xml || !xml.length
+            valid:
+              !!xmlDoc.getElementsByTagName('parsererror').length ||
+              !xml ||
+              !xml.length
           });
         } catch (error) {
           errorHandler.handle(error, 'Error validating XML');
@@ -84,16 +90,16 @@ app.directive('wzXmlFileEditor', function () {
         } catch (error) {
           errorHandler.handle(error, 'Fetching original file');
         }
-      }
+      };
 
       init();
 
       // Refresh content if it's not the very first time we are loading data
-      $scope.$on('fetchedFile',(ev,params) => {
-        if(!firstTime) {
+      $scope.$on('fetchedFile', (ev, params) => {
+        if (!firstTime) {
           init(params.data);
         }
-      })
+      });
 
       $scope.xmlCodeBox.on('change', () => {
         checkXmlParseError();

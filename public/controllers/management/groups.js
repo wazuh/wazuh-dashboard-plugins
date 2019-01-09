@@ -257,7 +257,7 @@ export function GroupsController(
     $scope.editingFile = true;
     try {
       $scope.fetchedXML = await fetchFile();
-      $scope.$broadcast('fetchedFile',{data:$scope.fetchedXML});
+      $scope.$broadcast('fetchedFile', { data: $scope.fetchedXML });
     } catch (error) {
       $scope.fetchedXML = null;
       errorHandler.handle(error, 'Fetch file error');
