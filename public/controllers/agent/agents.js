@@ -311,36 +311,63 @@ export class AgentsController {
     this.$scope.switchGroupEdit = () => this.switchGroupEdit();
 
     this.$scope.showConfirm = (ev, group) => {
-      const confirm = this.$mdDialog
-        .confirm()
-        .title(`Add group "${group}" to agent "${this.$scope.agent.id}"?`)
-        .targetEvent(ev)
-        .ok('Agree')
-        .cancel('Cancel');
-
-      this.$mdDialog.show(confirm).then(
-        () => {
-          this.groupHandler
-            .addAgentToGroup(group, this.$scope.agent.id)
-            .then(() =>
-              this.apiReq.request('GET', `/agents/${this.$scope.agent.id}`, {})
-            )
-            .then(agent => {
-              this.$scope.agent.group = agent.data.data.group;
-              this.$scope.groups = this.$scope.groups.filter(
-                item => !agent.data.data.group.includes(item)
-              );
-              if (!this.$scope.$$phase) this.$scope.$digest();
-            })
-            .catch(error =>
-              this.errorHandler.handle(
-                error.message || error,
-                'Error adding group to agent'
+      const confirm = this.$mdDialog.confirm({
+        controller: function ($scope, myScope, $mdDialog, groupHandler, apiReq, errorHandler) {
+          $scope.myScope = myScope;
+          $scope.closeDialog = () => {
+            $mdDialog.hide();
+            $('body').removeClass('md-dialog-body');
+          };
+          $scope.confirmDialog = () => {
+            groupHandler
+              .addAgentToGroup(group, $scope.myScope.agent.id)
+              .then(() =>
+                apiReq.request('GET', `/agents/${$scope.myScope.agent.id}`, {})
               )
-            );
+              .then(agent => {                
+                $mdDialog.hide();
+                $('body').removeClass('md-dialog-body');
+                $scope.myScope.agent.group = agent.data.data.group;
+                $scope.myScope.groups = $scope.myScope.groups.filter(
+                  item => !agent.data.data.group.includes(item)
+                );
+                if (!$scope.myScope.$$phase) $scope.myScope.$digest();
+              })
+              .catch(error =>
+                errorHandler.handle(
+                  error.message || error,
+                  'Error adding group to agent'
+                )
+              );
+          }
         },
-        () => {}
-      );
+        template:
+          '<md-dialog class="modalTheme euiToast euiToast--danger euiGlobalToastListItem">' +
+          '<md-dialog-content>' +
+          '<div class="euiToastHeader">' +
+          '<i class="fa fa-exclamation-triangle"></i>' +
+          '<span class="euiToastHeader__title">Add group ' +
+          `${group}` +
+          ' to agent ' +
+          `${this.$scope.agent.id}` +
+          '?</span>' +
+          '</div>' +
+          '</md-dialog-content>' +
+          '<md-dialog-actions>' +
+          '<button class="md-primary md-cancel-button md-button ng-scope md-default-theme md-ink-ripple" type="button" ng-click="closeDialog()">Cancel</button>' +
+          '<button class="md-primary md-confirm-button md-button md-ink-ripple md-default-theme" type="button" ng-click="confirmDialog()">Agree</button>' +
+          '</md-dialog-actions>' +
+          '</md-dialog>',
+        targetEvent: ev,
+        hasBackdrop: false,
+        clickOutsideToClose: true,
+        disableParentScroll: true,
+        locals: {
+          myScope: this.$scope
+        }
+      });
+      $('body').addClass('md-dialog-body');
+      this.$mdDialog.show(confirm);
     };
   }
   /**
@@ -447,12 +474,12 @@ export class AgentsController {
 
     // Update agent status
     try {
-      if((this.$scope || {}).agent || false){
-        const agentInfo = await this.apiReq.request('GET',`/agents/${this.$scope.agent.id}`,{select:'status'});
+      if ((this.$scope || {}).agent || false) {
+        const agentInfo = await this.apiReq.request('GET', `/agents/${this.$scope.agent.id}`, { select: 'status' });
         this.$scope.agent.status = (((agentInfo || {}).data || {}).data || {}).status || this.$scope.agent.status;
       }
-    }catch (error){ } // eslint-disable-line
-     
+    } catch (error) { } // eslint-disable-line
+
     try {
       this.$scope.showSyscheckFiles = false;
       if (tab === 'pci') {
@@ -468,7 +495,7 @@ export class AgentsController {
       if (tab === 'syscollector')
         try {
           await this.loadSyscollector(this.$scope.agent.id);
-        } catch (error) {} // eslint-disable-line
+        } catch (error) { } // eslint-disable-line
       if (tab === 'configuration') {
         const isSync = await this.apiReq.request(
           'GET',
@@ -595,7 +622,7 @@ export class AgentsController {
       this.$scope.syscollector = {
         hardware:
           typeof hardwareResponse === 'object' &&
-          Object.keys(hardwareResponse).length
+            Object.keys(hardwareResponse).length
             ? { ...hardwareResponse }
             : false,
         os:
