@@ -275,6 +275,7 @@ export function GroupsController(
   };
 
   $scope.doSaveGroupAgentConfig = () => {
+    $scope.editingFile = false;
     $scope.$broadcast('saveXmlFile', { group: $scope.currentGroup.name });
   };
 
