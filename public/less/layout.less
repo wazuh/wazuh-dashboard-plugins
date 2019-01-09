@@ -250,7 +250,7 @@ md-dialog.md-transition-out {
 }
 
 .md-dialog-container{
-    padding-bottom: 10vh;
+    //padding-bottom: 10vh;
     z-index: 100!important;
 }
 
@@ -320,10 +320,15 @@ md-dialog.modalTheme {
     transform: none!important;
     bottom: 0;
     right: 0;
-    position: absolute;
+    position: fixed;
     width: 350px;
 }
 
 md-dialog.modalTheme .md-button{
     margin-bottom: 0;
+}
+
+.md-dialog-body{
+    top: 0!important;
+    width: 100vw!important;
 }

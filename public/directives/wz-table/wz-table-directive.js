@@ -285,14 +285,16 @@ app.directive('wzTable', function() {
 
         const confirm = $mdDialog.confirm({
           controller: function($scope, $mdDialog) {
-            $scope.closeDialog = function() {
+            $scope.closeDialog = () => {
               $mdDialog.hide();
+              $('body').removeClass('md-dialog-body');
             };
-            $scope.confirmDialog = function() {
+            $scope.confirmDialog = () => {
               groupHandler
                 .removeAgentFromGroup(group, agent.id)
                 .then(() => {
                   $mdDialog.hide();
+                  $('body').removeClass('md-dialog-body');
                   init();
                 })
                 .then(() => $scope.$emit('updateGroupInformation', { group }))
@@ -323,8 +325,10 @@ app.directive('wzTable', function() {
             '</md-dialog>',
           targetEvent: ev,
           hasBackdrop: false,
+          disableParentScroll: true,
           clickOutsideToClose: true
         });
+        $('body').addClass('md-dialog-body');
         $mdDialog.show(confirm);
       };
     },

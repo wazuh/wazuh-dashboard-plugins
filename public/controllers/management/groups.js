@@ -372,7 +372,7 @@ export function GroupsController(
           mapped
         );
       }
-      if ($scope.availableAgents.data.length === 0 && !searchTerm) {
+      if ($scope.availableAgents.data.length < 10 && !searchTerm) {
         if ($scope.availableAgents.offset >= $scope.totalAgents) {
           $scope.availableAgents.loadedAll = true;
         }
