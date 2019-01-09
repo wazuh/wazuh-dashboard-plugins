@@ -44,7 +44,7 @@ export class GroupHandler {
     try {
       const result = await this.apiReq.request(
         'POST',
-        `/agents/groups/${group}/configuration`,
+        `/agents/groups/${group}/files/agent.conf`,
         { content, origin: 'xmleditor' }
       );
       return result;
