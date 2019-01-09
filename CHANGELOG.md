@@ -48,6 +48,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fix Dev-tools behavior when parse json invalid blocks ([#1102](https://github.com/wazuh/wazuh-kibana-app/pull/1102)).
 - Fixed Management > Monitoring tab frustration adding back buttons ([#1102](https://github.com/wazuh/wazuh-kibana-app/pull/1102)).
 - Fix template checking when using more than one pattern ([#1104](https://github.com/wazuh/wazuh-kibana-app/pull/1104)).
+- Fix infinite loop for Wazuh monitoring when the Wazuh API is not being able to give us all the agents ([5a26916](https://github.com/wazuh/wazuh-kibana-app/commit/5a2691642b40a34783d2eafb6ee24ae78b9af21a)).
 
 ## Wazuh v3.7.1 / v3.7.2 - Kibana v6.5.1 / v6.5.2 / v6.5.3 / v6.5.4 - Revision 415
 
