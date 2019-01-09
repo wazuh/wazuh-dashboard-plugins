@@ -54,8 +54,9 @@ app.directive('wzXmlFileEditor', function() {
         try {
           const content = $scope.xmlCodeBox.getValue().trim();
           await groupHandler.sendConfiguration(params.group, content);
+          errorHandler.info('Success. Group has been updated', '');
         } catch (error) {
-          errorHandler.handle(error, 'Send file error DEBUG 1');
+          errorHandler.handle(error, 'Send file error');
         }
         return;
       };
