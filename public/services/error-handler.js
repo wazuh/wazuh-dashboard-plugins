@@ -25,7 +25,7 @@ export class ErrorHandler {
     if ((error || {}).status === -1) {
       const isFromAPI = ((error || {}).config || {}).url === '/api/request';
       return isFromAPI
-        ? 'Wazuh API don\'t reachable. Reason: timeout.'
+        ? "Wazuh API don't reachable. Reason: timeout."
         : 'Server did not respond';
     }
     if ((((error || {}).data || {}).errorData || {}).message)

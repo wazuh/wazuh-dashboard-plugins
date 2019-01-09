@@ -312,7 +312,14 @@ export class AgentsController {
 
     this.$scope.showConfirm = (ev, group) => {
       const confirm = this.$mdDialog.confirm({
-        controller: function ($scope, myScope, $mdDialog, groupHandler, apiReq, errorHandler) {
+        controller: function(
+          $scope,
+          myScope,
+          $mdDialog,
+          groupHandler,
+          apiReq,
+          errorHandler
+        ) {
           $scope.myScope = myScope;
           $scope.closeDialog = () => {
             $mdDialog.hide();
@@ -324,7 +331,7 @@ export class AgentsController {
               .then(() =>
                 apiReq.request('GET', `/agents/${$scope.myScope.agent.id}`, {})
               )
-              .then(agent => {                
+              .then(agent => {
                 $mdDialog.hide();
                 $('body').removeClass('md-dialog-body');
                 $scope.myScope.agent.group = agent.data.data.group;
@@ -339,7 +346,7 @@ export class AgentsController {
                   'Error adding group to agent'
                 )
               );
-          }
+          };
         },
         template:
           '<md-dialog class="modalTheme euiToast euiToast--danger euiGlobalToastListItem">' +
@@ -475,10 +482,16 @@ export class AgentsController {
     // Update agent status
     try {
       if ((this.$scope || {}).agent || false) {
-        const agentInfo = await this.apiReq.request('GET', `/agents/${this.$scope.agent.id}`, { select: 'status' });
-        this.$scope.agent.status = (((agentInfo || {}).data || {}).data || {}).status || this.$scope.agent.status;
+        const agentInfo = await this.apiReq.request(
+          'GET',
+          `/agents/${this.$scope.agent.id}`,
+          { select: 'status' }
+        );
+        this.$scope.agent.status =
+          (((agentInfo || {}).data || {}).data || {}).status ||
+          this.$scope.agent.status;
       }
-    } catch (error) { } // eslint-disable-line
+    } catch (error) {} // eslint-disable-line
 
     try {
       this.$scope.showSyscheckFiles = false;
@@ -495,7 +508,7 @@ export class AgentsController {
       if (tab === 'syscollector')
         try {
           await this.loadSyscollector(this.$scope.agent.id);
-        } catch (error) { } // eslint-disable-line
+        } catch (error) {} // eslint-disable-line
       if (tab === 'configuration') {
         const isSync = await this.apiReq.request(
           'GET',
@@ -622,7 +635,7 @@ export class AgentsController {
       this.$scope.syscollector = {
         hardware:
           typeof hardwareResponse === 'object' &&
-            Object.keys(hardwareResponse).length
+          Object.keys(hardwareResponse).length
             ? { ...hardwareResponse }
             : false,
         os:
