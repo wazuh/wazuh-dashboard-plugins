@@ -16,7 +16,7 @@ import { uiModules } from 'ui/modules';
 
 const app = uiModules.get('app/wazuh', []);
 
-app.directive('wzXmlFileEditor', function() {
+app.directive('wzXmlFileEditor', function () {
   return {
     restrict: 'E',
     scope: {
@@ -30,7 +30,7 @@ app.directive('wzXmlFileEditor', function() {
         try {
           const parser = new DOMParser(); // eslint-disable-line
           const xml = $scope.xmlCodeBox.getValue();
-          const xmlDoc = parser.parseFromString(xml, 'text/xml');
+          const xmlDoc = parser.parseFromString('<file>' + xml + '</file>', 'text/xml');
           $scope.validFn({
             valid: !!xmlDoc.getElementsByTagName('parsererror').length
           });
