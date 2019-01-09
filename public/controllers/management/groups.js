@@ -24,6 +24,7 @@ export function GroupsController(
   wzTableFilter
 ) {
   $scope.$on('groupsIsReloaded', () => {
+    $scope.editingFile = false;
     $scope.currentGroup = false;
     $scope.lookingGroup = false;
     if (!$scope.$$phase) $scope.$digest();
