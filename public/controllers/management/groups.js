@@ -270,6 +270,7 @@ export function GroupsController(
 
   $scope.xmlIsValid = valid => {
     $scope.xmlHasErrors = valid;
+    if (!$scope.$$phase) $scope.$digest();
   };
 
   $scope.doSaveGroupAgentConfig = () => {
