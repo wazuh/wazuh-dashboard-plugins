@@ -27,7 +27,8 @@ export function buildOptionsObject(api) {
 export async function fetchAllAgents(api, maxSize, payload, options) {
   try {
     let agents = [];
-    while (agents.length < maxSize) {
+    // Prevents infinite loop if offset gets higher than maxSize
+    while ((agents.length < maxSize) && (payload.offset < maxSize)) {
       const response = await needle(
         'get',
         `${getPath(api)}/agents`,
