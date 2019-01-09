@@ -478,7 +478,7 @@ export function GroupsController(
       }
       $scope.addMultipleAgents(false);
       $scope.multipleSelectorLoading = false;
-      await this.updateGroupInformation(null, {
+      await updateGroupInformation(null, {
         group: $scope.currentGroup.name
       });
     } catch (err) {
