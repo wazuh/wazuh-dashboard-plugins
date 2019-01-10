@@ -156,12 +156,16 @@ export class AgentsPreviewController {
       this.searchBarModel = {
         status: ['Active', 'Disconnected', 'Never connected'],
         group: unique.groups,
-        node_name: unique.nodes,
         version: unique.versions,
         'os.platform': unique.osPlatforms.map(x => x.platform),
         'os.version': unique.osPlatforms.map(x => x.version),
         'os.name': unique.osPlatforms.map(x => x.name)
       };
+
+      if(clusterInfo.status === 'enabled' && unique.nodes) {
+        this.searchBarModel.node_name = unique.nodes;
+      }
+      
       this.searchBarModel['os.name'] = Array.from(
         new Set(this.searchBarModel['os.name'])
       );
