@@ -1,4 +1,4 @@
-<div flex layout="column" class="mozilla-table-size-85" ng-controller="groupsPreviewController" ng-if="mctrl.tab == 'groups'">
+<div flex layout="column" class="mozilla-table-size-85" ng-class="{'cursor-wait': multipleSelectorLoading}" ng-controller="groupsPreviewController" ng-if="mctrl.tab == 'groups'">
     <md-content flex layout="column" class="overflow-hidden" ng-init="lookingGroup=false">
 
         <!-- Loading ring -->
@@ -186,7 +186,7 @@
                     <span ng-show='!multipleSelectorLoading' class="wzMultipleSelectorCounter"><span style='color:green'>+{{currentAdding}}</span>&nbsp;<span
                             style='color:red'>-{{currentDeleting}}</span></span>
                     <wz-multiple-selector class='wzMultipleSelector' available-items="availableAgents.data"
-                        selected-items="selectedAgents.data" loading="multipleSelectorLoading" title-available-items="Available agents"
+                        selected-items="selectedAgents.data" title-available-items="Available agents"
                         title-selected-items="Current agents in the group" total-selected-items="totalSelectedAgents"
                         reload-scroll='reload(element, searchTerm, 499, start)' limit="checkLimit()">
                     </wz-multiple-selector>

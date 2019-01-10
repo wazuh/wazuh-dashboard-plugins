@@ -290,7 +290,7 @@ export function GroupsController(
           $scope.availableAgents.offset += addOffset + 1;
         }
         try {
-          await $scope.loadAllAgents(searchTerm, start);
+          await loadAllAgents(searchTerm, start);
         } catch (error) {
           errorHandler.handle(error, 'Error fetching all available agents');
         }
@@ -302,9 +302,9 @@ export function GroupsController(
         await $scope.loadSelectedAgents(searchTerm);
       }
     }
-    $timeout(() => {
-      $scope.multipleSelectorLoading = false;
-    }, 100);
+
+    $scope.multipleSelectorLoading = false;
+    if (!$scope.$$phase) $scope.$digest();
   };
 
   $scope.loadSelectedAgents = async searchTerm => {
@@ -344,19 +344,23 @@ export function GroupsController(
     $scope.selectedAgents.loaded = true;
   };
 
-  $scope.loadAllAgents = async (searchTerm, start) => {
+  const loadAllAgents = async (searchTerm, start) => {
     try {
       const params = {
-        q: 'id!=000',
+        limit: 500,
         offset: !searchTerm ? $scope.availableAgents.offset : 0,
         select: ['id', 'name']
       };
+
       if (searchTerm) {
         params.search = searchTerm;
         $scope.availableAgents.offset = 0;
       }
+
       const req = await apiReq.request('GET', '/agents/', params);
+
       $scope.totalAgents = req.data.data.totalItems;
+
       const mapped = req.data.data.items
         .filter(item => {
           return (
@@ -368,6 +372,7 @@ export function GroupsController(
         .map(item => {
           return { key: item.id, value: item.name };
         });
+
       if (searchTerm || start) {
         $scope.availableAgents.data = mapped;
       } else {
@@ -375,13 +380,14 @@ export function GroupsController(
           mapped
         );
       }
+
       if ($scope.availableAgents.data.length < 10 && !searchTerm) {
         if ($scope.availableAgents.offset >= $scope.totalAgents) {
           $scope.availableAgents.loadedAll = true;
         }
         if (!$scope.availableAgents.loadedAll) {
           $scope.availableAgents.offset += 499;
-          await $scope.loadAllAgents();
+          await loadAllAgents();
         }
       }
     } catch (error) {
@@ -411,7 +417,7 @@ export function GroupsController(
           $scope.selectedAgents.offset += 499;
         }
         $scope.firstSelectedList = [...$scope.selectedAgents.data];
-        await $scope.loadAllAgents();
+        await loadAllAgents();
         $scope.multipleSelectorLoading = false;
       }
     } catch (error) {
@@ -421,7 +427,7 @@ export function GroupsController(
     return;
   };
 
-  $scope.getItemsToSave = () => {
+  const getItemsToSave = () => {
     const original = $scope.firstSelectedList;
     const modified = $scope.selectedAgents.data;
     $scope.deletedAgents = [];
@@ -438,14 +444,14 @@ export function GroupsController(
       }
     });
 
-    return {
-      addedIds: [...new Set($scope.addedAgents.map(x => x.key))],
-      deletedIds: [...new Set($scope.deletedAgents.map(x => x.key))]
-    };
+    const addedIds = [...new Set($scope.addedAgents.map(x => x.key))];
+    const deletedIds = [...new Set($scope.deletedAgents.map(x => x.key))];
+
+    return { addedIds, deletedIds };
   };
 
   $scope.saveAddAgents = async () => {
-    const itemsToSave = $scope.getItemsToSave();
+    const itemsToSave = getItemsToSave();
     const failedIds = [];
 
     try {
@@ -495,7 +501,7 @@ export function GroupsController(
 
   $scope.checkLimit = () => {
     if ($scope.firstSelectedList) {
-      const itemsToSave = $scope.getItemsToSave();
+      const itemsToSave = getItemsToSave();
       $scope.currentAdding = itemsToSave.addedIds.length;
       $scope.currentDeleting = itemsToSave.deletedIds.length;
       $scope.moreThan1000 =

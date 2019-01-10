@@ -24,12 +24,12 @@
             </div>
         </div>
         <div class='wzMultipleSelectorButtons'>
-            <button ng-disabled='availableItems.length === 0' type='button' class='btn btn-primary' tooltip='Add all items'
+            <button ng-disabled='availableItems.length === 0 || availableItems.length > 500' type='button' class='btn btn-primary' tooltip='Add all items'
                 tooltip-placement='top' ng-click='moveAll(availableItems, selectedItems, "a");
                 availableItem=null;availableFilter="" ;doReload("left", availableFilter, true)'>
                 <span><i class='fa fa-forward'></i></span>
             </button>
-            <button ng-disabled='!availableItem' type='button' class='btn btn-primary' tooltip='Add selected items'
+            <button ng-disabled='!availableItem || availableItem.length > 500' type='button' class='btn btn-primary' tooltip='Add selected items'
                 tooltip-placement='top' ng-click='moveItem(availableItem, availableItems, selectedItems, "a");availableItem=null;availableFilter=""'>
                 <span><i class='fa fa-arrow-right'></i></span>
             </button>
