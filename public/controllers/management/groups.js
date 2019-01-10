@@ -504,8 +504,8 @@ export function GroupsController(
       const itemsToSave = getItemsToSave();
       $scope.currentAdding = itemsToSave.addedIds.length;
       $scope.currentDeleting = itemsToSave.deletedIds.length;
-      $scope.moreThan1000 =
-        $scope.currentAdding > 1000 || $scope.currentDeleting > 1000;
+      $scope.moreThan500 =
+        $scope.currentAdding > 500 || $scope.currentDeleting > 500;
     }
   };
 
