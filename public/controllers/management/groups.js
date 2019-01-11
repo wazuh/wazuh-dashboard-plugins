@@ -199,6 +199,7 @@ export function GroupsController(
   $scope.goBackFiles = () => {
     $scope.groupsSelectedTab = 'files';
     $scope.addingAgents = false;
+    $scope.editingFile = false;
     $scope.file = false;
     $scope.filename = false;
     $scope.fileViewer = false;
