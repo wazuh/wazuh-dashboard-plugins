@@ -35,69 +35,7 @@
             </md-card-content>
         </md-card>
     </div>
-
-    <div layout="row" class="layout-padding wz-padding-bottom-0" ng-if="agent && agent.status === 'Active' && hasSize(syscollector)">
-        <md-card flex class="wz-md-card">
-            <md-card-content class="wz-text-center" ng-if="syscollector.netiface && !syscollector.netiface.items.length">
-                <i class="fa fa-fw fa-info-circle" aria-hidden="true"></i> <span class="wz-headline-title">No interfaces scan available</span>
-             </md-card-content>
-            <md-card-content ng-if="syscollector.netiface && syscollector.netiface.items.length">
-                <span class="wz-headline-title"><i class="fa fa-fw fa-sitemap"></i> Network interfaces</span>
-                <span class="color-grey pull-right">Last scan: {{syscollector.netiface.items[0].scan.time}}</span>
-                <md-divider class="wz-margin-top-10"></md-divider>
-
-                <table class="table table-striped table-condensed table-layout-fixed">
-                    <thead class="wz-text-bold">
-                        <th class="wz-text-left">Name</th>
-                        <th class="wz-text-left">Mac</th>
-                        <th class="wz-text-left">State</th>
-                        <th class="wz-text-left">MTU</th>
-                        <th class="wz-text-left">Type</th>
-                    </thead>
-                    <tbody>
-                        <tr class="wz-word-wrap" ng-repeat="interface in syscollector.netiface.items">
-                            <td>{{interface.name}}</td>
-                            <td>{{interface.mac}}</td>
-                            <td>
-                                <svg ng-if="interface.state !== 'up'" class="euiIcon euiIcon--medium euiIcon--warning" focusable="false" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="16" height="16" viewBox="0 0 16 16"><defs><circle id="dot-a" cx="8" cy="8" r="4"></circle></defs><use xlink:href="#dot-a"></use></svg>
-                                <svg ng-if="interface.state === 'up'" class="euiIcon euiIcon--medium euiIcon--success" focusable="false" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="16" height="16" viewBox="0 0 16 16"><defs><circle id="dot-a" cx="8" cy="8" r="4"></circle></defs><use xlink:href="#dot-a"></use></svg>
-                                 {{interface.state}}
-                            </td>
-                            <td>{{interface.mtu}}</td>
-                            <td>{{interface.type}}</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </md-card-content>
-        </md-card>
-        <md-card flex class="wz-md-card">
-            <md-card-content class="wz-text-center wz-margin-bottom-40-inv" ng-if="syscollector.ports && !syscollector.ports.items.length">
-                <i class="fa fa-fw fa-info-circle" aria-hidden="true"></i> <span class="wz-headline-title">No ports scan available</span>
-            </md-card-content>
-            <md-card-content class="wz-margin-bottom-40-inv" ng-if="syscollector.ports && syscollector.ports.items.length">
-                <span class="wz-headline-title"><i class="fa fa-fw fa-exchange"></i> Network ports</span>
-                <span class="color-grey pull-right">Last scan: {{syscollector.ports.items[0].scan.time}}</span>
-                <md-divider class="wz-margin-top-10"></md-divider>
-                <wz-table flex path="'/syscollector/' + agent.id + '/ports'" row-sizes="[4]" keys="[{value:'local.ip',nosortable:true}, {value:'local.port',nosortable:true},{value:'remote.ip',nosortable:true},{value:'remote.port',nosortable:true},'state','protocol']">
-                </wz-table>
-            </md-card-content>
-        </md-card>
-    </div>
-
-    <div layout="row" class="layout-padding wz-padding-bottom-0" ng-if="agent && agent.status === 'Active' && hasSize(syscollector)">
-        <md-card flex class="wz-md-card">
-            <md-card-content class="wz-text-center" ng-if="syscollector.netaddr && !syscollector.netaddr.items.length">
-                <i class="fa fa-fw fa-info-circle" aria-hidden="true"></i> <span class="wz-headline-title">No network addresses scan available</span>
-             </md-card-content>
-            <md-card-content class="wz-margin-bottom-40-inv" ng-if="syscollector.netaddr && syscollector.netaddr.items.length">
-                <span class="wz-headline-title"><i class="fa fa-fw fa-exchange"></i> Network addresses</span>
-                <md-divider class="wz-margin-top-10"></md-divider>
-                <wz-table flex path="'/syscollector/' + agent.id + '/netaddr'" row-sizes="[4]" keys="['iface', 'address', 'netmask', 'proto', 'broadcast']">
-                </wz-table>
-            </md-card-content>
-        </md-card>
-    </div>
-
+   
     <div layout="row" class="layout-padding wz-padding-top-0" ng-if="agent && agent.status === 'Active' && hasSize(syscollector)">
         <md-card flex class="wz-md-card">
             <md-card-content>
@@ -161,6 +99,68 @@
                         keys="['name','euser','nice','state']"
                         />
                 </div>
+            </md-card-content>
+        </md-card>
+    </div>
+
+    <div layout="row" class="layout-padding wz-padding-bottom-0" ng-if="agent && agent.status === 'Active' && hasSize(syscollector)">
+        <md-card flex class="wz-md-card">
+            <md-card-content class="wz-text-center" ng-if="syscollector.netiface && !syscollector.netiface.items.length">
+                <i class="fa fa-fw fa-info-circle" aria-hidden="true"></i> <span class="wz-headline-title">No interfaces scan available</span>
+             </md-card-content>
+            <md-card-content ng-if="syscollector.netiface && syscollector.netiface.items.length">
+                <span class="wz-headline-title"><i class="fa fa-fw fa-sitemap"></i> Network interfaces</span>
+                <span class="color-grey pull-right">Last scan: {{syscollector.netiface.items[0].scan.time}}</span>
+                <md-divider class="wz-margin-top-10"></md-divider>
+
+                <table class="table table-striped table-condensed table-layout-fixed">
+                    <thead class="wz-text-bold">
+                        <th class="wz-text-left">Name</th>
+                        <th class="wz-text-left">Mac</th>
+                        <th class="wz-text-left">State</th>
+                        <th class="wz-text-left">MTU</th>
+                        <th class="wz-text-left">Type</th>
+                    </thead>
+                    <tbody>
+                        <tr class="wz-word-wrap" ng-repeat="interface in syscollector.netiface.items">
+                            <td>{{interface.name}}</td>
+                            <td>{{interface.mac}}</td>
+                            <td>
+                                <svg ng-if="interface.state !== 'up'" class="euiIcon euiIcon--medium euiIcon--warning" focusable="false" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="16" height="16" viewBox="0 0 16 16"><defs><circle id="dot-a" cx="8" cy="8" r="4"></circle></defs><use xlink:href="#dot-a"></use></svg>
+                                <svg ng-if="interface.state === 'up'" class="euiIcon euiIcon--medium euiIcon--success" focusable="false" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="16" height="16" viewBox="0 0 16 16"><defs><circle id="dot-a" cx="8" cy="8" r="4"></circle></defs><use xlink:href="#dot-a"></use></svg>
+                                 {{interface.state}}
+                            </td>
+                            <td>{{interface.mtu}}</td>
+                            <td>{{interface.type}}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </md-card-content>
+        </md-card>
+        <md-card flex class="wz-md-card">
+            <md-card-content class="wz-text-center wz-margin-bottom-40-inv" ng-if="syscollector.ports && !syscollector.ports.items.length">
+                <i class="fa fa-fw fa-info-circle" aria-hidden="true"></i> <span class="wz-headline-title">No ports scan available</span>
+            </md-card-content>
+            <md-card-content class="wz-margin-bottom-40-inv" ng-if="syscollector.ports && syscollector.ports.items.length">
+                <span class="wz-headline-title"><i class="fa fa-fw fa-exchange"></i> Network ports</span>
+                <span class="color-grey pull-right">Last scan: {{syscollector.ports.items[0].scan.time}}</span>
+                <md-divider class="wz-margin-top-10"></md-divider>
+                <wz-table flex path="'/syscollector/' + agent.id + '/ports'" row-sizes="[4]" keys="[{value:'local.ip',nosortable:true}, {value:'local.port',nosortable:true},{value:'remote.ip',nosortable:true},{value:'remote.port',nosortable:true},'state','protocol']">
+                </wz-table>
+            </md-card-content>
+        </md-card>
+    </div>
+
+    <div layout="row" class="layout-padding wz-padding-bottom-0" ng-if="agent && agent.status === 'Active' && hasSize(syscollector)">
+        <md-card flex class="wz-md-card">
+            <md-card-content class="wz-text-center" ng-if="syscollector.netaddr && !syscollector.netaddr.items.length">
+                <i class="fa fa-fw fa-info-circle" aria-hidden="true"></i> <span class="wz-headline-title">No network addresses scan available</span>
+             </md-card-content>
+            <md-card-content class="wz-margin-bottom-40-inv" ng-if="syscollector.netaddr && syscollector.netaddr.items.length">
+                <span class="wz-headline-title"><i class="fa fa-fw fa-exchange"></i> Network addresses</span>
+                <md-divider class="wz-margin-top-10"></md-divider>
+                <wz-table flex path="'/syscollector/' + agent.id + '/netaddr'" row-sizes="[4]" keys="['iface', 'address', 'netmask', 'proto', 'broadcast']">
+                </wz-table>
             </md-card-content>
         </md-card>
     </div>
