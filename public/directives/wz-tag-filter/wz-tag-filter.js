@@ -343,6 +343,7 @@ app.directive('wzTagFilter', function() {
           }
         }
       });
+      $('#wz-search-filter-bar-input').attr('autocomplete', 'off');
       load();
     },
     template
