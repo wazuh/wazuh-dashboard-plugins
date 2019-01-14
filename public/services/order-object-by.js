@@ -1,6 +1,6 @@
 /*
  * Wazuh app - Order object by filter module
- * Copyright (C) 2018 Wazuh, Inc.
+ * Copyright (C) 2015-2019 Wazuh, Inc.
  *
  * Copyright (C) 2015 Fabricio Quagliariello.
  * Source code available under the MIT License.
