@@ -36,6 +36,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Refreshing index pattern known fields on health check controller ([#1119](https://github.com/wazuh/wazuh-kibana-app/pull/1119)).
 - Less strict memory check ([786c764](https://github.com/wazuh/wazuh-kibana-app/commit/786c7642cd88083f9a77c57ed204488ecf5b710a)).
 - Checking message origin in error handler ([dfec368](https://github.com/wazuh/wazuh-kibana-app/commit/dfec368d22a148b2e4437db92d71294900241961)).
+- Dev tools is now showing the response as it is, like `curl` does ([#1137](https://github.com/wazuh/wazuh-kibana-app/pull/1137)) 
 
 ### Fixed
 
