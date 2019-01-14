@@ -523,12 +523,11 @@ export class WazuhApiCtrl {
     try {
       const api = await this.wzWrapper.getWazuhConfigurationById(id);
 
-      let devtools = false;
-      if(data.devTools){
+      const devTools = !!(data || {}).devTools;
+      if (devTools) {
         delete data.devTools;
-        devtools = true;
       }
-      
+
       if (api.error_code > 1) {
         //Can not connect to elasticsearch
         return ErrorResponse(
@@ -561,26 +560,16 @@ export class WazuhApiCtrl {
       const response = await needle(method, fullUrl, data, options);
 
       if (
-        response &&
-        response.body &&
-        !response.body.error &&
-        response.body.data
+        !((response || {}).body || {}).error &&
+        ((response || {}).body || {}).data
       ) {
         cleanKeys(response);
         return reply(response.body);
       }
 
-      if (
-        response &&
-        response.body &&
-        response.body.error &&
-        devtools
-      ) {
+      if (((response || {}).body || {}).error && devTools) {
         return reply(response.body);
       }
-
-      
-
 
       throw ((response || {}).body || {}).error &&
       ((response || {}).body || {}).message
@@ -595,8 +584,6 @@ export class WazuhApiCtrl {
       );
     }
   }
-
-
 
   /**
    * This performs a generic request and returs its response
@@ -689,7 +676,6 @@ export class WazuhApiCtrl {
             reply
           );
         }
-        
       }
       return this.makeRequest(
         req.payload.method,
