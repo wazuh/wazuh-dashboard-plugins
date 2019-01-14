@@ -511,7 +511,7 @@ export class WazuhApiCtrl {
   }
 
   /**
-   * This performs a request over Wazuh API and returs its response
+   * This performs a request over Wazuh API and returns its response
    * @param {String} method Method: GET, PUT, POST, DELETE
    * @param {String} path API route
    * @param {Object} data data and params to perform the request
@@ -570,7 +570,75 @@ export class WazuhApiCtrl {
         : new Error('Unexpected error fetching data from the Wazuh API');
     } catch (error) {
       return ErrorResponse(
-        error.message || error,
+        error,
+        `Wazuh API error: ${error.code}` || 3013,
+        500,
+        reply
+      );
+    }
+  }
+
+
+
+  async makeDevToolsRequest(method, path, data, id, reply) {
+    try {
+      const api = await this.wzWrapper.getWazuhConfigurationById(id);
+      if (api.error_code > 1) {
+        //Can not connect to elasticsearch
+        return ErrorResponse(
+          'Could not connect with elasticsearch',
+          3011,
+          404,
+          reply
+        );
+      } else if (api.error_code > 0) {
+        //Credentials not found
+        return ErrorResponse('Credentials does not exists', 3012, 404, reply);
+      }
+
+      if (!data) {
+        data = {};
+      }
+
+      const options = ApiHelper.buildOptionsObject(api);
+
+      // Set content type application/xml if needed
+      if (
+        typeof (data || {}).content === 'string' &&
+        (data || {}).origin === 'xmleditor'
+      ) {
+        options.content_type = 'application/xml';
+        data = data.content.replace(new RegExp('\\n', 'g'), '');
+      }
+
+      const fullUrl = getPath(api) + path;
+      const response = await needle(method, fullUrl, data, options);
+
+      if (
+        response &&
+        response.body &&
+        !response.body.error &&
+        response.body.data
+      ) {
+        cleanKeys(response);
+        return reply(response.body);
+      }
+      
+      if (
+        response &&
+        response.body &&
+        response.body.error
+      ) {
+        return reply(response.body);
+      }
+
+      throw ((response || {}).body || {}).error &&
+      ((response || {}).body || {}).message
+        ? { message: response.body.message, code: response.body.error }
+        : new Error('Unexpected error fetching data from the Wazuh API');
+    } catch (error) {
+      return ErrorResponse(
+        error,
         `Wazuh API error: ${error.code}` || 3013,
         500,
         reply
@@ -669,6 +737,13 @@ export class WazuhApiCtrl {
             reply
           );
         }
+        return this.makeDevToolsRequest(
+          req.payload.method,
+          req.payload.path,
+          req.payload.body,
+          req.payload.id,
+          reply
+        );
       }
       return this.makeRequest(
         req.payload.method,
