@@ -519,16 +519,16 @@ export class DevToolsController {
         if (typeof JSONraw === 'object') JSONraw.devTools = true;
         const output = await this.apiReq.request(method, path, JSONraw);
 
-        this.apiOutputBox.setValue(JSON.stringify(output.data.data, null, 2));
+        this.apiOutputBox.setValue(JSON.stringify(output.data, null, 2));
       } else {
         this.apiOutputBox.setValue('Welcome!');
       }
     } catch (error) {
       const parsedError = this.errorHandler.handle(error, null, null, true);
       if (typeof parsedError === 'string') {
-        return this.apiOutputBox.setValue(parsedError);
+        return this.apiOutputBox.setValue(error);
       } else if (error && error.data && typeof error.data === 'object') {
-        return this.apiOutputBox.setValue(JSON.stringify(error.data));
+        return this.apiOutputBox.setValue(JSON.stringify(error));
       } else {
         return this.apiOutputBox.setValue('Empty');
       }

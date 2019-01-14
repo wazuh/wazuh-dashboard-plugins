@@ -511,7 +511,7 @@ export class WazuhApiCtrl {
   }
 
   /**
-   * This performs a request over Wazuh API and returs its response
+   * This performs a request over Wazuh API and returns its response
    * @param {String} method Method: GET, PUT, POST, DELETE
    * @param {String} path API route
    * @param {Object} data data and params to perform the request
@@ -522,6 +522,11 @@ export class WazuhApiCtrl {
   async makeRequest(method, path, data, id, reply) {
     try {
       const api = await this.wzWrapper.getWazuhConfigurationById(id);
+
+      const devTools = !!(data || {}).devTools;
+      if (devTools) {
+        delete data.devTools;
+      }
 
       if (api.error_code > 1) {
         //Can not connect to elasticsearch
@@ -555,12 +560,14 @@ export class WazuhApiCtrl {
       const response = await needle(method, fullUrl, data, options);
 
       if (
-        response &&
-        response.body &&
-        !response.body.error &&
-        response.body.data
+        !((response || {}).body || {}).error &&
+        ((response || {}).body || {}).data
       ) {
         cleanKeys(response);
+        return reply(response.body);
+      }
+
+      if (((response || {}).body || {}).error && devTools) {
         return reply(response.body);
       }
 
@@ -655,7 +662,7 @@ export class WazuhApiCtrl {
         );
       }
       if (req.payload.body.devTools) {
-        delete req.payload.body.devTools;
+        //delete req.payload.body.devTools;
         const keyRegex = new RegExp(/.*agents\/\d*\/key.*/);
         if (
           typeof req.payload.path === 'string' &&
