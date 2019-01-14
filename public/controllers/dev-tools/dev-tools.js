@@ -517,9 +517,7 @@ export class DevToolsController {
         const path = req.includes('?') ? req.split('?')[0] : req;
 
         if (typeof JSONraw === 'object') JSONraw.devTools = true;
-        console.log("a")
         const output = await this.apiReq.request(method, path, JSONraw);
-        console.log(output)
 
         this.apiOutputBox.setValue(JSON.stringify(output.data, null, 2));
       } else {
