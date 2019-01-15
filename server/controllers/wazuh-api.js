@@ -738,7 +738,7 @@ export class WazuhApiCtrl {
       if (!path_tmp) throw new Error('An error occurred parsing path field');
 
       // Real limit, regardless the user query
-      const params = { limit: 1000 };
+      const params = { limit: 500 };
 
       if (filters.length) {
         for (const filter of filters) {
