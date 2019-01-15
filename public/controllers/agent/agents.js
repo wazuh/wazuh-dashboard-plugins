@@ -596,9 +596,7 @@ export class AgentsController {
       const data = await Promise.all([
         this.apiReq.request('GET', `/syscollector/${id}/hardware`, {}),
         this.apiReq.request('GET', `/syscollector/${id}/os`, {}),
-        this.apiReq.request('GET', `/syscollector/${id}/netiface`, {}),
         this.apiReq.request('GET', `/syscollector/${id}/ports`, { limit: 1 }),
-        this.apiReq.request('GET', `/syscollector/${id}/netaddr`, { limit: 1 }),
         this.apiReq.request('GET', `/syscollector/${id}/packages`, {
           limit: 1,
           select: 'scan_time'
@@ -614,12 +612,33 @@ export class AgentsController {
       const [
         hardwareResponse,
         osResponse,
-        netifaceResponse,
         portsResponse,
-        netaddrResponse,
         packagesDateResponse,
         processesDateResponse
       ] = result;
+
+      // This API call may fail so we put it out of Promise.all
+      let netifaceResponse = false;
+      try {
+        const resultNetiface = await this.apiReq.request(
+          'GET',
+          `/syscollector/${id}/netiface`,
+          {}
+        );
+        netifaceResponse = ((resultNetiface || {}).data || {}).data || false;
+      } catch (error) {} // eslint-disable-line
+
+      // This API call may fail so we put it out of Promise.all
+      let netaddrResponse = false;
+      try {
+        const resultNetaddrResponse = this.apiReq.request(
+          'GET',
+          `/syscollector/${id}/netaddr`,
+          { limit: 1 }
+        );
+        netaddrResponse =
+          ((resultNetaddrResponse || {}).data || {}).data || false;
+      } catch (error) {} // eslint-disable-line
 
       // Before proceeding, syscollector data is an empty object
       this.$scope.syscollector = {};
