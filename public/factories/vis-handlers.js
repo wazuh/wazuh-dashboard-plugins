@@ -44,13 +44,13 @@ export class VisHandlers {
 
     if (syscollector) {
       Object.assign(appliedFilters, {
-        filters: syscollector.syscollectorFilters,
+        filters: syscollector,
         time: {
           from: 'now-1d/d',
           to: 'now'
         },
         searchBar: false,
-        tables: syscollector.syscollectorTables
+        tables: []
       });
       return appliedFilters;
     }

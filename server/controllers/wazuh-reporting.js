@@ -29,6 +29,7 @@ import PdfTable from '../reporting/generic-table';
 import { WazuhApiCtrl } from './wazuh-api';
 import clockIconRaw from '../reporting/clock-icon-raw';
 import filterIconRaw from '../reporting/filter-icon-raw';
+import ProcessEquivalence from '../../util/process-state-equivalence';
 
 import {
   AgentsVisualizations,
@@ -1402,6 +1403,117 @@ export class WazuhReportingCtrl {
 
         const isSycollector = tab === 'syscollector';
 
+        let tables = [];
+        if (isSycollector) {
+          let agentId = '';
+          let agentOs = '';
+          try {
+            const agent = await this.apiRequest.makeGenericRequest(
+              'GET',
+              `/agents/${req.payload.filters[1].meta.value}`,
+              {},
+              apiId
+            );
+            agentId = agent.id ? agent.id : req.payload.filters[1].meta.value;
+            agentOs = agent.os.platform ? agent.os.platform : '';
+          } catch (err) { } //eslint-disable-line
+          try {
+            const packages = await this.apiRequest.makeGenericRequest(
+              'GET',
+              `/syscollector/${agentId}/packages`,
+              {},
+              apiId
+            );
+            if (packages && packages.data && packages.data.items) {
+              tables.push(
+                {
+                  title: 'Packages',
+                  columns: agentOs === 'windows' ?
+                    ['Name', 'Architecture', 'Version', 'Vendor'] :
+                    ['Name', 'Architecture', 'Version', 'Vendor', 'Description'],
+                  rows: packages.data.items.map((x) => {
+                    return agentOs === 'windows' ?
+                      [x['name'], x['architecture'], x['version'], x['vendor']] :
+                      [x['name'], x['architecture'], x['version'], x['vendor'], x['description']]
+                  })
+                });
+            }
+          } catch (err) { } //eslint-disable-line
+          try {
+            const processes = await this.apiRequest.makeGenericRequest(
+              'GET',
+              `/syscollector/${agentId}/processes`,
+              {},
+              apiId
+            );
+            if (processes && processes.data && processes.data.items) {
+              tables.push(
+                {
+                  title: 'Processes',
+                  columns: agentOs === 'windows' ?
+                    ['Name', 'CMD', 'Priority', 'NLWP'] :
+                    ['Name', 'Effective user', 'Priority', 'State'],
+                  rows: processes.data.items.map((x) => {
+                    return agentOs === 'windows' ?
+                      [x['name'], x['cmd'], x['priority'], x['nlwp']] :
+                      [x['name'], x['euser'], x['nice'], ProcessEquivalence[x.state]]
+                  })
+                });
+            }
+          } catch (err) { } //eslint-disable-line
+
+          try {
+            const ports = await this.apiRequest.makeGenericRequest(
+              'GET',
+              `/syscollector/${agentId}/ports`,
+              {},
+              apiId
+            );
+            if (ports && ports.data && ports.data.items) {
+              tables.push(
+                {
+                  title: 'Network ports',
+                  columns: ['Local IP', 'Local port', 'Process', 'State', 'Protocol'],
+                  rows: ports.data.items.map((x) => { return [x['local']['ip'], x['local']['port'], x['process'], x['state'], x['protocol']] })
+                });
+            }
+          } catch (err) { } //eslint-disable-line
+
+          try {
+            const netiface = await this.apiRequest.makeGenericRequest(
+              'GET',
+              `/syscollector/${agentId}/netiface`,
+              {},
+              apiId
+            );
+            if (netiface && netiface.data && netiface.data.items) {
+              tables.push(
+                {
+                  title: 'Network interfaces',
+                  columns: ['Name', 'Mac', 'State', 'MTU', 'Type'],
+                  rows: netiface.data.items.map((x) => { return [x['name'], x['mac'], x['state'], x['mtu'], x['type']] })
+                });
+            }
+          } catch (err) { } //eslint-disable-line
+          try {
+            const netaddr = await this.apiRequest.makeGenericRequest(
+              'GET',
+              `/syscollector/${agentId}/netaddr`,
+              {},
+              apiId
+            );
+            if (netaddr && netaddr.data && netaddr.data.items) {
+              tables.push(
+                {
+                  title: 'Network addresses',
+                  columns: ['Interface', 'Address', 'Netmask', 'Protocol', 'Broadcast'],
+                  rows: netaddr.data.items.map((x) => { return [x['interface'], x['address'], x['netmask'], x['protocol'], x['broadcast']] })
+                },
+              );
+            }
+          } catch (err) { } //eslint-disable-line
+        }
+
         await this.renderHeader(section, tab, isAgents, apiId);
 
         let filters = false;
@@ -1431,8 +1543,11 @@ export class WazuhReportingCtrl {
         !isSycollector &&
           this.renderVisualizations(req.payload.array, isAgents, tab);
 
-        if (req.payload.tables) {
-          isSycollector ? this.renderTables(req.payload.tables, false) : this.renderTables(req.payload.tables);
+        if (isSycollector) {
+          this.renderTables(tables, false);
+        }
+        if (!isSycollector && req.payload.tables) {
+          this.renderTables(req.payload.tables);
         }
 
         const pdfDoc = this.printer.createPdfKitDocument(this.dd);
