@@ -631,7 +631,7 @@ export class AgentsController {
       // This API call may fail so we put it out of Promise.all
       let netaddrResponse = false;
       try {
-        const resultNetaddrResponse = this.apiReq.request(
+        const resultNetaddrResponse = await this.apiReq.request(
           'GET',
           `/syscollector/${id}/netaddr`,
           { limit: 1 }
