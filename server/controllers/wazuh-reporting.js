@@ -1414,8 +1414,8 @@ export class WazuhReportingCtrl {
               {},
               apiId
             );
-            agentId = agent.id ? agent.id : req.payload.filters[1].meta.value;
-            agentOs = agent.os.platform ? agent.os.platform : '';
+            agentId = agent.data.id ? agent.data.id : req.payload.filters[1].meta.value;
+            agentOs = agent.data.os.platform ? agent.data.os.platform : '';
           } catch (err) { } //eslint-disable-line
           try {
             const packages = await this.apiRequest.makeGenericRequest(
