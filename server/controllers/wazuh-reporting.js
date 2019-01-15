@@ -1408,14 +1408,19 @@ export class WazuhReportingCtrl {
           let agentId = '';
           let agentOs = '';
           try {
+            if (!req.payload.filters || !req.payload.filters[1] || !req.payload.filters[1].meta || !req.payload.filters[1].meta.value) {
+              throw new Error(
+                'Syscollector reporting needs a valid agent in order to work properly'
+              );
+            }
             const agent = await this.apiRequest.makeGenericRequest(
               'GET',
               `/agents/${req.payload.filters[1].meta.value}`,
               {},
               apiId
             );
-            agentId = agent.data.id ? agent.data.id : req.payload.filters[1].meta.value;
-            agentOs = agent.data.os.platform ? agent.data.os.platform : '';
+            agentId = agent && agent.data && agent.data.id ? agent.data.id : req.payload.filters[1].meta.value;
+            agentOs = agent && agent.data && agent.data.os && agent.data.os.platform ? agent.data.os.platform : '';
           } catch (err) { } //eslint-disable-line
           try {
             const packages = await this.apiRequest.makeGenericRequest(
