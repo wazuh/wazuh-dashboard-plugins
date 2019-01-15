@@ -105,7 +105,7 @@
 
     <div layout="row" class="layout-padding wz-padding-bottom-0" ng-if="agent && agent.status === 'Active' && hasSize(syscollector)">
         <md-card flex class="wz-md-card">
-            <md-card-content class="wz-text-center" ng-if="syscollector.netiface && !syscollector.netiface.items.length">
+            <md-card-content class="wz-text-center" ng-if="!syscollector.netiface || !syscollector.netiface.items || !syscollector.netiface.items.length">
                 <i class="fa fa-fw fa-info-circle" aria-hidden="true"></i> <span class="wz-headline-title">No interfaces scan available</span>
              </md-card-content>
             <md-card-content ng-if="syscollector.netiface && syscollector.netiface.items.length">
@@ -145,7 +145,9 @@
                 <span class="wz-headline-title"><i class="fa fa-fw fa-exchange"></i> Network ports</span>
                 <span class="color-grey pull-right">Last scan: {{syscollector.ports.items[0].scan.time}}</span>
                 <md-divider class="wz-margin-top-10"></md-divider>
-                <wz-table flex path="'/syscollector/' + agent.id + '/ports'" row-sizes="[4]" keys="[{value:'local.ip',nosortable:true}, {value:'local.port',nosortable:true},{value:'remote.ip',nosortable:true},{value:'remote.port',nosortable:true},'state','protocol']">
+                <wz-table flex ng-if="agent && agent.os && agent.os.platform === 'windows'" path="'/syscollector/' + agent.id + '/ports'" row-sizes="[4]" keys="[{value:'process',nosortable:true},{value:'local.ip',nosortable:true}, {value:'local.port',nosortable:true},'state','protocol']">
+                </wz-table>
+                <wz-table flex ng-if="agent && agent.os && agent.os.platform !== 'windows'" path="'/syscollector/' + agent.id + '/ports'" row-sizes="[4]" keys="[{value:'local.ip',nosortable:true}, {value:'local.port',nosortable:true},'state','protocol']">
                 </wz-table>
             </md-card-content>
         </md-card>
@@ -153,7 +155,7 @@
 
     <div layout="row" class="layout-padding wz-padding-bottom-0" ng-if="agent && agent.status === 'Active' && hasSize(syscollector)">
         <md-card flex class="wz-md-card">
-            <md-card-content class="wz-text-center" ng-if="syscollector.netaddr && !syscollector.netaddr.items.length">
+            <md-card-content class="wz-text-center" ng-if="!syscollector.netaddr || !syscollector.netaddr.items || !syscollector.netaddr.items.length">
                 <i class="fa fa-fw fa-info-circle" aria-hidden="true"></i> <span class="wz-headline-title">No network addresses scan available</span>
              </md-card-content>
             <md-card-content class="wz-margin-bottom-40-inv" ng-if="syscollector.netaddr && syscollector.netaddr.items.length">
