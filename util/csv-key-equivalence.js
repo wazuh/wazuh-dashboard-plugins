@@ -78,5 +78,6 @@ export const KeyEquivalenece = {
   mtime: 'Last modified',
   priority: 'Priority',
   cmd: 'CMD',
-  nlwp: 'NLWP'
+  nlwp: 'NLWP',
+  process: 'Process'
 };
