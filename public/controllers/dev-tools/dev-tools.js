@@ -519,7 +519,7 @@ export class DevToolsController {
         if (typeof JSONraw === 'object') JSONraw.devTools = true;
         const output = await this.apiReq.request(method, path, JSONraw);
 
-        this.apiOutputBox.setValue(JSON.stringify(output.data, null, 2));
+        this.apiOutputBox.setValue(JSON.stringify((output || {}).data, null, 2));
       } else {
         this.apiOutputBox.setValue('Welcome!');
       }

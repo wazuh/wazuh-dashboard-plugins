@@ -520,10 +520,10 @@ export class WazuhApiCtrl {
    * @returns {Object} API response or ErrorResponse
    */
   async makeRequest(method, path, data, id, reply) {
+    const devTools = !!(data || {}).devTools;
     try {
       const api = await this.wzWrapper.getWazuhConfigurationById(id);
 
-      const devTools = !!(data || {}).devTools;
       if (devTools) {
         delete data.devTools;
       }
@@ -576,12 +576,14 @@ export class WazuhApiCtrl {
         ? { message: response.body.message, code: response.body.error }
         : new Error('Unexpected error fetching data from the Wazuh API');
     } catch (error) {
-      return ErrorResponse(
-        error.message || error,
-        `Wazuh API error: ${error.code}` || 3013,
-        500,
-        reply
-      );
+      return devTools
+        ? reply({ error: '3013', message: error.message || error })
+        : ErrorResponse(
+            error.message || error,
+            `Wazuh API error: ${error.code}` || 3013,
+            500,
+            reply
+          );
     }
   }
 
