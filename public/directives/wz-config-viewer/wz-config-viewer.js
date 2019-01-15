@@ -12,31 +12,75 @@
 
 import template from './wz-config-viewer.html';
 import { uiModules } from 'ui/modules';
+import CodeMirror from '../../utils/codemirror/lib/codemirror';
+
 
 const app = uiModules.get('app/wazuh', []);
 
-class WzConfigViewer {
-  /**
-   * Class constructor
-   */
-  constructor() {
-    this.restrict = 'E';
-    this.scope = {
+app.directive('wzConfigViewer', function () {
+  return {
+    restrict: 'E',
+    scope: {
       getjson: '&',
       getxml: '&',
+      type: '=type',
       jsoncontent: '=jsoncontent',
       xmlcontent: '=xmlcontent'
-    };
-    this.replace = true;
-    this.template = template;
-  }
 
-  link(scope) {
-    scope.callgetjson = () => {
-      scope.getjson();
-    };
-    scope.callgetxml = () => scope.getxml();
-  }
-}
+    },
 
-app.directive('wzConfigViewer', () => new WzConfigViewer());
+    controller($scope, $document, errorHandler, groupHandler) {
+      this.replace = true;
+
+      $scope.callgetjson = () => {
+        $scope.getjson();
+        $scope.jsonCodeBox.setValue($scope.jsoncontent);
+        $scope.jsonCodeBox.refresh();
+      };
+      $scope.callgetxml = () => {
+        $scope.getxml();
+        $scope.xmlCodeBox.setValue($scope.xmlcontent);
+        $scope.xmlCodeBox.refresh();
+      };
+
+      const init = () => {
+        
+        $scope.xmlCodeBox = CodeMirror.fromTextArea(
+          $document[0].getElementById('xml_box'),
+          {
+            lineNumbers: true,
+            matchClosing: true,
+            matchBrackets: true,
+            mode: 'text/xml',
+            readOnly: true,
+            theme: 'ttcn',
+            value: $scope.xmlcontent,
+            foldGutter: true,
+            styleSelectedText: true,
+            gutters: ['CodeMirror-foldgutter']
+          }
+        );
+
+        $scope.jsonCodeBox = CodeMirror.fromTextArea(
+          $document[0].getElementById('json_box'),
+          {
+            lineNumbers: true,
+            matchClosing: true,
+            matchBrackets: true,
+            mode: { name: 'javascript', json: true },
+            readOnly: true,
+            value: $scope.jsoncontent,
+            theme: 'ttcn',
+            foldGutter: true,
+            styleSelectedText: true,
+            gutters: ['CodeMirror-foldgutter']
+          }
+        );
+      }
+      init();
+
+
+    },
+    template
+  };
+});
