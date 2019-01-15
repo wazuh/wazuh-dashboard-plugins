@@ -13,6 +13,7 @@ import { FilterHandler } from '../../utils/filter-handler';
 import { generateMetric } from '../../utils/generate-metric';
 import { TabNames } from '../../utils/tab-names';
 import * as FileSaver from '../../services/file-saver';
+import { parseValue } from '../../directives/wz-table/lib/parse-value';
 import { TabDescription } from '../../../server/reporting/tab-description';
 
 import {
@@ -312,7 +313,7 @@ export class AgentsController {
 
     this.$scope.showConfirm = (ev, group) => {
       const confirm = this.$mdDialog.confirm({
-        controller: function(
+        controller: function (
           $scope,
           myScope,
           $mdDialog,
@@ -491,7 +492,7 @@ export class AgentsController {
           (((agentInfo || {}).data || {}).data || {}).status ||
           this.$scope.agent.status;
       }
-    } catch (error) {} // eslint-disable-line
+    } catch (error) { } // eslint-disable-line
 
     try {
       this.$scope.showSyscheckFiles = false;
@@ -508,7 +509,7 @@ export class AgentsController {
       if (tab === 'syscollector')
         try {
           await this.loadSyscollector(this.$scope.agent.id);
-        } catch (error) {} // eslint-disable-line
+        } catch (error) { } // eslint-disable-line
       if (tab === 'configuration') {
         const isSync = await this.apiReq.request(
           'GET',
@@ -626,7 +627,7 @@ export class AgentsController {
           {}
         );
         netifaceResponse = ((resultNetiface || {}).data || {}).data || false;
-      } catch (error) {} // eslint-disable-line
+      } catch (error) { } // eslint-disable-line
 
       // This API call may fail so we put it out of Promise.all
       let netaddrResponse = false;
@@ -638,7 +639,7 @@ export class AgentsController {
         );
         netaddrResponse =
           ((resultNetaddrResponse || {}).data || {}).data || false;
-      } catch (error) {} // eslint-disable-line
+      } catch (error) { } // eslint-disable-line
 
       // Before proceeding, syscollector data is an empty object
       this.$scope.syscollector = {};
@@ -654,7 +655,7 @@ export class AgentsController {
       this.$scope.syscollector = {
         hardware:
           typeof hardwareResponse === 'object' &&
-          Object.keys(hardwareResponse).length
+            Object.keys(hardwareResponse).length
             ? { ...hardwareResponse }
             : false,
         os:
@@ -813,23 +814,84 @@ export class AgentsController {
   /**
    * Transform a visualization into an image
    */
-  startVis2Png() {
-    const syscollectorFilters = [];
+  async startVis2Png() {
+    const syscollectorData = {};
+    syscollectorData.syscollectorFilters = [];
+    syscollectorData.syscollectorTables = [];
     if (this.$scope.tab === 'syscollector' && (this.$scope.agent || {}).id) {
-      syscollectorFilters.push(
+      syscollectorData.syscollectorFilters.push(
         this.filterHandler.managerQuery(
           this.appState.getClusterInfo().cluster,
           true
         )
       );
-      syscollectorFilters.push(
+      syscollectorData.syscollectorFilters.push(
         this.filterHandler.agentQuery(this.$scope.agent.id)
       );
+
+      const requiredData = await Promise.all([
+        this.apiReq.request('GET', `/syscollector/${this.$scope.agent.id}/ports`, {}),
+        this.apiReq.request('GET', `/syscollector/${this.$scope.agent.id}/packages`, {}),
+        this.apiReq.request('GET', `/syscollector/${this.$scope.agent.id}/processes`, {})
+      ]);
+      if (requiredData && requiredData[1] && requiredData[1].data && requiredData[1].data.data && requiredData[1].data.data.items) {
+        syscollectorData.syscollectorTables.push(
+          {
+            title: 'Packages',
+            columns: this.$scope.agent.os.platform === 'windows' ?
+              ['Name', 'Architecture', 'Version', 'Vendor'] :
+              ['Name', 'Architecture', 'Version', 'Vendor', 'Description'],
+            rows: requiredData[1].data.data.items.map((x) => {
+              return this.$scope.agent.os.platform === 'windows' ?
+                [x['name'], x['architecture'], x['version'], x['vendor']] :
+                [x['name'], x['architecture'], x['version'], x['vendor'], x['description']]
+            })
+          });
+      }
+      if (requiredData && requiredData[2] && requiredData[2].data && requiredData[2].data.data && requiredData[2].data.data.items) {
+        syscollectorData.syscollectorTables.push(
+          {
+            title: 'Processes',
+            columns: this.$scope.agent.os.platform === 'windows' ?
+              ['Name', 'CMD', 'Priority', 'NLWP'] :
+              ['Name', 'Effective user', 'Priority', 'State'],
+            rows: requiredData[2].data.data.items.map((x) => {
+              return this.$scope.agent.os.platform === 'windows' ?
+                [x['name'], x['cmd'], x['priority'], x['nlwp']] :
+                [x['name'], x['euser'], x['nice'], parseValue('state', x, 'processes')]
+            })
+          });
+      }
+      if (this.$scope.syscollector.netiface) {
+        syscollectorData.syscollectorTables.push(
+          {
+            title: 'Network interfaces',
+            columns: ['Name', 'Mac', 'State', 'MTU', 'Type'],
+            rows: this.$scope.syscollector.netiface.items.map((x) => { return [x['name'], x['mac'], x['state'], x['mtu'], x['type']] })
+          });
+      }
+      if (requiredData && requiredData[0] && requiredData[0].data && requiredData[0].data.data && requiredData[0].data.data.items) {
+        syscollectorData.syscollectorTables.push(
+          {
+            title: 'Network ports',
+            columns: ['Local IP', 'Local port', 'Process', 'State', 'Protocol'],
+            rows: requiredData[0].data.data.items.map((x) => { return [x['local']['ip'], x['local']['port'], x['process'], x['state'], x['protocol']] })
+          });
+      }
+      if (this.$scope.syscollector.netaddr) {
+        syscollectorData.syscollectorTables.push(
+          {
+            title: 'Network addresses',
+            columns: ['Interface', 'Address', 'Netmask', 'Protocol', 'Broadcast'],
+            rows: this.$scope.syscollector.netaddr.items.map((x) => { return [x['interface'], x['address'], x['netmask'], x['protocol'], x['broadcast']] })
+          },
+        );
+      }
     }
     this.reportingService.startVis2Png(
       this.$scope.tab,
       (this.$scope.agent || {}).id || true,
-      syscollectorFilters.length ? syscollectorFilters : null
+      syscollectorData.syscollectorFilters.length ? syscollectorData : null
     );
   }
 }

@@ -29,7 +29,7 @@ export class ReportingService {
     this.errorHandler = errorHandler;
   }
 
-  async startVis2Png(tab, isAgents = false, syscollectorFilters = null) {
+  async startVis2Png(tab, isAgents = false, syscollectorData = null) {
     try {
       if (this.vis2png.isWorking()) {
         this.errorHandler.handle('Report in progress', 'Reporting', true);
@@ -49,7 +49,7 @@ export class ReportingService {
       }
 
       const appliedFilters = this.visHandlers.getAppliedFilters(
-        syscollectorFilters
+        syscollectorData
       );
 
       const array = await this.vis2png.checkArray(idArray);

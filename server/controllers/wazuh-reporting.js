@@ -171,9 +171,14 @@ export class WazuhReportingCtrl {
    * This performs the rendering of given tables
    * @param {Array<Object>} tables tables to render
    */
-  renderTables(tables) {
+  renderTables(tables, isVis = true) {
     for (const table of tables) {
-      const rowsparsed = rawParser(table.rawResponse, table.columns);
+      let rowsparsed = [];
+      if (isVis) {
+        rowsparsed = rawParser(table.rawResponse, table.columns);
+      } else {
+        rowsparsed = table.rows;
+      }
       if (Array.isArray(rowsparsed) && rowsparsed.length) {
         const rows =
           rowsparsed.length > 100 ? rowsparsed.slice(0, 99) : rowsparsed;
@@ -188,8 +193,8 @@ export class WazuhReportingCtrl {
           parseInt(a[a.length - 1]) < parseInt(b[b.length - 1])
             ? 1
             : parseInt(a[a.length - 1]) > parseInt(b[b.length - 1])
-            ? -1
-            : 0;
+              ? -1
+              : 0;
 
         TimSort.sort(rows, sortFunction);
 
@@ -306,14 +311,14 @@ export class WazuhReportingCtrl {
       str +=
         i === len - 1
           ? (filter.meta.negate ? 'NOT ' : '') +
-            filter.meta.key +
-            ': ' +
-            filter.meta.value
+          filter.meta.key +
+          ': ' +
+          filter.meta.value
           : (filter.meta.negate ? 'NOT ' : '') +
-            filter.meta.key +
-            ': ' +
-            filter.meta.value +
-            ' AND ';
+          filter.meta.key +
+          ': ' +
+          filter.meta.value +
+          ' AND ';
     }
 
     if (searchBar) {
@@ -1014,14 +1019,14 @@ export class WazuhReportingCtrl {
             this.dd.content.push({
               text: `Last policy monitoring scan was executed from ${
                 lastScan.data.start
-              } to ${lastScan.data.end}.`,
+                } to ${lastScan.data.end}.`,
               style: 'standard'
             });
           } else if (lastScan.data.start) {
             this.dd.content.push({
               text: `Policy monitoring scan is currently in progress for this agent (started on ${
                 lastScan.data.start
-              }).`,
+                }).`,
               style: 'standard'
             });
           } else {
@@ -1141,13 +1146,13 @@ export class WazuhReportingCtrl {
             this.dd.content.push({
               text: `Last file integrity monitoring scan was executed from ${
                 lastScan.data.start
-              } to ${lastScan.data.end}.`
+                } to ${lastScan.data.end}.`
             });
           } else if (lastScan.data.start) {
             this.dd.content.push({
               text: `File integrity monitoring scan is currently in progress for this agent (started on ${
                 lastScan.data.start
-              }).`
+                }).`
             });
           } else {
             this.dd.content.push({
@@ -1426,8 +1431,8 @@ export class WazuhReportingCtrl {
         !isSycollector &&
           this.renderVisualizations(req.payload.array, isAgents, tab);
 
-        if (!isSycollector && req.payload.tables) {
-          this.renderTables(req.payload.tables);
+        if (req.payload.tables) {
+          isSycollector ? this.renderTables(req.payload.tables, false) : this.renderTables(req.payload.tables);
         }
 
         const pdfDoc = this.printer.createPdfKitDocument(this.dd);
