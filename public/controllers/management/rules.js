@@ -193,6 +193,9 @@ export function RulesController(
   //listeners
   $scope.$on('wazuhShowRule', (event, parameters) => {
     $scope.currentRule = parameters.rule;
+    if(!(Object.keys((($scope.currentRule || {}).details || {})) || []).length) {
+      $scope.currentRule.details = false;
+    }
     $scope.viewingDetail = true;
     if (!$scope.$$phase) $scope.$digest();
   });
@@ -218,6 +221,9 @@ export function RulesController(
       .request('get', `/rules/${incomingRule}`, {})
       .then(data => {
         $scope.currentRule = data.data.data.items[0];
+        if(!(Object.keys((($scope.currentRule || {}).details || {})) || []).length) {
+          $scope.currentRule.details = false;
+        }
         $scope.viewingDetail = true;
         if (!$scope.$$phase) $scope.$digest();
       })
