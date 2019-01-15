@@ -760,7 +760,7 @@ export class WazuhApiCtrl {
         params.offset = 0;
         const { totalItems } = output.body.data;
         itemsArray.push(...output.body.data.items);
-        while (itemsArray.length < totalItems) {
+        while (itemsArray.length < totalItems && params.offset < totalItems) {
           params.offset += params.limit;
           const tmpData = await needle(
             'get',
