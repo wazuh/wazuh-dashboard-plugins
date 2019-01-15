@@ -738,7 +738,7 @@ export class WazuhApiCtrl {
       if (!path_tmp) throw new Error('An error occurred parsing path field');
 
       // Real limit, regardless the user query
-      const params = { limit: 1000 };
+      const params = { limit: 500 };
 
       if (filters.length) {
         for (const filter of filters) {
@@ -760,7 +760,7 @@ export class WazuhApiCtrl {
         params.offset = 0;
         const { totalItems } = output.body.data;
         itemsArray.push(...output.body.data.items);
-        while (itemsArray.length < totalItems) {
+        while (itemsArray.length < totalItems && params.offset < totalItems) {
           params.offset += params.limit;
           const tmpData = await needle(
             'get',
