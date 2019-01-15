@@ -9,9 +9,14 @@
         <!-- Breadcrumbs -->
         <div layout="row" layout-padding>
             <!-- If you're not on the Welcome tab, show a functional breadcrumb -->
-            <div ng-if="mctrl.tab !== 'welcome'">
+            <div ng-if="mctrl.tab !== 'welcome' && !mctrl.currentGroup">
                 <span class="wz-text-link cursor-pointer" ng-click="mctrl.switchTab('welcome')">Management</span>
                 <span> / {{ mctrl.tabNames[mctrl.tab] }}</span>
+            </div>
+            <div ng-if="mctrl.tab === 'groups' && mctrl.currentGroup && mctrl.currentGroup.name">
+                <span class="wz-text-link cursor-pointer" ng-click="mctrl.switchTab('welcome')">Management</span>
+                <span class="wz-text-link cursor-pointer" ng-click="mctrl.switchTab('groups')"> / {{ mctrl.tabNames[mctrl.tab] }}</span>
+                <span> / {{ mctrl.currentGroup.name }} </span>
             </div>
             <!-- If you're on the Welcome tab, show a blank, simple breadcrumb -->
             <div ng-if="mctrl.tab === 'welcome'">
