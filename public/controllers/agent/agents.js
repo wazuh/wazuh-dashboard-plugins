@@ -815,9 +815,11 @@ export class AgentsController {
    * Transform a visualization into an image
    */
   async startVis2Png() {
-    const syscollectorData = {};
-    syscollectorData.syscollectorFilters = [];
-    syscollectorData.syscollectorTables = [];
+    const syscollectorData = {
+      syscollectorFilters: [],
+      syscollectorTables: []
+    };
+
     if (this.$scope.tab === 'syscollector' && (this.$scope.agent || {}).id) {
       syscollectorData.syscollectorFilters.push(
         this.filterHandler.managerQuery(
