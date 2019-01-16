@@ -36,7 +36,8 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Refreshing index pattern known fields on health check controller ([#1119](https://github.com/wazuh/wazuh-kibana-app/pull/1119)).
 - Less strict memory check ([786c764](https://github.com/wazuh/wazuh-kibana-app/commit/786c7642cd88083f9a77c57ed204488ecf5b710a)).
 - Checking message origin in error handler ([dfec368](https://github.com/wazuh/wazuh-kibana-app/commit/dfec368d22a148b2e4437db92d71294900241961)).
-- Dev tools is now showing the response as it is, like `curl` does ([#1137](https://github.com/wazuh/wazuh-kibana-app/pull/1137)) 
+- Dev tools is now showing the response as it is, like `curl` does ([#1137](https://github.com/wazuh/wazuh-kibana-app/pull/1137)). 
+- Removed `unknown` as valid node name ([#1149](https://github.com/wazuh/wazuh-kibana-app/pull/1149)).
 
 ### Fixed
 
@@ -50,6 +51,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed Management > Monitoring tab frustration adding back buttons ([#1102](https://github.com/wazuh/wazuh-kibana-app/pull/1102)).
 - Fix template checking when using more than one pattern ([#1104](https://github.com/wazuh/wazuh-kibana-app/pull/1104)).
 - Fix infinite loop for Wazuh monitoring when the Wazuh API is not being able to give us all the agents ([5a26916](https://github.com/wazuh/wazuh-kibana-app/commit/5a2691642b40a34783d2eafb6ee24ae78b9af21a)), ([85005a1](https://github.com/wazuh/wazuh-kibana-app/commit/85005a184d4f1c3d339b7c895b5d2469f3b45171)).
+- Fix rule details for `list` and `info` parameters ([#1149](https://github.com/wazuh/wazuh-kibana-app/pull/1149)).
 
 ## Wazuh v3.7.1 / v3.7.2 - Kibana v6.5.1 / v6.5.2 / v6.5.3 / v6.5.4 - Revision 415
 

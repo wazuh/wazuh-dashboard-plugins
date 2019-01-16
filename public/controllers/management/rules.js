@@ -23,6 +23,9 @@ export function RulesController(
   $location,
   apiReq
 ) {
+
+  $scope.isObject = item => typeof item === 'object';
+  
   $scope.appliedFilters = [];
   /**
    * This performs a search with a given term

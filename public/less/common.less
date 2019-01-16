@@ -511,28 +511,52 @@ md-sidenav {
     height: auto;
 }
 
-@media (min-width: 1060px) {      
-    .wz-logo{        
-        content: url("/plugins/wazuh/img/new_logo_white.png");
-    } 
-}
-@media (max-width: 1059px) {    
-    .wz-logo{         
-       content: url("/plugins/wazuh/img/new_logo_white_wolf.png");
-       max-height: 45px;
-       max-width: 28px;
-   } 
-   .wz-logo-container {
-        min-width: 20px!important;
-        max-width: 30px!important;
-        margin-right: 5px!important;
+@supports not (-moz-appearance:none) {
+    @media (min-width: 1060px) {      
+        .wz-logo{        
+            content: url("/plugins/wazuh/img/new_logo_white.png");
+        } 
+        .wz-logo-container {
+            width: 150px;
+            max-width: 150px;
+        }
+    }
+    @media (max-width: 1059px) {    
+        .wz-logo{         
+           content: url("/plugins/wazuh/img/new_logo_white_wolf.png");
+           max-height: 45px;
+           max-width: 28px;
+       } 
+       .wz-logo-container {
+            min-width: 20px!important;
+            max-width: 30px!important;
+            margin-right: 5px!important;
+        }
     }
 }
 
-/* Class for define Wazuh logo width */
-.wz-logo-container {
-    width: 150px;
-    max-width: 150px;
+@supports (-moz-appearance:none) {
+    @media (min-width: 1060px) {      
+        .wz-logo::after{        
+            content: url("/plugins/wazuh/img/new_logo_white.png");
+        } 
+        .wz-logo-container {
+            width: 185px;
+            max-width: 185px;
+        }
+    }
+    @media (max-width: 1059px) {    
+        .wz-logo::after{         
+            content: url("/plugins/wazuh/img/new_logo_white_wolf.png");
+            max-height: 45px;
+            max-width: 28px;
+        } 
+        .wz-logo-container {
+                min-width: 20px!important;
+                max-width: 30px!important;
+                margin-right: 5px!important;
+            }
+        }
 }
 
 /* Unclassified but important Wazuh app component styles */
