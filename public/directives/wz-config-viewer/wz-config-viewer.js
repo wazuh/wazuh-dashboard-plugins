@@ -14,87 +14,89 @@ import template from './wz-config-viewer.html';
 import { uiModules } from 'ui/modules';
 import CodeMirror from '../../utils/codemirror/lib/codemirror';
 
-
 const app = uiModules.get('app/wazuh', []);
 
-app.directive('wzConfigViewer', function () {
-  return {
-    restrict: 'E',
-    scope: {
+class WzConfigViewer {
+
+  constructor() {
+    this.restrict = 'E';
+    this.scope = {
       getjson: '&',
       getxml: '&',
       jsoncontent: '=',
       xmlcontent: '='
-    },
+    };
+    this.template = template;
+  }
 
-    controller($scope, $document) {
-      $scope.callgetjson = () => {
-        $scope.getjson();
-      };
-      $scope.callgetxml = () => {
-        $scope.getxml();
-      };
+  controller($scope, $document) {
 
-      $scope.$on('JSONContentReady', (ev, params) => {
-        $scope.refreshJsonBox(params.data);
-      });
-
-      $scope.$on('XMLContentReady', (ev, params) => {
-        $scope.refreshXmlBox(params.data);
-      });
-
-      $scope.refreshJsonBox = (json) => {
-        $scope.jsoncontent = json;
-        if ($scope.jsoncontent != false) {
-          $scope.jsonCodeBox.setValue($scope.jsoncontent);
-          setTimeout(function () {
-            $scope.jsonCodeBox.refresh();
-          }, 1);
+    const init = () => {    
+      $scope.xmlCodeBox = CodeMirror.fromTextArea(
+        $document[0].getElementById('xml_box'),
+        {
+          lineNumbers: true,
+          matchClosing: true,
+          matchBrackets: true,
+          mode: 'text/xml',
+          readOnly: true,
+          theme: 'ttcn',
+          foldGutter: true,
+          styleSelectedText: true,
+          gutters: ['CodeMirror-foldgutter']
         }
-      };
-      $scope.refreshXmlBox = (xml) => {
-        $scope.xmlcontent = xml;
-        if ($scope.xmlcontent != false) {
-          $scope.xmlCodeBox.setValue($scope.xmlcontent);
-          setTimeout(function () {
-            $scope.xmlCodeBox.refresh();
-          }, 1);
+      );
+  
+      $scope.jsonCodeBox = CodeMirror.fromTextArea(
+        $document[0].getElementById('json_box'),
+        {
+          lineNumbers: true,
+          matchClosing: true,
+          matchBrackets: true,
+          mode: { name: 'javascript', json: true },
+          readOnly: true,
+          theme: 'ttcn',
+          foldGutter: true,
+          styleSelectedText: true,
+          gutters: ['CodeMirror-foldgutter']
         }
-      };
-
-      const init = () => {
-        $scope.xmlCodeBox = CodeMirror.fromTextArea(
-          $document[0].getElementById('xml_box'),
-          {
-            lineNumbers: true,
-            matchClosing: true,
-            matchBrackets: true,
-            mode: 'text/xml',
-            readOnly: true,
-            theme: 'ttcn',
-            foldGutter: true,
-            styleSelectedText: true,
-            gutters: ['CodeMirror-foldgutter']
-          }
-        );
-
-        $scope.jsonCodeBox = CodeMirror.fromTextArea(
-          $document[0].getElementById('json_box'),
-          {
-            lineNumbers: true,
-            matchClosing: true,
-            matchBrackets: true,
-            mode: { name: 'javascript', json: true },
-            readOnly: true,
-            theme: 'ttcn',
-            foldGutter: true,
-            styleSelectedText: true,
-            gutters: ['CodeMirror-foldgutter']
-          }
-        );
+      );
+    }
+  
+    const refreshJsonBox = json => {
+      $scope.jsoncontent = json;
+      if ($scope.jsoncontent != false) {
+        $scope.jsonCodeBox.setValue($scope.jsoncontent);
+        setTimeout(function () {
+          $scope.jsonCodeBox.refresh();
+        }, 1);
       }
-      init();
-    },
-    template
-  };
-});
+    }
+  
+    const refreshXmlBox = xml => {
+      $scope.xmlcontent = xml;
+      if ($scope.xmlcontent != false) {
+        $scope.xmlCodeBox.setValue($scope.xmlcontent);
+        setTimeout(function () {
+          $scope.xmlCodeBox.refresh();
+        }, 1);
+      }
+    }
+
+    $scope.callgetjson = () => $scope.getjson();
+    
+    $scope.callgetxml = () => $scope.getxml();
+    
+    $scope.$on('JSONContentReady', (ev, params) => {
+      refreshJsonBox(params.data);
+    });
+
+    $scope.$on('XMLContentReady', (ev, params) => {
+      refreshXmlBox(params.data);
+    });
+    
+    init();
+  }
+}
+
+app.directive('wzConfigViewer', () => new WzConfigViewer());
