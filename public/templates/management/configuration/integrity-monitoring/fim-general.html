@@ -40,6 +40,7 @@
                 value="currentConfig['syscheck-syscheck'].syscheck.auto_ignore || 'no'">
             </wz-config-item>
             <wz-config-item
+                ng-if="!agent || agent.id === '000'"
                 label="Alert when new files are created"
                 value="currentConfig['syscheck-syscheck'].syscheck.alert_new_files || 'no'">
             </wz-config-item>
