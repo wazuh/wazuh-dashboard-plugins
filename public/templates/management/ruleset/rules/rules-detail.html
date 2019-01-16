@@ -56,10 +56,13 @@
                 <md-card-content>
                     <span class="wz-headline-title"><i class="fa fa-fw fa-info" aria-hidden="true"></i> Details</span>
                     <md-divider class="wz-margin-top-10"></md-divider>
-                    <div layout="row" layout-wrap class="wz-padding-top-10" ng-repeat="(key, value) in currentRule.details"
+                    <div layout="row" class="wz-padding-top-10" ng-repeat="(key, value) in currentRule.details"
                         ng-if='!isArray(value)'>
                         <span flex="20">{{key}}</span>
-                        <span class="wz-text-right color-grey">{{value}}</span>
+                        <span ng-if="!isObject(value)" class="wz-text-right color-grey">{{value}}</span>
+                        <span ng-if="isObject(value)" class="color-grey">
+                            <span ng-repeat="(key, value) in value">{{key}}: {{value}} <span ng-if="!$last">|</span> </span>
+                        </span>
                     </div>                    
                 </md-card-content>
             </md-card>
