@@ -18,7 +18,7 @@ export class ManagementController {
    * @param {*} $location
    * @param {*} shareAgent
    */
-  constructor($scope, $location, shareAgent) {
+  constructor($scope, $location, shareAgent, appState) {
     this.$scope = $scope;
     this.$location = $location;
     this.shareAgent = shareAgent;
@@ -28,12 +28,13 @@ export class ManagementController {
     this.wazuhManagementTabs = ['ruleset', 'groups'];
     this.statusReportsTabs = ['status', 'logs', 'reporting', 'monitoring'];
     this.currentGroup = false;
-    this.$scope.$on('setCurrentGroup',(ev,params) => {
+    this.$scope.$on('setCurrentGroup', (ev, params) => {
       this.currentGroup = (params || {}).currentGroup || false;
     })
-    this.$scope.$on('removeCurrentGroup',() => {
+    this.$scope.$on('removeCurrentGroup', () => {
       this.currentGroup = false;
     })
+    this.appState = appState;
   }
 
   /**
@@ -65,7 +66,10 @@ export class ManagementController {
    * This switch to a selected tab
    * @param {String} tab
    */
-  switchTab(tab) {
+  switchTab(tab, setNav = false) {
+    if (setNav) {
+      this.appState.setNavigation(true);
+    }
     this.tab = tab;
 
     if (this.tab === 'groups') {

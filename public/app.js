@@ -34,7 +34,7 @@ const app = uiModules.get('app/wazuh', ['ngCookies', 'ngMaterial']);
 
 app.config([
   '$compileProvider',
-  function($compileProvider) {
+  function ($compileProvider) {
     $compileProvider.aHrefSanitizationWhitelist(
       /^\s*(https?|ftp|mailto|data|blob):/
     );
@@ -43,10 +43,37 @@ app.config([
 
 app.config([
   '$httpProvider',
-  function($httpProvider) {
+  function ($httpProvider) {
     $httpProvider.useApplyAsync(true);
   }
 ]);
+
+app.run(function ($rootScope, $route, $location, appState) {
+  appState.setNavigation(false);
+  $rootScope.reloaded = false;
+  $rootScope.$on('$routeChangeSuccess', () => {
+    $rootScope.prevLocation = $location.path();
+    if (!$rootScope.reloaded) {
+      appState.setNavigation(true);
+    } else {
+      $rootScope.reloaded = false;
+    }
+  });
+  $rootScope.$on('$locationChangeSuccess', () => {
+    $rootScope.currLocation = $location.path();
+    if (!appState.getNavigation() && $rootScope.prevLocation &&
+      $rootScope.currLocation !== '/wazuh-discover/' &&
+      $rootScope.currLocation !== '/overview/' &&
+      $rootScope.currLocation !== '/agents') {
+      if ($rootScope.currLocation === $rootScope.prevLocation) {
+        $rootScope.reloaded = true;
+        $route.reload();
+      }
+    }
+    appState.setNavigation(false);
+  });
+});
+
 
 // Font Awesome, Kibana UI framework and others
 import './utils/fontawesome/css/font-awesome.min.css';
@@ -72,6 +99,7 @@ import './services';
 import './controllers';
 import './factories';
 import './directives';
+import { runInContext } from 'vm';
 
 // Added due to Kibana 6.3.0. Do not modify.
 uiModules.get('kibana').provider('dashboardConfig', () => {

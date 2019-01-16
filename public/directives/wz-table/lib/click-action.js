@@ -16,14 +16,15 @@ export function clickAction(
   instance,
   shareAgent,
   $location,
-  $scope
+  $scope,
+  appState
 ) {
+  appState.setNavigation(true);
   if (
     instance.path === '/agents' ||
     new RegExp(/^\/agents\/groups\/[a-zA-Z0-9_\-.]*$/).test(instance.path)
   ) {
     shareAgent.setAgent(item);
-
     // Check location target and go to that path
     switch (openAction) {
       case 'configuration':
