@@ -23,28 +23,50 @@ app.directive('wzConfigViewer', function () {
     scope: {
       getjson: '&',
       getxml: '&',
-      type: '=type',
       jsoncontent: '=jsoncontent',
       xmlcontent: '=xmlcontent'
-
     },
 
-    controller($scope, $document, errorHandler, groupHandler) {
+    controller($scope, $document) {
       this.replace = true;
 
       $scope.callgetjson = () => {
         $scope.getjson();
-        $scope.jsonCodeBox.setValue($scope.jsoncontent);
-        $scope.jsonCodeBox.refresh();
+        $scope.refreshJsonBox();
       };
       $scope.callgetxml = () => {
         $scope.getxml();
-        $scope.xmlCodeBox.setValue($scope.xmlcontent);
-        $scope.xmlCodeBox.refresh();
+        $scope.refreshXmlBox();
+      };
+
+      
+      $scope.$watch('jsoncontent', function() {
+          $scope.refreshJsonBox();
+      });
+      $scope.$watch('xmlcontent', function() {
+          $scope.refreshXmlBox();
+      });
+
+
+
+      $scope.refreshJsonCodeBox = () => {
+        if($scope.jsoncontent != false){
+          $scope.jsonCodeBox.setValue($scope.jsoncontent);
+          setTimeout(function() {
+            $scope.jsonCodeBox.refresh();
+          },1);
+        }
+      };
+      $scope.refreshXmlCodeBox = () => {
+        if($scope.xmlcontent != false){
+          $scope.xmlCodeBox.setValue($scope.xmlcontent);
+          setTimeout(function() {
+            $scope.xmlCodeBox.refresh();
+          },1);
+        }
       };
 
       const init = () => {
-        
         $scope.xmlCodeBox = CodeMirror.fromTextArea(
           $document[0].getElementById('xml_box'),
           {
@@ -54,7 +76,6 @@ app.directive('wzConfigViewer', function () {
             mode: 'text/xml',
             readOnly: true,
             theme: 'ttcn',
-            value: $scope.xmlcontent,
             foldGutter: true,
             styleSelectedText: true,
             gutters: ['CodeMirror-foldgutter']
@@ -69,7 +90,6 @@ app.directive('wzConfigViewer', function () {
             matchBrackets: true,
             mode: { name: 'javascript', json: true },
             readOnly: true,
-            value: $scope.jsoncontent,
             theme: 'ttcn',
             foldGutter: true,
             styleSelectedText: true,
@@ -78,8 +98,6 @@ app.directive('wzConfigViewer', function () {
         );
       }
       init();
-
-
     },
     template
   };

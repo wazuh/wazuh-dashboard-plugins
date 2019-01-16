@@ -230,7 +230,7 @@ export class ConfigurationHandler {
     } else {
       try {
         const cleaned = objectWithoutProperties(config);
-        $scope.JSONContent = beautifier.prettyPrint(cleaned);
+        $scope.JSONContent = JSON.stringify(cleaned, null, 2);
       } catch (error) {
         $scope.JSONContent = false;
       }
