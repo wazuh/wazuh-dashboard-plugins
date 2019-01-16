@@ -907,7 +907,7 @@ export class WazuhApiCtrl {
 
       if (nodes && nodes.items) {
         result.nodes = nodes.items
-          .filter(item => !!item.node_name)
+          .filter(item => !!item.node_name && item.node_name !== 'unknown')
           .map(item => item.node_name);
       }
 
