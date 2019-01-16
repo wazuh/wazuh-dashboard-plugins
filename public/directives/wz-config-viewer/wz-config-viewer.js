@@ -23,46 +23,42 @@ app.directive('wzConfigViewer', function () {
     scope: {
       getjson: '&',
       getxml: '&',
-      jsoncontent: '=jsoncontent',
-      xmlcontent: '=xmlcontent'
+      jsoncontent: '=',
+      xmlcontent: '='
     },
 
     controller($scope, $document) {
-      this.replace = true;
-
       $scope.callgetjson = () => {
         $scope.getjson();
-        $scope.refreshJsonBox();
       };
       $scope.callgetxml = () => {
         $scope.getxml();
-        $scope.refreshXmlBox();
       };
 
-      
-      $scope.$watch('jsoncontent', function() {
-          $scope.refreshJsonBox();
-      });
-      $scope.$watch('xmlcontent', function() {
-          $scope.refreshXmlBox();
+      $scope.$on('JSONContentReady', (ev, params) => {
+        $scope.refreshJsonBox(params.data);
       });
 
+      $scope.$on('XMLContentReady', (ev, params) => {
+        $scope.refreshXmlBox(params.data);
+      });
 
-
-      $scope.refreshJsonCodeBox = () => {
-        if($scope.jsoncontent != false){
+      $scope.refreshJsonBox = (json) => {
+        $scope.jsoncontent = json;
+        if ($scope.jsoncontent != false) {
           $scope.jsonCodeBox.setValue($scope.jsoncontent);
-          setTimeout(function() {
+          setTimeout(function () {
             $scope.jsonCodeBox.refresh();
-          },1);
+          }, 1);
         }
       };
-      $scope.refreshXmlCodeBox = () => {
-        if($scope.xmlcontent != false){
+      $scope.refreshXmlBox = (xml) => {
+        $scope.xmlcontent = xml;
+        if ($scope.xmlcontent != false) {
           $scope.xmlCodeBox.setValue($scope.xmlcontent);
-          setTimeout(function() {
+          setTimeout(function () {
             $scope.xmlCodeBox.refresh();
-          },1);
+          }, 1);
         }
       };
 
