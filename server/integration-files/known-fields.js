@@ -5592,5 +5592,32 @@ export const knownFields = [
     searchable: true,
     aggregatable: true,
     readFromDocValues: true
+  },
+  {
+    name: 'data.EventChannel.System.EventSourceName',
+    type: 'string',
+    count: 0,
+    scripted: false,
+    searchable: true,
+    aggregatable: true,
+    readFromDocValues: true
+  },
+  {
+    name: 'data.EventChannel.System.UserID',
+    type: 'string',
+    count: 0,
+    scripted: false,
+    searchable: true,
+    aggregatable: true,
+    readFromDocValues: true
+  },
+  {
+    name: 'data.EventChannel.System.SecurityUserID',
+    type: 'string',
+    count: 0,
+    scripted: false,
+    searchable: true,
+    aggregatable: true,
+    readFromDocValues: true
   }
 ];
