@@ -14,6 +14,19 @@ export class GroupHandler {
     this.apiReq = apiReq;
   }
 
+  async removeGroup(group) {
+    try {
+      const result = await this.apiReq.request(
+        'DELETE',
+        `/agents/groups/${group}`,
+        {}
+      );
+      return result;
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  }
+
   async removeAgentFromGroup(group, agentId) {
     try {
       const result = await this.apiReq.request(
@@ -46,6 +59,19 @@ export class GroupHandler {
         'POST',
         `/agents/groups/${group}/files/agent.conf`,
         { content, origin: 'xmleditor' }
+      );
+      return result;
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  }
+
+  async createGroup(name) {
+    try {
+      const result = await this.apiReq.request(
+        'PUT',
+        `/agents/groups/${name}`,
+        { }
       );
       return result;
     } catch (error) {
