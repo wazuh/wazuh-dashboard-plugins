@@ -30,10 +30,10 @@ export class ManagementController {
     this.currentGroup = false;
     this.$scope.$on('setCurrentGroup', (ev, params) => {
       this.currentGroup = (params || {}).currentGroup || false;
-    })
+    });
     this.$scope.$on('removeCurrentGroup', () => {
       this.currentGroup = false;
-    })
+    });
     this.appState = appState;
   }
 
