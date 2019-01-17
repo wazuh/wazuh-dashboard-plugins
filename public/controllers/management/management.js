@@ -28,12 +28,12 @@ export class ManagementController {
     this.wazuhManagementTabs = ['ruleset', 'groups'];
     this.statusReportsTabs = ['status', 'logs', 'reporting', 'monitoring'];
     this.currentGroup = false;
-    this.$scope.$on('setCurrentGroup',(ev,params) => {
+    this.$scope.$on('setCurrentGroup', (ev, params) => {
       this.currentGroup = (params || {}).currentGroup || false;
-    })
-    this.$scope.$on('removeCurrentGroup',() => {
+    });
+    this.$scope.$on('removeCurrentGroup', () => {
       this.currentGroup = false;
-    })
+    });
   }
 
   /**

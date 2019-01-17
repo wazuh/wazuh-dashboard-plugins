@@ -194,8 +194,8 @@ export class WazuhReportingCtrl {
           parseInt(a[a.length - 1]) < parseInt(b[b.length - 1])
             ? 1
             : parseInt(a[a.length - 1]) > parseInt(b[b.length - 1])
-              ? -1
-              : 0;
+            ? -1
+            : 0;
 
         TimSort.sort(rows, sortFunction);
 
@@ -312,14 +312,14 @@ export class WazuhReportingCtrl {
       str +=
         i === len - 1
           ? (filter.meta.negate ? 'NOT ' : '') +
-          filter.meta.key +
-          ': ' +
-          filter.meta.value
+            filter.meta.key +
+            ': ' +
+            filter.meta.value
           : (filter.meta.negate ? 'NOT ' : '') +
-          filter.meta.key +
-          ': ' +
-          filter.meta.value +
-          ' AND ';
+            filter.meta.key +
+            ': ' +
+            filter.meta.value +
+            ' AND ';
     }
 
     if (searchBar) {
@@ -1020,14 +1020,14 @@ export class WazuhReportingCtrl {
             this.dd.content.push({
               text: `Last policy monitoring scan was executed from ${
                 lastScan.data.start
-                } to ${lastScan.data.end}.`,
+              } to ${lastScan.data.end}.`,
               style: 'standard'
             });
           } else if (lastScan.data.start) {
             this.dd.content.push({
               text: `Policy monitoring scan is currently in progress for this agent (started on ${
                 lastScan.data.start
-                }).`,
+              }).`,
               style: 'standard'
             });
           } else {
@@ -1147,13 +1147,13 @@ export class WazuhReportingCtrl {
             this.dd.content.push({
               text: `Last file integrity monitoring scan was executed from ${
                 lastScan.data.start
-                } to ${lastScan.data.end}.`
+              } to ${lastScan.data.end}.`
             });
           } else if (lastScan.data.start) {
             this.dd.content.push({
               text: `File integrity monitoring scan is currently in progress for this agent (started on ${
                 lastScan.data.start
-                }).`
+              }).`
             });
           } else {
             this.dd.content.push({
@@ -1408,7 +1408,12 @@ export class WazuhReportingCtrl {
           let agentId = '';
           let agentOs = '';
           try {
-            if (!req.payload.filters || !req.payload.filters[1] || !req.payload.filters[1].meta || !req.payload.filters[1].meta.value) {
+            if (
+              !req.payload.filters ||
+              !req.payload.filters[1] ||
+              !req.payload.filters[1].meta ||
+              !req.payload.filters[1].meta.value
+            ) {
               throw new Error(
                 'Syscollector reporting needs a valid agent in order to work properly'
               );
@@ -1419,9 +1424,15 @@ export class WazuhReportingCtrl {
               {},
               apiId
             );
-            agentId = agent && agent.data && agent.data.id ? agent.data.id : req.payload.filters[1].meta.value;
-            agentOs = agent && agent.data && agent.data.os && agent.data.os.platform ? agent.data.os.platform : '';
-          } catch (err) { } //eslint-disable-line
+            agentId =
+              agent && agent.data && agent.data.id
+                ? agent.data.id
+                : req.payload.filters[1].meta.value;
+            agentOs =
+              agent && agent.data && agent.data.os && agent.data.os.platform
+                ? agent.data.os.platform
+                : '';
+          } catch (err) {} //eslint-disable-line
           try {
             const packages = await this.apiRequest.makeGenericRequest(
               'GET',
@@ -1430,20 +1441,32 @@ export class WazuhReportingCtrl {
               apiId
             );
             if (packages && packages.data && packages.data.items) {
-              tables.push(
-                {
-                  title: 'Packages',
-                  columns: agentOs === 'windows' ?
-                    ['Name', 'Architecture', 'Version', 'Vendor'] :
-                    ['Name', 'Architecture', 'Version', 'Vendor', 'Description'],
-                  rows: packages.data.items.map((x) => {
-                    return agentOs === 'windows' ?
-                      [x['name'], x['architecture'], x['version'], x['vendor']] :
-                      [x['name'], x['architecture'], x['version'], x['vendor'], x['description']]
-                  })
-                });
+              tables.push({
+                title: 'Packages',
+                columns:
+                  agentOs === 'windows'
+                    ? ['Name', 'Architecture', 'Version', 'Vendor']
+                    : [
+                        'Name',
+                        'Architecture',
+                        'Version',
+                        'Vendor',
+                        'Description'
+                      ],
+                rows: packages.data.items.map(x => {
+                  return agentOs === 'windows'
+                    ? [x['name'], x['architecture'], x['version'], x['vendor']]
+                    : [
+                        x['name'],
+                        x['architecture'],
+                        x['version'],
+                        x['vendor'],
+                        x['description']
+                      ];
+                })
+              });
             }
-          } catch (err) { } //eslint-disable-line
+          } catch (err) {} //eslint-disable-line
           try {
             const processes = await this.apiRequest.makeGenericRequest(
               'GET',
@@ -1452,20 +1475,25 @@ export class WazuhReportingCtrl {
               apiId
             );
             if (processes && processes.data && processes.data.items) {
-              tables.push(
-                {
-                  title: 'Processes',
-                  columns: agentOs === 'windows' ?
-                    ['Name', 'CMD', 'Priority', 'NLWP'] :
-                    ['Name', 'Effective user', 'Priority', 'State'],
-                  rows: processes.data.items.map((x) => {
-                    return agentOs === 'windows' ?
-                      [x['name'], x['cmd'], x['priority'], x['nlwp']] :
-                      [x['name'], x['euser'], x['nice'], ProcessEquivalence[x.state]]
-                  })
-                });
+              tables.push({
+                title: 'Processes',
+                columns:
+                  agentOs === 'windows'
+                    ? ['Name', 'CMD', 'Priority', 'NLWP']
+                    : ['Name', 'Effective user', 'Priority', 'State'],
+                rows: processes.data.items.map(x => {
+                  return agentOs === 'windows'
+                    ? [x['name'], x['cmd'], x['priority'], x['nlwp']]
+                    : [
+                        x['name'],
+                        x['euser'],
+                        x['nice'],
+                        ProcessEquivalence[x.state]
+                      ];
+                })
+              });
             }
-          } catch (err) { } //eslint-disable-line
+          } catch (err) {} //eslint-disable-line
 
           try {
             const ports = await this.apiRequest.makeGenericRequest(
@@ -1475,14 +1503,27 @@ export class WazuhReportingCtrl {
               apiId
             );
             if (ports && ports.data && ports.data.items) {
-              tables.push(
-                {
-                  title: 'Network ports',
-                  columns: ['Local IP', 'Local port', 'Process', 'State', 'Protocol'],
-                  rows: ports.data.items.map((x) => { return [x['local']['ip'], x['local']['port'], x['process'], x['state'], x['protocol']] })
-                });
+              tables.push({
+                title: 'Network ports',
+                columns: [
+                  'Local IP',
+                  'Local port',
+                  'Process',
+                  'State',
+                  'Protocol'
+                ],
+                rows: ports.data.items.map(x => {
+                  return [
+                    x['local']['ip'],
+                    x['local']['port'],
+                    x['process'],
+                    x['state'],
+                    x['protocol']
+                  ];
+                })
+              });
             }
-          } catch (err) { } //eslint-disable-line
+          } catch (err) {} //eslint-disable-line
 
           try {
             const netiface = await this.apiRequest.makeGenericRequest(
@@ -1492,14 +1533,15 @@ export class WazuhReportingCtrl {
               apiId
             );
             if (netiface && netiface.data && netiface.data.items) {
-              tables.push(
-                {
-                  title: 'Network interfaces',
-                  columns: ['Name', 'Mac', 'State', 'MTU', 'Type'],
-                  rows: netiface.data.items.map((x) => { return [x['name'], x['mac'], x['state'], x['mtu'], x['type']] })
-                });
+              tables.push({
+                title: 'Network interfaces',
+                columns: ['Name', 'Mac', 'State', 'MTU', 'Type'],
+                rows: netiface.data.items.map(x => {
+                  return [x['name'], x['mac'], x['state'], x['mtu'], x['type']];
+                })
+              });
             }
-          } catch (err) { } //eslint-disable-line
+          } catch (err) {} //eslint-disable-line
           try {
             const netaddr = await this.apiRequest.makeGenericRequest(
               'GET',
@@ -1508,15 +1550,27 @@ export class WazuhReportingCtrl {
               apiId
             );
             if (netaddr && netaddr.data && netaddr.data.items) {
-              tables.push(
-                {
-                  title: 'Network addresses',
-                  columns: ['Interface', 'Address', 'Netmask', 'Protocol', 'Broadcast'],
-                  rows: netaddr.data.items.map((x) => { return [x['interface'], x['address'], x['netmask'], x['protocol'], x['broadcast']] })
-                },
-              );
+              tables.push({
+                title: 'Network addresses',
+                columns: [
+                  'Interface',
+                  'Address',
+                  'Netmask',
+                  'Protocol',
+                  'Broadcast'
+                ],
+                rows: netaddr.data.items.map(x => {
+                  return [
+                    x['interface'],
+                    x['address'],
+                    x['netmask'],
+                    x['protocol'],
+                    x['broadcast']
+                  ];
+                })
+              });
             }
-          } catch (err) { } //eslint-disable-line
+          } catch (err) {} //eslint-disable-line
         }
 
         await this.renderHeader(section, tab, isAgents, apiId);

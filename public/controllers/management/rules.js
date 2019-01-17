@@ -23,9 +23,8 @@ export function RulesController(
   $location,
   apiReq
 ) {
-
   $scope.isObject = item => typeof item === 'object';
-  
+
   $scope.appliedFilters = [];
   /**
    * This performs a search with a given term
@@ -196,7 +195,7 @@ export function RulesController(
   //listeners
   $scope.$on('wazuhShowRule', (event, parameters) => {
     $scope.currentRule = parameters.rule;
-    if(!(Object.keys((($scope.currentRule || {}).details || {})) || []).length) {
+    if (!(Object.keys(($scope.currentRule || {}).details || {}) || []).length) {
       $scope.currentRule.details = false;
     }
     $scope.viewingDetail = true;
@@ -224,7 +223,9 @@ export function RulesController(
       .request('get', `/rules/${incomingRule}`, {})
       .then(data => {
         $scope.currentRule = data.data.data.items[0];
-        if(!(Object.keys((($scope.currentRule || {}).details || {})) || []).length) {
+        if (
+          !(Object.keys(($scope.currentRule || {}).details || {}) || []).length
+        ) {
           $scope.currentRule.details = false;
         }
         $scope.viewingDetail = true;
