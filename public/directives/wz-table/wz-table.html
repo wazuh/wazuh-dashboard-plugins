@@ -8,11 +8,11 @@
         <thead class="wz-text-bold">
             <th ng-repeat="key in keys" class="wz-text-left" ng-class="{ 'cursor-pointer' : !key.nosortable, 'col-lg-1' : !key.size, 'col-lg-{{key.size}}' : key.size }"
                 ng-click="!key.nosortable && sort(key)">
-                {{ keyEquivalence[key.value || key] || key.value || key }}
+                {{ path === '/agents/groups' && (key.value || key) === 'count' ? 'Agents' : keyEquivalence[key.value || key] || key.value || key }}
                 <i ng-if="!key.nosortable" class="fa wz-theader-sort-icon" ng-class="sortValue === (key.value || key) ? (sortDir ? 'fa-sort-asc' : 'fa-sort-desc') : 'fa-sort'"
                     aria-hidden="true"></i>
             </th>
-            <th ng-if="(path === '/agents' || isLookingGroup()) && !isLookingDefaultGroup" class="wz-text-left col-lg-1">Actions</th>
+            <th ng-if="(path === '/agents' || path === '/agents/groups' || isLookingGroup()) && !isLookingDefaultGroup" class="wz-text-left col-lg-1">Actions</th>
         </thead>
         <tbody>
             <tr ng-class="allowClick ? 'cursor-pointer' : ''" class="wz-word-wrap" ng-repeat="item in pagedItems[currentPage] | filter:{item:'!'}"
@@ -33,18 +33,42 @@
                     <i ng-click="clickAction(item, 'configuration'); $event.stopPropagation()" class="fa fa-fw fa-wrench cursor-pointer"
                         tooltip="Open configuration for this agent" tooltip-placement="left" aria-hidden="true"></i>
                 </td>
+                <td ng-if="path === '/agents/groups'" ng-click="$event.stopPropagation()" class="cursor-default action-btn-td">
+                    <i ng-if="removingGroup !== item.name" ng-click="showConfirmRemoveGroup($event, item); $event.stopPropagation()" class="fa fa-fw fa-remove cursor-pointer"
+                        tooltip="Remove this group" tooltip-placement="left" aria-hidden="true"></i>
+                    <div ng-if="removingGroup === item.name">
+                        <div layout="row">
+                            <span class="euiToastHeader__title font-size-12"><i class="fa fa-warning fa-fw"></i> Group {{item.name}} will be removed</span>
+                        </div>
+                        <div layout="row">
+                            <md-button class="cancelBtn" type="button" ng-click="cancelRemoveGroup()"><i aria-hidden='true' class='fa fa-fw fa-close'></i> Cancel</md-button>
+                            <md-button class="agreeBtn" type="button" ng-click="confirmRemoveGroup(item.name)"><i aria-hidden='true' class='fa fa-fw fa-save'></i> Agree</md-button>  
+                        </div>            
+                                                        
+                    </div>
+                </td>
                 <!--<td ng-if="path === '/agents/groups'" ng-click="$event.stopPropagation()" class="cursor-default action-btn-td">
                      <i ng-click="editGroupAgentConfig($event, item); $event.stopPropagation()" class="fa fa-fw fa-file-code-o cursor-pointer"
                         tooltip="Edit this group agent.conf file" tooltip-placement="left" aria-hidden="true"></i> 
                 </td>-->
                 <td ng-if="isLookingGroup() && !isLookingDefaultGroup" ng-click="$event.stopPropagation()" class="cursor-default action-btn-td">
-                    <i ng-click="showConfirm($event, item); $event.stopPropagation()" class="fa fa-fw fa-remove cursor-pointer"
+                    <i ng-if="removingAgent !== item.id" ng-click="showConfirmRemoveAgentFromGroup($event, item); $event.stopPropagation()" class="fa fa-fw fa-remove cursor-pointer"
                         tooltip="Remove this agent from the group" tooltip-placement="left" aria-hidden="true"></i>
+                    <div ng-if="removingAgent === item.id">
+                        <div layout="row">
+                            <span class="euiToastHeader__title font-size-12"><i class="fa fa-warning fa-fw"></i> The agent {{item.id}} will be removed from this group</span>
+                        </div>
+                        <div layout="row">
+                            <md-button flex class="cancelBtn" type="button" ng-click="cancelRemoveAgent()"><i aria-hidden='true' class='fa fa-fw fa-close'></i> Cancel</md-button>
+                            <md-button flex class="agreeBtn" type="button" ng-click="confirmRemoveAgent(item.id)"><i aria-hidden='true' class='fa fa-fw fa-save'></i> Agree</md-button>  
+                        </div>              
+                                                     
+                    </div>
                 </td>
             </tr>
         </tbody>
         <tfoot>
-            <td colspan="{{ (path === '/agents' || isLookingGroup()) && !isLookingDefaultGroup ? keys.length + 1 : keys.length}}">
+            <td colspan="{{ (path === '/agents' || path === '/agents/groups' || isLookingGroup()) && !isLookingDefaultGroup ? keys.length + 1 : keys.length}}">
                 <span ng-show="!wazuh_table_loading" class="color-grey">{{ totalItems }} items ({{time | number: 2}}
                     seconds)</span>
                 <div ng-show="items.length >= itemsPerPage" class="pagination pull-right" style="margin:0 !important">

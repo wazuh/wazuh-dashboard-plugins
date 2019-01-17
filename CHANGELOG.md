@@ -10,6 +10,7 @@ All notable changes to the Wazuh app project will be documented in this file.
     - Edit the group configuration ([#1096](https://github.com/wazuh/wazuh-kibana-app/pull/1096)).
     - Add/remove groups to/from an agent ([#1096](https://github.com/wazuh/wazuh-kibana-app/pull/1096)).
     - Add/remove agents to/from a group ([#1096](https://github.com/wazuh/wazuh-kibana-app/pull/1096)).
+    - Add/remove groups ([#1152](https://github.com/wazuh/wazuh-kibana-app/pull/1152)).
 - New directive for tables that don't need external data sources ([#1067](https://github.com/wazuh/wazuh-kibana-app/pull/1067)).
 - New search bar directive with interactive filters and suggestions ([#1058](https://github.com/wazuh/wazuh-kibana-app/pull/1058)).
 - New server route `/elastic/alerts` for fetching alerts using custom parameters([#1056](https://github.com/wazuh/wazuh-kibana-app/pull/1056)).

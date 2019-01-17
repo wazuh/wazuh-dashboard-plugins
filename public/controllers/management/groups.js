@@ -20,10 +20,12 @@ export function GroupsController(
   csvReq,
   appState,
   shareAgent,
-  $timeout,
+  groupHandler,
   wzTableFilter
 ) {
+  $scope.addingGroup = false;
   $scope.$on('groupsIsReloaded', () => {
+    $scope.groupsSelectedTab = false;
     $scope.editingFile = false;
     $scope.currentGroup = false;
     $scope.$emit('removeCurrentGroup');
@@ -144,6 +146,7 @@ export function GroupsController(
 
   //listeners
   $scope.$on('wazuhShowGroup', (event, parameters) => {
+    $scope.groupsSelectedTab = 'agents';
     return $scope.loadGroup(parameters.group);
   });
 
@@ -538,4 +541,19 @@ export function GroupsController(
       $scope.filename = false;
     }
   });
+
+  $scope.switchAddingGroup = () => {
+    $scope.addingGroup = !$scope.addingGroup;
+  };
+
+  $scope.createGroup = async name => {
+    try {
+      $scope.addingGroup = false;
+      await groupHandler.createGroup(name);
+      errorHandler.info(`Success. Group ${name} has been created`, '');
+    } catch (error) {
+      errorHandler.handle(`${error.message || error}`, '');
+    }
+    $scope.$broadcast('wazuhSearch', {});
+  };
 }
