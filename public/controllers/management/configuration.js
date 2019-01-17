@@ -91,7 +91,6 @@ export class ConfigurationController {
      * Navigate to configuration
      */
     this.$scope.switchConfigurationTab = (configurationTab, navigate) => {
-      this.appState.setNavigation({ status: true });
       this.$scope.navigate = navigate;
       this.configurationHandler.switchConfigurationTab(
         configurationTab,

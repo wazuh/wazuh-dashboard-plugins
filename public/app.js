@@ -61,25 +61,29 @@ app.run(function ($rootScope, $route, $location, appState, $window) {
     }
   });
   $rootScope.$on('$locationChangeSuccess', () => {
-    const setHistory = (navigation) => {
-      $window.history.pushState({ page: 'wazuh#' + navigation.discoverPrevious }, '', 'wazuh#' + navigation.discoverPrevious);
-      $window.history.pushState({ page: '/app/wazuh#' + $location.$$url }, '', '/app/wazuh#' + $location.$$url);
-    }
     const navigation = appState.getNavigation();
     appState.setNavigation({ currLocation: $location.path() });
-    if (!navigation.status && navigation.prevLocation) {
-      if (navigation.currLocation === navigation.prevLocation) {
-        if (!navigation.discoverSections.includes(navigation.currLocation)) {
-          appState.setNavigation({ reloaded: true });
-          $route.reload();
-        } else if (navigation.discoverSections.includes(navigation.currLocation)) {
-          setHistory(navigation);
-        }
-      }
-    }
     if (navigation.currLocation !== navigation.prevLocation) {
       if (navigation.discoverSections.includes(navigation.currLocation)) {
         appState.setNavigation({ discoverPrevious: navigation.prevLocation })
+      }
+    } else {
+      if (!navigation.status && navigation.prevLocation) {
+        if (!navigation.discoverSections.includes(navigation.currLocation)) {
+          appState.setNavigation({ reloaded: true });
+          $route.reload();
+          //discover sections
+        } else if (navigation.discoverSections.includes(navigation.currLocation)) {
+          if (navigation.currLocation === navigation.discoverSections[1]) {
+            $window.history.pushState({ page: 'wazuh#' + navigation.discoverPrevious + '/' }, '', 'wazuh#' + navigation.discoverPrevious + '/');
+          } else if (navigation.currLocation === navigation.discoverSections[2]) {
+            //$window.history.pushState({ page: 'wazuh#/agents/002/welcome/panels' }, '', 'wazuh#/agents/002/welcome/panels');
+            $window.history.pushState({ page: 'wazuh#' + navigation.discoverPrevious }, '', 'wazuh#' + navigation.discoverPrevious);
+          } else {
+            $window.history.pushState({ page: 'wazuh#' + navigation.discoverPrevious }, '', 'wazuh#' + navigation.discoverPrevious);
+          }
+          $window.history.pushState({ page: '/app/wazuh#' + $location.$$url }, '', '/app/wazuh#' + $location.$$url);
+        }
       }
     }
     appState.setNavigation({ status: false });
