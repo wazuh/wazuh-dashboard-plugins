@@ -19,7 +19,7 @@ export function clickAction(
   $scope,
   appState
 ) {
-  appState.setNavigation(true);
+  appState.setNavigation({ status: true });
   if (
     instance.path === '/agents' ||
     new RegExp(/^\/agents\/groups\/[a-zA-Z0-9_\-.]*$/).test(instance.path)

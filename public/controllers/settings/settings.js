@@ -105,7 +105,7 @@ export class SettingsController {
    */
   switchTab(tab, setNav = false) {
     if (setNav) {
-      this.appState.setNavigation(true);
+      this.appState.setNavigation({ status: true });
     }
     this.tab = tab;
     this.$location.search('tab', this.tab);

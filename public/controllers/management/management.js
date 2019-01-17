@@ -68,7 +68,7 @@ export class ManagementController {
    */
   switchTab(tab, setNav = false) {
     if (setNav) {
-      this.appState.setNavigation(true);
+      this.appState.setNavigation({ status: true });
     }
     this.tab = tab;
 

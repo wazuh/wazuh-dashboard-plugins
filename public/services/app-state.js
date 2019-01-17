@@ -18,7 +18,7 @@ export class AppState {
   constructor($cookies, $window) {
     this.$cookies = $cookies;
     this.$window = $window;
-    this.navigate = false;
+    this.navigate = {};
   }
 
   //Extensions setters and getters
@@ -136,8 +136,10 @@ export class AppState {
     this.$window.sessionStorage.removeItem(key);
   }
 
-  setNavigation(state) {
-    this.navigate = state;
+  setNavigation(params) {
+    for(var key in params){
+      this.navigate[key] = params[key];
+    }
   }
 
   getNavigation() {

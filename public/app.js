@@ -48,29 +48,41 @@ app.config([
   }
 ]);
 
-app.run(function ($rootScope, $route, $location, appState) {
-  appState.setNavigation(false);
-  $rootScope.reloaded = false;
+app.run(function ($rootScope, $route, $location, appState, $window) {
+  appState.setNavigation({ status: false });
+  appState.setNavigation({ reloaded: false, discoverPrevious: false, discoverSections: ['/wazuh-discover/', '/overview/', '/agents'] });
+
   $rootScope.$on('$routeChangeSuccess', () => {
-    $rootScope.prevLocation = $location.path();
-    if (!$rootScope.reloaded) {
-      appState.setNavigation(true);
+    appState.setNavigation({ prevLocation: $location.path() });
+    if (!appState.getNavigation().reloaded) {
+      appState.setNavigation({ status: true });
     } else {
-      $rootScope.reloaded = false;
+      appState.setNavigation({ reloaded: false });
     }
   });
   $rootScope.$on('$locationChangeSuccess', () => {
-    $rootScope.currLocation = $location.path();
-    if (!appState.getNavigation() && $rootScope.prevLocation &&
-      $rootScope.currLocation !== '/wazuh-discover/' &&
-      $rootScope.currLocation !== '/overview/' &&
-      $rootScope.currLocation !== '/agents') {
-      if ($rootScope.currLocation === $rootScope.prevLocation) {
-        $rootScope.reloaded = true;
-        $route.reload();
+    const setHistory = (navigation) => {
+      $window.history.pushState({ page: 'wazuh#' + navigation.discoverPrevious }, '', 'wazuh#' + navigation.discoverPrevious);
+      $window.history.pushState({ page: '/app/wazuh#' + $location.$$url }, '', '/app/wazuh#' + $location.$$url);
+    }
+    const navigation = appState.getNavigation();
+    appState.setNavigation({ currLocation: $location.path() });
+    if (!navigation.status && navigation.prevLocation) {
+      if (navigation.currLocation === navigation.prevLocation) {
+        if (!navigation.discoverSections.includes(navigation.currLocation)) {
+          appState.setNavigation({ reloaded: true });
+          $route.reload();
+        } else if (navigation.discoverSections.includes(navigation.currLocation)) {
+          setHistory(navigation);
+        }
       }
     }
-    appState.setNavigation(false);
+    if (navigation.currLocation !== navigation.prevLocation) {
+      if (navigation.discoverSections.includes(navigation.currLocation)) {
+        appState.setNavigation({ discoverPrevious: navigation.prevLocation })
+      }
+    }
+    appState.setNavigation({ status: false });
   });
 });
 
