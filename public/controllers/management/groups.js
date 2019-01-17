@@ -146,7 +146,7 @@ export function GroupsController(
 
   //listeners
   $scope.$on('wazuhShowGroup', (event, parameters) => {
-    $scope.groupsSelectedTab = 'agents'
+    $scope.groupsSelectedTab = 'agents';
     return $scope.loadGroup(parameters.group);
   });
 
@@ -544,19 +544,16 @@ export function GroupsController(
 
   $scope.switchAddingGroup = () => {
     $scope.addingGroup = !$scope.addingGroup;
-  }
+  };
 
-  $scope.createGroup = async (name) => {
-    try {   
+  $scope.createGroup = async name => {
+    try {
       $scope.addingGroup = false;
       await groupHandler.createGroup(name);
       errorHandler.info(`Success. Group ${name} has been created`, '');
     } catch (error) {
-      errorHandler.handle(
-        `${error.message || error}`,
-        ''
-      );
+      errorHandler.handle(`${error.message || error}`, '');
     }
-    $scope.$broadcast('wazuhSearch', { });
-  }
+    $scope.$broadcast('wazuhSearch', {});
+  };
 }

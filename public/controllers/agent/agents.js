@@ -313,37 +313,39 @@ export class AgentsController {
     this.$scope.switchGroupEdit = () => {
       this.$scope.addingGroupToAgent = false;
       this.switchGroupEdit();
-    }
+    };
 
-    this.$scope.showConfirmAddGroup = (group) => {
-      this.$scope.addingGroupToAgent = this.$scope.addingGroupToAgent ? false : group;
-    }
+    this.$scope.showConfirmAddGroup = group => {
+      this.$scope.addingGroupToAgent = this.$scope.addingGroupToAgent
+        ? false
+        : group;
+    };
 
-    this.$scope.cancelAddGroup = () => this.$scope.addingGroupToAgent = false;
+    this.$scope.cancelAddGroup = () => (this.$scope.addingGroupToAgent = false);
 
-    this.$scope.confirmAddGroup = (group) => {
+    this.$scope.confirmAddGroup = group => {
       this.groupHandler
-      .addAgentToGroup(group, this.$scope.agent.id)
-      .then(() =>
-        this.apiReq.request('GET', `/agents/${this.$scope.agent.id}`, {})
-      )
-      .then(agent => {
-        this.$scope.agent.group = agent.data.data.group;
-        this.$scope.groups = this.$scope.groups.filter(
-          item => !agent.data.data.group.includes(item)
-        );
-        this.$scope.addingGroupToAgent = false;
-        this.errorHandler.info(`Group ${group} has been added.`, '');
-        if (!this.$scope.$$phase) this.$scope.$digest();
-      })
-      .catch(error => {
-        this.$scope.addingGroupToAgent = false;
-        this.errorHandler.handle(
-          error.message || error,
-          'Error adding group to agent'
+        .addAgentToGroup(group, this.$scope.agent.id)
+        .then(() =>
+          this.apiReq.request('GET', `/agents/${this.$scope.agent.id}`, {})
         )
-      });
-    }    
+        .then(agent => {
+          this.$scope.agent.group = agent.data.data.group;
+          this.$scope.groups = this.$scope.groups.filter(
+            item => !agent.data.data.group.includes(item)
+          );
+          this.$scope.addingGroupToAgent = false;
+          this.errorHandler.info(`Group ${group} has been added.`, '');
+          if (!this.$scope.$$phase) this.$scope.$digest();
+        })
+        .catch(error => {
+          this.$scope.addingGroupToAgent = false;
+          this.errorHandler.handle(
+            error.message || error,
+            'Error adding group to agent'
+          );
+        });
+    };
   }
   /**
    * Create metric for given object

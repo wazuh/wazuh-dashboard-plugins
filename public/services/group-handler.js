@@ -71,7 +71,7 @@ export class GroupHandler {
       const result = await this.apiReq.request(
         'PUT',
         `/agents/groups/${name}`,
-        { }
+        {}
       );
       return result;
     } catch (error) {

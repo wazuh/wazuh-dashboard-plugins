@@ -279,50 +279,49 @@ app.directive('wzTable', function() {
         }
       };
 
-      $scope.showConfirmRemoveGroup = (ev,group) => { 
-        $scope.removingGroup = $scope.removingGroup === group.name ? null : group.name;
-      }
+      $scope.showConfirmRemoveGroup = (ev, group) => {
+        $scope.removingGroup =
+          $scope.removingGroup === group.name ? null : group.name;
+      };
 
-      $scope.showConfirmRemoveAgentFromGroup = (ev,agent) => { 
-        $scope.removingAgent = $scope.removingAgent === agent.id ? null : agent.id;
-      }
+      $scope.showConfirmRemoveAgentFromGroup = (ev, agent) => {
+        $scope.removingAgent =
+          $scope.removingAgent === agent.id ? null : agent.id;
+      };
 
       $scope.cancelRemoveAgent = () => {
         $scope.removingAgent = null;
-      }
+      };
 
       $scope.cancelRemoveGroup = () => {
         $scope.removingGroup = null;
-      }
+      };
 
-      $scope.confirmRemoveAgent = async (agent) => {
+      $scope.confirmRemoveAgent = async agent => {
         try {
           const group = instance.path.split('/').pop();
-          await groupHandler.removeAgentFromGroup(group,agent);
-          errorHandler.info(`Success. Agent ${agent} has been removed from ${group}`, '');
-        } catch (error) {
-          errorHandler.handle(
-            `${error.message || error}`,
+          await groupHandler.removeAgentFromGroup(group, agent);
+          errorHandler.info(
+            `Success. Agent ${agent} has been removed from ${group}`,
             ''
           );
+        } catch (error) {
+          errorHandler.handle(`${error.message || error}`, '');
         }
         $scope.removingAgent = null;
         return init();
-      }
+      };
 
-      $scope.confirmRemoveGroup = async (group) => {
+      $scope.confirmRemoveGroup = async group => {
         try {
           await groupHandler.removeGroup(group);
           errorHandler.info(`Success. Group ${group} has been removed`, '');
         } catch (error) {
-          errorHandler.handle(
-            `${error.message || error}`,
-            ''
-          );
+          errorHandler.handle(`${error.message || error}`, '');
         }
         $scope.removingGroup = null;
         return init();
-      }
+      };
     },
     template
   };
