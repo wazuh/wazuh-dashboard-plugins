@@ -31,22 +31,7 @@ class WzConfigViewer {
 
   controller($scope, $document) {
 
-    const init = () => {    
-      $scope.xmlCodeBox = CodeMirror.fromTextArea(
-        $document[0].getElementById('xml_box'),
-        {
-          lineNumbers: true,
-          matchClosing: true,
-          matchBrackets: true,
-          mode: 'text/xml',
-          readOnly: true,
-          theme: 'ttcn',
-          foldGutter: true,
-          styleSelectedText: true,
-          gutters: ['CodeMirror-foldgutter']
-        }
-      );
-  
+    const setJsonBox = () => {
       $scope.jsonCodeBox = CodeMirror.fromTextArea(
         $document[0].getElementById('json_box'),
         {
@@ -62,9 +47,32 @@ class WzConfigViewer {
         }
       );
     }
-  
+    const setXmlBox = () => {
+      $scope.xmlCodeBox = CodeMirror.fromTextArea(
+        $document[0].getElementById('xml_box'),
+        {
+          lineNumbers: true,
+          matchClosing: true,
+          matchBrackets: true,
+          mode: 'text/xml',
+          readOnly: true,
+          theme: 'ttcn',
+          foldGutter: true,
+          styleSelectedText: true,
+          gutters: ['CodeMirror-foldgutter']
+        }
+      );
+    }
+
+
+    const init = () => {
+      setJsonBox();
+      setXmlBox();
+    }
+
     const refreshJsonBox = json => {
       $scope.jsoncontent = json;
+      setJsonBox();
       if ($scope.jsoncontent != false) {
         $scope.jsonCodeBox.setValue($scope.jsoncontent);
         setTimeout(function () {
@@ -72,9 +80,10 @@ class WzConfigViewer {
         }, 1);
       }
     }
-  
+
     const refreshXmlBox = xml => {
       $scope.xmlcontent = xml;
+      setXmlBox();
       if ($scope.xmlcontent != false) {
         $scope.xmlCodeBox.setValue($scope.xmlcontent);
         setTimeout(function () {
@@ -84,9 +93,9 @@ class WzConfigViewer {
     }
 
     $scope.callgetjson = () => $scope.getjson();
-    
+
     $scope.callgetxml = () => $scope.getxml();
-    
+
     $scope.$on('JSONContentReady', (ev, params) => {
       refreshJsonBox(params.data);
     });
@@ -94,7 +103,7 @@ class WzConfigViewer {
     $scope.$on('XMLContentReady', (ev, params) => {
       refreshXmlBox(params.data);
     });
-    
+
     init();
   }
 }
