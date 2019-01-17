@@ -39,6 +39,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Checking message origin in error handler ([dfec368](https://github.com/wazuh/wazuh-kibana-app/commit/dfec368d22a148b2e4437db92d71294900241961)).
 - Dev tools is now showing the response as it is, like `curl` does ([#1137](https://github.com/wazuh/wazuh-kibana-app/pull/1137)). 
 - Removed `unknown` as valid node name ([#1149](https://github.com/wazuh/wazuh-kibana-app/pull/1149)).
+- Removed `rule.id` direct filter from the rule set tables ([#1151](https://github.com/wazuh/wazuh-kibana-app/pull/1151))
 
 ### Fixed
 
