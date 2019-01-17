@@ -162,10 +162,10 @@ export class AgentsPreviewController {
         'os.name': unique.osPlatforms.map(x => x.name)
       };
 
-      if(clusterInfo.status === 'enabled' && unique.nodes) {
+      if (clusterInfo.status === 'enabled' && unique.nodes) {
         this.searchBarModel.node_name = unique.nodes;
       }
-      
+
       this.searchBarModel['os.name'] = Array.from(
         new Set(this.searchBarModel['os.name'])
       );

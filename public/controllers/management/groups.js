@@ -26,7 +26,7 @@ export function GroupsController(
   $scope.$on('groupsIsReloaded', () => {
     $scope.editingFile = false;
     $scope.currentGroup = false;
-    $scope.$emit('removeCurrentGroup')
+    $scope.$emit('removeCurrentGroup');
     $scope.lookingGroup = false;
     if (!$scope.$$phase) $scope.$digest();
   });
@@ -133,7 +133,7 @@ export function GroupsController(
       $scope.totalFiles = count.data.data.totalItems;
       $scope.fileViewer = false;
       $scope.currentGroup = group;
-      $scope.$emit('setCurrentGroup',{currentGroup: $scope.currentGroup})
+      $scope.$emit('setCurrentGroup', { currentGroup: $scope.currentGroup });
       $scope.fileViewer = false;
       if (!$scope.$$phase) $scope.$digest();
     } catch (error) {
@@ -148,7 +148,7 @@ export function GroupsController(
   });
 
   $scope.$on('wazuhShowGroupFile', (event, parameters) => {
-    if(((parameters || {}).fileName || '').includes('agent.conf')){
+    if (((parameters || {}).fileName || '').includes('agent.conf')) {
       return $scope.editGroupAgentConfig();
     }
     return $scope.showFile(parameters.groupName, parameters.fileName);
@@ -216,7 +216,7 @@ export function GroupsController(
    */
   $scope.goBackGroups = () => {
     $scope.currentGroup = false;
-    $scope.$emit('removeCurrentGroup')
+    $scope.$emit('removeCurrentGroup');
     $scope.lookingGroup = false;
     $scope.editingFile = false;
     if (!$scope.$$phase) $scope.$digest();
