@@ -36,30 +36,33 @@
     </div>
     <div layout="row" layout-padding class="wz-padding-top-0 wz-padding-bottom-0" ng-if="agent.group">
         <md-card flex class="wz-metric-color wz-md-card wz-no-padding">
-            <md-card-content layout="row" class="wz-padding-metric">
-                <div class="layout-row wz-word-break" flex>
-                    Groups:&nbsp;<span ng-repeat="group in agent.group" class="wz-text-bold wz-text-link" ng-click="goGroups(agent,$index)">{{ group }}&nbsp;</span>
-                    <span ng-if="!editGroup" class="wz-text-link" ng-click="switchGroupEdit()"><i class="fa fa-fw fa-plus-circle"></i></span>
+            <md-card-content class="wz-padding-metric">
+                <div class="layout-row wz-word-break">
+                    <span class="wz-text-link" ng-click="switchGroupEdit()"><i class="fa fa-fw fa-plus-circle"></i></span>&nbsp;Groups:&nbsp;                    
+                    <span ng-repeat="group in agent.group" class="wz-text-bold wz-text-link" ng-click="goGroups(agent,$index)">{{ group }}&nbsp;</span>                   
                 </div>
-            </md-card-content>
-        </md-card>
-    </div>
-    <div layout="row" layout-padding class="wz-padding-top-0 wz-padding-bottom-0" ng-if="editGroup">
-        <md-card flex class="wz-metric-color wz-md-card wz-no-padding">
-            <md-card-content layout="column" class="wz-padding-metric">
-                <div layout="row">
-                <div class="wz-word-break" flex ng-if="groups && groups.length">
-                    Available groups: 
+                <div layout="row" class="wz-margin-top-10" ng-if="editGroup && !addingGroupToAgent">
+                    <div class="wz-word-break" flex ng-if="groups && groups.length">
+                        Available groups:
+                    </div>
+                    <div class="wz-word-break" flex ng-if="!groups || !groups.length">
+                        There are no more groups available.
+                    </div>
                 </div>
-                <div class="wz-word-break" flex ng-if="!groups || !groups.length">
-                    There are no more groups available.
+                <div ng-if="editGroup && !addingGroupToAgent" class="wz-margin-top-4" ng-if="groups && groups.length">
+                    <span ng-repeat="group in groups" class="wz-text-bold wz-text-link" ng-click="showConfirmAddGroup(group)">{{
+                        group }}&nbsp;</span>
                 </div>
-                <span flex></span>
-                <span class="wz-text-link" ng-click="switchGroupEdit()">Close</span>
-            </div>
-            <div >
-                <span ng-repeat="group in groups" class="wz-text-bold wz-text-link" ng-click="showConfirm($event,group)">{{ group }}&nbsp;</span>
-            </div>
+
+                <div class="wz-margin-top-10" ng-if="editGroup && addingGroupToAgent">
+                    <div layout="row">
+                        <span class="euiToastHeader__title font-size-12"><i class="fa fa-warning fa-fw"></i> Add group {{addingGroupToAgent}} to agent {{agent.id}}?</span>
+                    </div>
+                    <div layout="row">
+                        <md-button class="cancelBtnAgents" type="button" ng-click="cancelAddGroup()"><i aria-hidden='true' class='fa fa-fw fa-close'></i> Cancel</md-button>
+                        <md-button class="agreeBtnAgents" type="button" ng-click="confirmAddGroup(addingGroupToAgent)"><i aria-hidden='true' class='fa fa-fw fa-save'></i> Agree</md-button>  
+                    </div>                          
+                </div>
             </md-card-content>
         </md-card>
     </div>
