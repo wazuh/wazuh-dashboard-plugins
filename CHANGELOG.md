@@ -20,6 +20,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - New feature to be able to edit config.yml file from the Settings > Configuration section view ([#1105](https://github.com/wazuh/wazuh-kibana-app/pull/1105)).
 - Added a new table (network addresses) for agent inventory tab ([#1111](https://github.com/wazuh/wazuh-kibana-app/pull/1111)).
 - Added `audit_key` (Who-data Audit keys) for configuration tab ([#1123](https://github.com/wazuh/wazuh-kibana-app/pull/1123)).
+- Added new known fields for Kibana index pattern ([#1150](https://github.com/wazuh/wazuh-kibana-app/pull/1150)).
 
 ### Changed
 
