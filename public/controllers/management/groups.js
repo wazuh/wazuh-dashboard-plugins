@@ -101,11 +101,7 @@ export function GroupsController(
       }
 
       const configuration = wazuhConfig.getConfig();
-      $scope.adminMode = !(
-        configuration &&
-        typeof configuration.admin !== 'undefined' &&
-        !configuration.admin
-      );
+      $scope.adminMode = !!(configuration || {}).admin;
       $scope.load = false;
 
       if (!$scope.$$phase) $scope.$digest();
