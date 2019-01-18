@@ -58,7 +58,8 @@ export class AgentsController {
     csvReq,
     wzTableFilter,
     $mdDialog,
-    groupHandler
+    groupHandler,
+    wazuhConfig
   ) {
     this.$scope = $scope;
     this.$location = $location;
@@ -75,6 +76,7 @@ export class AgentsController {
     this.wzTableFilter = wzTableFilter;
     this.$mdDialog = $mdDialog;
     this.groupHandler = groupHandler;
+    this.wazuhConfig = wazuhConfig;
 
     // Config on-demand
     this.$scope.isArray = Array.isArray;
@@ -193,6 +195,9 @@ export class AgentsController {
       this.shareAgent.setAgent(this.$scope.agent);
       this.$location.path('/manager/groups');
     };
+
+    const configuration = this.wazuhConfig.getConfig();
+    this.$scope.adminMode = !!(configuration || {}).admin;
 
     //Load
     try {

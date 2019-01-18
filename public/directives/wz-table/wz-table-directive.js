@@ -48,7 +48,8 @@ app.directive('wzTable', function() {
       $window,
       appState,
       globalState,
-      groupHandler
+      groupHandler,
+      wazuhConfig
     ) {
       /**
        * Init variables
@@ -64,6 +65,8 @@ app.directive('wzTable', function() {
       $scope.wazuh_table_loading = true;
       $scope.items = [];
 
+      const configuration = wazuhConfig.getConfig();
+      $scope.adminMode = !!(configuration || {}).admin;
       /**
        * Resizing. Calculate number of table rows depending on the screen height
        */

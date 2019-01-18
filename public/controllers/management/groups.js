@@ -21,7 +21,8 @@ export function GroupsController(
   appState,
   shareAgent,
   groupHandler,
-  wzTableFilter
+  wzTableFilter,
+  wazuhConfig
 ) {
   $scope.addingGroup = false;
   $scope.$on('groupsIsReloaded', () => {
@@ -99,6 +100,8 @@ export function GroupsController(
         shareAgent.deleteAgent();
       }
 
+      const configuration = wazuhConfig.getConfig();
+      $scope.adminMode = !!(configuration || {}).admin;
       $scope.load = false;
 
       if (!$scope.$$phase) $scope.$digest();
@@ -151,7 +154,10 @@ export function GroupsController(
   });
 
   $scope.$on('wazuhShowGroupFile', (event, parameters) => {
-    if (((parameters || {}).fileName || '').includes('agent.conf')) {
+    if (
+      ((parameters || {}).fileName || '').includes('agent.conf') &&
+      $scope.adminMode
+    ) {
       return $scope.editGroupAgentConfig();
     }
     return $scope.showFile(parameters.groupName, parameters.fileName);
