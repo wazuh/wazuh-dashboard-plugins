@@ -9,9 +9,23 @@
 
         <!-- Headline -->
         <div ng-show="!load" layout="column" layout-padding ng-if="!currentGroup || !currentGroup.name">
-            <span class="font-size-18">
-                <i class="fa fa-fw fa-object-group" aria-hidden="true"></i> Groups</span>
-            <span class="md-subheader">List and check your groups, its agents and files</span>
+            <div layout="row">
+                <span class="font-size-18">
+                    <i class="fa fa-fw fa-object-group" aria-hidden="true"></i> Groups</span>
+                <span ng-if='adminMode' class="font-size-18 wz-text-link" ng-click="switchAddingGroup()"><i class="fa fa-fw fa-plus-circle"></i></span>
+            </div>
+            <div layout="row" ng-if="addingGroup" ng-if='adminMode'>
+                <input placeholder="Group name..." ng-model="groupToBeAdded" type="text" class="kuiLocalSearchInput addGroupInput ng-empty ng-pristine ng-scope ng-touched ng-valid"
+                    aria-invalid="false">
+                <button type="submit" aria-label="Search" class="kuiLocalSearchButton addGroupBtn" ng-click="createGroup(groupToBeAdded)">
+                    <span class="fa fa-save fa-fw" aria-hidden="true"></span>
+                </button>
+            </div>
+            <div layout="row" ng-if="!addingGroup">
+                <span class="md-subheader">List and check your groups, its agents and files</span>
+            </div>
+
+
         </div>
         <!-- End headline -->
 
@@ -24,6 +38,7 @@
                         <div layout="row">
                             <span class="font-size-18">
                                 <i class="fa fa-fw fa-object-group" aria-hidden="true"></i> {{currentGroup.name}}</span>
+
                         </div>
 
                         <md-divider class="wz-margin-top-10"></md-divider>
@@ -85,7 +100,7 @@
 
                 <!-- Search bar -->
                 <div layout="row" class="md-padding" ng-if="!addingAgents && !file">
-                    <input placeholder="{{groupsSelectedTab==='files' ? 'Filter files...' : 'Filter agents...'}}"
+                    <input placeholder="{{groupsSelectedTab==='files' ? 'Filter files...' : lookingGroup ? 'Filter agents...' : 'Filter groups...'}}"
                         ng-model="custom_search" type="text" class="kuiLocalSearchInput ng-empty ng-pristine ng-scope ng-touched ng-valid"
                         aria-invalid="false" wz-enter="search(custom_search)">
                     <button type="submit" aria-label="Search" class="kuiLocalSearchButton height-40" ng-click="search(custom_search)">
@@ -94,7 +109,7 @@
                 </div>
                 <!-- End search bar -->
 
-                <div layout="row" class="wz-margin-left-16" ng-if="lookingGroup && currentGroup && !addingAgents && !editingFile && !file">
+                <div layout="row" class="wz-margin-left-16" ng-if="lookingGroup && currentGroup && !addingAgents && !editingFile && !file && adminMode">
                     <button ng-if="lookingGroup && groupsSelectedTab==='files'" ng-click='editGroupAgentConfig(currentGroup)'
                         class='btn btn-primary'><i aria-hidden='true' class='fa fa-fw fa-pencil'></i>
                         Edit group configuration
@@ -162,9 +177,9 @@
                         <div flex layout="column">
                             <div layout="row" class="wz-padding-bottom-14">
                                 <span flex class="wz-headline-title">{{ filename }}</span>
-                                <button class="md-icon-button" ng-if="lookingGroup" aria-label="Back"
-                                tooltip="Close file" tooltip-placement="left" ng-click="goBackFiles()"><i class="fa fa-fw fa-close"
-                                    aria-hidden="true"></i></button>
+                                <button class="md-icon-button" ng-if="lookingGroup" aria-label="Back" tooltip="Close file"
+                                    tooltip-placement="left" ng-click="goBackFiles()"><i class="fa fa-fw fa-close"
+                                        aria-hidden="true"></i></button>
                                 <!--<span flex class="wz-text-right cursor-pointer color-grey" ng-click="goBackFiles()">close</span>-->
                             </div>
                             <div flex layout="column">

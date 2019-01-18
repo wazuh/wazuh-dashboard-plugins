@@ -48,8 +48,8 @@ app.directive('wzTable', function() {
       $window,
       appState,
       globalState,
-      $mdDialog,
-      groupHandler
+      groupHandler,
+      wazuhConfig
     ) {
       /**
        * Init variables
@@ -65,6 +65,8 @@ app.directive('wzTable', function() {
       $scope.wazuh_table_loading = true;
       $scope.items = [];
 
+      const configuration = wazuhConfig.getConfig();
+      $scope.adminMode = !!(configuration || {}).admin;
       /**
        * Resizing. Calculate number of table rows depending on the screen height
        */
@@ -280,56 +282,48 @@ app.directive('wzTable', function() {
         }
       };
 
-      $scope.showConfirm = function(ev, agent) {
-        const group = instance.path.split('/').pop();
+      $scope.showConfirmRemoveGroup = (ev, group) => {
+        $scope.removingGroup =
+          $scope.removingGroup === group.name ? null : group.name;
+      };
 
-        const confirm = $mdDialog.confirm({
-          controller: function($scope, $mdDialog) {
-            $scope.closeDialog = () => {
-              $mdDialog.hide();
-              $('body').removeClass('md-dialog-body');
-            };
-            $scope.confirmDialog = () => {
-              groupHandler
-                .removeAgentFromGroup(group, agent.id)
-                .then(() => {
-                  $mdDialog.hide();
-                  $('body').removeClass('md-dialog-body');
-                  init();
-                })
-                .then(() => $scope.$emit('updateGroupInformation', { group }))
-                .catch(error =>
-                  errorHandler.handle(
-                    error.message || error,
-                    'Error removing agent from group'
-                  )
-                );
-            };
-          },
-          template:
-            '<md-dialog class="modalTheme euiToast euiToast--danger euiGlobalToastListItem">' +
-            '<md-dialog-content>' +
-            '<div class="euiToastHeader">' +
-            '<i class="fa fa-exclamation-triangle"></i>' +
-            '<span class="euiToastHeader__title">The agent ' +
-            `${agent.id}` +
-            ' will be removed from group ' +
-            `${group}` +
-            '.</span>' +
-            '</div>' +
-            '</md-dialog-content>' +
-            '<md-dialog-actions>' +
-            '<button class="md-primary md-cancel-button md-button ng-scope md-default-theme md-ink-ripple" type="button" ng-click="closeDialog()">Cancel</button>' +
-            '<button class="md-primary md-confirm-button md-button md-ink-ripple md-default-theme" type="button" ng-click="confirmDialog()">Agree</button>' +
-            '</md-dialog-actions>' +
-            '</md-dialog>',
-          targetEvent: ev,
-          hasBackdrop: false,
-          disableParentScroll: true,
-          clickOutsideToClose: true
-        });
-        $('body').addClass('md-dialog-body');
-        $mdDialog.show(confirm);
+      $scope.showConfirmRemoveAgentFromGroup = (ev, agent) => {
+        $scope.removingAgent =
+          $scope.removingAgent === agent.id ? null : agent.id;
+      };
+
+      $scope.cancelRemoveAgent = () => {
+        $scope.removingAgent = null;
+      };
+
+      $scope.cancelRemoveGroup = () => {
+        $scope.removingGroup = null;
+      };
+
+      $scope.confirmRemoveAgent = async agent => {
+        try {
+          const group = instance.path.split('/').pop();
+          await groupHandler.removeAgentFromGroup(group, agent);
+          errorHandler.info(
+            `Success. Agent ${agent} has been removed from ${group}`,
+            ''
+          );
+        } catch (error) {
+          errorHandler.handle(`${error.message || error}`, '');
+        }
+        $scope.removingAgent = null;
+        return init();
+      };
+
+      $scope.confirmRemoveGroup = async group => {
+        try {
+          await groupHandler.removeGroup(group);
+          errorHandler.info(`Success. Group ${group} has been removed`, '');
+        } catch (error) {
+          errorHandler.handle(`${error.message || error}`, '');
+        }
+        $scope.removingGroup = null;
+        return init();
       };
     },
     template

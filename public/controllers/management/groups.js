@@ -20,10 +20,13 @@ export function GroupsController(
   csvReq,
   appState,
   shareAgent,
-  $timeout,
-  wzTableFilter
+  groupHandler,
+  wzTableFilter,
+  wazuhConfig
 ) {
+  $scope.addingGroup = false;
   $scope.$on('groupsIsReloaded', () => {
+    $scope.groupsSelectedTab = false;
     $scope.editingFile = false;
     $scope.currentGroup = false;
     $scope.$emit('removeCurrentGroup');
@@ -97,6 +100,8 @@ export function GroupsController(
         shareAgent.deleteAgent();
       }
 
+      const configuration = wazuhConfig.getConfig();
+      $scope.adminMode = !!(configuration || {}).admin;
       $scope.load = false;
 
       if (!$scope.$$phase) $scope.$digest();
@@ -145,11 +150,15 @@ export function GroupsController(
 
   //listeners
   $scope.$on('wazuhShowGroup', (event, parameters) => {
+    $scope.groupsSelectedTab = 'agents';
     return $scope.loadGroup(parameters.group);
   });
 
   $scope.$on('wazuhShowGroupFile', (event, parameters) => {
-    if (((parameters || {}).fileName || '').includes('agent.conf')) {
+    if (
+      ((parameters || {}).fileName || '').includes('agent.conf') &&
+      $scope.adminMode
+    ) {
       return $scope.editGroupAgentConfig();
     }
     return $scope.showFile(parameters.groupName, parameters.fileName);
@@ -539,4 +548,19 @@ export function GroupsController(
       $scope.filename = false;
     }
   });
+
+  $scope.switchAddingGroup = () => {
+    $scope.addingGroup = !$scope.addingGroup;
+  };
+
+  $scope.createGroup = async name => {
+    try {
+      $scope.addingGroup = false;
+      await groupHandler.createGroup(name);
+      errorHandler.info(`Success. Group ${name} has been created`, '');
+    } catch (error) {
+      errorHandler.handle(`${error.message || error}`, '');
+    }
+    $scope.$broadcast('wazuhSearch', {});
+  };
 }

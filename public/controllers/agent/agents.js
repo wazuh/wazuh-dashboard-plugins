@@ -58,7 +58,8 @@ export class AgentsController {
     csvReq,
     wzTableFilter,
     $mdDialog,
-    groupHandler
+    groupHandler,
+    wazuhConfig
   ) {
     this.$scope = $scope;
     this.$location = $location;
@@ -75,6 +76,7 @@ export class AgentsController {
     this.wzTableFilter = wzTableFilter;
     this.$mdDialog = $mdDialog;
     this.groupHandler = groupHandler;
+    this.wazuhConfig = wazuhConfig;
 
     // Config on-demand
     this.$scope.isArray = Array.isArray;
@@ -89,6 +91,8 @@ export class AgentsController {
 
     this.$scope.showSyscheckFiles = false;
     this.$scope.editGroup = false;
+
+    this.$scope.addingGroupToAgent = false;
   }
 
   /**
@@ -191,6 +195,9 @@ export class AgentsController {
       this.shareAgent.setAgent(this.$scope.agent);
       this.$location.path('/manager/groups');
     };
+
+    const configuration = this.wazuhConfig.getConfig();
+    this.$scope.adminMode = !!(configuration || {}).admin;
 
     //Load
     try {
@@ -308,73 +315,41 @@ export class AgentsController {
       this.appState.removeSessionStorageItem('configSubTab')
     );
 
-    this.$scope.switchGroupEdit = () => this.switchGroupEdit();
+    this.$scope.switchGroupEdit = () => {
+      this.$scope.addingGroupToAgent = false;
+      this.switchGroupEdit();
+    };
 
-    this.$scope.showConfirm = (ev, group) => {
-      const confirm = this.$mdDialog.confirm({
-        controller: function(
-          $scope,
-          myScope,
-          $mdDialog,
-          groupHandler,
-          apiReq,
-          errorHandler
-        ) {
-          $scope.myScope = myScope;
-          $scope.closeDialog = () => {
-            $mdDialog.hide();
-            $('body').removeClass('md-dialog-body');
-          };
-          $scope.confirmDialog = () => {
-            groupHandler
-              .addAgentToGroup(group, $scope.myScope.agent.id)
-              .then(() =>
-                apiReq.request('GET', `/agents/${$scope.myScope.agent.id}`, {})
-              )
-              .then(agent => {
-                $mdDialog.hide();
-                $('body').removeClass('md-dialog-body');
-                $scope.myScope.agent.group = agent.data.data.group;
-                $scope.myScope.groups = $scope.myScope.groups.filter(
-                  item => !agent.data.data.group.includes(item)
-                );
-                if (!$scope.myScope.$$phase) $scope.myScope.$digest();
-              })
-              .catch(error =>
-                errorHandler.handle(
-                  error.message || error,
-                  'Error adding group to agent'
-                )
-              );
-          };
-        },
-        template:
-          '<md-dialog class="modalTheme euiToast euiToast--danger euiGlobalToastListItem">' +
-          '<md-dialog-content>' +
-          '<div class="euiToastHeader">' +
-          '<i class="fa fa-exclamation-triangle"></i>' +
-          '<span class="euiToastHeader__title">Add group ' +
-          `${group}` +
-          ' to agent ' +
-          `${this.$scope.agent.id}` +
-          '?</span>' +
-          '</div>' +
-          '</md-dialog-content>' +
-          '<md-dialog-actions>' +
-          '<button class="md-primary md-cancel-button md-button ng-scope md-default-theme md-ink-ripple" type="button" ng-click="closeDialog()">Cancel</button>' +
-          '<button class="md-primary md-confirm-button md-button md-ink-ripple md-default-theme" type="button" ng-click="confirmDialog()">Agree</button>' +
-          '</md-dialog-actions>' +
-          '</md-dialog>',
-        targetEvent: ev,
-        hasBackdrop: false,
-        clickOutsideToClose: true,
-        disableParentScroll: true,
-        locals: {
-          myScope: this.$scope
-        }
-      });
-      $('body').addClass('md-dialog-body');
-      this.$mdDialog.show(confirm);
+    this.$scope.showConfirmAddGroup = group => {
+      this.$scope.addingGroupToAgent = this.$scope.addingGroupToAgent
+        ? false
+        : group;
+    };
+
+    this.$scope.cancelAddGroup = () => (this.$scope.addingGroupToAgent = false);
+
+    this.$scope.confirmAddGroup = group => {
+      this.groupHandler
+        .addAgentToGroup(group, this.$scope.agent.id)
+        .then(() =>
+          this.apiReq.request('GET', `/agents/${this.$scope.agent.id}`, {})
+        )
+        .then(agent => {
+          this.$scope.agent.group = agent.data.data.group;
+          this.$scope.groups = this.$scope.groups.filter(
+            item => !agent.data.data.group.includes(item)
+          );
+          this.$scope.addingGroupToAgent = false;
+          this.errorHandler.info(`Group ${group} has been added.`, '');
+          if (!this.$scope.$$phase) this.$scope.$digest();
+        })
+        .catch(error => {
+          this.$scope.addingGroupToAgent = false;
+          this.errorHandler.handle(
+            error.message || error,
+            'Error adding group to agent'
+          );
+        });
     };
   }
   /**
