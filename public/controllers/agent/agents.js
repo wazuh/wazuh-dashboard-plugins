@@ -197,11 +197,7 @@ export class AgentsController {
     };
 
     const configuration = this.wazuhConfig.getConfig();
-    this.$scope.adminMode = !(
-      configuration &&
-      typeof configuration.admin !== 'undefined' &&
-      !configuration.admin
-    );
+    this.$scope.adminMode = !!(configuration || {}).admin;
 
     //Load
     try {
