@@ -26,7 +26,7 @@ import { checkGap } from './lib/check-gap';
 
 const app = uiModules.get('app/wazuh', []);
 
-app.directive('wzTable', function() {
+app.directive('wzTable', function () {
   return {
     restrict: 'E',
     scope: {
@@ -48,7 +48,8 @@ app.directive('wzTable', function() {
       $window,
       appState,
       globalState,
-      groupHandler
+      groupHandler,
+      wazuhConfig
     ) {
       /**
        * Init variables
@@ -64,6 +65,12 @@ app.directive('wzTable', function() {
       $scope.wazuh_table_loading = true;
       $scope.items = [];
 
+      const configuration = wazuhConfig.getConfig();
+      $scope.adminMode = !(
+        configuration &&
+        typeof configuration.admin !== 'undefined' &&
+        !configuration.admin
+      );
       /**
        * Resizing. Calculate number of table rows depending on the screen height
        */
@@ -218,7 +225,7 @@ app.directive('wzTable', function() {
       $scope.prevPage = () => pagination.prevPage($scope);
       $scope.nextPage = async currentPage =>
         pagination.nextPage(currentPage, $scope, errorHandler, fetch);
-      $scope.setPage = function() {
+      $scope.setPage = function () {
         $scope.currentPage = this.n;
         $scope.nextPage(this.n);
       };

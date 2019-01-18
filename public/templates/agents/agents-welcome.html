@@ -38,7 +38,7 @@
         <md-card flex class="wz-metric-color wz-md-card wz-no-padding">
             <md-card-content class="wz-padding-metric">
                 <div class="layout-row wz-word-break">
-                    <span class="wz-text-link" ng-click="switchGroupEdit()"><i class="fa fa-fw fa-plus-circle"></i></span>&nbsp;Groups:&nbsp;                    
+                    <span class="wz-text-link" ng-if='adminMode' ng-click="switchGroupEdit()"><i class="fa fa-fw fa-plus-circle"></i>&nbsp;</span>Groups:&nbsp;                    
                     <span ng-repeat="group in agent.group" class="wz-text-bold wz-text-link" ng-click="goGroups(agent,$index)">{{ group }}&nbsp;</span>                   
                 </div>
                 <div layout="row" class="wz-margin-top-10" ng-if="editGroup && !addingGroupToAgent">
