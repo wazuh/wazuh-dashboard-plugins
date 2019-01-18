@@ -154,7 +154,10 @@ export function GroupsController(
   });
 
   $scope.$on('wazuhShowGroupFile', (event, parameters) => {
-    if (((parameters || {}).fileName || '').includes('agent.conf') && $scope.adminMode) {
+    if (
+      ((parameters || {}).fileName || '').includes('agent.conf') &&
+      $scope.adminMode
+    ) {
       return $scope.editGroupAgentConfig();
     }
     return $scope.showFile(parameters.groupName, parameters.fileName);
@@ -523,7 +526,7 @@ export function GroupsController(
   };
 
   // Resetting the factory configuration
-  $scope.$on('$destroy', () => { });
+  $scope.$on('$destroy', () => {});
 
   $scope.$watch('lookingGroup', value => {
     $scope.availableAgents = {
