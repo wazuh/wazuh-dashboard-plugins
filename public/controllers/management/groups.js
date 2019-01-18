@@ -21,7 +21,8 @@ export function GroupsController(
   appState,
   shareAgent,
   groupHandler,
-  wzTableFilter
+  wzTableFilter,
+  wazuhConfig
 ) {
   $scope.addingGroup = false;
   $scope.$on('groupsIsReloaded', () => {
@@ -99,6 +100,12 @@ export function GroupsController(
         shareAgent.deleteAgent();
       }
 
+      const configuration = wazuhConfig.getConfig();
+      $scope.adminMode = !(
+        configuration &&
+        typeof configuration.admin !== 'undefined' &&
+        !configuration.admin
+      );
       $scope.load = false;
 
       if (!$scope.$$phase) $scope.$digest();
@@ -520,7 +527,7 @@ export function GroupsController(
   };
 
   // Resetting the factory configuration
-  $scope.$on('$destroy', () => {});
+  $scope.$on('$destroy', () => { });
 
   $scope.$watch('lookingGroup', value => {
     $scope.availableAgents = {
