@@ -66,11 +66,7 @@ app.directive('wzTable', function () {
       $scope.items = [];
 
       const configuration = wazuhConfig.getConfig();
-      $scope.adminMode = !(
-        configuration &&
-        typeof configuration.admin !== 'undefined' &&
-        !configuration.admin
-      );
+      $scope.adminMode = !!(configuration || {}).admin;
       /**
        * Resizing. Calculate number of table rows depending on the screen height
        */
