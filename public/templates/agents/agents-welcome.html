@@ -56,11 +56,11 @@
 
                 <div class="wz-margin-top-10" ng-if="editGroup && addingGroupToAgent">
                     <div layout="row">
-                        <span class="euiToastHeader__title font-size-12"><i class="fa fa-warning fa-fw"></i> Add group {{addingGroupToAgent}} to agent {{agent.id}}?</span>
+                        <span class="euiToastHeader__title font-size-12">Group {{addingGroupToAgent}} will be added to agent {{agent.id}}</span>
                     </div>
                     <div layout="row">
                         <md-button class="cancelBtnAgents" type="button" ng-click="cancelAddGroup()"><i aria-hidden='true' class='fa fa-fw fa-close'></i> Cancel</md-button>
-                        <md-button class="agreeBtnAgents" type="button" ng-click="confirmAddGroup(addingGroupToAgent)"><i aria-hidden='true' class='fa fa-fw fa-save'></i> Agree</md-button>  
+                        <md-button class="agreeBtnAgents" type="button" ng-click="confirmAddGroup(addingGroupToAgent)"><i aria-hidden='true' class='fa fa-fw fa-check'></i> Confirm</md-button>  
                     </div>                          
                 </div>
             </md-card-content>
