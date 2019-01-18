@@ -154,7 +154,7 @@ export function GroupsController(
   });
 
   $scope.$on('wazuhShowGroupFile', (event, parameters) => {
-    if (((parameters || {}).fileName || '').includes('agent.conf')) {
+    if (((parameters || {}).fileName || '').includes('agent.conf') && $scope.adminMode) {
       return $scope.editGroupAgentConfig();
     }
     return $scope.showFile(parameters.groupName, parameters.fileName);
