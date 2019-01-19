@@ -1,7 +1,7 @@
 /*
  * Wazuh app - Factory to store visualizations handlers
- * 
- * Copyright (C) 2018 Wazuh, Inc.
+ *
+ * Copyright (C) 2015-2019 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -13,18 +13,32 @@
 import dateMath from '@kbn/datemath';
 
 export class VisHandlers {
+  /**
+   * Class constructor
+   */
   constructor() {
     this.list = [];
   }
 
+  /**
+   * Add given item
+   * @param {Object} item
+   */
   addItem(item) {
     this.list.push(item);
   }
 
+  /**
+   * Get all items
+   */
   getList() {
     return this.list;
   }
 
+  /**
+   * Get all applied filters
+   * @param {*} syscollector
+   */
   getAppliedFilters(syscollector) {
     const appliedFilters = {};
 
@@ -42,20 +56,15 @@ export class VisHandlers {
     }
 
     // Check raw response from all rendered tables
-
     const tables = this.list
-      .filter(
-        item => item.vis && item.vis._state && item.vis._state.type === 'table'
-      )
+      .filter(item => (((item || {}).vis || {})._state || {}).type === 'table')
       .map(item => {
         const columns = [];
         for (const table of item.dataLoader.visData.tables) {
           columns.push(...table.columns.map(t => t.title));
         }
 
-        return item.vis &&
-          item.vis.searchSource &&
-          item.vis.searchSource.rawResponse
+        return !!(((item || {}).vis || {}).searchSource || {}).rawResponse
           ? {
               rawResponse: item.vis.searchSource.rawResponse,
               title: item.vis.title || 'Table',
@@ -87,6 +96,9 @@ export class VisHandlers {
     return appliedFilters;
   }
 
+  /**
+   * Check if has data
+   */
   hasData() {
     for (const item of this.list) {
       if (
@@ -104,6 +116,9 @@ export class VisHandlers {
     return false;
   }
 
+  /**
+   * Remove all visualizations
+   */
   removeAll() {
     this.list = [];
   }

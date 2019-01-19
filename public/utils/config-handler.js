@@ -1,6 +1,6 @@
 /*
  * Wazuh app - Configuration handler class
- * Copyright (C) 2018 Wazuh, Inc.
+ * Copyright (C) 2015-2019 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -53,6 +53,25 @@ export class ConfigurationHandler {
         );
       } else {
         $scope.integrations = {};
+      }
+
+      if (
+        $scope.currentConfig['logcollector-localfile'] &&
+        $scope.currentConfig['logcollector-localfile'].localfile
+      ) {
+        $scope.currentConfig['logcollector-localfile'].localfile.forEach(
+          function(file) {
+            if (file.target) {
+              file.targetStr = '';
+              file.target.forEach(function(target, idx) {
+                file.targetStr = file.targetStr.concat(target);
+                if (idx != file.target.length - 1) {
+                  file.targetStr = file.targetStr.concat(', ');
+                }
+              });
+            }
+          }
+        );
       }
       $scope.load = false;
       if (!$scope.$$phase) $scope.$digest();

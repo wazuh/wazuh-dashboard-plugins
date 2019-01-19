@@ -1,6 +1,6 @@
 /*
  * Wazuh app - Fetch png from visualization div
- * Copyright (C) 2018 Wazuh, Inc.
+ * Copyright (C) 2015-2019 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -13,6 +13,10 @@
 import domtoimage from 'dom-to-image';
 
 export class Vis2PNG {
+  /**
+   * Class constructor
+   * @param {*} $rootScope
+   */
   constructor($rootScope) {
     this.$rootScope = $rootScope;
     this.rawArray = [];
@@ -20,6 +24,10 @@ export class Vis2PNG {
     this.working = false;
   }
 
+  /**
+   * Validate a visualizations array
+   * @param {Array<Object>} visArray
+   */
   async checkArray(visArray) {
     try {
       this.working = true;
@@ -54,15 +62,26 @@ export class Vis2PNG {
     }
   }
 
+  /**
+   * Check if is working
+   */
   isWorking() {
     return this.working;
   }
 
+  /**
+   * Clear raw array
+   */
   clear() {
     this.rawArray = [];
     this.htmlObject = {};
   }
 
+  /**
+   * Set content to a given html item
+   * @param {String} id
+   * @param {Object} content
+   */
   assignHTMLItem(id, content) {
     this.htmlObject[id] = content;
   }

@@ -1,6 +1,6 @@
 /*
  * Wazuh app - API request service
- * Copyright (C) 2018 Wazuh, Inc.
+ * Copyright (C) 2015-2019 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -10,12 +10,24 @@
  * Find more information about this on the LICENSE file.
  */
 export class ApiRequest {
+  /**
+   * Class constructor
+   * @param {*} $q
+   * @param {*} genericReq
+   * @param {*} appState
+   */
   constructor($q, genericReq, appState) {
     this.$q = $q;
     this.genericReq = genericReq;
     this.appState = appState;
   }
 
+  /**
+   * Perform an API request
+   * @param {String} method Eg. GET, PUT
+   * @param {String} path API route
+   * @param {Object} body Request body
+   */
   async request(method, path, body) {
     try {
       if (!method || !path || !body) {
@@ -41,7 +53,7 @@ export class ApiRequest {
 
       return this.$q.resolve(data);
     } catch (error) {
-      return error && error.data && error.data.message
+      return ((error || {}).data || {}).message || false
         ? this.$q.reject(error.data.message)
         : this.$q.reject(error.message || error);
     }

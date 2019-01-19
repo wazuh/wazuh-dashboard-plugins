@@ -1,4 +1,7 @@
 <div layout="column" ng-if="showNodes && !currentNode">
+    <!-- Back button -->
+    <md-button class="md-icon-button" aria-label="Back" tooltip="Go back" tooltip-placement="bottom" ng-click="goBack()"><i
+            class="fa fa-fw fa-arrow-left" aria-hidden="true"></i></md-button>
     <div layout="row" class="md-padding">
         <input placeholder="Filter nodes..." ng-model="custom_search" type="text" class="kuiLocalSearchInput ng-empty ng-pristine ng-scope ng-touched ng-valid"
             aria-invalid="false" wz-enter="search(custom_search)">
@@ -10,5 +13,4 @@
         <wz-table flex path="'/cluster/nodes'" keys="['name','version','ip','type']" allow-click="true">
         </wz-table>
     </div>
-
 </div>

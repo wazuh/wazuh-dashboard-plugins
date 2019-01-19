@@ -1,6 +1,6 @@
 /*
  * Wazuh app - Management status controller
- * Copyright (C) 2018 Wazuh, Inc.
+ * Copyright (C) 2015-2019 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -47,7 +47,7 @@ export class StatusController {
       ]);
 
       const parsedData = data.map(
-        item => (item && item.data && item.data.data ? item.data.data : false)
+        item => ((item || {}).data || {}).data || false
       );
       const [stats, clusterStatus, managerInfo] = parsedData;
 
@@ -114,6 +114,10 @@ export class StatusController {
     }
   }
 
+  /**
+   * This change to a selected node
+   * @param {String} node
+   */
   async changeNode(node) {
     try {
       this.clusterError = false;

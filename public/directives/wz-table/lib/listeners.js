@@ -1,6 +1,6 @@
 /*
  * Wazuh app - Wazuh table directive event listeners
- * Copyright (C) 2018 Wazuh, Inc.
+ * Copyright (C) 2015-2019 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,15 +20,32 @@ export function wazuhFilter(parameters, filter) {
   return filter(parameters.filter);
 }
 
+export function wazuhQuery(parameters, query) {
+  return query(parameters.query, parameters.search);
+}
+
 export function wazuhSearch(parameters, instance, search) {
-  if (
-    parameters &&
-    parameters.specificPath &&
-    !instance.path.includes(parameters.specificPath)
-  ) {
+  try {
+    const matchesSpecificPath =
+      parameters &&
+      parameters.specificPath &&
+      !instance.path.includes(parameters.specificPath);
+    const matchesSpecificFilter =
+      parameters &&
+      parameters.specificFilter &&
+      !instance.filters.filter(
+        filter =>
+          filter.name === parameters.specificFilter.name &&
+          filter.value === parameters.specificFilter.value
+      ).length;
+
+    if (matchesSpecificPath || matchesSpecificFilter) {
+      return;
+    }
+    return search(parameters.term, parameters.removeFilters);
+  } catch (error) {
     return;
   }
-  return search(parameters.term, parameters.removeFilters);
 }
 
 export function wazuhRemoveFilter(parameters, instance, wzTableFilter, init) {

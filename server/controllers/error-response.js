@@ -1,6 +1,6 @@
 /*
  * Wazuh app - Generic error response constructor
- * Copyright (C) 2018 Wazuh, Inc.
+ * Copyright (C) 2015-2019 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -17,6 +17,13 @@
  * wazuh-elastic     40XX
  * wazuh-reporting   50XX
  * unknown           1000
+ */
+/**
+ * Returns a suitable error message
+ * @param {String} message Error message
+ * @param {Number} code Error code
+ * @param {Number} statusCode Error status code
+ * @returns {Object} Error response object
  */
 export function ErrorResponse(
   message = null,
@@ -63,8 +70,8 @@ export function ErrorResponse(
     message: filteredMessage
       ? `${code ? code : 1000} - ${filteredMessage}`
       : typeof message === 'string'
-        ? `${code ? code : 1000} - ${message}`
-        : `${code ? code : 1000} - Unexpected error`,
+      ? `${code ? code : 1000} - ${message}`
+      : `${code ? code : 1000} - Unexpected error`,
     code: code ? code : 1000,
     statusCode: statusCode ? statusCode : 500
   }).code(statusCode ? statusCode : 500);

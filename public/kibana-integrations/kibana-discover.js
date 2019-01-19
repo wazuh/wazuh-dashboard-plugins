@@ -81,9 +81,11 @@ import { getDocLink } from 'ui/documentation_links';
 import { ShareContextMenuExtensionsRegistryProvider } from 'ui/share';
 import { getUnhashableStatesProvider } from 'ui/state_management/state_hashing';
 import { RequestAdapter } from 'ui/inspector/adapters';
-import { getRequestInspectorStats, getResponseInspectorStats } from 'ui/courier/utils/courier_inspector_utils';
+import {
+  getRequestInspectorStats,
+  getResponseInspectorStats
+} from 'ui/courier/utils/courier_inspector_utils';
 import { tabifyAggResponse } from 'ui/agg_response/tabify';
-
 
 import 'ui/courier/search_strategy/default_search_strategy';
 
@@ -136,11 +138,12 @@ function discoverController(
   });
 
   const getUnhashableStates = Private(getUnhashableStatesProvider);
-  const shareContextMenuExtensions = Private(ShareContextMenuExtensionsRegistryProvider);
+  const shareContextMenuExtensions = Private(
+    ShareContextMenuExtensionsRegistryProvider
+  );
   const inspectorAdapters = {
     requests: new RequestAdapter()
   };
-
 
   //////////////////////////////////////////////////////////
   //////////////////// WAZUH ///////////////////////////////
@@ -237,8 +240,6 @@ function discoverController(
   /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-
-
   // the actual courier.SearchSource
   $scope.searchSource = savedSearch.searchSource;
   $scope.indexPattern = resolveIndexPatternLoading();
@@ -254,7 +255,7 @@ function discoverController(
 
   // searchSource which applies time range
   const timeRangeSearchSource = savedSearch.searchSource.create();
-  if(isDefaultTypeIndexPattern($scope.indexPattern)) {
+  if (isDefaultTypeIndexPattern($scope.indexPattern)) {
     timeRangeSearchSource.setField('filter', () => {
       return timefilter.createFilter($scope.indexPattern);
     });
@@ -262,18 +263,22 @@ function discoverController(
 
   $scope.searchSource.setParent(timeRangeSearchSource);
 
-  const pageTitleSuffix = savedSearch.id && savedSearch.title ? `: ${savedSearch.title}` : '';
+  const pageTitleSuffix =
+    savedSearch.id && savedSearch.title ? `: ${savedSearch.title}` : '';
   docTitle.change(`Discover${pageTitleSuffix}`);
 
   if (savedSearch.id && savedSearch.title) {
-    breadcrumbState.set([{ text: 'Discover', href: '#/discover' }, { text: savedSearch.title }]);
+    breadcrumbState.set([
+      { text: 'Discover', href: '#/discover' },
+      { text: savedSearch.title }
+    ]);
   } else {
     breadcrumbState.set([{ text: 'Discover' }]);
   }
 
   let stateMonitor;
-  
-  const $state = $scope.state = new AppState(getStateDefaults());
+
+  const $state = ($scope.state = new AppState(getStateDefaults()));
 
   const getFieldCounts = async () => {
     // the field counts aren't set until we have the data back,
@@ -296,7 +301,7 @@ function discoverController(
 
   const getSharingDataFields = async () => {
     const selectedFields = $state.columns;
-    if (selectedFields.length === 1 && selectedFields[0] ===  '_source') {
+    if (selectedFields.length === 1 && selectedFields[0] === '_source') {
       const fieldCounts = await getFieldCounts();
       return {
         searchFields: null,
@@ -305,7 +310,9 @@ function discoverController(
     }
 
     const timeFieldName = $scope.indexPattern.timeFieldName;
-    const fields = timeFieldName ? [timeFieldName, ...selectedFields] : selectedFields;
+    const fields = timeFieldName
+      ? [timeFieldName, ...selectedFields]
+      : selectedFields;
     return {
       searchFields: fields,
       selectFields: fields
@@ -331,7 +338,9 @@ function discoverController(
       },
       fields: selectFields,
       metaFields: $scope.indexPattern.metaFields,
-      conflictedTypesFields: $scope.indexPattern.fields.filter(f => f.type === 'conflict').map(f => f.name),
+      conflictedTypesFields: $scope.indexPattern.fields
+        .filter(f => f.type === 'conflict')
+        .map(f => f.name),
       indexPatternId: searchSource.getField('index').id
     };
   };
@@ -349,10 +358,19 @@ function discoverController(
     return {
       query: $scope.searchSource.getField('query') || {
         query: '',
-        language: localStorage.get('kibana.userQueryLanguage') || config.get('search:queryLanguage')
+        language:
+          localStorage.get('kibana.userQueryLanguage') ||
+          config.get('search:queryLanguage')
       },
-      sort: getSort.array(savedSearch.sort, $scope.indexPattern, config.get('discover:sort:defaultOrder')),
-      columns: savedSearch.columns.length > 0 ? savedSearch.columns : config.get('defaultColumns').slice(),
+      sort: getSort.array(
+        savedSearch.sort,
+        $scope.indexPattern,
+        config.get('discover:sort:defaultOrder')
+      ),
+      columns:
+        savedSearch.columns.length > 0
+          ? savedSearch.columns
+          : config.get('defaultColumns').slice(),
       index: $scope.indexPattern.id,
       interval: wzInterval || 'h', //// WAZUH /////
       filters: _.cloneDeep($scope.searchSource.getOwnField('filter'))
@@ -363,10 +381,14 @@ function discoverController(
   $state.sort = getSort.array($state.sort, $scope.indexPattern);
 
   $scope.getBucketIntervalToolTipText = () => {
-    return (
-      `This interval creates ${$scope.bucketInterval.scale > 1 ? 'buckets that are too large' : 'too many buckets'}
-      to show in the selected time range, so it has been scaled to ${$scope.bucketInterval.description }`
-    );
+    return `This interval creates ${
+      $scope.bucketInterval.scale > 1
+        ? 'buckets that are too large'
+        : 'too many buckets'
+    }
+      to show in the selected time range, so it has been scaled to ${
+        $scope.bucketInterval.description
+      }`;
   };
 
   $scope.$watchCollection('state.columns', function() {
@@ -376,9 +398,11 @@ function discoverController(
   $scope.opts = {
     // number of records to fetch, then paginate through
     sampleSize: config.get('discover:sampleSize'),
-    timefield: isDefaultTypeIndexPattern($scope.indexPattern) && $scope.indexPattern.timeFieldName,
+    timefield:
+      isDefaultTypeIndexPattern($scope.indexPattern) &&
+      $scope.indexPattern.timeFieldName,
     savedSearch: savedSearch,
-    indexPatternList: $route.current.locals.ip.list,
+    indexPatternList: $route.current.locals.ip.list
   };
 
   const init = _.once(function() {
@@ -401,11 +425,13 @@ function discoverController(
         $scope.fetch();
       });
 
-      $scope.$watchCollection('state.sort', function (sort) {
+      $scope.$watchCollection('state.sort', function(sort) {
         if (!sort) return;
 
         // get the current sort from {key: val} to ["key", "val"];
-        const currentSort = Object.entries($scope.searchSource.getField('sort')).pop();
+        const currentSort = Object.entries(
+          $scope.searchSource.getField('sort')
+        ).pop();
 
         // if the searchSource doesn't know, tell it so
         if (!angular.equals(sort, currentSort)) $scope.fetch();
@@ -549,7 +575,7 @@ function discoverController(
         if (id) {
           toastNotifications.addSuccess({
             title: `Search '${savedSearch.title}' was saved`,
-            'data-test-subj': 'saveSearchSuccess',
+            'data-test-subj': 'saveSearchSuccess'
           });
 
           if (savedSearch.id !== $route.current.params.id) {
@@ -562,7 +588,7 @@ function discoverController(
         }
       });
       return { id };
-    } catch(saveError) {
+    } catch (saveError) {
       toastNotifications.addDanger({
         title: `Search '${savedSearch.title}' was not saved.`,
         text: saveError.message
@@ -673,7 +699,7 @@ function discoverController(
       segmented.setMaxSegments(1);
     }
 
-    segmented.setDirection(sortBy === 'time' ? (sort[1] || 'desc') : 'desc');
+    segmented.setDirection(sortBy === 'time' ? sort[1] || 'desc' : 'desc');
     segmented.setSortFn(sortFn);
     segmented.setSize($scope.opts.sampleSize);
 
@@ -688,7 +714,7 @@ function discoverController(
     }
 
     // triggered when the status updated
-    segmented.on('status', function (status) {
+    segmented.on('status', function(status) {
       $scope.fetchStatus = status;
       if (status.complete === 0) {
         // starting new segmented search request
@@ -700,36 +726,34 @@ function discoverController(
         const inspectorRequest = inspectorAdapters.requests.start(
           `Segment ${$scope.fetchStatus.complete}`,
           {
-            description: `This request queries Elasticsearch to fetch the data for the search.`,
-          });
+            description: `This request queries Elasticsearch to fetch the data for the search.`
+          }
+        );
         inspectorRequest.stats(getRequestInspectorStats($scope.searchSource));
         $scope.searchSource.getSearchRequestBody().then(body => {
           inspectorRequest.json(body);
         });
         inspectorRequests.push(inspectorRequest);
       }
-
     });
 
-    segmented.on('first', function () {
+    segmented.on('first', function() {
       flushResponseData();
     });
 
-    segmented.on('segment', (resp) => {
+    segmented.on('segment', resp => {
       logResponseInInspector(resp);
       if (resp._shards.failed > 0) {
         $scope.failures = _.union($scope.failures, resp._shards.failures);
-        $scope.failures = _.uniq($scope.failures, false, function (failure) {
+        $scope.failures = _.uniq($scope.failures, false, function(failure) {
           return failure.index + failure.shard + failure.reason;
         });
       }
     });
 
-    segmented.on('emptySegment', function (resp) {
+    segmented.on('emptySegment', function(resp) {
       logResponseInInspector(resp);
     });
-
-
 
     segmented.on('mergedSegment', function(merged) {
       $scope.mergedEsResp = merged;
@@ -737,19 +761,23 @@ function discoverController(
       if ($scope.opts.timefield) {
         const tabifiedData = tabifyAggResponse($scope.vis.aggs, merged);
         $scope.searchSource.rawResponse = merged;
-        Promise
-          .resolve(responseHandler(tabifiedData))
-          .then(resp => {
-            $scope.visData = resp;
-            if (
-              ($scope.tabView !== 'panels' ||
-                $location.path().includes('wazuh-discover')) &&
-              $scope.tabView !== 'cluster-monitoring'
-            ) {
-              const visEl = $element.find('#discoverHistogram')[0];
-              visualizationLoader.render(visEl, $scope.vis, $scope.visData, $scope.uiState, { listenOnChange: true });
-            }
-          });
+        Promise.resolve(responseHandler(tabifiedData)).then(resp => {
+          $scope.visData = resp;
+          if (
+            ($scope.tabView !== 'panels' ||
+              $location.path().includes('wazuh-discover')) &&
+            $scope.tabView !== 'cluster-monitoring'
+          ) {
+            const visEl = $element.find('#discoverHistogram')[0];
+            visualizationLoader.render(
+              visEl,
+              $scope.vis,
+              $scope.visData,
+              $scope.uiState,
+              { listenOnChange: true }
+            );
+          }
+        });
       }
 
       $scope.hits = merged.hits.total;
@@ -775,7 +803,7 @@ function discoverController(
         const fields = _.keys(indexPattern.flattenHit(hit));
         let n = fields.length;
         let field;
-        while (field = fields[--n]) {
+        while ((field = fields[--n])) {
           // eslint-disable-line
           if (counts[field]) counts[field] += 1;
           else counts[field] = 1;
@@ -793,7 +821,8 @@ function discoverController(
   }
 
   function beginSegmentedFetch() {
-    $scope.searchSource.onBeginSegmentedFetch(handleSegmentedFetch)
+    $scope.searchSource
+      .onBeginSegmentedFetch(handleSegmentedFetch)
       .catch(error => {
         const fetchError = getPainlessError(error);
 
@@ -850,7 +879,8 @@ function discoverController(
 
   // TODO: On array fields, negating does not negate the combination, rather all terms
   $scope.filterQuery = function(field, values, operation) {
-    $scope.indexPattern.popularizeField(field, 1);
+    // Commented due to https://github.com/elastic/kibana/issues/22426
+    //$scope.indexPattern.popularizeField(field, 1);
     filterActions.addFilter(
       field,
       values,
@@ -862,12 +892,14 @@ function discoverController(
   };
 
   $scope.addColumn = function addColumn(columnName) {
-    $scope.indexPattern.popularizeField(columnName, 1);
+    // Commented due to https://github.com/elastic/kibana/issues/22426
+    //$scope.indexPattern.popularizeField(columnName, 1);
     columnActions.addColumn($scope.state.columns, columnName);
   };
 
   $scope.removeColumn = function removeColumn(columnName) {
-    $scope.indexPattern.popularizeField(columnName, 1);
+    // Commented due to https://github.com/elastic/kibana/issues/22426
+    //$scope.indexPattern.popularizeField(columnName, 1);
     columnActions.removeColumn($scope.state.columns, columnName);
   };
 

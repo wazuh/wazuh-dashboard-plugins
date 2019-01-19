@@ -1,6 +1,6 @@
 /*
  * Wazuh app - File for app requirements and set up
- * Copyright (C) 2018 Wazuh, Inc.
+ * Copyright (C) 2015-2019 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -14,8 +14,15 @@ import './wz-enter/wz-enter';
 import './wz-menu/wz-menu';
 import './wz-menu/wz-menu.less';
 import './wz-table';
+import './wz-data-table';
 import './wz-welcome-card/wz-welcome-card';
 import './wz-no-config/wz-no-config';
 import './wz-config-item/wz-config-item';
 import './wz-config-item/wz-config-item.less';
+import './wz-tag-filter/wz-tag-filter';
+import './wz-tag-filter/wz-tag-filter.less';
 import './wz-config-viewer/wz-config-viewer';
+import './wz-xml-file-editor/wz-xml-file-editor';
+import './wz-xml-file-editor/wz-xml-file-editor.less';
+import './wz-multiple-selector/wz-multiple-selector';
+import './wz-multiple-selector/wz-multiple-selector.less';

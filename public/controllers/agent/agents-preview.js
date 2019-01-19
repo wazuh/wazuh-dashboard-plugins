@@ -1,6 +1,6 @@
 /*
  * Wazuh app - Agents preview controller
- * Copyright (C) 2018 Wazuh, Inc.
+ * Copyright (C) 2015-2019 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -10,8 +10,20 @@
  * Find more information about this on the LICENSE file.
  */
 import * as FileSaver from '../../services/file-saver';
+import { timefilter } from 'ui/timefilter';
 
 export class AgentsPreviewController {
+  /**
+   * Class constructor
+   * @param {Object} $scope
+   * @param {Object} genericReq
+   * @param {Object} appState
+   * @param {Object} $location
+   * @param {Object} errorHandler
+   * @param {Object} csvReq
+   * @param {Object} shareAgent
+   * @param {Object} wzTableFilter
+   */
   constructor(
     $scope,
     genericReq,
@@ -20,7 +32,8 @@ export class AgentsPreviewController {
     errorHandler,
     csvReq,
     shareAgent,
-    wzTableFilter
+    wzTableFilter,
+    commonData
   ) {
     this.$scope = $scope;
     this.genericReq = genericReq;
@@ -30,28 +43,29 @@ export class AgentsPreviewController {
     this.csvReq = csvReq;
     this.shareAgent = shareAgent;
     this.wzTableFilter = wzTableFilter;
+    this.commonData = commonData;
   }
 
+  /**
+   * On controller loads
+   */
   $onInit() {
     this.init = true;
     const loc = this.$location.search();
-    if (loc && loc.agent && loc.agent !== '000')
+    if ((loc || {}).agent && (loc || {}).agent !== '000') {
+      this.commonData.setTimefilter(timefilter.getTime());
       return this.showAgent({ id: loc.agent });
+    }
 
     this.isClusterEnabled =
       this.appState.getClusterInfo() &&
       this.appState.getClusterInfo().status === 'enabled';
 
     this.loading = true;
-    this.status = 'all';
-    this.osPlatform = 'all';
-    this.version = 'all';
     this.osPlatforms = [];
     this.versions = [];
     this.groups = [];
     this.nodes = [];
-    this.node_name = 'all';
-    this.selectedGroup = 'all';
     this.mostActiveAgent = {
       name: '',
       id: ''
@@ -72,19 +86,27 @@ export class AgentsPreviewController {
     this.load();
   }
 
-  search(term) {
-    this.$scope.$broadcast('wazuhSearch', { term });
+  /**
+   * Searches by a query and term
+   * @param {String} query
+   * @param {String} search
+   */
+  query(query, search) {
+    this.$scope.$broadcast('wazuhQuery', { query, search });
   }
 
-  filter(filter) {
-    this.$scope.$broadcast('wazuhFilter', { filter });
-  }
-
+  /**
+   * Selects an agent
+   * @param {String} agent
+   */
   showAgent(agent) {
     this.shareAgent.setAgent(agent);
     this.$location.path('/agents');
   }
 
+  /**
+   * Exports the table in CSV format
+   */
   async downloadCsv() {
     try {
       this.errorHandler.info(
@@ -108,6 +130,9 @@ export class AgentsPreviewController {
     return;
   }
 
+  /**
+   * On controller loads
+   */
   async load() {
     try {
       const api = JSON.parse(this.appState.getCurrentAPI()).id;
@@ -127,6 +152,29 @@ export class AgentsPreviewController {
       ]);
       const [agentsUnique, agentsTop] = data;
       const unique = agentsUnique.data.result;
+
+      this.searchBarModel = {
+        status: ['Active', 'Disconnected', 'Never connected'],
+        group: unique.groups,
+        version: unique.versions,
+        'os.platform': unique.osPlatforms.map(x => x.platform),
+        'os.version': unique.osPlatforms.map(x => x.version),
+        'os.name': unique.osPlatforms.map(x => x.name)
+      };
+
+      if (clusterInfo.status === 'enabled' && unique.nodes) {
+        this.searchBarModel.node_name = unique.nodes;
+      }
+
+      this.searchBarModel['os.name'] = Array.from(
+        new Set(this.searchBarModel['os.name'])
+      );
+      this.searchBarModel['os.version'] = Array.from(
+        new Set(this.searchBarModel['os.version'])
+      );
+      this.searchBarModel['os.platform'] = Array.from(
+        new Set(this.searchBarModel['os.platform'])
+      );
 
       this.groups = unique.groups;
       this.nodes = unique.nodes.map(item => ({ id: item }));

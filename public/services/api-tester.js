@@ -1,6 +1,6 @@
 /*
  * Wazuh app - API test service
- * Copyright (C) 2018 Wazuh, Inc.
+ * Copyright (C) 2015-2019 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -12,6 +12,13 @@
 import chrome from 'ui/chrome';
 
 export class ApiTester {
+  /**
+   * Class constructor
+   * @param {*} $http
+   * @param {*} appState
+   * @param {*} wzMisc
+   * @param {*} wazuhConfig
+   */
   constructor($http, appState, wzMisc, wazuhConfig) {
     this.$http = $http;
     this.appState = appState;

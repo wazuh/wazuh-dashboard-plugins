@@ -1,6 +1,6 @@
 /*
  * Wazuh app - Module for monitoring template
- * Copyright (C) 2018 Wazuh, Inc.
+ * Copyright (C) 2015-2019 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -11,7 +11,7 @@
  */
 export const monitoringTemplate = {
   order: 0,
-  template: 'wazuh-monitoring-3.x-*',
+  //template: 'wazuh-monitoring-3.x-*',
   settings: {
     'index.refresh_interval': '5s'
   },

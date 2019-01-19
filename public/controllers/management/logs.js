@@ -1,6 +1,6 @@
 /*
  * Wazuh app - Management logs controller
- * Copyright (C) 2018 Wazuh, Inc.
+ * Copyright (C) 2015-2019 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -12,6 +12,15 @@
 import * as FileSaver from '../../services/file-saver';
 
 export class LogsController {
+  /**
+   * Class constructor
+   * @param {*} $scope
+   * @param {*} apiReq
+   * @param {*} errorHandler
+   * @param {*} csvReq
+   * @param {*} appState
+   * @param {*} wzTableFilter
+   */
   constructor($scope, apiReq, errorHandler, csvReq, appState, wzTableFilter) {
     this.$scope = $scope;
     this.apiReq = apiReq;
@@ -90,6 +99,10 @@ export class LogsController {
     return;
   }
 
+  /**
+   * This change to a selected node
+   * @param {String} node
+   */
   async changeNode(node) {
     try {
       this.type_log = 'all';
@@ -122,20 +135,12 @@ export class LogsController {
         {}
       );
       const clusterEnabled =
-        clusterStatus &&
-        clusterStatus.data &&
-        clusterStatus.data.data &&
-        clusterStatus.data.data.running === 'yes' &&
-        clusterStatus.data.data.enabled === 'yes';
+        (((clusterStatus || {}).data || {}).data || {}).running === 'yes' &&
+        (((clusterStatus || {}).data || {}).data || {}).enabled === 'yes';
 
       if (clusterEnabled) {
         const nodeList = await this.apiReq.request('GET', '/cluster/nodes', {});
-        if (
-          nodeList &&
-          nodeList.data &&
-          nodeList.data.data &&
-          Array.isArray(nodeList.data.data.items)
-        ) {
+        if (Array.isArray((((nodeList || {}).data || {}).data || {}).items)) {
           this.nodeList = nodeList.data.data.items
             .map(item => item.name)
             .reverse();

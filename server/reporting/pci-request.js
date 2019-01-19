@@ -1,6 +1,6 @@
 /*
  * Wazuh app - Specific methods to fetch Wazuh PCI DSS data from Elasticsearch
- * Copyright (C) 2018 Wazuh, Inc.
+ * Copyright (C) 2015-2019 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -61,20 +61,22 @@ export class PciRequest {
       const response = await this.wzWrapper.searchWazuhAlertsWithPayload(base);
       const aggArray = response.aggregations['2'].buckets;
 
-      return aggArray.map(item => item.key).sort((a, b) => {
-        const a_split = a.split('.');
-        const b_split = b.split('.');
-        if (parseInt(a_split[0]) > parseInt(b_split[0])) return 1;
-        else if (parseInt(a_split[0]) < parseInt(b_split[0])) return -1;
-        else {
-          if (parseInt(a_split[1]) > parseInt(b_split[1])) return 1;
-          else if (parseInt(a_split[1]) < parseInt(b_split[1])) return -1;
+      return aggArray
+        .map(item => item.key)
+        .sort((a, b) => {
+          const a_split = a.split('.');
+          const b_split = b.split('.');
+          if (parseInt(a_split[0]) > parseInt(b_split[0])) return 1;
+          else if (parseInt(a_split[0]) < parseInt(b_split[0])) return -1;
           else {
-            if (parseInt(a_split[2]) > parseInt(b_split[2])) return 1;
-            else if (parseInt(a_split[2]) < parseInt(b_split[2])) return -1;
+            if (parseInt(a_split[1]) > parseInt(b_split[1])) return 1;
+            else if (parseInt(a_split[1]) < parseInt(b_split[1])) return -1;
+            else {
+              if (parseInt(a_split[2]) > parseInt(b_split[2])) return 1;
+              else if (parseInt(a_split[2]) < parseInt(b_split[2])) return -1;
+            }
           }
-        }
-      });
+        });
     } catch (error) {
       return Promise.reject(error);
     }

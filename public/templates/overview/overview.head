@@ -26,7 +26,7 @@
         <!-- End separator -->
 
         <!-- Reporting button section -->
-        <div ng-show="octrl.tab !== 'welcome'">
+        <div ng-show="octrl.tab !== 'welcome' && octrl.tabView === 'panels'">
             <!-- Report button -->
             <md-button md-no-ink class="md-icon-button small wz-no-margin-padding" tooltip="Generate report" tooltip-placement="bottom" ng-disabled="!rendered || loading || resultState !== 'ready'" ng-click="octrl.startVis2Png()" aria-label="Generate report button">
                 <i class="fa fa-fw fa-print" aria-hidden="true"></i>
@@ -107,7 +107,7 @@
     <!-- End Discover search bar section -->
 
     <!-- Loading status section -->
-    <div layout="column" layout-align="center center" ng-if="octrl.tab !== 'welcome'" ng-show="resultState === 'ready' && octrl.tabView === 'panels' && !rendered">
+    <div layout="column" layout-align="center center" ng-if="octrl.tab !== 'welcome' && octrl.tab !== 'aws'" ng-show="resultState === 'ready' && octrl.tabView === 'panels' && !rendered">
         <div class="percentage"><i class="fa fa-fw fa-spin fa-spinner" aria-hidden="true"></i></div>
         <div class="percentage">{{loadingStatus}}</div>
     </div>

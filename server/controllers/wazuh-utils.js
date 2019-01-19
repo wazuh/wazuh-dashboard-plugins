@@ -1,6 +1,6 @@
 /*
  * Wazuh app - Class for Wazuh-API functions
- * Copyright (C) 2018 Wazuh, Inc.
+ * Copyright (C) 2015-2019 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,10 +16,21 @@ import { getConfiguration } from '../lib/get-configuration';
 import { totalmem } from 'os';
 import simpleTail from 'simple-tail';
 import path from 'path';
+import { UpdateConfigurationFile } from '../lib/update-configuration';
+const updateConfigurationFile = new UpdateConfigurationFile();
 
 export class WazuhUtilsCtrl {
+  /**
+   * Constructor
+   */
   constructor() {}
 
+  /**
+   * Returns the config.yml file parsed
+   * @param {Object} req
+   * @param {Object} reply
+   * @returns {Object} Configuration File or ErrorResponse
+   */
   getConfigurationFile(req, reply) {
     try {
       const configFile = getConfiguration();
@@ -34,6 +45,31 @@ export class WazuhUtilsCtrl {
     }
   }
 
+  /**
+   * Returns the config.yml file in raw
+   * @param {Object} req
+   * @param {Object} reply
+   * @returns {Object} Configuration File or ErrorResponse
+   */
+  async updateConfigurationFile(req, reply) {
+    try {
+      const result = updateConfigurationFile.updateConfiguration(req);
+      return reply({
+        statusCode: 200,
+        error: 0,
+        data: result.needRestart
+      });
+    } catch (error) {
+      return ErrorResponse(error.message || error, 3021, 500, reply);
+    }
+  }
+
+  /**
+   * Returns total RAM available from the current machine where Kibana is being executed
+   * @param {Object} req
+   * @param {Object} reply
+   * @returns {Number} total ram or ErrorResponse
+   */
   async totalRam(req, reply) {
     try {
       // RAM in MB
@@ -44,6 +80,12 @@ export class WazuhUtilsCtrl {
     }
   }
 
+  /**
+   * Returns Wazuh app logs
+   * @param {Object} req
+   * @param {Object} reply
+   * @returns {Array<String>} app logs or ErrorResponse
+   */
   async getAppLogs(req, reply) {
     try {
       const lastLogs = await simpleTail(

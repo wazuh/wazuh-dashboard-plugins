@@ -1,6 +1,6 @@
 /*
  * Wazuh app - Health check controller
- * Copyright (C) 2018 Wazuh, Inc.
+ * Copyright (C) 2015-2019 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -12,6 +12,21 @@
 import { SavedObjectsClientProvider } from 'ui/saved_objects';
 
 export class HealthCheck {
+  /**
+   * Class constructor
+   * @param {*} $scope
+   * @param {*} $rootScope
+   * @param {*} $timeout
+   * @param {*} $location
+   * @param {*} genericReq
+   * @param {*} apiReq
+   * @param {*} appState
+   * @param {*} testAPI
+   * @param {*} errorHandler
+   * @param {*} wazuhConfig
+   * @param {*} Private
+   * @param {*} $window
+   */
   constructor(
     $scope,
     $rootScope,
@@ -53,16 +68,25 @@ export class HealthCheck {
     this.totalChecks = 0;
   }
 
+  /**
+   * When controller loads
+   */
   $onInit() {
     this.load();
   }
 
+  /**
+   * Manage an error
+   */
   handleError(error) {
     this.errors.push(
       this.errorHandler.handle(error, 'Health Check', false, true)
     );
   }
 
+  /**
+   * This validates a pattern
+   */
   async checkPatterns() {
     try {
       const data = await this.savedObjectsClient.get(
@@ -107,13 +131,16 @@ export class HealthCheck {
     }
   }
 
+  /**
+   * This attempts to connect with API
+   */
   async checkApiConnection() {
     try {
       if (this.checks.api) {
         const data = await this.testAPI.checkStored(
           JSON.parse(this.appState.getCurrentAPI()).id
         );
-        if (data && data.data && data.data.idChanged) {
+        if (((data || {}).data || {}).idChanged) {
           const apiRaw = JSON.parse(this.appState.getCurrentAPI());
           this.appState.setCurrentAPI(
             JSON.stringify({ name: apiRaw.name, id: data.data.idChanged })
@@ -170,6 +197,9 @@ export class HealthCheck {
     }
   }
 
+  /**
+   * On controller loads
+   */
   async load() {
     try {
       const configuration = this.wazuhConfig.getConfig();
@@ -201,6 +231,11 @@ export class HealthCheck {
           id: 3,
           description: 'Check Elasticsearch template',
           status: this.checks.template ? 'Checking...' : 'disabled'
+        },
+        {
+          id: 4,
+          description: 'Check index pattern known fields',
+          status: 'Checking...'
         }
       );
 
@@ -211,6 +246,15 @@ export class HealthCheck {
       await Promise.all([this.checkPatterns(), this.checkApiConnection()]);
 
       this.checksDone = true;
+
+      try {
+        await this.genericReq.request('GET', '/elastic/known-fields/all', {});
+        this.results[this.results.length - 1].status = 'Ready';
+      } catch (error) {
+        this.results[this.results.length - 1].status = 'Error';
+        this.handleError(error);
+      }
+
       if (!this.errors || !this.errors.length) {
         await this.$timeout(800);
         this.$window.location.assign(
@@ -226,6 +270,9 @@ export class HealthCheck {
     }
   }
 
+  /**
+   * This navigates to app root path or an a previous stored location
+   */
   goApp() {
     this.$window.location.assign(
       '/app/wazuh#' + this.$rootScope.previousLocation || ''

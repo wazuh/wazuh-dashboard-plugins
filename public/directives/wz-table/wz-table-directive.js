@@ -1,6 +1,6 @@
 /*
  * Wazuh app - Wazuh table directive
- * Copyright (C) 2018 Wazuh, Inc.
+ * Copyright (C) 2015-2019 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,7 +19,7 @@ import { parseValue } from './lib/parse-value';
 import * as pagination from './lib/pagination';
 import { sort } from './lib/sort';
 import * as listeners from './lib/listeners';
-import { searchData, filterData } from './lib/data';
+import { searchData, filterData, queryData } from './lib/data';
 import { clickAction } from './lib/click-action';
 import { initTable } from './lib/init';
 import { checkGap } from './lib/check-gap';
@@ -47,7 +47,9 @@ app.directive('wzTable', function() {
       wzTableFilter,
       $window,
       appState,
-      globalState
+      globalState,
+      groupHandler,
+      wazuhConfig
     ) {
       /**
        * Init variables
@@ -63,17 +65,25 @@ app.directive('wzTable', function() {
       $scope.wazuh_table_loading = true;
       $scope.items = [];
 
+      const configuration = wazuhConfig.getConfig();
+      $scope.adminMode = !!(configuration || {}).admin;
       /**
        * Resizing. Calculate number of table rows depending on the screen height
        */
       const rowSizes = $scope.rowSizes || [15, 13, 11];
       let doit;
+      // Prevents duplicated rows when resizing
+      let resizing = false;
       $window.onresize = () => {
+        if (resizing) return;
+        resizing = true;
         clearTimeout(doit);
         doit = setTimeout(() => {
           $scope.rowsPerPage = calcTableRows($window.innerHeight, rowSizes);
           $scope.itemsPerPage = $scope.rowsPerPage;
-          init();
+          init()
+            .then(() => (resizing = false))
+            .catch(() => (resizing = false));
         }, 150);
       };
       $scope.rowsPerPage = calcTableRows($window.innerHeight, rowSizes);
@@ -107,9 +117,15 @@ app.directive('wzTable', function() {
         }
       };
 
+      /**
+       * This sort data for a given filed
+       */
       $scope.sort = async field =>
         sort(field, $scope, instance, fetch, errorHandler);
 
+      /**
+       * This search in table data with a given term
+       */
       const search = async (term, removeFilters) =>
         searchData(
           term,
@@ -121,6 +137,10 @@ app.directive('wzTable', function() {
           errorHandler
         );
 
+      /**
+       * This filter table with a given filter
+       * @param {Object} filter
+       */
       const filter = async filter =>
         filterData(
           filter,
@@ -131,6 +151,24 @@ app.directive('wzTable', function() {
           errorHandler
         );
 
+      /**
+       * This filter table with using a q search
+       * @param {Object} filter
+       */
+      const query = async (query, search) =>
+        queryData(
+          query,
+          search,
+          instance,
+          wzTableFilter,
+          $scope,
+          fetch,
+          errorHandler
+        );
+
+      /**
+       * This refresh data every second
+       */
       const realTimeFunction = async () => {
         try {
           $scope.error = false;
@@ -153,6 +191,9 @@ app.directive('wzTable', function() {
 
       $scope.parseValue = (key, item) => parseValue(key, item, instance.path);
 
+      /**
+       * On controller loads
+       */
       const init = async () =>
         initTable(
           $scope,
@@ -200,6 +241,10 @@ app.directive('wzTable', function() {
         listeners.wazuhSearch(parameters, instance, search)
       );
 
+      $scope.$on('wazuhQuery', (event, parameters) =>
+        listeners.wazuhQuery(parameters, query)
+      );
+
       $scope.$on('wazuhRemoveFilter', (event, parameters) =>
         listeners.wazuhRemoveFilter(parameters, instance, wzTableFilter, init)
       );
@@ -214,6 +259,10 @@ app.directive('wzTable', function() {
         return init();
       });
 
+      /*$scope.editGroupAgentConfig = (ev, group) => {
+        $rootScope.$broadcast('editXmlFile', { target: group });
+      };*/
+
       $scope.$on('$destroy', () => {
         $window.onresize = null;
         realTime = null;
@@ -221,6 +270,61 @@ app.directive('wzTable', function() {
       });
 
       init();
+
+      $scope.isLookingGroup = () => {
+        try {
+          const regexp = new RegExp(/^\/agents\/groups\/[a-zA-Z0-9_\-.]*$/);
+          $scope.isLookingDefaultGroup =
+            instance.path.split('/').pop() === 'default';
+          return regexp.test(instance.path);
+        } catch (error) {
+          return false;
+        }
+      };
+
+      $scope.showConfirmRemoveGroup = (ev, group) => {
+        $scope.removingGroup =
+          $scope.removingGroup === group.name ? null : group.name;
+      };
+
+      $scope.showConfirmRemoveAgentFromGroup = (ev, agent) => {
+        $scope.removingAgent =
+          $scope.removingAgent === agent.id ? null : agent.id;
+      };
+
+      $scope.cancelRemoveAgent = () => {
+        $scope.removingAgent = null;
+      };
+
+      $scope.cancelRemoveGroup = () => {
+        $scope.removingGroup = null;
+      };
+
+      $scope.confirmRemoveAgent = async agent => {
+        try {
+          const group = instance.path.split('/').pop();
+          await groupHandler.removeAgentFromGroup(group, agent);
+          errorHandler.info(
+            `Success. Agent ${agent} has been removed from ${group}`,
+            ''
+          );
+        } catch (error) {
+          errorHandler.handle(`${error.message || error}`, '');
+        }
+        $scope.removingAgent = null;
+        return init();
+      };
+
+      $scope.confirmRemoveGroup = async group => {
+        try {
+          await groupHandler.removeGroup(group);
+          errorHandler.info(`Success. Group ${group} has been removed`, '');
+        } catch (error) {
+          errorHandler.handle(`${error.message || error}`, '');
+        }
+        $scope.removingGroup = null;
+        return init();
+      };
     },
     template
   };

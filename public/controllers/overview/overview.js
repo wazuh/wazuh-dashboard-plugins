@@ -1,6 +1,6 @@
 /*
  * Wazuh app - Overview controller
- * Copyright (C) 2018 Wazuh, Inc.
+ * Copyright (C) 2015-2019 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,9 +24,23 @@ import {
   metricsOsquery
 } from '../../utils/overview-metrics';
 
-import { queryConfig } from '../../services/query-config';
+import { timefilter } from 'ui/timefilter';
 
 export class OverviewController {
+  /**
+   * Class constructor
+   * @param {*} $scope
+   * @param {*} $location
+   * @param {*} $rootScope
+   * @param {*} appState
+   * @param {*} errorHandler
+   * @param {*} apiReq
+   * @param {*} tabVisualizations
+   * @param {*} commonData
+   * @param {*} reportingService
+   * @param {*} visFactoryService
+   * @param {*} wazuhConfig
+   */
   constructor(
     $scope,
     $location,
@@ -53,6 +67,9 @@ export class OverviewController {
     this.wazuhConfig = wazuhConfig;
   }
 
+  /**
+   * On controller loads
+   */
   $onInit() {
     this.wodlesConfiguration = false;
     this.TabDescription = TabDescription;
@@ -94,16 +111,30 @@ export class OverviewController {
     });
   }
 
+  /**
+   * This check if given array of items contais a single given item
+   * @param {Object} item
+   * @param {Array<Object>} array
+   */
   inArray(item, array) {
     return item && Array.isArray(array) && array.includes(item);
   }
 
+  /**
+   * Create metric for given object
+   * @param {*} metricsObject
+   */
   createMetrics(metricsObject) {
     for (const key in metricsObject) {
       this[key] = () => generateMetric(metricsObject[key]);
     }
   }
 
+  /**
+   * Classify metrics for create the suitable one
+   * @param {*} tab
+   * @param {*} subtab
+   */
   checkMetrics(tab, subtab) {
     if (subtab === 'panels') {
       switch (tab) {
@@ -167,58 +198,26 @@ export class OverviewController {
     return;
   }
 
+  /**
+   * Calculate woodle depending on given tab
+   * @param {*} tab
+   */
   calculateWodleTagFromTab(tab) {
     if (tab === 'aws') return 'aws-s3';
     return false;
   }
 
-  filterWodle(tab) {
-    try {
-      this.wodlesConfiguration = false;
-      const tag = this.calculateWodleTagFromTab(tab);
-      let result = [];
-      if (
-        tag &&
-        this.wodlesConfiguration &&
-        this.wodlesConfiguration['wmodules-wmodules'] &&
-        this.wodlesConfiguration['wmodules-wmodules'].wmodules
-      ) {
-        result = this.wodlesConfiguration['wmodules-wmodules'].wmodules.filter(
-          item => typeof item[tag] !== 'undefined'
-        );
-      }
-      if (result.length) {
-        this.wodlesConfiguration = result[0];
-      }
-    } catch (error) {} // eslint-disable-line
-
-    if (!this.$scope.$$phase) this.$scope.$digest();
-  }
-
-  async fetchWodles() {
-    try {
-      this.wodlesConfiguration = await queryConfig(
-        '000',
-        [{ component: 'wmodules', configuration: 'wmodules' }],
-        this.apiReq
-      );
-    } catch (error) {
-      this.wodlesConfiguration = false;
-    }
-    return;
-  }
-
   // Switch tab
   async switchTab(newTab, force = false) {
     try {
-      if (newTab !== 'welcome') {
-        await this.fetchWodles();
+      if (newTab === 'welcome') {
+        this.commonData.setRefreshInterval(timefilter.getRefreshInterval());
+        timefilter.setRefreshInterval({ pause: true, value: 0 });
+      } else if (this.tab === 'welcome') {
+        timefilter.setRefreshInterval(this.commonData.getRefreshInterval());
       }
 
-      if (
-        newTab === 'welcome' &&
-        typeof this.agentsCountTotal === 'undefined'
-      ) {
+      if (typeof this.agentsCountTotal === 'undefined') {
         await this.getSummary();
       }
 
@@ -233,8 +232,6 @@ export class OverviewController {
         this.gdprTabs = gdprTabs;
         this.selectedGdprIndex = 0;
       }
-
-      this.filterWodle(newTab);
 
       if (newTab !== 'welcome') this.tabHistory.push(newTab);
 
@@ -270,15 +267,22 @@ export class OverviewController {
     return;
   }
 
+  /**
+   * Transform a visualization into an image
+   */
   startVis2Png() {
     return this.reportingService.startVis2Png(this.tab);
   }
 
+  /**
+   * This fetch de agents summary
+   */
   async getSummary() {
     try {
       const data = await this.apiReq.request('GET', '/agents/summary', {});
-      const result =
-        data && data.data && data.data.data ? data.data.data : false;
+
+      const result = ((data || {}).data || {}).data || false;
+
       if (result) {
         const active = result.Active - 1;
         const total = result.Total - 1;
@@ -296,6 +300,9 @@ export class OverviewController {
     }
   }
 
+  /**
+   * This load the configuration settings
+   */
   async loadConfiguration() {
     try {
       const configuration = this.wazuhConfig.getConfig();
@@ -309,6 +316,9 @@ export class OverviewController {
     }
   }
 
+  /**
+   * On controller loads
+   */
   async init() {
     try {
       await this.loadConfiguration();

@@ -1,6 +1,6 @@
 /*
  * Wazuh app - Resolve function to parse configuration file
- * Copyright (C) 2018 Wazuh, Inc.
+ * Copyright (C) 2015-2019 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -28,17 +28,18 @@ export async function getWzConfig($q, genericReq, errorHandler, wazuhConfig) {
     'extensions.osquery': false,
     timeout: 8000,
     'wazuh.shards': 1,
-    'wazuh.replicas': 1,
+    'wazuh.replicas': 0,
     'wazuh-version.shards': 1,
-    'wazuh-version.replicas': 1,
+    'wazuh-version.replicas': 0,
     'ip.selector': true,
     'ip.ignore': [],
     'xpack.rbac.enabled': true,
     'wazuh.monitoring.enabled': true,
     'wazuh.monitoring.frequency': 3600,
-    'wazuh.monitoring.shards': 5,
-    'wazuh.monitoring.replicas': 1,
-    'admin': true
+    'wazuh.monitoring.shards': 2,
+    'wazuh.monitoring.replicas': 0,
+    'wazuh.monitoring.pattern': 'wazuh-monitoring-3.x-*',
+    admin: true
   };
 
   try {

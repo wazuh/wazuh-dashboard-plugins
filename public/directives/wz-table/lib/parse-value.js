@@ -1,6 +1,6 @@
 /*
  * Wazuh app - Wazuh table directive helper
- * Copyright (C) 2018 Wazuh, Inc.
+ * Copyright (C) 2015-2019 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,7 +23,7 @@ const splitArray = array => {
 };
 
 const checkIfArray = item => {
-  return typeof item === 'object' ? splitArray(item) : item == 0 ? '0' : item;
+  return typeof item === 'object' ? splitArray(item) : item === 0 ? '0' : item;
 };
 
 export function parseValue(key, item, instancePath) {

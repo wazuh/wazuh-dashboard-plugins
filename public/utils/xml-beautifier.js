@@ -1,6 +1,6 @@
 /*
  * Wazuh app - Module for XML beautify
- * Copyright (C) 2018 Wazuh, Inc.
+ * Copyright (C) 2015-2019 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -55,10 +55,10 @@ export default xml => {
     const type = single
       ? 'single'
       : closing
-        ? 'closing'
-        : opening
-          ? 'opening'
-          : 'other';
+      ? 'closing'
+      : opening
+      ? 'opening'
+      : 'other';
     const fromTo = lastType + '->' + type;
     lastType = type;
     let padding = '';

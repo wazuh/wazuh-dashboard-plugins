@@ -1,6 +1,6 @@
 /*
  * Wazuh app - Cluster monitoring controller
- * Copyright (C) 2018 Wazuh, Inc.
+ * Copyright (C) 2015-2019 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -10,6 +10,7 @@
  * Find more information about this on the LICENSE file.
  */
 import { FilterHandler } from '../../utils/filter-handler';
+import { timefilter } from 'ui/timefilter';
 
 export function ClusterController(
   $scope,
@@ -27,6 +28,7 @@ export function ClusterController(
   appState,
   genericReq
 ) {
+  timefilter.setRefreshInterval({ pause: true, value: 0 });
   $scope.search = term => {
     $scope.$broadcast('wazuhSearch', { term });
   };
@@ -54,16 +56,26 @@ export function ClusterController(
   $scope.currentNode = null;
   $scope.nodeSearchTerm = '';
 
+  /**
+   * This set default boolean flags for a given component
+   * @param {String} component
+   */
   const setBooleans = component => {
     $scope.showConfig = component === 'showConfig';
     $scope.showNodes = component === 'showNodes';
     $scope.currentNode = null;
   };
 
+  /**
+   * This navigates to agents preview
+   */
   $scope.goAgents = () => {
     $window.location.href = '#/agents-preview';
   };
 
+  /**
+   * This navigates to configuration
+   */
   $scope.goConfiguration = () => {
     setBooleans('showConfig');
     tabVisualizations.assign({
@@ -73,6 +85,9 @@ export function ClusterController(
     $rootScope.$broadcast('updateVis');
   };
 
+  /**
+   * This navigates to nodes
+   */
   $scope.goNodes = () => {
     setBooleans('showNodes');
     tabVisualizations.assign({
@@ -82,6 +97,9 @@ export function ClusterController(
     $rootScope.$broadcast('updateVis');
   };
 
+  /**
+   * This navigates back
+   */
   $scope.goBack = () => {
     setBooleans(null);
     tabVisualizations.assign({
@@ -91,6 +109,7 @@ export function ClusterController(
     $rootScope.$broadcast('updateVis');
   };
 
+  //listeners
   $scope.$on('wazuhShowClusterNode', async (event, parameters) => {
     try {
       tabVisualizations.assign({
@@ -177,6 +196,10 @@ export function ClusterController(
   });
 
   let filters = [];
+  /**
+   * This creatie custom filters for visualizations for a given node
+   * @param {Object} node
+   */
   const assignFilters = (node = false) => {
     try {
       filters = [];
@@ -200,6 +223,9 @@ export function ClusterController(
     }
   };
 
+  /**
+   * This set some required settings at init
+   */
   const load = async () => {
     try {
       visHandlers.removeAll();
@@ -223,9 +249,7 @@ export function ClusterController(
         apiReq.request('GET', '/cluster/healthcheck', {})
       ]);
 
-      const result = data.map(
-        item => (item && item.data && item.data.data ? item.data.data : false)
-      );
+      const result = data.map(item => ((item || {}).data || {}).data || false);
 
       const [
         nodeList,
@@ -265,6 +289,7 @@ export function ClusterController(
 
   if (clusterEnabled) load();
 
+  //listeners
   $scope.$on('$destroy', () => {
     $location.search('tabView', null);
     discoverPendingUpdates.removeAll();

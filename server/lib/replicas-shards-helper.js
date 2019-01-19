@@ -1,6 +1,6 @@
 /*
  * Wazuh app - Elastic wrapper helper
- * Copyright (C) 2018 Wazuh, Inc.
+ * Copyright (C) 2015-2019 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,8 +20,8 @@
 export function BuildBody(
   file,
   indexName,
-  defaultShards = 5,
-  defaulReplicas = 1
+  defaultShards = 1,
+  defaulReplicas = 0
 ) {
   if (indexName) {
     const shards =

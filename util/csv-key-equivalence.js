@@ -1,6 +1,6 @@
 /*
  * Wazuh app - Wazuh CSV column keys
- * Copyright (C) 2018 Wazuh, Inc.
+ * Copyright (C) 2015-2019 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -61,10 +61,23 @@ export const KeyEquivalenece = {
   proto: 'Protocol',
   address: 'Address',
   protocol: 'Protocol',
+  netmask: 'Netmask',
   'local.ip': 'Local IP',
   'remote.ip': 'Remote IP',
   'local.port': 'Local port',
   'remote.port': 'Remote port',
   euser: 'Effective user',
-  nice: 'Priority'
+  nice: 'Priority',
+  size: 'Size',
+  uname: 'User',
+  gname: 'Group',
+  perm: 'Permissions',
+  inode: 'Inode',
+  uid: 'User ID',
+  gid: 'Group ID',
+  mtime: 'Last modified',
+  priority: 'Priority',
+  cmd: 'CMD',
+  nlwp: 'NLWP',
+  process: 'Process'
 };

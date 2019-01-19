@@ -1,6 +1,6 @@
 /*
  * Wazuh app - Dev tools controller
- * Copyright (C) 2018 Wazuh, Inc.
+ * Copyright (C) 2015-2019 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,7 +16,25 @@ import queryString from 'querystring-browser';
 import $ from 'jquery';
 
 export class DevToolsController {
-  constructor($scope, apiReq, genericReq, $window, appState, errorHandler, $document) {
+  /**
+   * Constructor
+   * @param {*} $scope
+   * @param {*} apiReq
+   * @param {*} genericReq
+   * @param {*} $window
+   * @param {*} appState
+   * @param {*} errorHandler
+   * @param {*} $document
+   */
+  constructor(
+    $scope,
+    apiReq,
+    genericReq,
+    $window,
+    appState,
+    errorHandler,
+    $document
+  ) {
     this.$scope = $scope;
     this.apiReq = apiReq;
     this.genericReq = genericReq;
@@ -29,6 +47,9 @@ export class DevToolsController {
     this.widgets = [];
   }
 
+  /**
+   * When controller loads
+   */
   $onInit() {
     this.apiInputBox = CodeMirror.fromTextArea(
       this.$document[0].getElementById('api_input'),
@@ -42,7 +63,8 @@ export class DevToolsController {
         gutters: ['CodeMirror-foldgutter']
       }
     );
-    CodeMirror.commands.autocomplete = function (cm) {
+    // Register plugin for code mirror
+    CodeMirror.commands.autocomplete = function(cm) {
       CodeMirror.showHint(cm, CodeMirror.hint.dictionaryHint, {
         completeSingle: false
       });
@@ -59,13 +81,14 @@ export class DevToolsController {
         );
         if (hasWidget.length)
           this.apiInputBox.removeLineWidget(hasWidget[0].widget);
-        setTimeout(() => this.checkJsonParseError(), 450);
+        setTimeout(() => this.checkJsonParseError(), 150);
       }
     });
 
     this.apiInputBox.on('cursorActivity', () => {
       const currentGroup = this.calculateWhichGroup();
       this.highlightGroup(currentGroup);
+      this.checkJsonParseError();
     });
 
     this.apiOutputBox = CodeMirror.fromTextArea(
@@ -95,6 +118,9 @@ export class DevToolsController {
     this.$scope.send(true);
   }
 
+  /**
+   * Detect de groups of instructions
+   */
   analyzeGroups() {
     try {
       const currentState = this.apiInputBox.getValue().toString();
@@ -102,8 +128,9 @@ export class DevToolsController {
 
       const tmpgroups = [];
       const splitted = currentState
-        .split(/[\r\n]+(?=(?:GET|PUT|POST|DELETE)\b)/gm)
+        .split(/[\r\n]+(?=(?:GET|PUT|POST|DELETE|#)\b)/gm)
         .filter(item => item.replace(/\s/g, '').length);
+
       let start = 0;
       let end = 0;
 
@@ -163,6 +190,10 @@ export class DevToolsController {
     }
   }
 
+  /**
+   * This seta group as active, and highlight it
+   * @param {Object} group
+   */
   highlightGroup(group) {
     for (const line of this.linesWithClass) {
       this.apiInputBox.removeLineClass(
@@ -195,6 +226,9 @@ export class DevToolsController {
     }
   }
 
+  /**
+   * This validate fromat of JSON group
+   */
   checkJsonParseError() {
     const affectedGroups = [];
     for (const widget of this.widgets) {
@@ -239,6 +273,9 @@ export class DevToolsController {
     return affectedGroups;
   }
 
+  /**
+   * This loads all available paths of the API to show them in the autocomplete
+   */
   async getAvailableMethods() {
     try {
       const response = await this.genericReq.request('GET', '/api/routes', {});
@@ -248,11 +285,14 @@ export class DevToolsController {
     }
   }
 
+  /**
+   * This set some required settings at init
+   */
   init() {
     this.apiInputBox.setSize('auto', '100%');
     this.apiInputBox.model = [];
     this.getAvailableMethods();
-    this.apiInputBox.on('keyup', function (cm, e) {
+    this.apiInputBox.on('keyup', function(cm, e) {
       if (!ExcludedIntelliSenseTriggerKeys[(e.keyCode || e.which).toString()]) {
         cm.execCommand('autocomplete', null, {
           completeSingle: false
@@ -263,8 +303,9 @@ export class DevToolsController {
     const currentState = this.appState.getCurrentDevTools();
     if (!currentState) {
       const demoStr =
-        'GET /\n\n# Comment here\nGET /agents\n' +
-        JSON.stringify({ limit: 1 }, null, 2);
+        'GET /agents?status=Active\n\n#Example comment\nGET /manager/info\n\nGET /syscollector/000/packages?search=ssh\n' +
+        JSON.stringify({ limit: 5 }, null, 2);
+
       this.appState.setCurrentDevTools(demoStr);
       this.apiInputBox.getDoc().setValue(demoStr);
     } else {
@@ -275,34 +316,34 @@ export class DevToolsController {
     this.highlightGroup(currentGroup);
 
     // Register our custom Codemirror hint plugin.
-    CodeMirror.registerHelper('hint', 'dictionaryHint', function (editor) {
+    CodeMirror.registerHelper('hint', 'dictionaryHint', function(editor) {
       const model = editor.model;
       function getDictionary(line, word) {
         let hints = [];
         const exp = line.split(/\s+/g);
         if (exp[0] && exp[0].match(/^(?:GET|PUT|POST|DELETE).*$/)) {
-          let method = model.find(function (item) {
-            return item.method === exp[0]
+          let method = model.find(function(item) {
+            return item.method === exp[0];
           });
           const forbidChars = /^[^?{]+$/;
           if (method && !exp[2] && forbidChars.test(word)) {
-            method.endpoints.forEach(function (endpoint) {
+            method.endpoints.forEach(function(endpoint) {
               endpoint.path = endpoint.name;
               if (endpoint.args && endpoint.args.length > 0) {
                 let argSubs = [];
-                endpoint.args.forEach(function (arg) {
+                endpoint.args.forEach(function(arg) {
                   const pathSplitted = endpoint.name.split('/');
                   const arrayIdx = pathSplitted.indexOf(arg.name);
                   const wordSplitted = word.split('/');
                   if (wordSplitted[arrayIdx] && wordSplitted[arrayIdx] != '') {
                     argSubs.push({
-                      'id': arg.name,
-                      'value': wordSplitted[arrayIdx]
+                      id: arg.name,
+                      value: wordSplitted[arrayIdx]
                     });
                   }
                 });
                 let auxPath = endpoint.name;
-                argSubs.forEach(function (arg) {
+                argSubs.forEach(function(arg) {
                   auxPath = auxPath.replace(arg.id, arg.value);
                 });
                 endpoint.path = auxPath;
@@ -321,19 +362,54 @@ export class DevToolsController {
       let start = cur.ch;
       let end = start;
       const whiteSpace = /\s/;
-      while (end < curLine.length && !whiteSpace.test(curLine.charAt(end)))++end;
-      while (start && !whiteSpace.test(curLine.charAt(start - 1)))--start;
+      while (end < curLine.length && !whiteSpace.test(curLine.charAt(end)))
+        ++end;
+      while (start && !whiteSpace.test(curLine.charAt(start - 1))) --start;
       const curWord = start !== end && curLine.slice(start, end);
       return {
-        list: (!curWord ? [] : getDictionary(curLine, curWord).filter(function (item) {
-          return item.toUpperCase().includes(curWord.toUpperCase());
-        })).sort(),
+        list: (!curWord
+          ? []
+          : getDictionary(curLine, curWord).filter(function(item) {
+              return item.toUpperCase().includes(curWord.toUpperCase());
+            })
+        ).sort(),
         from: CodeMirror.Pos(cur.line, start),
         to: CodeMirror.Pos(cur.line, end)
-      }
+      };
     });
+    const evtDocument = this.$document[0];
+    $('.wz-dev-column-separator').mousedown(function(e) {
+      e.preventDefault();
+      const leftOrigWidth = $('#wz-dev-left-column').width();
+      const rightOrigWidth = $('#wz-dev-right-column').width();
+      $(evtDocument).mousemove(function(e) {
+        const leftWidth = e.pageX - 215 + 14;
+        let rightWidth = leftOrigWidth - leftWidth;
+        $('#wz-dev-left-column').css('width', leftWidth);
+        $('#wz-dev-right-column').css('width', rightOrigWidth + rightWidth);
+      });
+    });
+
+    $(evtDocument).mouseup(function() {
+      $(evtDocument).unbind('mousemove');
+    });
+
+    this.$window.onresize = () => {
+      $('#wz-dev-left-column').attr(
+        'style',
+        'width: calc(30% - 7px); !important'
+      );
+      $('#wz-dev-right-column').attr(
+        'style',
+        'width: calc(70% - 7px); !important'
+      );
+    };
   }
 
+  /**
+   * This method highlights one of the groups the first time
+   * @param {Boolean} firstTime
+   */
   calculateWhichGroup(firstTime) {
     try {
       const selection = this.apiInputBox.getCursor();
@@ -341,10 +417,10 @@ export class DevToolsController {
       const desiredGroup = firstTime
         ? this.groups.filter(item => item.requestText)
         : this.groups.filter(
-          item =>
-            item.requestText &&
-            (item.end >= selection.line && item.start <= selection.line)
-        );
+            item =>
+              item.requestText &&
+              (item.end >= selection.line && item.start <= selection.line)
+          );
 
       // Place play button at first line from the selected group
       const cords = this.apiInputBox.cursorCoords({
@@ -365,6 +441,10 @@ export class DevToolsController {
     }
   }
 
+  /**
+   * This perfoms the typed request to API
+   * @param {Boolean} firstTime
+   */
   async send(firstTime) {
     try {
       this.groups = this.analyzeGroups();
@@ -396,12 +476,12 @@ export class DevToolsController {
         const method = desiredGroup.requestText.startsWith('GET')
           ? 'GET'
           : desiredGroup.requestText.startsWith('POST')
-            ? 'POST'
-            : desiredGroup.requestText.startsWith('PUT')
-              ? 'PUT'
-              : desiredGroup.requestText.startsWith('DELETE')
-                ? 'DELETE'
-                : 'GET';
+          ? 'POST'
+          : desiredGroup.requestText.startsWith('PUT')
+          ? 'PUT'
+          : desiredGroup.requestText.startsWith('DELETE')
+          ? 'DELETE'
+          : 'GET';
 
         const requestCopy = desiredGroup.requestText.includes(method)
           ? desiredGroup.requestText.split(method)[1].trim()
@@ -439,16 +519,18 @@ export class DevToolsController {
         if (typeof JSONraw === 'object') JSONraw.devTools = true;
         const output = await this.apiReq.request(method, path, JSONraw);
 
-        this.apiOutputBox.setValue(JSON.stringify(output.data.data, null, 2));
+        this.apiOutputBox.setValue(
+          JSON.stringify((output || {}).data, null, 2)
+        );
       } else {
         this.apiOutputBox.setValue('Welcome!');
       }
     } catch (error) {
       const parsedError = this.errorHandler.handle(error, null, null, true);
       if (typeof parsedError === 'string') {
-        return this.apiOutputBox.setValue(parsedError);
+        return this.apiOutputBox.setValue(error);
       } else if (error && error.data && typeof error.data === 'object') {
-        return this.apiOutputBox.setValue(JSON.stringify(error.data));
+        return this.apiOutputBox.setValue(JSON.stringify(error));
       } else {
         return this.apiOutputBox.setValue('Empty');
       }

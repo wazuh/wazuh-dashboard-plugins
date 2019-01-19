@@ -1,6 +1,6 @@
 /*
  * Wazuh app - File for app requirements and set up
- * Copyright (C) 2018 Wazuh, Inc.
+ * Copyright (C) 2015-2019 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,6 +24,7 @@ import { VisFactoryService } from './vis-factory-handler';
 import './region-maps';
 import './order-object-by';
 import { uiModules } from 'ui/modules';
+import { GroupHandler } from './group-handler';
 
 const app = uiModules.get('app/wazuh', []);
 
@@ -37,4 +38,5 @@ app
   .service('csvReq', CSVRequest)
   .service('commonData', CommonData)
   .service('reportingService', ReportingService)
-  .service('visFactoryService', VisFactoryService);
+  .service('visFactoryService', VisFactoryService)
+  .service('groupHandler', GroupHandler);

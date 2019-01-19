@@ -1,6 +1,6 @@
 /*
  * Wazuh app - Class for the Elastic wrapper
- * Copyright (C) 2018 Wazuh, Inc.
+ * Copyright (C) 2015-2019 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -14,15 +14,11 @@ import { monitoringKnownFields } from '../integration-files/monitoring-known-fie
 
 export class ElasticWrapper {
   constructor(server) {
+    this.usingSearchGuard = ((server || {}).plugins || {}).searchguard || false;
     this.elasticRequest = server.plugins.elasticsearch.getCluster('data');
     this.WZ_KIBANA_INDEX =
-      server &&
-      server.registrations &&
-      server.registrations.kibana &&
-      server.registrations.kibana.options &&
-      server.registrations.kibana.options.index
-        ? server.registrations.kibana.options.index
-        : '.kibana';
+      ((((server || {}).registrations || {}).kibana || {}).options || {})
+        .index || '.kibana';
   }
 
   /**
@@ -125,7 +121,7 @@ export class ElasticWrapper {
           type: 'index-pattern',
           'index-pattern': {
             fields:
-              '[{"name":"@timestamp","type":"date","count":0,"scripted":false,"searchable":true,"aggregatable":true,"readFromDocValues":true},{"name":"_id","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":true,"readFromDocValues":false},{"name":"_index","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":true,"readFromDocValues":false},{"name":"_score","type":"number","count":0,"scripted":false,"searchable":false,"aggregatable":false,"readFromDocValues":false},{"name":"_source","type":"_source","count":0,"scripted":false,"searchable":false,"aggregatable":false,"readFromDocValues":false},{"name":"_type","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":true,"readFromDocValues":false},{"name":"dateAdd","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":false,"readFromDocValues":false},{"name":"dateAdd.keyword","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":true,"readFromDocValues":true},{"name":"group","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":false,"readFromDocValues":false},{"name":"group.keyword","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":true,"readFromDocValues":true},{"name":"host","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":true,"readFromDocValues":true},{"name":"id","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":true,"readFromDocValues":true},{"name":"ip","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":true,"readFromDocValues":true},{"name":"lastKeepAlive","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":false,"readFromDocValues":false},{"name":"lastKeepAlive.keyword","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":true,"readFromDocValues":true},{"name":"cluster.name","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":false,"readFromDocValues":false},{"name":"cluster.name.keyword","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":true,"readFromDocValues":true},{"name":"mergedSum","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":false,"readFromDocValues":false},{"name":"mergedSum.keyword","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":true,"readFromDocValues":true},{"name":"configSum","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":false,"readFromDocValues":false},{"name":"configSum.keyword","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":true,"readFromDocValues":true},{"name":"node_name","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":false,"readFromDocValues":false},{"name":"node_name.keyword","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":true,"readFromDocValues":true},{"name":"manager","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":false,"readFromDocValues":false},{"name":"manager.keyword","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":true,"readFromDocValues":true},{"name":"manager_host","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":false,"readFromDocValues":false},{"name":"manager_host.keyword","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":true,"readFromDocValues":true},{"name":"name","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":true,"readFromDocValues":true},{"name":"os.arch","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":false,"readFromDocValues":false},{"name":"os.arch.keyword","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":true,"readFromDocValues":true},{"name":"os.codename","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":false,"readFromDocValues":false},{"name":"os.codename.keyword","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":true,"readFromDocValues":true},{"name":"os.major","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":false,"readFromDocValues":false},{"name":"os.major.keyword","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":true,"readFromDocValues":true},{"name":"os.name","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":false,"readFromDocValues":false},{"name":"os.name.keyword","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":true,"readFromDocValues":true},{"name":"os.platform","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":false,"readFromDocValues":false},{"name":"os.platform.keyword","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":true,"readFromDocValues":true},{"name":"os.uname","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":false,"readFromDocValues":false},{"name":"os.uname.keyword","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":true,"readFromDocValues":true},{"name":"os.version","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":false,"readFromDocValues":false},{"name":"os.version.keyword","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":true,"readFromDocValues":true},{"name":"status","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":true,"readFromDocValues":true},{"name":"version","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":false,"readFromDocValues":false},{"name":"version.keyword","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":true,"readFromDocValues":true}]',
+              '[{"name":"@timestamp","type":"date","count":0,"scripted":false,"searchable":true,"aggregatable":true,"readFromDocValues":true},{"name":"_id","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":true,"readFromDocValues":false},{"name":"_index","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":true,"readFromDocValues":false},{"name":"_score","type":"number","count":0,"scripted":false,"searchable":false,"aggregatable":false,"readFromDocValues":false},{"name":"_source","type":"_source","count":0,"scripted":false,"searchable":false,"aggregatable":false,"readFromDocValues":false},{"name":"_type","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":true,"readFromDocValues":false},{"name":"dateAdd","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":false,"readFromDocValues":false},{"name":"group","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":false,"readFromDocValues":false},{"name":"host","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":true,"readFromDocValues":true},{"name":"id","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":true,"readFromDocValues":true},{"name":"ip","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":true,"readFromDocValues":true},{"name":"lastKeepAlive","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":false,"readFromDocValues":false},{"name":"cluster.name","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":false,"readFromDocValues":false},{"name":"mergedSum","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":false,"readFromDocValues":false},{"name":"configSum","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":false,"readFromDocValues":false},{"name":"node_name","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":false,"readFromDocValues":false},{"name":"manager","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":false,"readFromDocValues":false},{"name":"manager_host","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":false,"readFromDocValues":false},{"name":"name","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":true,"readFromDocValues":true},{"name":"os.arch","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":false,"readFromDocValues":false},{"name":"os.codename","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":false,"readFromDocValues":false},{"name":"os.major","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":false,"readFromDocValues":false},{"name":"os.name","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":false,"readFromDocValues":false},{"name":"os.platform","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":false,"readFromDocValues":false},{"name":"os.uname","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":false,"readFromDocValues":false},{"name":"os.version","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":false,"readFromDocValues":false},{"name":"status","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":true,"readFromDocValues":true},{"name":"version","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":false,"readFromDocValues":false}]',
             title: title,
             timeFieldName: '@timestamp'
           }
@@ -252,15 +248,19 @@ export class ElasticWrapper {
       let currentFields = [];
 
       // If true, it's an existing index pattern, we need to review its known fields
-      if (
-        pattern &&
-        pattern._source &&
-        pattern._source['index-pattern'] &&
-        pattern._source['index-pattern'].fields
-      ) {
+      if ((((pattern || {})._source || {})['index-pattern'] || {}).fields) {
         currentFields = JSON.parse(pattern._source['index-pattern'].fields);
 
         if (Array.isArray(currentFields) && Array.isArray(knownFields)) {
+          currentFields = currentFields.filter(
+            item =>
+              item.name &&
+              item.name !==
+                'data.aws.service.action.networkConnectionAction.remoteIpDetails.geoLocation.lat' &&
+              item.name !==
+                'data.aws.service.action.networkConnectionAction.remoteIpDetails.geoLocation.lon'
+          );
+
           for (const field of knownFields) {
             // It has this field?
             const index = currentFields
@@ -343,12 +343,7 @@ export class ElasticWrapper {
       let currentFields = [];
 
       // If true, it's an existing index pattern, we need to review its known fields
-      if (
-        pattern &&
-        pattern._source &&
-        pattern._source['index-pattern'] &&
-        pattern._source['index-pattern'].fields
-      ) {
+      if ((((pattern || {})._source || {})['index-pattern'] || {}).fields) {
         currentFields = JSON.parse(pattern._source['index-pattern'].fields);
 
         if (
@@ -489,12 +484,8 @@ export class ElasticWrapper {
       const fullPattern = await this.getIndexPatternUsingGet(pattern);
 
       const title =
-        fullPattern &&
-        fullPattern._source &&
-        fullPattern._source['index-pattern'] &&
-        fullPattern._source['index-pattern'].title
-          ? fullPattern._source['index-pattern'].title
-          : false;
+        (((fullPattern || {})._source || {})['index-pattern'] || {}).title ||
+        false;
 
       const data = await this.elasticRequest.callWithInternalUser('search', {
         index: title || 'wazuh-alerts-3.x-*',
@@ -580,20 +571,27 @@ export class ElasticWrapper {
 
   /**
    * Updates the a document from the .wazuh index using id and doc content
-   * @param {*} id
-   * @param {*} doc
+   * @param {*} req. Optional parameter to pass an incoming request (X-Pack related)
+   * @param {*} id. Wazuh API entry ID (Elasticsearch ID)
+   * @param {*} doc. The content to be used for updating the document.
    */
-  async updateWazuhIndexDocument(req, doc) {
+  async updateWazuhIndexDocument(req, id, doc) {
     try {
-      const id = typeof req === 'object' && req.payload ? req.payload.id : req;
       if (!id || !doc) throw new Error('No valid parameters given');
 
-      const data = await this.elasticRequest.callWithInternalUser('update', {
-        index: '.wazuh',
-        type: 'wazuh-configuration',
-        id: id,
-        body: doc
-      });
+      const data = req
+        ? await this.elasticRequest.callWithRequest(req, 'update', {
+            index: '.wazuh',
+            type: 'wazuh-configuration',
+            id: id,
+            body: doc
+          })
+        : await this.elasticRequest.callWithInternalUser('update', {
+            index: '.wazuh',
+            type: 'wazuh-configuration',
+            id: id,
+            body: doc
+          });
 
       return data;
     } catch (error) {
@@ -658,23 +656,6 @@ export class ElasticWrapper {
     }
   }
 
-  /**
-   * Same as curling the plugins from Elasticsearch
-   */
-  async getPlugins() {
-    try {
-      const data = await this.elasticRequest.callWithInternalUser(
-        'cat.plugins',
-        {}
-      );
-      const usingCredentials = await this.usingCredentials();
-
-      return usingCredentials ? data : false;
-    } catch (error) {
-      return Promise.reject(error);
-    }
-  }
-
   async usingCredentials() {
     try {
       const data = await this.elasticRequest.callWithInternalUser(
@@ -683,11 +664,9 @@ export class ElasticWrapper {
       );
 
       return (
-        data &&
-        data.defaults &&
-        data.defaults.xpack &&
-        data.defaults.xpack.security &&
-        data.defaults.xpack.security.enabled
+        this.usingSearchGuard ||
+        ((((data || {}).defaults || {}).xpack || {}).security || {}).enabled ==
+          'true'
       );
     } catch (error) {
       return Promise.reject(error);
@@ -969,9 +948,7 @@ export class ElasticWrapper {
 
       // Number of shards is not dynamic so delete that setting if it's given
       if (
-        configuration.settings &&
-        configuration.settings.index &&
-        configuration.settings.index.number_of_shards
+        (((configuration || {}).settings || {}).index || {}).number_of_shards
       ) {
         delete configuration.settings.index.number_of_shards;
       }

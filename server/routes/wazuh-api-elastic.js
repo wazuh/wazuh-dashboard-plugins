@@ -1,6 +1,6 @@
 /*
  * Wazuh app - Module for Wazuh-API-Elastic routes
- * Copyright (C) 2018 Wazuh, Inc.
+ * Copyright (C) 2015-2019 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -47,15 +47,6 @@ export function WazuhApiElasticRoutes(server) {
     path: '/elastic/apis/{id}',
     handler(req, reply) {
       return ctrl.deleteAPIEntries(req, reply);
-    }
-  });
-
-  // Set Wazuh-API as default (multimanager) on elasticsearch index
-  server.route({
-    method: 'PUT',
-    path: '/elastic/apis/{id}',
-    handler(req, reply) {
-      return ctrl.setAPIEntryDefault(req, reply);
     }
   });
 

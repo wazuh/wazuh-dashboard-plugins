@@ -1,6 +1,6 @@
 /*
  * Wazuh app - Module for Overview/General visualizations
- * Copyright (C) 2018 Wazuh, Inc.
+ * Copyright (C) 2015-2019 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,7 +22,7 @@ export default [
       version: 1,
       kibanaSavedObjectMeta: {
         searchSourceJSON:
-          '{"index":"wazuh-monitoring-3.x-*","filter":[],"query":{"query":"","language":"lucene"}}'
+          '{"index":"wazuh-monitoring","filter":[],"query":{"query":"","language":"lucene"}}'
       }
     },
     _type: 'visualization'

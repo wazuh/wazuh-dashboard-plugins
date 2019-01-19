@@ -28,14 +28,40 @@
                         Full OS name: {{ agentOS }}
                     </md-tooltip>
                 </div>
+                <div class="wz-text-truncatable" flex>
+                    <span class="wz-text-bold wz-text-link" ng-click="goDiscover()"><i class="fa fa-fw fa-compass" aria-hidden="true"></i> Discover</span>
+                </div>
             </md-card-content>
         </md-card>
     </div>
-    <div layout="row" layout-padding class="wz-padding-top-0 wz-padding-bottom-0">
+    <div layout="row" layout-padding class="wz-padding-top-0 wz-padding-bottom-0" ng-if="agent.group">
         <md-card flex class="wz-metric-color wz-md-card wz-no-padding">
-            <md-card-content layout="row" class="wz-padding-metric">
-                <div class="wz-word-break" flex ng-if="agent.group">
-                    Groups: <span ng-repeat="group in agent.group" class="wz-text-bold wz-text-link" ng-click="goGroups(agent,$index)">{{ group }}&nbsp;</span>
+            <md-card-content class="wz-padding-metric">
+                <div class="layout-row wz-word-break">
+                    <span class="wz-text-link" ng-if='adminMode' ng-click="switchGroupEdit()"><i class="fa fa-fw fa-plus-circle"></i>&nbsp;</span>Groups:&nbsp;                    
+                    <span ng-repeat="group in agent.group" class="wz-text-bold wz-text-link" ng-click="goGroups(agent,$index)">{{ group }}&nbsp;</span>                   
+                </div>
+                <div layout="row" class="wz-margin-top-10" ng-if="editGroup && !addingGroupToAgent">
+                    <div class="wz-word-break" flex ng-if="groups && groups.length">
+                        Available groups:
+                    </div>
+                    <div class="wz-word-break" flex ng-if="!groups || !groups.length">
+                        There are no more groups available.
+                    </div>
+                </div>
+                <div ng-if="editGroup && !addingGroupToAgent" class="wz-margin-top-4" ng-if="groups && groups.length">
+                    <span ng-repeat="group in groups" class="wz-text-bold wz-text-link" ng-click="showConfirmAddGroup(group)">{{
+                        group }}&nbsp;</span>
+                </div>
+
+                <div class="wz-margin-top-10" ng-if="editGroup && addingGroupToAgent">
+                    <div layout="row">
+                        <span class="euiToastHeader__title font-size-12">Group {{addingGroupToAgent}} will be added to agent {{agent.id}}</span>
+                    </div>
+                    <div layout="row">
+                        <md-button class="cancelBtnAgents" type="button" ng-click="cancelAddGroup()"><i aria-hidden='true' class='fa fa-fw fa-close'></i> Cancel</md-button>
+                        <md-button class="agreeBtnAgents" type="button" ng-click="confirmAddGroup(addingGroupToAgent)"><i aria-hidden='true' class='fa fa-fw fa-check'></i> Confirm</md-button>  
+                    </div>                          
                 </div>
             </md-card-content>
         </md-card>
@@ -61,6 +87,7 @@
                         Duration time: {{ agent.rootcheck.duration +' minutes' || 'Unknown'}}
                     </md-tooltip>
                 </div>
+                <div class="wz-text-truncatable" flex></div>
             </md-card-content>
         </md-card>
     </div>
@@ -108,12 +135,12 @@
                             description="TabDescription.pm.description"
                         ></wz-welcome-card>
                         <wz-welcome-card
-                            ng-if="extensions.audit" class="euiFlexItem" logo="'icons/app_monitoring.svg'"
+                            ng-if="extensions.audit && agent.isLinuxOS" class="euiFlexItem" logo="'icons/app_monitoring.svg'"
                             title="'System auditing'" switch-tab="switchTab('audit')" current-tab="'audit'"
                             description="TabDescription.audit.description"
                         ></wz-welcome-card>
                         <wz-welcome-card
-                            ng-if="extensions.oscap" class="euiFlexItem" logo="'icons/app_discover.svg'"
+                            ng-if="extensions.oscap && agent.isLinuxOS" class="euiFlexItem" logo="'icons/app_discover.svg'"
                             title="'OpenSCAP'" switch-tab="switchTab('oscap')" current-tab="'oscap'"
                             description="TabDescription.oscap.description"
                         ></wz-welcome-card>
@@ -147,7 +174,7 @@
                                 description="TabDescription.virustotal.description"
                             ></wz-welcome-card>
                             <wz-welcome-card
-                                ng-if="extensions.osquery" class="euiFlexItem" logo="'icons/osquery.png'"
+                                ng-if="extensions.osquery" class="euiFlexItem" logo="'icons/osquery.svg'"
                                 title="'Osquery'" switch-tab="switchTab('osquery')" current-tab="'osquery'"
                                 description="TabDescription.osquery.description"
                             ></wz-welcome-card>

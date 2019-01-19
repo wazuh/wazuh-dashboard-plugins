@@ -1,6 +1,6 @@
 /*
  * Wazuh app - Class for Wazuh-API functions
- * Copyright (C) 2018 Wazuh, Inc.
+ * Copyright (C) 2015-2019 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,7 +16,6 @@ import { pciRequirementsFile } from '../integration-files/pci-requirements';
 import { gdprRequirementsFile } from '../integration-files/gdpr-requirements';
 import { ElasticWrapper } from '../lib/elastic-wrapper';
 import { getPath } from '../../util/get-path';
-import packageInfo from '../../package.json';
 import { Monitoring } from '../monitoring';
 import { ErrorResponse } from './error-response';
 import { Parser } from 'json2csv';
@@ -24,38 +23,42 @@ import { getConfiguration } from '../lib/get-configuration';
 import { log } from '../logger';
 import { KeyEquivalenece } from '../../util/csv-key-equivalence';
 import { cleanKeys } from '../../util/remove-key';
-import { apiRequestList } from '../../util/api-request-list'
+import { apiRequestList } from '../../util/api-request-list';
+import * as ApiHelper from '../lib/api-helper';
 
 export class WazuhApiCtrl {
+  /**
+   * Constructor
+   * @param {*} server
+   */
   constructor(server) {
     this.wzWrapper = new ElasticWrapper(server);
-    this.fetchAgentsExternal = Monitoring(server, { disableCron: true });
+    this.monitoringInstance = new Monitoring(server, true);
   }
 
+  /**
+   * Returns if the wazuh-api configuration is working
+   * @param {Object} req
+   * @param {Object} reply
+   * @returns {Object} status obj or ErrorResponse
+   */
   async checkStoredAPI(req, reply) {
     try {
       // Get config from elasticsearch
-      const wapi_config = await this.wzWrapper.getWazuhConfigurationById(
-        req.payload
-      );
-      if (wapi_config.error_code > 1) {
+      const api = await this.wzWrapper.getWazuhConfigurationById(req.payload);
+      if (api.error_code > 1) {
         throw new Error(`Could not find Wazuh API entry on Elasticsearch.`);
-      } else if (wapi_config.error_code > 0) {
+      } else if (api.error_code > 0) {
         throw new Error(
           'Valid credentials not found in Elasticsearch. It seems the credentials were not saved.'
         );
       }
-      const credInfo = {
-        headers: {
-          'wazuh-app-version': packageInfo.version
-        },
-        username: wapi_config.user,
-        password: wapi_config.password,
-        rejectUnauthorized: !wapi_config.insecure
-      };
+
+      const credInfo = ApiHelper.buildOptionsObject(api);
+
       let response = await needle(
         'get',
-        `${wapi_config.url}:${wapi_config.port}/version`,
+        `${api.url}:${api.port}/version`,
         {},
         credInfo
       );
@@ -64,7 +67,7 @@ export class WazuhApiCtrl {
         // Checking the cluster status
         response = await needle(
           'get',
-          `${wapi_config.url}:${wapi_config.port}/cluster/status`,
+          `${api.url}:${api.port}/cluster/status`,
           {},
           credInfo
         );
@@ -73,14 +76,14 @@ export class WazuhApiCtrl {
           try {
             const managerInfo = await needle(
               'get',
-              `${wapi_config.url}:${wapi_config.port}/agents/000`,
+              `${api.url}:${api.port}/agents/000`,
               {},
               credInfo
             );
             const updatedManagerName = managerInfo.body.data.name;
-            wapi_config.cluster_info.manager = updatedManagerName;
-            await this.wzWrapper.updateWazuhIndexDocument(req.payload, {
-              doc: { cluster_info: wapi_config.cluster_info }
+            api.cluster_info.manager = updatedManagerName;
+            await this.wzWrapper.updateWazuhIndexDocument(null, req.payload, {
+              doc: { cluster_info: api.cluster_info }
             });
           } catch (error) {
             log(
@@ -93,70 +96,60 @@ export class WazuhApiCtrl {
           if (response.body.data.enabled === 'yes') {
             response = await needle(
               'get',
-              `${wapi_config.url}:${wapi_config.port}/cluster/node`,
+              `${api.url}:${api.port}/cluster/node`,
               {},
               credInfo
             );
 
             if (!response.body.error) {
-              let managerName = wapi_config.cluster_info.manager;
-              delete wapi_config.cluster_info;
-              wapi_config.cluster_info = {};
-              wapi_config.cluster_info.status = 'enabled';
-              wapi_config.cluster_info.manager = managerName;
-              wapi_config.cluster_info.node = response.body.data.node;
-              wapi_config.cluster_info.cluster = response.body.data.cluster;
-              wapi_config.password = '****';
+              let managerName = api.cluster_info.manager;
+              delete api.cluster_info;
+              api.cluster_info = {};
+              api.cluster_info.status = 'enabled';
+              api.cluster_info.manager = managerName;
+              api.cluster_info.node = response.body.data.node;
+              api.cluster_info.cluster = response.body.data.cluster;
+              api.password = '****';
               return reply({
                 statusCode: 200,
-                data: wapi_config,
+                data: api,
                 idChanged: req.idChanged || null
               });
             } else if (response.body.error) {
               const tmpMsg =
-                response && response.body && response.body.message
-                  ? response.body.message
-                  : 'Unexpected error from /cluster/node';
-
+                ((response || {}).body || {}).message ||
+                'Unexpected error from /cluster/node';
               throw new Error(tmpMsg);
             }
           } else {
             // Cluster mode is not active
-            let managerName = wapi_config.cluster_info.manager;
-            delete wapi_config.cluster_info;
-            wapi_config.cluster_info = {};
-            wapi_config.cluster_info.status = 'disabled';
-            wapi_config.cluster_info.cluster = 'Disabled';
-            wapi_config.cluster_info.manager = managerName;
-            wapi_config.password = '****';
+            let managerName = api.cluster_info.manager;
+            delete api.cluster_info;
+            api.cluster_info = {};
+            api.cluster_info.status = 'disabled';
+            api.cluster_info.cluster = 'Disabled';
+            api.cluster_info.manager = managerName;
+            api.password = '****';
 
             return reply({
               statusCode: 200,
-              data: wapi_config,
+              data: api,
               idChanged: req.idChanged || null
             });
           }
         } else {
           const tmpMsg =
-            response && response.body && response.body.message
-              ? response.body.message
-              : 'Unexpected error from /cluster/status';
+            ((response || {}).body || {}).message ||
+            'Unexpected error from /cluster/status';
 
           throw new Error(tmpMsg);
         }
       } else {
-        if (
-          response &&
-          response.body &&
-          response.body.error &&
-          response.body.message
-        ) {
+        if (((response || {}).body || {}).message) {
           throw new Error(response.body.message);
         }
 
-        throw new Error(
-          `${wapi_config.url}:${wapi_config.port}/version is unreachable`
-        );
+        throw new Error(`${api.url}:${api.port}/version is unreachable`);
       }
     } catch (error) {
       if (error.code === 'ECONNREFUSED') {
@@ -177,33 +170,28 @@ export class WazuhApiCtrl {
             const apis = await this.wzWrapper.getWazuhAPIEntries();
             for (const api of apis.hits.hits) {
               try {
+                const options = ApiHelper.buildOptionsObject(api);
+
+                options.password = Buffer.from(
+                  api._source.api_password,
+                  'base64'
+                ).toString('ascii');
+
                 const response = await needle(
                   'get',
                   `${api._source.url}:${api._source.api_port}/version`,
                   {},
-                  {
-                    headers: {
-                      'wazuh-app-version': packageInfo.version
-                    },
-                    username: api._source.api_user,
-                    password: Buffer.from(
-                      api._source.api_password,
-                      'base64'
-                    ).toString('ascii'),
-                    rejectUnauthorized: !api._source.insecure
-                  }
+                  options
                 );
                 if (
-                  response &&
-                  response.body &&
-                  response.body.error === 0 &&
-                  response.body.data
+                  ((response || {}).body || {}).error === 0 &&
+                  ((response || {}).body || {}).data
                 ) {
                   req.payload = api._id;
                   req.idChanged = api._id;
                   return this.checkStoredAPI(req, reply);
                 }
-              } catch (error) { } // eslint-disable-line
+              } catch (error) {} // eslint-disable-line
             }
           } catch (error) {
             log('POST /api/check-stored-api', error.message || error);
@@ -216,6 +204,10 @@ export class WazuhApiCtrl {
     }
   }
 
+  /**
+   * This perfoms a validation of API params
+   * @param {Object} payload API params
+   */
   validateCheckApiParams(payload) {
     if (!('user' in payload)) {
       return 'Missing param: API USER';
@@ -240,6 +232,12 @@ export class WazuhApiCtrl {
     return false;
   }
 
+  /**
+   * This check the wazuh-api configuration received in the POST body will work
+   * @param {Object} req
+   * @param {Object} reply
+   * @returns {Object} status obj or ErrorResponse
+   */
   async checkAPI(req, reply) {
     try {
       let apiAvailable = null;
@@ -274,14 +272,7 @@ export class WazuhApiCtrl {
         'get',
         `${apiAvailable.url}:${apiAvailable.port}/version`,
         {},
-        {
-          headers: {
-            'wazuh-app-version': packageInfo.version
-          },
-          username: apiAvailable.user,
-          password: apiAvailable.password,
-          rejectUnauthorized: !apiAvailable.insecure
-        }
+        ApiHelper.buildOptionsObject(apiAvailable)
       );
 
       // Check wrong credentials
@@ -294,14 +285,7 @@ export class WazuhApiCtrl {
           'get',
           `${apiAvailable.url}:${apiAvailable.port}/agents/000`,
           {},
-          {
-            headers: {
-              'wazuh-app-version': packageInfo.version
-            },
-            username: apiAvailable.user,
-            password: apiAvailable.password,
-            rejectUnauthorized: !apiAvailable.insecure
-          }
+          ApiHelper.buildOptionsObject(apiAvailable)
         );
 
         if (!response.body.error) {
@@ -311,15 +295,7 @@ export class WazuhApiCtrl {
             'get',
             `${apiAvailable.url}:${apiAvailable.port}/cluster/status`,
             {},
-            {
-              // Checking the cluster status
-              headers: {
-                'wazuh-app-version': packageInfo.version
-              },
-              username: apiAvailable.user,
-              password: apiAvailable.password,
-              rejectUnauthorized: !apiAvailable.insecure
-            }
+            ApiHelper.buildOptionsObject(apiAvailable)
           );
 
           if (!response.body.error) {
@@ -329,14 +305,7 @@ export class WazuhApiCtrl {
                 'get',
                 `${apiAvailable.url}:${apiAvailable.port}/cluster/node`,
                 {},
-                {
-                  headers: {
-                    'wazuh-app-version': packageInfo.version
-                  },
-                  username: apiAvailable.user,
-                  password: apiAvailable.password,
-                  rejectUnauthorized: !apiAvailable.insecure
-                }
+                ApiHelper.buildOptionsObject(apiAvailable)
               );
 
               if (!response.body.error) {
@@ -358,10 +327,10 @@ export class WazuhApiCtrl {
           }
         }
       }
+
       const tmpMsg =
-        response.body && response.body.message
-          ? response.body.message
-          : 'Unexpected error checking the Wazuh API';
+        ((response || {}).body || {}).message ||
+        'Unexpected error checking the Wazuh API';
 
       throw new Error(tmpMsg);
     } catch (error) {
@@ -370,6 +339,12 @@ export class WazuhApiCtrl {
     }
   }
 
+  /**
+   * This get PCI requirements
+   * @param {Object} req
+   * @param {Object} reply
+   * @returns {Array<Object>} requirements or ErrorResponse
+   */
   async getPciRequirement(req, reply) {
     try {
       let pci_description = '';
@@ -378,11 +353,11 @@ export class WazuhApiCtrl {
         if (!req.headers.id) {
           return reply(pciRequirementsFile);
         }
-        let wapi_config = await this.wzWrapper.getWazuhConfigurationById(
+        let api = await this.wzWrapper.getWazuhConfigurationById(
           req.headers.id
         );
 
-        if (wapi_config.error_code > 1) {
+        if (api.error_code > 1) {
           // Can not connect to elasticsearch
           return ErrorResponse(
             'Elasticsearch unexpected error or cannot connect',
@@ -390,28 +365,21 @@ export class WazuhApiCtrl {
             400,
             reply
           );
-        } else if (wapi_config.error_code > 0) {
+        } else if (api.error_code > 0) {
           // Credentials not found
           return ErrorResponse('Credentials does not exists', 3008, 400, reply);
         }
 
         const response = await needle(
           'get',
-          `${wapi_config.url}:${wapi_config.port}/rules/pci`,
+          `${api.url}:${api.port}/rules/pci`,
           {},
-          {
-            headers: {
-              'wazuh-app-version': packageInfo.version
-            },
-            username: wapi_config.user,
-            password: wapi_config.password,
-            rejectUnauthorized: !wapi_config.insecure
-          }
+          ApiHelper.buildOptionsObject(api)
         );
 
-        if (response.body.data && response.body.data.items) {
+        if ((((response || {}).body || {}).data || {}).items) {
           let PCIobject = {};
-          for (let item of response.body.data.items) {
+          for (const item of response.body.data.items) {
             if (typeof pciRequirementsFile[item] !== 'undefined')
               PCIobject[item] = pciRequirementsFile[item];
           }
@@ -443,6 +411,12 @@ export class WazuhApiCtrl {
     }
   }
 
+  /**
+   * This get GDPR Requirements
+   * @param {Object} req
+   * @param {Object} reply
+   * @returns {Array<Object>} requirements or ErrorResponse
+   */
   async getGdprRequirement(req, reply) {
     try {
       let gdpr_description = '';
@@ -451,23 +425,16 @@ export class WazuhApiCtrl {
         if (!req.headers.id) {
           return reply(gdprRequirementsFile);
         }
-        const wapi_config = await this.wzWrapper.getWazuhConfigurationById(
+        const api = await this.wzWrapper.getWazuhConfigurationById(
           req.headers.id
         );
 
         // Checking for GDPR
         const version = await needle(
           'get',
-          `${wapi_config.url}:${wapi_config.port}/version`,
+          `${api.url}:${api.port}/version`,
           {},
-          {
-            headers: {
-              'wazuh-app-version': packageInfo.version
-            },
-            username: wapi_config.user,
-            password: wapi_config.password,
-            rejectUnauthorized: !wapi_config.insecure
-          }
+          ApiHelper.buildOptionsObject(api)
         );
 
         const number = version.body.data;
@@ -489,7 +456,7 @@ export class WazuhApiCtrl {
           return reply({});
         }
 
-        if (wapi_config.error_code > 1) {
+        if (api.error_code > 1) {
           // Can not connect to elasticsearch
           return ErrorResponse(
             'Elasticsearch unexpected error or cannot connect',
@@ -497,28 +464,21 @@ export class WazuhApiCtrl {
             400,
             reply
           );
-        } else if (wapi_config.error_code > 0) {
+        } else if (api.error_code > 0) {
           // Credentials not found
           return ErrorResponse('Credentials does not exists', 3025, 400, reply);
         }
 
         const response = await needle(
           'get',
-          `${wapi_config.url}:${wapi_config.port}/rules/gdpr`,
+          `${api.url}:${api.port}/rules/gdpr`,
           {},
-          {
-            headers: {
-              'wazuh-app-version': packageInfo.version
-            },
-            username: wapi_config.user,
-            password: wapi_config.password,
-            rejectUnauthorized: !wapi_config.insecure
-          }
+          ApiHelper.buildOptionsObject(api)
         );
 
-        if (response.body.data && response.body.data.items) {
+        if ((((response || {}).body || {}).data || {}).items) {
           let GDPRobject = {};
-          for (let item of response.body.data.items) {
+          for (const item of response.body.data.items) {
             if (typeof gdprRequirementsFile[item] !== 'undefined')
               GDPRobject[item] = gdprRequirementsFile[item];
           }
@@ -550,11 +510,25 @@ export class WazuhApiCtrl {
     }
   }
 
+  /**
+   * This performs a request over Wazuh API and returns its response
+   * @param {String} method Method: GET, PUT, POST, DELETE
+   * @param {String} path API route
+   * @param {Object} data data and params to perform the request
+   * @param {String} id API id
+   * @param {Object} reply
+   * @returns {Object} API response or ErrorResponse
+   */
   async makeRequest(method, path, data, id, reply) {
+    const devTools = !!(data || {}).devTools;
     try {
-      const wapi_config = await this.wzWrapper.getWazuhConfigurationById(id);
+      const api = await this.wzWrapper.getWazuhConfigurationById(id);
 
-      if (wapi_config.error_code > 1) {
+      if (devTools) {
+        delete data.devTools;
+      }
+
+      if (api.error_code > 1) {
         //Can not connect to elasticsearch
         return ErrorResponse(
           'Could not connect with elasticsearch',
@@ -562,7 +536,7 @@ export class WazuhApiCtrl {
           404,
           reply
         );
-      } else if (wapi_config.error_code > 0) {
+      } else if (api.error_code > 0) {
         //Credentials not found
         return ErrorResponse('Credentials does not exists', 3012, 404, reply);
       }
@@ -571,52 +545,63 @@ export class WazuhApiCtrl {
         data = {};
       }
 
-      const options = {
-        headers: {
-          'wazuh-app-version': packageInfo.version
-        },
-        username: wapi_config.user,
-        password: wapi_config.password,
-        rejectUnauthorized: !wapi_config.insecure
-      };
+      const options = ApiHelper.buildOptionsObject(api);
 
-      const fullUrl = getPath(wapi_config) + path;
+      // Set content type application/xml if needed
+      if (
+        typeof (data || {}).content === 'string' &&
+        (data || {}).origin === 'xmleditor'
+      ) {
+        options.content_type = 'application/xml';
+        data = data.content.replace(new RegExp('\\n', 'g'), '');
+      }
+
+      const fullUrl = getPath(api) + path;
       const response = await needle(method, fullUrl, data, options);
 
       if (
-        response &&
-        response.body &&
-        !response.body.error &&
-        response.body.data
+        !((response || {}).body || {}).error &&
+        ((response || {}).body || {}).data
       ) {
         cleanKeys(response);
         return reply(response.body);
       }
 
-      throw response &&
-        response.body &&
-        response.body.error &&
-        response.body.message
+      if (((response || {}).body || {}).error && devTools) {
+        return reply(response.body);
+      }
+
+      throw ((response || {}).body || {}).error &&
+      ((response || {}).body || {}).message
         ? { message: response.body.message, code: response.body.error }
         : new Error('Unexpected error fetching data from the Wazuh API');
     } catch (error) {
-      return ErrorResponse(
-        error.message || error,
-        `Wazuh API error: ${error.code}` || 3013,
-        500,
-        reply
-      );
+      return devTools
+        ? reply({ error: '3013', message: error.message || error })
+        : ErrorResponse(
+            error.message || error,
+            `Wazuh API error: ${error.code}` || 3013,
+            500,
+            reply
+          );
     }
   }
 
+  /**
+   * This performs a generic request and returs its response
+   * @param {String} method Method: GET, PUT, POST, DELETE
+   * @param {String} path API route
+   * @param {Object} data data and params to perform the request
+   * @param {String} id API id
+   */
   async makeGenericRequest(method, path, data, id) {
     try {
-      const wapi_config = await this.wzWrapper.getWazuhConfigurationById(id);
+      const api = await this.wzWrapper.getWazuhConfigurationById(id);
 
-      if (wapi_config.error_code > 1) {
+      if (api.error_code > 1) {
         //Can not connect to elasticsearch
         throw new Error('Could not connect with elasticsearch');
-      } else if (wapi_config.error_code > 0) {
+      } else if (api.error_code > 0) {
         //Credentials not found
         throw new Error('Credentials does not exists');
       }
@@ -625,16 +610,9 @@ export class WazuhApiCtrl {
         data = {};
       }
 
-      const options = {
-        headers: {
-          'wazuh-app-version': packageInfo.version
-        },
-        username: wapi_config.user,
-        password: wapi_config.password,
-        rejectUnauthorized: !wapi_config.insecure
-      };
+      const options = ApiHelper.buildOptionsObject(api);
 
-      const fullUrl = getPath(wapi_config) + path;
+      const fullUrl = getPath(api) + path;
       const response = await needle(method, fullUrl, data, options);
 
       if (
@@ -647,10 +625,8 @@ export class WazuhApiCtrl {
         return response.body;
       }
 
-      throw response &&
-        response.body &&
-        response.body.error &&
-        response.body.message
+      throw ((response || {}).body || {}).error &&
+      ((response || {}).body || {}).message
         ? { message: response.body.message, code: response.body.error }
         : new Error('Unexpected error fetching data from the Wazuh API');
     } catch (error) {
@@ -658,26 +634,37 @@ export class WazuhApiCtrl {
     }
   }
 
+  /**
+   * This make a request to API
+   * @param {Object} req
+   * @param {Object} reply
+   * @returns {Object} api response or ErrorResponse
+   */
   requestApi(req, reply) {
     const configuration = getConfiguration();
-    const adminMode = !(configuration && typeof configuration.admin !== 'undefined' && !configuration.admin);
+    const adminMode = !(
+      configuration &&
+      typeof configuration.admin !== 'undefined' &&
+      !configuration.admin
+    );
 
     if (!req.payload.method) {
       return ErrorResponse('Missing param: method', 3015, 400, reply);
     } else if (!req.payload.path) {
       return ErrorResponse('Missing param: path', 3016, 400, reply);
     } else {
-      if (
-        req.payload.method !== 'GET' &&
-        req.payload.body &&
-        req.payload.body.devTools
-      ) {
-        if (!adminMode) {
-          return ErrorResponse('Allowed method: [GET]', 3029, 400, reply);
-        }
+      if (req.payload.method !== 'GET' && !adminMode) {
+        return ErrorResponse(
+          req.payload.body && req.payload.body.devTools
+            ? 'Allowed method: [GET]'
+            : `Forbidden (${req.payload.method} ${req.payload.path}`,
+          3029,
+          400,
+          reply
+        );
       }
       if (req.payload.body.devTools) {
-        delete req.payload.body.devTools;
+        //delete req.payload.body.devTools;
         const keyRegex = new RegExp(/.*agents\/\d*\/key.*/);
         if (
           typeof req.payload.path === 'string' &&
@@ -702,10 +689,15 @@ export class WazuhApiCtrl {
     }
   }
 
-  // Fetch agent status and insert it directly on demand
+  /**
+   * Fetch agent status and insert it directly on demand
+   * @param {Object} req
+   * @param {Object} reply
+   * @returns {Object} status obj or ErrorResponse
+   */
   async fetchAgents(req, reply) {
     try {
-      const output = await this.fetchAgentsExternal();
+      const output = await this.monitoringInstance.fetchAgentsExternal();
       return reply({
         statusCode: 200,
         error: '0',
@@ -719,8 +711,9 @@ export class WazuhApiCtrl {
 
   /**
    * Get full data on CSV format from a list Wazuh API endpoint
-   * @param {*} req
-   * @param {*} res
+   * @param {Object} req
+   * @param {Object} res
+   * @returns {Object} csv or ErrorResponse
    */
   async csv(req, reply) {
     try {
@@ -728,10 +721,9 @@ export class WazuhApiCtrl {
         throw new Error('Field path is required');
       if (!req.payload.id) throw new Error('Field id is required');
 
-      const filters =
-        req.payload && req.payload.filters && Array.isArray(req.payload.filters)
-          ? req.payload.filters
-          : [];
+      const filters = Array.isArray(((req || {}).payload || {}).filters)
+        ? req.payload.filters
+        : [];
 
       const config = await this.wzWrapper.getWazuhConfigurationById(
         req.payload.id
@@ -746,7 +738,7 @@ export class WazuhApiCtrl {
       if (!path_tmp) throw new Error('An error occurred parsing path field');
 
       // Real limit, regardless the user query
-      const params = { limit: 1000 };
+      const params = { limit: 500 };
 
       if (filters.length) {
         for (const filter of filters) {
@@ -755,14 +747,7 @@ export class WazuhApiCtrl {
         }
       }
 
-      const cred = {
-        headers: {
-          'wazuh-app-version': packageInfo.version
-        },
-        username: config.user,
-        password: config.password,
-        rejectUnauthorized: !config.insecure
-      };
+      const cred = ApiHelper.buildOptionsObject(config);
 
       const itemsArray = [];
       const output = await needle(
@@ -771,16 +756,11 @@ export class WazuhApiCtrl {
         params,
         cred
       );
-      if (
-        output &&
-        output.body &&
-        output.body.data &&
-        output.body.data.totalItems
-      ) {
+      if ((((output || {}).body || {}).data || {}).totalItems) {
         params.offset = 0;
         const { totalItems } = output.body.data;
         itemsArray.push(...output.body.data.items);
-        while (itemsArray.length < totalItems) {
+        while (itemsArray.length < totalItems && params.offset < totalItems) {
           params.offset += params.limit;
           const tmpData = await needle(
             'get',
@@ -792,12 +772,7 @@ export class WazuhApiCtrl {
         }
       }
 
-      if (
-        output &&
-        output.body &&
-        output.body.data &&
-        output.body.data.totalItems
-      ) {
+      if ((((output || {}).body || {}).data || {}).totalItems) {
         const fields = req.payload.path.includes('/agents')
           ? [
               'id',
@@ -839,6 +814,12 @@ export class WazuhApiCtrl {
     }
   }
 
+  /**
+   * Get the each filed unique values of agents
+   * @param {Object} req
+   * @param {Object} reply
+   * @returns {Array<Object>} unique fileds or ErrorResponse
+   */
   async getAgentsFieldsUniqueCount(req, reply) {
     try {
       if (!req.params || !req.params.api)
@@ -848,14 +829,7 @@ export class WazuhApiCtrl {
         req.params.api
       );
 
-      const headers = {
-        headers: {
-          'wazuh-app-version': packageInfo.version
-        },
-        username: config.user,
-        password: config.password,
-        rejectUnauthorized: !config.insecure
-      };
+      const headers = ApiHelper.buildOptionsObject(config);
 
       const distinctUrl = `${config.url}:${config.port}/agents/stats/distinct`;
 
@@ -901,8 +875,7 @@ export class WazuhApiCtrl {
         )
       ]);
 
-      const parsedResponses = data.map(
-        item =>
+      const parsedResponses = data.map(item =>
         item && item.body && item.body.data && !item.body.error
           ? item.body.data
           : false
@@ -934,7 +907,7 @@ export class WazuhApiCtrl {
 
       if (nodes && nodes.items) {
         result.nodes = nodes.items
-          .filter(item => !!item.node_name)
+          .filter(item => !!item.node_name && item.node_name !== 'unknown')
           .map(item => item.node_name);
       }
 

@@ -1,6 +1,6 @@
 /*
  * Wazuh app - Wazuh data factory
- * Copyright (C) 2018 Wazuh, Inc.
+ * Copyright (C) 2015-2019 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -11,6 +11,12 @@
  */
 
 export class DataFactory {
+  /**
+   * Class constructor
+   * @param {*} httpClient
+   * @param {*} path
+   * @param {*} implicitFilter
+   */
   constructor(httpClient, path, implicitFilter) {
     this.implicitFilter = implicitFilter || false;
     this.httpClient = httpClient;
@@ -20,19 +26,31 @@ export class DataFactory {
     this.sortValue = false;
     this.sortDir = false;
     this.sortValue = false;
+    this.busy = false;
     if (this.implicitFilter) this.filters.push(...this.implicitFilter);
   }
 
+  /**
+   * Add sort value
+   * @param {String} value
+   */
   addSorting(value) {
     this.sortValue = value;
     this.sortDir = !this.sortDir;
   }
 
+  /**
+   * Remove all filters
+   */
   removeFilters() {
     this.filters = [];
     if (this.implicitFilter) this.filters.push(...this.implicitFilter);
   }
 
+  /**
+   * Serialize filters
+   * @param {Object} parameters
+   */
   serializeFilters(parameters) {
     if (this.sortValue) {
       parameters.sort = this.sortDir ? '-' + this.sortValue : this.sortValue;
@@ -43,6 +61,11 @@ export class DataFactory {
     }
   }
 
+  /**
+   * Add new filter with a given name and value
+   * @param {String} filterName
+   * @param {String} value
+   */
   addFilter(filterName, value) {
     this.filters = this.filters.filter(filter => filter.name !== filterName);
 
@@ -54,8 +77,14 @@ export class DataFactory {
     }
   }
 
+  /**
+   * Get data
+   * @param {Object} options
+   */
   async fetch(options = {}) {
     try {
+      if (this.busy) return { items: this.items, time: 0 };
+      this.busy = true;
       const start = new Date();
 
       // If offset is not given, it means we need to start again
@@ -89,13 +118,17 @@ export class DataFactory {
 
       const end = new Date();
       const elapsed = (end - start) / 1000;
-
+      this.busy = false;
       return { items: this.items, time: elapsed };
     } catch (error) {
+      this.busy = false;
       return Promise.reject(error);
     }
   }
 
+  /**
+   * Reset filters
+   */
   reset() {
     this.items = [];
     this.filters = [];

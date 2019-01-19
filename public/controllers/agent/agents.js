@@ -1,6 +1,6 @@
 /*
  * Wazuh app - Agents controller
- * Copyright (C) 2018 Wazuh, Inc.
+ * Copyright (C) 2015-2019 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -27,6 +27,22 @@ import { ConfigurationHandler } from '../../utils/config-handler';
 import { timefilter } from 'ui/timefilter';
 
 export class AgentsController {
+  /**
+   * Class constructor
+   * @param {Object} $scope
+   * @param {Object} $location
+   * @param {Object} $rootScope
+   * @param {Object} appState
+   * @param {Object} apiReq
+   * @param {Object} errorHandler
+   * @param {Object} tabVisualizations
+   * @param {Object} shareAgent
+   * @param {Object} commonData
+   * @param {Object} reportingService
+   * @param {Object} visFactoryService
+   * @param {Object} csvReq
+   * @param {Object} wzTableFilter
+   */
   constructor(
     $scope,
     $location,
@@ -40,7 +56,10 @@ export class AgentsController {
     reportingService,
     visFactoryService,
     csvReq,
-    wzTableFilter
+    wzTableFilter,
+    $mdDialog,
+    groupHandler,
+    wazuhConfig
   ) {
     this.$scope = $scope;
     this.$location = $location;
@@ -55,6 +74,9 @@ export class AgentsController {
     this.visFactoryService = visFactoryService;
     this.csvReq = csvReq;
     this.wzTableFilter = wzTableFilter;
+    this.$mdDialog = $mdDialog;
+    this.groupHandler = groupHandler;
+    this.wazuhConfig = wazuhConfig;
 
     // Config on-demand
     this.$scope.isArray = Array.isArray;
@@ -66,9 +88,23 @@ export class AgentsController {
     this.$scope.selectedItem = 0;
     this.targetLocation = null;
     this.ignoredTabs = ['syscollector', 'welcome', 'configuration'];
+
+    this.$scope.showSyscheckFiles = false;
+    this.$scope.editGroup = false;
+
+    this.$scope.addingGroupToAgent = false;
   }
 
+  /**
+   * On controller loads
+   */
   $onInit() {
+    const savedTimefilter = this.commonData.getTimefilter();
+    if (savedTimefilter) {
+      timefilter.setTime(savedTimefilter);
+      this.commonData.removeTimefilter();
+    }
+
     this.$scope.TabDescription = TabDescription;
 
     this.$rootScope.reportStatus = false;
@@ -106,6 +142,11 @@ export class AgentsController {
     this.$scope.securityTabs = ['vuls', 'virustotal', 'osquery'];
     this.$scope.complianceTabs = ['pci', 'gdpr'];
 
+    /**
+     * This check if given array of items contais a single given item
+     * @param {Object} item
+     * @param {Array<Object>} array
+     */
     this.$scope.inArray = (item, array) =>
       item && Array.isArray(array) && array.includes(item);
 
@@ -133,10 +174,14 @@ export class AgentsController {
     this.$scope.goGroups = (agent, group) => this.goGroups(agent, group);
     this.$scope.analyzeAgents = async searchTerm =>
       this.analyzeAgents(searchTerm);
-    this.$scope.downloadCsv = async data_path => this.downloadCsv(data_path);
+    this.$scope.downloadCsv = async (path, fileName, filters = []) =>
+      this.downloadCsv(path, fileName, filters);
 
     this.$scope.search = (term, specificPath) =>
       this.$scope.$broadcast('wazuhSearch', { term, specificPath });
+
+    this.$scope.searchSyscheckFile = (term, specificFilter) =>
+      this.$scope.$broadcast('wazuhSearch', { term, specificFilter });
 
     this.$scope.startVis2Png = () => this.startVis2Png();
 
@@ -150,6 +195,9 @@ export class AgentsController {
       this.shareAgent.setAgent(this.$scope.agent);
       this.$location.path('/manager/groups');
     };
+
+    const configuration = this.wazuhConfig.getConfig();
+    this.$scope.adminMode = !!(configuration || {}).admin;
 
     //Load
     try {
@@ -167,12 +215,22 @@ export class AgentsController {
     this.$scope.isString = item => typeof item === 'string';
     this.$scope.hasSize = obj =>
       obj && typeof obj === 'object' && Object.keys(obj).length;
-    this.$scope.switchConfigTab = (configurationTab, sections, navigate = true) => {
+    this.$scope.switchConfigTab = (
+      configurationTab,
+      sections,
+      navigate = true
+    ) => {
       this.$scope.navigate = navigate;
       try {
-        this.$scope.configSubTab = JSON.stringify({ 'configurationTab': configurationTab, 'sections': sections });
+        this.$scope.configSubTab = JSON.stringify({
+          configurationTab: configurationTab,
+          sections: sections
+        });
         if (!this.$location.search().configSubTab) {
-          this.appState.setSessionStorageItem('configSubTab', this.$scope.configSubTab);
+          this.appState.setSessionStorageItem(
+            'configSubTab',
+            this.$scope.configSubTab
+          );
           this.$location.search('configSubTab', true);
         }
       } catch (error) {
@@ -184,7 +242,8 @@ export class AgentsController {
         this.$scope,
         this.$scope.agent.id
       );
-    }
+    };
+
     this.$scope.switchWodle = (wodleName, navigate = true) => {
       this.$scope.navigate = navigate;
       this.$scope.configWodle = wodleName;
@@ -195,8 +254,9 @@ export class AgentsController {
         wodleName,
         this.$scope,
         this.$scope.agent.id
-      )
+      );
     };
+
     this.$scope.switchConfigurationTab = (configurationTab, navigate) => {
       this.$scope.navigate = navigate;
       this.configurationHandler.switchConfigurationTab(
@@ -209,7 +269,11 @@ export class AgentsController {
           try {
             const config = this.appState.getSessionStorageItem('configSubTab');
             const configSubTabObj = JSON.parse(config);
-            this.$scope.switchConfigTab(configSubTabObj.configurationTab, configSubTabObj.sections, false);
+            this.$scope.switchConfigTab(
+              configSubTabObj.configurationTab,
+              configSubTabObj.sections,
+              false
+            );
           } catch (error) {
             this.errorHandler.handle(error, 'Get configuration path');
           }
@@ -224,26 +288,85 @@ export class AgentsController {
         this.appState.removeSessionStorageItem('configSubTab');
         this.$location.search('configWodle', null);
       }
-    }
+    };
     this.$scope.switchConfigurationSubTab = configurationSubTab => {
       this.configurationHandler.switchConfigurationSubTab(
         configurationSubTab,
         this.$scope
       );
-    }
+    };
     this.$scope.updateSelectedItem = i => (this.$scope.selectedItem = i);
     this.$scope.getIntegration = list =>
       this.configurationHandler.getIntegration(list, this.$scope);
 
-    this.$scope.$on('$routeChangeStart', () => this.appState.removeSessionStorageItem('configSubTab'));
-  }
+    this.$scope.switchSyscheckFiles = () => {
+      this.$scope.showSyscheckFiles = !this.$scope.showSyscheckFiles;
+      if (!this.$scope.showSyscheckFiles) {
+        this.$rootScope.$emit('changeTabView', {
+          tabView: this.$scope.tabView
+        });
+      }
+      if (!this.$scope.$$phase) this.$scope.$digest();
+    };
 
+    this.$scope.goDiscover = () => this.goDiscover();
+
+    this.$scope.$on('$routeChangeStart', () =>
+      this.appState.removeSessionStorageItem('configSubTab')
+    );
+
+    this.$scope.switchGroupEdit = () => {
+      this.$scope.addingGroupToAgent = false;
+      this.switchGroupEdit();
+    };
+
+    this.$scope.showConfirmAddGroup = group => {
+      this.$scope.addingGroupToAgent = this.$scope.addingGroupToAgent
+        ? false
+        : group;
+    };
+
+    this.$scope.cancelAddGroup = () => (this.$scope.addingGroupToAgent = false);
+
+    this.$scope.confirmAddGroup = group => {
+      this.groupHandler
+        .addAgentToGroup(group, this.$scope.agent.id)
+        .then(() =>
+          this.apiReq.request('GET', `/agents/${this.$scope.agent.id}`, {})
+        )
+        .then(agent => {
+          this.$scope.agent.group = agent.data.data.group;
+          this.$scope.groups = this.$scope.groups.filter(
+            item => !agent.data.data.group.includes(item)
+          );
+          this.$scope.addingGroupToAgent = false;
+          this.errorHandler.info(`Group ${group} has been added.`, '');
+          if (!this.$scope.$$phase) this.$scope.$digest();
+        })
+        .catch(error => {
+          this.$scope.addingGroupToAgent = false;
+          this.errorHandler.handle(
+            error.message || error,
+            'Error adding group to agent'
+          );
+        });
+    };
+  }
+  /**
+   * Create metric for given object
+   * @param {*} metricsObject
+   */
   createMetrics(metricsObject) {
     for (let key in metricsObject) {
       this.$scope[key] = () => generateMetric(metricsObject[key]);
     }
   }
 
+  /**
+   * Classify metrics for create the suitable one
+   * @param {*} tab
+   * @param {*} subtab
+   */
   checkMetrics(tab, subtab) {
     if (subtab === 'panels') {
       switch (tab) {
@@ -318,18 +441,35 @@ export class AgentsController {
     }
   }
 
-  // Switch tab
+  /**
+   * Switch tab
+   * @param {*} tab
+   * @param {*} force
+   */
   async switchTab(tab, force = false) {
     if (this.ignoredTabs.includes(tab)) {
-      const timeFilterRefreshStatus = timefilter.getRefreshInterval();
-      const toggle =
-        timeFilterRefreshStatus &&
-        timeFilterRefreshStatus.value &&
-        !timeFilterRefreshStatus.pause;
-      if (toggle) timefilter.toggleRefresh();
+      this.commonData.setRefreshInterval(timefilter.getRefreshInterval());
+      timefilter.setRefreshInterval({ pause: true, value: 0 });
+    } else if (this.ignoredTabs.includes(this.$scope.tab)) {
+      timefilter.setRefreshInterval(this.commonData.getRefreshInterval());
     }
 
+    // Update agent status
     try {
+      if ((this.$scope || {}).agent || false) {
+        const agentInfo = await this.apiReq.request(
+          'GET',
+          `/agents/${this.$scope.agent.id}`,
+          { select: 'status' }
+        );
+        this.$scope.agent.status =
+          (((agentInfo || {}).data || {}).data || {}).status ||
+          this.$scope.agent.status;
+      }
+    } catch (error) {} // eslint-disable-line
+
+    try {
+      this.$scope.showSyscheckFiles = false;
       if (tab === 'pci') {
         const pciTabs = await this.commonData.getPCI();
         this.$scope.pciTabs = pciTabs;
@@ -341,7 +481,9 @@ export class AgentsController {
         this.$scope.selectedGdprIndex = 0;
       }
       if (tab === 'syscollector')
-        await this.loadSyscollector(this.$scope.agent.id);
+        try {
+          await this.loadSyscollector(this.$scope.agent.id);
+        } catch (error) {} // eslint-disable-line
       if (tab === 'configuration') {
         const isSync = await this.apiReq.request(
           'GET',
@@ -350,7 +492,7 @@ export class AgentsController {
         );
         // Configuration synced
         this.$scope.isSynchronized =
-          isSync && isSync.data && isSync.data.data && isSync.data.data.synced;
+          (((isSync || {}).data || {}).data || {}).synced || false;
         this.$scope.switchConfigurationTab('welcome');
       } else {
         this.configurationHandler.reset(this.$scope);
@@ -392,38 +534,44 @@ export class AgentsController {
     if (!this.$scope.$$phase) this.$scope.$digest();
   }
 
+  goDiscover() {
+    this.targetLocation = {
+      tab: 'general',
+      subTab: 'discover'
+    };
+    return this.switchTab('general');
+  }
+
   // Agent data
 
+  /**
+   * Checks rootcheck of selected agent
+   */
   validateRootCheck() {
     const result = this.commonData.validateRange(this.$scope.agent.rootcheck);
     this.$scope.agent.rootcheck = result;
   }
 
+  /**
+   * Checks syscheck of selected agent
+   */
   validateSysCheck() {
     const result = this.commonData.validateRange(this.$scope.agent.syscheck);
     this.$scope.agent.syscheck = result;
   }
 
+  /**
+   * Get the needed data for load syscollector
+   * @param {*} id
+   */
   async loadSyscollector(id) {
     try {
-      // Check that Syscollector is enabled before proceeding
-      this.$scope.syscollectorEnabled = await this.configurationHandler.isWodleEnabled(
-        'syscollector',
-        id
-      );
-
-      // If Syscollector is disabled, stop loading
-      if (!this.$scope.syscollectorEnabled) {
-        return;
-      }
-
       // Continue API requests if we do have Syscollector enabled
       // Fetch Syscollector data
       const data = await Promise.all([
         this.apiReq.request('GET', `/syscollector/${id}/hardware`, {}),
         this.apiReq.request('GET', `/syscollector/${id}/os`, {}),
-        this.apiReq.request('GET', `/syscollector/${id}/netiface`, {}),
-        this.apiReq.request('GET', `/syscollector/${id}/ports`, {}),
+        this.apiReq.request('GET', `/syscollector/${id}/ports`, { limit: 1 }),
         this.apiReq.request('GET', `/syscollector/${id}/packages`, {
           limit: 1,
           select: 'scan_time'
@@ -434,17 +582,38 @@ export class AgentsController {
         })
       ]);
 
-      const result = data.map(
-        item => (item && item.data && item.data.data ? item.data.data : false)
-      );
+      const result = data.map(item => ((item || {}).data || {}).data || false);
+
       const [
         hardwareResponse,
         osResponse,
-        netifaceResponse,
         portsResponse,
         packagesDateResponse,
         processesDateResponse
       ] = result;
+
+      // This API call may fail so we put it out of Promise.all
+      let netifaceResponse = false;
+      try {
+        const resultNetiface = await this.apiReq.request(
+          'GET',
+          `/syscollector/${id}/netiface`,
+          {}
+        );
+        netifaceResponse = ((resultNetiface || {}).data || {}).data || false;
+      } catch (error) {} // eslint-disable-line
+
+      // This API call may fail so we put it out of Promise.all
+      let netaddrResponse = false;
+      try {
+        const resultNetaddrResponse = await this.apiReq.request(
+          'GET',
+          `/syscollector/${id}/netaddr`,
+          { limit: 1 }
+        );
+        netaddrResponse =
+          ((resultNetaddrResponse || {}).data || {}).data || false;
+      } catch (error) {} // eslint-disable-line
 
       // Before proceeding, syscollector data is an empty object
       this.$scope.syscollector = {};
@@ -460,7 +629,7 @@ export class AgentsController {
       this.$scope.syscollector = {
         hardware:
           typeof hardwareResponse === 'object' &&
-            Object.keys(hardwareResponse).length
+          Object.keys(hardwareResponse).length
             ? { ...hardwareResponse }
             : false,
         os:
@@ -469,14 +638,13 @@ export class AgentsController {
             : false,
         netiface: netifaceResponse ? { ...netifaceResponse } : false,
         ports: portsResponse ? { ...portsResponse } : false,
-        packagesDate:
-          packagesDate && packagesDate.items && packagesDate.items.length
-            ? packagesDate.items[0].scan_time
-            : 'Unknown',
-        processesDate:
-          processesDate && processesDate.items && processesDate.items.length
-            ? processesDate.items[0].scan_time
-            : 'Unknown'
+        netaddr: netaddrResponse ? { ...netaddrResponse } : false,
+        packagesDate: ((packagesDate || {}).items || []).length
+          ? packagesDate.items[0].scan_time
+          : 'Unknown',
+        processesDate: ((processesDate || {}).items || []).length
+          ? processesDate.items[0].scan_time
+          : 'Unknown'
       };
 
       return;
@@ -485,6 +653,10 @@ export class AgentsController {
     }
   }
 
+  /**
+   * Get all data from agent
+   * @param {*} newAgentId
+   */
   async getAgent(newAgentId) {
     try {
       this.$scope.isSynchronized = false;
@@ -501,9 +673,7 @@ export class AgentsController {
         this.apiReq.request('GET', `/rootcheck/${id}/last_scan`, {})
       ]);
 
-      const result = data.map(
-        item => (item && item.data && item.data.data ? item.data.data : false)
-      );
+      const result = data.map(item => ((item || {}).data || {}).data || false);
 
       const [agentInfo, syscheckLastScan, rootcheckLastScan] = result;
 
@@ -512,8 +682,12 @@ export class AgentsController {
       if (this.$scope.agent.os) {
         this.$scope.agentOS =
           this.$scope.agent.os.name + ' ' + this.$scope.agent.os.version;
+        this.$scope.agent.isLinuxOS = this.$scope.agent.os.uname.includes(
+          'Linux'
+        );
       } else {
         this.$scope.agentOS = 'Unknown';
+        this.$scope.agent.isLinuxOS = false;
       }
 
       // Syscheck
@@ -526,15 +700,40 @@ export class AgentsController {
 
       await this.$scope.switchTab(this.$scope.tab, true);
 
+      const groups = await this.apiReq.request('GET', '/agents/groups', {});
+      this.$scope.groups = groups.data.data.items
+        .map(item => item.name)
+        .filter(
+          item =>
+            this.$scope.agent.group && !this.$scope.agent.group.includes(item)
+        );
+
       this.$scope.load = false;
       if (!this.$scope.$$phase) this.$scope.$digest();
       return;
     } catch (error) {
       this.errorHandler.handle(error, 'Agents');
+      if (
+        error &&
+        typeof error === 'string' &&
+        error.includes('Agent does not exist')
+      ) {
+        this.$location.search('agent', null);
+        this.$location.path('/agents-preview');
+      }
     }
     return;
   }
 
+  switchGroupEdit() {
+    this.$scope.editGroup = !!!this.$scope.editGroup;
+    if (!this.$scope.$$phase) this.$scope.$digest();
+  }
+  /**
+   * Navigate to the groups of an agent
+   * @param {*} agent
+   * @param {*} group
+   */
   goGroups(agent, group) {
     this.visFactoryService.clearAll();
     this.shareAgent.setAgent(agent, group);
@@ -542,6 +741,10 @@ export class AgentsController {
     this.$location.path('/manager');
   }
 
+  /**
+   * Look for agents that satisfy search term, hidding master
+   * @param {*} searchTerm
+   */
   async analyzeAgents(searchTerm) {
     try {
       if (searchTerm) {
@@ -559,69 +762,35 @@ export class AgentsController {
     return;
   }
 
-  async downloadCsv(data_path) {
+  /**
+   * Get full data on CSV format from a path
+   * @param {*} path path with data to convert
+   * @param {*} fileName Output file name
+   * @param {*} filters Filters to apply
+   */
+  async downloadCsv(path, fileName, filters = []) {
     try {
       this.errorHandler.info(
         'Your download should begin automatically...',
         'CSV'
       );
       const currentApi = JSON.parse(this.appState.getCurrentAPI()).id;
-      const output = await this.csvReq.fetch(
-        data_path,
-        currentApi,
-        this.wzTableFilter.get()
-      );
+      const output = await this.csvReq.fetch(path, currentApi, filters);
       const blob = new Blob([output], { type: 'text/csv' }); // eslint-disable-line
 
-      FileSaver.saveAs(blob, 'packages.csv');
-
-      return;
+      FileSaver.saveAs(blob, fileName);
     } catch (error) {
       this.errorHandler.handle(error, 'Download CSV');
     }
     return;
   }
 
-  async firstLoad() {
-    try {
-      const globalAgent = this.shareAgent.getAgent();
-      this.$scope.configurationError = false;
-      this.$scope.load = true;
-
-      const id = this.commonData.checkLocationAgentId(false, globalAgent);
-
-      const data = await this.apiReq.request('GET', `/agents/${id}`, {});
-      this.$scope.agent = data.data.data;
-      this.$scope.groupName = this.$scope.agent.group;
-
-      if (!this.$scope.groupName) {
-        this.$scope.configurationError = true;
-        this.$scope.load = false;
-        if (!this.$scope.$$phase) this.$scope.$digest();
-        return;
-      }
-
-      this.$scope.load = false;
-
-      if (this.$scope.tab !== 'configuration')
-        await this.$scope.switchTab(this.$scope.tab, true);
-
-      if (!this.$scope.$$phase) this.$scope.$digest();
-      return;
-    } catch (error) {
-      this.errorHandler.handle(error, 'Agents');
-    }
-    return;
-  }
-  /** End of agent configuration */
-
+  /**
+   * Transform a visualization into an image
+   */
   startVis2Png() {
     const syscollectorFilters = [];
-    if (
-      this.$scope.tab === 'syscollector' &&
-      this.$scope.agent &&
-      this.$scope.agent.id
-    ) {
+    if (this.$scope.tab === 'syscollector' && (this.$scope.agent || {}).id) {
       syscollectorFilters.push(
         this.filterHandler.managerQuery(
           this.appState.getClusterInfo().cluster,
@@ -634,7 +803,7 @@ export class AgentsController {
     }
     this.reportingService.startVis2Png(
       this.$scope.tab,
-      this.$scope.agent && this.$scope.agent.id ? this.$scope.agent.id : true,
+      (this.$scope.agent || {}).id || true,
       syscollectorFilters.length ? syscollectorFilters : null
     );
   }

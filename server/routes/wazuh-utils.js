@@ -1,6 +1,6 @@
 /*
  * Wazuh app - Module for Wazuh utils routes
- * Copyright (C) 2018 Wazuh, Inc.
+ * Copyright (C) 2015-2019 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -20,6 +20,15 @@ export function WazuhUtilsRoutes(server) {
     path: '/utils/configuration',
     handler(req, reply) {
       return ctrl.getConfigurationFile(req, reply);
+    }
+  });
+
+  // Returns the config.yml file in raw
+  server.route({
+    method: 'PUT',
+    path: '/utils/configuration',
+    handler(req, reply) {
+      return ctrl.updateConfigurationFile(req, reply);
     }
   });
 

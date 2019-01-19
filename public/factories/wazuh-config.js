@@ -1,6 +1,6 @@
 /*
  * Wazuh app - Factory to store values from configuration file
- * Copyright (C) 2018 Wazuh, Inc.
+ * Copyright (C) 2015-2019 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -10,14 +10,23 @@
  * Find more information about this on the LICENSE file.
  */
 export class WazuhConfig {
+  /**
+   * Class constructor
+   */
   constructor() {
     this.config = {};
   }
-
+  /**
+   * Set given configuration
+   * @param {Object} cfg
+   */
   setConfig(cfg) {
     Object.assign(this.config, cfg);
   }
 
+  /**
+   * Get configuration
+   */
   getConfig() {
     return this.config;
   }

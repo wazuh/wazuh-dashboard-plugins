@@ -34,85 +34,26 @@
                 <md-divider class="wz-margin-top-10"></md-divider>
                 <div layout="row" class="wz-padding-top-10">
                     <p flex="35" class="manager-status-subtitle">Last registered agent</p>
-                    <p ng-if="ctrl.lastAgent.id !== '000'" class="wz-text-right wz-text-link" tooltip="Click to open this agent" tooltip-placement="right"
-                        ng-click="ctrl.showAgent(ctrl.lastAgent)">{{ctrl.lastAgent.name}}</p>
-                    <p ng-if="ctrl.lastAgent.id === '000'" class="wz-text-right" tooltip-placement="right">{{ctrl.lastAgent.name}} (manager)</p>
+                    <p ng-if="ctrl.lastAgent.id !== '000'" class="wz-text-right wz-text-link" tooltip="Click to open this agent"
+                        tooltip-placement="right" ng-click="ctrl.showAgent(ctrl.lastAgent)">{{ctrl.lastAgent.name}}</p>
+                    <p ng-if="ctrl.lastAgent.id === '000'" class="wz-text-right" tooltip-placement="right">{{ctrl.lastAgent.name}}
+                        (manager)</p>
                 </div>
                 <div layout="row" class="wz-padding-top-10">
                     <p flex="35" class="manager-status-subtitle">Higher activity</p>
-                    <p ng-show="ctrl.mostActiveAgent.id !== '000'" class="wz-text-right wz-text-link" tooltip="Click to open this agent" tooltip-placement="right"
-                        ng-click="ctrl.showAgent(ctrl.mostActiveAgent)">{{ctrl.mostActiveAgent.name}}</p>
+                    <p ng-show="ctrl.mostActiveAgent.id !== '000'" class="wz-text-right wz-text-link" tooltip="Click to open this agent"
+                        tooltip-placement="right" ng-click="ctrl.showAgent(ctrl.mostActiveAgent)">{{ctrl.mostActiveAgent.name}}</p>
                     <p ng-show="ctrl.mostActiveAgent.id === '000'" class="wz-text-right" tooltip-placement="right">{{ctrl.mostActiveAgent.name}}</p>
                 </div>
             </md-card-content>
         </md-card>
     </div>
 
-    <div layout="row" layout-align="start stretch">
-        <div flex layout="column" layout-align="center" class="height-40 wz-margin-top-17 wz-margin-right-15 wz-select-input">
-            <select flex class="kuiSelect wz-border-none cursor-pointer max-height-35" id="eventBox1" ng-model="ctrl.status" ng-change="ctrl.filter({name:'status',value:ctrl.status})"
-                aria-label="Filter by status">
-                <option value="all">All states</option>
-                <option value="active">Active</option>
-                <option value="disconnected">Disconnected</option>
-                <option value="Never Connected">Never connected</option>
-            </select>
-        </div>
-
-        <div flex ng-show="ctrl.isClusterEnabled" layout="column" layout-align="center" class="height-40 wz-margin-top-17 wz-margin-right-15 wz-select-input">
-            <select flex class="kuiSelect wz-border-none cursor-pointer max-height-35" id="eventBox2" ng-model="ctrl.node_name" ng-change="ctrl.filter({name:'node_name',value:ctrl.node_name})"
-                aria-label="Filter by node">
-                <option value="all">All nodes</option>
-                <option ng-repeat="node in ctrl.nodes | orderObjectBy: 'id'" value="{{node.id}}">
-                    {{node.id}}
-                </option>
-            </select>
-        </div>
-
-        <div flex layout="column" layout-align="center" class="height-40 wz-margin-top-17 wz-select-input wz-margin-right-15">
-            <select flex class="kuiSelect wz-border-none cursor-pointer max-height-35" id="eventBox3" ng-model="ctrl.osPlatform" ng-change="ctrl.filter({name:'platform',value:ctrl.osPlatform})"
-                aria-label="Filter by operative system">
-                <option value="all">All OS platforms</option>
-                <option ng-repeat="platform in ctrl.osPlatforms | orderObjectBy: 'name'" value="{{platform.platform}} - {{platform.version}}">
-                    {{platform.name}} {{platform.version}}
-                </option>
-            </select>
-        </div>
-        <div flex layout="column" layout-align="center" class="height-40 wz-margin-top-17 wz-select-input wz-margin-right-15">
-            <select flex class="kuiSelect wz-border-none cursor-pointer max-height-35" id="eventBox4" ng-model="ctrl.version" ng-change="ctrl.filter({name:'version',value:ctrl.version})"
-                aria-label="Filter by Wazuh version">
-                <option value="all">All versions</option>
-                <option ng-repeat="version in ctrl.versions | orderObjectBy: 'id'" value="{{version.id}}">
-                    {{version.id}}
-                </option>
-            </select>
-        </div>
-        <div flex layout="column" layout-align="center" class="height-40 wz-margin-top-17 wz-select-input">
-            <select flex class="kuiSelect wz-border-none cursor-pointer max-height-35" id="eventBox5" ng-model="ctrl.selectedGroup" ng-change="ctrl.filter({name:'group',value:ctrl.selectedGroup})"
-                aria-label="Filter by Wazuh version">
-                <option value="all">All groups</option>
-                <option ng-repeat="group in ctrl.groups" value="{{group}}">
-                    {{group}}
-                </option>
-            </select>
-        </div>
-    </div>
-    
-    <div layout="row" class=" wz-margin-top-17">
-        <input placeholder="Filter agents..." ng-model="ctrl.custom_search" type="text" class="kuiLocalSearchInput ng-empty ng-pristine ng-scope ng-touched ng-valid"
-            aria-invalid="false" wz-enter="ctrl.search(ctrl.custom_search)">
-        <button type="submit" aria-label="Search" class="kuiLocalSearchButton height-40" ng-click="ctrl.search(ctrl.custom_search)">
-            <span class="fa fa-search" aria-hidden="true"></span>
-        </button>
-     </div>
+    <wz-tag-filter path="'/agents'" query-fn="ctrl.query(q, search)" fields-model="ctrl.searchBarModel"></wz-tag-filter>
 
     <div layout="row" class="margin-top-30">
-        <wz-table
-            flex
-            path="'/agents'"
-            keys="['id',{value:'name',size:2},'ip','status','group','os.name','os.version','version']"
-            allow-click="true"
-            row-sizes="[17,15,13]">
+        <wz-table flex path="'/agents'" keys="['id','name','ip','status','group','os.name','os.version','version', 'dateAdd', 'lastKeepAlive']"
+            allow-click="true" row-sizes="[17,15,13]">
         </wz-table>
     </div>
 

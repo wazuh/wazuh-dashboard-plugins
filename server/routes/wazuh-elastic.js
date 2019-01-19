@@ -1,6 +1,6 @@
 /*
  * Wazuh app - Module for Wazuh-Elastic routes
- * Copyright (C) 2018 Wazuh, Inc.
+ * Copyright (C) 2015-2019 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -90,6 +90,15 @@ export function WazuhElasticRouter(server) {
     path: '/elastic/timestamp',
     handler(req, res) {
       return ctrl.getTimeStamp(req, res);
+    }
+  });
+
+  // Fetch alerts directly from Elasticsearch
+  server.route({
+    method: 'POST',
+    path: '/elastic/alerts',
+    handler(req, res) {
+      return ctrl.alerts(req, res);
     }
   });
 }

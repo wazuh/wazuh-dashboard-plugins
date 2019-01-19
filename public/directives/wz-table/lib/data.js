@@ -1,6 +1,6 @@
 /*
  * Wazuh app - Wazuh table directive data methods
- * Copyright (C) 2018 Wazuh, Inc.
+ * Copyright (C) 2015-2019 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -69,6 +69,43 @@ export async function filterData(
       `Error filtering by ${
         filter ? filter.value : 'undefined'
       }. ${error.message || error}`,
+      'Data factory'
+    );
+  }
+  if (!$scope.$$phase) $scope.$digest();
+  return;
+}
+
+export async function queryData(
+  query,
+  term,
+  instance,
+  wzTableFilter,
+  $scope,
+  fetch,
+  errorHandler
+) {
+  try {
+    $scope.error = false;
+    $scope.wazuh_table_loading = true;
+    instance.removeFilters();
+    if (term) {
+      instance.addFilter('search', term);
+    }
+    if (query) {
+      instance.addFilter('q', query);
+    }
+    wzTableFilter.set(instance.filters);
+    await fetch();
+    $scope.wazuh_table_loading = false;
+  } catch (error) {
+    $scope.wazuh_table_loading = false;
+    $scope.error = `Query error ${
+      query ? query.value : 'undefined'
+    } - ${error.message || error}.`;
+    errorHandler.handle(
+      `Query error ${query ? query.value : 'undefined'}. ${error.message ||
+        error}`,
       'Data factory'
     );
   }

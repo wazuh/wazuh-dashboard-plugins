@@ -2,6 +2,60 @@
 
 All notable changes to the Wazuh app project will be documented in this file.
 
+## Wazuh v3.8.0 - Kibana v6.5.3 - Revision 416
+
+### Added
+
+- Added group management features such as:
+    - Edit the group configuration ([#1096](https://github.com/wazuh/wazuh-kibana-app/pull/1096)).
+    - Add/remove groups to/from an agent ([#1096](https://github.com/wazuh/wazuh-kibana-app/pull/1096)).
+    - Add/remove agents to/from a group ([#1096](https://github.com/wazuh/wazuh-kibana-app/pull/1096)).
+    - Add/remove groups ([#1152](https://github.com/wazuh/wazuh-kibana-app/pull/1152)).
+- New directive for tables that don't need external data sources ([#1067](https://github.com/wazuh/wazuh-kibana-app/pull/1067)).
+- New search bar directive with interactive filters and suggestions ([#1058](https://github.com/wazuh/wazuh-kibana-app/pull/1058)).
+- New server route `/elastic/alerts` for fetching alerts using custom parameters([#1056](https://github.com/wazuh/wazuh-kibana-app/pull/1056)).
+- New table for an agent FIM monitored files, if the agent OS platform is Windows it will show two tables: files and registry ([#1032](https://github.com/wazuh/wazuh-kibana-app/pull/1032)).
+- Added description to each setting under Settings > Configuration ([#1048](https://github.com/wazuh/wazuh-kibana-app/pull/1048)).
+- Added a new setting to `config.yml` related to Wazuh monitoring and its index pattern ([#1095](https://github.com/wazuh/wazuh-kibana-app/pull/1095)).
+- Resizable columns by dragging in Dev-tools ([#1102](https://github.com/wazuh/wazuh-kibana-app/pull/1102)).
+- New feature to be able to edit config.yml file from the Settings > Configuration section view ([#1105](https://github.com/wazuh/wazuh-kibana-app/pull/1105)).
+- Added a new table (network addresses) for agent inventory tab ([#1111](https://github.com/wazuh/wazuh-kibana-app/pull/1111)).
+- Added `audit_key` (Who-data Audit keys) for configuration tab ([#1123](https://github.com/wazuh/wazuh-kibana-app/pull/1123)).
+- Added new known fields for Kibana index pattern ([#1150](https://github.com/wazuh/wazuh-kibana-app/pull/1150)).
+
+### Changed
+
+- Changed Inventory tables. Now the app looks for the OS platform and it shows different tables depending on the OS platform. In addition the process state codes has been replaced to be more meaningful ([#1059](https://github.com/wazuh/wazuh-kibana-app/pull/1059)).
+- Tiny rework for the AWS tab including.
+- "Report" button is hidden on Discover panel ([#1047](https://github.com/wazuh/wazuh-kibana-app/pull/1047)).
+- Visualizations, filters and Discover improved ([#1083](https://github.com/wazuh/wazuh-kibana-app/pull/1083)).
+- Removed `popularizeField` function until https://github.com/elastic/kibana/issues/22426 is solved in order to avoid `Unable to write index pattern!` error on Discover tab ([#1085](https://github.com/wazuh/wazuh-kibana-app/pull/1085)).
+- Improved Wazuh monitoring module ([#1094](https://github.com/wazuh/wazuh-kibana-app/pull/1094)).
+- Added "Registered date" and "Last keep alive" in agents table allowing you to sort by these fields ([#1102](https://github.com/wazuh/wazuh-kibana-app/pull/1102)).
+- Improved code quality in sections such as Ruleset > Rule and Decoder detail view simplify conditions ([#1102](https://github.com/wazuh/wazuh-kibana-app/pull/1102)).
+- Replaced reporting success message ([#1102](https://github.com/wazuh/wazuh-kibana-app/pull/1102)).
+- Reduced the default number of shards and the default number of replicas for the app indices ([#1113](https://github.com/wazuh/wazuh-kibana-app/pull/1113)).
+- Refreshing index pattern known fields on health check controller ([#1119](https://github.com/wazuh/wazuh-kibana-app/pull/1119)).
+- Less strict memory check ([786c764](https://github.com/wazuh/wazuh-kibana-app/commit/786c7642cd88083f9a77c57ed204488ecf5b710a)).
+- Checking message origin in error handler ([dfec368](https://github.com/wazuh/wazuh-kibana-app/commit/dfec368d22a148b2e4437db92d71294900241961)).
+- Dev tools is now showing the response as it is, like `curl` does ([#1137](https://github.com/wazuh/wazuh-kibana-app/pull/1137)). 
+- Removed `unknown` as valid node name ([#1149](https://github.com/wazuh/wazuh-kibana-app/pull/1149)).
+- Removed `rule.id` direct filter from the rule set tables ([#1151](https://github.com/wazuh/wazuh-kibana-app/pull/1151))
+
+### Fixed
+
+- Restored X-Pack security logic for the .wazuh index, now it's not bypassing the X-Pack roles ([#1081](https://github.com/wazuh/wazuh-kibana-app/pull/1081))
+- Avoid fetching twice the same data ([#1072](https://github.com/wazuh/wazuh-kibana-app/pull/1072), [#1061](https://github.com/wazuh/wazuh-kibana-app/pull/1061)).
+- Wazuh logo adapted to low resolutions ([#1074](https://github.com/wazuh/wazuh-kibana-app/pull/1074)).
+- Hide Audit, OpenSCAP tabs for non-linux agents. Fixed empty Windows events under Configuration > Log collection section. OSQuery logo has been standardized ([#1072](https://github.com/wazuh/wazuh-kibana-app/pull/1072), [#1076](https://github.com/wazuh/wazuh-kibana-app/pull/1076)).
+- Fix empty values on _Overview > Security events_ when Wazuh monitoring is disabled ([#1091](https://github.com/wazuh/wazuh-kibana-app/pull/1091)).
+- Fix overlapped play button in Dev-tools when the input box has a scrollbar ([#1102](https://github.com/wazuh/wazuh-kibana-app/pull/1102)).
+- Fix Dev-tools behavior when parse json invalid blocks ([#1102](https://github.com/wazuh/wazuh-kibana-app/pull/1102)).
+- Fixed Management > Monitoring tab frustration adding back buttons ([#1102](https://github.com/wazuh/wazuh-kibana-app/pull/1102)).
+- Fix template checking when using more than one pattern ([#1104](https://github.com/wazuh/wazuh-kibana-app/pull/1104)).
+- Fix infinite loop for Wazuh monitoring when the Wazuh API is not being able to give us all the agents ([5a26916](https://github.com/wazuh/wazuh-kibana-app/commit/5a2691642b40a34783d2eafb6ee24ae78b9af21a)), ([85005a1](https://github.com/wazuh/wazuh-kibana-app/commit/85005a184d4f1c3d339b7c895b5d2469f3b45171)).
+- Fix rule details for `list` and `info` parameters ([#1149](https://github.com/wazuh/wazuh-kibana-app/pull/1149)).
+
 ## Wazuh v3.7.1 / v3.7.2 - Kibana v6.5.1 / v6.5.2 / v6.5.3 / v6.5.4 - Revision 415
 
 ### Added

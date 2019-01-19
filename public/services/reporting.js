@@ -1,6 +1,6 @@
 /*
  * Wazuh app - Reporting service
- * Copyright (C) 2018 Wazuh, Inc.
+ * Copyright (C) 2015-2019 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -76,7 +76,7 @@ export class ReportingService {
       this.$rootScope.reportStatus = false;
       if (!this.$rootScope.$$phase) this.$rootScope.$digest();
       this.errorHandler.info(
-        'Success. Go to Management -> Reporting',
+        'Success. Go to Wazuh > Management > Reporting',
         'Reporting'
       );
 

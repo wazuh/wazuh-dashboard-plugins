@@ -1,6 +1,6 @@
 /*
  * Wazuh app - Top nav bar directive
- * Copyright (C) 2018 Wazuh, Inc.
+ * Copyright (C) 2015-2019 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,6 +16,9 @@ import { uiModules } from 'ui/modules';
 const app = uiModules.get('app/wazuh', []);
 
 class WzMenu {
+  /**
+   * Class constructor
+   */
   constructor() {
     this.template = menuTemplate;
   }
@@ -45,9 +48,14 @@ class WzMenu {
       $window.location.href = path;
     };
 
+    /**
+     * When controller loads
+     */
     const load = async () => {
       try {
         const list = await patternHandler.getPatternList();
+        if (!list) return;
+
         // Get the configuration to check if pattern selector is enabled
         const config = wazuhConfig.getConfig();
         appState.setPatternSelector(config['ip.selector']);
@@ -106,6 +114,7 @@ class WzMenu {
       }
     };
 
+    //listeners
     $scope.$on('updateAPI', (evt, params) => {
       const current = appState.getCurrentAPI();
       if (current) {

@@ -1,6 +1,6 @@
 /*
  * Wazuh app - Module for Wazuh-API routes
- * Copyright (C) 2018 Wazuh, Inc.
+ * Copyright (C) 2015-2019 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -87,7 +87,7 @@ export function WazuhApiRoutes(server) {
     }
   });
 
-  // Returns unique fields from the agents such OS, agent version ...
+  // Returns a route list used by the Dev Tools
   server.route({
     method: 'GET',
     path: '/api/routes',
@@ -95,5 +95,4 @@ export function WazuhApiRoutes(server) {
       return ctrl.getRequestList(req, res);
     }
   });
-
 }

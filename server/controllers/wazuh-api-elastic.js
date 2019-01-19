@@ -1,6 +1,6 @@
 /*
  * Wazuh app - Class for Wazuh-API-Elastic functions
- * Copyright (C) 2018 Wazuh, Inc.
+ * Copyright (C) 2015-2019 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -23,24 +23,29 @@ const urlRegExIP = new RegExp(
 const portRegEx = new RegExp(/^[0-9]{2,5}$/);
 
 export class WazuhApiElasticCtrl {
+  /**
+   * Constructor
+   * @param {*} server
+   */
   constructor(server) {
     this.wzWrapper = new ElasticWrapper(server);
   }
 
+  /**
+   * This get all API entries
+   * @param {Object} req
+   * @param {Object} reply
+   * API entries or ErrorResponse
+   */
   async getAPIEntries(req, reply) {
     try {
       const data = await this.wzWrapper.getWazuhAPIEntries();
 
       // Replacing password by ****
       const result = [];
-      if (
-        data &&
-        data.hits &&
-        data.hits.hits &&
-        Array.isArray(data.hits.hits)
-      ) {
+      if (Array.isArray(((data || {}).hits || {}).hits)) {
         for (const entry of data.hits.hits) {
-          if (entry && entry._source && entry._source.api_password) {
+          if (((entry || {})._source || {}).api_password) {
             entry._source.api_password = '****';
           }
           result.push(entry);
@@ -54,6 +59,12 @@ export class WazuhApiElasticCtrl {
     }
   }
 
+  /**
+   * This remove an API entry
+   * @param {Object} req
+   * @param {Object} reply
+   * Request response or ErrorResponse
+   */
   async deleteAPIEntries(req, reply) {
     try {
       const data = await this.wzWrapper.deleteWazuhAPIEntriesWithRequest(req);
@@ -65,33 +76,10 @@ export class WazuhApiElasticCtrl {
     }
   }
 
-  async setAPIEntryDefault(req, reply) {
-    try {
-      // Searching for previous default
-      const data = await this.wzWrapper.searchActiveDocumentsWazuhIndex(req);
-
-      if (data.hits.total === 1) {
-        await this.wzWrapper.updateWazuhIndexDocument(data.hits.hits[0]._id, {
-          doc: { active: 'false' }
-        });
-      }
-
-      await this.wzWrapper.updateWazuhIndexDocument(req.params.id, {
-        doc: { active: 'true' }
-      });
-
-      return reply({ statusCode: 200, message: 'ok' });
-    } catch (error) {
-      log('PUT /elastic/apis/{id}', error.message || error);
-      return ErrorResponse(
-        `Could not save data in elasticsearch due to ${error.message || error}`,
-        2003,
-        500,
-        reply
-      );
-    }
-  }
-
+  /**
+   * This check if connection and auth on an API is correct
+   * @param {Object} payload
+   */
   validateData(payload) {
     // Validate user
     if (!userRegEx.test(payload.user)) {
@@ -121,6 +109,10 @@ export class WazuhApiElasticCtrl {
     return false;
   }
 
+  /**
+   * This build an setting API obect
+   * @param {Object} payload
+   */
   buildSettingsObject(payload) {
     return {
       api_user: payload.user,
@@ -135,6 +127,12 @@ export class WazuhApiElasticCtrl {
     };
   }
 
+  /**
+   * This saves a new API entry
+   * @param {Object} req
+   * @param {Object} reply
+   * Status response or ErrorResponse
+   */
   async saveAPI(req, reply) {
     try {
       if (
@@ -168,9 +166,15 @@ export class WazuhApiElasticCtrl {
     }
   }
 
+  /**
+   * This update an API hostname
+   * @param {Object} req
+   * @param {Object} reply
+   * Status response or ErrorResponse
+   */
   async updateAPIHostname(req, reply) {
     try {
-      await this.wzWrapper.updateWazuhIndexDocument(req.params.id, {
+      await this.wzWrapper.updateWazuhIndexDocument(req, req.params.id, {
         doc: { cluster_info: req.payload.cluster_info }
       });
 
@@ -186,6 +190,12 @@ export class WazuhApiElasticCtrl {
     }
   }
 
+  /**
+   * This update an API settings into elasticsearch
+   * @param {Object} req
+   * @param {Object} reply
+   * Status response or ErrorResponse
+   */
   async updateFullAPI(req, reply) {
     try {
       if (
@@ -202,7 +212,9 @@ export class WazuhApiElasticCtrl {
 
       const settings = this.buildSettingsObject(req.payload);
 
-      await this.wzWrapper.updateWazuhIndexDocument(req, { doc: settings });
+      await this.wzWrapper.updateWazuhIndexDocument(req, req.payload.id, {
+        doc: settings
+      });
 
       return reply({ statusCode: 200, message: 'ok' });
     } catch (error) {

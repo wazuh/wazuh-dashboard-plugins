@@ -1,6 +1,6 @@
 /*
  * Wazuh app - Module for getting URL path
- * Copyright (C) 2018 Wazuh, Inc.
+ * Copyright (C) 2015-2019 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -8,6 +8,10 @@
  * (at your option) any later version.
  *
  * Find more information about this on the LICENSE file.
+ */
+/**
+ * Gets the correct path of given url
+ * @param {*} config
  */
 export function getPath(config) {
   let path = config.url;

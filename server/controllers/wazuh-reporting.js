@@ -1,6 +1,6 @@
 /*
  * Wazuh app - Class for Wazuh reporting controller
- * Copyright (C) 2018 Wazuh, Inc.
+ * Copyright (C) 2015-2019 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -29,6 +29,7 @@ import PdfTable from '../reporting/generic-table';
 import { WazuhApiCtrl } from './wazuh-api';
 import clockIconRaw from '../reporting/clock-icon-raw';
 import filterIconRaw from '../reporting/filter-icon-raw';
+import ProcessEquivalence from '../../util/process-state-equivalence';
 
 import {
   AgentsVisualizations,
@@ -38,6 +39,10 @@ import {
 const REPORTING_PATH = '../../../../optimize/wazuh-reporting';
 
 export class WazuhReportingCtrl {
+  /**
+   * Constructor
+   * @param {*} server
+   */
   constructor(server) {
     this.server = server;
     this.fonts = {
@@ -163,9 +168,18 @@ export class WazuhReportingCtrl {
     this.apiRequest = new WazuhApiCtrl(server);
   }
 
-  renderTables(tables) {
+  /**
+   * This performs the rendering of given tables
+   * @param {Array<Object>} tables tables to render
+   */
+  renderTables(tables, isVis = true) {
     for (const table of tables) {
-      const rowsparsed = rawParser(table.rawResponse, table.columns);
+      let rowsparsed = [];
+      if (isVis) {
+        rowsparsed = rawParser(table.rawResponse, table.columns);
+      } else {
+        rowsparsed = table.rows;
+      }
       if (Array.isArray(rowsparsed) && rowsparsed.length) {
         const rows =
           rowsparsed.length > 100 ? rowsparsed.slice(0, 99) : rowsparsed;
@@ -180,8 +194,8 @@ export class WazuhReportingCtrl {
           parseInt(a[a.length - 1]) < parseInt(b[b.length - 1])
             ? 1
             : parseInt(a[a.length - 1]) > parseInt(b[b.length - 1])
-              ? -1
-              : 0;
+            ? -1
+            : 0;
 
         TimSort.sort(rows, sortFunction);
 
@@ -222,6 +236,12 @@ export class WazuhReportingCtrl {
     }
   }
 
+  /**
+   * This performs the rendering of given time range and filters
+   * @param {Number} from Timestamp (ms) from
+   * @param {Number} to Timestamp (ms) to
+   * @param {String} filters E.g: cluster.name: wazuh AND rule.groups: vulnerability
+   */
   renderTimeRangeAndFilters(from, to, filters) {
     const str = `${from} to ${to}`;
 
@@ -277,6 +297,11 @@ export class WazuhReportingCtrl {
     this.dd.content.push({ text: '\n' });
   }
 
+  /**
+   * This do format to filters
+   * @param {String} filters E.g: cluster.name: wazuh AND rule.groups: vulnerability
+   * @param {String} searchBar search term
+   */
   sanitizeFilters(filters, searchBar) {
     let str = '';
 
@@ -304,6 +329,13 @@ export class WazuhReportingCtrl {
     return str;
   }
 
+  /**
+   * This performs the rendering of given header
+   * @param {String} section section target
+   * @param {Object} tab tab target
+   * @param {Boolean} isAgents is agents section
+   * @param {String} apiId ID of API
+   */
   async renderHeader(section, tab, isAgents, apiId) {
     try {
       if (section && typeof section === 'string') {
@@ -322,10 +354,8 @@ export class WazuhReportingCtrl {
           apiId
         );
         if (
-          agent &&
-          agent.data &&
-          typeof agent.data.status === 'string' &&
-          agent.data.status !== 'Active'
+          typeof ((agent || {}).data || {}).status === 'string' &&
+          ((agent || {}).data || {}).status !== 'Active'
         ) {
           this.dd.content.push({
             text: `Warning. Agent is ${agent.data.status.toLowerCase()}`,
@@ -336,12 +366,12 @@ export class WazuhReportingCtrl {
         await this.buildAgentsTable([isAgents], apiId);
 
         let dateAddStr = '';
-        if (agent && agent.data && agent.data.dateAdd) {
+        if (((agent || {}).data || {}).dateAdd) {
           dateAddStr = `Registration date: ${agent.data.dateAdd}.`;
         }
 
         let dateLastKeepAlive = '';
-        if (agent && agent.data && agent.data.lastKeepAlive) {
+        if (((agent || {}).data || {}).lastKeepAlive) {
           dateLastKeepAlive += `Last keep alive: ${agent.data.lastKeepAlive}.`;
         }
 
@@ -355,7 +385,7 @@ export class WazuhReportingCtrl {
           this.dd.content.push('\n');
         }
 
-        if (agent && agent.data && agent.data.group) {
+        if (((agent || {}).data || {}).group) {
           this.dd.content.push({
             text: `Group: ${agent.data.group}`,
             style: 'standard'
@@ -378,6 +408,12 @@ export class WazuhReportingCtrl {
     }
   }
 
+  /**
+   * This check if title is suitable
+   * @param {Object} item item of the title
+   * @param {Boolean} isAgents is agents section
+   * @param {Object} tab tab target
+   */
   checkTitle(item, isAgents, tab) {
     const title = isAgents
       ? AgentsVisualizations[tab].filter(v => v._id === item.id)
@@ -385,6 +421,12 @@ export class WazuhReportingCtrl {
     return title;
   }
 
+  /**
+   * This performs the rendering of given visualizations
+   * @param {Array<Objecys>} array Array of visualizations
+   * @param {Boolean} isAgents is agents section
+   * @param {Object} tab tab target
+   */
   renderVisualizations(array, isAgents, tab) {
     const single_vis = array.filter(item => item.width >= 600);
     const double_vis = array.filter(item => item.width < 600);
@@ -455,6 +497,11 @@ export class WazuhReportingCtrl {
     }
   }
 
+  /**
+   * This build the agents table
+   * @param {Array<Strings>} ids ids of agents
+   * @param {String} apiId API id
+   */
   async buildAgentsTable(ids, apiId) {
     if (!ids || !ids.length) return;
     try {
@@ -477,14 +524,14 @@ export class WazuhReportingCtrl {
         }
         const str = Array(6).fill('-');
         str[0] = item;
-        if (data && data.name) str[1] = data.name;
-        if (data && data.ip) str[2] = data.ip;
-        if (data && data.version) str[3] = data.version;
+        if ((data || {}).name) str[1] = data.name;
+        if ((data || {}).ip) str[2] = data.ip;
+        if ((data || {}).version) str[3] = data.version;
         // 3.7 <
-        if (data && data.manager_host) str[4] = data.manager_host;
+        if ((data || {}).manager_host) str[4] = data.manager_host;
         // 3.7 >=
-        if (data && data.manager) str[4] = data.manager;
-        if (data && data.os && data.os.name && data.os.version)
+        if ((data || {}).manager) str[4] = data.manager;
+        if ((data || {}).os && data.os.name && data.os.version)
           str[5] = `${data.os.name} ${data.os.version}`;
         rows.push(str);
       }
@@ -504,6 +551,18 @@ export class WazuhReportingCtrl {
     }
   }
 
+  /**
+   * This load more information
+   * @param {String} section section target
+   * @param {Object} tab tab target
+   * @param {String} apiId ID of API
+   * @param {Number} from Timestamp (ms) from
+   * @param {Number} to Timestamp (ms) to
+   * @param {String} filters E.g: cluster.name: wazuh AND rule.groups: vulnerability
+   * @param {String} pattern
+   * @param {Object} agent agent target
+   * @returns {Object} Extended information
+   */
   async extendedInformation(
     section,
     tab,
@@ -980,7 +1039,7 @@ export class WazuhReportingCtrl {
           this.dd.content.push('\n');
         }
 
-        if (database && database.data && database.data.items) {
+        if (((database || {}).data || {}).items) {
           PdfTable(
             this.dd,
             database.data.items,
@@ -991,7 +1050,7 @@ export class WazuhReportingCtrl {
           this.dd.content.push('\n');
         }
 
-        if (pci && pci.data && pci.data.items) {
+        if (((pci || {}).data || {}).items) {
           this.dd.content.push({
             text: 'Fired rules due to PCI requirements',
             style: 'h2',
@@ -1294,6 +1353,12 @@ export class WazuhReportingCtrl {
     }
   }
 
+  /**
+   * Builds a PDF report from multiple PNG images
+   * @param {Object} req
+   * @param {Object} reply
+   * @returns {Object} pdf or ErrorResponse
+   */
   async report(req, reply) {
     try {
       // Init
@@ -1338,6 +1403,176 @@ export class WazuhReportingCtrl {
 
         const isSycollector = tab === 'syscollector';
 
+        let tables = [];
+        if (isSycollector) {
+          let agentId = '';
+          let agentOs = '';
+          try {
+            if (
+              !req.payload.filters ||
+              !req.payload.filters[1] ||
+              !req.payload.filters[1].meta ||
+              !req.payload.filters[1].meta.value
+            ) {
+              throw new Error(
+                'Syscollector reporting needs a valid agent in order to work properly'
+              );
+            }
+            const agent = await this.apiRequest.makeGenericRequest(
+              'GET',
+              `/agents/${req.payload.filters[1].meta.value}`,
+              {},
+              apiId
+            );
+            agentId =
+              agent && agent.data && agent.data.id
+                ? agent.data.id
+                : req.payload.filters[1].meta.value;
+            agentOs =
+              agent && agent.data && agent.data.os && agent.data.os.platform
+                ? agent.data.os.platform
+                : '';
+          } catch (err) {} //eslint-disable-line
+          try {
+            const packages = await this.apiRequest.makeGenericRequest(
+              'GET',
+              `/syscollector/${agentId}/packages`,
+              {},
+              apiId
+            );
+            if (packages && packages.data && packages.data.items) {
+              tables.push({
+                title: 'Packages',
+                columns:
+                  agentOs === 'windows'
+                    ? ['Name', 'Architecture', 'Version', 'Vendor']
+                    : [
+                        'Name',
+                        'Architecture',
+                        'Version',
+                        'Vendor',
+                        'Description'
+                      ],
+                rows: packages.data.items.map(x => {
+                  return agentOs === 'windows'
+                    ? [x['name'], x['architecture'], x['version'], x['vendor']]
+                    : [
+                        x['name'],
+                        x['architecture'],
+                        x['version'],
+                        x['vendor'],
+                        x['description']
+                      ];
+                })
+              });
+            }
+          } catch (err) {} //eslint-disable-line
+          try {
+            const processes = await this.apiRequest.makeGenericRequest(
+              'GET',
+              `/syscollector/${agentId}/processes`,
+              {},
+              apiId
+            );
+            if (processes && processes.data && processes.data.items) {
+              tables.push({
+                title: 'Processes',
+                columns:
+                  agentOs === 'windows'
+                    ? ['Name', 'CMD', 'Priority', 'NLWP']
+                    : ['Name', 'Effective user', 'Priority', 'State'],
+                rows: processes.data.items.map(x => {
+                  return agentOs === 'windows'
+                    ? [x['name'], x['cmd'], x['priority'], x['nlwp']]
+                    : [
+                        x['name'],
+                        x['euser'],
+                        x['nice'],
+                        ProcessEquivalence[x.state]
+                      ];
+                })
+              });
+            }
+          } catch (err) {} //eslint-disable-line
+
+          try {
+            const ports = await this.apiRequest.makeGenericRequest(
+              'GET',
+              `/syscollector/${agentId}/ports`,
+              {},
+              apiId
+            );
+            if (ports && ports.data && ports.data.items) {
+              tables.push({
+                title: 'Network ports',
+                columns: [
+                  'Local IP',
+                  'Local port',
+                  'Process',
+                  'State',
+                  'Protocol'
+                ],
+                rows: ports.data.items.map(x => {
+                  return [
+                    x['local']['ip'],
+                    x['local']['port'],
+                    x['process'],
+                    x['state'],
+                    x['protocol']
+                  ];
+                })
+              });
+            }
+          } catch (err) {} //eslint-disable-line
+
+          try {
+            const netiface = await this.apiRequest.makeGenericRequest(
+              'GET',
+              `/syscollector/${agentId}/netiface`,
+              {},
+              apiId
+            );
+            if (netiface && netiface.data && netiface.data.items) {
+              tables.push({
+                title: 'Network interfaces',
+                columns: ['Name', 'Mac', 'State', 'MTU', 'Type'],
+                rows: netiface.data.items.map(x => {
+                  return [x['name'], x['mac'], x['state'], x['mtu'], x['type']];
+                })
+              });
+            }
+          } catch (err) {} //eslint-disable-line
+          try {
+            const netaddr = await this.apiRequest.makeGenericRequest(
+              'GET',
+              `/syscollector/${agentId}/netaddr`,
+              {},
+              apiId
+            );
+            if (netaddr && netaddr.data && netaddr.data.items) {
+              tables.push({
+                title: 'Network addresses',
+                columns: [
+                  'Interface',
+                  'Address',
+                  'Netmask',
+                  'Protocol',
+                  'Broadcast'
+                ],
+                rows: netaddr.data.items.map(x => {
+                  return [
+                    x['interface'],
+                    x['address'],
+                    x['netmask'],
+                    x['protocol'],
+                    x['broadcast']
+                  ];
+                })
+              });
+            }
+          } catch (err) {} //eslint-disable-line
+        }
+
         await this.renderHeader(section, tab, isAgents, apiId);
 
         let filters = false;
@@ -1367,6 +1602,9 @@ export class WazuhReportingCtrl {
         !isSycollector &&
           this.renderVisualizations(req.payload.array, isAgents, tab);
 
+        if (isSycollector) {
+          this.renderTables(tables, false);
+        }
         if (!isSycollector && req.payload.tables) {
           this.renderTables(req.payload.tables);
         }
@@ -1383,9 +1621,7 @@ export class WazuhReportingCtrl {
     } catch (error) {
       // Delete generated file if an error occurred
       if (
-        req &&
-        req.payload &&
-        req.payload.name &&
+        ((req || {}).payload || {}).name &&
         fs.existsSync(
           path.join(__dirname, REPORTING_PATH + '/' + req.payload.name)
         )
@@ -1398,6 +1634,12 @@ export class WazuhReportingCtrl {
     }
   }
 
+  /**
+   * Fetch the reports list
+   * @param {Object} req
+   * @param {Object} reply
+   * @returns {Array<Object>}reports list or ErrorResponse
+   */
   async getReports(req, reply) {
     try {
       if (!fs.existsSync(path.join(__dirname, REPORTING_PATH))) {
@@ -1423,6 +1665,12 @@ export class WazuhReportingCtrl {
     }
   }
 
+  /**
+   * Fetch specific report
+   * @param {Object} req
+   * @param {Object} reply
+   * @returns {Object} report or ErrorResponse
+   */
   async getReportByName(req, reply) {
     try {
       if (!req.params || !req.params.name) throw new Error('Invalid file name');
@@ -1434,6 +1682,12 @@ export class WazuhReportingCtrl {
     }
   }
 
+  /**
+   * Delete specific report
+   * @param {Object} req
+   * @param {Object} reply
+   * @returns {Object} status obj or ErrorResponse
+   */
   async deleteReportByName(req, reply) {
     try {
       if (!req.params || !req.params.name) throw new Error('Invalid file name');

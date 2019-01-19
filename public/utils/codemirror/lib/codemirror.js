@@ -11,8 +11,8 @@
   typeof exports === 'object' && typeof module !== 'undefined'
     ? (module.exports = factory())
     : typeof define === 'function' && define.amd
-      ? define(factory)
-      : (global.CodeMirror = factory());
+    ? define(factory)
+    : (global.CodeMirror = factory());
 })(this, function() {
   'use strict';
 
@@ -4134,8 +4134,8 @@
     return box.bottom <= y
       ? false
       : box.top > y
-        ? true
-        : (left ? box.left : box.right) > x;
+      ? true
+      : (left ? box.left : box.right) > x;
   }
 
   function coordsCharInner(cm, lineObj, lineNo$$1, x, y) {
@@ -4211,14 +4211,14 @@
         ch == 0
           ? 'after'
           : ch == lineObj.text.length
-            ? 'before'
-            : measureCharPrepared(cm, preparedMeasure, ch - (ltr ? 1 : 0))
-                .bottom +
-                widgetHeight$$1 <=
-                y ==
-              ltr
-              ? 'after'
-              : 'before';
+          ? 'before'
+          : measureCharPrepared(cm, preparedMeasure, ch - (ltr ? 1 : 0))
+              .bottom +
+              widgetHeight$$1 <=
+              y ==
+            ltr
+          ? 'after'
+          : 'before';
       // Now get accurate coordinates for this place, in order to get a
       // base X position
       var coords = cursorCoords(
@@ -9208,10 +9208,10 @@
             where == 'text'
               ? 'textClass'
               : where == 'background'
-                ? 'bgClass'
-                : where == 'gutter'
-                  ? 'gutterClass'
-                  : 'wrapClass';
+              ? 'bgClass'
+              : where == 'gutter'
+              ? 'gutterClass'
+              : 'wrapClass';
           if (!line[prop]) {
             line[prop] = cls;
           } else if (classTest(cls).test(line[prop])) {
@@ -9233,10 +9233,10 @@
             where == 'text'
               ? 'textClass'
               : where == 'background'
-                ? 'bgClass'
-                : where == 'gutter'
-                  ? 'gutterClass'
-                  : 'wrapClass';
+              ? 'bgClass'
+              : where == 'gutter'
+              ? 'gutterClass'
+              : 'wrapClass';
           var cur = line[prop];
           if (!cur) {
             return false;
@@ -10894,10 +10894,10 @@
       value.unit = rect
         ? 'rectangle'
         : repeat == 'single'
-          ? 'char'
-          : repeat == 'double'
-            ? 'word'
-            : 'line';
+        ? 'char'
+        : repeat == 'double'
+        ? 'word'
+        : 'line';
     }
     if (value.extend == null || cm.doc.extend) {
       value.extend = cm.doc.extend || event.shiftKey;
@@ -11187,8 +11187,8 @@
           e.clientY < editorSize.top
             ? -20
             : e.clientY > editorSize.bottom
-              ? 20
-              : 0;
+            ? 20
+            : 0;
         if (outside) {
           setTimeout(
             operation(cm, function() {
@@ -12729,12 +12729,12 @@
                 return isWordChar(ch, helper);
               }
             : /\s/.test(startChar)
-              ? function(ch) {
-                  return /\s/.test(ch);
-                }
-              : function(ch) {
-                  return !/\s/.test(ch) && !isWordChar(ch);
-                };
+            ? function(ch) {
+                return /\s/.test(ch);
+              }
+            : function(ch) {
+                return !/\s/.test(ch) && !isWordChar(ch);
+              };
           while (start > 0 && check(line.charAt(start - 1))) {
             --start;
           }
@@ -12962,10 +12962,10 @@
         var type = isWordChar(cur, helper)
           ? 'w'
           : group && cur == '\n'
-            ? 'n'
-            : !group || /\s/.test(cur)
-              ? null
-              : 'p';
+          ? 'n'
+          : !group || /\s/.test(cur)
+          ? null
+          : 'p';
         if (group && !first && !type) {
           type = 's';
         }
