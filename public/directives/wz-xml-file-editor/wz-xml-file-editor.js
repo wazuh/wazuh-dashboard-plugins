@@ -50,7 +50,6 @@ app.directive('wzXmlFileEditor', function () {
       const checkXmlParseError = () => {
         try {
           const text = $scope.xmlCodeBox.getValue();
-          console.log(text)
           const xml = replaceIllegalXML(text);
           const xmlDoc = parser.parseFromString(
             '<file>' + xml + '</file>',
