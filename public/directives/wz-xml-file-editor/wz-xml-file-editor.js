@@ -16,7 +16,7 @@ import { uiModules } from 'ui/modules';
 
 const app = uiModules.get('app/wazuh', []);
 
-app.directive('wzXmlFileEditor', function() {
+app.directive('wzXmlFileEditor', function () {
   return {
     restrict: 'E',
     scope: {
@@ -27,10 +27,31 @@ app.directive('wzXmlFileEditor', function() {
     },
     controller($scope, $document, errorHandler, groupHandler) {
       let firstTime = true;
+      const parser = new DOMParser(); // eslint-disable-line
+      const replaceIllegalXML = (t) => {
+        const oDOM = parser.parseFromString(t, 'text/html');
+        const lines = oDOM.documentElement.textContent.split('\n');
+        lines.forEach(function (line) {
+          let replace = line
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '\&lt;')
+            .replace(/>/g, '\&gt;')
+            .replace(/"/g, '\&quot;')
+            .replace(/'/g, '\&apos;')
+          if (replace != line) {
+            replace = replace.trim();
+            const regex = new RegExp(line.trim());
+            t = t.replace(regex, replace);
+          }
+        });
+        return t;
+      }
+
       const checkXmlParseError = () => {
         try {
-          const parser = new DOMParser(); // eslint-disable-line
-          const xml = $scope.xmlCodeBox.getValue();
+          const text = $scope.xmlCodeBox.getValue();
+          console.log(text)
+          const xml = replaceIllegalXML(text);
           const xmlDoc = parser.parseFromString(
             '<file>' + xml + '</file>',
             'text/xml'
