@@ -68,10 +68,9 @@ app.directive('wzTable', function () {
 
       const configuration = wazuhConfig.getConfig();
       $scope.adminMode = !!(configuration || {}).admin;
-      $scope.customEmptyResults =
-        $scope.emptyResults && typeof $scope.emptyResults === 'string'
-          ? $scope.emptyResults
-          : 'Empty results for this table.'
+
+      $scope.customEmptyResults = $scope.emptyResults || 'Empty results for this table.';
+
       /**
        * Resizing. Calculate number of table rows depending on the screen height
        */
@@ -133,7 +132,7 @@ app.directive('wzTable', function () {
        */
       const search = async (term, removeFilters) => {
         if (term && typeof term === 'string') {
-          $scope.customEmptyResults = 'No results match your search criteria.'
+          $scope.emptyResults = false;
         }
         searchData(
           term,
