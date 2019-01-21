@@ -211,4 +211,8 @@ export class AgentsPreviewController {
     }
     return;
   }
+
+  reloadList() {
+    this.$scope.$broadcast('wazuhSearch', { term:'' });
+  }
 }
