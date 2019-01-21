@@ -16,7 +16,7 @@ import { uiModules } from 'ui/modules';
 
 const app = uiModules.get('app/wazuh', []);
 
-app.directive('wzXmlFileEditor', function () {
+app.directive('wzXmlFileEditor', function() {
   return {
     restrict: 'E',
     scope: {
@@ -26,26 +26,27 @@ app.directive('wzXmlFileEditor', function () {
       targetName: '=targetName'
     },
     controller($scope, $document, errorHandler, groupHandler) {
+      String.prototype.xmlReplace = function(str, newstr) {
+        return this.split(str).join(newstr);
+      };
+
       let firstTime = true;
       const parser = new DOMParser(); // eslint-disable-line
-      const replaceIllegalXML = (t) => {
-        const oDOM = parser.parseFromString(t, 'text/html');
+      const replaceIllegalXML = text => {
+        const oDOM = parser.parseFromString(text, 'text/html');
         const lines = oDOM.documentElement.textContent.split('\n');
-        lines.forEach(function (line) {
-          let replace = line
-            .replace(/&/g, '&amp;')
-            .replace(/</g, '\&lt;')
-            .replace(/>/g, '\&gt;')
-            .replace(/"/g, '\&quot;')
-            .replace(/'/g, '\&apos;')
-          if (replace != line) {
-            replace = replace.trim();
-            const regex = new RegExp(line.trim());
-            t = t.replace(regex, replace);
-          }
-        });
-        return t;
-      }
+        for (const line of lines) {
+          const sanitized = line
+            .trim()
+            .xmlReplace('&', '&amp;')
+            .xmlReplace('<', '&lt;')
+            .xmlReplace('>', '&gt;')
+            .xmlReplace('"', '&quot;')
+            .xmlReplace("'", '&apos;');
+          text = text.xmlReplace(line.trim(), sanitized);
+        }
+        return text;
+      };
 
       const checkXmlParseError = () => {
         try {
