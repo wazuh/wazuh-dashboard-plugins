@@ -49,7 +49,10 @@
         </md-card>
     </div>
 
-    <wz-tag-filter path="'/agents'" query-fn="ctrl.query(q, search)" fields-model="ctrl.searchBarModel"></wz-tag-filter>
+    <div layout="row">
+        <wz-tag-filter flex path="'/agents'" query-fn="ctrl.query(q, search)" fields-model="ctrl.searchBarModel"></wz-tag-filter>
+        <md-button class="agents-prev-btn" ng-click="ctrl.reloadList()"><i class="fa fa-fw fa-refresh"></i> Refresh</md-button>
+    </div>
 
     <div layout="row" class="margin-top-30">
         <wz-table flex path="'/agents'" keys="['id','name','ip','status','group','os.name','os.version','version', 'dateAdd', 'lastKeepAlive']"
