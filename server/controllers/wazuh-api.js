@@ -22,7 +22,7 @@ import { Parser } from 'json2csv';
 import { getConfiguration } from '../lib/get-configuration';
 import { log } from '../logger';
 import { KeyEquivalenece } from '../../util/csv-key-equivalence';
-import { ApiErrorEquivalenece } from '../../util/api-errors-equivalence';
+import { ApiErrorEquivalence } from '../../util/api-errors-equivalence';
 import { cleanKeys } from '../../util/remove-key';
 import { apiRequestList } from '../../util/api-request-list';
 import * as ApiHelper from '../lib/api-helper';
@@ -580,8 +580,8 @@ export class WazuhApiCtrl {
       if (devTools) {
         return reply({ error: '3013', message: error.message || error });
       } else {
-        if ((error || {}).code && ApiErrorEquivalenece[error.code]) {
-          error.message = ApiErrorEquivalenece[error.code];
+        if ((error || {}).code && ApiErrorEquivalence[error.code]) {
+          error.message = ApiErrorEquivalence[error.code];
         }
         return ErrorResponse(
           error.message || error,
