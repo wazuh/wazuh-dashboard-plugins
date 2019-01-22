@@ -9,7 +9,10 @@
             </div>
             <div class="wz-dev-column-separator layout-column"><span>︙</span></div>
             <div id="wz-dev-right-column" flex layout="column">
-                <span class="wz-headline-title wz-dev-title"><i ng-click="help()" class="fa fa-question wz-question-dev-color cursor-pointer pull-right fa-fw" aria-hidden="true"></i></span>
+                <span class="wz-headline-title wz-dev-title">
+                    <i ng-click="help()" class="fa fa-question wz-question-dev-color cursor-pointer pull-right fa-fw" aria-hidden="true"></i>
+                    <i ng-click="exportOutput()" tooltip="Export as JSON" class="fa fa-download wz-question-dev-color cursor-pointer pull-right fa-fw" aria-hidden="true"></i>
+                </span>
                 <textarea flex id="api_output"></textarea>
             </div>
         </div>

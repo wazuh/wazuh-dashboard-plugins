@@ -14,7 +14,7 @@ import jsonLint from '../../utils/codemirror/json-lint';
 import { ExcludedIntelliSenseTriggerKeys } from '../../../util/excluded-devtools-autocomplete-keys';
 import queryString from 'querystring-browser';
 import $ from 'jquery';
-
+import * as FileSaver from '../../services/file-saver';
 export class DevToolsController {
   /**
    * Constructor
@@ -45,12 +45,32 @@ export class DevToolsController {
     this.groups = [];
     this.linesWithClass = [];
     this.widgets = [];
+    this.multipleKeyPressed = [];
   }
 
   /**
    * When controller loads
    */
   $onInit() {
+    $(this.$document[0]).keydown(e => {
+      if (!this.multipleKeyPressed.includes(e.which)) {
+        this.multipleKeyPressed.push(e.which);
+      }
+      if (
+        this.multipleKeyPressed.includes(13) &&
+        this.multipleKeyPressed.includes(16) &&
+        this.multipleKeyPressed.length === 2
+      ) {
+        e.preventDefault();
+        return this.send();
+      }
+    });
+
+    // eslint-disable-next-line
+    $(this.$document[0]).keyup(e => {
+      this.multipleKeyPressed = [];
+    });
+
     this.apiInputBox = CodeMirror.fromTextArea(
       this.$document[0].getElementById('api_input'),
       {
@@ -116,6 +136,8 @@ export class DevToolsController {
 
     this.init();
     this.$scope.send(true);
+
+    this.$scope.exportOutput = () => this.exportOutput();
   }
 
   /**
@@ -534,6 +556,18 @@ export class DevToolsController {
       } else {
         return this.apiOutputBox.setValue('Empty');
       }
+    }
+  }
+
+  exportOutput() {
+    try {
+      // eslint-disable-next-line
+      const blob = new Blob([this.apiOutputBox.getValue()], {
+        type: 'application/json'
+      }); 
+      FileSaver.saveAs(blob, 'export.json');
+    } catch (error) {
+      this.errorHandler.handle(error, 'Export JSON');
     }
   }
 }
