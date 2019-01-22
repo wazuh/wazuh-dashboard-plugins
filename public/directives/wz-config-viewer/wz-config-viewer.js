@@ -49,7 +49,7 @@ class WzConfigViewer {
     }
     const setXmlBox = () => {
       $scope.xmlCodeBox = CodeMirror.fromTextArea(
-        $document[0].getElementById('xml_box'),
+        $document[0].getElementById('viewer_xml_box'),
         {
           lineNumbers: true,
           matchClosing: true,

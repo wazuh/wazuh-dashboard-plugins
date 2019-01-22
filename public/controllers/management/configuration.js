@@ -73,6 +73,28 @@ export class ConfigurationController {
       );
     };
 
+
+    /**
+    * Edit configuration
+    */
+    this.$scope.editConfig = async () => {
+      this.$scope.editingFile = true;
+      try {
+        //$scope.fetchedXML = await fetchFile();
+        this.$scope.fetchedXML = `hola`;
+        this.$scope.$broadcast('fetchedFile', { data: this.$scope.fetchedXML });
+      } catch (error) {
+        this.$scope.fetchedXML = null;
+        errorHandler.handle(error, 'Fetch file error');
+      }
+      if (!this.$scope.$$phase) this.$scope.$digest();
+    };
+
+    this.$scope.closeEditingFile = () => {
+      this.$scope.editingFile = false;
+      this.$scope.$broadcast('closeEditXmlFile', {});
+    };
+
     /**
      * Navigate to woodle
      */
