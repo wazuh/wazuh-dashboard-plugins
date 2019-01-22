@@ -73,28 +73,6 @@ export class ConfigurationController {
       );
     };
 
-
-    /**
-    * Edit configuration
-    */
-    this.$scope.editConfig = async () => {
-      this.$scope.editingFile = true;
-      try {
-        //$scope.fetchedXML = await fetchFile();
-        this.$scope.fetchedXML = `hola`;
-        this.$scope.$broadcast('fetchedFile', { data: this.$scope.fetchedXML });
-      } catch (error) {
-        this.$scope.fetchedXML = null;
-        errorHandler.handle(error, 'Fetch file error');
-      }
-      if (!this.$scope.$$phase) this.$scope.$digest();
-    };
-
-    this.$scope.closeEditingFile = () => {
-      this.$scope.editingFile = false;
-      this.$scope.$broadcast('closeEditXmlFile', {});
-    };
-
     /**
      * Navigate to woodle
      */
@@ -158,5 +136,33 @@ export class ConfigurationController {
     this.$scope.$on('$routeChangeStart', () =>
       this.appState.removeSessionStorageItem('configSubTab')
     );
+
+    this.init();
+  }
+
+  async init() {
+    try {
+      this.$scope.clusterStatus = await this.apiReq.request('GET', '/cluster/status', {});
+      if (
+        this.$scope.clusterStatus &&
+        this.$scope.clusterStatus.data.data.enabled === 'yes' &&
+        this.$scope.clusterStatus.data.data.running === 'yes'
+      ) {
+        const nodes = await this.apiReq.request('GET', '/cluster/nodes', {});
+        this.$scope.nodes = nodes.data.data.items.reverse();
+        const masterNode = nodes.data.data.items.filter(
+          item => item.type === 'master'
+        )[0];
+        const daemons = await this.apiReq.request(
+          'GET',
+          `/cluster/${masterNode.name}/status`,
+          {}
+        );
+        this.daemons = daemons.data.data;
+        this.$scope.selectedNode = masterNode.name;
+      }
+    } catch (error) {
+      this.errorHandler.handle(error, 'Error getting cluster status');
+    }
   }
 }

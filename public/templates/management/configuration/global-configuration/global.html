@@ -24,8 +24,6 @@
                     <span ng-class="JSONContent ? 'wz-text-active' : ''" class="wz-text-link small" ng-click="getJSON()">JSON</span>
                     <span class="small">&nbsp;&centerdot;&nbsp;</span>
                     <span ng-class="XMLContent ? 'wz-text-active' : ''" class="wz-text-link small" ng-click="getXML()">XML</span>
-                    <span class="small">&nbsp;&centerdot;&nbsp;</span>
-                    <span class="btn btn-primary"  ng-click='editConfig()'>Edit</span>
                 </div>
                 <md-divider class="wz-margin-top-10"></md-divider>
 
@@ -134,19 +132,6 @@
         <!-- End main card with all the settings -->
 
         <wz-config-viewer flex getjson="getJSON()" getxml="getXML()" jsoncontent="JSONContent" xmlcontent="XMLContent" />
-
-        <div class="md-padding" ng-if="editingFile">
-            <div layout="row" class="md-padding">
-                <span ng-click='closeEditingFile()' class='btn btn-info'>Cancel</span>
-                <button ng-disabled='xmlHasErrors' ng-click='doSaveGroupAgentConfig()' class='btn btn-primary pull-right wz-margin-left-8'>
-                    <span ng-show='!xmlHasErrors'><i aria-hidden='true' class='fa fa-fw fa-save'></i>Save file</span>
-                    <span ng-show='xmlHasErrors' class='btn-danger'><i aria-hidden='true' class='fa fa-fw fa-exclamation-triangle'></i>
-                        XML format error</span>
-                </button>
-            </div>
-            <wz-xml-file-editor file-name='ossec.conf' data="fetchedXML" target-name="ossec.conf" valid-fn='xmlIsValid(valid)'>
-            </wz-xml-file-editor>
-        </div>
 
     </div>
     <!-- End main content section -->

@@ -9,6 +9,12 @@
         </div>
         <span class="font-size-18" ng-show="!agent || agent.id === '000'">
                 <i class="fa fa-fw fa-cog" aria-hidden="true"></i> Configuration</span>
+                <div ng-show="selectedNode" layout="column" layout-align="center" class="height-40 wz-select-input">
+                    <select class="kuiSelect wz-border-none cursor-pointer max-height-35" id="categoryBox" ng-model="selectedNode"
+                        ng-change="changeNode(selectedNode)" aria-label="Select node">
+                        <option ng-repeat="node in nodes" value="{{node.name}}">{{node.name}}</option>
+                    </select>
+                </div>
     </div>
     <!-- End headline -->
 
