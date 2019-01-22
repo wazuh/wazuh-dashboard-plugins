@@ -21,7 +21,8 @@ export function RulesController(
   csvReq,
   wzTableFilter,
   $location,
-  apiReq
+  apiReq,
+  wazuhConfig
 ) {
   $scope.isObject = item => typeof item === 'object';
 
@@ -124,7 +125,9 @@ export function RulesController(
   $scope.searchTerm = '';
   $scope.viewingDetail = false;
   $scope.isArray = Array.isArray;
-  $scope.adminMode = true;
+
+  const configuration = wazuhConfig.getConfig();
+  $scope.adminMode = !!(configuration || {}).admin;
 
   /**
    * This set color to a given rule argument
@@ -204,22 +207,11 @@ export function RulesController(
     if (!$scope.$$phase) $scope.$digest();
   });
 
-
   $scope.editRulesConfig = async () => {
     $scope.editingFile = true;
     try {
       //$scope.fetchedXML = await fetchFile();
       $scope.fetchedXML = `
-      <!--
-      -  Imapd rules
-      -  Author: Daniel Cid.
-      -  Copyright (C) 2009 Trend Micro Inc.
-      -  Updated by Wazuh, Inc. <support@wazuh.com>.
-      -  This program is a free software; you can redistribute it and/or modify it under the terms of GPLv2.
-    -->
-    
-    <var name="IMAPD_FREQ">8</var>
-    
     <group name="syslog,imapd,">
       <rule id="3600" level="0" noalert="1">
         <decoded_as>imapd</decoded_as>
@@ -238,22 +230,7 @@ export function RulesController(
         <match>Authenticated user=</match>
         <description>Imapd user login.</description>
         <group>authentication_success,pci_dss_10.2.5,gpg13_7.1,gdpr_IV_32.2,</group>
-      </rule>
-    
-      <rule id="3603" level="0">
-        <if_sid>3600</if_sid>
-        <match>Logout user=</match>
-        <description>Imapd user logout.</description>
-        <group>pci_dss_10.2.5,gpg13_7.1,gdpr_IV_32.2,</group>
-      </rule>
-    
-      <rule id="3651" level="10" frequency="$IMAPD_FREQ" timeframe="120">
-        <if_matched_sid>3601</if_matched_sid>
-        <same_source_ip />
-        <description>Imapd Multiple failed logins from same source ip.</description>
-        <group>authentication_failures,pci_dss_10.2.4,pci_dss_10.2.5,pci_dss_11.4,gpg13_7.1,gdpr_IV_35.7.d,gdpr_IV_32.2,</group>
-      </rule>
-    
+      </rule>    
     </group>`;
       $scope.$broadcast('fetchedFile', { data: $scope.fetchedXML });
     } catch (error) {

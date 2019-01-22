@@ -23,13 +23,14 @@ export class DecodersController {
    * @param {*} csvReq
    * @param {*} wzTableFilter
    */
-  constructor($scope, $sce, errorHandler, appState, csvReq, wzTableFilter) {
+  constructor($scope, $sce, errorHandler, appState, csvReq, wzTableFilter, wazuhConfig) {
     this.$scope = $scope;
     this.$sce = $sce;
     this.errorHandler = errorHandler;
     this.appState = appState;
     this.csvReq = csvReq;
     this.wzTableFilter = wzTableFilter;
+    this.wazuhConfig = wazuhConfig;
   }
 
   /**
@@ -43,6 +44,9 @@ export class DecodersController {
     this.viewingDetail = false;
     this.typeFilter = 'all';
     this.isArray = Array.isArray;
+
+    const configuration = this.wazuhConfig.getConfig();
+    this.$scope.adminMode = !!(configuration || {}).admin;
 
     // Reloading event listener
     this.$scope.$on('rulesetIsReloaded', () => {
@@ -189,6 +193,41 @@ export class DecodersController {
     }
     return;
   }
+
+
+  editDecodersConfig = async () => {
+    this.$scope.editingFile = true;
+    try {
+      //$scope.fetchedXML = await fetchFile();
+      this.$scope.fetchedXML = `
+      <decoder name="example">
+  <program_name>^example</program_name>
+</decoder>
+
+<decoder name="example">
+  <parent>example</parent>
+  <regex>User '(\w+)' logged from '(\d+.\d+.\d+.\d+)'</regex>
+  <order>user, srcip</order>
+</decoder>
+`;
+      this.$scope.$broadcast('fetchedFile', { data: this.$scope.fetchedXML });
+    } catch (error) {
+      this.$scope.fetchedXML = null;
+      this.errorHandler.handle(error, 'Fetch file error');
+    }
+  }
+  closeEditingFile = () => {
+    this.$scope.editingFile = false;
+    this.$scope.$broadcast('closeEditXmlFile', {});
+  };
+  xmlIsValid = valid => {
+    this.$scope.xmlHasErrors = valid;
+    if (!this.$scope.$$phase) this.$scope.$digest();
+  };
+  doSaveDecoderConfig = () => {
+    this.$scope.editingFile = false;
+    this.$scope.$broadcast('saveXmlFile', { decoder: this.currentDecoder.id });
+  };
 
   /**
    * This function takes back to the list but adding a filter from the detail view
