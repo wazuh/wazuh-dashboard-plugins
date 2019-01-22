@@ -124,6 +124,7 @@ export function RulesController(
   $scope.searchTerm = '';
   $scope.viewingDetail = false;
   $scope.isArray = Array.isArray;
+  $scope.adminMode = true;
 
   /**
    * This set color to a given rule argument
@@ -141,10 +142,10 @@ export function RulesController(
         coloredString = coloredString.replace(
           /\$\(((?!<\/span>).)*?\)(?!<\/span>)/im,
           '<span style="color: ' +
-            colors[i] +
-            ' ">' +
-            valuesArray[i] +
-            '</span>'
+          colors[i] +
+          ' ">' +
+          valuesArray[i] +
+          '</span>'
         );
       }
     }
@@ -195,12 +196,83 @@ export function RulesController(
   //listeners
   $scope.$on('wazuhShowRule', (event, parameters) => {
     $scope.currentRule = parameters.rule;
+    $scope.$emit('setCurrentRule', { currentRule: $scope.currentRule });
     if (!(Object.keys(($scope.currentRule || {}).details || {}) || []).length) {
       $scope.currentRule.details = false;
     }
     $scope.viewingDetail = true;
     if (!$scope.$$phase) $scope.$digest();
   });
+
+
+  $scope.editRulesConfig = async () => {
+    $scope.editingFile = true;
+    try {
+      //$scope.fetchedXML = await fetchFile();
+      $scope.fetchedXML = `
+      <!--
+      -  Imapd rules
+      -  Author: Daniel Cid.
+      -  Copyright (C) 2009 Trend Micro Inc.
+      -  Updated by Wazuh, Inc. <support@wazuh.com>.
+      -  This program is a free software; you can redistribute it and/or modify it under the terms of GPLv2.
+    -->
+    
+    <var name="IMAPD_FREQ">8</var>
+    
+    <group name="syslog,imapd,">
+      <rule id="3600" level="0" noalert="1">
+        <decoded_as>imapd</decoded_as>
+        <description>Grouping of the imapd rules.</description>
+      </rule>
+    
+      <rule id="3601" level="5">
+        <if_sid>3600</if_sid>
+        <match>Login failed user=|AUTHENTICATE LOGIN failure</match>
+        <description>Imapd user login failed.</description>
+        <group>authentication_failed,pci_dss_10.2.4,pci_dss_10.2.5,gpg13_7.1,gdpr_IV_35.7.d,gdpr_IV_32.2,</group>
+      </rule>
+    
+      <rule id="3602" level="3">
+        <if_sid>3600</if_sid>
+        <match>Authenticated user=</match>
+        <description>Imapd user login.</description>
+        <group>authentication_success,pci_dss_10.2.5,gpg13_7.1,gdpr_IV_32.2,</group>
+      </rule>
+    
+      <rule id="3603" level="0">
+        <if_sid>3600</if_sid>
+        <match>Logout user=</match>
+        <description>Imapd user logout.</description>
+        <group>pci_dss_10.2.5,gpg13_7.1,gdpr_IV_32.2,</group>
+      </rule>
+    
+      <rule id="3651" level="10" frequency="$IMAPD_FREQ" timeframe="120">
+        <if_matched_sid>3601</if_matched_sid>
+        <same_source_ip />
+        <description>Imapd Multiple failed logins from same source ip.</description>
+        <group>authentication_failures,pci_dss_10.2.4,pci_dss_10.2.5,pci_dss_11.4,gpg13_7.1,gdpr_IV_35.7.d,gdpr_IV_32.2,</group>
+      </rule>
+    
+    </group>`;
+      $scope.$broadcast('fetchedFile', { data: $scope.fetchedXML });
+    } catch (error) {
+      $scope.fetchedXML = null;
+      errorHandler.handle(error, 'Fetch file error');
+    }
+  }
+  $scope.closeEditingFile = () => {
+    $scope.editingFile = false;
+    $scope.$broadcast('closeEditXmlFile', {});
+  };
+  $scope.xmlIsValid = valid => {
+    $scope.xmlHasErrors = valid;
+    if (!$scope.$$phase) $scope.$digest();
+  };
+  $scope.doSaveRuleConfig = () => {
+    $scope.editingFile = false;
+    $scope.$broadcast('saveXmlFile', { rule: $scope.currentRule.id });
+  };
 
   /**
    * This function changes to the rules list view
@@ -213,6 +285,7 @@ export function RulesController(
       );
     $scope.viewingDetail = false;
     $scope.currentRule = false;
+    $scope.$emit('removeCurrentRule');
     if (!$scope.$$phase) $scope.$digest();
   };
 
@@ -223,6 +296,7 @@ export function RulesController(
       .request('get', `/rules/${incomingRule}`, {})
       .then(data => {
         $scope.currentRule = data.data.data.items[0];
+        $scope.$emit('setCurrentRule', { currentRule: $scope.currentRule });
         if (
           !(Object.keys(($scope.currentRule || {}).details || {}) || []).length
         ) {

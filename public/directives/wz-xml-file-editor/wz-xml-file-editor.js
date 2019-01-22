@@ -16,7 +16,7 @@ import { uiModules } from 'ui/modules';
 
 const app = uiModules.get('app/wazuh', []);
 
-app.directive('wzXmlFileEditor', function() {
+app.directive('wzXmlFileEditor', function () {
   return {
     restrict: 'E',
     scope: {
@@ -25,7 +25,7 @@ app.directive('wzXmlFileEditor', function() {
       data: '=data',
       targetName: '=targetName'
     },
-    controller($scope, $document, errorHandler, groupHandler) {
+    controller($scope, $document, errorHandler, groupHandler, rulesetHandler) {
       let firstTime = true;
       const checkXmlParseError = () => {
         try {
@@ -60,8 +60,16 @@ app.directive('wzXmlFileEditor', function() {
       const saveFile = async params => {
         try {
           const content = $scope.xmlCodeBox.getValue().trim();
-          await groupHandler.sendConfiguration(params.group, content);
-          errorHandler.info('Success. Group has been updated', '');
+          if (params.type === 'group') {
+            await groupHandler.sendConfiguration(params.group, content);
+            errorHandler.info('Success. Group has been updated', '');
+          } else if (params.type === 'rule') {
+            await rulesetHandler.sendRuleConfiguration(params.rule, content);
+            errorHandler.info('Success. Rules has been updated', '');
+          } else if (params.type === 'decoder') {
+            await rulesetHandler.sendDecoderConfiguration(params.decoder, content);
+            errorHandler.info('Success. Decoders has been updated', '');
+          }
         } catch (error) {
           errorHandler.handle(error, 'Send file error');
         }
@@ -85,7 +93,7 @@ app.directive('wzXmlFileEditor', function() {
         try {
           $scope.xmlCodeBox.setValue(data || $scope.data);
           firstTime = false;
-          $scope.xmlCodeBox.refresh();
+          setTimeout(() => { $scope.xmlCodeBox.refresh() }, 1);
           autoFormat();
         } catch (error) {
           errorHandler.handle(error, 'Fetching original file');

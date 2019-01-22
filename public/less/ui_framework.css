@@ -2829,7 +2829,7 @@
     line-height: 0;
     /* 1 */
     color: #ffffff;
-    background-color: #666;
+    background-color: #00445a;
     border: 0;
     border-radius: 0 4px 4px 0; }
     .kuiLocalSearchButton:focus {
@@ -2841,7 +2841,7 @@
       /* 3 */ }
     .theme-dark .kuiLocalSearchButton {
       color: #ffffff;
-      background-color: #777777; }
+      background-color: #524949; }
       .theme-dark .kuiLocalSearchButton:focus {
         z-index: 1;
         /* 1 */

@@ -34,6 +34,18 @@ export class ManagementController {
     this.$scope.$on('removeCurrentGroup', () => {
       this.currentGroup = false;
     });
+    this.$scope.$on('setCurrentRule', (ev, params) => {
+      this.currentRule = (params || {}).currentRule || false;
+    });
+    this.$scope.$on('removeCurrentRule', () => {
+      this.currentRule = false;
+    });
+    this.$scope.$on('setCurrentDecoder', (ev, params) => {
+      this.currentDecoder = (params || {}).currentDecoder || false;
+    });
+    this.$scope.$on('removeCurrentDecoder', () => {
+      this.currentDecoder = false;
+    });
   }
 
   /**

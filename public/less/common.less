@@ -114,6 +114,22 @@
     word-wrap: break-word;
 }
 
+.wz-content{
+    background-color: #F5F5F5;
+    border-top: 1px solid #d9d9d9;
+}
+.wz-content.content-no-border{
+    border: none!important;
+}
+
+.wz-content.min-106{
+    min-height: calc(~'100vh - 106px');
+}
+
+.wz-content.min-96{
+    min-height: calc(~'100vh - 96px');
+}
+
 /* CUstom styles for Configuration items list */
 
 .wz-item-list {
@@ -370,10 +386,22 @@ div.uil-ring-css {
 
 .wz-metric-color {
     background-color: rgb(228, 242, 245);
+    overflow: hidden;
+    margin: 3px 8px;
+    box-shadow: none!important;
+    border: 0!important;
+}
+
+.wz-content .wz-metric-color {
+    background-color: #d1e9f2!important;
 }
 
 .wz-background-transparent {
     background-color: transparent;
+}
+
+.md-subheader{
+    background: transparent!important;
 }
 
 /* Custom Kibana styles */
@@ -486,7 +514,7 @@ md-sidenav {
 
 /* Card and select input shadow overriding */
 
-.wz-md-card {
+.wz-md-card:not(.wz-metric-color) {
     box-shadow: 0 2px 2px -1px rgba(0, 0, 0, 0.1) !important;
     border: 1px solid #D9D9D9 !important;
     overflow: hidden;
@@ -635,6 +663,8 @@ md-sidenav {
 .wz-circle-back-button{
     border: 1px solid #d9d9d9!important;
     margin: 0px 15px 0px 0px!important;
+    background: white!important;
+    line-height: 18px!important;
 }
 
 .wz-circle-back-button:hover{
@@ -647,6 +677,10 @@ md-sidenav {
 
 .md-padding-h {
     padding: 0px 16px;
+}
+
+.md-margin-h {
+    margin: 0px 16px;
 }
 
 .cursor-wait {

@@ -52,6 +52,7 @@ export class DecodersController {
 
     this.$scope.$on('wazuhShowDecoder', (event, parameters) => {
       this.currentDecoder = parameters.decoder;
+      this.$scope.$emit('setCurrentDecoder', { currentDecoder: this.currentDecoder });
       this.viewingDetail = true;
       if (!this.$scope.$$phase) this.$scope.$digest();
     });
@@ -211,6 +212,7 @@ export class DecodersController {
       );
     this.viewingDetail = false;
     this.currentDecoder = false;
+    this.$scope.$emit('removeCurrentDecoder');
     if (!this.$scope.$$phase) this.$scope.$digest();
   }
 }
