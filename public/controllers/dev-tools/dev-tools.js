@@ -153,7 +153,7 @@ export class DevToolsController {
 
       let start = 0;
       let end = 0;
-
+      let starts = [];
       const slen = splitted.length;
       for (let i = 0; i < slen; i++) {
         let tmp = splitted[i].split('\n');
@@ -164,6 +164,26 @@ export class DevToolsController {
 
         if (cursor.findNext()) start = cursor.from().line;
         else return [];
+
+        /**
+         * Prevents from user frustation when there are duplicated queries.
+         * We want to look for the next query when available, even if it
+         * already exists but it's not the selected query.
+         */
+        if (tmp.length) {
+          // It's a safe loop since findNext method returns null if there is no next query.
+          while (
+            this.apiInputBox.getLine(cursor.from().line) !== tmp[0] &&
+            cursor.findNext()
+          ) {
+            start = cursor.from().line;
+          }
+          // It's a safe loop since findNext method returns null if there is no next query.
+          while (starts.includes(start) && cursor.findNext()) {
+            start = cursor.from().line;
+          }
+        }
+        starts.push(start);
 
         end = start + tmp.length;
 
@@ -203,7 +223,7 @@ export class DevToolsController {
           end
         });
       }
-
+      starts = [];
       return tmpgroups;
     } catch (error) {
       return [];
@@ -433,7 +453,6 @@ export class DevToolsController {
   calculateWhichGroup(firstTime) {
     try {
       const selection = this.apiInputBox.getCursor();
-
       const desiredGroup = firstTime
         ? this.groups.filter(item => item.requestText)
         : this.groups.filter(
