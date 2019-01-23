@@ -11,7 +11,6 @@
  */
 import js2xmlparser from 'js2xmlparser';
 import XMLBeautifier from './xml-beautifier';
-import beautifier from './json-beautifier';
 import { queryConfig } from '../services/query-config';
 import { objectWithoutProperties } from './remove-hash-key.js';
 
