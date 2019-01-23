@@ -26,11 +26,32 @@ app.directive('wzXmlFileEditor', function () {
       targetName: '=targetName'
     },
     controller($scope, $document, errorHandler, groupHandler, rulesetHandler) {
+      String.prototype.xmlReplace = function(str, newstr) {
+        return this.split(str).join(newstr);
+      };
+
       let firstTime = true;
+      const parser = new DOMParser(); // eslint-disable-line
+      const replaceIllegalXML = text => {
+        const oDOM = parser.parseFromString(text, 'text/html');
+        const lines = oDOM.documentElement.textContent.split('\n');
+        for (const line of lines) {
+          const sanitized = line
+            .trim()
+            .xmlReplace('&', '&amp;')
+            .xmlReplace('<', '&lt;')
+            .xmlReplace('>', '&gt;')
+            .xmlReplace('"', '&quot;')
+            .xmlReplace("'", '&apos;');
+          text = text.xmlReplace(line.trim(), sanitized);
+        }
+        return text;
+      };
+
       const checkXmlParseError = () => {
         try {
-          const parser = new DOMParser(); // eslint-disable-line
-          const xml = $scope.xmlCodeBox.getValue();
+          const text = $scope.xmlCodeBox.getValue();
+          const xml = replaceIllegalXML(text);
           const xmlDoc = parser.parseFromString(
             '<file>' + xml + '</file>',
             'text/xml'
