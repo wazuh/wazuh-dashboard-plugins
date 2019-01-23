@@ -46,6 +46,12 @@ export class ManagementController {
     this.$scope.$on('removeCurrentDecoder', () => {
       this.currentDecoder = false;
     });
+    this.$scope.$on('setCurrentList', (ev, params) => {
+      this.currentList = (params || {}).currentList || false;
+    });
+    this.$scope.$on('removeCurrentList', () => {
+      this.currentList = false;
+    });
   }
 
   /**

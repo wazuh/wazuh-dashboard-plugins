@@ -98,7 +98,7 @@ export class DataFactory {
       // Fetch next <limit> items
       const firstPage = await this.httpClient.request(
         'GET',
-        this.path,
+        this.path === '/cdblists' ? '/rules': this.path,
         parameters
       );
       this.items = this.items.filter(item => !!item);

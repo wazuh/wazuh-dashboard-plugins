@@ -1,0 +1,57 @@
+<div ng-if="!loading && !viewingDetail" layout="column">
+    <div id="content" layout="row" class="md-padding ">
+        <input flex placeholder="Filter rules..." ng-model="custom_search" type="text" class="kuiLocalSearchInput height-40 ng-empty ng-pristine ng-scope ng-touched ng-valid"
+            aria-invalid="false" wz-enter="search(custom_search)">
+        <button type="submit" aria-label="Search" class="kuiLocalSearchButton height-40" ng-click="search(custom_search)">
+            <span class="fa fa-search" aria-hidden="true"></span>
+        </button>
+    </div>
+
+    <md-chips class="wz-chips md-padding-h" readonly="true" ng-show="appliedFilters.length">
+        <md-chip class="wz-chip" ng-show="includesFilter('file')">
+            <span>File: {{getFilter('file')}}
+                <i class="fa fa-fw fa-times cursor-pointer" aria-hidden="true" ng-click="removeFilter('file')"></i>
+            </span>
+        </md-chip>
+        <md-chip class="wz-chip" ng-show="includesFilter('path')">
+            <span>Path: {{getFilter('path')}}
+                <i class="fa fa-fw fa-times cursor-pointer" aria-hidden="true" ng-click="removeFilter('path')"></i>
+            </span>
+        </md-chip>
+        <md-chip class="wz-chip" ng-show="includesFilter('level')">
+            <span>Level: {{getFilter('level')}}
+                <i class="fa fa-fw fa-times cursor-pointer" aria-hidden="true" ng-click="removeFilter('level')"></i>
+            </span>
+        </md-chip>
+        <md-chip class="wz-chip" ng-show="includesFilter('group')">
+            <span>Group: {{getFilter('group')}}
+                <i class="fa fa-fw fa-times cursor-pointer" aria-hidden="true" ng-click="removeFilter('group')"></i>
+            </span>
+        </md-chip>
+        <md-chip class="wz-chip" ng-show="includesFilter('pci')">
+            <span>PCI control: {{getFilter('pci')}}
+                <i class="fa fa-fw fa-times cursor-pointer" aria-hidden="true" ng-click="removeFilter('pci')"></i>
+            </span>
+        </md-chip>
+        <md-chip class="wz-chip" ng-show="includesFilter('gdpr')">
+            <span>GDPR: {{getFilter('gdpr')}}
+                <i class="fa fa-fw fa-times cursor-pointer" aria-hidden="true" ng-click="removeFilter('gdpr')"></i>
+            </span>
+        </md-chip>
+    </md-chips>
+
+    <div layout="row">
+        <md-card flex class="wz-md-card _md flex md-margin-h">
+            <md-card-content>
+                <wz-table implicit-filter="appliedFilters" flex path="'/cdblists'" keys="['id',{value:'file',size:2},{value:'description',size:2},{value:'groups',nosortable:true,size:2},{value:'pci',nosortable:true,size:2},{value:'gdpr',nosortable:true},'level']"
+                    allow-click="true" row-sizes="[15,13,11]">
+                </wz-table>
+            </md-card-content>
+        </md-card>
+    </div>
+
+    <div layout="row" class="wz-margin-top-10 md-padding-h">
+        <span flex></span>
+        <a class="small" id="btnDownload" ng-click="downloadCsv()">Formatted <i aria-hidden="true" class="fa fa-download"></i></a>
+    </div>
+</div>

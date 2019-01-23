@@ -6,8 +6,10 @@
             tooltip="Back" tooltip-placement="bottom" ng-click="dctrl.closeDetailView()"><i class="fa fa-fw fa-arrow-left"
                 aria-hidden="true"></i></md-button>
         <!-- Rule title -->
-        <h1 class="font-size-18">{{dctrl.currentDecoder.name}}</h1>
-
+        <div>
+            <h5 class="titleSectionIdentifier">Decoder</h5>
+            <h1 class="font-size-18">{{dctrl.currentDecoder.name}}</h1>
+        </div>
     </div>
     <!-- End back button, title and status indicator -->
 

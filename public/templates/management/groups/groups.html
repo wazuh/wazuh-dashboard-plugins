@@ -12,9 +12,9 @@
             <div layout="row">
                 <span class="font-size-18">
                     <i class="fa fa-fw fa-object-group" aria-hidden="true"></i> Groups</span>
-                <span ng-if='adminMode' class="font-size-18 wz-text-link" ng-click="switchAddingGroup()"><i class="fa fa-fw fa-plus-circle"></i></span>
+                <span ng-if='adminMode' class="font-size-18 wz-text-link" ng-click="switchAddingGroup()"> <i class="fa fa-fw fa-plus-circle"></i></span>
             </div>
-            <div layout="row" ng-if="addingGroup" ng-if='adminMode'>
+            <div layout="row" ng-if="addingGroup" ng-if='adminMode' class="wz-padding-bottom-0">
                 <input placeholder="Group name..." ng-model="groupToBeAdded" type="text" class="kuiLocalSearchInput addGroupInput ng-empty ng-pristine ng-scope ng-touched ng-valid"
                     aria-invalid="false">
                 <button type="submit" aria-label="Search" class="kuiLocalSearchButton addGroupBtn" ng-click="createGroup(groupToBeAdded)">

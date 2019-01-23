@@ -37,4 +37,17 @@ export class RulesetHandler {
       return Promise.reject(error);
     }
   }
+
+  async sendCdbList(list, content) {
+    try {
+      const result = await this.apiReq.request(
+        'POST',
+        `/manager/files`,
+        { content, path: `/etc/lists/${list}` }
+      );
+      return result;
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  }
 }
