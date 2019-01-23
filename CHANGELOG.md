@@ -14,6 +14,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 - Escape XML special characters ([#1159](https://github.com/wazuh/wazuh-kibana-app/pull/1159)).
 - Changed empty results message for Wazuh tables ([#1165](https://github.com/wazuh/wazuh-kibana-app/pull/1165)).
+- Allowing the same query multiple times on the Dev Tools ([#1174](https://github.com/wazuh/wazuh-kibana-app/pull/1174))
 
 ### Fixed
 
