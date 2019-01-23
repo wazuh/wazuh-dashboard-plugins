@@ -183,30 +183,9 @@ export function CdbListsController(
       });
   });
 
-  const toXml = (obj) => {
-    let xml = '';
-    for (let prop in obj) {
-      if (!obj.hasOwnProperty(prop)) {
-        continue;
-      }
-      if (obj[prop] == undefined) {
-        continue;
-      }
-      xml += "<" + prop + ">";
-      if (typeof obj[prop] == "object") {
-        xml += toXml(new Object(obj[prop]));
-      } else {
-        xml += obj[prop];
-      }
-      xml += "</" + prop + ">";
-    }
-    return xml;
-  }
-
   const saveList = () => {
     try {
-      const xml = toXml($scope.currentList.list);
-      rulesetHandler.sendCdbList('audit-key', xml);
+      rulesetHandler.sendCdbList('audit-key', $scope.currentList.list);
     } catch (err) {
       errorHandler.handle(err, 'Error updating list');
     }

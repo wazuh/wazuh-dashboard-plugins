@@ -17,8 +17,8 @@ export class RulesetHandler {
     try {
       const result = await this.apiReq.request(
         'POST',
-        `//${rule}/`,
-        { content, origin: 'xmleditor' }
+        `/manager/files`,
+        { content, path: "/etc/rules" }
       );
       return result;
     } catch (error) {
@@ -29,8 +29,8 @@ export class RulesetHandler {
     try {
       const result = await this.apiReq.request(
         'POST',
-        `//${decoder}/`,
-        { content, origin: 'xmleditor' }
+        `/manager/files`,
+        { content, path: "/etc/decoders" }
       );
       return result;
     } catch (error) {

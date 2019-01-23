@@ -60,13 +60,13 @@ app.directive('wzXmlFileEditor', function () {
       const saveFile = async params => {
         try {
           const content = $scope.xmlCodeBox.getValue().trim();
-          if (params.type === 'group') {
+          if (params.group) {
             await groupHandler.sendConfiguration(params.group, content);
             errorHandler.info('Success. Group has been updated', '');
-          } else if (params.type === 'rule') {
+          } else if (params.rule) {
             await rulesetHandler.sendRuleConfiguration(params.rule, content);
             errorHandler.info('Success. Rules has been updated', '');
-          } else if (params.type === 'decoder') {
+          } else if (params.decoder) {
             await rulesetHandler.sendDecoderConfiguration(params.decoder, content);
             errorHandler.info('Success. Decoders has been updated', '');
           }
