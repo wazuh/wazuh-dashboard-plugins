@@ -173,6 +173,25 @@
                 </md-button>
             </md-card-actions>
         </md-card>
+
+        <md-card flex="45" layout="column" class="wz-md-card">
+            <md-card-content flex="auto" layout="column">
+                <span class="wz-headline-title"><i class="fa fa-fw fa-share-alt" aria-hidden="true"></i> {{ ctrl.tabNames['owlh'] }}</span>
+                <md-divider class="wz-margin-top-10"></md-divider>
+                <div layout="column">
+                    <p class="md-body-1 wz-padding-top-10">Get visibility for your network security and behavior by integrating Network IDS solutions like Suricata and Zeek (bro IDS). This integration will help to analyze real-time traffic in on-premises, virtual or cloud environments.</p>
+                </div>
+                <span flex></span>
+                <div layout="row" class="wz-padding-top-10">
+                    <md-switch class="wz-switch" aria-label="OwlH extension switch" ng-model="ctrl.extensions.owlh" ng-change="ctrl.toggleExtension('owlh',ctrl.extensions.owlh)"></md-switch>
+                </div>
+            </md-card-content>
+            <md-card-actions layout="row" layout-align="end center" class="wz-card-actions">
+                <md-button target="_blank" href="http://www.owlh.net" class="wz-text-link cursor-pointer small" aria-label="Open OwlH integration documentation">
+                    <i class="fa fa-fw fa-info" aria-hidden="true"></i> More info
+                </md-button>
+            </md-card-actions>
+        </md-card>
     </div>
     <!-- End section cards -->
 
