@@ -8,21 +8,51 @@
             <span ng-if="!isSynchronized" class="wz-agent-status-indicator small red">NOT SYNCHRONIZED</span>
         </div>
         <span class="font-size-18" ng-show="!agent || agent.id === '000'">
-                <i class="fa fa-fw fa-cog" aria-hidden="true"></i> Configuration</span>
-                <div ng-show="selectedNode" layout="column" layout-align="center" class="height-40 wz-select-input">
-                    <select class="kuiSelect wz-border-none cursor-pointer max-height-35" id="categoryBox" ng-model="selectedNode"
-                        ng-change="changeNode(selectedNode)" aria-label="Select node">
-                        <option ng-repeat="node in nodes" value="{{node.name}}">{{node.name}}</option>
-                    </select>
-                </div>
+            <i class="fa fa-fw fa-cog" aria-hidden="true"></i> Configuration
+        </span>
+                
+        <div ng-show="selectedNode" layout="row" layout-padding style="position: absolute;right: calc(0% + 228px);margin-top: -10px;">
+            <div layout="column" layout-align="center" class="height-40 wz-select-input">
+                <select class="kuiSelect wz-border-none cursor-pointer max-height-35" id="categoryBox" ng-model="selectedNode"
+                    ng-change="changeNode(selectedNode)" aria-label="Select node">
+                    <option ng-repeat="node in nodes" value="{{node.name}}">{{node.name}} ({{node.type}})</option>
+                </select>
+            </div>
+            <div layout="column" layout-align="center" class="wz-padding-top-0 wz-margin-right-15">
+                <button type='button' class='height-40 btn btn-primary'
+                ng-click='editConf()'>Edit {{selectedNode}} configuration
+                </button>
+            </div>
+        </div>
     </div>
     <!-- End headline -->
+
+
+    
+     
 
     <!-- Configuration section cards and right sidenav -->
     <div flex="auto" layout="row">
 
+        <!-- XML editor for node configuration -->
+     <div flex layout="column" ng-show="editingFile">
+            <div layout="row" class="md-padding">
+                <span ng-click='closeEditingFile()' class='btn btn-info'>Cancel</span>
+                <button ng-disabled='xmlHasErrors' ng-click='saveConfiguration()' class='btn btn-primary pull-right wz-margin-left-8'>
+                    <span ng-show='!xmlHasErrors'><i aria-hidden='true' class='fa fa-fw fa-save'></i>Save file</span>
+                    <span ng-show='xmlHasErrors' class='btn-danger'><i aria-hidden='true' class='fa fa-fw fa-exclamation-triangle'></i>
+                        XML format error</span>
+                </button>
+            </div>
+            <div class="md-padding md-padding-top-10" ng-if="fetchedXML">
+                <wz-xml-file-editor file-name='ossec.conf' data="fetchedXML" target-name="selectedNode"
+                    valid-fn='xmlIsValid(valid)'>
+                </wz-xml-file-editor>
+            </div>
+        </div>
+
         <!-- This section has the configuration cards -->
-        <div flex layout="column">
+        <div ng-if="!editingFile" flex layout="column">
 
             <!-- Main configurations card -->
             <md-card class="wz-md-card">

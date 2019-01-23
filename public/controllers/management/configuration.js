@@ -34,12 +34,18 @@ export class ConfigurationController {
     this.$scope.configurationSubTab = '';
     this.$scope.integrations = {};
     this.$scope.selectedItem = 0;
+    this.$scope.selectedNode = false;
+    this.$scope.nodes = [];
+    this.$scope.editingFile = false;
+    this.$scope.fetchedXML = false;
   }
 
   /**
    * When controller loads
    */
   $onInit() {
+
+    this.init();
     this.$scope.getXML = () => this.configurationHandler.getXML(this.$scope);
     this.$scope.getJSON = () => this.configurationHandler.getJSON(this.$scope);
     this.$scope.isString = item => typeof item === 'string';
@@ -72,6 +78,44 @@ export class ConfigurationController {
         this.$scope
       );
     };
+
+
+    const fetchFile = async () => {
+      try {
+        const data = await this.apiReq.request(
+          'GET',
+          `/cluster/${this.$scope.selectedNode}/configuration`,
+          {}
+        );
+        const json = ((data || {}).data || {}).data || false;
+        const xml = this.configurationHandler.json2xml(json);
+        if (!xml) {
+          throw new Error('Could not fetch configuration file');
+        }
+        return xml;
+      } catch (error) {
+        return Promise.reject(error);
+      }
+    };
+
+    this.$scope.closeEditingFile = () => {
+      this.$scope.editingFile = false;
+    }
+
+    this.$scope.editConf = async () => {
+      this.$scope.editingFile = true;
+      try {
+        this.$scope.fetchedXML = await fetchFile();
+        //this.$scope.fetchedXML = 'hola';
+        this.$scope.$broadcast('fetchedFile', { data: this.$scope.fetchedXML });
+      } catch (error) {
+        this.$scope.fetchedXML = null;
+        this.errorHandler.handle(error, 'Fetch file error');
+      }
+      if (!this.$scope.$$phase) this.$scope.$digest();
+    };
+
+
 
     /**
      * Navigate to woodle
@@ -137,7 +181,6 @@ export class ConfigurationController {
       this.appState.removeSessionStorageItem('configSubTab')
     );
 
-    this.init();
   }
 
   async init() {
@@ -153,16 +196,11 @@ export class ConfigurationController {
         const masterNode = nodes.data.data.items.filter(
           item => item.type === 'master'
         )[0];
-        const daemons = await this.apiReq.request(
-          'GET',
-          `/cluster/${masterNode.name}/status`,
-          {}
-        );
-        this.daemons = daemons.data.data;
         this.$scope.selectedNode = masterNode.name;
       }
     } catch (error) {
       this.errorHandler.handle(error, 'Error getting cluster status');
     }
+    if (!this.$scope.$$phase) this.$scope.$digest();
   }
 }
