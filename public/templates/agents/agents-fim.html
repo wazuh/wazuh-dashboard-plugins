@@ -1,7 +1,9 @@
 <md-content flex layout="column" ng-if="tab === 'fim' && tabView === 'panels'" ng-show="!showSyscheckFiles" ng-class="{'no-opacity': resultState !== 'ready' || !rendered}" layout-align="start">
     <div layout="row" layout-padding class="wz-padding-top-0">
         <span flex></span>
-        <span ng-click="switchSyscheckFiles()" class="btn pull-right btn-primary">Show files</span>
+        <span ng-click="launchSyscheckScan()" class="btn pull-right btn-primary"><i class="fa fa-fw fa-play"></i> Run scan</span>
+        <span></span>
+        <span ng-click="switchSyscheckFiles()" class="btn pull-right btn-primary"><i class="fa fa-fw fa-file-o"></i> Show files</span>
     </div>
     <!-- View: Panels -->
     <div layout="row" class="height-230">
@@ -72,7 +74,9 @@
 <md-content flex layout="column" ng-if="tab === 'fim' && tabView === 'panels' && showSyscheckFiles" layout-align="start">
     <div layout="row" layout-padding class="wz-padding-top-0">
         <span flex></span>
-        <span ng-click="switchSyscheckFiles()" class="btn pull-right btn-primary">Show alerts</span>
+        <span ng-click="launchSyscheckScan()" class="btn pull-right btn-primary"><i class="fa fa-fw fa-play"></i> Run scan</span>
+        <span></span>
+        <span ng-click="switchSyscheckFiles()" class="btn pull-right btn-primary"><i class="fa fa-fw fa-area-chart"></i> Show alerts</span>
     </div>
 
     <div layout="row" class="wz-margin-top-10 wz-margin-right-8 wz-margin-left-8" ng-if="showSyscheckFiles && (!agent || !agent.os)">
@@ -97,7 +101,7 @@
                     </button>
                 </div>
                 <div layout="row" ng-if="agent && !load" class="wz-margin-top-10 wz-margin-bottom-40-inv">
-                    <wz-table flex path="'/syscheck/' + agent.id" implicit-filter="[{name:'type',value:'registry'}]" row-sizes="[6,6,6]" extra-limit="true" keys="['file','sha1','md5']">
+                    <wz-table flex path="'/syscheck/' + agent.id" implicit-filter="[{name:'type',value:'registry'}]" row-sizes="[6,6,6]" extra-limit="100" keys="['file','sha1','md5']">
                     </wz-table>
                 </div>
                 <div layout="row" layout-padding>
@@ -121,7 +125,7 @@
                     </button>
                 </div>
                 <div layout="row" ng-if="agent && !load" class="wz-margin-top-10 wz-margin-bottom-40-inv">
-                    <wz-table flex path="'/syscheck/' + agent.id" implicit-filter="[{name:'type',value:'file'}]" row-sizes="[6,6,6]" extra-limit="true" keys="['file','size','uname','perm','sha1','sha256','uid','mtime','md5']">
+                    <wz-table flex path="'/syscheck/' + agent.id" implicit-filter="[{name:'type',value:'file'}]" row-sizes="[6,6,6]" extra-limit="100" keys="['file','size','uname','perm','sha1','sha256','uid','mtime','md5']">
                     </wz-table>
                 </div>
                 <div layout="row" layout-padding>
@@ -145,7 +149,7 @@
                     </button>
                 </div>
                 <div layout="row" ng-if="agent && !load" class="wz-margin-top-10 wz-margin-bottom-40-inv">
-                    <wz-table flex path="'/syscheck/' + agent.id" row-sizes="[12,10,8]" extra-limit="true" keys="['file','size','inode','gname','uname','perm','sha1','sha256','uid','gid','mtime','md5']">
+                    <wz-table flex path="'/syscheck/' + agent.id" row-sizes="[12,10,8]" extra-limit="100" keys="['file','size','inode','gname','uname','perm','sha1','sha256','uid','gid','mtime','md5']">
                     </wz-table>
                 </div>
                 <div layout="row" layout-padding>
