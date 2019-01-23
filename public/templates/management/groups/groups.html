@@ -122,7 +122,7 @@
 
                 <!-- Groups table -->
                 <div layout="row" ng-if="!lookingGroup" class="md-padding">
-                    <wz-table flex extra-limit="true" path="'/agents/groups'" keys="['name','count','mergedSum']"
+                    <wz-table flex extra-limit="100" path="'/agents/groups'" keys="['name','count','mergedSum']"
                         allow-click="true" row-sizes="[14,12,10]">
                     </wz-table>
                 </div>
@@ -157,7 +157,7 @@
                     <!-- Group files table -->
                     <div layout="row" ng-if="lookingGroup && groupsSelectedTab==='files' && !fileViewer && currentGroup"
                         class="md-padding">
-                        <wz-table extra-limit="true" flex path="'/agents/groups/' + currentGroup.name + '/files'" keys="[{value:'filename',size:2},{value:'hash',size:6}]"
+                        <wz-table extra-limit="100" flex path="'/agents/groups/' + currentGroup.name + '/files'" keys="[{value:'filename',size:2},{value:'hash',size:6}]"
                             allow-click="true" row-sizes="[10,8,6,4]">
                         </wz-table>
                     </div>

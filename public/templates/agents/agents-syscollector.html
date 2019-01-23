@@ -55,14 +55,14 @@
                         ng-if="agent && agent.os && agent.os.platform !== 'windows'"
                         path="'/syscollector/' + agent.id + '/packages'" 
                         row-sizes="[10,8,6]" 
-                        extra-limit="true" 
+                        extra-limit="100" 
                         keys="[{value:'name',size:2},'architecture','version',{value:'vendor',size:2},{value:'description',size:3}]"
                     />
                     <wz-table flex 
                         ng-if="agent && agent.os && agent.os.platform === 'windows'"
                         path="'/syscollector/' + agent.id + '/packages'" 
                         row-sizes="[10,8,6]" 
-                        extra-limit="true" 
+                        extra-limit="100" 
                         keys="[{value:'name',size:3},'architecture','version',{value:'vendor',size:2}]"
                     />
                 </div>
@@ -88,14 +88,14 @@
                         ng-if="agent && agent.os && agent.os.platform === 'windows'"
                         path="'/syscollector/' + agent.id + '/processes'" 
                         row-sizes="[10,8,6]" 
-                        extra-limit="true" 
+                        extra-limit="100" 
                         keys="['name','cmd','priority','nlwp']"
                         />
                     <wz-table flex 
                         ng-if="agent && agent.os && agent.os.platform !== 'windows'"
                         path="'/syscollector/' + agent.id + '/processes'" 
                         row-sizes="[10,8,6]" 
-                        extra-limit="true" 
+                        extra-limit="100" 
                         keys="['name','euser','nice','state']"
                         />
                 </div>
