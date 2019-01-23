@@ -164,19 +164,22 @@ export class DevToolsController {
 
         if (cursor.findNext()) start = cursor.from().line;
         else return [];
-        
+
         /**
          * Prevents from user frustation when there are duplicated queries.
-         * We want to look for the next query when available, even if it 
+         * We want to look for the next query when available, even if it
          * already exists but it's not the selected query.
          */
-        if(tmp.length) {
+        if (tmp.length) {
           // It's a safe loop since findNext method returns null if there is no next query.
-          while (this.apiInputBox.getLine(cursor.from().line) !== tmp[0] && cursor.findNext()) {
+          while (
+            this.apiInputBox.getLine(cursor.from().line) !== tmp[0] &&
+            cursor.findNext()
+          ) {
             start = cursor.from().line;
           }
           // It's a safe loop since findNext method returns null if there is no next query.
-          while(starts.includes(start) && cursor.findNext()) {
+          while (starts.includes(start) && cursor.findNext()) {
             start = cursor.from().line;
           }
         }
@@ -450,16 +453,14 @@ export class DevToolsController {
   calculateWhichGroup(firstTime) {
     try {
       const selection = this.apiInputBox.getCursor();
-      console.log('SELECTION',selection)
       const desiredGroup = firstTime
         ? this.groups.filter(item => item.requestText)
         : this.groups.filter(
-            item => item.requestText &&
-              (item.end >= selection.line && item.start <= selection.line)            
+            item =>
+              item.requestText &&
+              (item.end >= selection.line && item.start <= selection.line)
           );
 
-      console.log('THIS GROUPS',this.groups)
-      console.log('DESIRED GROUP',desiredGroup)
       // Place play button at first line from the selected group
       const cords = this.apiInputBox.cursorCoords({
         line: desiredGroup[0].start,
