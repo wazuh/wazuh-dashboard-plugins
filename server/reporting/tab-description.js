@@ -79,5 +79,9 @@ export const TabDescription = {
     title: 'Osquery',
     description:
       'Osquery can be used to expose an operating system as a high-performance relational database.'
+  },
+  owlh: {
+    title: 'OwlH',
+    description: 'Get visibility for your network security and behavior by integrating Network IDS solutions like Suricata and Zeek (bro IDS).'
   }
 };
