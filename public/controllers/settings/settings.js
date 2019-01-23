@@ -359,6 +359,7 @@ export class SettingsController {
       tmpData.extensions.aws = config['extensions.aws'];
       tmpData.extensions.virustotal = config['extensions.virustotal'];
       tmpData.extensions.osquery = config['extensions.osquery'];
+      tmpData.extensions.owlh = config['extensions.owlh'];
 
       const checkData = await this.testAPI.check(tmpData);
 
@@ -670,6 +671,7 @@ export class SettingsController {
         this.extensions.aws = config['extensions.aws'];
         this.extensions.virustotal = config['extensions.virustotal'];
         this.extensions.osquery = config['extensions.osquery'];
+        this.extensions.owlh = config['extensions.owlh'];
       } else {
         this.extensions = this.appState.getExtensions(
           JSON.parse(this.appState.getCurrentAPI()).id

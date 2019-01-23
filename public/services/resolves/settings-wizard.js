@@ -123,7 +123,8 @@ export function settingsWizard(
           ciscat: config['extensions.ciscat'],
           aws: config['extensions.aws'],
           virustotal: config['extensions.virustotal'],
-          osquery: config['extensions.osquery']
+          osquery: config['extensions.osquery'],
+          owlh: config['extensions.owlh']
         };
         appState.setExtensions(currentApi, extensions);
       }

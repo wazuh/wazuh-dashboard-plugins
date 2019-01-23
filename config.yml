@@ -45,6 +45,7 @@
 #extensions.aws       : false
 #extensions.virustotal: false
 #extensions.osquery   : false
+#extensions.owlh      : false
 #
 # ---------------------------------- Time out ----------------------------------
 #

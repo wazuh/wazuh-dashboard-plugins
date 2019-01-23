@@ -79,7 +79,7 @@
 
     <!-- Security navigation bar -->
     <md-nav-bar
-        ng-if="octrl.inArray(octrl.tab, octrl.securityTabs) && (octrl.extensions.virustotal || octrl.extensions.osquery)"
+        ng-if="octrl.inArray(octrl.tab, octrl.securityTabs) && (octrl.extensions.virustotal || octrl.extensions.osquery || octrl.extensions.owlh)"
         class="wz-nav-bar"
         ng-show="octrl.tab !== 'welcome'"
         md-selected-nav-item="octrl.tab"
@@ -87,6 +87,7 @@
         <md-nav-item class="wz-nav-item" md-nav-click="octrl.switchTab('vuls',true)" name="vuls">{{ octrl.tabNames['vuls'] }}</md-nav-item>
         <md-nav-item ng-show="octrl.extensions.virustotal" class="wz-nav-item" md-nav-click="octrl.switchTab('virustotal',true)" name="virustotal">{{ octrl.tabNames['virustotal'] }}</md-nav-item>
         <md-nav-item ng-show="octrl.extensions.osquery" class="wz-nav-item" md-nav-click="octrl.switchTab('osquery',true)" name="osquery">{{ octrl.tabNames['osquery'] }}</md-nav-item>
+        <md-nav-item ng-show="octrl.extensions.owlh" class="wz-nav-item" md-nav-click="octrl.switchTab('owlh',true)" name="owlh">{{ octrl.tabNames['owlh'] }}</md-nav-item>
     </md-nav-bar>
     <!-- End Security navigation bar -->
 
