@@ -5671,7 +5671,7 @@ export const knownFields = [
     count: 0,
     scripted: false,
     searchable: true,
-    aggregatable: true,
+    aggregatable: true
   },
   {
     name: 'data.alert.rev',
@@ -5679,7 +5679,7 @@ export const knownFields = [
     count: 0,
     scripted: false,
     searchable: true,
-    aggregatable: true,
+    aggregatable: true
   },
   {
     name: 'data.dest_ip',
@@ -5687,7 +5687,7 @@ export const knownFields = [
     count: 0,
     scripted: false,
     searchable: true,
-    aggregatable: true,
+    aggregatable: true
   },
   {
     name: 'data.dest_port',
@@ -5695,7 +5695,7 @@ export const knownFields = [
     count: 0,
     scripted: false,
     searchable: true,
-    aggregatable: true,
+    aggregatable: true
   },
   {
     name: 'data.event_type',
@@ -5703,7 +5703,7 @@ export const knownFields = [
     count: 0,
     scripted: false,
     searchable: true,
-    aggregatable: true,
+    aggregatable: true
   },
   {
     name: 'data.flow_id',
@@ -5711,7 +5711,7 @@ export const knownFields = [
     count: 0,
     scripted: false,
     searchable: true,
-    aggregatable: true,
+    aggregatable: true
   },
   {
     name: 'data.in_iface',
@@ -5719,7 +5719,7 @@ export const knownFields = [
     count: 0,
     scripted: false,
     searchable: true,
-    aggregatable: true,
+    aggregatable: true
   },
   {
     name: 'data.packet',
@@ -5727,7 +5727,7 @@ export const knownFields = [
     count: 0,
     scripted: false,
     searchable: true,
-    aggregatable: true,
+    aggregatable: true
   },
   {
     name: 'data.packet_info.linktype',
@@ -5735,7 +5735,7 @@ export const knownFields = [
     count: 0,
     scripted: false,
     searchable: true,
-    aggregatable: true,
+    aggregatable: true
   },
   {
     name: 'data.proto',
@@ -5743,7 +5743,7 @@ export const knownFields = [
     count: 0,
     scripted: false,
     searchable: true,
-    aggregatable: true,
+    aggregatable: true
   },
   {
     name: 'data.src_ip',
@@ -5751,7 +5751,7 @@ export const knownFields = [
     count: 0,
     scripted: false,
     searchable: true,
-    aggregatable: true,
+    aggregatable: true
   },
   {
     name: 'data.src_port',
@@ -5759,7 +5759,7 @@ export const knownFields = [
     count: 0,
     scripted: false,
     searchable: true,
-    aggregatable: true,
+    aggregatable: true
   },
   {
     name: 'data.stream',
@@ -5767,7 +5767,7 @@ export const knownFields = [
     count: 0,
     scripted: false,
     searchable: true,
-    aggregatable: true,
+    aggregatable: true
   },
   {
     name: 'data.timestamp',
@@ -5775,7 +5775,7 @@ export const knownFields = [
     count: 0,
     scripted: false,
     searchable: true,
-    aggregatable: true,
+    aggregatable: true
   },
   {
     name: 'data.vlan',
@@ -5783,6 +5783,6 @@ export const knownFields = [
     count: 0,
     scripted: false,
     searchable: true,
-    aggregatable: true,
-  },
+    aggregatable: true
+  }
 ];

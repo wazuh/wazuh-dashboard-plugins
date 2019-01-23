@@ -82,6 +82,7 @@ export const TabDescription = {
   },
   owlh: {
     title: 'OwlH',
-    description: 'Get visibility for your network security and behavior by integrating Network IDS solutions like Suricata and Zeek (bro IDS).'
+    description:
+      'Get visibility for your network security and behavior by integrating Network IDS solutions like Suricata and Zeek (bro IDS).'
   }
 };
