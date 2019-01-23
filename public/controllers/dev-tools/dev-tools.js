@@ -35,7 +35,6 @@ export class DevToolsController {
     errorHandler,
     $document
   ) {
-    this.$scope = $scope;
     this.apiReq = apiReq;
     this.genericReq = genericReq;
     this.$window = $window;
@@ -126,18 +125,17 @@ export class DevToolsController {
       }
     );
 
-    this.$scope.send = firstTime => this.send(firstTime);
-
-    this.$scope.help = () => {
-      this.$window.open(
-        'https://documentation.wazuh.com/current/user-manual/api/reference.html'
-      );
-    };
-
     this.init();
-    this.$scope.send(true);
+    this.send(true);
+  }
 
-    this.$scope.exportOutput = () => this.exportOutput();
+  /**
+   * Open API reference documentation
+   */
+  help() {
+    this.$window.open(
+      'https://documentation.wazuh.com/current/user-manual/api/reference.html'
+    );
   }
 
   /**
@@ -564,7 +562,7 @@ export class DevToolsController {
       // eslint-disable-next-line
       const blob = new Blob([this.apiOutputBox.getValue()], {
         type: 'application/json'
-      }); 
+      });
       FileSaver.saveAs(blob, 'export.json');
     } catch (error) {
       this.errorHandler.handle(error, 'Export JSON');
