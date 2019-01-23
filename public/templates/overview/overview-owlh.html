@@ -1,0 +1,69 @@
+<md-content flex layout="column" ng-if="octrl.tab === 'owlh' && octrl.tabView === 'panels'" ng-class="{'no-opacity': resultState !== 'ready' || !rendered}" layout-align="start">
+    <div layout="row" layout-align="center stretch" class="height-270">
+        <md-card flex="33" class="wz-md-card">
+            <md-card-content class="wazuh-column">
+                <span class="wz-headline-title">Alerts severity</span>
+                <md-divider class="wz-margin-top-10"></md-divider>
+                <kbn-vis id="Wazuh-App-Overview-Owlh-Alerts-severity" vis-id="'Wazuh-App-Overview-Owlh-Alerts-severity'"></kbn-vis>
+            </md-card-content>
+        </md-card>
+        <md-card flex class="wz-md-card">
+            <md-card-content class="wazuh-column">
+                <span class="wz-headline-title">Alerts over time</span>
+                <md-divider class="wz-margin-top-10"></md-divider>
+                <kbn-vis id="Wazuh-App-Overview-Owlh-Alerts-over-time" vis-id="'Wazuh-App-Overview-Owlh-Alerts-over-time'"></kbn-vis>
+            </md-card-content>
+        </md-card>
+    </div>
+
+    <div layout="row" layout-align="center stretch" class="height-270">
+        <md-card flex="33" class="wz-md-card">
+            <md-card-content class="wazuh-column">
+                <span class="wz-headline-title">Alerts by signature ID</span>
+                <md-divider class="wz-margin-top-10"></md-divider>
+                <kbn-vis id="Wazuh-App-Overview-Owlh-Top-signature-ID" vis-id="'Wazuh-App-Overview-Owlh-Top-signature-ID'"></kbn-vis>
+            </md-card-content>
+        </md-card>
+        <md-card flex class="wz-md-card">
+            <md-card-content class="wazuh-column">
+                <span class="wz-headline-title">Top destination IP</span>
+                <md-divider class="wz-margin-top-10"></md-divider>
+                <kbn-vis id="Wazuh-App-Overview-Owlh-Alert-destination-IP" vis-id="'Wazuh-App-Overview-Owlh-Alert-destination-IP'"></kbn-vis>
+            </md-card-content>
+        </md-card>
+        <md-card flex class="wz-md-card">
+            <md-card-content class="wazuh-column">
+                <span class="wz-headline-title">Top source IP</span>
+                <md-divider class="wz-margin-top-10"></md-divider>
+                <kbn-vis id="Wazuh-App-Overview-Owlh-Alert-source-IP" vis-id="'Wazuh-App-Overview-Owlh-Alert-source-IP'"></kbn-vis>
+            </md-card-content>
+        </md-card>
+    </div>
+
+    <div layout="row" layout-align="center stretch" class="height-300">
+        <md-card flex class="wz-md-card">
+            <md-card-content class="wazuh-column">
+                <span class="wz-headline-title">Alerts summary</span>
+                <md-divider class="wz-margin-top-10"></md-divider>
+                <kbn-vis id="Wazuh-App-Overview-Owlh-Alerts-summary" vis-id="'Wazuh-App-Overview-Owlh-Alerts-summary'"></kbn-vis>
+            </md-card-content>
+        </md-card>
+    </div>
+
+    <div layout="row" layout-align="center stretch" class="height-300">
+        <md-card flex class="wz-md-card">
+            <md-card-content class="wazuh-column">
+                <span class="wz-headline-title">Alert categories</span>
+                <md-divider class="wz-margin-top-10"></md-divider>
+                <kbn-vis id="Wazuh-App-Overview-Owlh-Alert-categories" vis-id="'Wazuh-App-Overview-Owlh-Alert-categories'"></kbn-vis>
+            </md-card-content>
+        </md-card>
+        <md-card flex class="wz-md-card">
+                <md-card-content class="wazuh-column">
+                    <span class="wz-headline-title">NIDS node</span>
+                    <md-divider class="wz-margin-top-10"></md-divider>
+                    <kbn-vis id="Wazuh-App-Overview-Owlh-NIDS-node" vis-id="'Wazuh-App-Overview-Owlh-NIDS-node'"></kbn-vis>
+                </md-card-content>
+            </md-card>
+    </div>
+</md-content>
