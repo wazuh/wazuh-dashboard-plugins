@@ -90,8 +90,9 @@ export class AgentsController {
     this.ignoredTabs = ['syscollector', 'welcome', 'configuration'];
 
     this.$scope.showSyscheckFiles = false;
-    this.$scope.editGroup = false;
+    this.$scope.showRootcheckScan = false;
 
+    this.$scope.editGroup = false;
     this.$scope.addingGroupToAgent = false;
   }
 
@@ -182,6 +183,12 @@ export class AgentsController {
 
     this.$scope.searchSyscheckFile = (term, specificFilter) =>
       this.$scope.$broadcast('wazuhSearch', { term, specificFilter });
+
+    this.$scope.searchRootcheck = (term, specificFilter) =>
+      this.$scope.$broadcast('wazuhSearch', { term, specificFilter });  
+
+    this.$scope.launchRootcheckScan = () => this.launchRootcheckScan();
+    this.$scope.launchSyscheckScan = () => this.launchSyscheckScan();
 
     this.$scope.startVis2Png = () => this.startVis2Png();
 
@@ -302,6 +309,16 @@ export class AgentsController {
     this.$scope.switchSyscheckFiles = () => {
       this.$scope.showSyscheckFiles = !this.$scope.showSyscheckFiles;
       if (!this.$scope.showSyscheckFiles) {
+        this.$rootScope.$emit('changeTabView', {
+          tabView: this.$scope.tabView
+        });
+      }
+      if (!this.$scope.$$phase) this.$scope.$digest();
+    };
+
+    this.$scope.switchRootcheckScan = () => {
+      this.$scope.showRootcheckScan = !this.$scope.showRootcheckScan;
+      if (!this.$scope.showRootcheckScan) {
         this.$rootScope.$emit('changeTabView', {
           tabView: this.$scope.tabView
         });
@@ -470,6 +487,7 @@ export class AgentsController {
 
     try {
       this.$scope.showSyscheckFiles = false;
+      this.$scope.showRootcheckScan = false;
       if (tab === 'pci') {
         const pciTabs = await this.commonData.getPCI();
         this.$scope.pciTabs = pciTabs;
@@ -806,5 +824,25 @@ export class AgentsController {
       (this.$scope.agent || {}).id || true,
       syscollectorFilters.length ? syscollectorFilters : null
     );
+  }
+
+  async launchRootcheckScan() {
+    try {
+      await this.apiReq.request('PUT', `/rootcheck/${this.$scope.agent.id}`, {});
+      this.errorHandler.info(`Policy monitoring scan launched successfully on agent ${this.$scope.agent.id}`, '');
+    } catch (error) {
+      this.errorHandler.handle(error, '');
+    }
+    return;
+  }
+
+  async launchSyscheckScan() {
+    try {
+      await this.apiReq.request('PUT', `/syscheck/${this.$scope.agent.id}`, {});
+      this.errorHandler.info(`FIM scan launched successfully on agent ${this.$scope.agent.id}`, '');
+    } catch (error) {
+      this.errorHandler.handle(error, '');
+    }
+    return;
   }
 }
