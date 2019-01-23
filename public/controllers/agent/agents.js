@@ -185,7 +185,7 @@ export class AgentsController {
       this.$scope.$broadcast('wazuhSearch', { term, specificFilter });
 
     this.$scope.searchRootcheck = (term, specificFilter) =>
-      this.$scope.$broadcast('wazuhSearch', { term, specificFilter });  
+      this.$scope.$broadcast('wazuhSearch', { term, specificFilter });
 
     this.$scope.launchRootcheckScan = () => this.launchRootcheckScan();
     this.$scope.launchSyscheckScan = () => this.launchSyscheckScan();
@@ -828,8 +828,17 @@ export class AgentsController {
 
   async launchRootcheckScan() {
     try {
-      await this.apiReq.request('PUT', `/rootcheck/${this.$scope.agent.id}`, {});
-      this.errorHandler.info(`Policy monitoring scan launched successfully on agent ${this.$scope.agent.id}`, '');
+      await this.apiReq.request(
+        'PUT',
+        `/rootcheck/${this.$scope.agent.id}`,
+        {}
+      );
+      this.errorHandler.info(
+        `Policy monitoring scan launched successfully on agent ${
+          this.$scope.agent.id
+        }`,
+        ''
+      );
     } catch (error) {
       this.errorHandler.handle(error, '');
     }
@@ -839,7 +848,10 @@ export class AgentsController {
   async launchSyscheckScan() {
     try {
       await this.apiReq.request('PUT', `/syscheck/${this.$scope.agent.id}`, {});
-      this.errorHandler.info(`FIM scan launched successfully on agent ${this.$scope.agent.id}`, '');
+      this.errorHandler.info(
+        `FIM scan launched successfully on agent ${this.$scope.agent.id}`,
+        ''
+      );
     } catch (error) {
       this.errorHandler.handle(error, '');
     }

@@ -564,7 +564,7 @@ export class DevToolsController {
       // eslint-disable-next-line
       const blob = new Blob([this.apiOutputBox.getValue()], {
         type: 'application/json'
-      }); 
+      });
       FileSaver.saveAs(blob, 'export.json');
     } catch (error) {
       this.errorHandler.handle(error, 'Export JSON');
