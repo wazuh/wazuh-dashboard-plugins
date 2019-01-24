@@ -2,15 +2,15 @@
     <div id="content" layout="row" layout-align="start start" class="md-padding">
         <input flex placeholder="Filter decoders..." ng-model="dctrl.custom_search" type="text" class="kuiLocalSearchInput height-40  ng-empty ng-pristine ng-scope ng-touched ng-valid"
             aria-invalid="false" wz-enter="dctrl.search(dctrl.custom_search)">
-        <button type="submit" aria-label="Search" class="kuiLocalSearchButton height-40 wz-margin-right-8"
-            ng-click="dctrl.search(dctrl.custom_search)">
+        <button type="submit" aria-label="Search" class="kuiLocalSearchButton height-40 wz-margin-right-8" ng-click="dctrl.search(dctrl.custom_search)">
             <span class="fa fa-search" aria-hidden="true"></span>
         </button>
-        <button class="btn btn-info height-40 wz-margin-right-8" ng-click="dctrl.search('path:/var/ossec/etc/decoders')">Local decoders</button>
+        <button class="btn btn-info height-40 wz-margin-right-8" ng-if="dctrl.typeFilter === 'all'" ng-click="dctrl.search('path:/var/ossec/etc/decoders')">Local
+            decoders</button>
 
         <div layout="column" layout-align="center" class="height-40 wz-select-input">
-            <select flex class="kuiSelect wz-border-none cursor-pointer" ng-model="dctrl.typeFilter"
-                ng-change="dctrl.onlyParents(dctrl.typeFilter)" aria-label="Filter by type" ng-init="'All decoders'">
+            <select flex class="kuiSelect wz-border-none cursor-pointer" ng-model="dctrl.typeFilter" ng-change="dctrl.onlyParents(dctrl.typeFilter)"
+                aria-label="Filter by type" ng-init="'All decoders'">
                 <option value="all">All decoders</option>
                 <option value="parents">Parent decoders</option>
             </select>
