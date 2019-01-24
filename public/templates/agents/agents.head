@@ -51,7 +51,12 @@
             <span class="wz-agent-status-indicator small" ng-class="getAgentStatusClass(agent.status)" aria-label="Agent status indicator">{{formatAgentStatus(agent.status)}}</span>
         </div>
         <!-- End agent status section -->
-
+        <div ng-if="agent.outdated && !agent.upgrading" class="wz-padding-left-16">
+            <button class="updateBtn height-25" ng-click="updateAgent(agent); $event.stopPropagation()"><i class="fa fa-upload" aria-hidden="true"></i> Upgrade agent version</button>
+        </div>
+        <div ng-if="agent.outdated && agent.upgrading" class="wz-padding-left-16">
+            <span class="upgradingLabel height-25"><i class="fa fa-fw fa-spin fa-spinner"></i> Upgrading agent...</span>
+        </div>
         <!-- Separator -->
         <span flex></span>
         <!-- End separator -->

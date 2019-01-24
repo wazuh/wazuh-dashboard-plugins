@@ -59,7 +59,8 @@ export class AgentsController {
     wzTableFilter,
     $mdDialog,
     groupHandler,
-    wazuhConfig
+    wazuhConfig,
+    $interval
   ) {
     this.$scope = $scope;
     this.$location = $location;
@@ -77,6 +78,7 @@ export class AgentsController {
     this.$mdDialog = $mdDialog;
     this.groupHandler = groupHandler;
     this.wazuhConfig = wazuhConfig;
+    this.$interval = $interval;
 
     // Config on-demand
     this.$scope.isArray = Array.isArray;
@@ -194,6 +196,51 @@ export class AgentsController {
     this.$scope.goGroup = () => {
       this.shareAgent.setAgent(this.$scope.agent);
       this.$location.path('/manager/groups');
+    };
+
+    //Cancel the Timer.
+    const stopCheckUpdate = function (agent) {
+      this.$interval.cancel(this.$scope.intervalUpgradingAgent);
+      this.appState.removeSessionStorageItem(`updatingAgent${agent.id}`)
+      this.$scope.intervalUpgradingAgent = null;
+      agent.upgrading = false;
+      this.errorHandler.info(`Agent ${agent.id} has been upgraded.`, '');
+    };
+
+    //Timer start function.
+    const startCheckUpdate = function (agent) {
+      this.appState.setSessionStorageItem(`updatingAgent${agent.id}`, true)
+      this.$scope.intervalUpgradingAgent =
+        this.$interval(function () {
+          this.apiReq.request('GET ', `/agents/${agent.id}/upgrade_result`, {}).then((data) => {
+            if (data.data.data === 'Agent upgraded successfully')
+              stopCheckUpdate(agent);
+          });
+        }, 3000);
+    };
+
+    this.$scope.updateAgent = async agent => {
+      agent.upgrading = true;
+      try {
+        const data = await this.apiReq.request(
+          'PUT',
+          `/agents/${agent.id}/upgrade`,
+          {}
+        );
+        const err = data.data.error !== 0;
+        if (err) {
+          throw new Error('Error starting upgrade');
+        } else {
+          startCheckUpdate(agent);
+        }
+      } catch (error) {
+        if (error.status === -1) {
+          error.message = "Aborted"
+        }
+        this.errorHandler.handle(`${error.message || error}`, 'Error upgrading agent ' + agent.id);
+        agent.upgrading = false;
+      }
+      if (!this.$scope.$$phase) this.$scope.$digest();
     };
 
     const configuration = this.wazuhConfig.getConfig();
@@ -466,7 +513,7 @@ export class AgentsController {
           (((agentInfo || {}).data || {}).data || {}).status ||
           this.$scope.agent.status;
       }
-    } catch (error) {} // eslint-disable-line
+    } catch (error) { } // eslint-disable-line
 
     try {
       this.$scope.showSyscheckFiles = false;
@@ -483,7 +530,7 @@ export class AgentsController {
       if (tab === 'syscollector')
         try {
           await this.loadSyscollector(this.$scope.agent.id);
-        } catch (error) {} // eslint-disable-line
+        } catch (error) { } // eslint-disable-line
       if (tab === 'configuration') {
         const isSync = await this.apiReq.request(
           'GET',
@@ -601,7 +648,7 @@ export class AgentsController {
           {}
         );
         netifaceResponse = ((resultNetiface || {}).data || {}).data || false;
-      } catch (error) {} // eslint-disable-line
+      } catch (error) { } // eslint-disable-line
 
       // This API call may fail so we put it out of Promise.all
       let netaddrResponse = false;
@@ -613,7 +660,7 @@ export class AgentsController {
         );
         netaddrResponse =
           ((resultNetaddrResponse || {}).data || {}).data || false;
-      } catch (error) {} // eslint-disable-line
+      } catch (error) { } // eslint-disable-line
 
       // Before proceeding, syscollector data is an empty object
       this.$scope.syscollector = {};
@@ -629,7 +676,7 @@ export class AgentsController {
       this.$scope.syscollector = {
         hardware:
           typeof hardwareResponse === 'object' &&
-          Object.keys(hardwareResponse).length
+            Object.keys(hardwareResponse).length
             ? { ...hardwareResponse }
             : false,
         os:
@@ -707,6 +754,21 @@ export class AgentsController {
           item =>
             this.$scope.agent.group && !this.$scope.agent.group.includes(item)
         );
+
+      this.apiReq.request('GET', '/agents/outdated/', {}).then((data) => {
+        this.$scope.agent.outdated = data.data.data.items.map(x => x.id).find(x => x === this.$scope.agent.id);
+        if (this.$scope.agent.outdated) {
+          if (this.appState.getSessionStorageItem(`updatingAgent${this.$scope.agent.id}`)) {
+            this.$scope.agent.upgrading = true;
+          }
+        } else {
+          if (this.appState.getSessionStorageItem(`updatingAgent${this.$scope.agent.id}`)) {
+            this.appState.removeSessionStorageItem(`updatingAgent${this.$scope.agent.id}`)
+            this.$scope.agent.outdated = false;
+          }
+        }
+        if (!this.$scope.$$phase) this.$scope.$digest();
+      });
 
       this.$scope.load = false;
       if (!this.$scope.$$phase) this.$scope.$digest();

@@ -68,7 +68,13 @@ app.directive('wzTable', function () {
 
       const configuration = wazuhConfig.getConfig();
       $scope.adminMode = !!(configuration || {}).admin;
-         
+
+      if (instance.path === '/agents') {
+        apiReq.request('GET', '/agents/outdated/', {}).then((data) => {
+          $scope.outdatedAgents = data.data.data.items.map(x => x.id);
+          return init();
+        });
+      }
       /**
        * Resizing. Calculate number of table rows depending on the screen height
        */
@@ -98,7 +104,7 @@ app.directive('wzTable', function () {
 
       const fetch = async (options = {}) => {
         try {
-          if((instance.filters || []).length) {
+          if ((instance.filters || []).length) {
             $scope.customEmptyResults = 'No results match your search criteria'
           } else {
             $scope.customEmptyResults = $scope.emptyResults || 'Empty results for this table.';
@@ -107,6 +113,15 @@ app.directive('wzTable', function () {
           items = options.realTime ? result.items.slice(0, 10) : result.items;
           $scope.time = result.time;
           $scope.totalItems = items.length;
+          if ($scope.outdatedAgents) {
+            $scope.outdatedAgents.forEach(function (id) {
+              const item = items.find(function (item) {
+                return item.id === id;
+              });
+              if (item)
+                item.outdated = true;
+            });
+          }
           $scope.items = items;
           checkGap($scope, items);
           $scope.searchTable();
@@ -305,6 +320,18 @@ app.directive('wzTable', function () {
 
       $scope.cancelRemoveGroup = () => {
         $scope.removingGroup = null;
+      };
+
+      $scope.updateAgent = async agent => {
+        agent.upgrading = true;
+/*         try {
+          await apiReq.request('GET', '/agents/outdated/', {}).then((data) => {
+            $scope.outdatedAgents = data.data.data.items.map(x => x.id);
+            return init();
+          });
+        } catch (error) {
+          errorHandler.handle(`${error.message || error}`, '');
+        } */
       };
 
       $scope.confirmRemoveAgent = async agent => {
