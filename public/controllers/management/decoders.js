@@ -216,7 +216,7 @@ export class DecodersController {
   };
   doSaveDecoderConfig = () => {
     this.$scope.editingFile = false;
-    this.$scope.$broadcast('saveXmlFile', { decoder: this.currentDecoder.name });
+    this.$scope.$broadcast('saveXmlFile', { decoder: this.currentDecoder });
   };
 
   /**

@@ -2,10 +2,11 @@
     <div id="content" layout="row" layout-align="start start" class="md-padding">
         <input flex placeholder="Filter decoders..." ng-model="dctrl.custom_search" type="text" class="kuiLocalSearchInput height-40  ng-empty ng-pristine ng-scope ng-touched ng-valid"
             aria-invalid="false" wz-enter="dctrl.search(dctrl.custom_search)">
-        <button type="submit" aria-label="Search" class="kuiLocalSearchButton height-40 wz-margin-right-16"
+        <button type="submit" aria-label="Search" class="kuiLocalSearchButton height-40 wz-margin-right-8"
             ng-click="dctrl.search(dctrl.custom_search)">
             <span class="fa fa-search" aria-hidden="true"></span>
         </button>
+        <button class="btn btn-info height-40 wz-margin-right-8" ng-click="dctrl.search('path:/var/ossec/etc/decoders')">Local decoders</button>
 
         <div layout="column" layout-align="center" class="height-40 wz-select-input">
             <select flex class="kuiSelect wz-border-none cursor-pointer" ng-model="dctrl.typeFilter"
@@ -16,7 +17,7 @@
         </div>
     </div>
 
-    <md-chips class="wz-chips md-padding-h" readonly="true" ng-show="dctrl.appliedFilters.length">
+    <md-chips class="wz-chips md-padding-h wz-padding-bottom-14" readonly="true" ng-show="dctrl.appliedFilters.length">
         <md-chip class="wz-chip" ng-show="dctrl.includesFilter('file')">
             <span>File: {{ dctrl.getFilter('file') }}
                 <i class="fa fa-fw fa-times cursor-pointer" aria-hidden="true" ng-click="dctrl.removeFilter('file')"></i>

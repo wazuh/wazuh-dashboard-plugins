@@ -5,9 +5,10 @@
         <button type="submit" aria-label="Search" class="kuiLocalSearchButton height-40" ng-click="search(custom_search)">
             <span class="fa fa-search" aria-hidden="true"></span>
         </button>
+        <button class="btn btn-info height-40 wz-margin-left-8" ng-click="search('path:/var/ossec/etc/rules')">Local rules</button>
     </div>
 
-    <md-chips class="wz-chips md-padding-h" readonly="true" ng-show="appliedFilters.length">
+    <md-chips class="wz-chips md-padding-h wz-padding-bottom-14" readonly="true" ng-show="appliedFilters.length">
         <md-chip class="wz-chip" ng-show="includesFilter('file')">
             <span>File: {{getFilter('file')}}
                 <i class="fa fa-fw fa-times cursor-pointer" aria-hidden="true" ng-click="removeFilter('file')"></i>

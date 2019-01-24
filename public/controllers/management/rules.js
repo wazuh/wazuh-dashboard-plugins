@@ -88,6 +88,18 @@ export function RulesController(
       );
       $scope.appliedFilters.push(filter);
       $scope.$broadcast('wazuhFilter', { filter });
+    } else if (
+      term &&
+      term.startsWith('path:') &&
+      term.split('path:')[1].trim()
+    ) {
+      $scope.custom_search = '';
+      const filter = { name: 'path', value: term.split('path:')[1].trim() };
+      $scope.appliedFilters = $scope.appliedFilters.filter(
+        item => item.name !== 'path'
+      );
+      $scope.appliedFilters.push(filter);
+      $scope.$broadcast('wazuhFilter', { filter });
     } else {
       $scope.$broadcast('wazuhSearch', { term, removeFilters: 0 });
     }
@@ -229,7 +241,7 @@ export function RulesController(
   };
   $scope.doSaveRuleConfig = () => {
     $scope.editingFile = false;
-    $scope.$broadcast('saveXmlFile', { rule: $scope.currentRule.id });
+    $scope.$broadcast('saveXmlFile', { rule: $scope.currentRule });
   };
 
   /**
