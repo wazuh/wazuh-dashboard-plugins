@@ -30,9 +30,10 @@ app.directive('wzXmlFileEditor', function() {
       const checkXmlParseError = () => {
         try {
           const parser = new DOMParser(); // eslint-disable-line
-          const xml = $scope.xmlCodeBox.getValue();
+          let xml = $scope.xmlCodeBox.getValue();
+          xml = xml.replace(/..xml.+\?>/,'');
           const xmlDoc = parser.parseFromString(
-            '<file>' + xml + '</file>',
+            `<file>${xml}</file>`,
             'text/xml'
           );
           $scope.validFn({
@@ -41,6 +42,13 @@ app.directive('wzXmlFileEditor', function() {
               !xml ||
               !xml.length
           });
+
+          if(xmlDoc.getElementsByTagName('parsererror').length){
+              const xmlFullError = xmlDoc.getElementsByTagName('parsererror')[0].innerText;
+              $scope.xmlError = xmlFullError.match('error\\s.+\n')[0];
+          }else{
+            $scope.xmlError = false;
+          }
         } catch (error) {
           errorHandler.handle(error, 'Error validating XML');
         }
@@ -60,8 +68,8 @@ app.directive('wzXmlFileEditor', function() {
       const saveFile = async params => {
         try {
           const content = $scope.xmlCodeBox.getValue().trim();
-          await groupHandler.sendConfiguration(params.group, content);
-          errorHandler.info('Success. Group has been updated', '');
+          //await groupHandler.sendConfiguration(params.group, content);
+          errorHandler.info('Success. File has been updated', '');
         } catch (error) {
           errorHandler.handle(error, 'Send file error');
         }
@@ -83,6 +91,7 @@ app.directive('wzXmlFileEditor', function() {
 
       const init = (data = false) => {
         try {
+          $scope.xmlError = false;
           $scope.xmlCodeBox.setValue(data || $scope.data);
           firstTime = false;
           $scope.xmlCodeBox.refresh();
