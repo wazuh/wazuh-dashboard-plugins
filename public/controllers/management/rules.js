@@ -255,6 +255,7 @@ export function RulesController(
       );
     $scope.viewingDetail = false;
     $scope.currentRule = false;
+    $scope.closeEditingFile();
     $scope.$emit('removeCurrentRule');
     if (!$scope.$$phase) $scope.$digest();
   };

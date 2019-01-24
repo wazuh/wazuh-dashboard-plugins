@@ -241,6 +241,7 @@ export class DecodersController {
       );
     this.viewingDetail = false;
     this.currentDecoder = false;
+    this.closeEditingFile();
     this.$scope.$emit('removeCurrentDecoder');
     if (!this.$scope.$$phase) this.$scope.$digest();
   }
