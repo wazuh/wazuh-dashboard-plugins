@@ -2,6 +2,16 @@
 
 All notable changes to the Wazuh app project will be documented in this file.
 
+## Wazuh v3.8.1 - Kibana v6.5.4 - Revision 417
+
+### Added
+
+- Support for Wazuh v3.8.1
+
+### Changed
+
+- Moved monitored/ignored Windows registry entries to "FIM > Monitored" and "FIM > Ignored" to avoid user confusion ([#1176](https://github.com/wazuh/wazuh-kibana-app/pull/1176)).
+
 ## Wazuh v3.8.0 - Kibana v6.5.4 - Revision 416
 
 ### Added
