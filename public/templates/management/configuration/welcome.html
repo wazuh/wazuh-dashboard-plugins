@@ -11,7 +11,7 @@
             <i class="fa fa-fw fa-cog" aria-hidden="true"></i> Configuration
         </span>
                 
-        <div ng-show="selectedNode" layout="row" layout-padding style="position: absolute;right: calc(0% + 228px);margin-top: -10px;">
+        <div ng-show="selectedNode" ng-if="adminMode" layout="row" layout-padding style="position: absolute;right: calc(0% + 228px);margin-top: -10px;">
             <div layout="column" layout-align="center" class="height-40 wz-select-input">
                 <select class="kuiSelect wz-border-none cursor-pointer max-height-35" id="categoryBox" ng-model="selectedNode"
                     ng-change="changeNode(selectedNode)" aria-label="Select node">
@@ -29,8 +29,6 @@
 
 
     
-     
-
     <!-- Configuration section cards and right sidenav -->
     <div flex="auto" layout="row">
 

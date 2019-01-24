@@ -19,12 +19,14 @@ export class ConfigurationController {
    * @param {*} errorHandler
    * @param {*} apiReq
    * @param {*} appState
+   * @param {*} wazuhConfig
    */
-  constructor($scope, $location, errorHandler, apiReq, appState) {
+  constructor($scope, $location, errorHandler, apiReq, appState, wazuhConfig) {
     this.$scope = $scope;
     this.errorHandler = errorHandler;
     this.apiReq = apiReq;
     this.appState = appState;
+    this.wazuhConfig = wazuhConfig;
     this.$location = $location;
     this.$scope.load = false;
     this.$scope.isArray = Array.isArray;
@@ -46,6 +48,8 @@ export class ConfigurationController {
   $onInit() {
 
     this.init();
+    const configuration = this.wazuhConfig.getConfig();
+    this.$scope.adminMode = !!(configuration || {}).admin;
     this.$scope.getXML = () => this.configurationHandler.getXML(this.$scope);
     this.$scope.getJSON = () => this.configurationHandler.getJSON(this.$scope);
     this.$scope.isString = item => typeof item === 'string';
@@ -80,6 +84,9 @@ export class ConfigurationController {
     };
 
 
+   /**
+   * Edit node configuration
+   */
     const fetchFile = async () => {
       try {
         const data = await this.apiReq.request(
@@ -88,10 +95,10 @@ export class ConfigurationController {
           {}
         );
         const json = ((data || {}).data || {}).data || false;
-        const xml = this.configurationHandler.json2xml(json);
-        if (!xml) {
+        if (!json) {
           throw new Error('Could not fetch configuration file');
         }
+        const xml = this.configurationHandler.json2xml(json);
         return xml;
       } catch (error) {
         return Promise.reject(error);
@@ -106,7 +113,6 @@ export class ConfigurationController {
       this.$scope.editingFile = true;
       try {
         this.$scope.fetchedXML = await fetchFile();
-        //this.$scope.fetchedXML = 'hola';
         this.$scope.$broadcast('fetchedFile', { data: this.$scope.fetchedXML });
       } catch (error) {
         this.$scope.fetchedXML = null;
@@ -115,7 +121,21 @@ export class ConfigurationController {
       if (!this.$scope.$$phase) this.$scope.$digest();
     };
 
+    this.$scope.saveConfiguration = async () => {
+      try{
+        this.$scope.editingFile = false;
+        this.$scope.$broadcast('saveXmlFile', { node: this.$scope.selectedNode});
+      }catch( error ) {
+        this.$scope.fetchedXML = null;
+        this.errorHandler.handle(error, 'Save file error');
+      }
+        
+    }
 
+    this.$scope.xmlIsValid = valid => {
+      this.$scope.xmlHasErrors = valid;
+      if (!this.$scope.$$phase) this.$scope.$digest();
+    };
 
     /**
      * Navigate to woodle
