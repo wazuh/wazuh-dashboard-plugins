@@ -26,15 +26,56 @@ app.directive('wzXmlFileEditor', function() {
       targetName: '=targetName'
     },
     controller($scope, $document, errorHandler, groupHandler) {
+
+      /**
+       * Custom .replace method. Instead of using .replace which 
+       * evaluates regular expressions. 
+       * Alternative using split + join, same result.
+       */
+      String.prototype.xmlReplace = function(str, newstr) {
+        return this.split(str).join(newstr);
+      };
+
       let firstTime = true;
+      const parser = new DOMParser(); // eslint-disable-line
+
+      /**
+       * Escape "&" characters.
+       * @param {*} text 
+       */
+      const replaceIllegalXML = text => {
+        const oDOM = parser.parseFromString(text, 'text/html');
+        const lines = oDOM.documentElement.textContent.split('\n');
+
+        for (const line of lines) {
+          const sanitized = line.trim().xmlReplace('&', '&amp;');
+
+          /**
+           * Do not remove this condition. We don't want to replace
+           * non-sanitized lines.
+           */
+          if (!line.includes(sanitized)) {
+            text = text.xmlReplace(line.trim(), sanitized);
+          }
+        }
+        return text;
+      };
+
+      // Block function if there is another check in progress
+      let checkingXmlError = false; 
       const checkXmlParseError = () => {
+        if (checkingXmlError) return;
+        checkingXmlError = true;
         try {
-          const parser = new DOMParser(); // eslint-disable-line
-          const xml = $scope.xmlCodeBox.getValue();
+          const text = $scope.xmlCodeBox.getValue();
+
+          const xml = replaceIllegalXML(text);
+
           const xmlDoc = parser.parseFromString(
             '<file>' + xml + '</file>',
             'text/xml'
           );
+
           $scope.validFn({
             valid:
               !!xmlDoc.getElementsByTagName('parsererror').length ||
@@ -44,6 +85,7 @@ app.directive('wzXmlFileEditor', function() {
         } catch (error) {
           errorHandler.handle(error, 'Error validating XML');
         }
+        checkingXmlError = false;
         if (!$scope.$$phase) $scope.$digest();
         return;
       };
@@ -59,8 +101,9 @@ app.directive('wzXmlFileEditor', function() {
 
       const saveFile = async params => {
         try {
-          const content = $scope.xmlCodeBox.getValue().trim();
-          await groupHandler.sendConfiguration(params.group, content);
+          const text = $scope.xmlCodeBox.getValue();
+          const xml = replaceIllegalXML(text);
+          await groupHandler.sendConfiguration(params.group, xml);
           errorHandler.info('Success. Group has been updated', '');
         } catch (error) {
           errorHandler.handle(error, 'Send file error');
