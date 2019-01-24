@@ -65,7 +65,6 @@ app.directive('wzXmlFileEditor', function () {
         } catch (error) {
           errorHandler.handle(error, 'Error validating XML');
         }
-        if (!$scope.$$phase) $scope.$digest();
         return;
       };
 

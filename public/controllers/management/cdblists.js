@@ -173,8 +173,7 @@ export function CdbListsController(
   $scope.$on('wazuhShowCdbList', (event, parameters) => {
     //$scope.currentList = parameters.cdblist;
     $scope.currentList = {};
-    apiReq
-      .request('get', `/manager/files`, { path: '/etc/lists/audit-keys' })
+    rulesetHandler.getCdbList('/etc/lists/audit-keys')
       .then(data => {
         $scope.currentList.list = data.data.data;
         $scope.$emit('setCurrentList', { currentList: $scope.currentList });

@@ -23,7 +23,7 @@ export class DecodersController {
    * @param {*} csvReq
    * @param {*} wzTableFilter
    */
-  constructor($scope, $sce, errorHandler, appState, csvReq, wzTableFilter, wazuhConfig) {
+  constructor($scope, $sce, errorHandler, appState, csvReq, wzTableFilter, wazuhConfig, rulesetHandler) {
     this.$scope = $scope;
     this.$sce = $sce;
     this.errorHandler = errorHandler;
@@ -31,6 +31,7 @@ export class DecodersController {
     this.csvReq = csvReq;
     this.wzTableFilter = wzTableFilter;
     this.wazuhConfig = wazuhConfig;
+    this.rulesetHandler = rulesetHandler;
   }
 
   /**
@@ -194,22 +195,11 @@ export class DecodersController {
     return;
   }
 
-
   editDecodersConfig = async () => {
     this.$scope.editingFile = true;
     try {
-      //$scope.fetchedXML = await fetchFile();
-      this.$scope.fetchedXML = `
-      <decoder name="example">
-  <program_name>^example</program_name>
-</decoder>
-
-<decoder name="example">
-  <parent>example</parent>
-  <regex>User '(\w+)' logged from '(\d+.\d+.\d+.\d+)'</regex>
-  <order>user, srcip</order>
-</decoder>
-`;
+      this.$scope.fetchedXML = await this.rulesetHandler.getDecoderConfiguration(this.currentDecoder.file);
+      if (!this.$scope.$$phase) this.$scope.$digest();
       this.$scope.$broadcast('fetchedFile', { data: this.$scope.fetchedXML });
     } catch (error) {
       this.$scope.fetchedXML = null;

@@ -13,6 +13,42 @@ export class RulesetHandler {
   constructor(apiReq) {
     this.apiReq = apiReq;
   }
+  async getRuleConfiguration(path) {
+    try {
+      const result = await this.apiReq.request(
+        'GET',
+        `/manager/files`,
+        { path: `/etc/rules/${path}`, format: 'xml' }
+      );
+      return ((result || {}).data || {}).data || false;
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  }
+  async getDecoderConfiguration(path) {
+    try {
+      const result = await this.apiReq.request(
+        'GET',
+        `/manager/files`,
+        { path: `/etc/decoders/${path}`, format: 'xml' }
+      );
+      return ((result || {}).data || {}).data || false;
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  }
+  async getCdbList(path) {
+    try {
+      const result = await this.apiReq.request(
+        'GET',
+        `/manager/files`,
+        { path: path }
+      );
+      return result;
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  }
   async sendRuleConfiguration(rule, content) {
     try {
       const result = await this.apiReq.request(

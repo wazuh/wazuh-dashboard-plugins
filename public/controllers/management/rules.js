@@ -22,7 +22,8 @@ export function RulesController(
   wzTableFilter,
   $location,
   apiReq,
-  wazuhConfig
+  wazuhConfig,
+  rulesetHandler
 ) {
   $scope.isObject = item => typeof item === 'object';
 
@@ -210,28 +211,8 @@ export function RulesController(
   $scope.editRulesConfig = async () => {
     $scope.editingFile = true;
     try {
-      //$scope.fetchedXML = await fetchFile();
-      $scope.fetchedXML = `
-    <group name="syslog,imapd,">
-      <rule id="3600" level="0" noalert="1">
-        <decoded_as>imapd</decoded_as>
-        <description>Grouping of the imapd rules.</description>
-      </rule>
-    
-      <rule id="3601" level="5">
-        <if_sid>3600</if_sid>
-        <match>Login failed user=|AUTHENTICATE LOGIN failure</match>
-        <description>Imapd user login failed.</description>
-        <group>authentication_failed,pci_dss_10.2.4,pci_dss_10.2.5,gpg13_7.1,gdpr_IV_35.7.d,gdpr_IV_32.2,</group>
-      </rule>
-    
-      <rule id="3602" level="3">
-        <if_sid>3600</if_sid>
-        <match>Authenticated user=</match>
-        <description>Imapd user login.</description>
-        <group>authentication_success,pci_dss_10.2.5,gpg13_7.1,gdpr_IV_32.2,</group>
-      </rule>    
-    </group>`;
+      $scope.fetchedXML = await rulesetHandler.getRuleConfiguration($scope.currentRule.file)
+      if (!$scope.$$phase) $scope.$digest();
       $scope.$broadcast('fetchedFile', { data: $scope.fetchedXML });
     } catch (error) {
       $scope.fetchedXML = null;
