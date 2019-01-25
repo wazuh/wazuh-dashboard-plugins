@@ -184,8 +184,13 @@ export function CdbListsController(
 
   const saveList = async () => {
     try {
-      await rulesetHandler.sendCdbList('audit-keys', JSON.stringify($scope.currentList.list));
-      errorHandler.info('CDB list has been updated', '');
+      let raw = '';
+      for (var key in $scope.currentList.list) {
+        raw = raw.concat(`${key}:${$scope.currentList.list[key]}\n`);
+      }
+      //const result = await rulesetHandler.sendCdbList('audit-keys', raw);
+      const result = await rulesetHandler.sendCdbList('audit-keys', JSON.stringify($scope.currentList.list));
+      errorHandler.info(result.data.data, '');
     } catch (err) {
       errorHandler.handle(err, 'Error updating list');
     }
