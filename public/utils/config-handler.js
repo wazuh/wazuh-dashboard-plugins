@@ -210,6 +210,7 @@ export class ConfigurationHandler {
         $scope.XMLContent = XMLBeautifier(
           js2xmlparser.parse('configuration', cleaned)
         );
+        $scope.$broadcast('XMLContentReady', { data: $scope.XMLContent });
       } catch (error) {
         $scope.XMLContent = false;
       }
@@ -230,7 +231,8 @@ export class ConfigurationHandler {
     } else {
       try {
         const cleaned = objectWithoutProperties(config);
-        $scope.JSONContent = beautifier.prettyPrint(cleaned);
+        $scope.JSONContent = JSON.stringify(cleaned, null, 2);
+        $scope.$broadcast('JSONContentReady', { data: $scope.JSONContent });
       } catch (error) {
         $scope.JSONContent = false;
       }

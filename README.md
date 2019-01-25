@@ -1,6 +1,6 @@
 # Wazuh Kibana App
 
-[![Slack](https://img.shields.io/badge/slack-join-blue.svg)](https://goo.gl/forms/M2AoZC4b2R9A9Zy12)
+[![Slack](https://img.shields.io/badge/slack-join-blue.svg)](https://wazuh.com/community/join-us-on-slack/)
 [![Email](https://img.shields.io/badge/email-join-blue.svg)](https://groups.google.com/forum/#!forum/wazuh)
 [![Documentation](https://img.shields.io/badge/docs-view-green.svg)](https://documentation.wazuh.com)
 [![Documentation](https://img.shields.io/badge/web-view-green.svg)](https://wazuh.com)
@@ -25,8 +25,8 @@ Visualize and analyze Wazuh alerts stored in Elasticsearch using our Kibana app 
 
 ## Requisites
 
-- Wazuh HIDS 3.7.2
-- Wazuh RESTful API 3.7.2
+- Wazuh HIDS 3.8.1
+- Wazuh RESTful API 3.8.1
 - Kibana 6.5.4
 - Elasticsearch 6.5.4
 
@@ -35,7 +35,7 @@ Visualize and analyze Wazuh alerts stored in Elasticsearch using our Kibana app 
 Install the app
 
 ```
-sudo -u kibana NODE_OPTIONS="--max-old-space-size=3072" /usr/share/kibana/bin/kibana-plugin install https://packages.wazuh.com/wazuhapp/wazuhapp-3.7.2_6.5.4.zip
+sudo -u kibana NODE_OPTIONS="--max-old-space-size=3072" /usr/share/kibana/bin/kibana-plugin install https://packages.wazuh.com/wazuhapp/wazuhapp-3.8.1_6.5.4.zip
 ```
 
 Restart Kibana
@@ -90,7 +90,7 @@ chown -R kibana:kibana /usr/share/kibana/plugins
 Install the app
 
 ```
-sudo -u kibana NODE_OPTIONS="--max-old-space-size=3072" /usr/share/kibana/bin/kibana-plugin install https://packages.wazuh.com/wazuhapp/wazuhapp-3.7.2_6.5.4.zip
+sudo -u kibana NODE_OPTIONS="--max-old-space-size=3072" /usr/share/kibana/bin/kibana-plugin install https://packages.wazuh.com/wazuhapp/wazuhapp-3.8.1_6.5.4.zip
 ```
 
 Restart Kibana
@@ -156,6 +156,8 @@ service kibana restart
 |      6.5.3     |       3.7.1       | /usr/share/kibana/bin/kibana-plugin install <https://packages.wazuh.com/wazuhapp/wazuhapp-3.7.1_6.5.3.zip> |
 |      6.5.3     |       3.7.2       | /usr/share/kibana/bin/kibana-plugin install <https://packages.wazuh.com/wazuhapp/wazuhapp-3.7.2_6.5.3.zip> |
 |      6.5.4     |       3.7.2       | /usr/share/kibana/bin/kibana-plugin install <https://packages.wazuh.com/wazuhapp/wazuhapp-3.7.2_6.5.4.zip> |
+|      6.5.4     |       3.8.0       | /usr/share/kibana/bin/kibana-plugin install <https://packages.wazuh.com/wazuhapp/wazuhapp-3.8.0_6.5.4.zip> |
+|      6.5.4     |       3.8.1       | /usr/share/kibana/bin/kibana-plugin install <https://packages.wazuh.com/wazuhapp/wazuhapp-3.8.1_6.5.4.zip> |
 
 
 ## Contribute
@@ -172,7 +174,7 @@ If you want to contribute to our project please don't hesitate to send a pull re
 
 ## Copyright & License
 
-Copyright &copy; 2018 Wazuh, Inc.
+Copyright &copy; 2019 Wazuh, Inc.
 
 This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation; either version 2 of the License, or (at your option) any later version.
 
