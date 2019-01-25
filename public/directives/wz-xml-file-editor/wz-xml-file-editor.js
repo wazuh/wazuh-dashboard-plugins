@@ -25,11 +25,7 @@ app.directive('wzXmlFileEditor', function () {
       data: '=data',
       targetName: '=targetName'
     },
-<<<<<<< HEAD
     controller($scope, $document, errorHandler, groupHandler, rulesetHandler) {
-      String.prototype.xmlReplace = function (str, newstr) {
-=======
-    controller($scope, $document, errorHandler, groupHandler) {
 
       /**
        * Custom .replace method. Instead of using .replace which 
@@ -37,7 +33,6 @@ app.directive('wzXmlFileEditor', function () {
        * Alternative using split + join, same result.
        */
       String.prototype.xmlReplace = function(str, newstr) {
->>>>>>> 663ec391b9bf823200e939a97397344326549348
         return this.split(str).join(newstr);
       };
 
@@ -90,11 +85,8 @@ app.directive('wzXmlFileEditor', function () {
         } catch (error) {
           errorHandler.handle(error, 'Error validating XML');
         }
-<<<<<<< HEAD
-=======
         checkingXmlError = false;
         if (!$scope.$$phase) $scope.$digest();
->>>>>>> 663ec391b9bf823200e939a97397344326549348
         return;
       };
 
@@ -154,24 +146,18 @@ app.directive('wzXmlFileEditor', function () {
 
       const saveFile = async params => {
         try {
-<<<<<<< HEAD
-          const content = $scope.xmlCodeBox.getValue().trim();
-          if (params.group) {
-            await groupHandler.sendConfiguration(params.group, content);
-            errorHandler.info('Success. Group has been updated', '');
-          } else if (params.rule) {
-            await rulesetHandler.sendRuleConfiguration(params.rule, content);
-            errorHandler.info('Success. Rules has been updated', '');
-          } else if (params.decoder) {
-            await rulesetHandler.sendDecoderConfiguration(params.decoder, content);
-            errorHandler.info('Success. Decoders has been updated', '');
-          }
-=======
           const text = $scope.xmlCodeBox.getValue();
           const xml = replaceIllegalXML(text);
-          await groupHandler.sendConfiguration(params.group, xml);
-          errorHandler.info('Success. Group has been updated', '');
->>>>>>> 663ec391b9bf823200e939a97397344326549348
+          if (params.group) {
+            await groupHandler.sendConfiguration(params.group, xml);
+            errorHandler.info('Success. Group has been updated', '');
+          } else if (params.rule) {
+            await rulesetHandler.sendRuleConfiguration(params.rule, xml);
+            errorHandler.info('Success. Rules has been updated', '');
+          } else if (params.decoder) {
+            await rulesetHandler.sendDecoderConfiguration(params.decoder, xml);
+            errorHandler.info('Success. Decoders has been updated', '');
+          }
         } catch (error) {
           errorHandler.handle(error, 'Send file error');
         }
@@ -195,12 +181,7 @@ app.directive('wzXmlFileEditor', function () {
         try {
           $scope.xmlCodeBox.setValue(autoFormat(data || $scope.data));
           firstTime = false;
-<<<<<<< HEAD
           setTimeout(() => { $scope.xmlCodeBox.refresh() }, 1);
-=======
-          $scope.xmlCodeBox.refresh();
-          //autoFormat();
->>>>>>> 663ec391b9bf823200e939a97397344326549348
         } catch (error) {
           errorHandler.handle(error, 'Fetching original file');
         }
