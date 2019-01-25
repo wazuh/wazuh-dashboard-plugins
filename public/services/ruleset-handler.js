@@ -18,7 +18,7 @@ export class RulesetHandler {
       const result = await this.apiReq.request(
         'GET',
         `/manager/files`,
-        { path: `etc/rules/${path}`, format: 'xml' }
+        { path: `etc/rules/${path}` }
       );
       return ((result || {}).data || {}).data || false;
     } catch (error) {
@@ -30,7 +30,7 @@ export class RulesetHandler {
       const result = await this.apiReq.request(
         'GET',
         `/manager/files`,
-        { path: `etc/decoders/${path}`, format: 'xml' }
+        { path: `etc/decoders/${path}` }
       );
       return ((result || {}).data || {}).data || false;
     } catch (error) {
