@@ -696,3 +696,23 @@ md-sidenav {
     background-color: #d9d9d9 !important;
     border-color: #d9d9d9 !important;
 }
+
+.min-height-300 {
+    min-height: 300px;
+}
+
+/*
+ * https://css-tricks.com/snippets/css/prevent-long-urls-from-breaking-out-of-container/
+ * Handling long URLs on error toasts.
+ */
+.euiGlobalToastList > .euiToast > .euiToastHeader > .euiToastHeader__title {
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+    -ms-word-break: break-all;
+    word-break: break-all;
+    word-break: break-word;
+    -ms-hyphens: auto;
+    -moz-hyphens: auto;
+    -webkit-hyphens: auto;
+    hyphens: auto;
+}
