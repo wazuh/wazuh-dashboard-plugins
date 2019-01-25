@@ -97,7 +97,7 @@
                         </div>
                         <div flex="" layout="column" layout-align="center" class="height-40 wz-margin-top-17 layout-align-center-stretch layout-column flex">
                             <div layout="row" class="">
-                                <button class="btn btn-primary height-40" ng-disabled="!newKey || !newValue" ng-click="addEntry(newKey, newValue)"><i
+                                <button class="btn btn-primary height-40" ng-disabled="!newKey || !newValue" ng-click="addEntry(newKey, newValue);newKey = ''; newValue = ''"><i
                                         class="fa fa-fw fa-plus"></i>
                                     Add</button>
                             </div>

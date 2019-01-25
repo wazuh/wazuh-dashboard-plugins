@@ -194,8 +194,6 @@ export function CdbListsController(
   $scope.addEntry = (key, value) => {
     if (!$scope.currentList.list[key]) {
       $scope.currentList.list[key] = value;
-      $scope.newKey = '';
-      $scope.newValue = '';
       saveList();
     } else {
       errorHandler.handle('Entry already exists', '');
