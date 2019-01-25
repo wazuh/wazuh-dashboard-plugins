@@ -25,7 +25,7 @@ export class ManagementController {
     this.tab = 'welcome';
     this.rulesetTab = 'rules';
     this.tabNames = TabNames;
-    this.wazuhManagementTabs = ['ruleset', 'groups'];
+    this.wazuhManagementTabs = ['ruleset', 'groups', 'configuration'];
     this.statusReportsTabs = ['status', 'logs', 'reporting', 'monitoring'];
     this.currentGroup = false;
     this.$scope.$on('setCurrentGroup', (ev, params) => {
@@ -51,6 +51,12 @@ export class ManagementController {
     });
     this.$scope.$on('removeCurrentList', () => {
       this.currentList = false;
+    });
+    this.$scope.$on('setCurrentConfiguration', (ev, params) => {
+      this.currentConfiguration = (params || {}).currentConfiguration || false;
+    });
+    this.$scope.$on('removeCurrentConfiguration', () => {
+      this.currentConfiguration = false;
     });
   }
 
@@ -89,7 +95,12 @@ export class ManagementController {
     if (this.tab === 'groups') {
       this.$scope.$broadcast('groupsIsReloaded');
     }
-
+    if (this.tab === 'configuration') {
+      this.currentConfiguration = false;
+      this.$scope.$broadcast('configurationIsReloaded');
+    } else {
+      this.$location.search('configSubTab', null);
+    }
     if (this.tab === 'ruleset') {
       this.$scope.$broadcast('rulesetIsReloaded');
       this.globalRuleSet = 'ruleset';
@@ -97,6 +108,9 @@ export class ManagementController {
     } else {
       this.globalRuleSet = false;
       this.globalRulesetTab = false;
+      this.currentRule = false;
+      this.currentDecoder = false;
+      this.currentList = false;
     }
 
     this.$location.search('tab', this.tab);

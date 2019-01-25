@@ -18,7 +18,7 @@ export class RulesetHandler {
       const result = await this.apiReq.request(
         'GET',
         `/manager/files`,
-        { path: `/etc/rules/${path}`, format: 'xml' }
+        { path: `etc/rules/${path}`, format: 'xml' }
       );
       return ((result || {}).data || {}).data || false;
     } catch (error) {
@@ -30,7 +30,7 @@ export class RulesetHandler {
       const result = await this.apiReq.request(
         'GET',
         `/manager/files`,
-        { path: `/etc/decoders/${path}`, format: 'xml' }
+        { path: `etc/decoders/${path}`, format: 'xml' }
       );
       return ((result || {}).data || {}).data || false;
     } catch (error) {
@@ -42,7 +42,7 @@ export class RulesetHandler {
       const result = await this.apiReq.request(
         'GET',
         `/manager/files`,
-        { path: path }
+        { path: path, format: 'text' }
       );
       return result;
     } catch (error) {
@@ -53,7 +53,7 @@ export class RulesetHandler {
     try {
       const result = await this.apiReq.request(
         'POST',
-        `/manager/files?path=/etc/rules/${rule.file}`,
+        `/manager/files?path=etc/rules/${rule.file}`,
         { content, origin: 'xmleditor' }
       );
       return result;
@@ -65,7 +65,7 @@ export class RulesetHandler {
     try {
       const result = await this.apiReq.request(
         'POST',
-        `/manager/files?path=/etc/decoders/${decoder.file}`,
+        `/manager/files?path=etc/decoders/${decoder.file}`,
         { content, origin: 'xmleditor' }
       );
       return result;
@@ -78,8 +78,8 @@ export class RulesetHandler {
     try {
       const result = await this.apiReq.request(
         'POST',
-        `/manager/files`,
-        { content, path: `/etc/lists/${list}` }
+        `/manager/files?path=etc/lists/${list}`,
+        { content, origin: 'json' }
       );
       return result;
     } catch (error) {

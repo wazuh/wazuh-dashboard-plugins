@@ -170,10 +170,10 @@ export function CdbListsController(
   };
 
   //listeners
-  $scope.$on('wazuhShowCdbList', (event, parameters) => {
+  $scope.$on('wazuhShowCdbList', () => {
     //$scope.currentList = parameters.cdblist;
     $scope.currentList = {};
-    rulesetHandler.getCdbList('/etc/lists/audit-keys')
+    rulesetHandler.getCdbList('etc/lists/audit-keys')
       .then(data => {
         $scope.currentList.list = data.data.data;
         $scope.$emit('setCurrentList', { currentList: $scope.currentList });
@@ -182,9 +182,10 @@ export function CdbListsController(
       });
   });
 
-  const saveList = () => {
+  const saveList = async () => {
     try {
-      rulesetHandler.sendCdbList('audit-key', $scope.currentList.list);
+      await rulesetHandler.sendCdbList('audit-keys', JSON.stringify($scope.currentList.list));
+      errorHandler.info('CDB list has been updated', '');
     } catch (err) {
       errorHandler.handle(err, 'Error updating list');
     }

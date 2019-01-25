@@ -16,10 +16,10 @@
     <div flex="auto" layout="row">
 
         <!-- This section has the configuration cards -->
-        <div flex layout="column">
+        <div flex layout="column" class="md-margin-h">
 
             <!-- Main configurations card -->
-            <md-card class="wz-md-card">
+            <md-card class="wz-md-card md-margin-h-0">
                 <md-card-content>
                     <span class="font-size-16">Main configurations</span>
                     <md-divider class="wz-margin-top-10"></md-divider>
@@ -84,7 +84,7 @@
             <!-- End main configurations card -->
 
             <!-- Alerts and output management card -->
-            <md-card class="wz-md-card" ng-if="!agent || agent.id === '000'">
+            <md-card class="wz-md-card md-margin-h-0" ng-if="!agent || agent.id === '000'">
                 <md-card-content>
                     <span class="font-size-16" ng-if="!agent || agent.id === '000'">Alerts and output management</span>
                       <md-divider class="wz-margin-top-10"></md-divider>
@@ -115,7 +115,7 @@
             <!-- End alerts and output management card -->
 
             <!-- Auditing and policy monitoring card -->
-            <md-card class="wz-md-card">
+            <md-card class="wz-md-card md-margin-h-0">
                 <md-card-content>
                     <span class="font-size-16">Auditing and policy monitoring</span>
                     <md-divider class="wz-margin-top-10"></md-divider>
@@ -146,7 +146,7 @@
             <!-- End auditing and policy monitoring card -->
 
             <!-- System, threats and incident response card -->
-            <md-card class="wz-md-card">
+            <md-card class="wz-md-card md-margin-h-0">
                 <md-card-content>
                     <span class="font-size-16">System threats and incident response</span>
                     <md-divider class="wz-margin-top-10"></md-divider>
@@ -195,7 +195,7 @@
             <!-- End system, threats and incident response card -->
 
             <!-- Log data analysis card -->
-            <md-card class="wz-md-card">
+            <md-card class="wz-md-card md-margin-h-0">
                 <md-card-content>
                     <span class="font-size-16">Log data analysis</span>
                     <md-divider class="wz-margin-top-10"></md-divider>
@@ -226,7 +226,7 @@
             <!-- End log data analysis card -->
 
             <!-- Cloud security monitoring card -->
-            <md-card class="wz-md-card" ng-if="!agent || agent.id === '000'">
+            <md-card class="wz-md-card md-margin-h-0" ng-if="!agent || agent.id === '000'">
                 <md-card-content>
                     <span class="font-size-16">Cloud security monitoring</span>
                     <md-divider class="wz-margin-top-10"></md-divider>
