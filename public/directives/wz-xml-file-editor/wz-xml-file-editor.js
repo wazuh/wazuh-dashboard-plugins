@@ -25,7 +25,7 @@ app.directive('wzXmlFileEditor', function() {
       data: '=data',
       targetName: '=targetName'
     },
-    controller($scope, $document, errorHandler, groupHandler) {
+    controller($scope, $document, apiReq, errorHandler, groupHandler) {
       String.prototype.xmlReplace = function(str, newstr) {
         return this.split(str).join(newstr);
       };
@@ -90,6 +90,18 @@ app.directive('wzXmlFileEditor', function() {
         try {
           const content = $scope.xmlCodeBox.getValue().trim();
           //await groupHandler.sendConfiguration(params.group, content);
+          if(params.node){
+            //save node configuration
+            console.log("edit node config");
+          }else if(params.manager){
+            console.log(content)
+            const result = await apiReq.request(
+              'POST',
+              `/manager/files?path=etc/ossec.conf`,
+              { content, origin: 'xmleditor' }
+            );
+            console.log(result);
+          }
           errorHandler.info('Success. File has been updated', '');
         } catch (error) {
           errorHandler.handle(error, 'Send file error');

@@ -44,22 +44,31 @@ export class EditionController {
     this.init();
     const configuration = this.wazuhConfig.getConfig();
     this.$scope.adminMode = !!(configuration || {}).admin;
-    
-   /**
-   * Edit node configuration
-   */
+
+    /**
+    * Edit master/worker node configuration if cluster is enabled, otherwise edit manager configuration
+    */
     const fetchFile = async () => {
       try {
-        const data = await this.apiReq.request(
-          'GET',
-          `/cluster/${this.$scope.selectedNode}/configuration`,
-          {}
-        );
+        let data = false;
+        if (this.$scope.clusterStatus.data.data.enabled === 'yes') {
+          data = await this.apiReq.request(
+            'GET',
+            `/cluster/${this.$scope.selectedNode}/configuration`,
+            {}
+          );
+        } else {
+          data = await this.apiReq.request(
+            'GET',
+            `/manager/files`,
+            {path:'etc/ossec.conf', format:'xml'}
+          );
+        }
         const json = ((data || {}).data || {}).data || false;
         if (!json) {
           throw new Error('Could not fetch configuration file');
         }
-        const xml = this.configurationHandler.json2xml(json);
+        const xml = this.configurationHandler.json2xml(json); //.
         return xml;
       } catch (error) {
         return Promise.reject(error);
@@ -68,10 +77,12 @@ export class EditionController {
 
     this.$scope.closeEditingFile = () => {
       this.$scope.editingFile = false;
+      this.$scope.fetchedXML = false;
     }
 
     this.$scope.editConf = async () => {
       this.$scope.editingFile = true;
+      this.$scope.fetchedXML = false;
       try {
         this.$scope.fetchedXML = await fetchFile();
         this.$scope.$broadcast('fetchedFile', { data: this.$scope.fetchedXML });
@@ -83,14 +94,18 @@ export class EditionController {
     };
 
     this.$scope.saveConfiguration = async () => {
-      try{
-        this.$scope.editingFile = false;
-        this.$scope.$broadcast('saveXmlFile', { node: this.$scope.selectedNode});
-      }catch( error ) {
+      try {
+        console.log(this.$scope.selectedNode)
+        if (this.$scope.clusterStatus.data.data.enabled === 'yes') {
+          this.$scope.editingFile = false;
+          this.$scope.$broadcast('saveXmlFile', { node: this.$scope.selectedNode });
+        } else {
+          this.$scope.$broadcast('saveXmlFile', { manager: this.$scope.selectedNode });
+        }
+      } catch (error) {
         this.$scope.fetchedXML = null;
         this.errorHandler.handle(error, 'Save file error');
       }
-        
     }
 
     this.$scope.xmlIsValid = valid => {
@@ -124,6 +139,9 @@ export class EditionController {
           item => item.type === 'master'
         )[0];
         this.$scope.selectedNode = masterNode.name;
+      } else {
+        this.$scope.selectedNode = "manager";
+        this.$scope.editConf();
       }
     } catch (error) {
       this.errorHandler.handle(error, 'Error getting cluster status');
