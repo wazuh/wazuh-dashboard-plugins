@@ -150,7 +150,8 @@ export class Monitoring {
 
       const payload = {
         offset: 0,
-        limit: 500
+        limit: 500,
+        q: 'id!=000'
       };
 
       this.agentsArray = await ApiHelper.fetchAllAgents(
@@ -159,7 +160,7 @@ export class Monitoring {
         payload,
         options
       );
-
+      
       await this.saveStatus(api.clusterName);
 
       return;
@@ -182,7 +183,8 @@ export class Monitoring {
     try {
       const payload = {
         offset: 0,
-        limit: 1
+        limit: 1,
+        q: 'id!=000'
       };
 
       const options = ApiHelper.buildOptionsObject(api);

@@ -33,7 +33,6 @@
         <md-nav-item class="wz-nav-item" md-nav-click="switchConfigurationSubTab('fim-ignored')" name="fim-ignored">Ignored</md-nav-item>
         <md-nav-item class="wz-nav-item" md-nav-click="switchConfigurationSubTab('fim-nodiff')" name="fim-nodiff">No diff</md-nav-item>
         <md-nav-item class="wz-nav-item" md-nav-click="switchConfigurationSubTab('fim-whodata')" ng-if="!agent || agent.isLinuxOS" name="fim-whodata">Who-data</md-nav-item>
-        <md-nav-item class="wz-nav-item" md-nav-click="switchConfigurationSubTab('fim-windows')" ng-if="((agent || {}).os || {}).platform === 'windows'" name="fim-windows">Windows</md-nav-item>
     </md-nav-bar>
     <!-- End Integrity monitoring navigation bar -->
 

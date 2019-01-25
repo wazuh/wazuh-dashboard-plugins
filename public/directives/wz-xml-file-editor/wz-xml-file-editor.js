@@ -25,37 +25,62 @@ app.directive('wzXmlFileEditor', function () {
       data: '=data',
       targetName: '=targetName'
     },
+<<<<<<< HEAD
     controller($scope, $document, errorHandler, groupHandler, rulesetHandler) {
       String.prototype.xmlReplace = function (str, newstr) {
+=======
+    controller($scope, $document, errorHandler, groupHandler) {
+
+      /**
+       * Custom .replace method. Instead of using .replace which 
+       * evaluates regular expressions. 
+       * Alternative using split + join, same result.
+       */
+      String.prototype.xmlReplace = function(str, newstr) {
+>>>>>>> 663ec391b9bf823200e939a97397344326549348
         return this.split(str).join(newstr);
       };
 
       let firstTime = true;
       const parser = new DOMParser(); // eslint-disable-line
+
+      /**
+       * Escape "&" characters.
+       * @param {*} text 
+       */
       const replaceIllegalXML = text => {
         const oDOM = parser.parseFromString(text, 'text/html');
         const lines = oDOM.documentElement.textContent.split('\n');
+
         for (const line of lines) {
-          const sanitized = line
-            .trim()
-            .xmlReplace('&', '&amp;')
-            .xmlReplace('<', '&lt;')
-            .xmlReplace('>', '&gt;')
-            .xmlReplace('"', '&quot;')
-            .xmlReplace("'", '&apos;');
-          text = text.xmlReplace(line.trim(), sanitized);
+          const sanitized = line.trim().xmlReplace('&', '&amp;');
+
+          /**
+           * Do not remove this condition. We don't want to replace
+           * non-sanitized lines.
+           */
+          if (!line.includes(sanitized)) {
+            text = text.xmlReplace(line.trim(), sanitized);
+          }
         }
         return text;
       };
 
+      // Block function if there is another check in progress
+      let checkingXmlError = false; 
       const checkXmlParseError = () => {
+        if (checkingXmlError) return;
+        checkingXmlError = true;
         try {
           const text = $scope.xmlCodeBox.getValue();
+
           const xml = replaceIllegalXML(text);
+
           const xmlDoc = parser.parseFromString(
             '<file>' + xml + '</file>',
             'text/xml'
           );
+
           $scope.validFn({
             valid:
               !!xmlDoc.getElementsByTagName('parsererror').length ||
@@ -65,6 +90,11 @@ app.directive('wzXmlFileEditor', function () {
         } catch (error) {
           errorHandler.handle(error, 'Error validating XML');
         }
+<<<<<<< HEAD
+=======
+        checkingXmlError = false;
+        if (!$scope.$$phase) $scope.$digest();
+>>>>>>> 663ec391b9bf823200e939a97397344326549348
         return;
       };
 
@@ -124,6 +154,7 @@ app.directive('wzXmlFileEditor', function () {
 
       const saveFile = async params => {
         try {
+<<<<<<< HEAD
           const content = $scope.xmlCodeBox.getValue().trim();
           if (params.group) {
             await groupHandler.sendConfiguration(params.group, content);
@@ -135,6 +166,12 @@ app.directive('wzXmlFileEditor', function () {
             await rulesetHandler.sendDecoderConfiguration(params.decoder, content);
             errorHandler.info('Success. Decoders has been updated', '');
           }
+=======
+          const text = $scope.xmlCodeBox.getValue();
+          const xml = replaceIllegalXML(text);
+          await groupHandler.sendConfiguration(params.group, xml);
+          errorHandler.info('Success. Group has been updated', '');
+>>>>>>> 663ec391b9bf823200e939a97397344326549348
         } catch (error) {
           errorHandler.handle(error, 'Send file error');
         }
@@ -158,7 +195,12 @@ app.directive('wzXmlFileEditor', function () {
         try {
           $scope.xmlCodeBox.setValue(autoFormat(data || $scope.data));
           firstTime = false;
+<<<<<<< HEAD
           setTimeout(() => { $scope.xmlCodeBox.refresh() }, 1);
+=======
+          $scope.xmlCodeBox.refresh();
+          //autoFormat();
+>>>>>>> 663ec391b9bf823200e939a97397344326549348
         } catch (error) {
           errorHandler.handle(error, 'Fetching original file');
         }

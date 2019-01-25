@@ -557,6 +557,14 @@ export class WazuhApiCtrl {
         data = data.content.replace(new RegExp('\\n', 'g'), '');
       }
 
+      if (
+        typeof (data || {}).content === 'string' &&
+        (data || {}).origin === 'json'
+      ) {
+        options.content_type = 'application/json';
+        data = data.content.replace(new RegExp('\\n', 'g'), '');
+      }
+
       const fullUrl = getPath(api) + path;
       const response = await needle(method, fullUrl, data, options);
 
