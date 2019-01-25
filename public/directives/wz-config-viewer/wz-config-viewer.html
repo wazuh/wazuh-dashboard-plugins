@@ -1,4 +1,4 @@
-<div layout="row">
+<div layout="row" ng-show="jsoncontent || xmlcontent" style="height: calc(100vh - 240px);">
 
     <!-- JSON card -->
     <md-card flex="auto" class="wz-md-card" ng-show="jsoncontent">
@@ -18,8 +18,8 @@
             <md-divider class="wz-margin-top-10"></md-divider>
             
             <!-- The JSON viewer -->
-            <div class='wzXmlEditorBody'>
-                <textarea id='json_box'></textarea>
+            <div class='wzJsonXmlEditorBody'>
+                <textarea id='viewer_json_box'></textarea>
             </div>
             <!-- End JSON viewer -->
         </md-card-content>
@@ -44,7 +44,7 @@
             <md-divider class="wz-margin-top-10"></md-divider>
 
             <!-- The XML viewer -->
-            <div class='wzXmlEditorBody'>
+            <div class='wzJsonXmlEditorBody'>
                 <textarea id='viewer_xml_box' ></textarea>
             </div>
             <!-- End XML viewer -->

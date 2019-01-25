@@ -134,9 +134,6 @@ app.directive('wzTable', function () {
        * This search in table data with a given term
        */
       const search = async (term, removeFilters) => {
-        if (term && typeof term === 'string') {
-          $scope.emptyResults = false;
-        }
         searchData(
           term,
           removeFilters,
