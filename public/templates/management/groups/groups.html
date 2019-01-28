@@ -85,8 +85,8 @@
                             XML format error</span>
                     </button>
                 </div>
-                <div class="md-padding-h" ng-if="fetchedXML">
-                    <wz-xml-file-editor file-name='agent.conf' data="fetchedXML" target-name="currentGroup.name"
+                <div class="md-padding md-padding-top-10" ng-if="fetchedXML">
+                    <wz-xml-file-editor file-name='agent.conf' data="fetchedXML" target-name="currentGroup.name + ' group'"
                         valid-fn='xmlIsValid(valid)'>
                     </wz-xml-file-editor>
                 </div>

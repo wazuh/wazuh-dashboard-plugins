@@ -18,10 +18,11 @@ export class ManagementController {
    * @param {*} $location
    * @param {*} shareAgent
    */
-  constructor($scope, $location, shareAgent) {
+  constructor($scope, $location, shareAgent, wazuhConfig) {
     this.$scope = $scope;
     this.$location = $location;
     this.shareAgent = shareAgent;
+    this.wazuhConfig = wazuhConfig;
     this.tab = 'welcome';
     this.rulesetTab = 'rules';
     this.tabNames = TabNames;
@@ -64,6 +65,9 @@ export class ManagementController {
    * When controller loads
    */
   $onInit() {
+
+    const configuration = this.wazuhConfig.getConfig();
+    this.$scope.adminMode = !!(configuration || {}).admin;
     if (this.shareAgent.getAgent() && this.shareAgent.getSelectedGroup()) {
       this.tab = 'groups';
       this.switchTab(this.tab);

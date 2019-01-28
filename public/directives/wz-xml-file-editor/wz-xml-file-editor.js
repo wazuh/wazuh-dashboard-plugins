@@ -25,14 +25,14 @@ app.directive('wzXmlFileEditor', function () {
       data: '=data',
       targetName: '=targetName'
     },
-    controller($scope, $document, errorHandler, groupHandler, rulesetHandler) {
+    controller($scope, $document, errorHandler, groupHandler, rulesetHandler, saveConfig) {
 
       /**
        * Custom .replace method. Instead of using .replace which 
        * evaluates regular expressions. 
        * Alternative using split + join, same result.
        */
-      String.prototype.xmlReplace = function(str, newstr) {
+      String.prototype.xmlReplace = function (str, newstr) {
         return this.split(str).join(newstr);
       };
 
@@ -62,17 +62,16 @@ app.directive('wzXmlFileEditor', function () {
       };
 
       // Block function if there is another check in progress
-      let checkingXmlError = false; 
+      let checkingXmlError = false;
       const checkXmlParseError = () => {
         if (checkingXmlError) return;
         checkingXmlError = true;
         try {
           const text = $scope.xmlCodeBox.getValue();
-
-          const xml = replaceIllegalXML(text);
-
+          let xml = replaceIllegalXML(text);
+          xml = xml.replace(/..xml.+\?>/, '');
           const xmlDoc = parser.parseFromString(
-            '<file>' + xml + '</file>',
+            `<file>${xml}</file>`,
             'text/xml'
           );
 
@@ -82,6 +81,13 @@ app.directive('wzXmlFileEditor', function () {
               !xml ||
               !xml.length
           });
+
+          if (xmlDoc.getElementsByTagName('parsererror').length) {
+            const xmlFullError = xmlDoc.getElementsByTagName('parsererror')[0].innerText;
+            $scope.xmlError = xmlFullError.match('error\\s.+\n')[0];
+          } else {
+            $scope.xmlError = false;
+          }
         } catch (error) {
           errorHandler.handle(error, 'Error validating XML');
         }
@@ -157,6 +163,10 @@ app.directive('wzXmlFileEditor', function () {
           } else if (params.decoder) {
             await rulesetHandler.sendDecoderConfiguration(params.decoder, xml);
             errorHandler.info('Success. Decoders has been updated', '');
+          } else if (params.node) {
+            await saveConfig.saveNodeConfiguration(params.node, xml);
+          } else if (params.manager) {
+            await saveConfig.saveManagerConfiguration(xml);
           }
         } catch (error) {
           errorHandler.handle(error, 'Send file error');
@@ -179,7 +189,9 @@ app.directive('wzXmlFileEditor', function () {
 
       const init = (data = false) => {
         try {
-          $scope.xmlCodeBox.setValue(autoFormat(data || $scope.data));
+          $scope.xmlError = false;
+          $scope.xmlCodeBox.setValue(data || $scope.data);
+          autoFormat();
           firstTime = false;
           setTimeout(() => { $scope.xmlCodeBox.refresh() }, 1);
         } catch (error) {

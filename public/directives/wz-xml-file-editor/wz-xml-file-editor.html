@@ -1,6 +1,6 @@
 <div class='wzXmlEditor'>
     <div class='wzXmlEditorHeader'>
-        <span>Edit <b>configuration</b> of <b>{{targetName}}</b> group</span>
+        <span>Edit <b>{{fileName}}</b> of <b>{{targetName}}</b> <span tooltip='{{xmlError}}' class="wz-agent-status-indicator small red" ng-if="xmlError">{{xmlError}}</span></span>
     </div>
     <div class='wzXmlEditorBody'>
         <div ng-show='!loadingFile'>

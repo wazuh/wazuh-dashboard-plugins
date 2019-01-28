@@ -30,6 +30,11 @@
                             title="'Configuration'" switch-tab="mctrl.switchTab('configuration')" current-tab="'configuration'"
                             description="'Check your Wazuh cluster configuration.'"
                         ></wz-welcome-card>
+                        <wz-welcome-card
+                            class="euiFlexItem" logo="'icons/app_devtools.svg'"
+                            title="'Edition'" switch-tab="mctrl.switchTab('edition')" ng-if="adminMode" current-tab="'edition'"
+                            description="'Edit master/worker node configuration.'"
+                        ></wz-welcome-card>
                     </div>
                 </div>
             </div>

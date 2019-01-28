@@ -20,6 +20,7 @@ import { RulesController } from './rules';
 import { StatusController } from './status';
 import { ClusterController } from './monitoring';
 import { CdbListsController } from './cdblists';
+import { EditionController } from './edition';
 
 const app = uiModules.get('app/wazuh', []);
 
@@ -32,4 +33,5 @@ app
   .controller('rulesController', RulesController)
   .controller('managerStatusController', StatusController)
   .controller('clusterController', ClusterController)
-  .controller('cdbListsController', CdbListsController);
+  .controller('cdbListsController', CdbListsController)
+  .controller('editionController', EditionController);

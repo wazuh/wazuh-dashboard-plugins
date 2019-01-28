@@ -1,11 +1,14 @@
 <div flex="auto" layout="column" ng-if="configurationTab === 'welcome'">
 
-    <!-- Headline -->
-    <div layout="column" layout-padding>
-        <div ng-show="agent && agent.id !== '000'">
-            <span class="font-size-18"> <i class="fa fa-fw fa-cog" aria-hidden="true"></i> Configuration</span>
-            <span ng-if="isSynchronized" class="wz-agent-status-indicator small teal">SYNCHRONIZED</span>
-            <span ng-if="!isSynchronized" class="wz-agent-status-indicator small red">NOT SYNCHRONIZED</span>
+        <!-- Headline -->
+        <div layout="column" layout-padding>
+            <div ng-show="agent && agent.id !== '000'">
+                <span class="font-size-18"> <i class="fa fa-fw fa-cog" aria-hidden="true"></i> Configuration</span>
+                <span ng-if="isSynchronized" class="wz-agent-status-indicator small teal">SYNCHRONIZED</span>
+                <span ng-if="!isSynchronized" class="wz-agent-status-indicator small red">NOT SYNCHRONIZED</span>
+            </div>
+            <span class="font-size-18" ng-show="!agent || agent.id === '000'">
+                    <i class="fa fa-fw fa-cog" aria-hidden="true"></i> Configuration</span>
         </div>
         <span class="font-size-18" ng-show="!agent || agent.id === '000'">
                 <i class="fa fa-fw fa-cog" aria-hidden="true"></i> Configuration</span>
@@ -245,22 +248,6 @@
             <!-- End cloud security monitoring card -->
 
         </div>
-        <!-- End configuration cards section -->
-
-        <!-- This section is the right sidenav content -->
-        <md-sidenav
-            class="md-sidenav-right"
-            md-is-locked-open="true">
-            <md-list>
-                <md-subheader>More info about this section</md-subheader>
-                <md-list-item target="_blank" class="wz-text-link" ng-href="https://documentation.wazuh.com/current/user-manual/manager/index.html">Wazuh administration documentation</md-list-item>
-                <md-list-item target="_blank" class="wz-text-link" ng-href="https://documentation.wazuh.com/current/user-manual/capabilities/index.html">Wazuh capabilities documentation</md-list-item>
-                <md-list-item target="_blank" class="wz-text-link" ng-href="https://documentation.wazuh.com/current/user-manual/reference/ossec-conf/index.html">Local configuration reference</md-list-item>
-            </md-list>
-        </md-sidenav>
-        <!-- End right sidenav section -->
-
+        <!-- End configuration section cards and right sidenav -->
+    
     </div>
-    <!-- End configuration section cards and right sidenav -->
-
-</div>
