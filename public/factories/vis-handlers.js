@@ -10,7 +10,7 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import dateMath from '@kbn/datemath';
+import dateMath from '@elastic/datemath';
 
 export class VisHandlers {
   /**
