@@ -21,12 +21,11 @@ export class EditionController {
    * @param {*} appState
    * @param {*} wazuhConfig
    */
-  constructor($scope, $location, errorHandler, apiReq, appState, wazuhConfig) {
+  constructor($scope, $location, errorHandler, apiReq, appState) {
     this.$scope = $scope;
     this.errorHandler = errorHandler;
     this.apiReq = apiReq;
     this.appState = appState;
-    this.wazuhConfig = wazuhConfig;
     this.$location = $location;
     this.$scope.load = false;
     this.configurationHandler = new ConfigurationHandler(apiReq, errorHandler);
@@ -42,8 +41,6 @@ export class EditionController {
   $onInit() {
 
     this.init();
-    const configuration = this.wazuhConfig.getConfig();
-    this.$scope.adminMode = !!(configuration || {}).admin;
 
     /**
     * Edit master/worker node configuration if cluster is enabled, otherwise edit manager configuration
@@ -51,34 +48,33 @@ export class EditionController {
     const fetchFile = async () => {
       try {
         let data = false;
+        let xml = false;
         if (this.$scope.clusterStatus.data.data.enabled === 'yes') {
           data = await this.apiReq.request(
             'GET',
             `/cluster/${this.$scope.selectedNode}/configuration`,
             {}
           );
+          const json = ((data || {}).data || {}).data || false;
+          xml = this.configurationHandler.json2xml(json);
         } else {
           data = await this.apiReq.request(
             'GET',
             `/manager/files`,
-            {path:'etc/ossec.conf', format:'xml'}
+            { path: 'etc/ossec.conf', format: 'xml' }
           );
+          xml = ((data || {}).data || {}).data || false;
         }
-        const json = ((data || {}).data || {}).data || false;
-        if (!json) {
+        if (!xml) {
           throw new Error('Could not fetch configuration file');
         }
-        const xml = this.configurationHandler.json2xml(json); //.
+        xml = xml.replace(/..xml.+\?>/, '');
         return xml;
       } catch (error) {
         return Promise.reject(error);
       }
     };
 
-    this.$scope.closeEditingFile = () => {
-      this.$scope.editingFile = false;
-      this.$scope.fetchedXML = false;
-    }
 
     this.$scope.editConf = async () => {
       this.$scope.editingFile = true;
@@ -97,7 +93,6 @@ export class EditionController {
       try {
         console.log(this.$scope.selectedNode)
         if (this.$scope.clusterStatus.data.data.enabled === 'yes') {
-          this.$scope.editingFile = false;
           this.$scope.$broadcast('saveXmlFile', { node: this.$scope.selectedNode });
         } else {
           this.$scope.$broadcast('saveXmlFile', { manager: this.$scope.selectedNode });
@@ -141,11 +136,12 @@ export class EditionController {
         this.$scope.selectedNode = masterNode.name;
       } else {
         this.$scope.selectedNode = "manager";
-        this.$scope.editConf();
       }
     } catch (error) {
       this.errorHandler.handle(error, 'Error getting cluster status');
     }
+
+    this.$scope.editConf();
     if (!this.$scope.$$phase) this.$scope.$digest();
   }
 }

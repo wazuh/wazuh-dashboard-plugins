@@ -92,7 +92,6 @@ app.directive('wzXmlFileEditor', function() {
           //await groupHandler.sendConfiguration(params.group, content);
           if(params.node){
             //save node configuration
-            console.log("edit node config");
           }else if(params.manager){
             console.log(content)
             const result = await apiReq.request(
@@ -100,7 +99,6 @@ app.directive('wzXmlFileEditor', function() {
               `/manager/files?path=etc/ossec.conf`,
               { content, origin: 'xmleditor' }
             );
-            console.log(result);
           }
           errorHandler.info('Success. File has been updated', '');
         } catch (error) {
