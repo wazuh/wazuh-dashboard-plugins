@@ -292,12 +292,8 @@ export function GroupsController(
   };
 
   $scope.doSaveGroupAgentConfig = () => {
-<<<<<<< HEAD
     $scope.editingFile = false;
     $scope.$broadcast('saveXmlFile', { group: $scope.currentGroup.name, type: 'group' });
-=======
-    $scope.$broadcast('saveXmlFile', { group: $scope.currentGroup.name });
->>>>>>> 59b29df701d36adf8ef0565459b890e1eb59c848
   };
 
   $scope.reload = async (element, searchTerm, addOffset, start) => {
