@@ -27,7 +27,6 @@ import 'plugins/kibana/discover/directives/timechart';
 import 'ui/collapsible_sidebar';
 import 'plugins/kibana/discover/components/field_chooser/field_chooser';
 import 'plugins/kibana/discover/controllers/discover';
-//import 'plugins/kibana/discover/styles/main.less';
 import 'ui/doc_table/components/table_row';
 
 // Research added (further checks needed)
@@ -48,11 +47,13 @@ import 'ui/pager';
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 import _ from 'lodash';
+import React from 'react';
 import angular from 'angular';
+import chrome from 'ui/chrome';
 import { getSort } from 'ui/doc_table/lib/get_sort';
 import * as columnActions from 'ui/doc_table/actions/columns';
 import * as filterActions from 'ui/doc_table/actions/filter';
-import dateMath from '@kbn/datemath';
+import dateMath from '@elastic/datemath';
 import 'ui/doc_table';
 import 'ui/visualize';
 import 'ui/fixed_scroll';
@@ -61,7 +62,6 @@ import 'ui/filters/moment';
 import 'ui/index_patterns';
 import 'ui/state_management/app_state';
 import { timefilter } from 'ui/timefilter';
-import 'ui/share';
 import 'ui/query_bar';
 import {
   hasSearchStategyForIndexPattern,
@@ -73,13 +73,16 @@ import { VislibSeriesResponseHandlerProvider } from 'ui/vis/response_handlers/vi
 import { DocTitleProvider } from 'ui/doc_title';
 import PluginsKibanaDiscoverHitSortFnProvider from 'plugins/kibana/discover/_hit_sort_fn';
 import { FilterBarQueryFilterProvider } from 'ui/filter_bar/query_filter';
+// No need for this since we are using custom interval options
+//import { intervalOptions } from 'ui/agg_types/buckets/_interval_options';
 import { stateMonitorFactory } from 'ui/state_management/state_monitor_factory';
-import { migrateLegacyQuery } from 'ui/utils/migrateLegacyQuery';
+import { migrateLegacyQuery } from 'ui/utils/migrate_legacy_query';
 import { FilterManagerProvider } from 'ui/filter_manager';
-import { visualizationLoader } from 'ui/visualize/loader/visualization_loader';
 import { getDocLink } from 'ui/documentation_links';
+import { VisualizeLoaderProvider } from 'ui/visualize/loader/visualize_loader';
 import { ShareContextMenuExtensionsRegistryProvider } from 'ui/share';
 import { getUnhashableStatesProvider } from 'ui/state_management/state_hashing';
+import { Inspector } from 'ui/inspector';
 import { RequestAdapter } from 'ui/inspector/adapters';
 import {
   getRequestInspectorStats,
@@ -117,16 +120,19 @@ function discoverController(
   Promise,
   config,
   courier,
-  $rootScope,
-  $location,
   kbnUrl,
   localStorage,
-  breadcrumbState,
+  i18n,
+  // Wazuh requirements from here
+  $rootScope,
+  $location,
   getAppState,
   globalState,
   loadedVisualizations,
   discoverPendingUpdates
 ) {
+  const visualizeLoader = Private(VisualizeLoaderProvider);
+  let visualizeHandler;
   const Vis = Private(VisProvider);
   const docTitle = Private(DocTitleProvider);
   const HitSortFn = Private(PluginsKibanaDiscoverHitSortFnProvider);
@@ -136,11 +142,8 @@ function discoverController(
   const notify = new Notifier({
     location: 'Discover'
   });
-
   const getUnhashableStates = Private(getUnhashableStatesProvider);
-  const shareContextMenuExtensions = Private(
-    ShareContextMenuExtensionsRegistryProvider
-  );
+  const shareContextMenuExtensions = Private(ShareContextMenuExtensionsRegistryProvider);
   const inspectorAdapters = {
     requests: new RequestAdapter()
   };
@@ -266,14 +269,19 @@ function discoverController(
   const pageTitleSuffix =
     savedSearch.id && savedSearch.title ? `: ${savedSearch.title}` : '';
   docTitle.change(`Discover${pageTitleSuffix}`);
+  const discoverBreadcrumbsTitle = i18n('kbn.discover.discoverBreadcrumbTitle', {
+    defaultMessage: 'Discover',
+  });
 
   if (savedSearch.id && savedSearch.title) {
-    breadcrumbState.set([
-      { text: 'Discover', href: '#/discover' },
-      { text: savedSearch.title }
-    ]);
+    chrome.breadcrumbs.set([{
+      text: discoverBreadcrumbsTitle,
+      href: '#/discover'
+    }, { text: savedSearch.title }]);
   } else {
-    breadcrumbState.set([{ text: 'Discover' }]);
+    chrome.breadcrumbs.set([{
+      text: discoverBreadcrumbsTitle,
+    }]);
   }
 
   let stateMonitor;
@@ -381,14 +389,22 @@ function discoverController(
   $state.sort = getSort.array($state.sort, $scope.indexPattern);
 
   $scope.getBucketIntervalToolTipText = () => {
-    return `This interval creates ${
-      $scope.bucketInterval.scale > 1
-        ? 'buckets that are too large'
-        : 'too many buckets'
-    }
-      to show in the selected time range, so it has been scaled to ${
-        $scope.bucketInterval.description
-      }`;
+    return (
+      i18n('kbn.discover.bucketIntervalTooltip', {
+        // eslint-disable-next-line max-len
+        defaultMessage: 'This interval creates {bucketsDescription} to show in the selected time range, so it has been scaled to {bucketIntervalDescription}',
+        values: {
+          bucketsDescription: $scope.bucketInterval.scale > 1
+            ? i18n('kbn.discover.bucketIntervalTooltip.tooLargeBucketsText', {
+              defaultMessage: 'buckets that are too large',
+            })
+            : i18n('kbn.discover.bucketIntervalTooltip.tooManyBucketsText', {
+              defaultMessage: 'too many buckets',
+            }),
+          bucketIntervalDescription: $scope.bucketInterval.description,
+        },
+      })
+    );
   };
 
   $scope.$watchCollection('state.columns', function() {
@@ -549,8 +565,7 @@ function discoverController(
 
             prev = current;
           };
-        })()
-      );
+        }()));
 
       if ($scope.opts.timefield) {
         setupVisualization();
@@ -562,52 +577,20 @@ function discoverController(
     });
   });
 
-  async function saveDataSource(saveOptions) {
-    await $scope.updateDataSource();
+  ////////////////////////////////////////////////////////////////////////
+  // Wazuh - Removed saveDataSource, it's not needed by our integration //
+  ////////////////////////////////////////////////////////////////////////
 
-    savedSearch.columns = $scope.state.columns;
-    savedSearch.sort = $scope.state.sort;
-
-    try {
-      const id = await savedSearch.save(saveOptions);
-      $scope.$evalAsync(() => {
-        stateMonitor.setInitialState($state.toJSON());
-        if (id) {
-          toastNotifications.addSuccess({
-            title: `Search '${savedSearch.title}' was saved`,
-            'data-test-subj': 'saveSearchSuccess'
-          });
-
-          if (savedSearch.id !== $route.current.params.id) {
-            kbnUrl.change('/discover/{{id}}', { id: savedSearch.id });
-          } else {
-            // Update defaults so that "reload saved query" functions correctly
-            $state.setDefaults(getStateDefaults());
-            docTitle.change(savedSearch.lastSavedTitle);
-          }
-        }
-      });
-      return { id };
-    } catch (saveError) {
-      toastNotifications.addDanger({
-        title: `Search '${savedSearch.title}' was not saved.`,
-        text: saveError.message
-      });
-      return { error: saveError };
-    }
-  }
-
+  /**
+   * Wazuh - aux function for checking filters status
+   */
   const filtersAreReady = () => {
     const currentUrlPath = $location.path();
     if (currentUrlPath && !currentUrlPath.includes('wazuh-discover')) {
       let filters = queryFilter.getFilters();
       filters = Array.isArray(filters)
         ? filters.filter(
-            item =>
-              item &&
-              item.$state &&
-              item.$state.store &&
-              item.$state.store === 'appState'
+            item => (((item || {}).$state || {}).store || '') === 'appState'
           )
         : [];
       if (!filters || !filters.length) return false;
@@ -640,10 +623,6 @@ function discoverController(
     ////////////////////////////////////////////////////////////////////////////
     ///////////////////////////////  WAZUH   ///////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////
-    // We don't need this cause the auto-complete feature breaks using this   //
-    /*if ($state.query.language && $state.query.language !== query.language) {
-      $state.filters = [];
-    }*/
     // Wazuh filters are not ready yet
     if (!filtersAreReady()) return;
 
@@ -695,6 +674,8 @@ function discoverController(
       sortFn = new HitSortFn(sort[1]);
     }
 
+    $scope.updateTime();
+
     if (sort[0] === '_score') {
       segmented.setMaxSegments(1);
     }
@@ -724,11 +705,17 @@ function discoverController(
 
       if (status.remaining > 0) {
         const inspectorRequest = inspectorAdapters.requests.start(
-          `Segment ${$scope.fetchStatus.complete}`,
+          i18n('kbn.discover.inspectorRequest.segmentFetchCompleteStatusTitle', {
+            defaultMessage: 'Segment {fetchCompleteStatus}',
+            values: {
+              fetchCompleteStatus: $scope.fetchStatus.complete,
+            }
+          }),
           {
-            description: `This request queries Elasticsearch to fetch the data for the search.`
-          }
-        );
+            description: i18n('kbn.discover.inspectorRequest.segmentFetchCompleteStatusDescription', {
+              defaultMessage: 'This request queries Elasticsearch to fetch the data for the search.',
+            }),
+          });
         inspectorRequest.stats(getRequestInspectorStats($scope.searchSource));
         $scope.searchSource.getSearchRequestBody().then(body => {
           inspectorRequest.json(body);
@@ -761,21 +748,15 @@ function discoverController(
       if ($scope.opts.timefield) {
         const tabifiedData = tabifyAggResponse($scope.vis.aggs, merged);
         $scope.searchSource.rawResponse = merged;
-        Promise.resolve(responseHandler(tabifiedData)).then(resp => {
-          $scope.visData = resp;
+        Promise
+        .resolve(responseHandler(tabifiedData))
+        .then(resp => {
           if (
             ($scope.tabView !== 'panels' ||
               $location.path().includes('wazuh-discover')) &&
             $scope.tabView !== 'cluster-monitoring'
           ) {
-            const visEl = $element.find('#discoverHistogram')[0];
-            visualizationLoader.render(
-              visEl,
-              $scope.vis,
-              $scope.visData,
-              $scope.uiState,
-              { listenOnChange: true }
-            );
+            visualizeHandler.render(resp);
           }
         });
       }
@@ -941,53 +922,72 @@ function discoverController(
         }
       }
     ];
-
+    console.log('DEBUG SCOPE.VIS',$scope.vis)
     // we have a vis, just modify the aggs
     if ($scope.vis) {
       const visState = $scope.vis.getEnabledState();
       visState.aggs = visStateAggs;
 
       $scope.vis.setState(visState);
-    } else {
-      $scope.vis = new Vis($scope.indexPattern, {
-        title: savedSearch.title,
+      return;
+    } 
+
+    const visSavedObject = {
+      indexPattern: $scope.indexPattern.id,
+      visState: {
         type: 'histogram',
+        title: savedSearch.title,
         params: {
           addLegend: false,
           addTimeMarker: true
         },
         aggs: visStateAggs
-      });
-
-      $scope.searchSource.onRequestStart((searchSource, searchRequest) => {
-        return $scope.vis
-          .getAggConfig()
-          .onSearchRequestStart(searchSource, searchRequest);
-      });
-
-      $scope.searchSource.setField('aggs', function() {
-        //////////////////// WAZUH ////////////////////////////////
-        // Old code:                                             //
-        // return $scope.vis.getAggConfig().toDsl();             //
-        ///////////////////////////////////////////////////////////
-        const result = $scope.vis.getAggConfig().toDsl();
-        if (
-          result[2] &&
-          result[2].date_histogram &&
-          result[2].date_histogram.interval === '0ms'
-        ) {
-          result[2].date_histogram.interval = '1d';
-        }
-        return result;
-        ///////////////////////////////////////////////////////////
-        ///////////////////////////////////////////////////////////
-        ///////////////////////////////////////////////////////////
-      });
-    }
-
-    $scope.vis.filters = {
-      timeRange: timefilter.getTime()
+      }
     };
+
+    console.log($scope.searchSource.getField('index'))
+    $scope.vis = new Vis(
+      $scope.searchSource.getField('index'),
+      visSavedObject.visState
+    );
+    visSavedObject.vis = $scope.vis;
+    console.log(visSavedObject)
+    $scope.searchSource.onRequestStart((searchSource, searchRequest) => {
+      return $scope.vis
+        .getAggConfig()
+        .onSearchRequestStart(searchSource, searchRequest);
+    });
+
+    $scope.searchSource.setField('aggs', function() {
+      //////////////////// WAZUH ////////////////////////////////
+      // Old code:                                             //
+      // return $scope.vis.getAggConfig().toDsl();             //
+      ///////////////////////////////////////////////////////////
+      const result = $scope.vis.getAggConfig().toDsl();
+      if (
+        result[2] &&
+        result[2].date_histogram &&
+        result[2].date_histogram.interval === '0ms'
+      ) {
+        result[2].date_histogram.interval = '1d';
+      }
+      return result;
+      ///////////////////////////////////////////////////////////
+      ///////////////////////////////////////////////////////////
+      ///////////////////////////////////////////////////////////
+    });
+    
+    $timeout(async () => {
+      try {
+        console.log('ENTERING HERE',$scope.vis)
+      const visEl = $element.find('#discoverHistogram')[0];
+      visualizeHandler = await visualizeLoader.embedVisualizationWithSavedObject(visEl, visSavedObject, {
+        autoFetch: false,
+      });
+      }catch(error) {
+        console.log(error.message)
+      }
+    });
   }
 
   function resolveIndexPatternLoading() {
@@ -1004,23 +1004,36 @@ function discoverController(
     }
 
     if (stateVal && !stateValFound) {
-      const warningTitle = `"${stateVal}" is not a configured index pattern ID`;
+      const warningTitle = i18n('kbn.discover.valueIsNotConfiguredIndexPatternIDWarningTitle', {
+        defaultMessage: '{stateVal} is not a configured index pattern ID',
+        values: {
+          stateVal: `"${stateVal}"`,
+        },
+      });
 
       if (ownIndexPattern) {
         toastNotifications.addWarning({
           title: warningTitle,
-          text: `Showing the saved index pattern: "${ownIndexPattern.title}" (${
-            ownIndexPattern.id
-          })`
+          text: i18n('kbn.discover.showingSavedIndexPatternWarningDescription', {
+            defaultMessage: 'Showing the saved index pattern: "{ownIndexPatternTitle}" ({ownIndexPatternId})',
+            values: {
+              ownIndexPatternTitle: ownIndexPattern.title,
+              ownIndexPatternId: ownIndexPattern.id,
+            },
+          }),
         });
         return ownIndexPattern;
       }
 
       toastNotifications.addWarning({
         title: warningTitle,
-        text: `Showing the default index pattern: "${
-          loadedIndexPattern.title
-        }" (${loadedIndexPattern.id})`
+        text: i18n('kbn.discover.showingDefaultIndexPatternWarningDescription', {
+          defaultMessage: 'Showing the default index pattern: "{loadedIndexPatternTitle}" ({loadedIndexPatternId})',
+          values: {
+            loadedIndexPatternTitle: loadedIndexPattern.title,
+            loadedIndexPatternId: loadedIndexPattern.id,
+          },
+        }),
       });
     }
 
@@ -1029,9 +1042,10 @@ function discoverController(
 
   // Block the UI from loading if the user has loaded a rollup index pattern but it isn't
   // supported.
-  $scope.isUnsupportedIndexPattern =
-    !isDefaultTypeIndexPattern($route.current.locals.ip.loaded) &&
-    !hasSearchStategyForIndexPattern($route.current.locals.ip.loaded);
+  $scope.isUnsupportedIndexPattern = (
+    !isDefaultTypeIndexPattern($route.current.locals.ip.loaded)
+    && !hasSearchStategyForIndexPattern($route.current.locals.ip.loaded)
+  );
 
   if ($scope.isUnsupportedIndexPattern) {
     $scope.unsupportedIndexPatternType = $route.current.locals.ip.loaded.type;
