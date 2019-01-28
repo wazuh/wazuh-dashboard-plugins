@@ -150,11 +150,13 @@ app.directive('wzXmlFileEditor', function() {
           const xml = replaceIllegalXML(text);
           await groupHandler.sendConfiguration(params.group, xml);
           errorHandler.info('Success. Group has been updated', '');
+          $scope.$emit('configurationSuccess')
         } catch (error) {
           errorHandler.handle(error, 'Send file error');
         }
         return;
       };
+
       $scope.xmlCodeBox = CodeMirror.fromTextArea(
         $document[0].getElementById('xml_box'),
         {
