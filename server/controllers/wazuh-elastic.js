@@ -43,7 +43,7 @@ export class WazuhElasticCtrl {
         ((((data || {}).hits || {}).hits || [])[0] || {})._source || {};
 
       if (source.installationDate && source.lastRestart) {
-        return reply({
+        return ({
           installationDate: data.hits.hits[0]._source.installationDate,
           lastRestart: data.hits.hits[0]._source.lastRestart
         });
@@ -115,12 +115,12 @@ export class WazuhElasticCtrl {
       });
 
       return isIncluded && Array.isArray(isIncluded) && isIncluded.length
-        ? reply({
+        ? ({
             statusCode: 200,
             status: true,
             data: `Template found for ${req.params.pattern}`
           })
-        : reply({
+        : ({
             statusCode: 200,
             status: false,
             data: `No template found for ${req.params.pattern}`
@@ -152,8 +152,8 @@ export class WazuhElasticCtrl {
       );
 
       return filtered.length >= 1
-        ? reply({ statusCode: 200, status: true, data: 'Index pattern found' })
-        : reply({
+        ? ({ statusCode: 200, status: true, data: 'Index pattern found' })
+        : ({
             statusCode: 500,
             status: false,
             error: 10020,
@@ -218,8 +218,8 @@ export class WazuhElasticCtrl {
 
       return data.hits.total === 0 ||
         typeof data.aggregations['2'].buckets[0] === 'undefined'
-        ? reply({ statusCode: 200, data: '' })
-        : reply({
+        ? ({ statusCode: 200, data: '' })
+        : ({
             statusCode: 200,
             data: data.aggregations['2'].buckets[0].key
           });
@@ -239,8 +239,8 @@ export class WazuhElasticCtrl {
       const data = await this.wzWrapper.getWazuhVersionIndexAsSearch();
 
       return data.hits.total === 0
-        ? reply({ statusCode: 200, data: '' })
-        : reply({ statusCode: 200, data: data.hits.hits[0]._source });
+        ? ({ statusCode: 200, data: '' })
+        : ({ statusCode: 200, data: data.hits.hits[0]._source });
     } catch (error) {
       log('GET /elastic/setup', error.message || error);
       return ErrorResponse(
@@ -351,7 +351,7 @@ export class WazuhElasticCtrl {
               item && item.title && !config['ip.ignore'].includes(item.title)
           );
         }
-        return reply({
+        return ({
           data:
             isXpackEnabled && !isSuperUser
               ? await this.filterAllowedIndexPatternList(list, req)
@@ -528,7 +528,7 @@ export class WazuhElasticCtrl {
           : AgentsVisualizations[tabSufix];
 
       const raw = await this.buildVisualizationsRaw(file, req.params.pattern);
-      return reply({ acknowledge: true, raw: raw });
+      return ({ acknowledge: true, raw: raw });
     } catch (error) {
       return ErrorResponse(error.message || error, 4007, 500, reply);
     }
@@ -573,7 +573,7 @@ export class WazuhElasticCtrl {
         pattern_name
       );
 
-      return reply({ acknowledge: true, raw: raw });
+      return ({ acknowledge: true, raw: raw });
     } catch (error) {
       return ErrorResponse(error.message || error, 4009, 500, reply);
     }
@@ -596,7 +596,7 @@ export class WazuhElasticCtrl {
               req.params.pattern
             );
 
-      return reply({ acknowledge: true, output: output });
+      return ({ acknowledge: true, output: output });
     } catch (error) {
       log('GET /elastic/known-fields/{pattern}', error.message || error);
       return ErrorResponse(error.message || error, 4008, 500, reply);
@@ -661,7 +661,7 @@ export class WazuhElasticCtrl {
         'rule.description'
       ];
       const data = await this.wzWrapper.searchWazuhAlertsWithPayload(payload);
-      return reply({ alerts: data.hits.hits });
+      return ({ alerts: data.hits.hits });
     } catch (error) {
       log('POST /elastic/alerts', error.message || error);
       return ErrorResponse(error.message || error, 4010, 500, reply);
