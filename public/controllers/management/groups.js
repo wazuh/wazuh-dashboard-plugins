@@ -295,6 +295,11 @@ export function GroupsController(
     $scope.$broadcast('saveXmlFile', { group: $scope.currentGroup.name });
   };
 
+  $scope.$on('configurationSuccess',() => {
+    $scope.editingFile = false;
+    if(!$scope.$$phase) $scope.$digest();
+  });
+
   $scope.reload = async (element, searchTerm, addOffset, start) => {
     if (element === 'left') {
       if (!$scope.availableAgents.loadedAll) {
