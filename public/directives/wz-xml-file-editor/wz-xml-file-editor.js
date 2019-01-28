@@ -190,8 +190,7 @@ app.directive('wzXmlFileEditor', function () {
       const init = (data = false) => {
         try {
           $scope.xmlError = false;
-          $scope.xmlCodeBox.setValue(data || $scope.data);
-          autoFormat();
+          $scope.xmlCodeBox.setValue(autoFormat(data || $scope.data));
           firstTime = false;
           setTimeout(() => { $scope.xmlCodeBox.refresh() }, 1);
         } catch (error) {
