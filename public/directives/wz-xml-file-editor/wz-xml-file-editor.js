@@ -152,7 +152,6 @@ app.directive('wzXmlFileEditor', function() {
 
       const saveFile = async params => {
         try {
-<<<<<<< HEAD
           const content = $scope.xmlCodeBox.getValue().trim();
           //await groupHandler.sendConfiguration(params.group, content);
           if(params.node){
@@ -161,12 +160,6 @@ app.directive('wzXmlFileEditor', function() {
             const result = await saveConfig.saveManagerConfiguration(content);
           }
           errorHandler.info('Success. File has been updated', '');
-=======
-          const text = $scope.xmlCodeBox.getValue();
-          const xml = replaceIllegalXML(text);
-          await groupHandler.sendConfiguration(params.group, xml);
-          errorHandler.info('Success. Group has been updated', '');
->>>>>>> 59b29df701d36adf8ef0565459b890e1eb59c848
         } catch (error) {
           errorHandler.handle(error, 'Send file error');
         }
@@ -188,12 +181,8 @@ app.directive('wzXmlFileEditor', function() {
 
       const init = (data = false) => {
         try {
-<<<<<<< HEAD
           $scope.xmlError = false;
           $scope.xmlCodeBox.setValue(data || $scope.data);
-=======
-          $scope.xmlCodeBox.setValue(autoFormat(data || $scope.data));
->>>>>>> 59b29df701d36adf8ef0565459b890e1eb59c848
           firstTime = false;
           $scope.xmlCodeBox.refresh();
           //autoFormat();
