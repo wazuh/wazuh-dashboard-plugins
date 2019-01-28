@@ -28,6 +28,7 @@ export class ConfigurationController {
     this.$location = $location;
     this.$scope.load = false;
     this.$scope.isArray = Array.isArray;
+    this.globalConfigTab = 'view';
     this.configurationHandler = new ConfigurationHandler(apiReq, errorHandler);
     this.$scope.currentConfig = null;
     this.$scope.configurationTab = '';

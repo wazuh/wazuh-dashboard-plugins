@@ -1,8 +1,8 @@
-<div flex="auto" layout="column" ng-controller="managementConfigurationController" ng-if="mctrl.tab === 'configuration'" class="wz-content"
+<div flex="auto" layout="column" ng-controller="managementConfigurationController" ng-if="mctrl.tab === 'configuration'" class="wz-content content-no-border"
 ng-init="switchConfigurationTab('welcome', false)">
 
     <!-- Navigation section -->
-    <div layout="row" layout-align="start center" style="position: absolute;right: 0;width: 200px">
+    <div layout="row" layout-align="start center" style="position: absolute;right: 0;width: 200px; top: 140px">
 
         <!-- Separator -->
         <span flex></span>
@@ -15,3 +15,9 @@ ng-init="switchConfigurationTab('welcome', false)">
         <!-- End help button -->
     </div>
     <!-- End navigation section -->
+        <md-nav-bar class="wz-nav-bar nav-bar-white-bg" md-selected-nav-item="mctrl.globalConfigTab">
+        <md-nav-item class="wz-nav-item" md-nav-click="mctrl.setConfigTab('view')" name="view">View</md-nav-item>
+        <md-nav-item class="wz-nav-item" md-nav-click="mctrl.setConfigTab('configuration')" name="configuration">Edit configuration</md-nav-item>
+        <md-nav-item class="wz-nav-item" md-nav-click="mctrl.setConfigTab('ruleset')" name="ruleset">Edit ruleset</md-nav-item>
+        <md-nav-item class="wz-nav-item" md-nav-click="mctrl.setConfigTab('groups')" name="groups">Edit groups</md-nav-item>
+    </md-nav-bar>
