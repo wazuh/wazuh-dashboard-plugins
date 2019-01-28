@@ -111,7 +111,7 @@ export class WazuhApiCtrl {
               api.cluster_info.node = response.body.data.node;
               api.cluster_info.cluster = response.body.data.cluster;
               api.password = '****';
-              return reply({
+              return ({
                 statusCode: 200,
                 data: api,
                 idChanged: req.idChanged || null
@@ -132,7 +132,7 @@ export class WazuhApiCtrl {
             api.cluster_info.manager = managerName;
             api.password = '****';
 
-            return reply({
+            return ({
               statusCode: 200,
               data: api,
               idChanged: req.idChanged || null
@@ -155,7 +155,7 @@ export class WazuhApiCtrl {
     } catch (error) {
       if (error.code === 'ECONNREFUSED') {
         log('POST /api/check-stored-api', error.message || error);
-        return reply({
+        return ({
           statusCode: 200,
           data: { password: '****', apiIsDown: true }
         });
@@ -310,7 +310,7 @@ export class WazuhApiCtrl {
               );
 
               if (!response.body.error) {
-                return reply({
+                return ({
                   manager: managerName,
                   node: response.body.data.node,
                   cluster: response.body.data.cluster,
@@ -319,7 +319,7 @@ export class WazuhApiCtrl {
               }
             } else {
               // Cluster mode is not active
-              return reply({
+              return ({
                 manager: managerName,
                 cluster: 'Disabled',
                 status: 'disabled'
@@ -352,7 +352,7 @@ export class WazuhApiCtrl {
 
       if (req.params.requirement === 'all') {
         if (!req.headers.id) {
-          return reply(pciRequirementsFile);
+          return (pciRequirementsFile);
         }
         let api = await this.wzWrapper.getWazuhConfigurationById(
           req.headers.id
@@ -384,7 +384,7 @@ export class WazuhApiCtrl {
             if (typeof pciRequirementsFile[item] !== 'undefined')
               PCIobject[item] = pciRequirementsFile[item];
           }
-          return reply(PCIobject);
+          return (PCIobject);
         } else {
           return ErrorResponse(
             'An error occurred trying to parse PCI DSS requirements',
@@ -400,7 +400,7 @@ export class WazuhApiCtrl {
           pci_description = pciRequirementsFile[req.params.requirement];
         }
 
-        return reply({
+        return ({
           pci: {
             requirement: req.params.requirement,
             description: pci_description
@@ -424,7 +424,7 @@ export class WazuhApiCtrl {
 
       if (req.params.requirement === 'all') {
         if (!req.headers.id) {
-          return reply(gdprRequirementsFile);
+          return (gdprRequirementsFile);
         }
         const api = await this.wzWrapper.getWazuhConfigurationById(
           req.headers.id
@@ -454,7 +454,7 @@ export class WazuhApiCtrl {
           (major >= 3 && minor < 2) ||
           (major >= 3 && minor >= 2 && patch < 3)
         ) {
-          return reply({});
+          return ({});
         }
 
         if (api.error_code > 1) {
@@ -483,7 +483,7 @@ export class WazuhApiCtrl {
             if (typeof gdprRequirementsFile[item] !== 'undefined')
               GDPRobject[item] = gdprRequirementsFile[item];
           }
-          return reply(GDPRobject);
+          return (GDPRobject);
         } else {
           return ErrorResponse(
             'An error occurred trying to parse GDPR requirements',
@@ -499,7 +499,7 @@ export class WazuhApiCtrl {
           gdpr_description = gdprRequirementsFile[req.params.requirement];
         }
 
-        return reply({
+        return ({
           gdpr: {
             requirement: req.params.requirement,
             description: gdpr_description
@@ -565,11 +565,11 @@ export class WazuhApiCtrl {
         ((response || {}).body || {}).data
       ) {
         cleanKeys(response);
-        return reply(response.body);
+        return (response.body);
       }
 
       if (((response || {}).body || {}).error && devTools) {
-        return reply(response.body);
+        return (response.body);
       }
 
       throw ((response || {}).body || {}).error &&
@@ -578,7 +578,7 @@ export class WazuhApiCtrl {
         : new Error('Unexpected error fetching data from the Wazuh API');
     } catch (error) {
       if (devTools) {
-        return reply({ error: '3013', message: error.message || error });
+        return ({ error: '3013', message: error.message || error });
       } else {
         if ((error || {}).code && ApiErrorEquivalence[error.code]) {
           error.message = ApiErrorEquivalence[error.code];
@@ -704,7 +704,7 @@ export class WazuhApiCtrl {
   async fetchAgents(req, reply) {
     try {
       const output = await this.monitoringInstance.fetchAgentsExternal();
-      return reply({
+      return ({
         statusCode: 200,
         error: '0',
         data: '',
@@ -804,7 +804,7 @@ export class WazuhApiCtrl {
           }
         }
 
-        return reply(csv).type('text/csv');
+        return (csv).type('text/csv');
       } else if (
         output &&
         output.body &&
@@ -953,7 +953,7 @@ export class WazuhApiCtrl {
         Object.assign(result.lastAgent, lastAgent.items[0]);
       }
 
-      return reply({ error: 0, result });
+      return ({ error: 0, result });
     } catch (error) {
       return ErrorResponse(error.message || error, 3035, 500, reply);
     }
@@ -962,6 +962,6 @@ export class WazuhApiCtrl {
   // Get de list of available requests in the API
   getRequestList(req, reply) {
     //Read a static JSON until the api call has implemented
-    return reply(apiRequestList);
+    return (apiRequestList);
   }
 }
