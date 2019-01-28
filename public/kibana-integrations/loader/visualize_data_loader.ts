@@ -73,12 +73,26 @@ export class VisualizeDataLoader {
     this.vis.showRequestError = false;
 
     try {
-      // searchSource is only there for courier request handler
-      const requestHandlerResponse = await this.requestHandler(this.vis, {
-        partialRows: this.vis.params.partialRows || this.vis.type.requiresPartialRows,
-        ...params,
-      });
+      // Vis types that have a `showMetricsAtAllLevels` param (e.g. data table) should tell
+      // tabify whether to return columns for each bucket based on the param value. Vis types
+      // without this param should default to returning all columns if they are hierarchical.
+      const minimalColumns =
+        typeof this.vis.params.showMetricsAtAllLevels !== 'undefined'
+          ? !this.vis.params.showMetricsAtAllLevels
+          : !this.vis.isHierarchical();
 
+      // searchSource is only there for courier request handler
+      const requestHandlerResponse = await this.requestHandler({
+        partialRows: this.vis.type.requiresPartialRows || this.vis.params.showPartialRows,
+        minimalColumns,
+        metricsAtAllLevels: this.vis.isHierarchical(),
+        visParams: this.vis.params,
+        ...params,
+        filters: params.filters
+          ? params.filters.filter(filter => !filter.meta.disabled)
+          : undefined,
+      });
+      
       // No need to call the response handler when there have been no data nor has been there changes
       // in the vis-state (response handler does not depend on uiStat
       const canSkipResponseHandler =
@@ -91,9 +105,7 @@ export class VisualizeDataLoader {
       this.previousRequestHandlerResponse = requestHandlerResponse;
 
       if (!canSkipResponseHandler) {
-        this.visData = await Promise.resolve(
-          this.responseHandler(requestHandlerResponse)
-        );
+        this.visData = await Promise.resolve(this.responseHandler(requestHandlerResponse));
       }
       return this.visData;
     } catch (error) {
