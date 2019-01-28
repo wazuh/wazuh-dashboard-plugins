@@ -1,13 +1,13 @@
 <div flex="auto" layout="column" ng-if="mctrl.globalRuleSet == 'ruleset'" class="wz-content content-no-border mozilla-table-size-85">
 <div ng-show="!mctrl.currentRule && !mctrl.currentDecoder && !mctrl.currentList">
     <!-- Headline -->
-    <div layout="column" layout-padding>
+    <!--<div layout="column" layout-padding>
         <span class="font-size-18"><i class="fa fa-fw fa-file-text-o" aria-hidden="true"></i> Ruleset</span>
         <span class="md-subheader">Review all your current rules, decoders and CDB lists</span>
-    </div>
+    </div>-->
     <!-- End headline -->
     <!-- End group actions -->
-    <md-nav-bar class="wz-nav-bar" md-selected-nav-item="mctrl.globalRulesetTab">
+    <md-nav-bar class="wz-nav-bar nav-bar-white-bg" md-selected-nav-item="mctrl.globalRulesetTab">
         <md-nav-item class="wz-nav-item" md-nav-click="mctrl.setRulesTab('rules')" name="rules">Rules</md-nav-item>
         <md-nav-item class="wz-nav-item" md-nav-click="mctrl.setRulesTab('decoders')" name="decoders">Decoders</md-nav-item>
         <md-nav-item class="wz-nav-item" md-nav-click="mctrl.setRulesTab('cdblists')" name="cdblists">CDB Lists</md-nav-item>

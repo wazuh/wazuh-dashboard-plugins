@@ -47,7 +47,7 @@
     <!-- End navigation section -->
 
     <!-- Wazuh management navigation bar -->
-    <md-nav-bar
+    <!--<md-nav-bar
         ng-if="!mctrl.load && mctrl.inArray(mctrl.tab, mctrl.wazuhManagementTabs)"
         class="wz-nav-bar"
         ng-show="mctrl.tab !== 'welcome'"
@@ -56,7 +56,7 @@
         <md-nav-item class="wz-nav-item" md-nav-click="mctrl.switchTab('ruleset')" name="ruleset">Ruleset</md-nav-item>
         <md-nav-item class="wz-nav-item" md-nav-click="mctrl.switchTab('groups')" name="groups">Groups</md-nav-item>
         <md-nav-item class="wz-nav-item" md-nav-click="mctrl.switchTab('configuration')" name="configuration">Configuration</md-nav-item>
-    </md-nav-bar>
+    </md-nav-bar>-->
     <!-- End Wazuh management navigation bar -->
 
     <!-- Status and reports navigation bar -->
