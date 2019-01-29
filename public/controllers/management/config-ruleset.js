@@ -68,34 +68,30 @@ export class ConfigurationRulesetController {
       this.$scope.xmlHasErrors = valid;
       if (!this.$scope.$$phase) this.$scope.$digest();
     };
-    
-    this.$scope.doSaveConfig = (isNewFile,fileName) => {
-      if(isNewFile && !fileName){
-        this.errorHandler.handle('You need to specify a file name','Error creating a new file.');
-      }else{
+
+    this.$scope.doSaveConfig = (isNewFile, fileName) => {
+      if (isNewFile && !fileName) {
+        this.errorHandler.handle('You need to specify a file name', 'Error creating a new file.');
+      } else {
         this.$scope.editingFile = false;
-        if(isNewFile){
+        if (isNewFile) {
           const validFileName = /(.+).xml/;
           if (fileName && !validFileName.test(fileName)) {
             fileName = fileName + '.xml'
           }
-          this.$scope.selectedItem = {file:fileName}
-          if(this.$scope.type === 'rules'){
+          this.$scope.selectedItem = { file: fileName }
+          if (this.$scope.type === 'rules') {
             this.$scope.$broadcast('saveXmlFile', { rule: this.$scope.selectedItem });
-          }else if(this.$scope.type === 'decoders'){
+          } else if (this.$scope.type === 'decoders') {
             this.$scope.$broadcast('saveXmlFile', { decoder: this.$scope.selectedItem });
           }
-        }else{
+        } else {
           const objParam = this.$scope.selectedRulesetTab === 'rules' ? { rule: this.$scope.selectedItem } : { decoder: this.$scope.selectedItem };
           this.$scope.$broadcast('saveXmlFile', objParam);
         }
-        
+
       }
     };
-
-
-
-
     this.$scope.addNewFile = (type) => {
       this.$scope.editingFile = true;
       this.$scope.newFile = true;
@@ -103,7 +99,7 @@ export class ConfigurationRulesetController {
       this.$scope.fetchedXML = '<!-- Modify it at your will. -->';
       this.$scope.type = type;
       if (!this.$scope.$$phase) this.$scope.$digest();
-        this.$scope.$broadcast('fetchedFile', { data: this.$scope.fetchedXML });
+      this.$scope.$broadcast('fetchedFile', { data: this.$scope.fetchedXML });
     };
 
     /**
@@ -111,6 +107,7 @@ export class ConfigurationRulesetController {
      */
     this.$scope.switchRulesetTab = async (rulesettab) => {
       this.$scope.closeEditingFile();
+      this.$scope.viewingDetail = false;
       this.$scope.selectedRulesetTab = rulesettab;
       this.$scope.selectData;
       this.$scope.custom_search = '';
@@ -122,11 +119,9 @@ export class ConfigurationRulesetController {
         this.$scope.searchPlaceholder = 'Filter decoders...'
       }
       if (rulesettab === 'cdblists') {
-        const data = await this.rulesetHandler.getLocalDecoders();
-        this.$scope.selectData = ((((data || {}).data || {}).data || {}).items | {}).map(x => x.file) || false;
+        this.$scope.searchPlaceholder = 'Filter lists...'
       }
       if (!this.$scope.$$phase) this.$scope.$digest();
-      //this.configurationHandler.switchWodle(wodleName, this.$scope);
     };
     this.$scope.switchRulesetTab('rules');
 
@@ -140,17 +135,20 @@ export class ConfigurationRulesetController {
       });
       return result;
     }
+    this.$scope.cancelEditList = () => {
+      this.$scope.viewingDetail = false;
+      this.$scope.currentList = false;
+    }
     //listeners
-    this.$scope.$on('wazuhShowCdbList', () => {
-      this.$scope.currentList = {};
-      this.rulesetHandler.getCdbList('etc/lists/audit-keys')
+    this.$scope.$on('wazuhShowCdbList', (ev, parameters) => {
+      this.$scope.currentList = parameters.cdblist;
+      this.rulesetHandler.getCdbList(`etc/lists/${this.$scope.currentList.name}`)
         .then(data => {
           this.$scope.currentList.list = stringToObj(data.data.data);
           this.$scope.viewingDetail = true;
           if (!this.$scope.$$phase) this.$scope.$digest();
         });
     });
-    //listeners
     this.$scope.$on('wazuhShowRule', (event, parameters) => {
       this.$scope.selectedItem = parameters.rule;
       this.$scope.selectedFileName = 'rules';
@@ -158,12 +156,6 @@ export class ConfigurationRulesetController {
       if (!this.$scope.$$phase) this.$scope.$digest();
     });
     this.$scope.$on('wazuhShowDecoder', (event, parameters) => {
-      this.$scope.selectedItem = parameters.decoder;
-      this.$scope.selectedFileName = 'decoders';
-      this.$scope.editConfig();
-      if (!this.$scope.$$phase) this.$scope.$digest();
-    });
-    this.$scope.$on('wazuhShowCdbList', (event, parameters) => {
       this.$scope.selectedItem = parameters.decoder;
       this.$scope.selectedFileName = 'decoders';
       this.$scope.editConfig();

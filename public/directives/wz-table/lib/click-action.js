@@ -64,7 +64,7 @@ export function clickAction(
     $scope.$emit('wazuhShowRule', { rule: item });
   } else if (instance.path.includes('/decoders')) {
     $scope.$emit('wazuhShowDecoder', { decoder: item });
-  } else if (instance.path.includes('/cdblists')) {
+  } else if (instance.path.includes('/lists/files')) {
     $scope.$emit('wazuhShowCdbList', { cdblist: item });
   } else if (instance.path === '/cluster/nodes') {
     $scope.$emit('wazuhShowClusterNode', { node: item });

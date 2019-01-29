@@ -565,6 +565,14 @@ export class WazuhApiCtrl {
         data = data.content.replace(new RegExp('\\n', 'g'), '');
       }
 
+      if (
+        typeof (data || {}).content === 'string' &&
+        (data || {}).origin === 'raw'
+      ) {
+        options.content_type = 'application/octet-stream';
+        data = data.content;
+      }
+
       const fullUrl = getPath(api) + path;
       const response = await needle(method, fullUrl, data, options);
 

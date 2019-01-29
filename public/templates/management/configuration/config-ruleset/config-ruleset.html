@@ -9,7 +9,7 @@
         <md-nav-item class="wz-nav-item" md-nav-click="switchRulesetTab('cdblists')" name="cdblists">CDB Lists</md-nav-item>
     </md-nav-bar>
 
-    <div class="md-padding" ng-show="!editingFile">
+    <div class="md-padding" ng-show="!editingFile && !viewingDetail">
         <!-- Search bar -->
         <div layout="row" ng-if="!addingAgents && !file" class="wz-padding-bottom-14">
             <input placeholder="{{searchPlaceholder}}" ng-model="custom_search" type="text" class="kuiLocalSearchInput ng-empty ng-pristine ng-scope ng-touched ng-valid"
@@ -44,7 +44,7 @@
         <div ng-if="selectedRulesetTab === 'cdblists'">
             <md-card flex class="wz-md-card _md flex wz-no-margin">
                 <md-card-content>
-                    <wz-table flex path="'/cdblists'" keys="['name']" allow-click="true" row-sizes="[17,15,13]"></wz-table>
+                    <wz-table flex path="'/lists/files'" keys="['name']" allow-click="true" row-sizes="[17,15,13]"></wz-table>
                 </md-card-content>
             </md-card>
         </div>
@@ -75,6 +75,14 @@
                     valid-fn='xmlIsValid(valid)'>
                 </wz-xml-file-editor>
             </div>
+        </div>
+    </div>
+    <div class="md-padding" ng-show="viewingDetail">
+        <div flex layout="column">
+            <div layout="row" class="wz-padding-bottom-14 wz-margin-bottom-10">
+                <span ng-click='cancelEditList()' class='btn btn-info'>Cancel</span>
+            </div>
+            <wz-list-manage style="margin: -16px;" ng-if="currentList" list="currentList"></wz-list-manage>
         </div>
     </div>
 </div>

@@ -105,7 +105,7 @@ export class RulesetHandler {
       const result = await this.apiReq.request(
         'POST',
         `/manager/files?path=etc/lists/${list}`,
-        { content, origin: 'json' }
+        { content, origin: 'raw' }
       );
       return result;
     } catch (error) {

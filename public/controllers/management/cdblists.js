@@ -179,11 +179,11 @@ export function CdbListsController(
     });
     return result;
   }
+
   //listeners
-  $scope.$on('wazuhShowCdbList', () => {
-    //$scope.currentList = parameters.cdblist;
-    $scope.currentList = {};
-    rulesetHandler.getCdbList('etc/lists/audit-keys')
+  $scope.$on('wazuhShowCdbList', (ev, parameters) => {
+    $scope.currentList = parameters.cdblist;
+    rulesetHandler.getCdbList(`etc/lists/${$scope.currentList.name}`)
       .then(data => {
         $scope.currentList.list = stringToObj(data.data.data);
         $scope.$emit('setCurrentList', { currentList: $scope.currentList });
@@ -191,67 +191,6 @@ export function CdbListsController(
         if (!$scope.$$phase) $scope.$digest();
       });
   });
-
-  const saveList = async () => {
-    try {
-      let raw = '';
-      for (var key in $scope.currentList.list) {
-        raw = raw.concat(`${key}:${$scope.currentList.list[key]}\n`);
-      }
-      //const result = await rulesetHandler.sendCdbList('audit-keys', raw);
-      const result = await rulesetHandler.sendCdbList('audit-keys', JSON.stringify($scope.currentList.list));
-      errorHandler.info(result.data.data, '');
-    } catch (err) {
-      errorHandler.handle(err, 'Error updating list');
-    }
-  }
-
-  $scope.addEntry = (key, value) => {
-    if (!$scope.currentList.list[key]) {
-      $scope.currentList.list[key] = value;
-      saveList();
-    } else {
-      errorHandler.handle('Entry already exists', '');
-    }
-  }
-
-  /**
- * Enable edition for a given key
- * @param {String} key Entry key
- */
-  $scope.setEditingKey = (key, value) => {
-    $scope.editingKey = key;
-    $scope.editingNewValue = value;
-  }
-  /**
-   * Cancel edition of an entry
-   */
-  $scope.cancelEditingKey = () => {
-    $scope.editingKey = false;
-    $scope.editingNewValue = '';
-  }
-
-  $scope.showConfirmRemoveEntry = (ev, key) => {
-    $scope.removingEntry = key;
-  };
-
-  $scope.editKey = (key, newValue) => {
-    $scope.loadingChange = true;
-    $scope.currentList.list[key] = newValue;
-    $scope.cancelEditingKey();
-    $scope.loadingChange = false;
-    saveList();
-  }
-
-  $scope.cancelRemoveEntry = () => {
-    $scope.removingEntry = false;
-  };
-
-  $scope.confirmRemoveEntry = (key) => {
-    delete $scope.currentList.list[key];
-    $scope.removingEntry = false;
-    saveList();
-  };
 
   /**
    * This function changes to the lists list view

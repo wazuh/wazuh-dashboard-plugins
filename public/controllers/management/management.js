@@ -50,6 +50,7 @@ export class ManagementController {
     });
     this.$scope.$on('setCurrentList', (ev, params) => {
       this.currentList = (params || {}).currentList || false;
+      if (!this.$scope.$$phase) this.$scope.$digest();
     });
     this.$scope.$on('removeCurrentList', () => {
       this.currentList = false;
