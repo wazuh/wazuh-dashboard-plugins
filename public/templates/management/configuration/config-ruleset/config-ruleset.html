@@ -23,23 +23,25 @@
             <md-card flex class="wz-md-card _md flex wz-no-margin">
                 <md-card-content>
                     <wz-table flex path="'/rules'" keys="['id',{value:'file',size:2},{value:'description',size:2},{value:'groups',nosortable:true,size:2},{value:'pci',nosortable:true,size:2},{value:'gdpr',nosortable:true},'level']"
-                        implicit-filter="[{ name:'path',value: '/var/ossec/etc/rules'}]" allow-click="true" row-sizes="[17,15,13]">
+                        implicit-filter="[{ name:'path',value: '/var/ossec/etc/rules'}]" allow-click="true" row-sizes="[17,15,13]"></wz-table>
                 </md-card-content>
             </md-card>
-            </wz-table>
         </div>
         <div ng-if="selectedRulesetTab === 'decoders'">
             <md-card flex class="wz-md-card _md flex wz-no-margin">
                 <md-card-content>
                     <wz-table flex path="'/decoders'" keys="['name',{value:'details.program_name',size:2,nosortable:true},{value:'details.order',size:2,nosortable:true},'file']"
                         implicit-filter="[{ name:'path',value: '/var/ossec/etc/decoders'}]" allow-click="true"
-                        row-sizes="[17,15,13]">
+                        row-sizes="[17,15,13]"></wz-table>
                 </md-card-content>
             </md-card>
-            </wz-table>
         </div>
         <div ng-if="selectedRulesetTab === 'cdblists'">
-            elige CDB Lists
+            <md-card flex class="wz-md-card _md flex wz-no-margin">
+                <md-card-content>
+                    <wz-table flex path="'/cdblists'" keys="['name']" allow-click="true" row-sizes="[17,15,13]"></wz-table>
+                </md-card-content>
+            </md-card>
         </div>
     </div>
 
