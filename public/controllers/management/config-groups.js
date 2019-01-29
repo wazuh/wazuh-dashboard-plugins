@@ -84,7 +84,7 @@ export class ConfigurationGroupsController {
     };
     this.$scope.doSaveConfig = () => {
       this.$scope.editingFile = false;
-      this.$scope.$broadcast('saveXmlFile', { rule: this.$scope.selectedItem });
+      this.$scope.$broadcast('saveXmlFile', { group: this.$scope.selectedItem.name });
     };
 
     this.$scope.closeEditingFile();
