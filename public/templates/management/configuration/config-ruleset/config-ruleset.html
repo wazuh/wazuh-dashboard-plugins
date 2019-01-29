@@ -17,6 +17,11 @@
             <button type="submit" aria-label="Search" class="kuiLocalSearchButton height-40" ng-click="search(custom_search)">
                 <span class="fa fa-search" aria-hidden="true"></span>
             </button>
+            <button class="btn btn-primary wz-margin-left-8" ng-show="selectedRulesetTab === 'rules'" ng-click="addNewFile('rules');">New
+                rules
+                file</button>
+            <button class="btn btn-primary wz-margin-left-8" ng-show="selectedRulesetTab === 'decoders'" ng-click="addNewFile('decoders');">New
+                decoders file</button>
         </div>
         <!-- End search bar -->
         <div ng-if="selectedRulesetTab === 'rules'">
@@ -25,7 +30,6 @@
                     <wz-table flex path="'/rules'" keys="['id',{value:'file',size:2},{value:'description',size:2},{value:'groups',nosortable:true,size:2},{value:'pci',nosortable:true,size:2},{value:'gdpr',nosortable:true},'level']"
                         implicit-filter="[{ name:'path',value: '/var/ossec/etc/rules'}]" allow-click="true" row-sizes="[17,15,13]"></wz-table>
                 </md-card-content>
-                <button class="btn btn-primary" ng-click="addNewFile('rules');">New file</button>
             </md-card>
         </div>
         <div ng-if="selectedRulesetTab === 'decoders'">
@@ -35,7 +39,6 @@
                         implicit-filter="[{ name:'path',value: '/var/ossec/etc/decoders'}]" allow-click="true"
                         row-sizes="[17,15,13]"></wz-table>
                 </md-card-content>
-                <button class="btn btn-primary" ng-click="addNewFile('decoders');">New file</button>
             </md-card>
         </div>
         <div ng-if="selectedRulesetTab === 'cdblists'">
@@ -64,8 +67,8 @@
                     <span ng-show='xmlHasErrors' class='btn-danger'><i aria-hidden='true' class='fa fa-fw fa-exclamation-triangle'></i>
                         XML format error</span>
                 </button>
-                <input placeholder="Enter file name" ng-model="newFileName" type="text" class="kuiLocalSearchInput ng-empty ng-pristine ng-scope ng-touched ng-valid"
-                aria-invalid="false">
+                <input placeholder="Enter file name" ng-model="newFileName" type="text" class="wz-margin-left-8 kuiLocalSearchInput ng-empty ng-pristine ng-scope ng-touched ng-valid"
+                    aria-invalid="false">
             </div>
             <div ng-if="fetchedXML">
                 <wz-xml-file-editor file-name='{{selectedFileName}}' data="fetchedXML" target-name="selectedItem.file"
