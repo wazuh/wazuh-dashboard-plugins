@@ -68,7 +68,8 @@ export class ConfigurationRulesetController {
     };
     this.$scope.doSaveConfig = () => {
       this.$scope.editingFile = false;
-      this.$scope.$broadcast('saveXmlFile', { rule: this.$scope.selectedItem });
+      const objParam = this.$scope.selectedRulesetTab === 'rules' ? { rule: this.$scope.selectedItem } : { decoder: this.$scope.selectedItem };
+      this.$scope.$broadcast('saveXmlFile', objParam);
     };
 
     /**
@@ -80,7 +81,12 @@ export class ConfigurationRulesetController {
       this.$scope.selectData;
       this.$scope.custom_search = '';
       this.$scope.selectedItem = false;
-
+      if (rulesettab === 'rules') {
+        this.$scope.searchPlaceholder = 'Filter rules...'
+      }
+      if (rulesettab === 'decoders') {
+        this.$scope.searchPlaceholder = 'Filter decoders...'
+      }
       if (rulesettab === 'cdblists') {
         const data = await this.rulesetHandler.getLocalDecoders();
         this.$scope.selectData = ((((data || {}).data || {}).data || {}).items | {}).map(x => x.file) || false;

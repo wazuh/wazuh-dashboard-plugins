@@ -169,13 +169,23 @@ export function CdbListsController(
     $scope.closeDetailView();
   };
 
+  const stringToObj = (string) => {
+    let result = {};
+    const splitted = string.split('\n');
+    splitted.forEach(function (element) {
+      const keyValue = element.split(':');
+      if (keyValue[0])
+        result[keyValue[0]] = keyValue[1];
+    });
+    return result;
+  }
   //listeners
   $scope.$on('wazuhShowCdbList', () => {
     //$scope.currentList = parameters.cdblist;
     $scope.currentList = {};
     rulesetHandler.getCdbList('etc/lists/audit-keys')
       .then(data => {
-        $scope.currentList.list = data.data.data;
+        $scope.currentList.list = stringToObj(data.data.data);
         $scope.$emit('setCurrentList', { currentList: $scope.currentList });
         $scope.viewingDetail = true;
         if (!$scope.$$phase) $scope.$digest();

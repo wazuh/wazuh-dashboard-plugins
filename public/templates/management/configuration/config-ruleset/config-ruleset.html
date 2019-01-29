@@ -22,8 +22,8 @@
         <div ng-if="selectedRulesetTab === 'rules'">
             <md-card flex class="wz-md-card _md flex wz-no-margin">
                 <md-card-content>
-                    <wz-table flex path="'/rules'" keys="['file']" implicit-filter="[{ name:'path',value: '/var/ossec/etc/rules'}]"
-                        allow-click="true" row-sizes="[17,15,13]">
+                    <wz-table flex path="'/rules'" keys="['id',{value:'file',size:2},{value:'description',size:2},{value:'groups',nosortable:true,size:2},{value:'pci',nosortable:true,size:2},{value:'gdpr',nosortable:true},'level']"
+                        implicit-filter="[{ name:'path',value: '/var/ossec/etc/rules'}]" allow-click="true" row-sizes="[17,15,13]">
                 </md-card-content>
             </md-card>
             </wz-table>
@@ -31,8 +31,9 @@
         <div ng-if="selectedRulesetTab === 'decoders'">
             <md-card flex class="wz-md-card _md flex wz-no-margin">
                 <md-card-content>
-                    <wz-table flex path="'/decoders'" keys="['file']" implicit-filter="[{ name:'path',value: '/var/ossec/etc/decoders'}]"
-                        allow-click="true" row-sizes="[17,15,13]">
+                    <wz-table flex path="'/decoders'" keys="['name',{value:'details.program_name',size:2,nosortable:true},{value:'details.order',size:2,nosortable:true},'file']"
+                        implicit-filter="[{ name:'path',value: '/var/ossec/etc/decoders'}]" allow-click="true"
+                        row-sizes="[17,15,13]">
                 </md-card-content>
             </md-card>
             </wz-table>
@@ -41,7 +42,6 @@
             elige CDB Lists
         </div>
     </div>
-    <!-- <select ng-disabled="!selectData" class="wz-input-text wz-width-100" ng-model="selectedItem" ng-change="" ng-options="o as o for o in selectData"></select> -->
 
     <!-- XML editor for node configuration -->
     <div class="md-padding" ng-show="editingFile">
@@ -55,7 +55,8 @@
                 </button>
             </div>
             <div ng-if="fetchedXML">
-                <wz-xml-file-editor file-name='{{selectedFileName}}' data="fetchedXML" target-name="selectedItem.file" valid-fn='xmlIsValid(valid)'>
+                <wz-xml-file-editor file-name='{{selectedFileName}}' data="fetchedXML" target-name="selectedItem.file"
+                    valid-fn='xmlIsValid(valid)'>
                 </wz-xml-file-editor>
             </div>
         </div>

@@ -1,7 +1,7 @@
 <div flex="auto" layout="column" ng-if="editionTab === 'groups'" ng-controller="configurationGroupsController">
     <div layout="column" layout-padding>
-        <span class="font-size-18"><i class="fa fa-fw fa-file-text-o" aria-hidden="true"></i> Edit the groups</span>
-        <span class="md-subheader">Edit your current rules, decoders and CDB lists</span>
+        <span class="font-size-18"> <i class="fa fa-fw fa-object-group" aria-hidden="true"></i> Edit the groups</span>
+        <span class="md-subheader">Edit your groups configuration</span>
     </div>
 
     <div class="md-padding" ng-show="!editingFile">
@@ -21,7 +21,6 @@
         </md-card>
         </wz-table>
     </div>
-    <!-- <select ng-disabled="!selectData" class="wz-input-text wz-width-100" ng-model="selectedItem" ng-change="" ng-options="o as o for o in selectData"></select> -->
 
     <!-- XML editor for node configuration -->
     <div class="md-padding" ng-show="editingFile">
@@ -35,7 +34,7 @@
                 </button>
             </div>
             <div ng-if="fetchedXML">
-                <wz-xml-file-editor file-name='{{selectedFileName}}' data="fetchedXML" target-name="selectedItem.file"
+                <wz-xml-file-editor file-name='agent.conf' data="fetchedXML" target-name="selectedItem.name + ' group'"
                     valid-fn='xmlIsValid(valid)'>
                 </wz-xml-file-editor>
             </div>
