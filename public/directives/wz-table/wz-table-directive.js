@@ -94,7 +94,7 @@ app.directive('wzTable', function () {
        * Common functions
        */
       $scope.clickAction = (item, openAction = false) =>
-        clickAction(item, openAction, instance, shareAgent, $location, $scope);
+        clickAction(item, openAction, instance, shareAgent, $location, $scope, appState);
 
       const fetch = async (options = {}) => {
         try {

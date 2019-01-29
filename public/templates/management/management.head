@@ -10,12 +10,12 @@
         <div layout="row" layout-padding>
             <!-- If you're not on the Welcome tab, show a functional breadcrumb -->
             <div ng-if="mctrl.tab !== 'welcome' && !mctrl.currentGroup">
-                <span class="wz-text-link cursor-pointer" ng-click="mctrl.switchTab('welcome')">Management</span>
+                <span class="wz-text-link cursor-pointer" ng-click="mctrl.switchTab('welcome', true)">Management</span>
                 <span> / {{ mctrl.tabNames[mctrl.tab] }}</span>
             </div>
             <div ng-if="mctrl.tab === 'groups' && mctrl.currentGroup && mctrl.currentGroup.name">
-                <span class="wz-text-link cursor-pointer" ng-click="mctrl.switchTab('welcome')">Management</span>
-                <span class="wz-text-link cursor-pointer" ng-click="mctrl.switchTab('groups')"> / {{ mctrl.tabNames[mctrl.tab] }}</span>
+                <span class="wz-text-link cursor-pointer" ng-click="mctrl.switchTab('welcome', true)">Management</span>
+                <span class="wz-text-link cursor-pointer" ng-click="mctrl.switchTab('groups', true)"> / {{ mctrl.tabNames[mctrl.tab] }}</span>
                 <span> / {{ mctrl.currentGroup.name }} </span>
             </div>
             <!-- If you're on the Welcome tab, show a blank, simple breadcrumb -->
@@ -53,9 +53,9 @@
         ng-show="mctrl.tab !== 'welcome'"
         md-selected-nav-item="mctrl.tab"
         nav-bar-aria-label="Wazuh management navigation links">
-        <md-nav-item class="wz-nav-item" md-nav-click="mctrl.switchTab('ruleset')" name="ruleset">Ruleset</md-nav-item>
-        <md-nav-item class="wz-nav-item" md-nav-click="mctrl.switchTab('groups')" name="groups">Groups</md-nav-item>
-        <md-nav-item class="wz-nav-item" md-nav-click="mctrl.switchTab('configuration')" name="configuration">Configuration</md-nav-item>
+        <md-nav-item class="wz-nav-item" md-nav-click="mctrl.switchTab('ruleset', true)" name="ruleset">Ruleset</md-nav-item>
+        <md-nav-item class="wz-nav-item" md-nav-click="mctrl.switchTab('groups', true)" name="groups">Groups</md-nav-item>
+        <md-nav-item class="wz-nav-item" md-nav-click="mctrl.switchTab('configuration', true)" name="configuration">Configuration</md-nav-item>
     </md-nav-bar>-->
     <!-- End Wazuh management navigation bar -->
 
@@ -66,9 +66,9 @@
         ng-show="mctrl.tab !== 'welcome'"
         md-selected-nav-item="mctrl.tab"
         nav-bar-aria-label="Status and reports navigation links">
-        <md-nav-item class="wz-nav-item" md-nav-click="mctrl.switchTab('status')" name="status">Status</md-nav-item>
-        <md-nav-item class="wz-nav-item" md-nav-click="mctrl.switchTab('logs')" name="logs">Logs</md-nav-item>
-        <md-nav-item class="wz-nav-item" md-nav-click="mctrl.switchTab('monitoring')" name="monitoring">Cluster</md-nav-item>
-        <md-nav-item class="wz-nav-item" md-nav-click="mctrl.switchTab('reporting')" name="reporting">Reporting</md-nav-item>
+        <md-nav-item class="wz-nav-item" md-nav-click="mctrl.switchTab('status', true)" name="status">Status</md-nav-item>
+        <md-nav-item class="wz-nav-item" md-nav-click="mctrl.switchTab('logs', true)" name="logs">Logs</md-nav-item>
+        <md-nav-item class="wz-nav-item" md-nav-click="mctrl.switchTab('monitoring', true)" name="monitoring">Cluster</md-nav-item>
+        <md-nav-item class="wz-nav-item" md-nav-click="mctrl.switchTab('reporting', true)" name="reporting">Reporting</md-nav-item>
     </md-nav-bar>
     <!-- End Status and reports navigation bar -->

@@ -18,7 +18,7 @@ export class ManagementController {
    * @param {*} $location
    * @param {*} shareAgent
    */
-  constructor($scope, $location, shareAgent, wazuhConfig) {
+  constructor($scope, $location, shareAgent, wazuhConfig, appState) {
     this.$scope = $scope;
     this.$location = $location;
     this.shareAgent = shareAgent;
@@ -60,6 +60,7 @@ export class ManagementController {
     this.$scope.$on('removeCurrentConfiguration', () => {
       this.currentConfiguration = false;
     });
+    this.appState = appState;
   }
 
   /**
@@ -99,7 +100,10 @@ export class ManagementController {
    * This switch to a selected tab
    * @param {String} tab
    */
-  switchTab(tab) {
+  switchTab(tab, setNav = false) {
+    if (setNav) {
+      this.appState.setNavigation({ status: true });
+    }
     this.tab = tab;
 
     if (this.tab === 'groups') {

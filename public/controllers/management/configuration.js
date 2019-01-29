@@ -50,6 +50,7 @@ export class ConfigurationController {
       sections,
       navigate = true
     ) => {
+      this.appState.setNavigation({ status: true });
       this.$scope.navigate = navigate;
       try {
         this.$scope.configSubTab = JSON.stringify({
@@ -78,6 +79,7 @@ export class ConfigurationController {
      * Navigate to woodle
      */
     this.$scope.switchWodle = (wodleName, navigate = true) => {
+      this.appState.setNavigation({ status: true });
       this.$scope.navigate = navigate;
       this.$scope.configWodle = wodleName;
       if (!this.$location.search().configWodle) {
