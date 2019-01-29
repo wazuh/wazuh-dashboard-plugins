@@ -566,4 +566,11 @@ export function GroupsController(
     }
     $scope.$broadcast('wazuhSearch', {});
   };
+
+  // Come from the pencil icon on the groups table
+  $scope.$on('openGroupFromList',(ev,parameters) => {
+    $scope.editingFile = true;
+    $scope.groupsSelectedTab = 'files';
+    return $scope.loadGroup(parameters.group).then(() => $scope.editGroupAgentConfig());
+  })
 }

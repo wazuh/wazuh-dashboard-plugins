@@ -332,6 +332,10 @@ app.directive('wzTable', function () {
         $scope.removingGroup = null;
         return init();
       };
+
+      $scope.editGroup = group => {
+        $scope.$emit('openGroupFromList',{group})
+      }
     },
     template
   };
