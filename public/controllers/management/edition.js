@@ -61,7 +61,7 @@ export class EditionController {
           data = await this.apiReq.request(
             'GET',
             `/manager/files`,
-            { path: 'etc/ossec.conf', format: 'xml' }
+            { path: 'etc/ossec.conf'}
           );
           xml = ((data || {}).data || {}).data || false;
         }
@@ -91,7 +91,6 @@ export class EditionController {
 
     this.$scope.saveConfiguration = async () => {
       try {
-        console.log(this.$scope.selectedNode)
         if (this.$scope.clusterStatus.data.data.enabled === 'yes') {
           this.$scope.$broadcast('saveXmlFile', { node: this.$scope.selectedNode });
         } else {
