@@ -13,6 +13,32 @@ export class RulesetHandler {
   constructor(apiReq) {
     this.apiReq = apiReq;
   }
+  async getLocalRules() {
+    try {
+      const result = await this.apiReq.request(
+        'GET',
+        `/rules`,
+        { path: '/var/ossec/etc/rules' }
+      );
+      return result;
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  }
+
+  async getLocalDecoders() {
+    try {
+      const result = await this.apiReq.request(
+        'GET',
+        `/decoders`,
+        { path: '/var/ossec/etc/decoders' }
+      );
+      return result;
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  }
+
   async getRuleConfiguration(path) {
     try {
       const result = await this.apiReq.request(

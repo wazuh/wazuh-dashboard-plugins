@@ -28,7 +28,6 @@ export class ConfigurationController {
     this.$location = $location;
     this.$scope.load = false;
     this.$scope.isArray = Array.isArray;
-    this.globalConfigTab = 'view';
     this.configurationHandler = new ConfigurationHandler(apiReq, errorHandler);
     this.$scope.currentConfig = null;
     this.$scope.configurationTab = '';
@@ -142,8 +141,15 @@ export class ConfigurationController {
       this.appState.removeSessionStorageItem('configSubTab')
     );
 
-    this.$scope.$on('configurationIsReloaded', () => {
-      this.$scope.switchConfigurationTab('welcome', true)
+    this.$scope.$on('configurationIsReloaded', (ev, params) => {
+      if ((params || {}).globalConfigTab) {
+        this.$scope.configurationTab = '';
+        this.$scope.editionTab = params.globalConfigTab;
+        this.$scope.$emit('removeCurrentConfiguration', {});
+      } else {
+        this.$scope.editionTab = '';
+        this.$scope.switchConfigurationTab('welcome', true);
+      }
       if (!this.$scope.$$phase) this.$scope.$digest();
     });
   }

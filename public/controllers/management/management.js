@@ -25,6 +25,7 @@ export class ManagementController {
     this.wazuhConfig = wazuhConfig;
     this.tab = 'welcome';
     this.rulesetTab = 'rules';
+    this.globalConfigTab = 'overview'
     this.tabNames = TabNames;
     this.wazuhManagementTabs = ['ruleset', 'groups', 'configuration'];
     this.statusReportsTabs = ['status', 'logs', 'reporting', 'monitoring'];
@@ -89,6 +90,11 @@ export class ManagementController {
     return item && Array.isArray(array) && array.includes(item);
   }
 
+  setConfigTab(tab) {
+    this.globalConfigTab = tab;
+    this.$location.search('configSubTab', null);
+    this.$scope.$broadcast('configurationIsReloaded', { globalConfigTab: this.globalConfigTab });
+  }
   /**
    * This switch to a selected tab
    * @param {String} tab
@@ -100,6 +106,7 @@ export class ManagementController {
       this.$scope.$broadcast('groupsIsReloaded');
     }
     if (this.tab === 'configuration') {
+      this.globalConfigTab = 'overview'
       this.currentConfiguration = false;
       this.$scope.$broadcast('configurationIsReloaded');
     } else {
