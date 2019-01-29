@@ -1,5 +1,5 @@
 /*
- * Wazuh app - Management edit ruleset configuration controller
+ * Wazuh app - Management edit groups configuration controller
  * Copyright (C) 2015-2019 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -9,7 +9,7 @@
  *
  * Find more information about this on the LICENSE file.
  */
-export class ConfigurationRulesetController {
+export class ConfigurationGroupsController {
   /**
    * Constructor
    * @param {*} $scope
@@ -18,7 +18,7 @@ export class ConfigurationRulesetController {
    * @param {*} apiReq
    * @param {*} appState
    */
-  constructor($scope, $location, errorHandler, apiReq, appState, rulesetHandler) {
+  constructor($scope, $location, errorHandler, apiReq, appState, groupHandler) {
     this.$scope = $scope;
     this.errorHandler = errorHandler;
     this.apiReq = apiReq;
@@ -26,7 +26,7 @@ export class ConfigurationRulesetController {
     this.$location = $location;
     this.$scope.load = false;
     this.$scope.isArray = Array.isArray;
-    this.rulesetHandler = rulesetHandler;
+    this.groupHandler = groupHandler;
     this.$scope.currentConfig = null;
 
   }
@@ -47,9 +47,7 @@ export class ConfigurationRulesetController {
     this.$scope.editConfig = async () => {
       this.$scope.editingFile = true;
       try {
-        this.$scope.fetchedXML = this.$scope.selectedRulesetTab === 'rules' ?
-          await this.rulesetHandler.getRuleConfiguration(this.$scope.selectedItem.file) :
-          await this.rulesetHandler.getDecoderConfiguration(this.$scope.selectedItem.file)
+        this.$scope.fetchedXML = await this.groupHandler.getRuleConfiguration(this.$scope.selectedItem.file)
         if (!this.$scope.$$phase) this.$scope.$digest();
         this.$scope.$broadcast('fetchedFile', { data: this.$scope.fetchedXML });
       } catch (error) {
@@ -71,37 +69,37 @@ export class ConfigurationRulesetController {
       this.$scope.$broadcast('saveXmlFile', { rule: this.$scope.selectedItem });
     };
 
-    /**
-     * Navigate to woodle
-     */
-    this.$scope.switchRulesetTab = async (rulesettab) => {
-      this.$scope.closeEditingFile();
-      this.$scope.selectedRulesetTab = rulesettab;
-      this.$scope.selectData;
-      this.$scope.custom_search = '';
-      this.$scope.selectedItem = false;
+    this.$scope.closeEditingFile();
+    this.$scope.selectData;
+    this.$scope.custom_search = '';
+    this.$scope.selectedItem = false;
 
-      if (rulesettab === 'cdblists') {
-        const data = await this.rulesetHandler.getLocalDecoders();
-        this.$scope.selectData = ((((data || {}).data || {}).data || {}).items | {}).map(x => x.file) || false;
-      }
-      if (!this.$scope.$$phase) this.$scope.$digest();
-      //this.configurationHandler.switchWodle(wodleName, this.$scope);
-    };
-    this.$scope.switchRulesetTab('rules');
+    if (!this.$scope.$$phase) this.$scope.$digest();
+
 
     //listeners
-    this.$scope.$on('wazuhShowRule', (event, parameters) => {
-      this.$scope.selectedItem = parameters.rule;
-      this.$scope.selectedFileName = 'rules';
+    this.$scope.$on('wazuhShowGroup', (event, parameters) => {
+      this.$scope.selectedItem = parameters.groups;
       this.$scope.editConfig();
       if (!this.$scope.$$phase) this.$scope.$digest();
     });
-    this.$scope.$on('wazuhShowDecoder', (event, parameters) => {
-      this.$scope.selectedItem = parameters.decoder;
-      this.$scope.selectedFileName = 'decoders';
-      this.$scope.editConfig();
-      if (!this.$scope.$$phase) this.$scope.$digest();
-    });
+  }
+
+  async fetchFile() {
+    try {
+      const data = await this.apiReq.request(
+        'GET',
+        `/agents/groups/${this.$scope.selectedItem.name}/files/agent.conf`,
+        { format: 'xml' }
+      );
+      const xml = ((data || {}).data || {}).data || false;
+
+      if (!xml) {
+        throw new Error('Could not fetch agent.conf file');
+      }
+      return xml;
+    } catch (error) {
+      return Promise.reject(error);
+    }
   }
 }
