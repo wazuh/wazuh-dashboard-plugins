@@ -340,10 +340,12 @@ export class AgentsController {
             item => !agent.data.data.group.includes(item)
           );
           this.$scope.addingGroupToAgent = false;
+          this.$scope.editGroup = false;
           this.errorHandler.info(`Group ${group} has been added.`, '');
           if (!this.$scope.$$phase) this.$scope.$digest();
         })
         .catch(error => {
+          this.$scope.editGroup = false;
           this.$scope.addingGroupToAgent = false;
           this.errorHandler.handle(
             error.message || error,
@@ -659,6 +661,7 @@ export class AgentsController {
    */
   async getAgent(newAgentId) {
     try {
+      this.$scope.emptyAgent = false;
       this.$scope.isSynchronized = false;
       this.$scope.load = true;
       this.changeAgent = true;
@@ -707,11 +710,12 @@ export class AgentsController {
           item =>
             this.$scope.agent.group && !this.$scope.agent.group.includes(item)
         );
-
-      this.$scope.load = false;
-      if (!this.$scope.$$phase) this.$scope.$digest();
-      return;
     } catch (error) {
+      if(!this.$scope.agent) {
+        if ( (error || {}).status === -1 ) {
+          this.$scope.emptyAgent = 'Wazuh API timeout.';
+        }
+      }
       this.errorHandler.handle(error, 'Agents');
       if (
         error &&
@@ -722,6 +726,8 @@ export class AgentsController {
         this.$location.path('/agents-preview');
       }
     }
+    this.$scope.load = false;
+    if (!this.$scope.$$phase) this.$scope.$digest();
     return;
   }
 
