@@ -72,12 +72,17 @@ export class ConfigurationRulesetController {
     this.$scope.doSaveConfig = (isNewFile, fileName) => {
       if (isNewFile && !fileName) {
         this.errorHandler.handle('You need to specify a file name', 'Error creating a new file.');
+        return false;
       } else {
-        this.$scope.editingFile = false;
         if (isNewFile) {
           const validFileName = /(.+).xml/;
+          const containsNumber = /.*[0-9].*/;
           if (fileName && !validFileName.test(fileName)) {
             fileName = fileName + '.xml'
+          }
+          if (containsNumber.test(fileName)) {
+            this.errorHandler.handle('The filename can not contain numbers', 'Error creating a new file.');
+            return false;
           }
           this.$scope.selectedItem = { file: fileName }
           if (this.$scope.type === 'rules') {
@@ -89,6 +94,7 @@ export class ConfigurationRulesetController {
           const objParam = this.$scope.selectedRulesetTab === 'rules' ? { rule: this.$scope.selectedItem } : { decoder: this.$scope.selectedItem };
           this.$scope.$broadcast('saveXmlFile', objParam);
         }
+        this.$scope.editingFile = false;
 
       }
     };
