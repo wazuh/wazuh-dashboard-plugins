@@ -556,22 +556,29 @@ export class DevToolsController {
         const path = req.includes('?') ? req.split('?')[0] : req;
 
         if (typeof JSONraw === 'object') JSONraw.devTools = true;
-        const output = await this.apiReq.request(method, path, JSONraw);
+        if (!firstTime) {
+          const output = await this.apiReq.request(method, path, JSONraw);
+          this.apiOutputBox.setValue(
+            JSON.stringify((output || {}).data, null, 2)
+          );
+        }
+      }
 
-        this.apiOutputBox.setValue(
-          JSON.stringify((output || {}).data, null, 2)
+      (firstTime || !desiredGroup) && this.apiOutputBox.setValue('Welcome!');
+    } catch (error) {
+      if ((error || {}).status === -1) {
+        return this.apiOutputBox.setValue(
+          "Wazuh API don't reachable. Reason: timeout."
         );
       } else {
-        this.apiOutputBox.setValue('Welcome!');
-      }
-    } catch (error) {
-      const parsedError = this.errorHandler.handle(error, null, null, true);
-      if (typeof parsedError === 'string') {
-        return this.apiOutputBox.setValue(error);
-      } else if (error && error.data && typeof error.data === 'object') {
-        return this.apiOutputBox.setValue(JSON.stringify(error));
-      } else {
-        return this.apiOutputBox.setValue('Empty');
+        const parsedError = this.errorHandler.handle(error, null, null, true);
+        if (typeof parsedError === 'string') {
+          return this.apiOutputBox.setValue(error);
+        } else if (error && error.data && typeof error.data === 'object') {
+          return this.apiOutputBox.setValue(JSON.stringify(error));
+        } else {
+          return this.apiOutputBox.setValue('Empty');
+        }
       }
     }
   }
