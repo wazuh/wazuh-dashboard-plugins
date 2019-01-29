@@ -46,6 +46,7 @@ export class ConfigurationRulesetController {
 
     this.$scope.editConfig = async () => {
       this.$scope.editingFile = true;
+      this.$scope.newFile = false;
       try {
         this.$scope.fetchedXML = this.$scope.selectedRulesetTab === 'rules' ?
           await this.rulesetHandler.getRuleConfiguration(this.$scope.selectedItem.file) :
@@ -59,6 +60,7 @@ export class ConfigurationRulesetController {
     }
     this.$scope.closeEditingFile = () => {
       this.$scope.editingFile = false;
+      this.$scope.newFile = false;
       this.$scope.fetchedXML = null;
       this.$scope.$broadcast('closeEditXmlFile', {});
     };
@@ -66,9 +68,42 @@ export class ConfigurationRulesetController {
       this.$scope.xmlHasErrors = valid;
       if (!this.$scope.$$phase) this.$scope.$digest();
     };
-    this.$scope.doSaveConfig = () => {
-      this.$scope.editingFile = false;
-      this.$scope.$broadcast('saveXmlFile', { rule: this.$scope.selectedItem });
+    
+    this.$scope.doSaveConfig = (isNewFile,fileName) => {
+      if(isNewFile && !fileName){
+        this.errorHandler.handle('You need to specify a file name','Error creating a new file.');
+      }else{
+        this.$scope.editingFile = false;
+        if(isNewFile){
+          const validFileName = /(.+).xml/;
+          if (fileName && !validFileName.test(fileName)) {
+            fileName = fileName + '.xml'
+          }
+          this.$scope.selectedItem = {file:fileName}
+          if(this.$scope.type === 'rules'){
+            this.$scope.$broadcast('saveXmlFile', { rule: this.$scope.selectedItem });
+          }else if(this.$scope.type === 'decoders'){
+            this.$scope.$broadcast('saveXmlFile', { decoder: this.$scope.selectedItem });
+          }
+        }else{
+          const objParam = this.$scope.selectedRulesetTab === 'rules' ? { rule: this.$scope.selectedItem } : { decoder: this.$scope.selectedItem };
+          this.$scope.$broadcast('saveXmlFile', objParam);
+        }
+        
+      }
+    };
+
+
+
+
+    this.$scope.addNewFile = (type) => {
+      this.$scope.editingFile = true;
+      this.$scope.newFile = true;
+      this.$scope.newFileName = '';
+      this.$scope.fetchedXML = '<!-- Modify it at your will. -->';
+      this.$scope.type = type;
+      if (!this.$scope.$$phase) this.$scope.$digest();
+        this.$scope.$broadcast('fetchedFile', { data: this.$scope.fetchedXML });
     };
 
     /**

@@ -25,6 +25,7 @@
                     <wz-table flex path="'/rules'" keys="['file']" implicit-filter="[{ name:'path',value: '/var/ossec/etc/rules'}]"
                         allow-click="true" row-sizes="[17,15,13]">
                 </md-card-content>
+                <button class="btn btn-primary" ng-click="addNewFile('rules');">New file</button>
             </md-card>
             </wz-table>
         </div>
@@ -34,6 +35,7 @@
                     <wz-table flex path="'/decoders'" keys="['file']" implicit-filter="[{ name:'path',value: '/var/ossec/etc/decoders'}]"
                         allow-click="true" row-sizes="[17,15,13]">
                 </md-card-content>
+                <button class="btn btn-primary" ng-click="addNewFile('decoders');">New file</button>
             </md-card>
             </wz-table>
         </div>
@@ -42,17 +44,26 @@
         </div>
     </div>
     <!-- <select ng-disabled="!selectData" class="wz-input-text wz-width-100" ng-model="selectedItem" ng-change="" ng-options="o as o for o in selectData"></select> -->
-
     <!-- XML editor for node configuration -->
     <div class="md-padding" ng-show="editingFile">
         <div flex layout="column">
-            <div layout="row" class="wz-padding-bottom-14">
+            <div layout="row" ng-if="!newFile" class="wz-padding-bottom-14">
                 <span ng-click='closeEditingFile()' class='btn btn-info'>Cancel</span>
-                <button ng-disabled='xmlHasErrors' ng-click='doSaveConfig()' class='btn btn-primary pull-right wz-margin-left-8'>
+                <button ng-disabled='xmlHasErrors' ng-click='doSaveConfig(false)' class='btn btn-primary pull-right wz-margin-left-8'>
                     <span ng-show='!xmlHasErrors'><i aria-hidden='true' class='fa fa-fw fa-save'></i>Save file</span>
                     <span ng-show='xmlHasErrors' class='btn-danger'><i aria-hidden='true' class='fa fa-fw fa-exclamation-triangle'></i>
                         XML format error</span>
                 </button>
+            </div>
+            <div layout="row" ng-if="newFile" class="wz-padding-bottom-14">
+                <span ng-click='closeEditingFile()' class='btn btn-info'>Cancel</span>
+                <button ng-disabled='xmlHasErrors' ng-click='doSaveConfig(true,newFileName)' class='btn btn-primary pull-right wz-margin-left-8'>
+                    <span ng-show='!xmlHasErrors'><i aria-hidden='true' class='fa fa-fw fa-save'></i>Save file</span>
+                    <span ng-show='xmlHasErrors' class='btn-danger'><i aria-hidden='true' class='fa fa-fw fa-exclamation-triangle'></i>
+                        XML format error</span>
+                </button>
+                <input placeholder="Enter file name" ng-model="newFileName" type="text" class="kuiLocalSearchInput ng-empty ng-pristine ng-scope ng-touched ng-valid"
+                aria-invalid="false">
             </div>
             <div ng-if="fetchedXML">
                 <wz-xml-file-editor file-name='{{selectedFileName}}' data="fetchedXML" target-name="selectedItem.file" valid-fn='xmlIsValid(valid)'>
