@@ -68,7 +68,7 @@ export class RulesetHandler {
       const result = await this.apiReq.request(
         'GET',
         `/manager/files`,
-        { path: path, format: 'text' }
+        { path: path }
       );
       return result;
     } catch (error) {

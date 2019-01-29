@@ -138,6 +138,7 @@ export function GroupsController(
       $scope.totalFiles = count.data.data.totalItems;
       $scope.fileViewer = false;
       $scope.currentGroup = group;
+      $location.search('currentGroup', group.name);
       $scope.$emit('setCurrentGroup', { currentGroup: $scope.currentGroup });
       $scope.fileViewer = false;
       if (!$scope.$$phase) $scope.$digest();

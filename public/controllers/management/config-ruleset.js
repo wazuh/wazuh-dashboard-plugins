@@ -115,7 +115,12 @@ export class ConfigurationRulesetController {
       this.$scope.selectData;
       this.$scope.custom_search = '';
       this.$scope.selectedItem = false;
-
+      if (rulesettab === 'rules') {
+        this.$scope.searchPlaceholder = 'Filter rules...'
+      }
+      if (rulesettab === 'decoders') {
+        this.$scope.searchPlaceholder = 'Filter decoders...'
+      }
       if (rulesettab === 'cdblists') {
         const data = await this.rulesetHandler.getLocalDecoders();
         this.$scope.selectData = ((((data || {}).data || {}).data || {}).items | {}).map(x => x.file) || false;
@@ -125,6 +130,26 @@ export class ConfigurationRulesetController {
     };
     this.$scope.switchRulesetTab('rules');
 
+    const stringToObj = (string) => {
+      let result = {};
+      const splitted = string.split('\n');
+      splitted.forEach(function (element) {
+        const keyValue = element.split(':');
+        if (keyValue[0])
+          result[keyValue[0]] = keyValue[1];
+      });
+      return result;
+    }
+    //listeners
+    this.$scope.$on('wazuhShowCdbList', () => {
+      this.$scope.currentList = {};
+      this.rulesetHandler.getCdbList('etc/lists/audit-keys')
+        .then(data => {
+          this.$scope.currentList.list = stringToObj(data.data.data);
+          this.$scope.viewingDetail = true;
+          if (!this.$scope.$$phase) this.$scope.$digest();
+        });
+    });
     //listeners
     this.$scope.$on('wazuhShowRule', (event, parameters) => {
       this.$scope.selectedItem = parameters.rule;
@@ -133,6 +158,12 @@ export class ConfigurationRulesetController {
       if (!this.$scope.$$phase) this.$scope.$digest();
     });
     this.$scope.$on('wazuhShowDecoder', (event, parameters) => {
+      this.$scope.selectedItem = parameters.decoder;
+      this.$scope.selectedFileName = 'decoders';
+      this.$scope.editConfig();
+      if (!this.$scope.$$phase) this.$scope.$digest();
+    });
+    this.$scope.$on('wazuhShowCdbList', (event, parameters) => {
       this.$scope.selectedItem = parameters.decoder;
       this.$scope.selectedFileName = 'decoders';
       this.$scope.editConfig();

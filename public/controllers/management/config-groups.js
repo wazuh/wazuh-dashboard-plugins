@@ -28,7 +28,25 @@ export class ConfigurationGroupsController {
     this.$scope.isArray = Array.isArray;
     this.groupHandler = groupHandler;
     this.$scope.currentConfig = null;
+  }
 
+
+  async fetchFile() {
+    try {
+      const data = await this.apiReq.request(
+        'GET',
+        `/agents/groups/${this.$scope.selectedItem.name}/files/agent.conf`,
+        { format: 'xml' }
+      );
+      const xml = ((data || {}).data || {}).data || false;
+
+      if (!xml) {
+        throw new Error('Could not fetch agent.conf file');
+      }
+      return xml;
+    } catch (error) {
+      return Promise.reject(error);
+    }
   }
 
   /**
@@ -47,7 +65,7 @@ export class ConfigurationGroupsController {
     this.$scope.editConfig = async () => {
       this.$scope.editingFile = true;
       try {
-        this.$scope.fetchedXML = await this.groupHandler.getRuleConfiguration(this.$scope.selectedItem.file)
+        this.$scope.fetchedXML = await this.fetchFile();
         if (!this.$scope.$$phase) this.$scope.$digest();
         this.$scope.$broadcast('fetchedFile', { data: this.$scope.fetchedXML });
       } catch (error) {
@@ -79,27 +97,9 @@ export class ConfigurationGroupsController {
 
     //listeners
     this.$scope.$on('wazuhShowGroup', (event, parameters) => {
-      this.$scope.selectedItem = parameters.groups;
+      this.$scope.selectedItem = parameters.group;
       this.$scope.editConfig();
       if (!this.$scope.$$phase) this.$scope.$digest();
     });
-  }
-
-  async fetchFile() {
-    try {
-      const data = await this.apiReq.request(
-        'GET',
-        `/agents/groups/${this.$scope.selectedItem.name}/files/agent.conf`,
-        { format: 'xml' }
-      );
-      const xml = ((data || {}).data || {}).data || false;
-
-      if (!xml) {
-        throw new Error('Could not fetch agent.conf file');
-      }
-      return xml;
-    } catch (error) {
-      return Promise.reject(error);
-    }
   }
 }

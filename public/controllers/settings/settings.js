@@ -103,7 +103,10 @@ export class SettingsController {
    * This switch to a selected tab
    * @param {Object} tab
    */
-  switchTab(tab) {
+  switchTab(tab, setNav = false) {
+    if (setNav) {
+      this.appState.setNavigation({ status: true });
+    }
     this.tab = tab;
     this.$location.search('tab', this.tab);
   }
@@ -192,7 +195,7 @@ export class SettingsController {
 
     this.errorHandler.info(
       `API ${
-        this.apiEntries[index]._source.cluster_info.manager
+      this.apiEntries[index]._source.cluster_info.manager
       } set as default`,
       'Settings'
     );
