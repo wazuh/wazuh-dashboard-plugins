@@ -958,6 +958,6 @@ export class WazuhApiCtrl {
   // Get de list of available requests in the API
   getRequestList() {
     //Read a static JSON until the api call has implemented
-    return (apiRequestList);
+    return apiRequestList;
   }
 }

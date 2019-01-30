@@ -28,8 +28,7 @@
 export function ErrorResponse(
   message = null,
   code = null,
-  statusCode = null,
-  reply
+  statusCode = null
 ) {
   let filteredMessage = '';
   if (code) {
