@@ -28,8 +28,7 @@
 export function ErrorResponse(
   message = null,
   code = null,
-  statusCode = null,
-  reply
+  statusCode = null
 ) {
   let filteredMessage = '';
   if (code) {
@@ -66,7 +65,7 @@ export function ErrorResponse(
     }
   }
 
-  return reply({
+  return {
     message: filteredMessage
       ? `${code ? code : 1000} - ${filteredMessage}`
       : typeof message === 'string'
@@ -74,5 +73,5 @@ export function ErrorResponse(
       : `${code ? code : 1000} - Unexpected error`,
     code: code ? code : 1000,
     statusCode: statusCode ? statusCode : 500
-  }).code(statusCode ? statusCode : 500);
+  };
 }
