@@ -38,7 +38,7 @@
             <div ng-if="mctrl.currentConfiguration">
                 <span class="wz-text-link cursor-pointer" ng-click="mctrl.switchTab('welcome', true)">Management</span>
                 <span> / </span>
-                <span class="wz-text-link cursor-pointer" ng-click="mctrl.switchTab('configuration')">{{ mctrl.tabNames[mctrl.tab] }}</span>
+                <span class="wz-text-link cursor-pointer" ng-click="mctrl.switchTab('configuration', true)">{{ mctrl.tabNames[mctrl.tab] }}</span>
                 <span> / {{ mctrl.currentConfiguration }} </span>
             </div>
         </div>

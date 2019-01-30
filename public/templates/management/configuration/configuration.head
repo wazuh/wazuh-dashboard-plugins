@@ -16,8 +16,8 @@ ng-init="switchConfigurationTab('welcome', false)">
     </div>
     <!-- End navigation section -->
         <md-nav-bar class="wz-nav-bar nav-bar-white-bg" md-selected-nav-item="mctrl.globalConfigTab" ng-show="adminMode">
-        <md-nav-item class="wz-nav-item" md-nav-click="mctrl.switchTab('configuration')" name="overview">Overview</md-nav-item>
-        <md-nav-item class="wz-nav-item" md-nav-click="mctrl.setConfigTab('editconfiguration')" name="editconfiguration">Edit configuration</md-nav-item>
-        <md-nav-item class="wz-nav-item" md-nav-click="mctrl.setConfigTab('ruleset')" name="ruleset">Edit ruleset</md-nav-item>
-        <md-nav-item class="wz-nav-item" md-nav-click="mctrl.setConfigTab('groups')" name="groups">Edit groups</md-nav-item>
+        <md-nav-item class="wz-nav-item" md-nav-click="mctrl.switchTab('configuration', true)" name="overview">Overview</md-nav-item>
+        <md-nav-item class="wz-nav-item" md-nav-click="mctrl.setConfigTab('editconfiguration', true)" name="editconfiguration">Edit configuration</md-nav-item>
+        <md-nav-item class="wz-nav-item" md-nav-click="mctrl.setConfigTab('ruleset', true)" name="ruleset">Edit ruleset</md-nav-item>
+        <md-nav-item class="wz-nav-item" md-nav-click="mctrl.setConfigTab('groups', true)" name="groups">Edit groups</md-nav-item>
     </md-nav-bar>
