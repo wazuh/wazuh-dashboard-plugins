@@ -135,7 +135,7 @@
                     XML format error</span>
             </button>
         </div>
-        <div class="md-padding md-padding-top-10" ng-if="fetchedXML">
+        <div class="md-padding md-padding-top-10" ng-if="fetchedXML" style="height: calc(100vh - 356px);">
             <wz-xml-file-editor file-name='rules' data="fetchedXML" target-name="currentRule.file" valid-fn='xmlIsValid(valid)'>
             </wz-xml-file-editor>
         </div>
