@@ -1,11 +1,11 @@
 <div layout="column" layout-align="start">
     <div layout="row" class="wz-margin-top-8 md-padding-h">
-        <input placeholder="Filter entrys..." ng-model="searchTerm" ng-change="filterTable()" type="text" class="kuiLocalSearchInput ng-empty ng-pristine ng-scope ng-touched ng-valid">
+        <input placeholder="Filter entries..." ng-model="searchTerm" ng-change="filterTable()" type="text" class="kuiLocalSearchInput ng-empty ng-pristine ng-scope ng-touched ng-valid">
         <button class="kuiLocalSearchButton height-40"><span class="fa fa-search" aria-hidden="true"></span> </button>
     </div>
     <div layout="row" class="wz-padding-left-8 wz-padding-right-8" layout-align="start stretch">
         <md-card flex class="wz-md-card">
-            <md-card-content style="max-height: calc(100vh - 350px);overflow: auto;">
+            <md-card-content>
                 <table class="table table-striped table-condensed table-layout-fixed table-hover table-vertical-align-middle">
                     <thead class="wz-text-bold">
                         <th class="wz-text-left">Key</th>

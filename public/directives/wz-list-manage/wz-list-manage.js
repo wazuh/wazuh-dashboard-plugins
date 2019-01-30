@@ -121,6 +121,7 @@ app.directive('wzListManage', function () {
         } catch (err) {
           refresh();
           errorHandler.handle(err, 'Error updating list');
+          $scope.loadingChange = false;
         }
       }
 
