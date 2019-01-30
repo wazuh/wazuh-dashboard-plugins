@@ -800,7 +800,7 @@ export class WazuhApiCtrl {
           }
         }
 
-        return (csv).type('text/csv');
+        return reply.response(csv).type('text/csv');
       } else if (
         output &&
         output.body &&
