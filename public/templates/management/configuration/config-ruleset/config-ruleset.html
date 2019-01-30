@@ -1,11 +1,22 @@
 <div flex="auto" layout="column" ng-if="editionTab === 'ruleset'" ng-controller="configurationRulesetController">
     <div layout="column" layout-padding>
-        <span class="font-size-18"><i class="fa fa-fw fa-file-text-o" aria-hidden="true"></i> Edit the ruleset</span>
-        <span class="md-subheader">Edit your current rules, decoders and CDB lists</span>
+        <div layout="row">
+            <span class="font-size-18"><i class="fa fa-fw fa-file-text-o" aria-hidden="true"></i> Edit the ruleset
+            </span>
+            <span ng-if='adminMode && !editingFile && selectedRulesetTab === "rules"' class="font-size-18 wz-text-link"
+                ng-click="addNewFile('rules')" tooltip="Add new rules file" tooltip-placement="right">
+                <i class="fa fa-fw fa-plus-circle"></i></span>
+            <span ng-if='adminMode && !editingFile && selectedRulesetTab === "decoders"' class="font-size-18 wz-text-link"
+                ng-click="addNewFile('decoders')" tooltip="Add new decoders file" tooltip-placement="right">
+                <i class="fa fa-fw fa-plus-circle"></i></span>
+        </div>
+        <div layout="row">
+            <span class="md-subheader">Edit your current local rules, decoders and CDB lists</span>
+        </div>
     </div>
     <md-nav-bar class="wz-nav-bar" md-selected-nav-item="selectedRulesetTab">
-        <md-nav-item class="wz-nav-item" md-nav-click="switchRulesetTab('rules')" name="rules">Rules</md-nav-item>
-        <md-nav-item class="wz-nav-item" md-nav-click="switchRulesetTab('decoders')" name="decoders">Decoders</md-nav-item>
+        <md-nav-item class="wz-nav-item" md-nav-click="switchRulesetTab('rules')" name="rules">Local rules</md-nav-item>
+        <md-nav-item class="wz-nav-item" md-nav-click="switchRulesetTab('decoders')" name="decoders">Local decoders</md-nav-item>
         <md-nav-item class="wz-nav-item" md-nav-click="switchRulesetTab('cdblists')" name="cdblists">CDB Lists</md-nav-item>
     </md-nav-bar>
 
@@ -17,11 +28,6 @@
             <button type="submit" aria-label="Search" class="kuiLocalSearchButton height-40" ng-click="search(custom_search)">
                 <span class="fa fa-search" aria-hidden="true"></span>
             </button>
-            <button class="btn btn-primary wz-margin-left-8" ng-show="selectedRulesetTab === 'rules'" ng-click="addNewFile('rules');">New
-                rules
-                file</button>
-            <button class="btn btn-primary wz-margin-left-8" ng-show="selectedRulesetTab === 'decoders'" ng-click="addNewFile('decoders');">New
-                decoders file</button>
         </div>
         <!-- End search bar -->
         <div ng-if="selectedRulesetTab === 'rules'">
