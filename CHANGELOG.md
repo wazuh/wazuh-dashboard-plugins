@@ -2,6 +2,18 @@
 
 All notable changes to the Wazuh app project will be documented in this file.
 
+
+## Wazuh v3.8.2 - Kibana v6.5.4 - Revision 418
+
+### Added
+
+- Support for Wazuh v3.8.2
+
+### Changed
+
+- Close configuration editor only if it was successfully updated ([bc77c35](https://github.com/wazuh/wazuh-kibana-app/commit/bc77c35d8440a656d4704451ce857c9e1d36a438)).
+- Replaced FIM Vega visualization with standard visualization ([554ee1c](https://github.com/wazuh/wazuh-kibana-app/commit/554ee1c4c4d75c76d82272075acf8bb62e7f9e27)).
+
 ## Wazuh v3.8.1 - Kibana v6.5.4 - Revision 417
 
 ### Added
