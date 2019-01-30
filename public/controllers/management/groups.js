@@ -297,6 +297,11 @@ export function GroupsController(
     $scope.$broadcast('saveXmlFile', { group: $scope.currentGroup.name, type: 'group' });
   };
 
+  $scope.$on('configurationSuccess',() => {
+    $scope.editingFile = false;
+    if(!$scope.$$phase) $scope.$digest();
+  });
+
   $scope.reload = async (element, searchTerm, addOffset, start) => {
     if (element === 'left') {
       if (!$scope.availableAgents.loadedAll) {
@@ -563,4 +568,11 @@ export function GroupsController(
     }
     $scope.$broadcast('wazuhSearch', {});
   };
+
+  // Come from the pencil icon on the groups table
+  $scope.$on('openGroupFromList',(ev,parameters) => {
+    $scope.editingFile = true;
+    $scope.groupsSelectedTab = 'files';
+    return $scope.loadGroup(parameters.group).then(() => $scope.editGroupAgentConfig());
+  })
 }

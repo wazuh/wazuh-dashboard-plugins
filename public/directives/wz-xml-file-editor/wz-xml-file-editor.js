@@ -157,6 +157,7 @@ app.directive('wzXmlFileEditor', function () {
           if (params.group) {
             await groupHandler.sendConfiguration(params.group, xml);
             errorHandler.info('Success. Group has been updated', '');
+            $scope.$emit('configurationSuccess');
           } else if (params.rule) {
             await rulesetHandler.sendRuleConfiguration(params.rule, xml);
             errorHandler.info('Success. Rules has been updated', '');
@@ -175,6 +176,7 @@ app.directive('wzXmlFileEditor', function () {
         }
         return;
       };
+
       $scope.xmlCodeBox = CodeMirror.fromTextArea(
         $document[0].getElementById('xml_box'),
         {

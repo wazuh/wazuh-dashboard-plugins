@@ -5,9 +5,9 @@
     <!-- End top navbar section -->
 
     <!-- Navigation section -->
-    <div layout="row" layout-align="start center">
+    <div layout="row" layout-align="start center" ng-if="agent">
         <!-- Breadcrumbs -->
-        <div layout="row" layout-padding ng-if="agent">
+        <div layout="row" layout-padding>
             <!-- If you're not on the Welcome tab, show a functional breadcrumb -->
             <div ng-if="tab !== 'welcome' && tab !== 'configuration'">
                 <a class="wz-text-link cursor-pointer" href="#/agents-preview">Agents</a>
