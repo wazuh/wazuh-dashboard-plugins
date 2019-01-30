@@ -93,6 +93,7 @@ export class ManagementController {
   }
 
   setConfigTab(tab) {
+    this.appState.setNavigation({ status: true });
     this.globalConfigTab = tab;
     this.$location.search('configSubTab', null);
     this.$scope.$broadcast('configurationIsReloaded', { globalConfigTab: this.globalConfigTab });

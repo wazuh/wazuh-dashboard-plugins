@@ -102,6 +102,8 @@ export class ConfigurationRulesetController {
       this.$scope.editingFile = true;
       this.$scope.newFile = true;
       this.$scope.newFileName = '';
+      this.$scope.selectedFileName = this.$scope.selectedRulesetTab;
+      this.$scope.selectedItem = { file: 'new file' }
       this.$scope.fetchedXML = '<!-- Modify it at your will. -->';
       this.$scope.type = type;
       if (!this.$scope.$$phase) this.$scope.$digest();
@@ -119,13 +121,13 @@ export class ConfigurationRulesetController {
       this.$scope.custom_search = '';
       this.$scope.selectedItem = false;
       if (rulesettab === 'rules') {
-        this.$scope.searchPlaceholder = 'Filter rules...'
+        this.$scope.searchPlaceholder = 'Filter local rules...'
       }
       if (rulesettab === 'decoders') {
-        this.$scope.searchPlaceholder = 'Filter decoders...'
+        this.$scope.searchPlaceholder = 'Filter local decoders...'
       }
       if (rulesettab === 'cdblists') {
-        this.$scope.searchPlaceholder = 'Filter lists...'
+        this.$scope.searchPlaceholder = 'Filter CDB lists...'
       }
       if (!this.$scope.$$phase) this.$scope.$digest();
     };
