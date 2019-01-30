@@ -7,14 +7,14 @@
             <div></div>
         </div>
 
-        <!-- Headline -->
-        <div layout="column" layout-padding>
+        <!-- Headline (cluster) -->
+        <div layout="column" layout-padding ng-show="clusterStatus.data.data.enabled === 'yes'">
             <div layout="row">
                 <span class="font-size-18">
-                    <i class="fa fa-fw fa-edit" aria-hidden="true"></i> Node configuration</span>
+                    <i class="fa fa-fw fa-edit" aria-hidden="true"></i> Cluster configuration</span>
             </div>
             <div layout="row">
-                <span class="md-subheader">Edit master/worker node configuration</span>
+                <span class="md-subheader">Edit master/worker configuration</span>
             </div>
 
             <!-- List of nodes if cluster is enabled -->
@@ -27,8 +27,18 @@
                 </div>
             </div>
         </div>
-        <!-- End headline -->
 
+        <!-- Headline (manager) -->
+        <div layout="column" layout-padding ng-show="clusterStatus.data.data.enabled !== 'yes'">
+            <div layout="row">
+                <span class="font-size-18">
+                    <i class="fa fa-fw fa-edit" aria-hidden="true"></i> Manager configuration</span>
+            </div>
+            <div layout="row">
+                <span class="md-subheader">Edit manager configuration</span>
+            </div>
+        </div>
+        <!-- End headline -->
 
 
 
@@ -51,19 +61,6 @@
 
 
 
-            <!-- This section is the right sidenav content -->
-            <md-sidenav class="md-sidenav-right" md-is-locked-open="true">
-                <md-list>
-                    <md-subheader>More info about this section</md-subheader>
-                    <md-list-item target="_blank" class="wz-text-link" ng-href="https://documentation.wazuh.com/current/user-manual/manager/index.html">Wazuh
-                        administration documentation</md-list-item>
-                    <md-list-item target="_blank" class="wz-text-link" ng-href="https://documentation.wazuh.com/current/user-manual/capabilities/index.html">Wazuh
-                        capabilities documentation</md-list-item>
-                    <md-list-item target="_blank" class="wz-text-link" ng-href="https://documentation.wazuh.com/current/user-manual/reference/ossec-conf/index.html">Local
-                        configuration reference</md-list-item>
-                </md-list>
-            </md-sidenav>
-            <!-- End right sidenav section -->
         </div>
 
 

@@ -133,7 +133,13 @@ export class EditionController {
           item => item.type === 'master'
         )[0];
         this.$scope.selectedNode = masterNode.name;
-      } else {
+      } else if(
+        this.$scope.clusterStatus &&
+        this.$scope.clusterStatus.data.data.enabled === 'yes' &&
+        this.$scope.clusterStatus.data.data.running === 'no'){
+
+        this.errorHandler.handle('', 'Cluster is enabled but not running');
+      }else{
         this.$scope.selectedNode = "manager";
       }
     } catch (error) {
