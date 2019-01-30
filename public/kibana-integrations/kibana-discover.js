@@ -662,12 +662,12 @@ function discoverController(
      *
      * @type {String}
      */
-    const sortBy = (function() {
+    const sortBy = (function () {
       if (!Array.isArray(sort)) return 'implicit';
       else if (sort[0] === '_score') return 'implicit';
       else if (sort[0] === timeField) return 'time';
       else return 'non-time';
-    })();
+    }());
 
     let sortFn = null;
     if (sortBy !== 'implicit') {
@@ -680,7 +680,7 @@ function discoverController(
       segmented.setMaxSegments(1);
     }
 
-    segmented.setDirection(sortBy === 'time' ? sort[1] || 'desc' : 'desc');
+    segmented.setDirection(sortBy === 'time' ? (sort[1] || 'desc') : 'desc');
     segmented.setSortFn(sortFn);
     segmented.setSize($scope.opts.sampleSize);
 
@@ -749,16 +749,12 @@ function discoverController(
         const tabifiedData = tabifyAggResponse($scope.vis.aggs, merged);
         $scope.searchSource.rawResponse = merged;
         Promise
-        .resolve(responseHandler(tabifiedData))
-        .then(resp => {
-          if (
-            ($scope.tabView !== 'panels' ||
-              $location.path().includes('wazuh-discover')) &&
-            $scope.tabView !== 'cluster-monitoring'
-          ) {
-            visualizeHandler.render(resp);
-          }
-        });
+          .resolve(responseHandler(tabifiedData))
+          .then(resp => {
+            if(visualizeHandler) {
+              visualizeHandler.render(resp);
+            }
+          });
       }
 
       $scope.hits = merged.hits.total;
@@ -784,7 +780,7 @@ function discoverController(
         const fields = _.keys(indexPattern.flattenHit(hit));
         let n = fields.length;
         let field;
-        while ((field = fields[--n])) {
+        while (field = fields[--n]) {
           // eslint-disable-line
           if (counts[field]) counts[field] += 1;
           else counts[field] = 1;
@@ -903,7 +899,7 @@ function discoverController(
     $scope.minimumVisibleRows = $scope.hits;
   };
 
-  function setupVisualization() {
+  async function setupVisualization() {
     // If no timefield has been specified we don't create a histogram of messages
     if (!$scope.opts.timefield) return;
 
@@ -922,7 +918,7 @@ function discoverController(
         }
       }
     ];
-    console.log('DEBUG SCOPE.VIS',$scope.vis)
+    
     // we have a vis, just modify the aggs
     if ($scope.vis) {
       const visState = $scope.vis.getEnabledState();
@@ -945,13 +941,12 @@ function discoverController(
       }
     };
 
-    console.log($scope.searchSource.getField('index'))
     $scope.vis = new Vis(
       $scope.searchSource.getField('index'),
       visSavedObject.visState
     );
     visSavedObject.vis = $scope.vis;
-    console.log(visSavedObject)
+
     $scope.searchSource.onRequestStart((searchSource, searchRequest) => {
       return $scope.vis
         .getAggConfig()
@@ -978,15 +973,10 @@ function discoverController(
     });
     
     $timeout(async () => {
-      try {
-        console.log('ENTERING HERE',$scope.vis)
       const visEl = $element.find('#discoverHistogram')[0];
       visualizeHandler = await visualizeLoader.embedVisualizationWithSavedObject(visEl, visSavedObject, {
         autoFetch: false,
       });
-      }catch(error) {
-        console.log(error.message)
-      }
     });
   }
 
