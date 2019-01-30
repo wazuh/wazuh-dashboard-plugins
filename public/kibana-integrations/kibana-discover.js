@@ -158,8 +158,8 @@ function discoverController(
       const to = dateMath.parse(timefilter.getTime().to);
 
       const totalSeconds = (to - from) / 1000;
-      if (totalSeconds <= 3600) wzInterval = 'm';
-      else if (totalSeconds > 3600 && totalSeconds <= 86400) wzInterval = 'h';
+      if (totalSeconds <= 14401) wzInterval = 'm';
+      else if (totalSeconds > 14401 && totalSeconds <= 86400) wzInterval = 'h';
       else if (totalSeconds > 86400 && totalSeconds <= 604800) wzInterval = 'd';
       else if (totalSeconds > 604800 && totalSeconds <= 2419200)
         wzInterval = 'w';
@@ -902,7 +902,7 @@ function discoverController(
   async function setupVisualization() {
     // If no timefield has been specified we don't create a histogram of messages
     if (!$scope.opts.timefield) return;
-
+    $state.interval = calcWzInterval() || 'h';
     const visStateAggs = [
       {
         type: 'count',
@@ -959,16 +959,10 @@ function discoverController(
       // return $scope.vis.getAggConfig().toDsl();             //
       ///////////////////////////////////////////////////////////
       const result = $scope.vis.getAggConfig().toDsl();
-      if (
-        result[2] &&
-        result[2].date_histogram &&
-        result[2].date_histogram.interval === '0ms'
-      ) {
+      if (((result[2] || {}).date_histogram || {}).interval  === '0ms') {
         result[2].date_histogram.interval = '1d';
       }
       return result;
-      ///////////////////////////////////////////////////////////
-      ///////////////////////////////////////////////////////////
       ///////////////////////////////////////////////////////////
     });
     
