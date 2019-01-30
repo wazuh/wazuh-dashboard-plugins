@@ -49,7 +49,7 @@
             </md-card>
         </div>
     </div>
-    <!-- XML editor for node configuration -->
+    <!-- XML editor for ruleset -->
     <div class="md-padding" ng-show="editingFile">
         <div flex layout="column">
             <div layout="row" ng-if="!newFile" class="wz-padding-bottom-14">
@@ -70,9 +70,9 @@
                 <input placeholder="Enter file name" ng-model="newFileName" type="text" class="wz-margin-left-8 kuiLocalSearchInput ng-empty ng-pristine ng-scope ng-touched ng-valid"
                     aria-invalid="false">
             </div>
-            <div ng-if="fetchedXML">
-                <wz-xml-file-editor file-name='{{selectedFileName}}' data="fetchedXML" target-name="selectedItem.file"
-                    valid-fn='xmlIsValid(valid)'>
+            <div ng-if="fetchedXML" style="height: calc(100vh - 330px);" >
+                <wz-xml-file-editor  file-name='{{selectedFileName}}' data="fetchedXML" target-name="selectedItem.file"
+                    valid-fn='xmlIsValid(valid)' >
                 </wz-xml-file-editor>
             </div>
         </div>

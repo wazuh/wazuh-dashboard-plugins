@@ -43,7 +43,7 @@
                             XML format error</span>
                     </button>
                 </div>
-                <div class="md-padding md-padding-top-10" ng-if="fetchedXML">
+                <div class="md-padding md-padding-top-10" style="height: calc(100vh - 280px);" ng-if="fetchedXML">
                     <wz-xml-file-editor file-name='ossec.conf' data="fetchedXML" target-name="selectedNode" valid-fn='xmlIsValid(valid)'>
                     </wz-xml-file-editor>
                 </div>
