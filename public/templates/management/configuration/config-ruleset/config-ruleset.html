@@ -23,8 +23,9 @@
     <div class="md-padding" ng-show="!editingFile && !viewingDetail">
         <!-- Search bar -->
         <div layout="row" ng-if="!addingAgents && !file" class="wz-padding-bottom-14">
-            <input placeholder="{{searchPlaceholder}}" ng-model="custom_search" type="text" class="kuiLocalSearchInput ng-empty ng-pristine ng-scope ng-touched ng-valid"
-                aria-invalid="false" wz-enter="search(custom_search)">
+            <input placeholder="{{searchPlaceholder}}" ng-model="custom_search" type="text" id="config-ruleset-input-search"
+                class="kuiLocalSearchInput ng-empty ng-pristine ng-scope ng-touched ng-valid" aria-invalid="false"
+                wz-enter="search(custom_search)">
             <button type="submit" aria-label="Search" class="kuiLocalSearchButton height-40" ng-click="search(custom_search)">
                 <span class="fa fa-search" aria-hidden="true"></span>
             </button>
@@ -76,9 +77,9 @@
                 <input placeholder="Enter file name" ng-model="newFileName" type="text" class="wz-margin-left-8 kuiLocalSearchInput ng-empty ng-pristine ng-scope ng-touched ng-valid"
                     aria-invalid="false">
             </div>
-            <div ng-if="fetchedXML" style="height: calc(100vh - 330px);" >
-                <wz-xml-file-editor  file-name='{{selectedFileName}}' data="fetchedXML" target-name="selectedItem.file"
-                    valid-fn='xmlIsValid(valid)' >
+            <div ng-if="fetchedXML" style="height: calc(100vh - 330px);">
+                <wz-xml-file-editor file-name='{{selectedFileName}}' data="fetchedXML" target-name="selectedItem.file"
+                    valid-fn='xmlIsValid(valid)'>
                 </wz-xml-file-editor>
             </div>
         </div>

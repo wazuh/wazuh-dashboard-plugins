@@ -119,6 +119,7 @@ export class ConfigurationRulesetController {
       this.$scope.selectedRulesetTab = rulesettab;
       this.$scope.selectData;
       this.$scope.custom_search = '';
+      $('#config-ruleset-input-search').val('');
       this.$scope.selectedItem = false;
       if (rulesettab === 'rules') {
         this.$scope.searchPlaceholder = 'Filter local rules...'
