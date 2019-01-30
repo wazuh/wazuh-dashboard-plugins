@@ -235,7 +235,7 @@ export class EmbeddedVisualizeHandler {
    * renders visualization with provided data
    * @param visData: visualization data
    */
-  private render = (visData: any = null) => {
+  public render = (visData: any = null) => {
     return visualizationLoader
       .render(this.element, this.vis, visData, this.uiState, {
         listenOnChange: false,
