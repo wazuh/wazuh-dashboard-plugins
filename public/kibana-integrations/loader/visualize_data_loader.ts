@@ -81,18 +81,27 @@ export class VisualizeDataLoader {
           ? !this.vis.params.showMetricsAtAllLevels
           : !this.vis.isHierarchical();
 
+      let requestHandlerResponse;
+
       // searchSource is only there for courier request handler
-      const requestHandlerResponse = await this.requestHandler({
-        partialRows: this.vis.type.requiresPartialRows || this.vis.params.showPartialRows,
-        minimalColumns,
-        metricsAtAllLevels: this.vis.isHierarchical(),
-        visParams: this.vis.params,
-        ...params,
-        filters: params.filters
-          ? params.filters.filter(filter => !filter.meta.disabled)
-          : undefined,
-      });
-      
+      try {
+        requestHandlerResponse = await this.requestHandler({
+          partialRows: this.vis.type.requiresPartialRows || this.vis.params.showPartialRows,
+          minimalColumns,
+          metricsAtAllLevels: this.vis.isHierarchical(),
+          visParams: this.vis.params,
+          ...params,
+          filters: params.filters
+            ? params.filters.filter(filter => !filter.meta.disabled)
+            : undefined,
+        });
+      } catch (error) {
+        if(!this.vis || !this.vis.searchSource) {
+          return;
+        }
+        throw error;
+      }
+
       // No need to call the response handler when there have been no data nor has been there changes
       // in the vis-state (response handler does not depend on uiStat
       const canSkipResponseHandler =
@@ -105,18 +114,18 @@ export class VisualizeDataLoader {
       this.previousRequestHandlerResponse = requestHandlerResponse;
 
       if (!canSkipResponseHandler) {
-        this.visData = await Promise.resolve(this.responseHandler(requestHandlerResponse));
+        this.visData = await Promise.resolve(this.responseHandler(requestHandlerResponse));        
       }
+
       return this.visData;
     } catch (error) {
-      params.searchSource.cancelQueued();
+      if(typeof ((params || {}).searchSource || {}).cancelQueued === 'function') {
+        params.searchSource.cancelQueued();
+      }        
 
       this.vis.requestError = error;
       this.vis.showRequestError =
         error.type && ['NO_OP_SEARCH_STRATEGY', 'UNSUPPORTED_QUERY'].includes(error.type);
-
-      // tslint:disable-next-line
-      console.error(error);
 
       if (isTermSizeZeroError(error)) {
         return toastNotifications.addDanger(
@@ -125,6 +134,7 @@ export class VisualizeDataLoader {
             `the error.`
         );
       }
+      
       toastNotifications.addDanger({
         title: 'Error in visualization',
         text: error.message,

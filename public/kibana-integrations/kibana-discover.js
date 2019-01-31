@@ -47,7 +47,7 @@ import 'ui/pager';
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 import _ from 'lodash';
-import React from 'react';
+//import React from 'react';
 import angular from 'angular';
 import chrome from 'ui/chrome';
 import { getSort } from 'ui/doc_table/lib/get_sort';
@@ -79,10 +79,10 @@ import { stateMonitorFactory } from 'ui/state_management/state_monitor_factory';
 import { migrateLegacyQuery } from 'ui/utils/migrate_legacy_query';
 import { FilterManagerProvider } from 'ui/filter_manager';
 import { getDocLink } from 'ui/documentation_links';
-import { VisualizeLoaderProvider } from 'ui/visualize/loader/visualize_loader';
+import { VisualizeLoaderProvider } from './loader';
 import { ShareContextMenuExtensionsRegistryProvider } from 'ui/share';
 import { getUnhashableStatesProvider } from 'ui/state_management/state_hashing';
-import { Inspector } from 'ui/inspector';
+//import { Inspector } from 'ui/inspector';
 import { RequestAdapter } from 'ui/inspector/adapters';
 import {
   getRequestInspectorStats,
@@ -923,7 +923,6 @@ function discoverController(
     if ($scope.vis) {
       const visState = $scope.vis.getEnabledState();
       visState.aggs = visStateAggs;
-
       $scope.vis.setState(visState);
       return;
     } 
