@@ -181,15 +181,20 @@ export function CdbListsController(
   }
 
   //listeners
-  $scope.$on('wazuhShowCdbList', (ev, parameters) => {
+  $scope.$on('wazuhShowCdbList', async (ev, parameters) => {
     $scope.currentList = parameters.cdblist;
-    rulesetHandler.getCdbList(`etc/lists/${$scope.currentList.name}`)
-      .then(data => {
-        $scope.currentList.list = stringToObj(data.data.data);
-        $scope.$emit('setCurrentList', { currentList: $scope.currentList });
-        $scope.viewingDetail = true;
-        if (!$scope.$$phase) $scope.$digest();
-      });
+    try{
+      const data = await rulesetHandler.getCdbList(`etc/lists/${$scope.currentList.name}`);
+      $scope.currentList.list = stringToObj(data.data.data);
+      $scope.viewingDetail = true;    
+      $scope.$emit('setCurrentList', { currentList: $scope.currentList });
+    }catch(error){
+      $scope.currentList.list = [];
+      errorHandler.handle(error, '');
+    }
+    $scope.$broadcast('changeCdbList', { currentList: $scope.currentList });
+    if (!$scope.$$phase) $scope.$digest();
+
   });
 
   /**

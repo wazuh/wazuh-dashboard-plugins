@@ -95,6 +95,7 @@ export class ConfigurationRulesetController {
           this.$scope.$broadcast('saveXmlFile', objParam);
         }
         this.$scope.editingFile = false;
+        this.$scope.fetchedXML = null;
 
       }
     };
@@ -149,14 +150,18 @@ export class ConfigurationRulesetController {
       this.$scope.currentList = false;
     }
     //listeners
-    this.$scope.$on('wazuhShowCdbList', (ev, parameters) => {
+    this.$scope.$on('wazuhShowCdbList', async (ev, parameters) => {
       this.$scope.currentList = parameters.cdblist;
-      this.rulesetHandler.getCdbList(`etc/lists/${this.$scope.currentList.name}`)
-        .then(data => {
-          this.$scope.currentList.list = stringToObj(data.data.data);
-          this.$scope.viewingDetail = true;
-          if (!this.$scope.$$phase) this.$scope.$digest();
-        });
+      try{
+        const data = await this.rulesetHandler.getCdbList(`etc/lists/${this.$scope.currentList.name}`);
+        this.$scope.currentList.list = stringToObj(data.data.data);
+        this.$scope.viewingDetail = true;
+      }catch(error){
+        this.$scope.currentList.list = [];
+        this.errorHandler.handle(error, '');
+      }
+      this.$scope.$broadcast('changeCdbList', { currentList: this.$scope.currentList });
+      if (!this.$scope.$$phase) this.$scope.$digest();
     });
     this.$scope.$on('wazuhShowRule', (event, parameters) => {
       this.$scope.selectedItem = parameters.rule;

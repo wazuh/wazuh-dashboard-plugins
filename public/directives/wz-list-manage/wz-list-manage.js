@@ -107,6 +107,13 @@ app.directive('wzListManage', function () {
           });
       }
 
+      $scope.$on('changeCdbList', (ev, params) => {
+        if (params.currentList) {
+          $scope.currentList = params.currentList;
+          fetch();
+        }
+      });
+
       const saveList = async () => {
         try {
           let raw = '';
