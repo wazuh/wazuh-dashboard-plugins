@@ -28,25 +28,12 @@
         <!-- End headline -->
 
         <div flex layout="column" layout-align="start stretch" ng-show="!load" ng-init="groupsSelectedTab='agents'">
-            <!-- Back button and title -->
-            <div layout="row" layout-align="start center" ng-if="lookingGroup">
-                <!-- Back button -->
-                <md-button class="md-icon-button wz-circle-back-button" style="margin: 5px 15px!important;" aria-label="Back to rules list"
-                    tooltip="Back" tooltip-placement="bottom" ng-click="goBackGroups()"><i class="fa fa-fw fa-arrow-left"
-                        aria-hidden="true"></i></md-button>
-                <!-- Group name -->
-                <div>
-                    <h5 class="titleSectionIdentifier">Group</h5>
-                    <h1 class="font-size-18">{{currentGroup.name}}</h1>
-                </div>
-            </div>
-            <!-- End back button, title and status indicator -->
             <!-- MD5 Sums and Details cards -->
             <div layout="row" class="md-padding-h" ng-if="lookingGroup">
                 <!-- Group MD5 sums section -->
                 <md-card flex class="no-margin-left no-margin-right wz-margin-top-0 wz-md-card">
                     <md-card-content>
-                        <span class="wz-headline-title"><i class="fa fa-fw fa-info" aria-hidden="true"></i> Details</span>
+                        <span class="wz-headline-title font-size-18"><i class="fa fa-fw fa-object-group" aria-hidden="true"></i> {{currentGroup.name}}</span>
                         <md-divider class="wz-margin-top-10"></md-divider>
                         <div layout="row" class="wz-padding-top-10">
                             <span flex="15">Agents</span>
@@ -85,7 +72,7 @@
                             XML format error</span>
                     </button>
                 </div>
-                <div class="md-padding md-padding-top-10" style="height: calc(100vh - 405px);" ng-if="fetchedXML">
+                <div class="md-padding md-padding-top-10" style="height: calc(100vh - 358px);" ng-if="fetchedXML">
                     <wz-xml-file-editor file-name='agent.conf' data="fetchedXML" target-name="currentGroup.name + ' group'"
                         valid-fn='xmlIsValid(valid)'>
                     </wz-xml-file-editor>
