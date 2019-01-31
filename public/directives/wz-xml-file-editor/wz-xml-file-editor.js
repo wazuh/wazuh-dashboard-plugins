@@ -28,8 +28,8 @@ app.directive('wzXmlFileEditor', function () {
     controller($scope, $document, errorHandler, groupHandler, rulesetHandler, saveConfig) {
 
       /**
-       * Custom .replace method. Instead of using .replace which 
-       * evaluates regular expressions. 
+       * Custom .replace method. Instead of using .replace which
+       * evaluates regular expressions.
        * Alternative using split + join, same result.
        */
       String.prototype.xmlReplace = function (str, newstr) {
@@ -41,7 +41,7 @@ app.directive('wzXmlFileEditor', function () {
 
       /**
        * Escape "&" characters.
-       * @param {*} text 
+       * @param {*} text
        */
       const replaceIllegalXML = text => {
         const oDOM = parser.parseFromString(text, 'text/html');
@@ -96,11 +96,14 @@ app.directive('wzXmlFileEditor', function () {
         return;
       };
 
-      const autoFormat = (xml) => {
+      const autoFormat = xml => {
         var reg = /(>)\s*(<)(\/*)/g;
         var wsexp = / *(.*) +\n/g;
         var contexp = /(<.+>)(.+\n)/g;
-        xml = xml.replace(reg, '$1\n$2$3').replace(wsexp, '$1\n').replace(contexp, '$1\n$2');
+        xml = xml
+          .replace(reg, '$1\n$2$3')
+          .replace(wsexp, '$1\n')
+          .replace(contexp, '$1\n$2');
         var formatted = '';
         var lines = xml.split('\n');
         var indent = 0;
@@ -127,13 +130,19 @@ app.directive('wzXmlFileEditor', function () {
         for (var i = 0; i < lines.length; i++) {
           var ln = lines[i];
           if (ln.match(/\s*<\?xml/)) {
-            formatted += ln + "\n";
+            formatted += ln + '\n';
             continue;
           }
           var single = Boolean(ln.match(/<.+\/>/)); // is this line a single tag? ex. <br />
           var closing = Boolean(ln.match(/<\/.+>/)); // is this a closing tag? ex. </a>
           var opening = Boolean(ln.match(/<[^!].*>/)); // is this even a tag (that's not <!something>)
-          var type = single ? 'single' : closing ? 'closing' : opening ? 'opening' : 'other';
+          var type = single
+            ? 'single'
+            : closing
+            ? 'closing'
+            : opening
+            ? 'opening'
+            : 'other';
           var fromTo = lastType + '->' + type;
           lastType = type;
           var padding = '';
@@ -143,9 +152,9 @@ app.directive('wzXmlFileEditor', function () {
             padding += '\t';
           }
           if (fromTo == 'opening->closing')
-            formatted = formatted.substr(0, formatted.length - 1) + ln + '\n'; // substr removes line break (\n) from prev loop
-          else
-            formatted += padding + ln + '\n';
+            formatted = formatted.substr(0, formatted.length - 1) + ln + '\n';
+          // substr removes line break (\n) from prev loop
+          else formatted += padding + ln + '\n';
         }
         return formatted.trim();
       };
