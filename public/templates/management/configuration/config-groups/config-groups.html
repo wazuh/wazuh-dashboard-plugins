@@ -1,7 +1,18 @@
 <div flex="auto" layout="column" ng-if="editionTab === 'groups'" ng-controller="configurationGroupsController">
     <div layout="column" layout-padding>
-        <span class="font-size-18"> <i class="fa fa-fw fa-object-group" aria-hidden="true"></i> Edit the groups</span>
-        <span class="md-subheader">Edit your groups configuration</span>
+        <div layout="row">
+            <span class="font-size-18"> <i class="fa fa-fw fa-object-group" aria-hidden="true"></i> Edit the groups</span> 
+            <span ng-if='adminMode' class="font-size-18 wz-text-link" tooltip="Add new group" ng-click="switchAddingGroup()"> <i class="fa fa-fw fa-plus-circle"></i></span>
+        </div>
+        <span ng-if="!addingGroup" class="md-subheader">Edit your groups configuration</span>
+        
+        <div layout="row" ng-if="addingGroup" ng-if='adminMode' class="wz-padding-bottom-0">
+            <input placeholder="Group name..." ng-model="groupToBeAdded" type="text" class="kuiLocalSearchInput addGroupInput ng-empty ng-pristine ng-scope ng-touched ng-valid"
+                aria-invalid="false">
+            <button type="submit" aria-label="Search" class="kuiLocalSearchButton addGroupBtn" ng-click="createGroup(groupToBeAdded)">
+                <span class="fa fa-save fa-fw" aria-hidden="true"></span>
+            </button>
+        </div>
     </div>
 
     <div class="md-padding" ng-show="!editingFile">

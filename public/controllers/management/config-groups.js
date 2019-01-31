@@ -28,6 +28,7 @@ export class ConfigurationGroupsController {
     this.$scope.isArray = Array.isArray;
     this.groupHandler = groupHandler;
     this.$scope.currentConfig = null;
+    this.$scope.addingGroup = false;
   }
 
 
@@ -85,6 +86,19 @@ export class ConfigurationGroupsController {
     this.$scope.doSaveConfig = () => {
       this.$scope.editingFile = false;
       this.$scope.$broadcast('saveXmlFile', { group: this.$scope.selectedItem.name });
+    };
+    this.$scope.switchAddingGroup = () => {
+      this.$scope.addingGroup = !this.$scope.addingGroup;
+    };
+    this.$scope.createGroup = async name => {
+      try {
+        this.$scope.addingGroup = false;
+        await this.groupHandler.createGroup(name);
+        this.errorHandler.info(`Success. Group ${name} has been created`, '');
+      } catch (error) {
+        this.errorHandler.handle(`${error.message || error}`, '');
+      }
+      this.$scope.$broadcast('wazuhSearch', {});
     };
 
     this.$scope.closeEditingFile();
