@@ -169,6 +169,10 @@ export function RulesController(
     return $sce.trustAsHtml(coloredString);
   };
 
+  $scope.$on('closeRuleView', () => {
+    $scope.closeDetailView();
+  });
+
   // Reloading event listener
   $scope.$on('rulesetIsReloaded', () => {
     $scope.viewingDetail = false;

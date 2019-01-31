@@ -9,9 +9,16 @@
         <!-- Breadcrumbs -->
         <div layout="row" layout-padding>
             <!-- If you're not on the Welcome tab, show a functional breadcrumb -->
-            <div ng-if="mctrl.tab !== 'welcome' && !mctrl.currentGroup">
+            <div ng-if="mctrl.tab !== 'welcome' && !mctrl.currentGroup && !mctrl.currentRule && !mctrl.currentDecoder && !mctrl.currentList">
                 <span class="wz-text-link cursor-pointer" ng-click="mctrl.switchTab('welcome', true)">Management</span>
                 <span> / {{ mctrl.tabNames[mctrl.tab] }}</span>
+            </div>
+            <div ng-if="mctrl.tab !== 'welcome' && !mctrl.currentGroup && (mctrl.currentRule || mctrl.currentDecoder || mctrl.currentList)">
+                <span class="wz-text-link cursor-pointer" ng-click="mctrl.switchTab('welcome', true)">Management</span>
+                <span class="wz-text-link cursor-pointer" ng-click="mctrl.breadCrumbBack(true);"> / {{ mctrl.tabNames[mctrl.tab] }}</span>
+                <span ng-show="mctrl.currentRule"><span class="wz-text-link cursor-pointer" ng-click="mctrl.breadCrumbBack()"> / Rule</span> / {{mctrl.currentRule.id}}</span>
+                <span ng-show="mctrl.currentDecoder"><span class="wz-text-link cursor-pointer" ng-click="mctrl.breadCrumbBack()"> / Decoder</span> / {{mctrl.currentDecoder.file}}</span>
+                <span ng-show="mctrl.currentList"><span class="wz-text-link cursor-pointer" ng-click="mctrl.breadCrumbBack()"> / CDB List</span> / {{mctrl.currentList.name}}</span>
             </div>
             <div ng-if="mctrl.tab === 'groups' && mctrl.currentGroup && mctrl.currentGroup.name">
                 <span class="wz-text-link cursor-pointer" ng-click="mctrl.switchTab('welcome', true)">Management</span>

@@ -135,6 +135,10 @@ export function CdbListsController(
     if (!$scope.$$phase) $scope.$digest();
   });
 
+  $scope.$on('closeListView', () => {
+    $scope.closeDetailView();
+  });
+
   /**
    * Get full data on CSV format
    */
@@ -183,12 +187,12 @@ export function CdbListsController(
   //listeners
   $scope.$on('wazuhShowCdbList', async (ev, parameters) => {
     $scope.currentList = parameters.cdblist;
-    try{
+    try {
       const data = await rulesetHandler.getCdbList(`etc/lists/${$scope.currentList.name}`);
       $scope.currentList.list = stringToObj(data.data.data);
-      $scope.viewingDetail = true;    
+      $scope.viewingDetail = true;
       $scope.$emit('setCurrentList', { currentList: $scope.currentList });
-    }catch(error){
+    } catch (error) {
       $scope.currentList.list = [];
       errorHandler.handle(error, '');
     }

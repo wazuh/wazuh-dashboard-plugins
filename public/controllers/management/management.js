@@ -157,4 +157,18 @@ export class ManagementController {
     this.rulesetTab = tab;
     this.globalRulesetTab = this.rulesetTab;
   }
+
+  breadCrumbBack(goRoot = false) {
+    if (this.currentRule) {
+      this.$scope.$broadcast('closeRuleView');
+    } else if (this.currentDecoder) {
+      this.$scope.$broadcast('closeDecoderView');
+    } else if (this.currentList) {
+      this.$scope.$broadcast('closeListView');
+    }
+    if (goRoot) {
+      this.switchTab('ruleset', true);
+      this.setRulesTab('rules');
+    }
+  }
 }
