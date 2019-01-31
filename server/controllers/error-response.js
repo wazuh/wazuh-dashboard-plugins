@@ -29,7 +29,7 @@ export function ErrorResponse(
   message = null,
   code = null,
   statusCode = null,
-  reply
+  h
 ) {
   let filteredMessage = '';
   if (code) {
@@ -66,13 +66,15 @@ export function ErrorResponse(
     }
   }
 
-  return reply({
-    message: filteredMessage
-      ? `${code ? code : 1000} - ${filteredMessage}`
-      : typeof message === 'string'
-      ? `${code ? code : 1000} - ${message}`
-      : `${code ? code : 1000} - Unexpected error`,
-    code: code ? code : 1000,
-    statusCode: statusCode ? statusCode : 500
-  }).code(statusCode ? statusCode : 500);
+  return h
+    .response({
+      message: filteredMessage
+        ? `${code || 1000} - ${filteredMessage}`
+        : typeof message === 'string'
+        ? `${code || 1000} - ${message}`
+        : `${code || 1000} - Unexpected error`,
+      code: code || 1000,
+      statusCode: statusCode || 500
+    })
+    .code(statusCode || 500);
 }
