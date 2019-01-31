@@ -295,9 +295,9 @@ export function GroupsController(
     $scope.$broadcast('saveXmlFile', { group: $scope.currentGroup.name });
   };
 
-  $scope.$on('configurationSuccess',() => {
+  $scope.$on('configurationSuccess', () => {
     $scope.editingFile = false;
-    if(!$scope.$$phase) $scope.$digest();
+    if (!$scope.$$phase) $scope.$digest();
   });
 
   $scope.reload = async (element, searchTerm, addOffset, start) => {

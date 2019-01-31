@@ -10,15 +10,19 @@
             <span data-test-subj="discoverCurrentQuery" ng-bind="opts.savedSearch.lastSavedTitle"></span>
             <span
               id="reload_saved_search"
-              aria-label="Reload Saved Search"
-              tooltip="Reload Saved Search"
+              aria-label="{{::'kbn.discover.reloadSavedSearchAriaLabel' | i18n: {defaultMessage: 'Reload Saved Search'} }}"
+              tooltip="{{::'kbn.discover.reloadSavedSearchTooltip' | i18n: {defaultMessage: 'Reload Saved Search'} }}"
               ng-click="resetQuery()"
               kbn-accessible-click
               class="kuiIcon fa-undo small"
             ></span>&nbsp;
           </span>
           <span data-test-subj="discoverQueryHits" class="kuiLocalBreadcrumb__emphasis">{{(hits || 0) | number:0}}</span>
-          <ng-pluralize count="hits" when="{'1':'hit', 'other':'hits'}"></ng-pluralize>
+          <span
+            i18n-id="kbn.discover.hitsPluralTitle"
+            i18n-default-message="{hits, plural, one {hit} other {hits}}"
+            i18n-values="{ hits }"
+          ></span>
         </h1>
       </div>
 
@@ -89,7 +93,10 @@
               class="dscOverlay"
             >
               <div class="euiTitle" >
-                <h2>Searching</h2>
+                <h2
+                  i18n-id="kbn.discover.searchingTitle"
+                  i18n-default-message="Searching"
+                ></h2>
               </div>
               <div class="euiSpacer euiSpacer--m"></div>
               <div ng-show="fetchStatus">{{fetchStatus.complete}}/{{fetchStatus.total}}</div>
@@ -104,14 +111,25 @@
             >
               <span class="kuiButton__inner">
                 <span aria-hidden="true" class="kuiButton__icon kuiIcon fa-chevron-down"></span>
-                <span>Skip to bottom</span>
+                <span
+                  i18n-id="kbn.discover.skipToBottomButtonLabel"
+                  i18n-default-message="Skip to bottom"
+                ></span>
               </span>
             </button>
 
-            <section aria-label="Histogram of found documents" class="dscTimechart" ng-if="opts.timefield">
+            <section
+              aria-label="{{::'kbn.discover.histogramOfFoundDocumentsAriaLabel' | i18n: {defaultMessage: 'Histogram of found documents'} }}"
+              class="dscTimechart"
+              ng-if="opts.timefield"
+            >
               <header class="dscTimechart__header">
                 <div class="small">
-                  <span tooltip="To change the time, click the clock icon in the navigation bar">{{timeRange.from | moment}} - {{timeRange.to | moment}}</span>
+                  <span
+                    tooltip="{{::'kbn.discover.howToChangeTheTimeTooltip' | i18n: {defaultMessage: 'To change the time, click the clock icon in the navigation bar'} }}"
+                  >
+                    {{timeRange.from | moment}} - {{timeRange.to | moment}}
+                  </span>
 
                   &mdash;
 
@@ -129,7 +147,13 @@
                         content="getBucketIntervalToolTipText()"
                         position="'top'"
                       ></icon-tip>
-                      Scaled to {{ bucketInterval.description }}
+                      <span
+                        i18n-id="kbn.discover.scaledToDescription"
+                        i18n-default-message="Scaled to {bucketIntervalDescription}"
+                        i18n-values="{
+                          bucketIntervalDescription: bucketInterval.description
+                        }"
+                      ></span>
                     </span>
                   </span>
                 </div>
@@ -137,13 +161,17 @@
               </header>
 
               <div id="discoverHistogram"
-                 ng-if="vis && rows.length !== 0"
+                 ng-show="vis && rows.length !== 0"
                  style="display: flex; height: 200px"
                 >
               </div>
             </section>
 
-            <section class="dscTable" fixed-scroll aria-label="Documents">
+            <section
+              class="dscTable"
+              fixed-scroll
+              aria-label="{{::'kbn.discover.documentsAriaLabel' | i18n: {defaultMessage: 'Documents'} }}"
+            >
               <doc-table
                 hits="rows"
                 index-pattern="indexPattern"
@@ -165,10 +193,24 @@
 
               <a tabindex="0" id="discoverBottomMarker"></a>
 
-              <div ng-if="rows.length == opts.sampleSize" class="dscTable__footer">
-                These are the first {{opts.sampleSize}} documents matching
-                your search, refine your search to see others.
-                <a kbn-accessible-click ng-click="scrollToTop()">Back to top.</a>
+              <div
+                ng-if="rows.length == opts.sampleSize"
+                class="dscTable__footer"
+              >
+                <span
+                  i18n-id="kbn.discover.howToSeeOtherMatchingDocumentsDescription"
+                  i18n-default-message="These are the first {sampleSize} documents matching
+                  your search, refine your search to see others. "
+                  i18n-values="{
+                    sampleSize: opts.sampleSize,
+                  }"
+                ></span>
+                <a
+                  kbn-accessible-click
+                  ng-click="scrollToTop()"
+                  i18n-id="kbn.discover.backToTopLinkText"
+                  i18n-default-message="Back to top."
+                ></a>
               </div>
             </section>
           </div>
