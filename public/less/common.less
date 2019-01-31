@@ -245,6 +245,19 @@ div.uil-ring-css {
     top: 210px!important;
 }
 
+.btn-as-i{
+    background: none;
+    border: 0;
+    color: #0079a5;
+    padding: 0;
+    margin: 0;
+    font-size: 20px;
+}
+
+.btn-as-i:hover{
+    background: none!important;
+    color: #0079a5;
+}
 /* Custom reporting button styles */
 
 .wz-report-button:hover {
@@ -369,11 +382,19 @@ div.uil-ring-css {
 }
 
 .wz-metric-color {
-    background-color: rgb(228, 242, 245);
+    background-color: #d1e9f2!important;
+    overflow: hidden;
+    margin: 3px 8px;
+    box-shadow: none!important;
+    border: 0!important;
 }
 
 .wz-background-transparent {
     background-color: transparent;
+}
+
+.md-subheader{
+    background: transparent!important;
 }
 
 /* Custom Kibana styles */
@@ -395,6 +416,11 @@ div.uil-ring-css {
 .table-hover > tbody > tr:hover {
     background-color: #f0f0f0;
 }
+
+/* .table > tbody {
+    border-right: 1px solid #D9D9D9;
+    border-left: 1px solid #D9D9D9;
+} */
 
 .action-btn-td{
     font-size: 18px;
@@ -426,7 +452,8 @@ kbn-vis .visChart__container {
 
 md-sidenav {
     width: 250px!important;
-    font-size: 12px;    
+    font-size: 12px;  
+    background: transparent!important;  
 }
 
 /* Dev tools styles */
@@ -487,7 +514,7 @@ md-sidenav {
 
 /* Card and select input shadow overriding */
 
-.wz-md-card {
+.wz-md-card:not(.wz-metric-color) {
     box-shadow: 0 2px 2px -1px rgba(0, 0, 0, 0.1) !important;
     border: 1px solid #D9D9D9 !important;
     overflow: hidden;
@@ -513,7 +540,7 @@ md-sidenav {
 }
 
 @supports not (-moz-appearance:none) {
-    @media (min-width: 1060px) {      
+    @media (min-width: 1200px) {      
         .wz-logo{        
             content: url("/plugins/wazuh/img/new_logo_white.png");
         } 
@@ -522,11 +549,12 @@ md-sidenav {
             max-width: 150px;
         }
     }
-    @media (max-width: 1059px) {    
+    @media (max-width: 1199px) {    
         .wz-logo{         
            content: url("/plugins/wazuh/img/new_logo_white_wolf.png");
            max-height: 45px;
-           max-width: 28px;
+           max-width: 20px;
+           margin-right: 10px;
        } 
        .wz-logo-container {
             min-width: 20px!important;
@@ -537,7 +565,7 @@ md-sidenav {
 }
 
 @supports (-moz-appearance:none) {
-    @media (min-width: 1060px) {      
+    @media (min-width: 1200px) {      
         .wz-logo::after{        
             content: url("/plugins/wazuh/img/new_logo_white.png");
         } 
@@ -546,11 +574,12 @@ md-sidenav {
             max-width: 185px;
         }
     }
-    @media (max-width: 1059px) {    
+    @media (max-width: 1199px) {    
         .wz-logo::after{         
             content: url("/plugins/wazuh/img/new_logo_white_wolf.png");
             max-height: 45px;
-            max-width: 28px;
+            max-width: 20px;
+            margin-right: 10px;
         } 
         .wz-logo-container {
                 min-width: 20px!important;
@@ -641,6 +670,8 @@ md-sidenav {
 .wz-circle-back-button{
     border: 1px solid #d9d9d9!important;
     margin: 0px 15px 0px 0px!important;
+    background: white!important;
+    line-height: 18px!important;
 }
 
 .wz-circle-back-button:hover{
@@ -655,6 +686,15 @@ md-sidenav {
     padding: 0px 16px;
 }
 
+.md-margin-h {
+    margin: 0px 16px;
+}
+
+.md-margin-h-0 {
+    margin-left: 0px;
+    margin-right: 0px;
+}
+
 .cursor-wait {
     cursor: wait !important;
 }
@@ -664,18 +704,19 @@ md-sidenav {
 }
 
 .addGroupInput {
-    max-height: 20px !important;
+    height: 40px !important;
     max-width: 181px !important;
     padding-right: 0 !important;
 }
 
 .addGroupBtn {
-    background-color: #0079a5 !important
+    background-color: #0079a5 !important;
+    height: 40px!important;
 }
 
 .agreeBtn {
     min-height: 0px !important;
-    max-height: 25px !important;
+    height: 25px !important;
     line-height: inherit !important;
     color: #ffffff !important;
     background-color: #0079a5 !important;
@@ -687,20 +728,8 @@ md-sidenav {
     background-color: #d9d9d9 !important;
     border-color: #d9d9d9 !important;
     min-height: 0px !important;
-    max-height: 25px !important;
+    height: 25px !important;
     line-height: inherit !important;
-}
-
-.agreeBtnAgents {
-    color: #ffffff !important;
-    background-color: #0079a5 !important;
-    border-color: #0079a5 !important;
-}
-
-.cancelBtnAgents {
-    color: #000000 !important;
-    background-color: #d9d9d9 !important;
-    border-color: #d9d9d9 !important;
 }
 
 .agents-prev-btn {
@@ -709,6 +738,10 @@ md-sidenav {
 
 .min-height-300 {
     min-height: 300px;
+}
+
+.nav-bar-white-bg > div{
+    background: #fff;
 }
 
 /*
@@ -725,4 +758,21 @@ md-sidenav {
     -moz-hyphens: auto;
     -webkit-hyphens: auto;
     hyphens: auto;
+}
+
+.titleSectionIdentifier{
+    font-size: 12px;
+    color: #0079a5;
+    text-transform: capitalize;
+}
+.confirmEmbedBubble{
+    background-color: #ecf6fb;
+    border: 1px solid #dfeff8;
+    color: #31708f;
+    padding: 5px 10px;
+    max-width: 275px;
+}
+
+wz-xml-file-editor {
+    height: inherit;
 }

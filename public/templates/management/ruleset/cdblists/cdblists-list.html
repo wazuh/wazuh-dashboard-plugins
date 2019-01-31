@@ -1,13 +1,13 @@
 <div ng-if="!loading && !viewingDetail" layout="column">
     <div id="content" layout="row" class="md-padding ">
-        <input flex placeholder="Filter rules..." ng-model="custom_search" type="text" class="kuiLocalSearchInput height-40 ng-empty ng-pristine ng-scope ng-touched ng-valid"
+        <input flex placeholder="Filter lists..." ng-model="custom_search" type="text" class="kuiLocalSearchInput height-40 ng-empty ng-pristine ng-scope ng-touched ng-valid"
             aria-invalid="false" wz-enter="search(custom_search)">
         <button type="submit" aria-label="Search" class="kuiLocalSearchButton height-40" ng-click="search(custom_search)">
             <span class="fa fa-search" aria-hidden="true"></span>
         </button>
     </div>
 
-    <md-chips class="wz-chips md-padding-h wz-padding-bottom-14" readonly="true" ng-show="appliedFilters.length">
+    <md-chips class="wz-chips md-padding-h" readonly="true" ng-show="appliedFilters.length">
         <md-chip class="wz-chip" ng-show="includesFilter('file')">
             <span>File: {{getFilter('file')}}
                 <i class="fa fa-fw fa-times cursor-pointer" aria-hidden="true" ng-click="removeFilter('file')"></i>
@@ -43,7 +43,7 @@
     <div layout="row">
         <md-card flex class="wz-md-card _md flex md-margin-h">
             <md-card-content>
-                <wz-table implicit-filter="appliedFilters" flex path="'/rules'" keys="['id',{value:'file',size:2},{value:'description',size:2},{value:'groups',nosortable:true,size:2},{value:'pci',nosortable:true,size:2},{value:'gdpr',nosortable:true},'level']"
+                <wz-table implicit-filter="appliedFilters" flex path="'/lists/files'" keys="['name', 'path']"
                     allow-click="true" row-sizes="[15,13,11]">
                 </wz-table>
                 <div layout="row" class="wz-margin-top-10 md-padding-h">

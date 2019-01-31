@@ -11,11 +11,8 @@
  */
 import * as FileSaver from '../../services/file-saver';
 
-import { colors } from './colors';
-
-export function RulesController(
+export function CdbListsController(
   $scope,
-  $sce,
   errorHandler,
   appState,
   csvReq,
@@ -88,18 +85,6 @@ export function RulesController(
       );
       $scope.appliedFilters.push(filter);
       $scope.$broadcast('wazuhFilter', { filter });
-    } else if (
-      term &&
-      term.startsWith('path:') &&
-      term.split('path:')[1].trim()
-    ) {
-      $scope.custom_search = '';
-      const filter = { name: 'path', value: term.split('path:')[1].trim() };
-      $scope.appliedFilters = $scope.appliedFilters.filter(
-        item => item.name !== 'path'
-      );
-      $scope.appliedFilters.push(filter);
-      $scope.$broadcast('wazuhFilter', { filter });
     } else {
       $scope.$broadcast('wazuhSearch', { term, removeFilters: 0 });
     }
@@ -138,45 +123,20 @@ export function RulesController(
   $scope.searchTerm = '';
   $scope.viewingDetail = false;
   $scope.isArray = Array.isArray;
+  $scope.newKey = '';
+  $scope.newValue = '';
 
   const configuration = wazuhConfig.getConfig();
   $scope.adminMode = !!(configuration || {}).admin;
-
-  /**
-   * This set color to a given rule argument
-   */
-  $scope.colorRuleArg = ruleArg => {
-    ruleArg = ruleArg.toString();
-    let valuesArray = ruleArg.match(/\$\(((?!<\/span>).)*?\)(?!<\/span>)/gim);
-    let coloredString = ruleArg;
-
-    // If valuesArray is empty, means that the description doesn't have any arguments
-    // In this case, then simply return the string
-    // In other case, then colour the string and return
-    if (valuesArray && valuesArray.length) {
-      for (let i = 0, len = valuesArray.length; i < len; i++) {
-        coloredString = coloredString.replace(
-          /\$\(((?!<\/span>).)*?\)(?!<\/span>)/im,
-          '<span style="color: ' +
-          colors[i] +
-          ' ">' +
-          valuesArray[i] +
-          '</span>'
-        );
-      }
-    }
-
-    return $sce.trustAsHtml(coloredString);
-  };
-
-  $scope.$on('closeRuleView', () => {
-    $scope.closeDetailView();
-  });
 
   // Reloading event listener
   $scope.$on('rulesetIsReloaded', () => {
     $scope.viewingDetail = false;
     if (!$scope.$$phase) $scope.$digest();
+  });
+
+  $scope.$on('closeListView', () => {
+    $scope.closeDetailView();
   });
 
   /**
@@ -187,13 +147,13 @@ export function RulesController(
       errorHandler.info('Your download should begin automatically...', 'CSV');
       const currentApi = JSON.parse(appState.getCurrentAPI()).id;
       const output = await csvReq.fetch(
-        '/rules',
+        '/cdblists',
         currentApi,
         wzTableFilter.get()
       );
       const blob = new Blob([output], { type: 'text/csv' }); // eslint-disable-line
 
-      FileSaver.saveAs(blob, 'rules.csv');
+      FileSaver.saveAs(blob, 'cdblists.csv');
 
       return;
     } catch (error) {
@@ -213,43 +173,36 @@ export function RulesController(
     $scope.closeDetailView();
   };
 
+  const stringToObj = (string) => {
+    let result = {};
+    const splitted = string.split('\n');
+    splitted.forEach(function (element) {
+      const keyValue = element.split(':');
+      if (keyValue[0])
+        result[keyValue[0]] = keyValue[1];
+    });
+    return result;
+  }
+
   //listeners
-  $scope.$on('wazuhShowRule', (event, parameters) => {
-    $scope.currentRule = parameters.rule;
-    $scope.$emit('setCurrentRule', { currentRule: $scope.currentRule });
-    if (!(Object.keys(($scope.currentRule || {}).details || {}) || []).length) {
-      $scope.currentRule.details = false;
+  $scope.$on('wazuhShowCdbList', async (ev, parameters) => {
+    $scope.currentList = parameters.cdblist;
+    try {
+      const data = await rulesetHandler.getCdbList(`etc/lists/${$scope.currentList.name}`);
+      $scope.currentList.list = stringToObj(data.data.data);
+      $scope.viewingDetail = true;
+      $scope.$emit('setCurrentList', { currentList: $scope.currentList });
+    } catch (error) {
+      $scope.currentList.list = [];
+      errorHandler.handle(error, '');
     }
-    $scope.viewingDetail = true;
+    $scope.$broadcast('changeCdbList', { currentList: $scope.currentList });
     if (!$scope.$$phase) $scope.$digest();
+
   });
 
-  $scope.editRulesConfig = async () => {
-    $scope.editingFile = true;
-    try {
-      $scope.fetchedXML = await rulesetHandler.getRuleConfiguration($scope.currentRule.file)
-      if (!$scope.$$phase) $scope.$digest();
-      $scope.$broadcast('fetchedFile', { data: $scope.fetchedXML });
-    } catch (error) {
-      $scope.fetchedXML = null;
-      errorHandler.handle(error, 'Fetch file error');
-    }
-  }
-  $scope.closeEditingFile = () => {
-    $scope.editingFile = false;
-    $scope.$broadcast('closeEditXmlFile', {});
-  };
-  $scope.xmlIsValid = valid => {
-    $scope.xmlHasErrors = valid;
-    if (!$scope.$$phase) $scope.$digest();
-  };
-  $scope.doSaveRuleConfig = () => {
-    $scope.editingFile = false;
-    $scope.$broadcast('saveXmlFile', { rule: $scope.currentRule });
-  };
-
   /**
-   * This function changes to the rules list view
+   * This function changes to the lists list view
    */
   $scope.closeDetailView = clear => {
     if (clear)
@@ -258,32 +211,31 @@ export function RulesController(
         $scope.appliedFilters.length - 1
       );
     $scope.viewingDetail = false;
-    $scope.currentRule = false;
-    $scope.closeEditingFile();
-    $scope.$emit('removeCurrentRule');
+    $scope.currentList = false;
+    $scope.$emit('removeCurrentList');
     if (!$scope.$$phase) $scope.$digest();
   };
 
-  if ($location.search() && $location.search().ruleid) {
-    const incomingRule = $location.search().ruleid;
-    $location.search('ruleid', null);
+  if ($location.search() && $location.search().listname) {
+    const incomingList = $location.search().listname;
+    $location.search('listname', null);
     apiReq
-      .request('get', `/rules/${incomingRule}`, {})
+      .request('get', `/cdblists/${incomingList}`, {})
       .then(data => {
-        $scope.currentRule = data.data.data.items[0];
-        $scope.$emit('setCurrentRule', { currentRule: $scope.currentRule });
+        $scope.currentList = data.data.data.items[0];
+        $scope.$emit('setCurrentList', { currentList: $scope.currentList });
         if (
-          !(Object.keys(($scope.currentRule || {}).details || {}) || []).length
+          !(Object.keys(($scope.currentList || {}).details || {}) || []).length
         ) {
-          $scope.currentRule.details = false;
+          $scope.currentList.details = false;
         }
         $scope.viewingDetail = true;
         if (!$scope.$$phase) $scope.$digest();
       })
       .catch(() =>
         errorHandler.handle(
-          `Error fetching rule: ${incomingRule} from the Wazuh API`,
-          'Ruleset'
+          `Error fetching list: ${incomingList} from the Wazuh API`,
+          'CDB Lists'
         )
       );
   }

@@ -1,4 +1,4 @@
-<div layout="column" layout-align="start stretch" ng-if="tab === 'welcome'" ng-show="!load && !agent">
+<div layout="column" class="" layout-align="start stretch" ng-if="tab === 'welcome'" ng-show="!load && !agent">
     <div layout="row" class="layout-padding">
         <md-card flex class="wz-md-card" flex>
             <md-card-content class="wz-text-center">
@@ -12,7 +12,7 @@
         </md-card>
     </div>
 </div>
-<div layout="column" layout-align="start stretch" ng-if="tab === 'welcome'" ng-show="!load && agent">
+<div layout="column" class="" layout-align="start stretch" ng-if="tab === 'welcome'" ng-show="!load && agent">
 
     <!-- Headline -->
     <div layout="column" layout-padding>
@@ -96,13 +96,13 @@
                         group }}&nbsp;</span>
                 </div>
 
-                <div class="wz-margin-top-10" ng-if="agent.group && editGroup && addingGroupToAgent">
+                <div class="wz-margin-top-10 confirmEmbedBubble" ng-if="agent.group && editGroup && addingGroupToAgent">
                     <div layout="row">
-                        <span class="euiToastHeader__title font-size-12">Group {{addingGroupToAgent}} will be added to agent {{agent.id}}</span>
+                        <span class="font-size-12  wz-padding-left-8">Group {{addingGroupToAgent}} will be added to agent {{agent.id}}</span>
                     </div>
                     <div layout="row">
-                        <md-button class="cancelBtnAgents" type="button" ng-click="cancelAddGroup()"><i aria-hidden='true' class='fa fa-fw fa-close'></i> Cancel</md-button>
-                        <md-button class="agreeBtnAgents" type="button" ng-click="confirmAddGroup(addingGroupToAgent)"><i aria-hidden='true' class='fa fa-fw fa-check'></i> Confirm</md-button>  
+                        <md-button class="cancelBtn" type="button" ng-click="cancelAddGroup()"><i aria-hidden='true' class='fa fa-fw fa-close'></i> Cancel</md-button>
+                        <md-button class="agreeBtn" type="button" ng-click="confirmAddGroup(addingGroupToAgent)"><i aria-hidden='true' class='fa fa-fw fa-check'></i> Confirm</md-button>  
                     </div>                          
                 </div>
                 <div layout="row" layout-padding ng-if="agent.group" class="wz-word-break">

@@ -57,5 +57,6 @@ export const TabNames = {
   'aws-s3': 'Amazon S3',
   command: 'Wazuh commands',
   client: 'Client configuration',
+  edition: 'Edit node configuration',
   'client-buffer': 'Anti-flooding settings'
 };

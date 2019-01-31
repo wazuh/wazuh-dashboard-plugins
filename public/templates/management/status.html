@@ -1,4 +1,5 @@
-<div layout="column" layout-align="start stretch" ng-controller="managerStatusController as ctrl" ng-if="mctrl.tab === 'status'">
+<div layout="column" layout-align="start stretch" ng-controller="managerStatusController as ctrl" ng-if="mctrl.tab === 'status'"
+    class="">
 
     <!-- Loading ring -->
     <div class='uil-ring-css' ng-show="ctrl.load">
@@ -6,13 +7,12 @@
     </div>
 
     <!-- Headline -->
-    <div ng-show="!ctrl.load" layout="row" layout-padding>
+    <div ng-show="!ctrl.load" layout="column" layout-padding>
         <span class="font-size-18"><i class="fa fa-fw fa-heartbeat" aria-hidden="true"></i> Status</span>
+        <span class="md-subheader">Check the status of all Wazuh manager daemons <span ng-show="ctrl.selectedNode">({{ctrl.selectedNode}})</span></span>
     </div>
+
     <div ng-show="!ctrl.load" layout="row" layout-padding>
-        <div flex layout="column" layout-align="center" class="height-40 wz-margin-right-15">
-            <span class="md-subheader">Check the status of all Wazuh manager daemons <span ng-show="ctrl.selectedNode">({{ctrl.selectedNode}})</span></span>
-        </div>
         <div ng-show="ctrl.selectedNode" layout="column" layout-align="center" class="height-40 wz-select-input">
             <select class="kuiSelect wz-border-none cursor-pointer max-height-35" id="categoryBox" ng-model="ctrl.selectedNode"
                 ng-change="ctrl.changeNode(ctrl.selectedNode)" aria-label="Select node">
@@ -82,7 +82,8 @@
                 <md-divider class="wz-margin-top-10"></md-divider>
                 <div layout="row" class="wz-padding-top-10">
                     <span flex="25">Version</span>
-                    <span class="wz-text-right color-grey">{{ctrl.managerInfo.version ? ctrl.managerInfo.version : '-'}}</span>
+                    <span class="wz-text-right color-grey">{{ctrl.managerInfo.version ? ctrl.managerInfo.version :
+                        '-'}}</span>
                 </div>
                 <div layout="row" class="wz-padding-top-10">
                     <span flex="25">Compilation date</span>
@@ -99,11 +100,13 @@
                 </div>
                 <div layout="row" class="wz-padding-top-10">
                     <span flex="25">Agents limit</span>
-                    <span class="wz-text-right color-grey">{{ctrl.managerInfo.max_agents ? ctrl.managerInfo.max_agents : '-'}}</span>
+                    <span class="wz-text-right color-grey">{{ctrl.managerInfo.max_agents ? ctrl.managerInfo.max_agents
+                        : '-'}}</span>
                 </div>
                 <div layout="row" class="wz-padding-top-10">
                     <span flex="25">OpenSSL Support</span>
-                    <span class="wz-text-right color-grey">{{ctrl.managerInfo.openssl_support ? ctrl.managerInfo.openssl_support
+                    <span class="wz-text-right color-grey">{{ctrl.managerInfo.openssl_support ?
+                        ctrl.managerInfo.openssl_support
                         : '-'}}</span>
                 </div>
             </md-card-content>
@@ -141,7 +144,8 @@
                 </div>
                 <div layout="row" class="wz-padding-top-10" ng-if="ctrl.agentInfo.id !== '000'">
                     <span flex="25">Last keep alive</span>
-                    <span class="wz-text-right color-grey">{{ctrl.agentInfo.lastKeepAlive ? ctrl.agentInfo.lastKeepAlive : '-'}}</span>
+                    <span class="wz-text-right color-grey">{{ctrl.agentInfo.lastKeepAlive ?
+                        ctrl.agentInfo.lastKeepAlive : '-'}}</span>
                 </div>
                 <div layout="row" class="wz-padding-top-10">
                     <span flex="25">Operating system</span>
