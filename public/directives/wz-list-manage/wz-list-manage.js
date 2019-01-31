@@ -39,7 +39,7 @@ app.directive('wzListManage', function () {
         pagination.range(size, start, end, $scope.gap);
       $scope.prevPage = () => pagination.prevPage($scope);
       $scope.nextPage = async currentPage =>
-        pagination.nextPage(currentPage, $scope, errorHandler, fetch);
+        pagination.nextPage(currentPage, $scope, errorHandler, null);
       $scope.setPage = function () {
         $scope.currentPage = this.n;
         $scope.nextPage(this.n);

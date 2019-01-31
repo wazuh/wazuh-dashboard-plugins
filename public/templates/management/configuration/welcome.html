@@ -1,4 +1,4 @@
-<div flex="auto" layout="column" ng-if="configurationTab === 'welcome'" class="wz-content" ng-class="agent && agent.id !== '000'?'wz-margin-top-8':'no-border'">
+<div flex="auto" layout="column" ng-if="configurationTab === 'welcome' && !editionTab" class="wz-content" ng-class="agent && agent.id !== '000'?'wz-margin-top-8':'no-border'">
     <!-- Headline -->
     <div layout="column" layout-padding>
         <div ng-show="agent && agent.id !== '000'">

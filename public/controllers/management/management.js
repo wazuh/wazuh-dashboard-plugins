@@ -18,8 +18,9 @@ export class ManagementController {
    * @param {*} $location
    * @param {*} shareAgent
    */
-  constructor($scope, $location, shareAgent, wazuhConfig, appState) {
+  constructor($scope, $rootScope, $location, shareAgent, wazuhConfig, appState) {
     this.$scope = $scope;
+    this.$rootScope = $rootScope;
     this.$location = $location;
     this.shareAgent = shareAgent;
     this.wazuhConfig = wazuhConfig;
@@ -92,29 +93,44 @@ export class ManagementController {
     return item && Array.isArray(array) && array.includes(item);
   }
 
-  setConfigTab(tab) {
-    this.appState.setNavigation({ status: true });
+  setConfigTab(tab, nav = false) {
     this.globalConfigTab = tab;
+    if (nav) {
+      this.appState.setNavigation({ status: true });
+    } else {
+      this.$scope.editionTab = tab;
+      this.$rootScope.$broadcast('configurationIsReloaded', { globalConfigTab: this.globalConfigTab, reloadConfigSubTab: true });
+    }
     this.$location.search('configSubTab', null);
-    this.$scope.$broadcast('configurationIsReloaded', { globalConfigTab: this.globalConfigTab });
+    this.$location.search('editSubTab', tab);
+    this.$scope.$broadcast('configurationIsReloaded', { globalConfigTab: this.globalConfigTab, reloadConfigSubTab: true });
   }
   /**
    * This switch to a selected tab
    * @param {String} tab
    */
   switchTab(tab, setNav = false) {
+    this.editTab = '';
     if (setNav) {
       this.appState.setNavigation({ status: true });
+    } else {
+      if (this.$location.search().editSubTab) {
+        this.editTab = this.$location.search().editSubTab;
+      }
     }
+    this.$location.search('editSubTab', null);
     this.tab = tab;
 
     if (this.tab === 'groups') {
       this.$scope.$broadcast('groupsIsReloaded');
     }
-    if (this.tab === 'configuration') {
+    if (this.tab === 'configuration' && !this.editTab) {
       this.globalConfigTab = 'overview'
       this.currentConfiguration = false;
       this.$scope.$broadcast('configurationIsReloaded');
+    }
+    else if (this.tab === 'configuration' && this.editTab) {
+      this.setConfigTab(this.editTab);
     } else {
       this.$location.search('configSubTab', null);
     }

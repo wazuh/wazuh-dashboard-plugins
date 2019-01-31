@@ -20,8 +20,9 @@ export class ConfigurationController {
    * @param {*} apiReq
    * @param {*} appState
    */
-  constructor($scope, $location, errorHandler, apiReq, appState) {
+  constructor($scope, $rootScope, $location, errorHandler, apiReq, appState) {
     this.$scope = $scope;
+    this.$rootScope = $rootScope;
     this.errorHandler = errorHandler;
     this.apiReq = apiReq;
     this.appState = appState;
@@ -104,6 +105,8 @@ export class ConfigurationController {
           try {
             const config = this.appState.getSessionStorageItem('configSubTab');
             const configSubTabObj = JSON.parse(config);
+            if (!configSubTabObj)
+              return;
             this.$scope.$emit('setCurrentConfiguration', { currentConfiguration: configSubTabObj.configurationTab });
             this.$scope.switchConfigTab(
               configSubTabObj.configurationTab,
@@ -143,16 +146,26 @@ export class ConfigurationController {
       this.appState.removeSessionStorageItem('configSubTab')
     );
 
-    this.$scope.$on('configurationIsReloaded', (ev, params) => {
+    const reloadConfig = (params) => {
       if ((params || {}).globalConfigTab) {
         this.$scope.configurationTab = '';
         this.$scope.editionTab = params.globalConfigTab;
+        if ((params || {}).reloadConfigSubTab) {
+          this.$location.search('configSubTab', null);
+          this.appState.removeSessionStorageItem('configSubTab')
+        }
         this.$scope.$emit('removeCurrentConfiguration', {});
       } else {
         this.$scope.editionTab = '';
         this.$scope.switchConfigurationTab('welcome', true);
       }
       if (!this.$scope.$$phase) this.$scope.$digest();
+    }
+    this.$rootScope.$on('configurationIsReloaded', (ev, params) => {
+      reloadConfig(params);
+    });
+    this.$scope.$on('configurationIsReloaded', (ev, params) => {
+      reloadConfig(params);
     });
   }
 }

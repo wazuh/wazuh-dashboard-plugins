@@ -71,6 +71,7 @@ app.run(function ($rootScope, $route, $location, appState, $window) {
       if (!navigation.status && navigation.prevLocation) {
         if (!navigation.discoverSections.includes(navigation.currLocation)) {
           appState.setNavigation({ reloaded: true });
+          $location.search('configSubTab', null);
           $route.reload();
           //discover sections
         } else if (navigation.discoverSections.includes(navigation.currLocation)) {

@@ -30,7 +30,7 @@
         <div layout="row" layout-padding>
             <!-- Welcome section -->
             <div ng-if="!mctrl.currentConfiguration">
-                <span class="wz-text-link cursor-pointer" ng-click="mctrl.switchTab('welcome')">Management</span>
+                <span class="wz-text-link cursor-pointer" ng-click="mctrl.switchTab('welcome', true)">Management</span>
                 <span> / </span>
                 <span>{{ mctrl.tabNames[mctrl.tab] }}</span>
             </div>
