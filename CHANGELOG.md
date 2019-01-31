@@ -20,6 +20,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 ### Fixed
 
 - Properly handling long messages on notifier service, until now, they were using out of the card space, also we replaced some API messages with more meaningful messages ([#1168](https://github.com/wazuh/wazuh-kibana-app/pull/1168))
+
 ## Wazuh v3.8.2 - Kibana v6.6.0 - Revision 419
 
 ### Added

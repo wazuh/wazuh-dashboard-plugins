@@ -577,12 +577,12 @@ export class WazuhApiCtrl {
         ? { message: response.body.message, code: response.body.error }
         : new Error('Unexpected error fetching data from the Wazuh API');
     } catch (error) {
-      if ((error || {}).code && ApiErrorEquivalence[error.code]) {
-        error.message = ApiErrorEquivalence[error.code];
-      }
       if (devTools) {
         return { error: '3013', message: error.message || error };
       } else {
+        if ((error || {}).code && ApiErrorEquivalence[error.code]) {
+          error.message = ApiErrorEquivalence[error.code];
+        }
         return ErrorResponse(
           error.message || error,
           `Wazuh API error: ${error.code}` || 3013,
