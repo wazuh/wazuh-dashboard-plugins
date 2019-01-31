@@ -5,9 +5,6 @@
         <button type="submit" aria-label="Search" class="kuiLocalSearchButton height-40 wz-margin-right-8" ng-click="dctrl.search(dctrl.custom_search)">
             <span class="fa fa-search" aria-hidden="true"></span>
         </button>
-        <button class="btn btn-info height-40 wz-margin-right-8" ng-if="dctrl.typeFilter === 'all'" ng-click="dctrl.search('path:/var/ossec/etc/decoders')">Local
-            decoders</button>
-
         <div layout="column" layout-align="center" class="height-40 wz-select-input">
             <select flex class="kuiSelect wz-border-none cursor-pointer" ng-model="dctrl.typeFilter" ng-change="dctrl.onlyParents(dctrl.typeFilter)"
                 aria-label="Filter by type" ng-init="'All decoders'">
@@ -34,13 +31,14 @@
         <md-card flex class="wz-md-card _md flex md-margin-h">
             <md-card-content>
                 <wz-table implicit-filter="dctrl.appliedFilters" flex path="'/decoders'" keys="['name',{value:'details.program_name',size:2,nosortable:true},{value:'details.order',size:2,nosortable:true},'file']"
-                    allow-click="true" row-sizes="[15,13,11]" />
+                    allow-click="true" row-sizes="[15,13,11]">
+                </wz-table>
+                <div layout="row" class="wz-margin-top-10 md-padding-h">
+                    <span flex></span>
+                    <a class="small" id="btnDownload" ng-click="dctrl.downloadCsv()">Formatted <i aria-hidden="true"
+                            class="fa fa-download"></i></a>
+                </div>
             </md-card-content>
         </md-card>
-    </div>
-
-    <div layout="row" class="wz-margin-top-10 md-padding-h">
-        <span flex></span>
-        <a class="small" id="btnDownload" ng-click="dctrl.downloadCsv()">Formatted <i aria-hidden="true" class="fa fa-download"></i></a>
     </div>
 </div>

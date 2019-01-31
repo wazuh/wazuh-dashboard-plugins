@@ -1,4 +1,4 @@
-<div flex="auto" layout="column" ng-controller="managementConfigurationController" ng-if="mctrl.tab === 'configuration'" class="wz-content no-border"
+<div flex="auto" layout="column" ng-controller="managementConfigurationController" ng-if="mctrl.tab === 'configuration'" class=""
 ng-init="switchConfigurationTab('welcome', false)">
 
     <!-- Navigation section -->

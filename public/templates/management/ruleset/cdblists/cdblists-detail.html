@@ -1,13 +1,12 @@
-<div ng-if="!loading && viewingDetail" layout="column" class="wz-content">
+<div ng-if="!loading && viewingDetail" layout="column" class="">
     <!-- Back button and title -->
     <div layout="row" layout-align="start center">
         <!-- Back button -->
-        <md-button class="md-icon-button wz-circle-back-button" style="margin: 5px 15px!important;" aria-label="Back to CDB Lists list"
+        <md-button class="md-icon-button" style="margin: 5px!important;" aria-label="Back to CDB Lists list"
             tooltip="Back" tooltip-placement="bottom" ng-click="closeDetailView(true)"><i class="fa fa-fw fa-arrow-left"
                 aria-hidden="true"></i></md-button>
         <!-- List title -->
         <div>
-            <h5 class="titleSectionIdentifier">CDB List</h5>
             <!-- <h1 class="font-size-18">{{currentList.name}}</h1> -->
             <h1 class="font-size-18">{{currentList.name}}</h1>
         </div>

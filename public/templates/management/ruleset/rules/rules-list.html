@@ -46,12 +46,11 @@
                 <wz-table implicit-filter="appliedFilters" flex path="'/rules'" keys="['id',{value:'file',size:2},{value:'description',size:2},{value:'groups',nosortable:true,size:2},{value:'pci',nosortable:true,size:2},{value:'gdpr',nosortable:true},'level']"
                     allow-click="true" row-sizes="[15,13,11]">
                 </wz-table>
+                <div layout="row" class="wz-margin-top-10 md-padding-h">
+                    <span flex></span>
+                    <a class="small" id="btnDownload" ng-click="downloadCsv()">Formatted <i aria-hidden="true" class="fa fa-download"></i></a>
+                </div>
             </md-card-content>
         </md-card>
-    </div>
-
-    <div layout="row" class="wz-margin-top-10 md-padding-h">
-        <span flex></span>
-        <a class="small" id="btnDownload" ng-click="downloadCsv()">Formatted <i aria-hidden="true" class="fa fa-download"></i></a>
     </div>
 </div>

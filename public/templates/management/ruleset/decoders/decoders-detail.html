@@ -1,13 +1,12 @@
-<div ng-if="!loading && dctrl.viewingDetail" layout="column" class="wz-content">
+<div ng-if="!loading && dctrl.viewingDetail" layout="column" class="">
     <!-- Back button and title -->
     <div layout="row" layout-align="start center">
         <!-- Back button -->
-        <md-button class="md-icon-button wz-circle-back-button" style="margin: 5px 15px!important;" aria-label="Back to decoders list"
+        <md-button class="md-icon-button" style="margin: 5px!important;" aria-label="Back to decoders list"
             tooltip="Back" tooltip-placement="bottom" ng-click="dctrl.closeDetailView()"><i class="fa fa-fw fa-arrow-left"
                 aria-hidden="true"></i></md-button>
         <!-- Rule title -->
         <div>
-            <h5 class="titleSectionIdentifier">Decoder</h5>
             <h1 class="font-size-18">{{dctrl.currentDecoder.name}}</h1>
         </div>
     </div>

@@ -11,7 +11,7 @@
 
     <!-- Ruleset navigation bar -->
     <md-nav-bar
-        class="wz-nav-bar nav-bar-white-bg no-border"
+        class="wz-nav-bar nav-bar-white-bg "
         md-selected-nav-item="configurationSubTab"
         nav-bar-aria-label="Ruleset navigation links">
         <md-nav-item class="wz-nav-item" md-nav-click="switchConfigurationSubTab('rules')" name="rules">Rules</md-nav-item>

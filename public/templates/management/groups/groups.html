@@ -1,6 +1,6 @@
 <div flex layout="column" class="mozilla-table-size-85" ng-class="{'cursor-wait': multipleSelectorLoading}"
     ng-controller="groupsPreviewController" ng-if="mctrl.tab == 'groups'">
-    <md-content flex layout="column" class="wz-content overflow-hidden" ng-init="lookingGroup=false">
+    <md-content flex layout="column" class=" overflow-hidden" ng-init="lookingGroup=false">
 
         <!-- Loading ring -->
         <div class='uil-ring-css' ng-show="load">
@@ -31,7 +31,7 @@
             <!-- MD5 Sums and Details cards -->
             <div layout="row" class="md-padding-h" ng-if="lookingGroup">
                 <!-- Group MD5 sums section -->
-                <md-card flex class="no-margin-left no-margin-right wz-margin-top-0 wz-md-card">
+                <md-card flex class="no-margin-left no-margin-right wz-margin-top-8 wz-md-card">
                     <md-card-content>
                         <span class="wz-headline-title font-size-18"><i class="fa fa-fw fa-object-group" aria-hidden="true"></i> {{currentGroup.name}}</span>
                         <md-divider class="wz-margin-top-10"></md-divider>
