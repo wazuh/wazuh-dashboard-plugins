@@ -39,22 +39,31 @@ export class ManagementController {
     });
     this.$scope.$on('setCurrentRule', (ev, params) => {
       this.currentRule = (params || {}).currentRule || false;
+      $location.search('currentRule', true);
+      appState.setNavigation({ status: true });
     });
     this.$scope.$on('removeCurrentRule', () => {
       this.currentRule = false;
+      $location.search('currentRule', null);
     });
     this.$scope.$on('setCurrentDecoder', (ev, params) => {
       this.currentDecoder = (params || {}).currentDecoder || false;
+      $location.search('currentDecoder', true);
+      appState.setNavigation({ status: true });
     });
     this.$scope.$on('removeCurrentDecoder', () => {
       this.currentDecoder = false;
+      $location.search('currentDecoder', null);
     });
     this.$scope.$on('setCurrentList', (ev, params) => {
       this.currentList = (params || {}).currentList || false;
+      $location.search('currentList', true);
+      appState.setNavigation({ status: true });
       if (!this.$scope.$$phase) this.$scope.$digest();
     });
     this.$scope.$on('removeCurrentList', () => {
       this.currentList = false;
+      $location.search('currentList', null);
     });
     this.$scope.$on('setCurrentConfiguration', (ev, params) => {
       this.currentConfiguration = (params || {}).currentConfiguration || false;
