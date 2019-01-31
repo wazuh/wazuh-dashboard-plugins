@@ -52,7 +52,7 @@ export class WazuhApiElasticCtrl {
         }
       }
 
-      return (result);
+      return result;
     } catch (error) {
       log('GET /elastic/apis', error.message || error);
       return ErrorResponse(error.message || error, 2001, 500, reply);
@@ -69,7 +69,7 @@ export class WazuhApiElasticCtrl {
     try {
       const data = await this.wzWrapper.deleteWazuhAPIEntriesWithRequest(req);
 
-      return (data);
+      return data;
     } catch (error) {
       log('DELETE /elastic/apis/{id}', error.message || error);
       return ErrorResponse(error.message || error, 2002, 500, reply);
@@ -154,7 +154,7 @@ export class WazuhApiElasticCtrl {
         settings
       );
 
-      return ({ statusCode: 200, message: 'ok', response });
+      return { statusCode: 200, message: 'ok', response };
     } catch (error) {
       log('PUT /elastic/api', error.message || error);
       return ErrorResponse(
@@ -178,7 +178,7 @@ export class WazuhApiElasticCtrl {
         doc: { cluster_info: req.payload.cluster_info }
       });
 
-      return ({ statusCode: 200, message: 'ok' });
+      return { statusCode: 200, message: 'ok' };
     } catch (error) {
       log('PUT /elastic/api-hostname/{id}', error.message || error);
       return ErrorResponse(
@@ -216,7 +216,7 @@ export class WazuhApiElasticCtrl {
         doc: settings
       });
 
-      return ({ statusCode: 200, message: 'ok' });
+      return { statusCode: 200, message: 'ok' };
     } catch (error) {
       log('PUT /elastic/api-settings', error.message || error);
       return ErrorResponse(

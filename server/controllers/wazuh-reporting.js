@@ -1617,7 +1617,7 @@ export class WazuhReportingCtrl {
         );
         pdfDoc.end();
       }
-      return ({ error: 0, data: null });
+      return { error: 0, data: null };
     } catch (error) {
       // Delete generated file if an error occurred
       if (
@@ -1659,7 +1659,7 @@ export class WazuhReportingCtrl {
         list.push(file);
       });
       TimSort.sort(list, sortFunction);
-      return ({ list: list });
+      return { list: list };
     } catch (error) {
       return ErrorResponse(error.message || error, 5031, 500, reply);
     }
@@ -1694,7 +1694,7 @@ export class WazuhReportingCtrl {
       fs.unlinkSync(
         path.join(__dirname, REPORTING_PATH + '/' + req.params.name)
       );
-      return ({ error: 0 });
+      return { error: 0 };
     } catch (error) {
       return ErrorResponse(error.message || error, 5032, 500, reply);
     }
