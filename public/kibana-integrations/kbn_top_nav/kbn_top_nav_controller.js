@@ -1,8 +1,9 @@
-import { capitalize, isArray, isFunction } from 'lodash';
+import { capitalize, isArray, isFunction, get } from 'lodash';
 
 import chrome from 'ui/chrome';
 import filterTemplate from 'ui/chrome/config/filter.html';
 import intervalTemplate from 'ui/chrome/config/interval.html';
+import { i18n } from '@kbn/i18n';
 
 export function KbnTopNavControllerProvider($compile) {
   return class KbnTopNavController {
@@ -16,7 +17,7 @@ export function KbnTopNavControllerProvider($compile) {
       this.currentKey = null;
       this.templates = {
         interval: intervalTemplate,
-        filter: filterTemplate
+        filter: filterTemplate,
       };
       this.locals = new Map();
 
@@ -30,10 +31,9 @@ export function KbnTopNavControllerProvider($compile) {
     addItems(rawOpts) {
       if (!isArray(rawOpts)) rawOpts = [rawOpts];
 
-      rawOpts.forEach(rawOpt => {
+      rawOpts.forEach((rawOpt) => {
         const opt = this._applyOptDefault(rawOpt);
-        if (!opt.key)
-          throw new TypeError('KbnTopNav: menu items must have a key');
+        if (!opt.key) throw new TypeError('KbnTopNav: menu items must have a key');
         this.opts.push(opt);
         if (!opt.hideButton()) this.menuItems.push(opt);
         if (opt.template) this.templates[opt.key] = opt.template;
@@ -44,7 +44,7 @@ export function KbnTopNavControllerProvider($compile) {
     }
 
     // change the current key and rerender
-    setCurrent = key => {
+    setCurrent = (key) => {
       if (key && !this.templates.hasOwnProperty(key)) {
         throw new TypeError(`KbnTopNav: unknown template key "${key}"`);
       }
@@ -54,52 +54,37 @@ export function KbnTopNavControllerProvider($compile) {
     };
 
     // little usability helpers
-    getCurrent = () => {
-      return this.currentKey;
-    };
-    isCurrent = key => {
-      return this.getCurrent() === key;
-    };
-    open = key => {
-      this.setCurrent(key);
-    };
-    close = key => {
-      (!key || this.isCurrent(key)) && this.setCurrent(null);
-    };
-    toggle = key => {
-      this.setCurrent(this.isCurrent(key) ? null : key);
-    };
-    click = key => {
-      this.handleClick(this.getItem(key));
-    };
-    getItem = key => {
-      return this.menuItems.find(i => i.key === key);
-    };
-    handleClick = menuItem => {
+    getCurrent = () => { return this.currentKey; };
+    isCurrent = (key) => { return this.getCurrent() === key; };
+    open = (key) => { this.setCurrent(key); };
+    close = (key) => { (!key || this.isCurrent(key)) && this.setCurrent(null); };
+    toggle = (key) => { this.setCurrent(this.isCurrent(key) ? null : key); };
+    click = (key) => { this.handleClick(this.getItem(key)); };
+    getItem = (key) => { return this.menuItems.find(i => i.key === key); };
+    handleClick = (menuItem, event) => {
       if (menuItem.disableButton()) {
         return false;
       }
-      menuItem.run(menuItem, this);
+      // event will be undefined when method is called from click
+      menuItem.run(menuItem, this, get(event, 'target'));
     };
     // apply the defaults to individual options
     _applyOptDefault(opt = {}) {
+      const optLabel = opt.label ? opt.label : capitalize(opt.key);
       const defaultedOpt = {
-        label: capitalize(opt.key),
+        label: optLabel,
         hasFunction: !!opt.run,
-        description: opt.run ? opt.key : `Toggle ${opt.key} view`,
-        run: item => this.toggle(item.key),
+        description: opt.run ? optLabel : i18n.translate('common.ui.topNav.toggleViewAriaLabel', {
+          defaultMessage: 'Toggle {optLabel} view',
+          values: { optLabel }
+        }),
+        run: (item) => this.toggle(item.key),
         ...opt
       };
 
-      defaultedOpt.hideButton = isFunction(opt.hideButton)
-        ? opt.hideButton
-        : () => !!opt.hideButton;
-      defaultedOpt.disableButton = isFunction(opt.disableButton)
-        ? opt.disableButton
-        : () => !!opt.disableButton;
-      defaultedOpt.tooltip = isFunction(opt.tooltip)
-        ? opt.tooltip
-        : () => opt.tooltip;
+      defaultedOpt.hideButton = isFunction(opt.hideButton) ? opt.hideButton : () => !!opt.hideButton;
+      defaultedOpt.disableButton = isFunction(opt.disableButton) ? opt.disableButton : () => !!opt.disableButton;
+      defaultedOpt.tooltip = isFunction(opt.tooltip) ? opt.tooltip : () => opt.tooltip;
 
       return defaultedOpt;
     }
@@ -138,10 +123,7 @@ export function KbnTopNavControllerProvider($compile) {
       if (this.locals.has(currentKey)) {
         Object.assign($childScope, this.locals.get(currentKey));
       }
-      const $el = $element
-        .find('#template_wrapper')
-        .html(templateToRender)
-        .contents();
+      const $el = $element.find('#template_wrapper').html(templateToRender).contents();
       $compile($el)($childScope);
 
       this.rendered = { $childScope, $el, key: currentKey };

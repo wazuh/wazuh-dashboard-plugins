@@ -90,7 +90,7 @@ export class EmbeddedVisualizeHandler {
     private readonly element: HTMLElement,
     savedObject: VisSavedObject,
     params: EmbeddedVisualizeHandlerParams
-  ) {
+  ) {  
     const { searchSource, vis } = savedObject;
 
     const {
