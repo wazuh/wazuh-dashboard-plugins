@@ -160,7 +160,7 @@ export class Monitoring {
         payload,
         options
       );
-      
+
       await this.saveStatus(api.clusterName);
 
       return;
@@ -215,10 +215,13 @@ export class Monitoring {
         await this.checkStatus(api, response.body.data.totalItems);
       } else if ((response || {}).error) {
         const msg = ((response || {}).body || {}).message || false;
-        const extraLog =  msg || 'Wazuh API credentials not found or are not correct. Open the app in your browser and configure it to start monitoring agents.';
- 
+        const extraLog =
+          msg ||
+          'Wazuh API credentials not found or are not correct. Open the app in your browser and configure it to start monitoring agents.';
+
         !this.quiet && log('[monitoring][checkAndSaveStatus]', extraLog);
-        !this.quiet && this.server.log([blueWazuh, 'monitoring', 'error'], extraLog);
+        !this.quiet &&
+          this.server.log([blueWazuh, 'monitoring', 'error'], extraLog);
       }
       return;
     } catch (error) {

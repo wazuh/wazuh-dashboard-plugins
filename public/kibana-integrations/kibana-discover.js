@@ -143,7 +143,9 @@ function discoverController(
     location: 'Discover'
   });
   const getUnhashableStates = Private(getUnhashableStatesProvider);
-  const shareContextMenuExtensions = Private(ShareContextMenuExtensionsRegistryProvider);
+  const shareContextMenuExtensions = Private(
+    ShareContextMenuExtensionsRegistryProvider
+  );
   const inspectorAdapters = {
     requests: new RequestAdapter()
   };
@@ -269,19 +271,27 @@ function discoverController(
   const pageTitleSuffix =
     savedSearch.id && savedSearch.title ? `: ${savedSearch.title}` : '';
   docTitle.change(`Discover${pageTitleSuffix}`);
-  const discoverBreadcrumbsTitle = i18n('kbn.discover.discoverBreadcrumbTitle', {
-    defaultMessage: 'Discover',
-  });
+  const discoverBreadcrumbsTitle = i18n(
+    'kbn.discover.discoverBreadcrumbTitle',
+    {
+      defaultMessage: 'Discover'
+    }
+  );
 
   if (savedSearch.id && savedSearch.title) {
-    chrome.breadcrumbs.set([{
-      text: discoverBreadcrumbsTitle,
-      href: '#/discover'
-    }, { text: savedSearch.title }]);
+    chrome.breadcrumbs.set([
+      {
+        text: discoverBreadcrumbsTitle,
+        href: '#/discover'
+      },
+      { text: savedSearch.title }
+    ]);
   } else {
-    chrome.breadcrumbs.set([{
-      text: discoverBreadcrumbsTitle,
-    }]);
+    chrome.breadcrumbs.set([
+      {
+        text: discoverBreadcrumbsTitle
+      }
+    ]);
   }
 
   let stateMonitor;
@@ -389,22 +399,22 @@ function discoverController(
   $state.sort = getSort.array($state.sort, $scope.indexPattern);
 
   $scope.getBucketIntervalToolTipText = () => {
-    return (
-      i18n('kbn.discover.bucketIntervalTooltip', {
-        // eslint-disable-next-line max-len
-        defaultMessage: 'This interval creates {bucketsDescription} to show in the selected time range, so it has been scaled to {bucketIntervalDescription}',
-        values: {
-          bucketsDescription: $scope.bucketInterval.scale > 1
+    return i18n('kbn.discover.bucketIntervalTooltip', {
+      // eslint-disable-next-line max-len
+      defaultMessage:
+        'This interval creates {bucketsDescription} to show in the selected time range, so it has been scaled to {bucketIntervalDescription}',
+      values: {
+        bucketsDescription:
+          $scope.bucketInterval.scale > 1
             ? i18n('kbn.discover.bucketIntervalTooltip.tooLargeBucketsText', {
-              defaultMessage: 'buckets that are too large',
-            })
+                defaultMessage: 'buckets that are too large'
+              })
             : i18n('kbn.discover.bucketIntervalTooltip.tooManyBucketsText', {
-              defaultMessage: 'too many buckets',
-            }),
-          bucketIntervalDescription: $scope.bucketInterval.description,
-        },
-      })
-    );
+                defaultMessage: 'too many buckets'
+              }),
+        bucketIntervalDescription: $scope.bucketInterval.description
+      }
+    });
   };
 
   $scope.$watchCollection('state.columns', function() {
@@ -565,7 +575,8 @@ function discoverController(
 
             prev = current;
           };
-        }()));
+        })()
+      );
 
       if ($scope.opts.timefield) {
         setupVisualization();
@@ -662,12 +673,12 @@ function discoverController(
      *
      * @type {String}
      */
-    const sortBy = (function () {
+    const sortBy = (function() {
       if (!Array.isArray(sort)) return 'implicit';
       else if (sort[0] === '_score') return 'implicit';
       else if (sort[0] === timeField) return 'time';
       else return 'non-time';
-    }());
+    })();
 
     let sortFn = null;
     if (sortBy !== 'implicit') {
@@ -680,7 +691,7 @@ function discoverController(
       segmented.setMaxSegments(1);
     }
 
-    segmented.setDirection(sortBy === 'time' ? (sort[1] || 'desc') : 'desc');
+    segmented.setDirection(sortBy === 'time' ? sort[1] || 'desc' : 'desc');
     segmented.setSortFn(sortFn);
     segmented.setSize($scope.opts.sampleSize);
 
@@ -705,17 +716,25 @@ function discoverController(
 
       if (status.remaining > 0) {
         const inspectorRequest = inspectorAdapters.requests.start(
-          i18n('kbn.discover.inspectorRequest.segmentFetchCompleteStatusTitle', {
-            defaultMessage: 'Segment {fetchCompleteStatus}',
-            values: {
-              fetchCompleteStatus: $scope.fetchStatus.complete,
+          i18n(
+            'kbn.discover.inspectorRequest.segmentFetchCompleteStatusTitle',
+            {
+              defaultMessage: 'Segment {fetchCompleteStatus}',
+              values: {
+                fetchCompleteStatus: $scope.fetchStatus.complete
+              }
             }
-          }),
+          ),
           {
-            description: i18n('kbn.discover.inspectorRequest.segmentFetchCompleteStatusDescription', {
-              defaultMessage: 'This request queries Elasticsearch to fetch the data for the search.',
-            }),
-          });
+            description: i18n(
+              'kbn.discover.inspectorRequest.segmentFetchCompleteStatusDescription',
+              {
+                defaultMessage:
+                  'This request queries Elasticsearch to fetch the data for the search.'
+              }
+            )
+          }
+        );
         inspectorRequest.stats(getRequestInspectorStats($scope.searchSource));
         $scope.searchSource.getSearchRequestBody().then(body => {
           inspectorRequest.json(body);
@@ -748,13 +767,11 @@ function discoverController(
       if ($scope.opts.timefield) {
         const tabifiedData = tabifyAggResponse($scope.vis.aggs, merged);
         $scope.searchSource.rawResponse = merged;
-        Promise
-          .resolve(responseHandler(tabifiedData))
-          .then(resp => {
-            if(visualizeHandler) {
-              visualizeHandler.render(resp);
-            }
-          });
+        Promise.resolve(responseHandler(tabifiedData)).then(resp => {
+          if (visualizeHandler) {
+            visualizeHandler.render(resp);
+          }
+        });
       }
 
       $scope.hits = merged.hits.total;
@@ -780,7 +797,7 @@ function discoverController(
         const fields = _.keys(indexPattern.flattenHit(hit));
         let n = fields.length;
         let field;
-        while (field = fields[--n]) {
+        while ((field = fields[--n])) {
           // eslint-disable-line
           if (counts[field]) counts[field] += 1;
           else counts[field] = 1;
@@ -918,14 +935,14 @@ function discoverController(
         }
       }
     ];
-    
+
     // we have a vis, just modify the aggs
     if ($scope.vis) {
       const visState = $scope.vis.getEnabledState();
       visState.aggs = visStateAggs;
       $scope.vis.setState(visState);
       return;
-    } 
+    }
 
     const visSavedObject = {
       indexPattern: $scope.indexPattern.id,
@@ -958,18 +975,22 @@ function discoverController(
       // return $scope.vis.getAggConfig().toDsl();             //
       ///////////////////////////////////////////////////////////
       const result = $scope.vis.getAggConfig().toDsl();
-      if (((result[2] || {}).date_histogram || {}).interval  === '0ms') {
+      if (((result[2] || {}).date_histogram || {}).interval === '0ms') {
         result[2].date_histogram.interval = '1d';
       }
       return result;
       ///////////////////////////////////////////////////////////
     });
-    
+
     $timeout(async () => {
       const visEl = $element.find('#discoverHistogram')[0];
-      visualizeHandler = await visualizeLoader.embedVisualizationWithSavedObject(visEl, visSavedObject, {
-        autoFetch: false,
-      });
+      visualizeHandler = await visualizeLoader.embedVisualizationWithSavedObject(
+        visEl,
+        visSavedObject,
+        {
+          autoFetch: false
+        }
+      );
     });
   }
 
@@ -987,36 +1008,47 @@ function discoverController(
     }
 
     if (stateVal && !stateValFound) {
-      const warningTitle = i18n('kbn.discover.valueIsNotConfiguredIndexPatternIDWarningTitle', {
-        defaultMessage: '{stateVal} is not a configured index pattern ID',
-        values: {
-          stateVal: `"${stateVal}"`,
-        },
-      });
+      const warningTitle = i18n(
+        'kbn.discover.valueIsNotConfiguredIndexPatternIDWarningTitle',
+        {
+          defaultMessage: '{stateVal} is not a configured index pattern ID',
+          values: {
+            stateVal: `"${stateVal}"`
+          }
+        }
+      );
 
       if (ownIndexPattern) {
         toastNotifications.addWarning({
           title: warningTitle,
-          text: i18n('kbn.discover.showingSavedIndexPatternWarningDescription', {
-            defaultMessage: 'Showing the saved index pattern: "{ownIndexPatternTitle}" ({ownIndexPatternId})',
-            values: {
-              ownIndexPatternTitle: ownIndexPattern.title,
-              ownIndexPatternId: ownIndexPattern.id,
-            },
-          }),
+          text: i18n(
+            'kbn.discover.showingSavedIndexPatternWarningDescription',
+            {
+              defaultMessage:
+                'Showing the saved index pattern: "{ownIndexPatternTitle}" ({ownIndexPatternId})',
+              values: {
+                ownIndexPatternTitle: ownIndexPattern.title,
+                ownIndexPatternId: ownIndexPattern.id
+              }
+            }
+          )
         });
         return ownIndexPattern;
       }
 
       toastNotifications.addWarning({
         title: warningTitle,
-        text: i18n('kbn.discover.showingDefaultIndexPatternWarningDescription', {
-          defaultMessage: 'Showing the default index pattern: "{loadedIndexPatternTitle}" ({loadedIndexPatternId})',
-          values: {
-            loadedIndexPatternTitle: loadedIndexPattern.title,
-            loadedIndexPatternId: loadedIndexPattern.id,
-          },
-        }),
+        text: i18n(
+          'kbn.discover.showingDefaultIndexPatternWarningDescription',
+          {
+            defaultMessage:
+              'Showing the default index pattern: "{loadedIndexPatternTitle}" ({loadedIndexPatternId})',
+            values: {
+              loadedIndexPatternTitle: loadedIndexPattern.title,
+              loadedIndexPatternId: loadedIndexPattern.id
+            }
+          }
+        )
       });
     }
 
@@ -1025,10 +1057,9 @@ function discoverController(
 
   // Block the UI from loading if the user has loaded a rollup index pattern but it isn't
   // supported.
-  $scope.isUnsupportedIndexPattern = (
-    !isDefaultTypeIndexPattern($route.current.locals.ip.loaded)
-    && !hasSearchStategyForIndexPattern($route.current.locals.ip.loaded)
-  );
+  $scope.isUnsupportedIndexPattern =
+    !isDefaultTypeIndexPattern($route.current.locals.ip.loaded) &&
+    !hasSearchStategyForIndexPattern($route.current.locals.ip.loaded);
 
   if ($scope.isUnsupportedIndexPattern) {
     $scope.unsupportedIndexPatternType = $route.current.locals.ip.loaded.type;

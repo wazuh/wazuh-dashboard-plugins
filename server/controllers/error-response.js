@@ -66,13 +66,15 @@ export function ErrorResponse(
     }
   }
 
-  return h.response({
-    message: filteredMessage
-      ? `${code || 1000} - ${filteredMessage}`
-      : typeof message === 'string'
-      ? `${code || 1000} - ${message}`
-      : `${code || 1000} - Unexpected error`,
-    code: code || 1000,
-    statusCode: statusCode || 500
-  }).code(statusCode || 500);
+  return h
+    .response({
+      message: filteredMessage
+        ? `${code || 1000} - ${filteredMessage}`
+        : typeof message === 'string'
+        ? `${code || 1000} - ${message}`
+        : `${code || 1000} - Unexpected error`,
+      code: code || 1000,
+      statusCode: statusCode || 500
+    })
+    .code(statusCode || 500);
 }
