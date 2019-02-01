@@ -2,6 +2,25 @@
 
 All notable changes to the Wazuh app project will be documented in this file.
 
+## Wazuh v3.9.0 - Kibana v6.6.0 - Revision 420
+
+### Added 
+
+- Added hotkey `[shift] + [enter]` for sending query ([#1170](https://github.com/wazuh/wazuh-kibana-app/pull/1170)).
+- Added `Export JSON` button for the Dev Tools ([#1170](https://github.com/wazuh/wazuh-kibana-app/pull/1170)).
+- Added refresh button for agents preview table ([#1169](https://github.com/wazuh/wazuh-kibana-app/pull/1169))
+
+### Changed
+
+- Escape XML special characters ([#1159](https://github.com/wazuh/wazuh-kibana-app/pull/1159)).
+- Changed empty results message for Wazuh tables ([#1165](https://github.com/wazuh/wazuh-kibana-app/pull/1165)).
+- Allowing the same query multiple times on the Dev Tools ([#1174](https://github.com/wazuh/wazuh-kibana-app/pull/1174))
+- Refactor JSON/XML viewer for configuration tab ([#1173](https://github.com/wazuh/wazuh-kibana-app/pull/1173), [#1148](https://github.com/wazuh/wazuh-kibana-app/pull/1148)).
+
+### Fixed
+
+- Properly handling long messages on notifier service, until now, they were using out of the card space, also we replaced some API messages with more meaningful messages ([#1168](https://github.com/wazuh/wazuh-kibana-app/pull/1168))
+
 ## Wazuh v3.8.2 - Kibana v6.6.0 - Revision 419
 
 ### Added

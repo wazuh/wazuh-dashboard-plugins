@@ -23,13 +23,15 @@ export class DecodersController {
    * @param {*} csvReq
    * @param {*} wzTableFilter
    */
-  constructor($scope, $sce, errorHandler, appState, csvReq, wzTableFilter) {
+  constructor($scope, $sce, errorHandler, appState, csvReq, wzTableFilter, wazuhConfig, rulesetHandler) {
     this.$scope = $scope;
     this.$sce = $sce;
     this.errorHandler = errorHandler;
     this.appState = appState;
     this.csvReq = csvReq;
     this.wzTableFilter = wzTableFilter;
+    this.wazuhConfig = wazuhConfig;
+    this.rulesetHandler = rulesetHandler;
   }
 
   /**
@@ -44,14 +46,22 @@ export class DecodersController {
     this.typeFilter = 'all';
     this.isArray = Array.isArray;
 
+    const configuration = this.wazuhConfig.getConfig();
+    this.$scope.adminMode = !!(configuration || {}).admin;
+
     // Reloading event listener
     this.$scope.$on('rulesetIsReloaded', () => {
       this.viewingDetail = false;
       if (!this.$scope.$$phase) this.$scope.$digest();
     });
 
+    this.$scope.$on('closeDecoderView', () => {
+      this.closeDetailView();
+    });
+
     this.$scope.$on('wazuhShowDecoder', (event, parameters) => {
       this.currentDecoder = parameters.decoder;
+      this.$scope.$emit('setCurrentDecoder', { currentDecoder: this.currentDecoder });
       this.viewingDetail = true;
       if (!this.$scope.$$phase) this.$scope.$digest();
     });
@@ -189,6 +199,30 @@ export class DecodersController {
     return;
   }
 
+  editDecodersConfig = async () => {
+    this.$scope.editingFile = true;
+    try {
+      this.$scope.fetchedXML = await this.rulesetHandler.getDecoderConfiguration(this.currentDecoder.file);
+      if (!this.$scope.$$phase) this.$scope.$digest();
+      this.$scope.$broadcast('fetchedFile', { data: this.$scope.fetchedXML });
+    } catch (error) {
+      this.$scope.fetchedXML = null;
+      this.errorHandler.handle(error, 'Fetch file error');
+    }
+  }
+  closeEditingFile = () => {
+    this.$scope.editingFile = false;
+    this.$scope.$broadcast('closeEditXmlFile', {});
+  };
+  xmlIsValid = valid => {
+    this.$scope.xmlHasErrors = valid;
+    if (!this.$scope.$$phase) this.$scope.$digest();
+  };
+  doSaveDecoderConfig = () => {
+    this.$scope.editingFile = false;
+    this.$scope.$broadcast('saveXmlFile', { decoder: this.currentDecoder });
+  };
+
   /**
    * This function takes back to the list but adding a filter from the detail view
    */
@@ -211,6 +245,8 @@ export class DecodersController {
       );
     this.viewingDetail = false;
     this.currentDecoder = false;
+    this.closeEditingFile();
+    this.$scope.$emit('removeCurrentDecoder');
     if (!this.$scope.$$phase) this.$scope.$digest();
   }
 }

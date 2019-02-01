@@ -22,6 +22,7 @@ import { Parser } from 'json2csv';
 import { getConfiguration } from '../lib/get-configuration';
 import { log } from '../logger';
 import { KeyEquivalenece } from '../../util/csv-key-equivalence';
+import { ApiErrorEquivalence } from '../../util/api-errors-equivalence';
 import { cleanKeys } from '../../util/remove-key';
 import { apiRequestList } from '../../util/api-request-list';
 import * as ApiHelper from '../lib/api-helper';
@@ -191,7 +192,7 @@ export class WazuhApiCtrl {
                   req.idChanged = api._id;
                   return this.checkStoredAPI(req, reply);
                 }
-              } catch (error) {} // eslint-disable-line
+              } catch (error) { } // eslint-disable-line
             }
           } catch (error) {
             log('POST /api/check-stored-api', error.message || error);
@@ -556,6 +557,22 @@ export class WazuhApiCtrl {
         data = data.content.replace(new RegExp('\\n', 'g'), '');
       }
 
+      if (
+        typeof (data || {}).content === 'string' &&
+        (data || {}).origin === 'json'
+      ) {
+        options.content_type = 'application/json';
+        data = data.content.replace(new RegExp('\\n', 'g'), '');
+      }
+
+      if (
+        typeof (data || {}).content === 'string' &&
+        (data || {}).origin === 'raw'
+      ) {
+        options.content_type = 'application/octet-stream';
+        data = data.content;
+      }
+
       const fullUrl = getPath(api) + path;
       const response = await needle(method, fullUrl, data, options);
 
@@ -572,13 +589,16 @@ export class WazuhApiCtrl {
       }
 
       throw ((response || {}).body || {}).error &&
-      ((response || {}).body || {}).message
+        ((response || {}).body || {}).message
         ? { message: response.body.message, code: response.body.error }
         : new Error('Unexpected error fetching data from the Wazuh API');
     } catch (error) {
       if (devTools) {
         return { error: '3013', message: error.message || error };
       } else {
+        if ((error || {}).code && ApiErrorEquivalence[error.code]) {
+          error.message = ApiErrorEquivalence[error.code];
+        }
         return ErrorResponse(
           error.message || error,
           `Wazuh API error: ${error.code}` || 3013,
@@ -628,7 +648,7 @@ export class WazuhApiCtrl {
       }
 
       throw ((response || {}).body || {}).error &&
-      ((response || {}).body || {}).message
+        ((response || {}).body || {}).message
         ? { message: response.body.message, code: response.body.error }
         : new Error('Unexpected error fetching data from the Wazuh API');
     } catch (error) {
@@ -777,18 +797,18 @@ export class WazuhApiCtrl {
       if ((((output || {}).body || {}).data || {}).totalItems) {
         const fields = req.payload.path.includes('/agents')
           ? [
-              'id',
-              'status',
-              'name',
-              'ip',
-              'group',
-              'manager',
-              'node_name',
-              'dateAdd',
-              'version',
-              'lastKeepAlive',
-              'os'
-            ]
+            'id',
+            'status',
+            'name',
+            'ip',
+            'group',
+            'manager',
+            'node_name',
+            'dateAdd',
+            'version',
+            'lastKeepAlive',
+            'os'
+          ]
           : Object.keys(output.body.data.items[0]);
 
         const json2csvParser = new Parser({ fields });

@@ -210,11 +210,21 @@ export class ConfigurationHandler {
         $scope.XMLContent = XMLBeautifier(
           js2xmlparser.parse('configuration', cleaned)
         );
+        $scope.$broadcast('XMLContentReady', { data: $scope.XMLContent });
       } catch (error) {
         $scope.XMLContent = false;
       }
     }
     if (!$scope.$$phase) $scope.$digest();
+  }
+
+  json2xml(data,$scope) {
+    if(data){
+      const result = XMLBeautifier(
+        js2xmlparser.parse('configuration', data)
+      );
+      return result;
+    }
   }
 
   /**
@@ -230,7 +240,8 @@ export class ConfigurationHandler {
     } else {
       try {
         const cleaned = objectWithoutProperties(config);
-        $scope.JSONContent = beautifier.prettyPrint(cleaned);
+        $scope.JSONContent = JSON.stringify(cleaned, null, 2);
+        $scope.$broadcast('JSONContentReady', { data: $scope.JSONContent });
       } catch (error) {
         $scope.JSONContent = false;
       }

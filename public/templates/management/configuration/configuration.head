@@ -1,25 +1,8 @@
-<div flex="auto" layout="column" ng-controller="managementConfigurationController" ng-if="mctrl.tab === 'configuration'" ng-init="switchConfigurationTab('welcome', false)">
+<div flex="auto" layout="column" ng-controller="managementConfigurationController" ng-if="mctrl.tab === 'configuration'" class=""
+ng-init="switchConfigurationTab('welcome', false)">
 
     <!-- Navigation section -->
-    <div layout="row" layout-align="start center">
-        <!-- Breadcrumbs -->
-        <div layout="row" layout-padding>
-            <!-- Welcome section -->
-            <div ng-if="configurationTab === 'welcome'">
-                <span class="wz-text-link cursor-pointer" ng-click="mctrl.switchTab('welcome')">Management</span>
-                <span> / </span>
-                <span>{{ mctrl.tabNames[mctrl.tab] }}</span>
-            </div>
-            <!-- First-level section -->
-            <div ng-if="configurationTab !== 'welcome'">
-                <span class="wz-text-link cursor-pointer" ng-click="mctrl.switchTab('welcome')">Management</span>
-                <span> / </span>
-                <span class="wz-text-link cursor-pointer" ng-click="switchConfigurationTab('welcome', true)">{{ mctrl.tabNames[mctrl.tab] }}</span>
-                <span> / </span>
-                <span>{{ mctrl.tabNames[configurationTab] }}</span>
-            </div>
-        </div>
-        <!-- End breadcrumbs -->
+    <div layout="row" layout-align="start center" style="position: absolute;right: 0;width: 200px;top: 90px;z-index: 1;">
 
         <!-- Separator -->
         <span flex></span>
@@ -32,3 +15,9 @@
         <!-- End help button -->
     </div>
     <!-- End navigation section -->
+        <md-nav-bar class="wz-nav-bar nav-bar-white-bg" md-selected-nav-item="mctrl.globalConfigTab" ng-show="adminMode">
+        <md-nav-item class="wz-nav-item" md-nav-click="mctrl.switchTab('configuration', true)" name="overview">Overview</md-nav-item>
+        <md-nav-item class="wz-nav-item" md-nav-click="mctrl.setConfigTab('editconfiguration', true)" name="editconfiguration">Edit configuration</md-nav-item>
+        <md-nav-item class="wz-nav-item" md-nav-click="mctrl.setConfigTab('ruleset', true)" name="ruleset">Edit ruleset</md-nav-item>
+        <md-nav-item class="wz-nav-item" md-nav-click="mctrl.setConfigTab('groups', true)" name="groups">Edit groups</md-nav-item>
+    </md-nav-bar>
