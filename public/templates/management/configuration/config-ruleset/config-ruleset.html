@@ -1,0 +1,92 @@
+<div flex="auto" layout="column" ng-if="editionTab === 'ruleset'" ng-controller="configurationRulesetController">
+    <div layout="column" layout-padding>
+        <div layout="row">
+            <span class="font-size-18"><i class="fa fa-fw fa-file-text-o" aria-hidden="true"></i> Edit the ruleset
+            </span>
+            <span ng-if='adminMode && !editingFile && selectedRulesetTab === "rules"' class="font-size-18 wz-text-link"
+                ng-click="addNewFile('rules')" tooltip="Add new rules file" tooltip-placement="right">
+                <i class="fa fa-fw fa-plus-circle"></i></span>
+            <span ng-if='adminMode && !editingFile && selectedRulesetTab === "decoders"' class="font-size-18 wz-text-link"
+                ng-click="addNewFile('decoders')" tooltip="Add new decoders file" tooltip-placement="right">
+                <i class="fa fa-fw fa-plus-circle"></i></span>
+        </div>
+        <div layout="row">
+            <span class="md-subheader">Edit your current local rules, decoders and CDB lists</span>
+        </div>
+    </div>
+    <md-nav-bar class="wz-nav-bar" md-selected-nav-item="selectedRulesetTab">
+        <md-nav-item class="wz-nav-item" md-nav-click="switchRulesetTab('rules')" name="rules">Local rules</md-nav-item>
+        <md-nav-item class="wz-nav-item" md-nav-click="switchRulesetTab('decoders')" name="decoders">Local decoders</md-nav-item>
+        <md-nav-item class="wz-nav-item" md-nav-click="switchRulesetTab('cdblists')" name="cdblists">CDB Lists</md-nav-item>
+    </md-nav-bar>
+
+    <div class="md-padding" ng-show="!editingFile && !viewingDetail">
+        <!-- Search bar -->
+        <div layout="row" ng-if="!addingAgents && !file" class="wz-padding-bottom-14">
+            <input placeholder="{{searchPlaceholder}}" ng-model="custom_search" type="text" id="config-ruleset-input-search"
+                class="kuiLocalSearchInput ng-empty ng-pristine ng-scope ng-touched ng-valid" aria-invalid="false"
+                wz-enter="search(custom_search)">
+            <button type="submit" aria-label="Search" class="kuiLocalSearchButton height-40" ng-click="search(custom_search)">
+                <span class="fa fa-search" aria-hidden="true"></span>
+            </button>
+        </div>
+        <!-- End search bar -->
+        <div ng-if="selectedRulesetTab === 'rules'">
+            <md-card flex class="wz-md-card _md flex wz-no-margin">
+                <md-card-content>
+                    <wz-table flex path="'/rules'" keys="['id',{value:'file',size:2},{value:'description',size:2},{value:'groups',nosortable:true,size:2},{value:'pci',nosortable:true,size:2},{value:'gdpr',nosortable:true},'level']"
+                        implicit-filter="[{ name:'path',value: '/var/ossec/etc/rules'}]" allow-click="true" row-sizes="[17,15,13]"></wz-table>
+                </md-card-content>
+            </md-card>
+        </div>
+        <div ng-if="selectedRulesetTab === 'decoders'">
+            <md-card flex class="wz-md-card _md flex wz-no-margin">
+                <md-card-content>
+                    <wz-table flex path="'/decoders'" keys="['name',{value:'details.program_name',size:2,nosortable:true},{value:'details.order',size:2,nosortable:true},'file']"
+                        implicit-filter="[{ name:'path',value: '/var/ossec/etc/decoders'}]" allow-click="true"
+                        row-sizes="[17,15,13]"></wz-table>
+                </md-card-content>
+            </md-card>
+        </div>
+        <div ng-if="selectedRulesetTab === 'cdblists'">
+            <md-card flex class="wz-md-card _md flex wz-no-margin">
+                <md-card-content>
+                    <wz-table flex path="'/lists/files'" keys="['name']" allow-click="true" row-sizes="[17,15,13]"></wz-table>
+                </md-card-content>
+            </md-card>
+        </div>
+    </div>
+    <!-- XML editor for ruleset -->
+    <div class="md-padding" ng-show="editingFile">
+        <div flex layout="column">
+            <div layout="row" ng-if="!newFile" class="wz-padding-bottom-14">
+                <span ng-click='closeEditingFile()' class='btn btn-info'>Cancel</span>
+                <button ng-disabled='xmlHasErrors' ng-click='doSaveConfig(false)' class='btn btn-primary pull-right wz-margin-left-8'>
+                    <span ng-show='!xmlHasErrors'><i aria-hidden='true' class='fa fa-fw fa-save'></i>Save file</span>
+                    <span ng-show='xmlHasErrors' class='btn-danger'><i aria-hidden='true' class='fa fa-fw fa-exclamation-triangle'></i>
+                        XML format error</span>
+                </button>
+            </div>
+            <div layout="row" ng-if="newFile" class="wz-padding-bottom-14">
+                <span ng-click='closeEditingFile()' class='btn btn-info'>Cancel</span>
+                <button ng-disabled='xmlHasErrors' ng-click='doSaveConfig(true,newFileName)' class='btn btn-primary pull-right wz-margin-left-8'>
+                    <span ng-show='!xmlHasErrors'><i aria-hidden='true' class='fa fa-fw fa-save'></i>Save file</span>
+                    <span ng-show='xmlHasErrors' class='btn-danger'><i aria-hidden='true' class='fa fa-fw fa-exclamation-triangle'></i>
+                        XML format error</span>
+                </button>
+                <input placeholder="Enter file name" ng-model="newFileName" type="text" class="wz-margin-left-8 kuiLocalSearchInput ng-empty ng-pristine ng-scope ng-touched ng-valid"
+                    aria-invalid="false">
+            </div>
+            <div ng-if="fetchedXML" style="height: calc(100vh - 335px);" >
+                <wz-xml-file-editor file-name='{{selectedFileName}}' data="fetchedXML" target-name="selectedItem.file"
+                    valid-fn='xmlIsValid(valid)' >
+                </wz-xml-file-editor>
+            </div>
+        </div>
+    </div>
+    <div class="md-padding" ng-show="viewingDetail">
+        <div flex layout="column">
+            <wz-list-manage style="margin: -16px;" ng-if="currentList" list="currentList"></wz-list-manage>
+        </div>
+    </div>
+</div>

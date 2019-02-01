@@ -16,14 +16,15 @@ export function clickAction(
   instance,
   shareAgent,
   $location,
-  $scope
+  $scope,
+  appState
 ) {
+  appState.setNavigation({ status: true });
   if (
     instance.path === '/agents' ||
     new RegExp(/^\/agents\/groups\/[a-zA-Z0-9_\-.]*$/).test(instance.path)
   ) {
     shareAgent.setAgent(item);
-
     // Check location target and go to that path
     switch (openAction) {
       case 'configuration':
@@ -48,6 +49,8 @@ export function clickAction(
     $location.path('/agents');
   } else if (instance.path === '/agents/groups') {
     $scope.$emit('wazuhShowGroup', { group: item });
+  } else if (instance.path === '/cluster/nodes') {
+    $scope.$emit('wazuhShowNode', { node: item });
   } else if (
     new RegExp(/^\/agents\/groups\/[a-zA-Z0-9_\-.]*\/files$/).test(
       instance.path
@@ -61,6 +64,8 @@ export function clickAction(
     $scope.$emit('wazuhShowRule', { rule: item });
   } else if (instance.path.includes('/decoders')) {
     $scope.$emit('wazuhShowDecoder', { decoder: item });
+  } else if (instance.path.includes('/lists/files')) {
+    $scope.$emit('wazuhShowCdbList', { cdblist: item });
   } else if (instance.path === '/cluster/nodes') {
     $scope.$emit('wazuhShowClusterNode', { node: item });
   }

@@ -100,7 +100,7 @@ app.directive('wzTable', function () {
        * Common functions
        */
       $scope.clickAction = (item, openAction = false) =>
-        clickAction(item, openAction, instance, shareAgent, $location, $scope);
+        clickAction(item, openAction, instance, shareAgent, $location, $scope, appState);
 
       const fetch = async (options = {}) => {
         try {
@@ -359,6 +359,14 @@ app.directive('wzTable', function () {
         $scope.removingGroup = null;
         return init();
       };
+
+      $scope.editGroup = group => {
+        if ($location.search() && $location.search().tab && $location.search().tab === 'configuration') {
+          $scope.clickAction(group);
+        } else {
+          $scope.$emit('openGroupFromList', { group })
+        }
+      }
     },
     template
   };

@@ -1,0 +1,6 @@
+<div flex ng-if="!loading && mctrl.globalRuleSet == 'ruleset' && mctrl.globalRulesetTab == 'cdblists'" class="" ng-controller="cdbListsController" 
+layout="column" id="rulesContainer" layout-align="start space-around">
+
+    <div class='uil-ring-css' ng-show="loading">
+        <div></div>
+    </div>
