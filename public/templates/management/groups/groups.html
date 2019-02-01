@@ -64,7 +64,7 @@
 
             <!-- XML editor for group agents -->
             <div ng-show="editingFile">
-                <div layout="row" class="md-padding">
+                <div layout="row" class="md-padding-h wz-margin-top-10">
                     <span ng-click='closeEditingFile()' class='btn btn-info'>Cancel</span>
                     <button ng-disabled='xmlHasErrors' ng-click='doSaveGroupAgentConfig()' class='btn btn-primary pull-right wz-margin-left-8'>
                         <span ng-show='!xmlHasErrors'><i aria-hidden='true' class='fa fa-fw fa-save'></i>Save file</span>
@@ -72,7 +72,7 @@
                             XML format error</span>
                     </button>
                 </div>
-                <div class="md-padding md-padding-top-10" style="height: calc(100vh - 358px);" ng-if="fetchedXML">
+                <div class="md-padding md-padding-top-10" style="height: calc(100vh - 350px);" ng-if="fetchedXML">
                     <wz-xml-file-editor file-name='agent.conf' data="fetchedXML" target-name="currentGroup.name + ' group'"
                         valid-fn='xmlIsValid(valid)'>
                     </wz-xml-file-editor>
