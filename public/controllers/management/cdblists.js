@@ -188,7 +188,7 @@ export function CdbListsController(
   $scope.$on('wazuhShowCdbList', async (ev, parameters) => {
     $scope.currentList = parameters.cdblist;
     try {
-      const data = await rulesetHandler.getCdbList(`etc/lists/${$scope.currentList.name}`);
+      const data = await rulesetHandler.getCdbList(`${$scope.currentList.path}/${$scope.currentList.name}`);
       $scope.currentList.list = stringToObj(data.data.data);
       $scope.viewingDetail = true;
       $scope.$emit('setCurrentList', { currentList: $scope.currentList });

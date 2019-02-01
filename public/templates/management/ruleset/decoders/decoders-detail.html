@@ -2,9 +2,8 @@
     <!-- Back button and title -->
     <div layout="row" layout-align="start center">
         <!-- Back button -->
-        <md-button class="md-icon-button" style="margin: 5px!important;" aria-label="Back to decoders list"
-            tooltip="Back" tooltip-placement="bottom" ng-click="dctrl.closeDetailView()"><i class="fa fa-fw fa-arrow-left"
-                aria-hidden="true"></i></md-button>
+        <md-button class="md-icon-button" style="margin: 5px!important;" aria-label="Back to decoders list" tooltip="Back"
+            tooltip-placement="bottom" ng-click="dctrl.closeDetailView()"><i class="fa fa-fw fa-arrow-left" aria-hidden="true"></i></md-button>
         <!-- Rule title -->
         <div>
             <h1 class="font-size-18">{{dctrl.currentDecoder.name}}</h1>
@@ -135,7 +134,8 @@
             </button>
         </div>
         <div class="md-padding md-padding-top-10" ng-if="fetchedXML" style="height: calc(100vh - 367px);">
-            <wz-xml-file-editor file-name='decoders' data="fetchedXML" target-name="currentDecoder.file" valid-fn='xmlIsValid(valid)'>
+            <wz-xml-file-editor file-name='decoders' data="fetchedXML" target-name="currentDecoder.file" valid-fn='xmlIsValid(valid)'
+                close-fn='closeEditingFile(reload)'>
             </wz-xml-file-editor>
         </div>
     </div>

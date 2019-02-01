@@ -212,7 +212,6 @@ export class DecodersController {
   }
   closeEditingFile = () => {
     this.$scope.editingFile = false;
-    this.$scope.$broadcast('closeEditXmlFile', {});
   };
   xmlIsValid = valid => {
     this.$scope.xmlHasErrors = valid;

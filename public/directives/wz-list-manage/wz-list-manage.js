@@ -97,7 +97,7 @@ app.directive('wzListManage', function () {
       });
 
       const refresh = () => {
-        rulesetHandler.getCdbList(`etc/lists/${$scope.currentList.name}`)
+        rulesetHandler.getCdbList(`${$scope.currentList.path}/${$scope.currentList.name}`)
           .then(data => {
             $scope.currentList.list = stringToObj(data.data.data);
             fetch();
@@ -116,6 +116,12 @@ app.directive('wzListManage', function () {
 
       const saveList = async () => {
         try {
+          if ($scope.currentList.new && !$scope.currentList.newName) {
+            $scope.currentList.list = [];
+            throw new Error('New list name is needed');
+          } else {
+            $scope.currentList.name = $scope.currentList.newName;
+          }
           let raw = '';
           for (var key in $scope.currentList.list) {
             raw = raw.concat(`${key}:${$scope.currentList.list[key]}` + '\n');

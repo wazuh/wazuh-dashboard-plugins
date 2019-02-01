@@ -58,11 +58,13 @@ export class ConfigurationRulesetController {
         this.errorHandler.handle(error, 'Fetch file error');
       }
     }
-    this.$scope.closeEditingFile = () => {
+    this.$scope.closeEditingFile = (reload = false) => {
       this.$scope.editingFile = false;
       this.$scope.newFile = false;
       this.$scope.fetchedXML = null;
-      this.$scope.$broadcast('closeEditXmlFile', {});
+      if (reload)
+        this.$scope.search();
+      if (!this.$scope.$$phase) this.$scope.$digest();
     };
     this.$scope.xmlIsValid = valid => {
       this.$scope.xmlHasErrors = valid;
@@ -94,9 +96,6 @@ export class ConfigurationRulesetController {
           const objParam = this.$scope.selectedRulesetTab === 'rules' ? { rule: this.$scope.selectedItem } : { decoder: this.$scope.selectedItem };
           this.$scope.$broadcast('saveXmlFile', objParam);
         }
-        this.$scope.editingFile = false;
-        this.$scope.fetchedXML = null;
-
       }
     };
     this.$scope.addNewFile = (type) => {
@@ -109,6 +108,13 @@ export class ConfigurationRulesetController {
       this.$scope.type = type;
       if (!this.$scope.$$phase) this.$scope.$digest();
       this.$scope.$broadcast('fetchedFile', { data: this.$scope.fetchedXML });
+    };
+
+    this.$scope.addNewList = () => {
+      this.$scope.currentList = { file: '', path: 'etc/lists/', list: [], new: true };
+      this.$scope.viewingDetail = true;
+      if (!this.$scope.$$phase) this.$scope.$digest();
+      this.$scope.$broadcast('changeCdbList', { currentList: this.$scope.currentList });
     };
 
     /**
@@ -130,6 +136,7 @@ export class ConfigurationRulesetController {
       }
       if (rulesettab === 'cdblists') {
         this.$scope.searchPlaceholder = 'Filter CDB lists...'
+        this.$scope.search();
       }
       if (!this.$scope.$$phase) this.$scope.$digest();
     };
@@ -149,14 +156,15 @@ export class ConfigurationRulesetController {
       this.$scope.viewingDetail = false;
       this.$scope.currentList = false;
     }
+
     //listeners
     this.$scope.$on('wazuhShowCdbList', async (ev, parameters) => {
       this.$scope.currentList = parameters.cdblist;
-      try{
-        const data = await this.rulesetHandler.getCdbList(`etc/lists/${this.$scope.currentList.name}`);
+      try {
+        const data = await this.rulesetHandler.getCdbList(`${this.$scope.currentList.path}/${this.$scope.currentList.name}`);
         this.$scope.currentList.list = stringToObj(data.data.data);
         this.$scope.viewingDetail = true;
-      }catch(error){
+      } catch (error) {
         this.$scope.currentList.list = [];
         this.errorHandler.handle(error, '');
       }
@@ -169,6 +177,7 @@ export class ConfigurationRulesetController {
       this.$scope.editConfig();
       if (!this.$scope.$$phase) this.$scope.$digest();
     });
+
     this.$scope.$on('wazuhShowDecoder', (event, parameters) => {
       this.$scope.selectedItem = parameters.decoder;
       this.$scope.selectedFileName = 'decoders';

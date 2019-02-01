@@ -77,14 +77,13 @@ export class ConfigurationGroupsController {
     this.$scope.closeEditingFile = () => {
       this.$scope.editingFile = false;
       this.$scope.fetchedXML = null;
-      this.$scope.$broadcast('closeEditXmlFile', {});
+      if (!this.$scope.$$phase) this.$scope.$digest();
     };
     this.$scope.xmlIsValid = valid => {
       this.$scope.xmlHasErrors = valid;
       if (!this.$scope.$$phase) this.$scope.$digest();
     };
     this.$scope.doSaveConfig = () => {
-      this.$scope.editingFile = false;
       this.$scope.$broadcast('saveXmlFile', { group: this.$scope.selectedItem.name });
     };
     this.$scope.switchAddingGroup = () => {
