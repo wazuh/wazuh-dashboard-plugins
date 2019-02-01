@@ -44,6 +44,7 @@ export class ManagementController {
     });
     this.$scope.$on('removeCurrentRule', () => {
       this.currentRule = false;
+      appState.setNavigation({ status: true });
       $location.search('currentRule', null);
     });
     this.$scope.$on('setCurrentDecoder', (ev, params) => {
@@ -53,6 +54,7 @@ export class ManagementController {
     });
     this.$scope.$on('removeCurrentDecoder', () => {
       this.currentDecoder = false;
+      appState.setNavigation({ status: true });
       $location.search('currentDecoder', null);
     });
     this.$scope.$on('setCurrentList', (ev, params) => {
@@ -63,6 +65,7 @@ export class ManagementController {
     });
     this.$scope.$on('removeCurrentList', () => {
       this.currentList = false;
+      appState.setNavigation({ status: true });
       $location.search('currentList', null);
     });
     this.$scope.$on('setCurrentConfiguration', (ev, params) => {

@@ -78,8 +78,12 @@ app.run(function ($rootScope, $route, $location, appState, $window) {
           if (navigation.currLocation === navigation.discoverSections[1]) {
             $window.history.pushState({ page: 'wazuh#' + navigation.discoverPrevious + '/' }, '', 'wazuh#' + navigation.discoverPrevious + '/');
           } else if (navigation.currLocation === navigation.discoverSections[2]) {
-            //$window.history.pushState({ page: 'wazuh#/agents/002/welcome/panels' }, '', 'wazuh#/agents/002/welcome/panels');
-            $window.history.pushState({ page: 'wazuh#' + navigation.discoverPrevious }, '', 'wazuh#' + navigation.discoverPrevious);
+            if ($location.search().tab && $location.search().tab !== 'welcome') {
+              $window.history.pushState({ page: 'wazuh#' + navigation.discoverPrevious }, '', 'wazuh#' + navigation.discoverPrevious);
+              $window.history.pushState({ page: 'wazuh#' + navigation.discoverPrevious + '?agent=' + $location.search().agent }, '', 'wazuh#' + navigation.discoverPrevious + '?agent=' + $location.search().agent);
+            } else {
+              $window.history.pushState({ page: 'wazuh#' + navigation.discoverPrevious }, '', 'wazuh#' + navigation.discoverPrevious);
+            }
           } else {
             $window.history.pushState({ page: 'wazuh#' + navigation.discoverPrevious }, '', 'wazuh#' + navigation.discoverPrevious);
           }
