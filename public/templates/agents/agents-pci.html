@@ -19,7 +19,31 @@
             </md-card>
         </div>
 
-        <div layout="row" layout-align="center stretch" class="height-225">
+        <div layout="row" layout-align="center stretch" class="height-300">
+            <md-card flex class="wz-md-card">
+                <md-card-content class="wazuh-column">
+                    <span class="wz-headline-title">Top 5 rule groups</span>
+                    <md-divider class="wz-margin-top-10"></md-divider>
+                    <kbn-vis id="Wazuh-App-Agents-PCI-Groups" vis-id="'Wazuh-App-Agents-PCI-Groups'"></kbn-vis>
+                </md-card-content>
+            </md-card>
+            <md-card flex class="wz-md-card">
+                <md-card-content class="wazuh-column">
+                    <span class="wz-headline-title">Top 5 rules</span>
+                    <md-divider class="wz-margin-top-10"></md-divider>
+                    <kbn-vis id="Wazuh-App-Agents-PCI-Rule" vis-id="'Wazuh-App-Agents-PCI-Rule'"></kbn-vis>
+                </md-card-content>
+            </md-card>
+            <md-card flex class="wz-md-card">
+                <md-card-content class="wazuh-column">
+                    <span class="wz-headline-title">Top 5 PCI DSS requirements</span>
+                    <md-divider class="wz-margin-top-10"></md-divider>
+                    <kbn-vis id="Wazuh-App-Agents-PCI-Requirement" vis-id="'Wazuh-App-Agents-PCI-Requirement'"></kbn-vis>
+                </md-card-content>
+            </md-card>
+        </div>
+
+        <div layout="row" layout-align="center stretch" class="height-300">
             <md-card flex="70" class="wz-md-card">
                 <md-card-content class="wazuh-column">
                     <span class="wz-headline-title">PCI Requirements</span>
@@ -27,11 +51,11 @@
                     <kbn-vis id="Wazuh-App-Agents-PCI-Requirements" vis-id="'Wazuh-App-Agents-PCI-Requirements'"></kbn-vis>
                 </md-card-content>
             </md-card>
-            <md-card flex="30" class="wz-md-card">
+            <md-card flex class="wz-md-card">
                 <md-card-content class="wazuh-column">
-                    <span class="wz-headline-title">Groups</span>
+                    <span class="wz-headline-title">Rule level distribution</span>
                     <md-divider class="wz-margin-top-10"></md-divider>
-                    <kbn-vis id="Wazuh-App-Agents-PCI-Groups" vis-id="'Wazuh-App-Agents-PCI-Groups'"></kbn-vis>
+                    <kbn-vis id="Wazuh-App-Agents-PCI-Rule-level-distribution" vis-id="'Wazuh-App-Agents-PCI-Rule-level-distribution'"></kbn-vis>
                 </md-card-content>
             </md-card>
         </div>
@@ -45,7 +69,5 @@
                 </md-card-content>
             </md-card>
         </div>
-
-
 
 </md-content>
