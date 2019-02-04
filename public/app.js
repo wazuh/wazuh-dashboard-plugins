@@ -116,7 +116,6 @@ import './services';
 import './controllers';
 import './factories';
 import './directives';
-import { runInContext } from 'vm';
 
 // Added due to Kibana 6.3.0. Do not modify.
 uiModules.get('kibana').provider('dashboardConfig', () => {
