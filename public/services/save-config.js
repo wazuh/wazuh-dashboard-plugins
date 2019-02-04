@@ -36,11 +36,11 @@ export class SaveConfig {
    * @param {*} node Node name
    * @param {*} content XML raw content for ossec.conf file
    */
-  async saveNodeConfiguration(node,content) {
+  async saveNodeConfiguration(node, content) {
     try {
       //
     } catch (error) {
       return Promise.reject(error);
     }
-  } 
+  }
 }

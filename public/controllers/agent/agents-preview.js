@@ -213,6 +213,6 @@ export class AgentsPreviewController {
   }
 
   reloadList() {
-    this.$scope.$broadcast('wazuhSearch', { term:'' });
+    this.$scope.$broadcast('wazuhSearch', { term: '' });
   }
 }

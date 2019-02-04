@@ -158,10 +158,10 @@ export function RulesController(
         coloredString = coloredString.replace(
           /\$\(((?!<\/span>).)*?\)(?!<\/span>)/im,
           '<span style="color: ' +
-          colors[i] +
-          ' ">' +
-          valuesArray[i] +
-          '</span>'
+            colors[i] +
+            ' ">' +
+            valuesArray[i] +
+            '</span>'
         );
       }
     }
@@ -227,14 +227,16 @@ export function RulesController(
   $scope.editRulesConfig = async () => {
     $scope.editingFile = true;
     try {
-      $scope.fetchedXML = await rulesetHandler.getRuleConfiguration($scope.currentRule.file)
+      $scope.fetchedXML = await rulesetHandler.getRuleConfiguration(
+        $scope.currentRule.file
+      );
       if (!$scope.$$phase) $scope.$digest();
       $scope.$broadcast('fetchedFile', { data: $scope.fetchedXML });
     } catch (error) {
       $scope.fetchedXML = null;
       errorHandler.handle(error, 'Fetch file error');
     }
-  }
+  };
   $scope.closeEditingFile = () => {
     $scope.editingFile = false;
     $scope.$broadcast('closeEditXmlFile', {});

@@ -711,8 +711,8 @@ export class AgentsController {
             this.$scope.agent.group && !this.$scope.agent.group.includes(item)
         );
     } catch (error) {
-      if(!this.$scope.agent) {
-        if ( (error || {}).status === -1 ) {
+      if (!this.$scope.agent) {
+        if ((error || {}).status === -1) {
           this.$scope.emptyAgent = 'Wazuh API timeout.';
         }
       }

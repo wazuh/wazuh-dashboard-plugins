@@ -218,10 +218,8 @@ export class ConfigurationHandler {
   }
 
   json2xml(data) {
-    if(data){
-      const result = XMLBeautifier(
-        js2xmlparser.parse('configuration', data)
-      );
+    if (data) {
+      const result = XMLBeautifier(js2xmlparser.parse('configuration', data));
       return result;
     }
     return false;

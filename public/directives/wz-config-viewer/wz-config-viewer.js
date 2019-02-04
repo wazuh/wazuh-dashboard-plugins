@@ -17,7 +17,6 @@ import CodeMirror from '../../utils/codemirror/lib/codemirror';
 const app = uiModules.get('app/wazuh', []);
 
 class WzConfigViewer {
-
   constructor() {
     this.restrict = 'E';
     this.scope = {
@@ -30,7 +29,6 @@ class WzConfigViewer {
   }
 
   controller($scope, $document) {
-
     const setJsonBox = () => {
       $scope.jsonCodeBox = CodeMirror.fromTextArea(
         $document[0].getElementById('viewer_json_box'),
@@ -46,7 +44,7 @@ class WzConfigViewer {
           gutters: ['CodeMirror-foldgutter']
         }
       );
-    }
+    };
     const setXmlBox = () => {
       $scope.xmlCodeBox = CodeMirror.fromTextArea(
         $document[0].getElementById('viewer_xml_box'),
@@ -62,37 +60,35 @@ class WzConfigViewer {
           gutters: ['CodeMirror-foldgutter']
         }
       );
+    };
 
-    }
-
-
-    const init = () => {}
+    const init = () => {};
 
     const refreshJsonBox = json => {
       $scope.jsoncontent = json;
-      if(!$scope.jsonCodeBox){
+      if (!$scope.jsonCodeBox) {
         setJsonBox();
       }
       if ($scope.jsoncontent != false) {
         $scope.jsonCodeBox.setValue($scope.jsoncontent);
-        setTimeout(function () {
+        setTimeout(function() {
           $scope.jsonCodeBox.refresh();
         }, 1);
       }
-    }
+    };
 
     const refreshXmlBox = xml => {
       $scope.xmlcontent = xml;
-      if(!$scope.xmlCodeBox){
+      if (!$scope.xmlCodeBox) {
         setXmlBox();
       }
       if ($scope.xmlcontent != false) {
         $scope.xmlCodeBox.setValue($scope.xmlcontent);
-        setTimeout(function () {
+        setTimeout(function() {
           $scope.xmlCodeBox.refresh();
         }, 1);
       }
-    }
+    };
 
     $scope.callgetjson = () => $scope.getjson();
 
