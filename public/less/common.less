@@ -539,24 +539,25 @@ md-sidenav {
     height: auto;
 }
 
+.wz-logo-container {
+    height: 50px;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position-y: center;
+}
+
 @media (min-width: 1200px) {      
-    .wz-logo-container {
+    .wz-logo {
         background-image: url(/plugins/wazuh/img/new_logo_white.png);
-        height: 38px;
-        background-size: contain;
-        background-repeat: no-repeat;
         width: 150px;
         max-width: 150px;
     }
 }
 @media (max-width: 1199px) {    
-   .wz-logo-container {
+    .wz-logo{
         min-width: 23px!important;
         margin-right: 15px!important;
         background-image: url("/plugins/wazuh/img/new_logo_white_wolf.png");
-        height: 38px;
-        background-size: contain;
-        background-repeat: no-repeat;
     }
 }
 
