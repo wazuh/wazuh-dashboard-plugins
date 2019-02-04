@@ -31,7 +31,6 @@ export class ConfigurationGroupsController {
     this.$scope.addingGroup = false;
   }
 
-
   async fetchFile() {
     try {
       const data = await this.apiReq.request(
@@ -54,11 +53,10 @@ export class ConfigurationGroupsController {
    * When controller loads
    */
   $onInit() {
-
     /**
- * This perfoms a search by a given term
- * @param {String} term
- */
+     * This perfoms a search by a given term
+     * @param {String} term
+     */
     this.$scope.search = term => {
       this.$scope.$broadcast('wazuhSearch', { term });
     };
@@ -75,7 +73,7 @@ export class ConfigurationGroupsController {
         this.$scope.fetchedXML = null;
         this.errorHandler.handle(error, 'Fetch file error');
       }
-    }
+    };
     this.$scope.closeEditingFile = () => {
       this.$scope.editingFile = false;
       this.$scope.fetchedXML = null;
@@ -88,7 +86,9 @@ export class ConfigurationGroupsController {
     };
     this.$scope.doSaveConfig = () => {
       this.$scope.editingFile = false;
-      this.$scope.$broadcast('saveXmlFile', { group: this.$scope.selectedItem.name });
+      this.$scope.$broadcast('saveXmlFile', {
+        group: this.$scope.selectedItem.name
+      });
     };
     this.$scope.switchAddingGroup = () => {
       this.$scope.addingGroup = !this.$scope.addingGroup;
@@ -110,7 +110,6 @@ export class ConfigurationGroupsController {
     this.$scope.selectedItem = false;
 
     if (!this.$scope.$$phase) this.$scope.$digest();
-
 
     //listeners
     this.$scope.$on('wazuhShowGroup', (event, parameters) => {

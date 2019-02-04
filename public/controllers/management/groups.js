@@ -301,7 +301,10 @@ export function GroupsController(
 
   $scope.doSaveGroupAgentConfig = () => {
     $scope.editingFile = false;
-    $scope.$broadcast('saveXmlFile', { group: $scope.currentGroup.name, type: 'group' });
+    $scope.$broadcast('saveXmlFile', {
+      group: $scope.currentGroup.name,
+      type: 'group'
+    });
   };
 
   $scope.$on('configurationSuccess', () => {
@@ -539,7 +542,7 @@ export function GroupsController(
   };
 
   // Resetting the factory configuration
-  $scope.$on('$destroy', () => { });
+  $scope.$on('$destroy', () => {});
 
   $scope.$watch('lookingGroup', value => {
     $scope.availableAgents = {
@@ -582,6 +585,8 @@ export function GroupsController(
     $scope.groupsSelectedTab = 'files';
     appState.setNavigation({ status: true });
     $location.search('navigation', true);
-    return $scope.loadGroup(parameters.group).then(() => $scope.editGroupAgentConfig());
-  })
+    return $scope
+      .loadGroup(parameters.group)
+      .then(() => $scope.editGroupAgentConfig());
+  });
 }

@@ -24,7 +24,10 @@ export class ErrorHandler {
   extractMessage(error) {
     if ((error || {}).status === -1) {
       const origin = ((error || {}).config || {}).url || '';
-      const isFromAPI = origin.includes('/api/request') || origin.includes('/api/csv') || origin.includes('/api/agents-unique');
+      const isFromAPI =
+        origin.includes('/api/request') ||
+        origin.includes('/api/csv') ||
+        origin.includes('/api/agents-unique');
       return isFromAPI
         ? "Wazuh API don't reachable. Reason: timeout."
         : 'Server did not respond';

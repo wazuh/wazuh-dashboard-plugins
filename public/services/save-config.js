@@ -14,7 +14,10 @@ export class SaveConfig {
     this.apiReq = apiReq;
   }
 
-
+  /**
+   * Send ossec.conf content for manager (single-node API call)
+   * @param {*} content XML raw content for ossec.conf file
+   */
   async saveManagerConfiguration(content) {
     try {
       const result = await this.apiReq.request(
@@ -26,17 +29,18 @@ export class SaveConfig {
     } catch (error) {
       return Promise.reject(error);
     }
-  };
+  }
 
-  async saveNodeConfiguration(node,content) {
+  /**
+   * Send ossec.conf content for a cluster node
+   * @param {*} node Node name
+   * @param {*} content XML raw content for ossec.conf file
+   */
+  async saveNodeConfiguration(node, content) {
     try {
-      //-
-
-      return result;
+      //
     } catch (error) {
       return Promise.reject(error);
     }
-  };
-
- 
+  }
 }

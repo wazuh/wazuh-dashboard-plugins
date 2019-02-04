@@ -13,11 +13,10 @@
 import template from './wz-xml-file-editor.html';
 import CodeMirror from '../../utils/codemirror/lib/codemirror';
 import { uiModules } from 'ui/modules';
-import { AppState } from '../../services/app-state';
 
 const app = uiModules.get('app/wazuh', []);
 
-app.directive('wzXmlFileEditor', function () {
+app.directive('wzXmlFileEditor', function() {
   return {
     restrict: 'E',
     scope: {
@@ -26,14 +25,21 @@ app.directive('wzXmlFileEditor', function () {
       data: '=data',
       targetName: '=targetName'
     },
-    controller($scope, $document, $location, errorHandler, groupHandler, rulesetHandler, saveConfig) {
-
+    controller(
+      $scope,
+      $document,
+      $location,
+      errorHandler,
+      groupHandler,
+      rulesetHandler,
+      saveConfig
+    ) {
       /**
        * Custom .replace method. Instead of using .replace which
        * evaluates regular expressions.
        * Alternative using split + join, same result.
        */
-      String.prototype.xmlReplace = function (str, newstr) {
+      String.prototype.xmlReplace = function(str, newstr) {
         return this.split(str).join(newstr);
       };
 
@@ -84,7 +90,8 @@ app.directive('wzXmlFileEditor', function () {
           });
 
           if (xmlDoc.getElementsByTagName('parsererror').length) {
-            const xmlFullError = xmlDoc.getElementsByTagName('parsererror')[0].innerText;
+            const xmlFullError = xmlDoc.getElementsByTagName('parsererror')[0]
+              .innerText;
             $scope.xmlError = xmlFullError.match('error\\s.+\n')[0];
           } else {
             $scope.xmlError = false;
@@ -176,10 +183,16 @@ app.directive('wzXmlFileEditor', function () {
             errorHandler.info('Success. Decoders has been updated', '');
           } else if (params.node) {
             await saveConfig.saveNodeConfiguration(params.node, xml);
-            errorHandler.info('Success. Node configuration has been updated', '');
+            errorHandler.info(
+              'Success. Node configuration has been updated',
+              ''
+            );
           } else if (params.manager) {
             await saveConfig.saveManagerConfiguration(xml);
-            errorHandler.info('Success. Manager configuration has been updated', '');
+            errorHandler.info(
+              'Success. Manager configuration has been updated',
+              ''
+            );
           }
         } catch (error) {
           errorHandler.handle(error, 'Send file error');
@@ -206,7 +219,9 @@ app.directive('wzXmlFileEditor', function () {
           $scope.xmlError = false;
           $scope.xmlCodeBox.setValue(autoFormat(data || $scope.data));
           firstTime = false;
-          setTimeout(() => { $scope.xmlCodeBox.refresh() }, 1);
+          setTimeout(() => {
+            $scope.xmlCodeBox.refresh();
+          }, 1);
         } catch (error) {
           errorHandler.handle(error, 'Fetching original file');
         }
