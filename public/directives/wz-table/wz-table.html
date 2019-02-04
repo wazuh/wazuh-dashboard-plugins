@@ -23,13 +23,6 @@
                     {{
                     parseValue(key,item) | limitTo: extraLimit ? 100 : 25
                     }}
-                    <div ng-if="path === '/agents' && key === 'version'">
-                        <button ng-if="item.outdated && !item.upgrading" class="updateBtn height-20" tooltip="Upgrade agent"
-                            tooltip-placement="top" ng-click="updateAgent(item); $event.stopPropagation()"><i
-                                class="fa fa-upload" aria-hidden="true"></i></button>
-                        <span ng-if="item.outdated && item.upgrading" class="upgradingLabel height-25" tooltip="Upgrading agent..."
-                            tooltip-placement="top"><i class="fa fa-fw fa-spin fa-spinner"></i></span>
-                    </div>
                     <span ng-if="parseValue(key,item).length > (extraLimit ? 100 : 25)">...</span>
                     <md-tooltip ng-if="parseValue(key,item).length > (extraLimit ? 100 : 25)" md-direction="bottom"
                         class="wz-tooltip">
@@ -41,6 +34,11 @@
                         tooltip="Open Discover panel for this agent" tooltip-placement="left" aria-hidden="true"></i>
                     <i ng-click="clickAction(item, 'configuration'); $event.stopPropagation()" class="fa fa-fw fa-wrench cursor-pointer"
                         tooltip="Open configuration for this agent" tooltip-placement="left" aria-hidden="true"></i>
+                    <button ng-if="item.outdated && !item.upgrading" class="updateBtn height-20" tooltip="Upgrade agent"
+                        tooltip-placement="top" ng-click="updateAgent(item); $event.stopPropagation()"><i class="fa fa-upload"
+                            aria-hidden="true"></i></button>
+                    <span ng-if="item.outdated && item.upgrading" class="upgradingLabel height-25" tooltip="Upgrading agent..."
+                        tooltip-placement="top"><i class="fa fa-fw fa-spin fa-spinner"></i></span>
                 </td>
                 <td ng-if="path === '/agents/groups' && adminMode" ng-click="$event.stopPropagation()" class="cursor-default action-btn-td">
                     <i ng-if="removingGroup !== item.name && item.name !== 'default'" ng-click="showConfirmRemoveGroup($event, item); $event.stopPropagation()"

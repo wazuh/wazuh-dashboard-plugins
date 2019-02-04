@@ -118,8 +118,12 @@ app.directive('wzTable', function () {
               const item = items.find(function (item) {
                 return item.id === id;
               });
-              if (item)
+              if (item){
                 item.outdated = true;
+                if(appState.getSessionStorageItem(`updatingAgent${item.id}`)){
+                  item.upgrading = true;
+                }
+              }
             });
           }
           $scope.items = items;
@@ -324,14 +328,28 @@ app.directive('wzTable', function () {
 
       $scope.updateAgent = async agent => {
         agent.upgrading = true;
-/*         try {
-          await apiReq.request('GET', '/agents/outdated/', {}).then((data) => {
-            $scope.outdatedAgents = data.data.data.items.map(x => x.id);
-            return init();
-          });
+        this.appState.setSessionStorageItem(`updatingAgent${agent.id}`, true);
+        try {
+          const data = await this.apiReq.request(
+            'PUT',
+            `/agents/${agent.id}/upgrade?wait_for_complete`,
+            {}
+          );
+          const err = data.data.error !== 0;
+          if (err) {
+            this.errorHandler(error,"Error upgrading");
+          } 
         } catch (error) {
-          errorHandler.handle(`${error.message || error}`, '');
-        } */
+          if (error.status === -1) {
+            error.message = "Aborted"
+            console.log(error)
+          }else{
+            this.errorHandler.handle(`${error.message || error}`, 'Error upgrading agent ' + agent.id);
+            agent.upgrading = false;
+            this.appState.removeSessionStorageItem(`updatingAgent${agent.id}`);
+          }
+        }
+        if (!this.$scope.$$phase) this.$scope.$digest();
       };
 
       $scope.confirmRemoveAgent = async agent => {
