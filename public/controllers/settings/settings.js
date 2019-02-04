@@ -195,7 +195,7 @@ export class SettingsController {
 
     this.errorHandler.info(
       `API ${
-      this.apiEntries[index]._source.cluster_info.manager
+        this.apiEntries[index]._source.cluster_info.manager
       } set as default`,
       'Settings'
     );
