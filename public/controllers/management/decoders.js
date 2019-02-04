@@ -23,10 +23,11 @@ export class DecodersController {
    * @param {*} csvReq
    * @param {*} wzTableFilter
    */
-  constructor($scope, $sce, errorHandler, appState, csvReq, wzTableFilter, wazuhConfig, rulesetHandler) {
+  constructor($scope, $sce, $location, errorHandler, appState, csvReq, wzTableFilter, wazuhConfig, rulesetHandler) {
     this.$scope = $scope;
     this.$sce = $sce;
     this.errorHandler = errorHandler;
+    this.$location =  $location;
     this.appState = appState;
     this.csvReq = csvReq;
     this.wzTableFilter = wzTableFilter;
@@ -203,6 +204,8 @@ export class DecodersController {
     this.$scope.editingFile = true;
     try {
       this.$scope.fetchedXML = await this.rulesetHandler.getDecoderConfiguration(this.currentDecoder.file);
+      this.$location.search('editingFile', true);
+      this.appState.setNavigation({ status: true });
       if (!this.$scope.$$phase) this.$scope.$digest();
       this.$scope.$broadcast('fetchedFile', { data: this.$scope.fetchedXML });
     } catch (error) {
@@ -212,6 +215,7 @@ export class DecodersController {
   }
   closeEditingFile = () => {
     this.$scope.editingFile = false;
+    this.appState.setNavigation({ status: true });
     this.$scope.$broadcast('closeEditXmlFile', {});
   };
   xmlIsValid = valid => {

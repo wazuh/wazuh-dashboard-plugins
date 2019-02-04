@@ -198,7 +198,6 @@ export function CdbListsController(
     }
     $scope.$broadcast('changeCdbList', { currentList: $scope.currentList });
     if (!$scope.$$phase) $scope.$digest();
-
   });
 
   /**

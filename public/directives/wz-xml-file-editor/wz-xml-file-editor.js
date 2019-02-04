@@ -13,6 +13,7 @@
 import template from './wz-xml-file-editor.html';
 import CodeMirror from '../../utils/codemirror/lib/codemirror';
 import { uiModules } from 'ui/modules';
+import { AppState } from '../../services/app-state';
 
 const app = uiModules.get('app/wazuh', []);
 
@@ -25,7 +26,7 @@ app.directive('wzXmlFileEditor', function () {
       data: '=data',
       targetName: '=targetName'
     },
-    controller($scope, $document, errorHandler, groupHandler, rulesetHandler, saveConfig) {
+    controller($scope, $document, $location, errorHandler, groupHandler, rulesetHandler, saveConfig) {
 
       /**
        * Custom .replace method. Instead of using .replace which
@@ -225,6 +226,10 @@ app.directive('wzXmlFileEditor', function () {
       });
 
       $scope.$on('saveXmlFile', (ev, params) => saveFile(params));
+
+      $scope.$on("$destroy", function() {
+        $location.search('editingFile', null);
+    });
     },
     template
   };

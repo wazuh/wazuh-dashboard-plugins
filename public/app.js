@@ -72,6 +72,7 @@ app.run(function ($rootScope, $route, $location, appState, $window) {
         if (!navigation.discoverSections.includes(navigation.currLocation)) {
           appState.setNavigation({ reloaded: true });
           $location.search('configSubTab', null);
+          $location.search('editingFile', null);
           $route.reload();
           //discover sections
         } else if (navigation.discoverSections.includes(navigation.currLocation)) {
@@ -120,7 +121,6 @@ import './services';
 import './controllers';
 import './factories';
 import './directives';
-import { runInContext } from 'vm';
 
 // Added due to Kibana 6.3.0. Do not modify.
 uiModules.get('kibana').provider('dashboardConfig', () => {

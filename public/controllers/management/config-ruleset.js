@@ -51,6 +51,8 @@ export class ConfigurationRulesetController {
         this.$scope.fetchedXML = this.$scope.selectedRulesetTab === 'rules' ?
           await this.rulesetHandler.getRuleConfiguration(this.$scope.selectedItem.file) :
           await this.rulesetHandler.getDecoderConfiguration(this.$scope.selectedItem.file)
+        this.$location.search('editingFile', true);
+        this.appState.setNavigation({ status: true });
         if (!this.$scope.$$phase) this.$scope.$digest();
         this.$scope.$broadcast('fetchedFile', { data: this.$scope.fetchedXML });
       } catch (error) {
@@ -62,6 +64,7 @@ export class ConfigurationRulesetController {
       this.$scope.editingFile = false;
       this.$scope.newFile = false;
       this.$scope.fetchedXML = null;
+      this.appState.setNavigation({ status: true });
       this.$scope.$broadcast('closeEditXmlFile', {});
     };
     this.$scope.xmlIsValid = valid => {
@@ -108,6 +111,8 @@ export class ConfigurationRulesetController {
       this.$scope.fetchedXML = '<!-- Modify it at your will. -->';
       this.$scope.type = type;
       if (!this.$scope.$$phase) this.$scope.$digest();
+      this.$location.search('editingFile', true);
+      this.appState.setNavigation({ status: true });
       this.$scope.$broadcast('fetchedFile', { data: this.$scope.fetchedXML });
     };
 
@@ -146,17 +151,20 @@ export class ConfigurationRulesetController {
       return result;
     }
     this.$scope.cancelEditList = () => {
+      this.appState.setNavigation({ status: true });
       this.$scope.viewingDetail = false;
       this.$scope.currentList = false;
     }
     //listeners
     this.$scope.$on('wazuhShowCdbList', async (ev, parameters) => {
       this.$scope.currentList = parameters.cdblist;
-      try{
+      try {
         const data = await this.rulesetHandler.getCdbList(`etc/lists/${this.$scope.currentList.name}`);
         this.$scope.currentList.list = stringToObj(data.data.data);
+        this.$location.search('editingFile', true);
+        this.appState.setNavigation({ status: true });
         this.$scope.viewingDetail = true;
-      }catch(error){
+      } catch (error) {
         this.$scope.currentList.list = [];
         this.errorHandler.handle(error, '');
       }
