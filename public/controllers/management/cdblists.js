@@ -218,8 +218,8 @@ export function CdbListsController(
 
 
   $scope.fetchCdbList = async() => {
+    const incomingList = $location.search().listname;
     try{
-      const incomingList = $location.search().listname;
       $location.search('listname', null);
       const data =  await apiReq.request('get', `/cdblists/${incomingList}`, {});
       $scope.currentList = data.data.data.items[0];

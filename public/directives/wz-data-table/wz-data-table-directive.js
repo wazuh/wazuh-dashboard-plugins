@@ -103,10 +103,12 @@ app.directive('wzDataTable', function () {
        * On controller loads
        */
       const init = async () => {
-        $scope.error = false;
-        $scope.wazuh_table_loading = true;
-        await fetch();
-        $scope.wazuh_table_loading = false;
+        try {
+          $scope.error = false;
+          $scope.wazuh_table_loading = true;
+          await fetch();
+          $scope.wazuh_table_loading = false;
+        } catch (error) { }; // eslint-disable-line
       };
 
       /**

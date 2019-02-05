@@ -266,8 +266,8 @@ export function RulesController(
 
 
   $scope.fetchRule = async () => {
+    const incomingRule = $location.search().ruleid;
     try {
-      const incomingRule = $location.search().ruleid;
       $location.search('ruleid', null);
       const data = await apiReq.request('get', `/rules/${incomingRule}`, {});
       $scope.currentRule = data.data.data.items[0];
