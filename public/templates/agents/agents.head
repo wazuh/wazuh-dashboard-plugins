@@ -1,7 +1,7 @@
 <div flex="auto" layout="column" ng-cloak ng-controller="agentsController">
 
     <!-- Top navbar section -->
-    <wz-menu ng-init="menuNavItem = 'agents'"></wz-menu>
+    <wz-menu menu-nav-item="'agents'"></wz-menu>
     <!-- End top navbar section -->
 
     <!-- Navigation section -->

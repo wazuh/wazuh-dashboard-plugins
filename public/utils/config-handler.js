@@ -40,6 +40,15 @@ export class ConfigurationHandler {
       $scope.JSONContent = false;
       $scope.configurationSubTab = false;
       $scope.configurationTab = configurationTab;
+      if (configurationTab === 'active-response') this.switchConfigurationSubTab('active-response', $scope);
+      if (configurationTab === 'global-configuration') this.switchConfigurationSubTab('global', $scope);
+      if (configurationTab === 'integrity-monitoring') this.switchConfigurationSubTab('fim-general', $scope);
+      if (configurationTab === 'log-collection') this.switchConfigurationSubTab('localfile', $scope);
+      if (configurationTab === 'policy-monitoring') this.switchConfigurationSubTab('pm-general', $scope);
+      if (configurationTab === 'alerts') (!$scope.agent || $scope.agent.id === '000') ?
+        this.switchConfigurationSubTab('general-alerts', $scope) :
+        this.switchConfigurationSubTab('labels', $scope)
+
       $scope.currentConfig = await queryConfig(
         agentId || '000',
         sections,
@@ -60,10 +69,10 @@ export class ConfigurationHandler {
         $scope.currentConfig['logcollector-localfile'].localfile
       ) {
         $scope.currentConfig['logcollector-localfile'].localfile.forEach(
-          function(file) {
+          function (file) {
             if (file.target) {
               file.targetStr = '';
-              file.target.forEach(function(target, idx) {
+              file.target.forEach(function (target, idx) {
                 file.targetStr = file.targetStr.concat(target);
                 if (idx != file.target.length - 1) {
                   file.targetStr = file.targetStr.concat(', ');
@@ -94,6 +103,10 @@ export class ConfigurationHandler {
       $scope.JSONContent = false;
       $scope.configurationSubTab = false;
       $scope.configurationTab = wodleName;
+      if (wodleName === 'cis-cat') this.switchConfigurationSubTab('ciscat-general', $scope);
+      if (wodleName === 'aws-s3') this.switchConfigurationSubTab('amazon-general', $scope);
+      if (wodleName === 'vulnerability-detector') this.switchConfigurationSubTab('vulnerabilities-general', $scope);
+      if (wodleName === 'open-scap') this.switchConfigurationSubTab('openscap-general', $scope);
 
       $scope.currentConfig = await queryConfig(
         agentId || '000',
@@ -218,8 +231,8 @@ export class ConfigurationHandler {
     $scope.$applyAsync();
   }
 
-  json2xml(data,$scope) {
-    if(data){
+  json2xml(data, $scope) {
+    if (data) {
       const result = XMLBeautifier(
         js2xmlparser.parse('configuration', data)
       );

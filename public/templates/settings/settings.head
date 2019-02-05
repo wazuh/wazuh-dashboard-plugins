@@ -1,7 +1,7 @@
 <div flex="auto" layout="column" ng-cloak ng-controller="settingsController as ctrl">
 
     <!-- Top navbar section -->
-    <wz-menu ng-init="menuNavItem = 'settings'"></wz-menu>
+    <wz-menu menu-nav-item = "'settings'"></wz-menu>
     <!-- End top navbar section -->
 
     <!-- Loading ring -->

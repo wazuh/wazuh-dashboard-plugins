@@ -21,6 +21,9 @@ class WzMenu {
    */
   constructor() {
     this.template = menuTemplate;
+    this.scope = {
+      menuNavItem: '=menuNavItem'
+    };
   }
 
   controller(

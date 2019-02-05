@@ -1,4 +1,4 @@
-<div flex="auto" layout="column" ng-if="configurationTab === 'active-response'" ng-init="switchConfigurationSubTab('active-response')">
+<div flex="auto" layout="column" ng-if="configurationTab === 'active-response'">
 
     <!-- Headline -->
     <div layout="column" layout-padding>

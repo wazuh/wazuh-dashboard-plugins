@@ -1,4 +1,4 @@
-<div flex="auto" layout="column" ng-if="configurationTab === 'integrity-monitoring'" ng-init="switchConfigurationSubTab('fim-general')">
+<div flex="auto" layout="column" ng-if="configurationTab === 'integrity-monitoring'">
 
     <!-- Headline -->
     <div layout="column" layout-padding>

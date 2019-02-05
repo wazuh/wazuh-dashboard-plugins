@@ -1,4 +1,4 @@
-<div flex="auto" layout="column" ng-if="configurationTab === 'aws-s3'" ng-init="switchConfigurationSubTab('amazon-general')">
+<div flex="auto" layout="column" ng-if="configurationTab === 'aws-s3'">
 
     <!-- Headline -->
     <div layout="column" layout-padding>
