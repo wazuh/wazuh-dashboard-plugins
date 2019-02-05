@@ -19,127 +19,129 @@ import { checkGap } from '../wz-table/lib/check-gap';
 
 const app = uiModules.get('app/wazuh', []);
 
-app.directive('wzDataTable', function () {
-  return {
-    restrict: 'E',
-    scope: {
+class WzDataTable {
+  constructor() {
+    this.restrict = 'E';
+    this.scope = {
       rowSizes: '=rowSizes',
       data: '='
-    },
-    controller($scope, $filter, errorHandler, $window) {
-      /**
-       * Init variables
-       */
-      $scope.keyEquivalence = KeyEquivalenece;
-      $scope.totalItems = 0;
-      $scope.wazuh_table_loading = true;
-      $scope.items = [];
+    };
+    this.template = template;
+  }
+  controller($scope, $filter, errorHandler, $window) {
+    /**
+     * Init variables
+     */
+    $scope.keyEquivalence = KeyEquivalenece;
+    $scope.totalItems = 0;
+    $scope.wazuh_table_loading = true;
+    $scope.items = [];
 
-      /**
-       * Resizing. Calculate number of table rows depending on the screen height
-       */
-      const rowSizes = $scope.rowSizes || [15, 13, 11];
-      let doit;
-      let resizing = false;
-      $window.onresize = () => {
-        try {
-          if (resizing) return;
-          resizing = true;
-          clearTimeout(doit);
-          doit = setTimeout(async () => {
-            $scope.rowsPerPage = calcTableRows($window.innerHeight, rowSizes);
-            $scope.itemsPerPage = $scope.rowsPerPage;
-            await init();
-            resizing = false;
-          }, 150);
-        } catch (error) {
+    /**
+     * Resizing. Calculate number of table rows depending on the screen height
+     */
+    const rowSizes = $scope.rowSizes || [15, 13, 11];
+    let doit;
+    let resizing = false;
+    $window.onresize = () => {
+      try {
+        if (resizing) return;
+        resizing = true;
+        clearTimeout(doit);
+        doit = setTimeout(async () => {
+          $scope.rowsPerPage = calcTableRows($window.innerHeight, rowSizes);
+          $scope.itemsPerPage = $scope.rowsPerPage;
+          await init();
           resizing = false;
-        }
-      };
-      $scope.rowsPerPage = calcTableRows($window.innerHeight, rowSizes);
+        }, 150);
+      } catch (error) {
+        resizing = false;
+      }
+    };
+    $scope.rowsPerPage = calcTableRows($window.innerHeight, rowSizes);
 
-      /**
-       * This loads data for table, that has been provided by parameter
-       */
-      const fetch = () => {
-        try {
-          $scope.filterTable();
-          $scope.keys = Object.keys(items[0]);
-          return;
-        } catch (error) {
-          errorHandler.handle(error, 'Error loading table');
-        }
-        return;
-      };
-
-      $scope.sortValue = '';
-      $scope.sortReverse = false;
-      $scope.searchTerm = '';
-      $scope.sort = key => {
-        if (key !== $scope.sortValue) {
-          $scope.sortReverse = false;
-        }
-        $scope.sortValue = key;
-        $scope.sortReverse = !$scope.sortReverse;
+    /**
+     * This loads data for table, that has been provided by parameter
+     */
+    const fetch = () => {
+      try {
         $scope.filterTable();
-      };
+        $scope.keys = Object.keys(items[0]);
+        return;
+      } catch (error) {
+        errorHandler.handle(error, 'Error loading table');
+      }
+      return;
+    };
 
-      /**
-       * This apply filter and sorting to table data
-       */
-      $scope.filterTable = () => {
-        items = $filter('orderBy')(
-          $filter('filter')($scope.data, $scope.searchTerm),
-          $scope.sortValue,
-          $scope.sortReverse
-        );
-        $scope.totalItems = items.length;
-        $scope.items = items;
-        checkGap($scope, items);
-        $scope.searchTable();
-      };
+    $scope.sortValue = '';
+    $scope.sortReverse = false;
+    $scope.searchTerm = '';
+    $scope.sort = key => {
+      if (key !== $scope.sortValue) {
+        $scope.sortReverse = false;
+      }
+      $scope.sortValue = key;
+      $scope.sortReverse = !$scope.sortReverse;
+      $scope.filterTable();
+    };
 
-      /**
-       * On controller loads
-       */
-      const init = async () => {
-        try {
-          $scope.error = false;
-          $scope.wazuh_table_loading = true;
-          await fetch();
-          $scope.wazuh_table_loading = false;
-        } catch (error) { }; // eslint-disable-line
-      };
+    /**
+     * This apply filter and sorting to table data
+     */
+    $scope.filterTable = () => {
+      items = $filter('orderBy')(
+        $filter('filter')($scope.data, $scope.searchTerm),
+        $scope.sortValue,
+        $scope.sortReverse
+      );
+      $scope.totalItems = items.length;
+      $scope.items = items;
+      checkGap($scope, items);
+      $scope.searchTable();
+    };
 
-      /**
-       * Pagination variables and functions
-       */
-      $scope.itemsPerPage = $scope.rowsPerPage || 10;
-      $scope.pagedItems = [];
-      $scope.currentPage = 0;
-      let items = [];
-      $scope.gap = 0;
-      $scope.searchTable = () => pagination.searchTable($scope, items);
-      $scope.groupToPages = () => pagination.groupToPages($scope);
-      $scope.range = (size, start, end) =>
-        pagination.range(size, start, end, $scope.gap);
-      $scope.prevPage = () => pagination.prevPage($scope);
-      $scope.nextPage = async currentPage =>
-        pagination.nextPage(currentPage, $scope, errorHandler, fetch);
-      $scope.setPage = function () {
-        $scope.currentPage = this.n;
-        $scope.nextPage(this.n);
-      };
+    /**
+     * On controller loads
+     */
+    const init = async () => {
+      try {
+        $scope.error = false;
+        $scope.wazuh_table_loading = true;
+        await fetch();
+        $scope.wazuh_table_loading = false;
+      } catch (error) { }; // eslint-disable-line
+    };
 
-      /**
-       * Event listeners
-       */
-      $scope.$on('$destroy', () => {
-        $window.onresize = null;
-      });
+    /**
+     * Pagination variables and functions
+     */
+    $scope.itemsPerPage = $scope.rowsPerPage || 10;
+    $scope.pagedItems = [];
+    $scope.currentPage = 0;
+    let items = [];
+    $scope.gap = 0;
+    $scope.searchTable = () => pagination.searchTable($scope, items);
+    $scope.groupToPages = () => pagination.groupToPages($scope);
+    $scope.range = (size, start, end) =>
+      pagination.range(size, start, end, $scope.gap);
+    $scope.prevPage = () => pagination.prevPage($scope);
+    $scope.nextPage = async currentPage =>
+      pagination.nextPage(currentPage, $scope, errorHandler, fetch);
+    $scope.setPage = function () {
+      $scope.currentPage = this.n;
+      $scope.nextPage(this.n);
+    };
 
-      init();
-    },
-    template
-  };
-});
+    /**
+     * Event listeners
+     */
+    $scope.$on('$destroy', () => {
+      $window.onresize = null;
+    });
+
+    init();
+  }
+}
+
+app.directive('wzDataTable', () => new WzDataTable());

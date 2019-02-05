@@ -15,12 +15,14 @@ import { uiModules } from 'ui/modules';
 
 const app = uiModules.get('app/wazuh', []);
 
-app.directive('wzNoConfig', function() {
-  return {
-    restrict: 'E',
-    scope: {
+class WzNoConfig {
+  constructor() {
+    this.restrict = 'E';
+    this.scope = {
       error: '=error'
-    },
-    template: template
-  };
-});
+    };
+    this.template = template;
+  }
+  controller() { }
+}
+app.directive('wzNoConfig', () => new WzNoConfig());
