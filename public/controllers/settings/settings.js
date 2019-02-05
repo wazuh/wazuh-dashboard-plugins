@@ -148,7 +148,7 @@ export class SettingsController {
       for (const key in this.showEditForm) this.showEditForm[key] = false;
       this.$scope.$emit('updateAPI', {});
       this.errorHandler.info('The API was removed successfully', 'Settings');
-      if (!this.$scope.$$phase) this.$scope.$digest();
+      this.$scope.$applyAsync();
       return;
     } catch (error) {
       this.errorHandler.handle('Could not remove the API', 'Settings');
@@ -220,7 +220,7 @@ export class SettingsController {
 
     this.extensions = this.appState.getExtensions(JSON.parse(currentApi).id);
 
-    if (!this.$scope.$$phase) this.$scope.$digest();
+    this.$scope.$applyAsync();
     return;
   }
 
@@ -252,7 +252,7 @@ export class SettingsController {
         this.currentDefault = JSON.parse(currentApi).id;
       }
 
-      if (!this.$scope.$$phase) this.$scope.$digest();
+      this.$scope.$applyAsync();
       this.getCurrentAPIIndex();
       if (!this.currentApiEntryIndex && this.currentApiEntryIndex !== 0) return;
 
@@ -268,7 +268,7 @@ export class SettingsController {
 
       this.extensions = this.appState.getExtensions(JSON.parse(currentApi).id);
 
-      if (!this.$scope.$$phase) this.$scope.$digest();
+      this.$scope.$applyAsync();
       return;
     } catch (error) {
       this.errorHandler.handle('Error getting API entries', 'Settings');
@@ -327,7 +327,7 @@ export class SettingsController {
     this.showEditForm[entry._id] = !this.showEditForm[entry._id];
     this.isEditing = this.showEditForm[entry._id];
     this.addManagerContainer = false;
-    if (!this.$scope.$$phase) this.$scope.$digest();
+    this.$scope.$applyAsync();
   }
 
   // Save settings function
@@ -453,7 +453,7 @@ export class SettingsController {
       this.printError(error);
     }
     this.savingApi = false;
-    if (!this.$scope.$$phase) this.$scope.$digest();
+    this.$scope.$applyAsync();
     return;
   }
 
@@ -523,7 +523,7 @@ export class SettingsController {
       this.printError(error, true);
     }
     this.savingApi = false;
-    if (!this.$scope.$$phase) this.$scope.$digest();
+    this.$scope.$applyAsync();
     return;
   }
 
@@ -563,7 +563,7 @@ export class SettingsController {
       this.apiIsDown = false;
       this.errorHandler.info('Connection success', 'Settings');
 
-      if (!this.$scope.$$phase) this.$scope.$digest();
+      this.$scope.$applyAsync();
       return;
     } catch (error) {
       if (!this.wzMisc.getApiIsDown()) this.printError(error);
@@ -581,7 +581,7 @@ export class SettingsController {
       this.apiEntries[
         this.currentApiEntryIndex
       ]._source.extensions = currentExtensions;
-      if (!this.$scope.$$phase) this.$scope.$digest();
+      this.$scope.$applyAsync();
     } catch (error) {
       this.errorHandler.handle(error, 'Settings');
     }
@@ -605,7 +605,7 @@ export class SettingsController {
         'Settings'
       );
       this.selectedIndexPattern = newIndexPattern;
-      if (!this.$scope.$$phase) this.$scope.$digest();
+      this.$scope.$applyAsync();
       return;
     } catch (error) {
       this.errorHandler.handle(
@@ -636,7 +636,7 @@ export class SettingsController {
       const logs = await this.genericReq.request('GET', '/utils/logs', {});
       this.logs = logs.data.lastLogs.map(item => JSON.parse(item));
       this.loadingLogs = false;
-      if (!this.$scope.$$phase) this.$scope.$digest();
+      this.$scope.$applyAsync();
     } catch (error) {
       this.logs = [
         {
@@ -695,7 +695,7 @@ export class SettingsController {
       if (this.currentApiEntryIndex || this.currentApiEntryIndex === 0) {
         await this.checkManager(this.currentApiEntryIndex, true);
       }
-      if (!this.$scope.$$phase) this.$scope.$digest();
+      this.$scope.$applyAsync();
       return;
     } catch (error) {
       this.errorHandler.handle(

@@ -132,7 +132,7 @@ export function CdbListsController(
   // Reloading event listener
   $scope.$on('rulesetIsReloaded', () => {
     $scope.viewingDetail = false;
-    if (!$scope.$$phase) $scope.$digest();
+    $scope.$applyAsync();
   });
 
   $scope.$on('closeListView', () => {
@@ -197,7 +197,7 @@ export function CdbListsController(
       errorHandler.handle(error, '');
     }
     $scope.$broadcast('changeCdbList', { currentList: $scope.currentList });
-    if (!$scope.$$phase) $scope.$digest();
+    $scope.$applyAsync();
 
   });
 
@@ -213,7 +213,7 @@ export function CdbListsController(
     $scope.viewingDetail = false;
     $scope.currentList = false;
     $scope.$emit('removeCurrentList');
-    if (!$scope.$$phase) $scope.$digest();
+    $scope.$applyAsync();
   };
 
 
@@ -230,7 +230,7 @@ export function CdbListsController(
           $scope.currentList.details = false;
         }
         $scope.viewingDetail = true;
-        if (!$scope.$$phase) $scope.$digest();
+        $scope.$applyAsync();
     }catch (error) {
       errorHandler.handle(
         `Error fetching list: ${incomingList} from the Wazuh API`,

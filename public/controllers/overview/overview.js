@@ -194,7 +194,7 @@ export class OverviewController {
     } catch (error) {
       this.errorHandler.handle(error, 'Overview');
     }
-    if (!this.$scope.$$phase) this.$scope.$digest();
+    this.$scope.$applyAsync();
     return;
   }
 
@@ -263,7 +263,7 @@ export class OverviewController {
     } catch (error) {
       this.errorHandler.handle(error, 'Overview');
     }
-    if (!this.$scope.$$phase) this.$scope.$digest();
+    this.$scope.$applyAsync();
     return;
   }
 
@@ -326,7 +326,7 @@ export class OverviewController {
     } catch (error) {
       this.errorHandler.handle(error, 'Overview (init)');
     }
-    if (!this.$scope.$$phase) this.$scope.$digest();
+    this.$scope.$applyAsync();
     return;
   }
 }

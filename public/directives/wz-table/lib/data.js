@@ -34,7 +34,7 @@ export async function searchData(
       'Data factory'
     );
   }
-  if (!$scope.$$phase) $scope.$digest();
+  $scope.$applyAsync();
   return;
 }
 
@@ -72,7 +72,7 @@ export async function filterData(
       'Data factory'
     );
   }
-  if (!$scope.$$phase) $scope.$digest();
+  $scope.$applyAsync();
   return;
 }
 
@@ -109,6 +109,6 @@ export async function queryData(
       'Data factory'
     );
   }
-  if (!$scope.$$phase) $scope.$digest();
+  $scope.$applyAsync();
   return;
 }

@@ -118,7 +118,7 @@ export class LogsController {
       );
       const daemons = summary.data.data;
       this.daemons = Object.keys(daemons).map(item => ({ title: item }));
-      if (!this.$scope.$$phase) this.$scope.$digest();
+      this.$scope.$applyAsync();
     } catch (error) {
       this.errorHandler.handle(error, 'Logs');
     }
@@ -163,7 +163,7 @@ export class LogsController {
         : await this.apiReq.request('GET', '/manager/logs/summary', {});
       const daemons = data.data.data;
       this.daemons = Object.keys(daemons).map(item => ({ title: item }));
-      if (!this.$scope.$$phase) this.$scope.$digest();
+      this.$scope.$applyAsync();
       return;
     } catch (error) {
       this.errorHandler.handle(error, 'Logs');

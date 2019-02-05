@@ -67,7 +67,7 @@ export class ConfigurationGroupsController {
       this.$scope.editingFile = true;
       try {
         this.$scope.fetchedXML = await this.fetchFile();
-        if (!this.$scope.$$phase) this.$scope.$digest();
+        this.$scope.$applyAsync();
         this.$scope.$broadcast('fetchedFile', { data: this.$scope.fetchedXML });
       } catch (error) {
         this.$scope.fetchedXML = null;
@@ -81,7 +81,7 @@ export class ConfigurationGroupsController {
     };
     this.$scope.xmlIsValid = valid => {
       this.$scope.xmlHasErrors = valid;
-      if (!this.$scope.$$phase) this.$scope.$digest();
+      this.$scope.$applyAsync();
     };
     this.$scope.doSaveConfig = () => {
       this.$scope.editingFile = false;
@@ -106,14 +106,14 @@ export class ConfigurationGroupsController {
     this.$scope.custom_search = '';
     this.$scope.selectedItem = false;
 
-    if (!this.$scope.$$phase) this.$scope.$digest();
+    this.$scope.$applyAsync();
 
 
     //listeners
     this.$scope.$on('wazuhShowGroup', (event, parameters) => {
       this.$scope.selectedItem = parameters.group;
       this.$scope.editConfig();
-      if (!this.$scope.$$phase) this.$scope.$digest();
+      this.$scope.$applyAsync();
     });
   }
 }

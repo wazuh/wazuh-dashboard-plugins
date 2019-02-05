@@ -31,6 +31,6 @@ export async function sort(field, $scope, instance, fetch, errorHandler) {
       'Data factory'
     );
   }
-  if (!$scope.$$phase) $scope.$digest();
+  $scope.$applyAsync();
   return;
 }

@@ -52,7 +52,7 @@ export class DecodersController {
     // Reloading event listener
     this.$scope.$on('rulesetIsReloaded', () => {
       this.viewingDetail = false;
-      if (!this.$scope.$$phase) this.$scope.$digest();
+      this.$scope.$applyAsync();
     });
 
     this.$scope.$on('closeDecoderView', () => {
@@ -63,7 +63,7 @@ export class DecodersController {
       this.currentDecoder = parameters.decoder;
       this.$scope.$emit('setCurrentDecoder', { currentDecoder: this.currentDecoder });
       this.viewingDetail = true;
-      if (!this.$scope.$$phase) this.$scope.$digest();
+      this.$scope.$applyAsync();
     });
   }
 
@@ -203,7 +203,7 @@ export class DecodersController {
     this.$scope.editingFile = true;
     try {
       this.$scope.fetchedXML = await this.rulesetHandler.getDecoderConfiguration(this.currentDecoder.file);
-      if (!this.$scope.$$phase) this.$scope.$digest();
+      this.$scope.$applyAsync();
       this.$scope.$broadcast('fetchedFile', { data: this.$scope.fetchedXML });
     } catch (error) {
       this.$scope.fetchedXML = null;
@@ -216,7 +216,7 @@ export class DecodersController {
   };
   xmlIsValid = valid => {
     this.$scope.xmlHasErrors = valid;
-    if (!this.$scope.$$phase) this.$scope.$digest();
+    this.$scope.$applyAsync();
   };
   doSaveDecoderConfig = () => {
     this.$scope.editingFile = false;
@@ -247,6 +247,6 @@ export class DecodersController {
     this.currentDecoder = false;
     this.closeEditingFile();
     this.$scope.$emit('removeCurrentDecoder');
-    if (!this.$scope.$$phase) this.$scope.$digest();
+    this.$scope.$applyAsync();
   }
 }

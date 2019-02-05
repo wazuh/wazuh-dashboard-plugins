@@ -31,6 +31,6 @@ export async function initTable(
       'Data factory'
     );
   }
-  if (!$scope.$$phase) $scope.$digest();
+  $scope.$applyAsync();
   return;
 }

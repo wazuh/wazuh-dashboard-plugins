@@ -86,7 +86,7 @@ export class EditionController {
         this.$scope.fetchedXML = null;
         this.errorHandler.handle(error, 'Fetch file error');
       }
-      if (!this.$scope.$$phase) this.$scope.$digest();
+      this.$scope.$applyAsync();
     };
 
     this.$scope.saveConfiguration = async () => {
@@ -104,7 +104,7 @@ export class EditionController {
 
     this.$scope.xmlIsValid = valid => {
       this.$scope.xmlHasErrors = valid;
-      if (!this.$scope.$$phase) this.$scope.$digest();
+      this.$scope.$applyAsync();
     };
 
     this.$scope.edit = (node) => {
@@ -147,6 +147,6 @@ export class EditionController {
     }
 
     this.$scope.editConf();
-    if (!this.$scope.$$phase) this.$scope.$digest();
+    this.$scope.$applyAsync();
   }
 }

@@ -306,7 +306,7 @@ export class AgentsController {
           tabView: this.$scope.tabView
         });
       }
-      if (!this.$scope.$$phase) this.$scope.$digest();
+      this.$scope.$applyAsync();
     };
 
     this.$scope.goDiscover = () => this.goDiscover();
@@ -340,7 +340,7 @@ export class AgentsController {
         this.$scope.addingGroupToAgent = false;
         this.$scope.editGroup = false;
         this.errorHandler.info(`Group ${group} has been added.`, '');
-        if (!this.$scope.$$phase) this.$scope.$digest();
+        this.$scope.$applyAsync();
       } catch (error) {
         this.$scope.editGroup = false;
         this.$scope.addingGroupToAgent = false;
@@ -530,7 +530,7 @@ export class AgentsController {
     } catch (error) {
       return Promise.reject(error);
     }
-    if (!this.$scope.$$phase) this.$scope.$digest();
+    this.$scope.$applyAsync();
   }
 
   goDiscover() {
@@ -724,13 +724,13 @@ export class AgentsController {
       }
     }
     this.$scope.load = false;
-    if (!this.$scope.$$phase) this.$scope.$digest();
+    this.$scope.$applyAsync();
     return;
   }
 
   switchGroupEdit() {
     this.$scope.editGroup = !!!this.$scope.editGroup;
-    if (!this.$scope.$$phase) this.$scope.$digest();
+    this.$scope.$applyAsync();
   }
   /**
    * Navigate to the groups of an agent
