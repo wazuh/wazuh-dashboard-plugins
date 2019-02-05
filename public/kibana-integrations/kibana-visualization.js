@@ -150,7 +150,7 @@ app.directive('kbnVis', function() {
 
       // Listen for changes
       const updateVisWatcher = $rootScope.$on('updateVis', () => {
-        if (!$rootScope.$$phase) $rootScope.$digest();
+        $rootScope.$applyAsync();
         const rawVis = rawVisualizations.getList();
         if (Array.isArray(rawVis) && rawVis.length) {
           myRender(rawVis);
@@ -187,7 +187,7 @@ app.directive('kbnVis', function() {
           $rootScope.rendered = false;
         }
         // Forcing a digest cycle
-        if (!$rootScope.$$phase) $rootScope.$digest();
+        $rootScope.$applyAsync();
       };
 
       // Initializing the visualization
