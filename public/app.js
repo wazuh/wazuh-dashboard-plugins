@@ -53,7 +53,7 @@ app.run(function ($rootScope, $route, $location, appState, $window) {
   appState.setNavigation({
     reloaded: false,
     discoverPrevious: false,
-    discoverSections: ['/wazuh-discover/', '/overview/', '/agents']
+    discoverSections: ['/wazuh-discover/', '/overview/', '/agents', '/wazuh-dev']
   });
 
   $rootScope.$on('$routeChangeSuccess', () => {
@@ -91,7 +91,7 @@ app.run(function ($rootScope, $route, $location, appState, $window) {
             } else {
               $window.history.pushState({ page: 'wazuh#' + navigation.discoverPrevious }, '', 'wazuh#' + navigation.discoverPrevious);
             }
-          } else if (navigation.currLocation === navigation.discoverSections[0]) {
+          } else if (navigation.currLocation === navigation.discoverSections[0] || navigation.currLocation === navigation.discoverSections[3]) {
             $window.history.pushState(
               { page: 'wazuh#' + navigation.discoverPrevious },
               '',
