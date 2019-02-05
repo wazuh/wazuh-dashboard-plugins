@@ -216,14 +216,14 @@ export function CdbListsController(
     if (!$scope.$$phase) $scope.$digest();
   };
 
-  if ($location.search() && $location.search().listname) {
-    const incomingList = $location.search().listname;
-    $location.search('listname', null);
-    apiReq
-      .request('get', `/cdblists/${incomingList}`, {})
-      .then(data => {
-        $scope.currentList = data.data.data.items[0];
-        $scope.$emit('setCurrentList', { currentList: $scope.currentList });
+
+  $scope.fetchCdbList = async() => {
+    try{
+      const incomingList = $location.search().listname;
+      $location.search('listname', null);
+      const data =  await apiReq.request('get', `/cdblists/${incomingList}`, {});
+      $scope.currentList = data.data.data.items[0];
+      $scope.$emit('setCurrentList', { currentList: $scope.currentList });
         if (
           !(Object.keys(($scope.currentList || {}).details || {}) || []).length
         ) {
@@ -231,12 +231,15 @@ export function CdbListsController(
         }
         $scope.viewingDetail = true;
         if (!$scope.$$phase) $scope.$digest();
-      })
-      .catch(() =>
-        errorHandler.handle(
-          `Error fetching list: ${incomingList} from the Wazuh API`,
-          'CDB Lists'
-        )
-      );
+    }catch (error) {
+      errorHandler.handle(
+        `Error fetching list: ${incomingList} from the Wazuh API`,
+        'CDB Lists'
+      )
+    }
+  }
+
+  if ($location.search() && $location.search().listname) {
+    $scope.fetchCdbList();
   }
 }

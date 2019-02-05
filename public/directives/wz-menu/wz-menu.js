@@ -137,20 +137,19 @@ class WzMenu {
       }
     });
 
-    $scope.$on('updatePattern', () => {
-      if (!appState.getPatternSelector()) return;
-      indexPatterns
-        .get(appState.getCurrentPattern())
-        .then(() => {
-          $scope.theresPattern = true;
-          $scope.currentSelectedPattern = appState.getCurrentPattern();
-        })
-        .catch(error => {
-          errorHandler.handle(error, 'Directives - Menu');
-          $scope.theresPattern = false;
-        });
+    $scope.$on('updatePattern', async () => {
+      try {
+        if (!appState.getPatternSelector()) return;
+        await indexPatterns.get(appState.getCurrentPattern());
+        $scope.theresPattern = true;
+        $scope.currentSelectedPattern = appState.getCurrentPattern();
+      } catch (error) {
+        errorHandler.handle(error, 'Directives - Menu');
+        $scope.theresPattern = false;
+      }
     });
   }
 }
+
 
 app.directive('wzMenu', () => new WzMenu());

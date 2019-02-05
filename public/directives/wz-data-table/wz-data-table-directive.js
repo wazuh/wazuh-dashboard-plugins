@@ -19,7 +19,7 @@ import { checkGap } from '../wz-table/lib/check-gap';
 
 const app = uiModules.get('app/wazuh', []);
 
-app.directive('wzDataTable', function() {
+app.directive('wzDataTable', function () {
   return {
     restrict: 'E',
     scope: {
@@ -42,16 +42,19 @@ app.directive('wzDataTable', function() {
       let doit;
       let resizing = false;
       $window.onresize = () => {
-        if (resizing) return;
-        resizing = true;
-        clearTimeout(doit);
-        doit = setTimeout(() => {
-          $scope.rowsPerPage = calcTableRows($window.innerHeight, rowSizes);
-          $scope.itemsPerPage = $scope.rowsPerPage;
-          init()
-            .then(() => (resizing = false))
-            .catch(() => (resizing = false));
-        }, 150);
+        try {
+          if (resizing) return;
+          resizing = true;
+          clearTimeout(doit);
+          doit = setTimeout(async () => {
+            $scope.rowsPerPage = calcTableRows($window.innerHeight, rowSizes);
+            $scope.itemsPerPage = $scope.rowsPerPage;
+            await init();
+            resizing = false;
+          }, 150);
+        } catch (error) {
+          resizing = false;
+        }
       };
       $scope.rowsPerPage = calcTableRows($window.innerHeight, rowSizes);
 
@@ -121,7 +124,7 @@ app.directive('wzDataTable', function() {
       $scope.prevPage = () => pagination.prevPage($scope);
       $scope.nextPage = async currentPage =>
         pagination.nextPage(currentPage, $scope, errorHandler, fetch);
-      $scope.setPage = function() {
+      $scope.setPage = function () {
         $scope.currentPage = this.n;
         $scope.nextPage(this.n);
       };

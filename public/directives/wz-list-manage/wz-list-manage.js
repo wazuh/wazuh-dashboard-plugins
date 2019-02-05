@@ -96,15 +96,17 @@ app.directive('wzListManage', function () {
           fetch();
       });
 
-      const refresh = () => {
-        rulesetHandler.getCdbList(`etc/lists/${$scope.currentList.name}`)
-          .then(data => {
-            $scope.currentList.list = stringToObj(data.data.data);
-            fetch();
-            $scope.$emit('setCurrentList', { currentList: $scope.currentList });
-            $scope.viewingDetail = true;
-            if (!$scope.$$phase) $scope.$digest();
-          });
+      const refresh = async () => {
+        try {
+          const data = await rulesetHandler.getCdbList(`etc/lists/${$scope.currentList.name}`);
+          $scope.currentList.list = stringToObj(data.data.data);
+          fetch();
+          $scope.$emit('setCurrentList', { currentList: $scope.currentList });
+          $scope.viewingDetail = true;
+          if (!$scope.$$phase) $scope.$digest();
+        } catch (error) {
+          
+        }
       }
 
       $scope.$on('changeCdbList', (ev, params) => {

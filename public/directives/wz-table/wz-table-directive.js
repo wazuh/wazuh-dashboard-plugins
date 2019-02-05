@@ -77,16 +77,19 @@ app.directive('wzTable', function () {
       // Prevents duplicated rows when resizing
       let resizing = false;
       $window.onresize = () => {
-        if (resizing) return;
-        resizing = true;
-        clearTimeout(doit);
-        doit = setTimeout(() => {
-          $scope.rowsPerPage = calcTableRows($window.innerHeight, rowSizes);
-          $scope.itemsPerPage = $scope.rowsPerPage;
-          init()
-            .then(() => (resizing = false))
-            .catch(() => (resizing = false));
-        }, 150);
+        try {
+          if (resizing) return;
+          resizing = true;
+          clearTimeout(doit);
+          doit = setTimeout(async () => {
+            $scope.rowsPerPage = calcTableRows($window.innerHeight, rowSizes);
+            $scope.itemsPerPage = $scope.rowsPerPage;
+            await init();
+            resizing = false;
+          }, 150);
+        } catch (error) {
+          resizing = false;
+        }
       };
       $scope.rowsPerPage = calcTableRows($window.innerHeight, rowSizes);
 

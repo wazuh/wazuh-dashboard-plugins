@@ -108,23 +108,22 @@ const checkFiles = () => {
  * @param {*} message Message to show
  * @param {*} level Optional, default is 'error'
  */
-export function log(location, message, level) {
-  initDirectory()
-    .then(() => {
-      if (allowed) {
-        checkFiles();
-        wazuhlogger.log({
-          date: new Date(),
-          level: level || 'error',
-          location: location || 'unknown',
-          message: message || 'An error occurred'
-        });
-      }
-    })
-    .catch(error =>
-      // eslint-disable-next-line
-      console.error(
-        `Cannot create the logs directory due to:\n${error.message || error}`
-      )
+export async function log(location, message, level) {
+  try{
+    await initDirectory();
+    if (allowed) {
+      checkFiles();
+      wazuhlogger.log({
+        date: new Date(),
+        level: level || 'error',
+        location: location || 'unknown',
+        message: message || 'An error occurred'
+      });
+    }
+  }catch (error){
+    // eslint-disable-next-line
+    console.error(
+      `Cannot create the logs directory due to:\n${error.message || error}`
     );
+  }
 }

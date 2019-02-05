@@ -96,7 +96,16 @@ export class SettingsController {
    */
   $onInit() {
     // Loading data
-    this.getSettings().then(() => this.getAppInfo());
+    this.loadData();
+  }
+
+  async loadData() {
+    try {
+      await this.getSettings();
+      this.getAppInfo();
+    } catch (error) {
+      this.errorHandler.handle(error, 'Error loading data.');
+    }
   }
 
   /**

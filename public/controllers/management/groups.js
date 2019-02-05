@@ -574,11 +574,16 @@ export function GroupsController(
   };
 
   // Come from the pencil icon on the groups table
-  $scope.$on('openGroupFromList', (ev, parameters) => {
-    $scope.editingFile = true;
-    $scope.groupsSelectedTab = 'files';
-    appState.setNavigation({ status: true });
-    $location.search('navigation', true);
-    return $scope.loadGroup(parameters.group).then(() => $scope.editGroupAgentConfig());
+  $scope.$on('openGroupFromList', async (ev, parameters) => {
+    try {
+      $scope.editingFile = true;
+      $scope.groupsSelectedTab = 'files';
+      appState.setNavigation({ status: true });
+      $location.search('navigation', true);
+      await $scope.loadGroup(parameters.group);
+      $scope.editGroupAgentConfig();
+    } catch (error) {
+      errorHandler.handle(error, 'Groups');
+    }
   })
 }

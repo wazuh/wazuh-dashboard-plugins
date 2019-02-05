@@ -200,7 +200,7 @@ export function ClusterController(
    * This creatie custom filters for visualizations for a given node
    * @param {Object} node
    */
-  const assignFilters = (node = false) => {
+  const assignFilters = async(node = false) => {
     try {
       filters = [];
       filters.push(
@@ -212,7 +212,8 @@ export function ClusterController(
 
       $rootScope.$emit('wzEventFilters', { filters, localChange: false });
       if (!$rootScope.$$listenerCount['wzEventFilters']) {
-        $timeout(100).then(() => assignFilters(node));
+        await $timeout(100);
+        assignFilters(node);
       }
     } catch (error) {
       errorHandler.handle(
