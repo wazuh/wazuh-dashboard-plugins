@@ -29,6 +29,7 @@ export class ManagementController {
     this.$scope = $scope;
     this.$rootScope = $rootScope;
     this.$location = $location;
+    this.appState = appState;
     this.shareAgent = shareAgent;
     this.wazuhConfig = wazuhConfig;
     this.tab = 'welcome';
@@ -43,37 +44,38 @@ export class ManagementController {
     });
     this.$scope.$on('removeCurrentGroup', () => {
       this.currentGroup = false;
+      this.appState.setNavigation({ status: true });
     });
     this.$scope.$on('setCurrentRule', (ev, params) => {
       this.currentRule = (params || {}).currentRule || false;
-      $location.search('currentRule', true);
-      appState.setNavigation({ status: true });
+      this.$location.search('currentRule', true);
+      this.appState.setNavigation({ status: true });
     });
     this.$scope.$on('removeCurrentRule', () => {
       this.currentRule = false;
-      appState.setNavigation({ status: true });
-      $location.search('currentRule', null);
+      this.appState.setNavigation({ status: true });
+      this.$location.search('currentRule', null);
     });
     this.$scope.$on('setCurrentDecoder', (ev, params) => {
       this.currentDecoder = (params || {}).currentDecoder || false;
-      $location.search('currentDecoder', true);
-      appState.setNavigation({ status: true });
+      this.$location.search('currentDecoder', true);
+      this.appState.setNavigation({ status: true });
     });
     this.$scope.$on('removeCurrentDecoder', () => {
       this.currentDecoder = false;
-      appState.setNavigation({ status: true });
-      $location.search('currentDecoder', null);
+      this.appState.setNavigation({ status: true });
+      this.$location.search('currentDecoder', null);
     });
     this.$scope.$on('setCurrentList', (ev, params) => {
       this.currentList = (params || {}).currentList || false;
-      $location.search('currentList', true);
-      appState.setNavigation({ status: true });
+      this.$location.search('currentList', true);
+      this.appState.setNavigation({ status: true });
       if (!this.$scope.$$phase) this.$scope.$digest();
     });
     this.$scope.$on('removeCurrentList', () => {
       this.currentList = false;
-      appState.setNavigation({ status: true });
-      $location.search('currentList', null);
+      this.appState.setNavigation({ status: true });
+      this.$location.search('currentList', null);
     });
     this.$scope.$on('setCurrentConfiguration', (ev, params) => {
       this.currentConfiguration = (params || {}).currentConfiguration || false;
