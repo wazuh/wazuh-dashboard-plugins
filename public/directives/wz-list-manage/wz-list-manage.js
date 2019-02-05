@@ -104,9 +104,7 @@ app.directive('wzListManage', function () {
           $scope.$emit('setCurrentList', { currentList: $scope.currentList });
           $scope.viewingDetail = true;
           $scope.$applyAsync();
-        } catch (error) {
-          
-        }
+        } catch (error) { } // eslint-disable-line
       }
 
       $scope.$on('changeCdbList', (ev, params) => {
