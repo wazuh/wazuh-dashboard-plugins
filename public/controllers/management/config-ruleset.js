@@ -51,7 +51,7 @@ export class ConfigurationRulesetController {
         this.$scope.fetchedXML = this.$scope.selectedRulesetTab === 'rules' ?
           await this.rulesetHandler.getRuleConfiguration(this.$scope.selectedItem.file) :
           await this.rulesetHandler.getDecoderConfiguration(this.$scope.selectedItem.file)
-        if (!this.$scope.$$phase) this.$scope.$digest();
+        this.$scope.$applyAsync();
         this.$scope.$broadcast('fetchedFile', { data: this.$scope.fetchedXML });
       } catch (error) {
         this.$scope.fetchedXML = null;
@@ -66,7 +66,7 @@ export class ConfigurationRulesetController {
     };
     this.$scope.xmlIsValid = valid => {
       this.$scope.xmlHasErrors = valid;
-      if (!this.$scope.$$phase) this.$scope.$digest();
+      this.$scope.$applyAsync();
     };
 
     this.$scope.doSaveConfig = (isNewFile, fileName) => {
@@ -107,7 +107,7 @@ export class ConfigurationRulesetController {
       this.$scope.selectedItem = { file: 'new file' }
       this.$scope.fetchedXML = '<!-- Modify it at your will. -->';
       this.$scope.type = type;
-      if (!this.$scope.$$phase) this.$scope.$digest();
+      this.$scope.$applyAsync();
       this.$scope.$broadcast('fetchedFile', { data: this.$scope.fetchedXML });
     };
 
@@ -131,7 +131,7 @@ export class ConfigurationRulesetController {
       if (rulesettab === 'cdblists') {
         this.$scope.searchPlaceholder = 'Filter CDB lists...'
       }
-      if (!this.$scope.$$phase) this.$scope.$digest();
+      this.$scope.$applyAsync();
     };
     this.$scope.switchRulesetTab('rules');
 
@@ -161,19 +161,19 @@ export class ConfigurationRulesetController {
         this.errorHandler.handle(error, '');
       }
       this.$scope.$broadcast('changeCdbList', { currentList: this.$scope.currentList });
-      if (!this.$scope.$$phase) this.$scope.$digest();
+      this.$scope.$applyAsync();
     });
     this.$scope.$on('wazuhShowRule', (event, parameters) => {
       this.$scope.selectedItem = parameters.rule;
       this.$scope.selectedFileName = 'rules';
       this.$scope.editConfig();
-      if (!this.$scope.$$phase) this.$scope.$digest();
+      this.$scope.$applyAsync();
     });
     this.$scope.$on('wazuhShowDecoder', (event, parameters) => {
       this.$scope.selectedItem = parameters.decoder;
       this.$scope.selectedFileName = 'decoders';
       this.$scope.editConfig();
-      if (!this.$scope.$$phase) this.$scope.$digest();
+      this.$scope.$applyAsync();
     });
   }
 }

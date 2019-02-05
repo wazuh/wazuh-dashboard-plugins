@@ -103,7 +103,7 @@ app.directive('wzListManage', function () {
             fetch();
             $scope.$emit('setCurrentList', { currentList: $scope.currentList });
             $scope.viewingDetail = true;
-            if (!$scope.$$phase) $scope.$digest();
+            $scope.$applyAsync();
           });
       }
 
@@ -124,7 +124,7 @@ app.directive('wzListManage', function () {
           fetch();
           errorHandler.info(result.data.data, '');
           $scope.loadingChange = false;
-          if (!$scope.$$phase) $scope.$digest();
+          $scope.$applyAsync();
         } catch (err) {
           refresh();
           errorHandler.handle(err, 'Error updating list');

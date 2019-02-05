@@ -181,7 +181,7 @@ app.directive('wzTable', function () {
           $scope.error = false;
           while (realTime) {
             await fetch({ realTime: true, limit: 10 });
-            if (!$scope.$$phase) $scope.$digest();
+            $scope.$applyAsync();
             await $timeout(1000);
           }
         } catch (error) {

@@ -176,7 +176,7 @@ export function RulesController(
   // Reloading event listener
   $scope.$on('rulesetIsReloaded', () => {
     $scope.viewingDetail = false;
-    if (!$scope.$$phase) $scope.$digest();
+    $scope.$applyAsync();
   });
 
   /**
@@ -221,14 +221,14 @@ export function RulesController(
       $scope.currentRule.details = false;
     }
     $scope.viewingDetail = true;
-    if (!$scope.$$phase) $scope.$digest();
+    $scope.$applyAsync();
   });
 
   $scope.editRulesConfig = async () => {
     $scope.editingFile = true;
     try {
       $scope.fetchedXML = await rulesetHandler.getRuleConfiguration($scope.currentRule.file)
-      if (!$scope.$$phase) $scope.$digest();
+      $scope.$applyAsync();
       $scope.$broadcast('fetchedFile', { data: $scope.fetchedXML });
     } catch (error) {
       $scope.fetchedXML = null;
@@ -241,7 +241,7 @@ export function RulesController(
   };
   $scope.xmlIsValid = valid => {
     $scope.xmlHasErrors = valid;
-    if (!$scope.$$phase) $scope.$digest();
+    $scope.$applyAsync();
   };
   $scope.doSaveRuleConfig = () => {
     $scope.editingFile = false;
@@ -261,7 +261,7 @@ export function RulesController(
     $scope.currentRule = false;
     $scope.closeEditingFile();
     $scope.$emit('removeCurrentRule');
-    if (!$scope.$$phase) $scope.$digest();
+    $scope.$applyAsync();
   };
 
   if ($location.search() && $location.search().ruleid) {
@@ -278,7 +278,7 @@ export function RulesController(
           $scope.currentRule.details = false;
         }
         $scope.viewingDetail = true;
-        if (!$scope.$$phase) $scope.$digest();
+        $scope.$applyAsync();
       })
       .catch(() =>
         errorHandler.handle(

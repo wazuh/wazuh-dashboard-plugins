@@ -31,7 +31,7 @@ export function GroupsController(
     $scope.currentGroup = false;
     $scope.$emit('removeCurrentGroup');
     $scope.lookingGroup = false;
-    if (!$scope.$$phase) $scope.$digest();
+    $scope.$applyAsync();
   });
 
   $scope.load = true;
@@ -104,7 +104,7 @@ export function GroupsController(
       $scope.adminMode = !!(configuration || {}).admin;
       $scope.load = false;
 
-      if (!$scope.$$phase) $scope.$digest();
+      $scope.$applyAsync();
     } catch (error) {
       errorHandler.handle(error, 'Groups');
     }
@@ -145,7 +145,7 @@ export function GroupsController(
       }
       $scope.$emit('setCurrentGroup', { currentGroup: $scope.currentGroup });
       $scope.fileViewer = false;
-      if (!$scope.$$phase) $scope.$digest();
+      $scope.$applyAsync();
     } catch (error) {
       errorHandler.handle(error, 'Groups');
     }
@@ -196,7 +196,7 @@ export function GroupsController(
     } catch (error) {
       errorHandler.handle(error, 'Groups');
     }
-    if (!$scope.$$phase) $scope.$digest();
+    $scope.$applyAsync();
     return;
   };
 
@@ -209,7 +209,7 @@ export function GroupsController(
     $scope.groupsSelectedTab = 'agents';
     $scope.file = false;
     $scope.filename = false;
-    if (!$scope.$$phase) $scope.$digest();
+    $scope.$applyAsync();
   };
 
   /**
@@ -222,7 +222,7 @@ export function GroupsController(
     $scope.file = false;
     $scope.filename = false;
     $scope.fileViewer = false;
-    if (!$scope.$$phase) $scope.$digest();
+    $scope.$applyAsync();
   };
 
   /**
@@ -233,7 +233,7 @@ export function GroupsController(
     $scope.$emit('removeCurrentGroup');
     $scope.lookingGroup = false;
     $scope.editingFile = false;
-    if (!$scope.$$phase) $scope.$digest();
+    $scope.$applyAsync();
   };
 
   /**
@@ -249,7 +249,7 @@ export function GroupsController(
       $scope.file = beautifier.prettyPrint(data.data.data);
       $scope.filename = fileName;
 
-      if (!$scope.$$phase) $scope.$digest();
+      $scope.$applyAsync();
     } catch (error) {
       errorHandler.handle(error, 'Groups');
     }
@@ -283,7 +283,7 @@ export function GroupsController(
       $scope.fetchedXML = null;
       errorHandler.handle(error, 'Fetch file error');
     }
-    if (!$scope.$$phase) $scope.$digest();
+    $scope.$applyAsync();
   };
 
   $scope.closeEditingFile = () => {
@@ -293,7 +293,7 @@ export function GroupsController(
 
   $scope.xmlIsValid = valid => {
     $scope.xmlHasErrors = valid;
-    if (!$scope.$$phase) $scope.$digest();
+    $scope.$applyAsync();
   };
 
   $scope.doSaveGroupAgentConfig = () => {
@@ -303,7 +303,7 @@ export function GroupsController(
 
   $scope.$on('configurationSuccess', () => {
     $scope.editingFile = false;
-    if (!$scope.$$phase) $scope.$digest();
+    $scope.$applyAsync();
   });
 
   $scope.reload = async (element, searchTerm, addOffset, start) => {
@@ -330,7 +330,7 @@ export function GroupsController(
     }
 
     $scope.multipleSelectorLoading = false;
-    if (!$scope.$$phase) $scope.$digest();
+    $scope.$applyAsync();
   };
 
   $scope.loadSelectedAgents = async searchTerm => {
@@ -449,7 +449,7 @@ export function GroupsController(
     } catch (error) {
       errorHandler.handle(error, 'Error adding agents');
     }
-    if (!$scope.$$phase) $scope.$digest();
+    $scope.$applyAsync();
     return;
   };
 
@@ -521,7 +521,7 @@ export function GroupsController(
       $scope.multipleSelectorLoading = false;
       errorHandler.handle(err, 'Error applying changes');
     }
-    if (!$scope.$$phase) $scope.$digest();
+    $scope.$applyAsync();
     return;
   };
 

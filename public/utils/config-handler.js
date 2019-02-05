@@ -74,7 +74,7 @@ export class ConfigurationHandler {
         );
       }
       $scope.load = false;
-      if (!$scope.$$phase) $scope.$digest();
+      $scope.$applyAsync();
     } catch (error) {
       this.errorHandler.handle(error, 'Manager');
       $scope.load = false;
@@ -123,7 +123,7 @@ export class ConfigurationHandler {
       }
 
       $scope.load = false;
-      if (!$scope.$$phase) $scope.$digest();
+      $scope.$applyAsync();
     } catch (error) {
       this.errorHandler.handle(error, 'Manager');
       $scope.load = false;
@@ -179,7 +179,7 @@ export class ConfigurationHandler {
     $scope.JSONContent = false;
     $scope.configurationSubTab = false;
     $scope.configurationTab = configurationTab;
-    if (!$scope.$$phase) $scope.$digest();
+    $scope.$applyAsync();
   }
 
   /**
@@ -191,7 +191,7 @@ export class ConfigurationHandler {
     $scope.XMLContent = false;
     $scope.JSONContent = false;
     $scope.configurationSubTab = configurationSubTab;
-    if (!$scope.$$phase) $scope.$digest();
+    $scope.$applyAsync();
   }
 
   /**
@@ -215,7 +215,7 @@ export class ConfigurationHandler {
         $scope.XMLContent = false;
       }
     }
-    if (!$scope.$$phase) $scope.$digest();
+    $scope.$applyAsync();
   }
 
   json2xml(data,$scope) {
@@ -246,7 +246,7 @@ export class ConfigurationHandler {
         $scope.JSONContent = false;
       }
     }
-    if (!$scope.$$phase) $scope.$digest();
+    $scope.$applyAsync();
   }
 
   reset($scope) {

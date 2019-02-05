@@ -189,7 +189,7 @@ export function ClusterController(
       assignFilters($scope.currentNode.name);
       $rootScope.$broadcast('updateVis');
 
-      if (!$scope.$$phase) $scope.$digest();
+      $scope.$applyAsync();
     } catch (error) {
       errorHandler.handle(error, 'Cluster');
     }
@@ -279,7 +279,7 @@ export function ClusterController(
       $rootScope.$broadcast('updateVis');
 
       $scope.loading = false;
-      if (!$scope.$$phase) $scope.$digest();
+      $scope.$applyAsync();
       return;
     } catch (error) {
       $scope.loading = false;

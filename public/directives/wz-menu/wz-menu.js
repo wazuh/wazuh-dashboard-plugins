@@ -88,7 +88,7 @@ class WzMenu {
           $scope.patternList = list;
           $scope.currentSelectedPattern = appState.getCurrentPattern();
         }
-        if (!$scope.$$phase) $scope.$digest();
+        $scope.$applyAsync();
         if (!$rootScope.$$phase) $rootScope.$digest();
         return;
       } catch (error) {
@@ -106,7 +106,7 @@ class WzMenu {
         $scope.currentSelectedPattern = await patternHandler.changePattern(
           selectedPattern
         );
-        if (!$scope.$$phase) $scope.$digest();
+        $scope.$applyAsync();
         $window.location.reload();
         return;
       } catch (error) {

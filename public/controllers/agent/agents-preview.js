@@ -202,9 +202,8 @@ export class AgentsPreviewController {
           this.mostActiveAgent.id = info.data.data;
         }
       }
-
       this.loading = false;
-      if (!this.$scope.$$phase) this.$scope.$digest();
+      this.$scope.$applyAsync();
       return;
     } catch (error) {
       this.errorHandler.handle(error, 'Agents Preview');
@@ -213,6 +212,6 @@ export class AgentsPreviewController {
   }
 
   reloadList() {
-    this.$scope.$broadcast('wazuhSearch', { term:'' });
+    this.$scope.$broadcast('wazuhSearch', { term: '' });
   }
 }

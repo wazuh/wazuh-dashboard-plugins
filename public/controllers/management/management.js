@@ -59,7 +59,7 @@ export class ManagementController {
       this.currentList = (params || {}).currentList || false;
       $location.search('currentList', true);
       appState.setNavigation({ status: true });
-      if (!this.$scope.$$phase) this.$scope.$digest();
+      this.$scope.$applyAsync();
     });
     this.$scope.$on('removeCurrentList', () => {
       this.currentList = false;
