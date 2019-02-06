@@ -1,6 +1,6 @@
 <div flex layout="column" class="mozilla-table-size-85" ng-class="{'cursor-wait': multipleSelectorLoading}"
     ng-controller="groupsPreviewController" ng-if="mctrl.tab == 'groups'">
-    <md-content flex layout="column" class="overflow-hidden" ng-init="lookingGroup=false">
+    <md-content flex layout="column" class=" overflow-hidden" ng-init="lookingGroup=false">
 
         <!-- Loading ring -->
         <div class='uil-ring-css' ng-show="load">
@@ -11,10 +11,11 @@
         <div ng-show="!load" layout="column" layout-padding ng-if="!currentGroup || !currentGroup.name">
             <div layout="row">
                 <span class="font-size-18">
-                    <i class="fa fa-fw fa-object-group" aria-hidden="true"></i> Groups</span>
-                <span ng-if='adminMode' class="font-size-18 wz-text-link" ng-click="switchAddingGroup()"><i class="fa fa-fw fa-plus-circle"></i></span>
+                    <i class="fa fa-fw fa-object-group" aria-hidden="true"></i> Groups </span>
+                <span ng-if='adminMode' class="font-size-18 wz-text-link" ng-click="switchAddingGroup()"> <i class="fa fa-fw"
+                        ng-class="!addingGroup ? 'fa-plus-circle' : 'fa-minus-circle'"></i></span>
             </div>
-            <div layout="row" ng-if="addingGroup" ng-if='adminMode'>
+            <div layout="row" ng-if="addingGroup" ng-if='adminMode' class="wz-padding-bottom-0">
                 <input placeholder="Group name..." ng-model="groupToBeAdded" type="text" class="kuiLocalSearchInput addGroupInput ng-empty ng-pristine ng-scope ng-touched ng-valid"
                     aria-invalid="false">
                 <button type="submit" aria-label="Search" class="kuiLocalSearchButton addGroupBtn" ng-click="createGroup(groupToBeAdded)">
@@ -24,8 +25,6 @@
             <div layout="row" ng-if="!addingGroup">
                 <span class="md-subheader">List and check your groups, its agents and files</span>
             </div>
-
-
         </div>
         <!-- End headline -->
 
@@ -33,14 +32,10 @@
             <!-- MD5 Sums and Details cards -->
             <div layout="row" class="md-padding-h" ng-if="lookingGroup">
                 <!-- Group MD5 sums section -->
-                <md-card flex class="no-margin-left wz-md-card">
+                <md-card flex class="no-margin-left no-margin-right wz-margin-top-8 wz-md-card">
                     <md-card-content>
-                        <div layout="row">
-                            <span class="font-size-18">
-                                <i class="fa fa-fw fa-object-group" aria-hidden="true"></i> {{currentGroup.name}}</span>
-
-                        </div>
-
+                        <span class="wz-headline-title font-size-18"><i class="fa fa-fw fa-object-group" aria-hidden="true"></i>
+                            {{currentGroup.name}}</span>
                         <md-divider class="wz-margin-top-10"></md-divider>
                         <div layout="row" class="wz-padding-top-10">
                             <span flex="15">Agents</span>
@@ -63,7 +58,7 @@
             </div>
 
             <!-- End group actions -->
-            <md-nav-bar ng-if="lookingGroup && currentGroup && !addingAgents && !editingFile" class="wz-nav-bar wz-margin-left-16 wz-margin-right-16"
+            <md-nav-bar ng-if="lookingGroup && currentGroup && !addingAgents && !editingFile" class="wz-nav-bar"
                 md-selected-nav-item="groupsSelectedTab">
                 <md-nav-item class="wz-nav-item" md-nav-click="goBackToAgents()" name="agents">Agents</md-nav-item>
                 <md-nav-item class="wz-nav-item" md-nav-click="goBackFiles()" name="files">Content</md-nav-item>
@@ -71,7 +66,7 @@
 
             <!-- XML editor for group agents -->
             <div ng-show="editingFile">
-                <div layout="row" class="md-padding">
+                <div layout="row" class="md-padding-h wz-margin-top-10">
                     <span ng-click='closeEditingFile()' class='btn btn-info'>Cancel</span>
                     <button ng-disabled='xmlHasErrors' ng-click='doSaveGroupAgentConfig()' class='btn btn-primary pull-right wz-margin-left-8'>
                         <span ng-show='!xmlHasErrors'><i aria-hidden='true' class='fa fa-fw fa-save'></i>Save file</span>
@@ -79,9 +74,9 @@
                             XML format error</span>
                     </button>
                 </div>
-                <div class="md-padding md-padding-top-10" ng-if="fetchedXML">
-                    <wz-xml-file-editor file-name='agent.conf' data="fetchedXML" target-name="currentGroup.name"
-                        valid-fn='xmlIsValid(valid)'>
+                <div class="md-padding md-padding-top-10" style="height: calc(100vh - 350px);" ng-if="fetchedXML">
+                    <wz-xml-file-editor file-name='agent.conf' data="fetchedXML" target-name="currentGroup.name + ' group'"
+                        valid-fn='xmlIsValid(valid)' close-fn='closeEditingFile(reload)'>
                     </wz-xml-file-editor>
                 </div>
             </div>
@@ -98,6 +93,17 @@
                         possible to apply changes of more than 500 additions or deletions</span>
                 </div>
 
+                <div layout="row" class="md-padding wz-padding-bottom-0" ng-if="lookingGroup && currentGroup && !addingAgents && !editingFile && !file && adminMode">
+                    <button ng-if="lookingGroup && groupsSelectedTab==='files'" ng-click='editGroupAgentConfig(currentGroup)'
+                        class='btn btn-primary'><i aria-hidden='true' class='fa fa-fw fa-pencil'></i>
+                        Edit group configuration
+                    </button>
+                    <button ng-if="lookingGroup && groupsSelectedTab==='agents'" ng-disabled="currentGroup.name === 'default'"
+                        ng-click='addMultipleAgents(true)' class='btn btn-primary'><i aria-hidden='true' class='fa fa-fw fa-tv'></i>
+                        Add or remove agents
+                    </button>
+                </div>
+
                 <!-- Search bar -->
                 <div layout="row" class="md-padding" ng-if="!addingAgents && !file">
                     <input placeholder="{{groupsSelectedTab==='files' ? 'Filter files...' : lookingGroup ? 'Filter agents...' : 'Filter groups...'}}"
@@ -109,23 +115,16 @@
                 </div>
                 <!-- End search bar -->
 
-                <div layout="row" class="wz-margin-left-16" ng-if="lookingGroup && currentGroup && !addingAgents && !editingFile && !file && adminMode">
-                    <button ng-if="lookingGroup && groupsSelectedTab==='files'" ng-click='editGroupAgentConfig(currentGroup)'
-                        class='btn btn-primary'><i aria-hidden='true' class='fa fa-fw fa-pencil'></i>
-                        Edit group configuration
-                    </button>
-                    <button ng-if="lookingGroup && groupsSelectedTab==='agents'" ng-disabled="currentGroup.name === 'default'"
-                        ng-click='addMultipleAgents(true)' class='btn btn-primary'><i aria-hidden='true' class='fa fa-fw fa-tv'></i>
-                        Add or remove agents
-                    </button>
-                </div>
-
                 <!-- Groups table -->
-                <div layout="row" ng-if="!lookingGroup" class="md-padding">
-                    <wz-table flex extra-limit="100" path="'/agents/groups'" keys="['name','count','mergedSum']"
-                        allow-click="true" row-sizes="[14,12,10]">
-                    </wz-table>
-                </div>
+                <md-card flex class="wz-md-card _md flex md-margin-h" ng-if="!lookingGroup">
+                    <md-card-content>
+                        <div layout="row">
+                            <wz-table flex extra-limit="100" path="'/agents/groups'" keys="['name','count','mergedSum']"
+                                allow-click="true" row-sizes="[14,12,10]">
+                            </wz-table>
+                        </div>
+                    </md-card-content>
+                </md-card>
                 <!-- End groups table -->
 
                 <!-- CSV Download button section for groups -->
@@ -139,10 +138,14 @@
 
                 <div ng-if='!addingAgents'>
                     <!-- Group agents table -->
-                    <div layout="row" ng-if="lookingGroup && groupsSelectedTab==='agents' && currentGroup" class="md-padding">
-                        <wz-table flex path="'/agents/groups/' + currentGroup.name" keys="['id','name','ip','status','os.name','os.version','version']"
-                            allow-click="true" row-sizes="[14,12,10]" empty-results="'No agents were added to this group.'"/>
-                    </div>
+                    <md-card flex class="wz-md-card _md flex md-margin-h" ng-if="lookingGroup && groupsSelectedTab==='agents' && currentGroup">
+                        <md-card-content>
+                            <div layout="row">
+                                <wz-table flex path="'/agents/groups/' + currentGroup.name" keys="['id','name','ip','status','os.name','os.version','version']"
+                                    allow-click="true" row-sizes="[14,12,10]" empty-results="'No agents were added to this group.'" />
+                            </div>
+                        </md-card-content>
+                    </md-card>
                     <!-- End Group agents table -->
 
                     <!-- CSV Download button section for group agents -->
@@ -155,12 +158,16 @@
                     <!-- End CSV Download button section for group agents -->
 
                     <!-- Group files table -->
-                    <div layout="row" ng-if="lookingGroup && groupsSelectedTab==='files' && !fileViewer && currentGroup"
-                        class="md-padding">
-                        <wz-table extra-limit="100" flex path="'/agents/groups/' + currentGroup.name + '/files'" keys="[{value:'filename',size:2},{value:'hash',size:6}]"
-                            allow-click="true" row-sizes="[10,8,6,4]">
-                        </wz-table>
-                    </div>
+                    <md-card flex class="wz-md-card _md flex md-margin-h" ng-if="lookingGroup && groupsSelectedTab==='files' && !fileViewer && currentGroup">
+                        <md-card-content>
+                            <div layout="row">
+                                <wz-table extra-limit="100" flex path="'/agents/groups/' + currentGroup.name + '/files'"
+                                    keys="[{value:'filename',size:2},{value:'hash',size:6}]" allow-click="true"
+                                    row-sizes="[10,8,6,4]">
+                                </wz-table>
+                            </div>
+                        </md-card-content>
+                    </md-card>
                     <!-- End Group files table -->
 
                     <!-- CSV Download button section for group files-->

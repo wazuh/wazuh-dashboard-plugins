@@ -1,47 +1,90 @@
-<div layout="column" layout-align="start stretch" ng-if="tab === 'welcome'" ng-show="!load">
-
-    <!-- Headline -->
-    <div layout="column" layout-padding>
-        <span class="font-size-18"><i class="fa fa-fw fa-tv" aria-hidden="true"></i> Agent overview</span>
-    </div>
-    <!-- End headline -->
-
-    <!-- Agent information section -->
-    <div layout="row" layout-padding class="wz-padding-top-0 wz-padding-bottom-0">
-        <md-card flex class="wz-metric-color wz-md-card wz-no-padding">
-            <md-card-content layout="row" class="wz-padding-metric">
-                <div class="wz-text-truncatable" flex>
-                    Name: <span class="wz-text-bold">{{ agent.name }}</span>
-                    <md-tooltip ng-if="agent.name.length > 25" md-direction="bottom" class="wz-tooltip">
-                        Full name: {{ agent.name }}
-                    </md-tooltip>
+<div layout="column" class="" layout-align="start stretch" ng-if="tab === 'welcome'" ng-show="!load && !agent">
+    <div layout="row" class="layout-padding">
+        <md-card flex class="wz-md-card" flex>
+            <md-card-content class="wz-text-center">
+                <div layout="row" layout-padding>
+                    <i class="fa fa-fw fa-info-circle" aria-hidden="true"></i> <span class="wz-headline-title">Could not fetch data for this agent. <span ng-if="emptyAgent">Reason: {{emptyAgent}}</span></span>
                 </div>
-                <div class="wz-text-truncatable" flex>
-                    IP: <span class="wz-text-bold">{{ agent.ip }}</span>
-                </div>
-                <div class="wz-text-truncatable" flex ng-if="agent.version">
-                    Version: <span class="wz-text-bold">{{ agent.version }}</span>
-                </div>
-                <div class="wz-text-truncatable" flex>
-                    OS: <span class="wz-text-bold">{{ agentOS }}</span>
-                    <md-tooltip ng-if="agentOS.length > 25" md-direction="bottom" class="wz-tooltip">
-                        Full OS name: {{ agentOS }}
-                    </md-tooltip>
-                </div>
-                <div class="wz-text-truncatable" flex>
-                    <span class="wz-text-bold wz-text-link" ng-click="goDiscover()"><i class="fa fa-fw fa-compass" aria-hidden="true"></i> Discover</span>
-                </div>
+                <div layout="row" layout-padding ng-if="emptyAgent">
+                    <span class="wz-text-link" ng-click="getAgent()"><i class="fa fa-fw fa-refresh" aria-hidden="true"></i> Try again</span>
+                </div>               
             </md-card-content>
         </md-card>
     </div>
-    <div layout="row" layout-padding class="wz-padding-top-0 wz-padding-bottom-0" ng-if="agent.group">
-        <md-card flex class="wz-metric-color wz-md-card wz-no-padding">
-            <md-card-content class="wz-padding-metric">
-                <div class="layout-row wz-word-break">
-                    <span class="wz-text-link" ng-if='adminMode' ng-click="switchGroupEdit()"><i class="fa fa-fw fa-plus-circle"></i>&nbsp;</span>Groups:&nbsp;                    
-                    <span ng-repeat="group in agent.group" class="wz-text-bold wz-text-link" ng-click="goGroups(agent,$index)">{{ group }}&nbsp;</span>                   
+</div>
+<div layout="column" class="" layout-align="start stretch" ng-if="tab === 'welcome'" ng-show="!load && agent">
+
+    <!-- Headline -->
+    <div layout="column" layout-padding>
+        <span class="font-size-18"><i class="fa fa-fw fa-tv" aria-hidden="true"></i> {{ agent.name || '-' }} <span class="wz-text-bold wz-text-link" ng-click="goDiscover()" tooltip="Discover"><i class="fa fa-fw fa-compass" aria-hidden="true"></i></span></span>
+    </div>
+    <!-- End headline -->
+
+    <div layout="row" layout-padding class="wz-padding-top-0 wz-padding-bottom-0">
+        <md-card flex class="wz-md-card">
+            <md-card-content>
+                <div layout="row">
+                    <span class="font-size-16">Details</span>
+                </div>        
+                <md-divider class="wz-margin-top-10"></md-divider>
+                <div layout="row" layout-padding>
+                    <div layout="column" flex>
+                        <div layout="row" class="wz-padding-top-10">
+                            <span flex="15">Name</span>
+                            <span class="wz-text-right color-grey">{{ agent.name || '-' }}</span>
+                        </div>
+                        <div layout="row" class="wz-padding-top-10">
+                            <span flex="15">IP</span>
+                            <span class="wz-text-right color-grey">{{ agent.ip || '-'}}</span>
+                        </div>
+                        <div layout="row" class="wz-padding-top-10">
+                            <span flex="15">Version</span>
+                            <span class="wz-text-right color-grey">{{ agent.version || '-'}}</span>
+                        </div>
+                        <div layout="row" class="wz-padding-top-10">
+                            <span flex="15">OS</span>
+                            <span class="wz-text-right wz-text-truncatable color-grey">{{ agentOS || '-'}}</span>
+                            <md-tooltip ng-if="agentOS.length > 25" md-direction="bottom" class="wz-tooltip">
+                                Full OS name: {{ agentOS || '-'}}
+                            </md-tooltip>
+                        </div>
+                    </div>
+                    <div layout="column" flex>
+                        <div layout="row" class="wz-padding-top-10">
+                            <span flex="25">Last keep alive</span>
+                            <span class="wz-text-right color-grey">{{agent.lastKeepAlive || '-' }}</span>
+                        </div>
+                        <div layout="row" class="wz-padding-top-10">
+                            <span flex="25">Registration date</span>
+                            <span class="wz-text-right color-grey">{{agent.dateAdd || '-'}}</span>
+                        </div>
+                        <div layout="row" class="wz-padding-top-10">
+                            <span flex="25">Last syscheck scan</span>
+                            <span class="wz-text-right color-grey" ng-if="agent.syscheck.inProgress">Scan in progress</span>
+                            <span class="wz-text-right color-grey" ng-if="!agent.syscheck.inProgress">{{agent.syscheck.end || '-'}} <md-tooltip ng-if="!agent.syscheck.inProgress && agent.syscheck.start && agent.syscheck.end" md-direction="bottom" class="wz-tooltip">
+                                    Start time: {{ agent.syscheck.start || '-'}} <br>
+                                    End time: {{ agent.syscheck.end || '-'}} <br>
+                                    Duration time: {{ agent.syscheck.duration +' minutes' || '-'}}
+                            </md-tooltip></span>
+                            
+                        </div>
+                        <div layout="row" class="wz-padding-top-10">
+                            <span flex="25">Last rootcheck scan</span>
+                            <span class="wz-text-right color-grey" ng-if="agent.rootcheck.inProgress">Scan in progress</span>
+                            <span class="wz-text-right color-grey" ng-if="!agent.rootcheck.inProgress">{{agent.rootcheck.end || '-'}} <md-tooltip ng-if="!agent.rootcheck.inProgress && agent.rootcheck.start && agent.rootcheck.end" md-direction="bottom" class="wz-tooltip">
+                                    Start time: {{ agent.rootcheck.start || '-'}} <br>
+                                    End time: {{ agent.rootcheck.end || '-'}} <br>
+                                    Duration time: {{ agent.rootcheck.duration +' minutes' || '-'}}
+                            </md-tooltip></span>
+                        </div>
+                    </div>
                 </div>
-                <div layout="row" class="wz-margin-top-10" ng-if="editGroup && !addingGroupToAgent">
+                <div layout="row" ng-if="agent.group">
+                    <span class="font-size-16">Groups <i ng-if='adminMode' tooltip="Add group" ng-click="switchGroupEdit()" class="wz-text-bold wz-text-link fa fa-fw" ng-class="!addingGroupToAgent ? 'fa-plus-circle' : 'fa-minus-circle'"></i></span>
+                    <md-divider class="wz-margin-top-10"></md-divider>
+                </div>        
+
+                <div layout="row" class="wz-margin-top-10" ng-if="agent.group && editGroup && !addingGroupToAgent">
                     <div class="wz-word-break" flex ng-if="groups && groups.length">
                         Available groups:
                     </div>
@@ -49,50 +92,26 @@
                         There are no more groups available.
                     </div>
                 </div>
-                <div ng-if="editGroup && !addingGroupToAgent" class="wz-margin-top-4" ng-if="groups && groups.length">
+                <div ng-if="agent.group && editGroup && !addingGroupToAgent && groups && groups.length" class="wz-margin-top-4">
                     <span ng-repeat="group in groups" class="wz-text-bold wz-text-link" ng-click="showConfirmAddGroup(group)">{{
                         group }}&nbsp;</span>
                 </div>
 
-                <div class="wz-margin-top-10" ng-if="editGroup && addingGroupToAgent">
+                <div class="wz-margin-top-10 confirmEmbedBubble" ng-if="agent.group && editGroup && addingGroupToAgent">
                     <div layout="row">
-                        <span class="euiToastHeader__title font-size-12">Group {{addingGroupToAgent}} will be added to agent {{agent.id}}</span>
+                        <span class="font-size-12  wz-padding-left-8">Group {{addingGroupToAgent}} will be added to agent {{agent.id}}</span>
                     </div>
                     <div layout="row">
-                        <md-button class="cancelBtnAgents" type="button" ng-click="cancelAddGroup()"><i aria-hidden='true' class='fa fa-fw fa-close'></i> Cancel</md-button>
-                        <md-button class="agreeBtnAgents" type="button" ng-click="confirmAddGroup(addingGroupToAgent)"><i aria-hidden='true' class='fa fa-fw fa-check'></i> Confirm</md-button>  
+                        <md-button class="cancelBtn" type="button" ng-click="cancelAddGroup()"><i aria-hidden='true' class='fa fa-fw fa-close'></i> Cancel</md-button>
+                        <md-button class="agreeBtn" type="button" ng-click="confirmAddGroup(addingGroupToAgent)"><i aria-hidden='true' class='fa fa-fw fa-check'></i> Confirm</md-button>  
                     </div>                          
                 </div>
-            </md-card-content>
+                <div layout="row" layout-padding ng-if="agent.group" class="wz-word-break">
+                    <span ng-repeat="group in agent.group" class="wz-text-bold wz-text-link" ng-click="goGroups(agent,$index)">{{ group }}&nbsp;</span>                   
+                </div>
+              </md-card-content>
         </md-card>
     </div>
-    <div layout="row" layout-padding class="wz-padding-top-0 wz-padding-bottom-0">
-        <md-card flex class="wz-metric-color wz-md-card wz-no-padding">
-            <md-card-content layout="row" class="wz-padding-metric">
-                <div class="wz-text-truncatable" flex>Last keep alive:<span class="wz-text-bold"> {{agent.lastKeepAlive || 'Unknown' }}</span></div>
-                <div class="wz-text-truncatable" flex>Registration date:<span class="wz-text-bold"> {{agent.dateAdd}}</span></div>
-                <div class="wz-text-truncatable" flex ng-if="agent.syscheck.inProgress">Last syscheck scan:<span class="wz-text-bold"> Scan in progress</span></div>
-                <div class="wz-text-truncatable" flex ng-if="!agent.syscheck.inProgress">Last syscheck scan:<span class="wz-text-bold"> {{agent.syscheck.end || 'Unknown'}}</span>
-                    <md-tooltip ng-if="!agent.syscheck.inProgress && agent.syscheck.start && agent.syscheck.end" md-direction="bottom" class="wz-tooltip">
-                        Start time: {{ agent.syscheck.start || 'Unknown'}} <br>
-                        End time: {{ agent.syscheck.end || 'Unknown'}} <br>
-                        Duration time: {{ agent.syscheck.duration +' minutes' || 'Unknown'}}
-                    </md-tooltip>
-                </div>
-                <div class="wz-text-truncatable" flex ng-if="agent.rootcheck.inProgress">Last rootcheck scan:<span class="wz-text-bold"> Scan in progress</span></div>
-                <div class="wz-text-truncatable" flex ng-if="!agent.rootcheck.inProgress">Last rootcheck scan:<span class="wz-text-bold"> {{agent.rootcheck.end || 'Unknown'}}</span>
-                    <md-tooltip ng-if="!agent.rootcheck.inProgress && agent.rootcheck.start && agent.rootcheck.end" md-direction="bottom" class="wz-tooltip">
-                        Start time: {{ agent.rootcheck.start || 'Unknown'}} <br>
-                        End time: {{ agent.rootcheck.end || 'Unknown'}} <br>
-                        Duration time: {{ agent.rootcheck.duration +' minutes' || 'Unknown'}}
-                    </md-tooltip>
-                </div>
-                <div class="wz-text-truncatable" flex></div>
-            </md-card-content>
-        </md-card>
-    </div>
-    <!-- End agent information section -->
-
 
     <div layout="row" layout-padding>
         <div class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--responsive">

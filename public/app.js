@@ -48,6 +48,115 @@ app.config([
   }
 ]);
 
+app.run(function($rootScope, $route, $location, appState, $window) {
+  appState.setNavigation({ status: false });
+  appState.setNavigation({
+    reloaded: false,
+    discoverPrevious: false,
+    discoverSections: ['/wazuh-discover/', '/overview/', '/agents']
+  });
+
+  $rootScope.$on('$routeChangeSuccess', () => {
+    appState.setNavigation({ prevLocation: $location.path() });
+    if (!appState.getNavigation().reloaded) {
+      appState.setNavigation({ status: true });
+    } else {
+      appState.setNavigation({ reloaded: false });
+    }
+  });
+  $rootScope.$on('$locationChangeSuccess', () => {
+    const navigation = appState.getNavigation();
+    appState.setNavigation({ currLocation: $location.path() });
+    if (navigation.currLocation !== navigation.prevLocation) {
+      if (navigation.discoverSections.includes(navigation.currLocation)) {
+        appState.setNavigation({ discoverPrevious: navigation.prevLocation });
+      }
+    } else {
+      if (!navigation.status && navigation.prevLocation) {
+        if (
+          !navigation.discoverSections.includes(navigation.currLocation) &&
+          $location.search().tabView !== 'cluster-monitoring'
+        ) {
+          appState.setNavigation({ reloaded: true });
+          $location.search('configSubTab', null);
+          $location.search('editingFile', null);
+          $route.reload();
+          //discover sections
+        } else if (
+          navigation.discoverSections.includes(navigation.currLocation)
+        ) {
+          if (navigation.currLocation === navigation.discoverSections[1]) {
+            $window.history.pushState(
+              { page: 'wazuh#' + navigation.discoverPrevious + '/' },
+              '',
+              'wazuh#' + navigation.discoverPrevious + '/'
+            );
+          } else if (
+            navigation.currLocation === navigation.discoverSections[2]
+          ) {
+            if (
+              $location.search().tab &&
+              $location.search().tab !== 'welcome'
+            ) {
+              $window.history.pushState(
+                { page: 'wazuh#' + navigation.discoverPrevious },
+                '',
+                'wazuh#' + navigation.discoverPrevious
+              );
+              $window.history.pushState(
+                {
+                  page:
+                    'wazuh#' +
+                    navigation.discoverPrevious +
+                    '?agent=' +
+                    $location.search().agent
+                },
+                '',
+                'wazuh#' +
+                  navigation.discoverPrevious +
+                  '?agent=' +
+                  $location.search().agent
+              );
+            } else {
+              $window.history.pushState(
+                { page: 'wazuh#' + navigation.discoverPrevious },
+                '',
+                'wazuh#' + navigation.discoverPrevious
+              );
+            }
+          } else if (
+            navigation.currLocation === navigation.discoverSections[0] ||
+            navigation.currLocation === navigation.discoverSections[3]
+          ) {
+            $window.history.pushState(
+              { page: 'wazuh#' + navigation.discoverPrevious },
+              '',
+              'wazuh#' + navigation.discoverPrevious
+            );
+          }
+          $window.history.pushState(
+            { page: '/app/wazuh#' + $location.$$url },
+            '',
+            '/app/wazuh#' + $location.$$url
+          );
+        } else if ($location.search().tabView === 'cluster-monitoring') {
+          $window.history.pushState(
+            { page: '/app/wazuh#/manager//' },
+            '',
+            '/app/wazuh#/manager//'
+          );
+          $window.history.pushState(
+            { page: '/app/wazuh#' + $location.$$url },
+            '',
+            '/app/wazuh#' + $location.$$url
+          );
+        }
+      }
+    }
+    appState.setNavigation({ status: false });
+  });
+});
+
 // Font Awesome, Kibana UI framework and others
 import './utils/fontawesome/css/font-awesome.min.css';
 

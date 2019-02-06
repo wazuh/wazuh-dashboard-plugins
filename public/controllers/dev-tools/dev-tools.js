@@ -35,7 +35,6 @@ export class DevToolsController {
     errorHandler,
     $document
   ) {
-    this.$scope = $scope;
     this.apiReq = apiReq;
     this.genericReq = genericReq;
     this.$window = $window;
@@ -126,18 +125,17 @@ export class DevToolsController {
       }
     );
 
-    this.$scope.send = firstTime => this.send(firstTime);
-
-    this.$scope.help = () => {
-      this.$window.open(
-        'https://documentation.wazuh.com/current/user-manual/api/reference.html'
-      );
-    };
-
     this.init();
-    this.$scope.send(true);
+    this.send(true);
+  }
 
-    this.$scope.exportOutput = () => this.exportOutput();
+  /**
+   * Open API reference documentation
+   */
+  help() {
+    this.$window.open(
+      'https://documentation.wazuh.com/current/user-manual/api/reference.html'
+    );
   }
 
   /**
@@ -155,7 +153,7 @@ export class DevToolsController {
 
       let start = 0;
       let end = 0;
-
+      let starts = [];
       const slen = splitted.length;
       for (let i = 0; i < slen; i++) {
         let tmp = splitted[i].split('\n');
@@ -166,6 +164,26 @@ export class DevToolsController {
 
         if (cursor.findNext()) start = cursor.from().line;
         else return [];
+
+        /**
+         * Prevents from user frustation when there are duplicated queries.
+         * We want to look for the next query when available, even if it
+         * already exists but it's not the selected query.
+         */
+        if (tmp.length) {
+          // It's a safe loop since findNext method returns null if there is no next query.
+          while (
+            this.apiInputBox.getLine(cursor.from().line) !== tmp[0] &&
+            cursor.findNext()
+          ) {
+            start = cursor.from().line;
+          }
+          // It's a safe loop since findNext method returns null if there is no next query.
+          while (starts.includes(start) && cursor.findNext()) {
+            start = cursor.from().line;
+          }
+        }
+        starts.push(start);
 
         end = start + tmp.length;
 
@@ -205,7 +223,7 @@ export class DevToolsController {
           end
         });
       }
-
+      starts = [];
       return tmpgroups;
     } catch (error) {
       return [];
@@ -435,7 +453,6 @@ export class DevToolsController {
   calculateWhichGroup(firstTime) {
     try {
       const selection = this.apiInputBox.getCursor();
-
       const desiredGroup = firstTime
         ? this.groups.filter(item => item.requestText)
         : this.groups.filter(
@@ -539,22 +556,29 @@ export class DevToolsController {
         const path = req.includes('?') ? req.split('?')[0] : req;
 
         if (typeof JSONraw === 'object') JSONraw.devTools = true;
-        const output = await this.apiReq.request(method, path, JSONraw);
+        if (!firstTime) {
+          const output = await this.apiReq.request(method, path, JSONraw);
+          this.apiOutputBox.setValue(
+            JSON.stringify((output || {}).data, null, 2)
+          );
+        }
+      }
 
-        this.apiOutputBox.setValue(
-          JSON.stringify((output || {}).data, null, 2)
+      (firstTime || !desiredGroup) && this.apiOutputBox.setValue('Welcome!');
+    } catch (error) {
+      if ((error || {}).status === -1) {
+        return this.apiOutputBox.setValue(
+          "Wazuh API don't reachable. Reason: timeout."
         );
       } else {
-        this.apiOutputBox.setValue('Welcome!');
-      }
-    } catch (error) {
-      const parsedError = this.errorHandler.handle(error, null, null, true);
-      if (typeof parsedError === 'string') {
-        return this.apiOutputBox.setValue(error);
-      } else if (error && error.data && typeof error.data === 'object') {
-        return this.apiOutputBox.setValue(JSON.stringify(error));
-      } else {
-        return this.apiOutputBox.setValue('Empty');
+        const parsedError = this.errorHandler.handle(error, null, null, true);
+        if (typeof parsedError === 'string') {
+          return this.apiOutputBox.setValue(error);
+        } else if (error && error.data && typeof error.data === 'object') {
+          return this.apiOutputBox.setValue(JSON.stringify(error));
+        } else {
+          return this.apiOutputBox.setValue('Empty');
+        }
       }
     }
   }

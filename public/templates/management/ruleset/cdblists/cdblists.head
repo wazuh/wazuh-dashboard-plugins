@@ -1,0 +1,2 @@
+<div flex ng-if="mctrl.globalRuleSet == 'ruleset' && mctrl.globalRulesetTab == 'cdblists'" class="" ng-controller="cdbListsController as cdbctrl" 
+layout="column" id="rulesContainer" layout-align="start space-around">

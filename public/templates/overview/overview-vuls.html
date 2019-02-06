@@ -29,22 +29,22 @@
         </md-card>
         <md-card flex class="wz-md-card">
             <md-card-content class="wazuh-column">
-                <span class="wz-headline-title">Alerts evolution over time</span>
+                <span class="wz-headline-title">Alerts severity</span>
                 <md-divider class="wz-margin-top-10"></md-divider>
-                <kbn-vis id="Wazuh-App-Overview-vulnerability-Alerts-evolution-over-time" vis-id="'Wazuh-App-Overview-vulnerability-Alerts-evolution-over-time'"></kbn-vis>
+                <kbn-vis id="Wazuh-App-Overview-vulnerability-Alerts-severity" vis-id="'Wazuh-App-Overview-vulnerability-Alerts-severity'"></kbn-vis>
             </md-card-content>
         </md-card>
     </div>
 
     <div layout="row" layout-align="center stretch" class="height-270">
-        <md-card flex="30" class="wz-md-card">
+        <md-card flex class="wz-md-card">
             <md-card-content class="wazuh-column">
                 <span class="wz-headline-title">Severity distribution</span>
                 <md-divider class="wz-margin-top-10"></md-divider>
                 <kbn-vis id="Wazuh-App-Overview-vulnerability-Vulnerability-severity-distribution" vis-id="'Wazuh-App-Overview-vulnerability-Vulnerability-severity-distribution'"></kbn-vis>
             </md-card-content>
         </md-card>
-        <md-card flex="30" class="wz-md-card">
+        <md-card flex class="wz-md-card">
             <md-card-content class="wazuh-column">
                 <span class="wz-headline-title">Commonly affected packages</span>
                 <md-divider class="wz-margin-top-10"></md-divider>
@@ -56,6 +56,13 @@
                 <span class="wz-headline-title">Most common CVEs</span>
                 <md-divider class="wz-margin-top-10"></md-divider>
                 <kbn-vis id="Wazuh-App-Overview-vulnerability-Most-common-CVEs" vis-id="'Wazuh-App-Overview-vulnerability-Most-common-CVEs'"></kbn-vis>
+            </md-card-content>
+        </md-card>
+        <md-card flex class="wz-md-card">
+            <md-card-content class="wazuh-column">
+                <span class="wz-headline-title">Most common CWEs</span>
+                <md-divider class="wz-margin-top-10"></md-divider>
+                <kbn-vis id="Wazuh-App-Overview-vulnerability-Most-common-CWEs" vis-id="'Wazuh-App-Overview-vulnerability-Most-common-CWEs'"></kbn-vis>
             </md-card-content>
         </md-card>
     </div>

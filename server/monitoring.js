@@ -150,7 +150,8 @@ export class Monitoring {
 
       const payload = {
         offset: 0,
-        limit: 500
+        limit: 500,
+        q: 'id!=000'
       };
 
       this.agentsArray = await ApiHelper.fetchAllAgents(
@@ -182,7 +183,8 @@ export class Monitoring {
     try {
       const payload = {
         offset: 0,
-        limit: 1
+        limit: 1,
+        q: 'id!=000'
       };
 
       const options = ApiHelper.buildOptionsObject(api);
@@ -211,20 +213,15 @@ export class Monitoring {
 
       if (!response.error && ((response.body || {}).data || {}).totalItems) {
         await this.checkStatus(api, response.body.data.totalItems);
-      } else {
+      } else if ((response || {}).error) {
         const msg = ((response || {}).body || {}).message || false;
+        const extraLog =
+          msg ||
+          'Wazuh API credentials not found or are not correct. Open the app in your browser and configure it to start monitoring agents.';
+
+        !this.quiet && log('[monitoring][checkAndSaveStatus]', extraLog);
         !this.quiet &&
-          log(
-            '[monitoring][checkAndSaveStatus]',
-            msg ||
-              'Wazuh API credentials not found or are not correct. Open the app in your browser and configure it to start monitoring agents.'
-          );
-        !this.quiet &&
-          this.server.log(
-            [blueWazuh, 'monitoring', 'error'],
-            msg ||
-              'Wazuh API credentials not found or are not correct. Open the app in your browser and configure it to start monitoring agents.'
-          );
+          this.server.log([blueWazuh, 'monitoring', 'error'], extraLog);
       }
       return;
     } catch (error) {

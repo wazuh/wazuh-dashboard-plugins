@@ -1,8 +1,9 @@
-import { capitalize, isArray, isFunction } from 'lodash';
+import { capitalize, isArray, isFunction, get } from 'lodash';
 
 import chrome from 'ui/chrome';
 import filterTemplate from 'ui/chrome/config/filter.html';
 import intervalTemplate from 'ui/chrome/config/interval.html';
+import { i18n } from '@kbn/i18n';
 
 export function KbnTopNavControllerProvider($compile) {
   return class KbnTopNavController {
@@ -75,18 +76,25 @@ export function KbnTopNavControllerProvider($compile) {
     getItem = key => {
       return this.menuItems.find(i => i.key === key);
     };
-    handleClick = menuItem => {
+    handleClick = (menuItem, event) => {
       if (menuItem.disableButton()) {
         return false;
       }
-      menuItem.run(menuItem, this);
+      // event will be undefined when method is called from click
+      menuItem.run(menuItem, this, get(event, 'target'));
     };
     // apply the defaults to individual options
     _applyOptDefault(opt = {}) {
+      const optLabel = opt.label ? opt.label : capitalize(opt.key);
       const defaultedOpt = {
-        label: capitalize(opt.key),
+        label: optLabel,
         hasFunction: !!opt.run,
-        description: opt.run ? opt.key : `Toggle ${opt.key} view`,
+        description: opt.run
+          ? optLabel
+          : i18n.translate('common.ui.topNav.toggleViewAriaLabel', {
+              defaultMessage: 'Toggle {optLabel} view',
+              values: { optLabel }
+            }),
         run: item => this.toggle(item.key),
         ...opt
       };

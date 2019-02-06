@@ -1,10 +1,10 @@
 <div class="euiFlexItem" style="min-height: 64px;">
     <div class="synopsis">
-        <div class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--responsive">
+        <div class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--responsive" ng-click="callSwitchTab()">
             <div class="euiFlexItem euiFlexItem--flexGrowZero">
-                <img class="synopsisIcon" ng-src="/plugins/wazuh/img/{{logo || wzLogo}}" alt="">
+                <img class="synopsisIcon" ng-src="/plugins/wazuh/img/{{logo || wzLogo}}">
             </div>
-            <div class="euiFlexItem synopsisContent " ng-click="callSwitchTab()">
+            <div class="euiFlexItem synopsisContent">
                 <h4 class="euiTitle euiTitle--small synopsisTitle wz-text-link">{{ title }}</h4>
                 <div class="euiText synopsisBody cursor-pointer" ng-if="description">
                     <p>

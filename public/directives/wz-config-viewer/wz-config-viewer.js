@@ -31,7 +31,7 @@ class WzConfigViewer {
   controller($scope, $document) {
     const setJsonBox = () => {
       $scope.jsonCodeBox = CodeMirror.fromTextArea(
-        $document[0].getElementById('json_box'),
+        $document[0].getElementById('viewer_json_box'),
         {
           lineNumbers: true,
           matchClosing: true,
@@ -47,7 +47,7 @@ class WzConfigViewer {
     };
     const setXmlBox = () => {
       $scope.xmlCodeBox = CodeMirror.fromTextArea(
-        $document[0].getElementById('xml_box'),
+        $document[0].getElementById('viewer_xml_box'),
         {
           lineNumbers: true,
           matchClosing: true,
@@ -62,14 +62,11 @@ class WzConfigViewer {
       );
     };
 
-    const init = () => {
-      setJsonBox();
-      setXmlBox();
-    };
-
     const refreshJsonBox = json => {
       $scope.jsoncontent = json;
-      setJsonBox();
+      if (!$scope.jsonCodeBox) {
+        setJsonBox();
+      }
       if ($scope.jsoncontent != false) {
         $scope.jsonCodeBox.setValue($scope.jsoncontent);
         setTimeout(function() {
@@ -80,7 +77,9 @@ class WzConfigViewer {
 
     const refreshXmlBox = xml => {
       $scope.xmlcontent = xml;
-      setXmlBox();
+      if (!$scope.xmlCodeBox) {
+        setXmlBox();
+      }
       if ($scope.xmlcontent != false) {
         $scope.xmlCodeBox.setValue($scope.xmlcontent);
         setTimeout(function() {
@@ -101,7 +100,6 @@ class WzConfigViewer {
       refreshXmlBox(params.data);
     });
 
-    init();
   }
 }
 

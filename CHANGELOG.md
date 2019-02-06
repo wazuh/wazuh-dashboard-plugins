@@ -2,7 +2,7 @@
 
 All notable changes to the Wazuh app project will be documented in this file.
 
-## Wazuh v3.9.0 - Kibana v6.6.0 - Revision 417
+## Wazuh v3.9.0 - Kibana v6.6.0 - Revision 420
 
 ### Added 
 
@@ -14,11 +14,47 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 - Escape XML special characters ([#1159](https://github.com/wazuh/wazuh-kibana-app/pull/1159)).
 - Changed empty results message for Wazuh tables ([#1165](https://github.com/wazuh/wazuh-kibana-app/pull/1165)).
+- Allowing the same query multiple times on the Dev Tools ([#1174](https://github.com/wazuh/wazuh-kibana-app/pull/1174))
+- Refactor JSON/XML viewer for configuration tab ([#1173](https://github.com/wazuh/wazuh-kibana-app/pull/1173), [#1148](https://github.com/wazuh/wazuh-kibana-app/pull/1148)).
 
 ### Fixed
 
 - Properly handling long messages on notifier service, until now, they were using out of the card space, also we replaced some API messages with more meaningful messages ([#1168](https://github.com/wazuh/wazuh-kibana-app/pull/1168))
 
+## Wazuh v3.8.2 - Kibana v6.6.0 - Revision 419
+
+### Added
+
+- Support for Kibana v6.6.0
+
+## Wazuh v3.8.2 - Kibana v6.5.4 - Revision 418
+
+### Added
+
+- Support for Wazuh v3.8.2
+
+### Changed
+
+- Close configuration editor only if it was successfully updated ([bc77c35](https://github.com/wazuh/wazuh-kibana-app/commit/bc77c35d8440a656d4704451ce857c9e1d36a438)).
+- Replaced FIM Vega visualization with standard visualization ([554ee1c](https://github.com/wazuh/wazuh-kibana-app/commit/554ee1c4c4d75c76d82272075acf8bb62e7f9e27)).
+
+## Wazuh v3.8.1 - Kibana v6.5.4 - Revision 417
+
+### Added
+
+- Support for Wazuh v3.8.1
+
+### Changed
+
+- Moved monitored/ignored Windows registry entries to "FIM > Monitored" and "FIM > Ignored" to avoid user confusion ([#1176](https://github.com/wazuh/wazuh-kibana-app/pull/1176)).
+- Excluding managers from wazuh-monitoring indices ([#1177](https://github.com/wazuh/wazuh-kibana-app/pull/1177)).
+- Escape `&` before sending group configuration ([d3aa56f](https://github.com/wazuh/wazuh-kibana-app/commit/d3aa56fa73478c60505e500db7d3a7df263081b5)).
+- Improved `autoFormat` function before rendering group configuration ([f4f8144](https://github.com/wazuh/wazuh-kibana-app/commit/f4f8144eef8b93038fc897a9f16356e71029b844)).
+- Now the group configuration editor doesn't exit after sending data to the Wazuh API ([5c1a3ef](https://github.com/wazuh/wazuh-kibana-app/commit/5c1a3ef9bd710a7befbed0709c4a7cf414f44f6b)).
+
+### Fixed
+
+- Fixed style for the error toaster for long URLs or long paths ([11b8084](https://github.com/wazuh/wazuh-kibana-app/commit/11b8084c75bbc5da36587ff31d1bc80a55fe4dfe)).
 
 ## Wazuh v3.8.0 - Kibana v6.5.4 - Revision 416
 

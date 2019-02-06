@@ -1,5 +1,4 @@
-<div flex="auto" layout="column" ng-if="configurationTab === 'welcome'">
-
+<div flex="auto" layout="column" ng-if="configurationTab === 'welcome' && !editionTab" class="" ng-class="agent && agent.id !== '000'?'wz-margin-top-8':''">
     <!-- Headline -->
     <div layout="column" layout-padding>
         <div ng-show="agent && agent.id !== '000'">
@@ -8,7 +7,7 @@
             <span ng-if="!isSynchronized" class="wz-agent-status-indicator small red">NOT SYNCHRONIZED</span>
         </div>
         <span class="font-size-18" ng-show="!agent || agent.id === '000'">
-                <i class="fa fa-fw fa-cog" aria-hidden="true"></i> Configuration</span>
+            <i class="fa fa-fw fa-cog" aria-hidden="true"></i> Configuration</span>
     </div>
     <!-- End headline -->
 
@@ -16,10 +15,10 @@
     <div flex="auto" layout="row">
 
         <!-- This section has the configuration cards -->
-        <div flex layout="column">
+        <div flex layout="column" class="md-margin-h">
 
             <!-- Main configurations card -->
-            <md-card class="wz-md-card">
+            <md-card class="wz-md-card md-margin-h-0">
                 <md-card-content>
                     <span class="font-size-16">Main configurations</span>
                     <md-divider class="wz-margin-top-10"></md-divider>
@@ -28,7 +27,8 @@
                         <!-- Manager sections -->
                         <md-list-item flex="100" flex-gt-md="50" flex-gt-lg="33" class="md-2-line" ng-if="!agent || agent.id === '000'">
                             <div class="md-list-item-text">
-                                <h3 class="wz-text-link" ng-click="switchConfigTab('global-configuration', [{component:'analysis',configuration:'global'},{component:'request',configuration:'remote'},{component:'com',configuration:'logging'}])">Global configuration</h3>
+                                <h3 class="wz-text-link" ng-click="switchConfigTab('global-configuration', [{component:'analysis',configuration:'global'},{component:'request',configuration:'remote'},{component:'com',configuration:'logging'}])">Global
+                                    configuration</h3>
                                 <p>Global and remote settings</p>
                             </div>
                         </md-list-item>
@@ -40,21 +40,23 @@
                         </md-list-item>
                         <md-list-item flex="100" flex-gt-md="50" flex-gt-lg="33" class="md-2-line" ng-if="!agent || agent.id === '000'">
                             <div class="md-list-item-text">
-                                <h3 class="wz-text-link" ng-click="switchConfigTab('registration-service', [{component:'auth',configuration:'auth'}])">Registration service</h3>
+                                <h3 class="wz-text-link" ng-click="switchConfigTab('registration-service', [{component:'auth',configuration:'auth'}])">Registration
+                                    service</h3>
                                 <p>Automatic agent registration service</p>
                             </div>
                         </md-list-item>
                         <!-- <md-list-item flex="100" flex-gt-md="50" flex-gt-lg="33" class="md-2-line">
-                            <div class="md-list-item-text">
-                                <h3 class="wz-text-link" ng-click="switchConfigTab('ruleset')">Ruleset</h3>
-                                <p>Current rules, decoders and CDB lists loaded in the cluster</p>
-                            </div>
-                        </md-list-item> -->
+                                <div class="md-list-item-text">
+                                    <h3 class="wz-text-link" ng-click="switchConfigTab('ruleset')">Ruleset</h3>
+                                    <p>Current rules, decoders and CDB lists loaded in the cluster</p>
+                                </div>
+                            </md-list-item> -->
                         <!-- End manager sections -->
                         <!-- Agent sections -->
                         <md-list-item flex="100" flex-gt-md="50" flex-gt-lg="33" class="md-2-line" ng-if="agent && agent.id !== '000'">
                             <div class="md-list-item-text">
-                                <h3 class="wz-text-link" ng-click="switchConfigTab('global-configuration', [{component:'com',configuration:'logging'}])">Global configuration</h3>
+                                <h3 class="wz-text-link" ng-click="switchConfigTab('global-configuration', [{component:'com',configuration:'logging'}])">Global
+                                    configuration</h3>
                                 <p>Logging settings that apply to the agent</p>
                             </div>
                         </md-list-item>
@@ -66,7 +68,8 @@
                         </md-list-item>
                         <md-list-item flex="100" flex-gt-md="50" flex-gt-lg="33" class="md-2-line" ng-if="agent && agent.id !== '000'">
                             <div class="md-list-item-text">
-                                <h3 class="wz-text-link" ng-click="switchConfigTab('client-buffer', [{component:'agent',configuration:'buffer'}])">Anti-flooding settings</h3>
+                                <h3 class="wz-text-link" ng-click="switchConfigTab('client-buffer', [{component:'agent',configuration:'buffer'}])">Anti-flooding
+                                    settings</h3>
                                 <p>Agent bucket parameters to avoid event flooding</p>
                             </div>
                         </md-list-item>
@@ -84,10 +87,10 @@
             <!-- End main configurations card -->
 
             <!-- Alerts and output management card -->
-            <md-card class="wz-md-card" ng-if="!agent || agent.id === '000'">
+            <md-card class="wz-md-card md-margin-h-0" ng-if="!agent || agent.id === '000'">
                 <md-card-content>
                     <span class="font-size-16" ng-if="!agent || agent.id === '000'">Alerts and output management</span>
-                      <md-divider class="wz-margin-top-10"></md-divider>
+                    <md-divider class="wz-margin-top-10"></md-divider>
 
                     <md-list layout="row" layout-wrap>
                         <md-list-item flex="100" flex-gt-md="50" flex-gt-lg="33" class="md-2-line" ng-if="!agent || agent.id === '000'">
@@ -103,11 +106,11 @@
                             </div>
                         </md-list-item>
                         <!-- <md-list-item flex="100" flex-gt-md="50" flex-gt-lg="33" class="md-2-line">
-                            <div class="md-list-item-text">
-                                <h3 class="wz-text-link" ng-click="switchConfigTab('database-output')">Database output</h3>
-                                <p>MySQL and PostgreSQL database output configuration</p>
-                            </div>
-                        </md-list-item> -->
+                                <div class="md-list-item-text">
+                                    <h3 class="wz-text-link" ng-click="switchConfigTab('database-output')">Database output</h3>
+                                    <p>MySQL and PostgreSQL database output configuration</p>
+                                </div>
+                            </md-list-item> -->
                     </md-list>
 
                 </md-card-content>
@@ -115,7 +118,7 @@
             <!-- End alerts and output management card -->
 
             <!-- Auditing and policy monitoring card -->
-            <md-card class="wz-md-card">
+            <md-card class="wz-md-card md-margin-h-0">
                 <md-card-content>
                     <span class="font-size-16">Auditing and policy monitoring</span>
                     <md-divider class="wz-margin-top-10"></md-divider>
@@ -123,8 +126,10 @@
                     <md-list layout="row" layout-wrap>
                         <md-list-item flex="100" flex-gt-md="50" flex-gt-lg="33" class="md-2-line">
                             <div class="md-list-item-text">
-                                <h3 class="wz-text-link" ng-click="switchConfigTab('policy-monitoring', [{component:'syscheck',configuration:'rootcheck'}])">Policy monitoring</h3>
-                                <p>Configuration to ensure compliance with security policies, standards and hardening guides</p>
+                                <h3 class="wz-text-link" ng-click="switchConfigTab('policy-monitoring', [{component:'syscheck',configuration:'rootcheck'}])">Policy
+                                    monitoring</h3>
+                                <p>Configuration to ensure compliance with security policies, standards and hardening
+                                    guides</p>
                             </div>
                         </md-list-item>
                         <md-list-item flex="100" flex-gt-md="50" flex-gt-lg="33" class="md-2-line">
@@ -146,7 +151,7 @@
             <!-- End auditing and policy monitoring card -->
 
             <!-- System, threats and incident response card -->
-            <md-card class="wz-md-card">
+            <md-card class="wz-md-card md-margin-h-0">
                 <md-card-content>
                     <span class="font-size-16">System threats and incident response</span>
                     <md-divider class="wz-margin-top-10"></md-divider>
@@ -172,13 +177,15 @@
                         </md-list-item>
                         <md-list-item flex="100" flex-gt-md="50" flex-gt-lg="33" class="md-2-line" ng-if="!agent || agent.id === '000'">
                             <div class="md-list-item-text">
-                                <h3 class="wz-text-link" ng-click="switchConfigTab('active-response',[{component:'analysis',configuration:'command'},{component:'analysis',configuration:'active_response'}])">Active response</h3>
+                                <h3 class="wz-text-link" ng-click="switchConfigTab('active-response',[{component:'analysis',configuration:'command'},{component:'analysis',configuration:'active_response'}])">Active
+                                    response</h3>
                                 <p>Active threat addressing by inmmediate response</p>
                             </div>
                         </md-list-item>
                         <md-list-item flex="100" flex-gt-md="50" flex-gt-lg="33" class="md-2-line" ng-if="agent && agent.id !== '000'">
                             <div class="md-list-item-text">
-                                <h3 class="wz-text-link" ng-click="switchConfigTab('active-response',[{component:'com',configuration:'active-response'}])">Active response</h3>
+                                <h3 class="wz-text-link" ng-click="switchConfigTab('active-response',[{component:'com',configuration:'active-response'}])">Active
+                                    response</h3>
                                 <p>Active threat addressing by inmmediate response</p>
                             </div>
                         </md-list-item>
@@ -195,7 +202,7 @@
             <!-- End system, threats and incident response card -->
 
             <!-- Log data analysis card -->
-            <md-card class="wz-md-card">
+            <md-card class="wz-md-card md-margin-h-0">
                 <md-card-content>
                     <span class="font-size-16">Log data analysis</span>
                     <md-divider class="wz-margin-top-10"></md-divider>
@@ -203,13 +210,15 @@
                     <md-list layout="row" layout-wrap>
                         <md-list-item flex="100" flex-gt-md="50" flex-gt-lg="33" class="md-2-line">
                             <div class="md-list-item-text">
-                                <h3 class="wz-text-link" ng-click="switchConfigTab('log-collection',[{component:'logcollector',configuration:'localfile'},{component:'logcollector',configuration:'socket'}])">Log collection</h3>
+                                <h3 class="wz-text-link" ng-click="switchConfigTab('log-collection',[{component:'logcollector',configuration:'localfile'},{component:'logcollector',configuration:'socket'}])">Log
+                                    collection</h3>
                                 <p>Log analysis from text files, Windows events or syslog outputs</p>
                             </div>
                         </md-list-item>
                         <md-list-item flex="100" flex-gt-md="50" flex-gt-lg="33" class="md-2-line">
                             <div class="md-list-item-text">
-                                <h3 class="wz-text-link" ng-click="switchConfigTab('integrity-monitoring',[{component:'syscheck',configuration:'syscheck'}])">Integrity monitoring</h3>
+                                <h3 class="wz-text-link" ng-click="switchConfigTab('integrity-monitoring',[{component:'syscheck',configuration:'syscheck'}])">Integrity
+                                    monitoring</h3>
                                 <p>Identify changes in content, permissions, ownership, and attributes of files</p>
                             </div>
                         </md-list-item>
@@ -226,7 +235,7 @@
             <!-- End log data analysis card -->
 
             <!-- Cloud security monitoring card -->
-            <md-card class="wz-md-card" ng-if="!agent || agent.id === '000'">
+            <md-card class="wz-md-card md-margin-h-0" ng-if="!agent || agent.id === '000'">
                 <md-card-content>
                     <span class="font-size-16">Cloud security monitoring</span>
                     <md-divider class="wz-margin-top-10"></md-divider>
@@ -248,14 +257,15 @@
         <!-- End configuration cards section -->
 
         <!-- This section is the right sidenav content -->
-        <md-sidenav
-            class="md-sidenav-right"
-            md-is-locked-open="true">
+        <md-sidenav class="md-sidenav-right" md-is-locked-open="true">
             <md-list>
                 <md-subheader>More info about this section</md-subheader>
-                <md-list-item target="_blank" class="wz-text-link" ng-href="https://documentation.wazuh.com/current/user-manual/manager/index.html">Wazuh administration documentation</md-list-item>
-                <md-list-item target="_blank" class="wz-text-link" ng-href="https://documentation.wazuh.com/current/user-manual/capabilities/index.html">Wazuh capabilities documentation</md-list-item>
-                <md-list-item target="_blank" class="wz-text-link" ng-href="https://documentation.wazuh.com/current/user-manual/reference/ossec-conf/index.html">Local configuration reference</md-list-item>
+                <md-list-item target="_blank" class="wz-text-link" ng-href="https://documentation.wazuh.com/current/user-manual/manager/index.html">Wazuh
+                    administration documentation</md-list-item>
+                <md-list-item target="_blank" class="wz-text-link" ng-href="https://documentation.wazuh.com/current/user-manual/capabilities/index.html">Wazuh
+                    capabilities documentation</md-list-item>
+                <md-list-item target="_blank" class="wz-text-link" ng-href="https://documentation.wazuh.com/current/user-manual/reference/ossec-conf/index.html">Local
+                    configuration reference</md-list-item>
             </md-list>
         </md-sidenav>
         <!-- End right sidenav section -->

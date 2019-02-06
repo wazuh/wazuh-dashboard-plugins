@@ -21,7 +21,9 @@ export function RulesController(
   csvReq,
   wzTableFilter,
   $location,
-  apiReq
+  apiReq,
+  wazuhConfig,
+  rulesetHandler
 ) {
   $scope.isObject = item => typeof item === 'object';
 
@@ -86,6 +88,18 @@ export function RulesController(
       );
       $scope.appliedFilters.push(filter);
       $scope.$broadcast('wazuhFilter', { filter });
+    } else if (
+      term &&
+      term.startsWith('path:') &&
+      term.split('path:')[1].trim()
+    ) {
+      $scope.custom_search = '';
+      const filter = { name: 'path', value: term.split('path:')[1].trim() };
+      $scope.appliedFilters = $scope.appliedFilters.filter(
+        item => item.name !== 'path'
+      );
+      $scope.appliedFilters.push(filter);
+      $scope.$broadcast('wazuhFilter', { filter });
     } else {
       $scope.$broadcast('wazuhSearch', { term, removeFilters: 0 });
     }
@@ -125,6 +139,9 @@ export function RulesController(
   $scope.viewingDetail = false;
   $scope.isArray = Array.isArray;
 
+  const configuration = wazuhConfig.getConfig();
+  $scope.adminMode = !!(configuration || {}).admin;
+
   /**
    * This set color to a given rule argument
    */
@@ -151,6 +168,10 @@ export function RulesController(
 
     return $sce.trustAsHtml(coloredString);
   };
+
+  $scope.$on('closeRuleView', () => {
+    $scope.closeDetailView();
+  });
 
   // Reloading event listener
   $scope.$on('rulesetIsReloaded', () => {
@@ -195,12 +216,42 @@ export function RulesController(
   //listeners
   $scope.$on('wazuhShowRule', (event, parameters) => {
     $scope.currentRule = parameters.rule;
+    $scope.$emit('setCurrentRule', { currentRule: $scope.currentRule });
     if (!(Object.keys(($scope.currentRule || {}).details || {}) || []).length) {
       $scope.currentRule.details = false;
     }
     $scope.viewingDetail = true;
     if (!$scope.$$phase) $scope.$digest();
   });
+
+  $scope.editRulesConfig = async () => {
+    $scope.editingFile = true;
+    try {
+      $scope.fetchedXML = await rulesetHandler.getRuleConfiguration(
+        $scope.currentRule.file
+      );
+      $location.search('editingFile', true);
+      appState.setNavigation({ status: true });
+      if (!$scope.$$phase) $scope.$digest();
+      $scope.$broadcast('fetchedFile', { data: $scope.fetchedXML });
+    } catch (error) {
+      $scope.fetchedXML = null;
+      errorHandler.handle(error, 'Fetch file error');
+    }
+  };
+  $scope.closeEditingFile = () => {
+    $scope.editingFile = false;
+    appState.setNavigation({ status: true });
+    $scope.$broadcast('closeEditXmlFile', {});
+    if (!$scope.$$phase) $scope.$digest();
+  };
+  $scope.xmlIsValid = valid => {
+    $scope.xmlHasErrors = valid;
+    if (!$scope.$$phase) $scope.$digest();
+  };
+  $scope.doSaveRuleConfig = () => {
+    $scope.$broadcast('saveXmlFile', { rule: $scope.currentRule });
+  };
 
   /**
    * This function changes to the rules list view
@@ -213,6 +264,8 @@ export function RulesController(
       );
     $scope.viewingDetail = false;
     $scope.currentRule = false;
+    $scope.closeEditingFile();
+    $scope.$emit('removeCurrentRule');
     if (!$scope.$$phase) $scope.$digest();
   };
 
@@ -223,6 +276,7 @@ export function RulesController(
       .request('get', `/rules/${incomingRule}`, {})
       .then(data => {
         $scope.currentRule = data.data.data.items[0];
+        $scope.$emit('setCurrentRule', { currentRule: $scope.currentRule });
         if (
           !(Object.keys(($scope.currentRule || {}).details || {}) || []).length
         ) {

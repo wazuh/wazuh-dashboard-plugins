@@ -103,7 +103,10 @@ export class SettingsController {
    * This switch to a selected tab
    * @param {Object} tab
    */
-  switchTab(tab) {
+  switchTab(tab, setNav = false) {
+    if (setNav) {
+      this.appState.setNavigation({ status: true });
+    }
     this.tab = tab;
     this.$location.search('tab', this.tab);
   }

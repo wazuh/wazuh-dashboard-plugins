@@ -35,11 +35,11 @@ export class WazuhUtilsCtrl {
     try {
       const configFile = getConfiguration();
 
-      return reply({
+      return {
         statusCode: 200,
         error: 0,
         data: configFile || {}
-      });
+      };
     } catch (error) {
       return ErrorResponse(error.message || error, 3019, 500, reply);
     }
@@ -54,11 +54,11 @@ export class WazuhUtilsCtrl {
   async updateConfigurationFile(req, reply) {
     try {
       const result = updateConfigurationFile.updateConfiguration(req);
-      return reply({
+      return {
         statusCode: 200,
         error: 0,
         data: result.needRestart
-      });
+      };
     } catch (error) {
       return ErrorResponse(error.message || error, 3021, 500, reply);
     }
@@ -74,7 +74,7 @@ export class WazuhUtilsCtrl {
     try {
       // RAM in MB
       const ram = Math.ceil(totalmem() / 1024 / 1024);
-      return reply({ statusCode: 200, error: 0, ram });
+      return { statusCode: 200, error: 0, ram };
     } catch (error) {
       return ErrorResponse(error.message || error, 3033, 500, reply);
     }
@@ -93,13 +93,13 @@ export class WazuhUtilsCtrl {
         20
       );
       return lastLogs && Array.isArray(lastLogs)
-        ? reply({
+        ? {
             error: 0,
             lastLogs: lastLogs.filter(
               item => typeof item === 'string' && item.length
             )
-          })
-        : reply({ error: 0, lastLogs: [] });
+          }
+        : { error: 0, lastLogs: [] };
     } catch (error) {
       return ErrorResponse(error.message || error, 3036, 500, reply);
     }

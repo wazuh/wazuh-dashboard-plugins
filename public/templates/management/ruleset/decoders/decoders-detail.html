@@ -1,17 +1,18 @@
-<div ng-if="!loading && dctrl.viewingDetail" layout="column">
-
+<div ng-if="!loading && dctrl.viewingDetail" layout="column" class="">
     <!-- Back button and title -->
     <div layout="row" layout-align="start center">
         <!-- Back button -->
-        <md-button class="md-icon-button" aria-label="Back to decoders list" tooltip="Back" tooltip-placement="bottom"
-            ng-click="dctrl.closeDetailView()"><i class="fa fa-fw fa-arrow-left" aria-hidden="true"></i></md-button>
-        <!-- Decoder title -->
-        <h1 class="md-headline wz-headline">{{currentDecoder.name}}</h1>
+        <md-button class="md-icon-button" style="margin: 5px!important;" aria-label="Back to decoders list" tooltip="Back"
+            tooltip-placement="bottom" ng-click="dctrl.closeDetailView()"><i class="fa fa-fw fa-arrow-left" aria-hidden="true"></i></md-button>
+        <!-- Rule title -->
+        <div>
+            <h1 class="font-size-18">{{dctrl.currentDecoder.name}}</h1>
+        </div>
     </div>
     <!-- End back button, title and status indicator -->
 
     <!-- Decoder information ribbon -->
-    <div layout="row" class="wz-padding-left-16">
+    <div layout="row" class="wz-padding-left-8 wz-padding-right-8">
         <md-card flex class="wz-metric-color wz-md-card">
             <md-card-content layout="row" class="wz-padding-metric">
                 <div flex="20" ng-if="dctrl.currentDecoder.position || dctrl.currentDecoder.position == 0" class="wz-text-truncatable">Position:
@@ -30,7 +31,7 @@
     <!-- Rest of decoder information -->
     <div layout="column" layout-align="start">
 
-        <div layout="row" class="wz-padding-left-16" layout-align="start stretch">
+        <div layout="row" class="wz-padding-left-8 wz-padding-right-8" layout-align="start stretch">
 
             <!-- Details section -->
             <md-card flex class="wz-md-card">
@@ -64,7 +65,7 @@
 
         </div>
 
-        <div layout="row" class="wz-padding-left-16" layout-align="start stretch">
+        <div layout="row" class="wz-padding-left-8 wz-padding-right-8" layout-align="start stretch">
 
             <!-- Match section -->
             <md-card flex class="wz-md-card" ng-if="dctrl.isArray(dctrl.currentDecoder.details.match)">
@@ -93,20 +94,51 @@
                 </md-card-content>
             </md-card>
             <!-- End prematch section -->
-
+        </div>
+        <div layout="row" class="md-padding wz-padding-bottom-0" ng-if="!editingFile && dctrl.currentDecoder.file && dctrl.currentDecoder.path === '/var/ossec/etc/decoders' && adminMode">
+            <button ng-click='dctrl.editDecodersConfig(dctrl.currentDecoder)' class='btn btn-primary'><i aria-hidden='true'
+                    class='fa fa-fw fa-pencil'></i>
+                Edit decoder file
+            </button>
         </div>
 
         <!-- Related decoders section -->
-        <div layout="row" class="wz-padding-left-16" ng-if="dctrl.currentDecoder">
-            <h1 class="md-headline wz-headline"><i class="fa fa-fw fa-link" aria-hidden="true"></i> Related decoders</h1>
+        <div ng-show="!editingFile">
+            <div layout="row" class="md-padding wz-padding-top-10" ng-if="dctrl.currentDecoder">
+                <h1 class="md-headline wz-headline"><i class="fa fa-fw fa-link" aria-hidden="true"></i> Related
+                    decoders</h1>
+            </div>
+            <div layout="row" ng-if="dctrl.currentDecoder">
+                <md-card flex class="wz-md-card _md flex md-margin-h">
+                    <md-card-content>
+                        <wz-table flex path="'/decoders'" implicit-filter="[{ name:'file',value: dctrl.currentDecoder.file}]"
+                            keys="['name',{value:'details.program_name',size:2,nosortable:true},{value:'details.order',size:2,nosortable:true},'file']"
+                            allow-click="true" />
+                    </md-card-content>
+                </md-card>
+            </div>
+            <!-- End related decoders section -->
         </div>
-        <div layout="row" ng-if="dctrl.currentDecoder" class="md-padding">
-            <wz-table flex path="'/decoders'" implicit-filter="[{ name:'file',value: dctrl.currentDecoder.file}]" keys="['name',{value:'details.program_name',size:2,nosortable:true},{value:'details.order',size:2,nosortable:true},'file']"
-                allow-click="true" />
-        </div>
-        <!-- End related decoders section -->
-
+        <br>
     </div>
     <!-- End rest of decoder information -->
+
+    <!-- XML editor for rules -->
+    <div layout="column" layout-align="start" ng-show="editingFile">
+        <div layout="row" class="wz-margin-left-16">
+            <span ng-click='dctrl.closeEditingFile()' class='btn btn-info'>Cancel</span>
+            <button ng-disabled='xmlHasErrors' ng-click='dctrl.doSaveDecoderConfig()' class='btn btn-primary pull-right wz-margin-left-8'>
+                <span ng-show='!xmlHasErrors'><i aria-hidden='true' class='fa fa-fw fa-save'></i>Save file</span>
+                <span ng-show='xmlHasErrors' class='btn-danger'><i aria-hidden='true' class='fa fa-fw fa-exclamation-triangle'></i>
+                    XML format error</span>
+            </button>
+        </div>
+        <div class="md-padding md-padding-top-10" ng-if="fetchedXML" style="height: calc(100vh - 367px);">
+            <wz-xml-file-editor file-name='decoders' data="fetchedXML" target-name="currentDecoder.file" valid-fn='xmlIsValid(valid)'
+                close-fn='closeEditingFile(reload)'>
+            </wz-xml-file-editor>
+        </div>
+    </div>
+    <!-- XML editor for rules -->
 
 </div>
