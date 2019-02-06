@@ -37,7 +37,7 @@ export class DecodersController {
     this.$scope = $scope;
     this.$sce = $sce;
     this.errorHandler = errorHandler;
-    this.$location =  $location;
+    this.$location = $location;
     this.appState = appState;
     this.csvReq = csvReq;
     this.wzTableFilter = wzTableFilter;

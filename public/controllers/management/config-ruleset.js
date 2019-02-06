@@ -56,11 +56,11 @@ export class ConfigurationRulesetController {
         this.$scope.fetchedXML =
           this.$scope.selectedRulesetTab === 'rules'
             ? await this.rulesetHandler.getRuleConfiguration(
-              this.$scope.selectedItem.file
-            )
+                this.$scope.selectedItem.file
+              )
             : await this.rulesetHandler.getDecoderConfiguration(
-              this.$scope.selectedItem.file
-            );
+                this.$scope.selectedItem.file
+              );
         this.$location.search('editingFile', true);
         this.appState.setNavigation({ status: true });
         if (!this.$scope.$$phase) this.$scope.$digest();
@@ -165,7 +165,7 @@ export class ConfigurationRulesetController {
     const stringToObj = string => {
       let result = {};
       const splitted = string.split('\n');
-      splitted.forEach(function (element) {
+      splitted.forEach(function(element) {
         const keyValue = element.split(':');
         if (keyValue[0]) result[keyValue[0]] = keyValue[1];
       });

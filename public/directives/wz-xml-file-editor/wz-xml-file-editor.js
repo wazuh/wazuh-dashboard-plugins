@@ -242,9 +242,9 @@ app.directive('wzXmlFileEditor', function() {
 
       $scope.$on('saveXmlFile', (ev, params) => saveFile(params));
 
-      $scope.$on("$destroy", function() {
+      $scope.$on('$destroy', function() {
         $location.search('editingFile', null);
-    });
+      });
     },
     template
   };

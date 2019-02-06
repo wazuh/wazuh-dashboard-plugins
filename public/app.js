@@ -34,7 +34,7 @@ const app = uiModules.get('app/wazuh', ['ngCookies', 'ngMaterial']);
 
 app.config([
   '$compileProvider',
-  function ($compileProvider) {
+  function($compileProvider) {
     $compileProvider.aHrefSanitizationWhitelist(
       /^\s*(https?|ftp|mailto|data|blob):/
     );
@@ -43,17 +43,22 @@ app.config([
 
 app.config([
   '$httpProvider',
-  function ($httpProvider) {
+  function($httpProvider) {
     $httpProvider.useApplyAsync(true);
   }
 ]);
 
-app.run(function ($rootScope, $route, $location, appState, $window) {
+app.run(function($rootScope, $route, $location, appState, $window) {
   appState.setNavigation({ status: false });
   appState.setNavigation({
     reloaded: false,
     discoverPrevious: false,
-    discoverSections: ['/wazuh-discover/', '/overview/', '/agents', '/wazuh-dev']
+    discoverSections: [
+      '/wazuh-discover/',
+      '/overview/',
+      '/agents',
+      '/wazuh-dev'
+    ]
   });
 
   $rootScope.$on('$routeChangeSuccess', () => {
@@ -73,7 +78,10 @@ app.run(function ($rootScope, $route, $location, appState, $window) {
       }
     } else {
       if (!navigation.status && navigation.prevLocation) {
-        if (!navigation.discoverSections.includes(navigation.currLocation) && $location.search().tabView !== 'cluster-monitoring') {
+        if (
+          !navigation.discoverSections.includes(navigation.currLocation) &&
+          $location.search().tabView !== 'cluster-monitoring'
+        ) {
           appState.setNavigation({ reloaded: true });
           $location.search('configSubTab', null);
           $location.search('editingFile', null);
@@ -83,15 +91,48 @@ app.run(function ($rootScope, $route, $location, appState, $window) {
           navigation.discoverSections.includes(navigation.currLocation)
         ) {
           if (navigation.currLocation === navigation.discoverSections[1]) {
-            $window.history.pushState({ page: 'wazuh#' + navigation.discoverPrevious + '/' }, '', 'wazuh#' + navigation.discoverPrevious + '/');
-          } else if (navigation.currLocation === navigation.discoverSections[2]) {
-            if ($location.search().tab && $location.search().tab !== 'welcome') {
-              $window.history.pushState({ page: 'wazuh#' + navigation.discoverPrevious }, '', 'wazuh#' + navigation.discoverPrevious);
-              $window.history.pushState({ page: 'wazuh#' + navigation.discoverPrevious + '?agent=' + $location.search().agent }, '', 'wazuh#' + navigation.discoverPrevious + '?agent=' + $location.search().agent);
+            $window.history.pushState(
+              { page: 'wazuh#' + navigation.discoverPrevious + '/' },
+              '',
+              'wazuh#' + navigation.discoverPrevious + '/'
+            );
+          } else if (
+            navigation.currLocation === navigation.discoverSections[2]
+          ) {
+            if (
+              $location.search().tab &&
+              $location.search().tab !== 'welcome'
+            ) {
+              $window.history.pushState(
+                { page: 'wazuh#' + navigation.discoverPrevious },
+                '',
+                'wazuh#' + navigation.discoverPrevious
+              );
+              $window.history.pushState(
+                {
+                  page:
+                    'wazuh#' +
+                    navigation.discoverPrevious +
+                    '?agent=' +
+                    $location.search().agent
+                },
+                '',
+                'wazuh#' +
+                  navigation.discoverPrevious +
+                  '?agent=' +
+                  $location.search().agent
+              );
             } else {
-              $window.history.pushState({ page: 'wazuh#' + navigation.discoverPrevious }, '', 'wazuh#' + navigation.discoverPrevious);
+              $window.history.pushState(
+                { page: 'wazuh#' + navigation.discoverPrevious },
+                '',
+                'wazuh#' + navigation.discoverPrevious
+              );
             }
-          } else if (navigation.currLocation === navigation.discoverSections[0] || navigation.currLocation === navigation.discoverSections[3]) {
+          } else if (
+            navigation.currLocation === navigation.discoverSections[0] ||
+            navigation.currLocation === navigation.discoverSections[3]
+          ) {
             $window.history.pushState(
               { page: 'wazuh#' + navigation.discoverPrevious },
               '',
