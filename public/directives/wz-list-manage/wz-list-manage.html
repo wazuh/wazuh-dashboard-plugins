@@ -1,7 +1,11 @@
 <div layout="column" layout-align="start">
-    <div layout="row" class="wz-margin-top-8 md-padding-h">
+    <div layout="row" ng-show="currentList.name" class="wz-margin-top-8 md-padding-h">
         <input placeholder="Filter entries..." ng-model="searchTerm" ng-change="filterTable()" type="text" class="kuiLocalSearchInput ng-empty ng-pristine ng-scope ng-touched ng-valid">
         <button class="kuiLocalSearchButton height-40"><span class="fa fa-search" aria-hidden="true"></span> </button>
+    </div>
+    <div layout="row" class="wz-margin-top-8 md-padding-h">
+        <input ng-show="currentList.new && !currentList.name" placeholder="Enter list file name" ng-model="currentList.newName" type="text"
+            class="height-40 kuiLocalSearchInput ng-empty ng-pristine ng-scope ng-touched ng-valid" aria-invalid="false">
     </div>
     <div layout="row" class="wz-padding-left-8 wz-padding-right-8" layout-align="start stretch">
         <md-card flex class="wz-md-card">

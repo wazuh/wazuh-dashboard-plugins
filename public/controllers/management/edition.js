@@ -61,7 +61,7 @@ export class EditionController {
           data = await this.apiReq.request(
             'GET',
             `/manager/files`,
-            { path: 'etc/ossec.conf'}
+            { path: 'etc/ossec.conf' }
           );
           xml = ((data || {}).data || {}).data || false;
         }
@@ -112,6 +112,8 @@ export class EditionController {
       return this.$scope.editConf();
     };
 
+    this.$scope.closeEditingFile = () => { };
+
     //listeners
     this.$scope.$on('wazuhShowNode', (event, parameters) => {
       return this.$scope.edit(parameters.node);
@@ -133,13 +135,13 @@ export class EditionController {
           item => item.type === 'master'
         )[0];
         this.$scope.selectedNode = masterNode.name;
-      } else if(
+      } else if (
         this.$scope.clusterStatus &&
         this.$scope.clusterStatus.data.data.enabled === 'yes' &&
-        this.$scope.clusterStatus.data.data.running === 'no'){
+        this.$scope.clusterStatus.data.data.running === 'no') {
 
         this.errorHandler.handle('', 'Cluster is enabled but not running');
-      }else{
+      } else {
         this.$scope.selectedNode = "manager";
       }
     } catch (error) {

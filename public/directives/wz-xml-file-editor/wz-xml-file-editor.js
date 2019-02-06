@@ -23,7 +23,8 @@ app.directive('wzXmlFileEditor', function () {
       fileName: '@fileName',
       validFn: '&',
       data: '=data',
-      targetName: '=targetName'
+      targetName: '=targetName',
+      closeFn: '&'
     },
     controller($scope, $document, errorHandler, groupHandler, rulesetHandler, saveConfig) {
 
@@ -139,10 +140,10 @@ app.directive('wzXmlFileEditor', function () {
           var type = single
             ? 'single'
             : closing
-            ? 'closing'
-            : opening
-            ? 'opening'
-            : 'other';
+              ? 'closing'
+              : opening
+                ? 'opening'
+                : 'other';
           var fromTo = lastType + '->' + type;
           lastType = type;
           var padding = '';
@@ -180,6 +181,7 @@ app.directive('wzXmlFileEditor', function () {
             await saveConfig.saveManagerConfiguration(xml);
             errorHandler.info('Success. Manager configuration has been updated', '');
           }
+          $scope.closeFn({ reload: true });
         } catch (error) {
           errorHandler.handle(error, 'Send file error');
         }

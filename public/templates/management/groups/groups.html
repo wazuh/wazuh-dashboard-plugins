@@ -33,7 +33,8 @@
                 <!-- Group MD5 sums section -->
                 <md-card flex class="no-margin-left no-margin-right wz-margin-top-8 wz-md-card">
                     <md-card-content>
-                        <span class="wz-headline-title font-size-18"><i class="fa fa-fw fa-object-group" aria-hidden="true"></i> {{currentGroup.name}}</span>
+                        <span class="wz-headline-title font-size-18"><i class="fa fa-fw fa-object-group" aria-hidden="true"></i>
+                            {{currentGroup.name}}</span>
                         <md-divider class="wz-margin-top-10"></md-divider>
                         <div layout="row" class="wz-padding-top-10">
                             <span flex="15">Agents</span>
@@ -74,7 +75,7 @@
                 </div>
                 <div class="md-padding md-padding-top-10" style="height: calc(100vh - 358px);" ng-if="fetchedXML">
                     <wz-xml-file-editor file-name='agent.conf' data="fetchedXML" target-name="currentGroup.name + ' group'"
-                        valid-fn='xmlIsValid(valid)'>
+                        valid-fn='xmlIsValid(valid)' close-fn='closeEditingFile(reload)'>
                     </wz-xml-file-editor>
                 </div>
             </div>
