@@ -14,7 +14,6 @@ export class SaveConfig {
     this.apiReq = apiReq;
   }
 
-
   async saveManagerConfiguration(content) {
     try {
       const result = await this.apiReq.request(
@@ -26,9 +25,9 @@ export class SaveConfig {
     } catch (error) {
       return Promise.reject(error);
     }
-  };
+  }
 
-  async saveNodeConfiguration(node,content) {
+  async saveNodeConfiguration(node, content) {
     try {
       //-
 
@@ -36,7 +35,5 @@ export class SaveConfig {
     } catch (error) {
       return Promise.reject(error);
     }
-  };
-
- 
+  }
 }

@@ -173,22 +173,23 @@ export function CdbListsController(
     $scope.closeDetailView();
   };
 
-  const stringToObj = (string) => {
+  const stringToObj = string => {
     let result = {};
     const splitted = string.split('\n');
-    splitted.forEach(function (element) {
+    splitted.forEach(function(element) {
       const keyValue = element.split(':');
-      if (keyValue[0])
-        result[keyValue[0]] = keyValue[1];
+      if (keyValue[0]) result[keyValue[0]] = keyValue[1];
     });
     return result;
-  }
+  };
 
   //listeners
   $scope.$on('wazuhShowCdbList', async (ev, parameters) => {
     $scope.currentList = parameters.cdblist;
     try {
-      const data = await rulesetHandler.getCdbList(`${$scope.currentList.path}/${$scope.currentList.name}`);
+      const data = await rulesetHandler.getCdbList(
+        `${$scope.currentList.path}/${$scope.currentList.name}`
+      );
       $scope.currentList.list = stringToObj(data.data.data);
       $scope.viewingDetail = true;
       $scope.$emit('setCurrentList', { currentList: $scope.currentList });
@@ -198,7 +199,6 @@ export function CdbListsController(
     }
     $scope.$broadcast('changeCdbList', { currentList: $scope.currentList });
     if (!$scope.$$phase) $scope.$digest();
-
   });
 
   /**

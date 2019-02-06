@@ -17,17 +17,16 @@ import { checkGap } from '../wz-table/lib/check-gap';
 
 const app = uiModules.get('app/wazuh', []);
 
-app.directive('wzListManage', function () {
+app.directive('wzListManage', function() {
   return {
     restrict: 'E',
     scope: {
       list: '=list'
     },
     controller($scope, errorHandler, $filter, rulesetHandler, wazuhConfig) {
-
       /**
- * Pagination variables and functions
- */
+       * Pagination variables and functions
+       */
       $scope.itemsPerPage = $scope.rowsPerPage || 10;
       $scope.pagedItems = [];
       $scope.currentPage = 0;
@@ -40,18 +39,20 @@ app.directive('wzListManage', function () {
       $scope.prevPage = () => pagination.prevPage($scope);
       $scope.nextPage = async currentPage =>
         pagination.nextPage(currentPage, $scope, errorHandler, null);
-      $scope.setPage = function () {
+      $scope.setPage = function() {
         $scope.currentPage = this.n;
         $scope.nextPage(this.n);
       };
 
       /**
-      * This apply filter and sorting to table data
-      */
-      $scope.filterTable = (data) => {
-        const result = Object.keys(data || $scope.currentList.list).map(function (key) {
-          return [key, $scope.currentList.list[key]];
-        });
+       * This apply filter and sorting to table data
+       */
+      $scope.filterTable = data => {
+        const result = Object.keys(data || $scope.currentList.list).map(
+          function(key) {
+            return [key, $scope.currentList.list[key]];
+          }
+        );
 
         items = $filter('filter')(result, $scope.searchTerm);
         $scope.totalItems = items.length;
@@ -71,8 +72,7 @@ app.directive('wzListManage', function () {
       };
 
       $scope.currentList = $scope.list;
-      if ($scope.currentList.list)
-        fetch();
+      if ($scope.currentList.list) fetch();
       const configuration = wazuhConfig.getConfig();
       $scope.adminMode = !!(configuration || {}).admin;
 
@@ -80,24 +80,23 @@ app.directive('wzListManage', function () {
       $scope.sortReverse = false;
       $scope.searchTerm = '';
 
-      const stringToObj = (string) => {
+      const stringToObj = string => {
         let result = {};
         const splitted = string.split('\n');
-        splitted.forEach(function (element) {
+        splitted.forEach(function(element) {
           const keyValue = element.split(':');
-          if (keyValue[0])
-            result[keyValue[0]] = keyValue[1];
+          if (keyValue[0]) result[keyValue[0]] = keyValue[1];
         });
         return result;
-      }
+      };
 
-      $scope.$watch("currentList.list", () => {
-        if ($scope.currentList.list)
-          fetch();
+      $scope.$watch('currentList.list', () => {
+        if ($scope.currentList.list) fetch();
       });
 
       const refresh = () => {
-        rulesetHandler.getCdbList(`${$scope.currentList.path}/${$scope.currentList.name}`)
+        rulesetHandler
+          .getCdbList(`${$scope.currentList.path}/${$scope.currentList.name}`)
           .then(data => {
             $scope.currentList.list = stringToObj(data.data.data);
             fetch();
@@ -105,7 +104,7 @@ app.directive('wzListManage', function () {
             $scope.viewingDetail = true;
             if (!$scope.$$phase) $scope.$digest();
           });
-      }
+      };
 
       $scope.$on('changeCdbList', (ev, params) => {
         if (params.currentList) {
@@ -126,7 +125,10 @@ app.directive('wzListManage', function () {
           for (var key in $scope.currentList.list) {
             raw = raw.concat(`${key}:${$scope.currentList.list[key]}` + '\n');
           }
-          const result = await rulesetHandler.sendCdbList($scope.currentList.name, raw);
+          const result = await rulesetHandler.sendCdbList(
+            $scope.currentList.name,
+            raw
+          );
           fetch();
           errorHandler.info(result.data.data, '');
           $scope.loadingChange = false;
@@ -136,7 +138,7 @@ app.directive('wzListManage', function () {
           errorHandler.handle(err, 'Error updating list');
           $scope.loadingChange = false;
         }
-      }
+      };
 
       $scope.addEntry = (key, value) => {
         if (!$scope.currentList.list[key]) {
@@ -145,23 +147,23 @@ app.directive('wzListManage', function () {
         } else {
           errorHandler.handle('Entry already exists', '');
         }
-      }
+      };
 
       /**
-     * Enable edition for a given key
-     * @param {String} key Entry key
-     */
+       * Enable edition for a given key
+       * @param {String} key Entry key
+       */
       $scope.setEditingKey = (key, value) => {
         $scope.editingKey = key;
         $scope.editingNewValue = value;
-      }
+      };
       /**
        * Cancel edition of an entry
        */
       $scope.cancelEditingKey = () => {
         $scope.editingKey = false;
         $scope.editingNewValue = '';
-      }
+      };
 
       $scope.showConfirmRemoveEntry = (ev, key) => {
         $scope.removingEntry = key;
@@ -172,13 +174,13 @@ app.directive('wzListManage', function () {
         $scope.currentList.list[key] = newValue;
         $scope.cancelEditingKey();
         saveList();
-      }
+      };
 
       $scope.cancelRemoveEntry = () => {
         $scope.removingEntry = false;
       };
 
-      $scope.confirmRemoveEntry = (key) => {
+      $scope.confirmRemoveEntry = key => {
         delete $scope.currentList.list[key];
         $scope.removingEntry = false;
         saveList();

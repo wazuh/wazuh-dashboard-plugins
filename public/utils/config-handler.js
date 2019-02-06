@@ -218,11 +218,9 @@ export class ConfigurationHandler {
     if (!$scope.$$phase) $scope.$digest();
   }
 
-  json2xml(data,$scope) {
-    if(data){
-      const result = XMLBeautifier(
-        js2xmlparser.parse('configuration', data)
-      );
+  json2xml(data, $scope) {
+    if (data) {
+      const result = XMLBeautifier(js2xmlparser.parse('configuration', data));
       return result;
     }
   }

@@ -18,7 +18,14 @@ export class ManagementController {
    * @param {*} $location
    * @param {*} shareAgent
    */
-  constructor($scope, $rootScope, $location, shareAgent, wazuhConfig, appState) {
+  constructor(
+    $scope,
+    $rootScope,
+    $location,
+    shareAgent,
+    wazuhConfig,
+    appState
+  ) {
     this.$scope = $scope;
     this.$rootScope = $rootScope;
     this.$location = $location;
@@ -26,7 +33,7 @@ export class ManagementController {
     this.wazuhConfig = wazuhConfig;
     this.tab = 'welcome';
     this.rulesetTab = 'rules';
-    this.globalConfigTab = 'overview'
+    this.globalConfigTab = 'overview';
     this.tabNames = TabNames;
     this.wazuhManagementTabs = ['ruleset', 'groups', 'configuration'];
     this.statusReportsTabs = ['status', 'logs', 'reporting', 'monitoring'];
@@ -78,7 +85,6 @@ export class ManagementController {
    * When controller loads
    */
   $onInit() {
-
     const configuration = this.wazuhConfig.getConfig();
     this.$scope.adminMode = !!(configuration || {}).admin;
     if (this.shareAgent.getAgent() && this.shareAgent.getSelectedGroup()) {
@@ -108,11 +114,17 @@ export class ManagementController {
       this.appState.setNavigation({ status: true });
     } else {
       this.$scope.editionTab = tab;
-      this.$rootScope.$broadcast('configurationIsReloaded', { globalConfigTab: this.globalConfigTab, reloadConfigSubTab: true });
+      this.$rootScope.$broadcast('configurationIsReloaded', {
+        globalConfigTab: this.globalConfigTab,
+        reloadConfigSubTab: true
+      });
     }
     this.$location.search('configSubTab', null);
     this.$location.search('editSubTab', tab);
-    this.$scope.$broadcast('configurationIsReloaded', { globalConfigTab: this.globalConfigTab, reloadConfigSubTab: true });
+    this.$scope.$broadcast('configurationIsReloaded', {
+      globalConfigTab: this.globalConfigTab,
+      reloadConfigSubTab: true
+    });
   }
   /**
    * This switch to a selected tab
@@ -134,11 +146,10 @@ export class ManagementController {
       this.$scope.$broadcast('groupsIsReloaded');
     }
     if (this.tab === 'configuration' && !this.editTab) {
-      this.globalConfigTab = 'overview'
+      this.globalConfigTab = 'overview';
       this.currentConfiguration = false;
       this.$scope.$broadcast('configurationIsReloaded');
-    }
-    else if (this.tab === 'configuration' && this.editTab) {
+    } else if (this.tab === 'configuration' && this.editTab) {
       this.setConfigTab(this.editTab);
     } else {
       this.$location.search('configSubTab', null);
