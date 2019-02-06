@@ -18,15 +18,23 @@ export class ManagementController {
    * @param {*} $location
    * @param {*} shareAgent
    */
-  constructor($scope, $rootScope, $location, shareAgent, wazuhConfig, appState) {
+  constructor(
+    $scope,
+    $rootScope,
+    $location,
+    shareAgent,
+    wazuhConfig,
+    appState
+  ) {
     this.$scope = $scope;
     this.$rootScope = $rootScope;
     this.$location = $location;
+    this.appState = appState;
     this.shareAgent = shareAgent;
     this.wazuhConfig = wazuhConfig;
     this.tab = 'welcome';
     this.rulesetTab = 'rules';
-    this.globalConfigTab = 'overview'
+    this.globalConfigTab = 'overview';
     this.tabNames = TabNames;
     this.wazuhManagementTabs = ['ruleset', 'groups', 'configuration'];
     this.statusReportsTabs = ['status', 'logs', 'reporting', 'monitoring'];
@@ -36,34 +44,38 @@ export class ManagementController {
     });
     this.$scope.$on('removeCurrentGroup', () => {
       this.currentGroup = false;
+      this.appState.setNavigation({ status: true });
     });
     this.$scope.$on('setCurrentRule', (ev, params) => {
       this.currentRule = (params || {}).currentRule || false;
-      $location.search('currentRule', true);
-      appState.setNavigation({ status: true });
+      this.$location.search('currentRule', true);
+      this.appState.setNavigation({ status: true });
     });
     this.$scope.$on('removeCurrentRule', () => {
       this.currentRule = false;
-      $location.search('currentRule', null);
+      this.appState.setNavigation({ status: true });
+      this.$location.search('currentRule', null);
     });
     this.$scope.$on('setCurrentDecoder', (ev, params) => {
       this.currentDecoder = (params || {}).currentDecoder || false;
-      $location.search('currentDecoder', true);
-      appState.setNavigation({ status: true });
+      this.$location.search('currentDecoder', true);
+      this.appState.setNavigation({ status: true });
     });
     this.$scope.$on('removeCurrentDecoder', () => {
       this.currentDecoder = false;
-      $location.search('currentDecoder', null);
+      this.appState.setNavigation({ status: true });
+      this.$location.search('currentDecoder', null);
     });
     this.$scope.$on('setCurrentList', (ev, params) => {
       this.currentList = (params || {}).currentList || false;
-      $location.search('currentList', true);
-      appState.setNavigation({ status: true });
+      this.$location.search('currentList', true);
+      this.appState.setNavigation({ status: true });
       if (!this.$scope.$$phase) this.$scope.$digest();
     });
     this.$scope.$on('removeCurrentList', () => {
       this.currentList = false;
-      $location.search('currentList', null);
+      this.appState.setNavigation({ status: true });
+      this.$location.search('currentList', null);
     });
     this.$scope.$on('setCurrentConfiguration', (ev, params) => {
       this.currentConfiguration = (params || {}).currentConfiguration || false;
@@ -78,7 +90,6 @@ export class ManagementController {
    * When controller loads
    */
   $onInit() {
-
     const configuration = this.wazuhConfig.getConfig();
     this.$scope.adminMode = !!(configuration || {}).admin;
     if (this.shareAgent.getAgent() && this.shareAgent.getSelectedGroup()) {
@@ -108,11 +119,17 @@ export class ManagementController {
       this.appState.setNavigation({ status: true });
     } else {
       this.$scope.editionTab = tab;
-      this.$rootScope.$broadcast('configurationIsReloaded', { globalConfigTab: this.globalConfigTab, reloadConfigSubTab: true });
+      this.$rootScope.$broadcast('configurationIsReloaded', {
+        globalConfigTab: this.globalConfigTab,
+        reloadConfigSubTab: true
+      });
     }
     this.$location.search('configSubTab', null);
     this.$location.search('editSubTab', tab);
-    this.$scope.$broadcast('configurationIsReloaded', { globalConfigTab: this.globalConfigTab, reloadConfigSubTab: true });
+    this.$scope.$broadcast('configurationIsReloaded', {
+      globalConfigTab: this.globalConfigTab,
+      reloadConfigSubTab: true
+    });
   }
   /**
    * This switch to a selected tab
@@ -134,11 +151,10 @@ export class ManagementController {
       this.$scope.$broadcast('groupsIsReloaded');
     }
     if (this.tab === 'configuration' && !this.editTab) {
-      this.globalConfigTab = 'overview'
+      this.globalConfigTab = 'overview';
       this.currentConfiguration = false;
       this.$scope.$broadcast('configurationIsReloaded');
-    }
-    else if (this.tab === 'configuration' && this.editTab) {
+    } else if (this.tab === 'configuration' && this.editTab) {
       this.setConfigTab(this.editTab);
     } else {
       this.$location.search('configSubTab', null);

@@ -59,7 +59,7 @@
     /* 1 */
     outline: none !important;
     /* 2 */
-    box-shadow: 0 0 0 1px #ffffff, 0 0 0 2px #0079a5;
+    box-shadow: 0 0 0 1px #ffffff, 0 0 0 2px #006BB4;
     /* 3 */ }
   
   /**
@@ -266,7 +266,7 @@
         /* 1 */
         outline: none !important;
         /* 2 */
-        box-shadow: 0 0 0 1px #777777, 0 0 0 2px #0079a5;
+        box-shadow: 0 0 0 1px #777777, 0 0 0 2px #006BB4;
         /* 3 */
         color: #FFF; }
       a.theme-dark .kuiButton--basic:not(.kuiButton-isDisabled):focus {
@@ -275,7 +275,7 @@
         /* 1 */
         outline: none !important;
         /* 2 */
-        box-shadow: 0 0 0 1px #777777, 0 0 0 2px #0079a5;
+        box-shadow: 0 0 0 1px #777777, 0 0 0 2px #006BB4;
         /* 3 */
         color: #FFF; }
       .theme-dark .kuiButton--basic:enabled:hover {
@@ -298,7 +298,7 @@
    */
   .kuiButton--primary {
     color: #FFF;
-    background-color: #0079a5; }
+    background-color: #006BB4; }
     .kuiButton--primary:not(a):enabled:focus {
       color: #FFF; }
     a.kuiButton--primary:not(.kuiButton-isDisabled):focus {
@@ -447,7 +447,7 @@
    * 2. Override either Bootstrap or Timelion styles.
    */
   .kuiButton--hollow {
-    color: #0079a5 !important;
+    color: #006BB4 !important;
     /* 2 */
     background-color: transparent; }
     .theme-dark .kuiButton--hollow {
@@ -485,9 +485,9 @@
         /* 2 */ }
   
   .kuiButton--secondary {
-    color: #0079a5 !important;
+    color: #006BB4 !important;
     /* 2 */
-    border: solid 1px #0079a5;
+    border: solid 1px #006BB4;
     background-color: rgba(255, 255, 255, 0.5); }
     .kuiButton--secondary:enabled:hover {
       color: #005472 !important;
@@ -708,7 +708,7 @@
     opacity: 0; }
     .kuiCodeEditorKeyboardHint:focus {
       opacity: 1;
-      border: 2px solid #0079a5;
+      border: 2px solid #006BB4;
       z-index: 1000; }
     .kuiCodeEditorKeyboardHint.kuiCodeEditorKeyboardHint-isInactive {
       display: none; }
@@ -1570,8 +1570,8 @@
       color: #FFF;
       transition: opacity 0.1s linear; }
     .kuiCheckBox:checked {
-      border-color: #0079a5;
-      background-color: #0079a5; }
+      border-color: #006BB4;
+      background-color: #006BB4; }
       .kuiCheckBox:checked:before {
         opacity: 1; }
     .kuiCheckBox:focus {
@@ -1579,7 +1579,7 @@
       /* 1 */
       outline: none !important;
       /* 2 */
-      box-shadow: 0 0 0 1px #ffffff, 0 0 0 2px #0079a5;
+      box-shadow: 0 0 0 1px #ffffff, 0 0 0 2px #006BB4;
       /* 3 */ }
     .kuiCheckBox:disabled {
       opacity: 0.3;
@@ -1588,7 +1588,7 @@
       background-color: #444444;
       border-color: #444444; }
       .theme-dark .kuiCheckBox:checked {
-        background-color: #0079a5; }
+        background-color: #006BB4; }
   
   .kuiCheckBoxLabel {
     display: -webkit-box;
@@ -1662,7 +1662,7 @@
       border-color: #A30000; }
     .kuiSearchInput__input:focus {
       outline: none;
-      border-color: #0079a5; }
+      border-color: #006BB4; }
     .kuiSearchInput__input:disabled {
       opacity: 0.4;
       cursor: not-allowed; }
@@ -1671,7 +1671,7 @@
       border-color: #444444; }
       .theme-dark .kuiSearchInput__input:focus {
         outline: none;
-        border-color: #0079a5; }
+        border-color: #006BB4; }
   
   .kuiSearchInput--small {
     width: 60px; }
@@ -1712,7 +1712,7 @@
       border-color: #A30000; }
     .kuiSelect:focus {
       outline: none;
-      border-color: #0079a5; }
+      border-color: #006BB4; }
     .kuiSelect:disabled {
       opacity: 0.4;
       cursor: not-allowed; }
@@ -1721,7 +1721,7 @@
       border-color: #444444; }
       .theme-dark .kuiSelect:focus {
         outline: none;
-        border-color: #0079a5; }
+        border-color: #006BB4; }
     .kuiSelect:-moz-focusring {
       text-shadow: 0 0 0;
       /* 3 */ }
@@ -1733,7 +1733,7 @@
     .kuiSelect:focus {
       box-shadow: none;
       outline: none;
-      border-color: #0079a5; }
+      border-color: #006BB4; }
   
   .kuiSelect--small {
     width: 60px; }
@@ -1787,7 +1787,7 @@
       border-color: #A30000; }
     .kuiTextArea:focus {
       outline: none;
-      border-color: #0079a5; }
+      border-color: #006BB4; }
     .kuiTextArea:disabled {
       opacity: 0.4;
       cursor: not-allowed; }
@@ -1796,11 +1796,11 @@
       border-color: #444444; }
       .theme-dark .kuiTextArea:focus {
         outline: none;
-        border-color: #0079a5; }
+        border-color: #006BB4; }
     .kuiTextArea:focus {
       box-shadow: none;
       outline: none;
-      border-color: #0079a5; }
+      border-color: #006BB4; }
     .kuiTextArea.kuiTextArea-isInvalid {
       border-color: #A30000; }
   
@@ -1836,7 +1836,7 @@
       border-color: #A30000; }
     .kuiTextInput:focus {
       outline: none;
-      border-color: #0079a5; }
+      border-color: #006BB4; }
     .kuiTextInput:disabled {
       opacity: 0.4;
       cursor: not-allowed; }
@@ -1845,7 +1845,7 @@
       border-color: #444444; }
       .theme-dark .kuiTextInput:focus {
         outline: none;
-        border-color: #0079a5; }
+        border-color: #006BB4; }
     .kuiTextInput.kuiTextInput-isInvalid {
       border-color: #A30000; }
   
@@ -2037,7 +2037,7 @@
     font-size: 16px;
     line-height: 0;
     background-color: transparent;
-    color: #0079a5;
+    color: #006BB4;
     cursor: pointer;
     border: none;
     padding: 0; }
@@ -2147,7 +2147,7 @@
     line-height: 1.5; }
   
   .kuiLink {
-    color: #0079a5;
+    color: #006BB4;
     text-decoration: none;
     cursor: pointer;
     /* 1 */
@@ -2164,7 +2164,7 @@
     line-height: inherit;
     /* 2 */ }
     .kuiLink:visited, .kuiLink:active {
-      color: #0079a5; }
+      color: #006BB4; }
     .kuiLink:hover {
       color: #006E8A;
       text-decoration: underline; }
@@ -2210,7 +2210,7 @@
    * 1. Make it a bit darker to contrast with the gray background.
    */
   .kuiLocalBreadcrumb__link {
-    color: #0079a5;
+    color: #006BB4;
     text-decoration: none;
     cursor: pointer;
     /* 1 */
@@ -2226,11 +2226,11 @@
     /* 2 */
     line-height: inherit;
     /* 2 */
-    color: #0079a5;
+    color: #006BB4;
     /* 1 */
     font-size: 14px; }
     .kuiLocalBreadcrumb__link:visited, .kuiLocalBreadcrumb__link:active {
-      color: #0079a5; }
+      color: #006BB4; }
     .kuiLocalBreadcrumb__link:hover {
       color: #006E8A;
       text-decoration: underline; }
@@ -2282,13 +2282,13 @@
     .kuiDatePickerNavigationButton:hover, .kuiDatePickerNavigationButton:active {
       cursor: pointer;
       color: #F5F5F5;
-      background-color: #0079a5; }
+      background-color: #006BB4; }
     .kuiDatePickerNavigationButton:focus {
       z-index: 1;
       /* 1 */
       outline: none !important;
       /* 2 */
-      box-shadow: 0 0 0 1px #F5F5F5, 0 0 0 2px #0079a5;
+      box-shadow: 0 0 0 1px #F5F5F5, 0 0 0 2px #006BB4;
       /* 3 */
       color: #2d2d2d;
       /* 1 */ }
@@ -2302,7 +2302,7 @@
         /* 1 */
         outline: none !important;
         /* 2 */
-        box-shadow: 0 0 0 1px #525252, 0 0 0 2px #0079a5;
+        box-shadow: 0 0 0 1px #525252, 0 0 0 2px #006BB4;
         /* 3 */
         color: #dedede;
         /* 1 */ }
@@ -2350,7 +2350,7 @@
       /* 1 */
       outline: none !important;
       /* 2 */
-      box-shadow: 0 0 0 1px #F5F5F5, 0 0 0 2px #0079a5;
+      box-shadow: 0 0 0 1px #F5F5F5, 0 0 0 2px #006BB4;
       /* 3 */
       color: #2d2d2d;
       /* 1 */ }
@@ -2361,14 +2361,14 @@
       visibility: hidden;
       pointer-events: none; }
     .kuiDatePickerRowCellContent.kuiDatePickerRowCellContent-isCurrent {
-      color: #0079a5; }
+      color: #006BB4; }
     .kuiDatePickerRowCellContent.kuiDatePickerRowCellContent-isSelected {
       background-color: #777777;
       color: #ffffff; }
     .kuiDatePickerRowCellContent:hover, .kuiDatePickerRowCellContent:active {
       cursor: pointer;
       color: #F5F5F5;
-      background-color: #0079a5; }
+      background-color: #006BB4; }
     .theme-dark .kuiDatePickerRowCellContent {
       color: #cecece; }
       .theme-dark .kuiDatePickerRowCellContent:focus {
@@ -2376,7 +2376,7 @@
         /* 1 */
         outline: none !important;
         /* 2 */
-        box-shadow: 0 0 0 1px #525252, 0 0 0 2px #0079a5;
+        box-shadow: 0 0 0 1px #525252, 0 0 0 2px #006BB4;
         /* 3 */ }
       .theme-dark .kuiDatePickerRowCellContent.kuiDatePickerRowCellContent-isCurrent {
         color: #b7e2ea; }
@@ -2492,7 +2492,7 @@
     display: flex; }
   
   .kuiLocalDropdownHeader__action {
-    color: #0079a5;
+    color: #006BB4;
     font-size: 12px;
     text-decoration: none;
     cursor: pointer; }
@@ -2516,13 +2516,13 @@
     border: 1px solid #D9D9D9;
     border-radius: 4px; }
     .kuiLocalDropdownInput:focus {
-      border-color: #0079a5; }
+      border-color: #006BB4; }
     .theme-dark .kuiLocalDropdownInput {
       color: #cecece;
       background-color: #444444;
       border-color: #444444; }
       .theme-dark .kuiLocalDropdownInput:focus {
-        border-color: #0079a5; }
+        border-color: #006BB4; }
   
   .kuiLocalDropdownFormNote {
     font-size: 14px;
@@ -2576,16 +2576,16 @@
     border-right: solid 1px transparent;
     border-left: solid 1px transparent; }
     .kuiLocalMenuItem:hover, .kuiLocalMenuItem:focus {
-      background-color: #0079a5;
+      background-color: #006BB4;
       color: #F5F5F5; }
     .kuiLocalMenuItem.kuiLocalMenuItem-isSelected {
       background-color: #F5F5F5;
       border-color: #D9D9D9;
       height: calc(100% + 1px);
       z-index: 2;
-      color: #0079a5; }
+      color: #006BB4; }
       .kuiLocalMenuItem.kuiLocalMenuItem-isSelected:hover, .kuiLocalMenuItem.kuiLocalMenuItem-isSelected:focus {
-        color: #0079a5; }
+        color: #006BB4; }
     .kuiLocalMenuItem.kuiLocalMenuItem-isDisabled {
       opacity: 0.5;
       cursor: not-allowed; }
@@ -2720,7 +2720,7 @@
       border-color: #A30000; }
     .kuiLocalSearchInput:focus {
       outline: none;
-      border-color: #0079a5; }
+      border-color: #006BB4; }
     .kuiLocalSearchInput:disabled {
       opacity: 0.4;
       cursor: not-allowed; }
@@ -2729,7 +2729,7 @@
       border-color: #444444; }
       .theme-dark .kuiLocalSearchInput:focus {
         outline: none;
-        border-color: #0079a5; }
+        border-color: #006BB4; }
     .kuiLocalSearchInput.kuiLocalSearchInput-isInvalid {
       border-color: #e74C3c; }
   
@@ -2802,7 +2802,7 @@
       border-color: #A30000; }
     .kuiLocalSearchSelect:focus {
       outline: none;
-      border-color: #0079a5; }
+      border-color: #006BB4; }
     .kuiLocalSearchSelect:disabled {
       opacity: 0.4;
       cursor: not-allowed; }
@@ -2811,7 +2811,7 @@
       border-color: #444444; }
       .theme-dark .kuiLocalSearchSelect:focus {
         outline: none;
-        border-color: #0079a5; }
+        border-color: #006BB4; }
     .kuiLocalSearchSelect:-moz-focusring {
       text-shadow: 0 0 0;
       /* 3 */ }
@@ -2837,7 +2837,7 @@
       /* 1 */
       outline: none !important;
       /* 2 */
-      box-shadow: 0 0 0 1px #D9D9D9, 0 0 0 2px #0079a5;
+      box-shadow: 0 0 0 1px #D9D9D9, 0 0 0 2px #006BB4;
       /* 3 */ }
     .theme-dark .kuiLocalSearchButton {
       color: #ffffff;
@@ -2847,7 +2847,7 @@
         /* 1 */
         outline: none !important;
         /* 2 */
-        box-shadow: 0 0 0 1px #333333, 0 0 0 2px #0079a5;
+        box-shadow: 0 0 0 1px #333333, 0 0 0 2px #006BB4;
         /* 3 */ }
   
   /**
@@ -2883,12 +2883,12 @@
        *    a regular cursor instead of setting pointer-events: none.
        */ }
     .kuiLocalTab:hover:not(.kuiLocalTab-isDisabled), .kuiLocalTab:active:not(.kuiLocalTab-isDisabled) {
-      color: #0079a5; }
+      color: #006BB4; }
       .theme-dark .kuiLocalTab:hover:not(.kuiLocalTab-isDisabled), .theme-dark .kuiLocalTab:active:not(.kuiLocalTab-isDisabled) {
         color: #ffffff; }
     .kuiLocalTab.kuiLocalTab-isSelected {
-      color: #0079a5;
-      border-bottom-color: #0079a5;
+      color: #006BB4;
+      border-bottom-color: #006BB4;
       cursor: default; }
       .theme-dark .kuiLocalTab.kuiLocalTab-isSelected {
         color: #ffffff;
@@ -2971,7 +2971,7 @@
       /* 1 */
       outline: none !important;
       /* 2 */
-      box-shadow: 0 0 0 1px #ffffff, 0 0 0 2px #0079a5;
+      box-shadow: 0 0 0 1px #ffffff, 0 0 0 2px #006BB4;
       /* 3 */ }
   
   .kuiMenuButton--iconText .kuiMenuButton__icon:first-child {
@@ -3004,7 +3004,7 @@
    */
   .kuiMenuButton--primary {
     color: #ffffff;
-    background-color: #0079a5; }
+    background-color: #006BB4; }
     .kuiMenuButton--primary:focus {
       color: #ffffff !important;
       /* 1 */ }
@@ -3301,7 +3301,7 @@
       /* 1 */
       outline: none !important;
       /* 2 */
-      box-shadow: 0 0 0 1px #D9D9D9, 0 0 0 2px #0079a5;
+      box-shadow: 0 0 0 1px #D9D9D9, 0 0 0 2px #006BB4;
       /* 3 */ }
     a.kuiPanelHeader .kuiButton:not(.kuiButton-isDisabled):focus {
       /* 1 */
@@ -3309,7 +3309,7 @@
       /* 1 */
       outline: none !important;
       /* 2 */
-      box-shadow: 0 0 0 1px #D9D9D9, 0 0 0 2px #0079a5;
+      box-shadow: 0 0 0 1px #D9D9D9, 0 0 0 2px #006BB4;
       /* 3 */ }
     .kuiPanelHeader .kuiButton--danger:not(a):enabled:focus {
       z-index: 1;
@@ -3330,11 +3330,11 @@
       border-color: #ffffff; }
       .kuiPanelHeader .kuiSelect:not(a):enabled:focus {
         outline: none;
-        border-color: #0079a5; }
+        border-color: #006BB4; }
       a.kuiPanelHeader .kuiSelect:not(.kuiButton-isDisabled):focus {
         /* 1 */
         outline: none;
-        border-color: #0079a5; }
+        border-color: #006BB4; }
   
   /**
      * 1. This way we can use h1, h2, etc.
@@ -3809,8 +3809,8 @@
       /* 1 */ }
     .kuiTab:focus:not(.kuiTab-isSelected):not(:active) {
       z-index: 1;
-      color: #0079a5;
-      border: 1px solid #0079a5 !important; }
+      color: #006BB4;
+      border: 1px solid #006BB4 !important; }
       .theme-dark .kuiTab:focus:not(.kuiTab-isSelected):not(:active) {
         color: #cecece;
         background-color: #333333;
@@ -3851,7 +3851,7 @@
     .kuiToggleButton:focus {
       color: #191E23; }
     .kuiToggleButton:active {
-      color: #0079a5 !important;
+      color: #006BB4 !important;
       /* 2 */ }
     .kuiToggleButton:hover:not(:disabled) {
       color: #006E8A !important;
@@ -3906,7 +3906,7 @@
       /* 1 */
       outline: none !important;
       /* 2 */
-      box-shadow: 0 0 0 1px #D9D9D9, 0 0 0 2px #0079a5;
+      box-shadow: 0 0 0 1px #D9D9D9, 0 0 0 2px #006BB4;
       /* 3 */ }
     a.kuiToolBar .kuiButton:not(.kuiButton-isDisabled):focus {
       /* 1 */
@@ -3914,7 +3914,7 @@
       /* 1 */
       outline: none !important;
       /* 2 */
-      box-shadow: 0 0 0 1px #D9D9D9, 0 0 0 2px #0079a5;
+      box-shadow: 0 0 0 1px #D9D9D9, 0 0 0 2px #006BB4;
       /* 3 */ }
     .kuiToolBar .kuiButton--danger:not(a):enabled:focus {
       z-index: 1;
@@ -3935,11 +3935,11 @@
       border-color: #ffffff; }
       .kuiToolBar .kuiSelect:not(a):enabled:focus {
         outline: none;
-        border-color: #0079a5; }
+        border-color: #006BB4; }
       a.kuiToolBar .kuiSelect:not(.kuiButton-isDisabled):focus {
         /* 1 */
         outline: none;
-        border-color: #0079a5; }
+        border-color: #006BB4; }
   
   .kuiToolBarSection {
     display: -webkit-box;
@@ -4118,7 +4118,7 @@
     transition: border-color 0.1s linear; }
     .kuiToolBarSearchBox__input:focus {
       outline: none;
-      border-color: #0079a5; }
+      border-color: #006BB4; }
   
   /*
    * 1. We don't want the text to take up two lines and overflow the ToolBar.

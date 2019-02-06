@@ -24,7 +24,7 @@ export default kibana =>
         id: 'wazuh',
         title: 'Wazuh',
         description: 'Wazuh app for Kibana',
-        icon: 'plugins/wazuh/img/icon.png',
+        icon: 'plugins/wazuh/img/icon.svg',
         main: 'plugins/wazuh/app'
       },
       __bundleProvider__(kbnServer) {

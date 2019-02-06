@@ -15,11 +15,9 @@ export class RulesetHandler {
   }
   async getLocalRules() {
     try {
-      const result = await this.apiReq.request(
-        'GET',
-        `/rules`,
-        { path: '/var/ossec/etc/rules' }
-      );
+      const result = await this.apiReq.request('GET', `/rules`, {
+        path: '/var/ossec/etc/rules'
+      });
       return result;
     } catch (error) {
       return Promise.reject(error);
@@ -28,11 +26,9 @@ export class RulesetHandler {
 
   async getLocalDecoders() {
     try {
-      const result = await this.apiReq.request(
-        'GET',
-        `/decoders`,
-        { path: '/var/ossec/etc/decoders' }
-      );
+      const result = await this.apiReq.request('GET', `/decoders`, {
+        path: '/var/ossec/etc/decoders'
+      });
       return result;
     } catch (error) {
       return Promise.reject(error);
@@ -41,11 +37,9 @@ export class RulesetHandler {
 
   async getRuleConfiguration(path) {
     try {
-      const result = await this.apiReq.request(
-        'GET',
-        `/manager/files`,
-        { path: `etc/rules/${path}` }
-      );
+      const result = await this.apiReq.request('GET', `/manager/files`, {
+        path: `etc/rules/${path}`
+      });
       return ((result || {}).data || {}).data || false;
     } catch (error) {
       return Promise.reject(error);
@@ -53,11 +47,9 @@ export class RulesetHandler {
   }
   async getDecoderConfiguration(path) {
     try {
-      const result = await this.apiReq.request(
-        'GET',
-        `/manager/files`,
-        { path: `etc/decoders/${path}` }
-      );
+      const result = await this.apiReq.request('GET', `/manager/files`, {
+        path: `etc/decoders/${path}`
+      });
       return ((result || {}).data || {}).data || false;
     } catch (error) {
       return Promise.reject(error);
@@ -65,11 +57,9 @@ export class RulesetHandler {
   }
   async getCdbList(path) {
     try {
-      const result = await this.apiReq.request(
-        'GET',
-        `/manager/files`,
-        { path: path }
-      );
+      const result = await this.apiReq.request('GET', `/manager/files`, {
+        path: path
+      });
       return result;
     } catch (error) {
       return Promise.reject(error);

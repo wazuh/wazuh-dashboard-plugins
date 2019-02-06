@@ -278,6 +278,8 @@ export function GroupsController(
     $scope.editingFile = true;
     try {
       $scope.fetchedXML = await fetchFile();
+      $location.search('editingFile', true);
+      appState.setNavigation({ status: true });
       $scope.$broadcast('fetchedFile', { data: $scope.fetchedXML });
     } catch (error) {
       $scope.fetchedXML = null;
@@ -288,7 +290,9 @@ export function GroupsController(
 
   $scope.closeEditingFile = () => {
     $scope.editingFile = false;
+    appState.setNavigation({ status: true });
     $scope.$broadcast('closeEditXmlFile', {});
+    if (!$scope.$$phase) $scope.$digest();
   };
 
   $scope.xmlIsValid = valid => {
@@ -298,7 +302,10 @@ export function GroupsController(
 
   $scope.doSaveGroupAgentConfig = () => {
     $scope.editingFile = false;
-    $scope.$broadcast('saveXmlFile', { group: $scope.currentGroup.name, type: 'group' });
+    $scope.$broadcast('saveXmlFile', {
+      group: $scope.currentGroup.name,
+      type: 'group'
+    });
   };
 
   $scope.$on('configurationSuccess', () => {
@@ -536,7 +543,7 @@ export function GroupsController(
   };
 
   // Resetting the factory configuration
-  $scope.$on('$destroy', () => { });
+  $scope.$on('$destroy', () => {});
 
   $scope.$watch('lookingGroup', value => {
     $scope.availableAgents = {
@@ -579,6 +586,8 @@ export function GroupsController(
     $scope.groupsSelectedTab = 'files';
     appState.setNavigation({ status: true });
     $location.search('navigation', true);
-    return $scope.loadGroup(parameters.group).then(() => $scope.editGroupAgentConfig());
-  })
+    return $scope
+      .loadGroup(parameters.group)
+      .then(() => $scope.editGroupAgentConfig());
+  });
 }

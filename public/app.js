@@ -34,7 +34,7 @@ const app = uiModules.get('app/wazuh', ['ngCookies', 'ngMaterial']);
 
 app.config([
   '$compileProvider',
-  function ($compileProvider) {
+  function($compileProvider) {
     $compileProvider.aHrefSanitizationWhitelist(
       /^\s*(https?|ftp|mailto|data|blob):/
     );
@@ -43,14 +43,18 @@ app.config([
 
 app.config([
   '$httpProvider',
-  function ($httpProvider) {
+  function($httpProvider) {
     $httpProvider.useApplyAsync(true);
   }
 ]);
 
-app.run(function ($rootScope, $route, $location, appState, $window) {
+app.run(function($rootScope, $route, $location, appState, $window) {
   appState.setNavigation({ status: false });
-  appState.setNavigation({ reloaded: false, discoverPrevious: false, discoverSections: ['/wazuh-discover/', '/overview/', '/agents'] });
+  appState.setNavigation({
+    reloaded: false,
+    discoverPrevious: false,
+    discoverSections: ['/wazuh-discover/', '/overview/', '/agents']
+  });
 
   $rootScope.$on('$routeChangeSuccess', () => {
     appState.setNavigation({ prevLocation: $location.path() });
@@ -65,32 +69,93 @@ app.run(function ($rootScope, $route, $location, appState, $window) {
     appState.setNavigation({ currLocation: $location.path() });
     if (navigation.currLocation !== navigation.prevLocation) {
       if (navigation.discoverSections.includes(navigation.currLocation)) {
-        appState.setNavigation({ discoverPrevious: navigation.prevLocation })
+        appState.setNavigation({ discoverPrevious: navigation.prevLocation });
       }
     } else {
       if (!navigation.status && navigation.prevLocation) {
-        if (!navigation.discoverSections.includes(navigation.currLocation)) {
+        if (
+          !navigation.discoverSections.includes(navigation.currLocation) &&
+          $location.search().tabView !== 'cluster-monitoring'
+        ) {
           appState.setNavigation({ reloaded: true });
           $location.search('configSubTab', null);
+          $location.search('editingFile', null);
           $route.reload();
           //discover sections
-        } else if (navigation.discoverSections.includes(navigation.currLocation)) {
+        } else if (
+          navigation.discoverSections.includes(navigation.currLocation)
+        ) {
           if (navigation.currLocation === navigation.discoverSections[1]) {
-            $window.history.pushState({ page: 'wazuh#' + navigation.discoverPrevious + '/' }, '', 'wazuh#' + navigation.discoverPrevious + '/');
-          } else if (navigation.currLocation === navigation.discoverSections[2]) {
-            //$window.history.pushState({ page: 'wazuh#/agents/002/welcome/panels' }, '', 'wazuh#/agents/002/welcome/panels');
-            $window.history.pushState({ page: 'wazuh#' + navigation.discoverPrevious }, '', 'wazuh#' + navigation.discoverPrevious);
-          } else {
-            $window.history.pushState({ page: 'wazuh#' + navigation.discoverPrevious }, '', 'wazuh#' + navigation.discoverPrevious);
+            $window.history.pushState(
+              { page: 'wazuh#' + navigation.discoverPrevious + '/' },
+              '',
+              'wazuh#' + navigation.discoverPrevious + '/'
+            );
+          } else if (
+            navigation.currLocation === navigation.discoverSections[2]
+          ) {
+            if (
+              $location.search().tab &&
+              $location.search().tab !== 'welcome'
+            ) {
+              $window.history.pushState(
+                { page: 'wazuh#' + navigation.discoverPrevious },
+                '',
+                'wazuh#' + navigation.discoverPrevious
+              );
+              $window.history.pushState(
+                {
+                  page:
+                    'wazuh#' +
+                    navigation.discoverPrevious +
+                    '?agent=' +
+                    $location.search().agent
+                },
+                '',
+                'wazuh#' +
+                  navigation.discoverPrevious +
+                  '?agent=' +
+                  $location.search().agent
+              );
+            } else {
+              $window.history.pushState(
+                { page: 'wazuh#' + navigation.discoverPrevious },
+                '',
+                'wazuh#' + navigation.discoverPrevious
+              );
+            }
+          } else if (
+            navigation.currLocation === navigation.discoverSections[0] ||
+            navigation.currLocation === navigation.discoverSections[3]
+          ) {
+            $window.history.pushState(
+              { page: 'wazuh#' + navigation.discoverPrevious },
+              '',
+              'wazuh#' + navigation.discoverPrevious
+            );
           }
-          $window.history.pushState({ page: '/app/wazuh#' + $location.$$url }, '', '/app/wazuh#' + $location.$$url);
+          $window.history.pushState(
+            { page: '/app/wazuh#' + $location.$$url },
+            '',
+            '/app/wazuh#' + $location.$$url
+          );
+        } else if ($location.search().tabView === 'cluster-monitoring') {
+          $window.history.pushState(
+            { page: '/app/wazuh#/manager//' },
+            '',
+            '/app/wazuh#/manager//'
+          );
+          $window.history.pushState(
+            { page: '/app/wazuh#' + $location.$$url },
+            '',
+            '/app/wazuh#' + $location.$$url
+          );
         }
       }
     }
     appState.setNavigation({ status: false });
   });
 });
-
 
 // Font Awesome, Kibana UI framework and others
 import './utils/fontawesome/css/font-awesome.min.css';
@@ -116,7 +181,6 @@ import './services';
 import './controllers';
 import './factories';
 import './directives';
-import { runInContext } from 'vm';
 
 // Added due to Kibana 6.3.0. Do not modify.
 uiModules.get('kibana').provider('dashboardConfig', () => {

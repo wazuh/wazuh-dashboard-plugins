@@ -26,7 +26,7 @@ import { checkGap } from './lib/check-gap';
 
 const app = uiModules.get('app/wazuh', []);
 
-app.directive('wzTable', function () {
+app.directive('wzTable', function() {
   return {
     restrict: 'E',
     scope: {
@@ -94,14 +94,23 @@ app.directive('wzTable', function () {
        * Common functions
        */
       $scope.clickAction = (item, openAction = false) =>
-        clickAction(item, openAction, instance, shareAgent, $location, $scope, appState);
+        clickAction(
+          item,
+          openAction,
+          instance,
+          shareAgent,
+          $location,
+          $scope,
+          appState
+        );
 
       const fetch = async (options = {}) => {
         try {
           if ((instance.filters || []).length) {
-            $scope.customEmptyResults = 'No results match your search criteria'
+            $scope.customEmptyResults = 'No results match your search criteria';
           } else {
-            $scope.customEmptyResults = $scope.emptyResults || 'Empty results for this table.';
+            $scope.customEmptyResults =
+              $scope.emptyResults || 'Empty results for this table.';
           }
           const result = await instance.fetch(options);
           items = options.realTime ? result.items.slice(0, 10) : result.items;
@@ -143,7 +152,7 @@ app.directive('wzTable', function () {
           wzTableFilter,
           errorHandler
         );
-      }
+      };
       /**
        * This filter table with a given filter
        * @param {Object} filter
@@ -228,7 +237,7 @@ app.directive('wzTable', function () {
       $scope.prevPage = () => pagination.prevPage($scope);
       $scope.nextPage = async currentPage =>
         pagination.nextPage(currentPage, $scope, errorHandler, fetch);
-      $scope.setPage = function () {
+      $scope.setPage = function() {
         $scope.currentPage = this.n;
         $scope.nextPage(this.n);
       };
@@ -334,12 +343,16 @@ app.directive('wzTable', function () {
       };
 
       $scope.editGroup = group => {
-        if ($location.search() && $location.search().tab && $location.search().tab === 'configuration') {
+        if (
+          $location.search() &&
+          $location.search().tab &&
+          $location.search().tab === 'configuration'
+        ) {
           $scope.clickAction(group);
         } else {
-          $scope.$emit('openGroupFromList', { group })
+          $scope.$emit('openGroupFromList', { group });
         }
-      }
+      };
     },
     template
   };

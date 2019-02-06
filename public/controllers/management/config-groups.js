@@ -31,7 +31,6 @@ export class ConfigurationGroupsController {
     this.$scope.addingGroup = false;
   }
 
-
   async fetchFile() {
     try {
       const data = await this.apiReq.request(
@@ -54,11 +53,10 @@ export class ConfigurationGroupsController {
    * When controller loads
    */
   $onInit() {
-
     /**
- * This perfoms a search by a given term
- * @param {String} term
- */
+     * This perfoms a search by a given term
+     * @param {String} term
+     */
     this.$scope.search = term => {
       this.$scope.$broadcast('wazuhSearch', { term });
     };
@@ -67,17 +65,21 @@ export class ConfigurationGroupsController {
       this.$scope.editingFile = true;
       try {
         this.$scope.fetchedXML = await this.fetchFile();
+        this.$location.search('editingFile', true);
+        this.appState.setNavigation({ status: true });
         if (!this.$scope.$$phase) this.$scope.$digest();
         this.$scope.$broadcast('fetchedFile', { data: this.$scope.fetchedXML });
       } catch (error) {
         this.$scope.fetchedXML = null;
         this.errorHandler.handle(error, 'Fetch file error');
       }
-    }
+    };
     this.$scope.closeEditingFile = () => {
       this.$scope.editingFile = false;
       this.$scope.fetchedXML = null;
+      this.appState.setNavigation({ status: true });
       this.$scope.$broadcast('closeEditXmlFile', {});
+      if (!this.$scope.$$phase) this.$scope.$digest();
     };
     this.$scope.xmlIsValid = valid => {
       this.$scope.xmlHasErrors = valid;
@@ -85,7 +87,9 @@ export class ConfigurationGroupsController {
     };
     this.$scope.doSaveConfig = () => {
       this.$scope.editingFile = false;
-      this.$scope.$broadcast('saveXmlFile', { group: this.$scope.selectedItem.name });
+      this.$scope.$broadcast('saveXmlFile', {
+        group: this.$scope.selectedItem.name
+      });
     };
     this.$scope.switchAddingGroup = () => {
       this.$scope.addingGroup = !this.$scope.addingGroup;
@@ -107,7 +111,6 @@ export class ConfigurationGroupsController {
     this.$scope.selectedItem = false;
 
     if (!this.$scope.$$phase) this.$scope.$digest();
-
 
     //listeners
     this.$scope.$on('wazuhShowGroup', (event, parameters) => {

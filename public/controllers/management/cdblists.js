@@ -10,6 +10,7 @@
  * Find more information about this on the LICENSE file.
  */
 import * as FileSaver from '../../services/file-saver';
+import { stringToObj } from '../../utils/cdblist-to-object';
 
 export function CdbListsController(
   $scope,
@@ -173,22 +174,13 @@ export function CdbListsController(
     $scope.closeDetailView();
   };
 
-  const stringToObj = (string) => {
-    let result = {};
-    const splitted = string.split('\n');
-    splitted.forEach(function (element) {
-      const keyValue = element.split(':');
-      if (keyValue[0])
-        result[keyValue[0]] = keyValue[1];
-    });
-    return result;
-  }
-
   //listeners
   $scope.$on('wazuhShowCdbList', async (ev, parameters) => {
     $scope.currentList = parameters.cdblist;
     try {
-      const data = await rulesetHandler.getCdbList(`etc/lists/${$scope.currentList.name}`);
+      const data = await rulesetHandler.getCdbList(
+        `${$scope.currentList.path}/${$scope.currentList.name}`
+      );
       $scope.currentList.list = stringToObj(data.data.data);
       $scope.viewingDetail = true;
       $scope.$emit('setCurrentList', { currentList: $scope.currentList });
@@ -198,7 +190,6 @@ export function CdbListsController(
     }
     $scope.$broadcast('changeCdbList', { currentList: $scope.currentList });
     if (!$scope.$$phase) $scope.$digest();
-
   });
 
   /**
