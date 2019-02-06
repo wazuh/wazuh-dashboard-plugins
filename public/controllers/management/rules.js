@@ -243,13 +243,13 @@ export function RulesController(
     $scope.editingFile = false;
     appState.setNavigation({ status: true });
     $scope.$broadcast('closeEditXmlFile', {});
+    if (!$scope.$$phase) $scope.$digest();
   };
   $scope.xmlIsValid = valid => {
     $scope.xmlHasErrors = valid;
     if (!$scope.$$phase) $scope.$digest();
   };
   $scope.doSaveRuleConfig = () => {
-    $scope.editingFile = false;
     $scope.$broadcast('saveXmlFile', { rule: $scope.currentRule });
   };
 

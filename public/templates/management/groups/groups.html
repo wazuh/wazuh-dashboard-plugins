@@ -76,7 +76,7 @@
                 </div>
                 <div class="md-padding md-padding-top-10" style="height: calc(100vh - 350px);" ng-if="fetchedXML">
                     <wz-xml-file-editor file-name='agent.conf' data="fetchedXML" target-name="currentGroup.name + ' group'"
-                        valid-fn='xmlIsValid(valid)'>
+                        valid-fn='xmlIsValid(valid)' close-fn='closeEditingFile(reload)'>
                     </wz-xml-file-editor>
                 </div>
             </div>

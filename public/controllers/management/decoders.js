@@ -212,7 +212,7 @@ export class DecodersController {
     return;
   }
 
-  editDecodersConfig = async () => {
+  async editDecodersConfig() {
     this.$scope.editingFile = true;
     try {
       this.$scope.fetchedXML = await this.rulesetHandler.getDecoderConfiguration(
@@ -226,20 +226,23 @@ export class DecodersController {
       this.$scope.fetchedXML = null;
       this.errorHandler.handle(error, 'Fetch file error');
     }
-  };
-  closeEditingFile = () => {
+  }
+
+  closeEditingFile() {
     this.$scope.editingFile = false;
     this.appState.setNavigation({ status: true });
     this.$scope.$broadcast('closeEditXmlFile', {});
-  };
-  xmlIsValid = valid => {
+  }
+
+  xmlIsValid(valid) {
     this.$scope.xmlHasErrors = valid;
     if (!this.$scope.$$phase) this.$scope.$digest();
-  };
-  doSaveDecoderConfig = () => {
+  }
+
+  doSaveDecoderConfig() {
     this.$scope.editingFile = false;
     this.$scope.$broadcast('saveXmlFile', { decoder: this.currentDecoder });
-  };
+  }
 
   /**
    * This function takes back to the list but adding a filter from the detail view

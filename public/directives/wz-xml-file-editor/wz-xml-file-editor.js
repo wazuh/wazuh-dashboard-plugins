@@ -23,7 +23,8 @@ app.directive('wzXmlFileEditor', function() {
       fileName: '@fileName',
       validFn: '&',
       data: '=data',
-      targetName: '=targetName'
+      targetName: '=targetName',
+      closeFn: '&'
     },
     controller(
       $scope,
@@ -194,6 +195,7 @@ app.directive('wzXmlFileEditor', function() {
               ''
             );
           }
+          $scope.closeFn({ reload: true });
         } catch (error) {
           errorHandler.handle(error, 'Send file error');
         }

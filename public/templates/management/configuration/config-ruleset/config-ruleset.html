@@ -9,6 +9,9 @@
             <span ng-if='adminMode && !editingFile && selectedRulesetTab === "decoders"' class="font-size-18 wz-text-link"
                 ng-click="addNewFile('decoders')" tooltip="Add new decoders file" tooltip-placement="right">
                 <i class="fa fa-fw fa-plus-circle"></i></span>
+            <span ng-if='adminMode && !editingFile && selectedRulesetTab === "cdblists"' class="font-size-18 wz-text-link"
+                ng-click="addNewList()" tooltip="Add new list file" tooltip-placement="right">
+                <i class="fa fa-fw fa-plus-circle"></i></span>
         </div>
         <div layout="row">
             <span class="md-subheader">Edit your current local rules, decoders and CDB lists</span>
@@ -77,9 +80,9 @@
                 <input placeholder="Enter file name" ng-model="newFileName" type="text" class="wz-margin-left-8 kuiLocalSearchInput ng-empty ng-pristine ng-scope ng-touched ng-valid"
                     aria-invalid="false">
             </div>
-            <div ng-if="fetchedXML" style="height: calc(100vh - 340px);" >
+            <div ng-if="fetchedXML" style="height: calc(100vh - 335px);">
                 <wz-xml-file-editor file-name='{{selectedFileName}}' data="fetchedXML" target-name="selectedItem.file"
-                    valid-fn='xmlIsValid(valid)' >
+                    valid-fn='xmlIsValid(valid)' close-fn='closeEditingFile(reload)'>
                 </wz-xml-file-editor>
             </div>
         </div>

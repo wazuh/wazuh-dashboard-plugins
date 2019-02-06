@@ -70,13 +70,16 @@ export class ConfigurationRulesetController {
         this.errorHandler.handle(error, 'Fetch file error');
       }
     };
-    this.$scope.closeEditingFile = () => {
+    
+    this.$scope.closeEditingFile = (reload = false) => {
       this.$scope.editingFile = false;
       this.$scope.newFile = false;
       this.$scope.fetchedXML = null;
       this.appState.setNavigation({ status: true });
-      this.$scope.$broadcast('closeEditXmlFile', {});
+      if (reload) this.$scope.search();
+      if (!this.$scope.$$phase) this.$scope.$digest();
     };
+
     this.$scope.xmlIsValid = valid => {
       this.$scope.xmlHasErrors = valid;
       if (!this.$scope.$$phase) this.$scope.$digest();
@@ -138,6 +141,20 @@ export class ConfigurationRulesetController {
       this.$scope.$broadcast('fetchedFile', { data: this.$scope.fetchedXML });
     };
 
+    this.$scope.addNewList = () => {
+      this.$scope.currentList = {
+        file: '',
+        path: 'etc/lists/',
+        list: [],
+        new: true
+      };
+      this.$scope.viewingDetail = true;
+      if (!this.$scope.$$phase) this.$scope.$digest();
+      this.$scope.$broadcast('changeCdbList', {
+        currentList: this.$scope.currentList
+      });
+    };
+
     /**
      * Navigate to woodle
      */
@@ -171,17 +188,19 @@ export class ConfigurationRulesetController {
       });
       return result;
     };
+    
     this.$scope.cancelEditList = () => {
       this.appState.setNavigation({ status: true });
       this.$scope.viewingDetail = false;
       this.$scope.currentList = false;
     };
+
     //listeners
     this.$scope.$on('wazuhShowCdbList', async (ev, parameters) => {
       this.$scope.currentList = parameters.cdblist;
       try {
         const data = await this.rulesetHandler.getCdbList(
-          `etc/lists/${this.$scope.currentList.name}`
+          `${this.$scope.currentList.path}/${this.$scope.currentList.name}`
         );
         this.$scope.currentList.list = stringToObj(data.data.data);
         this.$location.search('editingFile', true);
@@ -202,6 +221,7 @@ export class ConfigurationRulesetController {
       this.$scope.editConfig();
       if (!this.$scope.$$phase) this.$scope.$digest();
     });
+
     this.$scope.$on('wazuhShowDecoder', (event, parameters) => {
       this.$scope.selectedItem = parameters.decoder;
       this.$scope.selectedFileName = 'decoders';

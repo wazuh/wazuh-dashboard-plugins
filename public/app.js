@@ -53,12 +53,7 @@ app.run(function($rootScope, $route, $location, appState, $window) {
   appState.setNavigation({
     reloaded: false,
     discoverPrevious: false,
-    discoverSections: [
-      '/wazuh-discover/',
-      '/overview/',
-      '/agents',
-      '/wazuh-dev'
-    ]
+    discoverSections: ['/wazuh-discover/', '/overview/', '/agents']
   });
 
   $rootScope.$on('$routeChangeSuccess', () => {

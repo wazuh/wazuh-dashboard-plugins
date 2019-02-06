@@ -188,7 +188,7 @@ export function CdbListsController(
     $scope.currentList = parameters.cdblist;
     try {
       const data = await rulesetHandler.getCdbList(
-        `etc/lists/${$scope.currentList.name}`
+        `${$scope.currentList.path}/${$scope.currentList.name}`
       );
       $scope.currentList.list = stringToObj(data.data.data);
       $scope.viewingDetail = true;
