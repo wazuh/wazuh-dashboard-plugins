@@ -144,7 +144,7 @@ export class ConfigurationRulesetController {
 
     this.$scope.addNewList = () => {
       this.$scope.currentList = {
-        file: '',
+        name: '',
         path: 'etc/lists/',
         list: [],
         new: true
@@ -175,9 +175,12 @@ export class ConfigurationRulesetController {
       }
       if (rulesettab === 'cdblists') {
         this.$scope.searchPlaceholder = 'Filter CDB lists...';
+        this.$scope.currentList = false;
+        this.$scope.search();
       }
       if (!this.$scope.$$phase) this.$scope.$digest();
     };
+
     this.$scope.switchRulesetTab('rules');
 
     this.$scope.cancelEditList = () => {
