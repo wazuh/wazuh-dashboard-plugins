@@ -26,17 +26,20 @@ export class SaveConfig {
     } catch (error) {
       return Promise.reject(error);
     }
-  };
+  }
 
   async saveNodeConfiguration(node,content) {
     try {
-      //-
-
+      const result = await this.apiReq.request(
+        'POST',
+        `/cluster/${node}/files?path=etc/ossec.conf`,
+        { content, origin: 'xmleditor' }
+      );
       return result;
     } catch (error) {
       return Promise.reject(error);
     }
-  };
+  }
 
  
 }

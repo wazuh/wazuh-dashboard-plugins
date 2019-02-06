@@ -52,8 +52,8 @@ export class EditionController {
         if (this.$scope.clusterStatus.data.data.enabled === 'yes') {
           data = await this.apiReq.request(
             'GET',
-            `/cluster/${this.$scope.selectedNode}/configuration`,
-            {}
+            `/cluster/${this.$scope.selectedNode}/files`,
+            { path: 'etc/ossec.conf'}
           );
           const json = ((data || {}).data || {}).data || false;
           xml = this.configurationHandler.json2xml(json);

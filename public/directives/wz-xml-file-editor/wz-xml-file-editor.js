@@ -175,7 +175,7 @@ app.directive('wzXmlFileEditor', function () {
             errorHandler.info('Success. Decoders has been updated', '');
           } else if (params.node) {
             await saveConfig.saveNodeConfiguration(params.node, xml);
-            errorHandler.info('Success. Node configuration has been updated', '');
+            errorHandler.info('Success. Cluster configuration has been updated', '');
           } else if (params.manager) {
             await saveConfig.saveManagerConfiguration(xml);
             errorHandler.info('Success. Manager configuration has been updated', '');
