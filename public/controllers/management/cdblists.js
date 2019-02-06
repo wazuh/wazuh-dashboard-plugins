@@ -100,7 +100,6 @@ export class CdbListsController {
   }
 
   search(term) {
-    console.log('TERM:' + term)
     if (term && term.startsWith('group:') && term.split('group:')[1].trim()) {
       this.custom_search = '';
       const filter = { name: 'group', value: term.split('group:')[1].trim() };
