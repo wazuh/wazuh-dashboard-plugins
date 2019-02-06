@@ -16,7 +16,7 @@ import { uiModules } from 'ui/modules';
 
 const app = uiModules.get('app/wazuh', []);
 
-app.directive('wzXmlFileEditor', function() {
+app.directive('wzXmlFileEditor', function () {
   return {
     restrict: 'E',
     scope: {
@@ -30,6 +30,7 @@ app.directive('wzXmlFileEditor', function() {
       $scope,
       $document,
       $location,
+      $mdDialog,
       errorHandler,
       groupHandler,
       rulesetHandler,
@@ -40,7 +41,7 @@ app.directive('wzXmlFileEditor', function() {
        * evaluates regular expressions.
        * Alternative using split + join, same result.
        */
-      String.prototype.xmlReplace = function(str, newstr) {
+      String.prototype.xmlReplace = function (str, newstr) {
         return this.split(str).join(newstr);
       };
 
@@ -148,10 +149,10 @@ app.directive('wzXmlFileEditor', function() {
           var type = single
             ? 'single'
             : closing
-            ? 'closing'
-            : opening
-            ? 'opening'
-            : 'other';
+              ? 'closing'
+              : opening
+                ? 'opening'
+                : 'other';
           var fromTo = lastType + '->' + type;
           lastType = type;
           var padding = '';
@@ -178,22 +179,18 @@ app.directive('wzXmlFileEditor', function() {
             $scope.$emit('configurationSuccess');
           } else if (params.rule) {
             await rulesetHandler.sendRuleConfiguration(params.rule, xml);
-            errorHandler.info('Success. Rules has been updated', '');
+            const msg = 'Success. Rules has been updated'
+            params.showRestartManager ? showRestartDialog(msg) : errorHandler.info(msg, '');
           } else if (params.decoder) {
             await rulesetHandler.sendDecoderConfiguration(params.decoder, xml);
             errorHandler.info('Success. Decoders has been updated', '');
           } else if (params.node) {
             await saveConfig.saveNodeConfiguration(params.node, xml);
-            errorHandler.info(
-              'Success. Node configuration has been updated',
-              ''
-            );
+            const msg = 'Success. Node configuration has been updated';
+            params.showRestartManager ? showRestartDialog(msg) : errorHandler.info(msg, '');
           } else if (params.manager) {
             await saveConfig.saveManagerConfiguration(xml);
-            errorHandler.info(
-              'Success. Manager configuration has been updated',
-              ''
-            );
+            errorHandler.info('Success. Manager configuration has been updated', '');
           }
           $scope.closeFn({ reload: true });
         } catch (error) {
@@ -242,9 +239,57 @@ app.directive('wzXmlFileEditor', function() {
         checkXmlParseError();
       });
 
+      const showRestartDialog = async (msg) => {
+        const confirm = $mdDialog.confirm({
+          controller: function ($scope, myScope, $mdDialog, saveConfig) {
+            $scope.myScope = myScope;
+            $scope.closeDialog = () => {
+              $mdDialog.hide();
+              $('body').removeClass('md-dialog-body');
+            };
+            $scope.confirmDialog = () => {
+              saveConfig.restartManager()
+                .then(data => {
+                  $mdDialog.hide();
+                  $('body').removeClass('md-dialog-body');
+                  //$scope.myScope.agent.group = agent.data.data.group;
+                  console.log(data + ' reset');
+                  $scope.myScope.$applyAsync();
+                })
+                .catch(error =>
+                  errorHandler.handle(error.message || error, 'Error restarting'));
+            }
+          },
+          template:
+            '<md-dialog class="modalTheme euiToast euiToast--success euiGlobalToastListItem">' +
+            '<md-dialog-content>' +
+            '<div class="euiToastHeader">' +
+            '<i class="fa fa-check"></i>' +
+            '<span class="euiToastHeader__title">' +
+            `${msg}` +
+            '. Do you want to restart the manager now?' +
+            '</span>' +
+            '</div>' +
+            '</md-dialog-content>' +
+            '<md-dialog-actions>' +
+            '<button class="md-primary md-cancel-button md-button ng-scope md-default-theme md-ink-ripple" type="button" ng-click="closeDialog()">I will do it later</button>' +
+            '<button class="md-primary md-confirm-button md-button md-ink-ripple md-default-theme" type="button" ng-click="confirmDialog()">Restart</button>' +
+            '</md-dialog-actions>' +
+            '</md-dialog>',
+          hasBackdrop: false,
+          clickOutsideToClose: true,
+          disableParentScroll: true,
+          locals: {
+            myScope: $scope
+          }
+        });
+        $('body').addClass('md-dialog-body');
+        $mdDialog.show(confirm);
+      }
+
       $scope.$on('saveXmlFile', (ev, params) => saveFile(params));
 
-      $scope.$on('$destroy', function() {
+      $scope.$on('$destroy', function () {
         $location.search('editingFile', null);
       });
     },
