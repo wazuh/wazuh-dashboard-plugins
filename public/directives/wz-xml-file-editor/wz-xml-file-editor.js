@@ -29,6 +29,7 @@ app.directive('wzXmlFileEditor', function() {
     controller(
       $scope,
       $document,
+      $location,
       errorHandler,
       groupHandler,
       rulesetHandler,
@@ -242,6 +243,10 @@ app.directive('wzXmlFileEditor', function() {
       });
 
       $scope.$on('saveXmlFile', (ev, params) => saveFile(params));
+
+      $scope.$on('$destroy', function() {
+        $location.search('editingFile', null);
+      });
     },
     template
   };

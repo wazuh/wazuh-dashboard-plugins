@@ -191,6 +191,10 @@ div.uil-ring-css {
     animation: uil-ring-anim 1.5s linear infinite;
 }
 
+.euiFlexGroup .euiFlexGroup:hover{
+    background: #fafcfe;
+}
+
 /* Custom Manager/Status styles */
 
 .status {
@@ -248,7 +252,7 @@ div.uil-ring-css {
 .btn-as-i{
     background: none;
     border: 0;
-    color: #0079a5;
+    color: #006BB4;
     padding: 0;
     margin: 0;
     font-size: 20px;
@@ -256,12 +260,12 @@ div.uil-ring-css {
 
 .btn-as-i:hover{
     background: none!important;
-    color: #0079a5;
+    color: #006BB4;
 }
 /* Custom reporting button styles */
 
 .wz-report-button:hover {
-    background-color: #0079a5 !important;
+    background-color: #006BB4 !important;
     color: #F5F5F5;
     border-radius: 0;
 }
@@ -320,7 +324,7 @@ div.uil-ring-css {
 }
 
 .wz-input-container label.md-required:after {
-    color: #0079a5 !important;
+    color: #006BB4 !important;
 }
 
 .wz-input-container input,
@@ -382,11 +386,11 @@ div.uil-ring-css {
 }
 
 .wz-metric-color {
-    background-color: #d1e9f2!important;
+    background-color: #ecf6fb!important;
     overflow: hidden;
     margin: 3px 8px;
     box-shadow: none!important;
-    border: 0!important;
+    border: 1px solid #dfeff8;
 }
 
 .wz-background-transparent {
@@ -425,7 +429,7 @@ div.uil-ring-css {
 .action-btn-td{
     font-size: 18px;
     padding: 2px!important;
-    color: #0079a5;
+    color: #006BB4;
 }
 .wazuhNavDiscover .euiTab ,
 .wazuhNavDiscover .euiText {
@@ -516,21 +520,21 @@ md-sidenav {
 
 .wz-md-card:not(.wz-metric-color) {
     box-shadow: 0 2px 2px -1px rgba(0, 0, 0, 0.1) !important;
-    border: 1px solid #D9D9D9 !important;
+    border: 1px solid #D3DAE6 !important;
     overflow: hidden;
 }
 
 .wz-card-actions {
     margin: 0 !important;
     padding: 0 10px !important;
-    border-top: 1px solid #D9D9D9 !important;
+    border-top: 1px solid #D3DAE6 !important;
     background-color: rgb(228, 242, 245);
 }
 
 .wz-select-input {
     border-radius: 0;
     box-shadow: 0 2px 2px -1px rgba(0, 0, 0, 0.1) !important;
-    border: 1px solid #D9D9D9;
+    border: 1px solid #D3DAE6;
 }
 
 /* Class for responsive images */
@@ -635,8 +639,21 @@ md-sidenav {
     overflow: hidden !important;
 }
 
+.btn{
+    box-shadow: 0 2px 2px -1px rgba(152, 162, 179, 0.3);
+    height: 35px;
+}
 .btn-info{
-    background: #d9d9d9;
+    border: 1px solid #d9d9d9!important;
+    line-height: 24px;
+}
+.btn-info:hover{
+    background: #ebebeb!important;
+    color: #000!important;
+}
+
+.btn-info:focus{
+    color: #000!important;
 }
 
 .wz-circle-back-button{
@@ -682,7 +699,7 @@ md-sidenav {
 }
 
 .addGroupBtn {
-    background-color: #0079a5 !important;
+    background-color: #006BB4 !important;
     height: 40px!important;
 }
 
@@ -691,8 +708,8 @@ md-sidenav {
     height: 25px !important;
     line-height: inherit !important;
     color: #ffffff !important;
-    background-color: #0079a5 !important;
-    border-color: #0079a5 !important;
+    background-color: #006BB4 !important;
+    border-color: #006BB4 !important;
 }
 
 .cancelBtn {
@@ -734,7 +751,7 @@ md-sidenav {
 
 .titleSectionIdentifier{
     font-size: 12px;
-    color: #0079a5;
+    color: #006BB4;
     text-transform: capitalize;
 }
 .confirmEmbedBubble{

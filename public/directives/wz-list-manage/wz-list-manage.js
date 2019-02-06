@@ -14,6 +14,7 @@ import template from './wz-list-manage.html';
 import { uiModules } from 'ui/modules';
 import * as pagination from '../wz-table/lib/pagination';
 import { checkGap } from '../wz-table/lib/check-gap';
+import { stringToObj } from '../../utils/cdblist-to-object';
 
 const app = uiModules.get('app/wazuh', []);
 
@@ -79,16 +80,6 @@ app.directive('wzListManage', function() {
       $scope.sortValue = '';
       $scope.sortReverse = false;
       $scope.searchTerm = '';
-
-      const stringToObj = string => {
-        let result = {};
-        const splitted = string.split('\n');
-        splitted.forEach(function(element) {
-          const keyValue = element.split(':');
-          if (keyValue[0]) result[keyValue[0]] = keyValue[1];
-        });
-        return result;
-      };
 
       $scope.$watch('currentList.list', () => {
         if ($scope.currentList.list) fetch();

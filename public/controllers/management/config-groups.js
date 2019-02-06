@@ -65,6 +65,8 @@ export class ConfigurationGroupsController {
       this.$scope.editingFile = true;
       try {
         this.$scope.fetchedXML = await this.fetchFile();
+        this.$location.search('editingFile', true);
+        this.appState.setNavigation({ status: true });
         if (!this.$scope.$$phase) this.$scope.$digest();
         this.$scope.$broadcast('fetchedFile', { data: this.$scope.fetchedXML });
       } catch (error) {
@@ -75,6 +77,8 @@ export class ConfigurationGroupsController {
     this.$scope.closeEditingFile = () => {
       this.$scope.editingFile = false;
       this.$scope.fetchedXML = null;
+      this.appState.setNavigation({ status: true });
+      this.$scope.$broadcast('closeEditXmlFile', {});
       if (!this.$scope.$$phase) this.$scope.$digest();
     };
     this.$scope.xmlIsValid = valid => {
@@ -82,6 +86,7 @@ export class ConfigurationGroupsController {
       if (!this.$scope.$$phase) this.$scope.$digest();
     };
     this.$scope.doSaveConfig = () => {
+      this.$scope.editingFile = false;
       this.$scope.$broadcast('saveXmlFile', {
         group: this.$scope.selectedItem.name
       });

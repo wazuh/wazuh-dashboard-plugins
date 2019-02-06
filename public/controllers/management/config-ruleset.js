@@ -9,6 +9,7 @@
  *
  * Find more information about this on the LICENSE file.
  */
+import { stringToObj } from '../../utils/cdblist-to-object';
 export class ConfigurationRulesetController {
   /**
    * Constructor
@@ -61,6 +62,8 @@ export class ConfigurationRulesetController {
             : await this.rulesetHandler.getDecoderConfiguration(
                 this.$scope.selectedItem.file
               );
+        this.$location.search('editingFile', true);
+        this.appState.setNavigation({ status: true });
         if (!this.$scope.$$phase) this.$scope.$digest();
         this.$scope.$broadcast('fetchedFile', { data: this.$scope.fetchedXML });
       } catch (error) {
@@ -68,13 +71,16 @@ export class ConfigurationRulesetController {
         this.errorHandler.handle(error, 'Fetch file error');
       }
     };
+
     this.$scope.closeEditingFile = (reload = false) => {
       this.$scope.editingFile = false;
       this.$scope.newFile = false;
       this.$scope.fetchedXML = null;
+      this.appState.setNavigation({ status: true });
       if (reload) this.$scope.search();
       if (!this.$scope.$$phase) this.$scope.$digest();
     };
+
     this.$scope.xmlIsValid = valid => {
       this.$scope.xmlHasErrors = valid;
       if (!this.$scope.$$phase) this.$scope.$digest();
@@ -118,6 +124,8 @@ export class ConfigurationRulesetController {
               : { decoder: this.$scope.selectedItem };
           this.$scope.$broadcast('saveXmlFile', objParam);
         }
+        this.$scope.editingFile = false;
+        this.$scope.fetchedXML = null;
       }
     };
     this.$scope.addNewFile = type => {
@@ -129,6 +137,8 @@ export class ConfigurationRulesetController {
       this.$scope.fetchedXML = '<!-- Modify it at your will. -->';
       this.$scope.type = type;
       if (!this.$scope.$$phase) this.$scope.$digest();
+      this.$location.search('editingFile', true);
+      this.appState.setNavigation({ status: true });
       this.$scope.$broadcast('fetchedFile', { data: this.$scope.fetchedXML });
     };
 
@@ -165,22 +175,13 @@ export class ConfigurationRulesetController {
       }
       if (rulesettab === 'cdblists') {
         this.$scope.searchPlaceholder = 'Filter CDB lists...';
-        this.$scope.search();
       }
       if (!this.$scope.$$phase) this.$scope.$digest();
     };
     this.$scope.switchRulesetTab('rules');
 
-    const stringToObj = string => {
-      let result = {};
-      const splitted = string.split('\n');
-      splitted.forEach(function(element) {
-        const keyValue = element.split(':');
-        if (keyValue[0]) result[keyValue[0]] = keyValue[1];
-      });
-      return result;
-    };
     this.$scope.cancelEditList = () => {
+      this.appState.setNavigation({ status: true });
       this.$scope.viewingDetail = false;
       this.$scope.currentList = false;
     };
@@ -193,6 +194,8 @@ export class ConfigurationRulesetController {
           `${this.$scope.currentList.path}/${this.$scope.currentList.name}`
         );
         this.$scope.currentList.list = stringToObj(data.data.data);
+        this.$location.search('editingFile', true);
+        this.appState.setNavigation({ status: true });
         this.$scope.viewingDetail = true;
       } catch (error) {
         this.$scope.currentList.list = [];

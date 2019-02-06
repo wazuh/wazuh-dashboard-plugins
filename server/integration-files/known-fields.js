@@ -4208,6 +4208,15 @@ export const knownFields = [
     readFromDocValues: true
   },
   {
+    name: 'data.vulnerability.cwe_reference',
+    type: 'string',
+    count: 0,
+    scripted: false,
+    searchable: true,
+    aggregatable: true,
+    readFromDocValues: true
+  },
+  {
     name: 'data.vulnerability.package.condition',
     type: 'string',
     count: 0,
@@ -5613,6 +5622,15 @@ export const knownFields = [
   },
   {
     name: 'data.EventChannel.System.SecurityUserID',
+    type: 'string',
+    count: 0,
+    scripted: false,
+    searchable: true,
+    aggregatable: true,
+    readFromDocValues: true
+  },
+  {
+    name: 'agent.labels.agent.group',
     type: 'string',
     count: 0,
     scripted: false,

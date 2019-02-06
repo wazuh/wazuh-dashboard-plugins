@@ -73,9 +73,13 @@ app.run(function($rootScope, $route, $location, appState, $window) {
       }
     } else {
       if (!navigation.status && navigation.prevLocation) {
-        if (!navigation.discoverSections.includes(navigation.currLocation)) {
+        if (
+          !navigation.discoverSections.includes(navigation.currLocation) &&
+          $location.search().tabView !== 'cluster-monitoring'
+        ) {
           appState.setNavigation({ reloaded: true });
           $location.search('configSubTab', null);
+          $location.search('editingFile', null);
           $route.reload();
           //discover sections
         } else if (
@@ -90,19 +94,57 @@ app.run(function($rootScope, $route, $location, appState, $window) {
           } else if (
             navigation.currLocation === navigation.discoverSections[2]
           ) {
-            //$window.history.pushState({ page: 'wazuh#/agents/002/welcome/panels' }, '', 'wazuh#/agents/002/welcome/panels');
-            $window.history.pushState(
-              { page: 'wazuh#' + navigation.discoverPrevious },
-              '',
-              'wazuh#' + navigation.discoverPrevious
-            );
-          } else {
+            if (
+              $location.search().tab &&
+              $location.search().tab !== 'welcome'
+            ) {
+              $window.history.pushState(
+                { page: 'wazuh#' + navigation.discoverPrevious },
+                '',
+                'wazuh#' + navigation.discoverPrevious
+              );
+              $window.history.pushState(
+                {
+                  page:
+                    'wazuh#' +
+                    navigation.discoverPrevious +
+                    '?agent=' +
+                    $location.search().agent
+                },
+                '',
+                'wazuh#' +
+                  navigation.discoverPrevious +
+                  '?agent=' +
+                  $location.search().agent
+              );
+            } else {
+              $window.history.pushState(
+                { page: 'wazuh#' + navigation.discoverPrevious },
+                '',
+                'wazuh#' + navigation.discoverPrevious
+              );
+            }
+          } else if (
+            navigation.currLocation === navigation.discoverSections[0] ||
+            navigation.currLocation === navigation.discoverSections[3]
+          ) {
             $window.history.pushState(
               { page: 'wazuh#' + navigation.discoverPrevious },
               '',
               'wazuh#' + navigation.discoverPrevious
             );
           }
+          $window.history.pushState(
+            { page: '/app/wazuh#' + $location.$$url },
+            '',
+            '/app/wazuh#' + $location.$$url
+          );
+        } else if ($location.search().tabView === 'cluster-monitoring') {
+          $window.history.pushState(
+            { page: '/app/wazuh#/manager//' },
+            '',
+            '/app/wazuh#/manager//'
+          );
           $window.history.pushState(
             { page: '/app/wazuh#' + $location.$$url },
             '',
@@ -139,7 +181,6 @@ import './services';
 import './controllers';
 import './factories';
 import './directives';
-import { runInContext } from 'vm';
 
 // Added due to Kibana 6.3.0. Do not modify.
 uiModules.get('kibana').provider('dashboardConfig', () => {

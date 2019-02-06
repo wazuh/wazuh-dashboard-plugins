@@ -4,34 +4,31 @@
         <span ng-click="switchSyscheckFiles()" class="btn pull-right btn-primary">Show files</span>
     </div>
     <!-- View: Panels -->
-    <div layout="row" class="height-230">
-        <div layout="column" flex>
-            <div layout="row" class="height-230">
+    <div layout="row" class="height-300">
+
                 <md-card flex class="wz-md-card">
                     <md-card-content class="wazuh-column">
-                        <span class="wz-headline-title">Users</span>
+                        <span class="wz-headline-title">Most active users</span>
                         <md-divider class="wz-margin-top-10"></md-divider>
                         <kbn-vis id="Wazuh-App-Agents-FIM-Users" vis-id="'Wazuh-App-Agents-FIM-Users'">
                     </md-card-content>
                 </md-card>
                 <md-card flex class="wz-md-card">
                     <md-card-content class="wazuh-column">
-                        <span class="wz-headline-title">Permissions</span>
+                        <span class="wz-headline-title">Actions</span>
                         <md-divider class="wz-margin-top-10"></md-divider>
-                        <kbn-vis id="Wazuh-App-Agents-FIM-Permissions" vis-id="'Wazuh-App-Agents-FIM-Permissions'">
+                        <kbn-vis id="Wazuh-App-Agents-FIM-Actions" vis-id="'Wazuh-App-Agents-FIM-Actions'">
                     </md-card-content>
                 </md-card>
-            </div>
-        </div>
-        <div layout="column" flex>
-            <md-card flex class="wz-md-card">
+
+            <md-card flex="40ç" class="wz-md-card">
                 <md-card-content class="wazuh-column">
                     <span class="wz-headline-title">Events</span>
                     <md-divider class="wz-margin-top-10"></md-divider>
                     <kbn-vis id="Wazuh-App-Agents-FIM-Events" vis-id="'Wazuh-App-Agents-FIM-Events'"></kbn-vis>
                 </md-card-content>
             </md-card>
-        </div>
+
     </div>
 
     <div layout="row" class="height-230">

@@ -230,6 +230,8 @@ export function RulesController(
       $scope.fetchedXML = await rulesetHandler.getRuleConfiguration(
         $scope.currentRule.file
       );
+      $location.search('editingFile', true);
+      appState.setNavigation({ status: true });
       if (!$scope.$$phase) $scope.$digest();
       $scope.$broadcast('fetchedFile', { data: $scope.fetchedXML });
     } catch (error) {
@@ -239,6 +241,8 @@ export function RulesController(
   };
   $scope.closeEditingFile = () => {
     $scope.editingFile = false;
+    appState.setNavigation({ status: true });
+    $scope.$broadcast('closeEditXmlFile', {});
     if (!$scope.$$phase) $scope.$digest();
   };
   $scope.xmlIsValid = valid => {
