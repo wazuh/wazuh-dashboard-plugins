@@ -185,7 +185,7 @@ app.directive('wzXmlFileEditor', function() {
           } else if (params.node) {
             await saveConfig.saveNodeConfiguration(params.node, xml);
             errorHandler.info(
-              'Success. Node configuration has been updated',
+              `Success. Node (${params.node}) configuration has been updated`,
               ''
             );
           } else if (params.manager) {

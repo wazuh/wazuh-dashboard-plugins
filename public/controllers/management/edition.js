@@ -54,14 +54,13 @@ export class EditionController {
             `/cluster/${this.$scope.selectedNode}/files`,
             { path: 'etc/ossec.conf'}
           );
-          const json = ((data || {}).data || {}).data || false;
-          xml = this.configurationHandler.json2xml(json);
         } else {
           data = await this.apiReq.request('GET', `/manager/files`, {
             path: 'etc/ossec.conf'
           });
-          xml = ((data || {}).data || {}).data || false;
         }
+
+        xml = ((data || {}).data || {}).data || false;
         if (!xml) {
           throw new Error('Could not fetch configuration file');
         }
@@ -110,6 +109,10 @@ export class EditionController {
     this.$scope.edit = node => {
       this.$scope.selectedNode = node.name;
       return this.$scope.editConf();
+    };
+
+    this.$scope.changeNode = () => {
+      this.$scope.editConf();
     };
 
     this.$scope.closeEditingFile = () => {};

@@ -44,7 +44,7 @@
                         layout-padding style="padding: 0;height: 32px;">
                         <div layout="column" layout-align="center" class="height-35 wz-select-input">
                             <select class="kuiSelect wz-border-none cursor-pointer max-height-35" id="categoryBox"
-                                ng-model="selectedNode" ng-change="changeNode(selectedNode)" aria-label="Select node">
+                                ng-model="selectedNode" ng-change="changeNode()" aria-label="Select node">
                                 <option ng-repeat="node in nodes" value="{{node.name}}">{{node.name}} ({{node.type}})</option>
                             </select>
                         </div>
