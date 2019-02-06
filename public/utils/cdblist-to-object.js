@@ -11,14 +11,14 @@
  */
 
 export function stringToObj(str) {
-    const result = {};
-    if(!str || typeof str !== 'string' || !str.length) {
-        return result;
-    }
-    const splitted = str.split('\n');
-    splitted.forEach(function(element) {
-      const keyValue = element.split(':');
-      if (keyValue[0]) result[keyValue[0]] = keyValue[1];
-    });
+  const result = {};
+  if (!str || typeof str !== 'string' || !str.length) {
     return result;
+  }
+  const splitted = str.split('\n');
+  splitted.forEach(function(element) {
+    const keyValue = element.split(':');
+    if (keyValue[0]) result[keyValue[0]] = keyValue[1];
+  });
+  return result;
 }

@@ -179,7 +179,7 @@ export class ConfigurationRulesetController {
       if (!this.$scope.$$phase) this.$scope.$digest();
     };
     this.$scope.switchRulesetTab('rules');
-   
+
     this.$scope.cancelEditList = () => {
       this.appState.setNavigation({ status: true });
       this.$scope.viewingDetail = false;
