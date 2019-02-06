@@ -9,6 +9,7 @@
  *
  * Find more information about this on the LICENSE file.
  */
+import { stringToObj } from '../../utils/cdblist-to-object';
 export class ConfigurationRulesetController {
   /**
    * Constructor
@@ -70,7 +71,7 @@ export class ConfigurationRulesetController {
         this.errorHandler.handle(error, 'Fetch file error');
       }
     };
-    
+
     this.$scope.closeEditingFile = (reload = false) => {
       this.$scope.editingFile = false;
       this.$scope.newFile = false;
@@ -178,17 +179,7 @@ export class ConfigurationRulesetController {
       if (!this.$scope.$$phase) this.$scope.$digest();
     };
     this.$scope.switchRulesetTab('rules');
-
-    const stringToObj = string => {
-      let result = {};
-      const splitted = string.split('\n');
-      splitted.forEach(function(element) {
-        const keyValue = element.split(':');
-        if (keyValue[0]) result[keyValue[0]] = keyValue[1];
-      });
-      return result;
-    };
-    
+   
     this.$scope.cancelEditList = () => {
       this.appState.setNavigation({ status: true });
       this.$scope.viewingDetail = false;

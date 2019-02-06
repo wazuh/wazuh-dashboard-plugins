@@ -10,6 +10,7 @@
  * Find more information about this on the LICENSE file.
  */
 import * as FileSaver from '../../services/file-saver';
+import { stringToObj } from '../../utils/cdblist-to-object';
 
 export function CdbListsController(
   $scope,
@@ -171,16 +172,6 @@ export function CdbListsController(
     $scope.searchTerm = '';
     // Go back to the list
     $scope.closeDetailView();
-  };
-
-  const stringToObj = string => {
-    let result = {};
-    const splitted = string.split('\n');
-    splitted.forEach(function(element) {
-      const keyValue = element.split(':');
-      if (keyValue[0]) result[keyValue[0]] = keyValue[1];
-    });
-    return result;
   };
 
   //listeners
