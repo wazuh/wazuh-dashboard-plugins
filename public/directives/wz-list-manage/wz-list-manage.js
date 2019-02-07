@@ -23,7 +23,7 @@ app.directive('wzListManage', function () {
     scope: {
       list: '=list'
     },
-    controller($scope, errorHandler, $filter, rulesetHandler, wazuhConfig) {
+    controller($scope, errorHandler, $filter, $mdDialog, rulesetHandler, wazuhConfig) {
       /**
        * Pagination variables and functions
        */
@@ -102,12 +102,10 @@ app.directive('wzListManage', function () {
           for (var key in $scope.currentList.list) {
             raw = raw.concat(`${key}:${$scope.currentList.list[key]}` + '\n');
           }
-          const result = await rulesetHandler.sendCdbList(
-            $scope.currentList.name,
-            raw
-          );
+          await rulesetHandler.sendCdbList($scope.currentList.name, raw);
+          const msg = 'Success. CDB list has been updated';
+          showRestartDialog(msg);
           fetch();
-          errorHandler.info(result.data.data, '');
           $scope.loadingChange = false;
           if (!$scope.$$phase) $scope.$digest();
         } catch (err) {
@@ -155,7 +153,7 @@ app.directive('wzListManage', function () {
         $scope.currentList.list[key] = $scope.currentList.editingNewValue;
         $scope.currentList.editingNewValue = '';
         $scope.cancelEditingKey();
-        fetch();
+        fetch(); ç
       };
 
       $scope.cancelRemoveEntry = () => {
@@ -167,6 +165,54 @@ app.directive('wzListManage', function () {
         $scope.removingEntry = false;
         fetch();
       };
+
+      const showRestartDialog = async (msg) => {
+        const confirm = $mdDialog.confirm({
+          controller: function ($scope, myScope, myError, $mdDialog, saveConfig) {
+            $scope.myScope = myScope;
+            $scope.closeDialog = () => {
+              $mdDialog.hide();
+              $('body').removeClass('md-dialog-body');
+            };
+            $scope.confirmDialog = () => {
+              $mdDialog.hide();
+              saveConfig.restartManager()
+                .then(data => {
+                  myError.info(data.data.data, '');
+                  $('body').removeClass('md-dialog-body');
+                  $scope.myScope.$applyAsync();
+                })
+                .catch(error =>
+                  myError.handle(error.message || error, 'Error restarting'));
+            }
+          },
+          template:
+            '<md-dialog class="modalTheme euiToast euiToast--success euiGlobalToastListItem">' +
+            '<md-dialog-content>' +
+            '<div class="euiToastHeader">' +
+            '<i class="fa fa-check"></i>' +
+            '<span class="euiToastHeader__title">' +
+            `${msg}` +
+            '. Do you want to restart the manager now?' +
+            '</span>' +
+            '</div>' +
+            '</md-dialog-content>' +
+            '<md-dialog-actions>' +
+            '<button class="md-primary md-cancel-button md-button ng-scope md-default-theme md-ink-ripple" type="button" ng-click="closeDialog()">I will do it later</button>' +
+            '<button class="md-primary md-confirm-button md-button md-ink-ripple md-default-theme" type="button" ng-click="confirmDialog()">Restart</button>' +
+            '</md-dialog-actions>' +
+            '</md-dialog>',
+          hasBackdrop: false,
+          clickOutsideToClose: true,
+          disableParentScroll: true,
+          locals: {
+            myScope: $scope,
+            myError: errorHandler
+          }
+        });
+        $('body').addClass('md-dialog-body');
+        $mdDialog.show(confirm);
+      }
     },
     template
   };

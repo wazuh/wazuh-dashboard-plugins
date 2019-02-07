@@ -88,7 +88,8 @@ export class ConfigurationGroupsController {
     this.$scope.doSaveConfig = () => {
       this.$scope.editingFile = false;
       this.$scope.$broadcast('saveXmlFile', {
-        group: this.$scope.selectedItem.name
+        group: this.$scope.selectedItem.name,
+        showRestartManager: true
       });
     };
     this.$scope.switchAddingGroup = () => {

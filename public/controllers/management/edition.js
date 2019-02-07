@@ -89,11 +89,13 @@ export class EditionController {
       try {
         if (this.$scope.clusterStatus.data.data.enabled === 'yes') {
           this.$scope.$broadcast('saveXmlFile', {
-            node: this.$scope.selectedNode
+            node: this.$scope.selectedNode,
+            showRestartManager: true
           });
         } else {
           this.$scope.$broadcast('saveXmlFile', {
-            manager: this.$scope.selectedNode
+            manager: this.$scope.selectedNode,
+            showRestartManager: true
           });
         }
       } catch (error) {

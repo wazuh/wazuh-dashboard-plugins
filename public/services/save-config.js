@@ -43,4 +43,36 @@ export class SaveConfig {
       return Promise.reject(error);
     }
   }
+
+  /**
+ * Restart manager (single-node API call)
+ */
+  async restartManager() {
+    try {
+      const result = await this.apiReq.request(
+        'PUT',
+        `/manager/restart`,
+        {}
+      );
+      return result;
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  }
+
+  /**
+* Restart a cluster node
+*/
+  async restartNode(node) {
+    try {
+      const result = await this.apiReq.request(
+        'PUT',
+        `/cluster/${node}/restart`,
+        {}
+      );
+      return result;
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  }
 }

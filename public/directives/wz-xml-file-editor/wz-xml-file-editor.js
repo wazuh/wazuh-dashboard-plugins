@@ -175,7 +175,8 @@ app.directive('wzXmlFileEditor', function () {
           const xml = replaceIllegalXML(text);
           if (params.group) {
             await groupHandler.sendConfiguration(params.group, xml);
-            errorHandler.info('Success. Group has been updated', '');
+            const msg = 'Success. Group has been updated'
+            params.showRestartManager ? showRestartDialog(msg) : errorHandler.info(msg, '');
             $scope.$emit('configurationSuccess');
           } else if (params.rule) {
             await rulesetHandler.sendRuleConfiguration(params.rule, xml);
@@ -183,14 +184,16 @@ app.directive('wzXmlFileEditor', function () {
             params.showRestartManager ? showRestartDialog(msg) : errorHandler.info(msg, '');
           } else if (params.decoder) {
             await rulesetHandler.sendDecoderConfiguration(params.decoder, xml);
-            errorHandler.info('Success. Decoders has been updated', '');
+            const msg = 'Success. Decoders has been updated';
+            params.showRestartManager ? showRestartDialog(msg) : errorHandler.info(msg, '');
           } else if (params.node) {
             await saveConfig.saveNodeConfiguration(params.node, xml);
             const msg = 'Success. Node configuration has been updated';
             params.showRestartManager ? showRestartDialog(msg) : errorHandler.info(msg, '');
           } else if (params.manager) {
             await saveConfig.saveManagerConfiguration(xml);
-            errorHandler.info('Success. Manager configuration has been updated', '');
+            const msg = 'Success. Manager configuration has been updated';
+            params.showRestartManager ? showRestartDialog(msg) : errorHandler.info(msg, '');
           }
           $scope.closeFn({ reload: true });
         } catch (error) {
@@ -241,23 +244,22 @@ app.directive('wzXmlFileEditor', function () {
 
       const showRestartDialog = async (msg) => {
         const confirm = $mdDialog.confirm({
-          controller: function ($scope, myScope, $mdDialog, saveConfig) {
+          controller: function ($scope, myScope, myError, $mdDialog, saveConfig) {
             $scope.myScope = myScope;
             $scope.closeDialog = () => {
               $mdDialog.hide();
               $('body').removeClass('md-dialog-body');
             };
-            $scope.confirmDialog = () => {
+            $scope.confirmDialog = () => {                  
+              $mdDialog.hide();
               saveConfig.restartManager()
                 .then(data => {
-                  $mdDialog.hide();
                   $('body').removeClass('md-dialog-body');
-                  //$scope.myScope.agent.group = agent.data.data.group;
-                  console.log(data + ' reset');
+                  myError.info(data.data.data, '');
                   $scope.myScope.$applyAsync();
                 })
                 .catch(error =>
-                  errorHandler.handle(error.message || error, 'Error restarting'));
+                  myError.handle(error.message || error, 'Error restarting'));
             }
           },
           template:
@@ -280,7 +282,8 @@ app.directive('wzXmlFileEditor', function () {
           clickOutsideToClose: true,
           disableParentScroll: true,
           locals: {
-            myScope: $scope
+            myScope: $scope,
+            myError: errorHandler
           }
         });
         $('body').addClass('md-dialog-body');

@@ -24,7 +24,9 @@ export class ManagementController {
     $location,
     shareAgent,
     wazuhConfig,
-    appState
+    appState,
+    saveConfig,
+    errorHandler
   ) {
     this.$scope = $scope;
     this.$rootScope = $rootScope;
@@ -32,6 +34,8 @@ export class ManagementController {
     this.appState = appState;
     this.shareAgent = shareAgent;
     this.wazuhConfig = wazuhConfig;
+    this.saveConfig = saveConfig;
+    this.errorHandler = errorHandler;
     this.tab = 'welcome';
     this.rulesetTab = 'rules';
     this.globalConfigTab = 'overview';
@@ -111,6 +115,16 @@ export class ManagementController {
    */
   inArray(item, array) {
     return item && Array.isArray(array) && array.includes(item);
+  }
+
+  async restartManager() {
+    try {
+      const data = await this.saveConfig.restartManager();
+      this.errorHandler.info(data.data.data, '');
+      this.$scope.$applyAsync();
+    } catch (error) {
+      this.errorHandler.handle(error.message || error, 'Error restarting');
+    }
   }
 
   setConfigTab(tab, nav = false) {
