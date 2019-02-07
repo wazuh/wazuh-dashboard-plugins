@@ -9,7 +9,7 @@
             <span ng-if='adminMode && !editingFile && selectedRulesetTab === "decoders"' class="font-size-18 wz-text-link"
                 ng-click="addNewFile('decoders')" tooltip="Add new decoders file" tooltip-placement="right">
                 <i class="fa fa-fw fa-plus-circle"></i></span>
-            <span ng-if='adminMode && !editingFile && selectedRulesetTab === "cdblists"' class="font-size-18 wz-text-link"
+            <span ng-if='adminMode && !currentList && selectedRulesetTab === "cdblists"' class="font-size-18 wz-text-link"
                 ng-click="addNewList()" tooltip="Add new list file" tooltip-placement="right">
                 <i class="fa fa-fw fa-plus-circle"></i></span>
         </div>
@@ -88,6 +88,9 @@
         </div>
     </div>
     <div class="md-padding" ng-show="viewingDetail">
+        <div class="wz-margin-bottom-25">
+            <h1 class="font-size-18">{{currentList.name}}</h1>
+        </div>
         <div flex layout="column">
             <wz-list-manage style="margin: -16px;" ng-if="currentList" list="currentList"></wz-list-manage>
         </div>

@@ -14,11 +14,10 @@ import template from './wz-list-manage.html';
 import { uiModules } from 'ui/modules';
 import * as pagination from '../wz-table/lib/pagination';
 import { checkGap } from '../wz-table/lib/check-gap';
-import { stringToObj } from '../../utils/cdblist-to-object';
 
 const app = uiModules.get('app/wazuh', []);
 
-app.directive('wzListManage', function() {
+app.directive('wzListManage', function () {
   return {
     restrict: 'E',
     scope: {
@@ -40,7 +39,7 @@ app.directive('wzListManage', function() {
       $scope.prevPage = () => pagination.prevPage($scope);
       $scope.nextPage = async currentPage =>
         pagination.nextPage(currentPage, $scope, errorHandler, null);
-      $scope.setPage = function() {
+      $scope.setPage = function () {
         $scope.currentPage = this.n;
         $scope.nextPage(this.n);
       };
@@ -50,7 +49,7 @@ app.directive('wzListManage', function() {
        */
       $scope.filterTable = data => {
         const result = Object.keys(data || $scope.currentList.list).map(
-          function(key) {
+          function (key) {
             return [key, $scope.currentList.list[key]];
           }
         );
@@ -81,22 +80,6 @@ app.directive('wzListManage', function() {
       $scope.sortReverse = false;
       $scope.searchTerm = '';
 
-      $scope.$watch('currentList.list', () => {
-        if ($scope.currentList.list) fetch();
-      });
-
-      const refresh = () => {
-        rulesetHandler
-          .getCdbList(`${$scope.currentList.path}/${$scope.currentList.name}`)
-          .then(data => {
-            $scope.currentList.list = stringToObj(data.data.data);
-            fetch();
-            $scope.$emit('setCurrentList', { currentList: $scope.currentList });
-            $scope.viewingDetail = true;
-            if (!$scope.$$phase) $scope.$digest();
-          });
-      };
-
       $scope.$on('changeCdbList', (ev, params) => {
         if (params.currentList) {
           $scope.currentList = params.currentList;
@@ -104,12 +87,15 @@ app.directive('wzListManage', function() {
         }
       });
 
-      const saveList = async () => {
+      $scope.saveList = async () => {
+        let addingNew = false;
         try {
           if ($scope.currentList.new && !$scope.currentList.newName) {
             $scope.currentList.list = [];
             throw new Error('New list name is needed');
-          } else {
+          } else if ($scope.currentList.new && $scope.currentList.newName) {
+            addingNew = true;
+            $scope.currentList.new = false;
             $scope.currentList.name = $scope.currentList.newName;
           }
           let raw = '';
@@ -125,7 +111,11 @@ app.directive('wzListManage', function() {
           $scope.loadingChange = false;
           if (!$scope.$$phase) $scope.$digest();
         } catch (err) {
-          refresh();
+          if (addingNew) {
+            $scope.currentList.name = false;
+            $scope.currentList.new = true;
+            $scope.$applyAsync();
+          }
           errorHandler.handle(err, 'Error updating list');
           $scope.loadingChange = false;
         }
@@ -133,8 +123,8 @@ app.directive('wzListManage', function() {
 
       $scope.addEntry = (key, value) => {
         if (!$scope.currentList.list[key]) {
-          $scope.currentList.list[key] = value;
-          saveList();
+          $scope.currentList.list[key] = value ? value : '';
+          fetch();
         } else {
           errorHandler.handle('Entry already exists', '');
         }
@@ -146,7 +136,7 @@ app.directive('wzListManage', function() {
        */
       $scope.setEditingKey = (key, value) => {
         $scope.editingKey = key;
-        $scope.editingNewValue = value;
+        $scope.currentList.editingNewValue = value;
       };
       /**
        * Cancel edition of an entry
@@ -160,11 +150,12 @@ app.directive('wzListManage', function() {
         $scope.removingEntry = key;
       };
 
-      $scope.editKey = (key, newValue) => {
+      $scope.editKey = (key) => {
         $scope.loadingChange = true;
-        $scope.currentList.list[key] = newValue;
+        $scope.currentList.list[key] = $scope.currentList.editingNewValue;
+        $scope.currentList.editingNewValue = '';
         $scope.cancelEditingKey();
-        saveList();
+        fetch();
       };
 
       $scope.cancelRemoveEntry = () => {
@@ -174,7 +165,7 @@ app.directive('wzListManage', function() {
       $scope.confirmRemoveEntry = key => {
         delete $scope.currentList.list[key];
         $scope.removingEntry = false;
-        saveList();
+        fetch();
       };
     },
     template
