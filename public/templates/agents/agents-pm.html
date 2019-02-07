@@ -2,9 +2,11 @@
     layout-align="start">
     <div layout="row" layout-padding class="wz-padding-top-0">
         <span flex></span>
-        <span ng-click="launchRootcheckScan()" class="btn pull-right btn-primary"><i class="fa fa-fw fa-play"></i> Run scan</span>
+        <span ng-click="launchRootcheckScan()" class="btn pull-right btn-primary"><i class="fa fa-fw fa-play"></i> Run
+            scan</span>
         <span></span>
-        <span ng-click="switchRootcheckScan()" class="btn pull-right btn-primary"><i class="fa fa-fw fa-database"></i> Show state</span>
+        <span ng-click="switchRootcheckScan()" class="btn pull-right btn-primary"><i class="fa fa-fw fa-database"></i>
+            Show state</span>
     </div>
     <div layout="row" class="height-240">
         <md-card flex="50" class="wz-md-card">
@@ -48,9 +50,11 @@
 <md-content flex layout="column" ng-if="tab === 'pm' && tabView === 'panels' && showRootcheckScan" layout-align="start">
     <div layout="row" layout-padding class="wz-padding-top-0">
         <span flex></span>
-        <span ng-click="launchRootcheckScan()" class="btn pull-right btn-primary"><i class="fa fa-fw fa-play"></i> Run scan</span>
+        <span ng-click="launchRootcheckScan()" class="btn pull-right btn-primary"><i class="fa fa-fw fa-play"></i> Run
+            scan</span>
         <span></span>
-        <span ng-click="switchRootcheckScan()" class="btn pull-right btn-primary"><i class="fa fa-fw fa-area-chart"></i> Show alerts</span>
+        <span ng-click="switchRootcheckScan()" class="btn pull-right btn-primary"><i class="fa fa-fw fa-area-chart"></i>
+            Show alerts</span>
     </div>
 
     <div layout="row" class="wz-margin-top-10 wz-margin-right-8 wz-margin-left-8" ng-if="showRootcheckScan && (!agent || !agent.os)">
@@ -69,25 +73,12 @@
     </div>
 
     <div layout="row" class="wz-padding-top-0" ng-if="agent && agent.os">
-        <md-card flex="" class="wz-md-card _md flex">
+        <md-card flex class="wz-md-card">
             <md-card-content>
-                <span class="wz-headline-title"><i class="fa fa-fw fa-table"></i> Last scan results</span>
+                <span class="wz-headline-title"><i class="fa fa-fw fa-shield"></i> Configuration assessment</span>
                 <md-divider class="wz-margin-top-10"></md-divider>
                 <div layout="row" class="wz-margin-top-10">
-                    <input placeholder="Filter..." ng-model="rootcheckSearch" type="text" class="kuiLocalSearchInput ng-empty ng-pristine ng-scope ng-touched ng-valid height-30"
-                        aria-invalid="false" wz-enter="searchRootcheck(rootcheckSearch)">
-                    <button type="submit" aria-label="Search" class="kuiLocalSearchButton height-30" ng-click="searchRootcheck(rootcheckSearch)">
-                        <span class="fa fa-search" aria-hidden="true"></span>
-                    </button>
-                </div>
-                <div layout="row" ng-if="agent && !load" class="wz-margin-top-10 wz-margin-bottom-40-inv">
-                    <wz-table flex path="'/rootcheck/' + agent.id" row-sizes="[12,10,8]" extra-limit="300" keys="[{value:'event', size:3},'status','cis','pci']">
-                    </wz-table>
-                </div>
-                <div layout="row" layout-padding>
-                    <span flex></span>
-                    <a class="small" id="btnDownload" ng-click="downloadCsv('/rootcheck/' + agent.id, 'policy-monitoring.csv')">Formatted
-                        <i aria-hidden="true" class="fa fa-fw fa-download"></i></a>
+
                 </div>
             </md-card-content>
         </md-card>
