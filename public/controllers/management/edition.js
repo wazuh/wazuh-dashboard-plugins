@@ -21,11 +21,12 @@ export class EditionController {
    * @param {*} appState
    * @param {*} wazuhConfig
    */
-  constructor($scope, $location, errorHandler, apiReq, appState) {
+  constructor($scope, $location, errorHandler, apiReq, appState, configHandler) {
     this.$scope = $scope;
     this.errorHandler = errorHandler;
     this.apiReq = apiReq;
     this.appState = appState;
+    this.configHandler = configHandler;
     this.$location = $location;
     this.$scope.load = false;
     this.configurationHandler = new ConfigurationHandler(apiReq, errorHandler);
@@ -52,7 +53,7 @@ export class EditionController {
           data = await this.apiReq.request(
             'GET',
             `/cluster/${this.$scope.selectedNode}/files`,
-            { path: 'etc/ossec.conf'}
+            { path: 'etc/ossec.conf' }
           );
         } else {
           data = await this.apiReq.request('GET', `/manager/files`, {
@@ -84,15 +85,26 @@ export class EditionController {
       if (!this.$scope.$$phase) this.$scope.$digest();
     };
 
+    this.$scope.restartNode = async (selectedNode) => {
+      try {
+        const data = await this.configHandler.restartNode(selectedNode);
+        this.errorHandler.info(data.data.data, '');
+        this.$scope.$applyAsync();
+      } catch (error) {
+        this.errorHandler.handle(error.message || error, 'Error restarting node');
+      }
+    }
     this.$scope.saveConfiguration = async () => {
       try {
         if (this.$scope.clusterStatus.data.data.enabled === 'yes') {
           this.$scope.$broadcast('saveXmlFile', {
-            node: this.$scope.selectedNode
+            node: this.$scope.selectedNode,
+            showRestartManager: 'cluster'
           });
         } else {
           this.$scope.$broadcast('saveXmlFile', {
-            manager: this.$scope.selectedNode
+            manager: this.$scope.selectedNode,
+            showRestartManager: 'manager'
           });
         }
       } catch (error) {
@@ -115,7 +127,7 @@ export class EditionController {
       this.$scope.editConf();
     };
 
-    this.$scope.closeEditingFile = () => {};
+    this.$scope.closeEditingFile = () => { };
 
     //listeners
     this.$scope.$on('wazuhShowNode', (event, parameters) => {

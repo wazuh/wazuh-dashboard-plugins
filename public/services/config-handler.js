@@ -9,7 +9,7 @@
  *
  * Find more information about this on the LICENSE file.
  */
-export class SaveConfig {
+export class ConfigHandler {
   constructor(apiReq) {
     this.apiReq = apiReq;
   }
@@ -42,6 +42,54 @@ export class SaveConfig {
         'POST',
         `/cluster/${node}/files?path=etc/ossec.conf`,
         { content, origin: 'xmleditor' }
+      );
+      return result;
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  }
+
+  /**
+ * Restart manager (single-node API call)
+ */
+  async restartManager() {
+    try {
+      const result = await this.apiReq.request(
+        'PUT',
+        `/manager/restart`,
+        {}
+      );
+      return result;
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  }
+
+  /**
+* Restart cluster
+*/
+  async restartCluster() {
+    try {
+      const result = await this.apiReq.request(
+        'PUT',
+        `/cluster/restart`,
+        {}
+      );
+      return result;
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  }
+
+  /**
+* Restart a cluster node
+*/
+  async restartNode(node) {
+    try {
+      const result = await this.apiReq.request(
+        'PUT',
+        `/cluster/${node}/restart`,
+        {}
       );
       return result;
     } catch (error) {
