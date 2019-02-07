@@ -49,7 +49,7 @@ export class ConfigurationRulesetController {
     this.$scope.search = term => {
       this.$scope.$broadcast('wazuhSearch', { term });
     };
-
+    this.clusterInfo = this.appState.getClusterInfo();
     this.$scope.editConfig = async () => {
       this.$scope.editingFile = true;
       this.$scope.newFile = false;
@@ -111,19 +111,19 @@ export class ConfigurationRulesetController {
           if (this.$scope.type === 'rules') {
             this.$scope.$broadcast('saveXmlFile', {
               rule: this.$scope.selectedItem,
-              showRestartManager: true
+              showRestartManager: this.clusterInfo.status === 'enabled' ? 'cluster' : 'manager'
             });
           } else if (this.$scope.type === 'decoders') {
             this.$scope.$broadcast('saveXmlFile', {
               decoder: this.$scope.selectedItem,
-              showRestartManager: true
+              showRestartManager: this.clusterInfo.status === 'enabled' ? 'cluster' : 'manager'
             });
           }
         } else {
           const objParam =
             this.$scope.selectedRulesetTab === 'rules'
-              ? { rule: this.$scope.selectedItem, showRestartManager: true }
-              : { decoder: this.$scope.selectedItem, showRestartManager: true };
+              ? { rule: this.$scope.selectedItem, showRestartManager: this.clusterInfo.status === 'enabled' ? 'cluster' : 'manager' }
+              : { decoder: this.$scope.selectedItem, showRestartManager: this.clusterInfo.status === 'enabled' ? 'cluster' : 'manager' };
           this.$scope.$broadcast('saveXmlFile', objParam);
         }
         this.$scope.editingFile = false;

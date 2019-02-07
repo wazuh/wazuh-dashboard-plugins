@@ -2,18 +2,15 @@
     class="" ng-init="switchConfigurationTab('welcome', false)">
 
     <!-- Navigation section -->
-    <div layout="row" layout-align="start center" style="position: absolute;right: 0;width: 220px;top: 90px;z-index: 1;">
-        <!-- Help button -->
-        <md-button md-no-ink class="md-icon-button small" tooltip="About and help" tooltip-placement="left" ng-href="#/settings/about"
-            aria-label="Link to open app about section">
-            <i class="fa fa-fw fa-question-circle-o" aria-hidden="true"></i>
-        </md-button>
-        <!-- End help button -->
-        <!-- Separator -->
-        <span flex></span>
-        <!-- End separator -->
-        <button class="btn btn-primary wz-margin-right-15" ng-click="mctrl.restartManager()"><i class="fa fa-refresh"></i>
-            Restart manager</button>
+    <div style="position: absolute;right: 0;top: 90px;z-index: 1;">        
+        <div style="float:left">
+            <button ng-if="mctrl.clusterInfo.status === 'enabled'" class="btn btn-primary wz-margin-right-15" ng-click="mctrl.restartCluster()"><i class="fa fa-refresh"></i>
+                Restart cluster
+            </button>
+            <button ng-if="mctrl.clusterInfo.status !== 'enabled'" class="btn btn-primary wz-margin-right-15" ng-click="mctrl.restartManager()"><i class="fa fa-refresh"></i>
+                Restart manager
+            </button>
+        </div>
     </div>
     <!-- End navigation section -->
     <md-nav-bar class="wz-nav-bar nav-bar-white-bg" md-selected-nav-item="mctrl.globalConfigTab" ng-show="adminMode">

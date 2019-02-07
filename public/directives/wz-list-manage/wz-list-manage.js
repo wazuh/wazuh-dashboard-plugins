@@ -23,7 +23,9 @@ app.directive('wzListManage', function () {
     scope: {
       list: '=list'
     },
-    controller($scope, errorHandler, $filter, $mdDialog, rulesetHandler, wazuhConfig) {
+    controller($scope, errorHandler, $filter, $mdDialog, rulesetHandler, wazuhConfig, appState) {
+      const clusterInfo = appState.getClusterInfo();
+
       /**
        * Pagination variables and functions
        */
@@ -104,7 +106,7 @@ app.directive('wzListManage', function () {
           }
           await rulesetHandler.sendCdbList($scope.currentList.name, raw);
           const msg = 'Success. CDB list has been updated';
-          showRestartDialog(msg);
+          showRestartDialog(msg, clusterInfo.status === 'enabled' ? 'cluster' : 'manager');
           fetch();
           $scope.loadingChange = false;
           if (!$scope.$$phase) $scope.$digest();
@@ -153,7 +155,7 @@ app.directive('wzListManage', function () {
         $scope.currentList.list[key] = $scope.currentList.editingNewValue;
         $scope.currentList.editingNewValue = '';
         $scope.cancelEditingKey();
-        fetch(); ç
+        fetch();
       };
 
       $scope.cancelRemoveEntry = () => {
@@ -166,9 +168,9 @@ app.directive('wzListManage', function () {
         fetch();
       };
 
-      const showRestartDialog = async (msg) => {
+      const showRestartDialog = async (msg, target) => {
         const confirm = $mdDialog.confirm({
-          controller: function ($scope, myScope, myError, $mdDialog, saveConfig) {
+          controller: function ($scope, myScope, myError, $mdDialog, configHandler) {
             $scope.myScope = myScope;
             $scope.closeDialog = () => {
               $mdDialog.hide();
@@ -176,14 +178,25 @@ app.directive('wzListManage', function () {
             };
             $scope.confirmDialog = () => {
               $mdDialog.hide();
-              saveConfig.restartManager()
-                .then(data => {
-                  myError.info(data.data.data, '');
-                  $('body').removeClass('md-dialog-body');
-                  $scope.myScope.$applyAsync();
-                })
-                .catch(error =>
-                  myError.handle(error.message || error, 'Error restarting'));
+              if (target === 'manager') {
+                configHandler.restartManager()
+                  .then(data => {
+                    $('body').removeClass('md-dialog-body');
+                    myError.info(data.data.data, '');
+                    $scope.myScope.$applyAsync();
+                  })
+                  .catch(error =>
+                    myError.handle(error.message || error, 'Error restarting manager'));
+              } else if (target === 'cluster') {
+                configHandler.restartCluster()
+                  .then(data => {
+                    $('body').removeClass('md-dialog-body');
+                    myError.info(data.data.data, '');
+                    $scope.myScope.$applyAsync();
+                  })
+                  .catch(error =>
+                    myError.handle(error.message || error, 'Error restarting cluster'));
+              }
             }
           },
           template:
@@ -193,13 +206,13 @@ app.directive('wzListManage', function () {
             '<i class="fa fa-check"></i>' +
             '<span class="euiToastHeader__title">' +
             `${msg}` +
-            '. Do you want to restart the manager now?' +
+            `. Do you want to restart the ${target} now?` +
             '</span>' +
             '</div>' +
             '</md-dialog-content>' +
             '<md-dialog-actions>' +
             '<button class="md-primary md-cancel-button md-button ng-scope md-default-theme md-ink-ripple" type="button" ng-click="closeDialog()">I will do it later</button>' +
-            '<button class="md-primary md-confirm-button md-button md-ink-ripple md-default-theme" type="button" ng-click="confirmDialog()">Restart</button>' +
+            `<button class="md-primary md-confirm-button md-button md-ink-ripple md-default-theme" type="button" ng-click="confirmDialog()">Restart ${target}</button>` +
             '</md-dialog-actions>' +
             '</md-dialog>',
           hasBackdrop: false,

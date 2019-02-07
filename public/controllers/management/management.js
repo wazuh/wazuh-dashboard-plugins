@@ -25,7 +25,7 @@ export class ManagementController {
     shareAgent,
     wazuhConfig,
     appState,
-    saveConfig,
+    configHandler,
     errorHandler
   ) {
     this.$scope = $scope;
@@ -34,7 +34,7 @@ export class ManagementController {
     this.appState = appState;
     this.shareAgent = shareAgent;
     this.wazuhConfig = wazuhConfig;
-    this.saveConfig = saveConfig;
+    this.configHandler = configHandler;
     this.errorHandler = errorHandler;
     this.tab = 'welcome';
     this.rulesetTab = 'rules';
@@ -94,6 +94,7 @@ export class ManagementController {
    * When controller loads
    */
   $onInit() {
+    this.clusterInfo = this.appState.getClusterInfo();
     const configuration = this.wazuhConfig.getConfig();
     this.$scope.adminMode = !!(configuration || {}).admin;
     if (this.shareAgent.getAgent() && this.shareAgent.getSelectedGroup()) {
@@ -119,11 +120,20 @@ export class ManagementController {
 
   async restartManager() {
     try {
-      const data = await this.saveConfig.restartManager();
+      const data = await this.configHandler.restartManager();
       this.errorHandler.info(data.data.data, '');
       this.$scope.$applyAsync();
     } catch (error) {
-      this.errorHandler.handle(error.message || error, 'Error restarting');
+      this.errorHandler.handle(error.message || error, 'Error restarting manager');
+    }
+  }
+  async restartCluster() {
+    try {
+      const data = await this.configHandler.restartCluster();
+      this.errorHandler.info(data.data.data, '');
+      this.$scope.$applyAsync();
+    } catch (error) {
+      this.errorHandler.handle(error.message || error, 'Error restarting cluster');
     }
   }
 

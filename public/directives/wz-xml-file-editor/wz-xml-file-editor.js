@@ -34,7 +34,7 @@ app.directive('wzXmlFileEditor', function () {
       errorHandler,
       groupHandler,
       rulesetHandler,
-      saveConfig
+      configHandler
     ) {
       /**
        * Custom .replace method. Instead of using .replace which
@@ -176,24 +176,24 @@ app.directive('wzXmlFileEditor', function () {
           if (params.group) {
             await groupHandler.sendConfiguration(params.group, xml);
             const msg = 'Success. Group has been updated'
-            params.showRestartManager ? showRestartDialog(msg) : errorHandler.info(msg, '');
+            params.showRestartManager ? showRestartDialog(msg, params.showRestartManager) : errorHandler.info(msg, '');
             $scope.$emit('configurationSuccess');
           } else if (params.rule) {
             await rulesetHandler.sendRuleConfiguration(params.rule, xml);
             const msg = 'Success. Rules has been updated'
-            params.showRestartManager ? showRestartDialog(msg) : errorHandler.info(msg, '');
+            params.showRestartManager ? showRestartDialog(msg, params.showRestartManager) : errorHandler.info(msg, '');
           } else if (params.decoder) {
             await rulesetHandler.sendDecoderConfiguration(params.decoder, xml);
             const msg = 'Success. Decoders has been updated';
-            params.showRestartManager ? showRestartDialog(msg) : errorHandler.info(msg, '');
+            params.showRestartManager ? showRestartDialog(msg, params.showRestartManager) : errorHandler.info(msg, '');
           } else if (params.node) {
-            await saveConfig.saveNodeConfiguration(params.node, xml);
+            await configHandler.saveNodeConfiguration(params.node, xml);
             const msg = `Success. Node (${params.node}) configuration has been updated`;
-            params.showRestartManager ? showRestartDialog(msg) : errorHandler.info(msg, '');
+            params.showRestartManager ? showRestartDialog(msg, params.node) : errorHandler.info(msg, '');
           } else if (params.manager) {
-            await saveConfig.saveManagerConfiguration(xml);
+            await configHandler.saveManagerConfiguration(xml);
             const msg = 'Success. Manager configuration has been updated';
-            params.showRestartManager ? showRestartDialog(msg) : errorHandler.info(msg, '');
+            params.showRestartManager ? showRestartDialog(msg, params.showRestartManager) : errorHandler.info(msg, '');
           }
           $scope.closeFn({ reload: true });
         } catch (error) {
@@ -242,24 +242,44 @@ app.directive('wzXmlFileEditor', function () {
         checkXmlParseError();
       });
 
-      const showRestartDialog = async (msg) => {
+      const showRestartDialog = async (msg, target) => {
         const confirm = $mdDialog.confirm({
-          controller: function ($scope, myScope, myError, $mdDialog, saveConfig) {
+          controller: function ($scope, myScope, myError, $mdDialog, configHandler) {
             $scope.myScope = myScope;
             $scope.closeDialog = () => {
               $mdDialog.hide();
               $('body').removeClass('md-dialog-body');
             };
-            $scope.confirmDialog = () => {                  
+            $scope.confirmDialog = () => {
               $mdDialog.hide();
-              saveConfig.restartManager()
-                .then(data => {
-                  $('body').removeClass('md-dialog-body');
-                  myError.info(data.data.data, '');
-                  $scope.myScope.$applyAsync();
-                })
-                .catch(error =>
-                  myError.handle(error.message || error, 'Error restarting'));
+              if (target === 'manager') {
+                configHandler.restartManager()
+                  .then(data => {
+                    $('body').removeClass('md-dialog-body');
+                    myError.info(data.data.data, '');
+                    $scope.myScope.$applyAsync();
+                  })
+                  .catch(error =>
+                    myError.handle(error.message || error, 'Error restarting manager'));
+              } else if (target === 'cluster') {
+                configHandler.restartCluster()
+                  .then(data => {
+                    $('body').removeClass('md-dialog-body');
+                    myError.info(data.data.data, '');
+                    $scope.myScope.$applyAsync();
+                  })
+                  .catch(error =>
+                    myError.handle(error.message || error, 'Error restarting cluster'));
+              } else {
+                configHandler.restartNode(target)
+                  .then(data => {
+                    $('body').removeClass('md-dialog-body');
+                    myError.info(data.data.data, '');
+                    $scope.myScope.$applyAsync();
+                  })
+                  .catch(error =>
+                    myError.handle(error.message || error, 'Error restarting node'));
+              }
             }
           },
           template:
@@ -269,13 +289,13 @@ app.directive('wzXmlFileEditor', function () {
             '<i class="fa fa-check"></i>' +
             '<span class="euiToastHeader__title">' +
             `${msg}` +
-            '. Do you want to restart the manager now?' +
+            `. Do you want to restart the ${target} now?` +
             '</span>' +
             '</div>' +
             '</md-dialog-content>' +
             '<md-dialog-actions>' +
             '<button class="md-primary md-cancel-button md-button ng-scope md-default-theme md-ink-ripple" type="button" ng-click="closeDialog()">I will do it later</button>' +
-            '<button class="md-primary md-confirm-button md-button md-ink-ripple md-default-theme" type="button" ng-click="confirmDialog()">Restart</button>' +
+            `<button class="md-primary md-confirm-button md-button md-ink-ripple md-default-theme" type="button" ng-click="confirmDialog()">Restart ${target}</button>` +
             '</md-dialog-actions>' +
             '</md-dialog>',
           hasBackdrop: false,

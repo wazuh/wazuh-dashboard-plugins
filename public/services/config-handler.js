@@ -9,7 +9,7 @@
  *
  * Find more information about this on the LICENSE file.
  */
-export class SaveConfig {
+export class ConfigHandler {
   constructor(apiReq) {
     this.apiReq = apiReq;
   }
@@ -57,6 +57,22 @@ export class SaveConfig {
       const result = await this.apiReq.request(
         'PUT',
         `/manager/restart`,
+        {}
+      );
+      return result;
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  }
+
+  /**
+* Restart cluster
+*/
+  async restartCluster() {
+    try {
+      const result = await this.apiReq.request(
+        'PUT',
+        `/cluster/restart`,
         {}
       );
       return result;
