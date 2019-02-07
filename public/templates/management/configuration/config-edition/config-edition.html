@@ -16,16 +16,6 @@
             <div layout="row">
                 <span class="md-subheader">Edit master/worker configuration</span>
             </div>
-
-            <!-- List of nodes if cluster is enabled -->
-            <div ng-show="selectedNode && clusterStatus.data.data.enabled === 'yes'" layout="row" layout-padding style="position: absolute;right: calc(0% + 260px);">
-                <div layout="column" layout-align="center" class="height-40 wz-select-input">
-                    <select class="kuiSelect wz-border-none cursor-pointer max-height-35" id="categoryBox" ng-model="selectedNode"
-                        ng-change="changeNode(selectedNode)" aria-label="Select node">
-                        <option ng-repeat="node in nodes" value="{{node.name}}">{{node.name}} ({{node.type}})</option>
-                    </select>
-                </div>
-            </div>
         </div>
 
         <!-- Headline (manager) -->
@@ -49,6 +39,16 @@
                         <span ng-show='xmlHasErrors' class='btn-danger'><i aria-hidden='true' class='fa fa-fw fa-exclamation-triangle'></i>
                             XML format error</span>
                     </button>
+                    <!-- List of nodes if cluster is enabled -->
+                    <div ng-show="selectedNode && clusterStatus.data.data.enabled === 'yes'" layout="row" class="wz-margin-left-8"
+                        layout-padding style="padding: 0;height: 32px;">
+                        <div layout="column" layout-align="center" class="height-35 wz-select-input">
+                            <select class="kuiSelect wz-border-none cursor-pointer max-height-35" id="categoryBox"
+                                ng-model="selectedNode" ng-change="changeNode()" aria-label="Select node">
+                                <option ng-repeat="node in nodes" value="{{node.name}}">{{node.name}} ({{node.type}})</option>
+                            </select>
+                        </div>
+                    </div>
                 </div>
                 <div class="md-padding md-padding-top-10" style="height: calc(100vh - 280px);" ng-if="fetchedXML">
                     <wz-xml-file-editor file-name='ossec.conf' data="fetchedXML" target-name="selectedNode" valid-fn='xmlIsValid(valid)'

@@ -188,7 +188,7 @@ app.directive('wzXmlFileEditor', function () {
             params.showRestartManager ? showRestartDialog(msg) : errorHandler.info(msg, '');
           } else if (params.node) {
             await saveConfig.saveNodeConfiguration(params.node, xml);
-            const msg = 'Success. Node configuration has been updated';
+            const msg = `Success. Node (${params.node}) configuration has been updated`;
             params.showRestartManager ? showRestartDialog(msg) : errorHandler.info(msg, '');
           } else if (params.manager) {
             await saveConfig.saveManagerConfiguration(xml);
