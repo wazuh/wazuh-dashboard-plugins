@@ -119,7 +119,7 @@
                 <md-card flex class="wz-md-card _md flex md-margin-h" ng-if="!lookingGroup">
                     <md-card-content>
                         <div layout="row">
-                            <wz-table flex extra-limit="true" path="'/agents/groups'" keys="['name','count','mergedSum']"
+                            <wz-table flex extra-limit="100" path="'/agents/groups'" keys="['name','count','mergedSum']"
                                 allow-click="true" row-sizes="[14,12,10]">
                             </wz-table>
                         </div>
@@ -161,7 +161,7 @@
                     <md-card flex class="wz-md-card _md flex md-margin-h" ng-if="lookingGroup && groupsSelectedTab==='files' && !fileViewer && currentGroup">
                         <md-card-content>
                             <div layout="row">
-                                <wz-table extra-limit="true" flex path="'/agents/groups/' + currentGroup.name + '/files'"
+                                <wz-table extra-limit="100" flex path="'/agents/groups/' + currentGroup.name + '/files'"
                                     keys="[{value:'filename',size:2},{value:'hash',size:6}]" allow-click="true"
                                     row-sizes="[10,8,6,4]">
                                 </wz-table>

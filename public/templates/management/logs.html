@@ -66,7 +66,7 @@
     <div layout="row" layout-padding ng-if="ctrl.logsPath">
         <wz-table
             flex
-            extra-limit="true"
+            extra-limit="100"
             path="ctrl.logsPath"
             keys="['timestamp',{value:'tag',size:2},'level',{value:'description',size:4,nosortable:true}]"
             row-sizes="[12,10,7]">

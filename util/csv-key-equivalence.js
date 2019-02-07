@@ -29,6 +29,8 @@ export const KeyEquivalenece = {
   file: 'File',
   gdpr: 'GDPR',
   pci: 'PCI',
+  cis: 'CIS',
+  event: 'Event',
   groups: 'Groups',
   name: 'Name',
   count: 'Count',
@@ -79,5 +81,8 @@ export const KeyEquivalenece = {
   priority: 'Priority',
   cmd: 'CMD',
   nlwp: 'NLWP',
-  process: 'Process'
+  process: 'Process',
+  md5: 'MD5',
+  sha1: 'SHA1',
+  sha256: 'SHA256'
 };

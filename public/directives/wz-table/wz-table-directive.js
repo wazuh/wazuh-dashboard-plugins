@@ -50,7 +50,8 @@ app.directive('wzTable', function() {
       appState,
       globalState,
       groupHandler,
-      wazuhConfig
+      wazuhConfig,
+      $sce
     ) {
       /**
        * Init variables
@@ -205,7 +206,8 @@ app.directive('wzTable', function() {
         return;
       };
 
-      $scope.parseValue = (key, item) => parseValue(key, item, instance.path);
+      $scope.parseValue = (key, item) =>
+        parseValue(key, item, instance.path, $sce);
 
       /**
        * On controller loads

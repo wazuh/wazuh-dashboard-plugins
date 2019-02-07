@@ -467,6 +467,22 @@ export const apiRequestList = [
         args: []
       },
       {
+        name: '/policy-monitoring/:agent_id',
+        args: [
+          {
+            name: ':agent_id'
+          }
+        ]
+      },
+      {
+        name: '/policy-monitoring/:agent_id/checks',
+        args: [
+          {
+            name: ':agent_id'
+          }
+        ]
+      },
+      {
         name: '/rootcheck/:agent_id',
         args: [
           {

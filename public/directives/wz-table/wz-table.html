@@ -20,11 +20,9 @@
             <tr ng-class="allowClick ? 'cursor-pointer' : ''" class="wz-word-wrap" ng-repeat="item in pagedItems[currentPage] | filter:{item:'!'}"
                 ng-click="clickAction(item)">
                 <td ng-repeat="key in keys">
-                    {{
-                    parseValue(key,item) | limitTo: extraLimit ? 100 : 25
-                    }}
-                    <span ng-if="parseValue(key,item).length > (extraLimit ? 100 : 25)">...</span>
-                    <md-tooltip ng-if="parseValue(key,item).length > (extraLimit ? 100 : 25)" md-direction="bottom"
+                    <span ng-bind-html="parseValue(key,item) | limitTo: extraLimit || 25"></span>
+                    <span ng-if="parseValue(key,item).length > (extraLimit || 25)">...</span>
+                    <md-tooltip ng-if="parseValue(key,item).length > (extraLimit || 25)" md-direction="bottom"
                         class="wz-tooltip">
                         {{ parseValue(key,item) }}
                     </md-tooltip>

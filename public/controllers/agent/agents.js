@@ -90,8 +90,9 @@ export class AgentsController {
     this.ignoredTabs = ['syscollector', 'welcome', 'configuration'];
 
     this.$scope.showSyscheckFiles = false;
-    this.$scope.editGroup = false;
+    this.$scope.showRootcheckScan = false;
 
+    this.$scope.editGroup = false;
     this.$scope.addingGroupToAgent = false;
   }
 
@@ -182,6 +183,12 @@ export class AgentsController {
 
     this.$scope.searchSyscheckFile = (term, specificFilter) =>
       this.$scope.$broadcast('wazuhSearch', { term, specificFilter });
+
+    this.$scope.searchRootcheck = (term, specificFilter) =>
+      this.$scope.$broadcast('wazuhSearch', { term, specificFilter });
+
+    this.$scope.launchRootcheckScan = () => this.launchRootcheckScan();
+    this.$scope.launchSyscheckScan = () => this.launchSyscheckScan();
 
     this.$scope.startVis2Png = () => this.startVis2Png();
 
@@ -302,6 +309,16 @@ export class AgentsController {
     this.$scope.switchSyscheckFiles = () => {
       this.$scope.showSyscheckFiles = !this.$scope.showSyscheckFiles;
       if (!this.$scope.showSyscheckFiles) {
+        this.$rootScope.$emit('changeTabView', {
+          tabView: this.$scope.tabView
+        });
+      }
+      if (!this.$scope.$$phase) this.$scope.$digest();
+    };
+
+    this.$scope.switchRootcheckScan = () => {
+      this.$scope.showRootcheckScan = !this.$scope.showRootcheckScan;
+      if (!this.$scope.showRootcheckScan) {
         this.$rootScope.$emit('changeTabView', {
           tabView: this.$scope.tabView
         });
@@ -468,10 +485,11 @@ export class AgentsController {
           (((agentInfo || {}).data || {}).data || {}).status ||
           this.$scope.agent.status;
       }
-    } catch (error) {} // eslint-disable-line
+    } catch (error) { } // eslint-disable-line
 
     try {
       this.$scope.showSyscheckFiles = false;
+      this.$scope.showRootcheckScan = false;
       if (tab === 'pci') {
         const pciTabs = await this.commonData.getPCI();
         this.$scope.pciTabs = pciTabs;
@@ -485,7 +503,7 @@ export class AgentsController {
       if (tab === 'syscollector')
         try {
           await this.loadSyscollector(this.$scope.agent.id);
-        } catch (error) {} // eslint-disable-line
+        } catch (error) { } // eslint-disable-line
       if (tab === 'configuration') {
         const isSync = await this.apiReq.request(
           'GET',
@@ -603,7 +621,7 @@ export class AgentsController {
           {}
         );
         netifaceResponse = ((resultNetiface || {}).data || {}).data || false;
-      } catch (error) {} // eslint-disable-line
+      } catch (error) { } // eslint-disable-line
 
       // This API call may fail so we put it out of Promise.all
       let netaddrResponse = false;
@@ -615,7 +633,7 @@ export class AgentsController {
         );
         netaddrResponse =
           ((resultNetaddrResponse || {}).data || {}).data || false;
-      } catch (error) {} // eslint-disable-line
+      } catch (error) { } // eslint-disable-line
 
       // Before proceeding, syscollector data is an empty object
       this.$scope.syscollector = {};
@@ -631,7 +649,7 @@ export class AgentsController {
       this.$scope.syscollector = {
         hardware:
           typeof hardwareResponse === 'object' &&
-          Object.keys(hardwareResponse).length
+            Object.keys(hardwareResponse).length
             ? { ...hardwareResponse }
             : false,
         os:
@@ -814,5 +832,45 @@ export class AgentsController {
       (this.$scope.agent || {}).id || true,
       syscollectorFilters.length ? syscollectorFilters : null
     );
+  }
+
+  async launchRootcheckScan() {
+    try {
+      const isActive = ((this.$scope.agent || {}).status || '') === 'Active';
+      if (!isActive) {
+        throw new Error('Agent is not active')
+      }
+      await this.apiReq.request(
+        'PUT',
+        `/rootcheck/${this.$scope.agent.id}`,
+        {}
+      );
+      this.errorHandler.info(
+        `Policy monitoring scan launched successfully on agent ${
+        this.$scope.agent.id
+        }`,
+        ''
+      );
+    } catch (error) {
+      this.errorHandler.handle(error, '');
+    }
+    return;
+  }
+
+  async launchSyscheckScan() {
+    try {
+      const isActive = ((this.$scope.agent || {}).status || '') === 'Active';
+      if (!isActive) {
+        throw new Error('Agent is not active')
+      }
+      await this.apiReq.request('PUT', `/syscheck/${this.$scope.agent.id}`, {});
+      this.errorHandler.info(
+        `FIM scan launched successfully on agent ${this.$scope.agent.id}`,
+        ''
+      );
+    } catch (error) {
+      this.errorHandler.handle(error, '');
+    }
+    return;
   }
 }
