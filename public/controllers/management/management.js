@@ -24,7 +24,9 @@ export class ManagementController {
     $location,
     shareAgent,
     wazuhConfig,
-    appState
+    appState,
+    configHandler,
+    errorHandler
   ) {
     this.$scope = $scope;
     this.$rootScope = $rootScope;
@@ -32,6 +34,8 @@ export class ManagementController {
     this.appState = appState;
     this.shareAgent = shareAgent;
     this.wazuhConfig = wazuhConfig;
+    this.configHandler = configHandler;
+    this.errorHandler = errorHandler;
     this.tab = 'welcome';
     this.rulesetTab = 'rules';
     this.globalConfigTab = 'overview';
@@ -83,6 +87,14 @@ export class ManagementController {
     this.$scope.$on('removeCurrentConfiguration', () => {
       this.currentConfiguration = false;
     });
+    this.$scope.$on('setRestarting', () => {
+      this.isRestarting = true;
+      this.$scope.$applyAsync();
+    });
+    this.$scope.$on('removeRestarting', () => {
+      this.isRestarting = false;
+      this.$scope.$applyAsync();
+    });
     this.appState = appState;
   }
 
@@ -90,6 +102,7 @@ export class ManagementController {
    * When controller loads
    */
   $onInit() {
+    this.clusterInfo = this.appState.getClusterInfo();
     const configuration = this.wazuhConfig.getConfig();
     this.$scope.adminMode = !!(configuration || {}).admin;
     if (this.shareAgent.getAgent() && this.shareAgent.getSelectedGroup()) {
@@ -111,6 +124,29 @@ export class ManagementController {
    */
   inArray(item, array) {
     return item && Array.isArray(array) && array.includes(item);
+  }
+
+  async restartManager() {
+    try {
+      this.isRestarting = true;  
+      const data = await this.configHandler.restartManager();
+      this.isRestarting = false;
+      this.errorHandler.info(data.data.data, '');
+      this.$scope.$applyAsync();
+    } catch (error) {
+      this.errorHandler.handle(error.message || error, 'Error restarting manager');
+    }
+  }
+  async restartCluster() {
+    try {
+      this.isRestarting = true;      
+      const data = await this.configHandler.restartCluster();
+      this.isRestarting = false;
+      this.errorHandler.info('It may take a few seconds...', data.data.data);
+      this.$scope.$applyAsync();
+    } catch (error) {
+      this.errorHandler.handle(error.message || error, 'Error restarting cluster');
+    }
   }
 
   setConfigTab(tab, nav = false) {
