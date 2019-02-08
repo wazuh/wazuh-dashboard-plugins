@@ -49,7 +49,7 @@ export class EditionController {
       try {
         let data = false;
         let xml = false;
-        if (this.$scope.clusterStatus.data.data.enabled === 'yes') {
+        if (this.$scope.clusterStatus.data.data.enabled === 'yes' && this.$scope.clusterStatus.data.data.running === 'yes') {
           data = await this.apiReq.request(
             'GET',
             `/cluster/${this.$scope.selectedNode}/files`,
@@ -87,16 +87,32 @@ export class EditionController {
 
     this.$scope.restartNode = async (selectedNode) => {
       try {
-        const data = await this.configHandler.restartNode(selectedNode);
-        this.errorHandler.info(data.data.data, '');
+        this.$scope.$emit('setRestarting', {});
+        this.$scope.isRestarting = true;
+        this.$scope.clusterStatus = await this.apiReq.request(
+          'GET',
+          '/cluster/status',
+          {}
+        );
+        let data;
+        if (this.$scope.clusterStatus.data.data.enabled === 'yes' && this.$scope.clusterStatus.data.data.running === 'yes') {
+          data = await this.configHandler.restartNode(selectedNode);
+        } else {
+          data = await this.configHandler.restartManager();
+        }
+        this.$scope.$emit('removeRestarting', {});
+        this.$scope.isRestarting = false;
+        this.errorHandler.info(data.data.data, 'It may take a few seconds...');
         this.$scope.$applyAsync();
       } catch (error) {
         this.errorHandler.handle(error.message || error, 'Error restarting node');
+        this.$scope.$emit('removeRestarting', {});
+        this.$scope.isRestarting = false;
       }
     }
     this.$scope.saveConfiguration = async () => {
       try {
-        if (this.$scope.clusterStatus.data.data.enabled === 'yes') {
+        if (this.$scope.clusterStatus.data.data.enabled === 'yes' && this.$scope.clusterStatus.data.data.running === 'yes') {
           this.$scope.$broadcast('saveXmlFile', {
             node: this.$scope.selectedNode,
             showRestartManager: 'cluster'
@@ -153,12 +169,6 @@ export class EditionController {
           item => item.type === 'master'
         )[0];
         this.$scope.selectedNode = masterNode.name;
-      } else if (
-        this.$scope.clusterStatus &&
-        this.$scope.clusterStatus.data.data.enabled === 'yes' &&
-        this.$scope.clusterStatus.data.data.running === 'no'
-      ) {
-        this.errorHandler.handle('', 'Cluster is enabled but not running');
       } else {
         this.$scope.selectedNode = 'manager';
       }

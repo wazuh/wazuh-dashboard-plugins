@@ -244,42 +244,57 @@ app.directive('wzXmlFileEditor', function () {
 
       const showRestartDialog = async (msg, target) => {
         const confirm = $mdDialog.confirm({
-          controller: function ($scope, myScope, myError, $mdDialog, configHandler) {
+          controller: function ($scope, myScope, myError, $mdDialog, configHandler, apiReq) {
             $scope.myScope = myScope;
             $scope.closeDialog = () => {
               $mdDialog.hide();
               $('body').removeClass('md-dialog-body');
             };
-            $scope.confirmDialog = () => {
+            $scope.confirmDialog = async () => {
               $mdDialog.hide();
-              if (target === 'manager') {
-                configHandler.restartManager()
-                  .then(data => {
-                    $('body').removeClass('md-dialog-body');
-                    myError.info(data.data.data, '');
-                    $scope.myScope.$applyAsync();
-                  })
-                  .catch(error =>
-                    myError.handle(error.message || error, 'Error restarting manager'));
-              } else if (target === 'cluster') {
-                configHandler.restartCluster()
-                  .then(data => {
-                    $('body').removeClass('md-dialog-body');
-                    myError.info(data.data.data, '');
-                    $scope.myScope.$applyAsync();
-                  })
-                  .catch(error =>
-                    myError.handle(error.message || error, 'Error restarting cluster'));
-              } else {
-                configHandler.restartNode(target)
-                  .then(data => {
-                    $('body').removeClass('md-dialog-body');
-                    myError.info(data.data.data, '');
-                    $scope.myScope.$applyAsync();
-                  })
-                  .catch(error =>
-                    myError.handle(error.message || error, 'Error restarting node'));
+              $scope.myScope.$emit('setRestarting', {});
+              const clusterStatus = await apiReq.request(
+                'GET',
+                '/cluster/status',
+                {}
+              );
+              if (target !== 'cluster' && target !== 'manager' && (clusterStatus.data.data.enabled === 'no' || clusterStatus.data.data.running === 'no')) {
+                target = 'manager';
               }
+              if (target === 'manager') {
+                try {
+                  const data = await configHandler.restartManager();
+                  $('body').removeClass('md-dialog-body');
+                  myError.info(data.data.data, 'It may take a few seconds...');
+                  $scope.myScope.$applyAsync();
+                } catch (error) {
+                  myError.handle(error.message || error, 'Error restarting manager');
+                  $scope.myScope.$emit('removeRestarting', {});
+                }
+
+              } else if (target === 'cluster') {
+                try {
+                  const data = await configHandler.restartCluster();
+                  $('body').removeClass('md-dialog-body');
+                  myError.info(data.data.data, 'It may take a few seconds...');
+                  $scope.myScope.$applyAsync();
+
+                } catch (error) {
+                  myError.handle(error.message || error, 'Error restarting cluster');
+                  $scope.myScope.$emit('removeRestarting', {});
+                }
+              } else {
+                try {
+                  const data = await configHandler.restartNode(target);
+                  $('body').removeClass('md-dialog-body');
+                  myError.info(data.data.data, 'It may take a few seconds...');
+                  $scope.myScope.$applyAsync();
+                } catch (error) {
+                  myError.handle(error.message || error, 'Error restarting node');
+                  $scope.myScope.$emit('removeRestarting', {});
+                }
+              }
+              $scope.myScope.$emit('removeRestarting', {});
             }
           },
           template:
