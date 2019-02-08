@@ -244,14 +244,22 @@ app.directive('wzXmlFileEditor', function () {
 
       const showRestartDialog = async (msg, target) => {
         const confirm = $mdDialog.confirm({
-          controller: function ($scope, myScope, myError, $mdDialog, configHandler) {
+          controller: function ($scope, myScope, myError, $mdDialog, configHandler, apiReq) {
             $scope.myScope = myScope;
             $scope.closeDialog = () => {
               $mdDialog.hide();
               $('body').removeClass('md-dialog-body');
             };
-            $scope.confirmDialog = () => {
+            $scope.confirmDialog = async () => {
               $mdDialog.hide();
+              const clusterStatus = await apiReq.request(
+                'GET',
+                '/cluster/status',
+                {}
+              );
+              if (target !== 'cluster' && target !== 'manager' && (clusterStatus.data.data.enabled === 'no' || clusterStatus.data.data.running === 'no')) {
+                target = 'manager';
+              }
               if (target === 'manager') {
                 configHandler.restartManager()
                   .then(data => {
