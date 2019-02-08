@@ -153,7 +153,13 @@ export class WazuhApiCtrl {
         throw new Error(`${api.url}:${api.port}/version is unreachable`);
       }
     } catch (error) {
-      if (error.code === 'ECONNREFUSED') {
+      if (error.code === 'EPROTO') {
+        log('POST /api/check-stored-api', 'Wrong protocol being used to connect to the Wazuh API');
+        return {
+          statusCode: 200,
+          data: { password: '****', apiIsDown: true }
+        };
+      } else if (error.code === 'ECONNREFUSED') {
         log('POST /api/check-stored-api', error.message || error);
         return {
           statusCode: 200,
@@ -192,7 +198,7 @@ export class WazuhApiCtrl {
                   req.idChanged = api._id;
                   return this.checkStoredAPI(req, reply);
                 }
-              } catch (error) {} // eslint-disable-line
+              } catch (error) { } // eslint-disable-line
             }
           } catch (error) {
             log('POST /api/check-stored-api', error.message || error);
@@ -335,6 +341,10 @@ export class WazuhApiCtrl {
 
       throw new Error(tmpMsg);
     } catch (error) {
+      if (error.code === 'EPROTO') {
+        log('POST /api/check-api', 'Wrong protocol being used to connect to the Wazuh API');
+        return ErrorResponse('Wrong protocol being used to connect to the Wazuh API', 3005, 500, reply);
+      }
       log('POST /api/check-api', error.message || error);
       return ErrorResponse(error.message || error, 3005, 500, reply);
     }
@@ -589,7 +599,7 @@ export class WazuhApiCtrl {
       }
 
       throw ((response || {}).body || {}).error &&
-      ((response || {}).body || {}).message
+        ((response || {}).body || {}).message
         ? { message: response.body.message, code: response.body.error }
         : new Error('Unexpected error fetching data from the Wazuh API');
     } catch (error) {
@@ -648,7 +658,7 @@ export class WazuhApiCtrl {
       }
 
       throw ((response || {}).body || {}).error &&
-      ((response || {}).body || {}).message
+        ((response || {}).body || {}).message
         ? { message: response.body.message, code: response.body.error }
         : new Error('Unexpected error fetching data from the Wazuh API');
     } catch (error) {
@@ -797,18 +807,18 @@ export class WazuhApiCtrl {
       if ((((output || {}).body || {}).data || {}).totalItems) {
         const fields = req.payload.path.includes('/agents')
           ? [
-              'id',
-              'status',
-              'name',
-              'ip',
-              'group',
-              'manager',
-              'node_name',
-              'dateAdd',
-              'version',
-              'lastKeepAlive',
-              'os'
-            ]
+            'id',
+            'status',
+            'name',
+            'ip',
+            'group',
+            'manager',
+            'node_name',
+            'dateAdd',
+            'version',
+            'lastKeepAlive',
+            'os'
+          ]
           : Object.keys(output.body.data.items[0]);
 
         const json2csvParser = new Parser({ fields });
