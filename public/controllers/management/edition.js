@@ -87,6 +87,8 @@ export class EditionController {
 
     this.$scope.restartNode = async (selectedNode) => {
       try {
+        this.$scope.$emit('setRestarting', {});
+        this.$scope.isRestarting = true;
         this.$scope.clusterStatus = await this.apiReq.request(
           'GET',
           '/cluster/status',
@@ -98,10 +100,14 @@ export class EditionController {
         } else {
           data = await this.configHandler.restartManager();
         }
-        this.errorHandler.info(data.data.data, '');
+        this.$scope.$emit('removeRestarting', {});
+        this.$scope.isRestarting = false;
+        this.errorHandler.info(data.data.data, 'It may take a few seconds...');
         this.$scope.$applyAsync();
       } catch (error) {
         this.errorHandler.handle(error.message || error, 'Error restarting node');
+        this.$scope.$emit('removeRestarting', {});
+        this.$scope.isRestarting = false;
       }
     }
     this.$scope.saveConfiguration = async () => {

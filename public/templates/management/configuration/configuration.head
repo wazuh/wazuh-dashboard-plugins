@@ -2,12 +2,12 @@
     class="" ng-init="switchConfigurationTab('welcome', false)">
 
     <!-- Navigation section -->
-    <div style="position: absolute;right: 0;top: 90px;z-index: 1;">        
+    <div ng-show="adminMode" style="position: absolute;right: 0;top: 90px;z-index: 1;">        
         <div style="float:left">
-            <button ng-if="mctrl.clusterInfo.status === 'enabled'" class="btn btn-primary wz-margin-right-15" ng-click="mctrl.restartCluster()"><i class="fa fa-refresh"></i>
+            <button ng-if="mctrl.clusterInfo.status === 'enabled'" class="btn btn-primary wz-margin-right-15" ng-disabled="mctrl.isRestarting" ng-click="mctrl.restartCluster()"><i class="fa fa-refresh"></i>
                 Restart cluster
             </button>
-            <button ng-if="mctrl.clusterInfo.status !== 'enabled'" class="btn btn-primary wz-margin-right-15" ng-click="mctrl.restartManager()"><i class="fa fa-refresh"></i>
+            <button ng-if="mctrl.clusterInfo.status !== 'enabled'" class="btn btn-primary wz-margin-right-15" ng-disabled="mctrl.isRestarting" ng-click="mctrl.restartManager()"><i class="fa fa-refresh"></i>
                 Restart manager
             </button>
         </div>

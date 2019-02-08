@@ -47,7 +47,7 @@
                                 <option ng-repeat="node in nodes" value="{{node.name}}">{{node.name}} ({{node.type}})</option>
                             </select>
                         </div>
-                        <button class="btn btn-primary wz-margin-left-8" ng-click="restartNode(selectedNode)"><i
+                        <button class="btn btn-primary wz-margin-left-8" ng-disabled="isRestarting" ng-click="restartNode(selectedNode)"><i
                                 class="fa fa-refresh"></i>
                             Restart {{selectedNode}}
                         </button>

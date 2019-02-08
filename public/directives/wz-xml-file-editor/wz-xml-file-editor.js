@@ -252,6 +252,7 @@ app.directive('wzXmlFileEditor', function () {
             };
             $scope.confirmDialog = async () => {
               $mdDialog.hide();
+              $scope.myScope.$emit('setRestarting', {});
               const clusterStatus = await apiReq.request(
                 'GET',
                 '/cluster/status',
@@ -261,33 +262,39 @@ app.directive('wzXmlFileEditor', function () {
                 target = 'manager';
               }
               if (target === 'manager') {
-                configHandler.restartManager()
-                  .then(data => {
-                    $('body').removeClass('md-dialog-body');
-                    myError.info(data.data.data, '');
-                    $scope.myScope.$applyAsync();
-                  })
-                  .catch(error =>
-                    myError.handle(error.message || error, 'Error restarting manager'));
+                try {
+                  const data = await configHandler.restartManager();
+                  $('body').removeClass('md-dialog-body');
+                  myError.info(data.data.data, 'It may take a few seconds...');
+                  $scope.myScope.$applyAsync();
+                } catch (error) {
+                  myError.handle(error.message || error, 'Error restarting manager');
+                  $scope.myScope.$emit('removeRestarting', {});
+                }
+
               } else if (target === 'cluster') {
-                configHandler.restartCluster()
-                  .then(data => {
-                    $('body').removeClass('md-dialog-body');
-                    myError.info(data.data.data, '');
-                    $scope.myScope.$applyAsync();
-                  })
-                  .catch(error =>
-                    myError.handle(error.message || error, 'Error restarting cluster'));
+                try {
+                  const data = await configHandler.restartCluster();
+                  $('body').removeClass('md-dialog-body');
+                  myError.info(data.data.data, 'It may take a few seconds...');
+                  $scope.myScope.$applyAsync();
+
+                } catch (error) {
+                  myError.handle(error.message || error, 'Error restarting cluster');
+                  $scope.myScope.$emit('removeRestarting', {});
+                }
               } else {
-                configHandler.restartNode(target)
-                  .then(data => {
-                    $('body').removeClass('md-dialog-body');
-                    myError.info(data.data.data, '');
-                    $scope.myScope.$applyAsync();
-                  })
-                  .catch(error =>
-                    myError.handle(error.message || error, 'Error restarting node'));
+                try {
+                  const data = await configHandler.restartNode(target);
+                  $('body').removeClass('md-dialog-body');
+                  myError.info(data.data.data, 'It may take a few seconds...');
+                  $scope.myScope.$applyAsync();
+                } catch (error) {
+                  myError.handle(error.message || error, 'Error restarting node');
+                  $scope.myScope.$emit('removeRestarting', {});
+                }
               }
+              $scope.myScope.$emit('removeRestarting', {});
             }
           },
           template:

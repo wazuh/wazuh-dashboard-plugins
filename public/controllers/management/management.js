@@ -87,6 +87,14 @@ export class ManagementController {
     this.$scope.$on('removeCurrentConfiguration', () => {
       this.currentConfiguration = false;
     });
+    this.$scope.$on('setRestarting', () => {
+      this.isRestarting = true;
+      this.$scope.$applyAsync();
+    });
+    this.$scope.$on('removeRestarting', () => {
+      this.isRestarting = false;
+      this.$scope.$applyAsync();
+    });
     this.appState = appState;
   }
 
@@ -120,7 +128,9 @@ export class ManagementController {
 
   async restartManager() {
     try {
+      this.isRestarting = true;  
       const data = await this.configHandler.restartManager();
+      this.isRestarting = false;
       this.errorHandler.info(data.data.data, '');
       this.$scope.$applyAsync();
     } catch (error) {
@@ -129,8 +139,10 @@ export class ManagementController {
   }
   async restartCluster() {
     try {
+      this.isRestarting = true;      
       const data = await this.configHandler.restartCluster();
-      this.errorHandler.info(data.data.data, '');
+      this.isRestarting = false;
+      this.errorHandler.info(data.data.data, 'It may take a few seconds...');
       this.$scope.$applyAsync();
     } catch (error) {
       this.errorHandler.handle(error.message || error, 'Error restarting cluster');
