@@ -102,7 +102,7 @@ export class EditionController {
         }
         this.$scope.$emit('removeRestarting', {});
         this.$scope.isRestarting = false;
-        this.errorHandler.info(data.data.data, 'It may take a few seconds...');
+        this.errorHandler.info('It may take a few seconds...', data.data.data);
         this.$scope.$applyAsync();
       } catch (error) {
         this.errorHandler.handle(error.message || error, 'Error restarting node');

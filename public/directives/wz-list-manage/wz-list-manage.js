@@ -183,7 +183,7 @@ app.directive('wzListManage', function () {
                 configHandler.restartManager()
                   .then(data => {
                     $('body').removeClass('md-dialog-body');
-                    myError.info(data.data.data, 'It may take a few seconds...');
+                    myError.info('It may take a few seconds...', data.data.data);
                     $scope.myScope.$applyAsync();
                   }).catch(error => { 
                     $scope.myScope.$emit('setRestarting', {});
@@ -193,7 +193,7 @@ app.directive('wzListManage', function () {
                 configHandler.restartCluster()
                   .then(data => {
                     $('body').removeClass('md-dialog-body');
-                    myError.info(data.data.data, 'It may take a few seconds...');
+                    myError.info('It may take a few seconds...', data.data.data);
                     $scope.myScope.$applyAsync();
                   })
                   .catch(error => { 

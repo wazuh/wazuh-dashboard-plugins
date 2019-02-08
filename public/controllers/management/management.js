@@ -142,7 +142,7 @@ export class ManagementController {
       this.isRestarting = true;      
       const data = await this.configHandler.restartCluster();
       this.isRestarting = false;
-      this.errorHandler.info(data.data.data, 'It may take a few seconds...');
+      this.errorHandler.info('It may take a few seconds...', data.data.data);
       this.$scope.$applyAsync();
     } catch (error) {
       this.errorHandler.handle(error.message || error, 'Error restarting cluster');

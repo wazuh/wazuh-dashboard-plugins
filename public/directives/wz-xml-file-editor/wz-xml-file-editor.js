@@ -251,8 +251,8 @@ app.directive('wzXmlFileEditor', function () {
               $('body').removeClass('md-dialog-body');
             };
             $scope.confirmDialog = async () => {
-              $mdDialog.hide();
               $scope.myScope.$emit('setRestarting', {});
+              $mdDialog.hide();
               const clusterStatus = await apiReq.request(
                 'GET',
                 '/cluster/status',
@@ -265,7 +265,7 @@ app.directive('wzXmlFileEditor', function () {
                 try {
                   const data = await configHandler.restartManager();
                   $('body').removeClass('md-dialog-body');
-                  myError.info(data.data.data, 'It may take a few seconds...');
+                  myError.info('It may take a few seconds...', data.data.data);
                   $scope.myScope.$applyAsync();
                 } catch (error) {
                   myError.handle(error.message || error, 'Error restarting manager');
@@ -276,7 +276,7 @@ app.directive('wzXmlFileEditor', function () {
                 try {
                   const data = await configHandler.restartCluster();
                   $('body').removeClass('md-dialog-body');
-                  myError.info(data.data.data, 'It may take a few seconds...');
+                  myError.info('It may take a few seconds...', data.data.data);
                   $scope.myScope.$applyAsync();
 
                 } catch (error) {
@@ -287,7 +287,7 @@ app.directive('wzXmlFileEditor', function () {
                 try {
                   const data = await configHandler.restartNode(target);
                   $('body').removeClass('md-dialog-body');
-                  myError.info(data.data.data, 'It may take a few seconds...');
+                  myError.info('It may take a few seconds...', data.data.data);
                   $scope.myScope.$applyAsync();
                 } catch (error) {
                   myError.handle(error.message || error, 'Error restarting node');
