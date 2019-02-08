@@ -76,8 +76,8 @@ export class ConfigurationRulesetController {
       this.$scope.editingFile = false;
       this.$scope.newFile = false;
       this.$scope.fetchedXML = null;
-      this.appState.setNavigation({ status: true });
       if (reload) this.$scope.search();
+      this.appState.setNavigation({ status: true });
       if (!this.$scope.$$phase) this.$scope.$digest();
     };
 

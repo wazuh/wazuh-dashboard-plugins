@@ -54,6 +54,14 @@ export class ConfigHandler {
  */
   async restartManager() {
     try {
+      const validationError = await this.apiReq.request(
+        'GET',
+        `/manager/configuration/validation`,
+        {}
+      );
+      if (validationError.data.data !== 'Configuration is OK') {
+        throw new Error("The configuration has some error.");
+      }
       const result = await this.apiReq.request(
         'PUT',
         `/manager/restart`,
@@ -70,6 +78,14 @@ export class ConfigHandler {
 */
   async restartCluster() {
     try {
+      const validationError = await this.apiReq.request(
+        'GET',
+        `/cluster/configuration/validation`,
+        {}
+      );
+      if (validationError.data.data !== 'Configuration is OK') {
+        throw new Error("The configuration has some error.");
+      }
       const result = await this.apiReq.request(
         'PUT',
         `/cluster/restart`,
@@ -86,6 +102,14 @@ export class ConfigHandler {
 */
   async restartNode(node) {
     try {
+      const validationError = await this.apiReq.request(
+        'GET',
+        `/cluster/${node}/configuration/validation`,
+        {}
+      );
+      if (validationError.data.data !== 'Configuration is OK') {
+        throw new Error("The configuration has some error.");
+      }
       const result = await this.apiReq.request(
         'PUT',
         `/cluster/${node}/restart`,
