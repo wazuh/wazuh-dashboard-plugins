@@ -77,6 +77,22 @@ export const apiRequestList = [
         args: []
       },
       {
+        name: '/cluster/:node_id/restart',
+        args: [
+          {
+            name: ':node_id'
+          }
+        ]
+      },
+      {
+        name: '/cluster/restart',
+        args: []
+      },
+      {
+        name: '/manager/restart',
+        args: []
+      },
+      {
         name: '/rootcheck',
         args: []
       },
@@ -131,6 +147,14 @@ export const apiRequestList = [
           {
             name: ':agent_id'
           },
+          {
+            name: ':group_id'
+          }
+        ]
+      },
+      {
+        name: '/agents/group/:group_id',
+        args: [
           {
             name: ':group_id'
           }
@@ -323,6 +347,22 @@ export const apiRequestList = [
         ]
       },
       {
+        name: '/cluster/:node_id/configuration/validation',
+        args: [
+          {
+            name: ':node_id'
+          }
+        ]
+      },
+      {
+        name: '/cluster/:node_id/files',
+        args: [
+          {
+            name: ':node_id'
+          }
+        ]
+      },
+      {
         name: '/cluster/:node_id/info',
         args: [
           {
@@ -355,7 +395,23 @@ export const apiRequestList = [
         ]
       },
       {
+        name: '/cluster/:node_id/stats/analysisd',
+        args: [
+          {
+            name: ':node_id'
+          }
+        ]
+      },
+      {
         name: '/cluster/:node_id/stats/hourly',
+        args: [
+          {
+            name: ':node_id'
+          }
+        ]
+      },
+      {
+        name: '/cluster/:node_id/stats/remoted',
         args: [
           {
             name: ':node_id'
@@ -383,6 +439,10 @@ export const apiRequestList = [
         args: []
       },
       {
+        name: '/cluster/configuration/validation',
+        args: []
+      },
+      {
         name: '/cluster/healthcheck',
         args: []
       },
@@ -407,6 +467,29 @@ export const apiRequestList = [
         args: []
       },
       {
+        name: '/manager/stats/remoted',
+        args: []
+      },
+      {
+        name: '/configuration_assessment/:agent_id',
+        args: [
+          {
+            name: ':agent_id'
+          }
+        ]
+      },
+      {
+        name: '/configuration_assessment/:agent_id/checks/:id',
+        args: [
+          {
+            name: ':agent_id'
+          },
+          {
+            name: ':id'
+          }
+        ]
+      },
+      {
         name: '/decoders',
         args: []
       },
@@ -427,7 +510,23 @@ export const apiRequestList = [
         args: []
       },
       {
+        name: '/lists',
+        args: []
+      },
+      {
+        name: '/lists/files',
+        args: []
+      },
+      {
         name: '/manager/configuration',
+        args: []
+      },
+      {
+        name: '/manager/configuration/validation',
+        args: []
+      },
+      {
+        name: '/manager/files',
         args: []
       },
       {
@@ -616,11 +715,50 @@ export const apiRequestList = [
         args: []
       },
       {
+        name: '/agents/group/:group_id',
+        args: [
+          {
+            name: ':group_id'
+          }
+        ]
+      },
+      {
+        name: '/agents/groups/:group_id/configuration',
+        args: [
+          {
+            name: ':group_id'
+          }
+        ]
+      },
+      {
+        name: '/agents/groups/:group_id/files/:file_name',
+        args: [
+          {
+            name: ':group_id'
+          },
+          {
+            name: ':file_name'
+          }
+        ]
+      },
+      {
         name: '/agents/insert',
         args: []
       },
       {
         name: '/agents/restart',
+        args: []
+      },
+      {
+        name: '/cluster/:node_id/files',
+        args: [
+          {
+            name: ':node_id'
+          }
+        ]
+      },
+      {
+        name: '/manager/files',
         args: []
       }
     ]
