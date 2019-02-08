@@ -32,8 +32,8 @@
         <div flex layout="column" ng-if="currentConfig && currentConfig.commands && !isString(currentConfig['wmodules-wmodules']) && currentConfig.commands.length">
 
             <!-- The main card will all the settings -->
-            <md-card flex="auto" class="wz-md-card" ng-if="!JSONContent && !XMLContent">
-                <md-card-content flex layout="column">
+            <md-card flex="auto" class="wz-md-card height-full" ng-if="!JSONContent && !XMLContent">
+                <md-card-content flex layout="column" class="height-full">
                     <div layout="row" layout-align="start center">
                         <div>
                             <span class="font-size-16">Command definitions</span>
@@ -49,7 +49,7 @@
                     <md-divider class="wz-margin-top-10"></md-divider>
 
                     <!-- The container for both list and detail -->
-                    <div flex="auto" layout="row" class="wz-margin-top-10">
+                    <div flex="auto" layout="row" class="wz-margin-top-10 min-height-300 height-full">
 
                         <!-- List container -->
                         <div flex="30" layout="column">
