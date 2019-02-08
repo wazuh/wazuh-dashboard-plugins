@@ -77,8 +77,12 @@
             <md-card-content>
                 <span class="wz-headline-title"><i class="fa fa-fw fa-shield"></i> Configuration assessment</span>
                 <md-divider class="wz-margin-top-10"></md-divider>
-                <div layout="row" class="wz-margin-top-10">
-
+                <div layout="row" class="wz-margin-top-10" ng-repeat="policy in policies">
+                    <span flex class="wz-text-link"><i class="fa fa-fw fa-eye"></i> {{policy.name}}</span>
+                    <span flex><strong>{{policy.fail}}</strong> checks <strong>failed</strong></span>
+                    <span flex><strong>{{policy.pass}}</strong> checks <strong>passed</strong></span>
+                    <span flex>Score: <strong>{{policy.score}}</strong></span>
+                    <span flex><a href="{{policy.references}}">{{policy.references}}</a></span>
                 </div>
             </md-card-content>
         </md-card>
