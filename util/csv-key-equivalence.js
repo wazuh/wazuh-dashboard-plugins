@@ -84,5 +84,9 @@ export const KeyEquivalenece = {
   process: 'Process',
   md5: 'MD5',
   sha1: 'SHA1',
-  sha256: 'SHA256'
+  sha256: 'SHA256',
+  title: 'Title',
+  remediation: 'Remediation',
+  references: 'References',
+  result: 'Result'
 };
