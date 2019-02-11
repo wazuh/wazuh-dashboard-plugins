@@ -153,7 +153,7 @@ export const apiRequestList = [
         ]
       },
       {
-        name: '/agents/group/:group_id',
+        name: '/agents/groups/:group_id',
         args: [
           {
             name: ':group_id'
@@ -479,13 +479,13 @@ export const apiRequestList = [
         ]
       },
       {
-        name: '/configuration_assessment/:agent_id/checks/:id',
+        name: '/configuration_assessment/:agent_id/checks/:policy_id',
         args: [
           {
             name: ':agent_id'
           },
           {
-            name: ':id'
+            name: ':policy_id'
           }
         ]
       },
@@ -715,7 +715,7 @@ export const apiRequestList = [
         args: []
       },
       {
-        name: '/agents/group/:group_id',
+        name: '/agents/groups/:group_id',
         args: [
           {
             name: ':group_id'
