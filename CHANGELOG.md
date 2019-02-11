@@ -9,9 +9,11 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Support for Wazuh v3.9.0
 - Edit master and worker configuration ([#1215](https://github.com/wazuh/wazuh-kibana-app/pull/1215)).
 - Edit local rules, local decoders and CDB lists ([#1212](https://github.com/wazuh/wazuh-kibana-app/pull/1212), [#1204](https://github.com/wazuh/wazuh-kibana-app/pull/1204), [#1196](https://github.com/wazuh/wazuh-kibana-app/pull/1196)).
-- Added hotkey `[shift] + [enter]` for sending query ([#1170](https://github.com/wazuh/wazuh-kibana-app/pull/1170)).
-- Added `Export JSON` button for the Dev Tools ([#1170](https://github.com/wazuh/wazuh-kibana-app/pull/1170)).
+- Dev Tools additions
+  - Added hotkey `[shift] + [enter]` for sending query ([#1170](https://github.com/wazuh/wazuh-kibana-app/pull/1170)).
+  - Added `Export JSON` button for the Dev Tools ([#1170](https://github.com/wazuh/wazuh-kibana-app/pull/1170)).
 - Added refresh button for agents preview table ([#1169](https://github.com/wazuh/wazuh-kibana-app/pull/1169)).
+- Added configuration assessment information in "Agent > Policy monitoring" ([#1227](https://github.com/wazuh/wazuh-kibana-app/pull/1227)).
 - Restart master and worker nodes ([#1222](https://github.com/wazuh/wazuh-kibana-app/pull/1222)).
 
 ### Changed
