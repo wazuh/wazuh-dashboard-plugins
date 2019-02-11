@@ -24,15 +24,15 @@ export class CdbListsController {
     wazuhConfig,
     rulesetHandler
   ) {
-    this.$scope = $scope
-    this.errorHandler = errorHandler
-    this.appState = appState
-    this.csvReq = csvReq
-    this.wzTableFilter = wzTableFilter
-    this.$location = $location
-    this.apiReq = apiReq
-    this.wazuhConfig = wazuhConfig
-    this.rulesetHandler = rulesetHandler
+    this.$scope = $scope;
+    this.errorHandler = errorHandler;
+    this.appState = appState;
+    this.csvReq = csvReq;
+    this.wzTableFilter = wzTableFilter;
+    this.$location = $location;
+    this.apiReq = apiReq;
+    this.wazuhConfig = wazuhConfig;
+    this.rulesetHandler = rulesetHandler;
 
     this.appliedFilters = [];
     this.searchTerm = '';
@@ -69,7 +69,9 @@ export class CdbListsController {
         this.currentList.list = [];
         this.errorHandler.handle(error, '');
       }
-      this.$scope.$broadcast('changeCdbList', { currentList: this.currentList });
+      this.$scope.$broadcast('changeCdbList', {
+        currentList: this.currentList
+      });
       if (!this.$scope.$$phase) this.$scope.$digest();
     });
 
@@ -81,7 +83,9 @@ export class CdbListsController {
         .request('get', `/cdblists/${incomingList}`, {})
         .then(data => {
           this.currentList = data.data.data.items[0];
-          this.$scope.$emit('setCurrentList', { currentList: this.currentList });
+          this.$scope.$emit('setCurrentList', {
+            currentList: this.currentList
+          });
           if (
             !(Object.keys((this.currentList || {}).details || {}) || []).length
           ) {
@@ -191,12 +195,15 @@ export class CdbListsController {
     return this.$scope.$broadcast('wazuhRemoveFilter', { filterName });
   }
 
-    /**
+  /**
    * Get full data on CSV format
    */
   async downloadCsv() {
     try {
-      this.errorHandler.info('Your download should begin automatically...', 'CSV');
+      this.errorHandler.info(
+        'Your download should begin automatically...',
+        'CSV'
+      );
       const currentApi = JSON.parse(this.appState.getCurrentAPI()).id;
       const output = await this.csvReq.fetch(
         '/cdblists',
@@ -206,7 +213,6 @@ export class CdbListsController {
       const blob = new Blob([output], { type: 'text/csv' }); // eslint-disable-line
 
       FileSaver.saveAs(blob, 'cdblists.csv');
-
     } catch (error) {
       this.errorHandler.handle(error, 'Download CSV');
     }
