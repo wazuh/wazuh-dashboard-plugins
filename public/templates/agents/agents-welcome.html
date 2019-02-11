@@ -17,18 +17,17 @@
 <div layout="column" class="" layout-align="start stretch" ng-if="tab === 'welcome'" ng-show="!load && agent">
 
     <!-- Headline -->
-    <div layout="column" layout-padding>
-            <span class="font-size-18"><i class="fa fa-fw fa-tv" aria-hidden="true"></i> {{ agent.name || '-' }} <span
-                    class="wz-text-bold wz-text-link" ng-click="goDiscover()" tooltip="Discover"><i class="fa fa-fw fa-compass"
-                        aria-hidden="true"></i></span></span>
-
-            <div  ng-show="agent.outdated && !agent.upgrading" class="wz-padding-left-16" style="position: absolute; right: calc(0% + 8px);">
-                <button class="updateBtn height-40" ng-click="updateAgent(agent); $event.stopPropagation()"><i
-                        class="fa fa-upload" aria-hidden="true"></i> Upgrade agent version</button>
-            </div>
-            <div ng-show="agent.outdated && agent.upgrading" class="wz-padding-left-16">
-                <span class="upgradingLabel height-40"><i class="fa fa-fw fa-spin fa-spinner"></i> Upgrading agent...</span>
-            </div>
+    <div layout="row" layout-padding>
+        <span class="font-size-18"><i class="fa fa-fw fa-tv" aria-hidden="true"></i> {{ agent.name || '-' }} <span
+                class="wz-text-bold wz-text-link" ng-click="goDiscover()" tooltip="Discover"><i class="fa fa-fw fa-compass"
+                    aria-hidden="true"></i></span></span>
+        <div ng-show="agent.outdated && !agent.upgrading" class="wz-padding-left-16">
+            <button class="updateBtn" ng-click="updateAgent(agent); $event.stopPropagation()"><i class="fa fa-upload"
+                    aria-hidden="true"></i> Upgrade agent version</button>
+        </div>
+        <div ng-show="agent.outdated && agent.upgrading" class="wz-padding-left-16">
+            <span class="upgradingLabel"><i class="fa fa-fw fa-spin fa-spinner"></i> Upgrading agent...</span>
+        </div>
     </div>
     <!-- End headline -->
 
@@ -96,8 +95,9 @@
                     </div>
                 </div>
                 <div layout="row" ng-if="agent.group">
-                    <span class="font-size-16">Groups <i ng-if='adminMode' tooltip="Add group" ng-click="switchGroupEdit()" class="wz-text-bold wz-text-link fa fa-fw" ng-class="!addingGroupToAgent ? 'fa-plus-circle' : 'fa-minus-circle'"></i></span>
-                </div>        
+                    <span class="font-size-16">Groups <i ng-if='adminMode' tooltip="Add group" ng-click="switchGroupEdit()"
+                            class="wz-text-bold wz-text-link fa fa-fw" ng-class="!addingGroupToAgent ? 'fa-plus-circle' : 'fa-minus-circle'"></i></span>
+                </div>
                 <md-divider ng-if="agent.group" class="wz-margin-top-10"></md-divider>
                 <div layout="row" class="wz-margin-top-10" ng-if="agent.group && editGroup && !addingGroupToAgent">
                     <div class="wz-word-break" flex ng-if="groups && groups.length">
