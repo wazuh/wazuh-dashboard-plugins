@@ -23,11 +23,12 @@ class WzXmlFileEditor {
       fileName: '@fileName',
       validFn: '&',
       data: '=data',
-      targetName: '=targetName'
+      targetName: '=targetName',
+      closeFn: '&'
     };
     this.template = template;
   }
-  controller($scope, $document, errorHandler, groupHandler, rulesetHandler, configHandler) {
+  controller($scope, $document, $location, errorHandler, $mdDialog, groupHandler, rulesetHandler, configHandler) {
 
     /**
      * Custom .replace method. Instead of using .replace which
@@ -167,21 +168,39 @@ class WzXmlFileEditor {
         const xml = replaceIllegalXML(text);
         if (params.group) {
           await groupHandler.sendConfiguration(params.group, xml);
-          errorHandler.info('Success. Group has been updated', '');
+          const msg = 'Success. Group has been updated';
+          params.showRestartManager
+            ? showRestartDialog(msg, params.showRestartManager)
+            : errorHandler.info(msg, '');
           $scope.$emit('configurationSuccess');
         } else if (params.rule) {
           await rulesetHandler.sendRuleConfiguration(params.rule, xml);
-          errorHandler.info('Success. Rules has been updated', '');
+          const msg = 'Success. Rules has been updated';
+          params.showRestartManager
+            ? showRestartDialog(msg, params.showRestartManager)
+            : errorHandler.info(msg, '');
         } else if (params.decoder) {
           await rulesetHandler.sendDecoderConfiguration(params.decoder, xml);
-          errorHandler.info('Success. Decoders has been updated', '');
+          const msg = 'Success. Decoders has been updated';
+          params.showRestartManager
+            ? showRestartDialog(msg, params.showRestartManager)
+            : errorHandler.info(msg, '');
         } else if (params.node) {
           await configHandler.saveNodeConfiguration(params.node, xml);
-          errorHandler.info('Success. Node configuration has been updated', '');
+          const msg = `Success. Node (${
+            params.node
+            }) configuration has been updated`;
+          params.showRestartManager
+            ? showRestartDialog(msg, params.node)
+            : errorHandler.info(msg, '');
         } else if (params.manager) {
           await configHandler.saveManagerConfiguration(xml);
-          errorHandler.info('Success. Manager configuration has been updated', '');
+          const msg = 'Success. Manager configuration has been updated';
+          params.showRestartManager
+            ? showRestartDialog(msg, params.showRestartManager)
+            : errorHandler.info(msg, '');
         }
+        $scope.closeFn({ reload: true });
       } catch (error) {
         errorHandler.handle(error, 'Send file error');
       }
@@ -226,7 +245,114 @@ class WzXmlFileEditor {
       checkXmlParseError();
     });
 
+
+    const showRestartDialog = async (msg, target) => {
+      const confirm = $mdDialog.confirm({
+        controller: function(
+          $scope,
+          myScope,
+          myError,
+          $mdDialog,
+          configHandler,
+          apiReq
+        ) {
+          $scope.myScope = myScope;
+          $scope.closeDialog = () => {
+            $mdDialog.hide();
+            $('body').removeClass('md-dialog-body');
+          };
+          $scope.confirmDialog = async () => {
+            $scope.myScope.$emit('setRestarting', {});
+            $mdDialog.hide();
+            const clusterStatus = await apiReq.request(
+              'GET',
+              '/cluster/status',
+              {}
+            );
+            if (
+              target !== 'cluster' &&
+              target !== 'manager' &&
+              (clusterStatus.data.data.enabled === 'no' ||
+                clusterStatus.data.data.running === 'no')
+            ) {
+              target = 'manager';
+            }
+            if (target === 'manager') {
+              try {
+                const data = await configHandler.restartManager();
+                $('body').removeClass('md-dialog-body');
+                myError.info('It may take a few seconds...', data.data.data);
+                $scope.myScope.$applyAsync();
+              } catch (error) {
+                myError.handle(
+                  error.message || error,
+                  'Error restarting manager'
+                );
+                $scope.myScope.$emit('removeRestarting', {});
+              }
+            } else if (target === 'cluster') {
+              try {
+                const data = await configHandler.restartCluster();
+                $('body').removeClass('md-dialog-body');
+                myError.info('It may take a few seconds...', data.data.data);
+                $scope.myScope.$applyAsync();
+              } catch (error) {
+                myError.handle(
+                  error.message || error,
+                  'Error restarting cluster'
+                );
+                $scope.myScope.$emit('removeRestarting', {});
+              }
+            } else {
+              try {
+                const data = await configHandler.restartNode(target);
+                $('body').removeClass('md-dialog-body');
+                myError.info('It may take a few seconds...', data.data.data);
+                $scope.myScope.$applyAsync();
+              } catch (error) {
+                myError.handle(
+                  error.message || error,
+                  'Error restarting node'
+                );
+                $scope.myScope.$emit('removeRestarting', {});
+              }
+            }
+            $scope.myScope.$emit('removeRestarting', {});
+          };
+        },
+        template:
+          '<md-dialog class="modalTheme euiToast euiToast--success euiGlobalToastListItem">' +
+          '<md-dialog-content>' +
+          '<div class="euiToastHeader">' +
+          '<i class="fa fa-check"></i>' +
+          '<span class="euiToastHeader__title">' +
+          `${msg}` +
+          `. Do you want to restart the ${target} now?` +
+          '</span>' +
+          '</div>' +
+          '</md-dialog-content>' +
+          '<md-dialog-actions>' +
+          '<button class="md-primary md-cancel-button md-button ng-scope md-default-theme md-ink-ripple" type="button" ng-click="closeDialog()">I will do it later</button>' +
+          `<button class="md-primary md-confirm-button md-button md-ink-ripple md-default-theme" type="button" ng-click="confirmDialog()">Restart ${target}</button>` +
+          '</md-dialog-actions>' +
+          '</md-dialog>',
+        hasBackdrop: false,
+        clickOutsideToClose: true,
+        disableParentScroll: true,
+        locals: {
+          myScope: $scope,
+          myError: errorHandler
+        }
+      });
+      $('body').addClass('md-dialog-body');
+      $mdDialog.show(confirm);
+    };
+
     $scope.$on('saveXmlFile', (ev, params) => saveFile(params));
+
+    $scope.$on('$destroy', function() {
+      $location.search('editingFile', null);
+    });
   }
 }
 app.directive('wzXmlFileEditor', () => new WzXmlFileEditor());

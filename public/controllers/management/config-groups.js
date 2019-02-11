@@ -79,7 +79,7 @@ export class ConfigurationGroupsController {
       this.$scope.fetchedXML = null;
       this.appState.setNavigation({ status: true });
       this.$scope.$broadcast('closeEditXmlFile', {});
-      if (!this.$scope.$$phase) this.$scope.$digest();
+      this.$applyAsync();
     };
     this.$scope.xmlIsValid = valid => {
       this.$scope.xmlHasErrors = valid;

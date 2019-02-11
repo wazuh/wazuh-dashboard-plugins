@@ -49,7 +49,7 @@ export class CdbListsController {
     // Reloading event listener
     this.$scope.$on('rulesetIsReloaded', () => {
       this.viewingDetail = false;
-      if (!this.$scope.$$phase) this.$scope.$digest();
+      this.$applyAsync();
     });
 
     this.$scope.$on('closeListView', () => {
@@ -72,7 +72,7 @@ export class CdbListsController {
       this.$scope.$broadcast('changeCdbList', {
         currentList: this.currentList
       });
-      if (!this.$scope.$$phase) this.$scope.$digest();
+      this.$applyAsync();
     });
 
     const currentLocation = this.$location.search();

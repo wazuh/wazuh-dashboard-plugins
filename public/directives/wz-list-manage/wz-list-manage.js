@@ -17,7 +17,7 @@ import { checkGap } from '../wz-table/lib/check-gap';
 
 const app = uiModules.get('app/wazuh', []);
 
-app.directive('wzListManage', function() {
+app.directive('wzListManage', function () {
   return {
     restrict: 'E',
     scope: {
@@ -49,7 +49,7 @@ app.directive('wzListManage', function() {
       $scope.prevPage = () => pagination.prevPage($scope);
       $scope.nextPage = async currentPage =>
         pagination.nextPage(currentPage, $scope, errorHandler, null);
-      $scope.setPage = function() {
+      $scope.setPage = function () {
         $scope.currentPage = this.n;
         $scope.nextPage(this.n);
       };
@@ -59,7 +59,7 @@ app.directive('wzListManage', function() {
        */
       $scope.filterTable = data => {
         const result = Object.keys(data || $scope.currentList.list).map(
-          function(key) {
+          function (key) {
             return [key, $scope.currentList.list[key]];
           }
         );
@@ -181,59 +181,55 @@ app.directive('wzListManage', function() {
 
       const showRestartDialog = async (msg, target) => {
         const confirm = $mdDialog.confirm({
-          controller: function(
+          controller: function (
             $scope,
-            myScope,
-            myError,
+            scope,
+            errorHandler,
             $mdDialog,
             configHandler
           ) {
-            $scope.myScope = myScope;
+            $scope.scope = scope;
             $scope.closeDialog = () => {
               $mdDialog.hide();
               $('body').removeClass('md-dialog-body');
             };
-            $scope.confirmDialog = () => {
+            $scope.confirmDialog = async () => {
               $mdDialog.hide();
-              $scope.myScope.$emit('setRestarting', {});
+              $scope.scope.$emit('setRestarting', {});
               if (target === 'manager') {
-                configHandler
-                  .restartManager()
-                  .then(data => {
-                    $('body').removeClass('md-dialog-body');
-                    myError.info(
-                      'It may take a few seconds...',
-                      data.data.data
-                    );
-                    $scope.myScope.$applyAsync();
-                  })
-                  .catch(error => {
-                    $scope.myScope.$emit('setRestarting', {});
-                    myError.handle(
-                      error.message || error,
-                      'Error restarting manager'
-                    );
-                  });
+                try {
+                  const data = await configHandler.restartManager();
+                  $('body').removeClass('md-dialog-body');
+                  errorHandler.info(
+                    'It may take a few seconds...',
+                    data.data.data);
+                } catch (error) {
+                  $scope.scope.$emit('setRestarting', {});
+                  errorHandler.handle(
+                    error.message || error,
+                    'Error restarting manager'
+                  );
+                }
+                $scope.scope.$applyAsync();
               } else if (target === 'cluster') {
-                configHandler
-                  .restartCluster()
-                  .then(data => {
-                    $('body').removeClass('md-dialog-body');
-                    myError.info(
-                      'It may take a few seconds...',
-                      data.data.data
-                    );
-                    $scope.myScope.$applyAsync();
-                  })
-                  .catch(error => {
-                    $scope.myScope.$emit('setRestarting', {});
-                    myError.handle(
-                      error.message || error,
-                      'Error restarting cluster'
-                    );
-                  });
+                try {
+                  const data = await configHandler.restartCluster();
+                  $('body').removeClass('md-dialog-body');
+                  errorHandler.info(
+                    'It may take a few seconds...',
+                    data.data.data
+                  );
+                  $scope.scope.$applyAsync();
+                } catch (error) {
+                  $scope.scope.$emit('setRestarting', {});
+                  errorHandler.handle(
+                    error.message || error,
+                    'Error restarting cluster'
+                  );
+
+                }
               }
-              $scope.myScope.$emit('removeRestarting', {});
+              $scope.scope.$emit('removeRestarting', {});
             };
           },
           template:
@@ -256,8 +252,8 @@ app.directive('wzListManage', function() {
           clickOutsideToClose: true,
           disableParentScroll: true,
           locals: {
-            myScope: $scope,
-            myError: errorHandler
+            scope: $scope,
+            errorHandler: errorHandler
           }
         });
         $('body').addClass('md-dialog-body');
