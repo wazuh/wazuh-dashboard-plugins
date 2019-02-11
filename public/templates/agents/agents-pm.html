@@ -84,6 +84,9 @@
                     <span flex>Score: <strong>{{policy.score}}</strong></span>
                     <span flex><a href="{{policy.references}}">{{policy.references}}</a></span>
                 </div>
+                <div layout="row" class="wz-margin-top-10" ng-if="!load && (!policies || !policies.length)">
+                    <span flex><i class="fa fa-fw fa-warning"></i> No scans available.</span>
+                </div>
             </md-card-content>
         </md-card>
     </div>

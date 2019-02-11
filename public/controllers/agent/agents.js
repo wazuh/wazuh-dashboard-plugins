@@ -503,9 +503,11 @@ export class AgentsController {
 
       if (tab === 'pm') {
         try {
+          this.$scope.load = true;
           const policies = await this.apiReq.request('GET', `/configuration_assessment/${this.$scope.agent.id}`, {});
           this.$scope.policies = policies.data.data.items;
         } catch (error) { this.$scope.policies = []; }
+        this.$scope.load = false;
       }
 
       if (tab === 'syscollector')
