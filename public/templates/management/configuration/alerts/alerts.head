@@ -1,4 +1,4 @@
-<div flex="auto" layout="column" ng-if="configurationTab === 'alerts'" ng-init="(!agent || agent.id === '000') ? switchConfigurationSubTab('general-alerts') : switchConfigurationSubTab('labels')">
+<div flex="auto" layout="column" ng-if="configurationTab === 'alerts'">
 
     <!-- Headline -->
     <div layout="column" layout-padding>

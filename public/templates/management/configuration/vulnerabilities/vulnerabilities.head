@@ -1,4 +1,4 @@
-<div flex="auto" layout="column" ng-if="configurationTab === 'vulnerability-detector'" ng-init="switchConfigurationSubTab('vulnerabilities-general')">
+<div flex="auto" layout="column" ng-if="configurationTab === 'vulnerability-detector'">
 
     <!-- Headline -->
     <div layout="column" layout-padding>

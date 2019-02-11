@@ -49,7 +49,7 @@ export class Vis2PNG {
           this.$rootScope.reportStatus = `Generating report...${Math.round(
             (currentCompleted / len) * 100
           )}%`;
-          if (!this.$rootScope.$$phase) this.$rootScope.$digest();
+          this.$rootScope.$applyAsync();
         })
       );
 

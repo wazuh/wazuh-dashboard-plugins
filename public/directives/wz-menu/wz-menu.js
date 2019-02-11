@@ -21,21 +21,23 @@ class WzMenu {
    */
   constructor() {
     this.template = menuTemplate;
+    this.scope = {
+      menuNavItem: '=menuNavItem'
+    };
   }
 
   controller(
     $scope,
     $window,
-    $rootScope,
     appState,
     patternHandler,
     indexPatterns,
     errorHandler,
     wazuhConfig
   ) {
-    $rootScope.showSelector = appState.getPatternSelector();
-
-    if (!$rootScope.$$phase) $rootScope.$digest();
+    
+    $scope.showSelector = appState.getPatternSelector();
+    $scope.$applyAsync();
 
     if (appState.getCurrentAPI()) {
       $scope.theresAPI = true;
@@ -64,7 +66,7 @@ class WzMenu {
         if (!appState.getPatternSelector()) return;
 
         // Show the pattern selector
-        $rootScope.showSelector = true;
+        $scope.showSelector = true;
         let filtered = false;
         // If there is no current pattern, fetch it
         if (!appState.getCurrentPattern()) {
@@ -89,7 +91,7 @@ class WzMenu {
           $scope.currentSelectedPattern = appState.getCurrentPattern();
         }
         $scope.$applyAsync();
-        if (!$rootScope.$$phase) $rootScope.$digest();
+
         return;
       } catch (error) {
         errorHandler.handle(error, 'Directives - Menu');

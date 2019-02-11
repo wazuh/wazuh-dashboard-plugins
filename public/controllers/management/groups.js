@@ -25,6 +25,7 @@ export function GroupsController(
   wazuhConfig
 ) {
   $scope.addingGroup = false;
+  $scope.groupsSelectedTab = 'agents';
   $scope.$on('groupsIsReloaded', () => {
     $scope.groupsSelectedTab = false;
     $scope.editingFile = false;

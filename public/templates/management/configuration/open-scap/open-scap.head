@@ -1,4 +1,4 @@
-<div flex="auto" layout="column" ng-if="configurationTab === 'open-scap'" ng-init="switchConfigurationSubTab('openscap-general')">
+<div flex="auto" layout="column" ng-if="configurationTab === 'open-scap'">
 
     <!-- Headline -->
     <div layout="column" layout-padding>

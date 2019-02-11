@@ -1,4 +1,4 @@
-<div flex="auto" layout="column" ng-if="configurationTab === 'log-collection'" ng-init="switchConfigurationSubTab('localfile')">
+<div flex="auto" layout="column" ng-if="configurationTab === 'log-collection'">
 
     <!-- Headline -->
     <div layout="column" layout-padding>

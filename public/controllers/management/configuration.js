@@ -174,5 +174,6 @@ export class ConfigurationController {
     this.$scope.$on('configurationIsReloaded', (ev, params) => {
       reloadConfig(params);
     });
+    this.$scope.switchConfigurationTab('welcome', false);
   }
 }

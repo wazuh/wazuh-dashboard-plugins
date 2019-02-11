@@ -1,7 +1,7 @@
 <div flex="auto" layout="column" ng-cloak ng-controller="managementController as mctrl">
 
     <!-- Top navbar section -->
-    <wz-menu ng-init="menuNavItem = 'manager'"></wz-menu>
+    <wz-menu menu-nav-item = "'manager'"></wz-menu>
     <!-- End top navbar section -->
 
     <!-- Navigation section -->

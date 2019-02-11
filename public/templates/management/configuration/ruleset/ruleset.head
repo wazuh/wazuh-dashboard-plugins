@@ -1,4 +1,4 @@
-<div flex="auto" layout="column" ng-if="configurationTab === 'ruleset'" ng-init="switchConfigurationSubTab('rules')">
+<div flex="auto" layout="column" ng-if="configurationTab === 'ruleset'">
 
     <!-- Headline -->
     <!--<div layout="column" layout-padding>
