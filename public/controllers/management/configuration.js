@@ -63,7 +63,9 @@ export class ConfigurationController {
             'configSubTab',
             this.$scope.configSubTab
           );
-          this.$scope.$emit('setCurrentConfiguration', { currentConfiguration: configurationTab });
+          this.$scope.$emit('setCurrentConfiguration', {
+            currentConfiguration: configurationTab
+          });
           this.$location.search('configSubTab', true);
         }
       } catch (error) {
@@ -84,7 +86,9 @@ export class ConfigurationController {
       this.$scope.navigate = navigate;
       this.$scope.configWodle = wodleName;
       if (!this.$location.search().configWodle) {
-        this.$scope.$emit('setCurrentConfiguration', { currentConfiguration: wodleName });
+        this.$scope.$emit('setCurrentConfiguration', {
+          currentConfiguration: wodleName
+        });
         this.$location.search('configWodle', this.$scope.configWodle);
       }
       this.configurationHandler.switchWodle(wodleName, this.$scope);
@@ -105,9 +109,10 @@ export class ConfigurationController {
           try {
             const config = this.appState.getSessionStorageItem('configSubTab');
             const configSubTabObj = JSON.parse(config);
-            if (!configSubTabObj)
-              return;
-            this.$scope.$emit('setCurrentConfiguration', { currentConfiguration: configSubTabObj.configurationTab });
+            if (!configSubTabObj) return;
+            this.$scope.$emit('setCurrentConfiguration', {
+              currentConfiguration: configSubTabObj.configurationTab
+            });
             this.$scope.switchConfigTab(
               configSubTabObj.configurationTab,
               configSubTabObj.sections,
@@ -119,7 +124,9 @@ export class ConfigurationController {
         } else {
           let configWodle = this.$location.search().configWodle;
           if (configWodle) {
-            this.$scope.$emit('setCurrentConfiguration', { currentConfiguration: configWodle });
+            this.$scope.$emit('setCurrentConfiguration', {
+              currentConfiguration: configWodle
+            });
             this.$scope.switchWodle(configWodle, false);
           }
         }
@@ -146,13 +153,13 @@ export class ConfigurationController {
       this.appState.removeSessionStorageItem('configSubTab')
     );
 
-    const reloadConfig = (params) => {
+    const reloadConfig = params => {
       if ((params || {}).globalConfigTab) {
         this.$scope.configurationTab = '';
         this.$scope.editionTab = params.globalConfigTab;
         if ((params || {}).reloadConfigSubTab) {
           this.$location.search('configSubTab', null);
-          this.appState.removeSessionStorageItem('configSubTab')
+          this.appState.removeSessionStorageItem('configSubTab');
         }
         this.$scope.$emit('removeCurrentConfiguration', {});
       } else {
@@ -160,7 +167,7 @@ export class ConfigurationController {
         this.$scope.switchConfigurationTab('welcome', true);
       }
       this.$scope.$applyAsync();
-    }
+    };
     this.$rootScope.$on('configurationIsReloaded', (ev, params) => {
       reloadConfig(params);
     });

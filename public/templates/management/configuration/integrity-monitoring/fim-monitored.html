@@ -6,8 +6,8 @@
 <!-- End no configuration section -->
 
 <!-- Monitored card -->
-<md-card class="wz-md-card" ng-if="!JSONContent && !XMLContent && configurationSubTab === 'fim-monitored' && currentConfig && currentConfig['syscheck-syscheck'] && currentConfig['syscheck-syscheck'].syscheck && currentConfig['syscheck-syscheck'].syscheck.directories && currentConfig['syscheck-syscheck'].syscheck.directories.length">
-    <md-card-content>
+<md-card class="wz-md-card height-full" ng-if="!JSONContent && !XMLContent && configurationSubTab === 'fim-monitored' && currentConfig && currentConfig['syscheck-syscheck'] && currentConfig['syscheck-syscheck'].syscheck && currentConfig['syscheck-syscheck'].syscheck.directories && currentConfig['syscheck-syscheck'].syscheck.directories.length">
+    <md-card-content class="height-full">
         <div layout="row" layout-align="start center">
             <div>
                 <span class="font-size-16">Monitored directories</span>
@@ -23,7 +23,7 @@
         <md-divider class="wz-margin-top-10"></md-divider>
 
         <!-- The container for both list and detail -->
-        <div layout="row" class="wz-margin-top-10 min-height-300">
+        <div layout="row" class="wz-margin-top-10 min-height-300 height-full">
 
             <!-- List container -->
             <div flex="30" layout="column">

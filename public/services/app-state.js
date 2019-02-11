@@ -137,7 +137,7 @@ export class AppState {
   }
 
   setNavigation(params) {
-    for(var key in params){
+    for (var key in params) {
       this.navigate[key] = params[key];
     }
   }

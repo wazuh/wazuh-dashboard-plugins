@@ -2,9 +2,8 @@
     <!-- Back button and title -->
     <div layout="row" layout-align="start center">
         <!-- Back button -->
-        <md-button class="md-icon-button" style="margin: 5px!important;" aria-label="Back to rules list"
-            tooltip="Back" tooltip-placement="bottom" ng-click="closeDetailView(true)"><i class="fa fa-fw fa-arrow-left"
-                aria-hidden="true"></i></md-button>
+        <md-button class="md-icon-button" style="margin: 5px!important;" aria-label="Back to rules list" tooltip="Back"
+            tooltip-placement="bottom" ng-click="closeDetailView(true)"><i class="fa fa-fw fa-arrow-left" aria-hidden="true"></i></md-button>
         <!-- Rule title -->
         <div>
             <h1 class="font-size-18" ng-bind-html="colorRuleArg(currentRule.description)"></h1>
@@ -58,8 +57,7 @@
                 <md-card-content>
                     <span class="wz-headline-title"><i class="fa fa-fw fa-info" aria-hidden="true"></i> Details</span>
                     <md-divider class="wz-margin-top-10"></md-divider>
-                    <div layout="row" class="wz-padding-top-10" ng-repeat="(key, value) in currentRule.details"
-                        ng-if='!isArray(value)'>
+                    <div layout="row" class="wz-padding-top-10" ng-repeat="(key, value) in currentRule.details" ng-if='!isArray(value)'>
                         <span class="wz-word-break-rule">{{key}}</span>
                         <span ng-if="!isObject(value)" class="wz-text-right color-grey">{{value}}</span>
                         <span ng-if="isObject(value)" class="color-grey">
@@ -190,7 +188,8 @@
             </button>
         </div>
         <div class="md-padding md-padding-top-10" ng-if="fetchedXML" style="height: calc(100vh - 539px);">
-            <wz-xml-file-editor file-name='rules' data="fetchedXML" target-name="currentRule.file" valid-fn='xmlIsValid(valid)'>
+            <wz-xml-file-editor file-name='rules' data="fetchedXML" target-name="currentRule.file" valid-fn='xmlIsValid(valid)'
+                close-fn='closeEditingFile(reload)'>
             </wz-xml-file-editor>
         </div>
     </div>

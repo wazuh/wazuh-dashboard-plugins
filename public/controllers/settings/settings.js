@@ -204,7 +204,7 @@ export class SettingsController {
 
     this.errorHandler.info(
       `API ${
-      this.apiEntries[index]._source.cluster_info.manager
+        this.apiEntries[index]._source.cluster_info.manager
       } set as default`,
       'Settings'
     );
@@ -567,6 +567,9 @@ export class SettingsController {
       return;
     } catch (error) {
       if (!this.wzMisc.getApiIsDown()) this.printError(error);
+      else {
+        this.errorHandler.handle(error);
+      }
     }
   }
 
