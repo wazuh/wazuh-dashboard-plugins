@@ -13,16 +13,22 @@ import { uiModules } from 'ui/modules';
 
 const app = uiModules.get('app/wazuh', []);
 
-app.directive('wzEnter', function() {
-  return function(scope, element, attrs) {
-    element.bind('keydown keypress', function(event) {
-      if (event.which === 13) {
-        scope.$apply(function() {
-          scope.$eval(attrs.wzEnter);
-        });
+class WzEnter {
+  constructor() {
+    return function(scope, element, attrs) {
+      element.bind('keydown keypress', function (event) {
+        if (event.which === 13) {
+          scope.$apply(function () {
+            scope.$eval(attrs.wzEnter);
+          });
 
-        event.preventDefault();
-      }
-    });
-  };
-});
+          event.preventDefault();
+        }
+      });
+    };
+  }
+}
+
+app.directive('wzEnter', () => new WzEnter());
+
+

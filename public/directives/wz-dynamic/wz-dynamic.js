@@ -13,15 +13,18 @@ import { uiModules } from 'ui/modules';
 
 const app = uiModules.get('app/wazuh', []);
 
-app.directive('wzDynamic', function($compile) {
-  return {
-    restrict: 'A',
-    replace: true,
-    link(scope, ele, attrs) {
-      scope.$watch(attrs.wzDynamic, function(html) {
-        ele.html(html);
-        $compile(ele.contents())(scope);
-      });
+  class WzDynamic {
+    constructor($compile) {
+      this.restrict = 'A';
+      this.replace = true;
+      this.link = (scope, ele, attrs) => {
+        scope.$watch(attrs.wzDynamic, function (html) {
+          ele.html(html);
+          $compile(ele.contents())(scope);
+        });
+      }
     }
-  };
-});
+  }
+
+  app.directive('wzDynamic', () => new WzDynamic());
+
