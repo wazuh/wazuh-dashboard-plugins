@@ -96,10 +96,9 @@
                     </div>
                 </div>
                 <div layout="row" ng-if="agent.group">
-                    <span class="font-size-16">Groups <i ng-if='adminMode' tooltip="Add group" ng-click="switchGroupEdit()"
-                            class="wz-text-bold wz-text-link fa fa-fw fa-plus-circle"></i></span>
-                </div>
-                <md-divider class="wz-margin-top-10"></md-divider>
+                    <span class="font-size-16">Groups <i ng-if='adminMode' tooltip="Add group" ng-click="switchGroupEdit()" class="wz-text-bold wz-text-link fa fa-fw" ng-class="!addingGroupToAgent ? 'fa-plus-circle' : 'fa-minus-circle'"></i></span>
+                </div>        
+                <md-divider ng-if="agent.group" class="wz-margin-top-10"></md-divider>
                 <div layout="row" class="wz-margin-top-10" ng-if="agent.group && editGroup && !addingGroupToAgent">
                     <div class="wz-word-break" flex ng-if="groups && groups.length">
                         Available groups:
@@ -203,5 +202,4 @@
             </div>
         </div>
     </div>
-
 </div>

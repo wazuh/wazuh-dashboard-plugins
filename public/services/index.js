@@ -26,7 +26,7 @@ import './order-object-by';
 import { uiModules } from 'ui/modules';
 import { GroupHandler } from './group-handler';
 import { RulesetHandler } from './ruleset-handler';
-import { SaveConfig } from './save-config';
+import { ConfigHandler } from './config-handler';
 
 const app = uiModules.get('app/wazuh', []);
 
@@ -43,4 +43,4 @@ app
   .service('visFactoryService', VisFactoryService)
   .service('groupHandler', GroupHandler)
   .service('rulesetHandler', RulesetHandler)
-  .service('saveConfig', SaveConfig);
+  .service('configHandler', ConfigHandler);

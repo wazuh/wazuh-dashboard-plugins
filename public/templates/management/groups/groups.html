@@ -12,7 +12,8 @@
             <div layout="row">
                 <span class="font-size-18">
                     <i class="fa fa-fw fa-object-group" aria-hidden="true"></i> Groups </span>
-                <span ng-if='adminMode' class="font-size-18 wz-text-link" ng-click="switchAddingGroup()"> <i class="fa fa-fw fa-plus-circle"></i></span>
+                <span ng-if='adminMode' class="font-size-18 wz-text-link" ng-click="switchAddingGroup()"> <i class="fa fa-fw"
+                        ng-class="!addingGroup ? 'fa-plus-circle' : 'fa-minus-circle'"></i></span>
             </div>
             <div layout="row" ng-if="addingGroup" ng-if='adminMode' class="wz-padding-bottom-0">
                 <input placeholder="Group name..." ng-model="groupToBeAdded" type="text" class="kuiLocalSearchInput addGroupInput ng-empty ng-pristine ng-scope ng-touched ng-valid"
@@ -33,7 +34,8 @@
                 <!-- Group MD5 sums section -->
                 <md-card flex class="no-margin-left no-margin-right wz-margin-top-8 wz-md-card">
                     <md-card-content>
-                        <span class="wz-headline-title font-size-18"><i class="fa fa-fw fa-object-group" aria-hidden="true"></i> {{currentGroup.name}}</span>
+                        <span class="wz-headline-title font-size-18"><i class="fa fa-fw fa-object-group" aria-hidden="true"></i>
+                            {{currentGroup.name}}</span>
                         <md-divider class="wz-margin-top-10"></md-divider>
                         <div layout="row" class="wz-padding-top-10">
                             <span flex="15">Agents</span>
@@ -64,7 +66,7 @@
 
             <!-- XML editor for group agents -->
             <div ng-show="editingFile">
-                <div layout="row" class="md-padding">
+                <div layout="row" class="md-padding-h wz-margin-top-10">
                     <span ng-click='closeEditingFile()' class='btn btn-info'>Cancel</span>
                     <button ng-disabled='xmlHasErrors' ng-click='doSaveGroupAgentConfig()' class='btn btn-primary pull-right wz-margin-left-8'>
                         <span ng-show='!xmlHasErrors'><i aria-hidden='true' class='fa fa-fw fa-save'></i>Save file</span>
@@ -72,9 +74,9 @@
                             XML format error</span>
                     </button>
                 </div>
-                <div class="md-padding md-padding-top-10" style="height: calc(100vh - 358px);" ng-if="fetchedXML">
+                <div class="md-padding md-padding-top-10" style="height: calc(100vh - 350px);" ng-if="fetchedXML">
                     <wz-xml-file-editor file-name='agent.conf' data="fetchedXML" target-name="currentGroup.name + ' group'"
-                        valid-fn='xmlIsValid(valid)'>
+                        valid-fn='xmlIsValid(valid)' close-fn='closeEditingFile(reload)'>
                     </wz-xml-file-editor>
                 </div>
             </div>

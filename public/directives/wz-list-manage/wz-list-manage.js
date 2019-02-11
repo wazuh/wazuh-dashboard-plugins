@@ -17,17 +17,26 @@ import { checkGap } from '../wz-table/lib/check-gap';
 
 const app = uiModules.get('app/wazuh', []);
 
-app.directive('wzListManage', function () {
+app.directive('wzListManage', function() {
   return {
     restrict: 'E',
     scope: {
       list: '=list'
     },
-    controller($scope, errorHandler, $filter, rulesetHandler, wazuhConfig) {
+    controller(
+      $scope,
+      errorHandler,
+      $filter,
+      $mdDialog,
+      rulesetHandler,
+      wazuhConfig,
+      appState
+    ) {
+      const clusterInfo = appState.getClusterInfo();
 
       /**
- * Pagination variables and functions
- */
+       * Pagination variables and functions
+       */
       $scope.itemsPerPage = $scope.rowsPerPage || 10;
       $scope.pagedItems = [];
       $scope.currentPage = 0;
@@ -40,18 +49,20 @@ app.directive('wzListManage', function () {
       $scope.prevPage = () => pagination.prevPage($scope);
       $scope.nextPage = async currentPage =>
         pagination.nextPage(currentPage, $scope, errorHandler, null);
-      $scope.setPage = function () {
+      $scope.setPage = function() {
         $scope.currentPage = this.n;
         $scope.nextPage(this.n);
       };
 
       /**
-      * This apply filter and sorting to table data
-      */
-      $scope.filterTable = (data) => {
-        const result = Object.keys(data || $scope.currentList.list).map(function (key) {
-          return [key, $scope.currentList.list[key]];
-        });
+       * This apply filter and sorting to table data
+       */
+      $scope.filterTable = data => {
+        const result = Object.keys(data || $scope.currentList.list).map(
+          function(key) {
+            return [key, $scope.currentList.list[key]];
+          }
+        );
 
         items = $filter('filter')(result, $scope.searchTerm);
         $scope.totalItems = items.length;
@@ -71,41 +82,13 @@ app.directive('wzListManage', function () {
       };
 
       $scope.currentList = $scope.list;
-      if ($scope.currentList.list)
-        fetch();
+      if ($scope.currentList.list) fetch();
       const configuration = wazuhConfig.getConfig();
       $scope.adminMode = !!(configuration || {}).admin;
 
       $scope.sortValue = '';
       $scope.sortReverse = false;
       $scope.searchTerm = '';
-
-      const stringToObj = (string) => {
-        let result = {};
-        const splitted = string.split('\n');
-        splitted.forEach(function (element) {
-          const keyValue = element.split(':');
-          if (keyValue[0])
-            result[keyValue[0]] = keyValue[1];
-        });
-        return result;
-      }
-
-      $scope.$watch("currentList.list", () => {
-        if ($scope.currentList.list)
-          fetch();
-      });
-
-      const refresh = () => {
-        rulesetHandler.getCdbList(`etc/lists/${$scope.currentList.name}`)
-          .then(data => {
-            $scope.currentList.list = stringToObj(data.data.data);
-            fetch();
-            $scope.$emit('setCurrentList', { currentList: $scope.currentList });
-            $scope.viewingDetail = true;
-            if (!$scope.$$phase) $scope.$digest();
-          });
-      }
 
       $scope.$on('changeCdbList', (ev, params) => {
         if (params.currentList) {
@@ -114,68 +97,171 @@ app.directive('wzListManage', function () {
         }
       });
 
-      const saveList = async () => {
+      $scope.saveList = async () => {
+        let addingNew = false;
         try {
+          if ($scope.currentList.new && !$scope.currentList.newName) {
+            $scope.currentList.list = [];
+            throw new Error('New list name is needed');
+          } else if ($scope.currentList.new && $scope.currentList.newName) {
+            addingNew = true;
+            $scope.currentList.new = false;
+            $scope.currentList.name = $scope.currentList.newName;
+          }
           let raw = '';
           for (var key in $scope.currentList.list) {
             raw = raw.concat(`${key}:${$scope.currentList.list[key]}` + '\n');
           }
-          const result = await rulesetHandler.sendCdbList($scope.currentList.name, raw);
+          await rulesetHandler.sendCdbList($scope.currentList.name, raw);
+          const msg = 'Success. CDB list has been updated';
+          showRestartDialog(
+            msg,
+            clusterInfo.status === 'enabled' ? 'cluster' : 'manager'
+          );
           fetch();
-          errorHandler.info(result.data.data, '');
           $scope.loadingChange = false;
           if (!$scope.$$phase) $scope.$digest();
         } catch (err) {
-          refresh();
+          if (addingNew) {
+            $scope.currentList.name = false;
+            $scope.currentList.new = true;
+            $scope.$applyAsync();
+          }
           errorHandler.handle(err, 'Error updating list');
           $scope.loadingChange = false;
         }
-      }
+      };
 
       $scope.addEntry = (key, value) => {
         if (!$scope.currentList.list[key]) {
-          $scope.currentList.list[key] = value;
-          saveList();
+          $scope.currentList.list[key] = value ? value : '';
+          fetch();
         } else {
           errorHandler.handle('Entry already exists', '');
         }
-      }
+      };
 
       /**
-     * Enable edition for a given key
-     * @param {String} key Entry key
-     */
+       * Enable edition for a given key
+       * @param {String} key Entry key
+       */
       $scope.setEditingKey = (key, value) => {
         $scope.editingKey = key;
-        $scope.editingNewValue = value;
-      }
+        $scope.currentList.editingNewValue = value;
+      };
       /**
        * Cancel edition of an entry
        */
       $scope.cancelEditingKey = () => {
         $scope.editingKey = false;
         $scope.editingNewValue = '';
-      }
+      };
 
       $scope.showConfirmRemoveEntry = (ev, key) => {
         $scope.removingEntry = key;
       };
 
-      $scope.editKey = (key, newValue) => {
+      $scope.editKey = key => {
         $scope.loadingChange = true;
-        $scope.currentList.list[key] = newValue;
+        $scope.currentList.list[key] = $scope.currentList.editingNewValue;
+        $scope.currentList.editingNewValue = '';
         $scope.cancelEditingKey();
-        saveList();
-      }
+        fetch();
+      };
 
       $scope.cancelRemoveEntry = () => {
         $scope.removingEntry = false;
       };
 
-      $scope.confirmRemoveEntry = (key) => {
+      $scope.confirmRemoveEntry = key => {
         delete $scope.currentList.list[key];
         $scope.removingEntry = false;
-        saveList();
+        fetch();
+      };
+
+      const showRestartDialog = async (msg, target) => {
+        const confirm = $mdDialog.confirm({
+          controller: function(
+            $scope,
+            myScope,
+            myError,
+            $mdDialog,
+            configHandler
+          ) {
+            $scope.myScope = myScope;
+            $scope.closeDialog = () => {
+              $mdDialog.hide();
+              $('body').removeClass('md-dialog-body');
+            };
+            $scope.confirmDialog = () => {
+              $mdDialog.hide();
+              $scope.myScope.$emit('setRestarting', {});
+              if (target === 'manager') {
+                configHandler
+                  .restartManager()
+                  .then(data => {
+                    $('body').removeClass('md-dialog-body');
+                    myError.info(
+                      'It may take a few seconds...',
+                      data.data.data
+                    );
+                    $scope.myScope.$applyAsync();
+                  })
+                  .catch(error => {
+                    $scope.myScope.$emit('setRestarting', {});
+                    myError.handle(
+                      error.message || error,
+                      'Error restarting manager'
+                    );
+                  });
+              } else if (target === 'cluster') {
+                configHandler
+                  .restartCluster()
+                  .then(data => {
+                    $('body').removeClass('md-dialog-body');
+                    myError.info(
+                      'It may take a few seconds...',
+                      data.data.data
+                    );
+                    $scope.myScope.$applyAsync();
+                  })
+                  .catch(error => {
+                    $scope.myScope.$emit('setRestarting', {});
+                    myError.handle(
+                      error.message || error,
+                      'Error restarting cluster'
+                    );
+                  });
+              }
+              $scope.myScope.$emit('removeRestarting', {});
+            };
+          },
+          template:
+            '<md-dialog class="modalTheme euiToast euiToast--success euiGlobalToastListItem">' +
+            '<md-dialog-content>' +
+            '<div class="euiToastHeader">' +
+            '<i class="fa fa-check"></i>' +
+            '<span class="euiToastHeader__title">' +
+            `${msg}` +
+            `. Do you want to restart the ${target} now?` +
+            '</span>' +
+            '</div>' +
+            '</md-dialog-content>' +
+            '<md-dialog-actions>' +
+            '<button class="md-primary md-cancel-button md-button ng-scope md-default-theme md-ink-ripple" type="button" ng-click="closeDialog()">I will do it later</button>' +
+            `<button class="md-primary md-confirm-button md-button md-ink-ripple md-default-theme" type="button" ng-click="confirmDialog()">Restart ${target}</button>` +
+            '</md-dialog-actions>' +
+            '</md-dialog>',
+          hasBackdrop: false,
+          clickOutsideToClose: true,
+          disableParentScroll: true,
+          locals: {
+            myScope: $scope,
+            myError: errorHandler
+          }
+        });
+        $('body').addClass('md-dialog-body');
+        $mdDialog.show(confirm);
       };
     },
     template
