@@ -153,7 +153,7 @@ export const apiRequestList = [
         ]
       },
       {
-        name: '/agents/groups/:group_id',
+        name: '/agents/group/:group_id',
         args: [
           {
             name: ':group_id'
@@ -715,7 +715,7 @@ export const apiRequestList = [
         args: []
       },
       {
-        name: '/agents/groups/:group_id',
+        name: '/agents/group/:group_id',
         args: [
           {
             name: ':group_id'
