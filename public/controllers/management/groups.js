@@ -293,7 +293,7 @@ export function GroupsController(
     $scope.editingFile = false;
     appState.setNavigation({ status: true });
     $scope.$broadcast('closeEditXmlFile', {});
-    this.$applyAsync();
+    $scope.$applyAsync();
   };
 
   $scope.xmlIsValid = valid => {

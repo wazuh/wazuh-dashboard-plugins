@@ -49,7 +49,7 @@ export class CdbListsController {
     // Reloading event listener
     this.$scope.$on('rulesetIsReloaded', () => {
       this.viewingDetail = false;
-      this.$applyAsync();
+      this.$scope.$applyAsync();
     });
 
     this.$scope.$on('closeListView', () => {
@@ -72,7 +72,7 @@ export class CdbListsController {
       this.$scope.$broadcast('changeCdbList', {
         currentList: this.currentList
       });
-      this.$applyAsync();
+      this.$scope.$applyAsync();
     });
 
     const currentLocation = this.$location.search();
@@ -220,7 +220,7 @@ export class CdbListsController {
     this.viewingDetail = false;
     this.currentList = false;
     this.$emit('removeCurrentList');
-    this.$applyAsync();
+    this.$scope.$applyAsync();
   }
 
 
@@ -237,7 +237,7 @@ export class CdbListsController {
         this.currentList.details = false;
       }
       this.viewingDetail = true;
-      this.$applyAsync();
+      this.$scope.$applyAsync();
     } catch (error) {
       this.errorHandler.handle(
         `Error fetching list: ${incomingList} from the Wazuh API`,

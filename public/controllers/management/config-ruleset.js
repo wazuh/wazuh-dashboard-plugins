@@ -78,7 +78,7 @@ export class ConfigurationRulesetController {
       this.$scope.fetchedXML = null;
       if (reload) this.$scope.search();
       this.appState.setNavigation({ status: true });
-      this.$applyAsync();
+      this.$scope.$applyAsync();
     };
 
     this.$scope.xmlIsValid = valid => {
@@ -166,7 +166,7 @@ export class ConfigurationRulesetController {
         new: true
       };
       this.$scope.viewingDetail = true;
-      this.$applyAsync();
+      this.$scope.$applyAsync();
       this.$scope.$broadcast('changeCdbList', {
         currentList: this.$scope.currentList
       });
