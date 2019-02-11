@@ -27,9 +27,10 @@ class WzListManage {
   }
   controller(
     $scope,
+    $rootScope,
     errorHandler,
     $filter,
-    $mdDialog,
+    configHandler,
     rulesetHandler,
     wazuhConfig,
     appState
@@ -181,85 +182,44 @@ class WzListManage {
       fetch();
     };
 
-    const showRestartDialog = async (msg, target) => {
-      const confirm = $mdDialog.confirm({
-        controller: function (
-          $scope,
-          scope,
-          errorHandler,
-          $mdDialog,
-          configHandler
-        ) {
-          $scope.scope = scope;
-          $scope.closeDialog = () => {
-            $mdDialog.hide();
-            $('body').removeClass('md-dialog-body');
-          };
-          $scope.confirmDialog = async () => {
-            $mdDialog.hide();
-            $scope.scope.$emit('setRestarting', {});
-            if (target === 'manager') {
-              try {
-                const data = await configHandler.restartManager();
-                $('body').removeClass('md-dialog-body');
-                errorHandler.info(
-                  'It may take a few seconds...',
-                  data.data.data);
-              } catch (error) {
-                $scope.scope.$emit('setRestarting', {});
-                errorHandler.handle(
-                  error.message || error,
-                  'Error restarting manager'
-                );
-              }
-              $scope.scope.$applyAsync();
-            } else if (target === 'cluster') {
-              try {
-                const data = await configHandler.restartCluster();
-                $('body').removeClass('md-dialog-body');
-                errorHandler.info(
-                  'It may take a few seconds...',
-                  data.data.data
-                );
-                $scope.scope.$applyAsync();
-              } catch (error) {
-                $scope.scope.$emit('setRestarting', {});
-                errorHandler.handle(
-                  error.message || error,
-                  'Error restarting cluster'
-                );
-
-              }
-            }
-            $scope.scope.$emit('removeRestarting', {});
-          };
-        },
-        template:
-          '<md-dialog class="modalTheme euiToast euiToast--success euiGlobalToastListItem">' +
-          '<md-dialog-content>' +
-          '<div class="euiToastHeader">' +
-          '<i class="fa fa-check"></i>' +
-          '<span class="euiToastHeader__title">' +
-          `${msg}` +
-          `. Do you want to restart the ${target} now?` +
-          '</span>' +
-          '</div>' +
-          '</md-dialog-content>' +
-          '<md-dialog-actions>' +
-          '<button class="md-primary md-cancel-button md-button ng-scope md-default-theme md-ink-ripple" type="button" ng-click="closeDialog()">I will do it later</button>' +
-          `<button class="md-primary md-confirm-button md-button md-ink-ripple md-default-theme" type="button" ng-click="confirmDialog()">Restart ${target}</button>` +
-          '</md-dialog-actions>' +
-          '</md-dialog>',
-        hasBackdrop: false,
-        clickOutsideToClose: true,
-        disableParentScroll: true,
-        locals: {
-          scope: $scope,
-          errorHandler: errorHandler
+    $scope.confirmDialogFn = async (target) => {
+      $rootScope.$emit('setRestarting', {});
+      if (target === 'manager') {
+        try {
+          const data = await configHandler.restartManager();
+          $('body').removeClass('md-dialog-body');
+          errorHandler.info(
+            'It may take a few seconds...',
+            data.data.data);
+          $rootScope.$emit('removeRestarting', {});
+        } catch (error) {
+          $rootScope.$emit('setRestarting', {});
+          errorHandler.handle(
+            error.message || error,
+            'Error restarting manager'
+          );
         }
-      });
-      $('body').addClass('md-dialog-body');
-      $mdDialog.show(confirm);
+      } else if (target === 'cluster') {
+        try {
+          const data = await configHandler.restartCluster();
+          $('body').removeClass('md-dialog-body');
+          errorHandler.info(
+            'It may take a few seconds...',
+            data.data.data
+          );
+          $rootScope.$emit('removeRestarting', {});
+        } catch (error) {
+          $rootScope.$emit('setRestarting', {});
+          errorHandler.handle(
+            error.message || error,
+            'Error restarting cluster'
+          );
+        }
+      }
+    }
+
+    const showRestartDialog = async (msg, target) => {
+      $scope.$broadcast('showCustomToaster', { target, msg, confirmDialogFn: $scope.confirmDialogFn });
     };
   }
 }

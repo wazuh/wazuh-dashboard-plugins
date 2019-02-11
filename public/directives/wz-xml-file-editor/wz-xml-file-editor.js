@@ -28,7 +28,7 @@ class WzXmlFileEditor {
     };
     this.template = template;
   }
-  controller($scope, $document, $location, errorHandler, $mdDialog, groupHandler, rulesetHandler, configHandler) {
+  controller($scope, $rootScope, $document, $location, errorHandler, $mdDialog, apiReq, groupHandler, rulesetHandler, configHandler) {
 
     /**
      * Custom .replace method. Instead of using .replace which
@@ -245,112 +245,70 @@ class WzXmlFileEditor {
       checkXmlParseError();
     });
 
+    $scope.confirmDialogFn = async (target) => {
+      $rootScope.$emit('setRestarting', {});
+      const clusterStatus = await apiReq.request(
+        'GET',
+        '/cluster/status',
+        {}
+      );
+      if (
+        target !== 'cluster' &&
+        target !== 'manager' &&
+        (clusterStatus.data.data.enabled === 'no' ||
+          clusterStatus.data.data.running === 'no')
+      ) {
+        target = 'manager';
+      }
+      if (target === 'manager') {
+        try {
+          const data = await configHandler.restartManager();
+          $('body').removeClass('md-dialog-body');
+          errorHandler.info('It may take a few seconds...', data.data.data);
+          $rootScope.$emit('removeRestarting', {});
+        } catch (error) {
+          errorHandler.handle(
+            error.message || error,
+            'Error restarting manager'
+          );
+          $rootScope.$emit('removeRestarting', {});
+        }
+      } else if (target === 'cluster') {
+        try {
+          const data = await configHandler.restartCluster();
+          $('body').removeClass('md-dialog-body');
+          errorHandler.info('It may take a few seconds...', data.data.data);
+          $rootScope.$emit('removeRestarting', {});
+        } catch (error) {
+          errorHandler.handle(
+            error.message || error,
+            'Error restarting cluster'
+          );
+          $rootScope.$emit('removeRestarting', {});
+        }
+      } else {
+        try {
+          const data = await configHandler.restartNode(target);
+          $('body').removeClass('md-dialog-body');
+          errorHandler.info('It may take a few seconds...', data.data.data);
+          $rootScope.$emit('removeRestarting', {});
+        } catch (error) {
+          errorHandler.handle(
+            error.message || error,
+            'Error restarting node'
+          );
+          $rootScope.$emit('removeRestarting', {});
+        }
+      }
+    };
 
     const showRestartDialog = async (msg, target) => {
-      const confirm = $mdDialog.confirm({
-        controller: function(
-          $scope,
-          myScope,
-          myError,
-          $mdDialog,
-          configHandler,
-          apiReq
-        ) {
-          $scope.myScope = myScope;
-          $scope.closeDialog = () => {
-            $mdDialog.hide();
-            $('body').removeClass('md-dialog-body');
-          };
-          $scope.confirmDialog = async () => {
-            $scope.myScope.$emit('setRestarting', {});
-            $mdDialog.hide();
-            const clusterStatus = await apiReq.request(
-              'GET',
-              '/cluster/status',
-              {}
-            );
-            if (
-              target !== 'cluster' &&
-              target !== 'manager' &&
-              (clusterStatus.data.data.enabled === 'no' ||
-                clusterStatus.data.data.running === 'no')
-            ) {
-              target = 'manager';
-            }
-            if (target === 'manager') {
-              try {
-                const data = await configHandler.restartManager();
-                $('body').removeClass('md-dialog-body');
-                myError.info('It may take a few seconds...', data.data.data);
-                $scope.myScope.$applyAsync();
-              } catch (error) {
-                myError.handle(
-                  error.message || error,
-                  'Error restarting manager'
-                );
-                $scope.myScope.$emit('removeRestarting', {});
-              }
-            } else if (target === 'cluster') {
-              try {
-                const data = await configHandler.restartCluster();
-                $('body').removeClass('md-dialog-body');
-                myError.info('It may take a few seconds...', data.data.data);
-                $scope.myScope.$applyAsync();
-              } catch (error) {
-                myError.handle(
-                  error.message || error,
-                  'Error restarting cluster'
-                );
-                $scope.myScope.$emit('removeRestarting', {});
-              }
-            } else {
-              try {
-                const data = await configHandler.restartNode(target);
-                $('body').removeClass('md-dialog-body');
-                myError.info('It may take a few seconds...', data.data.data);
-                $scope.myScope.$applyAsync();
-              } catch (error) {
-                myError.handle(
-                  error.message || error,
-                  'Error restarting node'
-                );
-                $scope.myScope.$emit('removeRestarting', {});
-              }
-            }
-            $scope.myScope.$emit('removeRestarting', {});
-          };
-        },
-        template:
-          '<md-dialog class="modalTheme euiToast euiToast--success euiGlobalToastListItem">' +
-          '<md-dialog-content>' +
-          '<div class="euiToastHeader">' +
-          '<i class="fa fa-check"></i>' +
-          '<span class="euiToastHeader__title">' +
-          `${msg}` +
-          `. Do you want to restart the ${target} now?` +
-          '</span>' +
-          '</div>' +
-          '</md-dialog-content>' +
-          '<md-dialog-actions>' +
-          '<button class="md-primary md-cancel-button md-button ng-scope md-default-theme md-ink-ripple" type="button" ng-click="closeDialog()">I will do it later</button>' +
-          `<button class="md-primary md-confirm-button md-button md-ink-ripple md-default-theme" type="button" ng-click="confirmDialog()">Restart ${target}</button>` +
-          '</md-dialog-actions>' +
-          '</md-dialog>',
-        hasBackdrop: false,
-        clickOutsideToClose: true,
-        disableParentScroll: true,
-        locals: {
-          myScope: $scope,
-          myError: errorHandler
-        }
-      });
-      $('body').addClass('md-dialog-body');
-      $mdDialog.show(confirm);
+      $scope.$broadcast('showCustomToaster', { target, msg, confirmDialogFn: $scope.confirmDialogFn });
     };
 
     $scope.$on('saveXmlFile', (ev, params) => saveFile(params));
 
-    $scope.$on('$destroy', function() {
+    $scope.$on('$destroy', function () {
       $location.search('editingFile', null);
     });
   }
