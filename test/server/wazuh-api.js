@@ -28,7 +28,7 @@ describe('wazuh-api', () => {
     API_PORT = res.body[0]._source.api_port;
     API_USER = res.body[0]._source.api_user;
   });
-
+  
   it('POST /api/csv', async () => {
     const res = await needle(
       'post',
@@ -82,6 +82,22 @@ describe('wazuh-api', () => {
     res.body.data.should.be.a('object');
     res.body.data.status.should.be.eql('Active');
     res.body.data.id.should.be.eql('000');
+  });
+
+
+
+  it('GET /api/monitoring', async () => {
+    const res = await needle('get',`localhost:5601/api/monitoring`,{},{});
+    res.body.should.be.a('object');
+    res.body.error.should.be.eql('0');
+    res.body.statusCode.should.be.eql(200);
+    res.body.output.should.be.a('object');
+  });
+
+
+  it('GET /api/routes', async () => {
+    const res = await needle('get',`localhost:5601/api/routes`,{},{});
+    res.body.should.be.a('array');
   });
 
   it('GET /api/pci/{requirement}', async () => {
