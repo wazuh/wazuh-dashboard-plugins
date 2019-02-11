@@ -6,9 +6,13 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 ### Added 
 
+- Support for Wazuh v3.9.0
+- Edit master and worker configuration ([#1215](https://github.com/wazuh/wazuh-kibana-app/pull/1215)).
+- Edit local rules, local decoders and CDB lists ([#1212](https://github.com/wazuh/wazuh-kibana-app/pull/1212), [#1204](https://github.com/wazuh/wazuh-kibana-app/pull/1204), [#1196](https://github.com/wazuh/wazuh-kibana-app/pull/1196)).
 - Added hotkey `[shift] + [enter]` for sending query ([#1170](https://github.com/wazuh/wazuh-kibana-app/pull/1170)).
 - Added `Export JSON` button for the Dev Tools ([#1170](https://github.com/wazuh/wazuh-kibana-app/pull/1170)).
-- Added refresh button for agents preview table ([#1169](https://github.com/wazuh/wazuh-kibana-app/pull/1169))
+- Added refresh button for agents preview table ([#1169](https://github.com/wazuh/wazuh-kibana-app/pull/1169)).
+- Restart master and worker nodes ([#1222](https://github.com/wazuh/wazuh-kibana-app/pull/1222)).
 
 ### Changed
 
@@ -16,10 +20,16 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Changed empty results message for Wazuh tables ([#1165](https://github.com/wazuh/wazuh-kibana-app/pull/1165)).
 - Allowing the same query multiple times on the Dev Tools ([#1174](https://github.com/wazuh/wazuh-kibana-app/pull/1174))
 - Refactor JSON/XML viewer for configuration tab ([#1173](https://github.com/wazuh/wazuh-kibana-app/pull/1173), [#1148](https://github.com/wazuh/wazuh-kibana-app/pull/1148)).
+- Using full height for all containers when possible ([#1224](https://github.com/wazuh/wazuh-kibana-app/pull/1224)).
+- Improved the way we are handling "back button" events ([#1207](https://github.com/wazuh/wazuh-kibana-app/pull/1207)).
+- Changed some visualizations for FIM, GDPR, PCI, Vulnerability and Security Events ([#1206](https://github.com/wazuh/wazuh-kibana-app/pull/1206)).
+- New design for agent header view ([#1186](https://github.com/wazuh/wazuh-kibana-app/pull/1186)).
+- Not fetching data the very first time the Dev Tools are opened ([#1185](https://github.com/wazuh/wazuh-kibana-app/pull/1185))
 
 ### Fixed
 
-- Properly handling long messages on notifier service, until now, they were using out of the card space, also we replaced some API messages with more meaningful messages ([#1168](https://github.com/wazuh/wazuh-kibana-app/pull/1168))
+- Properly handling long messages on notifier service, until now, they were using out of the card space, also we replaced some API messages with more meaningful messages ([#1168](https://github.com/wazuh/wazuh-kibana-app/pull/1168)).
+- Adapted Wazuh icon for multiple browsers where it was gone ([#1208](https://github.com/wazuh/wazuh-kibana-app/pull/1208))
 
 ## Wazuh v3.8.2 - Kibana v6.6.0 - Revision 419
 
