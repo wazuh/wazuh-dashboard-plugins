@@ -101,8 +101,9 @@ export class DataFactory {
         this.path,
         parameters
       );
+
       this.items = this.items.filter(item => !!item);
-      this.items.push(...firstPage.data.data.items);
+      Array.isArray(firstPage.data.data) ? this.items.push(...firstPage.data.data) : this.items.push(...firstPage.data.data.items);
 
       const totalItems = firstPage.data.data.totalItems;
 
@@ -121,6 +122,7 @@ export class DataFactory {
       this.busy = false;
       return { items: this.items, time: elapsed };
     } catch (error) {
+
       this.busy = false;
       return Promise.reject(error);
     }
