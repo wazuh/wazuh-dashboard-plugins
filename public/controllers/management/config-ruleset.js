@@ -57,11 +57,11 @@ export class ConfigurationRulesetController {
         this.$scope.fetchedXML =
           this.$scope.selectedRulesetTab === 'rules'
             ? await this.rulesetHandler.getRuleConfiguration(
-              this.$scope.selectedItem.file
-            )
+                this.$scope.selectedItem.file
+              )
             : await this.rulesetHandler.getDecoderConfiguration(
-              this.$scope.selectedItem.file
-            );
+                this.$scope.selectedItem.file
+              );
         this.$location.search('editingFile', true);
         this.appState.setNavigation({ status: true });
         if (!this.$scope.$$phase) this.$scope.$digest();
@@ -76,8 +76,8 @@ export class ConfigurationRulesetController {
       this.$scope.editingFile = false;
       this.$scope.newFile = false;
       this.$scope.fetchedXML = null;
-      this.appState.setNavigation({ status: true });
       if (reload) this.$scope.search();
+      this.appState.setNavigation({ status: true });
       if (!this.$scope.$$phase) this.$scope.$digest();
     };
 
@@ -111,19 +111,33 @@ export class ConfigurationRulesetController {
           if (this.$scope.type === 'rules') {
             this.$scope.$broadcast('saveXmlFile', {
               rule: this.$scope.selectedItem,
-              showRestartManager: this.clusterInfo.status === 'enabled' ? 'cluster' : 'manager'
+              showRestartManager:
+                this.clusterInfo.status === 'enabled' ? 'cluster' : 'manager'
             });
           } else if (this.$scope.type === 'decoders') {
             this.$scope.$broadcast('saveXmlFile', {
               decoder: this.$scope.selectedItem,
-              showRestartManager: this.clusterInfo.status === 'enabled' ? 'cluster' : 'manager'
+              showRestartManager:
+                this.clusterInfo.status === 'enabled' ? 'cluster' : 'manager'
             });
           }
         } else {
           const objParam =
             this.$scope.selectedRulesetTab === 'rules'
-              ? { rule: this.$scope.selectedItem, showRestartManager: this.clusterInfo.status === 'enabled' ? 'cluster' : 'manager' }
-              : { decoder: this.$scope.selectedItem, showRestartManager: this.clusterInfo.status === 'enabled' ? 'cluster' : 'manager' };
+              ? {
+                  rule: this.$scope.selectedItem,
+                  showRestartManager:
+                    this.clusterInfo.status === 'enabled'
+                      ? 'cluster'
+                      : 'manager'
+                }
+              : {
+                  decoder: this.$scope.selectedItem,
+                  showRestartManager:
+                    this.clusterInfo.status === 'enabled'
+                      ? 'cluster'
+                      : 'manager'
+                };
           this.$scope.$broadcast('saveXmlFile', objParam);
         }
         this.$scope.editingFile = false;
