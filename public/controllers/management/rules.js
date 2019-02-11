@@ -232,7 +232,7 @@ export function RulesController(
       );
       $location.search('editingFile', true);
       appState.setNavigation({ status: true });
-      this.$scope.$applyAsync();
+      $scope.$applyAsync();
       $scope.$broadcast('fetchedFile', { data: $scope.fetchedXML });
     } catch (error) {
       $scope.fetchedXML = null;
@@ -243,7 +243,11 @@ export function RulesController(
     $scope.editingFile = false;
     appState.setNavigation({ status: true });
     $scope.$broadcast('closeEditXmlFile', {});
+<<<<<<< HEAD
     this.$scope.$applyAsync();
+=======
+    $scope.$applyAsync();
+>>>>>>> 0a28a88620731bdc1190c75ddf536792b60d73e8
   };
   $scope.xmlIsValid = valid => {
     $scope.xmlHasErrors = valid;
