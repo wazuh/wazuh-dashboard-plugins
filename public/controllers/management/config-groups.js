@@ -60,7 +60,7 @@ export class ConfigurationGroupsController {
     this.$scope.search = term => {
       this.$scope.$broadcast('wazuhSearch', { term });
     };
-
+    this.clusterInfo = this.appState.getClusterInfo();
     this.$scope.editConfig = async () => {
       this.$scope.editingFile = true;
       try {
@@ -88,7 +88,8 @@ export class ConfigurationGroupsController {
     this.$scope.doSaveConfig = () => {
       this.$scope.editingFile = false;
       this.$scope.$broadcast('saveXmlFile', {
-        group: this.$scope.selectedItem.name
+        group: this.$scope.selectedItem.name,
+        showRestartManager: this.clusterInfo.status === 'enabled' ? 'cluster' : 'manager'
       });
     };
     this.$scope.switchAddingGroup = () => {

@@ -6,9 +6,8 @@
         <div class='uil-ring-css' ng-show="load">
             <div></div>
         </div>
-
         <!-- Headline (cluster) -->
-        <div layout="column" layout-padding ng-show="clusterStatus.data.data.enabled === 'yes'">
+        <div layout="column" layout-padding ng-show="clusterStatus.data.data.enabled === 'yes' && clusterStatus.data.data.running === 'yes' ">
             <div layout="row">
                 <span class="font-size-18">
                     <i class="fa fa-fw fa-edit" aria-hidden="true"></i> Cluster configuration</span>
@@ -19,7 +18,7 @@
         </div>
 
         <!-- Headline (manager) -->
-        <div layout="column" layout-padding ng-show="clusterStatus.data.data.enabled !== 'yes'">
+        <div layout="column" layout-padding ng-show="clusterStatus.data.data.enabled !== 'yes' || clusterStatus.data.data.running !== 'yes' ">
             <div layout="row">
                 <span class="font-size-18">
                     <i class="fa fa-fw fa-edit" aria-hidden="true"></i> Manager configuration</span>
@@ -40,7 +39,7 @@
                             XML format error</span>
                     </button>
                     <!-- List of nodes if cluster is enabled -->
-                    <div ng-show="selectedNode && clusterStatus.data.data.enabled === 'yes'" layout="row" class="wz-margin-left-8"
+                    <div ng-show="selectedNode && clusterStatus.data.data.enabled === 'yes' && clusterStatus.data.data.running === 'yes' " layout="row" class="wz-margin-left-8"
                         layout-padding style="padding: 0;height: 32px;">
                         <div layout="column" layout-align="center" class="height-35 wz-select-input">
                             <select class="kuiSelect wz-border-none cursor-pointer max-height-35" id="categoryBox"
@@ -48,6 +47,10 @@
                                 <option ng-repeat="node in nodes" value="{{node.name}}">{{node.name}} ({{node.type}})</option>
                             </select>
                         </div>
+                        <button class="btn btn-primary wz-margin-left-8" ng-disabled="isRestarting" ng-click="restartNode(selectedNode)"><i
+                                class="fa fa-refresh"></i>
+                            Restart {{selectedNode}}
+                        </button>
                     </div>
                 </div>
                 <div class="md-padding md-padding-top-10" style="height: calc(100vh - 280px);" ng-if="fetchedXML">

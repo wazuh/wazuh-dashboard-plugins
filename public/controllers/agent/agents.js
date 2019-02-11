@@ -500,6 +500,14 @@ export class AgentsController {
         this.$scope.gdprTabs = gdprTabs;
         this.$scope.selectedGdprIndex = 0;
       }
+
+      if (tab === 'pm') {
+        try {
+          const policies = await this.apiReq.request('GET', `/configuration_assessment/${this.$scope.agent.id}`, {});
+          this.$scope.policies = policies.data.data.items;
+        } catch (error) { this.$scope.policies = []; }
+      }
+
       if (tab === 'syscollector')
         try {
           await this.loadSyscollector(this.$scope.agent.id);

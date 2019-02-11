@@ -21,11 +21,12 @@ export class EditionController {
    * @param {*} appState
    * @param {*} wazuhConfig
    */
-  constructor($scope, $location, errorHandler, apiReq, appState) {
+  constructor($scope, $location, errorHandler, apiReq, appState, configHandler) {
     this.$scope = $scope;
     this.errorHandler = errorHandler;
     this.apiReq = apiReq;
     this.appState = appState;
+    this.configHandler = configHandler;
     this.$location = $location;
     this.$scope.load = false;
     this.configurationHandler = new ConfigurationHandler(apiReq, errorHandler);
@@ -48,11 +49,11 @@ export class EditionController {
       try {
         let data = false;
         let xml = false;
-        if (this.$scope.clusterStatus.data.data.enabled === 'yes') {
+        if (this.$scope.clusterStatus.data.data.enabled === 'yes' && this.$scope.clusterStatus.data.data.running === 'yes') {
           data = await this.apiReq.request(
             'GET',
             `/cluster/${this.$scope.selectedNode}/files`,
-            { path: 'etc/ossec.conf'}
+            { path: 'etc/ossec.conf' }
           );
         } else {
           data = await this.apiReq.request('GET', `/manager/files`, {
@@ -84,15 +85,42 @@ export class EditionController {
       if (!this.$scope.$$phase) this.$scope.$digest();
     };
 
+    this.$scope.restartNode = async (selectedNode) => {
+      try {
+        this.$scope.$emit('setRestarting', {});
+        this.$scope.isRestarting = true;
+        this.$scope.clusterStatus = await this.apiReq.request(
+          'GET',
+          '/cluster/status',
+          {}
+        );
+        let data;
+        if (this.$scope.clusterStatus.data.data.enabled === 'yes' && this.$scope.clusterStatus.data.data.running === 'yes') {
+          data = await this.configHandler.restartNode(selectedNode);
+        } else {
+          data = await this.configHandler.restartManager();
+        }
+        this.$scope.$emit('removeRestarting', {});
+        this.$scope.isRestarting = false;
+        this.errorHandler.info(data.data.data, 'It may take a few seconds...');
+        this.$scope.$applyAsync();
+      } catch (error) {
+        this.errorHandler.handle(error.message || error, 'Error restarting node');
+        this.$scope.$emit('removeRestarting', {});
+        this.$scope.isRestarting = false;
+      }
+    }
     this.$scope.saveConfiguration = async () => {
       try {
-        if (this.$scope.clusterStatus.data.data.enabled === 'yes') {
+        if (this.$scope.clusterStatus.data.data.enabled === 'yes' && this.$scope.clusterStatus.data.data.running === 'yes') {
           this.$scope.$broadcast('saveXmlFile', {
-            node: this.$scope.selectedNode
+            node: this.$scope.selectedNode,
+            showRestartManager: 'cluster'
           });
         } else {
           this.$scope.$broadcast('saveXmlFile', {
-            manager: this.$scope.selectedNode
+            manager: this.$scope.selectedNode,
+            showRestartManager: 'manager'
           });
         }
       } catch (error) {
@@ -115,7 +143,7 @@ export class EditionController {
       this.$scope.editConf();
     };
 
-    this.$scope.closeEditingFile = () => {};
+    this.$scope.closeEditingFile = () => { };
 
     //listeners
     this.$scope.$on('wazuhShowNode', (event, parameters) => {
@@ -141,12 +169,6 @@ export class EditionController {
           item => item.type === 'master'
         )[0];
         this.$scope.selectedNode = masterNode.name;
-      } else if (
-        this.$scope.clusterStatus &&
-        this.$scope.clusterStatus.data.data.enabled === 'yes' &&
-        this.$scope.clusterStatus.data.data.running === 'no'
-      ) {
-        this.errorHandler.handle('', 'Cluster is enabled but not running');
       } else {
         this.$scope.selectedNode = 'manager';
       }
