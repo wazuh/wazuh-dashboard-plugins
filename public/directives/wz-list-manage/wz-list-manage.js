@@ -191,6 +191,7 @@ class WzListManage {
           errorHandler.info(
             'It may take a few seconds...',
             data.data.data);
+            $scope.$applyAsync();
           $rootScope.$emit('removeRestarting', {});
         } catch (error) {
           $rootScope.$emit('setRestarting', {});
@@ -207,6 +208,7 @@ class WzListManage {
             'It may take a few seconds...',
             data.data.data
           );
+          $scope.$applyAsync();
           $rootScope.$emit('removeRestarting', {});
         } catch (error) {
           $rootScope.$emit('setRestarting', {});

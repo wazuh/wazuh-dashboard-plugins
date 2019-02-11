@@ -265,6 +265,7 @@ class WzXmlFileEditor {
           const data = await configHandler.restartManager();
           $('body').removeClass('md-dialog-body');
           errorHandler.info('It may take a few seconds...', data.data.data);
+          $scope.$applyAsync();
           $rootScope.$emit('removeRestarting', {});
         } catch (error) {
           errorHandler.handle(
@@ -278,6 +279,7 @@ class WzXmlFileEditor {
           const data = await configHandler.restartCluster();
           $('body').removeClass('md-dialog-body');
           errorHandler.info('It may take a few seconds...', data.data.data);
+          $scope.$applyAsync();
           $rootScope.$emit('removeRestarting', {});
         } catch (error) {
           errorHandler.handle(
@@ -291,6 +293,7 @@ class WzXmlFileEditor {
           const data = await configHandler.restartNode(target);
           $('body').removeClass('md-dialog-body');
           errorHandler.info('It may take a few seconds...', data.data.data);
+          $scope.$applyAsync();
           $rootScope.$emit('removeRestarting', {});
         } catch (error) {
           errorHandler.handle(
