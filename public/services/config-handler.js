@@ -50,8 +50,8 @@ export class ConfigHandler {
   }
 
   /**
- * Restart manager (single-node API call)
- */
+   * Restart manager (single-node API call)
+   */
   async restartManager() {
     try {
       const validationError = await this.apiReq.request(
@@ -59,14 +59,13 @@ export class ConfigHandler {
         `/manager/configuration/validation`,
         {}
       );
-      if (validationError.data.data !== 'Configuration is OK') {
-        throw new Error("The configuration has some error.");
+
+      const valid = (((validationError || {}).data || {}).data || {}).status === 'OK';
+      if (!valid) {
+        throw new Error('The configuration has some error.');
       }
-      const result = await this.apiReq.request(
-        'PUT',
-        `/manager/restart`,
-        {}
-      );
+
+      const result = await this.apiReq.request('PUT', `/manager/restart`, {});
       return result;
     } catch (error) {
       return Promise.reject(error);
@@ -74,8 +73,8 @@ export class ConfigHandler {
   }
 
   /**
-* Restart cluster
-*/
+   * Restart cluster
+   */
   async restartCluster() {
     try {
       const validationError = await this.apiReq.request(
@@ -83,14 +82,13 @@ export class ConfigHandler {
         `/cluster/configuration/validation`,
         {}
       );
-      if (validationError.data.data !== 'Configuration is OK') {
-        throw new Error("The configuration has some error.");
+
+      const valid = (((validationError || {}).data || {}).data || {}).status === 'OK';
+      if (!valid) {
+        throw new Error('The configuration has some error.');
       }
-      const result = await this.apiReq.request(
-        'PUT',
-        `/cluster/restart`,
-        {}
-      );
+
+      const result = await this.apiReq.request('PUT', `/cluster/restart`, {});
       return result;
     } catch (error) {
       return Promise.reject(error);
@@ -98,8 +96,8 @@ export class ConfigHandler {
   }
 
   /**
-* Restart a cluster node
-*/
+   * Restart a cluster node
+   */
   async restartNode(node) {
     try {
       const validationError = await this.apiReq.request(
@@ -107,9 +105,12 @@ export class ConfigHandler {
         `/cluster/${node}/configuration/validation`,
         {}
       );
-      if (validationError.data.data !== 'Configuration is OK') {
-        throw new Error("The configuration has some error.");
+
+      const valid = (((validationError || {}).data || {}).data || {}).status === 'OK';
+      if (!valid) {
+        throw new Error('The configuration has some error.');
       }
+
       const result = await this.apiReq.request(
         'PUT',
         `/cluster/${node}/restart`,
