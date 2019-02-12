@@ -1,7 +1,4 @@
 <div ng-if="!cdbctrl.viewingDetail" layout="column">
-    <div layout="row" class="wz-padding-left-16 wz-padding-top-10">
-        <a class="small" ng-click="cdbctrl.addNewList()">Add new list <i aria-hidden="true" class="fa fa-plus"></i></a>
-    </div>
     <div id="content" layout="row" class="md-padding ">
         <input flex placeholder="Filter lists..." ng-model="cdbctrl.custom_search" type="text" class="kuiLocalSearchInput height-40 ng-empty ng-pristine ng-scope ng-touched ng-valid"
             aria-invalid="false" wz-enter="cdbctrl.search(cdbctrl.custom_search)">
@@ -46,6 +43,9 @@
     <div layout="row">
         <md-card flex class="wz-md-card _md flex md-margin-h">
             <md-card-content>
+                <div layout="row">
+                    <a ng-click="cdbctrl.addNewList()">Add new list <i aria-hidden="true" class="fa fa-plus"></i></a>
+                </div>
                 <wz-table implicit-filter="cdbctrl.appliedFilters" flex path="'/lists/files'" keys="['name', 'path']"
                     allow-click="true" row-sizes="[15,13,11]">
                 </wz-table>
