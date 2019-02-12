@@ -1,14 +1,2 @@
 <div flex="auto" layout="column" ng-controller="managementConfigurationController" ng-if="mctrl.tab === 'configuration'"
     ng-init="switchConfigurationTab('welcome', false)">
-
-    <!-- Navigation section -->
-
-    <!-- End navigation section -->
-    <!--
-    <md-nav-bar class="wz-nav-bar nav-bar-white-bg" md-selected-nav-item="mctrl.globalConfigTab" ng-show="adminMode">
-        <md-nav-item class="wz-nav-item" md-nav-click="mctrl.switchTab('configuration', true)" name="overview">Overview</md-nav-item>
-        <md-nav-item class="wz-nav-item" md-nav-click="mctrl.setConfigTab('editconfiguration', true)" name="editconfiguration">Edit
-            configuration</md-nav-item>
-        <md-nav-item class="wz-nav-item" md-nav-click="mctrl.setConfigTab('ruleset', true)" name="ruleset">Edit ruleset</md-nav-item>
-        <md-nav-item class="wz-nav-item" md-nav-click="mctrl.setConfigTab('groups', true)" name="groups">Edit groups</md-nav-item>
-    </md-nav-bar>-->
