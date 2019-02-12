@@ -25,6 +25,10 @@ export function RulesController(
   wazuhConfig,
   rulesetHandler
 ) {
+  $scope.showingLocalRules = false;
+  $scope.switchLocalRules = () =>
+    ($scope.showingLocalRules = !$scope.showingLocalRules);
+
   $scope.isObject = item => typeof item === 'object';
 
   $scope.appliedFilters = [];
@@ -239,16 +243,19 @@ export function RulesController(
       errorHandler.handle(error, 'Fetch file error');
     }
   };
+
   $scope.closeEditingFile = () => {
     $scope.editingFile = false;
     appState.setNavigation({ status: true });
     $scope.$broadcast('closeEditXmlFile', {});
     if (!$scope.$$phase) $scope.$digest();
   };
+
   $scope.xmlIsValid = valid => {
     $scope.xmlHasErrors = valid;
     if (!$scope.$$phase) $scope.$digest();
   };
+
   $scope.doSaveRuleConfig = () => {
     $scope.$broadcast('saveXmlFile', { rule: $scope.currentRule });
   };
@@ -292,4 +299,72 @@ export function RulesController(
         )
       );
   }
+
+  $scope.addNewFile = type => {
+    $scope.editingFile = true;
+    $scope.newFile = true;
+    $scope.newFileName = '';
+    $scope.selectedFileName = $scope.selectedRulesetTab;
+    $scope.selectedItem = { file: 'new file' };
+    $scope.fetchedXML = '<!-- Modify it at your will. -->';
+    $scope.type = type;
+    if (!$scope.$$phase) $scope.$digest();
+    $location.search('editingFile', true);
+    appState.setNavigation({ status: true });
+    $scope.$emit('fetchedFile', { data: $scope.fetchedXML });
+  };
+
+  $scope.doSaveConfig = (isNewFile, fileName) => {
+    const clusterInfo = appState.getClusterInfo();
+    const showRestartManager =
+      clusterInfo.status === 'enabled' ? 'cluster' : 'manager';
+    if (isNewFile && !fileName) {
+      errorHandler.handle(
+        'You need to specify a file name',
+        'Error creating a new file.'
+      );
+      return false;
+    } else {
+      if (isNewFile) {
+        const validFileName = /(.+).xml/;
+        const containsNumber = /.*[0-9].*/;
+        if (fileName && !validFileName.test(fileName)) {
+          fileName = fileName + '.xml';
+        }
+        if (containsNumber.test(fileName)) {
+          this.errorHandler.handle(
+            'The filename can not contain numbers',
+            'Error creating a new file.'
+          );
+          return false;
+        }
+        $scope.selectedItem = { file: fileName };
+        if ($scope.type === 'rules') {
+          $scope.$broadcast('saveXmlFile', {
+            rule: $scope.selectedItem,
+            showRestartManager
+          });
+        } else if ($scope.type === 'decoders') {
+          $scope.$broadcast('saveXmlFile', {
+            decoder: $scope.selectedItem,
+            showRestartManager
+          });
+        }
+      } else {
+        const objParam =
+          $scope.selectedRulesetTab === 'rules'
+            ? {
+                rule: $scope.selectedItem,
+                showRestartManager
+              }
+            : {
+                decoder: $scope.selectedItem,
+                showRestartManager
+              };
+        $scope.$broadcast('saveXmlFile', objParam);
+      }
+      //$scope.editingFile = false;
+      //$scope.fetchedXML = null;
+    }
+  };
 }

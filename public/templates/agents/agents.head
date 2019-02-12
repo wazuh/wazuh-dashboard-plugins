@@ -39,7 +39,8 @@
                 <span> / </span>
                 <span class="wz-text-link cursor-pointer" ng-click="switchTab('welcome')">{{agent.name}} ({{agent.id}})</span>
                 <span> / </span>
-                <span class="wz-text-link cursor-pointer" ng-click="switchConfigurationTab('welcome', true)">{{ tabNames[tab] }}</span>
+                <span class="wz-text-link cursor-pointer" ng-click="switchConfigurationTab('welcome', true)">{{
+                    tabNames[tab] }}</span>
                 <span> / </span>
                 <span>{{ tabNames[configurationTab] === 'Alerts' ? 'Labels' : tabNames[configurationTab] }}</span>
             </div>
@@ -59,7 +60,9 @@
         <!-- Reporting button section -->
         <div ng-show="tab !== 'welcome' && tab !== 'configuration' && tabView === 'panels'">
             <!-- Report button -->
-            <md-button md-no-ink class="md-icon-button small wz-no-margin-padding" tooltip="Generate report" tooltip-placement="bottom" ng-disabled="(!rendered || loading || resultState !== 'ready' || showSyscheckFiles || showRootcheckScan) && tab !== 'syscollector'" ng-click="startVis2Png()" aria-label="Generate report button">
+            <md-button md-no-ink class="md-icon-button small wz-no-margin-padding" tooltip="Generate report"
+                tooltip-placement="bottom" ng-disabled="(!rendered || loading || resultState !== 'ready' || showSyscheckFiles || showRootcheckScan) && tab !== 'syscollector'"
+                ng-click="startVis2Png()" aria-label="Generate report button">
                 <i class="fa fa-fw fa-print" aria-hidden="true"></i>
             </md-button>
         </div>
@@ -68,12 +71,14 @@
         <!-- Discover/Dashboard buttons section -->
         <div ng-show="tab !== 'welcome' && tab !== 'configuration' && tab !== 'syscollector'">
             <!-- Dashboard button -->
-            <md-button ng-if="tabView === 'discover'" class="wz-button-flat small" ng-click="switchSubtab('panels')" aria-label="Dashboard button">
+            <md-button ng-if="tabView === 'discover'" class="wz-button-flat small" ng-click="switchSubtab('panels')"
+                aria-label="Dashboard button">
                 <i class="fa fa-fw fa-th" aria-hidden="true"></i> Dashboard
             </md-button>
 
             <!-- Discover button -->
-            <md-button ng-if="tabView === 'panels'" class="wz-button-flat small" ng-click="switchSubtab('discover')" aria-label="Discover button">
+            <md-button ng-if="tabView === 'panels'" class="wz-button-flat small" ng-click="switchSubtab('discover')"
+                aria-label="Discover button">
                 <i class="fa fa-fw fa-compass" aria-hidden="true"></i> Discover
             </md-button>
         </div>
@@ -81,24 +86,18 @@
 
         <!-- Agent autocomplete selector section -->
         <div flex="30" class="wz-margin-8-no-left">
-            <md-autocomplete flex class="wz-autocomplete wz-select-input"
-            md-no-cache="true"
-            md-select-on-match="false"
-            md-selected-item="_swpagent"
-            md-selected-item-change="getAgent(_swpagent.id,true)"
-            md-search-text="searchTerm"
-            md-items="agentAutoComplete in analyzeAgents(searchTerm)"
-            md-item-text="agentAutoComplete.name"
-            md-min-length="0"
-            md-clear-button="true"
-            md-no-asterisk="false"
-            placeholder="Search by name, ID or IP address">
+            <md-autocomplete flex class="wz-autocomplete wz-select-input" md-no-cache="true" md-select-on-match="false"
+                md-selected-item="_swpagent" md-selected-item-change="getAgent(_swpagent.id,true)" md-search-text="searchTerm"
+                md-items="agentAutoComplete in analyzeAgents(searchTerm)" md-item-text="agentAutoComplete.name"
+                md-min-length="0" md-clear-button="true" md-no-asterisk="false" placeholder="Search by name, ID or IP address">
                 <md-item-template>
                     <span class="item-title">
-                        <span><strong md-highlight-text="search" md-highlight-flags="i"> {{agentAutoComplete.name}} ({{agentAutoComplete.id}}) </strong></span>
+                        <span><strong md-highlight-text="search" md-highlight-flags="i"> {{agentAutoComplete.name}}
+                                ({{agentAutoComplete.id}}) </strong></span>
                     </span>
                     <span class="item-metadata">
-                        <span class="item-metastat" md-highlight-text="searchTerm" md-highlight-flags="i"> {{agentAutoComplete.ip}} ({{agentAutoComplete.status}}) </span>
+                        <span class="item-metastat" md-highlight-text="searchTerm" md-highlight-flags="i">
+                            {{agentAutoComplete.ip}} ({{agentAutoComplete.status}}) </span>
                     </span>
                 </md-item-template>
                 <md-not-found>
@@ -107,65 +106,50 @@
             </md-autocomplete>
         </div>
         <!-- End agent autocomplete selector section -->
-
-        <!-- Help button -->
-        <md-button md-no-ink class="md-icon-button small" tooltip="About and help" tooltip-placement="left" ng-href="#/settings/about" aria-label="Link to open app about section">
-            <i class="fa fa-fw fa-question-circle-o" aria-hidden="true"></i>
-        </md-button>
-        <!-- End help button -->
-
     </div>
     <!-- End navigation section -->
 
     <!-- Host monitoring navigation bar -->
-    <md-nav-bar
-        ng-if="inArray(tab, hostMonitoringTabs)"
-        class="wz-nav-bar"
-        ng-show="tab !== 'welcome'"
-        md-selected-nav-item="tab"
-        nav-bar-aria-label="Host monitoring navigation links">
+    <md-nav-bar ng-if="inArray(tab, hostMonitoringTabs)" class="wz-nav-bar" ng-show="tab !== 'welcome'"
+        md-selected-nav-item="tab" nav-bar-aria-label="Host monitoring navigation links">
         <md-nav-item class="wz-nav-item" md-nav-click="switchTab('general')" name="general">{{ tabNames['general'] }}</md-nav-item>
         <md-nav-item class="wz-nav-item" md-nav-click="switchTab('fim')" name="fim">{{ tabNames['fim'] }}</md-nav-item>
-        <md-nav-item class="wz-nav-item" md-nav-click="switchTab('syscollector')" name="syscollector">{{ tabNames['syscollector'] }}</md-nav-item>
+        <md-nav-item class="wz-nav-item" md-nav-click="switchTab('syscollector')" name="syscollector">{{
+            tabNames['syscollector'] }}</md-nav-item>
     </md-nav-bar>
     <!-- End Host monitoring navigation bar -->
 
     <!-- System audit navigation bar -->
-    <md-nav-bar
-        ng-if="inArray(tab, systemAuditTabs) && (extensions.audit || extensions.oscap || extensions.ciscat)"
-        class="wz-nav-bar"
-        ng-show="tab !== 'welcome'"
-        md-selected-nav-item="tab"
-        nav-bar-aria-label="System audit navigation links">
+    <md-nav-bar ng-if="inArray(tab, systemAuditTabs) && (extensions.audit || extensions.oscap || extensions.ciscat)"
+        class="wz-nav-bar" ng-show="tab !== 'welcome'" md-selected-nav-item="tab" nav-bar-aria-label="System audit navigation links">
         <md-nav-item class="wz-nav-item" md-nav-click="switchTab('pm')" name="pm">{{ tabNames['pm'] }}</md-nav-item>
-        <md-nav-item ng-show="extensions.audit" class="wz-nav-item" md-nav-click="switchTab('audit')" name="audit">{{ tabNames['audit'] }}</md-nav-item>
-        <md-nav-item ng-show="extensions.oscap" class="wz-nav-item" md-nav-click="switchTab('oscap')" name="oscap">{{ tabNames['oscap'] }}</md-nav-item>
-        <md-nav-item ng-show="extensions.ciscat" class="wz-nav-item" md-nav-click="switchTab('ciscat')" name="ciscat">{{ tabNames['ciscat'] }}</md-nav-item>
-      </md-nav-bar>
+        <md-nav-item ng-show="extensions.audit" class="wz-nav-item" md-nav-click="switchTab('audit')" name="audit">{{
+            tabNames['audit'] }}</md-nav-item>
+        <md-nav-item ng-show="extensions.oscap" class="wz-nav-item" md-nav-click="switchTab('oscap')" name="oscap">{{
+            tabNames['oscap'] }}</md-nav-item>
+        <md-nav-item ng-show="extensions.ciscat" class="wz-nav-item" md-nav-click="switchTab('ciscat')" name="ciscat">{{
+            tabNames['ciscat'] }}</md-nav-item>
+    </md-nav-bar>
     <!-- End System audit navigation bar -->
 
     <!-- Security navigation bar -->
-    <md-nav-bar
-        ng-if="inArray(tab, securityTabs) && (extensions.virustotal || extensions.osquery)"
-        class="wz-nav-bar"
-        ng-show="tab !== 'welcome'"
-        md-selected-nav-item="tab"
-        nav-bar-aria-label="Security navigation links">
+    <md-nav-bar ng-if="inArray(tab, securityTabs) && (extensions.virustotal || extensions.osquery)" class="wz-nav-bar"
+        ng-show="tab !== 'welcome'" md-selected-nav-item="tab" nav-bar-aria-label="Security navigation links">
         <md-nav-item class="wz-nav-item" md-nav-click="switchTab('vuls')" name="vuls">{{ tabNames['vuls'] }}</md-nav-item>
-        <md-nav-item ng-show="extensions.virustotal" class="wz-nav-item" md-nav-click="switchTab('virustotal')" name="virustotal">{{ tabNames['virustotal'] }}</md-nav-item>
-        <md-nav-item ng-show="extensions.osquery" class="wz-nav-item" md-nav-click="switchTab('osquery')" name="osquery">{{ tabNames['osquery'] }}</md-nav-item>
+        <md-nav-item ng-show="extensions.virustotal" class="wz-nav-item" md-nav-click="switchTab('virustotal')" name="virustotal">{{
+            tabNames['virustotal'] }}</md-nav-item>
+        <md-nav-item ng-show="extensions.osquery" class="wz-nav-item" md-nav-click="switchTab('osquery')" name="osquery">{{
+            tabNames['osquery'] }}</md-nav-item>
     </md-nav-bar>
     <!-- End Security navigation bar -->
 
     <!-- Compliance navigation bar -->
-    <md-nav-bar
-        ng-if="inArray(tab, complianceTabs) && extensions.pci && extensions.gdpr"
-        class="wz-nav-bar"
-        ng-show="tab !== 'welcome'"
-        md-selected-nav-item="tab"
-        nav-bar-aria-label="Compliance navigation links">
-        <md-nav-item ng-show="extensions.pci" class="wz-nav-item" md-nav-click="switchTab('pci')" name="pci">{{ tabNames['pci'] }}</md-nav-item>
-        <md-nav-item ng-show="extensions.gdpr" class="wz-nav-item" md-nav-click="switchTab('gdpr')" name="gdpr">{{ tabNames['gdpr'] }}</md-nav-item>
+    <md-nav-bar ng-if="inArray(tab, complianceTabs) && extensions.pci && extensions.gdpr" class="wz-nav-bar" ng-show="tab !== 'welcome'"
+        md-selected-nav-item="tab" nav-bar-aria-label="Compliance navigation links">
+        <md-nav-item ng-show="extensions.pci" class="wz-nav-item" md-nav-click="switchTab('pci')" name="pci">{{
+            tabNames['pci'] }}</md-nav-item>
+        <md-nav-item ng-show="extensions.gdpr" class="wz-nav-item" md-nav-click="switchTab('gdpr')" name="gdpr">{{
+            tabNames['gdpr'] }}</md-nav-item>
     </md-nav-bar>
     <!-- End Compliance navigation bar -->
 
@@ -174,36 +158,51 @@
     <!-- End Discover search bar section -->
 
     <!-- Loading status section -->
-    <div layout="column" layout-align="center center" ng-if="tab !== 'welcome' && tab !== 'configuration' && tab !== 'syscollector'" ng-show="resultState === 'ready' && tabView === 'panels' && !rendered">
+    <div layout="column" layout-align="center center" ng-if="tab !== 'welcome' && tab !== 'configuration' && tab !== 'syscollector'"
+        ng-show="resultState === 'ready' && tabView === 'panels' && !rendered">
         <div class="percentage"><i class="fa fa-fw fa-spin fa-spinner" aria-hidden="true"></i></div>
         <div class="percentage">{{loadingStatus}}</div>
     </div>
     <!-- End loading status section -->
 
     <!-- Report status section -->
-    <div layout="column" layout-align="center center" class="wz-margin-top-8" ng-if="(tab !== 'welcome') && (tab !== 'configuration')" ng-show="reportBusy && reportStatus">
+    <div layout="column" layout-align="center center" class="wz-margin-top-8" ng-if="(tab !== 'welcome') && (tab !== 'configuration')"
+        ng-show="reportBusy && reportStatus">
         <div class="percentage"><i class="fa fa-fw fa-spin fa-spinner" aria-hidden="true"></i></div>
         <div class="percentage">{{reportStatus}}</div>
     </div>
     <!-- End report status section -->
 
     <!-- No results section -->
-    <div layout="row" ng-if="!showSyscheckFiles && !showRootcheckScan && tab === 'fim' && resultState === 'none' && tabView === 'panels'" layout-padding class="wz-padding-top-0">
+    <div layout="row" ng-if="!showSyscheckFiles && !showRootcheckScan && tab === 'fim' && resultState === 'none' && tabView === 'panels'"
+        layout-padding class="wz-padding-top-0">
         <span flex></span>
-        <span ng-click="launchSyscheckScan()" class="btn pull-right btn-primary"><i class="fa fa-fw fa-play"></i> Run scan</span>
+        <span ng-click="launchSyscheckScan()" class="btn pull-right btn-primary"><i class="fa fa-fw fa-play"></i> Run
+            scan</span>
         <span></span>
-        <span ng-click="switchSyscheckFiles()" class="btn pull-right btn-primary"><i class="fa fa-fw fa-database"></i> Show state</span>
-    </div> 
-    <div layout="row" ng-if="!showSyscheckFiles && !showRootcheckScan && tab === 'pm' && resultState === 'none' && tabView === 'panels'" layout-padding class="wz-padding-top-0">
+        <span ng-click="switchSyscheckFiles()" class="btn pull-right btn-primary"><i class="fa fa-fw fa-database"></i>
+            Show state</span>
+    </div>
+    <div layout="row" ng-if="!showSyscheckFiles && !showRootcheckScan && tab === 'pm' && resultState === 'none' && tabView === 'panels'"
+        layout-padding class="wz-padding-top-0">
         <span flex></span>
-        <span ng-click="launchRootcheckScan()" class="btn pull-right btn-primary"><i class="fa fa-fw fa-play"></i> Run scan</span>
+        <span ng-click="launchRootcheckScan()" class="btn pull-right btn-primary"><i class="fa fa-fw fa-play"></i> Run
+            scan</span>
         <span></span>
-        <span ng-click="switchRootcheckScan()" class="btn pull-right btn-primary"><i class="fa fa-fw fa-database"></i> Show state</span>
-    </div> 
-    <div layout="row" class="wz-margin-top-10 wz-margin-right-8 wz-margin-left-8" ng-if="!showSyscheckFiles && !showRootcheckScan && tab !== 'welcome' && tab !== 'configuration' && tab !== 'syscollector'" ng-show="resultState === 'none' && tabView === 'panels'">
+        <span ng-click="switchRootcheckScan()" class="btn pull-right btn-primary"><i class="fa fa-fw fa-database"></i>
+            Show state</span>
+    </div>
+    <div layout="row" class="wz-margin-top-10 wz-margin-right-8 wz-margin-left-8" ng-if="!showSyscheckFiles && !showRootcheckScan && tab !== 'welcome' && tab !== 'configuration' && tab !== 'syscollector'"
+        ng-show="resultState === 'none' && tabView === 'panels'">
         <div flex class="euiCallOut euiCallOut--warning">
             <div class="euiCallOutHeader">
-                <svg class="euiIcon euiIcon--medium euiCallOutHeader__icon" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="16" height="16" viewBox="0 0 16 16"><defs><path id="help-a" d="M13.6 12.186l-1.357-1.358c-.025-.025-.058-.034-.084-.056.53-.794.84-1.746.84-2.773a4.977 4.977 0 0 0-.84-2.772c.026-.02.059-.03.084-.056L13.6 3.813a6.96 6.96 0 0 1 0 8.373zM8 15A6.956 6.956 0 0 1 3.814 13.6l1.358-1.358c.025-.025.034-.057.055-.084C6.02 12.688 6.974 13 8 13a4.978 4.978 0 0 0 2.773-.84c.02.026.03.058.056.083l1.357 1.358A6.956 6.956 0 0 1 8 15zm-5.601-2.813a6.963 6.963 0 0 1 0-8.373l1.359 1.358c.024.025.057.035.084.056A4.97 4.97 0 0 0 3 8c0 1.027.31 1.98.842 2.773-.027.022-.06.031-.084.056l-1.36 1.358zm5.6-.187A4 4 0 1 1 8 4a4 4 0 0 1 0 8zM8 1c1.573 0 3.019.525 4.187 1.4l-1.357 1.358c-.025.025-.035.057-.056.084A4.979 4.979 0 0 0 8 3a4.979 4.979 0 0 0-2.773.842c-.021-.027-.03-.059-.055-.084L3.814 2.4A6.957 6.957 0 0 1 8 1zm0-1a8.001 8.001 0 1 0 .003 16.002A8.001 8.001 0 0 0 8 0z"></path></defs><use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#help-a" fill-rule="evenodd"></use></svg>
+                <svg class="euiIcon euiIcon--medium euiCallOutHeader__icon" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
+                    xmlns:xlink="http://www.w3.org/1999/xlink" width="16" height="16" viewBox="0 0 16 16">
+                    <defs>
+                        <path id="help-a" d="M13.6 12.186l-1.357-1.358c-.025-.025-.058-.034-.084-.056.53-.794.84-1.746.84-2.773a4.977 4.977 0 0 0-.84-2.772c.026-.02.059-.03.084-.056L13.6 3.813a6.96 6.96 0 0 1 0 8.373zM8 15A6.956 6.956 0 0 1 3.814 13.6l1.358-1.358c.025-.025.034-.057.055-.084C6.02 12.688 6.974 13 8 13a4.978 4.978 0 0 0 2.773-.84c.02.026.03.058.056.083l1.357 1.358A6.956 6.956 0 0 1 8 15zm-5.601-2.813a6.963 6.963 0 0 1 0-8.373l1.359 1.358c.024.025.057.035.084.056A4.97 4.97 0 0 0 3 8c0 1.027.31 1.98.842 2.773-.027.022-.06.031-.084.056l-1.36 1.358zm5.6-.187A4 4 0 1 1 8 4a4 4 0 0 1 0 8zM8 1c1.573 0 3.019.525 4.187 1.4l-1.357 1.358c-.025.025-.035.057-.056.084A4.979 4.979 0 0 0 8 3a4.979 4.979 0 0 0-2.773.842c-.021-.027-.03-.059-.055-.084L3.814 2.4A6.957 6.957 0 0 1 8 1zm0-1a8.001 8.001 0 1 0 .003 16.002A8.001 8.001 0 0 0 8 0z"></path>
+                    </defs>
+                    <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#help-a" fill-rule="evenodd"></use>
+                </svg>
                 <span class="euiCallOutHeader__title">There are no results for selected time range. Try another one.</span>
             </div>
         </div>

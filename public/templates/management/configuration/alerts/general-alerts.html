@@ -2,14 +2,8 @@
 <div flex="auto" layout="row" ng-if="!load && configurationSubTab === 'general-alerts'">
 
     <!-- No configuration section -->
-    <wz-no-config
-      flex
-      error="currentConfig['analysis-alerts']"
-      ng-if="currentConfig['analysis-alerts'] && isString(currentConfig['analysis-alerts'])"></wz-no-config>
-    <wz-no-config
-      flex
-      error="'not-present'"
-      ng-if="currentConfig['analysis-alerts'] && !isString(currentConfig['analysis-alerts']) && !currentConfig['analysis-alerts'].alerts"></wz-no-config>
+    <wz-no-config flex error="currentConfig['analysis-alerts']" ng-if="currentConfig['analysis-alerts'] && isString(currentConfig['analysis-alerts'])"></wz-no-config>
+    <wz-no-config flex error="'not-present'" ng-if="currentConfig['analysis-alerts'] && !isString(currentConfig['analysis-alerts']) && !currentConfig['analysis-alerts'].alerts"></wz-no-config>
     <!-- End no configuration section -->
 
     <!-- This section is the main content -->
@@ -35,17 +29,11 @@
                 <!-- Configuration block -->
                 <div class="wz-padding-top-10">
 
-                    <wz-config-item
-                        label="Minimum severity level to store the alert"
-                        value="currentConfig['analysis-alerts'].alerts.log_alert_level">
+                    <wz-config-item label="Minimum severity level to store the alert" value="currentConfig['analysis-alerts'].alerts.log_alert_level">
                     </wz-config-item>
-                    <wz-config-item
-                        label="Minimum severity level to send the alert by email"
-                        value="currentConfig['analysis-alerts'].alerts.email_alert_level">
+                    <wz-config-item label="Minimum severity level to send the alert by email" value="currentConfig['analysis-alerts'].alerts.email_alert_level">
                     </wz-config-item>
-                    <wz-config-item
-                        label="Enable GeoIP lookups"
-                        value="currentConfig['analysis-alerts'].use_geoip || 'no'">
+                    <wz-config-item label="Enable GeoIP lookups" value="currentConfig['analysis-alerts'].use_geoip || 'no'">
                     </wz-config-item>
 
                 </div>
@@ -60,13 +48,15 @@
     <!-- End main content section -->
 
     <!-- This section is the right sidenav content -->
-    <md-sidenav
-        class="md-sidenav-right"
-        md-is-locked-open="true">
-        <md-list>
+    <md-sidenav class="md-sidenav-right" style="width: auto !important;" md-is-locked-open="true">
+        <span class="wz-margin-right-8 wz-text-link wz-text-right wz-margin-top-8" ng-click="showHelp = !showHelp"><i
+                class="fa fa-fw fa-question-circle-o"></i></span>
+        <md-list ng-if="showHelp">
             <md-subheader>More info about this section</md-subheader>
-            <md-list-item target="_blank" class="wz-text-link" ng-href="https://documentation.wazuh.com/current/getting-started/use-cases.html">Use cases about alerts generation</md-list-item>
-            <md-list-item target="_blank" class="wz-text-link" ng-href="https://documentation.wazuh.com/current/user-manual/reference/ossec-conf/alerts.html">Alerts reference</md-list-item>
+            <md-list-item target="_blank" class="wz-text-link" ng-href="https://documentation.wazuh.com/current/getting-started/use-cases.html">Use
+                cases about alerts generation</md-list-item>
+            <md-list-item target="_blank" class="wz-text-link" ng-href="https://documentation.wazuh.com/current/user-manual/reference/ossec-conf/alerts.html">Alerts
+                reference</md-list-item>
         </md-list>
     </md-sidenav>
     <!-- End right sidenav section -->

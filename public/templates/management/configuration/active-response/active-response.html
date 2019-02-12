@@ -2,14 +2,8 @@
 <div flex="auto" layout="row" ng-if="!load && configurationSubTab === 'active-response'">
 
     <!-- No configuration section -->
-    <wz-no-config
-      flex
-      error="currentConfig['analysis-active_response']"
-      ng-if="currentConfig['analysis-active_response'] && isString(currentConfig['analysis-active_response'])"></wz-no-config>
-    <wz-no-config
-      flex
-      error="'not-present'"
-      ng-if="currentConfig['analysis-active_response'] && !isString(currentConfig['analysis-active_response']) && currentConfig['analysis-active_response']['active-response'] && !currentConfig['analysis-active_response']['active-response'].length"></wz-no-config>
+    <wz-no-config flex error="currentConfig['analysis-active_response']" ng-if="currentConfig['analysis-active_response'] && isString(currentConfig['analysis-active_response'])"></wz-no-config>
+    <wz-no-config flex error="'not-present'" ng-if="currentConfig['analysis-active_response'] && !isString(currentConfig['analysis-active_response']) && currentConfig['analysis-active_response']['active-response'] && !currentConfig['analysis-active_response']['active-response'].length"></wz-no-config>
     <!-- End no configuration section -->
 
     <!-- This section is the main content -->
@@ -39,7 +33,8 @@
                     <div flex="30" layout="column">
 
                         <md-list flex="auto" class="wz-item-list">
-                            <md-list-item class="wz-text-link" ng-click="updateSelectedItem($index)" ng-repeat="item in currentConfig['analysis-active_response']['active-response']">{{ item.command }}</md-list-item>
+                            <md-list-item class="wz-text-link" ng-click="updateSelectedItem($index)" ng-repeat="item in currentConfig['analysis-active_response']['active-response']">{{
+                                item.command }}</md-list-item>
                         </md-list>
 
                     </div>
@@ -49,37 +44,21 @@
                     <div flex layout="column">
 
                         <div flex="auto" class="wz-item-detail">
-                            <wz-config-item
-                                label="Status of this active response"
-                                value="currentConfig['analysis-active_response']['active-response'][selectedItem].disabled === 'yes' ? 'disabled' : 'enabled'">
+                            <wz-config-item label="Status of this active response" value="currentConfig['analysis-active_response']['active-response'][selectedItem].disabled === 'yes' ? 'disabled' : 'enabled'">
                             </wz-config-item>
-                            <wz-config-item
-                                label="Command to execute"
-                                value="currentConfig['analysis-active_response']['active-response'][selectedItem].command">
+                            <wz-config-item label="Command to execute" value="currentConfig['analysis-active_response']['active-response'][selectedItem].command">
                             </wz-config-item>
-                            <wz-config-item
-                                label="Execute the command on this location"
-                                value="currentConfig['analysis-active_response']['active-response'][selectedItem].location">
+                            <wz-config-item label="Execute the command on this location" value="currentConfig['analysis-active_response']['active-response'][selectedItem].location">
                             </wz-config-item>
-                            <wz-config-item
-                                label="Agent ID on which execute the command"
-                                value="currentConfig['analysis-active_response']['active-response'][selectedItem].agent_id">
+                            <wz-config-item label="Agent ID on which execute the command" value="currentConfig['analysis-active_response']['active-response'][selectedItem].agent_id">
                             </wz-config-item>
-                            <wz-config-item
-                                label="Match to this severity level or above"
-                                value="currentConfig['analysis-active_response']['active-response'][selectedItem].level">
+                            <wz-config-item label="Match to this severity level or above" value="currentConfig['analysis-active_response']['active-response'][selectedItem].level">
                             </wz-config-item>
-                            <wz-config-item
-                                label="Match to one of these groups"
-                                value="currentConfig['analysis-active_response']['active-response'][selectedItem].rules_group">
+                            <wz-config-item label="Match to one of these groups" value="currentConfig['analysis-active_response']['active-response'][selectedItem].rules_group">
                             </wz-config-item>
-                            <wz-config-item
-                                label="Match to one of these rule IDs"
-                                value="currentConfig['analysis-active_response']['active-response'][selectedItem].rules_id">
+                            <wz-config-item label="Match to one of these rule IDs" value="currentConfig['analysis-active_response']['active-response'][selectedItem].rules_id">
                             </wz-config-item>
-                            <wz-config-item
-                                label="Timeout (in seconds) before reverting"
-                                value="currentConfig['analysis-active_response']['active-response'][selectedItem].timeout">
+                            <wz-config-item label="Timeout (in seconds) before reverting" value="currentConfig['analysis-active_response']['active-response'][selectedItem].timeout">
                             </wz-config-item>
                         </div>
 
@@ -98,13 +77,15 @@
     <!-- End main content section -->
 
     <!-- This section is the right sidenav content -->
-    <md-sidenav
-        class="md-sidenav-right"
-        md-is-locked-open="true">
-        <md-list>
+    <md-sidenav class="md-sidenav-right" style="width: auto !important;" md-is-locked-open="true">
+        <span class="wz-margin-right-8 wz-text-link wz-text-right wz-margin-top-8" ng-click="showHelp = !showHelp"><i
+                class="fa fa-fw fa-question-circle-o"></i></span>
+        <md-list ng-if="showHelp">
             <md-subheader>More info about this section</md-subheader>
-            <md-list-item target="_blank" class="wz-text-link" ng-href="https://documentation.wazuh.com/current/user-manual/capabilities/active-response/index.html">Active response documentation</md-list-item>
-            <md-list-item target="_blank" class="wz-text-link" ng-href="https://documentation.wazuh.com/current/user-manual/reference/ossec-conf/active-response.html">Active response reference</md-list-item>
+            <md-list-item target="_blank" class="wz-text-link" ng-href="https://documentation.wazuh.com/current/user-manual/capabilities/active-response/index.html">Active
+                response documentation</md-list-item>
+            <md-list-item target="_blank" class="wz-text-link" ng-href="https://documentation.wazuh.com/current/user-manual/reference/ossec-conf/active-response.html">Active
+                response reference</md-list-item>
         </md-list>
     </md-sidenav>
     <!-- End right sidenav section -->
