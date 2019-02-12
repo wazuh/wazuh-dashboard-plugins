@@ -96,14 +96,14 @@
             <!-- End prematch section -->
         </div>
         <div layout="row" class="md-padding wz-padding-bottom-0" ng-if="!editingFile && dctrl.currentDecoder.file && dctrl.currentDecoder.path === '/var/ossec/etc/decoders' && adminMode">
-            <button ng-click='dctrl.editDecodersConfig(dctrl.currentDecoder)' class='btn btn-primary'><i aria-hidden='true'
+            <button ng-click='dctrl.editDecodersConfig(dctrl.currentDecoder)' class='btn wz-button'><i aria-hidden='true'
                     class='fa fa-fw fa-pencil'></i>
                 Edit decoder file
             </button>
         </div>
 
         <!-- Related decoders section -->
-        <div ng-show="!editingFile">
+        <div ng-show="!dctrl.editingFile">
             <div layout="row" class="md-padding wz-padding-top-10" ng-if="dctrl.currentDecoder">
                 <h1 class="md-headline wz-headline"><i class="fa fa-fw fa-link" aria-hidden="true"></i> Related
                     decoders</h1>
@@ -124,18 +124,18 @@
     <!-- End rest of decoder information -->
 
     <!-- XML editor for rules -->
-    <div layout="column" layout-align="start" ng-show="editingFile">
+    <div layout="column" layout-align="start" ng-show="dctrl.editingFile">
         <div layout="row" class="wz-margin-left-16">
             <span ng-click='dctrl.closeEditingFile()' class='btn btn-info'>Cancel</span>
-            <button ng-disabled='xmlHasErrors' ng-click='dctrl.doSaveDecoderConfig()' class='btn btn-primary pull-right wz-margin-left-8'>
-                <span ng-show='!xmlHasErrors'><i aria-hidden='true' class='fa fa-fw fa-save'></i>Save file</span>
-                <span ng-show='xmlHasErrors' class='btn-danger'><i aria-hidden='true' class='fa fa-fw fa-exclamation-triangle'></i>
+            <button ng-disabled='dctrl.xmlHasErrors' ng-click='dctrl.doSaveDecoderConfig()' class='btn wz-button pull-right wz-margin-left-8'>
+                <span ng-show='!dctrl.xmlHasErrors'><i aria-hidden='true' class='fa fa-fw fa-save'></i>Save file</span>
+                <span ng-show='dctrl.xmlHasErrors' class='btn-danger'><i aria-hidden='true' class='fa fa-fw fa-exclamation-triangle'></i>
                     XML format error</span>
             </button>
         </div>
-        <div class="md-padding md-padding-top-10" ng-if="fetchedXML" style="height: calc(100vh - 367px);">
-            <wz-xml-file-editor file-name='decoders' data="fetchedXML" target-name="currentDecoder.file" valid-fn='xmlIsValid(valid)'
-                close-fn='closeEditingFile(reload)'>
+        <div class="md-padding md-padding-top-10" ng-if="dctrl.fetchedXML" style="height: calc(100vh - 367px);">
+            <wz-xml-file-editor file-name='decoders' data="dctrl.fetchedXML" target-name="dctrl.currentDecoder.file"
+                valid-fn='dctrl.xmlIsValid(valid)' close-fn='dctrl.closeEditingFile(reload)'>
             </wz-xml-file-editor>
         </div>
     </div>

@@ -18,10 +18,7 @@
     <div flex="auto" layout="row" ng-if="!load">
 
         <!-- No configuration section -->
-        <wz-no-config
-          flex
-          error="currentConfig['agent-client']"
-          ng-if="currentConfig['agent-client'] && isString(currentConfig['agent-client'])"></wz-no-config>
+        <wz-no-config flex error="currentConfig['agent-client']" ng-if="currentConfig['agent-client'] && isString(currentConfig['agent-client'])"></wz-no-config>
         <!-- End no configuration section -->
 
         <!-- This section is the main content -->
@@ -47,29 +44,18 @@
                     <!-- Configuration block -->
                     <div class="wz-padding-top-10">
 
-                        <wz-config-item
-                            label="Method used to encrypt communications"
-                            value="currentConfig['agent-client'].client.crypto_method || 'aes'">
+                        <wz-config-item label="Method used to encrypt communications" value="currentConfig['agent-client'].client.crypto_method || 'aes'">
                         </wz-config-item>
-                        <wz-config-item
-                            label="Auto-restart the agent when receiving valid configuration from manager"
+                        <wz-config-item label="Auto-restart the agent when receiving valid configuration from manager"
                             value="currentConfig['agent-client'].client.auto_restart || 'yes'">
                         </wz-config-item>
-                        <wz-config-item
-                            label="Time (in seconds) between agent checkings to the manager"
-                            value="currentConfig['agent-client'].client.notify_time || '60'">
+                        <wz-config-item label="Time (in seconds) between agent checkings to the manager" value="currentConfig['agent-client'].client.notify_time || '60'">
                         </wz-config-item>
-                        <wz-config-item
-                            label="Time (in seconds) before attempting to reconnect"
-                            value="currentConfig['agent-client'].client['time-reconnect'] || '300'">
+                        <wz-config-item label="Time (in seconds) before attempting to reconnect" value="currentConfig['agent-client'].client['time-reconnect'] || '300'">
                         </wz-config-item>
-                        <wz-config-item
-                            label="Configuration profiles"
-                            value="currentConfig['agent-client'].client['config-profile'] || '-'">
+                        <wz-config-item label="Configuration profiles" value="currentConfig['agent-client'].client['config-profile'] || '-'">
                         </wz-config-item>
-                        <wz-config-item
-                            ng-if="currentConfig['agent-client'].client.local_ip"
-                            label="IP address used when the agent has multiple network interfaces"
+                        <wz-config-item ng-if="currentConfig['agent-client'].client.local_ip" label="IP address used when the agent has multiple network interfaces"
                             value="currentConfig['agent-client'].client.local_ip">
                         </wz-config-item>
 
@@ -114,13 +100,15 @@
         <!-- End main content section -->
 
         <!-- This section is the right sidenav content -->
-        <md-sidenav
-            class="md-sidenav-right"
-            md-is-locked-open="true">
-            <md-list>
+        <md-sidenav class="md-sidenav-right" style="width: auto !important;" md-is-locked-open="true">
+            <span class="wz-margin-right-8 wz-text-link wz-text-right wz-margin-top-8" ng-click="showHelp = !showHelp"><i
+                    class="fa fa-fw fa-question-circle-o"></i></span>
+            <md-list ng-if="showHelp">
                 <md-subheader>More info about this section</md-subheader>
-                <md-list-item target="_blank" class="wz-text-link" ng-href="https://documentation.wazuh.com/current/user-manual/agents/agent-connection.html">Checking connection with manager</md-list-item>
-                <md-list-item target="_blank" class="wz-text-link" ng-href="https://documentation.wazuh.com/current/user-manual/reference/ossec-conf/client.html">Client reference</md-list-item>
+                <md-list-item target="_blank" class="wz-text-link" ng-href="https://documentation.wazuh.com/current/user-manual/agents/agent-connection.html">Checking
+                    connection with manager</md-list-item>
+                <md-list-item target="_blank" class="wz-text-link" ng-href="https://documentation.wazuh.com/current/user-manual/reference/ossec-conf/client.html">Client
+                    reference</md-list-item>
             </md-list>
         </md-sidenav>
         <!-- End right sidenav section -->

@@ -19,10 +19,7 @@
     <div flex="auto" layout="row" ng-if="!load">
 
         <!-- No configuration section -->
-        <wz-no-config
-          flex
-          error="currentConfig['com-cluster']"
-          ng-if="currentConfig['com-cluster'] && isString(currentConfig['com-cluster'])"></wz-no-config>
+        <wz-no-config flex error="currentConfig['com-cluster']" ng-if="currentConfig['com-cluster'] && isString(currentConfig['com-cluster'])"></wz-no-config>
         <!-- End no configuration section -->
 
         <!-- This section is the main content -->
@@ -45,38 +42,21 @@
                     <!-- Configuration block -->
                     <div class="wz-padding-top-10">
 
-                        <wz-config-item
-                            label="Cluster status"
-                            value="currentConfig['com-cluster'].disabled === 'yes'? 'disabled' : 'enabled'">
+                        <wz-config-item label="Cluster status" value="currentConfig['com-cluster'].disabled === 'yes'? 'disabled' : 'enabled'">
                         </wz-config-item>
-                        <wz-config-item
-                            label="Cluster name"
-                            value="currentConfig['com-cluster'].name">
+                        <wz-config-item label="Cluster name" value="currentConfig['com-cluster'].name">
                         </wz-config-item>
-                        <wz-config-item
-                            label="Node name"
-                            value="currentConfig['com-cluster'].node_name">
+                        <wz-config-item label="Node name" value="currentConfig['com-cluster'].node_name">
                         </wz-config-item>
-                        <wz-config-item
-                            label="Node type"
-                            value="currentConfig['com-cluster'].node_type">
+                        <wz-config-item label="Node type" value="currentConfig['com-cluster'].node_type">
                         </wz-config-item>
-                        <wz-config-item
-                            is-array="true"
-                            label="Master node IP address"
-                            value="currentConfig['com-cluster'].nodes">
+                        <wz-config-item is-array="true" label="Master node IP address" value="currentConfig['com-cluster'].nodes">
                         </wz-config-item>
-                        <wz-config-item
-                            label="Port to listen to cluster communications"
-                            value="currentConfig['com-cluster'].port">
+                        <wz-config-item label="Port to listen to cluster communications" value="currentConfig['com-cluster'].port">
                         </wz-config-item>
-                        <wz-config-item
-                            label="IP address to listen to cluster communications"
-                            value="currentConfig['com-cluster'].bind_addr">
+                        <wz-config-item label="IP address to listen to cluster communications" value="currentConfig['com-cluster'].bind_addr">
                         </wz-config-item>
-                        <wz-config-item
-                            label="Hide cluster information in alerts"
-                            value="currentConfig['com-cluster'].hidden">
+                        <wz-config-item label="Hide cluster information in alerts" value="currentConfig['com-cluster'].hidden">
                         </wz-config-item>
 
                     </div>
@@ -91,13 +71,15 @@
         <!-- End main content section -->
 
         <!-- This section is the right sidenav content -->
-        <md-sidenav
-            class="md-sidenav-right"
-            md-is-locked-open="true">
-            <md-list>
+        <md-sidenav class="md-sidenav-right" style="width: auto !important;" md-is-locked-open="true">
+            <span class="wz-margin-right-8 wz-text-link wz-text-right wz-margin-top-8" ng-click="showHelp = !showHelp"><i
+                    class="fa fa-fw fa-question-circle-o"></i></span>
+            <md-list ng-if="showHelp">
                 <md-subheader>More info about this section</md-subheader>
-                <md-list-item target="_blank" class="wz-text-link" ng-href="https://documentation.wazuh.com/current/user-manual/manager/wazuh-cluster.html">How to configure the Wazuh cluster</md-list-item>
-                <md-list-item target="_blank" class="wz-text-link" ng-href="https://documentation.wazuh.com/current/user-manual/reference/ossec-conf/cluster.html">Wazuh cluster reference</md-list-item>
+                <md-list-item target="_blank" class="wz-text-link" ng-href="https://documentation.wazuh.com/current/user-manual/manager/wazuh-cluster.html">How
+                    to configure the Wazuh cluster</md-list-item>
+                <md-list-item target="_blank" class="wz-text-link" ng-href="https://documentation.wazuh.com/current/user-manual/reference/ossec-conf/cluster.html">Wazuh
+                    cluster reference</md-list-item>
             </md-list>
         </md-sidenav>
         <!-- End right sidenav section -->

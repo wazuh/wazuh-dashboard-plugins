@@ -60,7 +60,8 @@ export class ConfigHandler {
         {}
       );
 
-      const valid = (((validationError || {}).data || {}).data || {}).status === 'OK';
+      const valid =
+        (((validationError || {}).data || {}).data || {}).status === 'OK';
       if (!valid) {
         throw new Error('The configuration has some error.');
       }
@@ -83,7 +84,8 @@ export class ConfigHandler {
         {}
       );
 
-      const valid = (((validationError || {}).data || {}).data || {}).status === 'OK';
+      const valid =
+        (((validationError || {}).data || {}).data || {}).status === 'OK';
       if (!valid) {
         throw new Error('The configuration has some error.');
       }
@@ -106,7 +108,8 @@ export class ConfigHandler {
         {}
       );
 
-      const valid = (((validationError || {}).data || {}).data || {}).status === 'OK';
+      const valid =
+        (((validationError || {}).data || {}).data || {}).status === 'OK';
       if (!valid) {
         throw new Error('The configuration has some error.');
       }

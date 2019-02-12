@@ -35,6 +35,7 @@ export class ConfigurationController {
     this.$scope.configurationSubTab = '';
     this.$scope.integrations = {};
     this.$scope.selectedItem = 0;
+    this.$scope.showHelp = false;
   }
 
   /**

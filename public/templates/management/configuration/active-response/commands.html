@@ -2,14 +2,8 @@
 <div flex="auto" layout="row" ng-if="!load && configurationSubTab === 'commands'">
 
     <!-- No configuration section -->
-    <wz-no-config
-      flex
-      error="currentConfig['analysis-command']"
-      ng-if="currentConfig['analysis-command'] && isString(currentConfig['analysis-command'])"></wz-no-config>
-    <wz-no-config
-      flex
-      error="'not-present'"
-      ng-if="currentConfig['analysis-command'] && !isString(currentConfig['analysis-command']) && currentConfig['analysis-command'].command && !currentConfig['analysis-command'].command.length"></wz-no-config>
+    <wz-no-config flex error="currentConfig['analysis-command']" ng-if="currentConfig['analysis-command'] && isString(currentConfig['analysis-command'])"></wz-no-config>
+    <wz-no-config flex error="'not-present'" ng-if="currentConfig['analysis-command'] && !isString(currentConfig['analysis-command']) && currentConfig['analysis-command'].command && !currentConfig['analysis-command'].command.length"></wz-no-config>
     <!-- End no configuration section -->
 
     <!-- This section is the main content -->
@@ -22,7 +16,8 @@
                     <div>
                         <span class="font-size-16">Command definitions</span>
                         <div class="wz-margin-top-10">
-                            <span class="md-subheader small">Find here all the currently defined commands used for Active response</span>
+                            <span class="md-subheader small">Find here all the currently defined commands used for
+                                Active response</span>
                         </div>
                     </div>
                     <span flex></span>
@@ -49,25 +44,15 @@
                     <div flex layout="column" ng-if="currentConfig['analysis-command'].command.length">
 
                         <div flex="auto" class="wz-item-detail">
-                            <wz-config-item
-                                label="Command name"
-                                value="currentConfig['analysis-command'].command[selectedItem].name">
+                            <wz-config-item label="Command name" value="currentConfig['analysis-command'].command[selectedItem].name">
                             </wz-config-item>
-                            <wz-config-item
-                                label="Name of executable file"
-                                value="currentConfig['analysis-command'].command[selectedItem].executable">
+                            <wz-config-item label="Name of executable file" value="currentConfig['analysis-command'].command[selectedItem].executable">
                             </wz-config-item>
-                            <wz-config-item
-                                label="List of expected fields"
-                                value="currentConfig['analysis-command'].command[selectedItem].expect">
+                            <wz-config-item label="List of expected fields" value="currentConfig['analysis-command'].command[selectedItem].expect">
                             </wz-config-item>
-                            <wz-config-item
-                                label="Extra arguments"
-                                value="currentConfig['analysis-command'].command[selectedItem].extra_args">
+                            <wz-config-item label="Extra arguments" value="currentConfig['analysis-command'].command[selectedItem].extra_args">
                             </wz-config-item>
-                            <wz-config-item
-                                label="Allow this command to be reverted"
-                                value="currentConfig['analysis-command'].command[selectedItem].timeout_allowed ? 'yes' : 'no'">
+                            <wz-config-item label="Allow this command to be reverted" value="currentConfig['analysis-command'].command[selectedItem].timeout_allowed ? 'yes' : 'no'">
                             </wz-config-item>
                         </div>
 
@@ -85,13 +70,15 @@
     <!-- End main content section -->
 
     <!-- This section is the right sidenav content -->
-    <md-sidenav
-        class="md-sidenav-right"
-        md-is-locked-open="true">
-        <md-list>
+    <md-sidenav class="md-sidenav-right" style="width: auto !important;" md-is-locked-open="true">
+        <span class="wz-margin-right-8 wz-text-link wz-text-right wz-margin-top-8" ng-click="showHelp = !showHelp"><i
+                class="fa fa-fw fa-question-circle-o"></i></span>
+        <md-list ng-if="showHelp">
             <md-subheader>More info about this section</md-subheader>
-            <md-list-item target="_blank" class="wz-text-link" ng-href="https://documentation.wazuh.com/current/user-manual/capabilities/active-response/index.html">Active response documentation</md-list-item>
-            <md-list-item target="_blank" class="wz-text-link" ng-href="https://documentation.wazuh.com/current/user-manual/reference/ossec-conf/commands.html">Commands reference</md-list-item>
+            <md-list-item target="_blank" class="wz-text-link" ng-href="https://documentation.wazuh.com/current/user-manual/capabilities/active-response/index.html">Active
+                response documentation</md-list-item>
+            <md-list-item target="_blank" class="wz-text-link" ng-href="https://documentation.wazuh.com/current/user-manual/reference/ossec-conf/commands.html">Commands
+                reference</md-list-item>
         </md-list>
     </md-sidenav>
     <!-- End right sidenav section -->

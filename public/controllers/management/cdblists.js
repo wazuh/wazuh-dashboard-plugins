@@ -241,7 +241,23 @@ export class CdbListsController {
       );
     this.viewingDetail = false;
     this.currentList = false;
+    this.addingList = false;
     this.$scope.$emit('removeCurrentList');
     if (!this.$scope.$$phase) this.$scope.$digest();
+  }
+
+  addNewList() {
+    this.addingList = true;
+    this.currentList = {
+      name: '',
+      path: 'etc/lists/',
+      list: [],
+      new: true
+    };
+    this.viewingDetail = true;
+    if (!this.$scope.$$phase) this.$scope.$digest();
+    this.$scope.$broadcast('changeCdbList', {
+      currentList: this.currentList
+    });
   }
 }

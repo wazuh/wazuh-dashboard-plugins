@@ -1,7 +1,7 @@
 <div layout="column" layout-align="start">
     <div layout="row" class="wz-margin-top-8 md-padding-h">
         <button ng-disabled='items.length === 0 || (currentList.new && !currentList.newName)' ng-click='saveList()'
-            class='btn btn-primary pull-right'>
+            class='btn wz-button pull-right'>
             <span><i aria-hidden='true' class='fa fa-fw fa-save'></i>Save list</span>
         </button>
         <input ng-show="currentList.new && !currentList.name" placeholder="Enter list file name" ng-model="currentList.newName"

@@ -36,6 +36,11 @@ export function parseValue(key, item, instancePath) {
   ) {
     return '-';
   }
+
+  if ((item || {})[key] === '(null)') {
+    return '-';
+  }
+
   const isComposedString = typeof key === 'string' && key.includes('.');
   const isComposedObject =
     typeof key === 'object' && key.value && key.value.includes('.');

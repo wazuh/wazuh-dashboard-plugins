@@ -43,6 +43,7 @@ export class DecodersController {
     this.wzTableFilter = wzTableFilter;
     this.wazuhConfig = wazuhConfig;
     this.rulesetHandler = rulesetHandler;
+    this.showingLocalDecoders = false;
   }
 
   /**
@@ -213,34 +214,34 @@ export class DecodersController {
   }
 
   async editDecodersConfig() {
-    this.$scope.editingFile = true;
+    this.editingFile = true;
     try {
-      this.$scope.fetchedXML = await this.rulesetHandler.getDecoderConfiguration(
+      this.fetchedXML = await this.rulesetHandler.getDecoderConfiguration(
         this.currentDecoder.file
       );
       this.$location.search('editingFile', true);
       this.appState.setNavigation({ status: true });
       if (!this.$scope.$$phase) this.$scope.$digest();
-      this.$scope.$broadcast('fetchedFile', { data: this.$scope.fetchedXML });
+      this.$scope.$broadcast('fetchedFile', { data: this.fetchedXML });
     } catch (error) {
-      this.$scope.fetchedXML = null;
+      this.fetchedXML = null;
       this.errorHandler.handle(error, 'Fetch file error');
     }
   }
 
   closeEditingFile() {
-    this.$scope.editingFile = false;
+    this.editingFile = false;
     this.appState.setNavigation({ status: true });
     this.$scope.$broadcast('closeEditXmlFile', {});
   }
 
   xmlIsValid(valid) {
-    this.$scope.xmlHasErrors = valid;
+    this.xmlHasErrors = valid;
     if (!this.$scope.$$phase) this.$scope.$digest();
   }
 
   doSaveDecoderConfig() {
-    this.$scope.editingFile = false;
+    this.editingFile = false;
     this.$scope.$broadcast('saveXmlFile', { decoder: this.currentDecoder });
   }
 
@@ -269,5 +270,73 @@ export class DecodersController {
     this.closeEditingFile();
     this.$scope.$emit('removeCurrentDecoder');
     if (!this.$scope.$$phase) this.$scope.$digest();
+  }
+
+  addNewFile(type) {
+    this.editingFile = true;
+    this.newFile = true;
+    this.newFileName = '';
+    this.selectedFileName = this.selectedRulesetTab;
+    this.selectedItem = { file: 'new file' };
+    this.fetchedXML = '<!-- Modify it at your will. -->';
+    this.type = type;
+    if (!this.$scope.$$phase) this.$scope.$digest();
+    this.$location.search('editingFile', true);
+    this.appState.setNavigation({ status: true });
+    this.$scope.$emit('fetchedFile', { data: this.fetchedXML });
+  }
+
+  doSaveConfig(isNewFile, fileName) {
+    const clusterInfo = this.appState.getClusterInfo();
+    const showRestartManager =
+      clusterInfo.status === 'enabled' ? 'cluster' : 'manager';
+    if (isNewFile && !fileName) {
+      this.errorHandler.handle(
+        'You need to specify a file name',
+        'Error creating a new file.'
+      );
+      return false;
+    } else {
+      if (isNewFile) {
+        const validFileName = /(.+).xml/;
+        const containsNumber = /.*[0-9].*/;
+        if (fileName && !validFileName.test(fileName)) {
+          fileName = fileName + '.xml';
+        }
+        if (containsNumber.test(fileName)) {
+          this.errorHandler.handle(
+            'The filename can not contain numbers',
+            'Error creating a new file.'
+          );
+          return false;
+        }
+        this.selectedItem = { file: fileName };
+        if (this.type === 'rules') {
+          this.$scope.$broadcast('saveXmlFile', {
+            rule: this.selectedItem,
+            showRestartManager
+          });
+        } else if (this.type === 'decoders') {
+          this.$scope.$broadcast('saveXmlFile', {
+            decoder: this.selectedItem,
+            showRestartManager
+          });
+        }
+      } else {
+        const objParam =
+          this.selectedRulesetTab === 'rules'
+            ? {
+                rule: this.selectedItem,
+                showRestartManager
+              }
+            : {
+                decoder: this.selectedItem,
+                showRestartManager
+              };
+        this.$scope.$broadcast('saveXmlFile', objParam);
+      }
+      //$scope.editingFile = false;
+      //$scope.fetchedXML = null;
+    }
   }
 }
