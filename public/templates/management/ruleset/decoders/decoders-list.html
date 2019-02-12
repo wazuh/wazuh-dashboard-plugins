@@ -1,16 +1,10 @@
 <div ng-if="!loading && !dctrl.viewingDetail" layout="column">
-    <div layout="row" ng-if="!dctrl.editingFile" class="wz-padding-left-16 wz-padding-top-10">
-        <a class="small" ng-click="dctrl.addNewFile('decoders')">Add new decoder <i aria-hidden="true" class="fa fa-plus"></i></a>
-    </div>
     <div id="content" layout="row" layout-align="start start" class="md-padding" ng-if="!dctrl.editingFile">
         <input flex placeholder="Filter decoders..." ng-model="dctrl.custom_search" type="text" class="kuiLocalSearchInput height-40  ng-empty ng-pristine ng-scope ng-touched ng-valid"
             aria-invalid="false" wz-enter="dctrl.search(dctrl.custom_search)">
         <button type="submit" aria-label="Search" class="kuiLocalSearchButton height-40 wz-margin-right-8" ng-click="dctrl.search(dctrl.custom_search)">
             <span class="fa fa-search" aria-hidden="true"></span>
         </button>
-        <md-switch ng-model="dctrl.showingLocalDecoders" class="md-primary wz-no-top-bottom-margin height-40 wz-padding-left-16">
-            Custom
-        </md-switch>
     </div>
 
     <md-chips class="wz-chips md-padding-h wz-padding-bottom-14" readonly="true" ng-show="dctrl.appliedFilters.length"
@@ -30,6 +24,13 @@
     <div layout="row">
         <md-card flex class="wz-md-card _md flex md-margin-h" ng-if="!dctrl.editingFile">
             <md-card-content>
+                <div layout="row" ng-if="!dctrl.editingFile">
+                    <a ng-click="dctrl.addNewFile('decoders')">Add new decoder <i aria-hidden="true" class="fa fa-plus"></i></a>
+                    <span flex></span>
+                    <md-switch ng-model="dctrl.showingLocalDecoders" class="md-primary wz-no-top-bottom-margin">
+                        Only custom
+                    </md-switch>
+                </div>
                 <wz-table ng-if="!dctrl.showingLocalDecoders" implicit-filter="dctrl.appliedFilters" flex path="'/decoders'"
                     keys="['name',{value:'details.program_name',size:2,nosortable:true},{value:'details.order',size:2,nosortable:true},'file']"
                     allow-click="true" row-sizes="[18,15,13]">
