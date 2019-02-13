@@ -1,11 +1,12 @@
-<md-content flex layout="column" ng-if="octrl.tab === 'aws' && octrl.tabView === 'panels'" layout-align="start">
-    <div layout="column" layout-align="center center" ng-if="octrl.tab === 'aws'" ng-show="resultState === 'ready' && octrl.tabView === 'panels' && !rendered">
+<md-content flex layout="column" ng-if="octrl.tab === 'aws' && octrl.tabView === 'panels'" layout-align="start" ng-show="resultState === 'ready' && octrl.tabView === 'panels' && !rendered">
+    <div layout="column" layout-align="center center" ng-if="octrl.tab === 'aws'">
         <div class="percentage"><i class="fa fa-fw fa-spin fa-spinner" aria-hidden="true"></i></div>
         <div class="percentage">{{loadingStatus}}</div>
     </div>
 </md-content>
 
-<md-content flex layout="column" ng-if="octrl.tab === 'aws' && octrl.tabView === 'panels'" ng-class="{'no-opacity': resultState !== 'ready' || !rendered}" layout-align="start">
+<md-content flex layout="column" ng-if="octrl.tab === 'aws' && octrl.tabView === 'panels'" ng-class="{'no-opacity': resultState !== 'ready' || !rendered}"
+    layout-align="start">
     <div layout="row" class="height-250">
         <md-card flex class="wz-md-card">
             <md-card-content class="wazuh-column">
@@ -36,7 +37,7 @@
             </md-card-content>
         </md-card>
     </div>
-    
+
     <div layout="row" class="height-300">
         <md-card flex="50" class="wz-md-card">
             <md-card-content class="wazuh-column">
@@ -55,7 +56,7 @@
     </div>
 
     <div layout="row" class="height-310">
-        <md-card flex class="wz-md-card">
+        <md-card flex="40" class="wz-md-card">
             <md-card-content class="wazuh-column">
                 <span class="wz-headline-title">Top 5 buckets</span>
                 <md-divider class="wz-margin-top-10"></md-divider>
