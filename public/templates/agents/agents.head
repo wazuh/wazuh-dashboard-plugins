@@ -189,7 +189,8 @@
             scan</span>
         <span></span>
         <span ng-click="switchRootcheckScan()" class="btn pull-right btn-primary"><i class="fa fa-fw fa-database"></i>
-            Show state</span>
+            Show
+            state</span>
     </div>
     <div layout="row" class="wz-margin-top-10 wz-margin-right-8 wz-margin-left-8" ng-if="!showSyscheckFiles && !showRootcheckScan && tab !== 'welcome' && tab !== 'configuration' && tab !== 'syscollector'"
         ng-show="resultState === 'none' && tabView === 'panels'">
