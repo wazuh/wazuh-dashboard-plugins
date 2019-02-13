@@ -291,7 +291,10 @@ app.directive('wzXmlFileEditor', function() {
                 try {
                   const data = await configHandler.restartManager();
                   $('body').removeClass('md-dialog-body');
-                  errorHandler.info('It may take a few seconds...', data.data.data);
+                  errorHandler.info(
+                    'It may take a few seconds...',
+                    data.data.data
+                  );
                   rootScope.$emit('removeRestarting', {});
                   scope.$applyAsync();
                 } catch (error) {
@@ -305,7 +308,10 @@ app.directive('wzXmlFileEditor', function() {
                 try {
                   const data = await configHandler.restartCluster();
                   $('body').removeClass('md-dialog-body');
-                  errorHandler.info('It may take a few seconds...', data.data.data);
+                  errorHandler.info(
+                    'It may take a few seconds...',
+                    data.data.data
+                  );
                   rootScope.$emit('removeRestarting', {});
                   scope.$applyAsync();
                 } catch (error) {
@@ -319,7 +325,10 @@ app.directive('wzXmlFileEditor', function() {
                 try {
                   const data = await configHandler.restartNode(target);
                   $('body').removeClass('md-dialog-body');
-                  errorHandler.info('It may take a few seconds...', data.data.data);
+                  errorHandler.info(
+                    'It may take a few seconds...',
+                    data.data.data
+                  );
                   rootScope.$emit('removeRestarting', {});
                   scope.$applyAsync();
                 } catch (error) {

@@ -52,7 +52,6 @@
             <span class="wz-agent-status-indicator small" ng-class="getAgentStatusClass(agent.status)" aria-label="Agent status indicator">{{formatAgentStatus(agent.status)}}</span>
         </div>
         <!-- End agent status section -->
-
         <!-- Separator -->
         <span flex></span>
         <!-- End separator -->

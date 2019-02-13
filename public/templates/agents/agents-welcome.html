@@ -17,10 +17,15 @@
 <div layout="column" class="" layout-align="start stretch" ng-if="tab === 'welcome'" ng-show="!load && agent">
 
     <!-- Headline -->
-    <div layout="column" layout-padding>
+    <div layout="row" layout-padding class="wz-margin-right-8">
         <span class="font-size-18"><i class="fa fa-fw fa-tv" aria-hidden="true"></i> {{ agent.name || '-' }} <span
                 class="wz-text-bold wz-text-link" ng-click="goDiscover()" tooltip="Discover"><i class="fa fa-fw fa-compass"
                     aria-hidden="true"></i></span></span>
+        <span flex></span>
+        <button ng-disabled="restartingAgent" class="btn wz-button" ng-disabled="isRestarting" ng-click="restartAgent(agent)"><i
+                class="fa fa-refresh"></i>
+            Restart agent
+        </button>
     </div>
     <!-- End headline -->
 
@@ -28,8 +33,8 @@
         <md-card flex class="wz-md-card">
             <md-card-content>
 
-                <div layout="row">
-                    <div layout="column" flex class="wz-padding-right-8">
+                <div layout="row" layout-padding>
+                    <div layout="column" flex>
                         <div layout="row">
                             <span class="font-size-16">Details</span>
                         </div>
@@ -69,65 +74,31 @@
                                 There are no more groups available.
                             </div>
                         </div>
-                        <div ng-if="agent.group && editGroup && !addingGroupToAgent && groups && groups.length" class="wz-margin-top-4">
-                            <span ng-repeat="group in groups" class="wz-text-bold wz-text-link" ng-click="showConfirmAddGroup(group)">{{
-                                group }}&nbsp;</span>
-                        </div>
+                        <div layout="row" class="wz-padding-top-10">
+                            <span flex="25">Last syscheck scan</span>
+                            <span class="wz-text-right color-grey" ng-if="agent.syscheck.inProgress">Scan in progress</span>
+                            <span class="wz-text-right color-grey" ng-if="!agent.syscheck.inProgress">{{agent.syscheck.end
+                                || '-'}} <md-tooltip ng-if="!agent.syscheck.inProgress && agent.syscheck.start && agent.syscheck.end"
+                                    md-direction="bottom" class="wz-tooltip">
+                                    Start time: {{ agent.syscheck.start || '-'}} <br>
+                                    End time: {{ agent.syscheck.end || '-'}} <br>
+                                    Duration time: {{ agent.syscheck.duration +' minutes' || '-'}}
+                                </md-tooltip></span>
 
-                        <div class="wz-margin-top-10 confirmEmbedBubble" ng-if="agent.group && editGroup && addingGroupToAgent">
-                            <div layout="row">
-                                <span class="font-size-12  wz-padding-left-8">Group {{addingGroupToAgent}} will be
-                                    added to agent {{agent.id}}</span>
-                            </div>
-                            <div layout="row">
-                                <md-button class="cancelBtn" type="button" ng-click="cancelAddGroup()">Cancel</md-button>
-                                <md-button class="agreeBtn" type="button" ng-click="confirmAddGroup(addingGroupToAgent)"><i
-                                        aria-hidden='true' class='fa fa-fw fa-check'></i> Confirm</md-button>
-                            </div>
                         </div>
-                        <div layout="row" layout-padding ng-if="agent.group" class="wz-word-break">
-                            <span ng-repeat="group in agent.group" class="wz-text-bold wz-text-link" ng-click="goGroups(agent,$index)">{{
-                                group
-                                }}&nbsp;</span>
+                        <div layout="row" class="wz-padding-top-10">
+                            <span flex="25">Last rootcheck scan</span>
+                            <span class="wz-text-right color-grey" ng-if="agent.rootcheck.inProgress">Scan in progress</span>
+                            <span class="wz-text-right color-grey" ng-if="!agent.rootcheck.inProgress">{{agent.rootcheck.end
+                                || '-'}} <md-tooltip ng-if="!agent.rootcheck.inProgress && agent.rootcheck.start && agent.rootcheck.end"
+                                    md-direction="bottom" class="wz-tooltip">
+                                    Start time: {{ agent.rootcheck.start || '-'}} <br>
+                                    End time: {{ agent.rootcheck.end || '-'}} <br>
+                                    Duration time: {{ agent.rootcheck.duration +' minutes' || '-'}}
+                                </md-tooltip></span>
                         </div>
                     </div>
                 </div>
-
-            </md-card-content>
-        </md-card>
-    </div>
-    <div layout="row" layout-padding class="wz-padding-top-0 wz-padding-bottom-0">
-        <md-card flex class="wz-md-card">
-            <md-card-content layout="row">
-
-                <span flex>Last keep alive
-                    <span class="color-grey">{{agent.lastKeepAlive || '-' }}</span>
-                </span>
-                <span flex>Registration date
-                    <span class="color-grey">{{agent.dateAdd || '-'}}</span>
-                </span>
-                <span flex>Last syscheck scan
-                    <span class="color-grey" ng-if="agent.syscheck.inProgress">Scan in progress</span>
-                    <span class="color-grey" ng-if="!agent.syscheck.inProgress">{{agent.syscheck.end
-                        || '-'}} <md-tooltip ng-if="!agent.syscheck.inProgress && agent.syscheck.start && agent.syscheck.end"
-                            md-direction="bottom" class="wz-tooltip">
-                            Start time: {{ agent.syscheck.start || '-'}} <br>
-                            End time: {{ agent.syscheck.end || '-'}} <br>
-                            Duration time: {{ agent.syscheck.duration +' minutes' || '-'}}
-                        </md-tooltip></span>
-                </span>
-
-                <span flex>Last rootcheck scan
-                    <span class="color-grey" ng-if="agent.rootcheck.inProgress">Scan in progress</span>
-                    <span class="color-grey" ng-if="!agent.rootcheck.inProgress">{{agent.rootcheck.end
-                        || '-'}}
-                        <md-tooltip ng-if="!agent.rootcheck.inProgress && agent.rootcheck.start && agent.rootcheck.end"
-                            md-direction="bottom" class="wz-tooltip">
-                            Start time: {{ agent.rootcheck.start || '-'}} <br>
-                            End time: {{ agent.rootcheck.end || '-'}} <br>
-                            Duration time: {{ agent.rootcheck.duration +' minutes' || '-'}}
-                        </md-tooltip></span>
-                </span>
             </md-card-content>
         </md-card>
     </div>

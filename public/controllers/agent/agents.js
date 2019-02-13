@@ -196,6 +196,34 @@ export class AgentsController {
       this.$location.path('/manager/groups');
     };
 
+    this.$scope.restartAgent = async agent => {
+      this.$scope.restartingAgent = true;
+      try {
+        const data = await this.apiReq.request(
+          'PUT',
+          `/agents/${agent.id}/restart`,
+          {}
+        );
+        const result = ((data || {}).data || {}).data || false;
+        const failed =
+          result &&
+          Array.isArray(result.failed_ids) &&
+          result.failed_ids.length;
+        if (failed) {
+          throw new Error(result.failed_ids[0].error.message);
+        } else if (result) {
+          this.errorHandler.info(result.msg, '');
+        } else {
+          throw new Error('Unexpected error upgrading agent');
+        }
+        this.$scope.restartingAgent = false;
+      } catch (error) {
+        this.errorHandler.handle(error, '');
+        this.$scope.restartingAgent = false;
+      }
+      this.$scope.$applyAsync();
+    };
+
     const configuration = this.wazuhConfig.getConfig();
     this.$scope.adminMode = !!(configuration || {}).admin;
 
@@ -710,6 +738,41 @@ export class AgentsController {
           item =>
             this.$scope.agent.group && !this.$scope.agent.group.includes(item)
         );
+
+      const outdatedAgents = await this.apiReq.request(
+        'GET',
+        '/agents/outdated/',
+        {}
+      );
+      this.$scope.agent.outdated = outdatedAgents.data.data.items
+        .map(x => x.id)
+        .find(x => x === this.$scope.agent.id);
+
+      if (this.$scope.agent.outdated) {
+        if (
+          this.appState.getSessionStorageItem(
+            `updatingAgent${this.$scope.agent.id}`
+          )
+        ) {
+          this.$scope.agent.upgrading = true;
+        }
+      } else {
+        if (
+          this.appState.getSessionStorageItem(
+            `updatingAgent${this.$scope.agent.id}`
+          )
+        ) {
+          this.appState.removeSessionStorageItem(
+            `updatingAgent${this.$scope.agent.id}`
+          );
+          this.$scope.agent.outdated = false;
+        }
+        if (!this.$scope.$$phase) this.$scope.$digest();
+      }
+
+      this.$scope.load = false;
+      if (!this.$scope.$$phase) this.$scope.$digest();
+      return;
     } catch (error) {
       if (!this.$scope.agent) {
         if ((error || {}).status === -1) {
