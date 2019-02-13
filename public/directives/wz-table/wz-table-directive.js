@@ -69,12 +69,6 @@ app.directive('wzTable', function() {
       const configuration = wazuhConfig.getConfig();
       $scope.adminMode = !!(configuration || {}).admin;
 
-      if (instance.path === '/agents') {
-        apiReq.request('GET', '/agents/outdated/', {}).then((data) => {
-          $scope.outdatedAgents = data.data.data.items.map(x => x.id);
-          return init();
-        });
-      }
       /**
        * Resizing. Calculate number of table rows depending on the screen height
        */
@@ -122,19 +116,6 @@ app.directive('wzTable', function() {
           items = options.realTime ? result.items.slice(0, 10) : result.items;
           $scope.time = result.time;
           $scope.totalItems = items.length;
-          if ($scope.outdatedAgents) {
-            $scope.outdatedAgents.forEach(function (id) {
-              const item = items.find(function (item) {
-                return item.id === id;
-              });
-              if (item){
-                item.outdated = true;
-                if(appState.getSessionStorageItem(`updatingAgent${item.id}`)){
-                  item.upgrading = true;
-                }
-              }
-            });
-          }
           $scope.items = items;
           checkGap($scope, items);
           $scope.searchTable();
@@ -333,32 +314,6 @@ app.directive('wzTable', function() {
 
       $scope.cancelRemoveGroup = () => {
         $scope.removingGroup = null;
-      };
-
-      $scope.updateAgent = async agent => {
-        agent.upgrading = true;
-        this.appState.setSessionStorageItem(`updatingAgent${agent.id}`, true);
-        try {
-          const data = await this.apiReq.request(
-            'PUT',
-            `/agents/${agent.id}/upgrade?wait_for_complete`,
-            {}
-          );
-          const err = data.data.error !== 0;
-          if (err) {
-            this.errorHandler(error,"Error upgrading");
-          } 
-        } catch (error) {
-          if (error.status === -1) {
-            error.message = "Aborted"
-            console.log(error)
-          }else{
-            this.errorHandler.handle(`${error.message || error}`, 'Error upgrading agent ' + agent.id);
-            agent.upgrading = false;
-            this.appState.removeSessionStorageItem(`updatingAgent${agent.id}`);
-          }
-        }
-        if (!this.$scope.$$phase) this.$scope.$digest();
       };
 
       $scope.confirmRemoveAgent = async agent => {

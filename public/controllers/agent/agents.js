@@ -198,6 +198,22 @@ export class AgentsController {
       this.$location.path('/manager/groups');
     };
 
+    this.$scope.restartAgent = async agent => {
+      this.$scope.restartingAgent = true;
+      try {
+        const data = await this.apiReq.request(
+          'PUT',
+          `/agents/${agent.id}/restart`,
+          {}
+        );
+        this.errorHandler.info(data.data.data.msg, '');
+        this.$scope.restartingAgent = false;
+      } catch (error) {
+        this.errorHandler.handle(`${error.message || error}`, 'Error restarting agent ' + agent.id);
+        this.$scope.restartingAgent = false;
+      }
+      this.$scope.$applyAsync();
+    }
 
     this.$scope.updateAgent = async agent => {
       agent.upgrading = true;
@@ -210,7 +226,7 @@ export class AgentsController {
         );
         const err = data.data.error !== 0;
         if (err) {
-          this.errorHandler(error, "Error upgrading agent");
+          this.errorHandler(err, "Error upgrading agent");
         }
       } catch (error) {
         if (error.status === -1) {

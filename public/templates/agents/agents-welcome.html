@@ -21,13 +21,6 @@
         <span class="font-size-18"><i class="fa fa-fw fa-tv" aria-hidden="true"></i> {{ agent.name || '-' }} <span
                 class="wz-text-bold wz-text-link" ng-click="goDiscover()" tooltip="Discover"><i class="fa fa-fw fa-compass"
                     aria-hidden="true"></i></span></span>
-        <div ng-show="agent.outdated && !agent.upgrading" class="wz-padding-left-16">
-            <button class="updateBtn" ng-click="updateAgent(agent); $event.stopPropagation()"><i class="fa fa-upload"
-                    aria-hidden="true"></i> Upgrade agent version</button>
-        </div>
-        <div ng-show="agent.outdated && agent.upgrading" class="wz-padding-left-16">
-            <span class="upgradingLabel"><i class="fa fa-fw fa-spin fa-spinner"></i> Upgrading agent...</span>
-        </div>
     </div>
     <!-- End headline -->
 
@@ -127,6 +120,30 @@
                 <div layout="row" layout-padding ng-if="agent.group" class="wz-word-break">
                     <span ng-repeat="group in agent.group" class="wz-text-bold wz-text-link" ng-click="goGroups(agent,$index)">{{
                         group }}&nbsp;</span>
+                </div>
+            </md-card-content>
+        </md-card>
+    </div>
+
+    <div layout="row" layout-padding class="wz-padding-top-0 wz-padding-bottom-0">
+        <md-card flex class="wz-md-card">
+            <md-card-content>
+                <div layout="row">
+                    <span class="font-size-16">Actions</span>
+                </div>
+                <md-divider class="wz-margin-top-10"></md-divider>
+                <div layout="row" class="wz-padding-top-10">
+                    <button ng-disabled="restartingAgent" class="btn btn-primary" ng-disabled="isRestarting" ng-click="restartAgent(agent)"><i
+                            class="fa fa-refresh"></i>
+                        Restart agent
+                    </button>
+                    <div ng-show="agent.outdated && !agent.upgrading" class="wz-padding-left-16">
+                        <button class="updateBtn btn" ng-click="updateAgent(agent)"><i class="fa fa-upload" aria-hidden="true"></i>
+                            Upgrade agent version</button>
+                    </div>
+                    <div ng-show="agent.outdated && agent.upgrading" class="wz-padding-left-16">
+                        <span class="upgradingLabel"><i class="fa fa-fw fa-spin fa-spinner"></i> Upgrading agent...</span>
+                    </div>
                 </div>
             </md-card-content>
         </md-card>
