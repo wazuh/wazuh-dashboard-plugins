@@ -68,7 +68,7 @@
             <div ng-show="editingFile">
                 <div layout="row" class="md-padding-h wz-margin-top-10">
                     <span ng-click='closeEditingFile()' class='btn btn-info'>Cancel</span>
-                    <button ng-disabled='xmlHasErrors' ng-click='doSaveGroupAgentConfig()' class='btn btn-primary pull-right wz-margin-left-8'>
+                    <button ng-disabled='xmlHasErrors' ng-click='doSaveGroupAgentConfig()' class='btn wz-button pull-right wz-margin-left-8'>
                         <span ng-show='!xmlHasErrors'><i aria-hidden='true' class='fa fa-fw fa-save'></i>Save file</span>
                         <span ng-show='xmlHasErrors' class='btn-danger'><i aria-hidden='true' class='fa fa-fw fa-exclamation-triangle'></i>
                             XML format error</span>
@@ -86,7 +86,7 @@
                 <div layout="row" class="md-padding" ng-if="lookingGroup && currentGroup && addingAgents">
                     <span ng-click='addMultipleAgents(false)' class='btn btn-info'>
                         Cancel</span>
-                    <span ng-hide='moreThan500' ng-click='saveAddAgents()' class='btn btn-primary wz-margin-left-8'><i
+                    <span ng-hide='moreThan500' ng-click='saveAddAgents()' class='btn wz-button wz-margin-left-8'><i
                             aria-hidden='true' class='fa fa-fw fa-save'></i>
                         Apply changes</span>
                     <span class='error-msg' ng-show='moreThan500'><i class="fa fa-exclamation-triangle"></i> It is not
@@ -95,11 +95,11 @@
 
                 <div layout="row" class="md-padding wz-padding-bottom-0" ng-if="lookingGroup && currentGroup && !addingAgents && !editingFile && !file && adminMode">
                     <button ng-if="lookingGroup && groupsSelectedTab==='files'" ng-click='editGroupAgentConfig(currentGroup)'
-                        class='btn btn-primary'><i aria-hidden='true' class='fa fa-fw fa-pencil'></i>
+                        class='btn wz-button'><i aria-hidden='true' class='fa fa-fw fa-pencil'></i>
                         Edit group configuration
                     </button>
                     <button ng-if="lookingGroup && groupsSelectedTab==='agents'" ng-disabled="currentGroup.name === 'default'"
-                        ng-click='addMultipleAgents(true)' class='btn btn-primary'><i aria-hidden='true' class='fa fa-fw fa-tv'></i>
+                        ng-click='addMultipleAgents(true)' class='btn wz-button'><i aria-hidden='true' class='fa fa-fw fa-tv'></i>
                         Add or remove agents
                     </button>
                 </div>

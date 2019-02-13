@@ -162,8 +162,6 @@ export class EditionController {
       this.$scope.editConf();
     };
 
-    this.$scope.closeEditingFile = () => {};
-
     //listeners
     this.$scope.$on('wazuhShowNode', (event, parameters) => {
       return this.$scope.edit(parameters.node);

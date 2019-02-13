@@ -2,14 +2,8 @@
 <div flex="auto" layout="row" ng-if="!load && configurationSubTab === 'syslog'">
 
     <!-- No configuration section -->
-    <wz-no-config
-      flex
-      error="currentConfig['csyslog-csyslog']"
-      ng-if="currentConfig['csyslog-csyslog'] && isString(currentConfig['csyslog-csyslog'])"></wz-no-config>
-    <wz-no-config
-      flex
-      error="'not-present'"
-      ng-if="currentConfig['csyslog-csyslog'] && !isString(currentConfig['csyslog-csyslog']) && (!currentConfig['csyslog-csyslog'].syslog_output || !currentConfig['csyslog-csyslog'].syslog_output.length)"></wz-no-config>
+    <wz-no-config flex error="currentConfig['csyslog-csyslog']" ng-if="currentConfig['csyslog-csyslog'] && isString(currentConfig['csyslog-csyslog'])"></wz-no-config>
+    <wz-no-config flex error="'not-present'" ng-if="currentConfig['csyslog-csyslog'] && !isString(currentConfig['csyslog-csyslog']) && (!currentConfig['csyslog-csyslog'].syslog_output || !currentConfig['csyslog-csyslog'].syslog_output.length)"></wz-no-config>
     <!-- End no configuration section -->
 
     <!-- This section is the main content -->
@@ -72,13 +66,15 @@
     <!-- End main content section -->
 
     <!-- This section is the right sidenav content -->
-    <md-sidenav
-        class="md-sidenav-right"
-        md-is-locked-open="true">
-        <md-list>
+    <md-sidenav class="md-sidenav-right" style="width: auto !important;" md-is-locked-open="true">
+        <span class="wz-margin-right-8 wz-text-link wz-text-right wz-margin-top-8" ng-click="showHelp = !showHelp"><i
+                class="fa fa-fw fa-question-circle-o"></i></span>
+        <md-list ng-if="showHelp">
             <md-subheader>More info about this section</md-subheader>
-            <md-list-item target="_blank" class="wz-text-link" ng-href="https://documentation.wazuh.com/current/user-manual/manager/manual-syslog-output.html">How to configure the syslog output</md-list-item>
-            <md-list-item target="_blank" class="wz-text-link" ng-href="https://documentation.wazuh.com/current/user-manual/reference/ossec-conf/syslog-output.html">Syslog output reference</md-list-item>
+            <md-list-item target="_blank" class="wz-text-link" ng-href="https://documentation.wazuh.com/current/user-manual/manager/manual-syslog-output.html">How
+                to configure the syslog output</md-list-item>
+            <md-list-item target="_blank" class="wz-text-link" ng-href="https://documentation.wazuh.com/current/user-manual/reference/ossec-conf/syslog-output.html">Syslog
+                output reference</md-list-item>
         </md-list>
     </md-sidenav>
     <!-- End right sidenav section -->

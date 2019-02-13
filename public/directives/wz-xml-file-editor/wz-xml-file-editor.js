@@ -28,6 +28,7 @@ app.directive('wzXmlFileEditor', function() {
     },
     controller(
       $scope,
+      $rootScope,
       $document,
       $location,
       $mdDialog,
@@ -258,19 +259,20 @@ app.directive('wzXmlFileEditor', function() {
         const confirm = $mdDialog.confirm({
           controller: function(
             $scope,
-            myScope,
-            myError,
+            scope,
+            errorHandler,
+            rootScope,
             $mdDialog,
             configHandler,
             apiReq
           ) {
-            $scope.myScope = myScope;
             $scope.closeDialog = () => {
               $mdDialog.hide();
               $('body').removeClass('md-dialog-body');
             };
             $scope.confirmDialog = async () => {
-              $scope.myScope.$emit('setRestarting', {});
+              rootScope.$emit('setRestarting', {});
+              scope.$applyAsync();
               $mdDialog.hide();
               const clusterStatus = await apiReq.request(
                 'GET',
@@ -289,43 +291,45 @@ app.directive('wzXmlFileEditor', function() {
                 try {
                   const data = await configHandler.restartManager();
                   $('body').removeClass('md-dialog-body');
-                  myError.info('It may take a few seconds...', data.data.data);
-                  $scope.myScope.$applyAsync();
+                  errorHandler.info('It may take a few seconds...', data.data.data);
+                  rootScope.$emit('removeRestarting', {});
+                  scope.$applyAsync();
                 } catch (error) {
-                  myError.handle(
+                  errorHandler.handle(
                     error.message || error,
                     'Error restarting manager'
                   );
-                  $scope.myScope.$emit('removeRestarting', {});
+                  rootScope.$emit('removeRestarting', {});
                 }
               } else if (target === 'cluster') {
                 try {
                   const data = await configHandler.restartCluster();
                   $('body').removeClass('md-dialog-body');
-                  myError.info('It may take a few seconds...', data.data.data);
-                  $scope.myScope.$applyAsync();
+                  errorHandler.info('It may take a few seconds...', data.data.data);
+                  rootScope.$emit('removeRestarting', {});
+                  scope.$applyAsync();
                 } catch (error) {
-                  myError.handle(
+                  errorHandler.handle(
                     error.message || error,
                     'Error restarting cluster'
                   );
-                  $scope.myScope.$emit('removeRestarting', {});
+                  rootScope.$emit('removeRestarting', {});
                 }
               } else {
                 try {
                   const data = await configHandler.restartNode(target);
                   $('body').removeClass('md-dialog-body');
-                  myError.info('It may take a few seconds...', data.data.data);
-                  $scope.myScope.$applyAsync();
+                  errorHandler.info('It may take a few seconds...', data.data.data);
+                  rootScope.$emit('removeRestarting', {});
+                  scope.$applyAsync();
                 } catch (error) {
-                  myError.handle(
+                  errorHandler.handle(
                     error.message || error,
                     'Error restarting node'
                   );
-                  $scope.myScope.$emit('removeRestarting', {});
+                  rootScope.$emit('removeRestarting', {});
                 }
               }
-              $scope.myScope.$emit('removeRestarting', {});
             };
           },
           template:
@@ -348,8 +352,9 @@ app.directive('wzXmlFileEditor', function() {
           clickOutsideToClose: true,
           disableParentScroll: true,
           locals: {
-            myScope: $scope,
-            myError: errorHandler
+            scope: $scope,
+            errorHandler: errorHandler,
+            rootScope: $rootScope
           }
         });
         $('body').addClass('md-dialog-body');
@@ -359,7 +364,7 @@ app.directive('wzXmlFileEditor', function() {
       $scope.$on('saveXmlFile', (ev, params) => saveFile(params));
 
       $scope.$on('$destroy', function() {
-        $location.search('editingFile', null);
+        //$location.search('editingFile', null);
       });
     },
     template

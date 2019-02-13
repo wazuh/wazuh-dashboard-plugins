@@ -19,6 +19,17 @@
                 <option ng-repeat="node in ctrl.nodes" value="{{node.name}}">{{node.name}}</option>
             </select>
         </div>
+        <div flex></div>
+        <div layout="column" class="height-40 wz-no-padding">
+            <button ng-if="mctrl.clusterInfo.status === 'enabled'" class="btn wz-button height-40" ng-disabled="mctrl.isRestarting"
+                ng-click="mctrl.restartCluster()"><i class="fa fa-refresh"></i>
+                Restart cluster
+            </button>
+            <button ng-if="mctrl.clusterInfo.status !== 'enabled'" class="btn wz-button height-40" ng-disabled="mctrl.isRestarting"
+                ng-click="mctrl.restartManager()"><i class="fa fa-refresh"></i>
+                Restart manager
+            </button>
+        </div>
     </div>
     <!-- End headline -->
 

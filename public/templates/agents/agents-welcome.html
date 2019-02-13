@@ -17,50 +17,62 @@
 <div layout="column" class="" layout-align="start stretch" ng-if="tab === 'welcome'" ng-show="!load && agent">
 
     <!-- Headline -->
-    <div layout="row" layout-padding>
+    <div layout="row" layout-padding class="wz-margin-right-8">
         <span class="font-size-18"><i class="fa fa-fw fa-tv" aria-hidden="true"></i> {{ agent.name || '-' }} <span
                 class="wz-text-bold wz-text-link" ng-click="goDiscover()" tooltip="Discover"><i class="fa fa-fw fa-compass"
                     aria-hidden="true"></i></span></span>
+        <span flex></span>
+        <button ng-disabled="restartingAgent" class="btn wz-button" ng-disabled="isRestarting" ng-click="restartAgent(agent)"><i
+                class="fa fa-refresh"></i>
+            Restart agent
+        </button>
     </div>
     <!-- End headline -->
 
     <div layout="row" layout-padding class="wz-padding-top-0 wz-padding-bottom-0">
         <md-card flex class="wz-md-card">
             <md-card-content>
-                <div layout="row">
-                    <span class="font-size-16">Details</span>
-                </div>
-                <md-divider class="wz-margin-top-10"></md-divider>
+
                 <div layout="row" layout-padding>
                     <div layout="column" flex>
+                        <div layout="row">
+                            <span class="font-size-16">Details</span>
+                        </div>
+                        <md-divider class="wz-margin-top-10"></md-divider>
                         <div layout="row" class="wz-padding-top-10">
-                            <span flex="15">Name</span>
+                            <span flex="25">Name</span>
                             <span class="wz-text-right color-grey">{{ agent.name || '-' }}</span>
                         </div>
                         <div layout="row" class="wz-padding-top-10">
-                            <span flex="15">IP</span>
+                            <span flex="25">IP</span>
                             <span class="wz-text-right color-grey">{{ agent.ip || '-'}}</span>
                         </div>
                         <div layout="row" class="wz-padding-top-10">
-                            <span flex="15">Version</span>
+                            <span flex="25">Version</span>
                             <span class="wz-text-right color-grey">{{ agent.version || '-'}}</span>
                         </div>
                         <div layout="row" class="wz-padding-top-10">
-                            <span flex="15">OS</span>
+                            <span flex="25">OS</span>
                             <span class="wz-text-right wz-text-truncatable color-grey">{{ agentOS || '-'}}</span>
                             <md-tooltip ng-if="agentOS.length > 25" md-direction="bottom" class="wz-tooltip">
                                 Full OS name: {{ agentOS || '-'}}
                             </md-tooltip>
                         </div>
+
                     </div>
                     <div layout="column" flex>
-                        <div layout="row" class="wz-padding-top-10">
-                            <span flex="25">Last keep alive</span>
-                            <span class="wz-text-right color-grey">{{agent.lastKeepAlive || '-' }}</span>
+                        <div layout="row" ng-if="agent.group">
+                            <span class="font-size-16">Groups <i ng-if='adminMode' tooltip="Add group" ng-click="switchGroupEdit()"
+                                    class="wz-text-bold wz-text-link fa fa-fw" ng-class="!addingGroupToAgent ? 'fa-plus-circle' : 'fa-minus-circle'"></i></span>
                         </div>
-                        <div layout="row" class="wz-padding-top-10">
-                            <span flex="25">Registration date</span>
-                            <span class="wz-text-right color-grey">{{agent.dateAdd || '-'}}</span>
+                        <md-divider ng-if="agent.group" class="wz-margin-top-10"></md-divider>
+                        <div layout="row" class="wz-margin-top-10" ng-if="agent.group && editGroup && !addingGroupToAgent">
+                            <div class="wz-word-break" flex ng-if="groups && groups.length">
+                                Available groups:
+                            </div>
+                            <div class="wz-word-break" flex ng-if="!groups || !groups.length">
+                                There are no more groups available.
+                            </div>
                         </div>
                         <div layout="row" class="wz-padding-top-10">
                             <span flex="25">Last syscheck scan</span>
@@ -86,64 +98,6 @@
                                 </md-tooltip></span>
                         </div>
                     </div>
-                </div>
-                <div layout="row" ng-if="agent.group">
-                    <span class="font-size-16">Groups <i ng-if='adminMode' tooltip="Add group" ng-click="switchGroupEdit()"
-                            class="wz-text-bold wz-text-link fa fa-fw" ng-class="!addingGroupToAgent ? 'fa-plus-circle' : 'fa-minus-circle'"></i></span>
-                </div>
-                <md-divider ng-if="agent.group" class="wz-margin-top-10"></md-divider>
-                <div layout="row" class="wz-margin-top-10" ng-if="agent.group && editGroup && !addingGroupToAgent">
-                    <div class="wz-word-break" flex ng-if="groups && groups.length">
-                        Available groups:
-                    </div>
-                    <div class="wz-word-break" flex ng-if="!groups || !groups.length">
-                        There are no more groups available.
-                    </div>
-                </div>
-                <div ng-if="agent.group && editGroup && !addingGroupToAgent && groups && groups.length" class="wz-margin-top-4">
-                    <span ng-repeat="group in groups" class="wz-text-bold wz-text-link" ng-click="showConfirmAddGroup(group)">{{
-                        group }}&nbsp;</span>
-                </div>
-
-                <div class="wz-margin-top-10 confirmEmbedBubble" ng-if="agent.group && editGroup && addingGroupToAgent">
-                    <div layout="row">
-                        <span class="font-size-12  wz-padding-left-8">Group {{addingGroupToAgent}} will be added to
-                            agent {{agent.id}}</span>
-                    </div>
-                    <div layout="row">
-                        <md-button class="cancelBtn" type="button" ng-click="cancelAddGroup()"><i aria-hidden='true'
-                                class='fa fa-fw fa-close'></i> Cancel</md-button>
-                        <md-button class="agreeBtn" type="button" ng-click="confirmAddGroup(addingGroupToAgent)"><i
-                                aria-hidden='true' class='fa fa-fw fa-check'></i> Confirm</md-button>
-                    </div>
-                </div>
-                <div layout="row" layout-padding ng-if="agent.group" class="wz-word-break">
-                    <span ng-repeat="group in agent.group" class="wz-text-bold wz-text-link" ng-click="goGroups(agent,$index)">{{
-                        group }}&nbsp;</span>
-                </div>
-            </md-card-content>
-        </md-card>
-    </div>
-
-    <div layout="row" layout-padding class="wz-padding-top-0 wz-padding-bottom-0">
-        <md-card flex class="wz-md-card">
-            <md-card-content>
-                <div layout="row">
-                    <span class="font-size-16">Actions</span>
-                </div>
-                <md-divider class="wz-margin-top-10"></md-divider>
-                <div layout="row" class="wz-padding-top-10">
-                    <button ng-disabled="restartingAgent" class="btn btn-primary" ng-disabled="isRestarting" ng-click="restartAgent(agent)"><i
-                            class="fa fa-refresh"></i>
-                        Restart agent
-                    </button>
-                    <!--                     <div ng-show="agent.outdated && !agent.upgrading" class="wz-padding-left-16">
-                        <button class="updateBtn btn" ng-click="updateAgent(agent)"><i class="fa fa-upload" aria-hidden="true"></i>
-                            Upgrade agent version</button>
-                    </div>
-                    <div ng-show="agent.outdated && agent.upgrading" class="wz-padding-left-16">
-                        <span class="upgradingLabel"><i class="fa fa-fw fa-spin fa-spinner"></i> Upgrading agent...</span>
-                    </div> -->
                 </div>
             </md-card-content>
         </md-card>
