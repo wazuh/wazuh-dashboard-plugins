@@ -33,15 +33,15 @@ export class TabVisualizations {
 
     this.overview = {
       welcome: 0,
-      general: 11,
+      general: 13,
       fim: 8,
       pm: 5,
       vuls: 10,
       oscap: 11,
       ciscat: 11,
       audit: 15,
-      pci: 6,
-      gdpr: 6,
+      pci: 5,
+      gdpr: 5,
       aws: 6,
       virustotal: 7,
       osquery: 5
