@@ -153,7 +153,7 @@
     <!-- End Compliance navigation bar -->
 
     <!-- Discover search bar section -->
-    <kbn-dis ng-show="(tab !== 'welcome') && (tab !== 'configuration') && tab !== 'syscollector'"></kbn-dis>
+    <kbn-dis ng-show="(tab !== 'welcome') && (tab !== 'configuration') && tab !== 'syscollector' && !showSyscheckFiles && !showRootcheckScan"></kbn-dis>
     <!-- End Discover search bar section -->
 
     <!-- Loading status section -->
