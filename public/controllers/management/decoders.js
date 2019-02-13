@@ -292,8 +292,8 @@ export class DecodersController {
       clusterInfo.status === 'enabled' ? 'cluster' : 'manager';
     if (isNewFile && !fileName) {
       this.errorHandler.handle(
-        'You need to specify a file name',
-        'Error creating a new file.'
+        'Error creating a new file. You need to specify a file name',
+        ''
       );
       return false;
     } else {
@@ -305,8 +305,8 @@ export class DecodersController {
         }
         if (containsNumber.test(fileName)) {
           this.errorHandler.handle(
-            'The filename can not contain numbers',
-            'Error creating a new file.'
+            'Error creating a new file. The filename can not contain numbers',
+            ''
           );
           return false;
         }
@@ -326,13 +326,13 @@ export class DecodersController {
         const objParam =
           this.selectedRulesetTab === 'rules'
             ? {
-                rule: this.selectedItem,
-                showRestartManager
-              }
+              rule: this.selectedItem,
+              showRestartManager
+            }
             : {
-                decoder: this.selectedItem,
-                showRestartManager
-              };
+              decoder: this.selectedItem,
+              showRestartManager
+            };
         this.$scope.$broadcast('saveXmlFile', objParam);
       }
       //$scope.editingFile = false;

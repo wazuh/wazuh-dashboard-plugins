@@ -30,12 +30,13 @@ app.directive('wzXmlFileEditor', function() {
       $scope,
       $rootScope,
       $document,
-      $location,
+      appState,
       $mdDialog,
       errorHandler,
       groupHandler,
       rulesetHandler,
-      configHandler
+      configHandler,
+      apiReq
     ) {
       /**
        * Custom .replace method. Instead of using .replace which
@@ -170,12 +171,41 @@ app.directive('wzXmlFileEditor', function() {
         return formatted.trim();
       };
 
+      const validateAfterSent = async () => {
+        try {
+          const isCluster = appState.getClusterInfo().status === 'enabled';
+
+          const validation = isCluster
+            ? await apiReq.request(
+                'GET',
+                `/cluster/configuration/validation`,
+                {}
+              )
+            : await apiReq.request(
+                'GET',
+                `/manager/configuration/validation`,
+                {}
+              );
+          const data = ((validation || {}).data || {}).data || {};
+          const isOk = data.status === 'OK';
+          if (!isOk && Array.isArray(data.details)) {
+            let str = '';
+            for (const detail of data.details) str += detail;
+            throw new Error(str);
+          }
+          return true;
+        } catch (error) {
+          return Promise.reject(error);
+        }
+      };
+
       const saveFile = async params => {
         try {
           const text = $scope.xmlCodeBox.getValue();
           const xml = replaceIllegalXML(text);
           if (params.group) {
             await groupHandler.sendConfiguration(params.group, xml);
+            await validateAfterSent();
             const msg = 'Success. Group has been updated';
             params.showRestartManager
               ? showRestartDialog(msg, params.showRestartManager)
@@ -183,18 +213,21 @@ app.directive('wzXmlFileEditor', function() {
             $scope.$emit('configurationSuccess');
           } else if (params.rule) {
             await rulesetHandler.sendRuleConfiguration(params.rule, xml);
-            const msg = 'Success. Rules has been updated';
+            await validateAfterSent();
+            const msg = 'Success. Rules updated';
             params.showRestartManager
               ? showRestartDialog(msg, params.showRestartManager)
               : errorHandler.info(msg, '');
           } else if (params.decoder) {
             await rulesetHandler.sendDecoderConfiguration(params.decoder, xml);
+            await validateAfterSent();
             const msg = 'Success. Decoders has been updated';
             params.showRestartManager
               ? showRestartDialog(msg, params.showRestartManager)
               : errorHandler.info(msg, '');
           } else if (params.node) {
             await configHandler.saveNodeConfiguration(params.node, xml);
+            await validateAfterSent();
             const msg = `Success. Node (${
               params.node
             }) configuration has been updated`;
@@ -203,14 +236,16 @@ app.directive('wzXmlFileEditor', function() {
               : errorHandler.info(msg, '');
           } else if (params.manager) {
             await configHandler.saveManagerConfiguration(xml);
+            await validateAfterSent();
             const msg = 'Success. Manager configuration has been updated';
             params.showRestartManager
               ? showRestartDialog(msg, params.showRestartManager)
               : errorHandler.info(msg, '');
           }
+
           $scope.closeFn({ reload: true });
         } catch (error) {
-          errorHandler.handle(error, 'Send file error');
+          errorHandler.handle(error, 'Error');
         }
         return;
       };
