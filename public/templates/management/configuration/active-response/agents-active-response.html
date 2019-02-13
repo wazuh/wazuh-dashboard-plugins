@@ -2,14 +2,8 @@
 <div flex="auto" layout="row" ng-if="!load && configurationSubTab === 'active-response'">
 
     <!-- No configuration section -->
-    <wz-no-config
-      flex
-      error="currentConfig['com-active-response']"
-      ng-if="currentConfig['com-active-response'] && isString(currentConfig['com-active-response'])"></wz-no-config>
-    <wz-no-config
-      flex
-      error="'not-present'"
-      ng-if="currentConfig['com-active-response'] && !isString(currentConfig['com-active-response']) && !currentConfig['com-active-response']['active-response']"></wz-no-config>
+    <wz-no-config flex error="currentConfig['com-active-response']" ng-if="currentConfig['com-active-response'] && isString(currentConfig['com-active-response'])"></wz-no-config>
+    <wz-no-config flex error="'not-present'" ng-if="currentConfig['com-active-response'] && !isString(currentConfig['com-active-response']) && !currentConfig['com-active-response']['active-response']"></wz-no-config>
     <!-- End no configuration section -->
 
     <!-- This section is the main content -->
@@ -35,22 +29,13 @@
                 <!-- Configuration block -->
                 <div class="wz-padding-top-10">
 
-                    <wz-config-item
-                        label="Active response status"
-                        value="currentConfig['com-active-response']['active-response'] === 'yes' ? 'disabled' : 'enabled'">
+                    <wz-config-item label="Active response status" value="currentConfig['com-active-response']['active-response'] === 'yes' ? 'disabled' : 'enabled'">
                     </wz-config-item>
-                    <wz-config-item
-                        label="List of timeouts (in minutes) for repeated offenders"
-                        value="currentConfig['com-active-response']['active-response'].repeated_offenders">
+                    <wz-config-item label="List of timeouts (in minutes) for repeated offenders" value="currentConfig['com-active-response']['active-response'].repeated_offenders">
                     </wz-config-item>
-                    <wz-config-item
-                        is-array="true"
-                        label="Use the following list of root CA certificates"
-                        value="currentConfig['com-active-response']['active-response'].ca_store">
+                    <wz-config-item is-array="true" label="Use the following list of root CA certificates" value="currentConfig['com-active-response']['active-response'].ca_store">
                     </wz-config-item>
-                    <wz-config-item
-                        label="Validate WPKs using root CA certificate"
-                        value="currentConfig['com-active-response']['active-response'].ca_verification">
+                    <wz-config-item label="Validate WPKs using root CA certificate" value="currentConfig['com-active-response']['active-response'].ca_verification">
                     </wz-config-item>
 
                 </div>
@@ -66,13 +51,15 @@
     <!-- End main content section -->
 
     <!-- This section is the right sidenav content -->
-    <md-sidenav
-        class="md-sidenav-right"
-        md-is-locked-open="true">
-        <md-list>
+    <md-sidenav class="md-sidenav-right" style="width: auto !important;" md-is-locked-open="true">
+        <span class="wz-margin-right-8 wz-text-link wz-text-right wz-margin-top-8" ng-click="showHelp = !showHelp"><i
+                class="fa fa-fw fa-question-circle-o"></i></span>
+        <md-list ng-if="showHelp">
             <md-subheader>More info about this section</md-subheader>
-            <md-list-item target="_blank" class="wz-text-link" ng-href="https://documentation.wazuh.com/current/user-manual/capabilities/active-response/index.html">Active response documentation</md-list-item>
-            <md-list-item target="_blank" class="wz-text-link" ng-href="https://documentation.wazuh.com/current/user-manual/reference/ossec-conf/active-response.html">Active response reference</md-list-item>
+            <md-list-item target="_blank" class="wz-text-link" ng-href="https://documentation.wazuh.com/current/user-manual/capabilities/active-response/index.html">Active
+                response documentation</md-list-item>
+            <md-list-item target="_blank" class="wz-text-link" ng-href="https://documentation.wazuh.com/current/user-manual/reference/ossec-conf/active-response.html">Active
+                response reference</md-list-item>
         </md-list>
     </md-sidenav>
     <!-- End right sidenav section -->

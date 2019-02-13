@@ -2,14 +2,8 @@
 <div flex="auto" layout="row" ng-if="!load && configurationSubTab === 'reports'">
 
     <!-- No configuration section -->
-    <wz-no-config
-      flex
-      error="currentConfig['monitor-reports']"
-      ng-if="currentConfig['monitor-reports'] && isString(currentConfig['monitor-reports'])"></wz-no-config>
-    <wz-no-config
-      flex
-      error="'not-present'"
-      ng-if="currentConfig['monitor-reports'] && !isString(currentConfig['monitor-reports']) && (!currentConfig['monitor-reports'].reports || !currentConfig['monitor-reports'].reports.length)"></wz-no-config>
+    <wz-no-config flex error="currentConfig['monitor-reports']" ng-if="currentConfig['monitor-reports'] && isString(currentConfig['monitor-reports'])"></wz-no-config>
+    <wz-no-config flex error="'not-present'" ng-if="currentConfig['monitor-reports'] && !isString(currentConfig['monitor-reports']) && (!currentConfig['monitor-reports'].reports || !currentConfig['monitor-reports'].reports.length)"></wz-no-config>
     <!-- End no configuration section -->
 
     <!-- This section is the main content -->
@@ -39,7 +33,8 @@
                     <div flex="30" layout="column">
 
                         <md-list flex="auto" class="wz-item-list">
-                            <md-list-item class="wz-text-link" ng-click="updateSelectedItem($index)" ng-repeat="item in currentConfig['monitor-reports'].reports">{{ item.title }}</md-list-item>
+                            <md-list-item class="wz-text-link" ng-click="updateSelectedItem($index)" ng-repeat="item in currentConfig['monitor-reports'].reports">{{
+                                item.title }}</md-list-item>
                         </md-list>
 
                     </div>
@@ -49,46 +44,25 @@
                     <div flex layout="column" ng-if="currentConfig['monitor-reports'].reports.length">
                         <div flex="auto" class="wz-item-detail">
 
-                            <wz-config-item
-                                label="Report name"
-                                value="currentConfig['monitor-reports'].reports[selectedItem].title">
+                            <wz-config-item label="Report name" value="currentConfig['monitor-reports'].reports[selectedItem].title">
                             </wz-config-item>
-                            <wz-config-item
-                                is-array="true"
-                                label="Send report to this email addresses"
-                                value="currentConfig['monitor-reports'].reports[selectedItem].mail_to">
+                            <wz-config-item is-array="true" label="Send report to this email addresses" value="currentConfig['monitor-reports'].reports[selectedItem].mail_to">
                             </wz-config-item>
-                            <wz-config-item
-                                label="Include logs when creating a report"
-                                value="currentConfig['monitor-reports'].reports[selectedItem].showlogs">
+                            <wz-config-item label="Include logs when creating a report" value="currentConfig['monitor-reports'].reports[selectedItem].showlogs">
                             </wz-config-item>
-                            <wz-config-item
-                                label="Filter by this group"
-                                value="currentConfig['monitor-reports'].reports[selectedItem].group">
+                            <wz-config-item label="Filter by this group" value="currentConfig['monitor-reports'].reports[selectedItem].group">
                             </wz-config-item>
-                            <wz-config-item
-                                label="Filter by this category"
-                                value="currentConfig['monitor-reports'].reports[selectedItem].category">
+                            <wz-config-item label="Filter by this category" value="currentConfig['monitor-reports'].reports[selectedItem].category">
                             </wz-config-item>
-                            <wz-config-item
-                                label="Filter by this rule ID"
-                                value="currentConfig['monitor-reports'].reports[selectedItem].rule">
+                            <wz-config-item label="Filter by this rule ID" value="currentConfig['monitor-reports'].reports[selectedItem].rule">
                             </wz-config-item>
-                            <wz-config-item
-                                label="Filter by this alert level and above"
-                                value="currentConfig['monitor-reports'].reports[selectedItem].level">
+                            <wz-config-item label="Filter by this alert level and above" value="currentConfig['monitor-reports'].reports[selectedItem].level">
                             </wz-config-item>
-                            <wz-config-item
-                                label="Filter by this log location"
-                                value="currentConfig['monitor-reports'].reports[selectedItem].location">
+                            <wz-config-item label="Filter by this log location" value="currentConfig['monitor-reports'].reports[selectedItem].location">
                             </wz-config-item>
-                            <wz-config-item
-                                label="Filter by this source IP address"
-                                value="currentConfig['monitor-reports'].reports[selectedItem].srcip">
+                            <wz-config-item label="Filter by this source IP address" value="currentConfig['monitor-reports'].reports[selectedItem].srcip">
                             </wz-config-item>
-                            <wz-config-item
-                                label="Filter by this user name"
-                                value="currentConfig['monitor-reports'].reports[selectedItem].user">
+                            <wz-config-item label="Filter by this user name" value="currentConfig['monitor-reports'].reports[selectedItem].user">
                             </wz-config-item>
 
                         </div>
@@ -107,13 +81,15 @@
     <!-- End main content section -->
 
     <!-- This section is the right sidenav content -->
-    <md-sidenav
-        class="md-sidenav-right"
-        md-is-locked-open="true">
-        <md-list>
+    <md-sidenav class="md-sidenav-right" style="width: auto !important;" md-is-locked-open="true">
+        <span class="wz-margin-right-8 wz-text-link wz-text-right wz-margin-top-8" ng-click="showHelp = !showHelp"><i
+                class="fa fa-fw fa-question-circle-o"></i></span>
+        <md-list ng-if="showHelp">
             <md-subheader>More info about this section</md-subheader>
-            <md-list-item target="_blank" class="wz-text-link" ng-href="https://documentation.wazuh.com/current/user-manual/manager/automatic-reports.html">How to generate automatic reports</md-list-item>
-            <md-list-item target="_blank" class="wz-text-link" ng-href="https://documentation.wazuh.com/current/user-manual/reference/ossec-conf/reports.html">Reports reference</md-list-item>
+            <md-list-item target="_blank" class="wz-text-link" ng-href="https://documentation.wazuh.com/current/user-manual/manager/automatic-reports.html">How
+                to generate automatic reports</md-list-item>
+            <md-list-item target="_blank" class="wz-text-link" ng-href="https://documentation.wazuh.com/current/user-manual/reference/ossec-conf/reports.html">Reports
+                reference</md-list-item>
         </md-list>
     </md-sidenav>
     <!-- End right sidenav section -->

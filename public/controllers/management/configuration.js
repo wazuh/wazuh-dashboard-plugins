@@ -35,6 +35,7 @@ export class ConfigurationController {
     this.$scope.configurationSubTab = '';
     this.$scope.integrations = {};
     this.$scope.selectedItem = 0;
+    this.$scope.showHelp = false;
   }
 
   /**
@@ -98,6 +99,7 @@ export class ConfigurationController {
      * Navigate to configuration
      */
     this.$scope.switchConfigurationTab = (configurationTab, navigate) => {
+      this.$scope.editionTab = '';
       this.$scope.navigate = navigate;
       this.configurationHandler.switchConfigurationTab(
         configurationTab,

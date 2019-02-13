@@ -89,7 +89,8 @@ export class ConfigurationGroupsController {
       this.$scope.editingFile = false;
       this.$scope.$broadcast('saveXmlFile', {
         group: this.$scope.selectedItem.name,
-        showRestartManager: this.clusterInfo.status === 'enabled' ? 'cluster' : 'manager'
+        showRestartManager:
+          this.clusterInfo.status === 'enabled' ? 'cluster' : 'manager'
       });
     };
     this.$scope.switchAddingGroup = () => {

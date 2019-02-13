@@ -17,13 +17,22 @@ import { checkGap } from '../wz-table/lib/check-gap';
 
 const app = uiModules.get('app/wazuh', []);
 
-app.directive('wzListManage', function () {
+app.directive('wzListManage', function() {
   return {
     restrict: 'E',
     scope: {
       list: '=list'
     },
-    controller($scope, errorHandler, $filter, $mdDialog, rulesetHandler, wazuhConfig, appState) {
+    controller(
+      $scope,
+      $rootScope,
+      errorHandler,
+      $filter,
+      $mdDialog,
+      rulesetHandler,
+      wazuhConfig,
+      appState
+    ) {
       const clusterInfo = appState.getClusterInfo();
 
       /**
@@ -41,7 +50,7 @@ app.directive('wzListManage', function () {
       $scope.prevPage = () => pagination.prevPage($scope);
       $scope.nextPage = async currentPage =>
         pagination.nextPage(currentPage, $scope, errorHandler, null);
-      $scope.setPage = function () {
+      $scope.setPage = function() {
         $scope.currentPage = this.n;
         $scope.nextPage(this.n);
       };
@@ -51,7 +60,7 @@ app.directive('wzListManage', function () {
        */
       $scope.filterTable = data => {
         const result = Object.keys(data || $scope.currentList.list).map(
-          function (key) {
+          function(key) {
             return [key, $scope.currentList.list[key]];
           }
         );
@@ -106,7 +115,10 @@ app.directive('wzListManage', function () {
           }
           await rulesetHandler.sendCdbList($scope.currentList.name, raw);
           const msg = 'Success. CDB list has been updated';
-          showRestartDialog(msg, clusterInfo.status === 'enabled' ? 'cluster' : 'manager');
+          showRestartDialog(
+            msg,
+            clusterInfo.status === 'enabled' ? 'cluster' : 'manager'
+          );
           fetch();
           $scope.loadingChange = false;
           if (!$scope.$$phase) $scope.$digest();
@@ -150,7 +162,7 @@ app.directive('wzListManage', function () {
         $scope.removingEntry = key;
       };
 
-      $scope.editKey = (key) => {
+      $scope.editKey = key => {
         $scope.loadingChange = true;
         $scope.currentList.list[key] = $scope.currentList.editingNewValue;
         $scope.currentList.editingNewValue = '';
@@ -170,39 +182,62 @@ app.directive('wzListManage', function () {
 
       const showRestartDialog = async (msg, target) => {
         const confirm = $mdDialog.confirm({
-          controller: function ($scope, myScope, myError, $mdDialog, configHandler) {
-            $scope.myScope = myScope;
+          controller: function(
+            $scope,
+            scope,
+            errorHandler,
+            rootScope,
+            $mdDialog,
+            configHandler
+          ) {
             $scope.closeDialog = () => {
               $mdDialog.hide();
               $('body').removeClass('md-dialog-body');
             };
             $scope.confirmDialog = () => {
+              rootScope.$emit('setRestarting', {});
+              scope.$applyAsync();
               $mdDialog.hide();
-              $scope.myScope.$emit('setRestarting', {});
               if (target === 'manager') {
-                configHandler.restartManager()
+                configHandler
+                  .restartManager()
                   .then(data => {
                     $('body').removeClass('md-dialog-body');
-                    myError.info(data.data.data, 'It may take a few seconds...');
-                    $scope.myScope.$applyAsync();
-                  }).catch(error => { 
-                    $scope.myScope.$emit('setRestarting', {});
-                    myError.handle(error.message || error, 'Error restarting manager');
+                    errorHandler.info(
+                      'It may take a few seconds...',
+                      data.data.data
+                    );
+                    rootScope.$emit('removeRestarting', {});
+                    scope.$applyAsync();
+                  })
+                  .catch(error => {
+                    rootScope.$emit('removeRestarting', {});
+                    errorHandler.handle(
+                      error.message || error,
+                      'Error restarting manager'
+                    );
                   });
               } else if (target === 'cluster') {
-                configHandler.restartCluster()
+                configHandler
+                  .restartCluster()
                   .then(data => {
                     $('body').removeClass('md-dialog-body');
-                    myError.info(data.data.data, 'It may take a few seconds...');
-                    $scope.myScope.$applyAsync();
+                    errorHandler.info(
+                      'It may take a few seconds...',
+                      data.data.data
+                    );
+                    rootScope.$emit('removeRestarting', {});
+                    scope.$applyAsync();
                   })
-                  .catch(error => { 
-                    $scope.myScope.$emit('setRestarting', {});
-                    myError.handle(error.message || error, 'Error restarting cluster');
+                  .catch(error => {
+                    rootScope.$emit('removeRestarting', {});
+                    errorHandler.handle(
+                      error.message || error,
+                      'Error restarting cluster'
+                    );
                   });
               }
-              $scope.myScope.$emit('removeRestarting', {});
-            }
+            };
           },
           template:
             '<md-dialog class="modalTheme euiToast euiToast--success euiGlobalToastListItem">' +
@@ -224,13 +259,14 @@ app.directive('wzListManage', function () {
           clickOutsideToClose: true,
           disableParentScroll: true,
           locals: {
-            myScope: $scope,
-            myError: errorHandler
+            scope: $scope,
+            errorHandler: errorHandler,
+            rootScope: $rootScope
           }
         });
         $('body').addClass('md-dialog-body');
         $mdDialog.show(confirm);
-      }
+      };
     },
     template
   };

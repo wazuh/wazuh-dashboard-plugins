@@ -31,7 +31,8 @@
                         <div>
                             <span class="font-size-16">Main settings</span>
                             <div class="wz-margin-top-10">
-                                <span class="md-subheader small">These settings indicate the database where alerts are stored</span>
+                                <span class="md-subheader small">These settings indicate the database where alerts are
+                                    stored</span>
                             </div>
                         </div>
                         <span flex></span>
@@ -44,21 +45,13 @@
                     <!-- Configuration block -->
                     <div class="wz-padding-top-10">
 
-                        <wz-config-item
-                            label="Database type"
-                            value="'foo'">
+                        <wz-config-item label="Database type" value="'foo'">
                         </wz-config-item>
-                        <wz-config-item
-                            label="Database name"
-                            value="'foo'">
+                        <wz-config-item label="Database name" value="'foo'">
                         </wz-config-item>
-                        <wz-config-item
-                            label="Database server IP"
-                            value="'foo'">
+                        <wz-config-item label="Database server IP" value="'foo'">
                         </wz-config-item>
-                        <wz-config-item
-                            label="Database username"
-                            value="'foo'">
+                        <wz-config-item label="Database username" value="'foo'">
                         </wz-config-item>
 
                     </div>
@@ -73,12 +66,13 @@
         <!-- End main content section -->
 
         <!-- This section is the right sidenav content -->
-        <md-sidenav
-            class="md-sidenav-right"
-            md-is-locked-open="true">
-            <md-list>
+        <md-sidenav class="md-sidenav-right" style="width: auto !important;" md-is-locked-open="true">
+            <span class="wz-margin-right-8 wz-text-link wz-text-right wz-margin-top-8" ng-click="showHelp = !showHelp"><i
+                    class="fa fa-fw fa-question-circle-o"></i></span>
+            <md-list ng-if="showHelp">
                 <md-subheader>More info about this section</md-subheader>
-                <md-list-item target="_blank" class="wz-text-link" ng-href="https://documentation.wazuh.com/current/user-manual/reference/ossec-conf/database-output.html">Database output reference</md-list-item>
+                <md-list-item target="_blank" class="wz-text-link" ng-href="https://documentation.wazuh.com/current/user-manual/reference/ossec-conf/database-output.html">Database
+                    output reference</md-list-item>
             </md-list>
         </md-sidenav>
         <!-- End right sidenav section -->

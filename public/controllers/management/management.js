@@ -87,11 +87,11 @@ export class ManagementController {
     this.$scope.$on('removeCurrentConfiguration', () => {
       this.currentConfiguration = false;
     });
-    this.$scope.$on('setRestarting', () => {
+    this.$rootScope.$on('setRestarting', () => {
       this.isRestarting = true;
       this.$scope.$applyAsync();
     });
-    this.$scope.$on('removeRestarting', () => {
+    this.$rootScope.$on('removeRestarting', () => {
       this.isRestarting = false;
       this.$scope.$applyAsync();
     });
@@ -128,24 +128,30 @@ export class ManagementController {
 
   async restartManager() {
     try {
-      this.isRestarting = true;  
+      this.isRestarting = true;
       const data = await this.configHandler.restartManager();
       this.isRestarting = false;
       this.errorHandler.info(data.data.data, '');
       this.$scope.$applyAsync();
     } catch (error) {
-      this.errorHandler.handle(error.message || error, 'Error restarting manager');
+      this.errorHandler.handle(
+        error.message || error,
+        'Error restarting manager'
+      );
     }
   }
   async restartCluster() {
     try {
-      this.isRestarting = true;      
+      this.isRestarting = true;
       const data = await this.configHandler.restartCluster();
       this.isRestarting = false;
-      this.errorHandler.info(data.data.data, 'It may take a few seconds...');
+      this.errorHandler.info('It may take a few seconds...', data.data.data);
       this.$scope.$applyAsync();
     } catch (error) {
-      this.errorHandler.handle(error.message || error, 'Error restarting cluster');
+      this.errorHandler.handle(
+        error.message || error,
+        'Error restarting cluster'
+      );
     }
   }
 
