@@ -162,10 +162,10 @@ export function RulesController(
         coloredString = coloredString.replace(
           /\$\(((?!<\/span>).)*?\)(?!<\/span>)/im,
           '<span style="color: ' +
-            colors[i] +
-            ' ">' +
-            valuesArray[i] +
-            '</span>'
+          colors[i] +
+          ' ">' +
+          valuesArray[i] +
+          '</span>'
         );
       }
     }
@@ -320,8 +320,8 @@ export function RulesController(
       clusterInfo.status === 'enabled' ? 'cluster' : 'manager';
     if (isNewFile && !fileName) {
       errorHandler.handle(
-        'You need to specify a file name',
-        'Error creating a new file.'
+        'Error creating a new file. You need to specify a file name',
+        ''
       );
       return false;
     } else {
@@ -333,8 +333,8 @@ export function RulesController(
         }
         if (containsNumber.test(fileName)) {
           this.errorHandler.handle(
-            'The filename can not contain numbers',
-            'Error creating a new file.'
+            'Error creating a new file. The filename can not contain numbers',
+            ''
           );
           return false;
         }
@@ -354,13 +354,13 @@ export function RulesController(
         const objParam =
           $scope.selectedRulesetTab === 'rules'
             ? {
-                rule: $scope.selectedItem,
-                showRestartManager
-              }
+              rule: $scope.selectedItem,
+              showRestartManager
+            }
             : {
-                decoder: $scope.selectedItem,
-                showRestartManager
-              };
+              decoder: $scope.selectedItem,
+              showRestartManager
+            };
         $scope.$broadcast('saveXmlFile', objParam);
       }
       //$scope.editingFile = false;
