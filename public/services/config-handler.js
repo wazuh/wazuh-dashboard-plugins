@@ -60,10 +60,12 @@ export class ConfigHandler {
         {}
       );
 
-      const valid =
-        (((validationError || {}).data || {}).data || {}).status === 'OK';
-      if (!valid) {
-        throw new Error('The configuration has some error.');
+      const data = ((validationError || {}).data || {}).data || {};
+      const isOk = data.status === 'OK';
+      if (!isOk && Array.isArray(data.details)) {
+        let str = '';
+        for (const detail of data.details) str += detail;
+        throw new Error(str);
       }
 
       const result = await this.apiReq.request('PUT', `/manager/restart`, {});
@@ -84,10 +86,12 @@ export class ConfigHandler {
         {}
       );
 
-      const valid =
-        (((validationError || {}).data || {}).data || {}).status === 'OK';
-      if (!valid) {
-        throw new Error('The configuration has some error.');
+      const data = ((validationError || {}).data || {}).data || {};
+      const isOk = data.status === 'OK';
+      if (!isOk && Array.isArray(data.details)) {
+        let str = '';
+        for (const detail of data.details) str += detail;
+        throw new Error(str);
       }
 
       const result = await this.apiReq.request('PUT', `/cluster/restart`, {});
@@ -108,10 +112,12 @@ export class ConfigHandler {
         {}
       );
 
-      const valid =
-        (((validationError || {}).data || {}).data || {}).status === 'OK';
-      if (!valid) {
-        throw new Error('The configuration has some error.');
+      const data = ((validationError || {}).data || {}).data || {};
+      const isOk = data.status === 'OK';
+      if (!isOk && Array.isArray(data.details)) {
+        let str = '';
+        for (const detail of data.details) str += detail;
+        throw new Error(str);
       }
 
       const result = await this.apiReq.request(
