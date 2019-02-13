@@ -59,8 +59,7 @@ export class AgentsController {
     wzTableFilter,
     $mdDialog,
     groupHandler,
-    wazuhConfig,
-    $interval
+    wazuhConfig
   ) {
     this.$scope = $scope;
     this.$location = $location;
@@ -78,7 +77,6 @@ export class AgentsController {
     this.$mdDialog = $mdDialog;
     this.groupHandler = groupHandler;
     this.wazuhConfig = wazuhConfig;
-    this.$interval = $interval;
 
     // Config on-demand
     this.$scope.isArray = Array.isArray;
@@ -206,47 +204,24 @@ export class AgentsController {
           `/agents/${agent.id}/restart`,
           {}
         );
-        if ((((data || {}).data || {}).data || {}).failed_ids) {
-          throw new Error(((((data || {}).data || {}).data || {}).failed_ids[0] || {}).error);
+        const result = ((data || {}).data || {}).data || false;
+        const failed =
+          result &&
+          Array.isArray(result.failed_ids) &&
+          result.failed_ids.length;
+        if (failed) {
+          throw new Error(result.failed_ids[0].error.message);
+        } else if (result) {
+          this.errorHandler.info(result.msg, '');
         } else {
-          this.errorHandler.info((((data || {}).data || {}).data || {}).msg, '');
+          throw new Error('Unexpected error upgrading agent');
         }
         this.$scope.restartingAgent = false;
       } catch (error) {
-        this.errorHandler.handle(
-          `${error.message || error}`,
-          'Error restarting agent ' + agent.id
-        );
+        this.errorHandler.handle(error, '');
         this.$scope.restartingAgent = false;
       }
       this.$scope.$applyAsync();
-    };
-
-    this.$scope.updateAgent = async agent => {
-      agent.upgrading = true;
-      this.appState.setSessionStorageItem(`updatingAgent${agent.id}`, true);
-      try {
-        const data = await this.apiReq.request(
-          'PUT',
-          `/agents/${agent.id}/upgrade?wait_for_complete`,
-          {}
-        );
-        if (((data || {}).data || {}).error !== 0) {
-          throw new Error(((data || {}).data || {}).data);
-        }
-      } catch (error) {
-        if ((error || {}).status === -1) {
-          error.message = 'Aborted';
-        } else {
-          this.errorHandler.handle(
-            `${error.message || error}`,
-            'Error upgrading agent ' + agent.id
-          );
-          agent.upgrading = false;
-          this.appState.removeSessionStorageItem(`updatingAgent${agent.id}`);
-        }
-      }
-      if (!this.$scope.$$phase) this.$scope.$digest();
     };
 
     const configuration = this.wazuhConfig.getConfig();
@@ -521,7 +496,7 @@ export class AgentsController {
           (((agentInfo || {}).data || {}).data || {}).status ||
           this.$scope.agent.status;
       }
-    } catch (error) { } // eslint-disable-line
+    } catch (error) {} // eslint-disable-line
 
     try {
       this.$scope.showSyscheckFiles = false;
@@ -538,7 +513,7 @@ export class AgentsController {
       if (tab === 'syscollector')
         try {
           await this.loadSyscollector(this.$scope.agent.id);
-        } catch (error) { } // eslint-disable-line
+        } catch (error) {} // eslint-disable-line
       if (tab === 'configuration') {
         const isSync = await this.apiReq.request(
           'GET',
@@ -656,7 +631,7 @@ export class AgentsController {
           {}
         );
         netifaceResponse = ((resultNetiface || {}).data || {}).data || false;
-      } catch (error) { } // eslint-disable-line
+      } catch (error) {} // eslint-disable-line
 
       // This API call may fail so we put it out of Promise.all
       let netaddrResponse = false;
@@ -668,7 +643,7 @@ export class AgentsController {
         );
         netaddrResponse =
           ((resultNetaddrResponse || {}).data || {}).data || false;
-      } catch (error) { } // eslint-disable-line
+      } catch (error) {} // eslint-disable-line
 
       // Before proceeding, syscollector data is an empty object
       this.$scope.syscollector = {};
@@ -684,7 +659,7 @@ export class AgentsController {
       this.$scope.syscollector = {
         hardware:
           typeof hardwareResponse === 'object' &&
-            Object.keys(hardwareResponse).length
+          Object.keys(hardwareResponse).length
             ? { ...hardwareResponse }
             : false,
         os:
