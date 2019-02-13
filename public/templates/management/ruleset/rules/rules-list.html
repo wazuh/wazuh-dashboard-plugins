@@ -51,9 +51,9 @@
                     </md-switch>
                 </div>
                 <wz-table flex ng-if="showingLocalRules" path="'/rules'" keys="['id',{value:'file',size:2},{value:'description',size:2},{value:'groups',nosortable:true,size:2},{value:'pci',nosortable:true,size:2},{value:'gdpr',nosortable:true},'level']"
-                    implicit-filter="[{ name:'path',value: '/var/ossec/etc/rules'}]" allow-click="true" row-sizes="[18,15,13]"></wz-table>
+                    implicit-filter="[{ name:'path',value: '/var/ossec/etc/rules'}]" allow-click="true" row-sizes="[16,13,11]"></wz-table>
                 <wz-table ng-if="!showingLocalRules" implicit-filter="appliedFilters" flex path="'/rules'" keys="['id',{value:'file',size:2},{value:'description',size:2},{value:'groups',nosortable:true,size:2},{value:'pci',nosortable:true,size:2},{value:'gdpr',nosortable:true},'level']"
-                    allow-click="true" row-sizes="[18,15,13]">
+                    allow-click="true" row-sizes="[16,13,11]">
                 </wz-table>
                 <div layout="row" class="wz-margin-top-10 md-padding-h">
                     <span flex></span>
