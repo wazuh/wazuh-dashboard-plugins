@@ -206,7 +206,11 @@ export class AgentsController {
           `/agents/${agent.id}/restart`,
           {}
         );
-        this.errorHandler.info(data.data.data.msg, '');
+        if (data.data.data.failed_ids) {
+          this.errorHandler.handle(data.data.data.failed_ids[0].error.message, 'Error restarting agent');
+        } else {
+          this.errorHandler.info(data.data.data.msg, '');
+        }
         this.$scope.restartingAgent = false;
       } catch (error) {
         this.errorHandler.handle(`${error.message || error}`, 'Error restarting agent ' + agent.id);
