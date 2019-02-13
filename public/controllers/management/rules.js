@@ -162,10 +162,10 @@ export function RulesController(
         coloredString = coloredString.replace(
           /\$\(((?!<\/span>).)*?\)(?!<\/span>)/im,
           '<span style="color: ' +
-          colors[i] +
-          ' ">' +
-          valuesArray[i] +
-          '</span>'
+            colors[i] +
+            ' ">' +
+            valuesArray[i] +
+            '</span>'
         );
       }
     }
@@ -332,7 +332,7 @@ export function RulesController(
           fileName = fileName + '.xml';
         }
         if (containsNumber.test(fileName)) {
-          this.errorHandler.handle(
+          errorHandler.handle(
             'Error creating a new file. The filename can not contain numbers',
             ''
           );
@@ -354,13 +354,13 @@ export function RulesController(
         const objParam =
           $scope.selectedRulesetTab === 'rules'
             ? {
-              rule: $scope.selectedItem,
-              showRestartManager
-            }
+                rule: $scope.selectedItem,
+                showRestartManager
+              }
             : {
-              decoder: $scope.selectedItem,
-              showRestartManager
-            };
+                decoder: $scope.selectedItem,
+                showRestartManager
+              };
         $scope.$broadcast('saveXmlFile', objParam);
       }
       //$scope.editingFile = false;
