@@ -16,7 +16,7 @@ import { uiModules } from 'ui/modules';
 
 const app = uiModules.get('app/wazuh', []);
 
-app.directive('wzXmlFileEditor', function() {
+app.directive('wzXmlFileEditor', function () {
   return {
     restrict: 'E',
     scope: {
@@ -42,7 +42,7 @@ app.directive('wzXmlFileEditor', function() {
        * evaluates regular expressions.
        * Alternative using split + join, same result.
        */
-      String.prototype.xmlReplace = function(str, newstr) {
+      String.prototype.xmlReplace = function (str, newstr) {
         return this.split(str).join(newstr);
       };
 
@@ -150,10 +150,10 @@ app.directive('wzXmlFileEditor', function() {
           var type = single
             ? 'single'
             : closing
-            ? 'closing'
-            : opening
-            ? 'opening'
-            : 'other';
+              ? 'closing'
+              : opening
+                ? 'opening'
+                : 'other';
           var fromTo = lastType + '->' + type;
           lastType = type;
           var padding = '';
@@ -183,7 +183,7 @@ app.directive('wzXmlFileEditor', function() {
             $scope.$emit('configurationSuccess');
           } else if (params.rule) {
             await rulesetHandler.sendRuleConfiguration(params.rule, xml);
-            const msg = 'Success. Rules has been updated';
+            const msg = 'Success. Rules updated';
             params.showRestartManager
               ? showRestartDialog(msg, params.showRestartManager)
               : errorHandler.info(msg, '');
@@ -197,7 +197,7 @@ app.directive('wzXmlFileEditor', function() {
             await configHandler.saveNodeConfiguration(params.node, xml);
             const msg = `Success. Node (${
               params.node
-            }) configuration has been updated`;
+              }) configuration has been updated`;
             params.showRestartManager
               ? showRestartDialog(msg, params.node)
               : errorHandler.info(msg, '');
@@ -257,7 +257,7 @@ app.directive('wzXmlFileEditor', function() {
 
       const showRestartDialog = async (msg, target) => {
         const confirm = $mdDialog.confirm({
-          controller: function(
+          controller: function (
             $scope,
             scope,
             errorHandler,
@@ -372,7 +372,7 @@ app.directive('wzXmlFileEditor', function() {
 
       $scope.$on('saveXmlFile', (ev, params) => saveFile(params));
 
-      $scope.$on('$destroy', function() {
+      $scope.$on('$destroy', function () {
         //$location.search('editingFile', null);
       });
     },
