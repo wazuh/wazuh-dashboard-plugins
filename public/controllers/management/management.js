@@ -87,11 +87,11 @@ export class ManagementController {
     this.$scope.$on('removeCurrentConfiguration', () => {
       this.currentConfiguration = false;
     });
-    this.$scope.$on('setRestarting', () => {
+    this.$rootScope.$on('setRestarting', () => {
       this.isRestarting = true;
       this.$scope.$applyAsync();
     });
-    this.$scope.$on('removeRestarting', () => {
+    this.$rootScope.$on('removeRestarting', () => {
       this.isRestarting = false;
       this.$scope.$applyAsync();
     });
