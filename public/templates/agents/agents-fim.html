@@ -74,14 +74,11 @@
 <md-content flex layout="column" ng-if="tab === 'fim' && tabView === 'panels' && showSyscheckFiles" layout-align="start">
     <div layout="row" layout-padding class="wz-padding-top-0">
         <span flex></span>
-        <<<<<<< HEAD <span ng-click="launchSyscheckScan()" class="btn pull-right btn-primary"><i class="fa fa-fw fa-play"></i>
+        <span ng-click="launchSyscheckScan()" class="btn pull-right btn-primary"><i class="fa fa-fw fa-play"></i>
             Run scan</span>
-            <span></span>
-            <span ng-click="switchSyscheckFiles()" class="btn pull-right btn-primary"><i class="fa fa-fw fa-area-chart"></i>
-                Show alerts</span>
-            =======
-            <span ng-click="switchSyscheckFiles()" class="btn pull-right wz-button">Show alerts</span>
-            >>>>>>> 3.9-6.6
+        <span></span>
+        <span ng-click="switchSyscheckFiles()" class="btn pull-right btn-primary"><i class="fa fa-fw fa-area-chart"></i>
+            Show alerts</span>
     </div>
 
     <div layout="row" class="wz-margin-top-10 wz-margin-right-8 wz-margin-left-8" ng-if="showSyscheckFiles && (!agent || !agent.os)">
@@ -112,13 +109,9 @@
                     </button>
                 </div>
                 <div layout="row" ng-if="agent && !load" class="wz-margin-top-10 wz-margin-bottom-40-inv">
-                    <<<<<<< HEAD <wz-table flex path="'/syscheck/' + agent.id" implicit-filter="[{name:'type',value:'registry'}]"
+                    <wz-table flex path="'/syscheck/' + agent.id" implicit-filter="[{name:'type',value:'registry'}]"
                         row-sizes="[6,6,6]" extra-limit="100" keys="['file','sha1','md5']">
-                        =======
-                        <wz-table flex path="'/syscheck/' + agent.id" implicit-filter="[{name:'type',value:'registry'}]"
-                            row-sizes="[6,6,6]" extra-limit="true" keys="['file','sha1','md5']">
-                            >>>>>>> 3.9-6.6
-                        </wz-table>
+                    </wz-table>
                 </div>
                 <div layout="row" layout-padding>
                     <span flex></span>
@@ -142,13 +135,9 @@
                     </button>
                 </div>
                 <div layout="row" ng-if="agent && !load" class="wz-margin-top-10 wz-margin-bottom-40-inv">
-                    <<<<<<< HEAD <wz-table flex path="'/syscheck/' + agent.id" implicit-filter="[{name:'type',value:'file'}]"
+                    <wz-table flex path="'/syscheck/' + agent.id" implicit-filter="[{name:'type',value:'file'}]"
                         row-sizes="[6,6,6]" extra-limit="100" keys="['file','size','uname','perm','sha1','sha256','uid','mtime','md5']">
-                        =======
-                        <wz-table flex path="'/syscheck/' + agent.id" implicit-filter="[{name:'type',value:'file'}]"
-                            row-sizes="[6,6,6]" extra-limit="true" keys="['file','size','uname','perm','sha1','sha256','uid','mtime','md5']">
-                            >>>>>>> 3.9-6.6
-                        </wz-table>
+                    </wz-table>
                 </div>
                 <div layout="row" layout-padding>
                     <span flex></span>

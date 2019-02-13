@@ -173,7 +173,7 @@
     <!-- End report status section -->
 
     <!-- No results section -->
-    <<<<<<< HEAD <div layout="row" ng-if="!showSyscheckFiles && !showRootcheckScan && tab === 'fim' && resultState === 'none' && tabView === 'panels'"
+    <div layout="row" ng-if="!showSyscheckFiles && !showRootcheckScan && tab === 'fim' && resultState === 'none' && tabView === 'panels'"
         layout-padding class="wz-padding-top-0">
         <span flex></span>
         <span ng-click="launchSyscheckScan()" class="btn pull-right btn-primary"><i class="fa fa-fw fa-play"></i> Run
@@ -181,26 +181,19 @@
         <span></span>
         <span ng-click="switchSyscheckFiles()" class="btn pull-right btn-primary"><i class="fa fa-fw fa-database"></i>
             Show state</span>
-</div>
-<div layout="row" ng-if="!showSyscheckFiles && !showRootcheckScan && tab === 'pm' && resultState === 'none' && tabView === 'panels'"
-    layout-padding class="wz-padding-top-0">
-    <span flex></span>
-    <span ng-click="launchRootcheckScan()" class="btn pull-right btn-primary"><i class="fa fa-fw fa-play"></i> Run scan</span>
-    <span></span>
-    <span ng-click="switchRootcheckScan()" class="btn pull-right btn-primary"><i class="fa fa-fw fa-database"></i> Show
-        state</span>
-</div>
-<div layout="row" class="wz-margin-top-10 wz-margin-right-8 wz-margin-left-8" ng-if="!showSyscheckFiles && !showRootcheckScan && tab !== 'welcome' && tab !== 'configuration' && tab !== 'syscollector'"
-    ng-show="resultState === 'none' && tabView === 'panels'">
-    =======
-    <div layout="row" ng-if="!showSyscheckFiles && tab === 'fim' && resultState === 'none' && tabView === 'panels'"
+    </div>
+    <div layout="row" ng-if="!showSyscheckFiles && !showRootcheckScan && tab === 'pm' && resultState === 'none' && tabView === 'panels'"
         layout-padding class="wz-padding-top-0">
         <span flex></span>
-        <span ng-click="switchSyscheckFiles()" class="btn pull-right wz-button">Show files</span>
+        <span ng-click="launchRootcheckScan()" class="btn pull-right btn-primary"><i class="fa fa-fw fa-play"></i> Run
+            scan</span>
+        <span></span>
+        <span ng-click="switchRootcheckScan()" class="btn pull-right btn-primary"><i class="fa fa-fw fa-database"></i>
+            Show
+            state</span>
     </div>
-    <div layout="row" class="wz-margin-top-10 wz-margin-right-8 wz-margin-left-8" ng-if="!showSyscheckFiles && tab !== 'welcome' && tab !== 'configuration' && tab !== 'syscollector'"
+    <div layout="row" class="wz-margin-top-10 wz-margin-right-8 wz-margin-left-8" ng-if="!showSyscheckFiles && !showRootcheckScan && tab !== 'welcome' && tab !== 'configuration' && tab !== 'syscollector'"
         ng-show="resultState === 'none' && tabView === 'panels'">
-        >>>>>>> 3.9-6.6
         <div flex class="euiCallOut euiCallOut--warning">
             <div class="euiCallOutHeader">
                 <svg class="euiIcon euiIcon--medium euiCallOutHeader__icon" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
