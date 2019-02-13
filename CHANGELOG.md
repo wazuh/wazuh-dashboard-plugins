@@ -8,6 +8,11 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 - Support for Kibana v6.6.0
 
+### Fixed
+
+- Fixed AWS dashboard, newer JavaScript browser engines break the view due to Angular.js ([6e882fc](https://github.com/wazuh/wazuh-kibana-app/commit/6e882fc1d7efe6059e6140ff40b8a20d9c1fa51e)).
+- Fixed AWS accounts visualization, using the right field now ([6e882fc](https://github.com/wazuh/wazuh-kibana-app/commit/6e882fc1d7efe6059e6140ff40b8a20d9c1fa51e)).
+
 ## Wazuh v3.8.2 - Kibana v6.5.4 - Revision 418
 
 ### Added
