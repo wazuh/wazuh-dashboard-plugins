@@ -1,13 +1,15 @@
 <div flex="auto" layout="column" ng-if="configurationTab === 'welcome' && !editionTab" class="" ng-class="agent && agent.id !== '000'?'wz-margin-top-8':''">
     <!-- Headline -->
-    <div layout="column" layout-padding>
-        <div ng-show="agent && agent.id !== '000'">
+    <div layout="column" layout-padding ng-show="agent && agent.id !== '000'">
+        <div>
             <span class="font-size-18"> <i class="fa fa-fw fa-cog" aria-hidden="true"></i> Configuration</span>
             <span ng-if="isSynchronized" class="wz-agent-status-indicator small teal">SYNCHRONIZED</span>
             <span ng-if="!isSynchronized" class="wz-agent-status-indicator small red">NOT SYNCHRONIZED</span>
         </div>
-        <span class="font-size-18" ng-show="!agent || agent.id === '000'">
-            <i class="fa fa-fw fa-cog" aria-hidden="true"></i> Configuration</span>
+    </div>
+    <div layout="row" ng-show="!agent || agent.id === '000'" class="wz-padding-left-8">
+        <md-button class="wz-button" ng-click="mctrl.setConfigTab('editconfiguration', true)"><i class="fa fa-fw fa-pencil"></i>
+            Edit configuration</md-button>
     </div>
     <!-- End headline -->
 
@@ -257,8 +259,10 @@
         <!-- End configuration cards section -->
 
         <!-- This section is the right sidenav content -->
-        <md-sidenav class="md-sidenav-right" md-is-locked-open="true">
-            <md-list>
+        <md-sidenav class="md-sidenav-right" style="width: auto !important;" md-is-locked-open="true">
+            <span class="wz-margin-right-8 wz-text-link wz-text-right wz-margin-top-8" ng-click="showHelp = !showHelp"><i
+                    class="fa fa-fw fa-question-circle-o"></i></span>
+            <md-list ng-if="showHelp">
                 <md-subheader>More info about this section</md-subheader>
                 <md-list-item target="_blank" class="wz-text-link" ng-href="https://documentation.wazuh.com/current/user-manual/manager/index.html">Wazuh
                     administration documentation</md-list-item>

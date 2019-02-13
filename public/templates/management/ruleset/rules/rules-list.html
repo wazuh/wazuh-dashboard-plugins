@@ -1,5 +1,5 @@
 <div ng-if="!loading && !viewingDetail" layout="column">
-    <div id="content" layout="row" class="md-padding ">
+    <div id="content" layout="row" class="md-padding " ng-if="!editingFile">
         <input flex placeholder="Filter rules..." ng-model="custom_search" type="text" class="kuiLocalSearchInput height-40 ng-empty ng-pristine ng-scope ng-touched ng-valid"
             aria-invalid="false" wz-enter="search(custom_search)">
         <button type="submit" aria-label="Search" class="kuiLocalSearchButton height-40" ng-click="search(custom_search)">
@@ -7,7 +7,7 @@
         </button>
     </div>
 
-    <md-chips class="wz-chips md-padding-h wz-padding-bottom-14" readonly="true" ng-show="appliedFilters.length">
+    <md-chips class="wz-chips md-padding-h wz-padding-bottom-14" readonly="true" ng-show="appliedFilters.length" ng-if="!editingFile">
         <md-chip class="wz-chip" ng-show="includesFilter('file')">
             <span>File: {{getFilter('file')}}
                 <i class="fa fa-fw fa-times cursor-pointer" aria-hidden="true" ng-click="removeFilter('file')"></i>
@@ -40,11 +40,20 @@
         </md-chip>
     </md-chips>
 
-    <div layout="row">
+    <div layout="row" ng-if="!editingFile">
         <md-card flex class="wz-md-card _md flex md-margin-h">
             <md-card-content>
-                <wz-table implicit-filter="appliedFilters" flex path="'/rules'" keys="['id',{value:'file',size:2},{value:'description',size:2},{value:'groups',nosortable:true,size:2},{value:'pci',nosortable:true,size:2},{value:'gdpr',nosortable:true},'level']"
-                    allow-click="true" row-sizes="[15,13,11]">
+                <div layout="row" ng-if="!editingFile">
+                    <a ng-click="addNewFile('rules')">Add new rule <i aria-hidden="true" class="fa fa-plus"></i></a>
+                    <span flex></span>
+                    <md-switch ng-model="showingLocalRules" ng-change="switchLocalRules()" class="md-primary wz-no-top-bottom-margin">
+                        Only custom
+                    </md-switch>
+                </div>
+                <wz-table flex ng-if="showingLocalRules" path="'/rules'" keys="['id',{value:'file',size:2},{value:'description',size:2},{value:'groups',nosortable:true,size:2},{value:'pci',nosortable:true,size:2},{value:'gdpr',nosortable:true},'level']"
+                    implicit-filter="[{ name:'path',value: '/var/ossec/etc/rules'}]" allow-click="true" row-sizes="[16,13,11]"></wz-table>
+                <wz-table ng-if="!showingLocalRules" implicit-filter="appliedFilters" flex path="'/rules'" keys="['id',{value:'file',size:2},{value:'description',size:2},{value:'groups',nosortable:true,size:2},{value:'pci',nosortable:true,size:2},{value:'gdpr',nosortable:true},'level']"
+                    allow-click="true" row-sizes="[16,13,11]">
                 </wz-table>
                 <div layout="row" class="wz-margin-top-10 md-padding-h">
                     <span flex></span>
@@ -52,5 +61,34 @@
                 </div>
             </md-card-content>
         </md-card>
+    </div>
+    <div class="md-padding" ng-if="editingFile && type === 'rules'">
+        <div flex layout="column">
+            <div layout="row" ng-if="!newFile" class="wz-padding-bottom-14">
+                <span ng-click='closeEditingFile()' class='btn btn-info'>Cancel</span>
+                <button ng-disabled='xmlHasErrors' ng-click='doSaveConfig(false)' class='btn wz-button pull-right wz-margin-left-8'>
+                    <span ng-show='!xmlHasErrors'><i aria-hidden='true' class='fa fa-fw fa-save'></i>Save
+                        file</span>
+                    <span ng-show='xmlHasErrors' class='btn-danger'><i aria-hidden='true' class='fa fa-fw fa-exclamation-triangle'></i>
+                        XML format error</span>
+                </button>
+            </div>
+            <div layout="row" ng-if="newFile" class="wz-padding-bottom-14">
+                <span ng-click='closeEditingFile()' class='btn btn-info'>Cancel</span>
+                <button ng-disabled='xmlHasErrors' ng-click='doSaveConfig(true,newFileName)' class='btn wz-button pull-right wz-margin-left-8'>
+                    <span ng-show='!xmlHasErrors'><i aria-hidden='true' class='fa fa-fw fa-save'></i>Save
+                        file</span>
+                    <span ng-show='xmlHasErrors' class='btn-danger'><i aria-hidden='true' class='fa fa-fw fa-exclamation-triangle'></i>
+                        XML format error</span>
+                </button>
+                <input placeholder="Eg: my_local_rule.xml" ng-model="newFileName" type="text" class="wz-margin-left-8 kuiLocalSearchInput ng-empty ng-pristine ng-scope ng-touched ng-valid"
+                    aria-invalid="false">
+            </div>
+            <div ng-if="fetchedXML" style="height: calc(100vh - 340px);">
+                <wz-xml-file-editor file-name='{{selectedFileName}}' data="fetchedXML" target-name="selectedItem.file"
+                    valid-fn='xmlIsValid(valid)' close-fn='closeEditingFile(reload)'>
+                </wz-xml-file-editor>
+            </div>
+        </div>
     </div>
 </div>

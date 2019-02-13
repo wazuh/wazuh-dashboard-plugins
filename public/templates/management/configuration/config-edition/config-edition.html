@@ -12,9 +12,6 @@
                 <span class="font-size-18">
                     <i class="fa fa-fw fa-edit" aria-hidden="true"></i> Cluster configuration</span>
             </div>
-            <div layout="row">
-                <span class="md-subheader">Edit master/worker configuration</span>
-            </div>
         </div>
 
         <!-- Headline (manager) -->
@@ -23,9 +20,6 @@
                 <span class="font-size-18">
                     <i class="fa fa-fw fa-edit" aria-hidden="true"></i> Manager configuration</span>
             </div>
-            <div layout="row">
-                <span class="md-subheader">Edit manager configuration</span>
-            </div>
         </div>
         <!-- End headline -->
 
@@ -33,27 +27,31 @@
             <!-- XML editor for node configuration -->
             <div flex layout="column">
                 <div layout="row" class="md-padding-h">
-                    <button ng-disabled='xmlHasErrors' ng-click='saveConfiguration()' class='btn btn-primary'>
-                        <span ng-show='!xmlHasErrors'><i aria-hidden='true' class='fa fa-fw fa-save'></i>Save file</span>
-                        <span ng-show='xmlHasErrors' class='btn-danger'><i aria-hidden='true' class='fa fa-fw fa-exclamation-triangle'></i>
-                            XML format error</span>
-                    </button>
                     <!-- List of nodes if cluster is enabled -->
-                    <div ng-show="selectedNode && clusterStatus.data.data.enabled === 'yes' && clusterStatus.data.data.running === 'yes' " layout="row" class="wz-margin-left-8"
-                        layout-padding style="padding: 0;height: 32px;">
+                    <div ng-show="selectedNode && clusterStatus.data.data.enabled === 'yes' && clusterStatus.data.data.running === 'yes' "
+                        layout="row" layout-padding style="padding: 0;height: 32px;">
                         <div layout="column" layout-align="center" class="height-35 wz-select-input">
                             <select class="kuiSelect wz-border-none cursor-pointer max-height-35" id="categoryBox"
                                 ng-model="selectedNode" ng-change="changeNode()" aria-label="Select node">
                                 <option ng-repeat="node in nodes" value="{{node.name}}">{{node.name}} ({{node.type}})</option>
                             </select>
                         </div>
-                        <button class="btn btn-primary wz-margin-left-8" ng-disabled="isRestarting" ng-click="restartNode(selectedNode)"><i
-                                class="fa fa-refresh"></i>
-                            Restart {{selectedNode}}
-                        </button>
                     </div>
+                    <button ng-disabled='xmlHasErrors' ng-click="switchConfigurationTab('welcome', false)" class='btn btn-info wz-margin-left-8'>
+                        <span>Cancel</span>
+                    </button>
+                    <button ng-disabled='xmlHasErrors' ng-click='saveConfiguration()' class='btn wz-button wz-margin-left-8'>
+                        <span ng-show='!xmlHasErrors'><i aria-hidden='true' class='fa fa-fw fa-save'></i>Save</span>
+                        <span ng-show='xmlHasErrors' class='btn-danger'><i aria-hidden='true' class='fa fa-fw fa-exclamation-triangle'></i>
+                            XML format error</span>
+                    </button>
+                    <span flex></span>
+                    <button class="btn wz-button" ng-disabled="isRestarting" ng-click="restartNode(selectedNode)"><i
+                            class="fa fa-refresh"></i>
+                        Restart {{selectedNode}}
+                    </button>
                 </div>
-                <div class="md-padding md-padding-top-10" style="height: calc(100vh - 280px);" ng-if="fetchedXML">
+                <div class="md-padding md-padding-top-10" style="height: calc(100vh - 230px);" ng-if="fetchedXML">
                     <wz-xml-file-editor file-name='ossec.conf' data="fetchedXML" target-name="selectedNode" valid-fn='xmlIsValid(valid)'
                         close-fn='closeEditingFile(reload)'>
                     </wz-xml-file-editor>

@@ -18,14 +18,8 @@
     <div flex="auto" layout="row" ng-if="!load">
 
         <!-- No configuration section -->
-        <wz-no-config
-          flex
-          error="currentConfig['wmodules-wmodules']"
-          ng-if="currentConfig['wmodules-wmodules'] && isString(currentConfig['wmodules-wmodules'])"></wz-no-config>
-        <wz-no-config
-          flex
-          error="'not-present'"
-          ng-if="currentConfig && !currentConfig.commands && !isString(currentConfig['wmodules-wmodules'])"></wz-no-config>
+        <wz-no-config flex error="currentConfig['wmodules-wmodules']" ng-if="currentConfig['wmodules-wmodules'] && isString(currentConfig['wmodules-wmodules'])"></wz-no-config>
+        <wz-no-config flex error="'not-present'" ng-if="currentConfig && !currentConfig.commands && !isString(currentConfig['wmodules-wmodules'])"></wz-no-config>
         <!-- End no configuration section -->
 
         <!-- This section is the main content -->
@@ -65,49 +59,27 @@
                         <div flex layout="column">
 
                             <div flex="auto" class="wz-item-detail">
-                                <wz-config-item
-                                    label="Command status"
-                                    value="currentConfig.commands[selectedItem].disabled === 'no' ? 'enabled' : 'disabled'">
+                                <wz-config-item label="Command status" value="currentConfig.commands[selectedItem].disabled === 'no' ? 'enabled' : 'disabled'">
                                 </wz-config-item>
-                                <wz-config-item
-                                    label="Command name"
-                                    value="currentConfig.commands[selectedItem].tag">
+                                <wz-config-item label="Command name" value="currentConfig.commands[selectedItem].tag">
                                 </wz-config-item>
-                                <wz-config-item
-                                    label="Command to execute"
-                                    value="currentConfig.commands[selectedItem].command">
+                                <wz-config-item label="Command to execute" value="currentConfig.commands[selectedItem].command">
                                 </wz-config-item>
-                                <wz-config-item
-                                    label="Interval between executions"
-                                    value="currentConfig.commands[selectedItem].interval">
+                                <wz-config-item label="Interval between executions" value="currentConfig.commands[selectedItem].interval">
                                 </wz-config-item>
-                                <wz-config-item
-                                    label="Run on start"
-                                    value="currentConfig.commands[selectedItem].run_on_start">
+                                <wz-config-item label="Run on start" value="currentConfig.commands[selectedItem].run_on_start">
                                 </wz-config-item>
-                                <wz-config-item
-                                    label="Ignore command output"
-                                    value="currentConfig.commands[selectedItem].ignore_output">
+                                <wz-config-item label="Ignore command output" value="currentConfig.commands[selectedItem].ignore_output">
                                 </wz-config-item>
-                                <wz-config-item
-                                    label="Timeout (in seconds) to wait for execution"
-                                    value="currentConfig.commands[selectedItem].timeout">
+                                <wz-config-item label="Timeout (in seconds) to wait for execution" value="currentConfig.commands[selectedItem].timeout">
                                 </wz-config-item>
-                                <wz-config-item
-                                    label="Verify MD5 sum"
-                                    value="currentConfig.commands[selectedItem].verify_md5">
+                                <wz-config-item label="Verify MD5 sum" value="currentConfig.commands[selectedItem].verify_md5">
                                 </wz-config-item>
-                                <wz-config-item
-                                    label="Verify SHA1 sum"
-                                    value="currentConfig.commands[selectedItem].verify_sha1">
+                                <wz-config-item label="Verify SHA1 sum" value="currentConfig.commands[selectedItem].verify_sha1">
                                 </wz-config-item>
-                                <wz-config-item
-                                    label="Verify SHA256 sum"
-                                    value="currentConfig.commands[selectedItem].verify_sha256">
+                                <wz-config-item label="Verify SHA256 sum" value="currentConfig.commands[selectedItem].verify_sha256">
                                 </wz-config-item>
-                                <wz-config-item
-                                    label="Ignore checksum verification"
-                                    value="currentConfig.commands[selectedItem].skip_verification">
+                                <wz-config-item label="Ignore checksum verification" value="currentConfig.commands[selectedItem].skip_verification">
                                 </wz-config-item>
                             </div>
 
@@ -125,12 +97,13 @@
         <!-- End main content section -->
 
         <!-- This section is the right sidenav content -->
-        <md-sidenav
-            class="md-sidenav-right"
-            md-is-locked-open="true">
-            <md-list>
+        <md-sidenav class="md-sidenav-right" style="width: auto !important;" md-is-locked-open="true">
+            <span class="wz-margin-right-8 wz-text-link wz-text-right wz-margin-top-8" ng-click="showHelp = !showHelp"><i
+                    class="fa fa-fw fa-question-circle-o"></i></span>
+            <md-list ng-if="showHelp">
                 <md-subheader>More info about this section</md-subheader>
-                <md-list-item target="_blank" class="wz-text-link" ng-href="https://documentation.wazuh.com/current/user-manual/reference/ossec-conf/wodle-command.html">Command module reference</md-list-item>
+                <md-list-item target="_blank" class="wz-text-link" ng-href="https://documentation.wazuh.com/current/user-manual/reference/ossec-conf/wodle-command.html">Command
+                    module reference</md-list-item>
             </md-list>
         </md-sidenav>
         <!-- End right sidenav section -->
