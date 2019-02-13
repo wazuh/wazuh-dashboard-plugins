@@ -33,7 +33,7 @@ export class TabVisualizations {
 
     this.overview = {
       welcome: 0,
-      general: 11,
+      general: 13,
       fim: 8,
       pm: 5,
       vuls: 10,
