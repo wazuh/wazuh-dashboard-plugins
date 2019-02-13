@@ -206,18 +206,21 @@ export class AgentsController {
           `/agents/${agent.id}/restart`,
           {}
         );
-        if (data.data.data.failed_ids) {
-          this.errorHandler.handle(data.data.data.failed_ids[0].error.message, 'Error restarting agent');
+        if ((((data || {}).data || {}).data || {}).failed_ids) {
+          throw new Error(((((data || {}).data || {}).data || {}).failed_ids[0] || {}).error);
         } else {
-          this.errorHandler.info(data.data.data.msg, '');
+          this.errorHandler.info((((data || {}).data || {}).data || {}).msg, '');
         }
         this.$scope.restartingAgent = false;
       } catch (error) {
-        this.errorHandler.handle(`${error.message || error}`, 'Error restarting agent ' + agent.id);
+        this.errorHandler.handle(
+          `${error.message || error}`,
+          'Error restarting agent ' + agent.id
+        );
         this.$scope.restartingAgent = false;
       }
       this.$scope.$applyAsync();
-    }
+    };
 
     this.$scope.updateAgent = async agent => {
       agent.upgrading = true;
@@ -228,15 +231,17 @@ export class AgentsController {
           `/agents/${agent.id}/upgrade?wait_for_complete`,
           {}
         );
-        const err = data.data.error !== 0;
-        if (err) {
-          this.errorHandler(err, "Error upgrading agent");
+        if (((data || {}).data || {}).error !== 0) {
+          throw new Error(((data || {}).data || {}).data);
         }
       } catch (error) {
-        if (error.status === -1) {
-          error.message = "Aborted";
+        if ((error || {}).status === -1) {
+          error.message = 'Aborted';
         } else {
-          this.errorHandler.handle(`${error.message || error}`, 'Error upgrading agent ' + agent.id);
+          this.errorHandler.handle(
+            `${error.message || error}`,
+            'Error upgrading agent ' + agent.id
+          );
           agent.upgrading = false;
           this.appState.removeSessionStorageItem(`updatingAgent${agent.id}`);
         }
@@ -759,16 +764,32 @@ export class AgentsController {
             this.$scope.agent.group && !this.$scope.agent.group.includes(item)
         );
 
+      const outdatedAgents = await this.apiReq.request(
+        'GET',
+        '/agents/outdated/',
+        {}
+      );
+      this.$scope.agent.outdated = outdatedAgents.data.data.items
+        .map(x => x.id)
+        .find(x => x === this.$scope.agent.id);
 
-      const outdatedAgents = await this.apiReq.request('GET', '/agents/outdated/', {});
-      this.$scope.agent.outdated = outdatedAgents.data.data.items.map(x => x.id).find(x => x === this.$scope.agent.id);
       if (this.$scope.agent.outdated) {
-        if (this.appState.getSessionStorageItem(`updatingAgent${this.$scope.agent.id}`)) {
+        if (
+          this.appState.getSessionStorageItem(
+            `updatingAgent${this.$scope.agent.id}`
+          )
+        ) {
           this.$scope.agent.upgrading = true;
         }
       } else {
-        if (this.appState.getSessionStorageItem(`updatingAgent${this.$scope.agent.id}`)) {
-          this.appState.removeSessionStorageItem(`updatingAgent${this.$scope.agent.id}`)
+        if (
+          this.appState.getSessionStorageItem(
+            `updatingAgent${this.$scope.agent.id}`
+          )
+        ) {
+          this.appState.removeSessionStorageItem(
+            `updatingAgent${this.$scope.agent.id}`
+          );
           this.$scope.agent.outdated = false;
         }
         if (!this.$scope.$$phase) this.$scope.$digest();
