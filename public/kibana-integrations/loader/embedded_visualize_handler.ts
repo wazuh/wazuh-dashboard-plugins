@@ -16,22 +16,31 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-
+// @ts-ignore
 import { EventEmitter } from 'events';
+// @ts-ignore
 import { debounce, forEach } from 'lodash';
 import * as Rx from 'rxjs';
 import { share } from 'rxjs/operators';
+// @ts-ignore
 import { Inspector } from 'ui/inspector';
+// @ts-ignore
 import { Adapters } from 'ui/inspector/types';
+// @ts-ignore
 import { PersistedState } from 'ui/persisted_state';
+// @ts-ignore
 import { IPrivate } from 'ui/private';
+// @ts-ignore
 import { RenderCompleteHelper } from 'ui/render_complete';
+// @ts-ignore
 import { AppState } from 'ui/state_management/app_state';
+// @ts-ignore
 import { timefilter } from 'ui/timefilter';
+// @ts-ignore
 import { RequestHandlerParams, Vis } from 'ui/vis';
 import { visualizationLoader } from './visualization_loader';
 import { VisualizeDataLoader } from './visualize_data_loader';
-
+// @ts-ignore
 import { DataAdapter, RequestAdapter } from 'ui/inspector/adapters';
 
 import { VisSavedObject, VisualizeLoaderParams, VisualizeUpdateParams } from './types';
@@ -90,7 +99,7 @@ export class EmbeddedVisualizeHandler {
     private readonly element: HTMLElement,
     savedObject: VisSavedObject,
     params: EmbeddedVisualizeHandlerParams
-  ) {  
+  ) {
     const { searchSource, vis } = savedObject;
 
     const {
@@ -143,7 +152,6 @@ export class EmbeddedVisualizeHandler {
     this.vis.openInspector = this.openInspector;
     this.vis.hasInspector = this.hasInspector;
 
-    // init default actions
     forEach(this.vis.type.events, (event, eventName) => {
       if (event.disabled || !eventName) {
         return;
@@ -159,7 +167,7 @@ export class EmbeddedVisualizeHandler {
         this.actions[event.name](event.data);
       }
     });
-    
+
     this.dataSubject = new Rx.Subject();
     this.data$ = this.dataSubject.asObservable().pipe(share());
 

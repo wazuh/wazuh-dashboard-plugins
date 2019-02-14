@@ -16,12 +16,15 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+// @ts-ignore
 import { isEqual } from 'lodash';
-
+// @ts-ignore
 import { VisRequestHandlersRegistryProvider as RequestHandlersProvider } from 'ui/registry/vis_request_handlers';
+// @ts-ignore
 import { VisResponseHandlersRegistryProvider as ResponseHandlerProvider } from 'ui/registry/vis_response_handlers';
-
+// @ts-ignore
 import { IPrivate } from 'ui/private';
+// @ts-ignore
 import {
   RequestHandler,
   RequestHandlerDescription,
@@ -29,11 +32,12 @@ import {
   ResponseHandler,
   ResponseHandlerDescription,
   Vis,
+  // @ts-ignore
 } from 'ui/vis';
 
 // @ts-ignore No typing present
 import { isTermSizeZeroError } from 'ui/elasticsearch_errors';
-
+// @ts-ignore
 import { toastNotifications } from 'ui/notify';
 
 function getHandler<T extends RequestHandler | ResponseHandler>(
@@ -96,7 +100,7 @@ export class VisualizeDataLoader {
             : undefined,
         });
       } catch (error) {
-        if(!this.vis || !this.vis.searchSource) {
+        if (!this.vis || !this.vis.searchSource) {
           return;
         }
         throw error;
@@ -114,14 +118,14 @@ export class VisualizeDataLoader {
       this.previousRequestHandlerResponse = requestHandlerResponse;
 
       if (!canSkipResponseHandler) {
-        this.visData = await Promise.resolve(this.responseHandler(requestHandlerResponse));        
+        this.visData = await Promise.resolve(this.responseHandler(requestHandlerResponse));
       }
 
       return this.visData;
     } catch (error) {
-      if(typeof ((params || {}).searchSource || {}).cancelQueued === 'function') {
+      if (typeof ((params || {}).searchSource || {}).cancelQueued === 'function') {
         params.searchSource.cancelQueued();
-      }        
+      }
 
       this.vis.requestError = error;
       this.vis.showRequestError =
@@ -130,11 +134,11 @@ export class VisualizeDataLoader {
       if (isTermSizeZeroError(error)) {
         return toastNotifications.addDanger(
           `Your visualization ('${this.vis.title}') has an error: it has a term ` +
-            `aggregation with a size of 0. Please set it to a number greater than 0 to resolve ` +
-            `the error.`
+          `aggregation with a size of 0. Please set it to a number greater than 0 to resolve ` +
+          `the error.`
         );
       }
-      
+
       toastNotifications.addDanger({
         title: 'Error in visualization',
         text: error.message,

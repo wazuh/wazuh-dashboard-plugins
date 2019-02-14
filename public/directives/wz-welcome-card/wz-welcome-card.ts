@@ -9,8 +9,9 @@
  *
  * Find more information about this on the LICENSE file.
  */
-
+// @ts-ignore
 import template from './wz-welcome-card.html';
+// @ts-ignore
 import { uiModules } from 'ui/modules';
 
 const app = uiModules.get('app/wazuh', []);
@@ -21,23 +22,23 @@ class WzWelcomeCard {
     private restrict: string;
     private scope: object;
     private appState: any;
-    
+
     constructor(appState: any) {
         this.restrict = 'E';
         this.scope = {
-            title:       '=title',
+            title: '=title',
             description: '=description',
-            logo:        '=logo',
-            switchTab:   '&',
-            currentTab:  '=currentTab',
-            wzLogo:      '=wzLogo'
+            logo: '=logo',
+            switchTab: '&',
+            currentTab: '=currentTab',
+            wzLogo: '=wzLogo'
         };
         this.replace = true;
         this.template = template;
         this.appState = appState;
     }
 
-    link(scope, elm, attrs) { 
+    link(scope, elm, attrs) {
         scope.callSwitchTab = () => {
             this.appState.setNavigation(true);
             scope.switchTab()
@@ -45,4 +46,4 @@ class WzWelcomeCard {
     }
 }
 
-app.directive('wzWelcomeCard',(appState: any) => new WzWelcomeCard(appState));
+app.directive('wzWelcomeCard', (appState: any) => new WzWelcomeCard(appState));
