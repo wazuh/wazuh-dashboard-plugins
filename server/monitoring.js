@@ -634,11 +634,11 @@ export class Monitoring {
       }
 
       !this.quiet &&
-        log('[monitoring][init]', 'Creating today index...', 'info');
+        log('[monitoring][init]', 'Creating new index...', 'info');
       !this.quiet &&
         this.server.log(
           [blueWazuh, 'monitoring', 'info'],
-          'Creating today index...'
+          'Creating new index...'
         );
 
       await this.saveStatus();

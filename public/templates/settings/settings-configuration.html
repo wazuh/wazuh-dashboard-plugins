@@ -32,18 +32,19 @@
                                 ng-style="ctrl.editingKey === key && {'background': '#e2f7ff'}">
                                 <td>{{key}}</td>
                                 <td>
-                                    <input ng-if="ctrl.editingKey === key && ctrl.configurationTypes[key] === 'string'"
-                                        ng-disabled="ctrl.loadingChange" id="input-{{key}}" type="text" class="wz-input-text"
-                                        ng-model="ctrl.editingNewValue"></input>
+                                    <input ng-if="ctrl.editingKey === key && ctrl.configurationTypes[key] === 'string' && key !== 'wazuh.monitoring.creation'"
+                                        ng-disabled="ctrl.loadingChange" type="text" class="wz-input-text" ng-model="ctrl.editingNewValue"></input>
                                     <input ng-if="ctrl.editingKey === key && ctrl.configurationTypes[key] === 'number'"
-                                        ng-disabled="ctrl.loadingChange" id="input-{{key}}" type="number" class="wz-input-text"
-                                        ng-model="ctrl.editingNewValue" min=0></input>
+                                        ng-disabled="ctrl.loadingChange" type="number" class="wz-input-text" ng-model="ctrl.editingNewValue"
+                                        min=0></input>
                                     <select ng-if="ctrl.editingKey === key && ctrl.configurationTypes[key] === 'boolean'"
-                                        ng-disabled="ctrl.loadingChange" id="input-{{key}}" class="wz-input-text wz-width-100"
-                                        ng-model="ctrl.editingNewValue" ng-options="o as o for o in [true, false]"></select>
+                                        ng-disabled="ctrl.loadingChange" class="wz-input-text wz-width-100" ng-model="ctrl.editingNewValue"
+                                        ng-options="o as o for o in [true, false]"></select>
+                                    <select ng-if="ctrl.editingKey === key && key === 'wazuh.monitoring.creation'"
+                                        ng-disabled="ctrl.loadingChange" class="wz-input-text wz-width-100" ng-model="ctrl.editingNewValue"
+                                        ng-options="key as value for (key , value) in  {'h': 'hourly', 'd': 'daily', 'w': 'weekly', 'm': 'monthly'}"></select>
                                     <textarea ng-if="ctrl.editingKey === key && ctrl.configurationTypes[key] === 'object'"
-                                        ng-disabled="ctrl.loadingChange" id="input-{{key}}" class="wz-input-text wz-width-100"
-                                        ng-model="ctrl.editingNewValue"></textarea>
+                                        ng-disabled="ctrl.loadingChange" class="wz-input-text wz-width-100" ng-model="ctrl.editingNewValue"></textarea>
                                     <span ng-show="!ctrl.editingKey || ctrl.editingKey !== key">{{value}}</span>
                                 </td>
                                 <td>{{ctrl.configEquivalence(key)}}</td>
