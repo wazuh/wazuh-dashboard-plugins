@@ -372,7 +372,6 @@ export class Monitoring {
    * @param {String} clusterName Wazuh cluster name.
    */
   async createIndex(datedIndex, clusterName) {
-    console.log('--------CREA EL INDICE ' + datedIndex)
     try {
       if (!this.ENABLED) return;
       const configFile = getConfiguration();
