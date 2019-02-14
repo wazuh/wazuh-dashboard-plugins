@@ -10,24 +10,25 @@
  * Find more information about this on the LICENSE file.
  */
 
-
-
 export function indexDate(interval) {
   try {
     if (!interval) throw new Error('Creation interval not found');
     const d = new Date();
-    let date = "";
+    let date = '';
     switch (interval) {
       case 'h':
-        date = d.toISOString()
-          .replace(/T/, '-')
-          .replace(/\..+/, '')
-          .replace(/-/g, '.')
-          .replace(/:/g, '')
-          .slice(0, -4) + 'h';
+        date =
+          d
+            .toISOString()
+            .replace(/T/, '-')
+            .replace(/\..+/, '')
+            .replace(/-/g, '.')
+            .replace(/:/g, '')
+            .slice(0, -4) + 'h';
         break;
       case 'd':
-        date = d.toISOString()
+        date = d
+          .toISOString()
           .replace(/T/, '-')
           .replace(/\..+/, '')
           .replace(/-/g, '.')
@@ -35,10 +36,11 @@ export function indexDate(interval) {
           .slice(0, -7);
         break;
       case 'w':
-        date = d.getFullYear() + "." + weekOfYear() + 'w'
+        date = d.getFullYear() + '.' + weekOfYear() + 'w';
         break;
       case 'm':
-        date = d.toISOString()
+        date = d
+          .toISOString()
           .replace(/T/, '-')
           .replace(/\..+/, '')
           .replace(/-/g, '.')
@@ -60,9 +62,9 @@ export function indexDate(interval) {
   }
 }
 
-var weekOfYear = function () {
+var weekOfYear = function() {
   var d = new Date();
   d.setHours(0, 0, 0);
   d.setDate(d.getDate() + 4 - (d.getDay() || 7));
-  return Math.ceil((((d - new Date(d.getFullYear(), 0, 1)) / 8.64e7) + 1) / 7);
+  return Math.ceil(((d - new Date(d.getFullYear(), 0, 1)) / 8.64e7 + 1) / 7);
 };

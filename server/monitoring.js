@@ -52,9 +52,9 @@ export class Monitoring {
 
       this.ENABLED =
         configFile &&
-          typeof configFile['wazuh.monitoring.enabled'] !== 'undefined'
+        typeof configFile['wazuh.monitoring.enabled'] !== 'undefined'
           ? configFile['wazuh.monitoring.enabled'] &&
-          configFile['wazuh.monitoring.enabled'] !== 'worker'
+            configFile['wazuh.monitoring.enabled'] !== 'worker'
           : this.ENABLED;
 
       this.FREQUENCY =
@@ -65,8 +65,7 @@ export class Monitoring {
       this.CREATION =
         (configFile || {})['wazuh.monitoring.creation'] || this.CREATION;
 
-      this.datedIndex =
-        this.index_prefix + indexDate(this.CREATION);
+      this.datedIndex = this.index_prefix + indexDate(this.CREATION);
 
       this.index_pattern =
         (configFile || {})['wazuh.monitoring.pattern'] || this.index_pattern;
@@ -112,7 +111,7 @@ export class Monitoring {
         log(
           '[monitoring][configuration]',
           `wazuh.monitoring.pattern: ${this.index_pattern} (index prefix: ${
-          this.index_prefix
+            this.index_prefix
           })`,
           'info'
         );
@@ -121,7 +120,7 @@ export class Monitoring {
         this.server.log(
           [blueWazuh, 'monitoring', 'info'],
           `wazuh.monitoring.pattern: ${this.index_pattern} (index prefix: ${
-          this.index_prefix
+            this.index_prefix
           })`
         );
     } catch (error) {
@@ -415,13 +414,13 @@ export class Monitoring {
         log(
           '[monitoring][createIndex]',
           `Could not create ${datedIndex} index on elasticsearch due to ${error.message ||
-          error}`
+            error}`
         );
       !this.quiet &&
         this.server.log(
           [blueWazuh, 'monitoring', 'error'],
           `Could not create ${datedIndex} index on elasticsearch due to ${error.message ||
-          error}`
+            error}`
         );
     }
   }
@@ -458,13 +457,13 @@ export class Monitoring {
         log(
           '[monitoring][insertDocument]',
           `Error inserting agent data into elasticsearch. Bulk request failed due to ${error.message ||
-          error}`
+            error}`
         );
       !this.quiet &&
         this.server.log(
           [blueWazuh, 'monitoring', 'error'],
           `Error inserting agent data into elasticsearch. Bulk request failed due to ${error.message ||
-          error}`
+            error}`
         );
     }
   }
@@ -477,8 +476,7 @@ export class Monitoring {
     try {
       if (!this.ENABLED) return;
 
-      this.datedIndex =
-        this.index_prefix + indexDate(this.CREATION);
+      this.datedIndex = this.index_prefix + indexDate(this.CREATION);
 
       const result = await this.wzWrapper.checkIfIndexExists(this.datedIndex);
 
@@ -504,14 +502,14 @@ export class Monitoring {
         log(
           '[monitoring][saveStatus]',
           `Could not check if the index ${
-          this.datedIndex
+            this.datedIndex
           } exists due to ${error.message || error}`
         );
       !this.quiet &&
         this.server.log(
           [blueWazuh, 'monitoring', 'error'],
           `Could not check if the index ${
-          this.datedIndex
+            this.datedIndex
           } exists due to ${error.message || error}`
         );
     }
@@ -599,13 +597,13 @@ export class Monitoring {
         log(
           '[monitoring][checkTemplate]',
           `Something went wrong updating wazuh-monitoring template... ${error.message ||
-          error}`
+            error}`
         );
       !this.quiet &&
         this.server.log(
           [blueWazuh, 'monitoring', 'error'],
           `Something went wrong updating wazuh-monitoring template... ${error.message ||
-          error}`
+            error}`
         );
       return Promise.reject(error);
     }
@@ -626,8 +624,7 @@ export class Monitoring {
         await this.checkTemplate();
       }
 
-      !this.quiet &&
-        log('[monitoring][init]', 'Creating new index...', 'info');
+      !this.quiet && log('[monitoring][init]', 'Creating new index...', 'info');
       !this.quiet &&
         this.server.log(
           [blueWazuh, 'monitoring', 'info'],
