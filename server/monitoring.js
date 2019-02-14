@@ -368,10 +368,11 @@ export class Monitoring {
 
   /**
    * Creating wazuh-monitoring index
-   * @param {String} datedIndex The name for the today's index (wazuh-monitoring-3.x-YYYY.MM.DD)
+   * @param {String} datedIndex The name for the index (e.g. daily: wazuh-monitoring-3.x-YYYY.MM.DD)
    * @param {String} clusterName Wazuh cluster name.
    */
   async createIndex(datedIndex, clusterName) {
+    console.log('--------CREA EL INDICE ' + datedIndex)
     try {
       if (!this.ENABLED) return;
       const configFile = getConfiguration();
@@ -400,13 +401,13 @@ export class Monitoring {
       !this.quiet &&
         log(
           '[monitoring][createIndex]',
-          'Successfully created today index.',
+          'Successfully created new index.',
           'info'
         );
       !this.quiet &&
         this.server.log(
           [blueWazuh, 'monitoring', 'info'],
-          'Successfully created today index.'
+          'Successfully created new index.'
         );
       await this.insertDocument(datedIndex, clusterName);
       return;
@@ -428,7 +429,7 @@ export class Monitoring {
 
   /**
    * Inserting one document per agent into Elastic. Bulk.
-   * @param {String} datedIndex The name for the today's index (wazuh-monitoring-3.x-YYYY.MM.DD)
+   * @param {String} datedIndex The name for the index (e.g. daily: wazuh-monitoring-3.x-YYYY.MM.DD)
    * @param {String} clusterName Wazuh cluster name.
    */
   async insertDocument(datedIndex, clusterName) {
@@ -478,14 +479,7 @@ export class Monitoring {
       if (!this.ENABLED) return;
 
       this.datedIndex =
-        this.index_prefix +
-        new Date()
-          .toISOString()
-          .replace(/T/, '-')
-          .replace(/\..+/, '')
-          .replace(/-/g, '.')
-          .replace(/:/g, '')
-          .slice(0, -7);
+        this.index_prefix + indexDate(this.CREATION);
 
       const result = await this.wzWrapper.checkIfIndexExists(this.datedIndex);
 
