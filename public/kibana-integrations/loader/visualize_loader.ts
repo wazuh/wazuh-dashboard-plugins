@@ -22,15 +22,17 @@
  * the docs (docs/development/visualize/development-create-visualization.asciidoc)
  * are up to date.
  */
-
+// @ts-ignore
 import chrome from 'ui/chrome';
+// @ts-ignore
 import { FilterBarQueryFilterProvider } from 'ui/filter_bar/query_filter';
+// @ts-ignore
 import { IPrivate } from 'ui/private';
 import { EmbeddedVisualizeHandler } from './embedded_visualize_handler';
 import { VisSavedObject, VisualizeLoaderParams } from './types';
 
 export class VisualizeLoader {
-  constructor(private readonly savedVisualizations: any, private readonly Private: IPrivate) {}
+  constructor(private readonly savedVisualizations: any, private readonly Private: IPrivate) { }
 
   /**
    * Renders a saved visualization specified by its id into a DOM element.

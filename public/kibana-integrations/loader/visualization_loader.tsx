@@ -16,13 +16,17 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-
+// @ts-ignore
 import _ from 'lodash';
+// @ts-ignore
 import React from 'react';
+// @ts-ignore
 import { render, unmountComponentAtNode } from 'react-dom';
-
+// @ts-ignore
 import { PersistedState } from 'ui/persisted_state';
+// @ts-ignore
 import { Vis } from 'ui/vis';
+// @ts-ignore
 import { Visualization } from 'ui/visualize/components/visualization';
 
 interface VisualizationLoaderParams {
