@@ -43,6 +43,8 @@ export const configEquivalences = {
     'Define the number of shards to use for the wazuh-monitoring-3.x-* indices.',
   'wazuh.monitoring.replicas':
     'Define the number of replicas to use for the wazuh-monitoring-3.x-* indices.',
+  'wazuh.monitoring.creation':
+    'Define the interval in which the wazuh-monitoring index will be created.',
   'wazuh.monitoring.pattern':
     'Default index pattern to use on the app for Wazuh monitoring.',
   admin:

@@ -18,6 +18,7 @@ import { ElasticWrapper } from './lib/elastic-wrapper';
 import { monitoringTemplate } from './integration-files/monitoring-template';
 import { getConfiguration } from './lib/get-configuration';
 import { parseCron } from './lib/parse-cron';
+import { indexDate } from './lib/index-date';
 import { BuildBody } from './lib/replicas-shards-helper';
 import * as ApiHelper from './lib/api-helper';
 
@@ -33,19 +34,11 @@ export class Monitoring {
     this.ENABLED = true;
     this.FREQUENCY = 3600;
     this.CRON_FREQ = '0 1 * * * *';
+    this.CREATION = 'd';
     this.index_pattern = 'wazuh-monitoring-3.x-*';
     this.index_prefix = 'wazuh-monitoring-3.x-';
     this.wzWrapper = new ElasticWrapper(server);
     this.agentsArray = [];
-    this.todayIndex =
-      this.index_prefix +
-      new Date()
-        .toISOString()
-        .replace(/T/, '-')
-        .replace(/\..+/, '')
-        .replace(/-/g, '.')
-        .replace(/:/g, '')
-        .slice(0, -7);
     this.quiet = quiet;
     this.initVariables();
   }
@@ -59,15 +52,21 @@ export class Monitoring {
 
       this.ENABLED =
         configFile &&
-        typeof configFile['wazuh.monitoring.enabled'] !== 'undefined'
+          typeof configFile['wazuh.monitoring.enabled'] !== 'undefined'
           ? configFile['wazuh.monitoring.enabled'] &&
-            configFile['wazuh.monitoring.enabled'] !== 'worker'
+          configFile['wazuh.monitoring.enabled'] !== 'worker'
           : this.ENABLED;
 
       this.FREQUENCY =
         (configFile || {})['wazuh.monitoring.frequency'] || this.FREQUENCY;
 
       this.CRON_FREQ = parseCron(this.FREQUENCY);
+
+      this.CREATION =
+        (configFile || {})['wazuh.monitoring.creation'] || this.CREATION;
+
+      this.datedIndex =
+        this.index_prefix + indexDate(this.CREATION);
 
       this.index_pattern =
         (configFile || {})['wazuh.monitoring.pattern'] || this.index_pattern;
@@ -113,7 +112,7 @@ export class Monitoring {
         log(
           '[monitoring][configuration]',
           `wazuh.monitoring.pattern: ${this.index_pattern} (index prefix: ${
-            this.index_prefix
+          this.index_prefix
           })`,
           'info'
         );
@@ -122,7 +121,7 @@ export class Monitoring {
         this.server.log(
           [blueWazuh, 'monitoring', 'info'],
           `wazuh.monitoring.pattern: ${this.index_pattern} (index prefix: ${
-            this.index_prefix
+          this.index_prefix
           })`
         );
     } catch (error) {
@@ -369,10 +368,10 @@ export class Monitoring {
 
   /**
    * Creating wazuh-monitoring index
-   * @param {String} todayIndex The name for the today's index (wazuh-monitoring-3.x-YYYY.MM.DD)
+   * @param {String} datedIndex The name for the today's index (wazuh-monitoring-3.x-YYYY.MM.DD)
    * @param {String} clusterName Wazuh cluster name.
    */
-  async createIndex(todayIndex, clusterName) {
+  async createIndex(datedIndex, clusterName) {
     try {
       if (!this.ENABLED) return;
       const configFile = getConfiguration();
@@ -396,7 +395,7 @@ export class Monitoring {
         }
       };
 
-      await this.wzWrapper.createIndexByName(todayIndex, configuration);
+      await this.wzWrapper.createIndexByName(datedIndex, configuration);
 
       !this.quiet &&
         log(
@@ -409,37 +408,37 @@ export class Monitoring {
           [blueWazuh, 'monitoring', 'info'],
           'Successfully created today index.'
         );
-      await this.insertDocument(todayIndex, clusterName);
+      await this.insertDocument(datedIndex, clusterName);
       return;
     } catch (error) {
       !this.quiet &&
         log(
           '[monitoring][createIndex]',
-          `Could not create ${todayIndex} index on elasticsearch due to ${error.message ||
-            error}`
+          `Could not create ${datedIndex} index on elasticsearch due to ${error.message ||
+          error}`
         );
       !this.quiet &&
         this.server.log(
           [blueWazuh, 'monitoring', 'error'],
-          `Could not create ${todayIndex} index on elasticsearch due to ${error.message ||
-            error}`
+          `Could not create ${datedIndex} index on elasticsearch due to ${error.message ||
+          error}`
         );
     }
   }
 
   /**
    * Inserting one document per agent into Elastic. Bulk.
-   * @param {String} todayIndex The name for the today's index (wazuh-monitoring-3.x-YYYY.MM.DD)
+   * @param {String} datedIndex The name for the today's index (wazuh-monitoring-3.x-YYYY.MM.DD)
    * @param {String} clusterName Wazuh cluster name.
    */
-  async insertDocument(todayIndex, clusterName) {
+  async insertDocument(datedIndex, clusterName) {
     try {
       let body = '';
       if (this.agentsArray.length > 0) {
         for (const element of this.agentsArray) {
           body +=
             '{ "index":  { "_index": "' +
-            todayIndex +
+            datedIndex +
             '", "_type": "wazuh-agent" } }\n';
           let date = new Date(Date.now()).toISOString();
           element['@timestamp'] = date;
@@ -449,7 +448,7 @@ export class Monitoring {
         }
         if (body === '') return;
 
-        await this.wzWrapper.pushBulkAnyIndex(todayIndex, body);
+        await this.wzWrapper.pushBulkAnyIndex(datedIndex, body);
 
         this.agentsArray = [];
       }
@@ -459,13 +458,13 @@ export class Monitoring {
         log(
           '[monitoring][insertDocument]',
           `Error inserting agent data into elasticsearch. Bulk request failed due to ${error.message ||
-            error}`
+          error}`
         );
       !this.quiet &&
         this.server.log(
           [blueWazuh, 'monitoring', 'error'],
           `Error inserting agent data into elasticsearch. Bulk request failed due to ${error.message ||
-            error}`
+          error}`
         );
     }
   }
@@ -478,7 +477,7 @@ export class Monitoring {
     try {
       if (!this.ENABLED) return;
 
-      this.todayIndex =
+      this.datedIndex =
         this.index_prefix +
         new Date()
           .toISOString()
@@ -488,7 +487,7 @@ export class Monitoring {
           .replace(/:/g, '')
           .slice(0, -7);
 
-      const result = await this.wzWrapper.checkIfIndexExists(this.todayIndex);
+      const result = await this.wzWrapper.checkIfIndexExists(this.datedIndex);
 
       if (result) {
         const configurationFile = getConfiguration();
@@ -498,12 +497,12 @@ export class Monitoring {
           2
         );
         await this.wzWrapper.updateIndexSettings(
-          this.todayIndex,
+          this.datedIndex,
           shardConfiguration
         );
-        await this.insertDocument(this.todayIndex, clusterName);
+        await this.insertDocument(this.datedIndex, clusterName);
       } else {
-        await this.createIndex(this.todayIndex, clusterName);
+        await this.createIndex(this.datedIndex, clusterName);
       }
 
       return;
@@ -512,14 +511,14 @@ export class Monitoring {
         log(
           '[monitoring][saveStatus]',
           `Could not check if the index ${
-            this.todayIndex
+          this.datedIndex
           } exists due to ${error.message || error}`
         );
       !this.quiet &&
         this.server.log(
           [blueWazuh, 'monitoring', 'error'],
           `Could not check if the index ${
-            this.todayIndex
+          this.datedIndex
           } exists due to ${error.message || error}`
         );
     }
@@ -607,13 +606,13 @@ export class Monitoring {
         log(
           '[monitoring][checkTemplate]',
           `Something went wrong updating wazuh-monitoring template... ${error.message ||
-            error}`
+          error}`
         );
       !this.quiet &&
         this.server.log(
           [blueWazuh, 'monitoring', 'error'],
           `Something went wrong updating wazuh-monitoring template... ${error.message ||
-            error}`
+          error}`
         );
       return Promise.reject(error);
     }
@@ -630,7 +629,9 @@ export class Monitoring {
           'Creating/Updating wazuh-agent template...',
           'info'
         );
-      await this.checkTemplate();
+      if (this.ENABLED) {
+        await this.checkTemplate();
+      }
 
       !this.quiet &&
         log('[monitoring][init]', 'Creating today index...', 'info');
