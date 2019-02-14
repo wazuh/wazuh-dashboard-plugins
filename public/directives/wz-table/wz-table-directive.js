@@ -26,7 +26,7 @@ import { checkGap } from './lib/check-gap';
 
 const app = uiModules.get('app/wazuh', []);
 
-app.directive('wzTable', function() {
+app.directive('wzTable', function () {
   return {
     restrict: 'E',
     scope: {
@@ -53,6 +53,31 @@ app.directive('wzTable', function() {
       wazuhConfig,
       $sce
     ) {
+      $scope.showColumns = false;
+      $scope.originalkeys = $scope.keys.map((key, idx) => ({ key, idx }));
+      $scope.updateColumns = (key) => {
+        const str = key.key.value || key.key;
+        const cleanArray = $scope.keys.map(item => item.value || item);
+        if (cleanArray.includes(str)) {
+          const idx = cleanArray.indexOf(str);
+          if (idx > -1) {
+            $scope.keys.splice(idx, 1);
+          }
+        } else {
+          const originalIdx = $scope.originalkeys.findIndex(item => (item.key.value || item.key) === (key.key.value || key.key));
+          if (originalIdx >= 0) {
+            $scope.keys.splice(originalIdx, 0, key.key);
+          } else {
+            $scope.keys.push(key.key)
+          }
+        }
+      }
+      $scope.exists = (key) => {
+        const str = key.key.value || key.key;
+        for (const k of $scope.keys) if ((k.value || k) === str) return true;
+        return false;
+      }
+
       /**
        * Init variables
        */
@@ -239,7 +264,7 @@ app.directive('wzTable', function() {
       $scope.prevPage = () => pagination.prevPage($scope);
       $scope.nextPage = async currentPage =>
         pagination.nextPage(currentPage, $scope, errorHandler, fetch);
-      $scope.setPage = function() {
+      $scope.setPage = function () {
         $scope.currentPage = this.n;
         $scope.nextPage(this.n);
       };

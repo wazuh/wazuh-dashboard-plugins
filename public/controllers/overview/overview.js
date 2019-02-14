@@ -54,6 +54,7 @@ export class OverviewController {
     visFactoryService,
     wazuhConfig
   ) {
+    this.$document = $document;
     this.$scope = $scope;
     this.$location = $location;
     this.$rootScope = $rootScope;
@@ -65,6 +66,7 @@ export class OverviewController {
     this.reportingService = reportingService;
     this.visFactoryService = visFactoryService;
     this.wazuhConfig = wazuhConfig;
+    this.expandArray = [false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false];
   }
 
   /**
@@ -328,5 +330,15 @@ export class OverviewController {
     }
     if (!this.$scope.$$phase) this.$scope.$digest();
     return;
+  }
+
+  falseAllExpand() {
+    this.expandArray = [false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false];
+  }
+
+  expand(i) {
+    const oldValue = this.expandArray[i];
+    this.falseAllExpand();
+    this.expandArray[i] = !oldValue;
   }
 }
