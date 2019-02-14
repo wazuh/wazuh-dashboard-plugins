@@ -54,7 +54,6 @@ export class OverviewController {
     visFactoryService,
     wazuhConfig
   ) {
-    this.$document = $document;
     this.$scope = $scope;
     this.$location = $location;
     this.$rootScope = $rootScope;
