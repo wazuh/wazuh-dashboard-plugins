@@ -95,6 +95,10 @@
 #wazuh.monitoring.shards: 2
 #wazuh.monitoring.replicas: 0
 #
+# Configure wazuh-monitoring-3.x-* indices custom creation interval.
+# Values: h (hourly), d (daily), w (weekly), m (monthly)
+#wazuh.monitoring.creation: d
+#
 # Default index pattern to use for Wazuh monitoring
 #wazuh.monitoring.pattern: wazuh-monitoring-3.x-*
 #
