@@ -528,10 +528,25 @@ md-sidenav {
 .wz-card-actions {
     margin: 0 !important;
     padding: 0 10px !important;
-    border-top: 1px solid #D3DAE6 !important;
-    background-color: rgb(228, 242, 245);
+    border-top: 1px solid #dfeff8 !important;
+    background-color: #ecf6fb;
 }
-
+.wz-card-actions.wz-card-actions-top {
+    border-top: 0!important;
+    border-bottom: 1px solid #dfeff8;
+    padding: 5px 10px!important;
+    min-height: 42px;
+}
+md-switch.md-default-theme .md-thumb, md-switch .md-thumb {
+    border: 1px solid #d3dae6;
+}
+md-switch.md-default-theme .md-bar, md-switch .md-bar {
+    border: 1px solid #d3dae6;
+}
+md-switch.md-default-theme.md-checked .md-thumb, md-switch.md-checked .md-thumb {
+    background-color: rgb(0, 107, 180);
+    border: none;
+}
 .wz-select-input {
     border-radius: 0;
     box-shadow: 0 2px 2px -1px rgba(0, 0, 0, 0.1) !important;
@@ -553,16 +568,16 @@ md-sidenav {
 
 @media (min-width: 1200px) {      
     .wz-logo {
-        background-image: url(/plugins/wazuh/img/new_logo_white.png);
+        background-image: url(/plugins/wazuh/img/new_logo_white.svg);
         width: 150px;
         max-width: 150px;
     }
 }
 @media (max-width: 1199px) {    
     .wz-logo{
-        min-width: 23px!important;
+        min-width: 28px!important;
         margin-right: 15px!important;
-        background-image: url("/plugins/wazuh/img/new_logo_white_wolf.png");
+        background-image: url("/plugins/wazuh/img/new_logo_white_wolf.svg");
     }
 }
 

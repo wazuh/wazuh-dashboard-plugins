@@ -223,6 +223,7 @@ export class ManagementController {
   setRulesTab(tab) {
     this.rulesetTab = tab;
     this.globalRulesetTab = this.rulesetTab;
+    this.breadCrumbBack();
   }
 
   breadCrumbBack(goRoot = false) {

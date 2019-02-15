@@ -2,8 +2,8 @@
     <!-- Back button and title -->
     <div layout="row" layout-align="start center">
         <!-- Back button -->
-        <md-button class="md-icon-button" style="margin: 5px!important;" aria-label="Back to CDB Lists list" tooltip="Back"
-            tooltip-placement="bottom" ng-click="cdbctrl.closeDetailView(true)"><i class="fa fa-fw fa-arrow-left"
+        <md-button ng-if="!cdbctrl.addingList" class="md-icon-button" style="margin: 5px!important;" aria-label="Back to CDB Lists list"
+            tooltip="Back" tooltip-placement="bottom" ng-click="cdbctrl.closeDetailView(true)"><i class="fa fa-fw fa-arrow-left"
                 aria-hidden="true"></i></md-button>
         <!-- List title -->
         <div ng-if="!cdbctrl.addingList">
@@ -24,7 +24,6 @@
         </md-card>
     </div>
     <!-- End List information ribbon -->
-
-    <wz-list-manage ng-if="cdbctrl.currentList" list="cdbctrl.currentList"></wz-list-manage>
+    <wz-list-manage list="cdbctrl.currentList" close-fn="cdbctrl.closeDetailView(true)" hide-close="cdbctrl.currentList && !cdbctrl.addingList ? true : false"></wz-list-manage>
     <br>
 </div>

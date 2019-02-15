@@ -240,11 +240,6 @@ export class DecodersController {
     if (!this.$scope.$$phase) this.$scope.$digest();
   }
 
-  doSaveDecoderConfig() {
-    this.editingFile = false;
-    this.$scope.$broadcast('saveXmlFile', { decoder: this.currentDecoder });
-  }
-
   /**
    * This function takes back to the list but adding a filter from the detail view
    */
@@ -299,44 +294,30 @@ export class DecodersController {
     } else {
       if (isNewFile) {
         const validFileName = /(.+).xml/;
-        const containsNumber = /.*[0-9].*/;
+        const containsNumberBlanks = /.*[0-9 ].*/;
         if (fileName && !validFileName.test(fileName)) {
           fileName = fileName + '.xml';
         }
-        if (containsNumber.test(fileName)) {
+        if (containsNumberBlanks.test(fileName)) {
           this.errorHandler.handle(
-            'Error creating a new file. The filename can not contain numbers',
+            'Error creating a new file. The filename can not contain numbers or white spaces.',
             ''
           );
           return false;
         }
         this.selectedItem = { file: fileName };
-        if (this.type === 'rules') {
-          this.$scope.$broadcast('saveXmlFile', {
-            rule: this.selectedItem,
-            showRestartManager
-          });
-        } else if (this.type === 'decoders') {
-          this.$scope.$broadcast('saveXmlFile', {
-            decoder: this.selectedItem,
-            showRestartManager
-          });
-        }
+        this.$scope.$broadcast('saveXmlFile', {
+          decoder: this.selectedItem,
+          showRestartManager
+        });
       } else {
         const objParam =
-          this.selectedRulesetTab === 'rules'
-            ? {
-              rule: this.selectedItem,
-              showRestartManager
-            }
-            : {
-              decoder: this.selectedItem,
-              showRestartManager
-            };
+        {
+          decoder: this.currentDecoder,
+          showRestartManager
+        };
         this.$scope.$broadcast('saveXmlFile', objParam);
       }
-      //$scope.editingFile = false;
-      //$scope.fetchedXML = null;
     }
   }
 }

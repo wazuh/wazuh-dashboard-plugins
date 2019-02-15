@@ -23,14 +23,14 @@
 
     <div layout="row">
         <md-card flex class="wz-md-card _md flex md-margin-h" ng-if="!dctrl.editingFile">
+            <md-card-actions layout="row" layout-align="end center" class="wz-card-actions wz-card-actions-top">
+                <a ng-click="dctrl.addNewFile('decoders')">Add new decoder <i aria-hidden="true" class="fa fa-plus"></i></a>
+                <span flex></span>
+                <md-switch class="wz-switch" ng-model="dctrl.showingLocalDecoders" class="md-primary wz-no-top-bottom-margin">
+                    Only custom
+                </md-switch>
+            </md-card-actions>
             <md-card-content>
-                <div layout="row" ng-if="!dctrl.editingFile">
-                    <a ng-click="dctrl.addNewFile('decoders')">Add new decoder <i aria-hidden="true" class="fa fa-plus"></i></a>
-                    <span flex></span>
-                    <md-switch ng-model="dctrl.showingLocalDecoders" class="md-primary wz-no-top-bottom-margin">
-                        Only custom
-                    </md-switch>
-                </div>
                 <wz-table ng-if="!dctrl.showingLocalDecoders" implicit-filter="dctrl.appliedFilters" flex path="'/decoders'"
                     keys="['name',{value:'details.program_name',size:2,nosortable:true},{value:'details.order',size:2,nosortable:true},'file']"
                     allow-click="true" row-sizes="[16,13,11]">
@@ -64,11 +64,12 @@
                     <span ng-show='dctrl.xmlHasErrors' class='btn-danger'><i aria-hidden='true' class='fa fa-fw fa-exclamation-triangle'></i>
                         XML format error</span>
                 </button>
-                <input placeholder="Eg: my_local_decoder.xml" ng-model="dctrl.newFileName" type="text" class="wz-margin-left-8 kuiLocalSearchInput ng-empty ng-pristine ng-scope ng-touched ng-valid"
+                <input placeholder="Eg: my_local_decoder.xml" ng-show="dctrl.selectedItem.file === 'new file'" ng-model="dctrl.newFileName"
+                    type="text" class="wz-margin-left-8 kuiLocalSearchInput ng-empty ng-pristine ng-scope ng-touched ng-valid"
                     aria-invalid="false">
             </div>
-            <div ng-if="dctrl.fetchedXML" style="height: calc(100vh - 340px);">
-                <wz-xml-file-editor file-name='{{dctrl.selectedFileName}}' data="dctrl.fetchedXML" target-name="dctrl.selectedItem.file"
+            <div ng-if="dctrl.fetchedXML" style="height: calc(100vh - 220px);">
+                <wz-xml-file-editor file-name='{{dctrl.type}}' data="dctrl.fetchedXML" target-name="dctrl.selectedItem.file"
                     valid-fn='dctrl.xmlIsValid(valid)' close-fn='dctrl.closeEditingFile(reload)'>
                 </wz-xml-file-editor>
             </div>

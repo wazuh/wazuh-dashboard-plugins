@@ -37,7 +37,7 @@
                             </select>
                         </div>
                     </div>
-                    <button ng-disabled='xmlHasErrors' ng-click="switchConfigurationTab('welcome', false)" class='btn btn-info wz-margin-left-8'>
+                    <button ng-disabled='xmlHasErrors' ng-click="switchConfigurationTab('welcome', false)" class='btn btn-info'>
                         <span>Cancel</span>
                     </button>
                     <button ng-disabled='xmlHasErrors' ng-click='saveConfiguration()' class='btn wz-button wz-margin-left-8'>
@@ -51,7 +51,7 @@
                         Restart {{selectedNode}}
                     </button>
                 </div>
-                <div class="md-padding md-padding-top-10" style="height: calc(100vh - 230px);" ng-if="fetchedXML">
+                <div class="md-padding md-padding-top-10" style="height: calc(100vh - 215px);" ng-if="fetchedXML">
                     <wz-xml-file-editor file-name='ossec.conf' data="fetchedXML" target-name="selectedNode" valid-fn='xmlIsValid(valid)'
                         close-fn='closeEditingFile(reload)'>
                     </wz-xml-file-editor>

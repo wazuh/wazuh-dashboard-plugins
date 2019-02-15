@@ -162,10 +162,10 @@ export function RulesController(
         coloredString = coloredString.replace(
           /\$\(((?!<\/span>).)*?\)(?!<\/span>)/im,
           '<span style="color: ' +
-            colors[i] +
-            ' ">' +
-            valuesArray[i] +
-            '</span>'
+          colors[i] +
+          ' ">' +
+          valuesArray[i] +
+          '</span>'
         );
       }
     }
@@ -256,10 +256,6 @@ export function RulesController(
     if (!$scope.$$phase) $scope.$digest();
   };
 
-  $scope.doSaveRuleConfig = () => {
-    $scope.$broadcast('saveXmlFile', { rule: $scope.currentRule });
-  };
-
   /**
    * This function changes to the rules list view
    */
@@ -327,44 +323,30 @@ export function RulesController(
     } else {
       if (isNewFile) {
         const validFileName = /(.+).xml/;
-        const containsNumber = /.*[0-9].*/;
+        const containsNumberBlanks = /.*[0-9 ].*/;
         if (fileName && !validFileName.test(fileName)) {
           fileName = fileName + '.xml';
         }
-        if (containsNumber.test(fileName)) {
+        if (containsNumberBlanks.test(fileName)) {
           errorHandler.handle(
-            'Error creating a new file. The filename can not contain numbers',
+            'Error creating a new file. The filename can not contain numbers or white spaces.',
             ''
           );
           return false;
         }
         $scope.selectedItem = { file: fileName };
-        if ($scope.type === 'rules') {
-          $scope.$broadcast('saveXmlFile', {
-            rule: $scope.selectedItem,
-            showRestartManager
-          });
-        } else if ($scope.type === 'decoders') {
-          $scope.$broadcast('saveXmlFile', {
-            decoder: $scope.selectedItem,
-            showRestartManager
-          });
-        }
+        $scope.$broadcast('saveXmlFile', {
+          rule: $scope.selectedItem,
+          showRestartManager
+        });
       } else {
         const objParam =
-          $scope.selectedRulesetTab === 'rules'
-            ? {
-                rule: $scope.selectedItem,
-                showRestartManager
-              }
-            : {
-                decoder: $scope.selectedItem,
-                showRestartManager
-              };
+        {
+          rule: $scope.currentRule,
+          showRestartManager
+        }
         $scope.$broadcast('saveXmlFile', objParam);
       }
-      //$scope.editingFile = false;
-      //$scope.fetchedXML = null;
     }
   };
 }
