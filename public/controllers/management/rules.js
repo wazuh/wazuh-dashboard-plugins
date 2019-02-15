@@ -162,10 +162,10 @@ export function RulesController(
         coloredString = coloredString.replace(
           /\$\(((?!<\/span>).)*?\)(?!<\/span>)/im,
           '<span style="color: ' +
-          colors[i] +
-          ' ">' +
-          valuesArray[i] +
-          '</span>'
+            colors[i] +
+            ' ">' +
+            valuesArray[i] +
+            '</span>'
         );
       }
     }
@@ -340,11 +340,10 @@ export function RulesController(
           showRestartManager
         });
       } else {
-        const objParam =
-        {
+        const objParam = {
           rule: $scope.currentRule,
           showRestartManager
-        }
+        };
         $scope.$broadcast('saveXmlFile', objParam);
       }
     }

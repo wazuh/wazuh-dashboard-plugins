@@ -311,8 +311,7 @@ export class DecodersController {
           showRestartManager
         });
       } else {
-        const objParam =
-        {
+        const objParam = {
           decoder: this.currentDecoder,
           showRestartManager
         };
