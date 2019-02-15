@@ -134,6 +134,7 @@ export class ManagementController {
       this.errorHandler.info(data.data.data, '');
       this.$scope.$applyAsync();
     } catch (error) {
+      this.isRestarting = false;
       this.errorHandler.handle(
         error.message || error,
         'Error restarting manager'
@@ -148,6 +149,7 @@ export class ManagementController {
       this.errorHandler.info('It may take a few seconds...', data.data.data);
       this.$scope.$applyAsync();
     } catch (error) {
+      this.isRestarting = false;
       this.errorHandler.handle(
         error.message || error,
         'Error restarting cluster'
