@@ -49,7 +49,7 @@
         <div flex layout="column">
             <div layout="row" ng-if="!dctrl.newFile" class="wz-padding-bottom-14">
                 <span ng-click='dctrl.closeEditingFile()' class='btn btn-info'>Cancel</span>
-                <button ng-disabled='dctrl.xmlHasErrors' ng-click='dctrl.doSaveConfig(false)' class='btn wz-button pull-right wz-margin-left-8'>
+                <button ng-disabled='dctrl.xmlHasErrors' ng-click='dctrl.doSaveConfig(false)' class='btn wz-button pull-right'>
                     <span ng-show='!dctrl.xmlHasErrors'><i aria-hidden='true' class='fa fa-fw fa-save'></i>Save
                         file</span>
                     <span ng-show='dctrl.xmlHasErrors' class='btn-danger'><i aria-hidden='true' class='fa fa-fw fa-exclamation-triangle'></i>

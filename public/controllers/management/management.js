@@ -135,6 +135,7 @@ export class ManagementController {
       this.$scope.$applyAsync();
     } catch (error) {
       this.isRestarting = false;
+      this.$scope.$applyAsync();
       this.errorHandler.handle(
         error.message || error,
         'Error restarting manager'
@@ -150,6 +151,7 @@ export class ManagementController {
       this.$scope.$applyAsync();
     } catch (error) {
       this.isRestarting = false;
+      this.$scope.$applyAsync();
       this.errorHandler.handle(
         error.message || error,
         'Error restarting cluster'
