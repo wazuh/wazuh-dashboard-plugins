@@ -21,14 +21,31 @@
         </div>
         <div flex></div>
         <div layout="column" class="height-40 wz-no-padding">
-            <button ng-if="mctrl.clusterInfo.status === 'enabled'" class="btn wz-button height-40" ng-disabled="mctrl.isRestarting"
-                ng-click="mctrl.restartCluster()"><i class="fa fa-refresh"></i>
+            <button ng-if="mctrl.clusterInfo.status === 'enabled' && !mctrl.showConfirmRestart" class="btn wz-button height-35"
+                ng-disabled="mctrl.isRestarting" ng-click="mctrl.showConfirmRestart = true"><i class="fa fa-refresh"></i>
                 Restart cluster
             </button>
-            <button ng-if="mctrl.clusterInfo.status !== 'enabled'" class="btn wz-button height-40" ng-disabled="mctrl.isRestarting"
-                ng-click="mctrl.restartManager()"><i class="fa fa-refresh"></i>
+            <button ng-if="mctrl.clusterInfo.status !== 'enabled' && !mctrl.showConfirmRestart" class="btn wz-button height-35"
+                ng-disabled="mctrl.isRestarting" ng-click="mctrl.showConfirmRestart = true"><i class="fa fa-refresh"></i>
                 Restart manager
             </button>
+            <div ng-show="mctrl.showConfirmRestart" class="confirmEmbedBubble confirmEmbedBubbleInline">
+                <div layout="row no-wrap">
+                    <span ng-if="mctrl.clusterInfo.status === 'enabled'" class="wz-padding-top-10 wz-padding-left-8">The
+                        cluster will be restarted... </span>
+                    <span ng-if="mctrl.clusterInfo.status !== 'enabled'" class="wz-padding-top-10 wz-padding-left-8">The
+                        manager will be restarted... </span>
+                </div>
+                <div layout="row">
+                    <md-button class="cancelBtn btn-info" type="button" ng-click="mctrl.showConfirmRestart = false">Cancel</md-button>
+                    <md-button ng-if="mctrl.clusterInfo.status === 'enabled'" class="btn wz-button" type="button"
+                        ng-click="mctrl.restartCluster();mctrl.showConfirmRestart = false"><i aria-hidden='true' class='fa fa-fw fa-check'></i>
+                        Confirm</md-button>
+                    <md-button ng-if="mctrl.clusterInfo.status !== 'enabled'" class="btn wz-button" type="button"
+                        ng-click="mctrl.restartManager();mctrl.showConfirmRestart = false"><i aria-hidden='true' class='fa fa-fw fa-check'></i>
+                        Confirm</md-button>
+                </div>
+            </div>
         </div>
     </div>
     <!-- End headline -->

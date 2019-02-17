@@ -96,6 +96,7 @@ export class AgentsController {
     this.$scope.addingGroupToAgent = false;
 
     this.$scope.lookingAssessment = false;
+    this.$scope.expandArray = [false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false];
   }
 
   /**
@@ -404,6 +405,8 @@ export class AgentsController {
           );
         });
     };
+
+    this.$scope.expand = i => this.expand(i);
   }
   /**
    * Create metric for given object
@@ -951,5 +954,15 @@ export class AgentsController {
       this.errorHandler.handle(error, '');
     }
     return;
+  }
+
+  falseAllExpand() {
+    this.$scope.expandArray = [false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false];
+  }
+
+  expand(i) {
+    const oldValue = this.$scope.expandArray[i];
+    this.falseAllExpand();
+    this.$scope.expandArray[i] = !oldValue;
   }
 }

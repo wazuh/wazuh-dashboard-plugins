@@ -21,7 +21,9 @@ app.directive('wzListManage', function() {
   return {
     restrict: 'E',
     scope: {
-      list: '=list'
+      list: '=list',
+      closeFn: '&',
+      hideClose: '='
     },
     controller(
       $scope,
@@ -109,6 +111,12 @@ app.directive('wzListManage', function() {
             $scope.currentList.new = false;
             $scope.currentList.name = $scope.currentList.newName;
           }
+          const containsBlanks = /.*[ ].*/;
+          if (containsBlanks.test($scope.currentList.name)) {
+            throw new Error(
+              'Error creating a new file. The filename can not contain white spaces.'
+            );
+          }
           let raw = '';
           for (var key in $scope.currentList.list) {
             raw = raw.concat(`${key}:${$scope.currentList.list[key]}` + '\n');
@@ -122,6 +130,7 @@ app.directive('wzListManage', function() {
           fetch();
           $scope.loadingChange = false;
           if (!$scope.$$phase) $scope.$digest();
+          $scope.closeFn();
         } catch (err) {
           if (addingNew) {
             $scope.currentList.name = false;

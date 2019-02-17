@@ -1,15 +1,17 @@
 <div layout="column" layout-align="start">
-    <div layout="row" class="wz-margin-top-8 md-padding-h">
+    <div layout="row" ng-class="hideClose ? ['wz-margin-top-8', 'md-padding-h'] : ''">
+        <span ng-if="!hideClose" ng-click='closeFn()' class='btn btn-info wz-margin-right-8'>Cancel</span>
         <button ng-disabled='items.length === 0 || (currentList.new && !currentList.newName)' ng-click='saveList()'
             class='btn wz-button pull-right'>
             <span><i aria-hidden='true' class='fa fa-fw fa-save'></i>Save list</span>
         </button>
-        <input ng-show="currentList.new && !currentList.name" placeholder="Enter list file name" ng-model="currentList.newName"
+        <input ng-show="currentList.new && !currentList.name" placeholder="Enter new list name" ng-model="currentList.newName"
             type="text" class="kuiLocalSearchInput ng-empty ng-pristine ng-scope ng-touched ng-valid wz-margin-left-8"
             aria-invalid="false">
     </div>
-    <div layout="row" class="wz-padding-left-8 wz-padding-right-8" layout-align="start stretch">
-        <md-card flex class="wz-md-card">
+    <div layout="row" ng-class="hideClose ? ['wz-padding-left-8', 'wz-padding-right-8'] : ['wz-padding-top-14']"
+        layout-align="start stretch">
+        <md-card flex class="wz-md-card" ng-class="{ 'wz-no-margin' : !hideClose }">
             <md-card-content>
                 <div layout="row">
                     <input placeholder="Filter entries..." ng-model="searchTerm" ng-change="filterTable()" type="text"

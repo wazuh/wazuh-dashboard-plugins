@@ -37,7 +37,7 @@
                             </select>
                         </div>
                     </div>
-                    <button ng-disabled='xmlHasErrors' ng-click="switchConfigurationTab('welcome', false)" class='btn btn-info wz-margin-left-8'>
+                    <button ng-disabled='xmlHasErrors' ng-click="switchConfigurationTab('welcome', false)" class='btn btn-info'>
                         <span>Cancel</span>
                     </button>
                     <button ng-disabled='xmlHasErrors' ng-click='saveConfiguration()' class='btn wz-button wz-margin-left-8'>
@@ -46,12 +46,23 @@
                             XML format error</span>
                     </button>
                     <span flex></span>
-                    <button class="btn wz-button" ng-disabled="isRestarting" ng-click="restartNode(selectedNode)"><i
+                    <button ng-show="!showConfirmRestartNode" class="btn wz-button" ng-disabled="isRestarting" ng-click="showConfirmRestartNode = true"><i
                             class="fa fa-refresh"></i>
                         Restart {{selectedNode}}
                     </button>
+                    <div ng-show="showConfirmRestartNode" class="confirmEmbedBubble confirmEmbedBubbleInline">
+                        <div layout="row no-wrap">
+                            <span class="wz-padding-top-10 wz-padding-left-8">The {{selectedNode}} will be restarted... </span>
+                        </div>
+                        <div layout="row">
+                            <md-button class="cancelBtn btn-info" type="button" ng-click="showConfirmRestartNode = false">Cancel</md-button>
+                            <md-button class="btn wz-button" type="button" ng-click="restartNode(selectedNode);showConfirmRestartNode = false"><i
+                                    aria-hidden='true' class='fa fa-fw fa-check'></i>
+                                Confirm</md-button>
+                        </div>
+                    </div>
                 </div>
-                <div class="md-padding md-padding-top-10" style="height: calc(100vh - 230px);" ng-if="fetchedXML">
+                <div class="md-padding md-padding-top-10" style="height: calc(100vh - 215px);" ng-if="fetchedXML">
                     <wz-xml-file-editor file-name='ossec.conf' data="fetchedXML" target-name="selectedNode" valid-fn='xmlIsValid(valid)'
                         close-fn='closeEditingFile(reload)'>
                     </wz-xml-file-editor>
