@@ -260,8 +260,9 @@ export default [
     _source: {
       title: 'Commonly fired rules',
       visState:
-        '{"title":"Commonly fired rules","type":"pie","params":{"type":"pie","addTooltip":true,"addLegend":true,"legendPosition":"right","isDonut":true,"labels":{"show":false,"values":true,"last_level":true,"truncate":100}},"aggs":[{"id":"1","enabled":true,"type":"count","schema":"metric","params":{}},{"id":"2","enabled":true,"type":"terms","schema":"segment","params":{"field":"rule.description","size":5,"order":"desc","orderBy":"1","otherBucket":false,"otherBucketLabel":"Other","missingBucket":false,"missingBucketLabel":"Missing"}}]}',
-      uiStateJSON: '{"vis":{"legendOpen":true}}',
+        '{"title":"Commonly fired rules","type":"table","params":{"perPage":10,"showPartialRows":false,"showMetricsAtAllLevels":false,"sort":{"columnIndex":null,"direction":null},"showTotal":false,"totalFunc":"sum"},"aggs":[{"id":"1","enabled":true,"type":"count","schema":"metric","params":{}},{"id":"2","enabled":true,"type":"terms","schema":"bucket","params":{"field":"rule.description","size":5,"order":"desc","orderBy":"1","otherBucket":false,"otherBucketLabel":"Other","missingBucket":false,"missingBucketLabel":"Missing","customLabel":"Description"}}]}',
+      uiStateJSON:
+        '{"vis":{"params":{"sort":{"columnIndex":null,"direction":null}}}}',
       description: '',
       version: 1,
       kibanaSavedObjectMeta: {
@@ -271,45 +272,14 @@ export default [
     }
   },
   {
-    _id: 'Wazuh-App-Overview-General-Rule-level-distribution',
+    _id: 'Wazuh-App-Overview-General-Most-active-origins',
     _type: 'visualization',
     _source: {
-      title: 'Rule level distribution',
+      title: 'Most active origins',
       visState:
-        '{"title":"Rule level distribution","type":"pie","params":{"type":"pie","addTooltip":true,"addLegend":true,"legendPosition":"right","isDonut":true,"labels":{"show":false,"values":true,"last_level":true,"truncate":100}},"aggs":[{"id":"1","enabled":true,"type":"count","schema":"metric","params":{}},{"id":"2","enabled":true,"type":"terms","schema":"segment","params":{"field":"rule.level","size":16,"order":"desc","orderBy":"1","otherBucket":false,"otherBucketLabel":"Other","missingBucket":false,"missingBucketLabel":"Missing"}}]}',
-      uiStateJSON: '{"vis":{"legendOpen":true}}',
-      description: '',
-      version: 1,
-      kibanaSavedObjectMeta: {
-        searchSourceJSON:
-          '{"index":"wazuh-alerts","filter":[],"query":{"query":"","language":"lucene"}}'
-      }
-    }
-  },
-  {
-    _id: 'Wazuh-App-Overview-General-Top-PCI',
-    _type: 'visualization',
-    _source: {
-      title: 'Top PCI DSS requirements',
-      visState:
-        '{"title":"Top PCI DSS requirements","type":"pie","params":{"type":"pie","addTooltip":true,"addLegend":true,"legendPosition":"right","isDonut":true,"labels":{"show":false,"values":true,"last_level":true,"truncate":100}},"aggs":[{"id":"1","enabled":true,"type":"count","schema":"metric","params":{}},{"id":"2","enabled":true,"type":"terms","schema":"segment","params":{"field":"rule.pci_dss","size":5,"order":"desc","orderBy":"1","otherBucket":false,"otherBucketLabel":"Other","missingBucket":false,"missingBucketLabel":"Missing"}}]}',
-      uiStateJSON: '{"vis":{"legendOpen":true}}',
-      description: '',
-      version: 1,
-      kibanaSavedObjectMeta: {
-        searchSourceJSON:
-          '{"index":"wazuh-alerts","filter":[],"query":{"query":"","language":"lucene"}}'
-      }
-    }
-  },
-  {
-    _id: 'Wazuh-App-Overview-General-Top-GDPR',
-    _type: 'visualization',
-    _source: {
-      title: 'Top GDPR requirements',
-      visState:
-        '{"title":"Top GDPR requirements","type":"pie","params":{"type":"pie","addTooltip":true,"addLegend":true,"legendPosition":"right","isDonut":true,"labels":{"show":false,"values":true,"last_level":true,"truncate":100}},"aggs":[{"id":"1","enabled":true,"type":"count","schema":"metric","params":{}},{"id":"2","enabled":true,"type":"terms","schema":"segment","params":{"field":"rule.gdpr","size":5,"order":"desc","orderBy":"1","otherBucket":false,"otherBucketLabel":"Other","missingBucket":false,"missingBucketLabel":"Missing"}}]}',
-      uiStateJSON: '{"vis":{"legendOpen":true}}',
+        '{"title":"Most active origins","type":"table","params":{"perPage":10,"showPartialRows":false,"showMetricsAtAllLevels":false,"sort":{"columnIndex":null,"direction":null},"showTotal":false,"totalFunc":"sum"},"aggs":[{"id":"1","enabled":true,"type":"count","schema":"metric","params":{}},{"id":"2","enabled":true,"type":"terms","schema":"bucket","params":{"field":"location","size":5,"order":"desc","orderBy":"1","otherBucket":false,"otherBucketLabel":"Other","missingBucket":false,"missingBucketLabel":"Missing","customLabel":"Description"}}]}',
+      uiStateJSON:
+        '{"vis":{"params":{"sort":{"columnIndex":null,"direction":null}}}}',
       description: '',
       version: 1,
       kibanaSavedObjectMeta: {

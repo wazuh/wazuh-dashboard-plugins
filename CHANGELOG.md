@@ -28,6 +28,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Changed some visualizations for FIM, GDPR, PCI, Vulnerability and Security Events ([#1206](https://github.com/wazuh/wazuh-kibana-app/pull/1206), [#1235](https://github.com/wazuh/wazuh-kibana-app/pull/1235)).
 - New design for agent header view ([#1186](https://github.com/wazuh/wazuh-kibana-app/pull/1186)).
 - Not fetching data the very first time the Dev Tools are opened ([#1185](https://github.com/wazuh/wazuh-kibana-app/pull/1185)).
+- Refresh all known fields for all valid index patterns on every parent state ([ff88df6f](https://github.com/wazuh/wazuh-kibana-app/commit/ff88df6f0ca5590d14b3bc71b7ad63d4484d6bb9)).
 
 ### Fixed
 
