@@ -96,7 +96,7 @@
                     {{lookingAssessment.name}} checks</span>
                 <md-divider class="wz-margin-top-10"></md-divider>
                 <div layout="row" class="wz-margin-top-10" ng-repeat="policy in policies">
-                    <wz-table flex path="'/configuration_assessment/' + agent.id + '/checks/' + lookingAssessment.id"
+                    <wz-table flex path="'/configuration_assessment/' + agent.id + '/checks/' + policy.policy_id"
                         row-sizes="[6,6,6]" extra-limit="500" keys="['title','file','remediation','process','description','references','result']">
                     </wz-table>
                 </div>
