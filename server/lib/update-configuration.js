@@ -23,6 +23,7 @@ const needRestartFields = [
   'wazuh.monitoring.frequency',
   'wazuh.monitoring.shards',
   'wazuh.monitoring.replicas',
+  'wazuh.monitoring.creation',
   'wazuh.monitoring.pattern'
 ];
 export class UpdateConfigurationFile {

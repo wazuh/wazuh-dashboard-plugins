@@ -14,10 +14,7 @@ import ProcessEquivalence from '../../../../util/process-state-equivalence';
 const splitArray = array => {
   if (Array.isArray(array)) {
     if (!array.length) return false;
-    let str = '';
-    for (const item of array) str += `${item}, `;
-    str = str.substring(0, str.length - 2);
-    return str;
+    return array.join();
   }
   return array;
 };
