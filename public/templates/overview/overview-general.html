@@ -109,7 +109,7 @@
         </md-card>
     </div>
 
-    <div layout="row" layout-align="center stretch" class="height-270">
+    <div layout="row" layout-align="center stretch" class="height-400">
         <md-card flex class="wz-md-card" ng-class="{'fullscreen': octrl.expandArray[5]}">
             <md-card-content class="wazuh-column">
                 <div layout="row">
@@ -124,34 +124,12 @@
         <md-card flex class="wz-md-card" ng-class="{'fullscreen': octrl.expandArray[6]}">
             <md-card-content class="wazuh-column">
                 <div layout="row">
-                    <span class="wz-headline-title">Rule level distribution</span>
+                    <span class="wz-headline-title">Most active origins</span>
                     <span flex></span>
-                    <span class="wz-text-link" ng-click="octrl.expand(6)"><i class="fa fa-fw fa-expand"></i></span>
+                    <span class="wz-text-link" ng-click="octrl.expand(5)"><i class="fa fa-fw fa-expand"></i></span>
                 </div>
                 <md-divider class="wz-margin-top-10"></md-divider>
-                <kbn-vis id="Wazuh-App-Overview-General-Rule-level-distribution" vis-id="'Wazuh-App-Overview-General-Rule-level-distribution'"></kbn-vis>
-            </md-card-content>
-        </md-card>
-        <md-card flex class="wz-md-card" ng-class="{'fullscreen': octrl.expandArray[7]}">
-            <md-card-content class="wazuh-column">
-                <div layout="row">
-                    <span class="wz-headline-title">Top PCI DSS requirements</span>
-                    <span flex></span>
-                    <span class="wz-text-link" ng-click="octrl.expand(7)"><i class="fa fa-fw fa-expand"></i></span>
-                </div>
-                <md-divider class="wz-margin-top-10"></md-divider>
-                <kbn-vis id="Wazuh-App-Overview-General-Top-PCI" vis-id="'Wazuh-App-Overview-General-Top-PCI'"></kbn-vis>
-            </md-card-content>
-        </md-card>
-        <md-card flex class="wz-md-card" ng-class="{'fullscreen': octrl.expandArray[8]}">
-            <md-card-content class="wazuh-column">
-                <div layout="row">
-                    <span class="wz-headline-title">Top GDPR requirements</span>
-                    <span flex></span>
-                    <span class="wz-text-link" ng-click="octrl.expand(8)"><i class="fa fa-fw fa-expand"></i></span>
-                </div>
-                <md-divider class="wz-margin-top-10"></md-divider>
-                <kbn-vis id="Wazuh-App-Overview-General-Top-GDPR" vis-id="'Wazuh-App-Overview-General-Top-GDPR'"></kbn-vis>
+                <kbn-vis id="Wazuh-App-Overview-General-Most-active-origins" vis-id="'Wazuh-App-Overview-General-Most-active-origins'"></kbn-vis>
             </md-card-content>
         </md-card>
     </div>

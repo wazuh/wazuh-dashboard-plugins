@@ -30,7 +30,7 @@
                     <!-- List of nodes if cluster is enabled -->
                     <div ng-show="selectedNode && clusterStatus.data.data.enabled === 'yes' && clusterStatus.data.data.running === 'yes' "
                         layout="row" layout-padding style="padding: 0;height: 32px;">
-                        <div layout="column" layout-align="center" class="height-35 wz-select-input">
+                        <div layout="column" layout-align="center" class="height-35 wz-select-input wz-margin-right-8">
                             <select class="kuiSelect wz-border-none cursor-pointer max-height-35" id="categoryBox"
                                 ng-model="selectedNode" ng-change="changeNode()" aria-label="Select node">
                                 <option ng-repeat="node in nodes" value="{{node.name}}">{{node.name}} ({{node.type}})</option>
@@ -52,7 +52,8 @@
                     </button>
                     <div ng-show="showConfirmRestartNode" class="confirmEmbedBubble confirmEmbedBubbleInline">
                         <div layout="row no-wrap">
-                            <span class="wz-padding-top-10 wz-padding-left-8">The {{selectedNode}} will be restarted... </span>
+                            <span class="wz-padding-top-10 wz-padding-left-8">The {{selectedNode}} will be restarted...
+                            </span>
                         </div>
                         <div layout="row">
                             <md-button class="cancelBtn btn-info" type="button" ng-click="showConfirmRestartNode = false">Cancel</md-button>
