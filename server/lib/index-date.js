@@ -18,7 +18,7 @@ export function indexDate(interval) {
       .replace(/T/, '-')
       .replace(/\..+/, '')
       .replace(/-/g, '.')
-      .replace(/:/g, '')
+      .replace(/:/g, '');
     let date = '';
     switch (interval) {
       case 'h':
@@ -48,7 +48,7 @@ export function indexDate(interval) {
   }
 }
 
-var weekOfYear = function () {
+var weekOfYear = function() {
   var d = new Date();
   d.setHours(0, 0, 0);
   d.setDate(d.getDate() + 4 - (d.getDay() || 7));
