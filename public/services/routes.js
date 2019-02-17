@@ -81,20 +81,26 @@ function nestedResolve(
 ) {
   assignPreviousLocation($rootScope, $location);
   const location = $location.path();
-  return getWzConfig($q, genericReq, errorHandler, wazuhConfig).then(() =>
-    settingsWizard(
-      $location,
-      $q,
-      $window,
-      testAPI,
-      appState,
-      genericReq,
-      errorHandler,
-      wzMisc,
-      wazuhConfig,
-      location && location.includes('/health-check')
+  return getWzConfig($q, genericReq, errorHandler, wazuhConfig)
+    .then(() =>
+      settingsWizard(
+        $location,
+        $q,
+        $window,
+        testAPI,
+        appState,
+        genericReq,
+        errorHandler,
+        wzMisc,
+        wazuhConfig,
+        location && location.includes('/health-check')
+      )
     )
-  );
+    .then(async () => {
+      try {
+        await this.genericReq.request('GET', '/elastic/known-fields/all', {});
+      } catch (error) {} //eslint-disable-line
+    });
 }
 
 function savedSearch(
