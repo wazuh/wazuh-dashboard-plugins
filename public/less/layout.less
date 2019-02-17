@@ -368,14 +368,16 @@ md-dialog.modalTheme .md-button{
 }
 
 .fullscreen {
+display: -webkit-box;
+    display: -webkit-flex;
+    display: -ms-flexbox;
     display: flex;
     z-index: 9999;
-    width: 98%;
-    height: 65%;
-    position: absolute;
-    top: 0;
-    left: 0;
+    width: auto;
+    height: 80vh;
+    position: fixed;
+    top: 10vh;
+    left: 20vh;
+    right: 0;
     background-color: white;
-    max-width: 98% !important;
-    max-height: 50vh !important;
 }
