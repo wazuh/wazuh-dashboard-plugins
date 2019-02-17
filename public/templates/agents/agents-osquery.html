@@ -1,15 +1,24 @@
-<md-content flex layout="column" ng-if="tab === 'osquery' && tabView === 'panels'" ng-class="{'no-opacity': resultState !== 'ready' || !rendered}" layout-align="start">
+<md-content flex layout="column" ng-if="tab === 'osquery' && tabView === 'panels'" ng-class="{'no-opacity': resultState !== 'ready' || !rendered}"
+    layout-align="start">
     <div layout="row" class="height-300">
-        <md-card flex class="wz-md-card">
+        <md-card flex class="wz-md-card" ng-class="{'fullscreen': expandArray[0]}">
             <md-card-content class="wazuh-column">
-                <span class="wz-headline-title">Most common Osquery packs being used</span>
+                <div layout="row">
+                    <span class="wz-headline-title">Most common Osquery packs being used</span>
+                    <span flex></span>
+                    <span class="wz-text-link" ng-click="expand(0)"><i class="fa fa-fw fa-expand"></i></span>
+                </div>
                 <md-divider class="wz-margin-top-10"></md-divider>
                 <kbn-vis id="Wazuh-App-Agents-Osquery-top-5-packs-being-used" vis-id="'Wazuh-App-Agents-Osquery-top-5-packs-being-used'"></kbn-vis>
             </md-card-content>
         </md-card>
-        <md-card flex="70" class="wz-md-card">
+        <md-card flex="70" class="wz-md-card" ng-class="{'fullscreen': expandArray[1]}">
             <md-card-content class="wazuh-column">
-                <span class="wz-headline-title">Evolution of Osquery events per pack over time</span>
+                <div layout="row">
+                    <span class="wz-headline-title">Evolution of Osquery events per pack over time</span>
+                    <span flex></span>
+                    <span class="wz-text-link" ng-click="expand(1)"><i class="fa fa-fw fa-expand"></i></span>
+                </div>
                 <md-divider class="wz-margin-top-10"></md-divider>
                 <kbn-vis id="Wazuh-App-Agents-Osquery-events-per-pack-over-time" vis-id="'Wazuh-App-Agents-Osquery-events-per-pack-over-time'"></kbn-vis>
             </md-card-content>
@@ -17,17 +26,25 @@
     </div>
 
     <div layout="row" class="height-300">
-        <md-card flex class="wz-md-card">
+        <md-card flex class="wz-md-card" ng-class="{'fullscreen': expandArray[2]}">
             <md-card-content class="wazuh-column">
-                <span class="wz-headline-title">Most common Osquery actions</span>
+                <div layout="row">
+                    <span class="wz-headline-title">Most common Osquery actions</span>
+                    <span flex></span>
+                    <span class="wz-text-link" ng-click="expand(2)"><i class="fa fa-fw fa-expand"></i></span>
+                </div>
                 <md-divider class="wz-margin-top-10"></md-divider>
                 <kbn-vis id="Wazuh-App-Agents-Osquery-most-common-osquery-actions" vis-id="'Wazuh-App-Agents-Osquery-most-common-osquery-actions'"></kbn-vis>
             </md-card-content>
         </md-card>
 
-        <md-card flex="70" class="wz-md-card">
+        <md-card flex="70" class="wz-md-card" ng-class="{'fullscreen': expandArray[3]}">
             <md-card-content class="wazuh-column">
-                <span class="wz-headline-title">Most common rules</span>
+                <div layout="row">
+                    <span class="wz-headline-title">Most common rules</span>
+                    <span flex></span>
+                    <span class="wz-text-link" ng-click="expand(3)"><i class="fa fa-fw fa-expand"></i></span>
+                </div>
                 <md-divider class="wz-margin-top-10"></md-divider>
                 <kbn-vis id="Wazuh-App-Agents-Osquery-monst-common-rules-being-fired" vis-id="'Wazuh-App-Agents-Osquery-monst-common-rules-being-fired'"></kbn-vis>
             </md-card-content>
@@ -35,9 +52,13 @@
     </div>
 
     <div layout="row" class="height-300">
-        <md-card flex class="wz-md-card">
+        <md-card flex class="wz-md-card" ng-class="{'fullscreen': expandArray[4]}">
             <md-card-content class="wazuh-column">
-                <span class="wz-headline-title">Evolution of Osquery events over time</span>
+                <div layout="row">
+                    <span class="wz-headline-title">Evolution of Osquery events over time</span>
+                    <span flex></span>
+                    <span class="wz-text-link" ng-click="expand(4)"><i class="fa fa-fw fa-expand"></i></span>
+                </div>
                 <md-divider class="wz-margin-top-10"></md-divider>
                 <kbn-vis id="Wazuh-App-Agents-Osquery-events-over-time" vis-id="'Wazuh-App-Agents-Osquery-events-over-time'"></kbn-vis>
             </md-card-content>
