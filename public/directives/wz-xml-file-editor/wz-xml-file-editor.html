@@ -1,8 +1,9 @@
 <div class='wzXmlEditor'>
     <div class='wzXmlEditorHeader'>
-        <span>Edit <b>{{fileName}}</b> of <b>{{targetName}}</b> <span tooltip='{{xmlError}}' class="wz-agent-status-indicator small red" ng-if="xmlError">{{xmlError}}</span></span>
+        <span>Edit <b>{{fileName}}</b> of <b>{{targetName}}</b> <span tooltip='{{xmlError}}' class="wz-agent-status-indicator small red-text"
+                ng-if="xmlError">{{xmlError}}</span></span>
     </div>
     <div class='wzXmlEditorBody' ng-show='!loadingFile'>
-            <textarea id='xml_box'></textarea>
+        <textarea id='xml_box'></textarea>
     </div>
 </div>
