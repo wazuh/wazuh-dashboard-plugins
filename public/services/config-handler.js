@@ -63,8 +63,7 @@ export class ConfigHandler {
       const data = ((validationError || {}).data || {}).data || {};
       const isOk = data.status === 'OK';
       if (!isOk && Array.isArray(data.details)) {
-        let str = '';
-        for (const detail of data.details) str += detail;
+        const str = data.details.join();
         throw new Error(str);
       }
 
@@ -89,8 +88,7 @@ export class ConfigHandler {
       const data = ((validationError || {}).data || {}).data || {};
       const isOk = data.status === 'OK';
       if (!isOk && Array.isArray(data.details)) {
-        let str = '';
-        for (const detail of data.details) str += detail;
+        const str = data.details.join();
         throw new Error(str);
       }
 
@@ -115,8 +113,7 @@ export class ConfigHandler {
       const data = ((validationError || {}).data || {}).data || {};
       const isOk = data.status === 'OK';
       if (!isOk && Array.isArray(data.details)) {
-        let str = '';
-        for (const detail of data.details) str += detail;
+        const str = data.details.join();
         throw new Error(str);
       }
 
