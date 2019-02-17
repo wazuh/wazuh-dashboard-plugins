@@ -210,6 +210,7 @@ export class OverviewController {
 
   // Switch tab
   async switchTab(newTab, force = false) {
+    this.falseAllExpand();
     try {
       if (newTab === 'welcome') {
         this.commonData.setRefreshInterval(timefilter.getRefreshInterval());
