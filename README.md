@@ -23,6 +23,11 @@ Visualize and analyze Wazuh alerts stored in Elasticsearch using our Kibana app 
 
 ![Overview](/public/img/app.png)
 
+## Branches
+
+- `stable` branch on correspond to the last Wazuh app stable version.
+- `master` branch contains the latest code, be aware of possible bugs on this branch.
+
 ## Requisites
 
 - Wazuh HIDS 3.9.0
