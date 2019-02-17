@@ -93,6 +93,8 @@ export class AgentsController {
     this.$scope.editGroup = false;
 
     this.$scope.addingGroupToAgent = false;
+
+    this.$scope.expandArray = [false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false];
   }
 
   /**
@@ -381,6 +383,8 @@ export class AgentsController {
           );
         });
     };
+
+    this.$scope.expand = i => this.expand(i);
   }
   /**
    * Create metric for given object
@@ -496,7 +500,7 @@ export class AgentsController {
           (((agentInfo || {}).data || {}).data || {}).status ||
           this.$scope.agent.status;
       }
-    } catch (error) {} // eslint-disable-line
+    } catch (error) { } // eslint-disable-line
 
     try {
       this.$scope.showSyscheckFiles = false;
@@ -513,7 +517,7 @@ export class AgentsController {
       if (tab === 'syscollector')
         try {
           await this.loadSyscollector(this.$scope.agent.id);
-        } catch (error) {} // eslint-disable-line
+        } catch (error) { } // eslint-disable-line
       if (tab === 'configuration') {
         const isSync = await this.apiReq.request(
           'GET',
@@ -631,7 +635,7 @@ export class AgentsController {
           {}
         );
         netifaceResponse = ((resultNetiface || {}).data || {}).data || false;
-      } catch (error) {} // eslint-disable-line
+      } catch (error) { } // eslint-disable-line
 
       // This API call may fail so we put it out of Promise.all
       let netaddrResponse = false;
@@ -643,7 +647,7 @@ export class AgentsController {
         );
         netaddrResponse =
           ((resultNetaddrResponse || {}).data || {}).data || false;
-      } catch (error) {} // eslint-disable-line
+      } catch (error) { } // eslint-disable-line
 
       // Before proceeding, syscollector data is an empty object
       this.$scope.syscollector = {};
@@ -659,7 +663,7 @@ export class AgentsController {
       this.$scope.syscollector = {
         hardware:
           typeof hardwareResponse === 'object' &&
-          Object.keys(hardwareResponse).length
+            Object.keys(hardwareResponse).length
             ? { ...hardwareResponse }
             : false,
         os:
@@ -877,5 +881,15 @@ export class AgentsController {
       (this.$scope.agent || {}).id || true,
       syscollectorFilters.length ? syscollectorFilters : null
     );
+  }
+
+  falseAllExpand() {
+    this.$scope.expandArray = [false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false];
+  }
+
+  expand(i) {
+    const oldValue = this.$scope.expandArray[i];
+    this.falseAllExpand();
+    this.$scope.expandArray[i] = !oldValue;
   }
 }
