@@ -4,6 +4,18 @@
     </div>
 </div>
 <div layout="row" ng-show="!error && !wazuh_table_loading && items.length">
+    <span flex></span>
+    <span class="wz-text-link" ng-click="showColumns = !showColumns" tooltip="Columns"><i class="fa fa-fw fa-gear"></i></span>
+</div>
+<div layout="row" layout-wrap ng-show="!error && !wazuh_table_loading && items.length" ng-if="showColumns">
+    <span flex></span>
+    <md-checkbox ng-repeat="key in originalkeys" ng-click="updateColumns(key)" ng-checked="exists(key)">
+        {{ keyEquivalence[key.key.value ||
+        key.key] }}
+    </md-checkbox>
+</div>
+
+<div layout="row" ng-show="!error && !wazuh_table_loading && items.length">
     <table class="table table-striped table-condensed table-hover" style="table-layout: fixed !important" id="wz_table">
         <thead class="wz-text-bold">
             <th ng-repeat="key in keys" class="wz-text-left" ng-class="{ 'cursor-pointer' : !key.nosortable, 'col-lg-1' : !key.size, 'col-lg-{{key.size}}' : key.size }"
