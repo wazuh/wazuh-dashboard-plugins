@@ -11,24 +11,36 @@
     <!-- View: Panels -->
     <div layout="row" class="height-300">
 
-        <md-card flex class="wz-md-card">
+        <md-card flex class="wz-md-card" ng-class="{'fullscreen': expandArray[0]}">
             <md-card-content class="wazuh-column">
-                <span class="wz-headline-title">Most active users</span>
+                <div layout="row">
+                    <span class="wz-headline-title">Most active users</span>
+                    <span flex></span>
+                    <span class="wz-text-link" ng-click="expand(0)"><i class="fa fa-fw fa-expand"></i></span>
+                </div>
                 <md-divider class="wz-margin-top-10"></md-divider>
                 <kbn-vis id="Wazuh-App-Agents-FIM-Users" vis-id="'Wazuh-App-Agents-FIM-Users'">
             </md-card-content>
         </md-card>
-        <md-card flex class="wz-md-card">
+        <md-card flex class="wz-md-card" ng-class="{'fullscreen': expandArray[1]}">
             <md-card-content class="wazuh-column">
-                <span class="wz-headline-title">Actions</span>
+                <div layout="row">
+                    <span class="wz-headline-title">Actions</span>
+                    <span flex></span>
+                    <span class="wz-text-link" ng-click="expand(1)"><i class="fa fa-fw fa-expand"></i></span>
+                </div>
                 <md-divider class="wz-margin-top-10"></md-divider>
                 <kbn-vis id="Wazuh-App-Agents-FIM-Actions" vis-id="'Wazuh-App-Agents-FIM-Actions'">
             </md-card-content>
         </md-card>
 
-        <md-card flex="40ç" class="wz-md-card">
+        <md-card flex="40" class="wz-md-card" ng-class="{'fullscreen': expandArray[2]}">
             <md-card-content class="wazuh-column">
-                <span class="wz-headline-title">Events</span>
+                <div layout="row">
+                    <span class="wz-headline-title">Events</span>
+                    <span flex></span>
+                    <span class="wz-text-link" ng-click="expand(2)"><i class="fa fa-fw fa-expand"></i></span>
+                </div>
                 <md-divider class="wz-margin-top-10"></md-divider>
                 <kbn-vis id="Wazuh-App-Agents-FIM-Events" vis-id="'Wazuh-App-Agents-FIM-Events'"></kbn-vis>
             </md-card-content>
@@ -37,23 +49,35 @@
     </div>
 
     <div layout="row" class="height-230">
-        <md-card flex="33" class="wz-md-card">
+        <md-card flex="33" class="wz-md-card" ng-class="{'fullscreen': expandArray[3]}">
             <md-card-content class="wazuh-column">
-                <span class="wz-headline-title">Files added</span>
+                <div layout="row">
+                    <span class="wz-headline-title">Files added</span>
+                    <span flex></span>
+                    <span class="wz-text-link" ng-click="expand(3)"><i class="fa fa-fw fa-expand"></i></span>
+                </div>
                 <md-divider class="wz-margin-top-10"></md-divider>
                 <kbn-vis id="Wazuh-App-Agents-FIM-Files-added" vis-id="'Wazuh-App-Agents-FIM-Files-added'"></kbn-vis>
             </md-card-content>
         </md-card>
-        <md-card flex="33" class="wz-md-card">
+        <md-card flex="33" class="wz-md-card" ng-class="{'fullscreen': expandArray[4]}">
             <md-card-content class="wazuh-column">
-                <span class="wz-headline-title">Files modified</span>
+                <div layout="row">
+                    <span class="wz-headline-title">Files modified</span>
+                    <span flex></span>
+                    <span class="wz-text-link" ng-click="expand(4)"><i class="fa fa-fw fa-expand"></i></span>
+                </div>
                 <md-divider class="wz-margin-top-10"></md-divider>
                 <kbn-vis id="Wazuh-App-Agents-FIM-Files-modified" vis-id="'Wazuh-App-Agents-FIM-Files-modified'"></kbn-vis>
             </md-card-content>
         </md-card>
-        <md-card flex="33" class="wz-md-card">
+        <md-card flex="33" class="wz-md-card" ng-class="{'fullscreen': expandArray[5]}">
             <md-card-content class="wazuh-column">
-                <span class="wz-headline-title">Files deleted</span>
+                <div layout="row">
+                    <span class="wz-headline-title">Files deleted</span>
+                    <span flex></span>
+                    <span class="wz-text-link" ng-click="expand(5)"><i class="fa fa-fw fa-expand"></i></span>
+                </div>
                 <md-divider class="wz-margin-top-10"></md-divider>
                 <kbn-vis id="Wazuh-App-Agents-FIM-Files-deleted" vis-id="'Wazuh-App-Agents-FIM-Files-deleted'"></kbn-vis>
             </md-card-content>
@@ -61,9 +85,13 @@
     </div>
 
     <div layout="row" layout-align="space-between stretch" class="height-570">
-        <md-card flex class="wz-md-card">
+        <md-card flex class="wz-md-card" ng-class="{'fullscreen': expandArray[6]}">
             <md-card-content class="wazuh-column">
-                <span class="wz-headline-title">Alerts summary</span>
+                <div layout="row">
+                    <span class="wz-headline-title">Alerts summary</span>
+                    <span flex></span>
+                    <span class="wz-text-link" ng-click="expand(6)"><i class="fa fa-fw fa-expand"></i></span>
+                </div>
                 <md-divider class="wz-margin-top-10"></md-divider>
                 <kbn-vis vis-id="'Wazuh-App-Agents-FIM-Alerts-summary'"></kbn-vis>
             </md-card-content>

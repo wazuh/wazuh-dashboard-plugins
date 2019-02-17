@@ -9,23 +9,35 @@
             Show state</span>
     </div>
     <div layout="row" class="height-240">
-        <md-card flex="50" class="wz-md-card">
+        <md-card flex="50" class="wz-md-card" ng-class="{'fullscreen': expandArray[0]}">
             <md-card-content class="wazuh-column">
-                <span class="wz-headline-title">Alerts over time</span>
+                <div layout="row">
+                    <span class="wz-headline-title">Alerts over time</span>
+                    <span flex></span>
+                    <span class="wz-text-link" ng-click="expand(0)"><i class="fa fa-fw fa-expand"></i></span>
+                </div>
                 <md-divider class="wz-margin-top-10"></md-divider>
                 <kbn-vis id="Wazuh-App-Agents-PM-Alerts-over-time" vis-id="'Wazuh-App-Agents-PM-Alerts-over-time'"></kbn-vis>
             </md-card-content>
         </md-card>
-        <md-card flex="25" class="wz-md-card">
+        <md-card flex="25" class="wz-md-card" ng-class="{'fullscreen': expandArray[1]}">
             <md-card-content class="wazuh-column">
-                <span class="wz-headline-title">Top 5 CIS Requirements</span>
+                <div layout="row">
+                    <span class="wz-headline-title">Top 5 CIS Requirements</span>
+                    <span flex></span>
+                    <span class="wz-text-link" ng-click="expand(1)"><i class="fa fa-fw fa-expand"></i></span>
+                </div>
                 <md-divider class="wz-margin-top-10"></md-divider>
                 <kbn-vis id="Wazuh-App-Agents-PM-Top-5-CIS-Requirements" vis-id="'Wazuh-App-Agents-PM-Top-5-CIS-Requirements'"></kbn-vis>
             </md-card-content>
         </md-card>
-        <md-card flex="25" class="wz-md-card">
+        <md-card flex="25" class="wz-md-card" ng-class="{'fullscreen': expandArray[2]}">
             <md-card-content class="wazuh-column">
-                <span class="wz-headline-title">Top 5 PCI DSS Requirements</span>
+                <div layout="row">
+                    <span class="wz-headline-title">Top 5 PCI DSS Requirements</span>
+                    <span flex></span>
+                    <span class="wz-text-link" ng-click="expand(2)"><i class="fa fa-fw fa-expand"></i></span>
+                </div>
                 <md-divider class="wz-margin-top-10"></md-divider>
                 <kbn-vis id="Wazuh-App-Agents-PM-Top-5-PCI-DSS-Requirements" vis-id="'Wazuh-App-Agents-PM-Top-5-PCI-DSS-Requirements'"></kbn-vis>
             </md-card-content>
@@ -33,9 +45,13 @@
     </div>
 
     <div layout="row" layout-align="space-between stretch" class="height-570">
-        <md-card flex="100" class="wz-md-card">
+        <md-card flex="100" class="wz-md-card" ng-class="{'fullscreen': expandArray[3]}">
             <md-card-content class="wazuh-column">
-                <span class="wz-headline-title">Alerts summary</span>
+                <div layout="row">
+                    <span class="wz-headline-title">Alerts summary</span>
+                    <span flex></span>
+                    <span class="wz-text-link" ng-click="expand(3)"><i class="fa fa-fw fa-expand"></i></span>
+                </div>
                 <md-divider class="wz-margin-top-10"></md-divider>
                 <kbn-vis vis-id="'Wazuh-App-Agents-PM-Alerts-summary'"></kbn-vis>
             </md-card-content>
