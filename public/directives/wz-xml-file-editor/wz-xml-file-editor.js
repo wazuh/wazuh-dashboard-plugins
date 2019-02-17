@@ -30,6 +30,7 @@ app.directive('wzXmlFileEditor', function () {
       $scope,
       $rootScope,
       $document,
+      $location,
       appState,
       $mdDialog,
       errorHandler,
@@ -194,55 +195,93 @@ app.directive('wzXmlFileEditor', function () {
           }
           return true;
         } catch (error) {
-          return Promise.reject(error);
+          errorHandler.handle(error, 'Error');
+          throw new Error(error);
         }
       };
 
       const saveFile = async params => {
+        let close = true;
+        const warnMsg =
+          'File has been updated, but there are errors in the configuration';
         try {
           const text = $scope.xmlCodeBox.getValue();
           const xml = replaceIllegalXML(text);
           if (params.group) {
             await groupHandler.sendConfiguration(params.group, xml);
-            await validateAfterSent();
+            try {
+              await validateAfterSent();
+            } catch (err) {
+              params.showRestartManager = 'warn';
+              close = false;
+            }
             const msg = 'Success. Group has been updated';
             params.showRestartManager
-              ? showRestartDialog(msg, params.showRestartManager)
+              ? params.showRestartManager !== 'warn'
+                ? showRestartDialog(msg, params.showRestartManager)
+                : errorHandler.handle(warnMsg, '', true)
               : errorHandler.info(msg, '');
             $scope.$emit('configurationSuccess');
           } else if (params.rule) {
             await rulesetHandler.sendRuleConfiguration(params.rule, xml);
-            await validateAfterSent();
+            try {
+              await validateAfterSent();
+            } catch (err) {
+              params.showRestartManager = 'warn';
+              close = false;
+            }
             const msg = 'Success. Rules updated';
             params.showRestartManager
-              ? showRestartDialog(msg, params.showRestartManager)
+              ? params.showRestartManager !== 'warn'
+                ? showRestartDialog(msg, params.showRestartManager)
+                : errorHandler.handle(warnMsg, '', true)
               : errorHandler.info(msg, '');
           } else if (params.decoder) {
             await rulesetHandler.sendDecoderConfiguration(params.decoder, xml);
-            await validateAfterSent();
+            try {
+              await validateAfterSent();
+            } catch (err) {
+              params.showRestartManager = 'warn';
+              close = false;
+            }
             const msg = 'Success. Decoders has been updated';
             params.showRestartManager
-              ? showRestartDialog(msg, params.showRestartManager)
+              ? params.showRestartManager !== 'warn'
+                ? showRestartDialog(msg, params.showRestartManager)
+                : errorHandler.handle(warnMsg, '', true)
               : errorHandler.info(msg, '');
           } else if (params.node) {
             await configHandler.saveNodeConfiguration(params.node, xml);
-            await validateAfterSent();
+            try {
+              await validateAfterSent();
+            } catch (err) {
+              params.showRestartManager = 'warn';
+              close = false;
+            }
             const msg = `Success. Node (${
               params.node
               }) configuration has been updated`;
             params.showRestartManager
-              ? showRestartDialog(msg, params.node)
+              ? params.showRestartManager !== 'warn'
+                ? showRestartDialog(msg, params.node)
+                : errorHandler.handle(warnMsg, '', true)
               : errorHandler.info(msg, '');
           } else if (params.manager) {
             await configHandler.saveManagerConfiguration(xml);
-            await validateAfterSent();
+            try {
+              await validateAfterSent();
+            } catch (err) {
+              params.showRestartManager = 'warn';
+              close = false;
+            }
             const msg = 'Success. Manager configuration has been updated';
             params.showRestartManager
-              ? showRestartDialog(msg, params.showRestartManager)
+              ? params.showRestartManager !== 'warn'
+                ? showRestartDialog(msg, params.showRestartManager)
+                : errorHandler.handle(warnMsg, '', true)
               : errorHandler.info(msg, '');
           }
-
-          $scope.closeFn({ reload: true });
+          if (close) $scope.closeFn({ reload: true });
         } catch (error) {
           errorHandler.handle(error, 'Error');
         }
@@ -406,8 +445,9 @@ app.directive('wzXmlFileEditor', function () {
 
       $scope.$on('saveXmlFile', (ev, params) => saveFile(params));
 
-      $scope.$on('$destroy', function () {
-        //$location.search('editingFile', null);
+      $scope.$on('$destroy', function() {
+        $location.search('editingFile', null);
+        appState.setNavigation({ status: true });
       });
     },
     template
