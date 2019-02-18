@@ -65,7 +65,24 @@ export class OverviewController {
     this.reportingService = reportingService;
     this.visFactoryService = visFactoryService;
     this.wazuhConfig = wazuhConfig;
-    this.expandArray = [false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false];
+    this.expandArray = [
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false
+    ];
   }
 
   /**
@@ -333,7 +350,24 @@ export class OverviewController {
   }
 
   falseAllExpand() {
-    this.expandArray = [false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false];
+    this.expandArray = [
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false
+    ];
   }
 
   expand(i) {

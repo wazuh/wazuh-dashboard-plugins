@@ -56,9 +56,11 @@ export class EditionController {
       try {
         let data = false;
         let xml = false;
-        const clusterStatus = ((this.$scope.clusterStatus || {}).data || {}).data || {};
+        const clusterStatus =
+          ((this.$scope.clusterStatus || {}).data || {}).data || {};
         if (
-          clusterStatus.enabled === 'yes' && clusterStatus.running === 'yes'
+          clusterStatus.enabled === 'yes' &&
+          clusterStatus.running === 'yes'
         ) {
           data = await this.apiReq.request(
             'GET',
@@ -105,9 +107,11 @@ export class EditionController {
           {}
         );
         let data;
-        const clusterStatus = ((this.$scope.clusterStatus || {}).data || {}).data || {};
+        const clusterStatus =
+          ((this.$scope.clusterStatus || {}).data || {}).data || {};
         if (
-          (clusterStatus.enabled === 'yes' && clusterStatus.running === 'yes') ||
+          (clusterStatus.enabled === 'yes' &&
+            clusterStatus.running === 'yes') ||
           (clusterStatus.enabled === 'no' && clusterStatus.running === 'yes')
         ) {
           data = await this.configHandler.restartNode(selectedNode);
@@ -129,19 +133,21 @@ export class EditionController {
     };
     this.$scope.saveConfiguration = async () => {
       try {
-        const clusterStatus = ((this.$scope.clusterStatus || {}).data || {}).data || {};
-        const enabledAndRunning = clusterStatus.enabled === 'yes' && clusterStatus.running === 'yes';
-        const parameters = enabledAndRunning ?
-          {
-            node: this.$scope.selectedNode,
-            showRestartManager: 'cluster'
-          } : {
-            manager: this.$scope.selectedNode,
-            showRestartManager: 'manager'
-          };
+        const clusterStatus =
+          ((this.$scope.clusterStatus || {}).data || {}).data || {};
+        const enabledAndRunning =
+          clusterStatus.enabled === 'yes' && clusterStatus.running === 'yes';
+        const parameters = enabledAndRunning
+          ? {
+              node: this.$scope.selectedNode,
+              showRestartManager: 'cluster'
+            }
+          : {
+              manager: this.$scope.selectedNode,
+              showRestartManager: 'manager'
+            };
 
         this.$scope.$broadcast('saveXmlFile', parameters);
-
       } catch (error) {
         this.$scope.fetchedXML = null;
         this.errorHandler.handle(error, 'Save file error');
@@ -175,14 +181,13 @@ export class EditionController {
         '/cluster/status',
         {}
       );
-      const clusterStatus = ((this.$scope.clusterStatus || {}).data || {}).data || {};
+      const clusterStatus =
+        ((this.$scope.clusterStatus || {}).data || {}).data || {};
       if (clusterStatus.enabled === 'yes' && clusterStatus.running === 'yes') {
         const nodes = await this.apiReq.request('GET', '/cluster/nodes', {});
         const items = nodes.data.data.items;
         this.$scope.nodes = items.reverse();
-        const masterNode = items.filter(
-          item => item.type === 'master'
-        )[0];
+        const masterNode = items.filter(item => item.type === 'master')[0];
         this.$scope.selectedNode = masterNode.name;
       } else {
         this.$scope.selectedNode = 'manager';

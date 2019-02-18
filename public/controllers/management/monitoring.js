@@ -289,13 +289,13 @@ export function ClusterController(
 
   $scope.falseAllExpand = () => {
     $scope.expandArray = [false, false];
-  }
+  };
 
   $scope.expand = i => {
     const oldValue = $scope.expandArray[i];
     $scope.falseAllExpand();
     $scope.expandArray[i] = !oldValue;
-  }
+  };
 
   $scope.expandArray = [false, false];
 
