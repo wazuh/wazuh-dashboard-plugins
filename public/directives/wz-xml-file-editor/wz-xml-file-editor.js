@@ -174,9 +174,14 @@ app.directive('wzXmlFileEditor', function () {
 
       const validateAfterSent = async (node = false) => {
         try {
-          const isCluster = appState.getClusterInfo().status === 'enabled';
+          const clusterStatus = await apiReq.request(
+            'GET',
+            `/cluster/status`,
+            {}
+          );
+          const isCluster = (clusterStatus && (clusterStatus.data.data.enabled === 'yes' && clusterStatus.data.data.running === 'yes' ))
           let validation = false;
-          if (node) {
+          if (node && isCluster) {
             validation = await apiReq.request(
               'GET',
               `/cluster/${node}/configuration/validation`,
