@@ -46,55 +46,55 @@
                     <div class="euiFlexItem euiFlexItem--flexGrowZero">
                         <div class="euiStat euiStat--leftAligned">
                             <div class="euiText euiText--small euiStat__description">
-                                <p>ID:</p>
+                                <p>ID</p>
                             </div>
                             <p class="euiTitle euiTitle--small euiStat__title">{{ agent.id || '-' }}</p>
                         </div>
                     </div>
-                    <div class="euiFlexItem euiFlexItem--flexGrowZero" data-test-subj="nodesCount">
+                    <div class="euiFlexItem euiFlexItem--flexGrowZero">
                         <div class="euiStat euiStat--leftAligned">
                             <div class="euiText euiText--small euiStat__description">
-                                <p>IP:</p>
+                                <p>IP</p>
                             </div>
                             <p class="euiTitle euiTitle--small euiStat__title">{{ agent.ip || '-'}}</p>
                         </div>
                     </div>
-                    <div class="euiFlexItem euiFlexItem--flexGrowZero" data-test-subj="indicesCount">
+                    <div class="euiFlexItem euiFlexItem--flexGrowZero">
                         <div class="euiStat euiStat--leftAligned">
                             <div class="euiText euiText--small euiStat__description">
-                                <p>Version:</p>
+                                <p>Version</p>
                             </div>
                             <p class="euiTitle euiTitle--small euiStat__title">{{ agent.version || '-'}}</p>
                         </div>
                     </div>
-                    <div class="euiFlexItem euiFlexItem--flexGrowZero" data-test-subj="memory">
+                    <div class="euiFlexItem euiFlexItem--flexGrowZero">
                         <div class="euiStat euiStat--leftAligned">
                             <div class="euiText euiText--small euiStat__description">
-                                <p>OS:</p>
+                                <p>OS</p>
                             </div>
                             <p class="euiTitle euiTitle--small euiStat__title">{{ agentOS || '-'}}</p>
                         </div>
                     </div>
-                    <div class="euiFlexItem euiFlexItem--flexGrowZero" data-test-subj="memory">
+                    <div class="euiFlexItem euiFlexItem--flexGrowZero">
                         <div class="euiStat euiStat--leftAligned">
                             <div class="euiText euiText--small euiStat__description">
-                                <p>Last keep alive:</p>
-                            </div>
-                            <p class="euiTitle euiTitle--small euiStat__title">{{agent.lastKeepAlive || '-' }}</p>
-                        </div>
-                    </div>
-                    <div class="euiFlexItem euiFlexItem--flexGrowZero" data-test-subj="memory">
-                        <div class="euiStat euiStat--leftAligned">
-                            <div class="euiText euiText--small euiStat__description">
-                                <p>Registration date:</p>
+                                <p>Registration date</p>
                             </div>
                             <p class="euiTitle euiTitle--small euiStat__title">{{agent.dateAdd || '-'}}</p>
                         </div>
                     </div>
-                    <div class="euiFlexItem euiFlexItem--flexGrowZero" data-test-subj="memory">
+                    <div class="euiFlexItem euiFlexItem--flexGrowZero">
                         <div class="euiStat euiStat--leftAligned">
                             <div class="euiText euiText--small euiStat__description">
-                                <p>Last syscheck scan:</p>
+                                <p>Last keep alive</p>
+                            </div>
+                            <p class="euiTitle euiTitle--small euiStat__title">{{agent.lastKeepAlive || '-' }}</p>
+                        </div>
+                    </div>
+                    <div class="euiFlexItem euiFlexItem--flexGrowZero">
+                        <div class="euiStat euiStat--leftAligned">
+                            <div class="euiText euiText--small euiStat__description">
+                                <p>Last syscheck scan</p>
                             </div>
                             <p class="euiTitle euiTitle--small euiStat__title" ng-if="agent.syscheck.inProgress">Scan
                                 in progress</p>
@@ -108,10 +108,10 @@
                             </p>
                         </div>
                     </div>
-                    <div class="euiFlexItem euiFlexItem--flexGrowZero" data-test-subj="memory">
+                    <div class="euiFlexItem euiFlexItem--flexGrowZero">
                         <div class="euiStat euiStat--leftAligned">
                             <div class="euiText euiText--small euiStat__description">
-                                <p>Last syscheck scan:</p>
+                                <p>Last rootcheck scan</p>
                             </div>
                             <p class="euiTitle euiTitle--small euiStat__title" ng-if="agent.rootcheck.inProgress">Scan
                                 in progress</p>
