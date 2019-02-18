@@ -179,7 +179,10 @@ app.directive('wzXmlFileEditor', function () {
             `/cluster/status`,
             {}
           );
-          const isCluster = (clusterStatus && (clusterStatus.data.data.enabled === 'yes' && clusterStatus.data.data.running === 'yes' ))
+
+          const clusterData = ((clusterStatus || {}).data || {}).data || {};
+          const isCluster = clusterData.enabled === 'yes' && clusterData.running === 'yes';
+
           let validation = false;
           if (node && isCluster) {
             validation = await apiReq.request(
