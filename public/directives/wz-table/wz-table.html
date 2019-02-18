@@ -3,7 +3,8 @@
         <div></div>
     </div>
 </div>
-<div layout="row" ng-show="!error && !wazuh_table_loading && items.length" class="columns-bar" ng-class="{'columns-bar-active': showColumns}">
+<div ng-if="customColumns" layout="row" ng-show="!error && !wazuh_table_loading && items.length" class="columns-bar"
+    ng-class="{'columns-bar-active': showColumns}">
     <div ng-if="showColumns" class="euiCheckbox wz-margin-right-8" ng-repeat="key in originalkeys" ng-click="updateColumns(key)">
         <input class="euiCheckbox__input" type="checkbox" aria-label="Select all rows" ng-checked="exists(key)">
         <div class="euiCheckbox__square"></div>

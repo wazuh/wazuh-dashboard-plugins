@@ -48,9 +48,9 @@
                 <wz-kbn-switch class="md-primary wz-no-top-bottom-margin" switch-model="showingLocalRules" switch-text="Only custom"></wz-kbn-switch>
             </md-card-actions>
             <md-card-content>
-                <wz-table flex ng-if="showingLocalRules" path="'/rules'" keys="['id',{value:'file',size:2},{value:'description',size:2},{value:'groups',nosortable:true,size:2},{value:'pci',nosortable:true,size:2},{value:'gdpr',nosortable:true},'level']"
+                <wz-table custom-columns="true" flex ng-if="showingLocalRules" path="'/rules'" keys="['id',{value:'file',size:2},{value:'description',size:2},{value:'groups',nosortable:true,size:2},{value:'pci',nosortable:true,size:2},{value:'gdpr',nosortable:true},'level']"
                     implicit-filter="[{ name:'path',value: '/var/ossec/etc/rules'}]" allow-click="true" row-sizes="[16,13,11]"></wz-table>
-                <wz-table ng-if="!showingLocalRules" implicit-filter="appliedFilters" flex path="'/rules'" keys="['id',{value:'file',size:2},{value:'description',size:2},{value:'groups',nosortable:true,size:2},{value:'pci',nosortable:true,size:2},{value:'gdpr',nosortable:true},'level']"
+                <wz-table custom-columns="true" ng-if="!showingLocalRules" implicit-filter="appliedFilters" flex path="'/rules'" keys="['id',{value:'file',size:2},{value:'description',size:2},{value:'groups',nosortable:true,size:2},{value:'pci',nosortable:true,size:2},{value:'gdpr',nosortable:true},'level']"
                     allow-click="true" row-sizes="[16,13,11]">
                 </wz-table>
                 <div layout="row" class="wz-margin-top-10 md-padding-h">

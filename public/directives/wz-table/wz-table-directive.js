@@ -26,7 +26,7 @@ import { checkGap } from './lib/check-gap';
 
 const app = uiModules.get('app/wazuh', []);
 
-app.directive('wzTable', function() {
+app.directive('wzTable', function () {
   return {
     restrict: 'E',
     scope: {
@@ -36,7 +36,8 @@ app.directive('wzTable', function() {
       implicitFilter: '=implicitFilter',
       rowSizes: '=rowSizes',
       extraLimit: '=extraLimit',
-      emptyResults: '=emptyResults'
+      emptyResults: '=emptyResults',
+      customColumns: '=customColumns'
     },
     controller(
       $scope,
@@ -264,7 +265,7 @@ app.directive('wzTable', function() {
       $scope.prevPage = () => pagination.prevPage($scope);
       $scope.nextPage = async currentPage =>
         pagination.nextPage(currentPage, $scope, errorHandler, fetch);
-      $scope.setPage = function() {
+      $scope.setPage = function () {
         $scope.currentPage = this.n;
         $scope.nextPage(this.n);
       };
