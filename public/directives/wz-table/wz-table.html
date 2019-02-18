@@ -31,15 +31,12 @@
         <tbody>
             <tr ng-class="allowClick ? 'cursor-pointer' : ''" class="wz-word-wrap" ng-repeat="item in pagedItems[currentPage] | filter:{item:'!'}"
                 ng-click="clickAction(item)">
-                <td ng-repeat="key in keys">
-                    {{
-                    parseValue(key,item) | limitTo: extraLimit ? 100 : 25
-                    }}
-                    <span ng-if="parseValue(key,item).length > (extraLimit ? 100 : 25)">...</span>
-                    <md-tooltip ng-if="parseValue(key,item).length > (extraLimit ? 100 : 25)" md-direction="bottom"
-                        class="wz-tooltip">
-                        {{ parseValue(key,item) }}
-                    </md-tooltip>
+                <td ng-repeat="key in keys" class="wz-text-truncatable">
+                    <span tooltip="{{ parseValue(key,item) }}" tooltip-placement="bottom">
+                        {{
+                        parseValue(key,item)
+                        }}
+                    </span>
                 </td>
                 <td ng-if="path === '/agents'" ng-click="$event.stopPropagation()" class="cursor-default action-btn-td">
                     <i ng-click="clickAction(item, 'discover'); $event.stopPropagation()" class="fa fa-fw fa-compass cursor-pointer"
@@ -49,8 +46,7 @@
                 </td>
                 <td ng-if="path === '/agents/groups' && adminMode" ng-click="$event.stopPropagation()" class="cursor-default action-btn-td">
                     <i ng-if="removingGroup !== item.name && item.name !== 'default'" ng-click="showConfirmRemoveGroup($event, item); $event.stopPropagation()"
-                        class="fa fa-fw fa-trash cursor-pointer" tooltip="Remove this group" tooltip-placement="left"
-                        aria-hidden="true"></i>
+                        class="fa fa-fw fa-trash cursor-pointer" aria-hidden="true"></i>
                     <i ng-if="removingGroup !== item.name" ng-click="editGroup(item); $event.stopPropagation()" class="fa fa-fw fa-pencil cursor-pointer"
                         tooltip="Edit this group configuration" tooltip-placement="left" aria-hidden="true"></i>
                     <div ng-if="removingGroup === item.name && item.name !== 'default'" class="confirmEmbedBubble">
