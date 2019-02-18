@@ -57,8 +57,8 @@ export class EditionController {
         let data = false;
         let xml = false;
         if (
-          this.$scope.clusterStatus.data.data.enabled === 'yes' &&
-          this.$scope.clusterStatus.data.data.running === 'yes'
+          (this.$scope.clusterStatus.data.data.enabled === 'yes' &&
+            this.$scope.clusterStatus.data.data.running === 'yes')
         ) {
           data = await this.apiReq.request(
             'GET',
@@ -106,8 +106,10 @@ export class EditionController {
         );
         let data;
         if (
-          this.$scope.clusterStatus.data.data.enabled === 'yes' &&
-          this.$scope.clusterStatus.data.data.running === 'yes'
+          (this.$scope.clusterStatus.data.data.enabled === 'yes' &&
+            this.$scope.clusterStatus.data.data.running === 'yes') ||
+          (this.$scope.clusterStatus.data.data.enabled === 'no' &&
+            this.$scope.clusterStatus.data.data.running === 'yes')
         ) {
           data = await this.configHandler.restartNode(selectedNode);
         } else {
@@ -129,9 +131,8 @@ export class EditionController {
     this.$scope.saveConfiguration = async () => {
       try {
         if (
-          this.$scope.clusterStatus.data.data.enabled === 'yes' &&
-          this.$scope.clusterStatus.data.data.running === 'yes'
-        ) {
+          (this.$scope.clusterStatus.data.data.enabled === 'yes' &&
+            this.$scope.clusterStatus.data.data.running === 'yes') ) {
           this.$scope.$broadcast('saveXmlFile', {
             node: this.$scope.selectedNode,
             showRestartManager: 'cluster'
@@ -178,8 +179,8 @@ export class EditionController {
       if (
         this.$scope.clusterStatus &&
         this.$scope.clusterStatus.data.data.enabled === 'yes' &&
-        this.$scope.clusterStatus.data.data.running === 'yes'
-      ) {
+        this.$scope.clusterStatus.data.data.running === 'yes') 
+      {
         const nodes = await this.apiReq.request('GET', '/cluster/nodes', {});
         this.$scope.nodes = nodes.data.data.items.reverse();
         const masterNode = nodes.data.data.items.filter(
