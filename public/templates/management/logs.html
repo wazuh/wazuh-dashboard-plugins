@@ -10,9 +10,10 @@
     <!-- Filters and Realtime button section -->
     <div ng-show="!ctrl.loading" layout="row" layout-align="start center" class="md-padding">
         <!-- Daemon selector -->
-        <div flex="20" layout="column"  layout-align="center" class="height-40 wz-margin-right-15 wz-select-input">
-            <select flex class="kuiSelect wz-border-none cursor-pointer max-height-35" ng-disabled="ctrl.realtime || !ctrl.daemons.length" id="categoryBox" ng-model="ctrl.category" ng-change="ctrl.filter({name:'category',value:ctrl.category})"
-            aria-label="Logs category">
+        <div flex="20" layout="column" layout-align="center" class="height-40 wz-margin-right-15 wz-select-input">
+            <select flex class="kuiSelect wz-border-none cursor-pointer max-height-35" ng-disabled="ctrl.realtime || !ctrl.daemons.length"
+                id="categoryBox" ng-model="ctrl.category" ng-change="ctrl.filter({name:'category',value:ctrl.category})"
+                aria-label="Logs category">
                 <option value="all">All daemons</option>
                 <option ng-repeat="daemon in ctrl.daemons | orderObjectBy: 'title'" value="{{daemon.title}}">{{daemon.title}}</option>
             </select>
@@ -21,8 +22,8 @@
 
         <!-- Level selector -->
         <div flex="20" layout="column" layout-align="center" class="height-40 wz-select-input wz-margin-right-15">
-            <select flex class="kuiSelect wz-border-none cursor-pointer max-height-35" ng-disabled="ctrl.realtime" id="levelBox" ng-model="ctrl.type_log" ng-change="ctrl.filter({name:'type_log',value:ctrl.type_log})"
-            aria-label="Logs level">
+            <select flex class="kuiSelect wz-border-none cursor-pointer max-height-35" ng-disabled="ctrl.realtime" id="levelBox"
+                ng-model="ctrl.type_log" ng-change="ctrl.filter({name:'type_log',value:ctrl.type_log})" aria-label="Logs level">
                 <option value="all">All log levels</option>
                 <option value="info">Info</option>
                 <option value="error">Error</option>
@@ -33,8 +34,8 @@
         </div>
 
         <div flex="20" layout="column" ng-show="ctrl.nodeList" layout-align="center" class="height-40 wz-select-input">
-            <select flex class="kuiSelect wz-border-none cursor-pointer max-height-35" ng-disabled="ctrl.realtime" id="categoryBox" ng-model="ctrl.selectedNode" ng-change="ctrl.changeNode(ctrl.selectedNode)"
-            aria-label="Logs category">
+            <select flex class="kuiSelect wz-border-none cursor-pointer max-height-35" ng-disabled="ctrl.realtime" id="categoryBox"
+                ng-model="ctrl.selectedNode" ng-change="ctrl.changeNode(ctrl.selectedNode)" aria-label="Logs category">
                 <option ng-repeat="node in ctrl.nodeList" value="{{node}}">{{node}}</option>
             </select>
         </div>
@@ -43,11 +44,13 @@
         <!-- White space between filters and Realtime button -->
         <span flex></span>
 
-        <md-button ng-if="!ctrl.realtime" class="wz-button md-raised md-primary no-margin-right" ng-click="ctrl.playRealtime()" aria-label="Play realtime button">
+        <md-button ng-if="!ctrl.realtime" class="wz-button md-raised md-primary no-margin-right" ng-click="ctrl.playRealtime()"
+            aria-label="Play realtime button">
             <i class="fa fa-play fa-fw" aria-hidden="true"></i>
             Play realtime
         </md-button>
-        <md-button ng-if="ctrl.realtime" class="wz-button md-raised md-primary no-margin-right" ng-click="ctrl.stopRealtime()" aria-label="Stop realtime button">
+        <md-button ng-if="ctrl.realtime" class="wz-button md-raised md-primary no-margin-right" ng-click="ctrl.stopRealtime()"
+            aria-label="Stop realtime button">
             <i class="fa fa-stop fa-fw" aria-hidden="true"></i>
             Stop realtime
         </md-button>
@@ -64,11 +67,7 @@
 
     <!-- Logs table section -->
     <div layout="row" layout-padding ng-if="ctrl.logsPath">
-        <wz-table
-            flex
-            extra-limit="true"
-            path="ctrl.logsPath"
-            keys="['timestamp',{value:'tag',size:2},'level',{value:'description',size:4,nosortable:true}]"
+        <wz-table custom-columns="true" flex extra-limit="true" path="ctrl.logsPath" keys="['timestamp',{value:'tag',size:2},'level',{value:'description',size:4,nosortable:true}]"
             row-sizes="[12,10,7]">
         </wz-table>
     </div>

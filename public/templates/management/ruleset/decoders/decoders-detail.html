@@ -112,7 +112,7 @@
             <div layout="row" ng-if="dctrl.currentDecoder">
                 <md-card flex class="wz-md-card _md flex md-margin-h">
                     <md-card-content>
-                        <wz-table flex path="'/decoders'" implicit-filter="[{ name:'file',value: dctrl.currentDecoder.file}]"
+                        <wz-table custom-columns="true" flex path="'/decoders'" implicit-filter="[{ name:'file',value: dctrl.currentDecoder.file}]"
                             keys="['name',{value:'details.program_name',size:2,nosortable:true},{value:'details.order',size:2,nosortable:true},'file']"
                             allow-click="true" />
                     </md-card-content>
