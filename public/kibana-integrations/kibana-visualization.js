@@ -15,8 +15,8 @@ import { getVisualizeLoader } from './loader';
 import { timefilter } from 'ui/timefilter';
 
 const app = uiModules.get('apps/webinar_app', []);
-
-app.directive('kbnVis', function() {
+let lockFields = false;
+app.directive('kbnVis', function () {
   return {
     restrict: 'E',
     scope: {
@@ -32,7 +32,8 @@ app.directive('kbnVis', function() {
       loadedVisualizations,
       tabVisualizations,
       discoverPendingUpdates,
-      visHandlers
+      visHandlers,
+      genericReq
     ) {
       let implicitFilter = '';
       let rawFilters = [];
@@ -130,16 +131,21 @@ app.directive('kbnVis', function() {
           }
         } catch (error) {
           if (
-            error &&
-            error.message &&
-            error.message.includes('not locate that index-pattern-field')
+            ((error || {}).message || '').includes('not locate that index-pattern-field')
           ) {
-            errorHandler.handle(
-              `${
-                error.message
-              }, please restart Kibana and refresh this page once done`,
-              'Visualize'
-            );
+            if (!lockFields) {
+              try {
+                lockFields = true;
+                errorHandler.info('Detected an incomplete index pattern, refreshing all its known fields...');
+                await genericReq.request('GET', '/elastic/known-fields/all', {});
+                lockFields = false;
+                errorHandler.info('Success');
+                return myRender(raw);
+              } catch (error) {
+                lockFields = false;
+                throw error;
+              }
+            }
           } else {
             errorHandler.handle(error, 'Visualize');
           }
@@ -161,10 +167,10 @@ app.directive('kbnVis', function() {
         updateVisWatcher();
         try {
           visualization.destroy();
-        } catch (error) {} // eslint-disable-line
+        } catch (error) { } // eslint-disable-line
         try {
           visHandler.destroy();
-        } catch (error) {} // eslint-disable-line
+        } catch (error) { } // eslint-disable-line
       });
 
       const renderComplete = () => {
@@ -173,11 +179,11 @@ app.directive('kbnVis', function() {
         const currentCompleted = Math.round(
           (loadedVisualizations.getList().length /
             tabVisualizations.getItem(tabVisualizations.getTab())) *
-            100
+          100
         );
         $rootScope.loadingStatus = `Rendering visualizations... ${
           currentCompleted > 100 ? 100 : currentCompleted
-        } %`;
+          } %`;
 
         if (currentCompleted >= 100) {
           $rootScope.rendered = true;
