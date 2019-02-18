@@ -29,6 +29,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - New design for agent header view ([#1186](https://github.com/wazuh/wazuh-kibana-app/pull/1186)).
 - Not fetching data the very first time the Dev Tools are opened ([#1185](https://github.com/wazuh/wazuh-kibana-app/pull/1185)).
 - Refresh all known fields for all valid index patterns on every parent state ([ff88df6f](https://github.com/wazuh/wazuh-kibana-app/commit/ff88df6f0ca5590d14b3bc71b7ad63d4484d6bb9)).
+- Refresh all known fields for all valid index patterns if `kbn-vis` detects a broken index pattern ([ecd7c8f](https://github.com/wazuh/wazuh-kibana-app/commit/ecd7c8f98c187a350f81261d13b0d45dcec6dc5d)).
 
 ### Fixed
 
