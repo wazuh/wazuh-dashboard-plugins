@@ -301,17 +301,11 @@ export function GroupsController(
   };
 
   $scope.doSaveGroupAgentConfig = () => {
-    $scope.editingFile = false;
     $scope.$broadcast('saveXmlFile', {
       group: $scope.currentGroup.name,
       type: 'group'
     });
   };
-
-  $scope.$on('configurationSuccess', () => {
-    $scope.editingFile = false;
-    if (!$scope.$$phase) $scope.$digest();
-  });
 
   $scope.reload = async (element, searchTerm, addOffset, start) => {
     if (element === 'left') {
