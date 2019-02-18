@@ -26,9 +26,8 @@
             <md-card-actions layout="row" layout-align="end center" class="wz-card-actions wz-card-actions-top">
                 <a ng-click="dctrl.addNewFile('decoders')">Add new decoder <i aria-hidden="true" class="fa fa-plus"></i></a>
                 <span flex></span>
-                <md-switch class="wz-switch" ng-model="dctrl.showingLocalDecoders" class="md-primary wz-no-top-bottom-margin">
-                    Only custom
-                </md-switch>
+                <wz-kbn-switch class="md-primary wz-no-top-bottom-margin" switch-model="dctrl.showingLocalDecoders"
+                    switch-text="Only custom"></wz-kbn-switch>
             </md-card-actions>
             <md-card-content>
                 <wz-table ng-if="!dctrl.showingLocalDecoders" implicit-filter="dctrl.appliedFilters" flex path="'/decoders'"
