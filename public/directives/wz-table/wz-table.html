@@ -3,16 +3,15 @@
         <div></div>
     </div>
 </div>
-<div layout="row" ng-show="!error && !wazuh_table_loading && items.length">
+<div layout="row" ng-show="!error && !wazuh_table_loading && items.length" class="columns-bar" ng-class="{'columns-bar-active': showColumns}">
+    <div ng-if="showColumns" class="euiCheckbox wz-margin-right-8" ng-repeat="key in originalkeys" ng-click="updateColumns(key)">
+        <input class="euiCheckbox__input" type="checkbox" aria-label="Select all rows" ng-checked="exists(key)">
+        <div class="euiCheckbox__square"></div>
+        <span class="euiCheckbox__label">{{ keyEquivalence[key.key.value || key.key] }}</span>
+    </div>
     <span flex></span>
-    <span class="wz-text-link" ng-click="showColumns = !showColumns" tooltip="Columns"><i class="fa fa-fw fa-gear"></i></span>
-</div>
-<div layout="row" layout-wrap ng-show="!error && !wazuh_table_loading && items.length" ng-if="showColumns">
-    <span flex></span>
-    <md-checkbox ng-repeat="key in originalkeys" ng-click="updateColumns(key)" ng-checked="exists(key)">
-        {{ keyEquivalence[key.key.value ||
-        key.key] }}
-    </md-checkbox>
+    <span class="wz-text-link" style="line-height: 24px;" ng-click="showColumns = !showColumns" tooltip="Columns"><i
+            class="fa fa-fw fa-gear"></i></span>
 </div>
 
 <div layout="row" ng-show="!error && !wazuh_table_loading && items.length">
