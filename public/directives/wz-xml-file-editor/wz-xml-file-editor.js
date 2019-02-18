@@ -172,21 +172,38 @@ app.directive('wzXmlFileEditor', function() {
         return formatted.trim();
       };
 
-      const validateAfterSent = async () => {
+      const validateAfterSent = async (node = false) => {
         try {
-          const isCluster = appState.getClusterInfo().status === 'enabled';
+          const clusterStatus = await apiReq.request(
+            'GET',
+            `/cluster/status`,
+            {}
+          );
 
-          const validation = isCluster
-            ? await apiReq.request(
-                'GET',
-                `/cluster/configuration/validation`,
-                {}
-              )
-            : await apiReq.request(
-                'GET',
-                `/manager/configuration/validation`,
-                {}
-              );
+          const clusterData = ((clusterStatus || {}).data || {}).data || {};
+          const isCluster =
+            clusterData.enabled === 'yes' && clusterData.running === 'yes';
+
+          let validation = false;
+          if (node && isCluster) {
+            validation = await apiReq.request(
+              'GET',
+              `/cluster/${node}/configuration/validation`,
+              {}
+            );
+          } else {
+            validation = isCluster
+              ? await apiReq.request(
+                  'GET',
+                  `/cluster/configuration/validation`,
+                  {}
+                )
+              : await apiReq.request(
+                  'GET',
+                  `/manager/configuration/validation`,
+                  {}
+                );
+          }
           const data = ((validation || {}).data || {}).data || {};
           const isOk = data.status === 'OK';
           if (!isOk && Array.isArray(data.details)) {
@@ -221,7 +238,6 @@ app.directive('wzXmlFileEditor', function() {
                 ? showRestartDialog(msg, params.showRestartManager)
                 : errorHandler.handle(warnMsg, '', true)
               : errorHandler.info(msg, '');
-            $scope.$emit('configurationSuccess');
           } else if (params.rule) {
             await rulesetHandler.sendRuleConfiguration(params.rule, xml);
             try {
@@ -253,7 +269,7 @@ app.directive('wzXmlFileEditor', function() {
           } else if (params.node) {
             await configHandler.saveNodeConfiguration(params.node, xml);
             try {
-              await validateAfterSent();
+              await validateAfterSent(params.node);
             } catch (err) {
               params.showRestartManager = 'warn';
               close = false;

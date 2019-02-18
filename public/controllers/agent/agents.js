@@ -96,7 +96,24 @@ export class AgentsController {
     this.$scope.addingGroupToAgent = false;
 
     this.$scope.lookingAssessment = false;
-    this.$scope.expandArray = [false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false];
+    this.$scope.expandArray = [
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false
+    ];
   }
 
   /**
@@ -958,7 +975,24 @@ export class AgentsController {
   }
 
   falseAllExpand() {
-    this.$scope.expandArray = [false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false];
+    this.$scope.expandArray = [
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false
+    ];
   }
 
   expand(i) {
