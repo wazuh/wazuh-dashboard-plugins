@@ -233,9 +233,11 @@ export class ManagementController {
   breadCrumbBack(goRoot = false) {
     if (this.currentRule) {
       this.$scope.$broadcast('closeRuleView');
-    } else if (this.currentDecoder) {
+    }
+    if (this.currentDecoder) {
       this.$scope.$broadcast('closeDecoderView');
-    } else if (this.currentList) {
+    }
+    if (this.currentList) {
       this.$scope.$broadcast('closeListView');
     }
     if (goRoot) {

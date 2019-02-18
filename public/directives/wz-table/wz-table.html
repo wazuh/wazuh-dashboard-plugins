@@ -3,7 +3,8 @@
         <div></div>
     </div>
 </div>
-<div layout="row" ng-show="!error && !wazuh_table_loading && items.length" class="columns-bar" ng-class="{'columns-bar-active': showColumns}">
+<div ng-if="customColumns" layout="row" ng-show="!error && !wazuh_table_loading && items.length" class="columns-bar"
+    ng-class="{'columns-bar-active': showColumns}">
     <div ng-if="showColumns" class="euiCheckbox wz-margin-right-8" ng-repeat="key in originalkeys" ng-click="updateColumns(key)">
         <input class="euiCheckbox__input" type="checkbox" aria-label="Select all rows" ng-checked="exists(key)">
         <div class="euiCheckbox__square"></div>
@@ -30,13 +31,12 @@
         <tbody>
             <tr ng-class="allowClick ? 'cursor-pointer' : ''" class="wz-word-wrap" ng-repeat="item in pagedItems[currentPage] | filter:{item:'!'}"
                 ng-click="clickAction(item)">
-                <td ng-repeat="key in keys">
-                    <span ng-bind-html="parseValue(key,item) | limitTo: extraLimit || 25"></span>
-                    <span ng-if="parseValue(key,item).length > (extraLimit || 25)">...</span>
-                    <md-tooltip ng-if="parseValue(key,item).length > (extraLimit || 25)" md-direction="bottom"
-                        class="wz-tooltip">
-                        {{ parseValue(key,item) }}
-                    </md-tooltip>
+                <td ng-repeat="key in keys" class="wz-text-truncatable">
+                    <span tooltip="{{ parseValue(key,item) }}" tooltip-placement="bottom">
+                        {{
+                        parseValue(key,item)
+                        }}
+                    </span>
                 </td>
                 <td ng-if="path === '/agents'" ng-click="$event.stopPropagation()" class="cursor-default action-btn-td">
                     <i ng-click="clickAction(item, 'discover'); $event.stopPropagation()" class="fa fa-fw fa-compass cursor-pointer"

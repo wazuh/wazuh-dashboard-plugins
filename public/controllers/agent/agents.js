@@ -753,11 +753,19 @@ export class AgentsController {
 
       const id = this.commonData.checkLocationAgentId(newAgentId, globalAgent);
 
-      const data = await Promise.all([
-        this.apiReq.request('GET', `/agents/${id}`, {}),
-        this.apiReq.request('GET', `/syscheck/${id}/last_scan`, {}),
-        this.apiReq.request('GET', `/rootcheck/${id}/last_scan`, {})
-      ]);
+      const data = [false, false, false];
+
+      try {
+        data[0] = await this.apiReq.request('GET', `/agents/${id}`, {});
+      } catch (error) { } //eslint-disable-line
+
+      try {
+        data[1] = await this.apiReq.request('GET', `/syscheck/${id}/last_scan`, {});
+      } catch (error) { } //eslint-disable-line
+
+      try {
+        data[2] = await this.apiReq.request('GET', `/rootcheck/${id}/last_scan`, {});
+      } catch (error) { } //eslint-disable-line
 
       const result = data.map(item => ((item || {}).data || {}).data || false);
 

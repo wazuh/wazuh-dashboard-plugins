@@ -28,3 +28,4 @@ import './wz-xml-file-editor/wz-xml-file-editor.less';
 import './wz-multiple-selector/wz-multiple-selector';
 import './wz-multiple-selector/wz-multiple-selector.less';
 import './wz-list-manage/wz-list-manage';
+import './wz-kbn-switch/wz-kbn-switch';
