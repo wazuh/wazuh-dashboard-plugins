@@ -181,15 +181,16 @@
             <md-card-content>
                 <span class="wz-headline-title"><i class="fa fa-fw fa-file-o"></i> Files</span>
                 <md-divider class="wz-margin-top-10"></md-divider>
-                <div layout="row" class="wz-margin-top-10">
+                <div layout="row" class="wz-margin-top-10 wz-margin-bottom-25">
                     <input placeholder="Filter files..." ng-model="filesSearch" type="text" class="kuiLocalSearchInput ng-empty ng-pristine ng-scope ng-touched ng-valid height-30"
                         aria-invalid="false" wz-enter="searchSyscheckFile(filesSearch)">
                     <button type="submit" aria-label="Search" class="kuiLocalSearchButton height-30" ng-click="searchSyscheckFile(filesSearch)">
                         <span class="fa fa-search" aria-hidden="true"></span>
                     </button>
                 </div>
-                <div layout="row" ng-if="agent && !load" class="wz-margin-top-10 wz-margin-bottom-40-inv">
-                    <wz-table flex path="'/syscheck/' + agent.id" row-sizes="[12,10,8]" extra-limit="100" keys="['file','size','inode','gname','uname','perm','sha1','sha256','uid','gid','mtime','md5']">
+                <div layout="row" ng-if="agent && !load" class="wz-margin-top-16 wz-margin-bottom-40-inv">
+                    <wz-table custom-columns="true" flex path="'/syscheck/' + agent.id" row-sizes="[12,10,8]"
+                        extra-limit="100" keys="['file','size','inode','gname','uname','perm','sha1','sha256','uid','gid','mtime','md5']">
                     </wz-table>
                 </div>
                 <div layout="row" layout-padding>
