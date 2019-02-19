@@ -394,7 +394,7 @@ export class AgentsController {
 
     this.$scope.cancelAddGroup = () => (this.$scope.addingGroupToAgent = false);
 
-    this.$scope.loadAssessmentChecks = policy => this.$scope.lookingAssessment = { name: policy.name, id: policy.id };
+    this.$scope.loadAssessmentChecks = policy => this.$scope.lookingAssessment = { name: policy.name, id: policy.policy_id };
     this.$scope.closeAssessmentChecks = () => this.$scope.lookingAssessment = false;
 
     this.$scope.confirmAddGroup = group => {
@@ -559,7 +559,7 @@ export class AgentsController {
       if (tab === 'pm') {
         try {
           this.$scope.load = true;
-          const policies = await this.apiReq.request('GET', `/configuration_assessment/${this.$scope.agent.id}`, {});
+          const policies = await this.apiReq.request('GET', `/configuration-assessment/${this.$scope.agent.id}`, {});
           this.$scope.policies = policies.data.data.items;
         } catch (error) { this.$scope.policies = []; }
         this.$scope.load = false;

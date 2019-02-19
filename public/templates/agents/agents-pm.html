@@ -57,6 +57,7 @@
             </md-card-content>
         </md-card>
     </div>
+
 </md-content>
 
 <md-content flex layout="column" ng-if="tab === 'pm' && tabView === 'panels' && showRootcheckScan" layout-align="start">
@@ -89,15 +90,49 @@
             <md-card-content>
                 <span class="wz-headline-title"><i class="fa fa-fw fa-shield"></i> Configuration assessment</span>
                 <md-divider class="wz-margin-top-10"></md-divider>
-                <div layout="row" class="wz-margin-top-10" ng-repeat="policy in policies">
-                    <span flex class="wz-text-link" ng-click="loadAssessmentChecks(policy)">{{policy.name}}</span>
-                    <span flex class="wz-text-center">
-                        <span class="red wz-text-bold wz-padding-left-16 wz-padding-right-16 color-white" tooltip="Fail">{{policy.fail}}</span>
-                        <span class="green wz-text-bold wz-padding-left-16 wz-padding-right-16 color-white" tooltip="Pass">{{policy.pass}}</span>
-                    </span>
-                    <span flex>Score: <strong>{{policy.score}}</strong></span>
-                    <span flex><a href="{{policy.references}}">{{policy.references}}</a></span>
-                </div>
+                <table class="euiTable euiTable--responsive" ng-if="policies && policies.length">
+                    <thead>
+                        <tr>
+                            <th class="euiTableHeaderCell" scope="col" data-test-subj="tableHeaderCell_kibana.name_0">
+                                <div class="euiTableCellContent"><span class="euiTableCellContent__text">Policy</span></div>
+                            </th>
+                            <th class="euiTableHeaderCell" scope="col" data-test-subj="tableHeaderCell_kibana.status_1">
+                                <div class="euiTableCellContent"><span class="euiTableCellContent__text">Fail</span></div>
+                            </th>
+                            <th class="euiTableHeaderCell" scope="col" data-test-subj="tableHeaderCell_os.load.1m_2">
+                                <div class="euiTableCellContent"><span class="euiTableCellContent__text">Pass</span></div>
+                            </th>
+                            <th class="euiTableHeaderCell" scope="col" data-test-subj="tableHeaderCell_process.memory.resident_set_size_in_bytes_3">
+                                <div class="euiTableCellContent"><span class="euiTableCellContent__text">Score</span></div>
+                            </th>
+                            <th class="euiTableHeaderCell" scope="col" data-test-subj="tableHeaderCell_requests.total_4">
+                                <div class="euiTableCellContent"><span class="euiTableCellContent__text">References</span></div>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="euiTableRow" ng-repeat="policy in policies">
+                            <td class="euiTableRowCell" data-header="Name" data-test-subj="monitoringTableHasData">
+                                <div class="euiTableCellContent euiTableCellContent--overflowingContent"><button
+                                        ng-click="loadAssessmentChecks(policy)" class="euiLink euiLink--primary" type="button"
+                                        data-test-subj="kibanaLink-master">{{policy.name}}</button></div>
+                            </td>
+                            <td class="euiTableRowCell" data-header="Load Average" data-test-subj="monitoringTableHasData">
+                                <div class="euiTableCellContent euiTableCellContent--overflowingContent"><span class="">{{policy.fail}}</span></div>
+                            </td>
+                            <td class="euiTableRowCell" data-header="Memory Size" data-test-subj="monitoringTableHasData">
+                                <div class="euiTableCellContent euiTableCellContent--overflowingContent"><span class="">{{policy.pass}}</span></div>
+                            </td>
+                            <td class="euiTableRowCell" data-header="Requests" data-test-subj="monitoringTableHasData">
+                                <div class="euiTableCellContent euiTableCellContent--overflowingContent"><span class="">{{policy.score}}</span></div>
+                            </td>
+                            <td class="euiTableRowCell" data-header="Requests" data-test-subj="monitoringTableHasData">
+                                <div class="euiTableCellContent euiTableCellContent--overflowingContent"><span class="">{{policy.references
+                                        || '-'}}</span></div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
                 <div layout="row" class="wz-margin-top-10" ng-if="!load && (!policies || !policies.length)">
                     <span flex><i class="fa fa-fw fa-warning"></i> No scans available.</span>
                 </div>
@@ -111,9 +146,9 @@
                 <span class="wz-headline-title"><i class="fa fa-fw fa-arrow-left cursor-pointer" ng-click="closeAssessmentChecks()"></i>
                     {{lookingAssessment.name}} checks</span>
                 <md-divider class="wz-margin-top-10"></md-divider>
-                <div layout="row" class="wz-margin-top-10" ng-repeat="policy in policies">
-                    <wz-table flex path="'/configuration_assessment/' + agent.id + '/checks/' + lookingAssessment.id"
-                        row-sizes="[6,6,6]" extra-limit="500" keys="['title','file','remediation','process','description','references','result']">
+                <div layout="row" class="wz-margin-top-16">
+                    <wz-table custom-columns="true" flex path="'/configuration-assessment/' + agent.id + '/checks/' + lookingAssessment.id"
+                        row-sizes="[17,15,13]" extra-limit="500" keys="['title','file','directory','result']">
                     </wz-table>
                 </div>
             </md-card-content>
