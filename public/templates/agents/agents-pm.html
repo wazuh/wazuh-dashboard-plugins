@@ -154,6 +154,13 @@
                 <span class="wz-headline-title"><i class="fa fa-fw fa-arrow-left cursor-pointer" ng-click="closeAssessmentChecks()"></i>
                     {{lookingAssessment.name}} checks</span>
                 <md-divider class="wz-margin-top-10"></md-divider>
+                <div layout="row" class="wz-margin-top-16 wz-margin-bottom-25">
+                    <input placeholder="Filter checks..." ng-model="custom_search" type="text" class="kuiLocalSearchInput ng-empty ng-pristine ng-scope ng-touched ng-valid"
+                        aria-invalid="false" wz-enter="search(custom_search)">
+                    <button type="submit" aria-label="Search" class="kuiLocalSearchButton height-40" ng-click="search(custom_search)">
+                        <span class="fa fa-search" aria-hidden="true"></span>
+                    </button>
+                </div>
                 <div layout="row" class="wz-margin-top-16">
                     <wz-table custom-columns="true" flex path="'/configuration-assessment/' + agent.id + '/checks/' + lookingAssessment.id"
                         row-sizes="[16,14,12]" extra-limit="100" keys="['title','file','directory','remediation','rationale','result']">
