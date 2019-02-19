@@ -383,6 +383,19 @@ app.directive('wzTable', function () {
           $scope.$emit('openGroupFromList', { group });
         }
       };
+
+      $scope.isPolicyMonitoring = () => {
+        return instance.path.includes('configuration-assessment') && instance.path.includes('/checks')
+      }
+
+      $scope.expandPolicyMonitoringCheck = item => {
+        if (item.expanded) item.expanded = false;
+        else {
+          $scope.pagedItems[$scope.currentPage].map(item => item.expanded = false);
+          item.expanded = true;
+        }
+
+      }
     },
     template
   };

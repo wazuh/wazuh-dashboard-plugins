@@ -90,7 +90,7 @@ export class AgentsController {
     this.ignoredTabs = ['syscollector', 'welcome', 'configuration'];
 
     this.$scope.showSyscheckFiles = false;
-    this.$scope.showRootcheckScan = false;
+    this.$scope.showConfigurationAssessmentScan = false;
 
     this.$scope.editGroup = false;
     this.$scope.addingGroupToAgent = false;
@@ -159,7 +159,7 @@ export class AgentsController {
     this.tabVisualizations.assign('agents');
 
     this.$scope.hostMonitoringTabs = ['general', 'fim', 'syscollector'];
-    this.$scope.systemAuditTabs = ['pm', 'audit', 'oscap', 'ciscat'];
+    this.$scope.systemAuditTabs = ['pm', 'configuration-assessment', 'audit', 'oscap', 'ciscat'];
     this.$scope.securityTabs = ['vuls', 'virustotal', 'osquery'];
     this.$scope.complianceTabs = ['pci', 'gdpr'];
 
@@ -364,10 +364,10 @@ export class AgentsController {
       if (!this.$scope.$$phase) this.$scope.$digest();
     };
 
-    this.$scope.switchRootcheckScan = () => {
+    this.$scope.switchConfigurationAssessmentScan = () => {
       this.$scope.lookingAssessment = false;
-      this.$scope.showRootcheckScan = !this.$scope.showRootcheckScan;
-      if (!this.$scope.showRootcheckScan) {
+      this.$scope.showConfigurationAssessmentScan = !this.$scope.showConfigurationAssessmentScan;
+      if (!this.$scope.showConfigurationAssessmentScan) {
         this.$rootScope.$emit('changeTabView', {
           tabView: this.$scope.tabView
         });
@@ -489,7 +489,6 @@ export class AgentsController {
       ) {
         const condition =
           !this.changeAgent && (localChange || preserveDiscover);
-
         await this.visFactoryService.buildAgentsVisualizations(
           this.filterHandler,
           this.$scope.tab,
@@ -544,7 +543,7 @@ export class AgentsController {
 
     try {
       this.$scope.showSyscheckFiles = false;
-      this.$scope.showRootcheckScan = false;
+      this.$scope.showConfigurationAssessmentScan = false;
       if (tab === 'pci') {
         const pciTabs = await this.commonData.getPCI();
         this.$scope.pciTabs = pciTabs;
@@ -556,7 +555,7 @@ export class AgentsController {
         this.$scope.selectedGdprIndex = 0;
       }
 
-      if (tab === 'pm') {
+      if (tab === 'configuration-assessment') {
         try {
           this.$scope.load = true;
           const policies = await this.apiReq.request('GET', `/configuration-assessment/${this.$scope.agent.id}`, {});
