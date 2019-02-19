@@ -396,6 +396,20 @@ app.directive('wzTable', function () {
         }
 
       }
+      $scope.showTooltip = (id1, id2, item) => {
+        var $element = $('#td-' + id1 + '-' + id2 + ' div');
+        var $c = $element
+          .clone()
+          .css({ display: 'inline', width: 'auto', visibility: 'hidden' })
+          .appendTo('body');
+        if ($c.width() > $element.width()) {
+          if (!item.showTooltip) {
+            item.showTooltip = [];
+          }
+          item.showTooltip[id2] = true;
+        }
+        $c.remove();
+      };
     },
     template
   };
