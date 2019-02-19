@@ -93,20 +93,23 @@
                 <table class="euiTable euiTable--responsive" ng-if="policies && policies.length">
                     <thead>
                         <tr>
-                            <th class="euiTableHeaderCell" scope="col" data-test-subj="tableHeaderCell_kibana.name_0">
+                            <th class="euiTableHeaderCell padding-left-0">
                                 <div class="euiTableCellContent"><span class="euiTableCellContent__text">Policy</span></div>
                             </th>
-                            <th class="euiTableHeaderCell" scope="col" data-test-subj="tableHeaderCell_kibana.status_1">
+                            <th class="euiTableHeaderCell col-sm-1 padding-left-0">
                                 <div class="euiTableCellContent"><span class="euiTableCellContent__text">Fail</span></div>
                             </th>
-                            <th class="euiTableHeaderCell" scope="col" data-test-subj="tableHeaderCell_os.load.1m_2">
+                            <th class="euiTableHeaderCell col-sm-1 padding-left-0">
                                 <div class="euiTableCellContent"><span class="euiTableCellContent__text">Pass</span></div>
                             </th>
-                            <th class="euiTableHeaderCell" scope="col" data-test-subj="tableHeaderCell_process.memory.resident_set_size_in_bytes_3">
+                            <th class="euiTableHeaderCell col-sm-1 padding-left-0">
                                 <div class="euiTableCellContent"><span class="euiTableCellContent__text">Score</span></div>
                             </th>
-                            <th class="euiTableHeaderCell" scope="col" data-test-subj="tableHeaderCell_requests.total_4">
-                                <div class="euiTableCellContent"><span class="euiTableCellContent__text">References</span></div>
+                            <th class="euiTableHeaderCell padding-left-0">
+                                <div class="euiTableCellContent"><span class="euiTableCellContent__text">Description</span></div>
+                            </th>
+                            <th class="euiTableHeaderCell padding-left-0">
+                                <div class="euiTableCellContent"><span class="euiTableCellContent__text">Last scan</span></div>
                             </th>
                         </tr>
                     </thead>
@@ -124,11 +127,16 @@
                                 <div class="euiTableCellContent euiTableCellContent--overflowingContent"><span class="">{{policy.pass}}</span></div>
                             </td>
                             <td class="euiTableRowCell" data-header="Requests" data-test-subj="monitoringTableHasData">
-                                <div class="euiTableCellContent euiTableCellContent--overflowingContent"><span class="">{{policy.score}}</span></div>
+                                <div class="euiTableCellContent euiTableCellContent--overflowingContent"><span class="">{{policy.score}}%</span></div>
                             </td>
                             <td class="euiTableRowCell" data-header="Requests" data-test-subj="monitoringTableHasData">
-                                <div class="euiTableCellContent euiTableCellContent--overflowingContent"><span class="">{{policy.references
-                                        || '-'}}</span></div>
+                                <div class="euiTableCellContent euiTableCellContent--overflowingContent"><span class="">{{policy.description
+                                        }}</span></div>
+                            </td>
+                            <td class="euiTableRowCell" data-header="Requests" data-test-subj="monitoringTableHasData">
+                                <div class="euiTableCellContent euiTableCellContent--overflowingContent"><span class="">{{policy.end_scan
+                                        || '-'
+                                        }}</span></div>
                             </td>
                         </tr>
                     </tbody>
@@ -146,9 +154,16 @@
                 <span class="wz-headline-title"><i class="fa fa-fw fa-arrow-left cursor-pointer" ng-click="closeAssessmentChecks()"></i>
                     {{lookingAssessment.name}} checks</span>
                 <md-divider class="wz-margin-top-10"></md-divider>
+                <div layout="row" class="wz-margin-top-16 wz-margin-bottom-25">
+                    <input placeholder="Filter checks..." ng-model="custom_search" type="text" class="kuiLocalSearchInput ng-empty ng-pristine ng-scope ng-touched ng-valid"
+                        aria-invalid="false" wz-enter="search(custom_search)">
+                    <button type="submit" aria-label="Search" class="kuiLocalSearchButton height-40" ng-click="search(custom_search)">
+                        <span class="fa fa-search" aria-hidden="true"></span>
+                    </button>
+                </div>
                 <div layout="row" class="wz-margin-top-16">
                     <wz-table custom-columns="true" flex path="'/configuration-assessment/' + agent.id + '/checks/' + lookingAssessment.id"
-                        row-sizes="[17,15,13]" extra-limit="500" keys="['title','file','directory','result']">
+                        row-sizes="[16,14,12]" extra-limit="100" keys="['title','file','directory','remediation','rationale','result']">
                     </wz-table>
                 </div>
             </md-card-content>

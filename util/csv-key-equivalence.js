@@ -88,5 +88,7 @@ export const KeyEquivalenece = {
   title: 'Title',
   remediation: 'Remediation',
   references: 'References',
-  result: 'Result'
+  result: 'Result',
+  directory: 'Path(s)',
+  rationale: 'Rationale'
 };
