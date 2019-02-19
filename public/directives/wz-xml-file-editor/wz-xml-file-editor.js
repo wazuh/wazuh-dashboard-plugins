@@ -39,6 +39,8 @@ app.directive('wzXmlFileEditor', function () {
       configHandler,
       apiReq
     ) {
+
+      $scope.configError = false;
       /**
        * Custom .replace method. Instead of using .replace which
        * evaluates regular expressions.
@@ -172,30 +174,50 @@ app.directive('wzXmlFileEditor', function () {
         return formatted.trim();
       };
 
-      const validateAfterSent = async () => {
+      const validateAfterSent = async (node = false) => {
+        $scope.configError = false;
         try {
-          const isCluster = appState.getClusterInfo().status === 'enabled';
+          const clusterStatus = await apiReq.request(
+            'GET',
+            `/cluster/status`,
+            {}
+          );
 
-          const validation = isCluster
-            ? await apiReq.request(
+          const clusterData = ((clusterStatus || {}).data || {}).data || {};
+          const isCluster =
+            clusterData.enabled === 'yes' && clusterData.running === 'yes';
+
+          let validation = false;
+          if (node && isCluster) {
+            validation = await apiReq.request(
               'GET',
-              `/cluster/configuration/validation`,
-              {}
-            )
-            : await apiReq.request(
-              'GET',
-              `/manager/configuration/validation`,
+              `/cluster/${node}/configuration/validation`,
               {}
             );
+          } else {
+            validation = isCluster
+              ? await apiReq.request(
+                'GET',
+                `/cluster/configuration/validation`,
+                {}
+              )
+              : await apiReq.request(
+                'GET',
+                `/manager/configuration/validation`,
+                {}
+              );
+          }
           const data = ((validation || {}).data || {}).data || {};
           const isOk = data.status === 'OK';
-          if (!isOk && Array.isArray(data.details)) {
-            const str = data.details.join();
-            throw new Error(str);
+          if (!isOk && Array.isArray(data.details) && data.details.join().includes('Configuration error')) {
+            $scope.configError = data.details;
+            $scope.$applyAsync();
+            return Promise.reject()
           }
           return true;
         } catch (error) {
-          errorHandler.handle(error, 'Error');
+          $scope.configError = false;
+          errorHandler.handle(error, 'Error asdfas');
           throw new Error(error);
         }
       };
@@ -221,7 +243,6 @@ app.directive('wzXmlFileEditor', function () {
                 ? showRestartDialog(msg, params.showRestartManager)
                 : errorHandler.handle(warnMsg, '', true)
               : errorHandler.info(msg, '');
-            $scope.$emit('configurationSuccess');
           } else if (params.rule) {
             await rulesetHandler.sendRuleConfiguration(params.rule, xml);
             try {
@@ -253,7 +274,7 @@ app.directive('wzXmlFileEditor', function () {
           } else if (params.node) {
             await configHandler.saveNodeConfiguration(params.node, xml);
             try {
-              await validateAfterSent();
+              await validateAfterSent(params.node);
             } catch (err) {
               params.showRestartManager = 'warn';
               close = false;
@@ -445,7 +466,7 @@ app.directive('wzXmlFileEditor', function () {
 
       $scope.$on('saveXmlFile', (ev, params) => saveFile(params));
 
-      $scope.$on('$destroy', function() {
+      $scope.$on('$destroy', function () {
         $location.search('editingFile', null);
         appState.setNavigation({ status: true });
       });

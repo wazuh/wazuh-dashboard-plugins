@@ -1,4 +1,5 @@
-<md-content flex layout="column" ng-if="octrl.tab === 'virustotal' && octrl.tabView === 'panels'" ng-class="{'no-opacity': resultState !== 'ready' || !rendered}" layout-align="start">
+<md-content flex layout="column" ng-if="octrl.tab === 'virustotal' && octrl.tabView === 'panels'" ng-class="{'no-opacity': resultState !== 'ready' || !rendered}"
+    layout-align="start">
 
     <div layout="row">
         <md-card flex class="wz-metric-color wz-md-card">
@@ -19,9 +20,13 @@
     <div layout="row" class="height-360">
         <div flex layout="column">
             <div flex layout="row">
-                <md-card flex class="wz-md-card">
-                    <md-card-content class="wazuh-column" >
-                        <span class="wz-headline-title">Unique malicious files per agent</span>
+                <md-card flex class="wz-md-card" ng-class="{'fullscreen': octrl.expandArray[0]}">
+                    <md-card-content class="wazuh-column">
+                        <div layout="row">
+                            <span class="wz-headline-title">Unique malicious files per agent</span>
+                            <span flex></span>
+                            <span class="wz-text-link" ng-click="octrl.expand(0)"><i class="fa fa-fw fa-expand"></i></span>
+                        </div>
                         <md-divider class="wz-margin-top-10"></md-divider>
                         <kbn-vis id="Wazuh-App-Overview-Virustotal-Malicious-Per-Agent" vis-id="'Wazuh-App-Overview-Virustotal-Malicious-Per-Agent'"></kbn-vis>
                     </md-card-content>
@@ -30,9 +35,13 @@
         </div>
         <div flex layout="column">
             <div flex layout="row">
-                <md-card flex class="wz-md-card">
-                    <md-card-content class="wazuh-column" >
-                        <span class="wz-headline-title">Last scanned files</span>
+                <md-card flex class="wz-md-card" ng-class="{'fullscreen': octrl.expandArray[1]}">
+                    <md-card-content class="wazuh-column">
+                        <div layout="row">
+                            <span class="wz-headline-title">Last scanned files</span>
+                            <span flex></span>
+                            <span class="wz-text-link" ng-click="octrl.expand(1)"><i class="fa fa-fw fa-expand"></i></span>
+                        </div>
                         <md-divider class="wz-margin-top-10"></md-divider>
                         <kbn-vis id="Wazuh-App-Overview-Virustotal-Last-Files-Pie" vis-id="'Wazuh-App-Overview-Virustotal-Last-Files-Pie'"></kbn-vis>
                     </md-card-content>
@@ -41,27 +50,39 @@
         </div>
     </div>
     <div layout="row" class="height-550">
-        <md-card flex class="wz-md-card">
-            <md-card-content class="wazuh-column" >
-                <span class="wz-headline-title">Top 10 agents with positive scans</span>
+        <md-card flex class="wz-md-card" ng-class="{'fullscreen': octrl.expandArray[2]}">
+            <md-card-content class="wazuh-column">
+                <div layout="row">
+                    <span class="wz-headline-title">Top 10 agents with positive scans</span>
+                    <span flex></span>
+                    <span class="wz-text-link" ng-click="octrl.expand(2)"><i class="fa fa-fw fa-expand"></i></span>
+                </div>
                 <md-divider class="wz-margin-top-10"></md-divider>
                 <kbn-vis id="Wazuh-App-Overview-Virustotal-Positives-Heatmap" vis-id="'Wazuh-App-Overview-Virustotal-Positives-Heatmap'"></kbn-vis>
             </md-card-content>
         </md-card>
     </div>
     <div layout="row" class="height-250">
-        <md-card flex class="wz-md-card">
-            <md-card-content class="wazuh-column" >
-                <span class="wz-headline-title">Malicious files alerts evolution</span>
+        <md-card flex class="wz-md-card" ng-class="{'fullscreen': octrl.expandArray[3]}">
+            <md-card-content class="wazuh-column">
+                <div layout="row">
+                    <span class="wz-headline-title">Malicious files alerts evolution</span>
+                    <span flex></span>
+                    <span class="wz-text-link" ng-click="octrl.expand(3)"><i class="fa fa-fw fa-expand"></i></span>
+                </div>
                 <md-divider class="wz-margin-top-10"></md-divider>
                 <kbn-vis id="Wazuh-App-Overview-Virustotal-Malicious-Evolution" vis-id="'Wazuh-App-Overview-Virustotal-Malicious-Evolution'"></kbn-vis>
             </md-card-content>
         </md-card>
     </div>
     <div layout="row" class="height-570">
-        <md-card flex class="wz-md-card">
+        <md-card flex class="wz-md-card" ng-class="{'fullscreen': octrl.expandArray[4]}">
             <md-card-content class="wazuh-column">
-                <span class="wz-headline-title">Last files</span>
+                <div layout="row">
+                    <span class="wz-headline-title">Last files</span>
+                    <span flex></span>
+                    <span class="wz-text-link" ng-click="octrl.expand(4)"><i class="fa fa-fw fa-expand"></i></span>
+                </div>
                 <md-divider class="wz-margin-top-10"></md-divider>
                 <kbn-vis vis-id="'Wazuh-App-Overview-Virustotal-Files-Table'"></kbn-vis>
             </md-card-content>

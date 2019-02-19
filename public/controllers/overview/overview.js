@@ -65,6 +65,24 @@ export class OverviewController {
     this.reportingService = reportingService;
     this.visFactoryService = visFactoryService;
     this.wazuhConfig = wazuhConfig;
+    this.expandArray = [
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false
+    ];
   }
 
   /**
@@ -209,6 +227,7 @@ export class OverviewController {
 
   // Switch tab
   async switchTab(newTab, force = false) {
+    this.falseAllExpand();
     try {
       if (newTab === 'welcome') {
         this.commonData.setRefreshInterval(timefilter.getRefreshInterval());
@@ -328,5 +347,32 @@ export class OverviewController {
     }
     if (!this.$scope.$$phase) this.$scope.$digest();
     return;
+  }
+
+  falseAllExpand() {
+    this.expandArray = [
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false
+    ];
+  }
+
+  expand(i) {
+    const oldValue = this.expandArray[i];
+    this.falseAllExpand();
+    this.expandArray[i] = !oldValue;
   }
 }

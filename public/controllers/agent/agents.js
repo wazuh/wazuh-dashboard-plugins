@@ -96,6 +96,24 @@ export class AgentsController {
     this.$scope.addingGroupToAgent = false;
 
     this.$scope.lookingAssessment = false;
+    this.$scope.expandArray = [
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false
+    ];
   }
 
   /**
@@ -404,6 +422,8 @@ export class AgentsController {
           );
         });
     };
+
+    this.$scope.expand = i => this.expand(i);
   }
   /**
    * Create metric for given object
@@ -500,6 +520,7 @@ export class AgentsController {
    * @param {*} force
    */
   async switchTab(tab, force = false) {
+    this.falseAllExpand();
     if (this.ignoredTabs.includes(tab)) {
       this.commonData.setRefreshInterval(timefilter.getRefreshInterval());
       timefilter.setRefreshInterval({ pause: true, value: 0 });
@@ -732,11 +753,19 @@ export class AgentsController {
 
       const id = this.commonData.checkLocationAgentId(newAgentId, globalAgent);
 
-      const data = await Promise.all([
-        this.apiReq.request('GET', `/agents/${id}`, {}),
-        this.apiReq.request('GET', `/syscheck/${id}/last_scan`, {}),
-        this.apiReq.request('GET', `/rootcheck/${id}/last_scan`, {})
-      ]);
+      const data = [false, false, false];
+
+      try {
+        data[0] = await this.apiReq.request('GET', `/agents/${id}`, {});
+      } catch (error) { } //eslint-disable-line
+
+      try {
+        data[1] = await this.apiReq.request('GET', `/syscheck/${id}/last_scan`, {});
+      } catch (error) { } //eslint-disable-line
+
+      try {
+        data[2] = await this.apiReq.request('GET', `/rootcheck/${id}/last_scan`, {});
+      } catch (error) { } //eslint-disable-line
 
       const result = data.map(item => ((item || {}).data || {}).data || false);
 
@@ -951,5 +980,32 @@ export class AgentsController {
       this.errorHandler.handle(error, '');
     }
     return;
+  }
+
+  falseAllExpand() {
+    this.$scope.expandArray = [
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false
+    ];
+  }
+
+  expand(i) {
+    const oldValue = this.$scope.expandArray[i];
+    this.falseAllExpand();
+    this.$scope.expandArray[i] = !oldValue;
   }
 }

@@ -294,13 +294,13 @@ export class DecodersController {
     } else {
       if (isNewFile) {
         const validFileName = /(.+).xml/;
-        const containsNumberBlanks = /.*[0-9 ].*/;
+        const containsBlanks = /.*[ ].*/;
         if (fileName && !validFileName.test(fileName)) {
           fileName = fileName + '.xml';
         }
-        if (containsNumberBlanks.test(fileName)) {
+        if (containsBlanks.test(fileName)) {
           this.errorHandler.handle(
-            'Error creating a new file. The filename can not contain numbers or white spaces.',
+            'Error creating a new file. The filename can not contain white spaces.',
             ''
           );
           return false;
