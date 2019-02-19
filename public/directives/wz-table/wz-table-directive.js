@@ -384,6 +384,18 @@ app.directive('wzTable', function () {
         }
       };
 
+      $scope.isPolicyMonitoring = () => {
+        return instance.path.includes('configuration-assessment') && instance.path.includes('/checks')
+      }
+
+      $scope.expandPolicyMonitoringCheck = item => {
+        if (item.expanded) item.expanded = false;
+        else {
+          $scope.pagedItems[$scope.currentPage].map(item => item.expanded = false);
+          item.expanded = true;
+        }
+
+      }
       $scope.showTooltip = (id1, id2, item) => {
         var $element = $('#td-' + id1 + '-' + id2 + ' div');
         var $c = $element
