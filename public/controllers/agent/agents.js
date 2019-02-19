@@ -394,7 +394,7 @@ export class AgentsController {
 
     this.$scope.cancelAddGroup = () => (this.$scope.addingGroupToAgent = false);
 
-    this.$scope.loadAssessmentChecks = policy => this.$scope.lookingAssessment = { name: policy.name, id: policy.id };
+    this.$scope.loadAssessmentChecks = policy => this.$scope.lookingAssessment = { name: policy.name, id: policy.policy_id };
     this.$scope.closeAssessmentChecks = () => this.$scope.lookingAssessment = false;
 
     this.$scope.confirmAddGroup = group => {
