@@ -31,12 +31,14 @@
         <tbody>
             <tr ng-class="allowClick ? 'cursor-pointer' : ''" class="wz-word-wrap" ng-repeat="item in pagedItems[currentPage] | filter:{item:'!'}"
                 ng-click="clickAction(item)">
-                <td ng-repeat="key in keys" class="wz-text-truncatable">
-                    <span tooltip="{{ parseValue(key,item) }}" tooltip-placement="bottom">
-                        {{
-                        parseValue(key,item)
-                        }}
-                    </span>
+                <td ng-repeat="key in keys">
+                    <div class="wz-text-truncatable" tooltip="{{ parseValue(key,item) }}" tooltip-placement="bottom">
+                        <span>
+                            {{
+                            parseValue(key,item)
+                            }}
+                        </span>
+                    </div>
                 </td>
                 <td ng-if="path === '/agents'" ng-click="$event.stopPropagation()" class="cursor-default action-btn-td">
                     <i ng-click="clickAction(item, 'discover'); $event.stopPropagation()" class="fa fa-fw fa-compass cursor-pointer"
