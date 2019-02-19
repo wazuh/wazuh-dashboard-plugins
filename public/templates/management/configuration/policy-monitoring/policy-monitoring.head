@@ -30,6 +30,7 @@
         nav-bar-aria-label="Policy monitoring navigation links">
         <md-nav-item class="wz-nav-item" md-nav-click="switchConfigurationSubTab('pm-general')" name="pm-general">General</md-nav-item>
         <md-nav-item class="wz-nav-item" md-nav-click="switchConfigurationSubTab('pm-unix')" name="pm-unix">System audit</md-nav-item>
+        <md-nav-item class="wz-nav-item" md-nav-click="switchConfigurationSubTab('pm-configuration-assessment')" name="pm-configuration-assessment">Configuration assessment</md-nav-item>
     </md-nav-bar>
     <!-- End Policy monitoring navigation bar -->
 
