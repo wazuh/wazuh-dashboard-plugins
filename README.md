@@ -39,8 +39,16 @@ Visualize and analyze Wazuh alerts stored in Elasticsearch using our Kibana app 
 
 Install the app
 
+- With sudo:
+
 ```
 sudo -u kibana NODE_OPTIONS="--max-old-space-size=3072" /usr/share/kibana/bin/kibana-plugin install https://packages.wazuh.com/wazuhapp/wazuhapp-3.8.2_6.6.1.zip
+```
+
+- Without sudo:
+
+```
+su -c 'NODE_OPTIONS="--max-old-space-size=3072" /usr/share/kibana/bin/kibana-plugin install https://packages.wazuh.com/wazuhapp/wazuhapp-3.8.2_6.6.1.zip' kibana
 ```
 
 Restart Kibana
@@ -94,8 +102,16 @@ chown -R kibana:kibana /usr/share/kibana/plugins
 
 Install the app
 
+- With sudo:
+
 ```
 sudo -u kibana NODE_OPTIONS="--max-old-space-size=3072" /usr/share/kibana/bin/kibana-plugin install https://packages.wazuh.com/wazuhapp/wazuhapp-3.8.2_6.6.1.zip
+```
+
+- Without sudo:
+
+```
+su -c 'NODE_OPTIONS="--max-old-space-size=3072" /usr/share/kibana/bin/kibana-plugin install https://packages.wazuh.com/wazuhapp/wazuhapp-3.8.2_6.6.1.zip' kibana
 ```
 
 Restart Kibana
