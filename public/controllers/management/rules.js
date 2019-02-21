@@ -162,10 +162,10 @@ export function RulesController(
         coloredString = coloredString.replace(
           /\$\(((?!<\/span>).)*?\)(?!<\/span>)/im,
           '<span style="color: ' +
-            colors[i] +
-            ' ">' +
-            valuesArray[i] +
-            '</span>'
+          colors[i] +
+          ' ">' +
+          valuesArray[i] +
+          '</span>'
         );
       }
     }
@@ -337,7 +337,8 @@ export function RulesController(
         $scope.selectedItem = { file: fileName };
         $scope.$broadcast('saveXmlFile', {
           rule: $scope.selectedItem,
-          showRestartManager
+          showRestartManager,
+          isNewFile
         });
       } else {
         const objParam = {
@@ -348,4 +349,10 @@ export function RulesController(
       }
     }
   };
+
+  $scope.$on('showFileNameInput', () => {
+    $scope.newFile = true;
+    $scope.selectedItem = { file: 'new file' };
+    $scope.$applyAsync();
+  });
 }

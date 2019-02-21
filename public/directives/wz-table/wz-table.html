@@ -57,7 +57,7 @@
                         tooltip="Edit this group configuration" tooltip-placement="left" aria-hidden="true"></i>
                     <div ng-if="removingGroup === item.name && item.name !== 'default'" class="confirmEmbedBubble">
                         <div layout="row">
-                            <span class="font-size-12 wz-padding-left-8">Group {{item.name}} will be removed</span>
+                            <span class="font-size-12 wz-padding-left-8">Group <b>{{item.name}}</b> will be removed</span>
                         </div>
                         <div layout="row">
                             <md-button class="cancelBtn" type="button" ng-click="cancelRemoveGroup()"><i aria-hidden='true'
@@ -74,7 +74,7 @@
                         tooltip-placement="left" aria-hidden="true"></i>
                     <div ng-if="removingAgent === item.id" class="confirmEmbedBubble">
                         <div layout="row">
-                            <span class="font-size-12 wz-padding-left-8">The agent {{item.id}} will be removed from
+                            <span class="font-size-12 wz-padding-left-8">Agent <b>{{item.id}}</b> will be removed from
                                 this group</span>
                         </div>
                         <div layout="row">

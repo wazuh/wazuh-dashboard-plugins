@@ -79,6 +79,12 @@ export class DecodersController {
       this.viewingDetail = true;
       if (!this.$scope.$$phase) this.$scope.$digest();
     });
+
+    this.$scope.$on('showFileNameInput', () => {
+      this.newFile = true;
+      this.selectedItem = { file: 'new file' };
+      this.$scope.$applyAsync();
+    });
   }
 
   /**
@@ -308,7 +314,8 @@ export class DecodersController {
         this.selectedItem = { file: fileName };
         this.$scope.$broadcast('saveXmlFile', {
           decoder: this.selectedItem,
-          showRestartManager
+          showRestartManager,
+          isNewFile
         });
       } else {
         const objParam = {

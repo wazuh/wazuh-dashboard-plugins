@@ -305,6 +305,9 @@ app.directive('wzXmlFileEditor', function () {
           if (close) $scope.closeFn({ reload: true });
         } catch (error) {
           errorHandler.handle(error, 'Error');
+          if (params.isNewFile) {
+            $scope.$emit('showFileNameInput', {});
+          }
         }
         return;
       };
