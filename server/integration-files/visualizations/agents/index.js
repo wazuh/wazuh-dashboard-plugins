@@ -20,7 +20,7 @@ import pm from './agents-pm';
 import virustotal from './agents-virustotal';
 import vuls from './agents-vuls';
 import osquery from './agents-osquery';
-import configurationAssessment from './agents-configuration-assessment';
+import sca from './agents-sca';
 
 export {
   audit,
@@ -34,5 +34,5 @@ export {
   virustotal,
   vuls,
   osquery,
-  configurationAssessment
+  sca
 };
