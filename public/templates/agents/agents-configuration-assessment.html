@@ -1,10 +1,8 @@
-<md-content flex layout="column" ng-if="tab === 'configuration-assessment' && tabView === 'panels'"
-    ng-show="!showConfigurationAssessmentScan" ng-class="{'no-opacity': resultState !== 'ready' || !rendered}"
-    layout-align="start">
+<md-content flex layout="column" ng-if="tab === 'sca' && tabView === 'panels'" ng-show="!showScaScan"
+    ng-class="{'no-opacity': resultState !== 'ready' || !rendered}" layout-align="start">
     <div layout="row">
         <span flex></span>
-        <md-button ng-click="switchConfigurationAssessmentScan()" class="wz-button pull-right"><i
-                class="fa fa-fw fa-database"></i>
+        <md-button ng-click="switchScaScan()" class="wz-button pull-right"><i class="fa fa-fw fa-database"></i>
             Show state</md-button>
     </div>
     <div layout="row" class="height-240">
@@ -77,18 +75,15 @@
 
 </md-content>
 
-<md-content flex layout="column"
-    ng-if="tab === 'configuration-assessment' && tabView === 'panels' && showConfigurationAssessmentScan"
-    layout-align="start">
+<md-content flex layout="column" ng-if="tab === 'sca' && tabView === 'panels' && showScaScan" layout-align="start">
     <div layout="row">
         <span flex></span>
-        <md-button ng-click="switchConfigurationAssessmentScan()" class="wz-button pull-right"><i
-                class="fa fa-fw fa-area-chart"></i>
+        <md-button ng-click="switchScaScan()" class="wz-button pull-right"><i class="fa fa-fw fa-area-chart"></i>
             Show alerts</md-button>
     </div>
 
     <div layout="row" class="wz-margin-top-10 wz-margin-right-8 wz-margin-left-8"
-        ng-if="showConfigurationAssessmentScan && (!agent || !agent.os)">
+        ng-if="showScaScan && (!agent || !agent.os)">
         <div flex class="euiCallOut euiCallOut--warning">
             <div class="euiCallOutHeader">
                 <svg class="euiIcon euiIcon--medium euiCallOutHeader__icon" aria-hidden="true"
@@ -106,11 +101,11 @@
         </div>
     </div>
 
-    <div layout="row" layout-padding class="wz-padding-top-0" ng-show="agent && agent.os && !lookingAssessment">
+    <div layout="row" layout-padding class="wz-padding-top-0" ng-show="agent && agent.os && !lookingSca">
 
         <span class="wz-headline-title"><i class="fa fa-fw fa-shield"></i> Configuration assessment</span>
     </div>
-    <div layout="row" class="md-padding" ng-show="agent && agent.os && !lookingAssessment">
+    <div layout="row" class="md-padding" ng-show="agent && agent.os && !lookingSca">
         <table class="euiTable euiTable--responsive" ng-if="policies && policies.length">
             <thead>
                 <tr>
@@ -140,7 +135,7 @@
                 <tr class="euiTableRow" ng-repeat="policy in policies">
                     <td class="euiTableRowCell">
                         <div class="euiTableCellContent euiTableCellContent--overflowingContent">
-                            <button ng-click="loadAssessmentChecks(policy)" class="euiLink euiLink--primary"
+                            <button ng-click="loadScaChecks(policy)" class="euiLink euiLink--primary"
                                 type="button">{{policy.name}}</button>
                         </div>
                     </td>
@@ -181,12 +176,12 @@
 
     </div>
 
-    <div layout="row" class="wz-padding-top-0" ng-if="agent && agent.os && lookingAssessment">
+    <div layout="row" class="wz-padding-top-0" ng-if="agent && agent.os && lookingSca">
         <md-card flex class="wz-md-card">
             <md-card-content>
                 <span class="wz-headline-title"><i class="fa fa-fw fa-arrow-left cursor-pointer"
-                        ng-click="closeAssessmentChecks()"></i>
-                    {{lookingAssessment.name}} checks</span>
+                        ng-click="closeScaChecks()"></i>
+                    {{lookingSca.name}} checks</span>
                 <md-divider class="wz-margin-top-10"></md-divider>
                 <div layout="row" class="wz-margin-top-16 wz-margin-bottom-25">
                     <input placeholder="Filter checks..." ng-model="custom_search" type="text"
@@ -198,14 +193,14 @@
                     </button>
                 </div>
                 <div layout="row" class="wz-margin-top-16 wz-margin-bottom-40-inv">
-                    <wz-table flex path="'/configuration-assessment/' + agent.id + '/checks/' + lookingAssessment.id"
-                        row-sizes="[13,11,9]" extra-limit="100" keys="['title','file','result']">
+                    <wz-table flex path="'/sca/' + agent.id + '/checks/' + lookingSca.id" row-sizes="[13,11,9]"
+                        extra-limit="100" keys="['title','file','result']">
                     </wz-table>
                 </div>
                 <div layout="row" layout-padding>
                     <span flex></span>
                     <a class="small" id="btnDownload"
-                        ng-click="downloadCsv('/configuration-assessment/' + agent.id + '/checks/' + lookingAssessment.id, lookingAssessment.id + '.csv')">Formatted
+                        ng-click="downloadCsv('/sca/' + agent.id + '/checks/' + lookingSca.id, lookingSca.id + '.csv')">Formatted
                         <i aria-hidden="true" class="fa fa-fw fa-download"></i></a>
                 </div>
             </md-card-content>
