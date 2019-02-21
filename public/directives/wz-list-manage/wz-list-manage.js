@@ -17,7 +17,7 @@ import { checkGap } from '../wz-table/lib/check-gap';
 
 const app = uiModules.get('app/wazuh', []);
 
-app.directive('wzListManage', function() {
+app.directive('wzListManage', function () {
   return {
     restrict: 'E',
     scope: {
@@ -52,7 +52,7 @@ app.directive('wzListManage', function() {
       $scope.prevPage = () => pagination.prevPage($scope);
       $scope.nextPage = async currentPage =>
         pagination.nextPage(currentPage, $scope, errorHandler, null);
-      $scope.setPage = function() {
+      $scope.setPage = function () {
         $scope.currentPage = this.n;
         $scope.nextPage(this.n);
       };
@@ -62,7 +62,7 @@ app.directive('wzListManage', function() {
        */
       $scope.filterTable = data => {
         const result = Object.keys(data || $scope.currentList.list).map(
-          function(key) {
+          function (key) {
             return [key, $scope.currentList.list[key]];
           }
         );
@@ -191,7 +191,7 @@ app.directive('wzListManage', function() {
 
       const showRestartDialog = async (msg, target) => {
         const confirm = $mdDialog.confirm({
-          controller: function(
+          controller: function (
             $scope,
             scope,
             errorHandler,
@@ -212,10 +212,7 @@ app.directive('wzListManage', function() {
                   .restartManager()
                   .then(data => {
                     $('body').removeClass('md-dialog-body');
-                    errorHandler.info(
-                      'It may take a few seconds...',
-                      data.data.data
-                    );
+                    errorHandler.info(`${data.data.data}. It may take a few seconds...`);
                     rootScope.$emit('removeRestarting', {});
                     scope.$applyAsync();
                   })
@@ -231,10 +228,7 @@ app.directive('wzListManage', function() {
                   .restartCluster()
                   .then(data => {
                     $('body').removeClass('md-dialog-body');
-                    errorHandler.info(
-                      'It may take a few seconds...',
-                      data.data.data
-                    );
+                    errorHandler.info(`${data.data.data}. It will take up to 15 seconds...`);
                     rootScope.$emit('removeRestarting', {});
                     scope.$applyAsync();
                   })

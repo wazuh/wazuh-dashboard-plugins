@@ -230,12 +230,12 @@ app.directive('wzXmlFileEditor', function () {
           const text = $scope.xmlCodeBox.getValue();
           const xml = replaceIllegalXML(text);
           if (params.group) {
+            close = false;
             await groupHandler.sendConfiguration(params.group, xml);
             try {
               await validateAfterSent();
             } catch (err) {
               params.showRestartManager = 'warn';
-              close = false;
             }
             const msg = 'Success. Group has been updated';
             params.showRestartManager
@@ -244,12 +244,12 @@ app.directive('wzXmlFileEditor', function () {
                 : errorHandler.handle(warnMsg, '', true)
               : errorHandler.info(msg, '');
           } else if (params.rule) {
+            close = false;
             await rulesetHandler.sendRuleConfiguration(params.rule, xml);
             try {
               await validateAfterSent();
             } catch (err) {
               params.showRestartManager = 'warn';
-              close = false;
             }
             const msg = 'Success. Rules updated';
             params.showRestartManager
@@ -258,12 +258,12 @@ app.directive('wzXmlFileEditor', function () {
                 : errorHandler.handle(warnMsg, '', true)
               : errorHandler.info(msg, '');
           } else if (params.decoder) {
+            close = false;
             await rulesetHandler.sendDecoderConfiguration(params.decoder, xml);
             try {
               await validateAfterSent();
             } catch (err) {
               params.showRestartManager = 'warn';
-              close = false;
             }
             const msg = 'Success. Decoders has been updated';
             params.showRestartManager
@@ -272,12 +272,12 @@ app.directive('wzXmlFileEditor', function () {
                 : errorHandler.handle(warnMsg, '', true)
               : errorHandler.info(msg, '');
           } else if (params.node) {
+            close = false;
             await configHandler.saveNodeConfiguration(params.node, xml);
             try {
               await validateAfterSent(params.node);
             } catch (err) {
               params.showRestartManager = 'warn';
-              close = false;
             }
             const msg = `Success. Node (${
               params.node
@@ -293,7 +293,6 @@ app.directive('wzXmlFileEditor', function () {
               await validateAfterSent();
             } catch (err) {
               params.showRestartManager = 'warn';
-              close = false;
             }
             const msg = 'Success. Manager configuration has been updated';
             params.showRestartManager
@@ -389,8 +388,7 @@ app.directive('wzXmlFileEditor', function () {
                   const data = await configHandler.restartManager();
                   $('body').removeClass('md-dialog-body');
                   errorHandler.info(
-                    'It may take a few seconds...',
-                    data.data.data
+                    `${data.data.data}. It may take a few seconds...`
                   );
                   rootScope.$emit('removeRestarting', {});
                   scope.$applyAsync();
@@ -406,8 +404,7 @@ app.directive('wzXmlFileEditor', function () {
                   const data = await configHandler.restartCluster();
                   $('body').removeClass('md-dialog-body');
                   errorHandler.info(
-                    'It may take a few seconds...',
-                    data.data.data
+                    `${data.data.data}. It will take up to 15 seconds...`
                   );
                   rootScope.$emit('removeRestarting', {});
                   scope.$applyAsync();
@@ -423,8 +420,7 @@ app.directive('wzXmlFileEditor', function () {
                   const data = await configHandler.restartNode(target);
                   $('body').removeClass('md-dialog-body');
                   errorHandler.info(
-                    'It may take a few seconds...',
-                    data.data.data
+                    `${data.data.data}. It will take up to 15 seconds...`
                   );
                   rootScope.$emit('removeRestarting', {});
                   scope.$applyAsync();
