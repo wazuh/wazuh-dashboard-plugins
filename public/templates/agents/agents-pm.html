@@ -1,5 +1,10 @@
 <md-content flex layout="column" ng-if="tab === 'pm' && tabView === 'panels'" ng-class="{'no-opacity': resultState !== 'ready' || !rendered}"
     layout-align="start">
+    <div layout="row" layout-padding class="wz-padding-top-0">
+        <span flex></span>
+        <span ng-click="launchRootcheckScan()" class="btn pull-right btn-primary"><i class="fa fa-fw fa-play"></i> Run
+            scan</span>
+    </div>
     <div layout="row" class="height-240">
         <md-card flex="50" class="wz-md-card" ng-class="{'fullscreen': expandArray[0]}">
             <md-card-content class="wazuh-column">
@@ -49,4 +54,5 @@
             </md-card-content>
         </md-card>
     </div>
+
 </md-content>

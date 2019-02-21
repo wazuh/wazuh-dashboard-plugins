@@ -62,8 +62,6 @@ class WzConfigViewer {
       );
     };
 
-    const init = () => {};
-
     const refreshJsonBox = json => {
       $scope.jsoncontent = json;
       if (!$scope.jsonCodeBox) {
@@ -102,7 +100,6 @@ class WzConfigViewer {
       refreshXmlBox(params.data);
     });
 
-    init();
   }
 }
 

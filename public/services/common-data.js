@@ -130,7 +130,8 @@ export class CommonData {
         gdpr: { group: 'gdpr' },
         aws: { group: 'amazon' },
         virustotal: { group: 'virustotal' },
-        osquery: { group: 'osquery' }
+        osquery: { group: 'osquery' },
+        'configurationAssessment': { group: 'configuration_assessment' }
       };
 
       const filters = [];

@@ -90,10 +90,12 @@ export class AgentsController {
     this.ignoredTabs = ['syscollector', 'welcome', 'configuration'];
 
     this.$scope.showSyscheckFiles = false;
-    this.$scope.editGroup = false;
+    this.$scope.showConfigurationAssessmentScan = false;
 
+    this.$scope.editGroup = false;
     this.$scope.addingGroupToAgent = false;
 
+    this.$scope.lookingAssessment = false;
     this.$scope.expandArray = [
       false,
       false,
@@ -157,7 +159,7 @@ export class AgentsController {
     this.tabVisualizations.assign('agents');
 
     this.$scope.hostMonitoringTabs = ['general', 'fim', 'syscollector'];
-    this.$scope.systemAuditTabs = ['pm', 'audit', 'oscap', 'ciscat'];
+    this.$scope.systemAuditTabs = ['pm', 'configuration-assessment', 'audit', 'oscap', 'ciscat'];
     this.$scope.securityTabs = ['vuls', 'virustotal', 'osquery'];
     this.$scope.complianceTabs = ['pci', 'gdpr'];
 
@@ -201,6 +203,12 @@ export class AgentsController {
 
     this.$scope.searchSyscheckFile = (term, specificFilter) =>
       this.$scope.$broadcast('wazuhSearch', { term, specificFilter });
+
+    this.$scope.searchRootcheck = (term, specificFilter) =>
+      this.$scope.$broadcast('wazuhSearch', { term, specificFilter });
+
+    this.$scope.launchRootcheckScan = () => this.launchRootcheckScan();
+    this.$scope.launchSyscheckScan = () => this.launchSyscheckScan();
 
     this.$scope.startVis2Png = () => this.startVis2Png();
 
@@ -356,6 +364,17 @@ export class AgentsController {
       if (!this.$scope.$$phase) this.$scope.$digest();
     };
 
+    this.$scope.switchConfigurationAssessmentScan = () => {
+      this.$scope.lookingAssessment = false;
+      this.$scope.showConfigurationAssessmentScan = !this.$scope.showConfigurationAssessmentScan;
+      if (!this.$scope.showConfigurationAssessmentScan) {
+        this.$rootScope.$emit('changeTabView', {
+          tabView: this.$scope.tabView
+        });
+      }
+      if (!this.$scope.$$phase) this.$scope.$digest();
+    };
+
     this.$scope.goDiscover = () => this.goDiscover();
 
     this.$scope.$on('$routeChangeStart', () =>
@@ -374,6 +393,9 @@ export class AgentsController {
     };
 
     this.$scope.cancelAddGroup = () => (this.$scope.addingGroupToAgent = false);
+
+    this.$scope.loadAssessmentChecks = policy => this.$scope.lookingAssessment = { name: policy.name, id: policy.policy_id };
+    this.$scope.closeAssessmentChecks = () => this.$scope.lookingAssessment = false;
 
     this.$scope.confirmAddGroup = group => {
       this.groupHandler
@@ -467,7 +489,6 @@ export class AgentsController {
       ) {
         const condition =
           !this.changeAgent && (localChange || preserveDiscover);
-
         await this.visFactoryService.buildAgentsVisualizations(
           this.filterHandler,
           this.$scope.tab,
@@ -522,6 +543,7 @@ export class AgentsController {
 
     try {
       this.$scope.showSyscheckFiles = false;
+      this.$scope.showConfigurationAssessmentScan = false;
       if (tab === 'pci') {
         const pciTabs = await this.commonData.getPCI();
         this.$scope.pciTabs = pciTabs;
@@ -532,6 +554,16 @@ export class AgentsController {
         this.$scope.gdprTabs = gdprTabs;
         this.$scope.selectedGdprIndex = 0;
       }
+
+      if (tab === 'configuration-assessment') {
+        try {
+          this.$scope.load = true;
+          const policies = await this.apiReq.request('GET', `/configuration-assessment/${this.$scope.agent.id}`, {});
+          this.$scope.policies = policies.data.data.items;
+        } catch (error) { this.$scope.policies = []; }
+        this.$scope.load = false;
+      }
+
       if (tab === 'syscollector')
         try {
           await this.loadSyscollector(this.$scope.agent.id);
@@ -907,6 +939,46 @@ export class AgentsController {
       (this.$scope.agent || {}).id || true,
       syscollectorFilters.length ? syscollectorFilters : null
     );
+  }
+
+  async launchRootcheckScan() {
+    try {
+      const isActive = ((this.$scope.agent || {}).status || '') === 'Active';
+      if (!isActive) {
+        throw new Error('Agent is not active')
+      }
+      await this.apiReq.request(
+        'PUT',
+        `/rootcheck/${this.$scope.agent.id}`,
+        {}
+      );
+      this.errorHandler.info(
+        `Policy monitoring scan launched successfully on agent ${
+        this.$scope.agent.id
+        }`,
+        ''
+      );
+    } catch (error) {
+      this.errorHandler.handle(error, '');
+    }
+    return;
+  }
+
+  async launchSyscheckScan() {
+    try {
+      const isActive = ((this.$scope.agent || {}).status || '') === 'Active';
+      if (!isActive) {
+        throw new Error('Agent is not active')
+      }
+      await this.apiReq.request('PUT', `/syscheck/${this.$scope.agent.id}`, {});
+      this.errorHandler.info(
+        `FIM scan launched successfully on agent ${this.$scope.agent.id}`,
+        ''
+      );
+    } catch (error) {
+      this.errorHandler.handle(error, '');
+    }
+    return;
   }
 
   falseAllExpand() {

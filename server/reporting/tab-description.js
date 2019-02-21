@@ -79,5 +79,10 @@ export const TabDescription = {
     title: 'Osquery',
     description:
       'Osquery can be used to expose an operating system as a high-performance relational database.'
+  },
+  'configuration-assessment': {
+    title: 'Configuration assessment',
+    description:
+      'Lorem ipsum.'
   }
 };

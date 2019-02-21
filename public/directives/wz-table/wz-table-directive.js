@@ -51,7 +51,8 @@ app.directive('wzTable', function () {
       appState,
       globalState,
       groupHandler,
-      wazuhConfig
+      wazuhConfig,
+      $sce
     ) {
       $scope.showColumns = false;
       $scope.originalkeys = $scope.keys.map((key, idx) => ({ key, idx }));
@@ -233,7 +234,8 @@ app.directive('wzTable', function () {
         return;
       };
 
-      $scope.parseValue = (key, item) => parseValue(key, item, instance.path);
+      $scope.parseValue = (key, item) =>
+        parseValue(key, item, instance.path, $sce);
 
       /**
        * On controller loads
@@ -382,6 +384,18 @@ app.directive('wzTable', function () {
         }
       };
 
+      $scope.isPolicyMonitoring = () => {
+        return instance.path.includes('configuration-assessment') && instance.path.includes('/checks')
+      }
+
+      $scope.expandPolicyMonitoringCheck = item => {
+        if (item.expanded) item.expanded = false;
+        else {
+          $scope.pagedItems[$scope.currentPage].map(item => item.expanded = false);
+          item.expanded = true;
+        }
+
+      }
       $scope.showTooltip = (id1, id2, item) => {
         var $element = $('#td-' + id1 + '-' + id2 + ' div');
         var $c = $element
