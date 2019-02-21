@@ -5639,7 +5639,7 @@ export const knownFields = [
     readFromDocValues: true
   },
   {
-    name: 'data.configuration_assessment.check.compliance.cis',
+    name: 'data.sca.check.compliance.cis',
     type: 'string',
     count: 0,
     scripted: false,
@@ -5648,7 +5648,7 @@ export const knownFields = [
     readFromDocValues: true
   },
   {
-    name: 'data.configuration_assessment.check.compliance.cis_csc',
+    name: 'data.sca.check.compliance.cis_csc',
     type: 'string',
     count: 0,
     scripted: false,
@@ -5657,7 +5657,7 @@ export const knownFields = [
     readFromDocValues: true
   },
   {
-    name: 'data.configuration_assessment.check.compliance.pci_dss',
+    name: 'data.sca.check.compliance.pci_dss',
     type: 'string',
     count: 0,
     scripted: false,
@@ -5666,7 +5666,7 @@ export const knownFields = [
     readFromDocValues: true
   },
   {
-    name: 'data.configuration_assessment.check.description',
+    name: 'data.sca.check.description',
     type: 'string',
     count: 0,
     scripted: false,
@@ -5675,7 +5675,7 @@ export const knownFields = [
     readFromDocValues: true
   },
   {
-    name: 'data.configuration_assessment.check.directory',
+    name: 'data.sca.check.directory',
     type: 'string',
     count: 0,
     scripted: false,
@@ -5684,7 +5684,7 @@ export const knownFields = [
     readFromDocValues: true
   },
   {
-    name: 'data.configuration_assessment.check.file',
+    name: 'data.sca.check.file',
     type: 'string',
     count: 0,
     scripted: false,
@@ -5693,7 +5693,7 @@ export const knownFields = [
     readFromDocValues: true
   },
   {
-    name: 'data.configuration_assessment.check.id',
+    name: 'data.sca.check.id',
     type: 'string',
     count: 0,
     scripted: false,
@@ -5702,7 +5702,7 @@ export const knownFields = [
     readFromDocValues: true
   },
   {
-    name: 'data.configuration_assessment.check.previous_result',
+    name: 'data.sca.check.previous_result',
     type: 'string',
     count: 0,
     scripted: false,
@@ -5711,7 +5711,7 @@ export const knownFields = [
     readFromDocValues: true
   },
   {
-    name: 'data.configuration_assessment.check.process',
+    name: 'data.sca.check.process',
     type: 'string',
     count: 0,
     scripted: false,
@@ -5720,7 +5720,7 @@ export const knownFields = [
     readFromDocValues: true
   },
   {
-    name: 'data.configuration_assessment.check.rationale',
+    name: 'data.sca.check.rationale',
     type: 'string',
     count: 0,
     scripted: false,
@@ -5729,7 +5729,7 @@ export const knownFields = [
     readFromDocValues: true
   },
   {
-    name: 'data.configuration_assessment.check.references',
+    name: 'data.sca.check.references',
     type: 'string',
     count: 0,
     scripted: false,
@@ -5738,7 +5738,7 @@ export const knownFields = [
     readFromDocValues: true
   },
   {
-    name: 'data.configuration_assessment.check.registry',
+    name: 'data.sca.check.registry',
     type: 'string',
     count: 0,
     scripted: false,
@@ -5747,7 +5747,7 @@ export const knownFields = [
     readFromDocValues: true
   },
   {
-    name: 'data.configuration_assessment.check.remediation',
+    name: 'data.sca.check.remediation',
     type: 'string',
     count: 0,
     scripted: false,
@@ -5756,7 +5756,7 @@ export const knownFields = [
     readFromDocValues: true
   },
   {
-    name: 'data.configuration_assessment.check.result',
+    name: 'data.sca.check.result',
     type: 'string',
     count: 0,
     scripted: false,
@@ -5765,7 +5765,7 @@ export const knownFields = [
     readFromDocValues: true
   },
   {
-    name: 'data.configuration_assessment.check.title',
+    name: 'data.sca.check.title',
     type: 'string',
     count: 0,
     scripted: false,
@@ -5774,7 +5774,7 @@ export const knownFields = [
     readFromDocValues: true
   },
   {
-    name: 'data.configuration_assessment.description',
+    name: 'data.sca.description',
     type: 'string',
     count: 0,
     scripted: false,
@@ -5783,7 +5783,7 @@ export const knownFields = [
     readFromDocValues: true
   },
   {
-    name: 'data.configuration_assessment.failed',
+    name: 'data.sca.failed',
     type: 'string',
     count: 0,
     scripted: false,
@@ -5792,7 +5792,7 @@ export const knownFields = [
     readFromDocValues: true
   },
   {
-    name: 'data.configuration_assessment.file',
+    name: 'data.sca.file',
     type: 'string',
     count: 0,
     scripted: false,
@@ -5801,7 +5801,7 @@ export const knownFields = [
     readFromDocValues: true
   },
   {
-    name: 'data.configuration_assessment.name',
+    name: 'data.sca.name',
     type: 'string',
     count: 0,
     scripted: false,
@@ -5810,7 +5810,7 @@ export const knownFields = [
     readFromDocValues: true
   },
   {
-    name: 'data.configuration_assessment.passed',
+    name: 'data.sca.passed',
     type: 'string',
     count: 0,
     scripted: false,
@@ -5819,7 +5819,7 @@ export const knownFields = [
     readFromDocValues: true
   },
   {
-    name: 'data.configuration_assessment.policy',
+    name: 'data.sca.policy',
     type: 'string',
     count: 0,
     scripted: false,
@@ -5828,7 +5828,7 @@ export const knownFields = [
     readFromDocValues: true
   },
   {
-    name: 'data.configuration_assessment.policy_id',
+    name: 'data.sca.policy_id',
     type: 'string',
     count: 0,
     scripted: false,
@@ -5837,7 +5837,7 @@ export const knownFields = [
     readFromDocValues: true
   },
   {
-    name: 'data.configuration_assessment.scan_id',
+    name: 'data.sca.scan_id',
     type: 'string',
     count: 0,
     scripted: false,
@@ -5846,7 +5846,7 @@ export const knownFields = [
     readFromDocValues: true
   },
   {
-    name: 'data.configuration_assessment.score',
+    name: 'data.sca.score',
     type: 'string',
     count: 0,
     scripted: false,
@@ -5855,7 +5855,7 @@ export const knownFields = [
     readFromDocValues: true
   },
   {
-    name: 'data.configuration_assessment.type',
+    name: 'data.sca.type',
     type: 'string',
     count: 0,
     scripted: false,
