@@ -60,7 +60,7 @@
         <div ng-show="tab !== 'welcome' && tab !== 'configuration' && tabView === 'panels'">
             <!-- Report button -->
             <md-button md-no-ink class="md-icon-button small wz-no-margin-padding" tooltip="Generate report"
-                tooltip-placement="bottom" ng-disabled="(!rendered || loading || resultState !== 'ready') && tab !== 'syscollector'"
+                tooltip-placement="bottom" ng-disabled="(!rendered || loading || resultState !== 'ready' || showSyscheckFiles || showConfigurationAssessmentScan) && tab !== 'syscollector'"
                 ng-click="startVis2Png()" aria-label="Generate report button">
                 <i class="fa fa-fw fa-print" aria-hidden="true"></i>
             </md-button>
@@ -76,8 +76,8 @@
             </md-button>
 
             <!-- Discover button -->
-            <md-button ng-if="tabView === 'panels'" class="wz-button-flat small" ng-click="switchSubtab('discover')"
-                aria-label="Discover button">
+            <md-button ng-if="tabView === 'panels' && !showSyscheckFiles && !showConfigurationAssessmentScan" class="wz-button-flat small"
+                ng-click="switchSubtab('discover')" aria-label="Discover button">
                 <i class="fa fa-fw fa-compass" aria-hidden="true"></i> Discover
             </md-button>
         </div>
@@ -122,6 +122,8 @@
     <md-nav-bar ng-if="inArray(tab, systemAuditTabs) && (extensions.audit || extensions.oscap || extensions.ciscat)"
         class="wz-nav-bar" ng-show="tab !== 'welcome'" md-selected-nav-item="tab" nav-bar-aria-label="System audit navigation links">
         <md-nav-item class="wz-nav-item" md-nav-click="switchTab('pm')" name="pm">{{ tabNames['pm'] }}</md-nav-item>
+        <md-nav-item class="wz-nav-item" md-nav-click="switchTab('configuration-assessment')" name="configuration-assessment">{{
+            tabNames['configuration-assessment'] }}</md-nav-item>
         <md-nav-item ng-show="extensions.audit" class="wz-nav-item" md-nav-click="switchTab('audit')" name="audit">{{
             tabNames['audit'] }}</md-nav-item>
         <md-nav-item ng-show="extensions.oscap" class="wz-nav-item" md-nav-click="switchTab('oscap')" name="oscap">{{
@@ -153,7 +155,7 @@
     <!-- End Compliance navigation bar -->
 
     <!-- Discover search bar section -->
-    <kbn-dis ng-show="(tab !== 'welcome') && (tab !== 'configuration') && tab !== 'syscollector'"></kbn-dis>
+    <kbn-dis ng-show="(tab !== 'welcome') && (tab !== 'configuration') && tab !== 'syscollector' && !showSyscheckFiles && !showConfigurationAssessmentScan"></kbn-dis>
     <!-- End Discover search bar section -->
 
     <!-- Loading status section -->
@@ -173,12 +175,23 @@
     <!-- End report status section -->
 
     <!-- No results section -->
-    <div layout="row" ng-if="!showSyscheckFiles && tab === 'fim' && resultState === 'none' && tabView === 'panels'"
+    <div layout="row" ng-if="!showSyscheckFiles && !showConfigurationAssessmentScan && tab === 'fim' && resultState === 'none' && tabView === 'panels'"
         layout-padding class="wz-padding-top-0">
         <span flex></span>
-        <span ng-click="switchSyscheckFiles()" class="btn pull-right wz-button">Show files</span>
+        <span ng-click="launchSyscheckScan()" class="btn pull-right btn-primary"><i class="fa fa-fw fa-play"></i> Run
+            scan</span>
+        <span></span>
+        <span ng-click="switchSyscheckFiles()" class="btn pull-right btn-primary"><i class="fa fa-fw fa-database"></i>
+            Show state</span>
     </div>
-    <div layout="row" class="wz-margin-top-10 wz-margin-right-8 wz-margin-left-8" ng-if="!showSyscheckFiles && tab !== 'welcome' && tab !== 'configuration' && tab !== 'syscollector'"
+    <div layout="row" ng-if="!showSyscheckFiles && !showConfigurationAssessmentScan && tab === 'configuration-assessment' && resultState === 'none' && tabView === 'panels'"
+        layout-padding class="wz-padding-top-0">
+        <span flex></span>
+        <span ng-click="switchConfigurationAssessmentScan()" class="btn pull-right btn-primary"><i class="fa fa-fw fa-database"></i>
+            Show
+            state</span>
+    </div>
+    <div layout="row" class="wz-margin-top-10 wz-margin-right-8 wz-margin-left-8" ng-if="!showSyscheckFiles && !showConfigurationAssessmentScan && tab !== 'welcome' && tab !== 'configuration' && tab !== 'syscollector'"
         ng-show="resultState === 'none' && tabView === 'panels'">
         <div flex class="euiCallOut euiCallOut--warning">
             <div class="euiCallOutHeader">

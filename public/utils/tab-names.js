@@ -58,5 +58,6 @@ export const TabNames = {
   command: 'Wazuh commands',
   client: 'Client configuration',
   edition: 'Edit node configuration',
-  'client-buffer': 'Anti-flooding settings'
+  'client-buffer': 'Anti-flooding settings',
+  'configuration-assessment': 'Configuration assessment'
 };

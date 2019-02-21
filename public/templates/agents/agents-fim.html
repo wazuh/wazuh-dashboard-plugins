@@ -2,7 +2,11 @@
     layout-align="start">
     <div layout="row" layout-padding class="wz-padding-top-0">
         <span flex></span>
-        <span ng-click="switchSyscheckFiles()" class="btn pull-right wz-button">Show files</span>
+        <span ng-click="launchSyscheckScan()" class="btn pull-right btn-primary"><i class="fa fa-fw fa-play"></i> Run
+            scan</span>
+        <span></span>
+        <span ng-click="switchSyscheckFiles()" class="btn pull-right btn-primary"><i class="fa fa-fw fa-database"></i>
+            Show state</span>
     </div>
     <!-- View: Panels -->
     <div layout="row" class="height-300">
@@ -96,9 +100,13 @@
 </md-content>
 
 <md-content flex layout="column" ng-if="tab === 'fim' && tabView === 'panels' && showSyscheckFiles" layout-align="start">
-    <div layout="row" layout-padding class="wz-padding-top-0">
+    <div layout="row" layout-padding>
         <span flex></span>
-        <span ng-click="switchSyscheckFiles()" class="btn pull-right wz-button">Show alerts</span>
+        <span ng-click="launchSyscheckScan()" class="btn pull-right btn-primary"><i class="fa fa-fw fa-play"></i>
+            Run scan</span>
+        <span></span>
+        <span ng-click="switchSyscheckFiles()" class="btn pull-right btn-primary"><i class="fa fa-fw fa-area-chart"></i>
+            Show alerts</span>
     </div>
 
     <div layout="row" class="wz-margin-top-10 wz-margin-right-8 wz-margin-left-8" ng-if="showSyscheckFiles && (!agent || !agent.os)">
@@ -130,7 +138,7 @@
                 </div>
                 <div layout="row" ng-if="agent && !load" class="wz-margin-top-10 wz-margin-bottom-40-inv">
                     <wz-table flex path="'/syscheck/' + agent.id" implicit-filter="[{name:'type',value:'registry'}]"
-                        row-sizes="[6,6,6]" extra-limit="true" keys="['file','sha1','md5']">
+                        row-sizes="[6,6,6]" extra-limit="100" keys="['file','sha1','md5']">
                     </wz-table>
                 </div>
                 <div layout="row" layout-padding>
@@ -156,7 +164,7 @@
                 </div>
                 <div layout="row" ng-if="agent && !load" class="wz-margin-top-10 wz-margin-bottom-40-inv">
                     <wz-table flex path="'/syscheck/' + agent.id" implicit-filter="[{name:'type',value:'file'}]"
-                        row-sizes="[6,6,6]" extra-limit="true" keys="['file','size','uname','perm','sha1','sha256','uid','mtime','md5']">
+                        row-sizes="[6,6,6]" extra-limit="100" keys="['file','size','uname','perm','sha1','sha256','uid','mtime','md5']">
                     </wz-table>
                 </div>
                 <div layout="row" layout-padding>
@@ -173,15 +181,16 @@
             <md-card-content>
                 <span class="wz-headline-title"><i class="fa fa-fw fa-file-o"></i> Files</span>
                 <md-divider class="wz-margin-top-10"></md-divider>
-                <div layout="row" class="wz-margin-top-10">
+                <div layout="row" class="wz-margin-top-10 wz-margin-bottom-25">
                     <input placeholder="Filter files..." ng-model="filesSearch" type="text" class="kuiLocalSearchInput ng-empty ng-pristine ng-scope ng-touched ng-valid height-30"
                         aria-invalid="false" wz-enter="searchSyscheckFile(filesSearch)">
                     <button type="submit" aria-label="Search" class="kuiLocalSearchButton height-30" ng-click="searchSyscheckFile(filesSearch)">
                         <span class="fa fa-search" aria-hidden="true"></span>
                     </button>
                 </div>
-                <div layout="row" ng-if="agent && !load" class="wz-margin-top-10 wz-margin-bottom-40-inv">
-                    <wz-table flex path="'/syscheck/' + agent.id" row-sizes="[12,10,8]" extra-limit="true" keys="['file','size','inode','gname','uname','perm','sha1','sha256','uid','gid','mtime','md5']">
+                <div layout="row" ng-if="agent && !load" class="wz-margin-top-16 wz-margin-bottom-40-inv">
+                    <wz-table custom-columns="true" flex path="'/syscheck/' + agent.id" row-sizes="[12,10,8]"
+                        extra-limit="100" keys="['file','size','inode','gname','uname','perm','sha1','sha256','uid','gid','mtime','md5']">
                     </wz-table>
                 </div>
                 <div layout="row" layout-padding>
