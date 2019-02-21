@@ -90,12 +90,12 @@ export class AgentsController {
     this.ignoredTabs = ['syscollector', 'welcome', 'configuration'];
 
     this.$scope.showSyscheckFiles = false;
-    this.$scope.showConfigurationAssessmentScan = false;
+    this.$scope.showScaScan = false;
 
     this.$scope.editGroup = false;
     this.$scope.addingGroupToAgent = false;
 
-    this.$scope.lookingAssessment = false;
+    this.$scope.lookingSca = false;
     this.$scope.expandArray = [
       false,
       false,
@@ -159,7 +159,7 @@ export class AgentsController {
     this.tabVisualizations.assign('agents');
 
     this.$scope.hostMonitoringTabs = ['general', 'fim', 'syscollector'];
-    this.$scope.systemAuditTabs = ['pm', 'configuration-assessment', 'audit', 'oscap', 'ciscat'];
+    this.$scope.systemAuditTabs = ['pm', 'sca', 'audit', 'oscap', 'ciscat'];
     this.$scope.securityTabs = ['vuls', 'virustotal', 'osquery'];
     this.$scope.complianceTabs = ['pci', 'gdpr'];
 
@@ -364,10 +364,10 @@ export class AgentsController {
       if (!this.$scope.$$phase) this.$scope.$digest();
     };
 
-    this.$scope.switchConfigurationAssessmentScan = () => {
-      this.$scope.lookingAssessment = false;
-      this.$scope.showConfigurationAssessmentScan = !this.$scope.showConfigurationAssessmentScan;
-      if (!this.$scope.showConfigurationAssessmentScan) {
+    this.$scope.switchScaScan = () => {
+      this.$scope.lookingSca = false;
+      this.$scope.showScaScan = !this.$scope.showScaScan;
+      if (!this.$scope.showScaScan) {
         this.$rootScope.$emit('changeTabView', {
           tabView: this.$scope.tabView
         });
@@ -394,8 +394,8 @@ export class AgentsController {
 
     this.$scope.cancelAddGroup = () => (this.$scope.addingGroupToAgent = false);
 
-    this.$scope.loadAssessmentChecks = policy => this.$scope.lookingAssessment = { name: policy.name, id: policy.policy_id };
-    this.$scope.closeAssessmentChecks = () => this.$scope.lookingAssessment = false;
+    this.$scope.loadScaChecks = policy => this.$scope.lookingSca = { name: policy.name, id: policy.policy_id };
+    this.$scope.closeScaChecks = () => this.$scope.lookingSca = false;
 
     this.$scope.confirmAddGroup = group => {
       this.groupHandler
@@ -543,7 +543,7 @@ export class AgentsController {
 
     try {
       this.$scope.showSyscheckFiles = false;
-      this.$scope.showConfigurationAssessmentScan = false;
+      this.$scope.showScaScan = false;
       if (tab === 'pci') {
         const pciTabs = await this.commonData.getPCI();
         this.$scope.pciTabs = pciTabs;
@@ -555,10 +555,10 @@ export class AgentsController {
         this.$scope.selectedGdprIndex = 0;
       }
 
-      if (tab === 'configuration-assessment') {
+      if (tab === 'sca') {
         try {
           this.$scope.load = true;
-          const policies = await this.apiReq.request('GET', `/configuration-assessment/${this.$scope.agent.id}`, {});
+          const policies = await this.apiReq.request('GET', `/sca/${this.$scope.agent.id}`, {});
           this.$scope.policies = policies.data.data.items;
         } catch (error) { this.$scope.policies = []; }
         this.$scope.load = false;

@@ -131,7 +131,7 @@ export class CommonData {
         aws: { group: 'amazon' },
         virustotal: { group: 'virustotal' },
         osquery: { group: 'osquery' },
-        'configurationAssessment': { group: 'configuration_assessment' }
+        sca: { group: 'sca' }
       };
 
       const filters = [];

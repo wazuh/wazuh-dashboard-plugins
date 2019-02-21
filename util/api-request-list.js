@@ -471,7 +471,7 @@ export const apiRequestList = [
         args: []
       },
       {
-        name: '/configuration-assessment/:agent_id',
+        name: '/sca/:agent_id',
         args: [
           {
             name: ':agent_id'
@@ -479,7 +479,7 @@ export const apiRequestList = [
         ]
       },
       {
-        name: '/configuration-assessment/:agent_id/checks/:policy_id',
+        name: '/sca/:agent_id/checks/:policy_id',
         args: [
           {
             name: ':agent_id'

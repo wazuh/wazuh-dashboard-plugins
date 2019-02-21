@@ -97,7 +97,6 @@ export class VisFactoryService {
    */
   async buildAgentsVisualizations(filterHandler, tab, subtab, localChange, id) {
     try {
-      if (tab === 'configuration-assessment') tab = 'configurationAssessment';
       const data = await this.genericReq.request(
         'GET',
         `/elastic/visualizations/agents-${tab}/${this.appState.getCurrentPattern()}`

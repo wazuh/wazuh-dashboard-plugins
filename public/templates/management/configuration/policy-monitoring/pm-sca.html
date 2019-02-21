@@ -1,31 +1,37 @@
 <!-- No configuration section -->
-<wz-no-config flex error="'not-present'" ng-if="configurationSubTab === 'pm-configuration-assessment' && !currentConfig['wmodules-wmodules'].wmodules[4]['configuration-assessment']"></wz-no-config>
+<wz-no-config flex error="'not-present'"
+    ng-if="configurationSubTab === 'pm-sca' && !currentConfig['wmodules-wmodules'].wmodules[4]['sca']"></wz-no-config>
 <!-- End no configuration section -->
 
 <!-- The main card will all the settings -->
-<md-card class="wz-md-card" ng-if="!JSONContent && !XMLContent && configurationSubTab === 'pm-configuration-assessment' && currentConfig['wmodules-wmodules'].wmodules[4]['configuration-assessment']">
+<md-card class="wz-md-card"
+    ng-if="!JSONContent && !XMLContent && configurationSubTab === 'pm-sca' && currentConfig['wmodules-wmodules'].wmodules[4]['sca']">
     <md-card-content>
         <div layout="row" layout-align="start center">
             <div>
                 <span class="font-size-16">Configuration assessment</span>
             </div>
             <span flex></span>
-            <span ng-class="JSONContent ? 'wz-text-active' : ''" class="wz-text-link small" ng-click="getJSON()">JSON</span>
+            <span ng-class="JSONContent ? 'wz-text-active' : ''" class="wz-text-link small"
+                ng-click="getJSON()">JSON</span>
             <span class="small">&nbsp;&centerdot;&nbsp;</span>
-            <span ng-class="XMLContent ? 'wz-text-active' : ''" class="wz-text-link small" ng-click="getXML()">XML</span>
+            <span ng-class="XMLContent ? 'wz-text-active' : ''" class="wz-text-link small"
+                ng-click="getXML()">XML</span>
         </div>
         <md-divider class="wz-margin-top-10"></md-divider>
 
         <!-- Configuration block -->
         <div class="wz-padding-top-10">
             <!-- content -->
-            <wz-config-item label="Configuration assessment status" value="currentConfig['wmodules-wmodules'].wmodules[4]['configuration-assessment'].enabled === 'yes' ? 'enabled' : 'disabled'">
+            <wz-config-item label="Configuration assessment status"
+                value="currentConfig['wmodules-wmodules'].wmodules[4]['sca'].enabled === 'yes' ? 'enabled' : 'disabled'">
             </wz-config-item>
-            <wz-config-item label="Interval" value="currentConfig['wmodules-wmodules'].wmodules[4]['configuration-assessment'].interval">
+            <wz-config-item label="Interval" value="currentConfig['wmodules-wmodules'].wmodules[4]['sca'].interval">
             </wz-config-item>
-            <wz-config-item label="Scan on start" value="currentConfig['wmodules-wmodules'].wmodules[4]['configuration-assessment'].scan_on_start">
+            <wz-config-item label="Scan on start"
+                value="currentConfig['wmodules-wmodules'].wmodules[4]['sca'].scan_on_start">
             </wz-config-item>
-            <wz-config-item label="Skip nfs" value="currentConfig['wmodules-wmodules'].wmodules[4]['configuration-assessment'].skip_nfs">
+            <wz-config-item label="Skip nfs" value="currentConfig['wmodules-wmodules'].wmodules[4]['sca'].skip_nfs">
             </wz-config-item>
             <!-- end content -->
         </div>
@@ -44,7 +50,7 @@
                     <th class="wz-text-left">Name</th>
                 </thead>
                 <tbody class="wz-word-wrap">
-                    <tr ng-repeat="policy in currentConfig['wmodules-wmodules'].wmodules[4]['configuration-assessment'].policies">
+                    <tr ng-repeat="policy in currentConfig['wmodules-wmodules'].wmodules[4]['sca'].policies">
                         <td>{{policy}}</td>
                     </tr>
                 </tbody>

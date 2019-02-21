@@ -1,9 +1,9 @@
-<md-content flex layout="column" ng-if="tab === 'configuration-assessment' && tabView === 'panels'" ng-show="!showConfigurationAssessmentScan"
+<md-content flex layout="column" ng-if="tab === 'sca' && tabView === 'panels'" ng-show="!showScaScan"
     ng-class="{'no-opacity': resultState !== 'ready' || !rendered}" layout-align="start">
-    <div layout="row" layout-padding class="wz-padding-top-0">
+    <div layout="row">
         <span flex></span>
-        <span ng-click="switchConfigurationAssessmentScan()" class="btn pull-right btn-primary"><i class="fa fa-fw fa-database"></i>
-            Show state</span>
+        <md-button ng-click="switchScaScan()" class="wz-button pull-right"><i class="fa fa-fw fa-database"></i>
+            Show state</md-button>
     </div>
     <div layout="row" class="height-240">
         <md-card flex class="wz-md-card" ng-class="{'fullscreen': expandArray[0]}">
@@ -14,7 +14,8 @@
                     <span class="wz-text-link" ng-click="expand(0)"><i class="fa fa-fw fa-expand"></i></span>
                 </div>
                 <md-divider class="wz-margin-top-10"></md-divider>
-                <kbn-vis id="Wazuh-App-Agents-CA-Top-5-CIS-Requirements" vis-id="'Wazuh-App-Agents-CA-Top-5-CIS-Requirements'"></kbn-vis>
+                <kbn-vis id="Wazuh-App-Agents-CA-Top-5-CIS-Requirements"
+                    vis-id="'Wazuh-App-Agents-CA-Top-5-CIS-Requirements'"></kbn-vis>
             </md-card-content>
         </md-card>
         <md-card flex class="wz-md-card" ng-class="{'fullscreen': expandArray[1]}">
@@ -25,7 +26,8 @@
                     <span class="wz-text-link" ng-click="expand(1)"><i class="fa fa-fw fa-expand"></i></span>
                 </div>
                 <md-divider class="wz-margin-top-10"></md-divider>
-                <kbn-vis id="Wazuh-App-Agents-CA-Top-5-PCI-DSS-Requirements" vis-id="'Wazuh-App-Agents-CA-Top-5-PCI-DSS-Requirements'"></kbn-vis>
+                <kbn-vis id="Wazuh-App-Agents-CA-Top-5-PCI-DSS-Requirements"
+                    vis-id="'Wazuh-App-Agents-CA-Top-5-PCI-DSS-Requirements'"></kbn-vis>
             </md-card-content>
         </md-card>
         <md-card flex class="wz-md-card" ng-class="{'fullscreen': expandArray[4]}">
@@ -36,7 +38,8 @@
                     <span class="wz-text-link" ng-click="expand(4)"><i class="fa fa-fw fa-expand"></i></span>
                 </div>
                 <md-divider class="wz-margin-top-10"></md-divider>
-                <kbn-vis id="Wazuh-App-Agents-CA-Result-distribution" vis-id="'Wazuh-App-Agents-CA-Result-distribution'"></kbn-vis>
+                <kbn-vis id="Wazuh-App-Agents-CA-Result-distribution"
+                    vis-id="'Wazuh-App-Agents-CA-Result-distribution'"></kbn-vis>
             </md-card-content>
         </md-card>
     </div>
@@ -50,7 +53,8 @@
                     <span class="wz-text-link" ng-click="expand(2)"><i class="fa fa-fw fa-expand"></i></span>
                 </div>
                 <md-divider class="wz-margin-top-10"></md-divider>
-                <kbn-vis id="Wazuh-App-Agents-CA-Alerts-over-time" vis-id="'Wazuh-App-Agents-CA-Alerts-over-time'"></kbn-vis>
+                <kbn-vis id="Wazuh-App-Agents-CA-Alerts-over-time" vis-id="'Wazuh-App-Agents-CA-Alerts-over-time'">
+                </kbn-vis>
             </md-card-content>
         </md-card>
     </div>
@@ -71,21 +75,24 @@
 
 </md-content>
 
-<md-content flex layout="column" ng-if="tab === 'configuration-assessment' && tabView === 'panels' && showConfigurationAssessmentScan"
-    layout-align="start">
-    <div layout="row" layout-padding>
+<md-content flex layout="column" ng-if="tab === 'sca' && tabView === 'panels' && showScaScan" layout-align="start">
+    <div layout="row">
         <span flex></span>
-        <span ng-click="switchConfigurationAssessmentScan()" class="btn pull-right btn-primary"><i class="fa fa-fw fa-area-chart"></i>
-            Show alerts</span>
+        <md-button ng-click="switchScaScan()" class="wz-button pull-right"><i class="fa fa-fw fa-area-chart"></i>
+            Show alerts</md-button>
     </div>
 
-    <div layout="row" class="wz-margin-top-10 wz-margin-right-8 wz-margin-left-8" ng-if="showConfigurationAssessmentScan && (!agent || !agent.os)">
+    <div layout="row" class="wz-margin-top-10 wz-margin-right-8 wz-margin-left-8"
+        ng-if="showScaScan && (!agent || !agent.os)">
         <div flex class="euiCallOut euiCallOut--warning">
             <div class="euiCallOutHeader">
-                <svg class="euiIcon euiIcon--medium euiCallOutHeader__icon" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
-                    xmlns:xlink="http://www.w3.org/1999/xlink" width="16" height="16" viewBox="0 0 16 16">
+                <svg class="euiIcon euiIcon--medium euiCallOutHeader__icon" aria-hidden="true"
+                    xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="16" height="16"
+                    viewBox="0 0 16 16">
                     <defs>
-                        <path id="help-a" d="M13.6 12.186l-1.357-1.358c-.025-.025-.058-.034-.084-.056.53-.794.84-1.746.84-2.773a4.977 4.977 0 0 0-.84-2.772c.026-.02.059-.03.084-.056L13.6 3.813a6.96 6.96 0 0 1 0 8.373zM8 15A6.956 6.956 0 0 1 3.814 13.6l1.358-1.358c.025-.025.034-.057.055-.084C6.02 12.688 6.974 13 8 13a4.978 4.978 0 0 0 2.773-.84c.02.026.03.058.056.083l1.357 1.358A6.956 6.956 0 0 1 8 15zm-5.601-2.813a6.963 6.963 0 0 1 0-8.373l1.359 1.358c.024.025.057.035.084.056A4.97 4.97 0 0 0 3 8c0 1.027.31 1.98.842 2.773-.027.022-.06.031-.084.056l-1.36 1.358zm5.6-.187A4 4 0 1 1 8 4a4 4 0 0 1 0 8zM8 1c1.573 0 3.019.525 4.187 1.4l-1.357 1.358c-.025.025-.035.057-.056.084A4.979 4.979 0 0 0 8 3a4.979 4.979 0 0 0-2.773.842c-.021-.027-.03-.059-.055-.084L3.814 2.4A6.957 6.957 0 0 1 8 1zm0-1a8.001 8.001 0 1 0 .003 16.002A8.001 8.001 0 0 0 8 0z"></path>
+                        <path id="help-a"
+                            d="M13.6 12.186l-1.357-1.358c-.025-.025-.058-.034-.084-.056.53-.794.84-1.746.84-2.773a4.977 4.977 0 0 0-.84-2.772c.026-.02.059-.03.084-.056L13.6 3.813a6.96 6.96 0 0 1 0 8.373zM8 15A6.956 6.956 0 0 1 3.814 13.6l1.358-1.358c.025-.025.034-.057.055-.084C6.02 12.688 6.974 13 8 13a4.978 4.978 0 0 0 2.773-.84c.02.026.03.058.056.083l1.357 1.358A6.956 6.956 0 0 1 8 15zm-5.601-2.813a6.963 6.963 0 0 1 0-8.373l1.359 1.358c.024.025.057.035.084.056A4.97 4.97 0 0 0 3 8c0 1.027.31 1.98.842 2.773-.027.022-.06.031-.084.056l-1.36 1.358zm5.6-.187A4 4 0 1 1 8 4a4 4 0 0 1 0 8zM8 1c1.573 0 3.019.525 4.187 1.4l-1.357 1.358c-.025.025-.035.057-.056.084A4.979 4.979 0 0 0 8 3a4.979 4.979 0 0 0-2.773.842c-.021-.027-.03-.059-.055-.084L3.814 2.4A6.957 6.957 0 0 1 8 1zm0-1a8.001 8.001 0 1 0 .003 16.002A8.001 8.001 0 0 0 8 0z">
+                        </path>
                     </defs>
                     <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#help-a" fill-rule="evenodd"></use>
                 </svg>
@@ -94,11 +101,11 @@
         </div>
     </div>
 
-    <div layout="row" layout-padding class="wz-padding-top-0" ng-show="agent && agent.os && !lookingAssessment">
+    <div layout="row" layout-padding class="wz-padding-top-0" ng-show="agent && agent.os && !lookingSca">
 
         <span class="wz-headline-title"><i class="fa fa-fw fa-shield"></i> Configuration assessment</span>
     </div>
-    <div layout="row" class="md-padding" ng-show="agent && agent.os && !lookingAssessment">
+    <div layout="row" class="md-padding" ng-show="agent && agent.os && !lookingSca">
         <table class="euiTable euiTable--responsive" ng-if="policies && policies.length">
             <thead>
                 <tr>
@@ -106,7 +113,8 @@
                         <div class="euiTableCellContent"><span class="euiTableCellContent__text">Policy</span></div>
                     </th>
                     <th class="euiTableHeaderCell padding-left-0 col-lg-5">
-                        <div class="euiTableCellContent"><span class="euiTableCellContent__text">Description</span></div>
+                        <div class="euiTableCellContent"><span class="euiTableCellContent__text">Description</span>
+                        </div>
                     </th>
                     <th class="euiTableHeaderCell padding-left-0">
                         <div class="euiTableCellContent"><span class="euiTableCellContent__text">Last scan</span></div>
@@ -127,7 +135,8 @@
                 <tr class="euiTableRow" ng-repeat="policy in policies">
                     <td class="euiTableRowCell">
                         <div class="euiTableCellContent euiTableCellContent--overflowingContent">
-                            <button ng-click="loadAssessmentChecks(policy)" class="euiLink euiLink--primary" type="button">{{policy.name}}</button>
+                            <button ng-click="loadScaChecks(policy)" class="euiLink euiLink--primary"
+                                type="button">{{policy.name}}</button>
                         </div>
                     </td>
                     <td class="euiTableRowCell">
@@ -167,27 +176,31 @@
 
     </div>
 
-    <div layout="row" class="wz-padding-top-0" ng-if="agent && agent.os && lookingAssessment">
+    <div layout="row" class="wz-padding-top-0" ng-if="agent && agent.os && lookingSca">
         <md-card flex class="wz-md-card">
             <md-card-content>
-                <span class="wz-headline-title"><i class="fa fa-fw fa-arrow-left cursor-pointer" ng-click="closeAssessmentChecks()"></i>
-                    {{lookingAssessment.name}} checks</span>
+                <span class="wz-headline-title"><i class="fa fa-fw fa-arrow-left cursor-pointer"
+                        ng-click="closeScaChecks()"></i>
+                    {{lookingSca.name}} checks</span>
                 <md-divider class="wz-margin-top-10"></md-divider>
                 <div layout="row" class="wz-margin-top-16 wz-margin-bottom-25">
-                    <input placeholder="Filter checks..." ng-model="custom_search" type="text" class="kuiLocalSearchInput ng-empty ng-pristine ng-scope ng-touched ng-valid"
+                    <input placeholder="Filter checks..." ng-model="custom_search" type="text"
+                        class="kuiLocalSearchInput ng-empty ng-pristine ng-scope ng-touched ng-valid"
                         aria-invalid="false" wz-enter="search(custom_search)">
-                    <button type="submit" aria-label="Search" class="kuiLocalSearchButton height-40" ng-click="search(custom_search)">
+                    <button type="submit" aria-label="Search" class="kuiLocalSearchButton height-40"
+                        ng-click="search(custom_search)">
                         <span class="fa fa-search" aria-hidden="true"></span>
                     </button>
                 </div>
                 <div layout="row" class="wz-margin-top-16 wz-margin-bottom-40-inv">
-                    <wz-table flex path="'/configuration-assessment/' + agent.id + '/checks/' + lookingAssessment.id"
-                        row-sizes="[13,11,9]" extra-limit="100" keys="['title','file','result']">
+                    <wz-table flex path="'/sca/' + agent.id + '/checks/' + lookingSca.id" row-sizes="[13,11,9]"
+                        extra-limit="100" keys="['title','file','result']">
                     </wz-table>
                 </div>
                 <div layout="row" layout-padding>
                     <span flex></span>
-                    <a class="small" id="btnDownload" ng-click="downloadCsv('/configuration-assessment/' + agent.id + '/checks/' + lookingAssessment.id, lookingAssessment.id + '.csv')">Formatted
+                    <a class="small" id="btnDownload"
+                        ng-click="downloadCsv('/sca/' + agent.id + '/checks/' + lookingSca.id, lookingSca.id + '.csv')">Formatted
                         <i aria-hidden="true" class="fa fa-fw fa-download"></i></a>
                 </div>
             </md-card-content>
