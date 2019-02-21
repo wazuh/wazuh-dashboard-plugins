@@ -240,7 +240,7 @@ app.directive('wzXmlFileEditor', function () {
             const msg = 'Success. Group has been updated';
             params.showRestartManager
               ? params.showRestartManager !== 'warn'
-                ? showRestartDialog(msg, params.showRestartManager)
+                ? showRestartMessage(msg, params.showRestartManager)
                 : errorHandler.handle(warnMsg, '', true)
               : errorHandler.info(msg, '');
           } else if (params.rule) {
@@ -254,7 +254,7 @@ app.directive('wzXmlFileEditor', function () {
             const msg = 'Success. Rules updated';
             params.showRestartManager
               ? params.showRestartManager !== 'warn'
-                ? showRestartDialog(msg, params.showRestartManager)
+                ? showRestartMessage(msg, params.showRestartManager)
                 : errorHandler.handle(warnMsg, '', true)
               : errorHandler.info(msg, '');
           } else if (params.decoder) {
@@ -268,7 +268,7 @@ app.directive('wzXmlFileEditor', function () {
             const msg = 'Success. Decoders has been updated';
             params.showRestartManager
               ? params.showRestartManager !== 'warn'
-                ? showRestartDialog(msg, params.showRestartManager)
+                ? showRestartMessage(msg, params.showRestartManager)
                 : errorHandler.handle(warnMsg, '', true)
               : errorHandler.info(msg, '');
           } else if (params.node) {
@@ -284,7 +284,7 @@ app.directive('wzXmlFileEditor', function () {
               }) configuration has been updated`;
             params.showRestartManager
               ? params.showRestartManager !== 'warn'
-                ? showRestartDialog(msg, params.node)
+                ? showRestartMessage(msg, params.node)
                 : errorHandler.handle(warnMsg, '', true)
               : errorHandler.info(msg, '');
           } else if (params.manager) {
@@ -297,16 +297,13 @@ app.directive('wzXmlFileEditor', function () {
             const msg = 'Success. Manager configuration has been updated';
             params.showRestartManager
               ? params.showRestartManager !== 'warn'
-                ? showRestartDialog(msg, params.showRestartManager)
+                ? showRestartMessage(msg, params.showRestartManager)
                 : errorHandler.handle(warnMsg, '', true)
               : errorHandler.info(msg, '');
           }
           if (close) $scope.closeFn({ reload: true });
         } catch (error) {
           errorHandler.handle(error, 'Error');
-          if (params.isNewFile) {
-            $scope.$emit('showFileNameInput', {});
-          }
         }
         return;
       };
@@ -351,7 +348,11 @@ app.directive('wzXmlFileEditor', function () {
         checkXmlParseError();
       });
 
-      const showRestartDialog = async (msg, target) => {
+      const showRestartMessage = async (msg, target) => {
+        console.log(`${msg}` + `. Do you want to restart the ${target} now?`);
+      };
+
+/*       const showRestartDialog = async (msg, target) => {
         const confirm = $mdDialog.confirm({
           controller: function (
             $scope,
@@ -461,7 +462,7 @@ app.directive('wzXmlFileEditor', function () {
         });
         $('body').addClass('md-dialog-body');
         $mdDialog.show(confirm);
-      };
+      }; */
 
       $scope.$on('saveXmlFile', (ev, params) => saveFile(params));
 

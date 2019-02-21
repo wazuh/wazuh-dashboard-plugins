@@ -146,7 +146,6 @@ export class ManagementController {
     try {
       this.isRestarting = true;
       const data = await this.configHandler.restartCluster();
-      this.isRestarting = false;
       this.errorHandler.info(`${data.data.data}. It will take up to 15 seconds...`);
       this.$scope.$applyAsync();
     } catch (error) {

@@ -47,7 +47,7 @@
                     </button>
                     <span flex></span>
                     <button ng-show="!showConfirmRestartNode" class="btn wz-button" ng-disabled="isRestarting" ng-click="showConfirmRestartNode = true"><i
-                            class="fa fa-refresh"></i>
+                            class="fa fa-refresh" ng-class="isRestarting ? 'fa-spin fa-spinner' : ''"></i>
                         Restart {{selectedNode}}
                     </button>
                     <div ng-show="showConfirmRestartNode" class="confirmEmbedBubble confirmEmbedBubbleInline">

@@ -22,11 +22,13 @@
         <div flex></div>
         <div layout="column" class="height-40 wz-no-padding">
             <button ng-if="mctrl.clusterInfo.status === 'enabled' && !mctrl.showConfirmRestart" class="btn wz-button height-35"
-                ng-disabled="mctrl.isRestarting" ng-click="mctrl.showConfirmRestart = true"><i class="fa fa-refresh"></i>
+                ng-disabled="mctrl.isRestarting" ng-click="mctrl.showConfirmRestart = true"><i class="fa fa-refresh"
+                    ng-class="mctrl.isRestarting ? 'fa-spin fa-spinner' : ''"></i>
                 Restart cluster
             </button>
             <button ng-if="mctrl.clusterInfo.status !== 'enabled' && !mctrl.showConfirmRestart" class="btn wz-button height-35"
-                ng-disabled="mctrl.isRestarting" ng-click="mctrl.showConfirmRestart = true"><i class="fa fa-refresh"></i>
+                ng-disabled="mctrl.isRestarting" ng-click="mctrl.showConfirmRestart = true"><i class="fa fa-refresh"
+                    ng-class="mctrl.isRestarting ? 'fa-spin fa-spinner' : ''"></i>
                 Restart manager
             </button>
             <div ng-show="mctrl.showConfirmRestart" class="confirmEmbedBubble confirmEmbedBubbleInline">
