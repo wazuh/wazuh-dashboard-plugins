@@ -394,8 +394,9 @@ export class AgentsController {
 
     this.$scope.cancelAddGroup = () => (this.$scope.addingGroupToAgent = false);
 
-    this.$scope.loadScaChecks = policy => this.$scope.lookingSca = { name: policy.name, id: policy.policy_id };
-    this.$scope.closeScaChecks = () => this.$scope.lookingSca = false;
+    this.$scope.loadScaChecks = policy =>
+      (this.$scope.lookingSca = { name: policy.name, id: policy.policy_id });
+    this.$scope.closeScaChecks = () => (this.$scope.lookingSca = false);
 
     this.$scope.confirmAddGroup = group => {
       this.groupHandler
@@ -539,7 +540,7 @@ export class AgentsController {
           (((agentInfo || {}).data || {}).data || {}).status ||
           this.$scope.agent.status;
       }
-    } catch (error) { } // eslint-disable-line
+    } catch (error) {} // eslint-disable-line
 
     try {
       this.$scope.showSyscheckFiles = false;
@@ -558,16 +559,22 @@ export class AgentsController {
       if (tab === 'sca') {
         try {
           this.$scope.load = true;
-          const policies = await this.apiReq.request('GET', `/sca/${this.$scope.agent.id}`, {});
+          const policies = await this.apiReq.request(
+            'GET',
+            `/sca/${this.$scope.agent.id}`,
+            {}
+          );
           this.$scope.policies = policies.data.data.items;
-        } catch (error) { this.$scope.policies = []; }
+        } catch (error) {
+          this.$scope.policies = [];
+        }
         this.$scope.load = false;
       }
 
       if (tab === 'syscollector')
         try {
           await this.loadSyscollector(this.$scope.agent.id);
-        } catch (error) { } // eslint-disable-line
+        } catch (error) {} // eslint-disable-line
       if (tab === 'configuration') {
         const isSync = await this.apiReq.request(
           'GET',
@@ -685,7 +692,7 @@ export class AgentsController {
           {}
         );
         netifaceResponse = ((resultNetiface || {}).data || {}).data || false;
-      } catch (error) { } // eslint-disable-line
+      } catch (error) {} // eslint-disable-line
 
       // This API call may fail so we put it out of Promise.all
       let netaddrResponse = false;
@@ -697,7 +704,7 @@ export class AgentsController {
         );
         netaddrResponse =
           ((resultNetaddrResponse || {}).data || {}).data || false;
-      } catch (error) { } // eslint-disable-line
+      } catch (error) {} // eslint-disable-line
 
       // Before proceeding, syscollector data is an empty object
       this.$scope.syscollector = {};
@@ -713,7 +720,7 @@ export class AgentsController {
       this.$scope.syscollector = {
         hardware:
           typeof hardwareResponse === 'object' &&
-            Object.keys(hardwareResponse).length
+          Object.keys(hardwareResponse).length
             ? { ...hardwareResponse }
             : false,
         os:
@@ -756,15 +763,23 @@ export class AgentsController {
 
       try {
         data[0] = await this.apiReq.request('GET', `/agents/${id}`, {});
-      } catch (error) { } //eslint-disable-line
+      } catch (error) {} //eslint-disable-line
 
       try {
-        data[1] = await this.apiReq.request('GET', `/syscheck/${id}/last_scan`, {});
-      } catch (error) { } //eslint-disable-line
+        data[1] = await this.apiReq.request(
+          'GET',
+          `/syscheck/${id}/last_scan`,
+          {}
+        );
+      } catch (error) {} //eslint-disable-line
 
       try {
-        data[2] = await this.apiReq.request('GET', `/rootcheck/${id}/last_scan`, {});
-      } catch (error) { } //eslint-disable-line
+        data[2] = await this.apiReq.request(
+          'GET',
+          `/rootcheck/${id}/last_scan`,
+          {}
+        );
+      } catch (error) {} //eslint-disable-line
 
       const result = data.map(item => ((item || {}).data || {}).data || false);
 
@@ -945,7 +960,7 @@ export class AgentsController {
     try {
       const isActive = ((this.$scope.agent || {}).status || '') === 'Active';
       if (!isActive) {
-        throw new Error('Agent is not active')
+        throw new Error('Agent is not active');
       }
       await this.apiReq.request(
         'PUT',
@@ -954,7 +969,7 @@ export class AgentsController {
       );
       this.errorHandler.info(
         `Policy monitoring scan launched successfully on agent ${
-        this.$scope.agent.id
+          this.$scope.agent.id
         }`,
         ''
       );
@@ -968,7 +983,7 @@ export class AgentsController {
     try {
       const isActive = ((this.$scope.agent || {}).status || '') === 'Active';
       if (!isActive) {
-        throw new Error('Agent is not active')
+        throw new Error('Agent is not active');
       }
       await this.apiReq.request('PUT', `/syscheck/${this.$scope.agent.id}`, {});
       this.errorHandler.info(

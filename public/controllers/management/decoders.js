@@ -297,7 +297,7 @@ export class DecodersController {
   toggleSaveConfig = () => {
     this.doingSaving = false;
     this.$scope.$applyAsync();
-  }
+  };
 
   doSaveConfig(isNewFile, fileName) {
     const clusterInfo = this.appState.getClusterInfo();
@@ -343,5 +343,5 @@ export class DecodersController {
 
   restart = () => {
     this.$scope.$emit('performRestart', {});
-  }
+  };
 }

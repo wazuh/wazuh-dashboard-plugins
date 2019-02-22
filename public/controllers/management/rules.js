@@ -163,10 +163,10 @@ export function RulesController(
         coloredString = coloredString.replace(
           /\$\(((?!<\/span>).)*?\)(?!<\/span>)/im,
           '<span style="color: ' +
-          colors[i] +
-          ' ">' +
-          valuesArray[i] +
-          '</span>'
+            colors[i] +
+            ' ">' +
+            valuesArray[i] +
+            '</span>'
         );
       }
     }
@@ -314,12 +314,12 @@ export function RulesController(
   $scope.toggleSaveConfig = () => {
     $scope.doingSaving = false;
     $scope.$applyAsync();
-  }
+  };
 
   $scope.toggleRestartMsg = () => {
     $scope.restartMsg = false;
     $scope.$applyAsync();
-  }
+  };
 
   $scope.doSaveConfig = (isNewFile, fileName) => {
     const clusterInfo = appState.getClusterInfo();
@@ -371,7 +371,7 @@ export function RulesController(
 
   $scope.restart = () => {
     $scope.$emit('performRestart', {});
-  }
+  };
 
   $rootScope.$on('showRestartMsg', () => {
     $scope.restartMsg = true;

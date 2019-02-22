@@ -17,7 +17,7 @@ import { checkGap } from '../wz-table/lib/check-gap';
 
 const app = uiModules.get('app/wazuh', []);
 
-app.directive('wzListManage', function () {
+app.directive('wzListManage', function() {
   return {
     restrict: 'E',
     scope: {
@@ -52,7 +52,7 @@ app.directive('wzListManage', function () {
       $scope.prevPage = () => pagination.prevPage($scope);
       $scope.nextPage = async currentPage =>
         pagination.nextPage(currentPage, $scope, errorHandler, null);
-      $scope.setPage = function () {
+      $scope.setPage = function() {
         $scope.currentPage = this.n;
         $scope.nextPage(this.n);
       };
@@ -62,7 +62,7 @@ app.directive('wzListManage', function () {
        */
       $scope.filterTable = data => {
         const result = Object.keys(data || $scope.currentList.list).map(
-          function (key) {
+          function(key) {
             return [key, $scope.currentList.list[key]];
           }
         );
@@ -190,16 +190,15 @@ app.directive('wzListManage', function () {
         fetch();
       };
 
-      const showRestartMessage = async (msg) => {
+      const showRestartMessage = async msg => {
         errorHandler.info(msg, '');
         $scope.restartMsg = true;
         $scope.$applyAsync();
       };
 
-
       $scope.restart = () => {
         $scope.$emit('performRestart', {});
-      }
+      };
 
       /*       const showRestartDialog = async (msg, target) => {
               const confirm = $mdDialog.confirm({

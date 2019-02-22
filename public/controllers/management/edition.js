@@ -117,10 +117,14 @@ export class EditionController {
           (clusterStatus.enabled === 'no' && clusterStatus.running === 'yes')
         ) {
           data = await this.configHandler.restartNode(selectedNode);
-          this.errorHandler.info(`${data.data.data}. It will take up to 15 seconds...`);
+          this.errorHandler.info(
+            `${data.data.data}. It will take up to 15 seconds...`
+          );
         } else {
           data = await this.configHandler.restartManager();
-          this.errorHandler.info(`${data.data.data}. It may take a few seconds...`);
+          this.errorHandler.info(
+            `${data.data.data}. It may take a few seconds...`
+          );
         }
         this.$scope.$emit('removeRestarting', {});
         this.$scope.isRestarting = false;
@@ -138,7 +142,7 @@ export class EditionController {
     this.$scope.toggleSaveConfig = () => {
       this.$scope.doingSaving = false;
       this.$scope.$applyAsync();
-    }
+    };
 
     this.$scope.saveConfiguration = async () => {
       try {
@@ -148,13 +152,13 @@ export class EditionController {
           clusterStatus.enabled === 'yes' && clusterStatus.running === 'yes';
         const parameters = enabledAndRunning
           ? {
-            node: this.$scope.selectedNode,
-            showRestartManager: 'cluster'
-          }
+              node: this.$scope.selectedNode,
+              showRestartManager: 'cluster'
+            }
           : {
-            manager: this.$scope.selectedNode,
-            showRestartManager: 'manager'
-          };
+              manager: this.$scope.selectedNode,
+              showRestartManager: 'manager'
+            };
         this.$scope.doingSaving = true;
         this.$scope.$applyAsync();
         this.$scope.$broadcast('saveXmlFile', parameters);

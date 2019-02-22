@@ -16,7 +16,7 @@ import { uiModules } from 'ui/modules';
 
 const app = uiModules.get('app/wazuh', []);
 
-app.directive('wzXmlFileEditor', function () {
+app.directive('wzXmlFileEditor', function() {
   return {
     restrict: 'E',
     scope: {
@@ -40,14 +40,13 @@ app.directive('wzXmlFileEditor', function () {
       configHandler,
       apiReq
     ) {
-
       $scope.configError = false;
       /**
        * Custom .replace method. Instead of using .replace which
        * evaluates regular expressions.
        * Alternative using split + join, same result.
        */
-      String.prototype.xmlReplace = function (str, newstr) {
+      String.prototype.xmlReplace = function(str, newstr) {
         return this.split(str).join(newstr);
       };
 
@@ -155,10 +154,10 @@ app.directive('wzXmlFileEditor', function () {
           var type = single
             ? 'single'
             : closing
-              ? 'closing'
-              : opening
-                ? 'opening'
-                : 'other';
+            ? 'closing'
+            : opening
+            ? 'opening'
+            : 'other';
           var fromTo = lastType + '->' + type;
           lastType = type;
           var padding = '';
@@ -198,22 +197,26 @@ app.directive('wzXmlFileEditor', function () {
           } else {
             validation = isCluster
               ? await apiReq.request(
-                'GET',
-                `/cluster/configuration/validation`,
-                {}
-              )
+                  'GET',
+                  `/cluster/configuration/validation`,
+                  {}
+                )
               : await apiReq.request(
-                'GET',
-                `/manager/configuration/validation`,
-                {}
-              );
+                  'GET',
+                  `/manager/configuration/validation`,
+                  {}
+                );
           }
           const data = ((validation || {}).data || {}).data || {};
           const isOk = data.status === 'OK';
-          if (!isOk && Array.isArray(data.details) && data.details.join().includes('Configuration error')) {
+          if (
+            !isOk &&
+            Array.isArray(data.details) &&
+            data.details.join().includes('Configuration error')
+          ) {
             $scope.configError = data.details;
             $scope.$applyAsync();
-            return Promise.reject()
+            return Promise.reject();
           }
           return true;
         } catch (error) {
@@ -282,7 +285,7 @@ app.directive('wzXmlFileEditor', function () {
             }
             const msg = `Success. Node (${
               params.node
-              }) configuration has been updated`;
+            }) configuration has been updated`;
             params.showRestartManager
               ? params.showRestartManager !== 'warn'
                 ? showRestartMessage(msg, params.node)
@@ -470,7 +473,7 @@ app.directive('wzXmlFileEditor', function () {
 
       $scope.$on('saveXmlFile', (ev, params) => saveFile(params));
 
-      $scope.$on('$destroy', function () {
+      $scope.$on('$destroy', function() {
         $location.search('editingFile', null);
         appState.setNavigation({ status: true });
       });
