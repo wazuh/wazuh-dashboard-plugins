@@ -316,7 +316,10 @@ export function RulesController(
     $scope.$applyAsync();
   }
 
-
+  $scope.toggleRestartMsg = () => {
+    $scope.restartMsg = false;
+    $scope.$applyAsync();
+  }
 
   $scope.doSaveConfig = (isNewFile, fileName) => {
     const clusterInfo = appState.getClusterInfo();

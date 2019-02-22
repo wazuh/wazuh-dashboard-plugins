@@ -86,9 +86,9 @@
                 <div ng-show="restartMsg" class="confirmEmbedBubble confirmEmbedBubbleInline">
                     <span class="wz-padding-top-10 wz-padding-left-8">Configuration is not applied yet. Do you want
                         to restart to apply it?</span>
-                    <button class="btn cancelBtn btn-info md-padding-h" type="button" ng-click="restartMsg = false">I
+                    <button class="btn cancelBtn btn-info md-padding-h" type="button" ng-click="toggleRestartMsg()">I
                         will do it later</button>
-                    <button class="btn wz-button" type="button" ng-disabled="doingSaving" ng-click="restart(); restartMsg = false">Restart
+                    <button class="btn wz-button" type="button" ng-disabled="doingSaving" ng-click="restart(); toggleRestartMsg()">Restart
                         now</button>
                 </div>
             </div>
