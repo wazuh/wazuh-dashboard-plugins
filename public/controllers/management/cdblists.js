@@ -14,6 +14,7 @@ import { stringToObj } from '../../utils/cdblist-to-object';
 
 export class CdbListsController {
   constructor(
+    $rootScope,
     $scope,
     errorHandler,
     appState,
@@ -24,6 +25,7 @@ export class CdbListsController {
     wazuhConfig,
     rulesetHandler
   ) {
+    this.$rootScope = $rootScope;
     this.$scope = $scope;
     this.errorHandler = errorHandler;
     this.appState = appState;
