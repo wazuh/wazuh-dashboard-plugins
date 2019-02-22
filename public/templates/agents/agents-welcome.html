@@ -17,22 +17,22 @@
 <div layout="column" class="" layout-align="start stretch" ng-if="tab === 'welcome'" ng-show="!load && agent">
 
     <!-- Headline -->
-    <div layout="row" layout-padding class="wz-margin-right-8">
+    <div layout="row" class="wz-margin-left-16 wz-margin-right-8">
         <span class="font-size-18"><i class="fa fa-fw fa-tv" aria-hidden="true"></i> {{ agent.name || '-' }} <span
                 class="wz-text-bold wz-text-link" ng-click="goDiscover()" tooltip="Discover"><i class="fa fa-fw fa-compass"
                     aria-hidden="true"></i></span></span>
         <span flex></span>
-        <button ng-show="!showConfirmRestartAgent" ng-disabled="restartingAgent" class="btn wz-button" ng-disabled="isRestarting"
+        <md-button ng-show="!showConfirmRestartAgent" ng-disabled="restartingAgent" class="wz-button" ng-disabled="isRestarting"
             ng-click="showConfirmRestartAgent = true"><i class="fa fa-refresh" ng-class="restartingAgent ? 'fa-spin fa-spinner' : ''"></i>
             Restart agent
-        </button>
-        <div ng-show="showConfirmRestartAgent" class="confirmEmbedBubble confirmEmbedBubbleInline">
+        </md-button>
+        <div ng-show="showConfirmRestartAgent" class="confirmEmbedBubble confirmEmbedBubbleInline wz-margin-right-8 wz-margin-top-8">
             <div layout="row no-wrap">
                 <span class="wz-padding-top-10 wz-padding-left-8">The agent will be restarted</span>
             </div>
             <div layout="row">
-                <md-button class="cancelBtn btn-info" type="button" ng-click="showConfirmRestartAgent = false">Cancel</md-button>
-                <md-button class="btn wz-button" type="button" ng-click="restartAgent(agent);showConfirmRestartAgent = false"><i
+                <md-button class="cancelBtn btn-info" ng-click="showConfirmRestartAgent = false">Cancel</md-button>
+                <md-button class="wz-button" ng-click="restartAgent(agent);showConfirmRestartAgent = false"><i
                         aria-hidden='true' class='fa fa-fw fa-check'></i>
                     Confirm</md-button>
             </div>
@@ -201,8 +201,7 @@
                         <wz-welcome-card class="euiFlexItem" logo="'icons/app_advanced_settings.svg'" title="'Policy monitoring'"
                             switch-tab="switchTab('pm')" current-tab="'pm'" description="TabDescription.pm.description"></wz-welcome-card>
                         <wz-welcome-card class="euiFlexItem" logo="'icons/app_timelion.svg'" title="'Configuration assessment'"
-                            switch-tab="switchTab('configuration-assessment')" current-tab="'configuration-assessment'"
-                            description="TabDescription['configuration-assessment'].description"></wz-welcome-card>
+                            switch-tab="switchTab('sca')" current-tab="'sca'" description="TabDescription['sca'].description"></wz-welcome-card>
                         <wz-welcome-card ng-if="extensions.audit && agent.isLinuxOS" class="euiFlexItem" logo="'icons/app_monitoring.svg'"
                             title="'System auditing'" switch-tab="switchTab('audit')" current-tab="'audit'" description="TabDescription.audit.description"></wz-welcome-card>
                         <wz-welcome-card ng-if="extensions.oscap && agent.isLinuxOS" class="euiFlexItem" logo="'icons/app_discover.svg'"

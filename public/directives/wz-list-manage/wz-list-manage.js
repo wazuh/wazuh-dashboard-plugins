@@ -255,7 +255,7 @@ app.directive('wzListManage', function () {
             '</md-dialog-content>' +
             '<md-dialog-actions>' +
             '<button class="md-primary md-cancel-button md-button ng-scope md-default-theme md-ink-ripple" type="button" ng-click="closeDialog()">I will do it later</button>' +
-            `<button class="md-primary md-confirm-button md-button md-ink-ripple md-default-theme" type="button" ng-click="confirmDialog()">Restart ${target}</button>` +
+            `<button class="wz-button md-confirm-button md-button md-ink-ripple md-default-theme" type="button" ng-click="confirmDialog()">Restart ${target}</button>` +
             '</md-dialog-actions>' +
             '</md-dialog>',
           hasBackdrop: false,
