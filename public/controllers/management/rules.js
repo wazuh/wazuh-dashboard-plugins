@@ -14,6 +14,7 @@ import * as FileSaver from '../../services/file-saver';
 import { colors } from './colors';
 
 export function RulesController(
+  $rootScope,
   $scope,
   $sce,
   errorHandler,
@@ -310,6 +311,13 @@ export function RulesController(
     $scope.$emit('fetchedFile', { data: $scope.fetchedXML });
   };
 
+  $scope.toggleSaveConfig = () => {
+    $scope.doingSaving = false;
+    $scope.$applyAsync();
+  }
+
+
+
   $scope.doSaveConfig = (isNewFile, fileName) => {
     const clusterInfo = appState.getClusterInfo();
     const showRestartManager =
@@ -334,6 +342,7 @@ export function RulesController(
           );
           return false;
         }
+        $scope.doingSaving = true;
         $scope.selectedItem = { file: fileName };
         $scope.$broadcast('saveXmlFile', {
           rule: $scope.selectedItem,
@@ -341,6 +350,7 @@ export function RulesController(
           isNewFile
         });
       } else {
+        $scope.doingSaving = true;
         const objParam = {
           rule: $scope.currentRule,
           showRestartManager
@@ -353,6 +363,15 @@ export function RulesController(
   $scope.$on('showFileNameInput', () => {
     $scope.newFile = true;
     $scope.selectedItem = { file: 'new file' };
+    $scope.$applyAsync();
+  });
+
+  $scope.restart = () => {
+    $scope.$emit('performRestart', {});
+  }
+
+  $rootScope.$on('showRestartMsg', () => {
+    $scope.restartMsg = true;
     $scope.$applyAsync();
   });
 }

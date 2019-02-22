@@ -23,12 +23,14 @@ export class EditionController {
    */
   constructor(
     $scope,
+    $rootScope,
     $location,
     errorHandler,
     apiReq,
     appState,
     configHandler
   ) {
+    this.$rootScope = $rootScope;
     this.$scope = $scope;
     this.errorHandler = errorHandler;
     this.apiReq = apiReq;
@@ -132,6 +134,12 @@ export class EditionController {
         this.$scope.isRestarting = false;
       }
     };
+
+    this.$scope.toggleSaveConfig = () => {
+      this.$scope.doingSaving = false;
+      this.$scope.$applyAsync();
+    }
+
     this.$scope.saveConfiguration = async () => {
       try {
         const clusterStatus =
@@ -147,10 +155,12 @@ export class EditionController {
             manager: this.$scope.selectedNode,
             showRestartManager: 'manager'
           };
-
+        this.$scope.doingSaving = true;
+        this.$scope.$applyAsync();
         this.$scope.$broadcast('saveXmlFile', parameters);
       } catch (error) {
         this.$scope.fetchedXML = null;
+        this.$scope.doingSaving = false;
         this.errorHandler.handle(error, 'Save file error');
       }
     };
@@ -172,6 +182,10 @@ export class EditionController {
     //listeners
     this.$scope.$on('wazuhShowNode', (event, parameters) => {
       return this.$scope.edit(parameters.node);
+    });
+    this.$rootScope.$on('showRestartMsg', () => {
+      this.$scope.restartMsg = true;
+      this.$scope.$applyAsync();
     });
   }
 
