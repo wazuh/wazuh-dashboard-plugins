@@ -182,13 +182,13 @@
                     <h3 class="euiTitle wzEuiTitle">Security Information Management</h3>
                     <div class="euiSpacer euiSpacer--m"></div>
                     <div class="euiFlexGrid euiFlexGrid--gutterLarge euiFlexGrid--halves">
-                        <wz-welcome-card class="euiFlexItem" logo="'icons/app_dashboard.svg'" title="'Security events'"
+                        <wz-welcome-card class="euiFlexItem" logo="'icons/app_dashboard.svg'" card-title="'Security events'"
                             switch-tab="switchTab('general')" current-tab="'general'" description="TabDescription.general.description"></wz-welcome-card>
-                        <wz-welcome-card class="euiFlexItem" logo="'icons/app_logging.svg'" title="'Integrity monitoring'"
+                        <wz-welcome-card class="euiFlexItem" logo="'icons/app_logging.svg'" card-title="'Integrity monitoring'"
                             switch-tab="switchTab('fim')" current-tab="'fim'" description="TabDescription.fim.description"></wz-welcome-card>
-                        <wz-welcome-card class="euiFlexItem" logo="'icons/app_devtools.svg'" title="'Configuration'"
+                        <wz-welcome-card class="euiFlexItem" logo="'icons/app_devtools.svg'" card-title="'Configuration'"
                             switch-tab="switchTab('configuration')" current-tab="'configuration'" description="TabDescription.configuration.description"></wz-welcome-card>
-                        <wz-welcome-card class="euiFlexItem" logo="'icons/app_index_pattern.svg'" title="'Inventory data'"
+                        <wz-welcome-card class="euiFlexItem" logo="'icons/app_index_pattern.svg'" card-title="'Inventory data'"
                             switch-tab="switchTab('syscollector')" current-tab="'syscollector'" description="TabDescription.syscollector.description"></wz-welcome-card>
                     </div>
                 </div>
@@ -198,16 +198,16 @@
                     <h3 class="euiTitle wzEuiTitle">Auditing and Policy Monitoring</h3>
                     <div class="euiSpacer euiSpacer--m"></div>
                     <div class="euiFlexGrid euiFlexGrid--gutterLarge euiFlexGrid--halves">
-                        <wz-welcome-card class="euiFlexItem" logo="'icons/app_advanced_settings.svg'" title="'Policy monitoring'"
+                        <wz-welcome-card class="euiFlexItem" logo="'icons/app_advanced_settings.svg'" card-title="'Policy monitoring'"
                             switch-tab="switchTab('pm')" current-tab="'pm'" description="TabDescription.pm.description"></wz-welcome-card>
-                        <wz-welcome-card class="euiFlexItem" logo="'icons/app_timelion.svg'" title="'Configuration assessment'"
+                        <wz-welcome-card class="euiFlexItem" logo="'icons/app_timelion.svg'" card-title="'Configuration assessment'"
                             switch-tab="switchTab('sca')" current-tab="'sca'" description="TabDescription['sca'].description"></wz-welcome-card>
                         <wz-welcome-card ng-if="extensions.audit && agent.isLinuxOS" class="euiFlexItem" logo="'icons/app_monitoring.svg'"
-                            title="'System auditing'" switch-tab="switchTab('audit')" current-tab="'audit'" description="TabDescription.audit.description"></wz-welcome-card>
+                            card-title="'System auditing'" switch-tab="switchTab('audit')" current-tab="'audit'" description="TabDescription.audit.description"></wz-welcome-card>
                         <wz-welcome-card ng-if="extensions.oscap && agent.isLinuxOS" class="euiFlexItem" logo="'icons/app_discover.svg'"
-                            title="'OpenSCAP'" switch-tab="switchTab('oscap')" current-tab="'oscap'" description="TabDescription.oscap.description"></wz-welcome-card>
+                            card-title="'OpenSCAP'" switch-tab="switchTab('oscap')" current-tab="'oscap'" description="TabDescription.oscap.description"></wz-welcome-card>
                         <wz-welcome-card ng-if="extensions.ciscat" class="euiFlexItem" logo="'icons/app_management.svg'"
-                            title="'CIS-CAT'" switch-tab="switchTab('ciscat')" current-tab="'ciscat'" description="TabDescription.ciscat.description"></wz-welcome-card>
+                            card-title="'CIS-CAT'" switch-tab="switchTab('ciscat')" current-tab="'ciscat'" description="TabDescription.ciscat.description"></wz-welcome-card>
                     </div>
                 </div>
             </div>
@@ -222,13 +222,13 @@
                         <h3 class="euiTitle wzEuiTitle">Threat Detection and Response</h3>
                         <div class="euiSpacer euiSpacer--m"></div>
                         <div class="euiFlexGrid euiFlexGrid--gutterLarge euiFlexGrid--halves">
-                            <wz-welcome-card class="euiFlexItem" logo="'icons/app_security.svg'" title="'Vulnerabilities'"
+                            <wz-welcome-card class="euiFlexItem" logo="'icons/app_security.svg'" card-title="'Vulnerabilities'"
                                 switch-tab="switchTab('vuls')" current-tab="'vuls'" description="TabDescription.vuls.description"></wz-welcome-card>
                             <wz-welcome-card ng-if="extensions.virustotal" class="euiFlexItem" logo="'icons/app_saved_objects.svg'"
-                                title="'VirusTotal'" switch-tab="switchTab('virustotal')" current-tab="'virustotal'"
+                                card-title="'VirusTotal'" switch-tab="switchTab('virustotal')" current-tab="'virustotal'"
                                 description="TabDescription.virustotal.description"></wz-welcome-card>
                             <wz-welcome-card ng-if="extensions.osquery" class="euiFlexItem" logo="'icons/osquery.svg'"
-                                title="'Osquery'" switch-tab="switchTab('osquery')" current-tab="'osquery'" description="TabDescription.osquery.description"></wz-welcome-card>
+                                card-title="'Osquery'" switch-tab="switchTab('osquery')" current-tab="'osquery'" description="TabDescription.osquery.description"></wz-welcome-card>
                         </div>
                     </div>
                 </div>
@@ -238,10 +238,10 @@
                     <h3 class="euiTitle wzEuiTitle">Regulatory Compliance</h3>
                     <div class="euiSpacer euiSpacer--m"></div>
                     <div class="euiFlexGrid euiFlexGrid--gutterLarge euiFlexGrid--halves">
-                        <wz-welcome-card ng-if="extensions.pci" class="euiFlexItem" logo="'icons/app_apm.svg'" title="'PCI DSS'"
+                        <wz-welcome-card ng-if="extensions.pci" class="euiFlexItem" logo="'icons/app_apm.svg'" card-title="'PCI DSS'"
                             switch-tab="switchTab('pci')" current-tab="'pci'" description="TabDescription.pci.description"></wz-welcome-card>
                         <wz-welcome-card ng-if="extensions.gdpr" class="euiFlexItem" logo="'icons/app_visualize.svg'"
-                            title="'GDPR'" switch-tab="switchTab('gdpr')" current-tab="'gdpr'" description="TabDescription.gdpr.description"></wz-welcome-card>
+                            card-title="'GDPR'" switch-tab="switchTab('gdpr')" current-tab="'gdpr'" description="TabDescription.gdpr.description"></wz-welcome-card>
                     </div>
                 </div>
             </div>

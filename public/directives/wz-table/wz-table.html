@@ -113,7 +113,8 @@
 </div>
 
 <div layout="row" ng-show="!error && !wazuh_table_loading && items.length" ng-if="isPolicyMonitoring()">
-    <table class="table table-striped table-condensed table-hover" style="table-layout: fixed !important" id="wz_table">
+    <table class="table table-striped table-striped-duo table-condensed table-hover" style="table-layout: fixed !important"
+        id="wz_table">
         <thead class="wz-text-bold">
             <th ng-repeat="key in keys" class="wz-text-left" ng-class="{ 'cursor-pointer' : !key.nosortable, 'col-lg-1' : !key.size, 'col-lg-{{key.size}}' : key.size }"
                 ng-click="!key.nosortable && sort(key)">
@@ -124,10 +125,13 @@
         </thead>
         <tbody>
             <tr class="wz-word-wrap cursor-pointer" ng-repeat-start="item in pagedItems[currentPage] | filter:{item:'!'}"
-                ng-click="expandPolicyMonitoringCheck(item)">
+                ng-click="expandPolicyMonitoringCheck(item)" ng-class="(item.expanded) ? 'selected' : ''">
                 <td ng-repeat="key in keys">
                     <div class="wz-text-truncatable">
                         <span>
+                            <span ng-show="key === 'result'" class="no-wrap">
+                                <p class="round status little" ng-class="(item.result === 'passed') ? 'teal' : 'red'"></p>&nbsp;&nbsp;
+                            </span>
                             {{
                             parseValue(key,item)
                             }}
@@ -135,29 +139,52 @@
                     </div>
                 </td>
             </tr>
-            <tr class="wz-word-wrap" style="background-color: #ecf6fb !important" ng-if="item.expanded" ng-repeat-end="">
-                <td colspan="3">
-                    <div layout="column" ng-if="item.rationale" class="wz-margin-top-10">
-                        <span class="wz-headline-title"><strong>Rationale</strong></span>
-                        <md-divider class="wz-margin-top-10"></md-divider>
-                        <p class="wz-margin-top-10">{{item.rationale}}</p>
+            <tr class="wz-word-wrap cursor-pointer selected" ng-show="item.expanded" ng-repeat-end="" ng-click="expandPolicyMonitoringCheck(item)">
+                <td colspan="3" style="border-top: none">
+                    <div layout="row" layout-padding="" class="layout-padding layout-row">
+                        <md-card flex="" class="wz-md-card wz-padding-top-0 wz-padding-bottom-0 wz-no-margin _md flex">
+                            <md-card-content>
+                                <div>
+                                    <div class="euiFlexItem euiFlexItem--flexGrowZero" ng-if="item.rationale">
+                                        <div class="euiStat euiStat--leftAligned">
+                                            <p class="euiTitle euiTitle--small euiStat__title ng-binding" style="font-size: 1.15rem;">Rationale</p>
+                                            <div class="euiText euiText--small euiStat__description wz-text-gray">
+                                                <p>{{item.rationale}}</p>
+                                            </div>
+                                        </div>
+                                        <div layout="column" class="wz-margin-bottom-10"></div>
+                                    </div>
+                                    <div class="euiFlexItem euiFlexItem--flexGrowZero" ng-if="item.remediation">
+                                        <div class="euiStat euiStat--leftAligned">
+                                            <p class="euiTitle euiTitle--small euiStat__title ng-binding" style="font-size: 1.15rem;">Remediation</p>
+                                            <div class="euiText euiText--small euiStat__description wz-text-gray">
+                                                <p>{{item.remediation}}</p>
+                                            </div>
+                                        </div>
+                                        <div layout="column" class="wz-margin-bottom-10"></div>
+                                    </div>
+                                    <div class="euiFlexItem euiFlexItem--flexGrowZero" ng-if="item.directory">
+                                        <div class="euiStat euiStat--leftAligned">
+                                            <p class="euiTitle euiTitle--small euiStat__title ng-binding" style="font-size: 1.15rem;">Path(s)</p>
+                                            <div class="euiText euiText--small euiStat__description wz-text-gray">
+                                                <p>{{item.directory}}</p>
+                                            </div>
+                                        </div>
+                                        <div layout="column" class="wz-margin-bottom-10"></div>
+                                    </div>
+                                    <div class="euiFlexItem euiFlexItem--flexGrowZero" ng-if="item.compliance && item.compliance.length > 0">
+                                        <div class="euiStat euiStat--leftAligned">
+                                            <p class="euiTitle euiTitle--small euiStat__title ng-binding" style="font-size: 1.15rem;">Compliance</p>
+                                            <div class="euiText euiText--small euiStat__description wz-text-gray">
+                                                <p><span class="wz-padding-right-8" ng-repeat="c in item.compliance">{{c.key}}/{{c.value}}</span></p>
+                                            </div>
+                                        </div>
+                                        <div layout="column" class="wz-margin-bottom-10"></div>
+                                    </div>
+                                </div>
+                            </md-card-content>
+                        </md-card>
                     </div>
-                    <div layout="column" ng-if="item.remediation" class="wz-margin-top-10">
-                        <span class="wz-headline-title"><strong>Remediation</strong></span>
-                        <md-divider class="wz-margin-top-10"></md-divider>
-                        <p class="wz-margin-top-10">{{item.remediation}}</p>
-                    </div>
-                    <div layout="column" ng-if="item.directory" class="wz-margin-top-10">
-                        <span class="wz-headline-title"><strong>Path(s)</strong></span>
-                        <md-divider class="wz-margin-top-10"></md-divider>
-                        <p class="wz-margin-top-10">{{ item.directory }}</p>
-                    </div>
-                    <div layout="column" ng-if="item.compliance" class="wz-margin-top-10">
-                        <span class="wz-headline-title"><strong>Compliance</strong></span>
-                        <md-divider class="wz-margin-top-10"></md-divider>
-                        <p class="wz-margin-top-10"><span class="wz-padding-right-8" ng-repeat="c in item.compliance">{{c.key}}/{{c.value}}</span></p>
-                    </div>
-                    <div layout="column" class="wz-margin-top-10"></div>
                 </td>
             </tr>
         </tbody>
