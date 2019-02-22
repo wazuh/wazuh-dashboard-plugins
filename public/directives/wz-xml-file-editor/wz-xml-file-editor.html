@@ -1,14 +1,14 @@
 <div class='wzXmlEditor'>
-    <div class='wzXmlEditorHeader'>
-        <span>Edit <b>{{fileName}}</b> of <b>{{targetName}}</b> <span tooltip='{{xmlError}}' class="wz-agent-status-indicator small red-text"
-                ng-if="xmlError">{{xmlError}}</span></span>
-    </div>
-    <div layout="row" ng-if="configError">
+    <div layout="row" ng-if="configError" class="extraHeader">
         <md-list>
             <md-list-item class="error-enum-configuration" ng-repeat="error in configError | unique: error">
                 <span class="wz-agent-status-indicator small red-text">{{error}}</span>
             </md-list-item>
         </md-list>
+    </div>
+    <div class='wzXmlEditorHeader'>
+        <span>Edit <b>{{fileName}}</b> of <b>{{targetName}}</b> <span tooltip='{{xmlError}}' class="wz-agent-status-indicator small red-text"
+                ng-if="xmlError">{{xmlError}}</span></span>
     </div>
     <div class='wzXmlEditorBody' ng-show='!loadingFile'>
         <textarea id='xml_box'></textarea>
