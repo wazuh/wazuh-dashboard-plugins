@@ -99,7 +99,6 @@ class WzConfigViewer {
     $scope.$on('XMLContentReady', (ev, params) => {
       refreshXmlBox(params.data);
     });
-
   }
 }
 

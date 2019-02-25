@@ -79,6 +79,17 @@ export class DecodersController {
       this.viewingDetail = true;
       if (!this.$scope.$$phase) this.$scope.$digest();
     });
+
+    this.$scope.$on('showFileNameInput', () => {
+      this.newFile = true;
+      this.selectedItem = { file: 'new file' };
+      this.$scope.$applyAsync();
+    });
+
+    this.$scope.$on('showRestartMsg', () => {
+      this.restartMsg = true;
+      this.$scope.$applyAsync();
+    });
   }
 
   /**
@@ -281,6 +292,11 @@ export class DecodersController {
     this.$scope.$emit('fetchedFile', { data: this.fetchedXML });
   }
 
+  toggleSaveConfig = () => {
+    this.doingSaving = false;
+    this.$scope.$applyAsync();
+  };
+
   doSaveConfig(isNewFile, fileName) {
     const clusterInfo = this.appState.getClusterInfo();
     const showRestartManager =
@@ -306,17 +322,19 @@ export class DecodersController {
           return false;
         }
         this.selectedItem = { file: fileName };
-        this.$scope.$broadcast('saveXmlFile', {
-          decoder: this.selectedItem,
-          showRestartManager
-        });
-      } else {
-        const objParam = {
-          decoder: this.currentDecoder,
-          showRestartManager
-        };
-        this.$scope.$broadcast('saveXmlFile', objParam);
       }
+      this.doingSaving = true;
+      const objParam = {
+        decoder: isNewFile ? this.selectedItem : this.currentDecoder,
+        showRestartManager,
+        isNewFile: !!isNewFile
+      };
+
+      this.$scope.$broadcast('saveXmlFile', objParam);
     }
   }
+
+  restart = () => {
+    this.$scope.$emit('performRestart', {});
+  };
 }

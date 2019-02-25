@@ -95,6 +95,11 @@ export class ManagementController {
       this.isRestarting = false;
       this.$scope.$applyAsync();
     });
+    this.$rootScope.$on('performRestart', () => {
+      this.clusterInfo.status === 'enabled'
+        ? this.restartCluster()
+        : this.restartManager();
+    });
     this.appState = appState;
   }
 
@@ -131,7 +136,7 @@ export class ManagementController {
       this.isRestarting = true;
       const data = await this.configHandler.restartManager();
       this.isRestarting = false;
-      this.errorHandler.info(data.data.data, '');
+      this.errorHandler.info(`${data.data.data}. It may take a few seconds.`);
       this.$scope.$applyAsync();
     } catch (error) {
       this.isRestarting = false;
@@ -146,8 +151,9 @@ export class ManagementController {
     try {
       this.isRestarting = true;
       const data = await this.configHandler.restartCluster();
-      this.isRestarting = false;
-      this.errorHandler.info('It may take a few seconds...', data.data.data);
+      this.errorHandler.info(
+        `${data.data.data}. It will take up to 15 seconds.`
+      );
       this.$scope.$applyAsync();
     } catch (error) {
       this.isRestarting = false;

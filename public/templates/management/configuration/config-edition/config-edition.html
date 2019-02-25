@@ -40,14 +40,23 @@
                     <button ng-disabled='xmlHasErrors' ng-click="switchConfigurationTab('welcome', false)" class='btn btn-info'>
                         <span>Cancel</span>
                     </button>
-                    <button ng-disabled='xmlHasErrors' ng-click='saveConfiguration()' class='btn wz-button wz-margin-left-8'>
-                        <span ng-show='!xmlHasErrors'><i aria-hidden='true' class='fa fa-fw fa-save'></i>Save</span>
+                    <button ng-disabled='xmlHasErrors || doingSaving || isRestarting' ng-click='saveConfiguration()'
+                        class='btn wz-button wz-margin-left-8'>
+                        <span ng-show='!xmlHasErrors'><i aria-hidden='true' class='fa fa-fw fa-save' ng-class="doingSaving ? 'fa-spin fa-spinner' : ''"></i>Save</span>
                         <span ng-show='xmlHasErrors' class='btn-danger'><i aria-hidden='true' class='fa fa-fw fa-exclamation-triangle'></i>
                             XML format error</span>
                     </button>
-                    <span flex></span>
-                    <button ng-show="!showConfirmRestartNode" class="btn wz-button" ng-disabled="isRestarting" ng-click="showConfirmRestartNode = true"><i
-                            class="fa fa-refresh"></i>
+                    <span flex ng-if="!restartMsg"></span>
+                    <div ng-show="restartMsg" class="confirmEmbedBubble confirmEmbedBubbleInline">
+                        <span class="wz-padding-top-10 wz-padding-left-8">Configuration is not applied yet. Do you want
+                            to restart <b>{{selectedNode}}</b> to apply it?</span>
+                        <button class="btn cancelBtn btn-info md-padding-h" type="button" ng-click="restartMsg = false">I
+                            will do it later</button>
+                        <button class="btn wz-button" type="button" ng-disabled="doingSaving" ng-click="restartNode(selectedNode); restartMsg = false">Restart
+                            <b>{{selectedNode}}</b> now</button>
+                    </div>
+                    <button ng-show="!showConfirmRestartNode && !restartMsg" class="btn wz-button" ng-disabled="isRestarting || doingSaving"
+                        ng-click="showConfirmRestartNode = true"><i class="fa fa-refresh" ng-class="isRestarting ? 'fa-spin fa-spinner' : ''"></i>
                         Restart {{selectedNode}}
                     </button>
                     <div ng-show="showConfirmRestartNode" class="confirmEmbedBubble confirmEmbedBubbleInline">
@@ -66,7 +75,7 @@
                 </div>
                 <div class="md-padding md-padding-top-10" style="height: calc(100vh - 215px);" ng-if="fetchedXML">
                     <wz-xml-file-editor file-name='ossec.conf' data="fetchedXML" target-name="selectedNode" valid-fn='xmlIsValid(valid)'
-                        close-fn='closeEditingFile(reload)'>
+                        saving-param='toggleSaveConfig()' close-fn='closeEditingFile(reload)'>
                     </wz-xml-file-editor>
                 </div>
             </div>

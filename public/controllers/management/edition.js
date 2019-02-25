@@ -115,12 +115,17 @@ export class EditionController {
           (clusterStatus.enabled === 'no' && clusterStatus.running === 'yes')
         ) {
           data = await this.configHandler.restartNode(selectedNode);
+          this.errorHandler.info(
+            `${data.data.data}. It will take up to 15 seconds.`
+          );
         } else {
           data = await this.configHandler.restartManager();
+          this.errorHandler.info(
+            `${data.data.data}. It may take a few seconds.`
+          );
         }
         this.$scope.$emit('removeRestarting', {});
         this.$scope.isRestarting = false;
-        this.errorHandler.info('It may take a few seconds...', data.data.data);
         this.$scope.$applyAsync();
       } catch (error) {
         this.errorHandler.handle(
@@ -131,6 +136,12 @@ export class EditionController {
         this.$scope.isRestarting = false;
       }
     };
+
+    this.$scope.toggleSaveConfig = () => {
+      this.$scope.doingSaving = false;
+      this.$scope.$applyAsync();
+    };
+
     this.$scope.saveConfiguration = async () => {
       try {
         const clusterStatus =
@@ -146,10 +157,12 @@ export class EditionController {
               manager: this.$scope.selectedNode,
               showRestartManager: 'manager'
             };
-
+        this.$scope.doingSaving = true;
+        this.$scope.$applyAsync();
         this.$scope.$broadcast('saveXmlFile', parameters);
       } catch (error) {
         this.$scope.fetchedXML = null;
+        this.$scope.doingSaving = false;
         this.errorHandler.handle(error, 'Save file error');
       }
     };
@@ -171,6 +184,10 @@ export class EditionController {
     //listeners
     this.$scope.$on('wazuhShowNode', (event, parameters) => {
       return this.$scope.edit(parameters.node);
+    });
+    this.$scope.$on('showRestartMsg', () => {
+      this.$scope.restartMsg = true;
+      this.$scope.$applyAsync();
     });
   }
 

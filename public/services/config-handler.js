@@ -10,8 +10,10 @@
  * Find more information about this on the LICENSE file.
  */
 export class ConfigHandler {
-  constructor(apiReq) {
+  constructor($rootScope, apiReq, errorHandler) {
     this.apiReq = apiReq;
+    this.$rootScope = $rootScope;
+    this.errorHandler = errorHandler;
   }
 
   /**
@@ -46,6 +48,16 @@ export class ConfigHandler {
       return result;
     } catch (error) {
       return Promise.reject(error);
+    }
+  }
+
+  async performClusterRestart() {
+    try {
+      await this.apiReq.request('PUT', `/cluster/restart`, {});
+      this.$rootScope.$emit('removeRestarting', {});
+    } catch (error) {
+      this.$rootScope.$emit('removeRestarting', {});
+      this.errorHandler.handle(error, 'Error restarting cluster');
     }
   }
 
@@ -91,9 +103,10 @@ export class ConfigHandler {
         const str = data.details.join();
         throw new Error(str);
       }
-
-      const result = await this.apiReq.request('PUT', `/cluster/restart`, {});
-      return result;
+      setTimeout(() => {
+        this.performClusterRestart();
+      }, 15000);
+      return { data: { data: 'Restarting cluster' } };
     } catch (error) {
       return Promise.reject(error);
     }

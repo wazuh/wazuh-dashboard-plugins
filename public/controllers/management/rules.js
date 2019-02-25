@@ -162,10 +162,10 @@ export function RulesController(
         coloredString = coloredString.replace(
           /\$\(((?!<\/span>).)*?\)(?!<\/span>)/im,
           '<span style="color: ' +
-            colors[i] +
-            ' ">' +
-            valuesArray[i] +
-            '</span>'
+          colors[i] +
+          ' ">' +
+          valuesArray[i] +
+          '</span>'
         );
       }
     }
@@ -310,6 +310,16 @@ export function RulesController(
     $scope.$emit('fetchedFile', { data: $scope.fetchedXML });
   };
 
+  $scope.toggleSaveConfig = () => {
+    $scope.doingSaving = false;
+    $scope.$applyAsync();
+  };
+
+  $scope.toggleRestartMsg = () => {
+    $scope.restartMsg = false;
+    $scope.$applyAsync();
+  };
+
   $scope.doSaveConfig = (isNewFile, fileName) => {
     const clusterInfo = appState.getClusterInfo();
     const showRestartManager =
@@ -335,17 +345,30 @@ export function RulesController(
           return false;
         }
         $scope.selectedItem = { file: fileName };
-        $scope.$broadcast('saveXmlFile', {
-          rule: $scope.selectedItem,
-          showRestartManager
-        });
-      } else {
-        const objParam = {
-          rule: $scope.currentRule,
-          showRestartManager
-        };
-        $scope.$broadcast('saveXmlFile', objParam);
       }
+      $scope.doingSaving = true;
+      const objParam = {
+        rule: isNewFile ? $scope.selectedItem : $scope.currentRule,
+        showRestartManager,
+        isNewFile: !!isNewFile
+      };
+
+      $scope.$broadcast('saveXmlFile', objParam);
     }
   };
+
+  $scope.$on('showFileNameInput', () => {
+    $scope.newFile = true;
+    $scope.selectedItem = { file: 'new file' };
+    $scope.$applyAsync();
+  });
+
+  $scope.restart = () => {
+    $scope.$emit('performRestart', {});
+  };
+
+  $scope.$on('showRestartMsg', () => {
+    $scope.restartMsg = true;
+    $scope.$applyAsync();
+  });
 }

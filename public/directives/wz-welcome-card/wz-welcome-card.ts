@@ -26,7 +26,7 @@ class WzWelcomeCard {
     constructor(appState: any) {
         this.restrict = 'E';
         this.scope = {
-            title: '=title',
+            cardTitle: '=cardTitle',
             description: '=description',
             logo: '=logo',
             switchTab: '&',
