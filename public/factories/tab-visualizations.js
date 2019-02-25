@@ -43,7 +43,7 @@ export class TabVisualizations {
       audit: 15,
       pci: 5,
       gdpr: 5,
-      aws: 6,
+      aws: 7,
       virustotal: 7,
       osquery: 5
     };
