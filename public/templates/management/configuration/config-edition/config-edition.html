@@ -40,7 +40,7 @@
                     <button ng-disabled='xmlHasErrors' ng-click="switchConfigurationTab('welcome', false)" class='btn btn-info'>
                         <span>Cancel</span>
                     </button>
-                    <button ng-disabled='xmlHasErrors || doingSaving ||isRestarting' ng-click='saveConfiguration()'
+                    <button ng-disabled='xmlHasErrors || doingSaving || isRestarting' ng-click='saveConfiguration()'
                         class='btn wz-button wz-margin-left-8'>
                         <span ng-show='!xmlHasErrors'><i aria-hidden='true' class='fa fa-fw fa-save' ng-class="doingSaving ? 'fa-spin fa-spinner' : ''"></i>Save</span>
                         <span ng-show='xmlHasErrors' class='btn-danger'><i aria-hidden='true' class='fa fa-fw fa-exclamation-triangle'></i>

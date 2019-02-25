@@ -23,14 +23,12 @@ export class EditionController {
    */
   constructor(
     $scope,
-    $rootScope,
     $location,
     errorHandler,
     apiReq,
     appState,
     configHandler
   ) {
-    this.$rootScope = $rootScope;
     this.$scope = $scope;
     this.errorHandler = errorHandler;
     this.apiReq = apiReq;
@@ -118,12 +116,12 @@ export class EditionController {
         ) {
           data = await this.configHandler.restartNode(selectedNode);
           this.errorHandler.info(
-            `${data.data.data}. It will take up to 15 seconds...`
+            `${data.data.data}. It will take up to 15 seconds.`
           );
         } else {
           data = await this.configHandler.restartManager();
           this.errorHandler.info(
-            `${data.data.data}. It may take a few seconds...`
+            `${data.data.data}. It may take a few seconds.`
           );
         }
         this.$scope.$emit('removeRestarting', {});
@@ -187,7 +185,7 @@ export class EditionController {
     this.$scope.$on('wazuhShowNode', (event, parameters) => {
       return this.$scope.edit(parameters.node);
     });
-    this.$rootScope.$on('showRestartMsg', () => {
+    this.$scope.$on('showRestartMsg', () => {
       this.$scope.restartMsg = true;
       this.$scope.$applyAsync();
     });

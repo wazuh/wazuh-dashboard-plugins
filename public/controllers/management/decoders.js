@@ -24,7 +24,6 @@ export class DecodersController {
    * @param {*} wzTableFilter
    */
   constructor(
-    $rootScope,
     $scope,
     $sce,
     $location,
@@ -35,7 +34,6 @@ export class DecodersController {
     wazuhConfig,
     rulesetHandler
   ) {
-    this.$rootScope = $rootScope;
     this.$scope = $scope;
     this.$sce = $sce;
     this.errorHandler = errorHandler;
@@ -88,7 +86,7 @@ export class DecodersController {
       this.$scope.$applyAsync();
     });
 
-    this.$rootScope.$on('showRestartMsg', () => {
+    this.$scope.$on('showRestartMsg', () => {
       this.restartMsg = true;
       this.$scope.$applyAsync();
     });
@@ -324,20 +322,15 @@ export class DecodersController {
           return false;
         }
         this.selectedItem = { file: fileName };
-        this.doingSaving = true;
-        this.$scope.$broadcast('saveXmlFile', {
-          decoder: this.selectedItem,
-          showRestartManager,
-          isNewFile
-        });
-      } else {
-        this.doingSaving = true;
-        const objParam = {
-          decoder: this.currentDecoder,
-          showRestartManager
-        };
-        this.$scope.$broadcast('saveXmlFile', objParam);
       }
+      this.doingSaving = true;
+      const objParam = {
+        decoder: this.currentDecoder,
+        showRestartManager,
+        isNewFile: !!isNewFile
+      };
+
+      this.$scope.$broadcast('saveXmlFile', objParam);
     }
   }
 

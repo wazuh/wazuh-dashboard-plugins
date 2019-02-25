@@ -16,7 +16,7 @@ import { uiModules } from 'ui/modules';
 
 const app = uiModules.get('app/wazuh', []);
 
-app.directive('wzXmlFileEditor', function() {
+app.directive('wzXmlFileEditor', function () {
   return {
     restrict: 'E',
     scope: {
@@ -46,7 +46,7 @@ app.directive('wzXmlFileEditor', function() {
        * evaluates regular expressions.
        * Alternative using split + join, same result.
        */
-      String.prototype.xmlReplace = function(str, newstr) {
+      String.prototype.xmlReplace = function (str, newstr) {
         return this.split(str).join(newstr);
       };
 
@@ -154,10 +154,10 @@ app.directive('wzXmlFileEditor', function() {
           var type = single
             ? 'single'
             : closing
-            ? 'closing'
-            : opening
-            ? 'opening'
-            : 'other';
+              ? 'closing'
+              : opening
+                ? 'opening'
+                : 'other';
           var fromTo = lastType + '->' + type;
           lastType = type;
           var padding = '';
@@ -197,15 +197,15 @@ app.directive('wzXmlFileEditor', function() {
           } else {
             validation = isCluster
               ? await apiReq.request(
-                  'GET',
-                  `/cluster/configuration/validation`,
-                  {}
-                )
+                'GET',
+                `/cluster/configuration/validation`,
+                {}
+              )
               : await apiReq.request(
-                  'GET',
-                  `/manager/configuration/validation`,
-                  {}
-                );
+                'GET',
+                `/manager/configuration/validation`,
+                {}
+              );
           }
           const data = ((validation || {}).data || {}).data || {};
           const isOk = data.status === 'OK';
@@ -246,7 +246,7 @@ app.directive('wzXmlFileEditor', function() {
               ? params.showRestartManager !== 'warn'
                 ? showRestartMessage(msg, params.showRestartManager)
                 : errorHandler.handle(warnMsg, '', true)
-              : errorHandler.info(msg, '');
+              : errorHandler.info(msg);
           } else if (params.rule) {
             close = false;
             await rulesetHandler.sendRuleConfiguration(params.rule, xml);
@@ -260,7 +260,7 @@ app.directive('wzXmlFileEditor', function() {
               ? params.showRestartManager !== 'warn'
                 ? showRestartMessage(msg, params.showRestartManager)
                 : errorHandler.handle(warnMsg, '', true)
-              : errorHandler.info(msg, '');
+              : errorHandler.info(msg);
           } else if (params.decoder) {
             close = false;
             await rulesetHandler.sendDecoderConfiguration(params.decoder, xml);
@@ -274,7 +274,7 @@ app.directive('wzXmlFileEditor', function() {
               ? params.showRestartManager !== 'warn'
                 ? showRestartMessage(msg, params.showRestartManager)
                 : errorHandler.handle(warnMsg, '', true)
-              : errorHandler.info(msg, '');
+              : errorHandler.info(msg);
           } else if (params.node) {
             close = false;
             await configHandler.saveNodeConfiguration(params.node, xml);
@@ -285,12 +285,12 @@ app.directive('wzXmlFileEditor', function() {
             }
             const msg = `Success. Node (${
               params.node
-            }) configuration has been updated`;
+              }) configuration has been updated`;
             params.showRestartManager
               ? params.showRestartManager !== 'warn'
                 ? showRestartMessage(msg, params.node)
                 : errorHandler.handle(warnMsg, '', true)
-              : errorHandler.info(msg, '');
+              : errorHandler.info(msg);
           } else if (params.manager) {
             await configHandler.saveManagerConfiguration(xml);
             try {
@@ -303,7 +303,7 @@ app.directive('wzXmlFileEditor', function() {
               ? params.showRestartManager !== 'warn'
                 ? showRestartMessage(msg, params.showRestartManager)
                 : errorHandler.handle(warnMsg, '', true)
-              : errorHandler.info(msg, '');
+              : errorHandler.info(msg);
           }
           $scope.savingParam();
           if (close) $scope.closeFn({ reload: true });
@@ -355,125 +355,13 @@ app.directive('wzXmlFileEditor', function() {
       });
 
       const showRestartMessage = async (msg, target) => {
-        errorHandler.info(msg, '');
+        errorHandler.info(msg);
         $scope.$emit('showRestartMsg', { msg, target });
       };
 
-      /*       const showRestartDialog = async (msg, target) => {
-              const confirm = $mdDialog.confirm({
-                controller: function (
-                  $scope,
-                  scope,
-                  errorHandler,
-                  rootScope,
-                  $mdDialog,
-                  configHandler,
-                  apiReq
-                ) {
-                  $scope.closeDialog = () => {
-                    $mdDialog.hide();
-                    $('body').removeClass('md-dialog-body');
-                  };
-                  $scope.confirmDialog = async () => {
-                    rootScope.$emit('setRestarting', {});
-                    scope.$applyAsync();
-                    $mdDialog.hide();
-                    const clusterStatus = await apiReq.request(
-                      'GET',
-                      '/cluster/status',
-                      {}
-                    );
-                    if (
-                      target !== 'cluster' &&
-                      target !== 'manager' &&
-                      (clusterStatus.data.data.enabled === 'no' ||
-                        clusterStatus.data.data.running === 'no')
-                    ) {
-                      target = 'manager';
-                    }
-                    if (target === 'manager') {
-                      try {
-                        const data = await configHandler.restartManager();
-                        $('body').removeClass('md-dialog-body');
-                        errorHandler.info(
-                          `${data.data.data}. It may take a few seconds...`
-                        );
-                        rootScope.$emit('removeRestarting', {});
-                        scope.$applyAsync();
-                      } catch (error) {
-                        errorHandler.handle(
-                          error.message || error,
-                          'Error restarting manager'
-                        );
-                        rootScope.$emit('removeRestarting', {});
-                      }
-                    } else if (target === 'cluster') {
-                      try {
-                        const data = await configHandler.restartCluster();
-                        $('body').removeClass('md-dialog-body');
-                        errorHandler.info(
-                          `${data.data.data}. It will take up to 15 seconds...`
-                        );
-                        rootScope.$emit('removeRestarting', {});
-                        scope.$applyAsync();
-                      } catch (error) {
-                        errorHandler.handle(
-                          error.message || error,
-                          'Error restarting cluster'
-                        );
-                        rootScope.$emit('removeRestarting', {});
-                      }
-                    } else {
-                      try {
-                        const data = await configHandler.restartNode(target);
-                        $('body').removeClass('md-dialog-body');
-                        errorHandler.info(
-                          `${data.data.data}. It will take up to 15 seconds...`
-                        );
-                        rootScope.$emit('removeRestarting', {});
-                        scope.$applyAsync();
-                      } catch (error) {
-                        errorHandler.handle(
-                          error.message || error,
-                          'Error restarting node'
-                        );
-                        rootScope.$emit('removeRestarting', {});
-                      }
-                    }
-                  };
-                },
-                template:
-                  '<md-dialog class="modalTheme euiToast euiToast--success euiGlobalToastListItem">' +
-                  '<md-dialog-content>' +
-                  '<div class="euiToastHeader">' +
-                  '<i class="fa fa-check"></i>' +
-                  '<span class="euiToastHeader__title">' +
-                  `${msg}` +
-                  `. Do you want to restart the ${target} now?` +
-                  '</span>' +
-                  '</div>' +
-                  '</md-dialog-content>' +
-                  '<md-dialog-actions>' +
-                  '<button class="md-primary md-cancel-button md-button ng-scope md-default-theme md-ink-ripple" type="button" ng-click="closeDialog()">I will do it later</button>' +
-                  `<button class="md-primary md-confirm-button md-button md-ink-ripple md-default-theme" type="button" ng-click="confirmDialog()">Restart ${target}</button>` +
-                  '</md-dialog-actions>' +
-                  '</md-dialog>',
-                hasBackdrop: false,
-                clickOutsideToClose: true,
-                disableParentScroll: true,
-                locals: {
-                  scope: $scope,
-                  errorHandler: errorHandler,
-                  rootScope: $rootScope
-                }
-              });
-              $('body').addClass('md-dialog-body');
-              $mdDialog.show(confirm);
-            }; */
-
       $scope.$on('saveXmlFile', (ev, params) => saveFile(params));
 
-      $scope.$on('$destroy', function() {
+      $scope.$on('$destroy', function () {
         $location.search('editingFile', null);
         appState.setNavigation({ status: true });
       });

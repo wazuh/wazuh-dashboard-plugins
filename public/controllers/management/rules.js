@@ -14,7 +14,6 @@ import * as FileSaver from '../../services/file-saver';
 import { colors } from './colors';
 
 export function RulesController(
-  $rootScope,
   $scope,
   $sce,
   errorHandler,
@@ -163,10 +162,10 @@ export function RulesController(
         coloredString = coloredString.replace(
           /\$\(((?!<\/span>).)*?\)(?!<\/span>)/im,
           '<span style="color: ' +
-            colors[i] +
-            ' ">' +
-            valuesArray[i] +
-            '</span>'
+          colors[i] +
+          ' ">' +
+          valuesArray[i] +
+          '</span>'
         );
       }
     }
@@ -345,21 +344,16 @@ export function RulesController(
           );
           return false;
         }
-        $scope.doingSaving = true;
         $scope.selectedItem = { file: fileName };
-        $scope.$broadcast('saveXmlFile', {
-          rule: $scope.selectedItem,
-          showRestartManager,
-          isNewFile
-        });
-      } else {
-        $scope.doingSaving = true;
-        const objParam = {
-          rule: $scope.currentRule,
-          showRestartManager
-        };
-        $scope.$broadcast('saveXmlFile', objParam);
       }
+      $scope.doingSaving = true;
+      const objParam = {
+        rule: $scope.selectedItem,
+        showRestartManager,
+        isNewFile: !!isNewFile
+      };
+
+      $scope.$broadcast('saveXmlFile', objParam);
     }
   };
 
@@ -373,7 +367,7 @@ export function RulesController(
     $scope.$emit('performRestart', {});
   };
 
-  $rootScope.$on('showRestartMsg', () => {
+  $scope.$on('showRestartMsg', () => {
     $scope.restartMsg = true;
     $scope.$applyAsync();
   });

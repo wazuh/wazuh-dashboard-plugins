@@ -12,7 +12,7 @@
 export function objectWithoutProperties(obj) {
   try {
     const result = JSON.parse(
-      JSON.stringify(obj, function(key, val) {
+      JSON.stringify(obj, (key, val) => {
         if (key == '$$hashKey') {
           return undefined;
         }
