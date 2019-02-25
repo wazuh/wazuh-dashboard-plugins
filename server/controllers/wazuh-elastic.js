@@ -395,13 +395,13 @@ export class WazuhElasticCtrl {
 
           defaultStr.includes('wazuh-monitoring')
             ? (aux_source.kibanaSavedObjectMeta.searchSourceJSON = defaultStr.replace(
-                'wazuh-monitoring',
+                /wazuh-monitoring/g,
                 monitoringPattern[monitoringPattern.length - 1] === '*'
                   ? monitoringPattern
                   : monitoringPattern + '*'
               ))
             : (aux_source.kibanaSavedObjectMeta.searchSourceJSON = defaultStr.replace(
-                'wazuh-alerts',
+                /wazuh-alerts/g,
                 id
               ));
         }
@@ -413,7 +413,10 @@ export class WazuhElasticCtrl {
           aux_source.visState &&
           typeof aux_source.visState === 'string'
         ) {
-          aux_source.visState = aux_source.visState.replace('wazuh-alerts', id);
+          aux_source.visState = aux_source.visState.replace(
+            /wazuh-alerts/g,
+            id
+          );
         }
 
         // Bulk source
@@ -456,7 +459,7 @@ export class WazuhElasticCtrl {
       for (const element of app_objects) {
         // Stringify and replace index-pattern for visualizations
         aux_source = JSON.stringify(element._source);
-        aux_source = aux_source.replace('wazuh-alerts', id);
+        aux_source = aux_source.replace(/wazuh-alerts/g, id);
         aux_source = JSON.parse(aux_source);
 
         // Bulk source
