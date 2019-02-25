@@ -162,10 +162,10 @@ export function RulesController(
         coloredString = coloredString.replace(
           /\$\(((?!<\/span>).)*?\)(?!<\/span>)/im,
           '<span style="color: ' +
-            colors[i] +
-            ' ">' +
-            valuesArray[i] +
-            '</span>'
+          colors[i] +
+          ' ">' +
+          valuesArray[i] +
+          '</span>'
         );
       }
     }
@@ -348,7 +348,7 @@ export function RulesController(
       }
       $scope.doingSaving = true;
       const objParam = {
-        rule: $scope.selectedItem,
+        rule: isNewFile ? $scope.selectedItem : $scope.currentRule,
         showRestartManager,
         isNewFile: !!isNewFile
       };
