@@ -17,7 +17,7 @@ import { checkGap } from '../wz-table/lib/check-gap';
 
 const app = uiModules.get('app/wazuh', []);
 
-app.directive('wzListManage', function () {
+app.directive('wzListManage', function() {
   return {
     restrict: 'E',
     scope: {
@@ -52,7 +52,7 @@ app.directive('wzListManage', function () {
       $scope.prevPage = () => pagination.prevPage($scope);
       $scope.nextPage = async currentPage =>
         pagination.nextPage(currentPage, $scope, errorHandler, null);
-      $scope.setPage = function () {
+      $scope.setPage = function() {
         $scope.currentPage = this.n;
         $scope.nextPage(this.n);
       };
@@ -61,11 +61,9 @@ app.directive('wzListManage', function () {
        * This apply filter and sorting to table data
        */
       $scope.filterTable = data => {
-        const result = Object.keys(data || $scope.currentList.list).map(
-          (key) => {
-            return [key, $scope.currentList.list[key]];
-          }
-        );
+        const result = Object.keys(data || $scope.currentList.list).map(key => {
+          return [key, $scope.currentList.list[key]];
+        });
 
         items = $filter('filter')(result, $scope.searchTerm);
         $scope.totalItems = items.length;
@@ -199,7 +197,6 @@ app.directive('wzListManage', function () {
       $scope.restart = () => {
         $scope.$emit('performRestart', {});
       };
-
     },
     template
   };
