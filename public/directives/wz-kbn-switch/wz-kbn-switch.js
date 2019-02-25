@@ -24,12 +24,12 @@ class WzKbnSwitch {
     this.scope = {
       switchModel: '=switchModel',
       switchChange: '&',
-      switchText: '@switchText'      
+      switchText: '@switchText'
     };
     this.template = template;
   }
 
-  controller() { }
+  controller() {}
 }
 
 app.directive('wzKbnSwitch', () => new WzKbnSwitch());
