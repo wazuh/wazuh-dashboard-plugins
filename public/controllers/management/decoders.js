@@ -325,7 +325,7 @@ export class DecodersController {
       }
       this.doingSaving = true;
       const objParam = {
-        decoder: this.currentDecoder,
+        decoder: isNewFile ? this.selectedItem : this.currentDecoder,
         showRestartManager,
         isNewFile: !!isNewFile
       };
