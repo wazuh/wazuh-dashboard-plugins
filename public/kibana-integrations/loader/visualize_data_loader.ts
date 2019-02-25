@@ -46,6 +46,9 @@ import { timefilter } from 'ui/timefilter';
 // @ts-ignore
 import { BuildESQueryProvider } from '@kbn/es-query';
 
+// @ts-ignore
+import { validateInterval } from './validate_interval';
+
 function getHandler<T extends RequestHandler | ResponseHandler>(
   from: Array<{ name: string; handler: T }>,
   type: string | T
@@ -113,7 +116,7 @@ export class VisualizeDataLoader {
 
             try {
               const maxBuckets = config.get('metrics:max_buckets');
-              //validateInterval(parsedTimeRange, panel, maxBuckets);
+              validateInterval(parsedTimeRange, panel, maxBuckets);
               const httpResult = $http.post('../api/metrics/vis/data', params)
                 .then(resp => ({ dateFormat, scaledDataFormat, timezone, ...resp.data }))
                 .catch(resp => { throw resp.data; });
