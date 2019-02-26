@@ -385,14 +385,16 @@ display: -webkit-box;
     display: -ms-flexbox;
     display: flex;
     z-index: 9999;
-    width: auto;
-    height: 80vh;
+    width: calc(~'100vw - 250px');
+    height: calc(~'100vh - 60px');
     position: fixed;
-    top: 10vh;
-    left: 20vh;
-    right: 0;
+    top: 0px;
+    left: 180px;
+    right: 20px;
     background-color: white;
     max-width: 100% !important;
+    margin: 30px;
+    outline: 30px solid rgba(0, 0, 0, 0.2);
 }
 
 .filter-bar .filter {

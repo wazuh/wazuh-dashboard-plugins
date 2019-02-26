@@ -90,5 +90,6 @@ export const KeyEquivalenece = {
   references: 'References',
   result: 'Result',
   directory: 'Path(s)',
-  rationale: 'Rationale'
+  rationale: 'Rationale',
+  registry: 'Registry'
 };
