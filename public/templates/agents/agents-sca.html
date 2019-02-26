@@ -68,22 +68,7 @@
                 <kbn-vis vis-id="'Wazuh-App-Agents-CA-Alerts-summary'"></kbn-vis>
             </md-card-content>
         </md-card>
-    </div>
-
-    <div layout="row" layout-align="space-between stretch" class="height-570">
-        <md-card flex class="wz-md-card" ng-class="{'fullscreen': expandArray[3]}">
-            <md-card-content class="wazuh-column">
-                <div layout="row">
-                    <span class="wz-headline-title">papanatas</span>
-                    <span flex></span>
-                    <span class="wz-text-link" ng-click="expand(3)"><i class="fa fa-fw fa-expand"></i></span>
-                </div>
-                <md-divider class="wz-margin-top-10"></md-divider>
-                <kbn-vis vis-id="'Wazuh-App-Agents-HAR'" id="Wazuh-App-Agents-HAR"></kbn-vis>
-            </md-card-content>
-        </md-card>
-    </div>
-
+    </div> 
 </md-content>
 
 <md-content flex layout="column" ng-if="tab === 'sca' && tabView === 'panels' && showScaScan" layout-align="start">
