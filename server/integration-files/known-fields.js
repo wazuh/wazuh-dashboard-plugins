@@ -5757,7 +5757,7 @@ export const knownFields = [
   },
   {
     name: 'data.sca.check.result',
-    type: 'string',
+    type: 'number',
     count: 0,
     scripted: false,
     searchable: true,
@@ -5784,7 +5784,7 @@ export const knownFields = [
   },
   {
     name: 'data.sca.failed',
-    type: 'string',
+    type: 'number',
     count: 0,
     scripted: false,
     searchable: true,
@@ -5811,7 +5811,7 @@ export const knownFields = [
   },
   {
     name: 'data.sca.passed',
-    type: 'string',
+    type: 'number',
     count: 0,
     scripted: false,
     searchable: true,
