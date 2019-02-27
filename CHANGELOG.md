@@ -20,7 +20,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Restart agents ([#1229](https://github.com/wazuh/wazuh-kibana-app/pull/1229)).
 - Added support for more than one Wazuh monitoring pattern ([#1243](https://github.com/wazuh/wazuh-kibana-app/pull/1243))
 - Added customizable interval for Wazuh monitoring indices creation ([#1243](https://github.com/wazuh/wazuh-kibana-app/pull/1243))
-- Expand visualization ([#1246](https://github.com/wazuh/wazuh-kibana-app/pull/1246))
+- Expand visualizations ([#1246](https://github.com/wazuh/wazuh-kibana-app/pull/1246))
 - Added a dynamic table columns selector ([#1246](https://github.com/wazuh/wazuh-kibana-app/pull/1246))
 
 ### Changed
@@ -38,14 +38,13 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Refresh all known fields for all valid index patterns if `kbn-vis` detects a broken index pattern ([ecd7c8f](https://github.com/wazuh/wazuh-kibana-app/commit/ecd7c8f98c187a350f81261d13b0d45dcec6dc5d)).
 - Truncate texts and display a tooltip when they don't fit in a table cell ([7b56a87](https://github.com/wazuh/wazuh-kibana-app/commit/7b56a873f85dcba7e6838aeb2e40d9b4cf472576))
 - Updated API autocomplete for Dev Tools ([#1218](https://github.com/wazuh/wazuh-kibana-app/pull/1218))
-- Expanded some containers to fit full windows height ([#1224](https://github.com/wazuh/wazuh-kibana-app/pull/1224))
 - Updated switches design to adapt it to Kibana's design ([#1253](https://github.com/wazuh/wazuh-kibana-app/pull/1253))
+- Reduced the width of some table cells with little text, to give more space to the other columns ([#1263](https://github.com/wazuh/wazuh-kibana-app/pull/1263))
 
 ### Fixed
 
 - Properly handling long messages on notifier service, until now, they were using out of the card space, also we replaced some API messages with more meaningful messages ([#1168](https://github.com/wazuh/wazuh-kibana-app/pull/1168)).
 - Adapted Wazuh icon for multiple browsers where it was gone ([#1208](https://github.com/wazuh/wazuh-kibana-app/pull/1208))
-- Reduced the width of some table cells with little text, to give more space to the other columns ([#1263](https://github.com/wazuh/wazuh-kibana-app/pull/1263))
 
 ## Wazuh v3.8.2 - Kibana v6.6.0 / v6.6.1 - Revision 419
 
