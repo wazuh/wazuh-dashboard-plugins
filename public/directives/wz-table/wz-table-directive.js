@@ -26,7 +26,7 @@ import { checkGap } from './lib/check-gap';
 
 const app = uiModules.get('app/wazuh', []);
 
-app.directive('wzTable', function() {
+app.directive('wzTable', function () {
   return {
     restrict: 'E',
     scope: {
@@ -51,6 +51,7 @@ app.directive('wzTable', function() {
       appState,
       globalState,
       groupHandler,
+      rulesetHandler,
       wazuhConfig,
       $sce
     ) {
@@ -267,7 +268,7 @@ app.directive('wzTable', function() {
       $scope.prevPage = () => pagination.prevPage($scope);
       $scope.nextPage = async currentPage =>
         pagination.nextPage(currentPage, $scope, errorHandler, fetch);
-      $scope.setPage = function() {
+      $scope.setPage = function () {
         $scope.currentPage = this.n;
         $scope.nextPage(this.n);
       };
@@ -338,12 +339,26 @@ app.directive('wzTable', function() {
           $scope.removingAgent === agent.id ? null : agent.id;
       };
 
+      $scope.showConfirmRemoveFile = (ev, file, path) => {
+        if (path !== '/lists/files') {
+          $scope.removingFile =
+            $scope.removingFile === file.file ? null : file.file;
+        } else {
+          $scope.removingFile =
+            $scope.removingFile === file.name ? null : file.name;
+        }
+      };
+
       $scope.cancelRemoveAgent = () => {
         $scope.removingAgent = null;
       };
 
       $scope.cancelRemoveGroup = () => {
         $scope.removingGroup = null;
+      };
+
+      $scope.cancelRemoveFile = () => {
+        $scope.removingFile = null;
       };
 
       $scope.confirmRemoveAgent = async agent => {
@@ -369,6 +384,17 @@ app.directive('wzTable', function() {
           errorHandler.handle(`${error.message || error}`, '');
         }
         $scope.removingGroup = null;
+        return init();
+      };
+
+      $scope.confirmRemoveFile = async (file, type) => {
+        try {
+          await rulesetHandler.deleteFile(file, type);
+          errorHandler.info(`Success. File ${file.file} has been deleted`, '');
+        } catch (error) {
+          errorHandler.handle(`${error.message || error}`, '');
+        }
+        $scope.removingFile = null;
         return init();
       };
 

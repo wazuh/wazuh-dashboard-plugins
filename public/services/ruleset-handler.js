@@ -102,4 +102,29 @@ export class RulesetHandler {
       return Promise.reject(error);
     }
   }
+
+  async deleteFile(file, path) {
+    let type;
+    switch (path) {
+      case '/rules/files':
+        type = 'rules'
+        break;
+      case '/decoders/files':
+        type = 'decoders'
+        break;
+      case '/lists/files':
+        type = 'lists'
+        break;
+    }
+    try {
+      const result = await this.apiReq.request(
+        'DELETE',
+        `/${type}/files?path=${file.path}/${type !== 'lists' ? file.file : file.name}`,
+        {}
+      );
+      return result;
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  }
 }

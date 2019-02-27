@@ -1,0 +1,19 @@
+<div ng-if="!files.viewingDetail" layout="column">
+    <div id="content" layout="row" class="md-padding ">
+        <input flex placeholder="Filter files..." ng-model="filesctrl.custom_search" type="text" class="kuiLocalSearchInput height-40 ng-empty ng-pristine ng-scope ng-touched ng-valid"
+            aria-invalid="false" wz-enter="filesctrl.search(filesctrl.custom_search)">
+        <button type="submit" aria-label="Search" class="kuiLocalSearchButton height-40" ng-click="filesctrl.search(filesctrl.custom_search)">
+            <span class="fa fa-search" aria-hidden="true"></span>
+        </button>
+    </div>
+    <div layout="row">
+        <md-card flex class="wz-md-card _md flex md-margin-h">
+            <md-card-content>
+                <wz-table ng-if="filesctrl.filesSubTab === 'rules'" implicit-filter="[{ name:'path',value: '/var/ossec/etc/rules'}]"
+                    flex path="'/rules/files'" keys="['file']" allow-click="true" row-sizes="[16,13,11]"></wz-table>
+                <wz-table ng-if="filesctrl.filesSubTab === 'decoders'" implicit-filter="[{ name:'path',value: '/var/ossec/etc/decoders'}]"
+                    flex path="'/decoders/files'" keys="['file']" allow-click="true" row-sizes="[16,13,11]"></wz-table>
+            </md-card-content>
+        </md-card>
+    </div>
+</div>
