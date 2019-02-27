@@ -310,21 +310,6 @@ export function RulesController(
     $scope.$emit('fetchedFile', { data: $scope.fetchedXML });
   };
 
-  $scope.deleteFile = async flag => {
-    try {
-      const data = await apiReq.request(
-        'GET',
-        `/rules/files`,
-        { path: '/var/ossec/etc/rules' }
-      );
-      $scope.rulesFiles = (((data || {}).data || {}).data || {}).items;
-    } catch (err) {
-      errorHandler.handle(err, 'Error fetching files.');
-    }
-    $scope.showDeleteFiles = flag;
-    $scope.$applyAsync();
-  };
-
   $scope.toggleSaveConfig = () => {
     $scope.doingSaving = false;
     $scope.$applyAsync();
