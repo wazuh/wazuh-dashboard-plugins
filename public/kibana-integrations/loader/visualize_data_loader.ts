@@ -78,9 +78,7 @@ export class VisualizeDataLoader {
     const responseHandlers: ResponseHandlerDescription[] = Private(ResponseHandlerProvider);
 
     if (((vis || {}).type || {}).title === 'Visual Builder') {
-      console.log(`Processing ${vis.title} with custom request handler`)
       const config = $injector.get('config');
-      const $rootScope = $injector.get('$rootScope')
       const discoverPendingUpdates = $injector.get('discoverPendingUpdates')
       const $http = $injector.get('$http')
       const buildEsQuery = Private(BuildESQueryProvider);
@@ -127,10 +125,8 @@ export class VisualizeDataLoader {
                   resolve({});
                   const err = new Error(resp.message);
                   err.stack = resp.stack;
-                  console.log('DEBUG', err)
                 });
             } catch (e) {
-              console.log('DEBUG 2', e)
               return resolve();
             }
           }
