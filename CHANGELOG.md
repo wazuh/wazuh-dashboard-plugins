@@ -19,9 +19,10 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Restart master and worker nodes ([#1222](https://github.com/wazuh/wazuh-kibana-app/pull/1222)).
 - Restart agents ([#1229](https://github.com/wazuh/wazuh-kibana-app/pull/1229)).
 - Added support for more than one Wazuh monitoring pattern ([#1243](https://github.com/wazuh/wazuh-kibana-app/pull/1243))
-- Added customizable interval for Wazuh monitoring indices creation ([#1243](https://github.com/wazuh/wazuh-kibana-app/pull/1243))
-- Expand visualizations ([#1246](https://github.com/wazuh/wazuh-kibana-app/pull/1246))
-- Added a dynamic table columns selector ([#1246](https://github.com/wazuh/wazuh-kibana-app/pull/1246))
+- Added customizable interval for Wazuh monitoring indices creation ([#1243](https://github.com/wazuh/wazuh-kibana-app/pull/1243)).
+- Expand visualizations ([#1246](https://github.com/wazuh/wazuh-kibana-app/pull/1246)).
+- Added a dynamic table columns selector ([#1246](https://github.com/wazuh/wazuh-kibana-app/pull/1246)).
+- Added a cron job for fetching missing fields of all valid index patterns, also merging dynamic fields every time an index pattern is refreshed by the app ([#1276](https://github.com/wazuh/wazuh-kibana-app/pull/1276)).
 
 ### Changed
 
