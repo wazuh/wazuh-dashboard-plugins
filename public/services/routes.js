@@ -95,12 +95,7 @@ function nestedResolve(
         wazuhConfig,
         location && location.includes('/health-check')
       )
-    )
-    .then(async () => {
-      try {
-        await this.genericReq.request('GET', '/elastic/known-fields/all', {});
-      } catch (error) {} //eslint-disable-line
-    });
+    );
 }
 
 function savedSearch(
@@ -175,15 +170,15 @@ routes
     resolve: { wzConfig }
   })
   .when('/visualize/create?', {
-    redirectTo: function() {},
+    redirectTo: function () { },
     resolve: { wzConfig, wzKibana }
   })
   .when('/context/:pattern?/:type?/:id?', {
-    redirectTo: function() {},
+    redirectTo: function () { },
     resolve: { wzKibana }
   })
   .when('/doc/:pattern?/:index?/:type?/:id?', {
-    redirectTo: function() {},
+    redirectTo: function () { },
     resolve: { wzKibana }
   })
   .when('/wazuh-dev', {
