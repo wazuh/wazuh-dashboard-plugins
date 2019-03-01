@@ -11,6 +11,7 @@
  */
 import colors from 'ansicolors';
 const blueWazuh = colors.blue('wazuh');
+import querystring from 'querystring';
 
 /**
  * Refresh known fields for all valid index patterns.
@@ -49,9 +50,20 @@ export async function checkKnownFields(
 
       if (indexPatternList.hits.hits.length > 0) {
         for (const index of indexPatternList.hits.hits) {
-          let valid, parsed;
+          let valid, parsed, standardResponse;
           try {
             parsed = JSON.parse(index._source['index-pattern'].fields);
+
+            // Merge fields logic
+            const pattern = index._id.split('index-pattern:')[1];
+            const meta_fields = ["_source", "_id", "_type", "_index", "_score"];
+            const standardRequest = {
+              url: `/api/index_patterns/_fields_for_wildcard?${querystring.stringify({ pattern, meta_fields })}`,
+              method: 'GET'
+            };
+            standardResponse = await server.inject(standardRequest);
+            // End merge fields logic
+
           } catch (error) {
             continue;
           }
@@ -60,7 +72,8 @@ export async function checkKnownFields(
           if (valid.length === 4) {
             list.push({
               id: index._id.split('index-pattern:')[1],
-              title: index._source['index-pattern'].title
+              title: index._source['index-pattern'].title,
+              detectedFields: ((standardResponse || {}).result || {}).fields || []
             });
           }
         }
@@ -159,7 +172,7 @@ export async function checkKnownFields(
           [blueWazuh, 'initialize', 'info'],
           `Refreshing known fields for "index-pattern:${item.title}"`
         );
-      await wzWrapper.updateIndexPatternKnownFields('index-pattern:' + item.id);
+      await wzWrapper.updateIndexPatternKnownFields('index-pattern:' + item.id, item.detectedFields);
     }
 
     !quiet &&
