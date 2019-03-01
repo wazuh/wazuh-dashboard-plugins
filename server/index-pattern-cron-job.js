@@ -15,37 +15,49 @@ import { ElasticWrapper } from './lib/elastic-wrapper';
 import { log } from './logger';
 
 export class IndexPatternCronJob {
-    /**
-     * @param {Object} server Hapi.js server object provided by Kibana
-     */
-    constructor(server) {
-        this.server = server;
-        this.wzWrapper = new ElasticWrapper(server);
-        this.CRON_FREQ = '0 * * * * *'; // Every minute
-    }
+  /**
+   * @param {Object} server Hapi.js server object provided by Kibana
+   */
+  constructor(server) {
+    this.server = server;
+    this.wzWrapper = new ElasticWrapper(server);
+    this.CRON_FREQ = '0 * * * * *'; // Every minute
+  }
 
-    /**
-     * Check all known fields for all Wazuh valid index patterns, every "this.CRON_FREQ".
-     * This function is wrapped into a double try/catch block because we 
-     * don't want to kill the Node.js process or to stop the app execution.
-     * This is not a reason to stop, a log is just enough to advice the user.
-     */
-    async run() {
-        try {
-            // Launch the Cron job
-            cron.schedule(this.CRON_FREQ, async () => {
-                try {
-                    // Call the proper method to refresh the known fields
-                    await checkKnownFields(this.wzWrapper, false, this.server, false, true);
-                } catch (error) {
-                    // Await execution failed
-                    log('[IndexPatternCronJob][checkKnownFields]', error.message || error);
-                }
-            }, true);
-        } catch (error) {
-            // Cron job creation failed
-            log('[IndexPatternCronJob][create-job]', error.message || error);
-        }
+  /**
+   * Check all known fields for all Wazuh valid index patterns, every "this.CRON_FREQ".
+   * This function is wrapped into a double try/catch block because we
+   * don't want to kill the Node.js process or to stop the app execution.
+   * This is not a reason to stop, a log is just enough to advice the user.
+   */
+  async run() {
+    try {
+      // Launch the Cron job
+      cron.schedule(
+        this.CRON_FREQ,
+        async () => {
+          try {
+            // Call the proper method to refresh the known fields
+            await checkKnownFields(
+              this.wzWrapper,
+              false,
+              this.server,
+              false,
+              true
+            );
+          } catch (error) {
+            // Await execution failed
+            log(
+              '[IndexPatternCronJob][checkKnownFields]',
+              error.message || error
+            );
+          }
+        },
+        true
+      );
+    } catch (error) {
+      // Cron job creation failed
+      log('[IndexPatternCronJob][create-job]', error.message || error);
     }
-
+  }
 }

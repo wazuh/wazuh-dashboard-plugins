@@ -257,9 +257,9 @@ export class ElasticWrapper {
             item =>
               item.name &&
               item.name !==
-              'data.aws.service.action.networkConnectionAction.remoteIpDetails.geoLocation.lat' &&
+                'data.aws.service.action.networkConnectionAction.remoteIpDetails.geoLocation.lat' &&
               item.name !==
-              'data.aws.service.action.networkConnectionAction.remoteIpDetails.geoLocation.lon'
+                'data.aws.service.action.networkConnectionAction.remoteIpDetails.geoLocation.lon'
           );
 
           for (const field of knownFields) {
@@ -285,9 +285,7 @@ export class ElasticWrapper {
       // Iterate over dynamic fields
       for (const field of detectedFields) {
         // It has this field?
-        const index = currentFields
-          .map(item => item.name)
-          .indexOf(field.name);
+        const index = currentFields.map(item => item.name).indexOf(field.name);
 
         if (index >= 0 && currentFields[index]) {
           // If field already exists, update its type
@@ -598,17 +596,17 @@ export class ElasticWrapper {
 
       const data = req
         ? await this.elasticRequest.callWithRequest(req, 'update', {
-          index: '.wazuh',
-          type: 'wazuh-configuration',
-          id: id,
-          body: doc
-        })
+            index: '.wazuh',
+            type: 'wazuh-configuration',
+            id: id,
+            body: doc
+          })
         : await this.elasticRequest.callWithInternalUser('update', {
-          index: '.wazuh',
-          type: 'wazuh-configuration',
-          id: id,
-          body: doc
-        });
+            index: '.wazuh',
+            type: 'wazuh-configuration',
+            id: id,
+            body: doc
+          });
 
       return data;
     } catch (error) {
@@ -683,7 +681,7 @@ export class ElasticWrapper {
       return (
         this.usingSearchGuard ||
         ((((data || {}).defaults || {}).xpack || {}).security || {}).enabled ==
-        'true'
+          'true'
       );
     } catch (error) {
       return Promise.reject(error);

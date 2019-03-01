@@ -81,21 +81,20 @@ function nestedResolve(
 ) {
   assignPreviousLocation($rootScope, $location);
   const location = $location.path();
-  return getWzConfig($q, genericReq, errorHandler, wazuhConfig)
-    .then(() =>
-      settingsWizard(
-        $location,
-        $q,
-        $window,
-        testAPI,
-        appState,
-        genericReq,
-        errorHandler,
-        wzMisc,
-        wazuhConfig,
-        location && location.includes('/health-check')
-      )
-    );
+  return getWzConfig($q, genericReq, errorHandler, wazuhConfig).then(() =>
+    settingsWizard(
+      $location,
+      $q,
+      $window,
+      testAPI,
+      appState,
+      genericReq,
+      errorHandler,
+      wzMisc,
+      wazuhConfig,
+      location && location.includes('/health-check')
+    )
+  );
 }
 
 function savedSearch(
@@ -170,15 +169,15 @@ routes
     resolve: { wzConfig }
   })
   .when('/visualize/create?', {
-    redirectTo: function () { },
+    redirectTo: function() {},
     resolve: { wzConfig, wzKibana }
   })
   .when('/context/:pattern?/:type?/:id?', {
-    redirectTo: function () { },
+    redirectTo: function() {},
     resolve: { wzKibana }
   })
   .when('/doc/:pattern?/:index?/:type?/:id?', {
-    redirectTo: function () { },
+    redirectTo: function() {},
     resolve: { wzKibana }
   })
   .when('/wazuh-dev', {

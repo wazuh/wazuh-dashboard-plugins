@@ -56,14 +56,15 @@ export async function checkKnownFields(
 
             // Merge fields logic
             const pattern = index._id.split('index-pattern:')[1];
-            const meta_fields = ["_source", "_id", "_type", "_index", "_score"];
+            const meta_fields = ['_source', '_id', '_type', '_index', '_score'];
             const standardRequest = {
-              url: `/api/index_patterns/_fields_for_wildcard?${querystring.stringify({ pattern, meta_fields })}`,
+              url: `/api/index_patterns/_fields_for_wildcard?${querystring.stringify(
+                { pattern, meta_fields }
+              )}`,
               method: 'GET'
             };
             standardResponse = await server.inject(standardRequest);
             // End merge fields logic
-
           } catch (error) {
             continue;
           }
@@ -73,7 +74,8 @@ export async function checkKnownFields(
             list.push({
               id: index._id.split('index-pattern:')[1],
               title: index._source['index-pattern'].title,
-              detectedFields: ((standardResponse || {}).result || {}).fields || []
+              detectedFields:
+                ((standardResponse || {}).result || {}).fields || []
             });
           }
         }
@@ -172,7 +174,10 @@ export async function checkKnownFields(
           [blueWazuh, 'initialize', 'info'],
           `Refreshing known fields for "index-pattern:${item.title}"`
         );
-      await wzWrapper.updateIndexPatternKnownFields('index-pattern:' + item.id, item.detectedFields);
+      await wzWrapper.updateIndexPatternKnownFields(
+        'index-pattern:' + item.id,
+        item.detectedFields
+      );
     }
 
     !quiet &&
