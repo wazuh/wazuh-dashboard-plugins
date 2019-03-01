@@ -29,6 +29,7 @@ export class DecodersController {
     $location,
     errorHandler,
     appState,
+    apiReq,
     csvReq,
     wzTableFilter,
     wazuhConfig,
@@ -39,6 +40,7 @@ export class DecodersController {
     this.errorHandler = errorHandler;
     this.$location = $location;
     this.appState = appState;
+    this.apiReq = apiReq;
     this.csvReq = csvReq;
     this.wzTableFilter = wzTableFilter;
     this.wazuhConfig = wazuhConfig;
@@ -240,8 +242,20 @@ export class DecodersController {
     }
   }
 
-  closeEditingFile() {
+  async closeEditingFile() {
     this.editingFile = false;
+    if (this.currentDecoder) {
+      try {
+        const decoderReload = await this.apiReq.request(
+          'GET',
+          `/decoders/${this.currentDecoder.name}`,
+          {}
+        );
+        this.currentDecoder = ((((decoderReload || {}).data || {}).data || {}).items || [])[0];
+      } catch (err) {
+        this.errorHandler.handle(err, 'Decoder reload error.');
+      }
+    }
     this.appState.setNavigation({ status: true });
     this.$scope.$broadcast('closeEditXmlFile', {});
   }

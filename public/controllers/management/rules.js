@@ -244,8 +244,20 @@ export function RulesController(
     }
   };
 
-  $scope.closeEditingFile = () => {
+  $scope.closeEditingFile = async () => {
     $scope.editingFile = false;
+    if ($scope.currentRule) {
+      try {
+        const ruleReloaded = await apiReq.request(
+          'GET',
+          `/rules/${$scope.currentRule.id}`,
+          {}
+        );
+        $scope.currentRule = ((((ruleReloaded || {}).data || {}).data || {}).items || [])[0];
+      } catch (err) {
+        errorHandler.handle(err, 'Rule reload error.');
+      }
+    }
     appState.setNavigation({ status: true });
     $scope.$broadcast('closeEditXmlFile', {});
     if (!$scope.$$phase) $scope.$digest();

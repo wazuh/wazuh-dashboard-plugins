@@ -62,13 +62,17 @@
                 <md-card-content>
                     <span class="wz-headline-title"><i class="fa fa-fw fa-info" aria-hidden="true"></i> Details</span>
                     <md-divider class="wz-margin-top-10"></md-divider>
-                    <div layout="row" class="wz-padding-top-10" ng-repeat="(key, value) in currentRule.details" ng-if='!isArray(value)'>
+                    <div layout="row" class="wz-padding-top-10" ng-repeat="(key, value) in currentRule.details">
                         <span class="wz-word-break-rule">{{key}}</span>
-                        <span ng-if="!isObject(value)" class="wz-text-right color-grey">{{value}}</span>
-                        <span ng-if="isObject(value)" class="color-grey">
-                            <span ng-repeat="(key, value) in value">{{key}}: {{value}} <span ng-if="!$last">|</span>
+                        <div ng-if='!isArray(value)'>
+                            <span ng-if="!isObject(value)" class="wz-text-right color-grey">{{value}}</span>
+                            <span ng-if="isObject(value)" class="color-grey">
+                                <span ng-repeat="(key, value) in value">{{key}}: {{value}} <span ng-if="!$last">|</span>
+                                </span>
                             </span>
-                        </span>
+                        </div>
+                        <span ng-if="isArray(value)" ng-repeat="v in value track by $index" class="wz-text-right color-grey">{{v}}{{$last
+                            ? '' : ',&nbsp;'}}</span>
                     </div>
                 </md-card-content>
             </md-card>
@@ -180,7 +184,7 @@
     <!-- XML editor for rules -->
     <div layout="column" layout-align="start" ng-show="editingFile">
         <div layout="row">
-            <span ng-click='closeEditingFile()' class='btn btn-info'>Cancel</span>
+            <span ng-click='closeEditingFile()' class='btn btn-info'>Close</span>
             <button ng-disabled='xmlHasErrors || doingSaving' ng-click='doSaveConfig()' class='btn wz-button pull-right wz-margin-left-8'>
                 <span ng-show='!xmlHasErrors'><i aria-hidden='true' class='fa fa-fw fa-save' ng-class="doingSaving ? 'fa-spin fa-spinner' : ''"></i>Save
                     file</span>
