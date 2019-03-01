@@ -11,10 +11,7 @@
  */
 
 export class FilesController {
-  constructor(
-    $scope,
-    wazuhConfig
-  ) {
+  constructor($scope, wazuhConfig) {
     this.$scope = $scope;
     this.wazuhConfig = wazuhConfig;
     this.appliedFilters = [];

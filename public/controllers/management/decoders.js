@@ -251,7 +251,8 @@ export class DecodersController {
           `/decoders/${this.currentDecoder.name}`,
           {}
         );
-        this.currentDecoder = ((((decoderReload || {}).data || {}).data || {}).items || [])[0];
+        this.currentDecoder = ((((decoderReload || {}).data || {}).data || {})
+          .items || [])[0];
       } catch (err) {
         this.errorHandler.handle(err, 'Decoder reload error.');
       }

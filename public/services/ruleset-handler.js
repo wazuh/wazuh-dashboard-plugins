@@ -107,19 +107,21 @@ export class RulesetHandler {
     let type;
     switch (path) {
       case '/rules/files':
-        type = 'rules'
+        type = 'rules';
         break;
       case '/decoders/files':
-        type = 'decoders'
+        type = 'decoders';
         break;
       case '/lists/files':
-        type = 'lists'
+        type = 'lists';
         break;
     }
     try {
       const result = await this.apiReq.request(
         'DELETE',
-        `/manager/files?path=${file.path}/${type !== 'lists' ? file.file : file.name}`,
+        `/manager/files?path=${file.path}/${
+          type !== 'lists' ? file.file : file.name
+        }`,
         {}
       );
       return result;

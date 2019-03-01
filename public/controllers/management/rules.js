@@ -162,10 +162,10 @@ export function RulesController(
         coloredString = coloredString.replace(
           /\$\(((?!<\/span>).)*?\)(?!<\/span>)/im,
           '<span style="color: ' +
-          colors[i] +
-          ' ">' +
-          valuesArray[i] +
-          '</span>'
+            colors[i] +
+            ' ">' +
+            valuesArray[i] +
+            '</span>'
         );
       }
     }
@@ -253,7 +253,8 @@ export function RulesController(
           `/rules/${$scope.currentRule.id}`,
           {}
         );
-        $scope.currentRule = ((((ruleReloaded || {}).data || {}).data || {}).items || [])[0];
+        $scope.currentRule = ((((ruleReloaded || {}).data || {}).data || {})
+          .items || [])[0];
       } catch (err) {
         errorHandler.handle(err, 'Rule reload error.');
       }
