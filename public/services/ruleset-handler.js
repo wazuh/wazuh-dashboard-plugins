@@ -16,7 +16,7 @@ export class RulesetHandler {
   async getLocalRules() {
     try {
       const result = await this.apiReq.request('GET', `/rules`, {
-        path: '/var/ossec/etc/rules'
+        path: 'etc/rules'
       });
       return result;
     } catch (error) {
@@ -27,7 +27,7 @@ export class RulesetHandler {
   async getLocalDecoders() {
     try {
       const result = await this.apiReq.request('GET', `/decoders`, {
-        path: '/var/ossec/etc/decoders'
+        path: 'etc/decoders'
       });
       return result;
     } catch (error) {
@@ -119,7 +119,7 @@ export class RulesetHandler {
     try {
       const result = await this.apiReq.request(
         'DELETE',
-        `/${type}/files?path=${file.path}/${type !== 'lists' ? file.file : file.name}`,
+        `/manager/files?path=${file.path}/${type !== 'lists' ? file.file : file.name}`,
         {}
       );
       return result;
