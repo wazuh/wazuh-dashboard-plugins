@@ -27,6 +27,7 @@ export class WazuhElasticCtrl {
    * @param {*} server
    */
   constructor(server) {
+    this._server = server;
     this.wzWrapper = new ElasticWrapper(server);
   }
 
@@ -588,7 +589,6 @@ export class WazuhElasticCtrl {
   async refreshIndex(req, reply) {
     try {
       if (!req.params.pattern) throw new Error('Missing parameters');
-
       const output =
         ((req || {}).params || {}).pattern === 'all'
           ? await checkKnownFields(this.wzWrapper, false, false, false, true)

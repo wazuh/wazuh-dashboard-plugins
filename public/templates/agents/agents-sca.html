@@ -68,8 +68,7 @@
                 <kbn-vis vis-id="'Wazuh-App-Agents-CA-Alerts-summary'"></kbn-vis>
             </md-card-content>
         </md-card>
-    </div>
-
+    </div> 
 </md-content>
 
 <md-content flex layout="column" ng-if="tab === 'sca' && tabView === 'panels' && showScaScan" layout-align="start">
@@ -183,7 +182,7 @@
                 </div>
                 <div layout="row" class="wz-margin-top-16 wz-margin-bottom-40-inv">
                     <wz-table custom-columns="true" flex path="'/sca/' + agent.id + '/checks/' + lookingSca.id"
-                        row-sizes="[13,11,9]" extra-limit="100" keys="['title','file','result']">
+                        row-sizes="[13,11,9]" extra-limit="100" keys="['title', 'file', 'registry', 'process', 'directory', 'result']">
                     </wz-table>
                 </div>
                 <div layout="row" layout-padding>
