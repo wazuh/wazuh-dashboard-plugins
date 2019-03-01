@@ -21,7 +21,7 @@ export class IndexPatternCronJob {
   constructor(server) {
     this.server = server;
     this.wzWrapper = new ElasticWrapper(server);
-    this.CRON_FREQ = '0 * * * * *'; // Every minute
+    this.CRON_FREQ = '0 */2 * * * *'; // Every minute
   }
 
   /**
