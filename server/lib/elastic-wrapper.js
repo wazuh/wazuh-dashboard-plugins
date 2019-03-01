@@ -11,9 +11,10 @@
  */
 import { knownFields } from '../integration-files/known-fields';
 import { monitoringKnownFields } from '../integration-files/monitoring-known-fields';
-
+import querystring from 'querystring';
 export class ElasticWrapper {
   constructor(server) {
+    this._server = server;
     this.usingSearchGuard = ((server || {}).plugins || {}).searchguard || false;
     this.elasticRequest = server.plugins.elasticsearch.getCluster('data');
     this.WZ_KIBANA_INDEX =
@@ -235,14 +236,30 @@ export class ElasticWrapper {
   /**
    * Updates index-pattern known fields
    * @param {*} id 'index-pattern:' + id
-   * @param {*} detectedFields Array of fields that we may be missing (commonly due to dynamic fields, eg: aws)
    */
-  async updateIndexPatternKnownFields(id, detectedFields = []) {
+  async updateIndexPatternKnownFields(id) {
     try {
       if (!id)
         return Promise.reject(
           new Error('No valid index pattern id for update index pattern')
         );
+
+      let detectedFields = [];
+      try {
+        // Merge fields logic
+        const patternId = id.includes('index-pattern')
+          ? id.split('index-pattern:')[1]
+          : id;
+        const meta_fields = ['_source', '_id', '_type', '_index', '_score'];
+        const standardRequest = {
+          url: `/api/index_patterns/_fields_for_wildcard?${querystring.stringify(
+            { pattern: patternId, meta_fields }
+          )}`,
+          method: 'GET'
+        };
+        const standardResponse = await this._server.inject(standardRequest);
+        detectedFields = ((standardResponse || {}).result || {}).fields || [];
+      } catch (error) {} //eslint-disable-line
 
       const pattern = await this.getIndexPatternUsingGet(id);
 

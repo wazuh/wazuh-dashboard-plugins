@@ -591,13 +591,7 @@ export class WazuhElasticCtrl {
       if (!req.params.pattern) throw new Error('Missing parameters');
       const output =
         ((req || {}).params || {}).pattern === 'all'
-          ? await checkKnownFields(
-              this.wzWrapper,
-              false,
-              this._server,
-              false,
-              true
-            )
+          ? await checkKnownFields(this.wzWrapper, false, false, false, true)
           : await this.wzWrapper.updateIndexPatternKnownFields(
               req.params.pattern
             );
