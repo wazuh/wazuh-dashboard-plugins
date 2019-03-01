@@ -25,7 +25,8 @@
                 <i ng-if="!key.nosortable" class="fa wz-theader-sort-icon" ng-class="sortValue === (key.value || key) ? (sortDir ? 'fa-sort-asc' : 'fa-sort-desc') : 'fa-sort'"
                     aria-hidden="true"></i>
             </th>
-            <th ng-if="(path === '/agents' || (path === '/agents/groups' && adminMode) || (isLookingGroup() && adminMode)) && !isLookingDefaultGroup"
+            <th ng-if="(path === '/agents' || (path === '/agents/groups' && adminMode) || (isLookingGroup() && adminMode) 
+            || path === '/rules/files' || path === '/decoders/files' || path === '/lists/files') && !isLookingDefaultGroup"
                 class="wz-text-left" ng-class="{'col-lg-2': path !== '/agents', 'col-lg-1': path === '/agents'}">Actions</th>
         </thead>
         <tbody>
@@ -85,10 +86,31 @@
                         </div>
                     </div>
                 </td>
+                <td ng-if="path === '/rules/files' || path === '/decoders/files' || path === '/lists/files'" ng-click="$event.stopPropagation()"
+                    class="cursor-default action-btn-td">
+                    <i ng-if="((item.name && removingFile !== item.name) || (item.file && removingFile !== item.file)) && adminMode"
+                        ng-click="showConfirmRemoveFile($event, item, path); $event.stopPropagation()" class="fa fa-fw fa-trash cursor-pointer"
+                        tooltip="Delete this file" tooltip-placement="left" aria-hidden="true"></i>
+                    <div ng-if="(item.name && removingFile === item.name) || (item.file && removingFile === item.file)"
+                        class="confirmEmbedBubble">
+                        <div layout="row">
+                            <span class="font-size-12 wz-padding-left-8">{{path === '/lists/files' ? 'List'
+                                : 'File'}} <b>{{path === '/lists/files' ? item.name
+                                    : item.file}}</b> will be deleted</span>
+                        </div>
+                        <div layout="row">
+                            <md-button class="cancelBtn" type="button" ng-click="cancelRemoveFile()"><i aria-hidden='true'
+                                    class='fa fa-fw fa-close'></i> Cancel</md-button>
+                            <md-button class="agreeBtn" type="button" ng-click="confirmRemoveFile(item, path)"><i
+                                    aria-hidden='true' class='fa fa-fw fa-check'></i> Confirm</md-button>
+                        </div>
+                    </div>
+                </td>
             </tr>
         </tbody>
         <tfoot>
-            <td colspan="{{ (path === '/agents' || (path === '/agents/groups' && adminMode) || (isLookingGroup() && adminMode)) && !isLookingDefaultGroup ? keys.length + 1 : keys.length}}">
+            <td colspan="{{ (path === '/agents' || (path === '/agents/groups' && adminMode) || (isLookingGroup() && adminMode) ||
+            path === '/rules/files' || path === '/decoders/files' || path === '/lists/files') && !isLookingDefaultGroup ? keys.length + 1 : keys.length}}">
                 <span ng-show="!wazuh_table_loading" class="color-grey">{{ totalItems }} items ({{time | number: 2}}
                     seconds)</span>
                 <div ng-show="items.length >= itemsPerPage" class="pagination pull-right" style="margin:0 !important">

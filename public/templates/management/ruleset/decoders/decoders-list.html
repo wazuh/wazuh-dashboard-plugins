@@ -35,7 +35,7 @@
                     allow-click="true" row-sizes="[16,13,11]">
                 </wz-table>
                 <wz-table custom-columns="true" ng-if="dctrl.showingLocalDecoders" flex path="'/decoders'" keys="['name',{value:'details.program_name',size:2,nosortable:true},{value:'details.order',size:2,nosortable:true},'file']"
-                    implicit-filter="[{ name:'path',value: '/var/ossec/etc/decoders'}]" allow-click="true" row-sizes="[16,13,11]"></wz-table>
+                    implicit-filter="[{ name:'path',value: 'etc/decoders'}]" allow-click="true" row-sizes="[16,13,11]"></wz-table>
                 <div layout="row" class="wz-margin-top-10 md-padding-h">
                     <span flex></span>
                     <a class="small" id="btnDownload" ng-click="dctrl.downloadCsv()">Formatted <i aria-hidden="true"

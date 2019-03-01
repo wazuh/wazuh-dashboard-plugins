@@ -16,7 +16,7 @@ export class RulesetHandler {
   async getLocalRules() {
     try {
       const result = await this.apiReq.request('GET', `/rules`, {
-        path: '/var/ossec/etc/rules'
+        path: 'etc/rules'
       });
       return result;
     } catch (error) {
@@ -27,7 +27,7 @@ export class RulesetHandler {
   async getLocalDecoders() {
     try {
       const result = await this.apiReq.request('GET', `/decoders`, {
-        path: '/var/ossec/etc/decoders'
+        path: 'etc/decoders'
       });
       return result;
     } catch (error) {
@@ -96,6 +96,33 @@ export class RulesetHandler {
         'POST',
         `/manager/files?path=etc/lists/${list}`,
         { content, origin: 'raw' }
+      );
+      return result;
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  }
+
+  async deleteFile(file, path) {
+    let type;
+    switch (path) {
+      case '/rules/files':
+        type = 'rules';
+        break;
+      case '/decoders/files':
+        type = 'decoders';
+        break;
+      case '/lists/files':
+        type = 'lists';
+        break;
+    }
+    try {
+      const result = await this.apiReq.request(
+        'DELETE',
+        `/manager/files?path=${file.path}/${
+          type !== 'lists' ? file.file : file.name
+        }`,
+        {}
       );
       return result;
     } catch (error) {

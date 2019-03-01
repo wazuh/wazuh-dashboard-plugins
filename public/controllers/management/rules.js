@@ -253,7 +253,8 @@ export function RulesController(
           `/rules/${$scope.currentRule.id}`,
           {}
         );
-        $scope.currentRule = ((((ruleReloaded || {}).data || {}).data || {}).items || [])[0];
+        $scope.currentRule = ((((ruleReloaded || {}).data || {}).data || {})
+          .items || [])[0];
       } catch (err) {
         errorHandler.handle(err, 'Rule reload error.');
       }
