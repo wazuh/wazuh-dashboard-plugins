@@ -27,12 +27,12 @@ export default [
     _type: 'visualization'
   },
   {
-    _id: 'Wazuh-App-Agents-Overview-Top-5-groups',
+    _id: 'Wazuh-App-Agents-Overview-Top-10-groups',
     _source: {
-      title: 'Top 5 groups',
+      title: 'Top 10 rule groups',
       visState:
-        '{"title":"Top 5 rule groups","type":"pie","params":{"type":"pie","addTooltip":true,"addLegend":true,"legendPosition":"right","isDonut":true,"labels":{"show":false,"values":true,"last_level":true,"truncate":100}},"aggs":[{"id":"1","enabled":true,"type":"count","schema":"metric","params":{}},{"id":"2","enabled":true,"type":"terms","schema":"segment","params":{"field":"rule.groups","size":5,"order":"desc","orderBy":"1","otherBucket":false,"otherBucketLabel":"Other","missingBucket":false,"missingBucketLabel":"Missing"}}]}',
-      uiStateJSON: '{"vis":{"legendOpen":true}}',
+        '{"title":"Top 10 rule groups","type":"tagcloud","params":{"scale":"linear","orientation":"single","minFontSize":11,"maxFontSize":24,"showLabel":false},"aggs":[{"id":"1","enabled":true,"type":"count","schema":"metric","params":{}},{"id":"2","enabled":true,"type":"terms","schema":"segment","params":{"field":"rule.groups","size":10,"order":"desc","orderBy":"1","otherBucket":false,"otherBucketLabel":"Other","missingBucket":false,"missingBucketLabel":"Missing"}}]}',
+      uiStateJSON: '{}',
       description: '',
       version: 1,
       kibanaSavedObjectMeta: {
@@ -61,9 +61,9 @@ export default [
   {
     _id: 'Wazuh-App-Agents-Overview-Alert-level-evolution',
     _source: {
-      title: 'Alert level evolution',
+      title: 'Rule group evolution',
       visState:
-        '{"title":"Alert level evolution","type":"histogram","params":{"type":"histogram","grid":{"categoryLines":false,"style":{"color":"#eee"}},"categoryAxes":[{"id":"CategoryAxis-1","type":"category","position":"bottom","show":true,"style":{},"scale":{"type":"linear"},"labels":{"show":true,"truncate":100},"title":{}}],"valueAxes":[{"id":"ValueAxis-1","name":"LeftAxis-1","type":"value","position":"left","show":true,"style":{},"scale":{"type":"linear","mode":"normal"},"labels":{"show":true,"rotate":0,"filter":false,"truncate":100},"title":{"text":"Count"}}],"seriesParams":[{"show":"true","type":"histogram","mode":"stacked","data":{"label":"Count","id":"1"},"valueAxis":"ValueAxis-1","drawLinesBetweenPoints":true,"showCircles":true}],"addTooltip":true,"addLegend":true,"legendPosition":"right","times":[],"addTimeMarker":false},"aggs":[{"id":"1","enabled":true,"type":"count","schema":"metric","params":{}},{"id":"3","enabled":true,"type":"terms","schema":"group","params":{"field":"rule.level","size":5,"order":"desc","orderBy":"1"}},{"id":"2","enabled":true,"type":"date_histogram","schema":"segment","params":{"field":"@timestamp","interval":"h","customInterval":"2h","min_doc_count":1,"extended_bounds":{}}}]}',
+        '{"title":"Rule group evolution","type":"metrics","params":{"id":"61ca57f0-469d-11e7-af02-69e470af7417","type":"timeseries","series":[{"id":"61ca57f1-469d-11e7-af02-69e470af7417","color":"rgba(0,156,224,1)","split_mode":"terms","metrics":[{"id":"61ca57f2-469d-11e7-af02-69e470af7417","type":"count"}],"separate_axis":0,"axis_position":"right","formatter":"number","chart_type":"line","line_width":1,"point_size":1,"fill":0.5,"stacked":"none","terms_field":"rule.groups"}],"time_field":"@timestamp","index_pattern":"wazuh-alerts","interval":"auto","axis_position":"right","axis_formatter":"number","axis_scale":"normal","show_legend":1,"show_grid":1,"annotations":[{"fields":"rule.level","template":"Detected level 12 and above alerts","index_pattern":"wazuh-alerts","query_string":"rule.level: { 11 TO * }","id":"790b0dd0-3672-11e9-a875-698afd42ed2c","color":"#F00","time_field":"@timestamp","icon":"fa-exclamation-triangle","ignore_global_filters":0,"ignore_panel_filters":0}],"legend_position":"left"},"aggs":[]}',
       uiStateJSON: '{}',
       description: '',
       version: 1,
@@ -79,8 +79,8 @@ export default [
     _source: {
       title: 'Alerts',
       visState:
-        '{"title":"Alerts","type":"histogram","params":{"type":"histogram","grid":{"categoryLines":false,"style":{"color":"#eee"}},"categoryAxes":[{"id":"CategoryAxis-1","type":"category","position":"bottom","show":true,"style":{},"scale":{"type":"linear"},"labels":{"show":true,"truncate":100},"title":{}}],"valueAxes":[{"id":"ValueAxis-1","name":"LeftAxis-1","type":"value","position":"left","show":true,"style":{},"scale":{"type":"linear","mode":"normal"},"labels":{"show":true,"rotate":0,"filter":false,"truncate":100},"title":{"text":"Count"}}],"seriesParams":[{"show":"true","type":"histogram","mode":"stacked","data":{"label":"Count","id":"1"},"valueAxis":"ValueAxis-1","drawLinesBetweenPoints":true,"showCircles":true}],"addTooltip":true,"addLegend":false,"legendPosition":"right","times":[],"addTimeMarker":false},"aggs":[{"id":"1","enabled":true,"type":"count","schema":"metric","params":{}},{"id":"2","enabled":true,"type":"date_histogram","schema":"segment","params":{"field":"@timestamp","interval":"h","customInterval":"2h","min_doc_count":1,"extended_bounds":{},"customLabel":"Agent alerts"}}]}',
-      uiStateJSON: '{"vis":{"legendOpen":false}}',
+        '{"title":"Alert level evolution","type":"metrics","params":{"id":"61ca57f0-469d-11e7-af02-69e470af7417","type":"timeseries","series":[{"id":"61ca57f1-469d-11e7-af02-69e470af7417","color":"rgba(0,156,224,1)","split_mode":"terms","metrics":[{"id":"61ca57f2-469d-11e7-af02-69e470af7417","type":"count"}],"separate_axis":0,"axis_position":"right","formatter":"number","chart_type":"bar","line_width":1,"point_size":1,"fill":0.5,"stacked":"none","terms_field":"rule.level","terms_size":"16"}],"time_field":"@timestamp","index_pattern":"wazuh-alerts","interval":"auto","axis_position":"left","axis_formatter":"number","axis_scale":"normal","show_legend":1,"show_grid":1,"background_color":null,"background_color_rules":[{"id":"2eaf6f30-367a-11e9-a875-698afd42ed2c"}],"bar_color_rules":[{"id":"2f685ef0-367a-11e9-a875-698afd42ed2c"}],"gauge_color_rules":[{"id":"339f78f0-367a-11e9-a875-698afd42ed2c"}],"gauge_width":10,"gauge_inner_width":10,"gauge_style":"half"},"aggs":[]}',
+      uiStateJSON: '{}',
       description: '',
       version: 1,
       kibanaSavedObjectMeta: {

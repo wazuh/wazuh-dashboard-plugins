@@ -4856,6 +4856,15 @@ export const knownFields = [
     readFromDocValues: true
   },
   {
+    name: 'syscheck.tags',
+    type: 'string',
+    count: 0,
+    scripted: false,
+    searchable: true,
+    aggregatable: true,
+    readFromDocValues: true
+  },
+  {
     name: 'title',
     type: 'string',
     count: 0,
