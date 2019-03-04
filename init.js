@@ -18,10 +18,13 @@ import { Monitoring } from './server/monitoring';
 import { WazuhApiRoutes } from './server/routes/wazuh-api';
 import { WazuhReportingRoutes } from './server/routes/wazuh-reporting';
 import { WazuhUtilsRoutes } from './server/routes/wazuh-utils';
+import { IndexPatternCronJob } from './server/index-pattern-cron-job';
 import { log } from './server/logger';
 
 export function initApp(server) {
   const monitoringInstance = new Monitoring(server);
+  const indexPatternCronJobInstance = new IndexPatternCronJob(server);
+
   log('[initApp]', `Waiting for awaitMigration()`, 'info');
   server.kibanaMigrator
     .awaitMigration()
@@ -35,6 +38,7 @@ export function initApp(server) {
       WazuhElasticRouter(server);
       WazuhApiElasticRoutes(server);
       monitoringInstance.run();
+      indexPatternCronJobInstance.run();
       WazuhApiRoutes(server);
       WazuhReportingRoutes(server);
       WazuhUtilsRoutes(server);

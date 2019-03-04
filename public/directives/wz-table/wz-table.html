@@ -143,7 +143,7 @@
             <tr class="wz-word-wrap cursor-pointer"
                 ng-repeat-start="item in pagedItems[currentPage] | filter:{item:'!'}"
                 ng-click="expandPolicyMonitoringCheck(item)" ng-class="{'selected': item.expanded}">
-                <td ng-repeat="key in keys">
+                <td ng-repeat="key in keys" id="td-{{$parent.$index}}-{{$index}}" ng-mouseover="showTooltip($parent.$index, $index, item)">
                     <div class="wz-text-truncatable">
                         <span>
                             <span ng-show="key === 'result'" class="no-wrap">
@@ -154,6 +154,9 @@
                             parseValue(key,item)
                             }}
                         </span>
+                        <md-tooltip ng-show="item.showTooltip[$index]" md-direction="bottom" class="wz-tooltip">
+                            {{ parseValue(key,item) }}
+                        </md-tooltip>
                     </div>
                 </td>
             </tr>
