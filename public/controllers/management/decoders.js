@@ -59,6 +59,7 @@ export class DecodersController {
     this.viewingDetail = false;
     this.typeFilter = 'all';
     this.isArray = Array.isArray;
+    this.saveAndOverwrite = false;
 
     const configuration = this.wazuhConfig.getConfig();
     this.$scope.adminMode = !!(configuration || {}).admin;
@@ -85,6 +86,11 @@ export class DecodersController {
     this.$scope.$on('showFileNameInput', () => {
       this.newFile = true;
       this.selectedItem = { file: 'new file' };
+      this.$scope.$applyAsync();
+    });
+
+    this.$scope.$on('showSaveAndOverwrite', () => {
+      this.saveAndOverwrite = true;
       this.$scope.$applyAsync();
     });
 
@@ -301,6 +307,7 @@ export class DecodersController {
     this.selectedItem = { file: 'new file' };
     this.fetchedXML = '<!-- Modify it at your will. -->';
     this.type = type;
+    this.cancelSaveAndOverwrite();
     if (!this.$scope.$$phase) this.$scope.$digest();
     this.$location.search('editingFile', true);
     this.appState.setNavigation({ status: true });
@@ -309,6 +316,11 @@ export class DecodersController {
 
   toggleSaveConfig = () => {
     this.doingSaving = false;
+    this.$scope.$applyAsync();
+  };
+
+  cancelSaveAndOverwrite = () => {
+    this.saveAndOverwrite = false;
     this.$scope.$applyAsync();
   };
 
@@ -342,7 +354,8 @@ export class DecodersController {
       const objParam = {
         decoder: isNewFile ? this.selectedItem : this.currentDecoder,
         showRestartManager,
-        isNewFile: !!isNewFile
+        isNewFile: !!isNewFile,
+        isOverwrite: !!this.saveAndOverwrite
       };
 
       this.$scope.$broadcast('saveXmlFile', objParam);

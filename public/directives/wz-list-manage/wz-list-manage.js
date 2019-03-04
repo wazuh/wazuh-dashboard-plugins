@@ -27,10 +27,8 @@ app.directive('wzListManage', function() {
     },
     controller(
       $scope,
-      $rootScope,
       errorHandler,
       $filter,
-      $mdDialog,
       rulesetHandler,
       wazuhConfig,
       appState
@@ -119,7 +117,11 @@ app.directive('wzListManage', function() {
           for (var key in $scope.currentList.list) {
             raw = raw.concat(`${key}:${$scope.currentList.list[key]}` + '\n');
           }
-          await rulesetHandler.sendCdbList($scope.currentList.name, raw);
+          await rulesetHandler.sendCdbList(
+            $scope.currentList.name,
+            raw,
+            !$scope.saveAndOverwrite
+          );
           const msg = 'Success. CDB list has been updated';
           showRestartMessage(
             msg,
@@ -129,14 +131,17 @@ app.directive('wzListManage', function() {
           $scope.doingSaving = false;
           $scope.loadingChange = false;
           if (!$scope.$$phase) $scope.$digest();
-          //$scope.closeFn();
         } catch (err) {
           if (addingNew) {
             $scope.currentList.name = false;
             $scope.$applyAsync();
           }
           $scope.doingSaving = false;
-          errorHandler.handle(err, 'Error updating list');
+          if ((err || '').includes('Wazuh API error: 1905')) {
+            $scope.saveAndOverwrite = true;
+          } else {
+            errorHandler.handle(err, 'Error updating list');
+          }
           $scope.loadingChange = false;
         }
       };

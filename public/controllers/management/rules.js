@@ -26,6 +26,7 @@ export function RulesController(
   rulesetHandler
 ) {
   $scope.showingLocalRules = false;
+  $scope.saveAndOverwrite = false;
   $scope.switchLocalRules = () =>
     ($scope.showingLocalRules = !$scope.showingLocalRules);
 
@@ -317,6 +318,7 @@ export function RulesController(
     $scope.selectedItem = { file: 'new file' };
     $scope.fetchedXML = '<!-- Modify it at your will. -->';
     $scope.type = type;
+    $scope.cancelSaveAndOverwrite();
     if (!$scope.$$phase) $scope.$digest();
     $location.search('editingFile', true);
     appState.setNavigation({ status: true });
@@ -330,6 +332,11 @@ export function RulesController(
 
   $scope.toggleRestartMsg = () => {
     $scope.restartMsg = false;
+    $scope.$applyAsync();
+  };
+
+  $scope.cancelSaveAndOverwrite = () => {
+    $scope.saveAndOverwrite = false;
     $scope.$applyAsync();
   };
 
@@ -363,7 +370,8 @@ export function RulesController(
       const objParam = {
         rule: isNewFile ? $scope.selectedItem : $scope.currentRule,
         showRestartManager,
-        isNewFile: !!isNewFile
+        isNewFile: !!isNewFile,
+        isOverwrite: !!$scope.saveAndOverwrite
       };
 
       $scope.$broadcast('saveXmlFile', objParam);
@@ -382,6 +390,11 @@ export function RulesController(
 
   $scope.$on('showRestartMsg', () => {
     $scope.restartMsg = true;
+    $scope.$applyAsync();
+  });
+
+  $scope.$on('showSaveAndOverwrite', () => {
+    $scope.saveAndOverwrite = true;
     $scope.$applyAsync();
   });
 }
