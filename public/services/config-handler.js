@@ -24,7 +24,7 @@ export class ConfigHandler {
     try {
       const result = await this.apiReq.request(
         'POST',
-        `/manager/files?path=etc/ossec.conf`,
+        `/manager/files?path=etc/ossec.conf&overwrite=true`,
         { content, origin: 'xmleditor' }
       );
       return result;
@@ -42,7 +42,7 @@ export class ConfigHandler {
     try {
       const result = await this.apiReq.request(
         'POST',
-        `/cluster/${node}/files?path=etc/ossec.conf`,
+        `/cluster/${node}/files?path=etc/ossec.conf&overwrite=true`,
         { content, origin: 'xmleditor' }
       );
       return result;
