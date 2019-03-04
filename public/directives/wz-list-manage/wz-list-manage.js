@@ -120,7 +120,7 @@ app.directive('wzListManage', function () {
           await rulesetHandler.sendCdbList(
             $scope.currentList.name,
             raw,
-            !$scope.overwriteError
+            addingNew ? !$scope.overwriteError : false
           );
           const msg = 'Success. CDB list has been updated';
           showRestartMessage(
