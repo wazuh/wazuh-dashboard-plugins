@@ -237,11 +237,11 @@ export default [
     _type: 'visualization'
   },
   {
-    _id: 'Wazuh-App-Overview-General-Top-5-rule-groups',
+    _id: 'Wazuh-App-Overview-General-Top-10-rule-groups',
     _source: {
-      title: 'Top 5 rule groups',
+      title: 'Top 10 rule groups',
       visState:
-        '{"title":"Top 5 rule groups","type":"tagcloud","params":{"scale":"linear","orientation":"single","minFontSize":11,"maxFontSize":24,"showLabel":false},"aggs":[{"id":"1","enabled":true,"type":"count","schema":"metric","params":{}},{"id":"2","enabled":true,"type":"terms","schema":"segment","params":{"field":"rule.groups","size":10,"order":"desc","orderBy":"1","otherBucket":false,"otherBucketLabel":"Other","missingBucket":false,"missingBucketLabel":"Missing"}}]}',
+        '{"title":"Top 10 rule groups","type":"tagcloud","params":{"scale":"linear","orientation":"single","minFontSize":11,"maxFontSize":24,"showLabel":false},"aggs":[{"id":"1","enabled":true,"type":"count","schema":"metric","params":{}},{"id":"2","enabled":true,"type":"terms","schema":"segment","params":{"field":"rule.groups","size":10,"order":"desc","orderBy":"1","otherBucket":false,"otherBucketLabel":"Other","missingBucket":false,"missingBucketLabel":"Missing"}}]}',
       uiStateJSON: '{}',
       description: '',
       version: 1,
