@@ -24,7 +24,7 @@
     <div layout="row">
         <md-card flex class="wz-md-card _md flex md-margin-h" ng-if="!dctrl.editingFile">
             <md-card-actions layout="row" layout-align="end center" class="wz-card-actions wz-card-actions-top">
-                <a ng-click="dctrl.addNewFile('decoders')">Add new decoder <i aria-hidden="true" class="fa fa-plus"></i></a>
+                <a ng-if="adminMode" ng-click="dctrl.addNewFile('decoders')">Add new decoder <i aria-hidden="true" class="fa fa-plus"></i></a>
                 <span flex></span>
                 <wz-kbn-switch class="md-primary wz-no-top-bottom-margin" switch-model="dctrl.showingLocalDecoders"
                     switch-text="Custom decoders"></wz-kbn-switch>
