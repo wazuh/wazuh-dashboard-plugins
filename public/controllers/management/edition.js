@@ -106,7 +106,7 @@ export class EditionController {
           '/cluster/status',
           {}
         );
-        let data;
+
         const clusterStatus =
           ((this.$scope.clusterStatus || {}).data || {}).data || {};
         if (
@@ -114,15 +114,11 @@ export class EditionController {
             clusterStatus.running === 'yes') ||
           (clusterStatus.enabled === 'no' && clusterStatus.running === 'yes')
         ) {
-          data = await this.configHandler.restartNode(selectedNode);
-          this.errorHandler.info(
-            `${data.data.data}. It will take up to 15 seconds.`
-          );
+          await this.configHandler.restartNode(selectedNode);
+          this.errorHandler.info('Success. It will take up to 15 seconds.');
         } else {
-          data = await this.configHandler.restartManager();
-          this.errorHandler.info(
-            `${data.data.data}. It may take a few seconds.`
-          );
+          await this.configHandler.restartManager();
+          this.errorHandler.info('Success. It may take a few seconds.');
         }
         this.$scope.$emit('removeRestarting', {});
         this.$scope.isRestarting = false;

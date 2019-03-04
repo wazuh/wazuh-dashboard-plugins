@@ -316,7 +316,7 @@ app.directive('wzXmlFileEditor', function() {
         } catch (error) {
           $scope.savingParam();
           if ((error || '').includes('Wazuh API error: 1905')) {
-            $scope.configError = ["File name already exists"];
+            $scope.configError = ['File name already exists'];
             $scope.$emit('showSaveAndOverwrite', {});
           } else {
             errorHandler.handle(error, 'Error');

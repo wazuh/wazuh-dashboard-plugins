@@ -1,5 +1,5 @@
 /*
- * Wazuh app - Module for refreshing all known fields every 1 minute
+ * Wazuh app - Module for refreshing all known fields every 2 minutes
  * Copyright (C) 2015-2019 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -21,7 +21,7 @@ export class IndexPatternCronJob {
   constructor(server) {
     this.server = server;
     this.wzWrapper = new ElasticWrapper(server);
-    this.CRON_FREQ = '0 */2 * * * *'; // Every minute
+    this.CRON_FREQ = '0 */2 * * * *'; // Every 2 minutes
   }
 
   /**
