@@ -203,7 +203,7 @@ export class WazuhApiCtrl {
                   req.idChanged = api._id;
                   return this.checkStoredAPI(req, reply);
                 }
-              } catch (error) { } // eslint-disable-line
+              } catch (error) {} // eslint-disable-line
             }
           } catch (error) {
             log('POST /api/check-stored-api', error.message || error);
@@ -624,7 +624,7 @@ export class WazuhApiCtrl {
       }
 
       throw ((response || {}).body || {}).error &&
-        ((response || {}).body || {}).message
+      ((response || {}).body || {}).message
         ? { message: response.body.message, code: response.body.error }
         : new Error('Unexpected error fetching data from the Wazuh API');
     } catch (error) {
@@ -683,7 +683,7 @@ export class WazuhApiCtrl {
       }
 
       throw ((response || {}).body || {}).error &&
-        ((response || {}).body || {}).message
+      ((response || {}).body || {}).message
         ? { message: response.body.message, code: response.body.error }
         : new Error('Unexpected error fetching data from the Wazuh API');
     } catch (error) {
@@ -832,18 +832,18 @@ export class WazuhApiCtrl {
       if ((((output || {}).body || {}).data || {}).totalItems) {
         const fields = req.payload.path.includes('/agents')
           ? [
-            'id',
-            'status',
-            'name',
-            'ip',
-            'group',
-            'manager',
-            'node_name',
-            'dateAdd',
-            'version',
-            'lastKeepAlive',
-            'os'
-          ]
+              'id',
+              'status',
+              'name',
+              'ip',
+              'group',
+              'manager',
+              'node_name',
+              'dateAdd',
+              'version',
+              'lastKeepAlive',
+              'os'
+            ]
           : Object.keys(output.body.data.items[0]);
 
         const json2csvParser = new Parser({ fields });
