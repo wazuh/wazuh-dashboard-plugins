@@ -162,10 +162,10 @@ export function RulesController(
         coloredString = coloredString.replace(
           /\$\(((?!<\/span>).)*?\)(?!<\/span>)/im,
           '<span style="color: ' +
-          colors[i] +
-          ' ">' +
-          valuesArray[i] +
-          '</span>'
+            colors[i] +
+            ' ">' +
+            valuesArray[i] +
+            '</span>'
         );
       }
     }

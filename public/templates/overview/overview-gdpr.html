@@ -1,9 +1,10 @@
-<md-content flex layout="column" ng-if="octrl.tab === 'gdpr' && octrl.tabView === 'panels'" ng-class="{'no-opacity': resultState !== 'ready' || !rendered}"
-    layout-align="start">
+<md-content flex layout="column" ng-if="octrl.tab === 'gdpr' && octrl.tabView === 'panels'"
+    ng-class="{'no-opacity': resultState !== 'ready' || !rendered}" layout-align="start">
 
     <div layout="row" layout-align="center stretch" ng-show="octrl.gdprTabs.length">
         <md-card flex class="wz-md-card">
-            <md-tabs md-selected="selectedGdprIndex" class="wz-md-tab" md-border-bottom md-dynamic-height id="gdprReq_tab">
+            <md-tabs md-selected="selectedGdprIndex" class="wz-md-tab" md-border-bottom md-dynamic-height
+                id="gdprReq_tab">
                 <md-tab ng-repeat="tab in octrl.gdprTabs" ng-disabled="tab.disabled" label="{{tab.title}}">
                     <div class="md-padding">
                         <span class="wz-headline-title">GDPR Requirement: {{tab.title}}</span>
@@ -17,7 +18,7 @@
         </md-card>
     </div>
 
-    <div layout="row" layout-align="center stretch" class="height-255">
+    <div layout="row" layout-align="center stretch" class="height-400">
         <md-card flex="30" class="wz-md-card" ng-class="{'fullscreen': octrl.expandArray[0]}">
             <md-card-content class="wazuh-column">
                 <div layout="row">
@@ -37,7 +38,8 @@
                     <span class="wz-text-link" ng-click="octrl.expand(1)"><i class="fa fa-fw fa-expand"></i></span>
                 </div>
                 <md-divider class="wz-margin-top-10"></md-divider>
-                <kbn-vis id="Wazuh-App-Overview-GDPR-requirements" vis-id="'Wazuh-App-Overview-GDPR-requirements'"></kbn-vis>
+                <kbn-vis id="Wazuh-App-Overview-GDPR-requirements" vis-id="'Wazuh-App-Overview-GDPR-requirements'">
+                </kbn-vis>
             </md-card-content>
         </md-card>
     </div>
@@ -51,7 +53,8 @@
                     <span class="wz-text-link" ng-click="octrl.expand(2)"><i class="fa fa-fw fa-expand"></i></span>
                 </div>
                 <md-divider class="wz-margin-top-10"></md-divider>
-                <kbn-vis id="Wazuh-App-Overview-GDPR-Requirements-heatmap" vis-id="'Wazuh-App-Overview-GDPR-Requirements-heatmap'"></kbn-vis>
+                <kbn-vis id="Wazuh-App-Overview-GDPR-Requirements-heatmap"
+                    vis-id="'Wazuh-App-Overview-GDPR-Requirements-heatmap'"></kbn-vis>
             </md-card-content>
         </md-card>
     </div>
@@ -65,7 +68,8 @@
                     <span class="wz-text-link" ng-click="octrl.expand(3)"><i class="fa fa-fw fa-expand"></i></span>
                 </div>
                 <md-divider class="wz-margin-top-10"></md-divider>
-                <kbn-vis id="Wazuh-App-Overview-GDPR-Requirements-by-agent" vis-id="'Wazuh-App-Overview-GDPR-Requirements-by-agent'"></kbn-vis>
+                <kbn-vis id="Wazuh-App-Overview-GDPR-Requirements-by-agent"
+                    vis-id="'Wazuh-App-Overview-GDPR-Requirements-by-agent'"></kbn-vis>
             </md-card-content>
         </md-card>
         <md-card flex="30" class="wz-md-card" ng-class="{'fullscreen': octrl.expandArray[4]}">

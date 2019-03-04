@@ -98,7 +98,8 @@ export class EmbeddedVisualizeHandler {
   constructor(
     private readonly element: HTMLElement,
     savedObject: VisSavedObject,
-    params: EmbeddedVisualizeHandlerParams
+    params: EmbeddedVisualizeHandlerParams,
+    $injector
   ) {
     const { searchSource, vis } = savedObject;
 
@@ -146,7 +147,7 @@ export class EmbeddedVisualizeHandler {
     this.uiState.on('change', this.onUiStateChange);
     timefilter.on('autoRefreshFetch', this.reload);
 
-    this.dataLoader = new VisualizeDataLoader(vis, Private);
+    this.dataLoader = new VisualizeDataLoader(vis, Private, $injector);
     this.renderCompleteHelper = new RenderCompleteHelper(element);
     this.inspectorAdapters = this.getActiveInspectorAdapters();
     this.vis.openInspector = this.openInspector;

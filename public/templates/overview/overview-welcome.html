@@ -1,4 +1,4 @@
-<div class=""  layout="column" layout-align="start stretch" ng-if="octrl.tab === 'welcome'">
+<div class="" layout="column" layout-align="start stretch" ng-if="octrl.tab === 'welcome'">
 
     <!-- Headline -->
     <div layout="column" layout-padding>
@@ -10,16 +10,20 @@
         <md-card flex class="wz-metric-color wz-md-card wz-no-padding">
             <md-card-content layout="row" class="wz-padding-metric">
                 <div class="wz-text-truncatable" flex>
-                    Total agents: <span class="wz-text-bold">{{octrl.agentsCountTotal >= 0 ? octrl.agentsCountTotal : '-'}}</span>
+                    Total agents: <span
+                        class="wz-text-bold">{{octrl.agentsCountTotal >= 0 ? octrl.agentsCountTotal : '-'}}</span>
                 </div>
                 <div class="wz-text-truncatable" flex>
-                    Active agents: <span class="wz-text-bold">{{octrl.agentsCountActive >= 0 ? octrl.agentsCountActive : '-'}}</span>
+                    Active agents: <span
+                        class="wz-text-bold">{{octrl.agentsCountActive >= 0 ? octrl.agentsCountActive : '-'}}</span>
                 </div>
                 <div class="wz-text-truncatable" flex>
-                    Disconnected agents: <span class="wz-text-bold">{{octrl.agentsCountDisconnected >= 0 ? octrl.agentsCountDisconnected : '-'}}</span>
+                    Disconnected agents: <span
+                        class="wz-text-bold">{{octrl.agentsCountDisconnected >= 0 ? octrl.agentsCountDisconnected : '-'}}</span>
                 </div>
                 <div class="wz-text-truncatable" flex>
-                    Never connected agents: <span class="wz-text-bold">{{octrl.agentsCountNeverConnected >= 0 ? octrl.agentsCountNeverConnected : '-'}}</span>
+                    Never connected agents: <span
+                        class="wz-text-bold">{{octrl.agentsCountNeverConnected >= 0 ? octrl.agentsCountNeverConnected : '-'}}</span>
                 </div>
             </md-card-content>
         </md-card>

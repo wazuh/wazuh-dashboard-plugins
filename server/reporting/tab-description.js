@@ -82,6 +82,6 @@ export const TabDescription = {
   },
   sca: {
     title: 'Configuration assessment',
-    description: 'Lorem ipsum.'
+    description: 'Scan your assets as part of a configuration assessment audit.'
   }
 };
