@@ -16,7 +16,7 @@ export class RulesetHandler {
   async getLocalRules() {
     try {
       const result = await this.apiReq.request('GET', `/rules`, {
-        path: '/var/ossec/etc/rules'
+        path: 'etc/rules'
       });
       return result;
     } catch (error) {
@@ -27,7 +27,7 @@ export class RulesetHandler {
   async getLocalDecoders() {
     try {
       const result = await this.apiReq.request('GET', `/decoders`, {
-        path: '/var/ossec/etc/decoders'
+        path: 'etc/decoders'
       });
       return result;
     } catch (error) {
@@ -65,11 +65,11 @@ export class RulesetHandler {
       return Promise.reject(error);
     }
   }
-  async sendRuleConfiguration(rule, content) {
+  async sendRuleConfiguration(rule, content, overwrite) {
     try {
       const result = await this.apiReq.request(
         'POST',
-        `/manager/files?path=etc/rules/${rule.file}`,
+        `/manager/files?path=etc/rules/${rule.file}&overwrite=${!overwrite}`,
         { content, origin: 'xmleditor' }
       );
       return result;
@@ -77,11 +77,13 @@ export class RulesetHandler {
       return Promise.reject(error);
     }
   }
-  async sendDecoderConfiguration(decoder, content) {
+  async sendDecoderConfiguration(decoder, content, overwrite) {
     try {
       const result = await this.apiReq.request(
         'POST',
-        `/manager/files?path=etc/decoders/${decoder.file}`,
+        `/manager/files?path=etc/decoders/${
+          decoder.file
+        }&overwrite=${!overwrite}`,
         { content, origin: 'xmleditor' }
       );
       return result;
@@ -90,12 +92,39 @@ export class RulesetHandler {
     }
   }
 
-  async sendCdbList(list, content) {
+  async sendCdbList(list, content, overwrite) {
     try {
       const result = await this.apiReq.request(
         'POST',
-        `/manager/files?path=etc/lists/${list}`,
+        `/manager/files?path=etc/lists/${list}&overwrite=${!overwrite}`,
         { content, origin: 'raw' }
+      );
+      return result;
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  }
+
+  async deleteFile(file, path) {
+    let type;
+    switch (path) {
+      case '/rules/files':
+        type = 'rules';
+        break;
+      case '/decoders/files':
+        type = 'decoders';
+        break;
+      case '/lists/files':
+        type = 'lists';
+        break;
+    }
+    try {
+      const result = await this.apiReq.request(
+        'DELETE',
+        `/manager/files?path=${file.path}/${
+          type !== 'lists' ? file.file : file.name
+        }`,
+        {}
       );
       return result;
     } catch (error) {

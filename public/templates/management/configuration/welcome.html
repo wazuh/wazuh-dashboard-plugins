@@ -8,7 +8,7 @@
         </div>
     </div>
     <div layout="row" ng-show="!agent || agent.id === '000'" class="wz-padding-left-8">
-        <md-button class="wz-button" ng-click="mctrl.setConfigTab('editconfiguration', true)"><i class="fa fa-fw fa-pencil"></i>
+        <md-button ng-if="adminMode" class="wz-button" ng-click="mctrl.setConfigTab('editconfiguration', true)"><i class="fa fa-fw fa-pencil"></i>
             Edit configuration</md-button>
     </div>
     <!-- End headline -->

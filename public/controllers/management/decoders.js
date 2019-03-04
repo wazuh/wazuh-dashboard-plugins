@@ -59,6 +59,7 @@ export class DecodersController {
     this.viewingDetail = false;
     this.typeFilter = 'all';
     this.isArray = Array.isArray;
+    this.overwriteError = false;
 
     const configuration = this.wazuhConfig.getConfig();
     this.$scope.adminMode = !!(configuration || {}).admin;
@@ -85,6 +86,11 @@ export class DecodersController {
     this.$scope.$on('showFileNameInput', () => {
       this.newFile = true;
       this.selectedItem = { file: 'new file' };
+      this.$scope.$applyAsync();
+    });
+
+    this.$scope.$on('showSaveAndOverwrite', () => {
+      this.overwriteError = true;
       this.$scope.$applyAsync();
     });
 
@@ -251,7 +257,8 @@ export class DecodersController {
           `/decoders/${this.currentDecoder.name}`,
           {}
         );
-        this.currentDecoder = ((((decoderReload || {}).data || {}).data || {}).items || [])[0];
+        this.currentDecoder = ((((decoderReload || {}).data || {}).data || {})
+          .items || [])[0];
       } catch (err) {
         this.errorHandler.handle(err, 'Decoder reload error.');
       }
@@ -300,6 +307,7 @@ export class DecodersController {
     this.selectedItem = { file: 'new file' };
     this.fetchedXML = '<!-- Modify it at your will. -->';
     this.type = type;
+    this.cancelSaveAndOverwrite();
     if (!this.$scope.$$phase) this.$scope.$digest();
     this.$location.search('editingFile', true);
     this.appState.setNavigation({ status: true });
@@ -308,6 +316,11 @@ export class DecodersController {
 
   toggleSaveConfig = () => {
     this.doingSaving = false;
+    this.$scope.$applyAsync();
+  };
+
+  cancelSaveAndOverwrite = () => {
+    this.overwriteError = false;
     this.$scope.$applyAsync();
   };
 
@@ -341,7 +354,8 @@ export class DecodersController {
       const objParam = {
         decoder: isNewFile ? this.selectedItem : this.currentDecoder,
         showRestartManager,
-        isNewFile: !!isNewFile
+        isNewFile: !!isNewFile,
+        isOverwrite: !!this.overwriteError
       };
 
       this.$scope.$broadcast('saveXmlFile', objParam);

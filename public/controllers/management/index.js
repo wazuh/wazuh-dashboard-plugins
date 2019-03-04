@@ -23,6 +23,7 @@ import { CdbListsController } from './cdblists';
 import { ConfigurationRulesetController } from './config-ruleset';
 import { ConfigurationGroupsController } from './config-groups';
 import { EditionController } from './edition';
+import { FilesController } from './files';
 
 const app = uiModules.get('app/wazuh', []);
 
@@ -38,4 +39,5 @@ app
   .controller('cdbListsController', CdbListsController)
   .controller('configurationRulesetController', ConfigurationRulesetController)
   .controller('configurationGroupsController', ConfigurationGroupsController)
-  .controller('editionController', EditionController);
+  .controller('editionController', EditionController)
+  .controller('filesController', FilesController);

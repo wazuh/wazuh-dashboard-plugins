@@ -43,13 +43,14 @@
     <div layout="row" ng-if="!editingFile">
         <md-card flex class="wz-md-card _md flex md-margin-h">
             <md-card-actions layout="row" layout-align="end center" class="wz-card-actions wz-card-actions-top">
-                <a ng-click="addNewFile('rules')">Add new rule <i aria-hidden="true" class="fa fa-plus"></i></a>
+                <a ng-if="adminMode" ng-click="addNewFile('rules')">Add new rule <i aria-hidden="true" class="fa fa-plus"></i></a>
                 <span flex></span>
                 <wz-kbn-switch class="md-primary wz-no-top-bottom-margin" switch-model="showingLocalRules" switch-text="Custom rules"></wz-kbn-switch>
             </md-card-actions>
             <md-card-content>
                 <wz-table custom-columns="true" flex ng-if="showingLocalRules" path="'/rules'" keys="['id',{value:'file',size:2},{value:'description',size:2},{value:'groups',nosortable:true,size:2},{value:'pci',nosortable:true,size:2},{value:'gdpr',nosortable:true},'level']"
-                    implicit-filter="[{ name:'path',value: '/var/ossec/etc/rules'}]" allow-click="true" row-sizes="[16,13,11]"></wz-table>
+                    implicit-filter="[{ name:'path',value: 'etc/rules'}]" allow-click="true" row-sizes="[16,13,11]">
+                </wz-table>
                 <wz-table custom-columns="true" ng-if="!showingLocalRules" implicit-filter="appliedFilters" flex path="'/rules'"
                     keys="['id',{value:'file',size:2},{value:'description',size:2},{value:'groups',nosortable:true,size:2},{value:'pci',nosortable:true,size:2},{value:'gdpr',nosortable:true},'level']"
                     allow-click="true" row-sizes="[16,13,11]">
@@ -74,15 +75,16 @@
             </div>
             <div layout="row" ng-if="newFile" class="wz-padding-bottom-14">
                 <span ng-click='closeEditingFile()' class='btn btn-info'>Cancel</span>
-                <button ng-disabled='xmlHasErrors || newFileName === "" || doingSaving' ng-click='doSaveConfig(true,newFileName)'
+                <button ng-disabled='xmlHasErrors || newFileName === "" || doingSaving || overwriteError' ng-click='doSaveConfig(true,newFileName)'
                     class='btn wz-button pull-right wz-margin-left-8'>
-                    <span ng-show='!xmlHasErrors'><i aria-hidden='true' class='fa fa-fw fa-save' ng-class="doingSaving ? 'fa-spin fa-spinner' : ''"></i>Save
+                    <span ng-show='!xmlHasErrors'><i aria-hidden='true' class='fa fa-fw fa-save'
+                            ng-class="doingSaving ? 'fa-spin fa-spinner' : ''"></i>Save
                         file</span>
                     <span ng-show='xmlHasErrors' class='btn-danger'><i aria-hidden='true' class='fa fa-fw fa-exclamation-triangle'></i>
                         XML format error</span>
                 </button>
                 <input placeholder="Eg: my_local_rule.xml" ng-model="newFileName" type="text" class="wz-margin-left-8 kuiLocalSearchInput ng-empty ng-pristine ng-scope ng-touched ng-valid"
-                    aria-invalid="false">
+                    aria-invalid="false" ng-change="cancelSaveAndOverwrite()">
                 <div ng-show="restartMsg" class="confirmEmbedBubble confirmEmbedBubbleInline">
                     <span class="wz-padding-top-10 wz-padding-left-8">Configuration is not applied yet. Do you want
                         to restart to apply it?</span>
