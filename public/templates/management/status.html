@@ -12,8 +12,8 @@
         <span class="md-subheader">Check the status of all Wazuh manager daemons <span ng-show="ctrl.selectedNode">({{ctrl.selectedNode}})</span></span>
     </div>
 
-    <div ng-show="!ctrl.load" layout="row" layout-padding>
-        <div ng-show="ctrl.selectedNode" layout="column" layout-align="center" class="height-40 wz-select-input">
+    <div ng-show="!ctrl.load" layout="row" layout-padding class="wz-padding-top-0 wz-padding-bottom-0">
+        <div ng-show="ctrl.selectedNode" layout="column" layout-align="center" class="height-35 wz-select-input">
             <select class="kuiSelect wz-border-none cursor-pointer max-height-35" id="categoryBox" ng-model="ctrl.selectedNode"
                 ng-change="ctrl.changeNode(ctrl.selectedNode)" aria-label="Select node">
                 <option ng-repeat="node in ctrl.nodes" value="{{node.name}}">{{node.name}}</option>
@@ -70,13 +70,13 @@
     </div>
 
     <!-- Daemons status section -->
-    <div layout="row" layout-align="start stretch" ng-show="!ctrl.load && !ctrl.clusterError">
-        <md-card flex class="wz-md-card" ng-repeat="(k,v) in ctrl.daemons">
-            <md-card-content>
-                <center>
-                    <p ng-class="ctrl.getDaemonStatusClass(v)" class="round"></p>
-                    <p class="wz-padding-top-10">{{k}}</p>
-                </center>
+    <div ng-show="!ctrl.load && !ctrl.clusterError">
+        <md-card flex class="wz-md-card wz-margin-bottom-25">
+            <md-card-content class="deamons-card">
+                <div ng-repeat="deamon in ctrl.daemons | filter: deamonsFilter" class="deamon-label">
+                    <p ng-class="ctrl.getDaemonStatusClass(deamon.value)" class="round deamon-bullet"></p>
+                    <p class="deamon-name">{{deamon.key}}</p>
+                </div>
             </md-card-content>
         </md-card>
     </div>
