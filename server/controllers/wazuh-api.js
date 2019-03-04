@@ -26,6 +26,7 @@ import { ApiErrorEquivalence } from '../../util/api-errors-equivalence';
 import { cleanKeys } from '../../util/remove-key';
 import { apiRequestList } from '../../util/api-request-list';
 import * as ApiHelper from '../lib/api-helper';
+import { Queue } from '../jobs/queue';
 
 export class WazuhApiCtrl {
   /**
@@ -33,6 +34,7 @@ export class WazuhApiCtrl {
    * @param {*} server
    */
   constructor(server) {
+    this.queue = Queue;
     this.wzWrapper = new ElasticWrapper(server);
     this.monitoringInstance = new Monitoring(server, true);
   }
@@ -201,7 +203,7 @@ export class WazuhApiCtrl {
                   req.idChanged = api._id;
                   return this.checkStoredAPI(req, reply);
                 }
-              } catch (error) {} // eslint-disable-line
+              } catch (error) { } // eslint-disable-line
             }
           } catch (error) {
             log('POST /api/check-stored-api', error.message || error);
@@ -593,8 +595,20 @@ export class WazuhApiCtrl {
         options.content_type = 'application/octet-stream';
         data = data.content;
       }
-
+      const delay = (data || {}).delay || 0;
       const fullUrl = getPath(api) + path;
+      if (delay) {
+        const current = new Date();
+        this.queue.addJob({
+          startAt: new Date(current.getTime() + delay),
+          type: 'request',
+          method,
+          fullUrl,
+          data,
+          options
+        });
+        return { error: 0, message: 'Success' };
+      }
       const response = await needle(method, fullUrl, data, options);
 
       if (
@@ -610,7 +624,7 @@ export class WazuhApiCtrl {
       }
 
       throw ((response || {}).body || {}).error &&
-      ((response || {}).body || {}).message
+        ((response || {}).body || {}).message
         ? { message: response.body.message, code: response.body.error }
         : new Error('Unexpected error fetching data from the Wazuh API');
     } catch (error) {
@@ -669,7 +683,7 @@ export class WazuhApiCtrl {
       }
 
       throw ((response || {}).body || {}).error &&
-      ((response || {}).body || {}).message
+        ((response || {}).body || {}).message
         ? { message: response.body.message, code: response.body.error }
         : new Error('Unexpected error fetching data from the Wazuh API');
     } catch (error) {
@@ -818,18 +832,18 @@ export class WazuhApiCtrl {
       if ((((output || {}).body || {}).data || {}).totalItems) {
         const fields = req.payload.path.includes('/agents')
           ? [
-              'id',
-              'status',
-              'name',
-              'ip',
-              'group',
-              'manager',
-              'node_name',
-              'dateAdd',
-              'version',
-              'lastKeepAlive',
-              'os'
-            ]
+            'id',
+            'status',
+            'name',
+            'ip',
+            'group',
+            'manager',
+            'node_name',
+            'dateAdd',
+            'version',
+            'lastKeepAlive',
+            'os'
+          ]
           : Object.keys(output.body.data.items[0]);
 
         const json2csvParser = new Parser({ fields });
