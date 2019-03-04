@@ -1,14 +1,12 @@
 <div layout="column" layout-align="start">
     <div layout="row" ng-class="hideClose ? ['wz-margin-top-8', 'md-padding-h'] : ''">
         <span ng-if="!hideClose" ng-click='closeFn()' class='btn btn-info wz-margin-right-8'>Cancel</span>
-        <button ng-disabled='!(items || []).length || (currentList.new && !currentList.newName) || doingSaving'
+        <button ng-disabled='!(items || []).length || (currentList.new && !currentList.newName) || doingSaving || overwriteError'
             ng-click='saveList()' class='btn wz-button pull-right'>
-            <span ng-show="!saveAndOverwrite"><i aria-hidden='true' class='fa fa-fw fa-save' ng-class="doingSaving ? 'fa-spin fa-spinner' : ''"></i>Save
+            <span><i aria-hidden='true' class='fa fa-fw fa-save' ng-class="doingSaving ? 'fa-spin fa-spinner' : ''"></i>Save
                 list</span>
-            <span ng-show="saveAndOverwrite"><i aria-hidden='true' class='fa fa-fw fa-save' ng-class="doingSaving ? 'fa-spin fa-spinner' : ''"></i>Save
-                and overwrite list</span>
         </button>
-        <input ng-show="currentList.new" placeholder="Enter new list name" ng-model="currentList.newName" ng-change="saveAndOverwrite = false"
+        <input ng-show="currentList.new" placeholder="Enter new list name" ng-model="currentList.newName" ng-change="overwriteError = false"
             type="text" class="kuiLocalSearchInput ng-empty ng-pristine ng-scope ng-touched ng-valid wz-margin-left-8"
             aria-invalid="false">
         <div ng-show="restartMsg" class="confirmEmbedBubble confirmEmbedBubbleInline">

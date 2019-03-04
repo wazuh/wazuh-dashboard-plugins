@@ -59,7 +59,7 @@ export class DecodersController {
     this.viewingDetail = false;
     this.typeFilter = 'all';
     this.isArray = Array.isArray;
-    this.saveAndOverwrite = false;
+    this.overwriteError = false;
 
     const configuration = this.wazuhConfig.getConfig();
     this.$scope.adminMode = !!(configuration || {}).admin;
@@ -90,7 +90,7 @@ export class DecodersController {
     });
 
     this.$scope.$on('showSaveAndOverwrite', () => {
-      this.saveAndOverwrite = true;
+      this.overwriteError = true;
       this.$scope.$applyAsync();
     });
 
@@ -320,7 +320,7 @@ export class DecodersController {
   };
 
   cancelSaveAndOverwrite = () => {
-    this.saveAndOverwrite = false;
+    this.overwriteError = false;
     this.$scope.$applyAsync();
   };
 
@@ -355,7 +355,7 @@ export class DecodersController {
         decoder: isNewFile ? this.selectedItem : this.currentDecoder,
         showRestartManager,
         isNewFile: !!isNewFile,
-        isOverwrite: !!this.saveAndOverwrite
+        isOverwrite: !!this.overwriteError
       };
 
       this.$scope.$broadcast('saveXmlFile', objParam);

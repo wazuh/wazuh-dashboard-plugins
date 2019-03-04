@@ -75,13 +75,11 @@
             </div>
             <div layout="row" ng-if="newFile" class="wz-padding-bottom-14">
                 <span ng-click='closeEditingFile()' class='btn btn-info'>Cancel</span>
-                <button ng-disabled='xmlHasErrors || newFileName === "" || doingSaving' ng-click='doSaveConfig(true,newFileName)'
+                <button ng-disabled='xmlHasErrors || newFileName === "" || doingSaving || overwriteError' ng-click='doSaveConfig(true,newFileName)'
                     class='btn wz-button pull-right wz-margin-left-8'>
-                    <span ng-show='!xmlHasErrors && !saveAndOverwrite'><i aria-hidden='true' class='fa fa-fw fa-save'
+                    <span ng-show='!xmlHasErrors'><i aria-hidden='true' class='fa fa-fw fa-save'
                             ng-class="doingSaving ? 'fa-spin fa-spinner' : ''"></i>Save
                         file</span>
-                    <span ng-show='!xmlHasErrors && saveAndOverwrite'><i aria-hidden='true' class='fa fa-fw' ng-class="doingSaving ? 'fa-spin fa-spinner' : 'fa-exclamation'"></i>Save
-                        and overwrite file</span>
                     <span ng-show='xmlHasErrors' class='btn-danger'><i aria-hidden='true' class='fa fa-fw fa-exclamation-triangle'></i>
                         XML format error</span>
                 </button>

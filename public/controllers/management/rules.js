@@ -26,7 +26,7 @@ export function RulesController(
   rulesetHandler
 ) {
   $scope.showingLocalRules = false;
-  $scope.saveAndOverwrite = false;
+  $scope.overwriteError = false;
   $scope.switchLocalRules = () =>
     ($scope.showingLocalRules = !$scope.showingLocalRules);
 
@@ -336,7 +336,7 @@ export function RulesController(
   };
 
   $scope.cancelSaveAndOverwrite = () => {
-    $scope.saveAndOverwrite = false;
+    $scope.overwriteError = false;
     $scope.$applyAsync();
   };
 
@@ -371,7 +371,7 @@ export function RulesController(
         rule: isNewFile ? $scope.selectedItem : $scope.currentRule,
         showRestartManager,
         isNewFile: !!isNewFile,
-        isOverwrite: !!$scope.saveAndOverwrite
+        isOverwrite: !!$scope.overwriteError
       };
 
       $scope.$broadcast('saveXmlFile', objParam);
@@ -394,7 +394,7 @@ export function RulesController(
   });
 
   $scope.$on('showSaveAndOverwrite', () => {
-    $scope.saveAndOverwrite = true;
+    $scope.overwriteError = true;
     $scope.$applyAsync();
   });
 }
