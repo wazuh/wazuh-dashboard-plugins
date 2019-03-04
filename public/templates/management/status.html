@@ -72,10 +72,10 @@
     <!-- Daemons status section -->
     <div ng-show="!ctrl.load && !ctrl.clusterError">
         <md-card flex class="wz-md-card wz-margin-bottom-25">
-            <md-card-content class="deamons-card">
-                <div ng-repeat="deamon in ctrl.daemons | filter: deamonsFilter" class="deamon-label">
-                    <p ng-class="ctrl.getDaemonStatusClass(deamon.value)" class="round deamon-bullet"></p>
-                    <p class="deamon-name">{{deamon.key}}</p>
+            <md-card-content class="daemons-card">
+                <div ng-repeat="daemon in ctrl.daemons | filter: daemonsFilter" class="daemon-label">
+                    <p ng-class="ctrl.getDaemonStatusClass(daemon.value)" class="round daemon-bullet"></p>
+                    <p class="daemon-name">{{daemon.key}}</p>
                 </div>
             </md-card-content>
         </md-card>
