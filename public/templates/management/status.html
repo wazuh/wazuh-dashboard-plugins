@@ -73,7 +73,7 @@
     <div ng-show="!ctrl.load && !ctrl.clusterError">
         <md-card flex class="wz-md-card wz-margin-bottom-25">
             <md-card-content class="daemons-card">
-                <div ng-repeat="daemon in ctrl.daemons | filter: daemonsFilter" class="daemon-label">
+                <div ng-repeat="daemon in ctrl.daemons" class="daemon-label">
                     <p ng-class="ctrl.getDaemonStatusClass(daemon.value)" class="round daemon-bullet"></p>
                     <p class="daemon-name">{{daemon.key}}</p>
                 </div>
