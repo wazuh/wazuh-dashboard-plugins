@@ -219,8 +219,7 @@ app.directive('wzXmlFileEditor', function() {
           return true;
         } catch (error) {
           $scope.configError = false;
-          errorHandler.handle(error, 'Error asdfas');
-          throw new Error(error);
+          return Promise.reject(error);
         }
       };
 
