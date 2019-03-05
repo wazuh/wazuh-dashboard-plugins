@@ -253,14 +253,13 @@ export function RulesController(
           `/rules/${$scope.currentRule.id}`,
           {}
         );
-        const response = ((((ruleReloaded || {}).data || {}).data || {})
-          .items || [])[0];
-        if (!response) {
+        const response = (((ruleReloaded || {}).data || {}).data || {}).items || [];
+        if (!response.length) {
           $scope.currentRule = null;
           $scope.showingLocalRules = true;
           $scope.closeDetailView(true);
         } else {
-          $scope.currentRule = response;
+          $scope.currentRule = response[0];
         }
       } catch (err) {
         errorHandler.handle(err, 'Rule reload error.');

@@ -256,13 +256,12 @@ export class DecodersController {
           `/decoders/${this.currentDecoder.name}`,
           {}
         );
-        const response = ((((decoderReload || {}).data || {}).data || {})
-          .items || [])[0];
-        if (!response) {
+        const response = (((decoderReload || {}).data || {}).data || {}).items || [];
+        if (!response.length) {
           this.currentDecoder = null;
           this.closeDetailView(true);
         } else {
-          this.currentDecoder = response;
+          this.currentDecoder = response[0];
         }
       } catch (err) {
         this.errorHandler.handle(err, 'Decoder reload error.');
