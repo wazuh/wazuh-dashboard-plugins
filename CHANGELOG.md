@@ -23,6 +23,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Expand visualizations ([#1246](https://github.com/wazuh/wazuh-kibana-app/pull/1246)).
 - Added a dynamic table columns selector ([#1246](https://github.com/wazuh/wazuh-kibana-app/pull/1246)).
 - Added a cron job for fetching missing fields of all valid index patterns, also merging dynamic fields every time an index pattern is refreshed by the app ([#1276](https://github.com/wazuh/wazuh-kibana-app/pull/1276)).
+- New server module, it's a job queue so we can add delayed jobs to be run in background, this iteration only accepts delayed Wazuh API calls ([#1283](https://github.com/wazuh/wazuh-kibana-app/pull/1283)).
 
 ### Changed
 
@@ -40,7 +41,9 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Truncate texts and display a tooltip when they don't fit in a table cell ([7b56a87](https://github.com/wazuh/wazuh-kibana-app/commit/7b56a873f85dcba7e6838aeb2e40d9b4cf472576))
 - Updated API autocomplete for Dev Tools ([#1218](https://github.com/wazuh/wazuh-kibana-app/pull/1218))
 - Updated switches design to adapt it to Kibana's design ([#1253](https://github.com/wazuh/wazuh-kibana-app/pull/1253))
-- Reduced the width of some table cells with little text, to give more space to the other columns ([#1263](https://github.com/wazuh/wazuh-kibana-app/pull/1263))
+- Reduced the width of some table cells with little text, to give more space to the other columns ([#1263](https://github.com/wazuh/wazuh-kibana-app/pull/1263)).
+- Redesign for Management > Status daemons list ([#1284](https://github.com/wazuh/wazuh-kibana-app/pull/1284)).
+- Redesign for Management > Configuration, Agent > Configuration ([#1289](https://github.com/wazuh/wazuh-kibana-app/pull/1289)).
 
 ### Fixed
 
