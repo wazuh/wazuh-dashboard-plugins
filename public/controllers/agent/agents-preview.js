@@ -154,6 +154,7 @@ export class AgentsPreviewController {
       const unique = agentsUnique.data.result;
 
       this.searchBarModel = {
+        name: [],
         status: ['Active', 'Disconnected', 'Never connected'],
         group: unique.groups,
         version: unique.versions,
@@ -175,7 +176,6 @@ export class AgentsPreviewController {
       this.searchBarModel['os.platform'] = Array.from(
         new Set(this.searchBarModel['os.platform'])
       );
-
       this.groups = unique.groups;
       this.nodes = unique.nodes.map(item => ({ id: item }));
       this.versions = unique.versions.map(item => ({ id: item }));
