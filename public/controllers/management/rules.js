@@ -163,10 +163,10 @@ export function RulesController(
         coloredString = coloredString.replace(
           /\$\(((?!<\/span>).)*?\)(?!<\/span>)/im,
           '<span style="color: ' +
-            colors[i] +
-            ' ">' +
-            valuesArray[i] +
-            '</span>'
+          colors[i] +
+          ' ">' +
+          valuesArray[i] +
+          '</span>'
         );
       }
     }
@@ -246,7 +246,6 @@ export function RulesController(
   };
 
   $scope.closeEditingFile = async () => {
-    $scope.editingFile = false;
     if ($scope.currentRule) {
       try {
         const ruleReloaded = await apiReq.request(
@@ -254,12 +253,21 @@ export function RulesController(
           `/rules/${$scope.currentRule.id}`,
           {}
         );
-        $scope.currentRule = ((((ruleReloaded || {}).data || {}).data || {})
+        const response = ((((ruleReloaded || {}).data || {}).data || {})
           .items || [])[0];
+        if (!response) {
+          $scope.currentRule = null;
+          $scope.showingLocalRules = true;
+          $scope.closeDetailView(true);
+        } else {
+          $scope.currentRule = response;
+        }
       } catch (err) {
         errorHandler.handle(err, 'Rule reload error.');
       }
     }
+    $scope.editingFile = false;
+    $scope.$applyAsync();
     appState.setNavigation({ status: true });
     $scope.$broadcast('closeEditXmlFile', {});
     if (!$scope.$$phase) $scope.$digest();
