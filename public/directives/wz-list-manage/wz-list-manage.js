@@ -17,7 +17,7 @@ import { checkGap } from '../wz-table/lib/check-gap';
 
 const app = uiModules.get('app/wazuh', []);
 
-app.directive('wzListManage', function() {
+app.directive('wzListManage', function () {
   return {
     restrict: 'E',
     scope: {
@@ -27,10 +27,8 @@ app.directive('wzListManage', function() {
     },
     controller(
       $scope,
-      $rootScope,
       errorHandler,
       $filter,
-      $mdDialog,
       rulesetHandler,
       wazuhConfig,
       appState
@@ -52,7 +50,7 @@ app.directive('wzListManage', function() {
       $scope.prevPage = () => pagination.prevPage($scope);
       $scope.nextPage = async currentPage =>
         pagination.nextPage(currentPage, $scope, errorHandler, null);
-      $scope.setPage = function() {
+      $scope.setPage = function () {
         $scope.currentPage = this.n;
         $scope.nextPage(this.n);
       };
@@ -119,7 +117,11 @@ app.directive('wzListManage', function() {
           for (var key in $scope.currentList.list) {
             raw = raw.concat(`${key}:${$scope.currentList.list[key]}` + '\n');
           }
-          await rulesetHandler.sendCdbList($scope.currentList.name, raw);
+          await rulesetHandler.sendCdbList(
+            $scope.currentList.name,
+            raw,
+            addingNew ? !$scope.overwriteError : false
+          );
           const msg = 'Success. CDB list has been updated';
           showRestartMessage(
             msg,
@@ -129,14 +131,18 @@ app.directive('wzListManage', function() {
           $scope.doingSaving = false;
           $scope.loadingChange = false;
           if (!$scope.$$phase) $scope.$digest();
-          //$scope.closeFn();
         } catch (err) {
           if (addingNew) {
             $scope.currentList.name = false;
             $scope.$applyAsync();
           }
           $scope.doingSaving = false;
-          errorHandler.handle(err, 'Error updating list');
+          if ((err || '').includes('Wazuh API error: 1905')) {
+            $scope.overwriteError = true;
+            errorHandler.handle('File name already exists');
+          } else {
+            errorHandler.handle(err, 'Error updating list');
+          }
           $scope.loadingChange = false;
         }
       };

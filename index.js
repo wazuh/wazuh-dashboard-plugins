@@ -27,6 +27,7 @@ export default kibana =>
         icon: 'plugins/wazuh/img/icon.svg',
         main: 'plugins/wazuh/app'
       },
+      hacks: ['plugins/wazuh/hack-icon-style'],
       __bundleProvider__(kbnServer) {
         kbnServer.uiBundles.addPostLoader({
           test: /\.pug$/,

@@ -26,6 +26,7 @@ export function RulesController(
   rulesetHandler
 ) {
   $scope.showingLocalRules = false;
+  $scope.overwriteError = false;
   $scope.switchLocalRules = () =>
     ($scope.showingLocalRules = !$scope.showingLocalRules);
 
@@ -162,10 +163,10 @@ export function RulesController(
         coloredString = coloredString.replace(
           /\$\(((?!<\/span>).)*?\)(?!<\/span>)/im,
           '<span style="color: ' +
-          colors[i] +
-          ' ">' +
-          valuesArray[i] +
-          '</span>'
+            colors[i] +
+            ' ">' +
+            valuesArray[i] +
+            '</span>'
         );
       }
     }
@@ -244,8 +245,21 @@ export function RulesController(
     }
   };
 
-  $scope.closeEditingFile = () => {
+  $scope.closeEditingFile = async () => {
     $scope.editingFile = false;
+    if ($scope.currentRule) {
+      try {
+        const ruleReloaded = await apiReq.request(
+          'GET',
+          `/rules/${$scope.currentRule.id}`,
+          {}
+        );
+        $scope.currentRule = ((((ruleReloaded || {}).data || {}).data || {})
+          .items || [])[0];
+      } catch (err) {
+        errorHandler.handle(err, 'Rule reload error.');
+      }
+    }
     appState.setNavigation({ status: true });
     $scope.$broadcast('closeEditXmlFile', {});
     if (!$scope.$$phase) $scope.$digest();
@@ -304,6 +318,7 @@ export function RulesController(
     $scope.selectedItem = { file: 'new file' };
     $scope.fetchedXML = '<!-- Modify it at your will. -->';
     $scope.type = type;
+    $scope.cancelSaveAndOverwrite();
     if (!$scope.$$phase) $scope.$digest();
     $location.search('editingFile', true);
     appState.setNavigation({ status: true });
@@ -317,6 +332,11 @@ export function RulesController(
 
   $scope.toggleRestartMsg = () => {
     $scope.restartMsg = false;
+    $scope.$applyAsync();
+  };
+
+  $scope.cancelSaveAndOverwrite = () => {
+    $scope.overwriteError = false;
     $scope.$applyAsync();
   };
 
@@ -350,7 +370,8 @@ export function RulesController(
       const objParam = {
         rule: isNewFile ? $scope.selectedItem : $scope.currentRule,
         showRestartManager,
-        isNewFile: !!isNewFile
+        isNewFile: !!isNewFile,
+        isOverwrite: !!$scope.overwriteError
       };
 
       $scope.$broadcast('saveXmlFile', objParam);
@@ -369,6 +390,11 @@ export function RulesController(
 
   $scope.$on('showRestartMsg', () => {
     $scope.restartMsg = true;
+    $scope.$applyAsync();
+  });
+
+  $scope.$on('showSaveAndOverwrite', () => {
+    $scope.overwriteError = true;
     $scope.$applyAsync();
   });
 }

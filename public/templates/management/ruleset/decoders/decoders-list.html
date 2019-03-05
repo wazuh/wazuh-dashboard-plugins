@@ -24,7 +24,8 @@
     <div layout="row">
         <md-card flex class="wz-md-card _md flex md-margin-h" ng-if="!dctrl.editingFile">
             <md-card-actions layout="row" layout-align="end center" class="wz-card-actions wz-card-actions-top">
-                <a ng-click="dctrl.addNewFile('decoders')">Add new decoder <i aria-hidden="true" class="fa fa-plus"></i></a>
+                <a ng-if="adminMode" ng-click="dctrl.addNewFile('decoders')">Add new decoder <i aria-hidden="true"
+                        class="fa fa-plus"></i></a>
                 <span flex></span>
                 <wz-kbn-switch class="md-primary wz-no-top-bottom-margin" switch-model="dctrl.showingLocalDecoders"
                     switch-text="Custom decoders"></wz-kbn-switch>
@@ -35,7 +36,7 @@
                     allow-click="true" row-sizes="[16,13,11]">
                 </wz-table>
                 <wz-table custom-columns="true" ng-if="dctrl.showingLocalDecoders" flex path="'/decoders'" keys="['name',{value:'details.program_name',size:2,nosortable:true},{value:'details.order',size:2,nosortable:true},'file']"
-                    implicit-filter="[{ name:'path',value: '/var/ossec/etc/decoders'}]" allow-click="true" row-sizes="[16,13,11]"></wz-table>
+                    implicit-filter="[{ name:'path',value: 'etc/decoders'}]" allow-click="true" row-sizes="[16,13,11]"></wz-table>
                 <div layout="row" class="wz-margin-top-10 md-padding-h">
                     <span flex></span>
                     <a class="small" id="btnDownload" ng-click="dctrl.downloadCsv()">Formatted <i aria-hidden="true"
@@ -58,14 +59,15 @@
             </div>
             <div layout="row" ng-if="dctrl.newFile" class="wz-padding-bottom-14">
                 <span ng-click='dctrl.closeEditingFile()' class='btn btn-info'>Cancel</span>
-                <button ng-disabled='dctrl.xmlHasErrors || dctrl.newFileName ===  "" || dctrl.doingSaving' ng-click='dctrl.doSaveConfig(true,dctrl.newFileName)'
-                    class='btn wz-button pull-right wz-margin-left-8'>
+                <button ng-disabled='dctrl.xmlHasErrors || dctrl.newFileName ===  "" || dctrl.doingSaving || dctrl.overwriteError'
+                    ng-click='dctrl.doSaveConfig(true,dctrl.newFileName)' class='btn wz-button pull-right wz-margin-left-8'>
                     <span ng-show='!dctrl.xmlHasErrors'><i aria-hidden='true' class='fa fa-fw fa-save' ng-class="dctrl.doingSaving ? 'fa-spin fa-spinner' : ''"></i>Save
                         file</span>
                     <span ng-show='dctrl.xmlHasErrors' class='btn-danger'><i aria-hidden='true' class='fa fa-fw fa-exclamation-triangle'></i>
                         XML format error</span>
                 </button>
-                <input placeholder="Eg: my_local_decoder.xml" ng-model="dctrl.newFileName" type="text" class="wz-margin-left-8 kuiLocalSearchInput ng-empty ng-pristine ng-scope ng-touched ng-valid"
+                <input placeholder="Eg: my_local_decoder.xml" ng-model="dctrl.newFileName" ng-change="dctrl.overwriteError = false"
+                    type="text" class="wz-margin-left-8 kuiLocalSearchInput ng-empty ng-pristine ng-scope ng-touched ng-valid"
                     aria-invalid="false">
                 <div ng-show="dctrl.restartMsg" class="confirmEmbedBubble confirmEmbedBubbleInline">
                     <span class="wz-padding-top-10 wz-padding-left-8">Configuration is not applied yet. Do you want

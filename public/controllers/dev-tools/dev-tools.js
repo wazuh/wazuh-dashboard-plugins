@@ -559,7 +559,10 @@ export class DevToolsController {
         if (!firstTime) {
           const output = await this.apiReq.request(method, path, JSONraw);
           this.apiOutputBox.setValue(
-            JSON.stringify((output || {}).data, null, 2)
+            JSON.stringify((output || {}).data || {}, null, 2).replace(
+              /\\\\/g,
+              '\\'
+            )
           );
         }
       }

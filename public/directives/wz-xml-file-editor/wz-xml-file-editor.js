@@ -29,11 +29,9 @@ app.directive('wzXmlFileEditor', function() {
     },
     controller(
       $scope,
-      $rootScope,
       $document,
       $location,
       appState,
-      $mdDialog,
       errorHandler,
       groupHandler,
       rulesetHandler,
@@ -221,8 +219,7 @@ app.directive('wzXmlFileEditor', function() {
           return true;
         } catch (error) {
           $scope.configError = false;
-          errorHandler.handle(error, 'Error asdfas');
-          throw new Error(error);
+          return Promise.reject(error);
         }
       };
 
@@ -249,7 +246,11 @@ app.directive('wzXmlFileEditor', function() {
               : errorHandler.info(msg);
           } else if (params.rule) {
             close = false;
-            await rulesetHandler.sendRuleConfiguration(params.rule, xml);
+            await rulesetHandler.sendRuleConfiguration(
+              params.rule,
+              xml,
+              params.isNewFile && !params.isOverwrite
+            );
             try {
               await validateAfterSent();
             } catch (err) {
@@ -263,7 +264,11 @@ app.directive('wzXmlFileEditor', function() {
               : errorHandler.info(msg);
           } else if (params.decoder) {
             close = false;
-            await rulesetHandler.sendDecoderConfiguration(params.decoder, xml);
+            await rulesetHandler.sendDecoderConfiguration(
+              params.decoder,
+              xml,
+              params.isNewFile && !params.isOverwrite
+            );
             try {
               await validateAfterSent();
             } catch (err) {
@@ -309,7 +314,12 @@ app.directive('wzXmlFileEditor', function() {
           if (close) $scope.closeFn({ reload: true });
         } catch (error) {
           $scope.savingParam();
-          errorHandler.handle(error, 'Error');
+          if ((error || '').includes('Wazuh API error: 1905')) {
+            $scope.configError = ['File name already exists'];
+            $scope.$emit('showSaveAndOverwrite', {});
+          } else {
+            errorHandler.handle(error, 'Error');
+          }
         }
         return;
       };
