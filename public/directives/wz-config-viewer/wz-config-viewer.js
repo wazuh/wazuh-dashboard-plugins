@@ -68,7 +68,7 @@ class WzConfigViewer {
         setJsonBox();
       }
       if ($scope.jsoncontent != false) {
-        $scope.jsonCodeBox.setValue($scope.jsoncontent);
+        $scope.jsonCodeBox.setValue($scope.jsoncontent.replace(/\\\\/g, '\\'));
         setTimeout(function() {
           $scope.jsonCodeBox.refresh();
         }, 1);
