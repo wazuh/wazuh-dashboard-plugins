@@ -71,7 +71,7 @@ app.directive('wzTagFilter', function () {
             };
             const idxSearch = $scope.tagList.find(x => x.type === 'search');
             if (!isFilter && idxSearch) {
-              $scope.removeTag(idxSearch.id, false);
+              $scope.removeTag(idxSearch.id, false, $scope.searchIdx, undefined, true);
             }
             if (
               !$scope.tagList.find(x => {
@@ -110,7 +110,8 @@ app.directive('wzTagFilter', function () {
             if (search) {
               $scope.searchIdx = idx;
               queryObj.search = search.value.name;
-              queryObj.query = queryObj.query.substring(0, queryObj.query.length - 1);
+              if (idx === groups.length - 1)
+                queryObj.query = queryObj.query.substring(0, queryObj.query.length - 1);
             } else {
               const twoOrMoreElements = group.length > 1;
               if (twoOrMoreElements) {
@@ -127,7 +128,7 @@ app.directive('wzTagFilter', function () {
               if (twoOrMoreElements) {
                 queryObj.query += ')';
               }
-              if (idx != groups.length - 1) {
+              if (idx !== groups.length - 1) {
                 queryObj.query += $scope.connectors[idx].value;
               }
             }
@@ -180,7 +181,7 @@ app.directive('wzTagFilter', function () {
       };
 
       $scope.changeConnector = (parentIdx, idx) => {
-        if (parentIdx === $scope.searchIdx - 1 && idx === undefined) {
+        if ((parentIdx === $scope.searchIdx - 1 || parentIdx === $scope.searchIdx) && idx === undefined) {
           $scope.connectors[parentIdx].value = ';';
         } else {
           if (idx !== undefined) {
@@ -217,7 +218,7 @@ app.directive('wzTagFilter', function () {
       /**
        * This remove tag from search bar
        */
-      $scope.removeTag = (id, deleteGroup, parentIdx, idx) => {
+      $scope.removeTag = (id, deleteGroup, parentIdx, idx, overwrite = false) => {
         if (deleteGroup) {
           $scope.tagList = $scope.tagList.filter(x => x.key !== id);
           $scope.connectors.splice(parentIdx, 1);
@@ -226,7 +227,7 @@ app.directive('wzTagFilter', function () {
           if (idx < 0) {
             idx = 0;
           }
-          if ($scope.connectors[parentIdx].subgroup) {
+          if ($scope.connectors[parentIdx] && $scope.connectors[parentIdx].subgroup) {
             $scope.connectors[parentIdx].subgroup.splice(idx, 1);
           } else
             $scope.connectors.splice(parentIdx, 1);
@@ -239,6 +240,16 @@ app.directive('wzTagFilter', function () {
         if (!search) {
           $scope.searchIdx = false;
         }
+        $scope.connectors = addConnectors($scope.groupedTagList);
+        if (!overwrite)
+          buildQuery($scope.groupedTagList);
+        $scope.showAutocomplete(false);
+      };
+
+      $scope.removeAll = () => {
+        $scope.tagList = [];
+        $scope.connectors = [];
+        $scope.groupedTagList = [];
         buildQuery($scope.groupedTagList);
         $scope.showAutocomplete(false);
       };

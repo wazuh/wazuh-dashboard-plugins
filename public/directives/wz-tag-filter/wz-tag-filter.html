@@ -26,6 +26,7 @@
         <input id='wz-search-filter-bar-input' class='wz-search-filter-bar-input input' type='text' ng-model='newTag'
             ng-focus='showAutocomplete(true)' ng-blur='showAutocomplete(false)' placeholder='Add filter or search'
             ng-keyup='!autocompleteEnter && $event.keyCode == 13 ? addTag(true) : addSearchKey($event)' />
+        <a class='wz-tag-remove-button wz-padding-top-5' ng-click='removeAll()'><i class="fa fa-trash" aria-hidden="true"></i></a>
         <div id='wz-search-filter-bar-autocomplete' class='wz-search-filter-bar-autocomplete' ng-show='isAutocomplete && autocompleteContent.list.length > 0'>
             <p><b>{{autocompleteContent.title}}</b></p>
             <ul id='wz-search-filter-bar-autocomplete-list'>
