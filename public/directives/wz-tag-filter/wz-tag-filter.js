@@ -108,7 +108,9 @@ app.directive('wzTagFilter', function () {
           groups.forEach((group, idx) => {
             const search = group.find(x => x.type === 'search');
             if (search) {
+              $scope.searchIdx = idx;
               queryObj.search = search.value.name;
+              queryObj.query = queryObj.query.substring(0, queryObj.query.length - 1);
             } else {
               const twoOrMoreElements = group.length > 1;
               if (twoOrMoreElements) {
@@ -178,14 +180,18 @@ app.directive('wzTagFilter', function () {
       };
 
       $scope.changeConnector = (parentIdx, idx) => {
-        if (idx !== undefined) {
-          const value = $scope.connectors[parentIdx].subgroup[idx].value;
-          $scope.connectors[parentIdx].subgroup[idx].value = value === ';' ? ',' : ';'
+        if (parentIdx === $scope.searchIdx - 1 && idx === undefined) {
+          $scope.connectors[parentIdx].value = ';';
         } else {
-          const value = $scope.connectors[parentIdx].value;
-          $scope.connectors[parentIdx].value = value === ';' ? ',' : ';'
+          if (idx !== undefined) {
+            const value = $scope.connectors[parentIdx].subgroup[idx].value;
+            $scope.connectors[parentIdx].subgroup[idx].value = value === ';' ? ',' : ';'
+          } else {
+            const value = $scope.connectors[parentIdx].value;
+            $scope.connectors[parentIdx].value = value === ';' ? ',' : ';'
+          }
+          buildQuery($scope.groupedTagList);
         }
-        buildQuery($scope.groupedTagList);
       };
 
       /**
@@ -229,6 +235,10 @@ app.directive('wzTagFilter', function () {
           $scope.connectors = [{}];
         }
         $scope.groupedTagList = groupBy($scope.tagList, 'key');
+        const search = $scope.tagList.find(x => x.type === 'search');
+        if (!search) {
+          $scope.searchIdx = false;
+        }
         buildQuery($scope.groupedTagList);
         $scope.showAutocomplete(false);
       };
