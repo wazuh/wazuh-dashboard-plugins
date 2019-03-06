@@ -37,7 +37,8 @@ app.directive('wzTable', function() {
       rowSizes: '=rowSizes',
       extraLimit: '=extraLimit',
       emptyResults: '=emptyResults',
-      customColumns: '=customColumns'
+      customColumns: '=customColumns',
+      implicitSort: '=implicitSort'
     },
     controller(
       $scope,
@@ -89,7 +90,8 @@ app.directive('wzTable', function() {
       const instance = new DataFactory(
         apiReq,
         $scope.path,
-        $scope.implicitFilter
+        $scope.implicitFilter,
+        $scope.implicitSort
       );
       $scope.keyEquivalence = KeyEquivalenece;
       $scope.totalItems = 0;
@@ -149,6 +151,7 @@ app.directive('wzTable', function() {
           $scope.items = items;
           checkGap($scope, items);
           $scope.searchTable();
+          $scope.$emit('wazuhFetched', { items });
           return;
         } catch (error) {
           if (
@@ -290,6 +293,10 @@ app.directive('wzTable', function() {
 
       $scope.$on('wazuhQuery', (event, parameters) =>
         listeners.wazuhQuery(parameters, query)
+      );
+
+      $scope.$on('wazuhSort', (event, parameters) =>
+        $scope.sort(parameters.field)
       );
 
       $scope.$on('wazuhRemoveFilter', (event, parameters) =>

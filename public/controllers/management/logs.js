@@ -31,6 +31,7 @@ export class LogsController {
     this.nodeList = false;
     this.type_log = 'all';
     this.category = 'all';
+    this.sortFilter = false;
   }
 
   /**
@@ -38,8 +39,30 @@ export class LogsController {
    */
   $onInit() {
     this.initialize();
+
+    this.$scope.$on('wazuhFetched', (ev, parameters) => {
+      this.$scope.XMLContent = this.parseLogsToText(parameters.items);
+      this.$scope.$broadcast('XMLContentReady', {
+        data: this.$scope.XMLContent
+      });
+      this.$scope.$applyAsync();
+    });
   }
 
+  parseLogsToText(logs) {
+    let result = '';
+    logs.forEach(function(log, idx) {
+      if (log) {
+        result = result.concat(
+          `${log.timestamp} ${log.tag} ${log.level} ${log.description}`
+        );
+        if (idx !== logs.length - 1) {
+          result = result.concat('\n');
+        }
+      }
+    });
+    return result;
+  }
   /**
    * Event handler for the search bar.
    * @param {string} term Term(s) to be searched
@@ -54,6 +77,10 @@ export class LogsController {
    */
   filter(filter) {
     this.$scope.$broadcast('wazuhFilter', { filter });
+  }
+
+  sort() {
+    this.$scope.$broadcast('wazuhSort', { field: 'timestamp' });
   }
 
   /**
