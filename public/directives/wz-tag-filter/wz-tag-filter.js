@@ -250,6 +250,7 @@ app.directive('wzTagFilter', function () {
         $scope.tagList = [];
         $scope.connectors = [];
         $scope.groupedTagList = [];
+        $scope.searchIdx = false;
         buildQuery($scope.groupedTagList);
         $scope.showAutocomplete(false);
       };
