@@ -92,6 +92,153 @@ export default [
     }
   },
   {
+    _id: 'Wazuh-App-Agents-FIM-Files-added',
+    _source: {
+      title: 'Files added',
+      visState:
+        '{"title":"Files added","type":"pie","params":{"type":"pie","addTooltip":true,"addLegend":true,"legendPosition":"right","isDonut":true},"aggs":[{"id":"1","enabled":true,"type":"count","schema":"metric","params":{}},{"id":"2","enabled":true,"type":"terms","schema":"segment","params":{"field":"syscheck.path","size":5,"order":"desc","orderBy":"1"}}]}',
+      uiStateJSON: '{}',
+      description: '',
+      version: 1,
+      kibanaSavedObjectMeta: {
+        searchSourceJSON: `{
+                    "index":"wazuh-alerts",
+                    "filter":[
+                        {
+                            "meta": {
+                              "index": "wazuh-alerts",
+                              "type": "phrases",
+                              "key": "syscheck.event",
+                              "value": "added, readded",
+                              "params": [
+                                "added",
+                                "readded"
+                              ],
+                              "negate": false,
+                              "disabled": false,
+                              "alias": null
+                            },
+                            "query": {
+                              "bool": {
+                                "should": [
+                                  {
+                                    "match_phrase": {
+                                      "syscheck.event": "added"
+                                    }
+                                  },
+                                  {
+                                    "match_phrase": {
+                                      "syscheck.event": "readded"
+                                    }
+                                  }
+                                ],
+                                "minimum_should_match": 1
+                              }
+                            },
+                            "$state": {
+                              "store": "appState"
+                            }
+                          }
+                    ],
+                    "query":{"query":"","language":"lucene"}
+                }`
+      }
+    },
+    _type: 'visualization'
+  },
+  {
+    _id: 'Wazuh-App-Agents-FIM-Files-modified',
+    _source: {
+      title: 'Files modified',
+      visState:
+        '{"title":"Files modified","type":"pie","params":{"type":"pie","addTooltip":true,"addLegend":true,"legendPosition":"right","isDonut":true},"aggs":[{"id":"1","enabled":true,"type":"count","schema":"metric","params":{}},{"id":"2","enabled":true,"type":"terms","schema":"segment","params":{"field":"syscheck.path","size":5,"order":"desc","orderBy":"1"}}]}',
+      uiStateJSON: '{}',
+      description: '',
+      version: 1,
+      kibanaSavedObjectMeta: {
+        searchSourceJSON: `{
+                    "index":"wazuh-alerts",
+                    "filter":[
+                        {
+                            "meta": {
+                              "index": "wazuh-alerts",
+                              "negate": false,
+                              "disabled": false,
+                              "alias": null,
+                              "type": "phrase",
+                              "key": "syscheck.event",
+                              "value": "modified",
+                              "params": {
+                                "query": "modified",
+                                "type": "phrase"
+                              }
+                            },
+                            "query": {
+                              "match": {
+                                "syscheck.event": {
+                                  "query": "modified",
+                                  "type": "phrase"
+                                }
+                              }
+                            },
+                            "$state": {
+                              "store": "appState"
+                            }
+                          }
+                    ],
+                    "query":{"query":"","language":"lucene"}
+                }`
+      }
+    },
+    _type: 'visualization'
+  },
+  {
+    _id: 'Wazuh-App-Agents-FIM-Files-deleted',
+    _source: {
+      title: 'Files deleted',
+      visState:
+        '{"title":"Files deleted","type":"pie","params":{"type":"pie","addTooltip":true,"addLegend":true,"legendPosition":"right","isDonut":true},"aggs":[{"id":"1","enabled":true,"type":"count","schema":"metric","params":{}},{"id":"2","enabled":true,"type":"terms","schema":"segment","params":{"field":"syscheck.path","size":5,"order":"desc","orderBy":"1"}}]}',
+      uiStateJSON: '{}',
+      description: '',
+      version: 1,
+      kibanaSavedObjectMeta: {
+        searchSourceJSON: `{
+                    "index":"wazuh-alerts",
+                    "filter":[
+                        {
+                            "meta": {
+                              "index": "wazuh-alerts",
+                              "negate": false,
+                              "disabled": false,
+                              "alias": null,
+                              "type": "phrase",
+                              "key": "syscheck.event",
+                              "value": "deleted",
+                              "params": {
+                                "query": "deleted",
+                                "type": "phrase"
+                              }
+                            },
+                            "query": {
+                              "match": {
+                                "syscheck.event": {
+                                  "query": "deleted",
+                                  "type": "phrase"
+                                }
+                              }
+                            },
+                            "$state": {
+                              "store": "appState"
+                            }
+                          }
+                    ],
+                    "query":{"query":"","language":"lucene"}
+                }`
+      }
+    },
+    _type: 'visualization'
+  },
+  {
     _id: 'Wazuh-App-Overview-FIM-added',
     _type: 'visualization',
     _source: {
