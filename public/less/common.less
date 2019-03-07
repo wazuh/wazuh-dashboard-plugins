@@ -235,7 +235,11 @@ margin-top: 8px;
 .wz-button {
     color: white !important;
     transition: none !important;
-    background-color: rgb(0, 85, 113) !important;
+    //background-color: rgb(0, 85, 113) !important;
+    background-color: #0079a5 !important;
+    min-width: 115px!important;
+    border-radius: 4px!important;
+    height: 40px;
 }
 
 .wz-button-flat {
@@ -247,8 +251,10 @@ margin-top: 8px;
 .wz-button.active,
 .wz-button:not([disabled]):hover,
 .wz-button-flat:not([disabled]):hover {
-    background-color: rgb(0, 121, 165) !important;
+    background-color: #005571 !important;
     color: white !important;
+    text-decoration: underline;
+    box-shadow: 0 3px 1px rgba(0, 0, 0, 0.05);
 }
 
 .wz-back-btn-absolute{
@@ -495,7 +501,7 @@ md-sidenav {
 }
 
 .wz-dev-column-separator{
-    width: 14px;
+    width: 12px;
     margin-top: 25px;
     background: #dddddd;
     float: left;
@@ -507,6 +513,11 @@ md-sidenav {
 
 .wz-dev-column-separator:hover {
     background-color: #cce4ed;
+}
+
+.wz-dev-column-separator:focus, .wz-dev-column-separator.active {
+    background-color: #0079a5;
+    color: #FFF;
 }
 
 .wz-dev-column-separator span {
@@ -529,6 +540,10 @@ md-sidenav {
     max-width: calc(~'80% - 7px');
     float: left;
     height: calc(~'100vh - 85px');
+}
+
+.wz-dev-box .CodeMirror{
+    border: 1px solid #ddd!important;
 }
 
 /* Card and select input shadow overriding */
@@ -738,8 +753,6 @@ md-switch.md-default-theme.md-checked .md-thumb, md-switch.md-checked .md-thumb 
     height: 25px !important;
     line-height: inherit !important;
     color: #ffffff !important;
-    background-color: #006BB4 !important;
-    border-color: #006BB4 !important;
 }
 
 .cancelBtn {
@@ -749,6 +762,7 @@ md-switch.md-default-theme.md-checked .md-thumb, md-switch.md-checked .md-thumb 
     min-height: 0px !important;
     height: 25px !important;
     line-height: inherit !important;
+    border-radius: 4px!important;
 }
 
 .agents-prev-btn {
