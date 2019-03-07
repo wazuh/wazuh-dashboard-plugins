@@ -26,7 +26,7 @@ import { checkGap } from './lib/check-gap';
 
 const app = uiModules.get('app/wazuh', []);
 
-app.directive('wzTable', function() {
+app.directive('wzTable', function () {
   return {
     restrict: 'E',
     scope: {
@@ -268,7 +268,7 @@ app.directive('wzTable', function() {
       $scope.prevPage = () => pagination.prevPage($scope);
       $scope.nextPage = async currentPage =>
         pagination.nextPage(currentPage, $scope, errorHandler, fetch);
-      $scope.setPage = function() {
+      $scope.setPage = function () {
         $scope.currentPage = this.n;
         $scope.nextPage(this.n);
       };
@@ -416,7 +416,13 @@ app.directive('wzTable', function() {
         );
       };
 
-      $scope.expandPolicyMonitoringCheck = item => {
+      $scope.isSyscheck = () => {
+        return (
+          instance.path.includes('/syscheck')
+        );
+      };
+
+      $scope.expandTableRow = item => {
         if (item.expanded) item.expanded = false;
         else {
           $scope.pagedItems[$scope.currentPage].map(
