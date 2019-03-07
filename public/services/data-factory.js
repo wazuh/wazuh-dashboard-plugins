@@ -29,7 +29,7 @@ export class DataFactory {
     this.sortValue = false;
     this.busy = false;
     if (this.implicitFilter) this.filters.push(...this.implicitFilter);
-    if (this.implicitSort) this.addSorting(implicitSort);
+    if (this.implicitSort) this.addSorting(this.implicitSort);
   }
 
   /**
