@@ -119,22 +119,19 @@
                 <md-card flex class="wz-md-card _md flex md-margin-h" ng-if="!lookingGroup">
                     <md-card-content>
                         <div layout="row">
-                            <wz-table flex extra-limit="100" path="'/agents/groups'" keys="['name','count','mergedSum']"
+                            <wz-table custom-columns="true" flex extra-limit="100" path="'/agents/groups'" keys="['name','count','mergedSum']"
                                 allow-click="true" row-sizes="[14,12,10]">
                             </wz-table>
                         </div>
                     </md-card-content>
+                    <!-- CSV Download button section for groups -->
+                    <md-card-actions layout="row" layout-align="end center" class="wz-card-actions layout-align-end-center layout-row">
+                        <a class="wz-text-link cursor-pointer small md-button md-ink-ripple" id="btnDownload" ng-click="downloadCsv('/agents/groups')">Formatted
+                            <i aria-hidden="true" class="fa fa-download"></i></a>
+                    </md-card-actions>
+                    <!-- End CSV Download button section for groups -->
                 </md-card>
                 <!-- End groups table -->
-
-                <!-- CSV Download button section for groups -->
-                <div layout="row" class="md-padding" ng-if="!lookingGroup">
-                    <span flex></span>
-                    <a class="small" id="btnDownload" ng-click="downloadCsv('/agents/groups')">Formatted
-                        <i aria-hidden="true" class="fa fa-fw fa-download"></i>
-                    </a>
-                </div>
-                <!-- End CSV Download button section for groups -->
 
                 <div ng-if='!addingAgents'>
                     <!-- Group agents table -->
