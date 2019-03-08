@@ -241,7 +241,7 @@ export default [
     _source: {
       title: 'Top 10 rule groups',
       visState:
-        '{"title":"Top 10 rule groups","type":"tagcloud","params":{"scale":"linear","orientation":"single","minFontSize":11,"maxFontSize":24,"showLabel":false},"aggs":[{"id":"1","enabled":true,"type":"count","schema":"metric","params":{}},{"id":"2","enabled":true,"type":"terms","schema":"segment","params":{"field":"rule.groups","size":10,"order":"desc","orderBy":"1","otherBucket":false,"otherBucketLabel":"Other","missingBucket":false,"missingBucketLabel":"Missing"}}]}',
+        '{"title":"Top 10 rule groups","type":"pie","params":{"scale":"linear","orientation":"single","minFontSize":11,"maxFontSize":24,"showLabel":false},"aggs":[{"id":"1","enabled":true,"type":"count","schema":"metric","params":{}},{"id":"2","enabled":true,"type":"terms","schema":"segment","params":{"field":"rule.groups","size":10,"order":"desc","orderBy":"1","otherBucket":false,"otherBucketLabel":"Other","missingBucket":false,"missingBucketLabel":"Missing"}}]}',
       uiStateJSON: '{}',
       description: '',
       version: 1,
