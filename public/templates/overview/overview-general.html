@@ -26,13 +26,13 @@
         <md-card flex class="wz-md-card" ng-class="{'fullscreen': octrl.expandArray[0]}">
             <md-card-content class="wazuh-column">
                 <div layout="row" ng-dblclick="octrl.expand(0)">
-                    <span class="wz-headline-title">Rule group evolution</span>
+                    <span class="wz-headline-title">Top 10 Agent alerts</span>
                     <span flex></span>
                     <span class="wz-text-link" ng-click="octrl.expand(0)"><i class="fa fa-fw fa-expand"></i></span>
                 </div>
                 <md-divider class="wz-margin-top-10"></md-divider>
-                <kbn-vis id="Wazuh-App-Overview-General-Rule-group-evolution"
-                    vis-id="'Wazuh-App-Overview-General-Rule-group-evolution'"></kbn-vis>
+                <kbn-vis id="Wazuh-App-Overview-General-Top-10-agent-alert"
+                    vis-id="'Wazuh-App-Overview-General-Top-10-agent-alert'"></kbn-vis>
             </md-card-content>
         </md-card>
         <md-card flex class="wz-md-card" ng-class="{'fullscreen': octrl.expandArray[1]}">
@@ -129,18 +129,6 @@
                 <md-divider class="wz-margin-top-10"></md-divider>
                 <kbn-vis id="Wazuh-App-Overview-General-Commonly-fired-rules"
                     vis-id="'Wazuh-App-Overview-General-Commonly-fired-rules'"></kbn-vis>
-            </md-card-content>
-        </md-card>
-        <md-card flex="40" class="wz-md-card" ng-class="{'fullscreen': octrl.expandArray[6]}">
-            <md-card-content class="wazuh-column">
-                <div layout="row" ng-dblclick="octrl.expand(6)">
-                    <span class="wz-headline-title">Alerts evolution - Top 5 agents</span>
-                    <span flex></span>
-                    <span class="wz-text-link" ng-click="octrl.expand(6)"><i class="fa fa-fw fa-expand"></i></span>
-                </div>
-                <md-divider class="wz-margin-top-10"></md-divider>
-                <kbn-vis id="Wazuh-App-Overview-General-Alerts-evolution-Top-5-agents"
-                    vis-id="'Wazuh-App-Overview-General-Alerts-evolution-Top-5-agents'"></kbn-vis>
             </md-card-content>
         </md-card>
     </div>
