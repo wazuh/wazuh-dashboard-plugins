@@ -23,7 +23,8 @@ class WzConfigViewer {
       getjson: '&',
       getxml: '&',
       jsoncontent: '=',
-      xmlcontent: '='
+      xmlcontent: '=',
+      hideHeader: '='
     };
     this.template = template;
   }
@@ -34,6 +35,7 @@ class WzConfigViewer {
         $document[0].getElementById('viewer_json_box'),
         {
           lineNumbers: true,
+          autoRefresh: true,
           matchClosing: true,
           matchBrackets: true,
           mode: { name: 'javascript', json: true },
@@ -50,6 +52,7 @@ class WzConfigViewer {
         $document[0].getElementById('viewer_xml_box'),
         {
           lineNumbers: true,
+          autoRefresh: true,
           matchClosing: true,
           matchBrackets: true,
           mode: 'text/xml',
@@ -71,7 +74,8 @@ class WzConfigViewer {
         $scope.jsonCodeBox.setValue($scope.jsoncontent.replace(/\\\\/g, '\\'));
         setTimeout(function() {
           $scope.jsonCodeBox.refresh();
-        }, 1);
+          $scope.$applyAsync();
+        }, 100);
       }
     };
 
@@ -84,7 +88,8 @@ class WzConfigViewer {
         $scope.xmlCodeBox.setValue($scope.xmlcontent);
         setTimeout(function() {
           $scope.xmlCodeBox.refresh();
-        }, 1);
+          $scope.$applyAsync();
+        }, 100);
       }
     };
 
