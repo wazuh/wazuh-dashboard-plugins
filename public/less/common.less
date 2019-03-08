@@ -555,7 +555,7 @@ md-sidenav {
 }
 
 .wz-card-actions {
-    margin: 0 !important;
+    margin: 15px 0 0 0;
     padding: 0 10px !important;
     border-top: 1px solid #dfeff8 !important;
     background-color: #ecf6fb;
@@ -565,6 +565,7 @@ md-sidenav {
     border-bottom: 1px solid #dfeff8;
     padding: 5px 10px!important;
     min-height: 42px;
+    margin: 0!important;
 }
 md-switch.md-default-theme .md-thumb, md-switch .md-thumb {
     border: 1px solid #d3dae6;
@@ -852,9 +853,9 @@ wz-xml-file-editor {
     background: #ecf6fb!important;
 }
 
-.table-striped-duo tbody tr:nth-child(2n+1):not(:hover), .table-striped-duo tbody tr:nth-child(2n+2):not(:hover) {
+.table-striped-duo>tbody tr:not(.no-duo):nth-child(2n+1):not(:hover), .table-striped-duo>tbody tr:not(.no-duo):nth-child(2n+2):not(:hover) {
     background: #f9f9f9;
 }
-.table-striped-duo tbody tr:nth-child(4n+1):not(:hover), .table-striped-duo tbody tr:nth-child(4n+2):not(:hover) {
+.table-striped-duo>tbody tr:not(.no-duo):nth-child(4n+1):not(:hover), .table-striped-duo>tbody tr:not(.no-duo):nth-child(4n+2):not(:hover) {
     background: #fff;
 }

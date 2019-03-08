@@ -275,20 +275,20 @@
                     <div layout="row" layout-padding="" class="layout-padding layout-row">
                         <md-card flex="" class="wz-md-card wz-padding-top-0 wz-padding-bottom-0 wz-no-margin _md flex">
                             <md-card-content>
-                                <div>
-                                    <table class="table table-condensed" style="table-layout: fixed !important">
-                                        <thead>
-                                            <tr>
-                                                <th ng-if="key !== 'expanded' && key !== 'showTooltip'" ng-repeat="(key, value) in item">{{key}}</th>
-                                            </tr>
-                                        </thead>
+                                <div layout="row" class="wz-padding-top-10">
+                                    <table class="table table-striped table-condensed">
                                         <tbody>
-                                            <tr>
-                                                <td ng-if="key !== 'expanded' && key !== 'showTooltip'" ng-repeat="(key, value) in item">{{value}}</td>
+                                            <tr ng-repeat="(key, value) in item" ng-if="key !== 'expanded' && key !== 'showTooltip'"
+                                                class="no-duo">
+                                                <td class="wz-word-break-rule">{{key}}</td>
+                                                <td>
+                                                    <span class="wz-text-right color-grey">{{value}}</span>
+                                                </td>
                                             </tr>
                                         </tbody>
                                     </table>
                                 </div>
+
                             </md-card-content>
                         </md-card>
                     </div>
