@@ -56,8 +56,11 @@ app.directive('wzTable', function () {
       $sce
     ) {
       $scope.showColumns = false;
+      $scope.showTable = true;
       $scope.originalkeys = $scope.keys.map((key, idx) => ({ key, idx }));
       $scope.updateColumns = key => {
+        $("#wz_table").colResizable({ disable: true });
+        $scope.showTable = false;
         const str = key.key.value || key.key;
         const cleanArray = $scope.keys.map(item => item.value || item);
         if (cleanArray.includes(str)) {
@@ -75,6 +78,8 @@ app.directive('wzTable', function () {
             $scope.keys.push(key.key);
           }
         }
+        init()
+          .then(() => ($scope.setColResizable()))
       };
       $scope.exists = key => {
         const str = key.key.value || key.key;
@@ -114,7 +119,10 @@ app.directive('wzTable', function () {
           $scope.rowsPerPage = calcTableRows($window.innerHeight, rowSizes);
           $scope.itemsPerPage = $scope.rowsPerPage;
           init()
-            .then(() => (resizing = false))
+            .then(() => {
+              resizing = false;
+              if ($scope.customColumns) { $scope.setColResizable() }
+            })
             .catch(() => (resizing = false));
         }, 150);
       };
@@ -241,8 +249,8 @@ app.directive('wzTable', function () {
       /**
        * On controller loads
        */
-      const init = async () =>
-        initTable(
+      const init = async () => {
+        await initTable(
           $scope,
           fetch,
           wzTableFilter,
@@ -252,7 +260,12 @@ app.directive('wzTable', function () {
           globalState,
           $window
         );
-
+        if ($scope.customColumns) {
+          setTimeout(() => {
+            $scope.setColResizable()
+          }, 100);
+        }
+      }
       /**
        * Pagination variables and functions
        */
@@ -445,6 +458,12 @@ app.directive('wzTable', function () {
         }
         $c.remove();
       };
+
+      $scope.setColResizable = () => {
+        $scope.showTable = true;
+        $("#wz_table").colResizable({ liveDrag: true, minWidth: 100, partialRefresh: true, draggingClass: false });
+        $scope.$applyAsync();
+      }
     },
     template
   };
