@@ -20,7 +20,7 @@
     ng-show="!loading && !showConfig && !showNodes && rendered">
     <md-card flex class="wz-md-card" ng-class="{'fullscreen': expandArray[0]}">
         <md-card-content class="wazuh-column">
-            <div layout="row">
+            <div layout="row" ng-dblclick="expand(0)">
                 <span class="wz-headline-title">Cluster alerts summary</span>
                 <span flex></span>
                 <span class="wz-text-link" ng-click="expand(0)"><i class="fa fa-fw fa-expand"></i></span>
@@ -31,7 +31,7 @@
     </md-card>
     <md-card flex class="wz-md-card" ng-class="{'fullscreen': expandArray[1]}">
         <md-card-content class="wazuh-column">
-            <div layout="row">
+            <div layout="row" ng-dblclick="expand(1)">
                 <span class="wz-headline-title">Alerts by node summary</span>
                 <span flex></span>
                 <span class="wz-text-link" ng-click="expand(1)"><i class="fa fa-fw fa-expand"></i></span>

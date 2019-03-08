@@ -461,7 +461,7 @@ app.directive('wzTable', function () {
 
       $scope.setColResizable = () => {
         $scope.showTable = true;
-        $("#wz_table").colResizable({ liveDrag: true, minWidth: 100, partialRefresh: true, draggingClass: false });
+        $("#wz_table").colResizable({ liveDrag: true, minWidth: 75, partialRefresh: true, draggingClass: false });
         $scope.$applyAsync();
       }
     },
