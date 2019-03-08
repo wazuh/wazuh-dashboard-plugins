@@ -10,9 +10,9 @@
         <md-card flex class="wz-md-card _md flex md-margin-h">
             <md-card-content>
                 <wz-table ng-if="filesctrl.filesSubTab === 'rules'" implicit-filter="[{ name:'path',value: 'etc/rules'}]"
-                    flex path="'/rules/files'" keys="['file']" allow-click="true" row-sizes="[16,13,11]"></wz-table>
+                    flex path="'/rules/files'" keys="[{value: 'file', width: '75px'}]" allow-click="true" row-sizes="[16,13,11]"></wz-table>
                 <wz-table ng-if="filesctrl.filesSubTab === 'decoders'" implicit-filter="[{ name:'path',value: 'etc/decoders'}]"
-                    flex path="'/decoders/files'" keys="['file']" allow-click="true" row-sizes="[16,13,11]"></wz-table>
+                    flex path="'/decoders/files'" keys="[{value: 'file', width: '75px'}]" allow-click="true" row-sizes="[16,13,11]"></wz-table>
             </md-card-content>
         </md-card>
     </div>

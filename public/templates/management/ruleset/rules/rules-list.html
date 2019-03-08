@@ -47,19 +47,19 @@
                 <span flex></span>
                 <wz-kbn-switch class="md-primary wz-no-top-bottom-margin" switch-model="showingLocalRules" switch-text="Custom rules"></wz-kbn-switch>
             </md-card-actions>
-            <md-card-content>
-                <wz-table custom-columns="true" flex ng-if="showingLocalRules" path="'/rules'" keys="['id',{value:'file',size:2},{value:'description',size:2},{value:'groups',nosortable:true,size:2},{value:'pci',nosortable:true,size:2},{value:'gdpr',nosortable:true},'level']"
+            <md-card-content class="wz-padding-bottom-0">
+                <wz-table custom-columns="true" flex ng-if="showingLocalRules" path="'/rules'" keys="[{value: 'id', width: '75px'},{value:'file',size:2},{value:'description',size:2},{value:'groups',nosortable:true,size:2},{value:'pci',nosortable:true,size:2},{value:'gdpr',nosortable:true},{value: 'level', width: '100px'}]"
                     implicit-filter="[{ name:'path',value: 'etc/rules'}]" allow-click="true" row-sizes="[16,13,11]">
                 </wz-table>
                 <wz-table custom-columns="true" ng-if="!showingLocalRules" implicit-filter="appliedFilters" flex path="'/rules'"
-                    keys="['id',{value:'file',size:2},{value:'description',size:2},{value:'groups',nosortable:true,size:2},{value:'pci',nosortable:true,size:2},{value:'gdpr',nosortable:true},'level']"
+                    keys="[{value: 'id', width: '75px'},{value:'file',size:2},{value:'description',size:2},{value:'groups',nosortable:true,size:2},{value:'pci',nosortable:true,size:2},{value:'gdpr',nosortable:true}, {value: 'level', width: '100px'}]"
                     allow-click="true" row-sizes="[16,13,11]">
                 </wz-table>
-                <div layout="row" class="wz-margin-top-10 md-padding-h">
-                    <span flex></span>
-                    <a class="small" id="btnDownload" ng-click="downloadCsv()">Formatted <i aria-hidden="true" class="fa fa-download"></i></a>
-                </div>
             </md-card-content>
+            <md-card-actions layout="row" layout-align="end center" class="wz-card-actions layout-align-end-center layout-row">
+                <a class="wz-text-link cursor-pointer small md-button md-ink-ripple" id="btnDownload" ng-click="downloadCsv()">Formatted
+                    <i aria-hidden="true" class="fa fa-download"></i></a>
+            </md-card-actions>
         </md-card>
     </div>
     <div class="md-padding" ng-if="editingFile && type === 'rules'">
@@ -77,8 +77,7 @@
                 <span ng-click='closeEditingFile()' class='btn btn-info'>Cancel</span>
                 <button ng-disabled='xmlHasErrors || newFileName === "" || doingSaving || overwriteError' ng-click='doSaveConfig(true,newFileName)'
                     class='btn wz-button pull-right wz-margin-left-8'>
-                    <span ng-show='!xmlHasErrors'><i aria-hidden='true' class='fa fa-fw fa-save'
-                            ng-class="doingSaving ? 'fa-spin fa-spinner' : ''"></i>Save
+                    <span ng-show='!xmlHasErrors'><i aria-hidden='true' class='fa fa-fw fa-save' ng-class="doingSaving ? 'fa-spin fa-spinner' : ''"></i>Save
                         file</span>
                     <span ng-show='xmlHasErrors' class='btn-danger'><i aria-hidden='true' class='fa fa-fw fa-exclamation-triangle'></i>
                         XML format error</span>

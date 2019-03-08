@@ -22,7 +22,7 @@
     <div layout="row" layout-align="center stretch" class="height-230">
         <md-card flex="25" class="wz-md-card" ng-class="{'fullscreen': expandArray[0]}">
             <md-card-content class="wazuh-column">
-                <div layout="row">
+                <div layout="row" ng-dblclick="expand(0)">
                     <span class="wz-headline-title">Top 5 Scans</span>
                     <span flex></span>
                     <span class="wz-text-link" ng-click="expand(0)"><i class="fa fa-fw fa-expand"></i></span>
@@ -33,7 +33,7 @@
         </md-card>
         <md-card flex="25" class="wz-md-card" ng-class="{'fullscreen': expandArray[1]}">
             <md-card-content class="wazuh-column">
-                <div layout="row">
+                <div layout="row" ng-dblclick="expand(1)">
                     <span class="wz-headline-title">Top 5 Profiles</span>
                     <span flex></span>
                     <span class="wz-text-link" ng-click="expand(1)"><i class="fa fa-fw fa-expand"></i></span>
@@ -44,7 +44,7 @@
         </md-card>
         <md-card flex="25" class="wz-md-card" ng-class="{'fullscreen': expandArray[2]}">
             <md-card-content class="wazuh-column">
-                <div layout="row">
+                <div layout="row" ng-dblclick="expand(2)">
                     <span class="wz-headline-title">Top 5 Content</span>
                     <span flex></span>
                     <span class="wz-text-link" ng-click="expand(2)"><i class="fa fa-fw fa-expand"></i></span>
@@ -55,7 +55,7 @@
         </md-card>
         <md-card flex="25" class="wz-md-card" ng-class="{'fullscreen': expandArray[3]}">
             <md-card-content class="wazuh-column">
-                <div layout="row">
+                <div layout="row" ng-dblclick="expand(3)">
                     <span class="wz-headline-title">Top 5 Severity</span>
                     <span flex></span>
                     <span class="wz-text-link" ng-click="expand(3)"><i class="fa fa-fw fa-expand"></i></span>
@@ -69,7 +69,7 @@
     <div layout="row" layout-align="start stretch" class="height-230">
         <md-card flex class="wz-md-card" ng-class="{'fullscreen': expandArray[4]}">
             <md-card-content class="wazuh-column">
-                <div layout="row">
+                <div layout="row" ng-dblclick="expand(4)">
                     <span class="wz-headline-title">Daily scans evolution</span>
                     <span flex></span>
                     <span class="wz-text-link" ng-click="expand(4)"><i class="fa fa-fw fa-expand"></i></span>
@@ -83,7 +83,7 @@
     <div layout="row" layout-align="center stretch" class="height-250">
         <md-card flex class="wz-md-card" ng-class="{'fullscreen': expandArray[5]}">
             <md-card-content class="wazuh-column">
-                <div layout="row">
+                <div layout="row" ng-dblclick="expand(5)">
                     <span class="wz-headline-title">Top 5 - Alerts</span>
                     <span flex></span>
                     <span class="wz-text-link" ng-click="expand(5)"><i class="fa fa-fw fa-expand"></i></span>
@@ -94,7 +94,7 @@
         </md-card>
         <md-card flex class="wz-md-card" ng-class="{'fullscreen': expandArray[6]}">
             <md-card-content class="wazuh-column">
-                <div layout="row">
+                <div layout="row" ng-dblclick="expand(6)">
                     <span class="wz-headline-title">Top 5 - High risk alerts</span>
                     <span flex></span>
                     <span class="wz-text-link" ng-click="expand(6)"><i class="fa fa-fw fa-expand"></i></span>
@@ -108,7 +108,7 @@
     <div layout="row" layout-align="center stretch" class="height-570">
         <md-card flex class="wz-md-card" ng-class="{'fullscreen': expandArray[7]}">
             <md-card-content class="wazuh-column">
-                <div layout="row">
+                <div layout="row" ng-dblclick="expand(7)">
                     <span class="wz-headline-title">Alerts summary</span>
                     <span flex></span>
                     <span class="wz-text-link" ng-click="expand(7)"><i class="fa fa-fw fa-expand"></i></span>

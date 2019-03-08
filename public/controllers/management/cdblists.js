@@ -206,7 +206,7 @@ export class CdbListsController {
       );
       const currentApi = JSON.parse(this.appState.getCurrentAPI()).id;
       const output = await this.csvReq.fetch(
-        '/cdblists',
+        '/lists',
         currentApi,
         this.wzTableFilter.get()
       );

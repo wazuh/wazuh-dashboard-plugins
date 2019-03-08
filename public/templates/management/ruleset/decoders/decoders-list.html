@@ -30,19 +30,18 @@
                 <wz-kbn-switch class="md-primary wz-no-top-bottom-margin" switch-model="dctrl.showingLocalDecoders"
                     switch-text="Custom decoders"></wz-kbn-switch>
             </md-card-actions>
-            <md-card-content>
+            <md-card-content class="wz-padding-bottom-0">
                 <wz-table custom-columns="true" ng-if="!dctrl.showingLocalDecoders" implicit-filter="dctrl.appliedFilters"
                     flex path="'/decoders'" keys="['name',{value:'details.program_name',size:2,nosortable:true},{value:'details.order',size:2,nosortable:true},'file']"
                     allow-click="true" row-sizes="[16,13,11]">
                 </wz-table>
                 <wz-table custom-columns="true" ng-if="dctrl.showingLocalDecoders" flex path="'/decoders'" keys="['name',{value:'details.program_name',size:2,nosortable:true},{value:'details.order',size:2,nosortable:true},'file']"
                     implicit-filter="[{ name:'path',value: 'etc/decoders'}]" allow-click="true" row-sizes="[16,13,11]"></wz-table>
-                <div layout="row" class="wz-margin-top-10 md-padding-h">
-                    <span flex></span>
-                    <a class="small" id="btnDownload" ng-click="dctrl.downloadCsv()">Formatted <i aria-hidden="true"
-                            class="fa fa-download"></i></a>
-                </div>
             </md-card-content>
+            <md-card-actions layout="row" layout-align="end center" class="wz-card-actions layout-align-end-center layout-row">
+                <a class="wz-text-link cursor-pointer small md-button md-ink-ripple" id="btnDownload" ng-click="dctrl.downloadCsv()">Formatted
+                    <i aria-hidden="true" class="fa fa-download"></i></a>
+            </md-card-actions>
         </md-card>
     </div>
     <div class="md-padding" ng-if="dctrl.editingFile && dctrl.type === 'decoders'">
