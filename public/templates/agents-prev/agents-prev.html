@@ -59,7 +59,7 @@
     <div layout="row">
         <md-card flex class="wz-md-card _md flex md-margin-h">
             <md-card-content class="wz-padding-bottom-30">
-                <wz-table custom-columns="true" flex path="'/agents'" keys="['id','name','ip','status','group','os.name','os.version','version', 'dateAdd', 'lastKeepAlive']"
+                <wz-table custom-columns="true" flex path="'/agents'" keys="[{value: 'id', width: '75px'},'name','ip','status','group','os.name','os.version','version', 'dateAdd', 'lastKeepAlive']"
                     allow-click="true" row-sizes="[17,15,13]"></wz-table>
             </md-card-content>
             <md-card-actions layout="row" layout-align="end center" class="wz-card-actions layout-align-end-center layout-row">

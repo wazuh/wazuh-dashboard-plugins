@@ -56,11 +56,9 @@ app.directive('wzTable', function () {
       $sce
     ) {
       $scope.showColumns = false;
-      $scope.showTable = true;
       $scope.originalkeys = $scope.keys.map((key, idx) => ({ key, idx }));
       $scope.updateColumns = key => {
         $("#wz_table").colResizable({ disable: true });
-        $scope.showTable = false;
         const str = key.key.value || key.key;
         const cleanArray = $scope.keys.map(item => item.value || item);
         if (cleanArray.includes(str)) {
@@ -460,7 +458,6 @@ app.directive('wzTable', function () {
       };
 
       $scope.setColResizable = () => {
-        $scope.showTable = true;
         $("#wz_table").colResizable({ liveDrag: true, minWidth: 75, partialRefresh: true, draggingClass: false });
         $scope.$applyAsync();
       }

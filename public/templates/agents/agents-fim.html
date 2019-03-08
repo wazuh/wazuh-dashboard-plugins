@@ -166,7 +166,7 @@
                 </div>
                 <div layout="row" ng-if="agent && !load" class="wz-margin-top-10 wz-margin-bottom-40-inv">
                     <wz-table flex path="'/syscheck/' + agent.id" implicit-filter="[{name:'type',value:'file'}]"
-                        row-sizes="[6,6,6]" extra-limit="100" keys="['file','size','uname','perm','sha256','uid','mtime']">
+                        row-sizes="[6,6,6]" extra-limit="100" keys="['file',{value: 'size', width: '100px'},'uname','perm','sha256',{value: 'uid', width: '100px'},'mtime']">
                     </wz-table>
                 </div>
             </md-card-content>
@@ -191,7 +191,7 @@
                 </div>
                 <div layout="row" ng-if="agent && !load" class="wz-margin-top-16 wz-margin-bottom-40-inv">
                     <wz-table custom-columns="true" flex path="'/syscheck/' + agent.id" row-sizes="[12,10,8]"
-                        extra-limit="100" keys="['file','size','gname','uname','perm','sha256','uid','gid','mtime']">
+                        extra-limit="100" keys="['file',{value: 'size', width: '100px'},{value: 'gname', width: '150px'},{value: 'uname', width: '150px'},{value: 'perm', width: '125px'},'sha256',{value: 'uid', width: '100px'},{value: 'gid', width: '100px'},{value: 'mtime', width: '150px'}]">
                     </wz-table>
                 </div>
             </md-card-content>
