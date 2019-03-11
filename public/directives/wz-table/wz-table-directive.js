@@ -437,6 +437,11 @@ app.directive('wzTable', function () {
         );
       };
 
+      $scope.isWindows = () => {
+        var agent = $scope.$parent.$parent.$parent.$parent.agent;
+        return (agent.os || {}).platform === "windows"
+      };
+
       $scope.expandTableRow = item => {
         if (item.expanded) item.expanded = false;
         else {
