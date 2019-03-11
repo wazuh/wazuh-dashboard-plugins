@@ -20,6 +20,7 @@ import { WazuhReportingRoutes } from './server/routes/wazuh-reporting';
 import { WazuhUtilsRoutes } from './server/routes/wazuh-utils';
 import { IndexPatternCronJob } from './server/index-pattern-cron-job';
 import { log } from './server/logger';
+import { Queue } from './server/jobs/queue';
 
 export function initApp(server) {
   const monitoringInstance = new Monitoring(server);
@@ -39,6 +40,7 @@ export function initApp(server) {
       WazuhApiElasticRoutes(server);
       monitoringInstance.run();
       indexPatternCronJobInstance.run();
+      Queue.launchCronJob();
       WazuhApiRoutes(server);
       WazuhReportingRoutes(server);
       WazuhUtilsRoutes(server);

@@ -249,7 +249,6 @@ export class DecodersController {
   }
 
   async closeEditingFile() {
-    this.editingFile = false;
     if (this.currentDecoder) {
       try {
         const decoderReload = await this.apiReq.request(
@@ -257,12 +256,19 @@ export class DecodersController {
           `/decoders/${this.currentDecoder.name}`,
           {}
         );
-        this.currentDecoder = ((((decoderReload || {}).data || {}).data || {})
-          .items || [])[0];
+        const response = (((decoderReload || {}).data || {}).data || {}).items || [];
+        if (!response.length) {
+          this.currentDecoder = null;
+          this.closeDetailView(true);
+        } else {
+          this.currentDecoder = response[0];
+        }
       } catch (err) {
         this.errorHandler.handle(err, 'Decoder reload error.');
       }
     }
+    this.editingFile = false;
+    this.$scope.$applyAsync();
     this.appState.setNavigation({ status: true });
     this.$scope.$broadcast('closeEditXmlFile', {});
   }

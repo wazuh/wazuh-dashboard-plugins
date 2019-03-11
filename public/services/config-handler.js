@@ -53,7 +53,7 @@ export class ConfigHandler {
 
   async performClusterRestart() {
     try {
-      await this.apiReq.request('PUT', `/cluster/restart`, {});
+      await this.apiReq.request('PUT', `/cluster/restart`, { delay: 15000 });
       this.$rootScope.$emit('removeRestarting', {});
     } catch (error) {
       this.$rootScope.$emit('removeRestarting', {});
@@ -103,9 +103,7 @@ export class ConfigHandler {
         const str = data.details.join();
         throw new Error(str);
       }
-      setTimeout(() => {
-        this.performClusterRestart();
-      }, 15000);
+      this.performClusterRestart();
       return { data: { data: 'Restarting cluster' } };
     } catch (error) {
       return Promise.reject(error);
