@@ -1,4 +1,5 @@
-<div layout="column" class="mozilla-table-size-85" ng-controller="managerLogController as ctrl" ng-if="!ctrl.loading && mctrl.tab == 'logs'">
+<div layout="column" class="mozilla-table-size-85" ng-controller="managerLogController as ctrl"
+    ng-if="!ctrl.loading && mctrl.tab == 'logs'">
 
     <!-- Headline -->
     <div ng-show="!ctrl.loading" layout="column" layout-padding>
@@ -11,9 +12,9 @@
     <div ng-show="!ctrl.loading" layout="row" layout-align="start center" class="md-padding-h">
         <!-- Daemon selector -->
         <div flex="20" layout="column" layout-align="center" class="height-40 wz-margin-right-15 wz-select-input">
-            <select flex class="kuiSelect wz-border-none cursor-pointer max-height-35" ng-disabled="ctrl.realtime || !ctrl.daemons.length"
-                id="categoryBox" ng-model="ctrl.category" ng-change="ctrl.filter({name:'category',value:ctrl.category})"
-                aria-label="Logs category">
+            <select flex class="kuiSelect wz-border-none cursor-pointer max-height-35"
+                ng-disabled="ctrl.realtime || !ctrl.daemons.length" id="categoryBox" ng-model="ctrl.category"
+                ng-change="ctrl.filter({name:'category',value:ctrl.category})" aria-label="Logs category">
                 <option value="all">All daemons</option>
                 <option ng-repeat="daemon in ctrl.daemons | orderObjectBy: 'title'" value="{{daemon.title}}">
                     {{daemon.title}}</option>
@@ -23,8 +24,9 @@
 
         <!-- Level selector -->
         <div flex="20" layout="column" layout-align="center" class="height-40 wz-select-input wz-margin-right-15">
-            <select flex class="kuiSelect wz-border-none cursor-pointer max-height-35" ng-disabled="ctrl.realtime" id="levelBox"
-                ng-model="ctrl.type_log" ng-change="ctrl.filter({name:'type_log',value:ctrl.type_log})" aria-label="Logs level">
+            <select flex class="kuiSelect wz-border-none cursor-pointer max-height-35" ng-disabled="ctrl.realtime"
+                id="levelBox" ng-model="ctrl.type_log" ng-change="ctrl.filter({name:'type_log',value:ctrl.type_log})"
+                aria-label="Logs level">
                 <option value="all">All log levels</option>
                 <option value="info">Info</option>
                 <option value="error">Error</option>
@@ -35,12 +37,14 @@
         </div>
 
         <div flex="20" layout="column" layout-align="center" class="height-40 wz-margin-right-15">
-            <wz-kbn-switch switch-model="ctrl.sortFilter" switch-change="ctrl.sort()" switch-text="Descending sort"></wz-kbn-switch>
+            <wz-kbn-switch switch-model="ctrl.sortFilter" switch-change="ctrl.sort()" switch-text="Descending sort">
+            </wz-kbn-switch>
         </div>
 
         <div flex="20" layout="column" ng-show="ctrl.nodeList" layout-align="center" class="height-40 wz-select-input">
-            <select flex class="kuiSelect wz-border-none cursor-pointer max-height-35" ng-disabled="ctrl.realtime" id="categoryBox"
-                ng-model="ctrl.selectedNode" ng-change="ctrl.changeNode(ctrl.selectedNode)" aria-label="Logs category">
+            <select flex class="kuiSelect wz-border-none cursor-pointer max-height-35" ng-disabled="ctrl.realtime"
+                id="categoryBox" ng-model="ctrl.selectedNode" ng-change="ctrl.changeNode(ctrl.selectedNode)"
+                aria-label="Logs category">
                 <option ng-repeat="node in ctrl.nodeList" value="{{node}}">{{node}}</option>
             </select>
         </div>
@@ -63,9 +67,11 @@
     <!-- End Filters and Realtime button section -->
 
     <div layout="row" flex class="md-padding-h wz-margin-top-10" ng-if="ctrl.logsPath">
-        <input placeholder="Filter logs..." ng-model="ctrl.custom_search" type="text" class="kuiLocalSearchInput ng-empty ng-pristine ng-scope ng-touched ng-valid"
-            aria-invalid="false" wz-enter="ctrl.search(ctrl.custom_search)">
-        <button type="submit" aria-label="Search" class="kuiLocalSearchButton height-40" ng-click="ctrl.search(ctrl.custom_search)">
+        <input placeholder="Filter logs..." ng-model="ctrl.custom_search" type="text"
+            class="kuiLocalSearchInput ng-empty ng-pristine ng-scope ng-touched ng-valid" aria-invalid="false"
+            wz-enter="ctrl.search(ctrl.custom_search)">
+        <button type="submit" aria-label="Search" class="kuiLocalSearchButton height-40"
+            ng-click="ctrl.search(ctrl.custom_search)">
             <span class="fa fa-search" aria-hidden="true"></span>
         </button>
     </div>
@@ -79,8 +85,10 @@
             <wz-config-viewer flex xmlcontent="XMLContent" hide-header="true" />
         </div>
         <md-card flex class="wz-md-card _md flex md-margin-h">
-            <md-card-actions layout="row" layout-align="end center" class="wz-card-actions layout-align-end-center layout-row height-25">
-                <a class="small" id="btnDownload" ng-click="ctrl.downloadCsv()">Formatted <i aria-hidden="true" class="fa fa-fw fa-download"></i></a>
+            <md-card-actions layout="row" layout-align="end center"
+                class="wz-card-actions layout-align-end-center wz-no-margin layout-row height-25">
+                <a class="small" id="btnDownload" ng-click="ctrl.downloadCsv()">Formatted <i aria-hidden="true"
+                        class="fa fa-fw fa-download"></i></a>
             </md-card-actions>
         </md-card>
     </div>
