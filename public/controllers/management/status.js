@@ -35,6 +35,12 @@ export class StatusController {
     return daemonStatus === 'running' ? 'status teal' : 'status red';
   }
 
+  objToArr(obj) {
+    const arr = [];
+    for (const key in obj) arr.push({ key, value: obj[key] });
+    return arr;
+  }
+
   /**
    * Fetchs all required data
    */
@@ -76,7 +82,7 @@ export class StatusController {
           `/cluster/${masterNode.name}/status`,
           {}
         );
-        this.daemons = daemons.data.data;
+        this.daemons = this.objToArr(daemons.data.data);
         this.selectedNode = masterNode.name;
         const nodeInfo = await this.apiReq.request(
           'GET',
@@ -92,7 +98,7 @@ export class StatusController {
         this.clusterError = `Cluster is enabled but it's not running, please check your cluster health.`;
       } else {
         const daemons = await this.apiReq.request('GET', '/manager/status', {});
-        this.daemons = daemons.data.data;
+        this.daemons = this.objToArr(daemons.data.data);
         this.managerInfo = managerInfo;
       }
 
@@ -127,7 +133,7 @@ export class StatusController {
         `/cluster/${node}/status`,
         {}
       );
-      this.daemons = daemons.data.data;
+      this.daemons = this.objToArr(daemons.data.data);
 
       const nodeInfo = await this.apiReq.request(
         'GET',
