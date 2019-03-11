@@ -218,11 +218,11 @@ app.directive('wzTable', function () {
       /**
        * This refresh data every second
        */
-      const realTimeFunction = async () => {
+      const realTimeFunction = async (limit = false) => {
         try {
           $scope.error = false;
           while (realTime) {
-            await fetch({ realTime: true, limit: 10 });
+            await fetch({ realTime: !limit ? true : false, limit: limit || 10 });
             if (!$scope.$$phase) $scope.$digest();
             await $timeout(1000);
           }
@@ -262,6 +262,7 @@ app.directive('wzTable', function () {
       $scope.itemsPerPage = $scope.rowsPerPage || 10;
       $scope.pagedItems = [];
       $scope.currentPage = 0;
+      $scope.currentOffset = 0;
       let items = [];
       $scope.gap = 0;
       $scope.searchTable = () => pagination.searchTable($scope, items);
@@ -271,9 +272,9 @@ app.directive('wzTable', function () {
       $scope.prevPage = () => pagination.prevPage($scope);
       $scope.nextPage = async currentPage =>
         pagination.nextPage(currentPage, $scope, errorHandler, fetch);
-      $scope.setPage = function () {
-        $scope.currentPage = this.n;
-        $scope.nextPage(this.n);
+      $scope.setPage = function (page = false) {
+        $scope.currentPage = page || this.n;
+        $scope.nextPage(this.n).then(() => { if (page) { $scope.$emit('scrollBottom', { line: parseInt(page * $scope.itemsPerPage) }) } });
       };
 
       /**
@@ -303,15 +304,19 @@ app.directive('wzTable', function () {
         listeners.wazuhRemoveFilter(parameters, instance, wzTableFilter, init)
       );
 
-      $scope.$on('wazuhPlayRealTime', () => {
+      $scope.$on('wazuhPlayRealTime', (ev, parameters) => {
         realTime = true;
-        return realTimeFunction();
+        return realTimeFunction(parameters.limit);
       });
 
       $scope.$on('wazuhStopRealTime', () => {
         realTime = false;
         return init();
       });
+
+      $scope.$on('increaseLogs', (event, parameters) => {
+        $scope.setPage(parseInt(parameters.lines / $scope.itemsPerPage));
+      })
 
       /*$scope.editGroupAgentConfig = (ev, group) => {
         $rootScope.$broadcast('editXmlFile', { target: group });
