@@ -23,7 +23,8 @@ class WzConfigViewer {
       getjson: '&',
       getxml: '&',
       jsoncontent: '=',
-      xmlcontent: '='
+      xmlcontent: '=',
+      hideHeader: '='
     };
     this.template = template;
   }
@@ -34,6 +35,7 @@ class WzConfigViewer {
         $document[0].getElementById('viewer_json_box'),
         {
           lineNumbers: true,
+          autoRefresh: true,
           matchClosing: true,
           matchBrackets: true,
           mode: { name: 'javascript', json: true },
@@ -50,6 +52,8 @@ class WzConfigViewer {
         $document[0].getElementById('viewer_xml_box'),
         {
           lineNumbers: true,
+          lineWrapping: true,
+          autoRefresh: true,
           matchClosing: true,
           matchBrackets: true,
           mode: 'text/xml',
@@ -60,6 +64,7 @@ class WzConfigViewer {
           gutters: ['CodeMirror-foldgutter']
         }
       );
+      bindXmlListener();
     };
 
     const refreshJsonBox = json => {
@@ -69,9 +74,10 @@ class WzConfigViewer {
       }
       if ($scope.jsoncontent != false) {
         $scope.jsonCodeBox.setValue($scope.jsoncontent.replace(/\\\\/g, '\\'));
-        setTimeout(function() {
+        setTimeout(function () {
           $scope.jsonCodeBox.refresh();
-        }, 1);
+          $scope.$applyAsync();
+        }, 100);
       }
     };
 
@@ -82,9 +88,10 @@ class WzConfigViewer {
       }
       if ($scope.xmlcontent != false) {
         $scope.xmlCodeBox.setValue($scope.xmlcontent);
-        setTimeout(function() {
+        setTimeout(function () {
           $scope.xmlCodeBox.refresh();
-        }, 1);
+          $scope.$applyAsync();
+        }, 100);
       }
     };
 
@@ -98,6 +105,22 @@ class WzConfigViewer {
 
     $scope.$on('XMLContentReady', (ev, params) => {
       refreshXmlBox(params.data);
+    });
+
+    const bindXmlListener = () => {
+      var scrollElement = $scope.xmlCodeBox.getScrollerElement();
+      $(scrollElement).bind('scroll', function (e) {
+        var element = $(e.currentTarget)[0];
+        if (element.scrollHeight - element.scrollTop === element.clientHeight) {
+          $scope.$emit('scrolledToBottom', { lines: $scope.xmlCodeBox.lineCount() });
+        }
+      });
+    }
+
+    $scope.$on('viewerScrollBottom', (ev, params) => {
+      var t = $scope.xmlCodeBox.charCoords({ line: params.line, ch: 0 }, "local").top;
+      var middleHeight = $scope.xmlCodeBox.getScrollerElement().offsetHeight / 2;
+      $scope.xmlCodeBox.scrollTo(null, t - middleHeight - 10);
     });
   }
 }
