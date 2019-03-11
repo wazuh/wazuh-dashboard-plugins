@@ -90,9 +90,12 @@
                 </td>
                 <td ng-if="path === '/rules/files' || path === '/decoders/files' || path === '/lists/files'" ng-click="$event.stopPropagation()"
                     class="cursor-default action-btn-td">
+                    <i ng-if="((item.name && removingFile !== item.name) || (item.file && removingFile !== item.file)) && adminMode && path !== '/lists/files'"
+                        ng-click="editFile(item, path); $event.stopPropagation()" class="fa fa-fw fa-pencil cursor-pointer"
+                        tooltip="Edit this file" tooltip-placement="left" aria-hidden="true"></i>
                     <i ng-if="((item.name && removingFile !== item.name) || (item.file && removingFile !== item.file)) && adminMode"
                         ng-click="showConfirmRemoveFile($event, item, path); $event.stopPropagation()" class="fa fa-fw fa-trash cursor-pointer"
-                        tooltip="Delete this file" tooltip-placement="left" aria-hidden="true"></i>
+                        tooltip="Delete this file" tooltip-placement="right" aria-hidden="true"></i>
                     <div ng-if="(item.name && removingFile === item.name) || (item.file && removingFile === item.file)"
                         class="confirmEmbedBubble">
                         <div layout="row">

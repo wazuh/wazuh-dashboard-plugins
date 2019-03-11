@@ -1,6 +1,6 @@
 <div flex ng-if="!loading && mctrl.globalRulesetTab == 'files'" class="" ng-controller="filesController as filesctrl" 
 layout="column" id="rulesContainer" layout-align="start space-around">
-<div>
+<div ng-show="!editingFile">
     <!-- Headline -->
     <div layout="column" layout-padding>
         <div>

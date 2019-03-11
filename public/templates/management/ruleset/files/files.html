@@ -1,4 +1,4 @@
-<div ng-if="!files.viewingDetail" layout="column">
+<div ng-if="!files.viewingDetail" ng-show="!editingFile" layout="column">
     <div id="content" layout="row" class="md-padding ">
         <input flex placeholder="Filter files..." ng-model="filesctrl.custom_search" type="text" class="kuiLocalSearchInput height-40 ng-empty ng-pristine ng-scope ng-touched ng-valid"
             aria-invalid="false" wz-enter="filesctrl.search(filesctrl.custom_search)">
@@ -16,4 +16,32 @@
             </md-card-content>
         </md-card>
     </div>
+</div>
+<div ng-show="editingFile" class="md-padding">
+    <!-- XML editor for rules -->
+    <div layout="column" layout-align="start">
+        <div layout="row">
+            <span ng-click='closeEditingFile()' class='btn btn-info'>Close</span>
+            <button ng-disabled='xmlHasErrors || doingSaving' ng-click='doSaveConfig()' class='btn wz-button pull-right wz-margin-left-8'>
+                <span ng-show='!xmlHasErrors'><i aria-hidden='true' class='fa fa-fw fa-save' ng-class="doingSaving ? 'fa-spin fa-spinner' : ''"></i>Save
+                    file</span>
+                <span ng-show='xmlHasErrors' class='btn-danger'><i aria-hidden='true' class='fa fa-fw fa-exclamation-triangle'></i>
+                    XML format error</span>
+            </button>
+            <div ng-show="restartMsg" class="confirmEmbedBubble confirmEmbedBubbleInline">
+                <span class="wz-padding-top-10 wz-padding-left-8">Configuration is not applied yet. Do you want
+                    to restart to apply it?</span>
+                <button class="btn cancelBtn btn-info md-padding-h" type="button" ng-click="toggleRestartMsg()">I
+                    will do it later</button>
+                <button class="btn wz-button" type="button" ng-disabled="doingSaving" ng-click="restart(); toggleRestartMsg()">Restart
+                    now</button>
+            </div>
+        </div>
+        <div class="wz-padding-top-14" ng-if="fetchedXML" style="height: calc(100vh - 220px);">
+            <wz-xml-file-editor file-name='rules' data="fetchedXML" target-name="currentFile.file" valid-fn='xmlIsValid(valid)'
+                saving-param='toggleSaveConfig()' close-fn='closeEditingFile(reload)'>
+            </wz-xml-file-editor>
+        </div>
+    </div>
+    <!-- XML editor for rules -->
 </div>
