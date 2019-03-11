@@ -50,12 +50,11 @@
                 <wz-table custom-columns="true" implicit-filter="cdbctrl.appliedFilters" flex path="'/lists/files'"
                     keys="['name', 'path']" allow-click="true" row-sizes="[15,13,11]">
                 </wz-table>
-                <div layout="row" class="wz-margin-top-10 md-padding-h">
-                    <span flex></span>
-                    <a class="small" id="btnDownload" ng-click="cdbctrl.downloadCsv()">Formatted <i aria-hidden="true"
-                            class="fa fa-download"></i></a>
-                </div>
             </md-card-content>
+            <md-card-actions layout="row" layout-align="end center" class="wz-card-actions layout-align-end-center layout-row">
+                <a class="wz-text-link cursor-pointer small md-button md-ink-ripple" id="btnDownload" ng-click="cdbctrl.downloadCsv()">Formatted
+                    <i aria-hidden="true" class="fa fa-download"></i></a>
+            </md-card-actions>
         </md-card>
     </div>
 </div>

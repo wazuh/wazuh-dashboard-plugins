@@ -22,7 +22,7 @@
     <div layout="row" layout-align="center stretch" class="height-300">
         <md-card flex class="wz-md-card" ng-class="{'fullscreen': expandArray[0]}">
             <md-card-content class="wazuh-column">
-                <div layout="row">
+                <div layout="row" ng-dblclick="expand(0)">
                     <span class="wz-headline-title">Top 5 rule groups</span>
                     <span flex></span>
                     <span class="wz-text-link" ng-click="expand(0)"><i class="fa fa-fw fa-expand"></i></span>
@@ -33,7 +33,7 @@
         </md-card>
         <md-card flex class="wz-md-card" ng-class="{'fullscreen': expandArray[1]}">
             <md-card-content class="wazuh-column">
-                <div layout="row">
+                <div layout="row" ng-dblclick="expand(1)">
                     <span class="wz-headline-title">Top 5 rules</span>
                     <span flex></span>
                     <span class="wz-text-link" ng-click="expand(1)"><i class="fa fa-fw fa-expand"></i></span>
@@ -44,7 +44,7 @@
         </md-card>
         <md-card flex class="wz-md-card" ng-class="{'fullscreen': expandArray[2]}">
             <md-card-content class="wazuh-column">
-                <div layout="row">
+                <div layout="row" ng-dblclick="expand(2)">
                     <span class="wz-headline-title">Top 5 GDPR requirements</span>
                     <span flex></span>
                     <span class="wz-text-link" ng-click="expand(2)"><i class="fa fa-fw fa-expand"></i></span>
@@ -58,7 +58,7 @@
     <div layout="row" layout-align="center stretch" class="height-300">
         <md-card flex="70" class="wz-md-card" ng-class="{'fullscreen': expandArray[3]}">
             <md-card-content class="wazuh-column">
-                <div layout="row">
+                <div layout="row" ng-dblclick="expand(3)">
                     <span class="wz-headline-title">GDPR Requirements</span>
                     <span flex></span>
                     <span class="wz-text-link" ng-click="expand(3)"><i class="fa fa-fw fa-expand"></i></span>
@@ -69,7 +69,7 @@
         </md-card>
         <md-card flex class="wz-md-card" ng-class="{'fullscreen': expandArray[4]}">
             <md-card-content class="wazuh-column">
-                <div layout="row">
+                <div layout="row" ng-dblclick="expand(4)">
                     <span class="wz-headline-title">Rule level distribution</span>
                     <span flex></span>
                     <span class="wz-text-link" ng-click="expand(4)"><i class="fa fa-fw fa-expand"></i></span>
@@ -83,7 +83,7 @@
     <div layout="row" layout-align="center stretch" class="height-570">
         <md-card class="wz-md-card" flex ng-class="{'fullscreen': expandArray[5]}">
             <md-card-content class="wazuh-column">
-                <div layout="row">
+                <div layout="row" ng-dblclick="expand(5)">
                     <span class="wz-headline-title">Alerts summary</span>
                     <span flex></span>
                     <span class="wz-text-link" ng-click="expand(5)"><i class="fa fa-fw fa-expand"></i></span>
