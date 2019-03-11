@@ -134,9 +134,9 @@ export class ManagementController {
   async restartManager() {
     try {
       this.isRestarting = true;
-      const data = await this.configHandler.restartManager();
+      await this.configHandler.restartManager();
       this.isRestarting = false;
-      this.errorHandler.info(`${data.data.data}. It may take a few seconds.`);
+      this.errorHandler.info('Success. It may take a few seconds.');
       this.$scope.$applyAsync();
     } catch (error) {
       this.isRestarting = false;
@@ -150,10 +150,8 @@ export class ManagementController {
   async restartCluster() {
     try {
       this.isRestarting = true;
-      const data = await this.configHandler.restartCluster();
-      this.errorHandler.info(
-        `${data.data.data}. It will take up to 15 seconds.`
-      );
+      await this.configHandler.restartCluster();
+      this.errorHandler.info('Success. It will take up to 15 seconds.');
       this.$scope.$applyAsync();
     } catch (error) {
       this.isRestarting = false;

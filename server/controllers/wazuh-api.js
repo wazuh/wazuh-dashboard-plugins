@@ -26,6 +26,7 @@ import { ApiErrorEquivalence } from '../../util/api-errors-equivalence';
 import { cleanKeys } from '../../util/remove-key';
 import { apiRequestList } from '../../util/api-request-list';
 import * as ApiHelper from '../lib/api-helper';
+import { Queue } from '../jobs/queue';
 
 export class WazuhApiCtrl {
   /**
@@ -33,6 +34,7 @@ export class WazuhApiCtrl {
    * @param {*} server
    */
   constructor(server) {
+    this.queue = Queue;
     this.wzWrapper = new ElasticWrapper(server);
     this.monitoringInstance = new Monitoring(server, true);
   }
@@ -593,8 +595,20 @@ export class WazuhApiCtrl {
         options.content_type = 'application/octet-stream';
         data = data.content;
       }
-
+      const delay = (data || {}).delay || 0;
       const fullUrl = getPath(api) + path;
+      if (delay) {
+        const current = new Date();
+        this.queue.addJob({
+          startAt: new Date(current.getTime() + delay),
+          type: 'request',
+          method,
+          fullUrl,
+          data,
+          options
+        });
+        return { error: 0, message: 'Success' };
+      }
       const response = await needle(method, fullUrl, data, options);
 
       if (
