@@ -107,7 +107,7 @@
         </div>
 
         <!-- Related decoders section -->
-        <div ng-show="!dctrl.editingFile">
+        <div ng-if="!dctrl.editingFile">
             <div layout="row" class="md-padding wz-padding-top-10" ng-if="dctrl.currentDecoder">
                 <h1 class="md-headline wz-headline"><i class="fa fa-fw fa-link" aria-hidden="true"></i> Related
                     decoders</h1>

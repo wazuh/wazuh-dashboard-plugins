@@ -140,7 +140,7 @@
 </div>
 
 <div ng-show="!error && !wazuh_table_loading && items.length" ng-if="isPolicyMonitoring()">
-    <table class="table table-striped table-condensed table-hover no-margin-bottom" ng-class="customColumns ? 'table-resizable' : ''"
+    <table class="table table-striped table-striped-duo table-condensed table-hover no-margin-bottom" ng-class="customColumns ? 'table-resizable' : ''"
         style="table-layout: fixed !important" id="wz_table">
         <thead class="wz-text-bold">
             <th ng-repeat="key in keys" class="wz-text-left" ng-class="{ 'cursor-pointer' : !key.nosortable }" ng-style="key.width && {'width':key.width}"
@@ -247,7 +247,7 @@
 </div>
 
 <div ng-show="!error && !wazuh_table_loading && items.length" ng-if="isSyscheck()">
-    <table class="table table-striped table-condensed table-hover no-margin-bottom" ng-class="customColumns ? 'table-resizable' : ''"
+    <table class="table table-striped table-striped-duo table-condensed table-hover no-margin-bottom" ng-class="customColumns ? 'table-resizable' : ''"
         style="table-layout: fixed !important" id="wz_table">
         <thead class="wz-text-bold">
             <th ng-repeat="key in keys" class="wz-text-left" ng-class="{ 'cursor-pointer' : !key.nosortable }" ng-style="key.width && {'width':key.width}"
@@ -275,13 +275,14 @@
             </tr>
             <tr class="wz-word-wrap cursor-pointer selected" ng-show="item.expanded" ng-repeat-end="" ng-click="expandTableRow(item)">
                 <td colspan="{{keys.length}}" style="border-top: none">
-                    <div layout="row" layout-padding="" class="layout-padding layout-row">
+                    <div layout="row" layout-padding="" class="layout-padding layout-row" ng-if="item.expanded">
                         <md-card flex="" class="wz-md-card wz-padding-top-0 wz-padding-bottom-0 wz-no-margin _md flex">
                             <md-card-content>
                                 <div layout="row" class="wz-padding-top-10">
                                     <table class="table table-striped table-condensed">
                                         <tbody>
                                             <tr ng-repeat="(key, value) in item" ng-if="key !== 'expanded' && key !== 'showTooltip'"
+                                                ng-show="!isWindows() || (key !== 'inode' && key !== 'gid' && key !== 'gname')"
                                                 class="no-duo">
                                                 <td class="wz-word-break-rule">{{key}}</td>
                                                 <td>

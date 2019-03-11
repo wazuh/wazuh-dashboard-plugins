@@ -75,15 +75,6 @@ export const monitoringKnownFields = [
     readFromDocValues: false
   },
   {
-    name: 'dateAdd.keyword',
-    type: 'string',
-    count: 0,
-    scripted: false,
-    searchable: true,
-    aggregatable: true,
-    readFromDocValues: true
-  },
-  {
     name: 'group',
     type: 'string',
     count: 0,
@@ -91,15 +82,6 @@ export const monitoringKnownFields = [
     searchable: true,
     aggregatable: false,
     readFromDocValues: false
-  },
-  {
-    name: 'group.keyword',
-    type: 'string',
-    count: 0,
-    scripted: false,
-    searchable: true,
-    aggregatable: true,
-    readFromDocValues: true
   },
   {
     name: 'host',
@@ -138,15 +120,6 @@ export const monitoringKnownFields = [
     readFromDocValues: false
   },
   {
-    name: 'lastKeepAlive.keyword',
-    type: 'string',
-    count: 0,
-    scripted: false,
-    searchable: true,
-    aggregatable: true,
-    readFromDocValues: true
-  },
-  {
     name: 'cluster.name',
     type: 'string',
     count: 0,
@@ -154,15 +127,6 @@ export const monitoringKnownFields = [
     searchable: true,
     aggregatable: false,
     readFromDocValues: false
-  },
-  {
-    name: 'cluster.name.keyword',
-    type: 'string',
-    count: 0,
-    scripted: false,
-    searchable: true,
-    aggregatable: true,
-    readFromDocValues: true
   },
   {
     name: 'mergedSum',
@@ -174,15 +138,6 @@ export const monitoringKnownFields = [
     readFromDocValues: false
   },
   {
-    name: 'mergedSum.keyword',
-    type: 'string',
-    count: 0,
-    scripted: false,
-    searchable: true,
-    aggregatable: true,
-    readFromDocValues: true
-  },
-  {
     name: 'configSum',
     type: 'string',
     count: 0,
@@ -190,15 +145,6 @@ export const monitoringKnownFields = [
     searchable: true,
     aggregatable: false,
     readFromDocValues: false
-  },
-  {
-    name: 'configSum.keyword',
-    type: 'string',
-    count: 0,
-    scripted: false,
-    searchable: true,
-    aggregatable: true,
-    readFromDocValues: true
   },
   {
     name: 'node_name',
@@ -210,15 +156,6 @@ export const monitoringKnownFields = [
     readFromDocValues: false
   },
   {
-    name: 'node_name.keyword',
-    type: 'string',
-    count: 0,
-    scripted: false,
-    searchable: true,
-    aggregatable: true,
-    readFromDocValues: true
-  },
-  {
     name: 'manager',
     type: 'string',
     count: 0,
@@ -228,15 +165,6 @@ export const monitoringKnownFields = [
     readFromDocValues: false
   },
   {
-    name: 'manager.keyword',
-    type: 'string',
-    count: 0,
-    scripted: false,
-    searchable: true,
-    aggregatable: true,
-    readFromDocValues: true
-  },
-  {
     name: 'manager_host',
     type: 'string',
     count: 0,
@@ -244,15 +172,6 @@ export const monitoringKnownFields = [
     searchable: true,
     aggregatable: false,
     readFromDocValues: false
-  },
-  {
-    name: 'manager_host.keyword',
-    type: 'string',
-    count: 0,
-    scripted: false,
-    searchable: true,
-    aggregatable: true,
-    readFromDocValues: true
   },
   {
     name: 'name',
@@ -273,15 +192,6 @@ export const monitoringKnownFields = [
     readFromDocValues: false
   },
   {
-    name: 'os.arch.keyword',
-    type: 'string',
-    count: 0,
-    scripted: false,
-    searchable: true,
-    aggregatable: true,
-    readFromDocValues: true
-  },
-  {
     name: 'os.codename',
     type: 'string',
     count: 0,
@@ -289,15 +199,6 @@ export const monitoringKnownFields = [
     searchable: true,
     aggregatable: false,
     readFromDocValues: false
-  },
-  {
-    name: 'os.codename.keyword',
-    type: 'string',
-    count: 0,
-    scripted: false,
-    searchable: true,
-    aggregatable: true,
-    readFromDocValues: true
   },
   {
     name: 'os.major',
@@ -309,13 +210,13 @@ export const monitoringKnownFields = [
     readFromDocValues: false
   },
   {
-    name: 'os.major.keyword',
+    name: 'os.minor',
     type: 'string',
     count: 0,
     scripted: false,
     searchable: true,
-    aggregatable: true,
-    readFromDocValues: true
+    aggregatable: false,
+    readFromDocValues: false
   },
   {
     name: 'os.name',
@@ -327,15 +228,6 @@ export const monitoringKnownFields = [
     readFromDocValues: false
   },
   {
-    name: 'os.name.keyword',
-    type: 'string',
-    count: 0,
-    scripted: false,
-    searchable: true,
-    aggregatable: true,
-    readFromDocValues: true
-  },
-  {
     name: 'os.platform',
     type: 'string',
     count: 0,
@@ -343,15 +235,6 @@ export const monitoringKnownFields = [
     searchable: true,
     aggregatable: false,
     readFromDocValues: false
-  },
-  {
-    name: 'os.platform.keyword',
-    type: 'string',
-    count: 0,
-    scripted: false,
-    searchable: true,
-    aggregatable: true,
-    readFromDocValues: true
   },
   {
     name: 'os.uname',
@@ -363,15 +246,6 @@ export const monitoringKnownFields = [
     readFromDocValues: false
   },
   {
-    name: 'os.uname.keyword',
-    type: 'string',
-    count: 0,
-    scripted: false,
-    searchable: true,
-    aggregatable: true,
-    readFromDocValues: true
-  },
-  {
     name: 'os.version',
     type: 'string',
     count: 0,
@@ -379,15 +253,6 @@ export const monitoringKnownFields = [
     searchable: true,
     aggregatable: false,
     readFromDocValues: false
-  },
-  {
-    name: 'os.version.keyword',
-    type: 'string',
-    count: 0,
-    scripted: false,
-    searchable: true,
-    aggregatable: true,
-    readFromDocValues: true
   },
   {
     name: 'status',
@@ -408,12 +273,12 @@ export const monitoringKnownFields = [
     readFromDocValues: false
   },
   {
-    name: 'version.keyword',
+    name: 'registerIP',
     type: 'string',
     count: 0,
     scripted: false,
     searchable: true,
-    aggregatable: true,
-    readFromDocValues: true
+    aggregatable: false,
+    readFromDocValues: false
   }
 ];
