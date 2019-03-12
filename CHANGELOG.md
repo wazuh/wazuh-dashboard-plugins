@@ -21,7 +21,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Added customizable interval for Wazuh monitoring indices creation ([#1243](https://github.com/wazuh/wazuh-kibana-app/pull/1243)).
 - Expand visualizations ([#1246](https://github.com/wazuh/wazuh-kibana-app/pull/1246)).
 - Added a dynamic table columns selector ([#1246](https://github.com/wazuh/wazuh-kibana-app/pull/1246)).
-- Added resizable columns by dragging in tables ([]())
+- Added resizable columns by dragging in tables ([d2bf8ee](https://github.com/wazuh/wazuh-kibana-app/commit/d2bf8ee9681ca5d6028325e165854b49214e86a3))
 - Added a cron job for fetching missing fields of all valid index patterns, also merging dynamic fields every time an index pattern is refreshed by the app ([#1276](https://github.com/wazuh/wazuh-kibana-app/pull/1276)).
 - Added auto-merging dynamic fields for Wazuh monitoring index patterns ([#1300](https://github.com/wazuh/wazuh-kibana-app/pull/1300))
 - New server module, it's a job queue so we can add delayed jobs to be run in background, this iteration only accepts delayed Wazuh API calls ([#1283](https://github.com/wazuh/wazuh-kibana-app/pull/1283)).
