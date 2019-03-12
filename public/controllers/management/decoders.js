@@ -83,12 +83,6 @@ export class DecodersController {
       if (!this.$scope.$$phase) this.$scope.$digest();
     });
 
-    this.$scope.$on('showFileNameInput', () => {
-      this.newFile = true;
-      this.selectedItem = { file: 'new file' };
-      this.$scope.$applyAsync();
-    });
-
     this.$scope.$on('showSaveAndOverwrite', () => {
       this.overwriteError = true;
       this.$scope.$applyAsync();
@@ -306,21 +300,6 @@ export class DecodersController {
     if (!this.$scope.$$phase) this.$scope.$digest();
   }
 
-  addNewFile(type) {
-    this.editingFile = true;
-    this.newFile = true;
-    this.newFileName = '';
-    this.selectedFileName = this.selectedRulesetTab;
-    this.selectedItem = { file: 'new file' };
-    this.fetchedXML = '<!-- Modify it at your will. -->';
-    this.type = type;
-    this.cancelSaveAndOverwrite();
-    if (!this.$scope.$$phase) this.$scope.$digest();
-    this.$location.search('editingFile', true);
-    this.appState.setNavigation({ status: true });
-    this.$scope.$emit('fetchedFile', { data: this.fetchedXML });
-  }
-
   toggleSaveConfig = () => {
     this.doingSaving = false;
     this.$scope.$applyAsync();
@@ -331,42 +310,17 @@ export class DecodersController {
     this.$scope.$applyAsync();
   };
 
-  doSaveConfig(isNewFile, fileName) {
+  doSaveConfig() {
     const clusterInfo = this.appState.getClusterInfo();
     const showRestartManager =
       clusterInfo.status === 'enabled' ? 'cluster' : 'manager';
-    if (isNewFile && !fileName) {
-      this.errorHandler.handle(
-        'Error creating a new file. You need to specify a file name',
-        ''
-      );
-      return false;
-    } else {
-      if (isNewFile) {
-        const validFileName = /(.+).xml/;
-        const containsBlanks = /.*[ ].*/;
-        if (fileName && !validFileName.test(fileName)) {
-          fileName = fileName + '.xml';
-        }
-        if (containsBlanks.test(fileName)) {
-          this.errorHandler.handle(
-            'Error creating a new file. The filename can not contain white spaces.',
-            ''
-          );
-          return false;
-        }
-        this.selectedItem = { file: fileName };
-      }
-      this.doingSaving = true;
-      const objParam = {
-        decoder: isNewFile ? this.selectedItem : this.currentDecoder,
-        showRestartManager,
-        isNewFile: !!isNewFile,
-        isOverwrite: !!this.overwriteError
-      };
-
-      this.$scope.$broadcast('saveXmlFile', objParam);
-    }
+    this.doingSaving = true;
+    const objParam = {
+      decoder: this.currentDecoder,
+      showRestartManager,
+      isOverwrite: !!this.overwriteError
+    };
+    this.$scope.$broadcast('saveXmlFile', objParam);
   }
 
   restart = () => {
