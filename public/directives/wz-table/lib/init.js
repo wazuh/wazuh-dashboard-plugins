@@ -15,12 +15,13 @@ export async function initTable(
   fetch,
   wzTableFilter,
   instance,
-  errorHandler
+  errorHandler,
+  skipFetching = false
 ) {
   try {
     $scope.error = false;
     $scope.wazuh_table_loading = true;
-    await fetch();
+    await fetch({ skipFetching });
     wzTableFilter.set(instance.filters);
     $scope.wazuh_table_loading = false;
   } catch (error) {

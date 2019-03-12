@@ -763,9 +763,16 @@ export class Monitoring {
   async cronTask() {
     try {
       const template = await this.wzWrapper.getTemplateByName('wazuh-agent');
-
+      const patterns =
+        ((template || {})['wazuh-agent'] || {}).index_patterns || false;
       // Prevents to insert monitoring indices without the proper template inserted
-      if (((template || {})['wazuh-agent'] || {}).index_patterns) {
+      if (Array.isArray(patterns)) {
+        // Discover new fields for all monitoring index patterns
+        for (const pattern of patterns) {
+          await this.wzWrapper.updateMonitoringIndexPatternKnownFields(
+            'index-pattern:' + pattern
+          );
+        }
         this.agentsArray = [];
         const data = await this.getConfig();
         await this.loadCredentials(data);

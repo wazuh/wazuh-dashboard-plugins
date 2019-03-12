@@ -22,7 +22,7 @@
             <div flex layout="row">
                 <md-card flex class="wz-md-card" ng-class="{'fullscreen': octrl.expandArray[0]}">
                     <md-card-content class="wazuh-column">
-                        <div layout="row">
+                        <div layout="row" ng-dblclick="octrl.expand(0)">
                             <span class="wz-headline-title">Unique malicious files per agent</span>
                             <span flex></span>
                             <span class="wz-text-link" ng-click="octrl.expand(0)"><i class="fa fa-fw fa-expand"></i></span>
@@ -37,7 +37,7 @@
             <div flex layout="row">
                 <md-card flex class="wz-md-card" ng-class="{'fullscreen': octrl.expandArray[1]}">
                     <md-card-content class="wazuh-column">
-                        <div layout="row">
+                        <div layout="row" ng-dblclick="octrl.expand(1)">
                             <span class="wz-headline-title">Last scanned files</span>
                             <span flex></span>
                             <span class="wz-text-link" ng-click="octrl.expand(1)"><i class="fa fa-fw fa-expand"></i></span>
@@ -52,7 +52,7 @@
     <div layout="row" class="height-550">
         <md-card flex class="wz-md-card" ng-class="{'fullscreen': octrl.expandArray[2]}">
             <md-card-content class="wazuh-column">
-                <div layout="row">
+                <div layout="row" ng-dblclick="octrl.expand(2)">
                     <span class="wz-headline-title">Top 10 agents with positive scans</span>
                     <span flex></span>
                     <span class="wz-text-link" ng-click="octrl.expand(2)"><i class="fa fa-fw fa-expand"></i></span>
@@ -65,7 +65,7 @@
     <div layout="row" class="height-250">
         <md-card flex class="wz-md-card" ng-class="{'fullscreen': octrl.expandArray[3]}">
             <md-card-content class="wazuh-column">
-                <div layout="row">
+                <div layout="row" ng-dblclick="octrl.expand(3)">
                     <span class="wz-headline-title">Malicious files alerts evolution</span>
                     <span flex></span>
                     <span class="wz-text-link" ng-click="octrl.expand(3)"><i class="fa fa-fw fa-expand"></i></span>
@@ -78,7 +78,7 @@
     <div layout="row" class="height-570">
         <md-card flex class="wz-md-card" ng-class="{'fullscreen': octrl.expandArray[4]}">
             <md-card-content class="wazuh-column">
-                <div layout="row">
+                <div layout="row" ng-dblclick="octrl.expand(4)">
                     <span class="wz-headline-title">Last files</span>
                     <span flex></span>
                     <span class="wz-text-link" ng-click="octrl.expand(4)"><i class="fa fa-fw fa-expand"></i></span>

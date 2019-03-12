@@ -243,58 +243,34 @@ export class ElasticWrapper {
         return Promise.reject(
           new Error('No valid index pattern id for update index pattern')
         );
+
       const pattern = await this.getIndexPatternUsingGet(id);
+
       let detectedFields = [];
       try {
-        // Merge fields logic
         const patternTitle =
           (((pattern || {})._source || {})['index-pattern'] || {}).title || '';
-
-        const metaFields = ['_source', '_id', '_type', '_index', '_score'];
-        const callCluster = this.elasticRequest.callWithInternalUser;
-        const patternService = await this._server.indexPatternsServiceFactory({
-          callCluster
-        });
-        detectedFields = await patternService.getFieldsForWildcard({
-          pattern: patternTitle,
-          metaFields
-        });
-
-        if (!Array.isArray(detectedFields)) {
-          detectedFields = [];
-        }
-      } catch (error) { } //eslint-disable-line
+        detectedFields = await this.discoverNewFields(patternTitle);
+      } catch (error) {} // eslint-disable-line
 
       let currentFields = [];
 
       // If true, it's an existing index pattern, we need to review its known fields
-      if ((((pattern || {})._source || {})['index-pattern'] || {}).fields) {
-        currentFields = JSON.parse(pattern._source['index-pattern'].fields);
+      const { fields } = ((pattern || {})._source || {})['index-pattern'] || {};
+      if (fields) {
+        currentFields = JSON.parse(fields);
 
         if (Array.isArray(currentFields) && Array.isArray(knownFields)) {
           currentFields = currentFields.filter(
             item =>
               item.name &&
               item.name !==
-              'data.aws.service.action.networkConnectionAction.remoteIpDetails.geoLocation.lat' &&
+                'data.aws.service.action.networkConnectionAction.remoteIpDetails.geoLocation.lat' &&
               item.name !==
-              'data.aws.service.action.networkConnectionAction.remoteIpDetails.geoLocation.lon'
+                'data.aws.service.action.networkConnectionAction.remoteIpDetails.geoLocation.lon'
           );
 
-          for (const field of knownFields) {
-            // It has this field?
-            const index = currentFields
-              .map(item => item.name)
-              .indexOf(field.name);
-
-            if (index >= 0 && currentFields[index]) {
-              // If field already exists, update its type
-              currentFields[index].type = field.type;
-            } else {
-              // If field doesn't exist, add it
-              currentFields.push(field);
-            }
-          }
+          this.mergeDetectedFields(knownFields, currentFields);
         }
       } else {
         // It's a new index pattern, just add our known fields
@@ -302,18 +278,7 @@ export class ElasticWrapper {
       }
 
       // Iterate over dynamic fields
-      for (const field of detectedFields) {
-        // It has this field?
-        const index = currentFields.map(item => item.name).indexOf(field.name);
-
-        if (index >= 0 && currentFields[index]) {
-          // If field already exists, update its type
-          currentFields[index].type = field.type;
-        } else {
-          // If field doesn't exist, add it
-          currentFields.push(field);
-        }
-      }
+      this.mergeDetectedFields(detectedFields, currentFields);
 
       // This array always must has items
       if (!currentFields || !currentFields.length) {
@@ -372,6 +337,13 @@ export class ElasticWrapper {
           new Error('No valid index pattern id for update index pattern')
         );
 
+      let detectedFields = [];
+
+      try {
+        const patternTitle = id.split('index-pattern:')[1];
+        detectedFields = await this.discoverNewFields(patternTitle);
+      } catch (error) {} // eslint-disable-line
+
       const pattern = await this.getIndexPatternUsingGet(id);
 
       let currentFields = [];
@@ -384,25 +356,15 @@ export class ElasticWrapper {
           Array.isArray(currentFields) &&
           Array.isArray(monitoringKnownFields)
         ) {
-          for (const field of monitoringKnownFields) {
-            // It has this field?
-            const index = currentFields
-              .map(item => item.name)
-              .indexOf(field.name);
-
-            if (index >= 0 && currentFields[index]) {
-              // If field already exists, update its type
-              currentFields[index].type = field.type;
-            } else {
-              // If field doesn't exist, add it
-              currentFields.push(field);
-            }
-          }
+          this.mergeDetectedFields(monitoringKnownFields, currentFields);
         }
       } else {
         // It's a new index pattern, just add our known fields
         currentFields = monitoringKnownFields;
       }
+
+      // Iterate over dynamic fields
+      this.mergeDetectedFields(detectedFields, currentFields);
 
       // This array always must has items
       if (!currentFields || !currentFields.length) {
@@ -615,17 +577,17 @@ export class ElasticWrapper {
 
       const data = req
         ? await this.elasticRequest.callWithRequest(req, 'update', {
-          index: '.wazuh',
-          type: 'wazuh-configuration',
-          id: id,
-          body: doc
-        })
+            index: '.wazuh',
+            type: 'wazuh-configuration',
+            id: id,
+            body: doc
+          })
         : await this.elasticRequest.callWithInternalUser('update', {
-          index: '.wazuh',
-          type: 'wazuh-configuration',
-          id: id,
-          body: doc
-        });
+            index: '.wazuh',
+            type: 'wazuh-configuration',
+            id: id,
+            body: doc
+          });
 
       return data;
     } catch (error) {
@@ -700,7 +662,7 @@ export class ElasticWrapper {
       return (
         this.usingSearchGuard ||
         ((((data || {}).defaults || {}).xpack || {}).security || {}).enabled ==
-        'true'
+          'true'
       );
     } catch (error) {
       return Promise.reject(error);
@@ -998,6 +960,56 @@ export class ElasticWrapper {
       return data;
     } catch (error) {
       return Promise.reject(error);
+    }
+  }
+
+  /**
+   * Fetch new fields found for certain index pattern.
+   * It always return an array, even if there are no results (empty array).
+   * @param {*} pattern Index pattern title
+   */
+  async discoverNewFields(pattern) {
+    let detectedFields = [];
+    try {
+      const metaFields = ['_source', '_id', '_type', '_index', '_score'];
+      const callCluster = this.elasticRequest.callWithInternalUser;
+      const patternService = await this._server.indexPatternsServiceFactory({
+        callCluster
+      });
+
+      detectedFields = await patternService.getFieldsForWildcard({
+        pattern,
+        metaFields
+      });
+    } catch (error) {} // eslint-disable-line
+
+    if (!Array.isArray(detectedFields)) {
+      detectedFields = [];
+    }
+
+    return detectedFields;
+  }
+
+  /**
+   * Merge :detectedFields into :currentFields.
+   * @param {*} detectedFields Source. Array of index pattern fields
+   * @param {*} currentFields Target. Array of index pattern fields
+   */
+  mergeDetectedFields(detectedFields, currentFields) {
+    if (Array.isArray(detectedFields) && Array.isArray(currentFields)) {
+      // Iterate over dynamic fields
+      for (const field of detectedFields) {
+        // It has this field?
+        const index = currentFields.map(item => item.name).indexOf(field.name);
+
+        if (index >= 0 && currentFields[index]) {
+          // If field already exists, update its type
+          currentFields[index].type = field.type;
+        } else {
+          // If field doesn't exist, add it
+          currentFields.push(field);
+        }
+      }
     }
   }
 }

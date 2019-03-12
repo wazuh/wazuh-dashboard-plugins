@@ -246,7 +246,6 @@ export function RulesController(
   };
 
   $scope.closeEditingFile = async () => {
-    $scope.editingFile = false;
     if ($scope.currentRule) {
       try {
         const ruleReloaded = await apiReq.request(
@@ -254,12 +253,21 @@ export function RulesController(
           `/rules/${$scope.currentRule.id}`,
           {}
         );
-        $scope.currentRule = ((((ruleReloaded || {}).data || {}).data || {})
-          .items || [])[0];
+        const response =
+          (((ruleReloaded || {}).data || {}).data || {}).items || [];
+        if (!response.length) {
+          $scope.currentRule = null;
+          $scope.showingLocalRules = true;
+          $scope.closeDetailView(true);
+        } else {
+          $scope.currentRule = response[0];
+        }
       } catch (err) {
         errorHandler.handle(err, 'Rule reload error.');
       }
     }
+    $scope.editingFile = false;
+    $scope.$applyAsync();
     appState.setNavigation({ status: true });
     $scope.$broadcast('closeEditXmlFile', {});
     if (!$scope.$$phase) $scope.$digest();
@@ -310,21 +318,6 @@ export function RulesController(
       );
   }
 
-  $scope.addNewFile = type => {
-    $scope.editingFile = true;
-    $scope.newFile = true;
-    $scope.newFileName = '';
-    $scope.selectedFileName = $scope.selectedRulesetTab;
-    $scope.selectedItem = { file: 'new file' };
-    $scope.fetchedXML = '<!-- Modify it at your will. -->';
-    $scope.type = type;
-    $scope.cancelSaveAndOverwrite();
-    if (!$scope.$$phase) $scope.$digest();
-    $location.search('editingFile', true);
-    appState.setNavigation({ status: true });
-    $scope.$emit('fetchedFile', { data: $scope.fetchedXML });
-  };
-
   $scope.toggleSaveConfig = () => {
     $scope.doingSaving = false;
     $scope.$applyAsync();
@@ -340,49 +333,18 @@ export function RulesController(
     $scope.$applyAsync();
   };
 
-  $scope.doSaveConfig = (isNewFile, fileName) => {
+  $scope.doSaveConfig = () => {
     const clusterInfo = appState.getClusterInfo();
     const showRestartManager =
       clusterInfo.status === 'enabled' ? 'cluster' : 'manager';
-    if (isNewFile && !fileName) {
-      errorHandler.handle(
-        'Error creating a new file. You need to specify a file name',
-        ''
-      );
-      return false;
-    } else {
-      if (isNewFile) {
-        const validFileName = /(.+).xml/;
-        const containsBlanks = /.*[ ].*/;
-        if (fileName && !validFileName.test(fileName)) {
-          fileName = fileName + '.xml';
-        }
-        if (containsBlanks.test(fileName)) {
-          errorHandler.handle(
-            'Error creating a new file. The filename can not contain white spaces.',
-            ''
-          );
-          return false;
-        }
-        $scope.selectedItem = { file: fileName };
-      }
-      $scope.doingSaving = true;
-      const objParam = {
-        rule: isNewFile ? $scope.selectedItem : $scope.currentRule,
-        showRestartManager,
-        isNewFile: !!isNewFile,
-        isOverwrite: !!$scope.overwriteError
-      };
-
-      $scope.$broadcast('saveXmlFile', objParam);
-    }
+    $scope.doingSaving = true;
+    const objParam = {
+      rule: $scope.currentRule,
+      showRestartManager,
+      isOverwrite: !!$scope.overwriteError
+    };
+    $scope.$broadcast('saveXmlFile', objParam);
   };
-
-  $scope.$on('showFileNameInput', () => {
-    $scope.newFile = true;
-    $scope.selectedItem = { file: 'new file' };
-    $scope.$applyAsync();
-  });
 
   $scope.restart = () => {
     $scope.$emit('performRestart', {});

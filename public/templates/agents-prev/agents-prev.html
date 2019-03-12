@@ -58,18 +58,14 @@
 
     <div layout="row">
         <md-card flex class="wz-md-card _md flex md-margin-h">
-            <md-card-content>
-                <wz-table custom-columns="true" flex path="'/agents'" keys="['id','name','ip','status','group','os.name','os.version','version', 'dateAdd', 'lastKeepAlive']"
-                    allow-click="true" row-sizes="[17,15,13]">
+            <md-card-content class="wz-padding-bottom-30">
+                <wz-table custom-columns="true" flex path="'/agents'" keys="[{value: 'id', width: '75px'},'name','ip','status','group','os.name','os.version','version', 'dateAdd', 'lastKeepAlive']"
+                    allow-click="true" row-sizes="[17,15,13]"></wz-table>
             </md-card-content>
+            <md-card-actions layout="row" layout-align="end center" class="wz-card-actions layout-align-end-center layout-row">
+                <a class="wz-text-link cursor-pointer small md-button md-ink-ripple" id="btnDownload" ng-click="ctrl.downloadCsv()">Formatted
+                    <i aria-hidden="true" class="fa fa-download"></i></a>
+            </md-card-actions>
         </md-card>
-        </wz-table>
-    </div>
-
-    <div layout="row" class="wz-margin-top-10 md-padding-h">
-        <span flex></span>
-        <a class="small" id="btnDownload" ng-click="ctrl.downloadCsv()">Formatted
-            <i aria-hidden="true" class="fa fa-download"></i>
-        </a>
     </div>
 </div>

@@ -1,4 +1,4 @@
-<div flex ng-if="!loading && mctrl.globalRulesetTab == 'decoders'" class="" ng-controller="decodersController as dctrl" layout="column" id="rulesContainer" layout-align="start space-around">
+<div flex ng-if="!loading && mctrl.globalRulesetTab == 'decoders' && !mctrl.managingFiles" class="" ng-controller="decodersController as dctrl" layout="column" id="rulesContainer" layout-align="start space-around">
 
     <div class='uil-ring-css' ng-show="loading">
         <div></div>

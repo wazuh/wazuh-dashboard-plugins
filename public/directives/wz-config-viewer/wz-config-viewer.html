@@ -1,54 +1,56 @@
-<div layout="row" ng-show="jsoncontent || xmlcontent" style="height: calc(100vh - 270px);">
+<div layout="row" ng-show="jsoncontent || xmlcontent" ng-style="hideHeader && {'height': 'calc(100vh - 375px)'} || {'height': 'calc(100vh - 270px)'}">
 
-    <!-- JSON card -->
-    <md-card flex="auto" class="wz-md-card" ng-show="jsoncontent">
-        <md-card-content flex layout="column">
-            <div layout="row" layout-align="start center">
-                <div>
-                    <span class="font-size-16">JSON viewer</span>
-                    <div class="wz-margin-top-10">
-                        <span class="md-subheader small">View this configuration in raw JSON format</span>
+        <!-- JSON card -->
+        <md-card flex="auto" class="wz-md-card" ng-show="jsoncontent" ng-class="hideHeader ? ['wz-no-margin'] : ''">
+            <md-card-content flex layout="column" ng-class="hideHeader ? ['wz-no-padding'] : ''">
+                <div ng-hide="hideHeader">
+                    <div layout="row" layout-align="start center">
+                        <div>
+                            <span class="font-size-16">JSON viewer</span>
+                            <div class="wz-margin-top-10">
+                                <span class="md-subheader small">View this configuration in raw JSON format</span>
+                            </div>
+                        </div>
+                        <span flex></span>
+                        <span ng-class="jsoncontent ? 'wz-text-active' : ''" class="wz-text-link small" ng-click="callgetjson()">JSON</span>
+                        <span class="small">&nbsp;&centerdot;&nbsp;</span>
+                        <span ng-class="xmlcontent ? 'wz-text-active' : ''" class="wz-text-link small" ng-click="callgetxml()">XML</span>
                     </div>
+                    <md-divider class="wz-margin-top-10"></md-divider>
                 </div>
-                <span flex></span>
-                <span ng-class="jsoncontent ? 'wz-text-active' : ''" class="wz-text-link small" ng-click="callgetjson()">JSON</span>
-                <span class="small">&nbsp;&centerdot;&nbsp;</span>
-                <span ng-class="xmlcontent ? 'wz-text-active' : ''" class="wz-text-link small" ng-click="callgetxml()">XML</span>
-            </div>
-            <md-divider class="wz-margin-top-10"></md-divider>
-            
-            <!-- The JSON viewer -->
-            <div class='wzJsonXmlEditorBody'>
-                <textarea id='viewer_json_box'></textarea>
-            </div>
-            <!-- End JSON viewer -->
-        </md-card-content>
-    </md-card>
-    <!-- End JSON card -->
-
-    <!-- XML card -->
-    <md-card flex="auto" class="wz-md-card" ng-show="xmlcontent">
-        <md-card-content flex layout="column">
-            <div layout="row" layout-align="start center">
-                <div>
-                    <span class="font-size-16">XML viewer</span>
-                    <div class="wz-margin-top-10">
-                        <span class="md-subheader small">View this configuration in raw XML format</span>
+                <!-- The JSON viewer -->
+                <div class='wzJsonXmlEditorBody'>
+                    <textarea id='viewer_json_box'></textarea>
+                </div>
+                <!-- End JSON viewer -->
+            </md-card-content>
+        </md-card>
+        <!-- End JSON card -->
+    
+        <!-- XML card -->
+        <md-card flex="auto" class="wz-md-card" ng-show="xmlcontent" ng-class="hideHeader ? ['wz-no-margin'] : ''">
+            <md-card-content flex layout="column" ng-class="hideHeader ? ['wz-no-padding'] : ''">
+                <div ng-hide="hideHeader">
+                    <div layout="row" layout-align="start center">
+                        <div>
+                            <span class="font-size-16">XML viewer</span>
+                            <div class="wz-margin-top-10">
+                                <span class="md-subheader small">View this configuration in raw XML format</span>
+                            </div>
+                        </div>
+                        <span flex></span>
+                        <span ng-class="jsoncontent ? 'wz-text-active' : ''" class="wz-text-link small" ng-click="callgetjson()">JSON</span>
+                        <span class="small">&nbsp;&centerdot;&nbsp;</span>
+                        <span ng-class="xmlcontent ? 'wz-text-active' : ''" class="wz-text-link small" ng-click="callgetxml()">XML</span>
                     </div>
+                    <md-divider class="wz-margin-top-10"></md-divider>
                 </div>
-                <span flex></span>
-                <span ng-class="jsoncontent ? 'wz-text-active' : ''" class="wz-text-link small" ng-click="callgetjson()">JSON</span>
-                <span class="small">&nbsp;&centerdot;&nbsp;</span>
-                <span ng-class="xmlcontent ? 'wz-text-active' : ''" class="wz-text-link small" ng-click="callgetxml()">XML</span>
-            </div>
-            <md-divider class="wz-margin-top-10"></md-divider>
-
-            <!-- The XML viewer -->
-            <div class='wzJsonXmlEditorBody'>
-                <textarea id='viewer_xml_box' ></textarea>
-            </div>
-            <!-- End XML viewer -->
-        </md-card-content>
-    </md-card>
-    <!-- End XML card -->
-</div>
+                <!-- The XML viewer -->
+                <div class='wzJsonXmlEditorBody'>
+                    <textarea id='viewer_xml_box'></textarea>
+                </div>
+                <!-- End XML viewer -->
+            </md-card-content>
+        </md-card>
+        <!-- End XML card -->
+    </div>

@@ -420,6 +420,7 @@ export class DevToolsController {
     const evtDocument = this.$document[0];
     $('.wz-dev-column-separator').mousedown(function(e) {
       e.preventDefault();
+      $('.wz-dev-column-separator').addClass('active');
       const leftOrigWidth = $('#wz-dev-left-column').width();
       const rightOrigWidth = $('#wz-dev-right-column').width();
       $(evtDocument).mousemove(function(e) {
@@ -431,6 +432,7 @@ export class DevToolsController {
     });
 
     $(evtDocument).mouseup(function() {
+      $('.wz-dev-column-separator').removeClass('active');
       $(evtDocument).unbind('mousemove');
     });
 

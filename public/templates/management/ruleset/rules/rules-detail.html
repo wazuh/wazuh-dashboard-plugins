@@ -171,7 +171,7 @@
         </div>
 
         <!-- Related rules section -->
-        <div ng-show="!editingFile">
+        <div ng-if="!editingFile">
             <div layout="row" class="md-padding wz-padding-top-10" ng-if="currentRule">
                 <h1 class="md-headline wz-headline"><i class="fa fa-fw fa-link" aria-hidden="true"></i> Related rules
                 </h1>
@@ -181,7 +181,7 @@
                     <md-card-content>
                         <wz-table custom-columns="true" flex path="'/rules'"
                             implicit-filter="[{ name:'file',value: currentRule.file}]"
-                            keys="['id',{value:'file',size:2},{value:'description',size:2},{value:'groups',nosortable:true,size:2},{value:'pci',nosortable:true,size:2},{value:'gdpr',nosortable:true},'level']"
+                            keys="[{value: 'id', width: '75px'},{value:'file',size:2},{value:'description',size:2},{value:'groups',nosortable:true,size:2},{value:'pci',nosortable:true,size:2},{value:'gdpr',nosortable:true},'level']"
                             allow-click="true">
                         </wz-table>
                     </md-card-content>

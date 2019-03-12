@@ -9,7 +9,7 @@
     <!-- End headline -->
 
     <!-- Filters and Realtime button section -->
-    <div ng-show="!ctrl.loading" layout="row" layout-align="start center" class="md-padding">
+    <div ng-show="!ctrl.loading" layout="row" layout-align="start center" class="md-padding-h">
         <!-- Daemon selector -->
         <div flex="20" layout="column" layout-align="center" class="height-40 wz-margin-right-15 wz-select-input">
             <select flex class="kuiSelect wz-border-none cursor-pointer max-height-35"
@@ -36,6 +36,11 @@
             </select>
         </div>
 
+        <div flex="20" layout="column" layout-align="center" class="height-40 wz-margin-right-15">
+            <wz-kbn-switch switch-model="ctrl.sortFilter" switch-change="ctrl.sort()" switch-text="Descending sort">
+            </wz-kbn-switch>
+        </div>
+
         <div flex="20" layout="column" ng-show="ctrl.nodeList" layout-align="center" class="height-40 wz-select-input">
             <select flex class="kuiSelect wz-border-none cursor-pointer max-height-35" ng-disabled="ctrl.realtime"
                 id="categoryBox" ng-model="ctrl.selectedNode" ng-change="ctrl.changeNode(ctrl.selectedNode)"
@@ -48,12 +53,12 @@
         <!-- White space between filters and Realtime button -->
         <span flex></span>
 
-        <md-button ng-if="!ctrl.realtime" class="wz-button md-raised no-margin-right" ng-click="ctrl.playRealtime()"
+        <md-button ng-if="!ctrl.realtime" class="wz-button no-margin-right" ng-click="ctrl.playRealtime()"
             aria-label="Play realtime button">
             <i class="fa fa-play fa-fw" aria-hidden="true"></i>
             Play realtime
         </md-button>
-        <md-button ng-if="ctrl.realtime" class="wz-button md-raised no-margin-right" ng-click="ctrl.stopRealtime()"
+        <md-button ng-if="ctrl.realtime" class="wz-button no-margin-right" ng-click="ctrl.stopRealtime()"
             aria-label="Stop realtime button">
             <i class="fa fa-stop fa-fw" aria-hidden="true"></i>
             Stop realtime
@@ -61,7 +66,7 @@
     </div>
     <!-- End Filters and Realtime button section -->
 
-    <div layout="row" flex class="md-padding" ng-if="ctrl.logsPath">
+    <div layout="row" flex class="md-padding-h wz-margin-top-10" ng-if="ctrl.logsPath">
         <input placeholder="Filter logs..." ng-model="ctrl.custom_search" type="text"
             class="kuiLocalSearchInput ng-empty ng-pristine ng-scope ng-touched ng-valid" aria-invalid="false"
             wz-enter="ctrl.search(ctrl.custom_search)">
@@ -71,18 +76,22 @@
         </button>
     </div>
 
-    <!-- Logs table section -->
-    <div layout="row" layout-padding ng-if="ctrl.logsPath">
-        <wz-table custom-columns="true" flex extra-limit="true" path="ctrl.logsPath"
-            keys="['timestamp',{value:'tag',size:2},'level',{value:'description',size:4,nosortable:true}]"
-            row-sizes="[12,10,7]">
-        </wz-table>
+    <!-- Logs section -->
+    <div layout="row" layout-padding ng-if="ctrl.logsPath" ng-hide="true">
+        <wz-table path="ctrl.logsPath" keys="[]" implicit-sort="'timestamp'"></wz-table>
     </div>
-    <!-- End Logs table section -->
+    <div ng-show="XMLContent">
+        <div layout="row" layout-padding class="wz-padding-bottom-0">
+            <wz-config-viewer flex xmlcontent="XMLContent" hide-header="true" />
+        </div>
+        <md-card flex class="wz-md-card _md flex md-margin-h">
+            <md-card-actions layout="row" layout-align="end center"
+                class="wz-card-actions layout-align-end-center wz-no-margin layout-row height-25">
+                <a class="small" id="btnDownload" ng-click="ctrl.downloadCsv()">Formatted <i aria-hidden="true"
+                        class="fa fa-fw fa-download"></i></a>
+            </md-card-actions>
+        </md-card>
+    </div>
+    <!-- End Logs section -->
 
-    <div layout="row" layout-padding>
-        <span flex></span>
-        <a class="small" id="btnDownload" ng-click="ctrl.downloadCsv()">Formatted <i aria-hidden="true"
-                class="fa fa-fw fa-download"></i></a>
-    </div>
 </div>

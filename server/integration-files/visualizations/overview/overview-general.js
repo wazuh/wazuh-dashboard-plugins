@@ -205,6 +205,22 @@ export default [
     _type: 'visualization'
   },
   {
+    _id: 'Wazuh-App-Overview-General-Top-10-agent-alert',
+    _source: {
+      title: 'Top 10 Agent alerts',
+      visState:
+        '{"title":"Top 10 Agent alerts","type":"metrics","params":{"id":"61ca57f0-469d-11e7-af02-69e470af7417","type":"timeseries","series":[{"id":"0eba6ef0-41a1-11e9-b2ca-a3f8ee4d0e71","color":"rgba(0,156,224,1)","split_mode":"terms","metrics":[{"id":"0eba6ef1-41a1-11e9-b2ca-a3f8ee4d0e71","type":"count"}],"separate_axis":0,"axis_position":"right","formatter":"number","chart_type":"line","line_width":1,"point_size":1,"fill":0.5,"stacked":"none","terms_field":"agent.name","terms_size":"10"}],"time_field":"@timestamp","index_pattern":"wazuh-alerts","interval":"auto","axis_position":"left","axis_formatter":"number","axis_scale":"normal","show_legend":1,"show_grid":1,"legend_position":"left"},"aggs":[]}',
+      uiStateJSON: '{}',
+      description: '',
+      version: 1,
+      kibanaSavedObjectMeta: {
+        searchSourceJSON:
+          '{"index":"wazuh-alerts","filter":[],"query":{"query":"","language":"lucene"}}'
+      }
+    },
+    _type: 'visualization'
+  },
+  {
     _id: 'Wazuh-App-Overview-General-Alert-level-evolution',
     _source: {
       title: 'Alert level evolution',
@@ -241,7 +257,7 @@ export default [
     _source: {
       title: 'Top 10 rule groups',
       visState:
-        '{"title":"Top 10 rule groups","type":"tagcloud","params":{"scale":"linear","orientation":"single","minFontSize":11,"maxFontSize":24,"showLabel":false},"aggs":[{"id":"1","enabled":true,"type":"count","schema":"metric","params":{}},{"id":"2","enabled":true,"type":"terms","schema":"segment","params":{"field":"rule.groups","size":10,"order":"desc","orderBy":"1","otherBucket":false,"otherBucketLabel":"Other","missingBucket":false,"missingBucketLabel":"Missing"}}]}',
+        '{"title":"Top 10 rule groups","type":"pie","params":{"scale":"linear","orientation":"single","minFontSize":11,"maxFontSize":24,"showLabel":false},"aggs":[{"id":"1","enabled":true,"type":"count","schema":"metric","params":{}},{"id":"2","enabled":true,"type":"terms","schema":"segment","params":{"field":"rule.groups","size":10,"order":"desc","orderBy":"1","otherBucket":false,"otherBucketLabel":"Other","missingBucket":false,"missingBucketLabel":"Missing"}}]}',
       uiStateJSON: '{}',
       description: '',
       version: 1,
