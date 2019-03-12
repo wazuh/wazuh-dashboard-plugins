@@ -147,7 +147,7 @@ export class FilesController {
     }
   }
 
-  addNewFile = type => {
+  addNewFile(type) {
     this.$scope.editingFile = true;
     this.$scope.newFile = true;
     this.$scope.newFileName = '';
@@ -160,7 +160,7 @@ export class FilesController {
     this.$location.search('editingFile', true);
     this.appState.setNavigation({ status: true });
     this.$scope.$emit('fetchedFile', { data: this.$scope.fetchedXML });
-  };
+  }
 
   switchFilesSubTab(tab) {
     this.filesSubTab = tab;
