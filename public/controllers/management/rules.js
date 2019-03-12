@@ -317,21 +317,6 @@ export function RulesController(
       );
   }
 
-  $scope.addNewFile = type => {
-    $scope.editingFile = true;
-    $scope.newFile = true;
-    $scope.newFileName = '';
-    $scope.selectedFileName = $scope.selectedRulesetTab;
-    $scope.selectedItem = { file: 'new file' };
-    $scope.fetchedXML = '<!-- Modify it at your will. -->';
-    $scope.type = type;
-    $scope.cancelSaveAndOverwrite();
-    if (!$scope.$$phase) $scope.$digest();
-    $location.search('editingFile', true);
-    appState.setNavigation({ status: true });
-    $scope.$emit('fetchedFile', { data: $scope.fetchedXML });
-  };
-
   $scope.toggleSaveConfig = () => {
     $scope.doingSaving = false;
     $scope.$applyAsync();
@@ -347,49 +332,18 @@ export function RulesController(
     $scope.$applyAsync();
   };
 
-  $scope.doSaveConfig = (isNewFile, fileName) => {
+  $scope.doSaveConfig = () => {
     const clusterInfo = appState.getClusterInfo();
     const showRestartManager =
       clusterInfo.status === 'enabled' ? 'cluster' : 'manager';
-    if (isNewFile && !fileName) {
-      errorHandler.handle(
-        'Error creating a new file. You need to specify a file name',
-        ''
-      );
-      return false;
-    } else {
-      if (isNewFile) {
-        const validFileName = /(.+).xml/;
-        const containsBlanks = /.*[ ].*/;
-        if (fileName && !validFileName.test(fileName)) {
-          fileName = fileName + '.xml';
-        }
-        if (containsBlanks.test(fileName)) {
-          errorHandler.handle(
-            'Error creating a new file. The filename can not contain white spaces.',
-            ''
-          );
-          return false;
-        }
-        $scope.selectedItem = { file: fileName };
-      }
-      $scope.doingSaving = true;
-      const objParam = {
-        rule: isNewFile ? $scope.selectedItem : $scope.currentRule,
-        showRestartManager,
-        isNewFile: !!isNewFile,
-        isOverwrite: !!$scope.overwriteError
-      };
-
-      $scope.$broadcast('saveXmlFile', objParam);
-    }
+    $scope.doingSaving = true;
+    const objParam = {
+      rule: $scope.currentRule,
+      showRestartManager,
+      isOverwrite: !!$scope.overwriteError
+    };
+    $scope.$broadcast('saveXmlFile', objParam);
   };
-
-  $scope.$on('showFileNameInput', () => {
-    $scope.newFile = true;
-    $scope.selectedItem = { file: 'new file' };
-    $scope.$applyAsync();
-  });
 
   $scope.restart = () => {
     $scope.$emit('performRestart', {});
@@ -403,5 +357,9 @@ export function RulesController(
   $scope.$on('showSaveAndOverwrite', () => {
     $scope.overwriteError = true;
     $scope.$applyAsync();
+  });
+
+  $scope.$on('addNewRulesFile', () => {
+    $scope.addNewFile('rules');
   });
 }

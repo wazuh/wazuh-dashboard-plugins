@@ -1,22 +1,2 @@
-<div flex ng-if="!loading && mctrl.globalRulesetTab == 'files'" class="" ng-controller="filesController as filesctrl" 
+<div flex ng-if="!loading && mctrl.managingFiles" class="" ng-controller="filesController as filesctrl" 
 layout="column" id="rulesContainer" layout-align="start space-around">
-<div ng-show="!editingFile">
-    <!-- Headline -->
-    <div layout="column" layout-padding>
-        <div>
-            <span class="font-size-18"><i class="fa fa-fw fa-file-o" aria-hidden="true"></i> Files</span>
-        </div>
-        <span class="md-subheader">Custom rules and decoders files</span>
-    </div>
-    <!-- End headline -->
-
-    <!-- Ruleset navigation bar -->
-    <md-nav-bar
-        class="wz-nav-bar nav-bar-white-bg "
-        md-selected-nav-item="filesctrl.filesSubTab"
-        nav-bar-aria-label="Files navigation links">
-        <md-nav-item class="wz-nav-item" md-nav-click="filesctrl.switchFilesSubTab('rules')" name="rules">Rules</md-nav-item>
-        <md-nav-item class="wz-nav-item" md-nav-click="filesctrl.switchFilesSubTab('decoders')" name="decoders">Decoders</md-nav-item>
-    </md-nav-bar>
-    <!-- End Ruleset navigation bar -->
-</div>
