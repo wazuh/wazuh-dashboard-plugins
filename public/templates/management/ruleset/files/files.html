@@ -1,8 +1,8 @@
 <div ng-if="!files.viewingDetail" ng-show="!editingFile" layout="column" ng-init="filesctrl.switchFilesSubTab(mctrl.globalRulesetTab)">
     <div id="content" layout="row" class="md-padding ">
-        <md-button class="md-icon-button wz-margin-left-8 wz-padding-right-16" aria-label="Back to list" tooltip="Back"
-            tooltip-placement="bottom" ng-click="mctrl.setRulesTab(filesctrl.filesSubTab)"><i class="fa fa-fw fa-arrow-left"
-                aria-hidden="true"></i></md-button>
+        <md-button class="md-icon-button wz-padding-right-16 btn btn-info" style="border: 1px solid #d9d9d9;border-radius: 5px;margin-left: 0;"
+            aria-label="Back to list" tooltip="Back" tooltip-placement="bottom" ng-click="mctrl.setRulesTab(filesctrl.filesSubTab)"><i
+                class="fa fa-fw fa-arrow-left" aria-hidden="true"></i></md-button>
         <input flex placeholder="Filter files..." ng-model="filesctrl.custom_search" type="text" class="kuiLocalSearchInput height-40 ng-empty ng-pristine ng-scope ng-touched ng-valid"
             aria-invalid="false" wz-enter="filesctrl.search(filesctrl.custom_search)">
         <button type="submit" aria-label="Search" class="kuiLocalSearchButton height-40" ng-click="filesctrl.search(filesctrl.custom_search)">
