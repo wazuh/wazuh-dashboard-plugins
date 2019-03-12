@@ -50,45 +50,13 @@ export class FilesController {
       const clusterInfo = this.appState.getClusterInfo();
       const showRestartManager =
         clusterInfo.status === 'enabled' ? 'cluster' : 'manager';
-      if (isNewFile && !fileName) {
-        this.errorHandler.handle(
-          'Error creating a new file. You need to specify a file name',
-          ''
-        );
-        return false;
-      } else {
-        if (isNewFile) {
-          const validFileName = /(.+).xml/;
-          const containsBlanks = /.*[ ].*/;
-          if (fileName && !validFileName.test(fileName)) {
-            fileName = fileName + '.xml';
-          }
-          if (containsBlanks.test(fileName)) {
-            this.errorHandler.handle(
-              'Error creating a new file. The filename can not contain white spaces.',
-              ''
-            );
-            return false;
-          }
-          this.selectedItem = { file: fileName };
-        }
-        this.$scope.doingSaving = true;
-        const objParam = {
-          showRestartManager,
-          isNewFile: !!isNewFile,
-          isOverwrite: !!this.overwriteError
-        };
-        (isNewFile && this.$scope.type === 'rules') ||
-        (!isNewFile && this.$scope.currentFile.type === 'rule')
-          ? (objParam.rule = isNewFile
-              ? this.selectedItem
-              : this.$scope.currentFile)
-          : (objParam.decoder = isNewFile
-              ? this.selectedItem
-              : this.$scope.currentFile);
-        this.$scope.$broadcast('saveXmlFile', objParam);
-        this.$scope.$applyAsync();
-      }
+      this.$scope.doingSaving = true;
+      const objParam = { showRestartManager };
+      this.$scope.currentFile.type === 'rule'
+        ? (objParam.rule = this.$scope.currentFile)
+        : (objParam.decoder = this.$scope.currentFile);
+      this.$scope.$broadcast('saveXmlFile', objParam);
+      this.$scope.$applyAsync();
     };
 
     this.$scope.toggleSaveConfig = () => {
@@ -130,9 +98,9 @@ export class FilesController {
       this.$scope.currentFile.type = params.path.includes('rules')
         ? 'rule'
         : 'decoder';
-      this.$scope.type = `${this.$scope.currentFile.type}s`;
       this.$scope.fetchedXML =
-        this.$scope.type === 'rules'
+        this.$scope.currentFile.type === 'rule'
+
           ? await this.rulesetHandler.getRuleConfiguration(
               this.$scope.currentFile.file
             )
