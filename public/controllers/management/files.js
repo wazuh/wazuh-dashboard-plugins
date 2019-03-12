@@ -79,13 +79,13 @@ export class FilesController {
           isOverwrite: !!this.overwriteError
         };
         (isNewFile && this.$scope.type === 'rules') ||
-        (!isNewFile && this.$scope.currentFile.type === 'rule')
+          (!isNewFile && this.$scope.currentFile.type === 'rule')
           ? (objParam.rule = isNewFile
-              ? this.selectedItem
-              : this.$scope.currentFile)
+            ? this.selectedItem
+            : this.$scope.currentFile)
           : (objParam.decoder = isNewFile
-              ? this.selectedItem
-              : this.$scope.currentFile);
+            ? this.selectedItem
+            : this.$scope.currentFile);
         this.$scope.$broadcast('saveXmlFile', objParam);
         this.$scope.$applyAsync();
       }
@@ -134,11 +134,11 @@ export class FilesController {
       this.$scope.fetchedXML =
         this.$scope.type === 'rules'
           ? await this.rulesetHandler.getRuleConfiguration(
-              this.$scope.currentFile.file
-            )
+            this.$scope.currentFile.file
+          )
           : await this.rulesetHandler.getDecoderConfiguration(
-              this.$scope.currentFile.file
-            );
+            this.$scope.currentFile.file
+          );
       this.$scope.$applyAsync();
       this.$scope.$broadcast('fetchedFile', { data: this.$scope.fetchedXML });
     } catch (error) {
@@ -147,7 +147,7 @@ export class FilesController {
     }
   }
 
-  addNewFile = type => {
+  addNewFile(type) {
     this.$scope.editingFile = true;
     this.$scope.newFile = true;
     this.$scope.newFileName = '';
@@ -156,11 +156,11 @@ export class FilesController {
     this.$scope.fetchedXML = '<!-- Modify it at your will. -->';
     this.$scope.type = type;
     this.$scope.cancelSaveAndOverwrite();
-    if (!this.$scope.$$phase) $scope.$digest();
+    this.$scope.$applyAsync();
     this.$location.search('editingFile', true);
     this.appState.setNavigation({ status: true });
     this.$scope.$emit('fetchedFile', { data: this.$scope.fetchedXML });
-  };
+  }
 
   switchFilesSubTab(tab) {
     this.filesSubTab = tab;
