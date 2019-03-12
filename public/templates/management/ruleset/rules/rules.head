@@ -1,4 +1,4 @@
-<div flex ng-if="!loading && mctrl.globalRuleSet == 'ruleset' && mctrl.globalRulesetTab == 'rules'" class="" ng-controller="rulesController" 
+<div flex ng-if="!loading && mctrl.globalRuleSet == 'ruleset' && mctrl.globalRulesetTab == 'rules' && !mctrl.managingFiles" class="" ng-controller="rulesController as rctrl" 
 layout="column" id="rulesContainer" layout-align="start space-around">
 
     <div class='uil-ring-css' ng-show="loading">

@@ -168,7 +168,7 @@ import './utils/fontawesome/css/font-awesome.min.css';
 // Dev tools
 import './utils/codemirror';
 
-import './utils/table-col-resizable'
+import './utils/table-col-resizable';
 
 // Material
 import 'angular-material/angular-material.css';

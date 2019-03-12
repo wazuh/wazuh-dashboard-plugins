@@ -74,7 +74,7 @@ class WzConfigViewer {
       }
       if ($scope.jsoncontent != false) {
         $scope.jsonCodeBox.setValue($scope.jsoncontent.replace(/\\\\/g, '\\'));
-        setTimeout(function () {
+        setTimeout(function() {
           $scope.jsonCodeBox.refresh();
           $scope.$applyAsync();
         }, 100);
@@ -88,7 +88,7 @@ class WzConfigViewer {
       }
       if ($scope.xmlcontent != false) {
         $scope.xmlCodeBox.setValue($scope.xmlcontent);
-        setTimeout(function () {
+        setTimeout(function() {
           $scope.xmlCodeBox.refresh();
           $scope.$applyAsync();
         }, 100);
@@ -109,17 +109,23 @@ class WzConfigViewer {
 
     const bindXmlListener = () => {
       var scrollElement = $scope.xmlCodeBox.getScrollerElement();
-      $(scrollElement).bind('scroll', function (e) {
+      $(scrollElement).bind('scroll', function(e) {
         var element = $(e.currentTarget)[0];
         if (element.scrollHeight - element.scrollTop === element.clientHeight) {
-          $scope.$emit('scrolledToBottom', { lines: $scope.xmlCodeBox.lineCount() });
+          $scope.$emit('scrolledToBottom', {
+            lines: $scope.xmlCodeBox.lineCount()
+          });
         }
       });
-    }
+    };
 
     $scope.$on('viewerScrollBottom', (ev, params) => {
-      var t = $scope.xmlCodeBox.charCoords({ line: params.line, ch: 0 }, "local").top;
-      var middleHeight = $scope.xmlCodeBox.getScrollerElement().offsetHeight / 2;
+      var t = $scope.xmlCodeBox.charCoords(
+        { line: params.line, ch: 0 },
+        'local'
+      ).top;
+      var middleHeight =
+        $scope.xmlCodeBox.getScrollerElement().offsetHeight / 2;
       $scope.xmlCodeBox.scrollTo(null, t - middleHeight - 10);
     });
   }

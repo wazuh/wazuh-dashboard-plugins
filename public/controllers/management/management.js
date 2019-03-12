@@ -231,7 +231,12 @@ export class ManagementController {
   setRulesTab(tab) {
     this.rulesetTab = tab;
     this.globalRulesetTab = this.rulesetTab;
+    this.managingFiles = false;
     this.breadCrumbBack();
+  }
+
+  switchFilesSubTab(flag) {
+    this.managingFiles = flag || true;
   }
 
   breadCrumbBack(goRoot = false) {
