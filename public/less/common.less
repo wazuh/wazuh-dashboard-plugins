@@ -231,13 +231,19 @@ margin-top: 8px;
 }
 
 /* Custom buttons styles */
+.wz-button-groups {
+    color: white !important;
+    transition: none !important;
+    background-color: #0079a5 !important;
+    border-radius: 4px!important;
+    height: 40px;
+}
 
 .wz-button {
     color: white !important;
     transition: none !important;
-    //background-color: rgb(0, 85, 113) !important;
     background-color: #0079a5 !important;
-    min-width: 115px!important;
+    min-width: 115px;
     border-radius: 4px!important;
     height: 40px;
 }
@@ -248,6 +254,8 @@ margin-top: 8px;
     line-height: 30px !important;
 }
 
+.wz-button-groups.active,
+.wz-button-groups:not([disabled]):hover,
 .wz-button.active,
 .wz-button:not([disabled]):hover,
 .wz-button-flat:not([disabled]):hover {
