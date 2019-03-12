@@ -2,20 +2,28 @@
 
 All notable changes to the Wazuh app project will be documented in this file.
 
-## Wazuh v3.9.0 - Kibana v6.6.0 - Revision 420
+## Wazuh v3.9.0 - Kibana v6.6.1 - Revision 420
 
 ### Added 
 
 - Support for Wazuh v3.9.0
 - Edit master and worker configuration ([#1215](https://github.com/wazuh/wazuh-kibana-app/pull/1215)).
-- Edit local rules, local decoders and CDB lists ([#1212](https://github.com/wazuh/wazuh-kibana-app/pull/1212), [#1204](https://github.com/wazuh/wazuh-kibana-app/pull/1204), [#1196](https://github.com/wazuh/wazuh-kibana-app/pull/1196), [#1233](https://github.com/wazuh/wazuh-kibana-app/pull/1233)).
+- Edit local rules, local decoders and CDB lists ([#1212](https://github.com/wazuh/wazuh-kibana-app/pull/1212), [#1204](https://github.com/wazuh/wazuh-kibana-app/pull/1204), [#1196](https://github.com/wazuh/wazuh-kibana-app/pull/1196), [#1233](https://github.com/wazuh/wazuh-kibana-app/pull/1233), [#1304](https://github.com/wazuh/wazuh-kibana-app/pull/1304)).
 - Dev Tools additions
   - Added hotkey `[shift] + [enter]` for sending query ([#1170](https://github.com/wazuh/wazuh-kibana-app/pull/1170)).
   - Added `Export JSON` button for the Dev Tools ([#1170](https://github.com/wazuh/wazuh-kibana-app/pull/1170)).
 - Added refresh button for agents preview table ([#1169](https://github.com/wazuh/wazuh-kibana-app/pull/1169)).
-- Added configuration assessment information in "Agent > Policy monitoring" ([#1227](https://github.com/wazuh/wazuh-kibana-app/pull/1227)).
+- Added `configuration assessment` information in "Agent > Policy monitoring" ([#1227](https://github.com/wazuh/wazuh-kibana-app/pull/1227)).
+- Added agents `configuration assessment` configuration section in "Agent > Configuration" ([1257](https://github.com/wazuh/wazuh-kibana-app/pull/1257))
 - Restart master and worker nodes ([#1222](https://github.com/wazuh/wazuh-kibana-app/pull/1222)).
 - Restart agents ([#1229](https://github.com/wazuh/wazuh-kibana-app/pull/1229)).
+- Added support for more than one Wazuh monitoring pattern ([#1243](https://github.com/wazuh/wazuh-kibana-app/pull/1243))
+- Added customizable interval for Wazuh monitoring indices creation ([#1243](https://github.com/wazuh/wazuh-kibana-app/pull/1243)).
+- Expand visualizations ([#1246](https://github.com/wazuh/wazuh-kibana-app/pull/1246)).
+- Added a dynamic table columns selector ([#1246](https://github.com/wazuh/wazuh-kibana-app/pull/1246)).
+- Added a cron job for fetching missing fields of all valid index patterns, also merging dynamic fields every time an index pattern is refreshed by the app ([#1276](https://github.com/wazuh/wazuh-kibana-app/pull/1276)).
+- Added auto-merging dynamic fields for Wazuh monitoring index patterns ([#1300](https://github.com/wazuh/wazuh-kibana-app/pull/1300))
+- New server module, it's a job queue so we can add delayed jobs to be run in background, this iteration only accepts delayed Wazuh API calls ([#1283](https://github.com/wazuh/wazuh-kibana-app/pull/1283)).
 
 ### Changed
 
@@ -25,16 +33,24 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Refactor JSON/XML viewer for configuration tab ([#1173](https://github.com/wazuh/wazuh-kibana-app/pull/1173), [#1148](https://github.com/wazuh/wazuh-kibana-app/pull/1148)).
 - Using full height for all containers when possible ([#1224](https://github.com/wazuh/wazuh-kibana-app/pull/1224)).
 - Improved the way we are handling "back button" events ([#1207](https://github.com/wazuh/wazuh-kibana-app/pull/1207)).
-- Changed some visualizations for FIM, GDPR, PCI, Vulnerability and Security Events ([#1206](https://github.com/wazuh/wazuh-kibana-app/pull/1206), [#1235](https://github.com/wazuh/wazuh-kibana-app/pull/1235)).
+- Changed some visualizations for FIM, GDPR, PCI, Vulnerability and Security Events ([#1206](https://github.com/wazuh/wazuh-kibana-app/pull/1206), [#1235](https://github.com/wazuh/wazuh-kibana-app/pull/1235), [#1293](https://github.com/wazuh/wazuh-kibana-app/pull/1293)).
 - New design for agent header view ([#1186](https://github.com/wazuh/wazuh-kibana-app/pull/1186)).
 - Not fetching data the very first time the Dev Tools are opened ([#1185](https://github.com/wazuh/wazuh-kibana-app/pull/1185)).
-- Refresh all known fields for all valid index patterns on every parent state ([ff88df6f](https://github.com/wazuh/wazuh-kibana-app/commit/ff88df6f0ca5590d14b3bc71b7ad63d4484d6bb9)).
 - Refresh all known fields for all valid index patterns if `kbn-vis` detects a broken index pattern ([ecd7c8f](https://github.com/wazuh/wazuh-kibana-app/commit/ecd7c8f98c187a350f81261d13b0d45dcec6dc5d)).
+- Truncate texts and display a tooltip when they don't fit in a table cell ([7b56a87](https://github.com/wazuh/wazuh-kibana-app/commit/7b56a873f85dcba7e6838aeb2e40d9b4cf472576))
+- Updated API autocomplete for Dev Tools ([#1218](https://github.com/wazuh/wazuh-kibana-app/pull/1218))
+- Updated switches design to adapt it to Kibana's design ([#1253](https://github.com/wazuh/wazuh-kibana-app/pull/1253))
+- Reduced the width of some table cells with little text, to give more space to the other columns ([#1263](https://github.com/wazuh/wazuh-kibana-app/pull/1263)).
+- Redesign for Management > Status daemons list ([#1284](https://github.com/wazuh/wazuh-kibana-app/pull/1284)).
+- Redesign for Management > Configuration, Agent > Configuration ([#1289](https://github.com/wazuh/wazuh-kibana-app/pull/1289)).
+- Replaced Management > Logs table with a log viewer component ([#1292](https://github.com/wazuh/wazuh-kibana-app/pull/1292)).
+- The agents list search bar now allows to switch between AND/OR operators ([#1291](https://github.com/wazuh/wazuh-kibana-app/pull/1291)).
 
 ### Fixed
 
 - Properly handling long messages on notifier service, until now, they were using out of the card space, also we replaced some API messages with more meaningful messages ([#1168](https://github.com/wazuh/wazuh-kibana-app/pull/1168)).
-- Adapted Wazuh icon for multiple browsers where it was gone ([#1208](https://github.com/wazuh/wazuh-kibana-app/pull/1208))
+- Adapted Wazuh icon for multiple browsers where it was gone ([#1208](https://github.com/wazuh/wazuh-kibana-app/pull/1208)).
+- Do not fetch data from tables twice when resize window ([#1303](https://github.com/wazuh/wazuh-kibana-app/pull/1303)).
 
 ## Wazuh v3.8.2 - Kibana v6.6.0 / v6.6.1 - Revision 419
 
