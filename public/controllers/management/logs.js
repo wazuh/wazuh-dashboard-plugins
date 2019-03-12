@@ -60,10 +60,12 @@ export class LogsController {
 
   parseLogsToText(logs) {
     let result = '';
-    logs.forEach(function (log, idx) {
+    logs.forEach(function(log, idx) {
       if (log) {
         result = result.concat(
-          `${log.timestamp} ${log.tag} ${(log.level || "").toUpperCase()}: ${log.description}`
+          `${log.timestamp} ${log.tag} ${(log.level || '').toUpperCase()}: ${
+            log.description
+          }`
         );
         if (idx !== logs.length - 1) {
           result = result.concat('\n');
@@ -192,10 +194,10 @@ export class LogsController {
 
       const data = clusterEnabled
         ? await this.apiReq.request(
-          'GET',
-          `/cluster/${this.selectedNode}/logs/summary`,
-          {}
-        )
+            'GET',
+            `/cluster/${this.selectedNode}/logs/summary`,
+            {}
+          )
         : await this.apiReq.request('GET', '/manager/logs/summary', {});
       const daemons = data.data.data;
       this.daemons = Object.keys(daemons).map(item => ({ title: item }));
@@ -206,6 +208,4 @@ export class LogsController {
     }
     return;
   }
-
-
 }

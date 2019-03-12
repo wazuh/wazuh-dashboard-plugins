@@ -11,7 +11,14 @@
  */
 
 export class FilesController {
-  constructor($scope, wazuhConfig, rulesetHandler, errorHandler, appState, $location) {
+  constructor(
+    $scope,
+    wazuhConfig,
+    rulesetHandler,
+    errorHandler,
+    appState,
+    $location
+  ) {
     this.$scope = $scope;
     this.wazuhConfig = wazuhConfig;
     this.rulesetHandler = rulesetHandler;
@@ -71,9 +78,14 @@ export class FilesController {
           isNewFile: !!isNewFile,
           isOverwrite: !!this.overwriteError
         };
-        (isNewFile && this.$scope.type === 'rules') || (!isNewFile && this.$scope.currentFile.type === 'rule') ?
-          objParam.rule = isNewFile ? this.selectedItem : this.$scope.currentFile :
-          objParam.decoder = isNewFile ? this.selectedItem : this.$scope.currentFile;
+        (isNewFile && this.$scope.type === 'rules') ||
+        (!isNewFile && this.$scope.currentFile.type === 'rule')
+          ? (objParam.rule = isNewFile
+              ? this.selectedItem
+              : this.$scope.currentFile)
+          : (objParam.decoder = isNewFile
+              ? this.selectedItem
+              : this.$scope.currentFile);
         this.$scope.$broadcast('saveXmlFile', objParam);
         this.$scope.$applyAsync();
       }
@@ -115,11 +127,18 @@ export class FilesController {
     this.$scope.newFile = false;
     try {
       this.$scope.currentFile = params.file;
-      this.$scope.currentFile.type = params.path.includes('rules') ? 'rule' : 'decoder';
+      this.$scope.currentFile.type = params.path.includes('rules')
+        ? 'rule'
+        : 'decoder';
       this.$scope.type = `${this.$scope.currentFile.type}s`;
-      this.$scope.fetchedXML = this.$scope.type === 'rules' ?
-        await this.rulesetHandler.getRuleConfiguration(this.$scope.currentFile.file) :
-        await this.rulesetHandler.getDecoderConfiguration(this.$scope.currentFile.file);
+      this.$scope.fetchedXML =
+        this.$scope.type === 'rules'
+          ? await this.rulesetHandler.getRuleConfiguration(
+              this.$scope.currentFile.file
+            )
+          : await this.rulesetHandler.getDecoderConfiguration(
+              this.$scope.currentFile.file
+            );
       this.$scope.$applyAsync();
       this.$scope.$broadcast('fetchedFile', { data: this.$scope.fetchedXML });
     } catch (error) {

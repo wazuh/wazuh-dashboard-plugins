@@ -163,10 +163,10 @@ export function RulesController(
         coloredString = coloredString.replace(
           /\$\(((?!<\/span>).)*?\)(?!<\/span>)/im,
           '<span style="color: ' +
-          colors[i] +
-          ' ">' +
-          valuesArray[i] +
-          '</span>'
+            colors[i] +
+            ' ">' +
+            valuesArray[i] +
+            '</span>'
         );
       }
     }
@@ -253,7 +253,8 @@ export function RulesController(
           `/rules/${$scope.currentRule.id}`,
           {}
         );
-        const response = (((ruleReloaded || {}).data || {}).data || {}).items || [];
+        const response =
+          (((ruleReloaded || {}).data || {}).data || {}).items || [];
         if (!response.length) {
           $scope.currentRule = null;
           $scope.showingLocalRules = true;

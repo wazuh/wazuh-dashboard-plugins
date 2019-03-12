@@ -250,7 +250,8 @@ export class DecodersController {
           `/decoders/${this.currentDecoder.name}`,
           {}
         );
-        const response = (((decoderReload || {}).data || {}).data || {}).items || [];
+        const response =
+          (((decoderReload || {}).data || {}).data || {}).items || [];
         if (!response.length) {
           this.currentDecoder = null;
           this.closeDetailView(true);

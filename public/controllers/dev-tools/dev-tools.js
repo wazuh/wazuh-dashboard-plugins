@@ -83,7 +83,7 @@ export class DevToolsController {
       }
     );
     // Register plugin for code mirror
-    CodeMirror.commands.autocomplete = function (cm) {
+    CodeMirror.commands.autocomplete = function(cm) {
       CodeMirror.showHint(cm, CodeMirror.hint.dictionaryHint, {
         completeSingle: false
       });
@@ -332,7 +332,7 @@ export class DevToolsController {
     this.apiInputBox.setSize('auto', '100%');
     this.apiInputBox.model = [];
     this.getAvailableMethods();
-    this.apiInputBox.on('keyup', function (cm, e) {
+    this.apiInputBox.on('keyup', function(cm, e) {
       if (!ExcludedIntelliSenseTriggerKeys[(e.keyCode || e.which).toString()]) {
         cm.execCommand('autocomplete', null, {
           completeSingle: false
@@ -356,22 +356,22 @@ export class DevToolsController {
     this.highlightGroup(currentGroup);
 
     // Register our custom Codemirror hint plugin.
-    CodeMirror.registerHelper('hint', 'dictionaryHint', function (editor) {
+    CodeMirror.registerHelper('hint', 'dictionaryHint', function(editor) {
       const model = editor.model;
       function getDictionary(line, word) {
         let hints = [];
         const exp = line.split(/\s+/g);
         if (exp[0] && exp[0].match(/^(?:GET|PUT|POST|DELETE).*$/)) {
-          let method = model.find(function (item) {
+          let method = model.find(function(item) {
             return item.method === exp[0];
           });
           const forbidChars = /^[^?{]+$/;
           if (method && !exp[2] && forbidChars.test(word)) {
-            method.endpoints.forEach(function (endpoint) {
+            method.endpoints.forEach(function(endpoint) {
               endpoint.path = endpoint.name;
               if (endpoint.args && endpoint.args.length > 0) {
                 let argSubs = [];
-                endpoint.args.forEach(function (arg) {
+                endpoint.args.forEach(function(arg) {
                   const pathSplitted = endpoint.name.split('/');
                   const arrayIdx = pathSplitted.indexOf(arg.name);
                   const wordSplitted = word.split('/');
@@ -383,7 +383,7 @@ export class DevToolsController {
                   }
                 });
                 let auxPath = endpoint.name;
-                argSubs.forEach(function (arg) {
+                argSubs.forEach(function(arg) {
                   auxPath = auxPath.replace(arg.id, arg.value);
                 });
                 endpoint.path = auxPath;
@@ -404,26 +404,26 @@ export class DevToolsController {
       const whiteSpace = /\s/;
       while (end < curLine.length && !whiteSpace.test(curLine.charAt(end)))
         ++end;
-      while (start && !whiteSpace.test(curLine.charAt(start - 1)))--start;
+      while (start && !whiteSpace.test(curLine.charAt(start - 1))) --start;
       const curWord = start !== end && curLine.slice(start, end);
       return {
         list: (!curWord
           ? []
-          : getDictionary(curLine, curWord).filter(function (item) {
-            return item.toUpperCase().includes(curWord.toUpperCase());
-          })
+          : getDictionary(curLine, curWord).filter(function(item) {
+              return item.toUpperCase().includes(curWord.toUpperCase());
+            })
         ).sort(),
         from: CodeMirror.Pos(cur.line, start),
         to: CodeMirror.Pos(cur.line, end)
       };
     });
     const evtDocument = this.$document[0];
-    $('.wz-dev-column-separator').mousedown(function (e) {
+    $('.wz-dev-column-separator').mousedown(function(e) {
       e.preventDefault();
       $('.wz-dev-column-separator').addClass('active');
       const leftOrigWidth = $('#wz-dev-left-column').width();
       const rightOrigWidth = $('#wz-dev-right-column').width();
-      $(evtDocument).mousemove(function (e) {
+      $(evtDocument).mousemove(function(e) {
         const leftWidth = e.pageX - 215 + 14;
         let rightWidth = leftOrigWidth - leftWidth;
         $('#wz-dev-left-column').css('width', leftWidth);
@@ -431,7 +431,7 @@ export class DevToolsController {
       });
     });
 
-    $(evtDocument).mouseup(function () {
+    $(evtDocument).mouseup(function() {
       $('.wz-dev-column-separator').removeClass('active');
       $(evtDocument).unbind('mousemove');
     });
@@ -458,10 +458,10 @@ export class DevToolsController {
       const desiredGroup = firstTime
         ? this.groups.filter(item => item.requestText)
         : this.groups.filter(
-          item =>
-            item.requestText &&
-            (item.end >= selection.line && item.start <= selection.line)
-        );
+            item =>
+              item.requestText &&
+              (item.end >= selection.line && item.start <= selection.line)
+          );
 
       // Place play button at first line from the selected group
       const cords = this.apiInputBox.cursorCoords({
@@ -517,12 +517,12 @@ export class DevToolsController {
         const method = desiredGroup.requestText.startsWith('GET')
           ? 'GET'
           : desiredGroup.requestText.startsWith('POST')
-            ? 'POST'
-            : desiredGroup.requestText.startsWith('PUT')
-              ? 'PUT'
-              : desiredGroup.requestText.startsWith('DELETE')
-                ? 'DELETE'
-                : 'GET';
+          ? 'POST'
+          : desiredGroup.requestText.startsWith('PUT')
+          ? 'PUT'
+          : desiredGroup.requestText.startsWith('DELETE')
+          ? 'DELETE'
+          : 'GET';
 
         const requestCopy = desiredGroup.requestText.includes(method)
           ? desiredGroup.requestText.split(method)[1].trim()
