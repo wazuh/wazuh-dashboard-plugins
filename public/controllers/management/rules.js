@@ -359,8 +359,4 @@ export function RulesController(
     $scope.overwriteError = true;
     $scope.$applyAsync();
   });
-
-  $scope.$on('addNewRulesFile', () => {
-    $scope.addNewFile('rules');
-  });
 }

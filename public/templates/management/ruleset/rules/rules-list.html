@@ -43,16 +43,17 @@
     <div layout="row" ng-if="!editingFile">
         <md-card flex class="wz-md-card _md flex md-margin-h">
             <md-card-actions layout="row" layout-align="end center" class="wz-card-actions wz-card-actions-top">
-                <a ng-if="adminMode" ng-click="$parent.$parent.$parent.$parent.$parent.mctrl.switchFilesSubTab('rules')">Manage rules files</a>
+                <a ng-if="adminMode" ng-click="$parent.$parent.$parent.$parent.$parent.mctrl.switchFilesSubTab('rules')">Manage
+                    rules files</a>
                 <span flex></span>
                 <wz-kbn-switch class="md-primary wz-no-top-bottom-margin" switch-model="showingLocalRules" switch-text="Custom rules"></wz-kbn-switch>
             </md-card-actions>
             <md-card-content class="wz-padding-bottom-0">
-                <wz-table custom-columns="true" flex ng-if="showingLocalRules" path="'/rules'" keys="[{value: 'id', width: '75px'},{value:'file',size:2},{value:'description',size:2},{value:'groups',nosortable:true,size:2},{value:'pci',nosortable:true,size:2},{value:'gdpr',nosortable:true},{value: 'level', width: '100px'}]"
+                <wz-table custom-columns="true" flex ng-if="showingLocalRules" path="'/rules'" keys="[{value: 'id', width: '75px'},{value:'description',size:2},{value:'groups',nosortable:true,size:2},{value:'pci',nosortable:true,size:2},{value:'gdpr',nosortable:true},{value: 'level', width: '100px'},{value:'file',size:2}]"
                     implicit-filter="[{ name:'path',value: 'etc/rules'}]" allow-click="true" row-sizes="[16,13,11]">
                 </wz-table>
                 <wz-table custom-columns="true" ng-if="!showingLocalRules" implicit-filter="appliedFilters" flex path="'/rules'"
-                    keys="[{value: 'id', width: '75px'},{value:'file',size:2},{value:'description',size:2},{value:'groups',nosortable:true,size:2},{value:'pci',nosortable:true,size:2},{value:'gdpr',nosortable:true}, {value: 'level', width: '100px'}]"
+                    keys="[{value: 'id', width: '75px'},{value:'description',size:2},{value:'groups',nosortable:true,size:2},{value:'pci',nosortable:true,size:2},{value:'gdpr',nosortable:true}, {value: 'level', width: '100px'}, {value:'file',size:2}]"
                     allow-click="true" row-sizes="[16,13,11]">
                 </wz-table>
             </md-card-content>
