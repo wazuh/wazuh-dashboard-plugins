@@ -1,13 +1,13 @@
 <div ng-if="!loading && !viewingDetail" layout="column">
     <div id="content" layout="row" class="md-padding" ng-if="!mctrl.filesSubTab">
-        <input flex placeholder="Filter rules..." ng-model="custom_search" type="text" class="kuiLocalSearchInput height-40 ng-empty ng-pristine ng-scope ng-touched ng-valid"
+        <input flex placeholder="Filter rules..." ng-model="custom_search" type="text" class="kuiLocalSearchInput height-40"
             aria-invalid="false" wz-enter="search(custom_search)">
         <button type="submit" aria-label="Search" class="kuiLocalSearchButton height-40" ng-click="search(custom_search)">
             <span class="fa fa-search" aria-hidden="true"></span>
         </button>
     </div>
 
-    <md-chips class="wz-chips md-padding-h wz-padding-bottom-14" readonly="true" ng-show="appliedFilters.length" ng-if="!editingFile && !$parent.$parent.$parent.$parent.$parent.mctrl.filesSubTab">
+    <md-chips class="wz-chips md-padding-h wz-padding-bottom-14" readonly="true" ng-show="appliedFilters.length" ng-if="!editingFile && !mctrl.filesSubTab">
         <md-chip class="wz-chip" ng-show="includesFilter('file')">
             <span>File: {{getFilter('file')}}
                 <i class="fa fa-fw fa-times cursor-pointer" aria-hidden="true" ng-click="removeFilter('file')"></i>
@@ -43,16 +43,17 @@
     <div layout="row" ng-if="!editingFile">
         <md-card flex class="wz-md-card _md flex md-margin-h">
             <md-card-actions layout="row" layout-align="end center" class="wz-card-actions wz-card-actions-top">
-                <a ng-if="adminMode" ng-click="$parent.$parent.$parent.$parent.$parent.mctrl.switchFilesSubTab('rules')">Manage
+                <a ng-if="adminMode" ng-click="mctrl.switchFilesSubTab('rules')">Manage
                     rules files</a>
                 <span flex></span>
-                <wz-kbn-switch class="md-primary wz-no-top-bottom-margin" switch-model="showingLocalRules" switch-text="Custom rules"></wz-kbn-switch>
+                <wz-kbn-switch class="md-primary wz-no-top-bottom-margin" switch-model="mctrl.showingLocalRules"
+                    switch-text="Custom rules"></wz-kbn-switch>
             </md-card-actions>
             <md-card-content class="wz-padding-bottom-0">
-                <wz-table custom-columns="true" flex ng-if="showingLocalRules" path="'/rules'" keys="[{value: 'id', width: '75px'},{value:'description',size:2},{value:'groups',nosortable:true,size:2},{value:'pci',nosortable:true,size:2},{value:'gdpr',nosortable:true},{value: 'level', width: '100px'},{value:'file',size:2}]"
+                <wz-table custom-columns="true" flex ng-if="mctrl.showingLocalRules" path="'/rules'" keys="[{value: 'id', width: '75px'},{value:'description',size:2},{value:'groups',nosortable:true,size:2},{value:'pci',nosortable:true,size:2},{value:'gdpr',nosortable:true},{value: 'level', width: '100px'},{value:'file',size:2}]"
                     implicit-filter="[{ name:'path',value: 'etc/rules'}]" allow-click="true" row-sizes="[16,13,11]">
                 </wz-table>
-                <wz-table custom-columns="true" ng-if="!showingLocalRules" implicit-filter="appliedFilters" flex path="'/rules'"
+                <wz-table custom-columns="true" ng-if="!mctrl.showingLocalRules" implicit-filter="appliedFilters" flex path="'/rules'"
                     keys="[{value: 'id', width: '75px'},{value:'description',size:2},{value:'groups',nosortable:true,size:2},{value:'pci',nosortable:true,size:2},{value:'gdpr',nosortable:true}, {value: 'level', width: '100px'}, {value:'file',size:2}]"
                     allow-click="true" row-sizes="[16,13,11]">
                 </wz-table>

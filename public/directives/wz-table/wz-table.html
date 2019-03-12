@@ -11,20 +11,22 @@
         <span class="euiCheckbox__label">{{ keyEquivalence[key.key.value || key.key] }}</span>
     </div>
     <span flex></span>
-    <span class="wz-text-link font-size-18" style="line-height: 24px;" ng-click="showColumns = !showColumns" tooltip="Columns"><i
+    <span class="wz-text-link" style="line-height: 28px;" ng-click="showColumns = !showColumns" tooltip="Columns"><i
             class="fa fa-fw fa-gear"></i></span>
 </div>
 
-<div ng-show="!error && !wazuh_table_loading && items.length" ng-if="!isPolicyMonitoring() && !isSyscheck()">
+<div ng-if="!wazuh_table_loading && !isPolicyMonitoring() && !isSyscheck()" ng-show="!error && items.length">
     <table class="table table-striped table-condensed table-hover no-margin-bottom" ng-class="customColumns ? 'table-resizable' : ''"
         style="table-layout: fixed !important" id="wz_table">
         <thead class="wz-text-bold">
-            <th ng-repeat="key in keys" class="wz-text-left" ng-class="{ 'cursor-pointer' : !key.nosortable}" ng-click="!key.nosortable && sort(key)"
-                ng-style="key.width && {'width':key.width}">
-                {{ path === '/agents/groups' && (key.value || key) === 'count' ? 'Agents' : keyEquivalence[key.value ||
-                key] || key.value || key }}
-                <i ng-if="!key.nosortable" class="fa wz-theader-sort-icon" ng-class="sortValue === (key.value || key) ? (sortDir ? 'fa-sort-asc' : 'fa-sort-desc') : 'fa-sort'"
-                    aria-hidden="true"></i>
+            <th ng-repeat="key in keys" class="wz-text-left" ng-style="key.width && {'width':key.width}">
+                <span ng-class="{ 'cursor-pointer' : !key.nosortable}" ng-click="!key.nosortable && sort(key)">
+                    {{ path === '/agents/groups' && (key.value || key) === 'count' ? 'Agents' :
+                    keyEquivalence[key.value ||
+                    key] || key.value || key }}
+                    <i ng-if="!key.nosortable" class="fa wz-theader-sort-icon" ng-class="sortValue === (key.value || key) ? (sortDir ? 'fa-sort-asc' : 'fa-sort-desc') : 'fa-sort'"
+                        aria-hidden="true"></i>
+                </span>
             </th>
             <th ng-if="(path === '/agents' || (path === '/agents/groups' && adminMode) || (isLookingGroup() && adminMode) 
             || path === '/rules/files' || path === '/decoders/files' || path === '/lists/files') && !isLookingDefaultGroup"
@@ -139,15 +141,16 @@
     </table>
 </div>
 
-<div ng-show="!error && !wazuh_table_loading && items.length" ng-if="isPolicyMonitoring()">
+<div ng-if="!wazuh_table_loading && isPolicyMonitoring()" ng-show="!error && items.length">
     <table class="table table-striped table-striped-duo table-condensed table-hover no-margin-bottom" ng-class="customColumns ? 'table-resizable' : ''"
         style="table-layout: fixed !important" id="wz_table">
         <thead class="wz-text-bold">
-            <th ng-repeat="key in keys" class="wz-text-left" ng-class="{ 'cursor-pointer' : !key.nosortable }" ng-style="key.width && {'width':key.width}"
-                ng-click="!key.nosortable && sort(key)">
-                {{ keyEquivalence[key.value || key] || key.value || key }}
-                <i ng-if="!key.nosortable" class="fa wz-theader-sort-icon" ng-class="sortValue === (key.value || key) ? (sortDir ? 'fa-sort-asc' : 'fa-sort-desc') : 'fa-sort'"
-                    aria-hidden="true"></i>
+            <th ng-repeat="key in keys" class="wz-text-left" ng-style="key.width && {'width':key.width}">
+                <span ng-class="{ 'cursor-pointer' : !key.nosortable }" ng-click="!key.nosortable && sort(key)">
+                    {{ keyEquivalence[key.value || key] || key.value || key }}
+                    <i ng-if="!key.nosortable" class="fa wz-theader-sort-icon" ng-class="sortValue === (key.value || key) ? (sortDir ? 'fa-sort-asc' : 'fa-sort-desc') : 'fa-sort'"
+                        aria-hidden="true"></i>
+                </span>
             </th>
         </thead>
         <tbody>
@@ -172,7 +175,7 @@
             </tr>
             <tr ng-if="item.rationale || item.remediation || item.directory || (item.compliance && item.compliance.length)"
                 class="wz-word-wrap cursor-pointer selected" ng-show="item.expanded" ng-repeat-end="" ng-click="expandTableRow(item)">
-                <td colspan="3" style="border-top: none">
+                <td colspan="{{keys.length}}" style="border-top: none">
                     <div layout="row" layout-padding="" class="layout-padding layout-row">
                         <md-card flex="" class="wz-md-card wz-padding-top-0 wz-padding-bottom-0 wz-no-margin _md flex">
                             <md-card-content>
@@ -246,15 +249,16 @@
     </table>
 </div>
 
-<div ng-show="!error && !wazuh_table_loading && items.length" ng-if="isSyscheck()">
+<div ng-if="!wazuh_table_loading && isSyscheck()" ng-show="!error && items.length">
     <table class="table table-striped table-striped-duo table-condensed table-hover no-margin-bottom" ng-class="customColumns ? 'table-resizable' : ''"
         style="table-layout: fixed !important" id="wz_table">
         <thead class="wz-text-bold">
-            <th ng-repeat="key in keys" class="wz-text-left" ng-class="{ 'cursor-pointer' : !key.nosortable }" ng-style="key.width && {'width':key.width}"
-                ng-click="!key.nosortable && sort(key)">
-                {{ keyEquivalence[key.value || key] || key.value || key }}
-                <i ng-if="!key.nosortable" class="fa wz-theader-sort-icon" ng-class="sortValue === (key.value || key) ? (sortDir ? 'fa-sort-asc' : 'fa-sort-desc') : 'fa-sort'"
-                    aria-hidden="true"></i>
+            <th ng-repeat="key in keys" class="wz-text-left" ng-style="key.width && {'width':key.width}">
+                <span ng-class="{ 'cursor-pointer' : !key.nosortable }" ng-click="!key.nosortable && sort(key)">{{
+                    keyEquivalence[key.value || key] || key.value || key }}
+                    <i ng-if="!key.nosortable" class="fa wz-theader-sort-icon" ng-class="sortValue === (key.value || key) ? (sortDir ? 'fa-sort-asc' : 'fa-sort-desc') : 'fa-sort'"
+                        aria-hidden="true"></i>
+                </span>
             </th>
         </thead>
         <tbody>

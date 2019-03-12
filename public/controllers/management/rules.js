@@ -25,13 +25,10 @@ export function RulesController(
   wazuhConfig,
   rulesetHandler
 ) {
-  $scope.showingLocalRules = false;
   $scope.overwriteError = false;
-  $scope.switchLocalRules = () =>
-    ($scope.showingLocalRules = !$scope.showingLocalRules);
-
   $scope.isObject = item => typeof item === 'object';
-
+  $scope.mctrl = $scope.$parent.$parent.$parent.mctrl;
+  $scope.mctrl.showingLocalRules = false;
   $scope.appliedFilters = [];
   /**
    * This performs a search with a given term
@@ -257,7 +254,6 @@ export function RulesController(
           (((ruleReloaded || {}).data || {}).data || {}).items || [];
         if (!response.length) {
           $scope.currentRule = null;
-          $scope.showingLocalRules = true;
           $scope.closeDetailView(true);
         } else {
           $scope.currentRule = response[0];

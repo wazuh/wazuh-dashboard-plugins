@@ -79,13 +79,13 @@ export class FilesController {
           isOverwrite: !!this.overwriteError
         };
         (isNewFile && this.$scope.type === 'rules') ||
-          (!isNewFile && this.$scope.currentFile.type === 'rule')
+        (!isNewFile && this.$scope.currentFile.type === 'rule')
           ? (objParam.rule = isNewFile
-            ? this.selectedItem
-            : this.$scope.currentFile)
+              ? this.selectedItem
+              : this.$scope.currentFile)
           : (objParam.decoder = isNewFile
-            ? this.selectedItem
-            : this.$scope.currentFile);
+              ? this.selectedItem
+              : this.$scope.currentFile);
         this.$scope.$broadcast('saveXmlFile', objParam);
         this.$scope.$applyAsync();
       }
