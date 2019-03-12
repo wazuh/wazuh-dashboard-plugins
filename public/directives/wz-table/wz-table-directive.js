@@ -76,7 +76,7 @@ app.directive('wzTable', function() {
             $scope.keys.push(key.key);
           }
         }
-        init().then(() => $scope.setColResizable());
+        init(true).then(() => $scope.setColResizable());
       };
       $scope.exists = key => {
         const str = key.key.value || key.key;
