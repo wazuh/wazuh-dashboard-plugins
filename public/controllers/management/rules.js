@@ -28,6 +28,7 @@ export function RulesController(
   $scope.overwriteError = false;
   $scope.isObject = item => typeof item === 'object';
   $scope.mctrl = $scope.$parent.$parent.$parent.mctrl;
+  $scope.mctrl.showingLocalRules = false;
   $scope.appliedFilters = [];
   /**
    * This performs a search with a given term
@@ -159,10 +160,10 @@ export function RulesController(
         coloredString = coloredString.replace(
           /\$\(((?!<\/span>).)*?\)(?!<\/span>)/im,
           '<span style="color: ' +
-          colors[i] +
-          ' ">' +
-          valuesArray[i] +
-          '</span>'
+            colors[i] +
+            ' ">' +
+            valuesArray[i] +
+            '</span>'
         );
       }
     }
