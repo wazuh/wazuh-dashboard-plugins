@@ -43,9 +43,9 @@ export class FilesController {
         clusterInfo.status === 'enabled' ? 'cluster' : 'manager';
       this.$scope.doingSaving = true;
       const objParam = { showRestartManager };
-      this.$scope.currentFile.type === 'rule' ?
-        objParam.rule = this.$scope.currentFile :
-        objParam.decoder = this.$scope.currentFile;
+      this.$scope.currentFile.type === 'rule'
+        ? (objParam.rule = this.$scope.currentFile)
+        : (objParam.decoder = this.$scope.currentFile);
       this.$scope.$broadcast('saveXmlFile', objParam);
       this.$scope.$applyAsync();
     };
@@ -74,10 +74,17 @@ export class FilesController {
     this.$scope.editingFile = true;
     try {
       this.$scope.currentFile = params.file;
-      this.$scope.currentFile.type = params.path.includes('rules') ? 'rule' : 'decoder';
-      this.$scope.fetchedXML = this.$scope.currentFile.type === 'rule' ?
-        await this.rulesetHandler.getRuleConfiguration(this.$scope.currentFile.file) :
-        await this.rulesetHandler.getDecoderConfiguration(this.$scope.currentFile.file);
+      this.$scope.currentFile.type = params.path.includes('rules')
+        ? 'rule'
+        : 'decoder';
+      this.$scope.fetchedXML =
+        this.$scope.currentFile.type === 'rule'
+          ? await this.rulesetHandler.getRuleConfiguration(
+              this.$scope.currentFile.file
+            )
+          : await this.rulesetHandler.getDecoderConfiguration(
+              this.$scope.currentFile.file
+            );
       this.$scope.$applyAsync();
       this.$scope.$broadcast('fetchedFile', { data: this.$scope.fetchedXML });
     } catch (error) {

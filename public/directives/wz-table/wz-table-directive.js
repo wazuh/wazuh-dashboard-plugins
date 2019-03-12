@@ -26,7 +26,7 @@ import { checkGap } from './lib/check-gap';
 
 const app = uiModules.get('app/wazuh', []);
 
-app.directive('wzTable', function () {
+app.directive('wzTable', function() {
   return {
     restrict: 'E',
     scope: {
@@ -50,7 +50,6 @@ app.directive('wzTable', function () {
       wzTableFilter,
       $window,
       appState,
-      globalState,
       groupHandler,
       rulesetHandler,
       wazuhConfig,
@@ -59,7 +58,7 @@ app.directive('wzTable', function () {
       $scope.showColumns = false;
       $scope.originalkeys = $scope.keys.map((key, idx) => ({ key, idx }));
       $scope.updateColumns = key => {
-        $("#wz_table").colResizable({ disable: true });
+        $('#wz_table').colResizable({ disable: true });
         const str = key.key.value || key.key;
         const cleanArray = $scope.keys.map(item => item.value || item);
         if (cleanArray.includes(str)) {
@@ -77,8 +76,7 @@ app.directive('wzTable', function () {
             $scope.keys.push(key.key);
           }
         }
-        init()
-          .then(() => ($scope.setColResizable()))
+        init().then(() => $scope.setColResizable());
       };
       $scope.exists = key => {
         const str = key.key.value || key.key;
@@ -118,10 +116,12 @@ app.directive('wzTable', function () {
         doit = setTimeout(() => {
           $scope.rowsPerPage = calcTableRows($window.innerHeight, rowSizes);
           $scope.itemsPerPage = $scope.rowsPerPage;
-          init()
+          init(true)
             .then(() => {
               resizing = false;
-              if ($scope.customColumns) { $scope.setColResizable() }
+              if ($scope.customColumns) {
+                $scope.setColResizable();
+              }
             })
             .catch(() => (resizing = false));
         }, 150);
@@ -150,14 +150,23 @@ app.directive('wzTable', function () {
             $scope.customEmptyResults =
               $scope.emptyResults || 'Empty results for this table.';
           }
-          const result = await instance.fetch(options);
-          items = options.realTime ? result.items.slice(0, 10) : result.items;
-          $scope.time = result.time;
-          $scope.totalItems = items.length;
-          $scope.items = items;
-          checkGap($scope, items);
-          $scope.searchTable();
-          $scope.$emit('wazuhFetched', { items });
+
+          if (!options.skipFetching) {
+            const result = await instance.fetch(options);
+            items = options.realTime ? result.items.slice(0, 10) : result.items;
+            $scope.time = result.time;
+            $scope.totalItems = items.length;
+            $scope.items = items;
+            checkGap($scope, items);
+            $scope.searchTable();
+            $scope.$emit('wazuhFetched', { items });
+          } else {
+            // Resize
+            checkGap($scope, $scope.items);
+            $scope.searchTable();
+            $scope.$emit('wazuhFetched', { items: $scope.items });
+          }
+
           return;
         } catch (error) {
           if (
@@ -228,7 +237,10 @@ app.directive('wzTable', function () {
         try {
           $scope.error = false;
           while (realTime) {
-            await fetch({ realTime: !limit ? true : false, limit: limit || 10 });
+            await fetch({
+              realTime: !limit ? true : false,
+              limit: limit || 10
+            });
             if (!$scope.$$phase) $scope.$digest();
             await $timeout(1000);
           }
@@ -250,23 +262,21 @@ app.directive('wzTable', function () {
       /**
        * On controller loads
        */
-      const init = async () => {
+      const init = async (skipFetching = false) => {
         await initTable(
           $scope,
           fetch,
           wzTableFilter,
           instance,
           errorHandler,
-          appState,
-          globalState,
-          $window
+          skipFetching
         );
         if ($scope.customColumns) {
           setTimeout(() => {
-            $scope.setColResizable()
+            $scope.setColResizable();
           }, 100);
         }
-      }
+      };
       /**
        * Pagination variables and functions
        */
@@ -283,9 +293,15 @@ app.directive('wzTable', function () {
       $scope.prevPage = () => pagination.prevPage($scope);
       $scope.nextPage = async currentPage =>
         pagination.nextPage(currentPage, $scope, errorHandler, fetch);
-      $scope.setPage = function (page = false) {
+      $scope.setPage = function(page = false) {
         $scope.currentPage = page || this.n;
-        $scope.nextPage(this.n).then(() => { if (page) { $scope.$emit('scrollBottom', { line: parseInt(page * $scope.itemsPerPage) }) } });
+        $scope.nextPage(this.n).then(() => {
+          if (page) {
+            $scope.$emit('scrollBottom', {
+              line: parseInt(page * $scope.itemsPerPage)
+            });
+          }
+        });
       };
 
       /**
@@ -327,7 +343,7 @@ app.directive('wzTable', function () {
 
       $scope.$on('increaseLogs', (event, parameters) => {
         $scope.setPage(parseInt(parameters.lines / $scope.itemsPerPage));
-      })
+      });
 
       /*$scope.editGroupAgentConfig = (ev, group) => {
         $rootScope.$broadcast('editXmlFile', { target: group });
@@ -444,9 +460,7 @@ app.directive('wzTable', function () {
       };
 
       $scope.isSyscheck = () => {
-        return (
-          instance.path.includes('/syscheck')
-        );
+        return instance.path.includes('/syscheck');
       };
 
       $scope.isWindows = () => {
@@ -479,9 +493,14 @@ app.directive('wzTable', function () {
       };
 
       $scope.setColResizable = () => {
-        $("#wz_table").colResizable({ liveDrag: true, minWidth: 75, partialRefresh: true, draggingClass: false });
+        $('#wz_table').colResizable({
+          liveDrag: true,
+          minWidth: 75,
+          partialRefresh: true,
+          draggingClass: false
+        });
         $scope.$applyAsync();
-      }
+      };
     },
     template
   };

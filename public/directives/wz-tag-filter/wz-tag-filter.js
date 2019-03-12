@@ -16,7 +16,7 @@ import { uiModules } from 'ui/modules';
 
 const app = uiModules.get('app/wazuh', []);
 
-app.directive('wzTagFilter', function () {
+app.directive('wzTagFilter', function() {
   return {
     restrict: 'E',
     scope: {
@@ -71,7 +71,13 @@ app.directive('wzTagFilter', function () {
             };
             const idxSearch = $scope.tagList.find(x => x.type === 'search');
             if (!isFilter && idxSearch) {
-              $scope.removeTag(idxSearch.id, false, $scope.searchIdx, undefined, true);
+              $scope.removeTag(
+                idxSearch.id,
+                false,
+                $scope.searchIdx,
+                undefined,
+                true
+              );
             }
             if (
               !$scope.tagList.find(x => {
@@ -111,7 +117,10 @@ app.directive('wzTagFilter', function () {
               $scope.searchIdx = idx;
               queryObj.search = search.value.name;
               if (idx === groups.length - 1)
-                queryObj.query = queryObj.query.substring(0, queryObj.query.length - 1);
+                queryObj.query = queryObj.query.substring(
+                  0,
+                  queryObj.query.length - 1
+                );
             } else {
               const twoOrMoreElements = group.length > 1;
               if (twoOrMoreElements) {
@@ -122,7 +131,8 @@ app.directive('wzTagFilter', function () {
                 .forEach((tag, idx2) => {
                   queryObj.query += tag.key + '=' + tag.value.value;
                   if (idx2 != group.length - 1) {
-                    queryObj.query += $scope.connectors[idx].subgroup[idx2].value;
+                    queryObj.query +=
+                      $scope.connectors[idx].subgroup[idx2].value;
                   }
                 });
               if (twoOrMoreElements) {
@@ -159,37 +169,47 @@ app.directive('wzTagFilter', function () {
         return result;
       };
 
-      const addConnectors = (groups) => {
+      const addConnectors = groups => {
         const result = [];
-        groups
-          .forEach((group, index) => {
-            result.push({});
-            const subGroup = [];
-            group
-              .forEach((tag, idx) => {
-                if (idx != group.length - 1) {
-                  subGroup.push({ value: (((($scope.connectors || [])[index] || {}).subgroup || [])[idx] || {}).value || ',' });
-                }
+        groups.forEach((group, index) => {
+          result.push({});
+          const subGroup = [];
+          group.forEach((tag, idx) => {
+            if (idx != group.length - 1) {
+              subGroup.push({
+                value:
+                  (
+                    ((($scope.connectors || [])[index] || {}).subgroup || [])[
+                      idx
+                    ] || {}
+                  ).value || ','
               });
-            if (subGroup.length > 0)
-              result[index].subgroup = subGroup;
-            if (index != groups.length - 1) {
-              result[index].value = (($scope.connectors || [])[index] || {}).value || ';';
             }
           });
+          if (subGroup.length > 0) result[index].subgroup = subGroup;
+          if (index != groups.length - 1) {
+            result[index].value =
+              (($scope.connectors || [])[index] || {}).value || ';';
+          }
+        });
         return result;
       };
 
       $scope.changeConnector = (parentIdx, idx) => {
-        if ((parentIdx === $scope.searchIdx - 1 || parentIdx === $scope.searchIdx) && idx === undefined) {
+        if (
+          (parentIdx === $scope.searchIdx - 1 ||
+            parentIdx === $scope.searchIdx) &&
+          idx === undefined
+        ) {
           $scope.connectors[parentIdx].value = ';';
         } else {
           if (idx !== undefined) {
             const value = $scope.connectors[parentIdx].subgroup[idx].value;
-            $scope.connectors[parentIdx].subgroup[idx].value = value === ';' ? ',' : ';'
+            $scope.connectors[parentIdx].subgroup[idx].value =
+              value === ';' ? ',' : ';';
           } else {
             const value = $scope.connectors[parentIdx].value;
-            $scope.connectors[parentIdx].value = value === ';' ? ',' : ';'
+            $scope.connectors[parentIdx].value = value === ';' ? ',' : ';';
           }
           buildQuery($scope.groupedTagList);
         }
@@ -218,7 +238,13 @@ app.directive('wzTagFilter', function () {
       /**
        * This remove tag from search bar
        */
-      $scope.removeTag = (id, deleteGroup, parentIdx, idx, overwrite = false) => {
+      $scope.removeTag = (
+        id,
+        deleteGroup,
+        parentIdx,
+        idx,
+        overwrite = false
+      ) => {
         if (deleteGroup) {
           $scope.tagList = $scope.tagList.filter(x => x.key !== id);
           $scope.connectors.splice(parentIdx, 1);
@@ -227,10 +253,12 @@ app.directive('wzTagFilter', function () {
           if (idx < 0) {
             idx = 0;
           }
-          if ($scope.connectors[parentIdx] && $scope.connectors[parentIdx].subgroup) {
+          if (
+            $scope.connectors[parentIdx] &&
+            $scope.connectors[parentIdx].subgroup
+          ) {
             $scope.connectors[parentIdx].subgroup.splice(idx, 1);
-          } else
-            $scope.connectors.splice(parentIdx, 1);
+          } else $scope.connectors.splice(parentIdx, 1);
         }
         if ($scope.tagList.length <= 1) {
           $scope.connectors = [{}];
@@ -241,8 +269,7 @@ app.directive('wzTagFilter', function () {
           $scope.searchIdx = false;
         }
         $scope.connectors = addConnectors($scope.groupedTagList);
-        if (!overwrite)
-          buildQuery($scope.groupedTagList);
+        if (!overwrite) buildQuery($scope.groupedTagList);
         $scope.showAutocomplete(false);
       };
 
@@ -364,7 +391,7 @@ app.directive('wzTagFilter', function () {
       /**
        * This set to bar a keydown listener to show the autocomplete
        */
-      $('#wz-search-filter-bar-input').bind('keydown', function (e) {
+      $('#wz-search-filter-bar-input').bind('keydown', function(e) {
         let $current = $('#wz-search-filter-bar-autocomplete-list li.selected');
         if ($current.length === 0 && (e.keyCode === 38 || e.keyCode === 40)) {
           $('#wz-search-filter-bar-autocomplete-list li')
