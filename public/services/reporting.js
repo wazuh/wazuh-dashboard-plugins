@@ -11,7 +11,8 @@
  */
 
 import $ from 'jquery';
-import moment from 'moment'
+import moment from 'moment';
+
 export class ReportingService {
   constructor(
     $rootScope,
