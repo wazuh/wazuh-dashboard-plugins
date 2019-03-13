@@ -247,7 +247,11 @@ export class WazuhReportingCtrl {
     const hours = date.getHours();
     const minutes = date.getMinutes();
     const seconds = date.getSeconds();
-    const str = `${year}-${month < 10 ? '0' + month : month}-${day < 10 ? '0' + day : day}T${hours < 10 ? '0' + hours : hours}:${minutes < 10 ? '0' + minutes : minutes}:${seconds < 10 ? '0' + seconds : seconds}`;
+    const str = `${year}-${month < 10 ? '0' + month : month}-${
+      day < 10 ? '0' + day : day
+    }T${hours < 10 ? '0' + hours : hours}:${
+      minutes < 10 ? '0' + minutes : minutes
+    }:${seconds < 10 ? '0' + seconds : seconds}`;
     return str;
   }
 
@@ -258,8 +262,10 @@ export class WazuhReportingCtrl {
    * @param {String} filters E.g: cluster.name: wazuh AND rule.groups: vulnerability
    */
   renderTimeRangeAndFilters(from, to, filters, timeZone) {
-    const fromDate = new Date(new Date(from).toLocaleString("en-US", { timeZone }));
-    const toDate = new Date(new Date(to).toLocaleString("en-US", { timeZone }));
+    const fromDate = new Date(
+      new Date(from).toLocaleString('en-US', { timeZone })
+    );
+    const toDate = new Date(new Date(to).toLocaleString('en-US', { timeZone }));
     const str = `${this.formatDate(fromDate)} to ${this.formatDate(toDate)}`;
 
     this.dd.content.push({

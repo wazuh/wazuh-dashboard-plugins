@@ -77,7 +77,7 @@ class WzConfigViewer {
         setTimeout(function() {
           $scope.jsonCodeBox.refresh();
           $scope.$applyAsync();
-        }, 100);
+        }, 200);
       }
     };
 
@@ -91,7 +91,7 @@ class WzConfigViewer {
         setTimeout(function() {
           $scope.xmlCodeBox.refresh();
           $scope.$applyAsync();
-        }, 100);
+        }, 200);
       }
     };
 
@@ -127,6 +127,14 @@ class WzConfigViewer {
       var middleHeight =
         $scope.xmlCodeBox.getScrollerElement().offsetHeight / 2;
       $scope.xmlCodeBox.scrollTo(null, t - middleHeight - 10);
+    });
+
+    $scope.$on('doRefresh', (ev, params) => {
+      if (params.type === 'xml') {
+        $scope.xmlCodeBox.refresh();
+      } else {
+        $scope.jsonCodeBox.refresh();
+      }
     });
   }
 }
