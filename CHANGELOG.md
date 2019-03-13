@@ -54,6 +54,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Adapted Wazuh icon for multiple browsers where it was gone ([#1208](https://github.com/wazuh/wazuh-kibana-app/pull/1208)).
 - Do not fetch data from tables twice when resize window ([#1303](https://github.com/wazuh/wazuh-kibana-app/pull/1303)).
 - Agent syncrhonization status is updated as we browse the configuration section ([#1305](https://github.com/wazuh/wazuh-kibana-app/pull/1305))
+- Using the browser timezone for reporting documents ([#1311](https://github.com/wazuh/wazuh-kibana-app/pull/1311)).
 
 ## Wazuh v3.8.2 - Kibana v6.6.0 / v6.6.1 - Revision 419
 

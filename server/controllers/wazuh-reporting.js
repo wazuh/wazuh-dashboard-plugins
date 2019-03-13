@@ -134,7 +134,7 @@ export class WazuhReportingCtrl {
         return {
           columns: [
             {
-              text: 'Copyright © 2018 Wazuh, Inc.',
+              text: 'Copyright © 2019 Wazuh, Inc.',
               color: '#1EA5C8',
               margin: [40, 40, 0, 0]
             },
@@ -237,13 +237,36 @@ export class WazuhReportingCtrl {
   }
 
   /**
+   * Format Date to string YYYY-mm-ddTHH:mm:ss
+   * @param {*} date JavaScript Date
+   */
+  formatDate(date) {
+    const year = date.getFullYear();
+    const month = date.getMonth() + 1;
+    const day = date.getDate();
+    const hours = date.getHours();
+    const minutes = date.getMinutes();
+    const seconds = date.getSeconds();
+    const str = `${year}-${month < 10 ? '0' + month : month}-${
+      day < 10 ? '0' + day : day
+    }T${hours < 10 ? '0' + hours : hours}:${
+      minutes < 10 ? '0' + minutes : minutes
+    }:${seconds < 10 ? '0' + seconds : seconds}`;
+    return str;
+  }
+
+  /**
    * This performs the rendering of given time range and filters
    * @param {Number} from Timestamp (ms) from
    * @param {Number} to Timestamp (ms) to
    * @param {String} filters E.g: cluster.name: wazuh AND rule.groups: vulnerability
    */
-  renderTimeRangeAndFilters(from, to, filters) {
-    const str = `${from} to ${to}`;
+  renderTimeRangeAndFilters(from, to, filters, timeZone) {
+    const fromDate = new Date(
+      new Date(from).toLocaleString('en-US', { timeZone })
+    );
+    const toDate = new Date(new Date(to).toLocaleString('en-US', { timeZone }));
+    const str = `${this.formatDate(fromDate)} to ${this.formatDate(toDate)}`;
 
     this.dd.content.push({
       fontSize: 8,
@@ -1370,20 +1393,14 @@ export class WazuhReportingCtrl {
       }
 
       if (req.payload && req.payload.array) {
-        const name = req.payload.name;
-        const tab = req.payload.tab;
-        const section = req.payload.section;
-        const apiId = req.headers && req.headers.id ? req.headers.id : false;
-        const pattern =
-          req.headers && req.headers.pattern ? req.headers.pattern : false;
+        const payload = (req || {}).payload || {};
+        const headers = (req || {}).headers || {};
+        const { name, tab, section, isAgents, browserTimezone } = payload;
+        const apiId = headers.id || false;
+        const pattern = headers.pattern || false;
+        const from = (payload.time || {}).from || false;
+        const to = (payload.time || {}).to || false;
         const kfilters = req.payload.filters;
-        const isAgents = req.payload.isAgents;
-        const from =
-          req.payload.time && req.payload.time.from
-            ? req.payload.time.from
-            : false;
-        const to =
-          req.payload.time && req.payload.time.to ? req.payload.time.to : false;
 
         if (!tab)
           throw new Error(
@@ -1582,7 +1599,7 @@ export class WazuhReportingCtrl {
         }
 
         if (!isSycollector && req.payload.time && filters) {
-          this.renderTimeRangeAndFilters(from, to, filters);
+          this.renderTimeRangeAndFilters(from, to, filters, browserTimezone);
         }
 
         if (req.payload.time || isSycollector) {

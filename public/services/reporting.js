@@ -11,6 +11,7 @@
  */
 
 import $ from 'jquery';
+import moment from 'moment';
 
 export class ReportingService {
   constructor(
@@ -55,7 +56,9 @@ export class ReportingService {
       const array = await this.vis2png.checkArray(idArray);
       const name = `wazuh-${
         isAgents ? 'agents' : 'overview'
-      }-${tab}-${(Date.now() / 1000) | 0}.pdf`;
+        }-${tab}-${(Date.now() / 1000) | 0}.pdf`;
+
+      const browserTimezone = moment.tz.guess(true);
 
       const data = {
         array,
@@ -67,7 +70,8 @@ export class ReportingService {
         tables: appliedFilters.tables,
         tab,
         section: isAgents ? 'agents' : 'overview',
-        isAgents
+        isAgents,
+        browserTimezone
       };
 
       await this.genericReq.request('POST', '/reports', data);
