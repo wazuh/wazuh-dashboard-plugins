@@ -134,7 +134,7 @@ export class WazuhReportingCtrl {
         return {
           columns: [
             {
-              text: 'Copyright © 2018 Wazuh, Inc.',
+              text: 'Copyright © 2019 Wazuh, Inc.',
               color: '#1EA5C8',
               margin: [40, 40, 0, 0]
             },
@@ -194,8 +194,8 @@ export class WazuhReportingCtrl {
           parseInt(a[a.length - 1]) < parseInt(b[b.length - 1])
             ? 1
             : parseInt(a[a.length - 1]) > parseInt(b[b.length - 1])
-            ? -1
-            : 0;
+              ? -1
+              : 0;
 
         TimSort.sort(rows, sortFunction);
 
@@ -237,13 +237,30 @@ export class WazuhReportingCtrl {
   }
 
   /**
+   * Format Date to string YYYY-mm-ddTHH:mm:ss
+   * @param {*} date JavaScript Date
+   */
+  formatDate(date) {
+    const year = date.getFullYear();
+    const month = date.getMonth() + 1;
+    const day = date.getDate();
+    const hours = date.getHours();
+    const minutes = date.getMinutes();
+    const seconds = date.getSeconds();
+    const str = `${year}-${month < 10 ? '0' + month : month}-${day < 10 ? '0' + day : day}T${hours < 10 ? '0' + hours : hours}:${minutes < 10 ? '0' + minutes : minutes}:${seconds < 10 ? '0' + seconds : seconds}`;
+    return str;
+  }
+
+  /**
    * This performs the rendering of given time range and filters
    * @param {Number} from Timestamp (ms) from
    * @param {Number} to Timestamp (ms) to
    * @param {String} filters E.g: cluster.name: wazuh AND rule.groups: vulnerability
    */
-  renderTimeRangeAndFilters(from, to, filters) {
-    const str = `${from} to ${to}`;
+  renderTimeRangeAndFilters(from, to, filters, timeZone) {
+    const fromDate = new Date(new Date(from).toLocaleString("en-US", { timeZone }));
+    const toDate = new Date(new Date(to).toLocaleString("en-US", { timeZone }));
+    const str = `${this.formatDate(fromDate)} to ${this.formatDate(toDate)}`;
 
     this.dd.content.push({
       fontSize: 8,
@@ -312,14 +329,14 @@ export class WazuhReportingCtrl {
       str +=
         i === len - 1
           ? (filter.meta.negate ? 'NOT ' : '') +
-            filter.meta.key +
-            ': ' +
-            filter.meta.value
+          filter.meta.key +
+          ': ' +
+          filter.meta.value
           : (filter.meta.negate ? 'NOT ' : '') +
-            filter.meta.key +
-            ': ' +
-            filter.meta.value +
-            ' AND ';
+          filter.meta.key +
+          ': ' +
+          filter.meta.value +
+          ' AND ';
     }
 
     if (searchBar) {
@@ -1020,14 +1037,14 @@ export class WazuhReportingCtrl {
             this.dd.content.push({
               text: `Last policy monitoring scan was executed from ${
                 lastScan.data.start
-              } to ${lastScan.data.end}.`,
+                } to ${lastScan.data.end}.`,
               style: 'standard'
             });
           } else if (lastScan.data.start) {
             this.dd.content.push({
               text: `Policy monitoring scan is currently in progress for this agent (started on ${
                 lastScan.data.start
-              }).`,
+                }).`,
               style: 'standard'
             });
           } else {
@@ -1147,13 +1164,13 @@ export class WazuhReportingCtrl {
             this.dd.content.push({
               text: `Last file integrity monitoring scan was executed from ${
                 lastScan.data.start
-              } to ${lastScan.data.end}.`
+                } to ${lastScan.data.end}.`
             });
           } else if (lastScan.data.start) {
             this.dd.content.push({
               text: `File integrity monitoring scan is currently in progress for this agent (started on ${
                 lastScan.data.start
-              }).`
+                }).`
             });
           } else {
             this.dd.content.push({
@@ -1217,7 +1234,7 @@ export class WazuhReportingCtrl {
           if (hardware.data.ram && hardware.data.ram.total)
             ulcustom.push(
               Number(hardware.data.ram.total / 1024 / 1024).toFixed(2) +
-                'GB RAM'
+              'GB RAM'
             );
           ulcustom &&
             ulcustom.length &&
@@ -1370,20 +1387,14 @@ export class WazuhReportingCtrl {
       }
 
       if (req.payload && req.payload.array) {
-        const name = req.payload.name;
-        const tab = req.payload.tab;
-        const section = req.payload.section;
-        const apiId = req.headers && req.headers.id ? req.headers.id : false;
-        const pattern =
-          req.headers && req.headers.pattern ? req.headers.pattern : false;
+        const payload = (req || {}).payload || {};
+        const headers = (req || {}).headers || {};
+        const { name, tab, section, isAgents, browserTimezone } = payload;
+        const apiId = headers.id || false;
+        const pattern = headers.pattern || false;
+        const from = (payload.time || {}).from || false;
+        const to = (payload.time || {}).to || false;
         const kfilters = req.payload.filters;
-        const isAgents = req.payload.isAgents;
-        const from =
-          req.payload.time && req.payload.time.from
-            ? req.payload.time.from
-            : false;
-        const to =
-          req.payload.time && req.payload.time.to ? req.payload.time.to : false;
 
         if (!tab)
           throw new Error(
@@ -1433,7 +1444,7 @@ export class WazuhReportingCtrl {
               agent && agent.data && agent.data.os && agent.data.os.platform
                 ? agent.data.os.platform
                 : '';
-          } catch (err) {} //eslint-disable-line
+          } catch (err) { } //eslint-disable-line
           try {
             const packages = await this.apiRequest.makeGenericRequest(
               'GET',
@@ -1448,26 +1459,26 @@ export class WazuhReportingCtrl {
                   agentOs === 'windows'
                     ? ['Name', 'Architecture', 'Version', 'Vendor']
                     : [
-                        'Name',
-                        'Architecture',
-                        'Version',
-                        'Vendor',
-                        'Description'
-                      ],
+                      'Name',
+                      'Architecture',
+                      'Version',
+                      'Vendor',
+                      'Description'
+                    ],
                 rows: packages.data.items.map(x => {
                   return agentOs === 'windows'
                     ? [x['name'], x['architecture'], x['version'], x['vendor']]
                     : [
-                        x['name'],
-                        x['architecture'],
-                        x['version'],
-                        x['vendor'],
-                        x['description']
-                      ];
+                      x['name'],
+                      x['architecture'],
+                      x['version'],
+                      x['vendor'],
+                      x['description']
+                    ];
                 })
               });
             }
-          } catch (err) {} //eslint-disable-line
+          } catch (err) { } //eslint-disable-line
           try {
             const processes = await this.apiRequest.makeGenericRequest(
               'GET',
@@ -1486,15 +1497,15 @@ export class WazuhReportingCtrl {
                   return agentOs === 'windows'
                     ? [x['name'], x['cmd'], x['priority'], x['nlwp']]
                     : [
-                        x['name'],
-                        x['euser'],
-                        x['nice'],
-                        ProcessEquivalence[x.state]
-                      ];
+                      x['name'],
+                      x['euser'],
+                      x['nice'],
+                      ProcessEquivalence[x.state]
+                    ];
                 })
               });
             }
-          } catch (err) {} //eslint-disable-line
+          } catch (err) { } //eslint-disable-line
 
           try {
             const ports = await this.apiRequest.makeGenericRequest(
@@ -1524,7 +1535,7 @@ export class WazuhReportingCtrl {
                 })
               });
             }
-          } catch (err) {} //eslint-disable-line
+          } catch (err) { } //eslint-disable-line
 
           try {
             const netiface = await this.apiRequest.makeGenericRequest(
@@ -1542,7 +1553,7 @@ export class WazuhReportingCtrl {
                 })
               });
             }
-          } catch (err) {} //eslint-disable-line
+          } catch (err) { } //eslint-disable-line
           try {
             const netaddr = await this.apiRequest.makeGenericRequest(
               'GET',
@@ -1571,7 +1582,7 @@ export class WazuhReportingCtrl {
                 })
               });
             }
-          } catch (err) {} //eslint-disable-line
+          } catch (err) { } //eslint-disable-line
         }
 
         await this.renderHeader(section, tab, isAgents, apiId);
@@ -1582,7 +1593,7 @@ export class WazuhReportingCtrl {
         }
 
         if (!isSycollector && req.payload.time && filters) {
-          this.renderTimeRangeAndFilters(from, to, filters);
+          this.renderTimeRangeAndFilters(from, to, filters, browserTimezone);
         }
 
         if (req.payload.time || isSycollector) {
@@ -1598,6 +1609,7 @@ export class WazuhReportingCtrl {
             pattern,
             isAgents
           );
+
         }
 
         !isSycollector &&

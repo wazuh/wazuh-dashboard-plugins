@@ -26,7 +26,7 @@ import { checkGap } from './lib/check-gap';
 
 const app = uiModules.get('app/wazuh', []);
 
-app.directive('wzTable', function() {
+app.directive('wzTable', function () {
   return {
     restrict: 'E',
     scope: {
@@ -76,7 +76,7 @@ app.directive('wzTable', function() {
             $scope.keys.push(key.key);
           }
         }
-        init(true).then(() => $scope.setColResizable());
+        init(true);
       };
       $scope.exists = key => {
         const str = key.key.value || key.key;
@@ -119,9 +119,6 @@ app.directive('wzTable', function() {
           init(true)
             .then(() => {
               resizing = false;
-              if ($scope.customColumns) {
-                $scope.setColResizable();
-              }
             })
             .catch(() => (resizing = false));
         }, 150);
@@ -166,7 +163,11 @@ app.directive('wzTable', function() {
             $scope.searchTable();
             $scope.$emit('wazuhFetched', { items: $scope.items });
           }
-
+          if ($scope.customColumns) {
+            setTimeout(() => {
+              $scope.setColResizable();
+            }, 100);
+          }
           return;
         } catch (error) {
           if (
@@ -271,11 +272,6 @@ app.directive('wzTable', function() {
           errorHandler,
           skipFetching
         );
-        if ($scope.customColumns) {
-          setTimeout(() => {
-            $scope.setColResizable();
-          }, 100);
-        }
       };
       /**
        * Pagination variables and functions
@@ -293,7 +289,7 @@ app.directive('wzTable', function() {
       $scope.prevPage = () => pagination.prevPage($scope);
       $scope.nextPage = async currentPage =>
         pagination.nextPage(currentPage, $scope, errorHandler, fetch);
-      $scope.setPage = function(page = false) {
+      $scope.setPage = function (page = false) {
         $scope.currentPage = page || this.n;
         $scope.nextPage(this.n).then(() => {
           if (page) {
@@ -344,10 +340,6 @@ app.directive('wzTable', function() {
       $scope.$on('increaseLogs', (event, parameters) => {
         $scope.setPage(parseInt(parameters.lines / $scope.itemsPerPage));
       });
-
-      /*$scope.editGroupAgentConfig = (ev, group) => {
-        $rootScope.$broadcast('editXmlFile', { target: group });
-      };*/
 
       $scope.$on('$destroy', () => {
         $window.onresize = null;
@@ -495,7 +487,7 @@ app.directive('wzTable', function() {
       $scope.setColResizable = () => {
         $('#wz_table').colResizable({
           liveDrag: true,
-          minWidth: 75,
+          minWidth: 78,
           partialRefresh: true,
           draggingClass: false
         });

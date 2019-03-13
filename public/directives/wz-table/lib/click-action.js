@@ -49,8 +49,6 @@ export function clickAction(
     $location.path('/agents');
   } else if (instance.path === '/agents/groups') {
     $scope.$emit('wazuhShowGroup', { group: item });
-  } else if (instance.path === '/cluster/nodes') {
-    $scope.$emit('wazuhShowNode', { node: item });
   } else if (
     new RegExp(/^\/agents\/groups\/[a-zA-Z0-9_\-.]*\/files$/).test(
       instance.path
