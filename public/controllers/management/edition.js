@@ -168,19 +168,11 @@ export class EditionController {
       if (!this.$scope.$$phase) this.$scope.$digest();
     };
 
-    this.$scope.edit = node => {
-      this.$scope.selectedNode = node.name;
-      return this.$scope.editConf();
-    };
-
     this.$scope.changeNode = () => {
       this.$scope.editConf();
     };
 
     //listeners
-    this.$scope.$on('wazuhShowNode', (event, parameters) => {
-      return this.$scope.edit(parameters.node);
-    });
     this.$scope.$on('showRestartMsg', () => {
       this.$scope.restartMsg = true;
       this.$scope.$applyAsync();
