@@ -87,6 +87,12 @@
 # Default: true
 #wazuh.monitoring.enabled: true
 #
+# Self Kibana instance address for failover
+wazuh.monitoring.self: ''
+#
+# List of other Kibana instances addresses for failover
+wazuh.monitoring.failover: []
+#
 # Custom setting to set the frequency for wazuh-monitoring indices cron task.
 # Default: 3600 (s)
 #wazuh.monitoring.frequency: 3600

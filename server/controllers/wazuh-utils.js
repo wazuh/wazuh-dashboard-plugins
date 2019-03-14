@@ -23,7 +23,16 @@ export class WazuhUtilsCtrl {
   /**
    * Constructor
    */
-  constructor() {}
+  constructor() { }
+
+  /**
+   * Check if the Kibana instance is master node
+   * @returns {Object} node or ErrorResponse
+   */
+  async checkIfIsMaster() {
+    const configFile = getConfiguration();
+    return configFile['wazuh.monitoring.enabled'] || true;
+  }
 
   /**
    * Returns the config.yml file parsed
@@ -94,11 +103,11 @@ export class WazuhUtilsCtrl {
       );
       return lastLogs && Array.isArray(lastLogs)
         ? {
-            error: 0,
-            lastLogs: lastLogs.filter(
-              item => typeof item === 'string' && item.length
-            )
-          }
+          error: 0,
+          lastLogs: lastLogs.filter(
+            item => typeof item === 'string' && item.length
+          )
+        }
         : { error: 0, lastLogs: [] };
     } catch (error) {
       return ErrorResponse(error.message || error, 3036, 500, reply);

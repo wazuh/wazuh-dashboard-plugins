@@ -49,4 +49,13 @@ export function WazuhUtilsRoutes(server) {
       return ctrl.getAppLogs(req, res);
     }
   });
+
+    // Check if the Kibana instance is master node
+    server.route({
+      method: 'GET',
+      path: '/utils/mastercheck',
+      handler(req, res) {
+        return ctrl.checkIfIsMaster(req, res);
+      }
+    });
 }

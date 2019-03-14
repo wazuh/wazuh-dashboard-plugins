@@ -23,6 +23,7 @@ import { BuildBody } from './lib/replicas-shards-helper';
 import * as ApiHelper from './lib/api-helper';
 
 const blueWazuh = colors.blue('wazuh');
+const request = require('request');
 
 export class Monitoring {
   /**
@@ -31,7 +32,7 @@ export class Monitoring {
    */
   constructor(server, quiet = false) {
     this.server = server;
-    this.ENABLED = true;
+    this.ENABLED = 'worker';
     this.FREQUENCY = 3600;
     this.CRON_FREQ = '0 1 * * * *';
     this.CREATION = 'd';
@@ -46,16 +47,21 @@ export class Monitoring {
   /**
    * Fill the value of ENABLED, FREQUENCY and CRON_FREQ depending on the user configuration.
    */
-  initVariables() {
+  async initVariables() {
     try {
       const configFile = getConfiguration();
 
       this.ENABLED =
         configFile &&
-        typeof configFile['wazuh.monitoring.enabled'] !== 'undefined'
+          typeof configFile['wazuh.monitoring.enabled'] !== 'undefined'
           ? configFile['wazuh.monitoring.enabled'] &&
-            configFile['wazuh.monitoring.enabled'] !== 'worker'
+          configFile['wazuh.monitoring.enabled'] !== 'worker'
           : this.ENABLED;
+
+      //Clear if a failover scenario exists
+      if (this.ENABLED === true || this.ENABLED === 'true') {
+        await this.wzWrapper.cleanFailoverRole();
+      }
 
       this.FREQUENCY =
         (configFile || {})['wazuh.monitoring.frequency'] || this.FREQUENCY;
@@ -111,7 +117,7 @@ export class Monitoring {
         log(
           '[monitoring][configuration]',
           `wazuh.monitoring.pattern: ${this.index_pattern} (index prefix: ${
-            this.index_prefix
+          this.index_prefix
           })`,
           'info'
         );
@@ -120,7 +126,7 @@ export class Monitoring {
         this.server.log(
           [blueWazuh, 'monitoring', 'info'],
           `wazuh.monitoring.pattern: ${this.index_pattern} (index prefix: ${
-            this.index_prefix
+          this.index_prefix
           })`
         );
     } catch (error) {
@@ -414,13 +420,13 @@ export class Monitoring {
         log(
           '[monitoring][createIndex]',
           `Could not create ${datedIndex} index on elasticsearch due to ${error.message ||
-            error}`
+          error}`
         );
       !this.quiet &&
         this.server.log(
           [blueWazuh, 'monitoring', 'error'],
           `Could not create ${datedIndex} index on elasticsearch due to ${error.message ||
-            error}`
+          error}`
         );
     }
   }
@@ -457,13 +463,13 @@ export class Monitoring {
         log(
           '[monitoring][insertDocument]',
           `Error inserting agent data into elasticsearch. Bulk request failed due to ${error.message ||
-            error}`
+          error}`
         );
       !this.quiet &&
         this.server.log(
           [blueWazuh, 'monitoring', 'error'],
           `Error inserting agent data into elasticsearch. Bulk request failed due to ${error.message ||
-            error}`
+          error}`
         );
     }
   }
@@ -502,14 +508,14 @@ export class Monitoring {
         log(
           '[monitoring][saveStatus]',
           `Could not check if the index ${
-            this.datedIndex
+          this.datedIndex
           } exists due to ${error.message || error}`
         );
       !this.quiet &&
         this.server.log(
           [blueWazuh, 'monitoring', 'error'],
           `Could not check if the index ${
-            this.datedIndex
+          this.datedIndex
           } exists due to ${error.message || error}`
         );
     }
@@ -597,13 +603,13 @@ export class Monitoring {
         log(
           '[monitoring][checkTemplate]',
           `Something went wrong updating wazuh-monitoring template... ${error.message ||
-            error}`
+          error}`
         );
       !this.quiet &&
         this.server.log(
           [blueWazuh, 'monitoring', 'error'],
           `Something went wrong updating wazuh-monitoring template... ${error.message ||
-            error}`
+          error}`
         );
       return Promise.reject(error);
     }
@@ -761,43 +767,102 @@ export class Monitoring {
    * Task used by the cron job.
    */
   async cronTask() {
-    try {
-      const template = await this.wzWrapper.getTemplateByName('wazuh-agent');
-      const patterns =
-        ((template || {})['wazuh-agent'] || {}).index_patterns || false;
-      // Prevents to insert monitoring indices without the proper template inserted
-      if (Array.isArray(patterns)) {
-        // Discover new fields for all monitoring index patterns
-        for (const pattern of patterns) {
-          await this.wzWrapper.updateMonitoringIndexPatternKnownFields(
-            'index-pattern:' + pattern
-          );
+    if (this.ENABLED === true || this.ENABLED === 'true') {
+      try {
+        const template = await this.wzWrapper.getTemplateByName('wazuh-agent');
+        const patterns =
+          ((template || {})['wazuh-agent'] || {}).index_patterns || false;
+        // Prevents to insert monitoring indices without the proper template inserted
+        if (Array.isArray(patterns)) {
+          // Discover new fields for all monitoring index patterns
+          for (const pattern of patterns) {
+            await this.wzWrapper.updateMonitoringIndexPatternKnownFields(
+              'index-pattern:' + pattern
+            );
+          }
+          this.agentsArray = [];
+          const data = await this.getConfig();
+          await this.loadCredentials(data);
+        } else {
+          !this.quiet &&
+            log(
+              '[monitoring][cronTask]',
+              'No wazuh-agent template found, not inserting monitoring data',
+              'info'
+            );
+          !this.quiet &&
+            this.server.log(
+              [blueWazuh, 'monitoring [cronTask]', 'info'],
+              'No wazuh-agent template found, not inserting monitoring data'
+            );
         }
-        this.agentsArray = [];
-        const data = await this.getConfig();
-        await this.loadCredentials(data);
-      } else {
-        !this.quiet &&
-          log(
-            '[monitoring][cronTask]',
-            'No wazuh-agent template found, not inserting monitoring data',
-            'info'
-          );
+
+        return;
+      } catch (error) {
+        !this.quiet && log('[monitoring][cronTask]', error.message || error);
         !this.quiet &&
           this.server.log(
-            [blueWazuh, 'monitoring [cronTask]', 'info'],
-            'No wazuh-agent template found, not inserting monitoring data'
+            [blueWazuh, 'monitoring [cronTask]', 'error'],
+            error.message || error
           );
       }
-
-      return;
-    } catch (error) {
-      !this.quiet && log('[monitoring][cronTask]', error.message || error);
-      !this.quiet &&
-        this.server.log(
-          [blueWazuh, 'monitoring [cronTask]', 'error'],
-          error.message || error
-        );
+    }
+    if (this.ENABLED === 'worker' || this.MASTER_ROLE) {
+      //Check failover scenario
+      const configFile = getConfiguration();
+      const self = (configFile || {})['wazuh.monitoring.self'] || "";
+      const ips = (configFile || {})['wazuh.monitoring.failover'] || [];
+      let addresses = [];
+      let requests = ips.map((ip) => {
+        return new Promise(async (resolve) => {
+          await request(`http://${ip}:5601/utils/mastercheck`, {}, (err, res, body) => {
+            addresses.push({ ip, status: err ? false : body });
+            resolve();
+          });
+        });
+      });
+      Promise.all(requests).then(async () => {
+        if (!addresses.find(async (x) => { return (x.status === true || x.status === 'true') })) {
+          //Failover scenario
+          try {
+            const result = await this.wzWrapper.takeFailoverRole(self);
+            if (result) {
+              this.server.log(
+                [blueWazuh, 'monitoring', 'info'],
+                "Master node has failed, so the current node provisionally takes the role of master."
+              );
+            }
+            //This node takes master role
+            this.ENABLED = true;
+            this.MASTER_ROLE = true;
+          } catch (err) {
+            //Check if node with master role is alive
+            await request(`http://${self}:5601/utils/mastercheck`, {}, async (err, res, body) => {
+              if (err) {
+                //Node with master role is dead
+                await this.wzWrapper.cleanFailoverRole();
+                const result = await this.wzWrapper.takeFailoverRole(self);
+                if (result) {
+                  this.server.log(
+                    [blueWazuh, 'monitoring', 'info'],
+                    "Master node has failed, so the current node provisionally takes the role of master."
+                  );
+                }
+                //This node takes master role
+                this.ENABLED = true;
+                this.MASTER_ROLE = true;
+              }
+            });
+            this.server.log(
+              [blueWazuh, 'monitoring', 'warning'],
+              "Master node has failed, but there's already a worker's node taking the master role."
+            );
+          }
+        } else {
+          this.ENABLED = 'worker';
+          this.MASTER_ROLE = false;
+        }
+      });
     }
   }
 
@@ -809,9 +874,7 @@ export class Monitoring {
     this.checkKibanaStatus();
 
     // Run the cron job only it it's enabled
-    if (this.ENABLED) {
-      this.cronTask();
-      cron.schedule(this.CRON_FREQ, () => this.cronTask(), true);
-    }
+    this.cronTask();
+    cron.schedule(this.CRON_FREQ, () => this.cronTask(), true);
   }
 }
