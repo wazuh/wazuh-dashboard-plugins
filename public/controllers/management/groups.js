@@ -505,8 +505,12 @@ export function GroupsController(
       }
 
       if (failedIds.length) {
+        let str = '';
+        failedIds.forEach((id) => {
+          str += (id || {}).id + ': ' + ((id || {}).error || {}).message + ', ';
+        });
         errorHandler.info(
-          `Warning. Group has been updated but an error has occurred with the following agents ${failedIds}`,
+          `Warning. Group has been updated but an error has occurred with the following agents:  ${str}`,
           '',
           true
         );
@@ -537,7 +541,7 @@ export function GroupsController(
   };
 
   // Resetting the factory configuration
-  $scope.$on('$destroy', () => {});
+  $scope.$on('$destroy', () => { });
 
   $scope.$watch('lookingGroup', value => {
     $scope.availableAgents = {

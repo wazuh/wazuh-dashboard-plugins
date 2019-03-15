@@ -395,9 +395,9 @@ app.directive('wzTable', function () {
       $scope.confirmRemoveAgent = async agent => {
         try {
           const group = instance.path.split('/').pop();
-          await groupHandler.removeAgentFromGroup(group, agent);
+          const data = await groupHandler.removeAgentFromGroup(group, agent);
           errorHandler.info(
-            `Success. Agent ${agent} has been removed from ${group}`,
+            `Success. ${((data || {}).data || {}).data}`,
             ''
           );
         } catch (error) {
