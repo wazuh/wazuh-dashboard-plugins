@@ -152,7 +152,7 @@ app.directive('wzListManage', function() {
           $scope.currentList.list[key] = value ? value : '';
           fetch();
         } else {
-          errorHandler.handle('Entry already exists', '');
+          errorHandler.handle('Entry already exists');
         }
       };
 

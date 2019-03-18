@@ -239,13 +239,13 @@ export class AgentsController {
         if (failed) {
           throw new Error(result.failed_ids[0].error.message);
         } else if (result) {
-          this.errorHandler.info(result.msg, '');
+          this.errorHandler.info(result.msg);
         } else {
           throw new Error('Unexpected error upgrading agent');
         }
         this.$scope.restartingAgent = false;
       } catch (error) {
-        this.errorHandler.handle(error, '');
+        this.errorHandler.handle(error);
         this.$scope.restartingAgent = false;
       }
       this.$scope.$applyAsync();
@@ -413,7 +413,7 @@ export class AgentsController {
           );
           this.$scope.addingGroupToAgent = false;
           this.$scope.editGroup = false;
-          this.errorHandler.info(`Group ${group} has been added.`, '');
+          this.errorHandler.info(`Group ${group} has been added.`);
           if (!this.$scope.$$phase) this.$scope.$digest();
         })
         .catch(error => {
@@ -980,7 +980,7 @@ export class AgentsController {
         ''
       );
     } catch (error) {
-      this.errorHandler.handle(error, '');
+      this.errorHandler.handle(error);
     }
     return;
   }
@@ -997,7 +997,7 @@ export class AgentsController {
         ''
       );
     } catch (error) {
-      this.errorHandler.handle(error, '');
+      this.errorHandler.handle(error);
     }
     return;
   }

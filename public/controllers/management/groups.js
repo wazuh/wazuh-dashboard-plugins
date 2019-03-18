@@ -537,7 +537,7 @@ export function GroupsController(
           true
         );
       } else {
-        errorHandler.info('Success. Group has been updated', '');
+        errorHandler.info('Group has been updated');
       }
       $scope.addMultipleAgents(false);
       $scope.multipleSelectorLoading = false;
@@ -593,9 +593,9 @@ export function GroupsController(
     try {
       $scope.addingGroup = false;
       await groupHandler.createGroup(name);
-      errorHandler.info(`Success. Group ${name} has been created`, '');
+      errorHandler.info(`Group ${name} has been created`);
     } catch (error) {
-      errorHandler.handle(`${error.message || error}`, '');
+      errorHandler.handle(error.message || error);
     }
     $scope.$broadcast('wazuhSearch', {});
   };

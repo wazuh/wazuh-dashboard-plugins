@@ -397,12 +397,9 @@ app.directive('wzTable', function () {
         try {
           const group = instance.path.split('/').pop();
           const data = await groupHandler.removeAgentFromGroup(group, agent);
-          errorHandler.info(
-            `Success. ${((data || {}).data || {}).data}`,
-            ''
-          );
+          errorHandler.info(((data || {}).data || {}).data);
         } catch (error) {
-          errorHandler.handle(`${error.message || error}`, '');
+          errorHandler.handle(error.message || error);
         }
         $scope.removingAgent = null;
         return init();
@@ -411,9 +408,9 @@ app.directive('wzTable', function () {
       $scope.confirmRemoveGroup = async group => {
         try {
           await groupHandler.removeGroup(group);
-          errorHandler.info(`Success. Group ${group} has been removed`, '');
+          errorHandler.info(`Group ${group} has been removed`);
         } catch (error) {
-          errorHandler.handle(`${error.message || error}`, '');
+          errorHandler.handle(error.message || error);
         }
         $scope.removingGroup = null;
         return init();
@@ -422,9 +419,9 @@ app.directive('wzTable', function () {
       $scope.confirmRemoveFile = async (file, type) => {
         try {
           await rulesetHandler.deleteFile(file, type);
-          errorHandler.info(`Success. File ${file.file} has been deleted`, '');
+          errorHandler.info(`File ${file.file} has been deleted`);
         } catch (error) {
-          errorHandler.handle(`${error.message || error}`, '');
+          errorHandler.handle(error.message || error);
         }
         $scope.removingFile = null;
         return init();
