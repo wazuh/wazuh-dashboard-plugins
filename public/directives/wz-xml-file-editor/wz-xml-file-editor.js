@@ -210,7 +210,7 @@ app.directive('wzXmlFileEditor', function () {
           if (
             !isOk &&
             Array.isArray(data.details) && (!isConfig ||
-              (isConfig && data.details.join().includes(`etc/${isConfig}`)))
+              (isConfig && data.details.join().includes(`${isConfig}`)))
           ) {
             $scope.configError = data.details;
             $scope.$applyAsync();
@@ -251,7 +251,7 @@ app.directive('wzXmlFileEditor', function () {
               params.isNewFile && !params.isOverwrite
             );
             try {
-              await validateAfterSent(false, 'rules');
+              await validateAfterSent(false, `${params.rule.path}/${params.rule.file}`);
             } catch (err) {
               params.showRestartManager = 'warn';
             }
@@ -269,7 +269,7 @@ app.directive('wzXmlFileEditor', function () {
               params.isNewFile && !params.isOverwrite
             );
             try {
-              await validateAfterSent(false, 'decoders');
+              await validateAfterSent(false, `${params.decoder.path}/${params.decoder.file}`);
             } catch (err) {
               params.showRestartManager = 'warn';
             }
@@ -283,7 +283,7 @@ app.directive('wzXmlFileEditor', function () {
             close = false;
             await configHandler.saveNodeConfiguration(params.node, xml);
             try {
-              await validateAfterSent(params.node, 'ossec');
+              await validateAfterSent(params.node, 'etc/ossec.conf');
             } catch (err) {
               params.showRestartManager = 'warn';
             }
@@ -298,7 +298,7 @@ app.directive('wzXmlFileEditor', function () {
           } else if (params.manager) {
             await configHandler.saveManagerConfiguration(xml);
             try {
-              await validateAfterSent(false, 'ossec');
+              await validateAfterSent(false, 'etc/ossec.conf');
             } catch (err) {
               params.showRestartManager = 'warn';
             }
