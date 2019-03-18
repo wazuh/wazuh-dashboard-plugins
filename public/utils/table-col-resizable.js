@@ -71,6 +71,7 @@
           t.opt.hoverCursor +
           '!important}</style>'
       ); //if hoverCursor has been set, append the style
+    $('.JCLRgrips').remove();
     t.addClass(SIGNATURE)
       .attr(ID, id)
       .before('<div class="JCLRgrips"/>'); //the grips container object is added. Signature class forces table rendering in fixed-layout mode to prevent column's min-width
