@@ -81,6 +81,10 @@ export class AgentsPreviewController {
       this.$location.search('tab', this.submenuNavItem);
     });
 
+    this.$scope.$on('wazuhFetched', (ev, parameters) => {
+      this.$scope.showNoAgents = !parameters.items.length > 0 && !parameters.filters.length;
+    });
+
     this.init = false;
     //Load
     this.load();
