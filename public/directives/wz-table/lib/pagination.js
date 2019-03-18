@@ -20,8 +20,7 @@ export async function nextPage(currentPage, $scope, errorHandler, fetch) {
     ) {
       $scope.currentPage++;
     }
-    if ($scope.pagedItems[currentPage || $scope.currentPage] &&
-      $scope.pagedItems[currentPage || $scope.currentPage].includes(null)) {
+    if (($scope.pagedItems[currentPage || $scope.currentPage] || []).includes(null)) {
       const copy = $scope.currentPage;
       $scope.wazuh_table_loading = true;
       const currentNonNull = $scope.items.filter(item => !!item);
