@@ -20,14 +20,15 @@ export async function nextPage(currentPage, $scope, errorHandler, fetch) {
     ) {
       $scope.currentPage++;
     }
-    if ($scope.pagedItems[currentPage || $scope.currentPage].includes(null)) {
+    if ($scope.pagedItems[currentPage || $scope.currentPage] &&
+      $scope.pagedItems[currentPage || $scope.currentPage].includes(null)) {
       const copy = $scope.currentPage;
       $scope.wazuh_table_loading = true;
       const currentNonNull = $scope.items.filter(item => !!item);
       await fetch({ offset: currentNonNull.length });
       $scope.wazuh_table_loading = false;
       $scope.currentPage = copy;
-      if (!$scope.$$phase) $scope.$digest();
+      $scope.$applyAsync();
     }
   } catch (error) {
     $scope.wazuh_table_loading = false;

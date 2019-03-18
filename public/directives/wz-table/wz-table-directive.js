@@ -111,6 +111,7 @@ app.directive('wzTable', function () {
       let resizing = false;
       $window.onresize = () => {
         if (resizing) return;
+        $('#wz_table').colResizable({ disable: true });
         resizing = true;
         clearTimeout(doit);
         doit = setTimeout(() => {
