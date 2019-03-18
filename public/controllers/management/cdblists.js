@@ -67,7 +67,7 @@ export class CdbListsController {
         this.$scope.$emit('setCurrentList', { currentList: this.currentList });
       } catch (error) {
         this.currentList.list = [];
-        this.errorHandler.handle(error, '');
+        this.errorHandler.handle(error);
       }
       this.$scope.$broadcast('changeCdbList', {
         currentList: this.currentList

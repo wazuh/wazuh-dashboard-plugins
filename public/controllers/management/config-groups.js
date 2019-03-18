@@ -100,9 +100,9 @@ export class ConfigurationGroupsController {
       try {
         this.$scope.addingGroup = false;
         await this.groupHandler.createGroup(name);
-        this.errorHandler.info(`Success. Group ${name} has been created`, '');
+        this.errorHandler.info(`Group ${name} has been created`);
       } catch (error) {
-        this.errorHandler.handle(`${error.message || error}`, '');
+        this.errorHandler.handle(error.message || error);
       }
       this.$scope.$broadcast('wazuhSearch', {});
     };

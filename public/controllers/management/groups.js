@@ -477,6 +477,30 @@ export function GroupsController(
     return { addedIds, deletedIds };
   };
 
+  /**
+   * Re-group the given array depending on the property provided as parameter.
+   * @param {*} collection Array<object>
+   * @param {*} property String
+   */
+  const groupBy = (collection, property) => {
+    try {
+      const values = [];
+      const result = [];
+
+      for (const item of collection) {
+        const index = values.indexOf(item[property]);
+        if (index > -1) result[index].push(item);
+        else {
+          values.push(item[property]);
+          result.push([item]);
+        }
+      }
+      return result.length ? result : false;
+    } catch (error) {
+      return false;
+    }
+  };
+
   $scope.saveAddAgents = async () => {
     const itemsToSave = getItemsToSave();
     const failedIds = [];
@@ -505,13 +529,20 @@ export function GroupsController(
       }
 
       if (failedIds.length) {
+        const failedErrors = failedIds.map(item => ({
+          id: (item || {}).id,
+          message: ((item || {}).error || {}).message
+        }));
+        $scope.failedErrors = groupBy(failedErrors, 'message') || false;
         errorHandler.info(
-          `Warning. Group has been updated but an error has occurred with the following agents ${failedIds}`,
+          `Group has been updated but an error has occurred with ${
+            failedIds.length
+          } agents`,
           '',
           true
         );
       } else {
-        errorHandler.info('Success. Group has been updated', '');
+        errorHandler.info('Group has been updated');
       }
       $scope.addMultipleAgents(false);
       $scope.multipleSelectorLoading = false;
@@ -567,9 +598,9 @@ export function GroupsController(
     try {
       $scope.addingGroup = false;
       await groupHandler.createGroup(name);
-      errorHandler.info(`Success. Group ${name} has been created`, '');
+      errorHandler.info(`Group ${name} has been created`);
     } catch (error) {
-      errorHandler.handle(`${error.message || error}`, '');
+      errorHandler.handle(error.message || error);
     }
     $scope.$broadcast('wazuhSearch', {});
   };
