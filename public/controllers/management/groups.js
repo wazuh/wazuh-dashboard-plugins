@@ -532,7 +532,7 @@ export function GroupsController(
         const failedErrors = failedIds.map(item => ({ id: (item || {}).id, message: ((item || {}).error || {}).message }));
         $scope.failedErrors = groupBy(failedErrors, 'message') || false;
         errorHandler.info(
-          `Warning. Group has been updated but an error has occurred with some agents`,
+          `Group has been updated but an error has occurred with ${failedIds.length} agents`,
           '',
           true
         );
