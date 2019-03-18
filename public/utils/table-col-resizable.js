@@ -16,13 +16,13 @@
 
 */
 
-(function (global, factory) {
+(function(global, factory) {
   typeof exports === 'object' && typeof module !== 'undefined'
     ? (module.exports = factory())
     : typeof define === 'function' && define.amd
-      ? define(factory)
-      : (global.CodeMirror = factory());
-})(this, function () {
+    ? define(factory)
+    : (global.CodeMirror = factory());
+})(this, function() {
   'use strict';
 
   var d = $(document); //window object
@@ -44,7 +44,7 @@
   var S;
   try {
     S = sessionStorage;
-  } catch (e) { } //Firefox crashes when executed as local file system
+  } catch (e) {} //Firefox crashes when executed as local file system
 
   //append required CSS rules
   h.append(
@@ -56,7 +56,7 @@
    * @param {DOM node} tb - reference to the DOM table object to be enhanced
    * @param {Object} options	- some customization values
    */
-  var init = function (tb, options) {
+  var init = function(tb, options) {
     var t = $(tb); //the table object is wrapped
     t.opt = options; //each table has its own options available at anytime
     t.mode = options.resizeMode; //shortcuts
@@ -68,10 +68,10 @@
     if (t.opt.hoverCursor !== 'e-resize')
       h.append(
         "<style type='text/css'>.JCLRgrip .JColResizer:hover{cursor:" +
-        t.opt.hoverCursor +
-        '!important}</style>'
+          t.opt.hoverCursor +
+          '!important}</style>'
       ); //if hoverCursor has been set, append the style
-    $(".JCLRgrips").remove();
+    $('.JCLRgrips').remove();
     t.addClass(SIGNATURE)
       .attr(ID, id)
       .before('<div class="JCLRgrips"/>'); //the grips container object is added. Signature class forces table rendering in fixed-layout mode to prevent column's min-width
@@ -103,7 +103,7 @@
    * This function allows to remove any enhancements performed by this plugin on a previously processed table.
    * @param {jQuery ref} t - table object
    */
-  var destroy = function (t) {
+  var destroy = function(t) {
     var id = t.attr(ID),
       t = tables[id]; //its table object is found
     if (!t || !t.is('table')) return; //if none, then it wasn't processed
@@ -115,7 +115,7 @@
    * Function to create all the grips associated with the table given by parameters
    * @param {jQuery ref} t - table object
    */
-  var createGrips = function (t) {
+  var createGrips = function(t) {
     var th = t.find('>thead>tr:first>th,>thead>tr:first>td'); //table headers are obtained
     if (!th.length)
       th = t.find(
@@ -125,7 +125,7 @@
     t.cg = t.find('col'); //a table can also contain a colgroup with col elements
     t.ln = th.length; //table length is stored
     if (t.p && S && S[t.id]) memento(t, th); //if 'postbackSafe' is enabled and there is data for the current table, its coloumn layout is restored
-    th.each(function (i) {
+    th.each(function(i) {
       //iterate through the table column headers
       var c = $(this); //jquery wrap for the current column
       var dc = t.dc.indexOf(i) != -1; //is this a disabled column?
@@ -164,7 +164,7 @@
     t.find('td, th')
       .not(th)
       .not('table th, table td')
-      .each(function () {
+      .each(function() {
         $(this).removeAttr('width'); //the width attribute is removed from all table cells which are not nested in other tables and dont belong to the header
       });
     if (!t.f) {
@@ -181,7 +181,7 @@
    * @param {jQuery ref} t - table object
    * @param {jQuery ref} th - reference to the first row elements (only set in deserialization)
    */
-  var memento = function (t, th) {
+  var memento = function(t, th) {
     var w,
       m = 0,
       i = 0,
@@ -230,7 +230,7 @@
    * Function that places each grip in the correct position according to the current table layout
    * @param {jQuery ref} t - table object
    */
-  var syncGrips = function (t) {
+  var syncGrips = function(t) {
     t.gc.width(t.w); //the grip's container width is updated
     for (var i = 0; i < t.ln; i++) {
       //for each column
@@ -258,7 +258,7 @@
    * @param {number} i - index of the grip being dragged
    * @param {bool} isOver - to identify when the function is being called from the onGripDragOver event
    */
-  var syncCols = function (t, i, isOver) {
+  var syncCols = function(t, i, isOver) {
     var inc = drag.x - drag.l,
       c = t.c[i],
       c2 = t.c[i + 1];
@@ -286,13 +286,13 @@
    * of max-width).
    * @param {jQuery ref} t - table object
    */
-  var applyBounds = function (t) {
-    var w = $.map(t.c, function (c) {
+  var applyBounds = function(t) {
+    var w = $.map(t.c, function(c) {
       //obtain real widths
       return c.width();
     });
     t.width((t.w = t.width())).removeClass(FLEX); //prevent table width changes
-    $.each(t.c, function (i, c) {
+    $.each(t.c, function(i, c) {
       c.width(w[i]).w = w[i]; //set column widths applying bounds (table's max-width)
     });
     t.addClass(FLEX); //allow table width changes
@@ -302,7 +302,7 @@
    * Event handler used while dragging a grip. It checks if the next grip's position is valid and updates it.
    * @param {event} e - mousemove event binded to the window object
    */
-  var onGripDrag = function (e) {
+  var onGripDrag = function(e) {
     if (!drag) return;
     var t = drag.t; //table object reference
     var oe = e.originalEvent.touches;
@@ -353,7 +353,7 @@
    * Event handler fired when the dragging is over, updating table layout
    * @param {event} e - grip's drag over event
    */
-  var onGripDragOver = function (e) {
+  var onGripDragOver = function(e) {
     d.unbind('touchend.' + SIGNATURE + ' mouseup.' + SIGNATURE).unbind(
       'touchmove.' + SIGNATURE + ' mousemove.' + SIGNATURE
     );
@@ -388,7 +388,7 @@
    * and store some values used while dragging.
    * @param {event} e - grip's mousedown event
    */
-  var onGripMouseDown = function (e) {
+  var onGripMouseDown = function(e) {
     var o = $(this).data(SIGNATURE); //retrieve grip's data
     var t = tables[o.t],
       g = t.g[o.i]; //shortcuts for the table and grip objects
@@ -403,8 +403,8 @@
     ).bind('touchend.' + SIGNATURE + ' mouseup.' + SIGNATURE, onGripDragOver); //mousemove and mouseup events are bound
     h.append(
       "<style type='text/css'>*{cursor:" +
-      t.opt.dragCursor +
-      '!important}</style>'
+        t.opt.dragCursor +
+        '!important}</style>'
     ); //change the mouse cursor
     g.addClass(t.opt.draggingClass); //add the dragging class (to allow some visual feedback)
     drag = g; //the current grip is stored as the current dragging object
@@ -421,7 +421,7 @@
    * Event handler fired when the browser is resized. The main purpose of this function is to update
    * table layout according to the browser's size synchronizing related grips
    */
-  var onResize = function () {
+  var onResize = function() {
     for (var t in tables) {
       if (tables.hasOwnProperty(t)) {
         t = tables[t];
@@ -463,7 +463,7 @@
    * @param {Object} options -  an object that holds some basic customization values
    */
   $.fn.extend({
-    colResizable: function (options) {
+    colResizable: function(options) {
       var defaults = {
         //attributes:
 
@@ -503,7 +503,7 @@
           break;
       }
 
-      return this.each(function () {
+      return this.each(function() {
         init(this, options);
       });
     }

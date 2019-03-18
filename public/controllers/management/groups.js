@@ -529,10 +529,15 @@ export function GroupsController(
       }
 
       if (failedIds.length) {
-        const failedErrors = failedIds.map(item => ({ id: (item || {}).id, message: ((item || {}).error || {}).message }));
+        const failedErrors = failedIds.map(item => ({
+          id: (item || {}).id,
+          message: ((item || {}).error || {}).message
+        }));
         $scope.failedErrors = groupBy(failedErrors, 'message') || false;
         errorHandler.info(
-          `Group has been updated but an error has occurred with ${failedIds.length} agents`,
+          `Group has been updated but an error has occurred with ${
+            failedIds.length
+          } agents`,
           '',
           true
         );
@@ -563,7 +568,7 @@ export function GroupsController(
   };
 
   // Resetting the factory configuration
-  $scope.$on('$destroy', () => { });
+  $scope.$on('$destroy', () => {});
 
   $scope.$watch('lookingGroup', value => {
     $scope.availableAgents = {
