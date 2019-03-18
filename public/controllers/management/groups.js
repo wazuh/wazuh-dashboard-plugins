@@ -477,6 +477,21 @@ export function GroupsController(
     return { addedIds, deletedIds };
   };
 
+  const groupBy = (collection, property) => {
+    const values = [];
+    const result = [];
+
+    for (const item of collection) {
+      const index = values.indexOf(item[property]);
+      if (index > -1) result[index].push(item);
+      else {
+        values.push(item[property]);
+        result.push([item]);
+      }
+    }
+    return result;
+  };
+
   $scope.saveAddAgents = async () => {
     const itemsToSave = getItemsToSave();
     const failedIds = [];
@@ -505,12 +520,14 @@ export function GroupsController(
       }
 
       if (failedIds.length) {
-        let str = '';
+        let failedErrors = [];
         failedIds.forEach((id) => {
-          str += (id || {}).id + ': ' + ((id || {}).error || {}).message + ', ';
+          failedErrors.push({ id: (id || {}).id, message: ((id || {}).error || {}).message });
         });
+        const groupedFailedIds = groupBy(failedErrors, 'message');
+        $scope.failedErrors = groupedFailedIds;
         errorHandler.info(
-          `Warning. Group has been updated but an error has occurred with the following agents:  ${str}`,
+          `Warning. Group has been updated but an error has occurred with some agents`,
           '',
           true
         );
