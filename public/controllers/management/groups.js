@@ -477,19 +477,28 @@ export function GroupsController(
     return { addedIds, deletedIds };
   };
 
+  /**
+   * Re-group the given array depending on the property provided as parameter.
+   * @param {*} collection Array<object>
+   * @param {*} property String
+   */
   const groupBy = (collection, property) => {
-    const values = [];
-    const result = [];
+    try {
+      const values = [];
+      const result = [];
 
-    for (const item of collection) {
-      const index = values.indexOf(item[property]);
-      if (index > -1) result[index].push(item);
-      else {
-        values.push(item[property]);
-        result.push([item]);
+      for (const item of collection) {
+        const index = values.indexOf(item[property]);
+        if (index > -1) result[index].push(item);
+        else {
+          values.push(item[property]);
+          result.push([item]);
+        }
       }
+      return result.length ? result : false;
+    } catch (error) {
+      return false;
     }
-    return result;
   };
 
   $scope.saveAddAgents = async () => {
@@ -520,12 +529,8 @@ export function GroupsController(
       }
 
       if (failedIds.length) {
-        let failedErrors = [];
-        failedIds.forEach((id) => {
-          failedErrors.push({ id: (id || {}).id, message: ((id || {}).error || {}).message });
-        });
-        const groupedFailedIds = groupBy(failedErrors, 'message');
-        $scope.failedErrors = groupedFailedIds;
+        const failedErrors = failedIds.map(item => ({ id: (item || {}).id, message: ((item || {}).error || {}).message }));
+        $scope.failedErrors = groupBy(failedErrors, 'message') || false;
         errorHandler.info(
           `Warning. Group has been updated but an error has occurred with some agents`,
           '',
