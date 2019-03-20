@@ -218,7 +218,7 @@ export class ConfigurationRulesetController {
         this.$scope.viewingDetail = true;
       } catch (error) {
         this.$scope.currentList.list = [];
-        this.errorHandler.handle(error, '');
+        this.errorHandler.handle(error);
       }
       this.$scope.$broadcast('changeCdbList', {
         currentList: this.$scope.currentList

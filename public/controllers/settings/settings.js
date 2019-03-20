@@ -75,7 +75,14 @@ export class SettingsController {
 
     // Tab names
     this.tabNames = TabNames;
+
     this.configuration = wazuhConfig.getConfig();
+    for (const key in this.configuration) {
+      if (key.includes('extension')) {
+        delete this.configuration[key];
+      }
+    }
+
     this.configurationTypes = [];
     for (const key in this.configuration) {
       this.configurationTypes[key] = typeof this.configuration[key];
