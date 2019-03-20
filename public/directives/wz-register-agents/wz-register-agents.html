@@ -52,7 +52,7 @@
             <div class="tutorial-body">
                 <p class="tutorial-exit">Please execute the following command:</p>
                 <div class="wz-code-viewer">{{registerObj.systems[0].steps[1].code}}</div>
-                <md-button class="wz-button btn height-40 next-btn" ng-click="nextStep('linux')"><i class="fa fa-success"></i>
+                <md-button class="wz-button btn height-40 next-btn" ng-click="nextStep()"><i class="fa fa-success"></i>
                     Next
                 </md-button>
             </div>
@@ -80,7 +80,7 @@
                     # sed -i 's/MANAGER_IP/{{registerObj.systems[0].steps[2].managerIp}}/g' /var/ossec/etc/ossec.conf
                 </div>
                 <md-button ng-show="registerObj.systems[0].steps[2].managerIp" class="wz-button btn height-40 next-btn"
-                    ng-click="nextStep('linux')"><i class="fa fa-success"></i> Next
+                    ng-click="nextStep()"><i class="fa fa-success"></i> Next
                 </md-button>
             </div>
         </div>
@@ -148,7 +148,7 @@
                 </div>
                 <md-button ng-show="registerObj.systems[1].steps[0].agentName && registerObj.systems[1].steps[0].managerIP &&
                 registerObj.systems[1].steps[0].authdIP"
-                    class="wz-button btn height-40 next-btn" ng-click="nextStep('windows')"><i class="fa fa-success"></i>
+                    class="wz-button btn height-40 next-btn" ng-click="nextStep()"><i class="fa fa-success"></i>
                     Next
                 </md-button>
             </div>

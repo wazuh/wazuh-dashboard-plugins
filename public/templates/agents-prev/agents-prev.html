@@ -86,20 +86,21 @@
     </div>
     <div class="col-md-12 wz-margin-bottom-25" ng-show="!wazuh_table_loading && (showNoAgents || registerNewAgent)">
         <div id="content" layout="row" class="wz-padding-bottom-14" ng-show="registerNewAgent">
-            <md-button class="md-icon-button md-icon-button-back wz-padding-right-16 btn btn-info" aria-label="Back to list"
-                tooltip="Back" tooltip-placement="bottom" ng-click="ctrl.registerNewAgent(false)"><i class="fa fa-fw fa-arrow-left"
+            <md-button class="md-icon-button" style="margin: 5px!important;" aria-label="Back to list" tooltip="Back"
+                tooltip-placement="bottom" ng-click="ctrl.registerNewAgent(false)"><i class="fa fa-fw fa-arrow-left"
                     aria-hidden="true"></i></md-button>
-            <span class="font-size-18 wz-padding-top-10"> Register new agent</span>
+            <h1 class="font-size-18 wz-margin-top-16"> Register new agent</h1>
         </div>
-        <div ng-class="registerNewAgent ? ['wz-md-card', 'md-padding'] : ''">
-            <wz-register-agents></wz-register-agents>
+        <div ng-if="adminMode" ng-class="registerNewAgent ? ['registerNewAgent', 'md-padding-h'] : ''">
+            <wz-register-agents reload="ctrl.reloadList()"></wz-register-agents>
         </div>
     </div>
     <div ng-show="!wazuh_table_loading && showNoAgents && !registerNewAgent">
-        <div class="md-padding text-center">
-            <a target="_blank" ng-href="https://documentation.wazuh.com/current/user-manual/registering/index.html">Or
-                take a look at the other methods of registering agents in our documentation <i class="fa fa-info-circle"
-                    aria-hidden="true"></i></a>
+        <div class="md-padding text-center wz-margin-top-10">
+            <a target="_blank" ng-href="https://documentation.wazuh.com/current/user-manual/registering/index.html">
+                <span ng-if="adminMode">Or take a look at the other methods of registering agents in our documentation</span>
+                <span ng-if="!adminMode">Take a look at how you can register agents in our documentation</span>
+                <i class="fa fa-info-circle" aria-hidden="true"></i></a>
         </div>
     </div>
 </div>

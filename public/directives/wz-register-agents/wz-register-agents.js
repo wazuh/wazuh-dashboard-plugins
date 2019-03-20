@@ -1,5 +1,5 @@
 /*
- * Wazuh app - Wazuh XML file editor
+ * Wazuh app - Wazuh register agents
  * Copyright (C) 2015-2019 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -21,15 +21,19 @@ class WzRegisterAgents {
    */
   constructor() {
     this.template = template;
+    this.restrict = 'E';
+    this.scope = {
+      reload: '&'
+    };
   }
   controller(
     $scope,
-    $document,
-    $location,
-    appState,
+    wazuhConfig,
     errorHandler,
     apiReq
   ) {
+    const configuration = wazuhConfig.getConfig();
+    $scope.adminMode = !!(configuration || {}).admin;
     const load = async () => {
       $scope.registerObj = {
         selectedSystem: 0,
@@ -67,9 +71,14 @@ class WzRegisterAgents {
     };
     load();
 
-    $scope.nextStep = (type) => {
-      type === 'linux' ?
-        $scope.registerObj.currentStep++ : $scope.registerObj.windows.currentStep++;
+    $scope.nextStep = () => {
+      $scope.registerObj.currentStep++;
+      if ($scope.registerObj.currentStep >= $scope.registerObj.systems[$scope.registerObj.selectedSystem].steps.length) {
+        $scope.restartingAgent = false;
+        $scope.reload();
+        load();
+      }
+      $scope.$applyAsync();
     }
     $scope.addAgent = async () => {
       try {
@@ -82,15 +91,14 @@ class WzRegisterAgents {
           throw new Error("No agent key received");
         } else {
           $scope.registerObj.systems[$scope.registerObj.selectedSystem].steps[1].key = data.data.data.key;
-          $scope.registerObj.systems[$scope.registerObj.selectedSystem].steps[1].systems[$scope.registerObj.selectedSystem].code += data.data.data.key;
+          $scope.registerObj.systems[$scope.registerObj.selectedSystem].steps[1].code += data.data.data.key;
           $scope.registerObj.systems[$scope.registerObj.selectedSystem].steps[3].id = data.data.data.id;
         }
         $scope.addingAgent = false;
-        $scope.nextStep('linux');
-        $scope.$applyAsync();
+        $scope.nextStep();
       } catch (error) {
         $scope.addingAgent = false;
-        errorHandler.handle(error, 'Adding agent error.');
+        errorHandler.handle(error, 'Adding agent error');
       }
       return;
     }
@@ -108,13 +116,7 @@ class WzRegisterAgents {
           throw new Error('Unexpected error restarting agent');
         }
         errorHandler.info(`Success. Agent ${$scope.registerObj.systems[$scope.registerObj.selectedSystem].steps[0].agentName} has been registered.`);
-        $scope.restartingAgent = false;
-        $scope.$broadcast('wazuhSearch', { term: '' });
-        if (($scope.$parent || {}).registerNewAgent) {
-          $scope.$parent.registerNewAgent = false;
-        }
-        $scope.$applyAsync();
-        load();
+        $scope.nextStep();
       } catch (error) {
         errorHandler.handle(error, '');
         $scope.restartingAgent = false;
@@ -123,6 +125,8 @@ class WzRegisterAgents {
     };
 
     $scope.setSystem = (system) => {
+      $scope.registerObj.currentStep = 0;
+      load();
       $scope.registerObj.selectedSystemTab = system;
       switch (system) {
         case 'linux':
