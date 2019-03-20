@@ -29,3 +29,5 @@ import './wz-multiple-selector/wz-multiple-selector';
 import './wz-multiple-selector/wz-multiple-selector.less';
 import './wz-list-manage/wz-list-manage';
 import './wz-kbn-switch/wz-kbn-switch';
+import './wz-register-agents/wz-register-agents';
+import './wz-register-agents/wz-register-agents.less';

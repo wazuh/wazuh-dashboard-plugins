@@ -33,7 +33,8 @@ export class AgentsPreviewController {
     csvReq,
     shareAgent,
     wzTableFilter,
-    commonData
+    commonData,
+    wazuhConfig
   ) {
     this.$scope = $scope;
     this.genericReq = genericReq;
@@ -44,6 +45,7 @@ export class AgentsPreviewController {
     this.shareAgent = shareAgent;
     this.wzTableFilter = wzTableFilter;
     this.commonData = commonData;
+    this.wazuhConfig = wazuhConfig;
   }
 
   /**
@@ -79,6 +81,11 @@ export class AgentsPreviewController {
     // Watcher for URL params
     this.$scope.$watch('submenuNavItem', () => {
       this.$location.search('tab', this.submenuNavItem);
+    });
+
+    this.$scope.$on('wazuhFetched', (ev, parameters) => {
+      this.$scope.showNoAgents =
+        !parameters.items.length > 0 && !parameters.filters.length;
     });
 
     this.init = false;
@@ -135,6 +142,9 @@ export class AgentsPreviewController {
    */
   async load() {
     try {
+      const configuration = this.wazuhConfig.getConfig();
+      this.$scope.adminMode = !!(configuration || {}).admin;
+
       const api = JSON.parse(this.appState.getCurrentAPI()).id;
       const clusterInfo = this.appState.getClusterInfo();
       const firstUrlParam =
@@ -210,6 +220,10 @@ export class AgentsPreviewController {
       this.errorHandler.handle(error, 'Agents Preview');
     }
     return;
+  }
+
+  registerNewAgent(flag) {
+    this.$scope.registerNewAgent = flag;
   }
 
   reloadList() {

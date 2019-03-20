@@ -1,0 +1,221 @@
+<div class="tutorial">
+    <md-nav-bar class="wz-nav-bar nav-bar-white-bg tutorial-nav-bar" md-selected-nav-item="registerObj.selectedSystemTab"
+        nav-bar-aria-label="System" class="wz-margin-bottom-25">
+        <md-nav-item class="wz-nav-item" md-nav-click="setSystem('linux')" name="linux"><i class="fa fa-linux"></i>
+            Linux</md-nav-item>
+        <md-nav-item class="wz-nav-item" md-nav-click="setSystem('windows')" name="windows"><i class="fa fa-windows"></i>
+            Windows</md-nav-item>
+        <md-nav-item class="wz-nav-item" md-nav-click="setSystem('osx')" name="osx"><i class="fa fa-apple"></i>
+            OSX</md-nav-item>
+    </md-nav-bar>
+    <!-- Linux -->
+    <div ng-if="registerObj.selectedSystem === 0">
+        <div class="tutorial-step" ng-class="{'active' : registerObj.currentStep === 0, 'completed' : registerObj.currentStep > 0 }">
+            <div layout="row" class="tutorial-header">
+                <div class="step-number">
+                    <p>1</p>
+                </div>
+                <h3 class="step-title">{{registerObj.systems[0].steps[0].title}}</h3>
+            </div>
+            <div class="tutorial-body">
+                <div layout="row">
+                    <div class="wz-padding-right-16">
+                        <label class="euiFormLabel">Agent name</label>
+                        <div class="euiFormControlLayout wz-margin-top-4">
+                            <div class="euiFormControlLayout__childrenWrapper">
+                                <input type="text" class="euiFieldText" aria-label="default columns" ng-model="registerObj.systems[0].steps[0].agentName">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="wz-padding-right-16">
+                        <label class="euiFormLabel">Agent IP</label>
+                        <div class="euiFormControlLayout wz-margin-top-4">
+                            <div class="euiFormControlLayout__childrenWrapper">
+                                <input type="text" class="euiFieldText" aria-label="default columns" ng-model="registerObj.systems[0].steps[0].agentIP">
+                            </div>
+                        </div>
+                    </div>
+                    <md-button ng-disabled="!registerObj.systems[0].steps[0].agentName || !registerObj.systems[0].steps[0].agentIP || addingAgent"
+                        class="wz-button btn height-40" ng-click="addAgent()"><i class="fa fa-plus" ng-class="addingAgent ? 'fa-spin fa-spinner' : ''"></i>
+                        Add agent
+                    </md-button>
+                </div>
+            </div>
+        </div>
+        <div class="tutorial-step" ng-class="{'active' : registerObj.currentStep === 1, 'completed' : registerObj.currentStep > 1, 'disabled' : registerObj.currentStep < 1 }">
+            <div layout="row" class="tutorial-header">
+                <div class="step-number">
+                    <p>2</p>
+                </div>
+                <h3 class="step-title">{{registerObj.systems[0].steps[1].title}}</h3>
+            </div>
+            <div class="tutorial-body">
+                <p class="tutorial-exit">Please execute the following command:</p>
+                <div class="wz-code-viewer">{{registerObj.systems[0].steps[1].code}}</div>
+                <md-button class="wz-button btn height-40 next-btn" ng-click="nextStep()"><i class="fa fa-success"></i>
+                    Next
+                </md-button>
+            </div>
+        </div>
+        <div class="tutorial-step" ng-class="{'active' : registerObj.currentStep === 2, 'completed' : registerObj.currentStep > 2, 'disabled' : registerObj.currentStep < 2 }">
+            <div layout="row" class="tutorial-header">
+                <div class="step-number">
+                    <p>3</p>
+                </div>
+                <h3 class="step-title">{{registerObj.systems[0].steps[2].title}}</h3>
+            </div>
+            <div class="tutorial-body">
+                <div class="wz-margin-bottom-10">
+                    <label class="euiFormLabel">Manager IP</label>
+                    <div class="euiFormControlLayout wz-margin-top-4">
+                        <div class="euiFormControlLayout__childrenWrapper">
+                            <input type="text" class="euiFieldText" aria-label="default columns" ng-model="registerObj.systems[0].steps[2].managerIp">
+                        </div>
+                    </div>
+                </div>
+                <p class="tutorial-exit" ng-show="registerObj.systems[0].steps[2].managerIp">Please execute the
+                    following
+                    command:</p>
+                <div ng-show="registerObj.systems[0].steps[2].managerIp" class="wz-code-viewer">
+                    sed -i 's/MANAGER_IP/{{registerObj.systems[0].steps[2].managerIp}}/g' /var/ossec/etc/ossec.conf
+                </div>
+                <md-button ng-show="registerObj.systems[0].steps[2].managerIp" class="wz-button btn height-40 next-btn"
+                    ng-click="nextStep()"><i class="fa fa-success"></i> Next
+                </md-button>
+            </div>
+        </div>
+        <div class="tutorial-step" ng-class="{'active' : registerObj.currentStep === 3, 'completed' : registerObj.currentStep > 3, 'disabled' : registerObj.currentStep < 3 }">
+            <div layout="row" class="tutorial-header">
+                <div class="step-number">
+                    <p>4</p>
+                </div>
+                <h3 class="step-title">{{registerObj.systems[0].steps[3].title}}</h3>
+            </div>
+            <div class="tutorial-body">
+                <md-button class="wz-button wz-no-margin height-40" ng-click="restartAgent()"><i class="fa fa-refresh"
+                        ng-class="restartingAgent ? 'fa-spin fa-spinner' : ''"></i>
+                    Restart agent
+                </md-button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Windows -->
+    <div ng-if="registerObj.selectedSystem === 1">
+        <div class="tutorial-step" ng-class="{'active' : registerObj.currentStep === 0, 'completed' : registerObj.currentStep > 0, 'disabled' : registerObj.currentStep < 0 }">
+            <div layout="row" class="tutorial-header">
+                <div class="step-number">
+                    <p>1</p>
+                </div>
+                <h3 class="step-title">{{registerObj.systems[1].steps[0].title}}</h3>
+            </div>
+            <div class="tutorial-body">
+                <div layout="row" class="wz-margin-bottom-10">
+                    <div class="wz-padding-right-16">
+                        <label class="euiFormLabel">Agent name</label>
+                        <div class="euiFormControlLayout wz-margin-top-4">
+                            <div class="euiFormControlLayout__childrenWrapper">
+                                <input type="text" class="euiFieldText" aria-label="default columns" ng-model="registerObj.systems[1].steps[0].agentName">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="wz-padding-right-16">
+                        <label class="euiFormLabel">Manager IP</label>
+                        <div class="euiFormControlLayout wz-margin-top-4">
+                            <div class="euiFormControlLayout__childrenWrapper">
+                                <input type="text" class="euiFieldText" aria-label="default columns" ng-model="registerObj.systems[1].steps[0].managerIP">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="wz-padding-right-16">
+                        <label class="euiFormLabel">Authd service IP</label>
+                        <div class="euiFormControlLayout wz-margin-top-4">
+                            <div class="euiFormControlLayout__childrenWrapper">
+                                <input type="text" class="euiFieldText" aria-label="default columns" ng-model="registerObj.systems[1].steps[0].authdIP">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <p class="tutorial-exit" ng-show="registerObj.systems[1].steps[0].agentName && registerObj.systems[1].steps[0].managerIP &&
+                registerObj.systems[1].steps[0].authdIP">Please
+                    execute the following command:</p>
+                <div ng-show="registerObj.systems[1].steps[0].agentName && registerObj.systems[1].steps[0].managerIP &&
+                registerObj.systems[1].steps[0].authdIP"
+                    class="wz-code-viewer">
+                    wazuh-agent-3.8.2-1.msi /q ADDRESS="{{registerObj.systems[1].steps[0].managerIP}}"
+                    AUTHD_SERVER="{{registerObj.systems[1].steps[0].authdIP}}"
+                    AGENT_NAME="{{registerObj.systems[1].steps[0].agentName}}"
+                </div>
+                <md-button ng-show="registerObj.systems[1].steps[0].agentName && registerObj.systems[1].steps[0].managerIP &&
+                registerObj.systems[1].steps[0].authdIP"
+                    class="wz-button btn height-40 next-btn" ng-click="nextStep()"><i class="fa fa-success"></i>
+                    Next
+                </md-button>
+            </div>
+        </div>
+    </div>
+
+    <!-- OSX -->
+    <div ng-if="registerObj.selectedSystem === 2">
+        <div class="tutorial-step" ng-class="{'active' : registerObj.currentStep === 0, 'completed' : registerObj.currentStep > 0, 'disabled' : registerObj.currentStep < 0 }">
+            <div layout="row" class="tutorial-header">
+                <div class="step-number">
+                    <p>1</p>
+                </div>
+                <h3 class="step-title">{{registerObj.systems[2].steps[0].title}}</h3>
+            </div>
+            <div class="tutorial-body">
+                <div class="wz-margin-bottom-10">
+                    <label class="euiFormLabel">Manager IP</label>
+                    <div class="euiFormControlLayout wz-margin-top-4">
+                        <div class="euiFormControlLayout__childrenWrapper">
+                            <input type="text" class="euiFieldText" aria-label="default columns" ng-model="registerObj.systems[2].steps[0].managerIp">
+                        </div>
+                    </div>
+                </div>
+                <p class="tutorial-exit" ng-show="registerObj.systems[2].steps[0].managerIp">Please execute the
+                    following
+                    command:</p>
+                <div ng-show="registerObj.systems[2].steps[0].managerIp" class="wz-code-viewer">
+                    /Library/Ossec/bin/agent-auth -m {{registerObj.systems[2].steps[0].managerIp}}
+                </div>
+                <md-button ng-show="registerObj.systems[2].steps[0].managerIp" class="wz-button btn height-40 next-btn"
+                    ng-click="nextStep()"><i class="fa fa-success"></i> Next
+                </md-button>
+            </div>
+        </div>
+        <div class="tutorial-step" ng-class="{'active' : registerObj.currentStep === 1, 'completed' : registerObj.currentStep > 1, 'disabled' : registerObj.currentStep < 1 }">
+            <div layout="row" class="tutorial-header">
+                <div class="step-number">
+                    <p>2</p>
+                </div>
+                <h3 class="step-title">{{registerObj.systems[2].steps[1].title}}</h3>
+            </div>
+            <div class="tutorial-body">
+                <p class="tutorial-exit">Please execute the following command:</p>
+                <div class="wz-code-viewer">sed -i '' -e 's/MANAGER_IP/{{registerObj.systems[2].steps[0].managerIp}}/g'
+                    /Library/Ossec/etc/ossec.conf</div>
+                <md-button class="wz-button btn height-40 next-btn" ng-click="nextStep()"><i class="fa fa-success"></i>
+                    Next
+                </md-button>
+            </div>
+        </div>
+        <div class="tutorial-step" ng-class="{'active' : registerObj.currentStep === 2, 'completed' : registerObj.currentStep > 2, 'disabled' : registerObj.currentStep < 2 }">
+            <div layout="row" class="tutorial-header">
+                <div class="step-number">
+                    <p>3</p>
+                </div>
+                <h3 class="step-title">{{registerObj.systems[2].steps[2].title}}</h3>
+            </div>
+            <div class="tutorial-body">
+                <p class="tutorial-exit">Please execute the following command:</p>
+                <div class="wz-code-viewer">
+                    {{registerObj.systems[2].steps[2].code}}
+                </div>
+                <md-button class="wz-button btn height-40 next-btn" ng-click="nextStep()"><i class="fa fa-success"></i>
+                    Next
+                </md-button>
+            </div>
+        </div>
+    </div>
+</div>
