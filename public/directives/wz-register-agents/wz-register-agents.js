@@ -36,14 +36,14 @@ class WzRegisterAgents {
         currentStep: 0,
         systems: [
           {
-            /* linux */
+            /* Linux */
             steps: [
               {
                 title: 'Add the agent to the manager'
               },
               {
                 title: 'Import the key to the agent',
-                code: '# /var/ossec/bin/manage_agents -i '
+                code: '/var/ossec/bin/manage_agents -i '
               },
               {
                 title:
@@ -55,10 +55,26 @@ class WzRegisterAgents {
             ]
           },
           {
-            /* windows */
+            /* Windows */
             steps: [
               {
                 title: 'Register the agent'
+              }
+            ]
+          },
+          {
+            /* OSX */
+            steps: [
+              {
+                title: 'Register the agent'
+              },
+              {
+                title:
+                  'Edit the Wazuh agent configuration to add the Wazuh manager IP'
+              },
+              {
+                title: 'Restart the agent',
+                code: '/Library/Ossec/bin/ossec-control restart'
               }
             ]
           }
@@ -110,6 +126,7 @@ class WzRegisterAgents {
         $scope.addingAgent = false;
         errorHandler.handle(error, 'Adding agent error');
       }
+      $scope.$applyAsync();
       return;
     };
 
@@ -119,8 +136,8 @@ class WzRegisterAgents {
         const data = await apiReq.request(
           'PUT',
           `/agents/${
-            $scope.registerObj.systems[$scope.registerObj.selectedSystem]
-              .steps[3].id
+          $scope.registerObj.systems[$scope.registerObj.selectedSystem]
+            .steps[3].id
           }/restart`,
           {}
         );
@@ -130,8 +147,8 @@ class WzRegisterAgents {
         }
         errorHandler.info(
           `Success. Agent ${
-            $scope.registerObj.systems[$scope.registerObj.selectedSystem]
-              .steps[0].agentName
+          $scope.registerObj.systems[$scope.registerObj.selectedSystem]
+            .steps[0].agentName
           } has been registered.`
         );
         $scope.nextStep();
