@@ -26,12 +26,7 @@ class WzRegisterAgents {
       reload: '&'
     };
   }
-  controller(
-    $scope,
-    wazuhConfig,
-    errorHandler,
-    apiReq
-  ) {
+  controller($scope, wazuhConfig, errorHandler, apiReq) {
     const configuration = wazuhConfig.getConfig();
     $scope.adminMode = !!(configuration || {}).admin;
     const load = async () => {
@@ -44,14 +39,15 @@ class WzRegisterAgents {
             /* linux */
             steps: [
               {
-                title: 'Add the agent to the manager',
+                title: 'Add the agent to the manager'
               },
               {
                 title: 'Import the key to the agent',
                 code: '# /var/ossec/bin/manage_agents -i '
               },
               {
-                title: 'Edit the Wazuh agent configuration to add the Wazuh manager IP',
+                title:
+                  'Edit the Wazuh agent configuration to add the Wazuh manager IP'
               },
               {
                 title: 'Restart the agent'
@@ -62,7 +58,7 @@ class WzRegisterAgents {
             /* windows */
             steps: [
               {
-                title: 'Register the agent',
+                title: 'Register the agent'
               }
             ]
           }
@@ -73,26 +69,40 @@ class WzRegisterAgents {
 
     $scope.nextStep = () => {
       $scope.registerObj.currentStep++;
-      if ($scope.registerObj.currentStep >= $scope.registerObj.systems[$scope.registerObj.selectedSystem].steps.length) {
+      if (
+        $scope.registerObj.currentStep >=
+        $scope.registerObj.systems[$scope.registerObj.selectedSystem].steps
+          .length
+      ) {
         $scope.restartingAgent = false;
         $scope.reload();
         load();
       }
       $scope.$applyAsync();
-    }
+    };
     $scope.addAgent = async () => {
       try {
         $scope.addingAgent = true;
         const data = await apiReq.request('POST', '/agents', {
-          name: $scope.registerObj.systems[$scope.registerObj.selectedSystem].steps[0].agentName,
-          ip: $scope.registerObj.systems[$scope.registerObj.selectedSystem].steps[0].agentIP
+          name:
+            $scope.registerObj.systems[$scope.registerObj.selectedSystem]
+              .steps[0].agentName,
+          ip:
+            $scope.registerObj.systems[$scope.registerObj.selectedSystem]
+              .steps[0].agentIP
         });
         if (!(((data || {}).data || {}).data || {}).key) {
-          throw new Error("No agent key received");
+          throw new Error('No agent key received');
         } else {
-          $scope.registerObj.systems[$scope.registerObj.selectedSystem].steps[1].key = data.data.data.key;
-          $scope.registerObj.systems[$scope.registerObj.selectedSystem].steps[1].code += data.data.data.key;
-          $scope.registerObj.systems[$scope.registerObj.selectedSystem].steps[3].id = data.data.data.id;
+          $scope.registerObj.systems[
+            $scope.registerObj.selectedSystem
+          ].steps[1].key = data.data.data.key;
+          $scope.registerObj.systems[
+            $scope.registerObj.selectedSystem
+          ].steps[1].code += data.data.data.key;
+          $scope.registerObj.systems[
+            $scope.registerObj.selectedSystem
+          ].steps[3].id = data.data.data.id;
         }
         $scope.addingAgent = false;
         $scope.nextStep();
@@ -101,21 +111,29 @@ class WzRegisterAgents {
         errorHandler.handle(error, 'Adding agent error');
       }
       return;
-    }
+    };
 
     $scope.restartAgent = async () => {
       $scope.restartingAgent = true;
       try {
         const data = await apiReq.request(
           'PUT',
-          `/agents/${$scope.registerObj.systems[$scope.registerObj.selectedSystem].steps[3].id}/restart`,
+          `/agents/${
+            $scope.registerObj.systems[$scope.registerObj.selectedSystem]
+              .steps[3].id
+          }/restart`,
           {}
         );
         const result = ((data || {}).data || {}).data || false;
         if (!result) {
           throw new Error('Unexpected error restarting agent');
         }
-        errorHandler.info(`Success. Agent ${$scope.registerObj.systems[$scope.registerObj.selectedSystem].steps[0].agentName} has been registered.`);
+        errorHandler.info(
+          `Success. Agent ${
+            $scope.registerObj.systems[$scope.registerObj.selectedSystem]
+              .steps[0].agentName
+          } has been registered.`
+        );
         $scope.nextStep();
       } catch (error) {
         errorHandler.handle(error, '');
@@ -124,7 +142,7 @@ class WzRegisterAgents {
       $scope.$applyAsync();
     };
 
-    $scope.setSystem = (system) => {
+    $scope.setSystem = system => {
       $scope.registerObj.currentStep = 0;
       load();
       $scope.registerObj.selectedSystemTab = system;
@@ -139,7 +157,7 @@ class WzRegisterAgents {
           $scope.registerObj.selectedSystem = 2;
           break;
       }
-    }
+    };
   }
 }
 

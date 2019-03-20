@@ -162,7 +162,10 @@ app.directive('wzTable', function() {
             // Resize
             checkGap($scope, $scope.items);
             $scope.searchTable();
-            $scope.$emit('wazuhFetched', { items: $scope.items, filters: instance.filters });
+            $scope.$emit('wazuhFetched', {
+              items: $scope.items,
+              filters: instance.filters
+            });
           }
           if ($scope.customColumns) {
             setTimeout(() => {
