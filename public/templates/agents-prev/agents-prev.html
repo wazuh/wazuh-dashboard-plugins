@@ -79,7 +79,7 @@
         <div class="md-padding text-center">
             <img class="wz-margin-top-17" src="/plugins/wazuh/img/agent.png" style="width: 10%; max-width: 175px;">
             <h3 class="euiTitle wzEuiTitle wz-margin-bottom-10 wz-margin-top-16">There are no registered agents yet</h3>
-            <div class="euiText euiText--small euiStat__description wz-text-gray">
+            <div ng-if="adminMode" class="euiText euiText--small euiStat__description wz-text-gray">
                 <p>You can start registering agents by following these steps!</p>
             </div>
         </div>
