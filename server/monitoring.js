@@ -32,7 +32,7 @@ export class Monitoring {
   constructor(server, quiet = false) {
     this.server = server;
     this.ENABLED = true;
-    this.FREQUENCY = 3600;
+    this.FREQUENCY = 900;
     this.CRON_FREQ = '0 1 * * * *';
     this.CREATION = 'd';
     this.index_pattern = 'wazuh-monitoring-3.x-*';
