@@ -1,6 +1,7 @@
-<md-content flex layout="column" ng-if="octrl.tab === 'fim' && octrl.tabView === 'panels'" ng-class="{'no-opacity': resultState !== 'ready' || !rendered}">
+<md-content flex layout="column" ng-if="octrl.tab === 'fim' && octrl.tabView === 'panels'"
+    ng-class="{'no-opacity': resultState !== 'ready' || !rendered}">
 
-    <div layout="row" class="height-225">
+    <div layout="row" class="height-300">
         <md-card flex class="wz-md-card" ng-class="{'fullscreen': octrl.expandArray[0]}">
             <md-card-content class="wazuh-column">
                 <div layout="row" ng-dblclick="octrl.expand(0)">
@@ -20,7 +21,8 @@
                     <span class="wz-text-link" ng-click="octrl.expand(1)"><i class="fa fa-fw fa-expand"></i></span>
                 </div>
                 <md-divider class="wz-margin-top-10"></md-divider>
-                <kbn-vis id="Wazuh-App-Agents-FIM-Files-modified" vis-id="'Wazuh-App-Agents-FIM-Files-modified'"></kbn-vis>
+                <kbn-vis id="Wazuh-App-Agents-FIM-Files-modified" vis-id="'Wazuh-App-Agents-FIM-Files-modified'">
+                </kbn-vis>
             </md-card-content>
         </md-card>
         <md-card flex class="wz-md-card" ng-class="{'fullscreen': octrl.expandArray[2]}">
@@ -44,7 +46,8 @@
                     <span class="wz-text-link" ng-click="octrl.expand(3)"><i class="fa fa-fw fa-expand"></i></span>
                 </div>
                 <md-divider class="wz-margin-top-10"></md-divider>
-                <kbn-vis id="Wazuh-App-Overview-FIM-Top-5-agents-pie" vis-id="'Wazuh-App-Overview-FIM-Top-5-agents-pie'"></kbn-vis>
+                <kbn-vis id="Wazuh-App-Overview-FIM-Top-5-agents-pie"
+                    vis-id="'Wazuh-App-Overview-FIM-Top-5-agents-pie'"></kbn-vis>
             </md-card-content>
         </md-card>
         <md-card flex class="wz-md-card" ng-class="{'fullscreen': octrl.expandArray[4]}">
@@ -55,7 +58,8 @@
                     <span class="wz-text-link" ng-click="octrl.expand(4)"><i class="fa fa-fw fa-expand"></i></span>
                 </div>
                 <md-divider class="wz-margin-top-10"></md-divider>
-                <kbn-vis id="Wazuh-App-Overview-FIM-Events-summary" vis-id="'Wazuh-App-Overview-FIM-Events-summary'"></kbn-vis>
+                <kbn-vis id="Wazuh-App-Overview-FIM-Events-summary" vis-id="'Wazuh-App-Overview-FIM-Events-summary'">
+                </kbn-vis>
             </md-card-content>
         </md-card>
     </div>
@@ -81,7 +85,8 @@
                     <span class="wz-text-link" ng-click="octrl.expand(6)"><i class="fa fa-fw fa-expand"></i></span>
                 </div>
                 <md-divider class="wz-margin-top-10"></md-divider>
-                <kbn-vis id="Wazuh-App-Overview-FIM-Common-actions" vis-id="'Wazuh-App-Overview-FIM-Common-actions'"></kbn-vis>
+                <kbn-vis id="Wazuh-App-Overview-FIM-Common-actions" vis-id="'Wazuh-App-Overview-FIM-Common-actions'">
+                </kbn-vis>
             </md-card-content>
         </md-card>
         <md-card flex class="wz-md-card" ng-class="{'fullscreen': octrl.expandArray[7]}">
