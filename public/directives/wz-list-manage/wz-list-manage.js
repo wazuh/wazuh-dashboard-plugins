@@ -14,10 +14,11 @@ import template from './wz-list-manage.html';
 import { uiModules } from 'ui/modules';
 import * as pagination from '../wz-table/lib/pagination';
 import { checkGap } from '../wz-table/lib/check-gap';
+import * as FileSaver from '../../services/file-saver';
 
 const app = uiModules.get('app/wazuh', []);
 
-app.directive('wzListManage', function() {
+app.directive('wzListManage', function () {
   return {
     restrict: 'E',
     scope: {
@@ -31,7 +32,8 @@ app.directive('wzListManage', function() {
       $filter,
       rulesetHandler,
       wazuhConfig,
-      appState
+      appState,
+      csvReq
     ) {
       const clusterInfo = appState.getClusterInfo();
 
@@ -50,7 +52,12 @@ app.directive('wzListManage', function() {
       $scope.prevPage = () => pagination.prevPage($scope);
       $scope.nextPage = async currentPage =>
         pagination.nextPage(currentPage, $scope, errorHandler, null);
-      $scope.setPage = function() {
+      $scope.firstPage = function () {
+        $scope.setPage(1);
+        $scope.prevPage();
+      }
+      $scope.setPage = function (page = false) {
+        this.n = page || this.n
         $scope.currentPage = this.n;
         $scope.nextPage(this.n);
       };
@@ -146,6 +153,24 @@ app.directive('wzListManage', function() {
           $scope.loadingChange = false;
         }
       };
+
+      $scope.downloadCsv = async (path, fileName, filePath) => {
+        try {
+          errorHandler.info(
+            'Your download should begin automatically...',
+            'CSV'
+          );
+          const filters = [{ name: 'path', value: filePath + '/' + fileName }];
+          const currentApi = JSON.parse(appState.getCurrentAPI()).id;
+          const output = await csvReq.fetch(path, currentApi, filters);
+          const blob = new Blob([output], { type: 'text/csv' }); // eslint-disable-line
+
+          FileSaver.saveAs(blob, fileName + '.csv');
+        } catch (error) {
+          errorHandler.handle(error, 'Download CSV');
+        }
+        return;
+      }
 
       $scope.addEntry = (key, value) => {
         if (!$scope.currentList.list[key]) {
