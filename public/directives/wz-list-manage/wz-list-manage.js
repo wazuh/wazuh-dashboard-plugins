@@ -141,7 +141,6 @@ app.directive('wzListManage', function () {
         } catch (err) {
           if (addingNew) {
             $scope.currentList.name = false;
-            $scope.$applyAsync();
           }
           $scope.doingSaving = false;
           if ((err || '').includes('Wazuh API error: 1905')) {
@@ -151,6 +150,7 @@ app.directive('wzListManage', function () {
             errorHandler.handle(err, 'Error updating list');
           }
           $scope.loadingChange = false;
+          $scope.$applyAsync();
         }
       };
 
