@@ -129,7 +129,7 @@
             </md-card-content>
             <md-card-content class="wz-margin-bottom-40-inv"
                 ng-if="syscollector.netaddr && syscollector.netaddr.items.length">
-                <span class="wz-headline-title"><i class="fa fa-fw fa-exchange"></i> Network addresses</span>
+                <span class="wz-headline-title"><i class="fa fa-fw fa-exchange"></i> Network settings</span>
                 <md-divider class="wz-margin-top-10"></md-divider>
                 <wz-table flex path="'/syscollector/' + agent.id + '/netaddr'" row-sizes="[4]"
                     keys="['iface', 'address', 'netmask', 'proto', 'broadcast']">
