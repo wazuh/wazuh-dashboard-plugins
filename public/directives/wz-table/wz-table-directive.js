@@ -26,7 +26,7 @@ import { checkGap } from './lib/check-gap';
 
 const app = uiModules.get('app/wazuh', []);
 
-app.directive('wzTable', function() {
+app.directive('wzTable', function () {
   return {
     restrict: 'E',
     scope: {
@@ -76,6 +76,7 @@ app.directive('wzTable', function() {
             $scope.keys.push(key.key);
           }
         }
+        updateStoredKeys($scope.keys.map(item => item.value || item));
         init(true);
       };
       $scope.exists = key => {
@@ -273,6 +274,10 @@ app.directive('wzTable', function() {
           errorHandler,
           skipFetching
         );
+        getStoredKeys();
+        if (!sessionStorage[$scope.path]) {
+          updateStoredKeys($scope.keys);
+        }
       };
       /**
        * Pagination variables and functions
@@ -290,7 +295,7 @@ app.directive('wzTable', function() {
       $scope.prevPage = () => pagination.prevPage($scope);
       $scope.nextPage = async currentPage =>
         pagination.nextPage(currentPage, $scope, errorHandler, fetch);
-      $scope.setPage = function(page = false) {
+      $scope.setPage = function (page = false) {
         $scope.currentPage = page || this.n;
         $scope.nextPage(this.n).then(() => {
           if (page) {
@@ -482,12 +487,40 @@ app.directive('wzTable', function() {
         $c.remove();
       };
 
+      const getStoredKeys = () => {
+        if ($scope.customColumns) {
+          $('#wz_table').colResizable({ disable: true });
+          if (sessionStorage[$scope.path]) {
+            $scope.keys = sessionStorage[$scope.path].split(';');
+          } else {
+            updateStoredKeys($scope.keys.map(item => item.value || item));
+          }
+          setTimeout(() => {
+            $scope.setColResizable();
+          }, 100);
+          $scope.$applyAsync();
+        }
+      }
+
+      const updateStoredKeys = keys => {
+        if ($scope.customColumns) {
+          let stringKeys = keys[0]
+          for (var i = 1; i < keys.length; i++) {
+            let tmp = keys[i].value || keys[i]
+            stringKeys += ';' + tmp
+          }
+          sessionStorage[$scope.path] = stringKeys
+          $scope.$applyAsync()
+        }
+      }
+
       $scope.setColResizable = () => {
         $('#wz_table').colResizable({
           liveDrag: true,
           minWidth: 78,
           partialRefresh: true,
-          draggingClass: false
+          draggingClass: false,
+          postbackSafe: true,
         });
         $scope.$applyAsync();
       };

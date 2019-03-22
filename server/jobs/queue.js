@@ -14,7 +14,7 @@ import cron from 'node-cron';
 import { log } from '../logger';
 
 let jobs = [];
-const CRON_FREQ = '0 * * * * *'; // Every 1 minute
+const CRON_FREQ = '0/15 * * * * *'; // Every 1 minute
 
 export class Queue {
   static addJob(job) {
