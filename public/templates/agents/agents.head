@@ -192,7 +192,7 @@
     <div layout="row"
         ng-if="!showSyscheckFiles && !showScaScan && tab === 'fim' && resultState === 'none' && tabView === 'panels'">
         <span flex></span>
-        <md-button ng-click="launchSyscheckScan()" class="wz-button pull-right"><i class="fa fa-fw fa-play"></i> Run
+        <md-button ng-click="launchSyscheckScan()" class="discoverSectionSwitchBtn pull-right"><i class="fa fa-fw fa-play"></i> Run
             scan</md-button>
         <span></span>
         <md-button ng-click="switchSyscheckFiles()" class="discoverSectionSwitchBtn pull-right"><i class="fa fa-fw fa-database"></i>
