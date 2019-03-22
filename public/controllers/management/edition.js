@@ -169,6 +169,7 @@ export class EditionController {
     };
 
     this.$scope.changeNode = () => {
+      this.$scope.restartMsg = false;
       this.$scope.editConf();
     };
 

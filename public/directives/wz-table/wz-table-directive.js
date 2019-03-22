@@ -26,7 +26,7 @@ import { checkGap } from './lib/check-gap';
 
 const app = uiModules.get('app/wazuh', []);
 
-app.directive('wzTable', function () {
+app.directive('wzTable', function() {
   return {
     restrict: 'E',
     scope: {
@@ -56,7 +56,7 @@ app.directive('wzTable', function () {
       $sce
     ) {
       $scope.showColumns = false;
-      $scope.scapepath = $scope.path.split('/').join('')
+      $scope.scapepath = $scope.path.split('/').join('');
       $scope.originalkeys = $scope.keys.map((key, idx) => ({ key, idx }));
       $scope.updateColumns = key => {
         $(`#table${$scope.scapepath}`).colResizable({ disable: true });
@@ -296,7 +296,7 @@ app.directive('wzTable', function () {
       $scope.prevPage = () => pagination.prevPage($scope);
       $scope.nextPage = async currentPage =>
         pagination.nextPage(currentPage, $scope, errorHandler, fetch);
-      $scope.setPage = function (page = false) {
+      $scope.setPage = function(page = false) {
         $scope.currentPage = page || this.n;
         $scope.nextPage(this.n).then(() => {
           if (page) {
@@ -510,7 +510,7 @@ app.directive('wzTable', function () {
             let tmp = keys[i].value || keys[i];
             stringKeys += ';' + tmp;
           }
-          sessionStorage[$scope.path] = stringKeys;
+          sessionStorage[$scope.path] = stringKeys || '';
           $scope.$applyAsync();
         }
       };
