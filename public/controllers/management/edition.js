@@ -115,7 +115,7 @@ export class EditionController {
           (clusterStatus.enabled === 'no' && clusterStatus.running === 'yes')
         ) {
           await this.configHandler.restartNode(selectedNode);
-          this.errorHandler.info('Success. It will take up to 15 seconds.');
+          this.errorHandler.info('Success. It will take up to 30 seconds.');
         } else {
           await this.configHandler.restartManager();
           this.errorHandler.info('Success. It may take a few seconds.');

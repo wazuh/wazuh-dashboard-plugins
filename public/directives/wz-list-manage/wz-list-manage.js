@@ -18,7 +18,7 @@ import * as FileSaver from '../../services/file-saver';
 
 const app = uiModules.get('app/wazuh', []);
 
-app.directive('wzListManage', function () {
+app.directive('wzListManage', function() {
   return {
     restrict: 'E',
     scope: {
@@ -52,12 +52,12 @@ app.directive('wzListManage', function () {
       $scope.prevPage = () => pagination.prevPage($scope);
       $scope.nextPage = async currentPage =>
         pagination.nextPage(currentPage, $scope, errorHandler, null);
-      $scope.firstPage = function () {
+      $scope.firstPage = function() {
         $scope.setPage(1);
         $scope.prevPage();
-      }
-      $scope.setPage = function (page = false) {
-        this.n = page || this.n
+      };
+      $scope.setPage = function(page = false) {
+        this.n = page || this.n;
         $scope.currentPage = this.n;
         $scope.nextPage(this.n);
       };
@@ -170,7 +170,7 @@ app.directive('wzListManage', function () {
           errorHandler.handle(error, 'Download CSV');
         }
         return;
-      }
+      };
 
       $scope.addEntry = (key, value) => {
         if (!$scope.currentList.list[key]) {

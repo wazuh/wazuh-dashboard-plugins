@@ -26,7 +26,7 @@ import { checkGap } from './lib/check-gap';
 
 const app = uiModules.get('app/wazuh', []);
 
-app.directive('wzTable', function () {
+app.directive('wzTable', function() {
   return {
     restrict: 'E',
     scope: {
@@ -295,7 +295,7 @@ app.directive('wzTable', function () {
       $scope.prevPage = () => pagination.prevPage($scope);
       $scope.nextPage = async currentPage =>
         pagination.nextPage(currentPage, $scope, errorHandler, fetch);
-      $scope.setPage = function (page = false) {
+      $scope.setPage = function(page = false) {
         $scope.currentPage = page || this.n;
         $scope.nextPage(this.n).then(() => {
           if (page) {
@@ -500,19 +500,19 @@ app.directive('wzTable', function () {
           }, 100);
           $scope.$applyAsync();
         }
-      }
+      };
 
       const updateStoredKeys = keys => {
         if ($scope.customColumns) {
-          let stringKeys = keys[0]
+          let stringKeys = keys[0];
           for (var i = 1; i < keys.length; i++) {
-            let tmp = keys[i].value || keys[i]
-            stringKeys += ';' + tmp
+            let tmp = keys[i].value || keys[i];
+            stringKeys += ';' + tmp;
           }
-          sessionStorage[$scope.path] = stringKeys
-          $scope.$applyAsync()
+          sessionStorage[$scope.path] = stringKeys;
+          $scope.$applyAsync();
         }
-      }
+      };
 
       $scope.setColResizable = () => {
         $('#wz_table').colResizable({
@@ -520,7 +520,7 @@ app.directive('wzTable', function () {
           minWidth: 78,
           partialRefresh: true,
           draggingClass: false,
-          postbackSafe: true,
+          postbackSafe: true
         });
         $scope.$applyAsync();
       };
