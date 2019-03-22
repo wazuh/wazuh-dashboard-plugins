@@ -116,12 +116,12 @@
 
 <md-content flex layout="column" ng-if="tab === 'sca' && tabView === 'panels' && showScaScan" layout-align="start">
     <div layout="row" class="md-padding-v wz-padding-right-8 wz-padding-bottom-0">
-        <div layout="row" layout-padding ng-show="agent && agent.os">
+        <div layout="row" ng-show="agent && agent.os" class="md-padding-h wz-padding-bottom-14">
             <span class="wz-headline-title font-size-18"><i class="fa fa-fw fa-shield"></i> Configuration assessment
                 state</span>
         </div>
         <span flex></span>
-        <md-button ng-click="switchScaScan()" class="wz-button pull-right"><i class="fa fa-fw fa-area-chart"></i>
+        <md-button ng-click="switchScaScan()" class="discoverSectionSwitchBtn pull-right"><i class="fa fa-fw fa-area-chart"></i>
             Show alerts</md-button>
     </div>
 

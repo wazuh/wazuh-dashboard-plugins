@@ -2,10 +2,10 @@
     ng-class="{'no-opacity': resultState !== 'ready' || !rendered}" layout-align="start">
     <div layout="row">
         <span flex></span>
-        <md-button ng-click="launchSyscheckScan()" class="wz-button pull-right"><i class="fa fa-fw fa-play"></i> Run
+        <md-button ng-click="launchSyscheckScan()" class="discoverSectionSwitchBtn pull-right"><i class="fa fa-fw fa-play"></i> Run
             scan</md-button>
         <span></span>
-        <md-button ng-click="switchSyscheckFiles()" class="wz-button pull-right"><i class="fa fa-fw fa-database"></i>
+        <md-button ng-click="switchSyscheckFiles()" class="discoverSectionSwitchBtn pull-right"><i class="fa fa-fw fa-database"></i>
             Show files</md-button>
     </div>
     <!-- View: Panels -->
@@ -103,12 +103,12 @@
 
 <md-content flex layout="column" ng-if="tab === 'fim' && tabView === 'panels' && showSyscheckFiles"
     layout-align="start">
-    <div layout="row">
+    <div layout="row" class="wz-padding-bottom-14 wz-padding-top-14">
         <span flex></span>
-        <md-button ng-click="launchSyscheckScan()" class="wz-button pull-right"><i class="fa fa-fw fa-play"></i>
+        <md-button ng-click="launchSyscheckScan()" class="discoverSectionSwitchBtn pull-right"><i class="fa fa-fw fa-play"></i>
             Run scan</md-button>
         <span></span>
-        <md-button ng-click="switchSyscheckFiles()" class="wz-button pull-right"><i class="fa fa-fw fa-area-chart"></i>
+        <md-button ng-click="switchSyscheckFiles()" class="discoverSectionSwitchBtn pull-right"><i class="fa fa-fw fa-area-chart"></i>
             Show alerts</md-button>
     </div>
 
