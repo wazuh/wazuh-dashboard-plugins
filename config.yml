@@ -88,8 +88,8 @@
 #wazuh.monitoring.enabled: true
 #
 # Custom setting to set the frequency for wazuh-monitoring indices cron task.
-# Default: 3600 (s)
-#wazuh.monitoring.frequency: 3600
+# Default: 900 (s)
+#wazuh.monitoring.frequency: 900
 #
 # Configure wazuh-monitoring-3.x-* indices shards and replicas.
 #wazuh.monitoring.shards: 2

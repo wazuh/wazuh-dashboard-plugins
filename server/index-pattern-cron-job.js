@@ -57,7 +57,7 @@ export class IndexPatternCronJob {
       );
       log(
         '[IndexPatternCronJob][create-job]',
-        'Index pattern cron job started'
+        'Index pattern cron job started', 'info'
       );
     } catch (error) {
       // Cron job creation failed

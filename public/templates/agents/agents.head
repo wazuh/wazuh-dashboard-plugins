@@ -167,13 +167,13 @@
 
     <!-- Discover search bar section -->
     <kbn-dis
-        ng-show="(tab !== 'welcome') && (tab !== 'configuration') && tab !== 'syscollector' && !showSyscheckFiles && !showScaScan">
+        ng-show="((tab !== 'welcome') && (tab !== 'configuration') && tab !== 'sca' && tab !== 'syscollector' && !showSyscheckFiles && !showScaScan) || (tab === 'sca' && tabView === 'discover')">
     </kbn-dis>
     <!-- End Discover search bar section -->
 
     <!-- Loading status section -->
     <div layout="column" layout-align="center center"
-        ng-if="tab !== 'welcome' && tab !== 'configuration' && tab !== 'syscollector'"
+        ng-if="tab !== 'welcome' && tab !== 'sca' && tab !== 'configuration' && tab !== 'syscollector'"
         ng-show="resultState === 'ready' && tabView === 'panels' && !rendered">
         <div class="percentage"><i class="fa fa-fw fa-spin fa-spinner" aria-hidden="true"></i></div>
         <div class="percentage">{{loadingStatus}}</div>
@@ -198,14 +198,9 @@
         <md-button ng-click="switchSyscheckFiles()" class="wz-button pull-right"><i class="fa fa-fw fa-database"></i>
             Show files</md-button>
     </div>
-    <div layout="row"
-        ng-if="!showSyscheckFiles && !showScaScan && tab === 'sca' && resultState === 'none' && tabView === 'panels'">
-        <span flex></span>
-        <md-button ng-click="switchScaScan()" class="wz-button pull-right"><i class="fa fa-fw fa-database"></i>
-            Show state</md-button>
-    </div>
+
     <div layout="row" class="wz-margin-top-10 wz-margin-right-8 wz-margin-left-8"
-        ng-if="!showSyscheckFiles && !showScaScan && tab !== 'welcome' && tab !== 'configuration' && tab !== 'syscollector'"
+        ng-if="!showSyscheckFiles && !showScaScan && tab !== 'welcome' && tab !== 'configuration' && tab !== 'syscollector' && tab !== 'sca'"
         ng-show="resultState === 'none' && tabView === 'panels'">
         <div flex class="euiCallOut euiCallOut--warning">
             <div class="euiCallOutHeader">

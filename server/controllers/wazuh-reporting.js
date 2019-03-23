@@ -1569,7 +1569,7 @@ export class WazuhReportingCtrl {
             );
             if (netaddr && netaddr.data && netaddr.data.items) {
               tables.push({
-                title: 'Network addresses',
+                title: 'Network settings',
                 columns: [
                   'Interface',
                   'Address',
