@@ -43,7 +43,7 @@
         </md-card>
     </div>
 
-    <div layout="row" class="layout-padding wz-padding-bottom-0"
+    <div layout="row" class="layout-padding"
         ng-if="agent && agent.status === 'Active' && hasSize(syscollector)">
         <md-card flex class="wz-md-card">
             <md-card-content class="wz-text-center"
@@ -97,29 +97,29 @@
             </md-card-content>
         </md-card>
         <md-card flex class="wz-md-card">
-            <md-card-content class="wz-text-center wz-margin-bottom-40-inv"
+            <md-card-content class="wz-text-center"
                 ng-if="syscollector.ports && !syscollector.ports.items.length">
                 <i class="fa fa-fw fa-info-circle" aria-hidden="true"></i> <span class="wz-headline-title">No ports
                     scan available</span>
             </md-card-content>
-            <md-card-content class="wz-margin-bottom-40-inv"
+            <md-card-content
                 ng-if="syscollector.ports && syscollector.ports.items.length">
                 <span class="wz-headline-title"><i class="fa fa-fw fa-exchange"></i> Network ports</span>
                 <span class="color-grey pull-right">Last scan: {{syscollector.ports.items[0].scan.time}}</span>
                 <md-divider class="wz-margin-top-10"></md-divider>
                 <wz-table flex ng-if="agent && agent.os && agent.os.platform === 'windows'"
-                    path="'/syscollector/' + agent.id + '/ports'" row-sizes="[4]"
+                    path="'/syscollector/' + agent.id + '/ports'" row-sizes="[6]"
                     keys="[{value:'process',nosortable:true},{value:'local.ip',nosortable:true}, {value:'local.port',nosortable:true},'state','protocol']">
                 </wz-table>
                 <wz-table flex ng-if="agent && agent.os && agent.os.platform !== 'windows'"
-                    path="'/syscollector/' + agent.id + '/ports'" row-sizes="[4]"
+                    path="'/syscollector/' + agent.id + '/ports'" row-sizes="[6]"
                     keys="[{value:'local.ip',nosortable:true}, {value:'local.port',nosortable:true},'state','protocol']">
                 </wz-table>
             </md-card-content>
         </md-card>
     </div>
 
-    <div layout="row" class="layout-padding wz-padding-bottom-0"
+    <div layout="row" class="layout-padding"
         ng-if="agent && agent.status === 'Active' && hasSize(syscollector)">
         <md-card flex class="wz-md-card">
             <md-card-content class="wz-text-center"
@@ -137,7 +137,7 @@
         </md-card>
     </div>
 
-    <div layout="row" class="layout-padding wz-padding-top-0"
+    <div layout="row" class="layout-padding"
         ng-if="agent && agent.status === 'Active' && hasSize(syscollector)">
         <md-card flex class="wz-md-card">
             <md-card-content>
@@ -155,7 +155,7 @@
                 </div>
 
                 <div layout="row" ng-if="agent && syscollector && !load"
-                    class="wz-margin-top-10 wz-margin-bottom-40-inv">
+                    class="wz-margin-top-10">
                     <wz-table flex ng-if="agent && agent.os && agent.os.platform !== 'windows'"
                         path="'/syscollector/' + agent.id + '/packages'" row-sizes="[10,8,6]" extra-limit="100"
                         keys="[{value:'name',size:2},'architecture','version',{value:'vendor',size:2},{value:'description',size:3}]" />
@@ -184,7 +184,7 @@
                     </button>
                 </div>
                 <div layout="row" ng-if="agent && syscollector && !load"
-                    class="wz-margin-top-10 wz-margin-bottom-40-inv">
+                    class="wz-margin-top-10">
                     <wz-table flex ng-if="agent && agent.os && agent.os.platform === 'windows'"
                         path="'/syscollector/' + agent.id + '/processes'" row-sizes="[10,8,6]" extra-limit="100"
                         keys="['name','cmd','priority','nlwp']" />
