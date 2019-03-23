@@ -28,7 +28,7 @@ export class TabVisualizations {
       pci: 6,
       virustotal: 6,
       configuration: 0,
-      sca: 8,
+      sca: 5,
       osquery: 5
     };
 

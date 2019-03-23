@@ -6,11 +6,11 @@
             Show state</md-button>
     </div>
 
-    <div layout="row" layout-align="space-between stretch" class="height-300">
+    <div layout="row" layout-align="space-between stretch" class="height-400">
         <md-card flex class="wz-md-card" ng-class="{'fullscreen': expandArray[0]}">
             <md-card-content class="wazuh-column">
                 <div layout="row" ng-dblclick="expand(0)">
-                    <span class="wz-headline-title">Alerts over time</span>
+                    <span class="wz-headline-title">Alerts by policy</span>
                     <span flex></span>
                     <span class="wz-text-link" ng-click="expand(0)"><i class="fa fa-fw fa-expand"></i></span>
                 </div>
@@ -21,97 +21,58 @@
         </md-card>
     </div>
 
-    <div layout="row">
-        <div layout="column" flex class="height-540">
-            <md-card flex class="wz-md-card" ng-class="{'fullscreen': expandArray[1]}">
-                <md-card-content class="wazuh-column">
-                    <div layout="row" ng-dblclick="expand(1)">
-                        <span class="wz-headline-title">Top 5 CIS requirements passed</span>
-                        <span flex></span>
-                        <span class="wz-text-link" ng-click="expand(1)"><i class="fa fa-fw fa-expand"></i></span>
-                    </div>
-                    <md-divider class="wz-margin-top-10"></md-divider>
-                    <kbn-vis id="Wazuh-App-Agents-CA-Top-5-CIS-Requirements-passed"
-                        vis-id="'Wazuh-App-Agents-CA-Top-5-CIS-Requirements-passed'">
-                    </kbn-vis>
-                </md-card-content>
-            </md-card>
-            <md-card flex class="wz-md-card" ng-class="{'fullscreen': expandArray[2]}">
-                <md-card-content class="wazuh-column">
-                    <div layout="row" ng-dblclick="expand(2)">
-                        <span class="wz-headline-title">Top 5 CIS requirements failed</span>
-                        <span flex></span>
-                        <span class="wz-text-link" ng-click="expand(2)"><i class="fa fa-fw fa-expand"></i></span>
-                    </div>
-                    <md-divider class="wz-margin-top-10"></md-divider>
-                    <kbn-vis id="Wazuh-App-Agents-CA-Top-5-CIS-Requirements-failed"
-                        vis-id="'Wazuh-App-Agents-CA-Top-5-CIS-Requirements-failed'"></kbn-vis>
-                </md-card-content>
-            </md-card>
-        </div>
-        <div layout="column" flex class="height-540">
-            <md-card flex class="wz-md-card" ng-class="{'fullscreen': expandArray[3]}">
-                <md-card-content class="wazuh-column">
-                    <div layout="row" ng-dblclick="expand(3)">
-                        <span class="wz-headline-title">Top 5 CIS CSC requirements passed</span>
-                        <span flex></span>
-                        <span class="wz-text-link" ng-click="expand(3)"><i class="fa fa-fw fa-expand"></i></span>
-                    </div>
-                    <md-divider class="wz-margin-top-10"></md-divider>
-                    <kbn-vis id="Wazuh-App-Agents-CA-Top-5-CIS-CSC-Requirements-passed"
-                        vis-id="'Wazuh-App-Agents-CA-Top-5-CIS-CSC-Requirements-passed'">
-                    </kbn-vis>
-                </md-card-content>
-            </md-card>
-            <md-card flex class="wz-md-card" ng-class="{'fullscreen': expandArray[4]}">
-                <md-card-content class="wazuh-column">
-                    <div layout="row" ng-dblclick="expand(4)">
-                        <span class="wz-headline-title">Top 5 CIS CSC requirements failed</span>
-                        <span flex></span>
-                        <span class="wz-text-link" ng-click="expand(4)"><i class="fa fa-fw fa-expand"></i></span>
-                    </div>
-                    <md-divider class="wz-margin-top-10"></md-divider>
-                    <kbn-vis id="Wazuh-App-Agents-CA-Top-5-CIS-CSC-Requirements-failed"
-                        vis-id="'Wazuh-App-Agents-CA-Top-5-CIS-CSC-Requirements-failed'"></kbn-vis>
-                </md-card-content>
-            </md-card>
-        </div>
-        <div layout="column" flex class="height-540">
-            <md-card flex class="wz-md-card" ng-class="{'fullscreen': expandArray[5]}">
-                <md-card-content class="wazuh-column">
-                    <div layout="row" ng-dblclick="expand(5)">
-                        <span class="wz-headline-title">Top 5 PCI DSS requirements passed</span>
-                        <span flex></span>
-                        <span class="wz-text-link" ng-click="expand(5)"><i class="fa fa-fw fa-expand"></i></span>
-                    </div>
-                    <md-divider class="wz-margin-top-10"></md-divider>
-                    <kbn-vis id="Wazuh-App-Agents-CA-Top-5-PCI-DSS-Requirements-passed"
-                        vis-id="'Wazuh-App-Agents-CA-Top-5-PCI-DSS-Requirements-passed'">
-                    </kbn-vis>
-                </md-card-content>
-            </md-card>
-            <md-card flex class="wz-md-card" ng-class="{'fullscreen': expandArray[6]}">
-                <md-card-content class="wazuh-column">
-                    <div layout="row" ng-dblclick="expand(6)">
-                        <span class="wz-headline-title">Top 5 PCI DSS requirements failed</span>
-                        <span flex></span>
-                        <span class="wz-text-link" ng-click="expand(6)"><i class="fa fa-fw fa-expand"></i></span>
-                    </div>
-                    <md-divider class="wz-margin-top-10"></md-divider>
-                    <kbn-vis id="Wazuh-App-Agents-CA-Top-5-PCI-DSS-Requirements-failed"
-                        vis-id="'Wazuh-App-Agents-CA-Top-5-PCI-DSS-Requirements-failed'"></kbn-vis>
-                </md-card-content>
-            </md-card>
-        </div>
+    <div layout="row" class="height-300">
+        <md-card flex="60" class="wz-md-card" ng-class="{'fullscreen': expandArray[1]}">
+            <md-card-content class="wazuh-column">
+                <div layout="row" ng-dblclick="expand(1)">
+                    <span class="wz-headline-title">Checks over time</span>
+                    <span flex></span>
+                    <span class="wz-text-link" ng-click="expand(1)"><i class="fa fa-fw fa-expand"></i></span>
+                </div>
+                <md-divider class="wz-margin-top-10"></md-divider>
+                <kbn-vis id="Wazuh-App-Agents-CA-Checks-over-time"
+                    vis-id="'Wazuh-App-Agents-CA-Checks-over-time'">
+                </kbn-vis>
+            </md-card-content>
+        </md-card>
+
+        <md-card flex class="wz-md-card" ng-class="{'fullscreen': expandArray[2]}">
+            <md-card-content class="wazuh-column">
+                <div layout="row" ng-dblclick="expand(2)">
+                    <span class="wz-headline-title">Passed vs Failed</span>
+                    <span flex></span>
+                    <span class="wz-text-link" ng-click="expand(2)"><i class="fa fa-fw fa-expand"></i></span>
+                </div>
+                <md-divider class="wz-margin-top-10"></md-divider>
+                <kbn-vis id="Wazuh-App-Agents-CA-Passed-vs-failed"
+                    vis-id="'Wazuh-App-Agents-CA-Passed-vs-failed'">
+                </kbn-vis>
+            </md-card-content>
+        </md-card>
+    </div>
+
+    <div layout="row" layout-align="space-between stretch" class="height-530">
+        <md-card flex class="wz-md-card" ng-class="{'fullscreen': expandArray[3]}">
+            <md-card-content class="wazuh-column">
+                <div layout="row" ng-dblclick="expand(3)">
+                    <span class="wz-headline-title">Alerts over time</span>
+                    <span flex></span>
+                    <span class="wz-text-link" ng-click="expand(3)"><i class="fa fa-fw fa-expand"></i></span>
+                </div>
+                <md-divider class="wz-margin-top-10"></md-divider>
+                <kbn-vis id="Wazuh-App-Overview-CA-Results-heatmap" vis-id="'Wazuh-App-Overview-CA-Results-heatmap'">
+                </kbn-vis>
+            </md-card-content>
+        </md-card>
     </div>
 
     <div layout="row" layout-align="space-between stretch" class="height-630">
-        <md-card flex class="wz-md-card" ng-class="{'fullscreen': expandArray[7]}">
+        <md-card flex class="wz-md-card" ng-class="{'fullscreen': expandArray[4]}">
             <md-card-content class="wazuh-column">
-                <div layout="row" ng-dblclick="expand(7)">
+                <div layout="row" ng-dblclick="expand(4)">
                     <span class="wz-headline-title">Alerts summary</span>
                     <span flex></span>
-                    <span class="wz-text-link" ng-click="expand(7)"><i class="fa fa-fw fa-expand"></i></span>
+                    <span class="wz-text-link" ng-click="expand(4)"><i class="fa fa-fw fa-expand"></i></span>
                 </div>
                 <md-divider class="wz-margin-top-10"></md-divider>
                 <kbn-vis vis-id="'Wazuh-App-Agents-CA-Alerts-summary'"></kbn-vis>
