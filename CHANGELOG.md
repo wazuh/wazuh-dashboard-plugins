@@ -26,6 +26,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Added auto-merging dynamic fields for Wazuh monitoring index patterns ([#1300](https://github.com/wazuh/wazuh-kibana-app/pull/1300))
 - New server module, it's a job queue so we can add delayed jobs to be run in background, this iteration only accepts delayed Wazuh API calls ([#1283](https://github.com/wazuh/wazuh-kibana-app/pull/1283)).
 - Added new way to view logs using a logs viewer ([#1292](https://github.com/wazuh/wazuh-kibana-app/pull/1292))
+- Added new directive for registering agents from the UI, including instructions on "how to" ([#1321](https://github.com/wazuh/wazuh-kibana-app/pull/1321)).
 
 ### Changed
 
