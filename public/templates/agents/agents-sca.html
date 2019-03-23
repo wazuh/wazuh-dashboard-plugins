@@ -17,12 +17,6 @@
             </div>
         </div>
     </div>
-    <div layout="row" class="md-padding">
-        <div class="sca-chart-widget">
-        <div class="sca-chart-header">Pass vs Failed</div>
-        <div id="sca_chart" class="sca-chart"></div>
-    </div>
-    </div>
 
     <div layout="row" class="md-padding" ng-show="agent && agent.os && !lookingSca">
         <table class="table table-striped table-condensed table-hover" ng-if="policies && policies.length">
@@ -93,6 +87,12 @@
             <span flex><i class="fa fa-fw fa-warning"></i> No scans available.</span>
         </div>
     </div>
+    <div layout="row" class="md-padding" ng-show="!lookingSca">
+        <div class="sca-chart-widget">
+            <div class="sca-chart-header">Pass vs Failed</div>
+            <div id="sca_chart" class="sca-chart"></div>
+        </div>
+    </div>
 
     <div layout="row" class="wz-padding-top-0" ng-if="agent && agent.os && lookingSca">
         <md-card flex class="wz-md-card">
@@ -100,9 +100,9 @@
                 class="wz-card-actions wz-card-actions-top">
                 <span><i class="fa fa-fw fa-arrow-left cursor-pointer" ng-click="closeScaChecks()"></i>
                     {{lookingSca.name}}</span>
-                <span class="wz-margin-left-16">{{lookingSca.pass}}</span>
-                <span class="wz-margin-left-16">{{lookingSca.fail}}</span>
-                <span class="wz-margin-left-16">{{lookingSca.score}}%</span>
+                <span class="wz-margin-left-16">Pass: <span class="wz-text-bold">{{lookingSca.pass}}</span></span>
+                <span class="wz-margin-left-16">Fail: <span class="wz-text-bold">{{lookingSca.fail}}</span></span>
+                <span class="wz-margin-left-16">Score: <span class="wz-text-bold">{{lookingSca.score}}%</span></span>
                 <span flex></span>
                 <span class="wz-text-gray">{{lookingSca.end_scan}}</span>
             </md-card-actions>
