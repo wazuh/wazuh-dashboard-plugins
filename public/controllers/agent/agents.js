@@ -25,6 +25,7 @@ import {
 
 import { ConfigurationHandler } from '../../utils/config-handler';
 import { timefilter } from 'ui/timefilter';
+import $ from 'jquery';
 
 export class AgentsController {
   /**
@@ -440,6 +441,9 @@ export class AgentsController {
 
   renderScaPie(policies) {
     try {
+      $(function () {
+        // code to run on document ready
+     
       console.log(policies);
       /* 
       var dataset = [
@@ -582,6 +586,7 @@ export class AgentsController {
       };
 
       restOfTheData();
+    });
     } catch (error) {
       console.log(error);
     }

@@ -21,7 +21,7 @@ export async function getWzConfig($q, genericReq, errorHandler, wazuhConfig) {
     'extensions.pci': true,
     'extensions.gdpr': true,
     'extensions.audit': true,
-    'extensions.oscap': true,
+    'extensions.oscap': false,
     'extensions.ciscat': false,
     'extensions.aws': false,
     'extensions.virustotal': false,

@@ -87,7 +87,8 @@
             <span flex><i class="fa fa-fw fa-warning"></i> No scans available.</span>
         </div>
     </div>
-    <div layout="row" class="md-padding" ng-show="!lookingSca">
+    
+    <div layout="row" class="md-padding" ng-show="!load && !lookingSca">
         <div class="sca-chart-widget">
             <div class="sca-chart-header">Pass vs Failed</div>
             <div id="sca_chart" class="sca-chart"></div>

@@ -192,13 +192,13 @@
     <div layout="row"
         ng-if="!showSyscheckFiles && !showScaScan && tab === 'fim' && resultState === 'none' && tabView === 'panels'">
         <span flex></span>
-        <md-button ng-click="launchSyscheckScan()" class="wz-button pull-right"><i class="fa fa-fw fa-play"></i> Run
+        <md-button ng-click="launchSyscheckScan()" class="discoverSectionSwitchBtn pull-right"><i class="fa fa-fw fa-play"></i> Run
             scan</md-button>
         <span></span>
-        <md-button ng-click="switchSyscheckFiles()" class="wz-button pull-right"><i class="fa fa-fw fa-database"></i>
+        <md-button ng-click="switchSyscheckFiles()" class="discoverSectionSwitchBtn pull-right"><i class="fa fa-fw fa-database"></i>
             Show files</md-button>
     </div>
-
+    
     <div layout="row" class="wz-margin-top-10 wz-margin-right-8 wz-margin-left-8"
         ng-if="!showSyscheckFiles && !showScaScan && tab !== 'welcome' && tab !== 'configuration' && tab !== 'syscollector' && tab !== 'sca'"
         ng-show="resultState === 'none' && tabView === 'panels'">

@@ -26,7 +26,8 @@ export class ManagementController {
     wazuhConfig,
     appState,
     configHandler,
-    errorHandler
+    errorHandler,
+    $interval
   ) {
     this.$scope = $scope;
     this.$rootScope = $rootScope;
@@ -36,6 +37,7 @@ export class ManagementController {
     this.wazuhConfig = wazuhConfig;
     this.configHandler = configHandler;
     this.errorHandler = errorHandler;
+    this.$interval = $interval;
     this.tab = 'welcome';
     this.rulesetTab = 'rules';
     this.globalConfigTab = 'overview';
@@ -88,6 +90,22 @@ export class ManagementController {
       this.currentConfiguration = false;
     });
     this.$rootScope.$on('setRestarting', () => {
+      if (this.clusterInfo.status === 'enabled') {
+        this.$scope.blockEditioncounter = 0;
+        this.$scope.blockEdition = true;
+        this.$interval(
+          () => {
+            this.$scope.blockEditioncounter++;
+            if (this.$scope.blockEditioncounter == 100) {
+              this.$scope.blockEdition = false;
+              this.isRestarting = false;
+              this.$scope.$applyAsync();
+            }
+          },
+          333,
+          100
+        );
+      }
       this.isRestarting = true;
       this.$scope.$applyAsync();
     });
@@ -151,7 +169,7 @@ export class ManagementController {
     try {
       this.isRestarting = true;
       await this.configHandler.restartCluster();
-      this.errorHandler.info('Success. It will take up to 15 seconds.');
+      this.errorHandler.info('Success. It will take up to 30 seconds.');
       this.$scope.$applyAsync();
     } catch (error) {
       this.isRestarting = false;

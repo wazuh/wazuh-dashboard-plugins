@@ -17,7 +17,7 @@
 
 <div ng-if="!wazuh_table_loading && !isPolicyMonitoring() && !isSyscheck()" ng-show="!error && items.length">
     <table class="table table-striped table-condensed table-hover no-margin-bottom" ng-class="customColumns ? 'table-resizable' : ''"
-        style="table-layout: fixed !important" id="wz_table">
+        style="table-layout: fixed !important" id="table{{scapepath}}">
         <thead class="wz-text-bold">
             <th ng-repeat="key in keys" class="wz-text-left" ng-style="key.width && {'width':key.width}">
                 <span ng-class="{ 'cursor-pointer' : !key.nosortable}" ng-click="!key.nosortable && sort(key)">
@@ -143,7 +143,7 @@
 
 <div ng-if="!wazuh_table_loading && isPolicyMonitoring()" ng-show="!error && items.length">
     <table class="table table-striped table-striped-duo table-condensed table-hover no-margin-bottom" ng-class="customColumns ? 'table-resizable' : ''"
-        style="table-layout: fixed !important" id="wz_table">
+        style="table-layout: fixed !important" id="table{{scapepath}}">
         <thead class="wz-text-bold">
             <th ng-repeat="key in keys" class="wz-text-left" ng-style="key.width && {'width':key.width}">
                 <span ng-class="{ 'cursor-pointer' : !key.nosortable }" ng-click="!key.nosortable && sort(key)">
@@ -251,7 +251,7 @@
 
 <div ng-if="!wazuh_table_loading && isSyscheck()" ng-show="!error && items.length">
     <table class="table table-striped table-striped-duo table-condensed table-hover no-margin-bottom" ng-class="customColumns ? 'table-resizable' : ''"
-        style="table-layout: fixed !important" id="wz_table">
+        style="table-layout: fixed !important" id="table{{scapepath}}">
         <thead class="wz-text-bold">
             <th ng-repeat="key in keys" class="wz-text-left" ng-style="key.width && {'width':key.width}">
                 <span ng-class="{ 'cursor-pointer' : !key.nosortable }" ng-click="!key.nosortable && sort(key)">{{

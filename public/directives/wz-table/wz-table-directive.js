@@ -56,9 +56,10 @@ app.directive('wzTable', function() {
       $sce
     ) {
       $scope.showColumns = false;
+      $scope.scapepath = $scope.path.split('/').join('');
       $scope.originalkeys = $scope.keys.map((key, idx) => ({ key, idx }));
       $scope.updateColumns = key => {
-        $('#wz_table').colResizable({ disable: true });
+        $(`#table${$scope.scapepath}`).colResizable({ disable: true });
         const str = key.key.value || key.key;
         const cleanArray = $scope.keys.map(item => item.value || item);
         if (cleanArray.includes(str)) {
@@ -76,6 +77,7 @@ app.directive('wzTable', function() {
             $scope.keys.push(key.key);
           }
         }
+        updateStoredKeys($scope.keys.map(item => item.value || item));
         init(true);
       };
       $scope.exists = key => {
@@ -111,7 +113,7 @@ app.directive('wzTable', function() {
       let resizing = false;
       $window.onresize = () => {
         if (resizing) return;
-        $('#wz_table').colResizable({ disable: true });
+        $(`#table${$scope.scapepath}`).colResizable({ disable: true });
         resizing = true;
         clearTimeout(doit);
         doit = setTimeout(() => {
@@ -276,6 +278,10 @@ app.directive('wzTable', function() {
           errorHandler,
           skipFetching
         );
+        getStoredKeys();
+        if (!sessionStorage[$scope.path]) {
+          updateStoredKeys($scope.keys);
+        }
       };
       /**
        * Pagination variables and functions
@@ -485,12 +491,40 @@ app.directive('wzTable', function() {
         $c.remove();
       };
 
+      const getStoredKeys = () => {
+        if ($scope.customColumns) {
+          $(`#table${$scope.scapepath}`).colResizable({ disable: true });
+          if (sessionStorage[$scope.path]) {
+            $scope.keys = sessionStorage[$scope.path].split(';');
+          } else {
+            updateStoredKeys($scope.keys.map(item => item.value || item));
+          }
+          setTimeout(() => {
+            $scope.setColResizable();
+          }, 100);
+          $scope.$applyAsync();
+        }
+      };
+
+      const updateStoredKeys = keys => {
+        if ($scope.customColumns) {
+          let stringKeys = keys[0];
+          for (var i = 1; i < keys.length; i++) {
+            let tmp = keys[i].value || keys[i];
+            stringKeys += ';' + tmp;
+          }
+          sessionStorage[$scope.path] = stringKeys || '';
+          $scope.$applyAsync();
+        }
+      };
+
       $scope.setColResizable = () => {
-        $('#wz_table').colResizable({
+        $(`#table${$scope.scapepath}`).colResizable({
           liveDrag: true,
           minWidth: 78,
           partialRefresh: true,
-          draggingClass: false
+          draggingClass: false,
+          postbackSafe: true
         });
         $scope.$applyAsync();
       };
