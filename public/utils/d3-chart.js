@@ -81,7 +81,7 @@ const renderScaPie = (dataset, element) => {
           .attr('dy', '.4em')
           .attr('text-anchor', 'middle')
           .text(function(d) {
-            return d.data.value + ' checks';
+            return d.data.value;
           })
           .style({
             fill: '#fff',
