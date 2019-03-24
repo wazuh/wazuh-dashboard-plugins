@@ -87,11 +87,24 @@
             <span flex><i class="fa fa-fw fa-warning"></i> No scans available.</span>
         </div>
     </div>
-    <div layout="row" class="md-padding" ng-show="!load && !lookingSca">
-        <div class="sca-chart-widget">
-            <div class="sca-chart-header">Pass vs Failed</div>
-            <div id="sca_chart" class="sca-chart"></div>
-        </div>
+    <div layout="row"  class="md-padding layout-align-center" ng-show="!load && !lookingSca" ng-if="policies.length">
+        <md-card class="wz-md-card">
+            <md-card-actions layout="row" class="wz-card-actions wz-card-actions-top" style="padding-top:14px !important">
+                <span class="wz-headline-title">Total</span>
+            </md-card-actions>
+            <md-card-content>
+                <div id="sca_chart_pass_vs_fail" class="sca-chart"></div>
+            </md-card-content>
+        </md-card>
+        <md-card class="wz-md-card" ng-repeat="policy in policies">
+            <md-card-actions layout="row" class="wz-card-actions wz-card-actions-top" style="padding-top:14px !important">
+                <span class="wz-headline-title">{{policy.name}}</span>
+            </md-card-actions>
+            <md-card-content>
+                <div id="sca_chart_{{policy.policy_id}}" class="sca-chart"></div>
+            </md-card-content>
+        </md-card>
+    
     </div>
 
     <div layout="row" class="wz-padding-top-0" ng-if="agent && agent.os && lookingSca">
