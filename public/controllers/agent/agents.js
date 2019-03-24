@@ -14,7 +14,6 @@ import { generateMetric } from '../../utils/generate-metric';
 import { TabNames } from '../../utils/tab-names';
 import * as FileSaver from '../../services/file-saver';
 import { TabDescription } from '../../../server/reporting/tab-description';
-import d3 from 'd3';
 import {
   metricsAudit,
   metricsVulnerability,
@@ -25,7 +24,7 @@ import {
 
 import { ConfigurationHandler } from '../../utils/config-handler';
 import { timefilter } from 'ui/timefilter';
-import $ from 'jquery';
+import { renderScaPie } from '../../utils/d3-chart';
 
 export class AgentsController {
   /**
@@ -439,159 +438,6 @@ export class AgentsController {
     }
   }
 
-  renderScaPie(policies) {
-    try {
-      $(function () {
-        // code to run on document ready
-     
-      console.log(policies);
-      /* 
-      var dataset = [
-          { name: 'IE', percent: 39.10 },
-          { name: 'Chrome', percent: 32.51 },
-          { name: 'Safari', percent: 13.68 },
-          { name: 'Firefox', percent: 8.71 },
-          { name: 'Others', percent: 6.01 }
-      ];
-      */
-      let pass = 0,
-        fail = 0;
-      policies.map(policy => {
-        pass += policy.pass;
-        fail += policy.fail;
-      });
-      var dataset = [
-        { name: 'Pass', value: pass },
-        { name: 'Fail', value: fail }
-      ];
-
-      var pie = d3.layout
-        .pie()
-        .value(function(d) {
-          return d.value;
-        })
-        .sort(null)
-        .padAngle(0.03);
-
-      var w = 400,
-        h = 400;
-
-      var outerRadius = w / 2;
-      var innerRadius = 130;
-
-      var color = d3.scale.category10();
-
-      var arc = d3.svg
-        .arc()
-        .outerRadius(outerRadius)
-        .innerRadius(innerRadius);
-
-      var svg = d3
-        .select('#sca_chart')
-        .append('svg')
-        .attr({
-          width: w,
-          height: h,
-          class: 'shadow'
-        })
-        .append('g')
-        .attr({
-          transform: 'translate(' + w / 2 + ',' + h / 2 + ')'
-        });
-      var path = svg
-        .selectAll('path')
-        .data(pie(dataset))
-        .enter()
-        .append('path')
-        .attr({
-          d: arc,
-          fill: function(d, i) {
-            return color(d.data.name);
-          }
-        });
-
-      path
-        .transition()
-        .duration(1000)
-        .attrTween('d', function(d) {
-          var interpolate = d3.interpolate({ startAngle: 0, endAngle: 0 }, d);
-          return function(t) {
-            return arc(interpolate(t));
-          };
-        });
-
-      var restOfTheData = function() {
-        var text = svg
-          .selectAll('text')
-          .data(pie(dataset))
-          .enter()
-          .append('text')
-          .transition()
-          .duration(200)
-          .attr('transform', function(d) {
-            return 'translate(' + arc.centroid(d) + ')';
-          })
-          .attr('dy', '.4em')
-          .attr('text-anchor', 'middle')
-          .text(function(d) {
-            return d.data.value + ' checks';
-          })
-          .style({
-            fill: '#fff',
-            'font-size': '10px'
-          });
-
-        var legendRectSize = 20;
-        var legendSpacing = 7;
-        var legendHeight = legendRectSize + legendSpacing;
-
-        var legend = svg
-          .selectAll('.legend')
-          .data(color.domain())
-          .enter()
-          .append('g')
-          .attr({
-            class: 'legend',
-            transform: function(d, i) {
-              //Just a calculation for x & y position
-              return 'translate(-35,' + (i * legendHeight - 65) + ')';
-            }
-          });
-        legend
-          .append('rect')
-          .attr({
-            width: legendRectSize,
-            height: legendRectSize,
-            rx: 20,
-            ry: 20
-          })
-          .style({
-            fill: color,
-            stroke: color
-          });
-
-        legend
-          .append('text')
-          .attr({
-            x: 30,
-            y: 15
-          })
-          .text(function(d) {
-            return d;
-          })
-          .style({
-            fill: '#929DAF',
-            'font-size': '14px'
-          });
-      };
-
-      restOfTheData();
-    });
-    } catch (error) {
-      console.log(error);
-    }
-  }
-
   /**
    * Classify metrics for create the suitable one
    * @param {*} tab
@@ -635,7 +481,13 @@ export class AgentsController {
       const localChange =
         subtab === 'panels' && this.$scope.tabView === 'discover' && sameTab;
       this.$scope.tabView = subtab;
-
+      if (
+        subtab === 'panels' &&
+        this.$scope.tab === 'sca' &&
+        (this.$scope.policies || []).length
+      ) {
+        this.renderScaCharts();
+      }
       if (
         (subtab === 'panels' ||
           (this.targetLocation &&
@@ -666,6 +518,34 @@ export class AgentsController {
       return;
     } catch (error) {
       this.errorHandler.handle(error, 'Agents');
+      return;
+    }
+  }
+
+  renderScaCharts() {
+    try {
+      renderScaPie(
+        [
+          {
+            name: 'Pass',
+            value: this.$scope.policies.reduce((a, { pass }) => a + pass, 0)
+          },
+          {
+            name: 'Fail',
+            value: this.$scope.policies.reduce((a, { fail }) => a + fail, 0)
+          }
+        ],
+        `sca_chart_pass_vs_fail`
+      );
+
+      for (const policy of this.$scope.policies) {
+        const dataset = [];
+        policy.pass && dataset.push({ name: 'Pass', value: policy.pass });
+        policy.fail && dataset.push({ name: 'Fail', value: policy.fail });
+        renderScaPie(dataset, `sca_chart_${policy.policy_id}`);
+      }
+    } catch (error) {
+      this.errorHandler.handle(error);
       return;
     }
   }
@@ -720,8 +600,9 @@ export class AgentsController {
             `/sca/${this.$scope.agent.id}`,
             {}
           );
-          this.renderScaPie(policies.data.data.items);
-          this.$scope.policies = policies.data.data.items;
+
+          this.$scope.policies =
+            (((policies || {}).data || {}).data || {}).items || [];
         } catch (error) {
           this.$scope.policies = [];
         }
@@ -741,7 +622,14 @@ export class AgentsController {
       if (this.tabHistory.length > 2)
         this.tabHistory = this.tabHistory.slice(-2);
       this.tabVisualizations.setTab(tab);
-      if (this.$scope.tab === tab && !force) return;
+      if (this.$scope.tab === tab && !force) {
+        if (tab === 'sca') {
+          console.log('622: TRYING TO FORCE');
+          this.renderScaCharts();
+          this.$scope.$applyAsync();
+        }
+        return;
+      }
       const onlyAgent = this.$scope.tab === tab && force;
       const sameTab = this.$scope.tab === tab;
       this.$location.search('tab', tab);
