@@ -222,6 +222,6 @@
     <!-- No results section -->
 
     <!-- Loading ring -->
-    <div class='uil-ring-css' ng-show="load && tab !== 'configuration' && tabView === 'panels'">
+    <div class='uil-ring-css' ng-show="load && tab !== 'configuration' && tab !== 'sca' && tabView === 'panels'">
         <div></div>
     </div>
