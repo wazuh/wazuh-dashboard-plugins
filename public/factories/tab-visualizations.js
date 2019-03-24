@@ -34,8 +34,8 @@ export class TabVisualizations {
 
     this.overview = {
       welcome: 0,
-      general: 11,
-      fim: 8,
+      general: 6,
+      fim: 6,
       pm: 5,
       vuls: 10,
       oscap: 11,
