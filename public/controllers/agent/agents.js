@@ -398,7 +398,10 @@ export class AgentsController {
 
     this.$scope.loadScaChecks = policy =>
       (this.$scope.lookingSca = { ...policy, id: policy.policy_id });
-    this.$scope.closeScaChecks = () => (this.$scope.lookingSca = false);
+    this.$scope.closeScaChecks = () => {
+      this.$scope.lookingSca = false;
+      this.renderScaCharts();
+    };
 
     this.$scope.confirmAddGroup = group => {
       this.groupHandler
@@ -624,7 +627,6 @@ export class AgentsController {
       this.tabVisualizations.setTab(tab);
       if (this.$scope.tab === tab && !force) {
         if (tab === 'sca') {
-          console.log('622: TRYING TO FORCE');
           this.renderScaCharts();
           this.$scope.$applyAsync();
         }
