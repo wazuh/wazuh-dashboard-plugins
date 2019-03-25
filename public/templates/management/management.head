@@ -25,10 +25,6 @@
                 <span class="wz-text-link cursor-pointer" ng-click="mctrl.switchTab('groups', true)"> / {{ mctrl.tabNames[mctrl.tab] }}</span>
                 <span> / {{ mctrl.currentGroup.name }} </span>
             </div>
-            <!-- If you're on the Welcome tab, show a blank, simple breadcrumb -->
-            <div ng-if="mctrl.tab === 'welcome'">
-                <span>Management / Welcome</span>
-            </div>
         </div>
         <!-- End breadcrumbs -->
     </div>

@@ -1,8 +1,10 @@
 <div ng-if="!cdbctrl.viewingDetail" layout="column">
     <div id="content" layout="row" class="md-padding ">
-        <input flex placeholder="Filter lists..." ng-model="cdbctrl.custom_search" type="text" class="kuiLocalSearchInput height-40 ng-empty ng-pristine ng-scope ng-touched ng-valid"
-            aria-invalid="false" wz-enter="cdbctrl.search(cdbctrl.custom_search)">
-        <button type="submit" aria-label="Search" class="kuiLocalSearchButton height-40" ng-click="cdbctrl.search(cdbctrl.custom_search)">
+        <input flex placeholder="Filter lists..." ng-model="cdbctrl.custom_search" type="text"
+            class="kuiLocalSearchInput height-40 ng-empty ng-pristine ng-scope ng-touched ng-valid" aria-invalid="false"
+            wz-enter="cdbctrl.search(cdbctrl.custom_search)">
+        <button type="submit" aria-label="Search" class="kuiLocalSearchButton height-40"
+            ng-click="cdbctrl.search(cdbctrl.custom_search)">
             <span class="fa fa-search" aria-hidden="true"></span>
         </button>
     </div>
@@ -10,39 +12,46 @@
     <md-chips class="wz-chips md-padding-h" readonly="true" ng-show="cdbctrl.appliedFilters.length">
         <md-chip class="wz-chip" ng-show="cdbctrl.includesFilter('file')">
             <span>File: {{cdbctrl.getFilter('file')}}
-                <i class="fa fa-fw fa-times cursor-pointer" aria-hidden="true" ng-click="cdbctrl.removeFilter('file')"></i>
+                <i class="fa fa-fw fa-times cursor-pointer" aria-hidden="true"
+                    ng-click="cdbctrl.removeFilter('file')"></i>
             </span>
         </md-chip>
         <md-chip class="wz-chip" ng-show="cdbctrl.includesFilter('path')">
             <span>Path: {{cdbctrl.getFilter('path')}}
-                <i class="fa fa-fw fa-times cursor-pointer" aria-hidden="true" ng-click="cdbctrl.removeFilter('path')"></i>
+                <i class="fa fa-fw fa-times cursor-pointer" aria-hidden="true"
+                    ng-click="cdbctrl.removeFilter('path')"></i>
             </span>
         </md-chip>
         <md-chip class="wz-chip" ng-show="cdbctrl.includesFilter('level')">
             <span>Level: {{cdbctrl.getFilter('level')}}
-                <i class="fa fa-fw fa-times cursor-pointer" aria-hidden="true" ng-click="cdbctrl.removeFilter('level')"></i>
+                <i class="fa fa-fw fa-times cursor-pointer" aria-hidden="true"
+                    ng-click="cdbctrl.removeFilter('level')"></i>
             </span>
         </md-chip>
         <md-chip class="wz-chip" ng-show="cdbctrl.includesFilter('group')">
             <span>Group: {{cdbctrl.getFilter('group')}}
-                <i class="fa fa-fw fa-times cursor-pointer" aria-hidden="true" ng-click="cdbctrl.removeFilter('group')"></i>
+                <i class="fa fa-fw fa-times cursor-pointer" aria-hidden="true"
+                    ng-click="cdbctrl.removeFilter('group')"></i>
             </span>
         </md-chip>
         <md-chip class="wz-chip" ng-show="cdbctrl.includesFilter('pci')">
             <span>PCI control: {{cdbctrl.getFilter('pci')}}
-                <i class="fa fa-fw fa-times cursor-pointer" aria-hidden="true" ng-click="cdbctrl.removeFilter('pci')"></i>
+                <i class="fa fa-fw fa-times cursor-pointer" aria-hidden="true"
+                    ng-click="cdbctrl.removeFilter('pci')"></i>
             </span>
         </md-chip>
         <md-chip class="wz-chip" ng-show="cdbctrl.includesFilter('gdpr')">
             <span>GDPR: {{cdbctrl.getFilter('gdpr')}}
-                <i class="fa fa-fw fa-times cursor-pointer" aria-hidden="true" ng-click="cdbctrl.removeFilter('gdpr')"></i>
+                <i class="fa fa-fw fa-times cursor-pointer" aria-hidden="true"
+                    ng-click="cdbctrl.removeFilter('gdpr')"></i>
             </span>
         </md-chip>
     </md-chips>
 
     <div layout="row">
         <md-card flex class="wz-md-card _md flex md-margin-h">
-            <md-card-actions ng-if="cdbctrl.adminMode" layout="row" layout-align="end center" class="wz-card-actions wz-card-actions-top">
+            <md-card-actions ng-if="cdbctrl.adminMode" layout="row" layout-align="end center"
+                class="wz-card-actions wz-card-actions-top">
                 <a ng-click="cdbctrl.addNewList()">Add new list <i aria-hidden="true" class="fa fa-plus"></i></a>
                 <span flex></span>
             </md-card-actions>
@@ -51,9 +60,20 @@
                     keys="['name', 'path']" allow-click="true" row-sizes="[15,13,11]">
                 </wz-table>
             </md-card-content>
-            <md-card-actions layout="row" layout-align="end center" class="wz-card-actions layout-align-end-center layout-row">
-                <a class="wz-text-link cursor-pointer small md-button md-ink-ripple" id="btnDownload" ng-click="cdbctrl.downloadCsv()">Formatted
-                    <i aria-hidden="true" class="fa fa-download"></i></a>
+            <md-card-actions layout="row" layout-align="end center"
+                class="layout-align-end-center layout-row">
+                <button type="button" ng-click="cdbctrl.downloadCsv()"
+                    class="euiButtonEmpty euiButtonEmpty--primary euiButtonEmpty--small">
+                    <span class="euiButtonEmpty__content">
+                        <svg class="euiIcon euiIcon--medium euiButtonEmpty__icon" focusable="false" aria-hidden="true"
+                            xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
+                            <path
+                                d="M9 10.114l1.85-1.943a.52.52 0 0 1 .77 0c.214.228.214.6 0 .829l-1.95 2.05a1.552 1.552 0 0 1-2.31 0L5.41 9a.617.617 0 0 1 0-.829.52.52 0 0 1 .77 0L8 10.082V1.556C8 1.249 8.224 1 8.5 1s.5.249.5.556v8.558zM4.18 6a.993.993 0 0 0-.972.804l-1.189 6A.995.995 0 0 0 2.991 14h11.018a1 1 0 0 0 .972-1.196l-1.19-6a.993.993 0 0 0-.97-.804H4.18zM6 5v1h5V5h1.825c.946 0 1.76.673 1.946 1.608l1.19 6A2 2 0 0 1 14.016 15H2.984a1.992 1.992 0 0 1-1.945-2.392l1.19-6C2.414 5.673 3.229 5 4.174 5H6z">
+                            </path>
+                        </svg>
+                        <span class="euiButtonEmpty__text">Formatted</span>
+                    </span>
+                </button>
             </md-card-actions>
         </md-card>
     </div>

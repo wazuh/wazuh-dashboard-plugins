@@ -35,36 +35,53 @@
                     <md-divider class="wz-margin-top-10"></md-divider>
                     <div layout="row" class="wz-padding-top-10">
                         <p flex="35" class="manager-status-subtitle">Last registered agent</p>
-                        <p ng-if="ctrl.lastAgent.id !== '000'" class="wz-text-right wz-text-link" tooltip="Click to open this agent"
-                            tooltip-placement="right" ng-click="ctrl.showAgent(ctrl.lastAgent)">{{ctrl.lastAgent.name}}</p>
-                        <p ng-if="ctrl.lastAgent.id === '000'" class="wz-text-right" tooltip-placement="right">{{ctrl.lastAgent.name}}
+                        <p ng-if="ctrl.lastAgent.id !== '000'" class="wz-text-right wz-text-link"
+                            tooltip="Click to open this agent" tooltip-placement="right"
+                            ng-click="ctrl.showAgent(ctrl.lastAgent)">{{ctrl.lastAgent.name}}</p>
+                        <p ng-if="ctrl.lastAgent.id === '000'" class="wz-text-right" tooltip-placement="right">
+                            {{ctrl.lastAgent.name}}
                             (manager)</p>
                     </div>
                     <div layout="row" class="wz-padding-top-10">
                         <p flex="35" class="manager-status-subtitle">Higher activity</p>
-                        <p ng-show="ctrl.mostActiveAgent.id !== '000'" class="wz-text-right wz-text-link" tooltip="Click to open this agent"
-                            tooltip-placement="right" ng-click="ctrl.showAgent(ctrl.mostActiveAgent)">{{ctrl.mostActiveAgent.name}}</p>
-                        <p ng-show="ctrl.mostActiveAgent.id === '000'" class="wz-text-right" tooltip-placement="right">{{ctrl.mostActiveAgent.name}}</p>
+                        <p ng-show="ctrl.mostActiveAgent.id !== '000'" class="wz-text-right wz-text-link"
+                            tooltip="Click to open this agent" tooltip-placement="right"
+                            ng-click="ctrl.showAgent(ctrl.mostActiveAgent)">{{ctrl.mostActiveAgent.name}}</p>
+                        <p ng-show="ctrl.mostActiveAgent.id === '000'" class="wz-text-right" tooltip-placement="right">
+                            {{ctrl.mostActiveAgent.name}}</p>
                     </div>
                 </md-card-content>
             </md-card>
         </div>
     </div>
     <div layout="row" class="md-padding">
-        <wz-tag-filter flex path="'/agents'" query-fn="ctrl.query(q, search)" fields-model="ctrl.searchBarModel"></wz-tag-filter>
-        <md-button class="agents-prev-btn btn btn-info" style="height: 48px;margin: 0px 0 0 8px!important;" ng-click="ctrl.reloadList()"><i
-                class="fa fa-fw fa-refresh"></i> Refresh</md-button>
+        <wz-tag-filter flex path="'/agents'" query-fn="ctrl.query(q, search)" fields-model="ctrl.searchBarModel">
+        </wz-tag-filter>
+        <md-button class="agents-prev-btn btn btn-info" style="height: 48px;margin: 0px 0 0 8px!important;"
+            ng-click="ctrl.reloadList()"><i class="fa fa-fw fa-refresh"></i> Refresh</md-button>
     </div>
 
     <div layout="row">
         <md-card flex class="wz-md-card _md flex md-margin-h">
             <md-card-content class="wz-padding-bottom-30">
-                <wz-table custom-columns="true" flex path="'/agents'" keys="[{value: 'id', width: '75px'},'name','ip','status','group','os.name','os.version','version', 'dateAdd', 'lastKeepAlive']"
+                <wz-table custom-columns="true" flex path="'/agents'"
+                    keys="[{value: 'id', width: '75px'},'name','ip','status','group','os.name','os.version','version', 'dateAdd', 'lastKeepAlive']"
                     allow-click="true" row-sizes="[17,15,13]"></wz-table>
             </md-card-content>
-            <md-card-actions layout="row" layout-align="end center" class="wz-card-actions layout-align-end-center layout-row">
-                <a class="wz-text-link cursor-pointer small md-button md-ink-ripple" id="btnDownload" ng-click="ctrl.downloadCsv()">Formatted
-                    <i aria-hidden="true" class="fa fa-download"></i></a>
+            <md-card-actions layout="row" layout-align="end center"
+                class="layout-align-end-center layout-row">
+                <button type="button" ng-click="ctrl.downloadCsv()"
+                    class="euiButtonEmpty euiButtonEmpty--primary euiButtonEmpty--small">
+                    <span class="euiButtonEmpty__content">
+                        <svg class="euiIcon euiIcon--medium euiButtonEmpty__icon" focusable="false" aria-hidden="true"
+                            xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
+                            <path
+                                d="M9 10.114l1.85-1.943a.52.52 0 0 1 .77 0c.214.228.214.6 0 .829l-1.95 2.05a1.552 1.552 0 0 1-2.31 0L5.41 9a.617.617 0 0 1 0-.829.52.52 0 0 1 .77 0L8 10.082V1.556C8 1.249 8.224 1 8.5 1s.5.249.5.556v8.558zM4.18 6a.993.993 0 0 0-.972.804l-1.189 6A.995.995 0 0 0 2.991 14h11.018a1 1 0 0 0 .972-1.196l-1.19-6a.993.993 0 0 0-.97-.804H4.18zM6 5v1h5V5h1.825c.946 0 1.76.673 1.946 1.608l1.19 6A2 2 0 0 1 14.016 15H2.984a1.992 1.992 0 0 1-1.945-2.392l1.19-6C2.414 5.673 3.229 5 4.174 5H6z">
+                            </path>
+                        </svg>
+                        <span class="euiButtonEmpty__text">Formatted</span>
+                    </span>
+                </button>
             </md-card-actions>
         </md-card>
     </div>
