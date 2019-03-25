@@ -61,28 +61,31 @@
         <!-- Reporting button section -->
         <div ng-show="tab !== 'welcome' && tab !== 'configuration' && tabView === 'panels'">
             <!-- Report button -->
-            <md-button md-no-ink class="md-icon-button small wz-no-margin-padding" tooltip="Generate report"
+            <button class="height-40 kuiButton kuiButton--secondary wz-margin-right-8 small" tooltip="Generate report"
                 tooltip-placement="bottom"
+                ng-class="{'euiButtonEmpty--disabled': (!rendered || loading || resultState !== 'ready' || showSyscheckFiles || showScaScan) && tab !== 'syscollector'}"
                 ng-disabled="(!rendered || loading || resultState !== 'ready' || showSyscheckFiles || showScaScan) && tab !== 'syscollector'"
                 ng-click="startVis2Png()" aria-label="Generate report button">
                 <i class="fa fa-fw fa-print" aria-hidden="true"></i>
-            </md-button>
+            </button>
         </div>
         <!-- End Reporting buttons section -->
 
         <!-- Discover/Dashboard buttons section -->
         <div ng-show="tab !== 'welcome' && tab !== 'configuration' && tab !== 'syscollector'">
             <!-- Dashboard button -->
-            <md-button ng-if="tabView === 'discover'" class="wz-button-flat small" ng-click="switchSubtab('panels')"
-                aria-label="Dashboard button">
+            <button ng-if="tabView === 'discover'"
+                class="height-40 kuiButton kuiButton--secondary small wz-margin-right-8"
+                ng-click="switchSubtab('panels')" aria-label="Dashboard button">
                 <i class="fa fa-fw fa-th" aria-hidden="true"></i> Dashboard
-            </md-button>
+            </button>
 
             <!-- Discover button -->
-            <md-button ng-if="tabView === 'panels' && !showSyscheckFiles && !showScaScan" class="wz-button-flat small"
+            <button ng-if="tabView === 'panels' && !showSyscheckFiles && !showScaScan"
+                class="height-40 kuiButton kuiButton--secondary small wz-margin-right-8"
                 ng-click="switchSubtab('discover')" aria-label="Discover button">
                 <i class="fa fa-fw fa-compass" aria-hidden="true"></i> Discover
-            </md-button>
+            </button>
         </div>
         <!-- End Discover/Dashboard buttons section -->
 
@@ -190,10 +193,12 @@
     <div layout="row"
         ng-if="!showSyscheckFiles && !showScaScan && tab === 'fim' && resultState === 'none' && tabView === 'panels'">
         <span flex></span>
-        <md-button ng-click="launchSyscheckScan()" class="wz-button pull-right"><i class="fa fa-fw fa-play"></i> Run
+        <md-button ng-click="launchSyscheckScan()" class="discoverSectionSwitchBtn pull-right"><i
+                class="fa fa-fw fa-play"></i> Run
             scan</md-button>
         <span></span>
-        <md-button ng-click="switchSyscheckFiles()" class="wz-button pull-right"><i class="fa fa-fw fa-database"></i>
+        <md-button ng-click="switchSyscheckFiles()" class="discoverSectionSwitchBtn pull-right"><i
+                class="fa fa-fw fa-database"></i>
             Show files</md-button>
     </div>
 
