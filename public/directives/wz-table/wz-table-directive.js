@@ -158,12 +158,15 @@ app.directive('wzTable', function () {
             $scope.items = items;
             checkGap($scope, items);
             $scope.searchTable();
-            $scope.$emit('wazuhFetched', { items });
+            $scope.$emit('wazuhFetched', { items, filters: instance.filters });
           } else {
             // Resize
             checkGap($scope, $scope.items);
             $scope.searchTable();
-            $scope.$emit('wazuhFetched', { items: $scope.items });
+            $scope.$emit('wazuhFetched', {
+              items: $scope.items,
+              filters: instance.filters
+            });
           }
           if ($scope.customColumns) {
             setTimeout(() => {
