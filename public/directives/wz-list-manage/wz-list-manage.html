@@ -46,7 +46,14 @@
                             <td><button class="btn btn-primary btn-as-i" ng-disabled="!newKey"
                                     ng-click="addEntry(newKey, newValue);newKey = ''; newValue = ''"
                                     tooltip="Add new entry" tooltip-placement="right">
-                                    <i class="fa fa-fw fa-plus" style="width:15px"></i></button></td>
+                                    <svg class="euiIcon euiIcon--medium" focusable="false"
+                                        xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
+                                        <path fill-rule="evenodd"
+                                            d="M8 7h3.5a.5.5 0 1 1 0 1H8v3.5a.5.5 0 1 1-1 0V8H3.5a.5.5 0 0 1 0-1H7V3.5a.5.5 0 0 1 1 0V7zm-.5-7C11.636 0 15 3.364 15 7.5S11.636 15 7.5 15 0 11.636 0 7.5 3.364 0 7.5 0zm0 .882a6.618 6.618 0 1 0 0 13.236A6.618 6.618 0 0 0 7.5.882z">
+                                        </path>
+                                    </svg>
+                                </button>
+                            </td>
                         </tr>
                         <tr class="wz-word-wrap" ng-repeat="item in pagedItems[currentPage] track by $index"
                             ng-style="editingKey === item[0] && {'background': '#e2f7ff'}">
@@ -60,7 +67,18 @@
                                 <div ng-hide="!adminMode">
                                     <span ng-show="(!editingKey || editingKey !== item[0]) && removingEntry !== item[0]"
                                         tooltip="Edit" ng-click="setEditingKey(item[0], item[1])"
-                                        class="fa fa-fw fa-pencil cursor-pointer"></span>
+                                        class="cursor-pointer">
+                                        <svg class="euiIcon euiIcon--medium euiButtonIcon__icon" focusable="false"
+                                            aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
+                                            xmlns:xlink="http://www.w3.org/1999/xlink" width="16" height="16"
+                                            viewBox="0 0 16 16">
+                                            <defs>
+                                                <path id="pencil-a"
+                                                    d="M12.148 3.148L11 2l-9 9v3h3l9-9-1.144-1.144-8.002 7.998a.502.502 0 0 1-.708 0 .502.502 0 0 1 0-.708l8.002-7.998zM11 1c.256 0 .512.098.707.293l3 3a.999.999 0 0 1 0 1.414l-9 9A.997.997 0 0 1 5 15H2a1 1 0 0 1-1-1v-3c0-.265.105-.52.293-.707l9-9A.997.997 0 0 1 11 1zM5 14H2v-3l3 3z">
+                                                </path>
+                                            </defs>
+                                            <use xlink:href="#pencil-a"></use>
+                                        </svg></span>
                                     <span ng-show="editingKey === item[0] && !loadingChange" tooltip="Cancel"
                                         class="fa fa-fw fa-times cursor-pointer" ng-click="cancelEditingKey()"></span>
                                     <span

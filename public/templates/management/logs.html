@@ -44,30 +44,47 @@
         </div>
 
         <!-- End Level selector -->
+    </div>
+    <!-- End Filters and Realtime button section -->
 
-        <!-- White space between filters and Realtime button -->
-        <span flex></span>
+    <div layout="row"
+        class="euiFlexGroup euiFlexGroup--alignItemsCenter euiFormControlLayout__childrenWrapper md-padding-h ng-scope wz-margin-top-16"
+        ng-if="ctrl.logsPath">
+        <input placeholder="Filter logs..." ng-model="ctrl.custom_search" type="text"
+            class="euiFieldSearch euiFieldSearch--fullWidth euiFlexItem height-35 ng-empty ng-pristine ng-touched ng-valid"
+            aria-invalid="false" wz-enter="ctrl.search(ctrl.custom_search)">
+        <div class="euiFormControlLayoutIcons wz-margin-left-16"><span class="euiFormControlLayoutCustomIcon"><svg
+                    class="euiIcon euiIcon--medium euiFormControlLayoutCustomIcon__icon" focusable="false"
+                    aria-hidden="true" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+                    width="16" height="16" viewBox="0 0 16 16">
+                    <defs>
+                        <path id="search-a"
+                            d="M11.271 11.978l3.872 3.873a.502.502 0 0 0 .708 0 .502.502 0 0 0 0-.708l-3.565-3.564c2.38-2.747 2.267-6.923-.342-9.532-2.73-2.73-7.17-2.73-9.898 0-2.728 2.729-2.728 7.17 0 9.9a6.955 6.955 0 0 0 4.949 2.05.5.5 0 0 0 0-1 5.96 5.96 0 0 1-4.242-1.757 6.01 6.01 0 0 1 0-8.486c2.337-2.34 6.143-2.34 8.484 0a6.01 6.01 0 0 1 0 8.486.5.5 0 0 0 .034.738z">
+                        </path>
+                    </defs>
+                    <use xlink:href="#search-a"></use>
+                </svg></span></div>
 
-        <button ng-if="!ctrl.realtime" class="height-35 kuiButton kuiButton--secondary no-margin-right"
+        <button type="submit" aria-label="Search"
+            class="euiFlexItem euiFlexItem--flexGrowZero height-35 kuiButton kuiButton--secondary wz-margin-left-8"
+            ng-click="ctrl.search(ctrl.custom_search)">
+            Search
+        </button>
+        <div class="euiFlexItem euiFlexItem--flexGrowZero height-35 wz-margin-left-8">
+            <div class="euiFilterGroup"></div>
+        </div>
+
+        <button ng-if="!ctrl.realtime"
+            class="euiFlexItem euiFlexItem--flexGrowZero height-35 kuiButton kuiButton--secondary ng-scope wz-margin-left-8"
             ng-click="ctrl.playRealtime()" aria-label="Play realtime button">
             <i class="fa fa-play fa-fw" aria-hidden="true"></i>
             Play realtime
         </button>
-        <button ng-if="ctrl.realtime" class="height-35 kuiButton kuiButton--secondary no-margin-right"
+        <button ng-if="ctrl.realtime"
+            class="euiFlexItem euiFlexItem--flexGrowZero height-35 kuiButton kuiButton--danger ng-scope wz-margin-left-8"
             ng-click="ctrl.stopRealtime()" aria-label="Stop realtime button">
             <i class="fa fa-stop fa-fw" aria-hidden="true"></i>
             Stop realtime
-        </button>
-    </div>
-    <!-- End Filters and Realtime button section -->
-
-    <div layout="row" flex class="md-padding-h wz-margin-top-16" ng-if="ctrl.logsPath">
-        <input placeholder="Filter logs..." ng-model="ctrl.custom_search" type="text"
-            class="kuiLocalSearchInput ng-empty ng-pristine ng-scope ng-touched ng-valid" aria-invalid="false"
-            wz-enter="ctrl.search(ctrl.custom_search)">
-        <button type="submit" aria-label="Search" class="kuiLocalSearchButton height-40"
-            ng-click="ctrl.search(ctrl.custom_search)">
-            <span class="fa fa-search" aria-hidden="true"></span>
         </button>
     </div>
 

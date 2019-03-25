@@ -12,8 +12,21 @@
             <div layout="row">
                 <span class="font-size-18">
                     <i class="fa fa-fw fa-object-group" aria-hidden="true"></i> Groups </span>
-                <span ng-if='adminMode' class="font-size-18 wz-text-link" ng-click="switchAddingGroup()"> <i
-                        class="fa fa-fw" ng-class="!addingGroup ? 'fa-plus-circle' : 'fa-minus-circle'"></i></span>
+                <span ng-if='adminMode' class="font-size-18 wz-text-link wz-margin-left-8"
+                    ng-click="switchAddingGroup()">
+                    <svg ng-if="!addingGroup" class="euiIcon euiIcon--medium" focusable="false"
+                        xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
+                        <path fill-rule="evenodd"
+                            d="M8 7h3.5a.5.5 0 1 1 0 1H8v3.5a.5.5 0 1 1-1 0V8H3.5a.5.5 0 0 1 0-1H7V3.5a.5.5 0 0 1 1 0V7zm-.5-7C11.636 0 15 3.364 15 7.5S11.636 15 7.5 15 0 11.636 0 7.5 3.364 0 7.5 0zm0 .882a6.618 6.618 0 1 0 0 13.236A6.618 6.618 0 0 0 7.5.882z">
+                        </path>
+                    </svg>
+                    <svg ng-if="addingGroup" class="euiIcon euiIcon--medium" focusable="false"
+                        xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
+                        <path fill-rule="evenodd"
+                            d="M7.5 0C11.636 0 15 3.364 15 7.5S11.636 15 7.5 15 0 11.636 0 7.5 3.364 0 7.5 0zm0 .882a6.618 6.618 0 1 0 0 13.236A6.618 6.618 0 0 0 7.5.882zM3.5 7h8a.5.5 0 1 1 0 1h-8a.5.5 0 0 1 0-1z">
+                        </path>
+                    </svg>
+                </span>
             </div>
             <div layout="row" ng-if="addingGroup" ng-if='adminMode' class="wz-padding-bottom-0">
                 <input placeholder="Group name..." ng-model="groupToBeAdded" type="text"
@@ -32,32 +45,9 @@
 
         <div flex layout="column" layout-align="start stretch" ng-show="!load" ng-init="groupsSelectedTab='agents'">
             <!-- MD5 Sums and Details cards -->
-            <div layout="row" class="md-padding-h" ng-if="lookingGroup">
-                <!-- Group MD5 sums section -->
-                <md-card flex class="no-margin-left no-margin-right wz-margin-top-8 wz-md-card">
-                    <md-card-content>
-                        <span class="wz-headline-title font-size-18"><i class="fa fa-fw fa-object-group"
-                                aria-hidden="true"></i>
-                            {{currentGroup.name}}</span>
-                        <md-divider class="wz-margin-top-10"></md-divider>
-                        <div layout="row" class="wz-padding-top-10">
-                            <span flex="15">Agents</span>
-                            <span class="wz-text-right color-grey">{{ currentGroup.count }}</span>
-                        </div>
-                        <div layout="row" class="wz-padding-top-10">
-                            <span flex="15">Content</span>
-                            <span class="wz-text-right color-grey">{{ totalFiles }} files</span>
-                        </div>
-                        <div layout="row" class="wz-padding-top-10">
-                            <span flex="15">Configuration sum</span>
-                            <span class="wz-text-right color-grey">{{ currentGroup.configSum }}</span>
-                        </div>
-                        <div layout="row" class="wz-padding-top-10">
-                            <span flex="15">Merged sum</span>
-                            <span class="wz-text-right color-grey">{{ currentGroup.mergedSum }}</span>
-                        </div>
-                    </md-card-content>
-                </md-card>
+            <div layout="row" class="md-padding" ng-if="lookingGroup && currentGroup">
+                <span class="wz-headline-title font-size-18"><i class="fa fa-fw fa-object-group" aria-hidden="true"></i>
+                    {{currentGroup.name}}</span>
             </div>
 
             <!-- End group actions -->
@@ -100,35 +90,71 @@
                         possible to apply changes of more than 500 additions or deletions</span>
                 </div>
 
-                <div layout="row" class="md-padding wz-padding-bottom-0"
-                    ng-if="lookingGroup && currentGroup && !addingAgents && !editingFile && !file && adminMode">
-                    <button ng-if="lookingGroup && groupsSelectedTab==='files'"
-                        ng-click='editGroupAgentConfig(currentGroup)' class='btn wz-button'><i aria-hidden='true'
-                            class='fa fa-fw fa-pencil'></i>
-                        Edit group configuration
-                    </button>
-                    <button ng-if="lookingGroup && groupsSelectedTab==='agents'" ng-click='addMultipleAgents(true)'
-                        class='btn wz-button'><i aria-hidden='true' class='fa fa-fw fa-tv'></i>
-                        Add or remove agents
-                    </button>
-                </div>
-
                 <!-- Search bar -->
-                <div layout="row" class="md-padding" ng-if="!addingAgents && !file">
+                <div layout="row"
+                    class="wz-margin-top-16 euiFlexGroup euiFlexGroup--alignItemsCenter euiFormControlLayout__childrenWrapper md-padding-h ng-scope"
+                    ng-if="!addingAgents && !file">
                     <input
                         placeholder="{{groupsSelectedTab==='files' ? 'Filter files...' : lookingGroup ? 'Filter agents...' : 'Filter groups...'}}"
                         ng-model="custom_search" type="text"
-                        class="kuiLocalSearchInput ng-empty ng-pristine ng-scope ng-touched ng-valid"
+                        class="euiFieldSearch euiFieldSearch--fullWidth euiFlexItem height-35 ng-empty ng-pristine ng-touched ng-valid"
                         aria-invalid="false" wz-enter="search(custom_search)">
-                    <button type="submit" aria-label="Search" class="kuiLocalSearchButton height-40"
+                    <div class="euiFormControlLayoutIcons wz-margin-left-16"><span
+                            class="euiFormControlLayoutCustomIcon"><svg
+                                class="euiIcon euiIcon--medium euiFormControlLayoutCustomIcon__icon" focusable="false"
+                                aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
+                                xmlns:xlink="http://www.w3.org/1999/xlink" width="16" height="16" viewBox="0 0 16 16">
+                                <defs>
+                                    <path id="search-a"
+                                        d="M11.271 11.978l3.872 3.873a.502.502 0 0 0 .708 0 .502.502 0 0 0 0-.708l-3.565-3.564c2.38-2.747 2.267-6.923-.342-9.532-2.73-2.73-7.17-2.73-9.898 0-2.728 2.729-2.728 7.17 0 9.9a6.955 6.955 0 0 0 4.949 2.05.5.5 0 0 0 0-1 5.96 5.96 0 0 1-4.242-1.757 6.01 6.01 0 0 1 0-8.486c2.337-2.34 6.143-2.34 8.484 0a6.01 6.01 0 0 1 0 8.486.5.5 0 0 0 .034.738z">
+                                    </path>
+                                </defs>
+                                <use xlink:href="#search-a"></use>
+                            </svg></span></div>
+
+                    <button type="submit" aria-label="Search"
+                        class="euiFlexItem euiFlexItem--flexGrowZero height-35 kuiButton kuiButton--secondary wz-margin-left-8"
                         ng-click="search(custom_search)">
-                        <span class="fa fa-search" aria-hidden="true"></span>
+                        Search
                     </button>
+                    <div ng-if="lookingGroup && currentGroup && !addingAgents && !editingFile && !file && adminMode"
+                        class="euiFlexItem euiFlexItem--flexGrowZero height-35 wz-margin-left-8">
+                        <div class="euiFilterGroup"></div>
+                    </div>
+                    <button
+                        ng-if="lookingGroup && currentGroup && !addingAgents && !editingFile && !file && adminMode && groupsSelectedTab==='files'"
+                        class="euiFlexItem euiFlexItem--flexGrowZero height-35 kuiButton kuiButton--secondary ng-scope wz-margin-left-8"
+                        ng-click="editGroupAgentConfig(currentGroup)" aria-label="Edit group configuration">
+                        <svg class="euiIcon euiIcon--medium euiButtonIcon__icon" focusable="false" aria-hidden="true"
+                            xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="16"
+                            height="16" viewBox="0 0 16 16">
+                            <defs>
+                                <path id="pencil-a"
+                                    d="M12.148 3.148L11 2l-9 9v3h3l9-9-1.144-1.144-8.002 7.998a.502.502 0 0 1-.708 0 .502.502 0 0 1 0-.708l8.002-7.998zM11 1c.256 0 .512.098.707.293l3 3a.999.999 0 0 1 0 1.414l-9 9A.997.997 0 0 1 5 15H2a1 1 0 0 1-1-1v-3c0-.265.105-.52.293-.707l9-9A.997.997 0 0 1 11 1zM5 14H2v-3l3 3z">
+                                </path>
+                            </defs>
+                            <use xlink:href="#pencil-a"></use>
+                        </svg>
+                        Edit group configuration
+                    </button>
+                    <button
+                        ng-if="lookingGroup && currentGroup && !addingAgents && !editingFile && !file && adminMode && groupsSelectedTab==='agents'"
+                        class="euiFlexItem euiFlexItem--flexGrowZero height-35 kuiButton kuiButton--secondary ng-scope wz-margin-left-8"
+                        ng-click="addMultipleAgents(true)" aria-label="Add or remove agents">
+                        <svg class="euiIcon euiIcon--medium" focusable="false" xmlns="http://www.w3.org/2000/svg"
+                            width="16" height="16" viewBox="0 0 16 16">
+                            <path fill-rule="evenodd"
+                                d="M8 7h3.5a.5.5 0 1 1 0 1H8v3.5a.5.5 0 1 1-1 0V8H3.5a.5.5 0 0 1 0-1H7V3.5a.5.5 0 0 1 1 0V7zm-.5-7C11.636 0 15 3.364 15 7.5S11.636 15 7.5 15 0 11.636 0 7.5 3.364 0 7.5 0zm0 .882a6.618 6.618 0 1 0 0 13.236A6.618 6.618 0 0 0 7.5.882z">
+                            </path>
+                        </svg>
+                        Add or remove agents
+                    </button>
+
                 </div>
                 <!-- End search bar -->
 
                 <!-- Groups table -->
-                <md-card flex class="wz-md-card _md flex md-margin-h" ng-if="!lookingGroup">
+                <md-card flex class="wz-md-card _md flex md-margin-h wz-margin-top-16" ng-if="!lookingGroup">
                     <md-card-content>
                         <div layout="row">
                             <wz-table custom-columns="true" flex extra-limit="100" path="'/agents/groups'"
@@ -137,8 +163,7 @@
                         </div>
                     </md-card-content>
                     <!-- CSV Download button section for groups -->
-                    <md-card-actions layout="row" layout-align="end center"
-                        class="layout-align-end-center layout-row">
+                    <md-card-actions layout="row" layout-align="end center" class="layout-align-end-center layout-row">
                         <button type="button" ng-click="downloadCsv('/agents/groups')"
                             class="euiButtonEmpty euiButtonEmpty--primary euiButtonEmpty--small">
                             <span class="euiButtonEmpty__content">
@@ -159,7 +184,7 @@
 
                 <div ng-if='!addingAgents'>
                     <!-- Group agents table -->
-                    <md-card flex class="wz-md-card _md flex md-margin-h"
+                    <md-card flex class="wz-md-card _md flex md-margin-h wz-margin-top-16"
                         ng-if="lookingGroup && groupsSelectedTab==='agents' && currentGroup">
                         <div layout="row" ng-show="failedErrors" class="extraHeader">
                             <md-list>
@@ -204,7 +229,7 @@
                     <!-- End CSV Download button section for group agents -->
 
                     <!-- Group files table -->
-                    <md-card flex class="wz-md-card _md flex md-margin-h"
+                    <md-card flex class="wz-md-card _md flex md-margin-h wz-margin-top-16"
                         ng-if="lookingGroup && groupsSelectedTab==='files' && !fileViewer && currentGroup">
                         <md-card-content>
                             <div layout="row">
