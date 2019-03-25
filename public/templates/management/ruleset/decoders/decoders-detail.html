@@ -137,14 +137,9 @@
                 <span ng-show='dctrl.xmlHasErrors' class='btn-danger'><i aria-hidden='true' class='fa fa-fw fa-exclamation-triangle'></i>
                     XML format error</span>
             </button>
-            <div ng-show="dctrl.restartMsg" class="confirmEmbedBubble confirmEmbedBubbleInline">
-                <span class="wz-padding-top-10 wz-padding-left-8">Configuration is not applied yet. Do you want
-                    to restart <b>{{selectedNode}}</b> to apply it?</span>
-                <button class="btn cancelBtn btn-info md-padding-h" type="button" ng-click="dctrl.restartMsg = false">I
-                    will do it later</button>
-                <button class="btn wz-button" type="button" ng-disabled="dctrl.doingSaving" ng-click="dctrl.restart(); dctrl.restartMsg = false">Restart
-                    <b>{{selectedNode}}</b> now</button>
-            </div>
+            <button class="btn wz-button" type="button" ng-show="dctrl.restartBtn" ng-disabled="dctrl.doingSaving"
+                ng-click="dctrl.restart(); dctrl.restartBtn = false">Restart
+                <b>{{selectedNode}}</b> now</button>
         </div>
         <div class="wz-padding-top-14" ng-if="dctrl.fetchedXML" style="height: calc(100vh - 220px);">
             <wz-xml-file-editor file-name='decoders' data="dctrl.fetchedXML" target-name="dctrl.currentDecoder.file"

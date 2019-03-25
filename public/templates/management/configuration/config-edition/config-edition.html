@@ -28,7 +28,7 @@
             <div flex layout="column">
                 <div layout="row" class="md-padding-h">
                     <!-- List of nodes if cluster is enabled -->
-                    <div ng-show="selectedNode && clusterStatus.data.data.enabled === 'yes' && clusterStatus.data.data.running === 'yes' "
+                    <div ng-show="selectedNode && clusterStatus.data.data.enabled === 'yes' && clusterStatus.data.data.running === 'yes' && (!blockEdition || (blockEdition && isRestarting))"
                         layout="row" layout-padding style="padding: 0;height: 32px;">
                         <div layout="column" layout-align="center" class="height-35 wz-select-input wz-margin-right-8">
                             <select class="kuiSelect wz-border-none cursor-pointer max-height-35" id="categoryBox"
@@ -40,36 +40,37 @@
                     <button ng-disabled='xmlHasErrors' ng-click="switchConfigurationTab('welcome', false)" class='btn btn-info'>
                         <span>Cancel</span>
                     </button>
-                    <button ng-disabled='xmlHasErrors || doingSaving || isRestarting' ng-click='saveConfiguration()'
-                        class='btn wz-button wz-margin-left-8'>
-                        <span ng-show='!xmlHasErrors'><i aria-hidden='true' class='fa fa-fw fa-save' ng-class="doingSaving ? 'fa-spin fa-spinner' : ''"></i>Save</span>
-                        <span ng-show='xmlHasErrors' class='btn-danger'><i aria-hidden='true' class='fa fa-fw fa-exclamation-triangle'></i>
-                            XML format error</span>
-                    </button>
-                    <span flex ng-if="!restartMsg"></span>
-                    <div ng-show="restartMsg" class="confirmEmbedBubble confirmEmbedBubbleInline">
-                        <span class="wz-padding-top-10 wz-padding-left-8">Configuration is not applied yet. Do you want
-                            to restart <b>{{selectedNode}}</b> to apply it?</span>
-                        <button class="btn cancelBtn btn-info md-padding-h" type="button" ng-click="restartMsg = false">I
-                            will do it later</button>
-                        <button class="btn wz-button" type="button" ng-disabled="doingSaving" ng-click="restartNode(selectedNode); restartMsg = false">Restart
-                            <b>{{selectedNode}}</b> now</button>
-                    </div>
-                    <button ng-show="!showConfirmRestartNode && !restartMsg" class="btn wz-button" ng-disabled="isRestarting || doingSaving"
-                        ng-click="showConfirmRestartNode = true"><i class="fa fa-refresh" ng-class="isRestarting ? 'fa-spin fa-spinner' : ''"></i>
-                        Restart {{selectedNode}}
-                    </button>
-                    <div ng-show="showConfirmRestartNode" class="confirmEmbedBubble confirmEmbedBubbleInline">
-                        <div layout="row no-wrap">
-                            <span class="wz-padding-top-10 wz-padding-left-8"><strong>{{selectedNode}}</strong> will be
-                                restarted
-                            </span>
+                    <div layout="row" class="fullWidth wz-padding-left-16" ng-show="blockEdition && !isRestarting">
+                        <div id="wz-progress">
+                            <div id="wz-progress-bar" style="width:{{blockEditioncounter}}%">Restarting cluster
+                                {{blockEditioncounter}}%</div>
                         </div>
-                        <div layout="row">
-                            <md-button class="cancelBtn btn-info" type="button" ng-click="showConfirmRestartNode = false">Cancel</md-button>
-                            <md-button class="btn wz-button" type="button" ng-click="restartNode(selectedNode);showConfirmRestartNode = false"><i
-                                    aria-hidden='true' class='fa fa-fw fa-check'></i>
-                                Confirm</md-button>
+                    </div>
+                    <div layout="row" ng-show="!blockEdition || (blockEdition && isRestarting)" class="fullWidth">
+                        <button ng-disabled='xmlHasErrors || doingSaving || isRestarting' ng-click='saveConfiguration()'
+                            class='btn wz-button wz-margin-left-8'>
+                            <span ng-show='!xmlHasErrors'><i aria-hidden='true' class='fa fa-fw fa-save' ng-class="doingSaving ? 'fa-spin fa-spinner' : ''"></i>Save</span>
+                            <span ng-show='xmlHasErrors' class='btn-danger'><i aria-hidden='true' class='fa fa-fw fa-exclamation-triangle'></i>
+                                XML format error</span>
+                        </button>
+                        <span flex ng-if="!restartBtn"></span>
+                        <button ng-show="!showConfirmRestartNode && !restartBtn" class="btn wz-button" ng-disabled="isRestarting || doingSaving"
+                            ng-click="showConfirmRestartNode = true"><i class="fa fa-refresh" ng-class="isRestarting ? 'fa-spin fa-spinner' : ''"></i>
+                            Restart {{selectedNode}}
+                        </button>
+                        <div ng-show="showConfirmRestartNode" class="confirmEmbedBubble confirmEmbedBubbleInline">
+                            <div layout="row no-wrap">
+                                <span class="wz-padding-top-10 wz-padding-left-8"><strong>{{selectedNode}}</strong>
+                                    will be
+                                    restarted
+                                </span>
+                            </div>
+                            <div layout="row">
+                                <md-button class="cancelBtn btn-info" type="button" ng-click="showConfirmRestartNode = false">Cancel</md-button>
+                                <md-button class="btn wz-button" type="button" ng-click="restartNode(selectedNode);showConfirmRestartNode = false"><i
+                                        aria-hidden='true' class='fa fa-fw fa-check'></i>
+                                    Confirm</md-button>
+                            </div>
                         </div>
                     </div>
                 </div>

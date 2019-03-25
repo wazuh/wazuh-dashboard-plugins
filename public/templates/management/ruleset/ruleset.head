@@ -10,6 +10,6 @@
     <md-nav-bar class="wz-nav-bar nav-bar-white-bg " md-selected-nav-item="mctrl.globalRulesetTab">
         <md-nav-item class="wz-nav-item" md-nav-click="mctrl.setRulesTab('rules')" name="rules">Rules</md-nav-item>
         <md-nav-item class="wz-nav-item" md-nav-click="mctrl.setRulesTab('decoders')" name="decoders">Decoders</md-nav-item>
-        <md-nav-item class="wz-nav-item" md-nav-click="mctrl.setRulesTab('cdblists')" name="cdblists">CDB Lists</md-nav-item>
+        <md-nav-item class="wz-nav-item" md-nav-click="mctrl.setRulesTab('cdblists')" name="cdblists">CDB lists</md-nav-item>
     </md-nav-bar>
 </div>

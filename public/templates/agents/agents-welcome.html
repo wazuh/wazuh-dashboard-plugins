@@ -18,10 +18,12 @@
 
     <!-- Headline -->
     <div layout="row" class="wz-margin-left-16 wz-margin-right-16 wz-margin-top-8">
-        <span class="font-size-18 wz-line-height-40"><i class="fa fa-fw fa-tv" aria-hidden="true"></i> {{ agent.name || '-' }} <span
-                class="wz-text-bold wz-text-link" ng-click="goDiscover()" tooltip="Discover"><i class="fa fa-fw fa-compass"
-                    aria-hidden="true"></i></span></span>
+        <span class="font-size-18 wz-line-height-40"><i class="fa fa-fw fa-tv" aria-hidden="true"></i> {{ agent.name ||
+            '-' }}</span>
         <span flex></span>
+        <md-button class="wz-button wz-no-margin height-35" ng-click="goDiscover()"><i class="fa fa-compass"></i>
+            Discover
+        </md-button>&nbsp;&nbsp;
         <md-button ng-show="!showConfirmRestartAgent" ng-disabled="restartingAgent" class="wz-button wz-no-margin height-35"
             ng-disabled="isRestarting" ng-click="showConfirmRestartAgent = true"><i class="fa fa-refresh" ng-class="restartingAgent ? 'fa-spin fa-spinner' : ''"></i>
             Restart agent
@@ -39,7 +41,7 @@
         </div>
     </div>
     <!-- End headline -->
-    <div layout="row" layout-padding>
+    <div layout="row" layout-padding class="agents-headline">
         <md-card flex class="wz-md-card wz-padding-top-0 wz-padding-bottom-0">
             <md-card-content>
                 <div class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--justifyContentSpaceBetween euiFlexGroup--directionRow euiFlexGroup--responsive">
@@ -130,8 +132,8 @@
             </md-card-content>
         </md-card>
     </div>
-    <div layout="row" layout-padding>
-        <md-card flex class="wz-md-card wz-padding-top-0 wz-padding-bottom-0">
+    <div layout="row" layout-padding class="wz-padding-bottom-0 wz-padding-top-0">
+        <md-card flex class="wz-md-card wz-padding-top-0 wz-padding-bottom-0 wz-no-top-bottom-margin">
             <md-card-content>
 
                 <div layout="row" ng-if="agent.group">
@@ -202,7 +204,7 @@
                     <div class="euiFlexGrid euiFlexGrid--gutterLarge euiFlexGrid--halves">
                         <wz-welcome-card class="euiFlexItem" logo="'icons/app_advanced_settings.svg'" card-title="'Policy monitoring'"
                             switch-tab="switchTab('pm')" current-tab="'pm'" description="TabDescription.pm.description"></wz-welcome-card>
-                        <wz-welcome-card class="euiFlexItem" logo="'icons/app_timelion.svg'" card-title="'Configuration assessment'"
+                        <wz-welcome-card class="euiFlexItem" logo="'icons/sca.png'" card-title="'Configuration assessment'"
                             switch-tab="switchTab('sca')" current-tab="'sca'" description="TabDescription['sca'].description"></wz-welcome-card>
                         <wz-welcome-card ng-if="extensions.audit && agent.isLinuxOS" class="euiFlexItem" logo="'icons/app_monitoring.svg'"
                             card-title="'System auditing'" switch-tab="switchTab('audit')" current-tab="'audit'"
