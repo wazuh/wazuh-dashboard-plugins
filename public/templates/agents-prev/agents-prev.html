@@ -50,29 +50,6 @@
                     </div>
                 </md-card-content>
             </md-card>
-            <md-card flex="50" class="wz-md-card">
-                <md-card-content>
-                    <span class="wz-headline-title">Top</span>
-                    <md-divider class="wz-margin-top-10"></md-divider>
-                    <div layout="row" class="wz-padding-top-10">
-                        <p flex="35" class="manager-status-subtitle">Last registered agent</p>
-                        <p ng-if="ctrl.lastAgent.id !== '000'" class="wz-text-right wz-text-link"
-                            tooltip="Click to open this agent" tooltip-placement="right"
-                            ng-click="ctrl.showAgent(ctrl.lastAgent)">{{ctrl.lastAgent.name}}</p>
-                        <p ng-if="ctrl.lastAgent.id === '000'" class="wz-text-right" tooltip-placement="right">
-                            {{ctrl.lastAgent.name}}
-                            (manager)</p>
-                    </div>
-                    <div layout="row" class="wz-padding-top-10">
-                        <p flex="35" class="manager-status-subtitle">Higher activity</p>
-                        <p ng-show="ctrl.mostActiveAgent.id !== '000'" class="wz-text-right wz-text-link"
-                            tooltip="Click to open this agent" tooltip-placement="right"
-                            ng-click="ctrl.showAgent(ctrl.mostActiveAgent)">{{ctrl.mostActiveAgent.name}}</p>
-                        <p ng-show="ctrl.mostActiveAgent.id === '000'" class="wz-text-right" tooltip-placement="right">
-                            {{ctrl.mostActiveAgent.name}}</p>
-                    </div>
-                </md-card-content>
-            </md-card>
         </div>
     </div>
     <div layout="row" class="md-padding">
