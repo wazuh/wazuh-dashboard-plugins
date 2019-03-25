@@ -3,7 +3,7 @@
         <div></div>
     </div>
 </div>
-<div ng-show="!wazuh_table_resizing">
+<div ng-style="wazuh_table_resizing && {'visibility': 'hidden', 'height': '0px'}">
     <div ng-if="customColumns" layout="row" ng-show="!error && !wazuh_table_loading && items.length" class="columns-bar"
         ng-class="{'columns-bar-active': showColumns}" ng-style="!showColumns && {'margin-bottom': '-35px'}">
         <div ng-if="showColumns" class="euiCheckbox wz-margin-right-8" ng-repeat="key in originalkeys" ng-click="updateColumns(key)">
