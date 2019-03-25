@@ -23,8 +23,6 @@
                 <a class="wz-text-link cursor-pointer" href="#/agents-preview">Agents</a>
                 <span> / </span>
                 <span>{{agent.name}} ({{agent.id}})</span>
-                <span> / </span>
-                <span>Welcome</span>
             </div>
 
             <div ng-if="tab === 'configuration' && configurationTab === 'welcome'">

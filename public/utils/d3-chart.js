@@ -23,11 +23,11 @@ const render = (dataset, element) => {
       .sort(null)
       .padAngle(0.03);
 
-    var w = 250,
-      h = 250;
+    var w = 200,
+      h = 200;
 
     var outerRadius = w / 2;
-    var innerRadius = 85;
+    var innerRadius = 75;
 
     var color = d3.scale.category10();
 
@@ -106,8 +106,8 @@ const render = (dataset, element) => {
       legend
         .append('rect')
         .attr({
-          width: legendRectSize,
-          height: legendRectSize,
+          width: 12,
+          height: 12,
           rx: 20,
           ry: 20
         })
@@ -119,15 +119,15 @@ const render = (dataset, element) => {
       legend
         .append('text')
         .attr({
-          x: 30,
-          y: 15
+          x: 20,
+          y: 10
         })
         .text(function(d) {
           return d;
         })
         .style({
           fill: '#929DAF',
-          'font-size': '14px'
+          'font-size': '10px'
         });
     };
 

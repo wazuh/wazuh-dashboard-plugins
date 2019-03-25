@@ -1,11 +1,14 @@
-<div ng-if="!files.viewingDetail" ng-show="!editingFile" layout="column" ng-init="filesctrl.switchFilesSubTab(mctrl.globalRulesetTab)">
+<div ng-if="!files.viewingDetail" ng-show="!editingFile" layout="column"
+    ng-init="filesctrl.switchFilesSubTab(mctrl.globalRulesetTab)">
     <div id="content" layout="row" class="md-padding">
         <md-button class="md-icon-button md-icon-button-back wz-padding-right-16 btn btn-info" aria-label="Back to list"
-            tooltip="Back" tooltip-placement="bottom" ng-click="mctrl.setRulesTab(filesctrl.filesSubTab)"><i class="fa fa-fw fa-arrow-left"
-                aria-hidden="true"></i></md-button>
-        <input flex placeholder="Filter files..." ng-model="filesctrl.custom_search" type="text" class="kuiLocalSearchInput height-40 ng-empty ng-pristine ng-scope ng-touched ng-valid"
-            aria-invalid="false" wz-enter="filesctrl.search(filesctrl.custom_search)">
-        <button type="submit" aria-label="Search" class="kuiLocalSearchButton height-40" ng-click="filesctrl.search(filesctrl.custom_search)">
+            tooltip="Back" tooltip-placement="bottom" ng-click="mctrl.setRulesTab(filesctrl.filesSubTab)"><i
+                class="fa fa-fw fa-arrow-left" aria-hidden="true"></i></md-button>
+        <input flex placeholder="Filter files..." ng-model="filesctrl.custom_search" type="text"
+            class="kuiLocalSearchInput height-40 ng-empty ng-pristine ng-scope ng-touched ng-valid" aria-invalid="false"
+            wz-enter="filesctrl.search(filesctrl.custom_search)">
+        <button type="submit" aria-label="Search" class="kuiLocalSearchButton height-40"
+            ng-click="filesctrl.search(filesctrl.custom_search)">
             <span class="fa fa-search" aria-hidden="true"></span>
         </button>
     </div>
@@ -17,10 +20,12 @@
                 <span flex></span>
             </md-card-actions>
             <md-card-content>
-                <wz-table ng-if="filesctrl.filesSubTab === 'rules'" implicit-filter="[{ name:'path',value: 'etc/rules'}]"
-                    flex path="'/rules/files'" keys="[{value: 'file', width: '75px'}]" allow-click="true" row-sizes="[16,13,11]"></wz-table>
-                <wz-table ng-if="filesctrl.filesSubTab === 'decoders'" implicit-filter="[{ name:'path',value: 'etc/decoders'}]"
-                    flex path="'/decoders/files'" keys="[{value: 'file', width: '75px'}]" allow-click="true" row-sizes="[16,13,11]"></wz-table>
+                <wz-table ng-if="filesctrl.filesSubTab === 'rules'"
+                    implicit-filter="[{ name:'path',value: 'etc/rules'}]" flex path="'/rules/files'"
+                    keys="[{value: 'file', width: '75px'}]" allow-click="true" row-sizes="[16,13,11]"></wz-table>
+                <wz-table ng-if="filesctrl.filesSubTab === 'decoders'"
+                    implicit-filter="[{ name:'path',value: 'etc/decoders'}]" flex path="'/decoders/files'"
+                    keys="[{value: 'file', width: '75px'}]" allow-click="true" row-sizes="[16,13,11]"></wz-table>
             </md-card-content>
         </md-card>
     </div>
@@ -30,32 +35,39 @@
         <div layout="row" class="wz-padding-bottom-14">
             <div ng-if="!newFile">
                 <span ng-click='closeEditingFile()' class='btn btn-info'>Cancel</span>
-                <button ng-disabled='xmlHasErrors || doingSaving' ng-click='doSaveConfig(false)' class='btn wz-button pull-right wz-margin-left-8'>
-                    <span ng-show='!xmlHasErrors'><i aria-hidden='true' class='fa fa-fw fa-save' ng-class="doingSaving ? 'fa-spin fa-spinner' : ''"></i>Save
+                <button ng-disabled='xmlHasErrors || doingSaving' ng-click='doSaveConfig(false)'
+                    class='btn wz-button pull-right wz-margin-left-8'>
+                    <span ng-show='!xmlHasErrors'><i aria-hidden='true' class='fa fa-fw fa-save'
+                            ng-class="doingSaving ? 'fa-spin fa-spinner' : ''"></i>Save
                         file</span>
-                    <span ng-show='xmlHasErrors' class='btn-danger'><i aria-hidden='true' class='fa fa-fw fa-exclamation-triangle'></i>
+                    <span ng-show='xmlHasErrors' class='btn-danger'><i aria-hidden='true'
+                            class='fa fa-fw fa-exclamation-triangle'></i>
                         XML format error</span>
                 </button>
             </div>
             <div ng-if="newFile" layout="row" class="wz-width-100">
                 <span ng-click='closeEditingFile()' class='btn btn-info'>Cancel</span>
-                <button ng-disabled='xmlHasErrors || newFileName === "" || doingSaving || overwriteError' ng-click='doSaveConfig(true,newFileName)'
-                    class='btn wz-button wz-margin-left-8'>
-                    <span ng-show='!xmlHasErrors'><i aria-hidden='true' class='fa fa-fw fa-save' ng-class="doingSaving ? 'fa-spin fa-spinner' : ''"></i>Save
+                <button ng-disabled='xmlHasErrors || newFileName === "" || doingSaving || overwriteError'
+                    ng-click='doSaveConfig(true,newFileName)' class='btn wz-button wz-margin-left-8'>
+                    <span ng-show='!xmlHasErrors'><i aria-hidden='true' class='fa fa-fw fa-save'
+                            ng-class="doingSaving ? 'fa-spin fa-spinner' : ''"></i>Save
                         file</span>
-                    <span ng-show='xmlHasErrors' class='btn-danger'><i aria-hidden='true' class='fa fa-fw fa-exclamation-triangle'></i>
+                    <span ng-show='xmlHasErrors' class='btn-danger'><i aria-hidden='true'
+                            class='fa fa-fw fa-exclamation-triangle'></i>
                         XML format error</span>
                 </button>
                 <input placeholder="{{type === 'rules' ? 'Eg: my_local_rule.xml' : 'Eg: my_local_decoder.xml'}}"
                     ng-model="newFileName" type="text" class="wz-margin-left-8 kuiLocalSearchInput" aria-invalid="false"
                     ng-change="cancelSaveAndOverwrite()">
-                <button ng-show="restartBtn" class="btn wz-button" type="button" ng-disabled="doingSaving" ng-click="restart(); toggleRestartMsg()">Restart
+                <button ng-show="restartBtn" class="btn wz-button" type="button" ng-disabled="doingSaving"
+                    ng-click="restart(); toggleRestartMsg()">Restart
                     now</button>
             </div>
         </div>
         <div ng-if="fetchedXML" style="height: calc(100vh - 220px);">
-            <wz-xml-file-editor file-name='{{type}}' data="fetchedXML" target-name="newFile ? selectedItem.file : currentFile.file"
-                valid-fn='xmlIsValid(valid)' saving-param='toggleSaveConfig()' close-fn='closeEditingFile(reload)'>
+            <wz-xml-file-editor file-name='{{type}}' data="fetchedXML"
+                target-name="newFile ? selectedItem.file : currentFile.file" valid-fn='xmlIsValid(valid)'
+                saving-param='toggleSaveConfig()' close-fn='closeEditingFile(reload)'>
             </wz-xml-file-editor>
         </div>
     </div>

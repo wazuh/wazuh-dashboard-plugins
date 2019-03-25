@@ -14,20 +14,16 @@
         <!-- End cluster disabled breadcrumbs -->
 
         <!-- Status and reports navigation bar -->
-        <md-nav-bar class="wz-nav-bar" ng-show="mctrl.tab !== 'welcome'" md-selected-nav-item="mctrl.tab" nav-bar-aria-label="Status and reports navigation links">
+        <md-nav-bar class="wz-nav-bar" ng-show="mctrl.tab !== 'welcome'" md-selected-nav-item="mctrl.tab"
+            nav-bar-aria-label="Status and reports navigation links">
             <md-nav-item class="wz-nav-item" md-nav-click="mctrl.switchTab('status')" name="status">Status</md-nav-item>
             <md-nav-item class="wz-nav-item" md-nav-click="mctrl.switchTab('logs')" name="logs">Logs</md-nav-item>
-            <md-nav-item class="wz-nav-item" md-nav-click="mctrl.switchTab('monitoring')" name="monitoring">Cluster</md-nav-item>
-            <md-nav-item class="wz-nav-item" md-nav-click="mctrl.switchTab('reporting')" name="reporting">Reporting</md-nav-item>
+            <md-nav-item class="wz-nav-item" md-nav-click="mctrl.switchTab('monitoring')" name="monitoring">Cluster
+            </md-nav-item>
+            <md-nav-item class="wz-nav-item" md-nav-click="mctrl.switchTab('reporting')" name="reporting">Reporting
+            </md-nav-item>
         </md-nav-bar>
         <!-- End status and reports navigation bar -->
-
-        <!-- Headline -->
-        <div layout="column" layout-padding>
-            <span class="font-size-18"><i class="fa fa-fw fa-search" aria-hidden="true"></i> Cluster</span>
-            <span class="md-subheader">Visualize your Wazuh cluster nodes and its agents</span>
-        </div>
-        <!-- End headline -->
 
         <!-- Cluster disabled section -->
         <div flex layout="row" layout-align="start start" ng-if="!isClusterEnabled">
@@ -37,7 +33,8 @@
                         disabled</span>
                     <md-divider class="wz-margin-top-10"></md-divider>
                     <div layout="column" class="wz-padding-top-10">
-                        <p>The cluster is disabled. Visit the documentation on <a target="_blank" href="https://documentation.wazuh.com/current/user-manual/manager/wazuh-cluster.html">this
+                        <p>The cluster is disabled. Visit the documentation on <a target="_blank"
+                                href="https://documentation.wazuh.com/current/user-manual/manager/wazuh-cluster.html">this
                                 link</a> to learn about how to enable it.
                         </p>
                     </div>
@@ -114,28 +111,24 @@
         <!-- End navigation section -->
 
         <!-- Status and reports navigation bar -->
-        <md-nav-bar ng-if="!loading" class="wz-nav-bar" ng-show="mctrl.tab !== 'welcome'" md-selected-nav-item="mctrl.tab"
-            nav-bar-aria-label="Status and reports navigation links">
+        <md-nav-bar ng-if="!loading" class="wz-nav-bar" ng-show="mctrl.tab !== 'welcome'"
+            md-selected-nav-item="mctrl.tab" nav-bar-aria-label="Status and reports navigation links">
             <md-nav-item class="wz-nav-item" md-nav-click="mctrl.switchTab('status')" name="status">Status</md-nav-item>
             <md-nav-item class="wz-nav-item" md-nav-click="mctrl.switchTab('logs')" name="logs">Logs</md-nav-item>
-            <md-nav-item class="wz-nav-item" md-nav-click="mctrl.switchTab('monitoring')" name="monitoring">Cluster</md-nav-item>
-            <md-nav-item class="wz-nav-item" md-nav-click="mctrl.switchTab('reporting')" name="reporting">Reporting</md-nav-item>
+            <md-nav-item class="wz-nav-item" md-nav-click="mctrl.switchTab('monitoring')" name="monitoring">Cluster
+            </md-nav-item>
+            <md-nav-item class="wz-nav-item" md-nav-click="mctrl.switchTab('reporting')" name="reporting">Reporting
+            </md-nav-item>
         </md-nav-bar>
         <!-- End status and reports navigation bar -->
 
-        <!-- Headline -->
-        <div ng-show="!loading" layout="column" layout-padding>
-            <span class="font-size-18"><i class="fa fa-fw fa-search" aria-hidden="true"></i> Cluster</span>
-            <span class="md-subheader">Visualize your Wazuh cluster nodes and its agents</span>
-        </div>
-        <!-- End headline -->
-
         <!-- Discover search bar section -->
-        <kbn-dis ng-show="!loading && (!showNodes || currentNode)"></kbn-dis>
+        <kbn-dis ng-show="!loading && (!showNodes || currentNode)" class="wz-margin-top-10"></kbn-dis>
         <!-- End Discover search bar section -->
 
         <!-- Loading status section -->
-        <div layout="column" layout-align="center center" class="wz-margin-bottom-40" ng-show="!loading && !rendered && resultState === 'ready' && (!showNodes || (showNodes && currentNode))">
+        <div layout="column" layout-align="center center" class="wz-margin-bottom-40"
+            ng-show="!loading && !rendered && resultState === 'ready' && (!showNodes || (showNodes && currentNode))">
             <div class="percentage"><i class="fa fa-fw fa-spin fa-spinner" aria-hidden="true"></i></div>
             <div class="percentage">{{loadingStatus}}</div>
         </div>
