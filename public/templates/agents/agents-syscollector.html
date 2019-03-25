@@ -173,6 +173,10 @@
                     </button>
                 </div>
             </md-card-content>
+            <md-card-actions layout="row" layout-align="end center" class="wz-card-actions layout-align-end-center layout-row" style="margin: 12px -10px -8px -8px!important;max-width: unset;">
+                    <a class="wz-text-link cursor-pointer small md-button md-ink-ripple" id="btnDownload" ng-click="downloadCsv('/syscollector/'+agent.id+'/packages', 'packages.csv')">Formatted
+                        <i aria-hidden="true" class="fa fa-download"></i></a>
+                </md-card-actions>
         </md-card>
     </div>
 
@@ -217,6 +221,10 @@
                     </button>
                 </div>
             </md-card-content>
+            <md-card-actions layout="row" layout-align="end center" class="wz-card-actions layout-align-end-center layout-row" style="margin: 12px -10px -8px -8px!important;max-width: unset;">
+                    <a class="wz-text-link cursor-pointer small md-button md-ink-ripple" id="btnDownload" ng-click="downloadCsv('/syscollector/'+agent.id+'/processes', 'processes.csv')">Formatted
+                        <i aria-hidden="true" class="fa fa-download"></i></a>
+                </md-card-actions>
         </md-card>
     </div>
 </md-content>

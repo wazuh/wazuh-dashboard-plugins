@@ -100,6 +100,7 @@ export class EditionController {
     this.$scope.restartNode = async selectedNode => {
       try {
         this.$scope.$emit('setRestarting', {});
+        this.$scope.$broadcast('removeRestartMsg', {});
         this.$scope.isRestarting = true;
         this.$scope.clusterStatus = await this.apiReq.request(
           'GET',
@@ -115,7 +116,7 @@ export class EditionController {
           (clusterStatus.enabled === 'no' && clusterStatus.running === 'yes')
         ) {
           await this.configHandler.restartNode(selectedNode);
-          this.errorHandler.info('Success. It will take up to 15 seconds.');
+          this.errorHandler.info('Success. It will take up to 30 seconds.');
         } else {
           await this.configHandler.restartManager();
           this.errorHandler.info('Success. It may take a few seconds.');
@@ -128,6 +129,7 @@ export class EditionController {
           error.message || error,
           'Error restarting node'
         );
+        this.$scope.$emit('removeBlockEdition', {});
         this.$scope.$emit('removeRestarting', {});
         this.$scope.isRestarting = false;
       }
@@ -146,13 +148,13 @@ export class EditionController {
           clusterStatus.enabled === 'yes' && clusterStatus.running === 'yes';
         const parameters = enabledAndRunning
           ? {
-              node: this.$scope.selectedNode,
-              showRestartManager: 'cluster'
-            }
+            node: this.$scope.selectedNode,
+            showRestartManager: 'cluster'
+          }
           : {
-              manager: this.$scope.selectedNode,
-              showRestartManager: 'manager'
-            };
+            manager: this.$scope.selectedNode,
+            showRestartManager: 'manager'
+          };
         this.$scope.doingSaving = true;
         this.$scope.$applyAsync();
         this.$scope.$broadcast('saveXmlFile', parameters);
@@ -169,12 +171,12 @@ export class EditionController {
     };
 
     this.$scope.changeNode = () => {
+      this.$scope.restartBtn = false;
       this.$scope.editConf();
     };
 
-    //listeners
-    this.$scope.$on('showRestartMsg', () => {
-      this.$scope.restartMsg = true;
+    this.$scope.$on('showRestart', () => {
+      this.$scope.restartBtn = true;
       this.$scope.$applyAsync();
     });
   }

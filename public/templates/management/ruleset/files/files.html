@@ -59,13 +59,7 @@
                 <input placeholder="{{type === 'rules' ? 'Eg: my_local_rule.xml' : 'Eg: my_local_decoder.xml'}}"
                     ng-model="newFileName" type="text" class="wz-margin-left-8 kuiLocalSearchInput" aria-invalid="false"
                     ng-change="cancelSaveAndOverwrite()">
-            </div>
-            <div ng-show="restartMsg" class="confirmEmbedBubble confirmEmbedBubbleInline">
-                <span class="wz-padding-top-10 wz-padding-left-8">Configuration is not applied yet. Do you want
-                    to restart to apply it?</span>
-                <button class="btn cancelBtn btn-info md-padding-h" type="button" ng-click="toggleRestartMsg()">I
-                    will do it later</button>
-                <button class="btn wz-button" type="button" ng-disabled="doingSaving"
+                <button ng-show="restartBtn" class="btn wz-button" type="button" ng-disabled="doingSaving"
                     ng-click="restart(); toggleRestartMsg()">Restart
                     now</button>
             </div>

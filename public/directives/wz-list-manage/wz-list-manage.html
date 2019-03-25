@@ -12,20 +12,17 @@
             ng-change="overwriteError = false" type="text"
             class="kuiLocalSearchInput ng-empty ng-pristine ng-scope ng-touched ng-valid wz-margin-left-8"
             aria-invalid="false">
-        <div ng-show="restartMsg" class="confirmEmbedBubble confirmEmbedBubbleInline">
-            <span class="wz-padding-top-10 wz-padding-left-8">Configuration is not applied yet. Do you want
-                to restart to apply it?</span>
-            <button class="btn cancelBtn btn-info md-padding-h" type="button" ng-click="restartMsg = false">I
-                will do it later</button>
-            <button class="btn wz-button" type="button" ng-disabled="doingSaving"
-                ng-click="restart(); restartMsg = false">Restart
-                now</button>
-        </div>
     </div>
     <div layout="row" ng-class="hideClose ? ['wz-padding-left-8', 'wz-padding-right-8'] : ['wz-padding-top-14']"
         layout-align="start stretch">
         <md-card flex class="wz-md-card" ng-class="{ 'wz-no-margin' : !hideClose }">
-            <md-card-content>
+            <div layout="row" ng-if="restartBtn" class="extraHeaderInfo">
+                <span><i class="fa fa-info-circle" aria-hidden="true"></i>&nbsp;
+                    Changes will not take effect until a restart is performed.</span>
+                <span flex></span>
+                <span class="cursor-pointer" ng-click="restart()">Restart now</span>
+            </div>
+            <md-card-content ng-style="hideClose && {'min-height': 'calc(100vh - 378px)'} || {'min-height': 'calc(100vh - 308px)'}">
                 <div layout="row">
                     <input placeholder="Filter entries..." ng-model="searchTerm" ng-change="filterTable()" type="text"
                         class="kuiLocalSearchInput ng-empty ng-pristine ng-scope ng-touched ng-valid height-40">
@@ -129,6 +126,10 @@
                             <div ng-show="items.length >= itemsPerPage" class="pagination pull-right"
                                 style="margin:0 !important">
                                 <ul layout="row">
+                                    <li ng-show="currentPage > 0" class="md-padding">
+                                        <a href ng-click="firstPage()">First</a>
+                                    </li>
+
                                     <li ng-show="currentPage" class="md-padding">
                                         <a href ng-click="prevPage()">« Prev</a>
                                     </li>
@@ -142,12 +143,20 @@
                                     <li ng-show="currentPage < pagedItems.length - 1" class="md-padding">
                                         <a href ng-click="nextPage()">Next »</a>
                                     </li>
+
+                                    <li ng-show="currentPage < pagedItems.length - 1" class="md-padding">
+                                        <a href ng-click="setPage(pagedItems.length - 1)">Last</a>
+                                    </li>
                                 </ul>
                             </div>
                         </td>
                     </tfoot>
                 </table>
             </md-card-content>
+            <md-card-actions layout="row" layout-align="end center" class="wz-card-actions layout-align-end-center layout-row">
+                <a class="wz-text-link cursor-pointer small md-button md-ink-ripple" id="btnDownload" ng-click="downloadCsv('/lists',  currentList.name, currentList.path)">Formatted
+                    <i aria-hidden="true" class="fa fa-download"></i></a>
+            </md-card-actions>
         </md-card>
     </div>
 </div>

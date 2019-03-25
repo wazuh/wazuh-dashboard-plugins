@@ -244,7 +244,10 @@ export class DevToolsController {
     }
     this.linesWithClass = [];
     if (group) {
-      if (!group.requestTextJson) {
+      if (
+        !group.requestTextJson ||
+        (group.requestText.includes('{') && group.requestText.includes('}'))
+      ) {
         this.linesWithClass.push(
           this.apiInputBox.addLineClass(
             group.start,
@@ -524,11 +527,16 @@ export class DevToolsController {
           ? 'DELETE'
           : 'GET';
 
-        const requestCopy = desiredGroup.requestText.includes(method)
+        let requestCopy = desiredGroup.requestText.includes(method)
           ? desiredGroup.requestText.split(method)[1].trim()
           : desiredGroup.requestText;
 
         // Checks for inline parameters
+        let paramsInline = false;
+        if (requestCopy.includes('{') && requestCopy.includes('}')) {
+          paramsInline = `{${requestCopy.split('{')[1]}`;
+          requestCopy = requestCopy.split('{')[0];
+        }
         const inlineSplit = requestCopy.split('?');
 
         const extra =
@@ -544,7 +552,7 @@ export class DevToolsController {
 
         let JSONraw = {};
         try {
-          JSONraw = JSON.parse(desiredGroup.requestTextJson);
+          JSONraw = JSON.parse(paramsInline || desiredGroup.requestTextJson);
         } catch (error) {
           JSONraw = {};
         }
