@@ -36,7 +36,8 @@
 
     <div layout="row" class="md-padding"
         ng-if="!dctrl.editingFile && dctrl.currentDecoder.file && dctrl.currentDecoder.path === 'etc/decoders' && adminMode">
-        <button ng-click='dctrl.editDecodersConfig(dctrl.currentDecoder)' class='btn wz-button'>
+        <button ng-click='dctrl.editDecodersConfig(dctrl.currentDecoder)'
+            class="height-35 kuiButton kuiButton--secondary">
             <svg class="euiIcon euiIcon--medium euiButtonIcon__icon" focusable="false" aria-hidden="true"
                 xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="16" height="16"
                 viewBox="0 0 16 16">
