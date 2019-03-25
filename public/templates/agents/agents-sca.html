@@ -220,30 +220,30 @@
                 </div>
             </div>
         </div>
-
-        <div layout="row" class="wz-padding-top-0" ng-if="agent && agent.os && lookingSca">
-            <md-card flex class="wz-md-card fullWidth">
-                <md-card-content class="wz-padding-bottom-30">
-                    <span class="wz-headline-title"><i class="fa fa-fw fa-arrow-left cursor-pointer" ng-click="closeScaChecks()"></i>
-                        {{lookingSca.name}} checks</span>
-                    <md-divider class="wz-margin-top-10"></md-divider>
-                    <div layout="row" class="wz-margin-top-16 wz-margin-bottom-25">
-                        <input placeholder="Filter checks..." ng-model="custom_search" type="text" class="kuiLocalSearchInput ng-empty ng-pristine ng-scope ng-touched ng-valid"
-                            aria-invalid="false" wz-enter="search(custom_search)">
-                        <button type="submit" aria-label="Search" class="kuiLocalSearchButton height-40" ng-click="search(custom_search)">
-                            <span class="fa fa-search" aria-hidden="true"></span>
-                        </button>
-                    </div>
-                    <div layout="row" class="wz-margin-top-16 wz-margin-bottom-40-inv">
-                        <wz-table custom-columns="true" flex path="'/sca/' + agent.id + '/checks/' + lookingSca.id"
-                            row-sizes="[13,11,9]" extra-limit="100" keys="['title', 'file', 'result']">
-                        </wz-table>
-                    </div>
-                </md-card-content>
-                <md-card-actions layout="row" layout-align="end center" class="wz-card-actions layout-align-end-center layout-row">
-                    <a class="wz-text-link cursor-pointer small md-button md-ink-ripple" id="btnDownload" ng-click="downloadCsv('/sca/' + agent.id + '/checks/' + lookingSca.id, lookingSca.id + '.csv')">Formatted
-                        <i aria-hidden="true" class="fa fa-download"></i></a>
-                </md-card-actions>
-            </md-card>
-        </div>
+    </div>
+    <div layout="row" class="wz-padding-top-0" ng-if="agent && agent.os && lookingSca">
+        <md-card flex class="wz-md-card fullWidth">
+            <md-card-content class="wz-padding-bottom-30">
+                <span class="wz-headline-title"><i class="fa fa-fw fa-arrow-left cursor-pointer" ng-click="closeScaChecks()"></i>
+                    {{lookingSca.name}} checks</span>
+                <md-divider class="wz-margin-top-10"></md-divider>
+                <div layout="row" class="wz-margin-top-16 wz-margin-bottom-25">
+                    <input placeholder="Filter checks..." ng-model="custom_search" type="text" class="kuiLocalSearchInput ng-empty ng-pristine ng-scope ng-touched ng-valid"
+                        aria-invalid="false" wz-enter="search(custom_search)">
+                    <button type="submit" aria-label="Search" class="kuiLocalSearchButton height-40" ng-click="search(custom_search)">
+                        <span class="fa fa-search" aria-hidden="true"></span>
+                    </button>
+                </div>
+                <div layout="row" class="wz-margin-top-16 wz-margin-bottom-40-inv">
+                    <wz-table custom-columns="true" flex path="'/sca/' + agent.id + '/checks/' + lookingSca.id"
+                        row-sizes="[13,11,9]" extra-limit="100" keys="['title', 'file', 'result']">
+                    </wz-table>
+                </div>
+            </md-card-content>
+            <md-card-actions layout="row" layout-align="end center" class="wz-card-actions layout-align-end-center layout-row">
+                <a class="wz-text-link cursor-pointer small md-button md-ink-ripple" id="btnDownload" ng-click="downloadCsv('/sca/' + agent.id + '/checks/' + lookingSca.id, lookingSca.id + '.csv')">Formatted
+                    <i aria-hidden="true" class="fa fa-download"></i></a>
+            </md-card-actions>
+        </md-card>
+    </div>
 </md-content>
