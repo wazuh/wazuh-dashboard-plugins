@@ -109,6 +109,11 @@ export class ManagementController {
       this.isRestarting = true;
       this.$scope.$applyAsync();
     });
+    this.$rootScope.$on('removeBlockEdition', () => {
+      this.$scope.blockEdition = false;
+      this.isRestarting = false;
+      this.$scope.$applyAsync();
+    });
     this.$rootScope.$on('removeRestarting', () => {
       this.isRestarting = false;
       this.$scope.$applyAsync();

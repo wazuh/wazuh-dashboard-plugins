@@ -500,10 +500,10 @@ app.directive('wzTable', function () {
           setTimeout(() => {
             $scope.setColResizable();
           }, 100);
-          $scope.$applyAsync();
         } else {
           $scope.wazuh_table_resizing = false;
         }
+        $scope.$applyAsync();
       };
 
       const updateStoredKeys = keys => {

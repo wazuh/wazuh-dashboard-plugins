@@ -221,11 +221,12 @@ app.directive('wzListManage', function() {
 
       const showRestartMessage = async msg => {
         errorHandler.info(msg);
-        $scope.restartMsg = true;
+        $scope.restartBtn = true;
         $scope.$applyAsync();
       };
 
       $scope.restart = () => {
+        $scope.restartBtn = false;
         $scope.$emit('performRestart', {});
       };
     },
