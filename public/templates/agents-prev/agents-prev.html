@@ -58,7 +58,12 @@
         <wz-tag-filter flex path="'/agents'" query-fn="ctrl.query(q, search)" fields-model="ctrl.searchBarModel">
         </wz-tag-filter>
         <md-button class="agents-prev-btn btn btn-info" style="height: 48px;margin: 0px 0 0 8px!important;"
-            ng-click="ctrl.reloadList()"><i class="fa fa-fw fa-refresh"></i> Refresh</md-button>
+            ng-click="ctrl.reloadList()"><svg class="euiIcon euiIcon--medium" focusable="false"
+                xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
+                <path
+                    d="M11.228 2.942a.5.5 0 1 1-.538.842A5 5 0 1 0 13 8a.5.5 0 1 1 1 0 6 6 0 1 1-2.772-5.058zM14 1.5v3A1.5 1.5 0 0 1 12.5 6h-3a.5.5 0 0 1 0-1h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 1 1 1 0z">
+                </path>
+            </svg> Refresh</md-button>
     </div>
 
     <div layout="row">
