@@ -88,8 +88,8 @@ export class DecodersController {
       this.$scope.$applyAsync();
     });
 
-    this.$scope.$on('showRestartMsg', () => {
-      this.restartMsg = true;
+    this.$scope.$on('showRestart', () => {
+      this.$scope.restartBtn = true;
       this.$scope.$applyAsync();
     });
   }

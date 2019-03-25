@@ -53,17 +53,8 @@
                             <span ng-show='xmlHasErrors' class='btn-danger'><i aria-hidden='true' class='fa fa-fw fa-exclamation-triangle'></i>
                                 XML format error</span>
                         </button>
-                        <span flex ng-if="!restartMsg"></span>
-                        <div ng-show="restartMsg" class="confirmEmbedBubble confirmEmbedBubbleInline">
-                            <span class="wz-padding-top-10 wz-padding-left-8">Configuration is not applied yet. Do you
-                                want
-                                to restart <b>{{selectedNode}}</b> to apply it?</span>
-                            <button class="btn cancelBtn btn-info md-padding-h" type="button" ng-click="restartMsg = false">I
-                                will do it later</button>
-                            <button class="btn wz-button" type="button" ng-disabled="doingSaving" ng-click="restartNode(selectedNode); restartMsg = false">Restart
-                                <b>{{selectedNode}}</b> now</button>
-                        </div>
-                        <button ng-show="!showConfirmRestartNode && !restartMsg" class="btn wz-button" ng-disabled="isRestarting || doingSaving"
+                        <span flex ng-if="!restartBtn"></span>
+                        <button ng-show="!showConfirmRestartNode && !restartBtn" class="btn wz-button" ng-disabled="isRestarting || doingSaving"
                             ng-click="showConfirmRestartNode = true"><i class="fa fa-refresh" ng-class="isRestarting ? 'fa-spin fa-spinner' : ''"></i>
                             Restart {{selectedNode}}
                         </button>

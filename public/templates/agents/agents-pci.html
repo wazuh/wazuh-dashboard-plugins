@@ -20,35 +20,35 @@
 
     <div layout="row" layout-align="center stretch" class="height-300">
         <md-card flex class="wz-md-card" ng-class="{'fullscreen': expandArray[0]}">
+            <md-card-actions layout="row" layout-align="end center" class="wz-card-actions wz-card-actions-top"
+                ng-dblclick="expand(0)">
+                <span class="wz-headline-title">Top 5 rule groups</span>
+                <span flex></span>
+                <span class="wz-text-link" ng-click="expand(0)"><i class="fa fa-fw fa-expand"></i></span>
+            </md-card-actions>
             <md-card-content class="wazuh-column">
-                <div layout="row" ng-dblclick="expand(0)">
-                    <span class="wz-headline-title">Top 5 rule groups</span>
-                    <span flex></span>
-                    <span class="wz-text-link" ng-click="expand(0)"><i class="fa fa-fw fa-expand"></i></span>
-                </div>
-                <md-divider class="wz-margin-top-10"></md-divider>
                 <kbn-vis id="Wazuh-App-Agents-PCI-Groups" vis-id="'Wazuh-App-Agents-PCI-Groups'"></kbn-vis>
             </md-card-content>
         </md-card>
         <md-card flex class="wz-md-card" ng-class="{'fullscreen': expandArray[1]}">
+            <md-card-actions layout="row" layout-align="end center" class="wz-card-actions wz-card-actions-top"
+                ng-dblclick="expand(1)">
+                <span class="wz-headline-title">Top 5 rules</span>
+                <span flex></span>
+                <span class="wz-text-link" ng-click="expand(1)"><i class="fa fa-fw fa-expand"></i></span>
+            </md-card-actions>
             <md-card-content class="wazuh-column">
-                <div layout="row" ng-dblclick="expand(1)">
-                    <span class="wz-headline-title">Top 5 rules</span>
-                    <span flex></span>
-                    <span class="wz-text-link" ng-click="expand(1)"><i class="fa fa-fw fa-expand"></i></span>
-                </div>
-                <md-divider class="wz-margin-top-10"></md-divider>
                 <kbn-vis id="Wazuh-App-Agents-PCI-Rule" vis-id="'Wazuh-App-Agents-PCI-Rule'"></kbn-vis>
             </md-card-content>
         </md-card>
         <md-card flex class="wz-md-card" ng-class="{'fullscreen': expandArray[2]}">
+            <md-card-actions layout="row" layout-align="end center" class="wz-card-actions wz-card-actions-top"
+                ng-dblclick="expand(2)">
+                <span class="wz-headline-title">Top 5 PCI DSS requirements</span>
+                <span flex></span>
+                <span class="wz-text-link" ng-click="expand(2)"><i class="fa fa-fw fa-expand"></i></span>
+            </md-card-actions>
             <md-card-content class="wazuh-column">
-                <div layout="row" ng-dblclick="expand(2)">
-                    <span class="wz-headline-title">Top 5 PCI DSS requirements</span>
-                    <span flex></span>
-                    <span class="wz-text-link" ng-click="expand(2)"><i class="fa fa-fw fa-expand"></i></span>
-                </div>
-                <md-divider class="wz-margin-top-10"></md-divider>
                 <kbn-vis id="Wazuh-App-Agents-PCI-Requirement" vis-id="'Wazuh-App-Agents-PCI-Requirement'"></kbn-vis>
             </md-card-content>
         </md-card>
@@ -56,24 +56,24 @@
 
     <div layout="row" layout-align="center stretch" class="height-300">
         <md-card flex="70" class="wz-md-card" ng-class="{'fullscreen': expandArray[3]}">
+            <md-card-actions layout="row" layout-align="end center" class="wz-card-actions wz-card-actions-top"
+                ng-dblclick="expand(3)">
+                <span class="wz-headline-title">PCI Requirements</span>
+                <span flex></span>
+                <span class="wz-text-link" ng-click="expand(3)"><i class="fa fa-fw fa-expand"></i></span>
+            </md-card-actions>
             <md-card-content class="wazuh-column">
-                <div layout="row" ng-dblclick="expand(3)">
-                    <span class="wz-headline-title">PCI Requirements</span>
-                    <span flex></span>
-                    <span class="wz-text-link" ng-click="expand(3)"><i class="fa fa-fw fa-expand"></i></span>
-                </div>
-                <md-divider class="wz-margin-top-10"></md-divider>
                 <kbn-vis id="Wazuh-App-Agents-PCI-Requirements" vis-id="'Wazuh-App-Agents-PCI-Requirements'"></kbn-vis>
             </md-card-content>
         </md-card>
         <md-card flex class="wz-md-card" ng-class="{'fullscreen': expandArray[4]}">
+            <md-card-actions layout="row" layout-align="end center" class="wz-card-actions wz-card-actions-top"
+                ng-dblclick="expand(4)">
+                <span class="wz-headline-title">Rule level distribution</span>
+                <span flex></span>
+                <span class="wz-text-link" ng-click="expand(4)"><i class="fa fa-fw fa-expand"></i></span>
+            </md-card-actions>
             <md-card-content class="wazuh-column">
-                <div layout="row" ng-dblclick="expand(4)">
-                    <span class="wz-headline-title">Rule level distribution</span>
-                    <span flex></span>
-                    <span class="wz-text-link" ng-click="expand(4)"><i class="fa fa-fw fa-expand"></i></span>
-                </div>
-                <md-divider class="wz-margin-top-10"></md-divider>
                 <kbn-vis id="Wazuh-App-Agents-PCI-Rule-level-distribution" vis-id="'Wazuh-App-Agents-PCI-Rule-level-distribution'"></kbn-vis>
             </md-card-content>
         </md-card>
@@ -81,13 +81,13 @@
 
     <div layout="row" layout-align="center stretch" class="height-570">
         <md-card class="wz-md-card" flex ng-class="{'fullscreen': expandArray[5]}">
+            <md-card-actions layout="row" layout-align="end center" class="wz-card-actions wz-card-actions-top"
+                ng-dblclick="expand(5)">
+                <span class="wz-headline-title">Alerts summary</span>
+                <span flex></span>
+                <span class="wz-text-link" ng-click="expand(5)"><i class="fa fa-fw fa-expand"></i></span>
+            </md-card-actions>
             <md-card-content class="wazuh-column">
-                <div layout="row" ng-dblclick="expand(5)">
-                    <span class="wz-headline-title">Alerts summary</span>
-                    <span flex></span>
-                    <span class="wz-text-link" ng-click="expand(5)"><i class="fa fa-fw fa-expand"></i></span>
-                </div>
-                <md-divider class="wz-margin-top-10"></md-divider>
                 <kbn-vis vis-id="'Wazuh-App-Agents-PCI-Last-alerts'"></kbn-vis>
             </md-card-content>
         </md-card>

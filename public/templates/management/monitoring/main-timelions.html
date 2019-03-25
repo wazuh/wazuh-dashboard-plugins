@@ -19,25 +19,22 @@
 <div layout="row" layout-align="start stretch" class="height-400" ng-class="{'no-opacity': resultState !== 'ready' || !rendered}"
     ng-show="!loading && !showConfig && !showNodes && rendered">
     <md-card flex class="wz-md-card" ng-class="{'fullscreen': expandArray[0]}">
+        <md-card-actions layout="row" layout-align="end center" class="wz-card-actions wz-card-actions-top" ng-dblclick="expand(0)">
+            <span class="wz-headline-title">Cluster alerts summary</span>
+            <span flex></span>
+            <span class="wz-text-link" ng-click="expand(0)"><i class="fa fa-fw fa-expand"></i></span>
+        </md-card-actions>
         <md-card-content class="wazuh-column">
-            <div layout="row" ng-dblclick="expand(0)">
-                <span class="wz-headline-title">Cluster alerts summary</span>
-                <span flex></span>
-                <span class="wz-text-link" ng-click="expand(0)"><i class="fa fa-fw fa-expand"></i></span>
-            </div>
-            <md-divider class="wz-margin-top-10"></md-divider>
             <kbn-vis vis-id="'Wazuh-App-Cluster-Overview-Manager'" id="Wazuh-App-Cluster-Overview-Manager"></kbn-vis>
         </md-card-content>
     </md-card>
     <md-card flex class="wz-md-card" ng-class="{'fullscreen': expandArray[1]}">
-        <md-card-content class="wazuh-column">
-            <div layout="row" ng-dblclick="expand(1)">
-                <span class="wz-headline-title">Alerts by node summary</span>
-                <span flex></span>
-                <span class="wz-text-link" ng-click="expand(1)"><i class="fa fa-fw fa-expand"></i></span>
-            </div>
-            <md-divider class="wz-margin-top-10"></md-divider>
-            <kbn-vis vis-id="'Wazuh-App-Cluster-Overview'" id="Wazuh-App-Cluster-Overview"></kbn-vis>
+        <md-card-actions layout="row" layout-align="end center" class="wz-card-actions wz-card-actions-top" ng-dblclick="expand(1)">
+            <span class="wz-headline-title">Alerts by node summary</span>
+            <span flex></span>
+            <span class="wz-text-link" ng-click="expand(1)"><i class="fa fa-fw fa-expand"></i></span>
+        </md-card-actions>
+        <kbn-vis vis-id="'Wazuh-App-Cluster-Overview'" id="Wazuh-App-Cluster-Overview"></kbn-vis>
         </md-card-content>
     </md-card>
 </div>

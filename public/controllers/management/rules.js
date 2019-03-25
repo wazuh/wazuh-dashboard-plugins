@@ -160,10 +160,10 @@ export function RulesController(
         coloredString = coloredString.replace(
           /\$\(((?!<\/span>).)*?\)(?!<\/span>)/im,
           '<span style="color: ' +
-            colors[i] +
-            ' ">' +
-            valuesArray[i] +
-            '</span>'
+          colors[i] +
+          ' ">' +
+          valuesArray[i] +
+          '</span>'
         );
       }
     }
@@ -320,7 +320,7 @@ export function RulesController(
   };
 
   $scope.toggleRestartMsg = () => {
-    $scope.restartMsg = false;
+    $scope.restartBtn = false;
     $scope.$applyAsync();
   };
 
@@ -346,8 +346,8 @@ export function RulesController(
     $scope.$emit('performRestart', {});
   };
 
-  $scope.$on('showRestartMsg', () => {
-    $scope.restartMsg = true;
+  $scope.$on('showRestart', () => {
+    $scope.restartBtn = true;
     $scope.$applyAsync();
   });
 
