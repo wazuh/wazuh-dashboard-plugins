@@ -71,12 +71,12 @@
             <md-card-content class="wz-padding-bottom-0">
                 <wz-table custom-columns="true" flex ng-if="mctrl.showingLocalRules" path="'/rules'"
                     keys="[{value: 'id', width: '85px'},{value:'description', width: 'auto'},{value:'groups',nosortable:true, width: '250px'},{value:'pci',nosortable:true, width: '170px'},{value:'gdpr',nosortable:true,width: '170px'}, {value: 'level', width: '100px'}, {value:'file',width: '200px'}]"
-                    implicit-filter="[{ name:'path',value: 'etc/rules'}]" allow-click="true" row-sizes="[16,13,11]">
+                    implicit-filter="[{ name:'path',value: 'etc/rules'}]" allow-click="true" row-sizes="[16,14,12]">
                 </wz-table>
                 <wz-table custom-columns="true" ng-if="!mctrl.showingLocalRules" implicit-filter="appliedFilters" flex
                     path="'/rules'"
                     keys="[{value: 'id', width: '85px'},{value:'description', width: 'auto'},{value:'groups',nosortable:true, width: '250px'},{value:'pci',nosortable:true, width: '170px'},{value:'gdpr',nosortable:true,width: '170px'}, {value: 'level', width: '100px'}, {value:'file',width: '200px'}]"
-                    allow-click="true" row-sizes="[16,13,11]">
+                    allow-click="true" row-sizes="[16,14,12]">
                 </wz-table>
             </md-card-content>
             <md-card-actions layout="row" layout-align="end center" class="layout-align-end-center layout-row">
