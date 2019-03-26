@@ -42,7 +42,7 @@
                 <span class="wz-text-link cursor-pointer" ng-click="mctrl.switchTab('welcome', true)">Management</span>
                 <span> / </span>
                 <span class="wz-text-link cursor-pointer" ng-click="mctrl.switchTab('configuration', true)">{{ mctrl.tabNames[mctrl.tab] }}</span>
-                <span> / {{ mctrl.currentConfiguration }} </span>
+                <span> / {{ mctrl.tabNames[mctrl.currentConfiguration] || mctrl.currentConfiguration }} </span>
             </div>
         </div>
         <!-- End breadcrumbs -->
