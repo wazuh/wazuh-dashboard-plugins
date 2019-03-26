@@ -24,7 +24,6 @@ import {
 
 import { ConfigurationHandler } from '../../utils/config-handler';
 import { timefilter } from 'ui/timefilter';
-import { renderScaPie } from '../../utils/d3-chart';
 
 export class AgentsController {
   /**
@@ -398,10 +397,7 @@ export class AgentsController {
 
     this.$scope.loadScaChecks = policy =>
       (this.$scope.lookingSca = { ...policy, id: policy.policy_id });
-    this.$scope.closeScaChecks = () => {
-      this.$scope.lookingSca = false;
-      this.renderScaCharts();
-    };
+    this.$scope.closeScaChecks = () => this.$scope.lookingSca = false;
 
     this.$scope.confirmAddGroup = group => {
       this.groupHandler
@@ -484,13 +480,7 @@ export class AgentsController {
       const localChange =
         subtab === 'panels' && this.$scope.tabView === 'discover' && sameTab;
       this.$scope.tabView = subtab;
-      if (
-        subtab === 'panels' &&
-        this.$scope.tab === 'sca' &&
-        (this.$scope.policies || []).length
-      ) {
-        this.renderScaCharts();
-      }
+
       if (
         (subtab === 'panels' ||
           (this.targetLocation &&
@@ -525,40 +515,13 @@ export class AgentsController {
     }
   }
 
-  renderScaCharts() {
-    try {
-      renderScaPie(
-        [
-          {
-            name: 'Pass',
-            value: this.$scope.policies.reduce((a, { pass }) => a + pass, 0)
-          },
-          {
-            name: 'Fail',
-            value: this.$scope.policies.reduce((a, { fail }) => a + fail, 0)
-          }
-        ],
-        `sca_chart_pass_vs_fail`
-      );
-
-      for (const policy of this.$scope.policies) {
-        const dataset = [];
-        policy.pass && dataset.push({ name: 'Pass', value: policy.pass });
-        policy.fail && dataset.push({ name: 'Fail', value: policy.fail });
-        renderScaPie(dataset, `sca_chart_${policy.policy_id}`);
-      }
-    } catch (error) {
-      this.errorHandler.handle(error);
-      return;
-    }
-  }
-
   /**
    * Switch tab
    * @param {*} tab
    * @param {*} force
    */
   async switchTab(tab, force = false) {
+    this.$scope.lookingSca = false;
     this.falseAllExpand();
     if (this.ignoredTabs.includes(tab)) {
       this.commonData.setRefreshInterval(timefilter.getRefreshInterval());
@@ -579,7 +542,7 @@ export class AgentsController {
           (((agentInfo || {}).data || {}).data || {}).status ||
           this.$scope.agent.status;
       }
-    } catch (error) {} // eslint-disable-line
+    } catch (error) { } // eslint-disable-line
 
     try {
       this.$scope.showSyscheckFiles = false;
@@ -615,7 +578,7 @@ export class AgentsController {
       if (tab === 'syscollector')
         try {
           await this.loadSyscollector(this.$scope.agent.id);
-        } catch (error) {} // eslint-disable-line
+        } catch (error) { } // eslint-disable-line
       if (tab === 'configuration') {
         this.$scope.switchConfigurationTab('welcome');
       } else {
@@ -625,13 +588,9 @@ export class AgentsController {
       if (this.tabHistory.length > 2)
         this.tabHistory = this.tabHistory.slice(-2);
       this.tabVisualizations.setTab(tab);
-      if (this.$scope.tab === tab && !force) {
-        if (tab === 'sca') {
-          this.renderScaCharts();
-          this.$scope.$applyAsync();
-        }
-        return;
-      }
+
+      if (this.$scope.tab === tab && !force) return;
+
       const onlyAgent = this.$scope.tab === tab && force;
       const sameTab = this.$scope.tab === tab;
       this.$location.search('tab', tab);
@@ -743,7 +702,7 @@ export class AgentsController {
           {}
         );
         netifaceResponse = ((resultNetiface || {}).data || {}).data || false;
-      } catch (error) {} // eslint-disable-line
+      } catch (error) { } // eslint-disable-line
 
       // This API call may fail so we put it out of Promise.all
       let netaddrResponse = false;
@@ -755,7 +714,7 @@ export class AgentsController {
         );
         netaddrResponse =
           ((resultNetaddrResponse || {}).data || {}).data || false;
-      } catch (error) {} // eslint-disable-line
+      } catch (error) { } // eslint-disable-line
 
       // Before proceeding, syscollector data is an empty object
       this.$scope.syscollector = {};
@@ -771,7 +730,7 @@ export class AgentsController {
       this.$scope.syscollector = {
         hardware:
           typeof hardwareResponse === 'object' &&
-          Object.keys(hardwareResponse).length
+            Object.keys(hardwareResponse).length
             ? { ...hardwareResponse }
             : false,
         os:
@@ -814,7 +773,7 @@ export class AgentsController {
 
       try {
         data[0] = await this.apiReq.request('GET', `/agents/${id}`, {});
-      } catch (error) {} //eslint-disable-line
+      } catch (error) { } //eslint-disable-line
 
       try {
         data[1] = await this.apiReq.request(
@@ -822,7 +781,7 @@ export class AgentsController {
           `/syscheck/${id}/last_scan`,
           {}
         );
-      } catch (error) {} //eslint-disable-line
+      } catch (error) { } //eslint-disable-line
 
       try {
         data[2] = await this.apiReq.request(
@@ -830,7 +789,7 @@ export class AgentsController {
           `/rootcheck/${id}/last_scan`,
           {}
         );
-      } catch (error) {} //eslint-disable-line
+      } catch (error) { } //eslint-disable-line
 
       const result = data.map(item => ((item || {}).data || {}).data || false);
 
@@ -947,6 +906,7 @@ export class AgentsController {
   async analyzeAgents(searchTerm) {
     try {
       if (searchTerm) {
+        this.$scope.lookingSca = false;
         const reqData = await this.apiReq.request('GET', '/agents', {
           search: searchTerm
         });
@@ -1020,7 +980,7 @@ export class AgentsController {
       );
       this.errorHandler.info(
         `Policy monitoring scan launched successfully on agent ${
-          this.$scope.agent.id
+        this.$scope.agent.id
         }`,
         ''
       );

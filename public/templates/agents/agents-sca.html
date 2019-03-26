@@ -87,27 +87,6 @@
             <span flex><i class="fa fa-fw fa-warning"></i> No scans available.</span>
         </div>
     </div>
-    <div layout="row" class="md-padding layout-align-center" ng-if="!load && !lookingSca && policies.length">
-        <md-card class="wz-md-card">
-            <md-card-actions layout="row" class="wz-card-actions wz-card-actions-top"
-                style="padding-top:14px !important">
-                <span class="wz-headline-title">Total</span>
-            </md-card-actions>
-            <md-card-content>
-                <div id="sca_chart_pass_vs_fail" class="sca-chart"></div>
-            </md-card-content>
-        </md-card>
-        <md-card class="wz-md-card" ng-repeat="policy in policies">
-            <md-card-actions layout="row" class="wz-card-actions wz-card-actions-top"
-                style="padding-top:14px !important">
-                <span class="wz-headline-title">{{policy.name}}</span>
-            </md-card-actions>
-            <md-card-content>
-                <div id="sca_chart_{{policy.policy_id}}" class="sca-chart"></div>
-            </md-card-content>
-        </md-card>
-
-    </div>
 
     <div layout="row" class="wz-margin-top-10" ng-if="agent && agent.os && lookingSca">
         <md-card flex class="wz-md-card">
@@ -134,12 +113,11 @@
                 <div layout="row" class="wz-margin-top-16 wz-margin-bottom-40-inv">
                     <wz-table custom-columns="true" flex path="'/sca/' + agent.id + '/checks/' + lookingSca.id"
                         row-sizes="[16,14,12]" extra-limit="100"
-                        keys="[{value: 'id', width: '75px'},'title', 'file', 'result']">
+                        keys="[{value: 'id', width: '75px'},'title', {value:'file', width:'250px'}, {value: 'result', width: '200px'}]">
                     </wz-table>
                 </div>
             </md-card-content>
-            <md-card-actions layout="row" layout-align="end center"
-                class="layout-align-end-center layout-row">
+            <md-card-actions layout="row" layout-align="end center" class="layout-align-end-center layout-row">
                 <button type="button"
                     ng-click="downloadCsv('/sca/' + agent.id + '/checks/' + lookingSca.id, lookingSca.id + '.csv')"
                     class="euiButtonEmpty euiButtonEmpty--primary euiButtonEmpty--small">
