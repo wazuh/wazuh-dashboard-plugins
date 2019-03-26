@@ -24,33 +24,30 @@
 
     <div layout="row" layout-align="center stretch" class="height-230">
         <md-card flex class="wz-md-card" ng-class="{'fullscreen': expandArray[0]}">
-            <md-card-actions layout="row" layout-align="end center" class="wz-card-actions-vis"
-                ng-dblclick="expand(0)">
+            <md-card-actions layout="row" layout-align="end center" class="wz-card-actions-vis" ng-dblclick="expand(0)">
                 <span class="wz-headline-title">Groups</span>
                 <span flex></span>
-                <span class="wz-text-link" ng-click="expand(0)"><i class="fa fa-fw fa-expand"></i></span>
+                <span class="cursor-pointer" ng-click="expand(0)"><svg class="euiIcon euiIcon--medium euiContextMenu__icon" focusable="false" width="16" height="16" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg"><path d="M2.014 10.777l-.043 2.8a.52.52 0 0 0 .544.544l2.8-.043a.526.526 0 0 1 .546.546.598.598 0 0 1-.575.575l-2.802.044A1.571 1.571 0 0 1 .85 13.609l.044-2.802a.598.598 0 0 1 .575-.575.526.526 0 0 1 .545.545zm12.064-5.461l.043-2.801a.52.52 0 0 0-.543-.544l-2.801.043a.526.526 0 0 1-.545-.545.598.598 0 0 1 .575-.575L13.609.85a1.571 1.571 0 0 1 1.634 1.634l-.044 2.802a.598.598 0 0 1-.575.575.526.526 0 0 1-.546-.545zm-9.724 7.038a.5.5 0 0 1-.708-.708l8-8a.5.5 0 0 1 .708.708l-8 8z" fill-rule="evenodd"></path></svg></span>
             </md-card-actions>
             <md-card-content class="wazuh-column">
                 <kbn-vis id="Wazuh-App-Agents-Audit-Groups" vis-id="'Wazuh-App-Agents-Audit-Groups'"></kbn-vis>
             </md-card-content>
         </md-card>
         <md-card flex class="wz-md-card" ng-class="{'fullscreen': expandArray[1]}">
-            <md-card-actions layout="row" layout-align="end center" class="wz-card-actions-vis"
-                ng-dblclick="expand(1)">
+            <md-card-actions layout="row" layout-align="end center" class="wz-card-actions-vis" ng-dblclick="expand(1)">
                 <span class="wz-headline-title">Directories</span>
                 <span flex></span>
-                <span class="wz-text-link" ng-click="expand(1)"><i class="fa fa-fw fa-expand"></i></span>
+                <span class="cursor-pointer" ng-click="expand(1)"><svg class="euiIcon euiIcon--medium euiContextMenu__icon" focusable="false" width="16" height="16" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg"><path d="M2.014 10.777l-.043 2.8a.52.52 0 0 0 .544.544l2.8-.043a.526.526 0 0 1 .546.546.598.598 0 0 1-.575.575l-2.802.044A1.571 1.571 0 0 1 .85 13.609l.044-2.802a.598.598 0 0 1 .575-.575.526.526 0 0 1 .545.545zm12.064-5.461l.043-2.801a.52.52 0 0 0-.543-.544l-2.801.043a.526.526 0 0 1-.545-.545.598.598 0 0 1 .575-.575L13.609.85a1.571 1.571 0 0 1 1.634 1.634l-.044 2.802a.598.598 0 0 1-.575.575.526.526 0 0 1-.546-.545zm-9.724 7.038a.5.5 0 0 1-.708-.708l8-8a.5.5 0 0 1 .708.708l-8 8z" fill-rule="evenodd"></path></svg></span>
             </md-card-actions>
             <md-card-content class="wazuh-column">
                 <kbn-vis id="Wazuh-App-Agents-Audit-Directories" vis-id="'Wazuh-App-Agents-Audit-Directories'"></kbn-vis>
             </md-card-content>
         </md-card>
         <md-card flex class="wz-md-card" ng-class="{'fullscreen': expandArray[2]}">
-            <md-card-actions layout="row" layout-align="end center" class="wz-card-actions-vis"
-                ng-dblclick="expand(2)">
+            <md-card-actions layout="row" layout-align="end center" class="wz-card-actions-vis" ng-dblclick="expand(2)">
                 <span class="wz-headline-title">Files</span>
                 <span flex></span>
-                <span class="wz-text-link" ng-click="expand(2)"><i class="fa fa-fw fa-expand"></i></span>
+                <span class="cursor-pointer" ng-click="expand(2)"><svg class="euiIcon euiIcon--medium euiContextMenu__icon" focusable="false" width="16" height="16" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg"><path d="M2.014 10.777l-.043 2.8a.52.52 0 0 0 .544.544l2.8-.043a.526.526 0 0 1 .546.546.598.598 0 0 1-.575.575l-2.802.044A1.571 1.571 0 0 1 .85 13.609l.044-2.802a.598.598 0 0 1 .575-.575.526.526 0 0 1 .545.545zm12.064-5.461l.043-2.801a.52.52 0 0 0-.543-.544l-2.801.043a.526.526 0 0 1-.545-.545.598.598 0 0 1 .575-.575L13.609.85a1.571 1.571 0 0 1 1.634 1.634l-.044 2.802a.598.598 0 0 1-.575.575.526.526 0 0 1-.546-.545zm-9.724 7.038a.5.5 0 0 1-.708-.708l8-8a.5.5 0 0 1 .708.708l-8 8z" fill-rule="evenodd"></path></svg></span>
             </md-card-actions>
             <md-card-content class="wazuh-column">
                 <kbn-vis id="Wazuh-App-Agents-Audit-Files" vis-id="'Wazuh-App-Agents-Audit-Files'"></kbn-vis>
@@ -60,11 +57,10 @@
 
     <div layout="row" layout-align="center stretch" class="height-230">
         <md-card flex class="wz-md-card" ng-class="{'fullscreen': expandArray[3]}">
-            <md-card-actions layout="row" layout-align="end center" class="wz-card-actions-vis"
-                ng-dblclick="expand(3)">
+            <md-card-actions layout="row" layout-align="end center" class="wz-card-actions-vis" ng-dblclick="expand(3)">
                 <span class="wz-headline-title">Alerts over time</span>
                 <span flex></span>
-                <span class="wz-text-link" ng-click="expand(3)"><i class="fa fa-fw fa-expand"></i></span>
+                <span class="cursor-pointer" ng-click="expand(3)"><svg class="euiIcon euiIcon--medium euiContextMenu__icon" focusable="false" width="16" height="16" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg"><path d="M2.014 10.777l-.043 2.8a.52.52 0 0 0 .544.544l2.8-.043a.526.526 0 0 1 .546.546.598.598 0 0 1-.575.575l-2.802.044A1.571 1.571 0 0 1 .85 13.609l.044-2.802a.598.598 0 0 1 .575-.575.526.526 0 0 1 .545.545zm12.064-5.461l.043-2.801a.52.52 0 0 0-.543-.544l-2.801.043a.526.526 0 0 1-.545-.545.598.598 0 0 1 .575-.575L13.609.85a1.571 1.571 0 0 1 1.634 1.634l-.044 2.802a.598.598 0 0 1-.575.575.526.526 0 0 1-.546-.545zm-9.724 7.038a.5.5 0 0 1-.708-.708l8-8a.5.5 0 0 1 .708.708l-8 8z" fill-rule="evenodd"></path></svg></span>
             </md-card-actions>
             <md-card-content class="wazuh-column">
                 <kbn-vis id="Wazuh-App-Agents-Audit-Alerts-over-time" vis-id="'Wazuh-App-Agents-Audit-Alerts-over-time'"></kbn-vis>
@@ -75,11 +71,10 @@
     <div class="height-448" layout="row" layout-align="center stretch">
         <div flex="20" layout="column" layout-align="center stretch">
             <md-card flex class="wz-md-card" ng-class="{'fullscreen': expandArray[4]}">
-                <md-card-actions layout="row" layout-align="end center" class="wz-card-actions-vis"
-                    ng-dblclick="expand(4)">
+                <md-card-actions layout="row" layout-align="end center" class="wz-card-actions-vis" ng-dblclick="expand(4)">
                     <span class="wz-headline-title">File read access</span>
                     <span flex></span>
-                    <span class="wz-text-link" ng-click="expand(4)"><i class="fa fa-fw fa-expand"></i></span>
+                    <span class="cursor-pointer" ng-click="expand(4)"><svg class="euiIcon euiIcon--medium euiContextMenu__icon" focusable="false" width="16" height="16" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg"><path d="M2.014 10.777l-.043 2.8a.52.52 0 0 0 .544.544l2.8-.043a.526.526 0 0 1 .546.546.598.598 0 0 1-.575.575l-2.802.044A1.571 1.571 0 0 1 .85 13.609l.044-2.802a.598.598 0 0 1 .575-.575.526.526 0 0 1 .545.545zm12.064-5.461l.043-2.801a.52.52 0 0 0-.543-.544l-2.801.043a.526.526 0 0 1-.545-.545.598.598 0 0 1 .575-.575L13.609.85a1.571 1.571 0 0 1 1.634 1.634l-.044 2.802a.598.598 0 0 1-.575.575.526.526 0 0 1-.546-.545zm-9.724 7.038a.5.5 0 0 1-.708-.708l8-8a.5.5 0 0 1 .708.708l-8 8z" fill-rule="evenodd"></path></svg></span>
                 </md-card-actions>
                 <md-card-content class="wazuh-column">
                     <kbn-vis id="Wazuh-App-Agents-Audit-File-read-access" vis-id="'Wazuh-App-Agents-Audit-File-read-access'"></kbn-vis>
@@ -87,11 +82,10 @@
             </md-card>
 
             <md-card flex class="wz-md-card" ng-class="{'fullscreen': expandArray[5]}">
-                <md-card-actions layout="row" layout-align="end center" class="wz-card-actions-vis"
-                    ng-dblclick="expand(5)">
+                <md-card-actions layout="row" layout-align="end center" class="wz-card-actions-vis" ng-dblclick="expand(5)">
                     <span class="wz-headline-title">File write access</span>
                     <span flex></span>
-                    <span class="wz-text-link" ng-click="expand(5)"><i class="fa fa-fw fa-expand"></i></span>
+                    <span class="cursor-pointer" ng-click="expand(5)"><svg class="euiIcon euiIcon--medium euiContextMenu__icon" focusable="false" width="16" height="16" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg"><path d="M2.014 10.777l-.043 2.8a.52.52 0 0 0 .544.544l2.8-.043a.526.526 0 0 1 .546.546.598.598 0 0 1-.575.575l-2.802.044A1.571 1.571 0 0 1 .85 13.609l.044-2.802a.598.598 0 0 1 .575-.575.526.526 0 0 1 .545.545zm12.064-5.461l.043-2.801a.52.52 0 0 0-.543-.544l-2.801.043a.526.526 0 0 1-.545-.545.598.598 0 0 1 .575-.575L13.609.85a1.571 1.571 0 0 1 1.634 1.634l-.044 2.802a.598.598 0 0 1-.575.575.526.526 0 0 1-.546-.545zm-9.724 7.038a.5.5 0 0 1-.708-.708l8-8a.5.5 0 0 1 .708.708l-8 8z" fill-rule="evenodd"></path></svg></span>
                 </md-card-actions>
                 <md-card-content class="wazuh-column">
                     <kbn-vis id="Wazuh-App-Agents-Audit-File-write-access" vis-id="'Wazuh-App-Agents-Audit-File-write-access'"></kbn-vis>
@@ -101,11 +95,10 @@
 
         <div flex="60" layout="column" layout-align="center stretch">
             <md-card flex class="wz-md-card" ng-class="{'fullscreen': expandArray[6]}">
-                <md-card-actions layout="row" layout-align="end center" class="wz-card-actions-vis"
-                    ng-dblclick="expand(6)">
+                <md-card-actions layout="row" layout-align="end center" class="wz-card-actions-vis" ng-dblclick="expand(6)">
                     <span class="wz-headline-title">Commands</span>
                     <span flex></span>
-                    <span class="wz-text-link" ng-click="expand(6)"><i class="fa fa-fw fa-expand"></i></span>
+                    <span class="cursor-pointer" ng-click="expand(6)"><svg class="euiIcon euiIcon--medium euiContextMenu__icon" focusable="false" width="16" height="16" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg"><path d="M2.014 10.777l-.043 2.8a.52.52 0 0 0 .544.544l2.8-.043a.526.526 0 0 1 .546.546.598.598 0 0 1-.575.575l-2.802.044A1.571 1.571 0 0 1 .85 13.609l.044-2.802a.598.598 0 0 1 .575-.575.526.526 0 0 1 .545.545zm12.064-5.461l.043-2.801a.52.52 0 0 0-.543-.544l-2.801.043a.526.526 0 0 1-.545-.545.598.598 0 0 1 .575-.575L13.609.85a1.571 1.571 0 0 1 1.634 1.634l-.044 2.802a.598.598 0 0 1-.575.575.526.526 0 0 1-.546-.545zm-9.724 7.038a.5.5 0 0 1-.708-.708l8-8a.5.5 0 0 1 .708.708l-8 8z" fill-rule="evenodd"></path></svg></span>
                 </md-card-actions>
                 <md-card-content class="wazuh-column">
                     <kbn-vis id="Wazuh-App-Agents-Audit-Commands" vis-id="'Wazuh-App-Agents-Audit-Commands'"></kbn-vis>
@@ -115,22 +108,20 @@
 
         <div flex="20" layout="column" layout-align="center stretch">
             <md-card flex class="wz-md-card" ng-class="{'fullscreen': expandArray[7]}">
-                <md-card-actions layout="row" layout-align="end center" class="wz-card-actions-vis"
-                    ng-dblclick="expand(7)">
+                <md-card-actions layout="row" layout-align="end center" class="wz-card-actions-vis" ng-dblclick="expand(7)">
                     <span class="wz-headline-title">Created files</span>
                     <span flex></span>
-                    <span class="wz-text-link" ng-click="expand(7)"><i class="fa fa-fw fa-expand"></i></span>
+                    <span class="cursor-pointer" ng-click="expand(7)"><svg class="euiIcon euiIcon--medium euiContextMenu__icon" focusable="false" width="16" height="16" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg"><path d="M2.014 10.777l-.043 2.8a.52.52 0 0 0 .544.544l2.8-.043a.526.526 0 0 1 .546.546.598.598 0 0 1-.575.575l-2.802.044A1.571 1.571 0 0 1 .85 13.609l.044-2.802a.598.598 0 0 1 .575-.575.526.526 0 0 1 .545.545zm12.064-5.461l.043-2.801a.52.52 0 0 0-.543-.544l-2.801.043a.526.526 0 0 1-.545-.545.598.598 0 0 1 .575-.575L13.609.85a1.571 1.571 0 0 1 1.634 1.634l-.044 2.802a.598.598 0 0 1-.575.575.526.526 0 0 1-.546-.545zm-9.724 7.038a.5.5 0 0 1-.708-.708l8-8a.5.5 0 0 1 .708.708l-8 8z" fill-rule="evenodd"></path></svg></span>
                 </md-card-actions>
                 <md-card-content class="wazuh-column">
                     <kbn-vis id="Wazuh-App-Agents-Audit-Created-files" vis-id="'Wazuh-App-Agents-Audit-Created-files'"></kbn-vis>
                 </md-card-content>
             </md-card>
             <md-card flex class="wz-md-card" ng-class="{'fullscreen': expandArray[8]}">
-                <md-card-actions layout="row" layout-align="end center" class="wz-card-actions-vis"
-                    ng-dblclick="expand(8)">
+                <md-card-actions layout="row" layout-align="end center" class="wz-card-actions-vis" ng-dblclick="expand(8)">
                     <span class="wz-headline-title">Removed files</span>
                     <span flex></span>
-                    <span class="wz-text-link" ng-click="expand(8)"><i class="fa fa-fw fa-expand"></i></span>
+                    <span class="cursor-pointer" ng-click="expand(8)"><svg class="euiIcon euiIcon--medium euiContextMenu__icon" focusable="false" width="16" height="16" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg"><path d="M2.014 10.777l-.043 2.8a.52.52 0 0 0 .544.544l2.8-.043a.526.526 0 0 1 .546.546.598.598 0 0 1-.575.575l-2.802.044A1.571 1.571 0 0 1 .85 13.609l.044-2.802a.598.598 0 0 1 .575-.575.526.526 0 0 1 .545.545zm12.064-5.461l.043-2.801a.52.52 0 0 0-.543-.544l-2.801.043a.526.526 0 0 1-.545-.545.598.598 0 0 1 .575-.575L13.609.85a1.571 1.571 0 0 1 1.634 1.634l-.044 2.802a.598.598 0 0 1-.575.575.526.526 0 0 1-.546-.545zm-9.724 7.038a.5.5 0 0 1-.708-.708l8-8a.5.5 0 0 1 .708.708l-8 8z" fill-rule="evenodd"></path></svg></span>
                 </md-card-actions>
                 <md-card-content class="wazuh-column">
                     <kbn-vis id="Wazuh-App-Agents-Audit-Removed-files" vis-id="'Wazuh-App-Agents-Audit-Removed-files'"></kbn-vis>
@@ -141,11 +132,10 @@
 
     <div layout="row" layout-align="center stretch" class="height-570">
         <md-card flex class="wz-md-card" ng-class="{'fullscreen': expandArray[9]}">
-            <md-card-actions layout="row" layout-align="end center" class="wz-card-actions-vis"
-                ng-dblclick="expand(9)">
+            <md-card-actions layout="row" layout-align="end center" class="wz-card-actions-vis" ng-dblclick="expand(9)">
                 <span class="wz-headline-title">Alerts summary</span>
                 <span flex></span>
-                <span class="wz-text-link" ng-click="expand(9)"><i class="fa fa-fw fa-expand"></i></span>
+                <span class="cursor-pointer" ng-click="expand(9)"><svg class="euiIcon euiIcon--medium euiContextMenu__icon" focusable="false" width="16" height="16" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg"><path d="M2.014 10.777l-.043 2.8a.52.52 0 0 0 .544.544l2.8-.043a.526.526 0 0 1 .546.546.598.598 0 0 1-.575.575l-2.802.044A1.571 1.571 0 0 1 .85 13.609l.044-2.802a.598.598 0 0 1 .575-.575.526.526 0 0 1 .545.545zm12.064-5.461l.043-2.801a.52.52 0 0 0-.543-.544l-2.801.043a.526.526 0 0 1-.545-.545.598.598 0 0 1 .575-.575L13.609.85a1.571 1.571 0 0 1 1.634 1.634l-.044 2.802a.598.598 0 0 1-.575.575.526.526 0 0 1-.546-.545zm-9.724 7.038a.5.5 0 0 1-.708-.708l8-8a.5.5 0 0 1 .708.708l-8 8z" fill-rule="evenodd"></path></svg></span>
             </md-card-actions>
             <md-card-content class="wazuh-column">
                 <kbn-vis vis-id="'Wazuh-App-Agents-Audit-Last-alerts'"></kbn-vis>

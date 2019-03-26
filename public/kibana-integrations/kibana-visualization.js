@@ -17,7 +17,7 @@ import dateMath from '@elastic/datemath';
 
 const app = uiModules.get('apps/webinar_app', []);
 let lockFields = false;
-app.directive('kbnVis', function () {
+app.directive('kbnVis', function() {
   return {
     restrict: 'E',
     scope: {
@@ -52,7 +52,7 @@ app.directive('kbnVis', function () {
         } catch (error) {
           return 0;
         }
-      }
+      };
 
       const setSearchSource = discoverList => {
         try {
@@ -127,12 +127,15 @@ app.directive('kbnVis', function () {
                 {}
               );
 
-              const timeFilterSeconds = calculateTimeFilterSeconds(timefilter.getTime());
+              const timeFilterSeconds = calculateTimeFilterSeconds(
+                timefilter.getTime()
+              );
 
               visHandler.update({
-                timeRange: isAgentStatus && timeFilterSeconds < 900
-                  ? { from: 'now-15m', to: 'now', mode: 'quick' }
-                  : timefilter.getTime()
+                timeRange:
+                  isAgentStatus && timeFilterSeconds < 900
+                    ? { from: 'now-15m', to: 'now', mode: 'quick' }
+                    : timefilter.getTime()
               });
               visHandlers.addItem(visHandler);
               visHandler.addRenderCompleteListener(renderComplete);
@@ -142,12 +145,15 @@ app.directive('kbnVis', function () {
               // Use the pending one, if it is empty, it won't matter
               implicitFilter = discoverList ? discoverList[0].query : '';
 
-              const timeFilterSeconds = calculateTimeFilterSeconds(timefilter.getTime());
+              const timeFilterSeconds = calculateTimeFilterSeconds(
+                timefilter.getTime()
+              );
 
               visHandler.update({
-                timeRange: isAgentStatus && timeFilterSeconds < 900
-                  ? { from: 'now-15m', to: 'now', mode: 'quick' }
-                  : timefilter.getTime()
+                timeRange:
+                  isAgentStatus && timeFilterSeconds < 900
+                    ? { from: 'now-15m', to: 'now', mode: 'quick' }
+                    : timefilter.getTime()
               });
               setSearchSource(discoverList);
             }
@@ -198,10 +204,10 @@ app.directive('kbnVis', function () {
         updateVisWatcher();
         try {
           visualization.destroy();
-        } catch (error) { } // eslint-disable-line
+        } catch (error) {} // eslint-disable-line
         try {
           visHandler.destroy();
-        } catch (error) { } // eslint-disable-line
+        } catch (error) {} // eslint-disable-line
       });
 
       const renderComplete = () => {
@@ -210,11 +216,11 @@ app.directive('kbnVis', function () {
         const currentCompleted = Math.round(
           (loadedVisualizations.getList().length /
             tabVisualizations.getItem(tabVisualizations.getTab())) *
-          100
+            100
         );
         $rootScope.loadingStatus = `Rendering visualizations... ${
           currentCompleted > 100 ? 100 : currentCompleted
-          } %`;
+        } %`;
 
         if (currentCompleted >= 100) {
           $rootScope.rendered = true;
