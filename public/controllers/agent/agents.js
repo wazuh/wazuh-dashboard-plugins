@@ -14,7 +14,6 @@ import { generateMetric } from '../../utils/generate-metric';
 import { TabNames } from '../../utils/tab-names';
 import * as FileSaver from '../../services/file-saver';
 import { TabDescription } from '../../../server/reporting/tab-description';
-
 import {
   metricsAudit,
   metricsVulnerability,
@@ -25,6 +24,7 @@ import {
 
 import { ConfigurationHandler } from '../../utils/config-handler';
 import { timefilter } from 'ui/timefilter';
+import { renderScaPie } from '../../utils/d3-chart';
 
 export class AgentsController {
   /**
@@ -397,8 +397,11 @@ export class AgentsController {
     this.$scope.cancelAddGroup = () => (this.$scope.addingGroupToAgent = false);
 
     this.$scope.loadScaChecks = policy =>
-      (this.$scope.lookingSca = { name: policy.name, id: policy.policy_id });
-    this.$scope.closeScaChecks = () => (this.$scope.lookingSca = false);
+      (this.$scope.lookingSca = { ...policy, id: policy.policy_id });
+    this.$scope.closeScaChecks = () => {
+      this.$scope.lookingSca = false;
+      this.renderScaCharts();
+    };
 
     this.$scope.confirmAddGroup = group => {
       this.groupHandler
@@ -481,7 +484,13 @@ export class AgentsController {
       const localChange =
         subtab === 'panels' && this.$scope.tabView === 'discover' && sameTab;
       this.$scope.tabView = subtab;
-
+      if (
+        subtab === 'panels' &&
+        this.$scope.tab === 'sca' &&
+        (this.$scope.policies || []).length
+      ) {
+        this.renderScaCharts();
+      }
       if (
         (subtab === 'panels' ||
           (this.targetLocation &&
@@ -512,6 +521,34 @@ export class AgentsController {
       return;
     } catch (error) {
       this.errorHandler.handle(error, 'Agents');
+      return;
+    }
+  }
+
+  renderScaCharts() {
+    try {
+      renderScaPie(
+        [
+          {
+            name: 'Pass',
+            value: this.$scope.policies.reduce((a, { pass }) => a + pass, 0)
+          },
+          {
+            name: 'Fail',
+            value: this.$scope.policies.reduce((a, { fail }) => a + fail, 0)
+          }
+        ],
+        `sca_chart_pass_vs_fail`
+      );
+
+      for (const policy of this.$scope.policies) {
+        const dataset = [];
+        policy.pass && dataset.push({ name: 'Pass', value: policy.pass });
+        policy.fail && dataset.push({ name: 'Fail', value: policy.fail });
+        renderScaPie(dataset, `sca_chart_${policy.policy_id}`);
+      }
+    } catch (error) {
+      this.errorHandler.handle(error);
       return;
     }
   }
@@ -566,7 +603,9 @@ export class AgentsController {
             `/sca/${this.$scope.agent.id}`,
             {}
           );
-          this.$scope.policies = policies.data.data.items;
+
+          this.$scope.policies =
+            (((policies || {}).data || {}).data || {}).items || [];
         } catch (error) {
           this.$scope.policies = [];
         }
@@ -586,7 +625,13 @@ export class AgentsController {
       if (this.tabHistory.length > 2)
         this.tabHistory = this.tabHistory.slice(-2);
       this.tabVisualizations.setTab(tab);
-      if (this.$scope.tab === tab && !force) return;
+      if (this.$scope.tab === tab && !force) {
+        if (tab === 'sca') {
+          this.renderScaCharts();
+          this.$scope.$applyAsync();
+        }
+        return;
+      }
       const onlyAgent = this.$scope.tab === tab && force;
       const sameTab = this.$scope.tab === tab;
       this.$location.search('tab', tab);

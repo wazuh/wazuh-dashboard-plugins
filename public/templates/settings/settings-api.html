@@ -3,7 +3,8 @@
     <!-- Headline -->
     <div layout="column" layout-padding>
         <span class="font-size-18"><i class="fa fa-fw fa-tasks" aria-hidden="true"></i> API configuration</span>
-        <span class="md-subheader">Use Wazuh API settings to connect the Kibana plugin to your Wazuh manager or cluster</span>
+        <span class="md-subheader">Use Wazuh API settings to connect the Kibana plugin to your Wazuh manager or
+            cluster</span>
     </div>
     <!-- End headline -->
 
@@ -25,43 +26,53 @@
                 <!-- API entries list section -->
                 <div ng-repeat="entry in ctrl.apiEntries">
                     <!-- API entry -->
-                    <div layout="row" layout-align="space-between center" class="wz-padding-top-10 wz-padding-bottom-14">
+                    <div layout="row" layout-align="space-between center"
+                        class="wz-padding-top-10 wz-padding-bottom-14">
                         <p flex="15">
-                            <i ng-show="(entry._id === ctrl.currentDefault)" tooltip="This is the default Manager" tooltip-placement="right" class="fa fa-star wz-color-orange" aria-hidden="true"></i> {{entry._source.cluster_info.cluster}}</p>
+                            <i ng-show="(entry._id === ctrl.currentDefault)" tooltip="This is the default Manager"
+                                tooltip-placement="right" class="fa fa-star wz-color-orange" aria-hidden="true"></i>
+                            {{entry._source.cluster_info.cluster}}</p>
                         <p flex="20">{{entry._source.cluster_info.manager}}</p>
                         <p flex="15">{{entry._source.url}}</p>
                         <p flex="15">{{entry._source.api_port}}</p>
                         <p flex="15">{{entry._source.api_user}}</p>
                         <p flex="20">
-                            <i ng-click="ctrl.setDefault(entry)" tooltip="Set as default Manager" class="fa fa-star font-size-18 cursor-pointer" aria-hidden="true"></i>
-                            <i ng-click="ctrl.removeManager(entry)" tooltip="Remove manager" class="fa fa-trash wz-margin-left-7 cursor-pointer" aria-hidden="true"></i>
-                            <i ng-click="ctrl.checkManager(entry)" tooltip="Check connection" class="fa fa-refresh wz-margin-left-7 cursor-pointer" aria-hidden="true"></i>
-                            <i ng-click="ctrl.toggleEditor(entry)" tooltip="Edit" class="fa fa-pencil wz-margin-left-7 cursor-pointer" aria-hidden="true"></i>
+                            <i ng-click="ctrl.setDefault(entry)" tooltip="Set as default Manager"
+                                class="fa fa-star font-size-18 cursor-pointer" aria-hidden="true"></i>
+                            <i ng-click="ctrl.removeManager(entry)" tooltip="Remove manager"
+                                class="fa fa-trash-o wz-margin-left-7 cursor-pointer" aria-hidden="true"></i>
+                            <i ng-click="ctrl.checkManager(entry)" tooltip="Check connection"
+                                class="fa fa-refresh wz-margin-left-7 cursor-pointer" aria-hidden="true"></i>
+                            <i ng-click="ctrl.toggleEditor(entry)" tooltip="Edit"
+                                class="fa fa-pencil wz-margin-left-7 cursor-pointer" aria-hidden="true"></i>
                         </p>
                     </div>
                     <!-- End API entry -->
                     <!-- Edit API form -->
-                    <div layout="row" layout-align="space-between center" ng-if="ctrl.showEditForm[entry._id] && ctrl.isEditing">
-                        <form flex ng-submit="ctrl.updateSettings(entry)" layout="column" layout-align="start stretch" class="margin-top-30">
+                    <div layout="row" layout-align="space-between center"
+                        ng-if="ctrl.showEditForm[entry._id] && ctrl.isEditing">
+                        <form flex ng-submit="ctrl.updateSettings(entry)" layout="column" layout-align="start stretch"
+                            class="margin-top-30">
                             <!-- Input section -->
                             <md-input-container class="wz-input-container">
                                 <label>Username</label>
-                                <input ng-model="ctrl.formUpdate.user" ng-init="formUpdate.user=entry._source.api_user" type="text" placeholder="" aria-label="username"
-                                    required/>
+                                <input ng-model="ctrl.formUpdate.user" ng-init="formUpdate.user=entry._source.api_user"
+                                    type="text" placeholder="" aria-label="username" required />
                             </md-input-container>
                             <md-input-container class="wz-input-container">
                                 <label>Password</label>
-                                <input ng-model="ctrl.formUpdate.password" type="password" placeholder="" aria-label="password" required/>
+                                <input ng-model="ctrl.formUpdate.password" type="password" placeholder=""
+                                    aria-label="password" required />
                             </md-input-container>
                             <md-input-container class="wz-input-container">
                                 <label>URL</label>
-                                <input ng-model="ctrl.formUpdate.url" ng-init="formUpdate.url=entry._source.url" type="url" placeholder="http(s)://" aria-label="full url"
-                                    required/>
+                                <input ng-model="ctrl.formUpdate.url" ng-init="formUpdate.url=entry._source.url"
+                                    type="url" placeholder="http(s)://" aria-label="full url" required />
                             </md-input-container>
                             <md-input-container class="wz-input-container">
                                 <label>Port</label>
-                                <input ng-model="ctrl.formUpdate.port" ng-init="formUpdate.port=entry._source.api_port" type="text" placeholder="" aria-label="port"
-                                    required/>
+                                <input ng-model="ctrl.formUpdate.port" ng-init="formUpdate.port=entry._source.api_port"
+                                    type="text" placeholder="" aria-label="port" required />
                             </md-input-container>
                             <!-- Button and errors section -->
                             <div layout="row" layout-align="center center" ng-if="ctrl.messageError">
@@ -69,7 +80,17 @@
                             </div>
                             <div layout="row" layout-align="center center">
                                 <md-button type="submit" class="wz-button md-primary" aria-label="Update API button">
-                                    <i class="fa fa-pencil fa-fw" aria-hidden="true"></i> Update Wazuh API entry
+                                    <svg class="euiIcon euiIcon--medium euiButtonIcon__icon" focusable="false"
+                                        aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
+                                        xmlns:xlink="http://www.w3.org/1999/xlink" width="16" height="16"
+                                        viewBox="0 0 16 16">
+                                        <defs>
+                                            <path id="pencil-a"
+                                                d="M12.148 3.148L11 2l-9 9v3h3l9-9-1.144-1.144-8.002 7.998a.502.502 0 0 1-.708 0 .502.502 0 0 1 0-.708l8.002-7.998zM11 1c.256 0 .512.098.707.293l3 3a.999.999 0 0 1 0 1.414l-9 9A.997.997 0 0 1 5 15H2a1 1 0 0 1-1-1v-3c0-.265.105-.52.293-.707l9-9A.997.997 0 0 1 11 1zM5 14H2v-3l3 3z">
+                                            </path>
+                                        </defs>
+                                        <use xlink:href="#pencil-a"></use>
+                                    </svg> Update Wazuh API entry
                                 </md-button>
                             </div>
                         </form>
@@ -80,8 +101,7 @@
 
                 <!-- Add API button section -->
                 <div ng-show="!ctrl.isUpdating()" layout="row" layout-align="center center" class="wz-padding-top-10">
-                    <md-button ng-click="ctrl.switch()" class="wz-button md-primary"
-                        aria-label="Add new API button">
+                    <md-button ng-click="ctrl.switch()" class="wz-button md-primary" aria-label="Add new API button">
                         <i class="fa fa-plus-circle fa-fw" aria-hidden="true"></i> Add new Wazuh API entry
                     </md-button>
                 </div>
@@ -95,19 +115,23 @@
                         <!-- Input section -->
                         <md-input-container class="wz-input-container">
                             <label>Username</label>
-                            <input ng-model="ctrl.formData.user" type="text" placeholder="" aria-label="username" required/>
+                            <input ng-model="ctrl.formData.user" type="text" placeholder="" aria-label="username"
+                                required />
                         </md-input-container>
                         <md-input-container class="wz-input-container">
                             <label>Password</label>
-                            <input ng-model="ctrl.formData.password" type="password" placeholder="" aria-label="password" required/>
+                            <input ng-model="ctrl.formData.password" type="password" placeholder=""
+                                aria-label="password" required />
                         </md-input-container>
                         <md-input-container class="wz-input-container">
                             <label>URL</label>
-                            <input ng-model="ctrl.formData.url" type="url" placeholder="http(s)://" aria-label="full url" required/>
+                            <input ng-model="ctrl.formData.url" type="url" placeholder="http(s)://"
+                                aria-label="full url" required />
                         </md-input-container>
                         <md-input-container class="wz-input-container">
                             <label>Port</label>
-                            <input ng-model="ctrl.formData.port" type="text" placeholder="" aria-label="port" required/>
+                            <input ng-model="ctrl.formData.port" type="text" placeholder="" aria-label="port"
+                                required />
                         </md-input-container>
                         <!-- Button and errors section -->
                         <div layout="row" layout-align="center center" ng-if="ctrl.messageError">

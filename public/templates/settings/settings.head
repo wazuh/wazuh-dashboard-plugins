@@ -10,21 +10,6 @@
     </div>
     <!-- End loading ring -->
 
-    <!-- Navigation section -->
-    <div layout="row" layout-align="start center" ng-if="!ctrl.load">
-        <!-- Breadcrumbs -->
-        <div layout="row" layout-padding>
-            <!-- Always show a functional breadcrumb -->
-            <div>
-                <span>Settings</span>
-                <span> / </span>
-                <span>{{ ctrl.tabNames[ctrl.tab] }}</span>
-            </div>
-        </div>
-        <!-- End breadcrumbs -->
-    </div>
-    <!-- End navigation section -->
-
     <!-- Navigation bar -->
     <md-nav-bar
         ng-if="!ctrl.load"

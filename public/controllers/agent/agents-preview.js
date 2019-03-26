@@ -84,9 +84,8 @@ export class AgentsPreviewController {
     });
 
     this.$scope.$on('wazuhFetched', (ev, parameters) => {
-      console.log(parameters)
       this.$scope.showNoAgents =
-        !(((parameters || {}).filters || []).length) && !(((parameters || {}).items || []).length);
+        !parameters.items.length > 0 && !parameters.filters.length;
     });
 
     this.init = false;

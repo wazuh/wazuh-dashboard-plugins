@@ -18,7 +18,7 @@ export class TabVisualizations {
     this.agents = {
       welcome: 0,
       general: 7,
-      fim: 7,
+      fim: 6,
       pm: 4,
       vuls: 10,
       oscap: 13,
@@ -28,14 +28,14 @@ export class TabVisualizations {
       pci: 6,
       virustotal: 6,
       configuration: 0,
-      sca: 8,
+      sca: 5,
       osquery: 5
     };
 
     this.overview = {
       welcome: 0,
-      general: 11,
-      fim: 8,
+      general: 6,
+      fim: 6,
       pm: 5,
       vuls: 10,
       oscap: 11,

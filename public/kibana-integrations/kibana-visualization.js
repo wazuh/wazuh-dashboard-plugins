@@ -13,10 +13,11 @@ import $ from 'jquery';
 import { uiModules } from 'ui/modules';
 import { getVisualizeLoader } from './loader';
 import { timefilter } from 'ui/timefilter';
+import dateMath from '@elastic/datemath';
 
 const app = uiModules.get('apps/webinar_app', []);
 let lockFields = false;
-app.directive('kbnVis', function() {
+app.directive('kbnVis', function () {
   return {
     restrict: 'E',
     scope: {
@@ -42,12 +43,23 @@ app.directive('kbnVis', function() {
       let visHandler = null;
       let renderInProgress = false;
 
+      const calculateTimeFilterSeconds = ({ from, to }) => {
+        try {
+          const fromParsed = dateMath.parse(from);
+          const toParsed = dateMath.parse(to);
+          const totalSeconds = (toParsed - fromParsed) / 1000;
+          return totalSeconds;
+        } catch (error) {
+          return 0;
+        }
+      }
+
       const setSearchSource = discoverList => {
         try {
-          if (
-            $scope.visID !== 'Wazuh-App-Overview-General-Agents-status' &&
-            !$scope.visID.includes('Cluster')
-          ) {
+          const isAgentStatus =
+            $scope.visID === 'Wazuh-App-Overview-General-Agents-status';
+          const isCluster = $scope.visID.includes('Cluster');
+          if (!isAgentStatus && !isCluster) {
             visualization.searchSource
               .setField('query', {
                 language: discoverList[0].language || 'lucene',
@@ -59,7 +71,7 @@ app.directive('kbnVis', function() {
                   ? [...discoverList[1], ...rawFilters]
                   : rawFilters
               );
-          } else {
+          } else if (!isAgentStatus) {
             // Checks for cluster.name or cluster.node filter existence
             const monitoringFilter = discoverList[1].filter(
               item =>
@@ -87,7 +99,8 @@ app.directive('kbnVis', function() {
           }
 
           const discoverList = discoverPendingUpdates.getList();
-
+          const isAgentStatus =
+            $scope.visID === 'Wazuh-App-Overview-General-Agents-status';
           if (raw && discoverList.length) {
             // There are pending updates from the discover (which is the one who owns the true app state)
 
@@ -113,8 +126,13 @@ app.directive('kbnVis', function() {
                 visualization,
                 {}
               );
+
+              const timeFilterSeconds = calculateTimeFilterSeconds(timefilter.getTime());
+
               visHandler.update({
-                timeRange: timefilter.getTime()
+                timeRange: isAgentStatus && timeFilterSeconds < 900
+                  ? { from: 'now-15m', to: 'now', mode: 'quick' }
+                  : timefilter.getTime()
               });
               visHandlers.addItem(visHandler);
               visHandler.addRenderCompleteListener(renderComplete);
@@ -123,8 +141,13 @@ app.directive('kbnVis', function() {
 
               // Use the pending one, if it is empty, it won't matter
               implicitFilter = discoverList ? discoverList[0].query : '';
+
+              const timeFilterSeconds = calculateTimeFilterSeconds(timefilter.getTime());
+
               visHandler.update({
-                timeRange: timefilter.getTime()
+                timeRange: isAgentStatus && timeFilterSeconds < 900
+                  ? { from: 'now-15m', to: 'now', mode: 'quick' }
+                  : timefilter.getTime()
               });
               setSearchSource(discoverList);
             }
@@ -175,10 +198,10 @@ app.directive('kbnVis', function() {
         updateVisWatcher();
         try {
           visualization.destroy();
-        } catch (error) {} // eslint-disable-line
+        } catch (error) { } // eslint-disable-line
         try {
           visHandler.destroy();
-        } catch (error) {} // eslint-disable-line
+        } catch (error) { } // eslint-disable-line
       });
 
       const renderComplete = () => {
@@ -187,11 +210,11 @@ app.directive('kbnVis', function() {
         const currentCompleted = Math.round(
           (loadedVisualizations.getList().length /
             tabVisualizations.getItem(tabVisualizations.getTab())) *
-            100
+          100
         );
         $rootScope.loadingStatus = `Rendering visualizations... ${
           currentCompleted > 100 ? 100 : currentCompleted
-        } %`;
+          } %`;
 
         if (currentCompleted >= 100) {
           $rootScope.rendered = true;
