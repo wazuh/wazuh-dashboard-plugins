@@ -1,10 +1,9 @@
-<md-content flex layout="column" ng-if="octrl.tab === 'gdpr' && octrl.tabView === 'panels'"
-    ng-class="{'no-opacity': resultState !== 'ready' || !rendered}" layout-align="start">
+<md-content flex layout="column" ng-if="octrl.tab === 'gdpr' && octrl.tabView === 'panels'" ng-class="{'no-opacity': resultState !== 'ready' || !rendered}"
+    layout-align="start">
 
     <div layout="row" layout-align="center stretch" ng-show="octrl.gdprTabs.length">
         <md-card flex class="wz-md-card">
-            <md-tabs md-selected="selectedGdprIndex" class="wz-md-tab" md-border-bottom md-dynamic-height
-                id="gdprReq_tab">
+            <md-tabs md-selected="selectedGdprIndex" class="wz-md-tab" md-border-bottom md-dynamic-height id="gdprReq_tab">
                 <md-tab ng-repeat="tab in octrl.gdprTabs" ng-disabled="tab.disabled" label="{{tab.title}}">
                     <div class="md-padding">
                         <span class="wz-headline-title">GDPR Requirement: {{tab.title}}</span>
@@ -20,22 +19,20 @@
 
     <div layout="row" layout-align="center stretch" class="height-400">
         <md-card flex="30" class="wz-md-card" ng-class="{'fullscreen': octrl.expandArray[0]}">
-            <md-card-actions layout="row" class="wz-card-actions wz-card-actions-top"
-                style="padding-top:14px !important">
+            <md-card-actions layout="row" class="wz-card-actions-vis">
                 <span class="wz-headline-title">Top 10 agents by alerts number</span>
                 <span flex></span>
-                <span class="wz-text-link" ng-click="octrl.expand(0)"><i class="fa fa-fw fa-expand"></i></span>
+                <span class="cursor-pointer" ng-click="octrl.expand(0)"><svg class="euiIcon euiIcon--medium euiContextMenu__icon" focusable="false" width="16" height="16" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg"><path d="M2.014 10.777l-.043 2.8a.52.52 0 0 0 .544.544l2.8-.043a.526.526 0 0 1 .546.546.598.598 0 0 1-.575.575l-2.802.044A1.571 1.571 0 0 1 .85 13.609l.044-2.802a.598.598 0 0 1 .575-.575.526.526 0 0 1 .545.545zm12.064-5.461l.043-2.801a.52.52 0 0 0-.543-.544l-2.801.043a.526.526 0 0 1-.545-.545.598.598 0 0 1 .575-.575L13.609.85a1.571 1.571 0 0 1 1.634 1.634l-.044 2.802a.598.598 0 0 1-.575.575.526.526 0 0 1-.546-.545zm-9.724 7.038a.5.5 0 0 1-.708-.708l8-8a.5.5 0 0 1 .708.708l-8 8z" fill-rule="evenodd"></path></svg></span>
             </md-card-actions>
             <md-card-content class="wazuh-column">
                 <kbn-vis id="Wazuh-App-Overview-GDPR-Agents" vis-id="'Wazuh-App-Overview-GDPR-Agents'"></kbn-vis>
             </md-card-content>
         </md-card>
         <md-card flex="70" class="wz-md-card" ng-class="{'fullscreen': octrl.expandArray[1]}">
-            <md-card-actions layout="row" class="wz-card-actions wz-card-actions-top"
-                style="padding-top:14px !important">
+            <md-card-actions layout="row" class="wz-card-actions-vis">
                 <span class="wz-headline-title">GDPR requirements</span>
                 <span flex></span>
-                <span class="wz-text-link" ng-click="octrl.expand(1)"><i class="fa fa-fw fa-expand"></i></span>
+                <span class="cursor-pointer" ng-click="octrl.expand(1)"><svg class="euiIcon euiIcon--medium euiContextMenu__icon" focusable="false" width="16" height="16" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg"><path d="M2.014 10.777l-.043 2.8a.52.52 0 0 0 .544.544l2.8-.043a.526.526 0 0 1 .546.546.598.598 0 0 1-.575.575l-2.802.044A1.571 1.571 0 0 1 .85 13.609l.044-2.802a.598.598 0 0 1 .575-.575.526.526 0 0 1 .545.545zm12.064-5.461l.043-2.801a.52.52 0 0 0-.543-.544l-2.801.043a.526.526 0 0 1-.545-.545.598.598 0 0 1 .575-.575L13.609.85a1.571 1.571 0 0 1 1.634 1.634l-.044 2.802a.598.598 0 0 1-.575.575.526.526 0 0 1-.546-.545zm-9.724 7.038a.5.5 0 0 1-.708-.708l8-8a.5.5 0 0 1 .708.708l-8 8z" fill-rule="evenodd"></path></svg></span>
             </md-card-actions>
             <md-card-content class="wazuh-column">
                 <kbn-vis id="Wazuh-App-Overview-GDPR-requirements" vis-id="'Wazuh-App-Overview-GDPR-requirements'">
@@ -46,30 +43,26 @@
 
     <div layout="row" layout-align="center stretch" class="height-300">
         <md-card flex class="wz-md-card" ng-class="{'fullscreen': octrl.expandArray[2]}">
-            <md-card-actions layout="row" class="wz-card-actions wz-card-actions-top"
-                style="padding-top:14px !important">
+            <md-card-actions layout="row" class="wz-card-actions-vis">
                 <span class="wz-headline-title">Top requirements over time</span>
                 <span flex></span>
-                <span class="wz-text-link" ng-click="octrl.expand(2)"><i class="fa fa-fw fa-expand"></i></span>
+                <span class="cursor-pointer" ng-click="octrl.expand(2)"><svg class="euiIcon euiIcon--medium euiContextMenu__icon" focusable="false" width="16" height="16" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg"><path d="M2.014 10.777l-.043 2.8a.52.52 0 0 0 .544.544l2.8-.043a.526.526 0 0 1 .546.546.598.598 0 0 1-.575.575l-2.802.044A1.571 1.571 0 0 1 .85 13.609l.044-2.802a.598.598 0 0 1 .575-.575.526.526 0 0 1 .545.545zm12.064-5.461l.043-2.801a.52.52 0 0 0-.543-.544l-2.801.043a.526.526 0 0 1-.545-.545.598.598 0 0 1 .575-.575L13.609.85a1.571 1.571 0 0 1 1.634 1.634l-.044 2.802a.598.598 0 0 1-.575.575.526.526 0 0 1-.546-.545zm-9.724 7.038a.5.5 0 0 1-.708-.708l8-8a.5.5 0 0 1 .708.708l-8 8z" fill-rule="evenodd"></path></svg></span>
             </md-card-actions>
             <md-card-content class="wazuh-column">
-                <kbn-vis id="Wazuh-App-Overview-GDPR-Requirements-heatmap"
-                    vis-id="'Wazuh-App-Overview-GDPR-Requirements-heatmap'"></kbn-vis>
+                <kbn-vis id="Wazuh-App-Overview-GDPR-Requirements-heatmap" vis-id="'Wazuh-App-Overview-GDPR-Requirements-heatmap'"></kbn-vis>
             </md-card-content>
         </md-card>
     </div>
 
     <div layout="row" layout-align="center stretch" class="height-530">
         <md-card flex class="wz-md-card" ng-class="{'fullscreen': octrl.expandArray[3]}">
-            <md-card-actions layout="row" class="wz-card-actions wz-card-actions-top"
-                style="padding-top:14px !important">
+            <md-card-actions layout="row" class="wz-card-actions-vis">
                 <span class="wz-headline-title">Last alerts</span>
                 <span flex></span>
-                <span class="wz-text-link" ng-click="octrl.expand(3)"><i class="fa fa-fw fa-expand"></i></span>
+                <span class="cursor-pointer" ng-click="octrl.expand(3)"><svg class="euiIcon euiIcon--medium euiContextMenu__icon" focusable="false" width="16" height="16" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg"><path d="M2.014 10.777l-.043 2.8a.52.52 0 0 0 .544.544l2.8-.043a.526.526 0 0 1 .546.546.598.598 0 0 1-.575.575l-2.802.044A1.571 1.571 0 0 1 .85 13.609l.044-2.802a.598.598 0 0 1 .575-.575.526.526 0 0 1 .545.545zm12.064-5.461l.043-2.801a.52.52 0 0 0-.543-.544l-2.801.043a.526.526 0 0 1-.545-.545.598.598 0 0 1 .575-.575L13.609.85a1.571 1.571 0 0 1 1.634 1.634l-.044 2.802a.598.598 0 0 1-.575.575.526.526 0 0 1-.546-.545zm-9.724 7.038a.5.5 0 0 1-.708-.708l8-8a.5.5 0 0 1 .708.708l-8 8z" fill-rule="evenodd"></path></svg></span>
             </md-card-actions>
             <md-card-content class="wazuh-column">
-                <kbn-vis id="Wazuh-App-Overview-GDPR-Requirements-Agents-heatmap"
-                    vis-id="'Wazuh-App-Overview-GDPR-Requirements-Agents-heatmap'">
+                <kbn-vis id="Wazuh-App-Overview-GDPR-Requirements-Agents-heatmap" vis-id="'Wazuh-App-Overview-GDPR-Requirements-Agents-heatmap'">
                 </kbn-vis>
             </md-card-content>
         </md-card>
@@ -77,15 +70,13 @@
 
     <div layout="row" layout-align="center stretch" class="height-255">
         <md-card flex class="wz-md-card" ng-class="{'fullscreen': octrl.expandArray[4]}">
-            <md-card-actions layout="row" class="wz-card-actions wz-card-actions-top"
-                style="padding-top:14px !important">
+            <md-card-actions layout="row" class="wz-card-actions-vis">
                 <span class="wz-headline-title">Requirements by agent</span>
                 <span flex></span>
-                <span class="wz-text-link" ng-click="octrl.expand(4)"><i class="fa fa-fw fa-expand"></i></span>
+                <span class="cursor-pointer" ng-click="octrl.expand(4)"><svg class="euiIcon euiIcon--medium euiContextMenu__icon" focusable="false" width="16" height="16" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg"><path d="M2.014 10.777l-.043 2.8a.52.52 0 0 0 .544.544l2.8-.043a.526.526 0 0 1 .546.546.598.598 0 0 1-.575.575l-2.802.044A1.571 1.571 0 0 1 .85 13.609l.044-2.802a.598.598 0 0 1 .575-.575.526.526 0 0 1 .545.545zm12.064-5.461l.043-2.801a.52.52 0 0 0-.543-.544l-2.801.043a.526.526 0 0 1-.545-.545.598.598 0 0 1 .575-.575L13.609.85a1.571 1.571 0 0 1 1.634 1.634l-.044 2.802a.598.598 0 0 1-.575.575.526.526 0 0 1-.546-.545zm-9.724 7.038a.5.5 0 0 1-.708-.708l8-8a.5.5 0 0 1 .708.708l-8 8z" fill-rule="evenodd"></path></svg></span>
             </md-card-actions>
             <md-card-content class="wazuh-column">
-                <kbn-vis id="Wazuh-App-Overview-GDPR-Requirements-by-agent"
-                    vis-id="'Wazuh-App-Overview-GDPR-Requirements-by-agent'"></kbn-vis>
+                <kbn-vis id="Wazuh-App-Overview-GDPR-Requirements-by-agent" vis-id="'Wazuh-App-Overview-GDPR-Requirements-by-agent'"></kbn-vis>
             </md-card-content>
         </md-card>
     </div>

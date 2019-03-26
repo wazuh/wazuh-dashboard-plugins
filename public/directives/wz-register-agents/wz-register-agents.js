@@ -136,8 +136,8 @@ class WzRegisterAgents {
         const data = await apiReq.request(
           'PUT',
           `/agents/${
-          $scope.registerObj.systems[$scope.registerObj.selectedSystem]
-            .steps[3].id
+            $scope.registerObj.systems[$scope.registerObj.selectedSystem]
+              .steps[3].id
           }/restart`,
           {}
         );
@@ -147,8 +147,8 @@ class WzRegisterAgents {
         }
         errorHandler.info(
           `Success. Agent ${
-          $scope.registerObj.systems[$scope.registerObj.selectedSystem]
-            .steps[0].agentName
+            $scope.registerObj.systems[$scope.registerObj.selectedSystem]
+              .steps[0].agentName
           } has been registered.`
         );
         $scope.nextStep();

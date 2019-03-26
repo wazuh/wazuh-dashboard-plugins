@@ -148,13 +148,13 @@ export class EditionController {
           clusterStatus.enabled === 'yes' && clusterStatus.running === 'yes';
         const parameters = enabledAndRunning
           ? {
-            node: this.$scope.selectedNode,
-            showRestartManager: 'cluster'
-          }
+              node: this.$scope.selectedNode,
+              showRestartManager: 'cluster'
+            }
           : {
-            manager: this.$scope.selectedNode,
-            showRestartManager: 'manager'
-          };
+              manager: this.$scope.selectedNode,
+              showRestartManager: 'manager'
+            };
         this.$scope.doingSaving = true;
         this.$scope.$applyAsync();
         this.$scope.$broadcast('saveXmlFile', parameters);

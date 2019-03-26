@@ -15,7 +15,7 @@ export default [
     _source: {
       title: 'Agents status',
       visState:
-        '{"title":"Agents Status","type":"histogram","params":{"type":"histogram","grid":{"categoryLines":false,"style":{"color":"#eee"}},"categoryAxes":[{"id":"CategoryAxis-1","type":"category","position":"bottom","show":true,"style":{},"scale":{"type":"linear"},"labels":{"show":true,"truncate":100},"title":{}}],"valueAxes":[{"id":"ValueAxis-1","name":"LeftAxis-1","type":"value","position":"left","show":true,"style":{},"scale":{"type":"linear","mode":"normal"},"labels":{"show":true,"rotate":0,"filter":false,"truncate":100},"title":{"text":"Count"}}],"seriesParams":[{"show":true,"mode":"normal","type":"line","drawLinesBetweenPoints":true,"showCircles":true,"interpolate":"cardinal","lineWidth":3.5,"data":{"id":"4","label":"Unique count of id"},"valueAxis":"ValueAxis-1"}],"addTooltip":true,"addLegend":true,"legendPosition":"right","times":[],"addTimeMarker":false},"aggs":[{"id":"2","enabled":true,"type":"date_histogram","schema":"segment","params":{"field":"@timestamp","interval":"auto","customInterval":"2h","min_doc_count":1,"extended_bounds":{}}},{"id":"3","enabled":true,"type":"terms","schema":"group","params":{"field":"status","size":5,"order":"desc","orderBy":"_term"}},{"id":"4","enabled":true,"type":"cardinality","schema":"metric","params":{"field":"id"}}]}',
+        '{"title":"Agents Status","type":"histogram","params":{"type":"histogram","grid":{"categoryLines":false,"style":{"color":"#eee"}},"categoryAxes":[{"id":"CategoryAxis-1","type":"category","position":"bottom","show":true,"style":{},"scale":{"type":"linear"},"labels":{"show":true,"truncate":100},"title":{}}],"valueAxes":[{"id":"ValueAxis-1","name":"LeftAxis-1","type":"value","position":"left","show":true,"style":{},"scale":{"type":"linear","mode":"normal"},"labels":{"show":true,"rotate":0,"filter":false,"truncate":100},"title":{"text":"Count"}}],"seriesParams":[{"show":true,"mode":"normal","type":"line","drawLinesBetweenPoints":true,"showCircles":true,"interpolate":"cardinal","lineWidth":3.5,"data":{"id":"4","label":"Unique count of id"},"valueAxis":"ValueAxis-1"}],"addTooltip":true,"addLegend":true,"legendPosition":"right","times":[],"addTimeMarker":false},"aggs":[{"id":"2","enabled":true,"type":"date_histogram","schema":"segment","params":{"field":"@timestamp","interval":"h","customInterval":"2h","min_doc_count":1,"extended_bounds":{}}},{"id":"3","enabled":true,"type":"terms","schema":"group","params":{"field":"status","size":5,"order":"desc","orderBy":"_term"}},{"id":"4","enabled":true,"type":"cardinality","schema":"metric","params":{"field":"id"}}]}',
       uiStateJSON:
         '{"vis":{"colors":{"Never connected":"#447EBC","Active":"#E5AC0E"}}}',
       description: '',
@@ -189,44 +189,29 @@ export default [
     _type: 'visualization'
   },
   {
-    _id: 'Wazuh-App-Overview-General-Rule-group-evolution',
-    _source: {
-      title: 'Rule group evolution',
-      visState:
-        '{"title":"Rule group evolution","type":"metrics","params":{"id":"61ca57f0-469d-11e7-af02-69e470af7417","type":"timeseries","series":[{"id":"61ca57f1-469d-11e7-af02-69e470af7417","color":"rgba(0,156,224,1)","split_mode":"terms","metrics":[{"id":"61ca57f2-469d-11e7-af02-69e470af7417","type":"count"}],"separate_axis":0,"axis_position":"right","split_color_mode":"rainbow","formatter":"number","chart_type":"line","line_width":1,"point_size":1,"fill":0.9,"stacked":"stacked","terms_field":"rule.groups"}],"time_field":"@timestamp","index_pattern":"wazuh-alerts","interval":"auto","axis_position":"right","axis_formatter":"number","axis_scale":"normal","show_legend":1,"show_grid":1,"annotations":[{"fields":"rule.level","template":"Detected level 12 and above alerts","index_pattern":"wazuh-alerts","query_string":"rule.level: { 11 TO * }","id":"790b0dd0-3672-11e9-a875-698afd42ed2c","color":"#F00","time_field":"@timestamp","icon":"fa-exclamation-triangle","ignore_global_filters":0,"ignore_panel_filters":0}],"legend_position":"left"},"aggs":[]}',
-      uiStateJSON: '{}',
-      description: '',
-      version: 1,
-      kibanaSavedObjectMeta: {
-        searchSourceJSON:
-          '{"index":"wazuh-alerts","filter":[],"query":{"query":"","language":"lucene"}}'
-      }
-    },
-    _type: 'visualization'
-  },
-  {
-    _id: 'Wazuh-App-Overview-General-Top-10-agent-alert',
-    _source: {
-      title: 'Top 10 agents by alerts number',
-      visState:
-        '{"title":"Top 10 agents by alerts number","type":"metrics","params":{"id":"61ca57f0-469d-11e7-af02-69e470af7417","type":"timeseries","series":[{"id":"0eba6ef0-41a1-11e9-b2ca-a3f8ee4d0e71","color":"rgba(0,156,224,1)","split_mode":"terms","metrics":[{"id":"0eba6ef1-41a1-11e9-b2ca-a3f8ee4d0e71","type":"count"}],"separate_axis":0,"axis_position":"right","split_color_mode":"rainbow","formatter":"number","chart_type":"line","line_width":1,"point_size":1,"fill":0.9,"stacked":"stacked","terms_field":"agent.name","terms_size":"10"}],"time_field":"@timestamp","index_pattern":"wazuh-alerts","interval":"auto","axis_position":"left","axis_formatter":"number","axis_scale":"normal","show_legend":1,"show_grid":1,"legend_position":"left"},"aggs":[]}',
-      uiStateJSON: '{}',
-      description: '',
-      version: 1,
-      kibanaSavedObjectMeta: {
-        searchSourceJSON:
-          '{"index":"wazuh-alerts","filter":[],"query":{"query":"","language":"lucene"}}'
-      }
-    },
-    _type: 'visualization'
-  },
-  {
     _id: 'Wazuh-App-Overview-General-Alert-level-evolution',
     _source: {
       title: 'Alert level evolution',
       visState:
-        '{"title":"Alert level evolution","type":"metrics","params":{"id":"61ca57f0-469d-11e7-af02-69e470af7417","type":"timeseries","series":[{"id":"61ca57f1-469d-11e7-af02-69e470af7417","color":"rgba(0,156,224,1)","split_mode":"terms","metrics":[{"id":"61ca57f2-469d-11e7-af02-69e470af7417","type":"count"}],"separate_axis":0,"axis_position":"right","split_color_mode":"rainbow","formatter":"number","chart_type":"bar","line_width":1,"point_size":1,"fill":0.9,"stacked":"stacked","terms_field":"rule.level","terms_size":"16"}],"time_field":"@timestamp","index_pattern":"wazuh-alerts","interval":"auto","axis_position":"left","axis_formatter":"number","axis_scale":"normal","show_legend":1,"show_grid":1,"background_color":null,"background_color_rules":[{"id":"2eaf6f30-367a-11e9-a875-698afd42ed2c"}],"bar_color_rules":[{"id":"2f685ef0-367a-11e9-a875-698afd42ed2c"}],"gauge_color_rules":[{"id":"339f78f0-367a-11e9-a875-698afd42ed2c"}],"gauge_width":10,"gauge_inner_width":10,"gauge_style":"half"},"aggs":[]}',
+        '{"title":"Alert level evolution","type":"area","params":{"type":"area","grid":{"categoryLines":true,"style":{"color":"#eee"}},"categoryAxes":[{"id":"CategoryAxis-1","type":"category","position":"bottom","show":true,"style":{},"scale":{"type":"linear"},"labels":{"show":true,"truncate":100},"title":{}}],"valueAxes":[{"id":"ValueAxis-1","name":"LeftAxis-1","type":"value","position":"left","show":true,"style":{},"scale":{"type":"linear","mode":"normal"},"labels":{"show":true,"rotate":0,"filter":false,"truncate":100},"title":{"text":"Count"}}],"seriesParams":[{"show":"true","type":"line","mode":"stacked","data":{"label":"Count","id":"1"},"drawLinesBetweenPoints":true,"showCircles":true,"interpolate":"cardinal","valueAxis":"ValueAxis-1"}],"addTooltip":true,"addLegend":true,"legendPosition":"right","times":[],"addTimeMarker":false},"aggs":[{"id":"1","enabled":true,"type":"count","schema":"metric","params":{}},{"id":"2","enabled":true,"type":"date_histogram","schema":"segment","params":{"field":"@timestamp","timeRange":{"from":"now-15m","to":"now","mode":"quick"},"useNormalizedEsInterval":true,"interval":"auto","time_zone":"Europe/Berlin","drop_partials":false,"customInterval":"2h","min_doc_count":1,"extended_bounds":{}}},{"id":"3","enabled":true,"type":"terms","schema":"group","params":{"field":"rule.level","size":5,"order":"desc","orderBy":"1","otherBucket":false,"otherBucketLabel":"Other","missingBucket":false,"missingBucketLabel":"Missing"}}]}',
       uiStateJSON: '{}',
+      description: '',
+      version: 1,
+      kibanaSavedObjectMeta: {
+        searchSourceJSON:
+          '{"index":"wazuh-alerts","filter":[],"query":{"query":"","language":"lucene"}}'
+      }
+    },
+    _type: 'visualization'
+  },
+  {
+    _id: 'Wazuh-App-Overview-General-Alerts',
+    _source: {
+      title: 'Alerts',
+      visState:
+        '{"title":"Alerts","type":"area","params":{"type":"area","grid":{"categoryLines":true,"style":{"color":"#eee"},"valueAxis":null},"categoryAxes":[{"id":"CategoryAxis-1","type":"category","position":"bottom","show":true,"style":{},"scale":{"type":"linear"},"labels":{"show":true,"truncate":100},"title":{}}],"valueAxes":[{"id":"ValueAxis-1","name":"LeftAxis-1","type":"value","position":"left","show":true,"style":{},"scale":{"type":"linear","mode":"normal"},"labels":{"show":true,"rotate":0,"filter":false,"truncate":100},"title":{"text":"Count"}}],"seriesParams":[{"show":"true","type":"area","mode":"stacked","data":{"label":"Count","id":"1"},"drawLinesBetweenPoints":true,"showCircles":true,"interpolate":"cardinal","valueAxis":"ValueAxis-1"}],"addTooltip":true,"addLegend":false,"legendPosition":"right","times":[],"addTimeMarker":false},"aggs":[{"id":"1","enabled":true,"type":"count","schema":"metric","params":{}},{"id":"2","enabled":true,"type":"date_histogram","schema":"segment","params":{"field":"@timestamp","timeRange":{"from":"now-15m","to":"now","mode":"quick"},"useNormalizedEsInterval":true,"interval":"auto","time_zone":"Europe/Berlin","drop_partials":false,"customInterval":"2h","min_doc_count":1,"extended_bounds":{}}}]}',
+      uiStateJSON:
+        '{"spy":{"mode":{"name":null,"fill":false}},"vis":{"legendOpen":false}}',
       description: '',
       version: 1,
       kibanaSavedObjectMeta: {
@@ -241,7 +226,7 @@ export default [
     _source: {
       title: 'Top 5 agents',
       visState:
-        '{"title":"Top 5 agents","type":"pie","params":{"type":"pie","addTooltip":true,"addLegend":false,"legendPosition":"right","isDonut":true,"labels":{"show":true,"values":false,"last_level":true,"truncate":100}},"aggs":[{"id":"1","enabled":true,"type":"count","schema":"metric","params":{}},{"id":"2","enabled":true,"type":"terms","schema":"segment","params":{"field":"agent.name","size":5,"order":"desc","orderBy":"1","otherBucket":false,"otherBucketLabel":"Other","missingBucket":false,"missingBucketLabel":"Missing"}}]}',
+        '{"title":"overrview-05","type":"pie","params":{"type":"pie","addTooltip":true,"addLegend":false,"legendPosition":"right","isDonut":true,"labels":{"show":true,"values":true,"last_level":true,"truncate":100}},"aggs":[{"id":"1","enabled":true,"type":"count","schema":"metric","params":{}},{"id":"2","enabled":true,"type":"terms","schema":"segment","params":{"field":"agent.name","size":5,"order":"desc","orderBy":"1","otherBucket":false,"otherBucketLabel":"Other","missingBucket":false,"missingBucketLabel":"Missing"}}]}',
       uiStateJSON: '{"vis":{"legendOpen":false}}',
       description: '',
       version: 1,
@@ -253,12 +238,12 @@ export default [
     _type: 'visualization'
   },
   {
-    _id: 'Wazuh-App-Overview-General-Top-10-rule-groups',
+    _id: 'Wazuh-App-Overview-General-Top-5-rule-groups',
     _source: {
-      title: 'Top 10 rule groups',
+      title: 'Top 5 rule groups',
       visState:
-        '{"title":"Top 10 rule groups","type":"pie","params":{"scale":"linear","orientation":"single","minFontSize":11,"maxFontSize":24,"showLabel":false},"aggs":[{"id":"1","enabled":true,"type":"count","schema":"metric","params":{}},{"id":"2","enabled":true,"type":"terms","schema":"segment","params":{"field":"rule.groups","size":10,"order":"desc","orderBy":"1","otherBucket":false,"otherBucketLabel":"Other","missingBucket":false,"missingBucketLabel":"Missing"}}]}',
-      uiStateJSON: '{}',
+        '{"title":"Top 5 rule groups","type":"pie","params":{"type":"pie","addTooltip":true,"addLegend":false,"legendPosition":"right","isDonut":true,"labels":{"show":true,"values":true,"last_level":true,"truncate":100}},"aggs":[{"id":"1","enabled":true,"type":"count","schema":"metric","params":{}},{"id":"2","enabled":true,"type":"terms","schema":"segment","params":{"field":"rule.groups","size":5,"order":"desc","orderBy":"1","otherBucket":false,"otherBucketLabel":"Other","missingBucket":false,"missingBucketLabel":"Missing"}}]}',
+      uiStateJSON: '{"vis":{"legendOpen":false}}',
       description: '',
       version: 1,
       kibanaSavedObjectMeta: {
@@ -269,30 +254,14 @@ export default [
     _type: 'visualization'
   },
   {
-    _id: 'Wazuh-App-Overview-General-Commonly-fired-rules',
+    _id: 'Wazuh-App-Overview-General-Alerts-summary',
     _type: 'visualization',
     _source: {
-      title: 'Commonly fired rules',
+      title: 'Alerts summary',
       visState:
-        '{"title":"Commonly fired rules","type":"table","params":{"perPage":10,"showPartialRows":false,"showMetricsAtAllLevels":false,"sort":{"columnIndex":null,"direction":null},"showTotal":false,"totalFunc":"sum"},"aggs":[{"id":"1","enabled":true,"type":"count","schema":"metric","params":{}},{"id":"2","enabled":true,"type":"terms","schema":"bucket","params":{"field":"rule.description","size":5,"order":"desc","orderBy":"1","otherBucket":false,"otherBucketLabel":"Other","missingBucket":false,"missingBucketLabel":"Missing","customLabel":"Description"}}]}',
+        '{"title":"Alerts summary","type":"table","params":{"perPage":10,"showPartialRows":false,"showMeticsAtAllLevels":false,"sort":{"columnIndex":null,"direction":null},"showTotal":false,"totalFunc":"sum"},"aggs":[{"id":"1","enabled":true,"type":"count","schema":"metric","params":{}},{"id":"2","enabled":true,"type":"terms","schema":"bucket","params":{"field":"rule.id","otherBucket":false,"otherBucketLabel":"Other","missingBucket":false,"missingBucketLabel":"Missing","size":50,"order":"desc","orderBy":"1","customLabel":"Rule ID"}},{"id":"3","enabled":true,"type":"terms","schema":"bucket","params":{"field":"rule.description","otherBucket":false,"otherBucketLabel":"Other","missingBucket":false,"missingBucketLabel":"Missing","size":1,"order":"desc","orderBy":"1","customLabel":"Description"}},{"id":"4","enabled":true,"type":"terms","schema":"bucket","params":{"field":"rule.level","otherBucket":false,"otherBucketLabel":"Other","missingBucket":false,"missingBucketLabel":"Missing","size":1,"order":"desc","orderBy":"1","customLabel":"Level"}}]}',
       uiStateJSON:
         '{"vis":{"params":{"sort":{"columnIndex":null,"direction":null}}}}',
-      description: '',
-      version: 1,
-      kibanaSavedObjectMeta: {
-        searchSourceJSON:
-          '{"index":"wazuh-alerts","filter":[],"query":{"query":"","language":"lucene"}}'
-      }
-    }
-  },
-  {
-    _id: 'Wazuh-App-Overview-General-Alerts-evolution-Top-5-agents',
-    _type: 'visualization',
-    _source: {
-      title: 'Alerts evolution Top 5 agents',
-      visState:
-        '{"title":"Alerts evolution Top 5 agents","type":"histogram","params":{"type":"histogram","grid":{"categoryLines":true,"style":{"color":"#eee"},"valueAxis":"ValueAxis-1"},"categoryAxes":[{"id":"CategoryAxis-1","type":"category","position":"bottom","show":true,"style":{},"scale":{"type":"linear"},"labels":{"show":true,"truncate":100},"title":{}}],"valueAxes":[{"id":"ValueAxis-1","name":"LeftAxis-1","type":"value","position":"left","show":true,"style":{},"scale":{"type":"linear","mode":"normal"},"labels":{"show":true,"rotate":0,"filter":false,"truncate":100},"title":{"text":"Alerts"}}],"seriesParams":[{"show":"true","type":"histogram","mode":"stacked","data":{"label":"Alerts","id":"1"},"valueAxis":"ValueAxis-1","drawLinesBetweenPoints":true,"showCircles":true}],"addTooltip":true,"addLegend":true,"legendPosition":"right","times":[],"addTimeMarker":false},"aggs":[{"id":"1","enabled":true,"type":"count","schema":"metric","params":{"customLabel":"Alerts"}},{"id":"2","enabled":true,"type":"date_histogram","schema":"segment","params":{"field":"@timestamp","timeRange":{"from":"now-4h","to":"now","mode":"quick"},"useNormalizedEsInterval":true,"interval":"auto","time_zone":"Europe/Berlin","drop_partials":false,"customInterval":"2h","min_doc_count":1,"extended_bounds":{},"customLabel":""}},{"id":"3","enabled":true,"type":"terms","schema":"group","params":{"field":"agent.name","size":5,"order":"desc","orderBy":"1","otherBucket":false,"otherBucketLabel":"Other","missingBucket":false,"missingBucketLabel":"Missing","customLabel":""}}]}',
-      uiStateJSON: '{}',
       description: '',
       version: 1,
       kibanaSavedObjectMeta: {

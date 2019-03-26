@@ -43,22 +43,22 @@
     <!-- Top groups and result evolution section -->
     <div layout="row" layout-align="start stretch" class="height-320">
         <md-card flex="60" class="wz-md-card" ng-class="{'fullscreen': expandArray[0]}">
-            <md-card-actions layout="row" layout-align="end center" class="wz-card-actions wz-card-actions-top"
+            <md-card-actions layout="row" layout-align="end center" class="wz-card-actions-vis"
                 ng-dblclick="expand(0)">
                 <span class="wz-headline-title">Top 5 CIS-CAT groups</span>
                 <span flex></span>
-                <span class="wz-text-link" ng-click="expand(0)"><i class="fa fa-fw fa-expand"></i></span>
+                <span class="cursor-pointer" ng-click="expand(0)"><svg class="euiIcon euiIcon--medium euiContextMenu__icon" focusable="false" width="16" height="16" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg"><path d="M2.014 10.777l-.043 2.8a.52.52 0 0 0 .544.544l2.8-.043a.526.526 0 0 1 .546.546.598.598 0 0 1-.575.575l-2.802.044A1.571 1.571 0 0 1 .85 13.609l.044-2.802a.598.598 0 0 1 .575-.575.526.526 0 0 1 .545.545zm12.064-5.461l.043-2.801a.52.52 0 0 0-.543-.544l-2.801.043a.526.526 0 0 1-.545-.545.598.598 0 0 1 .575-.575L13.609.85a1.571 1.571 0 0 1 1.634 1.634l-.044 2.802a.598.598 0 0 1-.575.575.526.526 0 0 1-.546-.545zm-9.724 7.038a.5.5 0 0 1-.708-.708l8-8a.5.5 0 0 1 .708.708l-8 8z" fill-rule="evenodd"></path></svg></span>
             </md-card-actions>
             <md-card-content class="wazuh-column">
                 <kbn-vis vis-id="'Wazuh-app-Agents-CISCAT-top-5-groups'" id="Wazuh-app-Agents-CISCAT-top-5-groups"></kbn-vis>
             </md-card-content>
         </md-card>
         <md-card flex class="wz-md-card" ng-class="{'fullscreen': expandArray[1]}">
-            <md-card-actions layout="row" layout-align="end center" class="wz-card-actions wz-card-actions-top"
+            <md-card-actions layout="row" layout-align="end center" class="wz-card-actions-vis"
                 ng-dblclick="expand(1)">
                 <span class="wz-headline-title">Scan result evolution</span>
                 <span flex></span>
-                <span class="wz-text-link" ng-click="expand(1)"><i class="fa fa-fw fa-expand"></i></span>
+                <span class="cursor-pointer" ng-click="expand(1)"><svg class="euiIcon euiIcon--medium euiContextMenu__icon" focusable="false" width="16" height="16" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg"><path d="M2.014 10.777l-.043 2.8a.52.52 0 0 0 .544.544l2.8-.043a.526.526 0 0 1 .546.546.598.598 0 0 1-.575.575l-2.802.044A1.571 1.571 0 0 1 .85 13.609l.044-2.802a.598.598 0 0 1 .575-.575.526.526 0 0 1 .545.545zm12.064-5.461l.043-2.801a.52.52 0 0 0-.543-.544l-2.801.043a.526.526 0 0 1-.545-.545.598.598 0 0 1 .575-.575L13.609.85a1.571 1.571 0 0 1 1.634 1.634l-.044 2.802a.598.598 0 0 1-.575.575.526.526 0 0 1-.546-.545zm-9.724 7.038a.5.5 0 0 1-.708-.708l8-8a.5.5 0 0 1 .708.708l-8 8z" fill-rule="evenodd"></path></svg></span>
             </md-card-actions>
             <md-card-content class="wazuh-column">
                 <kbn-vis vis-id="'Wazuh-app-Agents-CISCAT-scan-result-evolution'" id="Wazuh-app-Agents-CISCAT-scan-result-evolution"></kbn-vis>
@@ -70,11 +70,11 @@
     <!-- Alerts summary table section -->
     <div layout="row" layout-align="start stretch" class="height-570">
         <md-card flex class="wz-md-card" ng-class="{'fullscreen': expandArray[2]}">
-            <md-card-actions layout="row" layout-align="end center" class="wz-card-actions wz-card-actions-top"
+            <md-card-actions layout="row" layout-align="end center" class="wz-card-actions-vis"
                 ng-dblclick="expand(2)">
                 <span class="wz-headline-title">Alerts summary</span>
                 <span flex></span>
-                <span class="wz-text-link" ng-click="expand(2)"><i class="fa fa-fw fa-expand"></i></span>
+                <span class="cursor-pointer" ng-click="expand(2)"><svg class="euiIcon euiIcon--medium euiContextMenu__icon" focusable="false" width="16" height="16" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg"><path d="M2.014 10.777l-.043 2.8a.52.52 0 0 0 .544.544l2.8-.043a.526.526 0 0 1 .546.546.598.598 0 0 1-.575.575l-2.802.044A1.571 1.571 0 0 1 .85 13.609l.044-2.802a.598.598 0 0 1 .575-.575.526.526 0 0 1 .545.545zm12.064-5.461l.043-2.801a.52.52 0 0 0-.543-.544l-2.801.043a.526.526 0 0 1-.545-.545.598.598 0 0 1 .575-.575L13.609.85a1.571 1.571 0 0 1 1.634 1.634l-.044 2.802a.598.598 0 0 1-.575.575.526.526 0 0 1-.546-.545zm-9.724 7.038a.5.5 0 0 1-.708-.708l8-8a.5.5 0 0 1 .708.708l-8 8z" fill-rule="evenodd"></path></svg></span>
             </md-card-actions>
             <md-card-content class="wazuh-column">
                 <kbn-vis vis-id="'Wazuh-app-Agents-CISCAT-alerts-summary'"></kbn-vis>
