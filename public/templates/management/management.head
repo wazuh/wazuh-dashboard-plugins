@@ -18,7 +18,7 @@
                 <span class="wz-text-link cursor-pointer" ng-click="mctrl.breadCrumbBack(true);"> / {{ mctrl.tabNames[mctrl.tab] }}</span>
                 <span ng-show="mctrl.currentRule"><span class="wz-text-link cursor-pointer" ng-click="mctrl.breadCrumbBack()"> / rules</span> / {{mctrl.currentRule.id}}</span>
                 <span ng-show="mctrl.currentDecoder"><span class="wz-text-link cursor-pointer" ng-click="mctrl.breadCrumbBack()"> / decoders</span> / {{mctrl.currentDecoder.name}}</span>
-                <span ng-show="mctrl.currentList"><span class="wz-text-link cursor-pointer" ng-click="mctrl.breadCrumbBack()"> / CDB lists</span> / {{mctrl.currentList.name}}</span>
+                <span ng-show="mctrl.currentList"><span class="wz-text-link cursor-pointer" ng-click="mctrl.breadCrumbBack()"> / lists</span> / {{mctrl.currentList.name}}</span>
             </div>
             <div ng-if="mctrl.tab === 'groups' && mctrl.currentGroup && mctrl.currentGroup.name">
                 <span class="wz-text-link cursor-pointer" ng-click="mctrl.switchTab('welcome', true)">Management</span>
