@@ -842,7 +842,15 @@ export class WazuhApiCtrl {
               'dateAdd',
               'version',
               'lastKeepAlive',
-              'os'
+              'os.arch',
+              'os.build',
+              'os.codename',
+              'os.major',
+              'os.minor',
+              'os.name',
+              'os.platform',
+              'os.uname',
+              'os.version'
             ]
           : Object.keys(output.body.data.items[0]);
 

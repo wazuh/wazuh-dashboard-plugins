@@ -26,11 +26,12 @@
 </div>
 
 <div ng-if="!wazuh_table_loading && !isPolicyMonitoring() && !isSyscheck()" ng-show="!error && items.length">
-    <table class="table table-striped table-condensed table-hover no-margin-bottom"
+    <table class="euiTable euiTable--responsive table table-striped table-condensed table-hover no-margin-bottom"
         ng-class="customColumns ? 'table-resizable' : ''" style="table-layout: fixed !important"
         id="table{{scapepath}}">
         <thead class="wz-text-bold">
-            <th ng-repeat="key in keys" class="wz-text-left" ng-style="key.width && {'width':key.width}">
+            <th ng-repeat="key in keys" class="euiTableHeaderCell wz-text-left"
+                ng-style="key.width && {'width':key.width}">
                 <span ng-class="{ 'cursor-pointer' : !key.nosortable}" ng-click="!key.nosortable && sort(key)">
                     {{ path === '/agents/groups' && (key.value || key) === 'count' ? 'Agents' :
                     keyEquivalence[key.value ||
@@ -42,12 +43,13 @@
             </th>
             <th ng-if="(path === '/agents' || (path === '/agents/groups' && adminMode) || (isLookingGroup() && adminMode) 
                 || path === '/rules/files' || path === '/decoders/files' || path === '/lists/files')"
-                class="wz-text-left" ng-class="{'col-lg-2': path !== '/agents', 'col-lg-1': path === '/agents'}">
+                class="euiTableHeaderCell wz-text-left"
+                ng-class="{'col-lg-2': path !== '/agents', 'col-lg-1': path === '/agents'}">
                 Actions
             </th>
         </thead>
         <tbody>
-            <tr ng-class="allowClick ? 'cursor-pointer' : ''" class="wz-word-wrap"
+            <tr ng-class="allowClick ? 'cursor-pointer' : ''" class="euiTableRow wz-word-wrap"
                 ng-repeat="item in pagedItems[currentPage] | filter:{item:'!'}" ng-click="clickAction(item)">
                 <td ng-repeat="key in keys" id="td-{{$parent.$index}}-{{$index}}"
                     ng-mouseover="showTooltip($parent.$index, $index, item)">
@@ -224,6 +226,10 @@
                     seconds)</span>
                 <div ng-show="items.length >= itemsPerPage" class="pagination pull-right" style="margin:0 !important">
                     <ul layout="row">
+                        <li ng-show="currentPage > 0" class="md-padding">
+                            <a href ng-click="firstPage()">First</a>
+                        </li>
+
                         <li ng-show="currentPage" class="md-padding">
                             <a href ng-click="prevPage()">« Prev</a>
                         </li>
@@ -236,6 +242,10 @@
                         <li ng-show="currentPage < pagedItems.length - 1" class="md-padding">
                             <a href ng-click="nextPage()">Next »</a>
                         </li>
+
+                        <li ng-show="currentPage < pagedItems.length - 1" class="md-padding">
+                            <a href ng-click="setPage(pagedItems.length - 1, false, true)">Last</a>
+                        </li>
                     </ul>
                 </div>
             </td>
@@ -244,11 +254,13 @@
 </div>
 
 <div ng-if="!wazuh_table_loading && isPolicyMonitoring()" ng-show="!error && items.length">
-    <table class="table table-striped table-striped-duo table-condensed table-hover no-margin-bottom"
+    <table
+        class="euiTable euiTable--responsive table table-striped table-striped-duo table-condensed table-hover no-margin-bottom"
         ng-class="customColumns ? 'table-resizable' : ''" style="table-layout: fixed !important"
         id="table{{scapepath}}">
         <thead class="wz-text-bold">
-            <th ng-repeat="key in keys" class="wz-text-left" ng-style="key.width && {'width':key.width}">
+            <th ng-repeat="key in keys" class="euiTableHeaderCell wz-text-left"
+                ng-style="key.width && {'width':key.width}">
                 <span ng-class="{ 'cursor-pointer' : !key.nosortable }" ng-click="!key.nosortable && sort(key)">
                     {{ keyEquivalence[key.value || key] || key.value || key }}
                     <i ng-if="!key.nosortable" class="fa wz-theader-sort-icon"
@@ -258,7 +270,7 @@
             </th>
         </thead>
         <tbody>
-            <tr class="wz-word-wrap cursor-pointer"
+            <tr class="euiTableRow wz-word-wrap cursor-pointer"
                 ng-repeat-start="item in pagedItems[currentPage] | filter:{item:'!'}" ng-click="expandTableRow(item)"
                 ng-class="{'selected': item.expanded}">
                 <td ng-repeat="key in keys" id="td-{{$parent.$index}}-{{$index}}"
@@ -279,8 +291,8 @@
                     </div>
                 </td>
             </tr>
-            <tr ng-if="item.rationale || item.remediation || item.directory || (item.compliance && item.compliance.length)"
-                class="wz-word-wrap cursor-pointer selected" ng-show="item.expanded" ng-repeat-end=""
+            <tr ng-show="(item.rationale || item.remediation || item.directory || (item.compliance && item.compliance.length)) && item.expanded"
+                class="euiTableRow wz-word-wrap cursor-pointer selected" ng-repeat-end=""
                 ng-click="expandTableRow(item)">
                 <td colspan="{{keys.length}}" style="border-top: none">
                     <div layout="row" layout-padding="" class="layout-padding layout-row">
@@ -363,11 +375,13 @@
 </div>
 
 <div ng-if="!wazuh_table_loading && isSyscheck()" ng-show="!error && items.length">
-    <table class="table table-striped table-striped-duo table-condensed table-hover no-margin-bottom"
+    <table
+        class="euiTable euiTable--responsive table table-striped table-striped-duo table-condensed table-hover no-margin-bottom"
         ng-class="customColumns ? 'table-resizable' : ''" style="table-layout: fixed !important"
         id="table{{scapepath}}">
         <thead class="wz-text-bold">
-            <th ng-repeat="key in keys" class="wz-text-left" ng-style="key.width && {'width':key.width}">
+            <th ng-repeat="key in keys" class="euiTableHeaderCell wz-text-left"
+                ng-style="key.width && {'width':key.width}">
                 <span ng-class="{ 'cursor-pointer' : !key.nosortable }" ng-click="!key.nosortable && sort(key)">{{
                     keyEquivalence[key.value || key] || key.value || key }}
                     <i ng-if="!key.nosortable" class="fa wz-theader-sort-icon"
@@ -377,7 +391,7 @@
             </th>
         </thead>
         <tbody>
-            <tr class="wz-word-wrap cursor-pointer"
+            <tr class="euiTableRow wz-word-wrap cursor-pointer"
                 ng-repeat-start="item in pagedItems[currentPage] | filter:{item:'!'}" ng-click="expandTableRow(item)"
                 ng-class="{'selected': item.expanded}">
                 <td ng-repeat="key in keys" id="td-{{$parent.$index}}-{{$index}}"
@@ -394,20 +408,20 @@
                     </div>
                 </td>
             </tr>
-            <tr class="wz-word-wrap cursor-pointer selected" ng-show="item.expanded" ng-repeat-end=""
+            <tr class="euiTableRow wz-word-wrap cursor-pointer selected" ng-show="item.expanded" ng-repeat-end=""
                 ng-click="expandTableRow(item)">
                 <td colspan="{{keys.length}}" style="border-top: none">
                     <div layout="row" layout-padding="" class="layout-padding layout-row" ng-if="item.expanded">
                         <md-card flex="" class="wz-md-card wz-padding-top-0 wz-padding-bottom-0 wz-no-margin _md flex">
                             <md-card-content>
                                 <div layout="row" class="wz-padding-top-10">
-                                    <table class="table table-striped table-condensed">
+                                    <table class="euiTable euiTable--responsive table table-striped table-condensed">
                                         <tbody>
                                             <tr ng-repeat="(key, value) in item"
                                                 ng-if="key !== 'expanded' && key !== 'showTooltip'"
                                                 ng-show="!isWindows() || (key !== 'inode' && key !== 'gid' && key !== 'gname')"
-                                                class="no-duo">
-                                                <td class="wz-word-break-rule">{{key}}</td>
+                                                class="euiTableRow no-duo">
+                                                <td class="wz-word-break-rule ">{{key}}</td>
                                                 <td>
                                                     <span class="wz-text-right color-grey">{{value}}</span>
                                                 </td>
