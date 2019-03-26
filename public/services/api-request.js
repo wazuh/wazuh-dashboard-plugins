@@ -68,6 +68,7 @@ export class ApiRequest {
         const isUp =
           daemons['wazuh-modulesd'] === 'running' &&
           daemons['ossec-execd'] === 'running' &&
+          // daemons['wazuh-db'] === 'running' &&
           (clusterEnabled ? daemons['wazuh-clusterd'] === 'running' : true);
 
         if (!isUp) {
