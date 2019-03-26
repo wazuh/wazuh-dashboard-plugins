@@ -82,7 +82,7 @@ app.directive('wzListManage', function() {
           $scope.filterTable();
           return;
         } catch (error) {
-          errorHandler.handle(error, 'Error loading table');
+          errorHandler.handle(error.message || error);
         }
         return;
       };
@@ -138,16 +138,16 @@ app.directive('wzListManage', function() {
           $scope.doingSaving = false;
           $scope.loadingChange = false;
           if (!$scope.$$phase) $scope.$digest();
-        } catch (err) {
+        } catch (error) {
           if (addingNew) {
             $scope.currentList.name = false;
           }
           $scope.doingSaving = false;
-          if ((err || '').includes('Wazuh API error: 1905')) {
+          if ((error.message || error || '').includes('Wazuh API error: 1905')) {
             $scope.overwriteError = true;
             errorHandler.handle('File name already exists');
           } else {
-            errorHandler.handle(err, 'Error updating list');
+            errorHandler.handle(error.message || error);
           }
           $scope.loadingChange = false;
           $scope.$applyAsync();

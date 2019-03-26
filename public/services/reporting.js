@@ -88,7 +88,7 @@ export class ReportingService {
     } catch (error) {
       this.$rootScope.reportBusy = false;
       this.$rootScope.reportStatus = false;
-      this.errorHandler.handle(error, 'Reporting');
+      this.errorHandler.handle(error.message || error);
     }
   }
 }

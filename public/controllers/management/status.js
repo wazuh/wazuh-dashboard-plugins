@@ -116,7 +116,7 @@ export class StatusController {
       return;
     } catch (error) {
       this.load = false;
-      return this.errorHandler.handle(error, 'Manager');
+      return this.errorHandler.handle(error.message || error);
     }
   }
 

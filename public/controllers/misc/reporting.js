@@ -54,7 +54,7 @@ export class ReportingController {
       await this.load();
       this.errorHandler.info('Success', 'Reporting');
     } catch (error) {
-      this.errorHandler.handle(error, 'Reporting');
+      this.errorHandler.handle(error.message || error);
     }
   }
 
@@ -140,7 +140,7 @@ export class ReportingController {
       this.loading = false;
       if (!this.$scope.$$phase) this.$scope.$digest();
     } catch (error) {
-      this.errorHandler.handle(error, 'Reporting');
+      this.errorHandler.handle(error.message || error);
     }
   }
 }

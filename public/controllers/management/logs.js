@@ -61,11 +61,11 @@ export class LogsController {
 
   parseLogsToText(logs) {
     let result = '';
-    logs.forEach(function(log, idx) {
+    logs.forEach(function (log, idx) {
       if (log) {
         result = result.concat(
           `${log.timestamp} ${log.tag} ${(log.level || '').toUpperCase()}: ${
-            log.description
+          log.description
           }`
         );
         if (idx !== logs.length - 1) {
@@ -159,7 +159,7 @@ export class LogsController {
       this.daemons = Object.keys(daemons).map(item => ({ title: item }));
       if (!this.$scope.$$phase) this.$scope.$digest();
     } catch (error) {
-      this.errorHandler.handle(error, 'Logs');
+      this.errorHandler.handle(error);
     }
   }
 
@@ -195,17 +195,17 @@ export class LogsController {
 
       const data = clusterEnabled
         ? await this.apiReq.request(
-            'GET',
-            `/cluster/${this.selectedNode}/logs/summary`,
-            {}
-          )
+          'GET',
+          `/cluster/${this.selectedNode}/logs/summary`,
+          {}
+        )
         : await this.apiReq.request('GET', '/manager/logs/summary', {});
       const daemons = data.data.data;
       this.daemons = Object.keys(daemons).map(item => ({ title: item }));
       if (!this.$scope.$$phase) this.$scope.$digest();
       return;
     } catch (error) {
-      this.errorHandler.handle(error, 'Logs');
+      this.errorHandler.handle(error);
     }
     return;
   }

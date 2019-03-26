@@ -80,7 +80,7 @@ export class ErrorHandler {
     if (this.wzMisc.getBlankScr()) silent = true;
     let text =
       typeof message === 'string' && typeof origin === 'string' && origin.length
-        ? `${message} - ${origin}`
+        ? `${message} (${origin})`
         : message;
     if (error.extraMessage) text = error.extraMessage;
     text = location ? location + '. ' + text : text;

@@ -63,7 +63,7 @@ app.directive('wzDataTable', function() {
         try {
           $scope.filterTable();
         } catch (error) {
-          errorHandler.handle(error, 'Error loading table');
+          errorHandler.handle(error.message || error);
         }
         return;
       };

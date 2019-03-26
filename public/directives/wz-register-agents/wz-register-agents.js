@@ -124,7 +124,7 @@ class WzRegisterAgents {
         $scope.nextStep();
       } catch (error) {
         $scope.addingAgent = false;
-        errorHandler.handle(error, 'Adding agent error');
+        errorHandler.handle(error.message || error);
       }
       $scope.$applyAsync();
       return;
@@ -153,7 +153,7 @@ class WzRegisterAgents {
         );
         $scope.nextStep();
       } catch (error) {
-        errorHandler.handle(error, '');
+        errorHandler.handle(error.message || error);
         $scope.restartingAgent = false;
       }
       $scope.$applyAsync();

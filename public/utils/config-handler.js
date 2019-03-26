@@ -75,7 +75,7 @@ export class ConfigurationHandler {
       $scope.load = false;
       if (!$scope.$$phase) $scope.$digest();
     } catch (error) {
-      this.errorHandler.handle(error, 'Manager');
+      this.errorHandler.handle(error.message || error);
       $scope.load = false;
     }
     return;
@@ -124,7 +124,7 @@ export class ConfigurationHandler {
       $scope.load = false;
       if (!$scope.$$phase) $scope.$digest();
     } catch (error) {
-      this.errorHandler.handle(error, 'Manager');
+      this.errorHandler.handle(error.message || error);
       $scope.load = false;
     }
     return;

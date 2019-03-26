@@ -42,10 +42,8 @@ export async function nextPage(currentPage, $scope, errorHandler, fetch, last) {
     }
   } catch (error) {
     $scope.wazuh_table_loading = false;
-    $scope.error = `Error paginating table - ${error.message || error}.`;
-    errorHandler.handle(
-      `Error paginating table due to ${error.message || error}`
-    );
+    $scope.error = errorHandler.handle(error.message || error, 0, 0, 1);
+    errorHandler.handle(error.message || error);
   }
   return;
 }

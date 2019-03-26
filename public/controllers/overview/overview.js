@@ -210,7 +210,7 @@ export class OverviewController {
 
       this.checkMetrics(this.tab, subtab);
     } catch (error) {
-      this.errorHandler.handle(error, 'Overview');
+      this.errorHandler.handle(error.message || error);
     }
     if (!this.$scope.$$phase) this.$scope.$digest();
     return;
@@ -280,7 +280,7 @@ export class OverviewController {
 
       await this.switchSubtab('panels', true, sameTab, preserveDiscover);
     } catch (error) {
-      this.errorHandler.handle(error, 'Overview');
+      this.errorHandler.handle(error.message || error);
     }
     if (!this.$scope.$$phase) this.$scope.$digest();
     return;
@@ -343,7 +343,7 @@ export class OverviewController {
       await this.loadConfiguration();
       await this.switchTab(this.tab, true);
     } catch (error) {
-      this.errorHandler.handle(error, 'Overview (init)');
+      this.errorHandler.handle(error.message || error);
     }
     if (!this.$scope.$$phase) this.$scope.$digest();
     return;

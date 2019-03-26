@@ -258,8 +258,8 @@ export function RulesController(
         } else {
           $scope.currentRule = response[0];
         }
-      } catch (err) {
-        errorHandler.handle(err, 'Rule reload error.');
+      } catch (error) {
+        errorHandler.handle(error.message || error);
       }
     }
     $scope.editingFile = false;
@@ -307,10 +307,7 @@ export function RulesController(
         if (!$scope.$$phase) $scope.$digest();
       })
       .catch(() =>
-        errorHandler.handle(
-          `Error fetching rule: ${incomingRule} from the Wazuh API`,
-          'Ruleset'
-        )
+        errorHandler.handle(`Error fetching rule: ${incomingRule} from the Wazuh API`)
       );
   }
 

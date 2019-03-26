@@ -92,7 +92,7 @@ class WzMenu {
         if (!$rootScope.$$phase) $rootScope.$digest();
         return;
       } catch (error) {
-        errorHandler.handle(error, 'Directives - Menu');
+        errorHandler.handle(error.message || error);
         $scope.theresPattern = false;
       }
     };
@@ -110,7 +110,7 @@ class WzMenu {
         $window.location.reload();
         return;
       } catch (error) {
-        errorHandler.handle(error, 'Directives - Menu');
+        errorHandler.handle(error.message || error);
       }
     };
 
@@ -146,7 +146,7 @@ class WzMenu {
           $scope.currentSelectedPattern = appState.getCurrentPattern();
         })
         .catch(error => {
-          errorHandler.handle(error, 'Directives - Menu');
+          errorHandler.handle(error.message || error);
           $scope.theresPattern = false;
         });
     });
