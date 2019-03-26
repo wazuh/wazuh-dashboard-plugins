@@ -170,7 +170,7 @@ app.directive('wzTable', function () {
           if ($scope.customColumns) {
             setTimeout(() => {
               $scope.setColResizable();
-            }, 10);
+            }, 100);
           }
           return;
         } catch (error) {
@@ -268,8 +268,6 @@ app.directive('wzTable', function () {
        * On controller loads
        */
       const init = async (skipFetching = false) => {
-        if (!skipFetching)
-          $scope.wazuh_table_resizing = true;
         await initTable(
           $scope,
           fetch,
@@ -488,15 +486,11 @@ app.directive('wzTable', function () {
       };
 
       $scope.setColResizable = () => {
-        setTimeout(() => {
-          $scope.wazuh_table_resizing = false;
-        }, 1);
         $(`#table${$scope.scapepath}`).colResizable({
           liveDrag: true,
           minWidth: 78,
           partialRefresh: true,
-          draggingClass: false,
-          postbackSafe: true
+          draggingClass: false
         });
         $scope.$applyAsync();
       };
