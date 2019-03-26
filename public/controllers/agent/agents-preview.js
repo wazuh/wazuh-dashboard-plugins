@@ -46,6 +46,7 @@ export class AgentsPreviewController {
     this.wzTableFilter = wzTableFilter;
     this.commonData = commonData;
     this.wazuhConfig = wazuhConfig;
+    this.errorInit = false;
   }
 
   /**
@@ -142,6 +143,8 @@ export class AgentsPreviewController {
    */
   async load() {
     try {
+      this.errorInit = false;
+
       const configuration = this.wazuhConfig.getConfig();
       this.$scope.adminMode = !!(configuration || {}).admin;
 
@@ -212,13 +215,11 @@ export class AgentsPreviewController {
           this.mostActiveAgent.id = info.data.data;
         }
       }
-
-      this.loading = false;
-      if (!this.$scope.$$phase) this.$scope.$digest();
-      return;
     } catch (error) {
-      this.errorHandler.handle(error, 'Agents Preview');
+      this.errorInit = this.errorHandler.handle(error, false, false, true);
     }
+    this.loading = false;
+    this.$scope.$applyAsync();
     return;
   }
 

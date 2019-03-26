@@ -75,8 +75,13 @@ export class ErrorHandler {
    */
   handle(error, location, isWarning, silent) {
     const message = this.extractMessage(error);
+    const origin = ((error || {}).config || {}).url || '';
+
     if (this.wzMisc.getBlankScr()) silent = true;
-    let text = message;
+    let text =
+      typeof message === 'string' && typeof origin === 'string' && origin.length
+        ? `${message} - ${origin}`
+        : message;
     if (error.extraMessage) text = error.extraMessage;
     text = location ? location + '. ' + text : text;
     if (!silent) {

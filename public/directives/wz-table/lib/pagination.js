@@ -44,8 +44,7 @@ export async function nextPage(currentPage, $scope, errorHandler, fetch, last) {
     $scope.wazuh_table_loading = false;
     $scope.error = `Error paginating table - ${error.message || error}.`;
     errorHandler.handle(
-      `Error paginating table due to ${error.message || error}`,
-      'Data factory'
+      `Error paginating table due to ${error.message || error}`
     );
   }
   return;

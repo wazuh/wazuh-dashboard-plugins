@@ -26,7 +26,7 @@ import { checkGap } from './lib/check-gap';
 
 const app = uiModules.get('app/wazuh', []);
 
-app.directive('wzTable', function () {
+app.directive('wzTable', function() {
   return {
     restrict: 'E',
     scope: {
@@ -254,8 +254,7 @@ app.directive('wzTable', function () {
           $scope.error = `Real time feature aborted - ${error.message ||
             error}.`;
           errorHandler.handle(
-            `Real time feature aborted. ${error.message || error}`,
-            'Data factory'
+            `Real time feature aborted. ${error.message || error}`
           );
         }
         return;
@@ -293,11 +292,11 @@ app.directive('wzTable', function () {
       $scope.prevPage = () => pagination.prevPage($scope);
       $scope.nextPage = async (currentPage, last = false) =>
         pagination.nextPage(currentPage, $scope, errorHandler, fetch, last);
-      $scope.firstPage = function () {
+      $scope.firstPage = function() {
         $scope.setPage(1);
         $scope.prevPage();
       };
-      $scope.setPage = function (page = false, logs = false, last = false) {
+      $scope.setPage = function(page = false, logs = false, last = false) {
         this.n = page || this.n;
         $scope.currentPage = this.n;
         $scope.nextPage(this.n, last).then(() => {
@@ -481,7 +480,10 @@ app.directive('wzTable', function () {
           .clone()
           .css({ display: 'inline', width: 'auto', visibility: 'hidden' })
           .appendTo('body');
-        if ($c.width() > $element.width() && (($element || [])[0].children || [])[0].innerText !== '-') {
+        if (
+          $c.width() > $element.width() &&
+          (($element || [])[0].children || [])[0].innerText !== '-'
+        ) {
           if (!item.showTooltip) {
             item.showTooltip = [];
           }

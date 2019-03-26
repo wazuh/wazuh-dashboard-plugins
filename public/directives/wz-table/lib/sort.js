@@ -27,8 +27,7 @@ export async function sort(field, $scope, instance, fetch, errorHandler) {
     errorHandler.handle(
       `Error sorting table by ${
         field ? field.value : 'undefined'
-      }. ${error.message || error}`,
-      'Data factory'
+      }. ${error.message || error}`
     );
   }
   if (!$scope.$$phase) $scope.$digest();

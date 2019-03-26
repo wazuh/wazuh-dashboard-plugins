@@ -27,10 +27,7 @@ export async function initTable(
   } catch (error) {
     $scope.wazuh_table_loading = false;
     $scope.error = `Error while init table - ${error.message || error}.`;
-    errorHandler.handle(
-      `Error while init table. ${error.message || error}`,
-      'Data factory'
-    );
+    errorHandler.handle(`Error while init table. ${error.message || error}`);
   }
   if (!$scope.$$phase) $scope.$digest();
   return;
