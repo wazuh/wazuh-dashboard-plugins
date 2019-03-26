@@ -291,12 +291,17 @@ app.directive('wzTable', function () {
       $scope.range = (size, start, end) =>
         pagination.range(size, start, end, $scope.gap);
       $scope.prevPage = () => pagination.prevPage($scope);
-      $scope.nextPage = async currentPage =>
-        pagination.nextPage(currentPage, $scope, errorHandler, fetch);
-      $scope.setPage = function (page = false) {
-        $scope.currentPage = page || this.n;
-        $scope.nextPage(this.n).then(() => {
-          if (page) {
+      $scope.nextPage = async (currentPage, last = false) =>
+        pagination.nextPage(currentPage, $scope, errorHandler, fetch, last);
+      $scope.firstPage = function () {
+        $scope.setPage(1);
+        $scope.prevPage();
+      };
+      $scope.setPage = function (page = false, logs = false, last = false) {
+        this.n = page || this.n;
+        $scope.currentPage = this.n;
+        $scope.nextPage(this.n, last).then(() => {
+          if (logs) {
             $scope.$emit('scrollBottom', {
               line: parseInt(page * $scope.itemsPerPage)
             });
@@ -342,7 +347,7 @@ app.directive('wzTable', function () {
       });
 
       $scope.$on('increaseLogs', (event, parameters) => {
-        $scope.setPage(parseInt(parameters.lines / $scope.itemsPerPage));
+        $scope.setPage(parseInt(parameters.lines / $scope.itemsPerPage), true);
       });
 
       $scope.$on('$destroy', () => {

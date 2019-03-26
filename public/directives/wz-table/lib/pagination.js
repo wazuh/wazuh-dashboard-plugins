@@ -10,7 +10,7 @@
  * Find more information about this on the LICENSE file.
  */
 
-export async function nextPage(currentPage, $scope, errorHandler, fetch) {
+export async function nextPage(currentPage, $scope, errorHandler, fetch, last) {
   try {
     $scope.error = false;
     if (
@@ -27,8 +27,15 @@ export async function nextPage(currentPage, $scope, errorHandler, fetch) {
     ) {
       const copy = $scope.currentPage;
       $scope.wazuh_table_loading = true;
-      const currentNonNull = $scope.items.filter(item => !!item);
-      await fetch({ offset: currentNonNull.length });
+      let currentNonNull = $scope.items.filter(item => !!item);
+      if (!last) {
+        await fetch({ offset: currentNonNull.length });
+      } else {
+        while (currentNonNull.length < $scope.items.length) {
+          await fetch({ offset: currentNonNull.length });
+          currentNonNull = $scope.items.filter(item => !!item);
+        }
+      }
       $scope.wazuh_table_loading = false;
       $scope.currentPage = copy;
       $scope.$applyAsync();

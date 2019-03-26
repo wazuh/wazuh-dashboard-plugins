@@ -195,6 +195,10 @@
                     seconds)</span>
                 <div ng-show="items.length >= itemsPerPage" class="pagination pull-right" style="margin:0 !important">
                     <ul layout="row">
+                        <li ng-show="currentPage > 0" class="md-padding">
+                            <a href ng-click="firstPage()">First</a>
+                        </li>
+
                         <li ng-show="currentPage" class="md-padding">
                             <a href ng-click="prevPage()">« Prev</a>
                         </li>
@@ -206,6 +210,10 @@
 
                         <li ng-show="currentPage < pagedItems.length - 1" class="md-padding">
                             <a href ng-click="nextPage()">Next »</a>
+                        </li>
+
+                        <li ng-show="currentPage < pagedItems.length - 1" class="md-padding">
+                            <a href ng-click="setPage(pagedItems.length - 1, false, true)">Last</a>
                         </li>
                     </ul>
                 </div>
