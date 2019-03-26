@@ -89,7 +89,7 @@
     </div>
     <div layout="row" class="md-padding layout-align-center" ng-if="!load && !lookingSca && policies.length">
         <md-card class="wz-md-card">
-            <md-card-actions layout="row" class="wz-card-actions wz-card-actions-top"
+            <md-card-actions layout="row" class="wz-card-actions-vis"
                 style="padding-top:14px !important">
                 <span class="wz-headline-title">Total</span>
             </md-card-actions>
@@ -98,7 +98,7 @@
             </md-card-content>
         </md-card>
         <md-card class="wz-md-card" ng-repeat="policy in policies">
-            <md-card-actions layout="row" class="wz-card-actions wz-card-actions-top"
+            <md-card-actions layout="row" class="wz-card-actions-vis"
                 style="padding-top:14px !important">
                 <span class="wz-headline-title">{{policy.name}}</span>
             </md-card-actions>
@@ -112,7 +112,7 @@
     <div layout="row" class="wz-margin-top-10" ng-if="agent && agent.os && lookingSca">
         <md-card flex class="wz-md-card">
             <md-card-actions layout="row" style="padding-top: 14px !important;"
-                class="wz-card-actions wz-card-actions-top">
+                class="wz-card-actions-vis">
                 <span><i class="fa fa-fw fa-arrow-left cursor-pointer" ng-click="closeScaChecks()"></i>
                     {{lookingSca.name}}</span>
                 <span class="wz-margin-left-16">Pass: <span class="wz-text-bold">{{lookingSca.pass}}</span></span>
