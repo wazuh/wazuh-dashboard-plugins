@@ -15,7 +15,9 @@ export class ErrorHandler {
   /**
    * Constructor
    */
-  constructor() {}
+  constructor(wzMisc) {
+    this.wzMisc = wzMisc;
+  }
 
   /**
    * Extracts error message string from any kind of error.
@@ -73,7 +75,7 @@ export class ErrorHandler {
    */
   handle(error, location, isWarning, silent) {
     const message = this.extractMessage(error);
-
+    if (this.wzMisc.getBlankScr()) silent = true;
     let text = message;
     if (error.extraMessage) text = error.extraMessage;
     text = location ? location + '. ' + text : text;

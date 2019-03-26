@@ -10,10 +10,11 @@
  * Find more information about this on the LICENSE file.
  */
 export class ConfigHandler {
-  constructor($rootScope, apiReq, errorHandler) {
+  constructor($rootScope, apiReq, errorHandler, restartStatus) {
     this.apiReq = apiReq;
     this.$rootScope = $rootScope;
     this.errorHandler = errorHandler;
+    this.restartStatus = restartStatus;
   }
 
   /**
@@ -53,6 +54,7 @@ export class ConfigHandler {
 
   async performClusterRestart() {
     try {
+      this.restartStatus.setRestartingStatus(true);
       await this.apiReq.request('PUT', `/cluster/restart`, { delay: 15000 });
       this.$rootScope.$emit('removeRestarting', {});
     } catch (error) {
@@ -127,7 +129,7 @@ export class ConfigHandler {
         const str = data.details.join();
         throw new Error(str);
       }
-
+      this.restartStatus.setRestartingStatus(true);
       const result = await this.apiReq.request(
         'PUT',
         `/cluster/${node}/restart`,

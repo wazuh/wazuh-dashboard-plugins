@@ -27,6 +27,7 @@ import { uiModules } from 'ui/modules';
 import { GroupHandler } from './group-handler';
 import { RulesetHandler } from './ruleset-handler';
 import { ConfigHandler } from './config-handler';
+import { RestartStatus } from './restart-status';
 
 const app = uiModules.get('app/wazuh', []);
 
@@ -43,4 +44,5 @@ app
   .service('visFactoryService', VisFactoryService)
   .service('groupHandler', GroupHandler)
   .service('rulesetHandler', RulesetHandler)
-  .service('configHandler', ConfigHandler);
+  .service('configHandler', ConfigHandler)
+  .service('restartStatus', RestartStatus);

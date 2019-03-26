@@ -16,10 +16,22 @@ export class ApiRequest {
    * @param {*} genericReq
    * @param {*} appState
    */
-  constructor($q, genericReq, appState) {
+  constructor(
+    $q,
+    genericReq,
+    appState,
+    restartStatus,
+    wzMisc,
+    $location,
+    $rootScope
+  ) {
     this.$q = $q;
     this.genericReq = genericReq;
     this.appState = appState;
+    this.restartStatus = restartStatus;
+    this.wzMisc = wzMisc;
+    this.$location = $location;
+    this.$rootScope = $rootScope;
   }
 
   /**
@@ -40,6 +52,35 @@ export class ApiRequest {
 
       const { id } = JSON.parse(this.appState.getCurrentAPI());
       const requestData = { method, path, body, id };
+      const needCheck = this.restartStatus.getRestartingStatus();
+
+      if (needCheck) {
+        const clusterEnabled =
+          (this.appState.getClusterInfo() || {}).status === 'enabled';
+
+        const data = await this.genericReq.request('POST', '/api/request', {
+          method: 'GET',
+          path: '/manager/status',
+          body: {},
+          id
+        });
+        const daemons = ((data || {}).data || {}).data || {};
+        const isUp =
+          daemons['wazuh-modulesd'] === 'running' &&
+          daemons['ossec-execd'] === 'running' &&
+          (clusterEnabled ? daemons['wazuh-clusterd'] === 'running' : true);
+
+        if (!isUp) {
+          this.wzMisc.setBlankScr('Wazuh manager daemons are down');
+          this.$location.search('tab', null);
+          this.$location.path('/blank-screen');
+          this.$rootScope.$applyAsync();
+          return;
+        } else {
+          this.wzMisc.setBlankScr(false);
+          this.restartStatus.setRestartingStatus(false);
+        }
+      }
 
       const data = await this.genericReq.request(
         'POST',
