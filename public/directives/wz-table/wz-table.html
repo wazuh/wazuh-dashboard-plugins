@@ -319,6 +319,16 @@
                                         </div>
                                         <div layout="column" class="wz-margin-bottom-10"></div>
                                     </div>
+                                    <div class="euiFlexItem euiFlexItem--flexGrowZero" ng-if="item.description">
+                                        <div class="euiStat euiStat--leftAligned">
+                                            <p class="euiTitle euiTitle--small euiStat__title ng-binding"
+                                                style="font-size: 1.15rem;">Description</p>
+                                            <div class="euiText euiText--small euiStat__description wz-text-gray">
+                                                <p>{{item.description}}</p>
+                                            </div>
+                                        </div>
+                                        <div layout="column" class="wz-margin-bottom-10"></div>
+                                    </div>
                                     <div class="euiFlexItem euiFlexItem--flexGrowZero" ng-if="item.directory">
                                         <div class="euiStat euiStat--leftAligned">
                                             <p class="euiTitle euiTitle--small euiStat__title ng-binding"
