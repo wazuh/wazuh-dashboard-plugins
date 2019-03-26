@@ -20,18 +20,12 @@ export class ApiRequest {
     $q,
     genericReq,
     appState,
-    restartStatus,
-    wzMisc,
-    $location,
-    $rootScope
+    wzMisc
   ) {
     this.$q = $q;
     this.genericReq = genericReq;
     this.appState = appState;
-    this.restartStatus = restartStatus;
     this.wzMisc = wzMisc;
-    this.$location = $location;
-    this.$rootScope = $rootScope;
   }
 
   /**
@@ -52,7 +46,7 @@ export class ApiRequest {
 
       const { id } = JSON.parse(this.appState.getCurrentAPI());
       const requestData = { method, path, body, id };
-      const needCheck = this.restartStatus.getRestartingStatus();
+      const needCheck = method !== 'GET' || (method === 'GET' && path.includes('/validation'));
 
       if (needCheck) {
         const clusterEnabled =
@@ -64,7 +58,9 @@ export class ApiRequest {
           body: {},
           id
         });
+
         const daemons = ((data || {}).data || {}).data || {};
+
         const isUp =
           daemons['wazuh-modulesd'] === 'running' &&
           daemons['ossec-execd'] === 'running' &&
@@ -72,14 +68,7 @@ export class ApiRequest {
           (clusterEnabled ? daemons['wazuh-clusterd'] === 'running' : true);
 
         if (!isUp) {
-          this.wzMisc.setBlankScr('Wazuh manager daemons are down');
-          this.$location.search('tab', null);
-          this.$location.path('/blank-screen');
-          this.$rootScope.$applyAsync();
-          return;
-        } else {
-          this.wzMisc.setBlankScr(false);
-          this.restartStatus.setRestartingStatus(false);
+          throw new Error(`Wazuh manager is not ready yet - ${method} ${path} was aborted`);
         }
       }
 
