@@ -383,17 +383,22 @@ md-dialog.modalTheme .md-button{
     width: 0!important;
 }
 
+.kbnGlobalNav.kbnGlobalNav-isOpen + .app-wrapper .fullscreen {
+    width: calc(~'100vw - 250px')!important;
+    left: 180px!important;
+}
+
 .fullscreen {
 display: -webkit-box;
     display: -webkit-flex;
     display: -ms-flexbox;
     display: flex;
     z-index: 9999;
-    width: calc(~'100vw - 250px');
     height: calc(~'100vh - 60px');
+    width: calc(~'100vw - 133px');
     position: fixed;
     top: 0px;
-    left: 180px;
+    left: 53px;
     right: 20px;
     background-color: white;
     max-width: 100% !important;
