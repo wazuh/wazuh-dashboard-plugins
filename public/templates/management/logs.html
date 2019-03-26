@@ -97,7 +97,7 @@
             <wz-config-viewer flex xmlcontent="XMLContent" hide-header="true" />
         </div>
     </div>
-    <div layout="row" class="md-padding layout-align-end">
+    <div layout="row" class="md-padding layout-align-end" ng-if="XMLContent !== ''">
         <button type="button" ng-click="ctrl.downloadCsv()"
             class="euiButtonEmpty euiButtonEmpty--primary euiButtonEmpty--small">
             <span class="euiButtonEmpty__content">
