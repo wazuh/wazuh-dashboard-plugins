@@ -16,16 +16,12 @@ export class ApiRequest {
    * @param {*} genericReq
    * @param {*} appState
    */
-  constructor(
-    $q,
-    genericReq,
-    appState,
-    wzMisc
-  ) {
+  constructor($q, genericReq, appState, wzMisc) {
     this.$q = $q;
     this.genericReq = genericReq;
     this.appState = appState;
     this.wzMisc = wzMisc;
+    this.isRestarting = false;
   }
 
   /**
@@ -46,7 +42,15 @@ export class ApiRequest {
 
       const { id } = JSON.parse(this.appState.getCurrentAPI());
       const requestData = { method, path, body, id };
-      const needCheck = method !== 'GET' || (method === 'GET' && path.includes('/validation'));
+
+      this.isRestarting =
+        path.includes('restart') &&
+        (path.includes('manager') || path.includes('cluster'));
+
+      const needCheck =
+        this.isRestarting ||
+        method !== 'GET' ||
+        (method === 'GET' && path.includes('/validation'));
 
       if (needCheck) {
         const clusterEnabled =
@@ -68,7 +72,11 @@ export class ApiRequest {
           (clusterEnabled ? daemons['wazuh-clusterd'] === 'running' : true);
 
         if (!isUp) {
-          throw new Error(`Wazuh manager is not ready yet - ${method} ${path} was aborted`);
+          throw new Error(
+            `Wazuh manager is not ready yet - ${method} ${path} was aborted`
+          );
+        } else {
+          this.isRestarting = false;
         }
       }
 
