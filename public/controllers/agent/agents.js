@@ -566,9 +566,8 @@ export class AgentsController {
             `/sca/${this.$scope.agent.id}`,
             {}
           );
-          this.$scope.policies = [];
-          //this.$scope.policies =
-          // (((policies || {}).data || {}).data || {}).items || [];
+          this.$scope.policies =
+            (((policies || {}).data || {}).data || {}).items || [];
         } catch (error) {
           this.$scope.policies = [];
         }
@@ -745,10 +744,10 @@ export class AgentsController {
         netaddr: netaddrResponse ? { ...netaddrResponse } : false,
         packagesDate: ((packagesDate || {}).items || []).length
           ? packagesDate.items[0].scan_time
-          : 'Unknown',
+          : '-',
         processesDate: ((processesDate || {}).items || []).length
           ? processesDate.items[0].scan_time
-          : 'Unknown'
+          : '-'
       };
 
       return;
@@ -807,7 +806,7 @@ export class AgentsController {
           'Linux'
         );
       } else {
-        this.$scope.agentOS = 'Unknown';
+        this.$scope.agentOS = '-';
         this.$scope.agent.isLinuxOS = false;
       }
 

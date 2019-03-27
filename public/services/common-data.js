@@ -224,19 +224,23 @@ export class CommonData {
    */
   validateRange(data) {
     const result = {
-      duration: 'Unknown',
+      duration: '-',
       inProgress: false,
-      end: data.end || 'Unknown',
-      start: data.start || 'Unknown'
+      end: data.end || false,
+      start: data.start || false
     };
 
-    if (data.end && data.start) {
-      result.duration = (new Date(data.end) - new Date(data.start)) / 1000 / 60;
+    if (result.end && result.start) {
+      result.duration =
+        (new Date(result.end) - new Date(result.start)) / 1000 / 60;
       result.duration = Math.round(result.duration * 100) / 100;
       if (result.duration <= 0) {
         result.inProgress = true;
       }
     }
+
+    if (result.start === 'ND' || !result.start) result.start = '-';
+    if (result.end === 'ND' || !result.end) result.end = '-';
 
     return result;
   }

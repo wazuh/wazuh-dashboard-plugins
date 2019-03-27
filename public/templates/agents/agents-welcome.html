@@ -140,16 +140,16 @@
             </md-card-content>
         </md-card>
     </div>
-    <div layout="row" layout-padding class="wz-padding-bottom-0 wz-padding-top-0">
+    <div layout="row" layout-padding class="wz-padding-bottom-0 wz-padding-top-0" ng-if="agent.group">
         <md-card flex class="wz-md-card wz-padding-top-0 wz-padding-bottom-0 wz-no-top-bottom-margin">
             <md-card-content>
 
-                <div layout="row" ng-if="agent.group">
+                <div layout="row">
                     <span class="font-size-16">Groups <i ng-if='adminMode' tooltip="Add group"
                             ng-click="switchGroupEdit()" class="wz-text-bold wz-text-link-add fa fa-fw"
                             ng-class="!addingGroupToAgent ? 'fa-plus-circle' : 'fa-minus-circle'"></i></span>
                 </div>
-                <md-divider ng-if="agent.group" class="wz-margin-top-10"></md-divider>
+                <md-divider class="wz-margin-top-10"></md-divider>
                 <div layout="row" class="wz-margin-top-10" ng-if="agent.group && editGroup && !addingGroupToAgent">
                     <div class="wz-word-break" flex ng-if="groups && groups.length">
                         Available groups:
@@ -160,8 +160,7 @@
                             > Groups</a>.
                     </div>
                 </div>
-                <div ng-if="agent.group && editGroup && !addingGroupToAgent && groups && groups.length"
-                    class="wz-margin-top-4">
+                <div ng-if="editGroup && !addingGroupToAgent && groups && groups.length" class="wz-margin-top-4">
                     <span ng-repeat="group in groups" class="wz-text-bold wz-text-link"
                         ng-click="showConfirmAddGroup(group)">{{
                         group }}&nbsp;</span>
@@ -179,7 +178,7 @@
                                 class='fa fa-fw fa-check'></i> Confirm</md-button>
                     </div>
                 </div>
-                <div layout="row" ng-if="agent.group" class="wz-word-break wz-padding-top-10">
+                <div layout="row" class="wz-word-break wz-padding-top-10">
                     <span ng-repeat="group in agent.group" class="wz-text-bold wz-text-link"
                         ng-click="goGroups(agent,$index)">{{
                         group
