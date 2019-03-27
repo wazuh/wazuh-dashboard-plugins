@@ -46,7 +46,7 @@ export function parseValue(key, item, instancePath, $sce = null) {
     }
   }
   if (key === 'state' && instancePath.includes('processes')) {
-    return ProcessEquivalence[item.state] || 'Unknown';
+    return ProcessEquivalence[item.state] || '-';
   }
   if (
     (key === 'description' || (key.value && key.value === 'description')) &&
