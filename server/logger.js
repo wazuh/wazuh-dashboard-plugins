@@ -116,7 +116,7 @@ export function log(location, message, level) {
         wazuhlogger.log({
           date: new Date(),
           level: level || 'error',
-          location: location || 'unknown',
+          location: location || 'Unknown origin',
           message: message || 'An error occurred'
         });
       }
