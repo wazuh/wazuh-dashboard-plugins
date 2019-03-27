@@ -57,6 +57,18 @@ export class WazuhApiCtrl {
         );
       }
 
+      // Always check the daemons before requesting any endpoint
+      try {
+        await this.checkDaemons(api, null);
+      } catch (error) {
+        return ErrorResponse(
+          'ERROR3099',
+          3099,
+          500,
+          reply
+        );
+      }
+
       const credInfo = ApiHelper.buildOptionsObject(api);
 
       let response = await needle(
@@ -203,7 +215,7 @@ export class WazuhApiCtrl {
                   req.idChanged = api._id;
                   return this.checkStoredAPI(req, reply);
                 }
-              } catch (error) {} // eslint-disable-line
+              } catch (error) { } // eslint-disable-line
             }
           } catch (error) {
             log('POST /api/check-stored-api', error.message || error);
@@ -535,6 +547,39 @@ export class WazuhApiCtrl {
   }
 
   /**
+   * Check main Wazuh daemons status
+   * @param {*} api API entry stored in .wazuh
+   * @param {*} path Optional. Wazuh API target path.
+   */
+  async checkDaemons(api, path) {
+    try {
+      const response = await needle('GET', getPath(api) + '/manager/status', {}, ApiHelper.buildOptionsObject(api))
+
+      const daemons = ((response || {}).body || {}).data || {};
+
+      const isCluster = ((api || {}).cluster_info || {}).status === 'enabled' && typeof daemons['wazuh-clusterd'] !== 'undefined';
+      const wazuhdbExists = typeof daemons['wazuh-db'] !== 'undefined';
+
+      const execd = daemons['ossec-execd'] === 'running';
+      const modulesd = daemons['wazuh-modulesd'] === 'running';
+      const wazuhdb = (wazuhdbExists && daemons['wazuh-db'] === 'running') || true;
+      const clusterd = (isCluster && daemons['wazuh-clusterd'] === 'running') || true;
+
+      const isValid = execd && modulesd && wazuhdb && clusterd;
+
+      if (path === '/ping') {
+        return { isValid }
+      }
+
+      if (!isValid) {
+        throw new Error('Wazuh not ready yet')
+      }
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  }
+
+  /**
    * This performs a request over Wazuh API and returns its response
    * @param {String} method Method: GET, PUT, POST, DELETE
    * @param {String} path API route
@@ -609,6 +654,26 @@ export class WazuhApiCtrl {
         });
         return { error: 0, message: 'Success' };
       }
+
+
+      // Always check the daemons before requesting any endpoint
+      try {
+
+        const check = await this.checkDaemons(api, path);
+
+        if (path === '/ping') {
+          return check;
+        }
+
+      } catch (error) {
+        return ErrorResponse(
+          'ERROR3099',
+          3099,
+          500,
+          reply
+        );
+      }
+
       const response = await needle(method, fullUrl, data, options);
 
       if (
@@ -624,7 +689,7 @@ export class WazuhApiCtrl {
       }
 
       throw ((response || {}).body || {}).error &&
-      ((response || {}).body || {}).message
+        ((response || {}).body || {}).message
         ? { message: response.body.message, code: response.body.error }
         : new Error('Unexpected error fetching data from the Wazuh API');
     } catch (error) {
@@ -683,7 +748,7 @@ export class WazuhApiCtrl {
       }
 
       throw ((response || {}).body || {}).error &&
-      ((response || {}).body || {}).message
+        ((response || {}).body || {}).message
         ? { message: response.body.message, code: response.body.error }
         : new Error('Unexpected error fetching data from the Wazuh API');
     } catch (error) {
@@ -832,26 +897,26 @@ export class WazuhApiCtrl {
       if ((((output || {}).body || {}).data || {}).totalItems) {
         const fields = req.payload.path.includes('/agents')
           ? [
-              'id',
-              'status',
-              'name',
-              'ip',
-              'group',
-              'manager',
-              'node_name',
-              'dateAdd',
-              'version',
-              'lastKeepAlive',
-              'os.arch',
-              'os.build',
-              'os.codename',
-              'os.major',
-              'os.minor',
-              'os.name',
-              'os.platform',
-              'os.uname',
-              'os.version'
-            ]
+            'id',
+            'status',
+            'name',
+            'ip',
+            'group',
+            'manager',
+            'node_name',
+            'dateAdd',
+            'version',
+            'lastKeepAlive',
+            'os.arch',
+            'os.build',
+            'os.codename',
+            'os.major',
+            'os.minor',
+            'os.name',
+            'os.platform',
+            'os.uname',
+            'os.version'
+          ]
           : Object.keys(output.body.data.items[0]);
 
         const json2csvParser = new Parser({ fields });

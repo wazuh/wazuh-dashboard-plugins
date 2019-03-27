@@ -26,7 +26,7 @@ import { checkGap } from './lib/check-gap';
 
 const app = uiModules.get('app/wazuh', []);
 
-app.directive('wzTable', function () {
+app.directive('wzTable', function() {
   return {
     restrict: 'E',
     scope: {
@@ -242,11 +242,21 @@ app.directive('wzTable', function () {
         try {
           $scope.error = false;
           while (realTime) {
-            await fetch({
-              realTime: !limit ? true : false,
-              limit: limit || 10
-            });
-            if (!$scope.$$phase) $scope.$digest();
+            try {
+              await fetch({
+                realTime: !limit ? true : false,
+                limit: limit || 10
+              });
+            } catch (error) {
+              const handledError =
+                typeof error === 'string' &&
+                (error.includes('ERROR3099') ||
+                  (error.includes('1017') && error.includes('restarting')));
+              if (!handledError) {
+                throw new Error(error.message || error);
+              }
+            }
+            $scope.$applyAsync();
             await $timeout(1000);
           }
         } catch (error) {
@@ -289,11 +299,11 @@ app.directive('wzTable', function () {
       $scope.prevPage = () => pagination.prevPage($scope);
       $scope.nextPage = async (currentPage, last = false) =>
         pagination.nextPage(currentPage, $scope, errorHandler, fetch, last);
-      $scope.firstPage = function () {
+      $scope.firstPage = function() {
         $scope.setPage(1);
         $scope.prevPage();
       };
-      $scope.setPage = function (page = false, logs = false, last = false) {
+      $scope.setPage = function(page = false, logs = false, last = false) {
         this.n = page || this.n;
         $scope.currentPage = this.n;
         $scope.nextPage(this.n, last).then(() => {

@@ -131,7 +131,9 @@ export function settingsWizard(
       checkTimestamp(appState, genericReq, $location, wzMisc)
         .then(() => testAPI.checkStored(currentApi))
         .then(data => {
-          if (data && data === 'cookies_outdated') {
+          if (data === 3099) {
+            deferred.resolve();
+          } else if (data && data === 'cookies_outdated') {
             $location.search('tab', 'welcome');
             $location.path('/overview');
           } else {

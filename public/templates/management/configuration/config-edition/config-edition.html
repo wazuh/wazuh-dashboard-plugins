@@ -30,7 +30,7 @@
             <div flex layout="column">
                 <div layout="row" class="md-padding-h">
                     <!-- List of nodes if cluster is enabled -->
-                    <div ng-show="selectedNode && clusterStatus.data.data.enabled === 'yes' && clusterStatus.data.data.running === 'yes' && (!blockEdition || (blockEdition && isRestarting))"
+                    <div ng-show="selectedNode && clusterStatus.data.data.enabled === 'yes' && clusterStatus.data.data.running === 'yes'"
                         layout="row" layout-padding style="padding: 0;height: 32px;">
                         <div layout="column" layout-align="center" class="height-35 wz-select-input wz-margin-right-8">
                             <select class="kuiSelect wz-border-none cursor-pointer max-height-35" id="categoryBox"
@@ -40,17 +40,12 @@
                             </select>
                         </div>
                     </div>
-                    <button ng-disabled='xmlHasErrors' ng-click="switchConfigurationTab('welcome', false)"
-                        class='btn btn-info'>
+                    <button ng-disabled='xmlHasErrors || doingSaving || isRestarting'
+                        ng-click="switchConfigurationTab('welcome', false)" class='btn btn-info'>
                         <span>Cancel</span>
                     </button>
-                    <div layout="row" class="fullWidth wz-padding-left-16" ng-show="blockEdition && !isRestarting">
-                        <div id="wz-progress">
-                            <div id="wz-progress-bar" style="width:{{blockEditioncounter}}%">Restarting cluster
-                                {{blockEditioncounter}}%</div>
-                        </div>
-                    </div>
-                    <div layout="row" ng-show="!blockEdition || (blockEdition && isRestarting)" class="fullWidth">
+
+                    <div layout="row" class="fullWidth">
                         <button ng-disabled='xmlHasErrors || doingSaving || isRestarting' ng-click='saveConfiguration()'
                             class='btn wz-button wz-margin-left-8'>
                             <span ng-show='!xmlHasErrors'><i aria-hidden='true' class='fa fa-fw fa-save'

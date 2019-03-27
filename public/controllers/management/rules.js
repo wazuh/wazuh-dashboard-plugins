@@ -160,10 +160,10 @@ export function RulesController(
         coloredString = coloredString.replace(
           /\$\(((?!<\/span>).)*?\)(?!<\/span>)/im,
           '<span style="color: ' +
-          colors[i] +
-          ' ">' +
-          valuesArray[i] +
-          '</span>'
+            colors[i] +
+            ' ">' +
+            valuesArray[i] +
+            '</span>'
         );
       }
     }
@@ -307,7 +307,9 @@ export function RulesController(
         if (!$scope.$$phase) $scope.$digest();
       })
       .catch(() =>
-        errorHandler.handle(`Error fetching rule: ${incomingRule} from the Wazuh API`)
+        errorHandler.handle(
+          `Error fetching rule: ${incomingRule} from the Wazuh API`
+        )
       );
   }
 

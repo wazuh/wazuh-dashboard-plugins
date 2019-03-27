@@ -15,8 +15,10 @@ export class ErrorHandler {
   /**
    * Constructor
    */
-  constructor(wzMisc) {
+  constructor(wzMisc, $rootScope, checkDaemonsStatus) {
     this.wzMisc = wzMisc;
+    this.$rootScope = $rootScope;
+    this.checkDaemonsStatus = checkDaemonsStatus;
   }
 
   /**
@@ -75,6 +77,12 @@ export class ErrorHandler {
    */
   handle(error, location, isWarning, silent) {
     const message = this.extractMessage(error);
+    if (typeof message === 'string' && message.includes('ERROR3099')) {
+      this.$rootScope.wazuhNotReadyYet = 'Wazuh not ready yet.';
+      this.$rootScope.$applyAsync();
+      this.checkDaemonsStatus.makePing();
+      return;
+    }
     const origin = ((error || {}).config || {}).url || '';
 
     if (this.wzMisc.getBlankScr()) silent = true;

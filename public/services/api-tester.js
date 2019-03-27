@@ -65,6 +65,10 @@ export class ApiTester {
         return result;
       }
     } catch (error) {
+      if (((error || {}).data || {}).code === 3099) {
+        // Do nothing
+        return 3099;
+      }
       if (error.status && error.status === -1) {
         this.wzMisc.setApiIsDown(true);
       }

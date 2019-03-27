@@ -140,6 +140,7 @@ export class HealthCheck {
         const data = await this.testAPI.checkStored(
           JSON.parse(this.appState.getCurrentAPI()).id
         );
+
         if (((data || {}).data || {}).idChanged) {
           const apiRaw = JSON.parse(this.appState.getCurrentAPI());
           this.appState.setCurrentAPI(
@@ -147,7 +148,14 @@ export class HealthCheck {
           );
         }
         const i = this.results.map(item => item.id).indexOf(0);
-        if (data.data.error || data.data.data.apiIsDown) {
+        if (data === 3099) {
+          this.errors.push('Wazuh not ready yet.');
+          this.results[i].status = 'Error';
+          if (this.checks.setup) {
+            const i = this.results.map(item => item.id).indexOf(1);
+            this.results[i].status = 'Error';
+          }
+        } else if (data.data.error || data.data.data.apiIsDown) {
           this.errors.push('Error connecting to the API.');
           this.results[i].status = 'Error';
         } else {

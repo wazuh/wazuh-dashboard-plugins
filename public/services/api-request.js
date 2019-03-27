@@ -16,12 +16,10 @@ export class ApiRequest {
    * @param {*} genericReq
    * @param {*} appState
    */
-  constructor($q, genericReq, appState, wzMisc) {
+  constructor($q, genericReq, appState) {
     this.$q = $q;
     this.genericReq = genericReq;
     this.appState = appState;
-    this.wzMisc = wzMisc;
-    this.isRestarting = false;
   }
 
   /**
@@ -42,43 +40,6 @@ export class ApiRequest {
 
       const { id } = JSON.parse(this.appState.getCurrentAPI());
       const requestData = { method, path, body, id };
-
-      this.isRestarting =
-        path.includes('restart') &&
-        (path.includes('manager') || path.includes('cluster'));
-
-      const needCheck =
-        this.isRestarting ||
-        method !== 'GET' ||
-        (method === 'GET' && path.includes('/validation'));
-
-      if (needCheck) {
-        const clusterEnabled =
-          (this.appState.getClusterInfo() || {}).status === 'enabled';
-
-        const data = await this.genericReq.request('POST', '/api/request', {
-          method: 'GET',
-          path: '/manager/status',
-          body: {},
-          id
-        });
-
-        const daemons = ((data || {}).data || {}).data || {};
-
-        const isUp =
-          daemons['wazuh-modulesd'] === 'running' &&
-          daemons['ossec-execd'] === 'running' &&
-          // daemons['wazuh-db'] === 'running' &&
-          (clusterEnabled ? daemons['wazuh-clusterd'] === 'running' : true);
-
-        if (!isUp) {
-          throw new Error(
-            `Wazuh manager is not ready yet - ${method} ${path} was aborted`
-          );
-        } else {
-          this.isRestarting = false;
-        }
-      }
 
       const data = await this.genericReq.request(
         'POST',
