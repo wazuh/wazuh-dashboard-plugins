@@ -4,10 +4,9 @@ import uiRouter from 'ui/routes';
 
 const module = uiModules.get('kibana');
 
-module.directive('wzBreadCrumbs', function() {
+module.directive('wzBreadCrumbs', function () {
   return {
     restrict: 'E',
-    replace: true,
     scope: {
       omitCurrentPage: '=',
       /**
@@ -28,24 +27,38 @@ module.directive('wzBreadCrumbs', function() {
       useLinks: '='
     },
     template: breadCrumbsTemplate,
-    controller: function($scope) {
+    controller: function ($scope, config) {
+      config.watch('k7design', (val) => $scope.showPluginBreadcrumbs = !val);
+
       function omitPagesFilter(crumb) {
-        return !$scope.omitPages || !$scope.omitPages.includes(crumb.id);
+        return (
+          !$scope.omitPages ||
+          !$scope.omitPages.includes(crumb.id)
+        );
       }
 
       function omitCurrentPageFilter(crumb) {
         return !($scope.omitCurrentPage && crumb.current);
       }
 
-      $scope.$watchMulti(
-        ['[]omitPages', 'omitCurrentPage'],
-        function getBreadcrumbs() {
-          $scope.breadcrumbs = uiRouter
+      $scope.$watchMulti([
+        '[]omitPages',
+        'omitCurrentPage'
+      ], function getBreadcrumbs() {
+        $scope.breadcrumbs = (
+          uiRouter
             .getBreadcrumbs()
             .filter(omitPagesFilter)
-            .filter(omitCurrentPageFilter);
+            .filter(omitCurrentPageFilter)
+        );
+
+        const newBreadcrumbs = $scope.breadcrumbs
+          .map(b => ({ text: b.display, href: b.href }));
+
+        if ($scope.pageTitle) {
+          newBreadcrumbs.push({ text: $scope.pageTitle });
         }
-      );
+      });
     }
   };
 });
