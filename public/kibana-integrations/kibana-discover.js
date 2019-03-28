@@ -5,7 +5,7 @@ import { uiModules } from 'ui/modules';
 import discoverTemplate from '../templates/kibana-template/kibana-discover-template.html';
 
 uiModules.get('app/wazuh', ['kibana/courier']).directive('kbnDis', [
-  function() {
+  function () {
     return {
       restrict: 'E',
       scope: {},
@@ -98,7 +98,7 @@ const app = uiModules.get('apps/discover', [
   'app/wazuh'
 ]);
 
-app.directive('discoverAppW', function() {
+app.directive('discoverAppW', function () {
   return {
     restrict: 'E',
     controllerAs: 'discoverApp',
@@ -164,7 +164,7 @@ function discoverController(
       else if (totalSeconds > 604800 && totalSeconds <= 2419200)
         wzInterval = 'w';
       else wzInterval = 'M';
-    } catch (error) {} // eslint-disable-line
+    } catch (error) { } // eslint-disable-line
 
     return wzInterval;
   };
@@ -215,7 +215,7 @@ function discoverController(
   $scope.showInterval = false;
   $scope.minimumVisibleRows = 50;
 
-  $scope.intervalEnabled = function(interval) {
+  $scope.intervalEnabled = function (interval) {
     return interval.val !== 'custom';
   };
 
@@ -326,9 +326,8 @@ function discoverController(
     }
 
     const timeFieldName = $scope.indexPattern.timeFieldName;
-    const fields = timeFieldName
-      ? [timeFieldName, ...selectedFields]
-      : selectedFields;
+    const hideTimeColumn = config.get('doc_table:hideTimeColumn');
+    const fields = (timeFieldName && !hideTimeColumn) ? [timeFieldName, ...selectedFields] : selectedFields;
     return {
       searchFields: fields,
       selectFields: fields
@@ -405,17 +404,17 @@ function discoverController(
         bucketsDescription:
           $scope.bucketInterval.scale > 1
             ? i18n('kbn.discover.bucketIntervalTooltip.tooLargeBucketsText', {
-                defaultMessage: 'buckets that are too large'
-              })
+              defaultMessage: 'buckets that are too large'
+            })
             : i18n('kbn.discover.bucketIntervalTooltip.tooManyBucketsText', {
-                defaultMessage: 'too many buckets'
-              }),
+              defaultMessage: 'too many buckets'
+            }),
         bucketIntervalDescription: $scope.bucketInterval.description
       }
     });
   };
 
-  $scope.$watchCollection('state.columns', function() {
+  $scope.$watchCollection('state.columns', function () {
     $state.save();
   });
 
@@ -429,15 +428,15 @@ function discoverController(
     indexPatternList: $route.current.locals.ip.list
   };
 
-  const init = _.once(function() {
+  const init = _.once(function () {
     stateMonitor = stateMonitorFactory.create($state, getStateDefaults());
     stateMonitor.onChange(status => {
       $appStatus.dirty = status.dirty || !savedSearch.id;
     });
     $scope.$on('$destroy', () => stateMonitor.destroy());
 
-    $scope.updateDataSource().then(function() {
-      $scope.$listen(timefilter, 'fetch', function() {
+    $scope.updateDataSource().then(function () {
+      $scope.$listen(timefilter, 'fetch', function () {
         ////////////////////////////////////////////////
         //               WAZUH                        //
         ////////////////////////////////////////////////
@@ -449,7 +448,7 @@ function discoverController(
         $scope.fetch();
       });
 
-      $scope.$watchCollection('state.sort', function(sort) {
+      $scope.$watchCollection('state.sort', function (sort) {
         if (!sort) return;
 
         // get the current sort from {key: val} to ["key", "val"];
@@ -462,10 +461,10 @@ function discoverController(
       });
 
       // update data source when filters update
-      $scope.$listen(queryFilter, 'update', function() {
+      $scope.$listen(queryFilter, 'update', function () {
         return $scope
           .updateDataSource()
-          .then(function() {
+          .then(function () {
             ////////////////////////////////////////////////////////////////////////////
             ///////////////////////////////  WAZUH   ///////////////////////////////////
             ////////////////////////////////////////////////////////////////////////////
@@ -491,7 +490,7 @@ function discoverController(
       });
 
       // update data source when hitting forward/back and the query changes
-      $scope.$listen($state, 'fetch_with_changes', function(diff) {
+      $scope.$listen($state, 'fetch_with_changes', function (diff) {
         if (diff.indexOf('query') >= 0) $scope.fetch();
       });
 
@@ -499,7 +498,7 @@ function discoverController(
       $scope.$listen(queryFilter, 'fetch', $scope.fetch);
 
       timefilter.enableAutoRefreshSelector();
-      $scope.$watch('opts.timefield', function(timefield) {
+      $scope.$watch('opts.timefield', function (timefield) {
         if (!!timefield) {
           timefilter.enableTimeRangeSelector();
         } else {
@@ -507,11 +506,11 @@ function discoverController(
         }
       });
 
-      $scope.$watch('state.interval', function() {
+      $scope.$watch('state.interval', function () {
         $scope.fetch();
       });
 
-      $scope.$watch('vis.aggs', function() {
+      $scope.$watch('vis.aggs', function () {
         // no timefield, no vis, nothing to update
         if (!$scope.opts.timefield) return;
 
@@ -522,7 +521,10 @@ function discoverController(
         }
       });
 
-      $scope.$watch('state.query', $scope.updateQueryAndFetch);
+      $scope.$watch('state.query', (newQuery) => {
+        const query = migrateLegacyQuery(newQuery);
+        $scope.updateQueryAndFetch({ query });
+      });
 
       $scope.$watchMulti(
         ['rows', 'fetchStatus'],
@@ -550,7 +552,7 @@ function discoverController(
             else return status.NO_RESULTS;
           }
 
-          return function() {
+          return function () {
             const current = {
               rows: $scope.rows,
               fetchStatus: $scope.fetchStatus
@@ -599,15 +601,15 @@ function discoverController(
       let filters = queryFilter.getFilters();
       filters = Array.isArray(filters)
         ? filters.filter(
-            item => (((item || {}).$state || {}).store || '') === 'appState'
-          )
+          item => (((item || {}).$state || {}).store || '') === 'appState'
+        )
         : [];
       if (!filters || !filters.length) return false;
     }
     return true;
   };
 
-  $scope.opts.fetch = $scope.fetch = function() {
+  $scope.opts.fetch = $scope.fetch = function () {
     // Wazuh filters are not ready yet
     if (!filtersAreReady()) return;
 
@@ -621,14 +623,14 @@ function discoverController(
     $scope
       .updateDataSource()
       .then(setupVisualization)
-      .then(function() {
+      .then(function () {
         $state.save();
         return courier.fetch();
       })
       .catch(notify.error);
   };
 
-  $scope.updateQueryAndFetch = function(query) {
+  $scope.updateQueryAndFetch = function ({ query }) {
     ////////////////////////////////////////////////////////////////////////////
     ///////////////////////////////  WAZUH   ///////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////
@@ -642,8 +644,7 @@ function discoverController(
     ////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////
-
-    $state.query = migrateLegacyQuery(query);
+    $state.query = query;
     $scope.fetch();
   };
 
@@ -671,7 +672,7 @@ function discoverController(
      *
      * @type {String}
      */
-    const sortBy = (function() {
+    const sortBy = (function () {
       if (!Array.isArray(sort)) return 'implicit';
       else if (sort[0] === '_score') return 'implicit';
       else if (sort[0] === timeField) return 'time';
@@ -704,7 +705,7 @@ function discoverController(
     }
 
     // triggered when the status updated
-    segmented.on('status', function(status) {
+    segmented.on('status', function (status) {
       $scope.fetchStatus = status;
       if (status.complete === 0) {
         // starting new segmented search request
@@ -741,7 +742,7 @@ function discoverController(
       }
     });
 
-    segmented.on('first', function() {
+    segmented.on('first', function () {
       flushResponseData();
     });
 
@@ -749,17 +750,17 @@ function discoverController(
       logResponseInInspector(resp);
       if (resp._shards.failed > 0) {
         $scope.failures = _.union($scope.failures, resp._shards.failures);
-        $scope.failures = _.uniq($scope.failures, false, function(failure) {
+        $scope.failures = _.uniq($scope.failures, false, function (failure) {
           return failure.index + failure.shard + failure.reason;
         });
       }
     });
 
-    segmented.on('emptySegment', function(resp) {
+    segmented.on('emptySegment', function (resp) {
       logResponseInInspector(resp);
     });
 
-    segmented.on('mergedSegment', function(merged) {
+    segmented.on('mergedSegment', function (merged) {
       $scope.mergedEsResp = merged;
 
       if ($scope.opts.timefield) {
@@ -784,7 +785,7 @@ function discoverController(
       // if we haven't counted yet, or need a fresh count because we are sorting, reset the counts
       if (!counts || sortFn) counts = $scope.fieldCounts = {};
 
-      $scope.rows.forEach(function(hit) {
+      $scope.rows.forEach(function (hit) {
         // skip this work if we have already done it
         if (hit.$$_counted) return;
 
@@ -803,7 +804,7 @@ function discoverController(
       });
     });
 
-    segmented.on('complete', function() {
+    segmented.on('complete', function () {
       if ($scope.fetchStatus.hitCount === 0) {
         flushResponseData();
       }
@@ -830,7 +831,7 @@ function discoverController(
   }
   beginSegmentedFetch();
 
-  $scope.updateTime = function() {
+  $scope.updateTime = function () {
     ////////////////////////////////////////////////////////////////////////////
     ///////////////////////////////  WAZUH   ///////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////
@@ -849,11 +850,11 @@ function discoverController(
     };
   };
 
-  $scope.resetQuery = function() {
+  $scope.resetQuery = function () {
     kbnUrl.change('/discover/{{id}}', { id: $route.current.params.id });
   };
 
-  $scope.newQuery = function() {
+  $scope.newQuery = function () {
     kbnUrl.change('/discover');
   };
 
@@ -870,7 +871,7 @@ function discoverController(
   };
 
   // TODO: On array fields, negating does not negate the combination, rather all terms
-  $scope.filterQuery = function(field, values, operation) {
+  $scope.filterQuery = function (field, values, operation) {
     // Commented due to https://github.com/elastic/kibana/issues/22426
     //$scope.indexPattern.popularizeField(field, 1);
     filterActions.addFilter(
@@ -899,18 +900,18 @@ function discoverController(
     columnActions.moveColumn($scope.state.columns, columnName, newIndex);
   };
 
-  $scope.scrollToTop = function() {
+  $scope.scrollToTop = function () {
     $window.scrollTo(0, 0);
   };
 
-  $scope.scrollToBottom = function() {
+  $scope.scrollToBottom = function () {
     // delay scrolling to after the rows have been rendered
     $timeout(() => {
       $element.find('#discoverBottomMarker').focus();
     }, 0);
   };
 
-  $scope.showAllRows = function() {
+  $scope.showAllRows = function () {
     $scope.minimumVisibleRows = $scope.hits;
   };
 
@@ -967,7 +968,7 @@ function discoverController(
         .onSearchRequestStart(searchSource, searchRequest);
     });
 
-    $scope.searchSource.setField('aggs', function() {
+    $scope.searchSource.setField('aggs', function () {
       //////////////////// WAZUH ////////////////////////////////
       // Old code:                                             //
       // return $scope.vis.getAggConfig().toDsl();             //
@@ -1079,7 +1080,7 @@ function discoverController(
 
       queryFilter
         .addFilters(wzCurrentFilters)
-        .then(() => {})
+        .then(() => { })
         .catch(error => console.log(error.message || error)); // eslint-disable-line
     }
   };
