@@ -29,7 +29,7 @@ import 'plugins/kibana/discover/components/field_chooser/field_chooser';
 import 'plugins/kibana/discover/controllers/discover';
 import 'ui/doc_table/components/table_row';
 
-// Research added (further checks needed)
+// Research added (further checks needed) 
 import 'ui/doc_table/doc_table';
 import 'ui/doc_viewer/doc_viewer';
 import 'ui/doc_title/doc_title';
