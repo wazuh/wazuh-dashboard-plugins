@@ -3,6 +3,7 @@
   data-test-subj="breadcrumbs"
   role="heading"
   aria-level="1"
+  ng-if="showPluginBreadcrumbs"
 >
   <div
     class="kuiLocalBreadcrumb"
@@ -14,7 +15,7 @@
       href="{{ breadcrumb.href }}"
       data-test-subj="lnkBreadcrumb{{$index}}"
     >
-      {{ breadcrumb.display }}
+      {{ breadcrumb.display }}
     </a>
   </div>
 
