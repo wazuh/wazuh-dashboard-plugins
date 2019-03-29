@@ -192,8 +192,6 @@ export class AgentsController {
     };
     this.$scope.getAgent = async newAgentId => this.getAgent(newAgentId);
     this.$scope.goGroups = (agent, group) => this.goGroups(agent, group);
-    this.$scope.analyzeAgents = async searchTerm =>
-      this.analyzeAgents(searchTerm);
     this.$scope.downloadCsv = async (path, fileName, filters = []) =>
       this.downloadCsv(path, fileName, filters);
 
@@ -542,7 +540,7 @@ export class AgentsController {
           (((agentInfo || {}).data || {}).data || {}).status ||
           this.$scope.agent.status;
       }
-    } catch (error) {} // eslint-disable-line
+    } catch (error) { } // eslint-disable-line
 
     try {
       this.$scope.showSyscheckFiles = false;
@@ -577,7 +575,7 @@ export class AgentsController {
       if (tab === 'syscollector')
         try {
           await this.loadSyscollector(this.$scope.agent.id);
-        } catch (error) {} // eslint-disable-line
+        } catch (error) { } // eslint-disable-line
       if (tab === 'configuration') {
         this.$scope.switchConfigurationTab('welcome');
       } else {
@@ -704,7 +702,7 @@ export class AgentsController {
           {}
         );
         netifaceResponse = ((resultNetiface || {}).data || {}).data || false;
-      } catch (error) {} // eslint-disable-line
+      } catch (error) { } // eslint-disable-line
 
       // This API call may fail so we put it out of Promise.all
       let netaddrResponse = false;
@@ -716,7 +714,7 @@ export class AgentsController {
         );
         netaddrResponse =
           ((resultNetaddrResponse || {}).data || {}).data || false;
-      } catch (error) {} // eslint-disable-line
+      } catch (error) { } // eslint-disable-line
 
       // Before proceeding, syscollector data is an empty object
       this.$scope.syscollector = {};
@@ -732,7 +730,7 @@ export class AgentsController {
       this.$scope.syscollector = {
         hardware:
           typeof hardwareResponse === 'object' &&
-          Object.keys(hardwareResponse).length
+            Object.keys(hardwareResponse).length
             ? { ...hardwareResponse }
             : false,
         os:
@@ -775,7 +773,7 @@ export class AgentsController {
 
       try {
         data[0] = await this.apiReq.request('GET', `/agents/${id}`, {});
-      } catch (error) {} //eslint-disable-line
+      } catch (error) { } //eslint-disable-line
 
       try {
         data[1] = await this.apiReq.request(
@@ -783,7 +781,7 @@ export class AgentsController {
           `/syscheck/${id}/last_scan`,
           {}
         );
-      } catch (error) {} //eslint-disable-line
+      } catch (error) { } //eslint-disable-line
 
       try {
         data[2] = await this.apiReq.request(
@@ -791,7 +789,7 @@ export class AgentsController {
           `/rootcheck/${id}/last_scan`,
           {}
         );
-      } catch (error) {} //eslint-disable-line
+      } catch (error) { } //eslint-disable-line
 
       const result = data.map(item => ((item || {}).data || {}).data || false);
 
@@ -902,28 +900,6 @@ export class AgentsController {
   }
 
   /**
-   * Look for agents that satisfy search term, hidding master
-   * @param {*} searchTerm
-   */
-  async analyzeAgents(searchTerm) {
-    try {
-      if (searchTerm) {
-        this.$scope.lookingSca = false;
-        const reqData = await this.apiReq.request('GET', '/agents', {
-          search: searchTerm
-        });
-        return reqData.data.data.items.filter(item => item.id !== '000');
-      } else {
-        const reqData = await this.apiReq.request('GET', '/agents', {});
-        return reqData.data.data.items.filter(item => item.id !== '000');
-      }
-    } catch (error) {
-      this.errorHandler.handle(error, 'Agents');
-    }
-    return;
-  }
-
-  /**
    * Get full data on CSV format from a path
    * @param {*} path path with data to convert
    * @param {*} fileName Output file name
@@ -982,7 +958,7 @@ export class AgentsController {
       );
       this.errorHandler.info(
         `Policy monitoring scan launched successfully on agent ${
-          this.$scope.agent.id
+        this.$scope.agent.id
         }`,
         ''
       );
