@@ -135,7 +135,7 @@
         <!-- End Discover search bar section -->
 
         <!-- Loading status section -->
-        <div layout="column" layout-align="center center" class="wz-margin-bottom-40" ng-show="!loading && !rendered && resultState === 'ready' && (!showNodes || (showNodes && currentNode))">
+        <div layout="column" layout-align="center center" class="wz-margin-bottom-40" ng-show="!loading && !rendered && resultState === 'ready' && (!showNodes || (showNodes && currentNode))" class="wz-margin-top-10">
             <div class="percentage"><i class="fa fa-fw fa-spin fa-spinner" aria-hidden="true"></i></div>
             <div class="percentage">{{loadingStatus}}</div>
         </div>

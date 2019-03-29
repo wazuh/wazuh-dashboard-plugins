@@ -107,7 +107,7 @@
     <!-- End Discover search bar section -->
 
     <!-- Loading status section -->
-    <div layout="column" layout-align="center center" ng-if="octrl.tab !== 'welcome' && octrl.tab !== 'aws'" ng-show="resultState === 'ready' && octrl.tabView === 'panels' && !rendered">
+    <div layout="column" layout-align="center center" ng-if="octrl.tab !== 'welcome' && octrl.tab !== 'aws'" ng-show="resultState === 'ready' && octrl.tabView === 'panels' && !rendered" class="wz-margin-top-10">
         <div class="percentage"><i class="fa fa-fw fa-spin fa-spinner" aria-hidden="true"></i></div>
         <div class="percentage">{{loadingStatus}}</div>
     </div>
