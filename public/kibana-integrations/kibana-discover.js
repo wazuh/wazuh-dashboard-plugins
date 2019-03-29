@@ -326,9 +326,11 @@ function discoverController(
     }
 
     const timeFieldName = $scope.indexPattern.timeFieldName;
-    const fields = timeFieldName
-      ? [timeFieldName, ...selectedFields]
-      : selectedFields;
+    const hideTimeColumn = config.get('doc_table:hideTimeColumn');
+    const fields =
+      timeFieldName && !hideTimeColumn
+        ? [timeFieldName, ...selectedFields]
+        : selectedFields;
     return {
       searchFields: fields,
       selectFields: fields
@@ -522,7 +524,10 @@ function discoverController(
         }
       });
 
-      $scope.$watch('state.query', $scope.updateQueryAndFetch);
+      $scope.$watch('state.query', newQuery => {
+        const query = migrateLegacyQuery(newQuery);
+        $scope.updateQueryAndFetch({ query });
+      });
 
       $scope.$watchMulti(
         ['rows', 'fetchStatus'],
@@ -628,7 +633,7 @@ function discoverController(
       .catch(notify.error);
   };
 
-  $scope.updateQueryAndFetch = function(query) {
+  $scope.updateQueryAndFetch = function({ query }) {
     ////////////////////////////////////////////////////////////////////////////
     ///////////////////////////////  WAZUH   ///////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////
@@ -642,8 +647,7 @@ function discoverController(
     ////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////
-
-    $state.query = migrateLegacyQuery(query);
+    $state.query = query;
     $scope.fetch();
   };
 

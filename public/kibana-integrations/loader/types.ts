@@ -35,7 +35,7 @@ export interface FilterMeta {
 }
 
 export interface Filter {
-  meta: object;
+  meta: FilterMeta;
   query: object;
 }
 
@@ -106,6 +106,12 @@ export interface VisualizeLoaderParams {
    * global AppState.
    */
   appState?: AppState;
+  /**
+   * Whether or not the visualization should fetch its data automatically. If this is
+   * set to `false` the loader won't trigger a fetch on embedding or when an auto refresh
+   * cycle happens. Default value: `true`
+   */
+  autoFetch?: boolean;
 }
 
 /**
