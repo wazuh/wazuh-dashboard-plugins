@@ -123,8 +123,12 @@
             </svg>
             <span class="euiCallOutHeader__title">{{wazuhNotReadyYet}}</span>
             <span flex></span>
-            <div ng-if="wazuhNotReadyYet === 'Wazuh not ready yet.'"
+            <div ng-show="wazuhNotReadyYet === 'Wazuh not ready yet.'"
                 class="euiLoadingSpinner euiLoadingSpinner--medium"></div>
+            <button ng-show="wazuhNotReadyYet === 'Wazuh could not be recovered.'"
+                class="kuiButton kuiButton--secondary" ng-click="refresh()">
+                Refresh
+            </button>
         </div>
     </div>
 </div>

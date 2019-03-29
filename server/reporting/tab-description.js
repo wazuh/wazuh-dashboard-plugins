@@ -81,7 +81,7 @@ export const TabDescription = {
       'Osquery can be used to expose an operating system as a high-performance relational database.'
   },
   sca: {
-    title: 'Configuration assessment',
+    title: 'Security configuration assessment',
     description: 'Scan your assets as part of a configuration assessment audit.'
   }
 };

@@ -101,7 +101,8 @@ export class FilesController {
       this.$scope.$applyAsync();
     };
 
-    this.$scope.cancelSaveAndOverwrite = () => {
+    this.$scope.cancelSaveAndOverwrite = newFileName => {
+      this.$scope.$emit('changedInputFileName', { name: newFileName || 'new' });
       this.$scope.overwriteError = false;
       this.$scope.$applyAsync();
     };

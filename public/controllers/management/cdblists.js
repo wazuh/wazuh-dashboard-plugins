@@ -47,16 +47,17 @@ export class CdbListsController {
     this.adminMode = !!(configuration || {}).admin;
 
     // Reloading event listener
-    this.$scope.$on('rulesetIsReloaded', () => {
+    this.$scope.$on('rulesetIsReloaded', (ev, params) => {
       this.viewingDetail = false;
-      if (!this.$scope.$$phase) this.$scope.$digest();
+      this.$scope.$applyAsync();
     });
 
-    this.$scope.$on('closeListView', () => {
+    this.$scope.$on('closeListView', (ev, params) => {
       this.closeDetailView();
     });
 
     this.$scope.$on('wazuhShowCdbList', async (ev, parameters) => {
+      ev.stopPropagation();
       this.currentList = parameters.cdblist;
       try {
         const data = await this.rulesetHandler.getCdbList(
@@ -72,7 +73,7 @@ export class CdbListsController {
       this.$scope.$broadcast('changeCdbList', {
         currentList: this.currentList
       });
-      if (!this.$scope.$$phase) this.$scope.$digest();
+      this.$scope.$applyAsync();
     });
 
     const currentLocation = this.$location.search();
@@ -92,7 +93,7 @@ export class CdbListsController {
             this.currentList.details = false;
           }
           this.viewingDetail = true;
-          if (!this.$scope.$$phase) this.$scope.$digest();
+          this.$scope.$applyAsync();
         })
         .catch(() =>
           this.errorHandler.handle(
@@ -243,7 +244,7 @@ export class CdbListsController {
     this.currentList = false;
     this.addingList = false;
     this.$scope.$emit('removeCurrentList');
-    if (!this.$scope.$$phase) this.$scope.$digest();
+    this.$scope.$applyAsync();
   }
 
   addNewList() {
@@ -255,7 +256,7 @@ export class CdbListsController {
       new: true
     };
     this.viewingDetail = true;
-    if (!this.$scope.$$phase) this.$scope.$digest();
+    this.$scope.$applyAsync();
     this.$scope.$broadcast('changeCdbList', {
       currentList: this.currentList
     });

@@ -36,7 +36,7 @@ export class BlankScreenController {
       } catch (error) {} // eslint-disable-line
       this.errorToShow = parsed || catchedError;
       this.wzMisc.setBlankScr(false);
-      if (!this.$scope.$$phase) this.$scope.$digest();
+      this.$scope.$applyAsync();
     }
   }
 

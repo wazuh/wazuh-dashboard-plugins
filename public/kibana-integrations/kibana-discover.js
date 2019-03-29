@@ -31,8 +31,6 @@ import 'ui/doc_table/components/table_row';
 
 // Research added (further checks needed)
 import 'ui/doc_table/doc_table';
-import 'ui/styles/sidebar.less';
-import 'ui/styles/table.less';
 import 'ui/doc_viewer/doc_viewer';
 import 'ui/doc_title/doc_title';
 import 'ui/style_compile/style_compile';
@@ -1097,6 +1095,7 @@ function discoverController(
   const changeTabViewListener = $rootScope.$on(
     'changeTabView',
     (evt, parameters) => {
+      evt.stopPropagation();
       $scope.tabView = parameters.tabView || 'panels';
       $scope.updateQueryAndFetch($state.query);
     }

@@ -31,8 +31,9 @@
         id="table{{scapepath}}">
         <thead class="wz-text-bold">
             <th ng-repeat="key in keys" class="euiTableHeaderCell wz-text-left"
-                ng-style="key.width && {'width':key.width}">
-                <span ng-class="{ 'cursor-pointer' : !key.nosortable}" ng-click="!key.nosortable && sort(key)">
+                ng-style="key.width && {'width':key.width}" ng-class="{ 'cursor-pointer' : !key.nosortable}"
+                ng-click="!key.nosortable && sort(key)">
+                <span>
                     {{ path === '/agents/groups' && (key.value || key) === 'count' ? 'Agents' :
                     keyEquivalence[key.value ||
                     key] || key.value || key }}
@@ -168,7 +169,7 @@
                 <td ng-if="path === '/rules/files' || path === '/decoders/files' || path === '/lists/files'"
                     ng-click="$event.stopPropagation()" class="cursor-default action-btn-td">
                     <span
-                        ng-if="((item.name && removingFile !== item.name) || (item.file && removingFile !== item.file)) && adminMode && path !== '/lists/files'"
+                        ng-if="(item.path === 'etc/rules' || item.path === 'etc/decoders') && ((item.name && removingFile !== item.name) || (item.file && removingFile !== item.file)) && adminMode && path !== '/lists/files'"
                         ng-click="editFile(item, path); $event.stopPropagation()"
                         class="wz-margin-left-8 cursor-pointer" tooltip="Edit this file" tooltip-placement="left"
                         aria-hidden="true">
@@ -185,7 +186,7 @@
                         </svg>
                     </span>
                     <span
-                        ng-if="((item.name && removingFile !== item.name) || (item.file && removingFile !== item.file)) && adminMode"
+                        ng-if="(item.path === 'etc/rules' || item.path === 'etc/decoders' || path === '/lists/files') && ((item.name && removingFile !== item.name) || (item.file && removingFile !== item.file)) && adminMode"
                         ng-click="showConfirmRemoveFile($event, item, path); $event.stopPropagation()"
                         class="cursor-pointer" ng-class="{'wz-margin-left-8': path === '/lists/files'}"
                         tooltip="Delete this file" tooltip-placement="right" aria-hidden="true">
@@ -199,6 +200,11 @@
                             </defs>
                             <use xlink:href="#trash-a"></use>
                         </svg>
+                    </span>
+                    <span
+                        ng-if="(item.path !== 'etc/rules' && item.path !== 'etc/decoders') && ((item.name && removingFile !== item.name) || (item.file && removingFile !== item.file)) && adminMode && path !== '/lists/files'"
+                        class="wz-margin-left-8" aria-hidden="true">
+                        -
                     </span>
                     <div ng-if="(item.name && removingFile === item.name) || (item.file && removingFile === item.file)"
                         class="confirmEmbedBubble">
@@ -231,7 +237,20 @@
                         </li>
 
                         <li ng-show="currentPage" class="md-padding">
-                            <a href ng-click="prevPage()">« Prev</a>
+                            <a href ng-click="prevPage()">
+                                <svg class="euiIcon euiIcon--medium euiButtonIcon__icon" focusable="false"
+                                    aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
+                                    xmlns:xlink="http://www.w3.org/1999/xlink" width="16" height="16"
+                                    viewBox="0 0 16 16">
+                                    <defs>
+                                        <path id="arrow_left-a"
+                                            d="M13.069 5.157L8.384 9.768a.546.546 0 0 1-.768 0L2.93 5.158a.552.552 0 0 0-.771 0 .53.53 0 0 0 0 .759l4.684 4.61c.641.631 1.672.63 2.312 0l4.684-4.61a.53.53 0 0 0 0-.76.552.552 0 0 0-.771 0z">
+                                        </path>
+                                    </defs>
+                                    <use fill-rule="nonzero" transform="rotate(90 8 8)" xlink:href="#arrow_left-a">
+                                    </use>
+                                </svg>
+                            </a>
                         </li>
 
                         <li ng-repeat="n in range(pagedItems.length, currentPage, currentPage + gap) "
@@ -240,7 +259,20 @@
                         </li>
 
                         <li ng-show="currentPage < pagedItems.length - 1" class="md-padding">
-                            <a href ng-click="nextPage()">Next »</a>
+                            <a href ng-click="nextPage()">
+                                <svg class="euiIcon euiIcon--medium euiButtonIcon__icon" focusable="false"
+                                    aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
+                                    xmlns:xlink="http://www.w3.org/1999/xlink" width="16" height="16"
+                                    viewBox="0 0 16 16">
+                                    <defs>
+                                        <path id="arrow_right-a"
+                                            d="M13.069 5.157L8.384 9.768a.546.546 0 0 1-.768 0L2.93 5.158a.552.552 0 0 0-.771 0 .53.53 0 0 0 0 .759l4.684 4.61c.641.631 1.672.63 2.312 0l4.684-4.61a.53.53 0 0 0 0-.76.552.552 0 0 0-.771 0z">
+                                        </path>
+                                    </defs>
+                                    <use fill-rule="nonzero" transform="matrix(0 1 1 0 0 0)"
+                                        xlink:href="#arrow_right-a"></use>
+                                </svg>
+                            </a>
                         </li>
 
                         <li ng-show="currentPage < pagedItems.length - 1" class="md-padding">
@@ -260,8 +292,9 @@
         id="table{{scapepath}}">
         <thead class="wz-text-bold">
             <th ng-repeat="key in keys" class="euiTableHeaderCell wz-text-left"
-                ng-style="key.width && {'width':key.width}">
-                <span ng-class="{ 'cursor-pointer' : !key.nosortable }" ng-click="!key.nosortable && sort(key)">
+                ng-style="key.width && {'width':key.width}" ng-class="{ 'cursor-pointer' : !key.nosortable }"
+                ng-click="!key.nosortable && sort(key)">
+                <span>
                     {{ keyEquivalence[key.value || key] || key.value || key }}
                     <i ng-if="!key.nosortable" class="fa wz-theader-sort-icon"
                         ng-class="sortValue === (key.value || key) ? (sortDir ? 'fa-sort-asc' : 'fa-sort-desc') : 'fa-sort'"
@@ -366,7 +399,20 @@
                 <div ng-show="items.length >= itemsPerPage" class="pagination pull-right" style="margin:0 !important">
                     <ul layout="row">
                         <li ng-show="currentPage" class="md-padding">
-                            <a href ng-click="prevPage()">« Prev</a>
+                            <a href ng-click="prevPage()">
+                                <svg class="euiIcon euiIcon--medium euiButtonIcon__icon" focusable="false"
+                                    aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
+                                    xmlns:xlink="http://www.w3.org/1999/xlink" width="16" height="16"
+                                    viewBox="0 0 16 16">
+                                    <defs>
+                                        <path id="arrow_left-a"
+                                            d="M13.069 5.157L8.384 9.768a.546.546 0 0 1-.768 0L2.93 5.158a.552.552 0 0 0-.771 0 .53.53 0 0 0 0 .759l4.684 4.61c.641.631 1.672.63 2.312 0l4.684-4.61a.53.53 0 0 0 0-.76.552.552 0 0 0-.771 0z">
+                                        </path>
+                                    </defs>
+                                    <use fill-rule="nonzero" transform="rotate(90 8 8)" xlink:href="#arrow_left-a">
+                                    </use>
+                                </svg>
+                            </a>
                         </li>
 
                         <li ng-repeat="n in range(pagedItems.length, currentPage, currentPage + gap) "
@@ -375,7 +421,20 @@
                         </li>
 
                         <li ng-show="currentPage < pagedItems.length - 1" class="md-padding">
-                            <a href ng-click="nextPage()">Next »</a>
+                            <a href ng-click="nextPage()">
+                                <svg class="euiIcon euiIcon--medium euiButtonIcon__icon" focusable="false"
+                                    aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
+                                    xmlns:xlink="http://www.w3.org/1999/xlink" width="16" height="16"
+                                    viewBox="0 0 16 16">
+                                    <defs>
+                                        <path id="arrow_right-a"
+                                            d="M13.069 5.157L8.384 9.768a.546.546 0 0 1-.768 0L2.93 5.158a.552.552 0 0 0-.771 0 .53.53 0 0 0 0 .759l4.684 4.61c.641.631 1.672.63 2.312 0l4.684-4.61a.53.53 0 0 0 0-.76.552.552 0 0 0-.771 0z">
+                                        </path>
+                                    </defs>
+                                    <use fill-rule="nonzero" transform="matrix(0 1 1 0 0 0)"
+                                        xlink:href="#arrow_right-a"></use>
+                                </svg>
+                            </a>
                         </li>
                     </ul>
                 </div>
@@ -391,8 +450,9 @@
         id="table{{scapepath}}">
         <thead class="wz-text-bold">
             <th ng-repeat="key in keys" class="euiTableHeaderCell wz-text-left"
-                ng-style="key.width && {'width':key.width}">
-                <span ng-class="{ 'cursor-pointer' : !key.nosortable }" ng-click="!key.nosortable && sort(key)">{{
+                ng-style="key.width && {'width':key.width}" ng-class="{ 'cursor-pointer' : !key.nosortable }"
+                ng-click="!key.nosortable && sort(key)">
+                <span>{{
                     keyEquivalence[key.value || key] || key.value || key }}
                     <i ng-if="!key.nosortable" class="fa wz-theader-sort-icon"
                         ng-class="sortValue === (key.value || key) ? (sortDir ? 'fa-sort-asc' : 'fa-sort-desc') : 'fa-sort'"
@@ -453,7 +513,20 @@
                 <div ng-show="items.length >= itemsPerPage" class="pagination pull-right" style="margin:0 !important">
                     <ul layout="row">
                         <li ng-show="currentPage" class="md-padding">
-                            <a href ng-click="prevPage()">« Prev</a>
+                            <a href ng-click="prevPage()">
+                                <svg class="euiIcon euiIcon--medium euiButtonIcon__icon" focusable="false"
+                                    aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
+                                    xmlns:xlink="http://www.w3.org/1999/xlink" width="16" height="16"
+                                    viewBox="0 0 16 16">
+                                    <defs>
+                                        <path id="arrow_left-a"
+                                            d="M13.069 5.157L8.384 9.768a.546.546 0 0 1-.768 0L2.93 5.158a.552.552 0 0 0-.771 0 .53.53 0 0 0 0 .759l4.684 4.61c.641.631 1.672.63 2.312 0l4.684-4.61a.53.53 0 0 0 0-.76.552.552 0 0 0-.771 0z">
+                                        </path>
+                                    </defs>
+                                    <use fill-rule="nonzero" transform="rotate(90 8 8)" xlink:href="#arrow_left-a">
+                                    </use>
+                                </svg>
+                            </a>
                         </li>
 
                         <li ng-repeat="n in range(pagedItems.length, currentPage, currentPage + gap) "
@@ -462,7 +535,20 @@
                         </li>
 
                         <li ng-show="currentPage < pagedItems.length - 1" class="md-padding">
-                            <a href ng-click="nextPage()">Next »</a>
+                            <a href ng-click="nextPage()">
+                                <svg class="euiIcon euiIcon--medium euiButtonIcon__icon" focusable="false"
+                                    aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
+                                    xmlns:xlink="http://www.w3.org/1999/xlink" width="16" height="16"
+                                    viewBox="0 0 16 16">
+                                    <defs>
+                                        <path id="arrow_right-a"
+                                            d="M13.069 5.157L8.384 9.768a.546.546 0 0 1-.768 0L2.93 5.158a.552.552 0 0 0-.771 0 .53.53 0 0 0 0 .759l4.684 4.61c.641.631 1.672.63 2.312 0l4.684-4.61a.53.53 0 0 0 0-.76.552.552 0 0 0-.771 0z">
+                                        </path>
+                                    </defs>
+                                    <use fill-rule="nonzero" transform="matrix(0 1 1 0 0 0)"
+                                        xlink:href="#arrow_right-a"></use>
+                                </svg>
+                            </a>
                         </li>
                     </ul>
                 </div>

@@ -64,7 +64,7 @@ export class ConfigurationRulesetController {
               );
         this.$location.search('editingFile', true);
         this.appState.setNavigation({ status: true });
-        if (!this.$scope.$$phase) this.$scope.$digest();
+        this.$scope.$applyAsync();
         this.$scope.$broadcast('fetchedFile', { data: this.$scope.fetchedXML });
       } catch (error) {
         this.$scope.fetchedXML = null;
@@ -78,12 +78,12 @@ export class ConfigurationRulesetController {
       this.$scope.fetchedXML = null;
       if (reload) this.$scope.search();
       this.appState.setNavigation({ status: true });
-      if (!this.$scope.$$phase) this.$scope.$digest();
+      this.$scope.$applyAsync();
     };
 
     this.$scope.xmlIsValid = valid => {
       this.$scope.xmlHasErrors = valid;
-      if (!this.$scope.$$phase) this.$scope.$digest();
+      this.$scope.$applyAsync();
     };
 
     this.$scope.doSaveConfig = (isNewFile, fileName) => {
@@ -152,7 +152,7 @@ export class ConfigurationRulesetController {
       this.$scope.selectedItem = { file: 'new file' };
       this.$scope.fetchedXML = '<!-- Modify it at your will. -->';
       this.$scope.type = type;
-      if (!this.$scope.$$phase) this.$scope.$digest();
+      this.$scope.$applyAsync();
       this.$location.search('editingFile', true);
       this.appState.setNavigation({ status: true });
       this.$scope.$broadcast('fetchedFile', { data: this.$scope.fetchedXML });
@@ -166,7 +166,7 @@ export class ConfigurationRulesetController {
         new: true
       };
       this.$scope.viewingDetail = true;
-      if (!this.$scope.$$phase) this.$scope.$digest();
+      this.$scope.$applyAsync();
       this.$scope.$broadcast('changeCdbList', {
         currentList: this.$scope.currentList
       });
@@ -194,7 +194,7 @@ export class ConfigurationRulesetController {
         this.$scope.currentList = false;
         this.$scope.search();
       }
-      if (!this.$scope.$$phase) this.$scope.$digest();
+      this.$scope.$applyAsync();
     };
 
     this.$scope.switchRulesetTab('rules');
@@ -207,6 +207,7 @@ export class ConfigurationRulesetController {
 
     //listeners
     this.$scope.$on('wazuhShowCdbList', async (ev, parameters) => {
+      ev.stopPropagation();
       this.$scope.currentList = parameters.cdblist;
       try {
         const data = await this.rulesetHandler.getCdbList(
@@ -223,20 +224,22 @@ export class ConfigurationRulesetController {
       this.$scope.$broadcast('changeCdbList', {
         currentList: this.$scope.currentList
       });
-      if (!this.$scope.$$phase) this.$scope.$digest();
+      this.$scope.$applyAsync();
     });
-    this.$scope.$on('wazuhShowRule', (event, parameters) => {
+    this.$scope.$on('wazuhShowRule', (ev, parameters) => {
+      ev.stopPropagation();
       this.$scope.selectedItem = parameters.rule;
       this.$scope.selectedFileName = 'rules';
       this.$scope.editConfig();
-      if (!this.$scope.$$phase) this.$scope.$digest();
+      this.$scope.$applyAsync();
     });
 
-    this.$scope.$on('wazuhShowDecoder', (event, parameters) => {
+    this.$scope.$on('wazuhShowDecoder', (ev, parameters) => {
+      ev.stopPropagation();
       this.$scope.selectedItem = parameters.decoder;
       this.$scope.selectedFileName = 'decoders';
       this.$scope.editConfig();
-      if (!this.$scope.$$phase) this.$scope.$digest();
+      this.$scope.$applyAsync();
     });
   }
 }

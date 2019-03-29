@@ -29,6 +29,7 @@ export function RulesController(
   $scope.isObject = item => typeof item === 'object';
   $scope.mctrl = $scope.$parent.$parent.$parent.mctrl;
   $scope.mctrl.showingLocalRules = false;
+  $scope.mctrl.onlyLocalFiles = false;
   $scope.appliedFilters = [];
   /**
    * This performs a search with a given term
@@ -178,7 +179,7 @@ export function RulesController(
   // Reloading event listener
   $scope.$on('rulesetIsReloaded', () => {
     $scope.viewingDetail = false;
-    if (!$scope.$$phase) $scope.$digest();
+    $scope.$applyAsync();
   });
 
   /**
@@ -223,7 +224,7 @@ export function RulesController(
       $scope.currentRule.details = false;
     }
     $scope.viewingDetail = true;
-    if (!$scope.$$phase) $scope.$digest();
+    $scope.$applyAsync();
   });
 
   $scope.editRulesConfig = async () => {
@@ -234,7 +235,7 @@ export function RulesController(
       );
       $location.search('editingFile', true);
       appState.setNavigation({ status: true });
-      if (!$scope.$$phase) $scope.$digest();
+      $scope.$applyAsync();
       $scope.$broadcast('fetchedFile', { data: $scope.fetchedXML });
     } catch (error) {
       $scope.fetchedXML = null;
@@ -266,12 +267,12 @@ export function RulesController(
     $scope.$applyAsync();
     appState.setNavigation({ status: true });
     $scope.$broadcast('closeEditXmlFile', {});
-    if (!$scope.$$phase) $scope.$digest();
+    $scope.$applyAsync();
   };
 
   $scope.xmlIsValid = valid => {
     $scope.xmlHasErrors = valid;
-    if (!$scope.$$phase) $scope.$digest();
+    $scope.$applyAsync();
   };
 
   /**
@@ -287,7 +288,7 @@ export function RulesController(
     $scope.currentRule = false;
     $scope.closeEditingFile();
     $scope.$emit('removeCurrentRule');
-    if (!$scope.$$phase) $scope.$digest();
+    $scope.$applyAsync();
   };
 
   if ($location.search() && $location.search().ruleid) {
@@ -304,7 +305,7 @@ export function RulesController(
           $scope.currentRule.details = false;
         }
         $scope.viewingDetail = true;
-        if (!$scope.$$phase) $scope.$digest();
+        $scope.$applyAsync();
       })
       .catch(() =>
         errorHandler.handle(

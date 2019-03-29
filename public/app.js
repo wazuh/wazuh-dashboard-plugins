@@ -61,7 +61,7 @@ app.run(function($rootScope, $route, $location, appState, $window) {
     ]
   });
 
-  $rootScope.$on('$routeChangeSuccess', () => {
+  $rootScope.$on('$routeChangeSuccess', (ev, params) => {
     appState.setNavigation({ prevLocation: $location.path() });
     if (!appState.getNavigation().reloaded) {
       appState.setNavigation({ status: true });
@@ -69,7 +69,8 @@ app.run(function($rootScope, $route, $location, appState, $window) {
       appState.setNavigation({ reloaded: false });
     }
   });
-  $rootScope.$on('$locationChangeSuccess', () => {
+
+  $rootScope.$on('$locationChangeSuccess', (ev, params) => {
     const navigation = appState.getNavigation();
     appState.setNavigation({ currLocation: $location.path() });
     if (navigation.currLocation !== navigation.prevLocation) {

@@ -59,5 +59,5 @@ export const TabNames = {
   client: 'Client configuration',
   edition: 'Edit node configuration',
   'client-buffer': 'Anti-flooding settings',
-  sca: 'Configuration assessment'
+  sca: 'SCA'
 };

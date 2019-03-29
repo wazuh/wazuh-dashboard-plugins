@@ -205,14 +205,14 @@ export class OverviewController {
           localChange || preserveDiscover
         );
       } else {
-        this.$rootScope.$emit('changeTabView', { tabView: this.tabView });
+        this.$scope.$emit('changeTabView', { tabView: this.tabView });
       }
 
       this.checkMetrics(this.tab, subtab);
     } catch (error) {
       this.errorHandler.handle(error.message || error);
     }
-    if (!this.$scope.$$phase) this.$scope.$digest();
+    this.$scope.$applyAsync();
     return;
   }
 
@@ -282,7 +282,7 @@ export class OverviewController {
     } catch (error) {
       this.errorHandler.handle(error.message || error);
     }
-    if (!this.$scope.$$phase) this.$scope.$digest();
+    this.$scope.$applyAsync();
     return;
   }
 
@@ -345,7 +345,7 @@ export class OverviewController {
     } catch (error) {
       this.errorHandler.handle(error.message || error);
     }
-    if (!this.$scope.$$phase) this.$scope.$digest();
+    this.$scope.$applyAsync();
     return;
   }
 
