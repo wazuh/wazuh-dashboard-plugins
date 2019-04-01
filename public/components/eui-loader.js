@@ -11,8 +11,9 @@
  */
 import { uiModules } from 'ui/modules';
 import React from 'react';
-import { EuiIcon } from '@elastic/eui';
+import { EuiIcon, EuiSuperSelect } from '@elastic/eui';
 
 const app = uiModules.get('app/wazuh', ['react']);
 
-app.value('EuiIcon', EuiIcon);
+app.value('EuiIcon', EuiIcon)
+    .value('EuiSuperSelect', EuiSuperSelect);

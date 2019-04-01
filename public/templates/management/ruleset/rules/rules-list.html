@@ -6,17 +6,12 @@
         <input placeholder="Filter rules..." ng-model="custom_search" type="text"
             class="euiFieldSearch euiFieldSearch--fullWidth euiFlexItem height-35 ng-empty ng-pristine ng-touched ng-valid"
             aria-invalid="false" wz-enter="search(custom_search)">
-        <div class="euiFormControlLayoutIcons wz-margin-left-16"><span class="euiFormControlLayoutCustomIcon"><svg
-                    class="euiIcon euiIcon--medium euiFormControlLayoutCustomIcon__icon" focusable="false"
-                    aria-hidden="true" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
-                    width="16" height="16" viewBox="0 0 16 16">
-                    <defs>
-                        <path id="search-a"
-                            d="M11.271 11.978l3.872 3.873a.502.502 0 0 0 .708 0 .502.502 0 0 0 0-.708l-3.565-3.564c2.38-2.747 2.267-6.923-.342-9.532-2.73-2.73-7.17-2.73-9.898 0-2.728 2.729-2.728 7.17 0 9.9a6.955 6.955 0 0 0 4.949 2.05.5.5 0 0 0 0-1 5.96 5.96 0 0 1-4.242-1.757 6.01 6.01 0 0 1 0-8.486c2.337-2.34 6.143-2.34 8.484 0a6.01 6.01 0 0 1 0 8.486.5.5 0 0 0 .034.738z">
-                        </path>
-                    </defs>
-                    <use xlink:href="#search-a"></use>
-                </svg></span></div>
+        <div class="euiFormControlLayoutIcons wz-margin-left-16">
+            <span class="euiFormControlLayoutCustomIcon">
+                <react-component name="EuiIcon"
+                    props="{type:'search', className:'euiFormControlLayoutCustomIcon__icon'}" />
+            </span>
+        </div>
 
         <button type="submit" aria-label="Search"
             class="euiFlexItem euiFlexItem--flexGrowZero height-35 kuiButton kuiButton--secondary wz-margin-left-8"
@@ -83,12 +78,7 @@
                 <button type="button" ng-click="downloadCsv()"
                     class="euiButtonEmpty euiButtonEmpty--primary euiButtonEmpty--small">
                     <span class="euiButtonEmpty__content">
-                        <svg class="euiIcon euiIcon--medium euiButtonEmpty__icon" focusable="false" aria-hidden="true"
-                            xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
-                            <path
-                                d="M9 10.114l1.85-1.943a.52.52 0 0 1 .77 0c.214.228.214.6 0 .829l-1.95 2.05a1.552 1.552 0 0 1-2.31 0L5.41 9a.617.617 0 0 1 0-.829.52.52 0 0 1 .77 0L8 10.082V1.556C8 1.249 8.224 1 8.5 1s.5.249.5.556v8.558zM4.18 6a.993.993 0 0 0-.972.804l-1.189 6A.995.995 0 0 0 2.991 14h11.018a1 1 0 0 0 .972-1.196l-1.19-6a.993.993 0 0 0-.97-.804H4.18zM6 5v1h5V5h1.825c.946 0 1.76.673 1.946 1.608l1.19 6A2 2 0 0 1 14.016 15H2.984a1.992 1.992 0 0 1-1.945-2.392l1.19-6C2.414 5.673 3.229 5 4.174 5H6z">
-                            </path>
-                        </svg>
+                        <react-component name="EuiIcon" props="{type:'importAction'}" />
                         <span class="euiButtonEmpty__text">Formatted</span>
                     </span>
                 </button>
