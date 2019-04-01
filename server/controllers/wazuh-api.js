@@ -592,7 +592,7 @@ export class WazuhApiCtrl {
    * @param {Object} reply
    * @returns {Object} API response or ErrorResponse
    */
-  async makeRequest(method, path, data, id, reply) {
+  async makeRequest(method, path, data, id, reply, counter = 0) {
     const devTools = !!(data || {}).devTools;
     try {
       const api = await this.wzWrapper.getWazuhConfigurationById(id);
@@ -672,21 +672,32 @@ export class WazuhApiCtrl {
 
       const response = await needle(method, fullUrl, data, options);
 
-      if (
-        !((response || {}).body || {}).error &&
-        ((response || {}).body || {}).data
-      ) {
+      const responseBody = (response || {}).body || {};
+      const responseData = responseBody.data || false;
+      const responseError = responseBody.error || false;
+
+      // Avoid "1014 - Error communicating with socket" like errors
+      const socketErrorCodes = [1013, 1014, 1017, 1018, 1019];
+      if (socketErrorCodes.includes(responseError || 1)) {
+        if (counter > 3) {
+          throw new Error(
+            `Tried to execute ${method} ${path} three times with no success, aborted.`
+          );
+        }
+        return this.makeRequest(method, path, data, id, reply, counter + 1);
+      }
+
+      if (!responseError && responseData) {
         cleanKeys(response);
         return response.body;
       }
 
-      if (((response || {}).body || {}).error && devTools) {
+      if (responseError && devTools) {
         return response.body;
       }
 
-      throw ((response || {}).body || {}).error &&
-      ((response || {}).body || {}).message
-        ? { message: response.body.message, code: response.body.error }
+      throw responseError && responseBody.message
+        ? { message: responseBody.message, code: responseError }
         : new Error('Unexpected error fetching data from the Wazuh API');
     } catch (error) {
       if (devTools) {
@@ -697,7 +708,7 @@ export class WazuhApiCtrl {
         }
         return ErrorResponse(
           error.message || error,
-          `Wazuh API error: ${error.code}` || 3013,
+          error.code ? `Wazuh API error: ${error.code}` : 3013,
           500,
           reply
         );
