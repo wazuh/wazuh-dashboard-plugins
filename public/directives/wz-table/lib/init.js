@@ -26,9 +26,14 @@ export async function initTable(
     $scope.wazuh_table_loading = false;
   } catch (error) {
     $scope.wazuh_table_loading = false;
-    $scope.error = errorHandler.handle(error.message || error, false, false, true);
+    $scope.error = errorHandler.handle(
+      error.message || error,
+      false,
+      false,
+      true
+    );
     errorHandler.handle(error.message || error);
   }
-  if (!$scope.$$phase) $scope.$digest();
+  $scope.$applyAsync();
   return;
 }

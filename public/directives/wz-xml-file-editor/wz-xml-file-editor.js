@@ -16,7 +16,7 @@ import { uiModules } from 'ui/modules';
 
 const app = uiModules.get('app/wazuh', []);
 
-app.directive('wzXmlFileEditor', function () {
+app.directive('wzXmlFileEditor', function() {
   return {
     restrict: 'E',
     scope: {
@@ -36,15 +36,17 @@ app.directive('wzXmlFileEditor', function () {
       groupHandler,
       rulesetHandler,
       configHandler,
-      apiReq
+      apiReq,
+      $rootScope
     ) {
+      $scope.targetNameShown = $scope.targetName;
       $scope.configError = false;
       /**
        * Custom .replace method. Instead of using .replace which
        * evaluates regular expressions.
        * Alternative using split + join, same result.
        */
-      String.prototype.xmlReplace = function (str, newstr) {
+      String.prototype.xmlReplace = function(str, newstr) {
         return this.split(str).join(newstr);
       };
 
@@ -88,14 +90,13 @@ app.directive('wzXmlFileEditor', function () {
           );
           const parsererror = xmlDoc.getElementsByTagName('parsererror');
           $scope.validFn({
-            valid:
-              !!parsererror.length ||
-              !xml ||
-              !xml.length
+            valid: !!parsererror.length || !xml || !xml.length
           });
           if (parsererror.length) {
             const xmlFullError = parsererror[0].textContent;
-            $scope.xmlError = (xmlFullError.match('error\\s.+\n') || [])[0] || 'Error validating XML';
+            $scope.xmlError =
+              (xmlFullError.match('error\\s.+\n') || [])[0] ||
+              'Error validating XML';
           } else {
             $scope.xmlError = false;
           }
@@ -103,7 +104,7 @@ app.directive('wzXmlFileEditor', function () {
           errorHandler.handle(error, 'Error validating XML');
         }
         checkingXmlError = false;
-        if (!$scope.$$phase) $scope.$digest();
+        $scope.$applyAsync();
         return;
       };
 
@@ -150,10 +151,10 @@ app.directive('wzXmlFileEditor', function () {
           var type = single
             ? 'single'
             : closing
-              ? 'closing'
-              : opening
-                ? 'opening'
-                : 'other';
+            ? 'closing'
+            : opening
+            ? 'opening'
+            : 'other';
           var fromTo = lastType + '->' + type;
           lastType = type;
           var padding = '';
@@ -193,15 +194,15 @@ app.directive('wzXmlFileEditor', function () {
           } else {
             validation = isCluster
               ? await apiReq.request(
-                'GET',
-                `/cluster/configuration/validation`,
-                {}
-              )
+                  'GET',
+                  `/cluster/configuration/validation`,
+                  {}
+                )
               : await apiReq.request(
-                'GET',
-                `/manager/configuration/validation`,
-                {}
-              );
+                  'GET',
+                  `/manager/configuration/validation`,
+                  {}
+                );
           }
           const data = ((validation || {}).data || {}).data || {};
           const isOk = data.status === 'OK';
@@ -293,7 +294,7 @@ app.directive('wzXmlFileEditor', function () {
             }
             const msg = `Success. Node (${
               params.node
-              }) configuration has been updated`;
+            }) configuration has been updated`;
             params.showRestartManager
               ? params.showRestartManager !== 'warn'
                 ? showRestartMessage(msg, params.node)
@@ -387,7 +388,12 @@ app.directive('wzXmlFileEditor', function () {
         $scope.$applyAsync();
       });
 
-      $scope.$on('$destroy', function () {
+      $rootScope.$on('changedInputFileName', (ev, params) => {
+        $scope.targetNameShown = params.name;
+        $scope.$applyAsync();
+      });
+
+      $scope.$on('$destroy', function() {
         $location.search('editingFile', null);
         appState.setNavigation({ status: true });
       });

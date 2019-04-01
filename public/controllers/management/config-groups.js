@@ -67,7 +67,7 @@ export class ConfigurationGroupsController {
         this.$scope.fetchedXML = await this.fetchFile();
         this.$location.search('editingFile', true);
         this.appState.setNavigation({ status: true });
-        if (!this.$scope.$$phase) this.$scope.$digest();
+        this.$scope.$applyAsync();
         this.$scope.$broadcast('fetchedFile', { data: this.$scope.fetchedXML });
       } catch (error) {
         this.$scope.fetchedXML = null;
@@ -79,11 +79,11 @@ export class ConfigurationGroupsController {
       this.$scope.fetchedXML = null;
       this.appState.setNavigation({ status: true });
       this.$scope.$broadcast('closeEditXmlFile', {});
-      if (!this.$scope.$$phase) this.$scope.$digest();
+      this.$scope.$applyAsync();
     };
     this.$scope.xmlIsValid = valid => {
       this.$scope.xmlHasErrors = valid;
-      if (!this.$scope.$$phase) this.$scope.$digest();
+      this.$scope.$applyAsync();
     };
     this.$scope.doSaveConfig = () => {
       this.$scope.editingFile = false;
@@ -112,13 +112,14 @@ export class ConfigurationGroupsController {
     this.$scope.custom_search = '';
     this.$scope.selectedItem = false;
 
-    if (!this.$scope.$$phase) this.$scope.$digest();
+    this.$scope.$applyAsync();
 
     //listeners
-    this.$scope.$on('wazuhShowGroup', (event, parameters) => {
+    this.$scope.$on('wazuhShowGroup', (ev, parameters) => {
+      ev.stopPropagation();
       this.$scope.selectedItem = parameters.group;
       this.$scope.editConfig();
-      if (!this.$scope.$$phase) this.$scope.$digest();
+      this.$scope.$applyAsync();
     });
   }
 }

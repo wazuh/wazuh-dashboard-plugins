@@ -45,6 +45,7 @@ export class ManagementController {
     this.wazuhManagementTabs = ['ruleset', 'groups', 'configuration'];
     this.statusReportsTabs = ['status', 'logs', 'reporting', 'monitoring'];
     this.currentGroup = false;
+
     this.$scope.$on('setCurrentGroup', (ev, params) => {
       this.currentGroup = (params || {}).currentGroup || false;
     });
@@ -76,7 +77,7 @@ export class ManagementController {
       this.currentList = (params || {}).currentList || false;
       this.$location.search('currentList', true);
       this.appState.setNavigation({ status: true });
-      if (!this.$scope.$$phase) this.$scope.$digest();
+      this.$scope.$applyAsync();
     });
     this.$scope.$on('removeCurrentList', () => {
       this.currentList = false;
@@ -109,17 +110,20 @@ export class ManagementController {
       this.isRestarting = true;
       this.$scope.$applyAsync();
     });
+
     this.$rootScope.$on('removeBlockEdition', () => {
       this.$scope.blockEdition = false;
       this.isRestarting = false;
       this.$scope.$applyAsync();
     });
-    this.$rootScope.$on('removeRestarting', () => {
+
+    this.$scope.$on('removeRestarting', () => {
       this.isRestarting = false;
       this.$scope.$applyAsync();
     });
-    this.$rootScope.$on('performRestart', event => {
-      event.stopPropagation();
+
+    this.$rootScope.$on('performRestart', ev => {
+      ev.stopPropagation();
       this.clusterInfo.status === 'enabled'
         ? this.restartCluster()
         : this.restartManager();
@@ -195,10 +199,6 @@ export class ManagementController {
       this.appState.setNavigation({ status: true });
     } else {
       this.$scope.editionTab = tab;
-      this.$rootScope.$broadcast('configurationIsReloaded', {
-        globalConfigTab: this.globalConfigTab,
-        reloadConfigSubTab: true
-      });
     }
     this.$location.search('configSubTab', null);
     this.$location.search('editSubTab', tab);
@@ -207,6 +207,7 @@ export class ManagementController {
       reloadConfigSubTab: true
     });
   }
+
   /**
    * This switch to a selected tab
    * @param {String} tab

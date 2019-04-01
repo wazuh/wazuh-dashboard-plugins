@@ -61,7 +61,7 @@
         <!-- Reporting button section -->
         <div ng-show="tab !== 'welcome' && tab !== 'configuration' && tabView === 'panels'">
             <!-- Report button -->
-            <button class="height-40 kuiButton kuiButton--secondary wz-margin-right-8 small" tooltip="Generate report"
+            <button class="kuiButton kuiButton--secondary wz-margin-right-8 small" tooltip="Generate report"
                 tooltip-placement="bottom"
                 ng-class="{'euiButtonEmpty--disabled': (!rendered || loading || resultState !== 'ready' || showSyscheckFiles || showScaScan) && tab !== 'syscollector'}"
                 ng-disabled="(!rendered || loading || resultState !== 'ready' || showSyscheckFiles || showScaScan) && tab !== 'syscollector'"
@@ -75,43 +75,20 @@
         <div ng-show="tab !== 'welcome' && tab !== 'configuration' && tab !== 'syscollector'">
             <!-- Dashboard button -->
             <button ng-if="tabView === 'discover'"
-                class="height-40 kuiButton kuiButton--secondary small wz-margin-right-8"
+                class="kuiButton kuiButton--secondary small wz-margin-right-8"
                 ng-click="switchSubtab('panels')" aria-label="Dashboard button">
                 <i class="fa fa-fw fa-th" aria-hidden="true"></i> Dashboard
             </button>
 
             <!-- Discover button -->
             <button ng-if="tabView === 'panels' && !showSyscheckFiles && !showScaScan"
-                class="height-40 kuiButton kuiButton--secondary small wz-margin-right-8"
+                class="kuiButton kuiButton--secondary small wz-margin-right-8"
                 ng-click="switchSubtab('discover')" aria-label="Discover button">
                 <i class="fa fa-fw fa-compass" aria-hidden="true"></i> Discover
             </button>
         </div>
         <!-- End Discover/Dashboard buttons section -->
 
-        <!-- Agent autocomplete selector section -->
-        <div flex="30" class="wz-margin-8-no-left">
-            <md-autocomplete flex class="wz-autocomplete wz-select-input" md-no-cache="true" md-select-on-match="false"
-                md-selected-item="_swpagent" md-selected-item-change="getAgent(_swpagent.id,true)"
-                md-search-text="searchTerm" md-items="agentAutoComplete in analyzeAgents(searchTerm)"
-                md-item-text="agentAutoComplete.name" md-min-length="0" md-clear-button="true" md-no-asterisk="false"
-                placeholder="Search by name, ID or IP address">
-                <md-item-template>
-                    <span class="item-title">
-                        <span><strong md-highlight-text="search" md-highlight-flags="i"> {{agentAutoComplete.name}}
-                                ({{agentAutoComplete.id}}) </strong></span>
-                    </span>
-                    <span class="item-metadata">
-                        <span class="item-metastat" md-highlight-text="searchTerm" md-highlight-flags="i">
-                            {{agentAutoComplete.ip}} ({{agentAutoComplete.status}}) </span>
-                    </span>
-                </md-item-template>
-                <md-not-found>
-                    No agents matching "{{searchTerm}}" were found.
-                </md-not-found>
-            </md-autocomplete>
-        </div>
-        <!-- End agent autocomplete selector section -->
     </div>
     <!-- End navigation section -->
 

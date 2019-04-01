@@ -67,7 +67,7 @@ export class DecodersController {
     // Reloading event listener
     this.$scope.$on('rulesetIsReloaded', () => {
       this.viewingDetail = false;
-      if (!this.$scope.$$phase) this.$scope.$digest();
+      this.$scope.$applyAsync();
     });
 
     this.$scope.$on('closeDecoderView', () => {
@@ -80,7 +80,7 @@ export class DecodersController {
         currentDecoder: this.currentDecoder
       });
       this.viewingDetail = true;
-      if (!this.$scope.$$phase) this.$scope.$digest();
+      this.$scope.$applyAsync();
     });
 
     this.$scope.$on('showSaveAndOverwrite', () => {
@@ -234,7 +234,7 @@ export class DecodersController {
       );
       this.$location.search('editingFile', true);
       this.appState.setNavigation({ status: true });
-      if (!this.$scope.$$phase) this.$scope.$digest();
+      this.$scope.$applyAsync();
       this.$scope.$broadcast('fetchedFile', { data: this.fetchedXML });
     } catch (error) {
       this.fetchedXML = null;
@@ -270,7 +270,7 @@ export class DecodersController {
 
   xmlIsValid(valid) {
     this.xmlHasErrors = valid;
-    if (!this.$scope.$$phase) this.$scope.$digest();
+    this.$scope.$applyAsync();
   }
 
   /**
@@ -297,7 +297,7 @@ export class DecodersController {
     this.currentDecoder = false;
     this.closeEditingFile();
     this.$scope.$emit('removeCurrentDecoder');
-    if (!this.$scope.$$phase) this.$scope.$digest();
+    this.$scope.$applyAsync();
   }
 
   toggleSaveConfig = () => {

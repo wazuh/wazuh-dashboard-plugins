@@ -31,7 +31,7 @@ export async function searchData(
     $scope.error = errorHandler.handle(error.message || error, 0, 0, 1);
     errorHandler.handle(error.message || error);
   }
-  if (!$scope.$$phase) $scope.$digest();
+  $scope.$applyAsync();
   return;
 }
 
@@ -62,7 +62,7 @@ export async function filterData(
     $scope.error = errorHandler.handle(error.message || error, 0, 0, 1);
     errorHandler.handle(error.message || error);
   }
-  if (!$scope.$$phase) $scope.$digest();
+  $scope.$applyAsync();
   return;
 }
 
@@ -93,6 +93,6 @@ export async function queryData(
     $scope.error = errorHandler.handle(error.message || error, 0, 0, 1);
     errorHandler.handle(error.message || error);
   }
-  if (!$scope.$$phase) $scope.$digest();
+  $scope.$applyAsync();
   return;
 }

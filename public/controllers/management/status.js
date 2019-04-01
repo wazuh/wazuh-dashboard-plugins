@@ -111,7 +111,7 @@ export class StatusController {
       this.agentInfo = lastAgent;
       this.load = false;
 
-      if (!this.$scope.$$phase) this.$scope.$digest();
+      this.$scope.$applyAsync();
 
       return;
     } catch (error) {
@@ -143,13 +143,13 @@ export class StatusController {
       this.managerInfo = nodeInfo.data.data;
 
       this.load = false;
-      if (!this.$scope.$$phase) this.$scope.$digest();
+      this.$scope.$applyAsync();
     } catch (error) {
       this.load = false;
       this.clusterError = `Node ${node} is down`;
     }
 
-    if (!this.$scope.$$phase) this.$scope.$digest();
+    this.$scope.$applyAsync();
     return;
   }
 }

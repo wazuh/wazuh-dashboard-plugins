@@ -192,8 +192,6 @@ export class AgentsController {
     };
     this.$scope.getAgent = async newAgentId => this.getAgent(newAgentId);
     this.$scope.goGroups = (agent, group) => this.goGroups(agent, group);
-    this.$scope.analyzeAgents = async searchTerm =>
-      this.analyzeAgents(searchTerm);
     this.$scope.downloadCsv = async (path, fileName, filters = []) =>
       this.downloadCsv(path, fileName, filters);
 
@@ -358,29 +356,29 @@ export class AgentsController {
     this.$scope.switchSyscheckFiles = () => {
       this.$scope.showSyscheckFiles = !this.$scope.showSyscheckFiles;
       if (!this.$scope.showSyscheckFiles) {
-        this.$rootScope.$emit('changeTabView', {
+        this.$scope.$emit('changeTabView', {
           tabView: this.$scope.tabView
         });
       }
-      if (!this.$scope.$$phase) this.$scope.$digest();
+      this.$scope.$applyAsync();
     };
 
     this.$scope.switchScaScan = () => {
       this.$scope.lookingSca = false;
       this.$scope.showScaScan = !this.$scope.showScaScan;
       if (!this.$scope.showScaScan) {
-        this.$rootScope.$emit('changeTabView', {
+        this.$scope.$emit('changeTabView', {
           tabView: this.$scope.tabView
         });
       }
-      if (!this.$scope.$$phase) this.$scope.$digest();
+      this.$scope.$applyAsync();
     };
 
     this.$scope.goDiscover = () => this.goDiscover();
 
-    this.$scope.$on('$routeChangeStart', () =>
-      this.appState.removeSessionStorageItem('configSubTab')
-    );
+    this.$scope.$on('$routeChangeStart', (ev, params) => {
+      return this.appState.removeSessionStorageItem('configSubTab');
+    });
 
     this.$scope.switchGroupEdit = () => {
       this.$scope.addingGroupToAgent = false;
@@ -413,7 +411,7 @@ export class AgentsController {
           this.$scope.addingGroupToAgent = false;
           this.$scope.editGroup = false;
           this.errorHandler.info(`Group ${group} has been added.`);
-          if (!this.$scope.$$phase) this.$scope.$digest();
+          this.$scope.$applyAsync();
         })
         .catch(error => {
           this.$scope.editGroup = false;
@@ -501,7 +499,7 @@ export class AgentsController {
 
         this.changeAgent = false;
       } else {
-        this.$rootScope.$emit('changeTabView', {
+        this.$scope.$emit('changeTabView', {
           tabView: this.$scope.tabView
         });
       }
@@ -856,11 +854,11 @@ export class AgentsController {
           );
           this.$scope.agent.outdated = false;
         }
-        if (!this.$scope.$$phase) this.$scope.$digest();
+        this.$scope.$applyAsync();
       }
 
       this.$scope.load = false;
-      if (!this.$scope.$$phase) this.$scope.$digest();
+      this.$scope.$applyAsync();
       return;
     } catch (error) {
       if (!this.$scope.agent) {
@@ -879,13 +877,13 @@ export class AgentsController {
       }
     }
     this.$scope.load = false;
-    if (!this.$scope.$$phase) this.$scope.$digest();
+    this.$scope.$applyAsync();
     return;
   }
 
   switchGroupEdit() {
     this.$scope.editGroup = !!!this.$scope.editGroup;
-    if (!this.$scope.$$phase) this.$scope.$digest();
+    this.$scope.$applyAsync();
   }
   /**
    * Navigate to the groups of an agent
@@ -899,28 +897,6 @@ export class AgentsController {
     this.$location.search('tab', 'groups');
     this.$location.search('navigation', true);
     this.$location.path('/manager');
-  }
-
-  /**
-   * Look for agents that satisfy search term, hidding master
-   * @param {*} searchTerm
-   */
-  async analyzeAgents(searchTerm) {
-    try {
-      if (searchTerm) {
-        this.$scope.lookingSca = false;
-        const reqData = await this.apiReq.request('GET', '/agents', {
-          search: searchTerm
-        });
-        return reqData.data.data.items.filter(item => item.id !== '000');
-      } else {
-        const reqData = await this.apiReq.request('GET', '/agents', {});
-        return reqData.data.data.items.filter(item => item.id !== '000');
-      }
-    } catch (error) {
-      this.errorHandler.handle(error, 'Agents');
-    }
-    return;
   }
 
   /**

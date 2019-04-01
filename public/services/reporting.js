@@ -38,7 +38,7 @@ export class ReportingService {
       }
       this.$rootScope.reportBusy = true;
       this.$rootScope.reportStatus = 'Generating report...0%';
-      if (!this.$rootScope.$$phase) this.$rootScope.$digest();
+      this.$rootScope.$applyAsync();
 
       this.vis2png.clear();
 
@@ -78,7 +78,7 @@ export class ReportingService {
 
       this.$rootScope.reportBusy = false;
       this.$rootScope.reportStatus = false;
-      if (!this.$rootScope.$$phase) this.$rootScope.$digest();
+      this.$rootScope.$applyAsync();
       this.errorHandler.info(
         'Success. Go to Wazuh > Management > Reporting',
         'Reporting'

@@ -2,7 +2,7 @@
 
 All notable changes to the Wazuh app project will be documented in this file.
 
-## Wazuh v3.9.0 - Kibana v6.6.1 - Revision 420
+## Wazuh v3.9.0 - Kibana v6.7.0 - Revision 420
 
 ### Added 
 
@@ -57,11 +57,11 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Agent syncrhonization status is updated as we browse the configuration section ([#1305](https://github.com/wazuh/wazuh-kibana-app/pull/1305))
 - Using the browser timezone for reporting documents ([#1311](https://github.com/wazuh/wazuh-kibana-app/pull/1311)).
 
-## Wazuh v3.8.2 - Kibana v6.6.0 / v6.6.1 - Revision 419
+## Wazuh v3.8.2 - Kibana v6.6.0 / v6.6.1 / v6.6.2 / v6.7.0 - Revision 419
 
 ### Added
 
-- Support for Kibana v6.6.0 / v6.6.1
+- Support for Kibana v6.6.0 / v6.6.1 / v6.6.2 / v6.7.0
 
 ### Fixed
 

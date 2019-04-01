@@ -54,9 +54,9 @@ export class ConfigHandler {
   async performClusterRestart() {
     try {
       await this.apiReq.request('PUT', `/cluster/restart`, { delay: 15000 });
-      this.$rootScope.$emit('removeRestarting', {});
+      this.$rootScope.$broadcast('removeRestarting', {});
     } catch (error) {
-      this.$rootScope.$emit('removeRestarting', {});
+      this.$rootScope.$broadcast('removeRestarting', {});
       this.errorHandler.handle(error, 'Error restarting cluster');
     }
   }

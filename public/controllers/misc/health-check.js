@@ -124,7 +124,7 @@ export class HealthCheck {
           this.results[i].status = 'Ready';
         }
       }
-      if (!this.$scope.$$phase) this.$scope.$digest();
+      this.$scope.$applyAsync();
       return;
     } catch (error) {
       this.handleError(error);
@@ -198,7 +198,7 @@ export class HealthCheck {
       } else {
         if (this.checks.setup) this.processedChecks++;
       }
-      if (!this.$scope.$$phase) this.$scope.$digest();
+      this.$scope.$applyAsync();
       return;
     } catch (error) {
       this.handleError(error);
@@ -271,7 +271,7 @@ export class HealthCheck {
         return;
       }
 
-      if (!this.$scope.$$phase) this.$scope.$digest();
+      this.$scope.$applyAsync();
       return;
     } catch (error) {
       this.handleError(error);

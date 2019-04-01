@@ -168,12 +168,10 @@ export class ConfigurationController {
         this.$scope.editionTab = '';
         this.$scope.switchConfigurationTab('welcome', true);
       }
-      if (!this.$scope.$$phase) this.$scope.$digest();
+      this.$scope.$applyAsync();
     };
-    this.$rootScope.$on('configurationIsReloaded', (ev, params) => {
-      reloadConfig(params);
-    });
-    this.$scope.$on('configurationIsReloaded', (ev, params) => {
+
+    this.$scope.$on('configurationIsReloaded', (event, params, $e) => {
       reloadConfig(params);
     });
   }

@@ -137,13 +137,15 @@ app.directive('wzListManage', function() {
           fetch();
           $scope.doingSaving = false;
           $scope.loadingChange = false;
-          if (!$scope.$$phase) $scope.$digest();
+          $scope.$applyAsync();
         } catch (error) {
           if (addingNew) {
             $scope.currentList.name = false;
           }
           $scope.doingSaving = false;
-          if ((error.message || error || '').includes('Wazuh API error: 1905')) {
+          if (
+            (error.message || error || '').includes('Wazuh API error: 1905')
+          ) {
             $scope.overwriteError = true;
             errorHandler.handle('File name already exists');
           } else {

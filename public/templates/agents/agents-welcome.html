@@ -22,12 +22,12 @@
         <span class="font-size-18 wz-line-height-40"><i class="fa fa-fw fa-tv" aria-hidden="true"></i> {{ agent.name ||
             '-' }}</span>
         <span flex></span>
-        <button class="kuiButton kuiButton--secondary small wz-no-margin height-35" ng-click="goDiscover()"><i
+        <button class="kuiButton kuiButton--secondary small wz-no-margin" ng-click="goDiscover()"><i
                 class="fa fa-compass"></i>
             Discover
         </button>&nbsp;&nbsp;
         <button ng-show="!showConfirmRestartAgent" ng-disabled="restartingAgent"
-            class="kuiButton kuiButton--secondary small wz-no-margin height-35" ng-disabled="isRestarting"
+            class="kuiButton kuiButton--secondary small wz-no-margin" ng-disabled="isRestarting"
             ng-click="showConfirmRestartAgent = true"><i class="fa fa-refresh"
                 ng-class="restartingAgent ? 'fa-spin fa-spinner' : ''"></i>
             Restart agent
@@ -223,8 +223,8 @@
                             card-title="'Policy monitoring'" switch-tab="switchTab('pm')" current-tab="'pm'"
                             description="TabDescription.pm.description"></wz-welcome-card>
                         <wz-welcome-card class="euiFlexItem" logo="'icons/sca.png'"
-                            card-title="'Configuration assessment'" switch-tab="switchTab('sca')" current-tab="'sca'"
-                            description="TabDescription['sca'].description"></wz-welcome-card>
+                            card-title="'Security configuration assessment'" switch-tab="switchTab('sca')"
+                            current-tab="'sca'" description="TabDescription['sca'].description"></wz-welcome-card>
                         <wz-welcome-card ng-if="extensions.audit && agent.isLinuxOS" class="euiFlexItem"
                             logo="'icons/app_monitoring.svg'" card-title="'System auditing'"
                             switch-tab="switchTab('audit')" current-tab="'audit'"
