@@ -29,6 +29,9 @@ import 'uiExports/autocompleteProviders';
 import './less/loader';
 import { uiModules } from 'ui/modules';
 
+// EUI React components wrapper
+import './components';
+
 // Set up Wazuh app
 const app = uiModules.get('app/wazuh', ['ngCookies', 'ngMaterial']);
 
