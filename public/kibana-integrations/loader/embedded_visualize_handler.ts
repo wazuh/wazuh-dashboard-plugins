@@ -19,6 +19,8 @@
 
 // @ts-ignore untyped dependency
 import { registries } from '@kbn/interpreter/public';
+
+// @ts-ignore
 import { EventEmitter } from 'events';
 // @ts-ignore
 import { debounce, forEach } from 'lodash';
@@ -46,6 +48,8 @@ import { VisualizeDataLoader } from './visualize_data_loader';
 import { DataAdapter, RequestAdapter } from 'ui/inspector/adapters';
 
 import { VisSavedObject, VisualizeLoaderParams, VisualizeUpdateParams } from './types';
+
+// @ts-ignore
 import { queryGeohashBounds } from 'ui/visualize/loader/utils';
 
 interface EmbeddedVisualizeHandlerParams extends VisualizeLoaderParams {
@@ -102,7 +106,8 @@ export class EmbeddedVisualizeHandler {
   constructor(
     private readonly element: HTMLElement,
     savedObject: VisSavedObject,
-    params: EmbeddedVisualizeHandlerParams
+    params: EmbeddedVisualizeHandlerParams,
+    $injector
   ) {
     const { searchSource, vis } = savedObject;
 
