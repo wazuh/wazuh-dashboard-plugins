@@ -11,6 +11,8 @@
  */
 import { SavedObjectsClientProvider } from 'ui/saved_objects';
 
+import chrome from 'ui/chrome';
+
 export class HealthCheck {
   /**
    * Class constructor
@@ -266,7 +268,7 @@ export class HealthCheck {
       if (!this.errors || !this.errors.length) {
         await this.$timeout(800);
         this.$window.location.assign(
-          '/app/wazuh#' + this.$rootScope.previousLocation || ''
+          chrome.addBasePath('/app/wazuh#' + this.$rootScope.previousLocation || '')
         );
         return;
       }
