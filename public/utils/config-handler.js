@@ -54,23 +54,30 @@ export class ConfigurationHandler {
         $scope.integrations = {};
       }
 
+
       if (
         $scope.currentConfig['logcollector-localfile'] &&
         $scope.currentConfig['logcollector-localfile'].localfile
       ) {
-        $scope.currentConfig['logcollector-localfile'].localfile.forEach(
-          function(file) {
-            if (file.target) {
-              file.targetStr = '';
-              file.target.forEach(function(target, idx) {
-                file.targetStr = file.targetStr.concat(target);
-                if (idx != file.target.length - 1) {
-                  file.targetStr = file.targetStr.concat(', ');
-                }
-              });
-            }
+
+        const data = $scope.currentConfig['logcollector-localfile'].localfile;
+        $scope.currentConfig['logcollector-localfile']['localfile-logs'] = data.filter(item => typeof item.file !== 'undefined');
+        $scope.currentConfig['logcollector-localfile']['localfile-commands'] = data.filter(item => typeof item.file === 'undefined');
+
+        const sanitizeLocalfile = file => {
+          if (file.target) {
+            file.targetStr = '';
+            file.target.forEach(function (target, idx) {
+              file.targetStr = file.targetStr.concat(target);
+              if (idx != file.target.length - 1) {
+                file.targetStr = file.targetStr.concat(', ');
+              }
+            });
           }
-        );
+        }
+
+        $scope.currentConfig['logcollector-localfile']['localfile-logs'].forEach(sanitizeLocalfile);
+        $scope.currentConfig['logcollector-localfile']['localfile-commands'].forEach(sanitizeLocalfile);
       }
       $scope.load = false;
       $scope.$applyAsync();
