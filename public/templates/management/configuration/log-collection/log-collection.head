@@ -1,4 +1,4 @@
-<div flex="auto" layout="column" ng-if="configurationTab === 'log-collection'" ng-init="switchConfigurationSubTab('localfile')">
+<div flex="auto" layout="column" ng-if="configurationTab === 'log-collection'" ng-init="switchConfigurationSubTab('localfile-logs')">
 
     <!-- Headline -->
     <div layout="column" layout-padding>
@@ -14,7 +14,8 @@
         class="wz-nav-bar"
         md-selected-nav-item="configurationSubTab"
         nav-bar-aria-label="Log collection navigation links">
-        <md-nav-item class="wz-nav-item" md-nav-click="switchConfigurationSubTab('localfile')" name="localfile">Localfiles</md-nav-item>
+        <md-nav-item class="wz-nav-item" md-nav-click="switchConfigurationSubTab('localfile-logs')" name="localfile-logs">Logs</md-nav-item>
+        <md-nav-item class="wz-nav-item" md-nav-click="switchConfigurationSubTab('localfile-commands')" name="localfile-commands">Commands</md-nav-item>
         <md-nav-item class="wz-nav-item" md-nav-click="switchConfigurationSubTab('socket')" name="socket">Sockets</md-nav-item>
     </md-nav-bar>
     <!-- End Log collection navigation bar -->
