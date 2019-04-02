@@ -152,6 +152,10 @@ routes
     template: agentsPrevTemplate,
     resolve: { nestedResolve }
   })
+  .when('/manager/', {
+    template: managementTemplate,
+    resolve: { nestedResolve, ip, savedSearch, clearRuleId }
+  })
   .when('/manager/:tab?/', {
     template: managementTemplate,
     resolve: { nestedResolve, ip, savedSearch, clearRuleId }

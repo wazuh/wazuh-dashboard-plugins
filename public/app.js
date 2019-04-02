@@ -28,7 +28,7 @@ import 'uiExports/autocompleteProviders';
 // Require CSS
 import './less/loader';
 import { uiModules } from 'ui/modules';
-import 'ui/chrome';
+import chrome from 'ui/chrome';
 
 // Set up Wazuh app
 const app = uiModules.get('app/wazuh', ['ngCookies', 'ngMaterial']);
@@ -49,7 +49,7 @@ app.config([
   }
 ]);
 
-app.run(function($rootScope, $route, $location, appState, $window, chrome) {
+app.run(function($rootScope, $route, $location, appState, $window) {
   appState.setNavigation({ status: false });
   appState.setNavigation({
     reloaded: false,
@@ -159,20 +159,20 @@ app.run(function($rootScope, $route, $location, appState, $window, chrome) {
             );
           }
           $window.history.pushState(
-            { page: chrome.addBasePath('/app/wazuh#' + $location.$$url) },
+            { page: chrome.addBasePath('wazuh#' + $location.$$url) },
             '',
-            chrome.addBasePath('/app/wazuh#' + $location.$$url)
+            chrome.addBasePath('wazuh#' + $location.$$url)
           );
         } else if ($location.search().tabView === 'cluster-monitoring') {
           $window.history.pushState(
-            { page: chrome.addBasePath('/app/wazuh#/manager//') },
+            { page: chrome.addBasePath('wazuh#/manager/') },
             '',
-            chrome.addBasePath('/app/wazuh#/manager//')
+            chrome.addBasePath('wazuh#/manager/')
           );
           $window.history.pushState(
-            { page: '/app/wazuh#' + $location.$$url },
+            { page: 'wazuh#' + $location.$$url },
             '',
-            chrome.addBasePath('/app/wazuh#' + $location.$$url)
+            chrome.addBasePath('wazuh#' + $location.$$url)
           );
         }
       }
