@@ -35,7 +35,7 @@ const app = uiModules.get('app/wazuh', ['ngCookies', 'ngMaterial']);
 
 app.config([
   '$compileProvider',
-  function ($compileProvider) {
+  function($compileProvider) {
     $compileProvider.aHrefSanitizationWhitelist(
       /^\s*(https?|ftp|mailto|data|blob):/
     );
@@ -44,19 +44,27 @@ app.config([
 
 app.config([
   '$httpProvider',
-  function ($httpProvider) {
+  function($httpProvider) {
     $httpProvider.useApplyAsync(true);
   }
 ]);
 
-app.run(function ($rootScope, $route, $location, appState, $window, chrome) {
-  $window.onresize = function () {
+app.run(function($rootScope, $route, $location, appState, $window, chrome) {
+  $window.onresize = function() {
     if ($window.innerWidth >= 1200) {
-      document.getElementById("wz-logo").style.backgroundImage = `url(${chrome.addBasePath('/plugins/wazuh/img/new_logo_white.svg')})`;
+      document.getElementById(
+        'wz-logo'
+      ).style.backgroundImage = `url(${chrome.addBasePath(
+        '/plugins/wazuh/img/new_logo_white.svg'
+      )})`;
     } else {
-      document.getElementById("wz-logo").style.backgroundImage = `url(${chrome.addBasePath('/plugins/wazuh/img/new_logo_white_wolf.svg')})`;
+      document.getElementById(
+        'wz-logo'
+      ).style.backgroundImage = `url(${chrome.addBasePath(
+        '/plugins/wazuh/img/new_logo_white_wolf.svg'
+      )})`;
     }
-  }
+  };
   appState.setNavigation({ status: false });
   appState.setNavigation({
     reloaded: false,
@@ -101,7 +109,11 @@ app.run(function ($rootScope, $route, $location, appState, $window, chrome) {
         ) {
           if (navigation.currLocation === navigation.discoverSections[1]) {
             $window.history.pushState(
-              { page: chrome.addBasePath('wazuh#' + navigation.discoverPrevious + '/') },
+              {
+                page: chrome.addBasePath(
+                  'wazuh#' + navigation.discoverPrevious + '/'
+                )
+              },
               '',
               chrome.addBasePath('wazuh#' + navigation.discoverPrevious + '/')
             );
@@ -113,27 +125,38 @@ app.run(function ($rootScope, $route, $location, appState, $window, chrome) {
               $location.search().tab !== 'welcome'
             ) {
               $window.history.pushState(
-                { page: chrome.addBasePath('wazuh#' + navigation.discoverPrevious) },
+                {
+                  page: chrome.addBasePath(
+                    'wazuh#' + navigation.discoverPrevious
+                  )
+                },
                 '',
                 chrome.addBasePath('wazuh#' + navigation.discoverPrevious)
               );
               $window.history.pushState(
                 {
-                  page:
-                    chrome.addBasePath('wazuh#' +
+                  page: chrome.addBasePath(
+                    'wazuh#' +
                       navigation.discoverPrevious +
                       '?agent=' +
-                      $location.search().agent)
+                      $location.search().agent
+                  )
                 },
                 '',
-                chrome.addBasePath('wazuh#' +
-                  navigation.discoverPrevious +
-                  '?agent=' +
-                  $location.search().agent)
+                chrome.addBasePath(
+                  'wazuh#' +
+                    navigation.discoverPrevious +
+                    '?agent=' +
+                    $location.search().agent
+                )
               );
             } else {
               $window.history.pushState(
-                { page: chrome.addBasePath('wazuh#' + navigation.discoverPrevious) },
+                {
+                  page: chrome.addBasePath(
+                    'wazuh#' + navigation.discoverPrevious
+                  )
+                },
                 '',
                 chrome.addBasePath('wazuh#' + navigation.discoverPrevious)
               );
@@ -143,7 +166,9 @@ app.run(function ($rootScope, $route, $location, appState, $window, chrome) {
             navigation.currLocation === navigation.discoverSections[3]
           ) {
             $window.history.pushState(
-              { page: chrome.addBasePath('wazuh#' + navigation.discoverPrevious) },
+              {
+                page: chrome.addBasePath('wazuh#' + navigation.discoverPrevious)
+              },
               '',
               chrome.addBasePath('wazuh#' + navigation.discoverPrevious)
             );

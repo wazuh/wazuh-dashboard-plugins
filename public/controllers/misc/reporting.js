@@ -123,9 +123,9 @@ export class ReportingController {
     this.nextPage(n);
   }
 
-  goReport = (item) => {
+  goReport = item => {
     this.$window.open(chrome.addBasePath(`/reports/${item}`), '_blank');
-  }
+  };
 
   /**
    * On controller loads

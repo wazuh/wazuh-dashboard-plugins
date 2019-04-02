@@ -251,7 +251,7 @@ export class ElasticWrapper {
         const patternTitle =
           (((pattern || {})._source || {})['index-pattern'] || {}).title || '';
         detectedFields = await this.discoverNewFields(patternTitle);
-      } catch (error) { } // eslint-disable-line
+      } catch (error) {} // eslint-disable-line
 
       let currentFields = [];
 
@@ -265,9 +265,9 @@ export class ElasticWrapper {
             item =>
               item.name &&
               item.name !==
-              'data.aws.service.action.networkConnectionAction.remoteIpDetails.geoLocation.lat' &&
+                'data.aws.service.action.networkConnectionAction.remoteIpDetails.geoLocation.lat' &&
               item.name !==
-              'data.aws.service.action.networkConnectionAction.remoteIpDetails.geoLocation.lon'
+                'data.aws.service.action.networkConnectionAction.remoteIpDetails.geoLocation.lon'
           );
 
           this.mergeDetectedFields(knownFields, currentFields);
@@ -342,7 +342,7 @@ export class ElasticWrapper {
       try {
         const patternTitle = id.split('index-pattern:')[1];
         detectedFields = await this.discoverNewFields(patternTitle);
-      } catch (error) { } // eslint-disable-line
+      } catch (error) {} // eslint-disable-line
 
       const pattern = await this.getIndexPatternUsingGet(id);
 
@@ -577,17 +577,17 @@ export class ElasticWrapper {
 
       const data = req
         ? await this.elasticRequest.callWithRequest(req, 'update', {
-          index: '.wazuh',
-          type: 'wazuh-configuration',
-          id: id,
-          body: doc
-        })
+            index: '.wazuh',
+            type: 'wazuh-configuration',
+            id: id,
+            body: doc
+          })
         : await this.elasticRequest.callWithInternalUser('update', {
-          index: '.wazuh',
-          type: 'wazuh-configuration',
-          id: id,
-          body: doc
-        });
+            index: '.wazuh',
+            type: 'wazuh-configuration',
+            id: id,
+            body: doc
+          });
 
       return data;
     } catch (error) {
@@ -662,7 +662,7 @@ export class ElasticWrapper {
       return (
         this.usingSearchGuard ||
         ((((data || {}).defaults || {}).xpack || {}).security || {}).enabled ==
-        'true'
+          'true'
       );
     } catch (error) {
       return Promise.reject(error);
@@ -981,7 +981,7 @@ export class ElasticWrapper {
         pattern,
         metaFields
       });
-    } catch (error) { } // eslint-disable-line
+    } catch (error) {} // eslint-disable-line
 
     if (!Array.isArray(detectedFields)) {
       detectedFields = [];
