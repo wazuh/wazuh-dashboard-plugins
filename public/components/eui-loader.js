@@ -11,11 +11,17 @@
  */
 import { uiModules } from 'ui/modules';
 import React from 'react';
-import { EuiIcon, EuiSuperSelect, EuiLoadingSpinner, EuiProgress } from '@elastic/eui';
+import {
+  EuiIcon,
+  EuiSuperSelect,
+  EuiLoadingSpinner,
+  EuiProgress
+} from '@elastic/eui';
 
 const app = uiModules.get('app/wazuh', ['react']);
 
-app.value('EuiIcon', EuiIcon)
-    .value('EuiSuperSelect', EuiSuperSelect)
-    .value('EuiLoadingSpinner', EuiLoadingSpinner)
-    .value('EuiProgress', EuiProgress);
+app
+  .value('EuiIcon', EuiIcon)
+  .value('EuiSuperSelect', EuiSuperSelect)
+  .value('EuiLoadingSpinner', EuiLoadingSpinner)
+  .value('EuiProgress', EuiProgress);
