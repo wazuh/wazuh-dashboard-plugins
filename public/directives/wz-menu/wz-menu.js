@@ -52,7 +52,6 @@ class WzMenu {
      */
     const load = async () => {
       try {
-        $window.dispatchEvent(new Event('resize'));
         const list = await patternHandler.getPatternList();
         if (!list) return;
 
