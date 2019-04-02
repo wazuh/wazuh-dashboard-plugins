@@ -1,5 +1,4 @@
-<div layout="column" layout-align="start stretch" ng-controller="reportingController as ctrl"
-    ng-if="mctrl.tab === 'reporting'">
+<div layout="column" layout-align="start stretch" ng-controller="reportingController as ctrl" ng-if="mctrl.tab === 'reporting'">
 
     <!-- Loading ring -->
     <div class='uil-ring-css' ng-show="ctrl.loading">
@@ -8,16 +7,15 @@
     <!-- End loading ring -->
 
     <!-- No reports section -->
-    <div layout="row" class="wz-margin-top-16" layout-align="start start"
-        ng-show="!ctrl.loading && (!ctrl.pagedItems || !ctrl.pagedItems.length)">
+    <div layout="row" class="wz-margin-top-16" layout-align="start start" ng-show="!ctrl.loading && (!ctrl.pagedItems || !ctrl.pagedItems.length)">
         <md-card flex class="wz-md-card" flex>
             <md-card-content class="wz-text-center">
                 <i class="fa fa-fw fa-info-circle" aria-hidden="true"></i> <span class="wz-headline-title">No reports
                     available</span>
                 <md-divider class="wz-margin-top-10"></md-divider>
                 <div layout="column" class="wz-padding-top-10">
-                    <p>There are no reports yet. Go to the Overview or Agents tabs and click on the <i
-                            class="fa fa-fw fa-print" aria-hidden="true"></i> icon to create one.</p>
+                    <p>There are no reports yet. Go to the Overview or Agents tabs and click on the <i class="fa fa-fw fa-print"
+                            aria-hidden="true"></i> icon to create one.</p>
                 </div>
             </md-card-content>
         </md-card>
@@ -25,10 +23,9 @@
     <!-- End no reports section -->
     <div layout="row" class="wz-margin-top-16" ng-show="!ctrl.loading && ctrl.pagedItems && ctrl.pagedItems.length">
         <span flex></span>
-        <md-button ng-click="ctrl.load()"><svg class="euiIcon euiIcon--medium" focusable="false"
-                xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
-                <path
-                    d="M11.228 2.942a.5.5 0 1 1-.538.842A5 5 0 1 0 13 8a.5.5 0 1 1 1 0 6 6 0 1 1-2.772-5.058zM14 1.5v3A1.5 1.5 0 0 1 12.5 6h-3a.5.5 0 0 1 0-1h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 1 1 1 0z">
+        <md-button ng-click="ctrl.load()"><svg class="euiIcon euiIcon--medium" focusable="false" xmlns="http://www.w3.org/2000/svg"
+                width="16" height="16" viewBox="0 0 16 16">
+                <path d="M11.228 2.942a.5.5 0 1 1-.538.842A5 5 0 1 0 13 8a.5.5 0 1 1 1 0 6 6 0 1 1-2.772-5.058zM14 1.5v3A1.5 1.5 0 0 1 12.5 6h-3a.5.5 0 0 1 0-1h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 1 1 1 0z">
                 </path>
             </svg>
             Refresh
@@ -52,24 +49,20 @@
                                 <td>{{item.size / 1024 | number: 2}}KB</td>
                                 <td>{{item.date.split('T')[0]}} {{item.date.split('T')[1].split('.')[0]}}</td>
                                 <td>
-                                    <a ng-href="/reports/{{item.name}}" flex class="wz-text-right" target="_blank">
+                                    <a ng-click="ctrl.goReport(item.name)" flex class="wz-text-right">
                                         <svg class="euiIcon euiIcon--medium euiButtonEmpty__icon" focusable="false"
                                             aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="16" height="16"
                                             viewBox="0 0 16 16">
-                                            <path
-                                                d="M9 10.114l1.85-1.943a.52.52 0 0 1 .77 0c.214.228.214.6 0 .829l-1.95 2.05a1.552 1.552 0 0 1-2.31 0L5.41 9a.617.617 0 0 1 0-.829.52.52 0 0 1 .77 0L8 10.082V1.556C8 1.249 8.224 1 8.5 1s.5.249.5.556v8.558zM4.18 6a.993.993 0 0 0-.972.804l-1.189 6A.995.995 0 0 0 2.991 14h11.018a1 1 0 0 0 .972-1.196l-1.19-6a.993.993 0 0 0-.97-.804H4.18zM6 5v1h5V5h1.825c.946 0 1.76.673 1.946 1.608l1.19 6A2 2 0 0 1 14.016 15H2.984a1.992 1.992 0 0 1-1.945-2.392l1.19-6C2.414 5.673 3.229 5 4.174 5H6z">
+                                            <path d="M9 10.114l1.85-1.943a.52.52 0 0 1 .77 0c.214.228.214.6 0 .829l-1.95 2.05a1.552 1.552 0 0 1-2.31 0L5.41 9a.617.617 0 0 1 0-.829.52.52 0 0 1 .77 0L8 10.082V1.556C8 1.249 8.224 1 8.5 1s.5.249.5.556v8.558zM4.18 6a.993.993 0 0 0-.972.804l-1.189 6A.995.995 0 0 0 2.991 14h11.018a1 1 0 0 0 .972-1.196l-1.19-6a.993.993 0 0 0-.97-.804H4.18zM6 5v1h5V5h1.825c.946 0 1.76.673 1.946 1.608l1.19 6A2 2 0 0 1 14.016 15H2.984a1.992 1.992 0 0 1-1.945-2.392l1.19-6C2.414 5.673 3.229 5 4.174 5H6z">
                                             </path>
                                         </svg>
                                     </a>
-                                    <a flex class="wz-text-right cursor-pointer"
-                                        ng-click="ctrl.deleteReport(item.name)">
+                                    <a flex class="wz-text-right cursor-pointer" ng-click="ctrl.deleteReport(item.name)">
                                         <svg class="euiIcon euiIcon--medium euiButton__icon" focusable="false"
-                                            aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
-                                            xmlns:xlink="http://www.w3.org/1999/xlink" width="16" height="16"
-                                            viewBox="0 0 16 16">
+                                            aria-hidden="true" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+                                            width="16" height="16" viewBox="0 0 16 16">
                                             <defs>
-                                                <path id="trash-a"
-                                                    d="M11 3h5v1H0V3h5V1a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2zm-7.056 8H7v1H4.1l.392 2.519c.042.269.254.458.493.458h6.03c.239 0 .451-.189.493-.458l1.498-9.576H14l-1.504 9.73c-.116.747-.74 1.304-1.481 1.304h-6.03c-.741 0-1.365-.557-1.481-1.304l-1.511-9.73H9V5.95H3.157L3.476 8H8v1H3.632l.312 2zM6 3h4V1H6v2z">
+                                                <path id="trash-a" d="M11 3h5v1H0V3h5V1a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2zm-7.056 8H7v1H4.1l.392 2.519c.042.269.254.458.493.458h6.03c.239 0 .451-.189.493-.458l1.498-9.576H14l-1.504 9.73c-.116.747-.74 1.304-1.481 1.304h-6.03c-.741 0-1.365-.557-1.481-1.304l-1.511-9.73H9V5.95H3.157L3.476 8H8v1H3.632l.312 2zM6 3h4V1H6v2z">
                                                 </path>
                                             </defs>
                                             <use xlink:href="#trash-a"></use>
@@ -87,8 +80,7 @@
                                         </li>
 
                                         <li ng-repeat="n in ctrl.range(ctrl.pagedItems.length, ctrl.currentPage, ctrl.currentPage + ctrl.gap) "
-                                            ng-class="{active: n == ctrl.currentPage}" ng-click="ctrl.setPage(n)"
-                                            class="md-padding">
+                                            ng-class="{active: n == ctrl.currentPage}" ng-click="ctrl.setPage(n)" class="md-padding">
                                             <a href ng-bind="n + 1">1</a>
                                         </li>
 

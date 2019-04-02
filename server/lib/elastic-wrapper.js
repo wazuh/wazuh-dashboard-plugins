@@ -312,8 +312,8 @@ export class ElasticWrapper {
               fieldFormatMap: `{
                   "data.virustotal.permalink":{"id":"url"},
                   "data.vulnerability.reference":{"id":"url"},"data.url":{"id":"url"},
-                  "rule.id":{"id":"url","params":{"urlTemplate":"/app/wazuh#/manager/?tab=ruleset&ruleid={{value}}","labelTemplate":"{{value}}","openLinkInCurrentTab":true}},
-                  "agent.id":{"id":"url","params":{"urlTemplate":"/app/wazuh#/agents-preview/?_g=()&agent={{value}}","labelTemplate":"{{value}}","openLinkInCurrentTab":true}}
+                  "rule.id":{"id":"url","params":{"urlTemplate":"wazuh#/manager/?tab=ruleset&ruleid={{value}}","labelTemplate":"{{value}}","openLinkInCurrentTab":true}},
+                  "agent.id":{"id":"url","params":{"urlTemplate":"wazuh#/agents-preview/?_g=()&agent={{value}}","labelTemplate":"{{value}}","openLinkInCurrentTab":true}}
                 }`
             }
           }

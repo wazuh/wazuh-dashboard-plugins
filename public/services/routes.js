@@ -148,9 +148,17 @@ routes
     template: agentsTemplate,
     resolve: { nestedResolve, ip, savedSearch }
   })
+  .when('/agents-preview/', {
+    template: agentsPrevTemplate,
+    resolve: { nestedResolve }
+  })
   .when('/agents-preview/:tab?/', {
     template: agentsPrevTemplate,
     resolve: { nestedResolve }
+  })
+  .when('/manager/', {
+    template: managementTemplate,
+    resolve: { nestedResolve, ip, savedSearch, clearRuleId }
   })
   .when('/manager/:tab?/', {
     template: managementTemplate,

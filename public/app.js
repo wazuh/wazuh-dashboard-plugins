@@ -28,6 +28,7 @@ import 'uiExports/autocompleteProviders';
 // Require CSS
 import './less/loader';
 import { uiModules } from 'ui/modules';
+import chrome from 'ui/chrome';
 
 // EUI React components wrapper
 import './components';
@@ -96,9 +97,13 @@ app.run(function($rootScope, $route, $location, appState, $window) {
         ) {
           if (navigation.currLocation === navigation.discoverSections[1]) {
             $window.history.pushState(
-              { page: 'wazuh#' + navigation.discoverPrevious + '/' },
+              {
+                page: chrome.addBasePath(
+                  'wazuh#' + navigation.discoverPrevious + '/'
+                )
+              },
               '',
-              'wazuh#' + navigation.discoverPrevious + '/'
+              chrome.addBasePath('wazuh#' + navigation.discoverPrevious + '/')
             );
           } else if (
             navigation.currLocation === navigation.discoverSections[2]
@@ -108,29 +113,40 @@ app.run(function($rootScope, $route, $location, appState, $window) {
               $location.search().tab !== 'welcome'
             ) {
               $window.history.pushState(
-                { page: 'wazuh#' + navigation.discoverPrevious },
+                {
+                  page: chrome.addBasePath(
+                    'wazuh#' + navigation.discoverPrevious
+                  )
+                },
                 '',
-                'wazuh#' + navigation.discoverPrevious
+                chrome.addBasePath('wazuh#' + navigation.discoverPrevious)
               );
               $window.history.pushState(
                 {
-                  page:
+                  page: chrome.addBasePath(
                     'wazuh#' +
+                      navigation.discoverPrevious +
+                      '?agent=' +
+                      $location.search().agent
+                  )
+                },
+                '',
+                chrome.addBasePath(
+                  'wazuh#' +
                     navigation.discoverPrevious +
                     '?agent=' +
                     $location.search().agent
-                },
-                '',
-                'wazuh#' +
-                  navigation.discoverPrevious +
-                  '?agent=' +
-                  $location.search().agent
+                )
               );
             } else {
               $window.history.pushState(
-                { page: 'wazuh#' + navigation.discoverPrevious },
+                {
+                  page: chrome.addBasePath(
+                    'wazuh#' + navigation.discoverPrevious
+                  )
+                },
                 '',
-                'wazuh#' + navigation.discoverPrevious
+                chrome.addBasePath('wazuh#' + navigation.discoverPrevious)
               );
             }
           } else if (
@@ -138,26 +154,28 @@ app.run(function($rootScope, $route, $location, appState, $window) {
             navigation.currLocation === navigation.discoverSections[3]
           ) {
             $window.history.pushState(
-              { page: 'wazuh#' + navigation.discoverPrevious },
+              {
+                page: chrome.addBasePath('wazuh#' + navigation.discoverPrevious)
+              },
               '',
-              'wazuh#' + navigation.discoverPrevious
+              chrome.addBasePath('wazuh#' + navigation.discoverPrevious)
             );
           }
           $window.history.pushState(
-            { page: '/app/wazuh#' + $location.$$url },
+            { page: chrome.addBasePath('wazuh#' + $location.$$url) },
             '',
-            '/app/wazuh#' + $location.$$url
+            chrome.addBasePath('wazuh#' + $location.$$url)
           );
         } else if ($location.search().tabView === 'cluster-monitoring') {
           $window.history.pushState(
-            { page: '/app/wazuh#/manager//' },
+            { page: chrome.addBasePath('wazuh#/manager/') },
             '',
-            '/app/wazuh#/manager//'
+            chrome.addBasePath('wazuh#/manager/')
           );
           $window.history.pushState(
-            { page: '/app/wazuh#' + $location.$$url },
+            { page: 'wazuh#' + $location.$$url },
             '',
-            '/app/wazuh#' + $location.$$url
+            chrome.addBasePath('wazuh#' + $location.$$url)
           );
         }
       }
@@ -184,7 +202,6 @@ import 'angular-material/angular-material';
 import 'angular-cookies/angular-cookies';
 
 import 'ui/autoload/all';
-import 'ui/chrome';
 
 // Wazuh
 import './kibana-integrations';

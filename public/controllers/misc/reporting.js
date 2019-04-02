@@ -9,6 +9,7 @@
  *
  * Find more information about this on the LICENSE file.
  */
+import chrome from 'ui/chrome';
 export class ReportingController {
   /**
    * Class controller
@@ -16,8 +17,9 @@ export class ReportingController {
    * @param {*} errorHandler
    * @param {*} genericReq
    */
-  constructor($scope, errorHandler, genericReq) {
+  constructor($scope, errorHandler, genericReq, $window) {
     this.$scope = $scope;
+    this.$window = $window;
     this.errorHandler = errorHandler;
     this.genericReq = genericReq;
     this.loading = true;
@@ -120,6 +122,10 @@ export class ReportingController {
     this.currentPage = n;
     this.nextPage(n);
   }
+
+  goReport = item => {
+    this.$window.open(chrome.addBasePath(`/reports/${item}`), '_blank');
+  };
 
   /**
    * On controller loads
