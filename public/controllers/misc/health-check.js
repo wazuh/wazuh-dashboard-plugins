@@ -269,7 +269,7 @@ export class HealthCheck {
         await this.$timeout(800);
         this.$window.location.assign(
           chrome.addBasePath(
-            '/app/wazuh#' + this.$rootScope.previousLocation || ''
+            'wazuh#' + this.$rootScope.previousLocation || ''
           )
         );
         return;
@@ -287,7 +287,7 @@ export class HealthCheck {
    */
   goApp() {
     this.$window.location.assign(
-      chrome.addBasePath('/app/wazuh#' + this.$rootScope.previousLocation || '')
+      chrome.addBasePath('wazuh#' + this.$rootScope.previousLocation || '')
     );
   }
 }
