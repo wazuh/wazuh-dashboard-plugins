@@ -84,13 +84,13 @@
     <div flex class="euiCallOut euiCallOut--warning">
         <div class="euiCallOutHeader">
             <span class="euiCallOutHeader__title">
-                <react-component name="EuiIcon" props="{type:'help', className:'euiCallOutHeader__icon'}" />
+                <react-component name="EuiIcon" props="{type:'help'}" />
                 {{wazuhNotReadyYet}}</span>
             <span flex></span>
-            <div ng-show="wazuhNotReadyYet === 'Wazuh not ready yet.'"
-                class="euiLoadingSpinner euiLoadingSpinner--medium"></div>
-            <button ng-show="wazuhNotReadyYet === 'Wazuh could not be recovered.'"
-                class="kuiButton kuiButton--secondary" ng-click="refresh()">
+            <react-component ng-if="wazuhNotReadyYet === 'Wazuh not ready yet.'" name="EuiLoadingSpinner"
+                props="{size:'m'}" />
+            <button ng-if="wazuhNotReadyYet === 'Wazuh could not be recovered.'" class="kuiButton kuiButton--secondary"
+                ng-click="refresh()">
                 Refresh
             </button>
         </div>
