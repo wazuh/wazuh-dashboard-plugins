@@ -45,6 +45,7 @@ export class ConfigurationController {
     this.$scope.getXML = () => this.configurationHandler.getXML(this.$scope);
     this.$scope.getJSON = () => this.configurationHandler.getJSON(this.$scope);
     this.$scope.isString = item => typeof item === 'string';
+    this.$scope.changeNode = node => this.changeNode(node);
     this.$scope.hasSize = obj =>
       obj && typeof obj === 'object' && Object.keys(obj).length;
     this.$scope.switchConfigTab = (
@@ -72,10 +73,13 @@ export class ConfigurationController {
       } catch (error) {
         this.errorHandler.handle(error, 'Set configuration path');
       }
+
       this.configurationHandler.switchConfigTab(
         configurationTab,
         sections,
-        this.$scope
+        this.$scope,
+        false,
+        (this.$scope.mctrl || {}).selectedNode
       );
     };
 
@@ -92,7 +96,12 @@ export class ConfigurationController {
         });
         this.$location.search('configWodle', this.$scope.configWodle);
       }
-      this.configurationHandler.switchWodle(wodleName, this.$scope);
+      this.configurationHandler.switchWodle(
+        wodleName,
+        this.$scope,
+        false,
+        (this.$scope.mctrl || {}).selectedNode
+      );
     };
 
     /**
@@ -105,6 +114,7 @@ export class ConfigurationController {
         configurationTab,
         this.$scope
       );
+
       if (!this.$scope.navigate) {
         let configSubTab = this.$location.search().configSubTab;
         if (configSubTab) {
@@ -173,6 +183,14 @@ export class ConfigurationController {
 
     this.$scope.$on('configurationIsReloaded', (event, params, $e) => {
       reloadConfig(params);
+    });
+
+    this.$scope.$on('configNodeChanged', (ev, params) => {
+      this.$scope.switchConfigurationTab(
+        this.$scope.configurationTab,
+        false,
+        true
+      );
     });
   }
 }

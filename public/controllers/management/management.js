@@ -27,7 +27,8 @@ export class ManagementController {
     appState,
     configHandler,
     errorHandler,
-    $interval
+    $interval,
+    apiReq
   ) {
     this.$scope = $scope;
     this.$rootScope = $rootScope;
@@ -38,6 +39,7 @@ export class ManagementController {
     this.configHandler = configHandler;
     this.errorHandler = errorHandler;
     this.$interval = $interval;
+    this.apiReq = apiReq;
     this.tab = 'welcome';
     this.rulesetTab = 'rules';
     this.globalConfigTab = 'overview';
@@ -249,6 +251,7 @@ export class ManagementController {
     }
 
     this.$location.search('tab', this.tab);
+    this.loadNodeList();
   }
 
   /**
@@ -280,5 +283,35 @@ export class ManagementController {
       this.switchTab('ruleset', true);
       this.setRulesTab('rules');
     }
+  }
+
+  changeNode(node) {
+    this.selectedNode = node;
+    this.$scope.$broadcast('configNodeChanged');
+    this.$scope.$applyAsync();
+  }
+
+  async loadNodeList() {
+    try {
+      this.loadingNodes = true;
+      const clusterInfo = this.appState.getClusterInfo() || {};
+      const clusterEnabled = clusterInfo.status === 'enabled';
+      console.log('clusterEnabled', clusterEnabled);
+      if (clusterEnabled) {
+        const response = await this.apiReq.request('GET', '/cluster/nodes', {});
+        const nodeList =
+          (((response || {}).data || {}).data || {}).items || false;
+        if (Array.isArray(nodeList) && nodeList.length) {
+          this.nodeList = nodeList.map(item => item.name).reverse();
+          this.selectedNode = nodeList.filter(
+            item => item.type === 'master'
+          )[0].name;
+        }
+      }
+    } catch (error) {
+      console.log(error.message || error);
+    }
+    this.loadingNodes = false;
+    this.$scope.$applyAsync();
   }
 }
