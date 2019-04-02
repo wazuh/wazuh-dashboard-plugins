@@ -28,13 +28,14 @@ import 'uiExports/autocompleteProviders';
 // Require CSS
 import './less/loader';
 import { uiModules } from 'ui/modules';
+import 'ui/chrome';
 
 // Set up Wazuh app
 const app = uiModules.get('app/wazuh', ['ngCookies', 'ngMaterial']);
 
 app.config([
   '$compileProvider',
-  function($compileProvider) {
+  function ($compileProvider) {
     $compileProvider.aHrefSanitizationWhitelist(
       /^\s*(https?|ftp|mailto|data|blob):/
     );
@@ -43,12 +44,19 @@ app.config([
 
 app.config([
   '$httpProvider',
-  function($httpProvider) {
+  function ($httpProvider) {
     $httpProvider.useApplyAsync(true);
   }
 ]);
 
-app.run(function($rootScope, $route, $location, appState, $window) {
+app.run(function ($rootScope, $route, $location, appState, $window, chrome) {
+  $window.onresize = function () {
+    if ($window.innerWidth >= 1200) {
+      document.getElementById("wz-logo").style.backgroundImage = `url(${chrome.addBasePath('/plugins/wazuh/img/new_logo_white.svg')})`;
+    } else {
+      document.getElementById("wz-logo").style.backgroundImage = `url(${chrome.addBasePath('/plugins/wazuh/img/new_logo_white_wolf.svg')})`;
+    }
+  }
   appState.setNavigation({ status: false });
   appState.setNavigation({
     reloaded: false,
@@ -119,9 +127,9 @@ app.run(function($rootScope, $route, $location, appState, $window) {
                 },
                 '',
                 'wazuh#' +
-                  navigation.discoverPrevious +
-                  '?agent=' +
-                  $location.search().agent
+                navigation.discoverPrevious +
+                '?agent=' +
+                $location.search().agent
               );
             } else {
               $window.history.pushState(
@@ -181,7 +189,6 @@ import 'angular-material/angular-material';
 import 'angular-cookies/angular-cookies';
 
 import 'ui/autoload/all';
-import 'ui/chrome';
 
 // Wazuh
 import './kibana-integrations';
