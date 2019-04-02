@@ -188,7 +188,7 @@ export class HealthCheck {
             if (apiSplit[0] !== appSplit[0] || apiSplit[1] !== appSplit[1]) {
               this.errors.push(
                 'API version mismatch. Expected v' +
-                  setupData.data.data['app-version']
+                setupData.data.data['app-version']
               );
               this.results[i].status = 'Error';
             } else {
@@ -285,7 +285,7 @@ export class HealthCheck {
    */
   goApp() {
     this.$window.location.assign(
-      '/app/wazuh#' + this.$rootScope.previousLocation || ''
+      chrome.addBasePath('/app/wazuh#' + this.$rootScope.previousLocation || '')
     );
   }
 }

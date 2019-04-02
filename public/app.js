@@ -101,9 +101,9 @@ app.run(function ($rootScope, $route, $location, appState, $window, chrome) {
         ) {
           if (navigation.currLocation === navigation.discoverSections[1]) {
             $window.history.pushState(
-              { page: 'wazuh#' + navigation.discoverPrevious + '/' },
+              { page: chrome.addBasePath('wazuh#' + navigation.discoverPrevious + '/') },
               '',
-              'wazuh#' + navigation.discoverPrevious + '/'
+              chrome.addBasePath('wazuh#' + navigation.discoverPrevious + '/')
             );
           } else if (
             navigation.currLocation === navigation.discoverSections[2]
@@ -113,29 +113,29 @@ app.run(function ($rootScope, $route, $location, appState, $window, chrome) {
               $location.search().tab !== 'welcome'
             ) {
               $window.history.pushState(
-                { page: 'wazuh#' + navigation.discoverPrevious },
+                { page: chrome.addBasePath('wazuh#' + navigation.discoverPrevious) },
                 '',
-                'wazuh#' + navigation.discoverPrevious
+                chrome.addBasePath('wazuh#' + navigation.discoverPrevious)
               );
               $window.history.pushState(
                 {
                   page:
-                    'wazuh#' +
-                    navigation.discoverPrevious +
-                    '?agent=' +
-                    $location.search().agent
+                    chrome.addBasePath('wazuh#' +
+                      navigation.discoverPrevious +
+                      '?agent=' +
+                      $location.search().agent)
                 },
                 '',
-                'wazuh#' +
-                navigation.discoverPrevious +
-                '?agent=' +
-                $location.search().agent
+                chrome.addBasePath('wazuh#' +
+                  navigation.discoverPrevious +
+                  '?agent=' +
+                  $location.search().agent)
               );
             } else {
               $window.history.pushState(
-                { page: 'wazuh#' + navigation.discoverPrevious },
+                { page: chrome.addBasePath('wazuh#' + navigation.discoverPrevious) },
                 '',
-                'wazuh#' + navigation.discoverPrevious
+                chrome.addBasePath('wazuh#' + navigation.discoverPrevious)
               );
             }
           } else if (
@@ -143,26 +143,26 @@ app.run(function ($rootScope, $route, $location, appState, $window, chrome) {
             navigation.currLocation === navigation.discoverSections[3]
           ) {
             $window.history.pushState(
-              { page: 'wazuh#' + navigation.discoverPrevious },
+              { page: chrome.addBasePath('wazuh#' + navigation.discoverPrevious) },
               '',
-              'wazuh#' + navigation.discoverPrevious
+              chrome.addBasePath('wazuh#' + navigation.discoverPrevious)
             );
           }
           $window.history.pushState(
-            { page: '/app/wazuh#' + $location.$$url },
+            { page: chrome.addBasePath('/app/wazuh#' + $location.$$url) },
             '',
-            '/app/wazuh#' + $location.$$url
+            chrome.addBasePath('/app/wazuh#' + $location.$$url)
           );
         } else if ($location.search().tabView === 'cluster-monitoring') {
           $window.history.pushState(
-            { page: '/app/wazuh#/manager//' },
+            { page: chrome.addBasePath('/app/wazuh#/manager//') },
             '',
-            '/app/wazuh#/manager//'
+            chrome.addBasePath('/app/wazuh#/manager//')
           );
           $window.history.pushState(
             { page: '/app/wazuh#' + $location.$$url },
             '',
-            '/app/wazuh#' + $location.$$url
+            chrome.addBasePath('/app/wazuh#' + $location.$$url)
           );
         }
       }
