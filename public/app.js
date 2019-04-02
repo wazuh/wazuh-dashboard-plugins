@@ -50,21 +50,6 @@ app.config([
 ]);
 
 app.run(function($rootScope, $route, $location, appState, $window, chrome) {
-  $window.onresize = function() {
-    if ($window.innerWidth >= 1200) {
-      document.getElementById(
-        'wz-logo'
-      ).style.backgroundImage = `url(${chrome.addBasePath(
-        '/plugins/wazuh/img/new_logo_white.svg'
-      )})`;
-    } else {
-      document.getElementById(
-        'wz-logo'
-      ).style.backgroundImage = `url(${chrome.addBasePath(
-        '/plugins/wazuh/img/new_logo_white_wolf.svg'
-      )})`;
-    }
-  };
   appState.setNavigation({ status: false });
   appState.setNavigation({
     reloaded: false,
