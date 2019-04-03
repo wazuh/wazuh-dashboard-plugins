@@ -20,177 +20,180 @@ export class ConfigurationController {
    * @param {*} apiReq
    * @param {*} appState
    */
-  constructor($scope, $rootScope, $location, errorHandler, apiReq, appState) {
+  constructor($scope, $location, errorHandler, apiReq, appState) {
     this.$scope = $scope;
-    this.$rootScope = $rootScope;
     this.errorHandler = errorHandler;
     this.apiReq = apiReq;
     this.appState = appState;
     this.$location = $location;
-    this.$scope.load = false;
-    this.$scope.isArray = Array.isArray;
+    this.load = false;
+    this.isArray = Array.isArray;
     this.configurationHandler = new ConfigurationHandler(apiReq, errorHandler);
-    this.$scope.currentConfig = null;
-    this.$scope.configurationTab = '';
-    this.$scope.configurationSubTab = '';
-    this.$scope.integrations = {};
-    this.$scope.selectedItem = 0;
-    this.$scope.showHelp = false;
+    this.currentConfig = null;
+    this.configurationTab = '';
+    this.configurationSubTab = '';
+    this.integrations = {};
+    this.selectedItem = 0;
+    this.showHelp = false;
   }
 
   /**
    * When controller loads
    */
   $onInit() {
-    this.$scope.getXML = () => this.configurationHandler.getXML(this.$scope);
-    this.$scope.getJSON = () => this.configurationHandler.getJSON(this.$scope);
-    this.$scope.isString = item => typeof item === 'string';
-    this.$scope.changeNode = node => this.changeNode(node);
-    this.$scope.hasSize = obj =>
-      obj && typeof obj === 'object' && Object.keys(obj).length;
+    this.$scope.getXML = () => this.configurationHandler.getXML(this.$scope); 
+
+    this.$scope.getJSON = () => this.configurationHandler.getJSON(this.$scope); 
+
     this.$scope.switchConfigTab = (
       configurationTab,
       sections,
       navigate = true
-    ) => {
-      this.appState.setNavigation({ status: true });
-      this.$scope.navigate = navigate;
-      try {
-        this.$scope.configSubTab = JSON.stringify({
-          configurationTab: configurationTab,
-          sections: sections
-        });
-        if (!this.$location.search().configSubTab) {
-          this.appState.setSessionStorageItem(
-            'configSubTab',
-            this.$scope.configSubTab
-          );
-          this.$scope.$emit('setCurrentConfiguration', {
-            currentConfiguration: configurationTab
-          });
-          this.$location.search('configSubTab', true);
-        }
-      } catch (error) {
-        this.errorHandler.handle(error, 'Set configuration path');
-      }
+    ) => this.switchConfigTab(configurationTab, sections, navigate);
 
-      this.configurationHandler.switchConfigTab(
-        configurationTab,
-        sections,
-        this.$scope,
-        false,
-        (this.$scope.mctrl || {}).selectedNode
-      );
-    };
-
-    /**
-     * Navigate to woodle
-     */
-    this.$scope.switchWodle = (wodleName, navigate = true) => {
-      this.appState.setNavigation({ status: true });
-      this.$scope.navigate = navigate;
-      this.$scope.configWodle = wodleName;
-      if (!this.$location.search().configWodle) {
-        this.$scope.$emit('setCurrentConfiguration', {
-          currentConfiguration: wodleName
-        });
-        this.$location.search('configWodle', this.$scope.configWodle);
-      }
-      this.configurationHandler.switchWodle(
-        wodleName,
-        this.$scope,
-        false,
-        (this.$scope.mctrl || {}).selectedNode
-      );
-    };
-
-    /**
-     * Navigate to configuration
-     */
-    this.$scope.switchConfigurationTab = (configurationTab, navigate) => {
-      this.$scope.editionTab = '';
-      this.$scope.navigate = navigate;
-      this.configurationHandler.switchConfigurationTab(
-        configurationTab,
-        this.$scope
-      );
-
-      if (!this.$scope.navigate) {
-        let configSubTab = this.$location.search().configSubTab;
-        if (configSubTab) {
-          try {
-            const config = this.appState.getSessionStorageItem('configSubTab');
-            const configSubTabObj = JSON.parse(config);
-            if (!configSubTabObj) return;
-            this.$scope.$emit('setCurrentConfiguration', {
-              currentConfiguration: configSubTabObj.configurationTab
-            });
-            this.$scope.switchConfigTab(
-              configSubTabObj.configurationTab,
-              configSubTabObj.sections,
-              false
-            );
-          } catch (error) {
-            this.errorHandler.handle(error, 'Get configuration path');
-          }
-        } else {
-          let configWodle = this.$location.search().configWodle;
-          if (configWodle) {
-            this.$scope.$emit('setCurrentConfiguration', {
-              currentConfiguration: configWodle
-            });
-            this.$scope.switchWodle(configWodle, false);
-          }
-        }
-      } else {
-        this.$location.search('configSubTab', null);
-        this.appState.removeSessionStorageItem('configSubTab');
-        this.$location.search('configWodle', null);
-      }
-    };
-
-    /**
-     * Navigate to configuration sub tab
-     */
     this.$scope.switchConfigurationSubTab = configurationSubTab =>
-      this.configurationHandler.switchConfigurationSubTab(
-        configurationSubTab,
-        this.$scope
-      );
-    this.$scope.updateSelectedItem = i => (this.$scope.selectedItem = i);
-    this.$scope.getIntegration = list =>
-      this.configurationHandler.getIntegration(list, this.$scope);
+      this.switchConfigurationSubTab(configurationSubTab);
+
+    this.$scope.switchWodle = (wodleName, navigate = true) =>
+      this.switchWodle(wodleName, navigate);
+
+    this.isString = item => typeof item === 'string';
+
+    this.hasSize = obj =>
+      obj && typeof obj === 'object' && Object.keys(obj).length;
+
+    this.updateSelectedItem = i => (this.selectedItem = i);
+
+    this.getIntegration = list =>
+      this.configurationHandler.getIntegration(list, this.$scope); 
 
     this.$scope.$on('$routeChangeStart', () =>
       this.appState.removeSessionStorageItem('configSubTab')
     );
 
-    const reloadConfig = params => {
-      if ((params || {}).globalConfigTab) {
-        this.$scope.configurationTab = '';
-        this.$scope.editionTab = params.globalConfigTab;
-        if ((params || {}).reloadConfigSubTab) {
-          this.$location.search('configSubTab', null);
-          this.appState.removeSessionStorageItem('configSubTab');
-        }
-        this.$scope.$emit('removeCurrentConfiguration', {});
-      } else {
-        this.$scope.editionTab = '';
-        this.$scope.switchConfigurationTab('welcome', true);
+    this.$scope.$on('configurationIsReloaded', (event, params) => {
+      this.reloadConfig(params);
+    });
+
+    this.$scope.$on('configNodeChanged', () => {
+      if (!this.configurationTab || !this.configurationTab.length) {
+        this.configurationTab = 'welcome';
       }
-      this.$scope.$applyAsync();
-    };
-
-    this.$scope.$on('configurationIsReloaded', (event, params, $e) => {
-      reloadConfig(params);
+      this.switchConfigurationTab(this.configurationTab, false, true);
     });
+  }
 
-    this.$scope.$on('configNodeChanged', (ev, params) => {
-      this.$scope.switchConfigurationTab(
-        this.$scope.configurationTab,
-        false,
-        true
-      );
-    });
+  switchConfigurationSubTab(configurationSubTab) {
+    return this.configurationHandler.switchConfigurationSubTab(
+      configurationSubTab,
+      this.$scope 
+    );
+  }
+
+  /**
+   * Navigate to woodle
+   */
+  switchWodle(wodleName, navigate = true) {
+    this.appState.setNavigation({ status: true });
+    this.navigate = navigate;
+    this.configWodle = wodleName;
+    if (!this.$location.search().configWodle) {
+      this.$scope.$emit('setCurrentConfiguration', {
+        currentConfiguration: wodleName
+      });
+      this.$location.search('configWodle', this.configWodle);
+    }
+    this.configurationHandler.switchWodle(
+      wodleName,
+      this.$scope, 
+      false,
+      (this.$scope.mctrl || {}).selectedNode
+    );
+  }
+
+  /**
+   * Navigate to configuration
+   */
+  switchConfigurationTab(configurationTab, navigate) {
+    this.$scope.mctrl.editionTab = '';
+    this.navigate = navigate;
+    this.configurationHandler.switchConfigurationTab(
+      configurationTab,
+      this.$scope 
+    );
+
+    if (!this.navigate) {
+      let configSubTab = this.$location.search().configSubTab;
+      if (configSubTab) {
+        try {
+          const config = this.appState.getSessionStorageItem('configSubTab');
+          const configSubTabObj = JSON.parse(config);
+          if (!configSubTabObj) return;
+          this.$scope.$emit('setCurrentConfiguration', {
+            currentConfiguration: configSubTabObj.configurationTab
+          });
+          this.switchConfigTab(
+            configSubTabObj.configurationTab,
+            configSubTabObj.sections,
+            false
+          );
+        } catch (error) {
+          this.errorHandler.handle(error.message || error);
+        }
+      } else {
+        let configWodle = this.$location.search().configWodle;
+        if (configWodle) {
+          this.$scope.$emit('setCurrentConfiguration', {
+            currentConfiguration: configWodle
+          });
+          this.switchWodle(configWodle, false);
+        }
+      }
+    } else {
+      this.$location.search('configSubTab', null);
+      this.appState.removeSessionStorageItem('configSubTab');
+      this.$location.search('configWodle', null);
+    }
+  }
+
+  reloadConfig(params) {
+    if ((params || {}).globalConfigTab) {
+      this.configurationTab = '';
+      this.$scope.mctrl.editionTab = params.globalConfigTab;
+      if ((params || {}).reloadConfigSubTab) {
+        this.$location.search('configSubTab', null);
+        this.appState.removeSessionStorageItem('configSubTab');
+      }
+      this.$scope.$emit('removeCurrentConfiguration', {});
+    } else {
+      this.$scope.mctrl.editionTab = '';
+      this.switchConfigurationTab('welcome', true);
+    }
+    this.$scope.$applyAsync();
+  }
+
+  switchConfigTab(configurationTab, sections, navigate = true) {
+    this.appState.setNavigation({ status: true });
+    this.navigate = navigate;
+    try {
+      this.configSubTab = JSON.stringify({ configurationTab, sections });
+      if (!this.$location.search().configSubTab) {
+        this.appState.setSessionStorageItem('configSubTab', this.configSubTab);
+        this.$scope.$emit('setCurrentConfiguration', {
+          currentConfiguration: configurationTab
+        });
+        this.$location.search('configSubTab', true);
+      }
+    } catch (error) {
+      this.errorHandler.handle(error, 'Set configuration path');
+    }
+
+    this.configurationHandler.switchConfigTab(
+      configurationTab,
+      sections,
+      this.$scope, 
+      false,
+      (this.$scope.mctrl || {}).selectedNode
+    );
   }
 }

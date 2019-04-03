@@ -9,20 +9,22 @@
     </div>
     <!-- End headline -->
 
-    <!-- Loading ring -->
-    <div class='uil-ring-css' ng-show="load">
-        <div></div>
+    <div class="md-padding md-padding-top-16" ng-if="load">
+        <react-component name="EuiProgress" props="{size: 'xs', color: 'primary'}" />
     </div>
 
     <!-- This section contains the main content and the right sidenav -->
     <div flex="auto" layout="row" ng-if="!load">
 
         <!-- No configuration section -->
-        <wz-no-config flex error="currentConfig['integrator-integration']" ng-if="currentConfig['integrator-integration'] && isString(currentConfig['integrator-integration'])"></wz-no-config>
+        <wz-no-config flex error="currentConfig['integrator-integration']"
+            ng-if="currentConfig['integrator-integration'] && isString(currentConfig['integrator-integration'])">
+        </wz-no-config>
         <!-- End no configuration section -->
 
         <!-- This section is the main content -->
-        <div flex layout="column" ng-if="currentConfig['integrator-integration'] && !isString(currentConfig['integrator-integration'])">
+        <div flex layout="column"
+            ng-if="currentConfig['integrator-integration'] && !isString(currentConfig['integrator-integration'])">
 
             <!-- VirusTotal integration card -->
             <md-card class="wz-md-card" ng-if="!JSONContent && !XMLContent">
@@ -35,23 +37,30 @@
                             </div>
                         </div>
                         <span flex></span>
-                        <span ng-class="JSONContent ? 'wz-text-active' : ''" class="wz-text-link small" ng-click="getJSON()">JSON</span>
+                        <span ng-class="JSONContent ? 'wz-text-active' : ''" class="wz-text-link small"
+                            ng-click="getJSON()">JSON</span>
                         <span class="small">&nbsp;&centerdot;&nbsp;</span>
-                        <span ng-class="XMLContent ? 'wz-text-active' : ''" class="wz-text-link small" ng-click="getXML()">XML</span>
+                        <span ng-class="XMLContent ? 'wz-text-active' : ''" class="wz-text-link small"
+                            ng-click="getXML()">XML</span>
                     </div>
                     <md-divider class="wz-margin-top-10"></md-divider>
 
                     <!-- Configuration block -->
                     <div class="wz-padding-top-10" ng-if="integrations['virustotal']">
-                        <wz-config-item label="Filter alerts by this level or above" value="integrations['virustotal'].level">
+                        <wz-config-item label="Filter alerts by this level or above"
+                            value="integrations['virustotal'].level">
                         </wz-config-item>
-                        <wz-config-item label="Filter alerts by this rule IDs" value="integrations['virustotal'].rule_id">
+                        <wz-config-item label="Filter alerts by this rule IDs"
+                            value="integrations['virustotal'].rule_id">
                         </wz-config-item>
-                        <wz-config-item label="Filter alerts by this rule groups" value="integrations['virustotal'].group">
+                        <wz-config-item label="Filter alerts by this rule groups"
+                            value="integrations['virustotal'].group">
                         </wz-config-item>
-                        <wz-config-item label="Filter alerts by location (agent, IP or file)" value="integrations['virustotal'].event_location">
+                        <wz-config-item label="Filter alerts by location (agent, IP or file)"
+                            value="integrations['virustotal'].event_location">
                         </wz-config-item>
-                        <wz-config-item label="Used format to write alerts" value="integrations['virustotal'].alert_format">
+                        <wz-config-item label="Used format to write alerts"
+                            value="integrations['virustotal'].alert_format">
                         </wz-config-item>
 
                     </div>
@@ -70,13 +79,15 @@
 
                         <wz-config-item label="Hook URL" value="integrations['slack'].hook_url">
                         </wz-config-item>
-                        <wz-config-item label="Filter alerts by this level or above" value="integrations['slack'].level">
+                        <wz-config-item label="Filter alerts by this level or above"
+                            value="integrations['slack'].level">
                         </wz-config-item>
                         <wz-config-item label="Filter alerts by this rule IDs" value="integrations['slack'].rule_id">
                         </wz-config-item>
                         <wz-config-item label="Filter alerts by this rule groups" value="integrations['slack'].group">
                         </wz-config-item>
-                        <wz-config-item label="Filter alerts by location (agent, IP or file)" value="integrations['slack'].event_location">
+                        <wz-config-item label="Filter alerts by location (agent, IP or file)"
+                            value="integrations['slack'].event_location">
                         </wz-config-item>
                         <wz-config-item label="Used format to write alerts" value="integrations['slack'].alert_format">
                         </wz-config-item>
@@ -96,15 +107,20 @@
                     <!-- Configuration block -->
                     <div class="wz-padding-top-10" ng-if="integrations['pagerduty']">
 
-                        <wz-config-item label="Filter alerts by this level or above" value="integrations['pagerduty'].level">
+                        <wz-config-item label="Filter alerts by this level or above"
+                            value="integrations['pagerduty'].level">
                         </wz-config-item>
-                        <wz-config-item label="Filter alerts by this rule IDs" value="integrations['pagerduty'].rule_id">
+                        <wz-config-item label="Filter alerts by this rule IDs"
+                            value="integrations['pagerduty'].rule_id">
                         </wz-config-item>
-                        <wz-config-item label="Filter alerts by this rule groups" value="integrations['pagerduty'].group">
+                        <wz-config-item label="Filter alerts by this rule groups"
+                            value="integrations['pagerduty'].group">
                         </wz-config-item>
-                        <wz-config-item label="Filter alerts by location (agent, IP or file)" value="integrations['pagerduty'].event_location">
+                        <wz-config-item label="Filter alerts by location (agent, IP or file)"
+                            value="integrations['pagerduty'].event_location">
                         </wz-config-item>
-                        <wz-config-item label="Used format to write alerts" value="integrations['pagerduty'].alert_format">
+                        <wz-config-item label="Used format to write alerts"
+                            value="integrations['pagerduty'].alert_format">
                         </wz-config-item>
 
                     </div>
@@ -113,22 +129,28 @@
             </md-card>
             <!-- End VirusTotal integration card -->
 
-            <wz-config-viewer flex getjson="getJSON()" getxml="getXML()" jsoncontent="JSONContent" xmlcontent="XMLContent" />
+            <wz-config-viewer flex getjson="getJSON()" getxml="getXML()" jsoncontent="JSONContent"
+                xmlcontent="XMLContent" />
 
         </div>
         <!-- End main content section -->
 
         <!-- This section is the right sidenav content -->
         <md-sidenav class="md-sidenav-right" style="width: auto !important;" md-is-locked-open="true">
-            <span class="wz-margin-right-8 wz-text-link wz-text-right wz-margin-top-8" ng-click="showHelp = !showHelp"><i
-                    class="fa fa-fw fa-question-circle-o"></i></span>
+            <span class="wz-margin-right-8 wz-text-link wz-text-right wz-margin-top-8"
+                ng-click="showHelp = !showHelp"><i class="fa fa-fw fa-question-circle-o"></i></span>
             <md-list ng-if="showHelp">
                 <md-subheader>More info about this section</md-subheader>
-                <md-list-item target="_blank" class="wz-text-link" ng-href="https://documentation.wazuh.com/current/user-manual/manager/manual-integration.html">How
+                <md-list-item target="_blank" class="wz-text-link"
+                    ng-href="https://documentation.wazuh.com/current/user-manual/manager/manual-integration.html">How
                     to integrate Wazuh with external APIs</md-list-item>
-                <md-list-item target="_blank" class="wz-text-link" ng-href="https://documentation.wazuh.com/current/user-manual/capabilities/virustotal-scan/index.html">VirusTotal
+                <md-list-item target="_blank" class="wz-text-link"
+                    ng-href="https://documentation.wazuh.com/current/user-manual/capabilities/virustotal-scan/index.html">
+                    VirusTotal
                     integration documentation</md-list-item>
-                <md-list-item target="_blank" class="wz-text-link" ng-href="https://documentation.wazuh.com/current/user-manual/reference/ossec-conf/integration.html">Integration
+                <md-list-item target="_blank" class="wz-text-link"
+                    ng-href="https://documentation.wazuh.com/current/user-manual/reference/ossec-conf/integration.html">
+                    Integration
                     reference</md-list-item>
             </md-list>
         </md-sidenav>

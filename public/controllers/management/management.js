@@ -94,13 +94,13 @@ export class ManagementController {
     });
     this.$rootScope.$on('setRestarting', () => {
       if (this.clusterInfo.status === 'enabled') {
-        this.$scope.blockEditioncounter = 0;
-        this.$scope.blockEdition = true;
+        this.blockEditioncounter = 0;
+        this.blockEdition = true;
         this.$interval(
           () => {
-            this.$scope.blockEditioncounter++;
-            if (this.$scope.blockEditioncounter == 100) {
-              this.$scope.blockEdition = false;
+            this.blockEditioncounter++;
+            if (this.blockEditioncounter == 100) {
+              this.blockEdition = false;
               this.isRestarting = false;
               this.$scope.$applyAsync();
             }
@@ -114,7 +114,7 @@ export class ManagementController {
     });
 
     this.$rootScope.$on('removeBlockEdition', () => {
-      this.$scope.blockEdition = false;
+      this.blockEdition = false;
       this.isRestarting = false;
       this.$scope.$applyAsync();
     });
@@ -139,13 +139,16 @@ export class ManagementController {
   $onInit() {
     this.clusterInfo = this.appState.getClusterInfo();
     const configuration = this.wazuhConfig.getConfig();
-    this.$scope.adminMode = !!(configuration || {}).admin;
+    this.adminMode = !!(configuration || {}).admin;
+
     if (this.shareAgent.getAgent() && this.shareAgent.getSelectedGroup()) {
       this.tab = 'groups';
       this.switchTab(this.tab);
       return;
     }
+
     const location = this.$location.search();
+
     if (location && location.tab) {
       this.tab = location.tab;
       this.switchTab(this.tab);
@@ -196,11 +199,12 @@ export class ManagementController {
   }
 
   setConfigTab(tab, nav = false) {
+
     this.globalConfigTab = tab;
     if (nav) {
       this.appState.setNavigation({ status: true });
     } else {
-      this.$scope.editionTab = tab;
+      this.editionTab = tab;
     }
     this.$location.search('configSubTab', null);
     this.$location.search('editSubTab', tab);
@@ -296,7 +300,6 @@ export class ManagementController {
       this.loadingNodes = true;
       const clusterInfo = this.appState.getClusterInfo() || {};
       const clusterEnabled = clusterInfo.status === 'enabled';
-      console.log('clusterEnabled', clusterEnabled);
       if (clusterEnabled) {
         const response = await this.apiReq.request('GET', '/cluster/nodes', {});
         const nodeList =

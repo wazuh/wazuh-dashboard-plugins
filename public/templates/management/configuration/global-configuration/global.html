@@ -10,6 +10,8 @@
     <wz-no-config flex error="'not-present'"
         ng-if="currentConfig['analysis-global'] && !isString(currentConfig['analysis-global']) && !currentConfig['analysis-global'].global">
     </wz-no-config>
+    <wz-no-config flex error="'Wazuh not ready yet'"
+        ng-if="wazuhNotReadyYet && (!currentConfig || !currentConfig['analysis-global'])" />
     <!-- End no configuration section -->
 
     <!-- This section is the main content -->

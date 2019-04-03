@@ -268,9 +268,7 @@ export class HealthCheck {
       if (!this.errors || !this.errors.length) {
         await this.$timeout(800);
         this.$window.location.assign(
-          chrome.addBasePath(
-            'wazuh#' + this.$rootScope.previousLocation || ''
-          )
+          chrome.addBasePath('wazuh#' + this.$rootScope.previousLocation || '')
         );
         return;
       }

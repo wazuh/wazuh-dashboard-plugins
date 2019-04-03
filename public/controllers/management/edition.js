@@ -27,7 +27,9 @@ export class EditionController {
     errorHandler,
     apiReq,
     appState,
-    configHandler
+    configHandler,
+    $rootScope,
+    checkDaemonsStatus
   ) {
     this.$scope = $scope;
     this.errorHandler = errorHandler;
@@ -35,12 +37,14 @@ export class EditionController {
     this.appState = appState;
     this.configHandler = configHandler;
     this.$location = $location;
-    this.$scope.load = false;
+    this.$rootScope = $rootScope;
+    this.checkDaemonsStatus = checkDaemonsStatus;
+    this.load = false;
     this.configurationHandler = new ConfigurationHandler(apiReq, errorHandler);
-    this.$scope.selectedNode = false;
-    this.$scope.nodes = [];
-    this.$scope.editingFile = false;
-    this.$scope.fetchedXML = false;
+    this.selectedNode = false;
+    this.nodes = [];
+    this.editingFile = false;
+    this.fetchedXML = false;
   }
 
   /**
@@ -48,160 +52,151 @@ export class EditionController {
    */
   $onInit() {
     this.init();
-
-    /**
-     * Edit master/worker node configuration if cluster is enabled, otherwise edit manager configuration
-     */
-    const fetchFile = async () => {
-      try {
-        let data = false;
-        let xml = false;
-        const clusterStatus =
-          ((this.$scope.clusterStatus || {}).data || {}).data || {};
-        if (
-          clusterStatus.enabled === 'yes' &&
-          clusterStatus.running === 'yes'
-        ) {
-          data = await this.apiReq.request(
-            'GET',
-            `/cluster/${this.$scope.selectedNode}/files`,
-            { path: 'etc/ossec.conf' }
-          );
-        } else {
-          data = await this.apiReq.request('GET', `/manager/files`, {
-            path: 'etc/ossec.conf'
-          });
-        }
-
-        xml = ((data || {}).data || {}).data || false;
-        if (!xml) {
-          throw new Error('Could not fetch configuration file');
-        }
-        xml = xml.replace(/..xml.+\?>/, '');
-        return xml;
-      } catch (error) {
-        return Promise.reject(error);
-      }
-    };
-
-    this.$scope.editConf = async () => {
-      this.$scope.editingFile = true;
-      this.$scope.fetchedXML = false;
-      try {
-        this.$scope.fetchedXML = await fetchFile();
-        this.$scope.$broadcast('fetchedFile', { data: this.$scope.fetchedXML });
-      } catch (error) {
-        this.$scope.fetchedXML = null;
-        this.errorHandler.handle(error, 'Fetch file error');
-      }
-      this.$scope.$applyAsync();
-    };
-
-    this.$scope.restartNode = async selectedNode => {
-      try {
-        this.$scope.$emit('setRestarting', {});
-        this.$scope.$broadcast('removeRestartMsg', {});
-        this.$scope.isRestarting = true;
-        this.$scope.clusterStatus = await this.apiReq.request(
-          'GET',
-          '/cluster/status',
-          {}
-        );
-
-        const clusterStatus =
-          ((this.$scope.clusterStatus || {}).data || {}).data || {};
-        if (
-          (clusterStatus.enabled === 'yes' &&
-            clusterStatus.running === 'yes') ||
-          (clusterStatus.enabled === 'no' && clusterStatus.running === 'yes')
-        ) {
-          await this.configHandler.restartNode(selectedNode);
-        } else {
-          await this.configHandler.restartManager();
-        }
-        this.$scope.$emit('removeRestarting', {});
-        this.$scope.isRestarting = false;
-        this.$scope.$applyAsync();
-      } catch (error) {
-        this.errorHandler.handle(
-          error.message || error,
-          'Error restarting node'
-        );
-        this.$scope.$emit('removeBlockEdition', {});
-        this.$scope.$emit('removeRestarting', {});
-        this.$scope.isRestarting = false;
-      }
-    };
-
-    this.$scope.toggleSaveConfig = () => {
-      this.$scope.doingSaving = false;
-      this.$scope.$applyAsync();
-    };
-
-    this.$scope.saveConfiguration = async () => {
-      try {
-        const clusterStatus =
-          ((this.$scope.clusterStatus || {}).data || {}).data || {};
-        const enabledAndRunning =
-          clusterStatus.enabled === 'yes' && clusterStatus.running === 'yes';
-        const parameters = enabledAndRunning
-          ? {
-              node: this.$scope.selectedNode,
-              showRestartManager: 'cluster'
-            }
-          : {
-              manager: this.$scope.selectedNode,
-              showRestartManager: 'manager'
-            };
-        this.$scope.doingSaving = true;
-        this.$scope.$applyAsync();
-        this.$scope.$broadcast('saveXmlFile', parameters);
-      } catch (error) {
-        this.$scope.fetchedXML = null;
-        this.$scope.doingSaving = false;
-        this.errorHandler.handle(error, 'Save file error');
-      }
-    };
-
-    this.$scope.xmlIsValid = valid => {
-      this.$scope.xmlHasErrors = valid;
-      this.$scope.$applyAsync();
-    };
-
-    this.$scope.changeNode = () => {
-      this.$scope.restartBtn = false;
-      this.$scope.editConf();
-    };
-
     this.$scope.$on('showRestart', () => {
-      this.$scope.restartBtn = true;
+      this.restartBtn = true;
       this.$scope.$applyAsync();
     });
   }
 
-  async init() {
+  xmlIsValid(valid) {
+    this.xmlHasErrors = valid;
+    this.$scope.$applyAsync();
+  }
+
+  changeNode() {
+    this.restartBtn = false;
+    this.editConf();
+  }
+
+  async saveConfiguration() {
     try {
-      this.$scope.clusterStatus = await this.apiReq.request(
+      this.doingSaving = true;
+      const clusterStatus = ((this.clusterStatus || {}).data || {}).data || {};
+      const enabledAndRunning =
+        clusterStatus.enabled === 'yes' && clusterStatus.running === 'yes';
+      const parameters = enabledAndRunning
+        ? {
+            node: this.selectedNode,
+            showRestartManager: 'cluster'
+          }
+        : {
+            manager: this.selectedNode,
+            showRestartManager: 'manager'
+          };
+      this.$scope.$applyAsync();
+      this.$scope.$broadcast('saveXmlFile', parameters);
+    } catch (error) {
+      this.fetchedXML = null;
+      this.doingSaving = false;
+      this.errorHandler.handle(error.message || error);
+    }
+  }
+
+  toggleSaveConfig() {
+    this.doingSaving = false;
+    this.$scope.$applyAsync();
+  }
+
+  async restartNode(selectedNode) {
+    try {
+      this.$scope.$emit('setRestarting', {});
+      this.$scope.$broadcast('removeRestartMsg', {});
+      this.isRestarting = true;
+      this.clusterStatus = await this.apiReq.request(
         'GET',
         '/cluster/status',
         {}
       );
-      const clusterStatus =
-        ((this.$scope.clusterStatus || {}).data || {}).data || {};
+
+      const clusterStatus = ((this.clusterStatus || {}).data || {}).data || {};
+
+      const isCluster =
+        clusterStatus.enabled === 'yes' && clusterStatus.running === 'yes';
+
+      (await isCluster)
+        ? this.configHandler.restartNode(selectedNode)
+        : this.configHandler.restartManager();
+      this.$rootScope.wazuhNotReadyYet = `Restarting ${
+        isCluster ? selectedNode : 'manager'
+      }, please wait. `;
+      this.checkDaemonsStatus.makePing();
+      this.isRestarting = false;
+      this.$scope.$applyAsync();
+    } catch (error) {
+      this.errorHandler.handle(error.message || error);
+      this.$scope.$emit('removeBlockEdition', {});
+      this.$scope.$emit('removeRestarting', {});
+      this.isRestarting = false;
+    }
+  }
+
+  async editConf() {
+    this.editingFile = true;
+    this.fetchedXML = false;
+    try {
+      this.fetchedXML = await this.fetchFile();
+      this.$scope.$broadcast('fetchedFile', { data: this.$scope.fetchedXML });
+    } catch (error) {
+      this.fetchedXML = null;
+      this.errorHandler.handle(error.message || error);
+    }
+    this.$scope.$applyAsync();
+  }
+
+  /**
+   * Edit master/worker node configuration if cluster is enabled, otherwise edit manager configuration
+   */
+  async fetchFile() {
+    try {
+      const clusterStatus = ((this.clusterStatus || {}).data || {}).data || {};
+
+      const clusterEnabled =
+        clusterStatus.enabled === 'yes' && clusterStatus.running === 'yes';
+
+      const data = await this.apiReq.request(
+        'GET',
+        clusterEnabled
+          ? `/cluster/${this.selectedNode}/files`
+          : `/manager/files`,
+        { path: 'etc/ossec.conf' }
+      );
+
+      let xml = ((data || {}).data || {}).data || false;
+
+      if (!xml) {
+        throw new Error('Could not fetch configuration file');
+      }
+
+      xml = xml.replace(/..xml.+\?>/, '');
+
+      return xml;
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  }
+
+  async init() {
+    try {
+      this.clusterStatus = await this.apiReq.request(
+        'GET',
+        '/cluster/status',
+        {}
+      );
+      const clusterStatus = ((this.clusterStatus || {}).data || {}).data || {};
       if (clusterStatus.enabled === 'yes' && clusterStatus.running === 'yes') {
         const nodes = await this.apiReq.request('GET', '/cluster/nodes', {});
         const items = nodes.data.data.items;
-        this.$scope.nodes = items.reverse();
+        this.nodes = items.reverse();
         const masterNode = items.filter(item => item.type === 'master')[0];
-        this.$scope.selectedNode = masterNode.name;
+        this.selectedNode = masterNode.name;
       } else {
-        this.$scope.selectedNode = 'manager';
+        this.selectedNode = 'manager';
       }
     } catch (error) {
-      this.errorHandler.handle(error, 'Error getting cluster status');
+      this.errorHandler.handle(error.message || error);
     }
 
-    this.$scope.editConf();
+    this.editConf();
     this.$scope.$applyAsync();
   }
 }

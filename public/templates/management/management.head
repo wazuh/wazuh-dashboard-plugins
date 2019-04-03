@@ -38,24 +38,28 @@
     <div layout="row" layout-align="start center" ng-if="mctrl.tab !== 'monitoring' && mctrl.tab === 'configuration'">
         <div layout-padding class="euiFlexGroup">
 
-            <div layout="row" ng-if="!mctrl.currentConfiguration" class="euiFlexItem">
+            <div layout="row" ng-if="!mctrl.currentConfiguration && mctrl.editionTab !== 'editconfiguration'"
+                class="euiFlexItem">
                 <span class="wz-text-link cursor-pointer euiBreadcrumb"
                     ng-click="mctrl.switchTab('welcome', true)">Management</span>
                 <span class="euiBreadcrumb"> / </span>
                 <span>{{ mctrl.tabNames[mctrl.tab] }}</span>
             </div>
 
-            <div layout="row" ng-if="mctrl.currentConfiguration" class="euiFlexItem">
+            <div layout="row" ng-if="mctrl.currentConfiguration || mctrl.editionTab === 'editconfiguration'"
+                class="euiFlexItem">
                 <span class="wz-text-link cursor-pointer euiBreadcrumb"
                     ng-click="mctrl.switchTab('welcome', true)">Management</span>
                 <span class="euiBreadcrumb"> / </span>
                 <span class="wz-text-link cursor-pointer euiBreadcrumb"
                     ng-click="mctrl.switchTab('configuration', true)">{{ mctrl.tabNames[mctrl.tab] }}</span>
-                <span> / {{ mctrl.tabNames[mctrl.currentConfiguration] || mctrl.currentConfiguration }} </span>
+                <span ng-if="mctrl.editionTab !== 'editconfiguration'"> /
+                    {{ mctrl.tabNames[mctrl.currentConfiguration] || mctrl.currentConfiguration }} </span>
             </div>
 
-            <div>
-                <select class="kuiSelect wz-border-none cursor-pointer height-35" ng-model="mctrl.selectedNode"
+            <div ng-if="!mctrl.editTab && clusterInfo.status === 'enabled'"
+                class="height-35 layout-align-center-stretch layout-column wz-margin-right-8 wz-select-input">
+                <select class="kuiSelect wz-border-none cursor-pointer" ng-model="mctrl.selectedNode"
                     ng-change="mctrl.changeNode(mctrl.selectedNode)">
                     <option ng-repeat="node in mctrl.nodeList" value="{{node}}">{{node}}</option>
                 </select>

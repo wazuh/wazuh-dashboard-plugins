@@ -10,6 +10,8 @@
         <!-- No configuration section -->
         <wz-no-config flex error="currentConfig['com-cluster']"
             ng-if="currentConfig['com-cluster'] && isString(currentConfig['com-cluster'])"></wz-no-config>
+        <wz-no-config flex error="'Wazuh not ready yet'"
+            ng-if="wazuhNotReadyYet && (!currentConfig || !currentConfig['com-cluster'])" />
         <!-- End no configuration section -->
 
         <!-- This section is the main content -->
@@ -20,7 +22,7 @@
                 <md-card-content>
                     <div layout="row" layout-align="start center">
                         <div>
-                            <span class="font-size-16"><strong>{{mctrl.selectedNode}}</strong> settings</span>
+                            <span class="font-size-16">{{mctrl.selectedNode}} settings</span>
                         </div>
                         <span flex></span>
                         <span ng-class="JSONContent ? 'wz-text-active' : ''" class="wz-text-link small"

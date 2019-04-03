@@ -2,12 +2,18 @@
 <div flex="auto" layout="row" ng-if="!load && configurationSubTab === 'general-alerts'">
 
     <!-- No configuration section -->
-    <wz-no-config flex error="currentConfig['analysis-alerts']" ng-if="currentConfig['analysis-alerts'] && isString(currentConfig['analysis-alerts'])"></wz-no-config>
-    <wz-no-config flex error="'not-present'" ng-if="currentConfig['analysis-alerts'] && !isString(currentConfig['analysis-alerts']) && !currentConfig['analysis-alerts'].alerts"></wz-no-config>
+    <wz-no-config flex error="currentConfig['analysis-alerts']"
+        ng-if="currentConfig['analysis-alerts'] && isString(currentConfig['analysis-alerts'])"></wz-no-config>
+    <wz-no-config flex error="'not-present'"
+        ng-if="currentConfig['analysis-alerts'] && !isString(currentConfig['analysis-alerts']) && !currentConfig['analysis-alerts'].alerts">
+    </wz-no-config>
+    <wz-no-config flex error="'Wazuh not ready yet'"
+        ng-if="wazuhNotReadyYet && (!currentConfig || !currentConfig['analysis-alerts'])" />
     <!-- End no configuration section -->
 
     <!-- This section is the main content -->
-    <div flex layout="column" ng-if="currentConfig['analysis-alerts'] && !isString(currentConfig['analysis-alerts']) && currentConfig['analysis-alerts'].alerts">
+    <div flex layout="column"
+        ng-if="currentConfig['analysis-alerts'] && !isString(currentConfig['analysis-alerts']) && currentConfig['analysis-alerts'].alerts">
 
         <!-- The main card will all the settings -->
         <md-card class="wz-md-card" ng-if="!JSONContent && !XMLContent">
@@ -20,20 +26,25 @@
                         </div>
                     </div>
                     <span flex></span>
-                    <span ng-class="JSONContent ? 'wz-text-active' : ''" class="wz-text-link small" ng-click="getJSON()">JSON</span>
+                    <span ng-class="JSONContent ? 'wz-text-active' : ''" class="wz-text-link small"
+                        ng-click="getJSON()">JSON</span>
                     <span class="small">&nbsp;&centerdot;&nbsp;</span>
-                    <span ng-class="XMLContent ? 'wz-text-active' : ''" class="wz-text-link small" ng-click="getXML()">XML</span>
+                    <span ng-class="XMLContent ? 'wz-text-active' : ''" class="wz-text-link small"
+                        ng-click="getXML()">XML</span>
                 </div>
                 <md-divider class="wz-margin-top-10"></md-divider>
 
                 <!-- Configuration block -->
                 <div class="wz-padding-top-10">
 
-                    <wz-config-item label="Minimum severity level to store the alert" value="currentConfig['analysis-alerts'].alerts.log_alert_level">
+                    <wz-config-item label="Minimum severity level to store the alert"
+                        value="currentConfig['analysis-alerts'].alerts.log_alert_level">
                     </wz-config-item>
-                    <wz-config-item label="Minimum severity level to send the alert by email" value="currentConfig['analysis-alerts'].alerts.email_alert_level">
+                    <wz-config-item label="Minimum severity level to send the alert by email"
+                        value="currentConfig['analysis-alerts'].alerts.email_alert_level">
                     </wz-config-item>
-                    <wz-config-item label="Enable GeoIP lookups" value="currentConfig['analysis-alerts'].use_geoip || 'no'">
+                    <wz-config-item label="Enable GeoIP lookups"
+                        value="currentConfig['analysis-alerts'].use_geoip || 'no'">
                     </wz-config-item>
 
                 </div>
@@ -42,7 +53,8 @@
         </md-card>
         <!-- End main card with all the settings -->
 
-        <wz-config-viewer flex getjson="getJSON()" getxml="getXML()" jsoncontent="JSONContent" xmlcontent="XMLContent" />
+        <wz-config-viewer flex getjson="getJSON()" getxml="getXML()" jsoncontent="JSONContent"
+            xmlcontent="XMLContent" />
 
     </div>
     <!-- End main content section -->
@@ -53,9 +65,11 @@
                 class="fa fa-fw fa-question-circle-o"></i></span>
         <md-list ng-if="showHelp">
             <md-subheader>More info about this section</md-subheader>
-            <md-list-item target="_blank" class="wz-text-link" ng-href="https://documentation.wazuh.com/current/getting-started/use-cases.html">Use
+            <md-list-item target="_blank" class="wz-text-link"
+                ng-href="https://documentation.wazuh.com/current/getting-started/use-cases.html">Use
                 cases about alerts generation</md-list-item>
-            <md-list-item target="_blank" class="wz-text-link" ng-href="https://documentation.wazuh.com/current/user-manual/reference/ossec-conf/alerts.html">Alerts
+            <md-list-item target="_blank" class="wz-text-link"
+                ng-href="https://documentation.wazuh.com/current/user-manual/reference/ossec-conf/alerts.html">Alerts
                 reference</md-list-item>
         </md-list>
     </md-sidenav>
