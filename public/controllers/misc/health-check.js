@@ -10,6 +10,7 @@
  * Find more information about this on the LICENSE file.
  */
 import { SavedObjectsClientProvider } from 'ui/saved_objects';
+import chrome from 'ui/chrome';
 
 export class HealthCheck {
   /**
@@ -178,7 +179,7 @@ export class HealthCheck {
             if (apiSplit[0] !== appSplit[0] || apiSplit[1] !== appSplit[1]) {
               this.errors.push(
                 'API version mismatch. Expected v' +
-                  setupData.data.data['app-version']
+                setupData.data.data['app-version']
               );
               this.results[i].status = 'Error';
             } else {
@@ -258,7 +259,9 @@ export class HealthCheck {
       if (!this.errors || !this.errors.length) {
         await this.$timeout(800);
         this.$window.location.assign(
-          '/app/wazuh#' + this.$rootScope.previousLocation || ''
+          chrome.addBasePath(
+            'wazuh#' + this.$rootScope.previousLocation || ''
+          )
         );
         return;
       }
@@ -275,7 +278,7 @@ export class HealthCheck {
    */
   goApp() {
     this.$window.location.assign(
-      '/app/wazuh#' + this.$rootScope.previousLocation || ''
+      chrome.addBasePath('wazuh#' + this.$rootScope.previousLocation || '')
     );
   }
 }
