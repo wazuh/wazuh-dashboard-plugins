@@ -52,7 +52,7 @@ export async function getWzConfig($q, genericReq, errorHandler, wazuhConfig) {
     const ymlContent = config.data.data;
 
     if (typeof ymlContent === 'object') {
-      // Replace default values by custom values from config.yml file
+      // Replace default values with custom values from config.yml file
       for (const key in ymlContent) {
         defaultConfig[key] = ymlContent[key];
       }
@@ -61,11 +61,8 @@ export async function getWzConfig($q, genericReq, errorHandler, wazuhConfig) {
     wazuhConfig.setConfig(defaultConfig);
   } catch (error) {
     wazuhConfig.setConfig(defaultConfig);
-    errorHandler.handle(
-      'Error parsing config.yml, using default values.',
-      'Config',
-      true
-    );
+    console.log('Error parsing config.yml, using default values.')
+    console.log(error.message || error)
   }
 
   return $q.resolve();
