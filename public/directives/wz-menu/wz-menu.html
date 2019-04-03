@@ -87,8 +87,9 @@
                 <react-component name="EuiIcon" props="{type:'help'}" />
                 {{wazuhNotReadyYet}}</span>
             <span flex></span>
-            <react-component ng-if="wazuhNotReadyYet === 'Wazuh not ready yet.'" name="EuiLoadingSpinner"
-                props="{size:'m'}" />
+            <react-component
+                ng-if="wazuhNotReadyYet === 'Wazuh not ready yet.' || wazuhNotReadyYet.includes('Restarting')"
+                name="EuiLoadingSpinner" props="{size:'m'}" />
             <button ng-if="wazuhNotReadyYet === 'Wazuh could not be recovered.'" class="kuiButton kuiButton--secondary"
                 ng-click="refresh()">
                 Refresh
