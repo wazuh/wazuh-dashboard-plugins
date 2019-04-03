@@ -26,7 +26,7 @@ export async function getWzConfig($q, genericReq, errorHandler, wazuhConfig) {
     'extensions.aws': false,
     'extensions.virustotal': false,
     'extensions.osquery': false,
-    timeout: 8000,
+    timeout: 20000,
     'wazuh.shards': 1,
     'wazuh.replicas': 0,
     'wazuh-version.shards': 1,
@@ -61,8 +61,8 @@ export async function getWzConfig($q, genericReq, errorHandler, wazuhConfig) {
     wazuhConfig.setConfig(defaultConfig);
   } catch (error) {
     wazuhConfig.setConfig(defaultConfig);
-    console.log('Error parsing config.yml, using default values.')
-    console.log(error.message || error)
+    console.log('Error parsing config.yml, using default values.');
+    console.log(error.message || error);
   }
 
   return $q.resolve();
