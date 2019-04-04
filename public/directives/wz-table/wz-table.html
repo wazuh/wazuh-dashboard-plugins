@@ -377,21 +377,8 @@
                         <md-card flex="" class="wz-md-card wz-padding-top-0 wz-padding-bottom-0 wz-no-margin _md flex">
                             <md-card-content>
                                 <div layout="row" class="wz-padding-top-10">
-                                    <table class="euiTable euiTable--responsive table table-striped table-condensed">
-                                        <tbody>
-                                            <tr ng-repeat="(key, value) in item"
-                                                ng-if="key !== 'expanded' && key !== 'showTooltip'"
-                                                ng-show="!isWindows() || (key !== 'inode' && key !== 'gid' && key !== 'gname')"
-                                                class="euiTableRow no-duo">
-                                                <td class="wz-word-break-rule ">{{key}}</td>
-                                                <td>
-                                                    <span class="wz-text-right color-grey">{{value}}</span>
-                                                </td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
+                                    <react-component name="EuiBasicTable" props="getSyscheckRowProps(item)" />
                                 </div>
-
                             </md-card-content>
                         </md-card>
                     </div>
