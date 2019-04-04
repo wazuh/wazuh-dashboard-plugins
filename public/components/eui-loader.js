@@ -15,7 +15,8 @@ import {
   EuiIcon,
   EuiSuperSelect,
   EuiLoadingSpinner,
-  EuiProgress
+  EuiProgress,
+  EuiBasicTable
 } from '@elastic/eui';
 
 const app = uiModules.get('app/wazuh', ['react']);
@@ -24,4 +25,5 @@ app
   .value('EuiIcon', EuiIcon)
   .value('EuiSuperSelect', EuiSuperSelect)
   .value('EuiLoadingSpinner', EuiLoadingSpinner)
-  .value('EuiProgress', EuiProgress);
+  .value('EuiProgress', EuiProgress)
+  .value('EuiBasicTable', EuiBasicTable);
