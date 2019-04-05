@@ -10,6 +10,7 @@
  * Find more information about this on the LICENSE file.
  */
 import { SavedObjectsClientProvider } from 'ui/saved_objects';
+import chrome from 'ui/chrome';
 
 export class HealthCheck {
   /**
@@ -258,7 +259,7 @@ export class HealthCheck {
       if (!this.errors || !this.errors.length) {
         await this.$timeout(800);
         this.$window.location.assign(
-          '/app/wazuh#' + this.$rootScope.previousLocation || ''
+          chrome.addBasePath('wazuh#' + this.$rootScope.previousLocation || '')
         );
         return;
       }
@@ -275,7 +276,7 @@ export class HealthCheck {
    */
   goApp() {
     this.$window.location.assign(
-      '/app/wazuh#' + this.$rootScope.previousLocation || ''
+      chrome.addBasePath('wazuh#' + this.$rootScope.previousLocation || '')
     );
   }
 }
