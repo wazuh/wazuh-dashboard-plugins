@@ -2,6 +2,15 @@
 
 All notable changes to the Wazuh app project will be documented in this file.
 
+## Wazuh v3.8.2 - Kibana v6.7.1 - Revision 420
+
+### Added
+
+- Support for Kibana v6.7.1
+
+### Fixed
+
+- Fixed reverse proxy related issues when using a base path [b849564](https://github.com/wazuh/wazuh-kibana-app/commit/b84956400f7ae7a3eafea273bffcd625b2613d49).
 
 ## Wazuh v3.8.2 - Kibana v6.6.0 / v6.6.1 / v6.6.2 / v6.7.0 - Revision 419
 

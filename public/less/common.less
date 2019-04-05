@@ -508,52 +508,26 @@ md-sidenav {
     height: auto;
 }
 
-@supports not (-moz-appearance:none) {
-    @media (min-width: 1060px) {      
-        .wz-logo{        
-            content: url("/plugins/wazuh/img/new_logo_white.png");
-        } 
-        .wz-logo-container {
-            width: 150px;
-            max-width: 150px;
-        }
-    }
-    @media (max-width: 1059px) {    
-        .wz-logo{         
-           content: url("/plugins/wazuh/img/new_logo_white_wolf.png");
-           max-height: 45px;
-           max-width: 28px;
-       } 
-       .wz-logo-container {
-            min-width: 20px!important;
-            max-width: 30px!important;
-            margin-right: 5px!important;
-        }
-    }
+.wz-logo-container {
+    height: 50px;
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position-y: center;
 }
 
-@supports (-moz-appearance:none) {
-    @media (min-width: 1060px) {      
-        .wz-logo::after{        
-            content: url("/plugins/wazuh/img/new_logo_white.png");
-        } 
-        .wz-logo-container {
-            width: 185px;
-            max-width: 185px;
-        }
+@media (min-width: 1200px) {      
+    .wz-logo {
+        background-image: url("../img/new_logo_white.png");
+        width: 150px;
+        max-width: 150px;
     }
-    @media (max-width: 1059px) {    
-        .wz-logo::after{         
-            content: url("/plugins/wazuh/img/new_logo_white_wolf.png");
-            max-height: 45px;
-            max-width: 28px;
-        } 
-        .wz-logo-container {
-                min-width: 20px!important;
-                max-width: 30px!important;
-                margin-right: 5px!important;
-            }
-        }
+}
+@media (max-width: 1199px) {    
+    .wz-logo{
+        min-width: 28px!important;
+        margin-right: 15px!important;
+        background-image: url("../img/new_logo_white_wolf.png");
+    }
 }
 
 /* Unclassified but important Wazuh app component styles */
