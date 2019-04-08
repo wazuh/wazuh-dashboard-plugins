@@ -71,9 +71,11 @@ export function settingsWizard(
               'Wrong Wazuh API credentials, please add a new API and/or modify the existing one.',
               'Routes'
             );
-          $location.search('_a', null);
-          $location.search('tab', 'api');
-          $location.path('/settings');
+          if (!$location.path().includes('/settings')) {
+            $location.search('_a', null);
+            $location.search('tab', 'api');
+            $location.path('/settings');
+          }
         } else {
           $location.path('/blank-screen');
         }
@@ -171,9 +173,11 @@ export function settingsWizard(
               true
             );
 
-          $location.search('_a', null);
-          $location.search('tab', 'api');
-          $location.path('/settings');
+          if (!$location.path().includes('/settings')) {
+            $location.search('_a', null);
+            $location.search('tab', 'api');
+            $location.path('/settings');
+          }
         });
     };
 
@@ -219,7 +223,7 @@ export function settingsWizard(
                 $location.search('tab', 'api');
                 $location.path('/settings');
               }
-              deferred.reject();
+              deferred.resolve();
             }
           })
           .catch(error => {
