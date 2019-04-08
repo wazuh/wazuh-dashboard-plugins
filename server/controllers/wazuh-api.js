@@ -61,7 +61,8 @@ export class WazuhApiCtrl {
       try {
         await this.checkDaemons(api, null);
       } catch (error) {
-        return ErrorResponse('ERROR3099', 3099, 500, reply);
+        const isDown = (error || {}).code === 'ECONNREFUSED';
+        if (!isDown) return ErrorResponse('ERROR3099', 3099, 500, reply);
       }
 
       const credInfo = ApiHelper.buildOptionsObject(api);
@@ -673,7 +674,8 @@ export class WazuhApiCtrl {
           return check;
         }
       } catch (error) {
-        return ErrorResponse('ERROR3099', 3099, 500, reply);
+        const isDown = (error || {}).code === 'ECONNREFUSED';
+        if (!isDown) return ErrorResponse('ERROR3099', 3099, 500, reply);
       }
 
       const response = await needle(method, fullUrl, data, options);
