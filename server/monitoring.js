@@ -757,6 +757,12 @@ export class Monitoring {
     }
   }
 
+  sleep(timeMs) {
+    return new Promise((resolve, reject) => {
+      setTimeout(resolve, timeMs);
+    });
+  }
+
   /**
    * Task used by the cron job.
    */
@@ -792,6 +798,23 @@ export class Monitoring {
 
       return;
     } catch (error) {
+      // Retry to call itself again if Kibana index is not ready yet
+      try {
+        if (
+          this.wzWrapper.buildingKibanaIndex ||
+          ((error || {}).status === 404 &&
+            (error || {}).displayName === 'NotFound')
+        ) {
+          !this.quiet &&
+            this.server.log(
+              [blueWazuh, 'monitoring [cronTask]', 'info'],
+              'Waiting for default Kibana index creation to complete...'
+            );
+          await this.sleep(1000);
+          return this.cronTask();
+        }
+      } catch (error) {} //eslint-disable-line
+
       !this.quiet && log('[monitoring][cronTask]', error.message || error);
       !this.quiet &&
         this.server.log(

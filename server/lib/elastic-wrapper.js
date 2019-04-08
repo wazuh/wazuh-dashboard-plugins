@@ -754,13 +754,15 @@ export class ElasticWrapper {
    */
   async createEmptyKibanaIndex() {
     try {
+      this.buildingKibanaIndex = true;
       const data = await this.elasticRequest.callWithInternalUser(
         'indices.create',
         { index: this.WZ_KIBANA_INDEX }
       );
-
+      this.buildingKibanaIndex = false;
       return data;
     } catch (error) {
+      this.buildingKibanaIndex = false;
       return Promise.reject(error);
     }
   }
