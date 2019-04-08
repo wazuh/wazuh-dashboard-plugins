@@ -2,9 +2,12 @@
 
     <!-- Headline -->
     <div layout="column" layout-padding>
-        <span class="font-size-18"><i class="fa fa-fw fa-tasks" aria-hidden="true"></i> API configuration</span>
-        <span class="md-subheader">Use Wazuh API settings to connect the Kibana plugin to your Wazuh manager or
-            cluster</span>
+        <span class="font-size-18">
+            <react-component name="EuiIcon" props="{type:'visControls'}" /> Wazuh API configuration
+        </span>
+        <span class="md-subheader">
+            Use Wazuh API settings to connect the Kibana plugin to your Wazuh manager or cluster
+        </span>
     </div>
     <!-- End headline -->
 
@@ -13,7 +16,7 @@
         <md-card flex class="wz-md-card">
             <md-card-content>
                 <!-- API entries headings section -->
-                <div layout="row" class="wz-padding-bottom-14">
+                <div layout="row" class="wz-padding-bottom-14" ng-if="ctrl.apiEntries.length">
                     <p flex="15" class="wz-text-bold">Cluster</p>
                     <p flex="20" class="wz-text-bold">Manager</p>
                     <p flex="15" class="wz-text-bold">API URL</p>
@@ -37,14 +40,16 @@
                         <p flex="15">{{entry._source.api_port}}</p>
                         <p flex="15">{{entry._source.api_user}}</p>
                         <p flex="20">
-                            <i ng-click="ctrl.setDefault(entry)" tooltip="Set as default Manager"
-                                class="fa fa-star font-size-18 cursor-pointer" aria-hidden="true"></i>
-                            <i ng-click="ctrl.removeManager(entry)" tooltip="Remove manager"
-                                class="fa fa-trash-o wz-margin-left-7 cursor-pointer" aria-hidden="true"></i>
-                            <i ng-click="ctrl.checkManager(entry)" tooltip="Check connection"
-                                class="fa fa-refresh wz-margin-left-7 cursor-pointer" aria-hidden="true"></i>
-                            <i ng-click="ctrl.toggleEditor(entry)" tooltip="Edit"
-                                class="fa fa-pencil wz-margin-left-7 cursor-pointer" aria-hidden="true"></i>
+                            <react-component name="EuiIcon" class="cursor-pointer" props="{type:'starEmpty'}"
+                                ng-click="ctrl.setDefault(entry)" tooltip="Set as default Manager" />
+                            <react-component name="EuiIcon" class="cursor-pointer"
+                                props="{type:'trash', color:'danger'}" ng-click="ctrl.removeManager(entry)"
+                                tooltip="Remove manager" />
+                            <react-component name="EuiIcon" class="cursor-pointer" props="{type:'refresh'}"
+                                ng-click="ctrl.checkManager(entry)" tooltip="Check connection" />
+                            <react-component name="EuiIcon" class="cursor-pointer"
+                                props="{type:'pencil', color:'primary'}" ng-click="ctrl.toggleEditor(entry)"
+                                tooltip="Edit" />
                         </p>
                     </div>
                     <!-- End API entry -->
@@ -80,17 +85,7 @@
                             </div>
                             <div layout="row" layout-align="center center">
                                 <md-button type="submit" class="wz-button md-primary" aria-label="Update API button">
-                                    <svg class="euiIcon euiIcon--medium euiButtonIcon__icon" focusable="false"
-                                        aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
-                                        xmlns:xlink="http://www.w3.org/1999/xlink" width="16" height="16"
-                                        viewBox="0 0 16 16">
-                                        <defs>
-                                            <path id="pencil-a"
-                                                d="M12.148 3.148L11 2l-9 9v3h3l9-9-1.144-1.144-8.002 7.998a.502.502 0 0 1-.708 0 .502.502 0 0 1 0-.708l8.002-7.998zM11 1c.256 0 .512.098.707.293l3 3a.999.999 0 0 1 0 1.414l-9 9A.997.997 0 0 1 5 15H2a1 1 0 0 1-1-1v-3c0-.265.105-.52.293-.707l9-9A.997.997 0 0 1 11 1zM5 14H2v-3l3 3z">
-                                            </path>
-                                        </defs>
-                                        <use xlink:href="#pencil-a"></use>
-                                    </svg> Update Wazuh API entry
+                                    <react-component name="EuiIcon" props="{type:'save'}" /> Save
                                 </md-button>
                             </div>
                         </form>
@@ -100,9 +95,10 @@
                 <!-- End API entries list section -->
 
                 <!-- Add API button section -->
-                <div ng-show="!ctrl.isUpdating()" layout="row" layout-align="center center" class="wz-padding-top-10">
+                <div ng-show="!ctrl.isUpdating() && ctrl.apiEntries.length" layout="row" layout-align="center center"
+                    class="wz-padding-top-10">
                     <md-button ng-click="ctrl.switch()" class="wz-button md-primary" aria-label="Add new API button">
-                        <i class="fa fa-plus-circle fa-fw" aria-hidden="true"></i> Add new Wazuh API entry
+                        <react-component name="EuiIcon" props="{type:'plusInCircle'}" /> Add new
                     </md-button>
                 </div>
                 <!-- End add API button section -->
@@ -139,7 +135,7 @@
                         </div>
                         <div layout="row" layout-align="center center">
                             <md-button type="submit" class="wz-button md-primary" aria-label="Save API button">
-                                <i class="fa fa-floppy-o fa-fw" aria-hidden="true"></i> Save Wazuh API entry
+                                <react-component name="EuiIcon" props="{type:'save'}" /> Save
                             </md-button>
                         </div>
                     </form>
