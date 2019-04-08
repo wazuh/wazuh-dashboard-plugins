@@ -1,9 +1,5 @@
-<div layout="row" class="md-padding" ng-show="wazuh_table_loading">
-    <!--    <div class='uil-ring-css'>
-            <div></div>
-        </div>
-        -->
-    <div flex class="euiProgress euiProgress--indeterminate euiProgress--xs euiProgress--primary"></div>
+<div class="md-padding md-padding-top-16" ng-show="wazuh_table_loading">
+    <react-component name="EuiProgress" props="{size: 'xs', color: 'primary'}" />
 </div>
 <div ng-if="customColumns" layout="row" ng-show="!error && !wazuh_table_loading && items.length" class="columns-bar"
     ng-class="{'columns-bar-active': showColumns}" ng-style="!showColumns && {'margin-bottom': '-35px'}">
