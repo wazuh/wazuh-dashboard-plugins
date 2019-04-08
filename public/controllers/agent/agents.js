@@ -349,13 +349,10 @@ export class AgentsController {
         this.$scope
       );
       if (configurationSubTab === 'pm-sca') {
-        const wmodulesArray =
-          ((this.$scope.currentConfig || {})['wmodules-wmodules'] || {})
-            .wmodules || [];
-        const result = wmodulesArray.filter(
-          item => typeof item['sca'] !== 'undefined'
+        this.$scope.currentConfig.sca = this.configurationHandler.parseWodle(
+          this.$scope.currentConfig,
+          'sca'
         );
-        this.$scope.currentConfig.sca = result.length ? result[0].sca : false;
       }
     };
     this.$scope.updateSelectedItem = i => (this.$scope.selectedItem = i);
