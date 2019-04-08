@@ -143,7 +143,7 @@ routes
   })
   .when('/agents-preview/', {
     template: agentsPrevTemplate,
-    resolve: { nestedResolve }
+    resolve: { nestedResolve, ip, savedSearch }
   })
   .when('/manager/', {
     template: managementTemplate,
@@ -159,7 +159,7 @@ routes
   })
   .when('/settings', {
     template: settingsTemplate,
-    resolve: { wzConfig }
+    resolve: { nestedResolve, ip, savedSearch }
   })
   .when('/visualize/create?', {
     redirectTo: function() {},
