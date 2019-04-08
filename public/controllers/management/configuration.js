@@ -41,9 +41,9 @@ export class ConfigurationController {
    * When controller loads
    */
   $onInit() {
-    this.$scope.getXML = () => this.configurationHandler.getXML(this.$scope); 
+    this.$scope.getXML = () => this.configurationHandler.getXML(this.$scope);
 
-    this.$scope.getJSON = () => this.configurationHandler.getJSON(this.$scope); 
+    this.$scope.getJSON = () => this.configurationHandler.getJSON(this.$scope);
 
     this.$scope.switchConfigTab = (
       configurationTab,
@@ -65,7 +65,7 @@ export class ConfigurationController {
     this.updateSelectedItem = i => (this.selectedItem = i);
 
     this.getIntegration = list =>
-      this.configurationHandler.getIntegration(list, this.$scope); 
+      this.configurationHandler.getIntegration(list, this.$scope);
 
     this.$scope.$on('$routeChangeStart', () =>
       this.appState.removeSessionStorageItem('configSubTab')
@@ -84,10 +84,20 @@ export class ConfigurationController {
   }
 
   switchConfigurationSubTab(configurationSubTab) {
-    return this.configurationHandler.switchConfigurationSubTab(
+    this.configurationHandler.switchConfigurationSubTab(
       configurationSubTab,
-      this.$scope 
+      this.$scope
     );
+
+    if (configurationSubTab === 'pm-sca') {
+      const wmodulesArray =
+        ((this.$scope.currentConfig || {})['wmodules-wmodules'] || {})
+          .wmodules || [];
+      const result = wmodulesArray.filter(
+        item => typeof item['sca'] !== 'undefined'
+      );
+      this.$scope.currentConfig.sca = result.length ? result[0].sca : false;
+    }
   }
 
   /**
@@ -105,7 +115,7 @@ export class ConfigurationController {
     }
     this.configurationHandler.switchWodle(
       wodleName,
-      this.$scope, 
+      this.$scope,
       false,
       (this.$scope.mctrl || {}).selectedNode
     );
@@ -119,7 +129,7 @@ export class ConfigurationController {
     this.navigate = navigate;
     this.configurationHandler.switchConfigurationTab(
       configurationTab,
-      this.$scope 
+      this.$scope
     );
 
     if (!this.navigate) {
@@ -191,7 +201,7 @@ export class ConfigurationController {
     this.configurationHandler.switchConfigTab(
       configurationTab,
       sections,
-      this.$scope, 
+      this.$scope,
       false,
       (this.$scope.mctrl || {}).selectedNode
     );

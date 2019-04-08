@@ -52,6 +52,17 @@ export class ConfigurationHandler {
         this.errorHandler,
         node
       );
+
+      if ($scope.configurationSubTab === 'pm-sca') {
+        const wmodulesArray =
+          (($scope.currentConfig || {})['wmodules-wmodules'] || {}).wmodules ||
+          [];
+        const result = wmodulesArray.filter(
+          item => typeof item['sca'] !== 'undefined'
+        );
+        $scope.currentConfig.sca = result.length ? result[0].sca : false;
+      }
+
       if (sections[0].component === 'integrator') {
         this.buildIntegrations(
           $scope.currentConfig['integrator-integration'].integration,
