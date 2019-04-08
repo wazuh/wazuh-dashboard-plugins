@@ -191,7 +191,7 @@
     </div>
     <!-- No results section -->
 
-    <!-- Loading ring -->
-    <div class='uil-ring-css' ng-show="load && tab !== 'configuration' && tab !== 'sca' && tabView === 'panels'">
-        <div></div>
+    <div class="md-padding md-padding-top-16"
+        ng-show="load && tab !== 'configuration' && tab !== 'sca' && tabView === 'panels'">
+        <react-component name="EuiProgress" props="{size: 'xs', color: 'primary'}" />
     </div>

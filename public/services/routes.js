@@ -81,7 +81,7 @@ function nestedResolve(
 ) {
   assignPreviousLocation($rootScope, $location);
   const location = $location.path();
-  return getWzConfig($q, genericReq, errorHandler, wazuhConfig).then(() =>
+  return getWzConfig($q, genericReq, wazuhConfig).then(() =>
     settingsWizard(
       $location,
       $q,
@@ -115,16 +115,9 @@ function savedSearch(
   );
 }
 
-function wzConfig(
-  $q,
-  genericReq,
-  errorHandler,
-  wazuhConfig,
-  $rootScope,
-  $location
-) {
+function wzConfig($q, genericReq, wazuhConfig, $rootScope, $location) {
   assignPreviousLocation($rootScope, $location);
-  return getWzConfig($q, genericReq, errorHandler, wazuhConfig);
+  return getWzConfig($q, genericReq, wazuhConfig);
 }
 
 function wzKibana($location, $window, $rootScope) {
@@ -150,17 +143,9 @@ routes
   })
   .when('/agents-preview/', {
     template: agentsPrevTemplate,
-    resolve: { nestedResolve }
-  })
-  .when('/agents-preview/:tab?/', {
-    template: agentsPrevTemplate,
-    resolve: { nestedResolve }
+    resolve: { nestedResolve, ip, savedSearch }
   })
   .when('/manager/', {
-    template: managementTemplate,
-    resolve: { nestedResolve, ip, savedSearch, clearRuleId }
-  })
-  .when('/manager/:tab?/', {
     template: managementTemplate,
     resolve: { nestedResolve, ip, savedSearch, clearRuleId }
   })
@@ -172,9 +157,9 @@ routes
     template: discoverTemplate,
     resolve: { nestedResolve, ip, savedSearch }
   })
-  .when('/settings/:tab?/', {
+  .when('/settings', {
     template: settingsTemplate,
-    resolve: { wzConfig }
+    resolve: { nestedResolve, ip, savedSearch }
   })
   .when('/visualize/create?', {
     redirectTo: function() {},
@@ -203,5 +188,5 @@ routes
     redirectTo: '/overview/'
   })
   .otherwise({
-    redirectTo: '/overview/'
+    redirectTo: '/overview'
   });

@@ -1,11 +1,11 @@
 <!-- No configuration section -->
-<wz-no-config flex error="'not-present'"
-    ng-if="configurationSubTab === 'pm-sca' && !currentConfig['wmodules-wmodules'].wmodules[4]['sca']"></wz-no-config>
+<wz-no-config flex error="'not-present'" ng-if="configurationSubTab === 'pm-sca' && !currentConfig['sca']">
+</wz-no-config>
 <!-- End no configuration section -->
 
 <!-- The main card will all the settings -->
 <md-card class="wz-md-card"
-    ng-if="!JSONContent && !XMLContent && configurationSubTab === 'pm-sca' && currentConfig['wmodules-wmodules'].wmodules[4]['sca']">
+    ng-if="!JSONContent && !XMLContent && configurationSubTab === 'pm-sca' && currentConfig['sca']">
     <md-card-content>
         <div layout="row" layout-align="start center">
             <div>
@@ -24,14 +24,13 @@
         <div class="wz-padding-top-10">
             <!-- content -->
             <wz-config-item label="Security configuration assessment status"
-                value="currentConfig['wmodules-wmodules'].wmodules[4]['sca'].enabled === 'yes' ? 'enabled' : 'disabled'">
+                value="currentConfig['sca'].enabled === 'yes' ? 'enabled' : 'disabled'">
             </wz-config-item>
-            <wz-config-item label="Interval" value="currentConfig['wmodules-wmodules'].wmodules[4]['sca'].interval">
+            <wz-config-item label="Interval" value="currentConfig['sca'].interval">
             </wz-config-item>
-            <wz-config-item label="Scan on start"
-                value="currentConfig['wmodules-wmodules'].wmodules[4]['sca'].scan_on_start">
+            <wz-config-item label="Scan on start" value="currentConfig['sca'].scan_on_start">
             </wz-config-item>
-            <wz-config-item label="Skip nfs" value="currentConfig['wmodules-wmodules'].wmodules[4]['sca'].skip_nfs">
+            <wz-config-item label="Skip nfs" value="currentConfig['sca'].skip_nfs">
             </wz-config-item>
             <!-- end content -->
         </div>
@@ -50,7 +49,7 @@
                     <th class="wz-text-left">Name</th>
                 </thead>
                 <tbody class="wz-word-wrap">
-                    <tr ng-repeat="policy in currentConfig['wmodules-wmodules'].wmodules[4]['sca'].policies">
+                    <tr ng-repeat="policy in currentConfig['sca'].policies">
                         <td>{{policy}}</td>
                     </tr>
                 </tbody>

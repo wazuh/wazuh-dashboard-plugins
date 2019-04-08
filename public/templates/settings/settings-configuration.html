@@ -1,8 +1,10 @@
 <div layout="column" layout-align="start stretch" ng-if="ctrl.tab === 'configuration' && !ctrl.load">
     <!-- Headline -->
     <div layout="column" layout-padding>
-        <span class="font-size-18"><i class="fa fa-fw fa-wrench" aria-hidden="true"></i> Wazuh Kibana plugin
-            configuration settings</span>
+        <span class="font-size-18">
+            <react-component name="EuiIcon" props="{type:'wrench'}" /> Wazuh Kibana plugin
+            configuration settings
+        </span>
         <span class="md-subheader">Configuration file located at <span
                 class="wz-text-monospace">/usr/share/kibana/plugins/wazuh/config.yml</span></span>
     </div>

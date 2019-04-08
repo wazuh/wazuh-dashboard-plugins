@@ -10,7 +10,7 @@
  * Find more information about this on the LICENSE file.
  */
 
-export async function getWzConfig($q, genericReq, errorHandler, wazuhConfig) {
+export async function getWzConfig($q, genericReq, wazuhConfig) {
   // Remember to keep this values equal to default config.yml values
   const defaultConfig = {
     pattern: 'wazuh-alerts-3.x-*',
@@ -51,7 +51,10 @@ export async function getWzConfig($q, genericReq, errorHandler, wazuhConfig) {
 
     const ymlContent = config.data.data;
 
-    if (typeof ymlContent === 'object') {
+    if (
+      typeof ymlContent === 'object' &&
+      (Object.keys(ymlContent) || []).length
+    ) {
       // Replace default values with custom values from config.yml file
       for (const key in ymlContent) {
         defaultConfig[key] = ymlContent[key];

@@ -31,13 +31,12 @@
     </md-nav-item>
     <md-nav-item class="wz-nav-item" md-nav-click="switchConfigurationSubTab('pm-unix')" name="pm-unix">System audit
     </md-nav-item>
-    <md-nav-item class="wz-nav-item" md-nav-click="switchConfigurationSubTab('pm-sca')" name="pm-sca">Configuration
-      assessment</md-nav-item>
+    <md-nav-item class="wz-nav-item" md-nav-click="switchConfigurationSubTab('pm-sca')" name="pm-sca">SCA</md-nav-item>
   </md-nav-bar>
   <!-- End Policy monitoring navigation bar -->
 
   <div class="md-padding md-padding-top-16" ng-if="load">
-      <react-component name="EuiProgress" props="{size: 'xs', color: 'primary'}" />
+    <react-component name="EuiProgress" props="{size: 'xs', color: 'primary'}" />
   </div>
 
   <!-- This section contains the main content and the right sidenav -->
@@ -53,4 +52,4 @@
 
     <!-- This section is the main content -->
     <div flex layout="column"
-      ng-if="currentConfig['syscheck-rootcheck'] && !isString(currentConfig['syscheck-rootcheck']) && currentConfig['syscheck-rootcheck'].rootcheck">
+      ng-if="(currentConfig['syscheck-rootcheck'] && !isString(currentConfig['syscheck-rootcheck']) && currentConfig['syscheck-rootcheck'].rootcheck) || currentConfig['sca']">

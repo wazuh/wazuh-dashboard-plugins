@@ -1,7 +1,8 @@
 <div layout="column" layout-align="start stretch" ng-if="ctrl.tab === 'logs' && !ctrl.load">
     <!-- Headline -->
     <div layout="column" layout-padding>
-        <span class="font-size-18"><i class="fa fa-fw fa-file-text-o" aria-hidden="true"></i> Wazuh Kibana plugin log
+        <span class="font-size-18">
+            <react-component name="EuiIcon" props="{type:'visTable'}" /> Wazuh Kibana plugin log
             messages</span>
         <span class="md-subheader">Log file located at <span
                 class="wz-text-monospace">/usr/share/kibana/optimize/wazuh-logs/wazuhapp.log</span></span>
@@ -15,12 +16,9 @@
     <!-- End loading ring -->
 
     <div layout="row" ng-show="!ctrl.loadingLogs">
-        <md-button class="wz-report-refresh-btn" ng-click="ctrl.refreshLogs()"><svg class="euiIcon euiIcon--medium"
-                focusable="false" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
-                <path
-                    d="M11.228 2.942a.5.5 0 1 1-.538.842A5 5 0 1 0 13 8a.5.5 0 1 1 1 0 6 6 0 1 1-2.772-5.058zM14 1.5v3A1.5 1.5 0 0 1 12.5 6h-3a.5.5 0 0 1 0-1h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 1 1 1 0z">
-                </path>
-            </svg> Refresh</md-button>
+        <md-button class="wz-report-refresh-btn" ng-click="ctrl.refreshLogs()">
+            <react-component name="EuiIcon" props="{type:'refresh'}" /> Refresh
+        </md-button>
     </div>
 
     <div layout="row" class="md-padding" ng-show="!ctrl.loadingLogs">
