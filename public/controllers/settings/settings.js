@@ -76,7 +76,7 @@ export class SettingsController {
     // Tab names
     this.tabNames = TabNames;
 
-    this.configuration = wazuhConfig.getConfig();
+    this.configuration = { ...(wazuhConfig.getConfig() || {}) };
     for (const key in this.configuration) {
       if (key.includes('extension')) {
         delete this.configuration[key];
@@ -533,7 +533,7 @@ export class SettingsController {
   }
 
   // Check manager connectivity
-  async checkManager(item, isIndex) {
+  async checkManager(item, isIndex, silent = false) {
     try {
       const index = isIndex ? item : this.apiEntries.indexOf(item);
 
@@ -559,14 +559,14 @@ export class SettingsController {
       this.apiEntries[index]._source.cluster_info = tmpData.cluster_info;
       this.wzMisc.setApiIsDown(false);
       this.apiIsDown = false;
-      this.errorHandler.info('Connection success', 'Settings');
+      !silent && this.errorHandler.info('Connection success', 'Settings');
 
       this.$scope.$applyAsync();
       return;
     } catch (error) {
       if (!this.wzMisc.getApiIsDown()) this.printError(error);
       else {
-        this.errorHandler.handle(error);
+        !silent && this.errorHandler.handle(error);
       }
     }
   }
@@ -694,7 +694,7 @@ export class SettingsController {
       }
       this.getCurrentAPIIndex();
       if (this.currentApiEntryIndex || this.currentApiEntryIndex === 0) {
-        await this.checkManager(this.currentApiEntryIndex, true);
+        await this.checkManager(this.currentApiEntryIndex, true, true);
       }
       this.$scope.$applyAsync();
       return;
