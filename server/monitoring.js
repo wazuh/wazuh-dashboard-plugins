@@ -294,7 +294,7 @@ export class Monitoring {
       !this.quiet &&
         log(
           '[monitoring][getConfig]',
-          'There is no Wazuh API entries yet',
+          'There are no Wazuh API entries yet',
           'info'
         );
       return {
