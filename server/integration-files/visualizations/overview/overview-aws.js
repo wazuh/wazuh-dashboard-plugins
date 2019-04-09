@@ -27,15 +27,15 @@ export default [
       }
     }
   },
-  /*{
+  {
     _id: 'Wazuh-App-Overview-AWS-geo',
     _type: 'visualization',
     _source: {
-      title: 'AWS geolocation',
+      title: 'Geolocation map',
       visState:
-        '{"title":"AWS geolocation","type":"tile_map","params":{"colorSchema":"Green to Red","mapType":"Shaded Circle Markers","isDesaturated":true,"addTooltip":true,"heatClusterSize":1.5,"legendPosition":"topright","mapZoom":2,"mapCenter":[0,0],"wms":{"enabled":false,"options":{"format":"image/png","transparent":true},"baseLayersAreLoaded":{},"tmsLayers":[{"id":"road_map","url":"https://tiles.maps.elastic.co/v2/default/{z}/{x}/{y}.png?elastic_tile_service_tos=agree&my_app_name=kibana&my_app_version=6.4.0","minZoom":0,"maxZoom":10,"attribution":"<p>&#169; <a href=\\"http://www.openstreetmap.org/copyright\\">OpenStreetMap</a> contributors | <a href=\\"https://www.elastic.co/elastic-maps-service\\">Elastic Maps Service</a></p>&#10;","subdomains":[]}],"selectedTmsLayer":{"id":"road_map","url":"https://tiles.maps.elastic.co/v2/default/{z}/{x}/{y}.png?elastic_tile_service_tos=agree&my_app_name=kibana&my_app_version=6.4.0","minZoom":0,"maxZoom":10,"attribution":"<p>&#169; <a href=\\"http://www.openstreetmap.org/copyright\\">OpenStreetMap</a> contributors | <a href=\\"https://www.elastic.co/elastic-maps-service\\">Elastic Maps Service</a></p>&#10;","subdomains":[]}}},"aggs":[{"id":"1","enabled":true,"type":"count","schema":"metric","params":{"customLabel":""}},{"id":"2","enabled":true,"type":"geohash_grid","schema":"segment","params":{"field":"data.aws.service.action.networkConnectionAction.remoteIpDetails.geoLocation","autoPrecision":true,"isFilteredByCollar":true,"useGeocentroid":true,"mapZoom":2,"mapCenter":[0,0],"precision":2,"customLabel":""}}]}',
+        '{"title":"Geolocation map","type":"tile_map","params":{"colorSchema":"Green to Red","mapType":"Scaled Circle Markers","isDesaturated":true,"addTooltip":true,"heatClusterSize":1.5,"legendPosition":"bottomright","mapZoom":2,"mapCenter":[0,0],"wms":{"enabled":false,"options":{"format":"image/png","transparent":true},"selectedTmsLayer":{"origin":"self_hosted","id":"road_map","minZoom":0,"maxZoom":10,"attribution":"<p>&#169; <a href=\\"http://www.openstreetmap.org/copyright\\">OpenStreetMap</a> contributors | <a href=\\"https://openmaptiles.org/\\">OpenMapTiles</a> | <a href=\\"https://www.maptiler.com/\\">MapTiler</a> | <a href=\\"https://www.elastic.co/elastic-maps-service\\">Elastic Maps Service</a></p>&#10;"}}},"aggs":[{"id":"1","enabled":true,"type":"count","schema":"metric","params":{}},{"id":"2","enabled":true,"type":"geohash_grid","schema":"segment","params":{"field":"GeoLocation.location","autoPrecision":true,"isFilteredByCollar":true,"useGeocentroid":true,"mapZoom":4,"mapCenter":{"lon":-47.83150001429022,"lat":40.315046945235984},"mapBounds":{"bottom_right":{"lat":2.8991526985043135,"lon":11.513671875000002},"top_left":{"lat":64.58618480339979,"lon":-107.138671875}},"precision":2}}]}',
       uiStateJSON:
-        '{"mapZoom":3,"mapCenter":[25.085598897064777,-57.30468750000001]}',
+        '{"mapZoom":3,"mapCenter":[38.685509760012025,-31.816406250000004]}',
       description: '',
       version: 1,
       kibanaSavedObjectMeta: {
@@ -43,7 +43,7 @@ export default [
           '{"index":"wazuh-alerts","query":{"query":"","language":"lucene"},"filter":[]}'
       }
     }
-  },*/
+  },
   {
     _id: 'Wazuh-App-Overview-AWS-Top-5-buckets',
     _type: 'visualization',
