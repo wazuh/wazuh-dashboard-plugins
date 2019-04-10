@@ -18,7 +18,7 @@ import * as FileSaver from '../../services/file-saver';
 
 const app = uiModules.get('app/wazuh', []);
 
-app.directive('wzListManage', function() {
+app.directive('wzListManage', function () {
   return {
     restrict: 'E',
     scope: {
@@ -52,11 +52,11 @@ app.directive('wzListManage', function() {
       $scope.prevPage = () => pagination.prevPage($scope);
       $scope.nextPage = async currentPage =>
         pagination.nextPage(currentPage, $scope, errorHandler, null);
-      $scope.firstPage = function() {
+      $scope.firstPage = function () {
         $scope.setPage(1);
         $scope.prevPage();
       };
-      $scope.setPage = function(page = false) {
+      $scope.setPage = function (page = false) {
         this.n = page || this.n;
         $scope.currentPage = this.n;
         $scope.nextPage(this.n);
@@ -216,9 +216,11 @@ app.directive('wzListManage', function() {
       };
 
       $scope.confirmRemoveEntry = key => {
+        const page = $scope.currentPage;
         delete $scope.currentList.list[key];
         $scope.removingEntry = false;
         fetch();
+        $scope.setPage($scope.pagedItems.length - 1 >= $scope.n ? page : page - 1);
       };
 
       const showRestartMessage = async msg => {
