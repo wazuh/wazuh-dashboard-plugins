@@ -58,12 +58,11 @@ export class ConfigurationController {
       this.switchWodle(wodleName, navigate);
 
     this.$scope.isString = item => typeof item === 'string';
-    this.isString = item => typeof item === 'string';
 
     this.hasSize = obj =>
       obj && typeof obj === 'object' && Object.keys(obj).length;
 
-    this.updateSelectedItem = i => (this.selectedItem = i);
+    this.$scope.updateSelectedItem = i => (this.selectedItem = i);
 
     this.getIntegration = list =>
       this.configurationHandler.getIntegration(list, this.$scope);

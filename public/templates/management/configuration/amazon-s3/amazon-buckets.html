@@ -33,7 +33,8 @@
 
                 <md-list flex="auto" class="wz-item-list">
                     <md-list-item class="wz-text-link" ng-click="updateSelectedItem($index)"
-                        ng-repeat="item in currentConfig['aws-s3'].buckets">{{item.name}} ({{item.aws_account_alias}})
+                        ng-repeat="item in currentConfig['aws-s3'].buckets">{{item.name}}&nbsp;<span ng-if="item.type">
+                            ({{item.type}})</span>
                     </md-list-item>
                 </md-list>
 
@@ -43,32 +44,35 @@
             <!-- Detail container -->
             <div flex layout="column" ng-if="currentConfig['aws-s3'].buckets.length">
                 <div flex="auto" class="wz-item-detail">
-                    <wz-config-item label="Bucket name" value="currentConfig['aws-s3'].buckets[selectedItem].name">
+                    <wz-config-item label="Bucket name"
+                        value="currentConfig['aws-s3'].buckets[mconfigctrl.selectedItem].name">
                     </wz-config-item>
-                    <wz-config-item label="Bucket type" value="currentConfig['aws-s3'].buckets[selectedItem].type">
+                    <wz-config-item label="Bucket type"
+                        value="currentConfig['aws-s3'].buckets[mconfigctrl.selectedItem].type">
                     </wz-config-item>
                     <wz-config-item label="AWS account ID"
-                        value="currentConfig['aws-s3'].buckets[selectedItem].aws_account_id">
+                        value="currentConfig['aws-s3'].buckets[mconfigctrl.selectedItem].aws_account_id">
                     </wz-config-item>
                     <wz-config-item label="AWS account alias"
-                        value="currentConfig['aws-s3'].buckets[selectedItem].aws_account_alias">
+                        value="currentConfig['aws-s3'].buckets[mconfigctrl.selectedItem].aws_account_alias">
                     </wz-config-item>
                     <wz-config-item label="Profile name with read permissions"
-                        value="currentConfig['aws-s3'].buckets[selectedItem].aws_profile">
+                        value="currentConfig['aws-s3'].buckets[mconfigctrl.selectedItem].aws_profile">
                     </wz-config-item>
                     <wz-config-item label="IAM ARN role to read bucket logs"
-                        value="currentConfig['aws-s3'].buckets[selectedItem].iam_role_arn">
+                        value="currentConfig['aws-s3'].buckets[mconfigctrl.selectedItem].iam_role_arn">
                     </wz-config-item>
-                    <wz-config-item label="Bucket path" value="currentConfig['aws-s3'].buckets[selectedItem].path">
+                    <wz-config-item label="Bucket path"
+                        value="currentConfig['aws-s3'].buckets[mconfigctrl.selectedItem].path">
                     </wz-config-item>
                     <wz-config-item label="Parse only logs from this date onwards"
-                        value="currentConfig['aws-s3'].buckets[selectedItem].only_logs_after">
+                        value="currentConfig['aws-s3'].buckets[mconfigctrl.selectedItem].only_logs_after">
                     </wz-config-item>
                     <wz-config-item label="Remove bucket logs after being read"
-                        value="currentConfig['aws-s3'].buckets[selectedItem].remove_from_bucket || 'yes'">
+                        value="currentConfig['aws-s3'].buckets[mconfigctrl.selectedItem].remove_from_bucket || 'yes'">
                     </wz-config-item>
                     <wz-config-item label="Limit log parsing to these regions"
-                        value="currentConfig['aws-s3'].buckets[selectedItem].regions">
+                        value="currentConfig['aws-s3'].buckets[mconfigctrl.selectedItem].regions">
                     </wz-config-item>
                 </div>
 
