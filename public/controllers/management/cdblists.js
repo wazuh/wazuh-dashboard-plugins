@@ -105,65 +105,7 @@ export class CdbListsController {
   }
 
   search(term) {
-    if (term && term.startsWith('group:') && term.split('group:')[1].trim()) {
-      this.custom_search = '';
-      const filter = { name: 'group', value: term.split('group:')[1].trim() };
-      this.appliedFilters = this.appliedFilters.filter(
-        item => item.name !== 'group'
-      );
-      this.appliedFilters.push(filter);
-      this.$scope.$broadcast('wazuhFilter', { filter });
-    } else if (
-      term &&
-      term.startsWith('level:') &&
-      term.split('level:')[1].trim()
-    ) {
-      this.custom_search = '';
-      const filter = { name: 'level', value: term.split('level:')[1].trim() };
-      this.appliedFilters = this.appliedFilters.filter(
-        item => item.name !== 'level'
-      );
-      this.appliedFilters.push(filter);
-      this.$scope.$broadcast('wazuhFilter', { filter });
-    } else if (
-      term &&
-      term.startsWith('pci:') &&
-      term.split('pci:')[1].trim()
-    ) {
-      this.custom_search = '';
-      const filter = { name: 'pci', value: term.split('pci:')[1].trim() };
-      this.appliedFilters = this.appliedFilters.filter(
-        item => item.name !== 'pci'
-      );
-      this.appliedFilters.push(filter);
-      this.$scope.$broadcast('wazuhFilter', { filter });
-    } else if (
-      term &&
-      term.startsWith('gdpr:') &&
-      term.split('gdpr:')[1].trim()
-    ) {
-      this.custom_search = '';
-      const filter = { name: 'gdpr', value: term.split('gdpr:')[1].trim() };
-      this.appliedFilters = this.appliedFilters.filter(
-        item => item.name !== 'gdpr'
-      );
-      this.appliedFilters.push(filter);
-      this.$scope.$broadcast('wazuhFilter', { filter });
-    } else if (
-      term &&
-      term.startsWith('file:') &&
-      term.split('file:')[1].trim()
-    ) {
-      this.custom_search = '';
-      const filter = { name: 'file', value: term.split('file:')[1].trim() };
-      this.appliedFilters = this.appliedFilters.filter(
-        item => item.name !== 'file'
-      );
-      this.appliedFilters.push(filter);
-      this.$scope.$broadcast('wazuhFilter', { filter });
-    } else {
-      this.$scope.$broadcast('wazuhSearch', { term, removeFilters: 0 });
-    }
+    this.$scope.$broadcast('wazuhSearch', { term, removeFilters: 0 });
   }
 
   /**
