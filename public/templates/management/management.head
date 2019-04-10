@@ -9,69 +9,72 @@
         <!-- Breadcrumbs -->
         <div layout="row" layout-padding>
             <!-- If you're not on the Welcome tab, show a functional breadcrumb -->
-            <div ng-if="mctrl.tab !== 'welcome' && !mctrl.currentGroup && !mctrl.currentRule && !mctrl.currentDecoder && !mctrl.currentList">
+            <div
+                ng-if="mctrl.tab !== 'welcome' && !mctrl.currentGroup && !mctrl.currentRule && !mctrl.currentDecoder && !mctrl.currentList">
                 <span class="wz-text-link cursor-pointer" ng-click="mctrl.switchTab('welcome', true)">Management</span>
                 <span> / {{ mctrl.tabNames[mctrl.tab] }}</span>
             </div>
-            <div ng-if="mctrl.tab !== 'welcome' && !mctrl.currentGroup && (mctrl.currentRule || mctrl.currentDecoder || mctrl.currentList)">
+            <div
+                ng-if="mctrl.tab !== 'welcome' && !mctrl.currentGroup && (mctrl.currentRule || mctrl.currentDecoder || mctrl.currentList)">
                 <span class="wz-text-link cursor-pointer" ng-click="mctrl.switchTab('welcome', true)">Management</span>
-                <span class="wz-text-link cursor-pointer" ng-click="mctrl.breadCrumbBack(true);"> / {{ mctrl.tabNames[mctrl.tab] }}</span>
-                <span ng-show="mctrl.currentRule"><span class="wz-text-link cursor-pointer" ng-click="mctrl.breadCrumbBack()"> / rules</span> / {{mctrl.currentRule.id}}</span>
-                <span ng-show="mctrl.currentDecoder"><span class="wz-text-link cursor-pointer" ng-click="mctrl.breadCrumbBack()"> / decoders</span> / {{mctrl.currentDecoder.name}}</span>
-                <span ng-show="mctrl.currentList"><span class="wz-text-link cursor-pointer" ng-click="mctrl.breadCrumbBack()"> / lists</span> / {{mctrl.currentList.name}}</span>
+                <span class="wz-text-link cursor-pointer" ng-click="mctrl.breadCrumbBack(true);"> /
+                    {{ mctrl.tabNames[mctrl.tab] }}</span>
+                <span ng-show="mctrl.currentRule"><span class="wz-text-link cursor-pointer"
+                        ng-click="mctrl.breadCrumbBack()"> / rules</span> / {{mctrl.currentRule.id}}</span>
+                <span ng-show="mctrl.currentDecoder"><span class="wz-text-link cursor-pointer"
+                        ng-click="mctrl.breadCrumbBack()"> / decoders</span> / {{mctrl.currentDecoder.name}}</span>
+                <span ng-show="mctrl.currentList"><span class="wz-text-link cursor-pointer"
+                        ng-click="mctrl.breadCrumbBack()"> / lists</span> / {{mctrl.currentList.name}}</span>
             </div>
             <div ng-if="mctrl.tab === 'groups' && mctrl.currentGroup && mctrl.currentGroup.name">
                 <span class="wz-text-link cursor-pointer" ng-click="mctrl.switchTab('welcome', true)">Management</span>
-                <span class="wz-text-link cursor-pointer" ng-click="mctrl.switchTab('groups', true)"> / {{ mctrl.tabNames[mctrl.tab] }}</span>
+                <span class="wz-text-link cursor-pointer" ng-click="mctrl.switchTab('groups', true)"> /
+                    {{ mctrl.tabNames[mctrl.tab] }}</span>
                 <span> / {{ mctrl.currentGroup.name }} </span>
             </div>
         </div>
         <!-- End breadcrumbs -->
     </div>
     <div layout="row" layout-align="start center" ng-if="mctrl.tab !== 'monitoring' && mctrl.tab === 'configuration'">
-        <!-- Breadcrumbs -->
-        <div layout="row" layout-padding>
-            <!-- Welcome section -->
-            <div ng-if="!mctrl.currentConfiguration">
-                <span class="wz-text-link cursor-pointer" ng-click="mctrl.switchTab('welcome', true)">Management</span>
-                <span> / </span>
+        <div layout-padding class="euiFlexGroup">
+
+            <div layout="row" ng-if="!mctrl.currentConfiguration && mctrl.editionTab !== 'editconfiguration'"
+                class="euiFlexItem">
+                <span class="wz-text-link cursor-pointer euiBreadcrumb"
+                    ng-click="mctrl.switchTab('welcome', true)">Management</span>
+                <span class="euiBreadcrumb"> / </span>
                 <span>{{ mctrl.tabNames[mctrl.tab] }}</span>
             </div>
-            <!-- First-level section -->
-            <div ng-if="mctrl.currentConfiguration">
-                <span class="wz-text-link cursor-pointer" ng-click="mctrl.switchTab('welcome', true)">Management</span>
-                <span> / </span>
-                <span class="wz-text-link cursor-pointer" ng-click="mctrl.switchTab('configuration', true)">{{ mctrl.tabNames[mctrl.tab] }}</span>
-                <span> / {{ mctrl.tabNames[mctrl.currentConfiguration] || mctrl.currentConfiguration }} </span>
+
+            <div layout="row" ng-if="mctrl.currentConfiguration || mctrl.editionTab === 'editconfiguration'"
+                class="euiFlexItem">
+                <span class="wz-text-link cursor-pointer euiBreadcrumb"
+                    ng-click="mctrl.switchTab('welcome', true)">Management</span>
+                <span class="euiBreadcrumb"> / </span>
+                <span class="wz-text-link cursor-pointer euiBreadcrumb"
+                    ng-click="mctrl.switchTab('configuration', true)">{{ mctrl.tabNames[mctrl.tab] }}</span>
+                <span ng-if="mctrl.editionTab !== 'editconfiguration'"> /
+                    {{ mctrl.tabNames[mctrl.currentConfiguration] || mctrl.currentConfiguration }} </span>
+            </div>
+
+            <div ng-if="!mctrl.editTab && mctrl.clusterInfo.status === 'enabled'"
+                class="height-35 layout-align-center-stretch layout-column wz-margin-right-8 wz-select-input">
+                <select class="kuiSelect wz-border-none cursor-pointer" ng-model="mctrl.selectedNode"
+                    ng-change="mctrl.changeNode(mctrl.selectedNode)">
+                    <option ng-repeat="node in mctrl.nodeList" value="{{node}}">{{node}}</option>
+                </select>
             </div>
         </div>
-        <!-- End breadcrumbs -->
     </div>
-    <!-- End navigation section -->
 
-    <!-- Wazuh management navigation bar -->
-    <!--<md-nav-bar
-        ng-if="!mctrl.load && mctrl.inArray(mctrl.tab, mctrl.wazuhManagementTabs)"
-        class="wz-nav-bar"
-        ng-show="mctrl.tab !== 'welcome'"
-        md-selected-nav-item="mctrl.tab"
-        nav-bar-aria-label="Wazuh management navigation links">
-        <md-nav-item class="wz-nav-item" md-nav-click="mctrl.switchTab('ruleset', true)" name="ruleset">Ruleset</md-nav-item>
-        <md-nav-item class="wz-nav-item" md-nav-click="mctrl.switchTab('groups', true)" name="groups">Groups</md-nav-item>
-        <md-nav-item class="wz-nav-item" md-nav-click="mctrl.switchTab('configuration', true)" name="configuration">Configuration</md-nav-item>
-    </md-nav-bar>-->
-    <!-- End Wazuh management navigation bar -->
-
-    <!-- Status and reports navigation bar -->
-    <md-nav-bar
-        ng-if="!mctrl.load && mctrl.inArray(mctrl.tab, mctrl.statusReportsTabs) && mctrl.tab !== 'monitoring'"
-        class="wz-nav-bar"
-        ng-show="mctrl.tab !== 'welcome'"
-        md-selected-nav-item="mctrl.tab"
+    <md-nav-bar ng-if="!mctrl.load && mctrl.inArray(mctrl.tab, mctrl.statusReportsTabs) && mctrl.tab !== 'monitoring'"
+        class="wz-nav-bar" ng-show="mctrl.tab !== 'welcome'" md-selected-nav-item="mctrl.tab"
         nav-bar-aria-label="Status and reports navigation links">
-        <md-nav-item class="wz-nav-item" md-nav-click="mctrl.switchTab('status', true)" name="status">Status</md-nav-item>
+        <md-nav-item class="wz-nav-item" md-nav-click="mctrl.switchTab('status', true)" name="status">Status
+        </md-nav-item>
         <md-nav-item class="wz-nav-item" md-nav-click="mctrl.switchTab('logs', true)" name="logs">Logs</md-nav-item>
-        <md-nav-item class="wz-nav-item" md-nav-click="mctrl.switchTab('monitoring', true)" name="monitoring">Cluster</md-nav-item>
-        <md-nav-item class="wz-nav-item" md-nav-click="mctrl.switchTab('reporting', true)" name="reporting">Reporting</md-nav-item>
+        <md-nav-item class="wz-nav-item" md-nav-click="mctrl.switchTab('monitoring', true)" name="monitoring">Cluster
+        </md-nav-item>
+        <md-nav-item class="wz-nav-item" md-nav-click="mctrl.switchTab('reporting', true)" name="reporting">Reporting
+        </md-nav-item>
     </md-nav-bar>
-    <!-- End Status and reports navigation bar -->

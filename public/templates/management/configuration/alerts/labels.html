@@ -2,12 +2,19 @@
 <div flex="auto" layout="row" ng-if="!load && configurationSubTab === 'labels'">
 
     <!-- No configuration section -->
-    <wz-no-config flex error="currentConfig[(agent && agent.id !== '000') ? 'agent-labels' : 'analysis-labels']" ng-if="currentConfig[(agent && agent.id !== '000') ? 'agent-labels' : 'analysis-labels'] && isString(currentConfig[(agent && agent.id !== '000') ? 'agent-labels' : 'analysis-labels'])"></wz-no-config>
-    <wz-no-config flex error="'not-present'" ng-if="currentConfig[(agent && agent.id !== '000') ? 'agent-labels' : 'analysis-labels'] && !isString(currentConfig[(agent && agent.id !== '000') ? 'agent-labels' : 'analysis-labels']) && !hasSize(currentConfig[(agent && agent.id !== '000') ? 'agent-labels' : 'analysis-labels'].labels)"></wz-no-config>
+    <wz-no-config flex error="currentConfig[(agent && agent.id !== '000') ? 'agent-labels' : 'analysis-labels']"
+        ng-if="currentConfig[(agent && agent.id !== '000') ? 'agent-labels' : 'analysis-labels'] && isString(currentConfig[(agent && agent.id !== '000') ? 'agent-labels' : 'analysis-labels'])">
+    </wz-no-config>
+    <wz-no-config flex error="'not-present'"
+        ng-if="currentConfig[(agent && agent.id !== '000') ? 'agent-labels' : 'analysis-labels'] && !isString(currentConfig[(agent && agent.id !== '000') ? 'agent-labels' : 'analysis-labels']) && !hasSize(currentConfig[(agent && agent.id !== '000') ? 'agent-labels' : 'analysis-labels'].labels)">
+    </wz-no-config>
+    <wz-no-config flex error="'Wazuh not ready yet'"
+        ng-if="wazuhNotReadyYet && (!currentConfig || !currentConfig[(agent && agent.id !== '000') ? 'agent-labels' : 'analysis-labels'])" />
     <!-- End no configuration section -->
 
     <!-- This section is the main content -->
-    <div flex layout="column" ng-if="currentConfig[(agent && agent.id !== '000') ? 'agent-labels' : 'analysis-labels'] && !isString(currentConfig[(agent && agent.id !== '000') ? 'agent-labels' : 'analysis-labels']) && hasSize(currentConfig[(agent && agent.id !== '000') ? 'agent-labels' : 'analysis-labels'].labels)">
+    <div flex layout="column"
+        ng-if="currentConfig[(agent && agent.id !== '000') ? 'agent-labels' : 'analysis-labels'] && !isString(currentConfig[(agent && agent.id !== '000') ? 'agent-labels' : 'analysis-labels']) && hasSize(currentConfig[(agent && agent.id !== '000') ? 'agent-labels' : 'analysis-labels'].labels)">
 
         <!-- The main card will all the settings -->
         <md-card class="wz-md-card" ng-if="!JSONContent && !XMLContent">
@@ -17,9 +24,11 @@
                         <span class="font-size-16">Defined labels</span>
                     </div>
                     <span flex></span>
-                    <span ng-class="JSONContent ? 'wz-text-active' : ''" class="wz-text-link small" ng-click="getJSON()">JSON</span>
+                    <span ng-class="JSONContent ? 'wz-text-active' : ''" class="wz-text-link small"
+                        ng-click="getJSON()">JSON</span>
                     <span class="small">&nbsp;&centerdot;&nbsp;</span>
-                    <span ng-class="XMLContent ? 'wz-text-active' : ''" class="wz-text-link small" ng-click="getXML()">XML</span>
+                    <span ng-class="XMLContent ? 'wz-text-active' : ''" class="wz-text-link small"
+                        ng-click="getXML()">XML</span>
                 </div>
                 <md-divider class="wz-margin-top-10"></md-divider>
 
@@ -32,7 +41,8 @@
                             <th class="wz-text-left">Label value</th>
                         </thead>
                         <tbody class="wz-word-wrap">
-                            <tr ng-repeat="(key, value) in currentConfig[(agent && agent.id !== '000') ? 'agent-labels' : 'analysis-labels'].labels">
+                            <tr
+                                ng-repeat="(key, value) in currentConfig[(agent && agent.id !== '000') ? 'agent-labels' : 'analysis-labels'].labels">
                                 <td>{{ key }}</td>
                                 <td>{{ value }}</td>
                             </tr>
@@ -45,7 +55,8 @@
         </md-card>
         <!-- End main card with all the settings -->
 
-        <wz-config-viewer flex getjson="getJSON()" getxml="getXML()" jsoncontent="JSONContent" xmlcontent="XMLContent" />
+        <wz-config-viewer flex getjson="getJSON()" getxml="getXML()" jsoncontent="JSONContent"
+            xmlcontent="XMLContent" />
 
     </div>
     <!-- End main content section -->
@@ -56,9 +67,11 @@
                 class="fa fa-fw fa-question-circle-o"></i></span>
         <md-list ng-if="showHelp">
             <md-subheader>More info about this section</md-subheader>
-            <md-list-item target="_blank" class="wz-text-link" ng-href="https://documentation.wazuh.com/current/user-manual/capabilities/labels.html">Labels
+            <md-list-item target="_blank" class="wz-text-link"
+                ng-href="https://documentation.wazuh.com/current/user-manual/capabilities/labels.html">Labels
                 documentation</md-list-item>
-            <md-list-item target="_blank" class="wz-text-link" ng-href="https://documentation.wazuh.com/current/user-manual/reference/ossec-conf/labels.html">Labels
+            <md-list-item target="_blank" class="wz-text-link"
+                ng-href="https://documentation.wazuh.com/current/user-manual/reference/ossec-conf/labels.html">Labels
                 reference</md-list-item>
         </md-list>
     </md-sidenav>

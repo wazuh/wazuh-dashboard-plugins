@@ -1,9 +1,5 @@
-<div layout="row" class="md-padding" ng-show="wazuh_table_loading">
-    <!--    <div class='uil-ring-css'>
-            <div></div>
-        </div>
-        -->
-    <div flex class="euiProgress euiProgress--indeterminate euiProgress--xs euiProgress--primary"></div>
+<div class="md-padding md-padding-top-16" ng-show="wazuh_table_loading">
+    <react-component name="EuiProgress" props="{size: 'xs', color: 'primary'}" />
 </div>
 <div ng-if="customColumns" layout="row" ng-show="!error && !wazuh_table_loading && items.length" class="columns-bar"
     ng-class="{'columns-bar-active': showColumns}" ng-style="!showColumns && {'margin-bottom': '-35px'}">
@@ -14,15 +10,9 @@
         <span class="euiCheckbox__label">{{ keyEquivalence[key.key.value || key.key] }}</span>
     </div>
     <span flex></span>
-    <span class="wz-text-link" style="line-height: 28px;" ng-click="showColumns = !showColumns" tooltip="Columns"> <svg
-            class="euiIcon euiIcon--small" focusable="false" xmlns="http://www.w3.org/2000/svg" width="32" height="32"
-            viewBox="0 0 32 32">
-            <path class="euiIcon__fillSecondary"
-                d="M16 21a5 5 0 1 1 0-10 5 5 0 0 1 0 10zm0-8a3 3 0 1 0 0 6 3 3 0 0 0 0-6z"></path>
-            <path
-                d="M20 32h-8v-4.06a1 1 0 0 0-1.61-.67l-2.88 2.87-5.65-5.65 2.87-2.87a.92.92 0 0 0 .2-1 .93.93 0 0 0-.86-.6H0V12h4.06a.92.92 0 0 0 .85-.58.94.94 0 0 0-.19-1L1.86 7.51l5.65-5.65 2.87 2.87A1 1 0 0 0 12 4.06V0h8v4.06a1 1 0 0 0 1.61.67l2.87-2.87 5.66 5.66-2.87 2.87a.92.92 0 0 0-.2 1 .93.93 0 0 0 .86.6H32v8h-4.06a.92.92 0 0 0-.85.58.94.94 0 0 0 .19 1l2.87 2.87-5.66 5.66-2.87-2.87a1 1 0 0 0-1.61.67L20 32zm-6-2h4v-2.06a3 3 0 0 1 5-2.08l1.46 1.46 2.83-2.83L25.86 23a3 3 0 0 1 2.08-5H30v-4h-2.06a3 3 0 0 1-2.08-5l1.46-1.46-2.83-2.85L23 6.14a3 3 0 0 1-5-2.08V2h-4v2.06a3 3 0 0 1-5 2.08L7.51 4.69 4.69 7.51 6.14 9a3 3 0 0 1-2.08 5H2v4h2.06a3 3 0 0 1 2.08 5l-1.45 1.49 2.83 2.83L9 25.86a3 3 0 0 1 5 2.08V30z">
-            </path>
-        </svg></span>
+    <span class="wz-text-link" style="line-height: 28px;" ng-click="showColumns = !showColumns" tooltip="Columns">
+        <react-component name="EuiIcon" props="{type:'gear'}" />
+    </span>
 </div>
 
 <div ng-if="!wazuh_table_loading && !isPolicyMonitoring() && !isSyscheck()" ng-show="!error && items.length">
@@ -69,25 +59,11 @@
                     <span ng-click="clickAction(item, 'discover'); $event.stopPropagation()"
                         class="wz-margin-left-8 cursor-pointer" tooltip="Open Discover panel for this agent"
                         tooltip-placement="left" aria-hidden="true">
-                        <svg class="euiIcon euiIcon--medium" focusable="false" xmlns="http://www.w3.org/2000/svg"
-                            width="32" height="32" viewBox="0 0 32 32">
-                            <path class="euiIcon__fillSecondary"
-                                d="M8.33 23.67l4.79-10.55 10.55-4.79-4.79 10.55-10.55 4.79zm6.3-9l-2.28 5 5-2.28 2.28-5-5 2.28z">
-                            </path>
-                            <path
-                                d="M16 0C7.163 0 0 7.163 0 16s7.163 16 16 16 16-7.163 16-16A16 16 0 0 0 16 0zm1 29.95V28h-2v1.95A14 14 0 0 1 2.05 17H4v-2H2.05A14 14 0 0 1 15 2.05V4h2V2.05A14 14 0 0 1 29.95 15H28v2h1.95A14 14 0 0 1 17 29.95z">
-                            </path>
-                        </svg>
+                        <react-component name="EuiIcon" props="{type:'discoverApp', color:'primary'}" />
                     </span>
                     <span ng-click="clickAction(item, 'configuration'); $event.stopPropagation()" class="cursor-pointer"
                         tooltip="Open configuration for this agent" tooltip-placement="left" aria-hidden="true">
-
-                        <svg class="euiIcon euiIcon--medium" focusable="false" xmlns="http://www.w3.org/2000/svg"
-                            width="16" height="16" viewBox="0 0 16 16">
-                            <path
-                                d="M6.918 9.746l4.537 4.537a2 2 0 1 0 2.828-2.829l-3.157-3.156a.5.5 0 0 1 .708-.708l3.156 3.157a3 3 0 1 1-4.243 4.243l-4.949-4.95a5.001 5.001 0 0 1-5.22-7.106.5.5 0 0 1 .805-.138L3.676 5.09a1 1 0 1 0 1.415-1.414L2.797 1.382a.5.5 0 0 1 .138-.805 5.001 5.001 0 1 1 3.983 9.169zM1.226 4.054a4.002 4.002 0 0 0 6.693 3.865 4 4 0 0 0-3.865-6.693l1.744 1.743a2 2 0 1 1-2.829 2.828L1.226 4.054zm10.229 8.814a1 1 0 1 1 1.414-1.414 1 1 0 0 1-1.414 1.414z">
-                            </path>
-                        </svg>
+                        <react-component name="EuiIcon" props="{type:'wrench', color:'primary'}" />
                     </span>
                 </td>
                 <td ng-if="path === '/agents/groups' && adminMode" ng-click="$event.stopPropagation()"
@@ -96,29 +72,12 @@
                         ng-click="showConfirmRemoveGroup($event, item); $event.stopPropagation()"
                         ng-class="{'wz-margin-left-8': item.name !== 'default'}" class="cursor-pointer"
                         tooltip="Remove this group" tooltip-placement="left" aria-hidden="true">
-                        <svg class="euiIcon euiIcon--medium euiButton__icon" focusable="false" aria-hidden="true"
-                            xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="16"
-                            height="16" viewBox="0 0 16 16">
-                            <defs>
-                                <path id="trash-a"
-                                    d="M11 3h5v1H0V3h5V1a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2zm-7.056 8H7v1H4.1l.392 2.519c.042.269.254.458.493.458h6.03c.239 0 .451-.189.493-.458l1.498-9.576H14l-1.504 9.73c-.116.747-.74 1.304-1.481 1.304h-6.03c-.741 0-1.365-.557-1.481-1.304l-1.511-9.73H9V5.95H3.157L3.476 8H8v1H3.632l.312 2zM6 3h4V1H6v2z">
-                                </path>
-                            </defs>
-                            <use xlink:href="#trash-a"></use>
-                        </svg></span>
+                        <react-component name="EuiIcon" props="{type:'trash', color:'primary'}" />
+                    </span>
                     <span ng-if="removingGroup !== item.name" ng-click="editGroup(item); $event.stopPropagation()"
                         tooltip="Edit this group configuration" tooltip-placement="left"
-                        ng-class="{'wz-margin-left-8': item.name === 'default'}">
-                        <svg class="cursor-pointer euiIcon euiIcon--medium euiButtonIcon__icon" focusable="false"
-                            aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
-                            xmlns:xlink="http://www.w3.org/1999/xlink" width="16" height="16" viewBox="0 0 16 16">
-                            <defs>
-                                <path id="pencil-a"
-                                    d="M12.148 3.148L11 2l-9 9v3h3l9-9-1.144-1.144-8.002 7.998a.502.502 0 0 1-.708 0 .502.502 0 0 1 0-.708l8.002-7.998zM11 1c.256 0 .512.098.707.293l3 3a.999.999 0 0 1 0 1.414l-9 9A.997.997 0 0 1 5 15H2a1 1 0 0 1-1-1v-3c0-.265.105-.52.293-.707l9-9A.997.997 0 0 1 11 1zM5 14H2v-3l3 3z">
-                                </path>
-                            </defs>
-                            <use xlink:href="#pencil-a"></use>
-                        </svg>
+                        ng-class="{'wz-margin-left-8': item.name === 'default'}" class="cursor-pointer">
+                        <react-component name="EuiIcon" props="{type:'pencil', color:'primary'}" />
                     </span>
 
                     <div ng-if="removingGroup === item.name && item.name !== 'default'" class="confirmEmbedBubble">
@@ -141,16 +100,7 @@
                         ng-click="showConfirmRemoveAgentFromGroup($event, item); $event.stopPropagation()"
                         class="wz-margin-left-8 cursor-pointer" tooltip="Remove this agent from the group"
                         tooltip-placement="left" aria-hidden="true">
-                        <svg class="euiIcon euiIcon--medium euiButton__icon" focusable="false" aria-hidden="true"
-                            xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="16"
-                            height="16" viewBox="0 0 16 16">
-                            <defs>
-                                <path id="trash-a"
-                                    d="M11 3h5v1H0V3h5V1a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2zm-7.056 8H7v1H4.1l.392 2.519c.042.269.254.458.493.458h6.03c.239 0 .451-.189.493-.458l1.498-9.576H14l-1.504 9.73c-.116.747-.74 1.304-1.481 1.304h-6.03c-.741 0-1.365-.557-1.481-1.304l-1.511-9.73H9V5.95H3.157L3.476 8H8v1H3.632l.312 2zM6 3h4V1H6v2z">
-                                </path>
-                            </defs>
-                            <use xlink:href="#trash-a"></use>
-                        </svg>
+                        <react-component name="EuiIcon" props="{type:'trash', color:'primary'}" />
                     </span>
                     <div ng-if="removingAgent === item.id" class="confirmEmbedBubble">
                         <div layout="row">
@@ -174,32 +124,14 @@
                         class="wz-margin-left-8 cursor-pointer" tooltip="Edit this file" tooltip-placement="left"
                         aria-hidden="true">
 
-                        <svg class="euiIcon euiIcon--medium euiButtonIcon__icon" focusable="false" aria-hidden="true"
-                            xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="16"
-                            height="16" viewBox="0 0 16 16">
-                            <defs>
-                                <path id="pencil-a"
-                                    d="M12.148 3.148L11 2l-9 9v3h3l9-9-1.144-1.144-8.002 7.998a.502.502 0 0 1-.708 0 .502.502 0 0 1 0-.708l8.002-7.998zM11 1c.256 0 .512.098.707.293l3 3a.999.999 0 0 1 0 1.414l-9 9A.997.997 0 0 1 5 15H2a1 1 0 0 1-1-1v-3c0-.265.105-.52.293-.707l9-9A.997.997 0 0 1 11 1zM5 14H2v-3l3 3z">
-                                </path>
-                            </defs>
-                            <use xlink:href="#pencil-a"></use>
-                        </svg>
+                        <react-component name="EuiIcon" props="{type:'pencil', color:'primary'}" />
                     </span>
                     <span
                         ng-if="(item.path === 'etc/rules' || item.path === 'etc/decoders' || path === '/lists/files') && ((item.name && removingFile !== item.name) || (item.file && removingFile !== item.file)) && adminMode"
                         ng-click="showConfirmRemoveFile($event, item, path); $event.stopPropagation()"
                         class="cursor-pointer" ng-class="{'wz-margin-left-8': path === '/lists/files'}"
                         tooltip="Delete this file" tooltip-placement="right" aria-hidden="true">
-                        <svg class="euiIcon euiIcon--medium euiButton__icon" focusable="false" aria-hidden="true"
-                            xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="16"
-                            height="16" viewBox="0 0 16 16">
-                            <defs>
-                                <path id="trash-a"
-                                    d="M11 3h5v1H0V3h5V1a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2zm-7.056 8H7v1H4.1l.392 2.519c.042.269.254.458.493.458h6.03c.239 0 .451-.189.493-.458l1.498-9.576H14l-1.504 9.73c-.116.747-.74 1.304-1.481 1.304h-6.03c-.741 0-1.365-.557-1.481-1.304l-1.511-9.73H9V5.95H3.157L3.476 8H8v1H3.632l.312 2zM6 3h4V1H6v2z">
-                                </path>
-                            </defs>
-                            <use xlink:href="#trash-a"></use>
-                        </svg>
+                        <react-component name="EuiIcon" props="{type:'trash', color:'primary'}" />
                     </span>
                     <span
                         ng-if="(item.path !== 'etc/rules' && item.path !== 'etc/decoders') && ((item.name && removingFile !== item.name) || (item.file && removingFile !== item.file)) && adminMode && path !== '/lists/files'"
@@ -238,18 +170,7 @@
 
                         <li ng-show="currentPage" class="md-padding">
                             <a href ng-click="prevPage()">
-                                <svg class="euiIcon euiIcon--medium euiButtonIcon__icon" focusable="false"
-                                    aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
-                                    xmlns:xlink="http://www.w3.org/1999/xlink" width="16" height="16"
-                                    viewBox="0 0 16 16">
-                                    <defs>
-                                        <path id="arrow_left-a"
-                                            d="M13.069 5.157L8.384 9.768a.546.546 0 0 1-.768 0L2.93 5.158a.552.552 0 0 0-.771 0 .53.53 0 0 0 0 .759l4.684 4.61c.641.631 1.672.63 2.312 0l4.684-4.61a.53.53 0 0 0 0-.76.552.552 0 0 0-.771 0z">
-                                        </path>
-                                    </defs>
-                                    <use fill-rule="nonzero" transform="rotate(90 8 8)" xlink:href="#arrow_left-a">
-                                    </use>
-                                </svg>
+                                <react-component name="EuiIcon" props="{type:'arrowLeft'}" />
                             </a>
                         </li>
 
@@ -260,18 +181,7 @@
 
                         <li ng-show="currentPage < pagedItems.length - 1" class="md-padding">
                             <a href ng-click="nextPage()">
-                                <svg class="euiIcon euiIcon--medium euiButtonIcon__icon" focusable="false"
-                                    aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
-                                    xmlns:xlink="http://www.w3.org/1999/xlink" width="16" height="16"
-                                    viewBox="0 0 16 16">
-                                    <defs>
-                                        <path id="arrow_right-a"
-                                            d="M13.069 5.157L8.384 9.768a.546.546 0 0 1-.768 0L2.93 5.158a.552.552 0 0 0-.771 0 .53.53 0 0 0 0 .759l4.684 4.61c.641.631 1.672.63 2.312 0l4.684-4.61a.53.53 0 0 0 0-.76.552.552 0 0 0-.771 0z">
-                                        </path>
-                                    </defs>
-                                    <use fill-rule="nonzero" transform="matrix(0 1 1 0 0 0)"
-                                        xlink:href="#arrow_right-a"></use>
-                                </svg>
+                                <react-component name="EuiIcon" props="{type:'arrowRight'}" />
                             </a>
                         </li>
 
@@ -400,18 +310,7 @@
                     <ul layout="row">
                         <li ng-show="currentPage" class="md-padding">
                             <a href ng-click="prevPage()">
-                                <svg class="euiIcon euiIcon--medium euiButtonIcon__icon" focusable="false"
-                                    aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
-                                    xmlns:xlink="http://www.w3.org/1999/xlink" width="16" height="16"
-                                    viewBox="0 0 16 16">
-                                    <defs>
-                                        <path id="arrow_left-a"
-                                            d="M13.069 5.157L8.384 9.768a.546.546 0 0 1-.768 0L2.93 5.158a.552.552 0 0 0-.771 0 .53.53 0 0 0 0 .759l4.684 4.61c.641.631 1.672.63 2.312 0l4.684-4.61a.53.53 0 0 0 0-.76.552.552 0 0 0-.771 0z">
-                                        </path>
-                                    </defs>
-                                    <use fill-rule="nonzero" transform="rotate(90 8 8)" xlink:href="#arrow_left-a">
-                                    </use>
-                                </svg>
+                                <react-component name="EuiIcon" props="{type:'arrowLeft'}" />
                             </a>
                         </li>
 
@@ -422,18 +321,7 @@
 
                         <li ng-show="currentPage < pagedItems.length - 1" class="md-padding">
                             <a href ng-click="nextPage()">
-                                <svg class="euiIcon euiIcon--medium euiButtonIcon__icon" focusable="false"
-                                    aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
-                                    xmlns:xlink="http://www.w3.org/1999/xlink" width="16" height="16"
-                                    viewBox="0 0 16 16">
-                                    <defs>
-                                        <path id="arrow_right-a"
-                                            d="M13.069 5.157L8.384 9.768a.546.546 0 0 1-.768 0L2.93 5.158a.552.552 0 0 0-.771 0 .53.53 0 0 0 0 .759l4.684 4.61c.641.631 1.672.63 2.312 0l4.684-4.61a.53.53 0 0 0 0-.76.552.552 0 0 0-.771 0z">
-                                        </path>
-                                    </defs>
-                                    <use fill-rule="nonzero" transform="matrix(0 1 1 0 0 0)"
-                                        xlink:href="#arrow_right-a"></use>
-                                </svg>
+                                <react-component name="EuiIcon" props="{type:'arrowRight'}" />
                             </a>
                         </li>
                     </ul>
@@ -485,21 +373,8 @@
                         <md-card flex="" class="wz-md-card wz-padding-top-0 wz-padding-bottom-0 wz-no-margin _md flex">
                             <md-card-content>
                                 <div layout="row" class="wz-padding-top-10">
-                                    <table class="euiTable euiTable--responsive table table-striped table-condensed">
-                                        <tbody>
-                                            <tr ng-repeat="(key, value) in item"
-                                                ng-if="key !== 'expanded' && key !== 'showTooltip'"
-                                                ng-show="!isWindows() || (key !== 'inode' && key !== 'gid' && key !== 'gname')"
-                                                class="euiTableRow no-duo">
-                                                <td class="wz-word-break-rule ">{{key}}</td>
-                                                <td>
-                                                    <span class="wz-text-right color-grey">{{value}}</span>
-                                                </td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
+                                    <react-component name="EuiBasicTable" props="getSyscheckRowProps(item)" />
                                 </div>
-
                             </md-card-content>
                         </md-card>
                     </div>
@@ -514,18 +389,7 @@
                     <ul layout="row">
                         <li ng-show="currentPage" class="md-padding">
                             <a href ng-click="prevPage()">
-                                <svg class="euiIcon euiIcon--medium euiButtonIcon__icon" focusable="false"
-                                    aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
-                                    xmlns:xlink="http://www.w3.org/1999/xlink" width="16" height="16"
-                                    viewBox="0 0 16 16">
-                                    <defs>
-                                        <path id="arrow_left-a"
-                                            d="M13.069 5.157L8.384 9.768a.546.546 0 0 1-.768 0L2.93 5.158a.552.552 0 0 0-.771 0 .53.53 0 0 0 0 .759l4.684 4.61c.641.631 1.672.63 2.312 0l4.684-4.61a.53.53 0 0 0 0-.76.552.552 0 0 0-.771 0z">
-                                        </path>
-                                    </defs>
-                                    <use fill-rule="nonzero" transform="rotate(90 8 8)" xlink:href="#arrow_left-a">
-                                    </use>
-                                </svg>
+                                <react-component name="EuiIcon" props="{type:'arrowLeft'}" />
                             </a>
                         </li>
 
@@ -536,18 +400,7 @@
 
                         <li ng-show="currentPage < pagedItems.length - 1" class="md-padding">
                             <a href ng-click="nextPage()">
-                                <svg class="euiIcon euiIcon--medium euiButtonIcon__icon" focusable="false"
-                                    aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
-                                    xmlns:xlink="http://www.w3.org/1999/xlink" width="16" height="16"
-                                    viewBox="0 0 16 16">
-                                    <defs>
-                                        <path id="arrow_right-a"
-                                            d="M13.069 5.157L8.384 9.768a.546.546 0 0 1-.768 0L2.93 5.158a.552.552 0 0 0-.771 0 .53.53 0 0 0 0 .759l4.684 4.61c.641.631 1.672.63 2.312 0l4.684-4.61a.53.53 0 0 0 0-.76.552.552 0 0 0-.771 0z">
-                                        </path>
-                                    </defs>
-                                    <use fill-rule="nonzero" transform="matrix(0 1 1 0 0 0)"
-                                        xlink:href="#arrow_right-a"></use>
-                                </svg>
+                                <react-component name="EuiIcon" props="{type:'arrowRight'}" />
                             </a>
                         </li>
                     </ul>
@@ -560,17 +413,10 @@
 <div layout="row" ng-if="!error && !wazuh_table_loading && !totalItems">
     <div flex class="euiCallOut euiCallOut--warning">
         <div class="euiCallOutHeader">
-            <svg class="euiIcon euiIcon--medium euiCallOutHeader__icon" aria-hidden="true"
-                xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="16" height="16"
-                viewBox="0 0 16 16">
-                <defs>
-                    <path id="help-a"
-                        d="M13.6 12.186l-1.357-1.358c-.025-.025-.058-.034-.084-.056.53-.794.84-1.746.84-2.773a4.977 4.977 0 0 0-.84-2.772c.026-.02.059-.03.084-.056L13.6 3.813a6.96 6.96 0 0 1 0 8.373zM8 15A6.956 6.956 0 0 1 3.814 13.6l1.358-1.358c.025-.025.034-.057.055-.084C6.02 12.688 6.974 13 8 13a4.978 4.978 0 0 0 2.773-.84c.02.026.03.058.056.083l1.357 1.358A6.956 6.956 0 0 1 8 15zm-5.601-2.813a6.963 6.963 0 0 1 0-8.373l1.359 1.358c.024.025.057.035.084.056A4.97 4.97 0 0 0 3 8c0 1.027.31 1.98.842 2.773-.027.022-.06.031-.084.056l-1.36 1.358zm5.6-.187A4 4 0 1 1 8 4a4 4 0 0 1 0 8zM8 1c1.573 0 3.019.525 4.187 1.4l-1.357 1.358c-.025.025-.035.057-.056.084A4.979 4.979 0 0 0 8 3a4.979 4.979 0 0 0-2.773.842c-.021-.027-.03-.059-.055-.084L3.814 2.4A6.957 6.957 0 0 1 8 1zm0-1a8.001 8.001 0 1 0 .003 16.002A8.001 8.001 0 0 0 8 0z">
-                    </path>
-                </defs>
-                <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#help-a" fill-rule="evenodd"></use>
-            </svg>
-            <span class="euiCallOutHeader__title">{{customEmptyResults}}</span>
+            <span class="euiCallOutHeader__title">
+                <react-component name="EuiIcon" props="{type:'help'}" />
+                {{customEmptyResults}}
+            </span>
         </div>
     </div>
 </div>
@@ -578,17 +424,10 @@
 <div layout="row" ng-if="error" class="wz-margin-bottom-45">
     <div flex class="euiCallOut euiCallOut--warning">
         <div class="euiCallOutHeader">
-            <svg class="euiIcon euiIcon--medium euiCallOutHeader__icon" aria-hidden="true"
-                xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="16" height="16"
-                viewBox="0 0 16 16">
-                <defs>
-                    <path id="help-a"
-                        d="M13.6 12.186l-1.357-1.358c-.025-.025-.058-.034-.084-.056.53-.794.84-1.746.84-2.773a4.977 4.977 0 0 0-.84-2.772c.026-.02.059-.03.084-.056L13.6 3.813a6.96 6.96 0 0 1 0 8.373zM8 15A6.956 6.956 0 0 1 3.814 13.6l1.358-1.358c.025-.025.034-.057.055-.084C6.02 12.688 6.974 13 8 13a4.978 4.978 0 0 0 2.773-.84c.02.026.03.058.056.083l1.357 1.358A6.956 6.956 0 0 1 8 15zm-5.601-2.813a6.963 6.963 0 0 1 0-8.373l1.359 1.358c.024.025.057.035.084.056A4.97 4.97 0 0 0 3 8c0 1.027.31 1.98.842 2.773-.027.022-.06.031-.084.056l-1.36 1.358zm5.6-.187A4 4 0 1 1 8 4a4 4 0 0 1 0 8zM8 1c1.573 0 3.019.525 4.187 1.4l-1.357 1.358c-.025.025-.035.057-.056.084A4.979 4.979 0 0 0 8 3a4.979 4.979 0 0 0-2.773.842c-.021-.027-.03-.059-.055-.084L3.814 2.4A6.957 6.957 0 0 1 8 1zm0-1a8.001 8.001 0 1 0 .003 16.002A8.001 8.001 0 0 0 8 0z">
-                    </path>
-                </defs>
-                <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#help-a" fill-rule="evenodd"></use>
-            </svg>
-            <span class="euiCallOutHeader__title">{{error}}</span>
+            <span class="euiCallOutHeader__title">
+                <react-component name="EuiIcon" props="{type:'help'}" />
+                {{error}}
+            </span>
         </div>
     </div>
 </div>

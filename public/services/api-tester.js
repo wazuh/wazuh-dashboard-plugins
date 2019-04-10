@@ -29,10 +29,10 @@ export class ApiTester {
   async checkStored(data) {
     try {
       const configuration = this.wazuhConfig.getConfig();
-      const timeout = configuration ? configuration.timeout : 8000;
+      const timeout = configuration ? configuration.timeout : 20000;
       const headers = {
         headers: { 'Content-Type': 'application/json' },
-        timeout: timeout || 8000
+        timeout: timeout || 20000
       };
 
       /** Checks for outdated cookies */
@@ -82,7 +82,7 @@ export class ApiTester {
 
       const headers = {
         headers: { 'Content-Type': 'application/json' },
-        timeout: timeout || 8000
+        timeout: timeout || 20000
       };
 
       const url = chrome.addBasePath('/api/check-api');

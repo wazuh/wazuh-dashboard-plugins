@@ -51,8 +51,8 @@
 # Defines maximum timeout to be used on the Wazuh app requests.
 # It will be ignored if it is bellow 1500.
 # It means milliseconds before we consider a request as failed.
-# Default: 8000
-#timeout: 8000
+# Default: 20000
+#timeout: 20000
 #
 # ------------------------------ Advanced indices ------------------------------
 #

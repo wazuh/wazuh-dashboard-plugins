@@ -4,30 +4,35 @@
     <div layout="column" layout-padding>
         <div>
             <span class="font-size-18">Anti-flooding settings</span>
-            <span ng-if="(currentConfig['agent-buffer'] && currentConfig['agent-buffer'].buffer && currentConfig['agent-buffer'].buffer.disabled === 'no') || (currentConfig['agent-buffer'] && currentConfig['agent-buffer'].buffer && !currentConfig['agent-buffer'].buffer.disabled)"
+            <span
+                ng-if="(currentConfig['agent-buffer'] && currentConfig['agent-buffer'].buffer && currentConfig['agent-buffer'].buffer.disabled === 'no') || (currentConfig['agent-buffer'] && currentConfig['agent-buffer'].buffer && !currentConfig['agent-buffer'].buffer.disabled)"
                 class="wz-agent-status-indicator small teal">Enabled</span>
-            <span ng-if="currentConfig['agent-buffer'] && currentConfig['agent-buffer'].buffer && currentConfig['agent-buffer'].buffer.disabled === 'yes'"
+            <span
+                ng-if="currentConfig['agent-buffer'] && currentConfig['agent-buffer'].buffer && currentConfig['agent-buffer'].buffer.disabled === 'yes'"
                 class="wz-agent-status-indicator small red">Disabled</span>
         </div>
         <span class="md-subheader">Agent bucket parameters to avoid event flooding</span>
     </div>
     <!-- End headline -->
 
-    <!-- Loading ring -->
-    <div class='uil-ring-css' ng-show="load">
-        <div></div>
+    <div class="md-padding md-padding-top-16" ng-if="load">
+        <react-component name="EuiProgress" props="{size: 'xs', color: 'primary'}" />
     </div>
 
     <!-- This section contains the main content and the right sidenav -->
     <div flex="auto" layout="row" ng-if="!load">
 
         <!-- No configuration section -->
-        <wz-no-config flex error="currentConfig['agent-buffer']" ng-if="currentConfig['agent-buffer'] && isString(currentConfig['agent-buffer'])"></wz-no-config>
-        <wz-no-config flex error="'not-present'" ng-if="currentConfig['agent-buffer'] && !isString(currentConfig['agent-buffer']) && !currentConfig['agent-buffer'].buffer"></wz-no-config>
+        <wz-no-config flex error="currentConfig['agent-buffer']"
+            ng-if="currentConfig['agent-buffer'] && isString(currentConfig['agent-buffer'])"></wz-no-config>
+        <wz-no-config flex error="'not-present'"
+            ng-if="currentConfig['agent-buffer'] && !isString(currentConfig['agent-buffer']) && !currentConfig['agent-buffer'].buffer">
+        </wz-no-config>
         <!-- End no configuration section -->
 
         <!-- This section is the main content -->
-        <div flex layout="column" ng-if="currentConfig['agent-buffer'] && !isString(currentConfig['agent-buffer']) && currentConfig['agent-buffer'].buffer">
+        <div flex layout="column"
+            ng-if="currentConfig['agent-buffer'] && !isString(currentConfig['agent-buffer']) && currentConfig['agent-buffer'].buffer">
 
             <!-- The main card will all the settings -->
             <md-card class="wz-md-card" ng-if="!JSONContent && !XMLContent">
@@ -41,20 +46,25 @@
                             </div>
                         </div>
                         <span flex></span>
-                        <span ng-class="JSONContent ? 'wz-text-active' : ''" class="wz-text-link small" ng-click="getJSON()">JSON</span>
+                        <span ng-class="JSONContent ? 'wz-text-active' : ''" class="wz-text-link small"
+                            ng-click="getJSON()">JSON</span>
                         <span class="small">&nbsp;&centerdot;&nbsp;</span>
-                        <span ng-class="XMLContent ? 'wz-text-active' : ''" class="wz-text-link small" ng-click="getXML()">XML</span>
+                        <span ng-class="XMLContent ? 'wz-text-active' : ''" class="wz-text-link small"
+                            ng-click="getXML()">XML</span>
                     </div>
                     <md-divider class="wz-margin-top-10"></md-divider>
 
                     <!-- Configuration block -->
                     <div class="wz-padding-top-10">
 
-                        <wz-config-item label="Buffer status" value="currentConfig['agent-buffer'].buffer.disabled === 'yes'? 'disabled' : 'enabled'">
+                        <wz-config-item label="Buffer status"
+                            value="currentConfig['agent-buffer'].buffer.disabled === 'yes'? 'disabled' : 'enabled'">
                         </wz-config-item>
-                        <wz-config-item label="Queue size" value="currentConfig['agent-buffer'].buffer.queue_size || '5000'">
+                        <wz-config-item label="Queue size"
+                            value="currentConfig['agent-buffer'].buffer.queue_size || '5000'">
                         </wz-config-item>
-                        <wz-config-item label="Events per second" value="currentConfig['agent-buffer'].buffer.events_per_second || '500'">
+                        <wz-config-item label="Events per second"
+                            value="currentConfig['agent-buffer'].buffer.events_per_second || '500'">
                         </wz-config-item>
 
                     </div>
@@ -63,20 +73,25 @@
             </md-card>
             <!-- End main card with all the settings -->
 
-            <wz-config-viewer flex getjson="getJSON()" getxml="getXML()" jsoncontent="JSONContent" xmlcontent="XMLContent" />
+            <wz-config-viewer flex getjson="getJSON()" getxml="getXML()" jsoncontent="JSONContent"
+                xmlcontent="XMLContent" />
 
         </div>
         <!-- End main content section -->
 
         <!-- This section is the right sidenav content -->
         <md-sidenav class="md-sidenav-right" style="width: auto !important;" md-is-locked-open="true">
-            <span class="wz-margin-right-8 wz-text-link wz-text-right wz-margin-top-8" ng-click="showHelp = !showHelp"><i
-                    class="fa fa-fw fa-question-circle-o"></i></span>
+            <span class="wz-margin-right-8 wz-text-link wz-text-right wz-margin-top-8"
+                ng-click="showHelp = !showHelp"><i class="fa fa-fw fa-question-circle-o"></i></span>
             <md-list ng-if="showHelp">
                 <md-subheader>More info about this section</md-subheader>
-                <md-list-item target="_blank" class="wz-text-link" ng-href="https://documentation.wazuh.com/current/user-manual/capabilities/antiflooding.html">Anti-flooding
+                <md-list-item target="_blank" class="wz-text-link"
+                    ng-href="https://documentation.wazuh.com/current/user-manual/capabilities/antiflooding.html">
+                    Anti-flooding
                     mechanism</md-list-item>
-                <md-list-item target="_blank" class="wz-text-link" ng-href="https://documentation.wazuh.com/current/user-manual/reference/ossec-conf/agent_buffer.html">Client
+                <md-list-item target="_blank" class="wz-text-link"
+                    ng-href="https://documentation.wazuh.com/current/user-manual/reference/ossec-conf/agent_buffer.html">
+                    Client
                     buffer reference</md-list-item>
             </md-list>
         </md-sidenav>

@@ -216,9 +216,13 @@ app.directive('wzListManage', function() {
       };
 
       $scope.confirmRemoveEntry = key => {
+        const page = $scope.currentPage;
         delete $scope.currentList.list[key];
         $scope.removingEntry = false;
         fetch();
+        $scope.setPage(
+          $scope.pagedItems.length - 1 >= $scope.n ? page : page - 1
+        );
       };
 
       const showRestartMessage = async msg => {

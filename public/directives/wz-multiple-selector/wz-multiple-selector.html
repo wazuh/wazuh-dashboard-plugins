@@ -1,7 +1,9 @@
-<div flex class='row flex'>
-    <div class='uil-ring-css' ng-show='loading'>
-        <div></div>
+<div flex class="row flex">
+
+    <div ng-if="loading" class="md-padding wz-margin-top-16">
+        <react-component name="EuiProgress" props="{size: 'xs', color: 'primary'}" />
     </div>
+
     <div id='wzMultipleSelector' ng-show='!loading'>
         <div class='wzMultipleSelectorLeft'>
             <div class='panel panel-primary'>

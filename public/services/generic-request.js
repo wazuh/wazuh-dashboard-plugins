@@ -41,7 +41,7 @@ export class GenericRequest {
       const { timeout } = this.wazuhConfig.getConfig();
       const requestHeaders = {
         headers: { 'Content-Type': 'application/json' },
-        timeout: timeout || 8000
+        timeout: timeout || 20000
       };
       const tmpUrl = chrome.addBasePath(path);
 

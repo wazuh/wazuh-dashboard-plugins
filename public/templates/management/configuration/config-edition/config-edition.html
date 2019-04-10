@@ -1,26 +1,24 @@
-<div flex="auto" layout="column" ng-if="editionTab === 'editconfiguration'">
+<div flex="auto" layout="column" ng-if="mctrl.editionTab === 'editconfiguration'">
+    <div flex="auto" layout="column" ng-controller="editionController as editctrl"
+        ng-show="editctrl.editingFile && !editctrl.load ">
 
-    <div flex="auto" layout="column" ng-controller="editionController" ng-show="editingFile && !load ">
-
-        <!-- Loading ring -->
-        <div class='uil-ring-css' ng-show="load">
-            <div></div>
-        </div>
         <!-- Headline (cluster) -->
         <div layout="column" layout-padding
-            ng-show="clusterStatus.data.data.enabled === 'yes' && clusterStatus.data.data.running === 'yes' ">
+            ng-show="editctrl.clusterStatus.data.data.enabled === 'yes' && editctrl.clusterStatus.data.data.running === 'yes' ">
             <div layout="row">
                 <span class="font-size-18">
-                    <i class="fa fa-fw fa-edit" aria-hidden="true"></i> Cluster configuration</span>
+                    <react-component name="EuiIcon" props="{type:'gear', size:'l'}" /> Cluster configuration
+                </span>
             </div>
         </div>
 
         <!-- Headline (manager) -->
         <div layout="column" layout-padding
-            ng-show="clusterStatus.data.data.enabled !== 'yes' || clusterStatus.data.data.running !== 'yes' ">
+            ng-show="editctrl.clusterStatus.data.data.enabled !== 'yes' || editctrl.clusterStatus.data.data.running !== 'yes' ">
             <div layout="row">
                 <span class="font-size-18">
-                    <i class="fa fa-fw fa-edit" aria-hidden="true"></i> Manager configuration</span>
+                    <react-component name="EuiIcon" props="{type:'gear', size:'l'}" /> Manager configuration
+                </span>
             </div>
         </div>
         <!-- End headline -->
@@ -30,58 +28,100 @@
             <div flex layout="column">
                 <div layout="row" class="md-padding-h">
                     <!-- List of nodes if cluster is enabled -->
-                    <div ng-show="selectedNode && clusterStatus.data.data.enabled === 'yes' && clusterStatus.data.data.running === 'yes'"
+                    <div ng-show="editctrl.selectedNode && editctrl.clusterStatus.data.data.enabled === 'yes' && editctrl.clusterStatus.data.data.running === 'yes'"
                         layout="row" layout-padding style="padding: 0;height: 32px;">
                         <div layout="column" layout-align="center" class="height-35 wz-select-input wz-margin-right-8">
                             <select class="kuiSelect wz-border-none cursor-pointer max-height-35" id="categoryBox"
-                                ng-model="selectedNode" ng-change="changeNode()" aria-label="Select node">
-                                <option ng-repeat="node in nodes" value="{{node.name}}">{{node.name}} ({{node.type}})
+                                ng-model="editctrl.selectedNode" ng-change="editctrl.changeNode()"
+                                ng-disabled="editctrl.xmlHasErrors || editctrl.doingSaving || editctrl.isRestarting || wazuhNotReadyYet"
+                                aria-label="Select node">
+                                <option ng-repeat="node in editctrl.nodes" value="{{node.name}}">{{node.name}}
+                                    ({{node.type}})
                                 </option>
                             </select>
                         </div>
                     </div>
-                    <button ng-disabled='xmlHasErrors || doingSaving || isRestarting'
-                        ng-click="switchConfigurationTab('welcome', false)" class='btn btn-info'>
+                    <button
+                        ng-disabled="editctrl.xmlHasErrors || editctrl.doingSaving || editctrl.isRestarting || wazuhNotReadyYet"
+                        ng-click="mconfigctrl.switchConfigurationTab('welcome', false)"
+                        class='kuiButton kuiButton--hollow height-35'>
                         <span>Cancel</span>
                     </button>
 
                     <div layout="row" class="fullWidth">
-                        <button ng-disabled='xmlHasErrors || doingSaving || isRestarting' ng-click='saveConfiguration()'
-                            class='btn wz-button wz-margin-left-8'>
-                            <span ng-show='!xmlHasErrors'><i aria-hidden='true' class='fa fa-fw fa-save'
-                                    ng-class="doingSaving ? 'fa-spin fa-spinner' : ''"></i>Save</span>
-                            <span ng-show='xmlHasErrors' class='btn-danger'><i aria-hidden='true'
+                        <button
+                            ng-disabled="editctrl.xmlHasErrors || editctrl.doingSaving || editctrl.isRestarting || wazuhNotReadyYet"
+                            ng-click="editctrl.saveConfiguration()"
+                            class="kuiButton kuiButton--secondary height-35 wz-margin-left-8">
+                            <span ng-show="!editctrl.xmlHasErrors">
+                                <react-component name="EuiIcon" ng-if="!editctrl.doingSaving" props="{type:'save'}" />
+                                <react-component name="EuiLoadingSpinner" ng-if="editctrl.doingSaving"
+                                    props="{size: 's'}" />
+                                Save
+                            </span>
+                            <span ng-show="editctrl.xmlHasErrors" class='btn-danger'><i aria-hidden='true'
                                     class='fa fa-fw fa-exclamation-triangle'></i>
                                 XML format error</span>
                         </button>
                         <span flex ng-if="!restartBtn"></span>
                         <button ng-show="!showConfirmRestartNode && !restartBtn" class="btn wz-button"
-                            ng-disabled="isRestarting || doingSaving" ng-click="showConfirmRestartNode = true"><i
-                                class="fa fa-refresh" ng-class="isRestarting ? 'fa-spin fa-spinner' : ''"></i>
-                            Restart {{selectedNode}}
+                            ng-disabled="editctrl.isRestarting || editctrl.doingSaving || wazuhNotReadyYet"
+                            ng-click="showConfirmRestartNode = true">
+                            <react-component name="EuiIcon" ng-if="!editctrl.isRestarting" props="{type:'refresh'}" />
+                            <react-component name="EuiLoadingSpinner" ng-if="editctrl.isRestarting"
+                                props="{size: 's'}" />
+                            Restart {{editctrl.selectedNode}}
                         </button>
                         <div ng-show="showConfirmRestartNode" class="confirmEmbedBubble confirmEmbedBubbleInline">
                             <div layout="row no-wrap">
-                                <span class="wz-padding-top-10 wz-padding-left-8"><strong>{{selectedNode}}</strong>
+                                <span
+                                    class="wz-padding-top-10 wz-padding-left-8"><strong>{{editctrl.selectedNode}}</strong>
                                     will be
                                     restarted
                                 </span>
                             </div>
                             <div layout="row">
-                                <md-button class="cancelBtn btn-info" type="button"
+                                <md-button class="kuiButton kuiButton--hollow height-35" type="button"
                                     ng-click="showConfirmRestartNode = false">Cancel</md-button>
                                 <md-button class="btn wz-button" type="button"
-                                    ng-click="restartNode(selectedNode);showConfirmRestartNode = false"><i
-                                        aria-hidden='true' class='fa fa-fw fa-check'></i>
+                                    ng-click="editctrl.restartNode(editctrl.selectedNode);showConfirmRestartNode = false">
+                                    <react-component name="EuiIcon" props="{type:'check'}" />
                                     Confirm</md-button>
                             </div>
                         </div>
                     </div>
                 </div>
-                <div class="md-padding md-padding-top-10" style="height: calc(100vh - 215px);" ng-if="fetchedXML">
-                    <wz-xml-file-editor file-name='ossec.conf' data="fetchedXML" target-name="selectedNode"
-                        valid-fn='xmlIsValid(valid)' saving-param='toggleSaveConfig()'
-                        close-fn='closeEditingFile(reload)'>
+                <div class="md-padding md-padding-top-10" style="height: calc(100vh - 215px);"
+                    ng-if="!editctrl.fetchedXML && !editctrl.failedNode">
+                    <react-component name="EuiProgress" props="{size: 'xs', color: 'primary'}" />
+                </div>
+
+                <div class="md-padding md-padding-top-10" style="height: calc(100vh - 215px);"
+                    ng-if="!editctrl.fetchedXML && editctrl.failedNode">
+                    <div flex layout="row" layout-align="center center">
+                        <md-card flex="50" class="wz-md-card" flex>
+                            <md-card-content class="wz-text-center">
+                                <span class="wz-headline-title">
+                                    <react-component name="EuiIcon" props="{type: 'alert'}" /> Wazuh manager not
+                                    reachable.
+                                </span>
+                                <md-divider class="wz-margin-top-10"></md-divider>
+                                <div layout="row" class="wz-margin-top-10 layout-align-center-center">
+                                    <button class="kuiButton kuiButton--secondary height-35"
+                                        ng-click="editctrl.changeNode()">
+                                        <react-component name="EuiIcon" props="{type: 'refresh'}" /> Refresh
+                                    </button>
+                                </div>
+                            </md-card-content>
+                        </md-card>
+                    </div>
+                </div>
+
+                <div class="md-padding md-padding-top-10" style="height: calc(100vh - 215px);"
+                    ng-if="editctrl.fetchedXML">
+                    <wz-xml-file-editor file-name="ossec.conf" data="editctrl.fetchedXML"
+                        target-name="editctrl.selectedNode" valid-fn="editctrl.xmlIsValid(valid)"
+                        saving-param="editctrl.toggleSaveConfig()" close-fn="editctrl.closeEditingFile(reload)">
                     </wz-xml-file-editor>
                 </div>
             </div>

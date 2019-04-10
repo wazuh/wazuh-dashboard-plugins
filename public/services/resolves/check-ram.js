@@ -26,10 +26,6 @@ export async function totalRAM(genericReq, errorHandler) {
       );
     }
   } catch (error) {
-    errorHandler.handle(
-      `Kibana server has an unknown amount of RAM, please review it.`,
-      'RAM',
-      true
-    );
+    console.log(error.message || error);
   }
 }

@@ -31,3 +31,5 @@ import './wz-list-manage/wz-list-manage';
 import './wz-kbn-switch/wz-kbn-switch';
 import './wz-register-agents/wz-register-agents';
 import './wz-register-agents/wz-register-agents.less';
+import './wz-add-filter-chip/wz-add-filter-chip';
+import './wz-add-filter-chip/wz-add-filter-chip.less';

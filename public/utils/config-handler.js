@@ -26,25 +26,53 @@ export class ConfigurationHandler {
       $scope.integrations[integration.name] = integration;
   }
 
+  parseWodle(config, wodleKey) {
+    try {
+      console.log(config, wodleKey);
+      const wmodulesArray =
+        ((config || {})['wmodules-wmodules'] || {}).wmodules || [];
+      console.log(wmodulesArray);
+      const result = wmodulesArray.filter(
+        item => typeof item[wodleKey] !== 'undefined'
+      );
+      console.log(result[0][wodleKey]);
+      return result.length ? result[0][wodleKey] : false;
+    } catch (error) {
+      return false;
+    }
+  }
+
   /**
    * Switchs between configuration tabs
    * @param {string} configurationTab The configuration tab to open
    * @param {Array<object>} sections Array that includes sections to be fetched
    */
-  async switchConfigTab(configurationTab, sections, $scope, agentId = false) {
+  async switchConfigTab(
+    configurationTab,
+    sections,
+    $scope,
+    agentId = false,
+    node = false
+  ) {
     try {
       $scope.load = true;
       $scope.currentConfig = null;
       $scope.XMLContent = false;
       $scope.JSONContent = false;
-      $scope.configurationSubTab = false;
+      //$scope.configurationSubTab = false;
       $scope.configurationTab = configurationTab;
       $scope.currentConfig = await queryConfig(
         agentId || '000',
         sections,
         this.apiReq,
-        this.errorHandler
+        this.errorHandler,
+        node
       );
+
+      if ($scope.configurationSubTab === 'pm-sca') {
+        $scope.currentConfig.sca = this.parseWodle($scope.currentConfig, 'sca');
+      }
+
       if (sections[0].component === 'integrator') {
         this.buildIntegrations(
           $scope.currentConfig['integrator-integration'].integration,
@@ -54,23 +82,33 @@ export class ConfigurationHandler {
         $scope.integrations = {};
       }
 
-      if (
-        $scope.currentConfig['logcollector-localfile'] &&
-        $scope.currentConfig['logcollector-localfile'].localfile
-      ) {
-        $scope.currentConfig['logcollector-localfile'].localfile.forEach(
-          function(file) {
-            if (file.target) {
-              file.targetStr = '';
-              file.target.forEach(function(target, idx) {
-                file.targetStr = file.targetStr.concat(target);
-                if (idx != file.target.length - 1) {
-                  file.targetStr = file.targetStr.concat(', ');
-                }
-              });
-            }
+      if (($scope.currentConfig['logcollector-localfile'] || {}).localfile) {
+        const data = $scope.currentConfig['logcollector-localfile'].localfile;
+        $scope.currentConfig['logcollector-localfile'][
+          'localfile-logs'
+        ] = data.filter(item => typeof item.file !== 'undefined');
+        $scope.currentConfig['logcollector-localfile'][
+          'localfile-commands'
+        ] = data.filter(item => typeof item.file === 'undefined');
+
+        const sanitizeLocalfile = file => {
+          if (file.target) {
+            file.targetStr = '';
+            file.target.forEach(function(target, idx) {
+              file.targetStr = file.targetStr.concat(target);
+              if (idx != file.target.length - 1) {
+                file.targetStr = file.targetStr.concat(', ');
+              }
+            });
           }
-        );
+        };
+
+        $scope.currentConfig['logcollector-localfile'][
+          'localfile-logs'
+        ].forEach(sanitizeLocalfile);
+        $scope.currentConfig['logcollector-localfile'][
+          'localfile-commands'
+        ].forEach(sanitizeLocalfile);
       }
       $scope.load = false;
       $scope.$applyAsync();
@@ -85,29 +123,28 @@ export class ConfigurationHandler {
    * Switchs to a wodle section
    * @param {string} wodleName The wodle to open
    */
-  async switchWodle(wodleName, $scope, agentId = false) {
+  async switchWodle(wodleName, $scope, agentId = false, node = false) {
     try {
       $scope.load = true;
       $scope.currentConfig = null;
       $scope.XMLContent = false;
       $scope.JSONContent = false;
-      $scope.configurationSubTab = false;
+      //$scope.configurationSubTab = false;
       $scope.configurationTab = wodleName;
 
       $scope.currentConfig = await queryConfig(
         agentId || '000',
         [{ component: 'wmodules', configuration: 'wmodules' }],
         this.apiReq,
-        this.errorHandler
+        this.errorHandler,
+        node
       );
 
       // Filter by provided wodleName
       let result = [];
       if (
         wodleName &&
-        $scope.currentConfig &&
-        $scope.currentConfig['wmodules-wmodules'] &&
-        $scope.currentConfig['wmodules-wmodules'].wmodules
+        (($scope.currentConfig || {})['wmodules-wmodules'] || {}).wmodules
       ) {
         result = $scope.currentConfig['wmodules-wmodules'].wmodules.filter(
           item => typeof item[wodleName] !== 'undefined'
@@ -150,9 +187,7 @@ export class ConfigurationHandler {
       if (
         wodleName &&
         wodleName !== 'command' &&
-        wodlesConfig &&
-        wodlesConfig['wmodules-wmodules'] &&
-        wodlesConfig['wmodules-wmodules'].wmodules
+        ((wodlesConfig || {})['wmodules-wmodules'] || {}).wmodules
       ) {
         result = wodlesConfig['wmodules-wmodules'].wmodules.filter(
           item =>
@@ -176,7 +211,7 @@ export class ConfigurationHandler {
     $scope.currentConfig = null;
     $scope.XMLContent = false;
     $scope.JSONContent = false;
-    $scope.configurationSubTab = false;
+    //$scope.configurationSubTab = false;
     $scope.configurationTab = configurationTab;
     $scope.$applyAsync();
   }

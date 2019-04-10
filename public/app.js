@@ -30,6 +30,9 @@ import './less/loader';
 import { uiModules } from 'ui/modules';
 import chrome from 'ui/chrome';
 
+// EUI React components wrapper
+import './components';
+
 // Set up Wazuh app
 const app = uiModules.get('app/wazuh', ['ngCookies', 'ngMaterial']);
 

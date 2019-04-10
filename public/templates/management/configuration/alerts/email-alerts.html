@@ -2,12 +2,18 @@
 <div flex="auto" layout="row" ng-if="!load && configurationSubTab === 'email-alerts'">
 
     <!-- No configuration section -->
-    <wz-no-config flex error="currentConfig['mail-alerts']" ng-if="currentConfig['mail-alerts'] && isString(currentConfig['mail-alerts'])"></wz-no-config>
-    <wz-no-config flex error="'not-present'" ng-if="currentConfig['mail-alerts'] && !isString(currentConfig['mail-alerts']) && (!currentConfig['mail-alerts'].email_alerts || !currentConfig['mail-alerts'].email_alerts.length)"></wz-no-config>
+    <wz-no-config flex error="currentConfig['mail-alerts']"
+        ng-if="currentConfig['mail-alerts'] && isString(currentConfig['mail-alerts'])"></wz-no-config>
+    <wz-no-config flex error="'not-present'"
+        ng-if="currentConfig['mail-alerts'] && !isString(currentConfig['mail-alerts']) && (!currentConfig['mail-alerts'].email_alerts || !currentConfig['mail-alerts'].email_alerts.length)">
+    </wz-no-config>
+    <wz-no-config flex error="'Wazuh not ready yet'"
+        ng-if="wazuhNotReadyYet && (!currentConfig || !currentConfig['mail-alerts'])" />
     <!-- End no configuration section -->
 
     <!-- This section is the main content -->
-    <div flex layout="column" ng-if="currentConfig['mail-alerts'] && !isString(currentConfig['mail-alerts']) && currentConfig['mail-alerts'].email_alerts && currentConfig['mail-alerts'].email_alerts.length">
+    <div flex layout="column"
+        ng-if="currentConfig['mail-alerts'] && !isString(currentConfig['mail-alerts']) && currentConfig['mail-alerts'].email_alerts && currentConfig['mail-alerts'].email_alerts.length">
 
         <!-- The main card will all the settings -->
         <md-card flex="auto" class="wz-md-card height-full" ng-if="!JSONContent && !XMLContent">
@@ -20,9 +26,11 @@
                         </div>
                     </div>
                     <span flex></span>
-                    <span ng-class="JSONContent ? 'wz-text-active' : ''" class="wz-text-link small" ng-click="getJSON()">JSON</span>
+                    <span ng-class="JSONContent ? 'wz-text-active' : ''" class="wz-text-link small"
+                        ng-click="getJSON()">JSON</span>
                     <span class="small">&nbsp;&centerdot;&nbsp;</span>
-                    <span ng-class="XMLContent ? 'wz-text-active' : ''" class="wz-text-link small" ng-click="getXML()">XML</span>
+                    <span ng-class="XMLContent ? 'wz-text-active' : ''" class="wz-text-link small"
+                        ng-click="getXML()">XML</span>
                 </div>
                 <md-divider class="wz-margin-top-10"></md-divider>
 
@@ -32,7 +40,9 @@
                     <div flex="30" layout="column">
 
                         <md-list flex="auto" class="wz-item-list">
-                            <md-list-item class="wz-text-link" ng-click="updateSelectedItem($index)" ng-repeat="item in currentConfig['mail-alerts'].email_alerts">{{item.email_to}}</md-list-item>
+                            <md-list-item class="wz-text-link" ng-click="updateSelectedItem($index)"
+                                ng-repeat="item in currentConfig['mail-alerts'].email_alerts">{{item.email_to}}
+                            </md-list-item>
                         </md-list>
 
                     </div>
@@ -42,21 +52,29 @@
                     <div flex layout="column" ng-if="currentConfig['mail-alerts'].email_alerts.length">
 
                         <div flex="auto" class="wz-item-detail">
-                            <wz-config-item label="Send alerts to this email address" value="currentConfig['mail-alerts'].email_alerts[selectedItem].email_to">
+                            <wz-config-item label="Send alerts to this email address"
+                                value="currentConfig['mail-alerts'].email_alerts[selectedItem].email_to">
                             </wz-config-item>
-                            <wz-config-item label="Minimum severity level to send the alert by email" value="currentConfig['mail-alerts'].email_alerts[selectedItem].level">
+                            <wz-config-item label="Minimum severity level to send the alert by email"
+                                value="currentConfig['mail-alerts'].email_alerts[selectedItem].level">
                             </wz-config-item>
-                            <wz-config-item label="Send only alerts that belong to one of these groups" value="currentConfig['mail-alerts'].email_alerts[selectedItem].group">
+                            <wz-config-item label="Send only alerts that belong to one of these groups"
+                                value="currentConfig['mail-alerts'].email_alerts[selectedItem].group">
                             </wz-config-item>
-                            <wz-config-item label="Send alerts when they match this event location" value="currentConfig['mail-alerts'].email_alerts[selectedItem].event_location">
+                            <wz-config-item label="Send alerts when they match this event location"
+                                value="currentConfig['mail-alerts'].email_alerts[selectedItem].event_location">
                             </wz-config-item>
-                            <wz-config-item label="Format for email alerts" value="currentConfig['mail-alerts'].email_alerts[selectedItem].format">
+                            <wz-config-item label="Format for email alerts"
+                                value="currentConfig['mail-alerts'].email_alerts[selectedItem].format">
                             </wz-config-item>
-                            <wz-config-item label="Send only alerts that belong to one of these rule IDs" value="currentConfig['mail-alerts'].email_alerts[selectedItem].rule_id">
+                            <wz-config-item label="Send only alerts that belong to one of these rule IDs"
+                                value="currentConfig['mail-alerts'].email_alerts[selectedItem].rule_id">
                             </wz-config-item>
-                            <wz-config-item label="Disable delayed email delivery" value="currentConfig['mail-alerts'].email_alerts[selectedItem].do_not_delay">
+                            <wz-config-item label="Disable delayed email delivery"
+                                value="currentConfig['mail-alerts'].email_alerts[selectedItem].do_not_delay">
                             </wz-config-item>
-                            <wz-config-item label="Disable alerts grouping into the same email" value="currentConfig['mail-alerts'].email_alerts[selectedItem].do_not_group">
+                            <wz-config-item label="Disable alerts grouping into the same email"
+                                value="currentConfig['mail-alerts'].email_alerts[selectedItem].do_not_group">
                             </wz-config-item>
                         </div>
 
@@ -68,7 +86,8 @@
         </md-card>
         <!-- End main card with all the settings -->
 
-        <wz-config-viewer flex getjson="getJSON()" getxml="getXML()" jsoncontent="JSONContent" xmlcontent="XMLContent" />
+        <wz-config-viewer flex getjson="getJSON()" getxml="getXML()" jsoncontent="JSONContent"
+            xmlcontent="XMLContent" />
 
     </div>
     <!-- End main content section -->
@@ -79,11 +98,16 @@
                 class="fa fa-fw fa-question-circle-o"></i></span>
         <md-list ng-if="showHelp">
             <md-subheader>More info about this section</md-subheader>
-            <md-list-item target="_blank" class="wz-text-link" ng-href="https://documentation.wazuh.com/current/user-manual/manager/manual-email-report/index.html">How
+            <md-list-item target="_blank" class="wz-text-link"
+                ng-href="https://documentation.wazuh.com/current/user-manual/manager/manual-email-report/index.html">How
                 to configure email alerts</md-list-item>
-            <md-list-item target="_blank" class="wz-text-link" ng-href="https://documentation.wazuh.com/current/user-manual/manager/manual-email-report/smtp_authentication.html">How
+            <md-list-item target="_blank" class="wz-text-link"
+                ng-href="https://documentation.wazuh.com/current/user-manual/manager/manual-email-report/smtp_authentication.html">
+                How
                 to configure authenticated SMTP server</md-list-item>
-            <md-list-item target="_blank" class="wz-text-link" ng-href="https://documentation.wazuh.com/current/user-manual/reference/ossec-conf/email_alerts.html">Email
+            <md-list-item target="_blank" class="wz-text-link"
+                ng-href="https://documentation.wazuh.com/current/user-manual/reference/ossec-conf/email_alerts.html">
+                Email
                 alerts reference</md-list-item>
         </md-list>
     </md-sidenav>

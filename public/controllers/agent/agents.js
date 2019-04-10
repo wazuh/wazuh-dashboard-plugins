@@ -348,6 +348,12 @@ export class AgentsController {
         configurationSubTab,
         this.$scope
       );
+      if (configurationSubTab === 'pm-sca') {
+        this.$scope.currentConfig.sca = this.configurationHandler.parseWodle(
+          this.$scope.currentConfig,
+          'sca'
+        );
+      }
     };
     this.$scope.updateSelectedItem = i => (this.$scope.selectedItem = i);
     this.$scope.getIntegration = list =>

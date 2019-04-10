@@ -467,7 +467,7 @@ app.directive('wzTable', function() {
         return instance.path.includes('/syscheck');
       };
 
-      $scope.isWindows = () => {
+      const isWindows = () => {
         const agent = $scope.$parent.$parent.$parent.$parent.agent;
         return (agent.os || {}).platform === 'windows';
       };
@@ -481,6 +481,7 @@ app.directive('wzTable', function() {
           item.expanded = true;
         }
       };
+
       $scope.showTooltip = (id1, id2, item) => {
         const $element = $('#td-' + id1 + '-' + id2 + ' div');
         const $c = $element
@@ -507,6 +508,27 @@ app.directive('wzTable', function() {
           draggingClass: false
         });
         $scope.$applyAsync();
+      };
+
+      $scope.getSyscheckRowProps = item => {
+        const excluded = ['$$hashKey', 'expanded', 'showTooltip'];
+        isWindows() && excluded.push(...['inode', 'gid', 'gname']);
+        const isRegistry = (item || {}).type === 'registry';
+        isRegistry &&
+          excluded.push(...['size', 'uname', 'sha256', 'uid', 'inode']);
+        const items = [];
+        for (const key in item) {
+          !excluded.includes(key) &&
+            items.push({ key: KeyEquivalenece[key] || key, value: item[key] });
+        }
+        const props = {
+          items,
+          columns: [
+            { field: 'key', name: 'Field', width: '10%' },
+            { field: 'value', name: 'Value' }
+          ]
+        };
+        return props;
       };
     },
     template

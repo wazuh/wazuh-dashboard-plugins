@@ -9,29 +9,14 @@
         <!-- Main Wazuh app navigation buttons -->
         <md-button class="wz-menu-button" ng-href="#/overview"
             ng-class="{'wz-menu-active': menuNavItem === 'overview' }" aria-label="Overview tab">
-            <svg class="euiIcon euiIcon--ghost euiIcon--medium" focusable="false" xmlns="http://www.w3.org/2000/svg"
-                width="32" height="32" viewBox="0 0 32 32">
-                <path class="euiIcon__fillSecondary" d="M32 32H4a4 4 0 0 1-4-4V0h2v28a2 2 0 0 0 2 2h28v2z"></path>
-                <path d="M6 20h2v7H6zM16 12h2v15h-2zM26 17h2v10h-2z"></path>
-                <path
-                    d="M27 6a3 3 0 0 0-2.08.84L20 4.36A2.2 2.2 0 0 0 20 4a3 3 0 0 0-6 0c.001.341.062.68.18 1l-5.6 4.46A3 3 0 0 0 7 9a3 3 0 1 0 3 3 2.93 2.93 0 0 0-.18-1l5.6-4.48A3 3 0 0 0 17 7a3 3 0 0 0 2.08-.84l5 2.48A2.2 2.2 0 0 0 24 9a3 3 0 1 0 3-3zM7 13a1 1 0 1 1 0-2 1 1 0 0 1 0 2zm10-8a1 1 0 1 1 0-2 1 1 0 0 1 0 2zm10 5a1 1 0 1 1 0-2 1 1 0 0 1 0 2z">
-                </path>
-            </svg> Overview
+            <react-component name="EuiIcon" class="kbnGlobalNavLink__euiIcon"
+                props="{type:'visualizeApp', color:'ghost'}" /> Overview
         </md-button>
 
         <md-button class="wz-menu-button" ng-href="#/manager" ng-class="{'wz-menu-active': menuNavItem === 'manager' }"
             aria-label="Cluster tab">
-            <svg class="euiIcon euiIcon--ghost euiIcon--medium" focusable="false" xmlns="http://www.w3.org/2000/svg"
-                width="32" height="32" viewBox="0 0 32 32">
-                <path class="euiIcon__fillSecondary"
-                    d="M12.594 18.424h3.875v1.939h-3.875zM12.594 26.182h3.875v1.939h-3.875z"></path>
-                <path
-                    d="M8.719 14.545V32H31V14.545H8.719zm20.343 1.94v5.818H10.657v-5.818h18.407zM10.657 30.06v-5.819h18.407v5.819H10.655z">
-                </path>
-                <path
-                    d="M27.648 12.606a8.499 8.499 0 0 0-4.398-3.879 8.983 8.983 0 0 0-8.903-7.81 8.983 8.983 0 0 0-8.903 7.81 8.553 8.553 0 0 0-5.353 8.645 8.55 8.55 0 0 0 6.69 7.656V23.03a6.612 6.612 0 0 1-4.845-6.293 6.613 6.613 0 0 1 4.69-6.41l.64-.194v-.669a7.046 7.046 0 0 1 7.023-6.527 7.046 7.046 0 0 1 7.024 6.527v.67l.639.193a6.587 6.587 0 0 1 3.4 2.28h2.296z">
-                </path>
-            </svg> Management
+            <react-component name="EuiIcon" class="kbnGlobalNavLink__euiIcon"
+                props="{type:'infraApp', color:'ghost'}" /> Management
         </md-button>
 
         <md-button class="wz-menu-button" ng-href="#/agents-preview"
@@ -41,20 +26,13 @@
 
         <md-button class="wz-menu-button" ng-href="#/wazuh-discover"
             ng-class="{'wz-menu-active': menuNavItem === 'discover' }" aria-label="Discover tab">
-            <svg class="euiIcon euiIcon--ghost euiIcon--medium" focusable="false" xmlns="http://www.w3.org/2000/svg"
-                width="32" height="32" viewBox="0 0 32 32">
-                <path class="euiIcon__fillSecondary"
-                    d="M8.33 23.67l4.79-10.55 10.55-4.79-4.79 10.55-10.55 4.79zm6.3-9l-2.28 5 5-2.28 2.28-5-5 2.28z">
-                </path>
-                <path
-                    d="M16 0C7.163 0 0 7.163 0 16s7.163 16 16 16 16-7.163 16-16A16 16 0 0 0 16 0zm1 29.95V28h-2v1.95A14 14 0 0 1 2.05 17H4v-2H2.05A14 14 0 0 1 15 2.05V4h2V2.05A14 14 0 0 1 29.95 15H28v2h1.95A14 14 0 0 1 17 29.95z">
-                </path>
-            </svg> Discover
+            <react-component name="EuiIcon" class="kbnGlobalNavLink__euiIcon"
+                props="{type:'discoverApp', color:'ghost'}" /> Discover
         </md-button>
 
         <md-button class="wz-menu-button" ng-href="#/wazuh-dev"
             ng-class="{'wz-menu-active': menuNavItem === 'wazuh-dev' }" aria-label="Dev Tools tab">
-            <i class="fa fa-fw fa-code" aria-hidden="true"></i> Dev tools
+            <react-component name="EuiIcon" class="kbnGlobalNavLink__euiIcon" props="{type:'console'}" /> Dev tools
         </md-button>
 
         <!-- Fill up the space between left and right area -->
@@ -94,14 +72,8 @@
         <!-- Settings tab button -->
         <md-button class="wz-menu-button md-icon-button" ng-href="#/settings"
             ng-class="{'wz-menu-active': menuNavItem === 'settings' }" aria-label="Settings tab">
-            <svg class="euiIcon euiIcon--ghost euiIcon--medium" focusable="false" xmlns="http://www.w3.org/2000/svg"
-                width="32" height="32" viewBox="0 0 32 32">
-                <path class="euiIcon__fillSecondary"
-                    d="M16 21a5 5 0 1 1 0-10 5 5 0 0 1 0 10zm0-8a3 3 0 1 0 0 6 3 3 0 0 0 0-6z"></path>
-                <path
-                    d="M20 32h-8v-4.06a1 1 0 0 0-1.61-.67l-2.88 2.87-5.65-5.65 2.87-2.87a.92.92 0 0 0 .2-1 .93.93 0 0 0-.86-.6H0V12h4.06a.92.92 0 0 0 .85-.58.94.94 0 0 0-.19-1L1.86 7.51l5.65-5.65 2.87 2.87A1 1 0 0 0 12 4.06V0h8v4.06a1 1 0 0 0 1.61.67l2.87-2.87 5.66 5.66-2.87 2.87a.92.92 0 0 0-.2 1 .93.93 0 0 0 .86.6H32v8h-4.06a.92.92 0 0 0-.85.58.94.94 0 0 0 .19 1l2.87 2.87-5.66 5.66-2.87-2.87a1 1 0 0 0-1.61.67L20 32zm-6-2h4v-2.06a3 3 0 0 1 5-2.08l1.46 1.46 2.83-2.83L25.86 23a3 3 0 0 1 2.08-5H30v-4h-2.06a3 3 0 0 1-2.08-5l1.46-1.46-2.83-2.85L23 6.14a3 3 0 0 1-5-2.08V2h-4v2.06a3 3 0 0 1-5 2.08L7.51 4.69 4.69 7.51 6.14 9a3 3 0 0 1-2.08 5H2v4h2.06a3 3 0 0 1 2.08 5l-1.45 1.49 2.83 2.83L9 25.86a3 3 0 0 1 5 2.08V30z">
-                </path>
-            </svg>
+            <react-component name="EuiIcon" class="kbnGlobalNavLink__euiIcon"
+                props="{type:'managementApp', color:'ghost'}" />
         </md-button>
 
     </div>
@@ -111,22 +83,15 @@
 <div layout="row" ng-if="wazuhNotReadyYet">
     <div flex class="euiCallOut euiCallOut--warning">
         <div class="euiCallOutHeader">
-            <svg class="euiIcon euiIcon--medium euiCallOutHeader__icon" aria-hidden="true"
-                xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="16" height="16"
-                viewBox="0 0 16 16">
-                <defs>
-                    <path id="help-a"
-                        d="M13.6 12.186l-1.357-1.358c-.025-.025-.058-.034-.084-.056.53-.794.84-1.746.84-2.773a4.977 4.977 0 0 0-.84-2.772c.026-.02.059-.03.084-.056L13.6 3.813a6.96 6.96 0 0 1 0 8.373zM8 15A6.956 6.956 0 0 1 3.814 13.6l1.358-1.358c.025-.025.034-.057.055-.084C6.02 12.688 6.974 13 8 13a4.978 4.978 0 0 0 2.773-.84c.02.026.03.058.056.083l1.357 1.358A6.956 6.956 0 0 1 8 15zm-5.601-2.813a6.963 6.963 0 0 1 0-8.373l1.359 1.358c.024.025.057.035.084.056A4.97 4.97 0 0 0 3 8c0 1.027.31 1.98.842 2.773-.027.022-.06.031-.084.056l-1.36 1.358zm5.6-.187A4 4 0 1 1 8 4a4 4 0 0 1 0 8zM8 1c1.573 0 3.019.525 4.187 1.4l-1.357 1.358c-.025.025-.035.057-.056.084A4.979 4.979 0 0 0 8 3a4.979 4.979 0 0 0-2.773.842c-.021-.027-.03-.059-.055-.084L3.814 2.4A6.957 6.957 0 0 1 8 1zm0-1a8.001 8.001 0 1 0 .003 16.002A8.001 8.001 0 0 0 8 0z">
-                    </path>
-                </defs>
-                <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#help-a" fill-rule="evenodd"></use>
-            </svg>
-            <span class="euiCallOutHeader__title">{{wazuhNotReadyYet}}</span>
+            <span class="euiCallOutHeader__title">
+                <react-component name="EuiIcon" props="{type:'help'}" />
+                {{wazuhNotReadyYet}}</span>
             <span flex></span>
-            <div ng-show="wazuhNotReadyYet === 'Wazuh not ready yet.'"
-                class="euiLoadingSpinner euiLoadingSpinner--medium"></div>
-            <button ng-show="wazuhNotReadyYet === 'Wazuh could not be recovered.'"
-                class="kuiButton kuiButton--secondary" ng-click="refresh()">
+            <react-component
+                ng-if="wazuhNotReadyYet === 'Wazuh not ready yet.' || wazuhNotReadyYet.includes('Restarting')"
+                name="EuiLoadingSpinner" props="{size:'m'}" />
+            <button ng-if="wazuhNotReadyYet === 'Wazuh could not be recovered.'" class="kuiButton kuiButton--secondary"
+                ng-click="refresh()">
                 Refresh
             </button>
         </div>

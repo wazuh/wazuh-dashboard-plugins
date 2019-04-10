@@ -16,12 +16,13 @@ export class WazuhConfig {
   constructor() {
     this.config = {};
   }
+
   /**
    * Set given configuration
    * @param {Object} cfg
    */
   setConfig(cfg) {
-    Object.assign(this.config, cfg);
+    this.config = { ...cfg };
   }
 
   /**

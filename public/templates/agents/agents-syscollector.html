@@ -32,13 +32,22 @@
         ng-if="agent && agent.status === 'Active' && hasSize(syscollector) && hasSize(syscollector.hardware) && hasSize(syscollector.os)">
         <md-card flex class="wz-metric-color wz-md-card">
             <md-card-content layout="row" class="wz-padding-metric">
-                <div flex="10">Cores: <span class="wz-text-bold">{{ syscollector.hardware.cpu.cores }}</span></div>
-                <div flex="15">Memory: <span class="wz-text-bold">{{ (syscollector.hardware.ram.total / 1024) | number:
-                        2 }} MB</span></div>
-                <div flex="10">Arch: <span class="wz-text-bold">{{ syscollector.os.architecture }}</span></div>
-                <div flex>OS: <span class="wz-text-bold">{{ syscollector.os.os.name }}
-                        {{ syscollector.os.os.version }}</span></div>
-                <div flex>CPU: <span class="wz-text-bold">{{ syscollector.hardware.cpu.name }}</span></div>
+                <div class="euiFlexItem--flexGrowZero">Cores: <span
+                        class="wz-text-bold">{{ syscollector.hardware.cpu.cores }}</span>
+                </div>
+                <div class="euiFlexItem--flexGrowZero wz-margin-left-16">Memory: <span class="wz-text-bold">{{ (syscollector.hardware.ram.total / 1024) | number:
+                        2 }} MB</span>
+                </div>
+                <div class="euiFlexItem--flexGrowZero wz-margin-left-16">Arch: <span
+                        class="wz-text-bold">{{ syscollector.os.architecture }}</span>
+                </div>
+                <div class="euiFlexItem--flexGrowZero wz-margin-left-16">OS: <span
+                        class="wz-text-bold">{{ syscollector.os.os.name }}
+                        {{ syscollector.os.os.version }}</span>
+                </div>
+                <div class="euiFlexItem--flexGrowZero wz-margin-left-16">CPU: <span
+                        class="wz-text-bold">{{ syscollector.hardware.cpu.name }}</span>
+                </div>
             </md-card-content>
         </md-card>
     </div>
@@ -51,7 +60,8 @@
                     interfaces scan available</span>
             </md-card-content>
             <md-card-content ng-if="syscollector.netiface && syscollector.netiface.items.length">
-                <span class="wz-headline-title"><i class="fa fa-fw fa-sitemap"></i> Network interfaces</span>
+                <span class="wz-headline-title">
+                    <react-component name="EuiIcon" props="{type:'indexMapping'}" /> Network interfaces</span>
                 <span class="color-grey pull-right">Last scan: {{syscollector.netiface.items[0].scan.time}}</span>
                 <md-divider class="wz-margin-top-10"></md-divider>
 
@@ -101,7 +111,8 @@
                     scan available</span>
             </md-card-content>
             <md-card-content ng-if="syscollector.ports && syscollector.ports.items.length">
-                <span class="wz-headline-title"><i class="fa fa-fw fa-exchange"></i> Network ports</span>
+                <span class="wz-headline-title">
+                    <react-component name="EuiIcon" props="{type:'inputOutput'}" /> Network ports</span>
                 <span class="color-grey pull-right">Last scan: {{syscollector.ports.items[0].scan.time}}</span>
                 <md-divider class="wz-margin-top-10"></md-divider>
                 <wz-table flex ng-if="agent && agent.os && agent.os.platform === 'windows'"
@@ -124,7 +135,8 @@
                     addresses scan available</span>
             </md-card-content>
             <md-card-content ng-if="syscollector.netaddr && syscollector.netaddr.items.length">
-                <span class="wz-headline-title"><i class="fa fa-fw fa-exchange"></i> Network settings</span>
+                <span class="wz-headline-title">
+                    <react-component name="EuiIcon" props="{type:'controlsHorizontal'}" /> Network settings</span>
                 <md-divider class="wz-margin-top-10"></md-divider>
                 <wz-table flex path="'/syscollector/' + agent.id + '/netaddr'" row-sizes="[4]"
                     keys="['iface', 'address', 'netmask', 'proto', 'broadcast']">
@@ -136,7 +148,8 @@
     <div layout="row" class="layout-padding" ng-if="agent && agent.status === 'Active' && hasSize(syscollector)">
         <md-card flex class="wz-md-card">
             <md-card-content>
-                <span class="wz-headline-title"><i class="fa fa-fw fa-cubes"></i> Packages</span>
+                <span class="wz-headline-title">
+                    <react-component name="EuiIcon" props="{type:'apps'}" /> Packages</span>
                 <span class="color-grey pull-right">Last scan: {{syscollector.packagesDate}}</span>
                 <md-divider class="wz-margin-top-10"></md-divider>
                 <div layout="row"
@@ -144,17 +157,12 @@
                     <input placeholder="Filter packages..." ng-model="packageSearch" type="text"
                         class="euiFieldSearch euiFieldSearch--fullWidth euiFlexItem height-30" aria-invalid="false"
                         wz-enter="search(packageSearch,'packages')">
-                    <div class="euiFormControlLayoutIcons"><span class="euiFormControlLayoutCustomIcon"><svg
-                                class="euiIcon euiIcon--medium euiFormControlLayoutCustomIcon__icon" focusable="false"
-                                aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
-                                xmlns:xlink="http://www.w3.org/1999/xlink" width="16" height="16" viewBox="0 0 16 16">
-                                <defs>
-                                    <path id="search-a"
-                                        d="M11.271 11.978l3.872 3.873a.502.502 0 0 0 .708 0 .502.502 0 0 0 0-.708l-3.565-3.564c2.38-2.747 2.267-6.923-.342-9.532-2.73-2.73-7.17-2.73-9.898 0-2.728 2.729-2.728 7.17 0 9.9a6.955 6.955 0 0 0 4.949 2.05.5.5 0 0 0 0-1 5.96 5.96 0 0 1-4.242-1.757 6.01 6.01 0 0 1 0-8.486c2.337-2.34 6.143-2.34 8.484 0a6.01 6.01 0 0 1 0 8.486.5.5 0 0 0 .034.738z">
-                                    </path>
-                                </defs>
-                                <use xlink:href="#search-a"></use>
-                            </svg></span></div>
+                    <div class="euiFormControlLayoutIcons">
+                        <span class="euiFormControlLayoutCustomIcon">
+                            <react-component name="EuiIcon"
+                                props="{type:'search', className:'euiFormControlLayoutCustomIcon__icon'}" />
+                        </span>
+                    </div>
                     <button type="submit" aria-label="Search"
                         class="euiFlexItem euiFlexItem--flexGrowZero kuiButton kuiButton--secondary wz-margin-left-8 height-30"
                         ng-click="search(packageSearch,'packages')">
@@ -174,13 +182,7 @@
                     <button type="button" ng-click="downloadCsv('/syscollector/'+agent.id+'/packages', 'packages.csv')"
                         class="euiButtonEmpty euiButtonEmpty--primary euiButtonEmpty--small">
                         <span class="euiButtonEmpty__content">
-                            <svg class="euiIcon euiIcon--medium euiButtonEmpty__icon" focusable="false"
-                                aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="16" height="16"
-                                viewBox="0 0 16 16">
-                                <path
-                                    d="M9 10.114l1.85-1.943a.52.52 0 0 1 .77 0c.214.228.214.6 0 .829l-1.95 2.05a1.552 1.552 0 0 1-2.31 0L5.41 9a.617.617 0 0 1 0-.829.52.52 0 0 1 .77 0L8 10.082V1.556C8 1.249 8.224 1 8.5 1s.5.249.5.556v8.558zM4.18 6a.993.993 0 0 0-.972.804l-1.189 6A.995.995 0 0 0 2.991 14h11.018a1 1 0 0 0 .972-1.196l-1.19-6a.993.993 0 0 0-.97-.804H4.18zM6 5v1h5V5h1.825c.946 0 1.76.673 1.946 1.608l1.19 6A2 2 0 0 1 14.016 15H2.984a1.992 1.992 0 0 1-1.945-2.392l1.19-6C2.414 5.673 3.229 5 4.174 5H6z">
-                                </path>
-                            </svg>
+                            <react-component name="EuiIcon" props="{type:'importAction'}" />
                             <span class="euiButtonEmpty__text">Formatted</span>
                         </span>
                     </button>
@@ -193,7 +195,8 @@
         ng-if="agent && agent.status === 'Active' && hasSize(syscollector)">
         <md-card flex class="wz-md-card">
             <md-card-content>
-                <span class="wz-headline-title"><i class="fa fa-fw fa-terminal"></i> Processes</span>
+                <span class="wz-headline-title">
+                    <react-component name="EuiIcon" props="{type:'console'}" /> Processes</span>
                 <span class="color-grey pull-right">Last scan: {{syscollector.processesDate}}</span>
                 <md-divider class="wz-margin-top-10"></md-divider>
                 <div layout="row"
@@ -201,17 +204,12 @@
                     <input placeholder="Filter processes..." ng-model="processSearch" type="text"
                         class="euiFieldSearch euiFieldSearch--fullWidth euiFlexItem height-30" aria-invalid="false"
                         wz-enter="search(processSearch,'processes')">
-                    <div class="euiFormControlLayoutIcons"><span class="euiFormControlLayoutCustomIcon"><svg
-                                class="euiIcon euiIcon--medium euiFormControlLayoutCustomIcon__icon" focusable="false"
-                                aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
-                                xmlns:xlink="http://www.w3.org/1999/xlink" width="16" height="16" viewBox="0 0 16 16">
-                                <defs>
-                                    <path id="search-a"
-                                        d="M11.271 11.978l3.872 3.873a.502.502 0 0 0 .708 0 .502.502 0 0 0 0-.708l-3.565-3.564c2.38-2.747 2.267-6.923-.342-9.532-2.73-2.73-7.17-2.73-9.898 0-2.728 2.729-2.728 7.17 0 9.9a6.955 6.955 0 0 0 4.949 2.05.5.5 0 0 0 0-1 5.96 5.96 0 0 1-4.242-1.757 6.01 6.01 0 0 1 0-8.486c2.337-2.34 6.143-2.34 8.484 0a6.01 6.01 0 0 1 0 8.486.5.5 0 0 0 .034.738z">
-                                    </path>
-                                </defs>
-                                <use xlink:href="#search-a"></use>
-                            </svg></span></div>
+                    <div class="euiFormControlLayoutIcons">
+                        <span class="euiFormControlLayoutCustomIcon">
+                            <react-component name="EuiIcon"
+                                props="{type:'search', className:'euiFormControlLayoutCustomIcon__icon'}" />
+                        </span>
+                    </div>
                     <button type="submit" aria-label="Search"
                         class="euiFlexItem euiFlexItem--flexGrowZero kuiButton kuiButton--secondary wz-margin-left-8 height-30"
                         ng-click="search(processSearch,'processes')">
@@ -231,13 +229,7 @@
                         ng-click="downloadCsv('/syscollector/'+agent.id+'/processes', 'processes.csv')"
                         class="euiButtonEmpty euiButtonEmpty--primary euiButtonEmpty--small">
                         <span class="euiButtonEmpty__content">
-                            <svg class="euiIcon euiIcon--medium euiButtonEmpty__icon" focusable="false"
-                                aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="16" height="16"
-                                viewBox="0 0 16 16">
-                                <path
-                                    d="M9 10.114l1.85-1.943a.52.52 0 0 1 .77 0c.214.228.214.6 0 .829l-1.95 2.05a1.552 1.552 0 0 1-2.31 0L5.41 9a.617.617 0 0 1 0-.829.52.52 0 0 1 .77 0L8 10.082V1.556C8 1.249 8.224 1 8.5 1s.5.249.5.556v8.558zM4.18 6a.993.993 0 0 0-.972.804l-1.189 6A.995.995 0 0 0 2.991 14h11.018a1 1 0 0 0 .972-1.196l-1.19-6a.993.993 0 0 0-.97-.804H4.18zM6 5v1h5V5h1.825c.946 0 1.76.673 1.946 1.608l1.19 6A2 2 0 0 1 14.016 15H2.984a1.992 1.992 0 0 1-1.945-2.392l1.19-6C2.414 5.673 3.229 5 4.174 5H6z">
-                                </path>
-                            </svg>
+                            <react-component name="EuiIcon" props="{type:'importAction'}" />
                             <span class="euiButtonEmpty__text">Formatted</span>
                         </span>
                     </button>

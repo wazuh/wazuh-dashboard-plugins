@@ -16,7 +16,13 @@
  * @param {Array<object>} sections Array that includes sections to be fetched
  * @param {object} apiReq API request service reference
  */
-export async function queryConfig(agentId, sections, apiReq, errorHandler) {
+export async function queryConfig(
+  agentId,
+  sections,
+  apiReq,
+  errorHandler,
+  node = false
+) {
   try {
     if (
       !agentId ||
@@ -41,11 +47,13 @@ export async function queryConfig(agentId, sections, apiReq, errorHandler) {
         throw new Error('Invalid section');
       }
       try {
-        const partialResult = await apiReq.request(
-          'GET',
-          `/agents/${agentId}/config/${component}/${configuration}`,
-          {}
-        );
+        const url = node
+          ? `/cluster/${node}/config/${component}/${configuration}`
+          : !node && agentId === '000'
+          ? `/manager/config/${component}/${configuration}`
+          : `/agents/${agentId}/config/${component}/${configuration}`;
+
+        const partialResult = await apiReq.request('GET', url, {});
         result[`${component}-${configuration}`] = partialResult.data.data;
       } catch (error) {
         result[`${component}-${configuration}`] = errorHandler.handle(

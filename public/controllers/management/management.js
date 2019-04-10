@@ -27,7 +27,8 @@ export class ManagementController {
     appState,
     configHandler,
     errorHandler,
-    $interval
+    $interval,
+    apiReq
   ) {
     this.$scope = $scope;
     this.$rootScope = $rootScope;
@@ -38,6 +39,7 @@ export class ManagementController {
     this.configHandler = configHandler;
     this.errorHandler = errorHandler;
     this.$interval = $interval;
+    this.apiReq = apiReq;
     this.tab = 'welcome';
     this.rulesetTab = 'rules';
     this.globalConfigTab = 'overview';
@@ -92,13 +94,13 @@ export class ManagementController {
     });
     this.$rootScope.$on('setRestarting', () => {
       if (this.clusterInfo.status === 'enabled') {
-        this.$scope.blockEditioncounter = 0;
-        this.$scope.blockEdition = true;
+        this.blockEditioncounter = 0;
+        this.blockEdition = true;
         this.$interval(
           () => {
-            this.$scope.blockEditioncounter++;
-            if (this.$scope.blockEditioncounter == 100) {
-              this.$scope.blockEdition = false;
+            this.blockEditioncounter++;
+            if (this.blockEditioncounter == 100) {
+              this.blockEdition = false;
               this.isRestarting = false;
               this.$scope.$applyAsync();
             }
@@ -112,7 +114,7 @@ export class ManagementController {
     });
 
     this.$rootScope.$on('removeBlockEdition', () => {
-      this.$scope.blockEdition = false;
+      this.blockEdition = false;
       this.isRestarting = false;
       this.$scope.$applyAsync();
     });
@@ -137,13 +139,16 @@ export class ManagementController {
   $onInit() {
     this.clusterInfo = this.appState.getClusterInfo();
     const configuration = this.wazuhConfig.getConfig();
-    this.$scope.adminMode = !!(configuration || {}).admin;
+    this.adminMode = !!(configuration || {}).admin;
+
     if (this.shareAgent.getAgent() && this.shareAgent.getSelectedGroup()) {
       this.tab = 'groups';
       this.switchTab(this.tab);
       return;
     }
+
     const location = this.$location.search();
+
     if (location && location.tab) {
       this.tab = location.tab;
       this.switchTab(this.tab);
@@ -198,7 +203,7 @@ export class ManagementController {
     if (nav) {
       this.appState.setNavigation({ status: true });
     } else {
-      this.$scope.editionTab = tab;
+      this.editionTab = tab;
     }
     this.$location.search('configSubTab', null);
     this.$location.search('editSubTab', tab);
@@ -249,6 +254,7 @@ export class ManagementController {
     }
 
     this.$location.search('tab', this.tab);
+    this.loadNodeList();
   }
 
   /**
@@ -280,5 +286,34 @@ export class ManagementController {
       this.switchTab('ruleset', true);
       this.setRulesTab('rules');
     }
+  }
+
+  changeNode(node) {
+    this.selectedNode = node;
+    this.$scope.$broadcast('configNodeChanged');
+    this.$scope.$applyAsync();
+  }
+
+  async loadNodeList() {
+    try {
+      this.loadingNodes = true;
+      const clusterInfo = this.appState.getClusterInfo() || {};
+      const clusterEnabled = clusterInfo.status === 'enabled';
+      if (clusterEnabled) {
+        const response = await this.apiReq.request('GET', '/cluster/nodes', {});
+        const nodeList =
+          (((response || {}).data || {}).data || {}).items || false;
+        if (Array.isArray(nodeList) && nodeList.length) {
+          this.nodeList = nodeList.map(item => item.name).reverse();
+          this.selectedNode = nodeList.filter(
+            item => item.type === 'master'
+          )[0].name;
+        }
+      }
+    } catch (error) {
+      console.log(error.message || error);
+    }
+    this.loadingNodes = false;
+    this.$scope.$applyAsync();
   }
 }

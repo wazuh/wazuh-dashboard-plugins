@@ -21,9 +21,8 @@
     </md-nav-bar>
     <!-- End Vulnerabilities navigation bar -->
 
-    <!-- Loading ring -->
-    <div class='uil-ring-css' ng-show="load">
-        <div></div>
+    <div class="md-padding md-padding-top-16" ng-if="load">
+        <react-component name="EuiProgress" props="{size: 'xs', color: 'primary'}" />
     </div>
 
     <!-- This section contains the main content and the right sidenav -->

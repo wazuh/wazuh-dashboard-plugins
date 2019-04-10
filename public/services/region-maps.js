@@ -32,9 +32,12 @@ app
     return {
       // Intended noop function and false properties
       noop() {},
+      origin: 'self_hosted',
       deprecated: {
         config: {
-          options: false
+          options: false,
+          url:
+            'https://tiles.maps.elastic.co/v2/default/{z}/{x}/{y}.png?elastic_tile_service_tos=agree&my_app_name=kibana&my_app_version=6.7.1'
         }
       }
     };
