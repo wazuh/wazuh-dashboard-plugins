@@ -28,14 +28,11 @@ export class ConfigurationHandler {
 
   parseWodle(config, wodleKey) {
     try {
-      console.log(config, wodleKey);
       const wmodulesArray =
         ((config || {})['wmodules-wmodules'] || {}).wmodules || [];
-      console.log(wmodulesArray);
       const result = wmodulesArray.filter(
         item => typeof item[wodleKey] !== 'undefined'
       );
-      console.log(result[0][wodleKey]);
       return result.length ? result[0][wodleKey] : false;
     } catch (error) {
       return false;
