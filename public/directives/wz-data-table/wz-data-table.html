@@ -1,7 +1,5 @@
-<div layout="row" class="md-padding" ng-show="wazuh_table_loading">
-    <div class='uil-ring-css'>
-        <div></div>
-    </div>
+<div ng-if="wazuh_table_loading" class="md-padding wz-margin-top-16">
+    <react-component name="EuiProgress" props="{size: 'xs', color: 'primary'}" />
 </div>
 <div ng-show="!error && !wazuh_table_loading" layout="row" class="wz-margin-top-17">
     <input placeholder="Filter..." ng-model="searchTerm" ng-change="filterTable()" type="text"

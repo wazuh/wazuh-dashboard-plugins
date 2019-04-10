@@ -7,13 +7,10 @@
         <span class="md-subheader">Log file located at <span
                 class="wz-text-monospace">/usr/share/kibana/optimize/wazuh-logs/wazuhapp.log</span></span>
     </div>
-    <!-- End headline -->
 
-    <!-- Loading ring -->
-    <div class='uil-ring-css' ng-show="ctrl.loadingLogs">
-        <div></div>
+    <div ng-if="ctrl.loadingLogs" class="md-padding wz-margin-top-16">
+        <react-component name="EuiProgress" props="{size: 'xs', color: 'primary'}" />
     </div>
-    <!-- End loading ring -->
 
     <div layout="row" ng-show="!ctrl.loadingLogs">
         <md-button class="wz-report-refresh-btn" ng-click="ctrl.refreshLogs()">
