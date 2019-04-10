@@ -57,6 +57,7 @@ export class ConfigurationController {
     this.$scope.switchWodle = (wodleName, navigate = true) =>
       this.switchWodle(wodleName, navigate);
 
+    this.$scope.isString = item => typeof item === 'string';
     this.isString = item => typeof item === 'string';
 
     this.hasSize = obj =>
