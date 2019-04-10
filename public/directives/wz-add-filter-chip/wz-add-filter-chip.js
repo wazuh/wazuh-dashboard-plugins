@@ -16,26 +16,26 @@ import { uiModules } from 'ui/modules';
 const app = uiModules.get('app/wazuh', []);
 
 class WzAddFilterChip {
-    /**
-     * Class constructor
-     */
-    constructor() {
-        this.template = template;
-        this.restrict = 'E';
-        this.scope = {
-            idInput: '@',
-            options: '='
-        };
-    }
-    controller($scope) {
-        $scope.showDropdown = false;
-        $scope.select = chip => {
-            $scope.showDropdown = false;
-            const searchBar = $(`#${$scope.idInput}`);
-            searchBar.val(`${chip.value}: `);
-            searchBar.focus();
-        }
-    }
+  /**
+   * Class constructor
+   */
+  constructor() {
+    this.template = template;
+    this.restrict = 'E';
+    this.scope = {
+      idInput: '@',
+      options: '='
+    };
+  }
+  controller($scope) {
+    $scope.showDropdown = false;
+    $scope.select = chip => {
+      $scope.showDropdown = false;
+      const searchBar = $(`#${$scope.idInput}`);
+      searchBar.val(`${chip.value}: `);
+      searchBar.focus();
+    };
+  }
 }
 
 app.directive('wzAddFilterChip', () => new WzAddFilterChip());

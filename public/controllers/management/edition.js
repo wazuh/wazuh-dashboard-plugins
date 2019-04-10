@@ -76,13 +76,13 @@ export class EditionController {
         clusterStatus.enabled === 'yes' && clusterStatus.running === 'yes';
       const parameters = enabledAndRunning
         ? {
-          node: this.selectedNode,
-          showRestartManager: 'cluster'
-        }
+            node: this.selectedNode,
+            showRestartManager: 'cluster'
+          }
         : {
-          manager: this.selectedNode,
-          showRestartManager: 'manager'
-        };
+            manager: this.selectedNode,
+            showRestartManager: 'manager'
+          };
       this.$scope.$applyAsync();
       this.$scope.$broadcast('saveXmlFile', parameters);
     } catch (error) {
@@ -118,7 +118,7 @@ export class EditionController {
         : this.configHandler.restartManager();
       this.$rootScope.wazuhNotReadyYet = `Restarting ${
         isCluster ? selectedNode : 'manager'
-        }, please wait. `;
+      }, please wait. `;
       this.checkDaemonsStatus.makePing();
       this.isRestarting = false;
       this.$scope.$applyAsync();
@@ -137,7 +137,10 @@ export class EditionController {
       this.fetchedXML = await this.fetchFile();
       this.$scope.$broadcast('fetchedFile', { data: this.$scope.fetchedXML });
     } catch (error) {
-      const doNotShow = typeof error === 'string' && error.includes('Wazuh API error') && error.includes('3022');
+      const doNotShow =
+        typeof error === 'string' &&
+        error.includes('Wazuh API error') &&
+        error.includes('3022');
       this.fetchedXML = null;
       !doNotShow && this.errorHandler.handle(error.message || error);
     }

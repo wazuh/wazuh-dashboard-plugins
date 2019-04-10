@@ -28,9 +28,8 @@ export class CheckDaemonsStatus {
       if (!isValid) {
         throw new Error('Not recovered');
       }
-      
-      this.tries = 10;
 
+      this.tries = 10;
     } catch (error) {
       this.tries = 10;
       this.$rootScope.wazuhNotReadyYet = 'Wazuh could not be recovered.';

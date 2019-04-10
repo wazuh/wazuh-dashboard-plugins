@@ -199,7 +199,6 @@ export class ManagementController {
   }
 
   setConfigTab(tab, nav = false) {
-
     this.globalConfigTab = tab;
     if (nav) {
       this.appState.setNavigation({ status: true });
