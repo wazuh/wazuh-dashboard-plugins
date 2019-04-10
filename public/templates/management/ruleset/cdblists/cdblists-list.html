@@ -19,45 +19,6 @@
         </button>
     </div>
 
-    <md-chips class="wz-chips md-padding-h  wz-margin-top-16" readonly="true" ng-show="cdbctrl.appliedFilters.length">
-        <md-chip class="wz-chip" ng-show="cdbctrl.includesFilter('file')">
-            <span>File: {{cdbctrl.getFilter('file')}}
-                <i class="fa fa-fw fa-times cursor-pointer" aria-hidden="true"
-                    ng-click="cdbctrl.removeFilter('file')"></i>
-            </span>
-        </md-chip>
-        <md-chip class="wz-chip" ng-show="cdbctrl.includesFilter('path')">
-            <span>Path: {{cdbctrl.getFilter('path')}}
-                <i class="fa fa-fw fa-times cursor-pointer" aria-hidden="true"
-                    ng-click="cdbctrl.removeFilter('path')"></i>
-            </span>
-        </md-chip>
-        <md-chip class="wz-chip" ng-show="cdbctrl.includesFilter('level')">
-            <span>Level: {{cdbctrl.getFilter('level')}}
-                <i class="fa fa-fw fa-times cursor-pointer" aria-hidden="true"
-                    ng-click="cdbctrl.removeFilter('level')"></i>
-            </span>
-        </md-chip>
-        <md-chip class="wz-chip" ng-show="cdbctrl.includesFilter('group')">
-            <span>Group: {{cdbctrl.getFilter('group')}}
-                <i class="fa fa-fw fa-times cursor-pointer" aria-hidden="true"
-                    ng-click="cdbctrl.removeFilter('group')"></i>
-            </span>
-        </md-chip>
-        <md-chip class="wz-chip" ng-show="cdbctrl.includesFilter('pci')">
-            <span>PCI control: {{cdbctrl.getFilter('pci')}}
-                <i class="fa fa-fw fa-times cursor-pointer" aria-hidden="true"
-                    ng-click="cdbctrl.removeFilter('pci')"></i>
-            </span>
-        </md-chip>
-        <md-chip class="wz-chip" ng-show="cdbctrl.includesFilter('gdpr')">
-            <span>GDPR: {{cdbctrl.getFilter('gdpr')}}
-                <i class="fa fa-fw fa-times cursor-pointer" aria-hidden="true"
-                    ng-click="cdbctrl.removeFilter('gdpr')"></i>
-            </span>
-        </md-chip>
-    </md-chips>
-
     <div layout="row" class="wz-margin-top-16">
         <md-card flex class="wz-md-card _md flex md-margin-h">
             <md-card-actions ng-if="cdbctrl.adminMode" layout="row" layout-align="end center"
