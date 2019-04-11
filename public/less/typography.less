@@ -87,7 +87,10 @@ html, body, button:not(.fa):not(.fa-times), textarea, input, select, .wz-chip {
 .wz-text-truncatable {
     overflow: hidden;
     white-space: nowrap;
-    text-overflow: ellipsis;
+    text-overflow: ellipsis;        
+    &:before {
+        content: attr(data-name);
+      }
 }
 
 .font-size-12 {
