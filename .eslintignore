@@ -1,4 +1,4 @@
 node_modules/
 public/utils/codemirror/
 public/kibana-integrations/
-public/utils/table-col-resizable.js
+public/utils/jquery-ui.js

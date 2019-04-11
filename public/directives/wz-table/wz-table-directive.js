@@ -26,7 +26,7 @@ import { checkGap } from './lib/check-gap';
 
 const app = uiModules.get('app/wazuh', []);
 
-app.directive('wzTable', function() {
+app.directive('wzTable', function () {
   return {
     restrict: 'E',
     scope: {
@@ -111,7 +111,7 @@ app.directive('wzTable', function() {
       let resizing = false;
       $window.onresize = () => {
         if (resizing) return;
-        $(`#table${$scope.scapepath}`).colResizable({ disable: true });
+        //$(`#table${$scope.scapepath}`).colResizable({ disable: true });
         resizing = true;
         clearTimeout(doit);
         doit = setTimeout(() => {
@@ -299,11 +299,11 @@ app.directive('wzTable', function() {
       $scope.prevPage = () => pagination.prevPage($scope);
       $scope.nextPage = async (currentPage, last = false) =>
         pagination.nextPage(currentPage, $scope, errorHandler, fetch, last);
-      $scope.firstPage = function() {
+      $scope.firstPage = function () {
         $scope.setPage(1);
         $scope.prevPage();
       };
-      $scope.setPage = function(page = false, logs = false, last = false) {
+      $scope.setPage = function (page = false, logs = false, last = false) {
         this.n = page || this.n;
         $scope.currentPage = this.n;
         $scope.nextPage(this.n, last).then(() => {
@@ -501,11 +501,12 @@ app.directive('wzTable', function() {
       };
 
       $scope.setColResizable = () => {
-        $(`#table${$scope.scapepath}`).colResizable({
-          liveDrag: true,
-          minWidth: 78,
-          partialRefresh: true,
-          draggingClass: false
+        $(`#table${$scope.scapepath} th`).resizable({
+          handles: "e",
+          minWidth: 100,
+          resize: function (event, ui) {
+            $(this).siblings().height(ui.size.height);
+          }
         });
         $scope.$applyAsync();
       };
