@@ -124,11 +124,12 @@ export class SettingsController {
    */
   async removeManager(item) {
     try {
+      const currentApi = this.appState.getCurrentAPI();
       let index = this.apiEntries.indexOf(item);
-      if (this.appState.getCurrentAPI()) {
+      if (currentApi) {
         if (
           this.apiEntries[index]._id ===
-          JSON.parse(this.appState.getCurrentAPI()).id
+          JSON.parse(currentApi).id
         ) {
           // We are trying to remove the one selected as default
           this.appState.removeCurrentAPI();
@@ -202,7 +203,7 @@ export class SettingsController {
 
     this.errorHandler.info(
       `API ${
-        this.apiEntries[index]._source.cluster_info.manager
+      this.apiEntries[index]._source.cluster_info.manager
       } set as default`,
       'Settings'
     );
