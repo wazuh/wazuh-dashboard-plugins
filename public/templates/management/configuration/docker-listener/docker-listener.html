@@ -83,17 +83,15 @@
 
         <!-- This section is the right sidenav content -->
         <md-sidenav class="md-sidenav-right" style="width: auto !important;" md-is-locked-open="true">
-            <span class="wz-margin-right-8 wz-text-link wz-text-right wz-margin-top-8"
-                ng-click="showHelp = !showHelp"><i class="fa fa-fw fa-question-circle-o"></i></span>
+            <span class="wz-margin-right-8 wz-text-link wz-text-right wz-margin-top-8" ng-click="showHelp = !showHelp">
+                <react-component name="EuiIcon" props="{type:'questionInCircle'}" />
+            </span>
             <md-list ng-if="showHelp">
                 <md-subheader>More info about this section</md-subheader>
                 <md-list-item target="_blank" class="wz-text-link"
-                    ng-href="https://documentation.wazuh.com/current/user-manual/capabilities/osquery.html">Osquery
-                    module documentation</md-list-item>
-                <md-list-item target="_blank" class="wz-text-link"
-                    ng-href="https://documentation.wazuh.com/current/user-manual/reference/ossec-conf/wodle-osquery.html">
-                    Osquery
-                    module reference</md-list-item>
+                    ng-href="https://documentation.wazuh.com/current/user-manual/reference/ossec-conf/wodle-docker.html">
+                    Docker listener module reference
+                </md-list-item>
             </md-list>
         </md-sidenav>
         <!-- End right sidenav section -->
