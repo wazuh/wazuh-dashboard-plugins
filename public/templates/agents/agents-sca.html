@@ -41,7 +41,17 @@
         <span flex></span>
     </div>
 
-    <div layout="row" class="md-padding" ng-show="agent && agent.os && !lookingSca && !load && !loadSca">
+    <div class="md-padding euiFlexGroup--wrap layout-row" ng-if="agent && agent.os && !lookingSca && !load && !loadSca">
+        <div class="layout-column md-padding" ng-repeat="policy in policies">
+            <span class="wz-headline-title">{{policy.name}}</span>
+            <md-divider class="wz-margin-top-10"></md-divider>
+            <canvas id="bar" class="wz-margin-top-10 chart chart-doughnut" chart-data="[policy.pass, policy.fail]"
+                chart-labels="['pass','fail']" chart-colors="['#00a69b', '#ff645c']"
+                chart-options="{cutoutPercentage: 75, legend: {display: true,position: 'right',},responsive: false, maintainAspectRatio: false}" />
+        </div>
+    </div>
+
+    <div layout="row" class="md-padding" ng-if="agent && agent.os && !lookingSca && !load && !loadSca">
         <table class="table table-striped table-condensed table-hover" ng-if="policies && policies.length">
             <thead>
                 <tr>
