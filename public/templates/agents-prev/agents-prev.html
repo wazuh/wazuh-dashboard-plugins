@@ -32,75 +32,101 @@
     </div>
 </div>
 
-<div ng-if="!ctrl.init && !ctrl.loading && !ctrl.errorInit" class="" layout="column" layout-align="start space-around">
-    <div ng-hide="wazuh_table_loading || showNoAgents">
-        <div layout="column" layout-align="start">
-            <div layout="row" class="wz-padding-left-8 wz-padding-right-8 wz-margin-top-10"
-                layout-align="start stretch">
-                <md-card flex="50" class="wz-md-card">
-                    <md-card-content>
-                        <span class="wz-headline-title">Status</span>
-                        <md-divider class="wz-margin-top-10"></md-divider>
-                        <div layout="row">
-                            <div flex layout="column">
-                                <div layout="row" class="wz-padding-top-10">
-                                    <p flex="50">Active</p>
-                                    <p class="wz-text-right color-grey">{{ctrl.agentsCountActive}}</p>
-                                </div>
-                                <div layout="row" class="wz-padding-top-10">
-                                    <p flex="50">Disconnected</p>
-                                    <p class="wz-text-right color-grey">{{ctrl.agentsCountDisconnected}}</p>
-                                </div>
-                            </div>
-                            <div flex layout="column">
-                                <div layout="row" class="wz-padding-top-10">
-                                    <p flex="50">Never connected</p>
-                                    <p class="wz-text-right color-grey">{{ctrl.agentsCountNeverConnected}}</p>
-                                </div>
-                                <div layout="row" class="wz-padding-top-10">
-                                    <p flex="50">Agents coverage</p>
-                                    <p class="wz-text-right color-grey">{{(ctrl.agentsCoverity | number:2)}}%</p>
-                                </div>
-                            </div>
+<div ng-if="!ctrl.init && !ctrl.loading && !ctrl.errorInit" layout="column" layout-align="start space-around">
+
+    <div class="md-padding euiFlexGroup--wrap layout-row">
+        <div class="layout-column md-padding">
+            <span class="wz-headline-title">
+                <react-component name="EuiIcon" props="{type:'node'}" /> Status
+            </span>
+            <md-divider class="wz-margin-top-10"></md-divider>
+            <canvas id="bar" class="wz-margin-top-16 chart chart-doughnut"
+                chart-data="[ctrl.agentsCountActive,ctrl.agentsCountDisconnected,ctrl.agentsCountNeverConnected]"
+                chart-labels="['Active','Disconnected', 'Never connected']"
+                chart-colors="['#00a69b', '#ff645c', '#eff0f1']"
+                chart-options="{cutoutPercentage: 75, legend: {display: true,position: 'right',},responsive: false, maintainAspectRatio: false}" />
+        </div>
+        <div flex class="layout-column md-padding">
+            <span class="wz-headline-title">
+                <react-component name="EuiIcon" props="{type:'visHeatmap'}" /> Details
+            </span>
+            <md-divider class="wz-margin-top-10"></md-divider>
+            <div
+                class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--directionRow euiFlexGroup--responsive wz-margin-top-4">
+                <div class="euiFlexItem euiFlexItem--flexGrowZero">
+
+                    <div class="euiStat">
+                        <div class="euiText euiText--small euiStat__description">
+                            <p>Active</p>
                         </div>
-                    </md-card-content>
-                </md-card>
-                <md-card flex="50" class="wz-md-card">
-                    <md-card-content>
-                        <span class="wz-headline-title">Top</span>
-                        <md-divider class="wz-margin-top-10"></md-divider>
-                        <div layout="row" class="wz-padding-top-10">
-                            <p flex="35" class="manager-status-subtitle">Last registered agent</p>
-                            <p ng-if="ctrl.lastAgent.id !== '000'" class="wz-text-right wz-text-link"
-                                tooltip="Click to open this agent" tooltip-placement="right"
-                                ng-click="ctrl.showAgent(ctrl.lastAgent)">{{ctrl.lastAgent.name}}</p>
-                            <p ng-if="ctrl.lastAgent.id === '000'" class="wz-text-right" tooltip-placement="right">
-                                {{ctrl.lastAgent.name}}
-                                (manager)</p>
+                        <p class="euiTitle euiTitle--large euiStat__title">{{ctrl.agentsCountActive}}</p>
+                    </div>
+                </div>
+                <div class="euiFlexItem euiFlexItem--flexGrowZero">
+
+                    <div class="euiStat">
+                        <div class="euiText euiText--small euiStat__description">
+                            <p>Disconnected</p>
                         </div>
-                        <div layout="row" class="wz-padding-top-10">
-                            <p flex="35" class="manager-status-subtitle">Higher activity</p>
-                            <p ng-show="ctrl.mostActiveAgent.id !== '000'" class="wz-text-right wz-text-link"
-                                tooltip="Click to open this agent" tooltip-placement="right"
-                                ng-click="ctrl.showAgent(ctrl.mostActiveAgent)">{{ctrl.mostActiveAgent.name}}</p>
-                            <p ng-show="ctrl.mostActiveAgent.id === '000'" class="wz-text-right"
-                                tooltip-placement="right">{{ctrl.mostActiveAgent.name}}</p>
+                        <p class="euiTitle euiTitle--large euiStat__title">{{ctrl.agentsCountDisconnected}}</p>
+                    </div>
+                </div>
+                <div class="euiFlexItem euiFlexItem--flexGrowZero">
+
+                    <div class="euiStat">
+                        <div class="euiText euiText--small euiStat__description">
+                            <p>Never connected</p>
                         </div>
+                        <p class="euiTitle euiTitle--large euiStat__title">{{ctrl.agentsCountNeverConnected}}</p>
+                    </div>
+                </div>
+                <div class="euiFlexItem euiFlexItem--flexGrowZero">
+
+                    <div class="euiStat">
+                        <div class="euiText euiText--small euiStat__description">
+                            <p>Agents coverage</p>
+                        </div>
+                        <p class="euiTitle euiTitle--large euiStat__title">{{(ctrl.agentsCoverity | number:2)}}%</p>
+                    </div>
+                </div>
             </div>
-            </md-card-content>
-            </md-card>
+            <div class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--directionRow euiFlexGroup--responsive">
+                <div class="euiFlexItem euiFlexItem--flexGrowZero">
+
+                    <div class="euiStat">
+                        <div class="euiText euiText--small euiStat__description">
+                            <p>Last registered agent</p>
+                        </div>
+                        <p ng-if="ctrl.lastAgent.id !== '000'" ng-click="ctrl.showAgent(ctrl.mostActiveAgent)"
+                            class="euiTitle euiTitle--large euiStat__title wz-text-link cursor-pointer">
+                            {{ctrl.lastAgent.name}}</p>
+                        <p ng-if="ctrl.lastAgent.id === '000'" class="euiTitle euiTitle--large euiStat__title">
+                            {{ctrl.lastAgent.name}} (manager)</p>
+                    </div>
+                </div>
+                <div class="euiFlexItem euiFlexItem--flexGrowZero">
+
+                    <div class="euiStat">
+                        <div class="euiText euiText--small euiStat__description">
+                            <p>Most active agent</p>
+                        </div>
+                        <p ng-if="ctrl.mostActiveAgent.id !== '000'" ng-click="ctrl.showAgent(ctrl.mostActiveAgent)"
+                            class="euiTitle euiTitle--large euiStat__title wz-text-link cursor-pointer">
+                            {{ctrl.mostActiveAgent.name}}</p>
+                        <p ng-if="ctrl.mostActiveAgent.id === '000'" class="euiTitle euiTitle--large euiStat__title">
+                            {{ctrl.mostActiveAgent.name}}</p>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
+
     <div layout="row" class="md-padding">
         <wz-tag-filter flex path="'/agents'" query-fn="ctrl.query(q, search)" fields-model="ctrl.searchBarModel">
         </wz-tag-filter>
         <md-button class="agents-prev-btn btn btn-info" style="height: 48px;margin: 0px 0 0 8px!important;"
-            ng-click="ctrl.reloadList()"><svg class="euiIcon euiIcon--medium" focusable="false"
-                xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
-                <path
-                    d="M11.228 2.942a.5.5 0 1 1-.538.842A5 5 0 1 0 13 8a.5.5 0 1 1 1 0 6 6 0 1 1-2.772-5.058zM14 1.5v3A1.5 1.5 0 0 1 12.5 6h-3a.5.5 0 0 1 0-1h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 1 1 1 0z">
-                </path>
-            </svg> Refresh</md-button>
+            ng-click="ctrl.reloadList()">
+            <react-component name="EuiIcon" props="{type:'refresh'}" /> Refresh</md-button>
     </div>
 
     <div layout="row">
