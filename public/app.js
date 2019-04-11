@@ -34,7 +34,7 @@ import chrome from 'ui/chrome';
 import './components';
 
 // angular-charts.js
-import 'angular-chart.js'
+import 'angular-chart.js';
 
 // Set up Wazuh app
 const app = uiModules.get('app/wazuh', ['ngCookies', 'ngMaterial', 'chart.js']);

@@ -20,7 +20,6 @@ import pm from './agents-pm';
 import virustotal from './agents-virustotal';
 import vuls from './agents-vuls';
 import osquery from './agents-osquery';
-import sca from './agents-sca';
 
 export {
   audit,
@@ -33,6 +32,5 @@ export {
   pm,
   virustotal,
   vuls,
-  osquery,
-  sca
+  osquery
 };

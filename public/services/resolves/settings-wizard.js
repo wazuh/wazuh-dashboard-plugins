@@ -77,7 +77,7 @@ export function settingsWizard(
           $location.path('/blank-screen');
         }
       }
-
+      
       deferred.resolve();
     };
 
@@ -175,6 +175,7 @@ export function settingsWizard(
             $location.search('tab', 'api');
             $location.path('/settings');
           }
+          deferred.resolve();
         });
     };
 

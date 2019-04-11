@@ -74,6 +74,8 @@
         </md-nav-item>
         <md-nav-item ng-show="octrl.extensions.audit" class="wz-nav-item" md-nav-click="octrl.switchTab('audit',true)"
             name="audit">{{ octrl.tabNames['audit'] }}</md-nav-item>
+        <md-nav-item class="wz-nav-item" md-nav-click="octrl.switchTab('sca',true)" name="sca">
+            {{ octrl.tabNames['sca'] }}</md-nav-item>
         <md-nav-item ng-show="octrl.extensions.oscap" class="wz-nav-item" md-nav-click="octrl.switchTab('oscap',true)"
             name="oscap">{{ octrl.tabNames['oscap'] }}</md-nav-item>
         <md-nav-item ng-show="octrl.extensions.ciscat" class="wz-nav-item" md-nav-click="octrl.switchTab('ciscat',true)"
@@ -112,7 +114,7 @@
     <!-- End Discover search bar section -->
 
     <!-- Loading status section -->
-    <div layout="column" layout-align="center center" ng-if="octrl.tab !== 'welcome' && octrl.tab !== 'aws'"
+    <div layout="column" layout-align="center center" ng-if="octrl.tab !== 'welcome'"
         ng-show="resultState === 'ready' && octrl.tabView === 'panels' && !rendered">
         <div class="percentage"><i class="fa fa-fw fa-spin fa-spinner" aria-hidden="true"></i></div>
         <div class="percentage">{{loadingStatus}}</div>
