@@ -1,0 +1,69 @@
+<md-content flex layout="column" ng-if="octrl.tab === 'sca' && octrl.tabView === 'panels'"
+    ng-class="{'no-opacity': resultState !== 'ready' || !rendered}" layout-align="start">
+
+    <div layout="row" class="height-300">
+        <md-card flex="30" class="wz-md-card" ng-class="{'fullscreen': octrl.expandArray[0]}">
+            <md-card-content class="wazuh-column">
+                <div layout="row" ng-dblclick="octrl.expand(0)">
+                    <span class="wz-headline-title">Results distribution</span>
+                    <span flex></span>
+                    <span class="cursor-pointer" ng-click="octrl.expand(0)">
+                        <react-component name="EuiIcon" props="{type:'expand'}" />
+                    </span>
+                </div>
+                <md-divider class="wz-margin-top-10"></md-divider>
+                <kbn-vis id="Wazuh-App-Overview-CA-Passed-vs-failed"
+                    vis-id="'Wazuh-App-Overview-CA-Passed-vs-failed'" />
+
+            </md-card-content>
+        </md-card>
+        <md-card flex class="wz-md-card" ng-class="{'fullscreen': octrl.expandArray[1]}">
+            <md-card-content class="wazuh-column">
+                <div layout="row" ng-dblclick="octrl.expand(1)">
+                    <span class="wz-headline-title">Results over time</span>
+                    <span flex></span>
+                    <span class="cursor-pointer" ng-click="octrl.expand(1)">
+                        <react-component name="EuiIcon" props="{type:'expand'}" />
+                    </span>
+                </div>
+                <md-divider class="wz-margin-top-10"></md-divider>
+                <kbn-vis id="Wazuh-App-Overview-CA-Checks-over-time"
+                    vis-id="'Wazuh-App-Overview-CA-Checks-over-time'" />
+            </md-card-content>
+        </md-card>
+    </div>
+
+    <div layout="row" class="height-300">
+        <md-card flex class="wz-md-card" ng-class="{'fullscreen': octrl.expandArray[2]}">
+            <md-card-content class="wazuh-column">
+                <div layout="row" ng-dblclick="octrl.expand(2)">
+                    <span class="wz-headline-title">Alert level evolution</span>
+                    <span flex></span>
+                    <span class="cursor-pointer" ng-click="octrl.expand(2)">
+                        <react-component name="EuiIcon" props="{type:'expand'}" />
+                    </span>
+                </div>
+                <md-divider class="wz-margin-top-10"></md-divider>
+                <kbn-vis id="Wazuh-App-Overview-CA-Rule-level-over-time"
+                    vis-id="'Wazuh-App-Overview-CA-Rule-level-over-time'" />
+
+            </md-card-content>
+        </md-card>
+    </div>
+
+    <div layout="row" class="height-540">
+        <md-card flex class="wz-md-card" ng-class="{'fullscreen': octrl.expandArray[3]}">
+            <md-card-content class="wazuh-column">
+                <div layout="row" ng-dblclick="octrl.expand(3)">
+                    <span class="wz-headline-title">Alerts summary</span>
+                    <span flex></span>
+                    <span class="cursor-pointer" ng-click="octrl.expand(3)">
+                        <react-component name="EuiIcon" props="{type:'expand'}" />
+                    </span>
+                </div>
+                <md-divider class="wz-margin-top-10"></md-divider>
+                <kbn-vis vis-id="'Wazuh-App-Overview-CA-Alerts-summary'" />
+            </md-card-content>
+        </md-card>
+    </div>
+</md-content>
