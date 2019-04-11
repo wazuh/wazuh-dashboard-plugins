@@ -33,8 +33,11 @@ import chrome from 'ui/chrome';
 // EUI React components wrapper
 import './components';
 
+// angular-charts.js
+import 'angular-chart.js';
+
 // Set up Wazuh app
-const app = uiModules.get('app/wazuh', ['ngCookies', 'ngMaterial']);
+const app = uiModules.get('app/wazuh', ['ngCookies', 'ngMaterial', 'chart.js']);
 
 app.config([
   '$compileProvider',

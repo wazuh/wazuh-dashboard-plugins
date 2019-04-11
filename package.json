@@ -34,6 +34,7 @@
     },
     "dependencies": {
         "angular-animate": "1.6.5",
+        "angular-chart.js": "^1.1.1",
         "angular-cookies": "1.6.5",
         "angular-material": "1.1.10",
         "dom-to-image": "^2.6.0",

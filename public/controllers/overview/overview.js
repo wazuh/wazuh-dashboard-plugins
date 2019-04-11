@@ -116,7 +116,7 @@ export class OverviewController {
     this.tabVisualizations.assign('overview');
 
     this.hostMonitoringTabs = ['general', 'fim', 'aws'];
-    this.systemAuditTabs = ['pm', 'audit', 'oscap', 'ciscat'];
+    this.systemAuditTabs = ['pm', 'audit', 'oscap', 'ciscat', 'sca'];
     this.securityTabs = ['vuls', 'virustotal', 'osquery'];
     this.complianceTabs = ['pci', 'gdpr'];
 
