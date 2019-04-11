@@ -18,15 +18,14 @@
     <table class="euiTable euiTable--responsive table table-striped table-condensed table-hover no-margin-bottom"
         ng-class="customColumns ? 'table-resizable' : ''" style="table-layout: fixed !important" id="table{{scapepath}}">
         <thead class="wz-text-bold">
-            <th ng-repeat="key in keys" class="euiTableHeaderCell wz-text-left" ng-style="(key.width && !customColumns) && {'width':key.width}"
-                ng-class="{ 'cursor-pointer' : !key.nosortable}" ng-click="!key.nosortable && sort(key)">
-                <span>
+            <th ng-repeat="key in keys" class="euiTableHeaderCell wz-text-left" ng-style="(key.width && !customColumns) && {'width':key.width}">
+                <p ng-class="{ 'cursor-pointer' : !key.nosortable}" ng-click="!key.nosortable && sort(key)">
                     {{ path === '/agents/groups' && (key.value || key) === 'count' ? 'Agents' :
                     keyEquivalence[key.value ||
                     key] || key.value || key }}
                     <i ng-if="!key.nosortable" class="fa wz-theader-sort-icon" ng-class="sortValue === (key.value || key) ? (sortDir ? 'fa-sort-asc' : 'fa-sort-desc') : 'fa-sort'"
                         aria-hidden="true"></i>
-                </span>
+                </p>
             </th>
             <th ng-if="(path === '/agents' || (path === '/agents/groups' && adminMode) || (isLookingGroup() && adminMode) 
                 || path === '/rules/files' || path === '/decoders/files' || path === '/lists/files')"
@@ -181,13 +180,12 @@
     <table class="euiTable euiTable--responsive table table-striped table-striped-duo table-condensed table-hover no-margin-bottom"
         ng-class="customColumns ? 'table-resizable' : ''" style="table-layout: fixed !important" id="table{{scapepath}}">
         <thead class="wz-text-bold">
-            <th ng-repeat="key in keys" class="euiTableHeaderCell wz-text-left" ng-style="key.width && {'width':key.width}"
-                ng-class="{ 'cursor-pointer' : !key.nosortable }" ng-click="!key.nosortable && sort(key)">
-                <span>
+            <th ng-repeat="key in keys" class="euiTableHeaderCell wz-text-left" ng-style="key.width && {'width':key.width}">
+                <p ng-class="{ 'cursor-pointer' : !key.nosortable }" ng-click="!key.nosortable && sort(key)">
                     {{ keyEquivalence[key.value || key] || key.value || key }}
                     <i ng-if="!key.nosortable" class="fa wz-theader-sort-icon" ng-class="sortValue === (key.value || key) ? (sortDir ? 'fa-sort-asc' : 'fa-sort-desc') : 'fa-sort'"
                         aria-hidden="true"></i>
-                </span>
+                </p>
             </th>
         </thead>
         <tbody>
@@ -303,13 +301,12 @@
     <table class="euiTable euiTable--responsive table table-striped table-striped-duo table-condensed table-hover no-margin-bottom"
         ng-class="customColumns ? 'table-resizable' : ''" style="table-layout: fixed !important" id="table{{scapepath}}">
         <thead class="wz-text-bold">
-            <th ng-repeat="key in keys" class="euiTableHeaderCell wz-text-left" ng-style="key.width && {'width':key.width}"
-                ng-class="{ 'cursor-pointer' : !key.nosortable }" ng-click="!key.nosortable && sort(key)">
-                <span>{{
+            <th ng-repeat="key in keys" class="euiTableHeaderCell wz-text-left" ng-style="key.width && {'width':key.width}">
+                <p ng-class="{ 'cursor-pointer' : !key.nosortable }" ng-click="!key.nosortable && sort(key)">{{
                     keyEquivalence[key.value || key] || key.value || key }}
                     <i ng-if="!key.nosortable" class="fa wz-theader-sort-icon" ng-class="sortValue === (key.value || key) ? (sortDir ? 'fa-sort-asc' : 'fa-sort-desc') : 'fa-sort'"
                         aria-hidden="true"></i>
-                </span>
+                </p>
             </th>
         </thead>
         <tbody>

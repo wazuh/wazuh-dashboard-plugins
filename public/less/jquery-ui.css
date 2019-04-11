@@ -545,12 +545,14 @@ button.ui-button::-moz-focus-inner {
 	left: 0;
 }
 .ui-resizable-e {
-	cursor: e-resize;
-    width: 15px;
-    right: -8px;
+    cursor: e-resize;
+    width: 5px;
+    right: 0px;
     top: 0;
-	height: 100%;
-	z-index: 10000!important;
+    height: 100%;
+    z-index: 10000!important;
+    background: #f5f7fa59;
+    border-left: 1px dashed #e6f0f6;
 }
 .ui-resizable-w {
 	cursor: w-resize;
