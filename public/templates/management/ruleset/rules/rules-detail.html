@@ -36,16 +36,7 @@
     <div layout="row" class="md-padding"
         ng-if="!editingFile && currentRule.file && currentRule.path === 'etc/rules' && adminMode">
         <button ng-click='editRulesConfig(currentRule)' class="height-35 kuiButton kuiButton--secondary">
-            <svg class="euiIcon euiIcon--medium euiButtonIcon__icon" focusable="false" aria-hidden="true"
-                xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="16" height="16"
-                viewBox="0 0 16 16">
-                <defs>
-                    <path id="pencil-a"
-                        d="M12.148 3.148L11 2l-9 9v3h3l9-9-1.144-1.144-8.002 7.998a.502.502 0 0 1-.708 0 .502.502 0 0 1 0-.708l8.002-7.998zM11 1c.256 0 .512.098.707.293l3 3a.999.999 0 0 1 0 1.414l-9 9A.997.997 0 0 1 5 15H2a1 1 0 0 1-1-1v-3c0-.265.105-.52.293-.707l9-9A.997.997 0 0 1 11 1zM5 14H2v-3l3 3z">
-                    </path>
-                </defs>
-                <use xlink:href="#pencil-a"></use>
-            </svg>
+            <react-component name="EuiIcon" props="{type:'pencil'}" />
             Edit {{ currentRule.file }}
         </button>
     </div>
@@ -57,15 +48,7 @@
             <md-card flex class="wz-md-card" ng-if="currentRule.details">
                 <md-card-content>
                     <span class="wz-headline-title">
-                        <svg class="euiIcon euiIcon--medium" focusable="false" xmlns="http://www.w3.org/2000/svg"
-                            xmlns:xlink="http://www.w3.org/1999/xlink" width="16" height="16" viewBox="0 0 16 16">
-                            <defs>
-                                <path id="editor_unordered_list-a"
-                                    d="M5.5 4h8a.5.5 0 1 1 0 1h-8a.5.5 0 0 1 0-1zm0 4h8a.5.5 0 1 1 0 1h-8a.5.5 0 0 1 0-1zm0 4h8a.5.5 0 1 1 0 1h-8a.5.5 0 1 1 0-1zm-3-7a.5.5 0 1 1 0-1 .5.5 0 0 1 0 1zm0 4a.5.5 0 1 1 0-1 .5.5 0 0 1 0 1zm0 4a.5.5 0 1 1 0-1 .5.5 0 0 1 0 1z">
-                                </path>
-                            </defs>
-                            <use xlink:href="#editor_unordered_list-a"></use>
-                        </svg> Details
+                        <react-component name="EuiIcon" props="{type:'editorUnorderedList'}" /> Details
                     </span>
                     <md-divider class="wz-margin-top-10"></md-divider>
                     <div layout="row" class="wz-margin-top-10">
@@ -97,12 +80,7 @@
             <md-card flex class="wz-md-card" ng-if="currentRule.groups.length">
                 <md-card-content>
                     <span class="wz-margin-top-10 wz-headline-title">
-                        <svg class="euiIcon euiIcon--medium" focusable="false" xmlns="http://www.w3.org/2000/svg"
-                            width="16" height="16" viewBox="0 0 16 16">
-                            <path
-                                d="M5 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8zm0 1A5 5 0 1 1 5 3a5 5 0 0 1 0 10zm6-1a4 4 0 1 0 0-8 4 4 0 0 0 0 8zm0 1a5 5 0 1 1 0-10 5 5 0 0 1 0 10z">
-                            </path>
-                        </svg> Groups
+                        <react-component name="EuiIcon" props="{type:'kqlSelector'}" /> Groups
                     </span>
                     <md-divider class="wz-margin-top-10"></md-divider>
                     <div layout="row" class="wz-margin-top-10">
@@ -123,15 +101,7 @@
             <md-card flex class="wz-md-card" ng-if="currentRule.pci.length || currentRule.gdpr.length">
                 <md-card-content>
                     <span class="wz-margin-top-10 wz-headline-title">
-                        <svg class="euiIcon euiIcon--medium" focusable="false" xmlns="http://www.w3.org/2000/svg"
-                            xmlns:xlink="http://www.w3.org/1999/xlink" width="16" height="16" viewBox="0 0 16 16">
-                            <defs>
-                                <path id="controls_horizontal-a"
-                                    d="M10 7.95a2.5 2.5 0 0 1 0-4.9V1h1v2.05a2.5 2.5 0 0 1 0 4.9V15h-1V7.95zm-4 .1a2.5 2.5 0 0 1 0 4.9V15H5v-2.05a2.5 2.5 0 0 1 0-4.9V1h1v7.05zM5.5 12a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3zm5-8a1.5 1.5 0 1 0 0 3 1.5 1.5 0 0 0 0-3z">
-                                </path>
-                            </defs>
-                            <use transform="rotate(90 8 8)" xlink:href="#controls_horizontal-a"></use>
-                        </svg> Compliance
+                        <react-component name="EuiIcon" props="{type:'controlsHorizontal'}" /> Compliance
                     </span>
                     <md-divider class="wz-margin-top-10"></md-divider>
                     <div layout="row" class="wz-margin-top-10" ng-if="currentRule.pci.length">
