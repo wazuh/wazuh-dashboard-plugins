@@ -1,11 +1,3 @@
-<md-content flex layout="column" ng-if="octrl.tab === 'aws' && octrl.tabView === 'panels'" layout-align="start"
-    ng-show="resultState === 'ready' && octrl.tabView === 'panels' && !rendered">
-    <div layout="column" layout-align="center center" ng-if="octrl.tab === 'aws'">
-        <div class="percentage"><i class="fa fa-fw fa-spin fa-spinner" aria-hidden="true"></i></div>
-        <div class="percentage">{{loadingStatus}}</div>
-    </div>
-</md-content>
-
 <md-content flex layout="column" ng-if="octrl.tab === 'aws' && octrl.tabView === 'panels'"
     ng-class="{'no-opacity': resultState !== 'ready' || !rendered}" layout-align="start">
     <div layout="row" class="height-250">
