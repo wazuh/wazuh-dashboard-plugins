@@ -162,19 +162,10 @@ export function settingsWizard(
         .catch(error => {
           appState.removeCurrentAPI();
 
-          !disableErrors && errorHandler.handle(error);
-          !disableErrors &&
-            errorHandler.handle(
-              'Please insert a new Wazuh API or select an existing valid one.',
-              false,
-              true
-            );
+          $location.search('tab', 'welcome');
+          $location.path('/overview');
 
-          if (!$location.path().includes('/settings')) {
-            $location.search('_a', null);
-            $location.search('tab', 'api');
-            $location.path('/settings');
-          }
+          deferred.resolve();
         });
     };
 
