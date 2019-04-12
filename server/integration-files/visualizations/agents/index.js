@@ -20,6 +20,7 @@ import pm from './agents-pm';
 import virustotal from './agents-virustotal';
 import vuls from './agents-vuls';
 import osquery from './agents-osquery';
+import docker from './agents-docker';
 
 export {
   audit,
@@ -32,5 +33,6 @@ export {
   pm,
   virustotal,
   vuls,
-  osquery
+  osquery,
+  docker
 };

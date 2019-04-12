@@ -251,14 +251,17 @@
                         <div class="euiFlexGrid euiFlexGrid--gutterLarge euiFlexGrid--halves">
                             <wz-welcome-card class="euiFlexItem" logo="'icons/app_security.svg'"
                                 card-title="'Vulnerabilities'" switch-tab="switchTab('vuls')" current-tab="'vuls'"
-                                description="TabDescription.vuls.description"></wz-welcome-card>
+                                description="TabDescription.vuls.description" />
                             <wz-welcome-card ng-if="extensions.virustotal" class="euiFlexItem"
                                 logo="'icons/app_saved_objects.svg'" card-title="'VirusTotal'"
                                 switch-tab="switchTab('virustotal')" current-tab="'virustotal'"
-                                description="TabDescription.virustotal.description"></wz-welcome-card>
+                                description="TabDescription.virustotal.description" />
                             <wz-welcome-card ng-if="extensions.osquery" class="euiFlexItem" logo="'icons/osquery.svg'"
                                 card-title="'Osquery'" switch-tab="switchTab('osquery')" current-tab="'osquery'"
-                                description="TabDescription.osquery.description"></wz-welcome-card>
+                                description="TabDescription.osquery.description" />
+                            <wz-welcome-card ng-if="extensions.docker" class="euiFlexItem" logo="'icons/docker.svg'"
+                                card-title="'Docker listener'" switch-tab="switchTab('docker')" current-tab="'docker'"
+                                description="TabDescription.docker.description" />
                         </div>
                     </div>
                 </div>
