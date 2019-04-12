@@ -83,48 +83,28 @@ export class Monitoring {
 
       !this.quiet &&
         log(
-          '[monitoring][configuration]',
+          'monitoring:configuration',
           `wazuh.monitoring.enabled: ${this.ENABLED}`,
-          'info'
-        );
-
-      !this.quiet &&
-        this.server.log(
-          [blueWazuh, 'monitoring', 'info'],
-          `wazuh.monitoring.enabled: ${this.ENABLED}`
+          'debug'
         );
 
       !this.quiet &&
         log(
-          '[monitoring][configuration]',
+          'monitoring:configuration',
           `wazuh.monitoring.frequency: ${this.FREQUENCY} (${this.CRON_FREQ}) `,
-          'info'
-        );
-
-      !this.quiet &&
-        this.server.log(
-          [blueWazuh, 'monitoring', 'info'],
-          `wazuh.monitoring.frequency: ${this.FREQUENCY} (${this.CRON_FREQ})`
+          'debug'
         );
 
       !this.quiet &&
         log(
-          '[monitoring][configuration]',
+          'monitoring:configuration',
           `wazuh.monitoring.pattern: ${this.index_pattern} (index prefix: ${
             this.index_prefix
           })`,
-          'info'
-        );
-
-      !this.quiet &&
-        this.server.log(
-          [blueWazuh, 'monitoring', 'info'],
-          `wazuh.monitoring.pattern: ${this.index_pattern} (index prefix: ${
-            this.index_prefix
-          })`
+          'debug'
         );
     } catch (error) {
-      !this.quiet && log('[monitoring][configuration]', error.message || error);
+      !this.quiet && log('monitoring:configuration', error.message || error);
       !this.quiet &&
         this.server.log(
           [blueWazuh, 'monitoring', 'error'],
@@ -164,7 +144,7 @@ export class Monitoring {
       return;
     } catch (error) {
       this.agentsArray = [];
-      !this.quiet && log('[monitoring][checkStatus]', error.message || error);
+      !this.quiet && log('monitoring:checkStatus', error.message || error);
       !this.quiet &&
         this.server.log(
           [blueWazuh, 'monitoring', 'error'],
@@ -217,14 +197,14 @@ export class Monitoring {
           msg ||
           'Wazuh API credentials not found or are not correct. Open the app in your browser and configure it to start monitoring agents.';
 
-        !this.quiet && log('[monitoring][checkAndSaveStatus]', extraLog);
+        !this.quiet && log('monitoring:checkAndSaveStatus', extraLog);
         !this.quiet &&
           this.server.log([blueWazuh, 'monitoring', 'error'], extraLog);
       }
       return;
     } catch (error) {
       !this.quiet &&
-        log('[monitoring][checkAndSaveStatus]', error.message || error);
+        log('monitoring:checkAndSaveStatus', error.message || error);
       !this.quiet &&
         this.server.log(
           [blueWazuh, 'monitoring', 'error'],
@@ -270,8 +250,7 @@ export class Monitoring {
 
       return { result: 'ok' };
     } catch (error) {
-      !this.quiet &&
-        log('[monitoring][loadCredentials]', error.message || error);
+      !this.quiet && log('monitoring:loadCredentials', error.message || error);
       !this.quiet &&
         this.server.log(
           [blueWazuh, 'monitoring', 'error'],
@@ -293,16 +272,16 @@ export class Monitoring {
 
       !this.quiet &&
         log(
-          '[monitoring][getConfig]',
+          'monitoring:getConfig',
           'There are no Wazuh API entries yet',
-          'info'
+          'debug'
         );
       return {
         error: 'no credentials',
         error_code: 1
       };
     } catch (error) {
-      !this.quiet && log('[monitoring][getConfig]', error.message || error);
+      !this.quiet && log('monitoring:getConfig', error.message || error);
       return {
         error: 'no elasticsearch',
         error_code: 2
@@ -329,34 +308,23 @@ export class Monitoring {
     try {
       !this.quiet &&
         log(
-          '[monitoring][configureKibana]',
+          'monitoring:configureKibana',
           `Creating index pattern: ${this.index_pattern}`,
-          'info'
-        );
-      !this.quiet &&
-        this.server.log(
-          [blueWazuh, 'monitoring', 'info'],
-          `Creating index pattern: ${this.index_pattern}`
+          'debug'
         );
 
       await this.wzWrapper.createMonitoringIndexPattern(this.index_pattern);
 
       !this.quiet &&
         log(
-          '[monitoring][configureKibana]',
+          'monitoring:configureKibana',
           `Created index pattern: ${this.index_pattern}`,
           'info'
-        );
-      !this.quiet &&
-        this.server.log(
-          [blueWazuh, 'monitoring', 'info'],
-          `Created index pattern: ${this.index_pattern}`
         );
 
       return;
     } catch (error) {
-      !this.quiet &&
-        log('[monitoring][configureKibana]', error.message || error);
+      !this.quiet && log('monitoring:configureKibana', error.message || error);
       !this.quiet &&
         this.server.log(
           [blueWazuh, 'monitoring', 'error'],
@@ -398,21 +366,17 @@ export class Monitoring {
 
       !this.quiet &&
         log(
-          '[monitoring][createIndex]',
+          'monitoring:createIndex',
           'Successfully created new index.',
-          'info'
+          'debug'
         );
-      !this.quiet &&
-        this.server.log(
-          [blueWazuh, 'monitoring', 'info'],
-          'Successfully created new index.'
-        );
+
       await this.insertDocument(datedIndex, clusterName);
       return;
     } catch (error) {
       !this.quiet &&
         log(
-          '[monitoring][createIndex]',
+          'monitoring:createIndex',
           `Could not create ${datedIndex} index on elasticsearch due to ${error.message ||
             error}`
         );
@@ -455,7 +419,7 @@ export class Monitoring {
     } catch (error) {
       !this.quiet &&
         log(
-          '[monitoring][insertDocument]',
+          'monitoring:insertDocument',
           `Error inserting agent data into elasticsearch. Bulk request failed due to ${error.message ||
             error}`
         );
@@ -500,7 +464,7 @@ export class Monitoring {
     } catch (error) {
       !this.quiet &&
         log(
-          '[monitoring][saveStatus]',
+          'monitoring:saveStatus',
           `Could not check if the index ${
             this.datedIndex
           } exists due to ${error.message || error}`
@@ -525,26 +489,16 @@ export class Monitoring {
 
         !this.quiet &&
           log(
-            '[monitoring][createWazuhMonitoring]',
+            'monitoring:createWazuhMonitoring',
             'Successfully deleted old wazuh-monitoring pattern.',
-            'info'
-          );
-        !this.quiet &&
-          this.server.log(
-            [blueWazuh, 'monitoring', 'info'],
-            'Successfully deleted old wazuh-monitoring pattern.'
+            'debug'
           );
       } catch (error) {
         !this.quiet &&
           log(
-            '[monitoring][createWazuhMonitoring]',
+            'monitoring:createWazuhMonitoring',
             'No need to delete old wazuh-monitoring pattern.',
-            'info'
-          );
-        !this.quiet &&
-          this.server.log(
-            [blueWazuh, 'monitoring', 'info'],
-            'No need to delete  old wazuh-monitoring pattern.'
+            'debug'
           );
       }
 
@@ -562,14 +516,9 @@ export class Monitoring {
     try {
       !this.quiet &&
         log(
-          '[monitoring][checkTemplate]',
+          'monitoring:checkTemplate',
           'Updating wazuh-monitoring template...',
-          'info'
-        );
-      !this.quiet &&
-        this.server.log(
-          [blueWazuh, 'monitoring', 'info'],
-          'Updating wazuh-monitoring template...'
+          'debug'
         );
 
       try {
@@ -595,7 +544,7 @@ export class Monitoring {
     } catch (error) {
       !this.quiet &&
         log(
-          '[monitoring][checkTemplate]',
+          'monitoring:checkTemplate',
           `Something went wrong updating wazuh-monitoring template... ${error.message ||
             error}`
         );
@@ -616,20 +565,15 @@ export class Monitoring {
     try {
       !this.quiet &&
         log(
-          '[monitoring][init]',
+          'monitoring:init',
           'Creating/Updating wazuh-agent template...',
-          'info'
+          'debug'
         );
       if (this.ENABLED) {
         await this.checkTemplate();
       }
 
-      !this.quiet && log('[monitoring][init]', 'Creating new index...', 'info');
-      !this.quiet &&
-        this.server.log(
-          [blueWazuh, 'monitoring', 'info'],
-          'Creating new index...'
-        );
+      !this.quiet && log('monitoring:init', 'Creating new index...', 'debug');
 
       await this.saveStatus();
 
@@ -639,32 +583,24 @@ export class Monitoring {
       try {
         !this.quiet &&
           log(
-            '[monitoring][init]',
+            'monitoring:init',
             'Checking if wazuh-monitoring pattern exists...',
-            'info'
+            'debug'
           );
-        !this.quiet &&
-          this.server.log(
-            [blueWazuh, 'monitoring', 'info'],
-            'Checking if wazuh-monitoring pattern exists...'
-          );
+
         await this.wzWrapper.getIndexPatternUsingGet(patternId);
-        !this.quiet &&
-          this.server.log(
-            [blueWazuh, 'monitoring', 'info'],
-            'Updating known fields for wazuh-monitoring pattern...'
-          );
+
         !this.quiet &&
           log(
-            '[monitoring][init]',
+            'monitoring:init',
             'Updating known fields for wazuh-monitoring pattern...',
-            'info'
+            'debug'
           );
         await this.wzWrapper.updateMonitoringIndexPatternKnownFields(patternId);
       } catch (error) {
         !this.quiet &&
           log(
-            '[monitoring][init]',
+            'monitoring:init',
             "Didn't find wazuh-monitoring pattern for Kibana v6.x. Proceeding to create it...",
             'info'
           );
@@ -678,14 +614,9 @@ export class Monitoring {
 
       !this.quiet &&
         log(
-          '[monitoring][init]',
+          'monitoring:init',
           'Skipping wazuh-monitoring pattern creation. Already exists.',
-          'info'
-        );
-      !this.quiet &&
-        this.server.log(
-          [blueWazuh, 'monitoring', 'info'],
-          'Skipping wazuh-monitoring creation. Already exists.'
+          'debug'
         );
 
       return;
@@ -695,7 +626,7 @@ export class Monitoring {
           [blueWazuh, 'monitoring', 'error'],
           error.message || error
         );
-      !this.quiet && log('[monitoring][init]', error.message || error);
+      !this.quiet && log('monitoring:init', error.message || error);
       return;
     }
   }
@@ -716,7 +647,7 @@ export class Monitoring {
       return Promise.reject(data);
     } catch (error) {
       !this.quiet &&
-        log('[monitoring][checkElasticsearchServer]', error.message || error);
+        log('monitoring:checkElasticsearchServer', error.message || error);
       return Promise.reject(error);
     }
   }
@@ -728,31 +659,22 @@ export class Monitoring {
     try {
       !this.quiet &&
         log(
-          '[monitoring][checkKibanaStatus]',
+          'monitoring:checkKibanaStatus',
           'Waiting for Kibana and Elasticsearch servers to be ready...',
-          'info'
+          'debug'
         );
-      !this.quiet &&
-        this.server.log(
-          [blueWazuh, 'monitoring', 'info'],
-          'Waiting for Kibana and Elasticsearch servers to be ready...'
-        );
+
       await this.checkElasticsearchServer();
       await this.init();
       return;
     } catch (error) {
       !this.quiet &&
         log(
-          '[monitoring][checkKibanaStatus]',
+          'monitoring:checkKibanaStatus',
           'Waiting for Kibana and Elasticsearch servers to be ready...',
-          'info'
+          'debug'
         );
-      !this.quiet &&
-        this.server.log(
-          [blueWazuh, 'monitoring', 'info'],
-          'Waiting for Kibana and Elasticsearch servers to be ready...',
-          'info'
-        );
+
       setTimeout(() => this.checkKibanaStatus(), 3000);
     }
   }
@@ -785,14 +707,9 @@ export class Monitoring {
       } else {
         !this.quiet &&
           log(
-            '[monitoring][cronTask]',
+            'monitoring:cronTask',
             'No wazuh-agent template found, not inserting monitoring data',
-            'info'
-          );
-        !this.quiet &&
-          this.server.log(
-            [blueWazuh, 'monitoring [cronTask]', 'info'],
-            'No wazuh-agent template found, not inserting monitoring data'
+            'debug'
           );
       }
 
@@ -805,20 +722,15 @@ export class Monitoring {
           ((error || {}).status === 404 &&
             (error || {}).displayName === 'NotFound')
         ) {
-          !this.quiet &&
-            this.server.log(
-              [blueWazuh, 'monitoring [cronTask]', 'info'],
-              'Waiting for default Kibana index creation to complete...'
-            );
           await this.sleep(1000);
           return this.cronTask();
         }
       } catch (error) {} //eslint-disable-line
 
-      !this.quiet && log('[monitoring][cronTask]', error.message || error);
+      !this.quiet && log('monitoring:cronTask', error.message || error);
       !this.quiet &&
         this.server.log(
-          [blueWazuh, 'monitoring [cronTask]', 'error'],
+          [blueWazuh, 'monitoring :cronTask', 'error'],
           error.message || error
         );
     }

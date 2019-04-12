@@ -48,7 +48,7 @@ export class IndexPatternCronJob {
           } catch (error) {
             // Await execution failed
             log(
-              '[IndexPatternCronJob][checkKnownFields]',
+              ':IndexPatternCronJob:checkKnownFields',
               error.message || error
             );
           }
@@ -56,13 +56,13 @@ export class IndexPatternCronJob {
         true
       );
       log(
-        '[IndexPatternCronJob][create-job]',
+        'IndexPatternCronJob:create-job',
         'Index pattern cron job started',
-        'info'
+        'debug'
       );
     } catch (error) {
       // Cron job creation failed
-      log('[IndexPatternCronJob][create-job]', error.message || error);
+      log(':IndexPatternCronJob:create-job', error.message || error);
     }
   }
 }

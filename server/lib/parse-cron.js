@@ -35,7 +35,7 @@ export function parseCron(interval) {
     return cronstr;
   } catch (error) {
     log(
-      '[cron][parse-interval]',
+      'cron:parse-interval',
       `Using default value due to: ${error.message || error}`
     );
     return '0 1 * * * *';
