@@ -38,16 +38,7 @@
         ng-if="!dctrl.editingFile && dctrl.currentDecoder.file && dctrl.currentDecoder.path === 'etc/decoders' && adminMode">
         <button ng-click='dctrl.editDecodersConfig(dctrl.currentDecoder)'
             class="height-35 kuiButton kuiButton--secondary">
-            <svg class="euiIcon euiIcon--medium euiButtonIcon__icon" focusable="false" aria-hidden="true"
-                xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="16" height="16"
-                viewBox="0 0 16 16">
-                <defs>
-                    <path id="pencil-a"
-                        d="M12.148 3.148L11 2l-9 9v3h3l9-9-1.144-1.144-8.002 7.998a.502.502 0 0 1-.708 0 .502.502 0 0 1 0-.708l8.002-7.998zM11 1c.256 0 .512.098.707.293l3 3a.999.999 0 0 1 0 1.414l-9 9A.997.997 0 0 1 5 15H2a1 1 0 0 1-1-1v-3c0-.265.105-.52.293-.707l9-9A.997.997 0 0 1 11 1zM5 14H2v-3l3 3z">
-                    </path>
-                </defs>
-                <use xlink:href="#pencil-a"></use>
-            </svg>
+            <react-component name="EuiIcon" props="{type:'pencil'}" />
             Edit {{ dctrl.currentDecoder.file }}
         </button>
     </div>
@@ -60,12 +51,13 @@
             <!-- Details section -->
             <md-card flex class="wz-md-card">
                 <md-card-content>
-                    <span class="wz-headline-title"><i class="fa fa-fw fa-info" aria-hidden="true"></i> Details</span>
+                    <span class="wz-headline-title">
+                        <react-component name="EuiIcon" props="{type:'editorUnorderedList'}" /> Details</span>
                     <md-divider class="wz-margin-top-10"></md-divider>
                     <div layout="row" layout-wrap class="wz-padding-top-10"
                         ng-repeat="(key, value) in dctrl.currentDecoder.details">
-                        <span flex="20">{{key}}</span>
-                        <div ng-if="!dctrl.isArray(value)">
+                        {{key}}
+                        <div ng-if="!dctrl.isArray(value)" class="wz-margin-left-16">
                             <span class="wz-text-right color-grey"
                                 ng-if="key !== 'regex' && key !== 'order'">{{value}}</span>
                             <span class="wz-text-right color-grey" ng-if="key == 'regex'"
@@ -73,9 +65,10 @@
                             <span class="wz-text-right color-grey" ng-if="key == 'order'"
                                 ng-bind-html="dctrl.colorOrder(value)"></span>
                         </div>
-                        <span ng-if="dctrl.isArray(value)" ng-repeat="v in value track by $index"
-                            class="wz-text-right color-grey">{{v}}{{$last
+                        <div class="wz-margin-left-16" ng-if="dctrl.isArray(value)">
+                            <span ng-repeat="v in value track by $index" class="wz-text-right color-grey ">{{v}}{{$last
                             ? '' : ',&nbsp;'}}</span>
+                        </div>
                     </div>
                 </md-card-content>
             </md-card>
@@ -84,7 +77,8 @@
             <!-- Regex section -->
             <md-card flex class="wz-md-card" ng-if="dctrl.isArray(dctrl.currentDecoder.details.regex)">
                 <md-card-content>
-                    <span class="wz-headline-title"><i class="fa fa-fw fa-asterisk" aria-hidden="true"></i> Regex</span>
+                    <span class="wz-headline-title">
+                        <react-component name="EuiIcon" props="{type:'bullseye'}" /> Regex</span>
                     <md-divider class="wz-margin-top-10"></md-divider>
                     <div ng-repeat="item in dctrl.currentDecoder.details.regex">
                         <div layout="row" layout-wrap class="wz-padding-top-10">
@@ -102,7 +96,8 @@
             <!-- Match section -->
             <md-card flex class="wz-md-card" ng-if="dctrl.isArray(dctrl.currentDecoder.details.match)">
                 <md-card-content>
-                    <span class="wz-headline-title"><i class="fa fa-fw fa-retweet" aria-hidden="true"></i> Match</span>
+                    <span class="wz-headline-title">
+                        <react-component name="EuiIcon" props="{type:'kqlField'}" /> Match</span>
                     <md-divider class="wz-margin-top-10"></md-divider>
                     <div ng-repeat="item in dctrl.currentDecoder.details.match">
                         <div layout="row" layout-wrap class="wz-padding-top-10">
@@ -116,7 +111,8 @@
             <!-- Prematch section -->
             <md-card flex class="wz-md-card" ng-if="dctrl.isArray(dctrl.currentDecoder.details.prematch)">
                 <md-card-content>
-                    <span class="wz-headline-title"><i class="fa fa-fw fa-retweet" aria-hidden="true"></i>
+                    <span class="wz-headline-title">
+                        <react-component name="EuiIcon" props="{type:'kqlFunction'}" />
                         Prematch</span>
                     <md-divider class="wz-margin-top-10"></md-divider>
                     <div ng-repeat="item in dctrl.currentDecoder.details.prematch">
