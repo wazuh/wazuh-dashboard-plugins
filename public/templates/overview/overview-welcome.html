@@ -91,6 +91,10 @@
                                 logo="'icons/osquery.svg'" card-title="'Osquery'"
                                 switch-tab="octrl.switchTab('osquery')" current-tab="'osquery'"
                                 description="octrl.TabDescription.osquery.description" />
+                            <wz-welcome-card ng-if="octrl.extensions.docker" class="euiFlexItem"
+                                logo="'icons/docker.svg'" card-title="'Docker listener'"
+                                switch-tab="octrl.switchTab('docker')" current-tab="'docker'"
+                                description="octrl.TabDescription.docker.description" />
                         </div>
                     </div>
                 </div>

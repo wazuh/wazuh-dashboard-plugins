@@ -28,7 +28,8 @@ export class TabVisualizations {
       pci: 6,
       virustotal: 6,
       configuration: 0,
-      osquery: 5
+      osquery: 5,
+      docker: 5
     };
 
     this.overview = {
@@ -45,7 +46,8 @@ export class TabVisualizations {
       aws: 8,
       virustotal: 7,
       osquery: 5,
-      sca: 4
+      sca: 4,
+      docker: 5
     };
 
     this.tabVisualizations = {};

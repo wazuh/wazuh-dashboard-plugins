@@ -60,5 +60,6 @@ export const TabNames = {
   edition: 'Edit node configuration',
   'client-buffer': 'Anti-flooding settings',
   sca: 'SCA',
-  'docker-listener': 'Docker listener'
+  'docker-listener': 'Docker listener',
+  docker: 'Docker listener'
 };
