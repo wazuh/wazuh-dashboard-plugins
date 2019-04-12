@@ -97,7 +97,7 @@
                         <div class="euiText euiText--small euiStat__description">
                             <p>Last registered agent</p>
                         </div>
-                        <p ng-if="ctrl.lastAgent.id !== '000'" ng-click="ctrl.showAgent(ctrl.mostActiveAgent)"
+                        <p ng-if="ctrl.lastAgent.id !== '000'" ng-click="ctrl.showAgent(ctrl.lastAgent)"
                             class="euiTitle euiTitle--large euiStat__title wz-text-link cursor-pointer">
                             {{ctrl.lastAgent.name}}</p>
                         <p ng-if="ctrl.lastAgent.id === '000'" class="euiTitle euiTitle--large euiStat__title">
