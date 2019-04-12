@@ -131,7 +131,8 @@ export class CommonData {
         aws: { group: 'amazon' },
         virustotal: { group: 'virustotal' },
         osquery: { group: 'osquery' },
-        sca: { group: 'sca' }
+        sca: { group: 'sca' },
+        docker: { group: 'docker' }
       };
 
       const filters = [];
@@ -165,6 +166,7 @@ export class CommonData {
         );
       }
     } catch (error) {
+      console.log(error);
       this.errorHandler.handle(
         'An error occurred while creating custom filters for visualizations',
         agent ? 'Agents' : 'Overview',
