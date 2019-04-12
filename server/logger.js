@@ -12,16 +12,26 @@
 import winston from 'winston';
 import fs from 'fs';
 import path from 'path';
+import { getConfiguration } from './lib/get-configuration';
 
 let allowed = false;
 let wazuhlogger = undefined;
+let wazuhPlainLogger = undefined;
 
 /**
- * Here we create the logger
+ * Here we create the loggers
  */
 const initLogger = () => {
+  const configurationFile = getConfiguration();
+  const level =
+    typeof (configurationFile || {})['logs.level'] !== 'undefined' &&
+    ['info', 'debug'].includes(configurationFile['logs.level'])
+      ? configurationFile['logs.level']
+      : 'info';
+
+  // JSON logger
   wazuhlogger = winston.createLogger({
-    level: 'info',
+    level,
     format: winston.format.json(),
     transports: [
       new winston.transports.File({
@@ -33,10 +43,25 @@ const initLogger = () => {
     ]
   });
 
-  /**
-   * Prevents from exit on error related to the logger.
-   */
+  // Prevents from exit on error related to the logger.
   wazuhlogger.exitOnError = false;
+
+  // Plain text logger
+  wazuhPlainLogger = winston.createLogger({
+    level,
+    format: winston.format.simple(),
+    transports: [
+      new winston.transports.File({
+        filename: path.join(
+          __dirname,
+          '../../../optimize/wazuh-logs/wazuhapp-plain.log'
+        )
+      })
+    ]
+  });
+
+  // Prevents from exit on error related to the logger.
+  wazuhPlainLogger.exitOnError = false;
 };
 
 /**
@@ -47,7 +72,12 @@ const initDirectory = async () => {
     if (!fs.existsSync(path.join(__dirname, '../../../optimize/wazuh-logs'))) {
       fs.mkdirSync(path.join(__dirname, '../../../optimize/wazuh-logs'));
     }
-    if (typeof wazuhlogger === 'undefined') initLogger();
+    if (
+      typeof wazuhlogger === 'undefined' ||
+      typeof wazuhPlainLogger === 'undefined'
+    ) {
+      initLogger();
+    }
     allowed = true;
     return;
   } catch (error) {
@@ -99,7 +129,33 @@ const checkFiles = () => {
         }) + '\n'
       );
     }
+    if (
+      getFilesizeInMegaBytes(
+        path.join(__dirname, '../../../optimize/wazuh-logs/wazuhapp-plain.log')
+      ) >= 100
+    ) {
+      fs.renameSync(
+        path.join(__dirname, '../../../optimize/wazuh-logs/wazuhapp-plain.log'),
+        path.join(
+          __dirname,
+          `../../../optimize/wazuh-logs/wazuhapp-plain.${new Date().getTime()}.log`
+        )
+      );
+    }
   }
+};
+
+const yyyymmdd = () => {
+  const now = new Date();
+  const y = now.getFullYear();
+  const m = now.getMonth() + 1;
+  const d = now.getDate();
+  const seconds = now.getSeconds();
+  const minutes = now.getMinutes();
+  const hour = now.getHours();
+  return `${y}/${m < 10 ? '0' : ''}${m}/${
+    d < 10 ? '0' : ''
+  }${d} ${hour}:${minutes}:${seconds}`;
 };
 
 /**
@@ -119,6 +175,13 @@ export function log(location, message, level) {
           location: location || 'Unknown origin',
           message: message || 'An error occurred'
         });
+        try {
+          wazuhPlainLogger.log({
+            level: level || 'error',
+            message: `${yyyymmdd()}: ${location ||
+              'Unknown origin'}: ${message || 'An error occurred'}`
+          });
+        } catch (error) {}
       }
     })
     .catch(error =>
