@@ -110,7 +110,7 @@ app.directive('wzTable', function () {
       // Prevents duplicated rows when resizing
       let resizing = false;
       $window.onresize = () => {
-        if (resizing) return;
+        if (resizing || $scope.resizingColumns) return;
         resizing = true;
         clearTimeout(doit);
         doit = setTimeout(() => {
@@ -503,9 +503,9 @@ app.directive('wzTable', function () {
       $scope.setColResizable = () => {
         $(`#table${$scope.scapepath} th`).resizable({
           handles: "e",
-          minWidth: 100,
-          start: function () { },
-          resize: function (event, ui) { }
+          minWidth: 75,
+          start: () => { $scope.resizingColumns = true },
+          end: () => { $scope.resizingColumns = false }
         });
         $scope.$applyAsync();
       };
