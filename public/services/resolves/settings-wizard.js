@@ -122,7 +122,8 @@ export function settingsWizard(
           ciscat: config['extensions.ciscat'],
           aws: config['extensions.aws'],
           virustotal: config['extensions.virustotal'],
-          osquery: config['extensions.osquery']
+          osquery: config['extensions.osquery'],
+          docker: config['extensions.docker']
         };
         appState.setExtensions(currentApi, extensions);
       }

@@ -14,12 +14,13 @@ export const configEquivalences = {
     'Enable or disable the Open SCAP tab on Overview and Agents.',
   'extensions.ciscat':
     'Enable or disable the CIS-CAT tab on Overview and Agents.',
-  'extensions.aws':
-    'Enable or disable the Amazon (AWS) tab on Overview and Agents.',
+  'extensions.aws': 'Enable or disable the Amazon (AWS) tab on Overview.',
   'extensions.virustotal':
     'Enable or disable the VirusTotal tab on Overview and Agents.',
   'extensions.osquery':
     'Enable or disable the Osquery tab on Overview and Agents.',
+  'extensions.docker':
+    'Enable or disable the Docker listener tab on Overview and Agents.',
   timeout:
     'Defines the maximum time the app will wait for an API response when making requests to it.',
   'wazuh.shards': 'Define the number of shards to use for the .wazuh index.',
