@@ -84,9 +84,8 @@
     <!-- End System audit navigation bar -->
 
     <!-- Security navigation bar -->
-    <md-nav-bar
-        ng-if="octrl.inArray(octrl.tab, octrl.securityTabs) && (octrl.extensions.virustotal || octrl.extensions.osquery)"
-        class="wz-nav-bar" ng-show="octrl.tab !== 'welcome'" md-selected-nav-item="octrl.tab"
+    <md-nav-bar ng-if="octrl.inArray(octrl.tab, octrl.securityTabs)" class="wz-nav-bar"
+        ng-show="octrl.tab !== 'welcome'" md-selected-nav-item="octrl.tab"
         nav-bar-aria-label="Security navigation links">
         <md-nav-item class="wz-nav-item" md-nav-click="octrl.switchTab('vuls',true)" name="vuls">
             {{ octrl.tabNames['vuls'] }}</md-nav-item>
@@ -95,6 +94,9 @@
         </md-nav-item>
         <md-nav-item ng-show="octrl.extensions.osquery" class="wz-nav-item"
             md-nav-click="octrl.switchTab('osquery',true)" name="osquery">{{ octrl.tabNames['osquery'] }}</md-nav-item>
+        <md-nav-item ng-show="octrl.extensions.docker" class="wz-nav-item" md-nav-click="octrl.switchTab('docker',true)"
+            name="docker">
+            {{ octrl.tabNames['docker'] }}</md-nav-item>
     </md-nav-bar>
     <!-- End Security navigation bar -->
 
