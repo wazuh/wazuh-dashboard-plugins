@@ -117,7 +117,7 @@ export class OverviewController {
 
     this.hostMonitoringTabs = ['general', 'fim', 'aws'];
     this.systemAuditTabs = ['pm', 'audit', 'oscap', 'ciscat', 'sca'];
-    this.securityTabs = ['vuls', 'virustotal', 'osquery'];
+    this.securityTabs = ['vuls', 'virustotal', 'osquery', 'docker'];
     this.complianceTabs = ['pci', 'gdpr'];
 
     this.wodlesConfiguration = null;

@@ -26,6 +26,7 @@ export async function getWzConfig($q, genericReq, wazuhConfig) {
     'extensions.aws': false,
     'extensions.virustotal': false,
     'extensions.osquery': false,
+    'extensions.docker': false,
     timeout: 20000,
     'wazuh.shards': 1,
     'wazuh.replicas': 0,

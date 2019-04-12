@@ -159,7 +159,7 @@ export class AgentsController {
 
     this.$scope.hostMonitoringTabs = ['general', 'fim', 'syscollector'];
     this.$scope.systemAuditTabs = ['pm', 'sca', 'audit', 'oscap', 'ciscat'];
-    this.$scope.securityTabs = ['vuls', 'virustotal', 'osquery'];
+    this.$scope.securityTabs = ['vuls', 'virustotal', 'osquery', 'docker'];
     this.$scope.complianceTabs = ['pci', 'gdpr'];
 
     /**

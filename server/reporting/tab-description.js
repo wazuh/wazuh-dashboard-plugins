@@ -83,5 +83,10 @@ export const TabDescription = {
   sca: {
     title: 'Security configuration assessment',
     description: 'Scan your assets as part of a configuration assessment audit.'
+  },
+  docker: {
+    title: 'Docker listener',
+    description:
+      'Monitor and collect the activity from Docker containers such as creation, running, starting, stopping or pausing events.'
   }
 };
