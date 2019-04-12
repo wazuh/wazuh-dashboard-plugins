@@ -37,7 +37,7 @@
             <tr ng-class="allowClick ? 'cursor-pointer' : ''" class="wz-word-wrap" ng-repeat="item in pagedItems[currentPage] | filter:{item:'!'}"
                 ng-click="clickAction(item)">
                 <td ng-repeat="key in keys" id="td-{{$parent.$index}}-{{$index}}" ng-mouseover="showTooltip($parent.$index, $index, item)">
-                    <div class="wz-text-truncatable-container">
+                    <div ng-class="customColumns ? 'wz-text-truncatable-container' : ''">
                         <span class="wz-text-truncatable">
                             {{
                             parseValue(key,item)
@@ -192,7 +192,7 @@
             <tr class="wz-word-wrap cursor-pointer" ng-repeat-start="item in pagedItems[currentPage] | filter:{item:'!'}"
                 ng-click="expandTableRow(item)" ng-class="{'selected': item.expanded}">
                 <td ng-repeat="key in keys" id="td-{{$parent.$index}}-{{$index}}" ng-mouseover="showTooltip($parent.$index, $index, item)">
-                    <div class="wz-text-truncatable-container">
+                    <div ng-class="customColumns ? 'wz-text-truncatable-container' : ''">
                         <span class="wz-text-truncatable">
                             <span ng-show="(key.value || key ) === 'result'" class="no-wrap">
                                 <p class="round status little" ng-class="(item.result === 'passed') ? 'teal' : 'red'">
@@ -313,7 +313,7 @@
             <tr class="wz-word-wrap cursor-pointer" ng-repeat-start="item in pagedItems[currentPage] | filter:{item:'!'}"
                 ng-click="expandTableRow(item)" ng-class="{'selected': item.expanded}">
                 <td ng-repeat="key in keys" id="td-{{$parent.$index}}-{{$index}}" ng-mouseover="showTooltip($parent.$index, $index, item)">
-                    <div class="wz-text-truncatable-container">
+                    <div ng-class="customColumns ? 'wz-text-truncatable-container' : ''">
                         <span class="wz-text-truncatable">
                             {{
                             parseValue(key,item)

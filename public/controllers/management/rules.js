@@ -35,6 +35,7 @@ export function RulesController(
    * This performs a search with a given term
    */
   $scope.search = term => {
+    let clearInput = true;
     if (term && term.startsWith('group:') && term.split('group:')[1].trim()) {
       $scope.custom_search = '';
       const filter = { name: 'group', value: term.split('group:')[1].trim() };
@@ -97,15 +98,23 @@ export function RulesController(
       term.split('path:')[1].trim()
     ) {
       $scope.custom_search = '';
-      const filter = { name: 'path', value: term.split('path:')[1].trim() };
-      $scope.appliedFilters = $scope.appliedFilters.filter(
-        item => item.name !== 'path'
-      );
-      $scope.appliedFilters.push(filter);
-      $scope.$broadcast('wazuhFilter', { filter });
+      if (!$scope.mctrl.showingLocalRules) {
+        const filter = { name: 'path', value: term.split('path:')[1].trim() };
+        $scope.appliedFilters = $scope.appliedFilters.filter(
+          item => item.name !== 'path'
+        );
+        $scope.appliedFilters.push(filter);
+        $scope.$broadcast('wazuhFilter', { filter });
+      }
     } else {
+      clearInput = false;
       $scope.$broadcast('wazuhSearch', { term, removeFilters: 0 });
     }
+    if (clearInput) {
+      const searchBar = $('#search-input-rules');
+      searchBar.val('');
+    }
+    $scope.$applyAsync();
   };
 
   /**
@@ -124,6 +133,15 @@ export function RulesController(
       item => item.name === filterName
     );
     return filtered.length ? filtered[0].value : '';
+  };
+
+  $scope.switchLocalRules = () => {
+    if (!$scope.mctrl.showingLocalRules) {
+      $scope.removeFilter('path');
+      $scope.appliedFilters.push({ name: 'path', value: 'etc/rules' });
+    } else {
+      $scope.removeFilter('path');
+    }
   };
 
   /**
