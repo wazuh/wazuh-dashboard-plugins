@@ -31,4 +31,11 @@ export class WazuhConfig {
   getConfig() {
     return this.config;
   }
+
+  /**
+   * Returns true if debug level is enabled, otherwise it returns false.
+   */
+  isDebug() {
+    return ((this.config || {})['logs.level'] || false) === 'debug';
+  }
 }
