@@ -107,3 +107,9 @@
 #
 # ------------------------------- App privileges --------------------------------
 #admin: true
+#
+# ------------------------------- App logging level ---------------------------------
+# Set the loggin level for the Wazuh App log files.
+# Default value: info
+# Allowed values: info, debug
+#logs.level: info

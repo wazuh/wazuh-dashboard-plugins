@@ -31,11 +31,11 @@ export function parseCron(interval) {
       throw new Error(
         'Generated cron expression not valid for node-cron module'
       );
-
+    log('cron:parse-interval', `Using the next interval: ${cronstr}`, 'debug');
     return cronstr;
   } catch (error) {
     log(
-      '[cron][parse-interval]',
+      'cron:parse-interval',
       `Using default value due to: ${error.message || error}`
     );
     return '0 1 * * * *';

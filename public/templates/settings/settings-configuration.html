@@ -37,7 +37,7 @@
                                 <td>{{key}}</td>
                                 <td>
                                     <input
-                                        ng-if="ctrl.editingKey === key && ctrl.configurationTypes[key] === 'string' && key !== 'wazuh.monitoring.creation'"
+                                        ng-if="ctrl.editingKey === key && ctrl.configurationTypes[key] === 'string' && key !== 'logs.level' && key !== 'wazuh.monitoring.creation'"
                                         ng-disabled="ctrl.loadingChange" type="text" class="wz-input-text"
                                         ng-model="ctrl.editingNewValue"></input>
                                     <input ng-if="ctrl.editingKey === key && ctrl.configurationTypes[key] === 'number'"
@@ -52,6 +52,10 @@
                                         ng-disabled="ctrl.loadingChange" class="wz-input-text wz-width-100"
                                         ng-model="ctrl.editingNewValue"
                                         ng-options="key as value for (key , value) in  {'h': 'hourly', 'd': 'daily', 'w': 'weekly', 'm': 'monthly'}"></select>
+                                    <select ng-if="ctrl.editingKey === key && key === 'logs.level'"
+                                        ng-disabled="ctrl.loadingChange" class="wz-input-text wz-width-100"
+                                        ng-model="ctrl.editingNewValue"
+                                        ng-options="key as value for (key , value) in  {'info': 'info', 'debug': 'debug'}"></select>
                                     <textarea
                                         ng-if="ctrl.editingKey === key && ctrl.configurationTypes[key] === 'object'"
                                         ng-disabled="ctrl.loadingChange" class="wz-input-text wz-width-100"
@@ -63,17 +67,7 @@
                                     <div ng-hide="key === 'admin' || !ctrl.configuration['admin']">
                                         <span ng-show="!ctrl.editingKey || ctrl.editingKey !== key" tooltip="Edit"
                                             ng-click="ctrl.setEditingKey(key, value)" class="cursor-pointer">
-                                            <svg class="euiIcon euiIcon--medium euiButtonIcon__icon" focusable="false"
-                                                aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
-                                                xmlns:xlink="http://www.w3.org/1999/xlink" width="16" height="16"
-                                                viewBox="0 0 16 16">
-                                                <defs>
-                                                    <path id="pencil-a"
-                                                        d="M12.148 3.148L11 2l-9 9v3h3l9-9-1.144-1.144-8.002 7.998a.502.502 0 0 1-.708 0 .502.502 0 0 1 0-.708l8.002-7.998zM11 1c.256 0 .512.098.707.293l3 3a.999.999 0 0 1 0 1.414l-9 9A.997.997 0 0 1 5 15H2a1 1 0 0 1-1-1v-3c0-.265.105-.52.293-.707l9-9A.997.997 0 0 1 11 1zM5 14H2v-3l3 3z">
-                                                    </path>
-                                                </defs>
-                                                <use xlink:href="#pencil-a"></use>
-                                            </svg>
+                                            <react-component name="EuiIcon" props="{type: 'pencil'}" />
 
                                         </span>
                                         <span ng-show="ctrl.editingKey === key && !ctrl.loadingChange" tooltip="Cancel"

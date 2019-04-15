@@ -56,7 +56,7 @@ export class WazuhApiCtrl {
           'Valid credentials not found in Elasticsearch. It seems the credentials were not saved.'
         );
       }
-
+      log('wazuh-api:checkStoredAPI', `${req.payload} exists`, 'debug');
       // Always check the daemons before requesting any endpoint
       try {
         await this.checkDaemons(api, null);
@@ -64,7 +64,6 @@ export class WazuhApiCtrl {
         const isDown = (error || {}).code === 'ECONNREFUSED';
         if (!isDown) return ErrorResponse('ERROR3099', 3099, 500, reply);
       }
-
       const credInfo = ApiHelper.buildOptionsObject(api);
 
       let response = await needle(
@@ -97,10 +96,7 @@ export class WazuhApiCtrl {
               doc: { cluster_info: api.cluster_info }
             });
           } catch (error) {
-            log(
-              'POST /api/check-stored-api :: Error updating Wazuh manager name.',
-              error.message || error
-            );
+            log('wazuh-api:checkStoredAPI', error.message || error);
           }
 
           // If cluster mode is active
@@ -141,7 +137,7 @@ export class WazuhApiCtrl {
             api.cluster_info.cluster = 'Disabled';
             api.cluster_info.manager = managerName;
             api.password = '****';
-
+            log('wazuh-api:checkStoredAPI', `Success`, 'debug');
             return {
               statusCode: 200,
               data: api,
@@ -163,17 +159,13 @@ export class WazuhApiCtrl {
         throw new Error(`${api.url}:${api.port}/version is unreachable`);
       }
     } catch (error) {
+      log('wazuh-api:checkStoredAPI', error.message || error);
       if (error.code === 'EPROTO') {
-        log(
-          'POST /api/check-stored-api',
-          'Wrong protocol being used to connect to the Wazuh API'
-        );
         return {
           statusCode: 200,
           data: { password: '****', apiIsDown: true }
         };
       } else if (error.code === 'ECONNREFUSED') {
-        log('POST /api/check-stored-api', error.message || error);
         return {
           statusCode: 200,
           data: { password: '****', apiIsDown: true }
@@ -214,11 +206,9 @@ export class WazuhApiCtrl {
               } catch (error) {} // eslint-disable-line
             }
           } catch (error) {
-            log('POST /api/check-stored-api', error.message || error);
             return ErrorResponse(error.message || error, 3020, 500, reply);
           }
         }
-        log('POST /api/check-stored-api', error.message || error);
         return ErrorResponse(error.message || error, 3002, 500, reply);
       }
     }
@@ -264,20 +254,23 @@ export class WazuhApiCtrl {
 
       const notValid = this.validateCheckApiParams(req.payload);
       if (notValid) return ErrorResponse(notValid, 3003, 500, reply);
-
+      log('wazuh-api:checkAPI', `${req.payload.id} is valid`, 'debug');
       // Check if a Wazuh API id is given (already stored API)
       if (req.payload && req.payload.id && !req.payload.password) {
         const data = await this.wzWrapper.getWazuhConfigurationById(
           req.payload.id
         );
-        if (data) apiAvailable = data;
-        else
+        if (data) {
+          apiAvailable = data;
+        } else {
+          log('wazuh-api:checkAPI', `API ${req.payload.id} not found`);
           return ErrorResponse(
             `The API ${req.payload.id} was not found`,
             3029,
             500,
             reply
           );
+        }
 
         // Check if a password is given
       } else if (req.payload && req.payload.password) {
@@ -297,9 +290,14 @@ export class WazuhApiCtrl {
 
       // Check wrong credentials
       if (parseInt(response.statusCode) === 401) {
+        log('wazuh-api:checkAPI', `Wrong Wazuh API credentials used`);
         return ErrorResponse('Wrong credentials', 3004, 500, reply);
       }
-
+      log(
+        'wazuh-api:checkAPI',
+        `${req.payload.id} credentials are valid`,
+        'debug'
+      );
       if (parseInt(response.body.error) === 0 && response.body.data) {
         response = await needle(
           'get',
@@ -319,6 +317,11 @@ export class WazuhApiCtrl {
           );
 
           if (!response.body.error) {
+            log(
+              'wazuh-api:checkStoredAPI',
+              `Wazuh API response is valid`,
+              'debug'
+            );
             if (response.body.data.enabled === 'yes') {
               // If cluster mode is active
               response = await needle(
@@ -354,11 +357,8 @@ export class WazuhApiCtrl {
 
       throw new Error(tmpMsg);
     } catch (error) {
+      log('wazuh-api:checkAPI', error.message || error);
       if (error.code === 'EPROTO') {
-        log(
-          'POST /api/check-api',
-          'Wrong protocol being used to connect to the Wazuh API'
-        );
         return ErrorResponse(
           'Wrong protocol being used to connect to the Wazuh API',
           3005,
@@ -366,7 +366,6 @@ export class WazuhApiCtrl {
           reply
         );
       }
-      log('POST /api/check-api', error.message || error);
       return ErrorResponse(error.message || error, 3005, 500, reply);
     }
   }
@@ -390,6 +389,10 @@ export class WazuhApiCtrl {
         );
 
         if (api.error_code > 1) {
+          log(
+            'wazuh-api:getPciRequirement',
+            'Elasticsearch unexpected error or cannot connect'
+          );
           // Can not connect to elasticsearch
           return ErrorResponse(
             'Elasticsearch unexpected error or cannot connect',
@@ -398,8 +401,9 @@ export class WazuhApiCtrl {
             reply
           );
         } else if (api.error_code > 0) {
+          log('wazuh-api:getPciRequirement', 'Credentials do not exist');
           // Credentials not found
-          return ErrorResponse('Credentials does not exists', 3008, 400, reply);
+          return ErrorResponse('Credentials do not exist', 3008, 400, reply);
         }
 
         const response = await needle(
@@ -417,6 +421,10 @@ export class WazuhApiCtrl {
           }
           return PCIobject;
         } else {
+          log(
+            'wazuh-api:getPciRequirement',
+            'An error occurred trying to parse PCI DSS requirements'
+          );
           return ErrorResponse(
             'An error occurred trying to parse PCI DSS requirements',
             3009,
@@ -439,6 +447,7 @@ export class WazuhApiCtrl {
         };
       }
     } catch (error) {
+      log('wazuh-api:getPciRequirement', error.message || error);
       return ErrorResponse(error.message || error, 3010, 400, reply);
     }
   }
@@ -489,6 +498,10 @@ export class WazuhApiCtrl {
         }
 
         if (api.error_code > 1) {
+          log(
+            'wazuh-api:getGdprRequirement',
+            'Elasticsearch unexpected error or cannot connect'
+          );
           // Can not connect to elasticsearch
           return ErrorResponse(
             'Elasticsearch unexpected error or cannot connect',
@@ -497,8 +510,9 @@ export class WazuhApiCtrl {
             reply
           );
         } else if (api.error_code > 0) {
+          log('wazuh-api:getGdprRequirement', 'Credentials do not exist');
           // Credentials not found
-          return ErrorResponse('Credentials does not exists', 3025, 400, reply);
+          return ErrorResponse('Credentials do not exist', 3025, 400, reply);
         }
 
         const response = await needle(
@@ -516,6 +530,10 @@ export class WazuhApiCtrl {
           }
           return GDPRobject;
         } else {
+          log(
+            'wazuh-api:getGdprRequirement',
+            'An error occurred trying to parse GDPR requirements'
+          );
           return ErrorResponse(
             'An error occurred trying to parse GDPR requirements',
             3026,
@@ -538,6 +556,7 @@ export class WazuhApiCtrl {
         };
       }
     } catch (error) {
+      log('wazuh-api:getGdprRequirement', error.message || error);
       return ErrorResponse(error.message || error, 3027, 400, reply);
     }
   }
@@ -572,6 +591,8 @@ export class WazuhApiCtrl {
 
       const isValid = execd && modulesd && wazuhdb && clusterd;
 
+      isValid && log('wazuh-api:checkDaemons', `Wazuh is ready`, 'debug');
+
       if (path === '/ping') {
         return { isValid };
       }
@@ -580,6 +601,7 @@ export class WazuhApiCtrl {
         throw new Error('Wazuh not ready yet');
       }
     } catch (error) {
+      log('wazuh-api:checkDaemons', error.message || error);
       return Promise.reject(error);
     }
   }
@@ -610,16 +632,18 @@ export class WazuhApiCtrl {
       }
 
       if (api.error_code > 1) {
+        log('wazuh-api:makeRequest', 'Could not connect with Elasticsearch');
         //Can not connect to elasticsearch
         return ErrorResponse(
-          'Could not connect with elasticsearch',
+          'Could not connect with Elasticsearch',
           3011,
           404,
           reply
         );
       } else if (api.error_code > 0) {
+        log('wazuh-api:makeRequest', 'Credentials do not exist');
         //Credentials not found
-        return ErrorResponse('Credentials does not exists', 3012, 404, reply);
+        return ErrorResponse('Credentials do not exist', 3012, 404, reply);
       }
 
       if (!data) {
@@ -676,9 +700,15 @@ export class WazuhApiCtrl {
         }
       } catch (error) {
         const isDown = (error || {}).code === 'ECONNREFUSED';
-        if (!isDown) return ErrorResponse('ERROR3099', 3099, 500, reply);
+        if (!isDown) {
+          log(
+            'wazuh-api:makeRequest',
+            'Wazuh API is online but Wazuh is not ready yet'
+          );
+          return ErrorResponse('ERROR3099', 3099, 500, reply);
+        }
       }
-
+      log('wazuh-api:makeRequest', `${method} ${fullUrl}`, 'debug');
       const response = await needle(method, fullUrl, data, options);
 
       const responseBody = (response || {}).body || {};
@@ -710,6 +740,7 @@ export class WazuhApiCtrl {
         ? { message: responseBody.message, code: responseError }
         : new Error('Unexpected error fetching data from the Wazuh API');
     } catch (error) {
+      log('wazuh-api:makeRequest', error.message || error);
       if (devTools) {
         return { error: '3013', message: error.message || error };
       } else {
@@ -752,6 +783,7 @@ export class WazuhApiCtrl {
       const options = ApiHelper.buildOptionsObject(api);
 
       const fullUrl = getPath(api) + path;
+      log('wazuh-api:makeGenericRequest', `${method} ${fullUrl}`, 'debug');
       const response = await needle(method, fullUrl, data, options);
 
       if (
@@ -769,6 +801,7 @@ export class WazuhApiCtrl {
         ? { message: response.body.message, code: response.body.error }
         : new Error('Unexpected error fetching data from the Wazuh API');
     } catch (error) {
+      log('wazuh-api:makeGenericRequest', error.message || error);
       return Promise.reject(error);
     }
   }
@@ -793,6 +826,7 @@ export class WazuhApiCtrl {
       return ErrorResponse('Missing param: path', 3016, 400, reply);
     } else {
       if (req.payload.method !== 'GET' && !adminMode) {
+        log('wazuh-api:requestApi', 'Forbidden action, allowed methods: GET');
         return ErrorResponse(
           req.payload.body && req.payload.body.devTools
             ? 'Allowed method: [GET]'
@@ -810,8 +844,9 @@ export class WazuhApiCtrl {
           keyRegex.test(req.payload.path) &&
           !adminMode
         ) {
+          log('wazuh-api:makeRequest', 'Forbidden route /agents/:id/key');
           return ErrorResponse(
-            'Forbidden route /agents/<id>/key',
+            'Forbidden route /agents/:id/key',
             3028,
             400,
             reply
@@ -832,7 +867,7 @@ export class WazuhApiCtrl {
    * Fetch agent status and insert it directly on demand
    * @param {Object} req
    * @param {Object} reply
-   * @returns {Object} status obj or ErrorResponse
+   * @returns {Object} status obj or ErrorResponseerror.message || error
    */
   async fetchAgents(req, reply) {
     try {
@@ -844,6 +879,7 @@ export class WazuhApiCtrl {
         output
       };
     } catch (error) {
+      log('wazuh-api:fetchAgents', error.message || error);
       return ErrorResponse(error.message || error, 3018, 500, reply);
     }
   }
@@ -876,6 +912,7 @@ export class WazuhApiCtrl {
 
       if (!path_tmp) throw new Error('An error occurred parsing path field');
 
+      log('wazuh-api:csv', `Report ${path_tmp}`, 'debug');
       // Real limit, regardless the user query
       const params = { limit: 500 };
 
@@ -957,6 +994,7 @@ export class WazuhApiCtrl {
         throw new Error('An error occurred fetching data from the Wazuh API');
       }
     } catch (error) {
+      log('wazuh-api:csv', error.message || error);
       return ErrorResponse(error.message || error, 3034, 500, reply);
     }
   }
@@ -1096,6 +1134,7 @@ export class WazuhApiCtrl {
 
       return { error: 0, result };
     } catch (error) {
+      log('wazuh-api:getAgentsFieldsUniqueCount', error.message || error);
       return ErrorResponse(error.message || error, 3035, 500, reply);
     }
   }
