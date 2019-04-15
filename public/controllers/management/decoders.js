@@ -159,11 +159,9 @@ export class DecodersController {
   }
 
   switchLocalDecoders() {
+    this.removeFilter('path');
     if (!this.showingLocalDecoders) {
-      this.removeFilter('path');
       this.appliedFilters.push({ name: 'path', value: 'etc/decoders' });
-    } else {
-      this.removeFilter('path');
     }
   }
 

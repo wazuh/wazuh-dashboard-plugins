@@ -136,11 +136,9 @@ export function RulesController(
   };
 
   $scope.switchLocalRules = () => {
+    $scope.removeFilter('path');
     if (!$scope.mctrl.showingLocalRules) {
-      $scope.removeFilter('path');
       $scope.appliedFilters.push({ name: 'path', value: 'etc/rules' });
-    } else {
-      $scope.removeFilter('path');
     }
   };
 
@@ -271,18 +269,18 @@ export function RulesController(
         );
         const response =
           (((ruleReloaded || {}).data || {}).data || {}).items || [];
+        const totalItems =
+          (((ruleReloaded || {}).data || {}).data || {}).totalItems || 0;
         if (!response.length) {
           $scope.currentRule = null;
           $scope.closeDetailView(true);
         } else {
-          //Check if the rule is overwrited
-          if (ruleReloaded.data.data.totalItems > 1) {
-            const result = ruleReloaded.data.data.items.filter(
-              rule => rule.details.overwrite
-            );
-            $scope.currentRule = result[0];
+          //Check if the rule is overwritten
+          if (totalItems > 1) {
+            const result = response.filter(rule => rule.details.overwrite);
+            $scope.currentRule = (result || [])[0] || {};
           } else {
-            $scope.currentRule = ruleReloaded.data.data.items[0];
+            $scope.currentRule = (response || [])[0] || {};
           }
         }
       } catch (error) {
@@ -326,14 +324,15 @@ export function RulesController(
     apiReq
       .request('get', `/rules/${incomingRule}`, {})
       .then(data => {
-        //Check if the rule is overwrited
-        if (data.data.data.totalItems > 1) {
-          const result = data.data.data.items.filter(
-            rule => rule.details.overwrite
-          );
-          $scope.currentRule = result[0];
+        const response = (((data || {}).data || {}).data || {}).items || [];
+        const totalItems =
+          (((data || {}).data || {}).data || {}).totalItems || 0;
+        //Check if the rule is overwritten
+        if (totalItems > 1) {
+          const result = response.filter(rule => rule.details.overwrite);
+          $scope.currentRule = (result || [])[0] || {};
         } else {
-          $scope.currentRule = data.data.data.items[0];
+          $scope.currentRule = (response || [])[0] || {};
         }
         $scope.$emit('setCurrentRule', { currentRule: $scope.currentRule });
         if (
