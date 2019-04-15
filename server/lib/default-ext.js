@@ -10,11 +10,13 @@
  * Find more information about this on the LICENSE file.
  */
 export const defaultExt = {
-  audit: true,
   pci: true,
-  oscap: true,
-  aws: false,
+  gdpr: true,
+  audit: true,
+  oscap: false,
   ciscat: false,
+  aws: false,
   virustotal: false,
-  gdpr: true
+  osquery: false,
+  docker: false
 };
