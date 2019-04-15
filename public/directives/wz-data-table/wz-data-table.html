@@ -30,7 +30,7 @@
         <tfoot>
             <td colspan="{{keys.length}}">
                 <span ng-show="!wazuh_table_loading" class="color-grey">{{ totalItems }} items</span>
-                <div ng-show="items.length >= itemsPerPage" class="pagination pull-right" style="margin:0 !important">
+                <div ng-show="items.length > itemsPerPage" class="pagination pull-right" style="margin:0 !important">
                     <ul layout="row">
                         <li ng-show="currentPage" class="md-padding">
                             <a href ng-click="prevPage()">« Prev</a>

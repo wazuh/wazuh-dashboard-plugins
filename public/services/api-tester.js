@@ -47,7 +47,6 @@ export class ApiTester {
         return Promise.reject(result);
       }
       return result;
-      
     } catch (error) {
       if (((error || {}).data || {}).code === 3099) {
         // Do nothing

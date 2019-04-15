@@ -124,12 +124,10 @@ export class SettingsController {
    */
   async removeManager(item) {
     try {
+      const currentApi = this.appState.getCurrentAPI();
       let index = this.apiEntries.indexOf(item);
-      if (this.appState.getCurrentAPI()) {
-        if (
-          this.apiEntries[index]._id ===
-          JSON.parse(this.appState.getCurrentAPI()).id
-        ) {
+      if (currentApi) {
+        if (this.apiEntries[index]._id === JSON.parse(currentApi).id) {
           // We are trying to remove the one selected as default
           this.appState.removeCurrentAPI();
         }

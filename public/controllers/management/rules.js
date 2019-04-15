@@ -35,6 +35,7 @@ export function RulesController(
    * This performs a search with a given term
    */
   $scope.search = term => {
+    let clearInput = true;
     if (term && term.startsWith('group:') && term.split('group:')[1].trim()) {
       $scope.custom_search = '';
       const filter = { name: 'group', value: term.split('group:')[1].trim() };
@@ -97,15 +98,23 @@ export function RulesController(
       term.split('path:')[1].trim()
     ) {
       $scope.custom_search = '';
-      const filter = { name: 'path', value: term.split('path:')[1].trim() };
-      $scope.appliedFilters = $scope.appliedFilters.filter(
-        item => item.name !== 'path'
-      );
-      $scope.appliedFilters.push(filter);
-      $scope.$broadcast('wazuhFilter', { filter });
+      if (!$scope.mctrl.showingLocalRules) {
+        const filter = { name: 'path', value: term.split('path:')[1].trim() };
+        $scope.appliedFilters = $scope.appliedFilters.filter(
+          item => item.name !== 'path'
+        );
+        $scope.appliedFilters.push(filter);
+        $scope.$broadcast('wazuhFilter', { filter });
+      }
     } else {
+      clearInput = false;
       $scope.$broadcast('wazuhSearch', { term, removeFilters: 0 });
     }
+    if (clearInput) {
+      const searchBar = $('#search-input-rules');
+      searchBar.val('');
+    }
+    $scope.$applyAsync();
   };
 
   /**
@@ -124,6 +133,13 @@ export function RulesController(
       item => item.name === filterName
     );
     return filtered.length ? filtered[0].value : '';
+  };
+
+  $scope.switchLocalRules = () => {
+    $scope.removeFilter('path');
+    if (!$scope.mctrl.showingLocalRules) {
+      $scope.appliedFilters.push({ name: 'path', value: 'etc/rules' });
+    }
   };
 
   /**
@@ -253,16 +269,19 @@ export function RulesController(
         );
         const response =
           (((ruleReloaded || {}).data || {}).data || {}).items || [];
-        if (!response.length) {
-          $scope.currentRule = null;
-          $scope.closeDetailView(true);
+        if (response.length) {
+          const result = response.filter(rule => rule.details.overwrite);
+          $scope.currentRule = result.length ? result[0] : response[0];
         } else {
-          $scope.currentRule = response[0];
+          $scope.currentRule = false;
+          $scope.closeDetailView(true);
         }
+        $scope.fetchedXML = false;
       } catch (error) {
         errorHandler.handle(error.message || error);
       }
     }
+
     $scope.editingFile = false;
     $scope.$applyAsync();
     appState.setNavigation({ status: true });
@@ -279,6 +298,7 @@ export function RulesController(
    * This function changes to the rules list view
    */
   $scope.closeDetailView = clear => {
+    $scope.mctrl.showingLocalRules = !$scope.mctrl.showingLocalRules;
     if (clear)
       $scope.appliedFilters = $scope.appliedFilters.slice(
         0,
@@ -288,6 +308,8 @@ export function RulesController(
     $scope.currentRule = false;
     $scope.closeEditingFile();
     $scope.$emit('removeCurrentRule');
+    $scope.switchLocalRules();
+    $scope.mctrl.showingLocalRules = !$scope.mctrl.showingLocalRules;
     $scope.$applyAsync();
   };
 
@@ -297,7 +319,11 @@ export function RulesController(
     apiReq
       .request('get', `/rules/${incomingRule}`, {})
       .then(data => {
-        $scope.currentRule = data.data.data.items[0];
+        const response = (((data || {}).data || {}).data || {}).items || [];
+        if (response.length) {
+          const result = response.filter(rule => rule.details.overwrite);
+          $scope.currentRule = result.length ? result[0] : response[0];
+        }
         $scope.$emit('setCurrentRule', { currentRule: $scope.currentRule });
         if (
           !(Object.keys(($scope.currentRule || {}).details || {}) || []).length

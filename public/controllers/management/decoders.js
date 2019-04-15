@@ -158,6 +158,13 @@ export class DecodersController {
     return this.$sce.trustAsHtml(coloredString);
   }
 
+  switchLocalDecoders() {
+    this.removeFilter('path');
+    if (!this.showingLocalDecoders) {
+      this.appliedFilters.push({ name: 'path', value: 'etc/decoders' });
+    }
+  }
+
   /**
    * This perfoms a search by a given term
    * @param {String} term
@@ -165,12 +172,14 @@ export class DecodersController {
   search(term) {
     if (term && term.startsWith('path:') && term.split('path:')[1].trim()) {
       this.custom_search = '';
-      const filter = { name: 'path', value: term.split('path:')[1].trim() };
-      this.appliedFilters = this.appliedFilters.filter(
-        item => item.name !== 'path'
-      );
-      this.appliedFilters.push(filter);
-      this.$scope.$broadcast('wazuhFilter', { filter });
+      if (!this.showingLocalDecoders) {
+        const filter = { name: 'path', value: term.split('path:')[1].trim() };
+        this.appliedFilters = this.appliedFilters.filter(
+          item => item.name !== 'path'
+        );
+        this.appliedFilters.push(filter);
+        this.$scope.$broadcast('wazuhFilter', { filter });
+      }
     } else if (
       term &&
       term.startsWith('file:') &&

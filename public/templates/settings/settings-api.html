@@ -104,7 +104,7 @@
                 <!-- End add API button section -->
 
                 <!-- Add API section-->
-                <div layout="row" ng-show="!currentAPI || (ctrl.addManagerContainer && !ctrl.isEditing)">
+                <div layout="row" ng-show="!currentAPI || (ctrl.addManagerContainer && !ctrl.isEditing) || !ctrl.apiEntries.length">
                     <!-- Add API form -->
                     <form flex ng-submit="ctrl.saveSettings()" layout="column" layout-align="start stretch"
                         class="margin-top-30">

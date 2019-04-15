@@ -20,7 +20,8 @@
         </button>
     </div>
 
-    <md-chips class="wz-chips md-padding-h wz-margin-top-16" readonly="true" ng-show="dctrl.appliedFilters.length"
+    <md-chips class="wz-chips md-padding-h wz-margin-top-16" readonly="true" ng-hide="!dctrl.appliedFilters.length || 
+    (dctrl.appliedFilters.length === 1 && dctrl.includesFilter('path') && dctrl.showingLocalDecoders)"
         ng-if="!dctrl.editingFile">
         <md-chip class="wz-chip" ng-show="dctrl.includesFilter('file')">
             <span>File: {{ dctrl.getFilter('file') }}
@@ -28,7 +29,7 @@
                     ng-click="dctrl.removeFilter('file')"></i>
             </span>
         </md-chip>
-        <md-chip class="wz-chip" ng-show="dctrl.includesFilter('path')">
+        <md-chip class="wz-chip" ng-show="dctrl.includesFilter('path') && !dctrl.showingLocalDecoders">
             <span>Path: {{ dctrl.getFilter('path') }}
                 <i class="fa fa-fw fa-times cursor-pointer" aria-hidden="true"
                     ng-click="dctrl.removeFilter('path')"></i>
@@ -42,7 +43,7 @@
                 <a ng-if="adminMode" ng-click="mctrl.switchFilesSubTab('decoders')">Manage decoders files</a>
                 <span flex></span>
                 <wz-kbn-switch class="md-primary wz-no-top-bottom-margin" switch-model="dctrl.showingLocalDecoders"
-                    switch-text="Custom decoders"></wz-kbn-switch>
+                    switch-text="Custom decoders" switch-change="dctrl.switchLocalDecoders()"></wz-kbn-switch>
             </md-card-actions>
             <md-card-content class="wz-padding-bottom-0">
                 <wz-table custom-columns="true" ng-if="!dctrl.showingLocalDecoders"
@@ -52,7 +53,7 @@
                 </wz-table>
                 <wz-table custom-columns="true" ng-if="dctrl.showingLocalDecoders" flex path="'/decoders'"
                     keys="['name',{value:'details.program_name',size:2,nosortable:true},{value:'details.order',size:2,nosortable:true},'file']"
-                    implicit-filter="[{ name:'path',value: 'etc/decoders'}]" allow-click="true" row-sizes="[16,13,11]">
+                    implicit-filter="dctrl.appliedFilters" allow-click="true" row-sizes="[16,13,11]">
                 </wz-table>
             </md-card-content>
             <md-card-actions layout="row" layout-align="end center" class="layout-align-end-center layout-row">

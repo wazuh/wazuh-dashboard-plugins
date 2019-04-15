@@ -20,3 +20,4 @@ import './layout.less';
 import './media-queries.less';
 import './typography.less';
 import './ui_framework.css';
+import './jquery-ui.css';

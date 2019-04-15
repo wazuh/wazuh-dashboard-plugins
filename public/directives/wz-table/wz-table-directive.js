@@ -110,8 +110,7 @@ app.directive('wzTable', function() {
       // Prevents duplicated rows when resizing
       let resizing = false;
       $window.onresize = () => {
-        if (resizing) return;
-        $(`#table${$scope.scapepath}`).colResizable({ disable: true });
+        if (resizing || $scope.resizingColumns) return;
         resizing = true;
         clearTimeout(doit);
         doit = setTimeout(() => {
@@ -119,6 +118,7 @@ app.directive('wzTable', function() {
           $scope.itemsPerPage = $scope.rowsPerPage;
           init(true)
             .then(() => {
+              $scope.setColResizable();
               resizing = false;
             })
             .catch(() => (resizing = false));
@@ -501,11 +501,15 @@ app.directive('wzTable', function() {
       };
 
       $scope.setColResizable = () => {
-        $(`#table${$scope.scapepath}`).colResizable({
-          liveDrag: true,
-          minWidth: 78,
-          partialRefresh: true,
-          draggingClass: false
+        $(`#table${$scope.scapepath} th`).resizable({
+          handles: 'e',
+          minWidth: 75,
+          start: () => {
+            $scope.resizingColumns = true;
+          },
+          end: () => {
+            $scope.resizingColumns = false;
+          }
         });
         $scope.$applyAsync();
       };

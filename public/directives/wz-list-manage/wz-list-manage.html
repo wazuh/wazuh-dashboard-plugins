@@ -103,7 +103,7 @@
                     <tfoot>
                         <td colspan="3">
                             <span ng-show="!wazuh_table_loading" class="color-grey">{{ totalItems }} items</span>
-                            <div ng-show="items.length >= itemsPerPage" class="pagination pull-right"
+                            <div ng-show="items.length > itemsPerPage" class="pagination pull-right"
                                 style="margin:0 !important">
                                 <ul layout="row">
                                     <li ng-show="currentPage > 0" class="md-padding">
@@ -133,12 +133,14 @@
                     </tfoot>
                 </table>
             </md-card-content>
-            <md-card-actions layout="row" layout-align="end center"
-                class="wz-card-actions layout-align-end-center layout-row">
-                <a class="wz-text-link cursor-pointer small md-button md-ink-ripple" id="btnDownload"
-                    ng-click="downloadCsv('/lists',  currentList.name, currentList.path)">
-                    <react-component name="EuiIcon" props="{type:'importAction', color:'primary'}" /> Formatted
-                </a>
+            <md-card-actions layout="row" layout-align="end center" class="layout-align-end-center layout-row">
+                <button type="button" ng-click="downloadCsv('/lists',  currentList.name, currentList.path)"
+                    class="euiButtonEmpty euiButtonEmpty--primary euiButtonEmpty--small" id="btnDownload">
+                    <span class="euiButtonEmpty__content">
+                        <react-component name="EuiIcon" props="{type:'importAction'}" />
+                        <span class="euiButtonEmpty__text">Formatted</span>
+                    </span>
+                </button>
             </md-card-actions>
         </md-card>
     </div>
