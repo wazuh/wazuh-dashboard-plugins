@@ -275,7 +275,15 @@ export function RulesController(
           $scope.currentRule = null;
           $scope.closeDetailView(true);
         } else {
-          $scope.currentRule = response[0];
+          //Check if the rule is overwrited
+          if (ruleReloaded.data.data.totalItems > 1) {
+            const result = ruleReloaded.data.data.items.filter(
+              rule => rule.details.overwrite
+            );
+            $scope.currentRule = result[0];
+          } else {
+            $scope.currentRule = ruleReloaded.data.data.items[0];
+          }
         }
       } catch (error) {
         errorHandler.handle(error.message || error);
@@ -297,6 +305,7 @@ export function RulesController(
    * This function changes to the rules list view
    */
   $scope.closeDetailView = clear => {
+    $scope.mctrl.showingLocalRules = !$scope.mctrl.showingLocalRules;
     if (clear)
       $scope.appliedFilters = $scope.appliedFilters.slice(
         0,
@@ -306,6 +315,8 @@ export function RulesController(
     $scope.currentRule = false;
     $scope.closeEditingFile();
     $scope.$emit('removeCurrentRule');
+    $scope.switchLocalRules();
+    $scope.mctrl.showingLocalRules = !$scope.mctrl.showingLocalRules;
     $scope.$applyAsync();
   };
 
@@ -315,7 +326,15 @@ export function RulesController(
     apiReq
       .request('get', `/rules/${incomingRule}`, {})
       .then(data => {
-        $scope.currentRule = data.data.data.items[0];
+        //Check if the rule is overwrited
+        if (data.data.data.totalItems > 1) {
+          const result = data.data.data.items.filter(
+            rule => rule.details.overwrite
+          );
+          $scope.currentRule = result[0];
+        } else {
+          $scope.currentRule = data.data.data.items[0];
+        }
         $scope.$emit('setCurrentRule', { currentRule: $scope.currentRule });
         if (
           !(Object.keys(($scope.currentRule || {}).details || {}) || []).length
