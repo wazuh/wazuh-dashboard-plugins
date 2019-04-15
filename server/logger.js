@@ -181,7 +181,7 @@ export function log(location, message, level) {
             message: `${yyyymmdd()}: ${location ||
               'Unknown origin'}: ${message || 'An error occurred'}`
           });
-        } catch (error) {}
+        } catch (error) {} // eslint-disable-line
       }
     })
     .catch(error =>

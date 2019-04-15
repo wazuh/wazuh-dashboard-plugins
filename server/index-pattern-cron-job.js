@@ -47,10 +47,7 @@ export class IndexPatternCronJob {
             );
           } catch (error) {
             // Await execution failed
-            log(
-              'IndexPatternCronJob:checkKnownFields',
-              error.message || error
-            );
+            log('IndexPatternCronJob:checkKnownFields', error.message || error);
           }
         },
         true

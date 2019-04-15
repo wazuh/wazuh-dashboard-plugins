@@ -495,7 +495,10 @@ export class WazuhElasticCtrl {
 
       return visArray;
     } catch (error) {
-      log('wazuh-elastic:buildClusterVisualizationsRaw', error.message || error);
+      log(
+        'wazuh-elastic:buildClusterVisualizationsRaw',
+        error.message || error
+      );
       return Promise.reject(error);
     }
   }
