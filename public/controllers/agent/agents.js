@@ -382,7 +382,7 @@ export class AgentsController {
 
     this.$scope.goDiscover = () => this.goDiscover();
 
-    this.$scope.$on('$routeChangeStart', (ev, params) => {
+    this.$scope.$on('$routeChangeStart', () => {
       return this.appState.removeSessionStorageItem('configSubTab');
     });
 

@@ -758,6 +758,7 @@ export class Monitoring {
   }
 
   sleep(timeMs) {
+    // eslint-disable-next-line
     return new Promise((resolve, reject) => {
       setTimeout(resolve, timeMs);
     });

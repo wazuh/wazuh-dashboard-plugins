@@ -311,7 +311,7 @@ export class ManagementController {
         }
       }
     } catch (error) {
-      console.log(error.message || error);
+      console.log(error.message || error); // eslint-disable-line
     }
     this.loadingNodes = false;
     this.$scope.$applyAsync();

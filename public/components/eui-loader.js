@@ -10,7 +10,7 @@
  * Find more information about this on the LICENSE file.
  */
 import { uiModules } from 'ui/modules';
-import React from 'react';
+import 'react';
 import {
   EuiIcon,
   EuiSuperSelect,
