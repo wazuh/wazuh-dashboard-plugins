@@ -54,7 +54,7 @@ export class WazuhApiElasticCtrl {
 
       return result;
     } catch (error) {
-      log('GET /elastic/apis', error.message || error);
+      log('wazuh-api-elastic:getAPIEntries', error.message || error);
       return ErrorResponse(error.message || error, 2001, 500, reply);
     }
   }
@@ -71,7 +71,7 @@ export class WazuhApiElasticCtrl {
 
       return data;
     } catch (error) {
-      log('DELETE /elastic/apis/{id}', error.message || error);
+      log('wazuh-api-elastic:deleteAPIEntries', error.message || error);
       return ErrorResponse(error.message || error, 2002, 500, reply);
     }
   }
@@ -156,7 +156,7 @@ export class WazuhApiElasticCtrl {
 
       return { statusCode: 200, message: 'ok', response };
     } catch (error) {
-      log('PUT /elastic/api', error.message || error);
+      log('wazuh-api-elastic:saveAPI', error.message || error);
       return ErrorResponse(
         `Could not save data in elasticsearch due to ${error.message || error}`,
         2011,
@@ -180,7 +180,7 @@ export class WazuhApiElasticCtrl {
 
       return { statusCode: 200, message: 'ok' };
     } catch (error) {
-      log('PUT /elastic/api-hostname/{id}', error.message || error);
+      log('wazuh-api-elastic:updateAPIHostname', error.message || error);
       return ErrorResponse(
         `Could not save data in elasticsearch due to ${error.message || error}`,
         2012,
@@ -204,7 +204,8 @@ export class WazuhApiElasticCtrl {
         !('url' in req.payload) ||
         !('port' in req.payload)
       ) {
-        return ErrorResponse('Missing data', 2013, 400, reply);
+        log('wazuh-api-elastic:updateFullAPI', 'Missing paramaters');
+        return ErrorResponse('Missing parameters', 2013, 400, reply);
       }
 
       const valid = this.validateData(req.payload);
@@ -218,7 +219,7 @@ export class WazuhApiElasticCtrl {
 
       return { statusCode: 200, message: 'ok' };
     } catch (error) {
-      log('PUT /elastic/api-settings', error.message || error);
+      log('wazuh-api-elastic:updateFullAPI', error.message || error);
       return ErrorResponse(
         `Could not save data in elasticsearch due to ${error.message || error}`,
         2014,
