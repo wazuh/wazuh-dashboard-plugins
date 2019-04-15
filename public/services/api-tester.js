@@ -35,35 +35,19 @@ export class ApiTester {
         timeout: timeout || 20000
       };
 
-      /** Checks for outdated cookies */
-      const current = this.appState.getCreatedAt();
-      const lastRestart = this.wzMisc.getLastRestart();
+      const result = await this.$http.post(
+        chrome.addBasePath('/api/check-stored-api'),
+        data,
+        headers
+      );
 
-      if (current && lastRestart && lastRestart > current) {
-        this.appState.removeCurrentPattern();
-        this.appState.removeCurrentAPI();
-        this.appState.removeClusterInfo();
-        this.appState.removeCreatedAt();
-        this.wzMisc.setLastRestart(null);
+      this.appState.setPatternSelector(configuration['ip.selector']);
 
-        this.appState.setPatternSelector(configuration['ip.selector']);
-
-        return 'cookies_outdated';
-        /** End of checks for outdated cookies */
-      } else {
-        const result = await this.$http.post(
-          chrome.addBasePath('/api/check-stored-api'),
-          data,
-          headers
-        );
-
-        this.appState.setPatternSelector(configuration['ip.selector']);
-
-        if (result.error) {
-          return Promise.reject(result);
-        }
-        return result;
+      if (result.error) {
+        return Promise.reject(result);
       }
+      return result;
+      
     } catch (error) {
       if (((error || {}).data || {}).code === 3099) {
         // Do nothing
