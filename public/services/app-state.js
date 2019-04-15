@@ -42,10 +42,6 @@ export class AppState {
     return this.$cookies.getObject('_clusterInfo');
   }
 
-  removeClusterInfo() {
-    return this.$cookies.remove('_clusterInfo');
-  }
-
   setClusterInfo(cluster_info) {
     const exp = new Date();
     exp.setDate(exp.getDate() + 365);
@@ -64,10 +60,6 @@ export class AppState {
 
   getCreatedAt() {
     return this.$cookies.getObject('_createdAt');
-  }
-
-  removeCreatedAt() {
-    return this.$cookies.remove('_createdAt');
   }
 
   //Current api setters and getters
@@ -107,10 +99,6 @@ export class AppState {
 
   getCurrentPattern() {
     return this.$cookies.getObject('_currentPattern');
-  }
-
-  removeCurrentPattern() {
-    return this.$cookies.remove('_currentPattern');
   }
 
   //Dev tools setters and getters
