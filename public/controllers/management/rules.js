@@ -269,24 +269,19 @@ export function RulesController(
         );
         const response =
           (((ruleReloaded || {}).data || {}).data || {}).items || [];
-        const totalItems =
-          (((ruleReloaded || {}).data || {}).data || {}).totalItems || 0;
-        if (!response.length) {
-          $scope.currentRule = null;
-          $scope.closeDetailView(true);
+        if (response.length) {
+          const result = response.filter(rule => rule.details.overwrite);
+          $scope.currentRule = result.length ? result[0] : response[0];
         } else {
-          //Check if the rule is overwritten
-          if (totalItems > 1) {
-            const result = response.filter(rule => rule.details.overwrite);
-            $scope.currentRule = (result || [])[0] || {};
-          } else {
-            $scope.currentRule = (response || [])[0] || {};
-          }
+          $scope.currentRule = false;
+          $scope.closeDetailView(true);
         }
+        $scope.fetchedXML = false;
       } catch (error) {
         errorHandler.handle(error.message || error);
       }
     }
+
     $scope.editingFile = false;
     $scope.$applyAsync();
     appState.setNavigation({ status: true });
@@ -325,14 +320,9 @@ export function RulesController(
       .request('get', `/rules/${incomingRule}`, {})
       .then(data => {
         const response = (((data || {}).data || {}).data || {}).items || [];
-        const totalItems =
-          (((data || {}).data || {}).data || {}).totalItems || 0;
-        //Check if the rule is overwritten
-        if (totalItems > 1) {
+        if (response.length) {
           const result = response.filter(rule => rule.details.overwrite);
-          $scope.currentRule = (result || [])[0] || {};
-        } else {
-          $scope.currentRule = (response || [])[0] || {};
+          $scope.currentRule = result.length ? result[0] : response[0];
         }
         $scope.$emit('setCurrentRule', { currentRule: $scope.currentRule });
         if (
