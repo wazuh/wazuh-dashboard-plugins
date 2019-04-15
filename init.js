@@ -26,13 +26,13 @@ export function initApp(server) {
   const monitoringInstance = new Monitoring(server);
   const indexPatternCronJobInstance = new IndexPatternCronJob(server);
 
-  log('init:initApp', `Waiting for awaitMigration()`, 'debug');
+  log('init:initApp', `Waiting for Kibana migration jobs`, 'debug');
   server.kibanaMigrator
     .awaitMigration()
     .then(() => {
       log(
         'init:initApp',
-        `awaitMigration() has been executed successfully`,
+        `Kibana migration jobs executed successfully`,
         'debug'
       );
       Initialize(server);

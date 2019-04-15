@@ -44,6 +44,13 @@ export class WazuhElasticCtrl {
         ((((data || {}).hits || {}).hits || [])[0] || {})._source || {};
 
       if (source.installationDate && source.lastRestart) {
+        log(
+          'wazuh-elastic:getTimeStamp',
+          `Installation date: ${
+            data.hits.hits[0]._source.installationDate
+          }. Last restart: ${data.hits.hits[0]._source.lastRestart}`,
+          'debug'
+        );
         return {
           installationDate: data.hits.hits[0]._source.installationDate,
           lastRestart: data.hits.hits[0]._source.lastRestart
@@ -115,7 +122,15 @@ export class WazuhElasticCtrl {
         item = lastChar === '*' ? item.slice(0, -1) : item;
         return item.includes(pattern) || pattern.includes(item);
       });
-
+      log(
+        'wazuh-elastic:getTemplate',
+        `Template is valid: ${
+          isIncluded && Array.isArray(isIncluded) && isIncluded.length
+            ? 'yes'
+            : 'no'
+        }`,
+        'debug'
+      );
       return isIncluded && Array.isArray(isIncluded) && isIncluded.length
         ? {
             statusCode: 200,
@@ -152,7 +167,11 @@ export class WazuhElasticCtrl {
       const filtered = response.hits.hits.filter(
         item => item._source['index-pattern'].title === req.params.pattern
       );
-
+      log(
+        'wazuh-elastic:checkPattern',
+        `Index pattern found: ${filtered.length >= 1 ? 'yes' : 'no'}`,
+        'debug'
+      );
       return filtered.length >= 1
         ? { statusCode: 200, status: true, data: 'Index pattern found' }
         : {
@@ -381,7 +400,16 @@ export class WazuhElasticCtrl {
       const config = getConfiguration();
       const monitoringPattern =
         (config || {})['wazuh.monitoring.pattern'] || 'wazuh-monitoring-3.x-*';
-
+      log(
+        'wazuh-elastic:buildVisualizationsRaw',
+        `Building ${app_objects.length} visualizations`,
+        'debug'
+      );
+      log(
+        'wazuh-elastic:buildVisualizationsRaw',
+        `Index pattern ID: ${id}`,
+        'debug'
+      );
       const visArray = [];
       let aux_source, bulk_content;
       for (let element of app_objects) {
@@ -532,6 +560,12 @@ export class WazuhElasticCtrl {
         tabPrefix === 'overview'
           ? OverviewVisualizations[tabSufix]
           : AgentsVisualizations[tabSufix];
+      log('wazuh-elastic:createVis', `${tabPrefix}[${tabSufix}]`, 'debug');
+      log(
+        'wazuh-elastic:createVis',
+        `Index pattern: ${req.params.pattern}`,
+        'debug'
+      );
 
       const raw = await this.buildVisualizationsRaw(file, req.params.pattern);
       return { acknowledge: true, raw: raw };
@@ -596,6 +630,11 @@ export class WazuhElasticCtrl {
   async refreshIndex(req, reply) {
     try {
       if (!req.params.pattern) throw new Error('Missing parameters');
+      log(
+        'wazuh-elastic:refreshIndex',
+        `Index pattern: ${req.params.pattern}`,
+        'debug'
+      );
       const output =
         ((req || {}).params || {}).pattern === 'all'
           ? await checkKnownFields(this.wzWrapper, false, false, false, true)
