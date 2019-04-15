@@ -234,7 +234,7 @@
                     </div>
                 </td>
             </tr>
-            <tr ng-show="(item.rationale || item.remediation || item.directory || (item.compliance && item.compliance.length)) && item.expanded"
+            <tr ng-show="(item.rationale || item.remediation || item.directory || (item.rules && item.rules.length) || (item.compliance && item.compliance.length)) && item.expanded"
                 class="euiTableRow wz-word-wrap cursor-pointer selected" ng-repeat-end=""
                 ng-click="expandTableRow(item)">
                 <td colspan="{{keys.length}}" style="border-top: none">
@@ -283,14 +283,27 @@
                                         <div layout="column" class="wz-margin-bottom-10"></div>
                                     </div>
                                     <div class="euiFlexItem euiFlexItem--flexGrowZero"
+                                        ng-if="item.rules && item.rules.length">
+                                        <div class="euiStat euiStat--leftAligned">
+                                            <p class="euiTitle euiTitle--small euiStat__title ng-binding"
+                                                style="font-size: 1.15rem;">Rule(s)</p>
+                                            <div class="euiText euiText--small euiStat__description wz-text-gray">
+                                                <div layout="row" ng-repeat="rule in item.rules">
+                                                    {{rule.rule}}
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div layout="column" class="wz-margin-bottom-10"></div>
+                                    </div>
+                                    <div class="euiFlexItem euiFlexItem--flexGrowZero"
                                         ng-if="item.compliance && item.compliance.length">
                                         <div class="euiStat euiStat--leftAligned">
                                             <p class="euiTitle euiTitle--small euiStat__title ng-binding"
                                                 style="font-size: 1.15rem;">Compliance</p>
                                             <div class="euiText euiText--small euiStat__description wz-text-gray">
-                                                <p><span class="wz-padding-right-8"
-                                                        ng-repeat="c in item.compliance">{{c.key}}/{{c.value}}</span>
-                                                </p>
+                                                <div layout="row" ng-repeat="c in item.compliance">
+                                                    {{c.key}}/{{c.value}}
+                                                </div>
                                             </div>
                                         </div>
                                         <div layout="column" class="wz-margin-bottom-10"></div>
