@@ -160,7 +160,7 @@ export function settingsWizard(
             }
           }
         })
-        .catch(error => {
+        .catch(() => {
           appState.removeCurrentAPI();
 
           $location.search('tab', 'welcome');

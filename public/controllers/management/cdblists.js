@@ -47,12 +47,12 @@ export class CdbListsController {
     this.adminMode = !!(configuration || {}).admin;
 
     // Reloading event listener
-    this.$scope.$on('rulesetIsReloaded', (ev, params) => {
+    this.$scope.$on('rulesetIsReloaded', () => {
       this.viewingDetail = false;
       this.$scope.$applyAsync();
     });
 
-    this.$scope.$on('closeListView', (ev, params) => {
+    this.$scope.$on('closeListView', () => {
       this.closeDetailView();
     });
 

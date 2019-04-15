@@ -26,6 +26,6 @@ export async function totalRAM(genericReq, errorHandler) {
       );
     }
   } catch (error) {
-    console.log(error.message || error);
+    console.log(error.message || error); // eslint-disable-line
   }
 }

@@ -166,7 +166,6 @@ export class CommonData {
         );
       }
     } catch (error) {
-      console.log(error);
       this.errorHandler.handle(
         'An error occurred while creating custom filters for visualizations',
         agent ? 'Agents' : 'Overview',
