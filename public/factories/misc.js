@@ -75,11 +75,4 @@ export class WzMisc {
   setLastRestart(value) {
     this.state.lastRestart = value;
   }
-
-  /**
-   * Get last restart
-   */
-  getLastRestart() {
-    return this.state.lastRestart;
-  }
 }
