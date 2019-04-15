@@ -143,29 +143,25 @@
                 path === '/rules/files' || path === '/decoders/files' || path === '/lists/files') ? keys.length + 1 : keys.length}}">
                 <span ng-show="!wazuh_table_loading" class="color-grey">{{ totalItems }} items ({{time | number: 2}}
                     seconds)</span>
-                <div ng-show="items.length >= itemsPerPage" class="pagination pull-right" style="margin:0 !important">
+                <div ng-show="items.length > itemsPerPage" class="pagination pull-right" style="margin:0 !important">
                     <ul layout="row">
                         <li ng-show="currentPage > 0" class="md-padding">
                             <a href ng-click="firstPage()">First</a>
                         </li>
-
                         <li ng-show="currentPage" class="md-padding">
                             <a href ng-click="prevPage()">
                                 <react-component name="EuiIcon" props="{type:'arrowLeft'}" />
                             </a>
                         </li>
-
                         <li ng-repeat="n in range(pagedItems.length, currentPage, currentPage + gap) " ng-class="{'wz-text-active': n == currentPage}"
                             ng-click="setPage()" class="md-padding">
                             <a href ng-bind="n + 1">1</a>
                         </li>
-
                         <li ng-show="currentPage < pagedItems.length - 1" class="md-padding">
                             <a href ng-click="nextPage()">
                                 <react-component name="EuiIcon" props="{type:'arrowRight'}" />
                             </a>
                         </li>
-
                         <li ng-show="currentPage < pagedItems.length - 1" class="md-padding">
                             <a href ng-click="setPage(pagedItems.length - 1, false, true)">Last</a>
                         </li>
@@ -272,29 +268,25 @@
             <td colspan="{{keys.length}}">
                 <span ng-show="!wazuh_table_loading" class="color-grey">{{ totalItems }} items ({{time | number: 2}}
                     seconds)</span>
-                <div ng-show="items.length >= itemsPerPage" class="pagination pull-right" style="margin:0 !important">
+                <div ng-show="items.length > itemsPerPage" class="pagination pull-right" style="margin:0 !important">
                     <ul layout="row">
                         <li ng-show="currentPage > 0" class="md-padding">
                             <a href ng-click="firstPage()">First</a>
                         </li>
-
                         <li ng-show="currentPage" class="md-padding">
                             <a href ng-click="prevPage()">
                                 <react-component name="EuiIcon" props="{type:'arrowLeft'}" />
                             </a>
                         </li>
-
                         <li ng-repeat="n in range(pagedItems.length, currentPage, currentPage + gap) " ng-class="{'wz-text-active': n == currentPage}"
                             ng-click="setPage()" class="md-padding">
                             <a href ng-bind="n + 1">1</a>
                         </li>
-
                         <li ng-show="currentPage < pagedItems.length - 1" class="md-padding">
                             <a href ng-click="nextPage()">
                                 <react-component name="EuiIcon" props="{type:'arrowRight'}" />
                             </a>
                         </li>
-
                         <li ng-show="currentPage < pagedItems.length - 1" class="md-padding">
                             <a href ng-click="setPage(pagedItems.length - 1, false, true)">Last</a>
                         </li>
@@ -352,29 +344,25 @@
             <td colspan="{{keys.length}}">
                 <span ng-show="!wazuh_table_loading" class="color-grey">{{ totalItems }} items ({{time | number: 2}}
                     seconds)</span>
-                <div ng-show="items.length >= itemsPerPage" class="pagination pull-right" style="margin:0 !important">
+                <div ng-show="items.length > itemsPerPage" class="pagination pull-right" style="margin:0 !important">
                     <ul layout="row">
                         <li ng-show="currentPage > 0" class="md-padding">
                             <a href ng-click="firstPage()">First</a>
                         </li>
-
                         <li ng-show="currentPage" class="md-padding">
                             <a href ng-click="prevPage()">
                                 <react-component name="EuiIcon" props="{type:'arrowLeft'}" />
                             </a>
                         </li>
-
                         <li ng-repeat="n in range(pagedItems.length, currentPage, currentPage + gap) " ng-class="{'wz-text-active': n == currentPage}"
                             ng-click="setPage()" class="md-padding">
                             <a href ng-bind="n + 1">1</a>
                         </li>
-
                         <li ng-show="currentPage < pagedItems.length - 1" class="md-padding">
                             <a href ng-click="nextPage()">
                                 <react-component name="EuiIcon" props="{type:'arrowRight'}" />
                             </a>
                         </li>
-
                         <li ng-show="currentPage < pagedItems.length - 1" class="md-padding">
                             <a href ng-click="setPage(pagedItems.length - 1, false, true)">Last</a>
                         </li>
