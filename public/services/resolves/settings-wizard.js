@@ -133,9 +133,6 @@ export function settingsWizard(
         .then(data => {
           if (data === 3099) {
             deferred.resolve();
-          } else if (data && data === 'cookies_outdated') {
-            $location.search('tab', 'welcome');
-            $location.path('/overview');
           } else {
             if (data.data.error || data.data.data.apiIsDown) {
               checkResponse(data);
@@ -160,7 +157,7 @@ export function settingsWizard(
             }
           }
         })
-        .catch(error => {
+        .catch(() => {
           appState.removeCurrentAPI();
 
           $location.search('tab', 'welcome');

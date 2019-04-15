@@ -51,10 +51,14 @@ export class WazuhApiElasticCtrl {
           result.push(entry);
         }
       }
-
+      log(
+        'wazuh-api-elastic:getAPIEntries',
+        `${result.length} Wazuh API entries`,
+        'debug'
+      );
       return result;
     } catch (error) {
-      log('GET /elastic/apis', error.message || error);
+      log('wazuh-api-elastic:getAPIEntries', error.message || error);
       return ErrorResponse(error.message || error, 2001, 500, reply);
     }
   }
@@ -68,10 +72,10 @@ export class WazuhApiElasticCtrl {
   async deleteAPIEntries(req, reply) {
     try {
       const data = await this.wzWrapper.deleteWazuhAPIEntriesWithRequest(req);
-
+      log('wazuh-api-elastic:deleteAPIEntries', 'Success', 'debug');
       return data;
     } catch (error) {
-      log('DELETE /elastic/apis/{id}', error.message || error);
+      log('wazuh-api-elastic:deleteAPIEntries', error.message || error);
       return ErrorResponse(error.message || error, 2002, 500, reply);
     }
   }
@@ -141,6 +145,7 @@ export class WazuhApiElasticCtrl {
         !('url' in req.payload) ||
         !('port' in req.payload)
       ) {
+        log('wazuh-api-elastic:saveAPI', 'Missing parameters');
         return ErrorResponse('Missing data', 2010, 400, reply);
       }
 
@@ -153,10 +158,17 @@ export class WazuhApiElasticCtrl {
         req,
         settings
       );
+      log(
+        'wazuh-api-elastic:saveAPI',
+        `${req.payload.user}:*****@${req.payload.url}:${
+          req.payload.port
+        } entry saved successfully`,
+        'debug'
+      );
 
       return { statusCode: 200, message: 'ok', response };
     } catch (error) {
-      log('PUT /elastic/api', error.message || error);
+      log('wazuh-api-elastic:saveAPI', error.message || error);
       return ErrorResponse(
         `Could not save data in elasticsearch due to ${error.message || error}`,
         2011,
@@ -177,10 +189,14 @@ export class WazuhApiElasticCtrl {
       await this.wzWrapper.updateWazuhIndexDocument(req, req.params.id, {
         doc: { cluster_info: req.payload.cluster_info }
       });
-
+      log(
+        'wazuh-api-elastic:updateAPIHostname',
+        `API entry ${req.params.id} hostname updated`,
+        'debug'
+      );
       return { statusCode: 200, message: 'ok' };
     } catch (error) {
-      log('PUT /elastic/api-hostname/{id}', error.message || error);
+      log('wazuh-api-elastic:updateAPIHostname', error.message || error);
       return ErrorResponse(
         `Could not save data in elasticsearch due to ${error.message || error}`,
         2012,
@@ -204,7 +220,8 @@ export class WazuhApiElasticCtrl {
         !('url' in req.payload) ||
         !('port' in req.payload)
       ) {
-        return ErrorResponse('Missing data', 2013, 400, reply);
+        log('wazuh-api-elastic:updateFullAPI', 'Missing paramaters');
+        return ErrorResponse('Missing parameters', 2013, 400, reply);
       }
 
       const valid = this.validateData(req.payload);
@@ -215,10 +232,14 @@ export class WazuhApiElasticCtrl {
       await this.wzWrapper.updateWazuhIndexDocument(req, req.payload.id, {
         doc: settings
       });
-
+      log(
+        'wazuh-api-elastic:updateFullApi',
+        `API entry ${req.payload.id} updated`,
+        'debug'
+      );
       return { statusCode: 200, message: 'ok' };
     } catch (error) {
-      log('PUT /elastic/api-settings', error.message || error);
+      log('wazuh-api-elastic:updateFullAPI', error.message || error);
       return ErrorResponse(
         `Could not save data in elasticsearch due to ${error.message || error}`,
         2014,

@@ -18,6 +18,7 @@ const CRON_FREQ = '0/15 * * * * *'; // Every 15 seconds
 
 export class Queue {
   static addJob(job) {
+    log('queue:addJob', `New job added`, 'debug');
     jobs.push(job);
   }
 
@@ -36,6 +37,11 @@ export class Queue {
       if (!jobs || !jobs.length) return;
       const now = new Date();
       const pendingJobs = jobs.filter(item => item.startAt <= now);
+      log(
+        'queue:executePendingJobs',
+        `Pending jobs: ${pendingJobs.length}`,
+        'debug'
+      );
       if (!pendingJobs || !pendingJobs.length) return;
       jobs = jobs.filter(item => item.startAt > now);
 
@@ -48,6 +54,7 @@ export class Queue {
       }
     } catch (error) {
       jobs = [];
+      log('queue:executePendingJobs', error.message || error);
       return Promise.reject(error);
     }
   }
@@ -59,7 +66,7 @@ export class Queue {
         try {
           await Queue.executePendingJobs();
         } catch (error) {
-          log('[queue]', error.message || error);
+          log('queue:launchCronJob', error.message || error);
         }
       },
       true

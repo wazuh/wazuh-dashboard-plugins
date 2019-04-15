@@ -16,7 +16,6 @@ import { TabDescription } from '../../../server/reporting/tab-description';
 
 import {
   metricsGeneral,
-  metricsAudit,
   metricsVulnerability,
   metricsScap,
   metricsCiscat,
@@ -158,9 +157,6 @@ export class OverviewController {
       switch (tab) {
         case 'general':
           this.createMetrics(metricsGeneral);
-          break;
-        case 'audit':
-          this.createMetrics(metricsAudit);
           break;
         case 'vuls':
           this.createMetrics(metricsVulnerability);

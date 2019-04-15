@@ -26,14 +26,14 @@ export function initApp(server) {
   const monitoringInstance = new Monitoring(server);
   const indexPatternCronJobInstance = new IndexPatternCronJob(server);
 
-  log('[initApp]', `Waiting for awaitMigration()`, 'info');
+  log('init:initApp', `Waiting for Kibana migration jobs`, 'debug');
   server.kibanaMigrator
     .awaitMigration()
     .then(() => {
       log(
-        '[initApp]',
-        `awaitMigration() has been executed successfully`,
-        'info'
+        'init:initApp',
+        `Kibana migration jobs executed successfully`,
+        'debug'
       );
       Initialize(server);
       WazuhElasticRouter(server);
@@ -46,9 +46,6 @@ export function initApp(server) {
       WazuhUtilsRoutes(server);
     })
     .catch(error => {
-      log(
-        '[initApp]',
-        `initApp function failed due to: ${error.message || error}`
-      );
+      log('init:initApp', error.message || error);
     });
 }
