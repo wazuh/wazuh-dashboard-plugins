@@ -16,7 +16,7 @@
 
 <div ng-if="!wazuh_table_loading && !isPolicyMonitoring() && !isSyscheck()" ng-show="!error && items.length">
     <table class="table table-striped table-condensed table-hover no-margin-bottom"
-        ng-class="customColumns ? 'table-resizable' : ''" id="table{{scapepath}}">
+        ng-class="customColumns ? 'table-resizable' : 'euiTable euiTable--responsive'" id="table{{scapepath}}">
         <thead class="wz-text-bold">
             <th ng-repeat="key in keys" class="euiTableHeaderCell wz-text-left" ng-style="(key.width && !customColumns) && {'width':key.width}">
                 <p ng-class="{ 'cursor-pointer' : !key.nosortable}" ng-click="!key.nosortable && sort(key)">
@@ -178,7 +178,7 @@
 
 <div ng-if="!wazuh_table_loading && isPolicyMonitoring()" ng-show="!error && items.length">
     <table class="table table-striped table-striped-duo table-condensed table-hover no-margin-bottom"
-        ng-class="customColumns ? 'table-resizable' : ''" id="table{{scapepath}}">
+        ng-class="customColumns ? 'table-resizable' : 'euiTable euiTable--responsive'" id="table{{scapepath}}">
         <thead class="wz-text-bold">
             <th ng-repeat="key in keys" class="euiTableHeaderCell wz-text-left" ng-style="key.width && {'width':key.width}">
                 <p ng-class="{ 'cursor-pointer' : !key.nosortable }" ng-click="!key.nosortable && sort(key)">
@@ -274,6 +274,10 @@
                     seconds)</span>
                 <div ng-show="items.length >= itemsPerPage" class="pagination pull-right" style="margin:0 !important">
                     <ul layout="row">
+                        <li ng-show="currentPage > 0" class="md-padding">
+                            <a href ng-click="firstPage()">First</a>
+                        </li>
+
                         <li ng-show="currentPage" class="md-padding">
                             <a href ng-click="prevPage()">
                                 <react-component name="EuiIcon" props="{type:'arrowLeft'}" />
@@ -290,6 +294,10 @@
                                 <react-component name="EuiIcon" props="{type:'arrowRight'}" />
                             </a>
                         </li>
+
+                        <li ng-show="currentPage < pagedItems.length - 1" class="md-padding">
+                            <a href ng-click="setPage(pagedItems.length - 1, false, true)">Last</a>
+                        </li>
                     </ul>
                 </div>
             </td>
@@ -299,7 +307,7 @@
 
 <div ng-if="!wazuh_table_loading && isSyscheck()" ng-show="!error && items.length">
     <table class="table table-striped table-striped-duo table-condensed table-hover no-margin-bottom"
-        ng-class="customColumns ? 'table-resizable' : ''" id="table{{scapepath}}">
+    ng-class="customColumns ? 'table-resizable' : 'euiTable euiTable--responsive'" id="table{{scapepath}}">
         <thead class="wz-text-bold">
             <th ng-repeat="key in keys" class="euiTableHeaderCell wz-text-left" ng-style="key.width && {'width':key.width}">
                 <p ng-class="{ 'cursor-pointer' : !key.nosortable }" ng-click="!key.nosortable && sort(key)">{{
@@ -313,7 +321,7 @@
             <tr class="wz-word-wrap cursor-pointer" ng-repeat-start="item in pagedItems[currentPage] | filter:{item:'!'}"
                 ng-click="expandTableRow(item)" ng-class="{'selected': item.expanded}">
                 <td ng-repeat="key in keys" id="td-{{$parent.$index}}-{{$index}}" ng-mouseover="showTooltip($parent.$index, $index, item)">
-                    <div ng-class="customColumns ? 'wz-text-truncatable-container' : ''">
+                    <div class="wz-text-truncatable-container">
                         <span class="wz-text-truncatable">
                             {{
                             parseValue(key,item)
@@ -346,6 +354,10 @@
                     seconds)</span>
                 <div ng-show="items.length >= itemsPerPage" class="pagination pull-right" style="margin:0 !important">
                     <ul layout="row">
+                        <li ng-show="currentPage > 0" class="md-padding">
+                            <a href ng-click="firstPage()">First</a>
+                        </li>
+
                         <li ng-show="currentPage" class="md-padding">
                             <a href ng-click="prevPage()">
                                 <react-component name="EuiIcon" props="{type:'arrowLeft'}" />
@@ -361,6 +373,10 @@
                             <a href ng-click="nextPage()">
                                 <react-component name="EuiIcon" props="{type:'arrowRight'}" />
                             </a>
+                        </li>
+
+                        <li ng-show="currentPage < pagedItems.length - 1" class="md-padding">
+                            <a href ng-click="setPage(pagedItems.length - 1, false, true)">Last</a>
                         </li>
                     </ul>
                 </div>
