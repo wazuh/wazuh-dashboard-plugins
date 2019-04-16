@@ -34,7 +34,8 @@ export class AgentsPreviewController {
     shareAgent,
     wzTableFilter,
     commonData,
-    wazuhConfig
+    wazuhConfig,
+    $window
   ) {
     this.$scope = $scope;
     this.genericReq = genericReq;
@@ -47,6 +48,7 @@ export class AgentsPreviewController {
     this.commonData = commonData;
     this.wazuhConfig = wazuhConfig;
     this.errorInit = false;
+    this.$window = $window;
   }
 
   /**
@@ -230,5 +232,12 @@ export class AgentsPreviewController {
 
   reloadList() {
     this.$scope.$broadcast('wazuhSearch', { term: '' });
+  }
+
+  openRegistrationDocs() {
+    this.$window.open(
+      'https://documentation.wazuh.com/current/user-manual/registering/index.html',
+      '_blank'
+    );
   }
 }

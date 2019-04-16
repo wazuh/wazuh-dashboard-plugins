@@ -1055,7 +1055,7 @@ export class WazuhApiCtrl {
         needle(
           'get',
           `${config.url}:${config.port}/agents`,
-          { limit: 1, sort: '-dateAdd' },
+          { limit: 1, sort: '-dateAdd', q: 'id!=000' },
           headers
         )
       ]);
