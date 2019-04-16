@@ -62,7 +62,7 @@
 <div class="md-padding" ng-if="editingFile">
     <div flex layout="column">
         <div layout="row" class="wz-padding-bottom-14">
-            <div ng-if="!newFile">
+            <div ng-if="!newFile && !editorReadOnly">
                 <span ng-click='closeEditingFile()' class='btn btn-info'>Cancel</span>
                 <button ng-disabled='xmlHasErrors || doingSaving' ng-click='doSaveConfig(false)'
                     class='btn wz-button pull-right wz-margin-left-8'>
@@ -73,6 +73,11 @@
                             class='fa fa-fw fa-exclamation-triangle'></i>
                         XML format error</span>
                 </button>
+            </div>
+            <div ng-if="editorReadOnly">
+                <div layout="row" layout-align="start center">
+                    <span ng-click='closeEditingFile()' class='btn btn-info'>Close</span>
+                </div>
             </div>
             <div ng-if="newFile" layout="row" class="wz-width-100">
                 <button ng-click="closeEditingFile()" class="height-35 kuiButton kuiButton--hollow">Cancel</button>
@@ -100,11 +105,16 @@
                     now</button>
             </div>
         </div>
-        <div ng-if="fetchedXML" style="height: calc(100vh - 220px);">
+        <div ng-if="!editorReadOnly && fetchedXML" style="height: calc(100vh - 220px);">
             <wz-xml-file-editor file-name='{{type}}' data="fetchedXML"
                 target-name="newFile ? selectedItem.file : currentFile.file" valid-fn='xmlIsValid(valid)'
                 saving-param='toggleSaveConfig()' close-fn='closeEditingFile(reload)'>
             </wz-xml-file-editor>
+        </div>
+        <div ng-show="editorReadOnly && XMLContent">
+            <div layout="row" class="wz-padding-bottom-0">
+                <wz-config-viewer flex xmlcontent="XMLContent" hide-header="true" no-local="currentFile.file" />
+            </div>
         </div>
     </div>
 </div>

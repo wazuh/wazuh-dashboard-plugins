@@ -5261,6 +5261,60 @@ export const knownFields = [
     readFromDocValues: true
   },
   {
+    name: 'data.osquery.action',
+    type: 'string',
+    count: 0,
+    scripted: false,
+    searchable: true,
+    aggregatable: true,
+    readFromDocValues: true
+  },
+  {
+    name: 'data.osquery.calendarTime',
+    type: 'string',
+    count: 0,
+    scripted: false,
+    searchable: true,
+    aggregatable: true,
+    readFromDocValues: true
+  },
+  {
+    name: 'data.osquery.counter',
+    type: 'number',
+    count: 0,
+    scripted: false,
+    searchable: true,
+    aggregatable: true,
+    readFromDocValues: true
+  },
+  {
+    name: 'data.osquery.epoch',
+    type: 'string',
+    count: 0,
+    scripted: false,
+    searchable: true,
+    aggregatable: true,
+    readFromDocValues: true
+  },
+  {
+    name: 'data.osquery.hostIdentifier',
+    type: 'string',
+    count: 0,
+    scripted: false,
+    searchable: true,
+    aggregatable: true,
+    readFromDocValues: true
+  },
+  {
+    name: 'data.osquery.name',
+    type: 'string',
+    count: 0,
+    scripted: false,
+    searchable: true,
+    aggregatable: true,
+    readFromDocValues: true
+  },
+  {
     name: 'data.osquery.pack',
     type: 'string',
     count: 0,
@@ -5270,7 +5324,16 @@ export const knownFields = [
     readFromDocValues: true
   },
   {
-    name: 'data.osquery.action',
+    name: 'data.osquery.subquery',
+    type: 'string',
+    count: 0,
+    scripted: false,
+    searchable: true,
+    aggregatable: true,
+    readFromDocValues: true
+  },
+  {
+    name: 'data.osquery.unixTime',
     type: 'string',
     count: 0,
     scripted: false,

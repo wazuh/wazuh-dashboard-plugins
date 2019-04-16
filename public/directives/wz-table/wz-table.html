@@ -118,8 +118,9 @@
                         <react-component name="EuiIcon" props="{type:'trash', color:'primary'}" />
                     </span>
                     <span ng-if="(item.path !== 'etc/rules' && item.path !== 'etc/decoders') && ((item.name && removingFile !== item.name) || (item.file && removingFile !== item.file)) && adminMode && path !== '/lists/files'"
-                        class="wz-margin-left-8" aria-hidden="true">
-                        -
+                        class="wz-margin-left-8 cursor-pointer" aria-hidden="true" ng-click="viewFileOnly(item, path); $event.stopPropagation()"
+                        tooltip="View this file" tooltip-placement="right" aria-hidden="true">
+                        <react-component name="EuiIcon" props="{type:'eye', color:'primary'}" />
                     </span>
                     <div ng-if="(item.name && removingFile === item.name) || (item.file && removingFile === item.file)"
                         class="confirmEmbedBubble">
