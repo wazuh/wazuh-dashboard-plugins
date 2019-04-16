@@ -236,7 +236,7 @@ export function Initialize(server) {
         );
 
         // Save Setup Info
-        await saveConfiguration(defaultIndexPattern);
+        await saveConfiguration();
       }
 
       await wzWrapper.updateWazuhVersionIndexLastRestart(
