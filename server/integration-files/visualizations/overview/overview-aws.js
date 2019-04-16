@@ -14,11 +14,11 @@ export default [
     _id: 'Wazuh-App-Overview-AWS-Top-5-rules',
     _type: 'visualization',
     _source: {
-      title: 'Top 5 rules',
+      title: 'Top rules',
       visState:
-        '{"title":"Top 5 rules","type":"table","params":{"perPage":10,"showPartialRows":false,"showMetricsAtAllLevels":false,"sort":{"columnIndex":null,"direction":null},"showTotal":false,"totalFunc":"sum"},"aggs":[{"id":"1","enabled":true,"type":"count","schema":"metric","params":{}},{"id":"2","enabled":true,"type":"terms","schema":"bucket","params":{"field":"rule.id","size":5,"order":"desc","orderBy":"1","otherBucket":false,"otherBucketLabel":"Other","missingBucket":false,"missingBucketLabel":"Missing","customLabel":"Rule ID"}},{"id":"3","enabled":true,"type":"terms","schema":"bucket","params":{"field":"rule.description","size":1,"order":"desc","orderBy":"1","otherBucket":false,"otherBucketLabel":"Other","missingBucket":false,"missingBucketLabel":"Missing","customLabel":"Description"}}]}',
+        '{"title":"Top rules","type":"table","params":{"perPage":10,"showPartialRows":false,"showMetricsAtAllLevels":false,"sort":{"columnIndex":2,"direction":"desc"},"showTotal":false,"totalFunc":"sum"},"aggs":[{"id":"1","enabled":true,"type":"count","schema":"metric","params":{}},{"id":"3","enabled":true,"type":"terms","schema":"bucket","params":{"field":"rule.id","size":500,"order":"desc","orderBy":"1","otherBucket":false,"otherBucketLabel":"Other","missingBucket":false,"missingBucketLabel":"Missing","customLabel":"Rule ID"}},{"id":"2","enabled":true,"type":"terms","schema":"bucket","params":{"field":"rule.description","size":10,"order":"desc","orderBy":"1","otherBucket":false,"otherBucketLabel":"Other","missingBucket":false,"missingBucketLabel":"Missing","customLabel":"Event"}}]}',
       uiStateJSON:
-        '{"vis":{"params":{"sort":{"columnIndex":null,"direction":null}}}}',
+        '{"vis":{"params":{"sort":{"columnIndex":2,"direction":"desc"}}}}',
       description: '',
       version: 1,
       kibanaSavedObjectMeta: {
@@ -36,23 +36,6 @@ export default [
         '{"title":"Geolocation map","type":"tile_map","params":{"colorSchema":"Green to Red","mapType":"Scaled Circle Markers","isDesaturated":true,"addTooltip":true,"heatClusterSize":1.5,"legendPosition":"bottomright","mapZoom":2,"mapCenter":[0,0],"wms":{"enabled":false,"options":{"format":"image/png","transparent":true},"selectedTmsLayer":{"origin":"self_hosted","id":"road_map","minZoom":0,"maxZoom":10,"attribution":"<p>&#169; <a href=\\"http://www.openstreetmap.org/copyright\\">OpenStreetMap</a> contributors | <a href=\\"https://openmaptiles.org/\\">OpenMapTiles</a> | <a href=\\"https://www.maptiler.com/\\">MapTiler</a> | <a href=\\"https://www.elastic.co/elastic-maps-service\\">Elastic Maps Service</a></p>&#10;"}}},"aggs":[{"id":"1","enabled":true,"type":"count","schema":"metric","params":{}},{"id":"2","enabled":true,"type":"geohash_grid","schema":"segment","params":{"field":"GeoLocation.location","autoPrecision":true,"isFilteredByCollar":true,"useGeocentroid":true,"mapZoom":4,"mapCenter":{"lon":-47.83150001429022,"lat":40.315046945235984},"mapBounds":{"bottom_right":{"lat":2.8991526985043135,"lon":11.513671875000002},"top_left":{"lat":64.58618480339979,"lon":-107.138671875}},"precision":2}}]}',
       uiStateJSON:
         '{"mapZoom":3,"mapCenter":[38.685509760012025,-31.816406250000004]}',
-      description: '',
-      version: 1,
-      kibanaSavedObjectMeta: {
-        searchSourceJSON:
-          '{"index":"wazuh-alerts","query":{"query":"","language":"lucene"},"filter":[]}'
-      }
-    }
-  },
-  {
-    _id: 'Wazuh-App-Overview-AWS-Top-5-buckets',
-    _type: 'visualization',
-    _source: {
-      title: 'AWS-Top-5-Buckets-table',
-      visState:
-        '{"title":"AWS-Top-5-Buckets-table","type":"table","params":{"perPage":10,"showPartialRows":false,"showMetricsAtAllLevels":false,"sort":{"columnIndex":null,"direction":null},"showTotal":false,"totalFunc":"sum"},"aggs":[{"id":"1","enabled":true,"type":"count","schema":"metric","params":{"customLabel":"Alerts"}},{"id":"2","enabled":true,"type":"terms","schema":"bucket","params":{"field":"data.aws.log_info.s3bucket","size":5,"order":"desc","orderBy":"1","otherBucket":false,"otherBucketLabel":"Other","missingBucket":false,"missingBucketLabel":"Missing","customLabel":"Bucket"}}]}',
-      uiStateJSON:
-        '{"vis":{"params":{"sort":{"columnIndex":null,"direction":null}}}}',
       description: '',
       version: 1,
       kibanaSavedObjectMeta: {
