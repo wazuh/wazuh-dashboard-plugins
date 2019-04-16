@@ -10,7 +10,7 @@
  * Find more information about this on the LICENSE file.
  */
 export class StatusController {
-  constructor($scope, errorHandler, apiReq) {
+  constructor($scope, errorHandler, apiReq, wazuhConfig) {
     this.$scope = $scope;
     this.errorHandler = errorHandler;
     this.apiReq = apiReq;
@@ -18,6 +18,7 @@ export class StatusController {
     this.nodes = [];
     this.selectedNode = false;
     this.clusterError = false;
+    this.wazuhConfig = wazuhConfig;
   }
 
   /**
@@ -46,6 +47,9 @@ export class StatusController {
    */
   async init() {
     try {
+      const configuration = this.wazuhConfig.getConfig();
+      this.$scope.adminMode = !!(configuration || {}).admin;
+
       const data = await Promise.all([
         this.apiReq.request('GET', '/agents/summary', {}),
         this.apiReq.request('GET', '/cluster/status', {}),

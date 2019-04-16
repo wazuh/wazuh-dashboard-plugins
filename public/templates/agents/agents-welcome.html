@@ -26,7 +26,7 @@
                 class="fa fa-compass"></i>
             Discover
         </button>&nbsp;&nbsp;
-        <button ng-show="!showConfirmRestartAgent" ng-disabled="restartingAgent"
+        <button ng-show="!showConfirmRestartAgent && adminMode" ng-disabled="restartingAgent"
             class="kuiButton kuiButton--secondary small wz-no-margin" ng-disabled="isRestarting"
             ng-click="showConfirmRestartAgent = true"><i class="fa fa-refresh"
                 ng-class="restartingAgent ? 'fa-spin fa-spinner' : ''"></i>

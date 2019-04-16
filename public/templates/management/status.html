@@ -14,7 +14,7 @@
             </select>
         </div>
         <div flex></div>
-        <div layout="column" class="height-40 wz-no-padding">
+        <div layout="column" class="height-40 wz-no-padding" ng-show="adminMode">
             <button ng-if="mctrl.clusterInfo.status === 'enabled' && !mctrl.showConfirmRestart"
                 class="kuiButton kuiButton--secondary height-35" ng-disabled="mctrl.isRestarting"
                 ng-click="mctrl.showConfirmRestart = true"><i class="fa fa-refresh"
