@@ -206,6 +206,11 @@ export class WazuhElasticCtrl {
         query: {
           bool: {
             must: [],
+            must_not: {
+              term: {
+                'agent.id': '000'
+              }
+            },
             filter: { range: { '@timestamp': {} } }
           }
         },
