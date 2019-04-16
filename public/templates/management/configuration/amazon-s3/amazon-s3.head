@@ -17,6 +17,7 @@
         nav-bar-aria-label="Amazon S3 navigation links">
         <md-nav-item class="wz-nav-item" md-nav-click="switchConfigurationSubTab('amazon-general')" name="amazon-general">General</md-nav-item>
         <md-nav-item class="wz-nav-item" md-nav-click="switchConfigurationSubTab('amazon-buckets')" name="amazon-buckets">Buckets</md-nav-item>
+        <md-nav-item class="wz-nav-item" md-nav-click="switchConfigurationSubTab('amazon-services')" name="amazon-services">Services</md-nav-item>
     </md-nav-bar>
     <!-- End Amazon S3 navigation bar -->
 
