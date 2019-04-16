@@ -35,20 +35,24 @@ export class RulesetHandler {
     }
   }
 
-  async getRuleConfiguration(path) {
+  async getRuleConfiguration(path, nolocal = false) {
     try {
+      const _path = nolocal ? `ruleset/rules/${path}` : `etc/rules/${path}`;
       const result = await this.apiReq.request('GET', `/manager/files`, {
-        path: `etc/rules/${path}`
+        path: _path
       });
       return ((result || {}).data || {}).data || false;
     } catch (error) {
       return Promise.reject(error);
     }
   }
-  async getDecoderConfiguration(path) {
+  async getDecoderConfiguration(path, nolocal = false) {
     try {
+      const _path = nolocal
+        ? `ruleset/decoders/${path}`
+        : `etc/decoders/${path}`;
       const result = await this.apiReq.request('GET', `/manager/files`, {
-        path: `etc/decoders/${path}`
+        path: _path
       });
       return ((result || {}).data || {}).data || false;
     } catch (error) {
