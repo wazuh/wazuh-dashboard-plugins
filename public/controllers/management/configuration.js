@@ -84,6 +84,7 @@ export class ConfigurationController {
   }
 
   switchConfigurationSubTab(configurationSubTab) {
+    this.selectedItem = 0;
     this.configurationHandler.switchConfigurationSubTab(
       configurationSubTab,
       this.$scope
