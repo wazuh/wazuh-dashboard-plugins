@@ -32,9 +32,9 @@ export default [
     _source: {
       title: 'Files',
       visState:
-        '{"title":"Files","type":"table","params":{"perPage":10,"showPartialRows":false,"showMeticsAtAllLevels":false,"sort":{"columnIndex":null,"direction":null},"showTotal":false,"totalFunc":"sum"},"aggs":[{"id":"1","enabled":true,"type":"count","schema":"metric","params":{"customLabel":"Count"}},{"id":"4","enabled":true,"type":"terms","schema":"bucket","params":{"field":"data.virustotal.source.file","size":10,"order":"desc","orderBy":"1","customLabel":"File"}},{"id":"2","enabled":true,"type":"terms","schema":"bucket","params":{"field":"data.virustotal.permalink","size":1,"order":"desc","orderBy":"1","customLabel":"Link"}}]}',
+        '{"title":"Files","type":"table","params":{"perPage":10,"showPartialRows":false,"showMeticsAtAllLevels":false,"sort":{"columnIndex":2,"direction":"desc"},"showTotal":false,"totalFunc":"sum"},"aggs":[{"id":"1","enabled":true,"type":"count","schema":"metric","params":{"customLabel":"Count"}},{"id":"4","enabled":true,"type":"terms","schema":"bucket","params":{"field":"data.virustotal.source.file","size":10,"order":"desc","orderBy":"1","customLabel":"File"}},{"id":"2","enabled":true,"type":"terms","schema":"bucket","params":{"field":"data.virustotal.permalink","size":1,"order":"desc","orderBy":"1","customLabel":"Link"}}]}',
       uiStateJSON:
-        '{"vis":{"params":{"sort":{"columnIndex":null,"direction":null}}}}',
+        '{"vis":{"params":{"sort":{"columnIndex":2,"direction":"desc"}}}}',
       description: '',
       version: 1,
       kibanaSavedObjectMeta: {
