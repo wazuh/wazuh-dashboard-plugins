@@ -32,11 +32,19 @@ export function cleanKeys(response) {
   // Remove AWS keys
   if (response.body.data.wmodules) {
     response.body.data.wmodules.map(item => {
-      if (item['aws-s3'] && item['aws-s3'].buckets) {
-        item['aws-s3'].buckets.map(item => {
-          item.access_key = '********';
-          item.secret_key = '********';
-        });
+      if (item['aws-s3']) {
+        if (item['aws-s3'].buckets) {
+          item['aws-s3'].buckets.map(item => {
+            item.access_key = '********';
+            item.secret_key = '********';
+          });
+        }
+        if (item['aws-s3'].services) {
+          item['aws-s3'].services.map(item => {
+            item.access_key = '********';
+            item.secret_key = '********';
+          });
+        }
       }
     });
   }
