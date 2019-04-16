@@ -35,7 +35,14 @@ export class FilesController {
     this.adminMode = !!(configuration || {}).admin;
 
     this.$scope.$on('editFile', (ev, params) => {
+      this.$scope.editorReadOnly = false;
       this.editFile(params);
+      this.$scope.$applyAsync();
+    });
+
+    this.$scope.$on('viewFileOnly', (ev, params) => {
+      this.$scope.editorReadOnly = true;
+      this.editFile(params, true);
       this.$scope.$applyAsync();
     });
 
@@ -123,7 +130,7 @@ export class FilesController {
     };
   }
 
-  async editFile(params) {
+  async editFile(params, readonly = false) {
     this.$scope.editingFile = true;
     this.$scope.newFile = false;
     try {
@@ -135,13 +142,21 @@ export class FilesController {
       this.$scope.fetchedXML =
         this.$scope.type === 'rules'
           ? await this.rulesetHandler.getRuleConfiguration(
-              this.$scope.currentFile.file
+              this.$scope.currentFile.file,
+              readonly
             )
           : await this.rulesetHandler.getDecoderConfiguration(
-              this.$scope.currentFile.file
+              this.$scope.currentFile.file,
+              readonly
             );
       this.$scope.$applyAsync();
-      this.$scope.$broadcast('fetchedFile', { data: this.$scope.fetchedXML });
+      if (!readonly) {
+        this.$scope.$broadcast('fetchedFile', { data: this.$scope.fetchedXML });
+      } else {
+        this.$scope.$broadcast('XMLContentReady', {
+          data: this.$scope.fetchedXML
+        });
+      }
     } catch (error) {
       this.$scope.fetchedXML = null;
       this.errorHandler.handle(error, 'Fetch file error');

@@ -457,6 +457,10 @@ app.directive('wzTable', function() {
         $scope.$emit('editFile', { file, path });
       };
 
+      $scope.viewFileOnly = (file, path) => {
+        $scope.$emit('viewFileOnly', { file, path });
+      };
+
       $scope.isPolicyMonitoring = () => {
         return (
           instance.path.includes('sca') && instance.path.includes('/checks')

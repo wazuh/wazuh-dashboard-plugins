@@ -24,7 +24,8 @@ class WzConfigViewer {
       getxml: '&',
       jsoncontent: '=',
       xmlcontent: '=',
-      hideHeader: '='
+      hideHeader: '=',
+      noLocal: '='
     };
     this.template = template;
   }
