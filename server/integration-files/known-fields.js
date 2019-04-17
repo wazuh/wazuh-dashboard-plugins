@@ -5919,7 +5919,7 @@ export const knownFields = [
   },
   {
     name: 'data.sca.score',
-    type: 'string',
+    type: 'number',
     count: 0,
     scripted: false,
     searchable: true,
