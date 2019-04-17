@@ -63,9 +63,9 @@ export class EditionController {
     this.$scope.$applyAsync();
   }
 
-  changeNode() {
+  changeNode(refresh = false) {
     this.restartBtn = false;
-    this.editConf();
+    refresh ? this.init() : this.editConf();
   }
 
   async saveConfiguration() {
@@ -113,9 +113,9 @@ export class EditionController {
       const isCluster =
         clusterStatus.enabled === 'yes' && clusterStatus.running === 'yes';
 
-      (await isCluster)
-        ? this.configHandler.restartNode(selectedNode)
-        : this.configHandler.restartManager();
+      isCluster
+        ? await this.configHandler.restartNode(selectedNode)
+        : await this.configHandler.restartManager();
       this.$rootScope.wazuhNotReadyYet = `Restarting ${
         isCluster ? selectedNode : 'manager'
       }, please wait. `;
