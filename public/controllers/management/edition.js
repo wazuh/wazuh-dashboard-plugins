@@ -63,9 +63,9 @@ export class EditionController {
     this.$scope.$applyAsync();
   }
 
-  changeNode() {
+  changeNode(refresh = false) {
     this.restartBtn = false;
-    this.editConf();
+    refresh ? this.init() : this.editConf();
   }
 
   async saveConfiguration() {
