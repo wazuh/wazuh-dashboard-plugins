@@ -145,9 +145,11 @@
             <md-card-content>
 
                 <div layout="row">
-                    <span class="font-size-16">Groups <i ng-if='adminMode' tooltip="Add group"
-                            ng-click="switchGroupEdit()" class="wz-text-bold wz-text-link-add fa fa-fw"
-                            ng-class="!addingGroupToAgent ? 'fa-plus-circle' : 'fa-minus-circle'"></i></span>
+                    <span class="font-size-16">Groups 
+                        <span class="cursor-pointer"  ng-if='adminMode' ng-click="switchGroupEdit()">
+                            <react-component name="EuiIcon" props="{type:'plusInCircle', color:'primary'}" />
+                        </span>
+                    </span>
                 </div>
                 <md-divider class="wz-margin-top-10"></md-divider>
                 <div layout="row" class="wz-margin-top-10" ng-if="agent.group && editGroup && !addingGroupToAgent">
