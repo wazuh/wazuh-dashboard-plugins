@@ -2,7 +2,36 @@
     ng-class="{'no-opacity': resultState !== 'ready' || !rendered}" layout-align="start">
 
     <div layout="row" class="height-300">
-        <md-card flex="30" class="wz-md-card" ng-class="{'fullscreen': octrl.expandArray[0]}">
+        <md-card flex="20" class="wz-md-card">
+            <md-card-content class="wazuh-column">
+                <div layout="row">
+                    <span class="wz-headline-title">Overall score</span>
+                    <span flex></span>
+                </div>
+                <md-divider class="wz-margin-top-10"></md-divider>
+                <kbn-vis class="sca-vis" id="Wazuh-App-Overview-SCA-Overall-score"
+                    vis-id="'Wazuh-App-Overview-SCA-Overall-score'" />
+
+            </md-card-content>
+        </md-card>
+        <md-card flex class="wz-md-card" ng-class="{'fullscreen': octrl.expandArray[0]}">
+            <md-card-content class="wazuh-column">
+                <div layout="row" ng-dblclick="octrl.expand(0)">
+                    <span class="wz-headline-title">Score by policy</span>
+                    <span flex></span>
+                    <span class="cursor-pointer" ng-click="octrl.expand(0)">
+                        <react-component name="EuiIcon" props="{type:'expand'}" />
+                    </span>
+                </div>
+                <md-divider class="wz-margin-top-10"></md-divider>
+                <kbn-vis class="sca-vis" id="Wazuh-App-Overview-SCA-Score-by-Policy"
+                    vis-id="'Wazuh-App-Overview-SCA-Score-by-Policy'" />
+            </md-card-content>
+        </md-card>
+    </div>
+
+    <div layout="row" class="height-300">
+        <md-card flex="20" class="wz-md-card" ng-class="{'fullscreen': octrl.expandArray[0]}">
             <md-card-content class="wazuh-column">
                 <div layout="row" ng-dblclick="octrl.expand(0)">
                     <span class="wz-headline-title">Results distribution</span>
@@ -17,7 +46,7 @@
 
             </md-card-content>
         </md-card>
-        <md-card flex class="wz-md-card" ng-class="{'fullscreen': octrl.expandArray[1]}">
+<!--         <md-card flex class="wz-md-card" ng-class="{'fullscreen': octrl.expandArray[1]}">
             <md-card-content class="wazuh-column">
                 <div layout="row" ng-dblclick="octrl.expand(1)">
                     <span class="wz-headline-title">Results over time</span>
@@ -30,10 +59,10 @@
                 <kbn-vis id="Wazuh-App-Overview-CA-Checks-over-time"
                     vis-id="'Wazuh-App-Overview-CA-Checks-over-time'" />
             </md-card-content>
-        </md-card>
+        </md-card> -->
     </div>
 
-    <div layout="row" class="height-300">
+<!--     <div layout="row" class="height-300">
         <md-card flex class="wz-md-card" ng-class="{'fullscreen': octrl.expandArray[2]}">
             <md-card-content class="wazuh-column">
                 <div layout="row" ng-dblclick="octrl.expand(2)">
@@ -49,7 +78,7 @@
 
             </md-card-content>
         </md-card>
-    </div>
+    </div> -->
 
     <div layout="row" class="height-540">
         <md-card flex class="wz-md-card" ng-class="{'fullscreen': octrl.expandArray[3]}">
