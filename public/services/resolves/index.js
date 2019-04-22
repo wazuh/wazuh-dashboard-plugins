@@ -15,7 +15,6 @@ import { settingsWizard } from './settings-wizard';
 import { getSavedSearch } from './get-saved-search';
 import { goToKibana } from './go-to-kibana';
 import { getIp } from './get-ip';
-import { totalRAM } from './check-ram';
 import { getWzConfig } from './get-config';
 
 export {
@@ -25,6 +24,5 @@ export {
   getSavedSearch,
   goToKibana,
   getIp,
-  totalRAM,
   getWzConfig
 };

@@ -32,15 +32,6 @@ export function WazuhUtilsRoutes(server) {
     }
   });
 
-  // Returns total RAM available from the current machine where Kibana is being executed
-  server.route({
-    method: 'GET',
-    path: '/utils/memory',
-    handler(req, res) {
-      return ctrl.totalRam(req, res);
-    }
-  });
-
   // Returns Wazuh app logs ...
   server.route({
     method: 'GET',
