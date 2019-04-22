@@ -46,7 +46,7 @@
 
             </md-card-content>
         </md-card>
-        <md-card flex="20" class="wz-md-card" ng-class="{'fullscreen': octrl.expandArray[2]}">
+        <md-card flex="40" class="wz-md-card" ng-class="{'fullscreen': octrl.expandArray[2]}">
             <md-card-content class="wazuh-column">
                 <div layout="row" ng-dblclick="octrl.expand(2)">
                     <span class="wz-headline-title">Top 5 passed checks</span>
@@ -56,12 +56,12 @@
                     </span>
                 </div>
                 <md-divider class="wz-margin-top-10"></md-divider>
-                <kbn-vis id="Wazuh-App-Overview-SCA-Top-5-passed-checks"
+                <kbn-vis class="sca-vis" id="Wazuh-App-Overview-SCA-Top-5-passed-checks"
                     vis-id="'Wazuh-App-Overview-SCA-Top-5-passed-checks'" />
 
             </md-card-content>
         </md-card>
-        <md-card flex="20" class="wz-md-card" ng-class="{'fullscreen': octrl.expandArray[3]}">
+        <md-card flex="40" class="wz-md-card" ng-class="{'fullscreen': octrl.expandArray[3]}">
             <md-card-content class="wazuh-column">
                 <div layout="row" ng-dblclick="octrl.expand(3)">
                     <span class="wz-headline-title">Top 5 failed checks</span>
@@ -71,29 +71,29 @@
                     </span>
                 </div>
                 <md-divider class="wz-margin-top-10"></md-divider>
-                <kbn-vis id="Wazuh-App-Overview-SCA-Top-5-failed-checks"
+                <kbn-vis class="sca-vis" id="Wazuh-App-Overview-SCA-Top-5-failed-checks"
                     vis-id="'Wazuh-App-Overview-SCA-Top-5-failed-checks'" />
-
-            </md-card-content>
-        </md-card>
-        <md-card flex="40" class="wz-md-card" ng-class="{'fullscreen': octrl.expandArray[4]}">
-            <md-card-content class="wazuh-column">
-                <div layout="row" ng-dblclick="octrl.expand(4)">
-                    <span class="wz-headline-title">Results distribution by policy</span>
-                    <span flex></span>
-                    <span class="cursor-pointer" ng-click="octrl.expand(4)">
-                        <react-component name="EuiIcon" props="{type:'expand'}" />
-                    </span>
-                </div>
-                <md-divider class="wz-margin-top-10"></md-divider>
-                <kbn-vis id="Wazuh-App-Overview-SCA-Result-distribution-by-policy"
-                    vis-id="'Wazuh-App-Overview-SCA-Result-distribution-by-policy'" />
 
             </md-card-content>
         </md-card>
     </div>
 
     <div layout="row" class="height-540">
+      <md-card flex="50" class="wz-md-card" ng-class="{'fullscreen': octrl.expandArray[4]}">
+               <md-card-content class="wazuh-column">
+                  <div layout="row" ng-dblclick="octrl.expand(4)">
+                       <span class="wz-headline-title">Results distribution by policy</span>
+                       <span flex></span>
+                       <span class="cursor-pointer" ng-click="octrl.expand(4)">
+                           <react-component name="EuiIcon" props="{type:'expand'}" />
+                       </span>
+                 </div>
+                <md-divider class="wz-margin-top-10"></md-divider>
+                  <kbn-vis id="Wazuh-App-Overview-SCA-Result-distribution-by-policy"
+                       vis-id="'Wazuh-App-Overview-SCA-Result-distribution-by-policy'" />
+        
+            </md-card-content>
+        </md-card>
         <md-card flex class="wz-md-card" ng-class="{'fullscreen': octrl.expandArray[5]}">
             <md-card-content class="wazuh-column">
                 <div layout="row" ng-dblclick="octrl.expand(5)">
