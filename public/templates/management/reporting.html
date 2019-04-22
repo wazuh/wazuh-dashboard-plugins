@@ -79,7 +79,7 @@
                         <tfoot>
                             <td colspan="6">
                                 <div class="pagination pull-right">
-                                    <ul layout="row">
+                                    <ul layout="row" ng-show="ctrl.items.length > ctrl.itemsPerPage">
                                         <li ng-class="{disabled: ctrl.currentPage == 0}" class="md-padding">
                                             <a href ng-click="ctrl.prevPage()">« Prev</a>
                                         </li>

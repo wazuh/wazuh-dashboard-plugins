@@ -26,7 +26,7 @@
         <div flex="auto" class="wz-padding-top-50" layout="row" style="overflow-y: hidden;">
             <!-- XML editor for node configuration -->
             <div flex layout="column">
-                <div layout="row" class="md-padding-h">
+                <div layout="row" class="md-padding-h" ng-if="editctrl.fetchedXML && !editctrl.failedNode">
                     <!-- List of nodes if cluster is enabled -->
                     <div ng-show="editctrl.selectedNode && editctrl.clusterStatus.data.data.enabled === 'yes' && editctrl.clusterStatus.data.data.running === 'yes'"
                         layout="row" layout-padding style="padding: 0;height: 32px;">
@@ -108,7 +108,7 @@
                                 <md-divider class="wz-margin-top-10"></md-divider>
                                 <div layout="row" class="wz-margin-top-10 layout-align-center-center">
                                     <button class="kuiButton kuiButton--secondary height-35"
-                                        ng-click="editctrl.changeNode()">
+                                        ng-click="editctrl.changeNode(true)">
                                         <react-component name="EuiIcon" props="{type: 'refresh'}" /> Refresh
                                     </button>
                                 </div>
