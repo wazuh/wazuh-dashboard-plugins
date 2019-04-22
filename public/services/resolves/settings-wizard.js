@@ -11,7 +11,6 @@
  */
 import { checkTimestamp } from './check-timestamp';
 import { healthCheck } from './health-check';
-import { totalRAM } from './check-ram';
 
 export function settingsWizard(
   $location,
@@ -27,8 +26,6 @@ export function settingsWizard(
 ) {
   try {
     const deferred = $q.defer();
-
-    !disableErrors && totalRAM(genericReq, errorHandler);
 
     const checkResponse = data => {
       let fromElastic = false;

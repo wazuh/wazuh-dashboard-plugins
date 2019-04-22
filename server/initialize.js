@@ -19,6 +19,7 @@ import { getConfiguration } from './lib/get-configuration';
 import { defaultExt } from './lib/default-ext';
 import { BuildBody } from './lib/replicas-shards-helper';
 import { checkKnownFields } from './lib/refresh-known-fields';
+import { totalmem } from 'os';
 
 export function Initialize(server) {
   const blueWazuh = colors.blue('wazuh');
@@ -48,6 +49,17 @@ export function Initialize(server) {
     server.log(
       [blueWazuh, 'initialize', 'error'],
       'Something went wrong while reading the configuration.' + e.message
+    );
+  }
+
+  try {
+    // RAM in MB
+    const ram = Math.ceil(totalmem() / 1024 / 1024);
+    log('initialize', `Total RAM: ${ram}MB`, 'info');
+  } catch (error) {
+    log(
+      'initialize',
+      `Could not check total RAM due to: ${error.message || error}`
     );
   }
 

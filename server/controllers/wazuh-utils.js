@@ -13,7 +13,6 @@
 // Require some libraries
 import { ErrorResponse } from './error-response';
 import { getConfiguration } from '../lib/get-configuration';
-import { totalmem } from 'os';
 import simpleTail from 'simple-tail';
 import path from 'path';
 import { UpdateConfigurationFile } from '../lib/update-configuration';
@@ -61,22 +60,6 @@ export class WazuhUtilsCtrl {
       };
     } catch (error) {
       return ErrorResponse(error.message || error, 3021, 500, reply);
-    }
-  }
-
-  /**
-   * Returns total RAM available from the current machine where Kibana is being executed
-   * @param {Object} req
-   * @param {Object} reply
-   * @returns {Number} total ram or ErrorResponse
-   */
-  async totalRam(req, reply) {
-    try {
-      // RAM in MB
-      const ram = Math.ceil(totalmem() / 1024 / 1024);
-      return { statusCode: 200, error: 0, ram };
-    } catch (error) {
-      return ErrorResponse(error.message || error, 3033, 500, reply);
     }
   }
 
