@@ -49,13 +49,13 @@ export default [
     _source: {
       title: 'Top 5 failed checks',
       visState:
-        '{"title": "TOP5FAILED","type": "pie","params": {  "type": "pie",  "addTooltip": true,  "addLegend": true,  "legendPosition": "right",  "isDonut": true,  "labels": {    "show": false,    "values": true,    "last_level": true,    "truncate": 100  }},"aggs": [  {    "id": "1",    "enabled": true,    "type": "count",    "schema": "metric",    "params": {}  },  {    "id": "2",    "enabled": true,    "type": "terms",    "schema": "segment",    "params": {      "field": "data.sca.check.title",      "size": 5,      "order": "desc",      "orderBy": "1",      "otherBucket": false,      "otherBucketLabel": "Other",      "missingBucket": false,      "missingBucketLabel": "Missing"    }  }]}',
+        '{"title":"Top 5 failed checks","type":"pie","params":{"type":"pie","addTooltip":true,"addLegend":true,"legendPosition":"right","isDonut":true,"labels":{"show":false,"values":true,"last_level":true,"truncate":100}},"aggs":[{"id":"1","enabled":true,"type":"count","schema":"metric","params":{}},{"id":"2","enabled":true,"type":"terms","schema":"segment","params":{"field":"data.sca.check.title","size":5,"order":"desc","orderBy":"1","otherBucket":false,"otherBucketLabel":"Other","missingBucket":false,"missingBucketLabel":"Missing"}}]}',
       uiStateJSON: '{}',
       description: '',
       version: 1,
       kibanaSavedObjectMeta: {
         searchSourceJSON:
-          '{"index": "wazuh-alerts","query": {  "query": "", "language": "lucene"},"filter": [  {"meta": {"index": "wazuh-alerts-3.x-*","negate": false,"disabled": false,      "alias": null,      "type": "phrase",      "key": "data.sca.check.result",      "value": "failed",      "params": {        "query": "failed",        "type": "phrase"      }    },    "query": {      "match": {        "data.sca.check.result": {          "query": "failed",          "type": "phrase"        }      }    },    "$state": {      "store": "appState"    }  }]}'
+          '{"index":"wazuh-alerts","query":{"query":"","language":"lucene"},"filter":[{"meta":{"index":"wazuh-alerts-3.x-*","negate":false,"disabled":false,"alias":null,"type":"phrase","key":"data.sca.check.result","value":"failed","params":{"query":"failed","type":"phrase"}},"query":{"match":{"data.sca.check.result":{"query":"failed","type":"phrase"}}},"$state":{"store":"appState"}}]}'
       }
     }
   },
@@ -81,14 +81,13 @@ export default [
     _source: {
       title: 'Result distribution by policy',
       visState:
-        '{"title": "New Visualization","type": "horizontal_bar","params": {  "type": "histogram",  "grid": {    "categoryLines": false,    "style": {      "color": "#eee"    }  },  "categoryAxes": [    {      "id": "CategoryAxis-1",      "type": "category",      "position": "left",      "show": false,      "style": {},      "scale": {        "type": "linear"      },      "labels": {        "show": true,        "rotate": 0,        "filter": false,        "truncate": 200      },      "title": {}    }  ],  "valueAxes": [    {      "id": "ValueAxis-1",      "name": "LeftAxis-1",      "type": "value",      "position": "bottom",      "show": true,      "style": {},      "scale": {        "type": "linear",        "mode": "normal"      },      "labels": {        "show": true,        "rotate": 75,        "filter": true,        "truncate": 100      },      "title": {        "text": "Count"      }    }  ],  "seriesParams": [    {      "show": true,      "type": "histogram",      "mode": "stacked",      "data": {        "label": "Count",        "id": "1"      },      "valueAxis": "ValueAxis-1",      "drawLinesBetweenPoints": true,      "showCircles": true    }  ],  "addTooltip": true,  "addLegend": true,  "legendPosition": "right",  "times": [],  "addTimeMarker": false},"aggs": [  {    "id": "1",    "enabled": true,    "type": "count",    "schema": "metric",    "params": {}  },  {    "id": "2",    "enabled": true,    "type": "terms",    "schema": "group",    "params": {      "field": "data.sca.check.result",      "size": 5,      "order": "desc",      "orderBy": "1",      "otherBucket": false,      "otherBucketLabel": "Other",      "missingBucket": false,      "missingBucketLabel": "Missing"    }  },  {    "id": "3",    "enabled": true,    "type": "terms",    "schema": "split",    "params": {      "field": "data.sca.policy",      "size": 5,      "order": "desc",      "orderBy": "1",      "otherBucket": false,      "otherBucketLabel": "Other",      "missingBucket": false,      "missingBucketLabel": "Missing",      "row": true    }  }]}',
-      uiStateJSON:
-        '{"vis": {  "colors": {"failed": "#BF1B00","passed": "#508642"  }}}',
+        '{"title":"Result distribution by policy","type":"horizontal_bar","params":{"type":"histogram","grid":{"categoryLines":false,"style":{"color":"#eee"}},"categoryAxes":[{"id":"CategoryAxis-1","type":"category","position":"left","show":false,"style":{},"scale":{"type":"linear"},"labels":{"show":true,"rotate":0,"filter":false,"truncate":200},"title":{}}],"valueAxes":[{"id":"ValueAxis-1","name":"LeftAxis-1","type":"value","position":"bottom","show":true,"style":{},"scale":{"type":"linear","mode":"normal"},"labels":{"show":true,"rotate":75,"filter":true,"truncate":100},"title":{"text":"Count"}}],"seriesParams":[{"show":true,"type":"histogram","mode":"stacked","data":{"label":"Count","id":"1"},"valueAxis":"ValueAxis-1","drawLinesBetweenPoints":true,"showCircles":true}],"addTooltip":true,"addLegend":true,"legendPosition":"right","times":[],"addTimeMarker":false},"aggs":[{"id":"1","enabled":true,"type":"count","schema":"metric","params":{}},{"id":"2","enabled":true,"type":"terms","schema":"group","params":{"field":"data.sca.check.result","size":5,"order":"desc","orderBy":"1","otherBucket":false,"otherBucketLabel":"Other","missingBucket":false,"missingBucketLabel":"Missing"}},{"id":"3","enabled":true,"type":"terms","schema":"split","params":{"field":"data.sca.policy","size":5,"order":"desc","orderBy":"1","otherBucket":false,"otherBucketLabel":"Other","missingBucket":false,"missingBucketLabel":"Missing","row":true}}]}',
+      uiStateJSON: '{"vis":{"colors":{"failed":"#BF1B00","passed":"#508642"}}}',
       description: '',
       version: 1,
       kibanaSavedObjectMeta: {
         searchSourceJSON:
-          '{"index": "wazuh-alerts","query": {  "query": "",  "language": "lucene"},"filter": []}'
+          '{"index":"wazuh-alerts","query":{"query":"","language":"lucene"},"filter":[]}'
       }
     }
   },
