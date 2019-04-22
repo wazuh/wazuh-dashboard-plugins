@@ -242,7 +242,9 @@
                                     </div>
                                     <div class="euiFlexItem euiFlexItem--flexGrowZero" ng-if="item.directory">
                                         <div class="euiStat euiStat--leftAligned">
-                                            <p class="euiTitle euiTitle--small euiStat__title ng-binding" style="font-size: 1.15rem;">Path(s)</p>
+                                            <p class="euiTitle euiTitle--small euiStat__title ng-binding" style="font-size: 1.15rem;">
+                                                {{item.directory.includes(',') ? 'Paths' : 'Path'}}
+                                            </p>
                                             <div class="euiText euiText--small euiStat__description wz-text-gray">
                                                 <p>{{item.directory}}</p>
                                             </div>
@@ -253,7 +255,8 @@
                                         ng-if="item.rules && item.rules.length">
                                         <div class="euiStat euiStat--leftAligned">
                                             <p class="euiTitle euiTitle--small euiStat__title ng-binding"
-                                                style="font-size: 1.15rem;">Rule(s)</p>
+                                                style="font-size: 1.15rem;">{{item.rules.length > 1 ? 'Checks' : 'Check'}}
+                                            </p>
                                             <div class="euiText euiText--small euiStat__description wz-text-gray">
                                                 <div layout="row" ng-repeat="rule in item.rules">
                                                     {{rule.rule}}
