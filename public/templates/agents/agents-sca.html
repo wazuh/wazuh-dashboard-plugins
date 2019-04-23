@@ -120,28 +120,23 @@
 
     <div layout="row" class="wz-margin-top-10" ng-if="agent && agent.os && lookingSca">
         <md-card flex class="wz-md-card">
-            <md-card-actions layout="row" style="padding-top: 14px !important;" class="wz-card-actions-vis">
-                <span><i class="fa fa-fw fa-arrow-left cursor-pointer" ng-click="closeScaChecks()"></i>
+            <md-card-actions style="padding-top: 14px !important;" class="wz-card-actions-vis">
+                <div layout="row">                
+                    <span><i class="fa fa-fw fa-arrow-left cursor-pointer" ng-click="closeScaChecks()"></i>
                     {{lookingSca.name}}
-                </span>
-                <div layout="row" ng-show="seeHash">
-                    <span class="wz-margin-left-16">File hash: 
-                        <span class="wz-text-bold">{{lookingSca.hash_file}}</span>
                     </span>
-                    <a class="wz-margin-left-16" ng-click="seeHash = !seeHash">Hide hash&nbsp;
-                        <i class="fa fa-eye-slash" aria-hidden="true"></i></a>
-                </div>
-                <div ng-show="!seeHash" class="contents">
                     <span class="wz-margin-left-16">Pass: <span class="wz-text-bold">{{lookingSca.pass}}</span></span>
                     <span class="wz-margin-left-16">Fail: <span class="wz-text-bold">{{lookingSca.fail}}</span></span>
                     <span class="wz-margin-left-16">Score: <span class="wz-text-bold">{{lookingSca.score}}%</span></span>
-                    <a ng-if="lookingSca.hash_file" class="wz-margin-left-16" ng-click="seeHash = !seeHash">Show file hash&nbsp;
-                        <i class="fa fa-eye" aria-hidden="true"></i></a>
                     <span flex></span>
                     <span class="wz-text-gray">{{lookingSca.end_scan}}</span>
                 </div>
             </md-card-actions>
             <md-card-content class="wz-padding-bottom-30">
+                <div layout="row" ng-show="lookingSca.hash_file" class="sca-checksum">
+                    <span>Policy checksum: {{lookingSca.hash_file}}
+                    </span>
+                </div>
                 <div layout="row" class="wz-margin-bottom-25">
                     <input placeholder="Filter checks..." ng-model="custom_search" type="text"
                         class="kuiLocalSearchInput ng-empty ng-pristine ng-scope ng-touched ng-valid"
