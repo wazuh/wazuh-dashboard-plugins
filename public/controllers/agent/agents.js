@@ -525,7 +525,6 @@ export class AgentsController {
    * @param {*} force
    */
   async switchTab(tab, force = false) {
-    this.$scope.lookingSca = false;
     this.falseAllExpand();
     if (this.ignoredTabs.includes(tab)) {
       this.commonData.setRefreshInterval(timefilter.getRefreshInterval());
@@ -587,6 +586,7 @@ export class AgentsController {
       } else {
         this.configurationHandler.reset(this.$scope);
       }
+      this.$scope.lookingSca = false;
       if (!this.ignoredTabs.includes(tab)) this.tabHistory.push(tab);
       if (this.tabHistory.length > 2)
         this.tabHistory = this.tabHistory.slice(-2);

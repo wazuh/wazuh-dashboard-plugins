@@ -346,7 +346,7 @@
 /* Styles to override outline on components but avoid hidden shadow on focus */
 /* These are really important fixex and should not be deleted */
 
-:focus:not([class^="eui"]) {
+:focus:not([class^='eui']) {
   box-shadow: none;
 }
 
@@ -482,7 +482,7 @@ md-sidenav {
   margin-top: 25px;
   background: #dddddd;
   float: left;
-  height: calc(~"100vh - 110px");
+  height: calc(~'100vh - 110px');
   cursor: ew-resize;
   text-align: center;
   display: block !important;
@@ -499,25 +499,25 @@ md-sidenav {
 }
 
 .wz-dev-column-separator span {
-  height: calc(~"100vh - 110px");
+  height: calc(~'100vh - 110px');
   display: table-cell;
   vertical-align: middle;
 }
 
 #wz-dev-left-column {
-  width: calc(~"30% - 7px");
-  min-width: calc(~"20% - 7px");
-  max-width: calc(~"80% - 7px");
+  width: calc(~'30% - 7px');
+  min-width: calc(~'20% - 7px');
+  max-width: calc(~'80% - 7px');
   float: left;
-  height: calc(~"100vh - 85px");
+  height: calc(~'100vh - 85px');
 }
 
 #wz-dev-right-column {
-  width: calc(~"70% - 7px");
-  min-width: calc(~"20% - 7px");
-  max-width: calc(~"80% - 7px");
+  width: calc(~'70% - 7px');
+  min-width: calc(~'20% - 7px');
+  max-width: calc(~'80% - 7px');
   float: left;
-  height: calc(~"100vh - 85px");
+  height: calc(~'100vh - 85px');
 }
 
 .wz-dev-box .CodeMirror {
@@ -586,7 +586,7 @@ md-switch.md-checked .md-thumb {
 
 @media (min-width: 1200px) {
   .wz-logo {
-    background-image: url("../img/new_logo_white.svg");
+    background-image: url('../img/new_logo_white.svg');
     width: 150px;
     max-width: 150px;
   }
@@ -595,7 +595,7 @@ md-switch.md-checked .md-thumb {
   .wz-logo {
     min-width: 28px !important;
     margin-right: 15px !important;
-    background-image: url("../img/new_logo_white_wolf.svg");
+    background-image: url('../img/new_logo_white_wolf.svg');
   }
 }
 
@@ -888,6 +888,27 @@ wz-xml-file-editor {
 
 .visLegend .visLegend__list {
   overflow: hidden !important;
+}
+
+.visLegend .visLegend__list {
+  overflow: hidden !important;
+}
+
+.sca-vis .visWrapper .chart-label {
+  display: block !important;
+}
+
+.sca-vis .visWrapper .visWrapper__chart > div > svg > g > text:nth-child(2) {
+  font-size: 10px !important;
+}
+
+.sca-vis .visWrapper .chart-title,
+.sca-vis .mtrVis__container div:last-child {
+  display: none !important;
+}
+
+.sca-vis .visLegend__list {
+  width: 275px !important;
 }
 
 .tvbLegend {
