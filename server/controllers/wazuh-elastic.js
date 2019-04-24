@@ -240,9 +240,10 @@ export class WazuhElasticCtrl {
 
       payload.aggs['2'].terms.field = req.params.field;
       payload.pattern = req.params.pattern;
+
       const data = await this.wzWrapper.searchWazuhAlertsWithPayload(payload);
 
-      return data.hits.total === 0 ||
+      return data.hits.total.value === 0 ||
         typeof data.aggregations['2'].buckets[0] === 'undefined'
         ? { statusCode: 200, data: '' }
         : {
@@ -265,7 +266,7 @@ export class WazuhElasticCtrl {
     try {
       const data = await this.wzWrapper.getWazuhVersionIndexAsSearch();
 
-      return data.hits.total === 0
+      return data.hits.total.value === 0
         ? { statusCode: 200, data: '' }
         : { statusCode: 200, data: data.hits.hits[0]._source };
     } catch (error) {
@@ -301,7 +302,7 @@ export class WazuhElasticCtrl {
         forbidden = true;
       }
       if (
-        ((results || {}).hits || {}).total >= 1 ||
+        ((results || {}).hits || {}).total.value >= 1 ||
         (!forbidden && ((results || {}).hits || {}).total === 0)
       ) {
         finalList.push(item);
@@ -378,6 +379,7 @@ export class WazuhElasticCtrl {
               item && item.title && !config['ip.ignore'].includes(item.title)
           );
         }
+
         return {
           data:
             isXpackEnabled && !isSuperUser
