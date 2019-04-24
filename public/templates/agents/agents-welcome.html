@@ -88,7 +88,7 @@
                             <div class="euiText euiText--small euiStat__description">
                                 <p>Registration date</p>
                             </div>
-                            <p class="euiTitle euiTitle--small euiStat__title">{{agent.dateAdd || '-'}}</p>
+                            <p class="euiTitle euiTitle--small euiStat__title" ng-bind="agent.dateAdd ? offsetTimestamp('', agent.dateAdd) : '-'"></p>
                         </div>
                     </div>
                     <div class="euiFlexItem euiFlexItem--flexGrowZero">
@@ -96,7 +96,7 @@
                             <div class="euiText euiText--small euiStat__description">
                                 <p>Last keep alive</p>
                             </div>
-                            <p class="euiTitle euiTitle--small euiStat__title">{{agent.lastKeepAlive || '-' }}</p>
+                            <p class="euiTitle euiTitle--small euiStat__title" ng-bind="agent.lastKeepAlive ? offsetTimestamp('', agent.lastKeepAlive) : '-'"></p>
                         </div>
                     </div>
                     <div class="euiFlexItem euiFlexItem--flexGrowZero">
@@ -106,12 +106,13 @@
                             </div>
                             <p class="euiTitle euiTitle--small euiStat__title" ng-if="agent.syscheck.inProgress">Scan
                                 in progress</p>
-                            <p class="euiTitle euiTitle--small euiStat__title" ng-if="!agent.syscheck.inProgress">{{agent.syscheck.end
-                                || '-'}} <md-tooltip
+                            <p class="euiTitle euiTitle--small euiStat__title" ng-if="!agent.syscheck.inProgress"
+                            ng-bind="agent.syscheck.end ? offsetTimestamp('', agent.syscheck.end) : '-'">
+                            <md-tooltip
                                     ng-if="!agent.syscheck.inProgress && agent.syscheck.start && agent.syscheck.end"
                                     md-direction="bottom" class="wz-tooltip">
-                                    Start time: {{ agent.syscheck.start || '-'}} <br>
-                                    End time: {{ agent.syscheck.end || '-'}} <br>
+                                    Start time: {{ agent.syscheck.start ? offsetTimestamp('', agent.syscheck.start) : '-'}} <br>
+                                    End time: {{ agent.syscheck.end ? offsetTimestamp('', agent.syscheck.end) : '-'}} <br>
                                     Duration time: {{ agent.syscheck.duration +' minutes' || '-'}}
                                 </md-tooltip>
                             </p>
@@ -124,13 +125,13 @@
                             </div>
                             <p class="euiTitle euiTitle--small euiStat__title" ng-if="agent.rootcheck.inProgress">Scan
                                 in progress</p>
-                            <p class="euiTitle euiTitle--small euiStat__title" ng-if="!agent.rootcheck.inProgress">{{agent.rootcheck.end
-                                || '-'}}
+                            <p class="euiTitle euiTitle--small euiStat__title" ng-if="!agent.rootcheck.inProgress"
+                                    ng-bind="agent.rootcheck.end ? offsetTimestamp('', agent.rootcheck.end) : '-'">
                                 <md-tooltip
                                     ng-if="!agent.rootcheck.inProgress && agent.rootcheck.start && agent.rootcheck.end"
                                     md-direction="bottom" class="wz-tooltip">
-                                    Start time: {{ agent.rootcheck.start || '-'}} <br>
-                                    End time: {{ agent.rootcheck.end || '-'}} <br>
+                                    Start time: {{ agent.rootcheck.start ? offsetTimestamp('', agent.rootcheck.start) : '-'}} <br>
+                                    End time: {{ agent.rootcheck.end ? offsetTimestamp('', agent.rootcheck.end) : '-'}} <br>
                                     Duration time: {{ agent.rootcheck.duration +' minutes' || '-'}}
                                 </md-tooltip>
                             </p>

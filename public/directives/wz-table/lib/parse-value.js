@@ -23,7 +23,13 @@ const checkIfArray = item => {
   return typeof item === 'object' ? splitArray(item) : item === 0 ? '0' : item;
 };
 
-export function parseValue(key, item, instancePath, $sce = null) {
+export function parseValue(
+  key,
+  item,
+  instancePath,
+  $sce = null,
+  timeService = null
+) {
   if (
     (key === 'event' || (key.value && key.value === 'event')) &&
     instancePath.includes('rootcheck') &&
@@ -45,6 +51,15 @@ export function parseValue(key, item, instancePath, $sce = null) {
       }
     }
   }
+  if (key.offset && timeService) {
+    const date = (item || {})[key.value];
+    if (!item[`${key.value}offset`]) {
+      item[`${key.value}offset`] = date;
+    }
+    if (date) {
+      item[key.value] = timeService.offset(item[`${key.value}offset`]);
+    }
+  }
   if (key === 'state' && instancePath.includes('processes')) {
     return ProcessEquivalence[item.state] || '-';
   }
@@ -54,7 +69,6 @@ export function parseValue(key, item, instancePath, $sce = null) {
   ) {
     return '-';
   }
-
   if ((item || {})[key] === '(null)') {
     return '-';
   }

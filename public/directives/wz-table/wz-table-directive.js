@@ -53,7 +53,8 @@ app.directive('wzTable', function() {
       groupHandler,
       rulesetHandler,
       wazuhConfig,
-      $sce
+      $sce,
+      timeService
     ) {
       $scope.showColumns = false;
       $scope.scapepath = $scope.path.split('/').join('');
@@ -268,7 +269,7 @@ app.directive('wzTable', function() {
       };
 
       $scope.parseValue = (key, item) =>
-        parseValue(key, item, instance.path, $sce);
+        parseValue(key, item, instance.path, $sce, timeService);
 
       /**
        * On controller loads
@@ -483,6 +484,14 @@ app.directive('wzTable', function() {
             item => (item.expanded = false)
           );
           item.expanded = true;
+        }
+      };
+
+      $scope.offsetTimestamp = (text, time) => {
+        try {
+          return text + timeService.offset(time);
+        } catch (error) {
+          return '';
         }
       };
 

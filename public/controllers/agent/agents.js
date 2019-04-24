@@ -58,7 +58,8 @@ export class AgentsController {
     wzTableFilter,
     $mdDialog,
     groupHandler,
-    wazuhConfig
+    wazuhConfig,
+    timeService
   ) {
     this.$scope = $scope;
     this.$location = $location;
@@ -76,6 +77,7 @@ export class AgentsController {
     this.$mdDialog = $mdDialog;
     this.groupHandler = groupHandler;
     this.wazuhConfig = wazuhConfig;
+    this.timeService = timeService;
 
     // Config on-demand
     this.$scope.isArray = Array.isArray;
@@ -316,10 +318,7 @@ export class AgentsController {
      */
     this.$scope.offsetTimestamp = (text, time) => {
       try {
-        const date = new Date(time);
-        const offset = new Date().getTimezoneOffset();
-        const offsetTime = new Date(date.getTime() - offset * 60000);
-        return text + offsetTime.toLocaleString('en-ZA').replace(',', '');
+        return text + this.timeService.offset(time);
       } catch (error) {
         return '';
       }
