@@ -35,19 +35,10 @@ import {
   // @ts-ignore
 } from 'ui/vis';
 
-// @ts-ignore No typing present
-import { isTermSizeZeroError } from 'ui/elasticsearch_errors';
+import { VisResponseData } from './types';
 // @ts-ignore
-import { toastNotifications } from 'ui/notify';
-// @ts-ignore
-import { timezoneProvider } from 'ui/vis/lib/timezone';
-// @ts-ignore
-import { timefilter } from 'ui/timefilter';
-// @ts-ignore
-import { BuildESQueryProvider } from '@kbn/es-query';
+import { getVisParams } from 'ui/visualize/loader/pipeline_helpers/build_pipeline';
 
-// @ts-ignore
-import { validateInterval } from './validate_interval';
 
 function getHandler<T extends RequestHandler | ResponseHandler>(
   from: Array<{ name: string; handler: T }>,
@@ -63,6 +54,7 @@ function getHandler<T extends RequestHandler | ResponseHandler>(
   return handlerDesc.handler;
 }
 
+
 export class VisualizeDataLoader {
   private requestHandler: RequestHandler;
   private responseHandler: ResponseHandler;
@@ -71,142 +63,62 @@ export class VisualizeDataLoader {
   private previousVisState: any;
   private previousRequestHandlerResponse: any;
 
-  constructor(private readonly vis: Vis, Private: IPrivate, $injector) {
+  constructor(private readonly vis: Vis, Private: IPrivate) {
     const { requestHandler, responseHandler } = vis.type;
 
     const requestHandlers: RequestHandlerDescription[] = Private(RequestHandlersProvider);
     const responseHandlers: ResponseHandlerDescription[] = Private(ResponseHandlerProvider);
-
-    if (((vis || {}).type || {}).title === 'Visual Builder') {
-      const config = $injector.get('config');
-      const discoverPendingUpdates = $injector.get('discoverPendingUpdates')
-      const $http = $injector.get('$http')
-      const buildEsQuery = Private(BuildESQueryProvider);
-      this.requestHandler = ({ uiState, timeRange, filters, query, visParams }) => {
-        const timezone = Private(timezoneProvider)();
-        return new Promise((resolve) => {
-          const discoverList = discoverPendingUpdates.getList();
-          try {
-            if ((discoverList || []).length >= 2) {
-              const implicitFilter = (discoverList || []).length ? discoverList[0].query : '';
-              const parsedQuery = {
-                language: discoverList[0].language || 'lucene',
-                query: implicitFilter
-              };
-              const parsedFilters = discoverList[1];
-              query = parsedQuery;
-              filters = parsedFilters;
-            }
-          } catch (error) { }
-
-          const panel = visParams;
-          const uiStateObj = {};
-          const parsedTimeRange = timefilter.calculateBounds(timeRange);
-          const scaledDataFormat = config.get('dateFormat:scaled');
-          const dateFormat = config.get('dateFormat');
-          if (panel && panel.id) {
-            const params = {
-              timerange: { timezone, ...parsedTimeRange },
-              filters: [buildEsQuery(undefined, [query], filters)],
-              panels: [panel],
-              state: uiStateObj
-            };
-
-            try {
-              const maxBuckets = config.get('metrics:max_buckets');
-              validateInterval(parsedTimeRange, panel, maxBuckets);
-              const httpResult = $http.post('../api/metrics/vis/data', params)
-                .then(resp => ({ dateFormat, scaledDataFormat, timezone, ...resp.data }))
-                .catch(resp => { throw resp.data; });
-
-              return httpResult
-                .then(resolve)
-                .catch(resp => {
-                  resolve({});
-                  const err = new Error(resp.message);
-                  err.stack = resp.stack;
-                });
-            } catch (e) {
-              return resolve();
-            }
-          }
-        });
-
-      }
-
-    } else {
-      this.requestHandler = getHandler(requestHandlers, requestHandler);
-    }
+    this.requestHandler = getHandler(requestHandlers, requestHandler);
     this.responseHandler = getHandler(responseHandlers, responseHandler);
   }
 
-  public async fetch(params: RequestHandlerParams): Promise<any> {
-    this.vis.filters = { timeRange: params.timeRange };
-    this.vis.requestError = undefined;
-    this.vis.showRequestError = false;
+  public async fetch(params: RequestHandlerParams): Promise<VisResponseData | void> {
+    // add necessary params to vis object (dimensions, bucket, metric, etc)
+    const visParams = await getVisParams(this.vis, {
+      searchSource: params.searchSource,
+      timeRange: params.timeRange,
+    });
 
-    try {
-      // Vis types that have a `showMetricsAtAllLevels` param (e.g. data table) should tell
-      // tabify whether to return columns for each bucket based on the param value. Vis types
-      // without this param should default to returning all columns if they are hierarchical.
-      const minimalColumns =
-        typeof this.vis.params.showMetricsAtAllLevels !== 'undefined'
-          ? !this.vis.params.showMetricsAtAllLevels
-          : !this.vis.isHierarchical();
+    const filters = params.filters || [];
+    const savedFilters = params.searchSource.getField('filter') || [];
 
-      const filters = params.filters || [];
-      const savedFilters = params.searchSource.getField('filter') || [];
+    const query = params.query || params.searchSource.getField('query');
 
-      const query = params.query || params.searchSource.getField('query');
+    // searchSource is only there for courier request handler
+    const requestHandlerResponse = await this.requestHandler({
+      partialRows: this.vis.params.partialRows || this.vis.type.requiresPartialRows,
+      metricsAtAllLevels: this.vis.isHierarchical(),
+      visParams,
+      ...params,
+      query,
+      filters: filters.concat(savedFilters).filter(f => !f.meta.disabled),
+    });
 
-      // searchSource is only there for courier request handler
-      const requestHandlerResponse = await this.requestHandler({
-        partialRows: this.vis.type.requiresPartialRows || this.vis.params.showPartialRows,
-        minimalColumns,
-        metricsAtAllLevels: this.vis.isHierarchical(),
-        visParams: this.vis.params,
-        ...params,
-        query,
-        filters: filters.concat(savedFilters).filter(f => !f.meta.disabled),
-      });
+    // No need to call the response handler when there have been no data nor has there been changes
+    // in the vis-state (response handler does not depend on uiState)
+    const canSkipResponseHandler =
+      this.previousRequestHandlerResponse &&
+      this.previousRequestHandlerResponse === requestHandlerResponse &&
+      this.previousVisState &&
+      isEqual(this.previousVisState, this.vis.getState());
 
-      // No need to call the response handler when there have been no data nor has been there changes
-      // in the vis-state (response handler does not depend on uiStat
-      const canSkipResponseHandler =
-        this.previousRequestHandlerResponse &&
-        this.previousRequestHandlerResponse === requestHandlerResponse &&
-        this.previousVisState &&
-        isEqual(this.previousVisState, this.vis.getState());
+    this.previousVisState = this.vis.getState();
+    this.previousRequestHandlerResponse = requestHandlerResponse;
 
-      this.previousVisState = this.vis.getState();
-      this.previousRequestHandlerResponse = requestHandlerResponse;
-
-      if (!canSkipResponseHandler) {
-        this.visData = await Promise.resolve(this.responseHandler(requestHandlerResponse));
-      }
-      return this.visData;
-    } catch (error) {
-      params.searchSource.cancelQueued();
-
-      this.vis.requestError = error;
-      this.vis.showRequestError =
-        error.type && ['NO_OP_SEARCH_STRATEGY', 'UNSUPPORTED_QUERY'].includes(error.type);
-
-      // tslint:disable-next-line
-      console.error(error);
-
-      if (isTermSizeZeroError(error)) {
-        return toastNotifications.addDanger(
-          `Your visualization ('${this.vis.title}') has an error: it has a term ` +
-          `aggregation with a size of 0. Please set it to a number greater than 0 to resolve ` +
-          `the error.`
-        );
-      }
-
-      toastNotifications.addDanger({
-        title: 'Error in visualization',
-        text: error.message,
-      });
+    if (!canSkipResponseHandler) {
+      this.visData = await Promise.resolve(
+        this.responseHandler(requestHandlerResponse, visParams.dimensions)
+      );
     }
+
+    return {
+      as: 'visualization',
+      value: {
+        visType: this.vis.type.name,
+        visData: this.visData,
+        visConfig: visParams,
+        params: {},
+      },
+    };
   }
 }
