@@ -36,7 +36,7 @@ export class ElasticWrapper {
 
       const data = await this.elasticRequest.callWithInternalUser('search', {
         index: this.WZ_KIBANA_INDEX,
-        type: 'doc',
+        type: '_doc',
         body: {
           query: {
             match: {
@@ -84,7 +84,7 @@ export class ElasticWrapper {
 
       const data = await this.elasticRequest.callWithInternalUser('create', {
         index: this.WZ_KIBANA_INDEX,
-        type: 'doc',
+        type: '_doc',
         id: id ? id : 'index-pattern:' + title,
         body: {
           type: 'index-pattern',
@@ -116,7 +116,7 @@ export class ElasticWrapper {
 
       const data = await this.elasticRequest.callWithInternalUser('create', {
         index: this.WZ_KIBANA_INDEX,
-        type: 'doc',
+        type: '_doc',
         id: id ? id : 'index-pattern:' + title,
         body: {
           type: 'index-pattern',
@@ -198,7 +198,7 @@ export class ElasticWrapper {
 
       const data = await this.elasticRequest.callWithInternalUser('create', {
         index: '.wazuh-version',
-        type: 'wazuh-version',
+        type: '_doc',
         id: 1,
         body: configuration
       });
@@ -216,7 +216,7 @@ export class ElasticWrapper {
     try {
       const data = await this.elasticRequest.callWithInternalUser('search', {
         index: this.WZ_KIBANA_INDEX,
-        type: 'doc',
+        type: '_doc',
         body: {
           query: {
             match: {
@@ -302,7 +302,7 @@ export class ElasticWrapper {
       // Updating known fields
       const data = await this.elasticRequest.callWithInternalUser('update', {
         index: this.WZ_KIBANA_INDEX,
-        type: 'doc',
+        type: '_doc',
         id: id.includes('index-pattern:') ? id : 'index-pattern:' + id,
         body: {
           doc: {
@@ -311,9 +311,7 @@ export class ElasticWrapper {
               fields: currentFieldsString,
               fieldFormatMap: `{
                   "data.virustotal.permalink":{"id":"url"},
-                  "data.vulnerability.reference":{"id":"url"},"data.url":{"id":"url"},
-                  "rule.id":{"id":"url","params":{"urlTemplate":"wazuh#/manager/?tab=ruleset&ruleid={{value}}","labelTemplate":"{{value}}","openLinkInCurrentTab":true}},
-                  "agent.id":{"id":"url","params":{"urlTemplate":"wazuh#/agents-preview/?_g=()&agent={{value}}","labelTemplate":"{{value}}","openLinkInCurrentTab":true}}
+                  "data.vulnerability.reference":{"id":"url"},"data.url":{"id":"url"}
                 }`
             }
           }
@@ -388,7 +386,7 @@ export class ElasticWrapper {
       // Updating known fields
       const data = await this.elasticRequest.callWithInternalUser('update', {
         index: this.WZ_KIBANA_INDEX,
-        type: 'doc',
+        type: '_doc',
         id: id.includes('index-pattern:') ? id : 'index-pattern:' + id,
         body: {
           doc: {
@@ -413,7 +411,7 @@ export class ElasticWrapper {
     try {
       const data = await this.elasticRequest.callWithInternalUser('get', {
         index: '.wazuh-version',
-        type: 'wazuh-version',
+        type: '_doc',
         id: '1'
       });
 
@@ -435,7 +433,7 @@ export class ElasticWrapper {
 
       const data = await this.elasticRequest.callWithInternalUser('update', {
         index: '.wazuh-version',
-        type: 'wazuh-version',
+        type: '_doc',
         id: 1,
         body: {
           doc: {
@@ -459,7 +457,7 @@ export class ElasticWrapper {
     try {
       const data = await this.elasticRequest.callWithInternalUser('search', {
         index: '.wazuh-version',
-        type: 'wazuh-version'
+        type: '_doc'
       });
 
       return data;
@@ -485,7 +483,7 @@ export class ElasticWrapper {
 
       const data = await this.elasticRequest.callWithInternalUser('search', {
         index: title || 'wazuh-alerts-3.x-*',
-        type: 'wazuh',
+        type: '_doc',
         body: payload
       });
 
@@ -505,7 +503,7 @@ export class ElasticWrapper {
 
       const data = await this.elasticRequest.callWithInternalUser('get', {
         index: '.wazuh',
-        type: 'wazuh-configuration',
+        type: '_doc',
         id: id
       });
 
@@ -532,7 +530,7 @@ export class ElasticWrapper {
     try {
       const data = await this.elasticRequest.callWithInternalUser('search', {
         index: '.wazuh',
-        type: 'wazuh-configuration',
+        type: '_doc',
         size: '100'
       });
 
@@ -553,7 +551,7 @@ export class ElasticWrapper {
 
       const data = await this.elasticRequest.callWithRequest(req, 'create', {
         index: '.wazuh',
-        type: 'wazuh-configuration',
+        type: '_doc',
         id: new Date().getTime(),
         body: doc,
         refresh: true
@@ -578,13 +576,13 @@ export class ElasticWrapper {
       const data = req
         ? await this.elasticRequest.callWithRequest(req, 'update', {
             index: '.wazuh',
-            type: 'wazuh-configuration',
+            type: '_doc',
             id: id,
             body: doc
           })
         : await this.elasticRequest.callWithInternalUser('update', {
             index: '.wazuh',
-            type: 'wazuh-configuration',
+            type: '_doc',
             id: id,
             body: doc
           });
@@ -605,7 +603,7 @@ export class ElasticWrapper {
 
       const data = await this.elasticRequest.callWithRequest(req, 'search', {
         index: '.wazuh',
-        type: 'wazuh-configuration',
+        type: '_doc',
         q: 'active:true'
       });
 
@@ -626,7 +624,7 @@ export class ElasticWrapper {
 
       const data = await this.elasticRequest.callWithRequest(req, 'delete', {
         index: '.wazuh',
-        type: 'wazuh-configuration',
+        type: '_doc',
         id: req.params.id
       });
 
@@ -661,8 +659,8 @@ export class ElasticWrapper {
 
       return (
         this.usingSearchGuard ||
-        ((((data || {}).defaults || {}).xpack || {}).security || {}).enabled ==
-          'true'
+        ((((data || {}).defaults || {}).xpack || {}).security || {}).user !=
+          null
       );
     } catch (error) {
       return Promise.reject(error);
@@ -680,7 +678,7 @@ export class ElasticWrapper {
 
       const data = await this.elasticRequest.callWithInternalUser('bulk', {
         index: index,
-        type: 'agent',
+        type: '_doc',
         body: bulk
       });
 
@@ -702,7 +700,7 @@ export class ElasticWrapper {
 
       const data = await this.elasticRequest.callWithRequest(req, 'search', {
         index: index,
-        type: 'wazuh'
+        type: '_doc'
       });
 
       return data;
@@ -815,7 +813,7 @@ export class ElasticWrapper {
     try {
       const data = await this.elasticRequest.callWithInternalUser('delete', {
         index: this.WZ_KIBANA_INDEX,
-        type: 'doc',
+        type: '_doc',
         id: 'index-pattern:wazuh-monitoring-*'
       });
 
@@ -835,7 +833,7 @@ export class ElasticWrapper {
 
       const data = await this.elasticRequest.callWithInternalUser('get', {
         index: this.WZ_KIBANA_INDEX,
-        type: 'doc',
+        type: '_doc',
         id: id.includes('index-pattern:') ? id : 'index-pattern:' + id
       });
 
@@ -888,45 +886,6 @@ export class ElasticWrapper {
           body: template
         }
       );
-
-      return data;
-    } catch (error) {
-      return Promise.reject(error);
-    }
-  }
-
-  /**
-   * Check for the wazuh-setup index, only old installations.
-   * Reindex purposes
-   * Do not use
-   */
-  async getOldWazuhSetup() {
-    try {
-      const data = await this.elasticRequest.callWithInternalUser('get', {
-        index: '.wazuh',
-        type: 'wazuh-setup',
-        id: '1'
-      });
-
-      return data;
-    } catch (error) {
-      return Promise.reject(error);
-    }
-  }
-
-  /**
-   * Reindex purposes
-   * Do not use
-   * @param {*} configuration
-   */
-  async reindexWithCustomConfiguration(configuration) {
-    try {
-      if (!configuration)
-        return Promise.reject(new Error('No valid configuration given'));
-
-      const data = await this.elasticRequest.callWithInternalUser('reindex', {
-        body: configuration
-      });
 
       return data;
     } catch (error) {
