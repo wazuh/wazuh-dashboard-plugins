@@ -22,8 +22,7 @@ import 'ui/render_directive';
 
 // Added from its index.js
 import 'plugins/kibana/discover/saved_searches/saved_searches';
-import 'plugins/kibana/discover/directives/no_results';
-import 'plugins/kibana/discover/directives/timechart';
+import 'plugins/kibana/discover/directives';
 import 'ui/collapsible_sidebar';
 import 'plugins/kibana/discover/components/field_chooser/field_chooser';
 import 'plugins/kibana/discover/controllers/discover';
@@ -60,19 +59,18 @@ import 'ui/filters/moment';
 import 'ui/index_patterns';
 import 'ui/state_management/app_state';
 import { timefilter } from 'ui/timefilter';
-import 'ui/query_bar';
+import 'ui/search_bar';
 import {
   hasSearchStategyForIndexPattern,
   isDefaultTypeIndexPattern
 } from 'ui/courier';
-import { toastNotifications, getPainlessError } from 'ui/notify';
+import { toastNotifications } from 'ui/notify';
 import { VisProvider } from 'ui/vis';
 import { VislibSeriesResponseHandlerProvider } from 'ui/vis/response_handlers/vislib';
 import { DocTitleProvider } from 'ui/doc_title';
 import PluginsKibanaDiscoverHitSortFnProvider from 'plugins/kibana/discover/_hit_sort_fn';
 import { FilterBarQueryFilterProvider } from 'ui/filter_bar/query_filter';
-// No need for this since we are using custom interval options
-//import { intervalOptions } from 'ui/agg_types/buckets/_interval_options';
+import { intervalOptions } from 'ui/agg_types/buckets/_interval_options';
 import { stateMonitorFactory } from 'ui/state_management/state_monitor_factory';
 import { migrateLegacyQuery } from 'ui/utils/migrate_legacy_query';
 import { FilterManagerProvider } from 'ui/filter_manager';
@@ -87,6 +85,7 @@ import {
   getResponseInspectorStats
 } from 'ui/courier/utils/courier_inspector_utils';
 import { tabifyAggResponse } from 'ui/agg_response/tabify';
+import { buildVislibDimensions } from 'ui/visualize/loader/pipeline_helpers/build_pipeline';
 
 import 'ui/courier/search_strategy/default_search_strategy';
 
@@ -172,6 +171,9 @@ function discoverController(
   //////////////////////////////////////////////////////////
   //////////////////////////////////////////////////////////
 
+  timefilter.disableTimeRangeSelector();
+  timefilter.disableAutoRefreshSelector();
+
   $scope.getDocLink = getDocLink;
 
   ///////////////////////////////////////////////////////////////////////////////
@@ -230,19 +232,6 @@ function discoverController(
   // WAZUH MODIFIED
   $scope.topNavMenu = [];
 
-  /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  //////////////////////////////////////       WAZUH             //////////////////////////////////////////////////////////////
-  /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-  $scope.toggleRefresh = () => {
-    $scope.timefilter.refreshInterval.pause = !$scope.timefilter.refreshInterval
-      .pause;
-  };
-
-  /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
   // the actual courier.SearchSource
   $scope.searchSource = savedSearch.searchSource;
   $scope.indexPattern = resolveIndexPatternLoading();
@@ -295,6 +284,24 @@ function discoverController(
   let stateMonitor;
 
   const $state = ($scope.state = new AppState(getStateDefaults()));
+
+  $scope.filters = queryFilter.getFilters();
+
+  $scope.onFiltersUpdated = filters => {
+    // The filters will automatically be set when the queryFilter emits an update event (see below)
+    queryFilter.setFilters(filters);
+  };
+
+  $scope.applyFilters = filters => {
+    queryFilter.addFiltersAndChangeTimeFilter(filters);
+    $scope.state.$newFilters = [];
+  };
+
+  $scope.$watch('state.$newFilters', (filters = []) => {
+    if (filters.length === 1) {
+      $scope.applyFilters(filters);
+    }
+  });
 
   const getFieldCounts = async () => {
     // the field counts aren't set until we have the data back,
@@ -443,12 +450,21 @@ function discoverController(
         ////////////////////////////////////////////////
         //               WAZUH                        //
         ////////////////////////////////////////////////
-        $state.interval = calcWzInterval() || 'd';
+        //$state.interval = calcWzInterval() || 'd';
         ////////////////////////////////////////////////
         ////////////////////////////////////////////////
         ////////////////////////////////////////////////
 
         $scope.fetch();
+      });
+
+      $scope.$listen(timefilter, 'refreshIntervalUpdate', () => {
+        //$state.interval = calcWzInterval() || 'd';
+        $scope.updateRefreshInterval();
+      });
+      $scope.$listen(timefilter, 'timeUpdate', () => {
+        //$state.interval = calcWzInterval() || 'd';
+        $scope.updateTime();
       });
 
       $scope.$watchCollection('state.sort', function(sort) {
@@ -465,6 +481,7 @@ function discoverController(
 
       // update data source when filters update
       $scope.$listen(queryFilter, 'update', function() {
+        $scope.filters = queryFilter.getFilters();
         return $scope
           .updateDataSource()
           .then(function() {
@@ -500,13 +517,8 @@ function discoverController(
       // fetch data when filters fire fetch event
       $scope.$listen(queryFilter, 'fetch', $scope.fetch);
 
-      timefilter.enableAutoRefreshSelector();
       $scope.$watch('opts.timefield', function(timefield) {
-        if (!!timefield) {
-          timefilter.enableTimeRangeSelector();
-        } else {
-          timefilter.disableTimeRangeSelector();
-        }
+        $scope.enableTimeRangeSelector = !!timefield;
       });
 
       $scope.$watch('state.interval', function() {
@@ -633,7 +645,7 @@ function discoverController(
       .catch(notify.error);
   };
 
-  $scope.updateQueryAndFetch = function({ query }) {
+  $scope.updateQueryAndFetch = function({ query, dateRange }) {
     ////////////////////////////////////////////////////////////////////////////
     ///////////////////////////////  WAZUH   ///////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////
@@ -647,6 +659,7 @@ function discoverController(
     ////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////
+    timefilter.setTime(dateRange);
     $state.query = query;
     $scope.fetch();
   };
@@ -769,11 +782,26 @@ function discoverController(
       if ($scope.opts.timefield) {
         const tabifiedData = tabifyAggResponse($scope.vis.aggs, merged);
         $scope.searchSource.rawResponse = merged;
-        Promise.resolve(responseHandler(tabifiedData)).then(resp => {
-          if (visualizeHandler) {
-            visualizeHandler.render(resp);
-          }
-        });
+        Promise.resolve(
+          buildVislibDimensions($scope.vis, {
+            timeRange: $scope.timeRange,
+            searchSource: $scope.searchSource
+          })
+        )
+          .then(resp => responseHandler(tabifiedData, resp))
+          .then(resp => {
+            if (visualizeHandler) {
+              visualizeHandler.render({
+                as: 'visualization',
+                value: {
+                  visType: $scope.vis.type.name,
+                  visData: resp,
+                  visConfig: $scope.vis.params,
+                  params: {}
+                }
+              });
+            }
+          });
       }
 
       $scope.hits = merged.hits.total;
@@ -851,6 +879,18 @@ function discoverController(
       from: dateMath.parse(timefilter.getTime().from),
       to: dateMath.parse(timefilter.getTime().to, { roundUp: true })
     };
+    $scope.time = timefilter.getTime();
+  };
+
+  $scope.updateRefreshInterval = function() {
+    $scope.refreshInterval = timefilter.getRefreshInterval();
+  };
+
+  $scope.onRefreshChange = function({ isPaused, refreshInterval }) {
+    timefilter.setRefreshInterval({
+      pause: isPaused,
+      value: refreshInterval ? refreshInterval : $scope.refreshInterval.value
+    });
   };
 
   $scope.resetQuery = function() {
@@ -921,7 +961,7 @@ function discoverController(
   async function setupVisualization() {
     // If no timefield has been specified we don't create a histogram of messages
     if (!$scope.opts.timefield) return;
-    $state.interval = calcWzInterval() || 'h';
+    //$state.interval = calcWzInterval() || 'h';
     const visStateAggs = [
       {
         type: 'count',
@@ -986,13 +1026,15 @@ function discoverController(
 
     $timeout(async () => {
       const visEl = $element.find('#discoverHistogram')[0];
-      visualizeHandler = await visualizeLoader.embedVisualizationWithSavedObject(
-        visEl,
-        visSavedObject,
-        {
-          autoFetch: false
-        }
-      );
+      if (visEl) {
+        visualizeHandler = await visualizeLoader.embedVisualizationWithSavedObject(
+          visEl,
+          visSavedObject,
+          {
+            autoFetch: false
+          }
+        );
+      }
     });
   }
 

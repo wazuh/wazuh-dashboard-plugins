@@ -1,50 +1,56 @@
 <discover-app-w class="app-container">
   <!-- Local nav. -->
-  <wz-kbn-top-nav name="discover" config="topNavMenu">
+  <kbn-top-nav name="discover" config="topNavMenu">
     <!-- Transcluded elements. -->
     <div data-transclude-slots>
       <!-- Breadcrumbs. -->
       <div data-transclude-slot="topLeftCorner" class="kuiLocalBreadcrumbs">
-        <h1 tabindex="0" id="kui_local_breadcrumb" class="kuiLocalBreadcrumb">
-          <span ng-show="opts.savedSearch.id" class="kuiLocalBreadcrumb__emphasis">
-            <span data-test-subj="discoverCurrentQuery" ng-bind="opts.savedSearch.lastSavedTitle"></span>
+        <h1  tabindex="0" id="kui_local_breadcrumb" class="kuiLocalBreadcrumb" ng-if="opts.savedSearch.id">
+          <span class="kuiLocalBreadcrumb__emphasis">
             <span
               id="reload_saved_search"
-              aria-label="{{::'kbn.discover.reloadSavedSearchAriaLabel' | i18n: {defaultMessage: 'Reload Saved Search'} }}"
-              tooltip="{{::'kbn.discover.reloadSavedSearchTooltip' | i18n: {defaultMessage: 'Reload Saved Search'} }}"
+              aria-label="{{::'kbn.discover.reloadSavedSearchAriaLabel' | i18n: {defaultMessage: 'Reload saved search'} }}"
+              tooltip="{{::'kbn.discover.reloadSavedSearchTooltip' | i18n: {defaultMessage: 'Reload saved search'} }}"
+              tooltip-placement="right"
+              tooltip-append-to-body="1"
               ng-click="resetQuery()"
               kbn-accessible-click
               class="kuiIcon fa-undo small"
             ></span>&nbsp;
           </span>
+        </h1>
+        <div class="kuiLocalBreadcrumb">
           <span data-test-subj="discoverQueryHits" class="kuiLocalBreadcrumb__emphasis">{{(hits || 0) | number:0}}</span>
           <span
             i18n-id="kbn.discover.hitsPluralTitle"
             i18n-default-message="{hits, plural, one {hit} other {hits}}"
             i18n-values="{ hits }"
           ></span>
-        </h1>
+        </div>
       </div>
 
       <!-- Search. -->
       <div data-transclude-slot="bottomRow" class="fullWidth">
-        <query-bar
+        <search-bar
           query="state.query"
-          on-submit="updateQueryAndFetch"
+          on-query-submit="updateQueryAndFetch"
           app-name="'discover'"
           index-patterns="[indexPattern]"
-        ></query-bar>
+          filters="filters"
+          on-filters-updated="onFiltersUpdated"
+          show-date-picker="enableTimeRangeSelector"
+          date-range-from="time.from"
+          date-range-to="time.to"
+          is-refresh-paused="refreshInterval.pause"
+          refresh-interval="refreshInterval.value"
+          on-refresh-change="onRefreshChange"
+          watch-depth="reference"
+        ></search-bar>
       </div>
     </div>
-  </wz-kbn-top-nav>
+  </kbn-top-nav>
 
   <main class="container-fluid">
-    <div class="row">
-      <filter-bar
-        state="state"
-        index-patterns="[indexPattern]"
-      ></filter-bar>
-    </div>
     <div class="row">
       <div class="col-md-2 sidebar-container collapsible-sidebar" id="discover-sidebar">
         <disc-field-chooser
@@ -64,22 +70,18 @@
 
       <div class="dscWrapper col-md-10">
         <div class="dscWrapper__content">
-          <div layout="row" class="wz-margin-top-10" ng-if="isUnsupportedIndexPattern">
-            <div flex class="euiCallOut euiCallOut--warning" data-test-subj="discoverNoResults">
-                <div class="euiCallOutHeader">
-                    <svg class="euiIcon euiIcon--medium euiCallOutHeader__icon" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="16" height="16" viewBox="0 0 16 16"><defs><path id="help-a" d="M13.6 12.186l-1.357-1.358c-.025-.025-.058-.034-.084-.056.53-.794.84-1.746.84-2.773a4.977 4.977 0 0 0-.84-2.772c.026-.02.059-.03.084-.056L13.6 3.813a6.96 6.96 0 0 1 0 8.373zM8 15A6.956 6.956 0 0 1 3.814 13.6l1.358-1.358c.025-.025.034-.057.055-.084C6.02 12.688 6.974 13 8 13a4.978 4.978 0 0 0 2.773-.84c.02.026.03.058.056.083l1.357 1.358A6.956 6.956 0 0 1 8 15zm-5.601-2.813a6.963 6.963 0 0 1 0-8.373l1.359 1.358c.024.025.057.035.084.056A4.97 4.97 0 0 0 3 8c0 1.027.31 1.98.842 2.773-.027.022-.06.031-.084.056l-1.36 1.358zm5.6-.187A4 4 0 1 1 8 4a4 4 0 0 1 0 8zM8 1c1.573 0 3.019.525 4.187 1.4l-1.357 1.358c-.025.025-.035.057-.056.084A4.979 4.979 0 0 0 8 3a4.979 4.979 0 0 0-2.773.842c-.021-.027-.03-.059-.055-.084L3.814 2.4A6.957 6.957 0 0 1 8 1zm0-1a8.001 8.001 0 1 0 .003 16.002A8.001 8.001 0 0 0 8 0z"></path></defs><use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#help-a" fill-rule="evenodd"></use></svg>
-                    <span class="euiCallOutHeader__title">Unsupported index pattern.</span>
-                </div>
-            </div>
-          </div>
-          <div layout="row" class="wz-margin-top-10" ng-if="resultState === 'none'">
-            <div flex class="euiCallOut euiCallOut--warning" data-test-subj="discoverNoResults">
-                <div class="euiCallOutHeader">
-                    <svg class="euiIcon euiIcon--medium euiCallOutHeader__icon" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="16" height="16" viewBox="0 0 16 16"><defs><path id="help-a" d="M13.6 12.186l-1.357-1.358c-.025-.025-.058-.034-.084-.056.53-.794.84-1.746.84-2.773a4.977 4.977 0 0 0-.84-2.772c.026-.02.059-.03.084-.056L13.6 3.813a6.96 6.96 0 0 1 0 8.373zM8 15A6.956 6.956 0 0 1 3.814 13.6l1.358-1.358c.025-.025.034-.057.055-.084C6.02 12.688 6.974 13 8 13a4.978 4.978 0 0 0 2.773-.84c.02.026.03.058.056.083l1.357 1.358A6.956 6.956 0 0 1 8 15zm-5.601-2.813a6.963 6.963 0 0 1 0-8.373l1.359 1.358c.024.025.057.035.084.056A4.97 4.97 0 0 0 3 8c0 1.027.31 1.98.842 2.773-.027.022-.06.031-.084.056l-1.36 1.358zm5.6-.187A4 4 0 1 1 8 4a4 4 0 0 1 0 8zM8 1c1.573 0 3.019.525 4.187 1.4l-1.357 1.358c-.025.025-.035.057-.056.084A4.979 4.979 0 0 0 8 3a4.979 4.979 0 0 0-2.773.842c-.021-.027-.03-.059-.055-.084L3.814 2.4A6.957 6.957 0 0 1 8 1zm0-1a8.001 8.001 0 1 0 .003 16.002A8.001 8.001 0 0 0 8 0z"></path></defs><use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#help-a" fill-rule="evenodd"></use></svg>
-                    <span class="euiCallOutHeader__title">No results match your search criteria</span>
-                </div>
-            </div>
-          </div>
+          <discover-unsupported-index-pattern
+            ng-if="isUnsupportedIndexPattern"
+            unsupported-type="unsupportedIndexPatternType"
+          ></discover-unsupported-index-pattern>
+
+          <discover-no-results
+            ng-show="resultState === 'none'"
+            shard-failures="failures"
+            time-field-name="opts.timefield"
+            query-language="state.query.language"
+            get-doc-link="getDocLink"
+          ></discover-no-results>
 
           <!-- loading -->
           <div ng-show="resultState === 'loading'">
@@ -92,14 +94,15 @@
               ng-hide="fetchError"
               class="dscOverlay"
             >
-              <div class="euiTitle" >
-                <h2
-                  i18n-id="kbn.discover.searchingTitle"
-                  i18n-default-message="Searching"
-                ></h2>
-              </div>
+              <h2
+                i18n-id="kbn.discover.searchingTitle"
+                i18n-default-message="Searching"
+                class="euiTitle euiTitle--small"
+              ></h2>
               <div class="euiSpacer euiSpacer--m"></div>
-              <div ng-show="fetchStatus">{{fetchStatus.complete}}/{{fetchStatus.total}}</div>
+              <div class="euiLoadingSpinner euiLoadingSpinner--large"></div>
+              <div class="euiSpacer euiSpacer--m"></div>
+              <div ng-show="fetchStatus">{{fetchStatus.complete}} / {{fetchStatus.total}}</div>
             </div>
           </div>
 
@@ -140,7 +143,7 @@
                       ng-options="interval.val as interval.display for interval in intervalOptions | filter: intervalEnabled"
                       ng-blur="toggleInterval()"
                       data-test-subj="discoverIntervalSelect"
-                      >
+                    >
                     </select>
                     <span ng-if="bucketInterval.scaled">
                       <icon-tip
@@ -161,9 +164,9 @@
               </header>
 
               <div id="discoverHistogram"
-                 ng-show="vis && rows.length !== 0"
-                 style="display: flex; height: 200px"
-                >
+                ng-show="vis && rows.length !== 0"
+                style="display: flex; height: 200px"
+              >
               </div>
             </section>
 

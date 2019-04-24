@@ -1,219 +1,225 @@
 <discover-app-w class="app-container">
-    <!-- Local nav. -->
-    <wz-kbn-top-nav name="discover" config="topNavMenu">
-      <!-- Transcluded elements. -->
-      <div data-transclude-slots>
-        <!-- Breadcrumbs. -->
-        <div data-transclude-slot="topLeftCorner" class="kuiLocalBreadcrumbs">
-          <h1 tabindex="0" id="kui_local_breadcrumb" class="kuiLocalBreadcrumb" ng-show="tabView === 'discover'">
-            <span ng-show="opts.savedSearch.id" class="kuiLocalBreadcrumb__emphasis">
-              <span data-test-subj="discoverCurrentQuery" ng-bind="opts.savedSearch.lastSavedTitle"></span>
-              <span
-                id="reload_saved_search"
-                aria-label="{{::'kbn.discover.reloadSavedSearchAriaLabel' | i18n: {defaultMessage: 'Reload Saved Search'} }}"
-                tooltip="{{::'kbn.discover.reloadSavedSearchTooltip' | i18n: {defaultMessage: 'Reload Saved Search'} }}"
-                ng-click="resetQuery()"
-                kbn-accessible-click
-                class="kuiIcon fa-undo small"
-              ></span>&nbsp;
-            </span>
-            <span data-test-subj="discoverQueryHits" class="kuiLocalBreadcrumb__emphasis">{{(hits || 0) | number:0}}</span>
+  <!-- Local nav. -->
+  <kbn-top-nav name="discover" config="topNavMenu" class="wzKbnTopNav">
+    <!-- Transcluded elements. -->
+    <div data-transclude-slots>
+      <!-- Breadcrumbs. -->
+      <div data-transclude-slot="topLeftCorner" class="kuiLocalBreadcrumbs" ng-if="tabView === 'discover'">
+        <h1 tabindex="0" id="kui_local_breadcrumb" class="kuiLocalBreadcrumb" ng-if="opts.savedSearch.id">
+          <span class="kuiLocalBreadcrumb__emphasis">
             <span
-              i18n-id="kbn.discover.hitsPluralTitle"
-              i18n-default-message="{hits, plural, one {hit} other {hits}}"
-              i18n-values="{ hits }"
-            ></span>
-          </h1>
-        </div>
-  
-        <!-- Search. -->
-        <div data-transclude-slot="bottomRow" class="fullWidth" ng-show="tabView !== 'cluster-monitoring'">
-          <query-bar
-            query="state.query"
-            on-submit="updateQueryAndFetch"
-            app-name="'discover'"
-            index-patterns="[indexPattern]"
-          ></query-bar>
+              id="reload_saved_search"
+              aria-label="{{::'kbn.discover.reloadSavedSearchAriaLabel' | i18n: {defaultMessage: 'Reload saved search'} }}"
+              tooltip="{{::'kbn.discover.reloadSavedSearchTooltip' | i18n: {defaultMessage: 'Reload saved search'} }}"
+              tooltip-placement="right"
+              tooltip-append-to-body="1"
+              ng-click="resetQuery()"
+              kbn-accessible-click
+              class="kuiIcon fa-undo small"
+            ></span>&nbsp;
+          </span>
+        </h1>
+        <div class="kuiLocalBreadcrumb">
+          <span data-test-subj="discoverQueryHits" class="kuiLocalBreadcrumb__emphasis">{{(hits || 0) | number:0}}</span>
+          <span
+            i18n-id="kbn.discover.hitsPluralTitle"
+            i18n-default-message="{hits, plural, one {hit} other {hits}}"
+            i18n-values="{ hits }"
+          ></span>
         </div>
       </div>
-    </wz-kbn-top-nav>
-  
-    <main class="container-fluid" ng-show="tabView !== 'cluster-monitoring'">
-      <div class="row">
-        <filter-bar-w
-          state="state"
+
+      <!-- Search. -->
+      <div ng-show="tabView !== 'cluster-monitoring'" style="padding-top: 10px;" data-transclude-slot="bottomRow" class="fullWidth">
+        <search-bar
+          query="state.query"
+          on-query-submit="updateQueryAndFetch"
+          app-name="'discover'"
           index-patterns="[indexPattern]"
-        ></filter-bar-w>
+          filters="filters"
+          on-filters-updated="onFiltersUpdated"
+          show-date-picker="enableTimeRangeSelector"
+          date-range-from="time.from"
+          date-range-to="time.to"
+          is-refresh-paused="refreshInterval.pause"
+          refresh-interval="refreshInterval.value"
+          on-refresh-change="onRefreshChange"
+          watch-depth="reference"
+        ></search-bar>
       </div>
-      <div class="row" ng-show="tabView === 'discover'">
-        <div class="col-md-2 sidebar-container collapsible-sidebar" id="discover-sidebar">
-          <disc-field-chooser
-            class="dscFieldChooser"
-            columns="state.columns"
-            hits="rows"
-            field-counts="fieldCounts"
-            index-pattern="searchSource.getField('index')"
-            index-pattern-list="opts.indexPatternList"
-            state="state"
-            on-add-field="addColumn"
-            on-add-filter="filterQuery"
-            on-remove-field="removeColumn"
-          >
-          </disc-field-chooser>
-        </div>
-  
-        <div class="dscWrapper col-md-10">
-          <div class="dscWrapper__content">
-            <discover-unsupported-index-pattern
-              ng-if="isUnsupportedIndexPattern"
-              unsupported-type="unsupportedIndexPatternType"
-            ></discover-unsupported-index-pattern>
-  
-            <div layout="row" class="wz-margin-top-10" ng-if="resultState === 'none'">
-              <div flex class="euiCallOut euiCallOut--warning" data-test-subj="discoverNoResults">
-                  <div class="euiCallOutHeader">
-                      <svg class="euiIcon euiIcon--medium euiCallOutHeader__icon" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="16" height="16" viewBox="0 0 16 16"><defs><path id="help-a" d="M13.6 12.186l-1.357-1.358c-.025-.025-.058-.034-.084-.056.53-.794.84-1.746.84-2.773a4.977 4.977 0 0 0-.84-2.772c.026-.02.059-.03.084-.056L13.6 3.813a6.96 6.96 0 0 1 0 8.373zM8 15A6.956 6.956 0 0 1 3.814 13.6l1.358-1.358c.025-.025.034-.057.055-.084C6.02 12.688 6.974 13 8 13a4.978 4.978 0 0 0 2.773-.84c.02.026.03.058.056.083l1.357 1.358A6.956 6.956 0 0 1 8 15zm-5.601-2.813a6.963 6.963 0 0 1 0-8.373l1.359 1.358c.024.025.057.035.084.056A4.97 4.97 0 0 0 3 8c0 1.027.31 1.98.842 2.773-.027.022-.06.031-.084.056l-1.36 1.358zm5.6-.187A4 4 0 1 1 8 4a4 4 0 0 1 0 8zM8 1c1.573 0 3.019.525 4.187 1.4l-1.357 1.358c-.025.025-.035.057-.056.084A4.979 4.979 0 0 0 8 3a4.979 4.979 0 0 0-2.773.842c-.021-.027-.03-.059-.055-.084L3.814 2.4A6.957 6.957 0 0 1 8 1zm0-1a8.001 8.001 0 1 0 .003 16.002A8.001 8.001 0 0 0 8 0z"></path></defs><use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#help-a" fill-rule="evenodd"></use></svg>
-                      <span class="euiCallOutHeader__title">No results match your search criteria</span>
-                  </div>
-              </div>
+    </div>
+  </kbn-top-nav>
+
+  <main ng-show="tabView !== 'cluster-monitoring'" class="container-fluid">
+    <div ng-show="tabView === 'discover'" class="row">
+      <div ng-if="tabView === 'discover'" class="col-md-2 sidebar-container collapsible-sidebar" id="discover-sidebar">
+        <disc-field-chooser
+          class="dscFieldChooser"
+          columns="state.columns"
+          hits="rows"
+          field-counts="fieldCounts"
+          index-pattern="searchSource.getField('index')"
+          index-pattern-list="opts.indexPatternList"
+          state="state"
+          on-add-field="addColumn"
+          on-add-filter="filterQuery"
+          on-remove-field="removeColumn"
+        >
+        </disc-field-chooser>
+      </div>
+
+      <div class="dscWrapper col-md-10">
+        <div class="dscWrapper__content">
+          <discover-unsupported-index-pattern
+            ng-if="isUnsupportedIndexPattern"
+            unsupported-type="unsupportedIndexPatternType"
+          ></discover-unsupported-index-pattern>
+
+          <discover-no-results
+            ng-show="resultState === 'none'"
+            shard-failures="failures"
+            time-field-name="opts.timefield"
+            query-language="state.query.language"
+            get-doc-link="getDocLink"
+          ></discover-no-results>
+
+          <!-- loading -->
+          <div ng-show="resultState === 'loading'">
+            <discover-fetch-error
+              ng-show="fetchError"
+              fetch-error="fetchError"
+            ></discover-fetch-error>
+
+            <div
+              ng-hide="fetchError"
+              class="dscOverlay"
+            >
+              <h2
+                i18n-id="kbn.discover.searchingTitle"
+                i18n-default-message="Searching"
+                class="euiTitle euiTitle--small"
+              ></h2>
+              <div class="euiSpacer euiSpacer--m"></div>
+              <div class="euiLoadingSpinner euiLoadingSpinner--large"></div>
+              <div class="euiSpacer euiSpacer--m"></div>
+              <div ng-show="fetchStatus">{{fetchStatus.complete}} / {{fetchStatus.total}}</div>
             </div>
-  
-            <!-- loading -->
-            <div ng-show="resultState === 'loading'">
-              <discover-fetch-error
-                ng-show="fetchError"
-                fetch-error="fetchError"
-              ></discover-fetch-error>
-  
-              <div
-                ng-hide="fetchError"
-                class="dscOverlay"
-              >
-                <div class="euiTitle" >
-                  <h2
-                    i18n-id="kbn.discover.searchingTitle"
-                    i18n-default-message="Searching"
-                  ></h2>
-                </div>
-                <div class="euiSpacer euiSpacer--m"></div>
-                <div ng-show="fetchStatus">{{fetchStatus.complete}}/{{fetchStatus.total}}</div>
-              </div>
-            </div>
-  
-            <!-- result -->
-            <div class="dscResults" ng-show="resultState === 'ready'">
-              <button
-                class="kuiButton kuiButton--basic kuiButton--iconText dscSkipButton"
-                ng-click="showAllRows(); scrollToBottom()"
-              >
-                <span class="kuiButton__inner">
-                  <span aria-hidden="true" class="kuiButton__icon kuiIcon fa-chevron-down"></span>
+          </div>
+
+          <!-- result -->
+          <div class="dscResults" ng-show="resultState === 'ready'">
+            <button
+              class="kuiButton kuiButton--basic kuiButton--iconText dscSkipButton"
+              ng-click="showAllRows(); scrollToBottom()"
+            >
+              <span class="kuiButton__inner">
+                <span aria-hidden="true" class="kuiButton__icon kuiIcon fa-chevron-down"></span>
+                <span
+                  i18n-id="kbn.discover.skipToBottomButtonLabel"
+                  i18n-default-message="Skip to bottom"
+                ></span>
+              </span>
+            </button>
+
+            <section
+              aria-label="{{::'kbn.discover.histogramOfFoundDocumentsAriaLabel' | i18n: {defaultMessage: 'Histogram of found documents'} }}"
+              class="dscTimechart"
+              ng-if="opts.timefield"
+            >
+              <header class="dscTimechart__header">
+                <div class="small">
                   <span
-                    i18n-id="kbn.discover.skipToBottomButtonLabel"
-                    i18n-default-message="Skip to bottom"
-                  ></span>
-                </span>
-              </button>
-  
-              <section
-                aria-label="{{::'kbn.discover.histogramOfFoundDocumentsAriaLabel' | i18n: {defaultMessage: 'Histogram of found documents'} }}"
-                class="dscTimechart"
-                ng-if="opts.timefield"
-              >
-                <header class="dscTimechart__header">
-                  <div class="small">
-                    <span
-                      tooltip="{{::'kbn.discover.howToChangeTheTimeTooltip' | i18n: {defaultMessage: 'To change the time, click the clock icon in the navigation bar'} }}"
-                    >
-                      {{timeRange.from | moment}} - {{timeRange.to | moment}}
-                    </span>
-  
-                    &mdash;
-  
-                    <span class="form-inline">
-                      <select
-                        class="dscResults__interval form-control"
-                        ng-model="state.interval"
-                        ng-options="interval.val as interval.display for interval in intervalOptions | filter: intervalEnabled"
-                        ng-blur="toggleInterval()"
-                        data-test-subj="discoverIntervalSelect"
-                        >
-                      </select>
-                      <span ng-if="bucketInterval.scaled">
-                        <icon-tip
-                          content="getBucketIntervalToolTipText()"
-                          position="'top'"
-                        ></icon-tip>
-                        <span
-                          i18n-id="kbn.discover.scaledToDescription"
-                          i18n-default-message="Scaled to {bucketIntervalDescription}"
-                          i18n-values="{
-                            bucketIntervalDescription: bucketInterval.description
-                          }"
-                        ></span>
-                      </span>
-                    </span>
-                  </div>
-  
-                </header>
-  
-                <div id="discoverHistogram"
-                   ng-show="vis && rows.length !== 0"
-                   style="display: flex; height: 200px"
+                    tooltip="{{::'kbn.discover.howToChangeTheTimeTooltip' | i18n: {defaultMessage: 'To change the time, click the clock icon in the navigation bar'} }}"
                   >
+                    {{timeRange.from | moment}} - {{timeRange.to | moment}}
+                  </span>
+
+                  &mdash;
+
+                  <span class="form-inline">
+                    <select
+                      class="dscResults__interval form-control"
+                      ng-model="state.interval"
+                      ng-options="interval.val as interval.display for interval in intervalOptions | filter: intervalEnabled"
+                      ng-blur="toggleInterval()"
+                      data-test-subj="discoverIntervalSelect"
+                    >
+                    </select>
+                    <span ng-if="bucketInterval.scaled">
+                      <icon-tip
+                        content="getBucketIntervalToolTipText()"
+                        position="'top'"
+                      ></icon-tip>
+                      <span
+                        i18n-id="kbn.discover.scaledToDescription"
+                        i18n-default-message="Scaled to {bucketIntervalDescription}"
+                        i18n-values="{
+                          bucketIntervalDescription: bucketInterval.description
+                        }"
+                      ></span>
+                    </span>
+                  </span>
                 </div>
-              </section>
-  
-              <section
-                ng-if="tabView === 'discover'"
-                class="dscTable"
-                fixed-scroll
-                aria-label="{{::'kbn.discover.documentsAriaLabel' | i18n: {defaultMessage: 'Documents'} }}"
+
+              </header>
+
+              <div id="discoverHistogram"
+                ng-show="vis && rows.length !== 0"
+                style="display: flex; height: 200px"
               >
-                <doc-table
-                  hits="rows"
-                  index-pattern="indexPattern"
-                  sorting="state.sort"
-                  columns="state.columns"
-                  infinite-scroll="true"
-                  filter="filterQuery"
-                  filters="state.filters"
-                  data-shared-item
-                  data-title="{{opts.savedSearch.lastSavedTitle}}"
-                  data-description="{{opts.savedSearch.description}}"
-                  minimum-visible-rows="minimumVisibleRows"
-                  render-complete
-                  on-add-column="addColumn"
-                  on-change-sort-order="setSortOrder"
-                  on-move-column="moveColumn"
-                  on-remove-column="removeColumn"
-                ></doc-table>
-  
-                <a tabindex="0" id="discoverBottomMarker"></a>
-  
-                <div
-                  ng-if="rows.length == opts.sampleSize"
-                  class="dscTable__footer"
-                >
-                  <span
-                    i18n-id="kbn.discover.howToSeeOtherMatchingDocumentsDescription"
-                    i18n-default-message="These are the first {sampleSize} documents matching
-                    your search, refine your search to see others. "
-                    i18n-values="{
-                      sampleSize: opts.sampleSize,
-                    }"
-                  ></span>
-                  <a
-                    kbn-accessible-click
-                    ng-click="scrollToTop()"
-                    i18n-id="kbn.discover.backToTopLinkText"
-                    i18n-default-message="Back to top."
-                  ></a>
-                </div>
-              </section>
-            </div>
+              </div>
+            </section>
+
+            <section
+              ng-if="tabView === 'discover'"
+              class="dscTable"
+              fixed-scroll
+              aria-label="{{::'kbn.discover.documentsAriaLabel' | i18n: {defaultMessage: 'Documents'} }}"
+            >
+              <doc-table
+                hits="rows"
+                index-pattern="indexPattern"
+                sorting="state.sort"
+                columns="state.columns"
+                infinite-scroll="true"
+                filter="filterQuery"
+                filters="state.filters"
+                data-shared-item
+                data-title="{{opts.savedSearch.lastSavedTitle}}"
+                data-description="{{opts.savedSearch.description}}"
+                minimum-visible-rows="minimumVisibleRows"
+                render-complete
+                on-add-column="addColumn"
+                on-change-sort-order="setSortOrder"
+                on-move-column="moveColumn"
+                on-remove-column="removeColumn"
+              ></doc-table>
+
+              <a tabindex="0" id="discoverBottomMarker"></a>
+
+              <div
+                ng-if="rows.length == opts.sampleSize"
+                class="dscTable__footer"
+              >
+                <span
+                  i18n-id="kbn.discover.howToSeeOtherMatchingDocumentsDescription"
+                  i18n-default-message="These are the first {sampleSize} documents matching
+                  your search, refine your search to see others. "
+                  i18n-values="{
+                    sampleSize: opts.sampleSize,
+                  }"
+                ></span>
+                <a
+                  kbn-accessible-click
+                  ng-click="scrollToTop()"
+                  i18n-id="kbn.discover.backToTopLinkText"
+                  i18n-default-message="Back to top."
+                ></a>
+              </div>
+            </section>
           </div>
         </div>
       </div>
-    </main>
-  </discover-app-w>
+    </div>
+  </main>
+</discover-app-w>
