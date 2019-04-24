@@ -309,6 +309,18 @@ export class AgentsController {
       );
     };
 
+    /**
+     * This adds timezone offset to a given date
+     * @param {String} binding_text
+     * @param {String} date
+     */
+    this.$scope.offsetTimestamp = (text, time) => {
+      const date = new Date(time);
+      const offset = new Date().getTimezoneOffset();
+      var offsetTime = new Date(date.getTime() - offset * 60000);
+      return text + offsetTime.toLocaleString('en-ZA').replace(',', '');
+    };
+
     this.$scope.switchConfigurationTab = (configurationTab, navigate) => {
       // Check if configuration is synced
       this.$scope.isSynchronized = this.checkSync();
