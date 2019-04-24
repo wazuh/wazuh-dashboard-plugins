@@ -318,7 +318,7 @@ export class AgentsController {
       try {
         const date = new Date(time);
         const offset = new Date().getTimezoneOffset();
-        var offsetTime = new Date(date.getTime() - offset * 60000);
+        const offsetTime = new Date(date.getTime() - offset * 60000);
         return text + offsetTime.toLocaleString('en-ZA').replace(',', '');
       } catch (error) {
         return '';
