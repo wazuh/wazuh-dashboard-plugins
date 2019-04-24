@@ -10,8 +10,5 @@
  * Find more information about this on the LICENSE file.
  */
 import './kibana-visualization';
-import './kibana-filter-bar';
 import './kibana-discover';
 import './saved-visualizations';
-import './kbn_top_nav/index';
-import './kbn-global-timepicker/kbn_global_timepicker';
