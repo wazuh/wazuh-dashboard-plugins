@@ -315,10 +315,14 @@ export class AgentsController {
      * @param {String} date
      */
     this.$scope.offsetTimestamp = (text, time) => {
-      const date = new Date(time);
-      const offset = new Date().getTimezoneOffset();
-      var offsetTime = new Date(date.getTime() - offset * 60000);
-      return text + offsetTime.toLocaleString('en-ZA').replace(',', '');
+      try {
+        const date = new Date(time);
+        const offset = new Date().getTimezoneOffset();
+        var offsetTime = new Date(date.getTime() - offset * 60000);
+        return text + offsetTime.toLocaleString('en-ZA').replace(',', '');
+      } catch (error) {
+        return '';
+      }
     };
 
     this.$scope.switchConfigurationTab = (configurationTab, navigate) => {
