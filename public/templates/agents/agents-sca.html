@@ -45,8 +45,8 @@
         <div class="layout-column md-padding" ng-repeat="policy in policies">
             <span class="wz-headline-title">{{policy.name}}</span>
             <md-divider class="wz-margin-top-10"></md-divider>
-            <canvas id="bar" class="wz-margin-top-10 chart chart-doughnut" chart-data="[policy.pass, policy.fail]"
-                chart-labels="['pass','fail']" chart-colors="['#00a69b', '#ff645c']"
+            <canvas id="bar" class="wz-margin-top-10 chart chart-doughnut" chart-data="[policy.pass, policy.fail, policy.total_checks - policy.pass - policy.fail]"
+                chart-labels="['pass','fail', 'not applicable']" chart-colors="['#00a69b', '#ff645c', '#5c6773']"
                 chart-options="{cutoutPercentage: 75, legend: {display: true,position: 'right',},responsive: false, maintainAspectRatio: false}" />
         </div>
     </div>
