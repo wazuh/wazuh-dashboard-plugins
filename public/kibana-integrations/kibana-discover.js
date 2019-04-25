@@ -261,7 +261,7 @@ function discoverController(
   const discoverBreadcrumbsTitle = i18n(
     'kbn.discover.discoverBreadcrumbTitle',
     {
-      defaultMessage: 'Discover'
+      defaultMessage: 'Wazuh'
     }
   );
 
