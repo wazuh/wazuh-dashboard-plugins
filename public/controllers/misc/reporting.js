@@ -17,7 +17,7 @@ export class ReportingController {
    * @param {*} errorHandler
    * @param {*} genericReq
    */
-  constructor($scope, errorHandler, genericReq, $window) {
+  constructor($scope, errorHandler, genericReq, $window, timeService) {
     this.$scope = $scope;
     this.$window = $window;
     this.errorHandler = errorHandler;
@@ -28,6 +28,7 @@ export class ReportingController {
     this.currentPage = 0;
     this.items = [];
     this.gap = 0;
+    this.timeService = timeService;
   }
 
   /**
@@ -45,6 +46,14 @@ export class ReportingController {
     this.currentPage = 0;
     this.groupToPages();
   }
+
+  offsetTimestamp = time => {
+    try {
+      return this.timeService.offset(time);
+    } catch (error) {
+      return '';
+    }
+  };
 
   /**
    * This delete a report with a given name

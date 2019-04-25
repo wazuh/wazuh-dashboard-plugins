@@ -487,14 +487,6 @@ app.directive('wzTable', function() {
         }
       };
 
-      $scope.offsetTimestamp = (text, time) => {
-        try {
-          return text + timeService.offset(time);
-        } catch (error) {
-          return '';
-        }
-      };
-
       $scope.showTooltip = (id1, id2, item) => {
         const $element = $('#td-' + id1 + '-' + id2 + ' div');
         const $c = $element
