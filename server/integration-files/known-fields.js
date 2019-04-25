@@ -5909,6 +5909,15 @@ export const knownFields = [
     readFromDocValues: true
   },
   {
+    name: 'data.sca.invalid',
+    type: 'number',
+    count: 0,
+    scripted: false,
+    searchable: true,
+    aggregatable: true,
+    readFromDocValues: true
+  },
+  {
     name: 'data.sca.policy',
     type: 'string',
     count: 0,
