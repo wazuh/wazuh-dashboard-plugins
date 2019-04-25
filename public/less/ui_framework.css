@@ -54,13 +54,10 @@
  * 4. Fix an IE bug which causes the last child to overflow the container.
  * 5. Fixing this bug means we now need to align the children to the right.
  */
- :focus:not([class^="eui"]) {
-    z-index: 1;
-    /* 1 */
-    outline: none !important;
-    /* 2 */
-    box-shadow: 0 0 0 1px #ffffff, 0 0 0 2px #006BB4;
-    /* 3 */ }
+ :focus:not([class^="eui"]):not([class^="kbn-resetFocusState"]) {
+  -webkit-animation: none !important;
+  animation: none !important;
+}
   
   /**
    * 1. Required for IE11.

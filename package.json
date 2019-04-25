@@ -33,10 +33,10 @@
     "test": "_mocha test/**/*"
   },
   "dependencies": {
-    "angular-animate": "1.6.5",
-    "angular-chart.js": "^1.1.1",
+    "angular-animate": "1.7.8",
+    "angular-chart.js": "1.1.1",
     "angular-cookies": "1.6.5",
-    "angular-material": "1.1.10",
+    "angular-material": "1.1.18",
     "dom-to-image": "^2.6.0",
     "install": "^0.10.1",
     "js2xmlparser": "^3.0.0",
