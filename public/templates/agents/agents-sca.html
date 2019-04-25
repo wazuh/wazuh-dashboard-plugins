@@ -113,7 +113,7 @@
                     </td>
                     <td class="euiTableRowCell">
                         <div class="euiTableCellContent euiTableCellContent--overflowingContent no-wrap">
-                            <span>{{policy.invalid || '-'}}</span>
+                            <span>{{policy.invalid}}</span>
                         </div>
                     </td>
                     <td class="euiTableRowCell">
@@ -135,6 +135,7 @@
                     </span>
                     <span class="wz-margin-left-16">Pass: <span class="wz-text-bold">{{lookingSca.pass}}</span></span>
                     <span class="wz-margin-left-16">Fail: <span class="wz-text-bold">{{lookingSca.fail}}</span></span>
+                    <span class="wz-margin-left-16">Not applicable: <span class="wz-text-bold">{{lookingSca.invalid}}</span></span>
                     <span class="wz-margin-left-16">Score: <span class="wz-text-bold">{{lookingSca.score}}%</span></span>
                     <span flex></span>
                     <span class="wz-text-gray">{{lookingSca.end_scan}}</span>
