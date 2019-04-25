@@ -11,6 +11,87 @@
  */
 export default [
   {
+    _id: 'Wazuh-App-Overview-SCA-Score-by-Policy',
+    _type: 'visualization',
+    _source: {
+      title: 'Score by policy',
+      visState:
+        '{"title":"Score by policy","type":"gauge","params":{"type":"gauge","addTooltip":true,"addLegend":false,"isDisplayWarning":false,"gauge":{"verticalSplit":false,"extendRange":false,"percentageMode":true,"gaugeType":"Circle","gaugeStyle":"Full","backStyle":"Full","orientation":"vertical","colorSchema":"Green to Red","gaugeColorMode":"Labels","colorsRange":[{"from":0,"to":40},{"from":40,"to":70},{"from":70,"to":100}],"invertColors":true,"labels":{"show":true,"color":"black"},"scale":{"show":false,"labels":false,"color":"#333"},"type":"meter","style":{"bgWidth":0.9,"width":0.9,"mask":false,"bgMask":false,"maskBars":50,"bgFill":"#eee","bgColor":false,"subText":"","fontSize":60,"labelColor":false},"minAngle":0,"maxAngle":6.283185307179586}},"aggs":[{"id":"1","enabled":true,"type":"avg","schema":"metric","params":{"field":"data.sca.score","customLabel":"Scores by policy"}},{"id":"2","enabled":true,"type":"terms","schema":"group","params":{"field":"data.sca.policy_id","size":5,"order":"desc","orderBy":"1","otherBucket":false,"otherBucketLabel":"Other","missingBucket":false,"missingBucketLabel":"Missing"}}]}',
+      uiStateJSON:
+        '{"vis":{"defaultColors":{"0 - 40":"rgb(165,0,38)","40 - 70":"rgb(255,255,190)","70 - 100":"rgb(0,104,55)"}}}',
+      description: '',
+      version: 1,
+      kibanaSavedObjectMeta: {
+        searchSourceJSON:
+          '{"index":"wazuh-alerts","query":{"query":"","language":"lucene"},"filter":[]}'
+      }
+    }
+  },
+  {
+    _id: 'Wazuh-App-Overview-SCA-Overall-score',
+    _type: 'visualization',
+    _source: {
+      title: 'Overall score',
+      visState:
+        '{"title":"Overall score","type":"metric","params":{"addTooltip":true,"addLegend":false,"type":"metric","metric":{"percentageMode":true,"useRanges":false,"colorSchema":"Green to Red","metricColorMode":"None","colorsRange":[{"from":0,"to":100}],"labels":{"show":true},"invertColors":false,"style":{"bgFill":"#000","bgColor":false,"labelColor":false,"subText":"","fontSize":60}}},"aggs":[{"id":"1","enabled":true,"type":"avg","schema":"metric","params":{"field":"data.sca.score","customLabel":"Overall score"}}]}',
+      uiStateJSON: '{}',
+      description: '',
+      version: 1,
+      kibanaSavedObjectMeta: {
+        searchSourceJSON:
+          '{"index":"wazuh-alerts","query":{"query":"","language":"lucene"},"filter":[]}'
+      }
+    }
+  },
+  {
+    _id: 'Wazuh-App-Overview-SCA-Top-5-failed-checks',
+    _type: 'visualization',
+    _source: {
+      title: 'Top 5 failed checks',
+      visState:
+        '{"title":"Top 5 failed checks","type":"pie","params":{"type":"pie","addTooltip":true,"addLegend":true,"legendPosition":"right","isDonut":true,"labels":{"show":false,"values":true,"last_level":true,"truncate":100}},"aggs":[{"id":"1","enabled":true,"type":"count","schema":"metric","params":{}},{"id":"2","enabled":true,"type":"terms","schema":"segment","params":{"field":"data.sca.check.title","size":5,"order":"desc","orderBy":"1","otherBucket":false,"otherBucketLabel":"Other","missingBucket":false,"missingBucketLabel":"Missing"}}]}',
+      uiStateJSON: '{}',
+      description: '',
+      version: 1,
+      kibanaSavedObjectMeta: {
+        searchSourceJSON:
+          '{"index":"wazuh-alerts","query":{"query":"","language":"lucene"},"filter":[{"meta":{"index":"wazuh-alerts-3.x-*","negate":false,"disabled":false,"alias":null,"type":"phrase","key":"data.sca.check.result","value":"failed","params":{"query":"failed","type":"phrase"}},"query":{"match":{"data.sca.check.result":{"query":"failed","type":"phrase"}}},"$state":{"store":"appState"}}]}'
+      }
+    }
+  },
+  {
+    _id: 'Wazuh-App-Overview-SCA-Top-5-passed-checks',
+    _type: 'visualization',
+    _source: {
+      title: 'Top 5 passed checks',
+      visState:
+        '{"title":"Top 5 passed checks","type":"pie","params":{"type":"pie","addTooltip":true,"addLegend":true,"legendPosition":"right","isDonut":true,"labels":{"show":false,"values":true,"last_level":true,"truncate":100}},"aggs":[{"id":"1","enabled":true,"type":"count","schema":"metric","params":{}},{"id":"2","enabled":true,"type":"terms","schema":"segment","params":{"field":"data.sca.check.title","size":5,"order":"desc","orderBy":"1","otherBucket":false,"otherBucketLabel":"Other","missingBucket":false,"missingBucketLabel":"Missing"}}]}',
+      uiStateJSON: '{}',
+      description: '',
+      version: 1,
+      kibanaSavedObjectMeta: {
+        searchSourceJSON:
+          '{"index":"wazuh-alerts","query":{"query":"","language":"lucene"},"filter":[{"meta":{"index":"wazuh-alerts-3.x-*","negate":false,"disabled":false,"alias":null,"type":"phrase","key":"data.sca.check.result","value":"passed","params":{"query":"passed","type":"phrase"}},"query":{"match":{"data.sca.check.result":{"query":"passed","type":"phrase"}}},"$state":{"store":"appState"}}]}'
+      }
+    }
+  },
+  {
+    _id: 'Wazuh-App-Overview-SCA-Result-distribution-by-policy',
+    _type: 'visualization',
+    _source: {
+      title: 'Result distribution by policy',
+      visState:
+        '{"title":"Result distribution by policy","type":"histogram","params":{"type":"histogram","grid":{"categoryLines":false,"style":{"color":"#eee"}},"categoryAxes":[{"id":"CategoryAxis-1","type":"category","position":"bottom","show":true,"style":{},"scale":{"type":"linear"},"labels":{"show":true,"truncate":20,"rotate":0},"title":{}}],"valueAxes":[{"id":"ValueAxis-1","name":"LeftAxis-1","type":"value","position":"left","show":true,"style":{},"scale":{"type":"linear","mode":"normal"},"labels":{"show":true,"rotate":0,"filter":false,"truncate":20},"title":{"text":"Count"}}],"seriesParams":[{"show":"true","type":"histogram","mode":"stacked","data":{"label":"Count","id":"1"},"valueAxis":"ValueAxis-1","drawLinesBetweenPoints":true,"showCircles":true}],"addTooltip":true,"addLegend":true,"legendPosition":"right","times":[],"addTimeMarker":false},"aggs":[{"id":"1","enabled":true,"type":"count","schema":"metric","params":{}},{"id":"2","enabled":true,"type":"terms","schema":"segment","params":{"field":"data.sca.policy","size":5,"order":"desc","orderBy":"1","otherBucket":false,"otherBucketLabel":"Other","missingBucket":false,"missingBucketLabel":"Missing"}},{"id":"3","enabled":true,"type":"terms","schema":"group","params":{"field":"data.sca.check.result","size":5,"order":"desc","orderBy":"1","otherBucket":false,"otherBucketLabel":"Other","missingBucket":false,"missingBucketLabel":"Missing"}}]}',
+      uiStateJSON: '{}',
+      description: '',
+      version: 1,
+      kibanaSavedObjectMeta: {
+        searchSourceJSON:
+          '{"index":"wazuh-alerts","query":{"query":"","language":"lucene"},"filter":[]}'
+      }
+    }
+  },
+  {
     _id: 'Wazuh-App-Overview-CA-Checks-over-time',
     _source: {
       title: 'Checks over time',
