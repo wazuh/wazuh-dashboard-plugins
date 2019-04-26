@@ -255,6 +255,16 @@ export function Initialize(server) {
         checkWazuhVersionIndex(),
         checkKnownFields(wzWrapper, log, server, defaultIndexPattern)
       ]);
+      const reindexResult = await wzWrapper.reindexAppIndices();
+      Array.isArray(reindexResult) &&
+        reindexResult.length === 2 &&
+        log(
+          'initialize:init',
+          `${reindexResult[0].value} (${reindexResult[0].result}) / ${
+            reindexResult[1].value
+          } (${reindexResult[1].result})`,
+          'debug'
+        );
     } catch (error) {
       log('initialize:init', error.message || error);
       server.log(

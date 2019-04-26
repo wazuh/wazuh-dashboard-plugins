@@ -973,4 +973,73 @@ export class ElasticWrapper {
       }
     }
   }
+
+  /**
+   * Prevent from using types, reindex .wazuh and .wazuh-version indices
+   */
+  async reindexAppIndices() {
+    try {
+      const appIndices = [
+        { value: '.wazuh', copy: '.6x-wazuh', result: 'fail' },
+        { value: '.wazuh-version', copy: '.6x-wazuh-version', result: 'fail' }
+      ];
+      for (const index of appIndices) {
+        try {
+          const result = await this.elasticRequest.callWithInternalUser(
+            'reindex',
+            {
+              refresh: true,
+              body: {
+                source: {
+                  index: index.value
+                },
+                dest: {
+                  index: index.copy
+                }
+              }
+            }
+          );
+
+          if ((result || {}).total === 0) {
+            index.result = 'total: 0';
+            continue;
+          }
+
+          await this.elasticRequest.callWithInternalUser(
+            'indices.delete',
+            {
+              index: index.value
+            }
+          );
+         
+          await this.elasticRequest.callWithInternalUser(
+            'reindex',
+            {
+              refresh: true,
+              body: {
+                source: {
+                  index: index.copy
+                },
+                dest: {
+                  index: index.value
+                }
+              }
+            }
+          );
+
+          await this.elasticRequest.callWithInternalUser(
+            'indices.delete',
+            {
+              index: index.copy
+            }
+          );
+          index.result = 'success';
+        } catch (error) {}
+      }
+
+      return appIndices;
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  }
 }
