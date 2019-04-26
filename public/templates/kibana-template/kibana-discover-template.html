@@ -31,7 +31,7 @@
 
       <!-- Search. -->
       <div ng-show="tabView !== 'cluster-monitoring'" style="padding-top: 10px;" data-transclude-slot="bottomRow" class="fullWidth">
-        <search-bar
+        <wz-search-bar
           query="state.query"
           on-query-submit="updateQueryAndFetch"
           app-name="'discover'"
@@ -45,7 +45,7 @@
           refresh-interval="refreshInterval.value"
           on-refresh-change="onRefreshChange"
           watch-depth="reference"
-        ></search-bar>
+        ></wz-search-bar>
       </div>
     </div>
   </kbn-top-nav>
