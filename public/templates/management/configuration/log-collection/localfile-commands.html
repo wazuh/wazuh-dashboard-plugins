@@ -6,7 +6,7 @@
         ng-if="currentConfig['logcollector-localfile'] && isString(currentConfig['logcollector-localfile'])">
     </wz-no-config>
     <wz-no-config flex error="'not-present'"
-        ng-if="currentConfig['logcollector-localfile'] && !isString(currentConfig['logcollector-localfile']) && !currentConfig['logcollector-localfile']['localfile-commands']">
+        ng-if="currentConfig['logcollector-localfile'] && !isString(currentConfig['logcollector-localfile']) && currentConfig['logcollector-localfile']['localfile-commands'] && !currentConfig['logcollector-localfile']['localfile-commands'].length">
     </wz-no-config>
     <!-- End no configuration section -->
 
