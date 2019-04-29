@@ -193,8 +193,14 @@ class FilterBarUI extends Component<Props, State> {
     this.props.onFiltersUpdated(filters);
   };
 
+  private isRemovable = item => {
+    const property = ((item || {}).meta || {}).removable;
+    return typeof property !== 'undefined' && !property;
+  };
+
   private onRemoveAll = () => {
-    this.props.onFiltersUpdated([]);
+    const filters = this.props.filters.filter(item => this.isRemovable(item));
+    this.props.onFiltersUpdated(filters);
   };
 
   private onOpenAddFilterPopover = () => {
