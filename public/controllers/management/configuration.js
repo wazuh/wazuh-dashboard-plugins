@@ -34,7 +34,7 @@ export class ConfigurationController {
     this.configurationSubTab = '';
     this.integrations = {};
     this.$scope.integrations = {};
-    this.selectedItem = 0;
+    this.$scope.selectedItem = 0;
     this.showHelp = false;
   }
 
@@ -85,7 +85,7 @@ export class ConfigurationController {
   }
 
   switchConfigurationSubTab(configurationSubTab) {
-    this.selectedItem = 0;
+    this.$scope.selectedItem = 0;
     this.configurationHandler.switchConfigurationSubTab(
       configurationSubTab,
       this.$scope
