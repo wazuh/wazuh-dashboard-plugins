@@ -63,7 +63,7 @@ export class ConfigurationController {
     this.hasSize = obj =>
       obj && typeof obj === 'object' && Object.keys(obj).length;
 
-    this.$scope.updateSelectedItem = i => (this.selectedItem = i);
+    this.$scope.updateSelectedItem = i => (this.$scope.selectedItem = i);
 
     this.getIntegration = list =>
       this.configurationHandler.getIntegration(list, this.$scope);
