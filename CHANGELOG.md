@@ -2,7 +2,7 @@
 
 All notable changes to the Wazuh app project will be documented in this file.
 
-## Wazuh v3.9.0 - Kibana v6.7.0 / v6.7.1 - Revision 420
+## Wazuh v3.9.0 - Kibana v6.7.0 / v6.7.1 - Revision 436
 
 ### Added 
 
@@ -71,6 +71,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Being redirected to Overview once a Kibana restart is performed ([#1378](https://github.com/wazuh/wazuh-kibana-app/pull/1378))
 - Displaying the AWS services section of the aws-s3 wodle ([#1393](https://github.com/wazuh/wazuh-kibana-app/pull/1393))
 - Show email configuration on the configuration on demand ([#1401](https://github.com/wazuh/wazuh-kibana-app/issues/1401))
+- Show "Follow symbolic link" field in Integrity monitoring - Monitored configuration on demand ([0c9c9da](https://github.com/wazuh/wazuh-kibana-app/pull/1414/commits/0c9c9da3b951548761cd203db5ee5baa39afe26c))
 
 ## Wazuh v3.8.2 - Kibana v6.6.0 / v6.6.1 / v6.6.2 / v6.7.0 - Revision 419
 
