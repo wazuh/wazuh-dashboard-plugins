@@ -31,7 +31,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Added some Angular charts in Agents Preview and Agents SCA sections ([#1364](https://github.com/wazuh/wazuh-kibana-app/pull/1364))
 - Added Docker listener settings in configuration views ([#1365](https://github.com/wazuh/wazuh-kibana-app/pull/1365))
 - Added Docker dashboards for both Agents and Overview ([#1367](https://github.com/wazuh/wazuh-kibana-app/pull/1367))
-- Improved app logger with debug level ([#1373]https://github.com/wazuh/wazuh-kibana-app/pull/1373)
+- Improved app logger with debug level ([#1373](https://github.com/wazuh/wazuh-kibana-app/pull/1373))
 - Introducing React components from the EUI framework
 
 ### Changed
