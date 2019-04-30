@@ -2,13 +2,14 @@
 
 All notable changes to the Wazuh app project will be documented in this file.
 
-## Wazuh v3.9.0 - Kibana v6.7.0 - Revision 420
+## Wazuh v3.9.0 - Kibana v6.7.0 / v6.7.1 - Revision 436
 
 ### Added 
 
 - Support for Wazuh v3.9.0
 - Edit master and worker configuration ([#1215](https://github.com/wazuh/wazuh-kibana-app/pull/1215)).
 - Edit local rules, local decoders and CDB lists ([#1212](https://github.com/wazuh/wazuh-kibana-app/pull/1212), [#1204](https://github.com/wazuh/wazuh-kibana-app/pull/1204), [#1196](https://github.com/wazuh/wazuh-kibana-app/pull/1196), [#1233](https://github.com/wazuh/wazuh-kibana-app/pull/1233), [#1304](https://github.com/wazuh/wazuh-kibana-app/pull/1304)).
+- View no local rules/decoders XML files ([#1395](https://github.com/wazuh/wazuh-kibana-app/pull/1395))
 - Dev Tools additions
   - Added hotkey `[shift] + [enter]` for sending query ([#1170](https://github.com/wazuh/wazuh-kibana-app/pull/1170)).
   - Added `Export JSON` button for the Dev Tools ([#1170](https://github.com/wazuh/wazuh-kibana-app/pull/1170)).
@@ -27,6 +28,11 @@ All notable changes to the Wazuh app project will be documented in this file.
 - New server module, it's a job queue so we can add delayed jobs to be run in background, this iteration only accepts delayed Wazuh API calls ([#1283](https://github.com/wazuh/wazuh-kibana-app/pull/1283)).
 - Added new way to view logs using a logs viewer ([#1292](https://github.com/wazuh/wazuh-kibana-app/pull/1292))
 - Added new directive for registering agents from the UI, including instructions on "how to" ([#1321](https://github.com/wazuh/wazuh-kibana-app/pull/1321)).
+- Added some Angular charts in Agents Preview and Agents SCA sections ([#1364](https://github.com/wazuh/wazuh-kibana-app/pull/1364))
+- Added Docker listener settings in configuration views ([#1365](https://github.com/wazuh/wazuh-kibana-app/pull/1365))
+- Added Docker dashboards for both Agents and Overview ([#1367](https://github.com/wazuh/wazuh-kibana-app/pull/1367))
+- Improved app logger with debug level ([#1373](https://github.com/wazuh/wazuh-kibana-app/pull/1373))
+- Introducing React components from the EUI framework
 
 ### Changed
 
@@ -48,6 +54,10 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Redesign for Management > Configuration, Agent > Configuration ([#1289](https://github.com/wazuh/wazuh-kibana-app/pull/1289)).
 - Replaced Management > Logs table with a log viewer component ([#1292](https://github.com/wazuh/wazuh-kibana-app/pull/1292)).
 - The agents list search bar now allows to switch between AND/OR operators ([#1291](https://github.com/wazuh/wazuh-kibana-app/pull/1291)).
+- Improve audit dashboards ([#1374](https://github.com/wazuh/wazuh-kibana-app/pull/1374))
+- Exclude agent "000" getting the last registered and the most active agents from the Wazuh API.([#1391](https://github.com/wazuh/wazuh-kibana-app/pull/1391))
+- Reviewed Osquery dashboards ([#1394](https://github.com/wazuh/wazuh-kibana-app/pull/1394))
+- Memory info is now a log ([#1400](https://github.com/wazuh/wazuh-kibana-app/pull/1400))
 
 ### Fixed
 
@@ -56,6 +66,12 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Do not fetch data from tables twice when resize window ([#1303](https://github.com/wazuh/wazuh-kibana-app/pull/1303)).
 - Agent syncrhonization status is updated as we browse the configuration section ([#1305](https://github.com/wazuh/wazuh-kibana-app/pull/1305))
 - Using the browser timezone for reporting documents ([#1311](https://github.com/wazuh/wazuh-kibana-app/pull/1311)).
+- Wrong behaviors in the routing system when the basePath was set ([#1342](https://github.com/wazuh/wazuh-kibana-app/pull/1342))
+- Do not show pagination for one-page tables ([196c5b7](https://github.com/wazuh/wazuh-kibana-app/pull/1362/commits/196c5b717583032798da7791fa4f90ec06397f68))
+- Being redirected to Overview once a Kibana restart is performed ([#1378](https://github.com/wazuh/wazuh-kibana-app/pull/1378))
+- Displaying the AWS services section of the aws-s3 wodle ([#1393](https://github.com/wazuh/wazuh-kibana-app/pull/1393))
+- Show email configuration on the configuration on demand ([#1401](https://github.com/wazuh/wazuh-kibana-app/issues/1401))
+- Show "Follow symbolic link" field in Integrity monitoring - Monitored configuration on demand ([0c9c9da](https://github.com/wazuh/wazuh-kibana-app/pull/1414/commits/0c9c9da3b951548761cd203db5ee5baa39afe26c))
 
 ## Wazuh v3.8.2 - Kibana v6.6.0 / v6.6.1 / v6.6.2 / v6.7.0 - Revision 419
 
