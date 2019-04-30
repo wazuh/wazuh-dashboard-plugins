@@ -192,11 +192,11 @@
                     <div ng-class="customColumns ? 'wz-text-truncatable-container' : ''">
                         <span class="wz-text-truncatable">
                             <span ng-show="(key.value || key ) === 'result'" class="no-wrap">
-                                <p class="round status little" ng-class="(item.result === 'passed') ? 'teal' : 'red'">
+                                <p class="round status little" ng-class="item.result ? (item.result === 'passed' ? 'teal' : 'red') : 'gray'">
                                 </p>&nbsp;&nbsp;
                             </span>
                             {{
-                            parseValue(key,item)
+                                key.value === 'result' && !item.result ? item.status : parseValue(key,item)
                             }}
                         </span>
                         <md-tooltip ng-show="item.showTooltip[$index]" md-direction="bottom" class="wz-tooltip">
@@ -213,6 +213,15 @@
                         <md-card flex="" class="wz-md-card wz-padding-top-0 wz-padding-bottom-0 wz-no-margin _md flex">
                             <md-card-content>
                                 <div>
+                                    <div class="euiFlexItem euiFlexItem--flexGrowZero" ng-if="item.reason">
+                                            <div class="euiStat euiStat--leftAligned">
+                                                   <p class="euiTitle euiTitle--small euiStat__title ng-binding" style="font-size: 1.15rem;">Check not applicable due to:</p>
+                                                <div class="euiText euiText--small euiStat__description wz-text-gray">
+                                                    <p>{{item.reason}}</p>
+                                                  </div>
+                                            </div>
+                                             <div layout="column" class="wz-margin-bottom-10"></div>
+                                        </div>
                                     <div class="euiFlexItem euiFlexItem--flexGrowZero" ng-if="item.rationale">
                                         <div class="euiStat euiStat--leftAligned">
                                             <p class="euiTitle euiTitle--small euiStat__title ng-binding" style="font-size: 1.15rem;">Rationale</p>
@@ -242,7 +251,9 @@
                                     </div>
                                     <div class="euiFlexItem euiFlexItem--flexGrowZero" ng-if="item.directory">
                                         <div class="euiStat euiStat--leftAligned">
-                                            <p class="euiTitle euiTitle--small euiStat__title ng-binding" style="font-size: 1.15rem;">Path(s)</p>
+                                            <p class="euiTitle euiTitle--small euiStat__title ng-binding" style="font-size: 1.15rem;">
+                                                {{item.directory.includes(',') ? 'Paths' : 'Path'}}
+                                            </p>
                                             <div class="euiText euiText--small euiStat__description wz-text-gray">
                                                 <p>{{item.directory}}</p>
                                             </div>
@@ -253,7 +264,8 @@
                                         ng-if="item.rules && item.rules.length">
                                         <div class="euiStat euiStat--leftAligned">
                                             <p class="euiTitle euiTitle--small euiStat__title ng-binding"
-                                                style="font-size: 1.15rem;">Rule(s)</p>
+                                                style="font-size: 1.15rem;">{{item.rules.length > 1 ? 'Checks' : 'Check'}}
+                                            </p>
                                             <div class="euiText euiText--small euiStat__description wz-text-gray">
                                                 <div layout="row" ng-repeat="rule in item.rules">
                                                     {{rule.rule}}
