@@ -932,6 +932,7 @@ export class WazuhApiCtrl {
         params,
         cred
       );
+
       if ((((output || {}).body || {}).data || {}).totalItems) {
         params.offset = 0;
         const { totalItems } = output.body.data;
@@ -949,7 +950,10 @@ export class WazuhApiCtrl {
       }
 
       if ((((output || {}).body || {}).data || {}).totalItems) {
-        const fields = req.payload.path.includes('/agents')
+        const isList = req.payload.path.includes('/lists');
+        const isAgents = req.payload.path.includes('/agents');
+
+        const fields = isAgents
           ? [
               'id',
               'status',
@@ -971,10 +975,19 @@ export class WazuhApiCtrl {
               'os.uname',
               'os.version'
             ]
+          : isList
+          ? ['key', 'value']
           : Object.keys(output.body.data.items[0]);
 
         const json2csvParser = new Parser({ fields });
-        let csv = json2csvParser.parse(itemsArray);
+        if (isList) {
+          itemsArray[0].map(item => {
+            if (!item.value || !item.value.length) item.value = '-';
+            return item;
+          });
+        }
+        
+        let csv = json2csvParser.parse(isList ? itemsArray[0] : itemsArray);
 
         for (const field of fields) {
           if (csv.includes(field)) {

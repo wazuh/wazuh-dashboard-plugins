@@ -99,5 +99,6 @@ export const KeyEquivalenece = {
   directory: 'Path(s)',
   rationale: 'Rationale',
   registry: 'Registry',
-  date: 'Date'
+  date: 'Date',
+  value: 'Value'
 };
