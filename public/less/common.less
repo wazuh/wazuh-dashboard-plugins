@@ -187,6 +187,10 @@
   margin-top: 8px;
 }
 
+.status.round.little.gray {
+  background-color: #5c6773;
+}
+
 /* Custom Manager/Ruleset styles */
 
 .manager-ruleset-decoders-top-24 {
@@ -909,6 +913,21 @@ wz-xml-file-editor {
   overflow: hidden !important;
 }
 
+.wz-md-card:not(.fullscreen) .sca-vis.sca-gauges .visualization {
+  padding: 0;
+  height: 100%;
+  overflow: hidden !important;
+}
+
+.wz-md-card:not(.fullscreen) .sca-vis.sca-gauges .visLib {
+  overflow: hidden;
+}
+
+.wz-md-card:not(.fullscreen) .sca-vis.sca-gauges .visLib__chart {
+  height: 130%;
+  overflow: hidden;
+}
+
 .sca-vis .visWrapper .chart-label {
   display: block !important;
 }
@@ -922,8 +941,12 @@ wz-xml-file-editor {
   display: none !important;
 }
 
-.sca-vis .visLegend__list {
+.sca-vis:not(.sca-bars) .visLegend__list {
   width: 275px !important;
+}
+
+.sca-vis.sca-bars .visLegend__list {
+  width: 100px !important;
 }
 
 .tvbLegend {

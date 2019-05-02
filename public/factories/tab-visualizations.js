@@ -46,7 +46,7 @@ export class TabVisualizations {
       aws: 8,
       virustotal: 7,
       osquery: 5,
-      sca: 4,
+      sca: 8,
       docker: 5
     };
 

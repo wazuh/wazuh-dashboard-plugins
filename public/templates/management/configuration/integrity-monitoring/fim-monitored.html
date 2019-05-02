@@ -111,6 +111,10 @@
                         label="Recursion level"
                         value="currentConfig['syscheck-syscheck'].syscheck.directories[selectedItem].recursion_level">
                     </wz-config-item>
+                    <wz-config-item
+                        label="Follow symbolic link"
+                        value="currentConfig['syscheck-syscheck'].syscheck.directories[selectedItem].opts.includes('follow_symbolic_link') ? 'yes' : 'no'">
+                    </wz-config-item>
                 </div>
 
             </div>
