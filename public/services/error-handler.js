@@ -11,11 +11,26 @@
  */
 import { toastNotifications } from 'ui/notify';
 
+/**
+ * Override default behavior for notifications.
+ * The purpose is to increase default lifetime for error/warning toasters
+ */
+import { GlobalToastList } from '../../../../src/core/public/notifications/toasts/global_toast_list';
+import { ToastsService } from '../../../../src/core/public/notifications/toasts/toasts_service';
+import { ToastsServicew } from './notifications/toasts_service';
+import { GlobalToastListw } from './notifications/global_toast_list';
+ToastsService.prototype.start = ToastsServicew.prototype.start;
+GlobalToastList.prototype.render = GlobalToastListw.prototype.render;
+
 export class ErrorHandler {
   /**
    * Constructor
    */
-  constructor() {}
+  constructor(wzMisc, $rootScope, checkDaemonsStatus) {
+    this.wzMisc = wzMisc;
+    this.$rootScope = $rootScope;
+    this.checkDaemonsStatus = checkDaemonsStatus;
+  }
 
   /**
    * Extracts error message string from any kind of error.
@@ -23,7 +38,11 @@ export class ErrorHandler {
    */
   extractMessage(error) {
     if ((error || {}).status === -1) {
-      const isFromAPI = ((error || {}).config || {}).url === '/api/request';
+      const origin = ((error || {}).config || {}).url || '';
+      const isFromAPI =
+        origin.includes('/api/request') ||
+        origin.includes('/api/csv') ||
+        origin.includes('/api/agents-unique');
       return isFromAPI
         ? "Wazuh API don't reachable. Reason: timeout."
         : 'Server did not respond';
@@ -69,8 +88,19 @@ export class ErrorHandler {
    */
   handle(error, location, isWarning, silent) {
     const message = this.extractMessage(error);
+    if (typeof message === 'string' && message.includes('ERROR3099')) {
+      this.$rootScope.wazuhNotReadyYet = 'Wazuh not ready yet.';
+      this.$rootScope.$applyAsync();
+      this.checkDaemonsStatus.makePing();
+      return;
+    }
+    const origin = ((error || {}).config || {}).url || '';
 
-    let text = message;
+    if (this.wzMisc.getBlankScr()) silent = true;
+    let text =
+      typeof message === 'string' && typeof origin === 'string' && origin.length
+        ? `${message} (${origin})`
+        : message;
     if (error.extraMessage) text = error.extraMessage;
     text = location ? location + '. ' + text : text;
     if (!silent) {

@@ -57,5 +57,9 @@ export const TabNames = {
   'aws-s3': 'Amazon S3',
   command: 'Wazuh commands',
   client: 'Client configuration',
-  'client-buffer': 'Anti-flooding settings'
+  edition: 'Edit node configuration',
+  'client-buffer': 'Anti-flooding settings',
+  sca: 'SCA',
+  'docker-listener': 'Docker listener',
+  docker: 'Docker listener'
 };

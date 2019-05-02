@@ -11,11 +11,11 @@
  */
 export default [
   {
-    _id: 'Wazuh-App-Agents-GDPR-Requirements',
+    _id: 'Wazuh-App-Agents-GDPR-Groups',
     _source: {
-      title: 'Requirements',
+      title: 'Top 5 rule groups',
       visState:
-        '{"title":"Requirements","type":"histogram","params":{"type":"histogram","grid":{"categoryLines":false,"style":{"color":"#eee"}},"categoryAxes":[{"id":"CategoryAxis-1","type":"category","position":"bottom","show":true,"style":{},"scale":{"type":"linear"},"labels":{"show":true,"truncate":100,"rotate":0},"title":{}}],"valueAxes":[{"id":"ValueAxis-1","name":"LeftAxis-1","type":"value","position":"left","show":true,"style":{},"scale":{"type":"linear","mode":"normal"},"labels":{"show":true,"rotate":0,"filter":false,"truncate":100},"title":{"text":"Count"}}],"seriesParams":[{"show":"true","type":"histogram","mode":"stacked","data":{"label":"Count","id":"1"},"valueAxis":"ValueAxis-1","drawLinesBetweenPoints":true,"showCircles":true}],"addTooltip":true,"addLegend":true,"legendPosition":"right","times":[],"addTimeMarker":false},"aggs":[{"id":"1","enabled":true,"type":"count","schema":"metric","params":{}},{"id":"3","enabled":true,"type":"terms","schema":"group","params":{"field":"rule.gdpr","size":5,"order":"desc","orderBy":"1","customLabel":""}},{"id":"2","enabled":true,"type":"terms","schema":"segment","params":{"field":"rule.gdpr","size":10,"order":"desc","orderBy":"1","customLabel":"GDPR Requirements"}}]}',
+        '{"title":"Top 5 rule groups","type":"pie","params":{"type":"pie","addTooltip":true,"addLegend":true,"legendPosition":"right","isDonut":true},"aggs":[{"id":"1","enabled":true,"type":"count","schema":"metric","params":{}},{"id":"2","enabled":true,"type":"terms","schema":"segment","params":{"field":"rule.groups","size":5,"order":"desc","orderBy":"1"}}]}',
       uiStateJSON: '{}',
       description: '',
       version: 1,
@@ -27,11 +27,59 @@ export default [
     _type: 'visualization'
   },
   {
-    _id: 'Wazuh-App-Agents-GDPR-Groups',
+    _id: 'Wazuh-App-Agents-GDPR-Rule',
     _source: {
-      title: 'Groups',
+      title: 'Top 5 rules',
       visState:
-        '{"title":"Groups","type":"pie","params":{"type":"pie","addTooltip":true,"addLegend":true,"legendPosition":"right","isDonut":true},"aggs":[{"id":"1","enabled":true,"type":"count","schema":"metric","params":{}},{"id":"2","enabled":true,"type":"terms","schema":"segment","params":{"field":"rule.groups","size":5,"order":"desc","orderBy":"1"}}]}',
+        '{"title":"Top 5 rules","type":"pie","params":{"type":"pie","addTooltip":true,"addLegend":true,"legendPosition":"right","isDonut":true},"aggs":[{"id":"1","enabled":true,"type":"count","schema":"metric","params":{}},{"id":"2","enabled":true,"type":"terms","schema":"segment","params":{"field":"rule.description","size":5,"order":"desc","orderBy":"1"}}]}',
+      uiStateJSON: '{}',
+      description: '',
+      version: 1,
+      kibanaSavedObjectMeta: {
+        searchSourceJSON:
+          '{"index":"wazuh-alerts","filter":[],"query":{"query":"","language":"lucene"}}'
+      }
+    },
+    _type: 'visualization'
+  },
+  {
+    _id: 'Wazuh-App-Agents-GDPR-Requirement',
+    _source: {
+      title: 'Top 5 requirements',
+      visState:
+        '{"title":"Top 5 requirements","type":"pie","params":{"type":"pie","addTooltip":true,"addLegend":true,"legendPosition":"right","isDonut":true},"aggs":[{"id":"1","enabled":true,"type":"count","schema":"metric","params":{}},{"id":"2","enabled":true,"type":"terms","schema":"segment","params":{"field":"rule.gdpr","size":5,"order":"desc","orderBy":"1"}}]}',
+      uiStateJSON: '{}',
+      description: '',
+      version: 1,
+      kibanaSavedObjectMeta: {
+        searchSourceJSON:
+          '{"index":"wazuh-alerts","filter":[],"query":{"query":"","language":"lucene"}}'
+      }
+    },
+    _type: 'visualization'
+  },
+  {
+    _id: 'Wazuh-App-Agents-GDPR-Rule-level-distribution',
+    _source: {
+      title: 'Rule level distribution',
+      visState:
+        '{"title":"Rule level distribution","type":"pie","params":{"type":"pie","addTooltip":true,"addLegend":false,"legendPosition":"right","isDonut":true,"labels":{"show":true,"values":true,"last_level":true,"truncate":100}},"aggs":[{"id":"1","enabled":true,"type":"count","schema":"metric","params":{}},{"id":"2","enabled":true,"type":"terms","schema":"segment","params":{"field":"rule.level","size":15,"order":"desc","orderBy":"1","otherBucket":false,"otherBucketLabel":"Other","missingBucket":false,"missingBucketLabel":"Missing"}}]}',
+      uiStateJSON: '{"vis":{"legendOpen":false}}',
+      description: '',
+      version: 1,
+      kibanaSavedObjectMeta: {
+        searchSourceJSON:
+          '{"index":"wazuh-alerts","filter":[],"query":{"query":"","language":"lucene"}}'
+      }
+    },
+    _type: 'visualization'
+  },
+  {
+    _id: 'Wazuh-App-Agents-GDPR-Requirements',
+    _source: {
+      title: 'Requirements',
+      visState:
+        '{"title":"Requirements","type":"histogram","params":{"type":"histogram","grid":{"categoryLines":false,"style":{"color":"#eee"}},"categoryAxes":[{"id":"CategoryAxis-1","type":"category","position":"bottom","show":true,"style":{},"scale":{"type":"linear"},"labels":{"show":true,"truncate":100,"rotate":0},"title":{}}],"valueAxes":[{"id":"ValueAxis-1","name":"LeftAxis-1","type":"value","position":"left","show":true,"style":{},"scale":{"type":"linear","mode":"normal"},"labels":{"show":true,"rotate":0,"filter":false,"truncate":100},"title":{"text":"Count"}}],"seriesParams":[{"show":"true","type":"histogram","mode":"stacked","data":{"label":"Count","id":"1"},"valueAxis":"ValueAxis-1","drawLinesBetweenPoints":true,"showCircles":true}],"addTooltip":true,"addLegend":true,"legendPosition":"right","times":[],"addTimeMarker":false},"aggs":[{"id":"1","enabled":true,"type":"count","schema":"metric","params":{}},{"id":"3","enabled":true,"type":"terms","schema":"group","params":{"field":"rule.gdpr","size":5,"order":"desc","orderBy":"1","customLabel":""}},{"id":"2","enabled":true,"type":"terms","schema":"segment","params":{"field":"rule.gdpr","size":10,"order":"desc","orderBy":"1","customLabel":"GDPR requirements"}}]}',
       uiStateJSON: '{}',
       description: '',
       version: 1,
@@ -48,7 +96,7 @@ export default [
     _source: {
       title: 'Last alerts',
       visState:
-        '{"title":"Last alerts","type":"table","params":{"perPage":10,"showPartialRows":false,"showMeticsAtAllLevels":false,"sort":{"columnIndex":2,"direction":"asc"},"showTotal":false,"totalFunc":"sum"},"aggs":[{"id":"1","enabled":true,"type":"count","schema":"metric","params":{}},{"id":"3","enabled":true,"type":"terms","schema":"bucket","params":{"field":"rule.gdpr","otherBucket":false,"otherBucketLabel":"Other","missingBucket":false,"missingBucketLabel":"Missing","size":50,"order":"desc","orderBy":"1","customLabel":"Requirement"}},{"id":"4","enabled":true,"type":"terms","schema":"bucket","params":{"field":"rule.description","otherBucket":false,"otherBucketLabel":"Other","missingBucket":false,"missingBucketLabel":"Missing","size":10,"order":"desc","orderBy":"1","customLabel":"Rule description"}}]}',
+        '{"title":"Last alerts","type":"table","params":{"perPage":10,"showPartialRows":false,"showMeticsAtAllLevels":false,"sort":{"columnIndex":2,"direction":"desc"},"showTotal":false,"totalFunc":"sum"},"aggs":[{"id":"1","enabled":true,"type":"count","schema":"metric","params":{}},{"id":"3","enabled":true,"type":"terms","schema":"bucket","params":{"field":"rule.gdpr","otherBucket":false,"otherBucketLabel":"Other","missingBucket":false,"missingBucketLabel":"Missing","size":50,"order":"desc","orderBy":"1","customLabel":"Requirement"}},{"id":"4","enabled":true,"type":"terms","schema":"bucket","params":{"field":"rule.description","otherBucket":false,"otherBucketLabel":"Other","missingBucket":false,"missingBucketLabel":"Missing","size":10,"order":"desc","orderBy":"1","customLabel":"Rule description"}}]}',
       uiStateJSON:
         '{"vis":{"params":{"sort":{"columnIndex":2,"direction":"desc"}}}}',
       description: '',

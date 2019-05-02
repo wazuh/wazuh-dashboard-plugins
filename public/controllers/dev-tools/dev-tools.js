@@ -14,7 +14,7 @@ import jsonLint from '../../utils/codemirror/json-lint';
 import { ExcludedIntelliSenseTriggerKeys } from '../../../util/excluded-devtools-autocomplete-keys';
 import queryString from 'querystring-browser';
 import $ from 'jquery';
-
+import * as FileSaver from '../../services/file-saver';
 export class DevToolsController {
   /**
    * Constructor
@@ -35,7 +35,6 @@ export class DevToolsController {
     errorHandler,
     $document
   ) {
-    this.$scope = $scope;
     this.apiReq = apiReq;
     this.genericReq = genericReq;
     this.$window = $window;
@@ -45,12 +44,32 @@ export class DevToolsController {
     this.groups = [];
     this.linesWithClass = [];
     this.widgets = [];
+    this.multipleKeyPressed = [];
   }
 
   /**
    * When controller loads
    */
   $onInit() {
+    $(this.$document[0]).keydown(e => {
+      if (!this.multipleKeyPressed.includes(e.which)) {
+        this.multipleKeyPressed.push(e.which);
+      }
+      if (
+        this.multipleKeyPressed.includes(13) &&
+        this.multipleKeyPressed.includes(16) &&
+        this.multipleKeyPressed.length === 2
+      ) {
+        e.preventDefault();
+        return this.send();
+      }
+    });
+
+    // eslint-disable-next-line
+    $(this.$document[0]).keyup(e => {
+      this.multipleKeyPressed = [];
+    });
+
     this.apiInputBox = CodeMirror.fromTextArea(
       this.$document[0].getElementById('api_input'),
       {
@@ -106,16 +125,17 @@ export class DevToolsController {
       }
     );
 
-    this.$scope.send = firstTime => this.send(firstTime);
-
-    this.$scope.help = () => {
-      this.$window.open(
-        'https://documentation.wazuh.com/current/user-manual/api/reference.html'
-      );
-    };
-
     this.init();
-    this.$scope.send(true);
+    this.send(true);
+  }
+
+  /**
+   * Open API reference documentation
+   */
+  help() {
+    this.$window.open(
+      'https://documentation.wazuh.com/current/user-manual/api/reference.html'
+    );
   }
 
   /**
@@ -133,7 +153,7 @@ export class DevToolsController {
 
       let start = 0;
       let end = 0;
-
+      let starts = [];
       const slen = splitted.length;
       for (let i = 0; i < slen; i++) {
         let tmp = splitted[i].split('\n');
@@ -144,6 +164,26 @@ export class DevToolsController {
 
         if (cursor.findNext()) start = cursor.from().line;
         else return [];
+
+        /**
+         * Prevents from user frustation when there are duplicated queries.
+         * We want to look for the next query when available, even if it
+         * already exists but it's not the selected query.
+         */
+        if (tmp.length) {
+          // It's a safe loop since findNext method returns null if there is no next query.
+          while (
+            this.apiInputBox.getLine(cursor.from().line) !== tmp[0] &&
+            cursor.findNext()
+          ) {
+            start = cursor.from().line;
+          }
+          // It's a safe loop since findNext method returns null if there is no next query.
+          while (starts.includes(start) && cursor.findNext()) {
+            start = cursor.from().line;
+          }
+        }
+        starts.push(start);
 
         end = start + tmp.length;
 
@@ -183,7 +223,7 @@ export class DevToolsController {
           end
         });
       }
-
+      starts = [];
       return tmpgroups;
     } catch (error) {
       return [];
@@ -204,7 +244,10 @@ export class DevToolsController {
     }
     this.linesWithClass = [];
     if (group) {
-      if (!group.requestTextJson) {
+      if (
+        !group.requestTextJson ||
+        (group.requestText.includes('{') && group.requestText.includes('}'))
+      ) {
         this.linesWithClass.push(
           this.apiInputBox.addLineClass(
             group.start,
@@ -380,6 +423,7 @@ export class DevToolsController {
     const evtDocument = this.$document[0];
     $('.wz-dev-column-separator').mousedown(function(e) {
       e.preventDefault();
+      $('.wz-dev-column-separator').addClass('active');
       const leftOrigWidth = $('#wz-dev-left-column').width();
       const rightOrigWidth = $('#wz-dev-right-column').width();
       $(evtDocument).mousemove(function(e) {
@@ -391,6 +435,7 @@ export class DevToolsController {
     });
 
     $(evtDocument).mouseup(function() {
+      $('.wz-dev-column-separator').removeClass('active');
       $(evtDocument).unbind('mousemove');
     });
 
@@ -413,7 +458,6 @@ export class DevToolsController {
   calculateWhichGroup(firstTime) {
     try {
       const selection = this.apiInputBox.getCursor();
-
       const desiredGroup = firstTime
         ? this.groups.filter(item => item.requestText)
         : this.groups.filter(
@@ -483,11 +527,16 @@ export class DevToolsController {
           ? 'DELETE'
           : 'GET';
 
-        const requestCopy = desiredGroup.requestText.includes(method)
+        let requestCopy = desiredGroup.requestText.includes(method)
           ? desiredGroup.requestText.split(method)[1].trim()
           : desiredGroup.requestText;
 
         // Checks for inline parameters
+        let paramsInline = false;
+        if (requestCopy.includes('{') && requestCopy.includes('}')) {
+          paramsInline = `{${requestCopy.split('{')[1]}`;
+          requestCopy = requestCopy.split('{')[0];
+        }
         const inlineSplit = requestCopy.split('?');
 
         const extra =
@@ -503,7 +552,7 @@ export class DevToolsController {
 
         let JSONraw = {};
         try {
-          JSONraw = JSON.parse(desiredGroup.requestTextJson);
+          JSONraw = JSON.parse(paramsInline || desiredGroup.requestTextJson);
         } catch (error) {
           JSONraw = {};
         }
@@ -517,23 +566,45 @@ export class DevToolsController {
         const path = req.includes('?') ? req.split('?')[0] : req;
 
         if (typeof JSONraw === 'object') JSONraw.devTools = true;
-        const output = await this.apiReq.request(method, path, JSONraw);
+        if (!firstTime) {
+          const output = await this.apiReq.request(method, path, JSONraw);
+          this.apiOutputBox.setValue(
+            JSON.stringify((output || {}).data || {}, null, 2).replace(
+              /\\\\/g,
+              '\\'
+            )
+          );
+        }
+      }
 
-        this.apiOutputBox.setValue(
-          JSON.stringify((output || {}).data, null, 2)
+      (firstTime || !desiredGroup) && this.apiOutputBox.setValue('Welcome!');
+    } catch (error) {
+      if ((error || {}).status === -1) {
+        return this.apiOutputBox.setValue(
+          "Wazuh API don't reachable. Reason: timeout."
         );
       } else {
-        this.apiOutputBox.setValue('Welcome!');
+        const parsedError = this.errorHandler.handle(error, null, null, true);
+        if (typeof parsedError === 'string') {
+          return this.apiOutputBox.setValue(error);
+        } else if (error && error.data && typeof error.data === 'object') {
+          return this.apiOutputBox.setValue(JSON.stringify(error));
+        } else {
+          return this.apiOutputBox.setValue('Empty');
+        }
       }
+    }
+  }
+
+  exportOutput() {
+    try {
+      // eslint-disable-next-line
+      const blob = new Blob([this.apiOutputBox.getValue()], {
+        type: 'application/json'
+      });
+      FileSaver.saveAs(blob, 'export.json');
     } catch (error) {
-      const parsedError = this.errorHandler.handle(error, null, null, true);
-      if (typeof parsedError === 'string') {
-        return this.apiOutputBox.setValue(error);
-      } else if (error && error.data && typeof error.data === 'object') {
-        return this.apiOutputBox.setValue(JSON.stringify(error));
-      } else {
-        return this.apiOutputBox.setValue('Empty');
-      }
+      this.errorHandler.handle(error, 'Export JSON');
     }
   }
 }

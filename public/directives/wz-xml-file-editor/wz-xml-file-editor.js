@@ -23,9 +23,24 @@ app.directive('wzXmlFileEditor', function() {
       fileName: '@fileName',
       validFn: '&',
       data: '=data',
-      targetName: '=targetName'
+      targetName: '=targetName',
+      closeFn: '&',
+      savingParam: '&'
     },
-    controller($scope, $document, errorHandler, groupHandler) {
+    controller(
+      $scope,
+      $document,
+      $location,
+      appState,
+      errorHandler,
+      groupHandler,
+      rulesetHandler,
+      configHandler,
+      apiReq,
+      $rootScope
+    ) {
+      $scope.targetNameShown = $scope.targetName;
+      $scope.configError = false;
       /**
        * Custom .replace method. Instead of using .replace which
        * evaluates regular expressions.
@@ -67,25 +82,29 @@ app.directive('wzXmlFileEditor', function() {
         checkingXmlError = true;
         try {
           const text = $scope.xmlCodeBox.getValue();
-
-          const xml = replaceIllegalXML(text);
-
+          let xml = replaceIllegalXML(text);
+          xml = xml.replace(/..xml.+\?>/, '');
           const xmlDoc = parser.parseFromString(
-            '<file>' + xml + '</file>',
+            `<file>${xml}</file>`,
             'text/xml'
           );
-
+          const parsererror = xmlDoc.getElementsByTagName('parsererror');
           $scope.validFn({
-            valid:
-              !!xmlDoc.getElementsByTagName('parsererror').length ||
-              !xml ||
-              !xml.length
+            valid: !!parsererror.length || !xml || !xml.length
           });
+          if (parsererror.length) {
+            const xmlFullError = parsererror[0].textContent;
+            $scope.xmlError =
+              (xmlFullError.match('error\\s.+\n') || [])[0] ||
+              'Error validating XML';
+          } else {
+            $scope.xmlError = false;
+          }
         } catch (error) {
           errorHandler.handle(error, 'Error validating XML');
         }
         checkingXmlError = false;
-        if (!$scope.$$phase) $scope.$digest();
+        $scope.$applyAsync();
         return;
       };
 
@@ -152,15 +171,159 @@ app.directive('wzXmlFileEditor', function() {
         return formatted.trim();
       };
 
+      const validateAfterSent = async (node = false, isConfig = false) => {
+        $scope.configError = false;
+        try {
+          const clusterStatus = await apiReq.request(
+            'GET',
+            `/cluster/status`,
+            {}
+          );
+
+          const clusterData = ((clusterStatus || {}).data || {}).data || {};
+          const isCluster =
+            clusterData.enabled === 'yes' && clusterData.running === 'yes';
+
+          let validation = false;
+          if (node && isCluster) {
+            validation = await apiReq.request(
+              'GET',
+              `/cluster/${node}/configuration/validation`,
+              {}
+            );
+          } else {
+            validation = isCluster
+              ? await apiReq.request(
+                  'GET',
+                  `/cluster/configuration/validation`,
+                  {}
+                )
+              : await apiReq.request(
+                  'GET',
+                  `/manager/configuration/validation`,
+                  {}
+                );
+          }
+          const data = ((validation || {}).data || {}).data || {};
+          const isOk = data.status === 'OK';
+          if (
+            !isOk &&
+            Array.isArray(data.details) &&
+            (!isConfig || (isConfig && data.details.join().includes(isConfig)))
+          ) {
+            $scope.configError = data.details;
+            $scope.$applyAsync();
+            throw new Error('Validation error');
+          }
+          return true;
+        } catch (error) {
+          return Promise.reject(error);
+        }
+      };
+
       const saveFile = async params => {
+        let close = true;
+        const warnMsg =
+          'File has been updated, but there are errors in the configuration';
         try {
           const text = $scope.xmlCodeBox.getValue();
           const xml = replaceIllegalXML(text);
-          await groupHandler.sendConfiguration(params.group, xml);
-          errorHandler.info('Success. Group has been updated', '');
-          $scope.$emit('configurationSuccess');
+          if (params.group) {
+            close = false;
+            await groupHandler.sendConfiguration(params.group, xml);
+            try {
+              await validateAfterSent(false, 'groups');
+            } catch (err) {
+              params.showRestartManager = 'warn';
+            }
+            const msg = 'Success. Group has been updated';
+            params.showRestartManager
+              ? params.showRestartManager !== 'warn'
+                ? showRestartMessage(msg, params.showRestartManager)
+                : errorHandler.handle(warnMsg, '', true)
+              : errorHandler.info(msg);
+          } else if (params.rule) {
+            close = false;
+            await rulesetHandler.sendRuleConfiguration(
+              params.rule,
+              xml,
+              params.isNewFile && !params.isOverwrite
+            );
+            try {
+              await validateAfterSent(
+                false,
+                `${params.rule.path}/${params.rule.file}`
+              );
+            } catch (err) {
+              params.showRestartManager = 'warn';
+            }
+            const msg = 'Success. Rules updated';
+            params.showRestartManager
+              ? params.showRestartManager !== 'warn'
+                ? showRestartMessage(msg, params.showRestartManager)
+                : errorHandler.handle(warnMsg, '', true)
+              : errorHandler.info(msg);
+          } else if (params.decoder) {
+            close = false;
+            await rulesetHandler.sendDecoderConfiguration(
+              params.decoder,
+              xml,
+              params.isNewFile && !params.isOverwrite
+            );
+            try {
+              await validateAfterSent(
+                false,
+                `${params.decoder.path}/${params.decoder.file}`
+              );
+            } catch (err) {
+              params.showRestartManager = 'warn';
+            }
+            const msg = 'Success. Decoders has been updated';
+            params.showRestartManager
+              ? params.showRestartManager !== 'warn'
+                ? showRestartMessage(msg, params.showRestartManager)
+                : errorHandler.handle(warnMsg, '', true)
+              : errorHandler.info(msg);
+          } else if (params.node) {
+            close = false;
+            await configHandler.saveNodeConfiguration(params.node, xml);
+            try {
+              await validateAfterSent(params.node, 'etc/ossec.conf');
+            } catch (err) {
+              params.showRestartManager = 'warn';
+            }
+            const msg = `Success. Node (${
+              params.node
+            }) configuration has been updated`;
+            params.showRestartManager
+              ? params.showRestartManager !== 'warn'
+                ? showRestartMessage(msg, params.node)
+                : errorHandler.handle(warnMsg, '', true)
+              : errorHandler.info(msg);
+          } else if (params.manager) {
+            await configHandler.saveManagerConfiguration(xml);
+            try {
+              await validateAfterSent(false, 'etc/ossec.conf');
+            } catch (err) {
+              params.showRestartManager = 'warn';
+            }
+            const msg = 'Success. Manager configuration has been updated';
+            params.showRestartManager
+              ? params.showRestartManager !== 'warn'
+                ? showRestartMessage(msg, params.showRestartManager)
+                : errorHandler.handle(warnMsg, '', true)
+              : errorHandler.info(msg);
+          }
+          $scope.savingParam();
+          if (close) $scope.closeFn({ reload: true });
         } catch (error) {
-          errorHandler.handle(error, 'Send file error');
+          $scope.savingParam();
+          if ((error || '').includes('Wazuh API error: 1905')) {
+            $scope.configError = ['File name already exists'];
+            $scope.$emit('showSaveAndOverwrite', {});
+          } else {
+            errorHandler.handle(error, 'Error');
+          }
         }
         return;
       };
@@ -169,6 +332,7 @@ app.directive('wzXmlFileEditor', function() {
         $document[0].getElementById('xml_box'),
         {
           lineNumbers: true,
+          lineWrapping: true,
           matchClosing: true,
           matchBrackets: true,
           mode: 'text/xml',
@@ -181,10 +345,12 @@ app.directive('wzXmlFileEditor', function() {
 
       const init = (data = false) => {
         try {
+          $scope.xmlError = false;
           $scope.xmlCodeBox.setValue(autoFormat(data || $scope.data));
           firstTime = false;
-          $scope.xmlCodeBox.refresh();
-          //autoFormat();
+          setTimeout(() => {
+            $scope.xmlCodeBox.refresh();
+          }, 1);
         } catch (error) {
           errorHandler.handle(error, 'Fetching original file');
         }
@@ -203,7 +369,34 @@ app.directive('wzXmlFileEditor', function() {
         checkXmlParseError();
       });
 
+      $scope.doRestart = () => {
+        $scope.restartBtn = false;
+        $scope.$emit('performRestart', {});
+      };
+
+      const showRestartMessage = async (msg, target) => {
+        errorHandler.info(msg);
+        $scope.restartBtn = true;
+        $scope.$applyAsync();
+        $scope.$emit('showRestartBtn', { msg, target });
+      };
+
       $scope.$on('saveXmlFile', (ev, params) => saveFile(params));
+
+      $scope.$on('removeRestartMsg', () => {
+        $scope.restartBtn = false;
+        $scope.$applyAsync();
+      });
+
+      $rootScope.$on('changedInputFileName', (ev, params) => {
+        $scope.targetNameShown = params.name;
+        $scope.$applyAsync();
+      });
+
+      $scope.$on('$destroy', function() {
+        $location.search('editingFile', null);
+        appState.setNavigation({ status: true });
+      });
     },
     template
   };

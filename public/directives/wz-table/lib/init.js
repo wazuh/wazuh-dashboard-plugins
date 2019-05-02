@@ -15,22 +15,25 @@ export async function initTable(
   fetch,
   wzTableFilter,
   instance,
-  errorHandler
+  errorHandler,
+  skipFetching = false
 ) {
   try {
     $scope.error = false;
     $scope.wazuh_table_loading = true;
-    await fetch();
+    await fetch({ skipFetching });
     wzTableFilter.set(instance.filters);
     $scope.wazuh_table_loading = false;
   } catch (error) {
     $scope.wazuh_table_loading = false;
-    $scope.error = `Error while init table - ${error.message || error}.`;
-    errorHandler.handle(
-      `Error while init table. ${error.message || error}`,
-      'Data factory'
+    $scope.error = errorHandler.handle(
+      error.message || error,
+      false,
+      false,
+      true
     );
+    errorHandler.handle(error.message || error);
   }
-  if (!$scope.$$phase) $scope.$digest();
+  $scope.$applyAsync();
   return;
 }

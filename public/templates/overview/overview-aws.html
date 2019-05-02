@@ -1,71 +1,121 @@
-<md-content flex layout="column" ng-if="octrl.tab === 'aws' && octrl.tabView === 'panels'" layout-align="start" ng-show="resultState === 'ready' && octrl.tabView === 'panels' && !rendered">
-    <div layout="column" layout-align="center center" ng-if="octrl.tab === 'aws'" class="wz-margin-top-10">
-        <div class="percentage"><i class="fa fa-fw fa-spin fa-spinner" aria-hidden="true"></i></div>
-        <div class="percentage">{{loadingStatus}}</div>
-    </div>
-</md-content>
-
-<md-content flex layout="column" ng-if="octrl.tab === 'aws' && octrl.tabView === 'panels'" ng-class="{'no-opacity': resultState !== 'ready' || !rendered}"
-    layout-align="start">
+<md-content flex layout="column" ng-if="octrl.tab === 'aws' && octrl.tabView === 'panels'"
+    ng-class="{'no-opacity': resultState !== 'ready' || !rendered}" layout-align="start">
     <div layout="row" class="height-250">
-        <md-card flex class="wz-md-card">
+        <md-card flex class="wz-md-card" ng-class="{'fullscreen': octrl.expandArray[0]}">
             <md-card-content class="wazuh-column">
-                <span class="wz-headline-title">Sources</span>
+                <div layout="row" ng-dblclick="octrl.expand(0)">
+                    <span class="wz-headline-title">Sources</span>
+                    <span flex></span>
+                    <span class="cursor-pointer" ng-click="octrl.expand(0)">
+                        <react-component name="EuiIcon" props="{type:'expand'}" />
+                    </span>
+                </div>
                 <md-divider class="wz-margin-top-10"></md-divider>
-                <kbn-vis id="Wazuh-App-Overview-AWS-Top-sources" vis-id="'Wazuh-App-Overview-AWS-Top-sources'"></kbn-vis>
+                <kbn-vis id="Wazuh-App-Overview-AWS-Top-sources" vis-id="'Wazuh-App-Overview-AWS-Top-sources'">
+                </kbn-vis>
             </md-card-content>
         </md-card>
-        <md-card flex class="wz-md-card">
+        <md-card flex class="wz-md-card" ng-class="{'fullscreen': octrl.expandArray[1]}">
             <md-card-content class="wazuh-column">
-                <span class="wz-headline-title">Accounts</span>
+                <div layout="row" ng-dblclick="octrl.expand(1)">
+                    <span class="wz-headline-title">Accounts</span>
+                    <span flex></span>
+                    <span class="cursor-pointer" ng-click="octrl.expand(1)">
+                        <react-component name="EuiIcon" props="{type:'expand'}" />
+                    </span>
+                </div>
                 <md-divider class="wz-margin-top-10"></md-divider>
-                <kbn-vis id="Wazuh-App-Overview-AWS-Top-accounts" vis-id="'Wazuh-App-Overview-AWS-Top-accounts'"></kbn-vis>
+                <kbn-vis id="Wazuh-App-Overview-AWS-Top-accounts" vis-id="'Wazuh-App-Overview-AWS-Top-accounts'">
+                </kbn-vis>
             </md-card-content>
         </md-card>
-        <md-card flex class="wz-md-card">
+        <md-card flex class="wz-md-card" ng-class="{'fullscreen': octrl.expandArray[2]}">
             <md-card-content class="wazuh-column">
-                <span class="wz-headline-title">S3 buckets</span>
+                <div layout="row" ng-dblclick="octrl.expand(2)">
+                    <span class="wz-headline-title">S3 buckets</span>
+                    <span flex></span>
+                    <span class="cursor-pointer" ng-click="octrl.expand(2)">
+                        <react-component name="EuiIcon" props="{type:'expand'}" />
+                    </span>
+                </div>
                 <md-divider class="wz-margin-top-10"></md-divider>
-                <kbn-vis id="Wazuh-App-Overview-AWS-Top-buckets" vis-id="'Wazuh-App-Overview-AWS-Top-buckets'"></kbn-vis>
+                <kbn-vis id="Wazuh-App-Overview-AWS-Top-buckets" vis-id="'Wazuh-App-Overview-AWS-Top-buckets'">
+                </kbn-vis>
             </md-card-content>
         </md-card>
-        <md-card flex class="wz-md-card">
+        <md-card flex class="wz-md-card" ng-class="{'fullscreen': octrl.expandArray[3]}">
             <md-card-content class="wazuh-column">
-                <span class="wz-headline-title">Regions</span>
+                <div layout="row" ng-dblclick="octrl.expand(3)">
+                    <span class="wz-headline-title">Regions</span>
+                    <span flex></span>
+                    <span class="cursor-pointer" ng-click="octrl.expand(3)">
+                        <react-component name="EuiIcon" props="{type:'expand'}" />
+                    </span>
+                </div>
                 <md-divider class="wz-margin-top-10"></md-divider>
-                <kbn-vis id="Wazuh-App-Overview-AWS-Top-regions" vis-id="'Wazuh-App-Overview-AWS-Top-regions'"></kbn-vis>
+                <kbn-vis id="Wazuh-App-Overview-AWS-Top-regions" vis-id="'Wazuh-App-Overview-AWS-Top-regions'">
+                </kbn-vis>
             </md-card-content>
         </md-card>
     </div>
 
     <div layout="row" class="height-300">
-        <md-card flex="50" class="wz-md-card">
+        <md-card flex="50" class="wz-md-card" ng-class="{'fullscreen': octrl.expandArray[4]}">
             <md-card-content class="wazuh-column">
-                <span class="wz-headline-title">Events by source over time</span>
+                <div layout="row" ng-dblclick="octrl.expand(4)">
+                    <span class="wz-headline-title">Events by source over time</span>
+                    <span flex></span>
+                    <span class="cursor-pointer" ng-click="octrl.expand(4)">
+                        <react-component name="EuiIcon" props="{type:'expand'}" />
+                    </span>
+                </div>
                 <md-divider class="wz-margin-top-10"></md-divider>
-                <kbn-vis id="Wazuh-App-Overview-AWS-Events-by-source" vis-id="'Wazuh-App-Overview-AWS-Events-by-source'"></kbn-vis>
+                <kbn-vis id="Wazuh-App-Overview-AWS-Events-by-source"
+                    vis-id="'Wazuh-App-Overview-AWS-Events-by-source'"></kbn-vis>
             </md-card-content>
         </md-card>
-        <md-card flex="50" class="wz-md-card">
+        <md-card flex="50" class="wz-md-card" ng-class="{'fullscreen': octrl.expandArray[5]}">
             <md-card-content class="wazuh-column">
-                <span class="wz-headline-title">Events by S3 bucket over time</span>
+                <div layout="row" ng-dblclick="octrl.expand(5)">
+                    <span class="wz-headline-title">Events by S3 bucket over time</span>
+                    <span flex></span>
+                    <span class="cursor-pointer" ng-click="octrl.expand(5)">
+                        <react-component name="EuiIcon" props="{type:'expand'}" />
+                    </span>
+                </div>
                 <md-divider class="wz-margin-top-10"></md-divider>
-                <kbn-vis id=" Wazuh-App-Overview-AWS-Events-by-s3-bucket" vis-id="'Wazuh-App-Overview-AWS-Events-by-s3-bucket'"></kbn-vis>
+                <kbn-vis id=" Wazuh-App-Overview-AWS-Events-by-s3-bucket"
+                    vis-id="'Wazuh-App-Overview-AWS-Events-by-s3-bucket'"></kbn-vis>
             </md-card-content>
         </md-card>
     </div>
 
-    <div layout="row" class="height-310">
-        <md-card flex="40" class="wz-md-card">
+    <div layout="row" class="height-570">
+        <md-card flex class="wz-md-card" ng-class="{'fullscreen': octrl.expandArray[6]}">
             <md-card-content class="wazuh-column">
-                <span class="wz-headline-title">Top 5 buckets</span>
+                <div layout="row" ng-dblclick="octrl.expand(6)">
+                    <span class="wz-headline-title">Geolocation map</span>
+                    <span flex></span>
+                    <span class="cursor-pointer" ng-click="octrl.expand(6)">
+                        <react-component name="EuiIcon" props="{type:'expand'}" />
+                    </span>
+                </div>
                 <md-divider class="wz-margin-top-10"></md-divider>
-                <kbn-vis vis-id="'Wazuh-App-Overview-AWS-Top-5-buckets'"></kbn-vis>
+                <kbn-vis vis-id="'Wazuh-App-Overview-AWS-geo'" id="Wazuh-App-Overview-AWS-geo"></kbn-vis>
             </md-card-content>
         </md-card>
-        <md-card flex class="wz-md-card">
+    </div>
+
+    <div layout="row" class="height-570">
+        <md-card flex class="wz-md-card" ng-class="{'fullscreen': octrl.expandArray[7]}">
             <md-card-content class="wazuh-column">
-                <span class="wz-headline-title">Top 5 rules</span>
+                <div layout="row" ng-dblclick="octrl.expand(7)">
+                    <span class="wz-headline-title">Top rules</span>
+                    <span flex></span>
+                    <span class="cursor-pointer" ng-click="octrl.expand(7)">
+                        <react-component name="EuiIcon" props="{type:'expand'}" />
+                    </span>
+                </div>
                 <md-divider class="wz-margin-top-10"></md-divider>
                 <kbn-vis vis-id="'Wazuh-App-Overview-AWS-Top-5-rules'"></kbn-vis>
             </md-card-content>

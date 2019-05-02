@@ -23,13 +23,29 @@ export class DecodersController {
    * @param {*} csvReq
    * @param {*} wzTableFilter
    */
-  constructor($scope, $sce, errorHandler, appState, csvReq, wzTableFilter) {
+  constructor(
+    $scope,
+    $sce,
+    $location,
+    errorHandler,
+    appState,
+    apiReq,
+    csvReq,
+    wzTableFilter,
+    wazuhConfig,
+    rulesetHandler
+  ) {
     this.$scope = $scope;
     this.$sce = $sce;
     this.errorHandler = errorHandler;
+    this.$location = $location;
     this.appState = appState;
+    this.apiReq = apiReq;
     this.csvReq = csvReq;
     this.wzTableFilter = wzTableFilter;
+    this.wazuhConfig = wazuhConfig;
+    this.rulesetHandler = rulesetHandler;
+    this.showingLocalDecoders = false;
   }
 
   /**
@@ -43,17 +59,38 @@ export class DecodersController {
     this.viewingDetail = false;
     this.typeFilter = 'all';
     this.isArray = Array.isArray;
+    this.overwriteError = false;
+
+    const configuration = this.wazuhConfig.getConfig();
+    this.$scope.adminMode = !!(configuration || {}).admin;
 
     // Reloading event listener
     this.$scope.$on('rulesetIsReloaded', () => {
       this.viewingDetail = false;
-      if (!this.$scope.$$phase) this.$scope.$digest();
+      this.$scope.$applyAsync();
+    });
+
+    this.$scope.$on('closeDecoderView', () => {
+      this.closeDetailView();
     });
 
     this.$scope.$on('wazuhShowDecoder', (event, parameters) => {
       this.currentDecoder = parameters.decoder;
+      this.$scope.$emit('setCurrentDecoder', {
+        currentDecoder: this.currentDecoder
+      });
       this.viewingDetail = true;
-      if (!this.$scope.$$phase) this.$scope.$digest();
+      this.$scope.$applyAsync();
+    });
+
+    this.$scope.$on('showSaveAndOverwrite', () => {
+      this.overwriteError = true;
+      this.$scope.$applyAsync();
+    });
+
+    this.$scope.$on('showRestart', () => {
+      this.$scope.restartBtn = true;
+      this.$scope.$applyAsync();
     });
   }
 
@@ -121,6 +158,13 @@ export class DecodersController {
     return this.$sce.trustAsHtml(coloredString);
   }
 
+  switchLocalDecoders() {
+    this.removeFilter('path');
+    if (!this.showingLocalDecoders) {
+      this.appliedFilters.push({ name: 'path', value: 'etc/decoders' });
+    }
+  }
+
   /**
    * This perfoms a search by a given term
    * @param {String} term
@@ -128,12 +172,14 @@ export class DecodersController {
   search(term) {
     if (term && term.startsWith('path:') && term.split('path:')[1].trim()) {
       this.custom_search = '';
-      const filter = { name: 'path', value: term.split('path:')[1].trim() };
-      this.appliedFilters = this.appliedFilters.filter(
-        item => item.name !== 'path'
-      );
-      this.appliedFilters.push(filter);
-      this.$scope.$broadcast('wazuhFilter', { filter });
+      if (!this.showingLocalDecoders) {
+        const filter = { name: 'path', value: term.split('path:')[1].trim() };
+        this.appliedFilters = this.appliedFilters.filter(
+          item => item.name !== 'path'
+        );
+        this.appliedFilters.push(filter);
+        this.$scope.$broadcast('wazuhFilter', { filter });
+      }
     } else if (
       term &&
       term.startsWith('file:') &&
@@ -189,6 +235,53 @@ export class DecodersController {
     return;
   }
 
+  async editDecodersConfig() {
+    this.editingFile = true;
+    try {
+      this.fetchedXML = await this.rulesetHandler.getDecoderConfiguration(
+        this.currentDecoder.file
+      );
+      this.$location.search('editingFile', true);
+      this.appState.setNavigation({ status: true });
+      this.$scope.$applyAsync();
+      this.$scope.$broadcast('fetchedFile', { data: this.fetchedXML });
+    } catch (error) {
+      this.fetchedXML = null;
+      this.errorHandler.handle(error, 'Fetch file error');
+    }
+  }
+
+  async closeEditingFile() {
+    if (this.currentDecoder) {
+      try {
+        const decoderReload = await this.apiReq.request(
+          'GET',
+          `/decoders/${this.currentDecoder.name}`,
+          {}
+        );
+        const response =
+          (((decoderReload || {}).data || {}).data || {}).items || [];
+        if (!response.length) {
+          this.currentDecoder = null;
+          this.closeDetailView(true);
+        } else {
+          this.currentDecoder = response[0];
+        }
+      } catch (err) {
+        this.errorHandler.handle(err, 'Decoder reload error.');
+      }
+    }
+    this.editingFile = false;
+    this.$scope.$applyAsync();
+    this.appState.setNavigation({ status: true });
+    this.$scope.$broadcast('closeEditXmlFile', {});
+  }
+
+  xmlIsValid(valid) {
+    this.xmlHasErrors = valid;
+    this.$scope.$applyAsync();
+  }
+
   /**
    * This function takes back to the list but adding a filter from the detail view
    */
@@ -211,6 +304,35 @@ export class DecodersController {
       );
     this.viewingDetail = false;
     this.currentDecoder = false;
-    if (!this.$scope.$$phase) this.$scope.$digest();
+    this.closeEditingFile();
+    this.$scope.$emit('removeCurrentDecoder');
+    this.$scope.$applyAsync();
   }
+
+  toggleSaveConfig = () => {
+    this.doingSaving = false;
+    this.$scope.$applyAsync();
+  };
+
+  cancelSaveAndOverwrite = () => {
+    this.overwriteError = false;
+    this.$scope.$applyAsync();
+  };
+
+  doSaveConfig() {
+    const clusterInfo = this.appState.getClusterInfo();
+    const showRestartManager =
+      clusterInfo.status === 'enabled' ? 'cluster' : 'manager';
+    this.doingSaving = true;
+    const objParam = {
+      decoder: this.currentDecoder,
+      showRestartManager,
+      isOverwrite: !!this.overwriteError
+    };
+    this.$scope.$broadcast('saveXmlFile', objParam);
+  }
+
+  restart = () => {
+    this.$scope.$emit('performRestart', {});
+  };
 }

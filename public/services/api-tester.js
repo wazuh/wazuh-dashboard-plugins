@@ -29,42 +29,29 @@ export class ApiTester {
   async checkStored(data) {
     try {
       const configuration = this.wazuhConfig.getConfig();
-      const timeout = configuration ? configuration.timeout : 8000;
+      const timeout = configuration ? configuration.timeout : 20000;
       const headers = {
         headers: { 'Content-Type': 'application/json' },
-        timeout: timeout || 8000
+        timeout: timeout || 20000
       };
 
-      /** Checks for outdated cookies */
-      const current = this.appState.getCreatedAt();
-      const lastRestart = this.wzMisc.getLastRestart();
+      const result = await this.$http.post(
+        chrome.addBasePath('/api/check-stored-api'),
+        data,
+        headers
+      );
 
-      if (current && lastRestart && lastRestart > current) {
-        this.appState.removeCurrentPattern();
-        this.appState.removeCurrentAPI();
-        this.appState.removeClusterInfo();
-        this.appState.removeCreatedAt();
-        this.wzMisc.setLastRestart(null);
+      this.appState.setPatternSelector(configuration['ip.selector']);
 
-        this.appState.setPatternSelector(configuration['ip.selector']);
-
-        return 'cookies_outdated';
-        /** End of checks for outdated cookies */
-      } else {
-        const result = await this.$http.post(
-          chrome.addBasePath('/api/check-stored-api'),
-          data,
-          headers
-        );
-
-        this.appState.setPatternSelector(configuration['ip.selector']);
-
-        if (result.error) {
-          return Promise.reject(result);
-        }
-        return result;
+      if (result.error) {
+        return Promise.reject(result);
       }
+      return result;
     } catch (error) {
+      if (((error || {}).data || {}).code === 3099) {
+        // Do nothing
+        return 3099;
+      }
       if (error.status && error.status === -1) {
         this.wzMisc.setApiIsDown(true);
       }
@@ -78,7 +65,7 @@ export class ApiTester {
 
       const headers = {
         headers: { 'Content-Type': 'application/json' },
-        timeout: timeout || 8000
+        timeout: timeout || 20000
       };
 
       const url = chrome.addBasePath('/api/check-api');

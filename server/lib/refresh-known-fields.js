@@ -27,22 +27,17 @@ export async function checkKnownFields(
     const usingCredentials = await wzWrapper.usingCredentials();
     const msg = `Security enabled: ${usingCredentials ? 'yes' : 'no'}`;
 
-    !quiet && log('[initialize][checkKnownFields]', msg, 'info');
-    !quiet && server.log([blueWazuh, 'initialize', 'info'], msg);
+    !quiet && log('initialize:checkKnownFields', msg, 'debug');
 
     const indexPatternList = await wzWrapper.getAllIndexPatterns();
 
     !quiet &&
       log(
-        '[initialize][checkKnownFields]',
+        'initialize:checkKnownFields',
         `Found ${indexPatternList.hits.total} index patterns`,
-        'info'
+        'debug'
       );
-    !quiet &&
-      server.log(
-        [blueWazuh, 'initialize', 'info'],
-        `Found ${indexPatternList.hits.total} index patterns`
-      );
+
     const list = [];
     if (((indexPatternList || {}).hits || {}).hits) {
       const minimum = ['@timestamp', 'full_log', 'manager.name', 'agent.id'];
@@ -68,15 +63,11 @@ export async function checkKnownFields(
     }
     !quiet &&
       log(
-        '[initialize][checkKnownFields]',
+        'initialize:checkKnownFields',
         `Found ${list.length} valid index patterns for Wazuh alerts`,
-        'info'
+        'debug'
       );
-    !quiet &&
-      server.log(
-        [blueWazuh, 'initialize', 'info'],
-        `Found ${list.length} valid index patterns for Wazuh alerts`
-      );
+
     const defaultExists = list.filter(
       item => item.title === defaultIndexPattern
     );
@@ -84,14 +75,9 @@ export async function checkKnownFields(
     if (defaultIndexPattern && defaultExists.length === 0) {
       !quiet &&
         log(
-          '[initialize][checkKnownFields]',
+          'initialize:checkKnownFields',
           `Default index pattern not found, creating it...`,
-          'info'
-        );
-      !quiet &&
-        server.log(
-          [blueWazuh, 'initialize', 'info'],
-          `Default index pattern not found, creating it...`
+          'debug'
         );
 
       try {
@@ -102,15 +88,11 @@ export async function checkKnownFields(
 
       !quiet &&
         log(
-          '[initialize][checkKnownFields]',
+          'initialize:checkKnownFields',
           'Waiting for default index pattern creation to complete...',
-          'info'
+          'debug'
         );
-      !quiet &&
-        server.log(
-          [blueWazuh, 'initialize', 'info'],
-          'Waiting for default index pattern creation to complete...'
-        );
+
       let waitTill = new Date(new Date().getTime() + 0.5 * 1000);
       let tmplist = null;
       while (waitTill > new Date()) {
@@ -118,11 +100,7 @@ export async function checkKnownFields(
         if (tmplist.hits.total >= 1) break;
         else waitTill = new Date(new Date().getTime() + 0.5 * 1000);
       }
-      !quiet &&
-        server.log(
-          [blueWazuh, 'initialize', 'info'],
-          'Index pattern created...'
-        );
+
       list.push({
         id: tmplist.hits.hits[0]._id.split('index-pattern:')[1],
         title: tmplist.hits.hits[0]._source['index-pattern'].title
@@ -130,14 +108,9 @@ export async function checkKnownFields(
     } else {
       !quiet &&
         log(
-          '[initialize][checkKnownFields]',
+          'initialize:checkKnownFields',
           `Default index pattern found`,
-          'info'
-        );
-      !quiet &&
-        server.log(
-          [blueWazuh, 'initialize', 'info'],
-          `Default index pattern found`
+          'debug'
         );
     }
 
@@ -150,26 +123,20 @@ export async function checkKnownFields(
       }
       !quiet &&
         log(
-          '[initialize][checkKnownFields]',
+          'initialize:checkKnownFields',
           `Refreshing known fields for "index-pattern:${item.title}"`,
-          'info'
-        );
-      !quiet &&
-        server.log(
-          [blueWazuh, 'initialize', 'info'],
-          `Refreshing known fields for "index-pattern:${item.title}"`
+          'debug'
         );
       await wzWrapper.updateIndexPatternKnownFields('index-pattern:' + item.id);
     }
 
-    !quiet &&
-      log('[initialize][checkKnownFields]', 'App ready to be used.', 'info');
+    !quiet && log('initialize', 'App ready to be used.', 'info');
     !quiet &&
       server.log([blueWazuh, 'initialize', 'info'], 'App ready to be used.');
 
     return;
   } catch (error) {
-    !quiet && log('[initialize][checkKnownFields]', error.message || error);
+    !quiet && log('initialize:checkKnownFields', error.message || error);
     !quiet &&
       server.log(
         [blueWazuh, 'server', 'error'],

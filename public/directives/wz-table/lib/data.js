@@ -28,13 +28,10 @@ export async function searchData(
     $scope.wazuh_table_loading = false;
   } catch (error) {
     $scope.wazuh_table_loading = false;
-    $scope.error = `Error searching - ${error.message || error}.`;
-    errorHandler.handle(
-      `Error searching. ${error.message || error}`,
-      'Data factory'
-    );
+    $scope.error = errorHandler.handle(error.message || error, 0, 0, 1);
+    errorHandler.handle(error.message || error);
   }
-  if (!$scope.$$phase) $scope.$digest();
+  $scope.$applyAsync();
   return;
 }
 
@@ -62,17 +59,10 @@ export async function filterData(
     $scope.wazuh_table_loading = false;
   } catch (error) {
     $scope.wazuh_table_loading = false;
-    $scope.error = `Error filtering by ${
-      filter ? filter.value : 'undefined'
-    } - ${error.message || error}.`;
-    errorHandler.handle(
-      `Error filtering by ${
-        filter ? filter.value : 'undefined'
-      }. ${error.message || error}`,
-      'Data factory'
-    );
+    $scope.error = errorHandler.handle(error.message || error, 0, 0, 1);
+    errorHandler.handle(error.message || error);
   }
-  if (!$scope.$$phase) $scope.$digest();
+  $scope.$applyAsync();
   return;
 }
 
@@ -100,15 +90,9 @@ export async function queryData(
     $scope.wazuh_table_loading = false;
   } catch (error) {
     $scope.wazuh_table_loading = false;
-    $scope.error = `Query error ${
-      query ? query.value : 'undefined'
-    } - ${error.message || error}.`;
-    errorHandler.handle(
-      `Query error ${query ? query.value : 'undefined'}. ${error.message ||
-        error}`,
-      'Data factory'
-    );
+    $scope.error = errorHandler.handle(error.message || error, 0, 0, 1);
+    errorHandler.handle(error.message || error);
   }
-  if (!$scope.$$phase) $scope.$digest();
+  $scope.$applyAsync();
   return;
 }

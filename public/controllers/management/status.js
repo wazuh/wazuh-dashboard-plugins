@@ -10,7 +10,7 @@
  * Find more information about this on the LICENSE file.
  */
 export class StatusController {
-  constructor($scope, errorHandler, apiReq) {
+  constructor($scope, errorHandler, apiReq, wazuhConfig) {
     this.$scope = $scope;
     this.errorHandler = errorHandler;
     this.apiReq = apiReq;
@@ -18,6 +18,7 @@ export class StatusController {
     this.nodes = [];
     this.selectedNode = false;
     this.clusterError = false;
+    this.wazuhConfig = wazuhConfig;
   }
 
   /**
@@ -35,11 +36,20 @@ export class StatusController {
     return daemonStatus === 'running' ? 'status teal' : 'status red';
   }
 
+  objToArr(obj) {
+    const arr = [];
+    for (const key in obj) arr.push({ key, value: obj[key] });
+    return arr;
+  }
+
   /**
    * Fetchs all required data
    */
   async init() {
     try {
+      const configuration = this.wazuhConfig.getConfig();
+      this.$scope.adminMode = !!(configuration || {}).admin;
+
       const data = await Promise.all([
         this.apiReq.request('GET', '/agents/summary', {}),
         this.apiReq.request('GET', '/cluster/status', {}),
@@ -76,7 +86,7 @@ export class StatusController {
           `/cluster/${masterNode.name}/status`,
           {}
         );
-        this.daemons = daemons.data.data;
+        this.daemons = this.objToArr(daemons.data.data);
         this.selectedNode = masterNode.name;
         const nodeInfo = await this.apiReq.request(
           'GET',
@@ -92,7 +102,7 @@ export class StatusController {
         this.clusterError = `Cluster is enabled but it's not running, please check your cluster health.`;
       } else {
         const daemons = await this.apiReq.request('GET', '/manager/status', {});
-        this.daemons = daemons.data.data;
+        this.daemons = this.objToArr(daemons.data.data);
         this.managerInfo = managerInfo;
       }
 
@@ -105,12 +115,12 @@ export class StatusController {
       this.agentInfo = lastAgent;
       this.load = false;
 
-      if (!this.$scope.$$phase) this.$scope.$digest();
+      this.$scope.$applyAsync();
 
       return;
     } catch (error) {
       this.load = false;
-      return this.errorHandler.handle(error, 'Manager');
+      return this.errorHandler.handle(error.message || error);
     }
   }
 
@@ -127,7 +137,7 @@ export class StatusController {
         `/cluster/${node}/status`,
         {}
       );
-      this.daemons = daemons.data.data;
+      this.daemons = this.objToArr(daemons.data.data);
 
       const nodeInfo = await this.apiReq.request(
         'GET',
@@ -137,13 +147,13 @@ export class StatusController {
       this.managerInfo = nodeInfo.data.data;
 
       this.load = false;
-      if (!this.$scope.$$phase) this.$scope.$digest();
+      this.$scope.$applyAsync();
     } catch (error) {
       this.load = false;
       this.clusterError = `Node ${node} is down`;
     }
 
-    if (!this.$scope.$$phase) this.$scope.$digest();
+    this.$scope.$applyAsync();
     return;
   }
 }

@@ -16,7 +16,6 @@ import { TabDescription } from '../../../server/reporting/tab-description';
 
 import {
   metricsGeneral,
-  metricsAudit,
   metricsVulnerability,
   metricsScap,
   metricsCiscat,
@@ -65,6 +64,24 @@ export class OverviewController {
     this.reportingService = reportingService;
     this.visFactoryService = visFactoryService;
     this.wazuhConfig = wazuhConfig;
+    this.expandArray = [
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false
+    ];
   }
 
   /**
@@ -98,8 +115,8 @@ export class OverviewController {
     this.tabVisualizations.assign('overview');
 
     this.hostMonitoringTabs = ['general', 'fim', 'aws'];
-    this.systemAuditTabs = ['pm', 'audit', 'oscap', 'ciscat'];
-    this.securityTabs = ['vuls', 'virustotal', 'osquery'];
+    this.systemAuditTabs = ['pm', 'audit', 'oscap', 'ciscat', 'sca'];
+    this.securityTabs = ['vuls', 'virustotal', 'osquery', 'docker'];
     this.complianceTabs = ['pci', 'gdpr'];
 
     this.wodlesConfiguration = null;
@@ -140,9 +157,6 @@ export class OverviewController {
       switch (tab) {
         case 'general':
           this.createMetrics(metricsGeneral);
-          break;
-        case 'audit':
-          this.createMetrics(metricsAudit);
           break;
         case 'vuls':
           this.createMetrics(metricsVulnerability);
@@ -187,14 +201,14 @@ export class OverviewController {
           localChange || preserveDiscover
         );
       } else {
-        this.$rootScope.$emit('changeTabView', { tabView: this.tabView });
+        this.$scope.$emit('changeTabView', { tabView: this.tabView });
       }
 
       this.checkMetrics(this.tab, subtab);
     } catch (error) {
-      this.errorHandler.handle(error, 'Overview');
+      this.errorHandler.handle(error.message || error);
     }
-    if (!this.$scope.$$phase) this.$scope.$digest();
+    this.$scope.$applyAsync();
     return;
   }
 
@@ -209,6 +223,7 @@ export class OverviewController {
 
   // Switch tab
   async switchTab(newTab, force = false) {
+    this.falseAllExpand();
     try {
       if (newTab === 'welcome') {
         this.commonData.setRefreshInterval(timefilter.getRefreshInterval());
@@ -261,9 +276,9 @@ export class OverviewController {
 
       await this.switchSubtab('panels', true, sameTab, preserveDiscover);
     } catch (error) {
-      this.errorHandler.handle(error, 'Overview');
+      this.errorHandler.handle(error.message || error);
     }
-    if (!this.$scope.$$phase) this.$scope.$digest();
+    this.$scope.$applyAsync();
     return;
   }
 
@@ -324,9 +339,36 @@ export class OverviewController {
       await this.loadConfiguration();
       await this.switchTab(this.tab, true);
     } catch (error) {
-      this.errorHandler.handle(error, 'Overview (init)');
+      this.errorHandler.handle(error.message || error);
     }
-    if (!this.$scope.$$phase) this.$scope.$digest();
+    this.$scope.$applyAsync();
     return;
+  }
+
+  falseAllExpand() {
+    this.expandArray = [
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false
+    ];
+  }
+
+  expand(i) {
+    const oldValue = this.expandArray[i];
+    this.falseAllExpand();
+    this.expandArray[i] = !oldValue;
   }
 }

@@ -1,5 +1,5 @@
-<div flex="auto" layout="column" ng-if="configurationTab === 'global-configuration'" ng-init="switchConfigurationSubTab('global')">
-
+<div flex="auto" layout="column" ng-if="configurationTab === 'global-configuration'"
+    ng-init="switchConfigurationSubTab('global')">
     <!-- Headline -->
     <div layout="column" layout-padding>
         <div>
@@ -10,17 +10,16 @@
     <!-- End headline -->
 
     <!-- Global configuration navigation bar -->
-    <md-nav-bar
-        ng-if="!agent || agent.id === '000'"
-        class="wz-nav-bar"
-        md-selected-nav-item="configurationSubTab"
+    <md-nav-bar ng-if="!agent || agent.id === '000'" class="wz-nav-bar" md-selected-nav-item="configurationSubTab"
         nav-bar-aria-label="Global configuration navigation links">
-        <md-nav-item class="wz-nav-item" md-nav-click="switchConfigurationSubTab('global')" name="global">Global</md-nav-item>
-        <md-nav-item class="wz-nav-item" md-nav-click="switchConfigurationSubTab('remote')" name="remote">Remote</md-nav-item>
+        <md-nav-item class="wz-nav-item" md-nav-click="switchConfigurationSubTab('global')" name="global">
+            Global</md-nav-item>
+        <md-nav-item class="wz-nav-item" md-nav-click="switchConfigurationSubTab('remote')" name="remote">
+            Remote</md-nav-item>
     </md-nav-bar>
     <!-- End global configuration navigation bar -->
 
     <!-- Loading ring -->
-    <div class='uil-ring-css' ng-show="load">
-        <div></div>
+    <div class="md-padding md-padding-top-16" ng-if="load">
+        <react-component name="EuiProgress" props="{size: 'xs', color: 'primary'}" />
     </div>

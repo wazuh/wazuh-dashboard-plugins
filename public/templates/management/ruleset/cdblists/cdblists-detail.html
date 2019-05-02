@@ -1,0 +1,29 @@
+<div ng-if="cdbctrl.viewingDetail" layout="column" ng-class="{ 'md-padding' : cdbctrl.addingList }">
+    <!-- Back button and title -->
+    <div layout="row" layout-align="start center">
+        <!-- Back button -->
+        <md-button ng-if="!cdbctrl.addingList" class="md-icon-button" style="margin: 5px!important;" aria-label="Back to CDB Lists list"
+            tooltip="Back" tooltip-placement="bottom" ng-click="cdbctrl.closeDetailView(true)"><i class="fa fa-fw fa-arrow-left"
+                aria-hidden="true"></i></md-button>
+        <!-- List title -->
+        <div ng-if="!cdbctrl.addingList">
+            <!-- <h1 class="font-size-18">{{currentList.name}}</h1> -->
+            <h1 class="font-size-18">{{cdbctrl.currentList.name}}</h1>
+        </div>
+    </div>
+    <!-- End back button, title and status indicator -->
+
+
+    <!-- List information ribbon -->
+    <div layout="row" class="wz-padding-left-8 wz-padding-right-8" ng-if="!cdbctrl.addingList">
+        <md-card flex class="wz-metric-color wz-md-card">
+            <md-card-content layout="row" class="wz-padding-metric">
+                <div flex="50" class="wz-text-truncatable">Name: <span class="wz-text-bold wz-text-link">{{cdbctrl.currentList.name}}</span></div>
+                <div flex="50" class="wz-text-truncatable">Path: <span class="wz-text-bold wz-text-link">{{cdbctrl.currentList.path}}</span></div>
+            </md-card-content>
+        </md-card>
+    </div>
+    <!-- End List information ribbon -->
+    <wz-list-manage list="cdbctrl.currentList" close-fn="cdbctrl.closeDetailView(true)" hide-close="cdbctrl.currentList && !cdbctrl.addingList ? true : false"></wz-list-manage>
+    <br>
+</div>

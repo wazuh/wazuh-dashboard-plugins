@@ -1,0 +1,102 @@
+<div flex="auto" layout="column" ng-if="configurationTab === 'docker-listener'">
+
+    <!-- Headline -->
+    <div layout="column" layout-padding>
+        <div>
+            <span class="font-size-18">Docker listener</span>
+            <span
+                ng-if="currentConfig && currentConfig['docker-listener'] && currentConfig['docker-listener'].disabled === 'no'"
+                class="wz-agent-status-indicator small teal">Enabled</span>
+            <span
+                ng-if="(currentConfig && currentConfig['docker-listener'] && currentConfig['docker-listener'].disabled === 'yes') || (currentConfig && !currentConfig['docker-listener'])"
+                class="wz-agent-status-indicator small red">Disabled</span>
+        </div>
+        <span class="md-subheader">Monitor and collect the activity from Docker containers such as creation, running,
+            starting, stopping or pausing events</span>
+    </div>
+    <!-- End headline -->
+
+    <div class="md-padding md-padding-top-16" ng-if="load">
+        <react-component name="EuiProgress" props="{size: 'xs', color: 'primary'}" />
+    </div>
+
+    <!-- This section contains the main content and the right sidenav -->
+    <div flex="auto" layout="row" ng-if="!load">
+
+        <!-- No configuration section -->
+        <wz-no-config flex error="currentConfig['wmodules-wmodules']"
+            ng-if="currentConfig['wmodules-wmodules'] && isString(currentConfig['wmodules-wmodules'])"></wz-no-config>
+        <wz-no-config flex error="'not-present'"
+            ng-if="currentConfig && !currentConfig['docker-listener'] && !isString(currentConfig['wmodules-wmodules'])">
+        </wz-no-config>
+        <!-- End no configuration section -->
+
+        <!-- This section is the main content -->
+        <div flex layout="column" ng-if="currentConfig && currentConfig['docker-listener']">
+
+            <!-- The main card will all the settings -->
+            <md-card class="wz-md-card" ng-if="!JSONContent && !XMLContent">
+                <md-card-content>
+                    <div layout="row" layout-align="start center">
+                        <div>
+                            <span class="font-size-16">Main settings</span>
+                            <div class="wz-margin-top-10">
+                                <span class="md-subheader small">General Docker listener settings</span>
+                            </div>
+                        </div>
+                        <span flex></span>
+                        <span ng-class="JSONContent ? 'wz-text-active' : ''" class="wz-text-link small"
+                            ng-click="getJSON()">JSON</span>
+                        <span class="small">&nbsp;&centerdot;&nbsp;</span>
+                        <span ng-class="XMLContent ? 'wz-text-active' : ''" class="wz-text-link small"
+                            ng-click="getXML()">XML</span>
+                    </div>
+                    <md-divider class="wz-margin-top-10"></md-divider>
+
+                    <!-- Configuration block -->
+                    <div class="wz-padding-top-10">
+
+                        <wz-config-item label="Docker listener status"
+                            value="currentConfig['docker-listener'].disabled === 'yes' ? 'disabled' : 'enabled'">
+                        </wz-config-item>
+                        <wz-config-item label="Number of attempts to execute the listener"
+                            value="currentConfig['docker-listener'].attempts || '5'">
+                        </wz-config-item>
+                        <wz-config-item label="Waiting time to rerun the listener in case it fails"
+                            value="currentConfig['docker-listener'].interval || '10m'">
+                        </wz-config-item>
+                        <wz-config-item label="Run the listener immediately when service is started"
+                            value="currentConfig['docker-listener'].run_on_start || 'yes'">
+                        </wz-config-item>
+                    </div>
+                    <!-- End configuration block -->
+
+                </md-card-content>
+            </md-card>
+            <!-- End main card with all the settings -->
+
+            <wz-config-viewer flex getjson="getJSON()" getxml="getXML()" jsoncontent="JSONContent"
+                xmlcontent="XMLContent" />
+
+        </div>
+        <!-- End main content section -->
+
+        <!-- This section is the right sidenav content -->
+        <md-sidenav class="md-sidenav-right" style="width: auto !important;" md-is-locked-open="true">
+            <span class="wz-margin-right-8 wz-text-link wz-text-right wz-margin-top-8" ng-click="showHelp = !showHelp">
+                <react-component name="EuiIcon" props="{type:'questionInCircle'}" />
+            </span>
+            <md-list ng-if="showHelp">
+                <md-subheader>More info about this section</md-subheader>
+                <md-list-item target="_blank" class="wz-text-link"
+                    ng-href="https://documentation.wazuh.com/current/user-manual/reference/ossec-conf/wodle-docker.html">
+                    Docker listener module reference
+                </md-list-item>
+            </md-list>
+        </md-sidenav>
+        <!-- End right sidenav section -->
+
+    </div>
+    <!-- End main content and right sidenav section -->
+
+</div>

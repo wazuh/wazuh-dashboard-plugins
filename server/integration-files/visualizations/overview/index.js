@@ -21,6 +21,8 @@ import pm from './overview-pm';
 import virustotal from './overview-virustotal';
 import vuls from './overview-vuls';
 import osquery from './overview-osquery';
+import sca from './overview-sca';
+import docker from './overview-docker';
 
 export {
   audit,
@@ -34,5 +36,7 @@ export {
   pm,
   virustotal,
   vuls,
-  osquery
+  osquery,
+  sca,
+  docker
 };

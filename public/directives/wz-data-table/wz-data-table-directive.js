@@ -24,7 +24,8 @@ app.directive('wzDataTable', function() {
     restrict: 'E',
     scope: {
       rowSizes: '=rowSizes',
-      data: '='
+      data: '=',
+      keys: '='
     },
     controller($scope, $filter, errorHandler, $window) {
       /**
@@ -61,10 +62,8 @@ app.directive('wzDataTable', function() {
       const fetch = () => {
         try {
           $scope.filterTable();
-          $scope.keys = Object.keys(items[0]);
-          return;
         } catch (error) {
-          errorHandler.handle(error, 'Error loading table');
+          errorHandler.handle(error.message || error);
         }
         return;
       };

@@ -1,42 +1,69 @@
-<md-content flex layout="column" ng-if="tab === 'pm' && tabView === 'panels'" ng-class="{'no-opacity': resultState !== 'ready' || !rendered}" layout-align="start">
+<md-content flex layout="column" ng-if="tab === 'pm' && tabView === 'panels'" ng-class="{'no-opacity': resultState !== 'ready' || !rendered}"
+    layout-align="start">
+    <div layout="row" layout-padding class="wz-padding-top-0">
+        <span flex></span>
+            <md-button ng-click="launchRootcheckScan()" class="discoverSectionSwitchBtn pull-right"><i
+                class="fa fa-fw fa-play"></i>
+            Run scan</md-button>
+    </div>
+    <div layout="row" class="height-240">
+        <md-card flex="50" class="wz-md-card" ng-class="{'fullscreen': expandArray[0]}">
+            <md-card-actions layout="row" layout-align="end center" class="wz-card-actions-vis"
+                ng-dblclick="expand(0)">
+                <span class="wz-headline-title">Alerts over time</span>
+                <span flex></span>
+                <span class="cursor-pointer" ng-click="expand(0)">
+                    <react-component name="EuiIcon" props="{type:'expand'}" />
+                </span>
+            </md-card-actions>
+            <md-card-content class="wazuh-column">
+                <kbn-vis id="Wazuh-App-Agents-PM-Alerts-over-time" vis-id="'Wazuh-App-Agents-PM-Alerts-over-time'">
+                </kbn-vis>
+            </md-card-content>
+        </md-card>
+        <md-card flex="25" class="wz-md-card" ng-class="{'fullscreen': expandArray[1]}">
+            <md-card-actions layout="row" layout-align="end center" class="wz-card-actions-vis"
+                ng-dblclick="expand(1)">
+                <span class="wz-headline-title">Top 5 CIS Requirements</span>
+                <span flex></span>
+                </span>
+                <span class="cursor-pointer" ng-click="expand(1)">
+                    <react-component name="EuiIcon" props="{type:'expand'}" />
+                </span>
+            </md-card-actions>
+            <md-card-content class="wazuh-column">
+                <kbn-vis id="Wazuh-App-Agents-PM-Top-5-CIS-Requirements" vis-id="'Wazuh-App-Agents-PM-Top-5-CIS-Requirements'"></kbn-vis>
+            </md-card-content>
+        </md-card>
+        <md-card flex="25" class="wz-md-card" ng-class="{'fullscreen': expandArray[2]}">
+            <md-card-actions layout="row" layout-align="end center" class="wz-card-actions-vis"
+                ng-dblclick="expand(2)">
+                <span class="wz-headline-title">Top 5 PCI DSS Requirements</span>
+                <span flex></span>
+                <span class="cursor-pointer" ng-click="expand(2)">
+                    <react-component name="EuiIcon" props="{type:'expand'}" />
+                </span>
+            </md-card-actions>
+            <md-card-content class="wazuh-column">
+                <kbn-vis id="Wazuh-App-Agents-PM-Top-5-PCI-DSS-Requirements" vis-id="'Wazuh-App-Agents-PM-Top-5-PCI-DSS-Requirements'"></kbn-vis>
+            </md-card-content>
+        </md-card>
+    </div>
 
-    <!-- View: Panels -->
-
-
-        <div layout="row" class="height-240">
-            <md-card flex="50" class="wz-md-card">
-                <md-card-content class="wazuh-column">
-                    <span class="wz-headline-title">Alerts over time</span>
-                    <md-divider class="wz-margin-top-10"></md-divider>
-                    <kbn-vis id="Wazuh-App-Agents-PM-Alerts-over-time" vis-id="'Wazuh-App-Agents-PM-Alerts-over-time'"></kbn-vis>
-                </md-card-content>
-            </md-card>
-            <md-card flex="25" class="wz-md-card">
-                <md-card-content class="wazuh-column">
-                    <span class="wz-headline-title">Top 5 CIS Requirements</span>
-                    <md-divider class="wz-margin-top-10"></md-divider>
-                    <kbn-vis id="Wazuh-App-Agents-PM-Top-5-CIS-Requirements" vis-id="'Wazuh-App-Agents-PM-Top-5-CIS-Requirements'"></kbn-vis>
-                </md-card-content>
-            </md-card>
-            <md-card flex="25" class="wz-md-card">
-                <md-card-content class="wazuh-column">
-                    <span class="wz-headline-title">Top 5 PCI DSS Requirements</span>
-                    <md-divider class="wz-margin-top-10"></md-divider>
-                    <kbn-vis id="Wazuh-App-Agents-PM-Top-5-PCI-DSS-Requirements" vis-id="'Wazuh-App-Agents-PM-Top-5-PCI-DSS-Requirements'"></kbn-vis>
-                </md-card-content>
-            </md-card>
-        </div>
-
-        <div layout="row" layout-align="space-between stretch" class="height-570">
-            <md-card flex="100" class="wz-md-card">
-                <md-card-content class="wazuh-column">
-                    <span class="wz-headline-title">Alerts summary</span>
-                    <md-divider class="wz-margin-top-10"></md-divider>
-                    <kbn-vis vis-id="'Wazuh-App-Agents-PM-Alerts-summary'"></kbn-vis>
-                </md-card-content>
-            </md-card>
-       </div>
-
-
+    <div layout="row" layout-align="space-between stretch" class="height-570">
+        <md-card flex="100" class="wz-md-card" ng-class="{'fullscreen': expandArray[3]}">
+            <md-card-actions layout="row" layout-align="end center" class="wz-card-actions-vis"
+                ng-dblclick="expand(3)">
+                <span class="wz-headline-title">Alerts summary</span>
+                <span flex></span>
+                <span class="cursor-pointer" ng-click="expand(3)">
+                    <react-component name="EuiIcon" props="{type:'expand'}" />
+                </span>
+            </md-card-actions>
+            <md-card-content class="wazuh-column">
+                <kbn-vis vis-id="'Wazuh-App-Agents-PM-Alerts-summary'"></kbn-vis>
+            </md-card-content>
+        </md-card>
+    </div>
 
 </md-content>

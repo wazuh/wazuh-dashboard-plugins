@@ -18,33 +18,36 @@ export class TabVisualizations {
     this.agents = {
       welcome: 0,
       general: 7,
-      fim: 7,
+      fim: 6,
       pm: 4,
       vuls: 10,
       oscap: 13,
       ciscat: 11,
-      audit: 15,
-      gdpr: 3,
-      pci: 3,
+      audit: 9,
+      gdpr: 6,
+      pci: 6,
       virustotal: 6,
       configuration: 0,
-      osquery: 5
+      osquery: 5,
+      docker: 5
     };
 
     this.overview = {
       welcome: 0,
-      general: 11,
-      fim: 8,
+      general: 6,
+      fim: 6,
       pm: 5,
       vuls: 10,
       oscap: 11,
       ciscat: 11,
-      audit: 15,
-      pci: 6,
-      gdpr: 6,
-      aws: 6,
+      audit: 6,
+      pci: 5,
+      gdpr: 5,
+      aws: 8,
       virustotal: 7,
-      osquery: 5
+      osquery: 5,
+      sca: 8,
+      docker: 5
     };
 
     this.tabVisualizations = {};

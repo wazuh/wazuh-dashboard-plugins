@@ -1,50 +1,74 @@
-<div layout="column" layout-align="start stretch" ng-controller="managerStatusController as ctrl" ng-if="mctrl.tab === 'status'">
+<div layout="column" layout-align="start stretch" ng-controller="managerStatusController as ctrl"
+    ng-if="mctrl.tab === 'status'" class="">
 
-    <!-- Loading ring -->
-    <div class='uil-ring-css' ng-show="ctrl.load">
-        <div></div>
+    <div class="md-padding md-padding-top-16" ng-show="ctrl.load">
+        <react-component name="EuiProgress" props="{size: 'xs', color: 'primary'}" />
     </div>
 
     <!-- Headline -->
-    <div ng-show="!ctrl.load" layout="row" layout-padding>
-        <span class="font-size-18"><i class="fa fa-fw fa-heartbeat" aria-hidden="true"></i> Status</span>
-    </div>
-    <div ng-show="!ctrl.load" layout="row" layout-padding>
-        <div flex layout="column" layout-align="center" class="height-40 wz-margin-right-15">
-            <span class="md-subheader">Check the status of all Wazuh manager daemons <span ng-show="ctrl.selectedNode">({{ctrl.selectedNode}})</span></span>
-        </div>
-        <div ng-show="ctrl.selectedNode" layout="column" layout-align="center" class="height-40 wz-select-input">
-            <select class="kuiSelect wz-border-none cursor-pointer max-height-35" id="categoryBox" ng-model="ctrl.selectedNode"
-                ng-change="ctrl.changeNode(ctrl.selectedNode)" aria-label="Select node">
+    <div ng-show="!ctrl.load" layout="row" layout-padding class="wz-padding-bottom-0 wz-margin-top-16">
+        <div ng-show="ctrl.selectedNode" layout="column" layout-align="center" class="height-35 wz-select-input">
+            <select class="kuiSelect wz-border-none cursor-pointer max-height-35" id="categoryBox"
+                ng-model="ctrl.selectedNode" ng-change="ctrl.changeNode(ctrl.selectedNode)" aria-label="Select node">
                 <option ng-repeat="node in ctrl.nodes" value="{{node.name}}">{{node.name}}</option>
             </select>
+        </div>
+        <div flex></div>
+        <div layout="column" class="height-40 wz-no-padding" ng-show="adminMode">
+            <button ng-if="mctrl.clusterInfo.status === 'enabled' && !mctrl.showConfirmRestart"
+                class="kuiButton kuiButton--secondary height-35" ng-disabled="mctrl.isRestarting"
+                ng-click="mctrl.showConfirmRestart = true"><i class="fa fa-refresh"
+                    ng-class="mctrl.isRestarting ? 'fa-spin fa-spinner' : ''"></i>
+                Restart cluster
+            </button>
+            <button ng-if="mctrl.clusterInfo.status !== 'enabled' && !mctrl.showConfirmRestart"
+                class="kuiButton kuiButton--secondary height-35" ng-disabled="mctrl.isRestarting"
+                ng-click="mctrl.showConfirmRestart = true"><i class="fa fa-refresh"
+                    ng-class="mctrl.isRestarting ? 'fa-spin fa-spinner' : ''"></i>
+                Restart manager
+            </button>
+            <div ng-show="mctrl.showConfirmRestart" class="confirmEmbedBubble confirmEmbedBubbleInline">
+                <div layout="row no-wrap">
+                    <span ng-if="mctrl.clusterInfo.status === 'enabled'" class="wz-padding-top-10 wz-padding-left-8">The
+                        cluster will be restarted </span>
+                    <span ng-if="mctrl.clusterInfo.status !== 'enabled'" class="wz-padding-top-10 wz-padding-left-8">The
+                        manager will be restarted </span>
+                </div>
+                <div layout="row">
+                    <md-button class="cancelBtn btn-info" type="button" ng-click="mctrl.showConfirmRestart = false">
+                        Cancel</md-button>
+                    <md-button ng-if="mctrl.clusterInfo.status === 'enabled'" class="btn wz-button" type="button"
+                        ng-click="mctrl.restartCluster();mctrl.showConfirmRestart = false"><i aria-hidden='true'
+                            class='fa fa-fw fa-check'></i>
+                        Confirm</md-button>
+                    <md-button ng-if="mctrl.clusterInfo.status !== 'enabled'" class="btn wz-button" type="button"
+                        ng-click="mctrl.restartManager();mctrl.showConfirmRestart = false"><i aria-hidden='true'
+                            class='fa fa-fw fa-check'></i>
+                        Confirm</md-button>
+                </div>
+            </div>
         </div>
     </div>
     <!-- End headline -->
 
-    <div layout="row" class="wz-margin-top-10 wz-margin-right-8 wz-margin-left-8" ng-show="ctrl.clusterError && !ctrl.load">
+    <div layout="row" class="wz-margin-top-10 wz-margin-right-8 wz-margin-left-8"
+        ng-show="ctrl.clusterError && !ctrl.load">
         <div flex class="euiCallOut euiCallOut--warning">
             <div class="euiCallOutHeader">
-                <svg class="euiIcon euiIcon--medium euiCallOutHeader__icon" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
-                    xmlns:xlink="http://www.w3.org/1999/xlink" width="16" height="16" viewBox="0 0 16 16">
-                    <defs>
-                        <path id="help-a" d="M13.6 12.186l-1.357-1.358c-.025-.025-.058-.034-.084-.056.53-.794.84-1.746.84-2.773a4.977 4.977 0 0 0-.84-2.772c.026-.02.059-.03.084-.056L13.6 3.813a6.96 6.96 0 0 1 0 8.373zM8 15A6.956 6.956 0 0 1 3.814 13.6l1.358-1.358c.025-.025.034-.057.055-.084C6.02 12.688 6.974 13 8 13a4.978 4.978 0 0 0 2.773-.84c.02.026.03.058.056.083l1.357 1.358A6.956 6.956 0 0 1 8 15zm-5.601-2.813a6.963 6.963 0 0 1 0-8.373l1.359 1.358c.024.025.057.035.084.056A4.97 4.97 0 0 0 3 8c0 1.027.31 1.98.842 2.773-.027.022-.06.031-.084.056l-1.36 1.358zm5.6-.187A4 4 0 1 1 8 4a4 4 0 0 1 0 8zM8 1c1.573 0 3.019.525 4.187 1.4l-1.357 1.358c-.025.025-.035.057-.056.084A4.979 4.979 0 0 0 8 3a4.979 4.979 0 0 0-2.773.842c-.021-.027-.03-.059-.055-.084L3.814 2.4A6.957 6.957 0 0 1 8 1zm0-1a8.001 8.001 0 1 0 .003 16.002A8.001 8.001 0 0 0 8 0z"></path>
-                    </defs>
-                    <use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#help-a" fill-rule="evenodd"></use>
-                </svg>
+                <react-component name="EuiIcon" props="{type:'help',className:'euiCallOutHeader__title'}" />
                 <span class="euiCallOutHeader__title">{{ctrl.clusterError}}</span>
             </div>
         </div>
     </div>
 
     <!-- Daemons status section -->
-    <div layout="row" layout-align="start stretch" ng-show="!ctrl.load && !ctrl.clusterError">
-        <md-card flex class="wz-md-card" ng-repeat="(k,v) in ctrl.daemons">
-            <md-card-content>
-                <center>
-                    <p ng-class="ctrl.getDaemonStatusClass(v)" class="round"></p>
-                    <p class="wz-padding-top-10">{{k}}</p>
-                </center>
+    <div ng-show="!ctrl.load && !ctrl.clusterError">
+        <md-card flex class="wz-md-card">
+            <md-card-content class="daemons-card">
+                <div ng-repeat="daemon in ctrl.daemons" class="daemon-label">
+                    <p ng-class="ctrl.getDaemonStatusClass(daemon.value)" class="round daemon-bullet"></p>
+                    <p class="daemon-name">{{daemon.key}}</p>
+                </div>
             </md-card-content>
         </md-card>
     </div>
@@ -63,7 +87,8 @@
                 <div flex class="wz-text-truncatable">Disconnected:
                     <span class="wz-text-bold">{{ctrl.agentsCountDisconnected}}</span>
                 </div>
-                <div flex class="wz-text-truncatable">Never connected: <span class="wz-text-bold">{{ctrl.agentsCountNeverConnected}}</span>
+                <div flex class="wz-text-truncatable">Never connected: <span
+                        class="wz-text-bold">{{ctrl.agentsCountNeverConnected}}</span>
                 </div>
                 <div flex class="wz-text-truncatable">Agents coverage:
                     <span class="wz-text-bold">{{(ctrl.agentsCoverity | number:2)}}%</span>
@@ -77,12 +102,15 @@
         <!-- Manager information section -->
         <md-card flex class="wz-md-card">
             <md-card-content>
-                <i class="fa fa-fw fa-server" aria-hidden="true"></i> <span ng-if="ctrl.selectedNode" class="wz-headline-title">{{ctrl.selectedNode}}
-                    information</span> <span ng-if="!ctrl.selectedNode" class="wz-headline-title">Manager information</span>
+                <i class="fa fa-fw fa-server" aria-hidden="true"></i> <span ng-if="ctrl.selectedNode"
+                    class="wz-headline-title">{{ctrl.selectedNode}}
+                    information</span> <span ng-if="!ctrl.selectedNode" class="wz-headline-title">Manager
+                    information</span>
                 <md-divider class="wz-margin-top-10"></md-divider>
                 <div layout="row" class="wz-padding-top-10">
                     <span flex="25">Version</span>
-                    <span class="wz-text-right color-grey">{{ctrl.managerInfo.version ? ctrl.managerInfo.version : '-'}}</span>
+                    <span class="wz-text-right color-grey">{{ctrl.managerInfo.version ? ctrl.managerInfo.version :
+                        '-'}}</span>
                 </div>
                 <div layout="row" class="wz-padding-top-10">
                     <span flex="25">Compilation date</span>
@@ -91,19 +119,23 @@
                 </div>
                 <div layout="row" class="wz-padding-top-10">
                     <span flex="25">Installation path</span>
-                    <span class="wz-text-right color-grey">{{ctrl.managerInfo.path ? ctrl.managerInfo.path : '-'}}</span>
+                    <span
+                        class="wz-text-right color-grey">{{ctrl.managerInfo.path ? ctrl.managerInfo.path : '-'}}</span>
                 </div>
                 <div layout="row" class="wz-padding-top-10">
                     <span flex="25">Installation type</span>
-                    <span class="wz-text-right color-grey">{{ctrl.managerInfo.type ? ctrl.managerInfo.type : '-'}}</span>
+                    <span
+                        class="wz-text-right color-grey">{{ctrl.managerInfo.type ? ctrl.managerInfo.type : '-'}}</span>
                 </div>
                 <div layout="row" class="wz-padding-top-10">
                     <span flex="25">Agents limit</span>
-                    <span class="wz-text-right color-grey">{{ctrl.managerInfo.max_agents ? ctrl.managerInfo.max_agents : '-'}}</span>
+                    <span class="wz-text-right color-grey">{{ctrl.managerInfo.max_agents ? ctrl.managerInfo.max_agents
+                        : '-'}}</span>
                 </div>
                 <div layout="row" class="wz-padding-top-10">
                     <span flex="25">OpenSSL Support</span>
-                    <span class="wz-text-right color-grey">{{ctrl.managerInfo.openssl_support ? ctrl.managerInfo.openssl_support
+                    <span class="wz-text-right color-grey">{{ctrl.managerInfo.openssl_support ?
+                        ctrl.managerInfo.openssl_support
                         : '-'}}</span>
                 </div>
             </md-card-content>
@@ -113,7 +145,8 @@
         <!-- Last registered agent section -->
         <md-card flex class="wz-md-card" ng-show="ctrl.agentInfo && ctrl.agentInfo.id !== '000'">
             <md-card-content>
-                <i class="fa fa-fw fa-tv" aria-hidden="true"></i> <span class="wz-headline-title">Last registered agent</span>
+                <i class="fa fa-fw fa-tv" aria-hidden="true"></i> <span class="wz-headline-title">Last registered
+                    agent</span>
                 <md-divider class="wz-margin-top-10"></md-divider>
                 <div layout="row" class="wz-padding-top-10">
                     <span flex="25">Name</span>
@@ -125,7 +158,8 @@
                 </div>
                 <div layout="row" class="wz-padding-top-10">
                     <span flex="25">Status</span>
-                    <span class="wz-text-right color-grey">{{ctrl.agentInfo.status ? ctrl.agentInfo.status : '-'}}</span>
+                    <span
+                        class="wz-text-right color-grey">{{ctrl.agentInfo.status ? ctrl.agentInfo.status : '-'}}</span>
                 </div>
                 <div layout="row" class="wz-padding-top-10">
                     <span flex="25">IP Address</span>
@@ -133,15 +167,18 @@
                 </div>
                 <div layout="row" class="wz-padding-top-10">
                     <span flex="25">Date add</span>
-                    <span class="wz-text-right color-grey">{{ctrl.agentInfo.dateAdd ? ctrl.agentInfo.dateAdd : '-'}}</span>
+                    <span
+                        class="wz-text-right color-grey">{{ctrl.agentInfo.dateAdd ? ctrl.agentInfo.dateAdd : '-'}}</span>
                 </div>
                 <div layout="row" class="wz-padding-top-10">
                     <span flex="25">Version</span>
-                    <span class="wz-text-right color-grey">{{ctrl.agentInfo.version ? ctrl.agentInfo.version : '-'}}</span>
+                    <span
+                        class="wz-text-right color-grey">{{ctrl.agentInfo.version ? ctrl.agentInfo.version : '-'}}</span>
                 </div>
                 <div layout="row" class="wz-padding-top-10" ng-if="ctrl.agentInfo.id !== '000'">
                     <span flex="25">Last keep alive</span>
-                    <span class="wz-text-right color-grey">{{ctrl.agentInfo.lastKeepAlive ? ctrl.agentInfo.lastKeepAlive : '-'}}</span>
+                    <span class="wz-text-right color-grey">{{ctrl.agentInfo.lastKeepAlive ?
+                        ctrl.agentInfo.lastKeepAlive : '-'}}</span>
                 </div>
                 <div layout="row" class="wz-padding-top-10">
                     <span flex="25">Operating system</span>

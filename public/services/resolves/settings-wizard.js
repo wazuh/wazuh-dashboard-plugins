@@ -11,7 +11,6 @@
  */
 import { checkTimestamp } from './check-timestamp';
 import { healthCheck } from './health-check';
-import { totalRAM } from './check-ram';
 
 export function settingsWizard(
   $location,
@@ -28,15 +27,13 @@ export function settingsWizard(
   try {
     const deferred = $q.defer();
 
-    !disableErrors && totalRAM(genericReq, errorHandler);
-
     const checkResponse = data => {
       let fromElastic = false;
       if (parseInt(data.data.error) === 2) {
         !disableErrors &&
           errorHandler.handle(
-            'Wazuh App: Please set up Wazuh API credentials.',
-            'Routes',
+            'Please set up Wazuh API credentials.',
+            false,
             true
           );
       } else if (
@@ -45,11 +42,9 @@ export function settingsWizard(
         (((data || {}).data || {}).data || {}).apiIsDown
       ) {
         wzMisc.setApiIsDown(true);
-        !disableErrors &&
-          errorHandler.handle('Wazuh RESTful API seems to be down.', 'Routes');
       } else {
         fromElastic = true;
-        wzMisc.setBlankScr(errorHandler.handle(data, 'Routes'));
+        wzMisc.setBlankScr(errorHandler.handle(data));
         appState.removeCurrentAPI();
       }
 
@@ -68,18 +63,19 @@ export function settingsWizard(
         ) {
           !disableErrors &&
             errorHandler.handle(
-              'Wrong Wazuh API credentials, please add a new API and/or modify the existing one.',
-              'Routes'
+              'Wrong Wazuh API credentials, please add a new API and/or modify the existing one'
             );
-          $location.search('_a', null);
-          $location.search('tab', 'api');
-          $location.path('/settings');
+          if (!$location.path().includes('/settings')) {
+            $location.search('_a', null);
+            $location.search('tab', 'api');
+            $location.path('/settings');
+          }
         } else {
           $location.path('/blank-screen');
         }
       }
 
-      deferred.reject();
+      deferred.resolve();
     };
 
     const changeCurrentApi = data => {
@@ -123,7 +119,8 @@ export function settingsWizard(
           ciscat: config['extensions.ciscat'],
           aws: config['extensions.aws'],
           virustotal: config['extensions.virustotal'],
-          osquery: config['extensions.osquery']
+          osquery: config['extensions.osquery'],
+          docker: config['extensions.docker']
         };
         appState.setExtensions(currentApi, extensions);
       }
@@ -131,9 +128,8 @@ export function settingsWizard(
       checkTimestamp(appState, genericReq, $location, wzMisc)
         .then(() => testAPI.checkStored(currentApi))
         .then(data => {
-          if (data && data === 'cookies_outdated') {
-            $location.search('tab', 'welcome');
-            $location.path('/overview');
+          if (data === 3099) {
+            deferred.resolve();
           } else {
             if (data.data.error || data.data.data.apiIsDown) {
               checkResponse(data);
@@ -158,20 +154,13 @@ export function settingsWizard(
             }
           }
         })
-        .catch(error => {
+        .catch(() => {
           appState.removeCurrentAPI();
 
-          !disableErrors && errorHandler.handle(error, 'Routes');
-          !disableErrors &&
-            errorHandler.handle(
-              'Please insert a new Wazuh API or select an existing valid one.',
-              'Routes',
-              true
-            );
+          $location.search('tab', 'welcome');
+          $location.path('/overview');
 
-          $location.search('_a', null);
-          $location.search('tab', 'api');
-          $location.path('/settings');
+          deferred.resolve();
         });
     };
 
@@ -187,7 +176,7 @@ export function settingsWizard(
       healthCheck($window)
     ) {
       $location.path('/health-check');
-      deferred.reject();
+      deferred.resolve();
     } else {
       // There's no cookie for current API
       if (!appState.getCurrentAPI()) {
@@ -208,7 +197,7 @@ export function settingsWizard(
               !comeFromWizard &&
                 errorHandler.handle(
                   'Wazuh App: Please set up Wazuh API credentials.',
-                  'Routes',
+                  false,
                   true
                 );
               wzMisc.setWizard(true);
@@ -217,18 +206,18 @@ export function settingsWizard(
                 $location.search('tab', 'api');
                 $location.path('/settings');
               }
-              deferred.reject();
+              deferred.resolve();
             }
           })
           .catch(error => {
-            !disableErrors && errorHandler.handle(error, 'Routes');
+            !disableErrors && errorHandler.handle(error);
             wzMisc.setWizard(true);
             if (!$location.path().includes('/settings')) {
               $location.search('_a', null);
               $location.search('tab', 'api');
               $location.path('/settings');
             }
-            deferred.reject();
+            deferred.resolve();
           });
       } else {
         callCheckStored();
@@ -237,6 +226,6 @@ export function settingsWizard(
 
     return deferred.promise;
   } catch (error) {
-    !disableErrors && errorHandler.handle(error, 'Routes');
+    !disableErrors && errorHandler.handle(error);
   }
 }

@@ -16,12 +16,15 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+// @ts-ignore
 import { isEqual } from 'lodash';
-
+// @ts-ignore
 import { VisRequestHandlersRegistryProvider as RequestHandlersProvider } from 'ui/registry/vis_request_handlers';
+// @ts-ignore
 import { VisResponseHandlersRegistryProvider as ResponseHandlerProvider } from 'ui/registry/vis_response_handlers';
-
+// @ts-ignore
 import { IPrivate } from 'ui/private';
+// @ts-ignore
 import {
   RequestHandler,
   RequestHandlerDescription,
@@ -29,12 +32,22 @@ import {
   ResponseHandler,
   ResponseHandlerDescription,
   Vis,
+  // @ts-ignore
 } from 'ui/vis';
 
 // @ts-ignore No typing present
 import { isTermSizeZeroError } from 'ui/elasticsearch_errors';
-
+// @ts-ignore
 import { toastNotifications } from 'ui/notify';
+// @ts-ignore
+import { timezoneProvider } from 'ui/vis/lib/timezone';
+// @ts-ignore
+import { timefilter } from 'ui/timefilter';
+// @ts-ignore
+import { BuildESQueryProvider } from '@kbn/es-query';
+
+// @ts-ignore
+import { validateInterval } from './validate_interval';
 
 function getHandler<T extends RequestHandler | ResponseHandler>(
   from: Array<{ name: string; handler: T }>,
@@ -58,12 +71,72 @@ export class VisualizeDataLoader {
   private previousVisState: any;
   private previousRequestHandlerResponse: any;
 
-  constructor(private readonly vis: Vis, Private: IPrivate) {
+  constructor(private readonly vis: Vis, Private: IPrivate, $injector) {
     const { requestHandler, responseHandler } = vis.type;
 
     const requestHandlers: RequestHandlerDescription[] = Private(RequestHandlersProvider);
     const responseHandlers: ResponseHandlerDescription[] = Private(ResponseHandlerProvider);
-    this.requestHandler = getHandler(requestHandlers, requestHandler);
+
+    if (((vis || {}).type || {}).title === 'Visual Builder') {
+      const config = $injector.get('config');
+      const discoverPendingUpdates = $injector.get('discoverPendingUpdates')
+      const $http = $injector.get('$http')
+      const buildEsQuery = Private(BuildESQueryProvider);
+      this.requestHandler = ({ uiState, timeRange, filters, query, visParams }) => {
+        const timezone = Private(timezoneProvider)();
+        return new Promise((resolve) => {
+          const discoverList = discoverPendingUpdates.getList();
+          try {
+            if ((discoverList || []).length >= 2) {
+              const implicitFilter = (discoverList || []).length ? discoverList[0].query : '';
+              const parsedQuery = {
+                language: discoverList[0].language || 'lucene',
+                query: implicitFilter
+              };
+              const parsedFilters = discoverList[1];
+              query = parsedQuery;
+              filters = parsedFilters;
+            }
+          } catch (error) { }
+
+          const panel = visParams;
+          const uiStateObj = {};
+          const parsedTimeRange = timefilter.calculateBounds(timeRange);
+          const scaledDataFormat = config.get('dateFormat:scaled');
+          const dateFormat = config.get('dateFormat');
+          if (panel && panel.id) {
+            const params = {
+              timerange: { timezone, ...parsedTimeRange },
+              filters: [buildEsQuery(undefined, [query], filters)],
+              panels: [panel],
+              state: uiStateObj
+            };
+
+            try {
+              const maxBuckets = config.get('metrics:max_buckets');
+              validateInterval(parsedTimeRange, panel, maxBuckets);
+              const httpResult = $http.post('../api/metrics/vis/data', params)
+                .then(resp => ({ dateFormat, scaledDataFormat, timezone, ...resp.data }))
+                .catch(resp => { throw resp.data; });
+
+              return httpResult
+                .then(resolve)
+                .catch(resp => {
+                  resolve({});
+                  const err = new Error(resp.message);
+                  err.stack = resp.stack;
+                });
+            } catch (e) {
+              return resolve();
+            }
+          }
+        });
+
+      }
+
+    } else {
+      this.requestHandler = getHandler(requestHandlers, requestHandler);
+    }
     this.responseHandler = getHandler(responseHandlers, responseHandler);
   }
 
@@ -125,8 +198,8 @@ export class VisualizeDataLoader {
       if (isTermSizeZeroError(error)) {
         return toastNotifications.addDanger(
           `Your visualization ('${this.vis.title}') has an error: it has a term ` +
-            `aggregation with a size of 0. Please set it to a number greater than 0 to resolve ` +
-            `the error.`
+          `aggregation with a size of 0. Please set it to a number greater than 0 to resolve ` +
+          `the error.`
         );
       }
 

@@ -19,24 +19,37 @@
 
 // @ts-ignore untyped dependency
 import { registries } from '@kbn/interpreter/public';
+
+// @ts-ignore
 import { EventEmitter } from 'events';
+// @ts-ignore
 import { debounce, forEach } from 'lodash';
 import * as Rx from 'rxjs';
 import { share } from 'rxjs/operators';
+// @ts-ignore
 import { Inspector } from 'ui/inspector';
+// @ts-ignore
 import { Adapters } from 'ui/inspector/types';
+// @ts-ignore
 import { PersistedState } from 'ui/persisted_state';
+// @ts-ignore
 import { IPrivate } from 'ui/private';
+// @ts-ignore
 import { RenderCompleteHelper } from 'ui/render_complete';
+// @ts-ignore
 import { AppState } from 'ui/state_management/app_state';
+// @ts-ignore
 import { timefilter } from 'ui/timefilter';
+// @ts-ignore
 import { RequestHandlerParams, Vis } from 'ui/vis';
 import { visualizationLoader } from './visualization_loader';
 import { VisualizeDataLoader } from './visualize_data_loader';
-
+// @ts-ignore
 import { DataAdapter, RequestAdapter } from 'ui/inspector/adapters';
 
 import { VisSavedObject, VisualizeLoaderParams, VisualizeUpdateParams } from './types';
+
+// @ts-ignore
 import { queryGeohashBounds } from 'ui/visualize/loader/utils';
 
 interface EmbeddedVisualizeHandlerParams extends VisualizeLoaderParams {
@@ -93,7 +106,8 @@ export class EmbeddedVisualizeHandler {
   constructor(
     private readonly element: HTMLElement,
     savedObject: VisSavedObject,
-    params: EmbeddedVisualizeHandlerParams
+    params: EmbeddedVisualizeHandlerParams,
+    $injector
   ) {
     const { searchSource, vis } = savedObject;
 
@@ -153,13 +167,12 @@ export class EmbeddedVisualizeHandler {
       });
     };
 
-    this.dataLoader = new VisualizeDataLoader(vis, Private);
+    this.dataLoader = new VisualizeDataLoader(vis, Private, $injector);
     this.renderCompleteHelper = new RenderCompleteHelper(element);
     this.inspectorAdapters = this.getActiveInspectorAdapters();
     this.vis.openInspector = this.openInspector;
     this.vis.hasInspector = this.hasInspector;
 
-    // init default actions
     forEach(this.vis.type.events, (event, eventName) => {
       if (event.disabled || !eventName) {
         return;

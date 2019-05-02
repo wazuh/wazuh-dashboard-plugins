@@ -31,6 +31,7 @@ export class LogsController {
     this.nodeList = false;
     this.type_log = 'all';
     this.category = 'all';
+    this.sortFilter = false;
   }
 
   /**
@@ -38,8 +39,42 @@ export class LogsController {
    */
   $onInit() {
     this.initialize();
+
+    this.$scope.$on('wazuhFetched', (ev, parameters) => {
+      this.$scope.XMLContent = this.parseLogsToText(parameters.items) || '';
+
+      this.$scope.$broadcast('XMLContentReady', {
+        data: this.$scope.XMLContent
+      });
+      this.$scope.$applyAsync();
+      this.$scope.$broadcast('doRefresh', { type: 'xml' });
+    });
+
+    this.$scope.$on('scrolledToBottom', (ev, parameters) => {
+      if (!this.realtime)
+        this.$scope.$broadcast('increaseLogs', { lines: parameters.lines });
+    });
+    this.$scope.$on('scrollBottom', (ev, parameters) => {
+      this.$scope.$broadcast('viewerScrollBottom', { line: parameters.line });
+    });
   }
 
+  parseLogsToText(logs) {
+    let result = '';
+    logs.forEach(function(log, idx) {
+      if (log) {
+        result = result.concat(
+          `${log.timestamp} ${log.tag} ${(log.level || '').toUpperCase()}: ${
+            log.description
+          }`
+        );
+        if (idx !== logs.length - 1) {
+          result = result.concat('\n');
+        }
+      }
+    });
+    return result;
+  }
   /**
    * Event handler for the search bar.
    * @param {string} term Term(s) to be searched
@@ -56,12 +91,16 @@ export class LogsController {
     this.$scope.$broadcast('wazuhFilter', { filter });
   }
 
+  sort() {
+    this.$scope.$broadcast('wazuhSort', { field: 'timestamp' });
+  }
+
   /**
    * Starts real time mode
    */
   playRealtime() {
     this.realtime = true;
-    this.$scope.$broadcast('wazuhPlayRealTime');
+    this.$scope.$broadcast('wazuhPlayRealTime', { limit: 500 });
   }
 
   /**
@@ -118,9 +157,9 @@ export class LogsController {
       );
       const daemons = summary.data.data;
       this.daemons = Object.keys(daemons).map(item => ({ title: item }));
-      if (!this.$scope.$$phase) this.$scope.$digest();
+      this.$scope.$applyAsync();
     } catch (error) {
-      this.errorHandler.handle(error, 'Logs');
+      this.errorHandler.handle(error);
     }
   }
 
@@ -163,10 +202,10 @@ export class LogsController {
         : await this.apiReq.request('GET', '/manager/logs/summary', {});
       const daemons = data.data.data;
       this.daemons = Object.keys(daemons).map(item => ({ title: item }));
-      if (!this.$scope.$$phase) this.$scope.$digest();
+      this.$scope.$applyAsync();
       return;
     } catch (error) {
-      this.errorHandler.handle(error, 'Logs');
+      this.errorHandler.handle(error);
     }
     return;
   }

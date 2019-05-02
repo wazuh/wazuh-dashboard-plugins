@@ -1,26 +1,30 @@
 <div layout="column" layout-align="start stretch" ng-if="ctrl.tab === 'configuration' && !ctrl.load">
     <!-- Headline -->
     <div layout="column" layout-padding>
-        <span class="font-size-18"><i class="fa fa-fw fa-wrench" aria-hidden="true"></i> Wazuh Kibana plugin
-            configuration settings</span>
-        <span class="md-subheader">Configuration file located at <span class="wz-text-monospace">/usr/share/kibana/plugins/wazuh/config.yml</span></span>
+        <span class="font-size-18">
+            <react-component name="EuiIcon" props="{type:'wrench'}" /> Wazuh Kibana plugin
+            configuration settings
+        </span>
+        <span class="md-subheader">Configuration file located at <span
+                class="wz-text-monospace">/usr/share/kibana/plugins/wazuh/config.yml</span></span>
     </div>
     <!-- End headline -->
     <div layout="row" layout-align="start center" ng-if="!ctrl.load">
         <md-card flex class="wz-md-card">
+            <md-card-actions layout="row" class="wz-card-actions wz-card-actions-top layout-align-center-center">
+                <i class="fa fa-fw fa-file-o" aria-hidden="true"></i>
+                <span class="wz-headline-title">Current configuration</span>
+                <span flex></span>
+                <a tooltip="About and help" target="_blank" tooltip-placement="left"
+                    href="https://documentation.wazuh.com/current/user-manual/kibana-app/reference/config-file.html"
+                    aria-label="Link to open app about section">
+                    <i class="fa fa-fw fa-question-circle-o ng-scope" aria-hidden="true"></i>
+                </a>
+            </md-card-actions>
             <md-card-content>
                 <div layout="row">
-                    <i class="fa fa-fw fa-file-o" aria-hidden="true"></i>
-                    <span class="wz-headline-title">Current configuration</span>
-                    <span flex></span>
-                    <a tooltip="About and help" target="_blank" tooltip-placement="left" href="https://documentation.wazuh.com/current/user-manual/kibana-app/reference/config-file.html"
-                        aria-label="Link to open app about section">
-                        <i class="fa fa-fw fa-question-circle-o ng-scope" aria-hidden="true"></i>
-                    </a>
-                </div>
-                <md-divider class="wz-margin-top-10"></md-divider>
-                <div layout="row" class="wz-padding-top-10">
-                    <table class="table table-striped table-condensed table-layout-fixed table-hover table-vertical-align-middle">
+                    <table
+                        class="table table-striped table-condensed table-layout-fixed table-hover table-vertical-align-middle">
                         <thead class="wz-text-bold">
                             <th class="wz-text-left col-lg-2">Setting</th>
                             <th class="wz-text-left col-lg-2">Value</th>
@@ -32,17 +36,29 @@
                                 ng-style="ctrl.editingKey === key && {'background': '#e2f7ff'}">
                                 <td>{{key}}</td>
                                 <td>
-                                    <input ng-if="ctrl.editingKey === key && ctrl.configurationTypes[key] === 'string'"
-                                        ng-disabled="ctrl.loadingChange" id="input-{{key}}" type="text" class="wz-input-text"
+                                    <input
+                                        ng-if="ctrl.editingKey === key && ctrl.configurationTypes[key] === 'string' && key !== 'logs.level' && key !== 'wazuh.monitoring.creation'"
+                                        ng-disabled="ctrl.loadingChange" type="text" class="wz-input-text"
                                         ng-model="ctrl.editingNewValue"></input>
                                     <input ng-if="ctrl.editingKey === key && ctrl.configurationTypes[key] === 'number'"
-                                        ng-disabled="ctrl.loadingChange" id="input-{{key}}" type="number" class="wz-input-text"
+                                        ng-disabled="ctrl.loadingChange" type="number" class="wz-input-text"
                                         ng-model="ctrl.editingNewValue" min=0></input>
-                                    <select ng-if="ctrl.editingKey === key && ctrl.configurationTypes[key] === 'boolean'"
-                                        ng-disabled="ctrl.loadingChange" id="input-{{key}}" class="wz-input-text wz-width-100"
-                                        ng-model="ctrl.editingNewValue" ng-options="o as o for o in [true, false]"></select>
-                                    <textarea ng-if="ctrl.editingKey === key && ctrl.configurationTypes[key] === 'object'"
-                                        ng-disabled="ctrl.loadingChange" id="input-{{key}}" class="wz-input-text wz-width-100"
+                                    <select
+                                        ng-if="ctrl.editingKey === key && ctrl.configurationTypes[key] === 'boolean'"
+                                        ng-disabled="ctrl.loadingChange" class="wz-input-text wz-width-100"
+                                        ng-model="ctrl.editingNewValue"
+                                        ng-options="o as o for o in [true, false]"></select>
+                                    <select ng-if="ctrl.editingKey === key && key === 'wazuh.monitoring.creation'"
+                                        ng-disabled="ctrl.loadingChange" class="wz-input-text wz-width-100"
+                                        ng-model="ctrl.editingNewValue"
+                                        ng-options="key as value for (key , value) in  {'h': 'hourly', 'd': 'daily', 'w': 'weekly', 'm': 'monthly'}"></select>
+                                    <select ng-if="ctrl.editingKey === key && key === 'logs.level'"
+                                        ng-disabled="ctrl.loadingChange" class="wz-input-text wz-width-100"
+                                        ng-model="ctrl.editingNewValue"
+                                        ng-options="key as value for (key , value) in  {'info': 'info', 'debug': 'debug'}"></select>
+                                    <textarea
+                                        ng-if="ctrl.editingKey === key && ctrl.configurationTypes[key] === 'object'"
+                                        ng-disabled="ctrl.loadingChange" class="wz-input-text wz-width-100"
                                         ng-model="ctrl.editingNewValue"></textarea>
                                     <span ng-show="!ctrl.editingKey || ctrl.editingKey !== key">{{value}}</span>
                                 </td>
@@ -50,12 +66,19 @@
                                 <td class="action-btn-td">
                                     <div ng-hide="key === 'admin' || !ctrl.configuration['admin']">
                                         <span ng-show="!ctrl.editingKey || ctrl.editingKey !== key" tooltip="Edit"
-                                            ng-click="ctrl.setEditingKey(key, value)" class="fa fa-fw fa-pencil cursor-pointer"></span>
+                                            ng-click="ctrl.setEditingKey(key, value)" class="cursor-pointer">
+                                            <react-component name="EuiIcon" props="{type: 'pencil'}" />
+
+                                        </span>
                                         <span ng-show="ctrl.editingKey === key && !ctrl.loadingChange" tooltip="Cancel"
-                                            class="fa fa-fw fa-times cursor-pointer" ng-click="ctrl.cancelEditingKey()"></span>
-                                        <span ng-show="ctrl.editingKey === key && ctrl.editingNewValue !== '' && !ctrl.loadingChange"
-                                            tooltip="Apply" class="fa fa-fw fa-success cursor-pointer" ng-click="ctrl.editKey(key, ctrl.editingNewValue)"></span>
-                                        <span ng-show="ctrl.editingKey === key && ctrl.loadingChange"><i class="fa fa-fw fa-spin fa-spinner"></i></span>
+                                            class="fa fa-fw fa-times cursor-pointer"
+                                            ng-click="ctrl.cancelEditingKey()"></span>
+                                        <span
+                                            ng-show="ctrl.editingKey === key && ctrl.editingNewValue !== '' && !ctrl.loadingChange"
+                                            tooltip="Apply" class="fa fa-fw fa-success cursor-pointer"
+                                            ng-click="ctrl.editKey(key, ctrl.editingNewValue)"></span>
+                                        <span ng-show="ctrl.editingKey === key && ctrl.loadingChange"><i
+                                                class="fa fa-fw fa-spin fa-spinner"></i></span>
                                     </div>
                                 </td>
                             </tr>

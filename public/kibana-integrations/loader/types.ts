@@ -16,10 +16,13 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-
+// @ts-ignore
 import { SearchSource } from 'ui/courier';
+// @ts-ignore
 import { PersistedState } from 'ui/persisted_state';
+// @ts-ignore
 import { AppState } from 'ui/state_management/app_state';
+// @ts-ignore
 import { Vis } from 'ui/vis';
 
 export interface TimeRange {

@@ -18,31 +18,34 @@ import { Monitoring } from './server/monitoring';
 import { WazuhApiRoutes } from './server/routes/wazuh-api';
 import { WazuhReportingRoutes } from './server/routes/wazuh-reporting';
 import { WazuhUtilsRoutes } from './server/routes/wazuh-utils';
+import { IndexPatternCronJob } from './server/index-pattern-cron-job';
 import { log } from './server/logger';
+import { Queue } from './server/jobs/queue';
 
 export function initApp(server) {
   const monitoringInstance = new Monitoring(server);
-  log('[initApp]', `Waiting for awaitMigration()`, 'info');
+  const indexPatternCronJobInstance = new IndexPatternCronJob(server);
+
+  log('init:initApp', `Waiting for Kibana migration jobs`, 'debug');
   server.kibanaMigrator
     .awaitMigration()
     .then(() => {
       log(
-        '[initApp]',
-        `awaitMigration() has been executed successfully`,
-        'info'
+        'init:initApp',
+        `Kibana migration jobs executed successfully`,
+        'debug'
       );
       Initialize(server);
       WazuhElasticRouter(server);
       WazuhApiElasticRoutes(server);
       monitoringInstance.run();
+      indexPatternCronJobInstance.run();
+      Queue.launchCronJob();
       WazuhApiRoutes(server);
       WazuhReportingRoutes(server);
       WazuhUtilsRoutes(server);
     })
     .catch(error => {
-      log(
-        '[initApp]',
-        `initApp function failed due to: ${error.message || error}`
-      );
+      log('init:initApp', error.message || error);
     });
 }

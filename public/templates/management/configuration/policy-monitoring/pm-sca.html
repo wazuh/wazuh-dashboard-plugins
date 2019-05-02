@@ -1,0 +1,63 @@
+<!-- No configuration section -->
+<wz-no-config flex error="'not-present'" ng-if="configurationSubTab === 'pm-sca' && !currentConfig['sca']">
+</wz-no-config>
+<!-- End no configuration section -->
+
+<!-- The main card will all the settings -->
+<md-card class="wz-md-card"
+    ng-if="!JSONContent && !XMLContent && configurationSubTab === 'pm-sca' && currentConfig['sca']">
+    <md-card-content>
+        <div layout="row" layout-align="start center">
+            <div>
+                <span class="font-size-16">Security configuration assessment</span>
+            </div>
+            <span flex></span>
+            <span ng-class="JSONContent ? 'wz-text-active' : ''" class="wz-text-link small"
+                ng-click="getJSON()">JSON</span>
+            <span class="small">&nbsp;&centerdot;&nbsp;</span>
+            <span ng-class="XMLContent ? 'wz-text-active' : ''" class="wz-text-link small"
+                ng-click="getXML()">XML</span>
+        </div>
+        <md-divider class="wz-margin-top-10"></md-divider>
+
+        <!-- Configuration block -->
+        <div class="wz-padding-top-10">
+            <!-- content -->
+            <wz-config-item label="Security configuration assessment status"
+                value="currentConfig['sca'].enabled === 'yes' ? 'enabled' : 'disabled'">
+            </wz-config-item>
+            <wz-config-item label="Interval" value="currentConfig['sca'].interval">
+            </wz-config-item>
+            <wz-config-item label="Scan on start" value="currentConfig['sca'].scan_on_start">
+            </wz-config-item>
+            <wz-config-item label="Skip nfs" value="currentConfig['sca'].skip_nfs">
+            </wz-config-item>
+            <!-- end content -->
+        </div>
+        <!-- End configuration block -->
+
+        <div class="wz-margin-top-10">
+            <span class="font-size-16">Policies</span>
+        </div>
+        <md-divider class="wz-margin-top-10"></md-divider>
+
+        <!-- Policies block -->
+        <div class="wz-padding-top-10">
+            <!-- content -->
+            <table class="table table-striped table-condensed" style="table-layout: fixed !important;">
+                <thead class="wz-text-bold">
+                    <th class="wz-text-left">Name</th>
+                </thead>
+                <tbody class="wz-word-wrap">
+                    <tr ng-repeat="policy in currentConfig['sca'].policies">
+                        <td>{{policy}}</td>
+                    </tr>
+                </tbody>
+            </table>
+            </wz-config-item>
+            <!-- end content -->
+        </div>
+        <!-- End configuration block -->
+    </md-card-content>
+</md-card>
+<!-- End main card with all the settings -->

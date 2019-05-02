@@ -12,30 +12,131 @@
 
 import template from './wz-config-viewer.html';
 import { uiModules } from 'ui/modules';
+import CodeMirror from '../../utils/codemirror/lib/codemirror';
 
 const app = uiModules.get('app/wazuh', []);
 
 class WzConfigViewer {
-  /**
-   * Class constructor
-   */
   constructor() {
     this.restrict = 'E';
     this.scope = {
       getjson: '&',
       getxml: '&',
-      jsoncontent: '=jsoncontent',
-      xmlcontent: '=xmlcontent'
+      jsoncontent: '=',
+      xmlcontent: '=',
+      hideHeader: '=',
+      noLocal: '='
     };
-    this.replace = true;
     this.template = template;
   }
 
-  link(scope) {
-    scope.callgetjson = () => {
-      scope.getjson();
+  controller($scope, $document) {
+    const setJsonBox = () => {
+      $scope.jsonCodeBox = CodeMirror.fromTextArea(
+        $document[0].getElementById('viewer_json_box'),
+        {
+          lineNumbers: true,
+          autoRefresh: true,
+          matchClosing: true,
+          matchBrackets: true,
+          mode: { name: 'javascript', json: true },
+          readOnly: true,
+          theme: 'ttcn',
+          foldGutter: true,
+          styleSelectedText: true,
+          gutters: ['CodeMirror-foldgutter']
+        }
+      );
     };
-    scope.callgetxml = () => scope.getxml();
+    const setXmlBox = () => {
+      $scope.xmlCodeBox = CodeMirror.fromTextArea(
+        $document[0].getElementById('viewer_xml_box'),
+        {
+          lineNumbers: true,
+          lineWrapping: true,
+          autoRefresh: true,
+          matchClosing: true,
+          matchBrackets: true,
+          mode: 'text/xml',
+          readOnly: true,
+          theme: 'ttcn',
+          foldGutter: true,
+          styleSelectedText: true,
+          gutters: ['CodeMirror-foldgutter']
+        }
+      );
+      bindXmlListener();
+    };
+
+    const refreshJsonBox = json => {
+      $scope.jsoncontent = json;
+      if (!$scope.jsonCodeBox) {
+        setJsonBox();
+      }
+      if ($scope.jsoncontent != false) {
+        $scope.jsonCodeBox.setValue($scope.jsoncontent.replace(/\\\\/g, '\\'));
+        setTimeout(function() {
+          $scope.jsonCodeBox.refresh();
+          $scope.$applyAsync();
+        }, 200);
+      }
+    };
+
+    const refreshXmlBox = xml => {
+      $scope.xmlcontent = xml;
+      if (!$scope.xmlCodeBox) {
+        setXmlBox();
+      }
+      if ($scope.xmlcontent != false) {
+        $scope.xmlCodeBox.setValue($scope.xmlcontent);
+        setTimeout(function() {
+          $scope.xmlCodeBox.refresh();
+          $scope.$applyAsync();
+        }, 200);
+      }
+    };
+
+    $scope.callgetjson = () => $scope.getjson();
+
+    $scope.callgetxml = () => $scope.getxml();
+
+    $scope.$on('JSONContentReady', (ev, params) => {
+      refreshJsonBox(params.data);
+    });
+
+    $scope.$on('XMLContentReady', (ev, params) => {
+      refreshXmlBox(params.data);
+    });
+
+    const bindXmlListener = () => {
+      var scrollElement = $scope.xmlCodeBox.getScrollerElement();
+      $(scrollElement).bind('scroll', function(e) {
+        var element = $(e.currentTarget)[0];
+        if (element.scrollHeight - element.scrollTop === element.clientHeight) {
+          $scope.$emit('scrolledToBottom', {
+            lines: $scope.xmlCodeBox.lineCount()
+          });
+        }
+      });
+    };
+
+    $scope.$on('viewerScrollBottom', (ev, params) => {
+      var t = $scope.xmlCodeBox.charCoords(
+        { line: params.line, ch: 0 },
+        'local'
+      ).top;
+      var middleHeight =
+        $scope.xmlCodeBox.getScrollerElement().offsetHeight / 2;
+      $scope.xmlCodeBox.scrollTo(null, t - middleHeight - 10);
+    });
+
+    $scope.$on('doRefresh', (ev, params) => {
+      if (params.type === 'xml') {
+        $scope.xmlCodeBox.refresh();
+      } else {
+        $scope.jsonCodeBox.refresh();
+      }
+    });
   }
 }
 

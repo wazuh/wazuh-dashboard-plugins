@@ -26,16 +26,15 @@ class WzMenu {
   controller(
     $scope,
     $window,
-    $rootScope,
     appState,
     patternHandler,
     indexPatterns,
     errorHandler,
     wazuhConfig
   ) {
-    $rootScope.showSelector = appState.getPatternSelector();
+    $scope.showSelector = appState.getPatternSelector();
 
-    if (!$rootScope.$$phase) $rootScope.$digest();
+    $scope.$applyAsync();
 
     if (appState.getCurrentAPI()) {
       $scope.theresAPI = true;
@@ -64,7 +63,7 @@ class WzMenu {
         if (!appState.getPatternSelector()) return;
 
         // Show the pattern selector
-        $rootScope.showSelector = true;
+        $scope.showSelector = true;
         let filtered = false;
         // If there is no current pattern, fetch it
         if (!appState.getCurrentPattern()) {
@@ -88,11 +87,11 @@ class WzMenu {
           $scope.patternList = list;
           $scope.currentSelectedPattern = appState.getCurrentPattern();
         }
-        if (!$scope.$$phase) $scope.$digest();
-        if (!$rootScope.$$phase) $rootScope.$digest();
+        $scope.$applyAsync();
+
         return;
       } catch (error) {
-        errorHandler.handle(error, 'Directives - Menu');
+        errorHandler.handle(error.message || error);
         $scope.theresPattern = false;
       }
     };
@@ -106,13 +105,15 @@ class WzMenu {
         $scope.currentSelectedPattern = await patternHandler.changePattern(
           selectedPattern
         );
-        if (!$scope.$$phase) $scope.$digest();
+        $scope.$applyAsync();
         $window.location.reload();
         return;
       } catch (error) {
-        errorHandler.handle(error, 'Directives - Menu');
+        errorHandler.handle(error.message || error);
       }
     };
+
+    $scope.refresh = () => $window.location.reload();
 
     //listeners
     $scope.$on('updateAPI', (evt, params) => {
@@ -146,7 +147,7 @@ class WzMenu {
           $scope.currentSelectedPattern = appState.getCurrentPattern();
         })
         .catch(error => {
-          errorHandler.handle(error, 'Directives - Menu');
+          errorHandler.handle(error.message || error);
           $scope.theresPattern = false;
         });
     });

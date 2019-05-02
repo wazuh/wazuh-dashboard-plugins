@@ -1099,6 +1099,7 @@ function discoverController(
   const changeTabViewListener = $rootScope.$on(
     'changeTabView',
     (evt, parameters) => {
+      evt.stopPropagation();
       $scope.tabView = parameters.tabView || 'panels';
       $scope.updateQueryAndFetch($state.query);
     }

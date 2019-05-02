@@ -1,0 +1,81 @@
+<md-content flex layout="column" ng-if="tab === 'docker' && tabView === 'panels'"
+    ng-class="{'no-opacity': resultState !== 'ready' || !rendered}" layout-align="start">
+
+    <div layout="row" class="height-300">
+
+        <md-card flex class="wz-md-card" ng-class="{'fullscreen': expandArray[0]}">
+            <md-card-actions layout="row" layout-align="end center" class="wz-card-actions-vis" ng-dblclick="expand(0)">
+                <span class="wz-headline-title">Top 5 images</span>
+                <span flex></span>
+                <span class="cursor-pointer" ng-click="expand(0)">
+                    <react-component name="EuiIcon" props="{type:'expand'}" />
+                </span>
+            </md-card-actions>
+            <md-card-content class="wazuh-column">
+                <kbn-vis id="Wazuh-App-Agents-Docker-top-5-images" vis-id="'Wazuh-App-Agents-Docker-top-5-images'">
+            </md-card-content>
+        </md-card>
+
+        <md-card flex class="wz-md-card" ng-class="{'fullscreen': expandArray[1]}">
+            <md-card-actions layout="row" layout-align="end center" class="wz-card-actions-vis" ng-dblclick="expand(1)">
+                <span class="wz-headline-title">Top 5 events</span>
+                <span flex></span>
+                <span class="cursor-pointer" ng-click="expand(1)">
+                    <react-component name="EuiIcon" props="{type:'expand'}" />
+                </span>
+            </md-card-actions>
+            <md-card-content class="wazuh-column">
+                <kbn-vis id="Wazuh-App-Agents-Docker-top-5-actions" vis-id="'Wazuh-App-Agents-Docker-top-5-actions'">
+            </md-card-content>
+        </md-card>
+
+        <md-card flex="50" class="wz-md-card" ng-class="{'fullscreen': expandArray[2]}">
+            <md-card-actions layout="row" layout-align="end center" class="wz-card-actions-vis" ng-dblclick="expand(2)">
+                <span class="wz-headline-title">Resources usage over time</span>
+                <span flex></span>
+                <span class="cursor-pointer" ng-click="expand(2)">
+                    <react-component name="EuiIcon" props="{type:'expand'}" />
+                </span>
+            </md-card-actions>
+            <md-card-content class="wazuh-column">
+                <kbn-vis id="Wazuh-App-Agents-Docker-Types-over-time"
+                    vis-id="'Wazuh-App-Agents-Docker-Types-over-time'">
+            </md-card-content>
+        </md-card>
+    </div>
+
+    <div layout="row" class="height-300">
+
+        <md-card flex class="wz-md-card" ng-class="{'fullscreen': expandArray[3]}">
+            <md-card-actions layout="row" layout-align="end center" class="wz-card-actions-vis" ng-dblclick="expand(3)">
+                <span class="wz-headline-title">Events occurred evolution</span>
+                <span flex></span>
+                <span class="cursor-pointer" ng-click="expand(3)">
+                    <react-component name="EuiIcon" props="{type:'expand'}" />
+                </span>
+            </md-card-actions>
+            <md-card-content class="wazuh-column">
+                <kbn-vis id="Wazuh-App-Agents-Docker-Actions-over-time"
+                    vis-id="'Wazuh-App-Agents-Docker-Actions-over-time'">
+            </md-card-content>
+        </md-card>
+
+    </div>
+
+    <div layout="row" class="height-570">
+
+        <md-card flex class="wz-md-card" ng-class="{'fullscreen': expandArray[4]}">
+            <md-card-actions layout="row" layout-align="end center" class="wz-card-actions-vis" ng-dblclick="expand(4)">
+                <span class="wz-headline-title">Alerts summary</span>
+                <span flex></span>
+                <span class="cursor-pointer" ng-click="expand(4)">
+                    <react-component name="EuiIcon" props="{type:'expand'}" />
+                </span>
+            </md-card-actions>
+            <md-card-content class="wazuh-column">
+                <kbn-vis vis-id="'Wazuh-App-Agents-Docker-Events-summary'">
+            </md-card-content>
+        </md-card>
+    </div>
+
+</md-content>

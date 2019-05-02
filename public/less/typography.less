@@ -41,11 +41,15 @@ html, body, button:not(.fa):not(.fa-times), textarea, input, select, .wz-chip {
 }
 
 .color-pointer {
-    color: #0079a5 !important;
+    color: #006BB4 !important;
 }
 
 .wz-line-height {
     line-height: 20px !important;
+}
+
+.wz-line-height-40 {
+    line-height: 40px !important;
 }
 
 .wz-text-center {
@@ -83,7 +87,16 @@ html, body, button:not(.fa):not(.fa-times), textarea, input, select, .wz-chip {
 .wz-text-truncatable {
     overflow: hidden;
     white-space: nowrap;
-    text-overflow: ellipsis;
+    text-overflow: ellipsis;        
+    &:before {
+        content: attr(data-name);
+      }
+}
+
+.wz-text-truncatable-container {
+    overflow: hidden;
+    width: auto;
+    display: grid;
 }
 
 .font-size-12 {
@@ -119,10 +132,19 @@ html, body, button:not(.fa):not(.fa-times), textarea, input, select, .wz-chip {
 /* Class for linkable text elements */
 .wz-text-link {
     cursor: pointer !important;
-    color: rgb(0, 121, 165) !important;
+    color: #006BB4 !important;
 
     &:hover {
         text-decoration: underline !important;
+    }
+}
+
+.wz-text-link-add {
+    cursor: pointer !important;
+    color: #006BB4 !important;
+
+    &:hover {
+        text-decoration: none !important;
     }
 }
 
@@ -144,4 +166,8 @@ html, body, button:not(.fa):not(.fa-times), textarea, input, select, .wz-chip {
 
 .wz-text-red {
     color: rgb(255, 100, 92);
+}
+
+b{
+    font-weight: bold;
 }

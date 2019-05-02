@@ -31,7 +31,7 @@ export function GroupsController(
     $scope.currentGroup = false;
     $scope.$emit('removeCurrentGroup');
     $scope.lookingGroup = false;
-    if (!$scope.$$phase) $scope.$digest();
+    $scope.$applyAsync();
   });
 
   $scope.load = true;
@@ -104,7 +104,7 @@ export function GroupsController(
       $scope.adminMode = !!(configuration || {}).admin;
       $scope.load = false;
 
-      if (!$scope.$$phase) $scope.$digest();
+      $scope.$applyAsync();
     } catch (error) {
       errorHandler.handle(error, 'Groups');
     }
@@ -138,9 +138,14 @@ export function GroupsController(
       $scope.totalFiles = count.data.data.totalItems;
       $scope.fileViewer = false;
       $scope.currentGroup = group;
+      $location.search('currentGroup', group.name);
+      if ($location.search() && $location.search().navigation) {
+        appState.setNavigation({ status: true });
+        $location.search('navigation', null);
+      }
       $scope.$emit('setCurrentGroup', { currentGroup: $scope.currentGroup });
       $scope.fileViewer = false;
-      if (!$scope.$$phase) $scope.$digest();
+      $scope.$applyAsync();
     } catch (error) {
       errorHandler.handle(error, 'Groups');
     }
@@ -148,12 +153,14 @@ export function GroupsController(
   };
 
   //listeners
-  $scope.$on('wazuhShowGroup', (event, parameters) => {
+  $scope.$on('wazuhShowGroup', (ev, parameters) => {
+    ev.stopPropagation();
     $scope.groupsSelectedTab = 'agents';
     return $scope.loadGroup(parameters.group);
   });
 
-  $scope.$on('wazuhShowGroupFile', (event, parameters) => {
+  $scope.$on('wazuhShowGroupFile', (ev, parameters) => {
+    ev.stopPropagation();
     if (
       ((parameters || {}).fileName || '').includes('agent.conf') &&
       $scope.adminMode
@@ -191,7 +198,7 @@ export function GroupsController(
     } catch (error) {
       errorHandler.handle(error, 'Groups');
     }
-    if (!$scope.$$phase) $scope.$digest();
+    $scope.$applyAsync();
     return;
   };
 
@@ -204,7 +211,7 @@ export function GroupsController(
     $scope.groupsSelectedTab = 'agents';
     $scope.file = false;
     $scope.filename = false;
-    if (!$scope.$$phase) $scope.$digest();
+    $scope.$applyAsync();
   };
 
   /**
@@ -217,7 +224,7 @@ export function GroupsController(
     $scope.file = false;
     $scope.filename = false;
     $scope.fileViewer = false;
-    if (!$scope.$$phase) $scope.$digest();
+    $scope.$applyAsync();
   };
 
   /**
@@ -228,7 +235,7 @@ export function GroupsController(
     $scope.$emit('removeCurrentGroup');
     $scope.lookingGroup = false;
     $scope.editingFile = false;
-    if (!$scope.$$phase) $scope.$digest();
+    $scope.$applyAsync();
   };
 
   /**
@@ -244,7 +251,7 @@ export function GroupsController(
       $scope.file = beautifier.prettyPrint(data.data.data);
       $scope.filename = fileName;
 
-      if (!$scope.$$phase) $scope.$digest();
+      $scope.$applyAsync();
     } catch (error) {
       errorHandler.handle(error, 'Groups');
     }
@@ -273,32 +280,34 @@ export function GroupsController(
     $scope.editingFile = true;
     try {
       $scope.fetchedXML = await fetchFile();
+      $location.search('editingFile', true);
+      appState.setNavigation({ status: true });
       $scope.$broadcast('fetchedFile', { data: $scope.fetchedXML });
     } catch (error) {
       $scope.fetchedXML = null;
       errorHandler.handle(error, 'Fetch file error');
     }
-    if (!$scope.$$phase) $scope.$digest();
+    $scope.$applyAsync();
   };
 
   $scope.closeEditingFile = () => {
     $scope.editingFile = false;
+    appState.setNavigation({ status: true });
     $scope.$broadcast('closeEditXmlFile', {});
+    $scope.$applyAsync();
   };
 
   $scope.xmlIsValid = valid => {
     $scope.xmlHasErrors = valid;
-    if (!$scope.$$phase) $scope.$digest();
+    $scope.$applyAsync();
   };
 
   $scope.doSaveGroupAgentConfig = () => {
-    $scope.$broadcast('saveXmlFile', { group: $scope.currentGroup.name });
+    $scope.$broadcast('saveXmlFile', {
+      group: $scope.currentGroup.name,
+      type: 'group'
+    });
   };
-
-  $scope.$on('configurationSuccess', () => {
-    $scope.editingFile = false;
-    if (!$scope.$$phase) $scope.$digest();
-  });
 
   $scope.reload = async (element, searchTerm, addOffset, start) => {
     if (element === 'left') {
@@ -324,7 +333,7 @@ export function GroupsController(
     }
 
     $scope.multipleSelectorLoading = false;
-    if (!$scope.$$phase) $scope.$digest();
+    $scope.$applyAsync();
   };
 
   $scope.loadSelectedAgents = async searchTerm => {
@@ -443,7 +452,7 @@ export function GroupsController(
     } catch (error) {
       errorHandler.handle(error, 'Error adding agents');
     }
-    if (!$scope.$$phase) $scope.$digest();
+    $scope.$applyAsync();
     return;
   };
 
@@ -468,6 +477,30 @@ export function GroupsController(
     const deletedIds = [...new Set($scope.deletedAgents.map(x => x.key))];
 
     return { addedIds, deletedIds };
+  };
+
+  /**
+   * Re-group the given array depending on the property provided as parameter.
+   * @param {*} collection Array<object>
+   * @param {*} property String
+   */
+  const groupBy = (collection, property) => {
+    try {
+      const values = [];
+      const result = [];
+
+      for (const item of collection) {
+        const index = values.indexOf(item[property]);
+        if (index > -1) result[index].push(item);
+        else {
+          values.push(item[property]);
+          result.push([item]);
+        }
+      }
+      return result.length ? result : false;
+    } catch (error) {
+      return false;
+    }
   };
 
   $scope.saveAddAgents = async () => {
@@ -498,13 +531,20 @@ export function GroupsController(
       }
 
       if (failedIds.length) {
+        const failedErrors = failedIds.map(item => ({
+          id: (item || {}).id,
+          message: ((item || {}).error || {}).message
+        }));
+        $scope.failedErrors = groupBy(failedErrors, 'message') || false;
         errorHandler.info(
-          `Warning. Group has been updated but an error has occurred with the following agents ${failedIds}`,
+          `Group has been updated but an error has occurred with ${
+            failedIds.length
+          } agents`,
           '',
           true
         );
       } else {
-        errorHandler.info('Success. Group has been updated', '');
+        errorHandler.info('Group has been updated');
       }
       $scope.addMultipleAgents(false);
       $scope.multipleSelectorLoading = false;
@@ -515,7 +555,7 @@ export function GroupsController(
       $scope.multipleSelectorLoading = false;
       errorHandler.handle(err, 'Error applying changes');
     }
-    if (!$scope.$$phase) $scope.$digest();
+    $scope.$applyAsync();
     return;
   };
 
@@ -560,10 +600,21 @@ export function GroupsController(
     try {
       $scope.addingGroup = false;
       await groupHandler.createGroup(name);
-      errorHandler.info(`Success. Group ${name} has been created`, '');
+      errorHandler.info(`Group ${name} has been created`);
     } catch (error) {
-      errorHandler.handle(`${error.message || error}`, '');
+      errorHandler.handle(error.message || error);
     }
     $scope.$broadcast('wazuhSearch', {});
   };
+
+  // Come from the pencil icon on the groups table
+  $scope.$on('openGroupFromList', (ev, parameters) => {
+    $scope.editingFile = true;
+    $scope.groupsSelectedTab = 'files';
+    appState.setNavigation({ status: true });
+    $location.search('navigation', true);
+    return $scope
+      .loadGroup(parameters.group)
+      .then(() => $scope.editGroupAgentConfig());
+  });
 }

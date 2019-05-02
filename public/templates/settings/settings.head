@@ -1,41 +1,21 @@
 <div flex="auto" layout="column" ng-cloak ng-controller="settingsController as ctrl">
 
-    <!-- Top navbar section -->
     <wz-menu ng-init="menuNavItem = 'settings'"></wz-menu>
-    <!-- End top navbar section -->
 
-    <!-- Loading ring -->
-    <div class='uil-ring-css' ng-show="ctrl.load">
-        <div></div>
+    <div ng-if="ctrl.load" class="md-padding wz-margin-top-16">
+        <react-component name="EuiProgress" props="{size: 'xs', color: 'primary'}" />
     </div>
-    <!-- End loading ring -->
 
-    <!-- Navigation section -->
-    <div layout="row" layout-align="start center" ng-if="!ctrl.load">
-        <!-- Breadcrumbs -->
-        <div layout="row" layout-padding>
-            <!-- Always show a functional breadcrumb -->
-            <div>
-                <span>Settings</span>
-                <span> / </span>
-                <span>{{ ctrl.tabNames[ctrl.tab] }}</span>
-            </div>
-        </div>
-        <!-- End breadcrumbs -->
-    </div>
-    <!-- End navigation section -->
-
-    <!-- Navigation bar -->
-    <md-nav-bar
-        ng-if="!ctrl.load"
-        class="wz-nav-bar"
-        md-selected-nav-item="ctrl.tab"
+    <md-nav-bar ng-if="!ctrl.load" class="wz-nav-bar" md-selected-nav-item="ctrl.tab"
         nav-bar-aria-label="Settings navigation links">
-        <md-nav-item class="wz-nav-item" md-nav-click="ctrl.switchTab('api')" name="api">API</md-nav-item>
-        <md-nav-item class="wz-nav-item" ng-if="ctrl.apiEntries && ctrl.apiEntries.length" md-nav-click="ctrl.switchTab('extensions')" name="extensions">Extensions</md-nav-item>
-        <md-nav-item class="wz-nav-item" md-nav-click="ctrl.switchTab('pattern')" name="pattern">Pattern</md-nav-item>
-        <md-nav-item class="wz-nav-item" md-nav-click="ctrl.switchTab('configuration')" name="configuration">Configuration</md-nav-item>
-        <md-nav-item class="wz-nav-item" md-nav-click="ctrl.switchTab('logs'); ctrl.refreshLogs()" name="logs">Logs</md-nav-item>
-        <md-nav-item class="wz-nav-item" md-nav-click="ctrl.switchTab('about')" name="about">About</md-nav-item>
+        <md-nav-item class="wz-nav-item" md-nav-click="ctrl.switchTab('api', true)" name="api">API</md-nav-item>
+        <md-nav-item class="wz-nav-item" ng-if="ctrl.apiEntries && ctrl.apiEntries.length"
+            md-nav-click="ctrl.switchTab('extensions', true)" name="extensions">Extensions</md-nav-item>
+        <md-nav-item class="wz-nav-item" md-nav-click="ctrl.switchTab('pattern', true)" name="pattern">Pattern
+        </md-nav-item>
+        <md-nav-item class="wz-nav-item" md-nav-click="ctrl.switchTab('configuration', true)" name="configuration">
+            Configuration</md-nav-item>
+        <md-nav-item class="wz-nav-item" md-nav-click="ctrl.switchTab('logs', true); ctrl.refreshLogs()" name="logs">
+            Logs</md-nav-item>
+        <md-nav-item class="wz-nav-item" md-nav-click="ctrl.switchTab('about', true)" name="about">About</md-nav-item>
     </md-nav-bar>
-    <!-- End navigation bar -->

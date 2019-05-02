@@ -1,55 +1,70 @@
-<div ng-if="!loading && !dctrl.viewingDetail" layout="column" class="md-padding">
-    <div id="content" layout="row" layout-align="start start">
-
-        <input flex placeholder="Filter decoders..." ng-model="dctrl.custom_search" type="text" class="kuiLocalSearchInput ng-empty ng-pristine ng-scope ng-touched ng-valid wz-margin-top-4 height-36"
-            aria-invalid="false" wz-enter="dctrl.search(dctrl.custom_search)">
-        <button type="submit" aria-label="Search" class="kuiLocalSearchButton height-36 wz-margin-top-4 wz-margin-right-16" ng-click="dctrl.search(dctrl.custom_search)">
-            <span class="fa fa-search" aria-hidden="true"></span>
-        </button>
-
-        <div layout="column" layout-align="center" class="height-40 wz-select-input wz-margin-right-8">
-            <select flex class="kuiSelect wz-border-none cursor-pointer max-height-35" ng-model="dctrl.typeFilter" ng-change="dctrl.onlyParents(dctrl.typeFilter)" aria-label="Filter by type" ng-init="'All decoders'">
-                <option value="all">All decoders</option>
-                <option value="parents">Parent decoders</option>
-            </select>
+<div ng-if="!loading && !dctrl.viewingDetail" layout="column">
+    <div layout="row"
+        class="euiFlexGroup euiFlexGroup--alignItemsCenter euiFormControlLayout__childrenWrapper md-padding-h ng-scope wz-margin-top-16"
+        ng-if="!dctrl.editingFile && !mctrl.filesSubTab">
+        <input placeholder="Filter decoders..." ng-model="dctrl.custom_search" type="text"
+            class="euiFieldSearch euiFieldSearch--fullWidth euiFlexItem height-35 ng-empty ng-pristine ng-touched ng-valid"
+            aria-invalid="false" wz-enter="dctrl.search(dctrl.custom_search)" id="search-input-rules">
+        <wz-add-filter-chip id-input="search-input-rules"
+            options="[{label: 'File', value: 'file'}, {label: 'Path', value: 'path'}]" />
+        <div class="euiFormControlLayoutIcons wz-margin-left-16">
+            <span class="euiFormControlLayoutCustomIcon">
+                <react-component name="EuiIcon"
+                    props="{type:'search', className:'euiFormControlLayoutCustomIcon__icon'}" />
+            </span>
         </div>
-
-        <md-button ng-class="(mctrl.globalRulesetTab == 'rules') ? 'active' : ''" ng-click="mctrl.setRulesTab('rules')"
-            class="wz-button md-raised md-primary manager-ruleset-btn" aria-label="Ruleset rules button">
-            <i class="fa fa-fw fa-file-text-o" aria-hidden="true"></i> Rules
-        </md-button>
-        <md-button ng-class="(mctrl.globalRulesetTab == 'decoders') ? 'active' : ''" ng-click="mctrl.setRulesTab('decoders')"
-            class="wz-button md-raised md-primary manager-ruleset-btn" aria-label="Ruleset decoders button">
-            <i class="fa fa-fw fa-search" aria-hidden="true"></i> Decoders
-        </md-button>
+        <button type="submit" aria-label="Search"
+            class="euiFlexItem euiFlexItem--flexGrowZero height-35 kuiButton kuiButton--secondary wz-margin-left-8"
+            ng-click="dctrl.search(dctrl.custom_search)">
+            Search
+        </button>
     </div>
 
-    <md-chips class="wz-chips" readonly="true" ng-show="dctrl.appliedFilters.length">
+    <md-chips class="wz-chips md-padding-h wz-margin-top-16" readonly="true" ng-hide="!dctrl.appliedFilters.length || 
+    (dctrl.appliedFilters.length === 1 && dctrl.includesFilter('path') && dctrl.showingLocalDecoders)"
+        ng-if="!dctrl.editingFile">
         <md-chip class="wz-chip" ng-show="dctrl.includesFilter('file')">
             <span>File: {{ dctrl.getFilter('file') }}
-                <i class="fa fa-fw fa-times cursor-pointer" aria-hidden="true" ng-click="dctrl.removeFilter('file')"></i>
+                <i class="fa fa-fw fa-times cursor-pointer" aria-hidden="true"
+                    ng-click="dctrl.removeFilter('file')"></i>
             </span>
         </md-chip>
-        <md-chip class="wz-chip" ng-show="dctrl.includesFilter('path')">
+        <md-chip class="wz-chip" ng-show="dctrl.includesFilter('path') && !dctrl.showingLocalDecoders">
             <span>Path: {{ dctrl.getFilter('path') }}
-                <i class="fa fa-fw fa-times cursor-pointer" aria-hidden="true" ng-click="dctrl.removeFilter('path')"></i>
+                <i class="fa fa-fw fa-times cursor-pointer" aria-hidden="true"
+                    ng-click="dctrl.removeFilter('path')"></i>
             </span>
         </md-chip>
     </md-chips>
 
-    <div layout="row">
-        <wz-table
-            implicit-filter="dctrl.appliedFilters"
-            flex
-            path="'/decoders'"
-            keys="['name',{value:'details.program_name',size:2,nosortable:true},{value:'details.order',size:2,nosortable:true},'file']"
-            allow-click="true"
-            row-sizes="[15,13,11]"
-        />
-    </div>
-
-    <div layout="row" class="wz-margin-top-10">
-        <span flex></span>
-        <a class="small" id="btnDownload" ng-click="dctrl.downloadCsv()">Formatted <i aria-hidden="true" class="fa fa-download"></i></a>
+    <div layout="row" class="wz-margin-top-16">
+        <md-card flex class="wz-md-card _md flex md-margin-h" ng-if="!dctrl.editingFile && !mctrl.filesSubTab">
+            <md-card-actions layout="row" layout-align="end center" class="wz-card-actions wz-card-actions-top">
+                <a ng-if="adminMode" ng-click="mctrl.switchFilesSubTab('decoders')">Manage decoders files</a>
+                <span flex></span>
+                <wz-kbn-switch class="md-primary wz-no-top-bottom-margin" switch-model="dctrl.showingLocalDecoders"
+                    switch-text="Custom decoders" switch-change="dctrl.switchLocalDecoders()"></wz-kbn-switch>
+            </md-card-actions>
+            <md-card-content class="wz-padding-bottom-0">
+                <wz-table custom-columns="true" ng-if="!dctrl.showingLocalDecoders"
+                    implicit-filter="dctrl.appliedFilters" flex path="'/decoders'"
+                    keys="['name',{value:'details.program_name',size:2,nosortable:true},{value:'details.order',size:2,nosortable:true},'file']"
+                    allow-click="true" row-sizes="[16,13,11]">
+                </wz-table>
+                <wz-table custom-columns="true" ng-if="dctrl.showingLocalDecoders" flex path="'/decoders'"
+                    keys="['name',{value:'details.program_name',size:2,nosortable:true},{value:'details.order',size:2,nosortable:true},'file']"
+                    implicit-filter="dctrl.appliedFilters" allow-click="true" row-sizes="[16,13,11]">
+                </wz-table>
+            </md-card-content>
+            <md-card-actions layout="row" layout-align="end center" class="layout-align-end-center layout-row">
+                <button type="button" ng-click="dctrl.downloadCsv()"
+                    class="euiButtonEmpty euiButtonEmpty--primary euiButtonEmpty--small">
+                    <span class="euiButtonEmpty__content">
+                        <react-component name="EuiIcon" props="{type:'importAction'}" />
+                        <span class="euiButtonEmpty__text">Formatted</span>
+                    </span>
+                </button>
+            </md-card-actions>
+        </md-card>
     </div>
 </div>

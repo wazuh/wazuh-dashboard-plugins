@@ -21,15 +21,21 @@ export function RulesController(
   csvReq,
   wzTableFilter,
   $location,
-  apiReq
+  apiReq,
+  wazuhConfig,
+  rulesetHandler
 ) {
+  $scope.overwriteError = false;
   $scope.isObject = item => typeof item === 'object';
-
+  $scope.mctrl = $scope.$parent.$parent.$parent.mctrl;
+  $scope.mctrl.showingLocalRules = false;
+  $scope.mctrl.onlyLocalFiles = false;
   $scope.appliedFilters = [];
   /**
    * This performs a search with a given term
    */
   $scope.search = term => {
+    let clearInput = true;
     if (term && term.startsWith('group:') && term.split('group:')[1].trim()) {
       $scope.custom_search = '';
       const filter = { name: 'group', value: term.split('group:')[1].trim() };
@@ -86,9 +92,29 @@ export function RulesController(
       );
       $scope.appliedFilters.push(filter);
       $scope.$broadcast('wazuhFilter', { filter });
+    } else if (
+      term &&
+      term.startsWith('path:') &&
+      term.split('path:')[1].trim()
+    ) {
+      $scope.custom_search = '';
+      if (!$scope.mctrl.showingLocalRules) {
+        const filter = { name: 'path', value: term.split('path:')[1].trim() };
+        $scope.appliedFilters = $scope.appliedFilters.filter(
+          item => item.name !== 'path'
+        );
+        $scope.appliedFilters.push(filter);
+        $scope.$broadcast('wazuhFilter', { filter });
+      }
     } else {
+      clearInput = false;
       $scope.$broadcast('wazuhSearch', { term, removeFilters: 0 });
     }
+    if (clearInput) {
+      const searchBar = $('#search-input-rules');
+      searchBar.val('');
+    }
+    $scope.$applyAsync();
   };
 
   /**
@@ -109,6 +135,13 @@ export function RulesController(
     return filtered.length ? filtered[0].value : '';
   };
 
+  $scope.switchLocalRules = () => {
+    $scope.removeFilter('path');
+    if (!$scope.mctrl.showingLocalRules) {
+      $scope.appliedFilters.push({ name: 'path', value: 'etc/rules' });
+    }
+  };
+
   /**
    * This a the filter given its name
    * @param {String} filterName
@@ -124,6 +157,9 @@ export function RulesController(
   $scope.searchTerm = '';
   $scope.viewingDetail = false;
   $scope.isArray = Array.isArray;
+
+  const configuration = wazuhConfig.getConfig();
+  $scope.adminMode = !!(configuration || {}).admin;
 
   /**
    * This set color to a given rule argument
@@ -152,10 +188,14 @@ export function RulesController(
     return $sce.trustAsHtml(coloredString);
   };
 
+  $scope.$on('closeRuleView', () => {
+    $scope.closeDetailView();
+  });
+
   // Reloading event listener
   $scope.$on('rulesetIsReloaded', () => {
     $scope.viewingDetail = false;
-    if (!$scope.$$phase) $scope.$digest();
+    $scope.$applyAsync();
   });
 
   /**
@@ -195,17 +235,70 @@ export function RulesController(
   //listeners
   $scope.$on('wazuhShowRule', (event, parameters) => {
     $scope.currentRule = parameters.rule;
+    $scope.$emit('setCurrentRule', { currentRule: $scope.currentRule });
     if (!(Object.keys(($scope.currentRule || {}).details || {}) || []).length) {
       $scope.currentRule.details = false;
     }
     $scope.viewingDetail = true;
-    if (!$scope.$$phase) $scope.$digest();
+    $scope.$applyAsync();
   });
+
+  $scope.editRulesConfig = async () => {
+    $scope.editingFile = true;
+    try {
+      $scope.fetchedXML = await rulesetHandler.getRuleConfiguration(
+        $scope.currentRule.file
+      );
+      $location.search('editingFile', true);
+      appState.setNavigation({ status: true });
+      $scope.$applyAsync();
+      $scope.$broadcast('fetchedFile', { data: $scope.fetchedXML });
+    } catch (error) {
+      $scope.fetchedXML = null;
+      errorHandler.handle(error, 'Fetch file error');
+    }
+  };
+
+  $scope.closeEditingFile = async () => {
+    if ($scope.currentRule) {
+      try {
+        const ruleReloaded = await apiReq.request(
+          'GET',
+          `/rules/${$scope.currentRule.id}`,
+          {}
+        );
+        const response =
+          (((ruleReloaded || {}).data || {}).data || {}).items || [];
+        if (response.length) {
+          const result = response.filter(rule => rule.details.overwrite);
+          $scope.currentRule = result.length ? result[0] : response[0];
+        } else {
+          $scope.currentRule = false;
+          $scope.closeDetailView(true);
+        }
+        $scope.fetchedXML = false;
+      } catch (error) {
+        errorHandler.handle(error.message || error);
+      }
+    }
+
+    $scope.editingFile = false;
+    $scope.$applyAsync();
+    appState.setNavigation({ status: true });
+    $scope.$broadcast('closeEditXmlFile', {});
+    $scope.$applyAsync();
+  };
+
+  $scope.xmlIsValid = valid => {
+    $scope.xmlHasErrors = valid;
+    $scope.$applyAsync();
+  };
 
   /**
    * This function changes to the rules list view
    */
   $scope.closeDetailView = clear => {
+    $scope.mctrl.showingLocalRules = !$scope.mctrl.showingLocalRules;
     if (clear)
       $scope.appliedFilters = $scope.appliedFilters.slice(
         0,
@@ -213,7 +306,11 @@ export function RulesController(
       );
     $scope.viewingDetail = false;
     $scope.currentRule = false;
-    if (!$scope.$$phase) $scope.$digest();
+    $scope.closeEditingFile();
+    $scope.$emit('removeCurrentRule');
+    $scope.switchLocalRules();
+    $scope.mctrl.showingLocalRules = !$scope.mctrl.showingLocalRules;
+    $scope.$applyAsync();
   };
 
   if ($location.search() && $location.search().ruleid) {
@@ -222,20 +319,66 @@ export function RulesController(
     apiReq
       .request('get', `/rules/${incomingRule}`, {})
       .then(data => {
-        $scope.currentRule = data.data.data.items[0];
+        const response = (((data || {}).data || {}).data || {}).items || [];
+        if (response.length) {
+          const result = response.filter(rule => rule.details.overwrite);
+          $scope.currentRule = result.length ? result[0] : response[0];
+        }
+        $scope.$emit('setCurrentRule', { currentRule: $scope.currentRule });
         if (
           !(Object.keys(($scope.currentRule || {}).details || {}) || []).length
         ) {
           $scope.currentRule.details = false;
         }
         $scope.viewingDetail = true;
-        if (!$scope.$$phase) $scope.$digest();
+        $scope.$applyAsync();
       })
       .catch(() =>
         errorHandler.handle(
-          `Error fetching rule: ${incomingRule} from the Wazuh API`,
-          'Ruleset'
+          `Error fetching rule: ${incomingRule} from the Wazuh API`
         )
       );
   }
+
+  $scope.toggleSaveConfig = () => {
+    $scope.doingSaving = false;
+    $scope.$applyAsync();
+  };
+
+  $scope.toggleRestartMsg = () => {
+    $scope.restartBtn = false;
+    $scope.$applyAsync();
+  };
+
+  $scope.cancelSaveAndOverwrite = () => {
+    $scope.overwriteError = false;
+    $scope.$applyAsync();
+  };
+
+  $scope.doSaveConfig = () => {
+    const clusterInfo = appState.getClusterInfo();
+    const showRestartManager =
+      clusterInfo.status === 'enabled' ? 'cluster' : 'manager';
+    $scope.doingSaving = true;
+    const objParam = {
+      rule: $scope.currentRule,
+      showRestartManager,
+      isOverwrite: !!$scope.overwriteError
+    };
+    $scope.$broadcast('saveXmlFile', objParam);
+  };
+
+  $scope.restart = () => {
+    $scope.$emit('performRestart', {});
+  };
+
+  $scope.$on('showRestart', () => {
+    $scope.restartBtn = true;
+    $scope.$applyAsync();
+  });
+
+  $scope.$on('showSaveAndOverwrite', () => {
+    $scope.overwriteError = true;
+    $scope.$applyAsync();
+  });
 }

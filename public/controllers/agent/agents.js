@@ -14,7 +14,6 @@ import { generateMetric } from '../../utils/generate-metric';
 import { TabNames } from '../../utils/tab-names';
 import * as FileSaver from '../../services/file-saver';
 import { TabDescription } from '../../../server/reporting/tab-description';
-
 import {
   metricsAudit,
   metricsVulnerability,
@@ -90,9 +89,30 @@ export class AgentsController {
     this.ignoredTabs = ['syscollector', 'welcome', 'configuration'];
 
     this.$scope.showSyscheckFiles = false;
-    this.$scope.editGroup = false;
+    this.$scope.showScaScan = false;
 
+    this.$scope.editGroup = false;
     this.$scope.addingGroupToAgent = false;
+
+    this.$scope.lookingSca = false;
+    this.$scope.expandArray = [
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false
+    ];
   }
 
   /**
@@ -138,8 +158,8 @@ export class AgentsController {
     this.tabVisualizations.assign('agents');
 
     this.$scope.hostMonitoringTabs = ['general', 'fim', 'syscollector'];
-    this.$scope.systemAuditTabs = ['pm', 'audit', 'oscap', 'ciscat'];
-    this.$scope.securityTabs = ['vuls', 'virustotal', 'osquery'];
+    this.$scope.systemAuditTabs = ['pm', 'sca', 'audit', 'oscap', 'ciscat'];
+    this.$scope.securityTabs = ['vuls', 'virustotal', 'osquery', 'docker'];
     this.$scope.complianceTabs = ['pci', 'gdpr'];
 
     /**
@@ -172,8 +192,6 @@ export class AgentsController {
     };
     this.$scope.getAgent = async newAgentId => this.getAgent(newAgentId);
     this.$scope.goGroups = (agent, group) => this.goGroups(agent, group);
-    this.$scope.analyzeAgents = async searchTerm =>
-      this.analyzeAgents(searchTerm);
     this.$scope.downloadCsv = async (path, fileName, filters = []) =>
       this.downloadCsv(path, fileName, filters);
 
@@ -182,6 +200,12 @@ export class AgentsController {
 
     this.$scope.searchSyscheckFile = (term, specificFilter) =>
       this.$scope.$broadcast('wazuhSearch', { term, specificFilter });
+
+    this.$scope.searchRootcheck = (term, specificFilter) =>
+      this.$scope.$broadcast('wazuhSearch', { term, specificFilter });
+
+    this.$scope.launchRootcheckScan = () => this.launchRootcheckScan();
+    this.$scope.launchSyscheckScan = () => this.launchSyscheckScan();
 
     this.$scope.startVis2Png = () => this.startVis2Png();
 
@@ -194,6 +218,34 @@ export class AgentsController {
     this.$scope.goGroup = () => {
       this.shareAgent.setAgent(this.$scope.agent);
       this.$location.path('/manager/groups');
+    };
+
+    this.$scope.restartAgent = async agent => {
+      this.$scope.restartingAgent = true;
+      try {
+        const data = await this.apiReq.request(
+          'PUT',
+          `/agents/${agent.id}/restart`,
+          {}
+        );
+        const result = ((data || {}).data || {}).data || false;
+        const failed =
+          result &&
+          Array.isArray(result.failed_ids) &&
+          result.failed_ids.length;
+        if (failed) {
+          throw new Error(result.failed_ids[0].error.message);
+        } else if (result) {
+          this.errorHandler.info(result.msg);
+        } else {
+          throw new Error('Unexpected error upgrading agent');
+        }
+        this.$scope.restartingAgent = false;
+      } catch (error) {
+        this.errorHandler.handle(error);
+        this.$scope.restartingAgent = false;
+      }
+      this.$scope.$applyAsync();
     };
 
     const configuration = this.wazuhConfig.getConfig();
@@ -258,6 +310,8 @@ export class AgentsController {
     };
 
     this.$scope.switchConfigurationTab = (configurationTab, navigate) => {
+      // Check if configuration is synced
+      this.$scope.isSynchronized = this.checkSync();
       this.$scope.navigate = navigate;
       this.configurationHandler.switchConfigurationTab(
         configurationTab,
@@ -294,6 +348,12 @@ export class AgentsController {
         configurationSubTab,
         this.$scope
       );
+      if (configurationSubTab === 'pm-sca') {
+        this.$scope.currentConfig.sca = this.configurationHandler.parseWodle(
+          this.$scope.currentConfig,
+          'sca'
+        );
+      }
     };
     this.$scope.updateSelectedItem = i => (this.$scope.selectedItem = i);
     this.$scope.getIntegration = list =>
@@ -302,18 +362,29 @@ export class AgentsController {
     this.$scope.switchSyscheckFiles = () => {
       this.$scope.showSyscheckFiles = !this.$scope.showSyscheckFiles;
       if (!this.$scope.showSyscheckFiles) {
-        this.$rootScope.$emit('changeTabView', {
+        this.$scope.$emit('changeTabView', {
           tabView: this.$scope.tabView
         });
       }
-      if (!this.$scope.$$phase) this.$scope.$digest();
+      this.$scope.$applyAsync();
+    };
+
+    this.$scope.switchScaScan = () => {
+      this.$scope.lookingSca = false;
+      this.$scope.showScaScan = !this.$scope.showScaScan;
+      if (!this.$scope.showScaScan) {
+        this.$scope.$emit('changeTabView', {
+          tabView: this.$scope.tabView
+        });
+      }
+      this.$scope.$applyAsync();
     };
 
     this.$scope.goDiscover = () => this.goDiscover();
 
-    this.$scope.$on('$routeChangeStart', () =>
-      this.appState.removeSessionStorageItem('configSubTab')
-    );
+    this.$scope.$on('$routeChangeStart', () => {
+      return this.appState.removeSessionStorageItem('configSubTab');
+    });
 
     this.$scope.switchGroupEdit = () => {
       this.$scope.addingGroupToAgent = false;
@@ -328,6 +399,10 @@ export class AgentsController {
 
     this.$scope.cancelAddGroup = () => (this.$scope.addingGroupToAgent = false);
 
+    this.$scope.loadScaChecks = policy =>
+      (this.$scope.lookingSca = { ...policy, id: policy.policy_id });
+    this.$scope.closeScaChecks = () => (this.$scope.lookingSca = false);
+
     this.$scope.confirmAddGroup = group => {
       this.groupHandler
         .addAgentToGroup(group, this.$scope.agent.id)
@@ -340,10 +415,12 @@ export class AgentsController {
             item => !agent.data.data.group.includes(item)
           );
           this.$scope.addingGroupToAgent = false;
-          this.errorHandler.info(`Group ${group} has been added.`, '');
-          if (!this.$scope.$$phase) this.$scope.$digest();
+          this.$scope.editGroup = false;
+          this.errorHandler.info(`Group ${group} has been added.`);
+          this.$scope.$applyAsync();
         })
         .catch(error => {
+          this.$scope.editGroup = false;
           this.$scope.addingGroupToAgent = false;
           this.errorHandler.handle(
             error.message || error,
@@ -351,6 +428,8 @@ export class AgentsController {
           );
         });
     };
+
+    this.$scope.expand = i => this.expand(i);
   }
   /**
    * Create metric for given object
@@ -416,7 +495,6 @@ export class AgentsController {
       ) {
         const condition =
           !this.changeAgent && (localChange || preserveDiscover);
-
         await this.visFactoryService.buildAgentsVisualizations(
           this.filterHandler,
           this.$scope.tab,
@@ -427,7 +505,7 @@ export class AgentsController {
 
         this.changeAgent = false;
       } else {
-        this.$rootScope.$emit('changeTabView', {
+        this.$scope.$emit('changeTabView', {
           tabView: this.$scope.tabView
         });
       }
@@ -447,6 +525,7 @@ export class AgentsController {
    * @param {*} force
    */
   async switchTab(tab, force = false) {
+    this.falseAllExpand();
     if (this.ignoredTabs.includes(tab)) {
       this.commonData.setRefreshInterval(timefilter.getRefreshInterval());
       timefilter.setRefreshInterval({ pause: true, value: 0 });
@@ -470,6 +549,7 @@ export class AgentsController {
 
     try {
       this.$scope.showSyscheckFiles = false;
+      this.$scope.showScaScan = false;
       if (tab === 'pci') {
         const pciTabs = await this.commonData.getPCI();
         this.$scope.pciTabs = pciTabs;
@@ -480,28 +560,43 @@ export class AgentsController {
         this.$scope.gdprTabs = gdprTabs;
         this.$scope.selectedGdprIndex = 0;
       }
+
+      if (tab === 'sca') {
+        try {
+          this.$scope.loadSca = true;
+          const policies = await this.apiReq.request(
+            'GET',
+            `/sca/${this.$scope.agent.id}`,
+            {}
+          );
+          this.$scope.policies =
+            (((policies || {}).data || {}).data || {}).items || [];
+        } catch (error) {
+          this.$scope.policies = [];
+        }
+        this.$scope.loadSca = false;
+      }
+
       if (tab === 'syscollector')
         try {
           await this.loadSyscollector(this.$scope.agent.id);
         } catch (error) {} // eslint-disable-line
       if (tab === 'configuration') {
-        const isSync = await this.apiReq.request(
-          'GET',
-          `/agents/${this.$scope.agent.id}/group/is_sync`,
-          {}
-        );
-        // Configuration synced
-        this.$scope.isSynchronized =
-          (((isSync || {}).data || {}).data || {}).synced || false;
         this.$scope.switchConfigurationTab('welcome');
       } else {
         this.configurationHandler.reset(this.$scope);
       }
+      this.$scope.lookingSca = false;
       if (!this.ignoredTabs.includes(tab)) this.tabHistory.push(tab);
       if (this.tabHistory.length > 2)
         this.tabHistory = this.tabHistory.slice(-2);
       this.tabVisualizations.setTab(tab);
-      if (this.$scope.tab === tab && !force) return;
+
+      if (this.$scope.tab === tab && !force) {
+        this.$scope.$applyAsync();
+        return;
+      }
+
       const onlyAgent = this.$scope.tab === tab && force;
       const sameTab = this.$scope.tab === tab;
       this.$location.search('tab', tab);
@@ -528,10 +623,10 @@ export class AgentsController {
 
       this.shareAgent.deleteTargetLocation();
       this.targetLocation = null;
+      this.$scope.$applyAsync();
     } catch (error) {
       return Promise.reject(error);
     }
-    if (!this.$scope.$$phase) this.$scope.$digest();
   }
 
   goDiscover() {
@@ -558,6 +653,18 @@ export class AgentsController {
   validateSysCheck() {
     const result = this.commonData.validateRange(this.$scope.agent.syscheck);
     this.$scope.agent.syscheck = result;
+  }
+
+  /**
+   * Checks if configuration is sync
+   */
+  async checkSync() {
+    const isSync = await this.apiReq.request(
+      'GET',
+      `/agents/${this.$scope.agent.id}/group/is_sync`,
+      {}
+    );
+    return (((isSync || {}).data || {}).data || {}).synced || false;
   }
 
   /**
@@ -641,10 +748,10 @@ export class AgentsController {
         netaddr: netaddrResponse ? { ...netaddrResponse } : false,
         packagesDate: ((packagesDate || {}).items || []).length
           ? packagesDate.items[0].scan_time
-          : 'Unknown',
+          : '-',
         processesDate: ((processesDate || {}).items || []).length
           ? processesDate.items[0].scan_time
-          : 'Unknown'
+          : '-'
       };
 
       return;
@@ -659,6 +766,7 @@ export class AgentsController {
    */
   async getAgent(newAgentId) {
     try {
+      this.$scope.emptyAgent = false;
       this.$scope.isSynchronized = false;
       this.$scope.load = true;
       this.changeAgent = true;
@@ -667,11 +775,27 @@ export class AgentsController {
 
       const id = this.commonData.checkLocationAgentId(newAgentId, globalAgent);
 
-      const data = await Promise.all([
-        this.apiReq.request('GET', `/agents/${id}`, {}),
-        this.apiReq.request('GET', `/syscheck/${id}/last_scan`, {}),
-        this.apiReq.request('GET', `/rootcheck/${id}/last_scan`, {})
-      ]);
+      const data = [false, false, false];
+
+      try {
+        data[0] = await this.apiReq.request('GET', `/agents/${id}`, {});
+      } catch (error) {} //eslint-disable-line
+
+      try {
+        data[1] = await this.apiReq.request(
+          'GET',
+          `/syscheck/${id}/last_scan`,
+          {}
+        );
+      } catch (error) {} //eslint-disable-line
+
+      try {
+        data[2] = await this.apiReq.request(
+          'GET',
+          `/rootcheck/${id}/last_scan`,
+          {}
+        );
+      } catch (error) {} //eslint-disable-line
 
       const result = data.map(item => ((item || {}).data || {}).data || false);
 
@@ -686,7 +810,7 @@ export class AgentsController {
           'Linux'
         );
       } else {
-        this.$scope.agentOS = 'Unknown';
+        this.$scope.agentOS = '-';
         this.$scope.agent.isLinuxOS = false;
       }
 
@@ -708,10 +832,46 @@ export class AgentsController {
             this.$scope.agent.group && !this.$scope.agent.group.includes(item)
         );
 
+      const outdatedAgents = await this.apiReq.request(
+        'GET',
+        '/agents/outdated/',
+        {}
+      );
+      this.$scope.agent.outdated = outdatedAgents.data.data.items
+        .map(x => x.id)
+        .find(x => x === this.$scope.agent.id);
+
+      if (this.$scope.agent.outdated) {
+        if (
+          this.appState.getSessionStorageItem(
+            `updatingAgent${this.$scope.agent.id}`
+          )
+        ) {
+          this.$scope.agent.upgrading = true;
+        }
+      } else {
+        if (
+          this.appState.getSessionStorageItem(
+            `updatingAgent${this.$scope.agent.id}`
+          )
+        ) {
+          this.appState.removeSessionStorageItem(
+            `updatingAgent${this.$scope.agent.id}`
+          );
+          this.$scope.agent.outdated = false;
+        }
+        this.$scope.$applyAsync();
+      }
+
       this.$scope.load = false;
-      if (!this.$scope.$$phase) this.$scope.$digest();
+      this.$scope.$applyAsync();
       return;
     } catch (error) {
+      if (!this.$scope.agent) {
+        if ((error || {}).status === -1) {
+          this.$scope.emptyAgent = 'Wazuh API timeout.';
+        }
+      }
       this.errorHandler.handle(error, 'Agents');
       if (
         error &&
@@ -722,12 +882,14 @@ export class AgentsController {
         this.$location.path('/agents-preview');
       }
     }
+    this.$scope.load = false;
+    this.$scope.$applyAsync();
     return;
   }
 
   switchGroupEdit() {
     this.$scope.editGroup = !!!this.$scope.editGroup;
-    if (!this.$scope.$$phase) this.$scope.$digest();
+    this.$scope.$applyAsync();
   }
   /**
    * Navigate to the groups of an agent
@@ -735,31 +897,12 @@ export class AgentsController {
    * @param {*} group
    */
   goGroups(agent, group) {
+    this.appState.setNavigation({ status: true });
     this.visFactoryService.clearAll();
     this.shareAgent.setAgent(agent, group);
     this.$location.search('tab', 'groups');
+    this.$location.search('navigation', true);
     this.$location.path('/manager');
-  }
-
-  /**
-   * Look for agents that satisfy search term, hidding master
-   * @param {*} searchTerm
-   */
-  async analyzeAgents(searchTerm) {
-    try {
-      if (searchTerm) {
-        const reqData = await this.apiReq.request('GET', '/agents', {
-          search: searchTerm
-        });
-        return reqData.data.data.items.filter(item => item.id !== '000');
-      } else {
-        const reqData = await this.apiReq.request('GET', '/agents', {});
-        return reqData.data.data.items.filter(item => item.id !== '000');
-      }
-    } catch (error) {
-      this.errorHandler.handle(error, 'Agents');
-    }
-    return;
   }
 
   /**
@@ -806,5 +949,72 @@ export class AgentsController {
       (this.$scope.agent || {}).id || true,
       syscollectorFilters.length ? syscollectorFilters : null
     );
+  }
+
+  async launchRootcheckScan() {
+    try {
+      const isActive = ((this.$scope.agent || {}).status || '') === 'Active';
+      if (!isActive) {
+        throw new Error('Agent is not active');
+      }
+      await this.apiReq.request(
+        'PUT',
+        `/rootcheck/${this.$scope.agent.id}`,
+        {}
+      );
+      this.errorHandler.info(
+        `Policy monitoring scan launched successfully on agent ${
+          this.$scope.agent.id
+        }`,
+        ''
+      );
+    } catch (error) {
+      this.errorHandler.handle(error);
+    }
+    return;
+  }
+
+  async launchSyscheckScan() {
+    try {
+      const isActive = ((this.$scope.agent || {}).status || '') === 'Active';
+      if (!isActive) {
+        throw new Error('Agent is not active');
+      }
+      await this.apiReq.request('PUT', `/syscheck/${this.$scope.agent.id}`, {});
+      this.errorHandler.info(
+        `FIM scan launched successfully on agent ${this.$scope.agent.id}`,
+        ''
+      );
+    } catch (error) {
+      this.errorHandler.handle(error);
+    }
+    return;
+  }
+
+  falseAllExpand() {
+    this.$scope.expandArray = [
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false,
+      false
+    ];
+  }
+
+  expand(i) {
+    const oldValue = this.$scope.expandArray[i];
+    this.falseAllExpand();
+    this.$scope.expandArray[i] = !oldValue;
   }
 }

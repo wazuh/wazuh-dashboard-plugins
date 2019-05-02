@@ -16,7 +16,6 @@
 
 #wz-search-filter-bar {
     padding: 8px;
-    margin-top: 15px;
     overflow: auto;
 }
 
@@ -44,7 +43,7 @@
 }
 
 .wz-tags > ul li .grouped{
-    background: #d9d9d9;
+    background: #e8e8e8;
     border-radius: 3px;
     padding: 3px;
     height: 36px;
@@ -64,17 +63,25 @@
 .wz-tag-item-connector {
     font-size: 10px;
     line-height: 30px;
-    color: #005571;
+    color: #006bb4;
     font-weight: bold;
     padding: 0px 5px;
 }
 
+.wz-tag-item-connector:hover {
+    text-decoration: underline;
+}
+
 .wz-tag-remove-button{
-    color: #005571;
+    color: #b2ccd4;
 }
 
 .wz-tag-remove-button-group{
     padding: 4px 2px;
+    color: gray;
+}
+
+.wz-text-gray{
     color: gray;
 }
 
@@ -95,6 +102,7 @@
     border-radius: 5px;
     padding: 10px 0;
     margin-top: 30px;
+    z-index: 10000;
 }
 
 .wz-search-filter-bar-autocomplete p b{
@@ -114,6 +122,6 @@
 
 .wz-search-filter-bar-autocomplete ul li:hover, .wz-search-filter-bar-autocomplete ul li.selected{
     background: black;
-    color:#0079a5;
+    color:#00a4e1;
     cursor: pointer;
 }

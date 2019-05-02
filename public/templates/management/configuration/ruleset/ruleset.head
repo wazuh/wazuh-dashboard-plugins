@@ -1,17 +1,17 @@
 <div flex="auto" layout="column" ng-if="configurationTab === 'ruleset'" ng-init="switchConfigurationSubTab('rules')">
 
     <!-- Headline -->
-    <div layout="column" layout-padding>
+    <!--<div layout="column" layout-padding>
         <div>
             <span class="font-size-18">Ruleset</span>
         </div>
         <span class="md-subheader">Current rules, decoders and CDB lists loaded in the cluster</span>
-    </div>
+    </div>-->
     <!-- End headline -->
 
     <!-- Ruleset navigation bar -->
     <md-nav-bar
-        class="wz-nav-bar"
+        class="wz-nav-bar nav-bar-white-bg "
         md-selected-nav-item="configurationSubTab"
         nav-bar-aria-label="Ruleset navigation links">
         <md-nav-item class="wz-nav-item" md-nav-click="switchConfigurationSubTab('rules')" name="rules">Rules</md-nav-item>
@@ -20,9 +20,8 @@
     </md-nav-bar>
     <!-- End Ruleset navigation bar -->
 
-    <!-- Loading ring -->
-    <div class='uil-ring-css' ng-show="load">
-        <div></div>
+    <div class="md-padding md-padding-top-16" ng-if="load">
+        <react-component name="EuiProgress" props="{size: 'xs', color: 'primary'}" />
     </div>
 
     <!-- This section contains the main content and the right sidenav -->

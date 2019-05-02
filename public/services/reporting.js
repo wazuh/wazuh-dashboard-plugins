@@ -11,6 +11,7 @@
  */
 
 import $ from 'jquery';
+import moment from 'moment';
 
 export class ReportingService {
   constructor(
@@ -37,7 +38,7 @@ export class ReportingService {
       }
       this.$rootScope.reportBusy = true;
       this.$rootScope.reportStatus = 'Generating report...0%';
-      if (!this.$rootScope.$$phase) this.$rootScope.$digest();
+      this.$rootScope.$applyAsync();
 
       this.vis2png.clear();
 
@@ -57,6 +58,8 @@ export class ReportingService {
         isAgents ? 'agents' : 'overview'
       }-${tab}-${(Date.now() / 1000) | 0}.pdf`;
 
+      const browserTimezone = moment.tz.guess(true);
+
       const data = {
         array,
         name,
@@ -67,14 +70,15 @@ export class ReportingService {
         tables: appliedFilters.tables,
         tab,
         section: isAgents ? 'agents' : 'overview',
-        isAgents
+        isAgents,
+        browserTimezone
       };
 
       await this.genericReq.request('POST', '/reports', data);
 
       this.$rootScope.reportBusy = false;
       this.$rootScope.reportStatus = false;
-      if (!this.$rootScope.$$phase) this.$rootScope.$digest();
+      this.$rootScope.$applyAsync();
       this.errorHandler.info(
         'Success. Go to Wazuh > Management > Reporting',
         'Reporting'
@@ -84,7 +88,7 @@ export class ReportingService {
     } catch (error) {
       this.$rootScope.reportBusy = false;
       this.$rootScope.reportStatus = false;
-      this.errorHandler.handle(error, 'Reporting');
+      this.errorHandler.handle(error.message || error);
     }
   }
 }

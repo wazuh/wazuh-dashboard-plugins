@@ -11,6 +11,70 @@
  */
 export default [
   {
+    _id: 'Wazuh-App-Agents-PCI-Groups',
+    _source: {
+      title: 'Top 5 rule groups',
+      visState:
+        '{"title":"Top 5 rule groups","type":"pie","params":{"type":"pie","addTooltip":true,"addLegend":true,"legendPosition":"right","isDonut":true},"aggs":[{"id":"1","enabled":true,"type":"count","schema":"metric","params":{}},{"id":"2","enabled":true,"type":"terms","schema":"segment","params":{"field":"rule.groups","size":5,"order":"desc","orderBy":"1"}}]}',
+      uiStateJSON: '{}',
+      description: '',
+      version: 1,
+      kibanaSavedObjectMeta: {
+        searchSourceJSON:
+          '{"index":"wazuh-alerts","filter":[],"query":{"query":"","language":"lucene"}}'
+      }
+    },
+    _type: 'visualization'
+  },
+  {
+    _id: 'Wazuh-App-Agents-PCI-Rule',
+    _source: {
+      title: 'Top 5 rules',
+      visState:
+        '{"title":"Top 5 rules","type":"pie","params":{"type":"pie","addTooltip":true,"addLegend":true,"legendPosition":"right","isDonut":true},"aggs":[{"id":"1","enabled":true,"type":"count","schema":"metric","params":{}},{"id":"2","enabled":true,"type":"terms","schema":"segment","params":{"field":"rule.description","size":5,"order":"desc","orderBy":"1"}}]}',
+      uiStateJSON: '{}',
+      description: '',
+      version: 1,
+      kibanaSavedObjectMeta: {
+        searchSourceJSON:
+          '{"index":"wazuh-alerts","filter":[],"query":{"query":"","language":"lucene"}}'
+      }
+    },
+    _type: 'visualization'
+  },
+  {
+    _id: 'Wazuh-App-Agents-PCI-Requirement',
+    _source: {
+      title: 'Top 5 requirements',
+      visState:
+        '{"title":"Top 5 requirements","type":"pie","params":{"type":"pie","addTooltip":true,"addLegend":true,"legendPosition":"right","isDonut":true},"aggs":[{"id":"1","enabled":true,"type":"count","schema":"metric","params":{}},{"id":"2","enabled":true,"type":"terms","schema":"segment","params":{"field":"rule.pci_dss","size":5,"order":"desc","orderBy":"1"}}]}',
+      uiStateJSON: '{}',
+      description: '',
+      version: 1,
+      kibanaSavedObjectMeta: {
+        searchSourceJSON:
+          '{"index":"wazuh-alerts","filter":[],"query":{"query":"","language":"lucene"}}'
+      }
+    },
+    _type: 'visualization'
+  },
+  {
+    _id: 'Wazuh-App-Agents-PCI-Rule-level-distribution',
+    _source: {
+      title: 'Rule level distribution',
+      visState:
+        '{"title":"Rule level distribution","type":"pie","params":{"type":"pie","addTooltip":true,"addLegend":false,"legendPosition":"right","isDonut":true,"labels":{"show":true,"values":true,"last_level":true,"truncate":100}},"aggs":[{"id":"1","enabled":true,"type":"count","schema":"metric","params":{}},{"id":"2","enabled":true,"type":"terms","schema":"segment","params":{"field":"rule.level","size":15,"order":"desc","orderBy":"1","otherBucket":false,"otherBucketLabel":"Other","missingBucket":false,"missingBucketLabel":"Missing"}}]}',
+      uiStateJSON: '{"vis":{"legendOpen":false}}',
+      description: '',
+      version: 1,
+      kibanaSavedObjectMeta: {
+        searchSourceJSON:
+          '{"index":"wazuh-alerts","filter":[],"query":{"query":"","language":"lucene"}}'
+      }
+    },
+    _type: 'visualization'
+  },
+  {
     _id: 'Wazuh-App-Agents-PCI-Requirements',
     _source: {
       title: 'Requirements',
@@ -27,28 +91,12 @@ export default [
     _type: 'visualization'
   },
   {
-    _id: 'Wazuh-App-Agents-PCI-Groups',
-    _source: {
-      title: 'Groups',
-      visState:
-        '{"title":"Groups","type":"pie","params":{"type":"pie","addTooltip":true,"addLegend":true,"legendPosition":"right","isDonut":true},"aggs":[{"id":"1","enabled":true,"type":"count","schema":"metric","params":{}},{"id":"2","enabled":true,"type":"terms","schema":"segment","params":{"field":"rule.groups","size":5,"order":"desc","orderBy":"1"}}]}',
-      uiStateJSON: '{}',
-      description: '',
-      version: 1,
-      kibanaSavedObjectMeta: {
-        searchSourceJSON:
-          '{"index":"wazuh-alerts","filter":[],"query":{"query":"","language":"lucene"}}'
-      }
-    },
-    _type: 'visualization'
-  },
-  {
     _id: 'Wazuh-App-Agents-PCI-Last-alerts',
     _type: 'visualization',
     _source: {
       title: 'Last alerts',
       visState:
-        '{"title":"Last alerts","type":"table","params":{"perPage":10,"showPartialRows":false,"showMeticsAtAllLevels":false,"sort":{"columnIndex":2,"direction":"asc"},"showTotal":false,"totalFunc":"sum"},"aggs":[{"id":"1","enabled":true,"type":"count","schema":"metric","params":{}},{"id":"3","enabled":true,"type":"terms","schema":"bucket","params":{"field":"rule.pci_dss","otherBucket":false,"otherBucketLabel":"Other","missingBucket":false,"missingBucketLabel":"Missing","size":50,"order":"desc","orderBy":"1","customLabel":"Requirement"}},{"id":"4","enabled":true,"type":"terms","schema":"bucket","params":{"field":"rule.description","otherBucket":false,"otherBucketLabel":"Other","missingBucket":false,"missingBucketLabel":"Missing","size":10,"order":"desc","orderBy":"1","customLabel":"Rule description"}}]}',
+        '{"title":"Last alerts","type":"table","params":{"perPage":10,"showPartialRows":false,"showMeticsAtAllLevels":false,"sort":{"columnIndex":2,"direction":"desc"},"showTotal":false,"totalFunc":"sum"},"aggs":[{"id":"1","enabled":true,"type":"count","schema":"metric","params":{}},{"id":"3","enabled":true,"type":"terms","schema":"bucket","params":{"field":"rule.pci_dss","otherBucket":false,"otherBucketLabel":"Other","missingBucket":false,"missingBucketLabel":"Missing","size":50,"order":"desc","orderBy":"1","customLabel":"Requirement"}},{"id":"4","enabled":true,"type":"terms","schema":"bucket","params":{"field":"rule.description","otherBucket":false,"otherBucketLabel":"Other","missingBucket":false,"missingBucketLabel":"Missing","size":10,"order":"desc","orderBy":"1","customLabel":"Rule description"}}]}',
       uiStateJSON:
         '{"vis":{"params":{"sort":{"columnIndex":2,"direction":"desc"}}}}',
       description: '',

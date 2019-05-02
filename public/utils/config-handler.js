@@ -11,7 +11,6 @@
  */
 import js2xmlparser from 'js2xmlparser';
 import XMLBeautifier from './xml-beautifier';
-import beautifier from './json-beautifier';
 import { queryConfig } from '../services/query-config';
 import { objectWithoutProperties } from './remove-hash-key.js';
 
@@ -27,25 +26,50 @@ export class ConfigurationHandler {
       $scope.integrations[integration.name] = integration;
   }
 
+  parseWodle(config, wodleKey) {
+    try {
+      const wmodulesArray =
+        ((config || {})['wmodules-wmodules'] || {}).wmodules || [];
+      const result = wmodulesArray.filter(
+        item => typeof item[wodleKey] !== 'undefined'
+      );
+      return result.length ? result[0][wodleKey] : false;
+    } catch (error) {
+      return false;
+    }
+  }
+
   /**
    * Switchs between configuration tabs
    * @param {string} configurationTab The configuration tab to open
    * @param {Array<object>} sections Array that includes sections to be fetched
    */
-  async switchConfigTab(configurationTab, sections, $scope, agentId = false) {
+  async switchConfigTab(
+    configurationTab,
+    sections,
+    $scope,
+    agentId = false,
+    node = false
+  ) {
     try {
       $scope.load = true;
       $scope.currentConfig = null;
       $scope.XMLContent = false;
       $scope.JSONContent = false;
-      $scope.configurationSubTab = false;
+      //$scope.configurationSubTab = false;
       $scope.configurationTab = configurationTab;
       $scope.currentConfig = await queryConfig(
         agentId || '000',
         sections,
         this.apiReq,
-        this.errorHandler
+        this.errorHandler,
+        node
       );
+
+      if ($scope.configurationSubTab === 'pm-sca') {
+        $scope.currentConfig.sca = this.parseWodle($scope.currentConfig, 'sca');
+      }
+
       if (sections[0].component === 'integrator') {
         this.buildIntegrations(
           $scope.currentConfig['integrator-integration'].integration,
@@ -55,28 +79,38 @@ export class ConfigurationHandler {
         $scope.integrations = {};
       }
 
-      if (
-        $scope.currentConfig['logcollector-localfile'] &&
-        $scope.currentConfig['logcollector-localfile'].localfile
-      ) {
-        $scope.currentConfig['logcollector-localfile'].localfile.forEach(
-          function(file) {
-            if (file.target) {
-              file.targetStr = '';
-              file.target.forEach(function(target, idx) {
-                file.targetStr = file.targetStr.concat(target);
-                if (idx != file.target.length - 1) {
-                  file.targetStr = file.targetStr.concat(', ');
-                }
-              });
-            }
+      if (($scope.currentConfig['logcollector-localfile'] || {}).localfile) {
+        const data = $scope.currentConfig['logcollector-localfile'].localfile;
+        $scope.currentConfig['logcollector-localfile'][
+          'localfile-logs'
+        ] = data.filter(item => typeof item.file !== 'undefined');
+        $scope.currentConfig['logcollector-localfile'][
+          'localfile-commands'
+        ] = data.filter(item => typeof item.file === 'undefined');
+
+        const sanitizeLocalfile = file => {
+          if (file.target) {
+            file.targetStr = '';
+            file.target.forEach(function(target, idx) {
+              file.targetStr = file.targetStr.concat(target);
+              if (idx != file.target.length - 1) {
+                file.targetStr = file.targetStr.concat(', ');
+              }
+            });
           }
-        );
+        };
+
+        $scope.currentConfig['logcollector-localfile'][
+          'localfile-logs'
+        ].forEach(sanitizeLocalfile);
+        $scope.currentConfig['logcollector-localfile'][
+          'localfile-commands'
+        ].forEach(sanitizeLocalfile);
       }
       $scope.load = false;
-      if (!$scope.$$phase) $scope.$digest();
+      $scope.$applyAsync();
     } catch (error) {
-      this.errorHandler.handle(error, 'Manager');
+      this.errorHandler.handle(error.message || error);
       $scope.load = false;
     }
     return;
@@ -86,29 +120,28 @@ export class ConfigurationHandler {
    * Switchs to a wodle section
    * @param {string} wodleName The wodle to open
    */
-  async switchWodle(wodleName, $scope, agentId = false) {
+  async switchWodle(wodleName, $scope, agentId = false, node = false) {
     try {
       $scope.load = true;
       $scope.currentConfig = null;
       $scope.XMLContent = false;
       $scope.JSONContent = false;
-      $scope.configurationSubTab = false;
+      //$scope.configurationSubTab = false;
       $scope.configurationTab = wodleName;
 
       $scope.currentConfig = await queryConfig(
         agentId || '000',
         [{ component: 'wmodules', configuration: 'wmodules' }],
         this.apiReq,
-        this.errorHandler
+        this.errorHandler,
+        node
       );
 
       // Filter by provided wodleName
       let result = [];
       if (
         wodleName &&
-        $scope.currentConfig &&
-        $scope.currentConfig['wmodules-wmodules'] &&
-        $scope.currentConfig['wmodules-wmodules'].wmodules
+        (($scope.currentConfig || {})['wmodules-wmodules'] || {}).wmodules
       ) {
         result = $scope.currentConfig['wmodules-wmodules'].wmodules.filter(
           item => typeof item[wodleName] !== 'undefined'
@@ -123,9 +156,9 @@ export class ConfigurationHandler {
       }
 
       $scope.load = false;
-      if (!$scope.$$phase) $scope.$digest();
+      $scope.$applyAsync();
     } catch (error) {
-      this.errorHandler.handle(error, 'Manager');
+      this.errorHandler.handle(error.message || error);
       $scope.load = false;
     }
     return;
@@ -151,9 +184,7 @@ export class ConfigurationHandler {
       if (
         wodleName &&
         wodleName !== 'command' &&
-        wodlesConfig &&
-        wodlesConfig['wmodules-wmodules'] &&
-        wodlesConfig['wmodules-wmodules'].wmodules
+        ((wodlesConfig || {})['wmodules-wmodules'] || {}).wmodules
       ) {
         result = wodlesConfig['wmodules-wmodules'].wmodules.filter(
           item =>
@@ -177,9 +208,9 @@ export class ConfigurationHandler {
     $scope.currentConfig = null;
     $scope.XMLContent = false;
     $scope.JSONContent = false;
-    $scope.configurationSubTab = false;
+    //$scope.configurationSubTab = false;
     $scope.configurationTab = configurationTab;
-    if (!$scope.$$phase) $scope.$digest();
+    $scope.$applyAsync();
   }
 
   /**
@@ -191,7 +222,7 @@ export class ConfigurationHandler {
     $scope.XMLContent = false;
     $scope.JSONContent = false;
     $scope.configurationSubTab = configurationSubTab;
-    if (!$scope.$$phase) $scope.$digest();
+    $scope.$applyAsync();
   }
 
   /**
@@ -210,11 +241,20 @@ export class ConfigurationHandler {
         $scope.XMLContent = XMLBeautifier(
           js2xmlparser.parse('configuration', cleaned)
         );
+        $scope.$broadcast('XMLContentReady', { data: $scope.XMLContent });
       } catch (error) {
         $scope.XMLContent = false;
       }
     }
-    if (!$scope.$$phase) $scope.$digest();
+    $scope.$applyAsync();
+  }
+
+  json2xml(data) {
+    if (data) {
+      const result = XMLBeautifier(js2xmlparser.parse('configuration', data));
+      return result;
+    }
+    return false;
   }
 
   /**
@@ -230,12 +270,13 @@ export class ConfigurationHandler {
     } else {
       try {
         const cleaned = objectWithoutProperties(config);
-        $scope.JSONContent = beautifier.prettyPrint(cleaned);
+        $scope.JSONContent = JSON.stringify(cleaned, null, 2);
+        $scope.$broadcast('JSONContentReady', { data: $scope.JSONContent });
       } catch (error) {
         $scope.JSONContent = false;
       }
     }
-    if (!$scope.$$phase) $scope.$digest();
+    $scope.$applyAsync();
   }
 
   reset($scope) {

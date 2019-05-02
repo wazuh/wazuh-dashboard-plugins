@@ -13,9 +13,10 @@ import $ from 'jquery';
 import { uiModules } from 'ui/modules';
 import { getVisualizeLoader } from './loader';
 import { timefilter } from 'ui/timefilter';
+import dateMath from '@elastic/datemath';
 
 const app = uiModules.get('apps/webinar_app', []);
-
+let lockFields = false;
 app.directive('kbnVis', function() {
   return {
     restrict: 'E',
@@ -32,7 +33,8 @@ app.directive('kbnVis', function() {
       loadedVisualizations,
       tabVisualizations,
       discoverPendingUpdates,
-      visHandlers
+      visHandlers,
+      genericReq
     ) {
       let implicitFilter = '';
       let rawFilters = [];
@@ -41,12 +43,23 @@ app.directive('kbnVis', function() {
       let visHandler = null;
       let renderInProgress = false;
 
+      const calculateTimeFilterSeconds = ({ from, to }) => {
+        try {
+          const fromParsed = dateMath.parse(from);
+          const toParsed = dateMath.parse(to);
+          const totalSeconds = (toParsed - fromParsed) / 1000;
+          return totalSeconds;
+        } catch (error) {
+          return 0;
+        }
+      };
+
       const setSearchSource = discoverList => {
         try {
-          if (
-            $scope.visID !== 'Wazuh-App-Overview-General-Agents-status' &&
-            !$scope.visID.includes('Cluster')
-          ) {
+          const isAgentStatus =
+            $scope.visID === 'Wazuh-App-Overview-General-Agents-status';
+          const isCluster = $scope.visID.includes('Cluster');
+          if (!isAgentStatus && !isCluster) {
             visualization.searchSource
               .setField('query', {
                 language: discoverList[0].language || 'lucene',
@@ -58,7 +71,7 @@ app.directive('kbnVis', function() {
                   ? [...discoverList[1], ...rawFilters]
                   : rawFilters
               );
-          } else {
+          } else if (!isAgentStatus) {
             // Checks for cluster.name or cluster.node filter existence
             const monitoringFilter = discoverList[1].filter(
               item =>
@@ -86,7 +99,8 @@ app.directive('kbnVis', function() {
           }
 
           const discoverList = discoverPendingUpdates.getList();
-
+          const isAgentStatus =
+            $scope.visID === 'Wazuh-App-Overview-General-Agents-status';
           if (raw && discoverList.length) {
             // There are pending updates from the discover (which is the one who owns the true app state)
 
@@ -112,8 +126,16 @@ app.directive('kbnVis', function() {
                 visualization,
                 {}
               );
+
+              const timeFilterSeconds = calculateTimeFilterSeconds(
+                timefilter.getTime()
+              );
+
               visHandler.update({
-                timeRange: timefilter.getTime()
+                timeRange:
+                  isAgentStatus && timeFilterSeconds < 900
+                    ? { from: 'now-15m', to: 'now', mode: 'quick' }
+                    : timefilter.getTime()
               });
               visHandlers.addItem(visHandler);
               visHandler.addRenderCompleteListener(renderComplete);
@@ -122,24 +144,45 @@ app.directive('kbnVis', function() {
 
               // Use the pending one, if it is empty, it won't matter
               implicitFilter = discoverList ? discoverList[0].query : '';
+
+              const timeFilterSeconds = calculateTimeFilterSeconds(
+                timefilter.getTime()
+              );
+
               visHandler.update({
-                timeRange: timefilter.getTime()
+                timeRange:
+                  isAgentStatus && timeFilterSeconds < 900
+                    ? { from: 'now-15m', to: 'now', mode: 'quick' }
+                    : timefilter.getTime()
               });
               setSearchSource(discoverList);
             }
           }
         } catch (error) {
           if (
-            error &&
-            error.message &&
-            error.message.includes('not locate that index-pattern-field')
+            ((error || {}).message || '').includes(
+              'not locate that index-pattern-field'
+            )
           ) {
-            errorHandler.handle(
-              `${
-                error.message
-              }, please restart Kibana and refresh this page once done`,
-              'Visualize'
-            );
+            if (!lockFields) {
+              try {
+                lockFields = true;
+                errorHandler.info(
+                  'Detected an incomplete index pattern, refreshing all its known fields...'
+                );
+                await genericReq.request(
+                  'GET',
+                  '/elastic/known-fields/all',
+                  {}
+                );
+                lockFields = false;
+                errorHandler.info('Success');
+                return myRender(raw);
+              } catch (error) {
+                lockFields = false;
+                throw error;
+              }
+            }
           } else {
             errorHandler.handle(error, 'Visualize');
           }
@@ -149,8 +192,8 @@ app.directive('kbnVis', function() {
       };
 
       // Listen for changes
-      const updateVisWatcher = $rootScope.$on('updateVis', () => {
-        if (!$rootScope.$$phase) $rootScope.$digest();
+      const updateVisWatcher = $scope.$on('updateVis', () => {
+        $scope.$applyAsync();
         const rawVis = rawVisualizations.getList();
         if (Array.isArray(rawVis) && rawVis.length) {
           myRender(rawVis);
@@ -187,7 +230,7 @@ app.directive('kbnVis', function() {
           $rootScope.rendered = false;
         }
         // Forcing a digest cycle
-        if (!$rootScope.$$phase) $rootScope.$digest();
+        $rootScope.$applyAsync();
       };
 
       // Initializing the visualization

@@ -1,0 +1,45 @@
+<div ng-if="!cdbctrl.viewingDetail" layout="column">
+
+    <div layout="row"
+        class="euiFlexGroup euiFlexGroup--alignItemsCenter euiFormControlLayout__childrenWrapper md-padding-h ng-scope wz-margin-top-16"
+        ng-if="!dctrl.editingFile && !mctrl.filesSubTab">
+        <input placeholder="Filter lists..." ng-model="cdbctrl.custom_search" type="text"
+            class="euiFieldSearch euiFieldSearch--fullWidth euiFlexItem height-35 ng-empty ng-pristine ng-touched ng-valid"
+            aria-invalid="false" wz-enter="cdbctrl.search(cdbctrl.custom_search)">
+        <div class="euiFormControlLayoutIcons wz-margin-left-16">
+            <span class="euiFormControlLayoutCustomIcon">
+                <react-component name="EuiIcon"
+                    props="{type:'search', className:'euiFormControlLayoutCustomIcon__icon'}" />
+            </span>
+        </div>
+        <button type="submit" aria-label="Search"
+            class="euiFlexItem euiFlexItem--flexGrowZero height-35 kuiButton kuiButton--secondary wz-margin-left-8"
+            ng-click="cdbctrl.search(cdbctrl.custom_search)">
+            Search
+        </button>
+    </div>
+
+    <div layout="row" class="wz-margin-top-16">
+        <md-card flex class="wz-md-card _md flex md-margin-h">
+            <md-card-actions ng-if="cdbctrl.adminMode" layout="row" layout-align="end center"
+                class="wz-card-actions wz-card-actions-top">
+                <a ng-click="cdbctrl.addNewList()">Add new list</a>
+                <span flex></span>
+            </md-card-actions>
+            <md-card-content>
+                <wz-table custom-columns="true" implicit-filter="cdbctrl.appliedFilters" flex path="'/lists/files'"
+                    keys="['name', 'path']" allow-click="true" row-sizes="[15,13,11]">
+                </wz-table>
+            </md-card-content>
+            <md-card-actions layout="row" layout-align="end center" class="layout-align-end-center layout-row">
+                <button type="button" ng-click="cdbctrl.downloadCsv()"
+                    class="euiButtonEmpty euiButtonEmpty--primary euiButtonEmpty--small">
+                    <span class="euiButtonEmpty__content">
+                        <react-component name="EuiIcon" props="{type:'importAction'}" />
+                        <span class="euiButtonEmpty__text">Formatted</span>
+                    </span>
+                </button>
+            </md-card-actions>
+        </md-card>
+    </div>
+</div>

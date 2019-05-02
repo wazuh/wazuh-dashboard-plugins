@@ -56,7 +56,7 @@ export class ReportingController {
       await this.load();
       this.errorHandler.info('Success', 'Reporting');
     } catch (error) {
-      this.errorHandler.handle(error, 'Reporting');
+      this.errorHandler.handle(error.message || error);
     }
   }
 
@@ -144,9 +144,9 @@ export class ReportingController {
       if (this.gap > 5) this.gap = 5;
       this.search();
       this.loading = false;
-      if (!this.$scope.$$phase) this.$scope.$digest();
+      this.$scope.$applyAsync();
     } catch (error) {
-      this.errorHandler.handle(error, 'Reporting');
+      this.errorHandler.handle(error.message || error);
     }
   }
 }

@@ -1,13 +1,18 @@
-<md-content flex layout="column" ng-if="tab === 'ciscat' && tabView === 'panels'" ng-class="{'no-opacity': resultState !== 'ready' || !rendered}" layout-align="start">
+<md-content flex layout="column" ng-if="tab === 'ciscat' && tabView === 'panels'"
+    ng-class="{'no-opacity': resultState !== 'ready' || !rendered}" layout-align="start">
 
     <!-- Metric bar section -->
     <div layout="row" layout-align="start center">
-        <md-card flex class="wz-metric-color wz-md-card">
+        <md-card flex class="wz-md-card wz-metric-color">
             <md-card-content layout="row" class="wz-padding-metric">
-                <div class="wz-text-truncatable" flex>Last not checked: <span class="wz-text-bold" ng-bind="ciscatScanNotChecked()"></span></div>
-                <div class="wz-text-truncatable" flex>Last pass: <span class="wz-text-bold" ng-bind="ciscatScanPass()"></span></div>
-                <div class="wz-text-truncatable" flex>Last scan score: <span class="wz-text-bold" ng-bind="ciscatScanScore()"></span></div>
-                <div class="wz-text-truncatable">Last scan date: <span class="wz-text-bold" ng-bind="ciscatScanTimestamp()"></span></div>
+                <div class="wz-text-truncatable" flex>Last not checked: <span class="wz-text-bold"
+                        ng-bind="ciscatScanNotChecked()"></span></div>
+                <div class="wz-text-truncatable" flex>Last pass: <span class="wz-text-bold"
+                        ng-bind="ciscatScanPass()"></span></div>
+                <div class="wz-text-truncatable" flex>Last scan score: <span class="wz-text-bold"
+                        ng-bind="ciscatScanScore()"></span></div>
+                <div class="wz-text-truncatable">Last scan date: <span class="wz-text-bold"
+                        ng-bind="ciscatScanTimestamp()"></span></div>
             </md-card-content>
         </md-card>
     </div>
@@ -15,12 +20,16 @@
 
     <!-- Metric bar section -->
     <div layout="row" layout-align="start center">
-        <md-card flex class="wz-metric-color wz-md-card">
+        <md-card flex class="wz-md-card wz-metric-color">
             <md-card-content layout="row" class="wz-padding-metric">
-                <div class="wz-text-truncatable" flex>Last errors: <span class="wz-text-bold" ng-bind="ciscatScanError()"></span></div>
-                <div class="wz-text-truncatable" flex>Last fails: <span class="wz-text-bold" ng-bind="ciscatScanFail()"></span></div>
-                <div class="wz-text-truncatable" flex>Last unknown: <span class="wz-text-bold" ng-bind="ciscatScanUnknown()"></span></div>
-                <div class="wz-text-truncatable">Last scan benchmark: <span class="wz-text-bold" ng-bind="ciscatScanBenchmark()"></span></div>
+                <div class="wz-text-truncatable" flex>Last errors: <span class="wz-text-bold"
+                        ng-bind="ciscatScanError()"></span></div>
+                <div class="wz-text-truncatable" flex>Last fails: <span class="wz-text-bold"
+                        ng-bind="ciscatScanFail()"></span></div>
+                <div class="wz-text-truncatable" flex>Last unknown: <span class="wz-text-bold"
+                        ng-bind="ciscatScanUnknown()"></span></div>
+                <div class="wz-text-truncatable">Last scan benchmark: <span class="wz-text-bold"
+                        ng-bind="ciscatScanBenchmark()"></span></div>
             </md-card-content>
         </md-card>
     </div>
@@ -41,18 +50,30 @@
 
     <!-- Top groups and result evolution section -->
     <div layout="row" layout-align="start stretch" class="height-320">
-        <md-card flex="60" class="wz-md-card">
-            <md-card-content class="wazuh-column">
+        <md-card flex="60" class="wz-md-card" ng-class="{'fullscreen': expandArray[0]}">
+            <md-card-actions layout="row" layout-align="end center" class="wz-card-actions-vis" ng-dblclick="expand(0)">
                 <span class="wz-headline-title">Top 5 CIS-CAT groups</span>
-                <md-divider class="wz-margin-top-10"></md-divider>
-                <kbn-vis vis-id="'Wazuh-app-Agents-CISCAT-top-5-groups'" id="Wazuh-app-Agents-CISCAT-top-5-groups"></kbn-vis>
+                <span flex></span>
+                <span class="cursor-pointer" ng-click="expand(0)">
+                    <react-component name="EuiIcon" props="{type:'expand'}" />
+                </span>
+            </md-card-actions>
+            <md-card-content class="wazuh-column">
+                <kbn-vis vis-id="'Wazuh-app-Agents-CISCAT-top-5-groups'" id="Wazuh-app-Agents-CISCAT-top-5-groups">
+                </kbn-vis>
             </md-card-content>
         </md-card>
-        <md-card flex class="wz-md-card">
-            <md-card-content class="wazuh-column">
+        <md-card flex class="wz-md-card" ng-class="{'fullscreen': expandArray[1]}">
+            <md-card-actions layout="row" layout-align="end center" class="wz-card-actions-vis" ng-dblclick="expand(1)">
                 <span class="wz-headline-title">Scan result evolution</span>
-                <md-divider class="wz-margin-top-10"></md-divider>
-                <kbn-vis vis-id="'Wazuh-app-Agents-CISCAT-scan-result-evolution'" id="Wazuh-app-Agents-CISCAT-scan-result-evolution"></kbn-vis>
+                <span flex></span>
+                <span class="cursor-pointer" ng-click="expand(1)">
+                    <react-component name="EuiIcon" props="{type:'expand'}" />
+                </span>
+            </md-card-actions>
+            <md-card-content class="wazuh-column">
+                <kbn-vis vis-id="'Wazuh-app-Agents-CISCAT-scan-result-evolution'"
+                    id="Wazuh-app-Agents-CISCAT-scan-result-evolution"></kbn-vis>
             </md-card-content>
         </md-card>
     </div>
@@ -60,10 +81,15 @@
 
     <!-- Alerts summary table section -->
     <div layout="row" layout-align="start stretch" class="height-570">
-        <md-card flex class="wz-md-card">
-            <md-card-content class="wazuh-column">
+        <md-card flex class="wz-md-card" ng-class="{'fullscreen': expandArray[2]}">
+            <md-card-actions layout="row" layout-align="end center" class="wz-card-actions-vis" ng-dblclick="expand(2)">
                 <span class="wz-headline-title">Alerts summary</span>
-                <md-divider class="wz-margin-top-10"></md-divider>
+                <span flex></span>
+                <span class="cursor-pointer" ng-click="expand(2)">
+                    <react-component name="EuiIcon" props="{type:'expand'}" />
+                </span>
+            </md-card-actions>
+            <md-card-content class="wazuh-column">
                 <kbn-vis vis-id="'Wazuh-app-Agents-CISCAT-alerts-summary'"></kbn-vis>
             </md-card-content>
         </md-card>

@@ -75,7 +75,14 @@ export class SettingsController {
 
     // Tab names
     this.tabNames = TabNames;
-    this.configuration = wazuhConfig.getConfig();
+
+    this.configuration = { ...(wazuhConfig.getConfig() || {}) };
+    for (const key in this.configuration) {
+      if (key.includes('extension')) {
+        delete this.configuration[key];
+      }
+    }
+
     this.configurationTypes = [];
     for (const key in this.configuration) {
       this.configurationTypes[key] = typeof this.configuration[key];
@@ -103,7 +110,10 @@ export class SettingsController {
    * This switch to a selected tab
    * @param {Object} tab
    */
-  switchTab(tab) {
+  switchTab(tab, setNav = false) {
+    if (setNav) {
+      this.appState.setNavigation({ status: true });
+    }
     this.tab = tab;
     this.$location.search('tab', this.tab);
   }
@@ -114,12 +124,10 @@ export class SettingsController {
    */
   async removeManager(item) {
     try {
+      const currentApi = this.appState.getCurrentAPI();
       let index = this.apiEntries.indexOf(item);
-      if (this.appState.getCurrentAPI()) {
-        if (
-          this.apiEntries[index]._id ===
-          JSON.parse(this.appState.getCurrentAPI()).id
-        ) {
+      if (currentApi) {
+        if (this.apiEntries[index]._id === JSON.parse(currentApi).id) {
           // We are trying to remove the one selected as default
           this.appState.removeCurrentAPI();
         }
@@ -136,7 +144,7 @@ export class SettingsController {
       for (const key in this.showEditForm) this.showEditForm[key] = false;
       this.$scope.$emit('updateAPI', {});
       this.errorHandler.info('The API was removed successfully', 'Settings');
-      if (!this.$scope.$$phase) this.$scope.$digest();
+      this.$scope.$applyAsync();
       return;
     } catch (error) {
       this.errorHandler.handle('Could not remove the API', 'Settings');
@@ -208,7 +216,7 @@ export class SettingsController {
 
     this.extensions = this.appState.getExtensions(JSON.parse(currentApi).id);
 
-    if (!this.$scope.$$phase) this.$scope.$digest();
+    this.$scope.$applyAsync();
     return;
   }
 
@@ -240,7 +248,7 @@ export class SettingsController {
         this.currentDefault = JSON.parse(currentApi).id;
       }
 
-      if (!this.$scope.$$phase) this.$scope.$digest();
+      this.$scope.$applyAsync();
       this.getCurrentAPIIndex();
       if (!this.currentApiEntryIndex && this.currentApiEntryIndex !== 0) return;
 
@@ -256,7 +264,7 @@ export class SettingsController {
 
       this.extensions = this.appState.getExtensions(JSON.parse(currentApi).id);
 
-      if (!this.$scope.$$phase) this.$scope.$digest();
+      this.$scope.$applyAsync();
       return;
     } catch (error) {
       this.errorHandler.handle('Error getting API entries', 'Settings');
@@ -315,7 +323,7 @@ export class SettingsController {
     this.showEditForm[entry._id] = !this.showEditForm[entry._id];
     this.isEditing = this.showEditForm[entry._id];
     this.addManagerContainer = false;
-    if (!this.$scope.$$phase) this.$scope.$digest();
+    this.$scope.$applyAsync();
   }
 
   // Save settings function
@@ -359,6 +367,7 @@ export class SettingsController {
       tmpData.extensions.aws = config['extensions.aws'];
       tmpData.extensions.virustotal = config['extensions.virustotal'];
       tmpData.extensions.osquery = config['extensions.osquery'];
+      tmpData.extensions.docker = config['extensions.docker'];
 
       const checkData = await this.testAPI.check(tmpData);
 
@@ -441,7 +450,7 @@ export class SettingsController {
       this.printError(error);
     }
     this.savingApi = false;
-    if (!this.$scope.$$phase) this.$scope.$digest();
+    this.$scope.$applyAsync();
     return;
   }
 
@@ -511,7 +520,7 @@ export class SettingsController {
       this.printError(error, true);
     }
     this.savingApi = false;
-    if (!this.$scope.$$phase) this.$scope.$digest();
+    this.$scope.$applyAsync();
     return;
   }
 
@@ -523,7 +532,7 @@ export class SettingsController {
   }
 
   // Check manager connectivity
-  async checkManager(item, isIndex) {
+  async checkManager(item, isIndex, silent = false) {
     try {
       const index = isIndex ? item : this.apiEntries.indexOf(item);
 
@@ -549,12 +558,15 @@ export class SettingsController {
       this.apiEntries[index]._source.cluster_info = tmpData.cluster_info;
       this.wzMisc.setApiIsDown(false);
       this.apiIsDown = false;
-      this.errorHandler.info('Connection success', 'Settings');
+      !silent && this.errorHandler.info('Connection success', 'Settings');
 
-      if (!this.$scope.$$phase) this.$scope.$digest();
+      this.$scope.$applyAsync();
       return;
     } catch (error) {
       if (!this.wzMisc.getApiIsDown()) this.printError(error);
+      else {
+        !silent && this.errorHandler.handle(error);
+      }
     }
   }
 
@@ -569,7 +581,7 @@ export class SettingsController {
       this.apiEntries[
         this.currentApiEntryIndex
       ]._source.extensions = currentExtensions;
-      if (!this.$scope.$$phase) this.$scope.$digest();
+      this.$scope.$applyAsync();
     } catch (error) {
       this.errorHandler.handle(error, 'Settings');
     }
@@ -593,7 +605,7 @@ export class SettingsController {
         'Settings'
       );
       this.selectedIndexPattern = newIndexPattern;
-      if (!this.$scope.$$phase) this.$scope.$digest();
+      this.$scope.$applyAsync();
       return;
     } catch (error) {
       this.errorHandler.handle(
@@ -624,7 +636,7 @@ export class SettingsController {
       const logs = await this.genericReq.request('GET', '/utils/logs', {});
       this.logs = logs.data.lastLogs.map(item => JSON.parse(item));
       this.loadingLogs = false;
-      if (!this.$scope.$$phase) this.$scope.$digest();
+      this.$scope.$applyAsync();
     } catch (error) {
       this.logs = [
         {
@@ -670,6 +682,7 @@ export class SettingsController {
         this.extensions.aws = config['extensions.aws'];
         this.extensions.virustotal = config['extensions.virustotal'];
         this.extensions.osquery = config['extensions.osquery'];
+        this.extensions.docker = config['extensions.docker'];
       } else {
         this.extensions = this.appState.getExtensions(
           JSON.parse(this.appState.getCurrentAPI()).id
@@ -681,9 +694,9 @@ export class SettingsController {
       }
       this.getCurrentAPIIndex();
       if (this.currentApiEntryIndex || this.currentApiEntryIndex === 0) {
-        await this.checkManager(this.currentApiEntryIndex, true);
+        await this.checkManager(this.currentApiEntryIndex, true, true);
       }
-      if (!this.$scope.$$phase) this.$scope.$digest();
+      this.$scope.$applyAsync();
       return;
     } catch (error) {
       this.errorHandler.handle(

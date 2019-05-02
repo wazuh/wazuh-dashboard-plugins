@@ -20,14 +20,6 @@ const metricsGeneral = {
     '[vis-id="\'Wazuh-App-Overview-General-Authentication-success\'"]'
 };
 
-// Metrics Audit
-const metricsAudit = {
-  auditNewFiles: '[vis-id="\'Wazuh-App-Overview-Audit-New-files\'"]',
-  auditReadFiles: '[vis-id="\'Wazuh-App-Overview-Audit-Read-files\'"]',
-  auditModifiedFiles: '[vis-id="\'Wazuh-App-Overview-Audit-Modified-files\'"]',
-  auditRemovedFiles: '[vis-id="\'Wazuh-App-Overview-Audit-Removed-files\'"]'
-};
-
 // Metrics Vulnerability Detector
 const metricsVulnerability = {
   vulnCritical:
@@ -79,7 +71,6 @@ const metricsOsquery = {
 
 export default {
   metricsGeneral,
-  metricsAudit,
   metricsVulnerability,
   metricsScap,
   metricsCiscat,

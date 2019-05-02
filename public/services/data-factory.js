@@ -17,8 +17,9 @@ export class DataFactory {
    * @param {*} path
    * @param {*} implicitFilter
    */
-  constructor(httpClient, path, implicitFilter) {
+  constructor(httpClient, path, implicitFilter, implicitSort) {
     this.implicitFilter = implicitFilter || false;
+    this.implicitSort = implicitSort || false;
     this.httpClient = httpClient;
     this.items = [];
     this.path = path;
@@ -28,6 +29,7 @@ export class DataFactory {
     this.sortValue = false;
     this.busy = false;
     if (this.implicitFilter) this.filters.push(...this.implicitFilter);
+    if (this.implicitSort) this.addSorting(this.implicitSort);
   }
 
   /**
@@ -101,8 +103,11 @@ export class DataFactory {
         this.path,
         parameters
       );
+
       this.items = this.items.filter(item => !!item);
-      this.items.push(...firstPage.data.data.items);
+      Array.isArray(firstPage.data.data)
+        ? this.items.push(...firstPage.data.data)
+        : this.items.push(...firstPage.data.data.items);
 
       const totalItems = firstPage.data.data.totalItems;
 

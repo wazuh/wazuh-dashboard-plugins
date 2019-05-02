@@ -16,12 +16,13 @@ export class WazuhConfig {
   constructor() {
     this.config = {};
   }
+
   /**
    * Set given configuration
    * @param {Object} cfg
    */
   setConfig(cfg) {
-    Object.assign(this.config, cfg);
+    this.config = { ...cfg };
   }
 
   /**
@@ -29,5 +30,12 @@ export class WazuhConfig {
    */
   getConfig() {
     return this.config;
+  }
+
+  /**
+   * Returns true if debug level is enabled, otherwise it returns false.
+   */
+  isDebug() {
+    return ((this.config || {})['logs.level'] || false) === 'debug';
   }
 }

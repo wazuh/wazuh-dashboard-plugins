@@ -1,0 +1,2 @@
+<div flex ng-if="!loading && mctrl.managingFiles" ng-controller="filesController as filesctrl" 
+layout="column" id="rulesContainer" layout-align="start space-around">

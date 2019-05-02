@@ -33,7 +33,9 @@ export class AgentsPreviewController {
     csvReq,
     shareAgent,
     wzTableFilter,
-    commonData
+    commonData,
+    wazuhConfig,
+    $window
   ) {
     this.$scope = $scope;
     this.genericReq = genericReq;
@@ -44,6 +46,9 @@ export class AgentsPreviewController {
     this.shareAgent = shareAgent;
     this.wzTableFilter = wzTableFilter;
     this.commonData = commonData;
+    this.wazuhConfig = wazuhConfig;
+    this.errorInit = false;
+    this.$window = $window;
   }
 
   /**
@@ -79,6 +84,12 @@ export class AgentsPreviewController {
     // Watcher for URL params
     this.$scope.$watch('submenuNavItem', () => {
       this.$location.search('tab', this.submenuNavItem);
+    });
+
+    this.$scope.$on('wazuhFetched', (ev, parameters) => {
+      ev.stopPropagation();
+      this.$scope.showNoAgents =
+        !parameters.items.length > 0 && !parameters.filters.length;
     });
 
     this.init = false;
@@ -135,6 +146,11 @@ export class AgentsPreviewController {
    */
   async load() {
     try {
+      this.errorInit = false;
+
+      const configuration = this.wazuhConfig.getConfig();
+      this.$scope.adminMode = !!(configuration || {}).admin;
+
       const api = JSON.parse(this.appState.getCurrentAPI()).id;
       const clusterInfo = this.appState.getClusterInfo();
       const firstUrlParam =
@@ -154,6 +170,7 @@ export class AgentsPreviewController {
       const unique = agentsUnique.data.result;
 
       this.searchBarModel = {
+        name: [],
         status: ['Active', 'Disconnected', 'Never connected'],
         group: unique.groups,
         version: unique.versions,
@@ -175,7 +192,6 @@ export class AgentsPreviewController {
       this.searchBarModel['os.platform'] = Array.from(
         new Set(this.searchBarModel['os.platform'])
       );
-
       this.groups = unique.groups;
       this.nodes = unique.nodes.map(item => ({ id: item }));
       this.versions = unique.versions.map(item => ({ id: item }));
@@ -202,13 +218,26 @@ export class AgentsPreviewController {
           this.mostActiveAgent.id = info.data.data;
         }
       }
-
-      this.loading = false;
-      if (!this.$scope.$$phase) this.$scope.$digest();
-      return;
     } catch (error) {
-      this.errorHandler.handle(error, 'Agents Preview');
+      this.errorInit = this.errorHandler.handle(error, false, false, true);
     }
+    this.loading = false;
+    this.$scope.$applyAsync();
     return;
+  }
+
+  registerNewAgent(flag) {
+    this.$scope.registerNewAgent = flag;
+  }
+
+  reloadList() {
+    this.$scope.$broadcast('wazuhSearch', { term: '' });
+  }
+
+  openRegistrationDocs() {
+    this.$window.open(
+      'https://documentation.wazuh.com/current/user-manual/registering/index.html',
+      '_blank'
+    );
   }
 }

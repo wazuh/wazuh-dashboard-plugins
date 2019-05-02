@@ -18,6 +18,7 @@ export class AppState {
   constructor($cookies, $window) {
     this.$cookies = $cookies;
     this.$window = $window;
+    this.navigate = {};
   }
 
   //Extensions setters and getters
@@ -41,10 +42,6 @@ export class AppState {
     return this.$cookies.getObject('_clusterInfo');
   }
 
-  removeClusterInfo() {
-    return this.$cookies.remove('_clusterInfo');
-  }
-
   setClusterInfo(cluster_info) {
     const exp = new Date();
     exp.setDate(exp.getDate() + 365);
@@ -63,10 +60,6 @@ export class AppState {
 
   getCreatedAt() {
     return this.$cookies.getObject('_createdAt');
-  }
-
-  removeCreatedAt() {
-    return this.$cookies.remove('_createdAt');
   }
 
   //Current api setters and getters
@@ -108,10 +101,6 @@ export class AppState {
     return this.$cookies.getObject('_currentPattern');
   }
 
-  removeCurrentPattern() {
-    return this.$cookies.remove('_currentPattern');
-  }
-
   //Dev tools setters and getters
 
   setCurrentDevTools(current) {
@@ -133,5 +122,15 @@ export class AppState {
 
   removeSessionStorageItem(key) {
     this.$window.sessionStorage.removeItem(key);
+  }
+
+  setNavigation(params) {
+    for (var key in params) {
+      this.navigate[key] = params[key];
+    }
+  }
+
+  getNavigation() {
+    return this.navigate;
   }
 }
