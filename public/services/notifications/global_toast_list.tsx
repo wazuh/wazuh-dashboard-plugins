@@ -52,7 +52,7 @@ export class GlobalToastListw extends React.Component<Props, State> {
 
   public render() {
     const increaseTime = ((this.state || {}).toasts || []).some(
-      item => item.color === 'danger' || item.color === 'warning'
+      item => item.color === 'danger'
     );
 
     return (
