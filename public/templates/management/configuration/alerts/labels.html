@@ -6,7 +6,7 @@
         ng-if="currentConfig[(agent && agent.id !== '000') ? 'agent-labels' : 'analysis-labels'] && isString(currentConfig[(agent && agent.id !== '000') ? 'agent-labels' : 'analysis-labels'])">
     </wz-no-config>
     <wz-no-config flex error="'not-present'"
-        ng-if="currentConfig[(agent && agent.id !== '000') ? 'agent-labels' : 'analysis-labels'] && !isString(currentConfig[(agent && agent.id !== '000') ? 'agent-labels' : 'analysis-labels']) && !hasSize(currentConfig[(agent && agent.id !== '000') ? 'agent-labels' : 'analysis-labels'].labels)">
+        ng-if="currentConfig[(agent && agent.id !== '000') ? 'agent-labels' : 'analysis-labels'] && !isString(currentConfig[(agent && agent.id !== '000') ? 'agent-labels' : 'analysis-labels']) && !currentConfig[(agent && agent.id !== '000') ? 'agent-labels' : 'analysis-labels'].labels">
     </wz-no-config>
     <wz-no-config flex error="'Wazuh not ready yet'"
         ng-if="wazuhNotReadyYet && (!currentConfig || !currentConfig[(agent && agent.id !== '000') ? 'agent-labels' : 'analysis-labels'])" />
@@ -14,7 +14,7 @@
 
     <!-- This section is the main content -->
     <div flex layout="column"
-        ng-if="currentConfig[(agent && agent.id !== '000') ? 'agent-labels' : 'analysis-labels'] && !isString(currentConfig[(agent && agent.id !== '000') ? 'agent-labels' : 'analysis-labels']) && hasSize(currentConfig[(agent && agent.id !== '000') ? 'agent-labels' : 'analysis-labels'].labels)">
+        ng-if="currentConfig[(agent && agent.id !== '000') ? 'agent-labels' : 'analysis-labels'] && !isString(currentConfig[(agent && agent.id !== '000') ? 'agent-labels' : 'analysis-labels']) && currentConfig[(agent && agent.id !== '000') ? 'agent-labels' : 'analysis-labels'].labels">
 
         <!-- The main card will all the settings -->
         <md-card class="wz-md-card" ng-if="!JSONContent && !XMLContent">

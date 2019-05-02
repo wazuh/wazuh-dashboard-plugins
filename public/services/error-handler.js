@@ -11,6 +11,17 @@
  */
 import { toastNotifications } from 'ui/notify';
 
+/**
+ * Override default behavior for notifications.
+ * The purpose is to increase default lifetime for error/warning toasters
+ */
+import { GlobalToastList } from '../../../../src/core/public/notifications/toasts/global_toast_list';
+import { ToastsService } from '../../../../src/core/public/notifications/toasts/toasts_service';
+import { ToastsServicew } from './notifications/toasts_service';
+import { GlobalToastListw } from './notifications/global_toast_list';
+ToastsService.prototype.start = ToastsServicew.prototype.start;
+GlobalToastList.prototype.render = GlobalToastListw.prototype.render;
+
 export class ErrorHandler {
   /**
    * Constructor

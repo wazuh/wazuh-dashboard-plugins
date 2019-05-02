@@ -58,7 +58,7 @@
                             <td>
                                 <input ng-show="editingKey === item[0]" ng-disabled="loadingChange" type="text"
                                     class="wz-input-text" ng-model="currentList.editingNewValue"></input>
-                                <span ng-show="!editingKey || editingKey !== item[0]">{{item[1]}}</span>
+                                <span ng-show="!editingKey || editingKey !== item[0]">{{item[1] || '-'}}</span>
                             </td>
                             <td class="action-btn-td">
                                 <div ng-hide="!adminMode">

@@ -2,11 +2,11 @@
 <wz-no-config
   flex
   error="'not-present'"
-  ng-if="((agent || {}).os || {}).platform !== 'windows' && configurationSubTab === 'fim-ignored' && currentConfig && currentConfig['syscheck-syscheck'] && currentConfig['syscheck-syscheck'].syscheck && !currentConfig['syscheck-syscheck'].syscheck.ignore"></wz-no-config>
+  ng-if="((agent || {}).os || {}).platform !== 'windows' && configurationSubTab === 'fim-ignored' && currentConfig && currentConfig['syscheck-syscheck'] && currentConfig['syscheck-syscheck'].syscheck && currentConfig['syscheck-syscheck'].syscheck.ignore && !currentConfig['syscheck-syscheck'].syscheck.ignore.length"></wz-no-config>
 <!-- End no configuration section -->
 
 <!-- Ignored card -->
-<md-card class="wz-md-card" ng-if="((agent || {}).os || {}).platform !== 'windows' && !JSONContent && !XMLContent && configurationSubTab === 'fim-ignored' && currentConfig && currentConfig['syscheck-syscheck'] && currentConfig['syscheck-syscheck'].syscheck && currentConfig['syscheck-syscheck'].syscheck.ignore">
+<md-card class="wz-md-card" ng-if="((agent || {}).os || {}).platform !== 'windows' && !JSONContent && !XMLContent && configurationSubTab === 'fim-ignored' && currentConfig && currentConfig['syscheck-syscheck'] && currentConfig['syscheck-syscheck'].syscheck && currentConfig['syscheck-syscheck'].syscheck.ignore && currentConfig['syscheck-syscheck'].syscheck.ignore.length">
     <md-card-content>
         <div layout="row" layout-align="start center">
             <div>
