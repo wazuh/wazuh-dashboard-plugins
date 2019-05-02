@@ -58,6 +58,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Exclude agent "000" getting the last registered and the most active agents from the Wazuh API.([#1391](https://github.com/wazuh/wazuh-kibana-app/pull/1391))
 - Reviewed Osquery dashboards ([#1394](https://github.com/wazuh/wazuh-kibana-app/pull/1394))
 - Memory info is now a log ([#1400](https://github.com/wazuh/wazuh-kibana-app/pull/1400))
+- Error toasters time is now 30000ms, warning/info are still 6000ms ([#1420](https://github.com/wazuh/wazuh-kibana-app/pull/1420))
 
 ### Fixed
 
