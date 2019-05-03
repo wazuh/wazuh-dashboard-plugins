@@ -343,9 +343,24 @@ app.directive('wzXmlFileEditor', function() {
         }
       );
 
+      $(window).on('resize', function() {
+        dynamicHeight();
+      });
+
+      const dynamicHeight = () => {
+        setTimeout(function() {
+          const editorContainer = $('.wzXmlEditor');
+          const windows = $(window).height();
+          const offsetTop = getPosition(editorContainer[0]).y;
+          editorContainer.height(windows - (offsetTop + 20));
+        }, 1);
+      };
+
       const init = (data = false) => {
         try {
+          $('.wzXmlEditor').height(0);
           $scope.xmlError = false;
+          dynamicHeight();
           $scope.xmlCodeBox.setValue(autoFormat(data || $scope.data));
           firstTime = false;
           setTimeout(() => {
@@ -397,6 +412,21 @@ app.directive('wzXmlFileEditor', function() {
         $location.search('editingFile', null);
         appState.setNavigation({ status: true });
       });
+
+      function getPosition(element) {
+        var xPosition = 0;
+        var yPosition = 0;
+
+        while (element) {
+          xPosition +=
+            element.offsetLeft - element.scrollLeft + element.clientLeft;
+          yPosition +=
+            element.offsetTop - element.scrollTop + element.clientTop;
+          element = element.offsetParent;
+        }
+
+        return { x: xPosition, y: yPosition };
+      }
     },
     template
   };
