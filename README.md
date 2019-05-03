@@ -48,7 +48,7 @@ sudo -u kibana NODE_OPTIONS="--max-old-space-size=3072" /usr/share/kibana/bin/ki
 - Without sudo:
 
 ```
-sudo -u kibana NODE_OPTIONS="--max-old-space-size=3072" /usr/share/kibana/bin/kibana-plugin install https://packages.wazuh.com/wazuhapp/wazuhapp-3.9.0_6.7.1.zip
+su -c 'NODE_OPTIONS="--max-old-space-size=3072" /usr/share/kibana/bin/kibana-plugin install https://packages.wazuh.com/wazuhapp/wazuhapp-3.9.0_6.7.1.zip' kibana
 ```
 
 Restart Kibana
@@ -111,7 +111,7 @@ sudo -u kibana NODE_OPTIONS="--max-old-space-size=3072" /usr/share/kibana/bin/ki
 - Without sudo:
 
 ```
-sudo -u kibana NODE_OPTIONS="--max-old-space-size=3072" /usr/share/kibana/bin/kibana-plugin install https://packages.wazuh.com/wazuhapp/wazuhapp-3.9.0_6.7.1.zip
+su -c 'NODE_OPTIONS="--max-old-space-size=3072" /usr/share/kibana/bin/kibana-plugin install https://packages.wazuh.com/wazuhapp/wazuhapp-3.9.0_6.7.1.zip' kibana
 ```
 
 Restart Kibana
