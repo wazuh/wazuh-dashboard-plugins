@@ -177,7 +177,7 @@
                 ng-click="restart(); toggleRestartMsg()">Restart
                 now</button>
         </div>
-        <div class="wz-padding-top-14" ng-if="fetchedXML" style="height: calc(100vh - 220px);">
+        <div class="wz-padding-top-14" ng-if="fetchedXML">
             <wz-xml-file-editor file-name='rules' data="fetchedXML" target-name="currentRule.file"
                 valid-fn='xmlIsValid(valid)' saving-param='toggleSaveConfig()' close-fn='closeEditingFile(reload)'>
             </wz-xml-file-editor>
