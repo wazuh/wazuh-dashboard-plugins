@@ -616,7 +616,7 @@ export class DevToolsController {
     } catch (error) {
       if ((error || {}).status === -1) {
         return this.apiOutputBox.setValue(
-          "Wazuh API don't reachable. Reason: timeout."
+          "Wazuh API is not reachable. Reason: timeout."
         );
       } else {
         const parsedError = this.errorHandler.handle(error, null, null, true);
