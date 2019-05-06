@@ -29,6 +29,10 @@ export default kibana =>
       },
       hacks: ['plugins/wazuh/hack-icon-style'],
       __bundleProvider__(kbnServer) {
+        console.log(
+          kbnServer.uiExports.uiSettingDefaults['theme:darkMode'].value
+        );
+        //console.log(JSON.stringify(kbnServer[config]));
         kbnServer.uiBundles.addPostLoader({
           test: /\.pug$/,
           include: resolve(__dirname, 'public'),
