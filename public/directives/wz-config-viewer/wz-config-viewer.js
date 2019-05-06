@@ -68,6 +68,19 @@ class WzConfigViewer {
       bindXmlListener();
     };
 
+    $(window).on('resize', function() {
+      dynamicHeight();
+    });
+
+    const dynamicHeight = () => {
+      setTimeout(function() {
+        const editorContainer = $('.configViewer');
+        const windows = $(window).height();
+        const offsetTop = getPosition(editorContainer[0]).y;
+        editorContainer.height(windows - (offsetTop + 20));
+      }, 1);
+    };
+
     const refreshJsonBox = json => {
       $scope.jsoncontent = json;
       if (!$scope.jsonCodeBox) {
@@ -78,6 +91,7 @@ class WzConfigViewer {
         setTimeout(function() {
           $scope.jsonCodeBox.refresh();
           $scope.$applyAsync();
+          window.dispatchEvent(new Event('resize'));
         }, 200);
       }
     };
@@ -92,6 +106,7 @@ class WzConfigViewer {
         setTimeout(function() {
           $scope.xmlCodeBox.refresh();
           $scope.$applyAsync();
+          window.dispatchEvent(new Event('resize'));
         }, 200);
       }
     };
@@ -137,6 +152,20 @@ class WzConfigViewer {
         $scope.jsonCodeBox.refresh();
       }
     });
+
+    function getPosition(element) {
+      var xPosition = 0;
+      var yPosition = 0;
+
+      while (element) {
+        xPosition +=
+          element.offsetLeft - element.scrollLeft + element.clientLeft;
+        yPosition += element.offsetTop - element.scrollTop + element.clientTop;
+        element = element.offsetParent;
+      }
+
+      return { x: xPosition, y: yPosition };
+    }
   }
 }
 
