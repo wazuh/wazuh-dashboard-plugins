@@ -1,0 +1,5 @@
+.euiNavDrawerGroup__item .euiListGroupItem__icon.euiImage {
+  filter: invert(100%);
+  max-width: 18px;
+  left: -1px;
+}

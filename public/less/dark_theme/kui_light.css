@@ -1170,7 +1170,7 @@ a.kuiButton--secondary:not(.kuiButton-isDisabled):active {
   align-items: center;
   padding: 12px 8px;
   /* 1 */
-  border-bottom: 1px solid #d3dae6;
+  border-bottom: none;
   -webkit-box-flex: 1;
   -webkit-flex-grow: 1;
   -ms-flex-positive: 1;

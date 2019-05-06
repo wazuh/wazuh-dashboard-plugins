@@ -1413,6 +1413,120 @@
   color: #98a2b3;
   margin-bottom: 0 !important;
 }
+.euiComboBoxOptionsList {
+    max-width: 400px;
+    width: 100%;
+    height: auto;
+    /* 3 */
+    z-index: 8001;
+    position: absolute;
+    /* 2 */
+    top: 0;
+    /* 2 */ }
+    .euiComboBoxOptionsList--fullWidth {
+      max-width: 100%; }
+    .euiComboBoxOptionsList--compressed {
+      height: 32px; }
+    .euiComboBoxOptionsList--inGroup {
+      height: 38px;
+      /* 2 */ }
+    .euiComboBoxOptionsList--inGroup.euiComboBoxOptionsList--compressed {
+      height: 30px;
+      /* 2 */ }
+    .euiComboBoxOptionsList .ReactVirtualized__List {
+      scrollbar-width: thin; }
+      .euiComboBoxOptionsList .ReactVirtualized__List::-webkit-scrollbar {
+        width: 16px;
+        height: 16px; }
+      .euiComboBoxOptionsList .ReactVirtualized__List::-webkit-scrollbar-thumb {
+        background-color: rgba(105, 112, 125, 0.5);
+        border: 6px solid transparent;
+        background-clip: content-box; }
+      .euiComboBoxOptionsList .ReactVirtualized__List::-webkit-scrollbar-corner, .euiComboBoxOptionsList .ReactVirtualized__List::-webkit-scrollbar-track {
+        background-color: transparent; }
+    .euiComboBoxOptionsList.euiComboBoxOptionsList--bottom {
+      /* 4 */
+      -webkit-box-shadow: 0 6px 12px -1px rgba(152, 162, 179, 0.2), 0 4px 4px -1px rgba(152, 162, 179, 0.2), 0 2px 2px 0 rgba(152, 162, 179, 0.2);
+              box-shadow: 0 6px 12px -1px rgba(152, 162, 179, 0.2), 0 4px 4px -1px rgba(152, 162, 179, 0.2), 0 2px 2px 0 rgba(152, 162, 179, 0.2); }
+    .euiComboBoxOptionsList.euiComboBoxOptionsList--top {
+      /* 4 */
+      -webkit-box-shadow: 0 -2px 4px -1px rgba(152, 162, 179, 0.2), 0 0 2px 0 rgba(152, 162, 179, 0.2);
+              box-shadow: 0 -2px 4px -1px rgba(152, 162, 179, 0.2), 0 0 2px 0 rgba(152, 162, 179, 0.2); }
+  
+  .euiComboBoxOptionsList--bottom {
+    border-radius: 0 0 4px 4px !important;
+    border-top: none !important; }
+  
+  .euiComboBoxOptionsList--top {
+    border-radius: 4px 4px 0 0 !important; }
+  
+  /**
+    * 1. Prevent really long input from overflowing the container.
+    */
+  .euiComboBoxOptionsList__empty {
+    padding: 8px;
+    text-align: center;
+    color: #69707D;
+    word-wrap: break-word;
+    /* 1 */ }
+  
+  .euiComboBoxOptionsList__rowWrap {
+    padding: 0;
+    max-height: 200px;
+    overflow: hidden; }
+  
+  .euiComboBoxOption {
+    font-size: 14px;
+    padding: 4px 8px 4px 16px;
+    width: 100%;
+    text-align: left;
+    border: 1px solid #D3DAE6;
+    border-color: transparent;
+    display: -webkit-box;
+    display: -ms-flexbox;
+    display: flex;
+    -webkit-box-align: center;
+        -ms-flex-align: center;
+            align-items: center; }
+    .euiComboBoxOption:hover {
+      text-decoration: underline; }
+    .euiComboBoxOption.euiComboBoxOption-isFocused {
+      cursor: pointer;
+      color: #006BB4;
+      background-color: #e6f0f8; }
+    .euiComboBoxOption.euiComboBoxOption-isDisabled {
+      color: #98A2B3;
+      cursor: not-allowed; }
+      .euiComboBoxOption.euiComboBoxOption-isDisabled:hover {
+        text-decoration: none; }
+  
+  .euiComboBoxOption__content {
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap; }
+  
+  /**
+   * 1. Force each title to be the same height as an option, so that the virtualized scroll logic
+   *    works.
+   */
+  .euiComboBoxTitle {
+    font-size: 12px;
+    padding: 11px 8px 4px;
+    /* 1 */
+    width: 100%;
+    font-weight: 700;
+    color: #000; }
+  
+  .euiContextMenu {
+    width: 256px;
+    max-width: 100%;
+    position: relative;
+    overflow: hidden;
+    -webkit-transition: height 150ms cubic-bezier(0.694, 0.0482, 0.335, 1);
+    transition: height 150ms cubic-bezier(0.694, 0.0482, 0.335, 1);
+    border-radius: 4px; }
+    .euiContextMenu .euiContextMenu__content {
+      padding: 8px; }
 .euiSwitch {
   position: relative;
   display: inline-block;
@@ -2855,18 +2969,70 @@
                 .visWrapper .grid > path {
                     stroke: rgba(105, 112, 125, 0.2)!important;
                 }
-                .euiPopover__panel .euiPopover__panelArrow.euiPopover__panelArrow--bottom:before {
-                    top: -12px;
-                    border-left: 12px solid transparent!important;
-                    border-right: 12px solid transparent!important;
-                    border-bottom: 12px solid #D3DAE6!important;
-                }
-                .euiPopover__panel .euiPopover__panelArrow.euiPopover__panelArrow--bottom:after {
-                    top: -11px;
-                    border-left: 12px solid transparent!important;
-                    border-right: 12px solid transparent!important;
-                    border-bottom: 12px solid #FFF!important;
-                }
+                .euiPopover__panel.euiPopover__panel-isOpen {
+                    opacity: 1;
+                    visibility: visible;
+                    pointer-events: auto; }
+                  .euiPopover__panel .euiPopover__panelArrow {
+                    position: absolute;
+                    width: 0;
+                    height: 0; }
+                    .euiPopover__panel .euiPopover__panelArrow:before {
+                      position: absolute;
+                      content: '';
+                      height: 0;
+                      width: 0; }
+                    .euiPopover__panel .euiPopover__panelArrow:after {
+                      position: absolute;
+                      content: '';
+                      height: 0;
+                      width: 0; }
+                    .euiPopover__panel .euiPopover__panelArrow.euiPopover__panelArrow--top:before {
+                      bottom: -11px;
+                      border-left: 12px solid transparent;
+                      border-right: 12px solid transparent;
+                      border-top: 12px solid #D3DAE6; }
+                    .euiPopover__panel .euiPopover__panelArrow.euiPopover__panelArrow--top:after {
+                      bottom: -10px;
+                      border-left: 12px solid transparent;
+                      border-right: 12px solid transparent;
+                      border-top: 12px solid #FFF; }
+                    .euiPopover__panel .euiPopover__panelArrow.euiPopover__panelArrow--right:before {
+                      left: -12px;
+                      top: 50%;
+                      border-top: 12px solid transparent;
+                      border-bottom: 12px solid transparent;
+                      border-right: 12px solid #D3DAE6; }
+                    .euiPopover__panel .euiPopover__panelArrow.euiPopover__panelArrow--right:after {
+                      left: -11px;
+                      top: 50%;
+                      border-top: 12px solid transparent;
+                      border-bottom: 12px solid transparent;
+                      border-right: 12px solid #FFF; }
+                    .euiPopover__panel .euiPopover__panelArrow.euiPopover__panelArrow--bottom:before {
+                      top: -12px;
+                      border-left: 12px solid transparent;
+                      border-right: 12px solid transparent;
+                      border-bottom: 12px solid #D3DAE6; }
+                    .euiPopover__panel .euiPopover__panelArrow.euiPopover__panelArrow--bottom:after {
+                      top: -11px;
+                      border-left: 12px solid transparent;
+                      border-right: 12px solid transparent;
+                      border-bottom: 12px solid #FFF; }
+                    .euiPopover__panel .euiPopover__panelArrow.euiPopover__panelArrow--left:before {
+                      right: -11px;
+                      top: 50%;
+                      border-top: 12px solid transparent;
+                      border-bottom: 12px solid transparent;
+                      border-left: 12px solid #D3DAE6; }
+                    .euiPopover__panel .euiPopover__panelArrow.euiPopover__panelArrow--left:after {
+                      right: -10px;
+                      top: 50%;
+                      border-top: 12px solid transparent;
+                      border-bottom: 12px solid transparent;
+                      border-left: 12px solid #FFF; }
+                  .euiPopover__panel.euiPopover__panel-noArrow .euiPopover__panelArrow {
+                    display: none; }
                 .euiPanel .euiHorizontalRule {
                     border: none;
                     height: 1.1px;
@@ -3443,3 +3609,31 @@
                   
                   .euiFilterGroup__popoverPanel {
                     width: 288px; }
+
+                    .visLib--legend-left .visLegend__valueDetails, .visLib--legend-right .visLegend__valueDetails {
+                        border-bottom: 1px solid white!important;
+                    }
+                    .visLegend__valueDetails {
+                        background-color: white!important;
+                    }
+                    .euiPopoverTitle {
+                        color: #1a1c21;
+                        font-size: 14px;
+                        font-size: 0.875rem;
+                        line-height: 1.5;
+                        line-height: 1.5rem;
+                        font-weight: 700;
+                        padding: 12px;
+                        text-transform: uppercase;
+                        border-bottom: 1px solid #D3DAE6;
+                        border-top-left-radius: 3px;
+                        border-top-right-radius: 3px; }
+                        .euiPopover__panel.euiPanel--paddingSmall .euiPopoverTitle {
+                          padding: 12px 8px;
+                          margin: -8px -8px 8px; }
+                        .euiPopover__panel.euiPanel--paddingMedium .euiPopoverTitle {
+                          padding: 12px 16px;
+                          margin: -16px -16px 16px; }
+                        .euiPopover__panel.euiPanel--paddingLarge .euiPopoverTitle {
+                          padding: 12px 24px;
+                          margin: -24px -24px 24px; }
