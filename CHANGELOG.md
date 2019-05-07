@@ -2,11 +2,12 @@
 
 All notable changes to the Wazuh app project will be documented in this file.
 
-## Wazuh v3.9.0 - Kibana v6.7.0 / v6.7.1 - Revision 439
+## Wazuh v3.9.0 - Kibana v6.7.0 / v6.7.1 / v6.7.2 - Revision 441
 
 ### Added
 
 - Support for Wazuh v3.9.0
+- Support for Kibana v6.7.0 / v6.7.1 / v6.7.2
 - Edit master and worker configuration ([#1215](https://github.com/wazuh/wazuh-kibana-app/pull/1215)).
 - Edit local rules, local decoders and CDB lists ([#1212](https://github.com/wazuh/wazuh-kibana-app/pull/1212), [#1204](https://github.com/wazuh/wazuh-kibana-app/pull/1204), [#1196](https://github.com/wazuh/wazuh-kibana-app/pull/1196), [#1233](https://github.com/wazuh/wazuh-kibana-app/pull/1233), [#1304](https://github.com/wazuh/wazuh-kibana-app/pull/1304)).
 - View no local rules/decoders XML files ([#1395](https://github.com/wazuh/wazuh-kibana-app/pull/1395))

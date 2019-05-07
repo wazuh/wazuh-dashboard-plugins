@@ -32,8 +32,8 @@ Visualize and analyze Wazuh alerts stored in Elasticsearch using our Kibana app 
 
 - Wazuh HIDS 3.9.0
 - Wazuh RESTful API 3.9.0
-- Kibana 6.7.1
-- Elasticsearch 6.7.1
+- Kibana 6.7.2
+- Elasticsearch 6.7.2
 
 ## Installation
 
@@ -42,13 +42,13 @@ Install the app
 - With sudo:
 
 ```
-sudo -u kibana NODE_OPTIONS="--max-old-space-size=3072" /usr/share/kibana/bin/kibana-plugin install https://packages.wazuh.com/wazuhapp/wazuhapp-3.9.0_6.7.1.zip
+sudo -u kibana NODE_OPTIONS="--max-old-space-size=3072" /usr/share/kibana/bin/kibana-plugin install https://packages.wazuh.com/wazuhapp/wazuhapp-3.9.0_6.7.2.zip
 ```
 
 - Without sudo:
 
 ```
-su -c 'NODE_OPTIONS="--max-old-space-size=3072" /usr/share/kibana/bin/kibana-plugin install https://packages.wazuh.com/wazuhapp/wazuhapp-3.9.0_6.7.1.zip' kibana
+su -c 'NODE_OPTIONS="--max-old-space-size=3072" /usr/share/kibana/bin/kibana-plugin install https://packages.wazuh.com/wazuhapp/wazuhapp-3.9.0_6.7.2.zip' kibana
 ```
 
 Restart Kibana
@@ -105,13 +105,13 @@ Install the app
 - With sudo:
 
 ```
-sudo -u kibana NODE_OPTIONS="--max-old-space-size=3072" /usr/share/kibana/bin/kibana-plugin install https://packages.wazuh.com/wazuhapp/wazuhapp-3.9.0_6.7.1.zip
+sudo -u kibana NODE_OPTIONS="--max-old-space-size=3072" /usr/share/kibana/bin/kibana-plugin install https://packages.wazuh.com/wazuhapp/wazuhapp-3.9.0_6.7.2.zip
 ```
 
 - Without sudo:
 
 ```
-su -c 'NODE_OPTIONS="--max-old-space-size=3072" /usr/share/kibana/bin/kibana-plugin install https://packages.wazuh.com/wazuhapp/wazuhapp-3.9.0_6.7.1.zip' kibana
+su -c 'NODE_OPTIONS="--max-old-space-size=3072" /usr/share/kibana/bin/kibana-plugin install https://packages.wazuh.com/wazuhapp/wazuhapp-3.9.0_6.7.2.zip' kibana
 ```
 
 Restart Kibana
@@ -186,7 +186,7 @@ service kibana restart
 |      6.7.0     |       3.8.2       | /usr/share/kibana/bin/kibana-plugin install <https://packages.wazuh.com/wazuhapp/wazuhapp-3.8.2_6.7.0.zip> |
 |      6.7.1     |       3.8.2       | /usr/share/kibana/bin/kibana-plugin install <https://packages.wazuh.com/wazuhapp/wazuhapp-3.8.2_6.7.1.zip> |
 |      6.7.1     |       3.9.0       | /usr/share/kibana/bin/kibana-plugin install <https://packages.wazuh.com/wazuhapp/wazuhapp-3.9.0_6.7.1.zip> |
-
+|      6.7.2     |       3.9.0       | /usr/share/kibana/bin/kibana-plugin install <https://packages.wazuh.com/wazuhapp/wazuhapp-3.9.0_6.7.2.zip> |
 
 
 ## Contribute
