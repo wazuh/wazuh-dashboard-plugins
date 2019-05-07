@@ -718,7 +718,6 @@
     padding: 4px;
     border: none;
     line-height: 1;
-    font-size: 16px;
     color: #2d2d2d !important;
     /* 1 */
     cursor: pointer;
@@ -2031,7 +2030,6 @@
       /* 1 */ }
   
   .kuiInfoButton {
-    font-size: 16px;
     line-height: 0;
     background-color: transparent;
     color: #006BB4;
@@ -2403,7 +2401,6 @@
     padding: 4px;
     border: none;
     line-height: 1;
-    font-size: 16px;
     color: #2d2d2d !important;
     /* 1 */
     cursor: pointer;

@@ -14,6 +14,10 @@
 /* ------------------------ Wazuh layouts stylesheet ------------------------ */
 /* -------------------------------------------------------------------------- */
 
+html {
+  background: white !important;
+}
+
 /* Margins */
 
 .wz-margin-right-8 {
@@ -393,11 +397,11 @@ md-dialog.modalTheme .md-button {
   display: -ms-flexbox;
   display: flex;
   z-index: 9999;
-  height: calc(~'100vh - 60px');
-  width: calc(~'100vw - 133px');
+  height: calc(~'100vh - 119px');
+  width: calc(~'100vw - 128px');
   position: fixed;
-  top: 0px;
-  left: 53px;
+  top: 49px;
+  left: 48px;
   right: 20px;
   background-color: white;
   max-width: 100% !important;
@@ -461,6 +465,18 @@ md-dialog.modalTheme .md-button {
 :focus {
   outline: none !important;
   outline-color: transparent !important;
+}
+
+.dscWrapper {
+  .table > thead > tr > th,
+  .table > tbody > tr > th,
+  .table > tfoot > tr > th,
+  .table > thead > tr > td,
+  .table > tbody > tr > td,
+  .table > tfoot > tr > td {
+    font-size: 12px !important;
+    font-kerning: normal !important;
+  }
 }
 
 .table > thead > tr > th,
