@@ -44,7 +44,7 @@ export class ErrorHandler {
         origin.includes('/api/csv') ||
         origin.includes('/api/agents-unique');
       return isFromAPI
-        ? "Wazuh API don't reachable. Reason: timeout."
+        ? "Wazuh API is not reachable. Reason: timeout."
         : 'Server did not respond';
     }
     if ((((error || {}).data || {}).errorData || {}).message)

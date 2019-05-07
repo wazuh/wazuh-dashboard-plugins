@@ -77,7 +77,8 @@ class WzConfigViewer {
         const editorContainer = $('.configViewer');
         const windows = $(window).height();
         const offsetTop = getPosition(editorContainer[0]).y;
-        editorContainer.height(windows - (offsetTop + 20));
+        const bottom = $scope.isLogs ? 75 : 20;
+        editorContainer.height(windows - (offsetTop + bottom));
       }, 1);
     };
 
@@ -96,7 +97,8 @@ class WzConfigViewer {
       }
     };
 
-    const refreshXmlBox = xml => {
+    const refreshXmlBox = (xml, isLogs) => {
+      $scope.isLogs = isLogs;
       $scope.xmlcontent = xml;
       if (!$scope.xmlCodeBox) {
         setXmlBox();
@@ -106,7 +108,13 @@ class WzConfigViewer {
         setTimeout(function() {
           $scope.xmlCodeBox.refresh();
           $scope.$applyAsync();
+<<<<<<< HEAD
           window.dispatchEvent(new Event('resize'));
+=======
+          $scope.isLogs
+            ? dynamicHeight()
+            : window.dispatchEvent(new Event('resize'));
+>>>>>>> 79e7042920c0480f1dd41944f9c63bd8283e1332
         }, 200);
       }
     };
@@ -120,7 +128,7 @@ class WzConfigViewer {
     });
 
     $scope.$on('XMLContentReady', (ev, params) => {
-      refreshXmlBox(params.data);
+      refreshXmlBox(params.data, params.logs);
     });
 
     const bindXmlListener = () => {

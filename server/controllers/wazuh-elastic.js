@@ -316,7 +316,7 @@ export class WazuhElasticCtrl {
    * @param {Array<Object>} indexPatternList List of index patterns
    */
   validateIndexPattern(indexPatternList) {
-    const minimum = ['@timestamp', 'full_log', 'manager.name', 'agent.id'];
+    const minimum = ['@timestamp', 'rule.groups', 'manager.name', 'agent.id'];
     let list = [];
     for (const index of indexPatternList) {
       let valid, parsed;

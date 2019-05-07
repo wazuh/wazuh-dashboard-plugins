@@ -44,7 +44,8 @@ export class LogsController {
       this.$scope.XMLContent = this.parseLogsToText(parameters.items) || '';
 
       this.$scope.$broadcast('XMLContentReady', {
-        data: this.$scope.XMLContent
+        data: this.$scope.XMLContent,
+        logs: true
       });
       this.$scope.$applyAsync();
       this.$scope.$broadcast('doRefresh', { type: 'xml' });

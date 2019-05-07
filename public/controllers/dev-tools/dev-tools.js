@@ -440,7 +440,7 @@ export class DevToolsController {
       const leftOrigWidth = $('#wz-dev-left-column').width();
       const rightOrigWidth = $('#wz-dev-right-column').width();
       $(evtDocument).mousemove(function(e) {
-        const leftWidth = e.pageX - 215 + 14;
+        const leftWidth = e.pageX - 85 + 14;
         let rightWidth = leftOrigWidth - leftWidth;
         $('#wz-dev-left-column').css('width', leftWidth);
         $('#wz-dev-right-column').css('width', rightOrigWidth + rightWidth);
@@ -616,7 +616,7 @@ export class DevToolsController {
     } catch (error) {
       if ((error || {}).status === -1) {
         return this.apiOutputBox.setValue(
-          "Wazuh API don't reachable. Reason: timeout."
+          'Wazuh API is not reachable. Reason: timeout.'
         );
       } else {
         const parsedError = this.errorHandler.handle(error, null, null, true);
