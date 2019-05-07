@@ -14,6 +14,10 @@
 /* ------------------------ Wazuh layouts stylesheet ------------------------ */
 /* -------------------------------------------------------------------------- */
 
+html {
+  background: white !important;
+}
+
 /* Margins */
 
 .wz-margin-right-8 {
@@ -461,6 +465,18 @@ md-dialog.modalTheme .md-button {
 :focus {
   outline: none !important;
   outline-color: transparent !important;
+}
+
+.dscWrapper {
+  .table > thead > tr > th,
+  .table > tbody > tr > th,
+  .table > tfoot > tr > th,
+  .table > thead > tr > td,
+  .table > tbody > tr > td,
+  .table > tfoot > tr > td {
+    font-size: 12px !important;
+    font-kerning: normal !important;
+  }
 }
 
 .table > thead > tr > th,

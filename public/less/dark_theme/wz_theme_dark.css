@@ -339,7 +339,6 @@
    */
 .euiCallOutHeader {
   color: #1a1c21;
-  font-size: 16px;
   font-size: 1rem;
   line-height: 1.5;
   line-height: 1.5rem;
@@ -806,6 +805,24 @@
   padding-left: 4px;
   -ms-flex-negative: 0;
   flex-shrink: 0;
+}
+.globalFilterItem {
+  line-height: 28px!important;
+  border: none;
+  color: #343741;
+}
+.euiButtonEmpty.euiButtonEmpty--iconRight .euiButtonEmpty__content {
+  height: 100%;
+  width: 100%;
+  vertical-align: middle;
+  -webkit-box-orient: horizontal;
+  -webkit-box-direction: reverse;
+  -ms-flex-direction: row-reverse;
+  flex-direction: row-reverse;
+}
+.globalFilterItem:not(.globalFilterItem-isDisabled) {
+  background-color: #fbfcfd!important;
+  box-shadow: 0 1px 1px -1px rgba(152, 162, 179, 0.2), 0 3px 2px -2px rgba(152, 162, 179, 0.2), inset 0 0 0 1px rgba(0, 0, 0, 0.1)!important;
 }
 .euiFieldText {
   max-width: 400px;
@@ -2090,15 +2107,8 @@
   margin-left: 8px;
   /* 1 */
 }
-.euiButtonEmpty .euiButtonEmpty__text {
-  text-overflow: ellipsis;
-  overflow: hidden;
-}
-.euiButtonEmpty.euiButtonEmpty--small {
-  height: 32px;
-}
+
 .euiButtonEmpty.euiButtonEmpty--xSmall {
-  height: 24px;
   font-size: 14px;
 }
 .euiButtonEmpty.euiButtonEmpty--iconRight .euiButtonEmpty__content {
@@ -3079,6 +3089,595 @@
                 discover-app-w{
                     background-color: white!important;
                 }
+                .euiTable {
+                  font-size: 14px;
+                  font-size: 0.875rem;
+                  line-height: 1.5;
+                  -webkit-font-feature-settings: "calt" 1, "kern" 1, "liga" 1, "tnum" 1;
+                          font-feature-settings: "calt" 1, "kern" 1, "liga" 1, "tnum" 1;
+                  width: 100%;
+                  table-layout: fixed;
+                  border: none;
+                  border-collapse: collapse;
+                  background-color: #FFF; }
+                
+                @media only screen and (min-width: 768px) and (max-width: 991px) {
+                  .euiTable--compressed .euiTableCellContent {
+                    font-size: 12px;
+                    font-size: 0.75rem;
+                    line-height: 1.5;
+                    padding: 4px; } }
+                
+                @media only screen and (min-width: 992px) and (max-width: 1199px) {
+                  .euiTable--compressed .euiTableCellContent {
+                    font-size: 12px;
+                    font-size: 0.75rem;
+                    line-height: 1.5;
+                    padding: 4px; } }
+                
+                @media only screen and (min-width: 1200px) {
+                  .euiTable--compressed .euiTableCellContent {
+                    font-size: 12px;
+                    font-size: 0.75rem;
+                    line-height: 1.5;
+                    padding: 4px; } }
+                
+                .euiTableFooterCell,
+                .euiTableHeaderCell {
+                  vertical-align: middle;
+                  border-top: 1px solid #D3DAE6;
+                  border-bottom: 1px solid #D3DAE6;
+                  color: #1a1c21;
+                  font-size: 14px;
+                  font-size: 0.875rem;
+                  line-height: 1.5;
+                  line-height: 1.5rem;
+                  font-weight: 700;
+                  font-weight: 500;
+                  border-top: none; }
+                  .euiTableFooterCell .euiTableHeaderButton,
+                  .euiTableHeaderCell .euiTableHeaderButton {
+                    text-align: left;
+                    font-weight: 500; }
+                  .euiTableFooterCell .euiTableCellContent__text,
+                  .euiTableHeaderCell .euiTableCellContent__text {
+                    font-size: 12px;
+                    font-size: 0.75rem;
+                    line-height: 1.5;
+                    color: #1a1c21;
+                    font-weight: 700; }
+                
+                .euiTableHeaderButton {
+                  font-size: 14px;
+                  font-size: 0.875rem;
+                  line-height: 1.5;
+                  color: inherit;
+                  width: 100%; }
+                  .euiTableHeaderButton:hover .euiTableCellContent__text, .euiTableHeaderButton:focus .euiTableCellContent__text {
+                    text-decoration: underline;
+                    color: #006BB4; }
+                  .euiTableHeaderButton:hover .euiTableSortIcon, .euiTableHeaderButton:focus .euiTableSortIcon {
+                    fill: #006BB4; }
+                
+                .euiTableSortIcon {
+                  margin-left: 4px;
+                  -ms-flex-negative: 0;
+                      flex-shrink: 0; }
+                  .euiTableHeaderButton-isSorted .euiTableSortIcon {
+                    fill: #1a1c21; }
+                
+                .euiTableHeaderCellCheckbox {
+                  vertical-align: middle;
+                  border-top: 1px solid #D3DAE6;
+                  border-bottom: 1px solid #D3DAE6;
+                  width: 32px;
+                  vertical-align: middle;
+                  border-top: none; }
+                
+                .euiTableRow:hover {
+                  background-color: #fafbfd; }
+                
+                .euiTableRow.euiTableRow-isExpandedRow .euiTableRowCell {
+                  background-color: #fafbfd; }
+                
+                .euiTableRow.euiTableRow-isExpandedRow.euiTableRow-isSelectable .euiTableCellContent {
+                  padding-left: 40px; }
+                
+                .euiTableRow.euiTableRow-isSelected {
+                  background-color: #eef5fa; }
+                  .euiTableRow.euiTableRow-isSelected + .euiTableRow.euiTableRow-isExpandedRow .euiTableRowCell {
+                    background-color: #eef5fa; }
+                  .euiTableRow.euiTableRow-isSelected:hover,
+                  .euiTableRow.euiTableRow-isSelected:hover + .euiTableRow.euiTableRow-isExpandedRow .euiTableRowCell {
+                    background-color: #e6f0f8; }
+                
+                .euiTableRowCell {
+                  vertical-align: middle;
+                  border-top: 1px solid #D3DAE6;
+                  border-bottom: 1px solid #D3DAE6;
+                  color: #343741; }
+                  .euiTableRowCell.euiTableRowCell--isMobileHeader {
+                    display: none; }
+                
+                .euiTableRowCellCheckbox {
+                  vertical-align: middle;
+                  border-top: 1px solid #D3DAE6;
+                  border-bottom: 1px solid #D3DAE6;
+                  width: 32px;
+                  vertical-align: middle; }
+                
+                .euiTableFooterCell {
+                  background-color: #F5F7FA;
+                  border-bottom: none; }
+                
+                /**
+                 * 1. Vertically align all children.
+                 * 2. The padding on this div allows the ellipsis to show if the content is truncated. If
+                 *    the padding was on the cell, the ellipsis would be cropped.
+                 * 3. Support wrapping.
+                 * 4. Prevent very long single words (e.g. the name of a field in a document) from overflowing
+                 *    the cell.
+                 */
+                .euiTableCellContent {
+                  overflow: hidden;
+                  /* 4 */
+                  display: -webkit-box;
+                  display: -ms-flexbox;
+                  display: flex;
+                  -webkit-box-align: center;
+                      -ms-flex-align: center;
+                          align-items: center;
+                  /* 1 */
+                  padding: 8px;
+                  /* 2 */ }
+                
+                .euiTableCellContent__text {
+                  overflow-wrap: break-word;
+                  /* 4 */
+                  min-width: 0;
+                  text-overflow: ellipsis; }
+                  @media screen and (-ms-high-contrast: active), screen and (-ms-high-contrast: none) {
+                    .euiTableCellContent__text {
+                      word-break: break-all; } }
+                
+                .euiTableCellContent--alignRight {
+                  -webkit-box-pack: end;
+                      -ms-flex-pack: end;
+                          justify-content: flex-end;
+                  text-align: right; }
+                
+                .euiTableCellContent--alignCenter {
+                  -webkit-box-pack: center;
+                      -ms-flex-pack: center;
+                          justify-content: center;
+                  text-align: center; }
+                
+                .euiTableHeaderCell,
+                .euiTableFooterCell,
+                .euiTableCellContent--truncateText {
+                  white-space: nowrap;
+                  /* 3 */ }
+                  .euiTableHeaderCell .euiTableCellContent__text,
+                  .euiTableFooterCell .euiTableCellContent__text,
+                  .euiTableCellContent--truncateText .euiTableCellContent__text {
+                    overflow: hidden; }
+                
+                .euiTableCellContent--overflowingContent {
+                  overflow: visible;
+                  white-space: normal;
+                  word-break: break-all;
+                  word-break: break-word; }
+                
+                .euiTableCellContent--showOnHover > *:not(:first-child) {
+                  margin-left: 8px; }
+                
+                .euiTableRow-hasActions .euiTableCellContent--showOnHover .euiTableCellContent__hoverItem {
+                  -ms-flex-negative: 0;
+                      flex-shrink: 0;
+                  opacity: .7;
+                  -webkit-filter: grayscale(100%);
+                          filter: grayscale(100%);
+                  -webkit-transition: opacity 250ms cubic-bezier(0.694, 0.0482, 0.335, 1), -webkit-filter 250ms cubic-bezier(0.694, 0.0482, 0.335, 1);
+                  transition: opacity 250ms cubic-bezier(0.694, 0.0482, 0.335, 1), -webkit-filter 250ms cubic-bezier(0.694, 0.0482, 0.335, 1);
+                  transition: opacity 250ms cubic-bezier(0.694, 0.0482, 0.335, 1), filter 250ms cubic-bezier(0.694, 0.0482, 0.335, 1);
+                  transition: opacity 250ms cubic-bezier(0.694, 0.0482, 0.335, 1), filter 250ms cubic-bezier(0.694, 0.0482, 0.335, 1), -webkit-filter 250ms cubic-bezier(0.694, 0.0482, 0.335, 1); }
+                
+                .euiTableRow-hasActions .euiTableCellContent--showOnHover .expandedItemActions__completelyHide,
+                .euiTableRow-hasActions .euiTableCellContent--showOnHover .expandedItemActions__completelyHide:disabled,
+                .euiTableRow-hasActions .euiTableCellContent--showOnHover .expandedItemActions__completelyHide:disabled:hover,
+                .euiTableRow-hasActions .euiTableCellContent--showOnHover .expandedItemActions__completelyHide:disabled:focus,
+                .euiTableRow:hover .euiTableRow-hasActions .euiTableCellContent--showOnHover .expandedItemActions__completelyHide:disabled {
+                  -webkit-filter: grayscale(0%);
+                          filter: grayscale(0%);
+                  opacity: 0; }
+                
+                .euiTableRow-hasActions:hover .euiTableCellContent--showOnHover .euiTableCellContent__hoverItem:not(:disabled), .euiTableRow-hasActions:hover .euiTableCellContent--showOnHover .euiTableCellContent__hoverItem:not(:disabled):hover, .euiTableRow-hasActions:hover .euiTableCellContent--showOnHover .euiTableCellContent__hoverItem:not(:disabled):focus {
+                  opacity: 1;
+                  -webkit-filter: grayscale(0%);
+                          filter: grayscale(0%); }
+                
+                .euiTableRow-isExpandedRow .euiTableCellContent {
+                  overflow: hidden;
+                  -webkit-animation: 250ms cubic-bezier(0.694, 0.0482, 0.335, 1) 1 normal forwards growExpandedRow;
+                          animation: 250ms cubic-bezier(0.694, 0.0482, 0.335, 1) 1 normal forwards growExpandedRow; }
+                
+                @-webkit-keyframes growExpandedRow {
+                  0% {
+                    max-height: 0; }
+                  100% {
+                    max-height: 1000px; } }
+                
+                @keyframes growExpandedRow {
+                  0% {
+                    max-height: 0; }
+                  100% {
+                    max-height: 1000px; } }
+                
+                .euiTableRow-isClickable:hover {
+                  background-color: rgba(0, 107, 180, 0.05);
+                  cursor: pointer; }
+                
+                .euiTableRow-isClickable:focus {
+                  background-color: rgba(0, 107, 180, 0.1); }
+                
+                /**
+                 *  Mixin for use in:
+                 *  - EuiCard
+                 *  - EuiPageContent
+                */
+                @media only screen and (max-width: 574px) {
+                  .euiTable.euiTable--responsive thead {
+                    display: none; }
+                  .euiTable.euiTable--responsive tfoot {
+                    display: none; }
+                  .euiTable.euiTable--responsive .euiTableRow {
+                    -webkit-box-shadow: 0 2px 2px -1px rgba(152, 162, 179, 0.3), 0 1px 5px -2px rgba(152, 162, 179, 0.3);
+                            box-shadow: 0 2px 2px -1px rgba(152, 162, 179, 0.3), 0 1px 5px -2px rgba(152, 162, 179, 0.3);
+                    background-color: #FFF;
+                    border: 1px solid #D3DAE6;
+                    border-radius: 4px;
+                    -webkit-box-flex: 1;
+                        -ms-flex-positive: 1;
+                            flex-grow: 1; }
+                    .euiTable.euiTable--responsive .euiTableRow.euiTableRow--flexGrowZero {
+                      -webkit-box-flex: 0;
+                          -ms-flex-positive: 0;
+                              flex-grow: 0; }
+                    .euiTable.euiTable--responsive .euiTableRow.euiTableRow--isClickable {
+                      display: block;
+                      width: 100%;
+                      text-align: left;
+                      -webkit-transition: all 150ms cubic-bezier(0.694, 0.0482, 0.335, 1);
+                      transition: all 150ms cubic-bezier(0.694, 0.0482, 0.335, 1); }
+                      .euiTable.euiTable--responsive .euiTableRow.euiTableRow--isClickable:hover, .euiTable.euiTable--responsive .euiTableRow.euiTableRow--isClickable:focus {
+                        -webkit-box-shadow: 0 4px 8px 0 rgba(152, 162, 179, 0.15), 0 2px 2px -1px rgba(152, 162, 179, 0.3);
+                                box-shadow: 0 4px 8px 0 rgba(152, 162, 179, 0.15), 0 2px 2px -1px rgba(152, 162, 179, 0.3);
+                        -webkit-transform: translateY(-2px);
+                                transform: translateY(-2px);
+                        cursor: pointer; }
+                    .euiTable.euiTable--responsive .euiTableRow.euiTableRow--shadow {
+                      -webkit-box-shadow: 0 6px 12px -1px rgba(152, 162, 179, 0.2), 0 4px 4px -1px rgba(152, 162, 179, 0.2), 0 2px 2px 0 rgba(152, 162, 179, 0.2);
+                              box-shadow: 0 6px 12px -1px rgba(152, 162, 179, 0.2), 0 4px 4px -1px rgba(152, 162, 179, 0.2), 0 2px 2px 0 rgba(152, 162, 179, 0.2);
+                      border-bottom-color: rgba(152, 162, 179, 0.5); }
+                      .euiTable.euiTable--responsive .euiTableRow.euiTableRow--shadow.euiTableRow--isClickable:hover, .euiTable.euiTable--responsive .euiTableRow.euiTableRow--shadow.euiTableRow--isClickable:focus {
+                        -webkit-box-shadow: 0 12px 24px 0 rgba(152, 162, 179, 0.2), 0 6px 12px 0 rgba(152, 162, 179, 0.2), 0 4px 4px 0 rgba(152, 162, 179, 0.2), 0 2px 2px 0 rgba(152, 162, 179, 0.2);
+                                box-shadow: 0 12px 24px 0 rgba(152, 162, 179, 0.2), 0 6px 12px 0 rgba(152, 162, 179, 0.2), 0 4px 4px 0 rgba(152, 162, 179, 0.2), 0 2px 2px 0 rgba(152, 162, 179, 0.2); }
+                  .euiTable.euiTable--responsive .euiTableRow {
+                    display: -webkit-box;
+                    display: -ms-flexbox;
+                    display: flex;
+                    -ms-flex-wrap: wrap;
+                        flex-wrap: wrap;
+                    padding: 8px;
+                    margin-bottom: 8px; }
+                    .euiTable.euiTable--responsive .euiTableRow:hover {
+                      background-color: transparent; }
+                    .euiTable.euiTable--responsive .euiTableRow.euiTableRow-isExpandable, .euiTable.euiTable--responsive .euiTableRow.euiTableRow-hasActions {
+                      background-image: linear-gradient(to right, rgba(152, 162, 179, 0.1) 0, rgba(152, 162, 179, 0.1) 1px, transparent 1px, transparent 100%);
+                      background-size: 40px 100%;
+                      background-position-x: right;
+                      background-repeat: no-repeat;
+                      padding-right: 40px;
+                      position: relative; }
+                    .euiTable.euiTable--responsive .euiTableRow.euiTableRow-isExpandable .euiTableRowCell--isExpander,
+                    .euiTable.euiTable--responsive .euiTableRow.euiTableRow-hasActions .euiTableRowCell--hasActions {
+                      min-width: 0;
+                      width: 24px;
+                      position: absolute;
+                      top: 16px;
+                      right: 8px; }
+                      .euiTable.euiTable--responsive .euiTableRow.euiTableRow-isExpandable .euiTableRowCell--isExpander::before,
+                      .euiTable.euiTable--responsive .euiTableRow.euiTableRow-hasActions .euiTableRowCell--hasActions::before {
+                        display: none; }
+                      .euiTable.euiTable--responsive .euiTableRow.euiTableRow-isExpandable .euiTableRowCell--isExpander .euiTableCellContent,
+                      .euiTable.euiTable--responsive .euiTableRow.euiTableRow-hasActions .euiTableRowCell--hasActions .euiTableCellContent {
+                        -webkit-box-orient: vertical;
+                        -webkit-box-direction: normal;
+                            -ms-flex-direction: column;
+                                flex-direction: column;
+                        padding: 0; }
+                        .euiTable.euiTable--responsive .euiTableRow.euiTableRow-isExpandable .euiTableRowCell--isExpander .euiTableCellContent .euiLink,
+                        .euiTable.euiTable--responsive .euiTableRow.euiTableRow-hasActions .euiTableRowCell--hasActions .euiTableCellContent .euiLink {
+                          padding: 4px; }
+                    .euiTable.euiTable--responsive .euiTableRow.euiTableRow-hasActions.euiTableRow-isExpandable .euiTableRowCell--isExpander {
+                      top: auto;
+                      bottom: 16px; }
+                    .euiTable.euiTable--responsive .euiTableRow.euiTableRow-isSelectable {
+                      padding-left: 36px;
+                      position: relative; }
+                      .euiTable.euiTable--responsive .euiTableRow.euiTableRow-isSelectable .euiTableRowCellCheckbox {
+                        position: absolute;
+                        left: 4px;
+                        top: 12px; }
+                    .euiTable.euiTable--responsive .euiTableRow.euiTableRow-isSelected, .euiTable.euiTable--responsive .euiTableRow.euiTableRow-isSelected:hover,
+                    .euiTable.euiTable--responsive .euiTableRow.euiTableRow-isSelected + .euiTableRow.euiTableRow-isExpandedRow,
+                    .euiTable.euiTable--responsive .euiTableRow.euiTableRow-isSelected:hover + .euiTableRow.euiTableRow-isExpandedRow .euiTableRowCell {
+                      background-color: #eef5fa; }
+                    .euiTable.euiTable--responsive .euiTableRow.euiTableRow-isExpandedRow {
+                      background-image: linear-gradient(to right, rgba(152, 162, 179, 0.1) 0, rgba(152, 162, 179, 0.1) 1px, transparent 1px, transparent 100%);
+                      background-size: 40px 100%;
+                      background-position-x: right;
+                      background-repeat: no-repeat;
+                      -webkit-box-shadow: 0 2px 2px -1px rgba(152, 162, 179, 0.3), 0 1px 5px -2px rgba(152, 162, 179, 0.3);
+                              box-shadow: 0 2px 2px -1px rgba(152, 162, 179, 0.3), 0 1px 5px -2px rgba(152, 162, 179, 0.3);
+                      margin-top: -16px;
+                      position: relative;
+                      z-index: 2;
+                      border-top: none;
+                      border-top-left-radius: 0;
+                      border-top-right-radius: 0;
+                      padding-left: 8px; }
+                      .euiTable.euiTable--responsive .euiTableRow.euiTableRow-isExpandedRow:hover {
+                        background-color: #FFF; }
+                      .euiTable.euiTable--responsive .euiTableRow.euiTableRow-isExpandedRow .euiTableRowCell {
+                        width: calc(100% - 40px); }
+                        .euiTable.euiTable--responsive .euiTableRow.euiTableRow-isExpandedRow .euiTableRowCell::before {
+                          display: none; }
+                  .euiTable.euiTable--responsive .euiTableRowCell {
+                    display: block;
+                    /* IE requires block to grow and wrap. */
+                    min-width: 50%;
+                    border: none; }
+                    .euiTable.euiTable--responsive .euiTableRowCell[data-header]::before {
+                      font-size: 11px;
+                      font-size: 0.6875rem;
+                      content: attr(data-header);
+                      display: block;
+                      color: #69707D;
+                      padding: 8px;
+                      padding-bottom: 0;
+                      margin-bottom: -8px;
+                      min-height: 24px;
+                      white-space: nowrap;
+                      overflow: hidden;
+                      text-overflow: ellipsis; }
+                    .euiTable.euiTable--responsive .euiTableRowCell:only-child::before {
+                      min-height: 0; }
+                    .euiTable.euiTable--responsive .euiTableRowCell.euiTableRowCell--isMobileHeader {
+                      font-size: 1rem;
+                      line-height: 1.5;
+                      display: block;
+                      width: 100%; }
+                      .euiTable.euiTable--responsive .euiTableRowCell.euiTableRowCell--isMobileHeader::before {
+                        display: none; }
+                    .euiTable.euiTable--responsive .euiTableRowCell.euiTableRowCell--isMobileFullWidth {
+                      width: 100%; }
+                      .euiTable.euiTable--responsive .euiTableRowCell.euiTableRowCell--isMobileFullWidth .euiTableCellContent--alignCenter {
+                        -webkit-box-pack: center;
+                            -ms-flex-pack: center;
+                                justify-content: center;
+                        text-align: center; }
+                    .euiTable.euiTable--responsive .euiTableRowCell.euiTableRowCell--hideForMobile {
+                      display: none; }
+                  .euiTable.euiTable--responsive .euiTableRowCellCheckbox {
+                    border: none; }
+                  .euiTable.euiTable--responsive .euiTableRow-hasActions .euiTableCellContent--showOnHover .expandedItemActions__completelyHide {
+                    display: none; }
+                  .euiTable.euiTable--responsive .euiTableRow-hasActions .euiTableCellContent--showOnHover .euiTableCellContent__hoverItem {
+                    opacity: 1;
+                    -webkit-filter: none;
+                            filter: none;
+                    margin-left: 0;
+                    margin-bottom: 8px; }
+                  .euiTable.euiTable--responsive .euiTableCellContent--alignRight {
+                    -webkit-box-pack: start;
+                        -ms-flex-pack: start;
+                            justify-content: flex-start; }
+                  .euiTable.euiTable--responsive .euiTableCellContent--alignCenter {
+                    -webkit-box-pack: start;
+                        -ms-flex-pack: start;
+                            justify-content: flex-start; } }
+                
+                @media only screen and (min-width: 575px) and (max-width: 767px) {
+                  .euiTable.euiTable--responsive thead {
+                    display: none; }
+                  .euiTable.euiTable--responsive tfoot {
+                    display: none; }
+                  .euiTable.euiTable--responsive .euiTableRow {
+                    -webkit-box-shadow: 0 2px 2px -1px rgba(152, 162, 179, 0.3), 0 1px 5px -2px rgba(152, 162, 179, 0.3);
+                            box-shadow: 0 2px 2px -1px rgba(152, 162, 179, 0.3), 0 1px 5px -2px rgba(152, 162, 179, 0.3);
+                    background-color: #FFF;
+                    border: 1px solid #D3DAE6;
+                    border-radius: 4px;
+                    -webkit-box-flex: 1;
+                        -ms-flex-positive: 1;
+                            flex-grow: 1; }
+                    .euiTable.euiTable--responsive .euiTableRow.euiTableRow--flexGrowZero {
+                      -webkit-box-flex: 0;
+                          -ms-flex-positive: 0;
+                              flex-grow: 0; }
+                    .euiTable.euiTable--responsive .euiTableRow.euiTableRow--isClickable {
+                      display: block;
+                      width: 100%;
+                      text-align: left;
+                      -webkit-transition: all 150ms cubic-bezier(0.694, 0.0482, 0.335, 1);
+                      transition: all 150ms cubic-bezier(0.694, 0.0482, 0.335, 1); }
+                      .euiTable.euiTable--responsive .euiTableRow.euiTableRow--isClickable:hover, .euiTable.euiTable--responsive .euiTableRow.euiTableRow--isClickable:focus {
+                        -webkit-box-shadow: 0 4px 8px 0 rgba(152, 162, 179, 0.15), 0 2px 2px -1px rgba(152, 162, 179, 0.3);
+                                box-shadow: 0 4px 8px 0 rgba(152, 162, 179, 0.15), 0 2px 2px -1px rgba(152, 162, 179, 0.3);
+                        -webkit-transform: translateY(-2px);
+                                transform: translateY(-2px);
+                        cursor: pointer; }
+                    .euiTable.euiTable--responsive .euiTableRow.euiTableRow--shadow {
+                      -webkit-box-shadow: 0 6px 12px -1px rgba(152, 162, 179, 0.2), 0 4px 4px -1px rgba(152, 162, 179, 0.2), 0 2px 2px 0 rgba(152, 162, 179, 0.2);
+                              box-shadow: 0 6px 12px -1px rgba(152, 162, 179, 0.2), 0 4px 4px -1px rgba(152, 162, 179, 0.2), 0 2px 2px 0 rgba(152, 162, 179, 0.2);
+                      border-bottom-color: rgba(152, 162, 179, 0.5); }
+                      .euiTable.euiTable--responsive .euiTableRow.euiTableRow--shadow.euiTableRow--isClickable:hover, .euiTable.euiTable--responsive .euiTableRow.euiTableRow--shadow.euiTableRow--isClickable:focus {
+                        -webkit-box-shadow: 0 12px 24px 0 rgba(152, 162, 179, 0.2), 0 6px 12px 0 rgba(152, 162, 179, 0.2), 0 4px 4px 0 rgba(152, 162, 179, 0.2), 0 2px 2px 0 rgba(152, 162, 179, 0.2);
+                                box-shadow: 0 12px 24px 0 rgba(152, 162, 179, 0.2), 0 6px 12px 0 rgba(152, 162, 179, 0.2), 0 4px 4px 0 rgba(152, 162, 179, 0.2), 0 2px 2px 0 rgba(152, 162, 179, 0.2); }
+                  .euiTable.euiTable--responsive .euiTableRow {
+                    display: -webkit-box;
+                    display: -ms-flexbox;
+                    display: flex;
+                    -ms-flex-wrap: wrap;
+                        flex-wrap: wrap;
+                    padding: 8px;
+                    margin-bottom: 8px; }
+                    .euiTable.euiTable--responsive .euiTableRow:hover {
+                      background-color: transparent; }
+                    .euiTable.euiTable--responsive .euiTableRow.euiTableRow-isExpandable, .euiTable.euiTable--responsive .euiTableRow.euiTableRow-hasActions {
+                      background-image: linear-gradient(to right, rgba(152, 162, 179, 0.1) 0, rgba(152, 162, 179, 0.1) 1px, transparent 1px, transparent 100%);
+                      background-size: 40px 100%;
+                      background-position-x: right;
+                      background-repeat: no-repeat;
+                      padding-right: 40px;
+                      position: relative; }
+                    .euiTable.euiTable--responsive .euiTableRow.euiTableRow-isExpandable .euiTableRowCell--isExpander,
+                    .euiTable.euiTable--responsive .euiTableRow.euiTableRow-hasActions .euiTableRowCell--hasActions {
+                      min-width: 0;
+                      width: 24px;
+                      position: absolute;
+                      top: 16px;
+                      right: 8px; }
+                      .euiTable.euiTable--responsive .euiTableRow.euiTableRow-isExpandable .euiTableRowCell--isExpander::before,
+                      .euiTable.euiTable--responsive .euiTableRow.euiTableRow-hasActions .euiTableRowCell--hasActions::before {
+                        display: none; }
+                      .euiTable.euiTable--responsive .euiTableRow.euiTableRow-isExpandable .euiTableRowCell--isExpander .euiTableCellContent,
+                      .euiTable.euiTable--responsive .euiTableRow.euiTableRow-hasActions .euiTableRowCell--hasActions .euiTableCellContent {
+                        -webkit-box-orient: vertical;
+                        -webkit-box-direction: normal;
+                            -ms-flex-direction: column;
+                                flex-direction: column;
+                        padding: 0; }
+                        .euiTable.euiTable--responsive .euiTableRow.euiTableRow-isExpandable .euiTableRowCell--isExpander .euiTableCellContent .euiLink,
+                        .euiTable.euiTable--responsive .euiTableRow.euiTableRow-hasActions .euiTableRowCell--hasActions .euiTableCellContent .euiLink {
+                          padding: 4px; }
+                    .euiTable.euiTable--responsive .euiTableRow.euiTableRow-hasActions.euiTableRow-isExpandable .euiTableRowCell--isExpander {
+                      top: auto;
+                      bottom: 16px; }
+                    .euiTable.euiTable--responsive .euiTableRow.euiTableRow-isSelectable {
+                      padding-left: 36px;
+                      position: relative; }
+                      .euiTable.euiTable--responsive .euiTableRow.euiTableRow-isSelectable .euiTableRowCellCheckbox {
+                        position: absolute;
+                        left: 4px;
+                        top: 12px; }
+                    .euiTable.euiTable--responsive .euiTableRow.euiTableRow-isSelected, .euiTable.euiTable--responsive .euiTableRow.euiTableRow-isSelected:hover,
+                    .euiTable.euiTable--responsive .euiTableRow.euiTableRow-isSelected + .euiTableRow.euiTableRow-isExpandedRow,
+                    .euiTable.euiTable--responsive .euiTableRow.euiTableRow-isSelected:hover + .euiTableRow.euiTableRow-isExpandedRow .euiTableRowCell {
+                      background-color: #eef5fa; }
+                    .euiTable.euiTable--responsive .euiTableRow.euiTableRow-isExpandedRow {
+                      background-image: linear-gradient(to right, rgba(152, 162, 179, 0.1) 0, rgba(152, 162, 179, 0.1) 1px, transparent 1px, transparent 100%);
+                      background-size: 40px 100%;
+                      background-position-x: right;
+                      background-repeat: no-repeat;
+                      -webkit-box-shadow: 0 2px 2px -1px rgba(152, 162, 179, 0.3), 0 1px 5px -2px rgba(152, 162, 179, 0.3);
+                              box-shadow: 0 2px 2px -1px rgba(152, 162, 179, 0.3), 0 1px 5px -2px rgba(152, 162, 179, 0.3);
+                      margin-top: -16px;
+                      position: relative;
+                      z-index: 2;
+                      border-top: none;
+                      border-top-left-radius: 0;
+                      border-top-right-radius: 0;
+                      padding-left: 8px; }
+                      .euiTable.euiTable--responsive .euiTableRow.euiTableRow-isExpandedRow:hover {
+                        background-color: #FFF; }
+                      .euiTable.euiTable--responsive .euiTableRow.euiTableRow-isExpandedRow .euiTableRowCell {
+                        width: calc(100% - 40px); }
+                        .euiTable.euiTable--responsive .euiTableRow.euiTableRow-isExpandedRow .euiTableRowCell::before {
+                          display: none; }
+                  .euiTable.euiTable--responsive .euiTableRowCell {
+                    display: block;
+                    /* IE requires block to grow and wrap. */
+                    min-width: 50%;
+                    border: none; }
+                    .euiTable.euiTable--responsive .euiTableRowCell[data-header]::before {
+                      font-size: 11px;
+                      font-size: 0.6875rem;
+                      content: attr(data-header);
+                      display: block;
+                      color: #69707D;
+                      padding: 8px;
+                      padding-bottom: 0;
+                      margin-bottom: -8px;
+                      min-height: 24px;
+                      white-space: nowrap;
+                      overflow: hidden;
+                      text-overflow: ellipsis; }
+                    .euiTable.euiTable--responsive .euiTableRowCell:only-child::before {
+                      min-height: 0; }
+                    .euiTable.euiTable--responsive .euiTableRowCell.euiTableRowCell--isMobileHeader {
+                      font-size: 1rem;
+                      line-height: 1.5;
+                      display: block;
+                      width: 100%; }
+                      .euiTable.euiTable--responsive .euiTableRowCell.euiTableRowCell--isMobileHeader::before {
+                        display: none; }
+                    .euiTable.euiTable--responsive .euiTableRowCell.euiTableRowCell--isMobileFullWidth {
+                      width: 100%; }
+                      .euiTable.euiTable--responsive .euiTableRowCell.euiTableRowCell--isMobileFullWidth .euiTableCellContent--alignCenter {
+                        -webkit-box-pack: center;
+                            -ms-flex-pack: center;
+                                justify-content: center;
+                        text-align: center; }
+                    .euiTable.euiTable--responsive .euiTableRowCell.euiTableRowCell--hideForMobile {
+                      display: none; }
+                  .euiTable.euiTable--responsive .euiTableRowCellCheckbox {
+                    border: none; }
+                  .euiTable.euiTable--responsive .euiTableRow-hasActions .euiTableCellContent--showOnHover .expandedItemActions__completelyHide {
+                    display: none; }
+                  .euiTable.euiTable--responsive .euiTableRow-hasActions .euiTableCellContent--showOnHover .euiTableCellContent__hoverItem {
+                    opacity: 1;
+                    -webkit-filter: none;
+                            filter: none;
+                    margin-left: 0;
+                    margin-bottom: 8px; }
+                  .euiTable.euiTable--responsive .euiTableCellContent--alignRight {
+                    -webkit-box-pack: start;
+                        -ms-flex-pack: start;
+                            justify-content: flex-start; }
+                  .euiTable.euiTable--responsive .euiTableCellContent--alignCenter {
+                    -webkit-box-pack: start;
+                        -ms-flex-pack: start;
+                            justify-content: flex-start; } }
+                
+                .euiTableHeaderMobile,
+                .euiTableHeaderCell--isMobileHeader {
+                  display: none; }
+                
+                @media only screen and (max-width: 574px) {
+                  .euiTableHeaderMobile {
+                    display: -webkit-box;
+                    display: -ms-flexbox;
+                    display: flex;
+                    -webkit-box-pack: end;
+                        -ms-flex-pack: end;
+                            justify-content: flex-end;
+                    padding: 8px 0; }
+                  .euiTableSortMobile {
+                    display: block; } }
+                
+                @media only screen and (min-width: 575px) and (max-width: 767px) {
+                  .euiTableHeaderMobile {
+                    display: -webkit-box;
+                    display: -ms-flexbox;
+                    display: flex;
+                    -webkit-box-pack: end;
+                        -ms-flex-pack: end;
+                            justify-content: flex-end;
+                    padding: 8px 0; }
+                  .euiTableSortMobile {
+                    display: block; } }
                 .euiTableFooterCell,
 .euiTableHeaderCell {
   vertical-align: middle;
@@ -3259,7 +3858,6 @@
           animation: 250ms cubic-bezier(0.694, 0.0482, 0.335, 1) 1 normal forwards growExpandedRow; }
           .euiDescriptionList.euiDescriptionList--row .euiDescriptionList__title {
             color: #1a1c21;
-            font-size: 16px;
             font-size: 1rem;
             line-height: 1.5;
             line-height: 1.5rem;
@@ -3290,7 +3888,6 @@
           
           .euiDescriptionList.euiDescriptionList--row.euiDescriptionList--reverse .euiDescriptionList__description {
             color: #1a1c21;
-            font-size: 16px;
             font-size: 1rem;
             line-height: 1.5;
             line-height: 1.5rem;
@@ -3343,7 +3940,6 @@
               margin-top: 0; }
             .euiDescriptionList.euiDescriptionList--column .euiDescriptionList__title {
               color: #1a1c21;
-              font-size: 16px;
               font-size: 1rem;
               line-height: 1.5;
               line-height: 1.5rem;
@@ -3353,7 +3949,6 @@
               width: 50%;
               padding-right: 8px; }
             .euiDescriptionList.euiDescriptionList--column .euiDescriptionList__description {
-              font-size: 16px;
               font-size: 1rem;
               line-height: 1.5;
               width: 50%;
@@ -3363,12 +3958,10 @@
             .euiDescriptionList.euiDescriptionList--column.euiDescriptionList--reverse .euiDescriptionList__title {
               color: #343741;
               font-weight: 400;
-              font-size: 16px;
               font-size: 1rem;
               line-height: 1.5; }
             .euiDescriptionList.euiDescriptionList--column.euiDescriptionList--reverse .euiDescriptionList__description {
               color: #1a1c21;
-              font-size: 16px;
               font-size: 1rem;
               line-height: 1.5;
               line-height: 1.5rem;
@@ -3637,3 +4230,632 @@
                         .euiPopover__panel.euiPanel--paddingLarge .euiPopoverTitle {
                           padding: 12px 24px;
                           margin: -24px -24px 24px; }
+                          .euiTitle + .euiTitle {
+                            margin-top: 24px; }
+                          
+                          .euiTitle--uppercase {
+                            text-transform: uppercase; }
+                          
+                          .euiTitle--xxxsmall {
+                            color: #1a1c21!important;
+                          }
+                          
+                          .euiTitle--xxsmall {
+                            color: #1a1c21!important;
+                          }
+                          
+                          .euiTitle--xsmall {
+                            color: #1a1c21!important;
+                          }
+                          
+                          .euiTitle--small:not(.wz-text-link) {
+                            color: #1a1c21!important;
+                          }
+                          
+                          .euiTitle--medium {
+                            color: #1a1c21!important;
+                          }
+                          
+                          .euiTitle--large {
+                            color: #1a1c21!important;
+                          }
+                          .euiToast {
+                            border: 1px solid #D3DAE6;
+                            -webkit-box-shadow: 0 40px 64px 0 rgba(65, 78, 101, 0.1), 0 24px 32px 0 rgba(65, 78, 101, 0.1), 0 16px 16px 0 rgba(65, 78, 101, 0.1), 0 8px 8px 0 rgba(65, 78, 101, 0.1), 0 4px 4px 0 rgba(65, 78, 101, 0.1), 0 2px 2px 0 rgba(65, 78, 101, 0.1);
+                                    box-shadow: 0 40px 64px 0 rgba(65, 78, 101, 0.1), 0 24px 32px 0 rgba(65, 78, 101, 0.1), 0 16px 16px 0 rgba(65, 78, 101, 0.1), 0 8px 8px 0 rgba(65, 78, 101, 0.1), 0 4px 4px 0 rgba(65, 78, 101, 0.1), 0 2px 2px 0 rgba(65, 78, 101, 0.1);
+                            border-color: #c6cad1;
+                            border-top-color: #e3e4e8;
+                            border-bottom-color: #aaafba;
+                            position: relative;
+                            padding: 16px;
+                            background-color: #FFF;
+                            width: 100%; }
+                            .euiToast:hover .euiToast__closeButton,
+                            .euiToast:focus .euiToast__closeButton {
+                              opacity: 1; }
+                          
+                          /**
+                            * 1. Fit button to icon.
+                            */
+                          .euiToast__closeButton {
+                            position: absolute;
+                            top: 16px;
+                            right: 16px;
+                            line-height: 0;
+                            /* 1 */
+                            -webkit-appearance: none;
+                               -moz-appearance: none;
+                                    appearance: none;
+                            opacity: 0;
+                            -webkit-transition: opacity 150ms cubic-bezier(0.694, 0.0482, 0.335, 1);
+                            transition: opacity 150ms cubic-bezier(0.694, 0.0482, 0.335, 1); }
+                            .euiToast__closeButton svg {
+                              fill: #8d8e90; }
+                            .euiToast__closeButton:hover svg {
+                              fill: #1a1c21; }
+                            .euiToast__closeButton:focus {
+                              background-color: #e6f0f8;
+                              opacity: 1; }
+                              .euiToast__closeButton:focus svg {
+                                fill: #006BB4; }
+                          
+                          .euiToast--primary {
+                            border-top: 2px solid #006BB4; }
+                          
+                          .euiToast--success {
+                            border-top: 2px solid #017D73; }
+                          
+                          .euiToast--warning {
+                            border-top: 2px solid #F5A700; }
+                          
+                          .euiToast--danger {
+                            border-top: 2px solid #BD271E; }
+                          
+                          /**
+                           * 1. Align icon with first line of title text if it wraps.
+                           * 2. Apply margin to all but last item in the flex.
+                           * 3. Account for close button.
+                           */
+                          .euiToastHeader {
+                            padding-right: 24px;
+                            /* 3 */
+                            display: -webkit-box;
+                            display: -ms-flexbox;
+                            display: flex;
+                            -webkit-box-align: baseline;
+                                -ms-flex-align: baseline;
+                                    align-items: baseline;
+                            /* 1 */ }
+                            .euiToastHeader > * + * {
+                              margin-left: 8px;
+                              /* 2 */ }
+                          
+                          /**
+                            * 1. Vertically center icon with first line of title.
+                            */
+                          .euiToastHeader__icon {
+                            -webkit-box-flex: 0;
+                                -ms-flex: 0 0 auto;
+                                    flex: 0 0 auto;
+                            fill: #1a1c21;
+                            -webkit-transform: translateY(2px);
+                                    transform: translateY(2px);
+                            /* 1 */ }
+                          
+                          .euiToastHeader__title {
+                            color: #1a1c21;
+                            font-size: 1rem;
+                            line-height: 1.5;
+                            line-height: 1.5rem;
+                            font-weight: 600;
+                            letter-spacing: -.02em;
+                            font-weight: 300; }
+                            .euiTabs {
+                              scrollbar-width: thin;
+                              display: -webkit-box;
+                              display: -ms-flexbox;
+                              display: flex;
+                              position: relative;
+                              max-width: 100%;
+                              overflow-x: auto;
+                              overflow-y: hidden; }
+                              .euiTabs::-webkit-scrollbar {
+                                width: 16px;
+                                height: 16px; }
+                              .euiTabs::-webkit-scrollbar-thumb {
+                                background-color: rgba(105, 112, 125, 0.5);
+                                border: 6px solid transparent;
+                                background-clip: content-box; }
+                              .euiTabs::-webkit-scrollbar-corner, .euiTabs::-webkit-scrollbar-track {
+                                background-color: transparent; }
+                              .euiTabs:before {
+                                position: absolute;
+                                bottom: 0;
+                                left: 0;
+                                right: 0;
+                                height: 1px;
+                                background-color: #D3DAE6;
+                                content: ''; }
+                              .euiTabs::-webkit-scrollbar {
+                                height: 3px; }
+                              .euiTabs.euiTabs--small .euiTab {
+                                font-size: 14px;
+                                font-size: 0.875rem;
+                                padding: 8px; }
+                              .euiTabs.euiTabs--expand .euiTab {
+                                -webkit-box-flex: 1;
+                                    -ms-flex-positive: 1;
+                                        flex-grow: 1;
+                                -ms-flex-preferred-size: 0%;
+                                    flex-basis: 0%; }
+                            
+                            .euiTab {
+                              font-size: 1rem;
+                              line-height: 1.5;
+                              position: relative;
+                              cursor: pointer;
+                              padding: 12px 16px;
+                              background-color: transparent;
+                              -webkit-transition: color 250ms cubic-bezier(0.694, 0.0482, 0.335, 1), background-color 250ms cubic-bezier(0.694, 0.0482, 0.335, 1);
+                              transition: color 250ms cubic-bezier(0.694, 0.0482, 0.335, 1), background-color 250ms cubic-bezier(0.694, 0.0482, 0.335, 1); }
+                              .euiTab:hover:not(.euiTab-isSelected) {
+                                color: #343741;
+                                text-decoration: underline; }
+                              .euiTab:focus {
+                                background-color: #e6f0f8;
+                                text-decoration: underline; }
+                                .euiTab:focus:before {
+                                  position: absolute;
+                                  bottom: 0;
+                                  left: 0;
+                                  right: 0;
+                                  height: 1px;
+                                  background-color: #D3DAE6;
+                                  content: ''; }
+                              .euiTab.euiTab-isDisabled {
+                                color: #98A2B3; }
+                                .euiTab.euiTab-isDisabled:hover {
+                                  cursor: not-allowed;
+                                  text-decoration: none;
+                                  color: #98A2B3; }
+                              .euiTab.euiTab-isSelected {
+                                cursor: default;
+                                color: #006BB4; }
+                                .euiTab.euiTab-isSelected:after {
+                                  position: absolute;
+                                  bottom: 0;
+                                  left: 0;
+                                  content: ' ';
+                                  width: 100%;
+                                  height: 2px;
+                                  background-color: #006BB4;
+                                  -webkit-animation: euiTab 150ms cubic-bezier(0.694, 0.0482, 0.335, 1);
+                                          animation: euiTab 150ms cubic-bezier(0.694, 0.0482, 0.335, 1); }
+                            
+                            .euiTab__content {
+                              display: block;
+                              white-space: nowrap;
+                              overflow: hidden;
+                              text-overflow: ellipsis;
+                              -webkit-transition: -webkit-transform 150ms cubic-bezier(0.34, 1.61, 0.7, 1);
+                              transition: -webkit-transform 150ms cubic-bezier(0.34, 1.61, 0.7, 1);
+                              transition: transform 150ms cubic-bezier(0.34, 1.61, 0.7, 1);
+                              transition: transform 150ms cubic-bezier(0.34, 1.61, 0.7, 1), -webkit-transform 150ms cubic-bezier(0.34, 1.61, 0.7, 1);
+                              -webkit-transform: translateY(0);
+                                      transform: translateY(0); }
+                            
+                          
+
+
+                                      .application .ace-tm {
+                                        background-color: #F5F7FA;
+                                        color: #343741; }
+                                          .application .ace-tm .ace_scrollbar::-webkit-scrollbar {
+                                            width: 16px;
+                                            height: 16px; }
+                                          .application .ace-tm .ace_scrollbar::-webkit-scrollbar-thumb {
+                                            background-color: rgba(105, 112, 125, 0.5);
+                                            border: 6px solid transparent;
+                                            background-clip: content-box; }
+                                          .application .ace-tm .ace_scrollbar::-webkit-scrollbar-corner, .application .ace-tm .ace_scrollbar::-webkit-scrollbar-track {
+                                            background-color: transparent; }
+                                        .application .ace-tm .ace_gutter-active-line,
+                                        .application .ace-tm .ace_marker-layer .ace_active-line {
+                                          background-color: rgba(211, 218, 230, 0.7); }
+                                        .application .ace-tm .ace_snippet-marker {
+                                          width: 100%;
+                                          background-color: #e9edf3;
+                                          border: none; }
+                                        .application .ace-tm .ace_indent-guide {
+                                          background: linear-gradient(to left, #98A2B3 0%, #98A2B3 1px, transparent 1px, transparent 100%); }
+                                        .application .ace-tm .ace_search {
+                                          z-index: 1001; }
+                                        .application .ace-tm .ace_layer.ace_marker-layer {
+                                          overflow: visible; }
+                                        .application .ace-tm .ace_warning {
+                                          color: #BD271E; }
+                                        .application .ace-tm .ace_method {
+                                          color: #c80a68; }
+                                        .application .ace-tm .ace_url,
+                                        .application .ace-tm .ace_start_triple_quote,
+                                        .application .ace-tm .ace_end_triple_quote {
+                                          color: #00756c; }
+                                        .application .ace-tm .ace_multi_string {
+                                          color: #007c1e;
+                                          font-style: italic; }
+                                        .application .ace-tm .ace_gutter {
+                                          background-color: #FFF;
+                                          color: #69707D;
+                                          border-left: 1px solid #e9edf3; }
+                                        .application .ace-tm .ace_print-margin {
+                                          width: 1px;
+                                          background: #D3DAE6; }
+                                        .application .ace-tm .ace_fold {
+                                          background-color: #6B72E6; }
+                                        .application .ace-tm .ace_cursor {
+                                          color: #000; }
+                                        .application .ace-tm .ace_invisible {
+                                          color: #D3DAE6; }
+                                        .application .ace-tm .ace_storage,
+                                        .application .ace-tm .ace_keyword {
+                                          color: #00739d; }
+                                        .application .ace-tm .ace_constant {
+                                          color: #900; }
+                                        .application .ace-tm .ace_constant.ace_buildin {
+                                          color: #5848f6; }
+                                        .application .ace-tm .ace_constant.ace_language {
+                                          color: #5457ea; }
+                                        .application .ace-tm .ace_constant.ace_library {
+                                          color: #007c1e; }
+                                        .application .ace-tm .ace_invalid {
+                                          background-color: #f8e9e9;
+                                          color: #b4251d; }
+                                        .application .ace-tm .ace_support.ace_function {
+                                          color: #3c4c72; }
+                                        .application .ace-tm .ace_support.ace_constant {
+                                          color: #007c1e; }
+                                        .application .ace-tm .ace_support.ace_type,
+                                        .application .ace-tm .ace_support.ace_class {
+                                          color: #5963b5; }
+                                        .application .ace-tm .ace_keyword.ace_operator {
+                                          color: #646a77; }
+                                        .application .ace-tm .ace_string {
+                                          color: #007c1e; }
+                                        .application .ace-tm .ace_comment {
+                                          color: #41755c; }
+                                        .application .ace-tm .ace_comment.ace_doc {
+                                          color: #00739d; }
+                                        .application .ace-tm .ace_comment.ace_doc.ace_tag {
+                                          color: #656b77; }
+                                        .application .ace-tm .ace_constant.ace_numeric {
+                                          color: #00739d; }
+                                        .application .ace-tm .ace_variable {
+                                          color: #00739d; }
+                                        .application .ace-tm .ace_xml-pe {
+                                          color: #646a77; }
+                                        .application .ace-tm .ace_entity.ace_name.ace_function {
+                                          color: #0000A2; }
+                                        .application .ace-tm .ace_heading {
+                                          color: #0c07ff; }
+                                        .application .ace-tm .ace_list {
+                                          color: #b90690; }
+                                        .application .ace-tm .ace_meta.ace_tag {
+                                          color: #00168e; }
+                                        .application .ace-tm .ace_string.ace_regex {
+                                          color: #d00000; }
+                                        .application .ace-tm .ace_marker-layer .ace_selection {
+                                          background: #b3d3e9; }
+                                        .application .ace-tm.ace_multiselect .ace_selection.ace_start {
+                                          -webkit-box-shadow: 0 0 3px 0px #FFF;
+                                                  box-shadow: 0 0 3px 0px #FFF; }
+                                        .application .ace-tm .ace_marker-layer .ace_step {
+                                          background: #fdedcc; }
+                                        .application .ace-tm .ace_marker-layer .ace_stack {
+                                          background: #cce5e3; }
+                                        .application .ace-tm .ace_marker-layer .ace_bracket {
+                                          margin: -1px 0 0 -1px;
+                                          border: 1px solid #D3DAE6; }
+                                        .application .ace-tm .ace_marker-layer .ace_selected-word {
+                                          background: #F5F7FA;
+                                          border: 1px solid #D3DAE6; }
+                                          .sidebar-container {
+                                            padding-left: 0px !important;
+                                            padding-right: 0px !important;
+                                            background-color: #F5F7FA;
+                                            border-right-color: transparent;
+                                            border-bottom-color: transparent; }
+                                            .sidebar-container .sidebar-well {
+                                              background-color: #e6f0f8; }
+                                            .sidebar-container .sidebar-list .sidebar-controls {
+                                              border-radius: 4px;
+                                              margin-right: -13px;
+                                              margin-top: 2px; }
+                                              .sidebar-container .sidebar-list .sidebar-controls .navbar-btn-link {
+                                                padding-left: 8px;
+                                                padding-right: 8px; }
+                                              .sidebar-container .sidebar-list .sidebar-controls .sidebar-controls-error {
+                                                cursor: default; }
+                                            .sidebar-container .sidebar-list ul {
+                                              list-style: none;
+                                              margin-bottom: 0; }
+                                            .sidebar-container .sidebar-list .sidebar-item {
+                                              border-top-color: transparent;
+                                              font-size: 12px;
+                                              border-top: solid 1px transparent;
+                                              border-bottom: solid 1px transparent;
+                                              line-height: normal; }
+                                              .sidebar-container .sidebar-list .sidebar-item label {
+                                                font-size: 12px;
+                                                font-weight: 600;
+                                                color: #343741;
+                                                margin-bottom: 4px;
+                                                display: block; }
+                                                .sidebar-container .sidebar-list .sidebar-item label[for] {
+                                                  cursor: pointer; }
+                                              .sidebar-container .sidebar-list .sidebar-item.active {
+                                                background-color: #dddee1;
+                                                color: #343741;
+                                                border-color: #D3DAE6; }
+                                            .sidebar-container .sidebar-list .sidebar-item-title,
+                                            .sidebar-container .sidebar-list .sidebar-item-text {
+                                              margin: 0;
+                                              padding: 4px 8px;
+                                              text-align: center;
+                                              width: 100%;
+                                              border: none;
+                                              border-radius: 0; }
+                                            .sidebar-container .sidebar-list .sidebar-item-title {
+                                              max-width: 100%;
+                                              /* 1 */
+                                              overflow: hidden !important;
+                                              text-overflow: ellipsis !important;
+                                              white-space: nowrap !important;
+                                              word-wrap: normal !important;
+                                              /* 2 */
+                                              text-align: left; }
+                                              .sidebar-container .sidebar-list .sidebar-item-title.full-title {
+                                                white-space: normal; }
+                                            .sidebar-container .sidebar-list .sidebar-item-text {
+                                              background: #FFF; }
+                                            .sidebar-container .sidebar-list-header {
+                                              padding-left: 8px;
+                                              padding-right: 8px;
+                                              color: #000;
+                                              border: 1px solid transparent; }
+                                              .sidebar-container .sidebar-list-header .sidebar-list-header-label {
+                                                font-size: 14px;
+                                                line-height: 1.5;
+                                                font-weight: 700; }
+                                            .sidebar-container .index-pattern {
+                                              font-weight: 700;
+                                              padding: 4px 8px;
+                                              display: -webkit-box;
+                                              display: -webkit-flex;
+                                              display: -ms-flexbox;
+                                              display: flex;
+                                              -webkit-box-pack: justify;
+                                              -webkit-justify-content: space-between;
+                                                  -ms-flex-pack: justify;
+                                                      justify-content: space-between;
+                                              background-color: #002b48;
+                                              color: #FFF;
+                                              line-height: 24px; }
+                                              .sidebar-container .index-pattern .index-pattern-label {
+                                                font-size: 14px;
+                                                font-weight: 700;
+                                                margin: 0; }
+                                              .sidebar-container .index-pattern > * {
+                                                -webkit-box-flex: 0;
+                                                -webkit-flex: 0 1 auto;
+                                                    -ms-flex: 0 1 auto;
+                                                        flex: 0 1 auto;
+                                                -webkit-align-self: center;
+                                                    -ms-flex-item-align: center;
+                                                        align-self: center; }
+                                            .sidebar-container .index-pattern-selection {
+                                              padding: 8px;
+                                              padding-bottom: 0; }
+                                            .sidebar-container .index-pattern-selection .ui-select-choices {
+                                              width: auto;
+                                              max-height: 300px; }
+                                          
+                                              .dscFieldDetails .progress {
+                                                background-color: #e9ebee;
+                                                margin-bottom: 0;
+                                                border-radius: 0; }
+                                              
+                                              .dscFieldDetails .progress-bar {
+                                                padding-left: 10px;
+                                                text-align: right;
+                                                line-height: 20px;
+                                                max-width: 100%; }
+                                              
+                                              discover-app {
+                                                background-color: #FFF; }
+                                              
+                                              .dscSidebar__listHeader {
+                                                margin-top: 5px; }
+                                              
+                                              .dscFieldList--popular {
+                                                padding-top: 10px; }
+                                              
+                                              .dscWrapper {
+                                                padding-right: 0;
+                                                padding-left: 21px;
+                                                z-index: 1; }
+                                              
+                                              .dscWrapper__content {
+                                                padding-right: 16px;
+                                                clear: both; }
+                                              
+                                              .dscTimechart {
+                                                display: block;
+                                                position: relative; }
+                                                .dscTimechart .series > rect {
+                                                  fill-opacity: 0.5;
+                                                  stroke-width: 1; }
+                                              
+                                              .dscTimechart__header {
+                                                display: -webkit-box;
+                                                display: -webkit-flex;
+                                                display: -ms-flexbox;
+                                                display: flex;
+                                                -webkit-box-pack: center;
+                                                -webkit-justify-content: center;
+                                                    -ms-flex-pack: center;
+                                                        justify-content: center;
+                                                min-height: 40px;
+                                                padding: 4px 0; }
+                                              
+                                              .dscOverlay {
+                                                position: absolute;
+                                                top: 0;
+                                                right: 0;
+                                                bottom: 0;
+                                                left: 0;
+                                                z-index: 20;
+                                                padding-top: 12px;
+                                                opacity: 0.75;
+                                                text-align: center;
+                                                background-color: transparent; }
+                                              
+                                              .dscTable {
+                                                overflow: auto; }
+                                                .dscTable .kbnDocTable__row {
+                                                  font-family: "Roboto Mono", Consolas, Menlo, Courier, monospace;
+                                                  font-size: 12px; }
+                                              
+                                              .dscTable__footer {
+                                                background-color: #D3DAE6;
+                                                padding: 5px 10px;
+                                                text-align: center; }
+                                              
+                                              /**
+                                               * 1. Override sidebar-item-title styles.
+                                               */
+                                              .dscSidebarItem {
+                                                position: relative;
+                                                display: -webkit-box;
+                                                display: -webkit-flex;
+                                                display: -ms-flexbox;
+                                                display: flex;
+                                                -webkit-box-align: center;
+                                                -webkit-align-items: center;
+                                                    -ms-flex-align: center;
+                                                        align-items: center;
+                                                -webkit-box-pack: justify;
+                                                -webkit-justify-content: space-between;
+                                                    -ms-flex-pack: justify;
+                                                        justify-content: space-between;
+                                                padding-top: 0 !important;
+                                                /* 1 */
+                                                padding-bottom: 0 !important;
+                                                /* 1 */
+                                                height: 32px; }
+                                                .dscSidebarItem:hover .dscSidebarItem__action, .dscSidebarItem:focus .dscSidebarItem__action {
+                                                  opacity: 1; }
+                                              
+                                              .dscSidebarItem--active {
+                                                background: #e9ebee;
+                                                color: #000;
+                                                font-weight: bold; }
+                                              
+                                              /**
+                                               * 1. Truncate long text so it doesn't push the actions outside of the container.
+                                               */
+                                              .dscSidebarItem__label {
+                                                overflow: hidden;
+                                                /* 1 */
+                                                text-overflow: ellipsis;
+                                                /* 1 */ }
+                                              
+                                              /**
+                                               * 1. Only visually hide the action, so that it's still accessible to screen readers.
+                                               * 2. When tabbed to, this element needs to be visible for keyboard accessibility.
+                                               */
+                                              .dscSidebarItem__action {
+                                                opacity: 0;
+                                                /* 1 */ }
+                                                .dscSidebarItem__action:focus {
+                                                  opacity: 1;
+                                                  /* 2 */ }
+                                              
+                                              .dscFieldDetails {
+                                                padding: 10px;
+                                                background-color: #e9ebee;
+                                                color: #343741; }
+                                              
+                                              .dscFieldDetails__progress {
+                                                background-color: #FFF;
+                                                color: #69707D;
+                                                padding: 4px; }
+                                              
+                                              .dscFieldDetailsItem {
+                                                margin-top: 5px; }
+                                              
+                                              .dscFieldDetails__filter {
+                                                cursor: pointer; }
+                                              
+                                              .dscFieldDetailsItem__title {
+                                                line-height: 1.5;
+                                                display: -webkit-box;
+                                                display: -webkit-flex;
+                                                display: -ms-flexbox;
+                                                display: flex;
+                                                -webkit-box-align: center;
+                                                -webkit-align-items: center;
+                                                    -ms-flex-align: center;
+                                                        align-items: center;
+                                                -webkit-box-pack: justify;
+                                                -webkit-justify-content: space-between;
+                                                    -ms-flex-pack: justify;
+                                                        justify-content: space-between; }
+                                              
+                                              /**
+                                               * 1. If the field name is very long, don't let it squash the buttons.
+                                               */
+                                              .dscFieldDetailsItem__buttonGroup {
+                                                -webkit-box-flex: 0;
+                                                -webkit-flex: 0 0 auto;
+                                                    -ms-flex: 0 0 auto;
+                                                        flex: 0 0 auto;
+                                                /* 1 */ }
+                                              
+                                              .dscFieldDetailsItem__button {
+                                                -webkit-appearance: none;
+                                                   -moz-appearance: none;
+                                                        appearance: none;
+                                                border: none;
+                                                padding: 0;
+                                                background-color: transparent; }
+                                              
+                                              .dscField--noResults {
+                                                color: #69707D; }
+                                              
+                                              .dscField__icon {
+                                                margin-right: 5px;
+                                                text-align: center;
+                                                display: inline-block;
+                                                width: 12px;
+                                                color: #69707D; }
+                                              
+                                              .dscResults h3 {
+                                                margin: -20px 0 10px 0;
+                                                text-align: center; }
+                                              
+                                              .dscResults__interval {
+                                                display: inline-block;
+                                                width: auto; }
+                                              
+                                              .dscSkipButton {
+                                                position: absolute;
+                                                left: -10000px;
+                                                top: 4px;
+                                                width: 1px;
+                                                height: 1px;
+                                                overflow: hidden; }
+                                                .dscSkipButton:focus {
+                                                  left: initial;
+                                                  right: 16px;
+                                                  width: auto;
+                                                  height: auto; }

@@ -143,7 +143,6 @@ main {
   appearance: none;
   cursor: pointer;
   padding: 4px 12px 5px;
-  font-size: 16px;
   font-weight: 400;
   line-height: 1.5;
   height: 30px;
@@ -563,7 +562,6 @@ a.kuiButton--secondary:not(.kuiButton-isDisabled):active {
   padding: 4px;
   border: none;
   line-height: 1;
-  font-size: 16px;
   color: #343741 !important;
   /* 1 */
   cursor: pointer;
@@ -583,7 +581,6 @@ a.kuiButton--secondary:not(.kuiButton-isDisabled):active {
   padding: 5px 0px;
   border: none;
   border-bottom: dotted 2px #d3dae6;
-  font-size: 16px;
   cursor: pointer;
 }
 
@@ -700,7 +697,6 @@ a.kuiButton--secondary:not(.kuiButton-isDisabled):active {
 }
 
 .kuiCheckBoxLabel__text {
-  font-size: 16px;
   margin-left: 8px;
 }
 
@@ -708,7 +704,6 @@ a.kuiButton--secondary:not(.kuiButton-isDisabled):active {
    * 1. Override Bootstrap.
    */
 .kuiLabel {
-  font-size: 16px;
   line-height: 1.5;
   font-weight: bold;
   margin-bottom: 0;
@@ -719,7 +714,6 @@ a.kuiButton--secondary:not(.kuiButton-isDisabled):active {
   width: 180px;
   display: inline-block;
   position: relative;
-  font-size: 16px;
   line-height: 1.5;
 }
 .kuiSearchInput.kuiSearchInput-isInvalid .kuiSearchInput__input {
@@ -746,7 +740,6 @@ a.kuiButton--secondary:not(.kuiButton-isDisabled):active {
     Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
     'Segoe UI Symbol';
   padding: 4px 12px 4px;
-  font-size: 16px;
   font-weight: 400;
   line-height: 1.5;
   color: #343741;
@@ -793,7 +786,6 @@ a.kuiButton--secondary:not(.kuiButton-isDisabled):active {
     Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
     'Segoe UI Symbol';
   padding: 4px 12px 4px;
-  font-size: 16px;
   font-weight: 400;
   line-height: 1.5;
   color: #343741;
@@ -862,7 +854,6 @@ a.kuiButton--secondary:not(.kuiButton-isDisabled):active {
     Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
     'Segoe UI Symbol';
   padding: 4px 12px 4px;
-  font-size: 16px;
   font-weight: 400;
   line-height: 1.5;
   color: #343741;
@@ -880,7 +871,6 @@ a.kuiButton--secondary:not(.kuiButton-isDisabled):active {
     Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
     'Segoe UI Symbol';
   padding: 4px 12px 4px;
-  font-size: 16px;
   font-weight: 400;
   line-height: 1.5;
   color: #343741;
@@ -934,7 +924,6 @@ a.kuiButton--secondary:not(.kuiButton-isDisabled):active {
     Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
     'Segoe UI Symbol';
   padding: 4px 12px 4px;
-  font-size: 16px;
   font-weight: 400;
   line-height: 1.5;
   color: #343741;
@@ -1106,12 +1095,10 @@ a.kuiButton--secondary:not(.kuiButton-isDisabled):active {
 
 .kuiInfoPanelHeader__icon {
   margin-right: 10px;
-  font-size: 16px;
   line-height: 1.5;
 }
 
 .kuiInfoPanelHeader__title {
-  font-size: 16px;
   line-height: 1.5;
   font-weight: 700;
 }
@@ -1124,7 +1111,6 @@ a.kuiButton--secondary:not(.kuiButton-isDisabled):active {
 }
 
 .kuiInfoPanelBody__message {
-  font-size: 16px;
   line-height: 1.5;
 }
 
@@ -1221,7 +1207,6 @@ a.kuiButton--secondary:not(.kuiButton-isDisabled):active {
   /* 2 */
   color: #006bb4;
   /* 1 */
-  font-size: 16px;
 }
 .kuiLocalBreadcrumb__link:visited,
 .kuiLocalBreadcrumb__link:active {
@@ -1386,7 +1371,6 @@ a.kuiButton--secondary:not(.kuiButton-isDisabled):active {
   padding: 4px;
   border: none;
   line-height: 1;
-  font-size: 16px;
   color: #343741 !important;
   /* 1 */
   cursor: pointer;
@@ -1545,7 +1529,6 @@ a.kuiButton--secondary:not(.kuiButton-isDisabled):active {
   -ms-flex-align: center;
   align-items: center;
   padding: 2px 8px;
-  font-size: 16px;
   background-color: transparent;
   color: #343741;
   border: 0;
@@ -1670,7 +1653,6 @@ a.kuiButton--secondary:not(.kuiButton-isDisabled):active {
     Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
     'Segoe UI Symbol';
   padding: 4px 12px 4px;
-  font-size: 16px;
   font-weight: 400;
   line-height: 1.5;
   color: #343741;
@@ -1763,7 +1745,6 @@ a.kuiButton--secondary:not(.kuiButton-isDisabled):active {
     Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
     'Segoe UI Symbol';
   padding: 4px 12px 4px;
-  font-size: 16px;
   font-weight: 400;
   line-height: 1.5;
   color: #343741;
@@ -1807,7 +1788,6 @@ a.kuiButton--secondary:not(.kuiButton-isDisabled):active {
 .kuiLocalSearchButton {
   width: 43px;
   height: 32px;
-  font-size: 16px;
   line-height: 0;
   /* 1 */
   color: #fff;
@@ -1888,7 +1868,6 @@ a.kuiButton--secondary:not(.kuiButton-isDisabled):active {
   align-items: center;
   height: 100%;
   padding: 12px 8px;
-  font-size: 16px;
   font-weight: bold;
   border-bottom: 1px solid #d3dae6;
   -webkit-box-flex: 1;
@@ -2230,7 +2209,6 @@ a.kuiButton--secondary:not(.kuiButton-isDisabled):active {
 }
 
 .kuiPagerText {
-  font-size: 16px;
   line-height: 1.5;
   color: #69707d;
   white-space: nowrap;
@@ -2561,7 +2539,6 @@ a.kuiPanelHeader .kuiSelect:not(.kuiButton-isDisabled):focus {
   background-color: #f5f7fa;
   border-bottom: 1px solid #d3dae6;
   padding: 12px;
-  font-size: 16px;
 }
 
 .kuiEmptyTablePrompt {
@@ -2678,7 +2655,6 @@ a.kuiPanelHeader .kuiSelect:not(.kuiButton-isDisabled):focus {
 }
 
 .kuiTableHeaderCell {
-  font-size: 16px;
   font-weight: 400;
   text-align: left;
   max-width: 20px;
@@ -2762,7 +2738,6 @@ a.kuiPanelHeader .kuiSelect:not(.kuiButton-isDisabled):focus {
 }
 
 .kuiTableRowCell {
-  font-size: 16px;
   font-weight: 400;
   text-align: left;
   max-width: 20px;
@@ -2873,7 +2848,6 @@ a.kuiPanelHeader .kuiSelect:not(.kuiButton-isDisabled):focus {
   /* 1 */
   cursor: pointer;
   padding: 10px 30px;
-  font-size: 16px;
   color: #69707d;
   background-color: transparent;
   /* 1 */
@@ -3212,7 +3186,6 @@ a.kuiToolBar .kuiSelect:not(.kuiButton-isDisabled):focus {
   -ms-flex: 1 1 auto;
   flex: 1 1 auto;
   position: relative;
-  font-size: 16px;
   max-width: 800px;
 }
 
@@ -3254,7 +3227,6 @@ a.kuiToolBar .kuiSelect:not(.kuiButton-isDisabled):focus {
    * 1. We don't want the text to take up two lines and overflow the ToolBar.
    */
 .kuiToolBarText {
-  font-size: 16px;
   line-height: 1.5;
   color: #69707d;
   white-space: nowrap;
@@ -3292,7 +3264,6 @@ a.kuiToolBar .kuiSelect:not(.kuiButton-isDisabled):focus {
   font-weight: 700;
   /* 1 */
   line-height: 1.5;
-  font-size: 16px;
 }
 
 /**
@@ -3304,7 +3275,6 @@ a.kuiToolBar .kuiSelect:not(.kuiButton-isDisabled):focus {
   font-weight: 400;
   /* 1 */
   line-height: 1.5;
-  font-size: 16px;
 }
 
 .kuiSubText {
