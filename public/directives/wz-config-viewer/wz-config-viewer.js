@@ -108,13 +108,9 @@ class WzConfigViewer {
         setTimeout(function() {
           $scope.xmlCodeBox.refresh();
           $scope.$applyAsync();
-<<<<<<< HEAD
-          window.dispatchEvent(new Event('resize'));
-=======
           $scope.isLogs
             ? dynamicHeight()
             : window.dispatchEvent(new Event('resize'));
->>>>>>> 79e7042920c0480f1dd41944f9c63bd8283e1332
         }, 200);
       }
     };
