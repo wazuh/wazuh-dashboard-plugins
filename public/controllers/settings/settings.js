@@ -12,6 +12,7 @@
 import { base64 } from '../../utils/base64';
 import { TabNames } from '../../utils/tab-names';
 import { configEquivalences } from '../../utils/config-equivalences';
+import { kibana } from '../../../package.json';
 
 export class SettingsController {
   /**
@@ -37,6 +38,7 @@ export class SettingsController {
     wzMisc,
     wazuhConfig
   ) {
+    this.kibanaVersion = (kibana || {}).version || false;
     this.$scope = $scope;
     this.$window = $window;
     this.$location = $location;
