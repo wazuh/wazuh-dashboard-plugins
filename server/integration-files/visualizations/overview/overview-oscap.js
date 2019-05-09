@@ -15,7 +15,7 @@ export default [
     _source: {
       title: 'Last score',
       visState:
-        '{"title":"Last score","type":"table","params":{"perPage":10,"showPartialRows":false,"showMeticsAtAllLevels":false,"sort":{"columnIndex":null,"direction":null},"showTotal":false,"totalFunc":"sum"},"aggs":[{"id":"1","enabled":true,"type":"max","schema":"metric","params":{"field":"@timestamp"}},{"id":"2","enabled":true,"type":"terms","schema":"bucket","params":{"field":"data.oscap.scan.score","size":1,"order":"desc","orderBy":"1"}}]}',
+        '{"title":"Last score","type":"table","params":{"perPage":10,"showPartialRows":false,"showMeticsAtAllLevels":false,"sort":{"columnIndex":null,"direction":null},"showTotal":false,"totalFunc":"sum"},"aggs":[{"id":"1","enabled":true,"type":"max","schema":"metric","params":{"field":"timestamp"}},{"id":"2","enabled":true,"type":"terms","schema":"bucket","params":{"field":"data.oscap.scan.score","size":1,"order":"desc","orderBy":"1"}}]}',
       uiStateJSON:
         '{"vis":{"params":{"sort":{"columnIndex":null,"direction":null}}}}',
       description: '',
@@ -32,7 +32,7 @@ export default [
     _source: {
       title: 'Last agent scanned',
       visState:
-        '{"title":"Last agent scanned","type":"table","params":{"perPage":10,"showPartialRows":false,"showMeticsAtAllLevels":false,"sort":{"columnIndex":null,"direction":null},"showTotal":false,"totalFunc":"sum"},"aggs":[{"id":"1","enabled":true,"type":"max","schema":"metric","params":{"field":"@timestamp"}},{"id":"2","enabled":true,"type":"terms","schema":"bucket","params":{"field":"agent.name","size":1,"order":"desc","orderBy":"1"}}]}',
+        '{"title":"Last agent scanned","type":"table","params":{"perPage":10,"showPartialRows":false,"showMeticsAtAllLevels":false,"sort":{"columnIndex":null,"direction":null},"showTotal":false,"totalFunc":"sum"},"aggs":[{"id":"1","enabled":true,"type":"max","schema":"metric","params":{"field":"timestamp"}},{"id":"2","enabled":true,"type":"terms","schema":"bucket","params":{"field":"agent.name","size":1,"order":"desc","orderBy":"1"}}]}',
       uiStateJSON:
         '{"vis":{"params":{"sort":{"columnIndex":null,"direction":null}}}}',
       description: '',
@@ -79,7 +79,7 @@ export default [
     _source: {
       title: 'Last scan profile',
       visState:
-        '{"title":"Last scan profile","type":"table","params":{"perPage":10,"showPartialRows":false,"showMeticsAtAllLevels":false,"sort":{"columnIndex":null,"direction":null},"showTotal":false,"totalFunc":"sum"},"aggs":[{"id":"1","enabled":true,"type":"max","schema":"metric","params":{"field":"@timestamp"}},{"id":"2","enabled":true,"type":"terms","schema":"bucket","params":{"field":"data.oscap.scan.profile.title","size":1,"order":"desc","orderBy":"1"}}]}',
+        '{"title":"Last scan profile","type":"table","params":{"perPage":10,"showPartialRows":false,"showMeticsAtAllLevels":false,"sort":{"columnIndex":null,"direction":null},"showTotal":false,"totalFunc":"sum"},"aggs":[{"id":"1","enabled":true,"type":"max","schema":"metric","params":{"field":"timestamp"}},{"id":"2","enabled":true,"type":"terms","schema":"bucket","params":{"field":"data.oscap.scan.profile.title","size":1,"order":"desc","orderBy":"1"}}]}',
       uiStateJSON:
         '{"vis":{"params":{"sort":{"columnIndex":null,"direction":null}}}}',
       description: '',
@@ -504,7 +504,7 @@ export default [
     _source: {
       title: 'Latest alert',
       visState:
-        '{"title":"Latest alert","type":"table","params":{"perPage":10,"showPartialRows":false,"showMeticsAtAllLevels":false,"sort":{"columnIndex":null,"direction":null},"showTotal":false,"totalFunc":"sum"},"aggs":[{"id":"1","enabled":true,"type":"max","schema":"metric","params":{"field":"@timestamp"}},{"id":"2","enabled":true,"type":"terms","schema":"bucket","params":{"field":"data.oscap.check.title","size":1,"order":"desc","orderBy":"1"}}]}',
+        '{"title":"Latest alert","type":"table","params":{"perPage":10,"showPartialRows":false,"showMeticsAtAllLevels":false,"sort":{"columnIndex":null,"direction":null},"showTotal":false,"totalFunc":"sum"},"aggs":[{"id":"1","enabled":true,"type":"max","schema":"metric","params":{"field":"timestamp"}},{"id":"2","enabled":true,"type":"terms","schema":"bucket","params":{"field":"data.oscap.check.title","size":1,"order":"desc","orderBy":"1"}}]}',
       uiStateJSON:
         '{"vis":{"params":{"sort":{"columnIndex":null,"direction":null}}}}',
       description: '',

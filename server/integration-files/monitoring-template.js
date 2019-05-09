@@ -16,7 +16,7 @@ export const monitoringTemplate = {
   },
   mappings: {
     properties: {
-      '@timestamp': {
+      timestamp: {
         type: 'date',
         format: 'dateOptionalTime'
       },

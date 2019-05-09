@@ -986,7 +986,7 @@ export class WazuhApiCtrl {
             return item;
           });
         }
-        
+
         let csv = json2csvParser.parse(isList ? itemsArray[0] : itemsArray);
 
         for (const field of fields) {

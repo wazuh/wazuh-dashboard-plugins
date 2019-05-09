@@ -211,7 +211,7 @@ export class WazuhElasticCtrl {
                 'agent.id': '000'
               }
             },
-            filter: { range: { '@timestamp': {} } }
+            filter: { range: { timestamp: {} } }
           }
         },
         aggs: {
@@ -228,8 +228,8 @@ export class WazuhElasticCtrl {
       // Set up time interval, default to Last 24h
       const timeGTE = 'now-1d';
       const timeLT = 'now';
-      payload.query.bool.filter.range['@timestamp']['gte'] = timeGTE;
-      payload.query.bool.filter.range['@timestamp']['lt'] = timeLT;
+      payload.query.bool.filter.range['timestamp']['gte'] = timeGTE;
+      payload.query.bool.filter.range['timestamp']['lt'] = timeLT;
 
       // Set up match for default cluster name
       payload.query.bool.must.push(
@@ -316,7 +316,7 @@ export class WazuhElasticCtrl {
    * @param {Array<Object>} indexPatternList List of index patterns
    */
   validateIndexPattern(indexPatternList) {
-    const minimum = ['@timestamp', 'rule.groups', 'manager.name', 'agent.id'];
+    const minimum = ['timestamp', 'rule.groups', 'manager.name', 'agent.id'];
     let list = [];
     for (const index of indexPatternList) {
       let valid, parsed;
@@ -705,7 +705,7 @@ export class WazuhElasticCtrl {
 
       payload.size = size;
       payload.docvalue_fields = [
-        '@timestamp',
+        'timestamp',
         'cluster.name',
         'manager.name',
         'agent.id',

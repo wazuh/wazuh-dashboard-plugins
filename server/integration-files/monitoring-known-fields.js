@@ -12,7 +12,7 @@
 
 export const monitoringKnownFields = [
   {
-    name: '@timestamp',
+    name: 'timestamp',
     type: 'date',
     count: 0,
     scripted: false,

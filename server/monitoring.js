@@ -401,7 +401,7 @@ export class Monitoring {
         for (const element of this.agentsArray) {
           body += '{ "index":  { "_index": "' + datedIndex + '" } }\n';
           let date = new Date(Date.now()).toISOString();
-          element['@timestamp'] = date;
+          element['timestamp'] = date;
           element.host = element.manager;
           element.cluster = { name: clusterName ? clusterName : 'disabled' };
           body += JSON.stringify(element) + '\n';
