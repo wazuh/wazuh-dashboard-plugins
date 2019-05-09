@@ -30,7 +30,8 @@ class WzConfigViewer {
     this.template = template;
   }
 
-  controller($scope, $document) {
+  controller($scope, $document, $window) {
+    const window = $window;
     const setJsonBox = () => {
       $scope.jsonCodeBox = CodeMirror.fromTextArea(
         $document[0].getElementById('viewer_json_box'),
@@ -92,7 +93,7 @@ class WzConfigViewer {
         setTimeout(function() {
           $scope.jsonCodeBox.refresh();
           $scope.$applyAsync();
-          window.dispatchEvent(new Event('resize'));
+          window.dispatchEvent(new Event('resize')); // eslint-disable-line
         }, 200);
       }
     };
@@ -110,7 +111,7 @@ class WzConfigViewer {
           $scope.$applyAsync();
           $scope.isLogs
             ? dynamicHeight()
-            : window.dispatchEvent(new Event('resize'));
+            : window.dispatchEvent(new Event('resize')); // eslint-disable-line
         }, 200);
       }
     };

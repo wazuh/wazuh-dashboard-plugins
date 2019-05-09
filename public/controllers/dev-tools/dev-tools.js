@@ -466,6 +466,7 @@ export class DevToolsController {
 
     const dynamicHeight = () => {
       const self = this;
+      const window = this.$window;
       setTimeout(function() {
         const windows = $(window).height();
         $('#wz-dev-left-column').height(

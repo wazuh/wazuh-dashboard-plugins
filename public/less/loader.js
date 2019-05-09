@@ -1,5 +1,6 @@
 /*
  * Wazuh app - Stylesheets loader
+ * Copyright (C) 2015-2019 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,9 +26,9 @@ import './jquery-ui.css';
 //import './dark_theme/wz_theme_dark.css';
 import chrome from 'ui/chrome';
 const IS_DARK_THEME = chrome.getUiSettingsClient().get('theme:darkMode');
-
+/* eslint-disable no-undef */
 if (IS_DARK_THEME) {
-  var newSS = document.createElement('link');
+  let newSS = document.createElement('link');
   newSS.rel = 'stylesheet';
   newSS.href = '../plugins/wazuh/less/dark_theme/wz_theme_dark.css';
   document.getElementsByTagName('head')[0].appendChild(newSS);
@@ -42,3 +43,4 @@ if (IS_DARK_THEME) {
   newSS.href = '../plugins/wazuh/less/dark_theme/kui_light.css';
   document.getElementsByTagName('head')[0].appendChild(newSS);
 }
+/* eslint-enable no-undef */

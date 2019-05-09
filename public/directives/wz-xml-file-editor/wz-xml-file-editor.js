@@ -37,8 +37,10 @@ app.directive('wzXmlFileEditor', function() {
       rulesetHandler,
       configHandler,
       apiReq,
-      $rootScope
+      $rootScope,
+      $window
     ) {
+      const window = $window;
       $scope.targetNameShown = $scope.targetName;
       $scope.configError = false;
       /**
