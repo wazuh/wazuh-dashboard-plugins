@@ -37,8 +37,10 @@ app.directive('wzXmlFileEditor', function() {
       rulesetHandler,
       configHandler,
       apiReq,
-      $rootScope
+      $rootScope,
+      $window
     ) {
+      const window = $window;
       $scope.targetNameShown = $scope.targetName;
       $scope.configError = false;
       /**
@@ -105,6 +107,7 @@ app.directive('wzXmlFileEditor', function() {
         }
         checkingXmlError = false;
         $scope.$applyAsync();
+        dynamicHeight();
         return;
       };
 
@@ -213,6 +216,7 @@ app.directive('wzXmlFileEditor', function() {
           ) {
             $scope.configError = data.details;
             $scope.$applyAsync();
+            dynamicHeight();
             throw new Error('Validation error');
           }
           return true;
@@ -350,9 +354,13 @@ app.directive('wzXmlFileEditor', function() {
       const dynamicHeight = () => {
         setTimeout(function() {
           const editorContainer = $('.wzXmlEditor');
+          const headerContainer = $('#wzXmlEditorHeader');
           const windows = $(window).height();
           const offsetTop = getPosition(editorContainer[0]).y;
           editorContainer.height(windows - (offsetTop + 20));
+          $('.wzXmlEditorBody .CodeMirror').css({
+            height: 'calc(100% - ' + (headerContainer.height() - 22) + 'px)'
+          });
         }, 1);
       };
 
@@ -394,6 +402,7 @@ app.directive('wzXmlFileEditor', function() {
         $scope.restartBtn = true;
         $scope.$applyAsync();
         $scope.$emit('showRestartBtn', { msg, target });
+        dynamicHeight();
       };
 
       $scope.$on('saveXmlFile', (ev, params) => saveFile(params));
@@ -401,6 +410,7 @@ app.directive('wzXmlFileEditor', function() {
       $scope.$on('removeRestartMsg', () => {
         $scope.restartBtn = false;
         $scope.$applyAsync();
+        dynamicHeight();
       });
 
       $rootScope.$on('changedInputFileName', (ev, params) => {
