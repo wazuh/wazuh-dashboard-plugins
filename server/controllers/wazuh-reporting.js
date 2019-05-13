@@ -194,8 +194,8 @@ export class WazuhReportingCtrl {
           parseInt(a[a.length - 1]) < parseInt(b[b.length - 1])
             ? 1
             : parseInt(a[a.length - 1]) > parseInt(b[b.length - 1])
-            ? -1
-            : 0;
+              ? -1
+              : 0;
 
         TimSort.sort(rows, sortFunction);
 
@@ -237,6 +237,91 @@ export class WazuhReportingCtrl {
   }
 
   /**
+   * This performs the rendering of given tables
+   * @param {Array<Object>} tables tables to render
+   */
+  renderConfigTables(tables) {
+    for (const table of tables) {
+      let rowsparsed = table.rows;
+      if (Array.isArray(rowsparsed) && rowsparsed.length) {
+        const rows =
+          rowsparsed.length > 100 ? rowsparsed.slice(0, 99) : rowsparsed;
+        this.dd.content.push({
+          text: table.title,
+          style: { fontSize: 11, color: '#000' }
+        });
+
+        const full_body = [];
+
+        const modifiedRows = [];
+        for (const row of rows) {
+          modifiedRows.push(
+            row.map(cell => ({ text: cell, style: 'standard' }))
+          );
+        }
+        let widths = [];
+        if (table.type === 'config') {
+          widths = Array(table.columns.length).fill('50%');
+        } else {
+          widths = Array(table.columns.length - 1).fill('auto');
+          widths.push('*');
+        }
+
+        if (table.type === 'config') {
+          full_body.push(
+            table.columns.map(col => ({
+              text: col,
+              border: [0, 0, 0, 20],
+              fontSize: 0,
+              colSpan: 2
+            })),
+            ...modifiedRows
+          );
+          this.dd.content.push({
+            fontSize: 8,
+            table: {
+              headerRows: 0,
+              widths,
+              body: full_body,
+              dontBreakRows: true
+            },
+            layout: {
+              fillColor: i => (i === 0 ? '#fff' : null),
+              hLineColor: () => '#D3DAE6',
+              hLineWidth: () => 1,
+              vLineWidth: () => 0
+            }
+          });
+        } else if (table.type === 'table') {
+          full_body.push(
+            table.columns.map(col => ({
+              text: col,
+              style: 'whiteColor',
+              border: [0, 0, 0, 0]
+            })),
+            ...modifiedRows
+          );
+          this.dd.content.push({
+            fontSize: 8,
+            table: {
+              headerRows: 1,
+              widths,
+              body: full_body
+            },
+            layout: {
+              fillColor: i => (i === 0 ? '#78C8DE' : null),
+              hLineColor: () => '#78C8DE',
+              hLineWidth: () => 1,
+              vLineWidth: () => 0
+            }
+          });
+        }
+        this.dd.content.push('\n');
+      }
+    }
+  }
+
+  /**
    * Format Date to string YYYY-mm-ddTHH:mm:ss
    * @param {*} date JavaScript Date
    */
@@ -249,9 +334,9 @@ export class WazuhReportingCtrl {
     const seconds = date.getSeconds();
     const str = `${year}-${month < 10 ? '0' + month : month}-${
       day < 10 ? '0' + day : day
-    }T${hours < 10 ? '0' + hours : hours}:${
+      }T${hours < 10 ? '0' + hours : hours}:${
       minutes < 10 ? '0' + minutes : minutes
-    }:${seconds < 10 ? '0' + seconds : seconds}`;
+      }:${seconds < 10 ? '0' + seconds : seconds}`;
     return str;
   }
 
@@ -335,14 +420,14 @@ export class WazuhReportingCtrl {
       str +=
         i === len - 1
           ? (filter.meta.negate ? 'NOT ' : '') +
-            filter.meta.key +
-            ': ' +
-            filter.meta.value
+          filter.meta.key +
+          ': ' +
+          filter.meta.value
           : (filter.meta.negate ? 'NOT ' : '') +
-            filter.meta.key +
-            ': ' +
-            filter.meta.value +
-            ' AND ';
+          filter.meta.key +
+          ': ' +
+          filter.meta.value +
+          ' AND ';
     }
 
     if (searchBar) {
@@ -362,10 +447,17 @@ export class WazuhReportingCtrl {
   async renderHeader(section, tab, isAgents, apiId) {
     try {
       if (section && typeof section === 'string') {
-        this.dd.content.push({
-          text: descriptions[tab].title + ' report',
-          style: 'h1'
-        });
+        if (section !== 'agentConfig') {
+          this.dd.content.push({
+            text: descriptions[tab].title + ' report',
+            style: 'h1'
+          });
+        } else {
+          this.dd.content.push({
+            text: `Agent ${isAgents} configuration`,
+            style: 'h1'
+          });
+        }
         this.dd.content.push('\n');
       }
 
@@ -1043,14 +1135,14 @@ export class WazuhReportingCtrl {
             this.dd.content.push({
               text: `Last policy monitoring scan was executed from ${
                 lastScan.data.start
-              } to ${lastScan.data.end}.`,
+                } to ${lastScan.data.end}.`,
               style: 'standard'
             });
           } else if (lastScan.data.start) {
             this.dd.content.push({
               text: `Policy monitoring scan is currently in progress for this agent (started on ${
                 lastScan.data.start
-              }).`,
+                }).`,
               style: 'standard'
             });
           } else {
@@ -1170,13 +1262,13 @@ export class WazuhReportingCtrl {
             this.dd.content.push({
               text: `Last file integrity monitoring scan was executed from ${
                 lastScan.data.start
-              } to ${lastScan.data.end}.`
+                } to ${lastScan.data.end}.`
             });
           } else if (lastScan.data.start) {
             this.dd.content.push({
               text: `File integrity monitoring scan is currently in progress for this agent (started on ${
                 lastScan.data.start
-              }).`
+                }).`
             });
           } else {
             this.dd.content.push({
@@ -1240,7 +1332,7 @@ export class WazuhReportingCtrl {
           if (hardware.data.ram && hardware.data.ram.total)
             ulcustom.push(
               Number(hardware.data.ram.total / 1024 / 1024).toFixed(2) +
-                'GB RAM'
+              'GB RAM'
             );
           ulcustom &&
             ulcustom.length &&
@@ -1377,6 +1469,67 @@ export class WazuhReportingCtrl {
     }
   }
 
+  getConfigRows = (data, labels) => {
+    const result = [];
+    for (let prop in data || []) {
+      result.push([(labels || {})[prop] || prop, data[prop]]);
+    }
+    return result;
+  };
+
+  getConfigTables = (data, section, tab, array = []) => {
+    let plainData = {};
+    const nestedData = [];
+    const tableData = [];
+    for (let key in data) {
+      if (
+        ((typeof data[key] !== 'object' && !Array.isArray(data[key])) ||
+          ((Array.isArray(data[key]) && typeof data[key][0] !== 'object')))
+      ) {
+        plainData[key] =
+          Array.isArray(data[key]) && typeof data[key][0] !== 'object'
+            ? data[key].map(x => { return x + '\n' })
+            : data[key];
+      } else if (Array.isArray(data[key]) && typeof data[key][0] === 'object') {
+        tableData[key] = data[key];
+      } else {
+        nestedData.push(data[key]);
+      }
+    }
+    array.push({
+      title: (section.options || {}).hideHeader
+        ? ''
+        : (section.tabs || [])[tab] || 'Main settings',
+      columns: ['', ''],
+      type: 'config',
+      rows: this.getConfigRows(plainData, (section.labels || [])[0])
+    });
+    for (let key in tableData) {
+      const columns = Object.keys(tableData[key][0]);
+      const rows = tableData[key].map(x => {
+        let row = [];
+        for (var key in x) {
+          row.push(
+            typeof x[key] !== 'object' ? x[key] : Array.isArray(x[key]) ? x[key].map(x => { return x + '\n' }) : JSON.stringify(x[key])
+          );
+        }
+        return row;
+      });
+      array.push({
+        title: ((section.labels || [])[0] || [])[key] || '',
+        type: 'table',
+        columns,
+        rows
+      });
+    }
+
+    nestedData.forEach(nest => {
+      this.getConfigTables(nest, section, tab + 1, array);
+    })
+
+    return array;
+  };
+
   /**
    * Builds a PDF report from multiple PNG images
    * @param {Object} req
@@ -1395,18 +1548,26 @@ export class WazuhReportingCtrl {
       if (req.payload && req.payload.array) {
         const payload = (req || {}).payload || {};
         const headers = (req || {}).headers || {};
-        const { name, tab, section, isAgents, browserTimezone } = payload;
+        const {
+          name,
+          tab,
+          section,
+          isAgents,
+          browserTimezone,
+          configurations
+        } = payload;
         const apiId = headers.id || false;
         const pattern = headers.pattern || false;
         const from = (payload.time || {}).from || false;
         const to = (payload.time || {}).to || false;
-        const kfilters = req.payload.filters;
+        let kfilters = req.payload.filters;
+        const isAgentConfig = tab === 'agentConfig';
 
         if (!tab)
           throw new Error(
             'Reporting needs a valid app tab in order to work properly'
           );
-        if (!section)
+        if (!section && !isAgentConfig)
           throw new Error(
             'Reporting needs a valid app section in order to work properly'
           );
@@ -1419,9 +1580,89 @@ export class WazuhReportingCtrl {
             'Reporting needs a valid file name in order to work properly'
           );
 
-        const isSycollector = tab === 'syscollector';
-
         let tables = [];
+        if (isAgentConfig) {
+          const a_id = kfilters[0].agent;
+          let wmodules = {};
+          try {
+            wmodules = await this.apiRequest.makeGenericRequest(
+              'GET',
+              `/agents/${a_id}/config/wmodules/wmodules`,
+              {},
+              apiId
+            );
+          } catch (err) { } //eslint-disable-line
+          kfilters = [];
+          await this.renderHeader(tab, tab, a_id, apiId);
+          for (let config of configurations) {
+            this.dd.content.push({
+              text: config.title,
+              style: 'h1',
+              margin: [0, 0, 0, 15]
+            });
+            for (let section of config.sections) {
+              if (section.config || section.wodle) {
+                let idx = 0;
+                const configs = (section.config || []).concat(
+                  section.wodle || []
+                );
+                for (let conf of configs) {
+                  let data = {};
+                  try {
+                    if (!conf['name']) {
+                      data = await this.apiRequest.makeGenericRequest(
+                        'GET',
+                        `/agents/${a_id}/config/${conf.component}/${
+                        conf.configuration
+                        }`,
+                        {},
+                        apiId
+                      );
+                    } else {
+                      for (let wodle of wmodules.data['wmodules']) {
+                        if (Object.keys(wodle)[0] === conf['name']) {
+                          data.data = wodle;
+                        }
+                      }
+                    }
+                    if (data && data.data) {
+                      for (let _d of Object.keys(data.data)) {
+                        if (idx === 0) {
+                          this.dd.content.push({
+                            text: section.subtitle,
+                            style: 'h4'
+                          });
+                          this.dd.content.push({
+                            text: section.desc,
+                            style: { fontSize: 12, color: '#000' },
+                            margin: [0, 0, 0, 20]
+                          });
+                        }
+                        if (Array.isArray(data.data[_d])) {
+                          for (let _d2 of data.data[_d]) {
+                            tables.push(
+                              ...this.getConfigTables(_d2, section, idx)
+                            );
+                          }
+                        } else {
+                          tables.push(
+                            ...this.getConfigTables(data.data[_d], section, idx)
+                          );
+                        }
+                      }
+                    }
+                  } catch (err) { } //eslint-disable-line
+                  idx++;
+                }
+                for (const table of tables) {
+                  this.renderConfigTables([table]);
+                }
+              }
+              tables = [];
+            }
+          }
+        }
+        const isSycollector = tab === 'syscollector';
         if (isSycollector) {
           let agentId = '';
           let agentOs = '';
@@ -1450,7 +1691,7 @@ export class WazuhReportingCtrl {
               agent && agent.data && agent.data.os && agent.data.os.platform
                 ? agent.data.os.platform
                 : '';
-          } catch (err) {} //eslint-disable-line
+          } catch (err) { } //eslint-disable-line
           try {
             const packages = await this.apiRequest.makeGenericRequest(
               'GET',
@@ -1465,26 +1706,26 @@ export class WazuhReportingCtrl {
                   agentOs === 'windows'
                     ? ['Name', 'Architecture', 'Version', 'Vendor']
                     : [
-                        'Name',
-                        'Architecture',
-                        'Version',
-                        'Vendor',
-                        'Description'
-                      ],
+                      'Name',
+                      'Architecture',
+                      'Version',
+                      'Vendor',
+                      'Description'
+                    ],
                 rows: packages.data.items.map(x => {
                   return agentOs === 'windows'
                     ? [x['name'], x['architecture'], x['version'], x['vendor']]
                     : [
-                        x['name'],
-                        x['architecture'],
-                        x['version'],
-                        x['vendor'],
-                        x['description']
-                      ];
+                      x['name'],
+                      x['architecture'],
+                      x['version'],
+                      x['vendor'],
+                      x['description']
+                    ];
                 })
               });
             }
-          } catch (err) {} //eslint-disable-line
+          } catch (err) { } //eslint-disable-line
           try {
             const processes = await this.apiRequest.makeGenericRequest(
               'GET',
@@ -1503,15 +1744,15 @@ export class WazuhReportingCtrl {
                   return agentOs === 'windows'
                     ? [x['name'], x['cmd'], x['priority'], x['nlwp']]
                     : [
-                        x['name'],
-                        x['euser'],
-                        x['nice'],
-                        ProcessEquivalence[x.state]
-                      ];
+                      x['name'],
+                      x['euser'],
+                      x['nice'],
+                      ProcessEquivalence[x.state]
+                    ];
                 })
               });
             }
-          } catch (err) {} //eslint-disable-line
+          } catch (err) { } //eslint-disable-line
 
           try {
             const ports = await this.apiRequest.makeGenericRequest(
@@ -1541,7 +1782,7 @@ export class WazuhReportingCtrl {
                 })
               });
             }
-          } catch (err) {} //eslint-disable-line
+          } catch (err) { } //eslint-disable-line
 
           try {
             const netiface = await this.apiRequest.makeGenericRequest(
@@ -1559,7 +1800,7 @@ export class WazuhReportingCtrl {
                 })
               });
             }
-          } catch (err) {} //eslint-disable-line
+          } catch (err) { } //eslint-disable-line
           try {
             const netaddr = await this.apiRequest.makeGenericRequest(
               'GET',
@@ -1588,10 +1829,11 @@ export class WazuhReportingCtrl {
                 })
               });
             }
-          } catch (err) {} //eslint-disable-line
+          } catch (err) { } //eslint-disable-line
         }
-
-        await this.renderHeader(section, tab, isAgents, apiId);
+        if (!isAgentConfig) {
+          await this.renderHeader(section, tab, isAgents, apiId);
+        }
 
         let filters = false;
         if (kfilters) {
@@ -1617,13 +1859,13 @@ export class WazuhReportingCtrl {
           );
         }
 
-        !isSycollector &&
+        if (!isSycollector && !isAgentConfig) {
           this.renderVisualizations(req.payload.array, isAgents, tab);
-
+        }
         if (isSycollector) {
           this.renderTables(tables, false);
         }
-        if (!isSycollector && req.payload.tables) {
+        if (!isSycollector && !isAgentConfig && req.payload.tables) {
           this.renderTables(req.payload.tables);
         }
 
