@@ -78,8 +78,7 @@ class WzConfigViewer {
         const editorContainer = $('.configViewer');
         const windows = $(window).height();
         const offsetTop = getPosition(editorContainer[0]).y;
-        const bottom = $scope.isLogs ? 75 : 20;
-        editorContainer.height(windows - (offsetTop + bottom));
+        editorContainer.height(windows - (offsetTop + 20));
       }, 1);
     };
 
@@ -109,9 +108,7 @@ class WzConfigViewer {
         setTimeout(function() {
           $scope.xmlCodeBox.refresh();
           $scope.$applyAsync();
-          $scope.isLogs
-            ? dynamicHeight()
-            : window.dispatchEvent(new Event('resize')); // eslint-disable-line
+          window.dispatchEvent(new Event('resize')); // eslint-disable-line
         }, 200);
       }
     };
