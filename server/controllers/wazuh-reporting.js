@@ -1508,7 +1508,7 @@ export class WazuhReportingCtrl {
       const columns = Object.keys(tableData[key][0]);
       const rows = tableData[key].map(x => {
         let row = [];
-        for (var key in x) {
+        for (let key in x) {
           row.push(
             typeof x[key] !== 'object' ? x[key] : Array.isArray(x[key]) ? x[key].map(x => { return x + '\n' }) : JSON.stringify(x[key])
           );
