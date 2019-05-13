@@ -190,7 +190,7 @@
                 ng-click="expandTableRow(item)" ng-class="{'selected': item.expanded}">
                 <td ng-repeat="key in keys" id="td-{{$parent.$index}}-{{$index}}" ng-mouseover="showTooltip($parent.$index, $index, item)">
                     <div ng-class="customColumns ? 'wz-text-truncatable-container' : ''">
-                        <span class="wz-text-truncatable">
+                        <span class="wz-text-truncatable-container wz-text-truncatable">
                             <span ng-show="(key.value || key ) === 'result'" class="no-wrap">
                                 <p class="round status little" ng-class="item.result ? (item.result === 'passed' ? 'teal' : 'red') : 'gray'">
                                 </p>&nbsp;&nbsp;
