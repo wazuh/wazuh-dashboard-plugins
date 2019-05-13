@@ -105,7 +105,7 @@
                     now</button>
             </div>
         </div>
-        <div ng-if="!editorReadOnly && fetchedXML" style="height: calc(100vh - 220px);">
+        <div ng-if="!editorReadOnly && fetchedXML">
             <wz-xml-file-editor file-name='{{type}}' data="fetchedXML"
                 target-name="newFile ? selectedItem.file : currentFile.file" valid-fn='xmlIsValid(valid)'
                 saving-param='toggleSaveConfig()' close-fn='closeEditingFile(reload)'>
