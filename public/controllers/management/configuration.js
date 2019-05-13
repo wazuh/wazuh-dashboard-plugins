@@ -60,7 +60,7 @@ export class ConfigurationController {
 
     this.$scope.isString = item => typeof item === 'string';
 
-    this.hasSize = obj =>
+    this.$scope.hasSize = obj =>
       obj && typeof obj === 'object' && Object.keys(obj).length;
 
     this.$scope.updateSelectedItem = i => (this.$scope.selectedItem = i);
