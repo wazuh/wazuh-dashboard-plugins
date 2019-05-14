@@ -30,6 +30,8 @@ import { WazuhApiCtrl } from './wazuh-api';
 import clockIconRaw from '../reporting/clock-icon-raw';
 import filterIconRaw from '../reporting/filter-icon-raw';
 import ProcessEquivalence from '../../util/process-state-equivalence';
+import { KeyEquivalence } from '../../util/csv-key-equivalence';
+import { AgentConfiguration } from '../reporting/agent-configuration';
 
 import {
   AgentsVisualizations,
@@ -194,8 +196,8 @@ export class WazuhReportingCtrl {
           parseInt(a[a.length - 1]) < parseInt(b[b.length - 1])
             ? 1
             : parseInt(a[a.length - 1]) > parseInt(b[b.length - 1])
-              ? -1
-              : 0;
+            ? -1
+            : 0;
 
         TimSort.sort(rows, sortFunction);
 
@@ -263,7 +265,8 @@ export class WazuhReportingCtrl {
         if (table.type === 'config') {
           widths = Array(table.columns.length).fill('50%');
         } else {
-          widths = Array(table.columns.length - 1).fill('auto');
+          const col = 100 / table.columns.length;
+          widths = Array(table.columns.length - 1).fill(`${col - 9}%`);
           widths.push('*');
         }
 
@@ -334,9 +337,9 @@ export class WazuhReportingCtrl {
     const seconds = date.getSeconds();
     const str = `${year}-${month < 10 ? '0' + month : month}-${
       day < 10 ? '0' + day : day
-      }T${hours < 10 ? '0' + hours : hours}:${
+    }T${hours < 10 ? '0' + hours : hours}:${
       minutes < 10 ? '0' + minutes : minutes
-      }:${seconds < 10 ? '0' + seconds : seconds}`;
+    }:${seconds < 10 ? '0' + seconds : seconds}`;
     return str;
   }
 
@@ -420,14 +423,14 @@ export class WazuhReportingCtrl {
       str +=
         i === len - 1
           ? (filter.meta.negate ? 'NOT ' : '') +
-          filter.meta.key +
-          ': ' +
-          filter.meta.value
+            filter.meta.key +
+            ': ' +
+            filter.meta.value
           : (filter.meta.negate ? 'NOT ' : '') +
-          filter.meta.key +
-          ': ' +
-          filter.meta.value +
-          ' AND ';
+            filter.meta.key +
+            ': ' +
+            filter.meta.value +
+            ' AND ';
     }
 
     if (searchBar) {
@@ -1135,14 +1138,14 @@ export class WazuhReportingCtrl {
             this.dd.content.push({
               text: `Last policy monitoring scan was executed from ${
                 lastScan.data.start
-                } to ${lastScan.data.end}.`,
+              } to ${lastScan.data.end}.`,
               style: 'standard'
             });
           } else if (lastScan.data.start) {
             this.dd.content.push({
               text: `Policy monitoring scan is currently in progress for this agent (started on ${
                 lastScan.data.start
-                }).`,
+              }).`,
               style: 'standard'
             });
           } else {
@@ -1262,13 +1265,13 @@ export class WazuhReportingCtrl {
             this.dd.content.push({
               text: `Last file integrity monitoring scan was executed from ${
                 lastScan.data.start
-                } to ${lastScan.data.end}.`
+              } to ${lastScan.data.end}.`
             });
           } else if (lastScan.data.start) {
             this.dd.content.push({
               text: `File integrity monitoring scan is currently in progress for this agent (started on ${
                 lastScan.data.start
-                }).`
+              }).`
             });
           } else {
             this.dd.content.push({
@@ -1332,7 +1335,7 @@ export class WazuhReportingCtrl {
           if (hardware.data.ram && hardware.data.ram.total)
             ulcustom.push(
               Number(hardware.data.ram.total / 1024 / 1024).toFixed(2) +
-              'GB RAM'
+                'GB RAM'
             );
           ulcustom &&
             ulcustom.length &&
@@ -1472,7 +1475,10 @@ export class WazuhReportingCtrl {
   getConfigRows = (data, labels) => {
     const result = [];
     for (let prop in data || []) {
-      result.push([(labels || {})[prop] || prop, data[prop]]);
+      result.push([
+        (labels || {})[prop] || KeyEquivalence[prop] || prop,
+        data[prop] || '-'
+      ]);
     }
     return result;
   };
@@ -1483,12 +1489,14 @@ export class WazuhReportingCtrl {
     const tableData = [];
     for (let key in data) {
       if (
-        ((typeof data[key] !== 'object' && !Array.isArray(data[key])) ||
-          ((Array.isArray(data[key]) && typeof data[key][0] !== 'object')))
+        (typeof data[key] !== 'object' && !Array.isArray(data[key])) ||
+        (Array.isArray(data[key]) && typeof data[key][0] !== 'object')
       ) {
         plainData[key] =
           Array.isArray(data[key]) && typeof data[key][0] !== 'object'
-            ? data[key].map(x => { return x + '\n' })
+            ? data[key].map(x => {
+                return x + '\n';
+              })
             : data[key];
       } else if (Array.isArray(data[key]) && typeof data[key][0] === 'object') {
         tableData[key] = data[key];
@@ -1510,7 +1518,13 @@ export class WazuhReportingCtrl {
         let row = [];
         for (let key in x) {
           row.push(
-            typeof x[key] !== 'object' ? x[key] : Array.isArray(x[key]) ? x[key].map(x => { return x + '\n' }) : JSON.stringify(x[key])
+            typeof x[key] !== 'object'
+              ? x[key]
+              : Array.isArray(x[key])
+              ? x[key].map(x => {
+                  return x + '\n';
+                })
+              : JSON.stringify(x[key])
           );
         }
         return row;
@@ -1525,7 +1539,7 @@ export class WazuhReportingCtrl {
 
     nestedData.forEach(nest => {
       this.getConfigTables(nest, section, tab + 1, array);
-    })
+    });
 
     return array;
   };
@@ -1548,14 +1562,7 @@ export class WazuhReportingCtrl {
       if (req.payload && req.payload.array) {
         const payload = (req || {}).payload || {};
         const headers = (req || {}).headers || {};
-        const {
-          name,
-          tab,
-          section,
-          isAgents,
-          browserTimezone,
-          configurations
-        } = payload;
+        const { name, tab, section, isAgents, browserTimezone } = payload;
         const apiId = headers.id || false;
         const pattern = headers.pattern || false;
         const from = (payload.time || {}).from || false;
@@ -1582,6 +1589,7 @@ export class WazuhReportingCtrl {
 
         let tables = [];
         if (isAgentConfig) {
+          const configurations = AgentConfiguration.configurations;
           const a_id = kfilters[0].agent;
           let wmodules = {};
           try {
@@ -1591,7 +1599,7 @@ export class WazuhReportingCtrl {
               {},
               apiId
             );
-          } catch (err) { } //eslint-disable-line
+          } catch (err) {} //eslint-disable-line
           kfilters = [];
           await this.renderHeader(tab, tab, a_id, apiId);
           for (let config of configurations) {
@@ -1613,7 +1621,7 @@ export class WazuhReportingCtrl {
                       data = await this.apiRequest.makeGenericRequest(
                         'GET',
                         `/agents/${a_id}/config/${conf.component}/${
-                        conf.configuration
+                          conf.configuration
                         }`,
                         {},
                         apiId
@@ -1625,7 +1633,12 @@ export class WazuhReportingCtrl {
                         }
                       }
                     }
-                    if (data && data.data) {
+                    if (
+                      data &&
+                      data.data &&
+                      Object.keys(data.data[Object.keys(data.data)[0]]).length >
+                        0
+                    ) {
                       for (let _d of Object.keys(data.data)) {
                         if (idx === 0) {
                           this.dd.content.push({
@@ -1651,7 +1664,7 @@ export class WazuhReportingCtrl {
                         }
                       }
                     }
-                  } catch (err) { } //eslint-disable-line
+                  } catch (err) {} //eslint-disable-line
                   idx++;
                 }
                 for (const table of tables) {
@@ -1691,7 +1704,7 @@ export class WazuhReportingCtrl {
               agent && agent.data && agent.data.os && agent.data.os.platform
                 ? agent.data.os.platform
                 : '';
-          } catch (err) { } //eslint-disable-line
+          } catch (err) {} //eslint-disable-line
           try {
             const packages = await this.apiRequest.makeGenericRequest(
               'GET',
@@ -1706,26 +1719,26 @@ export class WazuhReportingCtrl {
                   agentOs === 'windows'
                     ? ['Name', 'Architecture', 'Version', 'Vendor']
                     : [
-                      'Name',
-                      'Architecture',
-                      'Version',
-                      'Vendor',
-                      'Description'
-                    ],
+                        'Name',
+                        'Architecture',
+                        'Version',
+                        'Vendor',
+                        'Description'
+                      ],
                 rows: packages.data.items.map(x => {
                   return agentOs === 'windows'
                     ? [x['name'], x['architecture'], x['version'], x['vendor']]
                     : [
-                      x['name'],
-                      x['architecture'],
-                      x['version'],
-                      x['vendor'],
-                      x['description']
-                    ];
+                        x['name'],
+                        x['architecture'],
+                        x['version'],
+                        x['vendor'],
+                        x['description']
+                      ];
                 })
               });
             }
-          } catch (err) { } //eslint-disable-line
+          } catch (err) {} //eslint-disable-line
           try {
             const processes = await this.apiRequest.makeGenericRequest(
               'GET',
@@ -1744,15 +1757,15 @@ export class WazuhReportingCtrl {
                   return agentOs === 'windows'
                     ? [x['name'], x['cmd'], x['priority'], x['nlwp']]
                     : [
-                      x['name'],
-                      x['euser'],
-                      x['nice'],
-                      ProcessEquivalence[x.state]
-                    ];
+                        x['name'],
+                        x['euser'],
+                        x['nice'],
+                        ProcessEquivalence[x.state]
+                      ];
                 })
               });
             }
-          } catch (err) { } //eslint-disable-line
+          } catch (err) {} //eslint-disable-line
 
           try {
             const ports = await this.apiRequest.makeGenericRequest(
@@ -1782,7 +1795,7 @@ export class WazuhReportingCtrl {
                 })
               });
             }
-          } catch (err) { } //eslint-disable-line
+          } catch (err) {} //eslint-disable-line
 
           try {
             const netiface = await this.apiRequest.makeGenericRequest(
@@ -1800,7 +1813,7 @@ export class WazuhReportingCtrl {
                 })
               });
             }
-          } catch (err) { } //eslint-disable-line
+          } catch (err) {} //eslint-disable-line
           try {
             const netaddr = await this.apiRequest.makeGenericRequest(
               'GET',
@@ -1829,7 +1842,7 @@ export class WazuhReportingCtrl {
                 })
               });
             }
-          } catch (err) { } //eslint-disable-line
+          } catch (err) {} //eslint-disable-line
         }
         if (!isAgentConfig) {
           await this.renderHeader(section, tab, isAgents, apiId);

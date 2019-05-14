@@ -12,7 +12,7 @@
 
 import template from './wz-data-table.html';
 import { uiModules } from 'ui/modules';
-import { KeyEquivalenece } from '../../../util/csv-key-equivalence';
+import { KeyEquivalence } from '../../../util/csv-key-equivalence';
 import { calcTableRows } from '../wz-table/lib/rows';
 import * as pagination from '../wz-table/lib/pagination';
 import { checkGap } from '../wz-table/lib/check-gap';
@@ -31,7 +31,7 @@ app.directive('wzDataTable', function() {
       /**
        * Init variables
        */
-      $scope.keyEquivalence = KeyEquivalenece;
+      $scope.keyEquivalence = KeyEquivalence;
       $scope.totalItems = 0;
       $scope.wazuh_table_loading = true;
       $scope.items = [];
