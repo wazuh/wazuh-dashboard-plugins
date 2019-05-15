@@ -75,7 +75,6 @@ export const AgentConfiguration = {
           wodle: [{ name: 'sca' }],
           labels: [
             {
-              system_audit: 'System audit',
               disabled: 'Policy monitoring service enabled',
               base_directory: 'Base directory',
               rootkit_files: 'Rootkit files database path',
@@ -94,7 +93,6 @@ export const AgentConfiguration = {
               system_audit: 'UNIX audit files paths',
               enabled: 'Security configuration assessment enabled',
               scan_on_start: 'Scan on start',
-              skip_nfs: 'Skip nfs',
               interval: 'Interval',
               policies: 'Policies'
             }
