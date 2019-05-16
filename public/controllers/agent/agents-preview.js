@@ -94,14 +94,6 @@ export class AgentsPreviewController {
         !parameters.items.length > 0 && !parameters.filters.length;
     });
 
-    this.$scope.offsetTimestamp = (text, time) => {
-      try {
-        return text + this.timeService.offset(time);
-      } catch (error) {
-        return '';
-      }
-    };
-
     this.init = false;
     //Load
     this.load();

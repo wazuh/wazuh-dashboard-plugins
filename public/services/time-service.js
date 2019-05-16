@@ -22,7 +22,7 @@ export class TimeService {
       const offsetTime = new Date(date.getTime() - offset * 60000);
       return offsetTime.toLocaleString('en-ZA').replace(',', '');
     } catch (error) {
-      return Promise.reject(error);
+      throw new Error(error);
     }
   }
 }

@@ -47,13 +47,13 @@ export class ReportingController {
     this.groupToPages();
   }
 
-  offsetTimestamp = time => {
+  offsetTimestamp(time) {
     try {
       return this.timeService.offset(time);
     } catch (error) {
-      return '';
+      return `${time} (UTC)`;
     }
-  };
+  }
 
   /**
    * This delete a report with a given name

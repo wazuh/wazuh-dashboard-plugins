@@ -27,8 +27,8 @@ export function parseValue(
   key,
   item,
   instancePath,
-  $sce = null,
-  timeService = null
+  $sce = false,
+  timeService = false
 ) {
   if (
     (key === 'event' || (key.value && key.value === 'event')) &&
