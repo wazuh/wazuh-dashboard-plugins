@@ -402,7 +402,8 @@ export class ElasticWrapper {
           doc: {
             type: 'index-pattern',
             'index-pattern': {
-              fields: currentFieldsString
+              fields: currentFieldsString,
+              timeFieldName: 'timestamp'
             }
           }
         }
