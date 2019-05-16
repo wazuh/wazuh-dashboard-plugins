@@ -2,11 +2,28 @@
 
 All notable changes to the Wazuh app project will be documented in this file.
 
-## Wazuh v3.9.0 - Kibana v6.7.0 / v6.7.1 - Revision 502
+## Wazuh v3.9.0 - Kibana v7.0.0 / v7.0.1 - Revision 502
 
 ### Added
 
 - Support for Kibana v7.0.0 / v7.0.1
+
+## Wazuh v3.9.1 - Kibana v6.7.2 - Revision 442
+
+### Fixed
+
+- Fixed background color for some parts of the Discover directive [2dfc763](https://github.com/wazuh/wazuh-kibana-app/commit/2dfc763bfa1093fb419f118c2938f6b348562c69).
+- Fixed cut values in non-resizable tables when the value is too large [cc4828f](https://github.com/wazuh/wazuh-kibana-app/commit/cc4828fbf50d4dab3dd4bb430617c1f2b13dac6a).
+- Fixed handled but not shown error messages from rule editor [0aa0e17](https://github.com/wazuh/wazuh-kibana-app/commit/0aa0e17ac8678879e5066f8d83fd46f5d8edd86a).
+- Minor typos corrected [fe11fb6](https://github.com/wazuh/wazuh-kibana-app/commit/fe11fb67e752368aedc89ec844ddf729eb8ad761).
+- Minor fixes in agents configuration [1bc2175](https://github.com/wazuh/wazuh-kibana-app/commit/1bc217590438573e7267687655bb5939b5bb9fde).
+
+### Changed
+
+- Kibana version shown in settings is now read from our package.json [c103d3e](https://github.com/wazuh/wazuh-kibana-app/commit/c103d3e782136106736c02039d28c4567b255aaa).
+- Removed an old header from Settings [0197b8b](https://github.com/wazuh/wazuh-kibana-app/commit/0197b8b1abc195f275c8cd9893df84cd5569527b).
+- Improved index pattern validation fields, replaced "full_log" with "rule.id" as part of the minimum required fields [dce0595](https://github.com/wazuh/wazuh-kibana-app/commit/dce059501cbd28f1294fd761da3e015e154747bc).
+- Improve dynamic height for configuration editor [c318131](https://github.com/wazuh/wazuh-kibana-app/commit/c318131dfb6b5f01752593f2aa972b98c0655610).
 
 ## Wazuh v3.9.0 - Kibana v6.7.0 / v6.7.1 / v6.7.2 - Revision 441
 
