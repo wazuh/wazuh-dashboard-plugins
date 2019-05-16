@@ -294,7 +294,7 @@ export class ElasticWrapper {
       // Ensure '@timestamp' field is always excluded, >= 7.0.0 is using 'timestamp'
       try {
         const idx = currentFields.map(item => item.name).indexOf('@timestamp');
-        if (idx || idx === 0) {
+        if (idx > -1) {
           currentFields[idx].excluded = true;
         }
       } catch (error) {} // eslint-disable-line
