@@ -316,6 +316,7 @@ export class ElasticWrapper {
           doc: {
             type: 'index-pattern',
             'index-pattern': {
+              timeFieldName: 'timestamp',
               fields: currentFieldsString,
               fieldFormatMap: `{
                   "data.virustotal.permalink":{"id":"url"},
