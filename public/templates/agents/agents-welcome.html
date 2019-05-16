@@ -158,8 +158,12 @@
                     </div>
                 </div>
                 <div ng-if="editGroup && !addingGroupToAgent && groups && groups.length" class="wz-margin-top-4">
-                    <span ng-repeat="group in groups" class="wz-text-bold wz-text-link" ng-click="showConfirmAddGroup(group)">{{
-                        group }}&nbsp;</span>
+                    <div class="euiFlexGrid">
+                        <span ng-repeat="group in groups" class="wz-margin-left-8 wz-text-link euiFlexItem euiFlexItem--flexGrowZero"
+                            ng-click="showConfirmAddGroup(group)">{{
+                            group }}</span>
+                    </div>
+
                 </div>
 
                 <div class="wz-margin-top-10 confirmEmbedBubble" ng-if="agent.group && editGroup && addingGroupToAgent">
@@ -174,9 +178,12 @@
                     </div>
                 </div>
                 <div layout="row" class="wz-word-break wz-padding-top-10">
-                    <span ng-repeat="group in agent.group" class="wz-text-bold wz-text-link" ng-click="goGroups(agent,$index)">{{
-                        group
-                        }}&nbsp;</span>
+                    <div class="euiFlexGrid">
+                        <span ng-repeat="group in agent.group" class="wz-text-link wz-margin-left-8 euiFlexItem euiFlexItem--flexGrowZero"
+                            ng-click="goGroups(agent,$index)">{{
+                            group
+                            }}</span>
+                    </div>
                 </div>
 
             </md-card-content>

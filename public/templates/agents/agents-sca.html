@@ -45,8 +45,8 @@
         <div class="layout-column md-padding" ng-repeat="policy in policies">
             <span class="wz-headline-title">{{policy.name}}</span>
             <md-divider class="wz-margin-top-10"></md-divider>
-            <canvas id="bar" class="wz-margin-top-10 chart chart-doughnut" chart-data="[policy.pass, policy.fail]"
-                chart-labels="['pass','fail']" chart-colors="['#00a69b', '#ff645c']"
+            <canvas id="bar" class="wz-margin-top-10 chart chart-doughnut" chart-data="[policy.pass, policy.fail, policy.invalid]"
+                chart-labels="['pass','fail', 'not applicable']" chart-colors="['#00a69b', '#ff645c', '#5c6773']"
                 chart-options="{cutoutPercentage: 75, legend: {display: true,position: 'right',},responsive: false, maintainAspectRatio: false}" />
         </div>
     </div>
@@ -66,10 +66,13 @@
                         <div class="euiTableCellContent"><span class="euiTableCellContent__text">Last scan</span></div>
                     </th>
                     <th class="euiTableHeaderCell padding-left-0">
+                         <div class="euiTableCellContent"><span class="euiTableCellContent__text">Pass</span></div>
+                    </th>
+                    <th class="euiTableHeaderCell padding-left-0">
                         <div class="euiTableCellContent"><span class="euiTableCellContent__text">Fail</span></div>
                     </th>
                     <th class="euiTableHeaderCell padding-left-0">
-                        <div class="euiTableCellContent"><span class="euiTableCellContent__text">Pass</span></div>
+                        <div class="euiTableCellContent"><span class="euiTableCellContent__text">Not applicable</span></div>
                     </th>
                     <th class="euiTableHeaderCell padding-left-0">
                         <div class="euiTableCellContent"><span class="euiTableCellContent__text">Score</span></div>
@@ -98,12 +101,17 @@
                     </td>
                     <td class="euiTableRowCell">
                         <div class="euiTableCellContent euiTableCellContent--overflowingContent no-wrap">
+                            <span>{{policy.pass}}</span>
+                        </div>
+                    </td>
+                    <td class="euiTableRowCell">
+                        <div class="euiTableCellContent euiTableCellContent--overflowingContent no-wrap">
                             <span>{{policy.fail}}</span>
                         </div>
                     </td>
                     <td class="euiTableRowCell">
                         <div class="euiTableCellContent euiTableCellContent--overflowingContent no-wrap">
-                            <span>{{policy.pass}}</span>
+                            <span>{{policy.invalid}}</span>
                         </div>
                     </td>
                     <td class="euiTableRowCell">
@@ -125,6 +133,7 @@
                     </span>
                     <span class="wz-margin-left-16">Pass: <span class="wz-text-bold">{{lookingSca.pass}}</span></span>
                     <span class="wz-margin-left-16">Fail: <span class="wz-text-bold">{{lookingSca.fail}}</span></span>
+                    <span class="wz-margin-left-16">Not applicable: <span class="wz-text-bold">{{lookingSca.invalid}}</span></span>
                     <span class="wz-margin-left-16">Score: <span class="wz-text-bold">{{lookingSca.score}}%</span></span>
                     <span flex></span>
                     <span class="wz-text-gray">{{lookingSca.end_scan}}</span>

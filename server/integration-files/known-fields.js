@@ -5846,6 +5846,24 @@ export const knownFields = [
     readFromDocValues: true
   },
   {
+    name: 'data.sca.check.status',
+    type: 'string',
+    count: 0,
+    scripted: false,
+    searchable: true,
+    aggregatable: true,
+    readFromDocValues: true
+  },
+  {
+    name: 'data.sca.check.reason',
+    type: 'string',
+    count: 0,
+    scripted: false,
+    searchable: true,
+    aggregatable: true,
+    readFromDocValues: true
+  },
+  {
     name: 'data.sca.description',
     type: 'string',
     count: 0,
@@ -5883,6 +5901,15 @@ export const knownFields = [
   },
   {
     name: 'data.sca.passed',
+    type: 'number',
+    count: 0,
+    scripted: false,
+    searchable: true,
+    aggregatable: true,
+    readFromDocValues: true
+  },
+  {
+    name: 'data.sca.invalid',
     type: 'number',
     count: 0,
     scripted: false,

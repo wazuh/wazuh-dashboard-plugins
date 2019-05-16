@@ -33,7 +33,8 @@ export class ConfigurationController {
     this.configurationTab = '';
     this.configurationSubTab = '';
     this.integrations = {};
-    this.selectedItem = 0;
+    this.$scope.integrations = {};
+    this.$scope.selectedItem = 0;
     this.showHelp = false;
   }
 
@@ -59,10 +60,10 @@ export class ConfigurationController {
 
     this.$scope.isString = item => typeof item === 'string';
 
-    this.hasSize = obj =>
+    this.$scope.hasSize = obj =>
       obj && typeof obj === 'object' && Object.keys(obj).length;
 
-    this.$scope.updateSelectedItem = i => (this.selectedItem = i);
+    this.$scope.updateSelectedItem = i => (this.$scope.selectedItem = i);
 
     this.getIntegration = list =>
       this.configurationHandler.getIntegration(list, this.$scope);
@@ -84,7 +85,7 @@ export class ConfigurationController {
   }
 
   switchConfigurationSubTab(configurationSubTab) {
-    this.selectedItem = 0;
+    this.$scope.selectedItem = 0;
     this.configurationHandler.switchConfigurationSubTab(
       configurationSubTab,
       this.$scope

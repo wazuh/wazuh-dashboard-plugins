@@ -22,8 +22,7 @@
                 <span flex></span>
                 <span class="cursor-pointer" ng-click="restart()">Restart now</span>
             </div>
-            <md-card-content
-                ng-style="hideClose && {'min-height': 'calc(100vh - 378px)'} || {'min-height': 'calc(100vh - 308px)'}">
+            <md-card-content>
                 <div layout="row">
                     <input placeholder="Filter entries..." ng-model="searchTerm" ng-change="filterTable()" type="text"
                         class="kuiLocalSearchInput ng-empty ng-pristine ng-scope ng-touched ng-valid height-40">
@@ -58,7 +57,7 @@
                             <td>
                                 <input ng-show="editingKey === item[0]" ng-disabled="loadingChange" type="text"
                                     class="wz-input-text" ng-model="currentList.editingNewValue"></input>
-                                <span ng-show="!editingKey || editingKey !== item[0]">{{item[1]}}</span>
+                                <span ng-show="!editingKey || editingKey !== item[0]">{{item[1] || '-'}}</span>
                             </td>
                             <td class="action-btn-td">
                                 <div ng-hide="!adminMode">
