@@ -17,7 +17,7 @@ export class TimeService {
    */
   offset(d) {
     try {
-      const date = new Date(d);
+      const date = new Date(d.replace('Z', ''));
       const offset = new Date().getTimezoneOffset();
       const offsetTime = new Date(date.getTime() - offset * 60000);
       return offsetTime.toLocaleString('en-ZA').replace(',', '');
