@@ -96,9 +96,7 @@
                     </td>
                     <td class="euiTableRowCell">
                         <div class="euiTableCellContent euiTableCellContent--overflowingContent no-wrap">
-                            <span>{{policy.end_scan
-                                || '-'
-                                }}</span>
+                            <span ng-bind="policy.end_scan ? offsetTimestamp('', policy.end_scan) : '-'"></span>
                         </div>
                     </td>
                     <td class="euiTableRowCell">
