@@ -21,7 +21,15 @@ export class LogsController {
    * @param {*} appState
    * @param {*} wzTableFilter
    */
-  constructor($scope, apiReq, errorHandler, csvReq, appState, wzTableFilter) {
+  constructor(
+    $scope,
+    apiReq,
+    errorHandler,
+    csvReq,
+    appState,
+    wzTableFilter,
+    timeService
+  ) {
     this.$scope = $scope;
     this.apiReq = apiReq;
     this.errorHandler = errorHandler;
@@ -32,6 +40,7 @@ export class LogsController {
     this.type_log = 'all';
     this.category = 'all';
     this.sortFilter = false;
+    this.timeService = timeService;
   }
 
   /**
@@ -62,18 +71,18 @@ export class LogsController {
 
   parseLogsToText(logs) {
     let result = '';
-    logs.forEach(function(log, idx) {
+    logs.forEach((log, idx) => {
       if (log) {
         result = result.concat(
-          `${log.timestamp} ${log.tag} ${(log.level || '').toUpperCase()}: ${
-            log.description
-          }`
+          `${this.timeService.offset(log.timestamp)} ${log.tag} ${(
+            log.level || ''
+          ).toUpperCase()}: ${log.description}`
         );
         if (idx !== logs.length - 1) {
           result = result.concat('\n');
         }
       }
-    });
+    }, this);
     return result;
   }
   /**
