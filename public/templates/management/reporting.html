@@ -48,7 +48,7 @@
                             <tr ng-repeat="item in ctrl.pagedItems[ctrl.currentPage]">
                                 <td>{{item.name}}</td>
                                 <td>{{item.size / 1024 | number: 2}}KB</td>
-                                <td>{{item.date.split('T')[0]}} {{item.date.split('T')[1].split('.')[0]}}</td>
+                                <td><span ng-bind="ctrl.offsetTimestamp(item.date)"></span></td>
                                 <td>
                                     <a ng-click="ctrl.goReport(item.name)" flex class="wz-text-right">
                                         <react-component name="EuiIcon" props="{type:'importAction'}" />

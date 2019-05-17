@@ -69,16 +69,17 @@ class WzConfigViewer {
       bindXmlListener();
     };
 
-    $(window).on('resize', function() {
+    $(window).on('resize', function () {
       dynamicHeight();
     });
 
     const dynamicHeight = () => {
-      setTimeout(function() {
+      setTimeout(function () {
         const editorContainer = $('.configViewer');
         const windows = $(window).height();
         const offsetTop = getPosition(editorContainer[0]).y;
-        editorContainer.height(windows - (offsetTop + 20));
+        const bottom = $scope.isLogs ? 75 : 20;
+        editorContainer.height(windows - (offsetTop + bottom));
       }, 1);
     };
 
@@ -89,7 +90,7 @@ class WzConfigViewer {
       }
       if ($scope.jsoncontent != false) {
         $scope.jsonCodeBox.setValue($scope.jsoncontent.replace(/\\\\/g, '\\'));
-        setTimeout(function() {
+        setTimeout(function () {
           $scope.jsonCodeBox.refresh();
           $scope.$applyAsync();
           window.dispatchEvent(new Event('resize')); // eslint-disable-line
@@ -105,10 +106,12 @@ class WzConfigViewer {
       }
       if ($scope.xmlcontent != false) {
         $scope.xmlCodeBox.setValue($scope.xmlcontent);
-        setTimeout(function() {
+        setTimeout(function () {
           $scope.xmlCodeBox.refresh();
           $scope.$applyAsync();
-          window.dispatchEvent(new Event('resize')); // eslint-disable-line
+          $scope.isLogs
+            ? dynamicHeight()
+            : window.dispatchEvent(new Event('resize'));
         }, 200);
       }
     };
@@ -127,7 +130,7 @@ class WzConfigViewer {
 
     const bindXmlListener = () => {
       var scrollElement = $scope.xmlCodeBox.getScrollerElement();
-      $(scrollElement).bind('scroll', function(e) {
+      $(scrollElement).bind('scroll', function (e) {
         var element = $(e.currentTarget)[0];
         if (element.scrollHeight - element.scrollTop === element.clientHeight) {
           $scope.$emit('scrolledToBottom', {

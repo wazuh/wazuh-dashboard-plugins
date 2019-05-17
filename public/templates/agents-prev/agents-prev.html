@@ -138,7 +138,7 @@
             <md-card-content>
                 <div layout="row">
                     <wz-table custom-columns="true" flex path="'/agents'"
-                        keys="[{value: 'id', width: '75px'},'name','ip','status','group','os.name','os.version','version', 'dateAdd', 'lastKeepAlive']"
+                        keys="[{value: 'id', width: '75px'},'name','ip','status','group','os.name','os.version','version', {value: 'dateAdd', offset: true}, {value: 'lastKeepAlive', offset: true}]"
                         allow-click="true" row-sizes="[17,15,13]"></wz-table>
                 </div>
                 <div layout="row" layout-align="end center">

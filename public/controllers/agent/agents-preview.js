@@ -35,7 +35,8 @@ export class AgentsPreviewController {
     wzTableFilter,
     commonData,
     wazuhConfig,
-    $window
+    $window,
+    timeService
   ) {
     this.$scope = $scope;
     this.genericReq = genericReq;
@@ -49,6 +50,7 @@ export class AgentsPreviewController {
     this.wazuhConfig = wazuhConfig;
     this.errorInit = false;
     this.$window = $window;
+    this.timeService = timeService;
   }
 
   /**
