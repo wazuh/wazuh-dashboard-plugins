@@ -53,24 +53,6 @@ export class ElasticWrapper {
   }
 
   /**
-   * Search any index by name
-   * @param {*} name
-   */
-  async searchIndexByName(name) {
-    try {
-      if (!name) return Promise.reject(new Error('No valid name given'));
-
-      const data = await this.elasticRequest.callWithInternalUser('search', {
-        index: name
-      });
-
-      return data;
-    } catch (error) {
-      return Promise.reject(error);
-    }
-  }
-
-  /**
    * This function creates a new index pattern.
    * @param {*} title Eg: 'wazuh-alerts-3.x-*'
    * @param {*} id Optional.
@@ -136,31 +118,6 @@ export class ElasticWrapper {
   }
 
   /**
-   * Creates the .wazuh-version index with a custom configuration.
-   * @param {*} config
-   */
-  async createWazuhVersionIndex(configuration) {
-    try {
-      if (!configuration)
-        return Promise.reject(
-          new Error('No valid configuration for create .wazuh-version index')
-        );
-
-      const data = await this.elasticRequest.callWithInternalUser(
-        'indices.create',
-        {
-          index: '.wazuh-version',
-          body: configuration
-        }
-      );
-
-      return data;
-    } catch (error) {
-      return Promise.reject(error);
-    }
-  }
-
-  /**
    * Creates the .wazuh index with a custom configuration.
    * @param {*} config
    */
@@ -186,18 +143,18 @@ export class ElasticWrapper {
   }
 
   /**
-   * Inserts configuration on .wazuh-version index
+   * Inserts configuration on .wazuh index
    * @param {*} configuration
    */
   async insertWazuhVersionConfiguration(configuration) {
     try {
       if (!configuration)
         return Promise.reject(
-          new Error('No valid configuration for create .wazuh-version index')
+          new Error('No valid configuration for create .wazuh document')
         );
 
       const data = await this.elasticRequest.callWithInternalUser('create', {
-        index: '.wazuh-version',
+        index: '.wazuh',
         type: '_doc',
         id: 1,
         body: configuration
@@ -416,14 +373,14 @@ export class ElasticWrapper {
   }
 
   /**
-   * Get the .wazuh-version index
+   * Get the .wazuh index document with ID 1
    */
-  async getWazuhVersionIndex() {
+  async getWazuhAppInformation() {
     try {
       const data = await this.elasticRequest.callWithInternalUser('get', {
-        index: '.wazuh-version',
+        index: '.wazuh',
         type: '_doc',
-        id: '1'
+        id: 1
       });
 
       return data;
@@ -433,17 +390,17 @@ export class ElasticWrapper {
   }
 
   /**
-   * Updates lastRestart field on .wazuh-version index
+   * Updates lastRestart field on .wazuh index
    * @param {*} version
    * @param {*} revision
    */
-  async updateWazuhVersionIndexLastRestart(version, revision) {
+  async updateWazuhAppLastRestart(version, revision) {
     try {
       if (!version || !revision)
         return Promise.reject(new Error('No valid version or revision given'));
 
       const data = await this.elasticRequest.callWithInternalUser('update', {
-        index: '.wazuh-version',
+        index: '.wazuh',
         type: '_doc',
         id: 1,
         body: {
@@ -453,22 +410,6 @@ export class ElasticWrapper {
             lastRestart: new Date().toISOString() // Indice exists so we update the lastRestarted date only
           }
         }
-      });
-
-      return data;
-    } catch (error) {
-      return Promise.reject(error);
-    }
-  }
-
-  /**
-   * Get .wazuh-version index
-   */
-  async getWazuhVersionIndexAsSearch() {
-    try {
-      const data = await this.elasticRequest.callWithInternalUser('search', {
-        index: '.wazuh-version',
-        type: '_doc'
       });
 
       return data;
@@ -542,7 +483,20 @@ export class ElasticWrapper {
       const data = await this.elasticRequest.callWithInternalUser('search', {
         index: '.wazuh',
         type: '_doc',
-        size: '100'
+        size: '100',
+        body: {
+          query: {
+            bool: {
+              must_not: [
+                {
+                  term: {
+                    _id: '1'
+                  }
+                }
+              ]
+            }
+          }
+        }
       });
 
       return data;
@@ -597,26 +551,6 @@ export class ElasticWrapper {
             id: id,
             body: doc
           });
-
-      return data;
-    } catch (error) {
-      return Promise.reject(error);
-    }
-  }
-
-  /**
-   * Search for active entries on .wazuh index
-   * @param {*} req
-   */
-  async searchActiveDocumentsWazuhIndex(req) {
-    try {
-      if (!req) return Promise.reject(new Error('No valid request given'));
-
-      const data = await this.elasticRequest.callWithRequest(req, 'search', {
-        index: '.wazuh',
-        type: '_doc',
-        q: 'active:true'
-      });
 
       return data;
     } catch (error) {
@@ -799,25 +733,6 @@ export class ElasticWrapper {
   }
 
   /**
-   * Deletes an Elasticsearch index by its name
-   * @param {} name
-   */
-  async deleteIndexByName(name) {
-    try {
-      if (!name) return Promise.reject(new Error('No valid name given'));
-
-      const data = await this.elasticRequest.callWithInternalUser(
-        'indices.delete',
-        { index: name }
-      );
-
-      return data;
-    } catch (error) {
-      return Promise.reject(error);
-    }
-  }
-
-  /**
    * Deletes wazuh monitoring index pattern
    */
   async deleteMonitoring() {
@@ -986,58 +901,68 @@ export class ElasticWrapper {
   }
 
   /**
-   * Prevent from using types, reindex .wazuh and .wazuh-version indices
+   * Prevent from using types, reindex .wazuh and removes .wazuh-version
    */
   async reindexAppIndices() {
     try {
       const appIndices = [
         { value: '.wazuh', copy: '.6x-wazuh', result: 'fail' },
-        { value: '.wazuh-version', copy: '.6x-wazuh-version', result: 'fail' }
+        { value: '.wazuh-version', result: 'fail' }
       ];
-      for (const index of appIndices) {
-        try {
-          const result = await this.elasticRequest.callWithInternalUser(
-            'reindex',
-            {
-              refresh: true,
-              body: {
-                source: {
-                  index: index.value
-                },
-                dest: {
-                  index: index.copy
-                }
-              }
-            }
-          );
 
-          if ((result || {}).total === 0) {
-            index.result = 'total: 0';
-            continue;
-          }
-
-          await this.elasticRequest.callWithInternalUser('indices.delete', {
-            index: index.value
-          });
-
-          await this.elasticRequest.callWithInternalUser('reindex', {
+      try {
+        const result = await this.elasticRequest.callWithInternalUser(
+          'reindex',
+          {
             refresh: true,
             body: {
               source: {
-                index: index.copy
+                index: appIndices[0].value
               },
               dest: {
-                index: index.value
+                index: appIndices[0].copy
               }
             }
-          });
+          }
+        );
 
-          await this.elasticRequest.callWithInternalUser('indices.delete', {
-            index: index.copy
-          });
-          index.result = 'success';
-        } catch (error) {} // eslint-disable-line
-      }
+        if ((result || {}).total === 0) {
+          appIndices[0].result = 'total: 0';
+        }
+
+        await this.elasticRequest.callWithInternalUser('indices.delete', {
+          index: appIndices[0].value
+        });
+
+        await this.elasticRequest.callWithInternalUser('reindex', {
+          refresh: true,
+          body: {
+            source: {
+              index: appIndices[0].copy
+            },
+            dest: {
+              index: appIndices[0].value
+            }
+          }
+        });
+
+        await this.elasticRequest.callWithInternalUser('indices.delete', {
+          index: appIndices[0].copy
+        });
+        appIndices[0].result = 'success';
+      } catch (error) {} // eslint-disable-line
+
+      try {
+        await this.elasticRequest.callWithInternalUser('indices.delete', {
+          index: '.wazuh-version'
+        });
+        appIndices[1].result = 'success';
+      } catch (error) {
+        const isNotFound =
+          (error || {}).status === 404 &&
+          (error || {}).displayName === 'NotFound';
+        if (isNotFound) appIndices[1].result = 'success';
+      } // eslint-disable-line
 
       return appIndices;
     } catch (error) {

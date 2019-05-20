@@ -281,7 +281,16 @@ export class Monitoring {
         error_code: 1
       };
     } catch (error) {
-      !this.quiet && log('monitoring:getConfig', error.message || error);
+      const isNotFound =
+        (error || {}).status === 404 &&
+        (error || {}).displayName === 'NotFound';
+
+      !this.quiet &&
+        isNotFound &&
+        log('monitoring:getConfig', 'Index .wazuh not ready yet');
+      !this.quiet &&
+        !isNotFound &&
+        log('monitoring:getConfig', error.message || error);
       return {
         error: 'no elasticsearch',
         error_code: 2

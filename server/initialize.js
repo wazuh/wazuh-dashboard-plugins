@@ -67,10 +67,6 @@ export function Initialize(server) {
   // Save Wazuh App setup
   const saveConfiguration = async () => {
     try {
-      const shardConfiguration = BuildBody(configurationFile, 'wazuh-version');
-
-      await wzWrapper.createWazuhVersionIndex(shardConfiguration);
-
       const commonDate = new Date().toISOString();
 
       const configuration = {
@@ -102,7 +98,7 @@ export function Initialize(server) {
       log('initialize:saveConfiguration', error.message || error);
       server.log(
         [blueWazuh, 'initialize', 'error'],
-        'Error creating index .wazuh-version.'
+        'Error inserting document in .wazuh index.'
       );
     }
   };
@@ -213,24 +209,18 @@ export function Initialize(server) {
     try {
       log(
         'initialize[checkWazuhVersionIndex]',
-        'Checking .wazuh-version index.',
+        'Checking .wazuh index (installation date and last restart date).',
         'debug'
       );
 
       try {
-        await wzWrapper.getWazuhVersionIndex();
-        const shardConfiguration = BuildBody(
-          configurationFile,
-          'wazuh-version'
-        );
-        await wzWrapper.updateIndexSettings(
-          '.wazuh-version',
-          shardConfiguration
-        );
+        await wzWrapper.getWazuhAppInformation();
+        const shardConfiguration = BuildBody(configurationFile, 'wazuh');
+        await wzWrapper.updateIndexSettings('.wazuh', shardConfiguration);
       } catch (error) {
         log(
           'initialize[checkWazuhVersionIndex]',
-          '.wazuh-version document does not exist. Initializating configuration...',
+          '.wazuh document does not exist. Initializating configuration...',
           'debug'
         );
 
@@ -238,7 +228,7 @@ export function Initialize(server) {
         await saveConfiguration();
       }
 
-      await wzWrapper.updateWazuhVersionIndexLastRestart(
+      await wzWrapper.updateWazuhAppLastRestart(
         packageJSON.version,
         packageJSON.revision
       );

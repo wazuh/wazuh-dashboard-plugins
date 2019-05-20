@@ -39,29 +39,29 @@ export class WazuhElasticCtrl {
    */
   async getTimeStamp(req, reply) {
     try {
-      const data = await this.wzWrapper.getWazuhVersionIndexAsSearch();
-      const source =
-        ((((data || {}).hits || {}).hits || [])[0] || {})._source || {};
+      const data = await this.wzWrapper.getWazuhAppInformation();
+
+      const source = (data || {})._source || {};
 
       if (source.installationDate && source.lastRestart) {
         log(
           'wazuh-elastic:getTimeStamp',
-          `Installation date: ${
-            data.hits.hits[0]._source.installationDate
-          }. Last restart: ${data.hits.hits[0]._source.lastRestart}`,
+          `Installation date: ${source.installationDate}. Last restart: ${
+            source.lastRestart
+          }`,
           'debug'
         );
         return {
-          installationDate: data.hits.hits[0]._source.installationDate,
-          lastRestart: data.hits.hits[0]._source.lastRestart
+          installationDate: source.installationDate,
+          lastRestart: source.lastRestart
         };
       } else {
-        throw new Error('Could not fetch .wazuh-version index');
+        throw new Error('Could not fetch .wazuh index');
       }
     } catch (error) {
       log('wazuh-elastic:getTimeStamp', error.message || error);
       return ErrorResponse(
-        error.message || 'Could not fetch .wazuh-version index',
+        error.message || 'Could not fetch .wazuh index',
         4001,
         500,
         reply
@@ -264,11 +264,11 @@ export class WazuhElasticCtrl {
    */
   async getSetupInfo(req, reply) {
     try {
-      const data = await this.wzWrapper.getWazuhVersionIndexAsSearch();
-
-      return data.hits.total.value === 0
-        ? { statusCode: 200, data: '' }
-        : { statusCode: 200, data: data.hits.hits[0]._source };
+      const data = await this.wzWrapper.getWazuhAppInformation();
+      const source = (data || {})._source || {};
+      return source.installationDate && source.lastRestart
+        ? { statusCode: 200, data: source }
+        : { statusCode: 200, data: '' };
     } catch (error) {
       log('wazuh-elastic:getSetupInfo', error.message || error);
       return ErrorResponse(
