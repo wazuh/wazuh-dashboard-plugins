@@ -164,7 +164,7 @@
                 ng-click="dctrl.restart(); dctrl.restartBtn = false">Restart
                 <b>{{selectedNode}}</b> now</button>
         </div>
-        <div class="wz-padding-top-14" ng-if="dctrl.fetchedXML" style="height: calc(100vh - 220px);">
+        <div class="wz-padding-top-14" ng-if="dctrl.fetchedXML">
             <wz-xml-file-editor file-name='decoders' data="dctrl.fetchedXML" target-name="dctrl.currentDecoder.file"
                 valid-fn='dctrl.xmlIsValid(valid)' saving-param='dctrl.toggleSaveConfig()'
                 close-fn='dctrl.closeEditingFile(reload)'>

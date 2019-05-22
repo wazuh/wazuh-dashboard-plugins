@@ -493,7 +493,6 @@ md-sidenav {
   margin-top: 25px;
   background: #dddddd;
   float: left;
-  height: calc(~'100vh - 110px');
   cursor: ew-resize;
   text-align: center;
   display: block !important;
@@ -510,7 +509,6 @@ md-sidenav {
 }
 
 .wz-dev-column-separator span {
-  height: calc(~'100vh - 110px');
   display: table-cell;
   vertical-align: middle;
 }
@@ -520,7 +518,6 @@ md-sidenav {
   min-width: calc(~'20% - 7px');
   max-width: calc(~'80% - 7px');
   float: left;
-  height: calc(~'100vh - 85px');
 }
 
 #wz-dev-right-column {
@@ -528,7 +525,6 @@ md-sidenav {
   min-width: calc(~'20% - 7px');
   max-width: calc(~'80% - 7px');
   float: left;
-  height: calc(~'100vh - 85px');
 }
 
 .wz-dev-box .CodeMirror {
@@ -851,6 +847,14 @@ wz-xml-file-editor {
   height: inherit;
 }
 
+.table-striped > tbody > tr:nth-of-type(odd) {
+  background-color: #f5f7fa;
+}
+
+.euiTableHeaderCell {
+  font-weight: 600;
+}
+
 .table-striped-duo .selected {
   background: #ecf6fb !important;
 }
@@ -982,4 +986,8 @@ wz-xml-file-editor {
   padding: 5px;
   background-color: #0079a5;
   white-space: nowrap;
+}
+
+discover-app-w .container-fluid {
+  background: #fff;
 }

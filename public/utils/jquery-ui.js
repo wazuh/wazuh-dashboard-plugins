@@ -12017,13 +12017,11 @@
         this._setOptionDisabled(this.options.disabled),
           this._setupEvents(this.options.event),
           this._setupHeightStyle(this.options.heightStyle),
-          this.tabs
-            .not(this.active)
-            .attr({
-              'aria-selected': 'false',
-              'aria-expanded': 'false',
-              tabIndex: -1
-            }),
+          this.tabs.not(this.active).attr({
+            'aria-selected': 'false',
+            'aria-expanded': 'false',
+            tabIndex: -1
+          }),
           this.panels
             .not(this._getPanelForTab(this.active))
             .hide()

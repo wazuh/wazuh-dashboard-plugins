@@ -30,7 +30,8 @@ class WzConfigViewer {
     this.template = template;
   }
 
-  controller($scope, $document) {
+  controller($scope, $document, $window) {
+    const window = $window;
     const setJsonBox = () => {
       $scope.jsonCodeBox = CodeMirror.fromTextArea(
         $document[0].getElementById('viewer_json_box'),
@@ -68,6 +69,20 @@ class WzConfigViewer {
       bindXmlListener();
     };
 
+    $(window).on('resize', function () {
+      dynamicHeight();
+    });
+
+    const dynamicHeight = () => {
+      setTimeout(function () {
+        const editorContainer = $('.configViewer');
+        const windows = $(window).height();
+        const offsetTop = getPosition(editorContainer[0]).y;
+        const bottom = $scope.isLogs ? 75 : 20;
+        editorContainer.height(windows - (offsetTop + bottom));
+      }, 1);
+    };
+
     const refreshJsonBox = json => {
       $scope.jsoncontent = json;
       if (!$scope.jsonCodeBox) {
@@ -75,23 +90,28 @@ class WzConfigViewer {
       }
       if ($scope.jsoncontent != false) {
         $scope.jsonCodeBox.setValue($scope.jsoncontent.replace(/\\\\/g, '\\'));
-        setTimeout(function() {
+        setTimeout(function () {
           $scope.jsonCodeBox.refresh();
           $scope.$applyAsync();
+          window.dispatchEvent(new Event('resize')); // eslint-disable-line
         }, 200);
       }
     };
 
-    const refreshXmlBox = xml => {
+    const refreshXmlBox = (xml, isLogs) => {
+      $scope.isLogs = isLogs;
       $scope.xmlcontent = xml;
       if (!$scope.xmlCodeBox) {
         setXmlBox();
       }
       if ($scope.xmlcontent != false) {
         $scope.xmlCodeBox.setValue($scope.xmlcontent);
-        setTimeout(function() {
+        setTimeout(function () {
           $scope.xmlCodeBox.refresh();
           $scope.$applyAsync();
+          $scope.isLogs
+            ? dynamicHeight()
+            : window.dispatchEvent(new Event('resize'));
         }, 200);
       }
     };
@@ -105,12 +125,12 @@ class WzConfigViewer {
     });
 
     $scope.$on('XMLContentReady', (ev, params) => {
-      refreshXmlBox(params.data);
+      refreshXmlBox(params.data, params.logs);
     });
 
     const bindXmlListener = () => {
       var scrollElement = $scope.xmlCodeBox.getScrollerElement();
-      $(scrollElement).bind('scroll', function(e) {
+      $(scrollElement).bind('scroll', function (e) {
         var element = $(e.currentTarget)[0];
         if (element.scrollHeight - element.scrollTop === element.clientHeight) {
           $scope.$emit('scrolledToBottom', {
@@ -137,6 +157,20 @@ class WzConfigViewer {
         $scope.jsonCodeBox.refresh();
       }
     });
+
+    function getPosition(element) {
+      var xPosition = 0;
+      var yPosition = 0;
+
+      while (element) {
+        xPosition +=
+          element.offsetLeft - element.scrollLeft + element.clientLeft;
+        yPosition += element.offsetTop - element.scrollTop + element.clientTop;
+        element = element.offsetParent;
+      }
+
+      return { x: xPosition, y: yPosition };
+    }
   }
 }
 

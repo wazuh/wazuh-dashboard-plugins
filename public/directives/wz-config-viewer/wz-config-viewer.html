@@ -1,6 +1,4 @@
-<div layout="row" ng-show="jsoncontent || xmlcontent"
-    ng-style="{'height': hideHeader ? (noLocal ? 'calc(100vh - 220px)' : 'calc(100vh - 335px)') : 'calc(100vh - 270px)'}">
-
+<div layout="row" ng-show="jsoncontent || xmlcontent" class="configViewer">
     <!-- JSON card -->
     <md-card flex="auto" class="wz-md-card" ng-show="jsoncontent" ng-class="hideHeader ? ['wz-no-margin'] : ''">
         <md-card-content flex layout="column" ng-class="hideHeader ? ['wz-no-padding'] : ''">

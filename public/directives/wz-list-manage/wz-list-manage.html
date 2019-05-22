@@ -22,8 +22,7 @@
                 <span flex></span>
                 <span class="cursor-pointer" ng-click="restart()">Restart now</span>
             </div>
-            <md-card-content
-                ng-style="hideClose && {'min-height': 'calc(100vh - 378px)'} || {'min-height': 'calc(100vh - 308px)'}">
+            <md-card-content>
                 <div layout="row">
                     <input placeholder="Filter entries..." ng-model="searchTerm" ng-change="filterTable()" type="text"
                         class="kuiLocalSearchInput ng-empty ng-pristine ng-scope ng-touched ng-valid height-40">

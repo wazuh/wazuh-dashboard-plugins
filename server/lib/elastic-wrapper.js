@@ -36,7 +36,7 @@ export class ElasticWrapper {
 
       const data = await this.elasticRequest.callWithInternalUser('search', {
         index: this.WZ_KIBANA_INDEX,
-        type: 'doc',
+        type: '_doc',
         body: {
           query: {
             match: {
@@ -84,13 +84,13 @@ export class ElasticWrapper {
 
       const data = await this.elasticRequest.callWithInternalUser('create', {
         index: this.WZ_KIBANA_INDEX,
-        type: 'doc',
+        type: '_doc',
         id: id ? id : 'index-pattern:' + title,
         body: {
           type: 'index-pattern',
           'index-pattern': {
             title: title,
-            timeFieldName: '@timestamp'
+            timeFieldName: 'timestamp'
           }
         }
       });
@@ -116,15 +116,15 @@ export class ElasticWrapper {
 
       const data = await this.elasticRequest.callWithInternalUser('create', {
         index: this.WZ_KIBANA_INDEX,
-        type: 'doc',
+        type: '_doc',
         id: id ? id : 'index-pattern:' + title,
         body: {
           type: 'index-pattern',
           'index-pattern': {
             fields:
-              '[{"name":"@timestamp","type":"date","count":0,"scripted":false,"searchable":true,"aggregatable":true,"readFromDocValues":true},{"name":"_id","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":true,"readFromDocValues":false},{"name":"_index","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":true,"readFromDocValues":false},{"name":"_score","type":"number","count":0,"scripted":false,"searchable":false,"aggregatable":false,"readFromDocValues":false},{"name":"_source","type":"_source","count":0,"scripted":false,"searchable":false,"aggregatable":false,"readFromDocValues":false},{"name":"_type","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":true,"readFromDocValues":false},{"name":"dateAdd","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":false,"readFromDocValues":false},{"name":"group","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":false,"readFromDocValues":false},{"name":"host","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":true,"readFromDocValues":true},{"name":"id","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":true,"readFromDocValues":true},{"name":"ip","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":true,"readFromDocValues":true},{"name":"lastKeepAlive","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":false,"readFromDocValues":false},{"name":"cluster.name","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":false,"readFromDocValues":false},{"name":"mergedSum","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":false,"readFromDocValues":false},{"name":"configSum","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":false,"readFromDocValues":false},{"name":"node_name","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":false,"readFromDocValues":false},{"name":"manager","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":false,"readFromDocValues":false},{"name":"manager_host","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":false,"readFromDocValues":false},{"name":"name","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":true,"readFromDocValues":true},{"name":"os.arch","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":false,"readFromDocValues":false},{"name":"os.codename","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":false,"readFromDocValues":false},{"name":"os.major","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":false,"readFromDocValues":false},{"name":"os.name","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":false,"readFromDocValues":false},{"name":"os.platform","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":false,"readFromDocValues":false},{"name":"os.uname","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":false,"readFromDocValues":false},{"name":"os.version","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":false,"readFromDocValues":false},{"name":"status","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":true,"readFromDocValues":true},{"name":"version","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":false,"readFromDocValues":false}]',
+              '[{"name":"timestamp","type":"date","count":0,"scripted":false,"searchable":true,"aggregatable":true,"readFromDocValues":true},{"name":"_id","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":true,"readFromDocValues":false},{"name":"_index","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":true,"readFromDocValues":false},{"name":"_score","type":"number","count":0,"scripted":false,"searchable":false,"aggregatable":false,"readFromDocValues":false},{"name":"_source","type":"_source","count":0,"scripted":false,"searchable":false,"aggregatable":false,"readFromDocValues":false},{"name":"_type","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":true,"readFromDocValues":false},{"name":"dateAdd","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":false,"readFromDocValues":false},{"name":"group","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":false,"readFromDocValues":false},{"name":"host","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":true,"readFromDocValues":true},{"name":"id","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":true,"readFromDocValues":true},{"name":"ip","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":true,"readFromDocValues":true},{"name":"lastKeepAlive","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":false,"readFromDocValues":false},{"name":"cluster.name","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":false,"readFromDocValues":false},{"name":"mergedSum","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":false,"readFromDocValues":false},{"name":"configSum","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":false,"readFromDocValues":false},{"name":"node_name","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":false,"readFromDocValues":false},{"name":"manager","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":false,"readFromDocValues":false},{"name":"manager_host","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":false,"readFromDocValues":false},{"name":"name","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":true,"readFromDocValues":true},{"name":"os.arch","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":false,"readFromDocValues":false},{"name":"os.codename","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":false,"readFromDocValues":false},{"name":"os.major","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":false,"readFromDocValues":false},{"name":"os.name","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":false,"readFromDocValues":false},{"name":"os.platform","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":false,"readFromDocValues":false},{"name":"os.uname","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":false,"readFromDocValues":false},{"name":"os.version","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":false,"readFromDocValues":false},{"name":"status","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":true,"readFromDocValues":true},{"name":"version","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":false,"readFromDocValues":false}]',
             title: title,
-            timeFieldName: '@timestamp'
+            timeFieldName: 'timestamp'
           }
         }
       });
@@ -198,7 +198,7 @@ export class ElasticWrapper {
 
       const data = await this.elasticRequest.callWithInternalUser('create', {
         index: '.wazuh-version',
-        type: 'wazuh-version',
+        type: '_doc',
         id: 1,
         body: configuration
       });
@@ -216,7 +216,7 @@ export class ElasticWrapper {
     try {
       const data = await this.elasticRequest.callWithInternalUser('search', {
         index: this.WZ_KIBANA_INDEX,
-        type: 'doc',
+        type: '_doc',
         body: {
           query: {
             match: {
@@ -291,6 +291,14 @@ export class ElasticWrapper {
 
       let currentFieldsString = null;
 
+      // Ensure '@timestamp' field is always excluded, >= 7.0.0 is using 'timestamp'
+      try {
+        const idx = currentFields.map(item => item.name).indexOf('@timestamp');
+        if (idx > -1) {
+          currentFields[idx].excluded = true;
+        }
+      } catch (error) {} // eslint-disable-line
+
       try {
         currentFieldsString = JSON.stringify(currentFields);
       } catch (error) {
@@ -302,19 +310,19 @@ export class ElasticWrapper {
       // Updating known fields
       const data = await this.elasticRequest.callWithInternalUser('update', {
         index: this.WZ_KIBANA_INDEX,
-        type: 'doc',
+        type: '_doc',
         id: id.includes('index-pattern:') ? id : 'index-pattern:' + id,
         body: {
           doc: {
             type: 'index-pattern',
             'index-pattern': {
+              timeFieldName: 'timestamp',
               fields: currentFieldsString,
               fieldFormatMap: `{
                   "data.virustotal.permalink":{"id":"url"},
-                  "data.vulnerability.reference":{"id":"url"},"data.url":{"id":"url"},
-                  "rule.id":{"id":"url","params":{"urlTemplate":"wazuh#/manager/?tab=ruleset&ruleid={{value}}","labelTemplate":"{{value}}","openLinkInCurrentTab":true}},
-                  "agent.id":{"id":"url","params":{"urlTemplate":"wazuh#/agents-preview/?_g=()&agent={{value}}","labelTemplate":"{{value}}","openLinkInCurrentTab":true}}
-                }`
+                  "data.vulnerability.reference":{"id":"url"},"data.url":{"id":"url"}
+                }`,
+              sourceFilters: '[{"value":"@timestamp"}]'
             }
           }
         }
@@ -388,13 +396,14 @@ export class ElasticWrapper {
       // Updating known fields
       const data = await this.elasticRequest.callWithInternalUser('update', {
         index: this.WZ_KIBANA_INDEX,
-        type: 'doc',
+        type: '_doc',
         id: id.includes('index-pattern:') ? id : 'index-pattern:' + id,
         body: {
           doc: {
             type: 'index-pattern',
             'index-pattern': {
-              fields: currentFieldsString
+              fields: currentFieldsString,
+              timeFieldName: 'timestamp'
             }
           }
         }
@@ -413,7 +422,7 @@ export class ElasticWrapper {
     try {
       const data = await this.elasticRequest.callWithInternalUser('get', {
         index: '.wazuh-version',
-        type: 'wazuh-version',
+        type: '_doc',
         id: '1'
       });
 
@@ -435,7 +444,7 @@ export class ElasticWrapper {
 
       const data = await this.elasticRequest.callWithInternalUser('update', {
         index: '.wazuh-version',
-        type: 'wazuh-version',
+        type: '_doc',
         id: 1,
         body: {
           doc: {
@@ -459,7 +468,7 @@ export class ElasticWrapper {
     try {
       const data = await this.elasticRequest.callWithInternalUser('search', {
         index: '.wazuh-version',
-        type: 'wazuh-version'
+        type: '_doc'
       });
 
       return data;
@@ -485,7 +494,7 @@ export class ElasticWrapper {
 
       const data = await this.elasticRequest.callWithInternalUser('search', {
         index: title || 'wazuh-alerts-3.x-*',
-        type: 'wazuh',
+        type: '_doc',
         body: payload
       });
 
@@ -505,7 +514,7 @@ export class ElasticWrapper {
 
       const data = await this.elasticRequest.callWithInternalUser('get', {
         index: '.wazuh',
-        type: 'wazuh-configuration',
+        type: '_doc',
         id: id
       });
 
@@ -532,7 +541,7 @@ export class ElasticWrapper {
     try {
       const data = await this.elasticRequest.callWithInternalUser('search', {
         index: '.wazuh',
-        type: 'wazuh-configuration',
+        type: '_doc',
         size: '100'
       });
 
@@ -553,7 +562,7 @@ export class ElasticWrapper {
 
       const data = await this.elasticRequest.callWithRequest(req, 'create', {
         index: '.wazuh',
-        type: 'wazuh-configuration',
+        type: '_doc',
         id: new Date().getTime(),
         body: doc,
         refresh: true
@@ -578,13 +587,13 @@ export class ElasticWrapper {
       const data = req
         ? await this.elasticRequest.callWithRequest(req, 'update', {
             index: '.wazuh',
-            type: 'wazuh-configuration',
+            type: '_doc',
             id: id,
             body: doc
           })
         : await this.elasticRequest.callWithInternalUser('update', {
             index: '.wazuh',
-            type: 'wazuh-configuration',
+            type: '_doc',
             id: id,
             body: doc
           });
@@ -605,7 +614,7 @@ export class ElasticWrapper {
 
       const data = await this.elasticRequest.callWithRequest(req, 'search', {
         index: '.wazuh',
-        type: 'wazuh-configuration',
+        type: '_doc',
         q: 'active:true'
       });
 
@@ -626,7 +635,7 @@ export class ElasticWrapper {
 
       const data = await this.elasticRequest.callWithRequest(req, 'delete', {
         index: '.wazuh',
-        type: 'wazuh-configuration',
+        type: '_doc',
         id: req.params.id
       });
 
@@ -661,8 +670,8 @@ export class ElasticWrapper {
 
       return (
         this.usingSearchGuard ||
-        ((((data || {}).defaults || {}).xpack || {}).security || {}).enabled ==
-          'true'
+        ((((data || {}).defaults || {}).xpack || {}).security || {}).user !=
+          null
       );
     } catch (error) {
       return Promise.reject(error);
@@ -680,7 +689,7 @@ export class ElasticWrapper {
 
       const data = await this.elasticRequest.callWithInternalUser('bulk', {
         index: index,
-        type: 'agent',
+        type: '_doc',
         body: bulk
       });
 
@@ -702,7 +711,7 @@ export class ElasticWrapper {
 
       const data = await this.elasticRequest.callWithRequest(req, 'search', {
         index: index,
-        type: 'wazuh'
+        type: '_doc'
       });
 
       return data;
@@ -815,7 +824,7 @@ export class ElasticWrapper {
     try {
       const data = await this.elasticRequest.callWithInternalUser('delete', {
         index: this.WZ_KIBANA_INDEX,
-        type: 'doc',
+        type: '_doc',
         id: 'index-pattern:wazuh-monitoring-*'
       });
 
@@ -835,7 +844,7 @@ export class ElasticWrapper {
 
       const data = await this.elasticRequest.callWithInternalUser('get', {
         index: this.WZ_KIBANA_INDEX,
-        type: 'doc',
+        type: '_doc',
         id: id.includes('index-pattern:') ? id : 'index-pattern:' + id
       });
 
@@ -888,45 +897,6 @@ export class ElasticWrapper {
           body: template
         }
       );
-
-      return data;
-    } catch (error) {
-      return Promise.reject(error);
-    }
-  }
-
-  /**
-   * Check for the wazuh-setup index, only old installations.
-   * Reindex purposes
-   * Do not use
-   */
-  async getOldWazuhSetup() {
-    try {
-      const data = await this.elasticRequest.callWithInternalUser('get', {
-        index: '.wazuh',
-        type: 'wazuh-setup',
-        id: '1'
-      });
-
-      return data;
-    } catch (error) {
-      return Promise.reject(error);
-    }
-  }
-
-  /**
-   * Reindex purposes
-   * Do not use
-   * @param {*} configuration
-   */
-  async reindexWithCustomConfiguration(configuration) {
-    try {
-      if (!configuration)
-        return Promise.reject(new Error('No valid configuration given'));
-
-      const data = await this.elasticRequest.callWithInternalUser('reindex', {
-        body: configuration
-      });
 
       return data;
     } catch (error) {
@@ -1012,6 +982,66 @@ export class ElasticWrapper {
           currentFields.push(field);
         }
       }
+    }
+  }
+
+  /**
+   * Prevent from using types, reindex .wazuh and .wazuh-version indices
+   */
+  async reindexAppIndices() {
+    try {
+      const appIndices = [
+        { value: '.wazuh', copy: '.6x-wazuh', result: 'fail' },
+        { value: '.wazuh-version', copy: '.6x-wazuh-version', result: 'fail' }
+      ];
+      for (const index of appIndices) {
+        try {
+          const result = await this.elasticRequest.callWithInternalUser(
+            'reindex',
+            {
+              refresh: true,
+              body: {
+                source: {
+                  index: index.value
+                },
+                dest: {
+                  index: index.copy
+                }
+              }
+            }
+          );
+
+          if ((result || {}).total === 0) {
+            index.result = 'total: 0';
+            continue;
+          }
+
+          await this.elasticRequest.callWithInternalUser('indices.delete', {
+            index: index.value
+          });
+
+          await this.elasticRequest.callWithInternalUser('reindex', {
+            refresh: true,
+            body: {
+              source: {
+                index: index.copy
+              },
+              dest: {
+                index: index.value
+              }
+            }
+          });
+
+          await this.elasticRequest.callWithInternalUser('indices.delete', {
+            index: index.copy
+          });
+          index.result = 'success';
+        } catch (error) {} // eslint-disable-line
+      }
+
+      return appIndices;
+    } catch (error) {
+      return Promise.reject(error);
     }
   }
 }

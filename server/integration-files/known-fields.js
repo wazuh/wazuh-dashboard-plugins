@@ -18,6 +18,16 @@ export const knownFields = [
     scripted: false,
     searchable: true,
     aggregatable: true,
+    readFromDocValues: true,
+    excluded: true
+  },
+  {
+    name: 'timestamp',
+    type: 'date',
+    count: 0,
+    scripted: false,
+    searchable: true,
+    aggregatable: true,
     readFromDocValues: true
   },
   {

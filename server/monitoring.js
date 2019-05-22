@@ -266,7 +266,7 @@ export class Monitoring {
     try {
       const data = await this.wzWrapper.getWazuhAPIEntries();
 
-      if (data.hits.total > 0) {
+      if (data.hits.total.value > 0) {
         return data.hits;
       }
 
@@ -399,12 +399,9 @@ export class Monitoring {
       let body = '';
       if (this.agentsArray.length > 0) {
         for (const element of this.agentsArray) {
-          body +=
-            '{ "index":  { "_index": "' +
-            datedIndex +
-            '", "_type": "wazuh-agent" } }\n';
+          body += '{ "index":  { "_index": "' + datedIndex + '" } }\n';
           let date = new Date(Date.now()).toISOString();
-          element['@timestamp'] = date;
+          element['timestamp'] = date;
           element.host = element.manager;
           element.cluster = { name: clusterName ? clusterName : 'disabled' };
           body += JSON.stringify(element) + '\n';

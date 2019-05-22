@@ -303,7 +303,6 @@ export function ClusterController(
 
   //listeners
   $scope.$on('$destroy', () => {
-    $location.search('tabView', null);
     discoverPendingUpdates.removeAll();
     tabVisualizations.removeAll();
     rawVisualizations.removeAll();
