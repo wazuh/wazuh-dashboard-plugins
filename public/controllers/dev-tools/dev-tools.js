@@ -328,6 +328,19 @@ export class DevToolsController {
     }
   }
 
+  getPosition(element) {
+    var xPosition = 0;
+    var yPosition = 0;
+
+    while (element) {
+      xPosition += element.offsetLeft - element.scrollLeft + element.clientLeft;
+      yPosition += element.offsetTop - element.scrollTop + element.clientTop;
+      element = element.offsetParent;
+    }
+
+    return { x: xPosition, y: yPosition };
+  }
+
   /**
    * This set some required settings at init
    */
@@ -427,7 +440,7 @@ export class DevToolsController {
       const leftOrigWidth = $('#wz-dev-left-column').width();
       const rightOrigWidth = $('#wz-dev-right-column').width();
       $(evtDocument).mousemove(function(e) {
-        const leftWidth = e.pageX - 215 + 14;
+        const leftWidth = e.pageX - 85 + 14;
         let rightWidth = leftOrigWidth - leftWidth;
         $('#wz-dev-left-column').css('width', leftWidth);
         $('#wz-dev-right-column').css('width', rightOrigWidth + rightWidth);
@@ -448,7 +461,30 @@ export class DevToolsController {
         'style',
         'width: calc(70% - 7px); !important'
       );
+      dynamicHeight();
     };
+
+    const dynamicHeight = () => {
+      const self = this;
+      const window = this.$window;
+      setTimeout(function() {
+        const windows = $(window).height();
+        $('#wz-dev-left-column').height(
+          windows - (self.getPosition($('#wz-dev-left-column')[0]).y + 20)
+        );
+        $('.wz-dev-column-separator').height(
+          windows - (self.getPosition($('.wz-dev-column-separator')[0]).y + 20)
+        );
+        $('#wz-dev-right-column').height(
+          windows - (self.getPosition($('#wz-dev-right-column')[0]).y + 20)
+        );
+        $('.wz-dev-column-separator span').height(
+          windows -
+            (self.getPosition($('.wz-dev-column-separator span')[0]).y + 20)
+        );
+      }, 1);
+    };
+    dynamicHeight();
   }
 
   /**
@@ -581,7 +617,7 @@ export class DevToolsController {
     } catch (error) {
       if ((error || {}).status === -1) {
         return this.apiOutputBox.setValue(
-          "Wazuh API don't reachable. Reason: timeout."
+          'Wazuh API is not reachable. Reason: timeout.'
         );
       } else {
         const parsedError = this.errorHandler.handle(error, null, null, true);

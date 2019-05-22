@@ -26,7 +26,7 @@
 
         <md-button class="wz-menu-button" ng-href="#/wazuh-discover"
             ng-class="{'wz-menu-active': menuNavItem === 'discover' }" aria-label="Discover tab">
-            <react-component name="EuiIcon" class="kbnGlobalNavLink__euiIcon"
+            <react-component name="EuiIcon" class="kbnGlobalNavLink__euiIcon wz-menu-discover-icon"
                 props="{type:'discoverApp', color:'ghost'}" /> Discover
         </md-button>
 
@@ -72,8 +72,7 @@
         <!-- Settings tab button -->
         <md-button class="wz-menu-button md-icon-button" ng-href="#/settings"
             ng-class="{'wz-menu-active': menuNavItem === 'settings' }" aria-label="Settings tab">
-            <react-component name="EuiIcon" class="kbnGlobalNavLink__euiIcon"
-                props="{type:'managementApp', color:'ghost'}" />
+            <react-component name="EuiIcon" class="kbnGlobalNavLink__euiIcon" props="{type:'gear', color:'ghost'}" />
         </md-button>
 
     </div>

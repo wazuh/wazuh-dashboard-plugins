@@ -22,7 +22,7 @@
         <!-- End separator -->
 
         <!-- Reporting button section -->
-        <div ng-show="octrl.tab !== 'welcome' && octrl.tabView === 'panels'">
+        <div ng-if="octrl.tab !== 'welcome' && octrl.tabView === 'panels'">
             <!-- Report button -->
             <button class="kuiButton kuiButton--secondary wz-margin-right-8 small" tooltip="Generate report"
                 tooltip-placement="bottom"
@@ -35,17 +35,15 @@
         <!-- End Reporting buttons section -->
 
         <!-- Discover/Dashboard buttons section -->
-        <div ng-show="octrl.tab !== 'welcome'" class="wz-margin-right-8">
+        <div ng-if="octrl.tab !== 'welcome'" class="wz-margin-right-8">
             <!-- Dashboard button -->
-            <button ng-if="octrl.tabView === 'discover'" class="kuiButton kuiButton--secondary small"
-                ng-click="octrl.switchSubtab('panels')" aria-label="Dashboard button">
-                <i class="fa fa-fw fa-th" aria-hidden="true"></i> Dashboard
-            </button>
-
-            <!-- Discover button -->
-            <button ng-if="octrl.tabView === 'panels'" class="kuiButton kuiButton--secondary small"
-                ng-click="octrl.switchSubtab('discover')" aria-label="Discover button">
-                <i class="fa fa-fw fa-compass" aria-hidden="true"></i> Discover
+            <button class="kuiButton kuiButton--secondary small"
+                ng-click="octrl.tabView === 'discover' ? octrl.switchSubtab('panels') : octrl.switchSubtab('discover')"
+                aria-label="Dashboard button">
+                <span ng-if="octrl.tabView === 'discover'"><i class="fa fa-fw fa-th" aria-hidden="true"></i>
+                    Dashboard</span>
+                <span ng-if="octrl.tabView === 'panels'"><i class="fa fa-fw fa-compass" aria-hidden="true"></i>
+                    Discover</span>
             </button>
         </div>
         <!-- End Discover/Dashboard buttons section -->
