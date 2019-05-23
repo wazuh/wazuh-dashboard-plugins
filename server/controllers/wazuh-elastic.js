@@ -345,6 +345,9 @@ export class WazuhElasticCtrl {
    */
   async getlist(req, reply) {
     try {
+      const spaces = this._server.plugins.spaces;
+      const namespace = spaces && spaces.getSpaceId(req);
+
       const config = getConfiguration();
 
       const usingCredentials = await this.wzWrapper.usingCredentials();
@@ -362,9 +365,14 @@ export class WazuhElasticCtrl {
         req.auth.credentials.roles.includes('superuser');
 
       const data = await this.wzWrapper.getAllIndexPatterns();
-
-      if ((((data || {}).hits || {}).hits || []).length === 0)
-        throw new Error('There is no index pattern');
+      if (namespace !== 'default') {
+        data.hits.hits = data.hits.hits.filter(item =>
+          (item._id || '').includes(namespace)
+        );
+      }
+      if ((((data || {}).hits || {}).hits || []).length === 0) {
+        throw new Error('There are no index patterns');
+      }
 
       if (((data || {}).hits || {}).hits) {
         let list = this.validateIndexPattern(data.hits.hits);
@@ -397,15 +405,36 @@ export class WazuhElasticCtrl {
     }
   }
 
+  async checkCustomSpaceMonitoring(namespace, monitoringPattern) {
+    try {
+      const patterns = await this.wzWrapper.getAllIndexPatterns();
+      const exists = patterns.hits.hits.filter(
+        item =>
+          item._source['index-pattern'].title === monitoringPattern &&
+          item._source.namespace === namespace
+      );
+      if (!exists.length) {
+        const title = monitoringPattern;
+        const id = `${namespace}:index-pattern:${monitoringPattern}`;
+        await this.wzWrapper.createMonitoringIndexPattern(title, id);
+        return id;
+      } else {
+        return exists[0]._id;
+      }
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  }
+
   /**
    * Replaces visualizations main fields to fit a certain pattern.
    * @param {Array<Object>} app_objects Object containing raw visualizations.
    * @param {String} id Index-pattern id to use in the visualizations. Eg: 'wazuh-alerts'
    */
-  buildVisualizationsRaw(app_objects, id) {
+  async buildVisualizationsRaw(app_objects, id, namespace = false) {
     try {
       const config = getConfiguration();
-      const monitoringPattern =
+      let monitoringPattern =
         (config || {})['wazuh.monitoring.pattern'] || 'wazuh-monitoring-3.x-*';
       log(
         'wazuh-elastic:buildVisualizationsRaw',
@@ -430,18 +459,35 @@ export class WazuhElasticCtrl {
           typeof aux_source.kibanaSavedObjectMeta.searchSourceJSON === 'string'
         ) {
           const defaultStr = aux_source.kibanaSavedObjectMeta.searchSourceJSON;
-
-          defaultStr.includes('wazuh-monitoring')
-            ? (aux_source.kibanaSavedObjectMeta.searchSourceJSON = defaultStr.replace(
-                /wazuh-monitoring/g,
-                monitoringPattern[monitoringPattern.length - 1] === '*'
-                  ? monitoringPattern
-                  : monitoringPattern + '*'
-              ))
-            : (aux_source.kibanaSavedObjectMeta.searchSourceJSON = defaultStr.replace(
-                /wazuh-alerts/g,
-                id
-              ));
+          const isMonitoring = defaultStr.includes('wazuh-monitoring');
+          if (isMonitoring) {
+            if (namespace && namespace !== 'default') {
+              monitoringPattern = await this.checkCustomSpaceMonitoring(
+                namespace,
+                monitoringPattern
+              );
+              if (
+                monitoringPattern.includes(namespace) &&
+                monitoringPattern.includes('index-pattern:')
+              ) {
+                monitoringPattern = monitoringPattern.split(
+                  'index-pattern:'
+                )[1];
+              }
+            }
+            aux_source.kibanaSavedObjectMeta.searchSourceJSON = defaultStr.replace(
+              /wazuh-monitoring/g,
+              monitoringPattern[monitoringPattern.length - 1] === '*' ||
+                (namespace && namespace !== 'default')
+                ? monitoringPattern
+                : monitoringPattern + '*'
+            );
+          } else {
+            aux_source.kibanaSavedObjectMeta.searchSourceJSON = defaultStr.replace(
+              /wazuh-alerts/g,
+              id
+            );
+          }
         }
 
         // Replace index-pattern for selector visualizations
@@ -573,8 +619,13 @@ export class WazuhElasticCtrl {
         `Index pattern: ${req.params.pattern}`,
         'debug'
       );
-
-      const raw = await this.buildVisualizationsRaw(file, req.params.pattern);
+      const spaces = this._server.plugins.spaces;
+      const namespace = spaces && spaces.getSpaceId(req);
+      const raw = await this.buildVisualizationsRaw(
+        file,
+        req.params.pattern,
+        namespace
+      );
       return { acknowledge: true, raw: raw };
     } catch (error) {
       log('wazuh-elastic:createVis', error.message || error);
