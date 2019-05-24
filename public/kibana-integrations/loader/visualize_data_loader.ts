@@ -111,12 +111,13 @@ export class VisualizeDataLoader {
       );
     }
 
-    if (((this.vis || {}).params || {}).valueAxes && (this.visData.series || [])[0]) {
-      const maxValue = Math.max.apply(Math, this.visData.series[0].values.map(x => { return x.y; }));
-      const lengthMaxValue = maxValue.toString().length;
-      const addTo = parseInt('1' + '0'.repeat(lengthMaxValue - 1));
-      visParams.valueAxes[0].scale.min = 0;
-      visParams.valueAxes[0].scale.max = maxValue + (addTo / 2);
+    if ((visParams || {}).valueAxes && (this.visData.series || [])[0]) {
+      visParams.valueAxes.forEach((axis, idx) => {
+        const maxValue = Math.max.apply(Math, this.visData.series[idx].values.map(x => { return x.y; }));
+        const lengthMaxValue = maxValue.toString().length;
+        const addTo = parseInt('1' + '0'.repeat(lengthMaxValue - 1));
+        axis.scale.max = maxValue + addTo;
+      });
     }
 
     return {
