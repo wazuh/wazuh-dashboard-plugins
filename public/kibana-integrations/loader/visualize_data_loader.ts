@@ -111,6 +111,14 @@ export class VisualizeDataLoader {
       );
     }
 
+    if (((this.vis || {}).params || {}).valueAxes && (this.visData.series || [])[0]) {
+      const maxValue = Math.max.apply(Math, this.visData.series[0].values.map(x => { return x.y; }));
+      const lengthMaxValue = maxValue.toString().length;
+      const addTo = parseInt('1' + '0'.repeat(lengthMaxValue - 1));
+      this.vis.params.valueAxes[0].scale.min = 0;
+      this.vis.params.valueAxes[0].scale.max = maxValue + addTo;
+    }
+
     return {
       as: 'visualization',
       value: {
