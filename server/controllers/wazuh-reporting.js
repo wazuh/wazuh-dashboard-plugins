@@ -30,6 +30,8 @@ import { WazuhApiCtrl } from './wazuh-api';
 import clockIconRaw from '../reporting/clock-icon-raw';
 import filterIconRaw from '../reporting/filter-icon-raw';
 import ProcessEquivalence from '../../util/process-state-equivalence';
+import { KeyEquivalence } from '../../util/csv-key-equivalence';
+import { AgentConfiguration } from '../reporting/agent-configuration';
 
 import {
   AgentsVisualizations,
@@ -237,6 +239,91 @@ export class WazuhReportingCtrl {
   }
 
   /**
+   * This performs the rendering of given tables
+   * @param {Array<Object>} tables tables to render
+   */
+  renderConfigTables(tables) {
+    for (const table of tables) {
+      let rowsparsed = table.rows;
+      if (Array.isArray(rowsparsed) && rowsparsed.length) {
+        const rows =
+          rowsparsed.length > 100 ? rowsparsed.slice(0, 99) : rowsparsed;
+        this.dd.content.push({
+          text: table.title,
+          style: { fontSize: 11, color: '#000' }
+        });
+
+        const full_body = [];
+
+        const modifiedRows = [];
+        for (const row of rows) {
+          modifiedRows.push(
+            row.map(cell => ({ text: cell, style: 'standard' }))
+          );
+        }
+        let widths = [];
+        /*         if (table.type === 'config') {
+                  widths = Array(table.columns.length).fill('50%');
+                } else { */
+        widths = Array(table.columns.length - 1).fill('auto');
+        widths.push('*');
+        ///*  */}
+
+        if (table.type === 'config') {
+          full_body.push(
+            table.columns.map(col => ({
+              text: col,
+              border: [0, 0, 0, 20],
+              fontSize: 0,
+              colSpan: 2
+            })),
+            ...modifiedRows
+          );
+          this.dd.content.push({
+            fontSize: 8,
+            table: {
+              headerRows: 0,
+              widths,
+              body: full_body,
+              dontBreakRows: true
+            },
+            layout: {
+              fillColor: i => (i === 0 ? '#fff' : null),
+              hLineColor: () => '#D3DAE6',
+              hLineWidth: () => 1,
+              vLineWidth: () => 0
+            }
+          });
+        } else if (table.type === 'table') {
+          full_body.push(
+            table.columns.map(col => ({
+              text: col,
+              style: 'whiteColor',
+              border: [0, 0, 0, 0]
+            })),
+            ...modifiedRows
+          );
+          this.dd.content.push({
+            fontSize: 8,
+            table: {
+              headerRows: 1,
+              widths,
+              body: full_body
+            },
+            layout: {
+              fillColor: i => (i === 0 ? '#78C8DE' : null),
+              hLineColor: () => '#78C8DE',
+              hLineWidth: () => 1,
+              vLineWidth: () => 0
+            }
+          });
+        }
+        this.dd.content.push('\n');
+      }
+    }
+  }
+
+  /**
    * Format Date to string YYYY-mm-ddTHH:mm:ss
    * @param {*} date JavaScript Date
    */
@@ -362,11 +449,32 @@ export class WazuhReportingCtrl {
   async renderHeader(section, tab, isAgents, apiId) {
     try {
       if (section && typeof section === 'string') {
-        this.dd.content.push({
-          text: descriptions[tab].title + ' report',
-          style: 'h1'
-        });
+        if (section !== 'agentConfig' && section !== 'groupConfig') {
+          this.dd.content.push({
+            text: descriptions[tab].title + ' report',
+            style: 'h1'
+          });
+        } else if (section === 'agentConfig') {
+          this.dd.content.push({
+            text: `Agent ${isAgents} configuration`,
+            style: 'h1'
+          });
+        } else if (section === 'groupConfig') {
+          this.dd.content.push({
+            text: `Group ${tab} configuration`,
+            style: 'h1'
+          });
+          this.dd.content.push({
+            text: `${isAgents.length} Agents in group`,
+            style: { fontSize: 14, color: '#000' },
+            margin: [0, 20, 0, 0]
+          });
+        }
         this.dd.content.push('\n');
+      }
+
+      if (isAgents && typeof isAgents === 'object') {
+        await this.buildAgentsTable(isAgents, apiId);
       }
 
       if (isAgents && typeof isAgents === 'string') {
@@ -388,35 +496,23 @@ export class WazuhReportingCtrl {
         }
         await this.buildAgentsTable([isAgents], apiId);
 
-        let dateAddStr = '';
-        if (((agent || {}).data || {}).dateAdd) {
-          dateAddStr = `Registration date: ${agent.data.dateAdd}.`;
-        }
-
-        let dateLastKeepAlive = '';
-        if (((agent || {}).data || {}).lastKeepAlive) {
-          dateLastKeepAlive += `Last keep alive: ${agent.data.lastKeepAlive}.`;
-        }
-
-        if (dateAddStr.length) {
-          this.dd.content.push({ text: dateAddStr, style: 'standard' });
-          this.dd.content.push('\n');
-        }
-
-        if (dateLastKeepAlive.length) {
-          this.dd.content.push({ text: dateLastKeepAlive, style: 'standard' });
-          this.dd.content.push('\n');
-        }
-
         if (((agent || {}).data || {}).group) {
+          let agGroups = '';
+          let index = 0;
+          for (let ag of agent.data.group) {
+            agGroups = agGroups.concat(ag);
+            if (index < agent.data.group.length - 1) {
+              agGroups = agGroups.concat(', ');
+            }
+            index++;
+          }
           this.dd.content.push({
-            text: `Group: ${agent.data.group}`,
+            text: `Group${agent.data.group.length > 1 ? 's' : ''}: ${agGroups}`,
             style: 'standard'
           });
           this.dd.content.push('\n');
         }
       }
-
       if (descriptions[tab] && descriptions[tab].description) {
         this.dd.content.push({
           text: descriptions[tab].description,
@@ -556,13 +652,24 @@ export class WazuhReportingCtrl {
         if ((data || {}).manager) str[4] = data.manager;
         if ((data || {}).os && data.os.name && data.os.version)
           str[5] = `${data.os.name} ${data.os.version}`;
+        str[6] = (data || {}).dateAdd ? data.dateAdd : '-';
+        str[7] = (data || {}).lastKeepAlive ? data.lastKeepAlive : '-';
         rows.push(str);
       }
 
       PdfTable(
         this.dd,
         rows,
-        ['ID', 'Name', 'IP', 'Version', 'Manager', 'OS'],
+        [
+          'ID',
+          'Name',
+          'IP',
+          'Version',
+          'Manager',
+          'OS',
+          'Registration date',
+          'Last keep alive'
+        ],
         null,
         null,
         true
@@ -1377,6 +1484,82 @@ export class WazuhReportingCtrl {
     }
   }
 
+  getConfigRows = (data, labels) => {
+    const result = [];
+    for (let prop in data || []) {
+      result.push([
+        (labels || {})[prop] || KeyEquivalence[prop] || prop,
+        data[prop] || '-'
+      ]);
+    }
+    return result;
+  };
+
+  getConfigTables = (data, section, tab, array = []) => {
+    let plainData = {};
+    const nestedData = [];
+    const tableData = [];
+    for (let key in data) {
+      if (
+        (typeof data[key] !== 'object' && !Array.isArray(data[key])) ||
+        (Array.isArray(data[key]) && typeof data[key][0] !== 'object')
+      ) {
+        plainData[key] =
+          Array.isArray(data[key]) && typeof data[key][0] !== 'object'
+            ? data[key].map(x => {
+                return x + '\n';
+              })
+            : data[key];
+      } else if (Array.isArray(data[key]) && typeof data[key][0] === 'object') {
+        tableData[key] = data[key];
+      } else {
+        nestedData.push(data[key]);
+      }
+    }
+    array.push({
+      title: (section.options || {}).hideHeader
+        ? ''
+        : (section.tabs || [])[tab] || 'Main settings',
+      columns: ['', ''],
+      type: 'config',
+      rows: this.getConfigRows(plainData, (section.labels || [])[0])
+    });
+    for (let key in tableData) {
+      const columns = Object.keys(tableData[key][0]);
+      columns.forEach((col, i) => {
+        columns[i] = col[0].toUpperCase() + col.slice(1);
+      });
+
+      const rows = tableData[key].map(x => {
+        let row = [];
+        for (let key in x) {
+          row.push(
+            typeof x[key] !== 'object'
+              ? x[key]
+              : Array.isArray(x[key])
+              ? x[key].map(x => {
+                  return x + '\n';
+                })
+              : JSON.stringify(x[key])
+          );
+        }
+        return row;
+      });
+      array.push({
+        title: ((section.labels || [])[0] || [])[key] || '',
+        type: 'table',
+        columns,
+        rows
+      });
+    }
+
+    nestedData.forEach(nest => {
+      this.getConfigTables(nest, section, tab + 1, array);
+    });
+
+    return array;
+  };
+
   /**
    * Builds a PDF report from multiple PNG images
    * @param {Object} req
@@ -1400,13 +1583,15 @@ export class WazuhReportingCtrl {
         const pattern = headers.pattern || false;
         const from = (payload.time || {}).from || false;
         const to = (payload.time || {}).to || false;
-        const kfilters = req.payload.filters;
+        let kfilters = req.payload.filters;
+        const isAgentConfig = tab === 'agentConfig';
+        const isGroupConfig = tab === 'groupConfig';
 
         if (!tab)
           throw new Error(
             'Reporting needs a valid app tab in order to work properly'
           );
-        if (!section)
+        if (!section && !isAgentConfig && !isGroupConfig)
           throw new Error(
             'Reporting needs a valid app section in order to work properly'
           );
@@ -1419,9 +1604,281 @@ export class WazuhReportingCtrl {
             'Reporting needs a valid file name in order to work properly'
           );
 
-        const isSycollector = tab === 'syscollector';
-
         let tables = [];
+        if (isGroupConfig) {
+          const g_id = kfilters[0].group;
+          let agentsInGroup = [];
+          try {
+            agentsInGroup = await this.apiRequest.makeGenericRequest(
+              'GET',
+              `/agents/groups/${g_id}`,
+              {},
+              apiId
+            );
+          } catch (err) {} //eslint-disable-line
+          await this.renderHeader(
+            tab,
+            g_id,
+            (((agentsInGroup || []).data || []).items || []).map(x => x.id),
+            apiId
+          );
+          kfilters = [];
+          let configuration = {};
+          try {
+            configuration = await this.apiRequest.makeGenericRequest(
+              'GET',
+              `/agents/groups/${g_id}/configuration`,
+              {},
+              apiId
+            );
+          } catch (err) {} //eslint-disable-line
+          if (Object.keys(configuration.data.items[0].config).length) {
+            this.dd.content.push({
+              text: `${configuration.data.items.length} Configurations`,
+              style: { fontSize: 14, color: '#000' },
+              margin: [0, 10, 0, 15]
+            });
+            const section = {
+              labels: []
+            };
+            for (let config of configuration.data.items) {
+              let filterTitle = '';
+              let index = 0;
+              for (let filter of Object.keys(config.filters)) {
+                filterTitle = filterTitle.concat(
+                  `${filter}: ${config.filters[filter]}`
+                );
+                if (index < Object.keys(config.filters).length - 1) {
+                  filterTitle = filterTitle.concat(' | ');
+                }
+                index++;
+              }
+              this.dd.content.push({
+                text: filterTitle,
+                style: 'h4',
+                margin: [0, 0, 0, 10]
+              });
+              let idx = 0;
+              section.tabs = [];
+              for (let _d of Object.keys(config.config)) {
+                for (let c of AgentConfiguration.configurations) {
+                  for (let s of c.sections) {
+                    for (let cn of s.config || []) {
+                      if (cn.configuration === _d) {
+                        section.labels = s.labels;
+                      }
+                    }
+                    for (let wo of s.wodle || []) {
+                      if (wo.name === _d) {
+                        section.labels = s.labels;
+                      }
+                    }
+                  }
+                }
+                section.tabs.push(_d);
+                if (Array.isArray(config.config[_d])) {
+                  for (let _d2 of config.config[_d]) {
+                    tables.push(...this.getConfigTables(_d2, section, idx));
+                  }
+                } else {
+                  tables.push(
+                    ...this.getConfigTables(config.config[_d], section, idx)
+                  );
+                }
+                for (const table of tables) {
+                  this.renderConfigTables([table]);
+                }
+                idx++;
+              }
+              tables = [];
+            }
+          }
+        }
+        if (isAgentConfig) {
+          const configurations = AgentConfiguration.configurations;
+          const a_id = kfilters[0].agent;
+          let wmodules = {};
+          try {
+            wmodules = await this.apiRequest.makeGenericRequest(
+              'GET',
+              `/agents/${a_id}/config/wmodules/wmodules`,
+              {},
+              apiId
+            );
+          } catch (err) {} //eslint-disable-line
+          kfilters = [];
+          await this.renderHeader(tab, tab, a_id, apiId);
+          for (let config of configurations) {
+            this.dd.content.push({
+              text: config.title,
+              style: 'h1',
+              margin: [0, 0, 0, 15]
+            });
+            for (let section of config.sections) {
+              if (section.config || section.wodle) {
+                let idx = 0;
+                const configs = (section.config || []).concat(
+                  section.wodle || []
+                );
+                for (let conf of configs) {
+                  let data = {};
+                  try {
+                    if (!conf['name']) {
+                      data = await this.apiRequest.makeGenericRequest(
+                        'GET',
+                        `/agents/${a_id}/config/${conf.component}/${
+                          conf.configuration
+                        }`,
+                        {},
+                        apiId
+                      );
+                    } else {
+                      for (let wodle of wmodules.data['wmodules']) {
+                        if (Object.keys(wodle)[0] === conf['name']) {
+                          data.data = wodle;
+                        }
+                      }
+                    }
+                    if (
+                      data &&
+                      data.data &&
+                      Object.keys(data.data[Object.keys(data.data)[0]]).length >
+                        0
+                    ) {
+                      for (let _d of Object.keys(data.data)) {
+                        if (idx === 0) {
+                          this.dd.content.push({
+                            text: section.subtitle,
+                            style: 'h4'
+                          });
+                          this.dd.content.push({
+                            text: section.desc,
+                            style: { fontSize: 12, color: '#000' },
+                            margin: [0, 0, 0, 20]
+                          });
+                        }
+                        if (Array.isArray(data.data[_d])) {
+                          /* LOG COLLECTOR */
+                          if (conf.filterBy) {
+                            let groups = [];
+                            data.data[_d].forEach(obj => {
+                              if (!groups[obj.logformat]) {
+                                groups[obj.logformat] = [];
+                              }
+                              groups[obj.logformat].push(obj);
+                            });
+                            Object.keys(groups).forEach(group => {
+                              let saveidx = 0;
+                              groups[group].forEach((x, i) => {
+                                if (
+                                  Object.keys(x).length >
+                                  Object.keys(groups[group][saveidx]).length
+                                ) {
+                                  saveidx = i;
+                                }
+                              });
+                              const columns = Object.keys(
+                                groups[group][saveidx]
+                              );
+                              const rows = groups[group].map(x => {
+                                let row = [];
+                                columns.forEach(key => {
+                                  row.push(
+                                    typeof x[key] !== 'object'
+                                      ? x[key]
+                                      : Array.isArray(x[key])
+                                      ? x[key].map(x => {
+                                          return x + '\n';
+                                        })
+                                      : JSON.stringify(x[key])
+                                  );
+                                });
+                                return row;
+                              });
+                              columns.forEach((col, i) => {
+                                columns[i] =
+                                  col[0].toUpperCase() + col.slice(1);
+                              });
+                              tables.push({
+                                title: group,
+                                type: 'table',
+                                columns,
+                                rows
+                              });
+                            });
+                          } else {
+                            for (let _d2 of data.data[_d]) {
+                              tables.push(
+                                ...this.getConfigTables(_d2, section, idx)
+                              );
+                            }
+                          }
+                        } else {
+                          /*INTEGRITY MONITORING MONITORED DIRECTORIES */
+                          if (conf.matrix) {
+                            const directories = data.data[_d].directories;
+                            delete data.data[_d].directories;
+                            tables.push(
+                              ...this.getConfigTables(
+                                data.data[_d],
+                                section,
+                                idx
+                              )
+                            );
+                            let diffOpts = [];
+                            Object.keys(section.opts).forEach(x => {
+                              diffOpts.push(x);
+                            });
+                            const columns = ['', ...diffOpts];
+                            let rows = [];
+                            console.log(columns);
+                            directories.forEach(x => {
+                              let row = [];
+                              row.push(x.dir);
+                              columns.forEach(y => {
+                                if (y !== '') {
+                                  row.push(
+                                    x.opts.indexOf(y) > -1 ? 'yes' : 'no'
+                                  );
+                                }
+                              });
+                              row.push(x.recursion_level);
+                              rows.push(row);
+                            });
+                            columns.forEach((x, idx) => {
+                              columns[idx] = section.opts[x];
+                            });
+                            columns.push('Recursion level');
+                            tables.push({
+                              title: 'Monitored directories',
+                              type: 'table',
+                              columns,
+                              rows
+                            });
+                          } else {
+                            tables.push(
+                              ...this.getConfigTables(
+                                data.data[_d],
+                                section,
+                                idx
+                              )
+                            );
+                          }
+                        }
+                      }
+                    }
+                  } catch (err) {} //eslint-disable-line
+                  idx++;
+                }
+                for (const table of tables) {
+                  this.renderConfigTables([table]);
+                }
+              }
+              tables = [];
+            }
+          }
+        }
+        const isSycollector = tab === 'syscollector';
         if (isSycollector) {
           let agentId = '';
           let agentOs = '';
@@ -1591,8 +2048,9 @@ export class WazuhReportingCtrl {
           } catch (err) {} //eslint-disable-line
         }
 
-        await this.renderHeader(section, tab, isAgents, apiId);
-
+        if (!isAgentConfig && !isGroupConfig) {
+          await this.renderHeader(section, tab, isAgents, apiId);
+        }
         let filters = false;
         if (kfilters) {
           filters = this.sanitizeFilters(kfilters, req.payload.searchBar);
@@ -1617,13 +2075,18 @@ export class WazuhReportingCtrl {
           );
         }
 
-        !isSycollector &&
+        if (!isSycollector && !isAgentConfig && !isGroupConfig) {
           this.renderVisualizations(req.payload.array, isAgents, tab);
-
+        }
         if (isSycollector) {
           this.renderTables(tables, false);
         }
-        if (!isSycollector && req.payload.tables) {
+        if (
+          !isSycollector &&
+          !isAgentConfig &&
+          !isGroupConfig &&
+          req.payload.tables
+        ) {
           this.renderTables(req.payload.tables);
         }
 

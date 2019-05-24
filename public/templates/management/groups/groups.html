@@ -140,8 +140,18 @@
                 <!-- End groups table -->
 
                 <div ng-if='!addingAgents'>
+                    <div layout="column" layout-align="center center" ng-show="reportBusy && reportStatus" class="md-padding-top-10">
+                        <div class="percentage"><i class="fa fa-fw fa-spin fa-spinner" aria-hidden="true"></i></div>
+                        <div class="percentage">{{reportStatus}}</div>
+                    </div>
                     <!-- Group agents table -->
                     <md-card flex class="wz-md-card _md flex md-margin-h wz-margin-top-16" ng-if="lookingGroup && groupsSelectedTab==='agents' && currentGroup">
+                        <md-card-actions layout="row" class="wz-card-actions wz-card-actions-top layout-align-start-center">
+                            <a ng-click="exportConfiguration(currentGroup)">
+                                <react-component name="EuiIcon" props="{type:'logstashOutput', color:'primary'}" />
+                                Generate group report
+                            </a>
+                        </md-card-actions>
                         <div layout="row" ng-show="failedErrors" class="extraHeader">
                             <md-list>
                                 <md-list-item class="error-enum-configuration" ng-repeat="group in failedErrors">
@@ -174,6 +184,12 @@
 
                     <!-- Group files table -->
                     <md-card flex class="wz-md-card _md flex md-margin-h wz-margin-top-16" ng-if="lookingGroup && groupsSelectedTab==='files' && !fileViewer && currentGroup">
+                        <md-card-actions layout="row" class="wz-card-actions wz-card-actions-top layout-align-start-center">
+                            <a ng-click="exportConfiguration(currentGroup)">
+                                <react-component name="EuiIcon" props="{type:'logstashOutput', color:'primary'}" />
+                                Generate group report
+                            </a>
+                        </md-card-actions>
                         <md-card-content>
                             <div layout="row">
                                 <wz-table custom-columns="true" extra-limit="100" flex path="'/agents/groups/' + currentGroup.name + '/files'"
