@@ -481,12 +481,12 @@ export class ElasticWrapper {
    *
    * @param {*} payload
    */
-  async searchWazuhAlertsWithPayload(payload) {
+  async searchWazuhAlertsWithPayload(payload, namespace) {
     try {
       if (!payload) return Promise.reject(new Error('No valid payload given'));
       const pattern = payload.pattern;
       delete payload.pattern;
-      const fullPattern = await this.getIndexPatternUsingGet(pattern);
+      const fullPattern = await this.getIndexPatternUsingGet(pattern, namespace);
 
       const title =
         (((fullPattern || {})._source || {})['index-pattern'] || {}).title ||

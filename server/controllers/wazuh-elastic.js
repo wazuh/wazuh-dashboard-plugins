@@ -240,8 +240,9 @@ export class WazuhElasticCtrl {
 
       payload.aggs['2'].terms.field = req.params.field;
       payload.pattern = req.params.pattern;
-
-      const data = await this.wzWrapper.searchWazuhAlertsWithPayload(payload);
+      const spaces = this._server.plugins.spaces;
+      const namespace = spaces && spaces.getSpaceId(req);
+      const data = await this.wzWrapper.searchWazuhAlertsWithPayload(payload, namespace);
 
       return data.hits.total.value === 0 ||
         typeof data.aggregations['2'].buckets[0] === 'undefined'
