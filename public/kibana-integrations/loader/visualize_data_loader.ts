@@ -115,8 +115,8 @@ export class VisualizeDataLoader {
       const maxValue = Math.max.apply(Math, this.visData.series[0].values.map(x => { return x.y; }));
       const lengthMaxValue = maxValue.toString().length;
       const addTo = parseInt('1' + '0'.repeat(lengthMaxValue - 1));
-      this.vis.params.valueAxes[0].scale.min = 0;
-      this.vis.params.valueAxes[0].scale.max = maxValue + addTo;
+      visParams.valueAxes[0].scale.min = 0;
+      visParams.valueAxes[0].scale.max = maxValue + (addTo / 2);
     }
 
     return {
