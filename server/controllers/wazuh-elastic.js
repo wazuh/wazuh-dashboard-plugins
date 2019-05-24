@@ -656,20 +656,25 @@ export class WazuhElasticCtrl {
       const file = ClusterVisualizations['monitoring'];
       const nodes = req.payload.nodes.items;
       const name = req.payload.nodes.name;
-      const master_node = req.payload.nodes.master_node;
+      const masterNode = req.payload.nodes.master_node;
 
-      const pattern_doc = await this.wzWrapper.getIndexPatternUsingGet(
-        req.params.pattern
+      const spaces = this._server.plugins.spaces;
+      const namespace = spaces && spaces.getSpaceId(req);
+
+      const patternDoc = await this.wzWrapper.getIndexPatternUsingGet(
+        req.params.pattern,
+        namespace
       );
-      const pattern_name = pattern_doc._source['index-pattern'].title;
+
+      const patternName = patternDoc._source['index-pattern'].title;
 
       const raw = await this.buildClusterVisualizationsRaw(
         file,
         req.params.pattern,
         nodes,
         name,
-        master_node,
-        pattern_name
+        masterNode,
+        patternName
       );
 
       return { acknowledge: true, raw: raw };

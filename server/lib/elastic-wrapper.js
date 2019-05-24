@@ -838,14 +838,17 @@ export class ElasticWrapper {
    * Get an index pattern by name and/or id
    * @param {*} id Could be id and/or title
    */
-  async getIndexPatternUsingGet(id) {
+  async getIndexPatternUsingGet(id, namespace) {
     try {
       if (!id) return Promise.reject(new Error('No valid id given'));
-
+      let idQuery = id.includes('index-pattern:') ? id : 'index-pattern:' + id;
+      if (namespace && namespace !== 'default') {
+        idQuery = `${namespace}:${idQuery}`;
+      }
       const data = await this.elasticRequest.callWithInternalUser('get', {
         index: this.WZ_KIBANA_INDEX,
         type: '_doc',
-        id: id.includes('index-pattern:') ? id : 'index-pattern:' + id
+        id: idQuery
       });
 
       return data;
