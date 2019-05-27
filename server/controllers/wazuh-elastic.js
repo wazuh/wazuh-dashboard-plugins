@@ -417,7 +417,7 @@ export class WazuhElasticCtrl {
       if (!exists.length) {
         const title = monitoringPattern;
         const id = `${namespace}:index-pattern:${monitoringPattern}`;
-        await this.wzWrapper.createMonitoringIndexPattern(title, id);
+        await this.wzWrapper.createMonitoringIndexPattern(title, id, namespace);
         return id;
       } else {
         return exists[0]._id;
