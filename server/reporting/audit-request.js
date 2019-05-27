@@ -76,7 +76,10 @@ export class AuditRequest {
         }
       });
 
-      const response = await this.wzWrapper.searchWazuhAlertsWithPayload(base);
+      const response = await this.wzWrapper.searchWazuhAlertsWithPayload(
+        base,
+        this.namespace
+      );
       const { buckets } = response.aggregations['3'];
       return buckets.map(item => item.key);
     } catch (error) {
@@ -133,7 +136,10 @@ export class AuditRequest {
         }
       });
 
-      const response = await this.wzWrapper.searchWazuhAlertsWithPayload(base);
+      const response = await this.wzWrapper.searchWazuhAlertsWithPayload(
+        base,
+        this.namespace
+      );
       const { buckets } = response.aggregations['3'];
 
       const result = [];
@@ -191,7 +197,10 @@ export class AuditRequest {
         }
       });
 
-      const response = await this.wzWrapper.searchWazuhAlertsWithPayload(base);
+      const response = await this.wzWrapper.searchWazuhAlertsWithPayload(
+        base,
+        this.namespace
+      );
       const { buckets } = response.aggregations['2'];
 
       return buckets.map(item => ({
