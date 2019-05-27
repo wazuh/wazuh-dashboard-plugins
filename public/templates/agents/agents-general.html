@@ -1,17 +1,16 @@
-<md-content flex layout="column" ng-if="tab === 'general' && tabView === 'panels'"
-    ng-class="{'no-opacity': resultState !== 'ready' || !rendered}" layout-align="start">
+<md-content flex layout="column" ng-if="tab === 'general' && tabView === 'panels'" ng-class="{'no-opacity': resultState !== 'ready' || !rendered}"
+    layout-align="start">
     <div layout="row" layout-align="start stretch" class="height-400">
         <md-card flex class="wz-md-card" ng-class="{'fullscreen': expandArray[0]}">
             <md-card-actions layout="row" layout-align="end center" class="wz-card-actions-vis" ng-dblclick="expand(0)">
-                <span class="wz-headline-title">Alert level evolution</span>
+                <span class="wz-headline-title">Alert groups evolution</span>
                 <span flex></span>
                 <span class="cursor-pointer" ng-click="expand(0)">
                     <react-component name="EuiIcon" props="{type:'expand'}" />
                 </span>
             </md-card-actions>
             <md-card-content class="wazuh-column">
-                <kbn-vis id="Wazuh-App-Agents-Overview-Alert-level-evolution"
-                    vis-id="'Wazuh-App-Agents-Overview-Alert-level-evolution'"></kbn-vis>
+                <kbn-vis id="Wazuh-App-Agents-Overview-Alert-groups-evolution" vis-id="'Wazuh-App-Agents-Overview-Alert-groups-evolution'"></kbn-vis>
             </md-card-content>
         </md-card>
         <md-card flex class="wz-md-card" ng-class="{'fullscreen': expandArray[1]}">
@@ -52,8 +51,7 @@
                 </span>
             </md-card-actions>
             <md-card-content class="wazuh-column">
-                <kbn-vis id="Wazuh-App-Agents-Overview-Top-10-groups"
-                    vis-id="'Wazuh-App-Agents-Overview-Top-10-groups'">
+                <kbn-vis id="Wazuh-App-Agents-Overview-Top-10-groups" vis-id="'Wazuh-App-Agents-Overview-Top-10-groups'">
                 </kbn-vis>
             </md-card-content>
         </md-card>
@@ -66,8 +64,7 @@
                 </span>
             </md-card-actions>
             <md-card-content class="wazuh-column">
-                <kbn-vis id="Wazuh-App-Agents-Overview-Top-5-PCI-DSS-Requirements"
-                    vis-id="'Wazuh-App-Agents-Overview-Top-5-PCI-DSS-Requirements'"></kbn-vis>
+                <kbn-vis id="Wazuh-App-Agents-Overview-Top-5-PCI-DSS-Requirements" vis-id="'Wazuh-App-Agents-Overview-Top-5-PCI-DSS-Requirements'"></kbn-vis>
             </md-card-content>
         </md-card>
     </div>
@@ -82,8 +79,7 @@
                 </span>
             </md-card-actions>
             <md-card-content class="wazuh-column">
-                <kbn-vis vis-id="'Wazuh-App-Agents-Overview-Alerts-summary'"
-                    id="Wazuh-App-Agents-Overview-Alerts-summary"></kbn-vis>
+                <kbn-vis vis-id="'Wazuh-App-Agents-Overview-Alerts-summary'" id="Wazuh-App-Agents-Overview-Alerts-summary"></kbn-vis>
             </md-card-content>
         </md-card>
         <md-card flex class="wz-md-card" ng-class="{'fullscreen': expandArray[6]}">
