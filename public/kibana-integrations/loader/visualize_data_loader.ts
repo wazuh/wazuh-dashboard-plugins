@@ -112,12 +112,14 @@ export class VisualizeDataLoader {
     }
 
     if ((visParams || {}).valueAxes && (this.visData.series || [])[0]) {
-      visParams.valueAxes.forEach((axis, idx) => {
-        const maxValue = Math.max.apply(Math, this.visData.series[idx].values.map(x => { return x.y; }));
-        const lengthMaxValue = maxValue.toString().length;
-        const addTo = parseInt('1' + '0'.repeat(lengthMaxValue - 1));
-        axis.scale.max = maxValue + addTo;
-      });
+      if (visParams.type !== 'area') {
+        visParams.valueAxes.forEach((axis: { scale: { max: number; }; }, idx: string | number) => {
+          const maxValue = Math.max.apply(Math, this.visData.series[idx].values.map((x: { y: any; }) => { return x.y; }));
+          const lengthMaxValue = maxValue.toString().length;
+          const addTo = parseInt('1' + '0'.repeat(lengthMaxValue - 1));
+          axis.scale.max = maxValue + (addTo / 2);
+        });
+      }
     }
 
     return {
