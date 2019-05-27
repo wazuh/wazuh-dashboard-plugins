@@ -1,6 +1,5 @@
 <md-content flex layout="column" ng-if="tab === 'sca' && tabView === 'panels'" layout-align="start">
-    <div layout="row" class="wz-margin-top-16 wz-margin-right-8 wz-margin-left-8"
-        ng-if="!loadSca && !load && (((agent || {}).status === 'Never connected') || !agent || !agent.os)">
+    <div layout="row" class="wz-margin-top-16 wz-margin-right-8 wz-margin-left-8" ng-if="!loadSca && !load && (((agent || {}).status === 'Never connected') || !agent || !agent.os)">
         <div flex class="euiCallOut euiCallOut--warning">
             <div class="euiCallOutHeader">
                 <react-component name="EuiIcon" props="{type:'help',className:'euiCallOutHeader__title'}" />
@@ -12,26 +11,23 @@
         <react-component name="EuiProgress" props="{size: 'xs', color: 'primary'}" />
     </div>
 
-    <div layout="row" class="wz-margin-top-16"
-        ng-if="!loadSca && !load && (!policies || !policies.length) && ((agent || {}).status !== 'Never connected')">
+    <div layout="row" class="wz-margin-top-16" ng-if="!loadSca && !load && (!policies || !policies.length) && ((agent || {}).status !== 'Never connected')">
         <span flex></span>
         <md-card flex="50" class="wz-md-card" flex>
             <md-card-content class="wz-text-center">
                 <span class="wz-headline-title">
                     <svg class="euiIcon euiIcon--medium" focusable="false" xmlns="http://www.w3.org/2000/svg" width="16"
                         height="16" viewBox="0 0 16 16">
-                        <path fill-rule="evenodd"
-                            d="M8.378 1.496l6.695 10.984A1 1 0 0 1 14.22 14H1.667a1 1 0 0 1-.883-1.47L6.642 1.545a1 1 0 0 1 1.736-.05zm-.853.52L1.667 13h12.552L7.525 2.016zM7.14 10.06L6.9 5.18h1.3l-.25 4.878h-.81zm.394 1.901a.61.61 0 0 1-.448-.186.606.606 0 0 1-.186-.444c0-.174.062-.323.186-.446a.614.614 0 0 1 .448-.184c.169 0 .315.06.44.182.124.122.186.27.186.448a.6.6 0 0 1-.189.446.607.607 0 0 1-.437.184z">
+                        <path fill-rule="evenodd" d="M8.378 1.496l6.695 10.984A1 1 0 0 1 14.22 14H1.667a1 1 0 0 1-.883-1.47L6.642 1.545a1 1 0 0 1 1.736-.05zm-.853.52L1.667 13h12.552L7.525 2.016zM7.14 10.06L6.9 5.18h1.3l-.25 4.878h-.81zm.394 1.901a.61.61 0 0 1-.448-.186.606.606 0 0 1-.186-.444c0-.174.062-.323.186-.446a.614.614 0 0 1 .448-.184c.169 0 .315.06.44.182.124.122.186.27.186.448a.6.6 0 0 1-.189.446.607.607 0 0 1-.437.184z">
                         </path>
                     </svg> No scans available.
                 </span>
                 <md-divider class="wz-margin-top-10"></md-divider>
                 <div layout="row" class="wz-margin-top-10 layout-align-center-center">
                     <button class="kuiButton kuiButton--secondary height-35" ng-click="switchTab('sca')">
-                        <svg class="euiIcon euiIcon--medium" focusable="false" xmlns="http://www.w3.org/2000/svg"
-                            width="16" height="16" viewBox="0 0 16 16">
-                            <path
-                                d="M11.228 2.942a.5.5 0 1 1-.538.842A5 5 0 1 0 13 8a.5.5 0 1 1 1 0 6 6 0 1 1-2.772-5.058zM14 1.5v3A1.5 1.5 0 0 1 12.5 6h-3a.5.5 0 0 1 0-1h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 1 1 1 0z">
+                        <svg class="euiIcon euiIcon--medium" focusable="false" xmlns="http://www.w3.org/2000/svg" width="16"
+                            height="16" viewBox="0 0 16 16">
+                            <path d="M11.228 2.942a.5.5 0 1 1-.538.842A5 5 0 1 0 13 8a.5.5 0 1 1 1 0 6 6 0 1 1-2.772-5.058zM14 1.5v3A1.5 1.5 0 0 1 12.5 6h-3a.5.5 0 0 1 0-1h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 1 1 1 0z">
                             </path>
                         </svg> Refresh
                     </button>
@@ -66,7 +62,7 @@
                         <div class="euiTableCellContent"><span class="euiTableCellContent__text">Last scan</span></div>
                     </th>
                     <th class="euiTableHeaderCell padding-left-0">
-                         <div class="euiTableCellContent"><span class="euiTableCellContent__text">Pass</span></div>
+                        <div class="euiTableCellContent"><span class="euiTableCellContent__text">Pass</span></div>
                     </th>
                     <th class="euiTableHeaderCell padding-left-0">
                         <div class="euiTableCellContent"><span class="euiTableCellContent__text">Fail</span></div>
@@ -84,8 +80,7 @@
                 <tr class="euiTableRow" ng-repeat="policy in policies">
                     <td class="euiTableRowCell">
                         <div class="euiTableCellContent euiTableCellContent--overflowingContent">
-                            <button ng-click="loadScaChecks(policy)" class="euiLink euiLink--primary"
-                                type="button">{{policy.name}}</button>
+                            <button ng-click="loadScaChecks(policy)" class="euiLink euiLink--primary" type="button">{{policy.name}}</button>
                         </div>
                     </td>
                     <td class="euiTableRowCell">
@@ -127,9 +122,9 @@
     <div layout="row" class="wz-margin-top-10" ng-if="agent && agent.os && lookingSca">
         <md-card flex class="wz-md-card">
             <md-card-actions style="padding-top: 14px !important;" class="wz-card-actions-vis">
-                <div layout="row">                
+                <div layout="row">
                     <span><i class="fa fa-fw fa-arrow-left cursor-pointer" ng-click="closeScaChecks()"></i>
-                    {{lookingSca.name}}
+                        {{lookingSca.name}}
                     </span>
                     <span class="wz-margin-left-16">Pass: <span class="wz-text-bold">{{lookingSca.pass}}</span></span>
                     <span class="wz-margin-left-16">Fail: <span class="wz-text-bold">{{lookingSca.fail}}</span></span>
@@ -145,24 +140,20 @@
                     </span>
                 </div>
                 <div layout="row" class="wz-margin-bottom-25">
-                    <input placeholder="Filter checks..." ng-model="custom_search" type="text"
-                        class="kuiLocalSearchInput ng-empty ng-pristine ng-scope ng-touched ng-valid"
+                    <input placeholder="Filter checks..." ng-model="custom_search" type="text" class="kuiLocalSearchInput ng-empty ng-pristine ng-scope ng-touched ng-valid"
                         aria-invalid="false" wz-enter="search(custom_search)">
-                    <button type="submit" aria-label="Search" class="kuiLocalSearchButton height-40"
-                        ng-click="search(custom_search)">
+                    <button type="submit" aria-label="Search" class="kuiLocalSearchButton height-40" ng-click="search(custom_search)">
                         <span class="fa fa-search" aria-hidden="true"></span>
                     </button>
                 </div>
                 <div layout="row" class="wz-margin-top-16 wz-margin-bottom-40-inv">
                     <wz-table custom-columns="true" flex path="'/sca/' + agent.id + '/checks/' + lookingSca.id"
-                        row-sizes="[16,14,12]" extra-limit="100"
-                        keys="[{value: 'id', width: '75px'},'title', {value:'file', width:'250px'}, {value: 'result', width: '200px'}]">
+                        row-sizes="[16,14,12]" extra-limit="100" keys="[{value: 'id', width: '75px'},'title', 'file', {value: 'result', width: '200px'}]">
                     </wz-table>
                 </div>
             </md-card-content>
             <md-card-actions layout="row" layout-align="end center" class="layout-align-end-center layout-row">
-                <button type="button"
-                    ng-click="downloadCsv('/sca/' + agent.id + '/checks/' + lookingSca.id, lookingSca.id + '.csv')"
+                <button type="button" ng-click="downloadCsv('/sca/' + agent.id + '/checks/' + lookingSca.id, lookingSca.id + '.csv')"
                     class="euiButtonEmpty euiButtonEmpty--primary euiButtonEmpty--small">
                     <span class="euiButtonEmpty__content">
                         <react-component name="EuiIcon" props="{type:'importAction'}" />
