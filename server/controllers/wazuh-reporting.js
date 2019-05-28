@@ -196,8 +196,8 @@ export class WazuhReportingCtrl {
           parseInt(a[a.length - 1]) < parseInt(b[b.length - 1])
             ? 1
             : parseInt(a[a.length - 1]) > parseInt(b[b.length - 1])
-            ? -1
-            : 0;
+              ? -1
+              : 0;
 
         TimSort.sort(rows, sortFunction);
 
@@ -250,8 +250,17 @@ export class WazuhReportingCtrl {
           rowsparsed.length > 100 ? rowsparsed.slice(0, 99) : rowsparsed;
         this.dd.content.push({
           text: table.title,
-          style: { fontSize: 11, color: '#000' }
+          style: { fontSize: 11, color: '#000' },
+          margin: table.title && table.type === 'table' ? [0, 0, 0, 5] : ''
         });
+
+        if (table.title === 'Monitored directories') {
+          this.dd.content.push({
+            text: 'RT: Real time | WD: Who-data | Per.: Permission | MT: Modification time | SL: Symbolic link | RL: Recursion level',
+            style: { fontSize: 8, color: '#78C8DE' },
+            margin: [0, 0, 0, 5]
+          });
+        }
 
         const full_body = [];
 
@@ -262,12 +271,8 @@ export class WazuhReportingCtrl {
           );
         }
         let widths = [];
-        /*         if (table.type === 'config') {
-                  widths = Array(table.columns.length).fill('50%');
-                } else { */
         widths = Array(table.columns.length - 1).fill('auto');
         widths.push('*');
-        ///*  */}
 
         if (table.type === 'config') {
           full_body.push(
@@ -336,9 +341,9 @@ export class WazuhReportingCtrl {
     const seconds = date.getSeconds();
     const str = `${year}-${month < 10 ? '0' + month : month}-${
       day < 10 ? '0' + day : day
-    }T${hours < 10 ? '0' + hours : hours}:${
+      }T${hours < 10 ? '0' + hours : hours}:${
       minutes < 10 ? '0' + minutes : minutes
-    }:${seconds < 10 ? '0' + seconds : seconds}`;
+      }:${seconds < 10 ? '0' + seconds : seconds}`;
     return str;
   }
 
@@ -422,14 +427,14 @@ export class WazuhReportingCtrl {
       str +=
         i === len - 1
           ? (filter.meta.negate ? 'NOT ' : '') +
-            filter.meta.key +
-            ': ' +
-            filter.meta.value
+          filter.meta.key +
+          ': ' +
+          filter.meta.value
           : (filter.meta.negate ? 'NOT ' : '') +
-            filter.meta.key +
-            ': ' +
-            filter.meta.value +
-            ' AND ';
+          filter.meta.key +
+          ': ' +
+          filter.meta.value +
+          ' AND ';
     }
 
     if (searchBar) {
@@ -1150,14 +1155,14 @@ export class WazuhReportingCtrl {
             this.dd.content.push({
               text: `Last policy monitoring scan was executed from ${
                 lastScan.data.start
-              } to ${lastScan.data.end}.`,
+                } to ${lastScan.data.end}.`,
               style: 'standard'
             });
           } else if (lastScan.data.start) {
             this.dd.content.push({
               text: `Policy monitoring scan is currently in progress for this agent (started on ${
                 lastScan.data.start
-              }).`,
+                }).`,
               style: 'standard'
             });
           } else {
@@ -1277,13 +1282,13 @@ export class WazuhReportingCtrl {
             this.dd.content.push({
               text: `Last file integrity monitoring scan was executed from ${
                 lastScan.data.start
-              } to ${lastScan.data.end}.`
+                } to ${lastScan.data.end}.`
             });
           } else if (lastScan.data.start) {
             this.dd.content.push({
               text: `File integrity monitoring scan is currently in progress for this agent (started on ${
                 lastScan.data.start
-              }).`
+                }).`
             });
           } else {
             this.dd.content.push({
@@ -1347,7 +1352,7 @@ export class WazuhReportingCtrl {
           if (hardware.data.ram && hardware.data.ram.total)
             ulcustom.push(
               Number(hardware.data.ram.total / 1024 / 1024).toFixed(2) +
-                'GB RAM'
+              'GB RAM'
             );
           ulcustom &&
             ulcustom.length &&
@@ -1499,27 +1504,31 @@ export class WazuhReportingCtrl {
     let plainData = {};
     const nestedData = [];
     const tableData = [];
-    for (let key in data) {
-      if (
-        (typeof data[key] !== 'object' && !Array.isArray(data[key])) ||
-        (Array.isArray(data[key]) && typeof data[key][0] !== 'object')
-      ) {
-        plainData[key] =
-          Array.isArray(data[key]) && typeof data[key][0] !== 'object'
-            ? data[key].map(x => {
+    if (data.length === 1 && Array.isArray(data)) {
+      tableData[section.config[tab].configuration] = data;
+    } else {
+      for (let key in data) {
+        if (
+          (typeof data[key] !== 'object' && !Array.isArray(data[key])) ||
+          (Array.isArray(data[key]) && typeof data[key][0] !== 'object')
+        ) {
+          plainData[key] =
+            Array.isArray(data[key]) && typeof data[key][0] !== 'object'
+              ? data[key].map(x => {
                 return x + '\n';
               })
-            : data[key];
-      } else if (Array.isArray(data[key]) && typeof data[key][0] === 'object') {
-        tableData[key] = data[key];
-      } else {
-        nestedData.push(data[key]);
+              : data[key];
+        } else if (Array.isArray(data[key]) && typeof data[key][0] === 'object') {
+          tableData[key] = data[key];
+        } else {
+          nestedData.push(data[key]);
+        }
       }
     }
     array.push({
       title: (section.options || {}).hideHeader
         ? ''
-        : (section.tabs || [])[tab] || 'Main settings',
+        : (section.tabs || [])[tab] || '',
       columns: ['', ''],
       type: 'config',
       rows: this.getConfigRows(plainData, (section.labels || [])[0])
@@ -1537,10 +1546,10 @@ export class WazuhReportingCtrl {
             typeof x[key] !== 'object'
               ? x[key]
               : Array.isArray(x[key])
-              ? x[key].map(x => {
+                ? x[key].map(x => {
                   return x + '\n';
                 })
-              : JSON.stringify(x[key])
+                : JSON.stringify(x[key])
           );
         }
         return row;
@@ -1615,7 +1624,7 @@ export class WazuhReportingCtrl {
               {},
               apiId
             );
-          } catch (err) {} //eslint-disable-line
+          } catch (err) { } //eslint-disable-line
           await this.renderHeader(
             tab,
             g_id,
@@ -1631,7 +1640,7 @@ export class WazuhReportingCtrl {
               {},
               apiId
             );
-          } catch (err) {} //eslint-disable-line
+          } catch (err) { } //eslint-disable-line
           if (Object.keys(configuration.data.items[0].config).length) {
             this.dd.content.push({
               text: `${configuration.data.items.length} Configurations`,
@@ -1705,7 +1714,7 @@ export class WazuhReportingCtrl {
               {},
               apiId
             );
-          } catch (err) {} //eslint-disable-line
+          } catch (err) { } //eslint-disable-line
           kfilters = [];
           await this.renderHeader(tab, tab, a_id, apiId);
           for (let config of configurations) {
@@ -1727,7 +1736,7 @@ export class WazuhReportingCtrl {
                       data = await this.apiRequest.makeGenericRequest(
                         'GET',
                         `/agents/${a_id}/config/${conf.component}/${
-                          conf.configuration
+                        conf.configuration
                         }`,
                         {},
                         apiId
@@ -1743,7 +1752,7 @@ export class WazuhReportingCtrl {
                       data &&
                       data.data &&
                       Object.keys(data.data[Object.keys(data.data)[0]]).length >
-                        0
+                      0
                     ) {
                       for (let _d of Object.keys(data.data)) {
                         if (idx === 0) {
@@ -1754,7 +1763,7 @@ export class WazuhReportingCtrl {
                           this.dd.content.push({
                             text: section.desc,
                             style: { fontSize: 12, color: '#000' },
-                            margin: [0, 0, 0, 20]
+                            margin: [0, 0, 0, 10]
                           });
                         }
                         if (Array.isArray(data.data[_d])) {
@@ -1787,25 +1796,28 @@ export class WazuhReportingCtrl {
                                     typeof x[key] !== 'object'
                                       ? x[key]
                                       : Array.isArray(x[key])
-                                      ? x[key].map(x => {
+                                        ? x[key].map(x => {
                                           return x + '\n';
                                         })
-                                      : JSON.stringify(x[key])
+                                        : JSON.stringify(x[key])
                                   );
                                 });
                                 return row;
                               });
                               columns.forEach((col, i) => {
-                                columns[i] =
-                                  col[0].toUpperCase() + col.slice(1);
+                                columns[i] = col[0].toUpperCase() + col.slice(1);
                               });
                               tables.push({
-                                title: group,
+                                title: section.labels[0][group],
                                 type: 'table',
                                 columns,
                                 rows
                               });
                             });
+                          } else if (_d.configuration !== 'socket') {
+                            tables.push(
+                              ...this.getConfigTables(data.data[_d], section, idx)
+                            );
                           } else {
                             for (let _d2 of data.data[_d]) {
                               tables.push(
@@ -1829,9 +1841,9 @@ export class WazuhReportingCtrl {
                             Object.keys(section.opts).forEach(x => {
                               diffOpts.push(x);
                             });
-                            const columns = ['', ...diffOpts];
+                            const columns = ['', ...diffOpts.filter(x =>
+                              (x !== 'check_all' && x !== 'check_sum'))];
                             let rows = [];
-                            console.log(columns);
                             directories.forEach(x => {
                               let row = [];
                               row.push(x.dir);
@@ -1848,7 +1860,7 @@ export class WazuhReportingCtrl {
                             columns.forEach((x, idx) => {
                               columns[idx] = section.opts[x];
                             });
-                            columns.push('Recursion level');
+                            columns.push('RL');
                             tables.push({
                               title: 'Monitored directories',
                               type: 'table',
@@ -1867,7 +1879,7 @@ export class WazuhReportingCtrl {
                         }
                       }
                     }
-                  } catch (err) {} //eslint-disable-line
+                  } catch (err) { } //eslint-disable-line
                   idx++;
                 }
                 for (const table of tables) {
@@ -1907,7 +1919,7 @@ export class WazuhReportingCtrl {
               agent && agent.data && agent.data.os && agent.data.os.platform
                 ? agent.data.os.platform
                 : '';
-          } catch (err) {} //eslint-disable-line
+          } catch (err) { } //eslint-disable-line
           try {
             const packages = await this.apiRequest.makeGenericRequest(
               'GET',
@@ -1922,26 +1934,26 @@ export class WazuhReportingCtrl {
                   agentOs === 'windows'
                     ? ['Name', 'Architecture', 'Version', 'Vendor']
                     : [
-                        'Name',
-                        'Architecture',
-                        'Version',
-                        'Vendor',
-                        'Description'
-                      ],
+                      'Name',
+                      'Architecture',
+                      'Version',
+                      'Vendor',
+                      'Description'
+                    ],
                 rows: packages.data.items.map(x => {
                   return agentOs === 'windows'
                     ? [x['name'], x['architecture'], x['version'], x['vendor']]
                     : [
-                        x['name'],
-                        x['architecture'],
-                        x['version'],
-                        x['vendor'],
-                        x['description']
-                      ];
+                      x['name'],
+                      x['architecture'],
+                      x['version'],
+                      x['vendor'],
+                      x['description']
+                    ];
                 })
               });
             }
-          } catch (err) {} //eslint-disable-line
+          } catch (err) { } //eslint-disable-line
           try {
             const processes = await this.apiRequest.makeGenericRequest(
               'GET',
@@ -1960,15 +1972,15 @@ export class WazuhReportingCtrl {
                   return agentOs === 'windows'
                     ? [x['name'], x['cmd'], x['priority'], x['nlwp']]
                     : [
-                        x['name'],
-                        x['euser'],
-                        x['nice'],
-                        ProcessEquivalence[x.state]
-                      ];
+                      x['name'],
+                      x['euser'],
+                      x['nice'],
+                      ProcessEquivalence[x.state]
+                    ];
                 })
               });
             }
-          } catch (err) {} //eslint-disable-line
+          } catch (err) { } //eslint-disable-line
 
           try {
             const ports = await this.apiRequest.makeGenericRequest(
@@ -1998,7 +2010,7 @@ export class WazuhReportingCtrl {
                 })
               });
             }
-          } catch (err) {} //eslint-disable-line
+          } catch (err) { } //eslint-disable-line
 
           try {
             const netiface = await this.apiRequest.makeGenericRequest(
@@ -2016,7 +2028,7 @@ export class WazuhReportingCtrl {
                 })
               });
             }
-          } catch (err) {} //eslint-disable-line
+          } catch (err) { } //eslint-disable-line
           try {
             const netaddr = await this.apiRequest.makeGenericRequest(
               'GET',
@@ -2045,7 +2057,7 @@ export class WazuhReportingCtrl {
                 })
               });
             }
-          } catch (err) {} //eslint-disable-line
+          } catch (err) { } //eslint-disable-line
         }
 
         if (!isAgentConfig && !isGroupConfig) {

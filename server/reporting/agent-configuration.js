@@ -243,7 +243,12 @@ export const AgentConfiguration = {
               target: 'Redirect output to this socket',
               frequency: 'Interval between command executions',
               file: 'Log location',
-              location: 'Log location'
+              location: 'Log location',
+              socket: 'Output sockets',
+              syslog: 'Syslog',
+              command: 'Command',
+              full_command: 'Full command',
+              audit: 'Audit'
             }
           ],
           options: { hideHeader: true }
@@ -270,21 +275,19 @@ export const AgentConfiguration = {
             }
           ],
           opts: {
-            realtime: 'Realtime',
-            check_whodata: 'Whodata',
+            realtime: 'RT',
+            check_whodata: 'WD',
             report_changes: 'Changes',
-            check_all: 'All sum',
-            check_sum: 'Sum',
             check_md5sum: 'MD5',
             check_sha1sum: 'SHA1',
-            check_perm: 'Permis.',
+            check_perm: 'Per.',
             check_size: 'Size',
             check_owner: 'Owner',
             check_group: 'Group',
-            check_mtime: 'Modif.',
+            check_mtime: 'MT',
             check_inode: 'Inode',
             check_sha256sum: 'SHA256',
-            follow_symbolic_link: 'Symlink'
+            follow_symbolic_link: 'SL'
           }
         }
       ]
