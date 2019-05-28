@@ -39,6 +39,8 @@
 # Values must to be true or false.
 #extensions.pci       : true
 #extensions.gdpr      : true
+#extensions.hipaa     : true
+#extensions.nist      : true
 #extensions.audit     : true
 #extensions.oscap     : false
 #extensions.ciscat    : false

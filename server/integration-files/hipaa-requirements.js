@@ -1,5 +1,5 @@
 /*
- * Wazuh app - Default extensions
+ * Wazuh app - Module for HIPAA requirements
  * Copyright (C) 2015-2019 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -9,16 +9,7 @@
  *
  * Find more information about this on the LICENSE file.
  */
-export const defaultExt = {
-  pci: true,
-  gdpr: true,
-  hipaa: true,
-  nist: true,
-  audit: true,
-  oscap: false,
-  ciscat: false,
-  aws: false,
-  virustotal: false,
-  osquery: false,
-  docker: false
+export const hipaaRequirementsFile = {
+  '164.312.b':
+    'Test HIPAA',
 };

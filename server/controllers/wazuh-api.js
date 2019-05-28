@@ -14,6 +14,8 @@
 import needle from 'needle';
 import { pciRequirementsFile } from '../integration-files/pci-requirements';
 import { gdprRequirementsFile } from '../integration-files/gdpr-requirements';
+import { hipaaRequirementsFile } from '../integration-files/hipaa-requirements';
+import { nistRequirementsFile } from '../integration-files/nist-requirements';
 import { ElasticWrapper } from '../lib/elastic-wrapper';
 import { getPath } from '../../util/get-path';
 import { Monitoring } from '../monitoring';
@@ -203,7 +205,7 @@ export class WazuhApiCtrl {
                   req.idChanged = api._id;
                   return this.checkStoredAPI(req, reply);
                 }
-              } catch (error) {} // eslint-disable-line
+              } catch (error) { } // eslint-disable-line
             }
           } catch (error) {
             return ErrorResponse(error.message || error, 3020, 500, reply);
@@ -562,6 +564,193 @@ export class WazuhApiCtrl {
   }
 
   /**
+ * This get PCI requirements
+ * @param {Object} req
+ * @param {Object} reply
+ * @returns {Array<Object>} requirements or ErrorResponse
+ */
+  async getHipaaRequirement(req, reply) {
+    try {
+      let hipaa_description = '';
+
+      if (req.params.requirement === 'all') {
+        if (!req.headers.id) {
+          return hipaaRequirementsFile;
+        }
+        let api = await this.wzWrapper.getWazuhConfigurationById(
+          req.headers.id
+        );
+
+        if (api.error_code > 1) {
+          log(
+            'wazuh-api:getHipaaRequirement',
+            'Elasticsearch unexpected error or cannot connect'
+          );
+          // Can not connect to elasticsearch
+          return ErrorResponse(
+            'Elasticsearch unexpected error or cannot connect',
+            3007,
+            400,
+            reply
+          );
+        } else if (api.error_code > 0) {
+          log('wazuh-api:getHipaaRequirement', 'Credentials do not exist');
+          // Credentials not found
+          return ErrorResponse('Credentials do not exist', 3008, 400, reply);
+        }
+
+        /*         const response = await needle(
+                  'get',
+                  `${api.url}:${api.port}/rules/hipaa`,
+                  {},
+                  ApiHelper.buildOptionsObject(api)
+                ); */
+        const response = {
+          "body": {
+            "error": 0,
+            "data": {
+              "items": [
+                "164.312.b"
+              ],
+              "totalItems": 1
+            }
+          }
+        }
+
+        if ((((response || {}).body || {}).data || {}).items) {
+          let HIPAAobject = {};
+          for (const item of response.body.data.items) {
+            if (typeof hipaaRequirementsFile[item] !== 'undefined')
+              HIPAAobject[item] = hipaaRequirementsFile[item];
+          }
+          return HIPAAobject;
+        } else {
+          log(
+            'wazuh-api:getPciRequirement',
+            'An error occurred trying to parse HIPAA requirements'
+          );
+          return ErrorResponse(
+            'An error occurred trying to parse HIPAA requirements',
+            3009,
+            400,
+            reply
+          );
+        }
+      } else {
+        if (
+          typeof hipaaRequirementsFile[req.params.requirement] !== 'undefined'
+        ) {
+          hipaa_description = hipaaRequirementsFile[req.params.requirement];
+        }
+
+        return {
+          hipaa: {
+            requirement: req.params.requirement,
+            description: hipaa_description
+          }
+        };
+      }
+    } catch (error) {
+      log('wazuh-api:getPciRequirement', error.message || error);
+      return ErrorResponse(error.message || error, 3010, 400, reply);
+    }
+  }
+
+  /**
+ * This get NIST 800-53 requirements
+ * @param {Object} req
+ * @param {Object} reply
+ * @returns {Array<Object>} requirements or ErrorResponse
+ */
+  async getNistRequirement(req, reply) {
+    try {
+      let nist_description = '';
+
+      if (req.params.requirement === 'all') {
+        if (!req.headers.id) {
+          return nistRequirementsFile;
+        }
+        let api = await this.wzWrapper.getWazuhConfigurationById(
+          req.headers.id
+        );
+
+        if (api.error_code > 1) {
+          log(
+            'wazuh-api:getNistRequirement',
+            'Elasticsearch unexpected error or cannot connect'
+          );
+          // Can not connect to elasticsearch
+          return ErrorResponse(
+            'Elasticsearch unexpected error or cannot connect',
+            3007,
+            400,
+            reply
+          );
+        } else if (api.error_code > 0) {
+          log('wazuh-api:getNistRequirement', 'Credentials do not exist');
+          // Credentials not found
+          return ErrorResponse('Credentials do not exist', 3008, 400, reply);
+        }
+
+        /*         const response = await needle(
+                  'get',
+                  `${api.url}:${api.port}/rules/nist`,
+                  {},
+                  ApiHelper.buildOptionsObject(api)
+                ); */
+        const response = {
+          "body": {
+            "error": 0,
+            "data": {
+              "items": [
+                "AU.3",
+                "IA.10"
+              ],
+              "totalItems": 2
+            }
+          }
+        }
+
+        if ((((response || {}).body || {}).data || {}).items) {
+          let NISTobject = {};
+          for (const item of response.body.data.items) {
+            if (typeof nistRequirementsFile[item] !== 'undefined')
+              NISTobject[item] = nistRequirementsFile[item];
+          }
+          return NISTobject;
+        } else {
+          log(
+            'wazuh-api:getNistRequirement',
+            'An error occurred trying to parse NIST 800-53 requirements'
+          );
+          return ErrorResponse(
+            'An error occurred trying to parse NIST 800-53 requirements',
+            3009,
+            400,
+            reply
+          );
+        }
+      } else {
+        if (
+          typeof nistRequirementsFile[req.params.requirement] !== 'undefined'
+        ) {
+          nist_description = nistRequirementsFile[req.params.requirement];
+        }
+
+        return {
+          nist: {
+            requirement: req.params.requirement,
+            description: nist_description
+          }
+        };
+      }
+    } catch (error) {
+      log('wazuh-api:getNistRequirement', error.message || error);
+      return ErrorResponse(error.message || error, 3010, 400, reply);
+    }
+  }
+
+  /**
    * Check main Wazuh daemons status
    * @param {*} api API entry stored in .wazuh
    * @param {*} path Optional. Wazuh API target path.
@@ -797,7 +986,7 @@ export class WazuhApiCtrl {
       }
 
       throw ((response || {}).body || {}).error &&
-      ((response || {}).body || {}).message
+        ((response || {}).body || {}).message
         ? { message: response.body.message, code: response.body.error }
         : new Error('Unexpected error fetching data from the Wazuh API');
     } catch (error) {
@@ -955,29 +1144,29 @@ export class WazuhApiCtrl {
 
         const fields = isAgents
           ? [
-              'id',
-              'status',
-              'name',
-              'ip',
-              'group',
-              'manager',
-              'node_name',
-              'dateAdd',
-              'version',
-              'lastKeepAlive',
-              'os.arch',
-              'os.build',
-              'os.codename',
-              'os.major',
-              'os.minor',
-              'os.name',
-              'os.platform',
-              'os.uname',
-              'os.version'
-            ]
+            'id',
+            'status',
+            'name',
+            'ip',
+            'group',
+            'manager',
+            'node_name',
+            'dateAdd',
+            'version',
+            'lastKeepAlive',
+            'os.arch',
+            'os.build',
+            'os.codename',
+            'os.major',
+            'os.minor',
+            'os.name',
+            'os.platform',
+            'os.uname',
+            'os.version'
+          ]
           : isList
-          ? ['key', 'value']
-          : Object.keys(output.body.data.items[0]);
+            ? ['key', 'value']
+            : Object.keys(output.body.data.items[0]);
 
         const json2csvParser = new Parser({ fields });
         if (isList) {

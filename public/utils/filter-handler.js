@@ -103,17 +103,17 @@ export class FilterHandler {
     result.meta.params.query = manager;
     result.query.match = isCluster
       ? {
-          'cluster.name': {
-            query: manager,
-            type: 'phrase'
-          }
+        'cluster.name': {
+          query: manager,
+          type: 'phrase'
         }
+      }
       : {
-          'manager.name': {
-            query: manager,
-            type: 'phrase'
-          }
-        };
+        'manager.name': {
+          query: manager,
+          type: 'phrase'
+        }
+      };
     return result;
   }
 
@@ -136,6 +136,30 @@ export class FilterHandler {
     result.meta.key = 'rule.gdpr';
     result.exists = {
       field: 'rule.gdpr'
+    };
+    delete result.query;
+    return result;
+  }
+
+  hipaaQuery() {
+    const result = this.base();
+    result.meta.type = 'exists';
+    result.meta.value = 'exists';
+    result.meta.key = 'rule.hipaa';
+    result.exists = {
+      field: 'rule.hipaa'
+    };
+    delete result.query;
+    return result;
+  }
+
+  nistQuery() {
+    const result = this.base();
+    result.meta.type = 'exists';
+    result.meta.value = 'exists';
+    result.meta.key = 'rule.nist';
+    result.exists = {
+      field: 'rule.nist'
     };
     delete result.query;
     return result;
