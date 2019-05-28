@@ -17,7 +17,7 @@ export function Base(pattern, filters, gte, lte) {
     stored_fields: ['*'],
     script_fields: {},
     docvalue_fields: [
-      '@timestamp',
+      'timestamp',
       'data.vulnerability.published',
       'data.vulnerability.updated',
       'syscheck.mtime_after',
@@ -36,7 +36,7 @@ export function Base(pattern, filters, gte, lte) {
           },
           {
             range: {
-              '@timestamp': {
+              timestamp: {
                 gte: gte,
                 lte: lte,
                 format: 'epoch_millis'

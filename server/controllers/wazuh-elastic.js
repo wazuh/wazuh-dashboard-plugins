@@ -211,7 +211,7 @@ export class WazuhElasticCtrl {
                 'agent.id': '000'
               }
             },
-            filter: { range: { '@timestamp': {} } }
+            filter: { range: { timestamp: {} } }
           }
         },
         aggs: {
@@ -228,8 +228,8 @@ export class WazuhElasticCtrl {
       // Set up time interval, default to Last 24h
       const timeGTE = 'now-1d';
       const timeLT = 'now';
-      payload.query.bool.filter.range['@timestamp']['gte'] = timeGTE;
-      payload.query.bool.filter.range['@timestamp']['lt'] = timeLT;
+      payload.query.bool.filter.range['timestamp']['gte'] = timeGTE;
+      payload.query.bool.filter.range['timestamp']['lt'] = timeLT;
 
       // Set up match for default cluster name
       payload.query.bool.must.push(
@@ -240,9 +240,10 @@ export class WazuhElasticCtrl {
 
       payload.aggs['2'].terms.field = req.params.field;
       payload.pattern = req.params.pattern;
+
       const data = await this.wzWrapper.searchWazuhAlertsWithPayload(payload);
 
-      return data.hits.total === 0 ||
+      return data.hits.total.value === 0 ||
         typeof data.aggregations['2'].buckets[0] === 'undefined'
         ? { statusCode: 200, data: '' }
         : {
@@ -265,7 +266,7 @@ export class WazuhElasticCtrl {
     try {
       const data = await this.wzWrapper.getWazuhVersionIndexAsSearch();
 
-      return data.hits.total === 0
+      return data.hits.total.value === 0
         ? { statusCode: 200, data: '' }
         : { statusCode: 200, data: data.hits.hits[0]._source };
     } catch (error) {
@@ -301,7 +302,7 @@ export class WazuhElasticCtrl {
         forbidden = true;
       }
       if (
-        ((results || {}).hits || {}).total >= 1 ||
+        ((results || {}).hits || {}).total.value >= 1 ||
         (!forbidden && ((results || {}).hits || {}).total === 0)
       ) {
         finalList.push(item);
@@ -315,7 +316,7 @@ export class WazuhElasticCtrl {
    * @param {Array<Object>} indexPatternList List of index patterns
    */
   validateIndexPattern(indexPatternList) {
-    const minimum = ['@timestamp', 'full_log', 'manager.name', 'agent.id'];
+    const minimum = ['timestamp', 'rule.groups', 'manager.name', 'agent.id'];
     let list = [];
     for (const index of indexPatternList) {
       let valid, parsed;
@@ -378,6 +379,7 @@ export class WazuhElasticCtrl {
               item && item.title && !config['ip.ignore'].includes(item.title)
           );
         }
+
         return {
           data:
             isXpackEnabled && !isSuperUser
@@ -703,7 +705,7 @@ export class WazuhElasticCtrl {
 
       payload.size = size;
       payload.docvalue_fields = [
-        '@timestamp',
+        'timestamp',
         'cluster.name',
         'manager.name',
         'agent.id',

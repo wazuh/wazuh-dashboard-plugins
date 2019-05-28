@@ -33,6 +33,7 @@ import { VisSavedObject, VisualizeLoaderParams } from './types';
 
 export class VisualizeLoader {
   constructor(private readonly savedVisualizations: any, private readonly Private: IPrivate, $injector) {
+    // @ts-ignore
     this.injector = $injector;
   }
 
@@ -140,7 +141,7 @@ export class VisualizeLoader {
       // lets add Private to the params, we'll need to pass it to visualize later
       Private: this.Private,
     };
-
+    // @ts-ignore
     return new EmbeddedVisualizeHandler(element, savedObj, handlerParams, this.injector);
   }
 }

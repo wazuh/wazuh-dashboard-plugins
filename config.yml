@@ -112,4 +112,4 @@
 # Set the logging level for the Wazuh App log files.
 # Default value: info
 # Allowed values: info, debug
-#logs.level: info
+logs.level: debug

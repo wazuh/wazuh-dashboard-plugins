@@ -1,5 +1,5 @@
 /*
- * Wazuh app - File for app requirements and set up
+ * Wazuh app - Visualizations, Discover, filters
  * Copyright (C) 2015-2019 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -10,8 +10,6 @@
  * Find more information about this on the LICENSE file.
  */
 import './kibana-visualization';
-import './kibana-filter-bar';
 import './kibana-discover';
 import './saved-visualizations';
-import './kbn_top_nav/index';
-import './kbn-global-timepicker/kbn_global_timepicker';
+import './search-bar/search-bar-directive';

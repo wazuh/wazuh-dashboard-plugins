@@ -12,7 +12,6 @@
 import cron from 'node-cron';
 import needle from 'needle';
 import { getPath } from '../util/get-path';
-import colors from 'ansicolors';
 import { log } from './logger';
 import { ElasticWrapper } from './lib/elastic-wrapper';
 import { monitoringTemplate } from './integration-files/monitoring-template';
@@ -22,7 +21,7 @@ import { indexDate } from './lib/index-date';
 import { BuildBody } from './lib/replicas-shards-helper';
 import * as ApiHelper from './lib/api-helper';
 
-const blueWazuh = colors.blue('wazuh');
+const blueWazuh = '\u001b[34mwazuh\u001b[39m';
 
 export class Monitoring {
   /**
@@ -266,7 +265,7 @@ export class Monitoring {
     try {
       const data = await this.wzWrapper.getWazuhAPIEntries();
 
-      if (data.hits.total > 0) {
+      if (data.hits.total.value > 0) {
         return data.hits;
       }
 
@@ -399,12 +398,9 @@ export class Monitoring {
       let body = '';
       if (this.agentsArray.length > 0) {
         for (const element of this.agentsArray) {
-          body +=
-            '{ "index":  { "_index": "' +
-            datedIndex +
-            '", "_type": "wazuh-agent" } }\n';
+          body += '{ "index":  { "_index": "' + datedIndex + '" } }\n';
           let date = new Date(Date.now()).toISOString();
-          element['@timestamp'] = date;
+          element['timestamp'] = date;
           element.host = element.manager;
           element.cluster = { name: clusterName ? clusterName : 'disabled' };
           body += JSON.stringify(element) + '\n';

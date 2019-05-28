@@ -61,14 +61,14 @@ export class VisHandlers {
       .map(item => {
         const columns = [];
         for (const table of item.dataLoader.visData.tables) {
-          columns.push(...table.columns.map(t => t.title));
+          columns.push(...table.columns.map(t => t.name));
         }
 
         return !!(((item || {}).vis || {}).searchSource || {}).rawResponse
           ? {
               rawResponse: item.vis.searchSource.rawResponse,
               title: item.vis.title || 'Table',
-              columns: columns
+              columns
             }
           : false;
       });

@@ -144,7 +144,7 @@ export class SyscheckRequest {
           aggs: {
             '1': {
               max: {
-                field: '@timestamp'
+                field: 'timestamp'
               }
             }
           }
@@ -195,7 +195,7 @@ export class SyscheckRequest {
           aggs: {
             '1': {
               max: {
-                field: '@timestamp'
+                field: 'timestamp'
               }
             }
           }

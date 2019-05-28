@@ -9,8 +9,7 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import colors from 'ansicolors';
-const blueWazuh = colors.blue('wazuh');
+const blueWazuh = '\u001b[34mwazuh\u001b[39m';
 
 /**
  * Refresh known fields for all valid index patterns.
@@ -34,13 +33,13 @@ export async function checkKnownFields(
     !quiet &&
       log(
         'initialize:checkKnownFields',
-        `Found ${indexPatternList.hits.total} index patterns`,
+        `Found ${indexPatternList.hits.total.value} index patterns`,
         'debug'
       );
 
     const list = [];
     if (((indexPatternList || {}).hits || {}).hits) {
-      const minimum = ['@timestamp', 'rule.id', 'manager.name', 'agent.id'];
+      const minimum = ['timestamp', 'rule.id', 'manager.name', 'agent.id'];
 
       if (indexPatternList.hits.hits.length > 0) {
         for (const index of indexPatternList.hits.hits) {
@@ -77,13 +76,13 @@ export async function checkKnownFields(
         log(
           'initialize:checkKnownFields',
           `Default index pattern not found, creating it...`,
-          'debug'
+          'info'
         );
 
       try {
         await wzWrapper.createIndexPattern(defaultIndexPattern);
       } catch (error) {
-        throw new Error('Error creating default index pattern');
+        log('initialize:checkKnownFields', error.message || error);
       }
 
       !quiet &&
@@ -97,7 +96,7 @@ export async function checkKnownFields(
       let tmplist = null;
       while (waitTill > new Date()) {
         tmplist = await wzWrapper.searchIndexPatternById(defaultIndexPattern);
-        if (tmplist.hits.total >= 1) break;
+        if (tmplist.hits.total.value >= 1) break;
         else waitTill = new Date(new Date().getTime() + 0.5 * 1000);
       }
 
