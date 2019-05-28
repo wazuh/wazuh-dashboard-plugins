@@ -3,20 +3,15 @@
     <!-- Main toolbar content -->
     <div class="md-toolbar-tools wz-menu-content">
 
-        <!-- Wazuh app logo -->
-        <a id="wz-logo" class="cursor-pointer wz-logo-container wz-logo wz-margin-right-15" href="#/"></a>
-
         <!-- Main Wazuh app navigation buttons -->
         <md-button class="wz-menu-button" ng-href="#/overview"
             ng-class="{'wz-menu-active': menuNavItem === 'overview' }" aria-label="Overview tab">
-            <react-component name="EuiIcon" class="kbnGlobalNavLink__euiIcon"
-                props="{type:'visualizeApp', color:'ghost'}" /> Overview
+            <react-component name="EuiIcon" class="kbnGlobalNavLink__euiIcon" props="{type:'visualizeApp'}" /> Overview
         </md-button>
 
         <md-button class="wz-menu-button" ng-href="#/manager" ng-class="{'wz-menu-active': menuNavItem === 'manager' }"
             aria-label="Cluster tab">
-            <react-component name="EuiIcon" class="kbnGlobalNavLink__euiIcon"
-                props="{type:'infraApp', color:'ghost'}" /> Management
+            <react-component name="EuiIcon" class="kbnGlobalNavLink__euiIcon" props="{type:'infraApp'}" /> Management
         </md-button>
 
         <md-button class="wz-menu-button" ng-href="#/agents-preview"
@@ -26,8 +21,7 @@
 
         <md-button class="wz-menu-button" ng-href="#/wazuh-discover"
             ng-class="{'wz-menu-active': menuNavItem === 'discover' }" aria-label="Discover tab">
-            <react-component name="EuiIcon" class="kbnGlobalNavLink__euiIcon wz-menu-discover-icon"
-                props="{type:'discoverApp', color:'ghost'}" /> Discover
+            <react-component name="EuiIcon" class="kbnGlobalNavLink__euiIcon" props="{type:'discoverApp'}" /> Discover
         </md-button>
 
         <md-button class="wz-menu-button" ng-href="#/wazuh-dev"
@@ -72,7 +66,7 @@
         <!-- Settings tab button -->
         <md-button class="wz-menu-button md-icon-button" ng-href="#/settings"
             ng-class="{'wz-menu-active': menuNavItem === 'settings' }" aria-label="Settings tab">
-            <react-component name="EuiIcon" class="kbnGlobalNavLink__euiIcon" props="{type:'gear', color:'ghost'}" />
+            <react-component name="EuiIcon" class="kbnGlobalNavLink__euiIcon" props="{type:'gear'}" />
         </md-button>
 
     </div>
