@@ -122,7 +122,10 @@ export class OverviewController {
     this.wodlesConfiguration = null;
 
     this.init();
-
+    this.welcomeCardsProps = {
+      switchTab: tab => this.switchTab(tab),
+      extensions: this.extensions
+    };
     this.$scope.$on('$destroy', () => {
       this.visFactoryService.clearAll();
     });
