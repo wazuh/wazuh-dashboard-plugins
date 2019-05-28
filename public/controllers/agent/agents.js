@@ -433,6 +433,11 @@ export class AgentsController {
     };
 
     this.$scope.expand = i => this.expand(i);
+
+    this.$scope.welcomeCardsProps = {
+      switchTab: tab => this.switchTab(tab),
+      extensions: this.$scope.extensions
+    };
   }
   /**
    * Create metric for given object

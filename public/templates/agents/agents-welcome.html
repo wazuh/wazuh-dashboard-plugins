@@ -7,7 +7,8 @@
                         not fetch data for this agent. <span ng-if="emptyAgent">Reason: {{emptyAgent}}</span></span>
                 </div>
                 <div layout="row" layout-padding ng-if="emptyAgent">
-                    <span class="cursor-pointer" ng-click="getAgent()"><i class="fa fa-fw fa-refresh" aria-hidden="true"></i>
+                    <span class="cursor-pointer" ng-click="getAgent()"><i class="fa fa-fw fa-refresh"
+                            aria-hidden="true"></i>
                         Try again</span>
                 </div>
             </md-card-content>
@@ -18,126 +19,27 @@
 
     <!-- Headline -->
     <div layout="row" class="wz-margin-left-16 wz-margin-right-16 wz-margin-top-8">
-        <span class="font-size-18 wz-line-height-40"><i class="fa fa-fw fa-tv" aria-hidden="true"></i> {{ agent.name ||
-            '-' }}</span>
         <span flex></span>
-        <button class="kuiButton kuiButton--secondary small wz-no-margin" ng-click="goDiscover()"><i class="fa fa-compass"></i>
+        <button class="kuiButton kuiButton--secondary small wz-no-margin" ng-click="goDiscover()"><i
+                class="fa fa-compass"></i>
             Discover
-        </button>&nbsp;&nbsp;
-        <button ng-show="!showConfirmRestartAgent && adminMode" ng-disabled="restartingAgent" class="kuiButton kuiButton--secondary small wz-no-margin"
-            ng-disabled="isRestarting" ng-click="showConfirmRestartAgent = true"><i class="fa fa-refresh" ng-class="restartingAgent ? 'fa-spin fa-spinner' : ''"></i>
-            Restart agent
         </button>
-        <div ng-show="showConfirmRestartAgent" class="confirmEmbedBubble confirmEmbedBubbleInline">
-            <div layout="row no-wrap">
-                <span class="wz-padding-top-10 wz-padding-left-8">The agent will be restarted</span>
-            </div>
-            <div layout="row">
-                <md-button class="cancelBtn btn-info" ng-click="showConfirmRestartAgent = false">Cancel</md-button>
-                <button class="kuiButton kuiButton--secondary" ng-click="restartAgent(agent);showConfirmRestartAgent = false"><i
-                        aria-hidden='true' class='fa fa-fw fa-check'></i>
-                    Confirm</button>
-            </div>
-        </div>
     </div>
-    <!-- End headline -->
-    <div layout="row" layout-padding class="agents-headline">
-        <md-card flex class="wz-md-card wz-padding-top-0 wz-padding-bottom-0">
-            <md-card-content>
-                <div class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--justifyContentSpaceBetween euiFlexGroup--directionRow euiFlexGroup--responsive">
-                    <div class="euiFlexItem euiFlexItem--flexGrowZero">
-                        <div class="euiStat euiStat--leftAligned">
-                            <div class="euiText euiText--small euiStat__description">
-                                <p>ID</p>
-                            </div>
-                            <p class="euiTitle euiTitle--small euiStat__title">{{ agent.id || '-' }}</p>
-                        </div>
-                    </div>
-                    <div class="euiFlexItem euiFlexItem--flexGrowZero">
-                        <div class="euiStat euiStat--leftAligned">
-                            <div class="euiText euiText--small euiStat__description">
-                                <p>IP</p>
-                            </div>
-                            <p class="euiTitle euiTitle--small euiStat__title">{{ agent.ip || '-'}}</p>
-                        </div>
-                    </div>
-                    <div class="euiFlexItem euiFlexItem--flexGrowZero">
-                        <div class="euiStat euiStat--leftAligned">
-                            <div class="euiText euiText--small euiStat__description">
-                                <p>Version</p>
-                            </div>
-                            <p class="euiTitle euiTitle--small euiStat__title">{{ agent.version || '-'}}</p>
-                        </div>
-                    </div>
-                    <div class="euiFlexItem euiFlexItem--flexGrowZero">
-                        <div class="euiStat euiStat--leftAligned">
-                            <div class="euiText euiText--small euiStat__description">
-                                <p>OS</p>
-                            </div>
-                            <p class="euiTitle euiTitle--small euiStat__title">{{ agentOS || '-'}}</p>
-                        </div>
-                    </div>
-                    <div class="euiFlexItem euiFlexItem--flexGrowZero">
-                        <div class="euiStat euiStat--leftAligned">
-                            <div class="euiText euiText--small euiStat__description">
-                                <p>Registration date</p>
-                            </div>
-                            <p class="euiTitle euiTitle--small euiStat__title" ng-bind="agent.dateAdd ? offsetTimestamp('', agent.dateAdd) : '-'"></p>
-                        </div>
-                    </div>
-                    <div class="euiFlexItem euiFlexItem--flexGrowZero">
-                        <div class="euiStat euiStat--leftAligned">
-                            <div class="euiText euiText--small euiStat__description">
-                                <p>Last keep alive</p>
-                            </div>
-                            <p class="euiTitle euiTitle--small euiStat__title" ng-bind="agent.lastKeepAlive ? offsetTimestamp('', agent.lastKeepAlive) : '-'"></p>
-                        </div>
-                    </div>
-                    <div class="euiFlexItem euiFlexItem--flexGrowZero">
-                        <div class="euiStat euiStat--leftAligned">
-                            <div class="euiText euiText--small euiStat__description">
-                                <p>Last syscheck scan</p>
-                            </div>
-                            <p class="euiTitle euiTitle--small euiStat__title" ng-if="agent.syscheck.inProgress">Scan
-                                in progress</p>
-                            <p class="euiTitle euiTitle--small euiStat__title" ng-if="!agent.syscheck.inProgress"
-                                ng-bind="agent.syscheck.end ? offsetTimestamp('', agent.syscheck.end) : '-'">
-                                <md-tooltip ng-show="!agent.syscheck.inProgress && agent.syscheck.start && agent.syscheck.end"
-                                    md-direction="bottom" class="wz-tooltip">
-                                    Start time: {{ agent.syscheck.start ? offsetTimestamp('', agent.syscheck.start) :
-                                    '-'}} |
-                                    End time: {{ agent.syscheck.end ? offsetTimestamp('', agent.syscheck.end) : '-'}} |
-                                    Duration time: {{ agent.syscheck.duration +' minutes' || '-'}}
-                                </md-tooltip>
-                            </p>
-                        </div>
-                    </div>
-                    <div class="euiFlexItem euiFlexItem--flexGrowZero">
-                        <div class="euiStat euiStat--leftAligned">
-                            <div class="euiText euiText--small euiStat__description">
-                                <p>Last rootcheck scan</p>
-                            </div>
-                            <p class="euiTitle euiTitle--small euiStat__title" ng-if="agent.rootcheck.inProgress">Scan
-                                in progress</p>
-                            <p class="euiTitle euiTitle--small euiStat__title" ng-if="!agent.rootcheck.inProgress"
-                                ng-bind="agent.rootcheck.end ? offsetTimestamp('', agent.rootcheck.end) : '-'">
-                                <md-tooltip ng-show="!agent.rootcheck.inProgress && agent.rootcheck.start && agent.rootcheck.end"
-                                    md-direction="bottom" class="wz-tooltip">
-                                    Start time: {{ agent.rootcheck.start ? offsetTimestamp('', agent.rootcheck.start) :
-                                    '-'}} |
-                                    End time: {{ agent.rootcheck.end ? offsetTimestamp('', agent.rootcheck.end) : '-'}}
-                                    |
-                                    Duration time: {{ agent.rootcheck.duration +' minutes' || '-'}}
-                                </md-tooltip>
-                            </p>
-                        </div>
-                    </div>
-                </div>
-            </md-card-content>
-        </md-card>
+    <div layout="row" layout-padding>
+        <react-component name="WazuhStatsAgent" flex props="{
+            name: agent.name || '-',
+            id: agent.id || '-',
+            ip: agent.ip || '-',
+            version: agent.version || '-',
+            agentOS: agentOS || '-',
+            dateAdd: agent.dateAdd ? offsetTimestamp('', agent.dateAdd) : '-',
+            lastKeepAlive: agent.lastKeepAlive ? offsetTimestamp('', agent.lastKeepAlive) : '-'
+        }" />
     </div>
-    <div layout="row" layout-padding class="wz-padding-bottom-0 wz-padding-top-0" ng-if="agent.group">
-        <md-card flex class="wz-md-card wz-padding-top-0 wz-padding-bottom-0 wz-no-top-bottom-margin">
+    <!-- End headline 
+
+   <!-- <div layout="row" layout-padding ng-if="agent.group">
+        <md-card flex class="wz-md-card wz-padding-top-0 wz-padding-bottom-0 wz-margin-top-0">
             <md-card-content>
 
                 <div layout="row">
@@ -153,13 +55,15 @@
                         Available groups:
                     </div>
                     <div class="wz-word-break" flex ng-if="!groups || !groups.length">
-                        No more groups available. Create a new group at <a ng-href="#/manager/?_g=()&tab=groups">Configuration
+                        No more groups available. Create a new group at <a
+                            ng-href="#/manager/?_g=()&tab=groups">Configuration
                             > Groups</a>.
                     </div>
                 </div>
                 <div ng-if="editGroup && !addingGroupToAgent && groups && groups.length" class="wz-margin-top-4">
                     <div class="euiFlexGrid">
-                        <span ng-repeat="group in groups" class="wz-margin-left-8 wz-text-link euiFlexItem euiFlexItem--flexGrowZero"
+                        <span ng-repeat="group in groups"
+                            class="wz-margin-left-8 wz-text-link euiFlexItem euiFlexItem--flexGrowZero"
                             ng-click="showConfirmAddGroup(group)">{{
                             group }}</span>
                     </div>
@@ -173,13 +77,15 @@
                     </div>
                     <div layout="row">
                         <md-button class="cancelBtn" type="button" ng-click="cancelAddGroup()">Cancel</md-button>
-                        <md-button class="agreeBtn wz-button" type="button" ng-click="confirmAddGroup(addingGroupToAgent)"><i
-                                aria-hidden='true' class='fa fa-fw fa-check'></i> Confirm</md-button>
+                        <md-button class="agreeBtn wz-button" type="button"
+                            ng-click="confirmAddGroup(addingGroupToAgent)"><i aria-hidden='true'
+                                class='fa fa-fw fa-check'></i> Confirm</md-button>
                     </div>
                 </div>
                 <div layout="row" class="wz-word-break wz-padding-top-10">
                     <div class="euiFlexGrid">
-                        <span ng-repeat="group in agent.group" class="wz-text-link wz-margin-left-8 euiFlexItem euiFlexItem--flexGrowZero"
+                        <span ng-repeat="group in agent.group"
+                            class="wz-text-link wz-margin-left-8 euiFlexItem euiFlexItem--flexGrowZero"
                             ng-click="goGroups(agent,$index)">{{
                             group
                             }}</span>
@@ -189,85 +95,9 @@
             </md-card-content>
         </md-card>
     </div>
-
-
-    <div layout="row" layout-padding>
-        <div class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--responsive">
-            <div class="euiFlexItem">
-                <div class="euiPanel euiPanel--paddingLarge">
-                    <h3 class="euiTitle wzEuiTitle">Security Information Management</h3>
-                    <div class="euiSpacer euiSpacer--m"></div>
-                    <div class="euiFlexGrid euiFlexGrid--gutterLarge euiFlexGrid--halves">
-                        <wz-welcome-card class="euiFlexItem" logo="'icons/app_dashboard.svg'" card-title="'Security events'"
-                            switch-tab="switchTab('general')" current-tab="'general'" description="TabDescription.general.description"></wz-welcome-card>
-                        <wz-welcome-card class="euiFlexItem" logo="'icons/app_logging.svg'" card-title="'Integrity monitoring'"
-                            switch-tab="switchTab('fim')" current-tab="'fim'" description="TabDescription.fim.description"></wz-welcome-card>
-                        <wz-welcome-card class="euiFlexItem" logo="'icons/app_devtools.svg'" card-title="'Configuration'"
-                            switch-tab="switchTab('configuration')" current-tab="'configuration'" description="TabDescription.configuration.description">
-                        </wz-welcome-card>
-                        <wz-welcome-card class="euiFlexItem" logo="'icons/app_index_pattern.svg'" card-title="'Inventory data'"
-                            switch-tab="switchTab('syscollector')" current-tab="'syscollector'" description="TabDescription.syscollector.description">
-                        </wz-welcome-card>
-                    </div>
-                </div>
-            </div>
-            <div class="euiFlexItem">
-                <div class="euiPanel euiPanel--paddingLarge">
-                    <h3 class="euiTitle wzEuiTitle">Auditing and Policy Monitoring</h3>
-                    <div class="euiSpacer euiSpacer--m"></div>
-                    <div class="euiFlexGrid euiFlexGrid--gutterLarge euiFlexGrid--halves">
-                        <wz-welcome-card class="euiFlexItem" logo="'icons/app_advanced_settings.svg'" card-title="'Policy monitoring'"
-                            switch-tab="switchTab('pm')" current-tab="'pm'" description="TabDescription.pm.description"></wz-welcome-card>
-                        <wz-welcome-card class="euiFlexItem" logo="'icons/sca.png'" card-title="'Security configuration assessment'"
-                            switch-tab="switchTab('sca')" current-tab="'sca'" description="TabDescription['sca'].description"></wz-welcome-card>
-                        <wz-welcome-card ng-if="extensions.audit && agent.isLinuxOS" class="euiFlexItem" logo="'icons/app_monitoring.svg'"
-                            card-title="'System auditing'" switch-tab="switchTab('audit')" current-tab="'audit'"
-                            description="TabDescription.audit.description"></wz-welcome-card>
-                        <wz-welcome-card ng-if="extensions.oscap && agent.isLinuxOS" class="euiFlexItem" logo="'icons/app_discover.svg'"
-                            card-title="'OpenSCAP'" switch-tab="switchTab('oscap')" current-tab="'oscap'" description="TabDescription.oscap.description"></wz-welcome-card>
-                        <wz-welcome-card ng-if="extensions.ciscat" class="euiFlexItem" logo="'icons/app_management.svg'"
-                            card-title="'CIS-CAT'" switch-tab="switchTab('ciscat')" current-tab="'ciscat'" description="TabDescription.ciscat.description"></wz-welcome-card>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+-->
 
     <div layout="row" layout-padding>
-        <div class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--responsive">
-            <div class="euiFlexItem">
-                <div class="euiFlexItem">
-                    <div class="euiPanel euiPanel--paddingLarge">
-                        <h3 class="euiTitle wzEuiTitle">Threat Detection and Response</h3>
-                        <div class="euiSpacer euiSpacer--m"></div>
-                        <div class="euiFlexGrid euiFlexGrid--gutterLarge euiFlexGrid--halves">
-                            <wz-welcome-card class="euiFlexItem" logo="'icons/app_security.svg'" card-title="'Vulnerabilities'"
-                                switch-tab="switchTab('vuls')" current-tab="'vuls'" description="TabDescription.vuls.description" />
-                            <wz-welcome-card ng-if="extensions.virustotal" class="euiFlexItem" logo="'icons/app_saved_objects.svg'"
-                                card-title="'VirusTotal'" switch-tab="switchTab('virustotal')" current-tab="'virustotal'"
-                                description="TabDescription.virustotal.description" />
-                            <wz-welcome-card ng-if="extensions.osquery" class="euiFlexItem" logo="'icons/osquery.svg'"
-                                card-title="'Osquery'" switch-tab="switchTab('osquery')" current-tab="'osquery'"
-                                description="TabDescription.osquery.description" />
-                            <wz-welcome-card ng-if="extensions.docker" class="euiFlexItem" logo="'icons/docker.svg'"
-                                card-title="'Docker listener'" switch-tab="switchTab('docker')" current-tab="'docker'"
-                                description="TabDescription.docker.description" />
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="euiFlexItem" ng-if="extensions && (extensions.pci || extensions.gdpr)">
-                <div class="euiPanel euiPanel--paddingLarge">
-                    <h3 class="euiTitle wzEuiTitle">Regulatory Compliance</h3>
-                    <div class="euiSpacer euiSpacer--m"></div>
-                    <div class="euiFlexGrid euiFlexGrid--gutterLarge euiFlexGrid--halves">
-                        <wz-welcome-card ng-if="extensions.pci" class="euiFlexItem" logo="'icons/app_apm.svg'"
-                            card-title="'PCI DSS'" switch-tab="switchTab('pci')" current-tab="'pci'" description="TabDescription.pci.description"></wz-welcome-card>
-                        <wz-welcome-card ng-if="extensions.gdpr" class="euiFlexItem" logo="'icons/app_visualize.svg'"
-                            card-title="'GDPR'" switch-tab="switchTab('gdpr')" current-tab="'gdpr'" description="TabDescription.gdpr.description"></wz-welcome-card>
-                    </div>
-                </div>
-            </div>
-        </div>
+        <react-component name="WazuhWelcomeCardAgent" props="welcomeCardsProps" />
     </div>
 </div>

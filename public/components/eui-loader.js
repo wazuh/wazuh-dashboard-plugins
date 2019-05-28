@@ -22,6 +22,8 @@ import {
 
 import { WazuhStats } from './stats';
 import { WazuhWelcomeCard } from './welcome-card';
+import { WazuhWelcomeCardAgent } from './welcome-card-agent';
+import { WazuhStatsAgent } from './stats-agent';
 
 const app = uiModules.get('app/wazuh', ['react']);
 
@@ -33,4 +35,6 @@ app
   .value('EuiButtonIcon', EuiButtonIcon)
   .value('EuiBasicTable', EuiBasicTable)
   .value('WazuhStats', WazuhStats)
-  .value('WazuhWelcomeCard', WazuhWelcomeCard);
+  .value('WazuhWelcomeCard', WazuhWelcomeCard)
+  .value('WazuhWelcomeCardAgent', WazuhWelcomeCardAgent)
+  .value('WazuhStatsAgent', WazuhStatsAgent);
