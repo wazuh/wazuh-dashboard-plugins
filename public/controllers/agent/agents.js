@@ -15,6 +15,7 @@ import { TabNames } from '../../utils/tab-names';
 import * as FileSaver from '../../services/file-saver';
 import { TabDescription } from '../../../server/reporting/tab-description';
 import {
+  metricsGeneral,
   metricsAudit,
   metricsVulnerability,
   metricsScap,
@@ -457,6 +458,9 @@ export class AgentsController {
   checkMetrics(tab, subtab) {
     if (subtab === 'panels') {
       switch (tab) {
+        case 'general':
+          this.createMetrics(metricsGeneral);
+          break;
         case 'audit':
           this.createMetrics(metricsAudit);
           break;
