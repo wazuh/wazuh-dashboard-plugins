@@ -99,6 +99,8 @@ import { buildVislibDimensions } from 'ui/visualize/loader/pipeline_helpers/buil
 
 import 'ui/courier/search_strategy/default_search_strategy';
 
+import { getPainlessError } from './get_painless_error';
+
 const app = uiModules.get('apps/discover', [
   'kibana/notify',
   'kibana/courier',
