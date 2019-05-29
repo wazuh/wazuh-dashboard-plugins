@@ -256,7 +256,7 @@
                     </div>
                 </div>
             </div>
-            <div class="euiFlexItem" ng-if="extensions && (extensions.pci || extensions.gdpr)">
+            <div class="euiFlexItem" ng-if="extensions && (extensions.pci || extensions.gdpr || extensions.hipaa || extensions.nist)">
                 <div class="euiPanel euiPanel--paddingLarge">
                     <h3 class="euiTitle wzEuiTitle">Regulatory Compliance</h3>
                     <div class="euiSpacer euiSpacer--m"></div>
@@ -265,6 +265,10 @@
                             card-title="'PCI DSS'" switch-tab="switchTab('pci')" current-tab="'pci'" description="TabDescription.pci.description"></wz-welcome-card>
                         <wz-welcome-card ng-if="extensions.gdpr" class="euiFlexItem" logo="'icons/app_visualize.svg'"
                             card-title="'GDPR'" switch-tab="switchTab('gdpr')" current-tab="'gdpr'" description="TabDescription.gdpr.description"></wz-welcome-card>
+                        <wz-welcome-card ng-if="extensions.hipaa" class="euiFlexItem" logo="'icons/app_visualize.svg'"
+                            card-title="'HIPAA'" switch-tab="switchTab('hipaa')" current-tab="'hipaa'" description="TabDescription.hipaa.description"></wz-welcome-card>
+                        <wz-welcome-card ng-if="extensions.nist" class="euiFlexItem" logo="'icons/app_visualize.svg'"
+                            card-title="'NIST-800-53'" switch-tab="switchTab('nist')" current-tab="'nist'" description="TabDescription.nist.description"></wz-welcome-card>
                     </div>
                 </div>
             </div>

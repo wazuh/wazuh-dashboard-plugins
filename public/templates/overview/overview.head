@@ -99,7 +99,7 @@
     <!-- End Security navigation bar -->
 
     <!-- Compliance navigation bar -->
-    <md-nav-bar ng-if="octrl.inArray(octrl.tab, octrl.complianceTabs) && octrl.extensions.pci && octrl.extensions.gdpr"
+    <md-nav-bar ng-if="octrl.inArray(octrl.tab, octrl.complianceTabs) && (octrl.extensions.pci || octrl.extensions.gdpr || octrl.extensions.hipaa || octrl.extensions.nist)"
         class="wz-nav-bar" ng-show="octrl.tab !== 'welcome'" md-selected-nav-item="octrl.tab"
         nav-bar-aria-label="Compliance navigation links">
         <md-nav-item ng-show="octrl.extensions.pci" class="wz-nav-item" md-nav-click="octrl.switchTab('pci',true)"

@@ -26,6 +26,8 @@ export class TabVisualizations {
       audit: 9,
       gdpr: 6,
       pci: 6,
+      hipaa: 6,
+      nist: 6,
       virustotal: 6,
       configuration: 0,
       osquery: 5,

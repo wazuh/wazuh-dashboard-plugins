@@ -1,22 +1,18 @@
 <div ng-if="!loading && !viewingDetail" layout="column">
 
-    <div layout="row"
-        class="euiFlexGroup euiFlexGroup--alignItemsCenter euiFormControlLayout__childrenWrapper md-padding-h ng-scope wz-margin-top-16"
+    <div layout="row" class="euiFlexGroup euiFlexGroup--alignItemsCenter euiFormControlLayout__childrenWrapper md-padding-h ng-scope wz-margin-top-16"
         ng-if="!mctrl.filesSubTab">
-        <input placeholder="Filter rules..." ng-model="custom_search" type="text"
-            class="euiFieldSearch euiFieldSearch--fullWidth euiFlexItem height-35 ng-empty ng-pristine ng-touched ng-valid"
+        <input placeholder="Filter rules..." ng-model="custom_search" type="text" class="euiFieldSearch euiFieldSearch--fullWidth euiFlexItem height-35 ng-empty ng-pristine ng-touched ng-valid"
             aria-invalid="false" wz-enter="search(custom_search)" id="search-input-rules">
         <wz-add-filter-chip id-input="search-input-rules" options="[{label: 'File', value: 'file'}, {label: 'Path', value: 'path'}, {label: 'Level', value: 'level'}, 
-        {label: 'Group', value: 'group'}, {label: 'PCI control', value: 'pci'}, {label: 'GDPR', value: 'gdpr'}]" />
+        {label: 'Group', value: 'group'}, {label: 'PCI control', value: 'pci'}, {label: 'GDPR', value: 'gdpr'}, {label: 'HIPAA', value: 'hipaa'}, {label: 'NIST-800-53', value: 'nist-800-53'}]" />
         <div class="euiFormControlLayoutIcons wz-margin-left-16">
             <span class="euiFormControlLayoutCustomIcon">
-                <react-component name="EuiIcon"
-                    props="{type:'search', className:'euiFormControlLayoutCustomIcon__icon'}" />
+                <react-component name="EuiIcon" props="{type:'search', className:'euiFormControlLayoutCustomIcon__icon'}" />
             </span>
         </div>
 
-        <button type="submit" aria-label="Search"
-            class="euiFlexItem euiFlexItem--flexGrowZero height-35 kuiButton kuiButton--secondary wz-margin-left-8"
+        <button type="submit" aria-label="Search" class="euiFlexItem euiFlexItem--flexGrowZero height-35 kuiButton kuiButton--secondary wz-margin-left-8"
             ng-click="search(custom_search)">
             Search
         </button>
@@ -55,6 +51,16 @@
                 <i class="fa fa-fw fa-times cursor-pointer" aria-hidden="true" ng-click="removeFilter('gdpr')"></i>
             </span>
         </md-chip>
+        <md-chip class="wz-chip" ng-show="includesFilter('hipaa')">
+            <span>HIPAA: {{getFilter('hipaa')}}
+                <i class="fa fa-fw fa-times cursor-pointer" aria-hidden="true" ng-click="removeFilter('hipaa')"></i>
+            </span>
+        </md-chip>
+        <md-chip class="wz-chip" ng-show="includesFilter('nist-800-53')">
+            <span>NIST-800-53: {{getFilter('nist-800-53')}}
+                <i class="fa fa-fw fa-times cursor-pointer" aria-hidden="true" ng-click="removeFilter('nist-800-53')"></i>
+            </span>
+        </md-chip>
     </md-chips>
 
     <div layout="row" ng-if="!editingFile" class="wz-margin-top-16">
@@ -67,19 +73,16 @@
                     switch-text="Custom rules" switch-change="switchLocalRules()"></wz-kbn-switch>
             </md-card-actions>
             <md-card-content class="wz-padding-bottom-0">
-                <wz-table custom-columns="true" flex ng-if="mctrl.showingLocalRules" path="'/rules'"
-                    keys="[{value: 'id', width: '85px'},{value:'description', width: 'auto'},{value:'groups',nosortable:true, width: '250px'},{value:'pci',nosortable:true, width: '170px'},{value:'gdpr',nosortable:true,width: '170px'}, {value: 'level', width: '100px'}, {value:'file',width: '200px'}]"
+                <wz-table custom-columns="true" flex ng-if="mctrl.showingLocalRules" path="'/rules'" keys="[{value: 'id', width: '85px'},{value:'description', width: 'auto'},{value:'groups',nosortable:true, width: '250px'},{value:'pci',nosortable:true, width: '170px'},{value:'gdpr',nosortable:true,width: '170px'}, {value: 'level', width: '100px'}, {value:'file',width: '200px'}]"
                     implicit-filter="appliedFilters" allow-click="true" row-sizes="[16,14,12]">
                 </wz-table>
                 <wz-table custom-columns="true" ng-if="!mctrl.showingLocalRules" implicit-filter="appliedFilters" flex
-                    path="'/rules'"
-                    keys="[{value: 'id', width: '85px'},{value:'description', width: 'auto'},{value:'groups',nosortable:true, width: '250px'},{value:'pci',nosortable:true, width: '170px'},{value:'gdpr',nosortable:true,width: '170px'}, {value: 'level', width: '100px'}, {value:'file',width: '200px'}]"
+                    path="'/rules'" keys="[{value: 'id', width: '85px'},{value:'description', width: 'auto'},{value:'groups',nosortable:true, width: '250px'},{value:'pci',nosortable:true, width: '170px'},{value:'gdpr',nosortable:true,width: '170px'}, {value: 'level', width: '100px'}, {value:'file',width: '200px'}]"
                     allow-click="true" row-sizes="[16,14,12]">
                 </wz-table>
             </md-card-content>
             <md-card-actions layout="row" layout-align="end center" class="layout-align-end-center layout-row">
-                <button type="button" ng-click="downloadCsv()"
-                    class="euiButtonEmpty euiButtonEmpty--primary euiButtonEmpty--small">
+                <button type="button" ng-click="downloadCsv()" class="euiButtonEmpty euiButtonEmpty--primary euiButtonEmpty--small">
                     <span class="euiButtonEmpty__content">
                         <react-component name="EuiIcon" props="{type:'importAction'}" />
                         <span class="euiButtonEmpty__text">Formatted</span>
