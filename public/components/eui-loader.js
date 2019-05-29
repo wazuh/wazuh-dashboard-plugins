@@ -24,6 +24,7 @@ import { WazuhStats } from './stats';
 import { WazuhWelcomeCard } from './welcome-card';
 import { WazuhWelcomeCardAgent } from './welcome-card-agent';
 import { WazuhStatsAgent } from './stats-agent';
+import { WazuhWelcomeManagement } from './welcom-card-management';
 
 const app = uiModules.get('app/wazuh', ['react']);
 
@@ -37,4 +38,5 @@ app
   .value('WazuhStats', WazuhStats)
   .value('WazuhWelcomeCard', WazuhWelcomeCard)
   .value('WazuhWelcomeCardAgent', WazuhWelcomeCardAgent)
-  .value('WazuhStatsAgent', WazuhStatsAgent);
+  .value('WazuhStatsAgent', WazuhStatsAgent)
+  .value('WazuhWelcomeManagement', WazuhWelcomeManagement);
