@@ -2,6 +2,19 @@
 
 All notable changes to the Wazuh app project will be documented in this file.
 
+## Wazuh v3.9.1 - Kibana v7.1.1 - Revision 509
+
+### Added
+
+- Support for Kibana v7.1.1
+- Added overall metrics for Agents > Overview [#1479](https://github.com/wazuh/wazuh-kibana-app/pull/1479).
+
+### Fixed
+
+- Fixed missing dependency for Discover [43f5dd5](https://github.com/wazuh/wazuh-kibana-app/commit/43f5dd5f64065c618ba930b2a4087f0a9e706c0e).
+- Fixed visualization for Agents > Overview [#1477](https://github.com/wazuh/wazuh-kibana-app/pull/1477). 
+- Fixed SCA policy checks table [#1478](https://github.com/wazuh/wazuh-kibana-app/pull/1478).
+
 ## Wazuh v3.9.1 - Kibana v7.1.0 - Revision 508
 
 ### Added
