@@ -21,7 +21,86 @@ export class WazuhWelcomeManagement extends Component {
       <div>
         <EuiFlexGroup>
           <EuiFlexItem>
-
+            <EuiPanel betaBadgeLabel="Administration">
+              <EuiSpacer size="m" />
+              <EuiFlexGroup>
+                <EuiFlexItem>
+                  <EuiCard
+                    layout="horizontal"
+                    icon={<EuiIcon size="xl" type="indexRollupApp" />}
+                    title="Ruleset"
+                    onClick={() => this.props.switchTab('ruleset', true)}
+                    description="Manage your Wazuh cluster ruleset."
+                  />
+                </EuiFlexItem>
+                <EuiFlexItem>
+                  <EuiCard
+                    layout="horizontal"
+                    icon={<EuiIcon size="xl" type="usersRolesApp" />}
+                    title="Groups"
+                    onClick={() => this.props.switchTab('groups', true)}
+                    description="Manage your agent groups."
+                  />
+                </EuiFlexItem>
+              </EuiFlexGroup>
+              <EuiFlexGroup>
+                <EuiFlexItem>
+                  <EuiCard
+                    layout="horizontal"
+                    icon={<EuiIcon size="xl" type="devToolsApp" />}
+                    title="Configuration"
+                    onClick={() => this.props.switchTab('configuration', true)}
+                    description="Manage your Wazuh cluster configuration."
+                  />
+                </EuiFlexItem>
+                <EuiFlexItem />
+              </EuiFlexGroup>
+            </EuiPanel>
+          </EuiFlexItem>
+          <EuiFlexItem>
+            <EuiPanel betaBadgeLabel="Status and reports">
+              <EuiSpacer size="m" />
+              <EuiFlexGroup>
+                <EuiFlexItem>
+                  <EuiCard
+                    layout="horizontal"
+                    icon={<EuiIcon size="xl" type="uptimeApp" />}
+                    title="Status"
+                    onClick={() => this.props.switchTab('status', true)}
+                    description="Manage your Wazuh cluster status."
+                  />
+                </EuiFlexItem>
+                <EuiFlexItem>
+                  <EuiCard
+                    layout="horizontal"
+                    icon={<EuiIcon size="xl" type="indexPatternApp" />}
+                    title="Cluster"
+                    onClick={() => this.props.switchTab('monitoring', true)}
+                    description="Visualize your Wazuh cluster."
+                  />
+                </EuiFlexItem>
+              </EuiFlexGroup>
+              <EuiFlexGroup>
+                <EuiFlexItem>
+                  <EuiCard
+                    layout="horizontal"
+                    icon={<EuiIcon size="xl" type="filebeatApp" />}
+                    title="Logs"
+                    onClick={() => this.props.switchTab('logs', true)}
+                    description="Logs from your Wazuh cluster."
+                  />
+                </EuiFlexItem>
+                <EuiFlexItem>
+                  <EuiCard
+                    layout="horizontal"
+                    icon={<EuiIcon size="xl" type="reportingApp" />}
+                    title="Reporting"
+                    onClick={() => this.props.switchTab('reporting', true)}
+                    description="Check your stored Wazuh reports."
+                  />
+                </EuiFlexItem>
+              </EuiFlexGroup>
+            </EuiPanel>
           </EuiFlexItem>
         </EuiFlexGroup>
       </div>
