@@ -8,6 +8,10 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 - Support for Wazuh v3.9.2
 
+### Changed
+
+- Avoid showing more than one toaster for the same error message [7937003](https://github.com/wazuh/wazuh-kibana-app/commit/793700382798033203091d160773363323e05bb9).
+
 ## Wazuh v3.9.1 - Kibana v7.1.1 - Revision 509
 
 ### Added
