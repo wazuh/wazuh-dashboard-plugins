@@ -6,14 +6,57 @@ import {
   EuiPanel,
   EuiFlexItem,
   EuiFlexGroup,
-  EuiSpacer
+  EuiSpacer,
+  EuiSwitch,
+  EuiPopover,
+  EuiButtonIcon,
+  EuiFormRow,
+  EuiFlexGrid
 } from '@elastic/eui';
+
+import { TabDescription } from '../../server/reporting/tab-description';
 
 export class WazuhWelcomeCard extends Component {
   constructor(props) {
     super(props);
 
-    this.state = {};
+    this.state = {
+      extensions: this.props.extensions
+    };
+  }
+
+  onButtonClick(btn) {
+    this.setState({
+      [btn]: !this.state[btn]
+    });
+  }
+
+  closePopover(popover) {
+    this.setState({
+      [popover]: false
+    });
+  }
+
+  toggleExtension(extension) {
+    const extensions = this.state.extensions;
+    extensions[extension] = !extensions[extension];
+    this.setState({
+      extensions
+    });
+  }
+
+  buildTabCard(tab, icon) {
+    return (
+      <EuiFlexItem>
+        <EuiCard
+          layout="horizontal"
+          icon={<EuiIcon size="xl" type={icon} />}
+          title={TabDescription[tab].title}
+          onClick={() => this.props.switchTab(tab)}
+          description={TabDescription[tab].description}
+        />
+      </EuiFlexItem>
+    );
   }
 
   render() {
@@ -22,108 +65,86 @@ export class WazuhWelcomeCard extends Component {
         <EuiFlexGroup>
           <EuiFlexItem>
             <EuiPanel betaBadgeLabel="Security Information Management">
-              <EuiSpacer size="m" />
-              <EuiFlexGroup>
-                <EuiFlexItem>
-                  <EuiCard
-                    layout="horizontal"
-                    icon={<EuiIcon size="xl" type="dashboardApp" />}
-                    title="Security events"
-                    onClick={() => this.props.switchTab('general')}
-                    description="Browse through your security alerts, identifying issues and threats in your environment."
-                  />
-                </EuiFlexItem>
-                <EuiFlexItem>
-                  <EuiCard
-                    layout="horizontal"
-                    icon={<EuiIcon size="xl" type="loggingApp" />}
-                    title="Integrity monitoring"
-                    onClick={() => this.props.switchTab('fim')}
-                    description="Alerts related to file changes, including permissions, content, ownership and attributes."
-                  />
-                </EuiFlexItem>
-              </EuiFlexGroup>
-              <EuiFlexGroup>
-                <EuiFlexItem>
-                  <EuiCard
-                    layout="horizontal"
-                    icon={<EuiIcon size="xl" type="logoAWSMono" />}
-                    title="Amazon AWS"
-                    onClick={() => this.props.switchTab('aws')}
-                    description="Security events related to your Amazon AWS services, collected directly via AWS API."
-                  />
-                </EuiFlexItem>
+              <EuiFlexGroup gutterSize="xs"> 
                 <EuiFlexItem />
+                <EuiFlexItem grow={false}>
+                  <EuiPopover
+                    id="popover"
+                    button={
+                      <EuiButtonIcon
+                        iconType="eye"
+                        onClick={() => this.onButtonClick('popoverSecurity')}
+                      />
+                    }
+                    isOpen={this.state.popoverSecurity}
+                    closePopover={() => this.closePopover('popoverSecurity')}
+                  >
+                    <EuiSwitch
+                      label="AWS extension"
+                      checked={this.state.extensions.aws}
+                      onChange={() => this.toggleExtension('aws')}
+                    />
+                  </EuiPopover>
+                </EuiFlexItem>
               </EuiFlexGroup>
+              <EuiFlexGrid columns={2}>
+                {this.buildTabCard('general', 'dashboardApp')}
+                {this.buildTabCard('fim', 'loggingApp')}
+                {this.props.extensions.aws &&
+                  this.buildTabCard('aws', 'logoAWSMono')}
+              </EuiFlexGrid>
             </EuiPanel>
           </EuiFlexItem>
           <EuiFlexItem>
             <EuiPanel betaBadgeLabel="Auditing and Policy Monitoring">
-              <EuiSpacer size="m" />
-              <EuiFlexGroup>
-                <EuiFlexItem>
-                  <EuiCard
-                    layout="horizontal"
-                    icon={<EuiIcon size="xl" type="advancedSettingsApp" />}
-                    title="Policy monitoring"
-                    onClick={() => this.props.switchTab('pm')}
-                    description="Verify that your systems are configured according to your security policies baseline."
-                  />
-                </EuiFlexItem>
-                <EuiFlexItem>
-                  <EuiCard
-                    layout="horizontal"
-                    icon={<EuiIcon size="xl" type="securityAnalyticsApp" />}
-                    title="Security configuration assessment"
-                    onClick={() => this.props.switchTab('sca')}
-                    description="Scan your assets as part of a configuration assessment audit."
-                  />
-                </EuiFlexItem>
-              </EuiFlexGroup>
-              <EuiFlexGroup>
-                {this.props.extensions.audit ? (
-                  <EuiFlexItem>
-                    <EuiCard
-                      layout="horizontal"
-                      icon={<EuiIcon size="xl" type="monitoringApp" />}
-                      title="System auditing"
-                      onClick={() => this.props.switchTab('audit')}
-                      description="Audit users behavior, monitoring command execution and alerting on access to critical files."
-                    />
-                  </EuiFlexItem>
-                ) : (
-                  <EuiFlexItem />
-                )}
-                {this.props.extensions.oscap ? (
-                  <EuiFlexItem>
-                    <EuiCard
-                      layout="horizontal"
-                      icon={<EuiIcon size="xl" type="codeApp" />}
-                      title="OpenSCAP"
-                      onClick={() => this.props.switchTab('oscap')}
-                      description="Configuration assessment and automation of compliance monitoring using SCAP checks."
-                    />
-                  </EuiFlexItem>
-                ) : (
-                  <EuiFlexItem />
-                )}
-              </EuiFlexGroup>
-              <EuiFlexGroup>
-                {this.props.extensions.ciscat ? (
-                  <EuiFlexItem>
-                    <EuiCard
-                      layout="horizontal"
-                      icon={<EuiIcon size="xl" type="auditbeatApp" />}
-                      title="CIS-CAT"
-                      onClick={() => this.props.switchTab('ciscat')}
-                      description="Configuration assessment using Center of Internet Security scanner and SCAP checks."
-                    />
-                  </EuiFlexItem>
-                ) : (
-                  <EuiFlexItem />
-                )}
+              <EuiFlexGroup gutterSize="xs"> 
                 <EuiFlexItem />
+                <EuiFlexItem grow={false}>
+                  <EuiPopover
+                    id="popover"
+                    button={
+                      <EuiButtonIcon
+                        iconType="eye"
+                        onClick={() => this.onButtonClick('popoverAuditing')}
+                      />
+                    }
+                    isOpen={this.state.popoverAuditing}
+                    closePopover={() => this.closePopover('popoverAuditing')}
+                  >
+                    <EuiFormRow>
+                      <EuiSwitch
+                        label="System auditing extension"
+                        checked={this.state.extensions.audit}
+                        onChange={() => this.toggleExtension('audit')}
+                      />
+                    </EuiFormRow>
+                    <EuiFormRow>
+                      <EuiSwitch
+                        label="OpenSCAP extension"
+                        checked={this.state.extensions.oscap}
+                        onChange={() => this.toggleExtension('oscap')}
+                      />
+                    </EuiFormRow>
+                    <EuiFormRow>
+                      <EuiSwitch
+                        label="CIS-CAT extension"
+                        checked={this.state.extensions.ciscat}
+                        onChange={() => this.toggleExtension('ciscat')}
+                      />
+                    </EuiFormRow>
+                  </EuiPopover>
+                </EuiFlexItem>
               </EuiFlexGroup>
+              <EuiFlexGrid columns={2}>
+                {this.buildTabCard('pm', 'advancedSettingsApp')}
+                {this.buildTabCard('sca', 'securityAnalyticsApp')}
+                {this.props.extensions.audit &&
+                  this.buildTabCard('audit', 'monitoringApp')}
+                {this.props.extensions.oscap &&
+                  this.buildTabCard('oscap', 'codeApp')}
+                {this.props.extensions.ciscat &&
+                  this.buildTabCard('ciscat', 'auditbeatApp')}
+              </EuiFlexGrid>
             </EuiPanel>
           </EuiFlexItem>
         </EuiFlexGroup>
@@ -132,98 +153,105 @@ export class WazuhWelcomeCard extends Component {
         <EuiFlexGroup>
           <EuiFlexItem>
             <EuiPanel betaBadgeLabel="Threat Detection and Response">
-              <EuiSpacer size="m" />
-              <EuiFlexGroup>
-                <EuiFlexItem>
-                  <EuiCard
-                    layout="horizontal"
-                    icon={<EuiIcon size="xl" type="securityApp" />}
-                    title="Vulnerabilities"
-                    onClick={() => this.props.switchTab('vuls')}
-                    description="Discover what applications in your environment are affected by well-known vulnerabilities."
-                  />
+              <EuiFlexGroup gutterSize="xs">
+                <EuiFlexItem />
+                <EuiFlexItem grow={false}>
+                  <EuiPopover
+                    id="popover"
+                    button={
+                      <EuiButtonIcon
+                        iconType="eye"
+                        onClick={() => this.onButtonClick('popoverThreat')}
+                      />
+                    }
+                    isOpen={this.state.popoverThreat}
+                    closePopover={() => this.closePopover('popoverThreat')}
+                  >
+                    <EuiFormRow>
+                      <EuiSwitch
+                        label="Virustotal extension"
+                        checked={this.state.extensions.virustotal}
+                        onChange={() => this.toggleExtension('virustotal')}
+                      />
+                    </EuiFormRow>
+                    <EuiFormRow>
+                      <EuiSwitch
+                        label="Osquery extension"
+                        checked={this.state.extensions.osquery}
+                        onChange={() => this.toggleExtension('osquery')}
+                      />
+                    </EuiFormRow>
+                    <EuiFormRow>
+                      <EuiSwitch
+                        label="Docker listener extension"
+                        checked={this.state.extensions.docker}
+                        onChange={() => this.toggleExtension('docker')}
+                      />
+                    </EuiFormRow>
+                  </EuiPopover>
                 </EuiFlexItem>
-                {this.props.extensions.virustotal ? (
-                  <EuiFlexItem>
-                    <EuiCard
-                      layout="horizontal"
-                      icon={<EuiIcon size="xl" type="savedObjectsApp" />}
-                      title="VirusTotal"
-                      onClick={() => this.props.switchTab('virustotal')}
-                      description="Alerts resulting from VirusTotal analysis of suspicious files via an integration with their API."
-                    />
-                  </EuiFlexItem>
-                ) : (
-                  <EuiFlexItem />
-                )}
               </EuiFlexGroup>
-              <EuiFlexGroup>
-                {this.props.extensions.osquery ? (
-                  <EuiFlexItem>
-                    <EuiCard
-                      layout="horizontal"
-                      icon={<EuiIcon size="xl" type="searchProfilerApp" />}
-                      title="Osquery"
-                      onClick={() => this.props.switchTab('osquery')}
-                      description="Osquery can be used to expose an operating system as a high-performance relational database."
-                    />
-                  </EuiFlexItem>
-                ) : (
-                  <EuiFlexItem />
-                )}
-                {this.props.extensions.docker ? (
-                  <EuiFlexItem>
-                    <EuiCard
-                      layout="horizontal"
-                      icon={<EuiIcon size="xl" type="spacesApp" />}
-                      title="Docker listener"
-                      onClick={() => this.props.switchTab('docker')}
-                      description="Monitor and collect the activity from Docker containers such as creation, running, starting, stopping or pausing events."
-                    />
-                  </EuiFlexItem>
-                ) : (
-                  <EuiFlexItem />
-                )}
-              </EuiFlexGroup>
+              <EuiFlexGrid columns={2}>
+                {this.buildTabCard('vuls', 'securityApp')}
+                {this.props.extensions.virustotal &&
+                  this.buildTabCard('virustotal', 'savedObjectsApp')}
+                {this.props.extensions.osquery &&
+                  this.buildTabCard('osquery', 'searchProfilerApp')}
+                {this.props.extensions.docker &&
+                  this.buildTabCard('docker', 'spacesApp')}
+              </EuiFlexGrid>
             </EuiPanel>
           </EuiFlexItem>
-          {this.props.extensions.pci || this.props.extensions.gdpr ? (
-            <EuiFlexItem>
-              <EuiPanel betaBadgeLabel="Regulatory Compliance">
-                <EuiSpacer size="m" />
-                <EuiFlexGroup>
-                  {this.props.extensions.pci ? (
-                    <EuiFlexItem>
-                      <EuiCard
-                        layout="horizontal"
-                        icon={<EuiIcon size="xl" type="visTagCloud" />}
-                        title="PCI DSS"
-                        onClick={() => this.props.switchTab('pci')}
-                        description="Global security standard for entities that process, store or transmit payment cardholder data."
+
+          <EuiFlexItem>
+            <EuiPanel betaBadgeLabel="Regulatory Compliance">
+              <EuiFlexGroup gutterSize="xs">
+                <EuiFlexItem />
+                <EuiFlexItem grow={false}>
+                  <EuiPopover
+                    id="popover"
+                    button={
+                      <EuiButtonIcon
+                        iconType="eye"
+                        onClick={() => this.onButtonClick('popoverRegulatory')}
                       />
-                    </EuiFlexItem>
-                  ) : (
-                    <EuiFlexItem />
-                  )}
-                  {this.props.extensions.gdpr ? (
-                    <EuiFlexItem>
-                      <EuiCard
-                        layout="horizontal"
-                        icon={<EuiIcon size="xl" type="visBarVertical" />}
-                        title="GDPR"
-                        onClick={() => this.props.switchTab('gdpr')}
-                        description="General Data Protection Regulation (GDPR) sets guidelines for processing of personal data."
+                    }
+                    isOpen={this.state.popoverRegulatory}
+                    closePopover={() => this.closePopover('popoverRegulatory')}
+                  >
+                    <EuiFormRow>
+                      <EuiSwitch
+                        label="PCI DSS extension"
+                        checked={this.state.extensions.pci}
+                        onChange={() => this.toggleExtension('pci')}
                       />
-                    </EuiFlexItem>
-                  ) : (
-                    <EuiFlexItem />
-                  )}
-                </EuiFlexGroup>
-              </EuiPanel>
-            </EuiFlexItem>
-          ) : (
-            <EuiFlexItem />
-          )}
+                    </EuiFormRow>
+                    <EuiFormRow>
+                      <EuiSwitch
+                        label="GDPR extension"
+                        checked={this.state.extensions.gdpr}
+                        onChange={() => this.toggleExtension('gdpr')}
+                      />
+                    </EuiFormRow>
+                  </EuiPopover>
+                </EuiFlexItem>
+              </EuiFlexGroup>
+              <EuiFlexGrid columns={2}>
+                {this.props.extensions.pci &&
+                  this.buildTabCard('pci', 'visTagCloud')}
+                {this.props.extensions.gdpr &&
+                  this.buildTabCard('gdpr', 'visBarVertical')}
+                {!this.props.extensions.pci && !this.props.extensions.gdpr && (
+                  <EuiFlexItem>
+                    <p>
+                      Click the <EuiIcon type="eye" /> icon to show regulatory
+                      compliance extensions.
+                    </p>
+                  </EuiFlexItem>
+                )}
+              </EuiFlexGrid>
+            </EuiPanel>
+          </EuiFlexItem>
         </EuiFlexGroup>
       </div>
     );
