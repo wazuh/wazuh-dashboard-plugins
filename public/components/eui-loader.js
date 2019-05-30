@@ -24,7 +24,7 @@ import { WazuhStats } from './stats';
 import { WazuhWelcomeCard } from './welcome-card';
 import { WazuhWelcomeCardAgent } from './welcome-card-agent';
 import { WazuhStatsAgent } from './stats-agent';
-import { WazuhWelcomeManagement } from './welcom-card-management';
+import { WazuhWelcomeManagement } from './welcome-card-management';
 
 const app = uiModules.get('app/wazuh', ['react']);
 
