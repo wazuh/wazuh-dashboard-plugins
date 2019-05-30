@@ -90,8 +90,9 @@ export class AgentsPreviewController {
 
     this.$scope.$on('wazuhFetched', (ev, parameters) => {
       ev.stopPropagation();
-      this.$scope.showNoAgents =
-        !parameters.items.length > 0 && !parameters.filters.length;
+      if (!parameters.items.length > 0 && !parameters.filters.length) {
+        this.addNewAgent(true);
+      }
     });
 
     this.init = false;
@@ -228,9 +229,13 @@ export class AgentsPreviewController {
     return;
   }
 
-  registerNewAgent(flag) {
-    this.$scope.registerNewAgent = flag;
+  addNewAgent(flag) {
+    this.addingNewAgent = flag;
   }
+
+  registerAgentsProps = {
+    addNewAgent: (flag) => this.addNewAgent(flag)
+  };
 
   reloadList() {
     this.$scope.$broadcast('wazuhSearch', { term: '' });
