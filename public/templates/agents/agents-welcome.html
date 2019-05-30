@@ -1,4 +1,4 @@
-<div layout="column" class="" layout-align="start stretch" ng-if="tab === 'welcome'" ng-show="!load && !agent">
+<div layout="column" layout-align="start stretch" ng-if="tab === 'welcome'" ng-show="!load && !agent">
     <div layout="row" class="layout-padding">
         <md-card flex class="wz-md-card" flex>
             <md-card-content class="wz-text-center">
@@ -17,7 +17,6 @@
 </div>
 <div layout="column" class="" layout-align="start stretch" ng-if="tab === 'welcome'" ng-show="!load && agent">
 
-    <!-- Headline -->
     <div layout="row" class="wz-margin-left-16 wz-margin-right-16 wz-margin-top-8">
         <span flex></span>
         <button class="kuiButton kuiButton--secondary small wz-no-margin" ng-click="goDiscover()"><i
@@ -26,7 +25,7 @@
         </button>
     </div>
     <div layout="row" layout-padding>
-        <react-component name="WazuhStatsAgent" flex props="{
+        <react-component name="StatsAgent" flex props="{
             name: agent.name || '-',
             id: agent.id || '-',
             ip: agent.ip || '-',
@@ -36,68 +35,8 @@
             lastKeepAlive: agent.lastKeepAlive ? offsetTimestamp('', agent.lastKeepAlive) : '-'
         }" />
     </div>
-    <!-- End headline 
-
-   <!-- <div layout="row" layout-padding ng-if="agent.group">
-        <md-card flex class="wz-md-card wz-padding-top-0 wz-padding-bottom-0 wz-margin-top-0">
-            <md-card-content>
-
-                <div layout="row">
-                    <span class="font-size-16">Groups
-                        <span class="cursor-pointer" ng-if='adminMode' ng-click="switchGroupEdit()">
-                            <react-component name="EuiIcon" props="{type:'plusInCircle', color:'primary'}" />
-                        </span>
-                    </span>
-                </div>
-                <md-divider class="wz-margin-top-10"></md-divider>
-                <div layout="row" class="wz-margin-top-10" ng-if="agent.group && editGroup && !addingGroupToAgent">
-                    <div class="wz-word-break" flex ng-if="groups && groups.length">
-                        Available groups:
-                    </div>
-                    <div class="wz-word-break" flex ng-if="!groups || !groups.length">
-                        No more groups available. Create a new group at <a
-                            ng-href="#/manager/?_g=()&tab=groups">Configuration
-                            > Groups</a>.
-                    </div>
-                </div>
-                <div ng-if="editGroup && !addingGroupToAgent && groups && groups.length" class="wz-margin-top-4">
-                    <div class="euiFlexGrid">
-                        <span ng-repeat="group in groups"
-                            class="wz-margin-left-8 wz-text-link euiFlexItem euiFlexItem--flexGrowZero"
-                            ng-click="showConfirmAddGroup(group)">{{
-                            group }}</span>
-                    </div>
-
-                </div>
-
-                <div class="wz-margin-top-10 confirmEmbedBubble" ng-if="agent.group && editGroup && addingGroupToAgent">
-                    <div layout="row">
-                        <span class="font-size-12  wz-padding-left-8">Agent <b>{{agent.name}}</b> will be
-                            added to group <b>{{addingGroupToAgent}}</b></span>
-                    </div>
-                    <div layout="row">
-                        <md-button class="cancelBtn" type="button" ng-click="cancelAddGroup()">Cancel</md-button>
-                        <md-button class="agreeBtn wz-button" type="button"
-                            ng-click="confirmAddGroup(addingGroupToAgent)"><i aria-hidden='true'
-                                class='fa fa-fw fa-check'></i> Confirm</md-button>
-                    </div>
-                </div>
-                <div layout="row" class="wz-word-break wz-padding-top-10">
-                    <div class="euiFlexGrid">
-                        <span ng-repeat="group in agent.group"
-                            class="wz-text-link wz-margin-left-8 euiFlexItem euiFlexItem--flexGrowZero"
-                            ng-click="goGroups(agent,$index)">{{
-                            group
-                            }}</span>
-                    </div>
-                </div>
-
-            </md-card-content>
-        </md-card>
-    </div>
--->
 
     <div layout="row" layout-padding>
-        <react-component name="WazuhWelcomeCardAgent" props="welcomeCardsProps" />
+        <react-component name="WelcomeScreenAgent" props="welcomeCardsProps" />
     </div>
 </div>

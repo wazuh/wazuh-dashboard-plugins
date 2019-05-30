@@ -20,12 +20,6 @@ import {
   EuiButtonIcon
 } from '@elastic/eui';
 
-import { WazuhStats } from './stats';
-import { WazuhWelcomeCard } from './welcome-card';
-import { WazuhWelcomeCardAgent } from './welcome-card-agent';
-import { WazuhStatsAgent } from './stats-agent';
-import { WazuhWelcomeManagement } from './welcome-card-management';
-
 const app = uiModules.get('app/wazuh', ['react']);
 
 app
@@ -34,9 +28,4 @@ app
   .value('EuiLoadingSpinner', EuiLoadingSpinner)
   .value('EuiProgress', EuiProgress)
   .value('EuiButtonIcon', EuiButtonIcon)
-  .value('EuiBasicTable', EuiBasicTable)
-  .value('WazuhStats', WazuhStats)
-  .value('WazuhWelcomeCard', WazuhWelcomeCard)
-  .value('WazuhWelcomeCardAgent', WazuhWelcomeCardAgent)
-  .value('WazuhStatsAgent', WazuhStatsAgent)
-  .value('WazuhWelcomeManagement', WazuhWelcomeManagement);
+  .value('EuiBasicTable', EuiBasicTable);

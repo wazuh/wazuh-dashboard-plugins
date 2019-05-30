@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 
 import { EuiStat, EuiFlexItem, EuiFlexGroup, EuiPanel } from '@elastic/eui';
 
-export class WazuhStatsAgent extends Component {
+export class Stats extends Component {
   constructor(props) {
     super(props);
 

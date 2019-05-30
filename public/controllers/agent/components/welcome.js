@@ -9,7 +9,7 @@ import {
   EuiSpacer
 } from '@elastic/eui';
 
-export class WazuhWelcomeCardAgent extends Component {
+export class WelcomeScreen extends Component {
   constructor(props) {
     super(props);
 
