@@ -216,8 +216,6 @@ export class SettingsController {
       );
     }
 
-    this.extensions = this.appState.getExtensions(JSON.parse(currentApi).id);
-
     this.$scope.$applyAsync();
     return;
   }
@@ -263,8 +261,6 @@ export class SettingsController {
           this.apiEntries[this.currentApiEntryIndex]._source.extensions
         );
       }
-
-      this.extensions = this.appState.getExtensions(JSON.parse(currentApi).id);
 
       this.$scope.$applyAsync();
       return;
@@ -572,23 +568,6 @@ export class SettingsController {
     }
   }
 
-  // Toggle extension
-  toggleExtension(extension, state) {
-    try {
-      const api = JSON.parse(this.appState.getCurrentAPI()).id;
-      const currentExtensions = this.appState.getExtensions(api);
-      currentExtensions[extension] = state;
-      this.appState.setExtensions(api, currentExtensions);
-      this.getCurrentAPIIndex();
-      this.apiEntries[
-        this.currentApiEntryIndex
-      ]._source.extensions = currentExtensions;
-      this.$scope.$applyAsync();
-    } catch (error) {
-      this.errorHandler.handle(error, 'Settings');
-    }
-  }
-
   /**
    * This change to a given index pattern
    * @param {} newIndexPattern
@@ -672,23 +651,6 @@ export class SettingsController {
       } else {
         // There's no pattern in the cookies, pick the one in the settings
         this.selectedIndexPattern = config['pattern'];
-      }
-
-      if (!this.appState.getCurrentAPI()) {
-        this.extensions = {};
-        this.extensions.audit = config['extensions.audit'];
-        this.extensions.pci = config['extensions.pci'];
-        this.extensions.gdpr = config['extensions.gdpr'];
-        this.extensions.oscap = config['extensions.oscap'];
-        this.extensions.ciscat = config['extensions.ciscat'];
-        this.extensions.aws = config['extensions.aws'];
-        this.extensions.virustotal = config['extensions.virustotal'];
-        this.extensions.osquery = config['extensions.osquery'];
-        this.extensions.docker = config['extensions.docker'];
-      } else {
-        this.extensions = this.appState.getExtensions(
-          JSON.parse(this.appState.getCurrentAPI()).id
-        );
       }
 
       if (this.tab === 'logs') {
