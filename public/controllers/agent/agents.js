@@ -550,8 +550,8 @@ export class AgentsController {
     }
 
     // Update agent status
-    try {
-      if ((this.$scope || {}).agent || false) {
+    if (!force && ((this.$scope || {}).agent || false)) {
+      try {
         const agentInfo = await this.apiReq.request(
           'GET',
           `/agents/${this.$scope.agent.id}`,
@@ -560,8 +560,8 @@ export class AgentsController {
         this.$scope.agent.status =
           (((agentInfo || {}).data || {}).data || {}).status ||
           this.$scope.agent.status;
-      }
-    } catch (error) {} // eslint-disable-line
+      } catch (error) {} // eslint-disable-line
+    }
 
     try {
       this.$scope.showSyscheckFiles = false;
@@ -791,35 +791,13 @@ export class AgentsController {
 
       const id = this.commonData.checkLocationAgentId(newAgentId, globalAgent);
 
-      const data = [false, false, false];
+      const data = await this.apiReq.request('GET', `/agents/${id}`, {});
 
-      try {
-        data[0] = await this.apiReq.request('GET', `/agents/${id}`, {});
-      } catch (error) {} //eslint-disable-line
-
-      try {
-        data[1] = await this.apiReq.request(
-          'GET',
-          `/syscheck/${id}/last_scan`,
-          {}
-        );
-      } catch (error) {} //eslint-disable-line
-
-      try {
-        data[2] = await this.apiReq.request(
-          'GET',
-          `/rootcheck/${id}/last_scan`,
-          {}
-        );
-      } catch (error) {} //eslint-disable-line
-
-      const result = data.map(item => ((item || {}).data || {}).data || false);
-
-      const [agentInfo, syscheckLastScan, rootcheckLastScan] = result;
+      const agentInfo = ((data || {}).data || {}).data || false;
 
       // Agent
       this.$scope.agent = agentInfo;
-      if (this.$scope.agent.os) {
+      if (agentInfo && this.$scope.agent.os) {
         this.$scope.agentOS =
           this.$scope.agent.os.name + ' ' + this.$scope.agent.os.version;
         this.$scope.agent.isLinuxOS = this.$scope.agent.os.uname.includes(
@@ -830,14 +808,6 @@ export class AgentsController {
         this.$scope.agent.isLinuxOS = false;
       }
 
-      // Syscheck
-      this.$scope.agent.syscheck = syscheckLastScan;
-      this.validateSysCheck();
-
-      // Rootcheck
-      this.$scope.agent.rootcheck = rootcheckLastScan;
-      this.validateRootCheck();
-
       await this.$scope.switchTab(this.$scope.tab, true);
 
       const groups = await this.apiReq.request('GET', '/agents/groups', {});
@@ -847,37 +817,6 @@ export class AgentsController {
           item =>
             this.$scope.agent.group && !this.$scope.agent.group.includes(item)
         );
-
-      const outdatedAgents = await this.apiReq.request(
-        'GET',
-        '/agents/outdated/',
-        {}
-      );
-      this.$scope.agent.outdated = outdatedAgents.data.data.items
-        .map(x => x.id)
-        .find(x => x === this.$scope.agent.id);
-
-      if (this.$scope.agent.outdated) {
-        if (
-          this.appState.getSessionStorageItem(
-            `updatingAgent${this.$scope.agent.id}`
-          )
-        ) {
-          this.$scope.agent.upgrading = true;
-        }
-      } else {
-        if (
-          this.appState.getSessionStorageItem(
-            `updatingAgent${this.$scope.agent.id}`
-          )
-        ) {
-          this.appState.removeSessionStorageItem(
-            `updatingAgent${this.$scope.agent.id}`
-          );
-          this.$scope.agent.outdated = false;
-        }
-        this.$scope.$applyAsync();
-      }
 
       this.$scope.load = false;
       this.$scope.$applyAsync();
@@ -919,7 +858,7 @@ export class AgentsController {
     } catch (error) {
       return `${text}${time} (UTC)`;
     }
-  }
+  };
 
   /**
    * Navigate to the groups of an agent
