@@ -17,7 +17,7 @@ import {
   EuiLoadingSpinner,
   EuiProgress,
   EuiBasicTable,
-  EuiButtonIcon,
+  EuiButtonIcon
 } from '@elastic/eui';
 
 const app = uiModules.get('app/wazuh', ['react']);
