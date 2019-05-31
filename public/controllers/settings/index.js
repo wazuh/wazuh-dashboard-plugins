@@ -14,4 +14,8 @@ import { SettingsController } from './settings';
 
 const app = uiModules.get('app/wazuh', []);
 
-app.controller('settingsController', SettingsController);
+import { ApiTable } from './components/api-table';
+
+app
+  .controller('settingsController', SettingsController)
+  .value('ApiTable', ApiTable);

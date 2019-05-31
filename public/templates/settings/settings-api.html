@@ -3,14 +3,16 @@
     <!-- Headline -->
     <div layout="column" layout-padding>
         <span class="font-size-18">
-            <react-component name="EuiIcon" props="{type:'visControls'}" /> Wazuh API configuration
+            <react-component flex name="EuiIcon" props="{type:'visControls'}" /> Wazuh API configuration
         </span>
         <span class="md-subheader">
             Use Wazuh API settings to connect the Kibana plugin to your Wazuh manager or cluster
         </span>
     </div>
     <!-- End headline -->
-
+    <div layout="row" layout-padding>
+        <react-component name="ApiTable" props="{apiEntries: ctrl.apiEntries, compressed: true}" />
+    </div>
     <!-- API configuration card section -->
     <div layout="row" layout-align="start start">
         <md-card flex class="wz-md-card">
@@ -29,7 +31,8 @@
                 <!-- API entries list section -->
                 <div ng-repeat="entry in ctrl.apiEntries">
                     <!-- API entry -->
-                    <div layout="row" layout-align="space-between center" class="wz-padding-top-10 wz-padding-bottom-14">
+                    <div layout="row" layout-align="space-between center"
+                        class="wz-padding-top-10 wz-padding-bottom-14">
                         <p flex="15">
                             <i ng-show="(entry._id === ctrl.currentDefault)" tooltip="This is the default Manager"
                                 tooltip-placement="right" class="fa fa-star wz-color-orange" aria-hidden="true"></i>
@@ -39,19 +42,22 @@
                         <p flex="15">{{entry._source.api_port}}</p>
                         <p flex="15">{{entry._source.api_user}}</p>
                         <p flex="20">
-                            <react-component name="EuiIcon" class="cursor-pointer" props="{type:'starEmpty'}" ng-click="ctrl.setDefault(entry)"
-                                tooltip="Set as default Manager" />
-                            <react-component name="EuiIcon" class="cursor-pointer" props="{type:'refresh'}" ng-click="ctrl.checkManager(entry)"
-                                tooltip="Check connection" />
-                            <react-component name="EuiIcon" class="cursor-pointer" props="{type:'pencil', color:'primary'}"
-                                ng-click="ctrl.toggleEditor(entry)" tooltip="Edit" />
-                            <react-component name="EuiIcon" class="cursor-pointer" props="{type:'trash', color:'danger'}"
-                                ng-click="ctrl.removeManager(entry)" tooltip="Remove manager" />
+                            <react-component name="EuiIcon" class="cursor-pointer" props="{type:'starEmpty'}"
+                                ng-click="ctrl.setDefault(entry)" tooltip="Set as default Manager" />
+                            <react-component name="EuiIcon" class="cursor-pointer" props="{type:'refresh'}"
+                                ng-click="ctrl.checkManager(entry)" tooltip="Check connection" />
+                            <react-component name="EuiIcon" class="cursor-pointer"
+                                props="{type:'pencil', color:'primary'}" ng-click="ctrl.toggleEditor(entry)"
+                                tooltip="Edit" />
+                            <react-component name="EuiIcon" class="cursor-pointer"
+                                props="{type:'trash', color:'danger'}" ng-click="ctrl.removeManager(entry)"
+                                tooltip="Remove manager" />
                         </p>
                     </div>
                     <!-- End API entry -->
                     <!-- Edit API form -->
-                    <div layout="row" layout-align="space-between center" ng-if="ctrl.showEditForm[entry._id] && ctrl.isEditing">
+                    <div layout="row" layout-align="space-between center"
+                        ng-if="ctrl.showEditForm[entry._id] && ctrl.isEditing">
                         <form flex ng-submit="ctrl.updateSettings(entry)" layout="column" layout-align="start stretch"
                             class="margin-top-30">
                             <!-- Input section -->
@@ -62,13 +68,13 @@
                             </md-input-container>
                             <md-input-container class="wz-input-container">
                                 <label>Password</label>
-                                <input ng-model="ctrl.formUpdate.password" type="password" placeholder="" aria-label="password"
-                                    required />
+                                <input ng-model="ctrl.formUpdate.password" type="password" placeholder=""
+                                    aria-label="password" required />
                             </md-input-container>
                             <md-input-container class="wz-input-container">
                                 <label>URL</label>
-                                <input ng-model="ctrl.formUpdate.url" ng-init="formUpdate.url=entry._source.url" type="url"
-                                    placeholder="http(s)://" aria-label="full url" required />
+                                <input ng-model="ctrl.formUpdate.url" ng-init="formUpdate.url=entry._source.url"
+                                    type="url" placeholder="http(s)://" aria-label="full url" required />
                             </md-input-container>
                             <md-input-container class="wz-input-container">
                                 <label>Port</label>
@@ -100,9 +106,11 @@
                 <!-- End add API button section -->
 
                 <!-- Add API section-->
-                <div layout="row" ng-show="!currentAPI || (ctrl.addManagerContainer && !ctrl.isEditing) || !ctrl.apiEntries.length">
+                <div layout="row"
+                    ng-show="!currentAPI || (ctrl.addManagerContainer && !ctrl.isEditing) || !ctrl.apiEntries.length">
                     <!-- Add API form -->
-                    <form flex ng-submit="ctrl.saveSettings()" layout="column" layout-align="start stretch" class="margin-top-30">
+                    <form flex ng-submit="ctrl.saveSettings()" layout="column" layout-align="start stretch"
+                        class="margin-top-30">
                         <!-- Input section -->
                         <md-input-container class="wz-input-container">
                             <label>Username</label>
@@ -111,17 +119,18 @@
                         </md-input-container>
                         <md-input-container class="wz-input-container">
                             <label>Password</label>
-                            <input ng-model="ctrl.formData.password" type="password" placeholder="" aria-label="password"
-                                required />
+                            <input ng-model="ctrl.formData.password" type="password" placeholder=""
+                                aria-label="password" required />
                         </md-input-container>
                         <md-input-container class="wz-input-container">
                             <label>URL</label>
-                            <input ng-model="ctrl.formData.url" type="url" placeholder="http(s)://" aria-label="full url"
-                                required />
+                            <input ng-model="ctrl.formData.url" type="url" placeholder="http(s)://"
+                                aria-label="full url" required />
                         </md-input-container>
                         <md-input-container class="wz-input-container">
                             <label>Port</label>
-                            <input ng-model="ctrl.formData.port" type="text" placeholder="" aria-label="port" required />
+                            <input ng-model="ctrl.formData.port" type="text" placeholder="" aria-label="port"
+                                required />
                         </md-input-container>
                         <!-- Button and errors section -->
                         <div layout="row" layout-align="center center" ng-if="ctrl.messageError">
