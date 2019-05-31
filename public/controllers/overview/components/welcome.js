@@ -11,7 +11,8 @@ import {
   EuiPopover,
   EuiButtonIcon,
   EuiFormRow,
-  EuiFlexGrid
+  EuiFlexGrid,
+  EuiCallOut
 } from '@elastic/eui';
 
 import { TabDescription } from '../../../../server/reporting/tab-description';
@@ -173,20 +174,30 @@ export class WelcomeScreen extends Component {
                   {this.buildPopover('popoverRegulatory', ['pci', 'gdpr'])}
                 </EuiFlexItem>
               </EuiFlexGroup>
-              <EuiFlexGrid columns={2}>
-                {this.props.extensions.pci &&
-                  this.buildTabCard('pci', 'visTagCloud')}
-                {this.props.extensions.gdpr &&
-                  this.buildTabCard('gdpr', 'visBarVertical')}
-                {!this.props.extensions.pci && !this.props.extensions.gdpr && (
+              {!this.props.extensions.pci && !this.props.extensions.gdpr && (
+                <EuiFlexGroup>
                   <EuiFlexItem>
-                    <p>
-                      Click the <EuiIcon type="eye" /> icon to show regulatory
-                      compliance extensions.
-                    </p>
+                    <EuiCallOut
+                      title={
+                        <p>
+                          Click the <EuiIcon type="eye" /> icon to show
+                          regulatory compliance extensions.
+                        </p>
+                      }
+                      color="success"
+                      iconType="help"
+                    />
                   </EuiFlexItem>
-                )}
-              </EuiFlexGrid>
+                </EuiFlexGroup>
+              )}
+              {(this.props.extensions.pci || this.props.extensions.gdpr) && (
+                <EuiFlexGrid columns={2}>
+                  {this.props.extensions.pci &&
+                    this.buildTabCard('pci', 'visTagCloud')}
+                  {this.props.extensions.gdpr &&
+                    this.buildTabCard('gdpr', 'visBarVertical')}
+                </EuiFlexGrid>
+              )}
             </EuiPanel>
           </EuiFlexItem>
         </EuiFlexGroup>
