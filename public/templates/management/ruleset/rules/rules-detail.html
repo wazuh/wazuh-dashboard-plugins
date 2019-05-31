@@ -137,13 +137,13 @@
                             </dl>
                         </div>
                     </div>
-                    <div layout="row" class="wz-margin-top-10" ng-if="currentRule.nist.length">
+                    <div layout="row" class="wz-margin-top-10" ng-if="currentRule['nist-800-53'].length">
                         <div class="euiFlexItem">
                             <dl class="euiDescriptionList euiDescriptionList--row">
                                 <dt class="euiDescriptionList__title">NIST-800-53</dt>
-                                <dd class="euiDescriptionList__description" ng-repeat="item in currentRule.nist">
+                                <dd class="euiDescriptionList__description" ng-repeat="item in currentRule['nist-800-53']">
                                     <span class="wz-text-link" tooltip="Filter by this requirement" tooltip-placement="bottom"
-                                        ng-click="addDetailFilter('nist', item)">
+                                        ng-click="addDetailFilter('nist-800-53', item)">
                                         {{item}}
                                     </span>
                                 </dd>
@@ -165,7 +165,7 @@
                 <md-card flex class="wz-md-card _md flex md-margin-h">
                     <md-card-content>
                         <wz-table custom-columns="true" flex path="'/rules'" implicit-filter="[{ name:'file',value: currentRule.file}]"
-                            keys="[{value: 'id', width: '75px'},{value:'file',size:2},{value:'description',size:2},{value:'groups',nosortable:true,size:2},{value:'pci',nosortable:true,size:2},{value:'gdpr',nosortable:true},{value:'hipaa',nosortable:true},{value:'nist',nosortable:true},'level']"
+                            keys="[{value: 'id', width: '75px'},{value:'file',size:2},{value:'description',size:2},{value:'groups',nosortable:true,size:2},{value:'pci',nosortable:true,size:2},{value:'gdpr',nosortable:true},{value:'hipaa',nosortable:true},{value:'nist-800-53',nosortable:true},'level']"
                             allow-click="true">
                         </wz-table>
                     </md-card-content>
