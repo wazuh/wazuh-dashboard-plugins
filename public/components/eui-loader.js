@@ -27,6 +27,7 @@ import {
   EuiFieldText,
   EuiCodeBlock,
   EuiTitle,
+  EuiCopy,
   Fragment
 } from '@elastic/eui';
 
@@ -51,5 +52,6 @@ app
   .value('EuiCodeBlock', EuiCodeBlock)
   .value('EuiTitle ', EuiTitle)
   .value('Fragment', Fragment)
+  .value('EuiCopy', EuiCopy)
   .value('WazuhRegisterAgents', WazuhRegisterAgents);
 

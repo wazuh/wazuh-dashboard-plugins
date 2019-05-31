@@ -1,6 +1,6 @@
 import React, { Component, Fragment } from 'react';
 
-import { EuiSteps, EuiFlexGroup, EuiFlexItem, EuiPanel, EuiButtonToggle, EuiFieldText, EuiText, EuiCodeBlock, EuiTitle, EuiButtonIcon, EuiButtonEmpty } from '@elastic/eui';
+import { EuiSteps, EuiFlexGroup, EuiFlexItem, EuiPanel, EuiButtonToggle, EuiFieldText, EuiText, EuiCodeBlock, EuiTitle, EuiButtonIcon, EuiButtonEmpty, EuiCopy } from '@elastic/eui';
 
 export class WazuhRegisterAgents extends Component {
   constructor(props) {
@@ -19,15 +19,6 @@ export class WazuhRegisterAgents extends Component {
 
   setServerAddress = e => {
     this.setState({ serverAddress: e.target.value })
-  }
-
-  copyCode(text) {
-    var dummy = document.createElement("textarea");
-    document.body.appendChild(dummy);
-    dummy.value = text;
-    dummy.select();
-    document.execCommand("copy");
-    document.body.removeChild(dummy);
   }
 
   render() {
@@ -94,22 +85,32 @@ export class WazuhRegisterAgents extends Component {
         {this.state.selectedOS === 'rpm' ? (
           <EuiText>
             <p>Add the Wazuh repository</p>
-            <EuiButtonIcon
-              style={copyButton}
-              onClick={(e) => this.copyCode(rpmText)}
-              iconType="copy"
-              aria-label="Copy"
-            />
+            <div style={copyButton}>
+              <EuiCopy textToCopy={rpmText} >
+                {copy => (
+                  <EuiButtonIcon
+                    onClick={copy}
+                    iconType="copy"
+                    aria-label="Copy"
+                  />
+                )}
+              </EuiCopy>
+            </div>
             <EuiCodeBlock style={codeBlock} language="js">
               {rpmText}
             </EuiCodeBlock>
             <p>Deploy the installation</p>
-            <EuiButtonIcon
-              style={copyButton}
-              onClick={(e) => this.copyCode(rpmText2)}
-              iconType="copy"
-              aria-label="Copy"
-            />
+            <div style={copyButton}>
+              <EuiCopy textToCopy={rpmText2} >
+                {copy => (
+                  <EuiButtonIcon
+                    onClick={copy}
+                    iconType="copy"
+                    aria-label="Copy"
+                  />
+                )}
+              </EuiCopy>
+            </div>
             <EuiCodeBlock style={codeBlock} language="js">
               {rpmText2}
             </EuiCodeBlock>
@@ -118,42 +119,62 @@ export class WazuhRegisterAgents extends Component {
         {this.state.selectedOS === 'deb' ? (
           <EuiText>
             <p>Install the necessaries utilities</p>
-            <EuiButtonIcon
-              style={copyButton}
-              onClick={(e) => this.copyCode(debText)}
-              iconType="copy"
-              aria-label="Copy"
-            />
+            <div style={copyButton}>
+              <EuiCopy textToCopy={debText} >
+                {copy => (
+                  <EuiButtonIcon
+                    onClick={copy}
+                    iconType="copy"
+                    aria-label="Copy"
+                  />
+                )}
+              </EuiCopy>
+            </div>
             <EuiCodeBlock style={codeBlock} language="js">
               {debText}
             </EuiCodeBlock>
             <p>Install the Wazuh repository GPG key</p>
-            <EuiButtonIcon
-              style={copyButton}
-              onClick={(e) => this.copyCode(debText2)}
-              iconType="copy"
-              aria-label="Copy"
-            />
+            <div style={copyButton}>
+              <EuiCopy textToCopy={debText2} >
+                {copy => (
+                  <EuiButtonIcon
+                    onClick={copy}
+                    iconType="copy"
+                    aria-label="Copy"
+                  />
+                )}
+              </EuiCopy>
+            </div>
             <EuiCodeBlock style={codeBlock} language="js">
               {debText2}
             </EuiCodeBlock>
             <p>Add the repository</p>
-            <EuiButtonIcon
-              style={copyButton}
-              onClick={(e) => this.copyCode(debText3)}
-              iconType="copy"
-              aria-label="Copy"
-            />
+            <div style={copyButton}>
+              <EuiCopy textToCopy={debText3} >
+                {copy => (
+                  <EuiButtonIcon
+                    onClick={copy}
+                    iconType="copy"
+                    aria-label="Copy"
+                  />
+                )}
+              </EuiCopy>
+            </div>
             <EuiCodeBlock style={codeBlock} language="js">
               {debText3}
             </EuiCodeBlock>
             <p>Deploy the installation</p>
-            <EuiButtonIcon
-              style={copyButton}
-              onClick={(e) => this.copyCode(debText4)}
-              iconType="copy"
-              aria-label="Copy"
-            />
+            <div style={copyButton}>
+              <EuiCopy textToCopy={debText4} >
+                {copy => (
+                  <EuiButtonIcon
+                    onClick={copy}
+                    iconType="copy"
+                    aria-label="Copy"
+                  />
+                )}
+              </EuiCopy>
+            </div>
             <EuiCodeBlock style={codeBlock} language="js">
               {debText4}
             </EuiCodeBlock>
@@ -162,12 +183,17 @@ export class WazuhRegisterAgents extends Component {
         {this.state.selectedOS === 'win' ? (
           <EuiText>
             <p>Deploy the installation</p>
-            <EuiButtonIcon
-              style={copyButton}
-              onClick={(e) => this.copyCode(win)}
-              iconType="copy"
-              aria-label="Copy"
-            />
+            <div style={copyButton}>
+              <EuiCopy textToCopy={winText} >
+                {copy => (
+                  <EuiButtonIcon
+                    onClick={copy}
+                    iconType="copy"
+                    aria-label="Copy"
+                  />
+                )}
+              </EuiCopy>
+            </div>
             <EuiCodeBlock style={codeBlock} language="js">
               {winText}
             </EuiCodeBlock>
@@ -176,12 +202,17 @@ export class WazuhRegisterAgents extends Component {
         {this.state.selectedOS === 'macos' ? (
           <EuiText>
             <p>Deploy the installation</p>
-            <EuiButtonIcon
-              style={copyButton}
-              onClick={(e) => this.copyCode(macos)}
-              iconType="copy"
-              aria-label="Copy"
-            />
+            <div style={copyButton}>
+              <EuiCopy textToCopy={macosText} >
+                {copy => (
+                  <EuiButtonIcon
+                    onClick={copy}
+                    iconType="copy"
+                    aria-label="Copy"
+                  />
+                )}
+              </EuiCopy>
+            </div>
             <EuiCodeBlock style={codeBlock} language="js">
               {macosText}
             </EuiCodeBlock>
