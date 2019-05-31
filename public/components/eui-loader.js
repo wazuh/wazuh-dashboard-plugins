@@ -12,23 +12,12 @@
 import { uiModules } from 'ui/modules';
 import 'react';
 import {
-  EuiFlexGroup,
-  EuiFlexItem,
-  EuiPanel,
   EuiIcon,
-  EuiText,
   EuiSuperSelect,
   EuiLoadingSpinner,
   EuiProgress,
   EuiBasicTable,
   EuiButtonIcon,
-  EuiButtonToggle,
-  EuiButtonEmpty,
-  EuiFieldText,
-  EuiCodeBlock,
-  EuiTitle,
-  EuiCopy,
-  Fragment
 } from '@elastic/eui';
 
 const app = uiModules.get('app/wazuh', ['react']);
@@ -36,22 +25,11 @@ const app = uiModules.get('app/wazuh', ['react']);
 import { WazuhRegisterAgents } from './register-agents';
 
 app
-  .value('EuiFlexGroup', EuiFlexGroup)
-  .value('EuiFlexItem', EuiFlexItem)
-  .value('EuiPanel', EuiPanel)
   .value('EuiIcon', EuiIcon)
-  .value('EuiText', EuiText)
   .value('EuiSuperSelect', EuiSuperSelect)
   .value('EuiLoadingSpinner', EuiLoadingSpinner)
   .value('EuiProgress', EuiProgress)
   .value('EuiButtonIcon', EuiButtonIcon)
-  .value('EuiButtonToggle', EuiButtonToggle)
-  .value('EuiButtonEmpty', EuiButtonEmpty)
   .value('EuiBasicTable', EuiBasicTable)
-  .value('EuiFieldText', EuiFieldText)
-  .value('EuiCodeBlock', EuiCodeBlock)
-  .value('EuiTitle ', EuiTitle)
-  .value('Fragment', Fragment)
-  .value('EuiCopy', EuiCopy)
   .value('WazuhRegisterAgents', WazuhRegisterAgents);
 
