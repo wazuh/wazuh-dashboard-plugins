@@ -4578,7 +4578,7 @@ export const knownFields = [
     readFromDocValues: true
   },
   {
-    name: 'rule.nist-800-53',
+    name: 'rule.nist_800_53',
     type: 'string',
     count: 0,
     scripted: false,

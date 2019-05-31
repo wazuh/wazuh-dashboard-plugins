@@ -37,7 +37,7 @@ export const KeyEquivalenece = {
   gdpr: 'GDPR',
   pci: 'PCI',
   hipaa: 'HIPAA',
-  nist: 'NIST 800-53',
+  'nist-800-53': 'NIST 800-53',
   cis: 'CIS',
   event: 'Event',
   groups: 'Groups',

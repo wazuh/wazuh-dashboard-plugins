@@ -157,9 +157,9 @@ export class FilterHandler {
     const result = this.base();
     result.meta.type = 'exists';
     result.meta.value = 'exists';
-    result.meta.key = 'rule.nist-800-53';
+    result.meta.key = 'rule.nist_800_53';
     result.exists = {
-      field: 'rule.nist-800-53'
+      field: 'rule.nist_800_53'
     };
     delete result.query;
     return result;

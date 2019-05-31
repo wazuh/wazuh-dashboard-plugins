@@ -159,7 +159,7 @@ export class CommonData {
           this.removeDuplicateExists('rule.hipaa');
           filters.push(filterHandler.hipaaQuery());
         } else if (tab === 'nist') {
-          this.removeDuplicateExists('rule.nist-800-53');
+          this.removeDuplicateExists('rule.nist_800_53');
           filters.push(filterHandler.nistQuery());
         } else {
           this.removeDuplicateRuleGroups(tabFilters[tab].group);

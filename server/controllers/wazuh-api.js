@@ -599,23 +599,12 @@ export class WazuhApiCtrl {
           return ErrorResponse('Credentials do not exist', 3008, 400, reply);
         }
 
-        /*         const response = await needle(
-                  'get',
-                  `${api.url}:${api.port}/rules/hipaa`,
-                  {},
-                  ApiHelper.buildOptionsObject(api)
-                ); */
-        const response = {
-          "body": {
-            "error": 0,
-            "data": {
-              "items": [
-                "164.312.b"
-              ],
-              "totalItems": 1
-            }
-          }
-        }
+        const response = await needle(
+          'get',
+          `${api.url}:${api.port}/rules/hipaa`,
+          {},
+          ApiHelper.buildOptionsObject(api)
+        );
 
         if ((((response || {}).body || {}).data || {}).items) {
           let HIPAAobject = {};
@@ -692,24 +681,12 @@ export class WazuhApiCtrl {
           return ErrorResponse('Credentials do not exist', 3008, 400, reply);
         }
 
-        /*         const response = await needle(
-                  'get',
-                  `${api.url}:${api.port}/rules/nist`,
-                  {},
-                  ApiHelper.buildOptionsObject(api)
-                ); */
-        const response = {
-          "body": {
-            "error": 0,
-            "data": {
-              "items": [
-                "AU.3",
-                "IA.10"
-              ],
-              "totalItems": 2
-            }
-          }
-        }
+        const response = await needle(
+          'get',
+          `${api.url}:${api.port}/rules/nist-800-53`,
+          {},
+          ApiHelper.buildOptionsObject(api)
+        );
 
         if ((((response || {}).body || {}).data || {}).items) {
           let NISTobject = {};
