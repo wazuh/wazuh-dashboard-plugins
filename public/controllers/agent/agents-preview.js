@@ -90,9 +90,6 @@ export class AgentsPreviewController {
 
     this.$scope.$on('wazuhFetched', (ev, parameters) => {
       ev.stopPropagation();
-      if (!parameters.items.length > 0 && !parameters.filters.length) {
-        this.addNewAgent(true);
-      }
     });
 
     this.init = false;
@@ -200,6 +197,9 @@ export class AgentsPreviewController {
       this.versions = unique.versions.map(item => ({ id: item }));
       this.osPlatforms = unique.osPlatforms;
       this.lastAgent = unique.lastAgent;
+      if (!this.lastAgent || !this.lastAgent.id) {
+        this.addNewAgent(true);
+      }
       this.agentsCountActive = unique.summary.agentsCountActive;
       this.agentsCountDisconnected = unique.summary.agentsCountDisconnected;
       this.agentsCountNeverConnected = unique.summary.agentsCountNeverConnected;
