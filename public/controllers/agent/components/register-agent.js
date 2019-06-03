@@ -103,32 +103,31 @@ export class RegisterAgent extends Component {
       winText1: `wazuh-agent-3.9.1-1.msi /q ADDRESS='${this.state.serverAddress}' AUTHD_SERVER='${this.state.serverAddress}'`
     }
 
-    let guide = [];
+    let text = '';
     for (let i = 0; i < this.state.osSteps[this.state.selectedOS]; i++) {
-      const title = `${this.state.selectedOS}Title${i + 1}`;
-      const text = `${this.state.selectedOS}Text${i + 1}`;
-      guide.push(
-        <div key={i}>
-          < EuiText >
-            <p>{RegisterGuideDefs[title]}</p>
-            <div style={copyButton}>
-              <EuiCopy textToCopy={RegisterGuideDefs[text] || customTexts[text]} >
-                {copy => (
-                  <EuiButtonIcon
-                    onClick={copy}
-                    iconType='copy'
-                    aria-label='Copy'
-                  />
-                )}
-              </EuiCopy>
-            </div>
-            <EuiCodeBlock style={codeBlock} language='js'>
-              {RegisterGuideDefs[text] || customTexts[text]}
-            </EuiCodeBlock>
-          </EuiText>
-        </div>
-      );
+      const field = `${this.state.selectedOS}Text${i + 1}`;
+      text = text.concat(`${RegisterGuideDefs[field] || customTexts[field]}\n`);
     }
+    const guide = (
+      <div>
+        < EuiText >
+          <div style={copyButton}>
+            <EuiCopy textToCopy={text} >
+              {copy => (
+                <EuiButtonIcon
+                  onClick={copy}
+                  iconType='copy'
+                  aria-label='Copy'
+                />
+              )}
+            </EuiCopy>
+          </div>
+          <EuiCodeBlock style={codeBlock} language='js'>
+            {text}
+          </EuiCodeBlock>
+        </EuiText>
+      </div>
+    );
 
     const steps = [
       {
@@ -163,7 +162,7 @@ export class RegisterAgent extends Component {
 
     return (
       <div>
-        <EuiPage restrictWidth='800px'>
+        <EuiPage restrictWidth='1000px'>
           <EuiPageBody>
             <EuiFlexGroup>
               <EuiFlexItem>

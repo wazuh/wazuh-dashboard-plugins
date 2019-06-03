@@ -10,14 +10,6 @@
  * Find more information about this on the LICENSE file.
  */
 export const RegisterGuideDefs = {
-    rpmTitle1: 'Add the Wazuh repository',
-    rpmTitle2: 'Deploy the installation',
-    debTitle1: 'Install the necessaries utilities',
-    debTitle2: 'Deploy the installation',
-    debTitle3: 'Add the repository',
-    debTitle4: 'Deploy the installation',
-    winTitle1: 'Deploy the installation',
-    macosTitle1: 'Deploy the installation',
     rpmText1: 'rpm --import http://packages.wazuh.com/key/GPG-KEY-WAZUH\ncat > /etc/yum.repos.d/wazuh.repo <<\EOF\n[wazuh_repo]\ngpgcheck=1\ngpgkey=https://packages.wazuh.com/key/GPG-KEY-WAZUH\nenabled=1\nname=Wazuh repository\nbaseurl=https://packages.wazuh.com/3.x/yum/\nprotect=1\nEOF',
     debText1: 'apt-get install curl apt-transport-https lsb-release',
     debText2: 'curl -s https://packages.wazuh.com/key/GPG-KEY-WAZUH | apt-key add -',
