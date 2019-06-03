@@ -18,7 +18,8 @@ import {
   EuiProgress,
   EuiBasicTable,
   EuiButtonIcon,
-  EuiHealth
+  EuiHealth,
+  EuiCallOut
 } from '@elastic/eui';
 
 const app = uiModules.get('app/wazuh', ['react']);
@@ -30,4 +31,5 @@ app
   .value('EuiProgress', EuiProgress)
   .value('EuiButtonIcon', EuiButtonIcon)
   .value('EuiBasicTable', EuiBasicTable)
-  .value('EuiHealth', EuiHealth);
+  .value('EuiHealth', EuiHealth)
+  .value('EuiCallOut', EuiCallOut);
