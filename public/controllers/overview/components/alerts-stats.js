@@ -9,43 +9,29 @@ export class AlertsStats extends Component {
     this.state = {};
   }
 
+  buildStats() {
+    const stats = this.props.items.map(item => {
+      return (
+        <EuiFlexItem>
+          <EuiStat
+            title={item.value}
+            description={item.description}
+            titleColor={item.color || 'primary'}
+            textAlign="center"
+          />
+        </EuiFlexItem>
+      );
+    });
+    return stats;
+  }
+
   render() {
+    const items = this.buildStats();
     return (
       <div>
         <EuiFlexGroup>
           <EuiFlexItem />
-          <EuiFlexItem>
-            <EuiStat
-              title={this.props.total}
-              description="Alerts"
-              titleColor="primary"
-              textAlign="center"
-            />
-          </EuiFlexItem>
-          <EuiFlexItem>
-            <EuiStat
-              title={this.props.highLevel}
-              description="Level 12 or above alerts"
-              titleColor="secondary"
-              textAlign="center"
-            />
-          </EuiFlexItem>
-          <EuiFlexItem>
-            <EuiStat
-              title={this.props.authFailure}
-              description="Authentication failure"
-              titleColor="danger"
-              textAlign="center"
-            />
-          </EuiFlexItem>
-          <EuiFlexItem>
-            <EuiStat
-              title={this.props.authSuccess}
-              description="Authentication success"
-              titleColor="accent"
-              textAlign="center"
-            />
-          </EuiFlexItem>
+          {items}
           <EuiFlexItem />
         </EuiFlexGroup>
       </div>

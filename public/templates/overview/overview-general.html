@@ -1,8 +1,15 @@
 <md-content flex layout="column" ng-if="octrl.tab === 'general' && octrl.tabView === 'panels'" layout-align="start"
     ng-class="{'no-opacity': resultState !== 'ready' || !rendered}">
-    <div layout="row">
-        <react-component flex name="AlertsStats"
-            props="{total: octrl.totalAlerts(),highLevel: octrl.level12(), authFailure: octrl.authFailure(), authSuccess: octrl.authSuccess()}" />
+
+    <div layout="row" layout-padding>
+        <react-component flex name="AlertsStats" props="{
+            items: [
+                { description: 'Total', value: octrl.totalAlerts(), color: 'primary' },
+                { description: 'Level 12 or above alerts', value: octrl.level12(), color: 'secondary' },
+                { description: 'Authentication failure', value: octrl.authFailure(), color: 'danger' }, 
+                { description: 'Authentication success', value: octrl.authSuccess(), color: 'accent' }
+            ]            
+        }" />
     </div>
 
     <div class="wz-no-display">
