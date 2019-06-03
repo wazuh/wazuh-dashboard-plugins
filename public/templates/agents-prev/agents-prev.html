@@ -22,9 +22,9 @@
 </div>
 
 <div ng-if="!ctrl.init && !ctrl.loading && !ctrl.errorInit" layout="column" layout-align="start space-around">
-
-    <react-component name="WazuhRegisterAgents" props="ctrl.registerAgentsProps" ng-show="ctrl.addingNewAgent" />
-
+    <div class="registerAgent" ng-show="ctrl.addingNewAgent">
+        <react-component name="RegisterAgent" props="ctrl.registerAgentsProps" />
+    </div>
     <div ng-show="!ctrl.addingNewAgent">
         <div class="md-padding euiFlexGroup--wrap layout-row">
             <div class="layout-column md-padding">

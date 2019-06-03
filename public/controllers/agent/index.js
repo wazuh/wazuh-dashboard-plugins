@@ -12,9 +12,11 @@
 import { uiModules } from 'ui/modules';
 import { AgentsPreviewController } from './agents-preview';
 import { AgentsController } from './agents';
+import { RegisterAgent } from './components/register-agent';
 
 const app = uiModules.get('app/wazuh', []);
 
 app
   .controller('agentsController', AgentsController)
-  .controller('agentsPreviewController', AgentsPreviewController);
+  .controller('agentsPreviewController', AgentsPreviewController)
+  .value('RegisterAgent', RegisterAgent);

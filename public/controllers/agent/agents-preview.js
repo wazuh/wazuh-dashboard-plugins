@@ -12,6 +12,8 @@
 import * as FileSaver from '../../services/file-saver';
 import { timefilter } from 'ui/timefilter';
 
+//import { RegisterAgent } from './components/registerAgent';
+
 export class AgentsPreviewController {
   /**
    * Class constructor
@@ -91,6 +93,10 @@ export class AgentsPreviewController {
     this.$scope.$on('wazuhFetched', (ev, parameters) => {
       ev.stopPropagation();
     });
+
+    this.registerAgentsProps = {
+      addNewAgent: (flag) => this.addNewAgent(flag)
+    };
 
     this.init = false;
     //Load
@@ -232,10 +238,6 @@ export class AgentsPreviewController {
   addNewAgent(flag) {
     this.addingNewAgent = flag;
   }
-
-  registerAgentsProps = {
-    addNewAgent: (flag) => this.addNewAgent(flag)
-  };
 
   reloadList() {
     this.$scope.$broadcast('wazuhSearch', { term: '' });

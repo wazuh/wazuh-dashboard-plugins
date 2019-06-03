@@ -22,14 +22,11 @@ import {
 
 const app = uiModules.get('app/wazuh', ['react']);
 
-import { WazuhRegisterAgents } from './register-agents';
-
 app
   .value('EuiIcon', EuiIcon)
   .value('EuiSuperSelect', EuiSuperSelect)
   .value('EuiLoadingSpinner', EuiLoadingSpinner)
   .value('EuiProgress', EuiProgress)
   .value('EuiButtonIcon', EuiButtonIcon)
-  .value('EuiBasicTable', EuiBasicTable)
-  .value('WazuhRegisterAgents', WazuhRegisterAgents);
+  .value('EuiBasicTable', EuiBasicTable);
 
