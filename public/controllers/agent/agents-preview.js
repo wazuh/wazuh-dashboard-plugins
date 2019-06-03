@@ -12,8 +12,6 @@
 import * as FileSaver from '../../services/file-saver';
 import { timefilter } from 'ui/timefilter';
 
-//import { RegisterAgent } from './components/registerAgent';
-
 export class AgentsPreviewController {
   /**
    * Class constructor
