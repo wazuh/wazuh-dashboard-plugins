@@ -105,8 +105,8 @@ export class RegisterAgent extends Component {
 
     let guide = [];
     for (let i = 0; i < this.state.osSteps[this.state.selectedOS]; i++) {
-      const title = `${this.state.selectedOS}Title${i + 1}`
-      const text = `${this.state.selectedOS}Text${i + 1}`
+      const title = `${this.state.selectedOS}Title${i + 1}`;
+      const text = `${this.state.selectedOS}Text${i + 1}`;
       guide.push(
         <div key={i}>
           < EuiText >
