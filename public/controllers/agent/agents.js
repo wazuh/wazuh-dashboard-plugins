@@ -163,7 +163,7 @@ export class AgentsController {
     this.$scope.hostMonitoringTabs = ['general', 'fim', 'syscollector'];
     this.$scope.systemAuditTabs = ['pm', 'sca', 'audit', 'oscap', 'ciscat'];
     this.$scope.securityTabs = ['vuls', 'virustotal', 'osquery', 'docker'];
-    this.$scope.complianceTabs = ['pci', 'gdpr'];
+    this.$scope.complianceTabs = ['pci', 'gdpr', 'hipaa', 'nist'];
 
     /**
      * This check if given array of items contais a single given item
@@ -566,6 +566,18 @@ export class AgentsController {
         const gdprTabs = await this.commonData.getPCI();
         this.$scope.gdprTabs = gdprTabs;
         this.$scope.selectedGdprIndex = 0;
+      }
+
+      if (tab === 'hipaa') {
+        const hipaaTabs = await this.commonData.getHIPAA();
+        this.$scope.hipaaTabs = hipaaTabs;
+        this.$scope.selectedHipaaIndex = 0;
+      }
+
+      if (tab === 'nist') {
+        const nistTabs = await this.commonData.getNIST();
+        this.$scope.nistTabs = nistTabs;
+        this.$scope.selectedNistIndex = 0;
       }
 
       if (tab === 'sca') {

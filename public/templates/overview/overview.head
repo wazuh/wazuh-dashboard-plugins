@@ -99,13 +99,17 @@
     <!-- End Security navigation bar -->
 
     <!-- Compliance navigation bar -->
-    <md-nav-bar ng-if="octrl.inArray(octrl.tab, octrl.complianceTabs) && octrl.extensions.pci && octrl.extensions.gdpr"
+    <md-nav-bar ng-if="octrl.inArray(octrl.tab, octrl.complianceTabs) && (octrl.extensions.pci || octrl.extensions.gdpr || octrl.extensions.hipaa || octrl.extensions.nist)"
         class="wz-nav-bar" ng-show="octrl.tab !== 'welcome'" md-selected-nav-item="octrl.tab"
         nav-bar-aria-label="Compliance navigation links">
         <md-nav-item ng-show="octrl.extensions.pci" class="wz-nav-item" md-nav-click="octrl.switchTab('pci',true)"
             name="pci">{{ octrl.tabNames['pci'] }}</md-nav-item>
         <md-nav-item ng-show="octrl.extensions.gdpr" class="wz-nav-item" md-nav-click="octrl.switchTab('gdpr',true)"
             name="gdpr">{{ octrl.tabNames['gdpr'] }}</md-nav-item>
+        <md-nav-item ng-show="octrl.extensions.gdpr" class="wz-nav-item" md-nav-click="octrl.switchTab('hipaa',true)"
+            name="hipaa">{{ octrl.tabNames['hipaa'] }}</md-nav-item>
+        <md-nav-item ng-show="octrl.extensions.gdpr" class="wz-nav-item" md-nav-click="octrl.switchTab('nist',true)"
+            name="nist">{{ octrl.tabNames['nist'] }}</md-nav-item>
     </md-nav-bar>
     <!-- End Compliance navigation bar -->
 

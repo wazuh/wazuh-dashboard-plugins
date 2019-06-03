@@ -3,8 +3,7 @@
     <div layout="row" layout-align="start center" ng-show="!editingFile">
         <!-- Back button -->
         <md-button class="md-icon-button" style="margin: 5px!important;" aria-label="Back to rules list" tooltip="Back"
-            tooltip-placement="bottom" ng-click="closeDetailView(true)"><i class="fa fa-fw fa-arrow-left"
-                aria-hidden="true"></i></md-button>
+            tooltip-placement="bottom" ng-click="closeDetailView(true)"><i class="fa fa-fw fa-arrow-left" aria-hidden="true"></i></md-button>
         <!-- Rule title -->
         <div>
             <h1 class="font-size-18" ng-bind-html="colorRuleArg(currentRule.description)"></h1>
@@ -16,25 +15,23 @@
     <div layout="row" ng-show="!editingFile" class="wz-padding-left-8 wz-padding-right-8">
         <md-card flex class="wz-metric-color wz-md-card">
             <md-card-content layout="row" class="wz-padding-metric">
-                <div flex="15" ng-if="currentRule.id" class="wz-text-truncatable">ID: <span
-                        class="wz-text-bold">{{currentRule.id}}</span></div>
+                <div flex="15" ng-if="currentRule.id" class="wz-text-truncatable">ID: <span class="wz-text-bold">{{currentRule.id}}</span></div>
                 <div flex="15" ng-if="currentRule.level || currentRule.level == 0" class="wz-text-truncatable">Level:
                     <span class="wz-text-bold wz-text-link" ng-click="addDetailFilter('level', currentRule.level)"
                         tooltip="Filter by this level" tooltip-placement="bottom">{{currentRule.level}}</span></div>
-                <div flex="35" ng-if="currentRule.file" class="wz-text-truncatable">File: <span
-                        class="wz-text-bold wz-text-link" ng-click="addDetailFilter('file', currentRule.file)"
-                        tooltip="Filter by this file" tooltip-placement="bottom">{{currentRule.file}}</span></div>
-                <div flex="35" ng-if="currentRule.path" class="wz-text-truncatable">Path: <span
-                        class="wz-text-bold wz-text-link" ng-click="addDetailFilter('path', currentRule.path)"
-                        tooltip="Filter by this path" tooltip-placement="bottom">{{currentRule.path}}</span></div>
+                <div flex="35" ng-if="currentRule.file" class="wz-text-truncatable">File: <span class="wz-text-bold wz-text-link"
+                        ng-click="addDetailFilter('file', currentRule.file)" tooltip="Filter by this file"
+                        tooltip-placement="bottom">{{currentRule.file}}</span></div>
+                <div flex="35" ng-if="currentRule.path" class="wz-text-truncatable">Path: <span class="wz-text-bold wz-text-link"
+                        ng-click="addDetailFilter('path', currentRule.path)" tooltip="Filter by this path"
+                        tooltip-placement="bottom">{{currentRule.path}}</span></div>
 
             </md-card-content>
         </md-card>
     </div>
     <!-- End Rule information ribbon -->
 
-    <div layout="row" class="md-padding"
-        ng-if="!editingFile && currentRule.file && currentRule.path === 'etc/rules' && adminMode">
+    <div layout="row" class="md-padding" ng-if="!editingFile && currentRule.file && currentRule.path === 'etc/rules' && adminMode">
         <button ng-click='editRulesConfig(currentRule)' class="height-35 kuiButton kuiButton--secondary">
             <react-component name="EuiIcon" props="{type:'pencil'}" />
             Edit {{ currentRule.file }}
@@ -54,20 +51,17 @@
                     <div layout="row" class="wz-margin-top-10">
 
                         <div class="euiFlexItem">
-                            <dl class="euiDescriptionList euiDescriptionList--row"
-                                ng-repeat="(key, value) in currentRule.details">
+                            <dl class="euiDescriptionList euiDescriptionList--row" ng-repeat="(key, value) in currentRule.details">
                                 <dt class="euiDescriptionList__title">{{key}}</dt>
                                 <dd class="euiDescriptionList__description">
                                     <div ng-if='!isArray(value)' class="wz-word-break">
                                         <span ng-if="!isObject(value)" class="wz-text-right color-grey">{{value}}</span>
                                         <span ng-if="isObject(value)" class="color-grey">
-                                            <span ng-repeat="(key, value) in value">{{key}}: {{value}} <span
-                                                    ng-if="!$last">|</span>
+                                            <span ng-repeat="(key, value) in value">{{key}}: {{value}} <span ng-if="!$last">|</span>
                                             </span>
                                         </span>
                                     </div>
-                                    <span ng-if="isArray(value)" ng-repeat="v in value track by $index"
-                                        class="wz-text-right color-grey">
+                                    <span ng-if="isArray(value)" ng-repeat="v in value track by $index" class="wz-text-right color-grey">
                                         {{v}}{{$last ? '' : ',&nbsp;'}}
                                     </span>
                                 </dd>
@@ -98,20 +92,19 @@
                 </md-card-content>
             </md-card>
 
-            <md-card flex class="wz-md-card" ng-if="currentRule.pci.length || currentRule.gdpr.length">
+            <md-card flex class="wz-md-card" ng-if="currentRule.pci.length || currentRule.gdpr.length || currentRule.hipaa.length ||currentRule.nist.length">
                 <md-card-content>
                     <span class="wz-margin-top-10 wz-headline-title">
                         <react-component name="EuiIcon" props="{type:'controlsHorizontal'}" /> Compliance
                     </span>
                     <md-divider class="wz-margin-top-10"></md-divider>
                     <div layout="row" class="wz-margin-top-10" ng-if="currentRule.pci.length">
-
                         <div class="euiFlexItem">
                             <dl class="euiDescriptionList euiDescriptionList--row">
                                 <dt class="euiDescriptionList__title">PCI DSS</dt>
                                 <dd class="euiDescriptionList__description" ng-repeat="item in currentRule.pci">
-                                    <span class="wz-text-link" tooltip="Filter by this requirement"
-                                        tooltip-placement="bottom" ng-click="addDetailFilter('pci', item)">
+                                    <span class="wz-text-link" tooltip="Filter by this requirement" tooltip-placement="bottom"
+                                        ng-click="addDetailFilter('pci', item)">
                                         {{item}}
                                     </span>
                                 </dd>
@@ -123,8 +116,34 @@
                             <dl class="euiDescriptionList euiDescriptionList--row">
                                 <dt class="euiDescriptionList__title">GDPR</dt>
                                 <dd class="euiDescriptionList__description" ng-repeat="item in currentRule.gdpr">
-                                    <span class="wz-text-link" tooltip="Filter by this requirement"
-                                        tooltip-placement="bottom" ng-click="addDetailFilter('gdpr', item)">
+                                    <span class="wz-text-link" tooltip="Filter by this requirement" tooltip-placement="bottom"
+                                        ng-click="addDetailFilter('gdpr', item)">
+                                        {{item}}
+                                    </span>
+                                </dd>
+                            </dl>
+                        </div>
+                    </div>
+                    <div layout="row" class="wz-margin-top-10" ng-if="currentRule.hipaa.length">
+                        <div class="euiFlexItem">
+                            <dl class="euiDescriptionList euiDescriptionList--row">
+                                <dt class="euiDescriptionList__title">HIPAA</dt>
+                                <dd class="euiDescriptionList__description" ng-repeat="item in currentRule.hipaa">
+                                    <span class="wz-text-link" tooltip="Filter by this requirement" tooltip-placement="bottom"
+                                        ng-click="addDetailFilter('hipaa', item)">
+                                        {{item}}
+                                    </span>
+                                </dd>
+                            </dl>
+                        </div>
+                    </div>
+                    <div layout="row" class="wz-margin-top-10" ng-if="currentRule['nist-800-53'].length">
+                        <div class="euiFlexItem">
+                            <dl class="euiDescriptionList euiDescriptionList--row">
+                                <dt class="euiDescriptionList__title">NIST-800-53</dt>
+                                <dd class="euiDescriptionList__description" ng-repeat="item in currentRule['nist-800-53']">
+                                    <span class="wz-text-link" tooltip="Filter by this requirement" tooltip-placement="bottom"
+                                        ng-click="addDetailFilter('nist-800-53', item)">
                                         {{item}}
                                     </span>
                                 </dd>
@@ -145,9 +164,8 @@
             <div layout="row" ng-if="currentRule">
                 <md-card flex class="wz-md-card _md flex md-margin-h">
                     <md-card-content>
-                        <wz-table custom-columns="true" flex path="'/rules'"
-                            implicit-filter="[{ name:'file',value: currentRule.file}]"
-                            keys="[{value: 'id', width: '75px'},{value:'file',size:2},{value:'description',size:2},{value:'groups',nosortable:true,size:2},{value:'pci',nosortable:true,size:2},{value:'gdpr',nosortable:true},'level']"
+                        <wz-table custom-columns="true" flex path="'/rules'" implicit-filter="[{ name:'file',value: currentRule.file}]"
+                            keys="[{value: 'id', width: '75px'},{value:'file',size:2},{value:'description',size:2},{value:'groups',nosortable:true,size:2},{value:'pci',nosortable:true,size:2},{value:'gdpr',nosortable:true},{value:'hipaa',nosortable:true},{value:'nist-800-53',nosortable:true},'level']"
                             allow-click="true">
                         </wz-table>
                     </md-card-content>
@@ -164,22 +182,18 @@
     <div layout="column" layout-align="start" ng-show="editingFile">
         <div layout="row">
             <span ng-click='closeEditingFile()' class='btn btn-info'>Close</span>
-            <button ng-disabled='xmlHasErrors || doingSaving' ng-click='doSaveConfig()'
-                class='btn wz-button pull-right wz-margin-left-8'>
-                <span ng-show='!xmlHasErrors'><i aria-hidden='true' class='fa fa-fw fa-save'
-                        ng-class="doingSaving ? 'fa-spin fa-spinner' : ''"></i>Save
+            <button ng-disabled='xmlHasErrors || doingSaving' ng-click='doSaveConfig()' class='btn wz-button pull-right wz-margin-left-8'>
+                <span ng-show='!xmlHasErrors'><i aria-hidden='true' class='fa fa-fw fa-save' ng-class="doingSaving ? 'fa-spin fa-spinner' : ''"></i>Save
                     file</span>
-                <span ng-show='xmlHasErrors' class='btn-danger'><i aria-hidden='true'
-                        class='fa fa-fw fa-exclamation-triangle'></i>
+                <span ng-show='xmlHasErrors' class='btn-danger'><i aria-hidden='true' class='fa fa-fw fa-exclamation-triangle'></i>
                     XML format error</span>
             </button>
-            <button ng-show="restartBtn" class="btn wz-button" type="button" ng-disabled="doingSaving"
-                ng-click="restart(); toggleRestartMsg()">Restart
+            <button ng-show="restartBtn" class="btn wz-button" type="button" ng-disabled="doingSaving" ng-click="restart(); toggleRestartMsg()">Restart
                 now</button>
         </div>
         <div class="wz-padding-top-14" ng-if="fetchedXML">
-            <wz-xml-file-editor file-name='rules' data="fetchedXML" target-name="currentRule.file"
-                valid-fn='xmlIsValid(valid)' saving-param='toggleSaveConfig()' close-fn='closeEditingFile(reload)'>
+            <wz-xml-file-editor file-name='rules' data="fetchedXML" target-name="currentRule.file" valid-fn='xmlIsValid(valid)'
+                saving-param='toggleSaveConfig()' close-fn='closeEditingFile(reload)'>
             </wz-xml-file-editor>
         </div>
     </div>
