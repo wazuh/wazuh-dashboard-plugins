@@ -21,8 +21,18 @@ export class ApiTable extends Component {
     super(props);
 
     this.state = {
-      itemIdToExpandedRowMap: {}
+      itemIdToExpandedRowMap: {},
+      user: '',
+      password: '',
+      url: '',
+      port: 55000
     };
+  }
+
+  onChangeEdit(e, field) {
+    this.setState({
+      [field]: e.target.value
+    });
   }
 
   toggleDetails(item) {
@@ -34,28 +44,49 @@ export class ApiTable extends Component {
         <EuiFlexGroup>
           <EuiFlexItem>
             <EuiFormRow label="Username">
-              <EuiFieldText name="first" placeholder="foo" />
+              <EuiFieldText
+                onChange={e => this.onChangeEdit(e, 'user')}
+                placeholder="foo"
+              />
             </EuiFormRow>
           </EuiFlexItem>
           <EuiFlexItem>
             <EuiFormRow label="Password">
-              <EuiFieldPassword placeholder="bar" />
+              <EuiFieldPassword
+                onChange={e => this.onChangeEdit(e, 'password')}
+                placeholder="bar"
+              />
             </EuiFormRow>
           </EuiFlexItem>
           <EuiFlexItem>
             <EuiFormRow label="Host">
-              <EuiFieldText name="first" placeholder="http://localhost" />
+              <EuiFieldText
+                onChange={e => this.onChangeEdit(e, 'url')}
+                placeholder="http://localhost"
+              />
             </EuiFormRow>
           </EuiFlexItem>
           <EuiFlexItem>
             <EuiFormRow label="Port">
-              <EuiFieldNumber max={99999} placeholder={55000} />
+              <EuiFieldNumber
+                max={99999}
+                onChange={e => this.onChangeEdit(e, 'port')}
+                placeholder={55000}
+              />
             </EuiFormRow>
           </EuiFlexItem>
 
           <EuiFlexItem grow={false}>
             <EuiFormRow label="Actions">
-              <EuiButtonEmpty iconType="save" color="primary">
+              <EuiButtonEmpty
+                iconType="save"
+                color="primary"
+                onClick={() =>
+                  this.props
+                    .updateSettings({ ...this.state, _id: item._id }, true)
+                    .then(result => result !== -1 && this.toggleDetails(item))
+                }
+              >
                 Save
               </EuiButtonEmpty>
             </EuiFormRow>
@@ -156,7 +187,10 @@ export class ApiTable extends Component {
         <EuiFlexGroup>
           <EuiFlexItem />
           <EuiFlexItem grow={false}>
-            <EuiButtonEmpty iconType="plusInCircle">
+            <EuiButtonEmpty
+              iconType="plusInCircle"
+              onClick={() => this.props.switch()}
+            >
               Add new
             </EuiButtonEmpty>
           </EuiFlexItem>

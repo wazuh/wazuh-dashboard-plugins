@@ -112,7 +112,13 @@ export class SettingsController {
         compressed: true,
         setDefault: entry => this.setDefault(entry),
         checkManager: entry => this.checkManager(entry),
-        removeManager: entry => this.removeManager(entry)
+        removeManager: entry => this.removeManager(entry),
+        updateSettings: (entry, useItem = false) =>
+          this.updateSettings(entry, useItem),
+        switch: () => this.switch()
+      };
+      this.addApiProps = {
+        saveSettings: entry => this.saveSettings(entry)
       };
       return this.getAppInfo();
     });
@@ -123,6 +129,7 @@ export class SettingsController {
    * @param {Object} tab
    */
   switchTab(tab, setNav = false) {
+    console.log(this.load, this.tab, tab);
     if (setNav) {
       this.appState.setNavigation({ status: true });
     }
@@ -137,7 +144,7 @@ export class SettingsController {
   async removeManager(item) {
     try {
       const currentApi = this.appState.getCurrentAPI();
-      let index = this.apiEntries.map(item =>  item._id).indexOf(item._id);
+      let index = this.apiEntries.map(item => item._id).indexOf(item._id);
       if (currentApi) {
         if (this.apiEntries[index]._id === JSON.parse(currentApi).id) {
           // We are trying to remove the one selected as default
@@ -335,12 +342,23 @@ export class SettingsController {
   }
 
   // Save settings function
-  async saveSettings() {
+  async saveSettings(entry) {
+    let err = false;
     try {
       if (this.savingApi) {
         this.errorHandler.info('Please, wait for success message', 'Settings');
-        return;
+        return -1;
       }
+
+      if (entry) {
+        this.formData = {
+          user: entry.user,
+          password: entry.password,
+          url: entry.url,
+          port: entry.port
+        };
+      }
+
       this.savingApi = true;
       this.messageError = '';
       this.isEditing = false;
@@ -350,7 +368,7 @@ export class SettingsController {
         this.messageError = invalid;
         this.errorHandler.handle(invalid, 'Settings');
         this.savingApi = false;
-        return;
+        return -1;
       }
 
       const tmpData = {
@@ -451,6 +469,7 @@ export class SettingsController {
 
       await this.getSettings();
     } catch (error) {
+      err = true;
       if (error.status === 400) {
         error.message =
           'Please, fill all the fields in order to connect with Wazuh RESTful API.';
@@ -459,7 +478,7 @@ export class SettingsController {
     }
     this.savingApi = false;
     this.$scope.$applyAsync();
-    return;
+    return err ? -1 : 0;
   }
 
   /**
@@ -473,24 +492,33 @@ export class SettingsController {
   }
 
   // Update settings function
-  async updateSettings(item) {
+  async updateSettings(item, useItem = false) {
+    let err = false;
     try {
       if (this.savingApi) {
         this.errorHandler.info('Please, wait for success message', 'Settings');
-        return;
+        return -1;
       }
       this.savingApi = true;
       this.messageErrorUpdate = '';
+      if (useItem) {
+        this.formUpdate = {
+          user: item.user,
+          password: item.password,
+          url: item.url,
+          port: item.port
+        };
+      }
 
       const invalid = this.validator('formUpdate');
       if (invalid) {
         this.messageErrorUpdate = invalid;
         this.errorHandler.handle(invalid, 'Settings');
         this.savingApi = false;
-        return;
+        return -1;
       }
 
-      const index = this.apiEntries.indexOf(item);
+      const index = this.apiEntries.map(item => item._id).indexOf(item._id);
 
       const tmpData = {
         user: this.formUpdate.user,
@@ -525,11 +553,12 @@ export class SettingsController {
 
       this.errorHandler.info('The API was updated successfully', 'Settings');
     } catch (error) {
+      err = true;
       this.printError(error, true);
     }
     this.savingApi = false;
     this.$scope.$applyAsync();
-    return;
+    return err ? -1 : 0;
   }
 
   /**
@@ -542,8 +571,10 @@ export class SettingsController {
   // Check manager connectivity
   async checkManager(item, isIndex, silent = false) {
     try {
-      const index = isIndex ? item : this.apiEntries.map(item => item._id).indexOf(item._id);
-    
+      const index = isIndex
+        ? item
+        : this.apiEntries.map(item => item._id).indexOf(item._id);
+
       const tmpData = {
         user: this.apiEntries[index]._source.api_user,
         //password    : this.apiEntries[index]._source.api_password,
