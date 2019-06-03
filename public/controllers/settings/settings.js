@@ -105,7 +105,17 @@ export class SettingsController {
    */
   $onInit() {
     // Loading data
-    this.getSettings().then(() => this.getAppInfo());
+    this.getSettings().then(() => {
+      this.apiTableProps = {
+        currentDefault: this.currentDefault,
+        apiEntries: this.apiEntries,
+        compressed: true,
+        setDefault: entry => this.setDefault(entry),
+        checkManager: entry => this.checkManager(entry),
+        removeManager: entry => this.removeManager(entry)
+      };
+      return this.getAppInfo();
+    });
   }
 
   /**
@@ -127,7 +137,7 @@ export class SettingsController {
   async removeManager(item) {
     try {
       const currentApi = this.appState.getCurrentAPI();
-      let index = this.apiEntries.indexOf(item);
+      let index = this.apiEntries.map(item =>  item._id).indexOf(item._id);
       if (currentApi) {
         if (this.apiEntries[index]._id === JSON.parse(currentApi).id) {
           // We are trying to remove the one selected as default
@@ -175,7 +185,7 @@ export class SettingsController {
 
   // Set default API
   setDefault(item) {
-    const index = this.apiEntries.indexOf(item);
+    const index = this.apiEntries.map(item => item._id).indexOf(item._id);
 
     this.appState.setClusterInfo(this.apiEntries[index]._source.cluster_info);
 
@@ -532,8 +542,8 @@ export class SettingsController {
   // Check manager connectivity
   async checkManager(item, isIndex, silent = false) {
     try {
-      const index = isIndex ? item : this.apiEntries.indexOf(item);
-
+      const index = isIndex ? item : this.apiEntries.map(item => item._id).indexOf(item._id);
+    
       const tmpData = {
         user: this.apiEntries[index]._source.api_user,
         //password    : this.apiEntries[index]._source.api_password,

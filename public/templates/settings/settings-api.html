@@ -10,8 +10,8 @@
         </span>
     </div>
     <!-- End headline -->
-    <div layout="row" layout-padding>
-        <react-component name="ApiTable" props="{apiEntries: ctrl.apiEntries, compressed: true}" />
+    <div layout="row" layout-padding ng-if="ctrl.apiTableProps.apiEntries.length">
+        <react-component name="ApiTable" props="ctrl.apiTableProps" />
     </div>
     <!-- API configuration card section -->
     <div layout="row" layout-align="start start">

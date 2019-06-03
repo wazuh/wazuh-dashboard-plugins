@@ -96,14 +96,14 @@ export class ApiTable extends Component {
       },
       {
         name: 'Actions',
-        render: () => (
+        render: item => (
           <EuiFlexGroup>
             <EuiFlexItem grow={false}>
               <EuiToolTip position="bottom" content={<p>Set as default</p>}>
                 <EuiButtonIcon
                   iconType="starEmpty"
                   aria-label="Set as default"
-                  onClick={() => console.log('clicked')}
+                  onClick={() => this.props.setDefault(item)}
                 />
               </EuiToolTip>
             </EuiFlexItem>
@@ -111,7 +111,7 @@ export class ApiTable extends Component {
               <EuiToolTip position="bottom" content={<p>Check connection</p>}>
                 <EuiButtonIcon
                   iconType="refresh"
-                  onClick={() => console.log('clicked')}
+                  onClick={() => this.props.checkManager(item)}
                   color="success"
                 />
               </EuiToolTip>
@@ -120,7 +120,7 @@ export class ApiTable extends Component {
               <EuiToolTip position="bottom" content={<p>Remove</p>}>
                 <EuiButtonIcon
                   iconType="trash"
-                  onClick={() => console.log('clicked')}
+                  onClick={() => this.props.removeManager(item)}
                   color="danger"
                 />
               </EuiToolTip>
