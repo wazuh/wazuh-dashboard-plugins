@@ -596,20 +596,9 @@ export class DevToolsController {
         if (typeof extra.pretty !== 'undefined') delete extra.pretty;
         if (typeof JSONraw.pretty !== 'undefined') delete JSONraw.pretty;
 
-        let path = '';
-        if (method === 'PUT' || method === 'POST') {
-          // Assign inline parameters
-          for (const key in extra) JSONraw[key] = extra[key];
-          path = req.includes('?') ? req.split('?')[0] : req;
-        } else {
-          path =
-            typeof JSONraw === 'object' && Object.keys(JSONraw).length
-              ? `${req}${req.includes('?') ? '&' : '?'}${queryString.unescape(
-                queryString.stringify(JSONraw)
-              )}`
-              : req;
-          JSONraw = {};
-        }
+        // Assign inline parameters
+        for (const key in extra) JSONraw[key] = extra[key];
+        const path = req.includes('?') ? req.split('?')[0] : req;
 
         if (typeof JSONraw === 'object') JSONraw.devTools = true;
         if (!firstTime) {
