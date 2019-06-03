@@ -78,7 +78,7 @@ export class ApiTable extends Component {
 
           <EuiFlexItem grow={false}>
             <EuiFormRow label="Actions">
-              <EuiButtonEmpty
+              <EuiButton
                 iconType="save"
                 color="primary"
                 onClick={() =>
@@ -88,7 +88,7 @@ export class ApiTable extends Component {
                 }
               >
                 Save
-              </EuiButtonEmpty>
+              </EuiButton>
             </EuiFormRow>
           </EuiFlexItem>
         </EuiFlexGroup>

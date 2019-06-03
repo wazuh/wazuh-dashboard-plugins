@@ -7,7 +7,7 @@ import {
   EuiFieldText,
   EuiFieldPassword,
   EuiFieldNumber,
-  EuiButtonEmpty,
+  EuiButton,
   EuiPanel
 } from '@elastic/eui';
 
@@ -69,13 +69,13 @@ export class AddApi extends Component {
 
           <EuiFlexItem grow={false}>
             <EuiFormRow label="Actions">
-              <EuiButtonEmpty
+              <EuiButton
                 iconType="save"
                 color="primary"
                 onClick={() => this.props.saveSettings({ ...this.state })}
               >
                 Save
-              </EuiButtonEmpty>
+              </EuiButton>
             </EuiFormRow>
           </EuiFlexItem>
         </EuiFlexGroup>
