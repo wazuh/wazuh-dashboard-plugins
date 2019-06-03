@@ -12,7 +12,8 @@ import {
   EuiFieldPassword,
   EuiFieldNumber,
   EuiButton,
-  EuiSpacer
+  EuiSpacer,
+  EuiButtonEmpty
 } from '@elastic/eui';
 
 export class ApiTable extends Component {
@@ -54,9 +55,9 @@ export class ApiTable extends Component {
 
           <EuiFlexItem grow={false}>
             <EuiFormRow label="Actions">
-              <EuiButton fill iconType="save" color="primary">
+              <EuiButtonEmpty iconType="save" color="primary">
                 Save
-              </EuiButton>
+              </EuiButtonEmpty>
             </EuiFormRow>
           </EuiFlexItem>
         </EuiFlexGroup>
@@ -155,9 +156,9 @@ export class ApiTable extends Component {
         <EuiFlexGroup>
           <EuiFlexItem />
           <EuiFlexItem grow={false}>
-            <EuiButton fill iconType="plusInCircle">
+            <EuiButtonEmpty iconType="plusInCircle">
               Add new
-            </EuiButton>
+            </EuiButtonEmpty>
           </EuiFlexItem>
           <EuiFlexItem />
         </EuiFlexGroup>
