@@ -169,16 +169,20 @@ export class AgentsPreviewController {
         )
       ]);
       const [agentsUnique, agentsTop] = data;
-      const unique = agentsUnique.data.result;
+      let unique = agentsUnique.data.result;
+      unique.osPlatforms.push({ platform: 'windows', version: "9", name: 'pollas' })
+      unique.osPlatforms.push({ platform: 'ubuntu', version: "1", name: 'wallas' })
+      unique.osPlatforms.push({ platform: 'alabama', version: "16", name: 'mnmbvdbdllas' })
+      unique.osPlatforms.push({ platform: 'Centos', version: "3", name: 'aadad' })
 
       this.searchBarModel = {
         name: [],
         status: ['Active', 'Disconnected', 'Never connected'],
-        group: unique.groups,
-        version: unique.versions,
-        'os.platform': unique.osPlatforms.map(x => x.platform),
-        'os.version': unique.osPlatforms.map(x => x.version),
-        'os.name': unique.osPlatforms.map(x => x.name)
+        group: unique.groups.sort((a, b) => { return a.toString().localeCompare(b.toString()) }),
+        version: unique.versions.sort((a, b) => { return a.toString().localeCompare(b.toString(), undefined, { numeric: true, sensitivity: 'base' }) }),
+        'os.platform': unique.osPlatforms.map(x => x.platform).sort((a, b) => { return a.toString().localeCompare(b.toString()) }),
+        'os.version': unique.osPlatforms.map(x => x.version).sort((a, b) => { return a.toString().localeCompare(b.toString(), undefined, { numeric: true, sensitivity: 'base' }) }),
+        'os.name': unique.osPlatforms.map(x => x.name).sort((a, b) => { return a.toString().localeCompare(b.toString()) }),
       };
 
       if (clusterInfo.status === 'enabled' && unique.nodes) {
