@@ -169,7 +169,7 @@ export class AgentsPreviewController {
         )
       ]);
       const [agentsUnique, agentsTop] = data;
-      let unique = agentsUnique.data.result;
+      const unique = agentsUnique.data.result;
 
       this.searchBarModel = {
         name: [],
