@@ -11,24 +11,16 @@
  */
 import chrome from 'ui/chrome';
 export class ReportingController {
-  /**
-   * Class controller
-   * @param {*} $scope
-   * @param {*} errorHandler
-   * @param {*} genericReq
-   */
-  constructor($scope, errorHandler, genericReq, $window, timeService) {
-    this.$scope = $scope;
+  constructor(errorHandler, genericReq, $window, timeService) {
+    // Services
     this.$window = $window;
     this.errorHandler = errorHandler;
     this.genericReq = genericReq;
-    this.loading = true;
-    this.itemsPerPage = 15;
-    this.pagedItems = [];
-    this.currentPage = 0;
-    this.items = [];
-    this.gap = 0;
     this.timeService = timeService;
+
+    // Variables
+    this.loading = true;
+    this.items = [];
   }
 
   /**
@@ -39,14 +31,9 @@ export class ReportingController {
   }
 
   /**
-   * This performs a search
+   * Transform a give date applying the browser's offset
+   * @param {*} time
    */
-  search() {
-    this.filteredItems = this.items;
-    this.currentPage = 0;
-    this.groupToPages();
-  }
-
   offsetTimestamp(time) {
     try {
       return this.timeService.offset(time);
@@ -56,85 +43,27 @@ export class ReportingController {
   }
 
   /**
-   * This delete a report with a given name
+   * Deletes a report
+   * @param {*} name The name of the report
    */
   async deleteReport(name) {
     try {
-      this.loading = true;
       await this.genericReq.request('DELETE', '/reports/' + name, {});
-      await this.load();
-      this.errorHandler.info('Success', 'Reporting');
+      this.items = this.items.filter(item => item.name !== name);
+      this.errorHandler.info('Success');
     } catch (error) {
       this.errorHandler.handle(error.message || error);
     }
-  }
-
-  // calculate page in place
-  groupToPages() {
-    this.pagedItems = [];
-
-    for (let i = 0; i < this.filteredItems.length; i++) {
-      if (i % this.itemsPerPage === 0) {
-        this.pagedItems[Math.floor(i / this.itemsPerPage)] = [
-          this.filteredItems[i]
-        ];
-      } else {
-        this.pagedItems[Math.floor(i / this.itemsPerPage)].push(
-          this.filteredItems[i]
-        );
-      }
-    }
+    return this.items;
   }
 
   /**
-   * This organize in pages of given size the items
-   * @param {*} size
-   * @param {*} start
-   * @param {*} end
+   * Downloads the report
+   * @param {*} name The name of the report
    */
-  range(size, start, end) {
-    const ret = [];
-
-    if (size < end) {
-      end = size;
-      start = size - this.gap;
-    }
-    for (let i = start; i < end; i++) {
-      ret.push(i);
-    }
-
-    return ret;
+  goReport(name) {
+    this.$window.open(chrome.addBasePath(`/reports/${name}`), '_blank');
   }
-
-  /**
-   * This navigates to the prevoous page
-   */
-  prevPage() {
-    if (this.currentPage > 0) {
-      this.currentPage--;
-    }
-  }
-
-  /**
-   * This navigates to the next page
-   */
-  nextPage(n) {
-    if (!n && n !== 0 && this.currentPage < this.pagedItems.length - 1) {
-      this.currentPage++;
-    }
-  }
-
-  /**
-   * This navigates to a given page
-   */
-  setPage(n) {
-    this.currentPage = n;
-    this.nextPage(n);
-  }
-
-  goReport = item => {
-    this.$window.open(chrome.addBasePath(`/reports/${item}`), '_blank');
-  };
 
   /**
    * On controller loads
@@ -143,19 +72,18 @@ export class ReportingController {
     try {
       this.loading = true;
       const data = await this.genericReq.request('GET', '/reports', {});
-      this.items = data.data.list;
-      const gap = this.items.length / 15;
-      const gapInteger = parseInt(this.items.length / 15);
-      this.gap =
-        gap - parseInt(this.items.length / 15) > 0
-          ? gapInteger + 1
-          : gapInteger;
-      if (this.gap > 5) this.gap = 5;
-      this.search();
-      this.loading = false;
-      this.$scope.$applyAsync();
+      this.items = ((data || {}).data || {}).list || [];
+      this.reportingTableProps = {
+        deleteReport: name => this.deleteReport(name),
+        goReport: name => this.goReport(name),
+        offsetTimestamp: time => this.offsetTimestamp(time),
+        load: () => this.load(true),
+        items: this.items
+      };
     } catch (error) {
       this.errorHandler.handle(error.message || error);
     }
+    this.loading = false;
+    return this.items;
   }
 }

@@ -25,6 +25,7 @@ import { ConfigurationGroupsController } from './config-groups';
 import { EditionController } from './edition';
 import { FilesController } from './files';
 import { WelcomeScreen } from './components/welcome';
+import { ReportingTable } from './components/reporting-table';
 
 const app = uiModules.get('app/wazuh', []);
 
@@ -42,4 +43,5 @@ app
   .controller('configurationGroupsController', ConfigurationGroupsController)
   .controller('editionController', EditionController)
   .controller('filesController', FilesController)
-  .value('WelcomeScreenManagement', WelcomeScreen);
+  .value('WelcomeScreenManagement', WelcomeScreen)
+  .value('ReportingTable', ReportingTable);
