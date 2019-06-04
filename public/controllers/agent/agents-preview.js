@@ -170,10 +170,6 @@ export class AgentsPreviewController {
       ]);
       const [agentsUnique, agentsTop] = data;
       let unique = agentsUnique.data.result;
-      unique.osPlatforms.push({ platform: 'windows', version: "9", name: 'pollas' })
-      unique.osPlatforms.push({ platform: 'ubuntu', version: "1", name: 'wallas' })
-      unique.osPlatforms.push({ platform: 'alabama', version: "16", name: 'mnmbvdbdllas' })
-      unique.osPlatforms.push({ platform: 'Centos', version: "3", name: 'aadad' })
 
       this.searchBarModel = {
         name: [],
