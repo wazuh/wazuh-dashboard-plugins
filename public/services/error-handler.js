@@ -74,8 +74,24 @@ export class ErrorHandler {
    */
   info(message, location) {
     if (typeof message === 'string') {
-      message = location ? location + '. ' + message : message;
-      toastNotifications.addSuccess(message);
+      // Current date in milliseconds
+      const date = new Date().getTime();
+
+      // Remove errors older than 2s from the error history
+      this.history = this.history.filter(item => date - item.date <= 2000);
+
+      // Check if the incoming error was already shown in the last two seconds
+      const recentlyShown = this.history
+        .map(item => item.text)
+        .includes(message);
+
+      // If the incoming error was not shown in the last two seconds, add it to the history
+      !recentlyShown && this.history.push({ text: message, date });
+
+      if (!recentlyShown) {
+        message = location ? location + '. ' + message : message;
+        toastNotifications.addSuccess(message);
+      }
     }
     return;
   }
