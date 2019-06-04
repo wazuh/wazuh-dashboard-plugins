@@ -129,7 +129,6 @@ export class SettingsController {
    * @param {Object} tab
    */
   switchTab(tab, setNav = false) {
-    console.log(this.load, this.tab, tab);
     if (setNav) {
       this.appState.setNavigation({ status: true });
     }
@@ -164,11 +163,10 @@ export class SettingsController {
       this.$scope.$emit('updateAPI', {});
       this.errorHandler.info('The API was removed successfully', 'Settings');
       this.$scope.$applyAsync();
-      return;
     } catch (error) {
       this.errorHandler.handle('Could not remove the API', 'Settings');
     }
-    return;
+    return this.apiEntries;
   }
 
   // Get current API index
@@ -234,7 +232,7 @@ export class SettingsController {
     }
 
     this.$scope.$applyAsync();
-    return;
+    return this.currentDefault;
   }
 
   // Get settings function
@@ -343,11 +341,10 @@ export class SettingsController {
 
   // Save settings function
   async saveSettings(entry) {
-    let err = false;
     try {
       if (this.savingApi) {
         this.errorHandler.info('Please, wait for success message', 'Settings');
-        return -1;
+        return this.apiEntries;
       }
 
       if (entry) {
@@ -368,7 +365,7 @@ export class SettingsController {
         this.messageError = invalid;
         this.errorHandler.handle(invalid, 'Settings');
         this.savingApi = false;
-        return -1;
+        return this.apiEntries;
       }
 
       const tmpData = {
@@ -411,7 +408,6 @@ export class SettingsController {
         _id: data.data.response._id,
         _source: {
           cluster_info: tmpData.cluster_info,
-          active: tmpData.active,
           url: tmpData.url,
           api_user: tmpData.user,
           api_port: tmpData.port,
@@ -469,7 +465,6 @@ export class SettingsController {
 
       await this.getSettings();
     } catch (error) {
-      err = true;
       if (error.status === 400) {
         error.message =
           'Please, fill all the fields in order to connect with Wazuh RESTful API.';
@@ -478,7 +473,7 @@ export class SettingsController {
     }
     this.savingApi = false;
     this.$scope.$applyAsync();
-    return err ? -1 : 0;
+    return this.apiEntries;
   }
 
   /**
@@ -493,11 +488,10 @@ export class SettingsController {
 
   // Update settings function
   async updateSettings(item, useItem = false) {
-    let err = false;
     try {
       if (this.savingApi) {
         this.errorHandler.info('Please, wait for success message', 'Settings');
-        return -1;
+        return this.apiEntries;
       }
       this.savingApi = true;
       this.messageErrorUpdate = '';
@@ -515,7 +509,7 @@ export class SettingsController {
         this.messageErrorUpdate = invalid;
         this.errorHandler.handle(invalid, 'Settings');
         this.savingApi = false;
-        return -1;
+        return this.apiEntries;
       }
 
       const index = this.apiEntries.map(item => item._id).indexOf(item._id);
@@ -553,12 +547,11 @@ export class SettingsController {
 
       this.errorHandler.info('The API was updated successfully', 'Settings');
     } catch (error) {
-      err = true;
       this.printError(error, true);
     }
     this.savingApi = false;
     this.$scope.$applyAsync();
-    return err ? -1 : 0;
+    return this.apiEntries;
   }
 
   /**

@@ -25,8 +25,17 @@ export class ApiTable extends Component {
       user: '',
       password: '',
       url: '',
-      port: 55000
+      port: 55000,
+      apiEntries: [],
+      currentDefault: 0
     };
+  }
+
+  componentDidMount() {
+    this.setState({
+      apiEntries: [...this.props.apiEntries],
+      currentDefault: this.props.currentDefault
+    });
   }
 
   onChangeEdit(e, field) {
@@ -97,9 +106,16 @@ export class ApiTable extends Component {
     this.setState({ itemIdToExpandedRowMap });
   }
 
+  componentWillReceiveProps(nextProps) {
+    this.setState({
+      apiEntries: nextProps.apiEntries,
+      currentDefault: nextProps.currentDefault
+    });
+  }
+
   render() {
     const { itemIdToExpandedRowMap } = this.state;
-    const items = [...this.props.apiEntries];
+    const items = [...this.state.apiEntries];
     const columns = [
       {
         field: '_source.cluster_info.cluster',
@@ -131,11 +147,23 @@ export class ApiTable extends Component {
         render: item => (
           <EuiFlexGroup>
             <EuiFlexItem grow={false}>
-              <EuiToolTip position="bottom" content={<p>Set as default</p>}>
+              <EuiToolTip
+                position="bottom"
+                content={<p>Set {item._id} as default</p>}
+              >
                 <EuiButtonIcon
-                  iconType="starEmpty"
+                  iconType={
+                    item._id === this.state.currentDefault
+                      ? 'starFilled'
+                      : 'starEmpty'
+                  }
                   aria-label="Set as default"
-                  onClick={() => this.props.setDefault(item)}
+                  onClick={() => {
+                    const currentDefault = this.props.setDefault(item);
+                    this.setState({
+                      currentDefault
+                    });
+                  }}
                 />
               </EuiToolTip>
             </EuiFlexItem>
@@ -152,7 +180,13 @@ export class ApiTable extends Component {
               <EuiToolTip position="bottom" content={<p>Remove</p>}>
                 <EuiButtonIcon
                   iconType="trash"
-                  onClick={() => this.props.removeManager(item)}
+                  onClick={() =>
+                    this.props.removeManager(item).then(apiEntries =>
+                      this.setState({
+                        apiEntries
+                      })
+                    )
+                  }
                   color="danger"
                 />
               </EuiToolTip>
