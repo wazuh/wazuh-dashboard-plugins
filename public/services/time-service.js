@@ -19,7 +19,7 @@ export class TimeService {
     try {
       const [day, time] = d.indexOf('T') !== -1 ? d.split('T') : d.split(' ');
       const [year, month, monthDay] = d.indexOf('-') !== -1 ? day.split('-') : day.split('/');
-      const [hour, minute, seconds] = time.split(':')
+      const [hour, minute, seconds] = time.split(':');
       const date = new Date(year, parseInt(month) - 1, monthDay, hour, minute, seconds.split('.')[0]);
       const offset = new Date().getTimezoneOffset();
       const offsetTime = new Date(date.getTime() - offset * 60000);
