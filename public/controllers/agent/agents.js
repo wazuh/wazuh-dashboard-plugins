@@ -60,7 +60,8 @@ export class AgentsController {
     $mdDialog,
     groupHandler,
     wazuhConfig,
-    timeService
+    timeService,
+    genericReq
   ) {
     this.$scope = $scope;
     this.$location = $location;
@@ -79,6 +80,7 @@ export class AgentsController {
     this.groupHandler = groupHandler;
     this.wazuhConfig = wazuhConfig;
     this.timeService = timeService;
+    this.genericReq = genericReq;
 
     // Config on-demand
     this.$scope.isArray = Array.isArray;
@@ -689,87 +691,13 @@ export class AgentsController {
    */
   async loadSyscollector(id) {
     try {
-      // Continue API requests if we do have Syscollector enabled
-      // Fetch Syscollector data
-      const data = await Promise.all([
-        this.apiReq.request('GET', `/syscollector/${id}/hardware`, {}),
-        this.apiReq.request('GET', `/syscollector/${id}/os`, {}),
-        this.apiReq.request('GET', `/syscollector/${id}/ports`, { limit: 1 }),
-        this.apiReq.request('GET', `/syscollector/${id}/packages`, {
-          limit: 1,
-          select: 'scan_time'
-        }),
-        this.apiReq.request('GET', `/syscollector/${id}/processes`, {
-          limit: 1,
-          select: 'scan_time'
-        })
-      ]);
-
-      const result = data.map(item => ((item || {}).data || {}).data || false);
-
-      const [
-        hardwareResponse,
-        osResponse,
-        portsResponse,
-        packagesDateResponse,
-        processesDateResponse
-      ] = result;
-
-      // This API call may fail so we put it out of Promise.all
-      let netifaceResponse = false;
-      try {
-        const resultNetiface = await this.apiReq.request(
-          'GET',
-          `/syscollector/${id}/netiface`,
-          {}
-        );
-        netifaceResponse = ((resultNetiface || {}).data || {}).data || false;
-      } catch (error) {} // eslint-disable-line
-
-      // This API call may fail so we put it out of Promise.all
-      let netaddrResponse = false;
-      try {
-        const resultNetaddrResponse = await this.apiReq.request(
-          'GET',
-          `/syscollector/${id}/netaddr`,
-          { limit: 1 }
-        );
-        netaddrResponse =
-          ((resultNetaddrResponse || {}).data || {}).data || false;
-      } catch (error) {} // eslint-disable-line
-
-      // Before proceeding, syscollector data is an empty object
-      this.$scope.syscollector = {};
-
-      const packagesDate = packagesDateResponse
-        ? { ...packagesDateResponse }
-        : false;
-      const processesDate = processesDateResponse
-        ? { ...processesDateResponse }
-        : false;
-
-      // Fill syscollector object
-      this.$scope.syscollector = {
-        hardware:
-          typeof hardwareResponse === 'object' &&
-          Object.keys(hardwareResponse).length
-            ? { ...hardwareResponse }
-            : false,
-        os:
-          typeof osResponse === 'object' && Object.keys(osResponse).length
-            ? { ...osResponse }
-            : false,
-        netiface: netifaceResponse ? { ...netifaceResponse } : false,
-        ports: portsResponse ? { ...portsResponse } : false,
-        netaddr: netaddrResponse ? { ...netaddrResponse } : false,
-        packagesDate: ((packagesDate || {}).items || []).length
-          ? packagesDate.items[0].scan_time
-          : '-',
-        processesDate: ((processesDate || {}).items || []).length
-          ? processesDate.items[0].scan_time
-          : '-'
-      };
-
+      const syscollectorData = await this.genericReq.request(
+        'GET',
+        `/api/syscollector/${id}`
+      );
+      
+      this.$scope.syscollector = (syscollectorData || {}).data || {};
+      
       return;
     } catch (error) {
       return Promise.reject(error);

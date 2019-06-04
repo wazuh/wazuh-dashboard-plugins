@@ -56,13 +56,14 @@
         <md-card flex class="wz-md-card">
             <md-card-content class="wz-text-center"
                 ng-if="!syscollector.netiface || !syscollector.netiface.items || !syscollector.netiface.items.length">
-                <i class="fa fa-fw fa-info-circle" aria-hidden="true"></i> <span class="wz-headline-title">No
-                    interfaces scan available</span>
+                <i class="fa fa-fw fa-info-circle" aria-hidden="true"></i> <span class="wz-headline-title">No network
+                    interfaces information available</span>
             </md-card-content>
             <md-card-content ng-if="syscollector.netiface && syscollector.netiface.items.length">
                 <span class="wz-headline-title">
                     <react-component name="EuiIcon" props="{type:'indexMapping'}" /> Network interfaces</span>
-                <span class="color-grey pull-right" ng-bind="offsetTimestamp('Last scan: ', syscollector.netiface.items[0].scan.time)"></span>
+                <span class="color-grey pull-right"
+                    ng-bind="offsetTimestamp('Last scan: ', syscollector.netiface.items[0].scan.time)"></span>
                 <md-divider class="wz-margin-top-10"></md-divider>
 
                 <table class="table table-striped table-condensed table-layout-fixed">
@@ -78,25 +79,8 @@
                             <td>{{interface.name}}</td>
                             <td>{{interface.mac}}</td>
                             <td>
-                                <svg ng-if="interface.state !== 'up'" class="euiIcon euiIcon--medium euiIcon--warning"
-                                    focusable="false" xmlns="http://www.w3.org/2000/svg"
-                                    xmlns:xlink="http://www.w3.org/1999/xlink" width="16" height="16"
-                                    viewBox="0 0 16 16">
-                                    <defs>
-                                        <circle id="dot-a" cx="8" cy="8" r="4"></circle>
-                                    </defs>
-                                    <use xlink:href="#dot-a"></use>
-                                </svg>
-                                <svg ng-if="interface.state === 'up'" class="euiIcon euiIcon--medium euiIcon--success"
-                                    focusable="false" xmlns="http://www.w3.org/2000/svg"
-                                    xmlns:xlink="http://www.w3.org/1999/xlink" width="16" height="16"
-                                    viewBox="0 0 16 16">
-                                    <defs>
-                                        <circle id="dot-a" cx="8" cy="8" r="4"></circle>
-                                    </defs>
-                                    <use xlink:href="#dot-a"></use>
-                                </svg>
-                                {{interface.state}}
+                                <react-component name="EuiHealth"
+                                    props="{color: interface.state === 'up' ? 'success' : 'danger', children: interface.state}" />
                             </td>
                             <td>{{interface.mtu}}</td>
                             <td>{{interface.type}}</td>
@@ -107,13 +91,14 @@
         </md-card>
         <md-card flex class="wz-md-card">
             <md-card-content class="wz-text-center" ng-if="syscollector.ports && !syscollector.ports.items.length">
-                <i class="fa fa-fw fa-info-circle" aria-hidden="true"></i> <span class="wz-headline-title">No ports
-                    scan available</span>
+                <i class="fa fa-fw fa-info-circle" aria-hidden="true"></i> <span class="wz-headline-title">No network
+                    ports information available</span>
             </md-card-content>
             <md-card-content ng-if="syscollector.ports && syscollector.ports.items.length">
                 <span class="wz-headline-title">
                     <react-component name="EuiIcon" props="{type:'inputOutput'}" /> Network ports</span>
-                <span class="color-grey pull-right" ng-bind="offsetTimestamp('Last scan: ', syscollector.ports.items[0].scan.time)"></span>
+                <span class="color-grey pull-right"
+                    ng-bind="offsetTimestamp('Last scan: ', syscollector.ports.items[0].scan.time)"></span>
                 <md-divider class="wz-margin-top-10"></md-divider>
                 <wz-table flex ng-if="agent && agent.os && agent.os.platform === 'windows'"
                     path="'/syscollector/' + agent.id + '/ports'" row-sizes="[6]"
@@ -132,7 +117,7 @@
             <md-card-content class="wz-text-center"
                 ng-if="!syscollector.netaddr || !syscollector.netaddr.items || !syscollector.netaddr.items.length">
                 <i class="fa fa-fw fa-info-circle" aria-hidden="true"></i> <span class="wz-headline-title">No network
-                    addresses scan available</span>
+                    addresses information available</span>
             </md-card-content>
             <md-card-content ng-if="syscollector.netaddr && syscollector.netaddr.items.length">
                 <span class="wz-headline-title">
@@ -150,7 +135,8 @@
             <md-card-content>
                 <span class="wz-headline-title">
                     <react-component name="EuiIcon" props="{type:'apps'}" /> Packages</span>
-                <span class="color-grey pull-right" ng-bind="offsetTimestamp('Last scan: ', syscollector.packagesDate)"></span>
+                <span class="color-grey pull-right"
+                    ng-bind="offsetTimestamp('Last scan: ', syscollector.packagesDate)"></span>
                 <md-divider class="wz-margin-top-10"></md-divider>
                 <div layout="row"
                     class="wz-margin-top-10 euiFlexGroup euiFlexGroup--alignItemsCenter euiFormControlLayout__childrenWrapper">
@@ -197,7 +183,8 @@
             <md-card-content>
                 <span class="wz-headline-title">
                     <react-component name="EuiIcon" props="{type:'console'}" /> Processes</span>
-                <span class="color-grey pull-right" ng-bind="offsetTimestamp('Last scan: ', syscollector.processesDate)"></span>
+                <span class="color-grey pull-right"
+                    ng-bind="offsetTimestamp('Last scan: ', syscollector.processesDate)"></span>
                 <md-divider class="wz-margin-top-10"></md-divider>
                 <div layout="row"
                     class="wz-margin-top-10 euiFlexGroup euiFlexGroup--alignItemsCenter euiFormControlLayout__childrenWrapper">

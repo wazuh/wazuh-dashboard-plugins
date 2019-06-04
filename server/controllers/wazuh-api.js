@@ -1171,4 +1171,134 @@ export class WazuhApiCtrl {
     //Read a static JSON until the api call has implemented
     return apiRequestList;
   }
+
+  /**
+   * Get basic syscollector information for given agent.
+   * @param {Object} req
+   * @param {Object} reply
+   * @returns {Object} Basic syscollector information
+   */
+  async getSyscollector(req, reply) {
+    try {
+      if (!req.params || !req.headers.id || !req.params.agent) {
+        throw new Error('Agent ID and API ID are required');
+      }
+
+      const { agent } = req.params;
+      const api = req.headers.id;
+
+      const config = await this.wzWrapper.getWazuhConfigurationById(api);
+
+      const headers = ApiHelper.buildOptionsObject(config);
+
+      const data = await Promise.all([
+        needle(
+          'get',
+          `${config.url}:${config.port}/syscollector/${agent}/hardware`,
+          {},
+          headers
+        ),
+        needle(
+          'get',
+          `${config.url}:${config.port}/syscollector/${agent}/os`,
+          {},
+          headers
+        ),
+        needle(
+          'get',
+          `${config.url}:${config.port}/syscollector/${agent}/ports`,
+          { limit: 1 },
+          headers
+        ),
+        needle(
+          'get',
+          `${config.url}:${config.port}/syscollector/${agent}/packages`,
+          {
+            limit: 1,
+            select: 'scan_time'
+          },
+          headers
+        ),
+        needle(
+          'get',
+          `${config.url}:${config.port}/syscollector/${agent}/processes`,
+          {
+            limit: 1,
+            select: 'scan_time'
+          },
+          headers
+        )
+      ]);
+
+      const result = data.map(item => (item.body || {}).data || false);
+      const [
+        hardwareResponse,
+        osResponse,
+        portsResponse,
+        packagesDateResponse,
+        processesDateResponse
+      ] = result;
+
+      let netifaceResponse = false;
+      try {
+        const resultNetiface = await needle(
+          'get',
+          `${config.url}:${config.port}/syscollector/${agent}/netiface`,
+          {},
+          headers
+        );
+        console.log('resultNetiface', resultNetiface.body);
+        netifaceResponse = ((resultNetiface || {}).body || {}).data || false;
+      } catch (error) {} // eslint-disable-line
+
+      // This API call may fail so we put it out of Promise.all
+      let netaddrResponse = false;
+      try {
+        const resultNetaddrResponse = await needle(
+          'get',
+          `${config.url}:${config.port}/syscollector/${agent}/netaddr`,
+          {
+            limit: 1
+          },
+          headers
+        );
+        netaddrResponse =
+          ((resultNetaddrResponse || {}).body || {}).data || false;
+      } catch (error) {} // eslint-disable-line
+
+      const packagesDate = packagesDateResponse
+        ? { ...packagesDateResponse }
+        : false;
+      const processesDate = processesDateResponse
+        ? { ...processesDateResponse }
+        : false;
+
+      // Fill syscollector object
+      const syscollector = {
+        hardware:
+          typeof hardwareResponse === 'object' &&
+          Object.keys(hardwareResponse).length
+            ? { ...hardwareResponse }
+            : false,
+        os:
+          typeof osResponse === 'object' && Object.keys(osResponse).length
+            ? { ...osResponse }
+            : false,
+        netiface: netifaceResponse ? { ...netifaceResponse } : false,
+        ports: portsResponse ? { ...portsResponse } : false,
+        netaddr: netaddrResponse ? { ...netaddrResponse } : false,
+        packagesDate: ((packagesDate || {}).items || []).length
+          ? packagesDate.items[0].scan_time
+          : '-',
+        processesDate: ((processesDate || {}).items || []).length
+          ? processesDate.items[0].scan_time
+          : '-'
+      };
+
+      return syscollector;
+    } catch (error) {
+      log('wazuh-api:getSyscollector', error.message || error);
+      return ErrorResponse(error.message || error, 3035, 500, reply);
+    }
+  }
 }
