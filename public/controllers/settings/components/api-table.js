@@ -106,7 +106,7 @@ export class ApiTable extends Component {
     this.setState({ itemIdToExpandedRowMap });
   }
 
-  componentWillReceiveProps(nextProps) {
+  UNSAFE_componentWillReceiveProps(nextProps) {
     this.setState({
       apiEntries: nextProps.apiEntries,
       currentDefault: nextProps.currentDefault
