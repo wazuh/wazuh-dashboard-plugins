@@ -51,7 +51,7 @@ export class ReportingController {
     try {
       return this.timeService.offset(time);
     } catch (error) {
-      return `${time} (UTC)`;
+      return time !== '-' ? `${time} (UTC)` : time;
     }
   }
 

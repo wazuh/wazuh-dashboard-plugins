@@ -920,7 +920,7 @@ export class AgentsController {
     try {
       return text + this.timeService.offset(time);
     } catch (error) {
-      return `${text}${time} (UTC)`;
+      return time !== '-' ? `${text}${time} (UTC)` : time;
     }
   }
 
