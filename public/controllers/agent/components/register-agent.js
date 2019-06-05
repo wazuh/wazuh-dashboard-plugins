@@ -18,6 +18,8 @@ import {
 } from '@elastic/eui';
 
 import { RegisterGuideDefs } from './register-guide-defs';
+import PropTypes from 'prop-types';
+
 export class RegisterAgent extends Component {
   constructor(props) {
     super(props);
@@ -39,15 +41,15 @@ export class RegisterAgent extends Component {
     this.setState({ selectedOS: os });
   }
 
-  setServerAddress = e => {
-    this.setState({ serverAddress: e.target.value });
-  };
+  setServerAddress(event) {
+    this.setState({ serverAddress: event.target.value });
+  }
 
   render() {
     const rpmButton = (
       <EuiButtonToggle
         label="Red Hat / CentOS"
-        onChange={e => this.selectOS('rpm')}
+        onChange={() => this.selectOS('rpm')}
         fill={this.state.selectedOS === 'rpm'}
       />
     );
@@ -55,7 +57,7 @@ export class RegisterAgent extends Component {
     const debButton = (
       <EuiButtonToggle
         label="Debian / Ubuntu"
-        onChange={e => this.selectOS('deb')}
+        onChange={() => this.selectOS('deb')}
         fill={this.state.selectedOS === 'deb'}
       />
     );
@@ -63,7 +65,7 @@ export class RegisterAgent extends Component {
     const windowsButton = (
       <EuiButtonToggle
         label="Windows"
-        onChange={e => this.selectOS('win')}
+        onChange={() => this.selectOS('win')}
         fill={this.state.selectedOS === 'win'}
       />
     );
@@ -71,7 +73,7 @@ export class RegisterAgent extends Component {
     const macOSButton = (
       <EuiButtonToggle
         label="MacOS"
-        onChange={e => this.selectOS('macos')}
+        onChange={() => this.selectOS('macos')}
         fill={this.state.selectedOS === 'macos'}
       />
     );
@@ -99,16 +101,16 @@ export class RegisterAgent extends Component {
     const customTexts = {
       rpmText2: `WAZUH_MANAGER_IP='${
         this.state.serverAddress
-      }' yum install wazuh-agent`,
+        }' yum install wazuh-agent`,
       debText4: `WAZUH_MANAGER_IP='${
         this.state.serverAddress
-      }' apt-get install wazuh-agent`,
+        }' apt-get install wazuh-agent`,
       macosText1: `launchctl setenv WAZUH_MANAGER_IP '${
         this.state.serverAddress
-      }' && installer -pkg wazuh-agent-.pkg -target /`,
+        }' && installer -pkg wazuh-agent-.pkg -target /`,
       winText1: `wazuh-agent-3.9.1-1.msi /q ADDRESS='${
         this.state.serverAddress
-      }' AUTHD_SERVER='${this.state.serverAddress}'`
+        }' AUTHD_SERVER='${this.state.serverAddress}'`
     };
 
     let text = '';
@@ -118,22 +120,24 @@ export class RegisterAgent extends Component {
     }
     const guide = (
       <div>
-        <EuiText>
-          <div style={copyButton}>
-            <EuiCopy textToCopy={text}>
-              {copy => (
-                <EuiButtonIcon
-                  onClick={copy}
-                  iconType="copy"
-                  aria-label="Copy"
-                />
-              )}
-            </EuiCopy>
-          </div>
-          <EuiCodeBlock style={codeBlock} language="js">
-            {text}
-          </EuiCodeBlock>
-        </EuiText>
+        {(this.state.selectedOS) && (
+          <EuiText>
+            <div style={copyButton}>
+              <EuiCopy textToCopy={text}>
+                {copy => (
+                  <EuiButtonIcon
+                    onClick={copy}
+                    iconType="copy"
+                    aria-label="Copy"
+                  />
+                )}
+              </EuiCopy>
+            </div>
+            <EuiCodeBlock style={codeBlock} language="js">
+              {text}
+            </EuiCodeBlock>
+          </EuiText>
+        )}
       </div>
     );
 
@@ -197,3 +201,7 @@ export class RegisterAgent extends Component {
     );
   }
 }
+
+RegisterAgent.propTypes = {
+  addNewAgent: PropTypes.func
+};
