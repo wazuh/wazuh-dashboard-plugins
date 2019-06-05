@@ -2,16 +2,16 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { EuiBasicTable, EuiButtonIcon } from '@elastic/eui';
 
-export class ReportingTable extends Component {
+export class BasicTable extends Component {
   constructor(props) {
     super(props);
 
     this.state = {
       items: this.props.items,
       pageIndex: 0,
-      pageSize: 10,
-      showPerPageOptions: true
+      pageSize: 10
     };
+
   }
 
   UNSAFE_componentWillReceiveProps(nextProps) {
@@ -47,53 +47,7 @@ export class ReportingTable extends Component {
       pageSize
     );
 
-    const columns = [
-      {
-        field: 'name',
-        name: 'File',
-        sortable: true
-      },
-      {
-        field: 'size',
-        name: 'Size',
-        sortable: true,
-        render: size => {
-          const fixedSize = size / 1024;
-          return `${fixedSize.toFixed(2)}KB`;
-        }
-      },
-      {
-        field: 'date',
-        name: 'Created',
-        sortable: true
-      },
-      {
-        name: 'Actions',
-
-        render: item => {
-          return (
-            <div>
-              <EuiButtonIcon
-                aria-label="Download report"
-                onClick={() => this.props.goReport(item.name)}
-                iconType="importAction"
-              />
-
-              <EuiButtonIcon
-                aria-label="Delete report"
-                onClick={() =>
-                  this.props
-                    .deleteReport(item.name)
-                    .then(items => this.setState({ items }))
-                }
-                iconType="trash"
-                color="danger"
-              />
-            </div>
-          );
-        }
-      }
-    ];
+    const columns = [...this.props.columns];
 
     const pagination = {
       pageIndex,
@@ -115,8 +69,6 @@ export class ReportingTable extends Component {
   }
 }
 
-ReportingTable.propTypes = {
-  items: PropTypes.array,
-  goReport: PropTypes.func,
-  deleteReport: PropTypes.func
+BasicTable.propTypes = {
+  items: PropTypes.array
 };

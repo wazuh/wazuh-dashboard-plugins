@@ -22,6 +22,8 @@ import {
   EuiCallOut
 } from '@elastic/eui';
 
+import { BasicTable } from '../directives/wz-table/components/table';
+
 const app = uiModules.get('app/wazuh', ['react']);
 
 app
@@ -32,4 +34,5 @@ app
   .value('EuiButtonIcon', EuiButtonIcon)
   .value('EuiBasicTable', EuiBasicTable)
   .value('EuiHealth', EuiHealth)
-  .value('EuiCallOut', EuiCallOut);
+  .value('EuiCallOut', EuiCallOut)
+  .value('BasicTable', BasicTable);

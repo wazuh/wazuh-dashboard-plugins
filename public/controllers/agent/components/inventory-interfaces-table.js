@@ -1,16 +1,15 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { EuiBasicTable, EuiButtonIcon } from '@elastic/eui';
+import { EuiBasicTable, EuiHealth } from '@elastic/eui';
 
-export class ReportingTable extends Component {
+export class InventoryInterfacesTable extends Component {
   constructor(props) {
     super(props);
 
     this.state = {
       items: this.props.items,
       pageIndex: 0,
-      pageSize: 10,
-      showPerPageOptions: true
+      pageSize: 10
     };
   }
 
@@ -50,48 +49,28 @@ export class ReportingTable extends Component {
     const columns = [
       {
         field: 'name',
-        name: 'File',
-        sortable: true
+        name: 'Name'
       },
       {
-        field: 'size',
-        name: 'Size',
-        sortable: true,
-        render: size => {
-          const fixedSize = size / 1024;
-          return `${fixedSize.toFixed(2)}KB`;
-        }
+        field: 'mac',
+        name: 'MAC'
       },
       {
-        field: 'date',
-        name: 'Created',
-        sortable: true
+        field: 'state',
+        name: 'State',
+        render: state => (
+          <EuiHealth color={state === 'up' ? 'success' : 'danger'}>
+            {state}
+          </EuiHealth>
+        )
       },
       {
-        name: 'Actions',
-
-        render: item => {
-          return (
-            <div>
-              <EuiButtonIcon
-                aria-label="Download report"
-                onClick={() => this.props.goReport(item.name)}
-                iconType="importAction"
-              />
-
-              <EuiButtonIcon
-                aria-label="Delete report"
-                onClick={() =>
-                  this.props
-                    .deleteReport(item.name)
-                    .then(items => this.setState({ items }))
-                }
-                iconType="trash"
-                color="danger"
-              />
-            </div>
-          );
-        }
+        field: 'mtu',
+        name: 'MTU'
+      },
+      {
+        field: 'type',
+        name: 'Type'
       }
     ];
 
@@ -115,8 +94,6 @@ export class ReportingTable extends Component {
   }
 }
 
-ReportingTable.propTypes = {
-  items: PropTypes.array,
-  goReport: PropTypes.func,
-  deleteReport: PropTypes.func
+InventoryInterfacesTable.propTypes = {
+  items: PropTypes.array
 };

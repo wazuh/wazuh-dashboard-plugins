@@ -66,27 +66,8 @@
                     ng-bind="offsetTimestamp('Last scan: ', syscollector.netiface.items[0].scan.time)"></span>
                 <md-divider class="wz-margin-top-10"></md-divider>
 
-                <table class="table table-striped table-condensed table-layout-fixed">
-                    <thead class="wz-text-bold">
-                        <th class="wz-text-left">Name</th>
-                        <th class="wz-text-left">Mac</th>
-                        <th class="wz-text-left">State</th>
-                        <th class="wz-text-left">MTU</th>
-                        <th class="wz-text-left">Type</th>
-                    </thead>
-                    <tbody>
-                        <tr class="wz-word-wrap" ng-repeat="interface in syscollector.netiface.items">
-                            <td>{{interface.name}}</td>
-                            <td>{{interface.mac}}</td>
-                            <td>
-                                <react-component name="EuiHealth"
-                                    props="{color: interface.state === 'up' ? 'success' : 'danger', children: interface.state}" />
-                            </td>
-                            <td>{{interface.mtu}}</td>
-                            <td>{{interface.type}}</td>
-                        </tr>
-                    </tbody>
-                </table>
+                <react-component name="InventoryInterfacesTable" props="{items: syscollector.netiface.items}" />
+
             </md-card-content>
         </md-card>
         <md-card flex class="wz-md-card">

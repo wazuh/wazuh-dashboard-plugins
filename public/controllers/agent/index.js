@@ -14,6 +14,7 @@ import { AgentsPreviewController } from './agents-preview';
 import { AgentsController } from './agents';
 import { WelcomeScreen } from './components/welcome';
 import { Stats } from './components/stats';
+import { InventoryInterfacesTable } from './components/inventory-interfaces-table';
 
 const app = uiModules.get('app/wazuh', []);
 
@@ -21,4 +22,5 @@ app
   .controller('agentsController', AgentsController)
   .controller('agentsPreviewController', AgentsPreviewController)
   .value('WelcomeScreenAgent', WelcomeScreen)
-  .value('StatsAgent', Stats);
+  .value('StatsAgent', Stats)
+  .value('InventoryInterfacesTable', InventoryInterfacesTable);
