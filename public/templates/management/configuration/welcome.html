@@ -13,23 +13,18 @@
     <div flex layout="row">
         <div flex layout="column">
             <md-card flex class="wz-md-card _md flex">
-                <md-card-actions layout="row" class="wz-card-actions wz-card-actions-top layout-align-start-center">
+                <md-card-actions layout="row" class="wz-card-actions wz-card-actions-top layout-align-end-center">
                     <a ng-if="mctrl.adminMode || adminMode" ng-show="!agent || agent.id === '000'" ng-click="mctrl.setConfigTab('editconfiguration', true)">
                         <react-component name="EuiIcon" props="{type:'pencil', color:'primary'}" /> Edit configuration
                     </a>
                     <button class="btn btn-primary btn-as-i" ng-show="agent && agent.id !== '000'" ng-click="exportConfiguration(agent)"
                         ng-disabled="reportBusy && reportStatus">
-                        <react-component name="EuiIcon" props="{type:'logstashOutput', color:'primary'}" /> Generate
-                        configuration report
+                        <react-component ng-show="!reportBusy || !reportStatus" name="EuiIcon" props="{type:'importAction', color:'primary'}" />
+                        <react-component ng-show="reportBusy && reportStatus" name="EuiLoadingSpinner" props="{size:'m'}" />
+                        PDF
                     </button>
                 </md-card-actions>
                 <md-card-content>
-                    <!-- Report status section -->
-                    <div layout="column" layout-align="center center" ng-if="agent && agent.id !== '000'" ng-show="reportBusy && reportStatus">
-                        <div class="percentage"><i class="fa fa-fw fa-spin fa-spinner" aria-hidden="true"></i></div>
-                        <div class="percentage">{{reportStatus}}</div>
-                    </div>
-                    <!-- End report status section -->
                     <span class="font-size-16 wz-text-bold">Main configurations</span>
                     <md-divider class="wz-margin-top-10"></md-divider>
                     <table ng-if="!agent || agent.id === '000'" class="table table-striped table-condensed table-layout-fixed table-hover table-vertical-align-middle">
