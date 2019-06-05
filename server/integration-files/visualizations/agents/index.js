@@ -16,6 +16,8 @@ import oscap from './agents-oscap';
 import ciscat from './agents-ciscat';
 import pci from './agents-pci';
 import gdpr from './agents-gdpr';
+import hipaa from './agents-hipaa';
+import nist from './agents-nist';
 import pm from './agents-pm';
 import virustotal from './agents-virustotal';
 import vuls from './agents-vuls';
@@ -30,6 +32,8 @@ export {
   ciscat,
   pci,
   gdpr,
+  hipaa,
+  nist,
   pm,
   virustotal,
   vuls,

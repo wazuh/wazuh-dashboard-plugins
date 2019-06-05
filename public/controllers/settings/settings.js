@@ -202,7 +202,7 @@ export class SettingsController {
 
     this.errorHandler.info(
       `API ${
-        this.apiEntries[index]._source.cluster_info.manager
+      this.apiEntries[index]._source.cluster_info.manager
       } set as default`,
       'Settings'
     );
@@ -364,6 +364,8 @@ export class SettingsController {
       tmpData.extensions.audit = config['extensions.audit'];
       tmpData.extensions.pci = config['extensions.pci'];
       tmpData.extensions.gdpr = config['extensions.gdpr'];
+      tmpData.extensions.hipaa = config['extensions.hipaa'];
+      tmpData.extensions.nist = config['extensions.nist'];
       tmpData.extensions.oscap = config['extensions.oscap'];
       tmpData.extensions.ciscat = config['extensions.ciscat'];
       tmpData.extensions.aws = config['extensions.aws'];
@@ -679,6 +681,8 @@ export class SettingsController {
         this.extensions.audit = config['extensions.audit'];
         this.extensions.pci = config['extensions.pci'];
         this.extensions.gdpr = config['extensions.gdpr'];
+        this.extensions.hipaa = config['extensions.hipaa'];
+        this.extensions.nist = config['extensions.nist'];
         this.extensions.oscap = config['extensions.oscap'];
         this.extensions.ciscat = config['extensions.ciscat'];
         this.extensions.aws = config['extensions.aws'];

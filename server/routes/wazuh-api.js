@@ -60,6 +60,24 @@ export function WazuhApiRoutes(server) {
     }
   });
 
+  // Return a NIST 800-53 requirement description
+  server.route({
+    method: 'GET',
+    path: '/api/nist/{requirement}',
+    handler(req, reply) {
+      return ctrl.getNistRequirement(req, reply);
+    }
+  });
+
+  // Return a HIPAA requirement description
+  server.route({
+    method: 'GET',
+    path: '/api/hipaa/{requirement}',
+    handler(req, reply) {
+      return ctrl.getHipaaRequirement(req, reply);
+    }
+  });
+
   // Force fetch data to be inserted on wazuh-monitoring indices
   server.route({
     method: 'GET',

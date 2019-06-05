@@ -9,6 +9,17 @@
  *
  * Find more information about this on the LICENSE file.
  */
+
+// Metrics General
+const metricsGeneral = {
+  totalAlerts: '[vis-id="\'Wazuh-App-Agents-General-Metric-alerts\'"]',
+  level12: '[vis-id="\'Wazuh-App-Agents-General-Level-12-alerts\'"]',
+  authFailure:
+    '[vis-id="\'Wazuh-App-Agents-General-Authentication-failure\'"]',
+  authSuccess:
+    '[vis-id="\'Wazuh-App-Agents-General-Authentication-success\'"]'
+};
+
 // Metrics Audit
 const metricsAudit = {
   auditNewFiles: '[vis-id="\'Wazuh-App-Agents-Audit-New-files-metric\'"]',
@@ -60,6 +71,7 @@ const metricsVirustotal = {
 };
 
 export default {
+  metricsGeneral,
   metricsAudit,
   metricsVulnerability,
   metricsScap,

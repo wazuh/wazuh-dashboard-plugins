@@ -15,6 +15,7 @@ import { TabNames } from '../../utils/tab-names';
 import * as FileSaver from '../../services/file-saver';
 import { TabDescription } from '../../../server/reporting/tab-description';
 import {
+  metricsGeneral,
   metricsAudit,
   metricsVulnerability,
   metricsScap,
@@ -162,7 +163,7 @@ export class AgentsController {
     this.$scope.hostMonitoringTabs = ['general', 'fim', 'syscollector'];
     this.$scope.systemAuditTabs = ['pm', 'sca', 'audit', 'oscap', 'ciscat'];
     this.$scope.securityTabs = ['vuls', 'virustotal', 'osquery', 'docker'];
-    this.$scope.complianceTabs = ['pci', 'gdpr'];
+    this.$scope.complianceTabs = ['pci', 'gdpr', 'hipaa', 'nist'];
 
     /**
      * This check if given array of items contais a single given item
@@ -453,6 +454,9 @@ export class AgentsController {
   checkMetrics(tab, subtab) {
     if (subtab === 'panels') {
       switch (tab) {
+        case 'general':
+          this.createMetrics(metricsGeneral);
+          break;
         case 'audit':
           this.createMetrics(metricsAudit);
           break;
@@ -563,6 +567,18 @@ export class AgentsController {
         const gdprTabs = await this.commonData.getPCI();
         this.$scope.gdprTabs = gdprTabs;
         this.$scope.selectedGdprIndex = 0;
+      }
+
+      if (tab === 'hipaa') {
+        const hipaaTabs = await this.commonData.getHIPAA();
+        this.$scope.hipaaTabs = hipaaTabs;
+        this.$scope.selectedHipaaIndex = 0;
+      }
+
+      if (tab === 'nist') {
+        const nistTabs = await this.commonData.getNIST();
+        this.$scope.nistTabs = nistTabs;
+        this.$scope.selectedNistIndex = 0;
       }
 
       if (tab === 'sca') {
@@ -905,7 +921,7 @@ export class AgentsController {
     try {
       return text + this.timeService.offset(time);
     } catch (error) {
-      return `${text}${time} (UTC)`;
+      return time !== '-' ? `${text}${time} (UTC)` : time;
     }
   };
 
