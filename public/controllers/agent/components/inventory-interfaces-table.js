@@ -78,7 +78,8 @@ export class InventoryInterfacesTable extends Component {
       pageIndex,
       pageSize,
       totalItemCount,
-      pageSizeOptions: [10, 20, 50]
+      pageSizeOptions: [10, 20, 50],
+      hidePerPageOptions: this.state.items.length <= 10
     };
 
     return (

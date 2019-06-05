@@ -11,7 +11,6 @@ export class BasicTable extends Component {
       pageIndex: 0,
       pageSize: 10
     };
-
   }
 
   UNSAFE_componentWillReceiveProps(nextProps) {
@@ -53,7 +52,8 @@ export class BasicTable extends Component {
       pageIndex,
       pageSize,
       totalItemCount,
-      pageSizeOptions: [10, 20, 50]
+      pageSizeOptions: [10, 20, 50],
+      hidePerPageOptions: this.state.items.length <= 10
     };
 
     return (

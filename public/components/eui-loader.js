@@ -22,7 +22,7 @@ import {
   EuiCallOut
 } from '@elastic/eui';
 
-import { BasicTable } from '../directives/wz-table/components/table';
+import { BasicTable } from '../directives/wz-table-eui/components/table';
 
 const app = uiModules.get('app/wazuh', ['react']);
 

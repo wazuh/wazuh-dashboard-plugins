@@ -35,7 +35,6 @@ app.directive('wzTable', function() {
       allowClick: '=allowClick',
       implicitFilter: '=implicitFilter',
       rowSizes: '=rowSizes',
-      extraLimit: '=extraLimit',
       emptyResults: '=emptyResults',
       customColumns: '=customColumns',
       implicitSort: '=implicitSort'
@@ -56,18 +55,6 @@ app.directive('wzTable', function() {
       $sce,
       timeService
     ) {
-      $scope.basicTableProps = {
-        columns: $scope.keys.map(item => ({
-          name: KeyEquivalenece[item.value || item] || item.value || item,
-          field: item.value || item,
-          width: item.width || undefined,
-          render: value => value || '-'
-        })),
-        items: []
-      };
-
-      $scope.isSyscollector = $scope.path.includes('/syscollector');
-
       $scope.showColumns = false;
       $scope.scapepath = $scope.path.split('/').join('');
       $scope.originalkeys = $scope.keys.map((key, idx) => ({ key, idx }));
@@ -152,19 +139,6 @@ app.directive('wzTable', function() {
           $scope,
           appState
         );
-
-      $scope.$watch('items', () => {
-        $scope.basicTableProps.items = [...$scope.items];
-      });
-
-      $scope.$watch('keys', () => {
-        $scope.basicTableProps.columns = $scope.keys.map(item => ({
-          name: KeyEquivalenece[item.value || item] || item.value || item,
-          field: item.value || item,
-          width: item.width || undefined,
-          render: value => value || '-'
-        }));
-      });
 
       const fetch = async (options = {}) => {
         try {
