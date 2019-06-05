@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { EuiBasicTable, EuiButtonIcon } from '@elastic/eui';
+import { EuiBasicTable } from '@elastic/eui';
 
 export class BasicTable extends Component {
   constructor(props) {
@@ -19,12 +19,29 @@ export class BasicTable extends Component {
     });
   }
 
-  onTableChange({ page = {} }) {
+  async onTableChange({ page = {} }) {
     const { index: pageIndex, size: pageSize } = page;
+    const { pageOfItems } = this.filterItems(pageIndex, pageSize);
+    const needMoreData = pageOfItems.includes(null);
+
+    if (needMoreData) {
+      const { items } = this.state;
+      const nonNull = items.filter(item => !!item).length;
+      await this.props.getData({ offset: nonNull });
+      return this.onTableChange({ page });
+    }
 
     this.setState({
       pageIndex,
       pageSize
+    });
+  }
+
+  promisedSetState(newState) {
+    return new Promise(resolve => {
+      this.setState(newState, () => {
+        resolve();
+      });
     });
   }
 

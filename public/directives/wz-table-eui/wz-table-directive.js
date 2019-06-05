@@ -14,7 +14,6 @@ import template from './wz-table.html';
 import { uiModules } from 'ui/modules';
 import { DataFactory } from '../../services/data-factory';
 import { KeyEquivalenece } from '../../../util/csv-key-equivalence';
-import { sort } from './lib/sort';
 import * as listeners from './lib/listeners';
 import { searchData, filterData, queryData } from './lib/data';
 import { initTable } from './lib/init';
@@ -29,17 +28,41 @@ app.directive('wzTableEui', function() {
       keys: '=keys'
     },
     controller($scope, apiReq, errorHandler, wzTableFilter) {
-      const parseColumns = columnsArray =>
-        columnsArray.map(item => ({
+      const parseColumns = columnsArray => {
+        return columnsArray.map(item => ({
           name: KeyEquivalenece[item.value || item] || item.value || item,
           field: item.value || item,
           width: item.width || undefined,
           render: value => value || '-'
         }));
+      };
+
+      let items = [];
+
+      const fetch = async (options = {}) => {
+        try {
+
+          const result = await instance.fetch(options);
+          items = result.items;
+          $scope.items = items;
+          return;
+        } catch (error) {
+          if (
+            error &&
+            !error.data &&
+            error.status === -1 &&
+            error.xhrStatus === 'abort'
+          ) {
+            return Promise.reject('Request took too long, aborted');
+          }
+          return Promise.reject(error);
+        }
+      };
 
       $scope.basicTableProps = {
         columns: parseColumns($scope.keys),
-        items: []
+        items: [],
+        getData: options => fetch(options)
         //noItemsMessage: 'Change this'
       };
 
@@ -55,42 +78,6 @@ app.directive('wzTableEui', function() {
       $scope.$watch('keys', () => {
         $scope.basicTableProps.columns = parseColumns($scope.keys);
       });
-
-      const fetch = async (options = {}) => {
-        try {
-          if (!options.skipFetching) {
-            const result = await instance.fetch(options);
-            const items = options.realTime
-              ? result.items.slice(0, 10)
-              : result.items;
-            $scope.items = items;
-            $scope.$emit('wazuhFetched', { items, filters: instance.filters });
-          } else {
-            $scope.$emit('wazuhFetched', {
-              items: $scope.items,
-              filters: instance.filters
-            });
-          }
-
-          return;
-        } catch (error) {
-          if (
-            error &&
-            !error.data &&
-            error.status === -1 &&
-            error.xhrStatus === 'abort'
-          ) {
-            return Promise.reject('Request took too long, aborted');
-          }
-          return Promise.reject(error);
-        }
-      };
-
-      /**
-       * This sort data for a given filed
-       */
-      $scope.sort = async field =>
-        sort(field, $scope, instance, fetch, errorHandler);
 
       /**
        * This search in table data with a given term
