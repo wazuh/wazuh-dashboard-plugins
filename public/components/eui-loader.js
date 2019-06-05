@@ -29,4 +29,3 @@ app
   .value('EuiProgress', EuiProgress)
   .value('EuiButtonIcon', EuiButtonIcon)
   .value('EuiBasicTable', EuiBasicTable);
-

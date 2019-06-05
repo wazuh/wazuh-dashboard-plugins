@@ -36,49 +36,49 @@ export class RegisterAgent extends Component {
   }
 
   selectOS(os) {
-    this.setState({ selectedOS: os })
+    this.setState({ selectedOS: os });
   }
 
   setServerAddress = e => {
-    this.setState({ serverAddress: e.target.value })
-  }
+    this.setState({ serverAddress: e.target.value });
+  };
 
   render() {
     const rpmButton = (
       <EuiButtonToggle
-        label='Red Hat / CentOS'
-        onChange={(e) => this.selectOS('rpm')}
+        label="Red Hat / CentOS"
+        onChange={e => this.selectOS('rpm')}
         fill={this.state.selectedOS === 'rpm'}
       />
     );
 
     const debButton = (
       <EuiButtonToggle
-        label='Debian / Ubuntu'
-        onChange={(e) => this.selectOS('deb')}
+        label="Debian / Ubuntu"
+        onChange={e => this.selectOS('deb')}
         fill={this.state.selectedOS === 'deb'}
       />
     );
 
     const windowsButton = (
       <EuiButtonToggle
-        label='Windows'
-        onChange={(e) => this.selectOS('win')}
+        label="Windows"
+        onChange={e => this.selectOS('win')}
         fill={this.state.selectedOS === 'win'}
       />
     );
 
     const macOSButton = (
       <EuiButtonToggle
-        label='MacOS'
-        onChange={(e) => this.selectOS('macos')}
+        label="MacOS"
+        onChange={e => this.selectOS('macos')}
         fill={this.state.selectedOS === 'macos'}
       />
     );
 
     const ipInput = (
       <EuiFieldText
-        placeholder='Server address...'
+        placeholder="Server address..."
         value={this.state.serverAddress}
         onChange={this.setServerAddress}
       />
@@ -93,15 +93,23 @@ export class RegisterAgent extends Component {
     };
 
     const codeBlock = {
-      zIndex: '100',
+      zIndex: '100'
     };
 
     const customTexts = {
-      rpmText2: `WAZUH_MANAGER_IP='${this.state.serverAddress}' yum install wazuh-agent`,
-      debText4: `WAZUH_MANAGER_IP='${this.state.serverAddress}' apt-get install wazuh-agent`,
-      macosText1: `launchctl setenv WAZUH_MANAGER_IP '${this.state.serverAddress}' && installer -pkg wazuh-agent-.pkg -target /`,
-      winText1: `wazuh-agent-3.9.1-1.msi /q ADDRESS='${this.state.serverAddress}' AUTHD_SERVER='${this.state.serverAddress}'`
-    }
+      rpmText2: `WAZUH_MANAGER_IP='${
+        this.state.serverAddress
+      }' yum install wazuh-agent`,
+      debText4: `WAZUH_MANAGER_IP='${
+        this.state.serverAddress
+      }' apt-get install wazuh-agent`,
+      macosText1: `launchctl setenv WAZUH_MANAGER_IP '${
+        this.state.serverAddress
+      }' && installer -pkg wazuh-agent-.pkg -target /`,
+      winText1: `wazuh-agent-3.9.1-1.msi /q ADDRESS='${
+        this.state.serverAddress
+      }' AUTHD_SERVER='${this.state.serverAddress}'`
+    };
 
     let text = '';
     for (let i = 0; i < this.state.osSteps[this.state.selectedOS]; i++) {
@@ -110,19 +118,19 @@ export class RegisterAgent extends Component {
     }
     const guide = (
       <div>
-        < EuiText >
+        <EuiText>
           <div style={copyButton}>
-            <EuiCopy textToCopy={text} >
+            <EuiCopy textToCopy={text}>
               {copy => (
                 <EuiButtonIcon
                   onClick={copy}
-                  iconType='copy'
-                  aria-label='Copy'
+                  iconType="copy"
+                  aria-label="Copy"
                 />
               )}
             </EuiCopy>
           </div>
-          <EuiCodeBlock style={codeBlock} language='js'>
+          <EuiCodeBlock style={codeBlock} language="js">
             {text}
           </EuiCodeBlock>
         </EuiText>
@@ -140,29 +148,23 @@ export class RegisterAgent extends Component {
       },
       {
         title: 'Wazuh server address',
-        children: (
-          <Fragment>
-            {ipInput}
-          </Fragment>
-        )
+        children: <Fragment>{ipInput}</Fragment>
       },
       {
         title: 'Complete the installation',
         children: (
           <div>
             <Fragment>
-              <div>
-                {guide}
-              </div>
+              <div>{guide}</div>
             </Fragment>
           </div>
         )
-      },
+      }
     ];
 
     return (
       <div>
-        <EuiPage restrictWidth='1000px'>
+        <EuiPage restrictWidth="1000px">
           <EuiPageBody>
             <EuiFlexGroup>
               <EuiFlexItem>
@@ -171,9 +173,13 @@ export class RegisterAgent extends Component {
                 </EuiTitle>
               </EuiFlexItem>
               <EuiFlexItem grow={false}>
-                <EuiButtonEmpty size='s' onClick={() => this.props.addNewAgent(false)} iconType='cross'>
+                <EuiButtonEmpty
+                  size="s"
+                  onClick={() => this.props.addNewAgent(false)}
+                  iconType="cross"
+                >
                   close
-            </EuiButtonEmpty>
+                </EuiButtonEmpty>
               </EuiFlexItem>
             </EuiFlexGroup>
             <EuiFlexGroup>
@@ -191,8 +197,3 @@ export class RegisterAgent extends Component {
     );
   }
 }
-
-
-
-
-

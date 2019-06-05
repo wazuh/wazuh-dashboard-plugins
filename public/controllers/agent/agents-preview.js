@@ -93,7 +93,7 @@ export class AgentsPreviewController {
     });
 
     this.registerAgentsProps = {
-      addNewAgent: (flag) => this.addNewAgent(flag)
+      addNewAgent: flag => this.addNewAgent(flag)
     };
 
     this.init = false;
