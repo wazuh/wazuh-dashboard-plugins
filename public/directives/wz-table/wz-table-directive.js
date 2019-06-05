@@ -60,12 +60,13 @@ app.directive('wzTable', function() {
         columns: $scope.keys.map(item => ({
           name: KeyEquivalenece[item.value || item] || item.value || item,
           field: item.value || item,
+          width: item.width || undefined,
           render: value => value || '-'
         })),
         items: []
       };
 
-      $scope.isSyscollector = $scope.path.includes('/syscollector')
+      $scope.isSyscollector = $scope.path.includes('/syscollector');
 
       $scope.showColumns = false;
       $scope.scapepath = $scope.path.split('/').join('');
@@ -160,8 +161,9 @@ app.directive('wzTable', function() {
         $scope.basicTableProps.columns = $scope.keys.map(item => ({
           name: KeyEquivalenece[item.value || item] || item.value || item,
           field: item.value || item,
+          width: item.width || undefined,
           render: value => value || '-'
-        }))
+        }));
       });
 
       const fetch = async (options = {}) => {

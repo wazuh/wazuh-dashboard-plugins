@@ -140,10 +140,10 @@
                 <div layout="row" ng-if="agent && syscollector && !load" class="wz-margin-top-10">
                     <wz-table flex ng-if="agent && agent.os && agent.os.platform !== 'windows'"
                         path="'/syscollector/' + agent.id + '/packages'" row-sizes="[15,13,11]" extra-limit="100"
-                        keys="['name','architecture','version','vendor','description']" />
+                        keys="['name','architecture','version',{value:'vendor',width: '30%'},{value:'description',width: '30%'}]" />
                     <wz-table flex ng-if="agent && agent.os && agent.os.platform === 'windows'"
                         path="'/syscollector/' + agent.id + '/packages'" row-sizes="[15,13,11]" extra-limit="100"
-                        keys="['name','architecture','version','vendor']" />
+                        keys="['name','architecture','version',{value:'vendor',width: '30%'}]" />
                 </div>
                 <div layout="row" layout-align="end center">
                     <button type="button" ng-click="downloadCsv('/syscollector/'+agent.id+'/packages', 'packages.csv')"
