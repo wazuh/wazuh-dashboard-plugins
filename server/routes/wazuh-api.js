@@ -113,4 +113,22 @@ export function WazuhApiRoutes(server) {
       return ctrl.getRequestList(req, res);
     }
   });
+
+  // Useful to check cookie consistence
+  server.route({
+    method: 'GET',
+    path: '/api/timestamp',
+    handler(req, res) {
+      return ctrl.getTimeStamp(req, res);
+    }
+  });
+
+  // Return Wazuh Appsetup info
+  server.route({
+    method: 'GET',
+    path: '/api/setup',
+    handler(req, res) {
+      return ctrl.getSetupInfo(req, res);
+    }
+  });
 }

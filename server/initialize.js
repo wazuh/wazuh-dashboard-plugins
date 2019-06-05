@@ -18,8 +18,12 @@ import { defaultExt } from './lib/default-ext';
 import { BuildBody } from './lib/replicas-shards-helper';
 import { checkKnownFields } from './lib/refresh-known-fields';
 import { totalmem } from 'os';
+import fs from 'fs';
+import path from 'path';
+import { createSourceMapSource } from 'typescript';
 
 export function Initialize(server) {
+  const wazuhVersion = path.join(__dirname, '/wazuh-version.json');
   const blueWazuh = '\u001b[34mwazuh\u001b[39m';
   // Elastic JS Client
   const wzWrapper = new ElasticWrapper(server);
@@ -38,7 +42,7 @@ export function Initialize(server) {
         : 'wazuh-alerts-3.x-*';
     global.XPACK_RBAC_ENABLED =
       configurationFile &&
-      typeof configurationFile['xpack.rbac.enabled'] !== 'undefined'
+        typeof configurationFile['xpack.rbac.enabled'] !== 'undefined'
         ? configurationFile['xpack.rbac.enabled']
         : true;
   } catch (e) {
@@ -65,10 +69,6 @@ export function Initialize(server) {
   // Save Wazuh App setup
   const saveConfiguration = async () => {
     try {
-      const shardConfiguration = BuildBody(configurationFile, 'wazuh-version');
-
-      await wzWrapper.createWazuhVersionIndex(shardConfiguration);
-
       const commonDate = new Date().toISOString();
 
       const configuration = {
@@ -80,8 +80,11 @@ export function Initialize(server) {
       };
 
       try {
-        await wzWrapper.insertWazuhVersionConfiguration(configuration);
-
+        fs.writeFileSync(wazuhVersion, JSON.stringify(configuration), (err) => {
+          if (err) {
+            throw new Error(err);
+          }
+        });
         log(
           'initialize:saveConfiguration',
           'Wazuh configuration inserted',
@@ -91,7 +94,7 @@ export function Initialize(server) {
         log('initialize:saveConfiguration', error.message || error);
         server.log(
           [blueWazuh, 'initialize', 'error'],
-          'Could not insert Wazuh configuration'
+          'Could not create Wazuh configuration registry'
         );
       }
 
@@ -100,7 +103,7 @@ export function Initialize(server) {
       log('initialize:saveConfiguration', error.message || error);
       server.log(
         [blueWazuh, 'initialize', 'error'],
-        'Error creating index .wazuh-version.'
+        'Error creating wazuh-version registry.'
       );
     }
   };
@@ -157,13 +160,13 @@ export function Initialize(server) {
             log(
               'initialize:checkAPIEntriesExtensions',
               `Error updating API entry extensions with ID: ${
-                item._id
+              item._id
               } due to ${error.message || error}`
             );
             server.log(
               [blueWazuh, 'initialize:checkAPIEntriesExtensions', 'error'],
               `Error updating API entry extensions with ID: ${
-                item._id
+              item._id
               } due to ${error.message || error}`
             );
           }
@@ -207,27 +210,35 @@ export function Initialize(server) {
     }
   };
 
-  const checkWazuhVersionIndex = async () => {
+  const checkWazuhVersionRegistry = async () => {
     try {
       log(
-        'initialize[checkWazuhVersionIndex]',
-        'Checking .wazuh-version index.',
+        'initialize[checkWazuhVersionRegistry]',
+        'Checking wazuh-version registry.',
         'debug'
       );
-
       try {
-        await wzWrapper.getWazuhVersionIndex();
-        const shardConfiguration = BuildBody(
-          configurationFile,
-          'wazuh-version'
-        );
-        await wzWrapper.updateIndexSettings(
-          '.wazuh-version',
-          shardConfiguration
+        await wzWrapper.deleteWazuhVersionIndex();
+        log(
+          'monitoring:checkWazuhVersionRegistry',
+          'Successfully deleted old wazuh-index pattern.',
+          'debug'
         );
       } catch (error) {
         log(
-          'initialize[checkWazuhVersionIndex]',
+          'initialize[checkWazuhVersionRegistry]',
+          'No need to delete old wazuh-version index',
+          'debug'
+        );
+      }
+
+      try {
+        if (!fs.existsSync(wazuhVersion)) {
+          throw new Error;
+        }
+      } catch (error) {
+        log(
+          'initialize[checkWazuhVersionRegistry]',
           '.wazuh-version document does not exist. Initializating configuration...',
           'debug'
         );
@@ -236,10 +247,16 @@ export function Initialize(server) {
         await saveConfiguration();
       }
 
-      await wzWrapper.updateWazuhVersionIndexLastRestart(
-        packageJSON.version,
-        packageJSON.revision
-      );
+      let source = JSON.parse(fs.readFileSync(wazuhVersion, 'utf8'));
+      source['app-version'] = packageJSON.version;
+      source.revision = packageJSON.revision;
+      source.lastRestart = new Date().toISOString(); // Registry exists so we update the lastRestarted date only
+
+      fs.writeFileSync(wazuhVersion, JSON.stringify(source), (err) => {
+        if (err) {
+          throw new Error(err);
+        }
+      });
     } catch (error) {
       return Promise.reject(error);
     }
@@ -250,7 +267,7 @@ export function Initialize(server) {
     try {
       await Promise.all([
         checkWazuhIndex(),
-        checkWazuhVersionIndex(),
+        checkWazuhVersionRegistry(),
         checkKnownFields(wzWrapper, log, server, defaultIndexPattern)
       ]);
       const reindexResult = await wzWrapper.reindexAppIndices();
@@ -259,7 +276,7 @@ export function Initialize(server) {
         log(
           'initialize:init',
           `${reindexResult[0].value} (${reindexResult[0].result}) / ${
-            reindexResult[1].value
+          reindexResult[1].value
           } (${reindexResult[1].result})`,
           'debug'
         );
@@ -307,7 +324,7 @@ export function Initialize(server) {
       return Promise.reject(
         new Error(
           `Error creating ${
-            wzWrapper.WZ_KIBANA_INDEX
+          wzWrapper.WZ_KIBANA_INDEX
           } index due to ${error.message || error}`
         )
       );
@@ -328,7 +345,7 @@ export function Initialize(server) {
       return Promise.reject(
         new Error(
           `Error creating template for ${
-            wzWrapper.WZ_KIBANA_INDEX
+          wzWrapper.WZ_KIBANA_INDEX
           } due to ${error.message || error}`
         )
       );
@@ -341,7 +358,7 @@ export function Initialize(server) {
       log(
         'initialize:checkKibanaStatus',
         `No need to create the ${
-          wzWrapper.WZ_KIBANA_INDEX
+        wzWrapper.WZ_KIBANA_INDEX
         } template, already exists.`,
         'debug'
       );

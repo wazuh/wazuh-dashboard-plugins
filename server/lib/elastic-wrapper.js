@@ -136,31 +136,6 @@ export class ElasticWrapper {
   }
 
   /**
-   * Creates the .wazuh-version index with a custom configuration.
-   * @param {*} config
-   */
-  async createWazuhVersionIndex(configuration) {
-    try {
-      if (!configuration)
-        return Promise.reject(
-          new Error('No valid configuration for create .wazuh-version index')
-        );
-
-      const data = await this.elasticRequest.callWithInternalUser(
-        'indices.create',
-        {
-          index: '.wazuh-version',
-          body: configuration
-        }
-      );
-
-      return data;
-    } catch (error) {
-      return Promise.reject(error);
-    }
-  }
-
-  /**
    * Creates the .wazuh index with a custom configuration.
    * @param {*} config
    */
@@ -186,23 +161,15 @@ export class ElasticWrapper {
   }
 
   /**
-   * Inserts configuration on .wazuh-version index
-   * @param {*} configuration
-   */
-  async insertWazuhVersionConfiguration(configuration) {
+ * Delete .wazuh-version index if exists
+ */
+  async deleteWazuhVersionIndex() {
     try {
-      if (!configuration)
-        return Promise.reject(
-          new Error('No valid configuration for create .wazuh-version index')
-        );
-
-      const data = await this.elasticRequest.callWithInternalUser('create', {
+      const data = await this.elasticRequest.callWithInternalUser('delete', {
         index: '.wazuh-version',
         type: '_doc',
-        id: 1,
-        body: configuration
+        id: '1'
       });
-
       return data;
     } catch (error) {
       return Promise.reject(error);
@@ -251,7 +218,7 @@ export class ElasticWrapper {
         const patternTitle =
           (((pattern || {})._source || {})['index-pattern'] || {}).title || '';
         detectedFields = await this.discoverNewFields(patternTitle);
-      } catch (error) {} // eslint-disable-line
+      } catch (error) { } // eslint-disable-line
 
       let currentFields = [];
 
@@ -265,9 +232,9 @@ export class ElasticWrapper {
             item =>
               item.name &&
               item.name !==
-                'data.aws.service.action.networkConnectionAction.remoteIpDetails.geoLocation.lat' &&
+              'data.aws.service.action.networkConnectionAction.remoteIpDetails.geoLocation.lat' &&
               item.name !==
-                'data.aws.service.action.networkConnectionAction.remoteIpDetails.geoLocation.lon'
+              'data.aws.service.action.networkConnectionAction.remoteIpDetails.geoLocation.lon'
           );
 
           this.mergeDetectedFields(knownFields, currentFields);
@@ -297,7 +264,7 @@ export class ElasticWrapper {
         if (idx > -1) {
           currentFields[idx].excluded = true;
         }
-      } catch (error) {} // eslint-disable-line
+      } catch (error) { } // eslint-disable-line
 
       try {
         currentFieldsString = JSON.stringify(currentFields);
@@ -350,7 +317,7 @@ export class ElasticWrapper {
       try {
         const patternTitle = id.split('index-pattern:')[1];
         detectedFields = await this.discoverNewFields(patternTitle);
-      } catch (error) {} // eslint-disable-line
+      } catch (error) { } // eslint-disable-line
 
       const pattern = await this.getIndexPatternUsingGet(id);
 
@@ -407,68 +374,6 @@ export class ElasticWrapper {
             }
           }
         }
-      });
-
-      return data;
-    } catch (error) {
-      return Promise.reject(error);
-    }
-  }
-
-  /**
-   * Get the .wazuh-version index
-   */
-  async getWazuhVersionIndex() {
-    try {
-      const data = await this.elasticRequest.callWithInternalUser('get', {
-        index: '.wazuh-version',
-        type: '_doc',
-        id: '1'
-      });
-
-      return data;
-    } catch (error) {
-      return Promise.reject(error);
-    }
-  }
-
-  /**
-   * Updates lastRestart field on .wazuh-version index
-   * @param {*} version
-   * @param {*} revision
-   */
-  async updateWazuhVersionIndexLastRestart(version, revision) {
-    try {
-      if (!version || !revision)
-        return Promise.reject(new Error('No valid version or revision given'));
-
-      const data = await this.elasticRequest.callWithInternalUser('update', {
-        index: '.wazuh-version',
-        type: '_doc',
-        id: 1,
-        body: {
-          doc: {
-            'app-version': version,
-            revision: revision,
-            lastRestart: new Date().toISOString() // Indice exists so we update the lastRestarted date only
-          }
-        }
-      });
-
-      return data;
-    } catch (error) {
-      return Promise.reject(error);
-    }
-  }
-
-  /**
-   * Get .wazuh-version index
-   */
-  async getWazuhVersionIndexAsSearch() {
-    try {
-      const data = await this.elasticRequest.callWithInternalUser('search', {
-        index: '.wazuh-version',
-        type: '_doc'
       });
 
       return data;
@@ -586,17 +491,17 @@ export class ElasticWrapper {
 
       const data = req
         ? await this.elasticRequest.callWithRequest(req, 'update', {
-            index: '.wazuh',
-            type: '_doc',
-            id: id,
-            body: doc
-          })
+          index: '.wazuh',
+          type: '_doc',
+          id: id,
+          body: doc
+        })
         : await this.elasticRequest.callWithInternalUser('update', {
-            index: '.wazuh',
-            type: '_doc',
-            id: id,
-            body: doc
-          });
+          index: '.wazuh',
+          type: '_doc',
+          id: id,
+          body: doc
+        });
 
       return data;
     } catch (error) {
@@ -671,7 +576,7 @@ export class ElasticWrapper {
       return (
         this.usingSearchGuard ||
         ((((data || {}).defaults || {}).xpack || {}).security || {}).user !=
-          null
+        null
       );
     } catch (error) {
       return Promise.reject(error);
@@ -953,7 +858,7 @@ export class ElasticWrapper {
         pattern,
         metaFields
       });
-    } catch (error) {} // eslint-disable-line
+    } catch (error) { } // eslint-disable-line
 
     if (!Array.isArray(detectedFields)) {
       detectedFields = [];
@@ -986,13 +891,12 @@ export class ElasticWrapper {
   }
 
   /**
-   * Prevent from using types, reindex .wazuh and .wazuh-version indices
+   * Prevent from using types, reindex .wazuh index
    */
   async reindexAppIndices() {
     try {
       const appIndices = [
-        { value: '.wazuh', copy: '.6x-wazuh', result: 'fail' },
-        { value: '.wazuh-version', copy: '.6x-wazuh-version', result: 'fail' }
+        { value: '.wazuh', copy: '.6x-wazuh', result: 'fail' }
       ];
       for (const index of appIndices) {
         try {
@@ -1036,7 +940,7 @@ export class ElasticWrapper {
             index: index.copy
           });
           index.result = 'success';
-        } catch (error) {} // eslint-disable-line
+        } catch (error) { } // eslint-disable-line
       }
 
       return appIndices;
