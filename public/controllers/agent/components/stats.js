@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-
+import PropTypes from 'prop-types';
 import { EuiStat, EuiFlexItem, EuiFlexGroup, EuiPanel } from '@elastic/eui';
 
 export class Stats extends Component {
@@ -12,7 +12,7 @@ export class Stats extends Component {
   buildStats(items) {
     const stats = items.map(item => {
       return (
-        <EuiFlexItem>
+        <EuiFlexItem key={item.description}>
           <EuiStat
             title={item.title}
             description={item.description}
@@ -42,3 +42,13 @@ export class Stats extends Component {
     );
   }
 }
+
+Stats.propTypes = {
+  id: PropTypes.string,
+  ip: PropTypes.string,
+  version: PropTypes.string,
+  agentOS: PropTypes.string,
+  dateAdd: PropTypes.any,
+  lastKeepAlive: PropTypes.any,
+  name: PropTypes.string
+};

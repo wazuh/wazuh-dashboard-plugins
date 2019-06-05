@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-
+import PropTypes from 'prop-types';
 import {
   EuiFlexGroup,
   EuiFlexItem,
@@ -70,6 +70,7 @@ export class AddApi extends Component {
           <EuiFlexItem grow={false}>
             <EuiFormRow label="Actions">
               <EuiButton
+                aria-label="Save"
                 iconType="save"
                 color="primary"
                 onClick={() => this.props.saveSettings({ ...this.state })}
@@ -83,3 +84,7 @@ export class AddApi extends Component {
     );
   }
 }
+
+AddApi.propTypes = {
+  saveSettings: PropTypes.func
+};

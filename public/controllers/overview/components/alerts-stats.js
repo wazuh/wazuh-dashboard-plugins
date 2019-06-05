@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-
+import PropTypes from 'prop-types';
 import { EuiStat, EuiFlexItem, EuiFlexGroup } from '@elastic/eui';
 
 export class AlertsStats extends Component {
@@ -12,7 +12,7 @@ export class AlertsStats extends Component {
   buildStats() {
     const stats = this.props.items.map(item => {
       return (
-        <EuiFlexItem>
+        <EuiFlexItem key={`${item.description}${item.value}`}>
           <EuiStat
             title={item.value}
             description={item.description}
@@ -38,3 +38,7 @@ export class AlertsStats extends Component {
     );
   }
 }
+
+AlertsStats.propTypes = {
+  items: PropTypes.array
+};

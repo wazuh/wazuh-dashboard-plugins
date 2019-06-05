@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-
+import PropTypes from 'prop-types';
 import { EuiStat, EuiFlexItem, EuiFlexGroup } from '@elastic/eui';
 
 export class Stats extends Component {
@@ -52,3 +52,10 @@ export class Stats extends Component {
     );
   }
 }
+
+Stats.propTypes = {
+  total: PropTypes.any,
+  active: PropTypes.any,
+  disconnected: PropTypes.any,
+  neverConnected: PropTypes.any
+};

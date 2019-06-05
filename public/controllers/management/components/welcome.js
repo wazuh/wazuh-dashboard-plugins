@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-
+import PropTypes from 'prop-types';
 import {
   EuiCard,
   EuiIcon,
@@ -107,3 +107,7 @@ export class WelcomeScreen extends Component {
     );
   }
 }
+
+WelcomeScreen.propTypes = {
+  switchTab: PropTypes.func
+};

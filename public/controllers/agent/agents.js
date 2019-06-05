@@ -695,9 +695,9 @@ export class AgentsController {
         'GET',
         `/api/syscollector/${id}`
       );
-      
+
       this.$scope.syscollector = (syscollectorData || {}).data || {};
-      
+
       return;
     } catch (error) {
       return Promise.reject(error);

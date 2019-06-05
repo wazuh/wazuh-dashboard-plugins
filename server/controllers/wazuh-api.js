@@ -1247,7 +1247,6 @@ export class WazuhApiCtrl {
           {},
           headers
         );
-        console.log('resultNetiface', resultNetiface.body);
         netifaceResponse = ((resultNetiface || {}).body || {}).data || false;
       } catch (error) {} // eslint-disable-line
 

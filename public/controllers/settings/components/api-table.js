@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import React, { Component } from 'react';
 import { RIGHT_ALIGNMENT } from '@elastic/eui/lib/services';
 import {
@@ -88,6 +89,7 @@ export class ApiTable extends Component {
           <EuiFlexItem grow={false}>
             <EuiFormRow label="Actions">
               <EuiButton
+                aria-label="Update"
                 iconType="save"
                 color="primary"
                 onClick={() =>
@@ -147,10 +149,7 @@ export class ApiTable extends Component {
         render: item => (
           <EuiFlexGroup>
             <EuiFlexItem grow={false}>
-              <EuiToolTip
-                position="bottom"
-                content={<p>Set {item._id} as default</p>}
-              >
+              <EuiToolTip position="bottom" content={<p>Set as default</p>}>
                 <EuiButtonIcon
                   iconType={
                     item._id === this.state.currentDefault
@@ -170,6 +169,7 @@ export class ApiTable extends Component {
             <EuiFlexItem grow={false}>
               <EuiToolTip position="bottom" content={<p>Check connection</p>}>
                 <EuiButtonIcon
+                  aria-label="Check connection"
                   iconType="refresh"
                   onClick={() => this.props.checkManager(item)}
                   color="success"
@@ -179,6 +179,7 @@ export class ApiTable extends Component {
             <EuiFlexItem grow={false}>
               <EuiToolTip position="bottom" content={<p>Remove</p>}>
                 <EuiButtonIcon
+                  aria-label="Remove manager"
                   iconType="trash"
                   onClick={() =>
                     this.props.removeManager(item).then(apiEntries =>
@@ -200,11 +201,18 @@ export class ApiTable extends Component {
         width: '40px',
         isExpander: true,
         render: item => (
-          <EuiButtonIcon
-            onClick={() => this.toggleDetails(item)}
-            aria-label={itemIdToExpandedRowMap[item.id] ? 'Collapse' : 'Expand'}
-            iconType={itemIdToExpandedRowMap[item.id] ? 'arrowUp' : 'arrowDown'}
-          />
+          <EuiToolTip position="bottom" content={<p>Edit</p>}>
+            <EuiButtonIcon
+              aria-label="Edit"
+              onClick={() => this.toggleDetails(item)}
+              aria-label={
+                itemIdToExpandedRowMap[item.id] ? 'Collapse' : 'Expand'
+              }
+              iconType={
+                itemIdToExpandedRowMap[item.id] ? 'arrowUp' : 'arrowDown'
+              }
+            />
+          </EuiToolTip>
         )
       }
     ];
@@ -222,6 +230,7 @@ export class ApiTable extends Component {
           <EuiFlexItem />
           <EuiFlexItem grow={false}>
             <EuiButtonEmpty
+              aria-label="Add"
               iconType="plusInCircle"
               onClick={() => this.props.switch()}
             >
@@ -234,3 +243,13 @@ export class ApiTable extends Component {
     );
   }
 }
+
+ApiTable.propTypes = {
+  apiEntries: PropTypes.array,
+  currentDefault: PropTypes.string,
+  updateSettings: PropTypes.func,
+  setDefault: PropTypes.func,
+  checkManager: PropTypes.func,
+  removeManager: PropTypes.func,
+  switch: PropTypes.func
+};

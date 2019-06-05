@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-
+import PropTypes from 'prop-types';
 import {
   EuiCard,
   EuiIcon,
@@ -67,7 +67,7 @@ export class WelcomeScreen extends Component {
   buildPopover(popoverName, extensions) {
     const switches = extensions.map(extension => {
       return (
-        <EuiFormRow>
+        <EuiFormRow key={extension}>
           <EuiSwitch
             label={`${TabDescription[extension].title} extension`}
             checked={this.state.extensions[extension]}
@@ -82,6 +82,7 @@ export class WelcomeScreen extends Component {
         id={popoverName}
         button={
           <EuiButtonIcon
+            aria-label="Extensions"
             iconType="eye"
             onClick={() => this.onButtonClick(popoverName)}
           />
@@ -205,3 +206,10 @@ export class WelcomeScreen extends Component {
     );
   }
 }
+
+WelcomeScreen.propTypes = {
+  extensions: PropTypes.object,
+  switchTab: PropTypes.func,
+  setExtensions: PropTypes.func,
+  api: PropTypes.string
+};

@@ -1,20 +1,6 @@
 import React, { Component } from 'react';
-
-import {
-  EuiCard,
-  EuiIcon,
-  EuiPanel,
-  EuiFlexItem,
-  EuiFlexGroup,
-  EuiSpacer,
-  EuiBasicTable,
-  EuiCode,
-  EuiLink,
-  EuiHealth,
-  EuiSwitch,
-  EuiButtonIcon,
-  EuiButtonEmpty
-} from '@elastic/eui';
+import PropTypes from 'prop-types';
+import { EuiBasicTable, EuiButtonIcon } from '@elastic/eui';
 
 export class ReportingTable extends Component {
   constructor(props) {
@@ -61,7 +47,6 @@ export class ReportingTable extends Component {
       pageSize
     );
 
-
     const columns = [
       {
         field: 'name',
@@ -89,11 +74,13 @@ export class ReportingTable extends Component {
           return (
             <div>
               <EuiButtonIcon
+                aria-label="Download report"
                 onClick={() => this.props.goReport(item.name)}
                 iconType="importAction"
               />
 
               <EuiButtonIcon
+                aria-label="Delete report"
                 onClick={() =>
                   this.props
                     .deleteReport(item.name)
@@ -127,3 +114,9 @@ export class ReportingTable extends Component {
     );
   }
 }
+
+ReportingTable.propTypes = {
+  items: PropTypes.array,
+  goReport: PropTypes.func,
+  deleteReport: PropTypes.func
+};
