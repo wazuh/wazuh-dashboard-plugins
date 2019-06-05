@@ -17,10 +17,11 @@
                     <a ng-if="mctrl.adminMode || adminMode" ng-show="!agent || agent.id === '000'" ng-click="mctrl.setConfigTab('editconfiguration', true)">
                         <react-component name="EuiIcon" props="{type:'pencil', color:'primary'}" /> Edit configuration
                     </a>
-                    <a ng-show="agent && agent.id !== '000'" ng-click="exportConfiguration(agent)">
+                    <button class="btn btn-primary btn-as-i" ng-show="agent && agent.id !== '000'" ng-click="exportConfiguration(agent)"
+                        ng-disabled="reportBusy && reportStatus">
                         <react-component name="EuiIcon" props="{type:'logstashOutput', color:'primary'}" /> Generate
                         configuration report
-                    </a>
+                    </button>
                 </md-card-actions>
                 <md-card-content>
                     <!-- Report status section -->
