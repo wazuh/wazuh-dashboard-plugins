@@ -111,7 +111,9 @@ export class VisualizeDataLoader {
       );
     }
 
-    if ((visParams || {}).valueAxes && (this.visData.series || [])[0]) {
+    const valueAxes = (visParams || {}).valueAxes || false;
+    const hasSeries = ((this.visData || {}).series || []).length;
+    if (valueAxes && hasSeries) {
       if (visParams.type !== 'area') {
         visParams.valueAxes.forEach((axis: { scale: { max: number; }; }, idx: string | number) => {
           const maxValue = Math.max.apply(Math, this.visData.series[idx].values.map((x: { y: any; }) => { return x.y; }));
