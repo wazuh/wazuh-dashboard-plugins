@@ -223,6 +223,10 @@ export class AgentsController {
       this.$location.path('/manager/groups');
     };
 
+    this.$scope.exportConfiguration = agent => {
+      this.reportingService.startConfigReport(agent, 'agentConfig');
+    };
+
     this.$scope.restartAgent = async agent => {
       this.$scope.restartingAgent = true;
       try {

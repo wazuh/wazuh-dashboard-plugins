@@ -13,7 +13,7 @@
 import template from './wz-table.html';
 import { uiModules } from 'ui/modules';
 import { DataFactory } from '../../services/data-factory';
-import { KeyEquivalenece } from '../../../util/csv-key-equivalence';
+import { KeyEquivalence } from '../../../util/csv-key-equivalence';
 import { calcTableRows } from './lib/rows';
 import { parseValue } from './lib/parse-value';
 import * as pagination from './lib/pagination';
@@ -95,7 +95,7 @@ app.directive('wzTable', function() {
         $scope.implicitFilter,
         $scope.implicitSort
       );
-      $scope.keyEquivalence = KeyEquivalenece;
+      $scope.keyEquivalence = KeyEquivalence;
       $scope.totalItems = 0;
       $scope.wazuh_table_loading = true;
       $scope.items = [];
@@ -528,7 +528,7 @@ app.directive('wzTable', function() {
         const items = [];
         for (const key in item) {
           !excluded.includes(key) &&
-            items.push({ key: KeyEquivalenece[key] || key, value: item[key] });
+            items.push({ key: KeyEquivalence[key] || key, value: item[key] });
         }
         const props = {
           items,

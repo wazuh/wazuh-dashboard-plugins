@@ -142,6 +142,14 @@
                 <div ng-if='!addingAgents'>
                     <!-- Group agents table -->
                     <md-card flex class="wz-md-card _md flex md-margin-h wz-margin-top-16" ng-if="lookingGroup && groupsSelectedTab==='agents' && currentGroup">
+                        <md-card-actions layout="row" class="wz-card-actions wz-card-actions-top layout-align-end-center">
+                            <button class="btn btn-primary btn-as-i" ng-click="exportConfiguration(currentGroup)"
+                                ng-disabled="reportBusy && reportStatus">
+                                <react-component ng-show="!reportBusy || !reportStatus" name="EuiIcon" props="{type:'importAction', color:'primary'}" />
+                                <react-component ng-show="reportBusy && reportStatus" name="EuiLoadingSpinner" props="{size:'m'}" />
+                                PDF
+                            </button>
+                        </md-card-actions>
                         <div layout="row" ng-show="failedErrors" class="extraHeader">
                             <md-list>
                                 <md-list-item class="error-enum-configuration" ng-repeat="group in failedErrors">
@@ -174,6 +182,14 @@
 
                     <!-- Group files table -->
                     <md-card flex class="wz-md-card _md flex md-margin-h wz-margin-top-16" ng-if="lookingGroup && groupsSelectedTab==='files' && !fileViewer && currentGroup">
+                        <md-card-actions layout="row" class="wz-card-actions wz-card-actions-top layout-align-end-center">
+                            <button class="btn btn-primary btn-as-i" ng-click="exportConfiguration(currentGroup)"
+                                ng-disabled="reportBusy && reportStatus">
+                                <react-component ng-show="!reportBusy || !reportStatus" name="EuiIcon" props="{type:'importAction', color:'primary'}" />
+                                <react-component ng-show="reportBusy && reportStatus" name="EuiLoadingSpinner" props="{size:'m'}" />
+                                PDF
+                            </button>
+                        </md-card-actions>
                         <md-card-content>
                             <div layout="row">
                                 <wz-table custom-columns="true" extra-limit="100" flex path="'/agents/groups/' + currentGroup.name + '/files'"

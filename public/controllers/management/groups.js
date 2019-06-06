@@ -22,7 +22,8 @@ export function GroupsController(
   shareAgent,
   groupHandler,
   wzTableFilter,
-  wazuhConfig
+  wazuhConfig,
+  reportingService
 ) {
   $scope.addingGroup = false;
   $scope.$on('groupsIsReloaded', () => {
@@ -236,6 +237,10 @@ export function GroupsController(
     $scope.lookingGroup = false;
     $scope.editingFile = false;
     $scope.$applyAsync();
+  };
+
+  $scope.exportConfiguration = group => {
+    reportingService.startConfigReport(group, 'groupConfig');
   };
 
   /**

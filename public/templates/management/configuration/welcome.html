@@ -13,65 +13,60 @@
     <div flex layout="row">
         <div flex layout="column">
             <md-card flex class="wz-md-card _md flex">
-                <md-card-actions ng-if="mctrl.adminMode || adminMode" ng-show="!agent || agent.id === '000'"
-                    layout="row" class="wz-card-actions wz-card-actions-top layout-align-start-center">
-                    <a ng-click="mctrl.setConfigTab('editconfiguration', true)">
+                <md-card-actions layout="row" class="wz-card-actions wz-card-actions-top layout-align-end-center">
+                    <a ng-if="mctrl.adminMode || adminMode" ng-show="!agent || agent.id === '000'" ng-click="mctrl.setConfigTab('editconfiguration', true)">
                         <react-component name="EuiIcon" props="{type:'pencil', color:'primary'}" /> Edit configuration
                     </a>
-
+                    <button class="btn btn-primary btn-as-i" ng-show="agent && agent.id !== '000'" ng-click="exportConfiguration(agent)"
+                        ng-disabled="reportBusy && reportStatus">
+                        <react-component ng-show="!reportBusy || !reportStatus" name="EuiIcon" props="{type:'importAction', color:'primary'}" />
+                        <react-component ng-show="reportBusy && reportStatus" name="EuiLoadingSpinner" props="{size:'m'}" />
+                        PDF
+                    </button>
                 </md-card-actions>
                 <md-card-content>
                     <span class="font-size-16 wz-text-bold">Main configurations</span>
                     <md-divider class="wz-margin-top-10"></md-divider>
-                    <table ng-if="!agent || agent.id === '000'"
-                        class="table table-striped table-condensed table-layout-fixed table-hover table-vertical-align-middle">
+                    <table ng-if="!agent || agent.id === '000'" class="table table-striped table-condensed table-layout-fixed table-hover table-vertical-align-middle">
                         <thead class="wz-text-bold">
                             <th class="wz-text-left col-lg-2">Name</th>
                             <th class="wz-text-left">Description</th>
                         </thead>
                         <tbody>
-                            <tr class="cursor-pointer"
-                                ng-click="switchConfigTab('global-configuration', [{component:'analysis',configuration:'global'},{component:'mail',configuration:'global'},{component:'request',configuration:'remote'},{component:'com',configuration:'logging'}])">
+                            <tr class="cursor-pointer" ng-click="switchConfigTab('global-configuration', [{component:'analysis',configuration:'global'},{component:'mail',configuration:'global'},{component:'request',configuration:'remote'},{component:'com',configuration:'logging'}])">
                                 <td>Global configuration</td>
                                 <td>Global and remote settings</td>
                             </tr>
-                            <tr class="cursor-pointer"
-                                ng-click="switchConfigTab('cluster', [{component:'com',configuration:'cluster'}])">
+                            <tr class="cursor-pointer" ng-click="switchConfigTab('cluster', [{component:'com',configuration:'cluster'}])">
                                 <td>Cluster</td>
                                 <td>Master node configuration</td>
                             </tr>
-                            <tr class="cursor-pointer"
-                                ng-click="switchConfigTab('registration-service', [{component:'auth',configuration:'auth'}])">
+                            <tr class="cursor-pointer" ng-click="switchConfigTab('registration-service', [{component:'auth',configuration:'auth'}])">
                                 <td>Registration service</td>
                                 <td>Automatic agent registration service</td>
                             </tr>
                         </tbody>
                     </table>
 
-                    <table ng-if="agent && agent.id !== '000'"
-                        class="table table-striped table-condensed table-layout-fixed table-hover table-vertical-align-middle">
+                    <table ng-if="agent && agent.id !== '000'" class="table table-striped table-condensed table-layout-fixed table-hover table-vertical-align-middle">
                         <thead class="wz-text-bold">
                             <th class="wz-text-left col-lg-2">Name</th>
                             <th class="wz-text-left">Description</th>
                         </thead>
                         <tbody>
-                            <tr class="cursor-pointer"
-                                ng-click="switchConfigTab('global-configuration', [{component:'com',configuration:'logging'}])">
+                            <tr class="cursor-pointer" ng-click="switchConfigTab('global-configuration', [{component:'com',configuration:'logging'}])">
                                 <td>Global configuration</td>
                                 <td>Logging settings that apply to the agent</td>
                             </tr>
-                            <tr class="cursor-pointer"
-                                ng-click="switchConfigTab('client', [{component:'agent',configuration:'client'}])">
+                            <tr class="cursor-pointer" ng-click="switchConfigTab('client', [{component:'agent',configuration:'client'}])">
                                 <td>Communication</td>
                                 <td>Settings related to the connection with the manager</td>
                             </tr>
-                            <tr class="cursor-pointer"
-                                ng-click="switchConfigTab('client-buffer', [{component:'agent',configuration:'buffer'}])">
+                            <tr class="cursor-pointer" ng-click="switchConfigTab('client-buffer', [{component:'agent',configuration:'buffer'}])">
                                 <td>Anti-flooding settings</td>
                                 <td>Agent bucket parameters to avoid event flooding</td>
                             </tr>
-                            <tr class="cursor-pointer"
-                                ng-click="switchConfigTab('alerts',[{component:'agent',configuration:'labels'}])">
+                            <tr class="cursor-pointer" ng-click="switchConfigTab('alerts',[{component:'agent',configuration:'labels'}])">
                                 <td>Labels</td>
                                 <td>User-defined information about the agent included in alerts</td>
                             </tr>
@@ -81,20 +76,17 @@
                     <span ng-if="!agent || agent.id === '000'" class="font-size-16 wz-text-bold">Alerts and output
                         management</span>
                     <md-divider ng-if="!agent || agent.id === '000'" class="wz-margin-top-10"></md-divider>
-                    <table ng-if="!agent || agent.id === '000'"
-                        class="table table-striped table-condensed table-layout-fixed table-hover table-vertical-align-middle">
+                    <table ng-if="!agent || agent.id === '000'" class="table table-striped table-condensed table-layout-fixed table-hover table-vertical-align-middle">
                         <thead class="wz-text-bold">
                             <th class="wz-text-left col-lg-2">Name</th>
                             <th class="wz-text-left">Description</th>
                         </thead>
                         <tbody>
-                            <tr class="cursor-pointer"
-                                ng-click="switchConfigTab('alerts',[{component:'analysis',configuration:'alerts'},{component:'analysis',configuration:'labels'},{component:'mail',configuration:'alerts'},{component:'monitor',configuration:'reports'}, {component:'csyslog',configuration:'csyslog'}])">
+                            <tr class="cursor-pointer" ng-click="switchConfigTab('alerts',[{component:'analysis',configuration:'alerts'},{component:'analysis',configuration:'labels'},{component:'mail',configuration:'alerts'},{component:'monitor',configuration:'reports'}, {component:'csyslog',configuration:'csyslog'}])">
                                 <td>Alerts</td>
                                 <td>Settings related to the alerts and their format</td>
                             </tr>
-                            <tr class="cursor-pointer"
-                                ng-click="switchConfigTab('integrations',[{component:'integrator',configuration:'integration'}])">
+                            <tr class="cursor-pointer" ng-click="switchConfigTab('integrations',[{component:'integrator',configuration:'integration'}])">
                                 <td>Integrations</td>
                                 <td>Slack, VirusTotal and PagerDuty integrations with external APIs</td>
                             </tr>
@@ -103,15 +95,13 @@
 
                     <span class="font-size-16 wz-text-bold">Auditing and policy monitoring</span>
                     <md-divider class="wz-margin-top-10"></md-divider>
-                    <table
-                        class="table table-striped table-condensed table-layout-fixed table-hover table-vertical-align-middle">
+                    <table class="table table-striped table-condensed table-layout-fixed table-hover table-vertical-align-middle">
                         <thead class="wz-text-bold">
                             <th class="wz-text-left col-lg-2">Name</th>
                             <th class="wz-text-left">Description</th>
                         </thead>
                         <tbody>
-                            <tr class="cursor-pointer"
-                                ng-click="switchConfigTab('policy-monitoring', [{component:'syscheck',configuration:'rootcheck'}, {component:'wmodules',configuration:'wmodules'}])">
+                            <tr class="cursor-pointer" ng-click="switchConfigTab('policy-monitoring', [{component:'syscheck',configuration:'rootcheck'}, {component:'wmodules',configuration:'wmodules'}])">
                                 <td>Policy monitoring</td>
                                 <td>Configuration to ensure compliance with security policies, standards and hardening
                                     guides</td>
@@ -131,15 +121,13 @@
 
                     <span class="font-size-16 wz-text-bold">System threats and incident response</span>
                     <md-divider class="wz-margin-top-10"></md-divider>
-                    <table
-                        class="table table-striped table-condensed table-layout-fixed table-hover table-vertical-align-middle">
+                    <table class="table table-striped table-condensed table-layout-fixed table-hover table-vertical-align-middle">
                         <thead class="wz-text-bold">
                             <th class="wz-text-left col-lg-2">Name</th>
                             <th class="wz-text-left">Description</th>
                         </thead>
                         <tbody>
-                            <tr class="cursor-pointer" ng-if="!agent || agent.id === '000'"
-                                ng-click="switchWodle('vulnerability-detector')">
+                            <tr class="cursor-pointer" ng-if="!agent || agent.id === '000'" ng-click="switchWodle('vulnerability-detector')">
                                 <td>Vulnerabilities</td>
                                 <td>Discover what applications are affected by well-known vulnerabilities</td>
                             </tr>
@@ -153,14 +141,12 @@
                                 <td>Gather relevant information about system OS, hardware, networking and packages
                                 </td>
                             </tr>
-                            <tr class="cursor-pointer" ng-if="!agent || agent.id === '000'"
-                                ng-click="switchConfigTab('active-response',[{component:'analysis',configuration:'command'},{component:'analysis',configuration:'active_response'}])">
+                            <tr class="cursor-pointer" ng-if="!agent || agent.id === '000'" ng-click="switchConfigTab('active-response',[{component:'analysis',configuration:'command'},{component:'analysis',configuration:'active_response'}])">
                                 <td>Active response</td>
                                 <td>Active threat addressing by inmmediate response
                                 </td>
                             </tr>
-                            <tr class="cursor-pointer" ng-if="agent && agent.id !== '000'"
-                                ng-click="switchConfigTab('active-response',[{component:'com',configuration:'active-response'}])">
+                            <tr class="cursor-pointer" ng-if="agent && agent.id !== '000'" ng-click="switchConfigTab('active-response',[{component:'com',configuration:'active-response'}])">
                                 <td>Active response</td>
                                 <td>Active threat addressing by inmmediate response
                                 </td>
@@ -181,26 +167,22 @@
 
                     <span class="font-size-16 wz-text-bold">Log data analysis</span>
                     <md-divider class="wz-margin-top-10"></md-divider>
-                    <table
-                        class="table table-striped table-condensed table-layout-fixed table-hover table-vertical-align-middle">
+                    <table class="table table-striped table-condensed table-layout-fixed table-hover table-vertical-align-middle">
                         <thead class="wz-text-bold">
                             <th class="wz-text-left col-lg-2">Name</th>
                             <th class="wz-text-left">Description</th>
                         </thead>
                         <tbody>
-                            <tr class="cursor-pointer"
-                                ng-click="switchConfigTab('log-collection',[{component:'logcollector',configuration:'localfile'},{component:'logcollector',configuration:'socket'}])">
+                            <tr class="cursor-pointer" ng-click="switchConfigTab('log-collection',[{component:'logcollector',configuration:'localfile'},{component:'logcollector',configuration:'socket'}])">
                                 <td>Log collection</td>
                                 <td>Log analysis from text files, Windows events or syslog outputs</td>
                             </tr>
-                            <tr class="cursor-pointer"
-                                ng-click="switchConfigTab('integrity-monitoring',[{component:'syscheck',configuration:'syscheck'}])">
+                            <tr class="cursor-pointer" ng-click="switchConfigTab('integrity-monitoring',[{component:'syscheck',configuration:'syscheck'}])">
                                 <td>Integrity monitoring</td>
                                 <td>Identify changes in content, permissions, ownership, and attributes of files
                                 </td>
                             </tr>
-                            <tr class="cursor-pointer" ng-if="!agent || agent.id === '000'"
-                                ng-click="switchConfigTab('agentless',[{component:'agentless',configuration:'agentless'}])">
+                            <tr class="cursor-pointer" ng-if="!agent || agent.id === '000'" ng-click="switchConfigTab('agentless',[{component:'agentless',configuration:'agentless'}])">
                                 <td>Agentless</td>
                                 <td>Run integrity checks on devices such as routers, firewalls and switches
                                 </td>
@@ -211,8 +193,7 @@
                     <span ng-if="!agent || agent.id === '000'" class="font-size-16 wz-text-bold">Cloud security
                         monitoring</span>
                     <md-divider ng-if="!agent || agent.id === '000'" class="wz-margin-top-10"></md-divider>
-                    <table ng-if="!agent || agent.id === '000'"
-                        class="table table-striped table-condensed table-layout-fixed table-hover table-vertical-align-middle">
+                    <table ng-if="!agent || agent.id === '000'" class="table table-striped table-condensed table-layout-fixed table-hover table-vertical-align-middle">
                         <thead class="wz-text-bold">
                             <th class="wz-text-left col-lg-2">Name</th>
                             <th class="wz-text-left">Description</th>
@@ -234,14 +215,11 @@
             </span>
             <md-list ng-if="showHelp">
                 <md-subheader>More info about this section</md-subheader>
-                <md-list-item target="_blank" class="wz-text-link"
-                    ng-href="https://documentation.wazuh.com/current/user-manual/manager/index.html">Wazuh
+                <md-list-item target="_blank" class="wz-text-link" ng-href="https://documentation.wazuh.com/current/user-manual/manager/index.html">Wazuh
                     administration documentation</md-list-item>
-                <md-list-item target="_blank" class="wz-text-link"
-                    ng-href="https://documentation.wazuh.com/current/user-manual/capabilities/index.html">Wazuh
+                <md-list-item target="_blank" class="wz-text-link" ng-href="https://documentation.wazuh.com/current/user-manual/capabilities/index.html">Wazuh
                     capabilities documentation</md-list-item>
-                <md-list-item target="_blank" class="wz-text-link"
-                    ng-href="https://documentation.wazuh.com/current/user-manual/reference/ossec-conf/index.html">Local
+                <md-list-item target="_blank" class="wz-text-link" ng-href="https://documentation.wazuh.com/current/user-manual/reference/ossec-conf/index.html">Local
                     configuration reference</md-list-item>
             </md-list>
         </md-sidenav>
