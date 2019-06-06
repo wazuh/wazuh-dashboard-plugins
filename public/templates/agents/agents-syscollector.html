@@ -82,11 +82,12 @@
                     ng-bind="offsetTimestamp('Last scan: ', syscollector.ports.items[0].scan.time)"></span>
                 <md-divider class="wz-margin-top-10"></md-divider>
                 <wz-table-eui flex ng-if="agent && agent.os && agent.os.platform === 'windows'"
-                    path="'/syscollector/' + agent.id + '/ports'"
+                    path="'/syscollector/' + agent.id + '/ports'" initial-sort-field="'protocol'"
                     keys="['process','local.ip','local.port','state','protocol']">
                 </wz-table-eui>
                 <wz-table-eui flex ng-if="agent && agent.os && agent.os.platform !== 'windows'"
-                    path="'/syscollector/' + agent.id + '/ports'" keys="['local.ip','local.port','state','protocol']">
+                    path="'/syscollector/' + agent.id + '/ports'" initial-sort-field="'protocol'"
+                    keys="['local.ip','local.port','state','protocol']">
                 </wz-table-eui>
             </md-card-content>
         </md-card>
@@ -104,7 +105,7 @@
                     <react-component name="EuiIcon" props="{type:'controlsHorizontal'}" /> Network settings</span>
                 <md-divider class="wz-margin-top-10"></md-divider>
                 <wz-table-eui flex path="'/syscollector/' + agent.id + '/netaddr'"
-                    keys="['iface', 'address', 'netmask', 'proto', 'broadcast']">
+                    keys="['iface', 'address', 'netmask', 'proto', 'broadcast']" initial-sort-field="'iface'">
                 </wz-table-eui>
             </md-card-content>
         </md-card>
@@ -138,7 +139,7 @@
 
                 <div layout="row" ng-if="agent && syscollector && !load" class="wz-margin-top-10">
                     <wz-table-eui flex ng-if="agent && agent.os && agent.os.platform !== 'windows'"
-                        path="'/syscollector/' + agent.id + '/packages'"
+                        path="'/syscollector/' + agent.id + '/packages'" initial-sort-field="'name'"
                         keys="['name',{value:'architecture',width: '10%'},'version',{value:'vendor',width: '30%'},{value:'description',width: '30%'}]" />
                     <wz-table-eui flex ng-if="agent && agent.os && agent.os.platform === 'windows'"
                         path="'/syscollector/' + agent.id + '/packages'"

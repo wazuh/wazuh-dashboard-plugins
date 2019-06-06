@@ -17,6 +17,7 @@ import { KeyEquivalenece } from '../../../util/csv-key-equivalence';
 import * as listeners from './lib/listeners';
 import { searchData, filterData, queryData } from './lib/data';
 import { initTable } from './lib/init';
+import { sort } from './lib/sort';
 
 const app = uiModules.get('app/wazuh', []);
 
@@ -25,14 +26,17 @@ app.directive('wzTableEui', function() {
     restrict: 'E',
     scope: {
       path: '=path',
-      keys: '=keys'
+      keys: '=keys',
+      initialSortField: '=initialSortField'
     },
     controller($scope, apiReq, errorHandler, wzTableFilter) {
+
       const parseColumns = columnsArray => {
         return columnsArray.map(item => ({
           name: KeyEquivalenece[item.value || item] || item.value || item,
           field: item.value || item,
           width: item.width || undefined,
+          sortable: typeof item.sortable !== 'undefined' ? item.sortable : true,
           render: value => value || '-'
         }));
       };
@@ -41,11 +45,11 @@ app.directive('wzTableEui', function() {
 
       const fetch = async (options = {}) => {
         try {
-
           const result = await instance.fetch(options);
           items = result.items;
           $scope.items = items;
-          return;
+          $scope.$applyAsync();
+          return items;
         } catch (error) {
           if (
             error &&
@@ -60,9 +64,11 @@ app.directive('wzTableEui', function() {
       };
 
       $scope.basicTableProps = {
+        initialSortField: $scope.initialSortField || false,
         columns: parseColumns($scope.keys),
         items: [],
-        getData: options => fetch(options)
+        getData: options => fetch(options),
+        sortByField: field => sort(field, $scope, instance, fetch, errorHandler)
         //noItemsMessage: 'Change this'
       };
 

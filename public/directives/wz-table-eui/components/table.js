@@ -9,7 +9,14 @@ export class BasicTable extends Component {
     this.state = {
       items: this.props.items,
       pageIndex: 0,
-      pageSize: 10
+      pageSize: 10,
+      sortField: this.props.initialSortField || this.props.columns[0].field,
+      sortDirection: 'desc'
+    };
+
+    this.lastSorting = {
+      sortField: this.props.initialSortField || this.props.columns[0].field,
+      sortDirection: 'desc'
     };
   }
 
@@ -19,21 +26,38 @@ export class BasicTable extends Component {
     });
   }
 
-  async onTableChange({ page = {} }) {
+  async onTableChange({ page = {}, sort = {} }) {
     const { index: pageIndex, size: pageSize } = page;
-    const { pageOfItems } = this.filterItems(pageIndex, pageSize);
-    const needMoreData = pageOfItems.includes(null);
+    const { field: sortField, direction: sortDirection } = sort;
 
-    if (needMoreData) {
+    const sortingChanged =
+      this.lastSorting.sortField !== sortField ||
+      this.lastSorting.sortDirection !== sortDirection;
+
+    if (sortingChanged) {
+      this.lastSorting = { sortField, sortDirection };
+      await this.props.sortByField(sortField);
+    }
+
+    const { pageOfItems } = this.filterItems(pageIndex, pageSize);
+    let needMoreData = pageOfItems.includes(null);
+
+    while (needMoreData) {
       const { items } = this.state;
       const nonNull = items.filter(item => !!item).length;
-      await this.props.getData({ offset: nonNull });
-      return this.onTableChange({ page });
+      const newItems = await this.props.getData({ offset: nonNull });
+      await this.promisedSetState({
+        items: newItems
+      });
+      const result = this.filterItems(pageIndex, pageSize);
+      needMoreData = result.pageOfItems.includes(null);
     }
 
     this.setState({
       pageIndex,
-      pageSize
+      pageSize,
+      sortField,
+      sortDirection
     });
   }
 
@@ -56,7 +80,7 @@ export class BasicTable extends Component {
   }
 
   render() {
-    const { pageIndex, pageSize } = this.state;
+    const { pageIndex, pageSize, sortField, sortDirection } = this.state;
 
     const { pageOfItems, totalItemCount } = this.filterItems(
       pageIndex,
@@ -73,9 +97,17 @@ export class BasicTable extends Component {
       hidePerPageOptions: this.state.items.length <= 10
     };
 
+    const sorting = {
+      sort: {
+        field: sortField,
+        direction: sortDirection
+      }
+    };
+
     return (
       <div>
         <EuiBasicTable
+          sorting={sorting}
           items={pageOfItems}
           columns={columns}
           pagination={pagination}

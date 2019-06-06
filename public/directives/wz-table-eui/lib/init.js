@@ -21,6 +21,7 @@ export async function initTable(
   try {
     $scope.error = false;
     $scope.wazuh_table_loading = true;
+    instance.addSorting($scope.initialSortField);
     await fetch({ skipFetching });
     wzTableFilter.set(instance.filters);
     $scope.wazuh_table_loading = false;
