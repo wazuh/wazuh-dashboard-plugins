@@ -20,7 +20,6 @@ import { checkKnownFields } from './lib/refresh-known-fields';
 import { totalmem } from 'os';
 import fs from 'fs';
 import path from 'path';
-import { createSourceMapSource } from 'typescript';
 
 export function Initialize(server) {
   const wazuhVersion = path.join(__dirname, '/wazuh-version.json');
@@ -87,7 +86,7 @@ export function Initialize(server) {
         });
         log(
           'initialize:saveConfiguration',
-          'Wazuh configuration inserted',
+          'Wazuh configuration registry inserted',
           'debug'
         );
       } catch (error) {
@@ -103,7 +102,7 @@ export function Initialize(server) {
       log('initialize:saveConfiguration', error.message || error);
       server.log(
         [blueWazuh, 'initialize', 'error'],
-        'Error creating wazuh-version registry.'
+        'Error creating wazuh-version registry'
       );
     }
   };
@@ -220,14 +219,14 @@ export function Initialize(server) {
       try {
         await wzWrapper.deleteWazuhVersionIndex();
         log(
-          'monitoring:checkWazuhVersionRegistry',
-          'Successfully deleted old wazuh-index pattern.',
+          'initialize[checkWazuhVersionRegistry]',
+          'Successfully deleted old .wazuh-index index.',
           'debug'
         );
       } catch (error) {
         log(
           'initialize[checkWazuhVersionRegistry]',
-          'No need to delete old wazuh-version index',
+          'No need to delete old .wazuh-version index',
           'debug'
         );
       }
@@ -239,7 +238,7 @@ export function Initialize(server) {
       } catch (error) {
         log(
           'initialize[checkWazuhVersionRegistry]',
-          '.wazuh-version document does not exist. Initializating configuration...',
+          'wazuh-version registry does not exist. Initializating configuration...',
           'debug'
         );
 
