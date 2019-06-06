@@ -27,13 +27,7 @@ export class RegisterAgent extends Component {
     this.state = {
       status: 'incomplete',
       selectedOS: '',
-      serverAddress: '',
-      osSteps: {
-        rpm: 2,
-        deb: 4,
-        win: 1,
-        macos: 1
-      }
+      serverAddress: ''
     };
   }
 
@@ -82,7 +76,7 @@ export class RegisterAgent extends Component {
       <EuiFieldText
         placeholder="Server address..."
         value={this.state.serverAddress}
-        onChange={this.setServerAddress}
+        onChange={event => this.setServerAddress(event)}
       />
     );
 
@@ -99,25 +93,23 @@ export class RegisterAgent extends Component {
     };
 
     const customTexts = {
-      rpmText2: `WAZUH_MANAGER_IP='${
+      rpmText: `WAZUH_MANAGER_IP='${
         this.state.serverAddress
         }' yum install wazuh-agent`,
-      debText4: `WAZUH_MANAGER_IP='${
+      debText: `WAZUH_MANAGER_IP='${
         this.state.serverAddress
         }' apt-get install wazuh-agent`,
-      macosText1: `launchctl setenv WAZUH_MANAGER_IP '${
+      macosText: `launchctl setenv WAZUH_MANAGER_IP '${
         this.state.serverAddress
         }' && installer -pkg wazuh-agent-.pkg -target /`,
-      winText1: `wazuh-agent-3.9.1-1.msi /q ADDRESS='${
+      winText: `wazuh-agent-3.9.1-1.msi /q ADDRESS='${
         this.state.serverAddress
         }' AUTHD_SERVER='${this.state.serverAddress}'`
     };
 
-    let text = '';
-    for (let i = 0; i < this.state.osSteps[this.state.selectedOS]; i++) {
-      const field = `${this.state.selectedOS}Text${i + 1}`;
-      text = text.concat(`${RegisterGuideDefs[field] || customTexts[field]}\n`);
-    }
+    const field = `${this.state.selectedOS}Text`;
+    const text = customTexts[field];
+
     const guide = (
       <div>
         {(this.state.selectedOS) && (
