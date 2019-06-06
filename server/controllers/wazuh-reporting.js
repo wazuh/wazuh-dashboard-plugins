@@ -466,11 +466,7 @@ export class WazuhReportingCtrl {
           });
         } else if (section === 'groupConfig') {
           this.dd.content.push({
-            text: `Group ${tab} configuration`,
-            style: 'h1'
-          });
-          this.dd.content.push({
-            text: `${isAgents.length} Agents in group`,
+            text: `Agents in group`,
             style: { fontSize: 14, color: '#000' },
             margin: [0, 20, 0, 0]
           });
@@ -479,7 +475,7 @@ export class WazuhReportingCtrl {
       }
 
       if (isAgents && typeof isAgents === 'object') {
-        await this.buildAgentsTable(isAgents, apiId);
+        await this.buildAgentsTable(isAgents, apiId, section === 'groupConfig' ? tab : false);
       }
 
       if (isAgents && typeof isAgents === 'string') {
@@ -626,19 +622,29 @@ export class WazuhReportingCtrl {
    * @param {Array<Strings>} ids ids of agents
    * @param {String} apiId API id
    */
-  async buildAgentsTable(ids, apiId) {
+  async buildAgentsTable(ids, apiId, multi = false) {
     if (!ids || !ids.length) return;
     try {
       const rows = [];
       for (const item of ids) {
         let data = false;
         try {
-          const agent = await this.apiRequest.makeGenericRequest(
-            'GET',
-            `/agents/${item}`,
-            {},
-            apiId
-          );
+          let agent = {};
+          if (multi) {
+            agent = await this.apiRequest.makeGenericRequest(
+              'GET',
+              `/agents/groups/${multi}`,
+              {},
+              apiId
+            );
+          } else {
+            agent = await this.apiRequest.makeGenericRequest(
+              'GET',
+              `/agents/${item}`,
+              {},
+              apiId
+            );
+          }
           if (agent && agent.data) {
             data = {};
             Object.assign(data, agent.data);
@@ -1616,23 +1622,12 @@ export class WazuhReportingCtrl {
         let tables = [];
         if (isGroupConfig) {
           const g_id = kfilters[0].group;
-          let agentsInGroup = [];
-          try {
-            agentsInGroup = await this.apiRequest.makeGenericRequest(
-              'GET',
-              `/agents/groups/${g_id}`,
-              {},
-              apiId
-            );
-          } catch (err) { } //eslint-disable-line
-          await this.renderHeader(
-            tab,
-            g_id,
-            (((agentsInGroup || []).data || []).items || []).map(x => x.id),
-            apiId
-          );
           kfilters = [];
           let configuration = {};
+          this.dd.content.push({
+            text: `Group ${g_id} configuration`,
+            style: 'h1'
+          });
           try {
             configuration = await this.apiRequest.makeGenericRequest(
               'GET',
@@ -1643,7 +1638,7 @@ export class WazuhReportingCtrl {
           } catch (err) { } //eslint-disable-line
           if (Object.keys(configuration.data.items[0].config).length) {
             this.dd.content.push({
-              text: `${configuration.data.items.length} Configurations`,
+              text: `Configurations`,
               style: { fontSize: 14, color: '#000' },
               margin: [0, 10, 0, 15]
             });
@@ -1686,10 +1681,60 @@ export class WazuhReportingCtrl {
                 }
                 section.tabs.push(_d);
                 if (Array.isArray(config.config[_d])) {
-                  for (let _d2 of config.config[_d]) {
-                    tables.push(...this.getConfigTables(_d2, section, idx));
+                  /* LOG COLLECTOR */
+                  if (_d === 'localfile') {
+                    let groups = [];
+                    config.config[_d].forEach(obj => {
+                      if (!groups[obj.logformat]) {
+                        groups[obj.logformat] = [];
+                      }
+                      groups[obj.logformat].push(obj);
+                    });
+                    Object.keys(groups).forEach(group => {
+                      let saveidx = 0;
+                      groups[group].forEach((x, i) => {
+                        if (
+                          Object.keys(x).length >
+                          Object.keys(groups[group][saveidx]).length
+                        ) {
+                          saveidx = i;
+                        }
+                      });
+                      const columns = Object.keys(
+                        groups[group][saveidx]
+                      );
+                      const rows = groups[group].map(x => {
+                        let row = [];
+                        columns.forEach(key => {
+                          row.push(
+                            typeof x[key] !== 'object'
+                              ? x[key]
+                              : Array.isArray(x[key])
+                                ? x[key].map(x => {
+                                  return x + '\n';
+                                })
+                                : JSON.stringify(x[key])
+                          );
+                        });
+                        return row;
+                      });
+                      columns.forEach((col, i) => {
+                        columns[i] = col[0].toUpperCase() + col.slice(1);
+                      });
+                      tables.push({
+                        title: 'Local files',
+                        type: 'table',
+                        columns,
+                        rows
+                      });
+                    });
+                  } else {
+                    for (let _d2 of config.config[_d]) {
+                      tables.push(...this.getConfigTables(_d2, section, idx));
+                    }
                   }
-                } else {
+                }
+                else {
                   tables.push(
                     ...this.getConfigTables(config.config[_d], section, idx)
                   );
@@ -1702,6 +1747,21 @@ export class WazuhReportingCtrl {
               tables = [];
             }
           }
+          let agentsInGroup = [];
+          try {
+            agentsInGroup = await this.apiRequest.makeGenericRequest(
+              'GET',
+              `/agents/groups/${g_id}`,
+              {},
+              apiId
+            );
+          } catch (err) { } //eslint-disable-line
+          await this.renderHeader(
+            tab,
+            g_id,
+            (((agentsInGroup || []).data || []).items || []).map(x => x.id),
+            apiId
+          );
         }
         if (isAgentConfig) {
           const configurations = AgentConfiguration.configurations;
