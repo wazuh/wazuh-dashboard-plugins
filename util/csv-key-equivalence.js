@@ -101,5 +101,6 @@ export const KeyEquivalenece = {
   registry: 'Registry',
   date: 'Date',
   value: 'Value',
-  location: 'Location'
+  location: 'Location',
+  mtu: 'MTU'
 };
