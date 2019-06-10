@@ -48,6 +48,11 @@
                 <div class="euiFlexItem--flexGrowZero wz-margin-left-16">CPU: <span
                         class="wz-text-bold">{{ syscollector.hardware.cpu.name }}</span>
                 </div>
+                <div flex></div>
+                <div class="euiFlexItem--flexGrowZero wz-margin-left-16"
+                    ng-if="syscollector.os.scan && syscollector.os.scan.time">Last scan: <span
+                        class="wz-text-bold">{{ offsetTimestamp('',syscollector.os.scan.time)  }}</span>
+                </div>
             </md-card-content>
         </md-card>
     </div>
@@ -68,18 +73,18 @@
         </md-card>
         <md-card flex class="wz-md-card" ng-if="agent && agent.os && agent.os.platform !== 'darwin'>
             <md-card-content>
-                <span class="wz-headline-title">
-                    <react-component name="EuiIcon" props="{type:'inputOutput'}" /> Network ports
-                </span>
-                <md-divider class="wz-margin-top-10"></md-divider>
-                <wz-table-eui flex ng-if="agent && agent.os && agent.os.platform === 'windows'"
-                    path="'/syscollector/' + agent.id + '/ports'" initial-sort-field="'process'"
-                    keys="['process',{value:'local.ip', sortable:false},{value:'local.port', sortable:false},'state','protocol']">
-                </wz-table-eui>
-                <wz-table-eui flex ng-if="agent && agent.os && agent.os.platform !== 'windows'"
-                    path="'/syscollector/' + agent.id + '/ports'" initial-sort-field="'protocol'"
-                    keys="[{value:'local.ip', sortable:false},{value:'local.port', sortable:false},'state','protocol']">
-                </wz-table-eui>
+                <span class=" wz-headline-title">
+            <react-component name="EuiIcon" props="{type:'inputOutput'}" /> Network ports
+            </span>
+            <md-divider class="wz-margin-top-10"></md-divider>
+            <wz-table-eui flex ng-if="agent && agent.os && agent.os.platform === 'windows'"
+                path="'/syscollector/' + agent.id + '/ports'" initial-sort-field="'process'"
+                keys="['process',{value:'local.ip', sortable:false},{value:'local.port', sortable:false},'state','protocol']">
+            </wz-table-eui>
+            <wz-table-eui flex ng-if="agent && agent.os && agent.os.platform !== 'windows'"
+                path="'/syscollector/' + agent.id + '/ports'" initial-sort-field="'protocol'"
+                keys="[{value:'local.ip', sortable:false},{value:'local.port', sortable:false},'state','protocol']">
+            </wz-table-eui>
             </md-card-content>
         </md-card>
     </div>
