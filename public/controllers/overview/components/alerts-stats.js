@@ -14,7 +14,7 @@ export class AlertsStats extends Component {
       return (
         <EuiFlexItem key={`${item.description}${item.value}`}>
           <EuiStat
-            title={item.value}
+            title={item.value || '-'}
             description={item.description}
             titleColor={item.color || 'primary'}
             textAlign="center"
