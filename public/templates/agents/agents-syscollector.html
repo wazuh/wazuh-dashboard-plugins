@@ -78,7 +78,7 @@
                 </wz-table-eui>
                 <wz-table-eui flex ng-if="agent && agent.os && agent.os.platform !== 'windows'"
                     path="'/syscollector/' + agent.id + '/ports'" initial-sort-field="'protocol'"
-                    keys="[{value:'local.ip', sortable:false},{value:'local.port', sortable:false}','state','protocol']">
+                    keys="[{value:'local.ip', sortable:false},{value:'local.port', sortable:false},'state','protocol']">
                 </wz-table-eui>
             </md-card-content>
         </md-card>
