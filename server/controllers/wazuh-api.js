@@ -57,13 +57,7 @@ export class WazuhApiCtrl {
         );
       }
       log('wazuh-api:checkStoredAPI', `${req.payload} exists`, 'debug');
-      // Always check the daemons before requesting any endpoint
-      try {
-        await this.checkDaemons(api, null);
-      } catch (error) {
-        const isDown = (error || {}).code === 'ECONNREFUSED';
-        if (!isDown) return ErrorResponse('ERROR3099', 3099, 500, reply);
-      }
+
       const credInfo = ApiHelper.buildOptionsObject(api);
 
       let response = await needle(
@@ -72,6 +66,10 @@ export class WazuhApiCtrl {
         {},
         credInfo
       );
+
+      if (this.checkResponseIsDown(response)) {
+        return ErrorResponse('ERROR3099', 3099, 500, reply);
+      }
 
       if (parseInt(response.body.error) === 0 && response.body.data) {
         // Checking the cluster status
@@ -82,6 +80,10 @@ export class WazuhApiCtrl {
           credInfo
         );
 
+        if (this.checkResponseIsDown(response)) {
+          return ErrorResponse('ERROR3099', 3099, 500, reply);
+        }
+
         if (!response.body.error) {
           try {
             const managerInfo = await needle(
@@ -90,6 +92,11 @@ export class WazuhApiCtrl {
               {},
               credInfo
             );
+
+            if (this.checkResponseIsDown(managerInfo)) {
+              return ErrorResponse('ERROR3099', 3099, 500, reply);
+            }
+
             const updatedManagerName = managerInfo.body.data.name;
             api.cluster_info.manager = updatedManagerName;
             await this.wzWrapper.updateWazuhIndexDocument(null, req.payload, {
@@ -107,6 +114,10 @@ export class WazuhApiCtrl {
               {},
               credInfo
             );
+
+            if (this.checkResponseIsDown(response)) {
+              return ErrorResponse('ERROR3099', 3099, 500, reply);
+            }
 
             if (!response.body.error) {
               let managerName = api.cluster_info.manager;
@@ -195,6 +206,11 @@ export class WazuhApiCtrl {
                   {},
                   options
                 );
+
+                if (this.checkResponseIsDown(response)) {
+                  return ErrorResponse('ERROR3099', 3099, 500, reply);
+                }
+
                 if (
                   ((response || {}).body || {}).error === 0 &&
                   ((response || {}).body || {}).data
@@ -561,6 +577,24 @@ export class WazuhApiCtrl {
     }
   }
 
+  checkResponseIsDown(response) {
+    const responseBody = (response || {}).body || {};
+    const responseError = responseBody.error || false;
+
+    // Avoid "Error communicating with socket" like errors
+    const socketErrorCodes = [1013, 1014, 1017, 1018, 1019];
+
+    const isDown = socketErrorCodes.includes(responseError || 1);
+
+    isDown &&
+      log(
+        'wazuh-api:makeRequest',
+        'Wazuh API is online but Wazuh is not ready yet'
+      );
+
+    return isDown;
+  }
+
   /**
    * Check main Wazuh daemons status
    * @param {*} api API entry stored in .wazuh
@@ -691,21 +725,19 @@ export class WazuhApiCtrl {
         return { error: 0, message: 'Success' };
       }
 
-      // Always check the daemons before requesting any endpoint
-      try {
-        const check = await this.checkDaemons(api, path);
-
-        if (path === '/ping') {
+      if (path === '/ping') {
+        try {
+          const check = await this.checkDaemons(api, path);
           return check;
-        }
-      } catch (error) {
-        const isDown = (error || {}).code === 'ECONNREFUSED';
-        if (!isDown) {
-          log(
-            'wazuh-api:makeRequest',
-            'Wazuh API is online but Wazuh is not ready yet'
-          );
-          return ErrorResponse('ERROR3099', 3099, 500, reply);
+        } catch (error) {
+          const isDown = (error || {}).code === 'ECONNREFUSED';
+          if (!isDown) {
+            log(
+              'wazuh-api:makeRequest',
+              'Wazuh API is online but Wazuh is not ready yet'
+            );
+            return ErrorResponse('ERROR3099', 3099, 500, reply);
+          }
         }
       }
 
@@ -725,21 +757,15 @@ export class WazuhApiCtrl {
         options
       );
 
+      const responseIsDown = this.checkResponseIsDown(response);
+
+      if (responseIsDown) {
+        return ErrorResponse('ERROR3099', 3099, 500, reply);
+      }
+
       const responseBody = (response || {}).body || {};
       const responseData = responseBody.data || false;
       const responseError = responseBody.error || false;
-
-      // Avoid "1014 - Error communicating with socket" like errors
-      const socketErrorCodes = [1013, 1014, 1017, 1018, 1019];
-      if (socketErrorCodes.includes(responseError || 1)) {
-        if (counter > 3) {
-          throw new Error(
-            `Tried to execute ${method} ${path} three times with no success, aborted.`
-          );
-        }
-        await this.sleep(500);
-        return this.makeRequest(method, path, data, id, reply, counter + 1);
-      }
 
       if (!responseError && responseData) {
         cleanKeys(response);
@@ -1170,5 +1196,66 @@ export class WazuhApiCtrl {
   getRequestList() {
     //Read a static JSON until the api call has implemented
     return apiRequestList;
+  }
+
+  /**
+   * Get basic syscollector information for given agent.
+   * @param {Object} req
+   * @param {Object} reply
+   * @returns {Object} Basic syscollector information
+   */
+  async getSyscollector(req, reply) {
+    try {
+      if (!req.params || !req.headers.id || !req.params.agent) {
+        throw new Error('Agent ID and API ID are required');
+      }
+
+      const { agent } = req.params;
+      const api = req.headers.id;
+
+      const config = await this.wzWrapper.getWazuhConfigurationById(api);
+
+      const headers = ApiHelper.buildOptionsObject(config);
+
+      const data = await Promise.all([
+        needle(
+          'get',
+          `${config.url}:${config.port}/syscollector/${agent}/hardware`,
+          {},
+          headers
+        ),
+        needle(
+          'get',
+          `${config.url}:${config.port}/syscollector/${agent}/os`,
+          {},
+          headers
+        )
+      ]);
+
+      const result = data.map(item => (item.body || {}).data || false);
+      const [
+        hardwareResponse,
+        osResponse
+      ] = result;
+
+
+      // Fill syscollector object
+      const syscollector = {
+        hardware:
+          typeof hardwareResponse === 'object' &&
+          Object.keys(hardwareResponse).length
+            ? { ...hardwareResponse }
+            : false,
+        os:
+          typeof osResponse === 'object' && Object.keys(osResponse).length
+            ? { ...osResponse }
+            : false
+      };
+
+      return syscollector;
+    } catch (error) {
+      log('wazuh-api:getSyscollector', error.message || error);
+      return ErrorResponse(error.message || error, 3035, 500, reply);
+    }
   }
 }

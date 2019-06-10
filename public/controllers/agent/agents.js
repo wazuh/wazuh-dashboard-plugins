@@ -60,7 +60,8 @@ export class AgentsController {
     $mdDialog,
     groupHandler,
     wazuhConfig,
-    timeService
+    timeService,
+    genericReq
   ) {
     this.$scope = $scope;
     this.$location = $location;
@@ -79,6 +80,7 @@ export class AgentsController {
     this.groupHandler = groupHandler;
     this.wazuhConfig = wazuhConfig;
     this.timeService = timeService;
+    this.genericReq = genericReq;
 
     // Config on-demand
     this.$scope.isArray = Array.isArray;
@@ -270,7 +272,8 @@ export class AgentsController {
     this.$scope.isString = item => typeof item === 'string';
     this.$scope.hasSize = obj =>
       obj && typeof obj === 'object' && Object.keys(obj).length;
-    this.$scope.offsetTimestamp = (text, time) => this.offsetTimestamp(text, time);
+    this.$scope.offsetTimestamp = (text, time) =>
+      this.offsetTimestamp(text, time);
     this.$scope.switchConfigTab = (
       configurationTab,
       sections,
@@ -434,6 +437,14 @@ export class AgentsController {
     };
 
     this.$scope.expand = i => this.expand(i);
+
+    this.$scope.welcomeCardsProps = {
+      switchTab: tab => this.switchTab(tab),
+      extensions: this.$scope.extensions,
+      api: this.appState.getCurrentAPI(),
+      setExtensions: (api, extensions) =>
+        this.appState.setExtensions(api, extensions)
+    };
   }
   /**
    * Create metric for given object
@@ -541,8 +552,8 @@ export class AgentsController {
     }
 
     // Update agent status
-    try {
-      if ((this.$scope || {}).agent || false) {
+    if (!force && ((this.$scope || {}).agent || false)) {
+      try {
         const agentInfo = await this.apiReq.request(
           'GET',
           `/agents/${this.$scope.agent.id}`,
@@ -551,8 +562,8 @@ export class AgentsController {
         this.$scope.agent.status =
           (((agentInfo || {}).data || {}).data || {}).status ||
           this.$scope.agent.status;
-      }
-    } catch (error) { } // eslint-disable-line
+      } catch (error) {} // eslint-disable-line
+    }
 
     try {
       this.$scope.showSyscheckFiles = false;
@@ -587,7 +598,7 @@ export class AgentsController {
       if (tab === 'syscollector')
         try {
           await this.loadSyscollector(this.$scope.agent.id);
-        } catch (error) { } // eslint-disable-line
+        } catch (error) {} // eslint-disable-line
       if (tab === 'configuration') {
         this.$scope.switchConfigurationTab('welcome');
       } else {
@@ -680,86 +691,12 @@ export class AgentsController {
    */
   async loadSyscollector(id) {
     try {
-      // Continue API requests if we do have Syscollector enabled
-      // Fetch Syscollector data
-      const data = await Promise.all([
-        this.apiReq.request('GET', `/syscollector/${id}/hardware`, {}),
-        this.apiReq.request('GET', `/syscollector/${id}/os`, {}),
-        this.apiReq.request('GET', `/syscollector/${id}/ports`, { limit: 1 }),
-        this.apiReq.request('GET', `/syscollector/${id}/packages`, {
-          limit: 1,
-          select: 'scan_time'
-        }),
-        this.apiReq.request('GET', `/syscollector/${id}/processes`, {
-          limit: 1,
-          select: 'scan_time'
-        })
-      ]);
+      const syscollectorData = await this.genericReq.request(
+        'GET',
+        `/api/syscollector/${id}`
+      );
 
-      const result = data.map(item => ((item || {}).data || {}).data || false);
-
-      const [
-        hardwareResponse,
-        osResponse,
-        portsResponse,
-        packagesDateResponse,
-        processesDateResponse
-      ] = result;
-
-      // This API call may fail so we put it out of Promise.all
-      let netifaceResponse = false;
-      try {
-        const resultNetiface = await this.apiReq.request(
-          'GET',
-          `/syscollector/${id}/netiface`,
-          {}
-        );
-        netifaceResponse = ((resultNetiface || {}).data || {}).data || false;
-      } catch (error) { } // eslint-disable-line
-
-      // This API call may fail so we put it out of Promise.all
-      let netaddrResponse = false;
-      try {
-        const resultNetaddrResponse = await this.apiReq.request(
-          'GET',
-          `/syscollector/${id}/netaddr`,
-          { limit: 1 }
-        );
-        netaddrResponse =
-          ((resultNetaddrResponse || {}).data || {}).data || false;
-      } catch (error) { } // eslint-disable-line
-
-      // Before proceeding, syscollector data is an empty object
-      this.$scope.syscollector = {};
-
-      const packagesDate = packagesDateResponse
-        ? { ...packagesDateResponse }
-        : false;
-      const processesDate = processesDateResponse
-        ? { ...processesDateResponse }
-        : false;
-
-      // Fill syscollector object
-      this.$scope.syscollector = {
-        hardware:
-          typeof hardwareResponse === 'object' &&
-            Object.keys(hardwareResponse).length
-            ? { ...hardwareResponse }
-            : false,
-        os:
-          typeof osResponse === 'object' && Object.keys(osResponse).length
-            ? { ...osResponse }
-            : false,
-        netiface: netifaceResponse ? { ...netifaceResponse } : false,
-        ports: portsResponse ? { ...portsResponse } : false,
-        netaddr: netaddrResponse ? { ...netaddrResponse } : false,
-        packagesDate: ((packagesDate || {}).items || []).length
-          ? packagesDate.items[0].scan_time
-          : '-',
-        processesDate: ((processesDate || {}).items || []).length
-          ? processesDate.items[0].scan_time
-          : '-'
-      };
+      this.$scope.syscollector = (syscollectorData || {}).data || {};
 
       return;
     } catch (error) {
@@ -782,35 +719,13 @@ export class AgentsController {
 
       const id = this.commonData.checkLocationAgentId(newAgentId, globalAgent);
 
-      const data = [false, false, false];
+      const data = await this.apiReq.request('GET', `/agents/${id}`, {});
 
-      try {
-        data[0] = await this.apiReq.request('GET', `/agents/${id}`, {});
-      } catch (error) { } //eslint-disable-line
-
-      try {
-        data[1] = await this.apiReq.request(
-          'GET',
-          `/syscheck/${id}/last_scan`,
-          {}
-        );
-      } catch (error) { } //eslint-disable-line
-
-      try {
-        data[2] = await this.apiReq.request(
-          'GET',
-          `/rootcheck/${id}/last_scan`,
-          {}
-        );
-      } catch (error) { } //eslint-disable-line
-
-      const result = data.map(item => ((item || {}).data || {}).data || false);
-
-      const [agentInfo, syscheckLastScan, rootcheckLastScan] = result;
+      const agentInfo = ((data || {}).data || {}).data || false;
 
       // Agent
       this.$scope.agent = agentInfo;
-      if (this.$scope.agent.os) {
+      if (agentInfo && this.$scope.agent.os) {
         this.$scope.agentOS =
           this.$scope.agent.os.name + ' ' + this.$scope.agent.os.version;
         this.$scope.agent.isLinuxOS = this.$scope.agent.os.uname.includes(
@@ -821,14 +736,6 @@ export class AgentsController {
         this.$scope.agent.isLinuxOS = false;
       }
 
-      // Syscheck
-      this.$scope.agent.syscheck = syscheckLastScan;
-      this.validateSysCheck();
-
-      // Rootcheck
-      this.$scope.agent.rootcheck = rootcheckLastScan;
-      this.validateRootCheck();
-
       await this.$scope.switchTab(this.$scope.tab, true);
 
       const groups = await this.apiReq.request('GET', '/agents/groups', {});
@@ -838,37 +745,6 @@ export class AgentsController {
           item =>
             this.$scope.agent.group && !this.$scope.agent.group.includes(item)
         );
-
-      const outdatedAgents = await this.apiReq.request(
-        'GET',
-        '/agents/outdated/',
-        {}
-      );
-      this.$scope.agent.outdated = outdatedAgents.data.data.items
-        .map(x => x.id)
-        .find(x => x === this.$scope.agent.id);
-
-      if (this.$scope.agent.outdated) {
-        if (
-          this.appState.getSessionStorageItem(
-            `updatingAgent${this.$scope.agent.id}`
-          )
-        ) {
-          this.$scope.agent.upgrading = true;
-        }
-      } else {
-        if (
-          this.appState.getSessionStorageItem(
-            `updatingAgent${this.$scope.agent.id}`
-          )
-        ) {
-          this.appState.removeSessionStorageItem(
-            `updatingAgent${this.$scope.agent.id}`
-          );
-          this.$scope.agent.outdated = false;
-        }
-        this.$scope.$applyAsync();
-      }
 
       this.$scope.load = false;
       this.$scope.$applyAsync();
@@ -900,11 +776,11 @@ export class AgentsController {
   }
 
   /**
- * This adds timezone offset to a given date
- * @param {String} binding_text
- * @param {String} date
- */
-  offsetTimestamp = (text, time) => {
+   * This adds timezone offset to a given date
+   * @param {String} binding_text
+   * @param {String} date
+   */
+  offsetTimestamp(text, time) {
     try {
       return text + this.timeService.offset(time);
     } catch (error) {
@@ -985,7 +861,7 @@ export class AgentsController {
       );
       this.errorHandler.info(
         `Policy monitoring scan launched successfully on agent ${
-        this.$scope.agent.id
+          this.$scope.agent.id
         }`,
         ''
       );
