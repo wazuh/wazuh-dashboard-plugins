@@ -618,10 +618,8 @@ export class WazuhApiCtrl {
 
       const execd = daemons['ossec-execd'] === 'running';
       const modulesd = daemons['wazuh-modulesd'] === 'running';
-      const wazuhdb =
-        (wazuhdbExists && daemons['wazuh-db'] === 'running') || true;
-      const clusterd =
-        (isCluster && daemons['wazuh-clusterd'] === 'running') || true;
+      const wazuhdb = wazuhdbExists ? daemons['wazuh-db'] === 'running' : true;
+      const clusterd = isCluster ? daemons['wazuh-clusterd'] === 'running' : true;
 
       const isValid = execd && modulesd && wazuhdb && clusterd;
 
@@ -1233,11 +1231,7 @@ export class WazuhApiCtrl {
       ]);
 
       const result = data.map(item => (item.body || {}).data || false);
-      const [
-        hardwareResponse,
-        osResponse
-      ] = result;
-
+      const [hardwareResponse, osResponse] = result;
 
       // Fill syscollector object
       const syscollector = {
