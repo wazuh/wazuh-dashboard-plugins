@@ -239,8 +239,8 @@ export function GroupsController(
     $scope.$applyAsync();
   };
 
-  $scope.exportConfiguration = () => {
-    reportingService.startConfigReport($scope.currentGroup, 'groupConfig');
+  $scope.exportConfiguration = (enabledComponents) => {
+    reportingService.startConfigReport($scope.currentGroup, 'groupConfig', enabledComponents);
   };
 
   /**
