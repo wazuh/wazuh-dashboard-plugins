@@ -20,7 +20,7 @@ import { initTable } from './lib/init';
 import { sort } from './lib/sort';
 import React, { Component } from 'react';
 import { EuiHealth } from '@elastic/eui';
-
+import * as ProcessEquivalence from '../../../util/process-state-equivalence';
 const app = uiModules.get('app/wazuh', []);
 
 app.directive('wzTableEui', function() {
@@ -37,6 +37,7 @@ app.directive('wzTableEui', function() {
           {state}
         </EuiHealth>
       );
+      const processStatus = value => ProcessEquivalence[value] || value;
 
       const defaultRender = value => value || '-';
 
@@ -47,7 +48,11 @@ app.directive('wzTableEui', function() {
           width: item.width || undefined,
           sortable: typeof item.sortable !== 'undefined' ? item.sortable : true,
           render: value =>
-            item.isHealth ? health(value, item.isHealth) : defaultRender(value)
+            item.isHealth
+              ? health(value, item.isHealth)
+              : item.isProcessStatus
+              ? processStatus(value)
+              : defaultRender(value)
         }));
       };
 

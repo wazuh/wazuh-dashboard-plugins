@@ -74,17 +74,17 @@
         <md-card flex class="wz-md-card" ng-if="agent && agent.os && agent.os.platform !== 'darwin'">
             <md-card-content>
                 <span class=" wz-headline-title">
-            <react-component name="EuiIcon" props="{type:'inputOutput'}" /> Network ports
-            </span>
-            <md-divider class="wz-margin-top-10"></md-divider>
-            <wz-table-eui flex ng-if="agent && agent.os && agent.os.platform === 'windows'"
-                path="'/syscollector/' + agent.id + '/ports'" initial-sort-field="'process'"
-                keys="['process',{value:'local.ip', sortable:false},{value:'local.port', sortable:false},'state','protocol']">
-            </wz-table-eui>
-            <wz-table-eui flex ng-if="agent && agent.os && agent.os.platform !== 'windows'"
-                path="'/syscollector/' + agent.id + '/ports'" initial-sort-field="'protocol'"
-                keys="[{value:'local.ip', sortable:false},{value:'local.port', sortable:false},'state','protocol']">
-            </wz-table-eui>
+                    <react-component name="EuiIcon" props="{type:'inputOutput'}" /> Network ports
+                </span>
+                <md-divider class="wz-margin-top-10"></md-divider>
+                <wz-table-eui flex ng-if="agent && agent.os && agent.os.platform === 'windows'"
+                    path="'/syscollector/' + agent.id + '/ports'" initial-sort-field="'process'"
+                    keys="['process',{value:'local.ip', sortable:false},{value:'local.port', sortable:false},'state','protocol']">
+                </wz-table-eui>
+                <wz-table-eui flex ng-if="agent && agent.os && agent.os.platform !== 'windows'"
+                    path="'/syscollector/' + agent.id + '/ports'" initial-sort-field="'protocol'"
+                    keys="[{value:'local.ip', sortable:false},{value:'local.port', sortable:false},'state','protocol']">
+                </wz-table-eui>
             </md-card-content>
         </md-card>
     </div>
@@ -180,7 +180,8 @@
                     <wz-table-eui flex ng-if="agent && agent.os && agent.os.platform === 'windows'"
                         path="'/syscollector/' + agent.id + '/processes'" keys="['name','cmd','priority','nlwp']" />
                     <wz-table-eui flex ng-if="agent && agent.os && agent.os.platform !== 'windows'"
-                        path="'/syscollector/' + agent.id + '/processes'" keys="['name','euser','nice','state']" />
+                        path="'/syscollector/' + agent.id + '/processes'"
+                        keys="['name','euser','nice',{value:'state',isProcessStatus:true}]" />
                 </div>
                 <div layout="row" layout-align="end center">
                     <button type="button"
