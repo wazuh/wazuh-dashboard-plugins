@@ -11,10 +11,11 @@ export class AlertsStats extends Component {
 
   buildStats() {
     const stats = this.props.items.map(item => {
+      const title = typeof item.value !== 'undefined' ? item.value : '-';
       return (
-        <EuiFlexItem key={`${item.description}${item.value}`}>
+        <EuiFlexItem key={`${item.description}${title}`}>
           <EuiStat
-            title={item.value || '-'}
+            title={title}
             description={item.description}
             titleColor={item.color || 'primary'}
             textAlign="center"
