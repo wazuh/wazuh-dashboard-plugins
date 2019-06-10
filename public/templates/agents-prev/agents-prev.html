@@ -106,6 +106,21 @@
                             -</p>
                     </div>
                 </div>
+                <div class="euiFlexItem euiFlexItem--flexGrowZero">
+
+                    <div class="euiStat">
+                        <div class="euiText euiText--small euiStat__description">
+                            <p>Most active agent</p>
+                        </div>
+                        <p ng-if="ctrl.lastAgent && ctrl.lastAgent.id && ctrl.mostActiveAgent.id !== '000'"
+                            ng-click="ctrl.showAgent(ctrl.mostActiveAgent)"
+                            class="euiTitle euiTitle--small euiStat__title wz-text-link cursor-pointer">
+                            {{ctrl.mostActiveAgent.name}}</p>
+                        <p ng-if="!ctrl.lastAgent || !ctrl.lastAgent.id"
+                            class="euiTitle euiTitle--small euiStat__title">
+                            -</p>
+                    </div>
+                </div>
             </div>
         </div>
     </div>

@@ -66,6 +66,15 @@ export function WazuhElasticRouter(server) {
     }
   });
 
+  // Returns the agent with most alerts
+  server.route({
+    method: 'GET',
+    path: '/elastic/top/{mode}/{cluster}/{field}/{pattern}',
+    handler(req, res) {
+      return ctrl.getFieldTop(req, res);
+    }
+  });
+
   // Return Wazuh Appsetup info
   server.route({
     method: 'GET',

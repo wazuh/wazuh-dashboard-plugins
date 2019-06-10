@@ -193,6 +193,70 @@ export class WazuhElasticCtrl {
   }
 
   /**
+   * This get the fields keys
+   * @param {Object} req
+   * @param {Object} reply
+   * @returns {Array<Object>} fields or ErrorResponse
+   */
+  async getFieldTop(req, reply) {
+    try {
+      // Top field payload
+      let payload = {
+        size: 1,
+        query: {
+          bool: {
+            must: [],
+            must_not: {
+              term: {
+                'agent.id': '000'
+              }
+            },
+            filter: { range: { timestamp: {} } }
+          }
+        },
+        aggs: {
+          '2': {
+            terms: {
+              field: '',
+              size: 1,
+              order: { _count: 'desc' }
+            }
+          }
+        }
+      };
+
+      // Set up time interval, default to Last 24h
+      const timeGTE = 'now-1d';
+      const timeLT = 'now';
+      payload.query.bool.filter.range['timestamp']['gte'] = timeGTE;
+      payload.query.bool.filter.range['timestamp']['lt'] = timeLT;
+
+      // Set up match for default cluster name
+      payload.query.bool.must.push(
+        req.params.mode === 'cluster'
+          ? { match: { 'cluster.name': req.params.cluster } }
+          : { match: { 'manager.name': req.params.cluster } }
+      );
+
+      payload.aggs['2'].terms.field = req.params.field;
+      payload.pattern = req.params.pattern;
+
+      const data = await this.wzWrapper.searchWazuhAlertsWithPayload(payload);
+
+      return data.hits.total.value === 0 ||
+        typeof data.aggregations['2'].buckets[0] === 'undefined'
+        ? { statusCode: 200, data: '' }
+        : {
+            statusCode: 200,
+            data: data.aggregations['2'].buckets[0].key
+          };
+    } catch (error) {
+      log('wazuh-elastic:getFieldTop', error.message || error);
+      return ErrorResponse(error.message || error, 4004, 500, reply);
+    }
+  }
+
+  /**
    * This get the elastic setup settings
    * @param {Object} req
    * @param {Object} reply
