@@ -18,6 +18,8 @@ import * as listeners from './lib/listeners';
 import { searchData, filterData, queryData } from './lib/data';
 import { initTable } from './lib/init';
 import { sort } from './lib/sort';
+import React, { Component } from 'react';
+import { EuiHealth } from '@elastic/eui';
 
 const app = uiModules.get('app/wazuh', []);
 
@@ -29,7 +31,14 @@ app.directive('wzTableEui', function() {
       keys: '=keys',
       initialSortField: '=initialSortField'
     },
-    controller($scope, apiReq, errorHandler, wzTableFilter) {
+    controller($scope, apiReq, errorHandler, wzTableFilter, timeService) {
+      const health = (state, config) => (
+        <EuiHealth color={state === config.success ? 'success' : 'danger'}>
+          {state}
+        </EuiHealth>
+      );
+
+      const defaultRender = value => value || '-';
 
       const parseColumns = columnsArray => {
         return columnsArray.map(item => ({
@@ -37,7 +46,8 @@ app.directive('wzTableEui', function() {
           field: item.value || item,
           width: item.width || undefined,
           sortable: typeof item.sortable !== 'undefined' ? item.sortable : true,
-          render: value => value || '-'
+          render: value =>
+            item.isHealth ? health(value, item.isHealth) : defaultRender(value)
         }));
       };
 
@@ -63,12 +73,23 @@ app.directive('wzTableEui', function() {
         }
       };
 
+      const offsetTimestamp = (text, time) => {
+        try {
+          return text + timeService.offset(time);
+        } catch (error) {
+          return time !== '-' ? `${text}${time} (UTC)` : time;
+        }
+      };
+
       $scope.basicTableProps = {
+        path: $scope.path,
         initialSortField: $scope.initialSortField || false,
         columns: parseColumns($scope.keys),
         items: [],
         getData: options => fetch(options),
-        sortByField: field => sort(field, $scope, instance, fetch, errorHandler)
+        sortByField: field =>
+          sort(field, $scope, instance, fetch, errorHandler),
+        offsetTimestamp: (text, time) => offsetTimestamp(text, time)
         //noItemsMessage: 'Change this'
       };
 

@@ -780,13 +780,13 @@ export class AgentsController {
    * @param {String} binding_text
    * @param {String} date
    */
-  offsetTimestamp = (text, time) => {
+  offsetTimestamp(text, time) {
     try {
       return text + this.timeService.offset(time);
     } catch (error) {
-      return `${text}${time} (UTC)`;
+      return time !== '-' ? `${text}${time} (UTC)` : time;
     }
-  };
+  }
 
   /**
    * Navigate to the groups of an agent
