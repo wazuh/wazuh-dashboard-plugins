@@ -12,7 +12,7 @@ export class Stats extends Component {
   buildStats(items) {
     const stats = items.map(item => {
       return (
-        <EuiFlexItem key={item.description}>
+        <EuiFlexItem key={item.description} style={item.style || null}>
           <EuiStat
             title={item.title}
             description={item.description}
@@ -28,10 +28,10 @@ export class Stats extends Component {
 
   render() {
     const stats = this.buildStats([
-      { title: this.props.id, description: 'ID' },
+      { title: this.props.id, description: 'ID',style:{ maxWidth: 100 } },
       { title: this.props.ip, description: 'IP' },
       { title: this.props.version, description: 'Version' },
-      { title: this.props.agentOS, description: 'OS' },
+      { title: this.props.agentOS, description: 'OS',style:{ minWidth: 400 } },
       { title: this.props.dateAdd, description: 'Registration date' },
       { title: this.props.lastKeepAlive, description: 'Last keep alive' }
     ]);
