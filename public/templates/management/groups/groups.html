@@ -143,12 +143,8 @@
                     <!-- Group agents table -->
                     <md-card flex class="wz-md-card _md flex md-margin-h wz-margin-top-16" ng-if="lookingGroup && groupsSelectedTab==='agents' && currentGroup">
                         <md-card-actions layout="row" class="wz-card-actions wz-card-actions-top layout-align-end-center">
-                            <button class="btn btn-primary btn-as-i" ng-click="exportConfiguration(currentGroup)"
-                                ng-disabled="reportBusy && reportStatus">
-                                <react-component ng-show="!reportBusy || !reportStatus" name="EuiIcon" props="{type:'importAction', color:'primary'}" />
-                                <react-component ng-show="reportBusy && reportStatus" name="EuiLoadingSpinner" props="{size:'m'}" />
-                                PDF
-                            </button>
+                            <react-component name="ExportConfiguration" ng-hide="reportBusy && reportStatus" props="{exportConfiguration, type: 'group'}" />
+                            <react-component ng-show="reportBusy && reportStatus" name="EuiLoadingSpinner" props="{size:'m'}" />
                         </md-card-actions>
                         <div layout="row" ng-show="failedErrors" class="extraHeader">
                             <md-list>
@@ -183,12 +179,8 @@
                     <!-- Group files table -->
                     <md-card flex class="wz-md-card _md flex md-margin-h wz-margin-top-16" ng-if="lookingGroup && groupsSelectedTab==='files' && !fileViewer && currentGroup">
                         <md-card-actions layout="row" class="wz-card-actions wz-card-actions-top layout-align-end-center">
-                            <button class="btn btn-primary btn-as-i" ng-click="exportConfiguration(currentGroup)"
-                                ng-disabled="reportBusy && reportStatus">
-                                <react-component ng-show="!reportBusy || !reportStatus" name="EuiIcon" props="{type:'importAction', color:'primary'}" />
-                                <react-component ng-show="reportBusy && reportStatus" name="EuiLoadingSpinner" props="{size:'m'}" />
-                                PDF
-                            </button>
+                            <react-component name="ExportConfiguration" ng-hide="reportBusy && reportStatus" props="{exportConfiguration, type: 'group'}" />
+                            <react-component ng-show="reportBusy && reportStatus" name="EuiLoadingSpinner" props="{size:'m'}" />
                         </md-card-actions>
                         <md-card-content>
                             <div layout="row">

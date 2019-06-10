@@ -1616,6 +1616,7 @@ export class WazuhReportingCtrl {
         let tables = [];
         if (isGroupConfig) {
           const g_id = kfilters[0].group;
+          const enabledComponents = req.payload.components;
           let agentsInGroup = [];
           try {
             agentsInGroup = await this.apiRequest.makeGenericRequest(
@@ -1705,6 +1706,7 @@ export class WazuhReportingCtrl {
         }
         if (isAgentConfig) {
           const configurations = AgentConfiguration.configurations;
+          const enabledComponents = req.payload.components;
           const a_id = kfilters[0].agent;
           let wmodules = {};
           try {
@@ -1717,18 +1719,16 @@ export class WazuhReportingCtrl {
           } catch (err) { } //eslint-disable-line
           kfilters = [];
           await this.renderHeader(tab, tab, a_id, apiId);
+          let idxComponent = 0;
           for (let config of configurations) {
-            this.dd.content.push({
-              text: config.title,
-              style: 'h1',
-              margin: [0, 0, 0, 15]
-            });
+            let titleOfSection = false;
             for (let section of config.sections) {
-              if (section.config || section.wodle) {
+              if (enabledComponents[idxComponent] && (section.config || section.wodle)) {
                 let idx = 0;
                 const configs = (section.config || []).concat(
                   section.wodle || []
                 );
+
                 for (let conf of configs) {
                   let data = {};
                   try {
@@ -1754,6 +1754,14 @@ export class WazuhReportingCtrl {
                       Object.keys(data.data[Object.keys(data.data)[0]]).length >
                       0
                     ) {
+                      if (!titleOfSection) {
+                        this.dd.content.push({
+                          text: config.title,
+                          style: 'h1',
+                          margin: [0, 0, 0, 15]
+                        });
+                        titleOfSection = true;
+                      }
                       for (let _d of Object.keys(data.data)) {
                         if (idx === 0) {
                           this.dd.content.push({
@@ -1881,11 +1889,14 @@ export class WazuhReportingCtrl {
                     }
                   } catch (err) { } //eslint-disable-line
                   idx++;
+
+
                 }
                 for (const table of tables) {
                   this.renderConfigTables([table]);
                 }
               }
+              idxComponent++;
               tables = [];
             }
           }
