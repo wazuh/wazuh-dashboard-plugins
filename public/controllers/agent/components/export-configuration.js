@@ -4,7 +4,10 @@ import {
   EuiPopover,
   EuiButton,
   EuiCheckboxGroup,
-  EuiSpacer
+  EuiSpacer,
+  EuiButtonEmpty,
+  EuiFlexGroup,
+  EuiFlexItem
 } from '@elastic/eui';
 
 import PropTypes from 'prop-types';
@@ -62,7 +65,17 @@ export class ExportConfiguration extends Component {
       ;
   }
 
-  onButtonClick() {
+  selectAll(flag) {
+    let newCheckboxIdToSelectedMap = {};
+    for (let i = 0; i < this.options.length; i++) {
+      newCheckboxIdToSelectedMap[`${i}`] = flag;
+    }
+    this.setState({
+      checkboxIdToSelectedMap: newCheckboxIdToSelectedMap,
+    });
+  }
+
+  exportClick() {
     this.setState({
       isPopoverOpen: !this.state.isPopoverOpen,
     });
@@ -94,7 +107,7 @@ export class ExportConfiguration extends Component {
         iconType="importAction"
         iconSide="left"
         size="s"
-        onClick={this.onButtonClick.bind(this)}>
+        onClick={this.exportClick.bind(this)}>
         PDF
       </EuiButton>
     );
@@ -112,6 +125,18 @@ export class ExportConfiguration extends Component {
           onChange={this.onChange}
           compressed
         />
+        <EuiSpacer size="s" />
+        <EuiButtonEmpty
+          size="xs"
+          onClick={() => this.selectAll(true)}>
+          Select all
+        </EuiButtonEmpty>
+        <EuiSpacer size="s" />
+        <EuiButtonEmpty
+          size="xs"
+          onClick={() => this.selectAll(false)}>
+          Unselect all
+        </EuiButtonEmpty>
         <EuiSpacer size="m" />
         <EuiButton
           onClick={() => { this.closePopover(); this.props.exportConfiguration(this.state.checkboxIdToSelectedMap) }}
