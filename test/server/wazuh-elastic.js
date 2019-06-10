@@ -100,10 +100,6 @@ describe('wazuh-elastic', () => {
     });
   });
 
-  /*it('GET /elastic/top/{mode}/{cluster}/{field}/{pattern}', async () => {
-        throw Error('Test not implemented...')
-    })*/
-
   describe('Checking .wazuh-version index', () => {
     it('GET /elastic/setup', async () => {
       const res = await needle(

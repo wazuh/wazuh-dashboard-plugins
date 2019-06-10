@@ -73,10 +73,6 @@ export class AgentsPreviewController {
     this.versions = [];
     this.groups = [];
     this.nodes = [];
-    this.mostActiveAgent = {
-      name: '',
-      id: ''
-    };
 
     // Load URL params
     if (loc && loc.tab) {
@@ -155,20 +151,13 @@ export class AgentsPreviewController {
 
       const api = JSON.parse(this.appState.getCurrentAPI()).id;
       const clusterInfo = this.appState.getClusterInfo();
-      const firstUrlParam =
-        clusterInfo.status === 'enabled' ? 'cluster' : 'manager';
-      const secondUrlParam = clusterInfo[firstUrlParam];
 
-      const pattern = this.appState.getCurrentPattern();
+      const agentsUnique = await this.genericReq.request(
+        'GET',
+        '/api/agents-unique/' + api,
+        {}
+      );
 
-      const data = await Promise.all([
-        this.genericReq.request('GET', '/api/agents-unique/' + api, {}),
-        this.genericReq.request(
-          'GET',
-          `/elastic/top/${firstUrlParam}/${secondUrlParam}/agent.name/${pattern}`
-        )
-      ]);
-      const [agentsUnique, agentsTop] = data;
       const unique = agentsUnique.data.result;
 
       this.searchBarModel = {
@@ -204,22 +193,6 @@ export class AgentsPreviewController {
       this.agentsCountNeverConnected = unique.summary.agentsCountNeverConnected;
       this.agentsCountTotal = unique.summary.agentsCountTotal;
       this.agentsCoverity = unique.summary.agentsCoverity;
-
-      if (agentsTop.data.data === '') {
-        this.mostActiveAgent.name = this.appState.getClusterInfo().manager;
-        this.mostActiveAgent.id = '000';
-      } else {
-        this.mostActiveAgent.name = agentsTop.data.data;
-        const info = await this.genericReq.request(
-          'GET',
-          `/elastic/top/${firstUrlParam}/${secondUrlParam}/agent.id/${pattern}`
-        );
-        if (info.data.data === '' && this.mostActiveAgent.name !== '') {
-          this.mostActiveAgent.id = '000';
-        } else {
-          this.mostActiveAgent.id = info.data.data;
-        }
-      }
     } catch (error) {
       this.errorInit = this.errorHandler.handle(error, false, false, true);
     }
