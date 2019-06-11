@@ -220,11 +220,12 @@
                             switch-tab="switchTab('pm')" current-tab="'pm'" description="TabDescription.pm.description"></wz-welcome-card>
                         <wz-welcome-card class="euiFlexItem" logo="'icons/sca.png'" card-title="'Security configuration assessment'"
                             switch-tab="switchTab('sca')" current-tab="'sca'" description="TabDescription['sca'].description"></wz-welcome-card>
-                        <wz-welcome-card ng-if="extensions.audit && agent.isLinuxOS" class="euiFlexItem" logo="'icons/app_monitoring.svg'"
-                            card-title="'System auditing'" switch-tab="switchTab('audit')" current-tab="'audit'"
-                            description="TabDescription.audit.description"></wz-welcome-card>
-                        <wz-welcome-card ng-if="extensions.oscap && agent.isLinuxOS" class="euiFlexItem" logo="'icons/app_discover.svg'"
-                            card-title="'OpenSCAP'" switch-tab="switchTab('oscap')" current-tab="'oscap'" description="TabDescription.oscap.description"></wz-welcome-card>
+                        <wz-welcome-card ng-if="extensions.audit && !agent.isWindowsOS && !agent.isMacOS" class="euiFlexItem"
+                            logo="'icons/app_monitoring.svg'" card-title="'System auditing'" switch-tab="switchTab('audit')"
+                            current-tab="'audit'" description="TabDescription.audit.description"></wz-welcome-card>
+                        <wz-welcome-card ng-if="extensions.oscap && !agent.isWindowsOS && !agent.isMacOS" class="euiFlexItem"
+                            logo="'icons/app_discover.svg'" card-title="'OpenSCAP'" switch-tab="switchTab('oscap')"
+                            current-tab="'oscap'" description="TabDescription.oscap.description"></wz-welcome-card>
                         <wz-welcome-card ng-if="extensions.ciscat" class="euiFlexItem" logo="'icons/app_management.svg'"
                             card-title="'CIS-CAT'" switch-tab="switchTab('ciscat')" current-tab="'ciscat'" description="TabDescription.ciscat.description"></wz-welcome-card>
                     </div>
@@ -241,17 +242,18 @@
                         <h3 class="euiTitle wzEuiTitle">Threat Detection and Response</h3>
                         <div class="euiSpacer euiSpacer--m"></div>
                         <div class="euiFlexGrid euiFlexGrid--gutterLarge euiFlexGrid--halves">
-                            <wz-welcome-card class="euiFlexItem" logo="'icons/app_security.svg'" card-title="'Vulnerabilities'"
-                                switch-tab="switchTab('vuls')" current-tab="'vuls'" description="TabDescription.vuls.description" />
+                            <wz-welcome-card class="euiFlexItem" ng-if="!agent.isWindowsOS && !agent.isMacOS" logo="'icons/app_security.svg'"
+                                card-title="'Vulnerabilities'" switch-tab="switchTab('vuls')" current-tab="'vuls'"
+                                description="TabDescription.vuls.description" />
                             <wz-welcome-card ng-if="extensions.virustotal" class="euiFlexItem" logo="'icons/app_saved_objects.svg'"
                                 card-title="'VirusTotal'" switch-tab="switchTab('virustotal')" current-tab="'virustotal'"
                                 description="TabDescription.virustotal.description" />
                             <wz-welcome-card ng-if="extensions.osquery" class="euiFlexItem" logo="'icons/osquery.svg'"
                                 card-title="'Osquery'" switch-tab="switchTab('osquery')" current-tab="'osquery'"
                                 description="TabDescription.osquery.description" />
-                            <wz-welcome-card ng-if="extensions.docker" class="euiFlexItem" logo="'icons/docker.svg'"
-                                card-title="'Docker listener'" switch-tab="switchTab('docker')" current-tab="'docker'"
-                                description="TabDescription.docker.description" />
+                            <wz-welcome-card ng-if="extensions.docker && !agent.isWindowsOS && !agent.isMacOS" class="euiFlexItem"
+                                logo="'icons/docker.svg'" card-title="'Docker listener'" switch-tab="switchTab('docker')"
+                                current-tab="'docker'" description="TabDescription.docker.description" />
                         </div>
                     </div>
                 </div>
