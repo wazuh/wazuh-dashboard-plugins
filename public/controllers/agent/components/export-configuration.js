@@ -17,6 +17,7 @@ export class ExportConfiguration extends Component {
     super(props);
 
     this.state = {
+      buttonDisabled: false,
       checkboxIdToSelectedMap:
         this.props.type === 'agent' ? {
           ['0']: true,
@@ -72,6 +73,7 @@ export class ExportConfiguration extends Component {
     }
     this.setState({
       checkboxIdToSelectedMap: newCheckboxIdToSelectedMap,
+      buttonDisabled: !flag
     });
   }
 
@@ -94,9 +96,15 @@ export class ExportConfiguration extends Component {
         [optionId]: !this.state.checkboxIdToSelectedMap[optionId],
       },
     };
-
+    let result = false;
+    for (let i = 0; i < this.options.length; i++) {
+      if (newCheckboxIdToSelectedMap[`${i}`] === true) {
+        result = true;
+      }
+    }
     this.setState({
       checkboxIdToSelectedMap: newCheckboxIdToSelectedMap,
+      buttonDisabled: !result
     });
   };
 
@@ -139,9 +147,10 @@ export class ExportConfiguration extends Component {
         </EuiButtonEmpty>
         <EuiSpacer size="m" />
         <EuiButton
+          isDisabled={this.state.buttonDisabled}
           onClick={() => { this.closePopover(); this.props.exportConfiguration(this.state.checkboxIdToSelectedMap) }}
           fill>Generate PDF report</EuiButton>
-      </EuiPopover>
+      </EuiPopover >
     );
   }
 }
