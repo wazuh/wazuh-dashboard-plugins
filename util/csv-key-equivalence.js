@@ -102,5 +102,7 @@ export const KeyEquivalence = {
   rationale: 'Rationale',
   registry: 'Registry',
   date: 'Date',
-  value: 'Value'
+  value: 'Value',
+  location: 'Location',
+  mtu: 'MTU'
 };
