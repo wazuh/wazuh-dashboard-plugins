@@ -605,26 +605,6 @@ export class ElasticWrapper {
   }
 
   /**
-   * Search for active entries on .wazuh index
-   * @param {*} req
-   */
-  async searchActiveDocumentsWazuhIndex(req) {
-    try {
-      if (!req) return Promise.reject(new Error('No valid request given'));
-
-      const data = await this.elasticRequest.callWithRequest(req, 'search', {
-        index: '.wazuh',
-        type: '_doc',
-        q: 'active:true'
-      });
-
-      return data;
-    } catch (error) {
-      return Promise.reject(error);
-    }
-  }
-
-  /**
    * Delete a Wazuh API entry using incoming request
    * @param {*} req
    */

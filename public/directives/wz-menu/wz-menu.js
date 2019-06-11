@@ -12,6 +12,7 @@
 
 import menuTemplate from './wz-menu.html';
 import { uiModules } from 'ui/modules';
+import $ from 'jquery';
 
 const app = uiModules.get('app/wazuh', []);
 
@@ -34,6 +35,12 @@ class WzMenu {
   ) {
     $scope.showSelector = appState.getPatternSelector();
 
+    let height = false;
+    try {
+      height = $('#navDrawerMenu > ul:nth-child(2)')[0].clientHeight;
+    } catch (error) {} // eslint-disable-line
+    $scope.barHeight = (height || 51) + 2;
+    
     $scope.$applyAsync();
 
     if (appState.getCurrentAPI()) {

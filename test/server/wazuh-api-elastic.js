@@ -32,7 +32,6 @@ describe('wazuh-api-elastic', () => {
         port: 55000,
         insecure: true,
         component: 'API',
-        active: true,
         cluster_info: {},
         extensions: {}
       },
@@ -59,7 +58,6 @@ describe('wazuh-api-elastic', () => {
         port: 55000,
         insecure: true,
         component: 'API',
-        active: true,
         cluster_info: {},
         extensions: {}
       },
@@ -104,7 +102,6 @@ describe('wazuh-api-elastic', () => {
         port: 55000,
         insecure: true,
         component: 'API',
-        active: true,
         cluster_info: {},
         extensions: {}
       },
