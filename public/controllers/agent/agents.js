@@ -441,14 +441,6 @@ export class AgentsController {
     };
 
     this.$scope.expand = i => this.expand(i);
-
-    this.$scope.welcomeCardsProps = {
-      switchTab: tab => this.switchTab(tab),
-      extensions: this.$scope.extensions,
-      api: this.appState.getCurrentAPI(),
-      setExtensions: (api, extensions) =>
-        this.appState.setExtensions(api, extensions)
-    };
   }
   /**
    * Create metric for given object
@@ -566,13 +558,8 @@ export class AgentsController {
         this.$scope.agent.status =
           (((agentInfo || {}).data || {}).data || {}).status ||
           this.$scope.agent.status;
-<<<<<<< HEAD
-      }
-    } catch (error) { } // eslint-disable-line
-=======
-      } catch (error) {} // eslint-disable-line
+      } catch (error) { } // eslint-disable-line
     }
->>>>>>> 3e73fec149ffe0d46c882de7263407288710c2f6
 
     try {
       this.$scope.showSyscheckFiles = false;
@@ -771,6 +758,7 @@ export class AgentsController {
             this.$scope.agent.group && !this.$scope.agent.group.includes(item)
         );
 
+      this.loadWelcomeCardsProps();
       this.$scope.load = false;
       this.$scope.$applyAsync();
       return;
@@ -790,9 +778,36 @@ export class AgentsController {
         this.$location.path('/agents-preview');
       }
     }
+
     this.$scope.load = false;
     this.$scope.$applyAsync();
     return;
+  }
+
+  cleanExtensions(extensions) {
+    const checkExtensions = ['audit', 'oscap', 'vuls', 'docker'];
+    let result = {};
+    for (let extension in extensions) {
+      if (!checkExtensions.includes(extension) ||
+        (checkExtensions.includes(extension) && (!this.$scope.agent.isWindowsOS && !this.$scope.agent.isMacOS))) {
+        result[extension] = extensions[extension];
+      }
+    }
+    return result;
+  }
+
+  /**
+ * Get available welcome cards after getting the agent
+ */
+  loadWelcomeCardsProps() {
+    this.$scope.welcomeCardsProps = {
+      switchTab: tab => this.switchTab(tab),
+      extensions: this.cleanExtensions(this.$scope.extensions),
+      agent: this.$scope.agent,
+      api: this.appState.getCurrentAPI(),
+      setExtensions: (api, extensions) =>
+        this.appState.setExtensions(api, extensions)
+    };
   }
 
   switchGroupEdit() {
