@@ -169,7 +169,7 @@ export class WelcomeScreen extends Component {
                   </EuiFlexGroup>
                 )}
               <EuiFlexGrid columns={2}>
-                {!this.props.agent.isWindowsOS && !this.props.agent.isMacOS &&
+                {(!this.props.agent.isWindowsOS && !this.props.agent.isMacOS) &&
                   this.buildTabCard('vuls', 'securityApp')}
                 {this.props.extensions.virustotal &&
                   this.buildTabCard('virustotal', 'savedObjectsApp')}

@@ -740,7 +740,7 @@ export class AgentsController {
           'Linux'
         );
         this.$scope.agent.isWindowsOS = this.$scope.agent.os.platform === 'windows';
-        this.$scope.agent.isMacOS = this.$scope.agent.os.platform === 'darwing';
+        this.$scope.agent.isMacOS = this.$scope.agent.os.platform === 'darwin';
       } else {
         this.$scope.agentOS = '-';
         this.$scope.agent.isLinuxOS = false;
