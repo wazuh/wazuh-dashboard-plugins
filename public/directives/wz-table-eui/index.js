@@ -9,5 +9,4 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import '../wz-table/wz-table-filter-service';
-import './wz-data-table-directive';
+import './wz-table-directive';

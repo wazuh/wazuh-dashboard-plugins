@@ -131,6 +131,10 @@ export class ManagementController {
         : this.restartManager();
     });
     this.appState = appState;
+
+    this.welcomeCardsProps = {
+      switchTab: (tab, setNav) => this.switchTab(tab, setNav)
+    };
   }
 
   /**

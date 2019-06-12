@@ -35,7 +35,6 @@ app.directive('wzTable', function() {
       allowClick: '=allowClick',
       implicitFilter: '=implicitFilter',
       rowSizes: '=rowSizes',
-      extraLimit: '=extraLimit',
       emptyResults: '=emptyResults',
       customColumns: '=customColumns',
       implicitSort: '=implicitSort'

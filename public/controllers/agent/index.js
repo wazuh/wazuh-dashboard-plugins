@@ -13,10 +13,14 @@ import { uiModules } from 'ui/modules';
 import { AgentsPreviewController } from './agents-preview';
 import { AgentsController } from './agents';
 import { RegisterAgent } from './components/register-agent';
+import { WelcomeScreen } from './components/welcome';
+import { Stats } from './components/stats';
 
 const app = uiModules.get('app/wazuh', []);
 
 app
   .controller('agentsController', AgentsController)
   .controller('agentsPreviewController', AgentsPreviewController)
-  .value('RegisterAgent', RegisterAgent);
+  .value('RegisterAgent', RegisterAgent)
+  .value('WelcomeScreenAgent', WelcomeScreen)
+  .value('StatsAgent', Stats);
