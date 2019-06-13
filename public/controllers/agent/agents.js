@@ -14,6 +14,7 @@ import { generateMetric } from '../../utils/generate-metric';
 import { TabNames } from '../../utils/tab-names';
 import * as FileSaver from '../../services/file-saver';
 import { TabDescription } from '../../../server/reporting/tab-description';
+import { ComponentsOsSupport } from '../../utils/components-os-support';
 import {
   metricsGeneral,
   metricsAudit,
@@ -131,6 +132,7 @@ export class AgentsController {
     }
 
     this.$scope.TabDescription = TabDescription;
+    this.$scope.ComponentsOsSupport = ComponentsOsSupport;
 
     this.$rootScope.reportStatus = false;
 
@@ -736,16 +738,11 @@ export class AgentsController {
       if (agentInfo && this.$scope.agent.os) {
         this.$scope.agentOS =
           this.$scope.agent.os.name + ' ' + this.$scope.agent.os.version;
-        this.$scope.agent.isLinuxOS = this.$scope.agent.os.uname.includes(
-          'Linux'
-        );
-        this.$scope.agent.isWindowsOS = this.$scope.agent.os.platform === 'windows';
-        this.$scope.agent.isMacOS = this.$scope.agent.os.platform === 'darwin';
+        const isLinux = this.$scope.agent.os.uname.includes('Linux');
+        this.$scope.agent.agentPlat = isLinux ? 'linux' : this.$scope.agent.os.platform;
       } else {
         this.$scope.agentOS = '-';
-        this.$scope.agent.isLinuxOS = false;
-        this.$scope.agent.isWindowsOS = false;
-        this.$scope.agent.isMacOS = false;
+        this.$scope.agent.agentPlat = false;
       }
 
       await this.$scope.switchTab(this.$scope.tab, true);
@@ -785,11 +782,11 @@ export class AgentsController {
   }
 
   cleanExtensions(extensions) {
-    const checkExtensions = ['audit', 'oscap', 'vuls', 'docker'];
+    const supportedOs = this.$scope.ComponentsOsSupport;
     let result = {};
     for (let extension in extensions) {
-      if (!checkExtensions.includes(extension) ||
-        (checkExtensions.includes(extension) && (!this.$scope.agent.isWindowsOS && !this.$scope.agent.isMacOS))) {
+      if (!supportedOs[extension] ||
+        (supportedOs[extension] && supportedOs[extension].includes(this.$scope.agent.agentPlat))) {
         result[extension] = extensions[extension];
       }
     }
