@@ -14,6 +14,7 @@ import { generateMetric } from '../../utils/generate-metric';
 import { TabNames } from '../../utils/tab-names';
 import * as FileSaver from '../../services/file-saver';
 import { TabDescription } from '../../../server/reporting/tab-description';
+import { ComponentsOsSupport } from '../../utils/components-os-support';
 import {
   metricsGeneral,
   metricsAudit,
@@ -131,6 +132,7 @@ export class AgentsController {
     }
 
     this.$scope.TabDescription = TabDescription;
+    this.$scope.ComponentsOsSupport = ComponentsOsSupport;
 
     this.$rootScope.reportStatus = false;
 
@@ -441,14 +443,6 @@ export class AgentsController {
     };
 
     this.$scope.expand = i => this.expand(i);
-
-    this.$scope.welcomeCardsProps = {
-      switchTab: tab => this.switchTab(tab),
-      extensions: this.$scope.extensions,
-      api: this.appState.getCurrentAPI(),
-      setExtensions: (api, extensions) =>
-        this.appState.setExtensions(api, extensions)
-    };
   }
   /**
    * Create metric for given object
@@ -744,12 +738,11 @@ export class AgentsController {
       if (agentInfo && this.$scope.agent.os) {
         this.$scope.agentOS =
           this.$scope.agent.os.name + ' ' + this.$scope.agent.os.version;
-        this.$scope.agent.isLinuxOS = this.$scope.agent.os.uname.includes(
-          'Linux'
-        );
+        const isLinux = this.$scope.agent.os.uname.includes('Linux');
+        this.$scope.agent.agentPlat = isLinux ? 'linux' : this.$scope.agent.os.platform;
       } else {
         this.$scope.agentOS = '-';
-        this.$scope.agent.isLinuxOS = false;
+        this.$scope.agent.agentPlat = false;
       }
 
       await this.$scope.switchTab(this.$scope.tab, true);
@@ -762,6 +755,7 @@ export class AgentsController {
             this.$scope.agent.group && !this.$scope.agent.group.includes(item)
         );
 
+      this.loadWelcomeCardsProps();
       this.$scope.load = false;
       this.$scope.$applyAsync();
       return;
@@ -781,9 +775,36 @@ export class AgentsController {
         this.$location.path('/agents-preview');
       }
     }
+
     this.$scope.load = false;
     this.$scope.$applyAsync();
     return;
+  }
+
+  cleanExtensions(extensions) {
+    const supportedOs = this.$scope.ComponentsOsSupport;
+    let result = {};
+    for (let extension in extensions) {
+      if (!supportedOs[extension] ||
+        (supportedOs[extension] && supportedOs[extension].includes(this.$scope.agent.agentPlat))) {
+        result[extension] = extensions[extension];
+      }
+    }
+    return result;
+  }
+
+  /**
+ * Get available welcome cards after getting the agent
+ */
+  loadWelcomeCardsProps() {
+    this.$scope.welcomeCardsProps = {
+      switchTab: tab => this.switchTab(tab),
+      extensions: this.cleanExtensions(this.$scope.extensions),
+      agent: this.$scope.agent,
+      api: this.appState.getCurrentAPI(),
+      setExtensions: (api, extensions) =>
+        this.appState.setExtensions(api, extensions)
+    };
   }
 
   switchGroupEdit() {

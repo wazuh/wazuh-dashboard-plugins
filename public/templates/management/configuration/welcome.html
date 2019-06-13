@@ -104,7 +104,7 @@
                                 <td>Configuration to ensure compliance with security policies, standards and hardening
                                     guides</td>
                             </tr>
-                            <tr class="cursor-pointer" ng-click="switchWodle('open-scap')">
+                            <tr class="cursor-pointer" ng-click="switchWodle('open-scap')" ng-if="ComponentsOsSupport['oscap'].includes(agent.agentPlat)">
                                 <td>OpenSCAP</td>
                                 <td>Configuration assessment and automation of compliance monitoring using SCAP checks
                                 </td>
@@ -154,7 +154,7 @@
                                 <td>Configuration options of the Command wodle
                                 </td>
                             </tr>
-                            <tr class="cursor-pointer" ng-click="switchWodle('docker-listener')">
+                            <tr class="cursor-pointer" ng-click="switchWodle('docker-listener')" ng-if="ComponentsOsSupport['docker'].includes(agent.agentPlat)">
                                 <td>Docker listener</td>
                                 <td>Monitor and collect the activity from Docker containers such as creation, running,
                                     starting, stopping or pausing events
