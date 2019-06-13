@@ -27,17 +27,15 @@ export class ExportConfiguration extends Component {
 
     this.options = [];
     const list = this.props.type === 'agent' ? agentOptions : groupOptions;
-    let idx = 0;
-    list.forEach(x => {
+    list.forEach((x, idx) => {
       if (typeof x === 'string' || (x.name && ComponentsOsSupport[x.name].includes(this.props.agentPlat))) {
         this.options.push({ id: `${idx}`, label: x.desc || x });
-        idx++;
       }
     });
 
     let initialChecks = {};
-    Object.keys(this.options).forEach(x => {
-      initialChecks[x] = true;
+    this.options.forEach(x => {
+      initialChecks[x.id] = true;
     });
     this.state.checkboxIdToSelectedMap = initialChecks;
   }
@@ -45,7 +43,7 @@ export class ExportConfiguration extends Component {
   selectAll(flag) {
     let newCheckboxIdToSelectedMap = {};
     for (let i = 0; i < this.options.length; i++) {
-      newCheckboxIdToSelectedMap[`${i}`] = flag;
+      newCheckboxIdToSelectedMap[`${this.options[i].id}`] = flag;
     }
     this.setState({
       checkboxIdToSelectedMap: newCheckboxIdToSelectedMap,
@@ -74,7 +72,7 @@ export class ExportConfiguration extends Component {
     };
     let result = false;
     for (let i = 0; i < this.options.length; i++) {
-      if (newCheckboxIdToSelectedMap[`${i}`] === true) {
+      if (newCheckboxIdToSelectedMap[`${this.options[i].id}`] === true) {
         result = true;
       }
     }
