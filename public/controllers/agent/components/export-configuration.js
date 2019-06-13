@@ -1,16 +1,15 @@
-import React, { Component, Fragment } from 'react';
+import React, { Component } from 'react';
 
 import {
   EuiPopover,
   EuiButton,
   EuiCheckboxGroup,
   EuiSpacer,
-  EuiButtonEmpty,
-  EuiFlexGroup,
-  EuiFlexItem
+  EuiButtonEmpty
 } from '@elastic/eui';
 
 import PropTypes from 'prop-types';
+import { ComponentsOsSupport } from '../../../utils/components-os-support';
 
 export class ExportConfiguration extends Component {
   constructor(props) {
@@ -18,52 +17,29 @@ export class ExportConfiguration extends Component {
 
     this.state = {
       buttonDisabled: false,
-      checkboxIdToSelectedMap:
-        this.props.type === 'agent' ? {
-          ['0']: true,
-          ['1']: true,
-          ['2']: true,
-          ['3']: true,
-          ['4']: true,
-          ['5']: true,
-          ['6']: true,
-          ['7']: true,
-          ['8']: true,
-          ['9']: true,
-          ['10']: true,
-          ['11']: true,
-          ['12']: true,
-          ['13']: true
-        } :
-          {
-            ['0']: true,
-            ['1']: true
-          },
-      isPopoverOpen: false,
+      isPopoverOpen: false
     };
 
+    const agentOptions = ['Global configuration', 'Communication', 'Anti-flooding settings', 'Labels', 'Policy monitoring',
+      { name: 'oscap', desc: 'OpenSCAP' }, 'CIS-CAT', 'Osquery', 'Inventory data', 'Active response', 'Commands',
+      { name: 'docker', desc: 'Docker listener' }, 'Log collection', 'Integrity monitoring'];
+    const groupOptions = ['Configurations', 'Agents in group'];
 
-    this.options = this.props.type === 'agent' ? [
-      { id: '0', label: 'Global configuration' },
-      { id: '1', label: 'Communication' },
-      { id: '2', label: 'Anti-flooding settings' },
-      { id: '3', label: 'Labels' },
-      { id: '4', label: 'Policy monitoring' },
-      { id: '5', label: 'OpenSCAP' },
-      { id: '6', label: 'CIS-CAT' },
-      { id: '7', label: 'Osquery' },
-      { id: '8', label: 'Inventory data' },
-      { id: '9', label: 'Active response' },
-      { id: '10', label: 'Commands' },
-      { id: '11', label: 'Docker listener' },
-      { id: '12', label: 'Log collection' },
-      { id: '13', label: 'Integrity monitoring' },
-    ] :
-      [
-        { id: '0', label: 'Configurations' },
-        { id: '1', label: 'Agents in group' }
-      ]
-      ;
+    this.options = [];
+    const list = this.props.type === 'agent' ? agentOptions : groupOptions;
+    let idx = 0;
+    list.forEach(x => {
+      if (typeof x === 'string' || (x.name && ComponentsOsSupport[x.name].includes(this.props.agentPlat))) {
+        this.options.push({ id: `${idx}`, label: x.desc || x });
+        idx++;
+      }
+    });
+
+    let initialChecks = {};
+    Object.keys(this.options).forEach(x => {
+      initialChecks[x] = true;
+    });
+    this.state.checkboxIdToSelectedMap = initialChecks;
   }
 
   selectAll(flag) {
@@ -157,5 +133,6 @@ export class ExportConfiguration extends Component {
 
 ExportConfiguration.propTypes = {
   exportConfiguration: PropTypes.func,
-  type: PropTypes.string
+  type: PropTypes.string,
+  agentPlat: PropTypes.string
 };
