@@ -16,7 +16,7 @@ import {
 } from '@elastic/eui';
 
 import { TabDescription } from '../../../../server/reporting/tab-description';
-import { ComponentsOsSupport } from '../../../utils/components-os-support';
+import { UnsupportedComponents } from '../../../utils/components-os-support';
 
 export class WelcomeScreen extends Component {
   constructor(props) {
@@ -153,7 +153,7 @@ export class WelcomeScreen extends Component {
                   ])}
                 </EuiFlexItem>
               </EuiFlexGroup>
-              {!ComponentsOsSupport['vuls'].includes(this.props.agent.agentPlat) &&
+              {(UnsupportedComponents[this.props.agent.agentPlatform] || UnsupportedComponents['other']).includes('vuls') &&
                 !this.props.extensions.virustotal && !this.props.extensions.osquery && !this.props.extensions.docker && (
                   <EuiFlexGroup>
                     <EuiFlexItem>
@@ -171,7 +171,7 @@ export class WelcomeScreen extends Component {
                   </EuiFlexGroup>
                 )}
               <EuiFlexGrid columns={2}>
-                {ComponentsOsSupport['vuls'].includes(this.props.agent.agentPlat) &&
+                {!(UnsupportedComponents[this.props.agent.agentPlatform] || UnsupportedComponents['other']).includes('vuls') &&
                   this.buildTabCard('vuls', 'securityApp')}
                 {this.props.extensions.virustotal &&
                   this.buildTabCard('virustotal', 'savedObjectsApp')}

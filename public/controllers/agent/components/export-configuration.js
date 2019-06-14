@@ -9,7 +9,7 @@ import {
 } from '@elastic/eui';
 
 import PropTypes from 'prop-types';
-import { ComponentsOsSupport } from '../../../utils/components-os-support';
+import { UnsupportedComponents } from '../../../utils/components-os-support';
 
 export class ExportConfiguration extends Component {
   constructor(props) {
@@ -28,7 +28,7 @@ export class ExportConfiguration extends Component {
     this.options = [];
     const list = this.props.type === 'agent' ? agentOptions : groupOptions;
     list.forEach((x, idx) => {
-      if (typeof x === 'string' || (x.name && ComponentsOsSupport[x.name].includes(this.props.agentPlat))) {
+      if (typeof x === 'string' || (x.name && !(UnsupportedComponents[this.props.agentPlatform] || UnsupportedComponents['other']).includes(x.name))) {
         this.options.push({ id: `${idx}`, label: x.desc || x });
       }
     });
@@ -132,5 +132,5 @@ export class ExportConfiguration extends Component {
 ExportConfiguration.propTypes = {
   exportConfiguration: PropTypes.func,
   type: PropTypes.string,
-  agentPlat: PropTypes.string
+  agentPlatform: PropTypes.string
 };

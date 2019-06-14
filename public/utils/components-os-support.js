@@ -10,9 +10,9 @@
  * Find more information about this on the LICENSE file.
  */
 
-export const ComponentsOsSupport = {
-  'audit': ['linux'],
-  'oscap': ['linux'],
-  'vuls': ['linux'],
-  'docker': ['linux']
+export const UnsupportedComponents = {
+  'linux': [],
+  'windows': ['audit', 'oscap', 'vuls', 'docker'],
+  'darwing': ['audit', 'oscap', 'vuls', 'docker'],
+  'other': ['audit', 'oscap', 'vuls', 'docker']
 };

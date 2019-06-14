@@ -14,7 +14,7 @@ import { generateMetric } from '../../utils/generate-metric';
 import { TabNames } from '../../utils/tab-names';
 import * as FileSaver from '../../services/file-saver';
 import { TabDescription } from '../../../server/reporting/tab-description';
-import { ComponentsOsSupport } from '../../utils/components-os-support';
+import { UnsupportedComponents } from '../../utils/components-os-support';
 import {
   metricsGeneral,
   metricsAudit,
@@ -132,7 +132,6 @@ export class AgentsController {
     }
 
     this.$scope.TabDescription = TabDescription;
-    this.$scope.ComponentsOsSupport = ComponentsOsSupport;
 
     this.$rootScope.reportStatus = false;
 
@@ -215,6 +214,9 @@ export class AgentsController {
     this.$scope.launchSyscheckScan = () => this.launchSyscheckScan();
 
     this.$scope.startVis2Png = () => this.startVis2Png();
+
+    this.$scope.shouldShowComponent = (component) => this.shouldShowComponent(component);
+
 
     this.$scope.$on('$destroy', () => {
       this.visFactoryService.clearAll();
@@ -739,10 +741,10 @@ export class AgentsController {
         this.$scope.agentOS =
           this.$scope.agent.os.name + ' ' + this.$scope.agent.os.version;
         const isLinux = this.$scope.agent.os.uname.includes('Linux');
-        this.$scope.agent.agentPlat = isLinux ? 'linux' : this.$scope.agent.os.platform;
+        this.$scope.agent.agentPlatform = isLinux ? 'linux' : this.$scope.agent.os.platform;
       } else {
         this.$scope.agentOS = '-';
-        this.$scope.agent.agentPlat = false;
+        this.$scope.agent.agentPlatform = false;
       }
 
       await this.$scope.switchTab(this.$scope.tab, true);
@@ -781,12 +783,14 @@ export class AgentsController {
     return;
   }
 
+  shouldShowComponent(component) {
+    return !(UnsupportedComponents[this.$scope.agent.agentPlatform] || UnsupportedComponents['other']).includes(component);
+  }
+
   cleanExtensions(extensions) {
-    const supportedOs = this.$scope.ComponentsOsSupport;
-    let result = {};
-    for (let extension in extensions) {
-      if (!supportedOs[extension] ||
-        (supportedOs[extension] && supportedOs[extension].includes(this.$scope.agent.agentPlat))) {
+    const result = {};
+    for (const extension in extensions) {
+      if (!(UnsupportedComponents[this.$scope.agent.agentPlatform] || UnsupportedComponents['other']).includes(extension)) {
         result[extension] = extensions[extension];
       }
     }
