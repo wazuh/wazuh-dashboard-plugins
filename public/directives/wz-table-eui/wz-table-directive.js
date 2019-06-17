@@ -13,7 +13,7 @@
 import template from './wz-table.html';
 import { uiModules } from 'ui/modules';
 import { DataFactory } from '../../services/data-factory';
-import { KeyEquivalenece } from '../../../util/csv-key-equivalence';
+import { KeyEquivalence } from '../../../util/csv-key-equivalence';
 import * as listeners from './lib/listeners';
 import { searchData, filterData, queryData } from './lib/data';
 import { initTable } from './lib/init';
@@ -43,7 +43,7 @@ app.directive('wzTableEui', function() {
 
       const parseColumns = columnsArray => {
         return columnsArray.map(item => ({
-          name: KeyEquivalenece[item.value || item] || item.value || item,
+          name: KeyEquivalence[item.value || item] || item.value || item,
           field: item.value || item,
           width: item.width || undefined,
           sortable: typeof item.sortable !== 'undefined' ? item.sortable : true,
