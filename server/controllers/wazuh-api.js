@@ -619,7 +619,9 @@ export class WazuhApiCtrl {
       const execd = daemons['ossec-execd'] === 'running';
       const modulesd = daemons['wazuh-modulesd'] === 'running';
       const wazuhdb = wazuhdbExists ? daemons['wazuh-db'] === 'running' : true;
-      const clusterd = isCluster ? daemons['wazuh-clusterd'] === 'running' : true;
+      const clusterd = isCluster
+        ? daemons['wazuh-clusterd'] === 'running'
+        : true;
 
       const isValid = execd && modulesd && wazuhdb && clusterd;
 
@@ -654,7 +656,7 @@ export class WazuhApiCtrl {
    * @param {Object} reply
    * @returns {Object} API response or ErrorResponse
    */
-  async makeRequest(method, path, data, id, reply, counter = 0) {
+  async makeRequest(method, path, data, id, reply) {
     const devTools = !!(data || {}).devTools;
     try {
       const api = await this.wzWrapper.getWazuhConfigurationById(id);

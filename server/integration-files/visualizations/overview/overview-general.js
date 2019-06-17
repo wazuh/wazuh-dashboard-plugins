@@ -285,5 +285,5 @@ export default [
           '{"index":"wazuh-alerts","filter":[],"query":{"query":"","language":"lucene"}}'
       }
     }
-  },
+  }
 ];

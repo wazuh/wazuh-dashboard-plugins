@@ -40,7 +40,7 @@ class WzMenu {
       height = $('#navDrawerMenu > ul:nth-child(2)')[0].clientHeight;
     } catch (error) {} // eslint-disable-line
     $scope.barHeight = (height || 51) + 2;
-    
+
     $scope.$applyAsync();
 
     if (appState.getCurrentAPI()) {
