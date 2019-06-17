@@ -23,7 +23,7 @@ import { ErrorResponse } from './error-response';
 import { Parser } from 'json2csv';
 import { getConfiguration } from '../lib/get-configuration';
 import { log } from '../logger';
-import { KeyEquivalenece } from '../../util/csv-key-equivalence';
+import { KeyEquivalence } from '../../util/csv-key-equivalence';
 import { ApiErrorEquivalence } from '../../util/api-errors-equivalence';
 import { cleanKeys } from '../../util/remove-key';
 import { apiRequestList } from '../../util/api-request-list';
@@ -909,7 +909,7 @@ export class WazuhApiCtrl {
       if (method === 'DELETE') {
         fixedUrl = `${
           fullUrl.includes('?') ? fullUrl.split('?')[0] : fullUrl
-        }?${querystring.stringify(data)}`;
+          }?${querystring.stringify(data)}`;
       }
 
       log('wazuh-api:makeRequest', `${method} ${fixedUrl || fullUrl}`, 'debug');
@@ -1195,7 +1195,7 @@ export class WazuhApiCtrl {
 
         for (const field of fields) {
           if (csv.includes(field)) {
-            csv = csv.replace(field, KeyEquivalenece[field] || field);
+            csv = csv.replace(field, KeyEquivalence[field] || field);
           }
         }
 
@@ -1403,7 +1403,7 @@ export class WazuhApiCtrl {
       const syscollector = {
         hardware:
           typeof hardwareResponse === 'object' &&
-          Object.keys(hardwareResponse).length
+            Object.keys(hardwareResponse).length
             ? { ...hardwareResponse }
             : false,
         os:
