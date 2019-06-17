@@ -65,7 +65,8 @@ export class ReportingTable extends Component {
       {
         field: 'date',
         name: 'Created',
-        sortable: true
+        sortable: true,
+        render: value => this.props.offsetTimestamp(value)
       },
       {
         name: 'Actions',
