@@ -1833,6 +1833,21 @@ export class WazuhReportingCtrl {
               apiId
             );
           }
+          let agentsInGroup = [];
+          try {
+            agentsInGroup = await this.apiRequest.makeGenericRequest(
+              'GET',
+              `/agents/groups/${g_id}`,
+              {},
+              apiId
+            );
+          } catch (err) { } //eslint-disable-line
+          await this.renderHeader(
+            tab,
+            g_id,
+            (((agentsInGroup || []).data || []).items || []).map(x => x.id),
+            apiId
+          );
         }
         if (isAgentConfig) {
           const configurations = AgentConfiguration.configurations;

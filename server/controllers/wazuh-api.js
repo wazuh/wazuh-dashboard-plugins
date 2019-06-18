@@ -23,7 +23,7 @@ import { ErrorResponse } from './error-response';
 import { Parser } from 'json2csv';
 import { getConfiguration } from '../lib/get-configuration';
 import { log } from '../logger';
-import { KeyEquivalenece } from '../../util/csv-key-equivalence';
+import { KeyEquivalence } from '../../util/csv-key-equivalence';
 import { ApiErrorEquivalence } from '../../util/api-errors-equivalence';
 import { cleanKeys } from '../../util/remove-key';
 import { apiRequestList } from '../../util/api-request-list';
@@ -785,7 +785,9 @@ export class WazuhApiCtrl {
       const execd = daemons['ossec-execd'] === 'running';
       const modulesd = daemons['wazuh-modulesd'] === 'running';
       const wazuhdb = wazuhdbExists ? daemons['wazuh-db'] === 'running' : true;
-      const clusterd = isCluster ? daemons['wazuh-clusterd'] === 'running' : true;
+      const clusterd = isCluster
+        ? daemons['wazuh-clusterd'] === 'running'
+        : true;
 
       const isValid = execd && modulesd && wazuhdb && clusterd;
 
@@ -820,7 +822,7 @@ export class WazuhApiCtrl {
    * @param {Object} reply
    * @returns {Object} API response or ErrorResponse
    */
-  async makeRequest(method, path, data, id, reply, counter = 0) {
+  async makeRequest(method, path, data, id, reply) {
     const devTools = !!(data || {}).devTools;
     try {
       const api = await this.wzWrapper.getWazuhConfigurationById(id);
@@ -1195,7 +1197,7 @@ export class WazuhApiCtrl {
 
         for (const field of fields) {
           if (csv.includes(field)) {
-            csv = csv.replace(field, KeyEquivalenece[field] || field);
+            csv = csv.replace(field, KeyEquivalence[field] || field);
           }
         }
 
