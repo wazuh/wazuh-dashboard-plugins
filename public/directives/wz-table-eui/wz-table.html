@@ -1,0 +1,11 @@
+<div class="md-padding md-padding-top-16" ng-show="wazuh_table_loading">
+    <react-component name="EuiProgress" props="{size: 'xs', color: 'primary'}" />
+</div>
+
+<div layout="row" ng-if="!error">
+    <react-component name="BasicTable" props="basicTableProps" />
+</div>
+
+<div layout="row" ng-if="error">
+    <react-component flex name="EuiCallOut" props="{color:'warning',iconType:'help', title: error}" />
+</div>

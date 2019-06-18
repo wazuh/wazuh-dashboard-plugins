@@ -9,7 +9,7 @@
  *
  * Find more information about this on the LICENSE file.
  */
-export const KeyEquivalenece = {
+export const KeyEquivalence = {
   id: 'ID',
   timestamp: 'Timestamp',
   url: 'URL',
@@ -102,5 +102,7 @@ export const KeyEquivalenece = {
   rationale: 'Rationale',
   registry: 'Registry',
   date: 'Date',
-  value: 'Value'
+  value: 'Value',
+  location: 'Location',
+  mtu: 'MTU'
 };

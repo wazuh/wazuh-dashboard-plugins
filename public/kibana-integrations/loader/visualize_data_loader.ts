@@ -111,6 +111,19 @@ export class VisualizeDataLoader {
       );
     }
 
+    const valueAxes = (visParams || {}).valueAxes || false;
+    const hasSeries = ((this.visData || {}).series || []).length;
+    if (valueAxes && hasSeries) {
+      if (visParams.type !== 'area') {
+        visParams.valueAxes.forEach((axis: { scale: { max: number; }; }, idx: string | number) => {
+          const maxValue = Math.max.apply(Math, this.visData.series[idx].values.map((x: { y: any; }) => { return x.y; }));
+          const lengthMaxValue = maxValue.toString().length;
+          const addTo = parseInt('1' + '0'.repeat(lengthMaxValue - 1));
+          axis.scale.max = maxValue + (addTo / 2);
+        });
+      }
+    }
+
     return {
       as: 'visualization',
       value: {

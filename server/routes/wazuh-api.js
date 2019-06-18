@@ -113,4 +113,13 @@ export function WazuhApiRoutes(server) {
       return ctrl.getRequestList(req, res);
     }
   });
+
+  // Return basic information of syscollector for given agent
+  server.route({
+    method: 'GET',
+    path: '/api/syscollector/{agent}',
+    handler(req, res) {
+      return ctrl.getSyscollector(req, res);
+    }
+  });
 }

@@ -11,10 +11,12 @@ All notable changes to the Wazuh app project will be documented in this file.
 ### Changed
 
 - Avoid showing more than one toaster for the same error message [7937003](https://github.com/wazuh/wazuh-kibana-app/commit/793700382798033203091d160773363323e05bb9).
+- Restored "Alerts evolution - Top 5 agents" in Overview > Security events [f9305c0](https://github.com/wazuh/wazuh-kibana-app/commit/f9305c0c6acf4a31c41b1cc9684b87f79b27524f).
 
 ### Fixed
 
 - Fix missing parameters in Dev Tools request [#1496](https://github.com/wazuh/wazuh-kibana-app/pull/1496).
+- Fix "Invalid Date" for Safari and Internet Explorer [#1505](https://github.com/wazuh/wazuh-kibana-app/pull/1505).
 
 ## Wazuh v3.9.1 - Kibana v7.1.1 - Revision 509
 

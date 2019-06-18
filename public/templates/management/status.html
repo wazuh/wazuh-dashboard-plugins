@@ -74,28 +74,38 @@
     </div>
     <!-- End daemons status section -->
 
-    <!-- Agents status section -->
-    <div layout="row" layout-align="start center" ng-show="!ctrl.load && !ctrl.clusterError">
-        <md-card flex class="wz-metric-color wz-md-card">
-            <md-card-content layout="row" class="wz-padding-metric">
-                <div flex class="wz-text-truncatable">Total agents:
-                    <span class="wz-text-bold">{{ctrl.agentsCountTotal}}</span>
-                </div>
-                <div flex class="wz-text-truncatable">Active:
-                    <span class="wz-text-bold">{{ctrl.agentsCountActive}}</span>
-                </div>
-                <div flex class="wz-text-truncatable">Disconnected:
-                    <span class="wz-text-bold">{{ctrl.agentsCountDisconnected}}</span>
-                </div>
-                <div flex class="wz-text-truncatable">Never connected: <span
-                        class="wz-text-bold">{{ctrl.agentsCountNeverConnected}}</span>
-                </div>
-                <div flex class="wz-text-truncatable">Agents coverage:
-                    <span class="wz-text-bold">{{(ctrl.agentsCoverity | number:2)}}%</span>
-                </div>
-            </md-card-content>
-        </md-card>
+    <div layout="row" layout-padding ng-if="!ctrl.load && !ctrl.clusterError">
+        <react-component flex name="AlertsStats" props="{
+                    items: [
+                    {
+                        description: 'Total agents',
+                        value: ctrl.agentsCountTotal,
+                        color: 'primary'
+                    },
+                    {
+                        description: 'Active',
+                        value: ctrl.agentsCountActive,
+                        color: 'secondary'
+                    },
+                    {
+                        description: 'Disconnected',
+                        value: ctrl.agentsCountDisconnected,
+                        color: 'danger'
+                    },
+                    {
+                        description: 'Never connected',
+                        value: ctrl.agentsCountNeverConnected,
+                        color: 'accent'
+                    },
+                    {
+                        description: 'Agents coverage',
+                        value: (ctrl.agentsCoverity | number:2) + '%',
+                        color: 'accent'
+                    }
+                    ]            
+                }" />
     </div>
+
     <!-- End agents status section -->
 
     <div layout="row" layout-align="start stretch" layout-wrap ng-if="!ctrl.load && !ctrl.clusterError">

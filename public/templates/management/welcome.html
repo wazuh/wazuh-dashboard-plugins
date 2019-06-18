@@ -1,46 +1,5 @@
-<div class="" layout="column" layout-align="start stretch" ng-if="mctrl.tab === 'welcome'">
-
-    <!-- Wazuh management card -->
+<div layout="column" layout-align="start stretch" ng-if="mctrl.tab === 'welcome'">
     <div layout="row" layout-padding>
-        <div class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--responsive">
-            <div class="euiFlexItem">
-                <div class="euiPanel euiPanel--paddingLarge">
-                    <h3 class="euiTitle wzEuiTitle">Administration</h3>
-                    <div class="euiSpacer euiSpacer--m"></div>
-                    <div class="euiFlexGrid euiFlexGrid--gutterLarge euiFlexGrid--halves">
-                        <wz-welcome-card class="euiFlexItem" logo="'icons/ruleset.png'" card-title="'Ruleset'"
-                            switch-tab="mctrl.switchTab('ruleset', true)" current-tab="'rules'"
-                            description="'Manage your Wazuh cluster ruleset.'"></wz-welcome-card>
-                        <wz-welcome-card class="euiFlexItem" logo="'icons/groups.png'" card-title="'Groups'"
-                            switch-tab="mctrl.switchTab('groups', true)" current-tab="'groups'"
-                            description="'Manage your agent groups.'"></wz-welcome-card>
-                        <wz-welcome-card class="euiFlexItem" logo="'icons/app_devtools.svg'"
-                            card-title="'Configuration'" switch-tab="mctrl.switchTab('configuration', true)"
-                            current-tab="'configuration'" description="'Manage your Wazuh cluster configuration.'">
-                        </wz-welcome-card>
-                    </div>
-                </div>
-            </div>
-            <div class="euiFlexItem">
-                <div class="euiPanel euiPanel--paddingLarge">
-                    <h3 class="euiTitle wzEuiTitle">Status and reports</h3>
-                    <div class="euiSpacer euiSpacer--m"></div>
-                    <div class="euiFlexGrid euiFlexGrid--gutterLarge euiFlexGrid--halves">
-                        <wz-welcome-card class="euiFlexItem" logo="'icons/app_monitoring.svg'" card-title="'Status'"
-                            switch-tab="mctrl.switchTab('status', true)" current-tab="'status'"
-                            description="'Check your Wazuh cluster status.'"></wz-welcome-card>
-                        <wz-welcome-card class="euiFlexItem" logo="'icons/app_logging.svg'" card-title="'Logs'"
-                            switch-tab="mctrl.switchTab('logs', true)" current-tab="'logs'"
-                            description="'Logs from your Wazuh cluster.'"></wz-welcome-card>
-                        <wz-welcome-card class="euiFlexItem" logo="'icons/app_index_pattern.svg'" card-title="'Cluster'"
-                            switch-tab="mctrl.switchTab('monitoring', true)" current-tab="'monitoring'"
-                            description="'Visualize your Wazuh cluster.'"></wz-welcome-card>
-                        <wz-welcome-card class="euiFlexItem" logo="'icons/reporting.png'" card-title="'Reporting'"
-                            switch-tab="mctrl.switchTab('reporting', true)" current-tab="'reporting'"
-                            description="'Check your stored Wazuh reports.'"></wz-welcome-card>
-                    </div>
-                </div>
-            </div>
-        </div>
+        <react-component flex name="WelcomeScreenManagement" props="mctrl.welcomeCardsProps" />
     </div>
 </div>
