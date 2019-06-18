@@ -2057,7 +2057,7 @@ export class WazuhReportingCtrl {
                         text: `${section.subtitle} configuration.`,
                         link: section.docuLink,
                         style: { fontSize: 12, color: '#1a0dab' },
-                        margin: [0, 0, 0, 0]
+                        margin: [0, 0, 0, 20]
                       });
                     }
                   } catch (err) { } //eslint-disable-line
