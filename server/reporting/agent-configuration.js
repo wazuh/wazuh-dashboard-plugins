@@ -199,7 +199,8 @@ export const AgentConfiguration = {
               verify_sha1: 'Verify SHA1 sum',
               verify_sha256: 'Verify SHA256 sum'
             }
-          ]
+          ],
+          docuLink: 'https://documentation.wazuh.com/current/user-manual/reference/ossec-conf/wodle-command.html'
         },
         {
           subtitle: 'Docker listener',

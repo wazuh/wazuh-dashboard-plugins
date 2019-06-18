@@ -2031,6 +2031,34 @@ export class WazuhReportingCtrl {
                           }
                         }
                       }
+                    } else {
+                      // Print the section title
+                      if (!titleOfSection) {
+                        this.dd.content.push({
+                          text: config.title,
+                          style: 'h1',
+                          margin: [0, 0, 0, 15]
+                        });
+                        titleOfSection = true;
+                      }
+                      //Print the subtitle
+                      this.dd.content.push({
+                        text: section.subtitle,
+                        style: 'h4'
+                      });
+                      // Print no configured module and link to the documentation
+                      this.dd.content.push({
+                        text: 'This module is not configured. Please take a look on how to configure it in',
+                        style: { fontSize: 12, color: '#000' },
+                        margin: [0, 10, 0, 0]
+                      });
+                      // Print no configured module and link to the documentation
+                      this.dd.content.push({
+                        text: `${section.subtitle} configuration.`,
+                        link: section.docuLink,
+                        style: { fontSize: 12, color: '#1a0dab' },
+                        margin: [0, 0, 0, 0]
+                      });
                     }
                   } catch (err) { } //eslint-disable-line
                   idx++;
