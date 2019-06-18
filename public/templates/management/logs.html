@@ -35,7 +35,7 @@
         </div>
 
         <div flex="20" layout="column" layout-align="center">
-            <wz-kbn-switch switch-model="ctrl.sortFilter" switch-change="ctrl.sort()" switch-text="Oldest logs first">
+            <wz-kbn-switch switch-model="ctrl.sortFilter" switch-change="ctrl.sort()" switch-text="Descending sort">
             </wz-kbn-switch>
         </div>
 
@@ -96,8 +96,7 @@
     <!-- End Logs section -->
 
     <div layout="row" layout-padding ng-if="XMLContent === ''">
-        <react-component flex name="EuiCallOut"
-            props="{color:'warning',iconType:'help', title:'No results match your search criteria'}" />
+        <react-component flex name="EuiCallOut" props="{color:'warning',iconType:'help', title:'No results match your search criteria'}" />
     </div>
 
 </div>

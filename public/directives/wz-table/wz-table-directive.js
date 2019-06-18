@@ -103,7 +103,7 @@ app.directive('wzTable', function () {
       if ($scope.implicitSort && $scope.implicitSort !== 'timestamp') {
         $scope.sort($scope.implicitSort);
       }
-      $scope.keyEquivalence = KeyEquivalenece;
+      $scope.keyEquivalence = KeyEquivalence;
       $scope.totalItems = 0;
       $scope.wazuh_table_loading = true;
       $scope.items = [];
