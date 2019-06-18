@@ -205,10 +205,10 @@ export class LogsController {
 
       const data = clusterEnabled
         ? await this.apiReq.request(
-            'GET',
-            `/cluster/${this.selectedNode}/logs/summary`,
-            {}
-          )
+          'GET',
+          `/cluster/${this.selectedNode}/logs/summary`,
+          {}
+        )
         : await this.apiReq.request('GET', '/manager/logs/summary', {});
       const daemons = data.data.data;
       this.daemons = Object.keys(daemons).map(item => ({ title: item }));

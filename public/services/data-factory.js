@@ -19,16 +19,14 @@ export class DataFactory {
    */
   constructor(httpClient, path, implicitFilter, implicitSort) {
     this.implicitFilter = implicitFilter || false;
-    this.implicitSort = implicitSort || false;
     this.httpClient = httpClient;
     this.items = [];
     this.path = path;
     this.filters = [];
-    this.sortValue = false;
-    this.sortDir = true;
+    this.sortDir = false;
     this.busy = false;
     if (this.implicitFilter) this.filters.push(...this.implicitFilter);
-    if (this.implicitSort) this.addSorting(this.implicitSort);
+    if (implicitSort) this.addSorting(implicitSort);
   }
 
   /**

@@ -23,7 +23,7 @@
                     {{ path === '/agents/groups' && (key.value || key) === 'count' ? 'Agents' :
                     keyEquivalence[key.value ||
                     key] || key.value || key }}
-                    <i ng-if="!key.nosortable" class="fa wz-theader-sort-icon" ng-class="sortValue === (key.value || key) ? (sortDir ? 'fa-sort-asc' : 'fa-sort-desc') : 'fa-sort'"
+                    <i ng-if="!key.nosortable" class="fa wz-theader-sort-icon" ng-class="sortValue === (key.value || key) ? (!sortDir ? 'fa-sort-asc' : 'fa-sort-desc') : 'fa-sort'"
                         aria-hidden="true"></i>
                 </p>
             </th>
