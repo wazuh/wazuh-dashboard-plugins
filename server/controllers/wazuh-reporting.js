@@ -2048,17 +2048,12 @@ export class WazuhReportingCtrl {
                       });
                       // Print no configured module and link to the documentation
                       this.dd.content.push({
-                        text: 'This module is not configured. Please take a look on how to configure it in',
-                        style: { fontSize: 12, color: '#000' },
-                        margin: [0, 10, 0, 0]
-                      });
-                      // Print no configured module and link to the documentation
-                      this.dd.content.push({
-                        text: `${section.subtitle.toLowerCase()} configuration.`,
-                        link: section.docuLink,
-                        style: { fontSize: 12, color: '#1a0dab' },
+                        text: [
+                          'This module is not configured. Please take a look on how to configure it in ',
+                          { text: `${section.subtitle.toLowerCase()} configuration.`, link: section.docuLink, style: { fontSize: 12, color: '#1a0dab' } }
+                        ],
                         margin: [0, 0, 0, 20]
-                      });
+                      })
                     }
                   } catch (err) { } //eslint-disable-line
                   idx++;
