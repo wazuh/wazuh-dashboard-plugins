@@ -2054,7 +2054,7 @@ export class WazuhReportingCtrl {
                       });
                       // Print no configured module and link to the documentation
                       this.dd.content.push({
-                        text: `${section.subtitle} configuration.`,
+                        text: `${section.subtitle.toLowerCase()} configuration.`,
                         link: section.docuLink,
                         style: { fontSize: 12, color: '#1a0dab' },
                         margin: [0, 0, 0, 20]
