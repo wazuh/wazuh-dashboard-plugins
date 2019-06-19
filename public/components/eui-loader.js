@@ -17,8 +17,12 @@ import {
   EuiLoadingSpinner,
   EuiProgress,
   EuiBasicTable,
-  EuiButtonIcon
+  EuiButtonIcon,
+  EuiHealth,
+  EuiCallOut
 } from '@elastic/eui';
+
+import { BasicTable } from '../directives/wz-table-eui/components/table';
 
 const app = uiModules.get('app/wazuh', ['react']);
 
@@ -28,4 +32,7 @@ app
   .value('EuiLoadingSpinner', EuiLoadingSpinner)
   .value('EuiProgress', EuiProgress)
   .value('EuiButtonIcon', EuiButtonIcon)
-  .value('EuiBasicTable', EuiBasicTable);
+  .value('EuiBasicTable', EuiBasicTable)
+  .value('EuiHealth', EuiHealth)
+  .value('EuiCallOut', EuiCallOut)
+  .value('BasicTable', BasicTable);

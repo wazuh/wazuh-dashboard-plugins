@@ -18,6 +18,10 @@
         </md-card>
     </div>
 
+    <div layout="row" layout-padding ng-if="octrl.pciTabs">
+        <react-component flex name="ComplianceRequirements" props="{items:octrl.pciTabs}" />
+    </div>
+
     <div layout="row" layout-align="center stretch" class="height-400">
         <md-card flex="70" class="wz-md-card" ng-class="{'fullscreen': octrl.expandArray[0]}">
             <md-card-actions layout="row" class="wz-card-actions-vis" ng-dblclick="octrl.expand(0)">

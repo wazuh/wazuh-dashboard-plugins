@@ -1,18 +1,15 @@
 <md-content flex layout="column" ng-if="tab === 'vuls' && tabView === 'panels'"
     ng-class="{'no-opacity': resultState !== 'ready' || !rendered}" layout-align="start">
 
-    <!-- View: Panels -->
-
-
-    <div layout="row">
-        <md-card flex class="wz-md-card wz-metric-color">
-            <md-card-content layout="row" class="wz-padding-metric">
-                <div flex>Critical severity alerts: <span class="wz-text-bold" ng-bind="vulnCritical()"></span></div>
-                <div flex>High severity alerts: <span class="wz-text-bold" ng-bind="vulnHigh()"></span></div>
-                <div flex>Medium severity alerts: <span class="wz-text-bold" ng-bind="vulnMedium()"></span></div>
-                <div flex>Low severity alerts: <span class="wz-text-bold" ng-bind="vulnLow()"></span></div>
-            </md-card-content>
-        </md-card>
+    <div layout="row" layout-padding>
+        <react-component flex name="AlertsStats" props="{
+            items: [
+                { description: 'Critical severity alerts', value: vulnCritical(), color: 'danger' },                
+                { description: 'High severity alerts', value: vulnHigh(), color: 'primary' },
+                { description: 'Medium severity alerts', value: vulnMedium(), color: 'secondary' },
+                { description: 'Low severity alerts', value: vulnLow(), color: 'accent' }
+            ]            
+        }" />
     </div>
 
     <div class="wz-no-display">
@@ -24,8 +21,7 @@
 
     <div layout="row" layout-align="center stretch" class="height-300">
         <md-card flex class="wz-md-card" ng-class="{'fullscreen': expandArray[0]}">
-            <md-card-actions layout="row" layout-align="end center" class="wz-card-actions-vis"
-                ng-dblclick="expand(0)">
+            <md-card-actions layout="row" layout-align="end center" class="wz-card-actions-vis" ng-dblclick="expand(0)">
                 <span class="wz-headline-title">Alerts severity over time</span>
                 <span flex></span>
                 <span class="cursor-pointer" ng-click="expand(0)">
@@ -38,8 +34,7 @@
             </md-card-content>
         </md-card>
         <md-card flex class="wz-md-card" ng-class="{'fullscreen': expandArray[1]}">
-            <md-card-actions layout="row" layout-align="end center" class="wz-card-actions-vis"
-                ng-dblclick="expand(1)">
+            <md-card-actions layout="row" layout-align="end center" class="wz-card-actions-vis" ng-dblclick="expand(1)">
                 <span class="wz-headline-title">Most common rules</span>
                 <span flex></span>
                 <span class="cursor-pointer" ng-click="expand(1)">
@@ -53,8 +48,7 @@
     </div>
     <div layout="row" layout-align="center stretch" class="height-270">
         <md-card flex class="wz-md-card" ng-class="{'fullscreen': expandArray[2]}">
-            <md-card-actions layout="row" layout-align="end center" class="wz-card-actions-vis"
-                ng-dblclick="expand(2)">
+            <md-card-actions layout="row" layout-align="end center" class="wz-card-actions-vis" ng-dblclick="expand(2)">
                 <span class="wz-headline-title">Most common CVEs</span>
                 <span flex></span>
                 <span class="cursor-pointer" ng-click="expand(2)">
@@ -67,8 +61,7 @@
             </md-card-content>
         </md-card>
         <md-card flex class="wz-md-card" ng-class="{'fullscreen': expandArray[3]}">
-            <md-card-actions layout="row" layout-align="end center" class="wz-card-actions-vis"
-                ng-dblclick="expand(3)">
+            <md-card-actions layout="row" layout-align="end center" class="wz-card-actions-vis" ng-dblclick="expand(3)">
                 <span class="wz-headline-title">Severity distribution</span>
                 <span flex></span>
                 <span class="cursor-pointer" ng-click="expand(3)">
@@ -81,8 +74,7 @@
             </md-card-content>
         </md-card>
         <md-card flex class="wz-md-card" ng-class="{'fullscreen': expandArray[4]}">
-            <md-card-actions layout="row" layout-align="end center" class="wz-card-actions-vis"
-                ng-dblclick="expand(4)">
+            <md-card-actions layout="row" layout-align="end center" class="wz-card-actions-vis" ng-dblclick="expand(4)">
                 <span class="wz-headline-title">Commonly affected packages</span>
                 <span flex></span>
                 <span class="cursor-pointer" ng-click="expand(4)">
@@ -98,8 +90,7 @@
 
     <div layout="row" class="height-570">
         <md-card flex class="wz-md-card" ng-class="{'fullscreen': expandArray[5]}">
-            <md-card-actions layout="row" layout-align="end center" class="wz-card-actions-vis"
-                ng-dblclick="expand(5)">
+            <md-card-actions layout="row" layout-align="end center" class="wz-card-actions-vis" ng-dblclick="expand(5)">
                 <span class="wz-headline-title">Alert summary</span>
                 <span flex></span>
                 <span class="cursor-pointer" ng-click="expand(5)">
