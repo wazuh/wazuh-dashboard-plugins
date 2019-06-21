@@ -670,7 +670,7 @@ export class SettingsController {
    */
   async getAppInfo() {
     try {
-      const data = await this.genericReq.request('GET', '/elastic/setup');
+      const data = await this.genericReq.request('GET', '/api/setup');
       this.appInfo = {};
       this.appInfo['app-version'] = data.data.data['app-version'];
       this.appInfo['installationDate'] = data.data.data['installationDate'];
