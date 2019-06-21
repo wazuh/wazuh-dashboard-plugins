@@ -220,7 +220,7 @@ export function Initialize(server) {
         await wzWrapper.deleteWazuhVersionIndex();
         log(
           'initialize[checkWazuhVersionRegistry]',
-          'Successfully deleted old .wazuh-index index.',
+          'Successfully deleted old .wazuh-version index.',
           'debug'
         );
       } catch (error) {

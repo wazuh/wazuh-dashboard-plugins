@@ -165,11 +165,11 @@ export class ElasticWrapper {
  */
   async deleteWazuhVersionIndex() {
     try {
-      const data = await this.elasticRequest.callWithInternalUser('delete', {
-        index: '.wazuh-version',
-        type: '_doc',
-        id: '1'
-      });
+      const data = await this.elasticRequest.callWithInternalUser(
+        'indices.delete',
+        {
+          index: '.wazuh-version'
+        });
       return data;
     } catch (error) {
       return Promise.reject(error);
