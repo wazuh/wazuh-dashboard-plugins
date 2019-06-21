@@ -562,7 +562,7 @@ export class AgentsController {
         this.$scope.agent.status =
           (((agentInfo || {}).data || {}).data || {}).status ||
           this.$scope.agent.status;
-      } catch (error) {} // eslint-disable-line
+      } catch (error) { } // eslint-disable-line
     }
 
     try {
@@ -574,7 +574,7 @@ export class AgentsController {
         this.$scope.selectedPciIndex = 0;
       }
       if (tab === 'gdpr') {
-        const gdprTabs = await this.commonData.getPCI();
+        const gdprTabs = await this.commonData.getGDPR();
         this.$scope.gdprTabs = gdprTabs;
         this.$scope.selectedGdprIndex = 0;
       }
@@ -598,7 +598,7 @@ export class AgentsController {
       if (tab === 'syscollector')
         try {
           await this.loadSyscollector(this.$scope.agent.id);
-        } catch (error) {} // eslint-disable-line
+        } catch (error) { } // eslint-disable-line
       if (tab === 'configuration') {
         this.$scope.switchConfigurationTab('welcome');
       } else {
@@ -861,7 +861,7 @@ export class AgentsController {
       );
       this.errorHandler.info(
         `Policy monitoring scan launched successfully on agent ${
-          this.$scope.agent.id
+        this.$scope.agent.id
         }`,
         ''
       );
