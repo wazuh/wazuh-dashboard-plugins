@@ -19,10 +19,11 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 - Corrected width for agent stats [a998955] (https://github.com/wazuh/wazuh-kibana-app/commit/a99895565a8854c55932ec94cffb08e1d0aa3da1).
 - Fix height for the menu directive with Dynamic height [427d0f3] (https://github.com/wazuh/wazuh-kibana-app/commit/427d0f3e9fa6c34287aa9e8557da99a51e0db40f).
-- Fix wazuh-db and clusterd check [cddcef6] (https://github.com/wazuh/wazuh-kibana-app/commit/cddcef630c5234dd6f6a495715743dfcfd4e4001)
-- Fix AlertsStats when value is "0", it was showing "-" [07a3e10] (https://github.com/wazuh/wazuh-kibana-app/commit/07a3e10c7f1e626ba75a55452b6c295d11fd657d)
-- Fix syscollector state value [f8d3d0e] (https://github.com/wazuh/wazuh-kibana-app/commit/f8d3d0eca44e67e26f79bc574495b1f4c8f751f2)
-- Fix time offset for reporting table [2ef500b] (https://github.com/wazuh/wazuh-kibana-app/commit/2ef500bb112e68bd4811b8e87ce8581d7c04d20f)
+- Fix wazuh-db and clusterd check [cddcef6] (https://github.com/wazuh/wazuh-kibana-app/commit/cddcef630c5234dd6f6a495715743dfcfd4e4001).
+- Fix AlertsStats when value is "0", it was showing "-" [07a3e10] (https://github.com/wazuh/wazuh-kibana-app/commit/07a3e10c7f1e626ba75a55452b6c295d11fd657d).
+- Fix syscollector state value [f8d3d0e] (https://github.com/wazuh/wazuh-kibana-app/commit/f8d3d0eca44e67e26f79bc574495b1f4c8f751f2).
+- Fix time offset for reporting table [2ef500b] (https://github.com/wazuh/wazuh-kibana-app/commit/2ef500bb112e68bd4811b8e87ce8581d7c04d20f).
+- Fix call to obtain GDPR requirements for specific agent [ccda846] (https://github.com/wazuh/wazuh-kibana-app/commit/ccda8464b50be05bc5b3642f25f4972c8a7a2c03).
 
 ## Wazuh v3.9.2 - Kibana v7.1.1 - Revision 510
 
