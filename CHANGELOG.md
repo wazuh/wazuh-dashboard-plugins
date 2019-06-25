@@ -24,6 +24,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fix syscollector state value [f8d3d0e] (https://github.com/wazuh/wazuh-kibana-app/commit/f8d3d0eca44e67e26f79bc574495b1f4c8f751f2).
 - Fix time offset for reporting table [2ef500b] (https://github.com/wazuh/wazuh-kibana-app/commit/2ef500bb112e68bd4811b8e87ce8581d7c04d20f).
 - Fix call to obtain GDPR requirements for specific agent [ccda846] (https://github.com/wazuh/wazuh-kibana-app/commit/ccda8464b50be05bc5b3642f25f4972c8a7a2c03).
+- Restore "rule.id" as a clickable field in visualizations [#1546] (https://github.com/wazuh/wazuh-kibana-app/pull/1546)
 
 ## Wazuh v3.9.2 - Kibana v7.1.1 - Revision 510
 
