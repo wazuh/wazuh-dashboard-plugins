@@ -190,6 +190,8 @@ service kibana restart
 |      6.8.0     |       3.9.1       | /usr/share/kibana/bin/kibana-plugin install <https://packages.wazuh.com/wazuhapp/wazuhapp-3.9.1_6.8.0.zip> |
 |      7.1.0     |       3.9.1       | /usr/share/kibana/bin/kibana-plugin install <https://packages.wazuh.com/wazuhapp/wazuhapp-3.9.1_7.1.0.zip> |
 |      7.1.1     |       3.9.1       | /usr/share/kibana/bin/kibana-plugin install <https://packages.wazuh.com/wazuhapp/wazuhapp-3.9.1_7.1.1.zip> |
+|      6.8.0     |       3.9.2       | /usr/share/kibana/bin/kibana-plugin install <https://packages.wazuh.com/wazuhapp/wazuhapp-3.9.2_6.8.0.zip> |
+|      6.8.1     |       3.9.2       | /usr/share/kibana/bin/kibana-plugin install <https://packages.wazuh.com/wazuhapp/wazuhapp-3.9.2_6.8.1.zip> |
 |      7.1.1     |       3.9.2       | /usr/share/kibana/bin/kibana-plugin install <https://packages.wazuh.com/wazuhapp/wazuhapp-3.9.2_7.1.1.zip> |
 
 
