@@ -15,7 +15,8 @@
 import 'plugins/kibana/visualize/saved_visualizations/_saved_vis';
 import { VisTypesRegistryProvider } from 'ui/registry/vis_types';
 import { uiModules } from 'ui/modules';
-import { SavedObjectLoader, SavedObjectsClientProvider } from 'ui/saved_objects';
+import { SavedObjectLoader } from './saved-object-loader';
+import { SavedObjectsClientProvider } from 'ui/saved_objects';
 import { savedObjectManagementRegistry } from 'plugins/kibana/management/saved_object_registry';
 
 const app = uiModules.get('app/visualize');

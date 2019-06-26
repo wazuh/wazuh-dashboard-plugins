@@ -198,9 +198,9 @@ function discoverController(
   $scope.searchSource.setParent(timeRangeSearchSource);
 
   const pageTitleSuffix = savedSearch.id && savedSearch.title ? `: ${savedSearch.title}` : '';
-  docTitle.change(`Discover${pageTitleSuffix}`);
+  docTitle.change(`Wazuh${pageTitleSuffix}`);
   const discoverBreadcrumbsTitle = i18n.translate('kbn.discover.discoverBreadcrumbTitle', {
-    defaultMessage: 'Discover',
+    defaultMessage: 'Wazuh',
   });
 
   if (savedSearch.id && savedSearch.title) {

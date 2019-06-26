@@ -39,14 +39,49 @@ export class SavedObjectLoader {
     this.savedObjectsClient = savedObjectClient;
   }
 
+  // Fake async function, only to resolve a promise
+  async processFunc() {
+    return;
+  }
+
   /**
    * Retrieve a saved object by id. Returns a promise that completes when the object finishes
    * initializing.
    * @param id
    * @returns {Promise<SavedObject>}
    */
-  get(id) {
-    return (new this.Class(id)).init();
+  get(id, raw) {
+    const instance = new this.Class(id);
+
+    instance.init = _.once(() => {
+      // ensure that the esType is defined
+
+      return Promise.resolve()
+        .then(() => {
+          // If there is not id, then there is no document to fetch from elasticsearch
+          if (!instance.id) {
+            // just assign the defaults and be done
+            _.assign(instance, instance.defaults);
+            return instance.hydrateIndexPattern().then(() => {
+              return afterESResp.call(instance); // eslint-disable-line
+            });
+          }
+          return this.processFunc()
+            .then(() => {
+              return {
+                _id: raw.id,
+                _type: raw.type,
+                _source: _.cloneDeep(raw.attributes),
+                found: raw._version ? true : false
+              };
+            })
+            .then(instance.applyESResp)
+            .catch(instance.applyEsResp);
+        })
+        .then(() => instance);
+    });
+    const object = instance.init();
+    return object;
   }
 
   urlFor(id) {
