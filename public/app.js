@@ -41,12 +41,16 @@ import 'angular-chart.js';
 const app = uiModules.get('app/wazuh', ['ngCookies', 'ngMaterial', 'chart.js']);
 
 
+// Adds the logo
+const addLogo = () => {
+  $('.euiBreadcrumb').html('<img src="/plugins/wazuh/img/new_logo_white.svg" class="navBarLogo" alt="">')
+}
 
 // Clear active class
-
 const clearActive = () => {
   $('.wz-menu-button').removeClass('wz-menu-active');
 }
+
 // Change the navbar with JQuery for the wz-menu
 const changeNavBar = () => {
   const interval = setInterval(() => {
@@ -55,6 +59,7 @@ const changeNavBar = () => {
       nav.append(`<div class="wz-menu-jq">${wzMenuTemplate}</div><div class="wz-menu-bottom-line"></div>`);
       clearInterval(interval);
     }
+    addLogo()
     const owBtn = $('#wzBtnOverview')
     const mngBtn = $('#wzBtnManager')
     const agBtn = $('#wzBtnAgents')
