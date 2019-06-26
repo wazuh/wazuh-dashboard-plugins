@@ -11,6 +11,7 @@
  *
  * Find more information about this on the LICENSE file.
  */
+import { data } from 'plugins/data';
 import { EuiButtonEmpty, EuiFlexGroup, EuiFlexItem, EuiPopover } from '@elastic/eui';
 import {
   buildEmptyFilter,
@@ -27,7 +28,7 @@ import classNames from 'classnames';
 import React, { Component } from 'react';
 import chrome from 'ui/chrome';
 import { IndexPattern } from 'ui/index_patterns';
-import { FilterOptions } from 'ui/search_bar/components/filter_options';
+const { FilterOptions } = data.search.ui;
 import { FilterEditor } from 'ui/filter_bar/filter_editor';
 import { FilterItem } from './filter_item';
 

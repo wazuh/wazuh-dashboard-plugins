@@ -12,7 +12,7 @@
  * Find more information about this on the LICENSE file.
  */
 import _ from 'lodash';
-import { Scanner } from 'ui/utils/scanner';
+//import { Scanner } from 'ui/utils/scanner';
 import { StringUtils } from 'ui/utils/string_utils';
 
 export class SavedObjectLoader {

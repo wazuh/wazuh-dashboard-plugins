@@ -18,7 +18,7 @@
  */
 
 // @ts-ignore untyped dependency
-import { registries } from '@kbn/interpreter/public';
+import { registries } from 'plugins/interpreter/registries';
 // @ts-ignore
 import { EventEmitter } from 'events';
 import { debounce, forEach, get } from 'lodash';

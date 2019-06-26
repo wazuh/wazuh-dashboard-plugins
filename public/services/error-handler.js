@@ -19,8 +19,8 @@ import { GlobalToastList } from '../../../../src/core/public/notifications/toast
 import { ToastsService } from '../../../../src/core/public/notifications/toasts/toasts_service';
 import { ToastsServicew } from './notifications/toasts_service';
 import { GlobalToastListw } from './notifications/global_toast_list';
-ToastsService.prototype.start = ToastsServicew.prototype.start;
-GlobalToastList.prototype.render = GlobalToastListw.prototype.render;
+//ToastsService.prototype.start = ToastsServicew.prototype.start;
+//GlobalToastList.prototype.render = GlobalToastListw.prototype.render;
 
 export class ErrorHandler {
   /**
