@@ -24,6 +24,7 @@ import 'uiExports/devTools';
 import 'uiExports/docViews';
 import 'uiExports/embeddableFactories';
 import 'uiExports/autocompleteProviders';
+import wzMenuTemplate from './directives/wz-menu/wz-menu.html';
 
 // Require CSS
 import './less/loader';
@@ -38,6 +39,17 @@ import 'angular-chart.js';
 
 // Set up Wazuh app
 const app = uiModules.get('app/wazuh', ['ngCookies', 'ngMaterial', 'chart.js']);
+
+// Change the navbar with JQuery for the wz-menu
+const changeNavBar = () => {
+  const interval = setInterval(() => {
+    const nav = $('nav');
+    if (nav.length) {
+      nav.append(`<div class="wz-menu-jq">${wzMenuTemplate}</div>`);
+      clearInterval(interval);
+    }
+  }, 500);
+}
 
 app.config([
   '$compileProvider',
@@ -56,6 +68,7 @@ app.config([
 ]);
 
 app.run(function($rootScope, $route, $location, appState, $window) {
+  changeNavBar();
   appState.setNavigation({ status: false });
   appState.setNavigation({
     reloaded: false,
