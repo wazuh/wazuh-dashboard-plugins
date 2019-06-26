@@ -77,8 +77,13 @@ const { getRootBreadcrumbs, getSavedSearchBreadcrumbs } = data.search.ui;
 import { buildVislibDimensions } from 'ui/visualize/loader/pipeline_helpers/build_pipeline';
 import 'ui/capabilities/route_setup';
 
-
 data.search.loadLegacyDirectives();
+
+const fetchStatuses = {
+  UNINITIALIZED: 'uninitialized',
+  LOADING: 'loading',
+  COMPLETE: 'complete',
+};
 
 const app = uiModules.get('apps/discover', [
   'kibana/notify',
