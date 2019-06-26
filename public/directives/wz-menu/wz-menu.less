@@ -16,6 +16,15 @@
 
 /* Style to the base toolbar */
 /* Style applied to the toolbar-tools container */
+
+wz-menu {
+    position: fixed;
+    width: 100%;
+    right: 0;
+    z-index: 2;
+    top: 49px;
+}
+
 .wz-menu-content {
     color: #373a42;
     background-color: #FFF;
@@ -82,7 +91,7 @@
     /*border-bottom: 1px solid #d3dae6;*/
     width: 100%;
     left: 48px;
-    width: 60%;
+    width: 50%;
     border-top: 1px solid #d2d9e5;
     z-index: 1000;
 }
@@ -107,4 +116,8 @@
 
 .euiHeader {
     box-shadow: none !important;
+}
+
+.app-wrapper {
+    margin-top: 49px !important;
 }
