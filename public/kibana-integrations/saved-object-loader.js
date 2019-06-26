@@ -16,33 +16,20 @@ import _ from 'lodash';
 import { StringUtils } from 'ui/utils/string_utils';
 
 export class SavedObjectLoader {
-  constructor(
-    SavedObjectClass,
-    kbnIndex,
-    kbnUrl,
-    $http,
-    chrome,
-    savedObjectsClient
-  ) {
+  constructor(SavedObjectClass, kbnUrl, chrome, savedObjectClient) {
     this.type = SavedObjectClass.type;
     this.Class = SavedObjectClass;
     this.lowercaseType = this.type.toLowerCase();
-    this.kbnIndex = kbnIndex;
     this.kbnUrl = kbnUrl;
     this.chrome = chrome;
 
-    this.scanner = new Scanner($http, {
-      index: kbnIndex,
-      type: this.lowercaseType
-    });
-
     this.loaderProperties = {
-      name: `${this.lowercaseType}s`,
+      name: `${ this.lowercaseType }s`,
       noun: StringUtils.upperFirst(this.type),
-      nouns: `${this.lowercaseType}s`
+      nouns: `${ this.lowercaseType }s`,
     };
 
-    this.savedObjectsClient = savedObjectsClient;
+    this.savedObjectsClient = savedObjectClient;
   }
 
   // Fake async function, only to resolve a promise
@@ -91,7 +78,7 @@ export class SavedObjectLoader {
   }
 
   urlFor(id) {
-    return this.kbnUrl.eval(`#/${this.lowercaseType}/{{id}}`, { id: id });
+    return this.kbnUrl.eval(`#/${ this.lowercaseType }/{{id}}`, { id: id });
   }
 
   delete(ids) {
@@ -122,13 +109,6 @@ export class SavedObjectLoader {
     return source;
   }
 
-  scanAll(queryString, pageSize = 1000) {
-    return this.scanner.scanAndMap(queryString, {
-      pageSize,
-      docCount: Infinity
-    });
-  }
-
   /**
    * Updates hit.attributes to contain an id and url field, and returns the updated
    * attributes object.
@@ -139,6 +119,7 @@ export class SavedObjectLoader {
     return this.mapHitSource(hit.attributes, hit.id);
   }
 
+
   /**
    * TODO: Rather than use a hardcoded limit, implement pagination. See
    * https://github.com/elastic/kibana/issues/8044 for reference.
@@ -148,23 +129,22 @@ export class SavedObjectLoader {
    * @returns {Promise}
    */
   findAll(search = '', size = 100, fields) {
-    return this.savedObjectsClient
-      .find({
+    return this.savedObjectsClient.find(
+      {
         type: this.lowercaseType,
         search: search ? `${search}*` : undefined,
         perPage: size,
         page: 1,
         searchFields: ['title^3', 'description'],
-        fields
-      })
-      .then(resp => {
-        return {
-          total: resp.total,
-          hits: resp.savedObjects.map(savedObject =>
-            this.mapSavedObjectApiHits(savedObject)
-          )
-        };
-      });
+        defaultSearchOperator: 'AND',
+        fields,
+      }).then((resp) => {
+      return {
+        total: resp.total,
+        hits: resp.savedObjects
+          .map((savedObject) => this.mapSavedObjectApiHits(savedObject))
+      };
+    });
   }
 
   find(search = '', size = 100) {

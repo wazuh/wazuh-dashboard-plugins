@@ -11,7 +11,6 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import { data } from 'plugins/data';
 import { EuiButtonEmpty, EuiFlexGroup, EuiFlexItem, EuiPopover } from '@elastic/eui';
 import {
   buildEmptyFilter,
@@ -28,9 +27,9 @@ import classNames from 'classnames';
 import React, { Component } from 'react';
 import chrome from 'ui/chrome';
 import { IndexPattern } from 'ui/index_patterns';
-const { FilterOptions } = data.search.ui;
 import { FilterEditor } from 'ui/filter_bar/filter_editor';
 import { FilterItem } from './filter_item';
+import { FilterOptions } from 'ui/filter_bar/filter_options';
 
 const config = chrome.getUiSettingsClient();
 
@@ -52,6 +51,7 @@ class FilterBarUI extends Component<Props, State> {
   };
 
   public render() {
+    console.log(this.props.className)
     const classes = classNames('globalFilterBar', this.props.className);
 
     return (
@@ -103,6 +103,7 @@ class FilterBarUI extends Component<Props, State> {
     ));
   }
 
+
   private renderAddFilter() {
     const isPinned = config.get('filters:pinnedByDefault');
     const [indexPattern] = this.props.indexPatterns;
@@ -138,6 +139,7 @@ class FilterBarUI extends Component<Props, State> {
                 indexPatterns={this.props.indexPatterns}
                 onSubmit={this.onAdd}
                 onCancel={this.onCloseAddFilterPopover}
+                key={JSON.stringify(newFilter)}
               />
             </div>
           </EuiFlexItem>
