@@ -11,10 +11,17 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import _ from 'lodash';
-//import { Scanner } from 'ui/utils/scanner';
+
 import { StringUtils } from 'ui/utils/string_utils';
 
+/**
+ * The SavedObjectLoader class provides some convenience functions
+ * to load and save one kind of saved objects (specified in the constructor).
+ *
+ * It is based on the SavedObjectClient which implements loading and saving
+ * in an abstract, type-agnostic way. If possible, use SavedObjectClient directly
+ * to avoid pulling in extra functionality which isn't used.
+ */
 export class SavedObjectLoader {
   constructor(SavedObjectClass, kbnUrl, chrome, savedObjectClient) {
     this.type = SavedObjectClass.type;
@@ -24,17 +31,12 @@ export class SavedObjectLoader {
     this.chrome = chrome;
 
     this.loaderProperties = {
-      name: `${ this.lowercaseType }s`,
+      name: `${this.lowercaseType}s`,
       noun: StringUtils.upperFirst(this.type),
-      nouns: `${ this.lowercaseType }s`,
+      nouns: `${this.lowercaseType}s`,
     };
 
     this.savedObjectsClient = savedObjectClient;
-  }
-
-  // Fake async function, only to resolve a promise
-  async processFunc() {
-    return;
   }
 
   /**
@@ -43,42 +45,12 @@ export class SavedObjectLoader {
    * @param id
    * @returns {Promise<SavedObject>}
    */
-  get(id, raw) {
-    const instance = new this.Class(id);
-
-    instance.init = _.once(() => {
-      // ensure that the esType is defined
-
-      return Promise.resolve()
-        .then(() => {
-          // If there is not id, then there is no document to fetch from elasticsearch
-          if (!instance.id) {
-            // just assign the defaults and be done
-            _.assign(instance, instance.defaults);
-            return instance.hydrateIndexPattern().then(() => {
-              return afterESResp.call(instance); // eslint-disable-line
-            });
-          }
-          return this.processFunc()
-            .then(() => {
-              return {
-                _id: raw.id,
-                _type: raw.type,
-                _source: _.cloneDeep(raw.attributes),
-                found: raw._version ? true : false
-              };
-            })
-            .then(instance.applyESResp)
-            .catch(instance.applyEsResp);
-        })
-        .then(() => instance);
-    });
-    const object = instance.init();
-    return object;
+  get(id) {
+    return (new this.Class(id)).init();
   }
 
   urlFor(id) {
-    return this.kbnUrl.eval(`#/${ this.lowercaseType }/{{id}}`, { id: id });
+    return this.kbnUrl.eval(`#/${this.lowercaseType}/{{id}}`, { id: id });
   }
 
   delete(ids) {
@@ -119,7 +91,6 @@ export class SavedObjectLoader {
     return this.mapHitSource(hit.attributes, hit.id);
   }
 
-
   /**
    * TODO: Rather than use a hardcoded limit, implement pagination. See
    * https://github.com/elastic/kibana/issues/8044 for reference.
@@ -139,12 +110,12 @@ export class SavedObjectLoader {
         defaultSearchOperator: 'AND',
         fields,
       }).then((resp) => {
-      return {
-        total: resp.total,
-        hits: resp.savedObjects
-          .map((savedObject) => this.mapSavedObjectApiHits(savedObject))
-      };
-    });
+        return {
+          total: resp.total,
+          hits: resp.savedObjects
+            .map((savedObject) => this.mapSavedObjectApiHits(savedObject))
+        };
+      });
   }
 
   find(search = '', size = 100) {

@@ -17,13 +17,17 @@
  * under the License.
  */
 
-// @ts-ignore untyped dependency
-import { registries } from 'plugins/interpreter/registries';
 // @ts-ignore
 import { EventEmitter } from 'events';
 import { debounce, forEach, get } from 'lodash';
 import * as Rx from 'rxjs';
 import { share } from 'rxjs/operators';
+// @ts-ignore
+import { i18n } from '@kbn/i18n';
+// @ts-ignore
+import { toastNotifications } from 'ui/notify';
+// @ts-ignore
+import { registries } from 'plugins/interpreter/registries';
 // @ts-ignore
 import { Inspector } from 'ui/inspector';
 // @ts-ignore
@@ -44,6 +48,7 @@ import { RequestHandlerParams, Vis } from 'ui/vis';
 import { PipelineDataLoader } from 'ui/visualize/loader/pipeline_data_loader';
 import { visualizationLoader } from './visualization_loader';
 import { VisualizeDataLoader } from './visualize_data_loader';
+
 // @ts-ignore
 import { DataAdapter, RequestAdapter } from 'ui/inspector/adapters';
 
@@ -57,18 +62,16 @@ import {
 } from './types';
 // @ts-ignore
 import { queryGeohashBounds } from 'ui/visualize/loader/utils';
-// @ts-ignore
-import { i18n } from '@kbn/i18n';
-// @ts-ignore
-import { toastNotifications } from 'ui/notify';
 
 interface EmbeddedVisualizeHandlerParams extends VisualizeLoaderParams {
   Private: IPrivate;
   queryFilter: any;
   autoFetch?: boolean;
+  pipelineDataLoader?: boolean;
 }
 
 const RENDER_COMPLETE_EVENT = 'render_complete';
+const DATA_SHARED_ITEM = 'data-shared-item';
 const LOADING_ATTRIBUTE = 'data-loading';
 const RENDERING_COUNT_ATTRIBUTE = 'data-rendering-count';
 
@@ -84,13 +87,13 @@ export class EmbeddedVisualizeHandler {
    * This should not be used by any plugin.
    * @ignore
    */
-  public static readonly __ENABLE_PIPELINE_DATA_LOADER__: boolean = false;
   public readonly data$: Rx.Observable<any>;
   public readonly inspectorAdapters: Adapters = {};
   private vis: Vis;
   private handlers: any;
   private loaded: boolean = false;
   private destroyed: boolean = false;
+  private pipelineDataLoader: boolean = false;
 
   private listeners = new EventEmitter();
   private firstRenderComplete: Promise<void>;
@@ -118,8 +121,7 @@ export class EmbeddedVisualizeHandler {
   constructor(
     private readonly element: HTMLElement,
     savedObject: VisSavedObject,
-    params: EmbeddedVisualizeHandlerParams,
-    $injector
+    params: EmbeddedVisualizeHandlerParams
   ) {
     const { searchSource, vis } = savedObject;
 
@@ -131,6 +133,7 @@ export class EmbeddedVisualizeHandler {
       filters,
       query,
       autoFetch = true,
+      pipelineDataLoader = false,
       Private,
     } = params;
 
@@ -145,13 +148,17 @@ export class EmbeddedVisualizeHandler {
       forceFetch: false,
     };
 
+    this.pipelineDataLoader = pipelineDataLoader;
+
     // Listen to the first RENDER_COMPLETE_EVENT to resolve this promise
     this.firstRenderComplete = new Promise(resolve => {
       this.listeners.once(RENDER_COMPLETE_EVENT, resolve);
     });
 
     element.setAttribute(LOADING_ATTRIBUTE, '');
+    element.setAttribute(DATA_SHARED_ITEM, '');
     element.setAttribute(RENDERING_COUNT_ATTRIBUTE, '0');
+
     element.addEventListener('renderComplete', this.onRenderCompleteListener);
 
     this.autoFetch = autoFetch;
@@ -185,14 +192,15 @@ export class EmbeddedVisualizeHandler {
       });
     };
 
-    this.dataLoader = EmbeddedVisualizeHandler.__ENABLE_PIPELINE_DATA_LOADER__
+    this.dataLoader = pipelineDataLoader
       ? new PipelineDataLoader(vis)
-      : new VisualizeDataLoader(vis, Private), $injector;
+      : new VisualizeDataLoader(vis, Private);
     this.renderCompleteHelper = new RenderCompleteHelper(element);
     this.inspectorAdapters = this.getActiveInspectorAdapters();
     this.vis.openInspector = this.openInspector;
     this.vis.hasInspector = this.hasInspector;
 
+    // init default actions
     forEach(this.vis.type.events, (event, eventName) => {
       if (event.disabled || !eventName) {
         return;
@@ -289,7 +297,7 @@ export class EmbeddedVisualizeHandler {
 
   /**
    * renders visualization with provided data
-   * @param visData: visualization data
+   * @param response: visualization data
    */
   public render = (response: VisResponseData | null = null): void => {
     const executeRenderer = this.rendererProvider(response);
@@ -466,7 +474,7 @@ export class EmbeddedVisualizeHandler {
       .catch(this.handleDataLoaderError);
   };
 
-    /**
+  /**
    * When dataLoader returns an error, we need to make sure it surfaces in the UI.
    *
    * TODO: Eventually we should add some custom error messages for issues that are
@@ -494,7 +502,7 @@ export class EmbeddedVisualizeHandler {
     let renderer: any = null;
     let args: any[] = [];
 
-    if (EmbeddedVisualizeHandler.__ENABLE_PIPELINE_DATA_LOADER__) {
+    if (this.pipelineDataLoader) {
       renderer = registries.renderers.get(get(response || {}, 'as', 'visualization'));
       args = [this.element, get(response, 'value', { visType: this.vis.type.name }), this.handlers];
     } else {

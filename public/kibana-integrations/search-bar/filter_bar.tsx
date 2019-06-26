@@ -51,7 +51,6 @@ class FilterBarUI extends Component<Props, State> {
   };
 
   public render() {
-    console.log(this.props.className)
     const classes = classNames('globalFilterBar', this.props.className);
 
     return (
