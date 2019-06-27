@@ -18,7 +18,7 @@
     <!-- Transcluded elements. -->
     <div data-transclude-slots>
       <!-- Search. -->
-      <div ng-show="tabView !== 'cluster-monitoring'" style="padding: 10px 8px 0px 8px;" data-transclude-slot="bottomRow"
+      <div ng-show="tabView !== 'cluster-monitoring'" data-transclude-slot="bottomRow"
         class="fullWidth">
         <wz-search-bar query="state.query" on-query-submit="updateQueryAndFetch" app-name="'discover'" index-patterns="[indexPattern]"
           filters="filters" on-filters-updated="onFiltersUpdated" show-date-picker="enableTimeRangeSelector"
