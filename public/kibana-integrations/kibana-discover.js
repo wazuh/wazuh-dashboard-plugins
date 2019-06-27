@@ -23,6 +23,26 @@ uiModules.get('app/wazuh', ['kibana/courier']).directive('kbnDis', [
     };
   }
 ]);
+
+// Added dependencies (from Kibana module)
+import 'ui/pager';
+import 'ui/render_directive';
+
+// Added from its index.js
+import 'plugins/kibana/discover/saved_searches/saved_searches';
+import 'plugins/kibana/discover/directives';
+import 'ui/collapsible_sidebar';
+import 'plugins/kibana/discover/components/field_chooser/field_chooser';
+import 'plugins/kibana/discover/controllers/discover';
+
+// Research added (further checks needed)
+
+import 'ui/style_compile/style_compile';
+import 'ui/registry/doc_views';
+import 'plugins/kbn_doc_views/kbn_doc_views';
+import 'ui/pager_control';
+import 'ui/pager';
+
 import { data } from 'plugins/data';
 import _ from 'lodash';
 import { i18n } from '@kbn/i18n';
@@ -53,8 +73,6 @@ import { FilterBarQueryFilterProvider } from 'ui/filter_bar/query_filter';
 import { intervalOptions } from 'ui/agg_types/buckets/_interval_options';
 import { stateMonitorFactory } from 'ui/state_management/state_monitor_factory';
 import uiRoutes from 'ui/routes';
-//import { uiModules } from 'ui/modules';
-//import indexTemplate from '../index.html';
 import { StateProvider } from 'ui/state_management/state';
 import { migrateLegacyQuery } from 'ui/utils/migrate_legacy_query';
 import { FilterManagerProvider } from 'ui/filter_manager';
