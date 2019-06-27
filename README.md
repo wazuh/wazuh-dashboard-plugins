@@ -4,6 +4,7 @@
 [![Email](https://img.shields.io/badge/email-join-blue.svg)](https://groups.google.com/forum/#!forum/wazuh)
 [![Documentation](https://img.shields.io/badge/docs-view-green.svg)](https://documentation.wazuh.com)
 [![Documentation](https://img.shields.io/badge/web-view-green.svg)](https://wazuh.com)
+[![Total alerts](https://img.shields.io/lgtm/alerts/g/wazuh/wazuh-kibana-app.svg?logo=lgtm&logoWidth=18)](https://lgtm.com/projects/g/wazuh/wazuh-kibana-app/alerts/)
 
 Wazuh is a security detection, visibility, and compliance open source project. It was born as a fork of OSSEC HIDS, later was integrated with Elastic Stack and OpenSCAP evolving into a more comprehensive solution. You can read more in <https://wazuh.com/>
 
