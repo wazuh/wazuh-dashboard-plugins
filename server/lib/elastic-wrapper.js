@@ -320,7 +320,8 @@ export class ElasticWrapper {
               fields: currentFieldsString,
               fieldFormatMap: `{
                   "data.virustotal.permalink":{"id":"url"},
-                  "data.vulnerability.reference":{"id":"url"},"data.url":{"id":"url"}
+                  "data.vulnerability.reference":{"id":"url"},"data.url":{"id":"url"},
+                  "rule.id":{"id":"url","params":{"urlTemplate":"/app/wazuh#/manager/?tab=ruleset&currentRule&ruleid={{value}}","labelTemplate":"{{value}}","openLinkInCurrentTab":true}}
                 }`,
               sourceFilters: '[{"value":"@timestamp"}]'
             }
@@ -597,26 +598,6 @@ export class ElasticWrapper {
             id: id,
             body: doc
           });
-
-      return data;
-    } catch (error) {
-      return Promise.reject(error);
-    }
-  }
-
-  /**
-   * Search for active entries on .wazuh index
-   * @param {*} req
-   */
-  async searchActiveDocumentsWazuhIndex(req) {
-    try {
-      if (!req) return Promise.reject(new Error('No valid request given'));
-
-      const data = await this.elasticRequest.callWithRequest(req, 'search', {
-        index: '.wazuh',
-        type: '_doc',
-        q: 'active:true'
-      });
 
       return data;
     } catch (error) {

@@ -2,6 +2,32 @@
 
 All notable changes to the Wazuh app project will be documented in this file.
 
+## Wazuh v3.9.3 - Kibana v6.8.1 / v7.1.1 - Revision 517
+
+### Added
+
+- Support for Wazuh v3.9.3
+- Support for Kibana v7.2.0 [#1556](https://github.com/wazuh/wazuh-kibana-app/pull/1556).
+
+### Changed
+
+- New design and several UI/UX changes [#1525](https://github.com/wazuh/wazuh-kibana-app/pull/1525).
+- Improved error checking + syscollector performance [94d0a83](https://github.com/wazuh/wazuh-kibana-app/commit/94d0a83e43aa1d2d84ef6f87cbb76b9aefa085b3).
+- Adapt Syscollector for MacOS agents [a4bf7ef](https://github.com/wazuh/wazuh-kibana-app/commit/a4bf7efc693a99b7565b5afcaa372155f15a4db9).
+- Show last scan for syscollector [73f2056](https://github.com/wazuh/wazuh-kibana-app/commit/73f2056673bb289d472663397ba7097e49b7b93b).
+
+### Fixed
+
+- Corrected width for agent stats [a998955](https://github.com/wazuh/wazuh-kibana-app/commit/a99895565a8854c55932ec94cffb08e1d0aa3da1).
+- Fix height for the menu directive with Dynamic height [427d0f3](https://github.com/wazuh/wazuh-kibana-app/commit/427d0f3e9fa6c34287aa9e8557da99a51e0db40f).
+- Fix wazuh-db and clusterd check [cddcef6](https://github.com/wazuh/wazuh-kibana-app/commit/cddcef630c5234dd6f6a495715743dfcfd4e4001).
+- Fix AlertsStats when value is "0", it was showing "-" [07a3e10](https://github.com/wazuh/wazuh-kibana-app/commit/07a3e10c7f1e626ba75a55452b6c295d11fd657d).
+- Fix syscollector state value [f8d3d0e](https://github.com/wazuh/wazuh-kibana-app/commit/f8d3d0eca44e67e26f79bc574495b1f4c8f751f2).
+- Fix time offset for reporting table [2ef500b](https://github.com/wazuh/wazuh-kibana-app/commit/2ef500bb112e68bd4811b8e87ce8581d7c04d20f).
+- Fix call to obtain GDPR requirements for specific agent [ccda846](https://github.com/wazuh/wazuh-kibana-app/commit/ccda8464b50be05bc5b3642f25f4972c8a7a2c03).
+- Restore "rule.id" as a clickable field in visualizations [#1546](https://github.com/wazuh/wazuh-kibana-app/pull/1546).
+
+
 ## Wazuh v3.9.2 - Kibana v7.1.1 - Revision 510
 
 ### Added

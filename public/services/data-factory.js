@@ -26,7 +26,6 @@ export class DataFactory {
     this.filters = [];
     this.sortValue = false;
     this.sortDir = false;
-    this.sortValue = false;
     this.busy = false;
     if (this.implicitFilter) this.filters.push(...this.implicitFilter);
     if (this.implicitSort) this.addSorting(this.implicitSort);
@@ -105,6 +104,7 @@ export class DataFactory {
       );
 
       this.items = this.items.filter(item => !!item);
+
       Array.isArray(firstPage.data.data)
         ? this.items.push(...firstPage.data.data)
         : this.items.push(...firstPage.data.data.items);
@@ -124,6 +124,7 @@ export class DataFactory {
       const end = new Date();
       const elapsed = (end - start) / 1000;
       this.busy = false;
+      if (this.items.length > totalItems) this.items.length = totalItems;
       return { items: this.items, time: elapsed };
     } catch (error) {
       this.busy = false;

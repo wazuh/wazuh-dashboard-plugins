@@ -11,7 +11,14 @@
  */
 import { uiModules } from 'ui/modules';
 import { OverviewController } from './overview';
+import { WelcomeScreen } from './components/welcome';
+import { Stats } from './components/stats';
+import { AlertsStats } from './components/alerts-stats';
 
-const app = uiModules.get('app/wazuh', []);
+const app = uiModules.get('app/wazuh', ['react']);
 
-app.controller('overviewController', OverviewController);
+app
+  .controller('overviewController', OverviewController)
+  .value('WelcomeScreenOverview', WelcomeScreen)
+  .value('StatsOverview', Stats)
+  .value('AlertsStats', AlertsStats);

@@ -123,6 +123,14 @@ export class OverviewController {
 
     this.init();
 
+    this.welcomeCardsProps = {
+      api: this.appState.getCurrentAPI(),
+      switchTab: tab => this.switchTab(tab),
+      extensions: this.extensions,
+      setExtensions: (api, extensions) =>
+        this.appState.setExtensions(api, extensions)
+    };
+
     this.$scope.$on('$destroy', () => {
       this.visFactoryService.clearAll();
     });
