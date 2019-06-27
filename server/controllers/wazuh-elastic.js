@@ -463,7 +463,6 @@ export class WazuhElasticCtrl {
           _version: bulk_content.visualization.version
         });
       }
-      log('wazuh-elastic:buildVisualizationsRaw', JSON.stringify(visArray || []), 'debug');
       return visArray;
     } catch (error) {
       log('wazuh-elastic:buildVisualizationsRaw', error.message || error);
