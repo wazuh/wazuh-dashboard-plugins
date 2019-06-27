@@ -48,7 +48,7 @@ export class ReportingController {
    */
   async deleteReport(name) {
     try {
-      await this.genericReq.request('DELETE', '/reports/' + name, {});
+      await this.genericReq.request('DELETE', `/reports/${name}`, {});
       this.items = this.items.filter(item => item.name !== name);
       this.errorHandler.info('Success');
     } catch (error) {

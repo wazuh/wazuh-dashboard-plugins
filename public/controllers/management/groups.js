@@ -527,8 +527,8 @@ export function GroupsController(
       if (itemsToSave.deletedIds.length) {
         const deleteResponse = await apiReq.request(
           'DELETE',
-          `/agents/group/${$scope.currentGroup.name}`,
-          { ids: itemsToSave.deletedIds }
+          `/agents/group/${$scope.currentGroup.name}/ids=${itemsToSave.deletedIds}`,
+          {}
         );
         if (deleteResponse.data.data.failed_ids) {
           failedIds.push(...deleteResponse.data.data.failed_ids);
