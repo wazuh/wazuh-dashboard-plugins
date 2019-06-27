@@ -807,9 +807,11 @@ function discoverController(
 
     $timeout(async () => {
       const visEl = $element.find('#discoverHistogram')[0];
-      visualizeHandler = await visualizeLoader.embedVisualizationWithSavedObject(visEl, visSavedObject, {
-        autoFetch: false,
-      });
+      if (visEl) {
+        visualizeHandler = await visualizeLoader.embedVisualizationWithSavedObject(visEl, visSavedObject, {
+          autoFetch: false,
+        });
+      }
     });
   }
 
