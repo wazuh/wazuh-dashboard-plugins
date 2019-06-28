@@ -563,7 +563,7 @@ export class AgentsController {
         this.$scope.selectedPciIndex = 0;
       }
       if (tab === 'gdpr') {
-        const gdprTabs = await this.commonData.getPCI();
+        const gdprTabs = await this.commonData.getGDPR();
         this.$scope.gdprTabs = gdprTabs;
         this.$scope.selectedGdprIndex = 0;
       }
