@@ -18,12 +18,12 @@
     <!-- Transcluded elements. -->
     <div data-transclude-slots>
       <!-- Search. -->
-      <div ng-show="tabView !== 'cluster-monitoring'" data-transclude-slot="bottomRow"
-        class="fullWidth">
+      <div data-transclude-slot="bottomRow" class="fullWidth">
         <wz-search-bar query="state.query" on-query-submit="updateQueryAndFetch" app-name="'discover'" index-patterns="[indexPattern]"
           filters="filters" on-filters-updated="onFiltersUpdated" show-date-picker="enableTimeRangeSelector"
           date-range-from="time.from" date-range-to="time.to" is-refresh-paused="refreshInterval.pause"
-          refresh-interval="refreshInterval.value" on-refresh-change="onRefreshChange" watch-depth="reference"></wz-search-bar>
+          refresh-interval="refreshInterval.value" on-refresh-change="onRefreshChange" watch-depth="reference"
+          show-filter-bar="tabView !== 'cluster-monitoring'"></wz-search-bar>
       </div>
     </div>
   </kbn-top-nav>
