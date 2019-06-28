@@ -4,28 +4,32 @@
     <div class="md-toolbar-tools wz-menu-content">
 
         <!-- Main Wazuh app navigation buttons -->
-        <md-button class="wz-menu-button" ng-href="#/overview"
-            ng-class="{'wz-menu-active': menuNavItem === 'overview' }" aria-label="Overview tab">
+        <md-button class="wz-menu-button" ng-href="#/overview" 
+            ng-class="{'wz-menu-active': menuNavItem === 'overview' }" aria-label="Overview tab"
+            data-test-subj="wzMenuOverview">
             <react-component name="EuiIcon" class="kbnGlobalNavLink__euiIcon" props="{type:'visualizeApp'}" /> Overview
         </md-button>
 
         <md-button class="wz-menu-button" ng-href="#/manager" ng-class="{'wz-menu-active': menuNavItem === 'manager' }"
-            aria-label="Cluster tab">
+            aria-label="Cluster tab" data-test-subj="wzMenuManagement">
             <react-component name="EuiIcon" class="kbnGlobalNavLink__euiIcon" props="{type:'infraApp'}" /> Management
         </md-button>
 
         <md-button class="wz-menu-button" ng-href="#/agents-preview"
-            ng-class="{'wz-menu-active': menuNavItem === 'agents' }" aria-label="Agents tab">
+            ng-class="{'wz-menu-active': menuNavItem === 'agents' }" aria-label="Agents tab"
+            data-test-subj="wzMenuAgents">
             <i class="fa fa-fw fa-tv" aria-hidden="true"></i> Agents
         </md-button>
 
         <md-button class="wz-menu-button" ng-href="#/wazuh-discover"
-            ng-class="{'wz-menu-active': menuNavItem === 'discover' }" aria-label="Discover tab">
+            ng-class="{'wz-menu-active': menuNavItem === 'discover' }" aria-label="Discover tab"
+            data-test-subj="wzMenuDiscover">
             <react-component name="EuiIcon" class="kbnGlobalNavLink__euiIcon" props="{type:'discoverApp'}" /> Discover
         </md-button>
 
         <md-button class="wz-menu-button" ng-href="#/wazuh-dev"
-            ng-class="{'wz-menu-active': menuNavItem === 'wazuh-dev' }" aria-label="Dev Tools tab">
+            ng-class="{'wz-menu-active': menuNavItem === 'wazuh-dev' }" aria-label="Dev Tools tab"
+            data-test-subj="wzMenuDevTools">
             <react-component name="EuiIcon" class="kbnGlobalNavLink__euiIcon" props="{type:'console'}" /> Dev tools
         </md-button>
 
@@ -34,13 +38,15 @@
 
         <!-- API/Index pattern section -->
         <!-- Case 1a - There's API -->
-        <span ng-show="theresAPI" class="small" tooltip="Selected API" tooltip-placement="bottom">
+        <span ng-show="theresAPI" class="small" tooltip="Selected API" tooltip-placement="bottom" 
+            data-test-subj="wzMenuTheresAPI">
             <i class="fa fa-star fa-fw wz-color-orange" aria-hidden="true"></i>{{currentAPI}}<span
                 ng-if="showSelector">&nbsp;&ndash;&nbsp;</span>
         </span>
 
         <!-- Case 1b - There's no API -->
-        <span ng-show="!theresAPI" class="small" tooltip="No API credentials inserted" tooltip-placement="bottom">
+        <span ng-show="!theresAPI" class="small" tooltip="No API credentials inserted" tooltip-placement="bottom"
+            data-test-subj="wzMenuTheresNoAPI">
             No API<span ng-if="showSelector">&nbsp;&ndash;&nbsp;</span>
         </span>
 

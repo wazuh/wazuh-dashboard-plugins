@@ -38,6 +38,7 @@ export class AddApi extends Component {
               <EuiFieldText
                 onChange={e => this.onChangeEdit(e, 'user')}
                 placeholder="foo"
+                data-test-subj="apiConfigUsername"
               />
             </EuiFormRow>
           </EuiFlexItem>
@@ -46,6 +47,7 @@ export class AddApi extends Component {
               <EuiFieldPassword
                 onChange={e => this.onChangeEdit(e, 'password')}
                 placeholder="bar"
+                data-test-subj="apiConfigPassword"
               />
             </EuiFormRow>
           </EuiFlexItem>
@@ -54,6 +56,7 @@ export class AddApi extends Component {
               <EuiFieldText
                 onChange={e => this.onChangeEdit(e, 'url')}
                 placeholder="http://localhost"
+                data-test-subj="apiConfigHost"
               />
             </EuiFormRow>
           </EuiFlexItem>
@@ -63,6 +66,7 @@ export class AddApi extends Component {
                 max={99999}
                 onChange={e => this.onChangeEdit(e, 'port')}
                 placeholder={55000}
+                data-test-subj="apiConfigPort"
               />
             </EuiFormRow>
           </EuiFlexItem>
@@ -74,6 +78,7 @@ export class AddApi extends Component {
                 iconType="save"
                 color="primary"
                 onClick={() => this.props.saveSettings({ ...this.state })}
+                data-test-subj="apiConfigButton"
               >
                 Save
               </EuiButton>
