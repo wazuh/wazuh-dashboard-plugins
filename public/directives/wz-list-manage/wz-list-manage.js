@@ -196,6 +196,7 @@ app.directive('wzListManage', function() {
        */
       $scope.cancelEditingKey = () => {
         $scope.editingKey = false;
+        $scope.loadingChange = false;
         $scope.editingNewValue = '';
       };
 
