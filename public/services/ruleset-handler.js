@@ -125,10 +125,10 @@ export class RulesetHandler {
     try {
       const result = await this.apiReq.request(
         'DELETE',
-        `/manager/files?path=${file.path}/${
-          type !== 'lists' ? file.file : file.name
-        }`,
-        {}
+        '/manager/files',
+        {
+          path: `${file.path}/${type !== 'lists' ? file.file : file.name}`
+        }
       );
       return result;
     } catch (error) {
