@@ -11,6 +11,7 @@ export default async function ({ readConfigFile }) {
       require.resolve('./apps/wazuh'),
       require.resolve('./apps/api'),
       require.resolve('./apps/health_check'),
+      require.resolve('./apps/overview'),
     ],
 
     services: {
