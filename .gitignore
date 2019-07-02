@@ -65,3 +65,7 @@ package-lock.json
 build/
 
 yarn.lock
+
+# Functional testing debug files
+/test/functional/tmp
+/test/functional/failure_debug

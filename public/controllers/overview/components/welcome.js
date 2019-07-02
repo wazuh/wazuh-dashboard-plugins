@@ -21,6 +21,7 @@ import { TabDescription } from '../../../../server/reporting/tab-description';
 export class WelcomeScreen extends Component {
   constructor(props) {
     super(props);
+    this.strtools = new StringsTools();
 
     this.state = {
       extensions: this.props.extensions
@@ -59,7 +60,7 @@ export class WelcomeScreen extends Component {
           icon={<EuiIcon size="xl" type={icon} />}
           title={TabDescription[tab].title}
           onClick={() => this.props.switchTab(tab)}
-          data-test-subj={`overviewWelcome${StringsTools.capitalize(tab)}`}
+          data-test-subj={`overviewWelcome${this.strtools.capitalize(tab)}`}
           description={TabDescription[tab].description}
         />
       </EuiFlexItem>

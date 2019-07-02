@@ -3,8 +3,7 @@ import expect from '@kbn/expect';
 
 
 export default function ({ getService, getPageObjects }) {
-  const log = getService('log');
-  const PageObjects = getPageObjects(['common', 'home', 'api']);
+  const PageObjects = getPageObjects(['common', 'api']);
   const testSubjects = getService('testSubjects');
 
   describe('api settings', function describeIndexTests() {

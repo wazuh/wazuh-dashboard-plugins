@@ -57,6 +57,7 @@ export class ApiTable extends Component {
               <EuiFieldText
                 onChange={e => this.onChangeEdit(e, 'user')}
                 placeholder="foo"
+                data-test-subj="apiTableEditUsername"
               />
             </EuiFormRow>
           </EuiFlexItem>
@@ -65,6 +66,7 @@ export class ApiTable extends Component {
               <EuiFieldPassword
                 onChange={e => this.onChangeEdit(e, 'password')}
                 placeholder="bar"
+                data-test-subj="apiTableEditPassword"
               />
             </EuiFormRow>
           </EuiFlexItem>
@@ -73,6 +75,7 @@ export class ApiTable extends Component {
               <EuiFieldText
                 onChange={e => this.onChangeEdit(e, 'url')}
                 placeholder="http://localhost"
+                data-test-subj="apiTableEditHost"
               />
             </EuiFormRow>
           </EuiFlexItem>
@@ -82,6 +85,7 @@ export class ApiTable extends Component {
                 max={99999}
                 onChange={e => this.onChangeEdit(e, 'port')}
                 placeholder={55000}
+                data-test-subj="apiTableEditPort"
               />
             </EuiFormRow>
           </EuiFlexItem>
@@ -92,6 +96,7 @@ export class ApiTable extends Component {
                 aria-label="Update"
                 iconType="save"
                 color="primary"
+                data-test-subj="apiTableEditSaveButton"
                 onClick={() =>
                   this.props
                     .updateSettings({ ...this.state, _id: item._id }, true)
@@ -157,6 +162,7 @@ export class ApiTable extends Component {
                       : 'starEmpty'
                   }
                   aria-label="Set as default"
+                  data-test-subj="apiTableStarredButton"
                   onClick={() => {
                     const currentDefault = this.props.setDefault(item);
                     this.setState({
@@ -171,6 +177,7 @@ export class ApiTable extends Component {
                 <EuiButtonIcon
                   aria-label="Check connection"
                   iconType="refresh"
+                  data-test-subj="apiTableRefreshButton"
                   onClick={() => this.props.checkManager(item)}
                   color="success"
                 />
@@ -181,6 +188,7 @@ export class ApiTable extends Component {
                 <EuiButtonIcon
                   aria-label="Remove manager"
                   iconType="trash"
+                  data-test-subj="apiTableTrashButton"
                   onClick={() =>
                     this.props.removeManager(item).then(apiEntries =>
                       this.setState({
@@ -205,6 +213,7 @@ export class ApiTable extends Component {
             <EuiButtonIcon
               aria-label="Edit"
               onClick={() => this.toggleDetails(item)}
+              data-test-subj="apiTableEditButton"
               aria-label={
                 itemIdToExpandedRowMap[item.id] ? 'Collapse' : 'Expand'
               }
@@ -232,6 +241,7 @@ export class ApiTable extends Component {
             <EuiButtonEmpty
               aria-label="Add"
               iconType="plusInCircle"
+              data-test-subj="apiTableAddButton"
               onClick={() => this.props.switch()}
             >
               Add new
