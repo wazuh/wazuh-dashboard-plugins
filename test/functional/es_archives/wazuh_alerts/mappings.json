@@ -1,0 +1,1237 @@
+{
+  "type": "index",
+  "value": {
+    "aliases": {
+    },
+    "index": "wazuh-alerts-3.x-2019.07.02",
+    "mappings": {
+      "dynamic_templates": [
+        {
+          "string_as_keyword": {
+            "mapping": {
+              "doc_values": "true",
+              "type": "keyword"
+            },
+            "match_mapping_type": "string"
+          }
+        }
+      ],
+      "properties": {
+        "@src_ip": {
+          "type": "keyword"
+        },
+        "@timestamp": {
+          "type": "date"
+        },
+        "@version": {
+          "type": "text"
+        },
+        "AlertsFile": {
+          "type": "keyword"
+        },
+        "GeoLocation": {
+          "properties": {
+            "area_code": {
+              "type": "long"
+            },
+            "city_name": {
+              "type": "keyword"
+            },
+            "continent_code": {
+              "type": "text"
+            },
+            "coordinates": {
+              "type": "double"
+            },
+            "country_code2": {
+              "type": "text"
+            },
+            "country_code3": {
+              "type": "text"
+            },
+            "country_name": {
+              "type": "keyword"
+            },
+            "dma_code": {
+              "type": "long"
+            },
+            "ip": {
+              "type": "keyword"
+            },
+            "latitude": {
+              "type": "double"
+            },
+            "location": {
+              "type": "geo_point"
+            },
+            "longitude": {
+              "type": "double"
+            },
+            "postal_code": {
+              "type": "keyword"
+            },
+            "real_region_name": {
+              "type": "keyword"
+            },
+            "region_name": {
+              "type": "keyword"
+            },
+            "timezone": {
+              "type": "text"
+            }
+          }
+        },
+        "agent": {
+          "properties": {
+            "id": {
+              "type": "keyword"
+            },
+            "ip": {
+              "type": "keyword"
+            },
+            "name": {
+              "type": "keyword"
+            }
+          }
+        },
+        "cluster": {
+          "properties": {
+            "name": {
+              "type": "keyword"
+            },
+            "node": {
+              "type": "keyword"
+            }
+          }
+        },
+        "command": {
+          "type": "keyword"
+        },
+        "data": {
+          "properties": {
+            "action": {
+              "type": "keyword"
+            },
+            "audit": {
+              "properties": {
+                "acct": {
+                  "type": "keyword"
+                },
+                "auid": {
+                  "type": "keyword"
+                },
+                "command": {
+                  "type": "keyword"
+                },
+                "cwd": {
+                  "type": "keyword"
+                },
+                "dev": {
+                  "type": "keyword"
+                },
+                "directory": {
+                  "properties": {
+                    "inode": {
+                      "type": "keyword"
+                    },
+                    "mode": {
+                      "type": "keyword"
+                    },
+                    "name": {
+                      "type": "keyword"
+                    }
+                  }
+                },
+                "egid": {
+                  "type": "keyword"
+                },
+                "enforcing": {
+                  "type": "keyword"
+                },
+                "euid": {
+                  "type": "keyword"
+                },
+                "exe": {
+                  "type": "keyword"
+                },
+                "exit": {
+                  "type": "keyword"
+                },
+                "file": {
+                  "properties": {
+                    "inode": {
+                      "type": "keyword"
+                    },
+                    "mode": {
+                      "type": "keyword"
+                    },
+                    "name": {
+                      "type": "keyword"
+                    }
+                  }
+                },
+                "fsgid": {
+                  "type": "keyword"
+                },
+                "fsuid": {
+                  "type": "keyword"
+                },
+                "gid": {
+                  "type": "keyword"
+                },
+                "id": {
+                  "type": "keyword"
+                },
+                "key": {
+                  "type": "keyword"
+                },
+                "list": {
+                  "type": "keyword"
+                },
+                "old-auid": {
+                  "type": "keyword"
+                },
+                "old-ses": {
+                  "type": "keyword"
+                },
+                "old_enforcing": {
+                  "type": "keyword"
+                },
+                "old_prom": {
+                  "type": "keyword"
+                },
+                "op": {
+                  "type": "keyword"
+                },
+                "pid": {
+                  "type": "keyword"
+                },
+                "ppid": {
+                  "type": "keyword"
+                },
+                "prom": {
+                  "type": "keyword"
+                },
+                "res": {
+                  "type": "keyword"
+                },
+                "session": {
+                  "type": "keyword"
+                },
+                "sgid": {
+                  "type": "keyword"
+                },
+                "srcip": {
+                  "type": "keyword"
+                },
+                "subj": {
+                  "type": "keyword"
+                },
+                "success": {
+                  "type": "keyword"
+                },
+                "suid": {
+                  "type": "keyword"
+                },
+                "syscall": {
+                  "type": "keyword"
+                },
+                "tty": {
+                  "type": "keyword"
+                },
+                "type": {
+                  "type": "keyword"
+                },
+                "uid": {
+                  "type": "keyword"
+                }
+              }
+            },
+            "aws": {
+              "properties": {
+                "bytes": {
+                  "type": "long"
+                },
+                "dstaddr": {
+                  "type": "ip"
+                },
+                "end": {
+                  "type": "date"
+                },
+                "resource": {
+                  "properties": {
+                    "instanceDetails": {
+                      "properties": {
+                        "networkInterfaces": {
+                          "properties": {
+                            "privateIpAddress": {
+                              "type": "ip"
+                            },
+                            "publicIp": {
+                              "type": "ip"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                "service": {
+                  "properties": {
+                    "action": {
+                      "properties": {
+                        "networkConnectionAction": {
+                          "properties": {
+                            "remoteIpDetails": {
+                              "properties": {
+                                "geoLocation": {
+                                  "type": "geo_point"
+                                },
+                                "ipAddressV4": {
+                                  "type": "ip"
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    },
+                    "count": {
+                      "type": "long"
+                    }
+                  }
+                },
+                "source_ip_address": {
+                  "type": "ip"
+                },
+                "srcaddr": {
+                  "type": "ip"
+                },
+                "start": {
+                  "type": "date"
+                }
+              }
+            },
+            "command": {
+              "type": "keyword"
+            },
+            "data": {
+              "type": "keyword"
+            },
+            "dstip": {
+              "type": "keyword"
+            },
+            "dstport": {
+              "type": "keyword"
+            },
+            "dstuser": {
+              "type": "keyword"
+            },
+            "hardware": {
+              "properties": {
+                "cpu_cores": {
+                  "type": "long"
+                },
+                "cpu_mhz": {
+                  "type": "double"
+                },
+                "cpu_name": {
+                  "type": "keyword"
+                },
+                "ram_free": {
+                  "type": "long"
+                },
+                "ram_total": {
+                  "type": "long"
+                },
+                "ram_usage": {
+                  "type": "long"
+                },
+                "serial": {
+                  "type": "keyword"
+                }
+              }
+            },
+            "id": {
+              "type": "keyword"
+            },
+            "netinfo": {
+              "properties": {
+                "iface": {
+                  "properties": {
+                    "adapter": {
+                      "type": "keyword"
+                    },
+                    "ipv4": {
+                      "properties": {
+                        "address": {
+                          "type": "keyword"
+                        },
+                        "broadcast": {
+                          "type": "keyword"
+                        },
+                        "dhcp": {
+                          "type": "keyword"
+                        },
+                        "gateway": {
+                          "type": "keyword"
+                        },
+                        "metric": {
+                          "type": "long"
+                        },
+                        "netmask": {
+                          "type": "keyword"
+                        }
+                      }
+                    },
+                    "ipv6": {
+                      "properties": {
+                        "address": {
+                          "type": "keyword"
+                        },
+                        "broadcast": {
+                          "type": "keyword"
+                        },
+                        "dhcp": {
+                          "type": "keyword"
+                        },
+                        "gateway": {
+                          "type": "keyword"
+                        },
+                        "metric": {
+                          "type": "long"
+                        },
+                        "netmask": {
+                          "type": "keyword"
+                        }
+                      }
+                    },
+                    "mac": {
+                      "type": "keyword"
+                    },
+                    "mtu": {
+                      "type": "long"
+                    },
+                    "name": {
+                      "type": "keyword"
+                    },
+                    "rx_bytes": {
+                      "type": "long"
+                    },
+                    "rx_dropped": {
+                      "type": "long"
+                    },
+                    "rx_errors": {
+                      "type": "long"
+                    },
+                    "rx_packets": {
+                      "type": "long"
+                    },
+                    "state": {
+                      "type": "keyword"
+                    },
+                    "tx_bytes": {
+                      "type": "long"
+                    },
+                    "tx_dropped": {
+                      "type": "long"
+                    },
+                    "tx_errors": {
+                      "type": "long"
+                    },
+                    "tx_packets": {
+                      "type": "long"
+                    },
+                    "type": {
+                      "type": "keyword"
+                    }
+                  }
+                }
+              }
+            },
+            "os": {
+              "properties": {
+                "architecture": {
+                  "type": "keyword"
+                },
+                "build": {
+                  "type": "keyword"
+                },
+                "codename": {
+                  "type": "keyword"
+                },
+                "hostname": {
+                  "type": "keyword"
+                },
+                "major": {
+                  "type": "keyword"
+                },
+                "minor": {
+                  "type": "keyword"
+                },
+                "name": {
+                  "type": "keyword"
+                },
+                "platform": {
+                  "type": "keyword"
+                },
+                "release": {
+                  "type": "keyword"
+                },
+                "release_version": {
+                  "type": "keyword"
+                },
+                "sysname": {
+                  "type": "keyword"
+                },
+                "version": {
+                  "type": "keyword"
+                }
+              }
+            },
+            "oscap": {
+              "properties": {
+                "check": {
+                  "properties": {
+                    "description": {
+                      "type": "text"
+                    },
+                    "id": {
+                      "type": "keyword"
+                    },
+                    "identifiers": {
+                      "type": "text"
+                    },
+                    "oval": {
+                      "properties": {
+                        "id": {
+                          "type": "keyword"
+                        }
+                      }
+                    },
+                    "rationale": {
+                      "type": "text"
+                    },
+                    "references": {
+                      "type": "text"
+                    },
+                    "result": {
+                      "type": "keyword"
+                    },
+                    "severity": {
+                      "type": "keyword"
+                    },
+                    "title": {
+                      "type": "keyword"
+                    }
+                  }
+                },
+                "scan": {
+                  "properties": {
+                    "benchmark": {
+                      "properties": {
+                        "id": {
+                          "type": "keyword"
+                        }
+                      }
+                    },
+                    "content": {
+                      "type": "keyword"
+                    },
+                    "id": {
+                      "type": "keyword"
+                    },
+                    "profile": {
+                      "properties": {
+                        "id": {
+                          "type": "keyword"
+                        },
+                        "title": {
+                          "type": "keyword"
+                        }
+                      }
+                    },
+                    "return_code": {
+                      "type": "long"
+                    },
+                    "score": {
+                      "type": "double"
+                    }
+                  }
+                }
+              }
+            },
+            "port": {
+              "properties": {
+                "inode": {
+                  "type": "long"
+                },
+                "local_ip": {
+                  "type": "ip"
+                },
+                "local_port": {
+                  "type": "long"
+                },
+                "pid": {
+                  "type": "long"
+                },
+                "process": {
+                  "type": "keyword"
+                },
+                "protocol": {
+                  "type": "keyword"
+                },
+                "remote_ip": {
+                  "type": "ip"
+                },
+                "remote_port": {
+                  "type": "long"
+                },
+                "rx_queue": {
+                  "type": "long"
+                },
+                "state": {
+                  "type": "keyword"
+                },
+                "tx_queue": {
+                  "type": "long"
+                }
+              }
+            },
+            "process": {
+              "properties": {
+                "args": {
+                  "type": "keyword"
+                },
+                "cmd": {
+                  "type": "keyword"
+                },
+                "egroup": {
+                  "type": "keyword"
+                },
+                "euser": {
+                  "type": "keyword"
+                },
+                "fgroup": {
+                  "type": "keyword"
+                },
+                "name": {
+                  "type": "keyword"
+                },
+                "nice": {
+                  "type": "long"
+                },
+                "nlwp": {
+                  "type": "long"
+                },
+                "pgrp": {
+                  "type": "long"
+                },
+                "pid": {
+                  "type": "long"
+                },
+                "ppid": {
+                  "type": "long"
+                },
+                "priority": {
+                  "type": "long"
+                },
+                "processor": {
+                  "type": "long"
+                },
+                "resident": {
+                  "type": "long"
+                },
+                "rgroup": {
+                  "type": "keyword"
+                },
+                "ruser": {
+                  "type": "keyword"
+                },
+                "session": {
+                  "type": "long"
+                },
+                "sgroup": {
+                  "type": "keyword"
+                },
+                "share": {
+                  "type": "long"
+                },
+                "size": {
+                  "type": "long"
+                },
+                "start_time": {
+                  "type": "long"
+                },
+                "state": {
+                  "type": "keyword"
+                },
+                "stime": {
+                  "type": "long"
+                },
+                "suser": {
+                  "type": "keyword"
+                },
+                "tgid": {
+                  "type": "long"
+                },
+                "tty": {
+                  "type": "long"
+                },
+                "utime": {
+                  "type": "long"
+                },
+                "vm_size": {
+                  "type": "long"
+                }
+              }
+            },
+            "program": {
+              "properties": {
+                "architecture": {
+                  "type": "keyword"
+                },
+                "description": {
+                  "type": "keyword"
+                },
+                "format": {
+                  "type": "keyword"
+                },
+                "install_time": {
+                  "type": "keyword"
+                },
+                "location": {
+                  "type": "keyword"
+                },
+                "multiarch": {
+                  "type": "keyword"
+                },
+                "name": {
+                  "type": "keyword"
+                },
+                "priority": {
+                  "type": "keyword"
+                },
+                "section": {
+                  "type": "keyword"
+                },
+                "size": {
+                  "type": "long"
+                },
+                "source": {
+                  "type": "keyword"
+                },
+                "vendor": {
+                  "type": "keyword"
+                },
+                "version": {
+                  "type": "keyword"
+                }
+              }
+            },
+            "protocol": {
+              "type": "keyword"
+            },
+            "pwd": {
+              "type": "keyword"
+            },
+            "sca": {
+              "properties": {
+                "check": {
+                  "properties": {
+                    "compliance": {
+                      "properties": {
+                        "cis": {
+                          "type": "keyword"
+                        },
+                        "cis_csc": {
+                          "type": "keyword"
+                        },
+                        "pci_dss": {
+                          "type": "keyword"
+                        }
+                      }
+                    },
+                    "description": {
+                      "type": "keyword"
+                    },
+                    "directory": {
+                      "type": "keyword"
+                    },
+                    "file": {
+                      "type": "keyword"
+                    },
+                    "id": {
+                      "type": "keyword"
+                    },
+                    "previous_result": {
+                      "type": "keyword"
+                    },
+                    "process": {
+                      "type": "keyword"
+                    },
+                    "rationale": {
+                      "type": "keyword"
+                    },
+                    "references": {
+                      "type": "keyword"
+                    },
+                    "registry": {
+                      "type": "keyword"
+                    },
+                    "remediation": {
+                      "type": "keyword"
+                    },
+                    "result": {
+                      "type": "keyword"
+                    },
+                    "title": {
+                      "type": "keyword"
+                    }
+                  }
+                },
+                "description": {
+                  "type": "keyword"
+                },
+                "failed": {
+                  "type": "integer"
+                },
+                "file": {
+                  "type": "keyword"
+                },
+                "name": {
+                  "type": "keyword"
+                },
+                "passed": {
+                  "type": "integer"
+                },
+                "policy": {
+                  "type": "keyword"
+                },
+                "scan_id": {
+                  "type": "keyword"
+                },
+                "score": {
+                  "type": "long"
+                },
+                "type": {
+                  "type": "keyword"
+                }
+              }
+            },
+            "srcip": {
+              "type": "keyword"
+            },
+            "srcport": {
+              "type": "keyword"
+            },
+            "srcuser": {
+              "type": "keyword"
+            },
+            "status": {
+              "type": "keyword"
+            },
+            "system_name": {
+              "type": "keyword"
+            },
+            "tty": {
+              "type": "keyword"
+            },
+            "type": {
+              "type": "keyword"
+            },
+            "uid": {
+              "type": "keyword"
+            },
+            "url": {
+              "type": "keyword"
+            },
+            "win": {
+              "properties": {
+                "eventdata": {
+                  "properties": {
+                    "auditPolicyChanges": {
+                      "type": "keyword"
+                    },
+                    "auditPolicyChangesId": {
+                      "type": "keyword"
+                    },
+                    "authenticationPackageName": {
+                      "type": "keyword"
+                    },
+                    "binary": {
+                      "type": "keyword"
+                    },
+                    "category": {
+                      "type": "keyword"
+                    },
+                    "categoryId": {
+                      "type": "keyword"
+                    },
+                    "data": {
+                      "type": "keyword"
+                    },
+                    "image": {
+                      "type": "keyword"
+                    },
+                    "impersonationLevel": {
+                      "type": "keyword"
+                    },
+                    "keyLength": {
+                      "type": "keyword"
+                    },
+                    "logonGuid": {
+                      "type": "keyword"
+                    },
+                    "logonProcessName": {
+                      "type": "keyword"
+                    },
+                    "logonType": {
+                      "type": "keyword"
+                    },
+                    "newState": {
+                      "type": "keyword"
+                    },
+                    "parentImage": {
+                      "type": "keyword"
+                    },
+                    "processId": {
+                      "type": "keyword"
+                    },
+                    "processName": {
+                      "type": "keyword"
+                    },
+                    "resourceManager": {
+                      "type": "keyword"
+                    },
+                    "subcategory": {
+                      "type": "keyword"
+                    },
+                    "subcategoryGuid": {
+                      "type": "keyword"
+                    },
+                    "subcategoryId": {
+                      "type": "keyword"
+                    },
+                    "subjectDomainName": {
+                      "type": "keyword"
+                    },
+                    "subjectLogonId": {
+                      "type": "keyword"
+                    },
+                    "subjectUserName": {
+                      "type": "keyword"
+                    },
+                    "subjectUserSid": {
+                      "type": "keyword"
+                    },
+                    "targetDomainName": {
+                      "type": "keyword"
+                    },
+                    "targetLogonId": {
+                      "type": "keyword"
+                    },
+                    "targetUserName": {
+                      "type": "keyword"
+                    },
+                    "targetUserSid": {
+                      "type": "keyword"
+                    },
+                    "transactionId": {
+                      "type": "keyword"
+                    }
+                  }
+                },
+                "rmSessionEvent": {
+                  "properties": {
+                    "rmSessionId": {
+                      "type": "keyword"
+                    },
+                    "uTCStartTime": {
+                      "type": "keyword"
+                    }
+                  }
+                },
+                "system": {
+                  "properties": {
+                    "channel": {
+                      "type": "keyword"
+                    },
+                    "computer": {
+                      "type": "keyword"
+                    },
+                    "eventID": {
+                      "type": "keyword"
+                    },
+                    "eventRecordID": {
+                      "type": "keyword"
+                    },
+                    "eventSourceName": {
+                      "type": "keyword"
+                    },
+                    "keywords": {
+                      "type": "keyword"
+                    },
+                    "level": {
+                      "type": "keyword"
+                    },
+                    "message": {
+                      "type": "keyword"
+                    },
+                    "opcode": {
+                      "type": "keyword"
+                    },
+                    "processID": {
+                      "type": "keyword"
+                    },
+                    "providerGuid": {
+                      "type": "keyword"
+                    },
+                    "providerName": {
+                      "type": "keyword"
+                    },
+                    "securityUserID": {
+                      "type": "keyword"
+                    },
+                    "severityValue": {
+                      "type": "keyword"
+                    },
+                    "systemTime": {
+                      "type": "keyword"
+                    },
+                    "task": {
+                      "type": "keyword"
+                    },
+                    "threadID": {
+                      "type": "keyword"
+                    },
+                    "userID": {
+                      "type": "keyword"
+                    },
+                    "version": {
+                      "type": "keyword"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "decoder": {
+          "properties": {
+            "accumulate": {
+              "type": "long"
+            },
+            "fts": {
+              "type": "long"
+            },
+            "ftscomment": {
+              "type": "keyword"
+            },
+            "name": {
+              "type": "keyword"
+            },
+            "parent": {
+              "type": "keyword"
+            }
+          }
+        },
+        "full_log": {
+          "type": "text"
+        },
+        "host": {
+          "type": "keyword"
+        },
+        "id": {
+          "type": "keyword"
+        },
+        "input": {
+          "properties": {
+            "type": {
+              "type": "keyword"
+            }
+          }
+        },
+        "location": {
+          "type": "keyword"
+        },
+        "manager": {
+          "properties": {
+            "name": {
+              "type": "keyword"
+            }
+          }
+        },
+        "message": {
+          "type": "text"
+        },
+        "offset": {
+          "type": "keyword"
+        },
+        "predecoder": {
+          "properties": {
+            "hostname": {
+              "type": "keyword"
+            },
+            "program_name": {
+              "type": "keyword"
+            },
+            "timestamp": {
+              "type": "keyword"
+            }
+          }
+        },
+        "previous_log": {
+          "type": "text"
+        },
+        "previous_output": {
+          "type": "keyword"
+        },
+        "program_name": {
+          "type": "keyword"
+        },
+        "rule": {
+          "properties": {
+            "cis": {
+              "type": "keyword"
+            },
+            "cve": {
+              "type": "keyword"
+            },
+            "description": {
+              "type": "keyword"
+            },
+            "firedtimes": {
+              "type": "long"
+            },
+            "frequency": {
+              "type": "long"
+            },
+            "gdpr": {
+              "type": "keyword"
+            },
+            "gpg13": {
+              "type": "keyword"
+            },
+            "groups": {
+              "type": "keyword"
+            },
+            "id": {
+              "type": "keyword"
+            },
+            "info": {
+              "type": "keyword"
+            },
+            "level": {
+              "type": "long"
+            },
+            "mail": {
+              "type": "boolean"
+            },
+            "pci_dss": {
+              "type": "keyword"
+            }
+          }
+        },
+        "syscheck": {
+          "properties": {
+            "diff": {
+              "type": "keyword"
+            },
+            "event": {
+              "type": "keyword"
+            },
+            "gid_after": {
+              "type": "keyword"
+            },
+            "gid_before": {
+              "type": "keyword"
+            },
+            "gname_after": {
+              "type": "keyword"
+            },
+            "gname_before": {
+              "type": "keyword"
+            },
+            "inode_after": {
+              "type": "keyword"
+            },
+            "inode_before": {
+              "type": "keyword"
+            },
+            "md5_after": {
+              "type": "keyword"
+            },
+            "md5_before": {
+              "type": "keyword"
+            },
+            "mtime_after": {
+              "format": "date_optional_time",
+              "type": "date"
+            },
+            "mtime_before": {
+              "format": "date_optional_time",
+              "type": "date"
+            },
+            "path": {
+              "type": "keyword"
+            },
+            "perm_after": {
+              "type": "keyword"
+            },
+            "perm_before": {
+              "type": "keyword"
+            },
+            "sha1_after": {
+              "type": "keyword"
+            },
+            "sha1_before": {
+              "type": "keyword"
+            },
+            "size_after": {
+              "type": "long"
+            },
+            "size_before": {
+              "type": "long"
+            },
+            "uid_after": {
+              "type": "keyword"
+            },
+            "uid_before": {
+              "type": "keyword"
+            },
+            "uname_after": {
+              "type": "keyword"
+            },
+            "uname_before": {
+              "type": "keyword"
+            }
+          }
+        },
+        "timestamp": {
+          "format": "date_optional_time||epoch_millis",
+          "type": "date"
+        },
+        "title": {
+          "type": "keyword"
+        },
+        "type": {
+          "type": "text"
+        }
+      }
+    },
+    "settings": {
+      "index": {
+        "auto_expand_replicas": "0-1",
+        "mapping": {
+          "total_fields": {
+            "limit": "2000"
+          }
+        },
+        "number_of_replicas": "0",
+        "number_of_shards": "3",
+        "refresh_interval": "5s"
+      }
+    }
+  }
+}
