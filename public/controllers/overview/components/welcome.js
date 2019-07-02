@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
+import { StringsTools } from '../../../utils/strings-tools';
 import {
   EuiCard,
   EuiIcon,
@@ -58,6 +59,7 @@ export class WelcomeScreen extends Component {
           icon={<EuiIcon size="xl" type={icon} />}
           title={TabDescription[tab].title}
           onClick={() => this.props.switchTab(tab)}
+          data-test-subj={`overviewWelcome${StringsTools.capitalize(tab)}`}
           description={TabDescription[tab].description}
         />
       </EuiFlexItem>
