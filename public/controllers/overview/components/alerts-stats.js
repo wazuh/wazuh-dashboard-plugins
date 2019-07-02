@@ -1,10 +1,12 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { EuiStat, EuiFlexItem, EuiFlexGroup } from '@elastic/eui';
+import { StringsTools } from '../../../utils/strings-tools';
 
 export class AlertsStats extends Component {
   constructor(props) {
     super(props);
+    this.strtools = new StringsTools();
 
     this.state = {};
   }
@@ -18,6 +20,7 @@ export class AlertsStats extends Component {
             title={title}
             description={item.description}
             titleColor={item.color || 'primary'}
+            data-test-subj={`alertStats${this.strtools.toUpperCamelCase(item.description)}`}
             textAlign="center"
           />
         </EuiFlexItem>
