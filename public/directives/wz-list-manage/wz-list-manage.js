@@ -59,8 +59,9 @@ app.directive('wzListManage', function() {
       $scope.setPage = function(page = false) {
         if (page === 0 || page === -1) {
           $scope.firstPage();
-        } else {      
+        } else {   
           this.n = page || this.n;
+          $scope.n = this.n;
           $scope.currentPage = this.n;
           $scope.nextPage(this.n); 
         }
