@@ -73,6 +73,7 @@ app.directive('wzListManage', function() {
         items = $filter('filter')(result, $scope.searchTerm);
         $scope.totalItems = items.length;
         $scope.items = items;
+        $scope.currentItems = Object.keys($scope.currentList.list);
         checkGap($scope, items);
         searchTable();
       };
