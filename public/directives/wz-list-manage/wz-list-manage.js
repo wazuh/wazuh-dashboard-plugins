@@ -57,9 +57,14 @@ app.directive('wzListManage', function() {
         $scope.prevPage();
       };
       $scope.setPage = function(page = false) {
-        this.n = page || this.n;
-        $scope.currentPage = this.n;
-        $scope.nextPage(this.n);
+        if (page === 0 || page === -1) {
+          $scope.firstPage();
+        } else {   
+          this.n = page || this.n;
+          $scope.n = this.n;
+          $scope.currentPage = this.n;
+          $scope.nextPage(this.n); 
+        }
       };
 
       /**
