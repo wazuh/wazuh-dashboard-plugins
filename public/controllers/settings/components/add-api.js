@@ -78,7 +78,7 @@ export class AddApi extends Component {
                 iconType="save"
                 color="primary"
                 onClick={() => this.props.saveSettings({ ...this.state })}
-                data-test-subj="apiConfigButton"
+                data-test-subj="apiConfigSaveButton"
               >
                 Save
               </EuiButton>
