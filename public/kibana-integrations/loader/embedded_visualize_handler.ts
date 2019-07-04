@@ -44,7 +44,6 @@ import { RequestHandlerParams, Vis } from 'ui/vis';
 import { PipelineDataLoader } from 'ui/visualize/loader/pipeline_data_loader';
 import { visualizationLoader } from './visualization_loader';
 import { VisualizeDataLoader } from './visualize_data_loader';
-import $ from "jquery";
 
 // @ts-ignore
 import { DataAdapter, RequestAdapter } from 'ui/inspector/adapters';
@@ -87,7 +86,6 @@ export class EmbeddedVisualizeHandler {
    * @ignore
    */
 
-  private isToast: any;
 
   public readonly data$: Rx.Observable<any>;
   public readonly inspectorAdapters: Adapters = {};
@@ -486,14 +484,12 @@ export class EmbeddedVisualizeHandler {
       error.type && ['NO_OP_SEARCH_STRATEGY', 'UNSUPPORTED_QUERY'].includes(error.type);
 
     //Do not show notification toast if it's already being shown a similar toast
-    this.isToast = $(".euiToastHeader__title")
-    if (this.isToast.length === 0 || (this.isToast.length > 0 && this.isToast[0].outerText !== 'Error in visualization'))
-      toastNotifications.addDanger({
-        title: i18n.translate('common.ui.visualize.dataLoaderError', {
-          defaultMessage: 'Error in visualization',
-        }),
-        text: error.message,
-      });
+    toastNotifications.addDanger({
+      title: i18n.translate('common.ui.visualize.dataLoaderError', {
+        defaultMessage: 'Error in visualization',
+      }),
+      text: error.message,
+    });
   };
 
   private rendererProvider = (response: VisResponseData | null) => {
