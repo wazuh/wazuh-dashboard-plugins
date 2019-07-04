@@ -30,11 +30,6 @@ export function ApiProvider({ getService, getPageObjects }) {
       expect(await browser.getCurrentUrl()).to.contain('app/wazuh#/settings');
     }
 
-    async findMessageInToasts (str) {
-      const euiGlobalToaltList = await find.byCssSelector('div.euiGlobalToastList');
-      expect(await euiGlobalToaltList.getVisibleText()).to.contain(str);
-    }
-
   }
   return new ApiPage;
 }

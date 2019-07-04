@@ -2,7 +2,7 @@
 import expect from '@kbn/expect';
 
 export default function ({ getService, getPageObjects }) {
-  const PageObjects = getPageObjects(['common', 'api']);
+  const PageObjects = getPageObjects(['common', 'api', 'toasts']);
   const testSubjects = getService('testSubjects');
   const browser = getService('browser');
 
@@ -39,28 +39,28 @@ export default function ({ getService, getPageObjects }) {
       it('should give error with empty user', async () => {
         await testSubjects.click('apiConfigButton');
         await PageObjects.common.sleep(1000);
-        await PageObjects.api.findMessageInToasts('Settings. Invalid user field');
+        await PageObjects.toasts.findMessageInToasts('Settings. Invalid user field');
       });
 
       it('should give error with empty password', async () => {
         await testSubjects.setValue('apiConfigUsername', 'foo');
         await testSubjects.click('apiConfigButton');
         await PageObjects.common.sleep(1000);
-        await PageObjects.api.findMessageInToasts('Settings. Invalid password field');
+        await PageObjects.toasts.findMessageInToasts('Settings. Invalid password field');
       });
 
       it('should give error with empty host', async () => {
         await testSubjects.setValue('apiConfigPassword', 'bar');
         await testSubjects.click('apiConfigButton');
         await PageObjects.common.sleep(1000);
-        await PageObjects.api.findMessageInToasts('Settings. Invalid url field');
+        await PageObjects.toasts.findMessageInToasts('Settings. Invalid url field');
       });
 
       it('should give error with not http/s url host', async () => {
         await testSubjects.setValue('apiConfigHost', 'localhost');
         await testSubjects.click('apiConfigButton');
         await PageObjects.common.sleep(1000);
-        await PageObjects.api.findMessageInToasts('Settings. Invalid url field');
+        await PageObjects.toasts.findMessageInToasts('Settings. Invalid url field');
       });
 
       it('should give error with negative port', async () => {
@@ -68,14 +68,15 @@ export default function ({ getService, getPageObjects }) {
         await testSubjects.setValue('apiConfigPort', '-1');
         await testSubjects.click('apiConfigButton');
         await PageObjects.common.sleep(1000);
-        await PageObjects.api.findMessageInToasts('Settings. Invalid port field');
+        await PageObjects.toasts.findMessageInToasts('Settings. Invalid port field');
       });
 
       it('should give error with port out of range', async () => {
+        await PageObjects.toasts.closeAllToasts();
         await testSubjects.setValue('apiConfigPort', '999999999999');
         await testSubjects.click('apiConfigButton');
         await PageObjects.common.sleep(1000);
-        await PageObjects.api.findMessageInToasts('Settings. Invalid port field');
+        await PageObjects.toasts.findMessageInToasts('Settings. Invalid port field');
       });
 
 
@@ -94,7 +95,8 @@ export default function ({ getService, getPageObjects }) {
 
       it('Check manager button right after inserting API credentials. Should success and not modify anything on the fields', async () => {
         await testSubjects.click('apiTableRefreshButton');
-        await PageObjects.api.findMessageInToasts('Settings. Connection success');
+        await PageObjects.common.sleep(1000);
+        await PageObjects.toasts.findMessageInToasts('Settings. Connection success');
       });
 
     });
