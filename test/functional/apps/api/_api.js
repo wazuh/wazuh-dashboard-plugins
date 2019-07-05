@@ -34,28 +34,28 @@ export default function ({ getService, getPageObjects }) {
 
       it('should give error with empty user', async () => {
         await testSubjects.click('apiConfigSaveButton');
-        await PageObjects.common.sleep(1000);
+        await PageObjects.common.sleep(1500);
         await PageObjects.toasts.findMessageInToasts('Settings. Invalid user field');
       });
 
       it('should give error with empty password', async () => {
         await testSubjects.setValue('apiConfigUsername', 'foo');
         await testSubjects.click('apiConfigSaveButton');
-        await PageObjects.common.sleep(1000);
+        await PageObjects.common.sleep(1500);
         await PageObjects.toasts.findMessageInToasts('Settings. Invalid password field');
       });
 
       it('should give error with empty host', async () => {
         await testSubjects.setValue('apiConfigPassword', 'bar');
         await testSubjects.click('apiConfigSaveButton');
-        await PageObjects.common.sleep(1000);
+        await PageObjects.common.sleep(1500);
         await PageObjects.toasts.findMessageInToasts('Settings. Invalid url field');
       });
 
       it('should give error with not http/s url host', async () => {
         await testSubjects.setValue('apiConfigHost', 'localhost');
         await testSubjects.click('apiConfigSaveButton');
-        await PageObjects.common.sleep(1000);
+        await PageObjects.common.sleep(1500);
         await PageObjects.toasts.findMessageInToasts('Settings. Invalid url field');
       });
 
@@ -63,7 +63,7 @@ export default function ({ getService, getPageObjects }) {
         await testSubjects.setValue('apiConfigHost', 'http://localhost');
         await testSubjects.setValue('apiConfigPort', '-1');
         await testSubjects.click('apiConfigSaveButton');
-        await PageObjects.common.sleep(1000);
+        await PageObjects.common.sleep(1500);
         await PageObjects.toasts.findMessageInToasts('Settings. Invalid port field');
       });
 
@@ -71,7 +71,7 @@ export default function ({ getService, getPageObjects }) {
         await PageObjects.toasts.closeAllToasts();
         await testSubjects.setValue('apiConfigPort', '999999999999');
         await testSubjects.click('apiConfigSaveButton');
-        await PageObjects.common.sleep(1000);
+        await PageObjects.common.sleep(1500);
         await PageObjects.toasts.findMessageInToasts('Settings. Invalid port field');
       });
 
@@ -91,7 +91,7 @@ export default function ({ getService, getPageObjects }) {
 
       it('Check manager button right after inserting API credentials. Should success and not modify anything on the fields', async () => {
         await testSubjects.click('apiTableRefreshButton');
-        await PageObjects.common.sleep(1000);
+        await PageObjects.common.sleep(1500);
         await PageObjects.toasts.findMessageInToasts('Settings. Connection success');
       });
 

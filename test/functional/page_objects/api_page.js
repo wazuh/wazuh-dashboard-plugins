@@ -28,7 +28,7 @@ export function ApiProvider({ getService, getPageObjects }) {
 
     async checkTabDisabled (tab) {
       await testSubjects.click(tab);
-      await PageObjects.common.sleep(500);
+      await PageObjects.common.sleep(1500);
       expect(await browser.getCurrentUrl()).to.contain('tab=api');
       expect(await browser.getCurrentUrl()).to.contain('app/wazuh#/settings');
     }
@@ -71,6 +71,7 @@ export function ApiProvider({ getService, getPageObjects }) {
         await deleteButton.moveMouseTo();
         await PageObjects.common.sleep(1000);
         await deleteButton.click();
+        await PageObjects.common.sleep(1500);
         await PageObjects.toasts.findMessageInToasts('Settings. The API was removed successfully');
         await PageObjects.toasts.closeAllToasts();
       }
