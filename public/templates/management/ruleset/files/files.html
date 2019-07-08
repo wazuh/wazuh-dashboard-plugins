@@ -37,7 +37,7 @@
     <div layout="row">
         <md-card flex class="wz-md-card _md flex md-margin-h">
             <md-card-actions layout="row" layout-align="end center" class="wz-card-actions wz-card-actions-top">
-                <a ng-if="adminMode" ng-click="filesctrl.addNewFile(mctrl.globalRulesetTab)">Add
+                <a ng-if="mctrl.adminMode" ng-click="filesctrl.addNewFile(mctrl.globalRulesetTab)">Add
                     new {{mctrl.globalRulesetTab}} file</a>
                 <span flex></span>
                 <wz-kbn-switch class="md-primary wz-no-top-bottom-margin" switch-model="mctrl.onlyLocalFiles"

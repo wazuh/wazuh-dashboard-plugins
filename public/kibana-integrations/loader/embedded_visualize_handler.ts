@@ -466,12 +466,12 @@ export class EmbeddedVisualizeHandler {
       .catch(this.handleDataLoaderError);
   };
 
-    /**
-   * When dataLoader returns an error, we need to make sure it surfaces in the UI.
-   *
-   * TODO: Eventually we should add some custom error messages for issues that are
-   * frequently encountered by users.
-   */
+  /**
+ * When dataLoader returns an error, we need to make sure it surfaces in the UI.
+ *
+ * TODO: Eventually we should add some custom error messages for issues that are
+ * frequently encountered by users.
+ */
   private handleDataLoaderError = (error: any): void => {
     // TODO: come up with a general way to cancel execution of pipeline expressions.
     if (this.dataLoaderParams.searchSource && this.dataLoaderParams.searchSource.cancelQueued) {

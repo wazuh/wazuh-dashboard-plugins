@@ -321,7 +321,7 @@ export class ElasticWrapper {
               fieldFormatMap: `{
                   "data.virustotal.permalink":{"id":"url"},
                   "data.vulnerability.reference":{"id":"url"},"data.url":{"id":"url"},
-                  "rule.id":{"id":"url","params":{"urlTemplate":"/app/wazuh#/manager/?tab=ruleset&currentRule&ruleid={{value}}","labelTemplate":"{{value}}","openLinkInCurrentTab":true}}
+                  "rule.id":{"id":"url"}
                 }`,
               sourceFilters: '[{"value":"@timestamp"}]'
             }

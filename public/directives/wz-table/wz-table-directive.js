@@ -433,7 +433,7 @@ app.directive('wzTable', function() {
       $scope.confirmRemoveFile = async (file, type) => {
         try {
           await rulesetHandler.deleteFile(file, type);
-          errorHandler.info(`File ${file.file} has been deleted`);
+          errorHandler.info(`File ${file.file || file.name} has been deleted`);
         } catch (error) {
           errorHandler.handle(error.message || error);
         }
