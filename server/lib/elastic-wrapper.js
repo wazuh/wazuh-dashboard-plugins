@@ -287,7 +287,8 @@ export class ElasticWrapper {
               fields: currentFieldsString,
               fieldFormatMap: `{
                   "data.virustotal.permalink":{"id":"url"},
-                  "data.vulnerability.reference":{"id":"url"},"data.url":{"id":"url"}
+                  "data.vulnerability.reference":{"id":"url"},"data.url":{"id":"url"},
+                  "rule.id":{"id":"url"}
                 }`,
               sourceFilters: '[{"value":"@timestamp"}]'
             }

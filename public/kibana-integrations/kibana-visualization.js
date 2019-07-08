@@ -17,7 +17,7 @@ import dateMath from '@elastic/datemath';
 
 const app = uiModules.get('apps/webinar_app', []);
 let lockFields = false;
-app.directive('kbnVis', function() {
+app.directive('kbnVis', function () {
   return {
     restrict: 'E',
     scope: {
@@ -204,10 +204,10 @@ app.directive('kbnVis', function() {
         updateVisWatcher();
         try {
           visualization.destroy();
-        } catch (error) {} // eslint-disable-line
+        } catch (error) { } // eslint-disable-line
         try {
           visHandler.destroy();
-        } catch (error) {} // eslint-disable-line
+        } catch (error) { } // eslint-disable-line
       });
 
       const renderComplete = () => {
@@ -216,11 +216,11 @@ app.directive('kbnVis', function() {
         const currentCompleted = Math.round(
           (loadedVisualizations.getList().length /
             tabVisualizations.getItem(tabVisualizations.getTab())) *
-            100
+          100
         );
         $rootScope.loadingStatus = `Rendering visualizations... ${
           currentCompleted > 100 ? 100 : currentCompleted
-        } %`;
+          } %`;
 
         if (currentCompleted >= 100) {
           $rootScope.rendered = true;

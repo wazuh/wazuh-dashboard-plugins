@@ -11,12 +11,13 @@
  *
  * Find more information about this on the LICENSE file.
  */
+
 import 'plugins/kibana/visualize/saved_visualizations/_saved_vis';
 import { VisTypesRegistryProvider } from 'ui/registry/vis_types';
 import { uiModules } from 'ui/modules';
 import { SavedObjectLoader } from './saved-object-loader';
-import { savedObjectManagementRegistry } from 'plugins/kibana/management/saved_object_registry';
 import { SavedObjectsClientProvider } from 'ui/saved_objects';
+import { savedObjectManagementRegistry } from 'plugins/kibana/management/saved_object_registry';
 
 const app = uiModules.get('app/visualize');
 
@@ -27,15 +28,13 @@ savedObjectManagementRegistry.register({
   title: 'visualizations'
 });
 
-app.service('wzsavedVisualizations', function(
-  Promise,
+app.service('wzsavedVisualizations', function (
   kbnIndex,
   SavedVis,
   Private,
   kbnUrl,
   $http,
-  chrome
-) {
+  chrome) {
   const visTypes = Private(VisTypesRegistryProvider);
 
   const savedObjectClient = Private(SavedObjectsClientProvider);
@@ -45,20 +44,16 @@ app.service('wzsavedVisualizations', function(
     kbnUrl,
     $http,
     chrome,
-    savedObjectClient
-  );
+    savedObjectClient);
 
-  saveVisualizationLoader.mapHitSource = function(source, id) {
+  saveVisualizationLoader.mapHitSource = function (source, id) {
     source.id = id;
     source.url = this.urlFor(id);
 
     let typeName = source.typeName;
     if (source.visState) {
-      try {
-        typeName = JSON.parse(source.visState).type;
-      } catch (e) {
-        /* missing typename handled below */
-      } // eslint-disable-line no-empty
+      try { typeName = JSON.parse(source.visState).type; }
+      catch (e) { /* missing typename handled below */ } // eslint-disable-line no-empty
     }
 
     if (!typeName || !visTypes.byName[typeName]) {
@@ -71,7 +66,7 @@ app.service('wzsavedVisualizations', function(
     return source;
   };
 
-  saveVisualizationLoader.urlFor = function(id) {
+  saveVisualizationLoader.urlFor = function (id) {
     return kbnUrl.eval('#/visualize/edit/{{id}}', { id: id });
   };
   return saveVisualizationLoader;

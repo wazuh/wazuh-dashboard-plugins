@@ -220,6 +220,31 @@ export class WazuhElasticCtrl {
   }
 
   /**
+   * This get the elastic setup settings
+   * @param {Object} req
+   * @param {Object} reply
+   * @returns {Object} setup info or ErrorResponse
+   */
+  async getSetupInfo(req, reply) {
+    try {
+      const data = await this.wzWrapper.getWazuhVersionIndexAsSearch();
+
+      return data.hits.total.value === 0
+        ? { statusCode: 200, data: '' }
+        : { statusCode: 200, data: data.hits.hits[0]._source };
+    } catch (error) {
+      log('wazuh-elastic:getSetupInfo', error.message || error);
+      return ErrorResponse(
+        `Could not get data from elasticsearch due to ${error.message ||
+        error}`,
+        4005,
+        500,
+        reply
+      );
+    }
+  }
+
+  /**
    * Checks one by one if the requesting user has enough privileges to use
    * an index pattern from the list.
    * @param {Array<Object>} list List of index patterns
