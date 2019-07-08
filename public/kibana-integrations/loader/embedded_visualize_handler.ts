@@ -44,7 +44,6 @@ import { RequestHandlerParams, Vis } from 'ui/vis';
 import { PipelineDataLoader } from 'ui/visualize/loader/pipeline_data_loader';
 import { visualizationLoader } from './visualization_loader';
 import { VisualizeDataLoader } from './visualize_data_loader';
-
 // @ts-ignore
 import { DataAdapter, RequestAdapter } from 'ui/inspector/adapters';
 
@@ -85,8 +84,7 @@ export class EmbeddedVisualizeHandler {
    * This should not be used by any plugin.
    * @ignore
    */
-
-
+  public static readonly __ENABLE_PIPELINE_DATA_LOADER__: boolean = false;
   public readonly data$: Rx.Observable<any>;
   public readonly inspectorAdapters: Adapters = {};
   private vis: Vis;
@@ -444,6 +442,7 @@ export class EmbeddedVisualizeHandler {
     this.dataLoaderParams.aggs = this.vis.getAggConfig();
     this.dataLoaderParams.forceFetch = forceFetch;
     this.dataLoaderParams.inspectorAdapters = this.inspectorAdapters;
+
     this.vis.filters = { timeRange: this.dataLoaderParams.timeRange };
     this.vis.requestError = undefined;
     this.vis.showRequestError = false;
@@ -483,7 +482,6 @@ export class EmbeddedVisualizeHandler {
     this.vis.showRequestError =
       error.type && ['NO_OP_SEARCH_STRATEGY', 'UNSUPPORTED_QUERY'].includes(error.type);
 
-    //Do not show notification toast if it's already being shown a similar toast
     toastNotifications.addDanger({
       title: i18n.translate('common.ui.visualize.dataLoaderError', {
         defaultMessage: 'Error in visualization',
