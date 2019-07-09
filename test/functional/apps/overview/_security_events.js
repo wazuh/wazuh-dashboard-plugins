@@ -4,6 +4,7 @@ import { pageObjects } from '../../page_objects';
 export default function({ getService, getPageObjects }) {
   const browser = getService('browser');
   const filterBar = getService('filterBar');
+  const queryBar = getService('queryBar');
   const find = getService('find');
   const PageObjects = getPageObjects(['common', 'wazuhCommon', 'timePicker', 'toasts']);
   const testSubjects = getService('testSubjects');
@@ -24,6 +25,7 @@ export default function({ getService, getPageObjects }) {
     });
 
     it('when change date, total alerts should be 21', async () => {
+      await PageObjects.common.sleep(1000);
       expect(await testSubjects.getVisibleText('alertStatsTotal')).to.equal('Total\n21');
     });
 
@@ -99,7 +101,7 @@ export default function({ getService, getPageObjects }) {
     
     });
 
-    describe('click Overview/Agent -> Discover subtab: ', function describeIndexTests () {
+    describe('click Overview/Agent -> Discover subtab: ', () => {
       this.tags('smoke');
     
       it('should appear selected the wazuh-alerts-3.x index pattern only', async () => {
@@ -110,7 +112,7 @@ export default function({ getService, getPageObjects }) {
         expect(await selectedIndex.getVisibleText()).to.equal('wazuh-alerts-3.x-*');
       });
 
-      describe('Click on a rule ID on the Discover tab: ', function describeIndexTests() {
+      describe('Click on a rule ID on the Discover tab: ', () => {
 
         before(async () => {
           await find.clickByCssSelector('li[attr-field="id"]');
@@ -137,6 +139,35 @@ export default function({ getService, getPageObjects }) {
 
     });
 
+    describe('search bar', () => {
+      before(async () => {
+        await testSubjects.click('overviewDiscoverButton');
+      });
+
+      it('search something on the search bar', async () => {
+        await queryBar.setQuery('rule.level:7');
+        await queryBar.submitQuery();
+        await PageObjects.common.sleep(750);
+        expect(await queryBar.getQueryString()).to.equal('rule.level:7');
+      });
+
+      it('total alerts should be 3', async () => {
+        expect(await testSubjects.getVisibleText('alertStatsTotal')).to.equal('Total\n3');
+      });
+
+      it('delete the content of the search bar', async () => {
+        await queryBar.setQuery('');
+        await queryBar.submitQuery();
+        await PageObjects.common.sleep(750);
+        expect(await queryBar.getQueryString()).to.equal('');
+      });
+
+      it('total alerts should be 21 again', async () => {
+        expect(await testSubjects.getVisibleText('alertStatsTotal')).to.equal('Total\n21');
+        await PageObjects.common.sleep(10000);
+      });
+
+    });
 
   });
 }
