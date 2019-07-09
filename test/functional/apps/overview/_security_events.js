@@ -1,10 +1,13 @@
 import expect from '@kbn/expect';
+import { pageObjects } from '../../page_objects';
 
 export default function({ getService, getPageObjects }) {
   const browser = getService('browser');
-  const PageObjects = getPageObjects(['common', 'wazuhCommon', 'timePicker']);
+  const filterBar = getService('filterBar');
+  const find = getService('find');
+  const PageObjects = getPageObjects(['common', 'wazuhCommon', 'timePicker', 'toasts']);
   const testSubjects = getService('testSubjects');
-  const log = getService('log');
+
 
   describe('Security events', function describeIndexTests() {
     before(async function () {
@@ -36,6 +39,104 @@ export default function({ getService, getPageObjects }) {
       expect(await testSubjects.getVisibleText('alertStatsAuthenticationSuccess')).to.equal('Authentication success\n7');
     });
 
+    it('should not toasts should appear of type danger', async () => {
+      expect(await PageObjects.toasts.anyTypeToasts('danger')).to.not.be.ok();
+    });
+
+    it('There should be no toast with the message: Error in visualization.', async () => {
+      expect(await PageObjects.toasts.findMessageInToasts('Error in visualization')).to.not.be.ok();
+    });
+
+    it('empty visualizations should not be shown', async () => {
+      const visualizations = await find.allByCssSelector('div.visLib__chart');
+      for (const visualization of visualizations) {
+        const result = await visualization.parseDomContent(); 
+        expect(result.html() != '').to.be.ok();        
+      }
+    });
+
+    describe('Activate a filter', function describeIndexTests () {
+      this.tags('smoke');
+
+      before(async () => {
+        await filterBar.addFilter('agent.name', 'is', 'master');
+      });
+
+      it('the filter should be working', async () => {
+        expect(await filterBar.getFilterCount()).to.be.greaterThan(0);
+      });
+
+      it('The filter should be still working and appear as a chip in Discover', async () => {
+        await testSubjects.click('overviewDiscoverButton');
+        PageObjects.common.sleep(500);
+        expect(await filterBar.getFilterCount()).to.be.greaterThan(0);
+      });
+
+      it('go back to Dashboard and remove the filter. The visualizations should reload properly after deleting the filter', async () => {
+        await testSubjects.click('overviewDiscoverButton');
+        await PageObjects.common.sleep(500);
+        await filterBar.removeAllFilters();
+        expect(await filterBar.getFilterCount()).to.equal(0);
+      });
+
+      it('Press F5 to reload the page. The filters should not keep applied unless they are pinned', async () => {
+        await browser.refresh();
+        expect(await filterBar.getFilterCount()).to.equal(0);
+      });
+
+      it('add and pinned filter', async () => {
+        await filterBar.addFilter('agent.name', 'is', 'master');
+        await filterBar.toggleFilterPinned('agent.name');
+        expect(await filterBar.getFilterCount()).to.be.greaterThan(0);
+      });
+
+      it('Click several times the app buttons and tabs while you are on the same tab, filters should persist and not disappear', async () => {
+        await testSubjects.click('overviewDiscoverButton');
+        expect(await filterBar.getFilterCount()).to.be.greaterThan(0);
+        await testSubjects.click('overviewDiscoverButton');
+        expect(await filterBar.getFilterCount()).to.be.greaterThan(0);
+      });
     
+    });
+
+    describe('click Overview/Agent -> Discover subtab: ', function describeIndexTests () {
+      this.tags('smoke');
+    
+      it('should appear selected the wazuh-alerts-3.x index pattern only', async () => {
+        await testSubjects.click('overviewDiscoverButton');
+        await PageObjects.common.waitUntilUrlIncludes('tabView=discover');
+
+        const selectedIndex = await find.byCssSelector('#index_pattern_id');
+        expect(await selectedIndex.getVisibleText()).to.equal('wazuh-alerts-3.x-*');
+      });
+
+      describe('Click on a rule ID on the Discover tab: ', function describeIndexTests() {
+
+        before(async () => {
+          await find.clickByCssSelector('li[attr-field="id"]');
+        });
+
+        it('It should have the class `active`', async () => {
+          const idRule = await find.byCssSelector('li[attr-field="id"]');
+          expect(await idRule.getAttribute('class')).to.contain('active');
+        });
+        
+        it('It should open the Ruleset detail tab for that rule ID', async () => {
+          const idRule = await find.byCssSelector('li[attr-field="id"]');
+          try {
+            const text = await idRule.findByCssSelector('div.dscFieldDetails');
+
+            expect(await text.getVisibleText()).to.match(/Top \d+ values in \d+ \/ \d+ records/);
+          } catch (error) {
+            console.log("Error: " + error);
+            expect(false).to.be.ok();
+          }
+        });
+
+      });
+
+    });
+
+
   });
 }

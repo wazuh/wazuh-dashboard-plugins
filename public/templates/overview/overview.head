@@ -39,7 +39,7 @@
             <!-- Dashboard button -->
             <button class="kuiButton kuiButton--secondary small"
                 ng-click="octrl.tabView === 'discover' ? octrl.switchSubtab('panels') : octrl.switchSubtab('discover')"
-                aria-label="Dashboard button">
+                aria-label="Dashboard button" data-test-subj="overviewDiscoverButton">
                 <span ng-if="octrl.tabView === 'discover'"><i class="fa fa-fw fa-th" aria-hidden="true"></i>
                     Dashboard</span>
                 <span ng-if="octrl.tabView === 'panels'"><i class="fa fa-fw fa-compass" aria-hidden="true"></i>
