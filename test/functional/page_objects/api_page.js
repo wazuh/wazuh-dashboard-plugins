@@ -49,8 +49,8 @@ export function ApiProvider({ getService, getPageObjects }) {
           await PageObjects.common.sleep(1000);
           await checkButton.click();
           await PageObjects.common.sleep(2000);
-          await PageObjects.toasts.findMessageInToasts('Settings. Connection success');
-          await PageObjects.toasts.closeAllToasts();
+          expect(await PageObjects.toasts.findMessageInToasts('Settings. Connection success')).to.be.ok();
+          await PageObjects.common.clearAllToasts();
         }
       }
     }
@@ -61,8 +61,8 @@ export function ApiProvider({ getService, getPageObjects }) {
         await PageObjects.common.sleep(1000);
         await apiButton.click();
         await this.completeApiForm('apiTableEdit');
-        await PageObjects.toasts.findMessageInToasts('Settings. The API was updated successfully');
-        await PageObjects.toasts.closeAllToasts();
+          expect(await PageObjects.toasts.findMessageInToasts('Settings. The API was updated successfully')).to.be.ok();
+        await PageObjects.common.clearAllToasts();
       }
     }
 
@@ -72,8 +72,8 @@ export function ApiProvider({ getService, getPageObjects }) {
         await PageObjects.common.sleep(1000);
         await deleteButton.click();
         await PageObjects.common.sleep(1500);
-        await PageObjects.toasts.findMessageInToasts('Settings. The API was removed successfully');
-        await PageObjects.toasts.closeAllToasts();
+        expect(await PageObjects.toasts.findMessageInToasts('Settings. The API was removed successfully')).to.be.ok();
+        await PageObjects.common.clearAllToasts();
       }
     }
 

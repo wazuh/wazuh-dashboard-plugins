@@ -11,17 +11,29 @@ export function ToastsProvider({ getService, getPageObjects }) {
 
     async findMessageInToasts (str) {
       const euiGlobalToastsList = await find.byCssSelector('div.euiGlobalToastList');
-      expect(await euiGlobalToastsList.getVisibleText()).to.contain(str);
+      const toastsText = await euiGlobalToastsList.getVisibleText();
+      if(toastsText.includes(str)){
+        return true
+      }
+      return false
     }
 
     async closeAllToasts () {
       const euiGlobalToastsButtonList = await find.allByCssSelector('div.euiGlobalToastList > div > button');
-      for (const key in euiGlobalToastsButtonList) {
-        if (euiGlobalToastsButtonList.hasOwnProperty(key)) {
-          const closeButton = euiGlobalToastsButtonList[key];
-          closeButton.click();
+      for (const closeButton of euiGlobalToastsButtonList) {
+        closeButton.click();        
+      }
+    }
+
+    async anyTypeToasts (type) {
+      const euiGlobalToastList = await find.allByCssSelector('div.euiGlobalToastsList > div');
+      for (const toast in euiGlobalToastList){
+        const classList = await toast.getAttribute('class');
+        if (classList.includes(type)){
+          return true;
         }
       }
+      return false;
     }
 
   }
