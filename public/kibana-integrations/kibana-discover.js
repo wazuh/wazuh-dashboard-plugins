@@ -60,6 +60,7 @@ import * as filterActions from 'plugins/kibana/discover/doc_table/actions/filter
 
 import 'ui/listen';
 import 'ui/visualize';
+import './debounce';
 import 'ui/fixed_scroll';
 import 'ui/index_patterns';
 import 'ui/state_management/app_state';
