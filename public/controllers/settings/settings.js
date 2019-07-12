@@ -105,7 +105,23 @@ export class SettingsController {
    */
   $onInit() {
     // Loading data
-    this.getSettings().then(() => this.getAppInfo());
+    this.getSettings().then(() => {
+      this.apiTableProps = {
+        currentDefault: this.currentDefault,
+        apiEntries: this.apiEntries,
+        compressed: true,
+        setDefault: entry => this.setDefault(entry),
+        checkManager: entry => this.checkManager(entry),
+        removeManager: entry => this.removeManager(entry),
+        updateSettings: (entry, useItem = false) =>
+          this.updateSettings(entry, useItem),
+        switch: () => this.switch()
+      };
+      this.addApiProps = {
+        saveSettings: entry => this.saveSettings(entry)
+      };
+      return this.getAppInfo();
+    });
   }
 
   /**
@@ -127,7 +143,7 @@ export class SettingsController {
   async removeManager(item) {
     try {
       const currentApi = this.appState.getCurrentAPI();
-      let index = this.apiEntries.indexOf(item);
+      let index = this.apiEntries.map(item => item._id).indexOf(item._id);
       if (currentApi) {
         if (this.apiEntries[index]._id === JSON.parse(currentApi).id) {
           // We are trying to remove the one selected as default
@@ -147,11 +163,10 @@ export class SettingsController {
       this.$scope.$emit('updateAPI', {});
       this.errorHandler.info('The API was removed successfully', 'Settings');
       this.$scope.$applyAsync();
-      return;
     } catch (error) {
       this.errorHandler.handle('Could not remove the API', 'Settings');
     }
-    return;
+    return this.apiEntries;
   }
 
   // Get current API index
@@ -175,7 +190,7 @@ export class SettingsController {
 
   // Set default API
   setDefault(item) {
-    const index = this.apiEntries.indexOf(item);
+    const index = this.apiEntries.map(item => item._id).indexOf(item._id);
 
     this.appState.setClusterInfo(this.apiEntries[index]._source.cluster_info);
 
@@ -202,7 +217,7 @@ export class SettingsController {
 
     this.errorHandler.info(
       `API ${
-        this.apiEntries[index]._source.cluster_info.manager
+      this.apiEntries[index]._source.cluster_info.manager
       } set as default`,
       'Settings'
     );
@@ -216,10 +231,8 @@ export class SettingsController {
       );
     }
 
-    this.extensions = this.appState.getExtensions(JSON.parse(currentApi).id);
-
     this.$scope.$applyAsync();
-    return;
+    return this.currentDefault;
   }
 
   // Get settings function
@@ -263,8 +276,6 @@ export class SettingsController {
           this.apiEntries[this.currentApiEntryIndex]._source.extensions
         );
       }
-
-      this.extensions = this.appState.getExtensions(JSON.parse(currentApi).id);
 
       this.$scope.$applyAsync();
       return;
@@ -329,12 +340,22 @@ export class SettingsController {
   }
 
   // Save settings function
-  async saveSettings() {
+  async saveSettings(entry) {
     try {
       if (this.savingApi) {
         this.errorHandler.info('Please, wait for success message', 'Settings');
-        return;
+        return this.apiEntries;
       }
+
+      if (entry) {
+        this.formData = {
+          user: entry.user,
+          password: entry.password,
+          url: entry.url,
+          port: entry.port
+        };
+      }
+
       this.savingApi = true;
       this.messageError = '';
       this.isEditing = false;
@@ -344,7 +365,7 @@ export class SettingsController {
         this.messageError = invalid;
         this.errorHandler.handle(invalid, 'Settings');
         this.savingApi = false;
-        return;
+        return this.apiEntries;
       }
 
       const tmpData = {
@@ -364,6 +385,8 @@ export class SettingsController {
       tmpData.extensions.audit = config['extensions.audit'];
       tmpData.extensions.pci = config['extensions.pci'];
       tmpData.extensions.gdpr = config['extensions.gdpr'];
+      tmpData.extensions.hipaa = config['extensions.hipaa'];
+      tmpData.extensions.nist = config['extensions.nist'];
       tmpData.extensions.oscap = config['extensions.oscap'];
       tmpData.extensions.ciscat = config['extensions.ciscat'];
       tmpData.extensions.aws = config['extensions.aws'];
@@ -387,7 +410,6 @@ export class SettingsController {
         _id: data.data.response._id,
         _source: {
           cluster_info: tmpData.cluster_info,
-          active: tmpData.active,
           url: tmpData.url,
           api_user: tmpData.user,
           api_port: tmpData.port,
@@ -453,7 +475,7 @@ export class SettingsController {
     }
     this.savingApi = false;
     this.$scope.$applyAsync();
-    return;
+    return this.apiEntries;
   }
 
   /**
@@ -467,24 +489,32 @@ export class SettingsController {
   }
 
   // Update settings function
-  async updateSettings(item) {
+  async updateSettings(item, useItem = false) {
     try {
       if (this.savingApi) {
         this.errorHandler.info('Please, wait for success message', 'Settings');
-        return;
+        return this.apiEntries;
       }
       this.savingApi = true;
       this.messageErrorUpdate = '';
+      if (useItem) {
+        this.formUpdate = {
+          user: item.user,
+          password: item.password,
+          url: item.url,
+          port: item.port
+        };
+      }
 
       const invalid = this.validator('formUpdate');
       if (invalid) {
         this.messageErrorUpdate = invalid;
         this.errorHandler.handle(invalid, 'Settings');
         this.savingApi = false;
-        return;
+        return this.apiEntries;
       }
 
-      const index = this.apiEntries.indexOf(item);
+      const index = this.apiEntries.map(item => item._id).indexOf(item._id);
 
       const tmpData = {
         user: this.formUpdate.user,
@@ -523,7 +553,7 @@ export class SettingsController {
     }
     this.savingApi = false;
     this.$scope.$applyAsync();
-    return;
+    return this.apiEntries;
   }
 
   /**
@@ -536,7 +566,9 @@ export class SettingsController {
   // Check manager connectivity
   async checkManager(item, isIndex, silent = false) {
     try {
-      const index = isIndex ? item : this.apiEntries.indexOf(item);
+      const index = isIndex
+        ? item
+        : this.apiEntries.map(item => item._id).indexOf(item._id);
 
       const tmpData = {
         user: this.apiEntries[index]._source.api_user,
@@ -569,23 +601,6 @@ export class SettingsController {
       else {
         !silent && this.errorHandler.handle(error);
       }
-    }
-  }
-
-  // Toggle extension
-  toggleExtension(extension, state) {
-    try {
-      const api = JSON.parse(this.appState.getCurrentAPI()).id;
-      const currentExtensions = this.appState.getExtensions(api);
-      currentExtensions[extension] = state;
-      this.appState.setExtensions(api, currentExtensions);
-      this.getCurrentAPIIndex();
-      this.apiEntries[
-        this.currentApiEntryIndex
-      ]._source.extensions = currentExtensions;
-      this.$scope.$applyAsync();
-    } catch (error) {
-      this.errorHandler.handle(error, 'Settings');
     }
   }
 
@@ -655,7 +670,7 @@ export class SettingsController {
    */
   async getAppInfo() {
     try {
-      const data = await this.genericReq.request('GET', '/elastic/setup');
+      const data = await this.genericReq.request('GET', '/api/setup');
       this.appInfo = {};
       this.appInfo['app-version'] = data.data.data['app-version'];
       this.appInfo['installationDate'] = data.data.data['installationDate'];
@@ -672,23 +687,6 @@ export class SettingsController {
       } else {
         // There's no pattern in the cookies, pick the one in the settings
         this.selectedIndexPattern = config['pattern'];
-      }
-
-      if (!this.appState.getCurrentAPI()) {
-        this.extensions = {};
-        this.extensions.audit = config['extensions.audit'];
-        this.extensions.pci = config['extensions.pci'];
-        this.extensions.gdpr = config['extensions.gdpr'];
-        this.extensions.oscap = config['extensions.oscap'];
-        this.extensions.ciscat = config['extensions.ciscat'];
-        this.extensions.aws = config['extensions.aws'];
-        this.extensions.virustotal = config['extensions.virustotal'];
-        this.extensions.osquery = config['extensions.osquery'];
-        this.extensions.docker = config['extensions.docker'];
-      } else {
-        this.extensions = this.appState.getExtensions(
-          JSON.parse(this.appState.getCurrentAPI()).id
-        );
       }
 
       if (this.tab === 'logs') {

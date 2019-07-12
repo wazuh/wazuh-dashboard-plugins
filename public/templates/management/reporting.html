@@ -5,7 +5,11 @@
         <react-component name="EuiProgress" props="{size: 'xs', color: 'primary'}" />
     </div>
 
-    <!-- No reports section -->
+    <div layout="row" layout-padding ng-if="!ctrl.loading">
+        <react-component name="ReportingTable" props="ctrl.reportingTableProps" />
+    </div>
+
+    <!--
     <div layout="row" class="wz-margin-top-16" layout-align="start start"
         ng-show="!ctrl.loading && (!ctrl.pagedItems || !ctrl.pagedItems.length)">
         <md-card flex class="wz-md-card" flex>
@@ -20,72 +24,8 @@
             </md-card-content>
         </md-card>
     </div>
-    <!-- End no reports section -->
-    <div layout="row" class="wz-margin-top-16" ng-show="!ctrl.loading && ctrl.pagedItems && ctrl.pagedItems.length">
-        <span flex></span>
-        <md-button ng-click="ctrl.load()"><svg class="euiIcon euiIcon--medium" focusable="false"
-                xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
-                <path
-                    d="M11.228 2.942a.5.5 0 1 1-.538.842A5 5 0 1 0 13 8a.5.5 0 1 1 1 0 6 6 0 1 1-2.772-5.058zM14 1.5v3A1.5 1.5 0 0 1 12.5 6h-3a.5.5 0 0 1 0-1h3a.5.5 0 0 0 .5-.5v-3a.5.5 0 1 1 1 0z">
-                </path>
-            </svg>
-            Refresh
-        </md-button>
-    </div>
-    <div layout="row" ng-show="!ctrl.loading && ctrl.pagedItems && ctrl.pagedItems.length">
-        <md-card flex class="wz-md-card">
+   -->
 
-            <md-card-content>
-                <div layout="row" class="wz-padding-top-10">
-                    <table class="table table-striped table-condensed wz-margin-bottom-40-inv" id="wz_table">
-                        <thead class="wz-text-bold">
-                            <th class="wz-text-left">File</th>
-                            <th class="wz-text-left">Size</th>
-                            <th class="wz-text-left">Created</th>
-                            <th class="wz-text-left">Options</th>
-                        </thead>
-                        <tbody>
-                            <tr ng-repeat="item in ctrl.pagedItems[ctrl.currentPage]">
-                                <td>{{item.name}}</td>
-                                <td>{{item.size / 1024 | number: 2}}KB</td>
-                                <td><span ng-bind="ctrl.offsetTimestamp(item.date)"></span></td>
-                                <td>
-                                    <a ng-click="ctrl.goReport(item.name)" flex class="wz-text-right">
-                                        <react-component name="EuiIcon" props="{type:'importAction'}" />
-                                    </a>
-                                    <a flex class="wz-text-right cursor-pointer"
-                                        ng-click="ctrl.deleteReport(item.name)">
-                                        <react-component name="EuiIcon" props="{type:'trash'}" />
-                                    </a>
-                                </td>
-                            </tr>
-                        </tbody>
-                        <tfoot>
-                            <td colspan="6">
-                                <div class="pagination pull-right">
-                                    <ul layout="row" ng-show="ctrl.items.length > ctrl.itemsPerPage">
-                                        <li ng-class="{disabled: ctrl.currentPage == 0}" class="md-padding">
-                                            <a href ng-click="ctrl.prevPage()">« Prev</a>
-                                        </li>
 
-                                        <li ng-repeat="n in ctrl.range(ctrl.pagedItems.length, ctrl.currentPage, ctrl.currentPage + ctrl.gap) "
-                                            ng-class="{active: n == ctrl.currentPage}" ng-click="ctrl.setPage(n)"
-                                            class="md-padding">
-                                            <a href ng-bind="n + 1">1</a>
-                                        </li>
-
-                                        <li ng-class="{disabled: (ctrl.currentPage) == ctrl.pagedItems.length - 1}"
-                                            class="md-padding">
-                                            <a href ng-click="ctrl.nextPage()">Next »</a>
-                                        </li>
-                                    </ul>
-                                </div>
-                            </td>
-                        </tfoot>
-                    </table>
-                </div>
-            </md-card-content>
-        </md-card>
-    </div>
 
 </div>

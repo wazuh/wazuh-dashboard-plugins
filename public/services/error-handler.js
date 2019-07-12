@@ -19,8 +19,8 @@ import { GlobalToastList } from '../../../../src/core/public/notifications/toast
 import { ToastsService } from '../../../../src/core/public/notifications/toasts/toasts_service';
 import { ToastsServicew } from './notifications/toasts_service';
 import { GlobalToastListw } from './notifications/global_toast_list';
-ToastsService.prototype.start = ToastsServicew.prototype.start;
-GlobalToastList.prototype.render = GlobalToastListw.prototype.render;
+//ToastsService.prototype.start = ToastsServicew.prototype.start;
+//GlobalToastList.prototype.render = GlobalToastListw.prototype.render;
 
 export class ErrorHandler {
   /**
@@ -30,6 +30,7 @@ export class ErrorHandler {
     this.wzMisc = wzMisc;
     this.$rootScope = $rootScope;
     this.checkDaemonsStatus = checkDaemonsStatus;
+    this.history = [];
   }
 
   /**
@@ -73,8 +74,24 @@ export class ErrorHandler {
    */
   info(message, location) {
     if (typeof message === 'string') {
-      message = location ? location + '. ' + message : message;
-      toastNotifications.addSuccess(message);
+      // Current date in milliseconds
+      const date = new Date().getTime();
+
+      // Remove errors older than 2s from the error history
+      this.history = this.history.filter(item => date - item.date <= 2000);
+
+      // Check if the incoming error was already shown in the last two seconds
+      const recentlyShown = this.history
+        .map(item => item.text)
+        .includes(message);
+
+      // If the incoming error was not shown in the last two seconds, add it to the history
+      !recentlyShown && this.history.push({ text: message, date });
+
+      if (!recentlyShown) {
+        message = location ? location + '. ' + message : message;
+        toastNotifications.addSuccess(message);
+      }
     }
     return;
   }
@@ -88,22 +105,41 @@ export class ErrorHandler {
    */
   handle(error, location, isWarning, silent) {
     const message = this.extractMessage(error);
-    if (typeof message === 'string' && message.includes('ERROR3099')) {
+    const messageIsString = typeof message === 'string';
+
+    if (messageIsString && message.includes('ERROR3099')) {
       this.$rootScope.wazuhNotReadyYet = 'Wazuh not ready yet.';
       this.$rootScope.$applyAsync();
       this.checkDaemonsStatus.makePing();
       return;
     }
+
     const origin = ((error || {}).config || {}).url || '';
+    const originIsString = typeof origin === 'string' && origin.length;
 
     if (this.wzMisc.getBlankScr()) silent = true;
-    let text =
-      typeof message === 'string' && typeof origin === 'string' && origin.length
-        ? `${message} (${origin})`
-        : message;
+
+    const hasOrigin = messageIsString && originIsString;
+
+    let text = hasOrigin ? `${message} (${origin})` : message;
+
     if (error.extraMessage) text = error.extraMessage;
     text = location ? location + '. ' + text : text;
-    if (!silent) {
+
+    // Current date in milliseconds
+    const date = new Date().getTime();
+
+    // Remove errors older than 2s from the error history
+    this.history = this.history.filter(item => date - item.date <= 2000);
+
+    // Check if the incoming error was already shown in the last two seconds
+    const recentlyShown = this.history.map(item => item.text).includes(text);
+
+    // If the incoming error was not shown in the last two seconds, add it to the history
+    !recentlyShown && this.history.push({ text, date });
+
+    // The error must be shown and the error was not shown in the last two seconds, then show the error
+    if (!silent && !recentlyShown) {
       if (
         isWarning ||
         (text &&

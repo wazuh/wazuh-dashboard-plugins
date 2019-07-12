@@ -103,13 +103,9 @@
     </div>
     <!-- End Logs section -->
 
-    <div layout="row" class="md-padding-h" ng-if="XMLContent === ''">
-        <div flex class="euiCallOut euiCallOut--warning wz-margin-top-17">
-            <div class="euiCallOutHeader">
-                <react-component name="EuiIcon" props="{type:'help',className:'euiCallOutHeader__title'}" />
-                <span class="euiCallOutHeader__title">No results match your search criteria</span>
-            </div>
-        </div>
+    <div layout="row" layout-padding ng-if="XMLContent === ''">
+        <react-component flex name="EuiCallOut"
+            props="{color:'warning',iconType:'help', title:'No results match your search criteria'}" />
     </div>
 
 </div>

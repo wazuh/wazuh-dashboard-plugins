@@ -99,13 +99,17 @@
     <!-- End Security navigation bar -->
 
     <!-- Compliance navigation bar -->
-    <md-nav-bar ng-if="octrl.inArray(octrl.tab, octrl.complianceTabs) && octrl.extensions.pci && octrl.extensions.gdpr"
+    <md-nav-bar ng-if="octrl.inArray(octrl.tab, octrl.complianceTabs) && (octrl.extensions.pci || octrl.extensions.gdpr || octrl.extensions.hipaa || octrl.extensions.nist)"
         class="wz-nav-bar" ng-show="octrl.tab !== 'welcome'" md-selected-nav-item="octrl.tab"
         nav-bar-aria-label="Compliance navigation links">
         <md-nav-item ng-show="octrl.extensions.pci" class="wz-nav-item" md-nav-click="octrl.switchTab('pci',true)"
             name="pci">{{ octrl.tabNames['pci'] }}</md-nav-item>
         <md-nav-item ng-show="octrl.extensions.gdpr" class="wz-nav-item" md-nav-click="octrl.switchTab('gdpr',true)"
             name="gdpr">{{ octrl.tabNames['gdpr'] }}</md-nav-item>
+        <md-nav-item ng-show="octrl.extensions.gdpr" class="wz-nav-item" md-nav-click="octrl.switchTab('hipaa',true)"
+            name="hipaa">{{ octrl.tabNames['hipaa'] }}</md-nav-item>
+        <md-nav-item ng-show="octrl.extensions.gdpr" class="wz-nav-item" md-nav-click="octrl.switchTab('nist',true)"
+            name="nist">{{ octrl.tabNames['nist'] }}</md-nav-item>
     </md-nav-bar>
     <!-- End Compliance navigation bar -->
 
@@ -132,12 +136,8 @@
     <!-- No results section -->
     <div layout="row" class="wz-margin-top-10 wz-margin-right-8 wz-margin-left-8" ng-if="octrl.tab !== 'welcome'"
         ng-show="resultState === 'none' && octrl.tabView === 'panels'">
-        <div flex class="euiCallOut euiCallOut--warning">
-            <div class="euiCallOutHeader">
-                <react-component name="EuiIcon" props="{type:'help',className:'euiCallOutHeader__title'}" />
-                <span class="euiCallOutHeader__title">There are no results for selected time range. Try another
-                    one.</span>
-            </div>
-        </div>
+        <react-component flex name="EuiCallOut"
+            props="{color:'warning',iconType:'help', title:'There are no results for selected time range. Try another
+            one.'}" />
     </div>
     <!-- No results section -->

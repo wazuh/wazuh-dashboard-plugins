@@ -117,11 +117,19 @@ export class OverviewController {
     this.hostMonitoringTabs = ['general', 'fim', 'aws'];
     this.systemAuditTabs = ['pm', 'audit', 'oscap', 'ciscat', 'sca'];
     this.securityTabs = ['vuls', 'virustotal', 'osquery', 'docker'];
-    this.complianceTabs = ['pci', 'gdpr'];
+    this.complianceTabs = ['pci', 'gdpr', 'hipaa', 'nist'];
 
     this.wodlesConfiguration = null;
 
     this.init();
+
+    this.welcomeCardsProps = {
+      api: this.appState.getCurrentAPI(),
+      switchTab: tab => this.switchTab(tab),
+      extensions: this.extensions,
+      setExtensions: (api, extensions) =>
+        this.appState.setExtensions(api, extensions)
+    };
 
     this.$scope.$on('$destroy', () => {
       this.visFactoryService.clearAll();
@@ -246,6 +254,18 @@ export class OverviewController {
         const gdprTabs = await this.commonData.getGDPR();
         this.gdprTabs = gdprTabs;
         this.selectedGdprIndex = 0;
+      }
+
+      if (newTab === 'hipaa') {
+        const hipaaTabs = await this.commonData.getHIPAA();
+        this.hipaaTabs = hipaaTabs;
+        this.selectedHipaaIndex = 0;
+      }
+
+      if (newTab === 'nist') {
+        const nistTabs = await this.commonData.getNIST();
+        this.nistTabs = nistTabs;
+        this.selectedNistIndex = 0;
       }
 
       if (newTab !== 'welcome') this.tabHistory.push(newTab);

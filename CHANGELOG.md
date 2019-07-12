@@ -2,6 +2,61 @@
 
 All notable changes to the Wazuh app project will be documented in this file.
 
+## Wazuh v3.9.3 - Kibana v6.8.1 / v7.1.1 / v7.2.0 - Revision 519
+
+### Added
+
+- Support for Wazuh v3.9.3
+- Support for Kibana v7.2.0 [#1556](https://github.com/wazuh/wazuh-kibana-app/pull/1556).
+
+### Changed
+
+- New design and several UI/UX changes [#1525](https://github.com/wazuh/wazuh-kibana-app/pull/1525).
+- Improved error checking + syscollector performance [94d0a83](https://github.com/wazuh/wazuh-kibana-app/commit/94d0a83e43aa1d2d84ef6f87cbb76b9aefa085b3).
+- Adapt Syscollector for MacOS agents [a4bf7ef](https://github.com/wazuh/wazuh-kibana-app/commit/a4bf7efc693a99b7565b5afcaa372155f15a4db9).
+- Show last scan for syscollector [73f2056](https://github.com/wazuh/wazuh-kibana-app/commit/73f2056673bb289d472663397ba7097e49b7b93b).
+
+### Fixed
+
+- Corrected width for agent stats [a998955](https://github.com/wazuh/wazuh-kibana-app/commit/a99895565a8854c55932ec94cffb08e1d0aa3da1).
+- Fix height for the menu directive with Dynamic height [427d0f3](https://github.com/wazuh/wazuh-kibana-app/commit/427d0f3e9fa6c34287aa9e8557da99a51e0db40f).
+- Fix wazuh-db and clusterd check [cddcef6](https://github.com/wazuh/wazuh-kibana-app/commit/cddcef630c5234dd6f6a495715743dfcfd4e4001).
+- Fix AlertsStats when value is "0", it was showing "-" [07a3e10](https://github.com/wazuh/wazuh-kibana-app/commit/07a3e10c7f1e626ba75a55452b6c295d11fd657d).
+- Fix syscollector state value [f8d3d0e](https://github.com/wazuh/wazuh-kibana-app/commit/f8d3d0eca44e67e26f79bc574495b1f4c8f751f2).
+- Fix time offset for reporting table [2ef500b](https://github.com/wazuh/wazuh-kibana-app/commit/2ef500bb112e68bd4811b8e87ce8581d7c04d20f).
+- Fix call to obtain GDPR requirements for specific agent [ccda846](https://github.com/wazuh/wazuh-kibana-app/commit/ccda8464b50be05bc5b3642f25f4972c8a7a2c03).
+- Restore "rule.id" as a clickable field in visualizations [#1546](https://github.com/wazuh/wazuh-kibana-app/pull/1546).
+- Fix timepicker in cluster monitoring [f7533ce](https://github.com/wazuh/wazuh-kibana-app/pull/1560/commits/f7533cecb6862abfb5c1d2173ec3e70ffc59804a).
+
+## Wazuh v3.9.2 - Kibana v7.1.1 - Revision 510
+
+### Added
+
+- Support for Wazuh v3.9.2
+
+### Changed
+
+- Avoid showing more than one toaster for the same error message [7937003](https://github.com/wazuh/wazuh-kibana-app/commit/793700382798033203091d160773363323e05bb9).
+- Restored "Alerts evolution - Top 5 agents" in Overview > Security events [f9305c0](https://github.com/wazuh/wazuh-kibana-app/commit/f9305c0c6acf4a31c41b1cc9684b87f79b27524f).
+
+### Fixed
+
+- Fix missing parameters in Dev Tools request [#1496](https://github.com/wazuh/wazuh-kibana-app/pull/1496).
+- Fix "Invalid Date" for Safari and Internet Explorer [#1505](https://github.com/wazuh/wazuh-kibana-app/pull/1505).
+
+## Wazuh v3.9.1 - Kibana v7.1.1 - Revision 509
+
+### Added
+
+- Support for Kibana v7.1.1
+- Added overall metrics for Agents > Overview [#1479](https://github.com/wazuh/wazuh-kibana-app/pull/1479).
+
+### Fixed
+
+- Fixed missing dependency for Discover [43f5dd5](https://github.com/wazuh/wazuh-kibana-app/commit/43f5dd5f64065c618ba930b2a4087f0a9e706c0e).
+- Fixed visualization for Agents > Overview [#1477](https://github.com/wazuh/wazuh-kibana-app/pull/1477). 
+- Fixed SCA policy checks table [#1478](https://github.com/wazuh/wazuh-kibana-app/pull/1478).
+
 ## Wazuh v3.9.1 - Kibana v7.1.0 - Revision 508
 
 ### Added

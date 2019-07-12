@@ -21,6 +21,7 @@ import {
 
 import { Base } from '../reporting/base-query';
 import { checkKnownFields } from '../lib/refresh-known-fields';
+
 export class WazuhElasticCtrl {
   /**
    * Constructor
@@ -29,44 +30,6 @@ export class WazuhElasticCtrl {
   constructor(server) {
     this._server = server;
     this.wzWrapper = new ElasticWrapper(server);
-  }
-
-  /**
-   * This get the timestamp field
-   * @param {Object} req
-   * @param {Object} reply
-   * @returns {Object} timestamp field or ErrorResponse
-   */
-  async getTimeStamp(req, reply) {
-    try {
-      const data = await this.wzWrapper.getWazuhVersionIndexAsSearch();
-      const source =
-        ((((data || {}).hits || {}).hits || [])[0] || {})._source || {};
-
-      if (source.installationDate && source.lastRestart) {
-        log(
-          'wazuh-elastic:getTimeStamp',
-          `Installation date: ${
-            data.hits.hits[0]._source.installationDate
-          }. Last restart: ${data.hits.hits[0]._source.lastRestart}`,
-          'debug'
-        );
-        return {
-          installationDate: data.hits.hits[0]._source.installationDate,
-          lastRestart: data.hits.hits[0]._source.lastRestart
-        };
-      } else {
-        throw new Error('Could not fetch .wazuh-version index');
-      }
-    } catch (error) {
-      log('wazuh-elastic:getTimeStamp', error.message || error);
-      return ErrorResponse(
-        error.message || 'Could not fetch .wazuh-version index',
-        4001,
-        500,
-        reply
-      );
-    }
   }
 
   /**
@@ -125,28 +88,28 @@ export class WazuhElasticCtrl {
       log(
         'wazuh-elastic:getTemplate',
         `Template is valid: ${
-          isIncluded && Array.isArray(isIncluded) && isIncluded.length
-            ? 'yes'
-            : 'no'
+        isIncluded && Array.isArray(isIncluded) && isIncluded.length
+          ? 'yes'
+          : 'no'
         }`,
         'debug'
       );
       return isIncluded && Array.isArray(isIncluded) && isIncluded.length
         ? {
-            statusCode: 200,
-            status: true,
-            data: `Template found for ${req.params.pattern}`
-          }
+          statusCode: 200,
+          status: true,
+          data: `Template found for ${req.params.pattern}`
+        }
         : {
-            statusCode: 200,
-            status: false,
-            data: `No template found for ${req.params.pattern}`
-          };
+          statusCode: 200,
+          status: false,
+          data: `No template found for ${req.params.pattern}`
+        };
     } catch (error) {
       log('wazuh-elastic:getTemplate', error.message || error);
       return ErrorResponse(
         `Could not retrieve templates from Elasticsearch due to ${error.message ||
-          error}`,
+        error}`,
         4002,
         500,
         reply
@@ -175,16 +138,16 @@ export class WazuhElasticCtrl {
       return filtered.length >= 1
         ? { statusCode: 200, status: true, data: 'Index pattern found' }
         : {
-            statusCode: 500,
-            status: false,
-            error: 10020,
-            message: 'Index pattern not found'
-          };
+          statusCode: 500,
+          status: false,
+          error: 10020,
+          message: 'Index pattern not found'
+        };
     } catch (error) {
       log('wazuh-elastic:checkPattern', error.message || error);
       return ErrorResponse(
         `Something went wrong retrieving index-patterns from Elasticsearch due to ${error.message ||
-          error}`,
+        error}`,
         4003,
         500,
         reply
@@ -248,9 +211,9 @@ export class WazuhElasticCtrl {
         typeof data.aggregations['2'].buckets[0] === 'undefined'
         ? { statusCode: 200, data: '' }
         : {
-            statusCode: 200,
-            data: data.aggregations['2'].buckets[0].key
-          };
+          statusCode: 200,
+          data: data.aggregations['2'].buckets[0].key
+        };
     } catch (error) {
       log('wazuh-elastic:getFieldTop', error.message || error);
       return ErrorResponse(error.message || error, 4004, 500, reply);
@@ -274,7 +237,7 @@ export class WazuhElasticCtrl {
       log('wazuh-elastic:getSetupInfo', error.message || error);
       return ErrorResponse(
         `Could not get data from elasticsearch due to ${error.message ||
-          error}`,
+        error}`,
         4005,
         500,
         reply
@@ -460,6 +423,7 @@ export class WazuhElasticCtrl {
           typeof aux_source.kibanaSavedObjectMeta.searchSourceJSON === 'string'
         ) {
           const defaultStr = aux_source.kibanaSavedObjectMeta.searchSourceJSON;
+
           const isMonitoring = defaultStr.includes('wazuh-monitoring');
           if (isMonitoring) {
             if (namespace && namespace !== 'default') {
@@ -489,6 +453,7 @@ export class WazuhElasticCtrl {
               id
             );
           }
+
         }
 
         // Replace index-pattern for selector visualizations
@@ -556,7 +521,7 @@ export class WazuhElasticCtrl {
             for (const node of nodes) {
               query += `.es(index=${pattern_name},q="cluster.name: ${name} AND cluster.node: ${
                 node.name
-              }").label("${node.name}"),`;
+                }").label("${node.name}"),`;
             }
             query = query.substring(0, query.length - 1);
           } else if (title === 'Wazuh App Cluster Overview Manager') {
@@ -703,8 +668,8 @@ export class WazuhElasticCtrl {
         ((req || {}).params || {}).pattern === 'all'
           ? await checkKnownFields(this.wzWrapper, false, false, false, true)
           : await this.wzWrapper.updateIndexPatternKnownFields(
-              req.params.pattern
-            );
+            req.params.pattern
+          );
 
       return { acknowledge: true, output: output };
     } catch (error) {

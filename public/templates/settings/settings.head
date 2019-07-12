@@ -9,8 +9,6 @@
     <md-nav-bar ng-if="!ctrl.load" class="wz-nav-bar" md-selected-nav-item="ctrl.tab"
         nav-bar-aria-label="Settings navigation links">
         <md-nav-item class="wz-nav-item" md-nav-click="ctrl.switchTab('api', true)" name="api">API</md-nav-item>
-        <md-nav-item class="wz-nav-item" ng-if="ctrl.apiEntries && ctrl.apiEntries.length"
-            md-nav-click="ctrl.switchTab('extensions', true)" name="extensions">Extensions</md-nav-item>
         <md-nav-item class="wz-nav-item" md-nav-click="ctrl.switchTab('pattern', true)" name="pattern">Pattern
         </md-nav-item>
         <md-nav-item class="wz-nav-item" md-nav-click="ctrl.switchTab('configuration', true)" name="configuration">

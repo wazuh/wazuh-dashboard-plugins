@@ -13,7 +13,7 @@
 import template from './wz-table.html';
 import { uiModules } from 'ui/modules';
 import { DataFactory } from '../../services/data-factory';
-import { KeyEquivalenece } from '../../../util/csv-key-equivalence';
+import { KeyEquivalence } from '../../../util/csv-key-equivalence';
 import { calcTableRows } from './lib/rows';
 import { parseValue } from './lib/parse-value';
 import * as pagination from './lib/pagination';
@@ -35,7 +35,6 @@ app.directive('wzTable', function() {
       allowClick: '=allowClick',
       implicitFilter: '=implicitFilter',
       rowSizes: '=rowSizes',
-      extraLimit: '=extraLimit',
       emptyResults: '=emptyResults',
       customColumns: '=customColumns',
       implicitSort: '=implicitSort'
@@ -95,7 +94,7 @@ app.directive('wzTable', function() {
         $scope.implicitFilter,
         $scope.implicitSort
       );
-      $scope.keyEquivalence = KeyEquivalenece;
+      $scope.keyEquivalence = KeyEquivalence;
       $scope.totalItems = 0;
       $scope.wazuh_table_loading = true;
       $scope.items = [];
@@ -434,7 +433,7 @@ app.directive('wzTable', function() {
       $scope.confirmRemoveFile = async (file, type) => {
         try {
           await rulesetHandler.deleteFile(file, type);
-          errorHandler.info(`File ${file.file} has been deleted`);
+          errorHandler.info(`File ${file.file || file.name} has been deleted`);
         } catch (error) {
           errorHandler.handle(error.message || error);
         }
@@ -528,7 +527,7 @@ app.directive('wzTable', function() {
         const items = [];
         for (const key in item) {
           !excluded.includes(key) &&
-            items.push({ key: KeyEquivalenece[key] || key, value: item[key] });
+            items.push({ key: KeyEquivalence[key] || key, value: item[key] });
         }
         const props = {
           items,

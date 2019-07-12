@@ -50,8 +50,8 @@
 
         <!-- Agent status section -->
         <div ng-if="agent.status">
-            <span class="wz-agent-status-indicator small" ng-class="getAgentStatusClass(agent.status)"
-                aria-label="Agent status indicator">{{formatAgentStatus(agent.status)}}</span>
+            <react-component name="EuiHealth"
+                props="{color: agent.status === 'Active' ? 'success' : 'danger', children: agent.status}" />
         </div>
         <!-- End agent status section -->
         <!-- Separator -->
@@ -119,8 +119,8 @@
     <!-- End System audit navigation bar -->
 
     <!-- Security navigation bar -->
-    <md-nav-bar ng-if="inArray(tab, securityTabs)" class="wz-nav-bar"
-        ng-show="tab !== 'welcome'" md-selected-nav-item="tab" nav-bar-aria-label="Security navigation links">
+    <md-nav-bar ng-if="inArray(tab, securityTabs)" class="wz-nav-bar" ng-show="tab !== 'welcome'"
+        md-selected-nav-item="tab" nav-bar-aria-label="Security navigation links">
         <md-nav-item class="wz-nav-item" md-nav-click="switchTab('vuls')" name="vuls">{{ tabNames['vuls'] }}
         </md-nav-item>
         <md-nav-item ng-show="extensions.virustotal" class="wz-nav-item" md-nav-click="switchTab('virustotal')"
@@ -129,19 +129,22 @@
         <md-nav-item ng-show="extensions.osquery" class="wz-nav-item" md-nav-click="switchTab('osquery')"
             name="osquery">{{
             tabNames['osquery'] }}</md-nav-item>
-        <md-nav-item ng-show="extensions.docker" class="wz-nav-item" md-nav-click="switchTab('docker')"
-            name="docker">{{
+        <md-nav-item ng-show="extensions.docker" class="wz-nav-item" md-nav-click="switchTab('docker')" name="docker">{{
             tabNames['docker'] }}</md-nav-item>
     </md-nav-bar>
     <!-- End Security navigation bar -->
 
     <!-- Compliance navigation bar -->
-    <md-nav-bar ng-if="inArray(tab, complianceTabs) && extensions.pci && extensions.gdpr" class="wz-nav-bar"
+    <md-nav-bar ng-if="inArray(tab, complianceTabs) && (extensions.pci || extensions.gdpr || extensions.hipaa || extensions.nist)" class="wz-nav-bar"
         ng-show="tab !== 'welcome'" md-selected-nav-item="tab" nav-bar-aria-label="Compliance navigation links">
         <md-nav-item ng-show="extensions.pci" class="wz-nav-item" md-nav-click="switchTab('pci')" name="pci">{{
             tabNames['pci'] }}</md-nav-item>
         <md-nav-item ng-show="extensions.gdpr" class="wz-nav-item" md-nav-click="switchTab('gdpr')" name="gdpr">{{
             tabNames['gdpr'] }}</md-nav-item>
+        <md-nav-item ng-show="extensions.hipaa" class="wz-nav-item" md-nav-click="switchTab('hipaa')" name="hipaa">{{
+            tabNames['hipaa'] }}</md-nav-item>
+        <md-nav-item ng-show="extensions.nist" class="wz-nav-item" md-nav-click="switchTab('nist')" name="nist">{{
+            tabNames['nist'] }}</md-nav-item>
     </md-nav-bar>
     <!-- End Compliance navigation bar -->
 
