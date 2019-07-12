@@ -192,7 +192,7 @@
     </div>
 
     <div layout="row" class="layout-padding wz-padding-top-0"
-        ng-if="agent && agent.status === 'Active' && hasSize(syscollector)">
+        ng-if="agent && agent.status === 'Active' && agent.os.platform !=='darwin' && hasSize(syscollector)">
         <md-card flex class="wz-md-card">
             <md-card-content>
                 <span class="wz-headline-title">
