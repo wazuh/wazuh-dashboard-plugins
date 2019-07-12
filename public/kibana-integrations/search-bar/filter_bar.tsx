@@ -27,9 +27,9 @@ import classNames from 'classnames';
 import React, { Component } from 'react';
 import chrome from 'ui/chrome';
 import { IndexPattern } from 'ui/index_patterns';
-import { FilterOptions } from 'ui/search_bar/components/filter_options';
 import { FilterEditor } from 'ui/filter_bar/filter_editor';
 import { FilterItem } from './filter_item';
+import { FilterOptions } from 'ui/filter_bar/filter_options';
 
 const config = chrome.getUiSettingsClient();
 
@@ -102,6 +102,7 @@ class FilterBarUI extends Component<Props, State> {
     ));
   }
 
+
   private renderAddFilter() {
     const isPinned = config.get('filters:pinnedByDefault');
     const [indexPattern] = this.props.indexPatterns;
@@ -137,6 +138,7 @@ class FilterBarUI extends Component<Props, State> {
                 indexPatterns={this.props.indexPatterns}
                 onSubmit={this.onAdd}
                 onCancel={this.onCloseAddFilterPopover}
+                key={JSON.stringify(newFilter)}
               />
             </div>
           </EuiFlexItem>

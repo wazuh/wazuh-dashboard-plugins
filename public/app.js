@@ -25,6 +25,9 @@ import 'uiExports/docViews';
 import 'uiExports/embeddableFactories';
 import 'uiExports/autocompleteProviders';
 
+// Require babel for Kibana 7.2
+import 'babel-polyfill';
+
 // Require CSS
 import './less/loader';
 import { uiModules } from 'ui/modules';
@@ -36,12 +39,15 @@ import './components';
 // angular-charts.js
 import 'angular-chart.js';
 
+// Override FieldFormat from Kibana (rule.id, agent.id clickable feature)
+import './kibana-integrations/field_format';
+
 // Set up Wazuh app
 const app = uiModules.get('app/wazuh', ['ngCookies', 'ngMaterial', 'chart.js']);
 
 app.config([
   '$compileProvider',
-  function($compileProvider) {
+  function ($compileProvider) {
     $compileProvider.aHrefSanitizationWhitelist(
       /^\s*(https?|ftp|mailto|data|blob):/
     );
@@ -50,12 +56,12 @@ app.config([
 
 app.config([
   '$httpProvider',
-  function($httpProvider) {
+  function ($httpProvider) {
     $httpProvider.useApplyAsync(true);
   }
 ]);
 
-app.run(function($rootScope, $route, $location, appState, $window) {
+app.run(function ($rootScope, $route, $location, appState, $window) {
   appState.setNavigation({ status: false });
   appState.setNavigation({
     reloaded: false,
@@ -128,17 +134,17 @@ app.run(function($rootScope, $route, $location, appState, $window) {
                 {
                   page: chrome.addBasePath(
                     'wazuh#' +
-                      navigation.discoverPrevious +
-                      '?agent=' +
-                      $location.search().agent
+                    navigation.discoverPrevious +
+                    '?agent=' +
+                    $location.search().agent
                   )
                 },
                 '',
                 chrome.addBasePath(
                   'wazuh#' +
-                    navigation.discoverPrevious +
-                    '?agent=' +
-                    $location.search().agent
+                  navigation.discoverPrevious +
+                  '?agent=' +
+                  $location.search().agent
                 )
               );
             } else {
