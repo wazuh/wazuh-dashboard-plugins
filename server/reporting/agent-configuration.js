@@ -28,6 +28,7 @@ export const AgentConfiguration = {
         },
         {
           subtitle: 'Communication',
+          docuLink: 'https://documentation.wazuh.com/current/user-manual/reference/ossec-conf/client.html',
           desc: 'Settings related to the connection with the manager',
           config: [{ component: 'agent', configuration: 'client' }],
           labels: [
@@ -47,6 +48,7 @@ export const AgentConfiguration = {
         },
         {
           subtitle: 'Anti-flooding settings',
+          docuLink: 'https://documentation.wazuh.com/current/user-manual/capabilities/antiflooding.html',
           desc: 'Agent bucket parameters to avoid event flooding',
           config: [{ component: 'agent', configuration: 'buffer' }],
           labels: [
@@ -59,6 +61,7 @@ export const AgentConfiguration = {
         },
         {
           subtitle: 'Labels',
+          docuLink: 'https://documentation.wazuh.com/current/user-manual/reference/ossec-conf/labels.html',
           desc: 'User-defined information about the agent included in alerts',
           config: [{ component: 'agent', configuration: 'labels' }]
         }
@@ -69,6 +72,7 @@ export const AgentConfiguration = {
       sections: [
         {
           subtitle: 'Policy monitoring',
+          docuLink: 'https://documentation.wazuh.com/current/pci-dss/policy-monitoring.html',
           desc:
             'Configuration to ensure compliance with security policies, standards and hardening guides',
           config: [{ component: 'syscheck', configuration: 'rootcheck' }],
@@ -101,6 +105,7 @@ export const AgentConfiguration = {
         },
         {
           subtitle: 'OpenSCAP',
+          docuLink: 'https://documentation.wazuh.com/current/user-manual/reference/ossec-conf/wodle-openscap.html',
           desc:
             'Configuration assessment and automation of compliance monitoring using SCAP checks',
           wodle: [{ name: 'open-scap' }],
@@ -116,6 +121,7 @@ export const AgentConfiguration = {
         },
         {
           subtitle: 'CIS-CAT',
+          docuLink: 'https://documentation.wazuh.com/current/user-manual/reference/ossec-conf/wodle-ciscat.html',
           desc: 'Configuration assessment using CIS scanner and SCAP checks',
           wodle: [{ name: 'cis-cat' }],
           labels: [
@@ -137,6 +143,7 @@ export const AgentConfiguration = {
       sections: [
         {
           subtitle: 'Osquery',
+          docuLink: 'https://documentation.wazuh.com/current/user-manual/reference/ossec-conf/wodle-osquery.html',
           desc:
             'Expose an operating system as a high-performance relational database',
           wodle: [{ name: 'osquery' }],
@@ -152,6 +159,7 @@ export const AgentConfiguration = {
         },
         {
           subtitle: 'Inventory data',
+          docuLink: 'https://documentation.wazuh.com/current/user-manual/reference/ossec-conf/wodle-syscollector.html',
           desc:
             'Gather relevant information about system OS, hardware, networking and packages',
           wodle: [{ name: 'syscollector' }],
@@ -172,6 +180,7 @@ export const AgentConfiguration = {
         },
         {
           subtitle: 'Active response',
+          docuLink: 'https://documentation.wazuh.com/current/user-manual/reference/ossec-conf/active-response.html',
           desc: 'Active threat addressing by inmmediate response',
           config: [{ component: 'com', configuration: 'active-response' }],
           labels: [
@@ -184,6 +193,7 @@ export const AgentConfiguration = {
         },
         {
           subtitle: 'Commands',
+          docuLink: 'https://documentation.wazuh.com/current/user-manual/reference/ossec-conf/wodle-command.html',
           desc: 'Configuration options of the Command wodle',
           wodle: [{ name: 'command' }],
           labels: [
@@ -203,6 +213,7 @@ export const AgentConfiguration = {
         },
         {
           subtitle: 'Docker listener',
+          docuLink: 'https://documentation.wazuh.com/current/user-manual/reference/ossec-conf/wodle-docker.html',
           desc:
             'Monitor and collect the activity from Docker containers such as creation, running, starting, stopping or pausing events',
           wodle: [{ name: 'docker-listener' }],
@@ -223,6 +234,7 @@ export const AgentConfiguration = {
       sections: [
         {
           subtitle: 'Log collection',
+          docuLink: 'https://documentation.wazuh.com/current/user-manual/capabilities/log-data-collection/index.html',
           desc:
             'Log analysis from text files, Windows events or syslog outputs',
           config: [
@@ -255,6 +267,7 @@ export const AgentConfiguration = {
         },
         {
           subtitle: 'Integrity monitoring',
+          docuLink: 'https://documentation.wazuh.com/current/user-manual/reference/ossec-conf/syscheck.html',
           desc:
             'Identify changes in content, permissions, ownership, and attributes of files',
           config: [

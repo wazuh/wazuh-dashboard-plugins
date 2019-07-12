@@ -14,6 +14,7 @@ import { generateMetric } from '../../utils/generate-metric';
 import { TabNames } from '../../utils/tab-names';
 import * as FileSaver from '../../services/file-saver';
 import { TabDescription } from '../../../server/reporting/tab-description';
+import { UnsupportedComponents } from '../../utils/components-os-support';
 import {
   metricsGeneral,
   metricsAudit,
@@ -214,6 +215,9 @@ export class AgentsController {
 
     this.$scope.startVis2Png = () => this.startVis2Png();
 
+    this.$scope.shouldShowComponent = (component) => this.shouldShowComponent(component);
+
+
     this.$scope.$on('$destroy', () => {
       this.visFactoryService.clearAll();
     });
@@ -225,8 +229,8 @@ export class AgentsController {
       this.$location.path('/manager/groups');
     };
 
-    this.$scope.exportConfiguration = agent => {
-      this.reportingService.startConfigReport(agent, 'agentConfig');
+    this.$scope.exportConfiguration = (enabledComponents) => {
+      this.reportingService.startConfigReport(this.$scope.agent, 'agentConfig', enabledComponents);
     };
 
     this.$scope.restartAgent = async agent => {
@@ -441,14 +445,6 @@ export class AgentsController {
     };
 
     this.$scope.expand = i => this.expand(i);
-
-    this.$scope.welcomeCardsProps = {
-      switchTab: tab => this.switchTab(tab),
-      extensions: this.$scope.extensions,
-      api: this.appState.getCurrentAPI(),
-      setExtensions: (api, extensions) =>
-        this.appState.setExtensions(api, extensions)
-    };
   }
   /**
    * Create metric for given object
@@ -566,7 +562,7 @@ export class AgentsController {
         this.$scope.agent.status =
           (((agentInfo || {}).data || {}).data || {}).status ||
           this.$scope.agent.status;
-      } catch (error) {} // eslint-disable-line
+      } catch (error) { } // eslint-disable-line
     }
 
     try {
@@ -614,7 +610,7 @@ export class AgentsController {
       if (tab === 'syscollector')
         try {
           await this.loadSyscollector(this.$scope.agent.id);
-        } catch (error) {} // eslint-disable-line
+        } catch (error) { } // eslint-disable-line
       if (tab === 'configuration') {
         this.$scope.switchConfigurationTab('welcome');
       } else {
@@ -744,12 +740,11 @@ export class AgentsController {
       if (agentInfo && this.$scope.agent.os) {
         this.$scope.agentOS =
           this.$scope.agent.os.name + ' ' + this.$scope.agent.os.version;
-        this.$scope.agent.isLinuxOS = this.$scope.agent.os.uname.includes(
-          'Linux'
-        );
+        const isLinux = this.$scope.agent.os.uname.includes('Linux');
+        this.$scope.agent.agentPlatform = isLinux ? 'linux' : this.$scope.agent.os.platform;
       } else {
         this.$scope.agentOS = '-';
-        this.$scope.agent.isLinuxOS = false;
+        this.$scope.agent.agentPlatform = false;
       }
 
       await this.$scope.switchTab(this.$scope.tab, true);
@@ -762,6 +757,7 @@ export class AgentsController {
             this.$scope.agent.group && !this.$scope.agent.group.includes(item)
         );
 
+      this.loadWelcomeCardsProps();
       this.$scope.load = false;
       this.$scope.$applyAsync();
       return;
@@ -781,9 +777,38 @@ export class AgentsController {
         this.$location.path('/agents-preview');
       }
     }
+
     this.$scope.load = false;
     this.$scope.$applyAsync();
     return;
+  }
+
+  shouldShowComponent(component) {
+    return !(UnsupportedComponents[this.$scope.agent.agentPlatform] || UnsupportedComponents['other']).includes(component);
+  }
+
+  cleanExtensions(extensions) {
+    const result = {};
+    for (const extension in extensions) {
+      if (!(UnsupportedComponents[this.$scope.agent.agentPlatform] || UnsupportedComponents['other']).includes(extension)) {
+        result[extension] = extensions[extension];
+      }
+    }
+    return result;
+  }
+
+  /**
+ * Get available welcome cards after getting the agent
+ */
+  loadWelcomeCardsProps() {
+    this.$scope.welcomeCardsProps = {
+      switchTab: tab => this.switchTab(tab),
+      extensions: this.cleanExtensions(this.$scope.extensions),
+      agent: this.$scope.agent,
+      api: this.appState.getCurrentAPI(),
+      setExtensions: (api, extensions) =>
+        this.appState.setExtensions(api, extensions)
+    };
   }
 
   switchGroupEdit() {
@@ -877,7 +902,7 @@ export class AgentsController {
       );
       this.errorHandler.info(
         `Policy monitoring scan launched successfully on agent ${
-          this.$scope.agent.id
+        this.$scope.agent.id
         }`,
         ''
       );
