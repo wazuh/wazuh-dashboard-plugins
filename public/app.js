@@ -36,9 +36,6 @@ import './components';
 // angular-charts.js
 import 'angular-chart.js';
 
-// Override FieldFormat from Kibana (rule.id, agent.id clickable feature)
-import './kibana-integrations/field_format';
-
 // Set up Wazuh app
 const app = uiModules.get('app/wazuh', ['ngCookies', 'ngMaterial', 'chart.js']);
 
