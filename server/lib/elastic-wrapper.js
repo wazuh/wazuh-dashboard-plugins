@@ -481,57 +481,6 @@ export class ElasticWrapper {
   }
 
   /**
-   * Updates the a document from the .wazuh index using id and doc content
-   * @param {*} req. Optional parameter to pass an incoming request (X-Pack related)
-   * @param {*} id. Wazuh API entry ID (Elasticsearch ID)
-   * @param {*} doc. The content to be used for updating the document.
-   */
-  async updateWazuhIndexDocument(req, id, doc) {
-    try {
-      if (!id || !doc) throw new Error('No valid parameters given');
-
-      const data = req
-        ? await this.elasticRequest.callWithRequest(req, 'update', {
-          index: '.wazuh',
-          type: '_doc',
-          id: id,
-          body: doc
-        })
-        : await this.elasticRequest.callWithInternalUser('update', {
-          index: '.wazuh',
-          type: '_doc',
-          id: id,
-          body: doc
-        });
-
-      return data;
-    } catch (error) {
-      return Promise.reject(error);
-    }
-  }
-
-  /**
-   * Delete a Wazuh API entry using incoming request
-   * @param {*} req
-   */
-  async deleteWazuhAPIEntriesWithRequest(req) {
-    try {
-      if (!req.params || !req.params.id)
-        return Promise.reject(new Error('No API id given'));
-
-      const data = await this.elasticRequest.callWithRequest(req, 'delete', {
-        index: '.wazuh',
-        type: '_doc',
-        id: req.params.id
-      });
-
-      return data;
-    } catch (error) {
-      return Promise.reject(error);
-    }
-  }
-
-  /**
    * Same as curling the templates from Elasticsearch
    */
   async getTemplates() {

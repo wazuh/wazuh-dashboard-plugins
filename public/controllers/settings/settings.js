@@ -152,7 +152,7 @@ export class SettingsController {
       }
       await this.genericReq.request(
         'DELETE',
-        `/elastic/apis/${this.apiEntries[index]._id}`
+        `/api/${this.apiEntries[index]._id}`
       );
       this.showEditForm[this.apiEntries[index]._id] = false;
       this.apiEntries.splice(index, 1);
@@ -192,19 +192,19 @@ export class SettingsController {
   setDefault(item) {
     const index = this.apiEntries.map(item => item._id).indexOf(item._id);
 
-    this.appState.setClusterInfo(this.apiEntries[index]._source.cluster_info);
+    this.appState.setClusterInfo(this.apiEntries[index].cluster_info);
 
-    if (this.apiEntries[index]._source.cluster_info.status == 'disabled') {
+    if (this.apiEntries[index].cluster_info.status == 'disabled') {
       this.appState.setCurrentAPI(
         JSON.stringify({
-          name: this.apiEntries[index]._source.cluster_info.manager,
+          name: this.apiEntries[index].cluster_info.manager,
           id: this.apiEntries[index]._id
         })
       );
     } else {
       this.appState.setCurrentAPI(
         JSON.stringify({
-          name: this.apiEntries[index]._source.cluster_info.cluster,
+          name: this.apiEntries[index].cluster_info.cluster,
           id: this.apiEntries[index]._id
         })
       );
@@ -217,7 +217,7 @@ export class SettingsController {
 
     this.errorHandler.info(
       `API ${
-      this.apiEntries[index]._source.cluster_info.manager
+      this.apiEntries[index].cluster_info.manager
       } set as default`,
       'Settings'
     );
@@ -227,7 +227,7 @@ export class SettingsController {
     if (currentApi && !this.appState.getExtensions(JSON.parse(currentApi).id)) {
       this.appState.setExtensions(
         this.apiEntries[this.currentApiEntryIndex]._id,
-        this.apiEntries[this.currentApiEntryIndex]._source.extensions
+        this.apiEntries[this.currentApiEntryIndex].extensions
       );
     }
 
@@ -251,10 +251,23 @@ export class SettingsController {
         this.$location.path('/blank-screen');
         return;
       }
-      const data = await this.genericReq.request('GET', '/elastic/apis');
-      for (const entry of data.data) this.showEditForm[entry._id] = false;
+      const data = await this.genericReq.request('GET', '/api/apis');
+      let result = [];
+      for (const entry of data.data) {
+        const id = Object.keys(entry)[0];
+        const host = entry[id];
+        const obj = {
+          _id: id,
+          url: host.url,
+          api_port: host.port,
+          api_user: host.username,
+          password: host.password
+        };
+        this.showEditForm[id] = false;
+        result.push(obj);
+      }
 
-      this.apiEntries = data.data.length > 0 ? data.data : [];
+      this.apiEntries = result.length > 0 ? result : [];
       this.apiEntries = this.apiEntries.sort(this.sortByTimestamp);
 
       const currentApi = this.appState.getCurrentAPI();
@@ -273,7 +286,7 @@ export class SettingsController {
       ) {
         this.appState.setExtensions(
           this.apiEntries[this.currentApiEntryIndex]._id,
-          this.apiEntries[this.currentApiEntryIndex]._source.extensions
+          this.apiEntries[this.currentApiEntryIndex].extensions
         );
       }
 
@@ -400,21 +413,24 @@ export class SettingsController {
       tmpData.cluster_info = checkData.data;
 
       // Insert new API entry
+      /*       const data = await this.genericReq.request(
+              'PUT',
+              '/elastic/api',
+              tmpData
+            ); */
       const data = await this.genericReq.request(
         'PUT',
-        '/elastic/api',
+        '/api/host',
         tmpData
       );
       this.appState.setExtensions(data.data.response._id, tmpData.extensions);
       const newEntry = {
         _id: data.data.response._id,
-        _source: {
-          cluster_info: tmpData.cluster_info,
-          url: tmpData.url,
-          api_user: tmpData.user,
-          api_port: tmpData.port,
-          extensions: tmpData.extensions
-        }
+        cluster_info: tmpData.cluster_info,
+        url: tmpData.url,
+        api_user: tmpData.user,
+        api_port: tmpData.port,
+        extensions: tmpData.extensions
       };
       this.apiEntries.push(newEntry);
       this.apiEntries = this.apiEntries.sort(this.sortByTimestamp);
@@ -428,21 +444,19 @@ export class SettingsController {
       if (!this.appState.getCurrentAPI()) {
         // No cookie
         if (
-          this.apiEntries[this.apiEntries.length - 1]._source.cluster_info
+          this.apiEntries[this.apiEntries.length - 1].cluster_info
             .status === 'disabled'
         ) {
           this.appState.setCurrentAPI(
             JSON.stringify({
-              name: this.apiEntries[this.apiEntries.length - 1]._source
-                .cluster_info.manager,
+              name: this.apiEntries[this.apiEntries.length - 1].cluster_info.manager,
               id: this.apiEntries[this.apiEntries.length - 1]._id
             })
           );
         } else {
           this.appState.setCurrentAPI(
             JSON.stringify({
-              name: this.apiEntries[this.apiEntries.length - 1]._source
-                .cluster_info.cluster,
+              name: this.apiEntries[this.apiEntries.length - 1].cluster_info.cluster,
               id: this.apiEntries[this.apiEntries.length - 1]._id
             })
           );
@@ -524,24 +538,24 @@ export class SettingsController {
         cluster_info: {},
         insecure: 'true',
         id: this.apiEntries[index]._id,
-        extensions: this.apiEntries[index]._source.extensions
+        extensions: this.apiEntries[index].extensions
       };
 
       const data = await this.testAPI.check(tmpData);
       tmpData.cluster_info = data.data;
-      await this.genericReq.request('PUT', '/elastic/api-settings', tmpData);
-      this.apiEntries[index]._source.cluster_info = tmpData.cluster_info;
+      await this.genericReq.request('PUT', '/api/settings', tmpData);
+      this.apiEntries[index].cluster_info = tmpData.cluster_info;
 
       this.wzMisc.setApiIsDown(false);
       this.apiIsDown = false;
 
-      this.apiEntries[index]._source.cluster_info.cluster =
+      this.apiEntries[index].cluster_info.cluster =
         tmpData.cluster_info.cluster;
-      this.apiEntries[index]._source.cluster_info.manager =
+      this.apiEntries[index].cluster_info.manager =
         tmpData.cluster_info.manager;
-      this.apiEntries[index]._source.url = tmpData.url;
-      this.apiEntries[index]._source.api_port = tmpData.port;
-      this.apiEntries[index]._source.api_user = tmpData.user;
+      this.apiEntries[index].url = tmpData.url;
+      this.apiEntries[index].api_port = tmpData.port;
+      this.apiEntries[index].api_user = tmpData.user;
 
       this.apiEntries = this.apiEntries.sort(this.sortByTimestamp);
       this.showEditForm[this.apiEntries[index]._id] = false;
@@ -571,10 +585,10 @@ export class SettingsController {
         : this.apiEntries.map(item => item._id).indexOf(item._id);
 
       const tmpData = {
-        user: this.apiEntries[index]._source.api_user,
-        //password    : this.apiEntries[index]._source.api_password,
-        url: this.apiEntries[index]._source.url,
-        port: this.apiEntries[index]._source.api_port,
+        user: this.apiEntries[index].api_user,
+        //password    : this.apiEntries[index].api_password,
+        url: this.apiEntries[index].url,
+        port: this.apiEntries[index].api_port,
         cluster_info: {},
         insecure: 'true',
         id: this.apiEntries[index]._id
@@ -589,7 +603,7 @@ export class SettingsController {
       });
       // Emit updateAPI event cause the cluster info could had been changed
       this.$scope.$emit('updateAPI', { cluster_info: tmpData.cluster_info });
-      this.apiEntries[index]._source.cluster_info = tmpData.cluster_info;
+      this.apiEntries[index].cluster_info = tmpData.cluster_info;
       this.wzMisc.setApiIsDown(false);
       this.apiIsDown = false;
       !silent && this.errorHandler.info('Connection success', 'Settings');

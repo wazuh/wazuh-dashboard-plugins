@@ -183,13 +183,13 @@ export function settingsWizard(
       // There's no cookie for current API
       if (!appState.getCurrentAPI()) {
         genericReq
-          .request('GET', '/elastic/apis')
+          .request('GET', '/api/apis')
           .then(data => {
             if (data.data.length > 0) {
               const apiEntries = data.data;
               appState.setCurrentAPI(
                 JSON.stringify({
-                  name: apiEntries[0]._source.cluster_info.manager,
+                  name: apiEntries[0].cluster_info.manager,
                   id: apiEntries[0]._id
                 })
               );

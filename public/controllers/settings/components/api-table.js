@@ -120,27 +120,27 @@ export class ApiTable extends Component {
     const items = [...this.state.apiEntries];
     const columns = [
       {
-        field: '_source.cluster_info.cluster',
+        field: 'cluster_info.cluster',
         name: 'Cluster',
         align: 'left'
       },
       {
-        field: '_source.cluster_info.manager',
+        field: 'cluster_info.manager',
         name: 'Manager',
         align: 'left'
       },
       {
-        field: '_source.url',
+        field: 'url',
         name: 'Host',
         align: 'left'
       },
       {
-        field: '_source.api_port',
+        field: 'api_port',
         name: 'Port',
         align: 'left'
       },
       {
-        field: '_source.api_user',
+        field: 'api_user',
         name: 'User',
         align: 'left'
       },

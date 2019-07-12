@@ -32,6 +32,7 @@ import { Queue } from '../jobs/queue';
 import querystring from 'querystring';
 import fs from 'fs';
 import path from 'path';
+import { UpdateConfigurationFile } from '../lib/update-configuration';
 export class WazuhApiCtrl {
   /**
    * Constructor
@@ -42,7 +43,9 @@ export class WazuhApiCtrl {
     this.wzWrapper = new ElasticWrapper(server);
     this.monitoringInstance = new Monitoring(server, true);
     this.wazuhVersion = path.join(__dirname, '../wazuh-version.json');
+    this.configurationFile = new UpdateConfigurationFile();
   }
+
 
   /**
    * Returns if the wazuh-api configuration is working
@@ -1480,6 +1483,192 @@ export class WazuhApiCtrl {
     } catch (error) {
       log('wazuh-api:getSyscollector', error.message || error);
       return ErrorResponse(error.message || error, 3035, 500, reply);
+    }
+  }
+
+  /**
+ * This check if connection and auth on an API is correct
+ * @param {Object} payload
+ */
+  validateData(payload) {
+    const userRegEx = new RegExp(/^.{3,100}$/);
+    const passRegEx = new RegExp(/^.{3,100}$/);
+    const urlRegEx = new RegExp(/^https?:\/\/[a-zA-Z0-9-.]{1,300}$/);
+    const urlRegExIP = new RegExp(
+      /^https?:\/\/[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$/
+    );
+    const portRegEx = new RegExp(/^[0-9]{2,5}$/);
+    // Validate user
+    if (!userRegEx.test(payload.user)) {
+      return { code: 2006, message: 'Invalid user field' };
+    }
+
+    // Validate password
+    if (!passRegEx.test(payload.password)) {
+      return { code: 2007, message: 'Invalid password field' };
+    }
+
+    // Validate url
+    if (!urlRegEx.test(payload.url) && !urlRegExIP.test(payload.url)) {
+      return { code: 2008, message: 'Invalid url field' };
+    }
+
+    // Validate port
+    const validatePort = parseInt(payload.port);
+    if (
+      !portRegEx.test(payload.port) ||
+      validatePort <= 0 ||
+      validatePort >= 99999
+    ) {
+      return { code: 2009, message: 'Invalid port field' };
+    }
+
+    return false;
+  }
+
+  /**
+ * This build an setting API obect
+ * @param {Object} payload
+ */
+  buildSettingsObject(payload) {
+    return {
+      url: payload.url,
+      port: payload.port,
+      user: payload.user,
+      password: payload.password
+    };
+  }
+
+  /**
+ * This saves a new API entry
+ * @param {Object} req
+ * @param {Object} reply
+ * Status response or ErrorResponse
+ */
+  async saveAPI(req, reply) {
+    try {
+      if (
+        !('user' in req.payload) ||
+        !('password' in req.payload) ||
+        !('url' in req.payload) ||
+        !('port' in req.payload)
+      ) {
+        log('wazuh-api:saveAPI', 'Missing parameters');
+        return ErrorResponse('Missing data', 2010, 400, reply);
+      }
+
+      const valid = this.validateData(req.payload);
+      if (valid) return ErrorResponse(valid.message, valid.code, 400, reply);
+
+      const host = this.buildSettingsObject(req.payload);
+
+      const response = await this.configurationFile.addHost(host);
+      log(
+        'wazuh-api:saveAPI',
+        `${host.user}:*****@${host.url}:${host.port} entry saved successfully`,
+        'debug'
+      );
+
+      return { statusCode: 200, message: 'ok', response };
+    } catch (error) {
+      log('wazuh-api:saveAPI', error.message || error);
+      return ErrorResponse(
+        `Could not save data in config.yml due to ${error.message || error}`,
+        2011,
+        500,
+        reply
+      );
+    }
+  }
+
+  /**
+ * This remove an API entry
+ * @param {Object} req
+ * @param {Object} reply
+ * Request response or ErrorResponse
+ */
+  async deleteAPI(req, reply) {
+    try {
+      const data = await this.configurationFile.deleteHost(req);
+      log('wazuh-api:deleteAPI', 'Success', 'debug');
+      return data;
+    } catch (error) {
+      log('wazuh-api:deleteAPI', error.message || error);
+      return ErrorResponse(error.message || error, 2002, 500, reply);
+    }
+  }
+
+  /**
+ * This get all API entries
+ * @param {Object} req
+ * @param {Object} reply
+ * API entries or ErrorResponse
+ */
+  async getAPIEntries(req, reply) {
+    try {
+      const data = await this.configurationFile.getHosts();
+
+      // Replacing password by ****
+      const result = [];
+      if (Array.isArray(data || [])) {
+        for (const entry of data) {
+          if ((entry || {}).password) {
+            entry.password = '****';
+          }
+          result.push(entry);
+        }
+      }
+      log(
+        'wazuh-api:getAPIEntries',
+        `${result.length} Wazuh API entries`,
+        'debug'
+      );
+      return result;
+    } catch (error) {
+      log('wazuh-api:getAPIEntries', error.message || error);
+      return ErrorResponse(error.message || error, 2001, 500, reply);
+    }
+  }
+
+  /**
+ * This update an API settings into config.yml
+ * @param {Object} req
+ * @param {Object} reply
+ * Status response or ErrorResponse
+ */
+  async updateFullAPI(req, reply) {
+    try {
+      if (
+        !('user' in req.payload) ||
+        !('password' in req.payload) ||
+        !('url' in req.payload) ||
+        !('port' in req.payload)
+      ) {
+        log('wazuh-api:updateFullAPI', 'Missing paramaters');
+        return ErrorResponse('Missing parameters', 2013, 400, reply);
+      }
+
+      const valid = this.validateData(req.payload);
+      if (valid) return ErrorResponse(valid.message, valid.code, 400, reply);
+
+      const settings = this.buildSettingsObject(req.payload);
+
+      await this.configurationFile.updateHost(req.payload.id, settings);
+
+      log(
+        'wazuh-api:updateFullApi',
+        `API entry ${req.payload.id} updated`,
+        'debug'
+      );
+      return { statusCode: 200, message: 'ok' };
+    } catch (error) {
+      log('wazuh-api:updateFullAPI', error.message || error);
+      return ErrorResponse(
+        `Could not save data in config.yml due to ${error.message || error}`,
+        2014,
+        500,
+        reply
+      );
     }
   }
 }

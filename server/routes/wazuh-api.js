@@ -140,4 +140,39 @@ export function WazuhApiRoutes(server) {
       return ctrl.getSyscollector(req, res);
     }
   });
+  // Save the given API into config.yml
+  server.route({
+    method: 'PUT',
+    path: '/api/host',
+    handler(req, reply) {
+      return ctrl.saveAPI(req, reply);
+    }
+  });
+
+  // Delete Wazuh-API entry (multimanager) from config.yml
+  server.route({
+    method: 'DELETE',
+    path: '/api/{id}',
+    handler(req, reply) {
+      return ctrl.deleteAPI(req, reply);
+    }
+  });
+
+  // Get Wazuh-API entries list (Multimanager) from config.yml
+  server.route({
+    method: 'GET',
+    path: '/api/apis',
+    handler(req, reply) {
+      return ctrl.getAPIEntries(req, reply);
+    }
+  });
+
+  // Update the given API into config.yml
+  server.route({
+    method: 'PUT',
+    path: '/api/settings',
+    handler(req, reply) {
+      return ctrl.updateFullAPI(req, reply);
+    }
+  });
 }
