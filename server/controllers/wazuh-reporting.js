@@ -1626,6 +1626,19 @@ export class WazuhReportingCtrl {
         const isAgentConfig = tab === 'agentConfig';
         const isGroupConfig = tab === 'groupConfig';
 
+        // Pass the namespace if present to all the requesters
+        if(pattern) {
+          const spaces = this.server.plugins.spaces;
+          const namespace = spaces && spaces.getSpaceId(req);
+          this.vulnerabilityRequest.namespace = namespace;
+          this.overviewRequest.namespace = namespace;
+          this.rootcheckRequest.namespace = namespace;
+          this.pciRequest.namespace = namespace;
+          this.gdprRequest.namespace = namespace;
+          this.auditRequest.namespace = namespace;
+          this.syscheckRequest.namespace = namespace;
+        }
+        
         if (!tab)
           throw new Error(
             'Reporting needs a valid app tab in order to work properly'
