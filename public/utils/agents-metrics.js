@@ -14,10 +14,8 @@
 const metricsGeneral = {
   totalAlerts: '[vis-id="\'Wazuh-App-Agents-General-Metric-alerts\'"]',
   level12: '[vis-id="\'Wazuh-App-Agents-General-Level-12-alerts\'"]',
-  authFailure:
-    '[vis-id="\'Wazuh-App-Agents-General-Authentication-failure\'"]',
-  authSuccess:
-    '[vis-id="\'Wazuh-App-Agents-General-Authentication-success\'"]'
+  authFailure: '[vis-id="\'Wazuh-App-Agents-General-Authentication-failure\'"]',
+  authSuccess: '[vis-id="\'Wazuh-App-Agents-General-Authentication-success\'"]'
 };
 
 // Metrics Audit

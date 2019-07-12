@@ -48,6 +48,7 @@ export class FilesController {
 
     this.$scope.closeEditingFile = () => {
       this.$scope.editingFile = false;
+      this.$scope.editorReadOnly = false;
       this.$scope.fetchedXML = null;
       this.search();
       this.$scope.$applyAsync();

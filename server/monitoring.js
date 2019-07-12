@@ -98,9 +98,7 @@ export class Monitoring {
       !this.quiet &&
         log(
           'monitoring:configuration',
-          `wazuh.monitoring.pattern: ${this.index_pattern} (index prefix: ${
-            this.index_prefix
-          })`,
+          `wazuh.monitoring.pattern: ${this.index_pattern} (index prefix: ${this.index_prefix})`,
           'debug'
         );
     } catch (error) {

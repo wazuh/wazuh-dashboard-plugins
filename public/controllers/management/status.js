@@ -50,11 +50,14 @@ export class StatusController {
       const configuration = this.wazuhConfig.getConfig();
       this.$scope.adminMode = !!(configuration || {}).admin;
 
-      const data = await Promise.all([
-        this.apiReq.request('GET', '/agents/summary', {}),
-        this.apiReq.request('GET', '/cluster/status', {}),
-        this.apiReq.request('GET', '/manager/info', {})
-      ]);
+      const agSumm = await this.apiReq.request('GET', '/agents/summary', {});
+      const clusStat = await this.apiReq.request('GET', '/cluster/status', {});
+      const manInfo = await this.apiReq.request('GET', '/manager/info', {});
+
+      const data = [];
+      data.push(agSumm);
+      data.push(clusStat);
+      data.push(manInfo);
 
       const parsedData = data.map(
         item => ((item || {}).data || {}).data || false

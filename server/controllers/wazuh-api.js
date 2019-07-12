@@ -585,7 +585,9 @@ export class WazuhApiCtrl {
       const execd = daemons['ossec-execd'] === 'running';
       const modulesd = daemons['wazuh-modulesd'] === 'running';
       const wazuhdb = wazuhdbExists ? daemons['wazuh-db'] === 'running' : true;
-      const clusterd = isCluster ? daemons['wazuh-clusterd'] === 'running' : true;
+      const clusterd = isCluster
+        ? daemons['wazuh-clusterd'] === 'running'
+        : true;
 
       const isValid = execd && modulesd && wazuhdb && clusterd;
 
@@ -998,7 +1000,7 @@ export class WazuhApiCtrl {
             return item;
           });
         }
-        
+
         let csv = json2csvParser.parse(isList ? itemsArray[0] : itemsArray);
 
         for (const field of fields) {
