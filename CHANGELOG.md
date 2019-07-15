@@ -2,7 +2,7 @@
 
 All notable changes to the Wazuh app project will be documented in this file.
 
-## Wazuh v3.9.3 - Kibana v6.8.1 / v7.1.1 / v7.2.0 - Revision 519
+## Wazuh v3.9.3 - Kibana v6.8.1 / v7.1.1 / v7.2.0 - Revision 523
 
 ### Added
 
@@ -15,6 +15,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Improved error checking + syscollector performance [94d0a83](https://github.com/wazuh/wazuh-kibana-app/commit/94d0a83e43aa1d2d84ef6f87cbb76b9aefa085b3).
 - Adapt Syscollector for MacOS agents [a4bf7ef](https://github.com/wazuh/wazuh-kibana-app/commit/a4bf7efc693a99b7565b5afcaa372155f15a4db9).
 - Show last scan for syscollector [73f2056](https://github.com/wazuh/wazuh-kibana-app/commit/73f2056673bb289d472663397ba7097e49b7b93b).
+- Extendend information for syscollector [#1585](https://github.com/wazuh/wazuh-kibana-app/issues/1585).
 
 ### Fixed
 
@@ -27,6 +28,10 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fix call to obtain GDPR requirements for specific agent [ccda846](https://github.com/wazuh/wazuh-kibana-app/commit/ccda8464b50be05bc5b3642f25f4972c8a7a2c03).
 - Restore "rule.id" as a clickable field in visualizations [#1546](https://github.com/wazuh/wazuh-kibana-app/pull/1546).
 - Fix timepicker in cluster monitoring [f7533ce](https://github.com/wazuh/wazuh-kibana-app/pull/1560/commits/f7533cecb6862abfb5c1d2173ec3e70ffc59804a).
+- Fix several bugs [#1569](https://github.com/wazuh/wazuh-kibana-app/pull/1569).
+- Fully removed "rule.id" as URL field [#1584](https://github.com/wazuh/wazuh-kibana-app/issues/1584).
+- Fix filters for dashboards [#1583](https://github.com/wazuh/wazuh-kibana-app/issues/1583).
+- Fix missing dependency [#1591](https://github.com/wazuh/wazuh-kibana-app/issues/1591).
 
 ## Wazuh v3.9.2 - Kibana v7.1.1 - Revision 510
 

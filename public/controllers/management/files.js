@@ -48,6 +48,7 @@ export class FilesController {
 
     this.$scope.closeEditingFile = () => {
       this.$scope.editingFile = false;
+      this.$scope.editorReadOnly = false;
       this.$scope.fetchedXML = null;
       this.search();
       this.$scope.$applyAsync();
@@ -86,13 +87,13 @@ export class FilesController {
           isOverwrite: !!this.overwriteError
         };
         (isNewFile && this.$scope.type === 'rules') ||
-        (!isNewFile && this.$scope.currentFile.type === 'rule')
+          (!isNewFile && this.$scope.currentFile.type === 'rule')
           ? (objParam.rule = isNewFile
-              ? this.selectedItem
-              : this.$scope.currentFile)
+            ? this.selectedItem
+            : this.$scope.currentFile)
           : (objParam.decoder = isNewFile
-              ? this.selectedItem
-              : this.$scope.currentFile);
+            ? this.selectedItem
+            : this.$scope.currentFile);
         this.$scope.$broadcast('saveXmlFile', objParam);
         this.$scope.$applyAsync();
       }
@@ -142,13 +143,13 @@ export class FilesController {
       this.$scope.fetchedXML =
         this.$scope.type === 'rules'
           ? await this.rulesetHandler.getRuleConfiguration(
-              this.$scope.currentFile.file,
-              readonly
-            )
+            this.$scope.currentFile.file,
+            readonly
+          )
           : await this.rulesetHandler.getDecoderConfiguration(
-              this.$scope.currentFile.file,
-              readonly
-            );
+            this.$scope.currentFile.file,
+            readonly
+          );
       this.$scope.$applyAsync();
       if (!readonly) {
         this.$scope.$broadcast('fetchedFile', { data: this.$scope.fetchedXML });
