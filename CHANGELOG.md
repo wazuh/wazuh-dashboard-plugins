@@ -2,17 +2,22 @@
 
 All notable changes to the Wazuh app project will be documented in this file.
 
-## Wazuh v3.9.3 - Kibana v6.8.1 Revision 448
+## Wazuh v3.9.3 - Kibana v6.8.1 Revision 450
 
 ### Added
 
 - Support for Wazuh v3.9.3
+
+### Changed
+
+- Extend information for syscollector [#1585](https://github.com/wazuh/wazuh-kibana-app/issues/1585).
 
 ### Fixed
 
 - Fix API call for fetching GDPR requirements in agents [b0450e9](https://github.com/wazuh/wazuh-kibana-app/commit/b0450e95fd7c67ad731eb267bfa5c1959e849a0a).
 - Fix daemons checking function [b0450e9](https://github.com/wazuh/wazuh-kibana-app/commit/b0450e95fd7c67ad731eb267bfa5c1959e849a0a).
 - Fix several bugs [#1569](https://github.com/wazuh/wazuh-kibana-app/pull/1569).
+- Fix error in Dev Tools when resizing the window [#1587](https://github.com/wazuh/wazuh-kibana-app/issues/1587).
 
 ## Wazuh v3.9.2 - Kibana v6.8.0 / v6.8.1 / v7.1.1 - Revision 510
 
