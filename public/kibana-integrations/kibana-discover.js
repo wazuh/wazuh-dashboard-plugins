@@ -60,6 +60,7 @@ import * as filterActions from 'plugins/kibana/discover/doc_table/actions/filter
 
 import 'ui/listen';
 import 'ui/visualize';
+import './debounce';
 import 'ui/fixed_scroll';
 import 'ui/index_patterns';
 import 'ui/state_management/app_state';
@@ -402,6 +403,7 @@ function discoverController(
           $scope.filters = queryFilter.getFilters();
           $scope.updateDataSource().then(function () {
             ///////////////////////////////  WAZUH   ///////////////////////////////////
+            if(!filtersAreReady()) return;
             discoverPendingUpdates.removeAll();
             discoverPendingUpdates.addItem(
               $state.query,
@@ -426,7 +428,7 @@ function discoverController(
 
       // update data source when hitting forward/back and the query changes
       $scope.$listen($state, 'fetch_with_changes', function (diff) {
-        if (diff.indexOf('query') >= 0) $scope.fetch();
+        if (diff.indexOf('query') >= 0) $scope.fetch();        
       });
 
       $scope.$watch('opts.timefield', function (timefield) {

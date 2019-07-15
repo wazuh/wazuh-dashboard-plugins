@@ -178,10 +178,11 @@
                 </div>
                 <div layout="row" ng-if="agent && syscollector && !load" class="wz-margin-top-10">
                     <wz-table-eui flex ng-if="agent && agent.os && agent.os.platform === 'windows'"
-                        path="'/syscollector/' + agent.id + '/processes'" keys="['name','cmd','priority','nlwp']" />
+                        path="'/syscollector/' + agent.id + '/processes'" 
+                        keys="[{value: 'name', width: '10%'},'pid','ppid','vm_size','priority','nlwp',{value: 'cmd', width: '30%'}]" />
                     <wz-table-eui flex ng-if="agent && agent.os && agent.os.platform !== 'windows'"
                         path="'/syscollector/' + agent.id + '/processes'"
-                        keys="['name','euser','nice',{value:'state',isProcessStatus:true}]" />
+                        keys="[{value: 'name', width: '10%'},'euser','egroup','pid','ppid',{value: 'cmd', width: '15%'},{value: 'argvs', width: '15%'},'vm_size','size','session','nice',{value:'state',isProcessStatus:true, width: '15%'}]" />
                 </div>
                 <div layout="row" layout-align="end center">
                     <button type="button"
