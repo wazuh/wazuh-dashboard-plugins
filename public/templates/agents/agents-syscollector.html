@@ -182,7 +182,7 @@
                         keys="['name','pid','ppid','vm_size','priority','nlwp','cmd']" />
                     <wz-table-eui flex ng-if="agent && agent.os && agent.os.platform !== 'windows'"
                         path="'/syscollector/' + agent.id + '/processes'"
-                        keys="['name','euser','egroup','pid','ppid','cmd','argvs','vm_size','size','session','nice',{value:'state',isProcessStatus:true}]" />
+                        keys="[{value: 'name', width: '10%'},'euser','egroup','pid','ppid',{value: 'cmd', width: '15%'},{value: 'argvs', width: '15%'},'vm_size','size','session','nice',{value:'state',isProcessStatus:true, width: '15%'}]" />
                 </div>
                 <div layout="row" layout-align="end center">
                     <button type="button"

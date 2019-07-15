@@ -40,35 +40,12 @@ app.directive('wzTableEui', function() {
       const processStatus = value => ProcessEquivalence[value] || value;
 
       const defaultRender = value => value || '-';
-
-      const setColumnWidth = item => {
-        try {
-          if ($scope.path.endsWith('/processes')) {
-            const field = item.value || item 
-            const smallFields = ['key', 'pid', 'ppid', 'uid', 'gid', 'nice', 'session', 'size', 'vm_size', 'nlwp', 'priority'];
-            const mediumFields = [];
-            const largeFields = ['state'];
-            if (smallFields.includes(field)) {
-              return '85px';
-            } else if (mediumFields.includes(field)) {
-              return '210px';
-            } else if (largeFields.includes(field)) {
-              return '375px';
-            }
-            return undefined;
-          } else { 
-            return undefined;
-          }
-        } catch (error) {
-          return undefined;
-        }
-      }
-
+      
       const parseColumns = columnsArray => {
         return columnsArray.map(item => ({
           name: KeyEquivalence[item.value || item] || item.value || item,
           field: item.value || item,
-          width: item.width || setColumnWidth(item),
+          width: item.width || undefined,
           sortable: typeof item.sortable !== 'undefined' ? item.sortable : true,
           render: value =>
             item.isHealth
