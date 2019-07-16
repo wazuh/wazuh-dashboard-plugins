@@ -68,7 +68,7 @@ export class WazuhApiCtrl {
     try {
       // Get config from config.yml
       const apis = (getConfiguration() || {})['wazuh.hosts'] || []
-      const api = this.findApi(apis, req.payload);
+      let api = this.findApi(apis, req.payload);
       if (!api) {
         throw new Error(`Could not find Wazuh API entry on config.yml.`);
       }
@@ -112,8 +112,15 @@ export class WazuhApiCtrl {
               return ErrorResponse('ERROR3099', 3099, 500, reply);
             }
 
-            const updatedManagerName = managerInfo.body.data.name;
-            api.cluster_info.manager = updatedManagerName;
+            const clusterData = managerInfo.body.data;
+
+            api.cluster_info = {
+              manager: clusterData.manager,
+              node: clusterData.node_name,
+              cluster: 'wazuh', //Find the way to get the cluster name
+              status: clusterData.status
+            }
+
             // TODO update manager/cluster name information
             /*await this.wzWrapper.updateWazuhIndexDocument(null, req.payload, {
               doc: { cluster_info: api.cluster_info }
