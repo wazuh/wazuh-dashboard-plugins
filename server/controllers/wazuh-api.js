@@ -267,6 +267,18 @@ export class WazuhApiCtrl {
   }
 
   /**
+   * This extracts the API data in case of it was read from the config.yml
+   * @param {Object} api 
+   */
+   cleanApiData(api) {
+    const keys = Object.keys(api);
+    if (keys.length === 1) {
+      return api[keys[0]];
+    }
+    return api;
+  }
+
+  /**
    * This check the wazuh-api configuration received in the POST body will work
    * @param {Object} req
    * @param {Object} reply
@@ -275,17 +287,18 @@ export class WazuhApiCtrl {
   async checkAPI(req, reply) {
     try {
       let apiAvailable = null;
-
       const notValid = this.validateCheckApiParams(req.payload);
       if (notValid) return ErrorResponse(notValid, 3003, 500, reply);
       log('wazuh-api:checkAPI', `${req.payload.id} is valid`, 'debug');
       // Check if a Wazuh API id is given (already stored API)
       if (req.payload && req.payload.id && !req.payload.password) {
-        const data = await this.wzWrapper.getWazuhConfigurationById(
-          req.payload.id
-        );
+        const configuration = getConfiguration();
+        const apis = configuration['wazuh.hosts']
+        const data = apis.find((api) => {
+          return Object.keys(api)[0] === req.payload.id;
+        });
         if (data) {
-          apiAvailable = data;
+          apiAvailable = this.cleanApiData(data);
         } else {
           log('wazuh-api:checkAPI', `API ${req.payload.id} not found`);
           return ErrorResponse(
