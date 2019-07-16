@@ -189,7 +189,9 @@ export class SettingsController {
   }
 
   // Set default API
-  setDefault(item) {
+  async setDefault(item) {
+    //Check the connection previously in order to get the manager/cluster name and the status
+    await this.checkManager(item, false, true)
     const index = this.apiEntries.map(item => item._id).indexOf(item._id);
 
     this.appState.setClusterInfo(this.apiEntries[index].cluster_info);
