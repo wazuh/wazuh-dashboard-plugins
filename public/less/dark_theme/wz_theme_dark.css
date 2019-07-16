@@ -29,6 +29,18 @@ html {
   border-bottom: 1px solid #343741;
 }
 
+.wz-card-actions.wz-card-actions-top {
+  border-bottom: 1px solid #343741;
+  background: #16171c;
+  color: #dfe5ef;
+}
+
+.kuiButton--secondary:enabled:hover {
+  color: #45b9f6!important;
+  border-color: #1BA9F5;
+  background: transparent;
+}
+
 md-content.md-default-theme,
 md-content {
   background-color: #1a1b20;
@@ -56,10 +68,6 @@ discover-app-w .container-fluid {
   color: #dfe5ef;
 }
 
-.euiButton--primary.euiButton--fill {
-  background-color: #232635!important;
-}
-
 .percentage {
   color: #fff;
   background-color: transparent !important;
@@ -67,7 +75,7 @@ discover-app-w .container-fluid {
 
 .wz-nav-item button.md-primary {
   color: #0079a5 !important;
-  background-color: #232635;
+  background-color: #232635!important;
   border-bottom: 2px solid #006BB4;
 }
 

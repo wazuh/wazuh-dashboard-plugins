@@ -23,7 +23,6 @@ import './typography.less';
 import './ui_framework.css';
 import './jquery-ui.css';
 
-//import './dark_theme/wz_theme_dark.css';
 import chrome from 'ui/chrome';
 const IS_DARK_THEME = chrome.getUiSettingsClient().get('theme:darkMode');
 /* eslint-disable no-undef */
