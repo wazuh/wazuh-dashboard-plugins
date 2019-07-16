@@ -597,10 +597,10 @@ export class SettingsController {
       const data = await this.testAPI.check(tmpData);
       tmpData.cluster_info = data.data;
 
-      const tmpUrl = `/elastic/api-hostname/${this.apiEntries[index]._id}`;
+      /*const tmpUrl = `/elastic/api-hostname/${this.apiEntries[index]._id}`;
       await this.genericReq.request('PUT', tmpUrl, {
         cluster_info: tmpData.cluster_info
-      });
+      });*/
       // Emit updateAPI event cause the cluster info could had been changed
       this.$scope.$emit('updateAPI', { cluster_info: tmpData.cluster_info });
       this.apiEntries[index].cluster_info = tmpData.cluster_info;

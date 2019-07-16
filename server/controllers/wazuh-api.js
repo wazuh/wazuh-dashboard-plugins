@@ -107,9 +107,10 @@ export class WazuhApiCtrl {
 
             const updatedManagerName = managerInfo.body.data.name;
             api.cluster_info.manager = updatedManagerName;
-            await this.wzWrapper.updateWazuhIndexDocument(null, req.payload, {
+            // TODO update manager/cluster name information
+            /*await this.wzWrapper.updateWazuhIndexDocument(null, req.payload, {
               doc: { cluster_info: api.cluster_info }
-            });
+            });*/
           } catch (error) {
             log('wazuh-api:checkStoredAPI', error.message || error);
           }
@@ -270,7 +271,7 @@ export class WazuhApiCtrl {
    * This extracts the API data in case of it was read from the config.yml
    * @param {Object} api 
    */
-   cleanApiData(api) {
+  cleanApiData(api) {
     const keys = Object.keys(api);
     if (keys.length === 1) {
       return api[keys[0]];
@@ -299,6 +300,10 @@ export class WazuhApiCtrl {
         });
         if (data) {
           apiAvailable = this.cleanApiData(data);
+          apiAvailable.password = Buffer.from(
+            apiAvailable.password,
+            'base64'
+          ).toString('ascii');
         } else {
           log('wazuh-api:checkAPI', `API ${req.payload.id} not found`);
           return ErrorResponse(
