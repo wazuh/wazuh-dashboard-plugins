@@ -51,7 +51,7 @@ export class WazuhApiCtrl {
    * This descrypts the encrypted password
    * @param {String} password 
    */
-  decryptApi(password) {
+  decryptApiPassword(password) {
     return Buffer.from(
       password,
       'base64'
@@ -74,7 +74,7 @@ export class WazuhApiCtrl {
       }
       log('wazuh-api:checkStoredAPI', `${req.payload} exists`, 'debug');
       const credInfo = ApiHelper.buildOptionsObject(api);
-      credInfo.password = this.decryptApi(credInfo.password)
+      credInfo.password = this.decryptApiPassword(credInfo.password)
       let response = await needle(
         'get',
         `${api.url}:${api.port}/version`,
@@ -218,7 +218,7 @@ export class WazuhApiCtrl {
               try {
                 const options = ApiHelper.buildOptionsObject(api);
 
-                options.password = this.decryptApi(api._source.api_password);
+                options.password = this.decryptApiPassword(api._source.api_password);
 
                 const response = await needle(
                   'get',
@@ -322,7 +322,7 @@ export class WazuhApiCtrl {
         const data = this.findApi(apis, req.payload.id);
         if (data) {
           apiAvailable = this.cleanApiData(data);
-          apiAvailable.password = this.decryptApi(apiAvailable.password);
+          apiAvailable.password = this.decryptApiPassword(apiAvailable.password);
         } else {
           log('wazuh-api:checkAPI', `API ${req.payload.id} not found`);
           return ErrorResponse(
@@ -336,7 +336,7 @@ export class WazuhApiCtrl {
         // Check if a password is given
       } else if (req.payload && req.payload.password) {
         apiAvailable = req.payload;
-        apiAvailable.password = this.decryptApi(req.payload.password);
+        apiAvailable.password = this.decryptApiPassword(req.payload.password);
       }
 
       let response = await needle(
@@ -865,25 +865,22 @@ export class WazuhApiCtrl {
   async makeRequest(method, path, data, id, reply) {
     const devTools = !!(data || {}).devTools;
     try {
-      const api = await this.wzWrapper.getWazuhConfigurationById(id);
-
+      const apis = (getConfiguration() || {})['wazuh.hosts'] || []
+      const api = this.findApi(apis, id);  
+      console.log('api ', api);
       if (devTools) {
         delete data.devTools;
       }
 
-      if (api.error_code > 1) {
-        log('wazuh-api:makeRequest', 'Could not connect with Elasticsearch');
+      if (!api) {
+        log('wazuh-api:makeRequest', 'Could not fetch API credentials');
         //Can not connect to elasticsearch
         return ErrorResponse(
-          'Could not connect with Elasticsearch',
+          'Could not fetch API credentials',
           3011,
           404,
           reply
         );
-      } else if (api.error_code > 0) {
-        log('wazuh-api:makeRequest', 'Credentials do not exist');
-        //Credentials not found
-        return ErrorResponse('Credentials do not exist', 3012, 404, reply);
       }
 
       if (!data) {
@@ -891,6 +888,8 @@ export class WazuhApiCtrl {
       }
 
       const options = ApiHelper.buildOptionsObject(api);
+      console.log('options ', options)
+      options.password = this.decryptApiPassword(options.password)
 
       // Set content type application/xml if needed
       if (
@@ -900,6 +899,7 @@ export class WazuhApiCtrl {
         options.content_type = 'application/xml';
         data = data.content;
       }
+      console.log('data ', data)
 
       if (
         typeof (data || {}).content === 'string' &&
@@ -1269,12 +1269,10 @@ export class WazuhApiCtrl {
       if (!req.params || !req.params.api)
         throw new Error('Field api is required');
 
-      const config = await this.wzWrapper.getWazuhConfigurationById(
-        req.params.api
-      );
+      const apis = (getConfiguration() || {})['wazuh.hosts'] || []
+      const config = this.findApi(apis, req.params.api);   
 
       const headers = ApiHelper.buildOptionsObject(config);
-
       const distinctUrl = `${config.url}:${config.port}/agents/stats/distinct`;
 
       const data = await Promise.all([
