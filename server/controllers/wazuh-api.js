@@ -48,6 +48,17 @@ export class WazuhApiCtrl {
 
 
   /**
+   * This descrypts the encrypted password
+   * @param {String} password 
+   */
+  decryptApi(password) {
+    return Buffer.from(
+      password,
+      'base64'
+    ).toString('ascii');
+  }
+
+  /**
    * Returns if the wazuh-api configuration is working
    * @param {Object} req
    * @param {Object} reply
@@ -55,19 +66,15 @@ export class WazuhApiCtrl {
    */
   async checkStoredAPI(req, reply) {
     try {
-      // Get config from elasticsearch
-      const api = await this.wzWrapper.getWazuhConfigurationById(req.payload);
-      if (api.error_code > 1) {
-        throw new Error(`Could not find Wazuh API entry on Elasticsearch.`);
-      } else if (api.error_code > 0) {
-        throw new Error(
-          'Valid credentials not found in Elasticsearch. It seems the credentials were not saved.'
-        );
+      // Get config from config.yml
+      const apis = (getConfiguration() || {})['wazuh.hosts'] || []
+      const api = this.findApi(apis, req.payload);
+      if (!api) {
+        throw new Error(`Could not find Wazuh API entry on config.yml.`);
       }
       log('wazuh-api:checkStoredAPI', `${req.payload} exists`, 'debug');
-
       const credInfo = ApiHelper.buildOptionsObject(api);
-
+      credInfo.password = this.decryptApi(credInfo.password)
       let response = await needle(
         'get',
         `${api.url}:${api.port}/version`,
@@ -204,10 +211,7 @@ export class WazuhApiCtrl {
               try {
                 const options = ApiHelper.buildOptionsObject(api);
 
-                options.password = Buffer.from(
-                  api._source.api_password,
-                  'base64'
-                ).toString('ascii');
+                options.password = this.decryptApi(api._source.api_password);
 
                 const response = await needle(
                   'get',
@@ -280,6 +284,19 @@ export class WazuhApiCtrl {
   }
 
   /**
+   * Find the API between all the APIs stored in the config.yml
+   * @param {Object} apis 
+   * @param {String} apiId 
+   */
+  findApi(apis, apiId) {
+    let data = apis.find((api) => {
+      return Object.keys(api)[0] == apiId;
+    });
+    data = Object.keys(data).length === 1 ? data[apiId] : data;
+    return data;
+  }
+
+  /**
    * This check the wazuh-api configuration received in the POST body will work
    * @param {Object} req
    * @param {Object} reply
@@ -294,16 +311,11 @@ export class WazuhApiCtrl {
       // Check if a Wazuh API id is given (already stored API)
       if (req.payload && req.payload.id && !req.payload.password) {
         const configuration = getConfiguration();
-        const apis = configuration['wazuh.hosts']
-        const data = apis.find((api) => {
-          return Object.keys(api)[0] === req.payload.id;
-        });
+        const apis = configuration['wazuh.hosts'];
+        const data = this.findApi(apis, req.payload.id);
         if (data) {
           apiAvailable = this.cleanApiData(data);
-          apiAvailable.password = Buffer.from(
-            apiAvailable.password,
-            'base64'
-          ).toString('ascii');
+          apiAvailable.password = this.decryptApi(apiAvailable.password);
         } else {
           log('wazuh-api:checkAPI', `API ${req.payload.id} not found`);
           return ErrorResponse(
@@ -317,10 +329,7 @@ export class WazuhApiCtrl {
         // Check if a password is given
       } else if (req.payload && req.payload.password) {
         apiAvailable = req.payload;
-        apiAvailable.password = Buffer.from(
-          req.payload.password,
-          'base64'
-        ).toString('ascii');
+        apiAvailable.password = this.decryptApi(req.payload.password);
       }
 
       let response = await needle(
