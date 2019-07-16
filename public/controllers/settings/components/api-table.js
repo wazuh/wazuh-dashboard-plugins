@@ -32,11 +32,19 @@ export class ApiTable extends Component {
     };
   }
 
+  checkApiConnection() {
+    this.props.apiEntries.map(api => {
+      console.log('api : ', api);
+      this.props.checkManager(api, false, true);
+    });
+  }
+
   componentDidMount() {
     this.setState({
       apiEntries: [...this.props.apiEntries],
       currentDefault: this.props.currentDefault
     });
+    this.checkApiConnection();
   }
 
   onChangeEdit(e, field) {
