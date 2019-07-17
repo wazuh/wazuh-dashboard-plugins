@@ -135,6 +135,27 @@ export class ManagementController {
     this.welcomeCardsProps = {
       switchTab: (tab, setNav) => this.switchTab(tab, setNav)
     };
+
+    this.rulesetTabsProps = {
+      clickAction: tab => this.setRulesTab(tab),
+      selectedTab: this.rulesetTab,
+      tabs: [
+        { id: 'rules', name: 'Rules' },
+        { id: 'decoders', name: 'Decoders' },
+        { id: 'cdblists', name: 'Lists' }
+      ]
+    };
+
+    this.managementTabsProps = {
+      clickAction: tab => this.switchTab(tab, true),
+      selectedTab: this.tab,
+      tabs: [
+        { id: 'status', name: 'Status' },
+        { id: 'logs', name: 'Logs' },
+        { id: 'monitoring', name: 'Cluster' },
+        { id: 'reporting', name: 'Reporting' }
+      ]
+    };
   }
 
   /**

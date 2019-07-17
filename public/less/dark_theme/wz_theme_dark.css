@@ -29,16 +29,59 @@ html {
   border-bottom: 1px solid #343741;
 }
 
-.wz-card-actions.wz-card-actions-top {
-  border-bottom: 1px solid #343741;
+.wz-card-actions.wz-card-actions-top, .columns-bar-active {
+  border-bottom: 1px solid #343741!important;
   background: #16171c;
   color: #dfe5ef;
+  border-top: none!important;
 }
 
 .kuiButton--secondary:enabled:hover {
+  background: rgba(27, 169, 245, 0.1)!important;
+  color: #45b9f6!important;
+  border-color: #1BA9F5!important;
+}
+
+.kuiButton--secondary {
   color: #45b9f6!important;
   border-color: #1BA9F5;
   background: transparent;
+}
+
+.btn-info:hover {
+  background: #ebebeb17 !important;
+  color: #fff !important;
+}
+
+#wz-search-filter-bar-input {
+  background: transparent;
+  color: white;
+}
+
+.registerAgent {
+  background: #1a1b20!important;
+}
+
+.json-beautifier {
+  background: black;
+  color: gray;
+}
+
+.wz-configuration-value {
+  background: transparent;
+  border-color: #343741;
+}
+
+.kuiSelect{
+  filter: invert(1);
+}
+
+md-card md-card-content {
+  color: #fff;
+}
+
+.ui-select-choices-row-inner {
+  color: #dfe5ef;
 }
 
 md-content.md-default-theme,
