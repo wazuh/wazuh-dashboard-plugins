@@ -32,7 +32,7 @@ export class ReportingTable extends Component {
   filterItems(pageIndex, pageSize) {
     const { items } = this.state;
     const pages = [];
-    const len = items.length;
+    const len = (items || []).length;
     for (let i = 0, j = len; i < j; i += pageSize) {
       pages.push(items.slice(i, i + pageSize));
     }
