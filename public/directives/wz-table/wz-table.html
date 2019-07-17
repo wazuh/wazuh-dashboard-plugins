@@ -42,7 +42,7 @@
         <tbody>
             <tr ng-class="allowClick ? 'cursor-pointer' : ''" class="wz-word-wrap" ng-repeat="item in pagedItems[currentPage] | filter:{item:'!'}"
                 ng-click="clickAction(item)">
-                <td ng-repeat="key in keys" id="td-{{$parent.$index}}-{{$index}}" ng-mouseover="showTooltip($parent.$index, $index, item)">
+                <td ng-repeat="key in keys" id="td-{{$parent.$index}}-{{$index}}" ng-mouseover="showTooltip($parent.$index, $index, item)" ng-click="applyFilter(key,parseValue(key,item),$event)">
                     <div class="wz-text-truncatable-container">
                         <span class="wz-text-truncatable">
                             {{
