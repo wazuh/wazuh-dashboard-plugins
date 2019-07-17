@@ -92,6 +92,10 @@ export class DecodersController {
       this.$scope.restartBtn = true;
       this.$scope.$applyAsync();
     });
+    
+    this.$scope.$on('applyFilter', (event, parameters) => {
+      this.search(parameters.filter)
+    });
   }
 
   /**
@@ -335,4 +339,6 @@ export class DecodersController {
   restart = () => {
     this.$scope.$emit('performRestart', {});
   };
+
+  
 }
