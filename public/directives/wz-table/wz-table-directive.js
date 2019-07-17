@@ -504,6 +504,30 @@ app.directive('wzTable', function() {
         $c.remove();
       };
 
+
+      
+      $scope.applyFilter = (key,value,ev) => {
+        
+        var keyTmp = typeof key === 'string' ? key : key.value; 
+        const valueTmp = typeof value !== 'string' ? value.toString() : value ;
+
+        const canFilter = (($scope.path === '/rules' && ( keyTmp === 'level' || keyTmp === 'pci' || keyTmp === 'gdpr' || keyTmp === 'groups' || keyTmp === 'file' || keyTmp === 'path' )) || 
+                        ($scope.path === '/decoders' && (keyTmp === 'path' || keyTmp === 'file')) )
+        if(canFilter){
+          if(value !== '-'){ 
+            // only 'group' is accepted as a filter so it has to be overwritten
+            if(keyTmp === 'groups')
+              keyTmp = 'group';
+            // PCI, GDPR and GROUPS can contains multiple values and the api only supports one at a time, just the first value is sent
+            const filter = `${keyTmp}:${valueTmp.split(',')[0]}` 
+            
+            $scope.$emit('applyFilter', { filter });
+          }
+          ev.stopPropagation();
+        }        
+      };
+
+
       $scope.setColResizable = () => {
         $(`#table${$scope.scapepath} th`).resizable({
           handles: 'e',

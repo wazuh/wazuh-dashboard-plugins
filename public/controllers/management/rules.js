@@ -381,4 +381,9 @@ export function RulesController(
     $scope.overwriteError = true;
     $scope.$applyAsync();
   });
+
+
+  $scope.$on('applyFilter', (event, parameters) => {
+    $scope.search(parameters.filter)
+  });
 }
