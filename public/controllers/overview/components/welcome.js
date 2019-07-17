@@ -47,7 +47,7 @@ export class WelcomeScreen extends Component {
     try {
       const api = JSON.parse(this.props.api).id;
       api && this.props.setExtensions(api, extensions);
-    } catch (error) {} //eslint-disable-line
+    } catch (error) { } //eslint-disable-line
   }
 
   buildTabCard(tab, icon) {
@@ -129,7 +129,6 @@ export class WelcomeScreen extends Component {
               </EuiFlexGroup>
               <EuiFlexGrid columns={2}>
                 {this.buildTabCard('pm', 'advancedSettingsApp')}
-                {this.buildTabCard('sca', 'securityAnalyticsApp')}
                 {this.props.extensions.audit &&
                   this.buildTabCard('audit', 'monitoringApp')}
                 {this.props.extensions.oscap &&
