@@ -164,6 +164,23 @@ export function settingsWizard(
         });
     };
 
+    const setUpCredentials = (msg) => {
+      const comeFromWizard = wzMisc.getWizard();
+      !comeFromWizard &&
+        errorHandler.handle(
+          msg,
+          false,
+          true
+        );
+      wzMisc.setWizard(true);
+      if (!$location.path().includes('/settings')) {
+        $location.search('_a', null);
+        $location.search('tab', 'api');
+        $location.path('/settings');
+      }
+      return deferred.resolve();
+    }
+
     const currentParams = $location.search();
     const targetedAgent =
       currentParams && (currentParams.agent || currentParams.agent === '000');
@@ -179,7 +196,8 @@ export function settingsWizard(
       deferred.resolve();
     } else {
       // There's no cookie for current API
-      if (!appState.getCurrentAPI()) {
+      const currentApi = appState.getCurrentAPI();
+      if (!currentApi) {
         genericReq
           .request('GET', '/elastic/apis')
           .then(data => {
@@ -193,20 +211,7 @@ export function settingsWizard(
               );
               callCheckStored();
             } else {
-              const comeFromWizard = wzMisc.getWizard();
-              !comeFromWizard &&
-                errorHandler.handle(
-                  'Wazuh App: Please set up Wazuh API credentials.',
-                  false,
-                  true
-                );
-              wzMisc.setWizard(true);
-              if (!$location.path().includes('/settings')) {
-                $location.search('_a', null);
-                $location.search('tab', 'api');
-                $location.path('/settings');
-              }
-              deferred.resolve();
+              setUpCredentials('Wazuh App: Please set up Wazuh API credentials.');
             }
           })
           .catch(error => {
@@ -220,7 +225,22 @@ export function settingsWizard(
             deferred.resolve();
           });
       } else {
-        callCheckStored();
+        const apiId = (JSON.parse(currentApi) || {}).id
+        genericReq
+          .request('GET', '/elastic/apis')
+          .then(data => {
+            if (data.data.length > 0 && data.data.find(x => x['_id'] == apiId)) {
+              callCheckStored();
+            } else {
+              appState.removeCurrentAPI();
+              setUpCredentials(data.data.length > 0 ?
+                'Wazuh App: Default API has been updated.' :
+                'Wazuh App: Please set up Wazuh API credentials.');
+            }
+          })
+          .catch(() => {
+            setUpCredentials('Wazuh App: Please set up Wazuh API credentials.');
+          });
       }
     }
 
