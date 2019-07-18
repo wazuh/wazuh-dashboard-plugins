@@ -10,6 +10,13 @@ export default function ({ getService, getPageObjects }) {
 
     before(async () => {
       await PageObjects.common.navigateToApp('wazuh');
+      const currentUrl = await browser.getCurrentUrl();
+      if(currentUrl.includes('#/overview') || currentUrl.includes('#/health-check')){
+        await PageObjects.common.waitUntilUrlIncludes('overview');
+        await testSubjects.click('wzMenuSettings');
+        await testSubjects.click('settingMenuApi');
+        await PageObjects.api.deleteAllApis();
+      }
     });
 
     it('should take you to Settings and warn you there are no API credentials available', async () => {
@@ -107,8 +114,7 @@ export default function ({ getService, getPageObjects }) {
     });
 
     it('delete all APIs should get a confirmation', async () => {
-      const deleteApiButtonList = await testSubjects.findAll('apiTableTrashButton');
-      await PageObjects.api.deleteAllApis(deleteApiButtonList);
+      await PageObjects.api.deleteAllApis();
     });
 
     it('the extensions tab should be disabled after delete the api', async () => {

@@ -66,7 +66,8 @@ export function ApiProvider({ getService, getPageObjects }) {
       }
     }
 
-    async deleteAllApis (deleteApiButtonList) {
+    async deleteAllApis () {
+      const deleteApiButtonList = await testSubjects.findAll('apiTableTrashButton');
       for (const deleteButton of deleteApiButtonList) {
         await deleteButton.moveMouseTo();
         await PageObjects.common.sleep(1000);
