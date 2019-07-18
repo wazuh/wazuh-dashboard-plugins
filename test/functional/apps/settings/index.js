@@ -1,7 +1,7 @@
 export default function ({ getService, loadTestFile }) {
   const browser = getService('browser');
 
-  describe('Checking ', function () {
+  describe('Settings ', function () {
     this.tags(['ciGroup6', 'smoke']);
 
     before(async function () {

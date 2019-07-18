@@ -2,6 +2,7 @@ import { resolve } from 'path';
 import { resolveKibanaPath } from '@kbn/plugin-helpers';
 
 import { pageObjects } from './page_objects';
+import { services } from './services';
 
 export default async function ({ readConfigFile }) {
   const kibanaConfig = await readConfigFile(resolveKibanaPath('../test/functional/config.js'));
@@ -9,13 +10,15 @@ export default async function ({ readConfigFile }) {
   return {
     testFiles: [
       require.resolve('./apps/wazuh'),
-      require.resolve('./apps/api'),
+      require.resolve('./apps/settings'),
       require.resolve('./apps/health_check'),
       require.resolve('./apps/overview'),
+      require.resolve('./apps/management'),
     ],
 
     services: {
       ...kibanaConfig.get('services'),
+      ...services
     },
 
     pageObjects: {
