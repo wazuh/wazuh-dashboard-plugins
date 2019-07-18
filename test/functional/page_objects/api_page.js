@@ -77,6 +77,42 @@ export function ApiProvider({ getService, getPageObjects }) {
       }
     }
 
+    async navigateToApiSetting () {
+      await testSubjects.click('wzMenuSettings');
+      await testSubjects.click('settingMenuApi');
+    }
+
+    async insertNewApi () {
+      const fromUrl = await browser.getCurrentUrl();
+      await this.navigateToApiSetting();
+      await testSubjects.click('apiTableAddButton');
+      await this.completeApiForm();
+      await find.clickByCssSelector('[api-default="false"]');
+      await browser.get(fromUrl);
+      await PageObjects.common.waitUntilUrlIncludes('tab=welcome');        
+    }
+
+    async deleteNewApi () {
+      const fromUrl = await browser.getCurrentUrl();
+      await this.navigateToApiSetting();
+      await PageObjects.common.sleep(500);
+      await this.clickTrashDefaultApi();
+      await browser.get(fromUrl);
+      await PageObjects.common.waitUntilUrlIncludes('tab=welcome');
+    }
+
+    async clickTrashDefaultApi () {
+      const rows = await find.allByCssSelector('table>tbody>tr');
+      for (const row of rows) {
+        try {
+          await row.findByCssSelector('[api-default="false"]')
+          const trashButton = await row.findByCssSelector('[data-test-subj="apiTableTrashButton"]')
+          await trashButton.click();
+          return;
+        } catch (error) {}
+      }
+    }
+
   }
   return new ApiPage;
 }

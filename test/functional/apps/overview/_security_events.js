@@ -1,5 +1,4 @@
 import expect from '@kbn/expect';
-import { pageObjects } from '../../page_objects';
 
 export default function({ getService, getPageObjects }) {
   const browser = getService('browser');
