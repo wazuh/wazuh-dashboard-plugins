@@ -177,10 +177,10 @@ export function RulesController(
         coloredString = coloredString.replace(
           /\$\(((?!<\/span>).)*?\)(?!<\/span>)/im,
           '<span style="color: ' +
-            colors[i] +
-            ' ">' +
-            valuesArray[i] +
-            '</span>'
+          colors[i] +
+          ' ">' +
+          valuesArray[i] +
+          '</span>'
         );
       }
     }
@@ -382,12 +382,11 @@ export function RulesController(
     $scope.$applyAsync();
   });
 
-
   $scope.$on('applyFilter', (event, parameters) => {
     $scope.search(parameters.filter)
   });
 
-  $scope.$on('viewFileOnlyTable', (event,parameters) => {
-    $scope.mctrl.switchFilesSubTab('rules',{parameters})
+  $scope.$on('viewFileOnlyTable', (event, parameters) => {
+    $scope.mctrl.switchFilesSubTab('rules', { parameters })
   });
 }

@@ -272,7 +272,7 @@ app.directive('wzTable', function () {
         parseValue(key, item, instance.path, $sce, timeService);
 
       $scope.parseKey = (key) => {
-        return typeof key === 'string' ? key : key.value;
+        return key ? key.value || key : key;
       }
 
       /**
@@ -297,17 +297,24 @@ app.directive('wzTable', function () {
       $scope.currentOffset = 0;
       let items = [];
       $scope.gap = 0;
+
       $scope.searchTable = () => pagination.searchTable($scope, items);
+
       $scope.groupToPages = () => pagination.groupToPages($scope);
+
       $scope.range = (size, start, end) =>
         pagination.range(size, start, end, $scope.gap);
+
       $scope.prevPage = () => pagination.prevPage($scope);
+
       $scope.nextPage = async (currentPage, last = false) =>
         pagination.nextPage(currentPage, $scope, errorHandler, fetch, last);
+
       $scope.firstPage = function () {
         $scope.setPage(1);
         $scope.prevPage();
       };
+
       $scope.setPage = function (page = false, logs = false, last = false) {
         this.n = page || this.n;
         $scope.currentPage = this.n;
@@ -493,7 +500,7 @@ app.directive('wzTable', function () {
 
       $scope.showTooltip = (id1, id2, item) => {
         const $element = $('#td-' + id1 + '-' + id2 + ' div span.wz-text-truncatable');
-        if($element[0].offsetWidth < $element[0].scrollWidth){
+        if ($element[0].offsetWidth < $element[0].scrollWidth) {
           if (!item.showTooltip) {
             item.showTooltip = [];
           }
@@ -505,11 +512,9 @@ app.directive('wzTable', function () {
         $scope.filterableColumns = [];
         $scope.keys.forEach(k => {
           const key = $scope.parseKey(k);
-          const canFilter = (($scope.path === '/rules' && (key === 'level' || key === 'pci' || key === 'gdpr' || key === 'groups' || key === 'file' || key === 'path')) ||
-            ($scope.path === '/decoders' && (key === 'path' || key === 'file')))
-          if (canFilter) {
-            $scope.filterableColumns[key] = true;
-          }
+          const canFilterInRules = $scope.path === '/rules' && (key === 'level' || key === 'pci' || key === 'gdpr' || key === 'groups' || key === 'file' || key === 'path');
+          const canFilterInDecoders = $scope.path === '/decoders' && (key === 'path' || key === 'file');
+          $scope.filterableColumns[key] = !!(canFilterInRules || canFilterInDecoders);
         });
       };
 
