@@ -46,7 +46,7 @@
                     ng-mouseleave="selectedCell = false" ng-click="handleClick(key,item,$event)">
                     <div class="wz-text-truncatable-container">
                         <span class="wzTableCellFilter" ng-show="filterableColumns[parseKey(key)] && selectedRow === $parent.$index && selectedCell == $index">
-                            <react-component name="EuiIcon" props="{type:'plusInCircleFilled'}" /> </span>
+                            <span class="fa fa-search-plus"></span> </span>
                         <span class="wz-text-truncatable" ng-class="parseKey(key) === 'file' && (path === '/rules' || path === '/decoders' )? 'wz-link' : ''">
                             {{
                             parseValue(key,item)
