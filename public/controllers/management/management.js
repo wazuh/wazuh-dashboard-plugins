@@ -92,6 +92,9 @@ export class ManagementController {
     this.$scope.$on('removeCurrentConfiguration', () => {
       this.currentConfiguration = false;
     });
+    this.$scope.$on('viewFileOnly', (ev, params) => {
+      $scope.$broadcast('viewFileOnly', { file:params.item, path:params.path });
+    });
     this.$rootScope.$on('setRestarting', () => {
       if (this.clusterInfo.status === 'enabled') {
         this.blockEditioncounter = 0;
@@ -272,8 +275,11 @@ export class ManagementController {
     this.breadCrumbBack();
   }
 
-  switchFilesSubTab(flag) {
+  switchFilesSubTab(flag,showFile) {
     this.managingFiles = flag || true;
+    if(showFile){
+      this.showFile = showFile
+    }
   }
 
   breadCrumbBack(goRoot = false) {

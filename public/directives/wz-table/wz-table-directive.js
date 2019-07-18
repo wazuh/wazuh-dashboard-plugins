@@ -270,6 +270,10 @@ app.directive('wzTable', function() {
       $scope.parseValue = (key, item) =>
         parseValue(key, item, instance.path, $sce, timeService);
 
+      $scope.parseKey = (key) => {
+        return typeof key === 'string' ? key : key.value; 
+      }
+
       /**
        * On controller loads
        */
@@ -506,15 +510,15 @@ app.directive('wzTable', function() {
 
 
       
-      $scope.applyFilter = (key,value,ev) => {
-        
-        var keyTmp = typeof key === 'string' ? key : key.value; 
+      $scope.handleClick = (key,item,ev) => {
+        const value = $scope.parseValue(key,item) 
+        var keyTmp = $scope.parseKey(key);
         const valueTmp = typeof value !== 'string' ? value.toString() : value ;
 
         const canFilter = (($scope.path === '/rules' && ( keyTmp === 'level' || keyTmp === 'pci' || keyTmp === 'gdpr' || keyTmp === 'groups' || keyTmp === 'file' || keyTmp === 'path' )) || 
                         ($scope.path === '/decoders' && (keyTmp === 'path' || keyTmp === 'file')) )
         if(canFilter){
-          if(value !== '-'){ 
+          if(value !== '-' && keyTmp !== 'file'){ 
             // only 'group' is accepted as a filter so it has to be overwritten
             if(keyTmp === 'groups')
               keyTmp = 'group';
@@ -522,9 +526,12 @@ app.directive('wzTable', function() {
             const filter = `${keyTmp}:${valueTmp.split(',')[0]}` 
             
             $scope.$emit('applyFilter', { filter });
+          }else if(keyTmp === 'file'){
+            $scope.$emit('viewFileOnlyTable', {file : item, path : $scope.path})
+           // $scope.viewFileOnly(item,$scope.path)
           }
           ev.stopPropagation();
-        }        
+        }     
       };
 
 

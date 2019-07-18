@@ -33,6 +33,8 @@ export class FilesController {
   $onInit() {
     const configuration = this.wazuhConfig.getConfig();
     this.adminMode = !!(configuration || {}).admin;
+    if(this.$scope.mctrl.showFile)
+      this.editFile(this.$scope.mctrl.showFile.parameters, true);
 
     this.$scope.$on('editFile', (ev, params) => {
       this.$scope.editorReadOnly = false;
