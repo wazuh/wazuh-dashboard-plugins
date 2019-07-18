@@ -386,4 +386,9 @@ export function RulesController(
   $scope.$on('applyFilter', (event, parameters) => {
     $scope.search(parameters.filter)
   });
+
+  $scope.$on('viewFileOnlyTable', (event,parameters) => {
+    $scope.mctrl.switchFilesSubTab('rules',{parameters})
+
+  });
 }
