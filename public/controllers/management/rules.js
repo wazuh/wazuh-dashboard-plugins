@@ -389,6 +389,5 @@ export function RulesController(
 
   $scope.$on('viewFileOnlyTable', (event,parameters) => {
     $scope.mctrl.switchFilesSubTab('rules',{parameters})
-
   });
 }

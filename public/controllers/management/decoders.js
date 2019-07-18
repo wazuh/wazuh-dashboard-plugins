@@ -96,6 +96,10 @@ export class DecodersController {
     this.$scope.$on('applyFilter', (event, parameters) => {
       this.search(parameters.filter)
     });
+
+    this.$scope.$on('viewFileOnlyTable', (event,parameters) => {
+      this.$scope.mctrl.switchFilesSubTab('decoders',{parameters})
+    });
   }
 
   /**
@@ -339,6 +343,6 @@ export class DecodersController {
   restart = () => {
     this.$scope.$emit('performRestart', {});
   };
-
   
+
 }
