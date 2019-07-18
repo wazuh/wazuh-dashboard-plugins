@@ -74,6 +74,7 @@ export class WelcomeScreen extends Component {
           <EuiSwitch
             label={`${TabDescription[extension].title} extension`}
             checked={this.state.extensions[extension]}
+            data-test-subj={`switch${this.strtools.capitalize(extension)}`}
             onChange={() => this.toggleExtension(extension)}
           />
         </EuiFormRow>
@@ -87,6 +88,7 @@ export class WelcomeScreen extends Component {
           <EuiButtonIcon
             aria-label="Extensions"
             iconType="eye"
+            data-test-subj={`eye${this.strtools.toUpperCamelCase(popoverName)}`}
             onClick={() => this.onButtonClick(popoverName)}
           />
         }
