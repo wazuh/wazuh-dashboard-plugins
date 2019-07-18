@@ -33,7 +33,7 @@ export class ReportingTable extends Component {
     const { items } = this.state;
     const pages = [];
     const len = (items || []).length;
-    for (let i = 0, j = len; i < j; i += pageSize) {
+    for (let i = 0; i < len; i += pageSize) {
       pages.push(items.slice(i, i + pageSize));
     }
     return { pageOfItems: pages[pageIndex] || [], totalItemCount: len };
