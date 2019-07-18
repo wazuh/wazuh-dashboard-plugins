@@ -26,7 +26,7 @@ import { checkGap } from './lib/check-gap';
 
 const app = uiModules.get('app/wazuh', []);
 
-app.directive('wzTable', function() {
+app.directive('wzTable', function () {
   return {
     restrict: 'E',
     scope: {
@@ -167,6 +167,7 @@ app.directive('wzTable', function() {
               filters: instance.filters
             });
           }
+          filterableColumns();
           if ($scope.customColumns) {
             setTimeout(() => {
               $scope.setColResizable();
@@ -271,7 +272,7 @@ app.directive('wzTable', function() {
         parseValue(key, item, instance.path, $sce, timeService);
 
       $scope.parseKey = (key) => {
-        return typeof key === 'string' ? key : key.value; 
+        return typeof key === 'string' ? key : key.value;
       }
 
       /**
@@ -303,11 +304,11 @@ app.directive('wzTable', function() {
       $scope.prevPage = () => pagination.prevPage($scope);
       $scope.nextPage = async (currentPage, last = false) =>
         pagination.nextPage(currentPage, $scope, errorHandler, fetch, last);
-      $scope.firstPage = function() {
+      $scope.firstPage = function () {
         $scope.setPage(1);
         $scope.prevPage();
       };
-      $scope.setPage = function(page = false, logs = false, last = false) {
+      $scope.setPage = function (page = false, logs = false, last = false) {
         this.n = page || this.n;
         $scope.currentPage = this.n;
         $scope.nextPage(this.n, last).then(() => {
@@ -491,46 +492,45 @@ app.directive('wzTable', function() {
       };
 
       $scope.showTooltip = (id1, id2, item) => {
-        const $element = $('#td-' + id1 + '-' + id2 + ' div');
-        const $c = $element
-          .clone()
-          .css({ display: 'inline', width: 'auto', visibility: 'hidden' })
-          .appendTo('body');
-        if (
-          $c.width() > $element.width() &&
-          (($element || [])[0].children || [])[0].innerText !== '-'
-        ) {
+        const $element = $('#td-' + id1 + '-' + id2 + ' div span.wz-text-truncatable');
+        if($element[0].offsetWidth < $element[0].scrollWidth){
           if (!item.showTooltip) {
             item.showTooltip = [];
           }
           item.showTooltip[id2] = true;
         }
-        $c.remove();
       };
 
+      const filterableColumns = () => {
+        $scope.filterableColumns = [];
+        $scope.keys.forEach(k => {
+          const key = $scope.parseKey(k);
+          const canFilter = (($scope.path === '/rules' && (key === 'level' || key === 'pci' || key === 'gdpr' || key === 'groups' || key === 'file' || key === 'path')) ||
+            ($scope.path === '/decoders' && (key === 'path' || key === 'file')))
+          if (canFilter) {
+            $scope.filterableColumns[key] = true;
+          }
+        });
+      };
 
-      
-      $scope.handleClick = (key,item,ev) => {
-        const value = $scope.parseValue(key,item) 
-        var keyTmp = $scope.parseKey(key);
-        const valueTmp = typeof value !== 'string' ? value.toString() : value ;
-
-        const canFilter = (($scope.path === '/rules' && ( keyTmp === 'level' || keyTmp === 'pci' || keyTmp === 'gdpr' || keyTmp === 'groups' || keyTmp === 'file' || keyTmp === 'path' )) || 
-                        ($scope.path === '/decoders' && (keyTmp === 'path' || keyTmp === 'file')) )
-        if(canFilter){
-          if(value !== '-' && keyTmp !== 'file'){ 
+      $scope.handleClick = (key, item, ev) => {
+        const value = $scope.parseValue(key, item)
+        let keyTmp = $scope.parseKey(key);
+        const valueTmp = typeof value !== 'string' ? value.toString() : value;
+        if ($scope.filterableColumns[keyTmp]) {
+          if (value !== '-' && keyTmp !== 'file') {
             // only 'group' is accepted as a filter so it has to be overwritten
-            if(keyTmp === 'groups')
+            if (keyTmp === 'groups')
               keyTmp = 'group';
             // PCI, GDPR and GROUPS can contains multiple values and the api only supports one at a time, just the first value is sent
-            const filter = `${keyTmp}:${valueTmp.split(',')[0]}` 
-            
+            const filter = `${keyTmp}:${valueTmp.split(',')[0]}`
+
             $scope.$emit('applyFilter', { filter });
-          }else if(keyTmp === 'file'){
-            $scope.$emit('viewFileOnlyTable', {file : item, path : item.path})
+          } else if (keyTmp === 'file') {
+            $scope.$emit('viewFileOnlyTable', { file: item, path: item.path })
           }
           ev.stopPropagation();
-        }     
+        }
       };
 
 
