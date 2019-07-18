@@ -33,9 +33,10 @@ export class FilesController {
   $onInit() {
     const configuration = this.wazuhConfig.getConfig();
     this.adminMode = !!(configuration || {}).admin;
-    if(this.$scope.mctrl.showFile)
-      this.editFile(this.$scope.mctrl.showFile.parameters, true);
-
+    if(this.$scope.mctrl.showFile){
+      const readOnly = ! (this.$scope.mctrl.showFile.parameters.path === 'etc/rules' || this.$scope.mctrl.showFile.parameters.path === 'etc/decoders')
+      this.editFile(this.$scope.mctrl.showFile.parameters, readOnly);
+    }
     this.$scope.$on('editFile', (ev, params) => {
       this.$scope.editorReadOnly = false;
       this.editFile(params);
@@ -138,9 +139,9 @@ export class FilesController {
     this.$scope.newFile = false;
     try {
       this.$scope.currentFile = params.file;
-      this.$scope.currentFile.type = params.path.includes('rules')
-        ? 'rule'
-        : 'decoder';
+      this.$scope.currentFile.type = params.path.includes('decoder')
+        ? 'decoder'
+        : 'rule';
       this.$scope.type = `${this.$scope.currentFile.type}s`;
       this.$scope.fetchedXML =
         this.$scope.type === 'rules'

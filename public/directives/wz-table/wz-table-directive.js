@@ -527,8 +527,7 @@ app.directive('wzTable', function() {
             
             $scope.$emit('applyFilter', { filter });
           }else if(keyTmp === 'file'){
-            $scope.$emit('viewFileOnlyTable', {file : item, path : $scope.path})
-           // $scope.viewFileOnly(item,$scope.path)
+            $scope.$emit('viewFileOnlyTable', {file : item, path : item.path})
           }
           ev.stopPropagation();
         }     
