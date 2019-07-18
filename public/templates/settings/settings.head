@@ -8,12 +8,12 @@
 
     <md-nav-bar ng-if="!ctrl.load" class="wz-nav-bar" md-selected-nav-item="ctrl.tab"
         nav-bar-aria-label="Settings navigation links">
-        <md-nav-item class="wz-nav-item" md-nav-click="ctrl.switchTab('api', true)" name="api">API</md-nav-item>
-        <md-nav-item class="wz-nav-item" md-nav-click="ctrl.switchTab('pattern', true)" name="pattern">Pattern
+        <md-nav-item class="wz-nav-item" md-nav-click="ctrl.switchTab('api', true)" name="api" data-test-subj="settingMenuApi">API</md-nav-item>
+        <md-nav-item class="wz-nav-item" md-nav-click="ctrl.switchTab('pattern', true)" name="pattern" data-test-subj="settingMenuPatter">Pattern
         </md-nav-item>
-        <md-nav-item class="wz-nav-item" md-nav-click="ctrl.switchTab('configuration', true)" name="configuration">
+        <md-nav-item class="wz-nav-item" md-nav-click="ctrl.switchTab('configuration', true)" name="configuration" data-test-subj="settingMenuConfiguration">
             Configuration</md-nav-item>
-        <md-nav-item class="wz-nav-item" md-nav-click="ctrl.switchTab('logs', true); ctrl.refreshLogs()" name="logs">
+        <md-nav-item class="wz-nav-item" md-nav-click="ctrl.switchTab('logs', true); ctrl.refreshLogs()" name="logs" data-test-subj="settingMenuLogs">
             Logs</md-nav-item>
-        <md-nav-item class="wz-nav-item" md-nav-click="ctrl.switchTab('about', true)" name="about">About</md-nav-item>
+        <md-nav-item class="wz-nav-item" md-nav-click="ctrl.switchTab('about', true)" name="about" data-test-subj="settingMenuAbout">About</md-nav-item>
     </md-nav-bar>
