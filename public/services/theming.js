@@ -11,7 +11,7 @@
  */
 import { uiModules } from 'ui/modules';
 
-uiModules.get('app/wazuh', []).config(function($mdThemingProvider) {
+uiModules.get('app/wazuh', []).config(function ($mdThemingProvider) {
   let kibanaWhiteBlack = {
     '50': '#ffffff',
     '100': '#ffffff',

@@ -1,5 +1,5 @@
-<md-content flex layout="column" ng-if="tab === 'general' && tabView === 'panels'"
-    ng-class="{'no-opacity': resultState !== 'ready' || !rendered}" layout-align="start">
+<md-content flex layout="column" ng-if="tab === 'general' && tabView === 'panels'" ng-class="{'no-opacity': resultState !== 'ready' || !rendered}"
+    layout-align="start">
 
     <div layout="row" layout-padding>
         <react-component flex name="AlertsStats" props="{
@@ -7,7 +7,7 @@
                 { description: 'Total', value: totalAlerts(), color: 'primary' },
                 { description: 'Level 12 or above alerts', value: level12(), color: 'secondary' },
                 { description: 'Authentication failure', value: authFailure(), color: 'danger' }, 
-                { description: 'Authentication success', value: authSuccess(), color: 'accent' }
+                { description: 'Authentication success', value: authSuccess(), color: 'subdued' }
             ]            
         }" />
     </div>
@@ -29,8 +29,7 @@
                 </span>
             </md-card-actions>
             <md-card-content class="wazuh-column">
-                <kbn-vis id="Wazuh-App-Agents-Overview-Alert-groups-evolution"
-                    vis-id="'Wazuh-App-Agents-Overview-Alert-groups-evolution'"></kbn-vis>
+                <kbn-vis id="Wazuh-App-Agents-Overview-Alert-groups-evolution" vis-id="'Wazuh-App-Agents-Overview-Alert-groups-evolution'"></kbn-vis>
             </md-card-content>
         </md-card>
         <md-card flex class="wz-md-card" ng-class="{'fullscreen': expandArray[1]}">
@@ -71,8 +70,7 @@
                 </span>
             </md-card-actions>
             <md-card-content class="wazuh-column">
-                <kbn-vis id="Wazuh-App-Agents-Overview-Top-10-groups"
-                    vis-id="'Wazuh-App-Agents-Overview-Top-10-groups'">
+                <kbn-vis id="Wazuh-App-Agents-Overview-Top-10-groups" vis-id="'Wazuh-App-Agents-Overview-Top-10-groups'">
                 </kbn-vis>
             </md-card-content>
         </md-card>
@@ -85,8 +83,7 @@
                 </span>
             </md-card-actions>
             <md-card-content class="wazuh-column">
-                <kbn-vis id="Wazuh-App-Agents-Overview-Top-5-PCI-DSS-Requirements"
-                    vis-id="'Wazuh-App-Agents-Overview-Top-5-PCI-DSS-Requirements'"></kbn-vis>
+                <kbn-vis id="Wazuh-App-Agents-Overview-Top-5-PCI-DSS-Requirements" vis-id="'Wazuh-App-Agents-Overview-Top-5-PCI-DSS-Requirements'"></kbn-vis>
             </md-card-content>
         </md-card>
     </div>

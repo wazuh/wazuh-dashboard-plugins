@@ -1,5 +1,5 @@
-<div layout="column" layout-align="start stretch" ng-controller="managerStatusController as ctrl"
-    ng-if="mctrl.tab === 'status'" class="">
+<div layout="column" layout-align="start stretch" ng-controller="managerStatusController as ctrl" ng-if="mctrl.tab === 'status'"
+    class="">
 
     <div class="md-padding md-padding-top-16" ng-show="ctrl.load">
         <react-component name="EuiProgress" props="{size: 'xs', color: 'primary'}" />
@@ -8,22 +8,20 @@
     <!-- Headline -->
     <div ng-show="!ctrl.load" layout="row" layout-padding class="wz-padding-bottom-0 wz-margin-top-16">
         <div ng-show="ctrl.selectedNode" layout="column" layout-align="center" class="height-35 wz-select-input">
-            <select class="kuiSelect wz-border-none cursor-pointer max-height-35" id="categoryBox"
-                ng-model="ctrl.selectedNode" ng-change="ctrl.changeNode(ctrl.selectedNode)" aria-label="Select node">
+            <select class="kuiSelect wz-border-none cursor-pointer max-height-35" id="categoryBox" ng-model="ctrl.selectedNode"
+                ng-change="ctrl.changeNode(ctrl.selectedNode)" aria-label="Select node">
                 <option ng-repeat="node in ctrl.nodes" value="{{node.name}}">{{node.name}}</option>
             </select>
         </div>
         <div flex></div>
         <div layout="column" class="height-40 wz-no-padding" ng-show="adminMode">
-            <button ng-if="mctrl.clusterInfo.status === 'enabled' && !mctrl.showConfirmRestart"
-                class="kuiButton kuiButton--secondary height-35" ng-disabled="mctrl.isRestarting"
-                ng-click="mctrl.showConfirmRestart = true"><i class="fa fa-refresh"
+            <button ng-if="mctrl.clusterInfo.status === 'enabled' && !mctrl.showConfirmRestart" class="kuiButton kuiButton--secondary height-35"
+                ng-disabled="mctrl.isRestarting" ng-click="mctrl.showConfirmRestart = true"><i class="fa fa-refresh"
                     ng-class="mctrl.isRestarting ? 'fa-spin fa-spinner' : ''"></i>
                 Restart cluster
             </button>
-            <button ng-if="mctrl.clusterInfo.status !== 'enabled' && !mctrl.showConfirmRestart"
-                class="kuiButton kuiButton--secondary height-35" ng-disabled="mctrl.isRestarting"
-                ng-click="mctrl.showConfirmRestart = true"><i class="fa fa-refresh"
+            <button ng-if="mctrl.clusterInfo.status !== 'enabled' && !mctrl.showConfirmRestart" class="kuiButton kuiButton--secondary height-35"
+                ng-disabled="mctrl.isRestarting" ng-click="mctrl.showConfirmRestart = true"><i class="fa fa-refresh"
                     ng-class="mctrl.isRestarting ? 'fa-spin fa-spinner' : ''"></i>
                 Restart manager
             </button>
@@ -38,12 +36,10 @@
                     <md-button class="cancelBtn btn-info" type="button" ng-click="mctrl.showConfirmRestart = false">
                         Cancel</md-button>
                     <md-button ng-if="mctrl.clusterInfo.status === 'enabled'" class="btn wz-button" type="button"
-                        ng-click="mctrl.restartCluster();mctrl.showConfirmRestart = false"><i aria-hidden='true'
-                            class='fa fa-fw fa-check'></i>
+                        ng-click="mctrl.restartCluster();mctrl.showConfirmRestart = false"><i aria-hidden='true' class='fa fa-fw fa-check'></i>
                         Confirm</md-button>
                     <md-button ng-if="mctrl.clusterInfo.status !== 'enabled'" class="btn wz-button" type="button"
-                        ng-click="mctrl.restartManager();mctrl.showConfirmRestart = false"><i aria-hidden='true'
-                            class='fa fa-fw fa-check'></i>
+                        ng-click="mctrl.restartManager();mctrl.showConfirmRestart = false"><i aria-hidden='true' class='fa fa-fw fa-check'></i>
                         Confirm</md-button>
                 </div>
             </div>
@@ -51,8 +47,7 @@
     </div>
     <!-- End headline -->
 
-    <div layout="row" class="wz-margin-top-10 wz-margin-right-8 wz-margin-left-8"
-        ng-show="ctrl.clusterError && !ctrl.load">
+    <div layout="row" class="wz-margin-top-10 wz-margin-right-8 wz-margin-left-8" ng-show="ctrl.clusterError && !ctrl.load">
         <div flex class="euiCallOut euiCallOut--warning">
             <div class="euiCallOutHeader">
                 <react-component name="EuiIcon" props="{type:'help',className:'euiCallOutHeader__title'}" />
@@ -95,7 +90,7 @@
                     {
                         description: 'Never connected',
                         value: ctrl.agentsCountNeverConnected,
-                        color: 'accent'
+                        color: 'subdued'
                     },
                     {
                         description: 'Agents coverage',
@@ -112,8 +107,7 @@
         <!-- Manager information section -->
         <md-card flex class="wz-md-card">
             <md-card-content>
-                <i class="fa fa-fw fa-server" aria-hidden="true"></i> <span ng-if="ctrl.selectedNode"
-                    class="wz-headline-title">{{ctrl.selectedNode}}
+                <i class="fa fa-fw fa-server" aria-hidden="true"></i> <span ng-if="ctrl.selectedNode" class="wz-headline-title">{{ctrl.selectedNode}}
                     information</span> <span ng-if="!ctrl.selectedNode" class="wz-headline-title">Manager
                     information</span>
                 <md-divider class="wz-margin-top-10"></md-divider>
@@ -129,13 +123,11 @@
                 </div>
                 <div layout="row" class="wz-padding-top-10">
                     <span flex="25">Installation path</span>
-                    <span
-                        class="wz-text-right color-grey">{{ctrl.managerInfo.path ? ctrl.managerInfo.path : '-'}}</span>
+                    <span class="wz-text-right color-grey">{{ctrl.managerInfo.path ? ctrl.managerInfo.path : '-'}}</span>
                 </div>
                 <div layout="row" class="wz-padding-top-10">
                     <span flex="25">Installation type</span>
-                    <span
-                        class="wz-text-right color-grey">{{ctrl.managerInfo.type ? ctrl.managerInfo.type : '-'}}</span>
+                    <span class="wz-text-right color-grey">{{ctrl.managerInfo.type ? ctrl.managerInfo.type : '-'}}</span>
                 </div>
                 <div layout="row" class="wz-padding-top-10">
                     <span flex="25">Agents limit</span>
@@ -168,8 +160,7 @@
                 </div>
                 <div layout="row" class="wz-padding-top-10">
                     <span flex="25">Status</span>
-                    <span
-                        class="wz-text-right color-grey">{{ctrl.agentInfo.status ? ctrl.agentInfo.status : '-'}}</span>
+                    <span class="wz-text-right color-grey">{{ctrl.agentInfo.status ? ctrl.agentInfo.status : '-'}}</span>
                 </div>
                 <div layout="row" class="wz-padding-top-10">
                     <span flex="25">IP Address</span>
@@ -177,13 +168,11 @@
                 </div>
                 <div layout="row" class="wz-padding-top-10">
                     <span flex="25">Date add</span>
-                    <span
-                        class="wz-text-right color-grey">{{ctrl.agentInfo.dateAdd ? ctrl.agentInfo.dateAdd : '-'}}</span>
+                    <span class="wz-text-right color-grey">{{ctrl.agentInfo.dateAdd ? ctrl.agentInfo.dateAdd : '-'}}</span>
                 </div>
                 <div layout="row" class="wz-padding-top-10">
                     <span flex="25">Version</span>
-                    <span
-                        class="wz-text-right color-grey">{{ctrl.agentInfo.version ? ctrl.agentInfo.version : '-'}}</span>
+                    <span class="wz-text-right color-grey">{{ctrl.agentInfo.version ? ctrl.agentInfo.version : '-'}}</span>
                 </div>
                 <div layout="row" class="wz-padding-top-10" ng-if="ctrl.agentInfo.id !== '000'">
                     <span flex="25">Last keep alive</span>
