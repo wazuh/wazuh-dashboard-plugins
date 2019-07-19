@@ -512,7 +512,7 @@ app.directive('wzTable', function () {
         $scope.filterableColumns = [];
         $scope.keys.forEach(k => {
           const key = $scope.parseKey(k);
-          const canFilterInRules = $scope.path === '/rules' && (key === 'level' || key === 'pci' || key === 'gdpr' || key === 'groups' || key === 'file' || key === 'path');
+          const canFilterInRules = $scope.path === '/rules' && (key === 'level' || key === 'file' || key === 'path');
           const canFilterInDecoders = $scope.path === '/decoders' && (key === 'path' || key === 'file');
           $scope.filterableColumns[key] = !!(canFilterInRules || canFilterInDecoders);
         });
@@ -524,12 +524,7 @@ app.directive('wzTable', function () {
         const valueTmp = typeof value !== 'string' ? value.toString() : value;
         if ($scope.filterableColumns[keyTmp]) {
           if (value !== '-' && keyTmp !== 'file') {
-            // only 'group' is accepted as a filter so it has to be overwritten
-            if (keyTmp === 'groups')
-              keyTmp = 'group';
-            // PCI, GDPR and GROUPS can contains multiple values and the api only supports one at a time, just the first value is sent
-            const filter = `${keyTmp}:${valueTmp.split(',')[0]}`
-
+            const filter = `${keyTmp}:${valueTmp}`
             $scope.$emit('applyFilter', { filter });
           } else if (keyTmp === 'file') {
             $scope.$emit('viewFileOnlyTable', { file: item, path: item.path })
