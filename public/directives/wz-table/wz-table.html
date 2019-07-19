@@ -35,7 +35,7 @@
             </th>
             <th ng-if="(path === '/agents' || (path === '/agents/groups' && adminMode) || (isLookingGroup() && adminMode) 
                 || path === '/rules/files' || path === '/decoders/files' || path === '/lists/files')"
-                class="euiTableHeaderCell wz-text-left">
+                class="euiTableHeaderCell wz-text-left" ng-style="path !== '/agents' && {'width':'350px'}">
                 Actions
             </th>
         </thead>
