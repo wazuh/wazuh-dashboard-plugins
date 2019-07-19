@@ -1,5 +1,4 @@
-<div ng-if="!ctrl.init && !ctrl.loading && ctrl.errorInit" class="wz-margin-top-16" layout="column"
-    layout-align="start space-around">
+<div ng-if="!ctrl.init && !ctrl.loading && ctrl.errorInit" class="wz-margin-top-16" layout="column" layout-align="start space-around">
     <div flex layout="row" layout-align="center center">
         <md-card flex="50" class="wz-md-card" flex>
             <md-card-content class="wz-text-center">
@@ -32,15 +31,12 @@
             <md-divider class="wz-margin-top-10"></md-divider>
             <canvas id="bar" ng-if="ctrl.lastAgent && ctrl.lastAgent.id" class="wz-margin-top-16 chart chart-doughnut"
                 chart-data="[ctrl.agentsCountActive,ctrl.agentsCountDisconnected,ctrl.agentsCountNeverConnected]"
-                chart-labels="['Active','Disconnected', 'Never connected']"
-                chart-colors="['#00a69b', '#ff645c', '#eff0f1']"
+                chart-labels="['Active','Disconnected', 'Never connected']" chart-colors="['#57C17B', '#BC52BC', '#9E3533']"
                 chart-options="{cutoutPercentage: 75, legend: {display: true,position: 'right',},responsive: false, maintainAspectRatio: false}" />
-            <div layout="row" class="wz-margin-top-16 layout-align-center-center"
-                ng-if="!ctrl.lastAgent || !ctrl.lastAgent.id">
+            <div layout="row" class="wz-margin-top-16 layout-align-center-center" ng-if="!ctrl.lastAgent || !ctrl.lastAgent.id">
                 There are no agents yet.
             </div>
-            <div layout="row" class="wz-margin-top-16 layout-align-center-center"
-                ng-if="!ctrl.lastAgent || !ctrl.lastAgent.id">
+            <div layout="row" class="wz-margin-top-16 layout-align-center-center" ng-if="!ctrl.lastAgent || !ctrl.lastAgent.id">
                 <button class="kuiButton kuiButton--success" ng-click="ctrl.openRegistrationDocs()">
                     <react-component name="EuiIcon" props="{type: 'help'}" /> How to
                 </button>
@@ -51,8 +47,7 @@
                 <react-component name="EuiIcon" props="{type:'visHeatmap'}" /> Details
             </span>
             <md-divider class="wz-margin-top-10"></md-divider>
-            <div
-                class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--directionRow euiFlexGroup--responsive wz-margin-top-4">
+            <div class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--directionRow euiFlexGroup--responsive wz-margin-top-4">
                 <div class="euiFlexItem euiFlexItem--flexGrowZero">
 
                     <div class="euiStat">
@@ -97,12 +92,10 @@
                         <div class="euiText euiText--small euiStat__description">
                             <p>Last registered agent</p>
                         </div>
-                        <p ng-if="ctrl.lastAgent && ctrl.lastAgent.id && ctrl.lastAgent.id !== '000'"
-                            ng-click="ctrl.showAgent(ctrl.lastAgent)"
+                        <p ng-if="ctrl.lastAgent && ctrl.lastAgent.id && ctrl.lastAgent.id !== '000'" ng-click="ctrl.showAgent(ctrl.lastAgent)"
                             class="euiTitle euiTitle--small euiStat__title wz-text-link cursor-pointer">
                             {{ctrl.lastAgent.name}}</p>
-                        <p ng-if="!ctrl.lastAgent || !ctrl.lastAgent.id"
-                            class="euiTitle euiTitle--small euiStat__title">
+                        <p ng-if="!ctrl.lastAgent || !ctrl.lastAgent.id" class="euiTitle euiTitle--small euiStat__title">
                             -</p>
                     </div>
                 </div>
@@ -112,12 +105,10 @@
                         <div class="euiText euiText--small euiStat__description">
                             <p>Most active agent</p>
                         </div>
-                        <p ng-if="ctrl.lastAgent && ctrl.lastAgent.id && ctrl.mostActiveAgent.id !== '000'"
-                            ng-click="ctrl.showAgent(ctrl.mostActiveAgent)"
+                        <p ng-if="ctrl.lastAgent && ctrl.lastAgent.id && ctrl.mostActiveAgent.id !== '000'" ng-click="ctrl.showAgent(ctrl.mostActiveAgent)"
                             class="euiTitle euiTitle--small euiStat__title wz-text-link cursor-pointer">
                             {{ctrl.mostActiveAgent.name}}</p>
-                        <p ng-if="!ctrl.lastAgent || !ctrl.lastAgent.id"
-                            class="euiTitle euiTitle--small euiStat__title">
+                        <p ng-if="!ctrl.lastAgent || !ctrl.lastAgent.id" class="euiTitle euiTitle--small euiStat__title">
                             -</p>
                     </div>
                 </div>
@@ -128,8 +119,7 @@
     <div layout="row" class="md-padding">
         <wz-tag-filter flex path="'/agents'" query-fn="ctrl.query(q, search)" fields-model="ctrl.searchBarModel">
         </wz-tag-filter>
-        <md-button class="agents-prev-btn btn btn-info" style="height: 48px;margin: 0px 0 0 8px!important;"
-            ng-click="ctrl.reloadList()">
+        <md-button class="agents-prev-btn btn btn-info" style="height: 48px;margin: 0px 0 0 8px!important;" ng-click="ctrl.reloadList()">
             <react-component name="EuiIcon" props="{type:'refresh'}" /> Refresh</md-button>
     </div>
 
@@ -137,13 +127,11 @@
         <md-card flex class="wz-md-card _md flex md-margin-h">
             <md-card-content>
                 <div layout="row">
-                    <wz-table custom-columns="true" flex path="'/agents'"
-                        keys="[{value: 'id', width: '75px'},'name','ip','status','group','os.name','os.version','version', {value: 'dateAdd', offset: true}, {value: 'lastKeepAlive', offset: true}]"
+                    <wz-table custom-columns="true" flex path="'/agents'" keys="[{value: 'id', width: '75px'},'name','ip','status','group','os.name','os.version','version', {value: 'dateAdd', offset: true}, {value: 'lastKeepAlive', offset: true}]"
                         allow-click="true" row-sizes="[17,15,13]"></wz-table>
                 </div>
                 <div layout="row" layout-align="end center">
-                    <button type="button" ng-click="ctrl.downloadCsv()"
-                        class="euiButtonEmpty euiButtonEmpty--primary euiButtonEmpty--small">
+                    <button type="button" ng-click="ctrl.downloadCsv()" class="euiButtonEmpty euiButtonEmpty--primary euiButtonEmpty--small">
                         <span class="euiButtonEmpty__content">
                             <react-component name="EuiIcon" props="{type:'importAction'}" />
                             <span class="euiButtonEmpty__text">Formatted</span>
