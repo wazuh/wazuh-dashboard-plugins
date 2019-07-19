@@ -103,7 +103,7 @@ export class ManagementController {
     });
 
     this.$scope.$on('viewFileOnly', (ev, params) => {
-      $scope.$broadcast('viewFileOnly', { file: params.item, path: params.path });
+      $scope.$broadcast('viewFileOnlyTable', { file: params.item, path: params.path });
     });
 
     this.$rootScope.$on('setRestarting', () => {
