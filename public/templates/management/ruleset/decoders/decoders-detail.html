@@ -21,7 +21,7 @@
                     <span class="wz-text-bold">{{dctrl.currentDecoder.position}}</span></div>
                 <div flex="40" ng-if="dctrl.currentDecoder.file" class="wz-text-truncatable">File: <span
                         class="wz-text-bold wz-text-link"
-                        ng-click="dctrl.addDetailFilter('file', dctrl.currentDecoder.file)"
+                        ng-click="dctrl.openFile(dctrl.currentDecoder.file,dctrl.currentDecoder.path)"
                         tooltip="Filter by this file" tooltip-placement="bottom">{{dctrl.currentDecoder.file}}</span>
                 </div>
                 <div flex="40" ng-if="dctrl.currentDecoder.path" class="wz-text-truncatable">Path: <span

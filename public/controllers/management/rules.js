@@ -232,6 +232,12 @@ export function RulesController(
     $scope.closeDetailView();
   };
 
+  $scope.openFile = (file,path) => {
+    if(file && path){
+      $scope.mctrl.switchFilesSubTab('rules', { parameters : {file: {file,path}, path} })
+    }
+  }
+
   //listeners
   $scope.$on('wazuhShowRule', (event, parameters) => {
     $scope.currentRule = parameters.rule;
@@ -258,6 +264,7 @@ export function RulesController(
       errorHandler.handle(error, 'Fetch file error');
     }
   };
+  
 
   $scope.closeEditingFile = async () => {
     if ($scope.currentRule) {
