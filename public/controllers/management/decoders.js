@@ -301,6 +301,12 @@ export class DecodersController {
     this.closeDetailView();
   }
 
+  openFile(file,path){
+    if(file && path){
+      this.$scope.mctrl.switchFilesSubTab('rules', { parameters : {file: {file,path}, path} })
+    }
+  }
+
   /**
    * This function changes to the decoders list view
    */
