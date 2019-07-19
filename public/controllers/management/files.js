@@ -37,6 +37,7 @@ export class FilesController {
       this.$scope.editorReadOnly = ! (this.$scope.mctrl.showFile.parameters.path === 'etc/rules' || this.$scope.mctrl.showFile.parameters.path === 'etc/decoders')
       this.editFile(this.$scope.mctrl.showFile.parameters, this.$scope.editorReadOnly);
     }
+    this.$scope.mctrl.showFile = false
     this.$scope.$on('editFile', (ev, params) => {
       this.$scope.editorReadOnly = false;
       this.editFile(params);
