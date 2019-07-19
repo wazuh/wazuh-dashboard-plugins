@@ -523,7 +523,7 @@ export function GroupsController(
         const deleteResponse = await apiReq.request(
           'DELETE',
           `/agents/group/${$scope.currentGroup.name}`,
-          { ids: itemsToSave.deletedIds }
+          { ids: itemsToSave.deletedIds.toString() }
         );
         if (deleteResponse.data.data.failed_ids) {
           failedIds.push(...deleteResponse.data.data.failed_ids);
@@ -538,7 +538,7 @@ export function GroupsController(
         $scope.failedErrors = groupBy(failedErrors, 'message') || false;
         errorHandler.info(
           `Group has been updated but an error has occurred with ${
-            failedIds.length
+          failedIds.length
           } agents`,
           '',
           true
@@ -570,7 +570,7 @@ export function GroupsController(
   };
 
   // Resetting the factory configuration
-  $scope.$on('$destroy', () => {});
+  $scope.$on('$destroy', () => { });
 
   $scope.$watch('lookingGroup', value => {
     $scope.availableAgents = {
