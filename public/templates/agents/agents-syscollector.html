@@ -1,12 +1,12 @@
 <md-content layout="column" ng-if="tab === 'syscollector'" ng-show="!load" class="">
 
-    <div layout="row" class="layout-padding" ng-if="agent && agent.status !== 'Active'">
-        <md-card flex class="wz-md-card" flex>
-            <md-card-content class="wz-text-center">
-                <i class="fa fa-fw fa-info-circle" aria-hidden="true"></i> <span class="wz-headline-title">Agent is not
-                    connected.</span>
-            </md-card-content>
-        </md-card>
+    <div layout="row" class="wz-margin-top-16 wz-margin-right-8 wz-margin-left-8" ng-if="agent && agent.status !== 'Active'">
+        <div flex class="euiCallOut euiCallOut--warning">
+            <div class="euiCallOutHeader">
+                <react-component name="EuiIcon" props="{type:'help',className:'euiCallOutHeader__title'}" />
+                <span class="euiCallOutHeader__title">This agent is never connected.</span>
+            </div>
+        </div>
     </div>
 
     <div layout="row" class="layout-padding" ng-if="agent && agent.status === 'Active' && !hasSize(syscollector)">
