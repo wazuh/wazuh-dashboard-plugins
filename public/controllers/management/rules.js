@@ -177,10 +177,10 @@ export function RulesController(
         coloredString = coloredString.replace(
           /\$\(((?!<\/span>).)*?\)(?!<\/span>)/im,
           '<span style="color: ' +
-          colors[i] +
-          ' ">' +
-          valuesArray[i] +
-          '</span>'
+            colors[i] +
+            ' ">' +
+            valuesArray[i] +
+            '</span>'
         );
       }
     }
@@ -232,11 +232,17 @@ export function RulesController(
     $scope.closeDetailView();
   };
 
-  $scope.openFile = (file,path) => {
-    if(file && path){
-      $scope.mctrl.switchFilesSubTab('rules', { parameters : {file: {file,path}, path, viewingDetail: $scope.viewingDetail} })
+  $scope.openFile = (file, path) => {
+    if (file && path) {
+      $scope.mctrl.switchFilesSubTab('rules', {
+        parameters: {
+          file: { file, path },
+          path,
+          viewingDetail: $scope.viewingDetail
+        }
+      });
     }
-  }
+  };
 
   //listeners
   $scope.$on('wazuhShowRule', (event, parameters) => {
@@ -264,7 +270,6 @@ export function RulesController(
       errorHandler.handle(error, 'Fetch file error');
     }
   };
-  
 
   $scope.closeEditingFile = async () => {
     if ($scope.currentRule) {
@@ -390,11 +395,11 @@ export function RulesController(
   });
 
   $scope.$on('applyFilter', (event, parameters) => {
-    $scope.search(parameters.filter)
+    $scope.search(parameters.filter);
   });
 
   $scope.$on('viewFileOnlyTable', (event, parameters) => {
-    parameters.viewingDetail = $scope.viewingDetail
-    $scope.mctrl.switchFilesSubTab('rules', { parameters })
+    parameters.viewingDetail = $scope.viewingDetail;
+    $scope.mctrl.switchFilesSubTab('rules', { parameters });
   });
 }

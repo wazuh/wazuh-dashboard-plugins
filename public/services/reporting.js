@@ -33,7 +33,9 @@ export class ReportingService {
   }
 
   removeAgentStatusVis(idArray) {
-    const monitoringEnabled = this.wazuhConfig.getConfig()['wazuh.monitoring.enabled'];
+    const monitoringEnabled = this.wazuhConfig.getConfig()[
+      'wazuh.monitoring.enabled'
+    ];
     if (!monitoringEnabled) {
       const visArray = idArray.filter(vis => {
         return vis !== 'Wazuh-App-Overview-General-Agents-status';
@@ -55,10 +57,11 @@ export class ReportingService {
 
       this.vis2png.clear();
 
-
       let idArray = [];
       if (tab === 'general') {
-        idArray = this.removeAgentStatusVis(this.rawVisualizations.getList().map(item => item.id));
+        idArray = this.removeAgentStatusVis(
+          this.rawVisualizations.getList().map(item => item.id)
+        );
       } else {
         idArray = this.rawVisualizations.getList().map(item => item.id);
       }
@@ -75,7 +78,7 @@ export class ReportingService {
       const array = await this.vis2png.checkArray(idArray);
       const name = `wazuh-${
         isAgents ? 'agents' : 'overview'
-        }-${tab}-${(Date.now() / 1000) | 0}.pdf`;
+      }-${tab}-${(Date.now() / 1000) | 0}.pdf`;
 
       const browserTimezone = moment.tz.guess(true);
 

@@ -47,7 +47,7 @@ export class WelcomeScreen extends Component {
     try {
       const api = JSON.parse(this.props.api).id;
       api && this.props.setExtensions(api, extensions);
-    } catch (error) { } //eslint-disable-line
+    } catch (error) {} //eslint-disable-line
   }
 
   buildTabCard(tab, icon) {

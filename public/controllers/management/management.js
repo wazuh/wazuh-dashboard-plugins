@@ -58,7 +58,7 @@ export class ManagementController {
     });
 
     this.$scope.$on('setCurrentRule', (ev, params) => {
-      this.setCurrentRule(params)
+      this.setCurrentRule(params);
     });
 
     this.$scope.$on('removeCurrentRule', () => {
@@ -101,7 +101,10 @@ export class ManagementController {
     });
 
     this.$scope.$on('viewFileOnly', (ev, params) => {
-      $scope.$broadcast('viewFileOnlyTable', { file: params.item, path: params.path });
+      $scope.$broadcast('viewFileOnlyTable', {
+        file: params.item,
+        path: params.path
+      });
     });
 
     this.$rootScope.$on('setRestarting', () => {
@@ -229,12 +232,11 @@ export class ManagementController {
     });
   }
 
-
-setCurrentRule(params){
-  this.currentRule = (params || {}).currentRule || false;
-  this.$location.search('currentRule', true);
-  this.appState.setNavigation({ status: true });
-}
+  setCurrentRule(params) {
+    this.currentRule = (params || {}).currentRule || false;
+    this.$location.search('currentRule', true);
+    this.appState.setNavigation({ status: true });
+  }
 
   /**
    * This switch to a selected tab
@@ -294,7 +296,7 @@ setCurrentRule(params){
   switchFilesSubTab(flag, showFile) {
     this.managingFiles = flag || true;
     if (showFile) {
-      this.showFile = showFile
+      this.showFile = showFile;
     }
   }
 

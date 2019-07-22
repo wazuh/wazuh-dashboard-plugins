@@ -562,7 +562,7 @@ export class AgentsController {
         this.$scope.agent.status =
           (((agentInfo || {}).data || {}).data || {}).status ||
           this.$scope.agent.status;
-      } catch (error) { } // eslint-disable-line
+      } catch (error) {} // eslint-disable-line
     }
 
     try {
@@ -598,7 +598,7 @@ export class AgentsController {
       if (tab === 'syscollector')
         try {
           await this.loadSyscollector(this.$scope.agent.id);
-        } catch (error) { } // eslint-disable-line
+        } catch (error) {} // eslint-disable-line
       if (tab === 'configuration') {
         this.$scope.switchConfigurationTab('welcome');
       } else {
@@ -682,7 +682,8 @@ export class AgentsController {
       `/agents/${this.$scope.agent.id}/group/is_sync`,
       {}
     );
-    this.$scope.isSynchronized = (((isSync || {}).data || {}).data || {}).synced || false;
+    this.$scope.isSynchronized =
+      (((isSync || {}).data || {}).data || {}).synced || false;
     this.$scope.$applyAsync();
   }
 
@@ -861,9 +862,7 @@ export class AgentsController {
         {}
       );
       this.errorHandler.info(
-        `Policy monitoring scan launched successfully on agent ${
-        this.$scope.agent.id
-        }`,
+        `Policy monitoring scan launched successfully on agent ${this.$scope.agent.id}`,
         ''
       );
     } catch (error) {

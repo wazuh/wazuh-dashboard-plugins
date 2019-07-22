@@ -33,13 +33,19 @@ export class FilesController {
   $onInit() {
     const configuration = this.wazuhConfig.getConfig();
     this.adminMode = !!(configuration || {}).admin;
-    if(this.$scope.mctrl.showFile){
-      this.$scope.editorReadOnly = ! (this.$scope.mctrl.showFile.parameters.path === 'etc/rules' || this.$scope.mctrl.showFile.parameters.path === 'etc/decoders')
-      this.editFile(this.$scope.mctrl.showFile.parameters, this.$scope.editorReadOnly);
-      this.$scope.goBack = true
-      this.$scope.viewingDetail = this.$scope.mctrl.showFile.parameters.viewingDetail
+    if (this.$scope.mctrl.showFile) {
+      this.$scope.editorReadOnly = !(
+        this.$scope.mctrl.showFile.parameters.path === 'etc/rules' ||
+        this.$scope.mctrl.showFile.parameters.path === 'etc/decoders'
+      );
+      this.editFile(
+        this.$scope.mctrl.showFile.parameters,
+        this.$scope.editorReadOnly
+      );
+      this.$scope.goBack = true;
+      this.$scope.viewingDetail = this.$scope.mctrl.showFile.parameters.viewingDetail;
     }
-    this.$scope.mctrl.showFile = false
+    this.$scope.mctrl.showFile = false;
     this.$scope.$on('editFile', (ev, params) => {
       this.$scope.editorReadOnly = false;
       this.editFile(params);
@@ -56,13 +62,15 @@ export class FilesController {
       this.$scope.editingFile = false;
       this.$scope.editorReadOnly = false;
       this.$scope.fetchedXML = null;
-      if(this.$scope.goBack){
-        if(this.$scope.viewingDetail){
-          this.$scope.mctrl.setCurrentRule({currentRule : this.$scope.mctrl.currentRule})
-          this.$scope.mctrl.currentRule = null
+      if (this.$scope.goBack) {
+        if (this.$scope.viewingDetail) {
+          this.$scope.mctrl.setCurrentRule({
+            currentRule: this.$scope.mctrl.currentRule
+          });
+          this.$scope.mctrl.currentRule = null;
         }
-        this.$scope.mctrl.setRulesTab(this.$scope.mctrl.globalRulesetTab)
-        this.$scope.goBack = false
+        this.$scope.mctrl.setRulesTab(this.$scope.mctrl.globalRulesetTab);
+        this.$scope.goBack = false;
       }
       this.search();
       this.$scope.$applyAsync();
@@ -101,13 +109,13 @@ export class FilesController {
           isOverwrite: !!this.overwriteError
         };
         (isNewFile && this.$scope.type === 'rules') ||
-          (!isNewFile && this.$scope.currentFile.type === 'rule')
+        (!isNewFile && this.$scope.currentFile.type === 'rule')
           ? (objParam.rule = isNewFile
-            ? this.selectedItem
-            : this.$scope.currentFile)
+              ? this.selectedItem
+              : this.$scope.currentFile)
           : (objParam.decoder = isNewFile
-            ? this.selectedItem
-            : this.$scope.currentFile);
+              ? this.selectedItem
+              : this.$scope.currentFile);
         this.$scope.$broadcast('saveXmlFile', objParam);
         this.$scope.$applyAsync();
       }
@@ -157,13 +165,13 @@ export class FilesController {
       this.$scope.fetchedXML =
         this.$scope.type === 'rules'
           ? await this.rulesetHandler.getRuleConfiguration(
-            this.$scope.currentFile.file,
-            readonly
-          )
+              this.$scope.currentFile.file,
+              readonly
+            )
           : await this.rulesetHandler.getDecoderConfiguration(
-            this.$scope.currentFile.file,
-            readonly
-          );
+              this.$scope.currentFile.file,
+              readonly
+            );
       this.$scope.$applyAsync();
       if (!readonly) {
         this.$scope.$broadcast('fetchedFile', { data: this.$scope.fetchedXML });

@@ -1041,16 +1041,12 @@ export class WazuhReportingCtrl {
         if (lastScan && lastScan.data) {
           if (lastScan.data.start && lastScan.data.end) {
             this.dd.content.push({
-              text: `Last policy monitoring scan was executed from ${
-                lastScan.data.start
-              } to ${lastScan.data.end}.`,
+              text: `Last policy monitoring scan was executed from ${lastScan.data.start} to ${lastScan.data.end}.`,
               style: 'standard'
             });
           } else if (lastScan.data.start) {
             this.dd.content.push({
-              text: `Policy monitoring scan is currently in progress for this agent (started on ${
-                lastScan.data.start
-              }).`,
+              text: `Policy monitoring scan is currently in progress for this agent (started on ${lastScan.data.start}).`,
               style: 'standard'
             });
           } else {
@@ -1168,15 +1164,11 @@ export class WazuhReportingCtrl {
         if (lastScan && lastScan.data) {
           if (lastScan.data.start && lastScan.data.end) {
             this.dd.content.push({
-              text: `Last file integrity monitoring scan was executed from ${
-                lastScan.data.start
-              } to ${lastScan.data.end}.`
+              text: `Last file integrity monitoring scan was executed from ${lastScan.data.start} to ${lastScan.data.end}.`
             });
           } else if (lastScan.data.start) {
             this.dd.content.push({
-              text: `File integrity monitoring scan is currently in progress for this agent (started on ${
-                lastScan.data.start
-              }).`
+              text: `File integrity monitoring scan is currently in progress for this agent (started on ${lastScan.data.start}).`
             });
           } else {
             this.dd.content.push({
