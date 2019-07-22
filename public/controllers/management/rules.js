@@ -234,7 +234,7 @@ export function RulesController(
 
   $scope.openFile = (file,path) => {
     if(file && path){
-      $scope.mctrl.switchFilesSubTab('rules', { parameters : {file: {file,path}, path} })
+      $scope.mctrl.switchFilesSubTab('rules', { parameters : {file: {file,path}, path, viewingDetail: $scope.viewingDetail} })
     }
   }
 
@@ -394,6 +394,7 @@ export function RulesController(
   });
 
   $scope.$on('viewFileOnlyTable', (event, parameters) => {
+    parameters.viewingDetail = $scope.viewingDetail
     $scope.mctrl.switchFilesSubTab('rules', { parameters })
   });
 }
