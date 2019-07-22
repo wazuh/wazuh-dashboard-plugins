@@ -15,6 +15,8 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Remove path filter from custom rules and decoders [895792e](https://github.com/wazuh/wazuh-kibana-app/pull/1615/commits/895792e6e6d9401b3293d5e16352b9abef515096)
 - Show path column in rules and decoders [6f49816](https://github.com/wazuh/wazuh-kibana-app/pull/1615/commits/6f49816c71b5999d77bf9e3838443627c9be945d)
 - Removed SCA overview dashboard [94ebbff](https://github.com/wazuh/wazuh-kibana-app/pull/1615/commits/94ebbff231cbfb6d793130e0b9ea855baa755a1c)
+- Disabled last custom column removal [f1ef7de](https://github.com/wazuh/wazuh-kibana-app/pull/1615/commits/f1ef7de1a34bbe53a899596002e8153b95e7dc0e)
+- Agents messages across sections unification [8fd7e36](https://github.com/wazuh/wazuh-kibana-app/pull/1615/commits/8fd7e36286fa9dfd03a797499af6ffbaa90b00e1)
 
 ### Fixed
 
@@ -25,6 +27,9 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fix missing permalink virustotal visualization [1b57529](https://github.com/wazuh/wazuh-kibana-app/pull/1615/commits/1b57529758fccdeb3ac0840e66a8aafbe4757a96)
 - Improved wz-table performance [224bd6f](https://github.com/wazuh/wazuh-kibana-app/pull/1615/commits/224bd6f31235c81ba01755c3c1e120c3f86beafd)
 - Fix inconsistent data between visualizations and tables in Overview Security Events [b12c600](https://github.com/wazuh/wazuh-kibana-app/pull/1615/commits/b12c600578d80d0715507dec4624a4ebc27ea573)
+- Timezone applied in cluster status [a4f620d](https://github.com/wazuh/wazuh-kibana-app/pull/1615/commits/a4f620d398f5834a6d2945af892a462425ca3bec)
+- Fixed Overview Security Events report when wazuh.monitoring is disabled [1c26da0](https://github.com/wazuh/wazuh-kibana-app/pull/1615/commits/1c26da05a0b6daf727e15c13b819111aa4e4e913)
+- Fixes in APIs management [2143943](https://github.com/wazuh/wazuh-kibana-app/pull/1615/commits/2143943a5049cbb59bb8d6702b5a56cbe0d27a2a)
 
 ## Wazuh v3.9.3 - Kibana v6.8.1 / v7.1.1 / v7.2.0 - Revision 523
 
