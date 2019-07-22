@@ -164,7 +164,7 @@ export function settingsWizard(
         });
     };
 
-    const setUpCredentials = (msg) => {
+    const setUpCredentials = (msg, redirect = false) => {
       const comeFromWizard = wzMisc.getWizard();
       !comeFromWizard &&
         errorHandler.handle(
@@ -173,7 +173,10 @@ export function settingsWizard(
           true
         );
       wzMisc.setWizard(true);
-      if (!$location.path().includes('/settings')) {
+      if (redirect) {
+        appState.setCurrentAPI(redirect);
+      }
+      else if (!$location.path().includes('/settings')) {
         $location.search('_a', null);
         $location.search('tab', 'api');
         $location.path('/settings');
@@ -233,9 +236,16 @@ export function settingsWizard(
               callCheckStored();
             } else {
               appState.removeCurrentAPI();
-              setUpCredentials(data.data.length > 0 ?
-                'Wazuh App: Default API has been updated.' :
-                'Wazuh App: Please set up Wazuh API credentials.');
+              if (data.data.length > 0) {
+                const defaultApi =
+                  JSON.stringify({
+                    name: data.data[0]._source.cluster_info.manager,
+                    id: data.data[0]._id
+                  });
+                setUpCredentials('Wazuh App: Default API has been updated.', defaultApi);
+              } else {
+                setUpCredentials('Wazuh App: Please set up Wazuh API credentials.', false);
+              }
             }
           })
           .catch(() => {
