@@ -36,6 +36,8 @@ export class FilesController {
     if(this.$scope.mctrl.showFile){
       this.$scope.editorReadOnly = ! (this.$scope.mctrl.showFile.parameters.path === 'etc/rules' || this.$scope.mctrl.showFile.parameters.path === 'etc/decoders')
       this.editFile(this.$scope.mctrl.showFile.parameters, this.$scope.editorReadOnly);
+      this.$scope.goBack = true
+      this.$scope.viewingDetail = this.$scope.mctrl.showFile.parameters.viewingDetail
     }
     this.$scope.mctrl.showFile = false
     this.$scope.$on('editFile', (ev, params) => {
@@ -54,6 +56,13 @@ export class FilesController {
       this.$scope.editingFile = false;
       this.$scope.editorReadOnly = false;
       this.$scope.fetchedXML = null;
+      if(this.$scope.goBack && !this.$scope.viewingDetail){
+        if(this.$scope.viewingDetail){
+          this.$scope.mctrl.setCurrentRule({currentRule : this.$scope.mctrl.currentRule})
+        }
+        this.$scope.mctrl.setRulesTab(this.$scope.mctrl.globalRulesetTab)
+        this.$scope.goBack = false
+      }
       this.search();
       this.$scope.$applyAsync();
     };

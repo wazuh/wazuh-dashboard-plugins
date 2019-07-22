@@ -234,12 +234,13 @@ export function RulesController(
 
   $scope.openFile = (file,path) => {
     if(file && path){
-      $scope.mctrl.switchFilesSubTab('rules', { parameters : {file: {file,path}, path} })
+      $scope.mctrl.switchFilesSubTab('rules', { parameters : {file: {file,path}, path, viewingDetail: $scope.viewingDetail} })
     }
   }
 
   //listeners
   $scope.$on('wazuhShowRule', (event, parameters) => {
+    console.log("aee")
     $scope.currentRule = parameters.rule;
     $scope.$emit('setCurrentRule', { currentRule: $scope.currentRule });
     if (!(Object.keys(($scope.currentRule || {}).details || {}) || []).length) {
@@ -267,6 +268,7 @@ export function RulesController(
   
 
   $scope.closeEditingFile = async () => {
+    console.log("ee")
     if ($scope.currentRule) {
       try {
         const ruleReloaded = await apiReq.request(
@@ -394,6 +396,7 @@ export function RulesController(
   });
 
   $scope.$on('viewFileOnlyTable', (event, parameters) => {
+    parameters.viewingDetail = $scope.viewingDetail
     $scope.mctrl.switchFilesSubTab('rules', { parameters })
   });
 }

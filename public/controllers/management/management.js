@@ -58,9 +58,7 @@ export class ManagementController {
     });
 
     this.$scope.$on('setCurrentRule', (ev, params) => {
-      this.currentRule = (params || {}).currentRule || false;
-      this.$location.search('currentRule', true);
-      this.appState.setNavigation({ status: true });
+      this.setCurrentRule(params)
     });
 
     this.$scope.$on('removeCurrentRule', () => {
@@ -230,6 +228,13 @@ export class ManagementController {
       reloadConfigSubTab: true
     });
   }
+
+
+setCurrentRule(params){
+  this.currentRule = (params || {}).currentRule || false;
+  this.$location.search('currentRule', true);
+  this.appState.setNavigation({ status: true });
+}
 
   /**
    * This switch to a selected tab
