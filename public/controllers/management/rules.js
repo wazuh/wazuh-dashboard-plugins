@@ -240,7 +240,6 @@ export function RulesController(
 
   //listeners
   $scope.$on('wazuhShowRule', (event, parameters) => {
-    console.log("aee")
     $scope.currentRule = parameters.rule;
     $scope.$emit('setCurrentRule', { currentRule: $scope.currentRule });
     if (!(Object.keys(($scope.currentRule || {}).details || {}) || []).length) {
@@ -268,7 +267,6 @@ export function RulesController(
   
 
   $scope.closeEditingFile = async () => {
-    console.log("ee")
     if ($scope.currentRule) {
       try {
         const ruleReloaded = await apiReq.request(

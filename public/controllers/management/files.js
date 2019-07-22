@@ -56,9 +56,10 @@ export class FilesController {
       this.$scope.editingFile = false;
       this.$scope.editorReadOnly = false;
       this.$scope.fetchedXML = null;
-      if(this.$scope.goBack && !this.$scope.viewingDetail){
+      if(this.$scope.goBack){
         if(this.$scope.viewingDetail){
           this.$scope.mctrl.setCurrentRule({currentRule : this.$scope.mctrl.currentRule})
+          this.$scope.mctrl.currentRule = null
         }
         this.$scope.mctrl.setRulesTab(this.$scope.mctrl.globalRulesetTab)
         this.$scope.goBack = false
