@@ -26,7 +26,7 @@ export function settingsWizard(
 ) {
   try {
     const deferred = $q.defer();
-
+    let checkedApi = false;
     const checkResponse = data => {
       let fromElastic = false;
       if (parseInt(data.data.error) === 2) {
@@ -156,11 +156,8 @@ export function settingsWizard(
         })
         .catch(() => {
           appState.removeCurrentAPI();
-
-          $location.search('tab', 'welcome');
-          $location.path('/overview');
-
-          deferred.resolve();
+          setUpCredentials('Wazuh App: Please set up Wazuh API credentials.', false);
+    
         });
     };
 
