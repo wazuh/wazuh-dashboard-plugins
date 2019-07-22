@@ -241,7 +241,7 @@ export function settingsWizard(
                   JSON.stringify({
                     name: data.data[0]._source.cluster_info.manager,
                     id: data.data[0]._id
-                  })
+                  });
                 setUpCredentials('Wazuh App: Default API has been updated.', defaultApi);
               } else {
                 setUpCredentials('Wazuh App: Please set up Wazuh API credentials.', false);
