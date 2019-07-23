@@ -103,12 +103,8 @@ export class UpdateConfigurationFile {
       }
       this.busy = true;
       const configuration = getConfiguration() || {};
-      if (!configuration['wazuh.hosts']) {
-        throw new Error('There are not configured hosts.');
-      } else {
-        this.busy = false;
-        return configuration['wazuh.hosts'] || [];
-      }
+      this.busy = false;
+      return configuration['wazuh.hosts'] || [];
     } catch (error) {
       this.busy = false;
       throw error;
