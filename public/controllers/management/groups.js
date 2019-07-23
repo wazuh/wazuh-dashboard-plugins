@@ -523,7 +523,7 @@ export function GroupsController(
         const deleteResponse = await apiReq.request(
           'DELETE',
           `/agents/group/${$scope.currentGroup.name}`,
-          { ids: itemsToSave.deletedIds }
+          { ids: itemsToSave.deletedIds.toString() }
         );
         if (deleteResponse.data.data.failed_ids) {
           failedIds.push(...deleteResponse.data.data.failed_ids);
@@ -568,7 +568,7 @@ export function GroupsController(
   };
 
   // Resetting the factory configuration
-  $scope.$on('$destroy', () => {});
+  $scope.$on('$destroy', () => { });
 
   $scope.$watch('lookingGroup', value => {
     $scope.availableAgents = {
