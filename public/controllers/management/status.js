@@ -10,7 +10,7 @@
  * Find more information about this on the LICENSE file.
  */
 export class StatusController {
-  constructor($scope, errorHandler, apiReq, wazuhConfig) {
+  constructor($scope, errorHandler, apiReq, wazuhConfig, timeService) {
     this.$scope = $scope;
     this.errorHandler = errorHandler;
     this.apiReq = apiReq;
@@ -19,6 +19,7 @@ export class StatusController {
     this.selectedNode = false;
     this.clusterError = false;
     this.wazuhConfig = wazuhConfig;
+    this.timeService = timeService;
   }
 
   /**
@@ -40,6 +41,14 @@ export class StatusController {
     const arr = [];
     for (const key in obj) arr.push({ key, value: obj[key] });
     return arr;
+  }
+
+  offsetTimestamp(time) {
+    try {
+      return this.timeService.offset(time);
+    } catch (error) {
+      return time !== '-' ? `${time} (UTC)` : time;
+    }
   }
 
   /**

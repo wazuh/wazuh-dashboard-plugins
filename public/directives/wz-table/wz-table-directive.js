@@ -59,26 +59,31 @@ app.directive('wzTable', function () {
       $scope.showColumns = false;
       $scope.scapepath = $scope.path.split('/').join('');
       $scope.originalkeys = $scope.keys.map((key, idx) => ({ key, idx }));
+
       $scope.updateColumns = key => {
-        const str = key.key.value || key.key;
-        const cleanArray = $scope.keys.map(item => item.value || item);
-        if (cleanArray.includes(str)) {
-          const idx = cleanArray.indexOf(str);
-          if (idx > -1) {
-            $scope.keys.splice(idx, 1);
-          }
-        } else {
-          const originalIdx = $scope.originalkeys.findIndex(
-            item => (item.key.value || item.key) === (key.key.value || key.key)
-          );
-          if (originalIdx >= 0) {
-            $scope.keys.splice(originalIdx, 0, key.key);
+        if (!$scope.isLastKey(key)) {
+          const str = key.key.value || key.key;
+          const cleanArray = $scope.keys.map(item => item.value || item);
+          if (cleanArray.includes(str)) {
+            const idx = cleanArray.indexOf(str);
+            if (idx > -1) {
+              $scope.keys.splice(idx, 1);
+            }
           } else {
-            $scope.keys.push(key.key);
+            const originalIdx = $scope.originalkeys.findIndex(
+              item =>
+                (item.key.value || item.key) === (key.key.value || key.key)
+            );
+            if (originalIdx >= 0) {
+              $scope.keys.splice(originalIdx, 0, key.key);
+            } else {
+              $scope.keys.push(key.key);
+            }
           }
+          init(true);
         }
-        init(true);
       };
+
       $scope.exists = key => {
         const str = key.key.value || key.key;
         for (const k of $scope.keys) if ((k.value || k) === str) return true;
@@ -540,6 +545,13 @@ app.directive('wzTable', function () {
         }
       };
 
+      $scope.isLastKey = (key) => {
+        const exists = $scope.exists(key);
+        const keysLength = $scope.keys.length === 1;
+        const keyValue = key.key.value || key.key;
+        const lastKeyValue = $scope.keys[0].value || $scope.keys[0];
+        return exists && keysLength && keyValue && lastKeyValue;
+      }
 
       $scope.setColResizable = () => {
         $(`#table${$scope.scapepath} th`).resizable({
