@@ -20,7 +20,8 @@ export default function ({ getService, getPageObjects }) {
     });
 
     it('should take you to Settings and warn you there are no API credentials available', async () => {
-      expect(await browser.getCurrentUrl()).to.contain('app/wazuh#/settings?_g=()&tab=api');
+      expect(await browser.getCurrentUrl()).to.contain('settings');
+      expect(await browser.getCurrentUrl()).to.contain('tab=api');
     });
 
     it('should appear "No API" on the top right corner', async () => {
