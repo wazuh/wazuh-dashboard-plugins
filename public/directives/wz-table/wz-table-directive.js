@@ -168,6 +168,7 @@ app.directive('wzTable', function () {
               filters: instance.filters
             });
           }
+          filterableColumns();
           if ($scope.customColumns) {
             setTimeout(() => {
               $scope.setColResizable();
@@ -504,6 +505,41 @@ app.directive('wzTable', function () {
         }
         $c.remove();
       };
+
+      $scope.parseKey = key => {		
+        return key ? key.value || key : key;		
+      };
+
+      const filterableColumns = () => {
+        $scope.filterableColumns = [];
+        $scope.keys.forEach(k => {
+          const key = $scope.parseKey(k);
+          const canFilterInRules =
+            $scope.path === '/rules' &&
+            (key === 'level' || key === 'file' || key === 'path');
+          const canFilterInDecoders =
+            $scope.path === '/decoders' && (key === 'path' || key === 'file');
+          $scope.filterableColumns[key] = !!(
+            canFilterInRules || canFilterInDecoders
+          );
+        });
+      };
+
+      $scope.handleClick = (key, item, ev) => {
+        const value = $scope.parseValue(key, item);
+        let keyTmp = $scope.parseKey(key);
+        const valueTmp = typeof value !== 'string' ? value.toString() : value;
+        if ($scope.filterableColumns[keyTmp]) {
+          if (value !== '-' && keyTmp !== 'file') {
+            const filter = `${keyTmp}:${valueTmp}`;
+            $scope.$emit('applyFilter', { filter });
+          } else if (keyTmp === 'file') {
+            $scope.$emit('viewFileOnlyTable', { file: item, path: item.path });
+          }
+          ev.stopPropagation();
+        }
+      };
+
 
       $scope.setColResizable = () => {
         $(`#table${$scope.scapepath} th`).resizable({
