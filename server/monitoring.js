@@ -98,9 +98,7 @@ export class Monitoring {
       !this.quiet &&
         log(
           'monitoring:configuration',
-          `wazuh.monitoring.pattern: ${this.index_pattern} (index prefix: ${
-            this.index_prefix
-          })`,
+          `wazuh.monitoring.pattern: ${this.index_pattern} (index prefix: ${this.index_prefix})`,
           'debug'
         );
     } catch (error) {
@@ -123,7 +121,11 @@ export class Monitoring {
       if (!maxSize) {
         throw new Error('You must provide a max size');
       }
-
+      log(
+        'monitoring:checkStatus',
+        `Prepare OptionsObject for API: ${api.url}:${api.port}`,
+        'debug'
+      );
       const options = ApiHelper.buildOptionsObject(api);
 
       const payload = {
@@ -140,7 +142,11 @@ export class Monitoring {
       );
 
       await this.saveStatus(api.clusterName);
-
+      log(
+        'monitoring:checkStatus',
+        `Status saved for API ${api.clusterName}`,
+        'debug'
+      );
       return;
     } catch (error) {
       this.agentsArray = [];
@@ -164,7 +170,11 @@ export class Monitoring {
         limit: 1,
         q: 'id!=000'
       };
-
+      log(
+        'monitoring:checkAndSaveStatus',
+        `Prepare OptionsObject for API: ${api.url}:${api.port}`,
+        'debug'
+      );
       const options = ApiHelper.buildOptionsObject(api);
 
       const response = await needle(
@@ -190,6 +200,11 @@ export class Monitoring {
         (((clusterName || {}).body || {}).data || {}).cluster || false;
 
       if (!response.error && ((response.body || {}).data || {}).totalItems) {
+        log(
+          'monitoring:checkAndSaveStatus',
+          `Calling checkStatus for API: ${api.url}:${api.port}`,
+          'debug'
+        );
         await this.checkStatus(api, response.body.data.totalItems);
       } else if ((response || {}).error) {
         const msg = ((response || {}).body || {}).message || false;
@@ -232,7 +247,11 @@ export class Monitoring {
               t._source.api_port === element._source.api_port
           )
       );
-
+      log(
+        'monitoring:loadCredentials',
+        `Number of valid APIs found: ${filteredApis.length}`,
+        'debug'
+      );
       for (const element of filteredApis) {
         const apiEntry = {
           user: element._source.api_user,
@@ -244,7 +263,11 @@ export class Monitoring {
           port: element._source.api_port,
           insecure: element._source.insecure
         };
-
+        log(
+          'monitoring:loadCredentials',
+          `Calling checkAndSaveStatus for API: ${apiEntry.url}:${apiEntry.port}`,
+          'debug'
+        );
         await this.checkAndSaveStatus(apiEntry);
       }
 
@@ -398,6 +421,11 @@ export class Monitoring {
     try {
       let body = '';
       if (this.agentsArray.length > 0) {
+        log(
+          'monitoring:insertDocument',
+          `Calling pushBulkAnyIndex for ${this.agentsArray.length} agents`,
+          'debug'
+        );
         for (const element of this.agentsArray) {
           body += '{ "index":  { "_index": "' + datedIndex + '" } }\n';
           let date = new Date(Date.now()).toISOString();
@@ -409,7 +437,11 @@ export class Monitoring {
         if (body === '') return;
 
         await this.wzWrapper.pushBulkAnyIndex(datedIndex, body);
-
+        log(
+          'monitoring:insertDocument',
+          `Calling pushBulkAnyIndex went fine`,
+          'debug'
+        );
         this.agentsArray = [];
       }
       return;

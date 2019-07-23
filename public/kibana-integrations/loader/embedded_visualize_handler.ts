@@ -87,6 +87,8 @@ export class EmbeddedVisualizeHandler {
    * This should not be used by any plugin.
    * @ignore
    */
+
+
   public readonly data$: Rx.Observable<any>;
   public readonly inspectorAdapters: Adapters = {};
   private vis: Vis;
@@ -450,7 +452,6 @@ export class EmbeddedVisualizeHandler {
     this.dataLoaderParams.aggs = this.vis.getAggConfig();
     this.dataLoaderParams.forceFetch = forceFetch;
     this.dataLoaderParams.inspectorAdapters = this.inspectorAdapters;
-
     this.vis.filters = { timeRange: this.dataLoaderParams.timeRange };
     this.vis.requestError = undefined;
     this.vis.showRequestError = false;
@@ -485,12 +486,13 @@ export class EmbeddedVisualizeHandler {
     if (this.dataLoaderParams.searchSource && this.dataLoaderParams.searchSource.cancelQueued) {
       this.dataLoaderParams.searchSource.cancelQueued();
     }
-
+    
     this.vis.requestError = error;
     this.vis.showRequestError =
       error.type && ['NO_OP_SEARCH_STRATEGY', 'UNSUPPORTED_QUERY'].includes(error.type);
-
-    toastNotifications.addDanger({
+    
+    //Do not show notification toast if it's already being shown a similar toast
+     toastNotifications.addDanger({
       title: i18n.translate('common.ui.visualize.dataLoaderError', {
         defaultMessage: 'Error in visualization',
       }),

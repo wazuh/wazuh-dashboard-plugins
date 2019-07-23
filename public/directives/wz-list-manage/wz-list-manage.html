@@ -2,7 +2,7 @@
     <div layout="row" ng-class="hideClose ? ['wz-margin-top-8', 'md-padding-h'] : ''">
         <span ng-if="!hideClose" ng-click='closeFn()' class='btn btn-info wz-margin-right-8'>Cancel</span>
         <button
-            ng-disabled='!(items || []).length || (currentList.new && !currentList.newName) || doingSaving || overwriteError'
+            ng-disabled='!(currentItems || []).length || (currentList.new && !currentList.newName) || doingSaving || overwriteError'
             ng-click='saveList()' class='btn wz-button pull-right'>
             <span><i aria-hidden='true' class='fa fa-fw fa-save'
                     ng-class="doingSaving ? 'fa-spin fa-spinner' : ''"></i>Save

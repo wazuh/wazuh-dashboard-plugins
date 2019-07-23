@@ -25,13 +25,31 @@
         <!-- Configuration block -->
         <div class="wz-padding-top-10">
 
-            <table class="table table-striped table-condensed" style="table-layout: fixed !important;">
+            <table class="table table-striped table-condensed" style="table-layout: fixed !important;" ng-if="currentConfig['syscheck-syscheck'].syscheck.ignore">
                 <thead class="wz-text-bold">
                     <th class="wz-text-left">Path</th>
                 </thead>
                 <tbody class="wz-word-wrap">
                     <tr ng-repeat="path in currentConfig['syscheck-syscheck'].syscheck.ignore">
                         <td>{{path}}</td>
+                    </tr>
+                </tbody>
+            </table>
+
+        </div>
+
+        <md-divider class="wz-margin-top-10"></md-divider>
+
+        <!-- Configuration block -->
+        <div class="wz-padding-top-10">
+
+            <table class="table table-striped table-condensed" style="table-layout: fixed !important;" ng-if="currentConfig['syscheck-syscheck'].syscheck.ignore_sregex">
+                <thead class="wz-text-bold">
+                    <th class="wz-text-left">Sregex</th>
+                </thead>
+                <tbody class="wz-word-wrap">
+                    <tr ng-repeat="sreg in currentConfig['syscheck-syscheck'].syscheck.ignore_sregex">
+                        <td>{{sreg}}</td>
                     </tr>
                 </tbody>
             </table>
@@ -68,7 +86,7 @@
         <!-- Configuration block -->
         <div class="wz-padding-top-10">
 
-            <table class="table table-striped table-condensed" style="table-layout: fixed !important;">
+            <table class="table table-striped table-condensed" style="table-layout: fixed !important;" ng-if="currentConfig['syscheck-syscheck'].syscheck.registry_ignore">
                 <thead class="wz-text-bold">
                     <th class="wz-text-left">Entry</th>
                     <th class="wz-text-left">Arch</th>
@@ -77,6 +95,56 @@
                     <tr ng-repeat="registry in currentConfig['syscheck-syscheck'].syscheck.registry_ignore">
                         <td>{{registry.entry}}</td>
                         <td>{{registry.arch}}</td>
+                    </tr>
+                </tbody>
+            </table>
+
+        </div>
+
+        <!-- Configuration block -->
+        <div class="wz-padding-top-10" ng-if="currentConfig['syscheck-syscheck'].syscheck.registry_ignore_sregex">
+
+            <table class="table table-striped table-condensed" style="table-layout: fixed !important;">
+                <thead class="wz-text-bold">
+                    <th class="wz-text-left">Entry Sregex</th>
+                    <th class="wz-text-left">Arch</th>
+                </thead>
+                <tbody class="wz-word-wrap">
+                    <tr ng-repeat="registry in currentConfig['syscheck-syscheck'].syscheck.registry_ignore_sregex">
+                        <td>{{registry.entry}}</td>
+                        <td>{{registry.arch}}</td>
+                    </tr>
+                </tbody>
+            </table>
+
+        </div>
+
+        <!-- Configuration block -->
+        <div class="wz-padding-top-10" ng-if="currentConfig['syscheck-syscheck'].syscheck.ignore">
+
+            <table class="table table-striped table-condensed" style="table-layout: fixed !important;">
+                <thead class="wz-text-bold">
+                    <th class="wz-text-left">Path</th>
+                </thead>
+                <tbody class="wz-word-wrap">
+                    <tr ng-repeat="registry in currentConfig['syscheck-syscheck'].syscheck.ignore">
+                        <td>{{registry}}
+                    </tr>
+                </tbody>
+            </table>
+
+        </div>
+
+        <!-- Configuration block -->
+        <div class="wz-padding-top-10" ng-if="currentConfig['syscheck-syscheck'].syscheck.ignore_sregex">
+
+            <table class="table table-striped table-condensed" style="table-layout: fixed !important;">
+                <thead class="wz-text-bold">
+                    <th class="wz-text-left">Sregex</th>
+                </thead>
+                <tbody class="wz-word-wrap">
+                    <tr ng-repeat="registry in currentConfig['syscheck-syscheck'].syscheck.ignore_sregex">
+                        <td>{{registry}}
                     </tr>
                 </tbody>
             </table>

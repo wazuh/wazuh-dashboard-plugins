@@ -216,11 +216,10 @@ export class ApiTable extends Component {
         render: item => (
           <EuiToolTip position="bottom" content={<p>Edit</p>}>
             <EuiButtonIcon
-              aria-label="Edit"
               onClick={() => this.toggleDetails(item)}
               data-test-subj="apiTableEditButton"
               aria-label={
-                itemIdToExpandedRowMap[item.id] ? 'Collapse' : 'Expand'
+                itemIdToExpandedRowMap[item.id] ? 'Collapse edition' : 'Expand edition'
               }
               iconType={
                 itemIdToExpandedRowMap[item.id] ? 'arrowUp' : 'arrowDown'

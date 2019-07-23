@@ -30,8 +30,8 @@ Visualize and analyze Wazuh alerts stored in Elasticsearch using our Kibana app 
 
 ## Requisites
 
-- Wazuh HIDS 3.9.3
-- Wazuh RESTful API 3.9.3
+- Wazuh HIDS 3.9.4
+- Wazuh RESTful API 3.9.4
 - Kibana 7.2.0
 - Elasticsearch 7.2.0
 
@@ -42,13 +42,13 @@ Install the app
 - With sudo:
 
 ```
-sudo -u kibana /usr/share/kibana/bin/kibana-plugin install https://packages.wazuh.com/wazuhapp/wazuhapp-3.9.3_7.2.0.zip
+sudo -u kibana /usr/share/kibana/bin/kibana-plugin install https://packages.wazuh.com/wazuhapp/wazuhapp-3.9.4_7.2.0.zip
 ```
 
 - Without sudo:
 
 ```
-su -c '/usr/share/kibana/bin/kibana-plugin install https://packages.wazuh.com/wazuhapp/wazuhapp-3.9.3_7.2.0.zip' kibana
+su -c '/usr/share/kibana/bin/kibana-plugin install https://packages.wazuh.com/wazuhapp/wazuhapp-3.9.4_7.2.0.zip' kibana
 ```
 
 Restart Kibana
@@ -105,13 +105,13 @@ Install the app
 - With sudo:
 
 ```
-sudo -u kibana /usr/share/kibana/bin/kibana-plugin install https://packages.wazuh.com/wazuhapp/wazuhapp-3.9.3_7.2.0.zip
+sudo -u kibana /usr/share/kibana/bin/kibana-plugin install https://packages.wazuh.com/wazuhapp/wazuhapp-3.9.4_7.2.0.zip
 ```
 
 - Without sudo:
 
 ```
-su -c '/usr/share/kibana/bin/kibana-plugin install https://packages.wazuh.com/wazuhapp/wazuhapp-3.9.3_7.2.0.zip' kibana
+su -c '/usr/share/kibana/bin/kibana-plugin install https://packages.wazuh.com/wazuhapp/wazuhapp-3.9.4_7.2.0.zip' kibana
 ```
 
 Restart Kibana
@@ -194,6 +194,7 @@ service kibana restart
 |      6.8.1     |       3.9.3       | /usr/share/kibana/bin/kibana-plugin install <https://packages.wazuh.com/wazuhapp/wazuhapp-3.9.3_6.8.1.zip> |
 |      7.1.1     |       3.9.3       | /usr/share/kibana/bin/kibana-plugin install <https://packages.wazuh.com/wazuhapp/wazuhapp-3.9.3_7.1.1.zip> |
 |      7.2.0     |       3.9.3       | /usr/share/kibana/bin/kibana-plugin install <https://packages.wazuh.com/wazuhapp/wazuhapp-3.9.3_7.2.0.zip> |
+|      7.2.0     |       3.9.4       | /usr/share/kibana/bin/kibana-plugin install <https://packages.wazuh.com/wazuhapp/wazuhapp-3.9.4_7.2.0.zip> |
 
 
 ## Contribute

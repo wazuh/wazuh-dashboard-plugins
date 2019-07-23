@@ -13,10 +13,10 @@ import { uiModules } from 'ui/modules';
 import chrome from 'ui/chrome';
 const app = uiModules.get('app/wazuh', []);
 
-app.directive('wzSrc', function () {
+app.directive('wzSrc', function() {
   return {
     restrict: 'A',
-    link: function ($scope, $el, $attr) {
+    link: function($scope, $el, $attr) {
       const url = chrome.addBasePath($attr.wzSrc);
       $attr.$set('src', url);
     }

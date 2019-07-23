@@ -5,7 +5,7 @@
         <span class="font-size-18">
             <react-component name="EuiIcon" props="{type:'logstashFilter'}" /> Index pattern
         </span>
-        <span class="md-subheader">Choose and index pattern, so Wazuh can use it to retrieve data from indices for
+        <span class="md-subheader">Choose an index pattern, so Wazuh can use it to retrieve data from indices for
             queries and visualizations.</span>
     </div>
     <!-- End headline -->
@@ -15,15 +15,13 @@
         <md-card flex class="wz-md-card">
             <md-card-content>
                 <div layout="row">
-                    <p class="md-body-1"><strong>Note:</strong> The chosen index pattern must use the template for Wazuh
-                        alerts, otherwise, you won't be able to select it.</p>
+                    <p class="md-body-1"><strong>Note:</strong> The chosen index pattern must use the template for
+                        Wazuh alerts. Otherwise, you won't be able to select it.</p>
                 </div>
                 <div flex="25" layout="column" class="wz-select-input wz-margin-top-10">
                     <select class="kuiSelect wz-border-none cursor-pointer" ng-model="ctrl.selectedIndexPattern"
-                        ng-change="ctrl.changeIndexPattern(ctrl.selectedIndexPattern)"
-                        aria-label="Select index pattern">
-                        <option ng-repeat="indexPattern in ctrl.indexPatterns | orderObjectBy:'title'"
-                            value="{{indexPattern.id}}">{{indexPattern.title}}</option>
+                        ng-change="ctrl.changeIndexPattern(ctrl.selectedIndexPattern)" aria-label="Select index pattern">
+                        <option ng-repeat="indexPattern in ctrl.indexPatterns | orderObjectBy:'title'" value="{{indexPattern.id}}">{{indexPattern.title}}</option>
                     </select>
                 </div>
             </md-card-content>
