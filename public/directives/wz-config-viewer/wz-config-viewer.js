@@ -111,7 +111,7 @@ class WzConfigViewer {
           $scope.$applyAsync();
           $scope.isLogs
             ? dynamicHeight()
-            : window.dispatchEvent(new Event('resize'));
+            : window.dispatchEvent(new Event('resize')); // eslint-disable-line
         }, 200);
       }
     };

@@ -232,16 +232,16 @@ export function RulesController(
     $scope.closeDetailView();
   };
 
-  $scope.openFile = (file, path) => {		
-    if (file && path) {		
-      $scope.mctrl.switchFilesSubTab('rules', {		
-        parameters: {		
-          file: { file, path },		
-          path,		
-          viewingDetail: $scope.viewingDetail		
-        }		
-      });		
-    }		
+  $scope.openFile = (file, path) => {
+    if (file && path) {
+      $scope.mctrl.switchFilesSubTab('rules', {
+        parameters: {
+          file: { file, path },
+          path,
+          viewingDetail: $scope.viewingDetail
+        }
+      });
+    }
   };
 
   //listeners
@@ -393,7 +393,7 @@ export function RulesController(
     $scope.overwriteError = true;
     $scope.$applyAsync();
   });
-  
+
   $scope.$on('applyFilter', (event, parameters) => {
     $scope.search(parameters.filter);
   });
