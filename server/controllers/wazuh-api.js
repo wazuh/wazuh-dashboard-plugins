@@ -867,7 +867,6 @@ export class WazuhApiCtrl {
     try {
       const apis = (getConfiguration() || {})['wazuh.hosts'] || []
       const api = this.findApi(apis, id);  
-      console.log('api ', api);
       if (devTools) {
         delete data.devTools;
       }
@@ -888,7 +887,6 @@ export class WazuhApiCtrl {
       }
 
       const options = ApiHelper.buildOptionsObject(api);
-      console.log('options ', options)
       options.password = this.decryptApiPassword(options.password)
 
       // Set content type application/xml if needed
@@ -899,7 +897,6 @@ export class WazuhApiCtrl {
         options.content_type = 'application/xml';
         data = data.content;
       }
-      console.log('data ', data)
 
       if (
         typeof (data || {}).content === 'string' &&
