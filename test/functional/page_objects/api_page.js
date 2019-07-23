@@ -106,7 +106,7 @@ export function ApiProvider({ getService, getPageObjects }) {
       const rows = await find.allByCssSelector('table>tbody>tr');
       for (const row of rows) {
         try {
-          await row.findByCssSelector('[api-default="false"]')
+          await row.findByCssSelector('[api-default="true"]')
           const trashButton = await row.findByCssSelector('[data-test-subj="apiTableTrashButton"]')
           await trashButton.click();
           return;
