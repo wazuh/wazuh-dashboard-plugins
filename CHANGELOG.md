@@ -2,6 +2,27 @@
 
 All notable changes to the Wazuh app project will be documented in this file.
 
+## Wazuh v3.9.4 - Kibana v6.8.1 Revision 451
+
+### Added
+
+- Support for Wazuh v3.9.4
+- Allow filtering by clicking a column in rules/decoders tables [262d7f7](https://github.com/wazuh/wazuh-kibana-app/commit/262d7f7a145a18902a6c5d55dab96c07ac66d9bb).
+- Allow open file in rules table clicking on the file column [262d7f7](https://github.com/wazuh/wazuh-kibana-app/commit/262d7f7a145a18902a6c5d55dab96c07ac66d9bb).
+
+### Changed
+
+- Remove path filter from custom rules and decoders [262d7f7](https://github.com/wazuh/wazuh-kibana-app/commit/262d7f7a145a18902a6c5d55dab96c07ac66d9bb).
+- Show path column in rules and decoders [262d7f7](https://github.com/wazuh/wazuh-kibana-app/commit/262d7f7a145a18902a6c5d55dab96c07ac66d9bb).
+- Removed SCA overview dashboard [6946a34](https://github.com/wazuh/wazuh-kibana-app/commit/6946a34b602c6a502219359570653cc38101fd12).
+- Disabled last custom column removal [06f3d4b](https://github.com/wazuh/wazuh-kibana-app/commit/06f3d4b70ca3401160b62e5990f14a243807e8d3).
+
+### Fixed
+
+- Improved wz-table performance [262d7f7](https://github.com/wazuh/wazuh-kibana-app/commit/262d7f7a145a18902a6c5d55dab96c07ac66d9bb).
+- Timezone applied in cluster status [9a3a582](https://github.com/wazuh/wazuh-kibana-app/commit/9a3a5827365308fb8fb54cd47eb1d8d0ad76b3b5).
+- Fixed Overview Security Events report when wazuh.monitoring is disabled [78d6693](https://github.com/wazuh/wazuh-kibana-app/commit/78d669378dd342a9ae735eb9c0fde9b31cc69ac8).
+
 ## Wazuh v3.9.3 - Kibana v6.8.1 Revision 450
 
 ### Added
