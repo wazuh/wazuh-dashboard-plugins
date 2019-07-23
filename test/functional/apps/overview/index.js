@@ -2,7 +2,7 @@ export default function ({ getService, loadTestFile }) {
   const browser = getService('browser');
   const esArchiver = getService('esArchiver');
 
-  describe('Overview ', function () {
+  describe('overview', function () {
     this.tags(['ciGroup6', 'smoke']);
 
     before(async function () {
@@ -10,7 +10,7 @@ export default function ({ getService, loadTestFile }) {
       await esArchiver.load('wazuh_alerts');
     });
     
-    loadTestFile(require.resolve('./_security_events'));
     loadTestFile(require.resolve('./_welcome'));
+    loadTestFile(require.resolve('./_security_events'));
   });
 }
