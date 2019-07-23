@@ -35,8 +35,8 @@ Ported to CodeMirror by Peter Kroon
 } /*65FC65*/
 
 .cm-s-lesser-dark .CodeMirror-gutters {
-  background: #262626;
-  border-right: 1px solid #aaa;
+  background: #1D1E24;
+  border-right: 1px solid #343741;
 }
 .cm-s-lesser-dark .CodeMirror-guttermarker {
   color: #599eff;
@@ -61,13 +61,16 @@ Ported to CodeMirror by Peter Kroon
   color: #c2b470;
 }
 .cm-s-lesser-dark span.cm-number {
-  color: #b35e4d;
+  color: #66c27d;
 }
 .cm-s-lesser-dark span.cm-def {
   color: #c8dad9;
 }
 .cm-s-lesser-dark span.cm-variable {
-  color: #d9bf8c;
+  color: #4dc0ba;
+}
+.cm-s-lesser-dark span.cm-variable:first-child {
+  color: #f094c1;
 }
 .cm-s-lesser-dark span.cm-variable-2 {
   color: #669199;
@@ -86,7 +89,7 @@ Ported to CodeMirror by Peter Kroon
   color: #666;
 }
 .cm-s-lesser-dark span.cm-string {
-  color: #bcd279;
+  color: #7cbad1;
 }
 .cm-s-lesser-dark span.cm-string-2 {
   color: #f50;
@@ -116,7 +119,7 @@ Ported to CodeMirror by Peter Kroon
   color: #7070e6;
 }
 .cm-s-lesser-dark span.cm-error {
-  color: #9d1e15;
+  color: #95b8a6;
 }
 
 .cm-s-lesser-dark .CodeMirror-activeline-background {

@@ -229,3 +229,19 @@ md-divider.md-default-theme, md-divider {
 .euiFlexGroup .euiFlexGroup:hover {
   background: #1D1E24;
 }
+
+.wz-dev-box .CodeMirror {
+  border: 1px solid #343741 !important;
+}
+
+.wz-dev-column-separator {
+  background: #1d1e24;
+}
+
+.CodeMirror-styled-background {
+  background-color: #343741;
+}
+
+.wz-dev-column-separator {
+  background-color: #0b4462;
+}
