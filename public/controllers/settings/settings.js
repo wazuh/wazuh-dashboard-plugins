@@ -201,7 +201,9 @@ export class SettingsController {
     this.currentDefault = JSON.parse(currentApi).id;
 
     this.errorHandler.info(
-      `API ${this.apiEntries[index]._source.cluster_info.manager} set as default`,
+      `API ${
+        this.apiEntries[index]._source.cluster_info.manager
+      } set as default`,
       'Settings'
     );
 

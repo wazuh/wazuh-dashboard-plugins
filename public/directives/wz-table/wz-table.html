@@ -4,7 +4,8 @@
 <div ng-if="customColumns" layout="row" ng-show="!error && !wazuh_table_loading && items.length" class="columns-bar"
     ng-class="{'columns-bar-active': showColumns}" ng-style="!showColumns && {'margin-bottom': '-35px'}">
     <div ng-if="showColumns" class="euiCheckbox wz-margin-right-8" ng-repeat="key in originalkeys" ng-click="updateColumns(key)">
-        <input class="euiCheckbox__input" type="checkbox" aria-label="Select all rows" ng-checked="exists(key)">
+        <input class="euiCheckbox__input" type="checkbox" aria-label="Select all rows" ng-checked="exists(key)"
+            ng-disabled="isLastKey(key)">
         <div class="euiCheckbox__square"></div>
         <span class="euiCheckbox__label">{{ keyEquivalence[key.key.value || key.key] }}</span>
     </div>
@@ -29,16 +30,19 @@
             </th>
             <th ng-if="(path === '/agents' || (path === '/agents/groups' && adminMode) || (isLookingGroup() && adminMode) 
                 || path === '/rules/files' || path === '/decoders/files' || path === '/lists/files')"
-                class="euiTableHeaderCell wz-text-left">
+                class="euiTableHeaderCell wz-text-left" ng-style="path !== '/agents' && {'width':'350px'}">
                 Actions
             </th>
         </thead>
         <tbody>
             <tr ng-class="allowClick ? 'cursor-pointer' : ''" class="wz-word-wrap" ng-repeat="item in pagedItems[currentPage] | filter:{item:'!'}"
-                ng-click="clickAction(item)">
-                <td ng-repeat="key in keys" id="{{scapepath}}-td-{{$parent.$index}}-{{$index}}" ng-mouseover="showTooltip($parent.$index, $index, item, scapepath)">
-                    <div class="wz-text-truncatable-container">
-                        <span class="wz-text-truncatable">
+            ng-click="clickAction(item)" ng-mouseover="selectedRow = $index" ng-mouseleave="selectedRow = false">
+            <td ng-repeat="key in keys" id="td-{{$parent.$index}}-{{$index}}" ng-mouseover="selectedCell = $index; showTooltip($parent.$index, $index, item);"
+                ng-mouseleave="selectedCell = false" ng-click="handleClick(key,item,$event)">
+                <div class="wz-text-truncatable-container">
+                    <span class="wzTableCellFilter" ng-show="filterableColumns[parseKey(key)] && selectedRow === $parent.$index && selectedCell == $index">
+                        <span class="fa fa-search-plus"></span> </span>
+                        <span class="wz-text-truncatable" ng-class="parseKey(key) === 'file' && (path === '/rules' || path === '/decoders' )? 'euiLink euiLink--primary' : ''">
                             {{
                             parseValue(key,item)
                             }}

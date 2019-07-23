@@ -56,9 +56,7 @@ export class ManagementController {
       this.appState.setNavigation({ status: true });
     });
     this.$scope.$on('setCurrentRule', (ev, params) => {
-      this.currentRule = (params || {}).currentRule || false;
-      this.$location.search('currentRule', true);
-      this.appState.setNavigation({ status: true });
+      this.setCurrentRule(params);
     });
     this.$scope.$on('removeCurrentRule', () => {
       this.currentRule = false;
@@ -92,6 +90,14 @@ export class ManagementController {
     this.$scope.$on('removeCurrentConfiguration', () => {
       this.currentConfiguration = false;
     });
+
+    this.$scope.$on('viewFileOnly', (ev, params) => {
+      $scope.$broadcast('viewFileOnlyTable', {
+        file: params.item,
+        path: params.path
+      });
+    });
+
     this.$rootScope.$on('setRestarting', () => {
       if (this.clusterInfo.status === 'enabled') {
         this.blockEditioncounter = 0;
@@ -213,6 +219,12 @@ export class ManagementController {
     });
   }
 
+  setCurrentRule(params) {
+    this.currentRule = (params || {}).currentRule || false;
+    this.$location.search('currentRule', true);
+    this.appState.setNavigation({ status: true });
+  }
+
   /**
    * This switch to a selected tab
    * @param {String} tab
@@ -268,8 +280,11 @@ export class ManagementController {
     this.breadCrumbBack();
   }
 
-  switchFilesSubTab(flag) {
+  switchFilesSubTab(flag, showFile) {
     this.managingFiles = flag || true;
+    if (showFile) {
+      this.showFile = showFile;
+    }
   }
 
   breadCrumbBack(goRoot = false) {

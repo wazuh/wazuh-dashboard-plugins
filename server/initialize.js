@@ -345,7 +345,9 @@ export function Initialize(server) {
       await wzWrapper.getTemplateByName('wazuh-kibana');
       log(
         'initialize:checkKibanaStatus',
-        `No need to create the ${wzWrapper.WZ_KIBANA_INDEX} template, already exists.`,
+        `No need to create the ${
+          wzWrapper.WZ_KIBANA_INDEX
+        } template, already exists.`,
         'debug'
       );
       await createEmptyKibanaIndex();
@@ -458,7 +460,9 @@ export function Initialize(server) {
 
       log(
         'initialize:updateSingleHostInformation',
-        `Successfully updated proper single host information for ${config.manager}`,
+        `Successfully updated proper single host information for ${
+          config.manager
+        }`,
         'debug'
       );
 
@@ -634,7 +638,9 @@ export function Initialize(server) {
         // Nothing to be done, cluster_info is present
         log(
           'initialize:reachAPI',
-          `Nothing to be done for ${config.manager} as it is already a 3.x version.`,
+          `Nothing to be done for ${
+            config.manager
+          } as it is already a 3.x version.`,
           'debug'
         );
       }
