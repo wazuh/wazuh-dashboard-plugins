@@ -36,10 +36,13 @@
         </thead>
         <tbody>
             <tr ng-class="allowClick ? 'cursor-pointer' : ''" class="wz-word-wrap" ng-repeat="item in pagedItems[currentPage] | filter:{item:'!'}"
-                ng-click="clickAction(item)">
-                <td ng-repeat="key in keys" id="{{scapepath}}-td-{{$parent.$index}}-{{$index}}" ng-mouseover="showTooltip($parent.$index, $index, item, scapepath)">
-                    <div class="wz-text-truncatable-container">
-                        <span class="wz-text-truncatable">
+            ng-click="clickAction(item)" ng-mouseover="selectedRow = $index" ng-mouseleave="selectedRow = false">
+            <td ng-repeat="key in keys" id="td-{{$parent.$index}}-{{$index}}" ng-mouseover="selectedCell = $index; showTooltip($parent.$index, $index, item);"
+                ng-mouseleave="selectedCell = false" ng-click="handleClick(key,item,$event)">
+                <div class="wz-text-truncatable-container">
+                    <span class="wzTableCellFilter" ng-show="filterableColumns[parseKey(key)] && selectedRow === $parent.$index && selectedCell == $index">
+                        <span class="fa fa-search-plus"></span> </span>
+                        <span class="wz-text-truncatable" ng-class="parseKey(key) === 'file' && (path === '/rules' || path === '/decoders' )? 'euiLink euiLink--primary' : ''">
                             {{
                             parseValue(key,item)
                             }}
