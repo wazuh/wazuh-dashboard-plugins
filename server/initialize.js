@@ -20,6 +20,8 @@ import { checkKnownFields } from './lib/refresh-known-fields';
 import { totalmem } from 'os';
 import fs from 'fs';
 import path from 'path';
+import { UpdateConfigurationFile } from './lib/update-configuration';
+const updateConfigurationFile = new UpdateConfigurationFile();
 
 export function Initialize(server) {
   const wazuhVersion = path.join(__dirname, '/wazuh-version.json');
@@ -186,23 +188,41 @@ export function Initialize(server) {
 
   const checkWazuhIndex = async () => {
     try {
-      log('initialize:checkWazuhIndex', 'Checking .wazuh index.', 'debug');
+      log('initialize:checkWazuhIndex', 'Checking if .wazuh index exists.', 'debug');
 
       const result = await wzWrapper.checkIfIndexExists('.wazuh');
 
-      const shardConfiguration = BuildBody(configurationFile, 'wazuh');
+      //const shardConfiguration = BuildBody(configurationFile, 'wazuh');
 
-      if (!result) {
+      if (result) {
         try {
-          await wzWrapper.createWazuhIndex(shardConfiguration);
-
-          log('initialize:checkWazuhIndex', 'Index .wazuh created.', 'debug');
+          const data = await wzWrapper.getWazuhAPIEntries();
+          const apiEntries = (((data || {}).hits || {}).hits || []);
+          apiEntries.forEach(async x => {
+            const host = x._source;
+            const added = await updateConfigurationFile.addHost({
+              url: host.url,
+              port: host.api_port,
+              user: host.api_user,
+              password: host.api_password
+            });
+            if (!added) {
+              throw new Error('Error adding Api host to config.yml.');
+            }
+            /*             const host2 = apiEntries[0]._source;
+                        const added2 = await updateConfigurationFile.addHost({
+                          url: host2.url,
+                          port: host2.api_port,
+                          user: host2.api_user,
+                          password: host2.api_password
+                        }); */
+          });
+          log('initialize:checkWazuhIndex', 'Index .wazuh will be removed and its content will be migrated to config.yml', 'debug');
+          //await wzWrapper.deleteIndexByName('.wazuh');
+          log('initialize:checkWazuhIndex', 'Index .wazuh deleted.', 'debug');
         } catch (error) {
-          throw new Error('Error creating index .wazuh.');
+          throw new Error('Error deleting index .wazuh. ' + error);
         }
-      } else {
-        await wzWrapper.updateIndexSettings('.wazuh', shardConfiguration);
-        await checkAPIEntriesExtensions();
       }
     } catch (error) {
       return Promise.reject(error);
@@ -251,11 +271,11 @@ export function Initialize(server) {
       source.revision = packageJSON.revision;
       source.lastRestart = new Date().toISOString(); // Registry exists so we update the lastRestarted date only
 
-      fs.writeFileSync(wazuhVersion, JSON.stringify(source), (err) => {
-        if (err) {
-          throw new Error(err);
-        }
-      });
+      /*       fs.writeFileSync(wazuhVersion, JSON.stringify(source), (err) => {
+              if (err) {
+                throw new Error(err);
+              }
+            }); */
     } catch (error) {
       return Promise.reject(error);
     }

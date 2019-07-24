@@ -32,6 +32,7 @@ import { Queue } from '../jobs/queue';
 import querystring from 'querystring';
 import fs from 'fs';
 import path from 'path';
+import { UpdateConfigurationFile } from '../lib/update-configuration';
 export class WazuhApiCtrl {
   /**
    * Constructor
@@ -42,6 +43,19 @@ export class WazuhApiCtrl {
     this.wzWrapper = new ElasticWrapper(server);
     this.monitoringInstance = new Monitoring(server, true);
     this.wazuhVersion = path.join(__dirname, '../wazuh-version.json');
+    this.configurationFile = new UpdateConfigurationFile();
+  }
+
+
+  /**
+   * This descrypts the encrypted password
+   * @param {String} password 
+   */
+  decryptApiPassword(password) {
+    return Buffer.from(
+      password,
+      'base64'
+    ).toString('ascii');
   }
 
   /**
@@ -52,19 +66,15 @@ export class WazuhApiCtrl {
    */
   async checkStoredAPI(req, reply) {
     try {
-      // Get config from elasticsearch
-      const api = await this.wzWrapper.getWazuhConfigurationById(req.payload);
-      if (api.error_code > 1) {
-        throw new Error(`Could not find Wazuh API entry on Elasticsearch.`);
-      } else if (api.error_code > 0) {
-        throw new Error(
-          'Valid credentials not found in Elasticsearch. It seems the credentials were not saved.'
-        );
+      // Get config from config.yml
+      const apis = (getConfiguration() || {})['wazuh.hosts'] || []
+      let api = this.findApi(apis, req.payload);
+      if (!api) {
+        throw new Error(`Could not find Wazuh API entry on config.yml.`);
       }
       log('wazuh-api:checkStoredAPI', `${req.payload} exists`, 'debug');
-
       const credInfo = ApiHelper.buildOptionsObject(api);
-
+      credInfo.password = this.decryptApiPassword(credInfo.password)
       let response = await needle(
         'get',
         `${api.url}:${api.port}/version`,
@@ -102,11 +112,19 @@ export class WazuhApiCtrl {
               return ErrorResponse('ERROR3099', 3099, 500, reply);
             }
 
-            const updatedManagerName = managerInfo.body.data.name;
-            api.cluster_info.manager = updatedManagerName;
-            await this.wzWrapper.updateWazuhIndexDocument(null, req.payload, {
+            const clusterData = managerInfo.body.data;
+
+            api.cluster_info = {
+              manager: clusterData.manager,
+              node: clusterData.node_name,
+              cluster: 'wazuh', //Find the way to get the cluster name
+              status: clusterData.status
+            }
+
+            // TODO update manager/cluster name information
+            /*await this.wzWrapper.updateWazuhIndexDocument(null, req.payload, {
               doc: { cluster_info: api.cluster_info }
-            });
+            });*/
           } catch (error) {
             log('wazuh-api:checkStoredAPI', error.message || error);
           }
@@ -200,10 +218,7 @@ export class WazuhApiCtrl {
               try {
                 const options = ApiHelper.buildOptionsObject(api);
 
-                options.password = Buffer.from(
-                  api._source.api_password,
-                  'base64'
-                ).toString('ascii');
+                options.password = this.decryptApiPassword(api._source.api_password);
 
                 const response = await needle(
                   'get',
@@ -264,6 +279,31 @@ export class WazuhApiCtrl {
   }
 
   /**
+   * This extracts the API data in case of it was read from the config.yml
+   * @param {Object} api 
+   */
+  cleanApiData(api) {
+    const keys = Object.keys(api);
+    if (keys.length === 1) {
+      return api[keys[0]];
+    }
+    return api;
+  }
+
+  /**
+   * Find the API between all the APIs stored in the config.yml
+   * @param {Object} apis 
+   * @param {String} apiId 
+   */
+  findApi(apis, apiId) {
+    let data = apis.find((api) => {
+      return Object.keys(api)[0] == apiId;
+    });
+    data = Object.keys(data).length === 1 ? data[apiId] : data;
+    return data;
+  }
+
+  /**
    * This check the wazuh-api configuration received in the POST body will work
    * @param {Object} req
    * @param {Object} reply
@@ -272,17 +312,17 @@ export class WazuhApiCtrl {
   async checkAPI(req, reply) {
     try {
       let apiAvailable = null;
-
       const notValid = this.validateCheckApiParams(req.payload);
       if (notValid) return ErrorResponse(notValid, 3003, 500, reply);
       log('wazuh-api:checkAPI', `${req.payload.id} is valid`, 'debug');
       // Check if a Wazuh API id is given (already stored API)
       if (req.payload && req.payload.id && !req.payload.password) {
-        const data = await this.wzWrapper.getWazuhConfigurationById(
-          req.payload.id
-        );
+        const configuration = getConfiguration();
+        const apis = configuration['wazuh.hosts'];
+        const data = this.findApi(apis, req.payload.id);
         if (data) {
-          apiAvailable = data;
+          apiAvailable = this.cleanApiData(data);
+          apiAvailable.password = this.decryptApiPassword(apiAvailable.password);
         } else {
           log('wazuh-api:checkAPI', `API ${req.payload.id} not found`);
           return ErrorResponse(
@@ -296,10 +336,7 @@ export class WazuhApiCtrl {
         // Check if a password is given
       } else if (req.payload && req.payload.password) {
         apiAvailable = req.payload;
-        apiAvailable.password = Buffer.from(
-          req.payload.password,
-          'base64'
-        ).toString('ascii');
+        apiAvailable.password = this.decryptApiPassword(req.payload.password);
       }
 
       let response = await needle(
@@ -828,25 +865,21 @@ export class WazuhApiCtrl {
   async makeRequest(method, path, data, id, reply) {
     const devTools = !!(data || {}).devTools;
     try {
-      const api = await this.wzWrapper.getWazuhConfigurationById(id);
-
+      const apis = (getConfiguration() || {})['wazuh.hosts'] || []
+      const api = this.findApi(apis, id);  
       if (devTools) {
         delete data.devTools;
       }
 
-      if (api.error_code > 1) {
-        log('wazuh-api:makeRequest', 'Could not connect with Elasticsearch');
+      if (!api) {
+        log('wazuh-api:makeRequest', 'Could not fetch API credentials');
         //Can not connect to elasticsearch
         return ErrorResponse(
-          'Could not connect with Elasticsearch',
+          'Could not fetch API credentials',
           3011,
           404,
           reply
         );
-      } else if (api.error_code > 0) {
-        log('wazuh-api:makeRequest', 'Credentials do not exist');
-        //Credentials not found
-        return ErrorResponse('Credentials do not exist', 3012, 404, reply);
       }
 
       if (!data) {
@@ -854,6 +887,7 @@ export class WazuhApiCtrl {
       }
 
       const options = ApiHelper.buildOptionsObject(api);
+      options.password = this.decryptApiPassword(options.password)
 
       // Set content type application/xml if needed
       if (
@@ -1232,12 +1266,10 @@ export class WazuhApiCtrl {
       if (!req.params || !req.params.api)
         throw new Error('Field api is required');
 
-      const config = await this.wzWrapper.getWazuhConfigurationById(
-        req.params.api
-      );
+      const apis = (getConfiguration() || {})['wazuh.hosts'] || []
+      const config = this.findApi(apis, req.params.api);   
 
       const headers = ApiHelper.buildOptionsObject(config);
-
       const distinctUrl = `${config.url}:${config.port}/agents/stats/distinct`;
 
       const data = await Promise.all([
@@ -1480,6 +1512,192 @@ export class WazuhApiCtrl {
     } catch (error) {
       log('wazuh-api:getSyscollector', error.message || error);
       return ErrorResponse(error.message || error, 3035, 500, reply);
+    }
+  }
+
+  /**
+ * This check if connection and auth on an API is correct
+ * @param {Object} payload
+ */
+  validateData(payload) {
+    const userRegEx = new RegExp(/^.{3,100}$/);
+    const passRegEx = new RegExp(/^.{3,100}$/);
+    const urlRegEx = new RegExp(/^https?:\/\/[a-zA-Z0-9-.]{1,300}$/);
+    const urlRegExIP = new RegExp(
+      /^https?:\/\/[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$/
+    );
+    const portRegEx = new RegExp(/^[0-9]{2,5}$/);
+    // Validate user
+    if (!userRegEx.test(payload.user)) {
+      return { code: 2006, message: 'Invalid user field' };
+    }
+
+    // Validate password
+    if (!passRegEx.test(payload.password)) {
+      return { code: 2007, message: 'Invalid password field' };
+    }
+
+    // Validate url
+    if (!urlRegEx.test(payload.url) && !urlRegExIP.test(payload.url)) {
+      return { code: 2008, message: 'Invalid url field' };
+    }
+
+    // Validate port
+    const validatePort = parseInt(payload.port);
+    if (
+      !portRegEx.test(payload.port) ||
+      validatePort <= 0 ||
+      validatePort >= 99999
+    ) {
+      return { code: 2009, message: 'Invalid port field' };
+    }
+
+    return false;
+  }
+
+  /**
+ * This build an setting API obect
+ * @param {Object} payload
+ */
+  buildSettingsObject(payload) {
+    return {
+      url: payload.url,
+      port: payload.port,
+      user: payload.user,
+      password: payload.password
+    };
+  }
+
+  /**
+ * This saves a new API entry
+ * @param {Object} req
+ * @param {Object} reply
+ * Status response or ErrorResponse
+ */
+  async saveAPI(req, reply) {
+    try {
+      if (
+        !('user' in req.payload) ||
+        !('password' in req.payload) ||
+        !('url' in req.payload) ||
+        !('port' in req.payload)
+      ) {
+        log('wazuh-api:saveAPI', 'Missing parameters');
+        return ErrorResponse('Missing data', 2010, 400, reply);
+      }
+
+      const valid = this.validateData(req.payload);
+      if (valid) return ErrorResponse(valid.message, valid.code, 400, reply);
+
+      const host = this.buildSettingsObject(req.payload);
+
+      const response = await this.configurationFile.addHost(host);
+      log(
+        'wazuh-api:saveAPI',
+        `${host.user}:*****@${host.url}:${host.port} entry saved successfully`,
+        'debug'
+      );
+
+      return { statusCode: 200, message: 'ok', response };
+    } catch (error) {
+      log('wazuh-api:saveAPI', error.message || error);
+      return ErrorResponse(
+        `Could not save data in config.yml due to ${error.message || error}`,
+        2011,
+        500,
+        reply
+      );
+    }
+  }
+
+  /**
+ * This remove an API entry
+ * @param {Object} req
+ * @param {Object} reply
+ * Request response or ErrorResponse
+ */
+  async deleteAPI(req, reply) {
+    try {
+      const data = await this.configurationFile.deleteHost(req);
+      log('wazuh-api:deleteAPI', 'Success', 'debug');
+      return data;
+    } catch (error) {
+      log('wazuh-api:deleteAPI', error.message || error);
+      return ErrorResponse(error.message || error, 2002, 500, reply);
+    }
+  }
+
+  /**
+ * This get all API entries
+ * @param {Object} req
+ * @param {Object} reply
+ * API entries or ErrorResponse
+ */
+  async getAPIEntries(req, reply) {
+    try {
+      const data = await this.configurationFile.getHosts();
+
+      // Replacing password by ****
+      const result = [];
+      if (Array.isArray(data || [])) {
+        for (const entry of data) {
+          if ((entry || {}).password) {
+            entry.password = '****';
+          }
+          result.push(entry);
+        }
+      }
+      log(
+        'wazuh-api:getAPIEntries',
+        `${result.length} Wazuh API entries`,
+        'debug'
+      );
+      return result;
+    } catch (error) {
+      log('wazuh-api:getAPIEntries', error.message || error);
+      return ErrorResponse(error.message || error, 2001, 500, reply);
+    }
+  }
+
+  /**
+ * This update an API settings into config.yml
+ * @param {Object} req
+ * @param {Object} reply
+ * Status response or ErrorResponse
+ */
+  async updateFullAPI(req, reply) {
+    try {
+      if (
+        !('user' in req.payload) ||
+        !('password' in req.payload) ||
+        !('url' in req.payload) ||
+        !('port' in req.payload)
+      ) {
+        log('wazuh-api:updateFullAPI', 'Missing paramaters');
+        return ErrorResponse('Missing parameters', 2013, 400, reply);
+      }
+
+      const valid = this.validateData(req.payload);
+      if (valid) return ErrorResponse(valid.message, valid.code, 400, reply);
+
+      const settings = this.buildSettingsObject(req.payload);
+
+      await this.configurationFile.updateHost(req.payload.id, settings);
+
+      log(
+        'wazuh-api:updateFullApi',
+        `API entry ${req.payload.id} updated`,
+        'debug'
+      );
+      return { statusCode: 200, message: 'ok' };
+    } catch (error) {
+      log('wazuh-api:updateFullAPI', error.message || error);
+      return ErrorResponse(
+        `Could not save data in config.yml due to ${error.message || error}`,
+        2014,
+        500,
+        reply
+      );
     }
   }
 }

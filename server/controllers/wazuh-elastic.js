@@ -365,7 +365,7 @@ export class WazuhElasticCtrl {
         req.auth.credentials.roles.includes('superuser');
 
       const data = await this.wzWrapper.getAllIndexPatterns();
-      if (namespace !== 'default') {
+      if (namespace && namespace !== 'default') {
         data.hits.hits = data.hits.hits.filter(item =>
           (item._id || '').includes(namespace)
         );
@@ -462,7 +462,7 @@ export class WazuhElasticCtrl {
 
           const isMonitoring = defaultStr.includes('wazuh-monitoring');
           if (isMonitoring) {
-            if (namespace && namespace !== 'default') {
+            if (namespace !== 'default') {
               monitoringPattern = await this.checkCustomSpaceMonitoring(
                 namespace,
                 monitoringPattern

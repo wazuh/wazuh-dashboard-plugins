@@ -32,55 +32,6 @@ export class WazuhApiElasticCtrl {
   }
 
   /**
-   * This get all API entries
-   * @param {Object} req
-   * @param {Object} reply
-   * API entries or ErrorResponse
-   */
-  async getAPIEntries(req, reply) {
-    try {
-      const data = await this.wzWrapper.getWazuhAPIEntries();
-
-      // Replacing password by ****
-      const result = [];
-      if (Array.isArray(((data || {}).hits || {}).hits)) {
-        for (const entry of data.hits.hits) {
-          if (((entry || {})._source || {}).api_password) {
-            entry._source.api_password = '****';
-          }
-          result.push(entry);
-        }
-      }
-      log(
-        'wazuh-api-elastic:getAPIEntries',
-        `${result.length} Wazuh API entries`,
-        'debug'
-      );
-      return result;
-    } catch (error) {
-      log('wazuh-api-elastic:getAPIEntries', error.message || error);
-      return ErrorResponse(error.message || error, 2001, 500, reply);
-    }
-  }
-
-  /**
-   * This remove an API entry
-   * @param {Object} req
-   * @param {Object} reply
-   * Request response or ErrorResponse
-   */
-  async deleteAPIEntries(req, reply) {
-    try {
-      const data = await this.wzWrapper.deleteWazuhAPIEntriesWithRequest(req);
-      log('wazuh-api-elastic:deleteAPIEntries', 'Success', 'debug');
-      return data;
-    } catch (error) {
-      log('wazuh-api-elastic:deleteAPIEntries', error.message || error);
-      return ErrorResponse(error.message || error, 2002, 500, reply);
-    }
-  }
-
-  /**
    * This check if connection and auth on an API is correct
    * @param {Object} payload
    */
@@ -131,51 +82,6 @@ export class WazuhApiElasticCtrl {
   }
 
   /**
-   * This saves a new API entry
-   * @param {Object} req
-   * @param {Object} reply
-   * Status response or ErrorResponse
-   */
-  async saveAPI(req, reply) {
-    try {
-      if (
-        !('user' in req.payload) ||
-        !('password' in req.payload) ||
-        !('url' in req.payload) ||
-        !('port' in req.payload)
-      ) {
-        log('wazuh-api-elastic:saveAPI', 'Missing parameters');
-        return ErrorResponse('Missing data', 2010, 400, reply);
-      }
-
-      const valid = this.validateData(req.payload);
-      if (valid) return ErrorResponse(valid.message, valid.code, 400, reply);
-
-      const settings = this.buildSettingsObject(req.payload);
-
-      const response = await this.wzWrapper.createWazuhIndexDocument(
-        req,
-        settings
-      );
-      log(
-        'wazuh-api-elastic:saveAPI',
-        `${req.payload.user}:*****@${req.payload.url}:${req.payload.port} entry saved successfully`,
-        'debug'
-      );
-
-      return { statusCode: 200, message: 'ok', response };
-    } catch (error) {
-      log('wazuh-api-elastic:saveAPI', error.message || error);
-      return ErrorResponse(
-        `Could not save data in elasticsearch due to ${error.message || error}`,
-        2011,
-        500,
-        reply
-      );
-    }
-  }
-
-  /**
    * This update an API hostname
    * @param {Object} req
    * @param {Object} reply
@@ -203,46 +109,4 @@ export class WazuhApiElasticCtrl {
     }
   }
 
-  /**
-   * This update an API settings into elasticsearch
-   * @param {Object} req
-   * @param {Object} reply
-   * Status response or ErrorResponse
-   */
-  async updateFullAPI(req, reply) {
-    try {
-      if (
-        !('user' in req.payload) ||
-        !('password' in req.payload) ||
-        !('url' in req.payload) ||
-        !('port' in req.payload)
-      ) {
-        log('wazuh-api-elastic:updateFullAPI', 'Missing paramaters');
-        return ErrorResponse('Missing parameters', 2013, 400, reply);
-      }
-
-      const valid = this.validateData(req.payload);
-      if (valid) return ErrorResponse(valid.message, valid.code, 400, reply);
-
-      const settings = this.buildSettingsObject(req.payload);
-
-      await this.wzWrapper.updateWazuhIndexDocument(req, req.payload.id, {
-        doc: settings
-      });
-      log(
-        'wazuh-api-elastic:updateFullApi',
-        `API entry ${req.payload.id} updated`,
-        'debug'
-      );
-      return { statusCode: 200, message: 'ok' };
-    } catch (error) {
-      log('wazuh-api-elastic:updateFullAPI', error.message || error);
-      return ErrorResponse(
-        `Could not save data in elasticsearch due to ${error.message || error}`,
-        2014,
-        500,
-        reply
-      );
-    }
-  }
 }

@@ -14,42 +14,6 @@ import { WazuhApiElasticCtrl } from '../controllers';
 export function WazuhApiElasticRoutes(server) {
   const ctrl = new WazuhApiElasticCtrl(server);
 
-  // Save the given API into elasticsearch
-  server.route({
-    method: 'PUT',
-    path: '/elastic/api',
-    handler(req, reply) {
-      return ctrl.saveAPI(req, reply);
-    }
-  });
-
-  // Update the given API into elasticsearch
-  server.route({
-    method: 'PUT',
-    path: '/elastic/api-settings',
-    handler(req, reply) {
-      return ctrl.updateFullAPI(req, reply);
-    }
-  });
-
-  // Get Wazuh-API entries list (Multimanager) from elasticsearch index
-  server.route({
-    method: 'GET',
-    path: '/elastic/apis',
-    handler(req, reply) {
-      return ctrl.getAPIEntries(req, reply);
-    }
-  });
-
-  // Delete Wazuh-API entry (multimanager) from elasticsearch index
-  server.route({
-    method: 'DELETE',
-    path: '/elastic/apis/{id}',
-    handler(req, reply) {
-      return ctrl.deleteAPIEntries(req, reply);
-    }
-  });
-
   // Update the API hostname
   server.route({
     method: 'PUT',

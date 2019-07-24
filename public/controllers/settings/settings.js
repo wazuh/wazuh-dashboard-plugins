@@ -111,7 +111,7 @@ export class SettingsController {
         apiEntries: this.apiEntries,
         compressed: true,
         setDefault: entry => this.setDefault(entry),
-        checkManager: entry => this.checkManager(entry),
+        checkManager: (entry, isIndex = false , silent = false) => this.checkManager(entry, isIndex, silent),
         removeManager: entry => this.removeManager(entry),
         updateSettings: (entry, useItem = false) =>
           this.updateSettings(entry, useItem),
@@ -152,7 +152,7 @@ export class SettingsController {
       }
       await this.genericReq.request(
         'DELETE',
-        `/elastic/apis/${this.apiEntries[index]._id}`
+        `/api/${this.apiEntries[index]._id}`
       );
       this.showEditForm[this.apiEntries[index]._id] = false;
       this.apiEntries.splice(index, 1);
@@ -190,22 +190,24 @@ export class SettingsController {
   }
 
   // Set default API
-  setDefault(item) {
+  async setDefault(item) {
+    //Check the connection previously in order to get the manager/cluster name and the status
+    await this.checkManager(item, false, true)
     const index = this.apiEntries.map(item => item._id).indexOf(item._id);
 
-    this.appState.setClusterInfo(this.apiEntries[index]._source.cluster_info);
+    this.appState.setClusterInfo(this.apiEntries[index].cluster_info);
 
-    if (this.apiEntries[index]._source.cluster_info.status == 'disabled') {
+    if (this.apiEntries[index].cluster_info.status == 'disabled') {
       this.appState.setCurrentAPI(
         JSON.stringify({
-          name: this.apiEntries[index]._source.cluster_info.manager,
+          name: this.apiEntries[index].cluster_info.manager,
           id: this.apiEntries[index]._id
         })
       );
     } else {
       this.appState.setCurrentAPI(
         JSON.stringify({
-          name: this.apiEntries[index]._source.cluster_info.cluster,
+          name: this.apiEntries[index].cluster_info.cluster,
           id: this.apiEntries[index]._id
         })
       );
@@ -219,7 +221,9 @@ export class SettingsController {
     this.$scope.$applyAsync();
 
     this.errorHandler.info(
-      `API ${this.apiEntries[index]._source.cluster_info.manager} set as default`,
+      `API ${
+      this.apiEntries[index].cluster_info.manager
+      } set as default`,
       'Settings'
     );
 
@@ -228,7 +232,7 @@ export class SettingsController {
     if (currentApi && !this.appState.getExtensions(JSON.parse(currentApi).id)) {
       this.appState.setExtensions(
         this.apiEntries[this.currentApiEntryIndex]._id,
-        this.apiEntries[this.currentApiEntryIndex]._source.extensions
+        this.apiEntries[this.currentApiEntryIndex].extensions
       );
     }
 
@@ -239,23 +243,23 @@ export class SettingsController {
   // Get settings function
   async getSettings() {
     try {
-      const patternList = await this.genericReq.request(
-        'GET',
-        '/elastic/index-patterns',
-        {}
-      );
-      this.indexPatterns = patternList.data.data;
-
-      if (!patternList.data.data.length) {
-        this.wzMisc.setBlankScr('Sorry but no valid index patterns were found');
-        this.$location.search('tab', null);
-        this.$location.path('/blank-screen');
-        return;
+      const data = await this.genericReq.request('GET', '/api/apis');
+      let result = [];
+      for (const entry of data.data) {
+        const id = Object.keys(entry)[0];
+        const host = entry[id];
+        const obj = {
+          _id: id,
+          url: host.url,
+          api_port: host.port,
+          api_user: host.username,
+          password: host.password
+        };
+        this.showEditForm[id] = false;
+        result.push(obj);
       }
-      const data = await this.genericReq.request('GET', '/elastic/apis');
-      for (const entry of data.data) this.showEditForm[entry._id] = false;
 
-      this.apiEntries = data.data.length > 0 ? data.data : [];
+      this.apiEntries = result.length > 0 ? result : [];
       this.apiEntries = this.apiEntries.sort(this.sortByTimestamp);
 
       const currentApi = this.appState.getCurrentAPI();
@@ -274,7 +278,7 @@ export class SettingsController {
       ) {
         this.appState.setExtensions(
           this.apiEntries[this.currentApiEntryIndex]._id,
-          this.apiEntries[this.currentApiEntryIndex]._source.extensions
+          this.apiEntries[this.currentApiEntryIndex].extensions
         );
       }
 
@@ -401,21 +405,24 @@ export class SettingsController {
       tmpData.cluster_info = checkData.data;
 
       // Insert new API entry
+      /*       const data = await this.genericReq.request(
+              'PUT',
+              '/elastic/api',
+              tmpData
+            ); */
       const data = await this.genericReq.request(
         'PUT',
-        '/elastic/api',
+        '/api/host',
         tmpData
       );
       this.appState.setExtensions(data.data.response._id, tmpData.extensions);
       const newEntry = {
         _id: data.data.response._id,
-        _source: {
-          cluster_info: tmpData.cluster_info,
-          url: tmpData.url,
-          api_user: tmpData.user,
-          api_port: tmpData.port,
-          extensions: tmpData.extensions
-        }
+        cluster_info: tmpData.cluster_info,
+        url: tmpData.url,
+        api_user: tmpData.user,
+        api_port: tmpData.port,
+        extensions: tmpData.extensions
       };
       this.apiEntries.push(newEntry);
       this.apiEntries = this.apiEntries.sort(this.sortByTimestamp);
@@ -434,21 +441,19 @@ export class SettingsController {
       if (!this.appState.getCurrentAPI()) {
         // No cookie
         if (
-          this.apiEntries[this.apiEntries.length - 1]._source.cluster_info
+          this.apiEntries[this.apiEntries.length - 1].cluster_info
             .status === 'disabled'
         ) {
           this.appState.setCurrentAPI(
             JSON.stringify({
-              name: this.apiEntries[this.apiEntries.length - 1]._source
-                .cluster_info.manager,
+              name: this.apiEntries[this.apiEntries.length - 1].cluster_info.manager,
               id: this.apiEntries[this.apiEntries.length - 1]._id
             })
           );
         } else {
           this.appState.setCurrentAPI(
             JSON.stringify({
-              name: this.apiEntries[this.apiEntries.length - 1]._source
-                .cluster_info.cluster,
+              name: this.apiEntries[this.apiEntries.length - 1].cluster_info.cluster,
               id: this.apiEntries[this.apiEntries.length - 1]._id
             })
           );
@@ -530,24 +535,24 @@ export class SettingsController {
         cluster_info: {},
         insecure: 'true',
         id: this.apiEntries[index]._id,
-        extensions: this.apiEntries[index]._source.extensions
+        extensions: this.apiEntries[index].extensions
       };
 
       const data = await this.testAPI.check(tmpData);
       tmpData.cluster_info = data.data;
-      await this.genericReq.request('PUT', '/elastic/api-settings', tmpData);
-      this.apiEntries[index]._source.cluster_info = tmpData.cluster_info;
+      await this.genericReq.request('PUT', '/api/settings', tmpData);
+      this.apiEntries[index].cluster_info = tmpData.cluster_info;
 
       this.wzMisc.setApiIsDown(false);
       this.apiIsDown = false;
 
-      this.apiEntries[index]._source.cluster_info.cluster =
+      this.apiEntries[index].cluster_info.cluster =
         tmpData.cluster_info.cluster;
-      this.apiEntries[index]._source.cluster_info.manager =
+      this.apiEntries[index].cluster_info.manager =
         tmpData.cluster_info.manager;
-      this.apiEntries[index]._source.url = tmpData.url;
-      this.apiEntries[index]._source.api_port = tmpData.port;
-      this.apiEntries[index]._source.api_user = tmpData.user;
+      this.apiEntries[index].url = tmpData.url;
+      this.apiEntries[index].api_port = tmpData.port;
+      this.apiEntries[index].api_user = tmpData.user;
 
       this.apiEntries = this.apiEntries.sort(this.sortByTimestamp);
       this.showEditForm[this.apiEntries[index]._id] = false;
@@ -577,10 +582,10 @@ export class SettingsController {
         : this.apiEntries.map(item => item._id).indexOf(item._id);
 
       const tmpData = {
-        user: this.apiEntries[index]._source.api_user,
-        //password    : this.apiEntries[index]._source.api_password,
-        url: this.apiEntries[index]._source.url,
-        port: this.apiEntries[index]._source.api_port,
+        user: this.apiEntries[index].api_user,
+        //password    : this.apiEntries[index].api_password,
+        url: this.apiEntries[index].url,
+        port: this.apiEntries[index].api_port,
         cluster_info: {},
         insecure: 'true',
         id: this.apiEntries[index]._id
@@ -589,13 +594,13 @@ export class SettingsController {
       const data = await this.testAPI.check(tmpData);
       tmpData.cluster_info = data.data;
 
-      const tmpUrl = `/elastic/api-hostname/${this.apiEntries[index]._id}`;
+      /*const tmpUrl = `/elastic/api-hostname/${this.apiEntries[index]._id}`;
       await this.genericReq.request('PUT', tmpUrl, {
         cluster_info: tmpData.cluster_info
-      });
+      });*/
       // Emit updateAPI event cause the cluster info could had been changed
       this.$scope.$emit('updateAPI', { cluster_info: tmpData.cluster_info });
-      this.apiEntries[index]._source.cluster_info = tmpData.cluster_info;
+      this.apiEntries[index].cluster_info = tmpData.cluster_info;
       this.wzMisc.setApiIsDown(false);
       this.apiIsDown = false;
       !silent && this.errorHandler.info('Connection success', 'Settings');
@@ -700,6 +705,7 @@ export class SettingsController {
       }
       this.getCurrentAPIIndex();
       if (this.currentApiEntryIndex || this.currentApiEntryIndex === 0) {
+        console.log('gonna check the current api jeje');
         await this.checkManager(this.currentApiEntryIndex, true, true);
       }
       this.$scope.$applyAsync();

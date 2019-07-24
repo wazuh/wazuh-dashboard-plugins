@@ -196,14 +196,17 @@ export function settingsWizard(
       const currentApi = appState.getCurrentAPI();
       if (!currentApi) {
         genericReq
-          .request('GET', '/elastic/apis')
+          .request('GET', '/api/apis')
           .then(data => {
             if (data.data.length > 0) {
-              const apiEntries = data.data;
+              const firstApiEntry = data.data[0];
+              const apiId = Object.keys(firstApiEntry)[0];
+              //TODO remove fake info
+              const apiData = Object.assign(firstApiEntry[apiId], {'_id': apiId, 'cluster_info': {'manager': 'wazuh-fake'}});
               appState.setCurrentAPI(
                 JSON.stringify({
-                  name: apiEntries[0]._source.cluster_info.manager,
-                  id: apiEntries[0]._id
+                  name: apiData.cluster_info.manager,
+                  id: apiData._id
                 })
               );
               callCheckStored();
@@ -226,7 +229,7 @@ export function settingsWizard(
       } else {
         const apiId = (JSON.parse(currentApi) || {}).id;
         genericReq
-          .request('GET', '/elastic/apis')
+          .request('GET', '/api/apis')
           .then(data => {
             if (
               data.data.length > 0 &&
@@ -236,9 +239,13 @@ export function settingsWizard(
             } else {
               appState.removeCurrentAPI();
               if (data.data.length > 0) {
+                const firstApiEntry = data.data[0];
+                const apiId = Object.keys(firstApiEntry)[0];
+                //TODO remove fake info
+                const apiData = Object.assign(firstApiEntry[apiId], {'_id': apiId, 'cluster_info': {'manager': 'wazuh-fake'}});
                 const defaultApi = JSON.stringify({
-                  name: data.data[0]._source.cluster_info.manager,
-                  id: data.data[0]._id
+                  name: apiData.cluster_info.manager,
+                  id: apiData._id
                 });
                 setUpCredentials(
                   'Wazuh App: Default API has been updated.',
@@ -252,7 +259,8 @@ export function settingsWizard(
               }
             }
           })
-          .catch(() => {
+          .catch((err) => {
+            console.error('Error getting the current API ', err);
             setUpCredentials('Wazuh App: Please set up Wazuh API credentials.');
           });
       }
