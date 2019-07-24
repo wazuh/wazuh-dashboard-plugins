@@ -240,19 +240,6 @@ export class SettingsController {
   // Get settings function
   async getSettings() {
     try {
-      const patternList = await this.genericReq.request(
-        'GET',
-        '/elastic/index-patterns',
-        {}
-      );
-      this.indexPatterns = patternList.data.data;
-
-      if (!patternList.data.data.length) {
-        this.wzMisc.setBlankScr('Sorry but no valid index patterns were found');
-        this.$location.search('tab', null);
-        this.$location.path('/blank-screen');
-        return;
-      }
       const data = await this.genericReq.request('GET', '/api/apis');
       let result = [];
       for (const entry of data.data) {
