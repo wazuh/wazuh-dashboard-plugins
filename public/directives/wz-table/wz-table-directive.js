@@ -59,24 +59,27 @@ app.directive('wzTable', function() {
       $scope.scapepath = $scope.path.split('/').join('');
       $scope.originalkeys = $scope.keys.map((key, idx) => ({ key, idx }));
       $scope.updateColumns = key => {
-        const str = key.key.value || key.key;
-        const cleanArray = $scope.keys.map(item => item.value || item);
-        if (cleanArray.includes(str)) {
-          const idx = cleanArray.indexOf(str);
-          if (idx > -1) {
-            $scope.keys.splice(idx, 1);
-          }
-        } else {
-          const originalIdx = $scope.originalkeys.findIndex(
-            item => (item.key.value || item.key) === (key.key.value || key.key)
-          );
-          if (originalIdx >= 0) {
-            $scope.keys.splice(originalIdx, 0, key.key);
+        if (!$scope.isLastKey(key)) {
+          const str = key.key.value || key.key;
+          const cleanArray = $scope.keys.map(item => item.value || item);
+          if (cleanArray.includes(str)) {
+            const idx = cleanArray.indexOf(str);
+            if (idx > -1) {
+              $scope.keys.splice(idx, 1);
+            }
           } else {
-            $scope.keys.push(key.key);
+            const originalIdx = $scope.originalkeys.findIndex(
+              item =>
+                (item.key.value || item.key) === (key.key.value || key.key)
+            );
+            if (originalIdx >= 0) {
+              $scope.keys.splice(originalIdx, 0, key.key);
+            } else {
+              $scope.keys.push(key.key);
+            }
           }
+          init(true);
         }
-        init(true);
       };
       $scope.exists = key => {
         const str = key.key.value || key.key;
@@ -167,6 +170,7 @@ app.directive('wzTable', function() {
               filters: instance.filters
             });
           }
+          filterableColumns();
           if ($scope.customColumns) {
             setTimeout(() => {
               $scope.setColResizable();
@@ -270,6 +274,10 @@ app.directive('wzTable', function() {
       $scope.parseValue = (key, item) =>
         parseValue(key, item, instance.path, $sce, timeService);
 
+      $scope.parseKey = key => {
+        return key ? key.value || key : key;
+      };
+
       /**
        * On controller loads
        */
@@ -292,17 +300,24 @@ app.directive('wzTable', function() {
       $scope.currentOffset = 0;
       let items = [];
       $scope.gap = 0;
+
       $scope.searchTable = () => pagination.searchTable($scope, items);
+
       $scope.groupToPages = () => pagination.groupToPages($scope);
+
       $scope.range = (size, start, end) =>
         pagination.range(size, start, end, $scope.gap);
+
       $scope.prevPage = () => pagination.prevPage($scope);
+
       $scope.nextPage = async (currentPage, last = false) =>
         pagination.nextPage(currentPage, $scope, errorHandler, fetch, last);
+
       $scope.firstPage = function() {
         $scope.setPage(1);
         $scope.prevPage();
       };
+
       $scope.setPage = function(page = false, logs = false, last = false) {
         this.n = page || this.n;
         $scope.currentPage = this.n;
@@ -487,23 +502,54 @@ app.directive('wzTable', function() {
       };
 
       $scope.showTooltip = (id1, id2, item) => {
-        const $element = $('#td-' + id1 + '-' + id2 + ' div');
-        const $c = $element
-          .clone()
-          .css({ display: 'inline', width: 'auto', visibility: 'hidden' })
-          .appendTo('body');
-        if (
-          $c.width() > $element.width() &&
-          (($element || [])[0].children || [])[0].innerText !== '-'
-        ) {
+        const $element = $(
+          '#td-' + id1 + '-' + id2 + ' div span.wz-text-truncatable'
+        );
+        if ($element[0].offsetWidth < $element[0].scrollWidth) {
           if (!item.showTooltip) {
             item.showTooltip = [];
           }
           item.showTooltip[id2] = true;
         }
-        $c.remove();
       };
 
+      const filterableColumns = () => {
+        $scope.filterableColumns = [];
+        $scope.keys.forEach(k => {
+          const key = $scope.parseKey(k);
+          const canFilterInRules =
+            $scope.path === '/rules' &&
+            (key === 'level' || key === 'file' || key === 'path');
+          const canFilterInDecoders =
+            $scope.path === '/decoders' && (key === 'path' || key === 'file');
+          $scope.filterableColumns[key] = !!(
+            canFilterInRules || canFilterInDecoders
+          );
+        });
+      };
+
+      $scope.handleClick = (key, item, ev) => {
+        const value = $scope.parseValue(key, item);
+        let keyTmp = $scope.parseKey(key);
+        const valueTmp = typeof value !== 'string' ? value.toString() : value;
+        if ($scope.filterableColumns[keyTmp]) {
+          if (value !== '-' && keyTmp !== 'file') {
+            const filter = `${keyTmp}:${valueTmp}`;
+            $scope.$emit('applyFilter', { filter });
+          } else if (keyTmp === 'file') {
+            $scope.$emit('viewFileOnlyTable', { file: item, path: item.path });
+          }
+          ev.stopPropagation();
+        }
+      };
+
+      $scope.isLastKey = key => {
+        const exists = $scope.exists(key);
+        const keysLength = $scope.keys.length === 1;
+        const keyValue = key.key.value || key.key;
+        const lastKeyValue = $scope.keys[0].value || $scope.keys[0];
+        return exists && keysLength && keyValue && lastKeyValue;
+      };
       $scope.setColResizable = () => {
         $(`#table${$scope.scapepath} th`).resizable({
           handles: 'e',

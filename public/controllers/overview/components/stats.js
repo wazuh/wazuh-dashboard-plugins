@@ -42,7 +42,7 @@ export class Stats extends Component {
             <EuiStat
               title={this.props.neverConnected}
               description="Never connected agents"
-              titleColor="accent"
+              titleColor="subdued"
               textAlign="center"
             />
           </EuiFlexItem>

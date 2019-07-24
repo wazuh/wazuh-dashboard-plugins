@@ -34,7 +34,7 @@
                 <md-divider class="wz-margin-top-10"></md-divider>
                 <canvas id="bar" ng-if="ctrl.lastAgent && ctrl.lastAgent.id" class="wz-margin-top-16 chart chart-doughnut"
                     chart-data="[ctrl.agentsCountActive,ctrl.agentsCountDisconnected,ctrl.agentsCountNeverConnected]"
-                    chart-labels="['Active','Disconnected', 'Never connected']" chart-colors="['#00a69b', '#ff645c', '#eff0f1']"
+                    chart-labels="['Active','Disconnected', 'Never connected']" chart-colors="['#57C17B', '#BC52BC', '#9E3533']"
                     chart-options="{cutoutPercentage: 75, legend: {display: true,position: 'right',},responsive: false, maintainAspectRatio: false}" />
                 <div layout="row" class="wz-margin-top-16 layout-align-center-center" ng-if="!ctrl.lastAgent || !ctrl.lastAgent.id">
                     There are no agents yet.

@@ -92,6 +92,14 @@ export class DecodersController {
       this.$scope.restartBtn = true;
       this.$scope.$applyAsync();
     });
+
+    this.$scope.$on('applyFilter', (event, parameters) => {
+      this.search(parameters.filter);
+    });
+
+    this.$scope.$on('viewFileOnlyTable', (event, parameters) => {
+      this.$scope.mctrl.switchFilesSubTab('decoders', { parameters });
+    });
   }
 
   /**
@@ -291,6 +299,14 @@ export class DecodersController {
     this.searchTerm = '';
     // Go back to the list
     this.closeDetailView();
+  }
+
+  openFile(file, path) {
+    if (file && path) {
+      this.$scope.mctrl.switchFilesSubTab('rules', {
+        parameters: { file: { file, path }, path }
+      });
+    }
   }
 
   /**

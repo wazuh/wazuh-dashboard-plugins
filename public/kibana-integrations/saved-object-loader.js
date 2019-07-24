@@ -33,7 +33,7 @@ export class SavedObjectLoader {
     this.loaderProperties = {
       name: `${this.lowercaseType}s`,
       noun: StringUtils.upperFirst(this.type),
-      nouns: `${this.lowercaseType}s`,
+      nouns: `${this.lowercaseType}s`
     };
 
     this.savedObjectsClient = savedObjectClient;
@@ -135,20 +135,22 @@ export class SavedObjectLoader {
    * @returns {Promise}
    */
   findAll(search = '', size = 100, fields) {
-    return this.savedObjectsClient.find(
-      {
+    return this.savedObjectsClient
+      .find({
         type: this.lowercaseType,
         search: search ? `${search}*` : undefined,
         perPage: size,
         page: 1,
         searchFields: ['title^3', 'description'],
         defaultSearchOperator: 'AND',
-        fields,
-      }).then((resp) => {
+        fields
+      })
+      .then(resp => {
         return {
           total: resp.total,
-          hits: resp.savedObjects
-            .map((savedObject) => this.mapSavedObjectApiHits(savedObject))
+          hits: resp.savedObjects.map(savedObject =>
+            this.mapSavedObjectApiHits(savedObject)
+          )
         };
       });
   }

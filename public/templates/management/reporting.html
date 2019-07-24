@@ -1,20 +1,12 @@
-<div ng-controller="reportingController as ctrl">
-    <div class="refresh-report-button">
-        <button class="euiButton euiButton--primary euiButton--small" ng-click="ctrl.load()">
-            <react-component name="EuiIcon" props="{type:'refresh', color:'primary'}" />
-            Refresh
-        </button>
+<div layout="column" layout-align="start stretch" ng-controller="reportingController as ctrl" ng-if="mctrl.tab === 'reporting'">
+
+    <div ng-if="ctrl.loading" class="md-padding wz-margin-top-16">
+        <react-component name="EuiProgress" props="{size: 'xs', color: 'primary'}" />
     </div>
 
-    <div layout="column" layout-align="start stretch" ng-if="mctrl.tab === 'reporting'">
-
-        <div ng-if="ctrl.loading" class="md-padding wz-margin-top-16">
-            <react-component name="EuiProgress" props="{size: 'xs', color: 'primary'}" />
-        </div>
-
-        <div layout="row" layout-padding ng-if="!ctrl.loading">
-            <react-component name="ReportingTable" props="ctrl.reportingTableProps" />
-        </div>
+    <div layout="row" layout-padding ng-if="!ctrl.loading && ctrl.reportingTableProps">
+        <react-component name="ReportingTable" props="ctrl.reportingTableProps" />
+    </div>
 
         <!--
     <div layout="row" class="wz-margin-top-16" layout-align="start start"

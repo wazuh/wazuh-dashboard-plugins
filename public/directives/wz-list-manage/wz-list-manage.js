@@ -59,11 +59,11 @@ app.directive('wzListManage', function() {
       $scope.setPage = function(page = false) {
         if (page === 0 || page === -1) {
           $scope.firstPage();
-        } else {   
+        } else {
           this.n = page || this.n;
           $scope.n = this.n;
           $scope.currentPage = this.n;
-          $scope.nextPage(this.n); 
+          $scope.nextPage(this.n);
         }
       };
 
@@ -202,8 +202,8 @@ app.directive('wzListManage', function() {
        * Cancel edition of an entry
        */
       $scope.cancelEditingKey = () => {
-        $scope.editingKey = false; 
-        $scope.loadingChange = false; 
+        $scope.editingKey = false;
+        $scope.loadingChange = false;
         $scope.editingNewValue = '';
       };
 

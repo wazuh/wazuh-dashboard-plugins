@@ -44,7 +44,7 @@ const app = uiModules.get('app/wazuh', ['ngCookies', 'ngMaterial', 'chart.js']);
 
 app.config([
   '$compileProvider',
-  function ($compileProvider) {
+  function($compileProvider) {
     $compileProvider.aHrefSanitizationWhitelist(
       /^\s*(https?|ftp|mailto|data|blob):/
     );
@@ -53,12 +53,12 @@ app.config([
 
 app.config([
   '$httpProvider',
-  function ($httpProvider) {
+  function($httpProvider) {
     $httpProvider.useApplyAsync(true);
   }
 ]);
 
-app.run(function ($rootScope, $route, $location, appState, $window) {
+app.run(function($rootScope, $route, $location, appState, $window) {
   appState.setNavigation({ status: false });
   appState.setNavigation({
     reloaded: false,
@@ -131,17 +131,17 @@ app.run(function ($rootScope, $route, $location, appState, $window) {
                 {
                   page: chrome.addBasePath(
                     'wazuh#' +
-                    navigation.discoverPrevious +
-                    '?agent=' +
-                    $location.search().agent
+                      navigation.discoverPrevious +
+                      '?agent=' +
+                      $location.search().agent
                   )
                 },
                 '',
                 chrome.addBasePath(
                   'wazuh#' +
-                  navigation.discoverPrevious +
-                  '?agent=' +
-                  $location.search().agent
+                    navigation.discoverPrevious +
+                    '?agent=' +
+                    $location.search().agent
                 )
               );
             } else {
