@@ -1,15 +1,10 @@
-<div ng-if="!viewingDetail" ng-show="!editingFile" layout="column"
-    ng-init="filesctrl.switchFilesSubTab(mctrl.globalRulesetTab)">
+<div ng-if="!viewingDetail" ng-show="!editingFile" layout="column" ng-init="filesctrl.switchFilesSubTab(mctrl.globalRulesetTab)">
 
     <div layout="row">
         <div class="md-padding padding-right-0">
             <button type="submit" aria-label="Search" class="euiFlexItem euiFlexItem--flexGrowZero height-35 kuiButton kuiButton--secondary "
                 ng-click="mctrl.setRulesTab(filesctrl.filesSubTab)" tooltip="Go back" tooltip-placement="bottom">
-                <svg class="euiIcon euiIcon--medium" focusable="false" xmlns="http://www.w3.org/2000/svg" width="16"
-                    height="16" viewBox="0 0 16 16">
-                    <path d="M4.308 7h8.136c.307 0 .556.224.556.5s-.249.5-.556.5H4.308l4.096 4.096a.5.5 0 0 1-.707.707L3.454 8.561a1.494 1.494 0 0 1-.433-.925.454.454 0 0 1 0-.272c.03-.338.175-.666.433-.925l4.243-4.242a.5.5 0 1 1 .707.707L4.308 7z"
-                        fill-rule="evenodd"></path>
-                </svg>
+                <react-component name="EuiIcon" props="{type:'sortLeft', color:'primary'}" />
             </button>
         </div>
         <div class="md-padding euiFlexGroup euiFlexGroup--alignItemsCenter euiFormControlLayout__childrenWrapper md-padding-h ng-scope ">
