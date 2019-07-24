@@ -1,16 +1,13 @@
 import expect from '@kbn/expect';
-import { pageObjects } from '../../page_objects';
 
 
 export default function ({ getService, getPageObjects }) {
   const appsMenu = getService('appsMenu');
-  const PageObjects = getPageObjects(['common', 'home']);
+  const PageObjects = getPageObjects(['common',]);
   const testSubjects = getService('testSubjects');
   const find = getService('find');
-  const log = getService('log');
 
-  describe('Wazuh plugin', function describeIndexTests() {
-    this.tags('smoke');
+  describe('Wazuh plugin', () => {
 
     it('should exist the app in the kibana menu', async ()=> {
       await PageObjects.common.navigateToApp('settings');

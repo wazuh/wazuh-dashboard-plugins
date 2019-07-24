@@ -1,10 +1,9 @@
 export default function ({ getService, loadTestFile }) {
   const browser = getService('browser');
 
-  describe('Overview ', function () {
-    this.tags(['smoke']);
+  describe('Overview ', () => {
 
-    before(async function () {
+    before(async () => {
       await browser.setWindowSize(1200, 800);
     });
     

@@ -1,11 +1,8 @@
 import expect from '@kbn/expect';
 
 export default function({ getService, getPageObjects }) {
-  const browser = getService('browser');
-  const filterBar = getService('filterBar');
-  const queryBar = getService('queryBar');
   const find = getService('find');
-  const PageObjects = getPageObjects(['common', 'wazuhCommon', 'timePicker', 'toasts']);
+  const PageObjects = getPageObjects(['common', 'wazuhCommon', 'timePicker']);
   const testSubjects = getService('testSubjects');
   
   describe('Discover subtab', () => {
