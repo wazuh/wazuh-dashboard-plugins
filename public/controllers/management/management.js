@@ -303,9 +303,13 @@ export class ManagementController {
   breadCrumbBack(goRoot = false) {
     if (this.currentRule) {
       this.$scope.$broadcast('closeRuleView');
+      this.$scope.$broadcast('closeRulesetFile');
+      this.$scope.$emit('removeCurrentRule');
     }
     if (this.currentDecoder) {
       this.$scope.$broadcast('closeDecoderView');
+      this.$scope.$broadcast('closeRulesetFile');
+      this.$scope.$emit('removeCurrentDecoder');
     }
     if (this.currentList) {
       this.$scope.$broadcast('closeListView');
@@ -314,6 +318,7 @@ export class ManagementController {
       this.switchTab('ruleset', true);
       this.setRulesTab('rules');
     }
+    this.$scope.$applyAsync();
   }
 
   changeNode(node) {
