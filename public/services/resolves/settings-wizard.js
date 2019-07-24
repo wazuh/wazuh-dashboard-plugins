@@ -233,7 +233,7 @@ export function settingsWizard(
           .then(data => {
             if (
               data.data.length > 0 &&
-              data.data.find(x => x['_id'] == apiId)
+              data.data.find(api => Object.keys(api)[0] == apiId)
             ) {
               callCheckStored();
             } else {
