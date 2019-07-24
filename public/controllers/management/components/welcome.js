@@ -29,6 +29,7 @@ export class WelcomeScreen extends Component {
                     layout="horizontal"
                     icon={<EuiIcon size="xl" type="indexRollupApp" />}
                     title="Ruleset"
+                    data-test-subj="managementWelcomeRuleset"
                     onClick={() => this.props.switchTab('ruleset', true)}
                     description="Manage your Wazuh cluster ruleset."
                   />
@@ -38,6 +39,7 @@ export class WelcomeScreen extends Component {
                     layout="horizontal"
                     icon={<EuiIcon size="xl" type="usersRolesApp" />}
                     title="Groups"
+                    data-test-subj="managementWelcomeGroups"
                     onClick={() => this.props.switchTab('groups', true)}
                     description="Manage your agent groups."
                   />
@@ -49,6 +51,7 @@ export class WelcomeScreen extends Component {
                     layout="horizontal"
                     icon={<EuiIcon size="xl" type="devToolsApp" />}
                     title="Configuration"
+                    data-test-subj="managementWelcomeConfiguration"
                     onClick={() => this.props.switchTab('configuration', true)}
                     description="Manage your Wazuh cluster configuration."
                   />
@@ -66,6 +69,7 @@ export class WelcomeScreen extends Component {
                     layout="horizontal"
                     icon={<EuiIcon size="xl" type="uptimeApp" />}
                     title="Status"
+                    data-test-subj="managementWelcomeStatus"
                     onClick={() => this.props.switchTab('status', true)}
                     description="Manage your Wazuh cluster status."
                   />
@@ -75,6 +79,7 @@ export class WelcomeScreen extends Component {
                     layout="horizontal"
                     icon={<EuiIcon size="xl" type="indexPatternApp" />}
                     title="Cluster"
+                    data-test-subj="managementWelcomeCluster"
                     onClick={() => this.props.switchTab('monitoring', true)}
                     description="Visualize your Wazuh cluster."
                   />
@@ -86,6 +91,7 @@ export class WelcomeScreen extends Component {
                     layout="horizontal"
                     icon={<EuiIcon size="xl" type="filebeatApp" />}
                     title="Logs"
+                    data-test-subj="managementWelcomeLogs"
                     onClick={() => this.props.switchTab('logs', true)}
                     description="Logs from your Wazuh cluster."
                   />
@@ -95,6 +101,7 @@ export class WelcomeScreen extends Component {
                     layout="horizontal"
                     icon={<EuiIcon size="xl" type="reportingApp" />}
                     title="Reporting"
+                    data-test-subj="managementWelcomeReporting"
                     onClick={() => this.props.switchTab('reporting', true)}
                     description="Check your stored Wazuh reports."
                   />

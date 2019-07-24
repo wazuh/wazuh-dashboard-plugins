@@ -29,7 +29,7 @@ export default function({ getService, getPageObjects }) {
 
     it('after reload the browser the `Amazon AWS` extension should be enabled', async () => {
       browser.refresh();
-      await PageObjects.common.sleep(1000);
+      await PageObjects.common.sleep(1250);
       expect(await testSubjects.exists('overviewWelcomeAws')).to.be.ok();
     });
 
@@ -44,7 +44,7 @@ export default function({ getService, getPageObjects }) {
 
     it('after reload the browser the `OpenSCAP` extension should be enabled', async () => {
       browser.refresh();
-      await PageObjects.common.sleep(1000);
+      await PageObjects.common.sleep(1250);
       expect(await testSubjects.exists('overviewWelcomeOscap')).to.be.ok();
     });
 
@@ -59,7 +59,7 @@ export default function({ getService, getPageObjects }) {
 
     it('after reload the browser the `CIS-CAT` extension should be enabled', async () => {
       browser.refresh();
-      await PageObjects.common.sleep(1000);
+      await PageObjects.common.sleep(1250);
       expect(await testSubjects.exists('overviewWelcomeCiscat')).to.be.ok();
     });
 
@@ -74,7 +74,7 @@ export default function({ getService, getPageObjects }) {
 
     it('after reload the browser the `VirusTotal` extension should be enabled', async () => {
       browser.refresh();
-      await PageObjects.common.sleep(1000);
+      await PageObjects.common.sleep(1250);
       expect(await testSubjects.exists('overviewWelcomeVirustotal')).to.be.ok();
     });
 
@@ -89,7 +89,7 @@ export default function({ getService, getPageObjects }) {
 
     it('after reload the browser the `Osquery` extension should be enabled', async () => {
       browser.refresh();
-      await PageObjects.common.sleep(1000);
+      await PageObjects.common.sleep(1250);
       expect(await testSubjects.exists('overviewWelcomeOsquery')).to.be.ok();
     });
 
@@ -104,7 +104,7 @@ export default function({ getService, getPageObjects }) {
 
     it('after reload the browser the `Docker listener` extension should be enabled', async () => {
       browser.refresh();
-      await PageObjects.common.sleep(1000);
+      await PageObjects.common.sleep(1250);
       expect(await testSubjects.exists('overviewWelcomeDocker')).to.be.ok();
     });
 
@@ -157,7 +157,7 @@ export default function({ getService, getPageObjects }) {
 
     it('after reload the browser the `Amazon AWS` extension should be disabled', async () => {
       browser.refresh();
-      await PageObjects.common.sleep(1000);
+      await PageObjects.common.sleep(1250);
       expect(await testSubjects.exists('overviewWelcomeAws')).to.not.be.ok();
     });
 
@@ -172,7 +172,7 @@ export default function({ getService, getPageObjects }) {
 
     it('after reload the browser the `OpenSCAP` extension should be disabled', async () => {
       browser.refresh();
-      await PageObjects.common.sleep(1000);
+      await PageObjects.common.sleep(1250);
       expect(await testSubjects.exists('overviewWelcomeOscap')).to.not.be.ok();
     });
 
@@ -187,7 +187,7 @@ export default function({ getService, getPageObjects }) {
 
     it('after reload the browser the `CIS-CAT` extension should be disabled', async () => {
       browser.refresh();
-      await PageObjects.common.sleep(1000);
+      await PageObjects.common.sleep(1250);
       expect(await testSubjects.exists('overviewWelcomeCiscat')).to.not.be.ok();
     });
 
@@ -202,7 +202,7 @@ export default function({ getService, getPageObjects }) {
 
     it('after reload the browser the `VirusTotal` extension should be disabled', async () => {
       browser.refresh();
-      await PageObjects.common.sleep(1000);
+      await PageObjects.common.sleep(1250);
       expect(await testSubjects.exists('overviewWelcomeVirustotal')).to.not.be.ok();
     });
 
@@ -217,7 +217,7 @@ export default function({ getService, getPageObjects }) {
 
     it('after reload the browser the `Osquery` extension should be disabled', async () => {
       browser.refresh();
-      await PageObjects.common.sleep(1000);
+      await PageObjects.common.sleep(1250);
       expect(await testSubjects.exists('overviewWelcomeOsquery')).to.not.be.ok();
     });
 
@@ -232,7 +232,7 @@ export default function({ getService, getPageObjects }) {
 
     it('after reload the browser the `Docker listener` extension should be disabled', async () => {
       browser.refresh();
-      await PageObjects.common.sleep(1000);
+      await PageObjects.common.sleep(1250);
       expect(await testSubjects.exists('overviewWelcomeDocker')).to.not.be.ok();
     });
 
