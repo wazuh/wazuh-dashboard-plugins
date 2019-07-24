@@ -78,7 +78,7 @@ export class ReportingService {
       const array = await this.vis2png.checkArray(idArray);
       const name = `wazuh-${
         isAgents ? 'agents' : 'overview'
-      }-${tab}-${(Date.now() / 1000) | 0}.pdf`;
+        }-${tab}-${(Date.now() / 1000) | 0}.pdf`;
 
       const browserTimezone = moment.tz.guess(true);
 
@@ -114,7 +114,7 @@ export class ReportingService {
     }
   }
 
-  async startConfigReport(obj, type) {
+  async startConfigReport(obj, type, components) {
     try {
       this.$rootScope.reportBusy = true;
       this.$rootScope.reportStatus = 'Generating PDF document...';
@@ -138,7 +138,8 @@ export class ReportingService {
         searchBar: '',
         tables: [],
         tab: type,
-        browserTimezone
+        browserTimezone,
+        components
       };
 
       await this.genericReq.request('POST', '/reports', data);

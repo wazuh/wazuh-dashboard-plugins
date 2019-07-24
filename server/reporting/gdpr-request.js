@@ -58,7 +58,10 @@ export class GdprRequest {
         }
       });
 
-      const response = await this.wzWrapper.searchWazuhAlertsWithPayload(base);
+      const response = await this.wzWrapper.searchWazuhAlertsWithPayload(
+        base,
+        this.namespace
+      );
       const aggArray = response.aggregations['2'].buckets;
 
       return aggArray.map(item => item.key);
@@ -122,7 +125,10 @@ export class GdprRequest {
         requirement +
         '"';
 
-      const response = await this.wzWrapper.searchWazuhAlertsWithPayload(base);
+      const response = await this.wzWrapper.searchWazuhAlertsWithPayload(
+        base,
+        this.namespace
+      );
       const { buckets } = response.aggregations['2'];
       const result = [];
       for (const bucket of buckets) {

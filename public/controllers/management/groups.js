@@ -239,8 +239,8 @@ export function GroupsController(
     $scope.$applyAsync();
   };
 
-  $scope.exportConfiguration = group => {
-    reportingService.startConfigReport(group, 'groupConfig');
+  $scope.exportConfiguration = (enabledComponents) => {
+    reportingService.startConfigReport($scope.currentGroup, 'groupConfig', enabledComponents);
   };
 
   /**
@@ -573,7 +573,7 @@ export function GroupsController(
   };
 
   // Resetting the factory configuration
-  $scope.$on('$destroy', () => {});
+  $scope.$on('$destroy', () => { });
 
   $scope.$watch('lookingGroup', value => {
     $scope.availableAgents = {
