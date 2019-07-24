@@ -120,17 +120,29 @@ export default function({ getService, getPageObjects }) {
 
     it('all extension should be enabled when return to the last api', async () => {
       await PageObjects.api.deleteNewApi();
-      while(!await testSubjects.exists('overviewWelcomeAws')){}
+      while(!await testSubjects.exists('overviewWelcomeAws')){
+        await PageObjects.common.sleep(500);
+      }
       expect(true).to.be.ok();
-      while(!await testSubjects.exists('overviewWelcomeOscap')){}
+      while(!await testSubjects.exists('overviewWelcomeOscap')){
+        await PageObjects.common.sleep(500);
+      }
       expect(true).to.be.ok();
-      while(!await testSubjects.exists('overviewWelcomeCiscat')){}
+      while(!await testSubjects.exists('overviewWelcomeCiscat')){
+        await PageObjects.common.sleep(500);
+      }
       expect(true).to.be.ok();
-      while(!await testSubjects.exists('overviewWelcomeVirustotal')){}
+      while(!await testSubjects.exists('overviewWelcomeVirustotal')){
+        await PageObjects.common.sleep(500);
+      }
       expect(true).to.be.ok();
-      while(!await testSubjects.exists('overviewWelcomeOsquery')){}
+      while(!await testSubjects.exists('overviewWelcomeOsquery')){
+        await PageObjects.common.sleep(500);
+      }
       expect(true).to.be.ok();
-      while(!await testSubjects.exists('overviewWelcomeDocker')){}
+      while(!await testSubjects.exists('overviewWelcomeDocker')){
+        await PageObjects.common.sleep(500);
+      }
       expect(true).to.be.ok();
     });
 
