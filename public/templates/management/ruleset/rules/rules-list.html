@@ -4,8 +4,12 @@
         ng-if="!mctrl.filesSubTab">
         <input placeholder="Filter rules..." ng-model="custom_search" type="text" class="euiFieldSearch euiFieldSearch--fullWidth euiFlexItem height-35 ng-empty ng-pristine ng-touched ng-valid"
             aria-invalid="false" wz-enter="search(custom_search)" id="search-input-rules">
-        <wz-add-filter-chip id-input="search-input-rules" options="[{label: 'File', value: 'file'}, {label: 'Path', value: 'path'}, {label: 'Level', value: 'level'}, 
+        <<<<<<< HEAD <wz-add-filter-chip id-input="search-input-rules" options="[{label: 'File', value: 'file'}, {label: 'Path', value: 'path'}, {label: 'Level', value: 'level'}, 
         {label: 'Group', value: 'group'}, {label: 'PCI control', value: 'pci'}, {label: 'GDPR', value: 'gdpr'}, {label: 'HIPAA', value: 'hipaa'}, {label: 'NIST-800-53', value: 'nist-800-53'}]" />
+        =======
+        <wz-add-filter-chip id-input="search-input-rules" options="[{label: 'File', value: 'file'}, {label: 'Path', value: 'path', hide: mctrl.showingLocalRules}, {label: 'Level', value: 'level'}, 
+        {label: 'Group', value: 'group'}, {label: 'PCI control', value: 'pci'}, {label: 'GDPR', value: 'gdpr'}]" />
+        >>>>>>> 0339b918df5635c0aab03133783c84f1690396bb
         <div class="euiFormControlLayoutIcons wz-margin-left-16">
             <span class="euiFormControlLayoutCustomIcon">
                 <react-component name="EuiIcon" props="{type:'search', className:'euiFormControlLayoutCustomIcon__icon'}" />
@@ -73,11 +77,11 @@
                     switch-text="Custom rules" switch-change="switchLocalRules()"></wz-kbn-switch>
             </md-card-actions>
             <md-card-content class="wz-padding-bottom-0">
-                <wz-table custom-columns="true" flex ng-if="mctrl.showingLocalRules" path="'/rules'" keys="[{value: 'id', width: '85px'},{value:'description', width: 'auto'},{value:'groups',nosortable:true, width: '250px'},{value:'pci',nosortable:true, width: '170px'},{value:'gdpr',nosortable:true,width: '170px'}, {value:'hipaa',nosortable:true,width: '170px'}, {value:'nist-800-53',nosortable:true,width: '170px'}, {value: 'level', width: '100px'}, {value:'file',width: '200px'}]"
+                <wz-table custom-columns="true" flex ng-if="mctrl.showingLocalRules" path="'/rules'" keys="[{value: 'id', width: '85px'},{value:'description', width: 'auto'},{value:'groups',nosortable:true, width: '250px'},{value:'pci',nosortable:true, width: '170px'},{value:'gdpr',nosortable:true,width: '170px'}, {value:'hipaa',nosortable:true,width: '170px'}, {value:'nist-800-53',nosortable:true,width: '170px'}, {value: 'level', width: '100px'}, {value:'file',width: '200px'}, {value:'path', width: 'auto'}]"
                     implicit-filter="appliedFilters" allow-click="true" row-sizes="[16,14,12]">
                 </wz-table>
                 <wz-table custom-columns="true" ng-if="!mctrl.showingLocalRules" implicit-filter="appliedFilters" flex
-                    path="'/rules'" keys="[{value: 'id', width: '85px'},{value:'description', width: 'auto'},{value:'groups',nosortable:true, width: '250px'},{value:'pci',nosortable:true, width: '170px'},{value:'gdpr',nosortable:true,width: '170px'}, {value:'hipaa',nosortable:true,width: '170px'}, {value:'nist-800-53',nosortable:true,width: '170px'}, {value: 'level', width: '100px'}, {value:'file',width: '200px'}]"
+                    path="'/rules'" keys="[{value: 'id', width: '85px'},{value:'description', width: 'auto'},{value:'groups',nosortable:true, width: '250px'},{value:'pci',nosortable:true, width: '170px'},{value:'gdpr',nosortable:true,width: '170px'}, {value:'hipaa',nosortable:true,width: '170px'}, {value:'nist-800-53',nosortable:true,width: '170px'}, {value: 'level', width: '100px'}, {value:'file',width: '200px'}, {value:'path', width: 'auto'}]"
                     allow-click="true" row-sizes="[16,14,12]">
                 </wz-table>
             </md-card-content>

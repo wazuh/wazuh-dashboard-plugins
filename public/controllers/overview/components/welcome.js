@@ -129,7 +129,6 @@ export class WelcomeScreen extends Component {
               </EuiFlexGroup>
               <EuiFlexGrid columns={2}>
                 {this.buildTabCard('pm', 'advancedSettingsApp')}
-                {this.buildTabCard('sca', 'securityAnalyticsApp')}
                 {this.props.extensions.audit &&
                   this.buildTabCard('audit', 'monitoringApp')}
                 {this.props.extensions.oscap &&

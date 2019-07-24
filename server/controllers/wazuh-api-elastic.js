@@ -159,9 +159,7 @@ export class WazuhApiElasticCtrl {
       );
       log(
         'wazuh-api-elastic:saveAPI',
-        `${req.payload.user}:*****@${req.payload.url}:${
-          req.payload.port
-        } entry saved successfully`,
+        `${req.payload.user}:*****@${req.payload.url}:${req.payload.port} entry saved successfully`,
         'debug'
       );
 

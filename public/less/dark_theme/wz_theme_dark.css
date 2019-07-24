@@ -199,6 +199,24 @@ md-nav-bar.md-default-theme .md-nav-bar, md-nav-bar .md-nav-bar {
 
 .kuiLocalSearchInput, .kuiLocalSearchInput:focus {
   border: 1px solid #343741 !important;
+  background: #16171c;
+  color: #dfe5ef;
+}
+
+.wzMultipleSelector .panel-primary {
+  border: 1px solid #343741!important;
+  -webkit-box-shadow: 0 2px 2px -1px rgba(0, 0, 0, 0.1) !important;
+  box-shadow: 0 2px 2px -1px rgba(0, 0, 0, 0.1) !important;
+  border-radius: 2px;
+}
+
+.wzMultipleSelector .panel-primary > .panel-heading {
+  color: #fff;
+  border-color: #343741;
+}
+
+.wzMultipleSelector select {
+  border-color: #343741;
 }
 
 .btn-info {
@@ -242,6 +260,12 @@ md-divider.md-default-theme, md-divider {
   background-color: #343741;
 }
 
-.wz-dev-column-separator {
+.wz-dev-column-separator:hover {
   background-color: #0b4462;
+}
+
+.CodeMirror-hints{
+  background-color: #16171c !important;
+  border-color: #000;
+  color: #dfe5ef;
 }
