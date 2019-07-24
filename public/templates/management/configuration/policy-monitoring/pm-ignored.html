@@ -1,0 +1,58 @@
+<!-- No configuration section -->
+<wz-no-config flex error="'not-present'" ng-if="configurationSubTab === 'pm-ignored' && currentConfig && currentConfig['syscheck-rootcheck'] && currentConfig['syscheck-rootcheck'].rootcheck && (!currentConfig['syscheck-rootcheck'].rootcheck.ignore || ( currentConfig['syscheck-rootcheck'].rootcheck.ignore && !currentConfig['syscheck-rootcheck'].rootcheck.ignore.length))"></wz-no-config>
+<!-- End no configuration section -->
+
+<!-- Ignored card -->
+<md-card class="wz-md-card" ng-if="!JSONContent && !XMLContent && configurationSubTab === 'pm-ignored' && currentConfig && currentConfig['syscheck-rootcheck'] && currentConfig['syscheck-rootcheck'].rootcheck && currentConfig['syscheck-rootcheck'].rootcheck.ignore && currentConfig['syscheck-rootcheck'].rootcheck.ignore.length">
+    <md-card-content>
+        <div layout="row" layout-align="start center">
+            <div>
+                <span class="font-size-16">Ignored files and directories</span>
+                <div class="wz-margin-top-10">
+                    <span class="md-subheader small">These files and directories are ignored from the rootcheck scan</span>
+                </div>
+            </div>
+            <span flex></span>
+            <span ng-class="JSONContent ? 'wz-text-active' : ''" class="wz-text-link small" ng-click="getJSON()">JSON</span>
+            <span class="small">&nbsp;&centerdot;&nbsp;</span>
+            <span ng-class="XMLContent ? 'wz-text-active' : ''" class="wz-text-link small" ng-click="getXML()">XML</span>
+        </div>
+        <md-divider class="wz-margin-top-10"></md-divider>
+
+        <!-- Configuration block -->
+        <div class="wz-padding-top-10">
+
+            <table class="table table-striped table-condensed" style="table-layout: fixed !important;" ng-if="(currentConfig['syscheck-rootcheck'].rootcheck.ignore || {}).length">
+                <thead class="wz-text-bold">
+                    <th class="wz-text-left">Path</th>
+                </thead>
+                <tbody class="wz-word-wrap">
+                    <tr ng-repeat="path in currentConfig['syscheck-rootcheck'].rootcheck.ignore">
+                        <td>{{path}}</td>
+                    </tr>
+                </tbody>
+            </table>
+
+        </div>
+
+        <md-divider class="wz-margin-top-10"></md-divider>
+
+        <!-- Configuration block -->
+        <div class="wz-padding-top-10" ng-if="(currentConfig['syscheck-rootcheck'].rootcheck.ignore_sregex || {}).length">
+
+            <table class="table table-striped table-condensed" style="table-layout: fixed !important;">
+                <thead class="wz-text-bold">
+                    <th class="wz-text-left">Sregex</th>
+                </thead>
+                <tbody class="wz-word-wrap">
+                    <tr ng-repeat="sreg in currentConfig['syscheck-rootcheck'].rootcheck.ignore_sregex">
+                        <td>{{sreg}}</td>
+                    </tr>
+                </tbody>
+            </table>
+
+        </div>
+        <!-- End configuration block -->
+    </md-card-content>
+</md-card>
+<!-- End ignored card -->

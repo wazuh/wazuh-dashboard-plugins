@@ -1173,16 +1173,12 @@ export class WazuhReportingCtrl {
         if (lastScan && lastScan.data) {
           if (lastScan.data.start && lastScan.data.end) {
             this.dd.content.push({
-              text: `Last policy monitoring scan was executed from ${
-                lastScan.data.start
-                } to ${lastScan.data.end}.`,
+              text: `Last policy monitoring scan was executed from ${lastScan.data.start} to ${lastScan.data.end}.`,
               style: 'standard'
             });
           } else if (lastScan.data.start) {
             this.dd.content.push({
-              text: `Policy monitoring scan is currently in progress for this agent (started on ${
-                lastScan.data.start
-                }).`,
+              text: `Policy monitoring scan is currently in progress for this agent (started on ${lastScan.data.start}).`,
               style: 'standard'
             });
           } else {
@@ -1300,15 +1296,11 @@ export class WazuhReportingCtrl {
         if (lastScan && lastScan.data) {
           if (lastScan.data.start && lastScan.data.end) {
             this.dd.content.push({
-              text: `Last file integrity monitoring scan was executed from ${
-                lastScan.data.start
-                } to ${lastScan.data.end}.`
+              text: `Last file integrity monitoring scan was executed from ${lastScan.data.start} to ${lastScan.data.end}.`
             });
           } else if (lastScan.data.start) {
             this.dd.content.push({
-              text: `File integrity monitoring scan is currently in progress for this agent (started on ${
-                lastScan.data.start
-                }).`
+              text: `File integrity monitoring scan is currently in progress for this agent (started on ${lastScan.data.start}).`
             });
           } else {
             this.dd.content.push({
@@ -1626,6 +1618,19 @@ export class WazuhReportingCtrl {
         const isAgentConfig = tab === 'agentConfig';
         const isGroupConfig = tab === 'groupConfig';
 
+        // Pass the namespace if present to all the requesters
+        if(pattern) {
+          const spaces = this.server.plugins.spaces;
+          const namespace = spaces && spaces.getSpaceId(req);
+          this.vulnerabilityRequest.namespace = namespace;
+          this.overviewRequest.namespace = namespace;
+          this.rootcheckRequest.namespace = namespace;
+          this.pciRequest.namespace = namespace;
+          this.gdprRequest.namespace = namespace;
+          this.auditRequest.namespace = namespace;
+          this.syscheckRequest.namespace = namespace;
+        }
+        
         if (!tab)
           throw new Error(
             'Reporting needs a valid app tab in order to work properly'
@@ -1659,103 +1664,130 @@ export class WazuhReportingCtrl {
           }
           const g_id = kfilters[0].group;
           kfilters = [];
-          let configuration = {};
+          const enabledComponents = req.payload.components;
           this.dd.content.push({
             text: `Group ${g_id} configuration`,
             style: 'h1'
           });
-          try {
-            configuration = await this.apiRequest.makeGenericRequest(
-              'GET',
-              `/agents/groups/${g_id}/configuration`,
-              {},
-              apiId
-            );
-          } catch (err) { } //eslint-disable-line
-          if (Object.keys(configuration.data.items[0].config).length) {
-            this.dd.content.push({
-              text: `Configurations`,
-              style: { fontSize: 14, color: '#000' },
-              margin: [0, 10, 0, 15]
-            });
-            const section = {
-              labels: [],
-              isGroupConfig: true
-            };
-            for (let config of configuration.data.items) {
-              let filterTitle = '';
-              let index = 0;
-              for (let filter of Object.keys(config.filters)) {
-                filterTitle = filterTitle.concat(
-                  `${filter}: ${config.filters[filter]}`
-                );
-                if (index < Object.keys(config.filters).length - 1) {
-                  filterTitle = filterTitle.concat(' | ');
-                }
-                index++;
-              }
+          if (enabledComponents['0']) {
+            let configuration = {};
+            try {
+              configuration = await this.apiRequest.makeGenericRequest(
+                'GET',
+                `/agents/groups/${g_id}/configuration`,
+                {},
+                apiId
+              );
+            } catch (err) { } //eslint-disable-line
+            if (Object.keys(configuration.data.items[0].config).length) {
               this.dd.content.push({
-                text: filterTitle,
-                style: 'h4',
-                margin: [0, 0, 0, 10]
+                text: `Configurations`,
+                style: { fontSize: 14, color: '#000' },
+                margin: [0, 10, 0, 15]
               });
-              let idx = 0;
-              section.tabs = [];
-              for (let _d of Object.keys(config.config)) {
-                for (let c of AgentConfiguration.configurations) {
-                  for (let s of c.sections) {
-                    for (let cn of s.config || []) {
-                      if (cn.configuration === _d) {
-                        section.labels = s.labels || [[]];
+              const section = {
+                labels: [],
+                isGroupConfig: true
+              };
+              for (let config of configuration.data.items) {
+                let filterTitle = '';
+                let index = 0;
+                for (let filter of Object.keys(config.filters)) {
+                  filterTitle = filterTitle.concat(
+                    `${filter}: ${config.filters[filter]}`
+                  );
+                  if (index < Object.keys(config.filters).length - 1) {
+                    filterTitle = filterTitle.concat(' | ');
+                  }
+                  index++;
+                }
+                this.dd.content.push({
+                  text: filterTitle,
+                  style: 'h4',
+                  margin: [0, 0, 0, 10]
+                });
+                let idx = 0;
+                section.tabs = [];
+                for (let _d of Object.keys(config.config)) {
+                  for (let c of AgentConfiguration.configurations) {
+                    for (let s of c.sections) {
+                      for (let cn of s.config || []) {
+                        if (cn.configuration === _d) {
+                          section.labels = s.labels || [[]];
+                        }
                       }
-                    }
-                    for (let wo of s.wodle || []) {
-                      if (wo.name === _d) {
-                        section.labels = s.labels || [[]];
+                      for (let wo of s.wodle || []) {
+                        if (wo.name === _d) {
+                          section.labels = s.labels || [[]];
+                        }
                       }
                     }
                   }
-                }
-                section.labels[0]['pack'] = 'Packs';
-                section.labels[0]['content'] = 'Evaluations';
-                section.labels[0]['7'] = 'Scan listening netwotk ports';
-                section.tabs.push(equivalences[_d]);
+                  section.labels[0]['pack'] = 'Packs';
+                  section.labels[0]['content'] = 'Evaluations';
+                  section.labels[0]['7'] = 'Scan listening netwotk ports';
+                  section.tabs.push(equivalences[_d]);
 
-                if (Array.isArray(config.config[_d])) {
-                  /* LOG COLLECTOR */
-                  if (_d === 'localfile') {
-                    let groups = [];
-                    config.config[_d].forEach(obj => {
-                      if (!groups[obj.logformat]) {
-                        groups[obj.logformat] = [];
-                      }
-                      groups[obj.logformat].push(obj);
-                    });
-                    Object.keys(groups).forEach(group => {
-                      let saveidx = 0;
-                      groups[group].forEach((x, i) => {
-                        if (
-                          Object.keys(x).length >
-                          Object.keys(groups[group][saveidx]).length
-                        ) {
-                          saveidx = i;
+                  if (Array.isArray(config.config[_d])) {
+                    /* LOG COLLECTOR */
+                    if (_d === 'localfile') {
+                      let groups = [];
+                      config.config[_d].forEach(obj => {
+                        if (!groups[obj.logformat]) {
+                          groups[obj.logformat] = [];
                         }
+                        groups[obj.logformat].push(obj);
                       });
+                      Object.keys(groups).forEach(group => {
+                        let saveidx = 0;
+                        groups[group].forEach((x, i) => {
+                          if (
+                            Object.keys(x).length >
+                            Object.keys(groups[group][saveidx]).length
+                          ) {
+                            saveidx = i;
+                          }
+                        });
+                        const columns = Object.keys(
+                          groups[group][saveidx]
+                        );
+                        const rows = groups[group].map(x => {
+                          let row = [];
+                          columns.forEach(key => {
+                            row.push(
+                              typeof x[key] !== 'object'
+                                ? x[key]
+                                : Array.isArray(x[key])
+                                  ? x[key].map(x => {
+                                    return x + '\n';
+                                  })
+                                  : JSON.stringify(x[key])
+                            );
+                          });
+                          return row;
+                        });
+                        columns.forEach((col, i) => {
+                          columns[i] = col[0].toUpperCase() + col.slice(1);
+                        });
+                        tables.push({
+                          title: 'Local files',
+                          type: 'table',
+                          columns,
+                          rows
+                        });
+                      });
+                    } else if (_d === 'labels') {
+                      const obj = config.config[_d][0].label;
                       const columns = Object.keys(
-                        groups[group][saveidx]
+                        obj[0]
                       );
-                      const rows = groups[group].map(x => {
+                      if (!columns.includes('hidden')) {
+                        columns.push('hidden')
+                      }
+                      const rows = obj.map(x => {
                         let row = [];
                         columns.forEach(key => {
-                          row.push(
-                            typeof x[key] !== 'object'
-                              ? x[key]
-                              : Array.isArray(x[key])
-                                ? x[key].map(x => {
-                                  return x + '\n';
-                                })
-                                : JSON.stringify(x[key])
-                          );
+                          row.push(x[key]);
                         });
                         return row;
                       });
@@ -1763,55 +1795,48 @@ export class WazuhReportingCtrl {
                         columns[i] = col[0].toUpperCase() + col.slice(1);
                       });
                       tables.push({
-                        title: 'Local files',
+                        title: 'Labels',
                         type: 'table',
                         columns,
                         rows
                       });
-                    });
-                  } else if (_d === 'labels') {
-                    const obj = config.config[_d][0].label;
-                    const columns = Object.keys(
-                      obj[0]
-                    );
-                    if (!columns.includes('hidden')) {
-                      columns.push('hidden')
-                    }
-                    const rows = obj.map(x => {
-                      let row = [];
-                      columns.forEach(key => {
-                        row.push(x[key]);
-                      });
-                      return row;
-                    });
-                    columns.forEach((col, i) => {
-                      columns[i] = col[0].toUpperCase() + col.slice(1);
-                    });
-                    tables.push({
-                      title: 'Labels',
-                      type: 'table',
-                      columns,
-                      rows
-                    });
-                  } else {
-                    for (let _d2 of config.config[_d]) {
-                      tables.push(...this.getConfigTables(_d2, section, idx));
+                    } else {
+                      for (let _d2 of config.config[_d]) {
+                        tables.push(...this.getConfigTables(_d2, section, idx));
+                      }
                     }
                   }
+                  else {
+                    tables.push(
+                      ...this.getConfigTables(config.config[_d], section, idx)
+                    );
+                  }
+                  for (const table of tables) {
+                    this.renderConfigTables([table]);
+                  }
+                  idx++;
+                  tables = [];
                 }
-                else {
-                  tables.push(
-                    ...this.getConfigTables(config.config[_d], section, idx)
-                  );
-                }
-                for (const table of tables) {
-                  this.renderConfigTables([table]);
-                }
-                idx++;
                 tables = [];
               }
-              tables = [];
             }
+          };
+          if (enabledComponents['1']) {
+            let agentsInGroup = [];
+            try {
+              agentsInGroup = await this.apiRequest.makeGenericRequest(
+                'GET',
+                `/agents/groups/${g_id}`,
+                {},
+                apiId
+              );
+            } catch (err) { } //eslint-disable-line
+            await this.renderHeader(
+              tab,
+              g_id,
+              (((agentsInGroup || []).data || []).items || []).map(x => x.id),
+              apiId
+            );
           }
           let agentsInGroup = [];
           try {
@@ -1831,6 +1856,7 @@ export class WazuhReportingCtrl {
         }
         if (isAgentConfig) {
           const configurations = AgentConfiguration.configurations;
+          const enabledComponents = req.payload.components;
           const a_id = kfilters[0].agent;
           let wmodules = {};
           try {
@@ -1843,18 +1869,16 @@ export class WazuhReportingCtrl {
           } catch (err) { } //eslint-disable-line
           kfilters = [];
           await this.renderHeader(tab, tab, a_id, apiId);
+          let idxComponent = 0;
           for (let config of configurations) {
-            this.dd.content.push({
-              text: config.title,
-              style: 'h1',
-              margin: [0, 0, 0, 15]
-            });
+            let titleOfSection = false;
             for (let section of config.sections) {
-              if (section.config || section.wodle) {
+              if (enabledComponents[idxComponent] && (section.config || section.wodle)) {
                 let idx = 0;
                 const configs = (section.config || []).concat(
                   section.wodle || []
                 );
+
                 for (let conf of configs) {
                   let data = {};
                   try {
@@ -1880,6 +1904,14 @@ export class WazuhReportingCtrl {
                       Object.keys(data.data[Object.keys(data.data)[0]]).length >
                       0
                     ) {
+                      if (!titleOfSection) {
+                        this.dd.content.push({
+                          text: config.title,
+                          style: 'h1',
+                          margin: [0, 0, 0, 15]
+                        });
+                        titleOfSection = true;
+                      }
                       for (let _d of Object.keys(data.data)) {
                         if (idx === 0) {
                           this.dd.content.push({
@@ -2004,14 +2036,40 @@ export class WazuhReportingCtrl {
                           }
                         }
                       }
+                    } else {
+                      // Print the section title
+                      if (!titleOfSection) {
+                        this.dd.content.push({
+                          text: config.title,
+                          style: 'h1',
+                          margin: [0, 0, 0, 15]
+                        });
+                        titleOfSection = true;
+                      }
+                      //Print the subtitle
+                      this.dd.content.push({
+                        text: section.subtitle,
+                        style: 'h4'
+                      });
+                      // Print no configured module and link to the documentation
+                      this.dd.content.push({
+                        text: [
+                          'This module is not configured. Please take a look on how to configure it in ',
+                          { text: `${section.subtitle.toLowerCase()} configuration.`, link: section.docuLink, style: { fontSize: 12, color: '#1a0dab' } }
+                        ],
+                        margin: [0, 0, 0, 20]
+                      })
                     }
                   } catch (err) { } //eslint-disable-line
                   idx++;
+
+
                 }
                 for (const table of tables) {
                   this.renderConfigTables([table]);
                 }
               }
+              idxComponent++;
               tables = [];
             }
           }

@@ -256,6 +256,18 @@ export function RulesController(
     $scope.closeDetailView();
   };
 
+  $scope.openFile = (file, path) => {
+    if (file && path) {
+      $scope.mctrl.switchFilesSubTab('rules', {
+        parameters: {
+          file: { file, path },
+          path,
+          viewingDetail: $scope.viewingDetail
+        }
+      });
+    }
+  };
+
   //listeners
   $scope.$on('wazuhShowRule', (event, parameters) => {
     $scope.currentRule = parameters.rule;
@@ -404,5 +416,14 @@ export function RulesController(
   $scope.$on('showSaveAndOverwrite', () => {
     $scope.overwriteError = true;
     $scope.$applyAsync();
+  });
+
+  $scope.$on('applyFilter', (event, parameters) => {
+    $scope.search(parameters.filter);
+  });
+
+  $scope.$on('viewFileOnlyTable', (event, parameters) => {
+    parameters.viewingDetail = $scope.viewingDetail;
+    $scope.mctrl.switchFilesSubTab('rules', { parameters });
   });
 }

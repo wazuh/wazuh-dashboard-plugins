@@ -1,4 +1,5 @@
-<div ng-if="!files.viewingDetail" ng-show="!editingFile" layout="column" ng-init="filesctrl.switchFilesSubTab(mctrl.globalRulesetTab)">
+<div ng-if="!viewingDetail" ng-show="!editingFile" layout="column"
+    ng-init="filesctrl.switchFilesSubTab(mctrl.globalRulesetTab)">
 
     <div layout="row">
         <div class="md-padding padding-right-0">
@@ -30,7 +31,7 @@
     <div layout="row">
         <md-card flex class="wz-md-card _md flex md-margin-h">
             <md-card-actions layout="row" layout-align="end center" class="wz-card-actions wz-card-actions-top">
-                <a ng-if="adminMode" ng-click="filesctrl.addNewFile(mctrl.globalRulesetTab)">Add
+                <a ng-if="mctrl.adminMode" ng-click="filesctrl.addNewFile(mctrl.globalRulesetTab)">Add
                     new {{mctrl.globalRulesetTab}} file</a>
                 <span flex></span>
                 <wz-kbn-switch class="md-primary wz-no-top-bottom-margin" switch-model="mctrl.onlyLocalFiles"

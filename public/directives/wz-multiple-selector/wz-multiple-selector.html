@@ -7,48 +7,41 @@
     <div id='wzMultipleSelector' ng-show='!loading'>
         <div class='wzMultipleSelectorLeft'>
             <div class='panel panel-primary'>
-                <div class='panel-heading text-center'>{{titleAvailableItems}}<span
-                        ng-click='doReload("left", availableFilter, true)' class='pull-right cursor-pointer'><span
+                <div class='panel-heading text-center'>{{titleAvailableItems}}<span ng-click='doReload("left", availableFilter, true)'
+                        class='pull-right cursor-pointer' ng-hide="$parent.$parent.$parent.selectedAgents.loadedAll"><span
                             class='fa fa-refresh' aria-hidden='true'></span></span></div>
                 <div class='panel-body'>
                     <div layout="row">
-                        <input placeholder='Filter...' ng-model='availableFilter' type='text'
-                            class='kuiLocalSearchInput' wz-enter='doReload("left", availableFilter, true)'
-                            ng-change='availableItem=null'>
-                        <button type='submit' class='kuiLocalSearchButton height-40'
-                            ng-click='doReload("left", availableFilter, true)'>
+                        <input placeholder='Filter...' ng-model='availableFilter' type='text' class='kuiLocalSearchInput'
+                            wz-enter='doReload("left", availableFilter, true)' ng-change='availableItem=null'>
+                        <button type='submit' class='kuiLocalSearchButton height-40' ng-click='doReload("left", availableFilter, true)'>
                             <span class='fa fa-search' aria-hidden='true'></span>
                         </button>
                     </div>
                     <select size='10' multiple ng-model='availableItem' ng-change='selectedElement=null;doCheckLimit()'
-                        class='width-100'
-                        ng-dblclick='moveItem(availableItem, availableItems, selectedItems);availableItem=null'>
-                        <option ng-repeat='item in availableItems | orderBy:sort'
-                            ng-style='{"background-color":(item.type === "a" ? "#c6ffc6": item.type === "r" ? "#ffe7e7" : "")}'
+                        class='width-100' ng-dblclick='moveItem(availableItem, availableItems, selectedItems);availableItem=null'>
+                        <option ng-repeat='item in availableItems | orderBy:sort' ng-style='{"background-color":(item.type === "a" ? "#c6ffc6": item.type === "r" ? "#ffe7e7" : "")}'
                             ng-value="{{item}}">{{item.key + " - " + item.value}}</option>
                     </select>
                 </div>
             </div>
         </div>
         <div class='wzMultipleSelectorButtons'>
-            <button ng-disabled='availableItems.length === 0 || availableItems.length > 500' type='button'
-                class='btn wz-button-groups' tooltip='Add all items' tooltip-placement='top' ng-click='moveAll(availableItems, selectedItems, "a");
+            <button ng-disabled='availableItems.length === 0 || availableItems.length > 500' type='button' class='btn wz-button-groups'
+                tooltip='Add all items' tooltip-placement='top' ng-click='moveAll(availableItems, selectedItems, "a");
                 availableItem=null;availableFilter="" ;doReload("left", availableFilter, true)'>
                 <span><i class='fa fa-forward'></i></span>
             </button>
-            <button ng-disabled='!availableItem || availableItem.length > 500' type='button'
-                class='btn wz-button-groups' tooltip='Add selected items' tooltip-placement='top'
-                ng-click='moveItem(availableItem, availableItems, selectedItems, "a");availableItem=null;availableFilter=""'>
+            <button ng-disabled='!availableItem || availableItem.length > 500' type='button' class='btn wz-button-groups'
+                tooltip='Add selected items' tooltip-placement='top' ng-click='moveItem(availableItem, availableItems, selectedItems, "a");availableItem=null;availableFilter=""'>
                 <span><i class='fa fa-arrow-right'></i></span>
             </button>
-            <button ng-disabled='!selectedElement || selectedElement.length > 500' type='button'
-                class='btn wz-button-groups' tooltip='Remove selected items' tooltip-placement='top'
-                ng-click='moveItem(selectedElement, selectedItems, availableItems, "r");selectedFilter="";selectedElement=null'>
+            <button ng-disabled='!selectedElement || selectedElement.length > 500' type='button' class='btn wz-button-groups'
+                tooltip='Remove selected items' tooltip-placement='top' ng-click='moveItem(selectedElement, selectedItems, availableItems, "r");selectedFilter="";selectedElement=null'>
                 <span><i class='fa fa-arrow-left'></i></span>
             </button>
-            <button ng-disabled='selectedItems.length === 0 || selectedItems.length > 500' type='button'
-                class='btn wz-button-groups' tooltip='Remove all items' tooltip-placement='top'
-                ng-click='moveAll(selectedItems, availableItems, "r");selectedElement=null;selectedFilter="";doReload("right")'>
+            <button ng-disabled='selectedItems.length === 0 || selectedItems.length > 500' type='button' class='btn wz-button-groups'
+                tooltip='Remove all items' tooltip-placement='top' ng-click='moveAll(selectedItems, availableItems, "r");selectedElement=null;selectedFilter="";doReload("right")'>
                 <span><i class='fa fa-backward'></i></span>
             </button>
         </div>
@@ -59,10 +52,8 @@
                     <input placeholder='Filter...' ng-model='selectedFilter' type='text' class='kuiLocalSearchInput'
                         ng-change='selectedElement=null' style='padding: 8px 15px'>
                     <select size='10' multiple ng-model='selectedElement' ng-change='availableItem=null;doCheckLimit()'
-                        class='width-100'
-                        ng-dblclick='moveItem(selectedElement, selectedItems, availableItems);selectedElement=null'>
-                        <option ng-repeat='item in selectedItems | filter: selectedFilter | orderBy:sort'
-                            ng-style='{"background-color":(item.type === "a" ? "#c6ffc6": item.type === "r" ? "#ffe7e7" : "")}'
+                        class='width-100' ng-dblclick='moveItem(selectedElement, selectedItems, availableItems);selectedElement=null'>
+                        <option ng-repeat='item in selectedItems | filter: selectedFilter | orderBy:sort' ng-style='{"background-color":(item.type === "a" ? "#c6ffc6": item.type === "r" ? "#ffe7e7" : "")}'
                             ng-value="{{item}}">{{item.key + " - " + item.value}}</option>
                     </select>
                 </div>

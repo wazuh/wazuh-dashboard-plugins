@@ -162,6 +162,7 @@ export class SettingsController {
       for (const key in this.showEditForm) this.showEditForm[key] = false;
       this.$scope.$emit('updateAPI', {});
       this.errorHandler.info('The API was removed successfully', 'Settings');
+      this.apiTableProps.apiEntries = this.apiEntries;
       this.$scope.$applyAsync();
     } catch (error) {
       this.errorHandler.handle('Could not remove the API', 'Settings');
@@ -214,11 +215,11 @@ export class SettingsController {
 
     const currentApi = this.appState.getCurrentAPI();
     this.currentDefault = JSON.parse(currentApi).id;
+    this.apiTableProps.currentDefault = this.currentDefault;
+    this.$scope.$applyAsync();
 
     this.errorHandler.info(
-      `API ${
-      this.apiEntries[index]._source.cluster_info.manager
-      } set as default`,
+      `API ${this.apiEntries[index]._source.cluster_info.manager} set as default`,
       'Settings'
     );
 
@@ -418,6 +419,11 @@ export class SettingsController {
       };
       this.apiEntries.push(newEntry);
       this.apiEntries = this.apiEntries.sort(this.sortByTimestamp);
+      this.apiTableProps.apiEntries = this.apiEntries;
+      if (this.apiEntries.length === 1) {
+        this.setDefault(newEntry);
+      }
+      this.$scope.$applyAsync();
 
       this.errorHandler.info('Wazuh API successfully added', 'Settings');
       this.addManagerContainer = false;
@@ -670,7 +676,7 @@ export class SettingsController {
    */
   async getAppInfo() {
     try {
-      const data = await this.genericReq.request('GET', '/elastic/setup');
+      const data = await this.genericReq.request('GET', '/api/setup');
       this.appInfo = {};
       this.appInfo['app-version'] = data.data.data['app-version'];
       this.appInfo['installationDate'] = data.data.data['installationDate'];

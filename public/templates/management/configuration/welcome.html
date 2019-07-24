@@ -18,12 +18,9 @@
                     <a ng-if="mctrl.adminMode || adminMode" ng-show="!agent || agent.id === '000'" ng-click="mctrl.setConfigTab('editconfiguration', true)">
                         <react-component name="EuiIcon" props="{type:'pencil', color:'primary'}" /> Edit configuration
                     </a>
-                    <button class="btn btn-primary btn-as-i" ng-show="agent && agent.id !== '000' && agent.status === 'Active'"
-                        ng-click="exportConfiguration(agent)" ng-disabled="reportBusy && reportStatus">
-                        <react-component ng-show="!reportBusy || !reportStatus" name="EuiIcon" props="{type:'importAction', color:'primary'}" />
-                        <react-component ng-show="reportBusy && reportStatus" name="EuiLoadingSpinner" props="{size:'m'}" />
-                        PDF
-                    </button>
+                    <react-component ng-show="agent && agent.id !== '000' && agent.status === 'Active'" name="ExportConfiguration"
+                        ng-hide="reportBusy && reportStatus" props="{exportConfiguration, type: 'agent', agentPlatform: agent.agentPlatform}" />
+                    <react-component ng-show="reportBusy && reportStatus" name="EuiLoadingSpinner" props="{size:'m'}" />
                 </md-card-actions>
                 <md-card-content>
                     <span class="font-size-16 wz-text-bold">Main configurations</span>
@@ -107,7 +104,7 @@
                                 <td>Configuration to ensure compliance with security policies, standards and hardening
                                     guides</td>
                             </tr>
-                            <tr class="cursor-pointer" ng-click="switchWodle('open-scap')">
+                            <tr class="cursor-pointer" ng-click="switchWodle('open-scap')" ng-if="shouldShowComponent('oscap')">
                                 <td>OpenSCAP</td>
                                 <td>Configuration assessment and automation of compliance monitoring using SCAP checks
                                 </td>
@@ -157,7 +154,7 @@
                                 <td>Configuration options of the Command wodle
                                 </td>
                             </tr>
-                            <tr class="cursor-pointer" ng-click="switchWodle('docker-listener')">
+                            <tr class="cursor-pointer" ng-click="switchWodle('docker-listener')" ng-if="shouldShowComponent('docker')">
                                 <td>Docker listener</td>
                                 <td>Monitor and collect the activity from Docker containers such as creation, running,
                                     starting, stopping or pausing events

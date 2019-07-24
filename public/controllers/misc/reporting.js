@@ -11,8 +11,9 @@
  */
 import chrome from 'ui/chrome';
 export class ReportingController {
-  constructor(errorHandler, genericReq, $window, timeService) {
+  constructor($scope, errorHandler, genericReq, $window, timeService) {
     // Services
+    this.$scope = $scope;
     this.$window = $window;
     this.errorHandler = errorHandler;
     this.genericReq = genericReq;
@@ -84,6 +85,7 @@ export class ReportingController {
       this.errorHandler.handle(error.message || error);
     }
     this.loading = false;
+    this.$scope.$applyAsync();
     return this.items;
   }
 }

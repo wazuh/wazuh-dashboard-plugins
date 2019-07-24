@@ -30,6 +30,8 @@ import { apiRequestList } from '../../util/api-request-list';
 import * as ApiHelper from '../lib/api-helper';
 import { Queue } from '../jobs/queue';
 import querystring from 'querystring';
+import fs from 'fs';
+import path from 'path';
 export class WazuhApiCtrl {
   /**
    * Constructor
@@ -39,6 +41,7 @@ export class WazuhApiCtrl {
     this.queue = Queue;
     this.wzWrapper = new ElasticWrapper(server);
     this.monitoringInstance = new Monitoring(server, true);
+    this.wazuhVersion = path.join(__dirname, '../wazuh-version.json');
   }
 
   /**
@@ -911,7 +914,7 @@ export class WazuhApiCtrl {
       if (method === 'DELETE') {
         fixedUrl = `${
           fullUrl.includes('?') ? fullUrl.split('?')[0] : fullUrl
-        }?${querystring.stringify(data)}`;
+          }?${querystring.stringify(data)}`;
       }
 
       log('wazuh-api:makeRequest', `${method} ${fixedUrl || fullUrl}`, 'debug');
@@ -1365,11 +1368,70 @@ export class WazuhApiCtrl {
   }
 
   /**
-   * Get basic syscollector information for given agent.
+   * This get the timestamp field
    * @param {Object} req
    * @param {Object} reply
-   * @returns {Object} Basic syscollector information
+   * @returns {Object} timestamp field or ErrorResponse
    */
+  async getTimeStamp(req, reply) {
+    try {
+      const source = JSON.parse(fs.readFileSync(this.wazuhVersion, 'utf8'));
+      if (source.installationDate && source.lastRestart) {
+        log(
+          'wazuh-api:getTimeStamp',
+          `Installation date: ${
+          source.installationDate
+          }. Last restart: ${source.lastRestart}`,
+          'debug'
+        );
+        return {
+          installationDate: source.installationDate,
+          lastRestart: source.lastRestart
+        };
+      } else {
+        throw new Error('Could not fetch wazuh-version registry');
+      }
+    } catch (error) {
+      log('wazuh-api:getTimeStamp', error.message || error);
+      return ErrorResponse(
+        error.message || 'Could not fetch wazuh-version registry',
+        4001,
+        500,
+        reply
+      );
+    }
+  }
+
+  /**
+ * This get the wazuh setup settings
+ * @param {Object} req
+ * @param {Object} reply
+ * @returns {Object} setup info or ErrorResponse
+ */
+  async getSetupInfo(req, reply) {
+    try {
+      const source = JSON.parse(fs.readFileSync(this.wazuhVersion, 'utf8'));
+      return !Object.values(source).length
+        ? { statusCode: 200, data: '' }
+        : { statusCode: 200, data: source };
+    } catch (error) {
+      log('wazuh-api:getSetupInfo', error.message || error);
+      return ErrorResponse(
+        `Could not get data from wazuh-version registry due to ${error.message ||
+        error}`,
+        4005,
+        500,
+        reply
+      );
+    }
+  }
+
+  /**
+* Get basic syscollector information for given agent.
+* @param {Object} req
+* @param {Object} reply
+* @returns {Object} Basic syscollector information
+*/
   async getSyscollector(req, reply) {
     try {
       if (!req.params || !req.headers.id || !req.params.agent) {
@@ -1405,7 +1467,7 @@ export class WazuhApiCtrl {
       const syscollector = {
         hardware:
           typeof hardwareResponse === 'object' &&
-          Object.keys(hardwareResponse).length
+            Object.keys(hardwareResponse).length
             ? { ...hardwareResponse }
             : false,
         os:

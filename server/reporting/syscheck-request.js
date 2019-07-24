@@ -55,7 +55,10 @@ export class SyscheckRequest {
         }
       });
 
-      const response = await this.wzWrapper.searchWazuhAlertsWithPayload(base);
+      const response = await this.wzWrapper.searchWazuhAlertsWithPayload(
+        base,
+        this.namespace
+      );
       const { buckets } = response.aggregations['2'];
 
       return buckets.map(item => item.key);
@@ -100,7 +103,10 @@ export class SyscheckRequest {
         }
       });
 
-      const response = await this.wzWrapper.searchWazuhAlertsWithPayload(base);
+      const response = await this.wzWrapper.searchWazuhAlertsWithPayload(
+        base,
+        this.namespace
+      );
       const { buckets } = response.aggregations['2'];
 
       const result = [];
@@ -159,7 +165,10 @@ export class SyscheckRequest {
         }
       });
 
-      const response = await this.wzWrapper.searchWazuhAlertsWithPayload(base);
+      const response = await this.wzWrapper.searchWazuhAlertsWithPayload(
+        base,
+        this.namespace
+      );
       const { buckets } = response.aggregations['2'];
 
       return buckets
@@ -210,7 +219,10 @@ export class SyscheckRequest {
         }
       });
 
-      const response = await this.wzWrapper.searchWazuhAlertsWithPayload(base);
+      const response = await this.wzWrapper.searchWazuhAlertsWithPayload(
+        base,
+        this.namespace
+      );
       const { buckets } = response.aggregations['2'];
 
       return buckets
