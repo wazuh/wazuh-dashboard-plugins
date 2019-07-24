@@ -3,6 +3,7 @@ import expect from '@kbn/expect';
 export default function({ getService, getPageObjects }) {
   const find = getService('find');
   const PageObjects = getPageObjects(['common', 'wazuhCommon', 'timePicker']);
+  const queryBar = getService('queryBar');
   const testSubjects = getService('testSubjects');
   
   describe('Discover subtab', () => {
@@ -43,6 +44,18 @@ export default function({ getService, getPageObjects }) {
         console.log("Error: " + error);
         expect(false).to.be.ok();
       }
+    });
+
+    it('search `rule.leve:7` should return 3 elements', async () => {
+      await queryBar.setQuery('rule.level:7');
+      await queryBar.submitQuery();
+      await PageObjects.common.sleep(750);
+
+      const table = await testSubjects.find('docTable');
+      const rows = await table.findAllByCssSelector('tbody > tr.kbnDocTable__row');
+      expect(rows.length).to.equal(3);
+      await queryBar.setQuery('');
+      await queryBar.submitQuery();
     });
 
   });
