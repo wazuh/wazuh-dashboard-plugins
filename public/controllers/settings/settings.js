@@ -417,7 +417,7 @@ export class SettingsController {
       );
       this.appState.setExtensions(data.data.response._id, tmpData.extensions);
       const newEntry = {
-        _id: data.data.response._id,
+        _id: ((data || {}).data).response || false,
         cluster_info: tmpData.cluster_info,
         url: tmpData.url,
         api_user: tmpData.user,
@@ -501,6 +501,7 @@ export class SettingsController {
 
   // Update settings function
   async updateSettings(item, useItem = false) {
+    console.log('gonna add or update an API ', item);
     try {
       if (this.savingApi) {
         this.errorHandler.info('Please, wait for success message', 'Settings');
@@ -705,7 +706,6 @@ export class SettingsController {
       }
       this.getCurrentAPIIndex();
       if (this.currentApiEntryIndex || this.currentApiEntryIndex === 0) {
-        console.log('gonna check the current api jeje');
         await this.checkManager(this.currentApiEntryIndex, true, true);
       }
       this.$scope.$applyAsync();

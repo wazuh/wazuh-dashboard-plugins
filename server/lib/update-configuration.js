@@ -112,6 +112,8 @@ export class UpdateConfigurationFile {
   }
 
   async addHost(host) {
+    const id = new Date().getTime();
+    const compose = this.composeHost(host, id);
     const file = path.join(__dirname, '../../config.yml');
     let data = await fs.readFileSync(file, { encoding: 'utf-8' });
     try {
@@ -121,7 +123,7 @@ export class UpdateConfigurationFile {
       this.busy = true;
       const configuration = getConfiguration() || {};
       if (!configuration['wazuh.hosts']) {
-        const result = `${data}\nwazuh.hosts:\n${this.composeHost(host)}\n`;
+        const result = `${data}\nwazuh.hosts:\n${compose}\n`;
         await fs.writeFileSync(file, result, 'utf8');
         data = await fs.readFileSync(file, { encoding: 'utf-8' });
       } else {
@@ -129,12 +131,12 @@ export class UpdateConfigurationFile {
         if (lastHost) {
           const lastHostObject = this.composeHost(lastHost[Object.keys(lastHost)[0]], Object.keys(lastHost)[0]);
           const regex = this.composeRegex(lastHost);
-          const replace = data.replace(regex, `\n${lastHostObject}\n${this.composeHost(host)}\n`)
+          const replace = data.replace(regex, `\n${lastHostObject}\n${compose}\n`)
           await fs.writeFileSync(file, replace, 'utf8');
         }
       }
       this.busy = false;
-      return true;
+      return id;
     } catch (error) {
       this.busy = false;
       throw error;
