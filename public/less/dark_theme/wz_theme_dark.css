@@ -269,3 +269,9 @@ md-divider.md-default-theme, md-divider {
   border-color: #000;
   color: #dfe5ef;
 }
+
+.wz-input-text {
+  background-color: #16171c;
+  border: 1px solid #343741;
+  color: #dfe5ef;
+}
