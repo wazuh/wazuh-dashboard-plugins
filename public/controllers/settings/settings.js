@@ -111,7 +111,7 @@ export class SettingsController {
         apiEntries: this.apiEntries,
         compressed: true,
         setDefault: entry => this.setDefault(entry),
-        checkManager: entry => this.checkManager(entry),
+        checkManager: (entry, isIndex = false , silent = false) => this.checkManager(entry, isIndex, silent),
         removeManager: entry => this.removeManager(entry),
         updateSettings: (entry, useItem = false) =>
           this.updateSettings(entry, useItem),
@@ -697,6 +697,7 @@ export class SettingsController {
       }
       this.getCurrentAPIIndex();
       if (this.currentApiEntryIndex || this.currentApiEntryIndex === 0) {
+        console.log('gonna check the current api jeje');
         await this.checkManager(this.currentApiEntryIndex, true, true);
       }
       this.$scope.$applyAsync();
