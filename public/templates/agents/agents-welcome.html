@@ -7,20 +7,18 @@
                         not fetch data for this agent. <span ng-if="emptyAgent">Reason: {{emptyAgent}}</span></span>
                 </div>
                 <div layout="row" layout-padding ng-if="emptyAgent">
-                    <span class="cursor-pointer" ng-click="getAgent()"><i class="fa fa-fw fa-refresh"
-                            aria-hidden="true"></i>
+                    <span class="cursor-pointer" ng-click="getAgent()"><i class="fa fa-fw fa-refresh" aria-hidden="true"></i>
                         Try again</span>
                 </div>
             </md-card-content>
         </md-card>
     </div>
 </div>
-<div layout="column" class="" layout-align="start stretch" ng-if="tab === 'welcome'" ng-show="!load && agent">
+<div layout="column" layout-align="start stretch" ng-if="tab === 'welcome'" ng-show="!load && agent">
 
     <div layout="row" class="wz-margin-left-16 wz-margin-right-16 wz-margin-top-8">
         <span flex></span>
-        <button class="kuiButton kuiButton--secondary small wz-no-margin" ng-click="goDiscover()"><i
-                class="fa fa-compass"></i>
+        <button class="kuiButton kuiButton--secondary small wz-no-margin" ng-click="goDiscover()"><i class="fa fa-compass"></i>
             Discover
         </button>
     </div>
@@ -36,7 +34,7 @@
         }" />
     </div>
 
-    <div layout="row" layout-padding>
+    <div layout="row" layout-padding ng-if="welcomeCardsProps">
         <react-component name="WelcomeScreenAgent" props="welcomeCardsProps" />
     </div>
 </div>

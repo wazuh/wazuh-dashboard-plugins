@@ -626,6 +626,14 @@ export const apiRequestList = [
         args: []
       },
       {
+        name: '/rules/hipaa',
+        args: []
+      },
+      {
+        name: '/rules/nist-800-53',
+        args: []
+      },
+      {
         name: '/syscheck/:agent_id',
         args: [
           {

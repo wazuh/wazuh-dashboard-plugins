@@ -257,9 +257,9 @@
   box-shadow: none !important;
 }
 
-.btn-as-i:hover {
+.btn-as-i:hover, .btn-as-i:focus {
   background: none !important;
-  color: #006bb4;
+  color: #006bb4!important;
 }
 /* Custom reporting button styles */
 
@@ -990,6 +990,17 @@ wz-xml-file-editor {
 
 discover-app-w .container-fluid {
   background: #fff;
+}
+
+.registerAgent{
+  min-height: calc(~'100vh - 100px');
+  background: #fafbfd;
+  padding-top: 25px;
+}
+
+.refresh-report-button {
+  padding: 10px;
+  text-align: right;
 }
 
 .monitoring-discover form{

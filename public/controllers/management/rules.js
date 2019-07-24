@@ -82,6 +82,30 @@ export function RulesController(
       $scope.$broadcast('wazuhFilter', { filter });
     } else if (
       term &&
+      term.startsWith('hipaa:') &&
+      term.split('hipaa:')[1].trim()
+    ) {
+      $scope.custom_search = '';
+      const filter = { name: 'hipaa', value: term.split('hipaa:')[1].trim() };
+      $scope.appliedFilters = $scope.appliedFilters.filter(
+        item => item.name !== 'hipaa'
+      );
+      $scope.appliedFilters.push(filter);
+      $scope.$broadcast('wazuhFilter', { filter });
+    } else if (
+      term &&
+      term.startsWith('nist-800-53:') &&
+      term.split('nist-800-53:')[1].trim()
+    ) {
+      $scope.custom_search = '';
+      const filter = { name: 'nist-800-53', value: term.split('nist-800-53:')[1].trim() };
+      $scope.appliedFilters = $scope.appliedFilters.filter(
+        item => item.name !== 'nist-800-53'
+      );
+      $scope.appliedFilters.push(filter);
+      $scope.$broadcast('wazuhFilter', { filter });
+    } else if (
+      term &&
       term.startsWith('file:') &&
       term.split('file:')[1].trim()
     ) {
@@ -177,10 +201,10 @@ export function RulesController(
         coloredString = coloredString.replace(
           /\$\(((?!<\/span>).)*?\)(?!<\/span>)/im,
           '<span style="color: ' +
-            colors[i] +
-            ' ">' +
-            valuesArray[i] +
-            '</span>'
+          colors[i] +
+          ' ">' +
+          valuesArray[i] +
+          '</span>'
         );
       }
     }
