@@ -294,29 +294,29 @@ export class SettingsController {
    * This validate format of fileds in a given api connection form
    * @param {Object} formName
    */
-  validator(formName) {
+  validator(form) {
     // Validate user
-    if (!this.userRegEx.test(this[formName].user)) {
+    if (!this.userRegEx.test(form.user)) {
       return 'Invalid user field';
     }
 
     // Validate password
-    if (!this.passRegEx.test(this[formName].password)) {
+    if (!this.passRegEx.test(form.password)) {
       return 'Invalid password field';
     }
 
     // Validate url
     if (
-      !this.urlRegEx.test(this[formName].url) &&
-      !this.urlRegExIP.test(this[formName].url)
+      !this.urlRegEx.test(form.url) &&
+      !this.urlRegExIP.test(form.url)
     ) {
       return 'Invalid url field';
     }
 
     // Validate port
-    const validatePort = parseInt(this[formName].port);
+    const validatePort = parseInt(form.port);
     if (
-      !this.portRegEx.test(this[formName].port) ||
+      !this.portRegEx.test(form.port) ||
       validatePort <= 0 ||
       validatePort >= 99999
     ) {
@@ -364,7 +364,7 @@ export class SettingsController {
       this.savingApi = true;
       this.messageError = '';
       this.isEditing = false;
-      const invalid = this.validator('formData');
+      const invalid = this.validator(this.formData);
 
       if (invalid) {
         this.messageError = invalid;
@@ -517,7 +517,7 @@ export class SettingsController {
         };
       }
 
-      const invalid = this.validator('formUpdate');
+      const invalid = this.validator(this.formUpdate);
       if (invalid) {
         this.messageErrorUpdate = invalid;
         this.errorHandler.handle(invalid, 'Settings');
