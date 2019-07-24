@@ -39,10 +39,6 @@ export class ApiTable extends Component {
   }
 
   componentDidMount() {
-    this.setState({
-      apiEntries: [...this.props.apiEntries],
-      currentDefault: this.props.currentDefault
-    });
     this.checkApiConnection();
   }
 
@@ -124,7 +120,7 @@ export class ApiTable extends Component {
 
   render() {
     const { itemIdToExpandedRowMap } = this.state;
-    const items = [...this.state.apiEntries];
+    const items = [...this.props.apiEntries];
     const columns = [
       {
         field: 'cluster_info.cluster',
@@ -159,7 +155,7 @@ export class ApiTable extends Component {
               <EuiToolTip position="bottom" content={<p>Set as default</p>}>
                 <EuiButtonIcon
                   iconType={
-                    item._id === this.state.currentDefault
+                    item._id === this.props.currentDefault
                       ? 'starFilled'
                       : 'starEmpty'
                   }
