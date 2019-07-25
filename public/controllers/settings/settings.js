@@ -154,6 +154,7 @@ export class SettingsController {
         'DELETE',
         `/api/${this.apiEntries[index]._id}`
       );
+      this.appState.removeExtensions(item._id);
       this.showEditForm[this.apiEntries[index]._id] = false;
       this.apiEntries.splice(index, 1);
       this.wzMisc.setApiIsDown(false);

@@ -32,22 +32,40 @@ export class AppState {
     if (id && extensions) {
       const current = this.$cookies.getObject('extensions') || {};
       current[id] = extensions;
-      const exp = new Date();
-      exp.setDate(exp.getDate() + 365);
-      if (extensions) {
-        this.$cookies.putObject('extensions', current, { expires: exp });
-      }
+      const exp = this.generateExpirationDate();
+      this.$cookies.putObject('extensions', current, { expires: exp });
     }
   }
 
+  //Removes the extension when an API is removed
+  removeExtensions(id) {
+    try {
+      const current = angular.copy(this.$cookies.getObject('extensions') || {});
+      delete current[id]
+      const exp = this.generateExpirationDate();
+      if (Object.keys(current).length) {
+        this.$cookies.putObject('extensions', current, { expires: exp });
+      } else {
+        this.$cookies.remove('extensions');
+      }
+    } catch (error) {}
+  }
+
+  //Generates the expiration date
+  generateExpirationDate() {
+    const exp = new Date();
+    exp.setDate(exp.getDate() + 365);
+    return exp;
+  }
+  
   //Cluster setters and getters
   getClusterInfo() {
     return this.$cookies.getObject('_clusterInfo');
   }
 
+  //Sets the cluster info
   setClusterInfo(cluster_info) {
-    const exp = new Date();
-    exp.setDate(exp.getDate() + 365);
+    const exp = this.generateExpirationDate();
     if (cluster_info) {
       this.$cookies.putObject('_clusterInfo', cluster_info, { expires: exp });
     }
@@ -56,8 +74,7 @@ export class AppState {
   //CreatedAt setters and getters
 
   setCreatedAt(date) {
-    const exp = new Date();
-    exp.setDate(exp.getDate() + 365);
+    const exp = this.generateExpirationDate();
     this.$cookies.putObject('_createdAt', date, { expires: exp });
   }
 
@@ -76,8 +93,7 @@ export class AppState {
   }
 
   setCurrentAPI(API) {
-    const exp = new Date();
-    exp.setDate(exp.getDate() + 365);
+    const exp = this.generateExpirationDate();
     if (API) {
       this.$cookies.putObject('API', API, { expires: exp });
     }
@@ -93,8 +109,7 @@ export class AppState {
   }
 
   setCurrentPattern(newPattern) {
-    const exp = new Date();
-    exp.setDate(exp.getDate() + 365);
+    const exp = this.generateExpirationDate();
     if (newPattern) {
       this.$cookies.putObject('_currentPattern', newPattern, { expires: exp });
     }
