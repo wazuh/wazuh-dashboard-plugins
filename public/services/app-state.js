@@ -27,13 +27,16 @@ export class AppState {
     return current ? current[id] : false;
   }
 
+  //Sets the extension for an API
   setExtensions(id, extensions) {
-    const current = this.$cookies.getObject('extensions') || {};
-    current[id] = extensions;
-    const exp = new Date();
-    exp.setDate(exp.getDate() + 365);
-    if (extensions) {
-      this.$cookies.putObject('extensions', current, { expires: exp });
+    if (id && extensions) {
+      const current = this.$cookies.getObject('extensions') || {};
+      current[id] = extensions;
+      const exp = new Date();
+      exp.setDate(exp.getDate() + 365);
+      if (extensions) {
+        this.$cookies.putObject('extensions', current, { expires: exp });
+      }
     }
   }
 

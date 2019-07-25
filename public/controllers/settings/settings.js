@@ -111,7 +111,7 @@ export class SettingsController {
         apiEntries: this.apiEntries,
         compressed: true,
         setDefault: entry => this.setDefault(entry),
-        checkManager: (entry, isIndex = false , silent = false) => this.checkManager(entry, isIndex, silent),
+        checkManager: (entry, isIndex = false, silent = false) => this.checkManager(entry, isIndex, silent),
         removeManager: entry => this.removeManager(entry),
         updateSettings: (entry, useItem = false) =>
           this.updateSettings(entry, useItem),
@@ -232,12 +232,31 @@ export class SettingsController {
     if (currentApi && !this.appState.getExtensions(JSON.parse(currentApi).id)) {
       this.appState.setExtensions(
         this.apiEntries[this.currentApiEntryIndex]._id,
-        this.apiEntries[this.currentApiEntryIndex].extensions
+        this.apiEntries[this.currentApiEntryIndex].extensions || this.getDefaultExtensions()
       );
     }
 
     this.$scope.$applyAsync();
     return this.currentDefault;
+  }
+
+
+  //Gets the default extensions
+  getDefaultExtensions() {
+    const configuration = this.wazuhConfig.getConfig();
+    return {
+      'audit': configuration['extensions.audit'],
+      'pci': configuration['extensions.pci'],
+      'gdpr': configuration['extensions.gdpr'],
+      'hipaa': configuration['extensions.hipaa'],
+      'nist': configuration['extensions.nist'],
+      'oscap': configuration['extensions.oscap'],
+      'ciscat': configuration['extensions.ciscat'],
+      'aws': configuration['extensions.aws'],
+      'virustotal': configuration['extensions.virustotal'],
+      'osquery': configuration['extensions.osquery'],
+      'docker': configuration['extensions.docker']
+    }
   }
 
   // Get settings function
@@ -278,7 +297,7 @@ export class SettingsController {
       ) {
         this.appState.setExtensions(
           this.apiEntries[this.currentApiEntryIndex]._id,
-          this.apiEntries[this.currentApiEntryIndex].extensions
+          this.apiEntries[this.currentApiEntryIndex].extensions || this.getDefaultExtensions()
         );
       }
 
@@ -380,24 +399,11 @@ export class SettingsController {
         port: this.formData.port,
         cluster_info: {},
         insecure: 'true',
-        extensions: {}
+        extensions: this.getDefaultExtensions()
       };
 
       const config = this.wazuhConfig.getConfig();
-
       this.appState.setPatternSelector(config['ip.selector']);
-
-      tmpData.extensions.audit = config['extensions.audit'];
-      tmpData.extensions.pci = config['extensions.pci'];
-      tmpData.extensions.gdpr = config['extensions.gdpr'];
-      tmpData.extensions.hipaa = config['extensions.hipaa'];
-      tmpData.extensions.nist = config['extensions.nist'];
-      tmpData.extensions.oscap = config['extensions.oscap'];
-      tmpData.extensions.ciscat = config['extensions.ciscat'];
-      tmpData.extensions.aws = config['extensions.aws'];
-      tmpData.extensions.virustotal = config['extensions.virustotal'];
-      tmpData.extensions.osquery = config['extensions.osquery'];
-      tmpData.extensions.docker = config['extensions.docker'];
 
       const checkData = await this.testAPI.check(tmpData);
 
