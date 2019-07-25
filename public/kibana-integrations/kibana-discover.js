@@ -152,7 +152,8 @@ function discoverController(
   getAppState,
   globalState,
   loadedVisualizations,
-  discoverPendingUpdates
+  discoverPendingUpdates,
+  errorHandler
 ) {
   const visualizeLoader = Private(VisualizeLoaderProvider);
   let visualizeHandler;
@@ -260,9 +261,32 @@ function discoverController(
   $scope.filters = queryFilter.getFilters();
   $scope.screenTitle = savedSearch.title;
 
+  const isRemovable = filter =>
+    typeof filter.meta.removable !== 'undefined' && !filter.meta.removable;
+
   $scope.onFiltersUpdated = filters => {
+    ///////////////////////////////  WAZUH   ///////////////////////////////////
+    // Store non removable filters
+    const nonRemovableFilters = filters
+      .filter(isRemovable)
+      .map(item => item.meta.key);
+
+    // Compose final filters array not including filters that also exist as non removable filter
+    const finalFilters = filters.filter(item => {
+      const key =
+        item.meta.key || (Object.keys(item.query.match) || [undefined])[0];
+      const isIncluded = nonRemovableFilters.includes(key);
+      const isNonRemovable = isRemovable(item);
+      const shouldBeAdded = (isIncluded && isNonRemovable) || !isIncluded;
+      if (!shouldBeAdded) {
+        errorHandler.handle(`Filter for ${key} already added`);
+      }
+      return shouldBeAdded;
+    });
+    ///////////////////////////////  END-WAZUH   ////////////////////////////////
+
     // The filters will automatically be set when the queryFilter emits an update event (see below)
-    queryFilter.setFilters(filters);
+    queryFilter.setFilters(finalFilters);
   };
 
   $scope.applyFilters = filters => {
