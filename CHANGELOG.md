@@ -2,7 +2,7 @@
 
 All notable changes to the Wazuh app project will be documented in this file.
 
-## Wazuh v3.9.4 - v7.2.0 - Revision 525
+## Wazuh v3.9.4 - v7.2.0 - Revision 526
 
 ### Added
 
@@ -30,6 +30,10 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Timezone applied in cluster status [a4f620d](https://github.com/wazuh/wazuh-kibana-app/pull/1615/commits/a4f620d398f5834a6d2945af892a462425ca3bec)
 - Fixed Overview Security Events report when wazuh.monitoring is disabled [1c26da0](https://github.com/wazuh/wazuh-kibana-app/pull/1615/commits/1c26da05a0b6daf727e15c13b819111aa4e4e913)
 - Fixes in APIs management [2143943](https://github.com/wazuh/wazuh-kibana-app/pull/1615/commits/2143943a5049cbb59bb8d6702b5a56cbe0d27a2a)
+- Prevent duplicated visualization toast errors [786faf3](https://github.com/wazuh/wazuh-kibana-app/commit/786faf3e62d2cad13f512c0f873b36eca6e9787d)
+- Fix not properly updated breadcrumb in ruleset section [9645903](https://github.com/wazuh/wazuh-kibana-app/commit/96459031cd4edbe047970bf0d22d0c099771879f)
+- Fix badly dimensioned table in Integrity Monitoring section [9645903](https://github.com/wazuh/wazuh-kibana-app/commit/96459031cd4edbe047970bf0d22d0c099771879f)
+- Fix implicit filters can be destroyed []()
 
 ## Wazuh v3.9.3 - Kibana v6.8.1 / v7.1.1 / v7.2.0 - Revision 523
 
