@@ -117,5 +117,5 @@ wazuh.hosts:
   - 1562642463569:
       url: http://localhost
       port: 55000
-      username: foo
+      user: foo
       password: bar

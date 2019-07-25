@@ -272,7 +272,7 @@ export class SettingsController {
           _id: id,
           url: host.url,
           api_port: host.port,
-          api_user: host.username,
+          api_user: host.user,
           password: host.password
         };
         this.showEditForm[id] = false;

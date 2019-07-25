@@ -201,15 +201,22 @@ export function settingsWizard(
             if (data.data.length > 0) {
               const firstApiEntry = data.data[0];
               const apiId = Object.keys(firstApiEntry)[0];
-              //TODO remove fake info
-              const apiData = Object.assign(firstApiEntry[apiId], {'_id': apiId, 'cluster_info': {'manager': 'wazuh-fake'}});
-              appState.setCurrentAPI(
-                JSON.stringify({
-                  name: apiData.cluster_info.manager,
-                  id: apiData._id
+              const api = firstApiEntry[apiId];
+              testAPI.check(api)
+                .then(data => {
+                  const apiInfo = data.data;
+                  const apiData = Object.assign(api, { '_id': apiId, 'cluster_info': { 'manager': apiInfo.manager } });
+                  appState.setCurrentAPI(
+                    JSON.stringify({
+                      name: apiData.cluster_info.manager,
+                      id: apiData._id
+                    })
+                  );
+                  callCheckStored();
                 })
-              );
-              callCheckStored();
+                .catch(error => {
+                  errorHandler.handle(error);
+                });
             } else {
               setUpCredentials(
                 'Wazuh App: Please set up Wazuh API credentials.'
@@ -241,16 +248,23 @@ export function settingsWizard(
               if (data.data.length > 0) {
                 const firstApiEntry = data.data[0];
                 const apiId = Object.keys(firstApiEntry)[0];
-                //TODO remove fake info
-                const apiData = Object.assign(firstApiEntry[apiId], {'_id': apiId, 'cluster_info': {'manager': 'wazuh-fake'}});
-                const defaultApi = JSON.stringify({
-                  name: apiData.cluster_info.manager,
-                  id: apiData._id
-                });
-                setUpCredentials(
-                  'Wazuh App: Default API has been updated.',
-                  defaultApi
-                );
+                const api = firstApiEntry[apiId];
+                testAPI.check(api)
+                  .then(data => {
+                    const apiInfo = data.data;
+                    const apiData = Object.assign(api, { '_id': apiId, 'cluster_info': { 'manager': apiInfo.manager } });
+                    const defaultApi = JSON.stringify({
+                      name: apiData.cluster_info.manager,
+                      id: apiData._id
+                    });
+                    setUpCredentials(
+                      'Wazuh App: Default API has been updated.',
+                      defaultApi
+                    );
+                  })
+                  .catch(error => {
+                    errorHandler.handle(error);
+                  });
               } else {
                 setUpCredentials(
                   'Wazuh App: Please set up Wazuh API credentials.',
