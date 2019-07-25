@@ -496,11 +496,13 @@ export class EmbeddedVisualizeHandler {
 
     //Do not show notification toast if it's already being shown a similar toast
     if (this.isToast.length === 0 || (this.isToast.length > 0 && this.isToast[0].outerText !== 'Error in visualization')) {
+      const err = ((((error.resp || {}).error) || {}).root_cause || [])[0] || [];
+      const errMsg = err ? `Found ${err.type} error making a query on the ${err.index} index, reason: ${err.reason} ` : error.message;
       toastNotifications.addDanger({
         title: i18n.translate('common.ui.visualize.dataLoaderError', {
           defaultMessage: 'Error in visualization',
         }),
-        text: error.message,
+        text: errMsg,
       });
     }
   };
