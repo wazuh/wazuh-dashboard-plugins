@@ -48,7 +48,6 @@ import { RequestHandlerParams, Vis } from 'ui/vis';
 import { PipelineDataLoader } from 'ui/visualize/loader/pipeline_data_loader';
 import { visualizationLoader } from './visualization_loader';
 import { VisualizeDataLoader } from './visualize_data_loader';
-import $ from 'jquery';
 
 // @ts-ignore
 import { DataAdapter, RequestAdapter } from 'ui/inspector/adapters';
@@ -89,7 +88,6 @@ export class EmbeddedVisualizeHandler {
    * @ignore
    */
 
-  private isToast: any;
   public readonly data$: Rx.Observable<any>;
   public readonly inspectorAdapters: Adapters = {};
   private vis: Vis;
@@ -120,11 +118,14 @@ export class EmbeddedVisualizeHandler {
   private actions: any = {};
   private events$: Rx.Observable<any>;
   private autoFetch: boolean;
+  private errorHandler: any;
 
   constructor(
     private readonly element: HTMLElement,
     savedObject: VisSavedObject,
-    params: EmbeddedVisualizeHandlerParams
+    params: EmbeddedVisualizeHandlerParams,
+    injector,
+    errorHandler
   ) {
     const { searchSource, vis } = savedObject;
 
@@ -137,8 +138,10 @@ export class EmbeddedVisualizeHandler {
       query,
       autoFetch = true,
       pipelineDataLoader = false,
-      Private,
+      Private
     } = params;
+
+    this.errorHandler = errorHandler;
 
     this.dataLoaderParams = {
       searchSource,
@@ -492,19 +495,11 @@ export class EmbeddedVisualizeHandler {
     this.vis.showRequestError =
       error.type && ['NO_OP_SEARCH_STRATEGY', 'UNSUPPORTED_QUERY'].includes(error.type);
 
-    this.isToast = $(".euiToastHeader__title");
 
     //Do not show notification toast if it's already being shown a similar toast
-    if (this.isToast.length === 0 || (this.isToast.length > 0 && this.isToast[0].outerText !== 'Error in visualization')) {
-      const err = ((((error.resp || {}).error) || {}).root_cause || [])[0] || [];
-      const errMsg = err ? `Found ${err.type} error making a query on the ${err.index} index, reason: ${err.reason} ` : error.message;
-      toastNotifications.addDanger({
-        title: i18n.translate('common.ui.visualize.dataLoaderError', {
-          defaultMessage: 'Error in visualization',
-        }),
-        text: errMsg,
-      });
-    }
+    this.errorHandler.handle(error.message, i18n.translate('common.ui.visualize.dataLoaderError', {
+      defaultMessage: 'Error in visualization',
+    }));
   };
 
   private rendererProvider = (response: VisResponseData | null) => {
