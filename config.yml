@@ -113,9 +113,9 @@
 # Default value: info
 # Allowed values: info, debug
 logs.level: debug
-wazuh.hosts:
+wazuh.hosts: 
   - 1562642463569:
       url: http://localhost
       port: 55000
       username: foo
-      password: YmFy
+      password: bar

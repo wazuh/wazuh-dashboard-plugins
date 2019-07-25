@@ -48,7 +48,7 @@ export class WazuhApiCtrl {
 
 
   /**
-   * This descrypts the encrypted password
+   * This decrypts the encrypted password
    * @param {String} password 
    */
   decryptApiPassword(password) {
@@ -74,7 +74,6 @@ export class WazuhApiCtrl {
       }
       log('wazuh-api:checkStoredAPI', `${req.payload} exists`, 'debug');
       const credInfo = ApiHelper.buildOptionsObject(api);
-      credInfo.password = this.decryptApiPassword(credInfo.password)
       let response = await needle(
         'get',
         `${api.url}:${api.port}/version`,
@@ -218,7 +217,7 @@ export class WazuhApiCtrl {
               try {
                 const options = ApiHelper.buildOptionsObject(api);
 
-                options.password = this.decryptApiPassword(api._source.api_password);
+                options.password = api._source.api_password;
 
                 const response = await needle(
                   'get',
@@ -322,7 +321,7 @@ export class WazuhApiCtrl {
         const data = this.findApi(apis, req.payload.id);
         if (data) {
           apiAvailable = this.cleanApiData(data);
-          apiAvailable.password = this.decryptApiPassword(apiAvailable.password);
+          apiAvailable.password = apiAvailable.password;
         } else {
           log('wazuh-api:checkAPI', `API ${req.payload.id} not found`);
           return ErrorResponse(
@@ -336,7 +335,7 @@ export class WazuhApiCtrl {
         // Check if a password is given
       } else if (req.payload && req.payload.password) {
         apiAvailable = req.payload;
-        apiAvailable.password = this.decryptApiPassword(req.payload.password);
+        apiAvailable.password = req.payload.password;
       }
 
       let response = await needle(

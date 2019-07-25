@@ -375,7 +375,7 @@ export class SettingsController {
 
       const tmpData = {
         user: this.formData.user,
-        password: base64.encode(this.formData.password),
+        password: this.formData.password,
         url: this.formData.url,
         port: this.formData.port,
         cluster_info: {},
@@ -404,12 +404,6 @@ export class SettingsController {
       // API Check correct. Get Cluster info
       tmpData.cluster_info = checkData.data;
 
-      // Insert new API entry
-      /*       const data = await this.genericReq.request(
-              'PUT',
-              '/elastic/api',
-              tmpData
-            ); */
       const data = await this.genericReq.request(
         'PUT',
         '/api/host',
@@ -501,7 +495,6 @@ export class SettingsController {
 
   // Update settings function
   async updateSettings(item, useItem = false) {
-    console.log('gonna add or update an API ', item);
     try {
       if (this.savingApi) {
         this.errorHandler.info('Please, wait for success message', 'Settings');
@@ -530,7 +523,7 @@ export class SettingsController {
 
       const tmpData = {
         user: this.formUpdate.user,
-        password: base64.encode(this.formUpdate.password),
+        password: this.formUpdate.password,
         url: this.formUpdate.url,
         port: this.formUpdate.port,
         cluster_info: {},
