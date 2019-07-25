@@ -286,11 +286,13 @@ export class ManagementController {
    * This set the rules tab
    * @param {String} tab
    */
-  setRulesTab(tab) {
+  setRulesTab(tab, flag) {
     this.rulesetTab = tab;
     this.globalRulesetTab = this.rulesetTab;
     this.managingFiles = false;
-    this.breadCrumbBack();
+    if (!flag) {
+      this.breadCrumbBack();
+    }
   }
 
   switchFilesSubTab(flag, showFile) {
