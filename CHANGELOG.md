@@ -33,7 +33,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Prevent duplicated visualization toast errors [786faf3](https://github.com/wazuh/wazuh-kibana-app/commit/786faf3e62d2cad13f512c0f873b36eca6e9787d)
 - Fix not properly updated breadcrumb in ruleset section [9645903](https://github.com/wazuh/wazuh-kibana-app/commit/96459031cd4edbe047970bf0d22d0c099771879f)
 - Fix badly dimensioned table in Integrity Monitoring section [9645903](https://github.com/wazuh/wazuh-kibana-app/commit/96459031cd4edbe047970bf0d22d0c099771879f)
-- Fix implicit filters can be destroyed []()
+- Fix implicit filters can be destroyed [9cf8578](https://github.com/wazuh/wazuh-kibana-app/commit/9cf85786f504f5d67edddeea6cfbf2ab577e799b)
 
 ## Wazuh v3.9.3 - Kibana v6.8.1 / v7.1.1 / v7.2.0 - Revision 523
 
