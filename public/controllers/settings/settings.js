@@ -143,7 +143,7 @@ export class SettingsController {
   async removeManager(item) {
     try {
       const currentApi = this.appState.getCurrentAPI();
-      let index = this.apiEntries.map(item => (item._id).toString()).indexOf((item._id).toString());
+      let index = this.getSelectedApiIndex(item);
       if (currentApi) {
         if (this.apiEntries[index]._id === JSON.parse(currentApi).id) {
           // We are trying to remove the one selected as default
@@ -193,7 +193,7 @@ export class SettingsController {
   async setDefault(item) {
     //Check the connection previously in order to get the manager/cluster name and the status
     await this.checkManager(item, false, true)
-    const index = this.apiEntries.map(item => (item._id).toString()).indexOf((item._id).toString());
+    const index = this.getSelectedApiIndex(item);
 
     this.appState.setClusterInfo(this.apiEntries[index].cluster_info);
 
@@ -519,7 +519,7 @@ export class SettingsController {
         return this.apiEntries;
       }
 
-      const index = this.apiEntries.map(item => (item._id).toString()).indexOf((item._id).toString());
+      const index = this.getSelectedApiIndex(item);
 
       const tmpData = {
         user: this.formUpdate.user,
@@ -568,12 +568,20 @@ export class SettingsController {
     this.addManagerContainer = !this.addManagerContainer;
   }
 
+  /**
+   * Returns the index of the array where the API entry is 
+   * @param {Object} item 
+   */
+  getSelectedApiIndex(item) {
+    return this.apiEntries.map(item => (item._id).toString()).indexOf((item._id).toString());
+  }
+
   // Check manager connectivity
   async checkManager(item, isIndex, silent = false) {
     try {
       const index = isIndex
         ? item
-        : this.apiEntries.map(item => (item._id).toString()).indexOf((item._id).toString());
+        : this.getSelectedApiIndex(item);
       const tmpData = {
         user: this.apiEntries[index].api_user,
         //password    : this.apiEntries[index].api_password,
