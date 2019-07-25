@@ -48,17 +48,6 @@ export class WazuhApiCtrl {
 
 
   /**
-   * This decrypts the encrypted password
-   * @param {String} password 
-   */
-  decryptApiPassword(password) {
-    return Buffer.from(
-      password,
-      'base64'
-    ).toString('ascii');
-  }
-
-  /**
    * Returns if the wazuh-api configuration is working
    * @param {Object} req
    * @param {Object} reply
@@ -886,7 +875,6 @@ export class WazuhApiCtrl {
       }
 
       const options = ApiHelper.buildOptionsObject(api);
-      options.password = this.decryptApiPassword(options.password)
 
       // Set content type application/xml if needed
       if (

@@ -67,6 +67,14 @@ export function Initialize(server) {
 
   const defaultIndexPattern = pattern || 'wazuh-alerts-3.x-*';
 
+  // Decrypts the encrypted password
+  const decryptApiPassword = password => {
+    return Buffer.from(
+      password,
+      'base64'
+    ).toString('ascii');
+  }
+
   // Save Wazuh App setup
   const saveConfiguration = async () => {
     try {
@@ -204,18 +212,11 @@ export function Initialize(server) {
               url: host.url,
               port: host.api_port,
               user: host.api_user,
-              password: host.api_password
+              password: decryptApiPassword(host.api_password)
             });
             if (!added) {
               throw new Error('Error adding Api host to config.yml.');
             }
-            /*             const host2 = apiEntries[0]._source;
-                        const added2 = await updateConfigurationFile.addHost({
-                          url: host2.url,
-                          port: host2.api_port,
-                          user: host2.api_user,
-                          password: host2.api_password
-                        }); */
           });
           log('initialize:checkWazuhIndex', 'Index .wazuh will be removed and its content will be migrated to config.yml', 'debug');
           //await wzWrapper.deleteIndexByName('.wazuh');
