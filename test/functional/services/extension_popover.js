@@ -1,12 +1,20 @@
-
-
 export function ExtensionPopoverProvider({ getService, getPageObjects }) {
   const testSubjects = getService('testSubjects');
   const browser = getService('browser');
-  const PageObjects = getPageObjects([ 'common' ]);
 
-
+  /**
+   * Tools to interact with PopOver elements.
+   *
+   * @class ExtensionPopover
+   */
   class ExtensionPopover {
+
+    /**
+     * Check if the view has PopOvers
+     *
+     * @returns {bool}
+     * @memberof ExtensionPopover
+     */
     async availablePopovers () {
       const currentUrl = await browser.getCurrentUrl();
       if(currentUrl.includes('tab=welcome')){
@@ -15,6 +23,14 @@ export function ExtensionPopoverProvider({ getService, getPageObjects }) {
       throw new Error('The current view has not popovers');
     }
 
+    /**
+     * Click on a PopOver and enable or disable an extension
+     *
+     * @param {*} key extension testSubject
+     * @param {*} popOver testsubject
+     * @returns {bool} extension status
+     * @memberof ExtensionPopover
+     */
     async checkedPopover (key, popOver) {
       await this.availablePopovers();
       if (await testSubjects.exists(popOver)){

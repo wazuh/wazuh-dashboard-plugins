@@ -7,9 +7,24 @@ export function ApiProvider({ getService, getPageObjects }) {
   const PageObjects = getPageObjects(['header', 'common', 'toasts']);
   const testSubjects = getService('testSubjects');
 
-  class ApiPage {
 
-    async completeApiForm (type='apiConfig') {
+  /**
+   * The Api Page class provides functions to automate the process 
+   * of testing the API configuration
+   *
+   * @class ApiPage
+   */
+  class ApiPage {
+      
+      /**
+       * Complete the form to create a new Api connection.
+       *
+       * @param {string} [type='apiConfig'] Set the form type
+       *  - apiConfig: For new API form
+       *  - apiTableEdit: For edit API form
+       * @memberof ApiPage
+       */
+      async completeApiForm (type='apiConfig') {
       if (!(type == 'apiConfig' || type == 'apiTableEdit')){
         throw new Error(`Invalid type: ${type}; use 'apiConfig' or 'apiTableEdit'`);
       }
@@ -26,6 +41,12 @@ export function ApiProvider({ getService, getPageObjects }) {
       await PageObjects.common.sleep(2000);
     }
 
+    /**
+     * Check the menu tab status
+     *
+     * @param {string} tab testSubjects value
+     * @memberof ApiPage
+     */
     async checkTabDisabled (tab) {
       await testSubjects.click(tab);
       await PageObjects.common.sleep(1500);
@@ -33,6 +54,11 @@ export function ApiProvider({ getService, getPageObjects }) {
       expect(await browser.getCurrentUrl()).to.contain('app/wazuh#/settings');
     }
 
+    /**
+     * Check all menu tabs status
+     *
+     * @memberof ApiPage
+     */
     async checkIfAllTabsAreDisables () {
       await this.checkTabDisabled('wzMenuOverview');
       await this.checkTabDisabled('wzMenuManagement');
@@ -41,6 +67,13 @@ export function ApiProvider({ getService, getPageObjects }) {
       await this.checkTabDisabled('wzMenuDevTools');
     }
 
+    /**
+     * Press all refresh buttons of the API list and 
+     * the response in the toasts
+     *
+     * @param {array} buttonList list of button WebElementWrapper
+     * @memberof ApiPage
+     */
     async pressAllCheckConnectionButtons (buttonList) {
       for (const key in buttonList) {
         if (buttonList.hasOwnProperty(key)) {
@@ -55,6 +88,12 @@ export function ApiProvider({ getService, getPageObjects }) {
       }
     }
 
+    /**
+     * Edit all APIs in the table of settings
+     *
+     * @param {array} apiButtonList list of button WebElementWrapper
+     * @memberof ApiPage
+     */
     async editAllApis (apiButtonList) {
       for (const apiButton of apiButtonList) {
         await apiButton.moveMouseTo();
@@ -66,6 +105,11 @@ export function ApiProvider({ getService, getPageObjects }) {
       }
     }
 
+    /**
+     * Press all the trash buttons in the table of settings
+     *
+     * @memberof ApiPage
+     */
     async deleteAllApis () {
       const deleteApiButtonList = await testSubjects.findAll('apiTableTrashButton');
       for (const deleteButton of deleteApiButtonList) {
@@ -78,21 +122,36 @@ export function ApiProvider({ getService, getPageObjects }) {
       }
     }
 
+    /**
+     * Navigate to API view in settings
+     *
+     * @memberof ApiPage
+     */
     async navigateToApiSetting () {
       await testSubjects.click('wzMenuSettings');
       await testSubjects.click('settingMenuApi');
     }
 
+    /**
+     * Go to the API settings, insert a new API and set it as default
+     *
+     * @memberof ApiPage
+     */
     async insertNewApi () {
       const fromUrl = await browser.getCurrentUrl();
       await this.navigateToApiSetting();
       await testSubjects.click('apiTableAddButton');
       await this.completeApiForm();
-      await find.clickByCssSelector('[api-default="false"]');
+      await find.clickByCssSelector('[test-api-default="false"]');
       await browser.get(fromUrl);
       await PageObjects.common.waitUntilUrlIncludes('tab=welcome');        
     }
 
+    /**
+     * Go to the API settings, delete the new API
+     *
+     * @memberof ApiPage
+     */
     async deleteNewApi () {
       const fromUrl = await browser.getCurrentUrl();
       await this.navigateToApiSetting();
@@ -102,11 +161,17 @@ export function ApiProvider({ getService, getPageObjects }) {
       await PageObjects.common.waitUntilUrlIncludes('tab=welcome');
     }
 
+    /**
+     * Remove the API marked as default 
+     *
+     * @returns
+     * @memberof ApiPage
+     */
     async clickTrashDefaultApi () {
       const rows = await find.allByCssSelector('table>tbody>tr');
       for (const row of rows) {
         try {
-          await row.findByCssSelector('[api-default="true"]')
+          await row.findByCssSelector('[test-api-default="true"]')
           const trashButton = await row.findByCssSelector('[data-test-subj="apiTableTrashButton"]')
           await trashButton.click();
           return;

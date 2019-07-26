@@ -1,14 +1,20 @@
-import expect from '@kbn/expect';
-
 export function ToastsProvider({ getService, getPageObjects }) {
-  const browser = getService('browser');
   const find = getService('find');
-  const log = getService('log');
-  const PageObjects = getPageObjects(['header', 'common']);
-  const testSubjects = getService('testSubjects');
 
+  /**
+   * Tools to interact with the toasts elements
+   *
+   * @class ToastsPage
+   */
   class ToastsPage {
 
+    /**
+     * Get all the text inside the toasts and check if it includes a string
+     *
+     * @param {string} str
+     * @returns {bool}
+     * @memberof ToastsPage
+     */
     async findMessageInToasts (str) {
       const euiGlobalToastsList = await find.byCssSelector('div.euiGlobalToastList');
       const toastsText = await euiGlobalToastsList.getVisibleText();
@@ -18,6 +24,11 @@ export function ToastsProvider({ getService, getPageObjects }) {
       return false
     }
 
+    /**
+     * Press the close buttons on all active toasts.
+     *
+     * @memberof ToastsPage
+     */
     async closeAllToasts () {
       const euiGlobalToastsButtonList = await find.allByCssSelector('div.euiGlobalToastList > div > button');
       for (const closeButton of euiGlobalToastsButtonList) {
@@ -25,6 +36,17 @@ export function ToastsProvider({ getService, getPageObjects }) {
       }
     }
 
+    /**
+     * Return if any of the active toasts has the indicated type.
+     *  - success
+     *  - warning
+     *  - error
+     *  - info
+     *
+     * @param {string} type
+     * @returns {bool}
+     * @memberof ToastsPage
+     */
     async anyTypeToasts (type) {
       const euiGlobalToastList = await find.allByCssSelector('div.euiGlobalToastsList > div');
       for (const toast in euiGlobalToastList){
