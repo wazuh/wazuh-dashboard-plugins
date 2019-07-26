@@ -16,7 +16,7 @@
 
     <!-- Add API section-->
     <div layout="row" layout-padding
-        ng-if="!currentAPI || (ctrl.addManagerContainer && !ctrl.isEditing) || !ctrl.apiEntries.length">
+        ng-if="!currentAPI || (ctrl.addManagerContainer && !ctrl.isEditing) || !ctrl.apiTableProps.apiEntries.length">
         <react-component flex name="AddApi" props="ctrl.addApiProps" />
         <!-- End add API form -->
     </div>

@@ -90,7 +90,9 @@ export class SettingsController {
       this.configurationTypes[key] = typeof this.configuration[key];
     }
     this.indexPatterns = [];
-    this.apiEntries = [];
+    this.apiTableProps = {
+      apiEntries: []
+    }
 
     const location = this.$location.search();
     if (location && location.tab) {
@@ -106,9 +108,8 @@ export class SettingsController {
   $onInit() {
     // Loading data
     this.getSettings().then(() => {
-      this.apiTableProps = {
+      const restApiTableProps = {
         currentDefault: this.currentDefault,
-        apiEntries: this.apiEntries,
         compressed: true,
         setDefault: entry => this.setDefault(entry),
         checkManager: (entry, isIndex = false, silent = false) => this.checkManager(entry, isIndex, silent),
@@ -117,6 +118,7 @@ export class SettingsController {
           this.updateSettings(entry, useItem),
         switch: () => this.switch()
       };
+      this.apiTableProps = Object.assign(this.apiTableProps, restApiTableProps);
       this.addApiProps = {
         saveSettings: entry => this.saveSettings(entry)
       };
@@ -145,36 +147,36 @@ export class SettingsController {
       const currentApi = this.appState.getCurrentAPI();
       let index = this.getSelectedApiIndex(item);
       if (currentApi) {
-        if (this.apiEntries[index]._id === JSON.parse(currentApi).id) {
+        if (this.apiTableProps.apiEntries[index]._id === JSON.parse(currentApi).id) {
           // We are trying to remove the one selected as default
           this.appState.removeCurrentAPI();
         }
       }
       await this.genericReq.request(
         'DELETE',
-        `/api/${this.apiEntries[index]._id}`
+        `/api/${this.apiTableProps.apiEntries[index]._id}`
       );
       this.appState.removeExtensions(item._id);
-      this.showEditForm[this.apiEntries[index]._id] = false;
-      this.apiEntries.splice(index, 1);
+      this.showEditForm[this.apiTableProps.apiEntries[index]._id] = false;
+      this.apiTableProps.apiEntries.splice(index, 1);
       this.wzMisc.setApiIsDown(false);
       this.apiIsDown = false;
       this.isEditing = false;
       for (const key in this.showEditForm) this.showEditForm[key] = false;
       this.$scope.$emit('updateAPI', {});
       this.errorHandler.info('The API was removed successfully', 'Settings');
-      this.apiTableProps.apiEntries = this.apiEntries;
+      //this.apiTableProps.apiEntries = this.apiTableProps.apiEntries;
       this.$scope.$applyAsync();
     } catch (error) {
       this.errorHandler.handle('Could not remove the API', 'Settings');
     }
-    return this.apiEntries;
+    return this.apiTableProps.apiEntries;
   }
 
   // Get current API index
   getCurrentAPIIndex() {
     // eslint-disable-next-line
-    this.apiEntries.map((entry, index, array) => {
+    this.apiTableProps.apiEntries.map((entry, index, array) => {
       if (entry._id === this.currentDefault) this.currentApiEntryIndex = index;
     });
   }
@@ -196,20 +198,20 @@ export class SettingsController {
     await this.checkManager(item, false, true)
     const index = this.getSelectedApiIndex(item);
 
-    this.appState.setClusterInfo(this.apiEntries[index].cluster_info);
+    this.appState.setClusterInfo(this.apiTableProps.apiEntries[index].cluster_info);
 
-    if (this.apiEntries[index].cluster_info.status == 'disabled') {
+    if (this.apiTableProps.apiEntries[index].cluster_info.status == 'disabled') {
       this.appState.setCurrentAPI(
         JSON.stringify({
-          name: this.apiEntries[index].cluster_info.manager,
-          id: this.apiEntries[index]._id
+          name: this.apiTableProps.apiEntries[index].cluster_info.manager,
+          id: this.apiTableProps.apiEntries[index]._id
         })
       );
     } else {
       this.appState.setCurrentAPI(
         JSON.stringify({
-          name: this.apiEntries[index].cluster_info.cluster,
-          id: this.apiEntries[index]._id
+          name: this.apiTableProps.apiEntries[index].cluster_info.cluster,
+          id: this.apiTableProps.apiEntries[index]._id
         })
       );
     }
@@ -223,7 +225,7 @@ export class SettingsController {
 
     this.errorHandler.info(
       `API ${
-      this.apiEntries[index].cluster_info.manager
+      this.apiTableProps.apiEntries[index].cluster_info.manager
       } set as default`,
       'Settings'
     );
@@ -232,8 +234,8 @@ export class SettingsController {
 
     if (currentApi && !this.appState.getExtensions(JSON.parse(currentApi).id)) {
       this.appState.setExtensions(
-        this.apiEntries[this.currentApiEntryIndex]._id,
-        this.apiEntries[this.currentApiEntryIndex].extensions || this.getDefaultExtensions()
+        this.apiTableProps.apiEntries[this.currentApiEntryIndex]._id,
+        this.apiTableProps.apiEntries[this.currentApiEntryIndex].extensions || this.getDefaultExtensions()
       );
     }
 
@@ -279,8 +281,8 @@ export class SettingsController {
         result.push(obj);
       }
 
-      this.apiEntries = result.length > 0 ? result : [];
-      this.apiEntries = this.apiEntries.sort(this.sortByTimestamp);
+      this.apiTableProps.apiEntries = result.length > 0 ? result : [];
+      this.apiTableProps.apiEntries = this.apiTableProps.apiEntries.sort(this.sortByTimestamp);
 
       const currentApi = this.appState.getCurrentAPI();
 
@@ -297,14 +299,15 @@ export class SettingsController {
         !this.appState.getExtensions(JSON.parse(currentApi).id)
       ) {
         this.appState.setExtensions(
-          this.apiEntries[this.currentApiEntryIndex]._id,
-          this.apiEntries[this.currentApiEntryIndex].extensions || this.getDefaultExtensions()
+          this.apiTableProps.apiEntries[this.currentApiEntryIndex]._id,
+          this.apiTableProps.apiEntries[this.currentApiEntryIndex].extensions || this.getDefaultExtensions()
         );
       }
 
       this.$scope.$applyAsync();
       return;
     } catch (error) {
+      console.error('error ', error)
       this.errorHandler.handle('Error getting API entries', 'Settings');
     }
     return;
@@ -369,7 +372,7 @@ export class SettingsController {
     try {
       if (this.savingApi) {
         this.errorHandler.info('Please, wait for success message', 'Settings');
-        return this.apiEntries;
+        return this.apiTableProps.apiEntries;
       }
 
       if (entry) {
@@ -390,7 +393,7 @@ export class SettingsController {
         this.messageError = invalid;
         this.errorHandler.handle(invalid, 'Settings');
         this.savingApi = false;
-        return this.apiEntries;
+        return this.apiTableProps.apiEntries;
       }
 
       const tmpData = {
@@ -425,10 +428,10 @@ export class SettingsController {
         api_port: tmpData.port,
         extensions: tmpData.extensions
       };
-      this.apiEntries.push(newEntry);
-      this.apiEntries = this.apiEntries.sort(this.sortByTimestamp);
-      this.apiTableProps.apiEntries = this.apiEntries;
-      if (this.apiEntries.length === 1) {
+      this.apiTableProps.apiEntries.push(newEntry);
+      this.apiTableProps.apiEntries = this.apiTableProps.apiEntries.sort(this.sortByTimestamp);
+      //this.apiTableProps.apiEntries = this.apiTableProps.apiEntries;
+      if (this.apiTableProps.apiEntries.length === 1) {
         this.setDefault(newEntry);
       }
       this.$scope.$applyAsync();
@@ -442,20 +445,20 @@ export class SettingsController {
       if (!this.appState.getCurrentAPI()) {
         // No cookie
         if (
-          this.apiEntries[this.apiEntries.length - 1].cluster_info
+          this.apiTableProps.apiEntries[this.apiTableProps.apiEntries.length - 1].cluster_info
             .status === 'disabled'
         ) {
           this.appState.setCurrentAPI(
             JSON.stringify({
-              name: this.apiEntries[this.apiEntries.length - 1].cluster_info.manager,
-              id: this.apiEntries[this.apiEntries.length - 1]._id
+              name: this.apiTableProps.apiEntries[this.apiTableProps.apiEntries.length - 1].cluster_info.manager,
+              id: this.apiTableProps.apiEntries[this.apiTableProps.apiEntries.length - 1]._id
             })
           );
         } else {
           this.appState.setCurrentAPI(
             JSON.stringify({
-              name: this.apiEntries[this.apiEntries.length - 1].cluster_info.cluster,
-              id: this.apiEntries[this.apiEntries.length - 1]._id
+              name: this.apiTableProps.apiEntries[this.apiTableProps.apiEntries.length - 1].cluster_info.cluster,
+              id: this.apiTableProps.apiEntries[this.apiTableProps.apiEntries.length - 1]._id
             })
           );
         }
@@ -487,7 +490,7 @@ export class SettingsController {
     }
     this.savingApi = false;
     this.$scope.$applyAsync();
-    return this.apiEntries;
+    return this.apiTableProps.apiEntries;
   }
 
   /**
@@ -505,7 +508,7 @@ export class SettingsController {
     try {
       if (this.savingApi) {
         this.errorHandler.info('Please, wait for success message', 'Settings');
-        return this.apiEntries;
+        return this.apiTableProps.apiEntries;
       }
       this.savingApi = true;
       this.messageErrorUpdate = '';
@@ -523,7 +526,7 @@ export class SettingsController {
         this.messageErrorUpdate = invalid;
         this.errorHandler.handle(invalid, 'Settings');
         this.savingApi = false;
-        return this.apiEntries;
+        return this.apiTableProps.apiEntries;
       }
 
       const index = this.getSelectedApiIndex(item);
@@ -535,28 +538,28 @@ export class SettingsController {
         port: this.formUpdate.port,
         cluster_info: {},
         insecure: 'true',
-        id: this.apiEntries[index]._id,
-        extensions: this.apiEntries[index].extensions
+        id: this.apiTableProps.apiEntries[index]._id,
+        extensions: this.apiTableProps.apiEntries[index].extensions
       };
 
       const data = await this.testAPI.check(tmpData);
       tmpData.cluster_info = data.data;
       await this.genericReq.request('PUT', '/api/settings', tmpData);
-      this.apiEntries[index].cluster_info = tmpData.cluster_info;
+      this.apiTableProps.apiEntries[index].cluster_info = tmpData.cluster_info;
 
       this.wzMisc.setApiIsDown(false);
       this.apiIsDown = false;
 
-      this.apiEntries[index].cluster_info.cluster =
+      this.apiTableProps.apiEntries[index].cluster_info.cluster =
         tmpData.cluster_info.cluster;
-      this.apiEntries[index].cluster_info.manager =
+      this.apiTableProps.apiEntries[index].cluster_info.manager =
         tmpData.cluster_info.manager;
-      this.apiEntries[index].url = tmpData.url;
-      this.apiEntries[index].api_port = tmpData.port;
-      this.apiEntries[index].api_user = tmpData.user;
+      this.apiTableProps.apiEntries[index].url = tmpData.url;
+      this.apiTableProps.apiEntries[index].api_port = tmpData.port;
+      this.apiTableProps.apiEntries[index].api_user = tmpData.user;
 
-      this.apiEntries = this.apiEntries.sort(this.sortByTimestamp);
-      this.showEditForm[this.apiEntries[index]._id] = false;
+      this.apiTableProps.apiEntries = this.apiTableProps.apiEntries.sort(this.sortByTimestamp);
+      this.showEditForm[this.apiTableProps.apiEntries[index]._id] = false;
       this.isEditing = false;
 
       this.errorHandler.info('The API was updated successfully', 'Settings');
@@ -565,7 +568,7 @@ export class SettingsController {
     }
     this.savingApi = false;
     this.$scope.$applyAsync();
-    return this.apiEntries;
+    return this.apiTableProps.apiEntries;
   }
 
   /**
@@ -580,7 +583,7 @@ export class SettingsController {
    * @param {Object} item 
    */
   getSelectedApiIndex(item) {
-    return this.apiEntries.map(item => (item._id).toString()).indexOf((item._id).toString());
+    return this.apiTableProps.apiEntries.map(item => (item._id).toString()).indexOf((item._id).toString());
   }
 
   // Check manager connectivity
@@ -590,25 +593,24 @@ export class SettingsController {
         ? item
         : this.getSelectedApiIndex(item);
       const tmpData = {
-        user: this.apiEntries[index].api_user,
-        //password    : this.apiEntries[index].api_password,
-        url: this.apiEntries[index].url,
-        port: this.apiEntries[index].api_port,
+        user: this.apiTableProps.apiEntries[index].api_user,
+        url: this.apiTableProps.apiEntries[index].url,
+        port: this.apiTableProps.apiEntries[index].api_port,
         cluster_info: {},
         insecure: 'true',
-        id: this.apiEntries[index]._id
+        id: this.apiTableProps.apiEntries[index]._id
       };
 
       const data = await this.testAPI.check(tmpData);
       tmpData.cluster_info = data.data;
 
-      /*const tmpUrl = `/elastic/api-hostname/${this.apiEntries[index]._id}`;
+      /*const tmpUrl = `/elastic/api-hostname/${this.apiTableProps.apiEntries[index]._id}`;
       await this.genericReq.request('PUT', tmpUrl, {
         cluster_info: tmpData.cluster_info
       });*/
       // Emit updateAPI event cause the cluster info could had been changed
       this.$scope.$emit('updateAPI', { cluster_info: tmpData.cluster_info });
-      this.apiEntries[index].cluster_info = tmpData.cluster_info;
+      this.apiTableProps.apiEntries[index].cluster_info = tmpData.cluster_info;
       this.wzMisc.setApiIsDown(false);
       this.apiIsDown = false;
       !silent && this.errorHandler.info('Connection success', 'Settings');
@@ -718,6 +720,7 @@ export class SettingsController {
       this.$scope.$applyAsync();
       return;
     } catch (error) {
+      console.error('error ', error)
       this.errorHandler.handle(
         'Error when loading Wazuh setup info',
         'Settings'
