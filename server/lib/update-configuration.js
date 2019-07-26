@@ -200,7 +200,7 @@ export class UpdateConfigurationFile {
           throw new Error(`Host ${id} not found.`);
         }
         const regex = this.composeRegex(target);
-        const result = data.replace(regex, `\n${this.composeHost(host)}`);
+        const result = data.replace(regex, `\n${this.composeHost(host, id)}`);
         await fs.writeFileSync(file, result, 'utf8');
       }
       this.busy = false;
