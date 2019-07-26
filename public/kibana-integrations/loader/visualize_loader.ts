@@ -32,8 +32,11 @@ import { EmbeddedVisualizeHandler } from './embedded_visualize_handler';
 import { VisSavedObject, VisualizeLoaderParams } from './types';
 
 export class VisualizeLoader {
-  constructor(private readonly savedVisualizations: any, private readonly Private: IPrivate, $injector) {
+  constructor(private readonly savedVisualizations: any, private readonly Private: IPrivate, $injector, errorHandler) {
+    // @ts-ignore
     this.injector = $injector;
+    // @ts-ignore
+    this.errorHandler = errorHandler;
   }
 
   /**
@@ -141,12 +144,12 @@ export class VisualizeLoader {
       Private: this.Private,
     };
 
-    return new EmbeddedVisualizeHandler(element, savedObj, handlerParams, this.injector);
+    return new EmbeddedVisualizeHandler(element, savedObj, handlerParams, this.injector, this.errorHandler);
   }
 }
 
-function VisualizeLoaderProvider(savedVisualizations: any, Private: IPrivate, $injector) {
-  return new VisualizeLoader(savedVisualizations, Private, $injector);
+function VisualizeLoaderProvider(savedVisualizations: any, Private: IPrivate, $injector, errorHandler) {
+  return new VisualizeLoader(savedVisualizations, Private, $injector, errorHandler);
 }
 
 /**

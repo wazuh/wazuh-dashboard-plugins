@@ -273,11 +273,13 @@ export class ManagementController {
    * This set the rules tab
    * @param {String} tab
    */
-  setRulesTab(tab) {
+  setRulesTab(tab, flag) {
     this.rulesetTab = tab;
     this.globalRulesetTab = this.rulesetTab;
     this.managingFiles = false;
-    this.breadCrumbBack();
+    if (!flag) {
+      this.breadCrumbBack();
+    }
   }
 
   switchFilesSubTab(flag, showFile) {
@@ -290,9 +292,13 @@ export class ManagementController {
   breadCrumbBack(goRoot = false) {
     if (this.currentRule) {
       this.$scope.$broadcast('closeRuleView');
+      this.$scope.$broadcast('closeRulesetFile');
+      this.$scope.$emit('removeCurrentRule');
     }
     if (this.currentDecoder) {
       this.$scope.$broadcast('closeDecoderView');
+      this.$scope.$broadcast('closeRulesetFile');
+      this.$scope.$emit('removeCurrentDecoder');
     }
     if (this.currentList) {
       this.$scope.$broadcast('closeListView');
@@ -301,6 +307,7 @@ export class ManagementController {
       this.switchTab('ruleset', true);
       this.setRulesTab('rules');
     }
+    this.$scope.$applyAsync();
   }
 
   changeNode(node) {
