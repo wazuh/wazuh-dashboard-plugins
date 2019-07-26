@@ -127,8 +127,7 @@ function discoverController(
   getAppState,
   globalState,
   loadedVisualizations,
-  discoverPendingUpdates,
-  errorHandler
+  discoverPendingUpdates
 ) {
   const visualizeLoader = Private(VisualizeLoaderProvider);
   let visualizeHandler;
@@ -464,32 +463,8 @@ function discoverController(
         if (!angular.equals(sort, currentSort)) $scope.fetch();
       });
 
-      const isRemovable = filter =>
-        typeof filter.meta.removable !== 'undefined' && !filter.meta.removable;
-
       // update data source when filters update
       $scope.$listen(queryFilter, 'update', function () {
-        if (!$scope.implicitFilters) {
-          $scope.implicitFilters = queryFilter.getFilters();
-        }
-        const filters = queryFilter.getFilters();
-        ///////////////////////////////  WAZUH   ///////////////////////////////////
-        // Store non removable filters
-        const nonRemovableFilters = $scope.implicitFilters
-          .map(item => item.meta.key);
-
-        // Compose final filters array not including filters that also exist as non removable filter
-        filters.filter(item => {
-          const key =
-            item.meta.key || (Object.keys(item.query.match) || [undefined])[0];
-          const isIncluded = nonRemovableFilters.includes(key);
-          const isNonRemovable = isRemovable(item);
-          if (isIncluded && !isNonRemovable) {
-            errorHandler.handle(`Filter for ${key} already added`);
-            item.meta.removable = false;
-          }
-        });
-
         return $scope
           .updateDataSource()
           .then(function () {
@@ -499,7 +474,7 @@ function discoverController(
             discoverPendingUpdates.removeAll();
             discoverPendingUpdates.addItem(
               $state.query,
-              filters
+              queryFilter.getFilters()
             );
             $rootScope.$broadcast('updateVis');
             $rootScope.$broadcast('fetch');
