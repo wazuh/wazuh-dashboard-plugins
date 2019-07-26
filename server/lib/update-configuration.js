@@ -79,7 +79,7 @@ export class UpdateConfigurationFile {
     return `  - ${!id ? new Date().getTime() : id}:
       url: ${host.url}
       port: ${host.port}
-      username: ${host.username || host.user}
+      user: ${host.username || host.user}
       password: ${host.password}`;
   }
 
