@@ -163,7 +163,7 @@ export class ApiTable extends Component {
                   }
                   aria-label="Set as default"
                   data-test-subj="apiTableStarredButton"
-                  api-default={
+                  test-api-default={
                     item._id === this.state.currentDefault
                       ? 'true'
                       : 'false'
