@@ -30,15 +30,18 @@ export class ApiTable extends Component {
       apiEntries: [],
       currentDefault: 0
     };
+
+    this.editionEnabled = false;
   }
 
   checkApiConnection() {
+    if (this.editionEnabled) return;
     this.props.apiEntries.map(api => {
       this.props.checkManager(api, false, true);
     });
   }
 
-  shouldComponentUpdate() {
+  shouldComponentUpdate() {   
     this.checkApiConnection();
     return true;
   }
@@ -50,6 +53,7 @@ export class ApiTable extends Component {
   }
 
   toggleDetails(item) {
+    this.editionEnabled = true;
     const itemIdToExpandedRowMap = { ...this.state.itemIdToExpandedRowMap };
     if (itemIdToExpandedRowMap[item._id]) {
       delete itemIdToExpandedRowMap[item._id];
@@ -99,7 +103,10 @@ export class ApiTable extends Component {
                 onClick={() =>
                   this.props
                     .updateSettings({ ...this.state, _id: item._id }, true)
-                    .then(result => result !== -1 && this.toggleDetails(item))
+                    .then(result => {
+                      result !== -1 && this.toggleDetails(item)
+                      this.editionEnabled = false;
+                    })
                 }
               >
                 Save
