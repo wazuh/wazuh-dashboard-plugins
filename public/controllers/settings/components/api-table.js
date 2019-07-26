@@ -38,8 +38,9 @@ export class ApiTable extends Component {
     });
   }
 
-  componentDidMount() {
+  shouldComponentUpdate() {
     this.checkApiConnection();
+    return true;
   }
 
   onChangeEdit(e, field) {
