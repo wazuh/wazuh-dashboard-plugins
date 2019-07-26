@@ -155,7 +155,7 @@ export class ApiTable extends Component {
               <EuiToolTip position="bottom" content={<p>Set as default</p>}>
                 <EuiButtonIcon
                   iconType={
-                    item._id === this.props.currentDefault
+                    item._id == this.props.currentDefault
                       ? 'starFilled'
                       : 'starEmpty'
                   }
