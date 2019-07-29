@@ -166,7 +166,7 @@ export class UpdateConfigurationFile {
     try {
       const entry = hosts.shift();
       const response = await this.addHost(entry);
-      if (hosts && response) {
+      if (hosts.length && response) {
         await this.addSeveralHosts(hosts);
       } else {
         return 'All APIs entries were migrated to the config.yml'
