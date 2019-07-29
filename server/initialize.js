@@ -200,8 +200,12 @@ export function Initialize(server) {
           const apiEntries = (((data || {}).hits || {}).hits || []);
           await updateConfigurationFile.migrateFromIndex(apiEntries)
           log('initialize:checkWazuhIndex', 'Index .wazuh will be removed and its content will be migrated to config.yml', 'debug');
-          // Delete the documents stored in the index .wazuh
-          await wzWrapper.deleteDocumentsInIndex('.wazuh');
+          // Check if all APIs entries were migrated properly and delete it from the .wazuh index
+          if (await checkProperlyMigrate()){
+            await wzWrapper.deleteDocumentsInIndex('.wazuh');
+          } else {
+            throw new Error('Cannot migrate all APIs from .wazuh index to the config.yml file properly.');
+          }
           log('initialize:checkWazuhIndex', 'Content of index .wazuh deleted.', 'debug');
         } catch (error) {
           throw new Error('Error deleting index .wazuh. ' + error);
@@ -211,6 +215,25 @@ export function Initialize(server) {
       return Promise.reject(error);
     }
   };
+
+  // Checks if all the APIs were migrated
+  const checkProperlyMigrate = async () => {
+    let apisIndex = await wzWrapper.getWazuhAPIEntries();
+    let apisConfig = await updateConfigurationFile.getHosts();
+    apisIndex = (apisIndex.hits || {}).hits || [];
+
+    const apisIndexKeys = apisIndex.map(api => {
+      return api._id;
+    });
+
+    const apisConfigKeys = apisConfig.map(api => {
+      return Object.keys(api)[0];
+    });
+    
+    apisIndexKeys.map(k => {
+      if (!apisConfigKeys.includes(k)) throw new Error('Cannot migrate all the APIs entries.');
+    });
+  }
 
   const checkWazuhVersionRegistry = async () => {
     try {
