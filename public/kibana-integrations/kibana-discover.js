@@ -1004,8 +1004,9 @@ function discoverController(
             if (wzCurrentFilters.find(item => item.meta.key === 'agent.id')) {
               queryFilter.removeFilter(pinnedAgent);
             }
-            if (wzCurrentFilters.find(item => item.meta.value === pinnedAgent.meta.value)) {
-              queryFilter.addFilters(wzCurrentFilters);
+            const implicitFilter = wzCurrentFilters.find(item => item.meta.value === pinnedAgent.meta.value);
+            if (implicitFilter) {
+              queryFilter.addFilters(implicitFilter);
             }
           }
         })
