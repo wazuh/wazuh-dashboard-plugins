@@ -654,6 +654,28 @@ export class ElasticWrapper {
   }
 
   /**
+   * Delete a Wazuh API entry using incoming request
+   * @param {*} req
+   */
+  async deleteWazuhAPIEntriesWithRequest(req) {
+    try {
+      if (!req.params || !req.params.id)
+        return Promise.reject(new Error('No API id given'));
+
+      const data = await this.elasticRequest.callWithRequest(req, 'delete', {
+        index: '.wazuh',
+        type: '_doc',
+        id: req.params.id,
+        refresh: true
+      });
+
+      return data;
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  }
+
+  /**
    * Deletes wazuh monitoring index pattern
    */
   async deleteMonitoring() {

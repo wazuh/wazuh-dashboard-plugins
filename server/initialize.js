@@ -201,8 +201,11 @@ export function Initialize(server) {
           await updateConfigurationFile.migrateFromIndex(apiEntries)
           log('initialize:checkWazuhIndex', 'Index .wazuh will be removed and its content will be migrated to config.yml', 'debug');
           // Check if all APIs entries were migrated properly and delete it from the .wazuh index
-          if (await checkProperlyMigrate()){
-            await wzWrapper.deleteDocumentsInIndex('.wazuh');
+          const apisToDelete = await checkProperlyMigrate();
+          if (apisToDelete.length){
+            apisToDelete.map(async id => {
+              await wzWrapper.deleteWazuhAPIEntriesWithRequest({'params': {'id': id}});
+            });            
           } else {
             throw new Error('Cannot migrate all APIs from .wazuh index to the config.yml file properly.');
           }
@@ -229,10 +232,11 @@ export function Initialize(server) {
     const apisConfigKeys = apisConfig.map(api => {
       return Object.keys(api)[0];
     });
-    
+
     apisIndexKeys.map(k => {
       if (!apisConfigKeys.includes(k)) throw new Error('Cannot migrate all the APIs entries.');
     });
+    return apisIndexKeys;
   }
 
   const checkWazuhVersionRegistry = async () => {
