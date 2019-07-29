@@ -9,7 +9,6 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import colors from 'ansicolors';
 import { log } from './logger';
 import { ElasticWrapper } from './lib/elastic-wrapper';
 import packageJSON from '../package.json';
@@ -21,7 +20,7 @@ import { checkKnownFields } from './lib/refresh-known-fields';
 import { totalmem } from 'os';
 
 export function Initialize(server) {
-  const blueWazuh = colors.blue('wazuh');
+  const blueWazuh = '\u001b[34mwazuh\u001b[39m'
 
   // Elastic JS Client
   const wzWrapper = new ElasticWrapper(server);
