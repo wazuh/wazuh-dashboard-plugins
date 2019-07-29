@@ -10,13 +10,23 @@
         </span>
     </div>
     <!-- End headline -->
-    <div layout="row" layout-padding ng-if="ctrl.apiTableProps.apiEntries.length">
+    <div layout="row" layout-padding ng-if="ctrl.apiTableProps.apiEntries.length && !ctrl.duplicatedApisKeys">
         <react-component name="ApiTable" props="ctrl.apiTableProps" />
+    </div>
+    <div ng-ig="ctrl.duplicatedApisKeys">
+        <div flex class="euiCallOut euiCallOut--warning md-margin-h">
+            <div class="euiCallOutHeader">
+                <span class="euiCallOutHeader__title">
+                    <react-component name="EuiIcon" props="{type:'help'}" />
+                    {{ctrl.errMsg}}
+                </span>
+            </div>
+        </div>
     </div>
 
     <!-- Add API section-->
     <div layout="row" layout-padding
-        ng-if="!currentAPI || (ctrl.addManagerContainer && !ctrl.isEditing) || !ctrl.apiTableProps.apiEntries.length">
+        ng-if="(!currentAPI || (ctrl.addManagerContainer && !ctrl.isEditing) || !ctrl.apiTableProps.apiEntries.length) && !ctrl.duplicatedApisKeys">
         <react-component flex name="AddApi" props="ctrl.addApiProps" />
         <!-- End add API form -->
     </div>

@@ -165,7 +165,6 @@ export class SettingsController {
       for (const key in this.showEditForm) this.showEditForm[key] = false;
       this.$scope.$emit('updateAPI', {});
       this.errorHandler.info('The API was removed successfully', 'Settings');
-      //this.apiTableProps.apiEntries = this.apiTableProps.apiEntries;
       this.$scope.$applyAsync();
     } catch (error) {
       this.errorHandler.handle('Could not remove the API', 'Settings');
@@ -262,10 +261,26 @@ export class SettingsController {
     }
   }
 
+  checkNotDuplicatedApis(apis) {
+    try {
+      const keys = apis.map(api => { return Object.keys(api)[0] });
+      const cleanKeys = [...new Set(keys)];
+      if (keys.length !== cleanKeys.length){
+        this.duplicatedApisKeys = true;
+        this.errMsg = 'Please check the config.yml file, there were found duplicated APIs keys.'
+      }
+      return 
+    } catch (error) {
+      console.error('Error checking duplicated APIs keys');
+      throw error;
+    }
+  }
+
   // Get settings function
   async getSettings() {
     try {
       const data = await this.genericReq.request('GET', '/api/apis');
+      this.checkNotDuplicatedApis(data.data);
       let result = [];
       for (const entry of data.data) {
         const id = Object.keys(entry)[0];

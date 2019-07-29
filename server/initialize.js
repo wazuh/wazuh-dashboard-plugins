@@ -191,9 +191,6 @@ export function Initialize(server) {
       log('initialize:checkWazuhIndex', 'Checking if .wazuh index exists.', 'debug');
 
       const result = await wzWrapper.checkIfIndexExists('.wazuh');
-
-      //const shardConfiguration = BuildBody(configurationFile, 'wazuh');
-
       if (result) {
         try {
           const data = await wzWrapper.getWazuhAPIEntries();
