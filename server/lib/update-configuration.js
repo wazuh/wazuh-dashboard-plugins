@@ -107,12 +107,81 @@ export class UpdateConfigurationFile {
       return configuration['wazuh.hosts'] || [];
     } catch (error) {
       this.busy = false;
-      throw error;
+      return Promise.reject(error);
     }
   }
 
+  // Decrypts the encrypted password
+  decryptApiPassword(password) {
+    return Buffer.from(
+      password,
+      'base64'
+    ).toString('ascii');
+  }
+
+  /**
+   *  Iterate the array with the API entries in given from the .wazuh index in order to create a valid array
+   * @param {Object} apiEntries 
+   */
+  transformIndexedApis(apiEntries) {
+    const entries = [];
+    try {
+      apiEntries.map(entry => {
+        const id = entry._id;
+        const host = entry._source;
+        const api = {
+          id: id,
+          url: host.url,
+          port: host.api_port,
+          user: host.api_user,
+          password: this.decryptApiPassword(host.api_password)
+        };
+        entries.push(api);
+      });
+    } catch (error) {
+      throw error;
+    }
+    return entries;
+  }
+
+
+ /**
+ * Calls transformIndexedApis() to get the entries to migrate and after that calls addSeveralHosts()
+ * @param {Object} apiEntries 
+ */
+  async migrateFromIndex(apiEntries) {
+    try {
+      const apis = this.transformIndexedApis(apiEntries);
+      await this.addSeveralHosts(apis);
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  }
+
+  /**
+   * Recursive function used to add several APIs entries
+   * @param {Array} hosts 
+   */
+  async addSeveralHosts(hosts) {
+    try {
+      const entry = hosts.shift();
+      const response = await this.addHost(entry);
+      if (hosts && response) {
+        await this.addSeveralHosts(hosts);
+      } else {
+        return 'All APIs entries were migrated to the config.yml'
+      }
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  }
+
+  /**
+   * 
+   * @param {Obeject} host 
+   */
   async addHost(host) {
-    const id = new Date().getTime();
+    const id = host.id || new Date().getTime();
     const compose = this.composeHost(host, id);
     const file = path.join(__dirname, '../../config.yml');
     let data = await fs.readFileSync(file, { encoding: 'utf-8' });
@@ -139,7 +208,7 @@ export class UpdateConfigurationFile {
       return id;
     } catch (error) {
       this.busy = false;
-      throw error;
+      return Promise.reject(error);
     }
   }
 
@@ -176,7 +245,7 @@ export class UpdateConfigurationFile {
       return true;
     } catch (error) {
       this.busy = false;
-      throw error;
+      return Promise.reject(error);
     }
   }
 
@@ -207,7 +276,7 @@ export class UpdateConfigurationFile {
       return true;
     } catch (error) {
       this.busy = false;
-      throw error;
+      return Promise.reject(error);
     }
   }
 }
