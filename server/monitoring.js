@@ -12,7 +12,6 @@
 import cron from 'node-cron';
 import needle from 'needle';
 import { getPath } from '../util/get-path';
-import colors from 'ansicolors';
 import { log } from './logger';
 import { ElasticWrapper } from './lib/elastic-wrapper';
 import { monitoringTemplate } from './integration-files/monitoring-template';
@@ -22,7 +21,7 @@ import { indexDate } from './lib/index-date';
 import { BuildBody } from './lib/replicas-shards-helper';
 import * as ApiHelper from './lib/api-helper';
 
-const blueWazuh = colors.blue('wazuh');
+const blueWazuh = '\u001b[34mwazuh\u001b[39m'
 
 export class Monitoring {
   /**
