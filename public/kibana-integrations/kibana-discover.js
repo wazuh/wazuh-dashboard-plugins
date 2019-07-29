@@ -1004,9 +1004,6 @@ function discoverController(
             if (wzCurrentFilters.find(item => item.meta.key === 'agent.id')) {
               queryFilter.removeFilter(pinnedAgent);
             }
-            if (item.meta.value === pinnedAgent.meta.value) {
-              queryFilter.addFilters(wzCurrentFilters);
-            }
           }
         })
         .catch(error => console.log(error.message || error)); // eslint-disable-line
