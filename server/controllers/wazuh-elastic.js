@@ -33,42 +33,6 @@ export class WazuhElasticCtrl {
   }
 
   /**
-   * This get the timestamp field
-   * @param {Object} req
-   * @param {Object} reply
-   * @returns {Object} timestamp field or ErrorResponse
-   */
-  async getTimeStamp(req, reply) {
-    try {
-      const data = await this.wzWrapper.getWazuhVersionIndexAsSearch();
-      const source =
-        ((((data || {}).hits || {}).hits || [])[0] || {})._source || {};
-
-      if (source.installationDate && source.lastRestart) {
-        log(
-          'wazuh-elastic:getTimeStamp',
-          `Installation date: ${data.hits.hits[0]._source.installationDate}. Last restart: ${data.hits.hits[0]._source.lastRestart}`,
-          'debug'
-        );
-        return {
-          installationDate: data.hits.hits[0]._source.installationDate,
-          lastRestart: data.hits.hits[0]._source.lastRestart
-        };
-      } else {
-        throw new Error('Could not fetch .wazuh-version index');
-      }
-    } catch (error) {
-      log('wazuh-elastic:getTimeStamp', error.message || error);
-      return ErrorResponse(
-        error.message || 'Could not fetch .wazuh-version index',
-        4001,
-        500,
-        reply
-      );
-    }
-  }
-
-  /**
    * This retrieve a template from Elasticsearch
    * @param {Object} req
    * @param {Object} reply
