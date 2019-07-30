@@ -28,7 +28,7 @@
                 tooltip-placement="bottom"
                 ng-class="{'euiButtonEmpty--disabled': !rendered || loading || resultState !== 'ready'}"
                 ng-disabled="!rendered || loading || resultState !== 'ready'" ng-click="octrl.startVis2Png()"
-                aria-label="Generate report button">
+                aria-label="Generate report button" data-test-subj="overviewGenerateReport">
                 <i class="fa fa-fw fa-print" aria-hidden="true"></i>
             </button>
         </div>

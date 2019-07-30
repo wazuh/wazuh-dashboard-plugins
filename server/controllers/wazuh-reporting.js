@@ -30,6 +30,8 @@ import { WazuhApiCtrl } from './wazuh-api';
 import clockIconRaw from '../reporting/clock-icon-raw';
 import filterIconRaw from '../reporting/filter-icon-raw';
 import ProcessEquivalence from '../../util/process-state-equivalence';
+import Chrome from 'selenium-webdriver/chrome';
+import {Builder, By, Key, until} from 'selenium-webdriver';
 
 import {
   AgentsVisualizations,
@@ -1366,6 +1368,47 @@ export class WazuhReportingCtrl {
       return false;
     } catch (error) {
       return Promise.reject(error);
+    }
+  }
+
+  async autoReport(req, reply) {
+    const uri = (((req || {}).server || {}).info || {}).uri;
+    const ctrl = 'overview';
+    const tab = 'general';
+    const view = 'panels';
+
+
+    const url = `${uri}/app/wazuh#/${ctrl}/?_g=(time:(from:now-7d,to:now))&tabView=${view}&tab=${tab}&_a=(columns:!(_source),filters:!((%27$state%27:(store:appState),meta:(alias:!n,disabled:!f,index:%27wazuh-alerts-3.x-*%27,key:cluster.name,negate:!f,params:(query:wazuh),removable:!f,type:phrase,value:wazuh),query:(match:(cluster.name:(query:wazuh,type:phrase))))),index:%27wazuh-alerts-3.x-*%27,interval:auto,query:(language:kuery,query:%27%27),sort:!(timestamp,desc))`
+
+    const eventAlertSelector = '#kibana-body > div > div > div > div.application.ng-scope.tab-overview > div > div.ng-scope.layout-align-start-stretch.layout-column > div:nth-child(2) > react-component > div > div:nth-child(1) > div:nth-child(1) > div > div.euiFlexGrid.euiFlexGrid--gutterLarge.euiFlexGrid--halves.euiFlexGrid--responsive > div:nth-child(1) > button'
+    const screen = {
+      width: 1920,
+      height: 1080
+    };
+    const driver = await new Builder()
+                              .forBrowser('chrome')
+                              .setChromeOptions(new Chrome.Options().headless().windowSize(screen))
+                              .build();
+
+    try {
+      await driver.get(url);
+      await driver.sleep(5000);
+      const eventAlertButton = await driver.wait(until.elementLocated(By.css(eventAlertSelector)), 50000)
+      await eventAlertButton.click();
+      await driver.sleep(10000);
+      driver.takeScreenshot().then(
+        function(image, err) {
+          require('fs').writeFile('./plugins/wazuh/out.png', image, 'base64', function(err) {
+          });
+        }
+      );
+
+      const export_button = await driver.wait(until.elementLocated(By.css('[data-test-subj="overviewGenerateReport"]')), 50000);
+      await export_button.click();
+      await driver.sleep(20000);
+    } finally {
+      await driver.quit();
+      return 'Reporting success.\n';
     }
   }
 

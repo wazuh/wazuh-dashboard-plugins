@@ -49,4 +49,13 @@ export function WazuhReportingRoutes(server) {
       return ctrl.getReports(req, res);
     }
   });
+
+  // Fetch the reports list
+  server.route({
+    method: 'GET',
+    path: '/autoReport',
+    handler(req, res) {
+      return ctrl.autoReport(req, res);
+    }
+  });
 }
