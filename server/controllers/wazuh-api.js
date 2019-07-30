@@ -42,7 +42,7 @@ export class WazuhApiCtrl {
     this.queue = Queue;
     this.wzWrapper = new ElasticWrapper(server);
     this.monitoringInstance = new Monitoring(server, true);
-    this.wazuhRegistry = path.join(__dirname, '../../../../optimize/wazuh-registry.json'); ///home/vagrant/kibana/plugins/wazuh/server
+    this.wazuhRegistry = path.join(__dirname, '../wazuh-registry.json'); ///home/vagrant/kibana/plugins/wazuh/server
     this.configurationFile = new UpdateConfigurationFile();
   }
 

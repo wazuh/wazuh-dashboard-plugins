@@ -24,7 +24,7 @@ import { UpdateConfigurationFile } from './lib/update-configuration';
 const updateConfigurationFile = new UpdateConfigurationFile();
 
 export function Initialize(server) {
-  const wazuhRegistry = path.join(__dirname, '../../../optimize/wazuh-registry.json');
+  const wazuhRegistry = path.join(__dirname, '/wazuh-registry.json');
   const blueWazuh = '\u001b[34mwazuh\u001b[39m';
   // Elastic JS Client
   const wzWrapper = new ElasticWrapper(server);
