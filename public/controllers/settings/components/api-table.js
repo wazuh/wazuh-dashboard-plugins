@@ -205,7 +205,9 @@ export class ApiTable extends Component {
             <EuiButtonIcon
               onClick={() => this.toggleDetails(item)}
               aria-label={
-                itemIdToExpandedRowMap[item.id] ? 'Collapse edition' : 'Expand edition'
+                itemIdToExpandedRowMap[item.id]
+                  ? 'Collapse edition'
+                  : 'Expand edition'
               }
               iconType={
                 itemIdToExpandedRowMap[item.id] ? 'arrowUp' : 'arrowDown'

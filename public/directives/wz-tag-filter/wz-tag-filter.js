@@ -16,7 +16,7 @@ import { uiModules } from 'ui/modules';
 
 const app = uiModules.get('app/wazuh', []);
 
-app.directive('wzTagFilter', function () {
+app.directive('wzTagFilter', function() {
   return {
     restrict: 'E',
     scope: {
@@ -180,7 +180,7 @@ app.directive('wzTagFilter', function () {
                 value:
                   (
                     ((($scope.connectors || [])[index] || {}).subgroup || [])[
-                    idx
+                      idx
                     ] || {}
                   ).value || ','
               });
@@ -389,7 +389,7 @@ app.directive('wzTagFilter', function () {
       /**
        * This set to bar a keydown listener to show the autocomplete
        */
-      $('#wz-search-filter-bar-input').bind('keydown', function (e) {
+      $('#wz-search-filter-bar-input').bind('keydown', function(e) {
         let $current = $('#wz-search-filter-bar-autocomplete-list li.selected');
         if ($current.length === 0 && (e.keyCode === 38 || e.keyCode === 40)) {
           $('#wz-search-filter-bar-autocomplete-list li')

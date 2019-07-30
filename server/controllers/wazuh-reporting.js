@@ -196,8 +196,8 @@ export class WazuhReportingCtrl {
           parseInt(a[a.length - 1]) < parseInt(b[b.length - 1])
             ? 1
             : parseInt(a[a.length - 1]) > parseInt(b[b.length - 1])
-              ? -1
-              : 0;
+            ? -1
+            : 0;
 
         TimSort.sort(rows, sortFunction);
 
@@ -256,7 +256,8 @@ export class WazuhReportingCtrl {
 
         if (table.title === 'Monitored directories') {
           this.dd.content.push({
-            text: 'RT: Real time | WD: Who-data | Per.: Permission | MT: Modification time | SL: Symbolic link | RL: Recursion level',
+            text:
+              'RT: Real time | WD: Who-data | Per.: Permission | MT: Modification time | SL: Symbolic link | RL: Recursion level',
             style: { fontSize: 8, color: '#78C8DE' },
             margin: [0, 0, 0, 5]
           });
@@ -341,9 +342,9 @@ export class WazuhReportingCtrl {
     const seconds = date.getSeconds();
     const str = `${year}-${month < 10 ? '0' + month : month}-${
       day < 10 ? '0' + day : day
-      }T${hours < 10 ? '0' + hours : hours}:${
+    }T${hours < 10 ? '0' + hours : hours}:${
       minutes < 10 ? '0' + minutes : minutes
-      }:${seconds < 10 ? '0' + seconds : seconds}`;
+    }:${seconds < 10 ? '0' + seconds : seconds}`;
     return str;
   }
 
@@ -427,14 +428,14 @@ export class WazuhReportingCtrl {
       str +=
         i === len - 1
           ? (filter.meta.negate ? 'NOT ' : '') +
-          filter.meta.key +
-          ': ' +
-          filter.meta.value
+            filter.meta.key +
+            ': ' +
+            filter.meta.value
           : (filter.meta.negate ? 'NOT ' : '') +
-          filter.meta.key +
-          ': ' +
-          filter.meta.value +
-          ' AND ';
+            filter.meta.key +
+            ': ' +
+            filter.meta.value +
+            ' AND ';
     }
 
     if (searchBar) {
@@ -475,7 +476,11 @@ export class WazuhReportingCtrl {
       }
 
       if (isAgents && typeof isAgents === 'object') {
-        await this.buildAgentsTable(isAgents, apiId, section === 'groupConfig' ? tab : false);
+        await this.buildAgentsTable(
+          isAgents,
+          apiId,
+          section === 'groupConfig' ? tab : false
+        );
       }
 
       if (isAgents && typeof isAgents === 'string') {
@@ -1364,7 +1369,7 @@ export class WazuhReportingCtrl {
           if (hardware.data.ram && hardware.data.ram.total)
             ulcustom.push(
               Number(hardware.data.ram.total / 1024 / 1024).toFixed(2) +
-              'GB RAM'
+                'GB RAM'
             );
           ulcustom &&
             ulcustom.length &&
@@ -1506,9 +1511,8 @@ export class WazuhReportingCtrl {
     for (let prop in data || []) {
       if (Array.isArray(data[prop])) {
         data[prop].forEach((x, idx) => {
-          if (typeof x === 'object')
-            data[prop][idx] = JSON.stringify(x);
-        })
+          if (typeof x === 'object') data[prop][idx] = JSON.stringify(x);
+        });
       }
       result.push([
         (labels || {})[prop] || KeyEquivalence[prop] || prop,
@@ -1533,10 +1537,13 @@ export class WazuhReportingCtrl {
           plainData[key] =
             Array.isArray(data[key]) && typeof data[key][0] !== 'object'
               ? data[key].map(x => {
-                return (typeof x === 'object') ? (JSON.stringify(x)) : x + '\n';
-              })
+                  return typeof x === 'object' ? JSON.stringify(x) : x + '\n';
+                })
               : data[key];
-        } else if (Array.isArray(data[key]) && typeof data[key][0] === 'object') {
+        } else if (
+          Array.isArray(data[key]) &&
+          typeof data[key][0] === 'object'
+        ) {
           tableData[key] = data[key];
         } else {
           if (section.isGroupConfig && ['pack', 'content'].includes(key)) {
@@ -1550,7 +1557,8 @@ export class WazuhReportingCtrl {
     array.push({
       title: (section.options || {}).hideHeader
         ? ''
-        : (section.tabs || [])[tab] || (section.isGroupConfig ? ((section.labels || [])[0] || [])[tab] : ''),
+        : (section.tabs || [])[tab] ||
+          (section.isGroupConfig ? ((section.labels || [])[0] || [])[tab] : ''),
       columns: ['', ''],
       type: 'config',
       rows: this.getConfigRows(plainData, (section.labels || [])[0])
@@ -1568,10 +1576,10 @@ export class WazuhReportingCtrl {
             typeof x[key] !== 'object'
               ? x[key]
               : Array.isArray(x[key])
-                ? x[key].map(x => {
+              ? x[key].map(x => {
                   return x + '\n';
                 })
-                : JSON.stringify(x[key])
+              : JSON.stringify(x[key])
           );
         }
         return row;
@@ -1619,7 +1627,7 @@ export class WazuhReportingCtrl {
         const isGroupConfig = tab === 'groupConfig';
 
         // Pass the namespace if present to all the requesters
-        if(pattern) {
+        if (pattern) {
           const spaces = this.server.plugins.spaces;
           const namespace = spaces && spaces.getSpaceId(req);
           this.vulnerabilityRequest.namespace = namespace;
@@ -1630,7 +1638,7 @@ export class WazuhReportingCtrl {
           this.auditRequest.namespace = namespace;
           this.syscheckRequest.namespace = namespace;
         }
-        
+
         if (!tab)
           throw new Error(
             'Reporting needs a valid app tab in order to work properly'
@@ -1651,17 +1659,17 @@ export class WazuhReportingCtrl {
         let tables = [];
         if (isGroupConfig) {
           const equivalences = {
-            'localfile': 'Local files',
-            'osquery': 'Osquery',
-            'command': 'Command',
-            'syscheck': 'Syscheck',
+            localfile: 'Local files',
+            osquery: 'Osquery',
+            command: 'Command',
+            syscheck: 'Syscheck',
             'open-scap': 'OpenSCAP',
             'cis-cat': 'CIS-CAT',
-            'syscollector': 'Syscollector',
-            'rootcheck': 'Rootcheck',
-            'labels': 'Labels',
-            'sca': 'Security configuration assessment'
-          }
+            syscollector: 'Syscollector',
+            rootcheck: 'Rootcheck',
+            labels: 'Labels',
+            sca: 'Security configuration assessment'
+          };
           const g_id = kfilters[0].group;
           kfilters = [];
           const enabledComponents = req.payload.components;
@@ -1678,7 +1686,7 @@ export class WazuhReportingCtrl {
                 {},
                 apiId
               );
-            } catch (err) { } //eslint-disable-line
+            } catch (err) {} //eslint-disable-line
             if (Object.keys(configuration.data.items[0].config).length) {
               this.dd.content.push({
                 text: `Configurations`,
@@ -1748,9 +1756,7 @@ export class WazuhReportingCtrl {
                             saveidx = i;
                           }
                         });
-                        const columns = Object.keys(
-                          groups[group][saveidx]
-                        );
+                        const columns = Object.keys(groups[group][saveidx]);
                         const rows = groups[group].map(x => {
                           let row = [];
                           columns.forEach(key => {
@@ -1758,10 +1764,10 @@ export class WazuhReportingCtrl {
                               typeof x[key] !== 'object'
                                 ? x[key]
                                 : Array.isArray(x[key])
-                                  ? x[key].map(x => {
+                                ? x[key].map(x => {
                                     return x + '\n';
                                   })
-                                  : JSON.stringify(x[key])
+                                : JSON.stringify(x[key])
                             );
                           });
                           return row;
@@ -1778,11 +1784,9 @@ export class WazuhReportingCtrl {
                       });
                     } else if (_d === 'labels') {
                       const obj = config.config[_d][0].label;
-                      const columns = Object.keys(
-                        obj[0]
-                      );
+                      const columns = Object.keys(obj[0]);
                       if (!columns.includes('hidden')) {
-                        columns.push('hidden')
+                        columns.push('hidden');
                       }
                       const rows = obj.map(x => {
                         let row = [];
@@ -1805,8 +1809,7 @@ export class WazuhReportingCtrl {
                         tables.push(...this.getConfigTables(_d2, section, idx));
                       }
                     }
-                  }
-                  else {
+                  } else {
                     tables.push(
                       ...this.getConfigTables(config.config[_d], section, idx)
                     );
@@ -1820,7 +1823,7 @@ export class WazuhReportingCtrl {
                 tables = [];
               }
             }
-          };
+          }
           if (enabledComponents['1']) {
             let agentsInGroup = [];
             try {
@@ -1830,7 +1833,7 @@ export class WazuhReportingCtrl {
                 {},
                 apiId
               );
-            } catch (err) { } //eslint-disable-line
+            } catch (err) {} //eslint-disable-line
             await this.renderHeader(
               tab,
               g_id,
@@ -1846,7 +1849,7 @@ export class WazuhReportingCtrl {
               {},
               apiId
             );
-          } catch (err) { } //eslint-disable-line
+          } catch (err) {} //eslint-disable-line
           await this.renderHeader(
             tab,
             g_id,
@@ -1866,14 +1869,17 @@ export class WazuhReportingCtrl {
               {},
               apiId
             );
-          } catch (err) { } //eslint-disable-line
+          } catch (err) {} //eslint-disable-line
           kfilters = [];
           await this.renderHeader(tab, tab, a_id, apiId);
           let idxComponent = 0;
           for (let config of configurations) {
             let titleOfSection = false;
             for (let section of config.sections) {
-              if (enabledComponents[idxComponent] && (section.config || section.wodle)) {
+              if (
+                enabledComponents[idxComponent] &&
+                (section.config || section.wodle)
+              ) {
                 let idx = 0;
                 const configs = (section.config || []).concat(
                   section.wodle || []
@@ -1885,9 +1891,7 @@ export class WazuhReportingCtrl {
                     if (!conf['name']) {
                       data = await this.apiRequest.makeGenericRequest(
                         'GET',
-                        `/agents/${a_id}/config/${conf.component}/${
-                        conf.configuration
-                        }`,
+                        `/agents/${a_id}/config/${conf.component}/${conf.configuration}`,
                         {},
                         apiId
                       );
@@ -1902,7 +1906,7 @@ export class WazuhReportingCtrl {
                       data &&
                       data.data &&
                       Object.keys(data.data[Object.keys(data.data)[0]]).length >
-                      0
+                        0
                     ) {
                       if (!titleOfSection) {
                         this.dd.content.push({
@@ -1954,16 +1958,17 @@ export class WazuhReportingCtrl {
                                     typeof x[key] !== 'object'
                                       ? x[key]
                                       : Array.isArray(x[key])
-                                        ? x[key].map(x => {
+                                      ? x[key].map(x => {
                                           return x + '\n';
                                         })
-                                        : JSON.stringify(x[key])
+                                      : JSON.stringify(x[key])
                                   );
                                 });
                                 return row;
                               });
                               columns.forEach((col, i) => {
-                                columns[i] = col[0].toUpperCase() + col.slice(1);
+                                columns[i] =
+                                  col[0].toUpperCase() + col.slice(1);
                               });
                               tables.push({
                                 title: section.labels[0][group],
@@ -1974,7 +1979,11 @@ export class WazuhReportingCtrl {
                             });
                           } else if (_d.configuration !== 'socket') {
                             tables.push(
-                              ...this.getConfigTables(data.data[_d], section, idx)
+                              ...this.getConfigTables(
+                                data.data[_d],
+                                section,
+                                idx
+                              )
                             );
                           } else {
                             for (let _d2 of data.data[_d]) {
@@ -1999,8 +2008,12 @@ export class WazuhReportingCtrl {
                             Object.keys(section.opts).forEach(x => {
                               diffOpts.push(x);
                             });
-                            const columns = ['', ...diffOpts.filter(x =>
-                              (x !== 'check_all' && x !== 'check_sum'))];
+                            const columns = [
+                              '',
+                              ...diffOpts.filter(
+                                x => x !== 'check_all' && x !== 'check_sum'
+                              )
+                            ];
                             let rows = [];
                             directories.forEach(x => {
                               let row = [];
@@ -2055,15 +2068,17 @@ export class WazuhReportingCtrl {
                       this.dd.content.push({
                         text: [
                           'This module is not configured. Please take a look on how to configure it in ',
-                          { text: `${section.subtitle.toLowerCase()} configuration.`, link: section.docuLink, style: { fontSize: 12, color: '#1a0dab' } }
+                          {
+                            text: `${section.subtitle.toLowerCase()} configuration.`,
+                            link: section.docuLink,
+                            style: { fontSize: 12, color: '#1a0dab' }
+                          }
                         ],
                         margin: [0, 0, 0, 20]
-                      })
+                      });
                     }
-                  } catch (err) { } //eslint-disable-line
+                  } catch (err) {} //eslint-disable-line
                   idx++;
-
-
                 }
                 for (const table of tables) {
                   this.renderConfigTables([table]);
@@ -2103,7 +2118,7 @@ export class WazuhReportingCtrl {
               agent && agent.data && agent.data.os && agent.data.os.platform
                 ? agent.data.os.platform
                 : '';
-          } catch (err) { } //eslint-disable-line
+          } catch (err) {} //eslint-disable-line
           try {
             const packages = await this.apiRequest.makeGenericRequest(
               'GET',
@@ -2118,26 +2133,26 @@ export class WazuhReportingCtrl {
                   agentOs === 'windows'
                     ? ['Name', 'Architecture', 'Version', 'Vendor']
                     : [
-                      'Name',
-                      'Architecture',
-                      'Version',
-                      'Vendor',
-                      'Description'
-                    ],
+                        'Name',
+                        'Architecture',
+                        'Version',
+                        'Vendor',
+                        'Description'
+                      ],
                 rows: packages.data.items.map(x => {
                   return agentOs === 'windows'
                     ? [x['name'], x['architecture'], x['version'], x['vendor']]
                     : [
-                      x['name'],
-                      x['architecture'],
-                      x['version'],
-                      x['vendor'],
-                      x['description']
-                    ];
+                        x['name'],
+                        x['architecture'],
+                        x['version'],
+                        x['vendor'],
+                        x['description']
+                      ];
                 })
               });
             }
-          } catch (err) { } //eslint-disable-line
+          } catch (err) {} //eslint-disable-line
           try {
             const processes = await this.apiRequest.makeGenericRequest(
               'GET',
@@ -2156,15 +2171,15 @@ export class WazuhReportingCtrl {
                   return agentOs === 'windows'
                     ? [x['name'], x['cmd'], x['priority'], x['nlwp']]
                     : [
-                      x['name'],
-                      x['euser'],
-                      x['nice'],
-                      ProcessEquivalence[x.state]
-                    ];
+                        x['name'],
+                        x['euser'],
+                        x['nice'],
+                        ProcessEquivalence[x.state]
+                      ];
                 })
               });
             }
-          } catch (err) { } //eslint-disable-line
+          } catch (err) {} //eslint-disable-line
 
           try {
             const ports = await this.apiRequest.makeGenericRequest(
@@ -2194,7 +2209,7 @@ export class WazuhReportingCtrl {
                 })
               });
             }
-          } catch (err) { } //eslint-disable-line
+          } catch (err) {} //eslint-disable-line
 
           try {
             const netiface = await this.apiRequest.makeGenericRequest(
@@ -2212,7 +2227,7 @@ export class WazuhReportingCtrl {
                 })
               });
             }
-          } catch (err) { } //eslint-disable-line
+          } catch (err) {} //eslint-disable-line
           try {
             const netaddr = await this.apiRequest.makeGenericRequest(
               'GET',
@@ -2241,7 +2256,7 @@ export class WazuhReportingCtrl {
                 })
               });
             }
-          } catch (err) { } //eslint-disable-line
+          } catch (err) {} //eslint-disable-line
         }
 
         if (!isAgentConfig && !isGroupConfig) {
