@@ -19,7 +19,8 @@ import {
   getSavedSearch,
   goToKibana,
   getIp,
-  getWzConfig
+  getWzConfig,
+  apiCount
 } from './resolves';
 
 // HTML templates
@@ -140,7 +141,7 @@ routes.enable();
 routes
   .when('/health-check', {
     template: healthCheckTemplate,
-    resolve: { wzConfig, ip }
+    resolve: { apiCount, wzConfig, ip }
   })
   .when('/agents/:id?/:tab?/:view?', {
     template: agentsTemplate,
