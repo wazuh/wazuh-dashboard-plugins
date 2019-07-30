@@ -288,9 +288,7 @@ app.directive('wzXmlFileEditor', function() {
             } catch (err) {
               params.showRestartManager = 'warn';
             }
-            const msg = `Success. Node (${
-              params.node
-            }) configuration has been updated`;
+            const msg = `Success. Node (${params.node}) configuration has been updated`;
             params.showRestartManager
               ? params.showRestartManager !== 'warn'
                 ? showRestartMessage(msg, params.node)
