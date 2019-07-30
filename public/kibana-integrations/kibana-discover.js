@@ -995,6 +995,26 @@ function discoverController(
     } else {
       $state.filters = localChange ? $state.filters : [];
 
+      const currentFilters = queryFilter.getFilters();
+      const pinnedAgentIDs = currentFilters.filter(
+        item =>
+          ((item || {}).meta || {}).key === 'agent.id' &&
+          ((item || {}).$state || {}).store === 'globalState'
+      );
+
+      const implicitAgentIDs = wzCurrentFilters.filter(
+        item =>
+          ((typeof item || {}).meta || {}).removable !== 'undefined' &&
+          !((item || {}).meta || {}).removable &&
+          ((item || {}).meta || {}).key === 'agent.id'
+      );
+
+      if (pinnedAgentIDs.length && implicitAgentIDs.length) {
+        for (const filter of pinnedAgentIDs) {
+          queryFilter.removeFilter(filter);
+        }
+      }
+
       queryFilter
         .addFilters(wzCurrentFilters)
         .then(() => {})
