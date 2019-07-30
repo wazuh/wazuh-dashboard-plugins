@@ -4,6 +4,7 @@
 import './codemirror.css';
 import './foldgutter.css';
 import './ttcn.css';
+import './lesser-dark.css';
 import './javascript.js';
 import './xml.js';
 import './formatting.js';
