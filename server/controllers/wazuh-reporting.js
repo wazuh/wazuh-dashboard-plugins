@@ -1899,7 +1899,9 @@ export class WazuhReportingCtrl {
                     if (!conf['name']) {
                       data = await this.apiRequest.makeGenericRequest(
                         'GET',
-                        `/agents/${a_id}/config/${conf.component}/${conf.configuration}`,
+                        `/agents/${a_id}/config/${conf.component}/${
+                          conf.configuration
+                        }`,
                         {},
                         apiId
                       );

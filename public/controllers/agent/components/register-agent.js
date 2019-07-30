@@ -93,10 +93,18 @@ export class RegisterAgent extends Component {
     };
 
     const customTexts = {
-      rpmText: `WAZUH_MANAGER_IP='${this.state.serverAddress}' yum install wazuh-agent`,
-      debText: `WAZUH_MANAGER_IP='${this.state.serverAddress}' apt-get install wazuh-agent`,
-      macosText: `launchctl setenv WAZUH_MANAGER_IP '${this.state.serverAddress}' && installer -pkg wazuh-agent-.pkg -target /`,
-      winText: `wazuh-agent-3.9.1-1.msi /q ADDRESS='${this.state.serverAddress}' AUTHD_SERVER='${this.state.serverAddress}'`
+      rpmText: `WAZUH_MANAGER_IP='${
+        this.state.serverAddress
+      }' yum install wazuh-agent`,
+      debText: `WAZUH_MANAGER_IP='${
+        this.state.serverAddress
+      }' apt-get install wazuh-agent`,
+      macosText: `launchctl setenv WAZUH_MANAGER_IP '${
+        this.state.serverAddress
+      }' && installer -pkg wazuh-agent-.pkg -target /`,
+      winText: `wazuh-agent-3.9.1-1.msi /q ADDRESS='${
+        this.state.serverAddress
+      }' AUTHD_SERVER='${this.state.serverAddress}'`
     };
 
     const field = `${this.state.selectedOS}Text`;

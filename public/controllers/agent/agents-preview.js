@@ -180,12 +180,10 @@ export class AgentsPreviewController {
           return a.toString().localeCompare(b.toString());
         }),
         version: unique.versions.sort((a, b) => {
-          return a
-            .toString()
-            .localeCompare(b.toString(), undefined, {
-              numeric: true,
-              sensitivity: 'base'
-            });
+          return a.toString().localeCompare(b.toString(), undefined, {
+            numeric: true,
+            sensitivity: 'base'
+          });
         }),
         'os.platform': unique.osPlatforms
           .map(x => x.platform)
@@ -195,12 +193,10 @@ export class AgentsPreviewController {
         'os.version': unique.osPlatforms
           .map(x => x.version)
           .sort((a, b) => {
-            return a
-              .toString()
-              .localeCompare(b.toString(), undefined, {
-                numeric: true,
-                sensitivity: 'base'
-              });
+            return a.toString().localeCompare(b.toString(), undefined, {
+              numeric: true,
+              sensitivity: 'base'
+            });
           }),
         'os.name': unique.osPlatforms
           .map(x => x.name)

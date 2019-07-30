@@ -274,7 +274,9 @@ export function Initialize(server) {
         reindexResult.length === 2 &&
         log(
           'initialize:init',
-          `${reindexResult[0].value} (${reindexResult[0].result}) / ${reindexResult[1].value} (${reindexResult[1].result})`,
+          `${reindexResult[0].value} (${reindexResult[0].result}) / ${
+            reindexResult[1].value
+          } (${reindexResult[1].result})`,
           'debug'
         );
     } catch (error) {
@@ -354,7 +356,9 @@ export function Initialize(server) {
       await wzWrapper.getTemplateByName('wazuh-kibana');
       log(
         'initialize:checkKibanaStatus',
-        `No need to create the ${wzWrapper.WZ_KIBANA_INDEX} template, already exists.`,
+        `No need to create the ${
+          wzWrapper.WZ_KIBANA_INDEX
+        } template, already exists.`,
         'debug'
       );
       await createEmptyKibanaIndex();

@@ -1379,7 +1379,9 @@ export class WazuhApiCtrl {
       if (source.installationDate && source.lastRestart) {
         log(
           'wazuh-api:getTimeStamp',
-          `Installation date: ${source.installationDate}. Last restart: ${source.lastRestart}`,
+          `Installation date: ${source.installationDate}. Last restart: ${
+            source.lastRestart
+          }`,
           'debug'
         );
         return {
