@@ -17,7 +17,7 @@ import chrome from 'ui/chrome';
 
 const app = uiModules.get('app/wazuh', []);
 
-app.directive('wzXmlFileEditor', function () {
+app.directive('wzXmlFileEditor', function() {
   return {
     restrict: 'E',
     scope: {
@@ -50,7 +50,7 @@ app.directive('wzXmlFileEditor', function () {
        * evaluates regular expressions.
        * Alternative using split + join, same result.
        */
-      String.prototype.xmlReplace = function (str, newstr) {
+      String.prototype.xmlReplace = function(str, newstr) {
         return this.split(str).join(newstr);
       };
 
@@ -156,10 +156,10 @@ app.directive('wzXmlFileEditor', function () {
           var type = single
             ? 'single'
             : closing
-              ? 'closing'
-              : opening
-                ? 'opening'
-                : 'other';
+            ? 'closing'
+            : opening
+            ? 'opening'
+            : 'other';
           var fromTo = lastType + '->' + type;
           lastType = type;
           var padding = '';
@@ -199,15 +199,15 @@ app.directive('wzXmlFileEditor', function () {
           } else {
             validation = isCluster
               ? await apiReq.request(
-                'GET',
-                `/cluster/configuration/validation`,
-                {}
-              )
+                  'GET',
+                  `/cluster/configuration/validation`,
+                  {}
+                )
               : await apiReq.request(
-                'GET',
-                `/manager/configuration/validation`,
-                {}
-              );
+                  'GET',
+                  `/manager/configuration/validation`,
+                  {}
+                );
           }
           const data = ((validation || {}).data || {}).data || {};
           const isOk = data.status === 'OK';
@@ -288,7 +288,9 @@ app.directive('wzXmlFileEditor', function () {
             } catch (err) {
               params.showRestartManager = 'warn';
             }
-            const msg = `Success. Node (${params.node}) configuration has been updated`;
+            const msg = `Success. Node (${
+              params.node
+            }) configuration has been updated`;
             params.showRestartManager
               ? params.showRestartManager !== 'warn'
                 ? showRestartMessage(msg, params.node)
@@ -337,12 +339,12 @@ app.directive('wzXmlFileEditor', function () {
         }
       );
 
-      $(window).on('resize', function () {
+      $(window).on('resize', function() {
         dynamicHeight();
       });
 
       const dynamicHeight = () => {
-        setTimeout(function () {
+        setTimeout(function() {
           const editorContainer = $('.wzXmlEditor');
           const headerContainer = $('#wzXmlEditorHeader');
           const windows = $(window).height();
@@ -408,7 +410,7 @@ app.directive('wzXmlFileEditor', function () {
         $scope.$applyAsync();
       });
 
-      $scope.$on('$destroy', function () {
+      $scope.$on('$destroy', function() {
         $location.search('editingFile', null);
         appState.setNavigation({ status: true });
       });

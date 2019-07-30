@@ -176,11 +176,37 @@ export class AgentsPreviewController {
       this.searchBarModel = {
         name: [],
         status: ['Active', 'Disconnected', 'Never connected'],
-        group: unique.groups.sort((a, b) => { return a.toString().localeCompare(b.toString()) }),
-        version: unique.versions.sort((a, b) => { return a.toString().localeCompare(b.toString(), undefined, { numeric: true, sensitivity: 'base' }) }),
-        'os.platform': unique.osPlatforms.map(x => x.platform).sort((a, b) => { return a.toString().localeCompare(b.toString()) }),
-        'os.version': unique.osPlatforms.map(x => x.version).sort((a, b) => { return a.toString().localeCompare(b.toString(), undefined, { numeric: true, sensitivity: 'base' }) }),
-        'os.name': unique.osPlatforms.map(x => x.name).sort((a, b) => { return a.toString().localeCompare(b.toString()) }),
+        group: unique.groups.sort((a, b) => {
+          return a.toString().localeCompare(b.toString());
+        }),
+        version: unique.versions.sort((a, b) => {
+          return a
+            .toString()
+            .localeCompare(b.toString(), undefined, {
+              numeric: true,
+              sensitivity: 'base'
+            });
+        }),
+        'os.platform': unique.osPlatforms
+          .map(x => x.platform)
+          .sort((a, b) => {
+            return a.toString().localeCompare(b.toString());
+          }),
+        'os.version': unique.osPlatforms
+          .map(x => x.version)
+          .sort((a, b) => {
+            return a
+              .toString()
+              .localeCompare(b.toString(), undefined, {
+                numeric: true,
+                sensitivity: 'base'
+              });
+          }),
+        'os.name': unique.osPlatforms
+          .map(x => x.name)
+          .sort((a, b) => {
+            return a.toString().localeCompare(b.toString());
+          })
       };
 
       if (clusterInfo.status === 'enabled' && unique.nodes) {

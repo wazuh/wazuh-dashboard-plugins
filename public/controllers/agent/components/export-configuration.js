@@ -20,15 +20,35 @@ export class ExportConfiguration extends Component {
       isPopoverOpen: false
     };
 
-    const agentOptions = ['Global configuration', 'Communication', 'Anti-flooding settings', 'Labels', 'Policy monitoring',
-      { name: 'oscap', desc: 'OpenSCAP' }, 'CIS-CAT', 'Osquery', 'Inventory data', 'Active response', 'Commands',
-      { name: 'docker', desc: 'Docker listener' }, 'Log collection', 'Integrity monitoring'];
+    const agentOptions = [
+      'Global configuration',
+      'Communication',
+      'Anti-flooding settings',
+      'Labels',
+      'Policy monitoring',
+      { name: 'oscap', desc: 'OpenSCAP' },
+      'CIS-CAT',
+      'Osquery',
+      'Inventory data',
+      'Active response',
+      'Commands',
+      { name: 'docker', desc: 'Docker listener' },
+      'Log collection',
+      'Integrity monitoring'
+    ];
     const groupOptions = ['Configurations', 'Agents in group'];
 
     this.options = [];
     const list = this.props.type === 'agent' ? agentOptions : groupOptions;
     list.forEach((x, idx) => {
-      if (typeof x === 'string' || (x.name && !(UnsupportedComponents[this.props.agentPlatform] || UnsupportedComponents['other']).includes(x.name))) {
+      if (
+        typeof x === 'string' ||
+        (x.name &&
+          !(
+            UnsupportedComponents[this.props.agentPlatform] ||
+            UnsupportedComponents['other']
+          ).includes(x.name))
+      ) {
         this.options.push({ id: `${idx}`, label: x.desc || x });
       }
     });
@@ -53,13 +73,13 @@ export class ExportConfiguration extends Component {
 
   exportClick() {
     this.setState({
-      isPopoverOpen: !this.state.isPopoverOpen,
+      isPopoverOpen: !this.state.isPopoverOpen
     });
   }
 
   closePopover() {
     this.setState({
-      isPopoverOpen: false,
+      isPopoverOpen: false
     });
   }
 
@@ -67,8 +87,8 @@ export class ExportConfiguration extends Component {
     const newCheckboxIdToSelectedMap = {
       ...this.state.checkboxIdToSelectedMap,
       ...{
-        [optionId]: !this.state.checkboxIdToSelectedMap[optionId],
-      },
+        [optionId]: !this.state.checkboxIdToSelectedMap[optionId]
+      }
     };
     let result = false;
     for (let i = 0; i < this.options.length; i++) {
@@ -82,14 +102,14 @@ export class ExportConfiguration extends Component {
     });
   };
 
-
   render() {
     const button = (
       <EuiButton
         iconType="importAction"
         iconSide="left"
         size="s"
-        onClick={this.exportClick.bind(this)}>
+        onClick={this.exportClick.bind(this)}
+      >
         PDF
       </EuiButton>
     );
@@ -100,7 +120,8 @@ export class ExportConfiguration extends Component {
         button={button}
         isOpen={this.state.isPopoverOpen}
         closePopover={this.closePopover.bind(this)}
-        anchorPosition="downRight">
+        anchorPosition="downRight"
+      >
         <EuiCheckboxGroup
           options={this.options}
           idToSelectedMap={this.state.checkboxIdToSelectedMap}
@@ -108,23 +129,25 @@ export class ExportConfiguration extends Component {
           compressed
         />
         <EuiSpacer size="s" />
-        <EuiButtonEmpty
-          size="xs"
-          onClick={() => this.selectAll(true)}>
+        <EuiButtonEmpty size="xs" onClick={() => this.selectAll(true)}>
           Select all
         </EuiButtonEmpty>
         <EuiSpacer size="s" />
-        <EuiButtonEmpty
-          size="xs"
-          onClick={() => this.selectAll(false)}>
+        <EuiButtonEmpty size="xs" onClick={() => this.selectAll(false)}>
           Unselect all
         </EuiButtonEmpty>
         <EuiSpacer size="m" />
         <EuiButton
           isDisabled={this.state.buttonDisabled}
-          onClick={() => { this.closePopover(); this.props.exportConfiguration(this.state.checkboxIdToSelectedMap) }}
-          fill>Generate PDF report</EuiButton>
-      </EuiPopover >
+          onClick={() => {
+            this.closePopover();
+            this.props.exportConfiguration(this.state.checkboxIdToSelectedMap);
+          }}
+          fill
+        >
+          Generate PDF report
+        </EuiButton>
+      </EuiPopover>
     );
   }
 }

@@ -1,16 +1,13 @@
 import React, { Component, Fragment } from 'react';
 import PropTypes from 'prop-types';
-import {
-  EuiTabs,
-  EuiTab
-} from '@elastic/eui';
+import { EuiTabs, EuiTab } from '@elastic/eui';
 
 export class Tabs extends Component {
   constructor(props) {
     super(props);
 
     this.tabs = [];
-    this.props.tabs.forEach((tab) => {
+    this.props.tabs.forEach(tab => {
       this.tabs.push({
         id: tab.id,
         name: tab.name
@@ -18,13 +15,13 @@ export class Tabs extends Component {
     });
 
     this.state = {
-      selectedTabId: this.props.selectedTab,
+      selectedTabId: this.props.selectedTab
     };
   }
 
   onSelectedTabChanged = id => {
     this.setState({
-      selectedTabId: id,
+      selectedTabId: id
     });
     this.props.clickAction(id);
   };
@@ -34,7 +31,8 @@ export class Tabs extends Component {
       <EuiTab
         onClick={() => this.onSelectedTabChanged(tab.id)}
         isSelected={tab.id === this.state.selectedTabId}
-        key={index}>
+        key={index}
+      >
         {tab.name}
       </EuiTab>
     ));

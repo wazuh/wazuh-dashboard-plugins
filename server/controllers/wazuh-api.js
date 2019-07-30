@@ -224,7 +224,7 @@ export class WazuhApiCtrl {
                   req.idChanged = api._id;
                   return this.checkStoredAPI(req, reply);
                 }
-              } catch (error) { } // eslint-disable-line
+              } catch (error) {} // eslint-disable-line
             }
           } catch (error) {
             return ErrorResponse(error.message || error, 3020, 500, reply);
@@ -601,11 +601,11 @@ export class WazuhApiCtrl {
   }
 
   /**
- * This get PCI requirements
- * @param {Object} req
- * @param {Object} reply
- * @returns {Array<Object>} requirements or ErrorResponse
- */
+   * This get PCI requirements
+   * @param {Object} req
+   * @param {Object} reply
+   * @returns {Array<Object>} requirements or ErrorResponse
+   */
   async getHipaaRequirement(req, reply) {
     try {
       let hipaa_description = '';
@@ -683,11 +683,11 @@ export class WazuhApiCtrl {
   }
 
   /**
- * This get NIST 800-53 requirements
- * @param {Object} req
- * @param {Object} reply
- * @returns {Array<Object>} requirements or ErrorResponse
- */
+   * This get NIST 800-53 requirements
+   * @param {Object} req
+   * @param {Object} reply
+   * @returns {Array<Object>} requirements or ErrorResponse
+   */
   async getNistRequirement(req, reply) {
     try {
       let nist_description = '';
@@ -914,7 +914,7 @@ export class WazuhApiCtrl {
       if (method === 'DELETE') {
         fixedUrl = `${
           fullUrl.includes('?') ? fullUrl.split('?')[0] : fullUrl
-          }?${querystring.stringify(data)}`;
+        }?${querystring.stringify(data)}`;
       }
 
       log('wazuh-api:makeRequest', `${method} ${fixedUrl || fullUrl}`, 'debug');
@@ -1006,7 +1006,7 @@ export class WazuhApiCtrl {
       }
 
       throw ((response || {}).body || {}).error &&
-        ((response || {}).body || {}).message
+      ((response || {}).body || {}).message
         ? { message: response.body.message, code: response.body.error }
         : new Error('Unexpected error fetching data from the Wazuh API');
     } catch (error) {
@@ -1164,29 +1164,29 @@ export class WazuhApiCtrl {
 
         const fields = isAgents
           ? [
-            'id',
-            'status',
-            'name',
-            'ip',
-            'group',
-            'manager',
-            'node_name',
-            'dateAdd',
-            'version',
-            'lastKeepAlive',
-            'os.arch',
-            'os.build',
-            'os.codename',
-            'os.major',
-            'os.minor',
-            'os.name',
-            'os.platform',
-            'os.uname',
-            'os.version'
-          ]
+              'id',
+              'status',
+              'name',
+              'ip',
+              'group',
+              'manager',
+              'node_name',
+              'dateAdd',
+              'version',
+              'lastKeepAlive',
+              'os.arch',
+              'os.build',
+              'os.codename',
+              'os.major',
+              'os.minor',
+              'os.name',
+              'os.platform',
+              'os.uname',
+              'os.version'
+            ]
           : isList
-            ? ['key', 'value']
-            : Object.keys(output.body.data.items[0]);
+          ? ['key', 'value']
+          : Object.keys(output.body.data.items[0]);
 
         const json2csvParser = new Parser({ fields });
         if (isList) {
@@ -1379,9 +1379,9 @@ export class WazuhApiCtrl {
       if (source.installationDate && source.lastRestart) {
         log(
           'wazuh-api:getTimeStamp',
-          `Installation date: ${
-          source.installationDate
-          }. Last restart: ${source.lastRestart}`,
+          `Installation date: ${source.installationDate}. Last restart: ${
+            source.lastRestart
+          }`,
           'debug'
         );
         return {
@@ -1403,11 +1403,11 @@ export class WazuhApiCtrl {
   }
 
   /**
- * This get the wazuh setup settings
- * @param {Object} req
- * @param {Object} reply
- * @returns {Object} setup info or ErrorResponse
- */
+   * This get the wazuh setup settings
+   * @param {Object} req
+   * @param {Object} reply
+   * @returns {Object} setup info or ErrorResponse
+   */
   async getSetupInfo(req, reply) {
     try {
       const source = JSON.parse(fs.readFileSync(this.wazuhVersion, 'utf8'));
@@ -1418,7 +1418,7 @@ export class WazuhApiCtrl {
       log('wazuh-api:getSetupInfo', error.message || error);
       return ErrorResponse(
         `Could not get data from wazuh-version registry due to ${error.message ||
-        error}`,
+          error}`,
         4005,
         500,
         reply
@@ -1427,11 +1427,11 @@ export class WazuhApiCtrl {
   }
 
   /**
-* Get basic syscollector information for given agent.
-* @param {Object} req
-* @param {Object} reply
-* @returns {Object} Basic syscollector information
-*/
+   * Get basic syscollector information for given agent.
+   * @param {Object} req
+   * @param {Object} reply
+   * @returns {Object} Basic syscollector information
+   */
   async getSyscollector(req, reply) {
     try {
       if (!req.params || !req.headers.id || !req.params.agent) {
@@ -1467,7 +1467,7 @@ export class WazuhApiCtrl {
       const syscollector = {
         hardware:
           typeof hardwareResponse === 'object' &&
-            Object.keys(hardwareResponse).length
+          Object.keys(hardwareResponse).length
             ? { ...hardwareResponse }
             : false,
         os:
