@@ -19,12 +19,12 @@ import { BuildBody } from './lib/replicas-shards-helper';
 import { checkKnownFields } from './lib/refresh-known-fields';
 import { totalmem } from 'os';
 import fs from 'fs';
-import path from 'path';
 import { UpdateConfigurationFile } from './lib/update-configuration';
+import { UpdateRegistry } from './lib/update-registry';
 const updateConfigurationFile = new UpdateConfigurationFile();
 
 export function Initialize(server) {
-  const wazuhRegistry = path.join(__dirname, '/wazuh-registry.json');
+  const wazuhRegistry = new UpdateRegistry().file;
   const blueWazuh = '\u001b[34mwazuh\u001b[39m';
   // Elastic JS Client
   const wzWrapper = new ElasticWrapper(server);
@@ -77,7 +77,8 @@ export function Initialize(server) {
         'app-version': packageJSON.version,
         revision: packageJSON.revision,
         installationDate: commonDate,
-        lastRestart: commonDate
+        lastRestart: commonDate,
+        hosts: []
       };
 
       try {
@@ -202,7 +203,7 @@ export function Initialize(server) {
           if (apisToDelete.length){
             apisToDelete.map(async id => {
               await wzWrapper.deleteWazuhAPIEntriesWithRequest({'params': {'id': id}});
-            });            
+            });
           } else {
             throw new Error('Cannot migrate all APIs from .wazuh index to the config.yml file properly.');
           }
@@ -278,11 +279,11 @@ export function Initialize(server) {
       source.revision = packageJSON.revision;
       source.lastRestart = new Date().toISOString(); // Registry exists so we update the lastRestarted date only
 
-      /*       fs.writeFileSync(wazuhRegistry, JSON.stringify(source), (err) => {
-              if (err) {
-                throw new Error(err);
-              }
-            }); */
+      fs.writeFileSync(wazuhRegistry, JSON.stringify(source), (err) => {
+        if (err) {
+          throw new Error(err);
+        }
+      });
     } catch (error) {
       return Promise.reject(error);
     }

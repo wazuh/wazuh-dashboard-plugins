@@ -33,6 +33,7 @@ import querystring from 'querystring';
 import fs from 'fs';
 import path from 'path';
 import { UpdateConfigurationFile } from '../lib/update-configuration';
+import { UpdateRegistry } from '../lib/update-registry';
 export class WazuhApiCtrl {
   /**
    * Constructor
@@ -42,8 +43,8 @@ export class WazuhApiCtrl {
     this.queue = Queue;
     this.wzWrapper = new ElasticWrapper(server);
     this.monitoringInstance = new Monitoring(server, true);
-    this.wazuhRegistry = path.join(__dirname, '../wazuh-registry.json'); ///home/vagrant/kibana/plugins/wazuh/server
     this.configurationFile = new UpdateConfigurationFile();
+    this.wazuhRegistry = new UpdateRegistry();
   }
 
 
@@ -56,12 +57,13 @@ export class WazuhApiCtrl {
   async checkStoredAPI(req, reply) {
     try {
       // Get config from config.yml
+      const apiId = req.payload
       const apis = (getConfiguration() || {})['wazuh.hosts'] || []
-      let api = this.findApi(apis, req.payload);
+      let api = this.findApi(apis, apiId);
       if (!api) {
         throw new Error(`Could not find Wazuh API entry on config.yml.`);
       }
-      log('wazuh-api:checkStoredAPI', `${req.payload} exists`, 'debug');
+      log('wazuh-api:checkStoredAPI', `${apiId} exists`, 'debug');
       const credInfo = ApiHelper.buildOptionsObject(api);
       let response = await needle(
         'get',
@@ -110,6 +112,7 @@ export class WazuhApiCtrl {
             }
 
             // TODO update manager/cluster name information
+            const r = await this.configurationFile.updateWazuhClusterInfo(apiId, api.cluster_info);
             /*await this.wzWrapper.updateWazuhIndexDocument(null, req.payload, {
               doc: { cluster_info: api.cluster_info }
             });*/
@@ -1394,7 +1397,7 @@ export class WazuhApiCtrl {
    */
   async getTimeStamp(req, reply) {
     try {
-      const source = JSON.parse(fs.readFileSync(this.wazuhRegistry, 'utf8'));
+      const source = await this.wazuhRegistry.readContent();
       if (source.installationDate && source.lastRestart) {
         log(
           'wazuh-api:getTimeStamp',
@@ -1429,7 +1432,7 @@ export class WazuhApiCtrl {
  */
   async getSetupInfo(req, reply) {
     try {
-      const source = JSON.parse(fs.readFileSync(this.wazuhRegistry, 'utf8'));
+      const source = await this.wazuhRegistry.readContent();
       return !Object.values(source).length
         ? { statusCode: 200, data: '' }
         : { statusCode: 200, data: source };
