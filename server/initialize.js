@@ -24,7 +24,7 @@ import { UpdateConfigurationFile } from './lib/update-configuration';
 const updateConfigurationFile = new UpdateConfigurationFile();
 
 export function Initialize(server) {
-  const wazuhVersion = path.join(__dirname, '/wazuh-version.json');
+  const wazuhRegistry = path.join(__dirname, '../../../optimize/wazuh-registry.json');
   const blueWazuh = '\u001b[34mwazuh\u001b[39m';
   // Elastic JS Client
   const wzWrapper = new ElasticWrapper(server);
@@ -81,7 +81,7 @@ export function Initialize(server) {
       };
 
       try {
-        fs.writeFileSync(wazuhVersion, JSON.stringify(configuration), (err) => {
+        fs.writeFileSync(wazuhRegistry, JSON.stringify(configuration), (err) => {
           if (err) {
             throw new Error(err);
           }
@@ -236,35 +236,35 @@ export function Initialize(server) {
     return apisIndexKeys;
   }
 
-  const checkWazuhVersionRegistry = async () => {
+  const checkWazuhRegistry = async () => {
     try {
       log(
-        'initialize[checkWazuhVersionRegistry]',
+        'initialize[checkWazuhRegistry]',
         'Checking wazuh-version registry.',
         'debug'
       );
       try {
-        await wzWrapper.deleteWazuhVersionIndex();
+        await wzWrapper.deletewazuhRegistryIndex();
         log(
-          'initialize[checkWazuhVersionRegistry]',
+          'initialize[checkWazuhRegistry]',
           'Successfully deleted old .wazuh-version index.',
           'debug'
         );
       } catch (error) {
         log(
-          'initialize[checkWazuhVersionRegistry]',
+          'initialize[checkWazuhRegistry]',
           'No need to delete old .wazuh-version index',
           'debug'
         );
       }
 
       try {
-        if (!fs.existsSync(wazuhVersion)) {
+        if (!fs.existsSync(wazuhRegistry)) {
           throw new Error;
         }
       } catch (error) {
         log(
-          'initialize[checkWazuhVersionRegistry]',
+          'initialize[checkWazuhRegistry]',
           'wazuh-version registry does not exist. Initializating configuration...',
           'debug'
         );
@@ -273,12 +273,12 @@ export function Initialize(server) {
         await saveConfiguration();
       }
 
-      let source = JSON.parse(fs.readFileSync(wazuhVersion, 'utf8'));
+      let source = JSON.parse(fs.readFileSync(wazuhRegistry, 'utf8'));
       source['app-version'] = packageJSON.version;
       source.revision = packageJSON.revision;
       source.lastRestart = new Date().toISOString(); // Registry exists so we update the lastRestarted date only
 
-      /*       fs.writeFileSync(wazuhVersion, JSON.stringify(source), (err) => {
+      /*       fs.writeFileSync(wazuhRegistry, JSON.stringify(source), (err) => {
               if (err) {
                 throw new Error(err);
               }
@@ -293,7 +293,7 @@ export function Initialize(server) {
     try {
       await Promise.all([
         checkWazuhIndex(),
-        checkWazuhVersionRegistry(),
+        checkWazuhRegistry(),
         checkKnownFields(wzWrapper, log, server, defaultIndexPattern)
       ]);
       const reindexResult = await wzWrapper.reindexAppIndices();

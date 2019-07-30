@@ -42,7 +42,7 @@ export class WazuhApiCtrl {
     this.queue = Queue;
     this.wzWrapper = new ElasticWrapper(server);
     this.monitoringInstance = new Monitoring(server, true);
-    this.wazuhVersion = path.join(__dirname, '../wazuh-version.json');
+    this.wazuhRegistry = path.join(__dirname, '../../../../optimize/wazuh-registry.json'); ///home/vagrant/kibana/plugins/wazuh/server
     this.configurationFile = new UpdateConfigurationFile();
   }
 
@@ -1394,7 +1394,7 @@ export class WazuhApiCtrl {
    */
   async getTimeStamp(req, reply) {
     try {
-      const source = JSON.parse(fs.readFileSync(this.wazuhVersion, 'utf8'));
+      const source = JSON.parse(fs.readFileSync(this.wazuhRegistry, 'utf8'));
       if (source.installationDate && source.lastRestart) {
         log(
           'wazuh-api:getTimeStamp',
@@ -1429,7 +1429,7 @@ export class WazuhApiCtrl {
  */
   async getSetupInfo(req, reply) {
     try {
-      const source = JSON.parse(fs.readFileSync(this.wazuhVersion, 'utf8'));
+      const source = JSON.parse(fs.readFileSync(this.wazuhRegistry, 'utf8'));
       return !Object.values(source).length
         ? { statusCode: 200, data: '' }
         : { statusCode: 200, data: source };
