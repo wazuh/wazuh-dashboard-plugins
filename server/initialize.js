@@ -41,7 +41,7 @@ export function Initialize(server) {
         : 'wazuh-alerts-3.x-*';
     global.XPACK_RBAC_ENABLED =
       configurationFile &&
-        typeof configurationFile['xpack.rbac.enabled'] !== 'undefined'
+      typeof configurationFile['xpack.rbac.enabled'] !== 'undefined'
         ? configurationFile['xpack.rbac.enabled']
         : true;
   } catch (e) {
@@ -79,7 +79,7 @@ export function Initialize(server) {
       };
 
       try {
-        fs.writeFileSync(wazuhVersion, JSON.stringify(configuration), (err) => {
+        fs.writeFileSync(wazuhVersion, JSON.stringify(configuration), err => {
           if (err) {
             throw new Error(err);
           }
@@ -159,13 +159,13 @@ export function Initialize(server) {
             log(
               'initialize:checkAPIEntriesExtensions',
               `Error updating API entry extensions with ID: ${
-              item._id
+                item._id
               } due to ${error.message || error}`
             );
             server.log(
               [blueWazuh, 'initialize:checkAPIEntriesExtensions', 'error'],
               `Error updating API entry extensions with ID: ${
-              item._id
+                item._id
               } due to ${error.message || error}`
             );
           }
@@ -233,7 +233,7 @@ export function Initialize(server) {
 
       try {
         if (!fs.existsSync(wazuhVersion)) {
-          throw new Error;
+          throw new Error();
         }
       } catch (error) {
         log(
@@ -251,7 +251,7 @@ export function Initialize(server) {
       source.revision = packageJSON.revision;
       source.lastRestart = new Date().toISOString(); // Registry exists so we update the lastRestarted date only
 
-      fs.writeFileSync(wazuhVersion, JSON.stringify(source), (err) => {
+      fs.writeFileSync(wazuhVersion, JSON.stringify(source), err => {
         if (err) {
           throw new Error(err);
         }
@@ -321,7 +321,7 @@ export function Initialize(server) {
       return Promise.reject(
         new Error(
           `Error creating ${
-          wzWrapper.WZ_KIBANA_INDEX
+            wzWrapper.WZ_KIBANA_INDEX
           } index due to ${error.message || error}`
         )
       );
@@ -342,7 +342,7 @@ export function Initialize(server) {
       return Promise.reject(
         new Error(
           `Error creating template for ${
-          wzWrapper.WZ_KIBANA_INDEX
+            wzWrapper.WZ_KIBANA_INDEX
           } due to ${error.message || error}`
         )
       );
