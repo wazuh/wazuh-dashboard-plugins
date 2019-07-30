@@ -275,3 +275,25 @@ md-divider.md-default-theme, md-divider {
   border: 1px solid #343741;
   color: #dfe5ef;
 }
+
+.navBarLogo {
+  width: 100px;
+  margin: 2px 0px 0px 10px;
+  filter: invert(0);
+}
+
+.wz-menu-jq {
+  border-top: 1px solid #343741;
+}
+
+.wz-menu-bottom-line {
+  border-bottom: 1px solid #343741;
+}
+
+.wz-menu-content {
+  border-bottom: none;
+}
+
+body {
+  background: #1a1b20;
+}
