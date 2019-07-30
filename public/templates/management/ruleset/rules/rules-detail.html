@@ -19,12 +19,12 @@
                 <div flex="15" ng-if="currentRule.level || currentRule.level == 0" class="wz-text-truncatable">Level:
                     <span class="wz-text-bold wz-text-link" ng-click="addDetailFilter('level', currentRule.level)"
                         tooltip="Filter by this level" tooltip-placement="bottom">{{currentRule.level}}</span></div>
-                <div flex="35" ng-if="currentRule.file" class="wz-text-truncatable">File: <span class="wz-text-bold wz-text-link"
-                        ng-click="addDetailFilter('file', currentRule.file)" tooltip="Filter by this file"
-                        tooltip-placement="bottom">{{currentRule.file}}</span></div>
-                <div flex="35" ng-if="currentRule.path" class="wz-text-truncatable">Path: <span class="wz-text-bold wz-text-link"
-                        ng-click="addDetailFilter('path', currentRule.path)" tooltip="Filter by this path"
-                        tooltip-placement="bottom">{{currentRule.path}}</span></div>
+                <div flex="35" ng-if="currentRule.file" class="wz-text-truncatable">File: <span
+                        class="wz-text-bold wz-text-link" ng-click="openFile(currentRule.file,currentRule.path)"
+                        tooltip="Filter by this file" tooltip-placement="bottom">{{currentRule.file}}</span></div>
+                <div flex="35" ng-if="currentRule.path" class="wz-text-truncatable">Path: <span
+                        class="wz-text-bold wz-text-link" ng-click="addDetailFilter('path', currentRule.path)"
+                        tooltip="Filter by this path" tooltip-placement="bottom">{{currentRule.path}}</span></div>
 
             </md-card-content>
         </md-card>

@@ -13,10 +13,11 @@
 import template from './wz-xml-file-editor.html';
 import CodeMirror from '../../utils/codemirror/lib/codemirror';
 import { uiModules } from 'ui/modules';
+import chrome from 'ui/chrome';
 
 const app = uiModules.get('app/wazuh', []);
 
-app.directive('wzXmlFileEditor', function() {
+app.directive('wzXmlFileEditor', function () {
   return {
     restrict: 'E',
     scope: {
@@ -41,6 +42,7 @@ app.directive('wzXmlFileEditor', function() {
       $window
     ) {
       const window = $window;
+      const IS_DARK_THEME = chrome.getUiSettingsClient().get('theme:darkMode');
       $scope.targetNameShown = $scope.targetName;
       $scope.configError = false;
       /**
@@ -48,7 +50,7 @@ app.directive('wzXmlFileEditor', function() {
        * evaluates regular expressions.
        * Alternative using split + join, same result.
        */
-      String.prototype.xmlReplace = function(str, newstr) {
+      String.prototype.xmlReplace = function (str, newstr) {
         return this.split(str).join(newstr);
       };
 
@@ -154,10 +156,10 @@ app.directive('wzXmlFileEditor', function() {
           var type = single
             ? 'single'
             : closing
-            ? 'closing'
-            : opening
-            ? 'opening'
-            : 'other';
+              ? 'closing'
+              : opening
+                ? 'opening'
+                : 'other';
           var fromTo = lastType + '->' + type;
           lastType = type;
           var padding = '';
@@ -197,15 +199,15 @@ app.directive('wzXmlFileEditor', function() {
           } else {
             validation = isCluster
               ? await apiReq.request(
-                  'GET',
-                  `/cluster/configuration/validation`,
-                  {}
-                )
+                'GET',
+                `/cluster/configuration/validation`,
+                {}
+              )
               : await apiReq.request(
-                  'GET',
-                  `/manager/configuration/validation`,
-                  {}
-                );
+                'GET',
+                `/manager/configuration/validation`,
+                {}
+              );
           }
           const data = ((validation || {}).data || {}).data || {};
           const isOk = data.status === 'OK';
@@ -286,9 +288,7 @@ app.directive('wzXmlFileEditor', function() {
             } catch (err) {
               params.showRestartManager = 'warn';
             }
-            const msg = `Success. Node (${
-              params.node
-            }) configuration has been updated`;
+            const msg = `Success. Node (${params.node}) configuration has been updated`;
             params.showRestartManager
               ? params.showRestartManager !== 'warn'
                 ? showRestartMessage(msg, params.node)
@@ -330,19 +330,19 @@ app.directive('wzXmlFileEditor', function() {
           matchClosing: true,
           matchBrackets: true,
           mode: 'text/xml',
-          theme: 'ttcn',
+          theme: IS_DARK_THEME ? 'lesser-dark' : 'ttcn',
           foldGutter: true,
           styleSelectedText: true,
           gutters: ['CodeMirror-foldgutter']
         }
       );
 
-      $(window).on('resize', function() {
+      $(window).on('resize', function () {
         dynamicHeight();
       });
 
       const dynamicHeight = () => {
-        setTimeout(function() {
+        setTimeout(function () {
           const editorContainer = $('.wzXmlEditor');
           const headerContainer = $('#wzXmlEditorHeader');
           const windows = $(window).height();
@@ -408,7 +408,7 @@ app.directive('wzXmlFileEditor', function() {
         $scope.$applyAsync();
       });
 
-      $scope.$on('$destroy', function() {
+      $scope.$on('$destroy', function () {
         $location.search('editingFile', null);
         appState.setNavigation({ status: true });
       });

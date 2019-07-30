@@ -424,7 +424,7 @@
 }
 
 .table-hover > tbody > tr:hover {
-  background-color: #f0f0f0;
+  background-color: #f0f0f0!important;
 }
 
 /* .table > tbody {
@@ -535,7 +535,7 @@ md-sidenav {
 
 .wz-md-card:not(.wz-metric-color) {
   box-shadow: 0 2px 2px -1px rgba(0, 0, 0, 0.1) !important;
-  border: 1px solid #d3dae6 !important;
+  border: 1px solid #d3dae6;
   overflow: hidden;
 }
 
@@ -1002,4 +1002,33 @@ discover-app-w .container-fluid {
   width: 100px;
   margin: 2px 0px 0px 10px;
   filter: invert(75%);
+}
+
+.refresh-report-button {
+  padding: 10px;
+  text-align: right;
+}
+
+.monitoring-discover form{
+  display: none;
+}
+
+.euiBadge{
+  font-size: 12px!important;
+}
+
+.wz-link{
+  cursor:pointer;
+  color: #006BB4;
+  text-decoration: none;
+}
+
+.wzTableCellFilter{
+  text-align: right;
+  height: 0;
+  cursor: pointer;
+}
+
+.wz-md-card:not(.fullscreen) .sca-vis.table-scrollable .kbnAggTable__paginated{
+  height: 150px;
 }

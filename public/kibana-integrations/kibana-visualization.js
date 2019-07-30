@@ -15,7 +15,7 @@ import { getVisualizeLoader } from './loader';
 import { timefilter } from 'ui/timefilter';
 import dateMath from '@elastic/datemath';
 
-const app = uiModules.get('apps/webinar_app', []);
+const app = uiModules.get('app/wazuh', []);
 let lockFields = false;
 app.directive('kbnVis', function() {
   return {

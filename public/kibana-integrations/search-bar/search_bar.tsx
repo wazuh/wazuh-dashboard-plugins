@@ -13,6 +13,7 @@
  */
 
 // @ts-ignore
+import { data } from 'plugins/data';
 import { EuiFilterButton, EuiFlexGroup, EuiFlexItem } from '@elastic/eui';
 import { Filter } from '@kbn/es-query';
 import { InjectedIntl, injectI18n } from '@kbn/i18n/react';
@@ -21,7 +22,7 @@ import React, { Component } from 'react';
 import ResizeObserver from 'resize-observer-polyfill';
 import { FilterBar } from './filter_bar';
 import { IndexPattern } from 'ui/index_patterns';
-import { QueryBar } from 'ui/query_bar';
+const { QueryBar } = data.query.ui;
 import { Storage } from 'ui/storage';
 
 interface Query {

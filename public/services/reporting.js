@@ -20,7 +20,8 @@ export class ReportingService {
     rawVisualizations,
     visHandlers,
     genericReq,
-    errorHandler
+    errorHandler,
+    wazuhConfig
   ) {
     this.$rootScope = $rootScope;
     this.vis2png = vis2png;
@@ -28,6 +29,20 @@ export class ReportingService {
     this.visHandlers = visHandlers;
     this.genericReq = genericReq;
     this.errorHandler = errorHandler;
+    this.wazuhConfig = wazuhConfig;
+  }
+
+  removeAgentStatusVis(idArray) {
+    const monitoringEnabled = this.wazuhConfig.getConfig()[
+      'wazuh.monitoring.enabled'
+    ];
+    if (!monitoringEnabled) {
+      const visArray = idArray.filter(vis => {
+        return vis !== 'Wazuh-App-Overview-General-Agents-status';
+      });
+      return visArray;
+    }
+    return idArray;
   }
 
   async startVis2Png(tab, isAgents = false, syscollectorFilters = null) {
@@ -42,7 +57,14 @@ export class ReportingService {
 
       this.vis2png.clear();
 
-      const idArray = this.rawVisualizations.getList().map(item => item.id);
+      let idArray = [];
+      if (tab === 'general') {
+        idArray = this.removeAgentStatusVis(
+          this.rawVisualizations.getList().map(item => item.id)
+        );
+      } else {
+        idArray = this.rawVisualizations.getList().map(item => item.id);
+      }
 
       for (const item of idArray) {
         const tmpHTMLElement = $(`#${item}`);
@@ -56,7 +78,7 @@ export class ReportingService {
       const array = await this.vis2png.checkArray(idArray);
       const name = `wazuh-${
         isAgents ? 'agents' : 'overview'
-      }-${tab}-${(Date.now() / 1000) | 0}.pdf`;
+        }-${tab}-${(Date.now() / 1000) | 0}.pdf`;
 
       const browserTimezone = moment.tz.guess(true);
 
@@ -92,7 +114,7 @@ export class ReportingService {
     }
   }
 
-  async startConfigReport(obj, type) {
+  async startConfigReport(obj, type, components) {
     try {
       this.$rootScope.reportBusy = true;
       this.$rootScope.reportStatus = 'Generating PDF document...';
@@ -116,7 +138,8 @@ export class ReportingService {
         searchBar: '',
         tables: [],
         tab: type,
-        browserTimezone
+        browserTimezone,
+        components
       };
 
       await this.genericReq.request('POST', '/reports', data);

@@ -21,40 +21,44 @@ import React from 'react';
 import { render, unmountComponentAtNode } from 'react-dom';
 
 import { Toast } from '@elastic/eui';
-import { I18nStartContract } from '../../../../../src/core/public/notifications/toasts/../../i18n';
-import { GlobalToastListw } from './global_toast_list';
-import { ToastsStartContract } from '../../../../../src/core/public/notifications/toasts/toasts_start_contract';
+import { I18nSetup } from '../../../../../src/core/public/i18n';
+import { GlobalToastList } from '../../../../../src/core/public/notifications/toasts/global_toast_list';
+import { ToastsApi } from '../../../../../src/core/public/notifications/toasts/toasts_api';
 
-interface Params {
+interface StartDeps {
+  i18n: I18nSetup;
   targetDomElement: HTMLElement;
 }
 
-interface Deps {
-  i18n: I18nStartContract;
-}
+export class ToastsService {
+  private api?: ToastsApi;
+  private targetDomElement?: HTMLElement;
 
-export class ToastsServicew {
-  constructor(private readonly params: Params) {}
+  public setup() {
+    this.api = new ToastsApi();
+    return this.api!;
+  }
 
-  public start({ i18n }: Deps) {
-    const toasts = new ToastsStartContract();
+  public start({ i18n, targetDomElement }: StartDeps) {
+    this.targetDomElement = targetDomElement;
 
     render(
       <i18n.Context>
-        <GlobalToastListw
-          dismissToast={(toast: Toast) => toasts.remove(toast)}
-          toasts$={toasts.get$()}
+        <GlobalToastList
+          dismissToast={(toast: Toast) => this.api!.remove(toast)}
+          toasts$={this.api!.get$()}
         />
       </i18n.Context>,
-      this.params.targetDomElement
+      targetDomElement
     );
 
-    return toasts;
+    return this.api!;
   }
 
   public stop() {
-    unmountComponentAtNode(this.params.targetDomElement);
-
-    this.params.targetDomElement.textContent = '';
+    if (this.targetDomElement) {
+      unmountComponentAtNode(this.targetDomElement);
+      this.targetDomElement.textContent = '';
+    }
   }
 }

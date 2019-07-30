@@ -107,7 +107,7 @@ export class ElasticWrapper {
    * @param {*} title
    * @param {*} id
    */
-  async createMonitoringIndexPattern(title, id) {
+  async createMonitoringIndexPattern(title, id, namespace = undefined) {
     try {
       if (!title)
         return Promise.reject(
@@ -125,7 +125,8 @@ export class ElasticWrapper {
               '[{"name":"timestamp","type":"date","count":0,"scripted":false,"searchable":true,"aggregatable":true,"readFromDocValues":true},{"name":"_id","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":true,"readFromDocValues":false},{"name":"_index","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":true,"readFromDocValues":false},{"name":"_score","type":"number","count":0,"scripted":false,"searchable":false,"aggregatable":false,"readFromDocValues":false},{"name":"_source","type":"_source","count":0,"scripted":false,"searchable":false,"aggregatable":false,"readFromDocValues":false},{"name":"_type","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":true,"readFromDocValues":false},{"name":"dateAdd","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":false,"readFromDocValues":false},{"name":"group","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":false,"readFromDocValues":false},{"name":"host","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":true,"readFromDocValues":true},{"name":"id","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":true,"readFromDocValues":true},{"name":"ip","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":true,"readFromDocValues":true},{"name":"lastKeepAlive","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":false,"readFromDocValues":false},{"name":"cluster.name","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":false,"readFromDocValues":false},{"name":"mergedSum","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":false,"readFromDocValues":false},{"name":"configSum","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":false,"readFromDocValues":false},{"name":"node_name","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":false,"readFromDocValues":false},{"name":"manager","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":false,"readFromDocValues":false},{"name":"manager_host","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":false,"readFromDocValues":false},{"name":"name","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":true,"readFromDocValues":true},{"name":"os.arch","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":false,"readFromDocValues":false},{"name":"os.codename","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":false,"readFromDocValues":false},{"name":"os.major","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":false,"readFromDocValues":false},{"name":"os.name","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":false,"readFromDocValues":false},{"name":"os.platform","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":false,"readFromDocValues":false},{"name":"os.uname","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":false,"readFromDocValues":false},{"name":"os.version","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":false,"readFromDocValues":false},{"name":"status","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":true,"readFromDocValues":true},{"name":"version","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":false,"readFromDocValues":false}]',
             title: title,
             timeFieldName: 'timestamp'
-          }
+          },
+          namespace          
         }
       });
 
@@ -287,7 +288,8 @@ export class ElasticWrapper {
               fields: currentFieldsString,
               fieldFormatMap: `{
                   "data.virustotal.permalink":{"id":"url"},
-                  "data.vulnerability.reference":{"id":"url"},"data.url":{"id":"url"}
+                  "data.vulnerability.reference":{"id":"url"},
+                  "data.url":{"id":"url"}
                 }`,
               sourceFilters: '[{"value":"@timestamp"}]'
             }
@@ -386,12 +388,12 @@ export class ElasticWrapper {
    *
    * @param {*} payload
    */
-  async searchWazuhAlertsWithPayload(payload) {
+  async searchWazuhAlertsWithPayload(payload, namespace) {
     try {
       if (!payload) return Promise.reject(new Error('No valid payload given'));
       const pattern = payload.pattern;
       delete payload.pattern;
-      const fullPattern = await this.getIndexPatternUsingGet(pattern);
+      const fullPattern = await this.getIndexPatternUsingGet(pattern, namespace);
 
       const title =
         (((fullPattern || {})._source || {})['index-pattern'] || {}).title ||
@@ -723,14 +725,17 @@ export class ElasticWrapper {
    * Get an index pattern by name and/or id
    * @param {*} id Could be id and/or title
    */
-  async getIndexPatternUsingGet(id) {
+  async getIndexPatternUsingGet(id, namespace) {
     try {
       if (!id) return Promise.reject(new Error('No valid id given'));
-
+      let idQuery = id.includes('index-pattern:') ? id : 'index-pattern:' + id;
+      if (namespace && namespace !== 'default') {
+        idQuery = `${namespace}:${idQuery}`;
+      }
       const data = await this.elasticRequest.callWithInternalUser('get', {
         index: this.WZ_KIBANA_INDEX,
         type: '_doc',
-        id: id.includes('index-pattern:') ? id : 'index-pattern:' + id
+        id: idQuery
       });
 
       return data;

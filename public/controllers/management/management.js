@@ -51,47 +51,62 @@ export class ManagementController {
     this.$scope.$on('setCurrentGroup', (ev, params) => {
       this.currentGroup = (params || {}).currentGroup || false;
     });
+
     this.$scope.$on('removeCurrentGroup', () => {
       this.currentGroup = false;
       this.appState.setNavigation({ status: true });
     });
+
     this.$scope.$on('setCurrentRule', (ev, params) => {
-      this.currentRule = (params || {}).currentRule || false;
-      this.$location.search('currentRule', true);
-      this.appState.setNavigation({ status: true });
+      this.setCurrentRule(params);
     });
+
     this.$scope.$on('removeCurrentRule', () => {
       this.currentRule = false;
       this.appState.setNavigation({ status: true });
       this.$location.search('currentRule', null);
     });
+
     this.$scope.$on('setCurrentDecoder', (ev, params) => {
       this.currentDecoder = (params || {}).currentDecoder || false;
       this.$location.search('currentDecoder', true);
       this.appState.setNavigation({ status: true });
     });
+
     this.$scope.$on('removeCurrentDecoder', () => {
       this.currentDecoder = false;
       this.appState.setNavigation({ status: true });
       this.$location.search('currentDecoder', null);
     });
+
     this.$scope.$on('setCurrentList', (ev, params) => {
       this.currentList = (params || {}).currentList || false;
       this.$location.search('currentList', true);
       this.appState.setNavigation({ status: true });
       this.$scope.$applyAsync();
     });
+
     this.$scope.$on('removeCurrentList', () => {
       this.currentList = false;
       this.appState.setNavigation({ status: true });
       this.$location.search('currentList', null);
     });
+
     this.$scope.$on('setCurrentConfiguration', (ev, params) => {
       this.currentConfiguration = (params || {}).currentConfiguration || false;
     });
+
     this.$scope.$on('removeCurrentConfiguration', () => {
       this.currentConfiguration = false;
     });
+
+    this.$scope.$on('viewFileOnly', (ev, params) => {
+      $scope.$broadcast('viewFileOnlyTable', {
+        file: params.item,
+        path: params.path
+      });
+    });
+
     this.$rootScope.$on('setRestarting', () => {
       if (this.clusterInfo.status === 'enabled') {
         this.blockEditioncounter = 0;
@@ -134,6 +149,27 @@ export class ManagementController {
 
     this.welcomeCardsProps = {
       switchTab: (tab, setNav) => this.switchTab(tab, setNav)
+    };
+
+    this.rulesetTabsProps = {
+      clickAction: tab => this.setRulesTab(tab),
+      selectedTab: this.rulesetTab,
+      tabs: [
+        { id: 'rules', name: 'Rules' },
+        { id: 'decoders', name: 'Decoders' },
+        { id: 'cdblists', name: 'Lists' }
+      ]
+    };
+
+    this.managementTabsProps = {
+      clickAction: tab => this.switchTab(tab, true),
+      selectedTab: this.tab,
+      tabs: [
+        { id: 'status', name: 'Status' },
+        { id: 'logs', name: 'Logs' },
+        { id: 'monitoring', name: 'Cluster' },
+        { id: 'reporting', name: 'Reporting' }
+      ]
     };
   }
 
@@ -217,6 +253,12 @@ export class ManagementController {
     });
   }
 
+  setCurrentRule(params) {
+    this.currentRule = (params || {}).currentRule || false;
+    this.$location.search('currentRule', true);
+    this.appState.setNavigation({ status: true });
+  }
+
   /**
    * This switch to a selected tab
    * @param {String} tab
@@ -272,16 +314,23 @@ export class ManagementController {
     this.breadCrumbBack();
   }
 
-  switchFilesSubTab(flag) {
+  switchFilesSubTab(flag, showFile) {
     this.managingFiles = flag || true;
+    if (showFile) {
+      this.showFile = showFile;
+    }
   }
 
   breadCrumbBack(goRoot = false) {
     if (this.currentRule) {
       this.$scope.$broadcast('closeRuleView');
+      this.$scope.$broadcast('closeRulesetFile');
+      this.$scope.$emit('removeCurrentRule');
     }
     if (this.currentDecoder) {
       this.$scope.$broadcast('closeDecoderView');
+      this.$scope.$broadcast('closeRulesetFile');
+      this.$scope.$emit('removeCurrentDecoder');
     }
     if (this.currentList) {
       this.$scope.$broadcast('closeListView');
@@ -290,6 +339,7 @@ export class ManagementController {
       this.switchTab('ruleset', true);
       this.setRulesTab('rules');
     }
+    this.$scope.$applyAsync();
   }
 
   changeNode(node) {
