@@ -82,22 +82,25 @@ export class WazuhApiCtrl {
 
       // If we have a valid response from the Wazuh API
       if (validResponse) {
-        // Update cluster information in Elasticsearch .wazuh document
         const { name, cluster } = data;
-        api.cluster_info.manager = name;
-        await this.wzWrapper.updateWazuhIndexDocument(null, req.payload, {
-          doc: { cluster_info: api.cluster_info }
-        });
-
         // Clear and update cluster information before being sent back to frontend
         delete api.cluster_info;
-        const clusterEnabled = cluster.enabled;
+        const clusterEnabled = cluster.enabled === 'yes';
         api.cluster_info = {
           status: clusterEnabled ? 'enabled' : 'disabled',
           manager: name,
           node: cluster.node_name,
           cluster: clusterEnabled ? cluster.name : 'Disabled'
         };
+
+        // Update cluster information in Elasticsearch .wazuh document
+        const result = await this.wzWrapper.updateWazuhIndexDocument(
+          null,
+          req.payload,
+          {
+            doc: { cluster_info: api.cluster_info }
+          }
+        );
 
         // Hide Wazuh API password
         api.password = '****';
@@ -111,7 +114,6 @@ export class WazuhApiCtrl {
 
       // If we have an invalid response from the Wazuh API
       throw new Error(message || `${api.url}:${api.port} is unreachable`);
-
     } catch (error) {
       log('wazuh-api:checkStoredAPI', error.message || error);
       if (error.code === 'EPROTO') {
