@@ -11,12 +11,13 @@
  *
  * Find more information about this on the LICENSE file.
  */
+
 import 'plugins/kibana/visualize/saved_visualizations/_saved_vis';
 import { VisTypesRegistryProvider } from 'ui/registry/vis_types';
 import { uiModules } from 'ui/modules';
 import { SavedObjectLoader } from './saved-object-loader';
-import { savedObjectManagementRegistry } from 'plugins/kibana/management/saved_object_registry';
 import { SavedObjectsClientProvider } from 'ui/saved_objects';
+import { savedObjectManagementRegistry } from 'plugins/kibana/management/saved_object_registry';
 
 const app = uiModules.get('app/visualize');
 
@@ -28,7 +29,6 @@ savedObjectManagementRegistry.register({
 });
 
 app.service('wzsavedVisualizations', function(
-  Promise,
   kbnIndex,
   SavedVis,
   Private,

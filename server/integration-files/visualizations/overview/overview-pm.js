@@ -27,36 +27,36 @@ export default [
     }
   },
   {
-    _id: 'Wazuh-App-Overview-PM-Top-5-CIS-requirements',
+    _id: 'Wazuh-App-Overview-PM-Top-5-rules',
+    _type: 'visualization',
     _source: {
-      title: 'Top 5 CIS requirements',
+      title: 'Top 5 rules',
       visState:
-        '{"params": {"isDonut": true, "shareYAxis": true, "addTooltip": true, "addLegend": true}, "listeners": {}, "type": "pie", "aggs": [{"type": "count", "enabled": true, "id": "1", "params": {}, "schema": "metric"}, {"type": "terms", "enabled": true, "id": "2", "params": {"orderBy": "1", "field": "rule.cis", "order": "desc", "size": 5}, "schema": "segment"}], "title": "PM Top 5 CIS Requirements"}',
+        '{"title":"Export rule distr","type":"pie","params":{"type":"pie","addTooltip":true,"addLegend":true,"legendPosition":"right","isDonut":true,"labels":{"show":false,"values":true,"last_level":true,"truncate":100}},"aggs":[{"id":"1","enabled":true,"type":"sum","schema":"metric","params":{"field":"rule.level"}},{"id":"2","enabled":true,"type":"terms","schema":"segment","params":{"field":"rule.description","size":5,"order":"desc","orderBy":"1","otherBucket":false,"otherBucketLabel":"Other","missingBucket":false,"missingBucketLabel":"Missing"}}]}',
       uiStateJSON: '{}',
       description: '',
       version: 1,
       kibanaSavedObjectMeta: {
         searchSourceJSON:
-          '{"index":"wazuh-alerts","filter":[],"query":{"query":"","language":"lucene"}}'
+          '{"index":"wazuh-alerts","query":{"query":"","language":"lucene"},"filter":[]}'
       }
-    },
-    _type: 'visualization'
+    }
   },
   {
-    _id: 'Wazuh-App-Overview-PM-Top-5-PCI-DSS-requirements',
+    _id: 'Wazuh-App-Overview-PM-Top-5-agents-pie',
+    _type: 'visualization',
     _source: {
-      title: 'Top 5 PCI DSS requirements',
+      title: 'Top 5 agents pie',
       visState:
-        '{"params": {"isDonut": true, "shareYAxis": true, "addTooltip": true, "addLegend": true}, "listeners": {}, "type": "pie", "aggs": [{"type": "count", "enabled": true, "id": "1", "params": {}, "schema": "metric"}, {"type": "terms", "enabled": true, "id": "2", "params": {"orderBy": "1", "field": "rule.pci_dss", "order": "desc", "size": 5}, "schema": "segment"}], "title": "PM Top 5 PCI DSS Requirements"}',
+        '{"title":"Top 5 agents pie","type":"pie","params":{"type":"pie","addTooltip":true,"addLegend":true,"legendPosition":"right","isDonut":true,"labels":{"show":false,"values":true,"last_level":true,"truncate":100}},"aggs":[{"id":"1","enabled":true,"type":"count","schema":"metric","params":{}},{"id":"2","enabled":true,"type":"terms","schema":"segment","params":{"field":"agent.name","size":5,"order":"desc","orderBy":"1","otherBucket":false,"otherBucketLabel":"Other","missingBucket":false,"missingBucketLabel":"Missing"}}]}',
       uiStateJSON: '{}',
       description: '',
       version: 1,
       kibanaSavedObjectMeta: {
         searchSourceJSON:
-          '{"index":"wazuh-alerts","filter":[],"query":{"query":"","language":"lucene"}}'
+          '{"index":"wazuh-alerts","query":{"language":"lucene","query":""},"filter":[]}'
       }
-    },
-    _type: 'visualization'
+    }
   },
   {
     _id: 'Wazuh-App-Overview-PM-Events-per-agent-evolution',
@@ -80,7 +80,7 @@ export default [
     _source: {
       title: 'Alerts summary',
       visState:
-        '{"title":"Alerts summary","type":"table","params":{"perPage":10,"showPartialRows":false,"showMetricsAtAllLevels":false,"sort":{"columnIndex":1,"direction":"desc"},"showTotal":false,"totalFunc":"sum"},"aggs":[{"id":"1","enabled":true,"type":"count","schema":"metric","params":{}},{"id":"3","enabled":true,"type":"terms","schema":"bucket","params":{"field":"data.title","size":10,"order":"desc","orderBy":"1","otherBucket":false,"otherBucketLabel":"Other","missingBucket":false,"missingBucketLabel":"Missing","customLabel":"Control"}}]}',
+        '{"title":"Alerts summary","type":"table","params":{"perPage":10,"showPartialRows":false,"showMeticsAtAllLevels":false,"sort":{"columnIndex":2,"direction":"desc"},"showTotal":false,"totalFunc":"sum"},"aggs":[{"id":"1","enabled":true,"type":"count","schema":"metric","params":{}},{"id":"3","enabled":true,"type":"terms","schema":"bucket","params":{"field":"rule.description","otherBucket":false,"otherBucketLabel":"Other","missingBucket":false,"missingBucketLabel":"Missing","size":50,"order":"desc","orderBy":"1","customLabel":"Rule description"}},{"id":"4","enabled":true,"type":"terms","schema":"bucket","params":{"field":"data.title","otherBucket":false,"otherBucketLabel":"Other","missingBucket":false,"missingBucketLabel":"Missing","size":10,"order":"desc","orderBy":"1","customLabel":"Control"}}]}',
       uiStateJSON:
         '{"vis":{"params":{"sort":{"columnIndex":1,"direction":"desc"}}}}',
       description: '',

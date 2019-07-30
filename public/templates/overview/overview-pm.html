@@ -19,28 +19,28 @@
         <md-card flex="25" class="wz-md-card" ng-class="{'fullscreen': octrl.expandArray[1]}">
             <md-card-content class="wazuh-column">
                 <div layout="row" ng-dblclick="octrl.expand(1)">
-                    <span class="wz-headline-title">Top 5 CIS Requirements</span>
+                    <span class="wz-headline-title">Rule distribution</span>
                     <span flex></span>
                     <span class="cursor-pointer" ng-click="octrl.expand(1)">
                         <react-component name="EuiIcon" props="{type:'expand'}" />
                     </span>
                 </div>
                 <md-divider class="wz-margin-top-10"></md-divider>
-                <kbn-vis id="Wazuh-App-Overview-PM-Top-5-CIS-requirements" vis-id="'Wazuh-App-Overview-PM-Top-5-CIS-requirements'"></kbn-vis>
+                <kbn-vis id="Wazuh-App-Overview-PM-Top-5-rules" vis-id="'Wazuh-App-Overview-PM-Top-5-rules'"></kbn-vis>
             </md-card-content>
         </md-card>
 
         <md-card flex="25" class="wz-md-card" ng-class="{'fullscreen': octrl.expandArray[2]}">
             <md-card-content class="wazuh-column">
                 <div layout="row" ng-dblclick="octrl.expand(2)">
-                    <span class="wz-headline-title">Top 5 PCI DSS Requirements</span>
+                    <span class="wz-headline-title">Top 5 agents</span>
                     <span flex></span>
                     <span class="cursor-pointer" ng-click="octrl.expand(2)">
                         <react-component name="EuiIcon" props="{type:'expand'}" />
                     </span>
                 </div>
                 <md-divider class="wz-margin-top-10"></md-divider>
-                <kbn-vis id="Wazuh-App-Overview-PM-Top-5-PCI-DSS-requirements" vis-id="'Wazuh-App-Overview-PM-Top-5-PCI-DSS-requirements'"></kbn-vis>
+                <kbn-vis id="Wazuh-App-Overview-PM-Top-5-agents-pie" vis-id="'Wazuh-App-Overview-PM-Top-5-agents-pie'"></kbn-vis>
             </md-card-content>
         </md-card>
     </div>

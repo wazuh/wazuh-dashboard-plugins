@@ -11,30 +11,24 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import _ from 'lodash';
-import { Scanner } from 'ui/utils/scanner';
+
 import { StringUtils } from 'ui/utils/string_utils';
 
+/**
+ * The SavedObjectLoader class provides some convenience functions
+ * to load and save one kind of saved objects (specified in the constructor).
+ *
+ * It is based on the SavedObjectClient which implements loading and saving
+ * in an abstract, type-agnostic way. If possible, use SavedObjectClient directly
+ * to avoid pulling in extra functionality which isn't used.
+ */
 export class SavedObjectLoader {
-  constructor(
-    SavedObjectClass,
-    kbnIndex,
-    kbnUrl,
-    $http,
-    chrome,
-    savedObjectsClient
-  ) {
+  constructor(SavedObjectClass, kbnUrl, chrome, savedObjectClient) {
     this.type = SavedObjectClass.type;
     this.Class = SavedObjectClass;
     this.lowercaseType = this.type.toLowerCase();
-    this.kbnIndex = kbnIndex;
     this.kbnUrl = kbnUrl;
     this.chrome = chrome;
-
-    this.scanner = new Scanner($http, {
-      index: kbnIndex,
-      type: this.lowercaseType
-    });
 
     this.loaderProperties = {
       name: `${this.lowercaseType}s`,
@@ -42,7 +36,7 @@ export class SavedObjectLoader {
       nouns: `${this.lowercaseType}s`
     };
 
-    this.savedObjectsClient = savedObjectsClient;
+    this.savedObjectsClient = savedObjectClient;
   }
 
   // Fake async function, only to resolve a promise
@@ -122,13 +116,6 @@ export class SavedObjectLoader {
     return source;
   }
 
-  scanAll(queryString, pageSize = 1000) {
-    return this.scanner.scanAndMap(queryString, {
-      pageSize,
-      docCount: Infinity
-    });
-  }
-
   /**
    * Updates hit.attributes to contain an id and url field, and returns the updated
    * attributes object.
@@ -155,6 +142,7 @@ export class SavedObjectLoader {
         perPage: size,
         page: 1,
         searchFields: ['title^3', 'description'],
+        defaultSearchOperator: 'AND',
         fields
       })
       .then(resp => {

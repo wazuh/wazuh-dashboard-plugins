@@ -33,6 +33,42 @@ export class WazuhElasticCtrl {
   }
 
   /**
+   * This get the timestamp field
+   * @param {Object} req
+   * @param {Object} reply
+   * @returns {Object} timestamp field or ErrorResponse
+   */
+  async getTimeStamp(req, reply) {
+    try {
+      const data = await this.wzWrapper.getWazuhVersionIndexAsSearch();
+      const source =
+        ((((data || {}).hits || {}).hits || [])[0] || {})._source || {};
+
+      if (source.installationDate && source.lastRestart) {
+        log(
+          'wazuh-elastic:getTimeStamp',
+          `Installation date: ${data.hits.hits[0]._source.installationDate}. Last restart: ${data.hits.hits[0]._source.lastRestart}`,
+          'debug'
+        );
+        return {
+          installationDate: data.hits.hits[0]._source.installationDate,
+          lastRestart: data.hits.hits[0]._source.lastRestart
+        };
+      } else {
+        throw new Error('Could not fetch .wazuh-version index');
+      }
+    } catch (error) {
+      log('wazuh-elastic:getTimeStamp', error.message || error);
+      return ErrorResponse(
+        error.message || 'Could not fetch .wazuh-version index',
+        4001,
+        500,
+        reply
+      );
+    }
+  }
+
+  /**
    * This retrieve a template from Elasticsearch
    * @param {Object} req
    * @param {Object} reply
@@ -88,28 +124,28 @@ export class WazuhElasticCtrl {
       log(
         'wazuh-elastic:getTemplate',
         `Template is valid: ${
-        isIncluded && Array.isArray(isIncluded) && isIncluded.length
-          ? 'yes'
-          : 'no'
+          isIncluded && Array.isArray(isIncluded) && isIncluded.length
+            ? 'yes'
+            : 'no'
         }`,
         'debug'
       );
       return isIncluded && Array.isArray(isIncluded) && isIncluded.length
         ? {
-          statusCode: 200,
-          status: true,
-          data: `Template found for ${req.params.pattern}`
-        }
+            statusCode: 200,
+            status: true,
+            data: `Template found for ${req.params.pattern}`
+          }
         : {
-          statusCode: 200,
-          status: false,
-          data: `No template found for ${req.params.pattern}`
-        };
+            statusCode: 200,
+            status: false,
+            data: `No template found for ${req.params.pattern}`
+          };
     } catch (error) {
       log('wazuh-elastic:getTemplate', error.message || error);
       return ErrorResponse(
         `Could not retrieve templates from Elasticsearch due to ${error.message ||
-        error}`,
+          error}`,
         4002,
         500,
         reply
@@ -138,16 +174,16 @@ export class WazuhElasticCtrl {
       return filtered.length >= 1
         ? { statusCode: 200, status: true, data: 'Index pattern found' }
         : {
-          statusCode: 500,
-          status: false,
-          error: 10020,
-          message: 'Index pattern not found'
-        };
+            statusCode: 500,
+            status: false,
+            error: 10020,
+            message: 'Index pattern not found'
+          };
     } catch (error) {
       log('wazuh-elastic:checkPattern', error.message || error);
       return ErrorResponse(
         `Something went wrong retrieving index-patterns from Elasticsearch due to ${error.message ||
-        error}`,
+          error}`,
         4003,
         500,
         reply
@@ -203,19 +239,45 @@ export class WazuhElasticCtrl {
 
       payload.aggs['2'].terms.field = req.params.field;
       payload.pattern = req.params.pattern;
-
-      const data = await this.wzWrapper.searchWazuhAlertsWithPayload(payload);
+      const spaces = this._server.plugins.spaces;
+      const namespace = spaces && spaces.getSpaceId(req);
+      const data = await this.wzWrapper.searchWazuhAlertsWithPayload(payload, namespace);
 
       return data.hits.total.value === 0 ||
         typeof data.aggregations['2'].buckets[0] === 'undefined'
         ? { statusCode: 200, data: '' }
         : {
-          statusCode: 200,
-          data: data.aggregations['2'].buckets[0].key
-        };
+            statusCode: 200,
+            data: data.aggregations['2'].buckets[0].key
+          };
     } catch (error) {
       log('wazuh-elastic:getFieldTop', error.message || error);
       return ErrorResponse(error.message || error, 4004, 500, reply);
+    }
+  }
+
+  /**
+   * This get the elastic setup settings
+   * @param {Object} req
+   * @param {Object} reply
+   * @returns {Object} setup info or ErrorResponse
+   */
+  async getSetupInfo(req, reply) {
+    try {
+      const data = await this.wzWrapper.getWazuhVersionIndexAsSearch();
+
+      return data.hits.total.value === 0
+        ? { statusCode: 200, data: '' }
+        : { statusCode: 200, data: data.hits.hits[0]._source };
+    } catch (error) {
+      log('wazuh-elastic:getSetupInfo', error.message || error);
+      return ErrorResponse(
+        `Could not get data from elasticsearch due to ${error.message ||
+          error}`,
+        4005,
+        500,
+        reply
+      );
     }
   }
 
@@ -283,6 +345,9 @@ export class WazuhElasticCtrl {
    */
   async getlist(req, reply) {
     try {
+      const spaces = this._server.plugins.spaces;
+      const namespace = spaces && spaces.getSpaceId(req);
+
       const config = getConfiguration();
 
       const usingCredentials = await this.wzWrapper.usingCredentials();
@@ -300,9 +365,14 @@ export class WazuhElasticCtrl {
         req.auth.credentials.roles.includes('superuser');
 
       const data = await this.wzWrapper.getAllIndexPatterns();
-
-      if ((((data || {}).hits || {}).hits || []).length === 0)
-        throw new Error('There is no index pattern');
+      if (namespace !== 'default') {
+        data.hits.hits = data.hits.hits.filter(item =>
+          (item._id || '').includes(namespace)
+        );
+      }
+      if ((((data || {}).hits || {}).hits || []).length === 0) {
+        throw new Error('There are no index patterns');
+      }
 
       if (((data || {}).hits || {}).hits) {
         let list = this.validateIndexPattern(data.hits.hits);
@@ -335,15 +405,36 @@ export class WazuhElasticCtrl {
     }
   }
 
+  async checkCustomSpaceMonitoring(namespace, monitoringPattern) {
+    try {
+      const patterns = await this.wzWrapper.getAllIndexPatterns();
+      const exists = patterns.hits.hits.filter(
+        item =>
+          item._source['index-pattern'].title === monitoringPattern &&
+          item._source.namespace === namespace
+      );
+      if (!exists.length) {
+        const title = monitoringPattern;
+        const id = `${namespace}:index-pattern:${monitoringPattern}`;
+        await this.wzWrapper.createMonitoringIndexPattern(title, id, namespace);
+        return id;
+      } else {
+        return exists[0]._id;
+      }
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  }
+
   /**
    * Replaces visualizations main fields to fit a certain pattern.
    * @param {Array<Object>} app_objects Object containing raw visualizations.
    * @param {String} id Index-pattern id to use in the visualizations. Eg: 'wazuh-alerts'
    */
-  buildVisualizationsRaw(app_objects, id) {
+  async buildVisualizationsRaw(app_objects, id, namespace = false) {
     try {
       const config = getConfiguration();
-      const monitoringPattern =
+      let monitoringPattern =
         (config || {})['wazuh.monitoring.pattern'] || 'wazuh-monitoring-3.x-*';
       log(
         'wazuh-elastic:buildVisualizationsRaw',
@@ -369,17 +460,36 @@ export class WazuhElasticCtrl {
         ) {
           const defaultStr = aux_source.kibanaSavedObjectMeta.searchSourceJSON;
 
-          defaultStr.includes('wazuh-monitoring')
-            ? (aux_source.kibanaSavedObjectMeta.searchSourceJSON = defaultStr.replace(
+          const isMonitoring = defaultStr.includes('wazuh-monitoring');
+          if (isMonitoring) {
+            if (namespace && namespace !== 'default') {
+              monitoringPattern = await this.checkCustomSpaceMonitoring(
+                namespace,
+                monitoringPattern
+              );
+              if (
+                monitoringPattern.includes(namespace) &&
+                monitoringPattern.includes('index-pattern:')
+              ) {
+                monitoringPattern = monitoringPattern.split(
+                  'index-pattern:'
+                )[1];
+              }
+            }
+            aux_source.kibanaSavedObjectMeta.searchSourceJSON = defaultStr.replace(
               /wazuh-monitoring/g,
-              monitoringPattern[monitoringPattern.length - 1] === '*'
+              monitoringPattern[monitoringPattern.length - 1] === '*' ||
+                (namespace && namespace !== 'default')
                 ? monitoringPattern
                 : monitoringPattern + '*'
-            ))
-            : (aux_source.kibanaSavedObjectMeta.searchSourceJSON = defaultStr.replace(
+            );
+          } else {
+            aux_source.kibanaSavedObjectMeta.searchSourceJSON = defaultStr.replace(
               /wazuh-alerts/g,
               id
-            ));
+            );
+          }
+
         }
 
         // Replace index-pattern for selector visualizations
@@ -445,9 +555,7 @@ export class WazuhElasticCtrl {
           let query = '';
           if (title === 'Wazuh App Cluster Overview') {
             for (const node of nodes) {
-              query += `.es(index=${pattern_name},q="cluster.name: ${name} AND cluster.node: ${
-                node.name
-                }").label("${node.name}"),`;
+              query += `.es(index=${pattern_name},q="cluster.name: ${name} AND cluster.node: ${node.name}").label("${node.name}"),`;
             }
             query = query.substring(0, query.length - 1);
           } else if (title === 'Wazuh App Cluster Overview Manager') {
@@ -511,8 +619,13 @@ export class WazuhElasticCtrl {
         `Index pattern: ${req.params.pattern}`,
         'debug'
       );
-
-      const raw = await this.buildVisualizationsRaw(file, req.params.pattern);
+      const spaces = this._server.plugins.spaces;
+      const namespace = spaces && spaces.getSpaceId(req);
+      const raw = await this.buildVisualizationsRaw(
+        file,
+        req.params.pattern,
+        namespace
+      );
       return { acknowledge: true, raw: raw };
     } catch (error) {
       log('wazuh-elastic:createVis', error.message || error);
@@ -543,20 +656,25 @@ export class WazuhElasticCtrl {
       const file = ClusterVisualizations['monitoring'];
       const nodes = req.payload.nodes.items;
       const name = req.payload.nodes.name;
-      const master_node = req.payload.nodes.master_node;
+      const masterNode = req.payload.nodes.master_node;
 
-      const pattern_doc = await this.wzWrapper.getIndexPatternUsingGet(
-        req.params.pattern
+      const spaces = this._server.plugins.spaces;
+      const namespace = spaces && spaces.getSpaceId(req);
+
+      const patternDoc = await this.wzWrapper.getIndexPatternUsingGet(
+        req.params.pattern,
+        namespace
       );
-      const pattern_name = pattern_doc._source['index-pattern'].title;
+
+      const patternName = patternDoc._source['index-pattern'].title;
 
       const raw = await this.buildClusterVisualizationsRaw(
         file,
         req.params.pattern,
         nodes,
         name,
-        master_node,
-        pattern_name
+        masterNode,
+        patternName
       );
 
       return { acknowledge: true, raw: raw };
@@ -584,8 +702,8 @@ export class WazuhElasticCtrl {
         ((req || {}).params || {}).pattern === 'all'
           ? await checkKnownFields(this.wzWrapper, false, false, false, true)
           : await this.wzWrapper.updateIndexPatternKnownFields(
-            req.params.pattern
-          );
+              req.params.pattern
+            );
 
       return { acknowledge: true, output: output };
     } catch (error) {

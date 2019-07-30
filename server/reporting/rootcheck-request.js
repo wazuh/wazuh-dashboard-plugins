@@ -56,7 +56,10 @@ export class RootcheckRequest {
         base.query.bool.must[0].query_string.query +
         ' AND "rootkit" AND "detected"';
 
-      const response = await this.wzWrapper.searchWazuhAlertsWithPayload(base);
+      const response = await this.wzWrapper.searchWazuhAlertsWithPayload(
+        base,
+        this.namespace
+      );
       const aggArray = response.aggregations['2'].buckets;
       const mapped = aggArray.map(item => item.key);
       const result = [];
@@ -102,7 +105,10 @@ export class RootcheckRequest {
         ' AND "process" AND "hidden"';
 
       // "aggregations": { "1": { "value": 1 } }
-      const response = await this.wzWrapper.searchWazuhAlertsWithPayload(base);
+      const response = await this.wzWrapper.searchWazuhAlertsWithPayload(
+        base,
+        this.namespace
+      );
 
       return response &&
         response.aggregations &&
@@ -145,7 +151,10 @@ export class RootcheckRequest {
         base.query.bool.must[0].query_string.query + ' AND "port" AND "hidden"';
 
       // "aggregations": { "1": { "value": 1 } }
-      const response = await this.wzWrapper.searchWazuhAlertsWithPayload(base);
+      const response = await this.wzWrapper.searchWazuhAlertsWithPayload(
+        base,
+        this.namespace
+      );
 
       return response &&
         response.aggregations &&
