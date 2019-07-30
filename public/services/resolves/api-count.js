@@ -18,12 +18,21 @@
  * @param {*} genericReq Wazuh module for doing generic requests to our backend.
  * @param {*} $location Angular.js library for URL and paths manipulation.
  */
-export function apiCount($q, genericReq, $location) {
+export function apiCount($q, genericReq, $location, appState) {
   const deferred = $q.defer();
   genericReq
     .request('GET', '/elastic/apis')
     .then(data => {
       if (!data.data.length) throw new Error('No API entries found');
+      else {
+        const firstEntry = data.data[0];
+        appState.setCurrentAPI(
+          JSON.stringify({
+            name: firstEntry._source.cluster_info.manager,
+            id: firstEntry._id
+          })
+        );
+      }
       deferred.resolve();
     })
     .catch(err => {
