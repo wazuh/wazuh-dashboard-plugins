@@ -111,11 +111,8 @@ export class WazuhApiCtrl {
               status: clusterData.status
             }
 
-            // TODO update manager/cluster name information
-            const r = await this.configurationFile.updateWazuhClusterInfo(apiId, api.cluster_info);
-            /*await this.wzWrapper.updateWazuhIndexDocument(null, req.payload, {
-              doc: { cluster_info: api.cluster_info }
-            });*/
+            await this.wazuhRegistry.updateWazuhClusterInfo(apiId, api.cluster_info);
+            
           } catch (error) {
             log('wazuh-api:checkStoredAPI', error.message || error);
           }
