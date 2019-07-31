@@ -11,6 +11,7 @@
  */
 import fs from 'fs';
 import path from 'path';
+import { log } from '../logger';
 
 export class UpdateRegistry {
   constructor() {
@@ -25,8 +26,10 @@ export class UpdateRegistry {
   async readContent(){
     try {
       const content = await fs.readFileSync(this.file, { encoding: 'utf-8' });
+      log('update-registry:readContent', 'Reading wazuh-registry.json content', 'debug');
       return JSON.parse(content);  
     } catch (error) {
+      log('update-registry:readContent', error.message || error);
       return Promise.reject(error);
     }
   }
@@ -43,7 +46,9 @@ export class UpdateRegistry {
         this.busy = true;
         await fs.writeFileSync(this.file, JSON.stringify(content));
         this.busy = false;
+        log('update-registry:writeContent', 'Writting wazuh-registry.json content', 'debug');
       } catch (error) {
+        log('update-registry:writeContent', error.message || error);
         return Promise.reject(error)
       }
   }
@@ -64,7 +69,9 @@ export class UpdateRegistry {
         content.hosts = Object.assign(this.updateHostInfo(id, hosts, clusterInfo));
       }
       this.writeContent(content);
+      log('update-registry:updateWazuhClusterInfo', `API ${id} was properly updated`, 'debug');
     } catch (error) {
+      log('update-registry:updateWazuhClusterInfo', error.message || error);
       return Promise.reject(error);
     }
   }
@@ -81,6 +88,7 @@ export class UpdateRegistry {
       });
       return exists.length === 1; //Checks if the host exists and if is an unique
     } catch (error) {
+      log('update-registry:checkHost', error.message || error);
       return Promise.reject(error);
     }
   }
@@ -97,6 +105,7 @@ export class UpdateRegistry {
       hosts[idx] = Object.assign({'id': id}, clusterInfo);
       return hosts;
     } catch (error) {
+      log('update-registry:updateHostInfo', error.message || error);
       return Promise.reject(error);
     }
   }
@@ -115,6 +124,7 @@ export class UpdateRegistry {
       }
       return i;
     } catch (error) {
+      log('update-registry:findIndexHost', error.message || error);
       return Promise.reject(error)
     }
   }

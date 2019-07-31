@@ -11,6 +11,7 @@
  */
 import fs from 'fs';
 import path from 'path';
+import { log } from '../logger';
 import { getConfiguration } from './get-configuration';
 
 const needRestartFields = [
@@ -28,6 +29,7 @@ const needRestartFields = [
 export class UpdateConfigurationFile {
   constructor() {
     this.busy = false;
+    this.file = path.join(__dirname, '../../config.yml');
   }
 
   /**
@@ -38,15 +40,16 @@ export class UpdateConfigurationFile {
    */
   updateLine(key, value, exists = false) {
     try {
-      const file = path.join(__dirname, '../../config.yml');
-      const data = fs.readFileSync(file, { encoding: 'utf-8' });
+      const data = fs.readFileSync(this.file, { encoding: 'utf-8' });
       const re = new RegExp(`^${key}\\s{0,}:\\s{1,}.*`, 'gm');
       const result = exists
         ? data.replace(re, `${key}: ${value}`)
         : `${data}\n${key}: ${value}`;
-      fs.writeFileSync(file, result, 'utf8');
+      fs.writeFileSync(this.file, result, 'utf8');
+      log('update-configuration:updateLine', 'Updating line', 'debug');
       return true;
     } catch (error) {
+      log('update-configuration:updateLine', error.message || error);
       throw error;
     }
   }
@@ -68,32 +71,46 @@ export class UpdateConfigurationFile {
       const { key, value } = (input || {}).payload || {};
       this.updateLine(key, value, typeof configuration[key] !== 'undefined');
       this.busy = false;
+      log('update-configuration:updateConfiguration', 'Updating configuration', 'debug');
       return { needRestart: needRestartFields.includes(key) };
     } catch (error) {
+      log('update-configuration:updateConfiguration', error.message || error);
       this.busy = false;
       throw error;
     }
   }
 
   composeHost(host, id) {
-    return `  - ${!id ? new Date().getTime() : id}:
+    try {
+      log('update-configuration:composeHost', 'Composing host', 'debug');
+      return `  - ${!id ? new Date().getTime() : id}:
       url: ${host.url}
       port: ${host.port}
       user: ${host.username || host.user}
       password: ${host.password}`;
+    } catch (error) {
+      log('update-configuration:composeHost', error.message || error);
+      throw error;
+    }
   }
 
   composeRegex(host) {
-    const hostId = Object.keys(host)[0];
-    const hostProps = Object.keys(host[hostId]).length;
-    let str = `\\s*-\\s*${hostId}\\s*:[\\n\\r]`;
-    for (let i = 0; i < hostProps; i++) {
-      str = str.concat('\\s*\\S*\\s*\\S*');
-      if (i != hostProps - 1) {
-        str = str.concat('[\\n\\r]')
+    try {
+      const hostId = Object.keys(host)[0];
+      const hostProps = Object.keys(host[hostId]).length;
+      let str = `\\s*-\\s*${hostId}\\s*:[\\n\\r]`;
+      for (let i = 0; i < hostProps; i++) {
+        str = str.concat('\\s*\\S*\\s*\\S*');
+        if (i != hostProps - 1) {
+          str = str.concat('[\\n\\r]')
+        }
       }
+      log('update-configuration:composeRegex', 'Composing regex', 'debug');
+      return new RegExp(`${str}`, 'gm');
+    } catch (error) {
+      log('update-configuration:composeRegex', error.message || error);
+      throw error;
     }
-    return new RegExp(`${str}`, 'gm');
   }
 
   async getHosts() {
@@ -104,9 +121,11 @@ export class UpdateConfigurationFile {
       this.busy = true;
       const configuration = getConfiguration() || {};
       this.busy = false;
+      log('update-configuration:getHosts', 'Getting hosts', 'debug');
       return configuration['wazuh.hosts'] || [];
     } catch (error) {
       this.busy = false;
+      log('update-configuration:getHosts', error.message || error);
       return Promise.reject(error);
     }
   }
@@ -138,22 +157,26 @@ export class UpdateConfigurationFile {
         };
         entries.push(api);
       });
+      log('update-configuration:transformIndexedApis', 'Transforming index API schedule to config.yml', 'debug');
     } catch (error) {
+      log('update-configuration:transformIndexedApis', error.message || error);
       throw error;
     }
     return entries;
   }
 
 
- /**
- * Calls transformIndexedApis() to get the entries to migrate and after that calls addSeveralHosts()
- * @param {Object} apiEntries 
- */
+  /**
+  * Calls transformIndexedApis() to get the entries to migrate and after that calls addSeveralHosts()
+  * @param {Object} apiEntries 
+  */
   async migrateFromIndex(apiEntries) {
     try {
       const apis = this.transformIndexedApis(apiEntries);
       await this.addSeveralHosts(apis);
+      log('update-configuration:addHost', `Host ${id} was properly added`, 'debug');
     } catch (error) {
+      log('update-configuration:migrateFromIndex', error.message || error);
       return Promise.reject(error);
     }
   }
@@ -164,6 +187,7 @@ export class UpdateConfigurationFile {
    */
   async addSeveralHosts(hosts) {
     try {
+      log('update-configuration:addSeveralHosts', `Adding several hosts(${hosts.length})`, 'debug');
       const entry = hosts.shift();
       const response = await this.addHost(entry);
       if (hosts.length && response) {
@@ -172,6 +196,7 @@ export class UpdateConfigurationFile {
         return 'All APIs entries were migrated to the config.yml'
       }
     } catch (error) {
+      log('update-configuration:addSeveralHosts', error.message || error);
       return Promise.reject(error);
     }
   }
@@ -183,8 +208,7 @@ export class UpdateConfigurationFile {
   async addHost(host) {
     const id = host.id || new Date().getTime();
     const compose = this.composeHost(host, id);
-    const file = path.join(__dirname, '../../config.yml');
-    let data = await fs.readFileSync(file, { encoding: 'utf-8' });
+    let data = await fs.readFileSync(this.file, { encoding: 'utf-8' });
     try {
       if (this.busy) {
         throw new Error('Another process is updating the configuration file');
@@ -193,28 +217,29 @@ export class UpdateConfigurationFile {
       const configuration = getConfiguration() || {};
       if (!configuration['wazuh.hosts']) {
         const result = `${data}\nwazuh.hosts:\n${compose}\n`;
-        await fs.writeFileSync(file, result, 'utf8');
-        data = await fs.readFileSync(file, { encoding: 'utf-8' });
+        await fs.writeFileSync(this.file, result, 'utf8');
+        data = await fs.readFileSync(this.file, { encoding: 'utf-8' });
       } else {
         const lastHost = (configuration['wazuh.hosts'] || []).pop();
         if (lastHost) {
           const lastHostObject = this.composeHost(lastHost[Object.keys(lastHost)[0]], Object.keys(lastHost)[0]);
           const regex = this.composeRegex(lastHost);
           const replace = data.replace(regex, `\n${lastHostObject}\n${compose}\n`)
-          await fs.writeFileSync(file, replace, 'utf8');
+          await fs.writeFileSync(this.file, replace, 'utf8');
         }
       }
       this.busy = false;
+      log('update-configuration:addHost', `Host ${id} was properly added`, 'debug');
       return id;
     } catch (error) {
       this.busy = false;
+      log('update-configuration:addHost', error.message || error);
       return Promise.reject(error);
     }
   }
 
   async deleteHost(req) {
-    const file = path.join(__dirname, '../../config.yml');
-    let data = await fs.readFileSync(file, { encoding: 'utf-8' });
+    let data = await fs.readFileSync(this.file, { encoding: 'utf-8' });
     try {
       if (this.busy) {
         throw new Error('Another process is updating the configuration file');
@@ -234,24 +259,25 @@ export class UpdateConfigurationFile {
         }
         const regex = this.composeRegex(target);
         const result = data.replace(regex, ``)
-        await fs.writeFileSync(file, result, 'utf8');
+        await fs.writeFileSync(this.file, result, 'utf8');
         if (hostsNumber === 1) {
-          data = await fs.readFileSync(file, { encoding: 'utf-8' });
+          data = await fs.readFileSync(this.file, { encoding: 'utf-8' });
           const clearHosts = data.replace(new RegExp(`wazuh.hosts:\\s*[\\n\\r]`, 'gm'), '')
-          await fs.writeFileSync(file, clearHosts, 'utf8');
+          await fs.writeFileSync(this.file, clearHosts, 'utf8');
         }
       }
       this.busy = false;
+      log('update-configuration:deleteHost', `Host ${req.params.id} was properly deleted`, 'debug');
       return true;
     } catch (error) {
       this.busy = false;
+      log('update-configuration:deleteHost', error.message || error);
       return Promise.reject(error);
     }
   }
 
   async updateHost(id, host) {
-    const file = path.join(__dirname, '../../config.yml');
-    let data = await fs.readFileSync(file, { encoding: 'utf-8' });
+    let data = await fs.readFileSync(this.file, { encoding: 'utf-8' });
     try {
       if (this.busy) {
         throw new Error('Another process is updating the configuration file');
@@ -270,12 +296,14 @@ export class UpdateConfigurationFile {
         }
         const regex = this.composeRegex(target);
         const result = data.replace(regex, `\n${this.composeHost(host, id)}`);
-        await fs.writeFileSync(file, result, 'utf8');
+        await fs.writeFileSync(this.file, result, 'utf8');
       }
       this.busy = false;
+      log('update-configuration:updateHost', `Host ${id} was properly updated`, 'debug');
       return true;
     } catch (error) {
       this.busy = false;
+      log('update-configuration:updateHost', error.message || error);
       return Promise.reject(error);
     }
   }
