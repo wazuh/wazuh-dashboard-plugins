@@ -284,11 +284,17 @@ export class WazuhApiCtrl {
    * @param {String} apiId 
    */
   findApi(apis, apiId) {
-    let data = apis.find((api) => {
-      return Object.keys(api)[0] == apiId;
-    });
-    data = Object.keys(data).length === 1 ? data[apiId] : data;
-    return data;
+    try {
+      log('wazuh-api:findApi', 'Finding API','debug');
+      let data = apis.find((api) => {
+        return Object.keys(api)[0] == apiId;
+      });
+      data = Object.keys(data).length === 1 ? data[apiId] : data;
+      return data;  
+    } catch (error) {
+      log('wazuh-api:findApi', error.message || error);
+      throw error;
+    }
   }
 
   /**
@@ -306,8 +312,8 @@ export class WazuhApiCtrl {
       // Check if a Wazuh API id is given (already stored API)
       if (req.payload && req.payload.id && !req.payload.password) {
         const configuration = getConfiguration();
-        const apis = configuration['wazuh.hosts'];
-        const data = this.findApi(apis, req.payload.id);
+        const apis = configuration['wazuh.hosts'] || [];
+        const data = apis.length ? this.findApi(apis, req.payload.id) : false;
         if (data) {
           apiAvailable = this.cleanApiData(data);
           apiAvailable.password = apiAvailable.password;
@@ -1606,6 +1612,7 @@ export class WazuhApiCtrl {
   async deleteAPI(req, reply) {
     try {
       const data = await this.configurationFile.deleteHost(req);
+      await this.wazuhRegistry.deleteHost(req);
       log('wazuh-api:deleteAPI', 'Success', 'debug');
       return data;
     } catch (error) {

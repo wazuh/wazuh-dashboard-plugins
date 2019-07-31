@@ -128,4 +128,25 @@ export class UpdateRegistry {
       return Promise.reject(error)
     }
   }
+
+  /**
+   * 
+   * @param {Object} req 
+   */
+  async deleteHost(req) {
+    try {
+      if (!req.params || !req.params.id) throw new Error('API id is not present');
+      const id = req.params.id;
+      const content = await this.readContent();
+      const hosts = content.hosts.filter(h => {
+        return h.id != id;
+      });
+      content.hosts = hosts;
+      await this.writeContent(content);
+      log('update-registry:deleteHost', `API ${id} was removed from the registry`, 'debug'); 
+    } catch (error) {
+      log('update-registry:deleteHost', error.message || error);
+      return Promise.reject(error);
+    }
+  }
 }
