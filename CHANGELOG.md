@@ -12,6 +12,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 ### Changed
 
+- Improved app performance [#1640](https://github.com/wazuh/wazuh-kibana-app/pull/1640).
 - Remove path filter from custom rules and decoders [895792e](https://github.com/wazuh/wazuh-kibana-app/pull/1615/commits/895792e6e6d9401b3293d5e16352b9abef515096)
 - Show path column in rules and decoders [6f49816](https://github.com/wazuh/wazuh-kibana-app/pull/1615/commits/6f49816c71b5999d77bf9e3838443627c9be945d)
 - Removed SCA overview dashboard [94ebbff](https://github.com/wazuh/wazuh-kibana-app/pull/1615/commits/94ebbff231cbfb6d793130e0b9ea855baa755a1c)
