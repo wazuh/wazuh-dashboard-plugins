@@ -46,9 +46,7 @@ export class WazuhElasticCtrl {
       if (source.installationDate && source.lastRestart) {
         log(
           'wazuh-elastic:getTimeStamp',
-          `Installation date: ${
-            data.hits.hits[0]._source.installationDate
-          }. Last restart: ${data.hits.hits[0]._source.lastRestart}`,
+          `Installation date: ${data.hits.hits[0]._source.installationDate}. Last restart: ${data.hits.hits[0]._source.lastRestart}`,
           'debug'
         );
         return {
@@ -507,9 +505,7 @@ export class WazuhElasticCtrl {
           let query = '';
           if (title === 'Wazuh App Cluster Overview') {
             for (const node of nodes) {
-              query += `.es(index=${pattern_name},q="cluster.name: ${name} AND cluster.node: ${
-                node.name
-              }").label("${node.name}"),`;
+              query += `.es(index=${pattern_name},q="cluster.name: ${name} AND cluster.node: ${node.name}").label("${node.name}"),`;
             }
             query = query.substring(0, query.length - 1);
           } else if (title === 'Wazuh App Cluster Overview Manager') {

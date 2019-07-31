@@ -537,9 +537,7 @@ export function GroupsController(
         }));
         $scope.failedErrors = groupBy(failedErrors, 'message') || false;
         errorHandler.info(
-          `Group has been updated but an error has occurred with ${
-            failedIds.length
-          } agents`,
+          `Group has been updated but an error has occurred with ${failedIds.length} agents`,
           '',
           true
         );
