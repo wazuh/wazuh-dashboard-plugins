@@ -49,126 +49,71 @@ export class WazuhApiCtrl {
     try {
       // Get config from elasticsearch
       const api = await this.wzWrapper.getWazuhConfigurationById(req.payload);
-      if (api.error_code > 1) {
-        throw new Error(`Could not find Wazuh API entry on Elasticsearch.`);
-      } else if (api.error_code > 0) {
-        throw new Error(
-          'Valid credentials not found in Elasticsearch. It seems the credentials were not saved.'
-        );
+
+      // Check Elasticsearch API errors
+      if (api.error_code) {
+        throw new Error('Could not find Wazuh API entry on Elasticsearch.');
       }
+
       log('wazuh-api:checkStoredAPI', `${req.payload} exists`, 'debug');
 
+      // Build credentials object for making a Wazuh API request
       const credInfo = ApiHelper.buildOptionsObject(api);
 
-      let response = await needle(
+      // Fetch needed information about the cluster and the manager itself
+      const response = await needle(
         'get',
-        `${api.url}:${api.port}/version`,
+        `${api.url}:${api.port}/manager/info`,
         {},
         credInfo
       );
 
+      // Look for socket-related errors
       if (this.checkResponseIsDown(response)) {
         return ErrorResponse('ERROR3099', 3099, 500, reply);
       }
 
-      if (parseInt(response.body.error) === 0 && response.body.data) {
-        // Checking the cluster status
-        response = await needle(
-          'get',
-          `${api.url}:${api.port}/cluster/status`,
-          {},
-          credInfo
+      // Store error and data fields from the Wazuh API into different variables
+      const { body } = response;
+      const { error, data, message } = body;
+
+      // Check if the response has no errors (error code is zero and there is data)
+      const validResponse = parseInt(error) === 0 && data;
+
+      // If we have a valid response from the Wazuh API
+      if (validResponse) {
+        const { name, cluster } = data;
+        // Clear and update cluster information before being sent back to frontend
+        delete api.cluster_info;
+        const clusterEnabled = cluster.enabled === 'yes';
+        api.cluster_info = {
+          status: clusterEnabled ? 'enabled' : 'disabled',
+          manager: name,
+          node: cluster.node_name,
+          cluster: clusterEnabled ? cluster.name : 'Disabled'
+        };
+
+        // Update cluster information in Elasticsearch .wazuh document
+        const result = await this.wzWrapper.updateWazuhIndexDocument(
+          null,
+          req.payload,
+          {
+            doc: { cluster_info: api.cluster_info }
+          }
         );
 
-        if (this.checkResponseIsDown(response)) {
-          return ErrorResponse('ERROR3099', 3099, 500, reply);
-        }
+        // Hide Wazuh API password
+        api.password = '****';
 
-        if (!response.body.error) {
-          try {
-            const managerInfo = await needle(
-              'get',
-              `${api.url}:${api.port}/agents/000`,
-              {},
-              credInfo
-            );
-
-            if (this.checkResponseIsDown(managerInfo)) {
-              return ErrorResponse('ERROR3099', 3099, 500, reply);
-            }
-
-            const updatedManagerName = managerInfo.body.data.name;
-            api.cluster_info.manager = updatedManagerName;
-            await this.wzWrapper.updateWazuhIndexDocument(null, req.payload, {
-              doc: { cluster_info: api.cluster_info }
-            });
-          } catch (error) {
-            log('wazuh-api:checkStoredAPI', error.message || error);
-          }
-
-          // If cluster mode is active
-          if (response.body.data.enabled === 'yes') {
-            response = await needle(
-              'get',
-              `${api.url}:${api.port}/cluster/node`,
-              {},
-              credInfo
-            );
-
-            if (this.checkResponseIsDown(response)) {
-              return ErrorResponse('ERROR3099', 3099, 500, reply);
-            }
-
-            if (!response.body.error) {
-              let managerName = api.cluster_info.manager;
-              delete api.cluster_info;
-              api.cluster_info = {};
-              api.cluster_info.status = 'enabled';
-              api.cluster_info.manager = managerName;
-              api.cluster_info.node = response.body.data.node;
-              api.cluster_info.cluster = response.body.data.cluster;
-              api.password = '****';
-              return {
-                statusCode: 200,
-                data: api,
-                idChanged: req.idChanged || null
-              };
-            } else if (response.body.error) {
-              const tmpMsg =
-                ((response || {}).body || {}).message ||
-                'Unexpected error from /cluster/node';
-              throw new Error(tmpMsg);
-            }
-          } else {
-            // Cluster mode is not active
-            let managerName = api.cluster_info.manager;
-            delete api.cluster_info;
-            api.cluster_info = {};
-            api.cluster_info.status = 'disabled';
-            api.cluster_info.cluster = 'Disabled';
-            api.cluster_info.manager = managerName;
-            api.password = '****';
-            log('wazuh-api:checkStoredAPI', `Success`, 'debug');
-            return {
-              statusCode: 200,
-              data: api,
-              idChanged: req.idChanged || null
-            };
-          }
-        } else {
-          const tmpMsg =
-            ((response || {}).body || {}).message ||
-            'Unexpected error from /cluster/status';
-
-          throw new Error(tmpMsg);
-        }
-      } else {
-        if (((response || {}).body || {}).message) {
-          throw new Error(response.body.message);
-        }
-
-        throw new Error(`${api.url}:${api.port}/version is unreachable`);
+        return {
+          statusCode: 200,
+          data: api,
+          idChanged: req.idChanged || null
+        };
       }
+
+      // If we have an invalid response from the Wazuh API
+      throw new Error(message || `${api.url}:${api.port} is unreachable`);
     } catch (error) {
       log('wazuh-api:checkStoredAPI', error.message || error);
       if (error.code === 'EPROTO') {

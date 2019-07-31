@@ -266,7 +266,7 @@ export class HealthCheck {
       }
 
       if (!this.errors || !this.errors.length) {
-        await this.$timeout(800);
+        await this.$timeout(300);
         this.$window.location.assign(
           chrome.addBasePath('wazuh#' + this.$rootScope.previousLocation || '')
         );
