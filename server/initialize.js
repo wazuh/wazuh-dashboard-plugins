@@ -20,7 +20,7 @@ import { checkKnownFields } from './lib/refresh-known-fields';
 import { totalmem } from 'os';
 
 export function Initialize(server) {
-  const blueWazuh = '\u001b[34mwazuh\u001b[39m'
+  const blueWazuh = '\u001b[34mwazuh\u001b[39m';
 
   // Elastic JS Client
   const wzWrapper = new ElasticWrapper(server);
@@ -259,9 +259,7 @@ export function Initialize(server) {
         reindexResult.length === 2 &&
         log(
           'initialize:init',
-          `${reindexResult[0].value} (${reindexResult[0].result}) / ${
-            reindexResult[1].value
-          } (${reindexResult[1].result})`,
+          `${reindexResult[0].value} (${reindexResult[0].result}) / ${reindexResult[1].value} (${reindexResult[1].result})`,
           'debug'
         );
     } catch (error) {
@@ -341,9 +339,7 @@ export function Initialize(server) {
       await wzWrapper.getTemplateByName('wazuh-kibana');
       log(
         'initialize:checkKibanaStatus',
-        `No need to create the ${
-          wzWrapper.WZ_KIBANA_INDEX
-        } template, already exists.`,
+        `No need to create the ${wzWrapper.WZ_KIBANA_INDEX} template, already exists.`,
         'debug'
       );
       await createEmptyKibanaIndex();

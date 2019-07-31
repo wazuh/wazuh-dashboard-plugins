@@ -23,7 +23,7 @@ import { EuiHealth } from '@elastic/eui';
 import * as ProcessEquivalence from '../../../util/process-state-equivalence';
 const app = uiModules.get('app/wazuh', []);
 
-app.directive('wzTableEui', function () {
+app.directive('wzTableEui', function() {
   return {
     restrict: 'E',
     scope: {
@@ -51,8 +51,8 @@ app.directive('wzTableEui', function () {
             item.isHealth
               ? health(value, item.isHealth)
               : item.isProcessStatus
-                ? processStatus(value)
-                : defaultRender(value)
+              ? processStatus(value)
+              : defaultRender(value)
         }));
       };
 

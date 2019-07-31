@@ -21,7 +21,7 @@ import { indexDate } from './lib/index-date';
 import { BuildBody } from './lib/replicas-shards-helper';
 import * as ApiHelper from './lib/api-helper';
 
-const blueWazuh = '\u001b[34mwazuh\u001b[39m'
+const blueWazuh = '\u001b[34mwazuh\u001b[39m';
 
 export class Monitoring {
   /**
@@ -97,9 +97,7 @@ export class Monitoring {
       !this.quiet &&
         log(
           'monitoring:configuration',
-          `wazuh.monitoring.pattern: ${this.index_pattern} (index prefix: ${
-            this.index_prefix
-          })`,
+          `wazuh.monitoring.pattern: ${this.index_pattern} (index prefix: ${this.index_prefix})`,
           'debug'
         );
     } catch (error) {
@@ -266,9 +264,7 @@ export class Monitoring {
         };
         log(
           'monitoring:loadCredentials',
-          `Calling checkAndSaveStatus for API: ${apiEntry.url}:${
-            apiEntry.port
-          }`,
+          `Calling checkAndSaveStatus for API: ${apiEntry.url}:${apiEntry.port}`,
           'debug'
         );
         await this.checkAndSaveStatus(apiEntry);

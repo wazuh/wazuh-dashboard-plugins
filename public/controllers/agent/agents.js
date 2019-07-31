@@ -862,9 +862,7 @@ export class AgentsController {
         {}
       );
       this.errorHandler.info(
-        `Policy monitoring scan launched successfully on agent ${
-          this.$scope.agent.id
-        }`,
+        `Policy monitoring scan launched successfully on agent ${this.$scope.agent.id}`,
         ''
       );
     } catch (error) {
