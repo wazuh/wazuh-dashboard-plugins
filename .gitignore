@@ -66,5 +66,5 @@ build/
 
 yarn.lock
 
-# Wazuh version registry
-server/wazuh-version.json
+# Wazuh version and cluster info registry
+server/wazuh-registry.json
