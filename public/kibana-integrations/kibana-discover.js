@@ -472,22 +472,26 @@ function discoverController(
         if (!$scope.implicitFilters) {
           $scope.implicitFilters = queryFilter.getFilters();
         }
-        const filters = queryFilter.getFilters();
+        let filters = queryFilter.getFilters();
         ///////////////////////////////  WAZUH   ///////////////////////////////////
         // Store non removable filters
         const nonRemovableFilters = $scope.implicitFilters
           .map(item => item.meta.key);
 
         // Compose final filters array not including filters that also exist as non removable filter
-        filters.filter(item => {
+        filters = filters.filter(item => {
           const key =
             item.meta.key || (Object.keys(item.query.match) || [undefined])[0];
           const isIncluded = nonRemovableFilters.includes(key);
           const isNonRemovable = isRemovable(item);
           if (isIncluded && !isNonRemovable) {
-            errorHandler.handle(`Filter for ${key} already added`);
-            item.meta.removable = false;
+            const removablesByKey = filters.filter(x => x.meta.removable == false && x.meta.key === key).length;
+            if (removablesByKey < 1) {
+              item.meta.removable = false;
+            }
           }
+          const shouldBeAdded = (isIncluded && isNonRemovable) || !isIncluded;
+          return shouldBeAdded;
         });
 
         return $scope
@@ -1096,6 +1100,7 @@ function discoverController(
   ////////////////////////////////////////////////////// WAZUH //////////////////////////////////////////////////////////
   ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+
   const loadFilters = (wzCurrentFilters, localChange) => {
     const appState = getAppState();
     if (!appState || !globalState) {
@@ -1104,6 +1109,25 @@ function discoverController(
       });
     } else {
       $state.filters = localChange ? $state.filters : [];
+      const currentFilters = queryFilter.getFilters();
+      const hasAgentIDPinned = currentFilters.filter(
+        item =>
+          ((item || {}).meta || {}).key === 'agent.id' &&
+          ((item || {}).$state || {}).store === 'globalState'
+      );
+
+      const weHaveAgentIDImplicit = wzCurrentFilters.filter(
+        item =>
+          ((typeof item || {}).meta || {}).removable !== 'undefined' &&
+          !((item || {}).meta || {}).removable &&
+          ((item || {}).meta || {}).key === 'agent.id'
+      );
+
+      if (weHaveAgentIDImplicit.length && hasAgentIDPinned.length) {
+        for (const filter of hasAgentIDPinned) {
+          queryFilter.removeFilter(filter);
+        }
+      }
 
       queryFilter
         .addFilters(wzCurrentFilters)
