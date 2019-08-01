@@ -25,7 +25,7 @@
 // @ts-ignore
 import chrome from 'ui/chrome';
 // @ts-ignore
-import { FilterBarQueryFilterProvider } from 'ui/filter_bar/query_filter';
+import { FilterBarQueryFilterProvider } from 'ui/filter_manager/query_filter';
 // @ts-ignore
 import { IPrivate } from 'ui/private';
 import { EmbeddedVisualizeHandler } from './embedded_visualize_handler';
