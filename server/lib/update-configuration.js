@@ -130,6 +130,22 @@ export class UpdateConfigurationFile {
     }
   }
 
+  /**
+   * Get host by id
+   * @param {String} id 
+   */
+  async getHostById(id) {
+    try {
+      log('update-configuration:getHostById', `Getting host ${id}`, 'debug');
+      const hosts = await this.getHosts();
+      const host = hosts.filter(h => { return Object.keys(h)[0] == id });
+      return host[0];
+    } catch (error) {
+      log('update-configuration:getHostById', error.message || error);
+      return Promise.reject(error);
+    }
+  }
+
   // Decrypts the encrypted password
   decryptApiPassword(password) {
     return Buffer.from(

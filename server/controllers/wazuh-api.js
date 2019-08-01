@@ -1697,14 +1697,32 @@ export class WazuhApiCtrl {
 
   /** 
    * Get the hosts in the registry
+   * @param {Object} req 
+   * @param {Object} reply 
   */
-  async getApisInRegistry(req, reply){
+  async getApisInRegistry(req, reply) {
     try {
       log('wazuh-api:getApisInRegistry', 'Getting APIs info fromt registry', 'debug');
       return await this.wazuhRegistry.getHosts();
     } catch (error) {
       log('wazuh-api:getApisInRegistry', error.message || error);
       return ErrorResponse('Cannot get the hosts in the wazuh-registry.json');
+    }
+  }
+
+  /**
+   * Get an API by id in the registry
+   * @param {Object} req 
+   * @param {Object} reply 
+   */
+  async getApiById(req, reply) {
+    try {
+      log('wazuh-api:getApiById', 'Getting API info from registry', 'debug');
+      if (!req || !req.params || !req.params.id) throw new Error('API id is missing');  
+      return await this.configurationFile.getHostById(req.params.id);
+    } catch (error) {
+      log('wazuh-api:getApiById', error.message || error);
+      return ErrorResponse('Missing parameters', 2016, 500, reply);
     }
   }
 

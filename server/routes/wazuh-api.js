@@ -178,6 +178,14 @@ export function WazuhApiRoutes(server) {
 
   server.route({
     method: 'GET',
+    path: '/api/registry/{id}',
+    handler(req, reply) {
+      return ctrl.getApiById(req, reply);
+    }
+  });
+
+  server.route({
+    method: 'GET',
     path: '/apis/registry',
     handler(req, reply) {
       return ctrl.getApisInRegistry(req, reply);

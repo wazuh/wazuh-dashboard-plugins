@@ -34,19 +34,65 @@ export class ApiTable extends Component {
     this.editionEnabled = false;
   }
 
-  async bindClusterInfo() {
-    if (this.editionEnabled) return;
-    const result = await this.props.getApisInRegistry();
-    const hosts = result.data || [];
-    hosts.map(h => {
-      const idx = this.props.getSelectedApiIndex(h);
-      delete h.id;
-      this.props.apiEntries[idx].cluster_info = h;
-    });
-    this.props.digest();
+
+  async getHostsInconfig() {
+    try {
+      const result = await this.props.getApisInRegistry();
+      return result.data || [];
+    } catch (error) {
+      return Promise.reject(error)
+    }
   }
 
-  shouldComponentUpdate() {   
+  /**
+   * Binds the cluster info to the API entries
+   */
+  async bindClusterInfo() {
+    try {
+      if (this.editionEnabled) return;
+      const hosts = await this.getHostsInconfig();
+      await this.checkMissingApisInRegistry(angular.copy(hosts));
+      hosts.map(h => {
+        this.setApiEntryInfo(h, h);
+      });
+      this.props.digest();
+    } catch (error) {
+      this.props.handleError('Cannot get cluster information about API entries');
+    }
+  }
+
+  /**
+   * Set in the apiEntries the cluster information for each API
+   * @param {String} id 
+   * @param {Object} info 
+   */
+  setApiEntryInfo(id, info) {
+    const idx = this.props.getSelectedApiIndex(id);
+    delete info.id;
+    this.props.apiEntries[idx].cluster_info = info;
+  }
+
+  /**
+   * Checks if in the wazuh-registry.json is missing any API entry of the config.yml in order to create it.
+   * @param {Object} registryHosts
+   */
+  async checkMissingApisInRegistry(registryHosts) {
+    try {
+      const registryIds = registryHosts.map(h => {return h.id.toString()});
+      const entriesIds = this.props.apiEntries.map(e => {return e._id});
+      const diff = entriesIds.filter(api => !registryIds.includes(api));
+      if (!diff.length) return;
+      diff.map(async id => {
+        const api = await this.props.setHostRegistryInfo(id);
+        const info = api.data || {};
+        this.setApiEntryInfo(id, info);
+      });
+    } catch (error) {
+      this.props.handleError('Cannot update registry');
+    }
+  }
+
+  shouldComponentUpdate() {
     this.bindClusterInfo();
     return true;
   }
@@ -269,5 +315,7 @@ ApiTable.propTypes = {
   getSelectedApiIndex: PropTypes.func,
   digest: PropTypes.func,
   removeManager: PropTypes.func,
-  switch: PropTypes.func
+  switch: PropTypes.func,
+  handleError: PropTypes.func,
+  setHostRegistryInfo: PropTypes.func,
 };

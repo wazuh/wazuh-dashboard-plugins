@@ -117,6 +117,8 @@ export class SettingsController {
         getApisInRegistry: () => this.getApisInRegistry(),
         getSelectedApiIndex: item => this.getSelectedApiIndex(item),
         digest: () => this.$scope.$applyAsync(),
+        handleError: error => this.errorHandler.handle(error),
+        setHostRegistryInfo: id => this.setHostRegistryInfo(id),
         updateSettings: (entry, useItem = false) =>
           this.updateSettings(entry, useItem),
         switch: () => this.switch()
@@ -605,7 +607,7 @@ export class SettingsController {
    * @param {Object} item 
    */
   getSelectedApiIndex(item) {
-    const id = item._id || item.id;
+    const id = item._id || item.id || item;
     return this.apiTableProps.apiEntries.map(item => (item._id).toString()).indexOf((id).toString());
   }
 
@@ -846,11 +848,28 @@ export class SettingsController {
     try {
       const id = newEntry._id || newEntry.id;
       const host = Object.assign({id: id}, newEntry.cluster_info);
-      await this.genericReq.request(
+      return await this.genericReq.request(
         'POST',
         '/api/registry/add',
         host
       )
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  }
+
+  /**
+   * Save the missing APIs information in the registry
+   * @param {String} id 
+   */
+  async setHostRegistryInfo(id) {
+    try {
+      const host = await this.genericReq.request('GET', `/api/registry/${id}`);
+      if (!host.data || !host.data[id]) throw new Error(`Cannot update API ${id} registry`);
+      const info = await this.testAPI.check(host.data[id]);
+      const clusterInfo = info.data || {};
+      const api = Object.assign({id: id}, {cluster_info: clusterInfo});
+      return await this.saveApiInRegistry(api);
     } catch (error) {
       return Promise.reject(error);
     }

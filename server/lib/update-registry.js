@@ -85,7 +85,8 @@ export class UpdateRegistry {
       }
       this.writeContent(content);
       log('update-registry:updateWazuhClusterInfo', `API ${id} was properly updated`, 'debug');
-      return `API ${id} was successful updated.`;
+      const updatedHost = content.hosts.filter(h => {return h.id == id});
+      return updatedHost[0];
     } catch (error) {
       log('update-registry:updateWazuhClusterInfo', error.message || error);
       return Promise.reject(error);
