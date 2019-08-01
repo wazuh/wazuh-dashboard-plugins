@@ -175,4 +175,20 @@ export function WazuhApiRoutes(server) {
       return ctrl.updateFullAPI(req, reply);
     }
   });
+
+  server.route({
+    method: 'GET',
+    path: '/apis/registry',
+    handler(req, reply) {
+      return ctrl.getApisInRegistry(req, reply);
+    }
+  });
+
+  server.route({
+    method: 'POST',
+    path: '/api/registry/add',
+    handler(req, reply) {
+      return ctrl.saveApiInRegistry(req, reply);
+    }
+  });  
 }

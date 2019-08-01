@@ -112,7 +112,7 @@ export class WazuhApiCtrl {
             }
 
             await this.wazuhRegistry.updateWazuhClusterInfo(apiId, api.cluster_info);
-            
+
           } catch (error) {
             log('wazuh-api:checkStoredAPI', error.message || error);
           }
@@ -285,12 +285,12 @@ export class WazuhApiCtrl {
    */
   findApi(apis, apiId) {
     try {
-      log('wazuh-api:findApi', 'Finding API','debug');
+      log('wazuh-api:findApi', 'Finding API', 'debug');
       let data = apis.find((api) => {
         return Object.keys(api)[0] == apiId;
       });
       data = Object.keys(data).length === 1 ? data[apiId] : data;
-      return data;  
+      return data;
     } catch (error) {
       log('wazuh-api:findApi', error.message || error);
       throw error;
@@ -860,7 +860,7 @@ export class WazuhApiCtrl {
     const devTools = !!(data || {}).devTools;
     try {
       const apis = (getConfiguration() || {})['wazuh.hosts'] || []
-      const api = this.findApi(apis, id);  
+      const api = this.findApi(apis, id);
       if (devTools) {
         delete data.devTools;
       }
@@ -1260,7 +1260,7 @@ export class WazuhApiCtrl {
         throw new Error('Field api is required');
 
       const apis = (getConfiguration() || {})['wazuh.hosts'] || []
-      const config = this.findApi(apis, req.params.api);   
+      const config = this.findApi(apis, req.params.api);
 
       const headers = ApiHelper.buildOptionsObject(config);
       const distinctUrl = `${config.url}:${config.port}/agents/stats/distinct`;
@@ -1692,6 +1692,38 @@ export class WazuhApiCtrl {
         500,
         reply
       );
+    }
+  }
+
+  /** 
+   * Get the hosts in the registry
+  */
+  async getApisInRegistry(req, reply){
+    try {
+      log('wazuh-api:getApisInRegistry', 'Getting APIs info fromt registry', 'debug');
+      return await this.wazuhRegistry.getHosts();
+    } catch (error) {
+      log('wazuh-api:getApisInRegistry', error.message || error);
+      return ErrorResponse('Cannot get the hosts in the wazuh-registry.json');
+    }
+  }
+
+  /**
+   * Returns the cluster information associated to an API id
+   * @param {Object} req
+   * @param {Object} reply
+   */
+  async saveApiInRegistry(req, reply) {
+    try {
+      log('wazuh-api:saveApiInRegistry', 'Saving API info in registry', 'debug');
+      if (!req || !req.payload || !req.payload.id) throw new Error('API id is missing');
+      const info = req.payload;
+      const id = info.id;
+      delete info.id;
+      return await this.wazuhRegistry.updateWazuhClusterInfo(id, info);
+    } catch (error) {
+      log('wazuh-api:getClusterInfoByAPI', error.message || error);
+      return ErrorResponse('Missing parameters', 2015, 500, reply);
     }
   }
 }

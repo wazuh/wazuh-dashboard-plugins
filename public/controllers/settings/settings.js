@@ -114,6 +114,9 @@ export class SettingsController {
         setDefault: entry => this.setDefault(entry),
         checkManager: (entry, isIndex = false, silent = false) => this.checkManager(entry, isIndex, silent),
         removeManager: entry => this.removeManager(entry),
+        getApisInRegistry: () => this.getApisInRegistry(),
+        getSelectedApiIndex: item => this.getSelectedApiIndex(item),
+        digest: () => this.$scope.$applyAsync(),
         updateSettings: (entry, useItem = false) =>
           this.updateSettings(entry, useItem),
         switch: () => this.switch()
@@ -434,6 +437,7 @@ export class SettingsController {
         '/api/host',
         tmpData
       );
+
       this.appState.setExtensions(data.data.response._id, tmpData.extensions);
       const newEntry = {
         _id: ((data || {}).data).response || false,
@@ -450,7 +454,9 @@ export class SettingsController {
         this.setDefault(newEntry);
       }
       this.$scope.$applyAsync();
-
+      // Store the cluster info in the registry
+      await this.saveApiInRegistry(newEntry);
+      const index = this.apiTableProps.apiEntries.length - 1;
       this.errorHandler.info('Wazuh API successfully added', 'Settings');
       this.addManagerContainer = false;
 
@@ -460,20 +466,20 @@ export class SettingsController {
       if (!this.appState.getCurrentAPI()) {
         // No cookie
         if (
-          this.apiTableProps.apiEntries[this.apiTableProps.apiEntries.length - 1].cluster_info
+          this.apiTableProps.apiEntries[index].cluster_info
             .status === 'disabled'
         ) {
           this.appState.setCurrentAPI(
             JSON.stringify({
-              name: this.apiTableProps.apiEntries[this.apiTableProps.apiEntries.length - 1].cluster_info.manager,
-              id: this.apiTableProps.apiEntries[this.apiTableProps.apiEntries.length - 1]._id
+              name: this.apiTableProps.apiEntries[index].cluster_info.manager,
+              id: this.apiTableProps.apiEntries[index]._id
             })
           );
         } else {
           this.appState.setCurrentAPI(
             JSON.stringify({
-              name: this.apiTableProps.apiEntries[this.apiTableProps.apiEntries.length - 1].cluster_info.cluster,
-              id: this.apiTableProps.apiEntries[this.apiTableProps.apiEntries.length - 1]._id
+              name: this.apiTableProps.apiEntries[index].cluster_info.cluster,
+              id: this.apiTableProps.apiEntries[index]._id
             })
           );
         }
@@ -560,7 +566,8 @@ export class SettingsController {
       const data = await this.testAPI.check(tmpData);
       tmpData.cluster_info = data.data;
       await this.genericReq.request('PUT', '/api/settings', tmpData);
-      this.apiTableProps.apiEntries[index].cluster_info = tmpData.cluster_info;
+      // Update the cluster info in the registry
+      await this.saveApiInRegistry(tmpData);
 
       this.wzMisc.setApiIsDown(false);
       this.apiIsDown = false;
@@ -598,7 +605,8 @@ export class SettingsController {
    * @param {Object} item 
    */
   getSelectedApiIndex(item) {
-    return this.apiTableProps.apiEntries.map(item => (item._id).toString()).indexOf((item._id).toString());
+    const id = item._id || item.id;
+    return this.apiTableProps.apiEntries.map(item => (item._id).toString()).indexOf((id).toString());
   }
 
   // Check manager connectivity
@@ -619,10 +627,6 @@ export class SettingsController {
       const data = await this.testAPI.check(tmpData);
       tmpData.cluster_info = data.data;
 
-      /*const tmpUrl = `/elastic/api-hostname/${this.apiTableProps.apiEntries[index]._id}`;
-      await this.genericReq.request('PUT', tmpUrl, {
-        cluster_info: tmpData.cluster_info
-      });*/
       // Emit updateAPI event cause the cluster info could had been changed
       this.$scope.$emit('updateAPI', { cluster_info: tmpData.cluster_info });
       this.apiTableProps.apiEntries[index].cluster_info = tmpData.cluster_info;
@@ -817,6 +821,38 @@ export class SettingsController {
       this.cancelEditingKey();
       this.loadingChange = false;
       this.errorHandler.handle(error);
+    }
+  }
+
+  /**
+   * Get the hosts in the registry
+   */
+  async getApisInRegistry() {
+    try {
+      return await this.genericReq.request(
+        'GET',
+        '/apis/registry'
+      );
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  }
+
+  /**
+   * Saves the cluster info of the API in the registry
+   * @param {Object} newEntry 
+   */
+  async saveApiInRegistry(newEntry){
+    try {
+      const id = newEntry._id || newEntry.id;
+      const host = Object.assign({id: id}, newEntry.cluster_info);
+      await this.genericReq.request(
+        'POST',
+        '/api/registry/add',
+        host
+      )
+    } catch (error) {
+      return Promise.reject(error);
     }
   }
 }

@@ -34,15 +34,20 @@ export class ApiTable extends Component {
     this.editionEnabled = false;
   }
 
-  checkApiConnection() {
+  async bindClusterInfo() {
     if (this.editionEnabled) return;
-    this.props.apiEntries.map(api => {
-      this.props.checkManager(api, false, true);
+    const result = await this.props.getApisInRegistry();
+    const hosts = result.data || [];
+    hosts.map(h => {
+      const idx = this.props.getSelectedApiIndex(h);
+      delete h.id;
+      this.props.apiEntries[idx].cluster_info = h;
     });
+    this.props.digest();
   }
 
   shouldComponentUpdate() {   
-    this.checkApiConnection();
+    this.bindClusterInfo();
     return true;
   }
 
@@ -260,6 +265,9 @@ ApiTable.propTypes = {
   updateSettings: PropTypes.func,
   setDefault: PropTypes.func,
   checkManager: PropTypes.func,
+  getApisInRegistry: PropTypes.func,
+  getSelectedApiIndex: PropTypes.func,
+  digest: PropTypes.func,
   removeManager: PropTypes.func,
   switch: PropTypes.func
 };

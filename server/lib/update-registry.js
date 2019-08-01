@@ -12,6 +12,7 @@
 import fs from 'fs';
 import path from 'path';
 import { log } from '../logger';
+import { ErrorResponse } from '../controllers/error-response';
 
 export class UpdateRegistry {
   constructor() {
@@ -25,11 +26,25 @@ export class UpdateRegistry {
    */
   async readContent(){
     try {
-      const content = await fs.readFileSync(this.file, { encoding: 'utf-8' });
       log('update-registry:readContent', 'Reading wazuh-registry.json content', 'debug');
+      const content = await fs.readFileSync(this.file, { encoding: 'utf-8' });
       return JSON.parse(content);  
     } catch (error) {
       log('update-registry:readContent', error.message || error);
+      return Promise.reject(error);
+    }
+  }
+
+  /**
+   * Get the hosts and their cluster info stored in the registry
+   */
+  async getHosts() {
+    try {
+      log('update-registry:getHosts', 'Getting hosts from registry', 'debug');
+      const content = await this.readContent();
+      return content.hosts;
+    } catch (error) {
+      log('update-registry:getHosts', error.message || error);
       return Promise.reject(error);
     }
   }
@@ -40,13 +55,13 @@ export class UpdateRegistry {
    */
     async writeContent(content){
       try {
+        log('update-registry:writeContent', 'Writting wazuh-registry.json content', 'debug');
         if (this.busy) {
           throw new Error('Another process is updating the registry file');
         }
         this.busy = true;
         await fs.writeFileSync(this.file, JSON.stringify(content));
         this.busy = false;
-        log('update-registry:writeContent', 'Writting wazuh-registry.json content', 'debug');
       } catch (error) {
         log('update-registry:writeContent', error.message || error);
         return Promise.reject(error)
@@ -54,7 +69,7 @@ export class UpdateRegistry {
   }
 
   /**
-   * Uptades the cluster information associated with the current selected API
+   * Uptades the cluster information associated with an API id
    * @param {String} id 
    * @param {Object} clusterInfo 
    */
@@ -70,6 +85,7 @@ export class UpdateRegistry {
       }
       this.writeContent(content);
       log('update-registry:updateWazuhClusterInfo', `API ${id} was properly updated`, 'debug');
+      return `API ${id} was successful updated.`;
     } catch (error) {
       log('update-registry:updateWazuhClusterInfo', error.message || error);
       return Promise.reject(error);
@@ -146,6 +162,23 @@ export class UpdateRegistry {
       log('update-registry:deleteHost', `API ${id} was removed from the registry`, 'debug'); 
     } catch (error) {
       log('update-registry:deleteHost', error.message || error);
+      return Promise.reject(error);
+    }
+  }
+
+  /**
+   * Returns the cluster information associated to an API id
+   * @param {String} id 
+   */
+  async getClusterInfoByAPI(id){
+    try {
+      if (!id) throw new Error('API id is missing');
+      const hosts = await this.getHosts();
+      const info = hosts.filter(h => {
+        return h.id == id;
+      });
+    } catch (error) {
+      log('update-registry:getClusterInfoByAPI', error.message || error);
       return Promise.reject(error);
     }
   }
