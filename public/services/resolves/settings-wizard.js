@@ -179,7 +179,6 @@ export function settingsWizard(
     };
 
     const cleanApisCookies = () => {
-      console.log('cleaning apis cookies.')
       genericReq
         .request('GET', '/api/apis')
         .then(data => {
