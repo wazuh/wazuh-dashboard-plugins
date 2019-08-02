@@ -107,7 +107,7 @@ export default [
                               "value": "authentication_failed, authentication_failures",
                               "params": [
                                 "authentication_failed",
-                                "authentication_failures"
+                                "win_authentication_failed"
                               ],
                               "negate": false,
                               "disabled": false,
@@ -123,7 +123,7 @@ export default [
                                   },
                                   {
                                     "match_phrase": {
-                                      "rule.groups": "authentication_failures"
+                                      "rule.groups": "win_authentication_failed"
                                     }
                                   }
                                 ],
