@@ -1,6 +1,5 @@
 import Chrome from 'selenium-webdriver/chrome';
-import {WebDriver, Builder, By, until, WebElementCondition, WebElement} from 'selenium-webdriver';
-import { async } from 'rxjs/internal/scheduler/async';
+import {WebDriver, Builder, By, until} from 'selenium-webdriver';
 
 interface Report {
   uri: string,
@@ -14,7 +13,7 @@ interface AgentReport extends Report {
   agent: number
 }
 
-export class AutoReport {
+class AutoReport {
   screen: { width: number; height: number; };
   url: string;
   tab: string;
@@ -34,6 +33,11 @@ export class AutoReport {
     this.tTo = report.tTo;
   }
 
+  /**
+   * Check if the tab is available else trow a error
+   *
+   * @returns {boolean}
+   */
   availabeTab() {
     if(this.tab in this.tabs) {
       return true;
@@ -43,6 +47,13 @@ export class AutoReport {
     );
   }
 
+  /**
+   * Click on the button or link after verifying if this exists or if it is enabled
+   *
+   * @param {string} selector Css selector of the button or link
+   * @param {string} errorMessage Custom error message if throw error
+   * @param {boolean} [apendError=false] Append the throw error to the `errorMessage`
+   */
   async clickButton(selector: string, errorMessage: string, apendError=false) {
     try {
       await this.driver.wait(until.elementLocated(By.css(selector)), 10000).then(async (button) => {
@@ -58,7 +69,12 @@ export class AutoReport {
     }
   }
 
-
+  /**
+   * Create and return a webdriver 
+   *
+   * @returns {WebDriver}
+   * @memberof AutoReport
+   */
   async createDriver() {
     return await new Builder()
     .forBrowser('chrome')
@@ -66,6 +82,11 @@ export class AutoReport {
     .build();
   }
 
+  /**
+   * Press the 'generate report' button
+   *
+   * @memberof AutoReport
+   */
   async generateReport() {
     const selector = '[data-test-subj="overviewGenerateReport"]';
     await this.clickButton(
@@ -74,6 +95,11 @@ export class AutoReport {
     );
   }
 
+  /**
+   * Open Wazuh app in the web browser
+   *
+   * @memberof AutoReport
+   */
   async openWazuh(){
     this.driver.get(this.url);
     await this.driver.wait(until.urlContains('overview'), 10000);
@@ -99,6 +125,11 @@ export class AutoReport {
     );
   }
 
+  /**
+   * Open the selected tab in the web browser
+   *
+   * @memberof AutoReport
+   */
   async setTab() {
     const selector = this.tabs[this.tab];
     await this.clickButton(
