@@ -234,6 +234,8 @@ export class AgentsPreviewController {
     this.$scope.$broadcast('wazuhSearch', { term: this.prevSearch || '' });
   }
 
+  
+
   async refreshAgentsStats() {
     try {
       const data = await this.genericReq.request('GET', '/api/agents-unique/' + this.api, {});
