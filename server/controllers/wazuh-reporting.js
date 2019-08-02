@@ -1395,17 +1395,26 @@ export class WazuhReportingCtrl {
   }
 
   async autoReport(req, reply) {
-    const args = {
-      uri: (((req || {}).server || {}).info || {}).uri,
-      tab: '[data-test-subj="overviewWelcomeGeneral"]',
-      filters: '',
-      tFrom: '',
-      tTo: ''
+    if (req.payload) {
+      const payload = req.payload;
+
+      if (!payload.tab) {
+        throw new Error(
+          'Reporting needs a valid app tab in order to work properly'
+        );
+      }
+      
+      const args = {
+        uri: (((req || {}).server || {}).info || {}).uri,
+        tab: payload.tab,
+        filters: (payload || {}).filters,
+        tFrom: (payload || {}).tFrom,
+        tTo: (payload || {}).tTo,
+      }
+      
+      const driver = new OverviewAutoReport(args);
+      return driver.run(this.takeScreenshot);
     }
-
-    const driver = new OverviewAutoReport(args);
-
-    return driver.run(this.takeScreenshot);
   }
 
   /**

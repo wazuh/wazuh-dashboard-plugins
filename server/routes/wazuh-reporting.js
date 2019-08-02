@@ -52,7 +52,7 @@ export function WazuhReportingRoutes(server) {
 
   // Fetch the reports list
   server.route({
-    method: 'GET',
+    method: 'POST',
     path: '/autoReport',
     handler(req, res) {
       return ctrl.autoReport(req, res);
