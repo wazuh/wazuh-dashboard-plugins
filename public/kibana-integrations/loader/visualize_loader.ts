@@ -22,6 +22,7 @@
  * the docs (docs/development/visualize/development-create-visualization.asciidoc)
  * are up to date.
  */
+
 // @ts-ignore
 import chrome from 'ui/chrome';
 // @ts-ignore
@@ -32,7 +33,13 @@ import { EmbeddedVisualizeHandler } from './embedded_visualize_handler';
 import { VisSavedObject, VisualizeLoaderParams } from './types';
 
 export class VisualizeLoader {
-  constructor(private readonly savedVisualizations: any, private readonly Private: IPrivate, $injector, errorHandler) {
+  constructor(
+    private readonly savedVisualizations: any,
+    private readonly pipelineDataLoader: boolean,
+    private readonly Private: IPrivate,
+    $injector,
+    errorHandler
+  ) {
     // @ts-ignore
     this.injector = $injector;
     // @ts-ignore
@@ -143,13 +150,20 @@ export class VisualizeLoader {
       // lets add Private to the params, we'll need to pass it to visualize later
       Private: this.Private,
     };
-    // @ts-ignore
+
     return new EmbeddedVisualizeHandler(element, savedObj, handlerParams, this.injector, this.errorHandler);
   }
 }
 
-function VisualizeLoaderProvider(savedVisualizations: any, Private: IPrivate, $injector, errorHandler) {
-  return new VisualizeLoader(savedVisualizations, Private, $injector, errorHandler);
+function VisualizeLoaderProvider(
+  savedVisualizations: any,
+  interpreterConfig: any,
+  Private: IPrivate,
+  $injector,
+  errorHandler
+) {
+  // @ts-ignore
+  return new VisualizeLoader(savedVisualizations, interpreterConfig.enableInVisualize, Private, $injector, errorHandler);
 }
 
 /**

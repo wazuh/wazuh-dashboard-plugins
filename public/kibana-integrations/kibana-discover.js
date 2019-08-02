@@ -401,9 +401,26 @@ function discoverController(
 
     $scope.updateDataSource()
       .then(function () {
-        $scope.$listen(timefilter, 'autoRefreshFetch', $scope.fetch);
-        $scope.$listen(timefilter, 'refreshIntervalUpdate', $scope.updateRefreshInterval);
-        $scope.$listen(timefilter, 'timeUpdate', $scope.updateTime);
+        $scope.$listen(timefilter, 'fetch', function () {
+          // WAZUH
+          $rootScope.$broadcast('updateVis');
+          $scope.fetch();
+        });
+        $scope.$listen(timefilter, 'autoRefreshFetch', function () {
+          // WAZUH
+          $rootScope.$broadcast('updateVis');
+          $scope.fetch();
+        });
+        $scope.$listen(timefilter, 'refreshIntervalUpdate', () => {
+          // WAZUH
+          $rootScope.$broadcast('updateVis');
+          $scope.updateRefreshInterval();
+        });
+        $scope.$listen(timefilter, 'timeUpdate', () => {
+          // WAZUH
+          $rootScope.$broadcast('updateVis');
+          $scope.updateTime();
+        });
 
         $scope.$watchCollection('state.sort', function (sort) {
           if (!sort) return;
@@ -929,6 +946,9 @@ function discoverController(
   const wzEventFiltersListener = $rootScope.$on(
     'wzEventFilters',
     (evt, parameters) => {
+      if (!parameters.localChange) {
+        queryFilter.removeAll();
+      }
       loadFilters(parameters.filters, parameters.localChange);
     }
   );
