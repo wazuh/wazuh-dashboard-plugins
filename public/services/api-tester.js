@@ -37,7 +37,7 @@ export class ApiTester {
 
       const result = await this.$http.post(
         chrome.addBasePath('/api/check-stored-api'),
-        data,
+        {id: data.toString()},
         headers
       );
 

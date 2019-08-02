@@ -57,7 +57,7 @@ export class WazuhApiCtrl {
   async checkStoredAPI(req, reply) {
     try {
       // Get config from config.yml
-      const apiId = req.payload
+      const apiId = req.payload.id
       const apis = (getConfiguration() || {})['wazuh.hosts'] || []
       let api = this.findApi(apis, apiId);
       if (!api) {
