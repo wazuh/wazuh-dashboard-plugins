@@ -59,7 +59,7 @@
                         <div class="euiText euiText--small euiStat__description">
                             <p>Active</p>
                         </div>
-                        <p class="euiTitle euiTitle--small euiStat__title">{{ctrl.agentsCountActive}}</p>
+                        <p class="euiTitle euiTitle--small euiStat__title">{{ctrl.summary.agentsCountActive}}</p>
                     </div>
                 </div>
                 <div class="euiFlexItem euiFlexItem--flexGrowZero">
@@ -68,7 +68,7 @@
                         <div class="euiText euiText--small euiStat__description">
                             <p>Disconnected</p>
                         </div>
-                        <p class="euiTitle euiTitle--small euiStat__title">{{ctrl.agentsCountDisconnected}}</p>
+                        <p class="euiTitle euiTitle--small euiStat__title">{{ctrl.summary.agentsCountDisconnected}}</p>
                     </div>
                 </div>
                 <div class="euiFlexItem euiFlexItem--flexGrowZero">
@@ -77,7 +77,7 @@
                         <div class="euiText euiText--small euiStat__description">
                             <p>Never connected</p>
                         </div>
-                        <p class="euiTitle euiTitle--small euiStat__title">{{ctrl.agentsCountNeverConnected}}</p>
+                        <p class="euiTitle euiTitle--small euiStat__title">{{ctrl.summary.agentsCountNeverConnected}}</p>
                     </div>
                 </div>
                 <div class="euiFlexItem euiFlexItem--flexGrowZero">
@@ -86,7 +86,7 @@
                         <div class="euiText euiText--small euiStat__description">
                             <p>Agents coverage</p>
                         </div>
-                        <p class="euiTitle euiTitle--small euiStat__title">{{(ctrl.agentsCoverity | number:2)}}%</p>
+                        <p class="euiTitle euiTitle--small euiStat__title">{{(ctrl.summary.agentsCoverity | number:2)}}%</p>
                     </div>
                 </div>
             </div>
