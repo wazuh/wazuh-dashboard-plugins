@@ -21,6 +21,12 @@ export class AppState {
     this.navigate = {};
   }
 
+
+  //Gets all the extensions
+  getAllExtensions() {
+    return this.$cookies.getObject('extensions');
+  }
+
   //Extensions setters and getters
   getExtensions(id) {
     const current = this.$cookies.getObject('extensions');

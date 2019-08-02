@@ -178,6 +178,25 @@ export function settingsWizard(
       return deferred.resolve();
     };
 
+    const cleanApisCookies = () => {
+      console.log('cleaning apis cookies.')
+      genericReq
+        .request('GET', '/api/apis')
+        .then(data => {
+          const hosts = data.data || [];
+          const hostKeys = hosts.map(h => Object.keys(h)[0]);
+          const extensions = appState.getAllExtensions();
+          const extensionsKeys = Object.keys(extensions);
+          const diff = extensionsKeys.filter(e => !hostKeys.includes(e));
+          diff.map(d => appState.removeExtensions(d));
+        })
+        .catch(error => {
+          errorHandler.handle(error);
+        });
+    };
+
+    cleanApisCookies();
+
     const currentParams = $location.search();
     const targetedAgent =
       currentParams && (currentParams.agent || currentParams.agent === '000');
