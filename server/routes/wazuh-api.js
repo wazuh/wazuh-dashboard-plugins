@@ -199,4 +199,12 @@ export function WazuhApiRoutes(server) {
       return ctrl.saveApiInRegistry(req, reply);
     }
   });  
+
+  server.route({
+    method: 'POST',
+    path: '/apis/registry/clean',
+    handler(req, reply) {
+      return ctrl.cleanRegistryHosts(req, reply);
+    }
+  });  
 }

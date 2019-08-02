@@ -1744,4 +1744,18 @@ export class WazuhApiCtrl {
       return ErrorResponse('Missing parameters', 2015, 500, reply);
     }
   }
+
+  async cleanRegistryHosts(req, reply)  {
+    try {
+      const registryKeys = req.payload.map(r => r.id.toString());
+      const hosts = await this.configurationFile.getHosts();
+      const hostsKeys = hosts.map(h => Object.keys(h)[0]);
+      const diff = registryKeys.filter(r => !hostsKeys.includes(r));
+      await this.wazuhRegistry.cleanRegistryHosts(diff);
+      return true;
+    } catch (error) {
+      log('wazuh-api:cleanRegistryHosts', error.message || error);
+      return ErrorResponse('Missing parameters', 2016, 500, reply);
+    }
+  }
 }

@@ -12,7 +12,6 @@
 import fs from 'fs';
 import path from 'path';
 import { log } from '../logger';
-import { ErrorResponse } from '../controllers/error-response';
 
 export class UpdateRegistry {
   constructor() {
@@ -147,7 +146,7 @@ export class UpdateRegistry {
   }
 
   /**
-   * 
+   * Delete a host
    * @param {Object} req 
    */
   async deleteHost(req) {
@@ -168,6 +167,24 @@ export class UpdateRegistry {
   }
 
   /**
+   * Deletes several hosts
+   * @param {Array} keys 
+   */
+  async deleteSeveralHosts(keys) {
+    try {
+      log('update-registry:deleteSeveralHosts', 'Deleting several registry hosts.', 'debug'); 
+      const content = await this.readContent();
+      const hosts = content.hosts || [];
+      const hostsUpdated = hosts.filter(h => !keys.includes(h.id.toString()));
+      content.hosts = hostsUpdated;
+      await this.writeContent(content);
+    } catch (error) {
+      log('update-registry:deleteSeveralHosts', error.message || error);
+      return Promise.reject(error);
+    }
+  }
+
+  /**
    * Returns the cluster information associated to an API id
    * @param {String} id 
    */
@@ -178,8 +195,24 @@ export class UpdateRegistry {
       const info = hosts.filter(h => {
         return h.id == id;
       });
+      return info[0];
     } catch (error) {
       log('update-registry:getClusterInfoByAPI', error.message || error);
+      return Promise.reject(error);
+    }
+  }
+
+  /**
+   * Cleans the registry of the APIs ids given
+   * @param {Array} keys 
+   */
+  async cleanRegistryHosts(keys) {
+    try {
+      log('update-registry:cleanRegistryHosts', 'Cleaning registry hosts.', 'debug'); 
+      await this.deleteSeveralHosts(keys);
+      return 'Cleaning the registry hosts successfully';
+    } catch (error) {
+      log('update-registry:cleanRegistryHosts', error.message || error);
       return Promise.reject(error);
     }
   }

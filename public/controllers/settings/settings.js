@@ -107,28 +107,33 @@ export class SettingsController {
    */
   $onInit() {
     // Loading data
-    this.getSettings().then(() => {
-      const restApiTableProps = {
-        currentDefault: this.currentDefault,
-        compressed: true,
-        setDefault: entry => this.setDefault(entry),
-        checkManager: (entry, isIndex = false, silent = false) => this.checkManager(entry, isIndex, silent),
-        removeManager: entry => this.removeManager(entry),
-        getApisInRegistry: () => this.getApisInRegistry(),
-        getSelectedApiIndex: item => this.getSelectedApiIndex(item),
-        digest: () => this.$scope.$applyAsync(),
-        handleError: error => this.errorHandler.handle(error),
-        setHostRegistryInfo: id => this.setHostRegistryInfo(id),
-        updateSettings: (entry, useItem = false) =>
-          this.updateSettings(entry, useItem),
-        switch: () => this.switch()
-      };
-      this.apiTableProps = Object.assign(this.apiTableProps, restApiTableProps);
-      this.addApiProps = {
-        saveSettings: entry => this.saveSettings(entry)
-      };
-      return this.getAppInfo();
-    });
+    this.cleanRegistryHosts().then(() => {
+      this.getSettings().then(() => {
+        const restApiTableProps = {
+          currentDefault: this.currentDefault,
+          compressed: true,
+          setDefault: entry => this.setDefault(entry),
+          checkManager: (entry, isIndex = false, silent = false) => this.checkManager(entry, isIndex, silent),
+          removeManager: entry => this.removeManager(entry),
+          getApisInRegistry: () => this.getApisInRegistry(),
+          getSelectedApiIndex: item => this.getSelectedApiIndex(item),
+          digest: () => this.$scope.$applyAsync(),
+          handleError: error => this.errorHandler.handle(error),
+          setHostRegistryInfo: id => this.setHostRegistryInfo(id),
+          updateSettings: (entry, useItem = false) =>
+            this.updateSettings(entry, useItem),
+          switch: () => this.switch()
+        };
+        this.apiTableProps = Object.assign(this.apiTableProps, restApiTableProps);
+        this.addApiProps = {
+          saveSettings: entry => this.saveSettings(entry)
+        };
+        return this.getAppInfo();
+      });
+    })
+    .catch(error => {
+      this.errorHandler.handle(error);
+    })
   }
 
   /**
@@ -270,11 +275,11 @@ export class SettingsController {
     try {
       const keys = apis.map(api => { return Object.keys(api)[0] });
       const cleanKeys = [...new Set(keys)];
-      if (keys.length !== cleanKeys.length){
+      if (keys.length !== cleanKeys.length) {
         this.duplicatedApisKeys = true;
         this.errMsg = 'Please check the config.yml file, there were found duplicated APIs keys.'
       }
-      return 
+      return
     } catch (error) {
       console.error('Error checking duplicated APIs keys');
       throw error;
@@ -844,10 +849,10 @@ export class SettingsController {
    * Saves the cluster info of the API in the registry
    * @param {Object} newEntry 
    */
-  async saveApiInRegistry(newEntry){
+  async saveApiInRegistry(newEntry) {
     try {
       const id = newEntry._id || newEntry.id;
-      const host = Object.assign({id: id}, newEntry.cluster_info);
+      const host = Object.assign({ id: id }, newEntry.cluster_info);
       return await this.genericReq.request(
         'POST',
         '/api/registry/add',
@@ -868,8 +873,21 @@ export class SettingsController {
       if (!host.data || !host.data[id]) throw new Error(`Cannot update API ${id} registry`);
       const info = await this.testAPI.check(host.data[id]);
       const clusterInfo = info.data || {};
-      const api = Object.assign({id: id}, {cluster_info: clusterInfo});
+      const api = Object.assign({ id: id }, { cluster_info: clusterInfo });
       return await this.saveApiInRegistry(api);
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  }
+
+  /**
+   * Clean the wazuh-registry.json hosts in order to prevent information whithout it corresponding API entry.
+   */
+  async cleanRegistryHosts() {
+    try {
+      const data = await this.genericReq.request('GET', '/apis/registry');
+      const registryHosts = data.data || [];
+      await this.genericReq.request('POST', '/apis/registry/clean', registryHosts);
     } catch (error) {
       return Promise.reject(error);
     }
