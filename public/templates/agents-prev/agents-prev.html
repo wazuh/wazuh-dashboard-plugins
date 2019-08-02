@@ -30,7 +30,7 @@
             </span>
             <md-divider class="wz-margin-top-10"></md-divider>
             <canvas id="bar" ng-if="ctrl.lastAgent && ctrl.lastAgent.id" class="wz-margin-top-16 chart chart-doughnut"
-                chart-data="[ctrl.agentsCountActive,ctrl.agentsCountDisconnected,ctrl.agentsCountNeverConnected]"
+                chart-data="[ctrl.summary.agentsCountActive,ctrl.summary.agentsCountDisconnected,ctrl.summary.agentsCountNeverConnected]"
                 chart-labels="['Active','Disconnected', 'Never connected']" chart-colors="['#57C17B', '#BC52BC', '#9E3533']"
                 chart-options="{cutoutPercentage: 75, legend: {display: true,position: 'right',},responsive: false, maintainAspectRatio: false}" />
             <div layout="row" class="wz-margin-top-16 layout-align-center-center" ng-if="!ctrl.lastAgent || !ctrl.lastAgent.id">
@@ -54,7 +54,7 @@
                         <div class="euiText euiText--small euiStat__description">
                             <p>Active</p>
                         </div>
-                        <p class="euiTitle euiTitle--small euiStat__title">{{ctrl.agentsCountActive}}</p>
+                        <p class="euiTitle euiTitle--small euiStat__title">{{ctrl.summary.agentsCountActive}}</p>
                     </div>
                 </div>
                 <div class="euiFlexItem euiFlexItem--flexGrowZero">
@@ -63,7 +63,7 @@
                         <div class="euiText euiText--small euiStat__description">
                             <p>Disconnected</p>
                         </div>
-                        <p class="euiTitle euiTitle--small euiStat__title">{{ctrl.agentsCountDisconnected}}</p>
+                        <p class="euiTitle euiTitle--small euiStat__title">{{ctrl.summary.agentsCountDisconnected}}</p>
                     </div>
                 </div>
                 <div class="euiFlexItem euiFlexItem--flexGrowZero">
@@ -72,7 +72,7 @@
                         <div class="euiText euiText--small euiStat__description">
                             <p>Never connected</p>
                         </div>
-                        <p class="euiTitle euiTitle--small euiStat__title">{{ctrl.agentsCountNeverConnected}}</p>
+                        <p class="euiTitle euiTitle--small euiStat__title">{{ctrl.summary.agentsCountNeverConnected}}</p>
                     </div>
                 </div>
                 <div class="euiFlexItem euiFlexItem--flexGrowZero">
@@ -81,7 +81,7 @@
                         <div class="euiText euiText--small euiStat__description">
                             <p>Agents coverage</p>
                         </div>
-                        <p class="euiTitle euiTitle--small euiStat__title">{{(ctrl.agentsCoverity | number:2)}}%</p>
+                        <p class="euiTitle euiTitle--small euiStat__title">{{(ctrl.summary.agentsCoverity | number:2)}}%</p>
                     </div>
                 </div>
             </div>
