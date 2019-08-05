@@ -77,6 +77,7 @@ export class AgentsPreviewController {
       name: '',
       id: ''
     };
+    this.prevSearch = false;
 
     // Load URL params
     if (loc && loc.tab) {
@@ -106,6 +107,7 @@ export class AgentsPreviewController {
    */
   query(query, search) {
     this.$scope.$broadcast('wazuhQuery', { query, search });
+    this.prevSearch = search || false;
   }
 
   /**
@@ -233,7 +235,7 @@ export class AgentsPreviewController {
   }
 
   reloadList() {
-    this.$scope.$broadcast('wazuhSearch', { term: '' });
+    this.$scope.$broadcast('wazuhSearch', { term: this.prevSearch || '' });
   }
 
   openRegistrationDocs() {
