@@ -2,7 +2,7 @@
 
 All notable changes to the Wazuh app project will be documented in this file.
 
-## Wazuh v3.9.4 - Kibana v6.8.1 Revision 451
+## Wazuh v3.9.4 - Kibana v6.8.1 / Kibana v6.8.2 / Kibana v7.2.0 / Kibana v7.3.0 Revision 453
 
 ### Added
 
@@ -22,6 +22,11 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Improved wz-table performance [262d7f7](https://github.com/wazuh/wazuh-kibana-app/commit/262d7f7a145a18902a6c5d55dab96c07ac66d9bb).
 - Timezone applied in cluster status [9a3a582](https://github.com/wazuh/wazuh-kibana-app/commit/9a3a5827365308fb8fb54cd47eb1d8d0ad76b3b5).
 - Fixed Overview Security Events report when wazuh.monitoring is disabled [78d6693](https://github.com/wazuh/wazuh-kibana-app/commit/78d669378dd342a9ae735eb9c0fde9b31cc69ac8).
+- Windows agent dashboard doesn't show failure logon access. [d38d088](https://github.com/wazuh/wazuh-kibana-app/commit/d38d0881ac8e4294accde83d63108337b74cdd91) 
+- Number of agents is not properly updated.  [f7cbbe5](https://github.com/wazuh/wazuh-kibana-app/commit/f7cbbe54394db825827715c3ad4370ac74317108) 
+- Missing scrollbar on Firefox file viewer.  [df4e8f9](https://github.com/wazuh/wazuh-kibana-app/commit/df4e8f9305b35e9ee1473bed5f5d452dd3420567) 
+- Agent search filter by name, lost when refreshing. [71b5274](https://github.com/wazuh/wazuh-kibana-app/commit/71b5274ccc332d8961a158587152f7badab28a95) 
+- Alerts of level 12 cannot be displayed in the table. [ec0e888](https://github.com/wazuh/wazuh-kibana-app/commit/ec0e8885d9f1306523afbc87de01a31f24e36309) 
 
 ## Wazuh v3.9.3 - Kibana v6.8.1 Revision 450
 
