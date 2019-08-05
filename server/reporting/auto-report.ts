@@ -1,12 +1,14 @@
 import Chrome from 'selenium-webdriver/chrome';
-import {WebDriver, Builder, By, until} from 'selenium-webdriver';
+import {WebDriver, Builder, By, until, Key, WebElement, Origin} from 'selenium-webdriver';
 
 interface Report {
   uri: string,
   tab: string,
   filters: string,
-  tFrom: string,
-  tTo: string
+  tlapse: string
+  // TODO: Generate report from custom time input
+  // tFrom: string,
+  // tTo: string
 }
 
 interface AgentReport extends Report {
@@ -19,9 +21,23 @@ class AutoReport {
   tab: string;
   tabs: {};
   filters: string;
-  tFrom: string;
-  tTo: string;
+  tlapse: string;
+  // tFrom: string;
+  // tTo: string;
   driver!: WebDriver;
+
+  dateSelectors = {
+    today: '[data-test-subj="superDatePickerCommonlyUsed_Today"]',
+    week: '[data-test-subj="superDatePickerCommonlyUsed_This_week"]',
+    min15: '[data-test-subj="superDatePickerCommonlyUsed_Last_15 minutes"]',
+    min30: '[data-test-subj="superDatePickerCommonlyUsed_Last_30 minutes"]',
+    hours1: '[data-test-subj="superDatePickerCommonlyUsed_Last_1 hour"]',
+    hours24: '[data-test-subj="superDatePickerCommonlyUsed_Last_24 hours"]',
+    days7: '[data-test-subj="superDatePickerCommonlyUsed_Last_7 days"]',
+    days30: '[data-test-subj="superDatePickerCommonlyUsed_Last_30 days"]', 
+    days90: '[data-test-subj="superDatePickerCommonlyUsed_Last_90 days"]',
+    year: '[data-test-subj="superDatePickerCommonlyUsed_Last_1 year"]', 
+  }
 
   constructor(report: Report) {
     this.screen = { width: 1920, height: 1080 };
@@ -29,8 +45,9 @@ class AutoReport {
     this.tab = report.tab; 
     this.tabs = {};
     this.filters = report.filters;
-    this.tFrom = report.tFrom;
-    this.tTo = report.tTo;
+    this.tlapse = this.selectDate(report.tlapse);
+    // this.tFrom = report.tFrom;
+    // this.tTo = report.tTo;
   }
 
   /**
@@ -38,12 +55,30 @@ class AutoReport {
    *
    * @returns {boolean}
    */
-  availabeTab() {
+  availableTab() {
     if(this.tab in this.tabs) {
       return true;
     }
     throw new Error(
       `The tab don't exists for the current context`
+    );
+  }
+
+  /**
+   * Return the selector of the time lapse or undefined 
+   *
+   * @param {string} tlapse
+   * @returns
+   */
+  selectDate(tlapse: string) {
+    if (tlapse == undefined) {
+      return undefined;
+    }
+    if (tlapse in this.dateSelectors) {
+      return this.dateSelectors[tlapse];
+    }
+    throw new Error(
+      `The time lapse don't exists`
     );
   }
 
@@ -73,7 +108,6 @@ class AutoReport {
    * Create and return a webdriver 
    *
    * @returns {WebDriver}
-   * @memberof AutoReport
    */
   async createDriver() {
     return await new Builder()
@@ -85,7 +119,6 @@ class AutoReport {
   /**
    * Press the 'generate report' button
    *
-   * @memberof AutoReport
    */
   async generateReport() {
     const selector = '[data-test-subj="overviewGenerateReport"]';
@@ -98,7 +131,6 @@ class AutoReport {
   /**
    * Open Wazuh app in the web browser
    *
-   * @memberof AutoReport
    */
   async openWazuh(){
     this.driver.get(this.url);
@@ -128,7 +160,6 @@ class AutoReport {
   /**
    * Open the selected tab in the web browser
    *
-   * @memberof AutoReport
    */
   async setTab() {
     const selector = this.tabs[this.tab];
@@ -136,6 +167,20 @@ class AutoReport {
       selector,
       `The tab is disabled or don't exists for the current context`
     );
+  }
+
+/**
+ * Select in the web browser the time lapse.
+ *
+ * @memberof AutoReport
+ */
+async setTime() {
+    if (this.tlapse != undefined){
+      const datePickerSelector = '[data-test-subj="superDatePickerToggleQuickMenuButton"]';
+      await this.driver.sleep(3000);
+      await this.clickButton(datePickerSelector, 'Date picker button not found');
+      await this.clickButton(this.tlapse, 'The time lapse filter not found');
+    }
   }
 
 }
@@ -160,7 +205,7 @@ export class OverviewAutoReport extends AutoReport {
       pci: '[data-test-subj="overviewWelcomePci"]',
       gdpr: '[data-test-subj="overviewWelcomeGdpr"]',
     }
-    this.availabeTab();
+    this.availableTab();
   }
 
   public async run(screenshot: (name: string, driver: WebDriver) => any) {
@@ -169,9 +214,9 @@ export class OverviewAutoReport extends AutoReport {
       await this.openWazuh();
       await this.setController('overview');
       await this.setTab();
+      await this.setTime();
       await this.generateReport();
       await this.driver.sleep(30000);
-      await screenshot('test-'+Date.now(), this.driver);
       await this.driver.quit();
       return 'Reporting success.\n';
     } catch (err) {

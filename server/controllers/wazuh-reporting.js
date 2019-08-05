@@ -1408,8 +1408,9 @@ export class WazuhReportingCtrl {
         uri: (((req || {}).server || {}).info || {}).uri,
         tab: payload.tab,
         filters: (payload || {}).filters,
-        tFrom: (payload || {}).tFrom,
-        tTo: (payload || {}).tTo,
+        tlapse: (payload || {}).tlapse,
+        // tFrom: (payload || {}).tFrom,
+        // tTo: (payload || {}).tTo,
       }
       
       const driver = new OverviewAutoReport(args);
