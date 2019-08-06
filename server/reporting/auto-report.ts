@@ -157,10 +157,13 @@ class AutoReport {
     );
   }
 
-
+  /**
+   * Set the KQL query in the filter bar
+   *
+   */
   async setFilters() {
     if (this.filters != undefined) {
-      await this.driver.sleep(3000);
+      await this.waitLoad();
       const selector = '[data-test-subj="queryInput"]';
       const filterBar = await this.driver.wait(until.elementLocated(By.css(selector)), 10000);
       await filterBar.sendKeys(this.filters);
@@ -190,10 +193,24 @@ class AutoReport {
    */
   async setTime() {
     if (this.tlapse != undefined){
+      await this.waitLoad();
       const datePickerSelector = '[data-test-subj="superDatePickerToggleQuickMenuButton"]';
-      await this.driver.sleep(3000);
       await this.clickButton(datePickerSelector, 'Date picker button not found');
       await this.clickButton(this.tlapse, 'The time lapse filter not found');
+    }
+  }
+
+  /**
+   * Check the status of the Kibana load indicator 
+   *
+   */
+  async waitLoad() {
+    try {
+      await this.driver.wait(until.elementLocated(By.css('[data-test-subj="globalLoadingIndicator-hidden"]')), 10000);
+    } catch (error) {
+      throw new Error(
+        `The view did not load correctly`
+      )
     }
   }
 
