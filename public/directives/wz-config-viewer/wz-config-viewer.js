@@ -79,10 +79,13 @@ class WzConfigViewer {
         const windows = $(window).height();
         const offsetTop = getPosition(editorContainer[0]).y;
         const bottom = $scope.isLogs ? 75 : 20;
-        const headerContainer = $('.wzXmlEditorHeader')
-        const headerContainerHeight = headerContainer.height() + 30 ? headerContainer.height() + 30 : 80;
+        const headerContainer = $('.wzXmlEditorHeader');
+        const headerContainerHeight =
+          headerContainer.height() + 30 ? headerContainer.height() + 30 : 80;
         editorContainer.height(windows - (offsetTop + bottom));
-        $('.wzXmlEditorBody .CodeMirror').height(windows - (offsetTop + bottom + headerContainerHeight));
+        $('.wzXmlEditorBody .CodeMirror').height(
+          windows - (offsetTop + bottom + headerContainerHeight)
+        );
       }, 1);
     };
 

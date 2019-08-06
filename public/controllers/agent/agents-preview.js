@@ -236,7 +236,11 @@ export class AgentsPreviewController {
 
   async refreshAgentsStats() {
     try {
-      const data = await this.genericReq.request('GET', '/api/agents-unique/' + this.api, {});
+      const data = await this.genericReq.request(
+        'GET',
+        '/api/agents-unique/' + this.api,
+        {}
+      );
       this.summary = ((data.data || {}).result || {}).summary || {};
     } catch (error) {
       this.errorHandler.handle('Error refreshing agents stats');
