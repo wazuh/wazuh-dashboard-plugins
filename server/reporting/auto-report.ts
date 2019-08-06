@@ -167,7 +167,7 @@ class AutoReport {
     const selector = ctrls[type];
     await this.clickButton(
       selector,
-      `Unexpected error when load the controlle`,
+      `Unexpected error when load the controller`,
       true
     );
   }
