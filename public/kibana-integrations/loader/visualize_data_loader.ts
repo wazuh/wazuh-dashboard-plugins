@@ -19,6 +19,8 @@
 // @ts-ignore
 import { isEqual } from 'lodash';
 // @ts-ignore
+import { getVisParams } from 'ui/visualize/loader/pipeline_helpers/build_pipeline';
+// @ts-ignore
 import { VisRequestHandlersRegistryProvider as RequestHandlersProvider } from 'ui/registry/vis_request_handlers';
 // @ts-ignore
 import { VisResponseHandlersRegistryProvider as ResponseHandlerProvider } from 'ui/registry/vis_response_handlers';
@@ -36,9 +38,6 @@ import {
 } from 'ui/vis';
 
 import { VisResponseData } from './types';
-// @ts-ignore
-import { getVisParams } from 'ui/visualize/loader/pipeline_helpers/build_pipeline';
-
 
 function getHandler<T extends RequestHandler | ResponseHandler>(
   from: Array<{ name: string; handler: T }>,
@@ -53,7 +52,6 @@ function getHandler<T extends RequestHandler | ResponseHandler>(
   }
   return handlerDesc.handler;
 }
-
 
 export class VisualizeDataLoader {
   private requestHandler: RequestHandler;
