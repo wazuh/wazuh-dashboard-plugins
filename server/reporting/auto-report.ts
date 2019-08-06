@@ -117,6 +117,21 @@ class AutoReport {
   }
 
   /**
+   * Throw a error if the dashboard are no results
+   *
+   */
+  async hasResult() {
+    const elementStatusLoad = await this.driver.wait(until.elementLocated(By.css('[data-test-subj="reportStatusLoad"]')), 10000);
+    await this.driver.wait(until.elementIsNotVisible(elementStatusLoad), 60000);
+    const elementStatusNone = await this.driver.wait(until.elementLocated(By.css('[data-test-subj="reportStatusNone"]')), 10000);
+    if (await elementStatusNone.isDisplayed()){
+      throw new Error(
+        'There are no results for selected time range or filters. Try another one.'
+      );
+    }
+  }
+
+  /**
    * Press the 'generate report' button
    *
    */
@@ -171,6 +186,7 @@ class AutoReport {
         '[data-test-subj="querySubmitButton"]',
         'Query submit button not found'
       )
+      await this.hasResult();
     }
   }
 
@@ -197,6 +213,7 @@ class AutoReport {
       const datePickerSelector = '[data-test-subj="superDatePickerToggleQuickMenuButton"]';
       await this.clickButton(datePickerSelector, 'Date picker button not found');
       await this.clickButton(this.tlapse, 'The time lapse filter not found');
+      await this.hasResult();
     }
   }
 
