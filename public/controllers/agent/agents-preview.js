@@ -58,6 +58,7 @@ export class AgentsPreviewController {
    */
   $onInit() {
     this.init = true;
+    this.api =  JSON.parse(this.appState.getCurrentAPI()).id;
     const loc = this.$location.search();
     if ((loc || {}).agent && (loc || {}).agent !== '000') {
       this.commonData.setTimefilter(timefilter.getTime());
@@ -77,6 +78,7 @@ export class AgentsPreviewController {
       name: '',
       id: ''
     };
+    this.prevSearch = false;
 
     // Load URL params
     if (loc && loc.tab) {
@@ -106,6 +108,7 @@ export class AgentsPreviewController {
    */
   query(query, search) {
     this.$scope.$broadcast('wazuhQuery', { query, search });
+    this.prevSearch = search || false;
   }
 
   /**
@@ -126,10 +129,9 @@ export class AgentsPreviewController {
         'Your download should begin automatically...',
         'CSV'
       );
-      const currentApi = JSON.parse(this.appState.getCurrentAPI()).id;
       const output = await this.csvReq.fetch(
         '/agents',
-        currentApi,
+        this.api,
         this.wzTableFilter.get()
       );
       const blob = new Blob([output], { type: 'text/csv' }); // eslint-disable-line
@@ -153,7 +155,6 @@ export class AgentsPreviewController {
       const configuration = this.wazuhConfig.getConfig();
       this.$scope.adminMode = !!(configuration || {}).admin;
 
-      const api = JSON.parse(this.appState.getCurrentAPI()).id;
       const clusterInfo = this.appState.getClusterInfo();
       const firstUrlParam =
         clusterInfo.status === 'enabled' ? 'cluster' : 'manager';
@@ -162,7 +163,7 @@ export class AgentsPreviewController {
       const pattern = this.appState.getCurrentPattern();
 
       const data = await Promise.all([
-        this.genericReq.request('GET', '/api/agents-unique/' + api, {}),
+        this.genericReq.request('GET', '/api/agents-unique/' + this.api, {}),
         this.genericReq.request(
           'GET',
           `/elastic/top/${firstUrlParam}/${secondUrlParam}/agent.name/${pattern}`
@@ -199,11 +200,7 @@ export class AgentsPreviewController {
       this.versions = unique.versions.map(item => ({ id: item }));
       this.osPlatforms = unique.osPlatforms;
       this.lastAgent = unique.lastAgent;
-      this.agentsCountActive = unique.summary.agentsCountActive;
-      this.agentsCountDisconnected = unique.summary.agentsCountDisconnected;
-      this.agentsCountNeverConnected = unique.summary.agentsCountNeverConnected;
-      this.agentsCountTotal = unique.summary.agentsCountTotal;
-      this.agentsCoverity = unique.summary.agentsCoverity;
+      this.summary = unique.summary;
 
       if (agentsTop.data.data === '') {
         this.mostActiveAgent.name = this.appState.getClusterInfo().manager;
@@ -232,8 +229,18 @@ export class AgentsPreviewController {
     this.$scope.registerNewAgent = flag;
   }
 
-  reloadList() {
-    this.$scope.$broadcast('wazuhSearch', { term: '' });
+  async reloadList() {
+    this.refreshAgentsStats();    
+    this.$scope.$broadcast('wazuhSearch', { term: this.prevSearch || '' });
+  }
+
+  async refreshAgentsStats() {
+    try {
+      const data = await this.genericReq.request('GET', '/api/agents-unique/' + this.api, {});
+      this.summary  = ((data.data || {}).result || {}).summary || {};
+    } catch (error) {
+      this.errorHandler.handle('Error refreshing agents stats');
+    }
   }
 
   openRegistrationDocs() {
