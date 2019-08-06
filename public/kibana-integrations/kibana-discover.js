@@ -528,7 +528,7 @@ function discoverController(
       });
 
       $scope.$watch('state.query', newQuery => {
-        const query = migrateLegacyQuery(newQuery);
+        const query = migrateLegacyQuery(newQuery || '');
         $scope.updateQueryAndFetch({ query });
       });
 
@@ -648,15 +648,9 @@ function discoverController(
   $scope.updateQueryAndFetch = function ({ query, dateRange }) {
     // Wazuh filters are not ready yet
     if (!filtersAreReady()) return;
-
-    // Update Wazuh filters
-    discoverPendingUpdates.removeAll();
-    discoverPendingUpdates.addItem($state.query, queryFilter.getFilters());
     $rootScope.$broadcast('updateVis');
-    $rootScope.$broadcast('fetch');
-    ////////////////////////////////////////////////////////////////////////////
     timefilter.setTime(dateRange);
-    $state.query = query;
+    if (query) $state.query = query;
     $scope.fetch();
   };
 
@@ -978,7 +972,7 @@ function discoverController(
   ////////////////////////////////////////////////////// WAZUH //////////////////////////////////////////////////////////
   ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-  const loadFilters = (wzCurrentFilters, localChange) => {
+  const loadFilters = async (wzCurrentFilters, localChange) => {
     const appState = getAppState();
     if (!appState || !globalState) {
       $timeout(100).then(() => {
@@ -986,7 +980,9 @@ function discoverController(
       });
     } else {
       $state.filters = localChange ? $state.filters : [];
-
+      if (($scope.pinnedFilters || []).length) {
+        await queryFilter.addFilters($scope.pinnedFilters);
+      }
       const currentFilters = queryFilter.getFilters();
       const pinnedAgentIDs = currentFilters.filter(
         item =>
@@ -1014,10 +1010,23 @@ function discoverController(
     }
   };
 
+  const getPinnedFilters = () => {
+    const currentFilters = queryFilter.getFilters();
+    if (currentFilters) {
+      return currentFilters.filter(
+        item =>
+          ((item || {}).$state || {}).store === 'globalState'
+      );
+    }
+  }
+
   const wzEventFiltersListener = $rootScope.$on(
     'wzEventFilters',
     (evt, parameters) => {
       if (!parameters.localChange) {
+        if (!($scope.pinnedFilters || []).length) {
+          $scope.pinnedFilters = getPinnedFilters();
+        }
         queryFilter.removeAll();
       }
       loadFilters(parameters.filters, parameters.localChange);
@@ -1028,9 +1037,10 @@ function discoverController(
   const changeTabViewListener = $rootScope.$on(
     'changeTabView',
     (evt, parameters) => {
+      $scope.pinnedFilters = getPinnedFilters();
+      queryFilter.removeAll();
       evt.stopPropagation();
       $scope.tabView = parameters.tabView || 'panels';
-      $scope.updateQueryAndFetch($state.query);
     }
   );
 
