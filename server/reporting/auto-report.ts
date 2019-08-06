@@ -157,6 +157,20 @@ class AutoReport {
     );
   }
 
+
+  async setFilters() {
+    if (this.filters != undefined) {
+      await this.driver.sleep(3000);
+      const selector = '[data-test-subj="queryInput"]';
+      const filterBar = await this.driver.wait(until.elementLocated(By.css(selector)), 10000);
+      await filterBar.sendKeys(this.filters);
+      await this.clickButton(
+        '[data-test-subj="querySubmitButton"]',
+        'Query submit button not found'
+      )
+    }
+  }
+
   /**
    * Open the selected tab in the web browser
    *
@@ -169,12 +183,12 @@ class AutoReport {
     );
   }
 
-/**
- * Select in the web browser the time lapse.
- *
- * @memberof AutoReport
- */
-async setTime() {
+  /**
+   * Select in the web browser the time lapse.
+   *
+   * @memberof AutoReport
+   */
+  async setTime() {
     if (this.tlapse != undefined){
       const datePickerSelector = '[data-test-subj="superDatePickerToggleQuickMenuButton"]';
       await this.driver.sleep(3000);
@@ -215,6 +229,7 @@ export class OverviewAutoReport extends AutoReport {
       await this.setController('overview');
       await this.setTab();
       await this.setTime();
+      await this.setFilters();
       await this.generateReport();
       await this.driver.sleep(30000);
       await this.driver.quit();
