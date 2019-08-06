@@ -1035,9 +1035,11 @@ function discoverController(
   $scope.tabView = $location.search().tabView || 'panels';
   const changeTabViewListener = $rootScope.$on(
     'changeTabView',
-    (evt, parameters) => {
+    async (evt, parameters) => {
       $scope.pinnedFilters = getPinnedFilters();
-      queryFilter.removeAll();
+      if (parameters.tabView !== 'discover') {
+        queryFilter.removeAll();
+      }
       evt.stopPropagation();
       $scope.tabView = parameters.tabView || 'panels';
     }
