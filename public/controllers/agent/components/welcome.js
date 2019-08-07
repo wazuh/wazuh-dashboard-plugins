@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
+import { StringsTools } from '../../../utils/strings-tools';
 import {
   EuiCard,
   EuiIcon,
@@ -19,6 +20,7 @@ import { TabDescription } from '../../../../server/reporting/tab-description';
 export class WelcomeScreen extends Component {
   constructor(props) {
     super(props);
+    this.strtools = new StringsTools();
 
     this.state = {
       extensions: this.props.extensions
@@ -58,6 +60,7 @@ export class WelcomeScreen extends Component {
           title={TabDescription[tab].title}
           onClick={() => this.props.switchTab(tab)}
           description={TabDescription[tab].description}
+          data-test-subj={`agentsWelcome${this.strtools.capitalize(tab)}`}          
         />
       </EuiFlexItem>
     );

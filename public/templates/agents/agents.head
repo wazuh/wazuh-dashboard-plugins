@@ -49,7 +49,7 @@
         <!-- End breadcrumbs -->
 
         <!-- Agent status section -->
-        <div ng-if="agent.status">
+        <div ng-if="agent.status" data-test-subj="agentStatus">
             <react-component name="EuiHealth"
                 props="{color: agent.status === 'Active' ? 'success' : 'danger', children: agent.status}" />
         </div>
@@ -65,7 +65,7 @@
                 tooltip-placement="bottom"
                 ng-class="{'euiButtonEmpty--disabled': (!rendered || loading || resultState !== 'ready' || showSyscheckFiles || showScaScan) && tab !== 'syscollector'}"
                 ng-disabled="(!rendered || loading || resultState !== 'ready' || showSyscheckFiles || showScaScan) && tab !== 'syscollector'"
-                ng-click="startVis2Png()" aria-label="Generate report button">
+                ng-click="startVis2Png()" aria-label="Generate report button" data-test-subj="generateReport">
                 <i class="fa fa-fw fa-print" aria-hidden="true"></i>
             </button>
         </div>
@@ -82,7 +82,7 @@
             <!-- Discover button -->
             <button ng-if="tabView === 'panels' && !showSyscheckFiles && !showScaScan"
                 class="kuiButton kuiButton--secondary small wz-margin-right-8" ng-click="switchSubtab('discover')"
-                aria-label="Discover button">
+                aria-label="Discover button" data-test-subj="discoverButton">
                 <i class="fa fa-fw fa-compass" aria-hidden="true"></i> Discover
             </button>
         </div>
@@ -153,7 +153,8 @@
     <!-- Loading status section -->
     <div layout="column" layout-align="center center"
         ng-if="tab !== 'welcome' && tab !== 'sca' && tab !== 'configuration' && tab !== 'syscollector'"
-        ng-show="resultState === 'ready' && tabView === 'panels' && !rendered">
+        ng-show="resultState === 'ready' && tabView === 'panels' && !rendered"
+        data-test-subj="reportStatusLoad">
         <div class="percentage"><i class="fa fa-fw fa-spin fa-spinner" aria-hidden="true"></i></div>
         <div class="percentage">{{loadingStatus}}</div>
     </div>
@@ -182,7 +183,7 @@
 
     <div layout="row" class="wz-margin-top-10 wz-margin-right-8 wz-margin-left-8"
         ng-if="!showSyscheckFiles && !showScaScan && tab !== 'welcome' && tab !== 'configuration' && tab !== 'syscollector' && tab !== 'sca'"
-        ng-show="resultState === 'none' && tabView === 'panels'">
+        ng-show="resultState === 'none' && tabView === 'panels'" data-test-subj="reportStatusNone">
         <div flex class="euiCallOut euiCallOut--warning">
             <div class="euiCallOutHeader">
                 <react-component name="EuiIcon" props="{type:'help',className:'euiCallOutHeader__title'}" />
