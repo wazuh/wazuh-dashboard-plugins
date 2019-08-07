@@ -14,6 +14,8 @@
 import needle from 'needle';
 import { pciRequirementsFile } from '../integration-files/pci-requirements';
 import { gdprRequirementsFile } from '../integration-files/gdpr-requirements';
+import { hipaaRequirementsFile } from '../integration-files/hipaa-requirements';
+import { nistRequirementsFile } from '../integration-files/nist-requirements';
 import { ElasticWrapper } from '../lib/elastic-wrapper';
 import { getPath } from '../../util/get-path';
 import { Monitoring } from '../monitoring';
@@ -28,6 +30,8 @@ import { apiRequestList } from '../../util/api-request-list';
 import * as ApiHelper from '../lib/api-helper';
 import { Queue } from '../jobs/queue';
 import querystring from 'querystring';
+import fs from 'fs';
+import path from 'path';
 export class WazuhApiCtrl {
   /**
    * Constructor
@@ -37,6 +41,7 @@ export class WazuhApiCtrl {
     this.queue = Queue;
     this.wzWrapper = new ElasticWrapper(server);
     this.monitoringInstance = new Monitoring(server, true);
+    this.wazuhVersion = path.join(__dirname, '../wazuh-version.json');
   }
 
   /**
@@ -538,6 +543,170 @@ export class WazuhApiCtrl {
       );
 
     return isDown;
+  }
+
+  /**
+   * This get PCI requirements
+   * @param {Object} req
+   * @param {Object} reply
+   * @returns {Array<Object>} requirements or ErrorResponse
+   */
+  async getHipaaRequirement(req, reply) {
+    try {
+      let hipaa_description = '';
+
+      if (req.params.requirement === 'all') {
+        if (!req.headers.id) {
+          return hipaaRequirementsFile;
+        }
+        let api = await this.wzWrapper.getWazuhConfigurationById(
+          req.headers.id
+        );
+
+        if (api.error_code > 1) {
+          log(
+            'wazuh-api:getHipaaRequirement',
+            'Elasticsearch unexpected error or cannot connect'
+          );
+          // Can not connect to elasticsearch
+          return ErrorResponse(
+            'Elasticsearch unexpected error or cannot connect',
+            3007,
+            400,
+            reply
+          );
+        } else if (api.error_code > 0) {
+          log('wazuh-api:getHipaaRequirement', 'Credentials do not exist');
+          // Credentials not found
+          return ErrorResponse('Credentials do not exist', 3008, 400, reply);
+        }
+
+        const response = await needle(
+          'get',
+          `${api.url}:${api.port}/rules/hipaa`,
+          {},
+          ApiHelper.buildOptionsObject(api)
+        );
+
+        if ((((response || {}).body || {}).data || {}).items) {
+          let HIPAAobject = {};
+          for (const item of response.body.data.items) {
+            if (typeof hipaaRequirementsFile[item] !== 'undefined')
+              HIPAAobject[item] = hipaaRequirementsFile[item];
+          }
+          return HIPAAobject;
+        } else {
+          log(
+            'wazuh-api:getPciRequirement',
+            'An error occurred trying to parse HIPAA requirements'
+          );
+          return ErrorResponse(
+            'An error occurred trying to parse HIPAA requirements',
+            3009,
+            400,
+            reply
+          );
+        }
+      } else {
+        if (
+          typeof hipaaRequirementsFile[req.params.requirement] !== 'undefined'
+        ) {
+          hipaa_description = hipaaRequirementsFile[req.params.requirement];
+        }
+
+        return {
+          hipaa: {
+            requirement: req.params.requirement,
+            description: hipaa_description
+          }
+        };
+      }
+    } catch (error) {
+      log('wazuh-api:getPciRequirement', error.message || error);
+      return ErrorResponse(error.message || error, 3010, 400, reply);
+    }
+  }
+
+  /**
+   * This get NIST 800-53 requirements
+   * @param {Object} req
+   * @param {Object} reply
+   * @returns {Array<Object>} requirements or ErrorResponse
+   */
+  async getNistRequirement(req, reply) {
+    try {
+      let nist_description = '';
+
+      if (req.params.requirement === 'all') {
+        if (!req.headers.id) {
+          return nistRequirementsFile;
+        }
+        let api = await this.wzWrapper.getWazuhConfigurationById(
+          req.headers.id
+        );
+
+        if (api.error_code > 1) {
+          log(
+            'wazuh-api:getNistRequirement',
+            'Elasticsearch unexpected error or cannot connect'
+          );
+          // Can not connect to elasticsearch
+          return ErrorResponse(
+            'Elasticsearch unexpected error or cannot connect',
+            3007,
+            400,
+            reply
+          );
+        } else if (api.error_code > 0) {
+          log('wazuh-api:getNistRequirement', 'Credentials do not exist');
+          // Credentials not found
+          return ErrorResponse('Credentials do not exist', 3008, 400, reply);
+        }
+
+        const response = await needle(
+          'get',
+          `${api.url}:${api.port}/rules/nist-800-53`,
+          {},
+          ApiHelper.buildOptionsObject(api)
+        );
+
+        if ((((response || {}).body || {}).data || {}).items) {
+          let NISTobject = {};
+          for (const item of response.body.data.items) {
+            if (typeof nistRequirementsFile[item] !== 'undefined')
+              NISTobject[item] = nistRequirementsFile[item];
+          }
+          return NISTobject;
+        } else {
+          log(
+            'wazuh-api:getNistRequirement',
+            'An error occurred trying to parse NIST 800-53 requirements'
+          );
+          return ErrorResponse(
+            'An error occurred trying to parse NIST 800-53 requirements',
+            3009,
+            400,
+            reply
+          );
+        }
+      } else {
+        if (
+          typeof nistRequirementsFile[req.params.requirement] !== 'undefined'
+        ) {
+          nist_description = nistRequirementsFile[req.params.requirement];
+        }
+
+        return {
+          nist: {
+            requirement: req.params.requirement,
+            description: nist_description
+          }
+        };
+      }
+    } catch (error) {
+      log('wazuh-api:getNistRequirement', error.message || error);
+      return ErrorResponse(error.message || error, 3010, 400, reply);
+    }
   }
 
   /**
@@ -1141,6 +1310,63 @@ export class WazuhApiCtrl {
   getRequestList() {
     //Read a static JSON until the api call has implemented
     return apiRequestList;
+  }
+
+  /**
+   * This get the timestamp field
+   * @param {Object} req
+   * @param {Object} reply
+   * @returns {Object} timestamp field or ErrorResponse
+   */
+  async getTimeStamp(req, reply) {
+    try {
+      const source = JSON.parse(fs.readFileSync(this.wazuhVersion, 'utf8'));
+      if (source.installationDate && source.lastRestart) {
+        log(
+          'wazuh-api:getTimeStamp',
+          `Installation date: ${source.installationDate}. Last restart: ${source.lastRestart}`,
+          'debug'
+        );
+        return {
+          installationDate: source.installationDate,
+          lastRestart: source.lastRestart
+        };
+      } else {
+        throw new Error('Could not fetch wazuh-version registry');
+      }
+    } catch (error) {
+      log('wazuh-api:getTimeStamp', error.message || error);
+      return ErrorResponse(
+        error.message || 'Could not fetch wazuh-version registry',
+        4001,
+        500,
+        reply
+      );
+    }
+  }
+
+  /**
+   * This get the wazuh setup settings
+   * @param {Object} req
+   * @param {Object} reply
+   * @returns {Object} setup info or ErrorResponse
+   */
+  async getSetupInfo(req, reply) {
+    try {
+      const source = JSON.parse(fs.readFileSync(this.wazuhVersion, 'utf8'));
+      return !Object.values(source).length
+        ? { statusCode: 200, data: '' }
+        : { statusCode: 200, data: source };
+    } catch (error) {
+      log('wazuh-api:getSetupInfo', error.message || error);
+      return ErrorResponse(
+        `Could not get data from wazuh-version registry due to ${error.message ||
+          error}`,
+        4005,
+        500,
+        reply
+      );
+    }
   }
 
   /**

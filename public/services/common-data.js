@@ -128,6 +128,8 @@ export class CommonData {
         audit: { group: 'audit' },
         pci: { group: 'pci_dss' },
         gdpr: { group: 'gdpr' },
+        hipaa: { group: 'hipaa' },
+        nist: { group: 'nist' },
         aws: { group: 'amazon' },
         virustotal: { group: 'virustotal' },
         osquery: { group: 'osquery' },
@@ -153,6 +155,12 @@ export class CommonData {
         } else if (tab === 'gdpr') {
           this.removeDuplicateExists('rule.gdpr');
           filters.push(filterHandler.gdprQuery());
+        } else if (tab === 'hipaa') {
+          this.removeDuplicateExists('rule.hipaa');
+          filters.push(filterHandler.hipaaQuery());
+        } else if (tab === 'nist') {
+          this.removeDuplicateExists('rule.nist_800_53');
+          filters.push(filterHandler.nistQuery());
         } else {
           this.removeDuplicateRuleGroups(tabFilters[tab].group);
           filters.push(filterHandler.ruleGroupQuery(tabFilters[tab].group));
@@ -203,6 +211,40 @@ export class CommonData {
         pciTabs.push({ title: key, content: data.data[key] });
       }
       return pciTabs;
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  }
+
+  /**
+   * GET HIPAA
+   */
+  async getHIPAA() {
+    try {
+      const hipaaTabs = [];
+      const data = await this.genericReq.request('GET', '/api/hipaa/all');
+      if (!data.data) return [];
+      for (const key in data.data) {
+        hipaaTabs.push({ title: key, content: data.data[key] });
+      }
+      return hipaaTabs;
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  }
+
+  /**
+   * GET NIST 800-53
+   */
+  async getNIST() {
+    try {
+      const nistTabs = [];
+      const data = await this.genericReq.request('GET', '/api/nist/all');
+      if (!data.data) return [];
+      for (const key in data.data) {
+        nistTabs.push({ title: key, content: data.data[key] });
+      }
+      return nistTabs;
     } catch (error) {
       return Promise.reject(error);
     }

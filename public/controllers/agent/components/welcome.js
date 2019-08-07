@@ -16,6 +16,8 @@ import {
 } from '@elastic/eui';
 
 import { TabDescription } from '../../../../server/reporting/tab-description';
+import { UnsupportedComponents } from '../../../utils/components-os-support';
+
 export class WelcomeScreen extends Component {
   constructor(props) {
     super(props);
@@ -64,17 +66,19 @@ export class WelcomeScreen extends Component {
   }
 
   buildPopover(popoverName, extensions) {
-    const switches = extensions.map(extension => {
-      return (
-        <EuiFormRow key={extension}>
-          <EuiSwitch
-            label={`${TabDescription[extension].title} extension`}
-            checked={this.state.extensions[extension]}
-            onChange={() => this.toggleExtension(extension)}
-          />
-        </EuiFormRow>
-      );
-    });
+    const switches = extensions
+      .filter(extension => this.props.extensions[extension] !== undefined)
+      .map(extension => {
+        return (
+          <EuiFormRow key={extension}>
+            <EuiSwitch
+              label={`${TabDescription[extension].title} extension`}
+              checked={this.state.extensions[extension]}
+              onChange={() => this.toggleExtension(extension)}
+            />
+          </EuiFormRow>
+        );
+      });
 
     return (
       <EuiPopover
@@ -149,8 +153,33 @@ export class WelcomeScreen extends Component {
                   ])}
                 </EuiFlexItem>
               </EuiFlexGroup>
+              {(
+                UnsupportedComponents[this.props.agent.agentPlatform] ||
+                UnsupportedComponents['other']
+              ).includes('vuls') &&
+                !this.props.extensions.virustotal &&
+                !this.props.extensions.osquery &&
+                !this.props.extensions.docker && (
+                  <EuiFlexGroup>
+                    <EuiFlexItem>
+                      <EuiCallOut
+                        title={
+                          <p>
+                            Click the <EuiIcon type="eye" /> icon to show thread
+                            detection and response extensions.
+                          </p>
+                        }
+                        color="success"
+                        iconType="help"
+                      />
+                    </EuiFlexItem>
+                  </EuiFlexGroup>
+                )}
               <EuiFlexGrid columns={2}>
-                {this.buildTabCard('vuls', 'securityApp')}
+                {!(
+                  UnsupportedComponents[this.props.agent.agentPlatform] ||
+                  UnsupportedComponents['other']
+                ).includes('vuls') && this.buildTabCard('vuls', 'securityApp')}
                 {this.props.extensions.virustotal &&
                   this.buildTabCard('virustotal', 'savedObjectsApp')}
                 {this.props.extensions.osquery &&
@@ -202,6 +231,7 @@ export class WelcomeScreen extends Component {
 
 WelcomeScreen.propTypes = {
   extensions: PropTypes.object,
+  agent: PropTypes.object,
   setExtensions: PropTypes.func,
   switchTab: PropTypes.func,
   api: PropTypes.string

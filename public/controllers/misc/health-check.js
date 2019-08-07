@@ -172,7 +172,7 @@ export class HealthCheck {
             const apiVersion = versionData.data.data;
             const setupData = await this.genericReq.request(
               'GET',
-              '/elastic/setup'
+              '/api/setup'
             );
             if (!setupData.data.data['app-version'] || !apiVersion) {
               this.errorHandler.handle(

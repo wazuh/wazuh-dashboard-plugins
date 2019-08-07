@@ -108,7 +108,7 @@ export class ElasticWrapper {
    * @param {*} title
    * @param {*} id
    */
-  async createMonitoringIndexPattern(title, id) {
+  async createMonitoringIndexPattern(title, id, namespace = undefined) {
     try {
       if (!title)
         return Promise.reject(
@@ -126,34 +126,10 @@ export class ElasticWrapper {
               '[{"name":"timestamp","type":"date","count":0,"scripted":false,"searchable":true,"aggregatable":true,"readFromDocValues":true},{"name":"_id","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":true,"readFromDocValues":false},{"name":"_index","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":true,"readFromDocValues":false},{"name":"_score","type":"number","count":0,"scripted":false,"searchable":false,"aggregatable":false,"readFromDocValues":false},{"name":"_source","type":"_source","count":0,"scripted":false,"searchable":false,"aggregatable":false,"readFromDocValues":false},{"name":"_type","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":true,"readFromDocValues":false},{"name":"dateAdd","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":false,"readFromDocValues":false},{"name":"group","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":false,"readFromDocValues":false},{"name":"host","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":true,"readFromDocValues":true},{"name":"id","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":true,"readFromDocValues":true},{"name":"ip","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":true,"readFromDocValues":true},{"name":"lastKeepAlive","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":false,"readFromDocValues":false},{"name":"cluster.name","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":false,"readFromDocValues":false},{"name":"mergedSum","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":false,"readFromDocValues":false},{"name":"configSum","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":false,"readFromDocValues":false},{"name":"node_name","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":false,"readFromDocValues":false},{"name":"manager","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":false,"readFromDocValues":false},{"name":"manager_host","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":false,"readFromDocValues":false},{"name":"name","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":true,"readFromDocValues":true},{"name":"os.arch","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":false,"readFromDocValues":false},{"name":"os.codename","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":false,"readFromDocValues":false},{"name":"os.major","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":false,"readFromDocValues":false},{"name":"os.name","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":false,"readFromDocValues":false},{"name":"os.platform","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":false,"readFromDocValues":false},{"name":"os.uname","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":false,"readFromDocValues":false},{"name":"os.version","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":false,"readFromDocValues":false},{"name":"status","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":true,"readFromDocValues":true},{"name":"version","type":"string","count":0,"scripted":false,"searchable":true,"aggregatable":false,"readFromDocValues":false}]',
             title: title,
             timeFieldName: 'timestamp'
-          }
+          },
+          namespace
         }
       });
-
-      return data;
-    } catch (error) {
-      return Promise.reject(error);
-    }
-  }
-
-  /**
-   * Creates the .wazuh-version index with a custom configuration.
-   * @param {*} config
-   */
-  async createWazuhVersionIndex(configuration) {
-    try {
-      if (!configuration)
-        return Promise.reject(
-          new Error('No valid configuration for create .wazuh-version index')
-        );
-
-      const data = await this.elasticRequest.callWithInternalUser(
-        'indices.create',
-        {
-          index: '.wazuh-version',
-          body: configuration
-        }
-      );
 
       return data;
     } catch (error) {
@@ -187,23 +163,16 @@ export class ElasticWrapper {
   }
 
   /**
-   * Inserts configuration on .wazuh-version index
-   * @param {*} configuration
+   * Delete .wazuh-version index if exists
    */
-  async insertWazuhVersionConfiguration(configuration) {
+  async deleteWazuhVersionIndex() {
     try {
-      if (!configuration)
-        return Promise.reject(
-          new Error('No valid configuration for create .wazuh-version index')
-        );
-
-      const data = await this.elasticRequest.callWithInternalUser('create', {
-        index: '.wazuh-version',
-        type: '_doc',
-        id: 1,
-        body: configuration
-      });
-
+      const data = await this.elasticRequest.callWithInternalUser(
+        'indices.delete',
+        {
+          index: '.wazuh-version'
+        }
+      );
       return data;
     } catch (error) {
       return Promise.reject(error);
@@ -418,77 +387,18 @@ export class ElasticWrapper {
   }
 
   /**
-   * Get the .wazuh-version index
-   */
-  async getWazuhVersionIndex() {
-    try {
-      const data = await this.elasticRequest.callWithInternalUser('get', {
-        index: '.wazuh-version',
-        type: '_doc',
-        id: '1'
-      });
-
-      return data;
-    } catch (error) {
-      return Promise.reject(error);
-    }
-  }
-
-  /**
-   * Updates lastRestart field on .wazuh-version index
-   * @param {*} version
-   * @param {*} revision
-   */
-  async updateWazuhVersionIndexLastRestart(version, revision) {
-    try {
-      if (!version || !revision)
-        return Promise.reject(new Error('No valid version or revision given'));
-
-      const data = await this.elasticRequest.callWithInternalUser('update', {
-        index: '.wazuh-version',
-        type: '_doc',
-        id: 1,
-        body: {
-          doc: {
-            'app-version': version,
-            revision: revision,
-            lastRestart: new Date().toISOString() // Indice exists so we update the lastRestarted date only
-          }
-        }
-      });
-
-      return data;
-    } catch (error) {
-      return Promise.reject(error);
-    }
-  }
-
-  /**
-   * Get .wazuh-version index
-   */
-  async getWazuhVersionIndexAsSearch() {
-    try {
-      const data = await this.elasticRequest.callWithInternalUser('search', {
-        index: '.wazuh-version',
-        type: '_doc'
-      });
-
-      return data;
-    } catch (error) {
-      return Promise.reject(error);
-    }
-  }
-
-  /**
    *
    * @param {*} payload
    */
-  async searchWazuhAlertsWithPayload(payload) {
+  async searchWazuhAlertsWithPayload(payload, namespace) {
     try {
       if (!payload) return Promise.reject(new Error('No valid payload given'));
       const pattern = payload.pattern;
       delete payload.pattern;
-      const fullPattern = await this.getIndexPatternUsingGet(pattern);
+      const fullPattern = await this.getIndexPatternUsingGet(
+        pattern,
+        namespace
+      );
 
       const title =
         (((fullPattern || {})._source || {})['index-pattern'] || {}).title ||
@@ -835,14 +745,17 @@ export class ElasticWrapper {
    * Get an index pattern by name and/or id
    * @param {*} id Could be id and/or title
    */
-  async getIndexPatternUsingGet(id) {
+  async getIndexPatternUsingGet(id, namespace) {
     try {
       if (!id) return Promise.reject(new Error('No valid id given'));
-
+      let idQuery = id.includes('index-pattern:') ? id : 'index-pattern:' + id;
+      if (namespace && namespace !== 'default') {
+        idQuery = `${namespace}:${idQuery}`;
+      }
       const data = await this.elasticRequest.callWithInternalUser('get', {
         index: this.WZ_KIBANA_INDEX,
         type: '_doc',
-        id: id.includes('index-pattern:') ? id : 'index-pattern:' + id
+        id: idQuery
       });
 
       return data;
@@ -983,13 +896,12 @@ export class ElasticWrapper {
   }
 
   /**
-   * Prevent from using types, reindex .wazuh and .wazuh-version indices
+   * Prevent from using types, reindex .wazuh index
    */
   async reindexAppIndices() {
     try {
       const appIndices = [
-        { value: '.wazuh', copy: '.6x-wazuh', result: 'fail' },
-        { value: '.wazuh-version', copy: '.6x-wazuh-version', result: 'fail' }
+        { value: '.wazuh', copy: '.6x-wazuh', result: 'fail' }
       ];
       for (const index of appIndices) {
         try {

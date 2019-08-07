@@ -60,6 +60,24 @@ export function WazuhApiRoutes(server) {
     }
   });
 
+  // Return a NIST 800-53 requirement description
+  server.route({
+    method: 'GET',
+    path: '/api/nist/{requirement}',
+    handler(req, reply) {
+      return ctrl.getNistRequirement(req, reply);
+    }
+  });
+
+  // Return a HIPAA requirement description
+  server.route({
+    method: 'GET',
+    path: '/api/hipaa/{requirement}',
+    handler(req, reply) {
+      return ctrl.getHipaaRequirement(req, reply);
+    }
+  });
+
   // Force fetch data to be inserted on wazuh-monitoring indices
   server.route({
     method: 'GET',
@@ -93,6 +111,24 @@ export function WazuhApiRoutes(server) {
     path: '/api/routes',
     handler(req, res) {
       return ctrl.getRequestList(req, res);
+    }
+  });
+
+  // Useful to check cookie consistence
+  server.route({
+    method: 'GET',
+    path: '/api/timestamp',
+    handler(req, res) {
+      return ctrl.getTimeStamp(req, res);
+    }
+  });
+
+  // Return Wazuh Appsetup info
+  server.route({
+    method: 'GET',
+    path: '/api/setup',
+    handler(req, res) {
+      return ctrl.getSetupInfo(req, res);
     }
   });
 
