@@ -142,6 +142,11 @@ class AutoReport {
       selector,
       `The generate report button is disabled`
     );
+    if (!await this.waitToReport()){
+      throw new Error(
+        `Unexpected error while trying to generate the report`
+      );
+    }
   }
 
   /**
@@ -234,6 +239,21 @@ class AutoReport {
     }
   }
 
+  /**
+   * Returns true if the report is generated
+   *
+   * @return {boolean}
+   */
+  async waitToReport() {
+    try {
+      const toasts = await this.driver.wait(until.elementLocated(By.css('div.euiGlobalToastList')), 10000);
+      await this.driver.wait(until.elementTextContains(toasts, 'Reporting. Success.'), 60000);
+      return true;
+    } catch (error) {
+      return false;
+    }
+  }
+
 }
 
 
@@ -269,7 +289,6 @@ export class OverviewAutoReport extends AutoReport {
       await this.setTime();
       await this.setFilters();
       await this.generateReport();
-      await this.driver.sleep(30000);
       await this.driver.quit();
       return 'Reporting success.\n';
     } catch (err) {
@@ -321,7 +340,6 @@ export class AgentsAutoReport extends AutoReport {
         await this.setFilters();
       }
       await this.generateReport();
-      await this.driver.sleep(30000);
       await this.driver.quit();
       return 'Reporting success.\n';
     } catch (err) {
@@ -346,7 +364,4 @@ export class AgentsAutoReport extends AutoReport {
       return true;
     }
   }
-
-
-
 }
