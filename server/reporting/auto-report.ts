@@ -1,5 +1,16 @@
+/*
+ * Wazuh app - Classes to generate PDF reports from the backend
+ * Copyright (C) 2015-2019 Wazuh, Inc.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * Find more information about this on the LICENSE file.
+ */
 import Chrome from 'selenium-webdriver/chrome';
-import {WebDriver, Builder, By, until, Key, WebElement, Origin} from 'selenium-webdriver';
+import {WebDriver, Builder, By, until} from 'selenium-webdriver';
 
 interface Report {
   uri: string,
@@ -15,6 +26,11 @@ interface AgentReport extends Report {
   agent: number
 }
 
+/**
+ * Class with the methods to generate a PDF report from the backend
+ *
+ * @class AutoReport
+ */
 class AutoReport {
   screen: { width: number; height: number; };
   url: string;
@@ -256,7 +272,12 @@ class AutoReport {
 
 }
 
-
+/**
+ * Extends the class AutoReport to generate the reports of the overview
+ *
+ * @class OverviewAutoReport
+ * @extends {AutoReport}
+ */
 export class OverviewAutoReport extends AutoReport {
 
   constructor(report: Report) {
@@ -298,6 +319,12 @@ export class OverviewAutoReport extends AutoReport {
   }
 }
 
+/**
+ * Extends the class AutoReport to generate the reports of the agents
+ *
+ * @class AgentsAutoReport
+ * @extends {AutoReport}
+ */
 export class AgentsAutoReport extends AutoReport {
   agent: number;
   constructor(agentReport: AgentReport) {
