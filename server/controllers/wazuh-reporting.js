@@ -30,7 +30,7 @@ import { WazuhApiCtrl } from './wazuh-api';
 import clockIconRaw from '../reporting/clock-icon-raw';
 import filterIconRaw from '../reporting/filter-icon-raw';
 import ProcessEquivalence from '../../util/process-state-equivalence';
-import { OverviewAutoReport } from '../reporting/auto-report';
+import { OverviewAutoReport, AgentsAutoReport } from '../reporting/auto-report';
 import {
   AgentsVisualizations,
   OverviewVisualizations
@@ -1403,7 +1403,7 @@ export class WazuhReportingCtrl {
           'Reporting needs a valid app tab in order to work properly'
         );
       }
-      
+
       const args = {
         uri: (((req || {}).server || {}).info || {}).uri,
         tab: payload.tab,
@@ -1412,8 +1412,15 @@ export class WazuhReportingCtrl {
         // tFrom: (payload || {}).tFrom,
         // tTo: (payload || {}).tTo,
       }
-      
-      const driver = new OverviewAutoReport(args);
+
+      if (payload.agent != undefined){
+        args["agent"] = payload.agent;
+      }
+
+      const driver = (payload.agent == undefined)
+        ? new OverviewAutoReport(args)
+        : new AgentsAutoReport(args);
+
       return driver.run(this.takeScreenshot);
     }
   }

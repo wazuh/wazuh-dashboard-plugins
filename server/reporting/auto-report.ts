@@ -25,6 +25,7 @@ class AutoReport {
   // tFrom: string;
   // tTo: string;
   driver!: WebDriver;
+  controller!: string;
 
   dateSelectors = {
     today: '[data-test-subj="superDatePickerCommonlyUsed_Today"]',
@@ -34,15 +35,15 @@ class AutoReport {
     hours1: '[data-test-subj="superDatePickerCommonlyUsed_Last_1 hour"]',
     hours24: '[data-test-subj="superDatePickerCommonlyUsed_Last_24 hours"]',
     days7: '[data-test-subj="superDatePickerCommonlyUsed_Last_7 days"]',
-    days30: '[data-test-subj="superDatePickerCommonlyUsed_Last_30 days"]', 
+    days30: '[data-test-subj="superDatePickerCommonlyUsed_Last_30 days"]',
     days90: '[data-test-subj="superDatePickerCommonlyUsed_Last_90 days"]',
-    year: '[data-test-subj="superDatePickerCommonlyUsed_Last_1 year"]', 
+    year: '[data-test-subj="superDatePickerCommonlyUsed_Last_1 year"]',
   }
 
   constructor(report: Report) {
     this.screen = { width: 1920, height: 1080 };
     this.url = `${report.uri}/app/wazuh#/`;
-    this.tab = report.tab; 
+    this.tab = report.tab;
     this.tabs = {};
     this.filters = report.filters;
     this.tlapse = this.selectDate(report.tlapse);
@@ -65,7 +66,7 @@ class AutoReport {
   }
 
   /**
-   * Return the selector of the time lapse or undefined 
+   * Return the selector of the time lapse or undefined
    *
    * @param {string} tlapse
    * @returns
@@ -105,7 +106,7 @@ class AutoReport {
   }
 
   /**
-   * Create and return a webdriver 
+   * Create and return a webdriver
    *
    * @returns {WebDriver}
    */
@@ -136,7 +137,7 @@ class AutoReport {
    *
    */
   async generateReport() {
-    const selector = '[data-test-subj="overviewGenerateReport"]';
+    const selector = '[data-test-subj="generateReport"]';
     await this.clickButton(
       selector,
       `The generate report button is disabled`
@@ -149,22 +150,22 @@ class AutoReport {
    */
   async openWazuh(){
     this.driver.get(this.url);
-    await this.driver.wait(until.urlContains('overview'), 10000);
+    await this.driver.wait(until.urlContains(this.controller), 10000);
   }
 
   /**
    * Open de correct controller in the web browser
    *
-   * @param {string} type 
+   * @param {string} type
    * @param {WebDriver} driver
    */
-  async setController(type: string) {
+  async setController() {
     const ctrls = {
-      agent: '[data-test-subj="wzMenuAgents"]',
+      agents: '[data-test-subj="wzMenuAgents"]',
       overview: '[data-test-subj="wzMenuOverview"]'
     }
-    
-    const selector = ctrls[type];
+
+    const selector = ctrls[this.controller];
     await this.clickButton(
       selector,
       `Unexpected error when load the controller`,
@@ -195,6 +196,8 @@ class AutoReport {
    *
    */
   async setTab() {
+    await this.waitLoad();
+
     const selector = this.tabs[this.tab];
     await this.clickButton(
       selector,
@@ -218,7 +221,7 @@ class AutoReport {
   }
 
   /**
-   * Check the status of the Kibana load indicator 
+   * Check the status of the Kibana load indicator
    *
    */
   async waitLoad() {
@@ -238,6 +241,7 @@ export class OverviewAutoReport extends AutoReport {
 
   constructor(report: Report) {
     super(report);
+    this.controller = 'overview';
     this.tabs = {
       general: '[data-test-subj="overviewWelcomeGeneral"]',
       fim: '[data-test-subj="overviewWelcomeFim"]',
@@ -260,7 +264,7 @@ export class OverviewAutoReport extends AutoReport {
     try {
       this.driver = await this.createDriver();
       await this.openWazuh();
-      await this.setController('overview');
+      await this.setController();
       await this.setTab();
       await this.setTime();
       await this.setFilters();
@@ -280,7 +284,69 @@ export class AgentsAutoReport extends AutoReport {
   agent: number;
   constructor(agentReport: AgentReport) {
     super(agentReport);
+    this.controller = 'agents';
     this.agent = agentReport.agent;
+    this.url += 'agents?_g=()&agent=' + this.agent;
+    this.tabs = {
+      general: '[data-test-subj="agentsWelcomeGeneral"]',
+      fim: '[data-test-subj="agentsWelcomeFim"]',
+      syscollector: '[data-test-subj="agentsWelcomeSyscollector"]',
+      pm: '[data-test-subj="agentsWelcomePm"]',
+      sca: '[data-test-subj="agentsWelcomeSca"]',
+      audit: '[data-test-subj="agentsWelcomeAudit"]',
+      oscap: '[data-test-subj="agentsWelcomeOscap"]',
+      ciscat: '[data-test-subj="agentsWelcomeCiscat"]',
+      vuls: '[data-test-subj="agentsWelcomeVuls"]',
+      virustotal: '[data-test-subj="agentsWelcomeVirustotal"]',
+      osquery: '[data-test-subj="agentsWelcomeOsquery"]',
+      docker: '[data-test-subj="agentsWelcomeDocker"]',
+      pci: '[data-test-subj="agentsWelcomePci"]',
+      gdpr: '[data-test-subj="agentsWelcomeGdpr"]',
+    };
+    this.availableTab();
   }
+
+  public async run(screenshot: (name: string, driver: WebDriver) => any) {
+    try {
+      this.driver = await this.createDriver();
+      await this.openWazuh();
+      if (!await this.checkAgent()){
+        throw new Error(
+          `Agent does not exist`
+        );
+      }
+      await this.setTab();
+      if (this.tab != 'syscollector') {
+        await this.setTime();
+        await this.setFilters();
+      }
+      await this.generateReport();
+      await this.driver.sleep(30000);
+      await this.driver.quit();
+      return 'Reporting success.\n';
+    } catch (err) {
+      await screenshot('error-'+Date.now(), this.driver);
+      await this.driver.quit();
+      return `${err}`;
+    }
+  }
+
+  /**
+   * Wait for the agent welcome panel to load or
+   * return false if the agent does not exist.
+   *
+   * @return {boolean}
+   */
+  async checkAgent() {
+    try {
+      const toasts = await this.driver.wait(until.elementLocated(By.css('div.euiGlobalToastList')), 10000);
+      await this.driver.wait(until.elementTextContains(toasts, 'Agent does not exist'), 10000);
+      return false;
+    } catch (error) {
+      return true;
+    }
+  }
+
+
 
 }
