@@ -280,7 +280,7 @@ export class OverviewAutoReport extends AutoReport {
     this.availableTab();
   }
 
-  public async run(screenshot: (name: string, driver: WebDriver) => any) {
+  public async run() {
     try {
       this.driver = await this.createDriver();
       await this.openWazuh();
@@ -290,9 +290,8 @@ export class OverviewAutoReport extends AutoReport {
       await this.setFilters();
       await this.generateReport();
       await this.driver.quit();
-      return 'Reporting success.\n';
+      return 'Reporting success.';
     } catch (err) {
-      await screenshot('error-'+Date.now(), this.driver);
       await this.driver.quit();
       return `${err}`;
     }
@@ -325,7 +324,7 @@ export class AgentsAutoReport extends AutoReport {
     this.availableTab();
   }
 
-  public async run(screenshot: (name: string, driver: WebDriver) => any) {
+  public async run() {
     try {
       this.driver = await this.createDriver();
       await this.openWazuh();
@@ -341,11 +340,10 @@ export class AgentsAutoReport extends AutoReport {
       }
       await this.generateReport();
       await this.driver.quit();
-      return 'Reporting success.\n';
+      return { finish: true, message: 'Reporting success.' };
     } catch (err) {
-      await screenshot('error-'+Date.now(), this.driver);
       await this.driver.quit();
-      return `${err}`;
+      return { finish: false, message: `${err}`};
     }
   }
 

@@ -1370,58 +1370,57 @@ export class WazuhReportingCtrl {
   }
 
   /**
-   * Take a screenshot from the web browser an save in `REPORTING_PATH`
+   * Create a PDF report from the backend
    *
-   * @param {String} name
-   * @param {WebDriver} driver
-   * @returns {Boolean}
+   * @param {*} req
+   * @param {*} reply
+   * @returns
    */
-  async takeScreenshot(name, driver) {
-    driver.takeScreenshot().then(
-      (image, err) => {
-        fs.writeFile(
-          path.join(__dirname, REPORTING_PATH + '/' + name + '.png'),
-          image,
-          'base64',
-          (err) => {
-            if (err){
-              return err;
-            }
-            return true;
-          }
-        );
-      }
-    );
-  }
-
   async autoReport(req, reply) {
-    if (req.payload) {
-      const payload = req.payload;
+    try{
+      if (req.payload) {
+        const payload = req.payload;
 
-      if (!payload.tab) {
-        throw new Error(
-          'Reporting needs a valid app tab in order to work properly'
-        );
+        if (!payload.tab) {
+          throw new Error(
+            'Reporting needs a valid app tab in order to work properly'
+          );
+        }
+
+        const args = {
+          uri: (((req || {}).server || {}).info || {}).uri,
+          tab: payload.tab,
+          filters: (payload || {}).filters,
+          tlapse: (payload || {}).tlapse,
+          // tFrom: (payload || {}).tFrom,
+          // tTo: (payload || {}).tTo,
+        }
+
+        if (payload.agent != undefined){
+          args["agent"] = parseInt(payload.agent);
+          if (isNaN(args["agent"]) || args["agent"] < 1 || args["agent"] > 999) {
+            throw new Error(
+              `The agent ID must be a number between 001 and 999`
+            );
+          }
+        }
+
+        const driver = (payload.agent == undefined)
+          ? new OverviewAutoReport(args)
+          : new AgentsAutoReport(args);
+
+        const result = await driver.run();
+
+        if (result.finish) {
+          return { message: result.message };
+        } else {
+          throw new Error(
+            result.message
+          );
+        }
       }
-
-      const args = {
-        uri: (((req || {}).server || {}).info || {}).uri,
-        tab: payload.tab,
-        filters: (payload || {}).filters,
-        tlapse: (payload || {}).tlapse,
-        // tFrom: (payload || {}).tFrom,
-        // tTo: (payload || {}).tTo,
-      }
-
-      if (payload.agent != undefined){
-        args["agent"] = payload.agent;
-      }
-
-      const driver = (payload.agent == undefined)
-        ? new OverviewAutoReport(args)
-        : new AgentsAutoReport(args);
-
-      return driver.run(this.takeScreenshot);
+    }catch (error) {
+      return ErrorResponse(error.message || error, 5029, 500, reply);
     }
   }
 
