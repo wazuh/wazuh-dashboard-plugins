@@ -68,7 +68,7 @@ import {
 } from 'ui/courier';
 import { toastNotifications } from 'ui/notify';
 import { VisProvider } from 'ui/vis';
-import { FilterBarQueryFilterProvider } from 'ui/filter_manager/query_filter';
+import { FilterBarQueryFilterProvider } from './search-bar/query-filter';
 import { vislibSeriesResponseHandlerProvider } from 'ui/vis/response_handlers/vislib';
 import { docTitle } from 'ui/doc_title';
 import { intervalOptions } from 'ui/agg_types/buckets/_interval_options';
@@ -78,7 +78,7 @@ import uiRoutes from 'ui/routes';
 import { StateProvider } from 'ui/state_management/state';
 import { migrateLegacyQuery } from 'ui/utils/migrate_legacy_query';
 import { subscribeWithScope } from 'ui/utils/subscribe_with_scope';
-import { getFilterGenerator } from 'ui/filter_manager';
+import { getFilterGenerator } from './search-bar/filter-generator';
 import { SavedObjectsClientProvider } from 'ui/saved_objects';
 import { VisualizeLoaderProvider } from 'ui/visualize/loader/visualize_loader';
 import { recentlyAccessed } from 'ui/persisted_log';

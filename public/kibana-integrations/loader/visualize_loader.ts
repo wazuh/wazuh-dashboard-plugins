@@ -26,7 +26,7 @@
 // @ts-ignore
 import chrome from 'ui/chrome';
 // @ts-ignore
-import { FilterBarQueryFilterProvider } from 'ui/filter_manager/query_filter';
+import { FilterBarQueryFilterProvider } from '../search-bar/query-filter';
 // @ts-ignore
 import { IPrivate } from 'ui/private';
 import { EmbeddedVisualizeHandler } from './embedded_visualize_handler';
@@ -150,7 +150,7 @@ export class VisualizeLoader {
       // lets add Private to the params, we'll need to pass it to visualize later
       Private: this.Private,
     };
-
+    // @ts-ignore
     return new EmbeddedVisualizeHandler(element, savedObj, handlerParams, this.injector, this.errorHandler);
   }
 }
