@@ -33,23 +33,28 @@
     "test": "_mocha test/**/*"
   },
   "dependencies": {
+    "@types/chromedriver": "^2.38.0",
+    "@types/selenium-webdriver": "^3.0.15",    
     "angular-animate": "1.7.8",
     "angular-chart.js": "1.1.1",
     "angular-cookies": "1.6.5",
     "angular-material": "1.1.18",
+    "babel-polyfill": "^6.13.0",
+    "chromedriver": "^74.0.0",
     "dom-to-image": "^2.6.0",
     "install": "^0.10.1",
     "js2xmlparser": "^3.0.0",
     "json2csv": "^4.1.2",
+    "karma-chrome-launcher": "2.1.1",
     "needle": "^2.0.1",
     "node-cron": "^1.1.2",
     "pdfmake": "^0.1.37",
     "pug-loader": "^2.4.0",
     "querystring-browser": "1.0.4",
+    "selenium-webdriver": "4.0.0-alpha.1",
     "simple-tail": "^1.1.0",
     "timsort": "^0.3.0",
-    "winston": "3.0.0",
-    "babel-polyfill": "^6.13.0"
+    "winston": "3.0.0"
   },
   "devDependencies": {
     "@elastic/plugin-helpers": "^7.1.8",
