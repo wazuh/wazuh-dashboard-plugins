@@ -11,6 +11,7 @@
  */
 import Chrome from 'selenium-webdriver/chrome';
 import {WebDriver, Builder, By, until} from 'selenium-webdriver';
+import Chromedriver from 'chromedriver';
 
 interface Report {
   uri: string,
@@ -127,6 +128,7 @@ class AutoReport {
    * @returns {WebDriver}
    */
   async createDriver() {
+    Chrome.setDefaultService(new Chrome.ServiceBuilder(Chromedriver.path).build());
     return await new Builder()
     .forBrowser('chrome')
     .setChromeOptions(new Chrome.Options().headless().windowSize(this.screen))
