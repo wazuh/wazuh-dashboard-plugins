@@ -230,7 +230,7 @@ export class AgentsPreviewController {
   }
 
   reloadList() {
-    this.refreshAgentsStats();    
+    this.refreshAgentsStats(); 
     this.$scope.$broadcast('wazuhSearch', { term: this.prevSearch || '' });
   }
 
