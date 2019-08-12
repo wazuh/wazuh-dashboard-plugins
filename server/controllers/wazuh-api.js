@@ -27,7 +27,7 @@ import { cleanKeys } from '../../util/remove-key';
 import { apiRequestList } from '../../util/api-request-list';
 import * as ApiHelper from '../lib/api-helper';
 import { Queue } from '../jobs/queue';
-
+import querystring from 'querystring';
 export class WazuhApiCtrl {
   /**
    * Constructor
@@ -584,10 +584,10 @@ export class WazuhApiCtrl {
 
       const execd = daemons['ossec-execd'] === 'running';
       const modulesd = daemons['wazuh-modulesd'] === 'running';
-      const wazuhdb =
-        (wazuhdbExists && daemons['wazuh-db'] === 'running') || true;
-      const clusterd =
-        (isCluster && daemons['wazuh-clusterd'] === 'running') || true;
+      const wazuhdb = wazuhdbExists ? daemons['wazuh-db'] === 'running' : true;
+      const clusterd = isCluster
+        ? daemons['wazuh-clusterd'] === 'running'
+        : true;
 
       const isValid = execd && modulesd && wazuhdb && clusterd;
 
@@ -708,8 +708,22 @@ export class WazuhApiCtrl {
           return ErrorResponse('ERROR3099', 3099, 500, reply);
         }
       }
-      log('wazuh-api:makeRequest', `${method} ${fullUrl}`, 'debug');
-      const response = await needle(method, fullUrl, data, options);
+
+      let fixedUrl = false;
+      if (method === 'DELETE') {
+        fixedUrl = `${
+          fullUrl.includes('?') ? fullUrl.split('?')[0] : fullUrl
+        }?${querystring.stringify(data)}`;
+      }
+
+      log('wazuh-api:makeRequest', `${method} ${fixedUrl || fullUrl}`, 'debug');
+
+      const response = await needle(
+        method,
+        fixedUrl || fullUrl,
+        fixedUrl ? null : data,
+        options
+      );
 
       const responseBody = (response || {}).body || {};
       const responseData = responseBody.data || false;
@@ -986,7 +1000,7 @@ export class WazuhApiCtrl {
             return item;
           });
         }
-        
+
         let csv = json2csvParser.parse(isList ? itemsArray[0] : itemsArray);
 
         for (const field of fields) {

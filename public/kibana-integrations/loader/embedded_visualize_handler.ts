@@ -107,7 +107,8 @@ export class EmbeddedVisualizeHandler {
     private readonly element: HTMLElement,
     savedObject: VisSavedObject,
     params: EmbeddedVisualizeHandlerParams,
-    $injector
+    $injector,
+    errorHandler
   ) {
     const { searchSource, vis } = savedObject;
 
@@ -131,6 +132,7 @@ export class EmbeddedVisualizeHandler {
       uiState,
       aggs: vis.getAggConfig(),
       forceFetch: false,
+      errorHandler
     };
 
     // Listen to the first RENDER_COMPLETE_EVENT to resolve this promise

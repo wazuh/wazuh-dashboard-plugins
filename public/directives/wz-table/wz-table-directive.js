@@ -59,26 +59,31 @@ app.directive('wzTable', function() {
       $scope.showColumns = false;
       $scope.scapepath = $scope.path.split('/').join('');
       $scope.originalkeys = $scope.keys.map((key, idx) => ({ key, idx }));
+
       $scope.updateColumns = key => {
-        const str = key.key.value || key.key;
-        const cleanArray = $scope.keys.map(item => item.value || item);
-        if (cleanArray.includes(str)) {
-          const idx = cleanArray.indexOf(str);
-          if (idx > -1) {
-            $scope.keys.splice(idx, 1);
-          }
-        } else {
-          const originalIdx = $scope.originalkeys.findIndex(
-            item => (item.key.value || item.key) === (key.key.value || key.key)
-          );
-          if (originalIdx >= 0) {
-            $scope.keys.splice(originalIdx, 0, key.key);
+        if (!$scope.isLastKey(key)) {
+          const str = key.key.value || key.key;
+          const cleanArray = $scope.keys.map(item => item.value || item);
+          if (cleanArray.includes(str)) {
+            const idx = cleanArray.indexOf(str);
+            if (idx > -1) {
+              $scope.keys.splice(idx, 1);
+            }
           } else {
-            $scope.keys.push(key.key);
+            const originalIdx = $scope.originalkeys.findIndex(
+              item =>
+                (item.key.value || item.key) === (key.key.value || key.key)
+            );
+            if (originalIdx >= 0) {
+              $scope.keys.splice(originalIdx, 0, key.key);
+            } else {
+              $scope.keys.push(key.key);
+            }
           }
+          init(true);
         }
-        init(true);
       };
+
       $scope.exists = key => {
         const str = key.key.value || key.key;
         for (const k of $scope.keys) if ((k.value || k) === str) return true;
@@ -168,6 +173,7 @@ app.directive('wzTable', function() {
               filters: instance.filters
             });
           }
+          filterableColumns();
           if ($scope.customColumns) {
             setTimeout(() => {
               $scope.setColResizable();
@@ -434,7 +440,7 @@ app.directive('wzTable', function() {
       $scope.confirmRemoveFile = async (file, type) => {
         try {
           await rulesetHandler.deleteFile(file, type);
-          errorHandler.info(`File ${file.file} has been deleted`);
+          errorHandler.info(`File ${file.file || file.name} has been deleted`);
         } catch (error) {
           errorHandler.handle(error.message || error);
         }
@@ -487,8 +493,8 @@ app.directive('wzTable', function() {
         }
       };
 
-      $scope.showTooltip = (id1, id2, item) => {
-        const $element = $('#td-' + id1 + '-' + id2 + ' div');
+      $scope.showTooltip = (id1, id2, item, path) => {
+        const $element = $(`#${path}-td-` + id1 + '-' + id2 + ' div');
         const $c = $element
           .clone()
           .css({ display: 'inline', width: 'auto', visibility: 'hidden' })
@@ -503,6 +509,48 @@ app.directive('wzTable', function() {
           item.showTooltip[id2] = true;
         }
         $c.remove();
+      };
+
+      $scope.parseKey = key => {
+        return key ? key.value || key : key;
+      };
+
+      const filterableColumns = () => {
+        $scope.filterableColumns = [];
+        $scope.keys.forEach(k => {
+          const key = $scope.parseKey(k);
+          const canFilterInRules =
+            $scope.path === '/rules' &&
+            (key === 'level' || key === 'file' || key === 'path');
+          const canFilterInDecoders =
+            $scope.path === '/decoders' && (key === 'path' || key === 'file');
+          $scope.filterableColumns[key] = !!(
+            canFilterInRules || canFilterInDecoders
+          );
+        });
+      };
+
+      $scope.handleClick = (key, item, ev) => {
+        const value = $scope.parseValue(key, item);
+        let keyTmp = $scope.parseKey(key);
+        const valueTmp = typeof value !== 'string' ? value.toString() : value;
+        if ($scope.filterableColumns[keyTmp]) {
+          if (value !== '-' && keyTmp !== 'file') {
+            const filter = `${keyTmp}:${valueTmp}`;
+            $scope.$emit('applyFilter', { filter });
+          } else if (keyTmp === 'file') {
+            $scope.$emit('viewFileOnlyTable', { file: item, path: item.path });
+          }
+          ev.stopPropagation();
+        }
+      };
+
+      $scope.isLastKey = key => {
+        const exists = $scope.exists(key);
+        const keysLength = $scope.keys.length === 1;
+        const keyValue = key.key.value || key.key;
+        const lastKeyValue = $scope.keys[0].value || $scope.keys[0];
+        return exists && keysLength && keyValue && lastKeyValue;
       };
 
       $scope.setColResizable = () => {

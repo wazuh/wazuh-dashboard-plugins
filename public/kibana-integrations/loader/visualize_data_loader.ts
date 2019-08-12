@@ -202,11 +202,7 @@ export class VisualizeDataLoader {
           `the error.`
         );
       }
-
-      toastNotifications.addDanger({
-        title: 'Error in visualization',
-        text: error.message,
-      });
+      params.errorHandler.handle(error.message, 'Error in visualization')
     }
   }
 }

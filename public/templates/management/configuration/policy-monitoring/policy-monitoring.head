@@ -31,6 +31,8 @@
     </md-nav-item>
     <md-nav-item class="wz-nav-item" md-nav-click="switchConfigurationSubTab('pm-unix')" name="pm-unix">System audit
     </md-nav-item>
+    <md-nav-item class="wz-nav-item" md-nav-click="switchConfigurationSubTab('pm-ignored')" name="pm-ignored">Ignored
+    </md-nav-item>
     <md-nav-item class="wz-nav-item" md-nav-click="switchConfigurationSubTab('pm-sca')" name="pm-sca">SCA</md-nav-item>
   </md-nav-bar>
   <!-- End Policy monitoring navigation bar -->

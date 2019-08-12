@@ -33,6 +33,19 @@ export class FilesController {
   $onInit() {
     const configuration = this.wazuhConfig.getConfig();
     this.adminMode = !!(configuration || {}).admin;
+    if (this.$scope.mctrl.showFile) {
+      this.$scope.editorReadOnly = !(
+        this.$scope.mctrl.showFile.parameters.path === 'etc/rules' ||
+        this.$scope.mctrl.showFile.parameters.path === 'etc/decoders'
+      );
+      this.editFile(
+        this.$scope.mctrl.showFile.parameters,
+        this.$scope.editorReadOnly
+      );
+      this.$scope.goBack = true;
+      this.$scope.viewingDetail = this.$scope.mctrl.showFile.parameters.viewingDetail;
+    }
+    this.$scope.mctrl.showFile = false;
 
     this.$scope.$on('editFile', (ev, params) => {
       this.$scope.editorReadOnly = false;
@@ -46,9 +59,20 @@ export class FilesController {
       this.$scope.$applyAsync();
     });
 
-    this.$scope.closeEditingFile = () => {
+    this.$scope.closeEditingFile = (flag = false) => {
       this.$scope.editingFile = false;
+      this.$scope.editorReadOnly = false;
       this.$scope.fetchedXML = null;
+      if (this.$scope.goBack) {
+        if (this.$scope.viewingDetail) {
+          this.$scope.mctrl.setCurrentRule({
+            currentRule: this.$scope.mctrl.currentRule
+          });
+          this.$scope.mctrl.currentRule = null;
+        }
+        this.$scope.mctrl.setRulesTab(this.$scope.mctrl.globalRulesetTab, flag);
+        this.$scope.goBack = false;
+      }
       this.search();
       this.$scope.$applyAsync();
     };
@@ -119,6 +143,11 @@ export class FilesController {
       this.$scope.$applyAsync();
     });
 
+    this.$scope.$on('closeRulesetFile', () => {
+      this.$scope.closeEditingFile(true);
+      this.$scope.$applyAsync();
+    });
+
     this.$scope.$on('showFileNameInput', () => {
       this.newFile = true;
       this.selectedItem = { file: 'new file' };
@@ -135,9 +164,9 @@ export class FilesController {
     this.$scope.newFile = false;
     try {
       this.$scope.currentFile = params.file;
-      this.$scope.currentFile.type = params.path.includes('rules')
-        ? 'rule'
-        : 'decoder';
+      this.$scope.currentFile.type = params.path.includes('decoder')
+        ? 'decoder'
+        : 'rule';
       this.$scope.type = `${this.$scope.currentFile.type}s`;
       this.$scope.fetchedXML =
         this.$scope.type === 'rules'

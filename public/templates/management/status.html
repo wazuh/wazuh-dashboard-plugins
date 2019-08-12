@@ -168,7 +168,7 @@
                 <div layout="row" class="wz-padding-top-10">
                     <span flex="25">Date add</span>
                     <span
-                        class="wz-text-right color-grey">{{ctrl.agentInfo.dateAdd ? ctrl.agentInfo.dateAdd : '-'}}</span>
+                        class="wz-text-right color-grey">{{ ctrl.offsetTimestamp(ctrl.agentInfo.dateAdd) }}</span>
                 </div>
                 <div layout="row" class="wz-padding-top-10">
                     <span flex="25">Version</span>
@@ -177,8 +177,7 @@
                 </div>
                 <div layout="row" class="wz-padding-top-10" ng-if="ctrl.agentInfo.id !== '000'">
                     <span flex="25">Last keep alive</span>
-                    <span class="wz-text-right color-grey">{{ctrl.agentInfo.lastKeepAlive ?
-                        ctrl.agentInfo.lastKeepAlive : '-'}}</span>
+                    <span class="wz-text-right color-grey">{{ ctrl.offsetTimestamp(ctrl.agentInfo.lastKeepAlive) }}</span>
                 </div>
                 <div layout="row" class="wz-padding-top-10">
                     <span flex="25">Operating system</span>

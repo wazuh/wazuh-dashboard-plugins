@@ -6,7 +6,7 @@
             class="euiFieldSearch euiFieldSearch--fullWidth euiFlexItem height-35 ng-empty ng-pristine ng-touched ng-valid"
             aria-invalid="false" wz-enter="dctrl.search(dctrl.custom_search)" id="search-input-rules">
         <wz-add-filter-chip id-input="search-input-rules"
-            options="[{label: 'File', value: 'file'}, {label: 'Path', value: 'path'}]" />
+            options="[{label: 'File', value: 'file'}, {label: 'Path', value: 'path', hide: dctrl.showingLocalDecoders}]" />
         <div class="euiFormControlLayoutIcons wz-margin-left-16">
             <span class="euiFormControlLayoutCustomIcon">
                 <react-component name="EuiIcon"
@@ -48,11 +48,11 @@
             <md-card-content class="wz-padding-bottom-0">
                 <wz-table custom-columns="true" ng-if="!dctrl.showingLocalDecoders"
                     implicit-filter="dctrl.appliedFilters" flex path="'/decoders'"
-                    keys="['name',{value:'details.program_name',size:2,nosortable:true},{value:'details.order',size:2,nosortable:true},'file']"
+                    keys="['name',{value:'details.program_name',size:2,nosortable:true},{value:'details.order',size:2,nosortable:true},'file','path']"
                     allow-click="true" row-sizes="[16,13,11]">
                 </wz-table>
                 <wz-table custom-columns="true" ng-if="dctrl.showingLocalDecoders" flex path="'/decoders'"
-                    keys="['name',{value:'details.program_name',size:2,nosortable:true},{value:'details.order',size:2,nosortable:true},'file']"
+                    keys="['name',{value:'details.program_name',size:2,nosortable:true},{value:'details.order',size:2,nosortable:true},'file','path']"
                     implicit-filter="dctrl.appliedFilters" allow-click="true" row-sizes="[16,13,11]">
                 </wz-table>
             </md-card-content>

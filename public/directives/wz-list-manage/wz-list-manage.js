@@ -57,9 +57,14 @@ app.directive('wzListManage', function() {
         $scope.prevPage();
       };
       $scope.setPage = function(page = false) {
-        this.n = page || this.n;
-        $scope.currentPage = this.n;
-        $scope.nextPage(this.n);
+        if (page === 0 || page === -1) {
+          $scope.firstPage();
+        } else {
+          this.n = page || this.n;
+          $scope.n = this.n;
+          $scope.currentPage = this.n;
+          $scope.nextPage(this.n);
+        }
       };
 
       /**
@@ -73,6 +78,7 @@ app.directive('wzListManage', function() {
         items = $filter('filter')(result, $scope.searchTerm);
         $scope.totalItems = items.length;
         $scope.items = items;
+        $scope.currentItems = Object.keys($scope.currentList.list);
         checkGap($scope, items);
         searchTable();
       };
@@ -196,6 +202,7 @@ app.directive('wzListManage', function() {
        */
       $scope.cancelEditingKey = () => {
         $scope.editingKey = false;
+        $scope.loadingChange = false;
         $scope.editingNewValue = '';
       };
 

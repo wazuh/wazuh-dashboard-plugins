@@ -10,7 +10,7 @@
  * Find more information about this on the LICENSE file.
  */
 export class StatusController {
-  constructor($scope, errorHandler, apiReq, wazuhConfig) {
+  constructor($scope, errorHandler, apiReq, wazuhConfig, timeService) {
     this.$scope = $scope;
     this.errorHandler = errorHandler;
     this.apiReq = apiReq;
@@ -19,6 +19,7 @@ export class StatusController {
     this.selectedNode = false;
     this.clusterError = false;
     this.wazuhConfig = wazuhConfig;
+    this.timeService = timeService;
   }
 
   /**
@@ -42,6 +43,14 @@ export class StatusController {
     return arr;
   }
 
+  offsetTimestamp(time) {
+    try {
+      return this.timeService.offset(time);
+    } catch (error) {
+      return time !== '-' ? `${time} (UTC)` : time;
+    }
+  }
+
   /**
    * Fetchs all required data
    */
@@ -50,11 +59,14 @@ export class StatusController {
       const configuration = this.wazuhConfig.getConfig();
       this.$scope.adminMode = !!(configuration || {}).admin;
 
-      const data = await Promise.all([
-        this.apiReq.request('GET', '/agents/summary', {}),
-        this.apiReq.request('GET', '/cluster/status', {}),
-        this.apiReq.request('GET', '/manager/info', {})
-      ]);
+      const agSumm = await this.apiReq.request('GET', '/agents/summary', {});
+      const clusStat = await this.apiReq.request('GET', '/cluster/status', {});
+      const manInfo = await this.apiReq.request('GET', '/manager/info', {});
+
+      const data = [];
+      data.push(agSumm);
+      data.push(clusStat);
+      data.push(manInfo);
 
       const parsedData = data.map(
         item => ((item || {}).data || {}).data || false

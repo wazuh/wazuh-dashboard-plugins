@@ -127,7 +127,8 @@ function discoverController(
   getAppState,
   globalState,
   loadedVisualizations,
-  discoverPendingUpdates
+  discoverPendingUpdates,
+  errorHandler
 ) {
   const visualizeLoader = Private(VisualizeLoaderProvider);
   let visualizeHandler;
@@ -463,8 +464,39 @@ function discoverController(
         if (!angular.equals(sort, currentSort)) $scope.fetch();
       });
 
+      const isRemovable = filter =>
+        typeof filter.meta.removable !== 'undefined' && !filter.meta.removable;
+
       // update data source when filters update
       $scope.$listen(queryFilter, 'update', function() {
+        if (!$scope.implicitFilters) {
+          $scope.implicitFilters = queryFilter.getFilters();
+        }
+        let filters = queryFilter.getFilters();
+        ///////////////////////////////  WAZUH   ///////////////////////////////////
+        // Store non removable filters
+        const nonRemovableFilters = $scope.implicitFilters.map(
+          item => item.meta.key
+        );
+
+        // Compose final filters array not including filters that also exist as non removable filter
+        filters = filters.filter(item => {
+          const key =
+            item.meta.key || (Object.keys(item.query.match) || [undefined])[0];
+          const isIncluded = nonRemovableFilters.includes(key);
+          const isNonRemovable = isRemovable(item);
+          if (isIncluded && !isNonRemovable) {
+            const removablesByKey = filters.filter(
+              x => x.meta.removable == false && x.meta.key === key
+            ).length;
+            if (removablesByKey < 1) {
+              item.meta.removable = false;
+            }
+          }
+          const shouldBeAdded = (isIncluded && isNonRemovable) || !isIncluded;
+          return shouldBeAdded;
+        });
+
         return $scope
           .updateDataSource()
           .then(function() {
@@ -472,10 +504,7 @@ function discoverController(
             ///////////////////////////////  WAZUH   ///////////////////////////////////
             ////////////////////////////////////////////////////////////////////////////
             discoverPendingUpdates.removeAll();
-            discoverPendingUpdates.addItem(
-              $state.query,
-              queryFilter.getFilters()
-            );
+            discoverPendingUpdates.addItem($state.query, filters);
             $rootScope.$broadcast('updateVis');
             $rootScope.$broadcast('fetch');
             if ($location.search().tab != 'configuration') {
@@ -585,7 +614,6 @@ function discoverController(
         setupVisualization();
         $scope.updateTime();
       }
-
       init.complete = true;
       $state.replace();
     });
@@ -1080,6 +1108,25 @@ function discoverController(
       });
     } else {
       $state.filters = localChange ? $state.filters : [];
+      const currentFilters = queryFilter.getFilters();
+      const hasAgentIDPinned = currentFilters.filter(
+        item =>
+          ((item || {}).meta || {}).key === 'agent.id' &&
+          ((item || {}).$state || {}).store === 'globalState'
+      );
+
+      const weHaveAgentIDImplicit = wzCurrentFilters.filter(
+        item =>
+          ((typeof item || {}).meta || {}).removable !== 'undefined' &&
+          !((item || {}).meta || {}).removable &&
+          ((item || {}).meta || {}).key === 'agent.id'
+      );
+
+      if (weHaveAgentIDImplicit.length && hasAgentIDPinned.length) {
+        for (const filter of hasAgentIDPinned) {
+          queryFilter.removeFilter(filter);
+        }
+      }
 
       queryFilter
         .addFilters(wzCurrentFilters)
