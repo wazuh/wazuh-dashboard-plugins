@@ -8,7 +8,7 @@ export class BasicTable extends Component {
 
     this.state = {
       items: this.props.items,
-      pageIndex: 0,
+      pageIndex: this.props.pageIndex,
       pageSize: 10,
       sortField: this.props.initialSortField || this.props.columns[0].field,
       sortDirection: 'desc'
@@ -22,7 +22,8 @@ export class BasicTable extends Component {
 
   UNSAFE_componentWillReceiveProps(nextProps) {
     this.setState({
-      items: nextProps.items
+      items: nextProps.items,
+      pageIndex: nextProps.pageIndex
     });
   }
 
