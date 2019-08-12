@@ -135,10 +135,7 @@ class WzRegisterAgents {
       try {
         const data = await apiReq.request(
           'PUT',
-          `/agents/${
-            $scope.registerObj.systems[$scope.registerObj.selectedSystem]
-              .steps[3].id
-          }/restart`,
+          `/agents/${$scope.registerObj.systems[$scope.registerObj.selectedSystem].steps[3].id}/restart`,
           {}
         );
         const result = ((data || {}).data || {}).data || false;
@@ -146,10 +143,7 @@ class WzRegisterAgents {
           throw new Error('Unexpected error restarting agent');
         }
         errorHandler.info(
-          `Success. Agent ${
-            $scope.registerObj.systems[$scope.registerObj.selectedSystem]
-              .steps[0].agentName
-          } has been registered.`
+          `Success. Agent ${$scope.registerObj.systems[$scope.registerObj.selectedSystem].steps[0].agentName} has been registered.`
         );
         $scope.nextStep();
       } catch (error) {

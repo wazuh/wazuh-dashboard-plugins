@@ -59,7 +59,7 @@ export class FilesController {
       this.$scope.$applyAsync();
     });
 
-    this.$scope.closeEditingFile = () => {
+    this.$scope.closeEditingFile = (flag = false) => {
       this.$scope.editingFile = false;
       this.$scope.editorReadOnly = false;
       this.$scope.fetchedXML = null;
@@ -70,7 +70,7 @@ export class FilesController {
           });
           this.$scope.mctrl.currentRule = null;
         }
-        this.$scope.mctrl.setRulesTab(this.$scope.mctrl.globalRulesetTab);
+        this.$scope.mctrl.setRulesTab(this.$scope.mctrl.globalRulesetTab, flag);
         this.$scope.goBack = false;
       }
       this.search();
@@ -140,6 +140,11 @@ export class FilesController {
 
     this.$scope.$on('showRestart', () => {
       this.$scope.restartBtn = true;
+      this.$scope.$applyAsync();
+    });
+
+    this.$scope.$on('closeRulesetFile', () => {
+      this.$scope.closeEditingFile(true);
       this.$scope.$applyAsync();
     });
 

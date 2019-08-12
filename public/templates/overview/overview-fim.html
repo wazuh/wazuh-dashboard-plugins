@@ -1,5 +1,4 @@
-<md-content flex layout="column" ng-if="octrl.tab === 'fim' && octrl.tabView === 'panels'"
-    ng-class="{'no-opacity': resultState !== 'ready' || !rendered}">
+<md-content flex layout="column" ng-if="octrl.tab === 'fim' && octrl.tabView === 'panels'" ng-class="{'no-opacity': resultState !== 'ready' || !rendered}">
 
     <div layout="row" class="height-400">
         <md-card flex class="wz-md-card" ng-class="{'fullscreen': octrl.expandArray[0]}">
@@ -11,8 +10,7 @@
                 </span>
             </md-card-actions>
             <md-card-content class="wazuh-column">
-                <kbn-vis id="Wazuh-App-Agents-FIM-Alerts-by-action-over-time"
-                    vis-id="'Wazuh-App-Agents-FIM-Alerts-by-action-over-time'"></kbn-vis>
+                <kbn-vis id="Wazuh-App-Agents-FIM-Alerts-by-action-over-time" vis-id="'Wazuh-App-Agents-FIM-Alerts-by-action-over-time'"></kbn-vis>
             </md-card-content>
         </md-card>
     </div>
@@ -26,8 +24,7 @@
                 </span>
             </md-card-actions>
             <md-card-content class="wazuh-column">
-                <kbn-vis id="Wazuh-App-Overview-FIM-Top-5-agents-pie"
-                    vis-id="'Wazuh-App-Overview-FIM-Top-5-agents-pie'"></kbn-vis>
+                <kbn-vis id="Wazuh-App-Overview-FIM-Top-5-agents-pie" vis-id="'Wazuh-App-Overview-FIM-Top-5-agents-pie'"></kbn-vis>
             </md-card-content>
         </md-card>
         <md-card flex class="wz-md-card" ng-class="{'fullscreen': octrl.expandArray[2]}">
@@ -81,7 +78,7 @@
                 </span>
             </md-card-actions>
             <md-card-content class="wazuh-column">
-                <kbn-vis vis-id="'Wazuh-App-Overview-FIM-top-agents-user'"></kbn-vis>
+                <kbn-vis class="sca-vis table-scrollable" vis-id="'Wazuh-App-Overview-FIM-top-agents-user'"></kbn-vis>
             </md-card-content>
         </md-card>
     </div>
