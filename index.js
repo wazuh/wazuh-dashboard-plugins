@@ -38,6 +38,16 @@ export default kibana =>
       }
     },
     init(server, options) {
+      // Kibana spaces locker
+      const xpackMainPlugin = server.plugins.xpack_main;
+      xpackMainPlugin.registerFeature({
+        id: 'wazuh',
+        name: 'Wazuh',
+        app: ['wazuh','kibana','elasticsearch'],
+        navLinkId: 'wazuh',
+        privileges: {}
+      });
+
       return initApp(server, options);
     }
   });
