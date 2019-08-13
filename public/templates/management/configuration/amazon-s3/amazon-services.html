@@ -44,22 +44,22 @@
             <div flex layout="column" ng-if="currentConfig['aws-s3'].services.length">
                 <div flex="auto" class="wz-item-detail">
                     <wz-config-item label="Service type"
-                        value="currentConfig['aws-s3'].services[mconfigctrl.selectedItem].type">
+                        value="currentConfig['aws-s3'].services[selectedItem].type">
                     </wz-config-item>
                     <wz-config-item label="Profile name with read permissions"
-                        value="currentConfig['aws-s3'].services[mconfigctrl.selectedItem].aws_profile">
+                        value="currentConfig['aws-s3'].services[selectedItem].aws_profile">
                     </wz-config-item>
                     <wz-config-item label="AWS account alias"
-                        value="currentConfig['aws-s3'].services[mconfigctrl.selectedItem].account_alias">
+                        value="currentConfig['aws-s3'].services[selectedItem].account_alias">
                     </wz-config-item>
                     <wz-config-item label="IAM ARN role to read bucket logs"
-                        value="currentConfig['aws-s3'].services[mconfigctrl.selectedItem].iam_role_arn">
+                        value="currentConfig['aws-s3'].services[selectedItem].iam_role_arn">
                     </wz-config-item>
                     <wz-config-item label="Parse only logs from this date onwards"
-                        value="currentConfig['aws-s3'].services[mconfigctrl.selectedItem].only_logs_after">
+                        value="currentConfig['aws-s3'].services[selectedItem].only_logs_after">
                     </wz-config-item>
                     <wz-config-item label="Limit log parsing to these regions"
-                        value="currentConfig['aws-s3'].services[mconfigctrl.selectedItem].regions">
+                        value="currentConfig['aws-s3'].services[selectedItem].regions">
                     </wz-config-item>
                 </div>
 
