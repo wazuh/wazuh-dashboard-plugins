@@ -1,9 +1,4 @@
 <div flex="auto" layout="column" ng-cloak ng-controller="agentsController">
-
-    <!-- Top navbar section -->
-    <wz-menu ng-init="menuNavItem = 'agents'"></wz-menu>
-    <!-- End top navbar section -->
-
     <!-- Navigation section -->
     <div layout="row" layout-align="start center" ng-if="agent">
         <!-- Breadcrumbs -->

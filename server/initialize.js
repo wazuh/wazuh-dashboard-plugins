@@ -251,11 +251,11 @@ export function Initialize(server) {
       source.revision = packageJSON.revision;
       source.lastRestart = new Date().toISOString(); // Registry exists so we update the lastRestarted date only
 
-      fs.writeFileSync(wazuhVersion, JSON.stringify(source), err => {
-        if (err) {
-          throw new Error(err);
-        }
-      });
+      /*       fs.writeFileSync(wazuhVersion, JSON.stringify(source), err => {
+              if (err) {
+                throw new Error(err);
+              }
+            }); */
     } catch (error) {
       return Promise.reject(error);
     }

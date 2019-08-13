@@ -168,15 +168,15 @@ routes
     resolve: { nestedResolve, ip, savedSearch }
   })
   .when('/visualize/create?', {
-    redirectTo: function() {},
+    redirectTo: function () { },
     resolve: { wzConfig, wzKibana }
   })
   .when('/context/:pattern?/:type?/:id?', {
-    redirectTo: function() {},
+    redirectTo: function () { },
     resolve: { wzKibana }
   })
   .when('/doc/:pattern?/:index?/:type?/:id?', {
-    redirectTo: function() {},
+    redirectTo: function () { },
     resolve: { wzKibana }
   })
   .when('/wazuh-dev', {

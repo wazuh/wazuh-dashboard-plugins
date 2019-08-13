@@ -999,9 +999,18 @@ discover-app-w .container-fluid {
 }
 
 .navBarLogo {
-  width: 100px;
-  margin: 2px 0px 0px 10px;
-  filter: invert(75%);
+  width: 124px;
+  margin: 4px 0px 0px 0px;
+}
+
+@media only screen and (max-width: 767px){
+  .wz-menu-jq .md-toolbar-tools {
+    margin-left: -60px;
+  }
+}
+
+md-toolbar.md-default-theme:not(.md-menu-toolbar), md-toolbar:not(.md-menu-toolbar) {
+    background-color: transparent!important;
 }
 
 .refresh-report-button {
@@ -1031,4 +1040,14 @@ discover-app-w .container-fluid {
 
 .wz-md-card:not(.fullscreen) .sca-vis.table-scrollable .kbnAggTable__paginated{
   height: 150px;
+}
+
+.header-global-wrapper + .app-wrapper:not(.hidden-chrome) {
+  top: 49px!important;
+  left: 49px!important;
+}
+@media only screen and (max-width: 767px){
+  .header-global-wrapper + .app-wrapper:not(.hidden-chrome) {
+      left: 0!important;
+  }
 }

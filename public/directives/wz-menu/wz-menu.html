@@ -3,6 +3,32 @@
     <!-- Main toolbar content -->
     <div class="md-toolbar-tools wz-menu-content">
 
+        <!-- Main Wazuh app navigation buttons -->
+        <md-button class="wz-menu-button" ng-href="#/overview" ng-click="setMenuNavItem('overview')"
+            ng-class="{'wz-menu-active': menuNavItem === 'overview' }" aria-label="Overview tab">
+            <react-component name="EuiIcon" class="kbnGlobalNavLink__euiIcon" props="{type:'visualizeApp'}" /> Overview
+        </md-button>
+
+        <md-button class="wz-menu-button" ng-href="#/manager" ng-click="setMenuNavItem('manager')"
+            ng-class="{'wz-menu-active': menuNavItem === 'manager' }" aria-label="Cluster tab">
+            <react-component name="EuiIcon" class="kbnGlobalNavLink__euiIcon" props="{type:'infraApp'}" /> Management
+        </md-button>
+
+        <md-button class="wz-menu-button" ng-href="#/agents-preview" ng-click="setMenuNavItem('agents')"
+            ng-class="{'wz-menu-active': menuNavItem === 'agents' }" aria-label="Agents tab">
+            <i class="fa fa-fw fa-tv" aria-hidden="true"></i> Agents
+        </md-button>
+
+        <md-button class="wz-menu-button" ng-href="#/wazuh-discover" ng-click="setMenuNavItem('discover')"
+            ng-class="{'wz-menu-active': menuNavItem === 'discover' }" aria-label="Discover tab">
+            <react-component name="EuiIcon" class="kbnGlobalNavLink__euiIcon" props="{type:'discoverApp'}" /> Discover
+        </md-button>
+
+        <md-button class="wz-menu-button" ng-href="#/wazuh-dev" ng-click="setMenuNavItem('wazuh-dev')"
+            ng-class="{'wz-menu-active': menuNavItem === 'wazuh-dev' }" aria-label="Dev Tools tab">
+            <react-component name="EuiIcon" class="kbnGlobalNavLink__euiIcon" props="{type:'console'}" /> Dev tools
+        </md-button>
+
         <!-- Fill up the space between left and right area -->
         <span flex></span>
 

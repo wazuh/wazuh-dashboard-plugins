@@ -19,18 +19,21 @@
 
 wz-menu {
     position: fixed;
-    width: 100%;
-    right: 0;
-    z-index: 2;
-    top: 49px;
 }
 
 .wz-menu-content {
     color: #373a42;
     background-color: #FFF;
     z-index: 1000;
-    /*border-bottom: 1px solid #D3DAE6;*/
+    border-bottom: 1px solid #D3DAE6;
+    position: fixed;
+    width: calc(~'100% - 49px');
 }
+@media only screen and (max-width: 767px){
+    .wz-menu-content {
+        width: 100%;
+    }
+  }
 
 /* Style to override the font on the toolbar */
 .wz-menu-content {
@@ -40,12 +43,12 @@ wz-menu {
 .wz-menu-button {
     font-size: 14px !important;
     transition: none !important;
-    min-height: 30px !important;
-    line-height: 30px !important;
-    height: 48px;
-    border-radius: 0;
-    padding: 10px 13px;
-    margin: 0;
+    min-height: 35px !important;
+    line-height: 35px !important;
+    height: 35px;
+    padding: 0px 8px;
+    border-radius: 4px;
+    margin: 0px 5px;
 }
 
 .wz-menu-button.md-icon-button {
@@ -84,27 +87,6 @@ wz-menu {
     height: 16px !important;
 }
 
-.wz-menu-jq {
-    position: fixed;
-    top: 48px;
-    height: 48px;
-    /*border-bottom: 1px solid #d3dae6;*/
-    width: 100%;
-    left: 48px;
-    width: 50%;
-    border-top: 1px solid #d2d9e5;
-    z-index: 1000;
-}
-
-.wz-menu-jq md-toolbar {
-    height: 48px !important;
-    min-height: 0px !important;
-}
-
-.wz-menu-jq .md-toolbar-tools {
-    height: 48px !important;
-}
-
 .wz-menu-bottom-line {
     border-bottom: 1px solid #d3dae6;
     width: 100%;
@@ -118,6 +100,11 @@ wz-menu {
     box-shadow: none !important;
 }
 
-.app-wrapper {
-    margin-top: 49px !important;
+md-toolbar {
+    height: 49px !important;
+    min-height: 0px !important;
+}
+
+.md-toolbar-tools {
+    height: 49px !important;
 }
