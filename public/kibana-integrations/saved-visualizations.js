@@ -11,13 +11,12 @@
  *
  * Find more information about this on the LICENSE file.
  */
-
 import 'plugins/kibana/visualize/saved_visualizations/_saved_vis';
 import { VisTypesRegistryProvider } from 'ui/registry/vis_types';
 import { uiModules } from 'ui/modules';
 import { SavedObjectLoader } from './saved-object-loader';
-import { SavedObjectsClientProvider } from 'ui/saved_objects';
 import { savedObjectManagementRegistry } from 'plugins/kibana/management/saved_object_registry';
+import { SavedObjectsClientProvider } from 'ui/saved_objects';
 
 const app = uiModules.get('app/visualize');
 
@@ -28,7 +27,8 @@ savedObjectManagementRegistry.register({
   title: 'visualizations'
 });
 
-app.service('wzsavedVisualizations', function(
+app.service('wzsavedVisualizations', function (
+  Promise,
   kbnIndex,
   SavedVis,
   Private,
@@ -48,7 +48,7 @@ app.service('wzsavedVisualizations', function(
     savedObjectClient
   );
 
-  saveVisualizationLoader.mapHitSource = function(source, id) {
+  saveVisualizationLoader.mapHitSource = function (source, id) {
     source.id = id;
     source.url = this.urlFor(id);
 
@@ -71,7 +71,7 @@ app.service('wzsavedVisualizations', function(
     return source;
   };
 
-  saveVisualizationLoader.urlFor = function(id) {
+  saveVisualizationLoader.urlFor = function (id) {
     return kbnUrl.eval('#/visualize/edit/{{id}}', { id: id });
   };
   return saveVisualizationLoader;

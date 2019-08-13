@@ -13,7 +13,6 @@
  */
 
 // @ts-ignore
-import { data } from 'plugins/data';
 import { EuiFilterButton, EuiFlexGroup, EuiFlexItem } from '@elastic/eui';
 import { Filter } from '@kbn/es-query';
 import { InjectedIntl, injectI18n } from '@kbn/i18n/react';
@@ -22,7 +21,7 @@ import React, { Component } from 'react';
 import ResizeObserver from 'resize-observer-polyfill';
 import { FilterBar } from './filter_bar';
 import { IndexPattern } from 'ui/index_patterns';
-const { QueryBar } = data.query.ui;
+import { QueryBar } from 'ui/query_bar';
 import { Storage } from 'ui/storage';
 
 interface Query {
@@ -118,13 +117,13 @@ class SearchBarUI extends Component<Props, State> {
     });
     const clickToShowOrHideText = this.state.isFiltersVisible
       ? this.props.intl.formatMessage({
-          id: 'common.ui.searchBar.filtersButtonClickToShowTitle',
-          defaultMessage: 'Select to hide',
-        })
+        id: 'common.ui.searchBar.filtersButtonClickToShowTitle',
+        defaultMessage: 'Select to hide',
+      })
       : this.props.intl.formatMessage({
-          id: 'common.ui.searchBar.filtersButtonClickToHideTitle',
-          defaultMessage: 'Select to show',
-        });
+        id: 'common.ui.searchBar.filtersButtonClickToHideTitle',
+        defaultMessage: 'Select to show',
+      });
 
     const filterTriggerButton = (
       <EuiFilterButton
@@ -163,8 +162,8 @@ class SearchBarUI extends Component<Props, State> {
             onRefreshChange={this.props.onRefreshChange}
           />
         ) : (
-          ''
-        )}
+            ''
+          )}
 
         {this.props.showFilterBar ? (
           <div
@@ -188,8 +187,8 @@ class SearchBarUI extends Component<Props, State> {
             </div>
           </div>
         ) : (
-          ''
-        )}
+            ''
+          )}
       </div>
     );
   }
