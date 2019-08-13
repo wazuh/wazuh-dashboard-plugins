@@ -54,126 +54,71 @@ export class WazuhApiCtrl {
     try {
       // Get config from elasticsearch
       const api = await this.wzWrapper.getWazuhConfigurationById(req.payload);
-      if (api.error_code > 1) {
-        throw new Error(`Could not find Wazuh API entry on Elasticsearch.`);
-      } else if (api.error_code > 0) {
-        throw new Error(
-          'Valid credentials not found in Elasticsearch. It seems the credentials were not saved.'
-        );
+
+      // Check Elasticsearch API errors
+      if (api.error_code) {
+        throw new Error('Could not find Wazuh API entry on Elasticsearch.');
       }
+
       log('wazuh-api:checkStoredAPI', `${req.payload} exists`, 'debug');
 
+      // Build credentials object for making a Wazuh API request
       const credInfo = ApiHelper.buildOptionsObject(api);
 
-      let response = await needle(
+      // Fetch needed information about the cluster and the manager itself
+      const response = await needle(
         'get',
-        `${api.url}:${api.port}/version`,
+        `${api.url}:${api.port}/manager/info`,
         {},
         credInfo
       );
 
+      // Look for socket-related errors
       if (this.checkResponseIsDown(response)) {
         return ErrorResponse('ERROR3099', 3099, 500, reply);
       }
 
-      if (parseInt(response.body.error) === 0 && response.body.data) {
-        // Checking the cluster status
-        response = await needle(
-          'get',
-          `${api.url}:${api.port}/cluster/status`,
-          {},
-          credInfo
+      // Store error and data fields from the Wazuh API into different variables
+      const { body } = response;
+      const { error, data, message } = body;
+
+      // Check if the response has no errors (error code is zero and there is data)
+      const validResponse = parseInt(error) === 0 && data;
+
+      // If we have a valid response from the Wazuh API
+      if (validResponse) {
+        const { name, cluster } = data;
+        // Clear and update cluster information before being sent back to frontend
+        delete api.cluster_info;
+        const clusterEnabled = cluster.enabled === 'yes';
+        api.cluster_info = {
+          status: clusterEnabled ? 'enabled' : 'disabled',
+          manager: name,
+          node: cluster.node_name,
+          cluster: clusterEnabled ? cluster.name : 'Disabled'
+        };
+
+        // Update cluster information in Elasticsearch .wazuh document
+        const result = await this.wzWrapper.updateWazuhIndexDocument(
+          null,
+          req.payload,
+          {
+            doc: { cluster_info: api.cluster_info }
+          }
         );
 
-        if (this.checkResponseIsDown(response)) {
-          return ErrorResponse('ERROR3099', 3099, 500, reply);
-        }
+        // Hide Wazuh API password
+        api.password = '****';
 
-        if (!response.body.error) {
-          try {
-            const managerInfo = await needle(
-              'get',
-              `${api.url}:${api.port}/agents/000`,
-              {},
-              credInfo
-            );
-
-            if (this.checkResponseIsDown(managerInfo)) {
-              return ErrorResponse('ERROR3099', 3099, 500, reply);
-            }
-
-            const updatedManagerName = managerInfo.body.data.name;
-            api.cluster_info.manager = updatedManagerName;
-            await this.wzWrapper.updateWazuhIndexDocument(null, req.payload, {
-              doc: { cluster_info: api.cluster_info }
-            });
-          } catch (error) {
-            log('wazuh-api:checkStoredAPI', error.message || error);
-          }
-
-          // If cluster mode is active
-          if (response.body.data.enabled === 'yes') {
-            response = await needle(
-              'get',
-              `${api.url}:${api.port}/cluster/node`,
-              {},
-              credInfo
-            );
-
-            if (this.checkResponseIsDown(response)) {
-              return ErrorResponse('ERROR3099', 3099, 500, reply);
-            }
-
-            if (!response.body.error) {
-              let managerName = api.cluster_info.manager;
-              delete api.cluster_info;
-              api.cluster_info = {};
-              api.cluster_info.status = 'enabled';
-              api.cluster_info.manager = managerName;
-              api.cluster_info.node = response.body.data.node;
-              api.cluster_info.cluster = response.body.data.cluster;
-              api.password = '****';
-              return {
-                statusCode: 200,
-                data: api,
-                idChanged: req.idChanged || null
-              };
-            } else if (response.body.error) {
-              const tmpMsg =
-                ((response || {}).body || {}).message ||
-                'Unexpected error from /cluster/node';
-              throw new Error(tmpMsg);
-            }
-          } else {
-            // Cluster mode is not active
-            let managerName = api.cluster_info.manager;
-            delete api.cluster_info;
-            api.cluster_info = {};
-            api.cluster_info.status = 'disabled';
-            api.cluster_info.cluster = 'Disabled';
-            api.cluster_info.manager = managerName;
-            api.password = '****';
-            log('wazuh-api:checkStoredAPI', `Success`, 'debug');
-            return {
-              statusCode: 200,
-              data: api,
-              idChanged: req.idChanged || null
-            };
-          }
-        } else {
-          const tmpMsg =
-            ((response || {}).body || {}).message ||
-            'Unexpected error from /cluster/status';
-
-          throw new Error(tmpMsg);
-        }
-      } else {
-        if (((response || {}).body || {}).message) {
-          throw new Error(response.body.message);
-        }
-
-        throw new Error(`${api.url}:${api.port}/version is unreachable`);
+        return {
+          statusCode: 200,
+          data: api,
+          idChanged: req.idChanged || null
+        };
       }
+
+      // If we have an invalid response from the Wazuh API
+      throw new Error(message || `${api.url}:${api.port} is unreachable`);
     } catch (error) {
       log('wazuh-api:checkStoredAPI', error.message || error);
       if (error.code === 'EPROTO') {
@@ -224,7 +169,7 @@ export class WazuhApiCtrl {
                   req.idChanged = api._id;
                   return this.checkStoredAPI(req, reply);
                 }
-              } catch (error) { } // eslint-disable-line
+              } catch (error) {} // eslint-disable-line
             }
           } catch (error) {
             return ErrorResponse(error.message || error, 3020, 500, reply);
@@ -601,11 +546,11 @@ export class WazuhApiCtrl {
   }
 
   /**
- * This get PCI requirements
- * @param {Object} req
- * @param {Object} reply
- * @returns {Array<Object>} requirements or ErrorResponse
- */
+   * This get PCI requirements
+   * @param {Object} req
+   * @param {Object} reply
+   * @returns {Array<Object>} requirements or ErrorResponse
+   */
   async getHipaaRequirement(req, reply) {
     try {
       let hipaa_description = '';
@@ -683,11 +628,11 @@ export class WazuhApiCtrl {
   }
 
   /**
- * This get NIST 800-53 requirements
- * @param {Object} req
- * @param {Object} reply
- * @returns {Array<Object>} requirements or ErrorResponse
- */
+   * This get NIST 800-53 requirements
+   * @param {Object} req
+   * @param {Object} reply
+   * @returns {Array<Object>} requirements or ErrorResponse
+   */
   async getNistRequirement(req, reply) {
     try {
       let nist_description = '';
@@ -914,7 +859,7 @@ export class WazuhApiCtrl {
       if (method === 'DELETE') {
         fixedUrl = `${
           fullUrl.includes('?') ? fullUrl.split('?')[0] : fullUrl
-          }?${querystring.stringify(data)}`;
+        }?${querystring.stringify(data)}`;
       }
 
       log('wazuh-api:makeRequest', `${method} ${fixedUrl || fullUrl}`, 'debug');
@@ -1006,7 +951,7 @@ export class WazuhApiCtrl {
       }
 
       throw ((response || {}).body || {}).error &&
-        ((response || {}).body || {}).message
+      ((response || {}).body || {}).message
         ? { message: response.body.message, code: response.body.error }
         : new Error('Unexpected error fetching data from the Wazuh API');
     } catch (error) {
@@ -1164,29 +1109,29 @@ export class WazuhApiCtrl {
 
         const fields = isAgents
           ? [
-            'id',
-            'status',
-            'name',
-            'ip',
-            'group',
-            'manager',
-            'node_name',
-            'dateAdd',
-            'version',
-            'lastKeepAlive',
-            'os.arch',
-            'os.build',
-            'os.codename',
-            'os.major',
-            'os.minor',
-            'os.name',
-            'os.platform',
-            'os.uname',
-            'os.version'
-          ]
+              'id',
+              'status',
+              'name',
+              'ip',
+              'group',
+              'manager',
+              'node_name',
+              'dateAdd',
+              'version',
+              'lastKeepAlive',
+              'os.arch',
+              'os.build',
+              'os.codename',
+              'os.major',
+              'os.minor',
+              'os.name',
+              'os.platform',
+              'os.uname',
+              'os.version'
+            ]
           : isList
-            ? ['key', 'value']
-            : Object.keys(output.body.data.items[0]);
+          ? ['key', 'value']
+          : Object.keys(output.body.data.items[0]);
 
         const json2csvParser = new Parser({ fields });
         if (isList) {
@@ -1379,9 +1324,7 @@ export class WazuhApiCtrl {
       if (source.installationDate && source.lastRestart) {
         log(
           'wazuh-api:getTimeStamp',
-          `Installation date: ${
-          source.installationDate
-          }. Last restart: ${source.lastRestart}`,
+          `Installation date: ${source.installationDate}. Last restart: ${source.lastRestart}`,
           'debug'
         );
         return {
@@ -1403,11 +1346,11 @@ export class WazuhApiCtrl {
   }
 
   /**
- * This get the wazuh setup settings
- * @param {Object} req
- * @param {Object} reply
- * @returns {Object} setup info or ErrorResponse
- */
+   * This get the wazuh setup settings
+   * @param {Object} req
+   * @param {Object} reply
+   * @returns {Object} setup info or ErrorResponse
+   */
   async getSetupInfo(req, reply) {
     try {
       const source = JSON.parse(fs.readFileSync(this.wazuhVersion, 'utf8'));
@@ -1418,7 +1361,7 @@ export class WazuhApiCtrl {
       log('wazuh-api:getSetupInfo', error.message || error);
       return ErrorResponse(
         `Could not get data from wazuh-version registry due to ${error.message ||
-        error}`,
+          error}`,
         4005,
         500,
         reply
@@ -1427,11 +1370,11 @@ export class WazuhApiCtrl {
   }
 
   /**
-* Get basic syscollector information for given agent.
-* @param {Object} req
-* @param {Object} reply
-* @returns {Object} Basic syscollector information
-*/
+   * Get basic syscollector information for given agent.
+   * @param {Object} req
+   * @param {Object} reply
+   * @returns {Object} Basic syscollector information
+   */
   async getSyscollector(req, reply) {
     try {
       if (!req.params || !req.headers.id || !req.params.agent) {
@@ -1467,7 +1410,7 @@ export class WazuhApiCtrl {
       const syscollector = {
         hardware:
           typeof hardwareResponse === 'object' &&
-            Object.keys(hardwareResponse).length
+          Object.keys(hardwareResponse).length
             ? { ...hardwareResponse }
             : false,
         os:

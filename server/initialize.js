@@ -79,7 +79,7 @@ export function Initialize(server) {
       };
 
       try {
-        fs.writeFileSync(wazuhVersion, JSON.stringify(configuration), (err) => {
+        fs.writeFileSync(wazuhVersion, JSON.stringify(configuration), err => {
           if (err) {
             throw new Error(err);
           }
@@ -233,7 +233,7 @@ export function Initialize(server) {
 
       try {
         if (!fs.existsSync(wazuhVersion)) {
-          throw new Error;
+          throw new Error();
         }
       } catch (error) {
         log(
@@ -251,7 +251,7 @@ export function Initialize(server) {
       source.revision = packageJSON.revision;
       source.lastRestart = new Date().toISOString(); // Registry exists so we update the lastRestarted date only
 
-      fs.writeFileSync(wazuhVersion, JSON.stringify(source), (err) => {
+      fs.writeFileSync(wazuhVersion, JSON.stringify(source), err => {
         if (err) {
           throw new Error(err);
         }

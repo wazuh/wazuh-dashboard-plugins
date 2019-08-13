@@ -215,8 +215,8 @@ export class AgentsController {
 
     this.$scope.startVis2Png = () => this.startVis2Png();
 
-    this.$scope.shouldShowComponent = (component) => this.shouldShowComponent(component);
-
+    this.$scope.shouldShowComponent = component =>
+      this.shouldShowComponent(component);
 
     this.$scope.$on('$destroy', () => {
       this.visFactoryService.clearAll();
@@ -229,8 +229,12 @@ export class AgentsController {
       this.$location.path('/manager/groups');
     };
 
-    this.$scope.exportConfiguration = (enabledComponents) => {
-      this.reportingService.startConfigReport(this.$scope.agent, 'agentConfig', enabledComponents);
+    this.$scope.exportConfiguration = enabledComponents => {
+      this.reportingService.startConfigReport(
+        this.$scope.agent,
+        'agentConfig',
+        enabledComponents
+      );
     };
 
     this.$scope.restartAgent = async agent => {
@@ -743,7 +747,9 @@ export class AgentsController {
         this.$scope.agentOS =
           this.$scope.agent.os.name + ' ' + this.$scope.agent.os.version;
         const isLinux = this.$scope.agent.os.uname.includes('Linux');
-        this.$scope.agent.agentPlatform = isLinux ? 'linux' : this.$scope.agent.os.platform;
+        this.$scope.agent.agentPlatform = isLinux
+          ? 'linux'
+          : this.$scope.agent.os.platform;
       } else {
         this.$scope.agentOS = '-';
         this.$scope.agent.agentPlatform = false;
@@ -786,13 +792,21 @@ export class AgentsController {
   }
 
   shouldShowComponent(component) {
-    return !(UnsupportedComponents[this.$scope.agent.agentPlatform] || UnsupportedComponents['other']).includes(component);
+    return !(
+      UnsupportedComponents[this.$scope.agent.agentPlatform] ||
+      UnsupportedComponents['other']
+    ).includes(component);
   }
 
   cleanExtensions(extensions) {
     const result = {};
     for (const extension in extensions) {
-      if (!(UnsupportedComponents[this.$scope.agent.agentPlatform] || UnsupportedComponents['other']).includes(extension)) {
+      if (
+        !(
+          UnsupportedComponents[this.$scope.agent.agentPlatform] ||
+          UnsupportedComponents['other']
+        ).includes(extension)
+      ) {
         result[extension] = extensions[extension];
       }
     }
@@ -800,8 +814,8 @@ export class AgentsController {
   }
 
   /**
- * Get available welcome cards after getting the agent
- */
+   * Get available welcome cards after getting the agent
+   */
   loadWelcomeCardsProps() {
     this.$scope.welcomeCardsProps = {
       switchTab: tab => this.switchTab(tab),

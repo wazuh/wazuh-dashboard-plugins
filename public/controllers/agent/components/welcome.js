@@ -48,7 +48,7 @@ export class WelcomeScreen extends Component {
     try {
       const api = JSON.parse(this.props.api).id;
       api && this.props.setExtensions(api, extensions);
-    } catch (error) { } //eslint-disable-line
+    } catch (error) {} //eslint-disable-line
   }
 
   buildTabCard(tab, icon) {
@@ -153,16 +153,21 @@ export class WelcomeScreen extends Component {
                   ])}
                 </EuiFlexItem>
               </EuiFlexGroup>
-              {(UnsupportedComponents[this.props.agent.agentPlatform] || UnsupportedComponents['other']).includes('vuls') &&
-                !this.props.extensions.virustotal && !this.props.extensions.osquery && !this.props.extensions.docker && (
+              {(
+                UnsupportedComponents[this.props.agent.agentPlatform] ||
+                UnsupportedComponents['other']
+              ).includes('vuls') &&
+                !this.props.extensions.virustotal &&
+                !this.props.extensions.osquery &&
+                !this.props.extensions.docker && (
                   <EuiFlexGroup>
                     <EuiFlexItem>
                       <EuiCallOut
                         title={
                           <p>
-                            Click the <EuiIcon type="eye" /> icon to show
-                            thread detection and response extensions.
-                        </p>
+                            Click the <EuiIcon type="eye" /> icon to show thread
+                            detection and response extensions.
+                          </p>
                         }
                         color="success"
                         iconType="help"
@@ -171,8 +176,10 @@ export class WelcomeScreen extends Component {
                   </EuiFlexGroup>
                 )}
               <EuiFlexGrid columns={2}>
-                {!(UnsupportedComponents[this.props.agent.agentPlatform] || UnsupportedComponents['other']).includes('vuls') &&
-                  this.buildTabCard('vuls', 'securityApp')}
+                {!(
+                  UnsupportedComponents[this.props.agent.agentPlatform] ||
+                  UnsupportedComponents['other']
+                ).includes('vuls') && this.buildTabCard('vuls', 'securityApp')}
                 {this.props.extensions.virustotal &&
                   this.buildTabCard('virustotal', 'savedObjectsApp')}
                 {this.props.extensions.osquery &&

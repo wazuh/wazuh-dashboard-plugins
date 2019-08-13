@@ -14,6 +14,7 @@ import { monitoringKnownFields } from '../integration-files/monitoring-known-fie
 
 export class ElasticWrapper {
   constructor(server) {
+    this.cachedCredentials = {};
     this._server = server;
     this.usingSearchGuard = ((server || {}).plugins || {}).searchguard || false;
     this.elasticRequest = server.plugins.elasticsearch.getCluster('data');
@@ -126,7 +127,7 @@ export class ElasticWrapper {
             title: title,
             timeFieldName: 'timestamp'
           },
-          namespace          
+          namespace
         }
       });
 
@@ -162,15 +163,16 @@ export class ElasticWrapper {
   }
 
   /**
- * Delete .wazuh-version index if exists
- */
+   * Delete .wazuh-version index if exists
+   */
   async deleteWazuhVersionIndex() {
     try {
       const data = await this.elasticRequest.callWithInternalUser(
         'indices.delete',
         {
           index: '.wazuh-version'
-        });
+        }
+      );
       return data;
     } catch (error) {
       return Promise.reject(error);
@@ -219,7 +221,7 @@ export class ElasticWrapper {
         const patternTitle =
           (((pattern || {})._source || {})['index-pattern'] || {}).title || '';
         detectedFields = await this.discoverNewFields(patternTitle);
-      } catch (error) { } // eslint-disable-line
+      } catch (error) {} // eslint-disable-line
 
       let currentFields = [];
 
@@ -233,9 +235,9 @@ export class ElasticWrapper {
             item =>
               item.name &&
               item.name !==
-              'data.aws.service.action.networkConnectionAction.remoteIpDetails.geoLocation.lat' &&
+                'data.aws.service.action.networkConnectionAction.remoteIpDetails.geoLocation.lat' &&
               item.name !==
-              'data.aws.service.action.networkConnectionAction.remoteIpDetails.geoLocation.lon'
+                'data.aws.service.action.networkConnectionAction.remoteIpDetails.geoLocation.lon'
           );
 
           this.mergeDetectedFields(knownFields, currentFields);
@@ -265,7 +267,7 @@ export class ElasticWrapper {
         if (idx > -1) {
           currentFields[idx].excluded = true;
         }
-      } catch (error) { } // eslint-disable-line
+      } catch (error) {} // eslint-disable-line
 
       try {
         currentFieldsString = JSON.stringify(currentFields);
@@ -319,7 +321,7 @@ export class ElasticWrapper {
       try {
         const patternTitle = id.split('index-pattern:')[1];
         detectedFields = await this.discoverNewFields(patternTitle);
-      } catch (error) { } // eslint-disable-line
+      } catch (error) {} // eslint-disable-line
 
       const pattern = await this.getIndexPatternUsingGet(id);
 
@@ -393,7 +395,10 @@ export class ElasticWrapper {
       if (!payload) return Promise.reject(new Error('No valid payload given'));
       const pattern = payload.pattern;
       delete payload.pattern;
-      const fullPattern = await this.getIndexPatternUsingGet(pattern, namespace);
+      const fullPattern = await this.getIndexPatternUsingGet(
+        pattern,
+        namespace
+      );
 
       const title =
         (((fullPattern || {})._source || {})['index-pattern'] || {}).title ||
@@ -411,6 +416,14 @@ export class ElasticWrapper {
     }
   }
 
+  cleanCachedCredentials() {
+    const now = new Date().getTime();
+    for (const key in this.cachedCredentials) {
+      if (now - this.cachedCredentials[key].fetched_at >= 2000)
+        delete this.cachedCredentials[key];
+    }
+  }
+
   /**
    * Search for the Wazuh API configuration document using its own id (usually it's a timestamp)
    * @param {*} id Eg: 12396176723
@@ -418,24 +431,31 @@ export class ElasticWrapper {
   async getWazuhConfigurationById(id) {
     try {
       if (!id) return Promise.reject(new Error('No valid document id given'));
+      this.cleanCachedCredentials();
+      if (!this.cachedCredentials[id]) {
+        const data = await this.elasticRequest.callWithInternalUser('get', {
+          index: '.wazuh',
+          type: '_doc',
+          id: id
+        });
+        const object = {
+          user: data._source.api_user,
+          secret: Buffer.from(data._source.api_password, 'base64').toString(
+            'ascii'
+          ),
+          url: data._source.url,
+          port: data._source.api_port,
+          insecure: data._source.insecure,
+          cluster_info: data._source.cluster_info,
+          extensions: data._source.extensions,
+          fetched_at: new Date().getTime()
+        };
+        this.cachedCredentials[id] = { ...object };
+      }
 
-      const data = await this.elasticRequest.callWithInternalUser('get', {
-        index: '.wazuh',
-        type: '_doc',
-        id: id
-      });
+      this.cachedCredentials[id].password = this.cachedCredentials[id].secret;
 
-      return {
-        user: data._source.api_user,
-        password: Buffer.from(data._source.api_password, 'base64').toString(
-          'ascii'
-        ),
-        url: data._source.url,
-        port: data._source.api_port,
-        insecure: data._source.insecure,
-        cluster_info: data._source.cluster_info,
-        extensions: data._source.extensions
-      };
+      return this.cachedCredentials[id];
     } catch (error) {
       return Promise.reject(error);
     }
@@ -493,17 +513,17 @@ export class ElasticWrapper {
 
       const data = req
         ? await this.elasticRequest.callWithRequest(req, 'update', {
-          index: '.wazuh',
-          type: '_doc',
-          id: id,
-          body: doc
-        })
+            index: '.wazuh',
+            type: '_doc',
+            id: id,
+            body: doc
+          })
         : await this.elasticRequest.callWithInternalUser('update', {
-          index: '.wazuh',
-          type: '_doc',
-          id: id,
-          body: doc
-        });
+            index: '.wazuh',
+            type: '_doc',
+            id: id,
+            body: doc
+          });
 
       return data;
     } catch (error) {
@@ -558,7 +578,7 @@ export class ElasticWrapper {
       return (
         this.usingSearchGuard ||
         ((((data || {}).defaults || {}).xpack || {}).security || {}).user !=
-        null
+          null
       );
     } catch (error) {
       return Promise.reject(error);
@@ -843,7 +863,7 @@ export class ElasticWrapper {
         pattern,
         metaFields
       });
-    } catch (error) { } // eslint-disable-line
+    } catch (error) {} // eslint-disable-line
 
     if (!Array.isArray(detectedFields)) {
       detectedFields = [];
@@ -925,7 +945,7 @@ export class ElasticWrapper {
             index: index.copy
           });
           index.result = 'success';
-        } catch (error) { } // eslint-disable-line
+        } catch (error) {} // eslint-disable-line
       }
 
       return appIndices;

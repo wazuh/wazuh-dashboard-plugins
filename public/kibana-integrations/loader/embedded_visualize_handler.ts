@@ -88,7 +88,6 @@ export class EmbeddedVisualizeHandler {
    * @ignore
    */
 
-
   public readonly data$: Rx.Observable<any>;
   public readonly inspectorAdapters: Adapters = {};
   private vis: Vis;
@@ -119,11 +118,14 @@ export class EmbeddedVisualizeHandler {
   private actions: any = {};
   private events$: Rx.Observable<any>;
   private autoFetch: boolean;
+  private errorHandler: any;
 
   constructor(
     private readonly element: HTMLElement,
     savedObject: VisSavedObject,
-    params: EmbeddedVisualizeHandlerParams
+    params: EmbeddedVisualizeHandlerParams,
+    injector,
+    errorHandler
   ) {
     const { searchSource, vis } = savedObject;
 
@@ -136,8 +138,10 @@ export class EmbeddedVisualizeHandler {
       query,
       autoFetch = true,
       pipelineDataLoader = false,
-      Private,
+      Private
     } = params;
+
+    this.errorHandler = errorHandler;
 
     this.dataLoaderParams = {
       searchSource,
@@ -486,18 +490,16 @@ export class EmbeddedVisualizeHandler {
     if (this.dataLoaderParams.searchSource && this.dataLoaderParams.searchSource.cancelQueued) {
       this.dataLoaderParams.searchSource.cancelQueued();
     }
-    
+
     this.vis.requestError = error;
     this.vis.showRequestError =
       error.type && ['NO_OP_SEARCH_STRATEGY', 'UNSUPPORTED_QUERY'].includes(error.type);
-    
+
+
     //Do not show notification toast if it's already being shown a similar toast
-     toastNotifications.addDanger({
-      title: i18n.translate('common.ui.visualize.dataLoaderError', {
-        defaultMessage: 'Error in visualization',
-      }),
-      text: error.message,
-    });
+    this.errorHandler.handle(error.message, i18n.translate('common.ui.visualize.dataLoaderError', {
+      defaultMessage: 'Error in visualization',
+    }));
   };
 
   private rendererProvider = (response: VisResponseData | null) => {
