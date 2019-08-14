@@ -409,6 +409,10 @@
 
 /* Custom Kibana styles */
 
+md-content.md-default-theme, md-content{
+  background: transparent!important;
+}
+
 .wz-border-none,
 .wz-border-none md-select-value {
   border: none !important;
@@ -424,7 +428,7 @@
 }
 
 .table-hover > tbody > tr:hover {
-  background-color: #f0f0f0!important;
+  background-color: #fafbfd!important;
 }
 
 /* .table > tbody {
@@ -999,8 +1003,63 @@ discover-app-w .container-fluid {
 }
 
 .navBarLogo {
-  width: 124px;
-  margin: 4px 0px 0px 0px;
+  width: 110px;
+  margin-top: 4px;
+}
+
+.application.tab-health-check wz-menu{
+  display: none;
+}
+
+.health-check table tr td{
+    border-top: none!important;
+}
+
+.health-check{
+  padding-top: 5%;
+}
+
+@keyframes rotation {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(359deg);
+  }
+}
+
+.health-check-loader{
+  background: white;
+  height: 128px;
+  width: 128px;
+  margin: 0 auto;
+  position: relative;
+  border: 2px solid transparent;
+  border-top: 2px solid #00A9E5;
+  border-radius: 100%;
+  display: block;
+  animation: rotation .75s .5s infinite linear;
+  animation-play-state: running;
+}
+
+.health-check-logo{
+    width: 90px;
+    height: 90px;
+    float: left;
+    margin: 0 auto;
+    margin-top: -110px;
+    margin-bottom: 50px;
+    z-index: 1;
+}
+
+.application.tab-manager, .application.tab-wazuh-dev, .application.tab-overview,
+.application.tab-agents-preview, .application.tab-agents, .application.tab-settings,
+.application.tab-health-check{
+  background: #fafbfd;
+}
+
+.CodeMirror-gutters {
+  z-index: 1!important;
 }
 
 @media only screen and (max-width: 767px){
