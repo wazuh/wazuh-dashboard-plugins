@@ -2,13 +2,13 @@
 
 All notable changes to the Wazuh app project will be documented in this file.
 
-## Wazuh v3.9.5 - Kibana v6.8.2 / Kibana v7.2.1 / Kibana v7.3.0 - Revision 531
+## Wazuh v3.9.5 - Kibana v6.8.2 / Kibana v7.2.1 / Kibana v7.3.0 - Revision 533
 
 ### Added
 
 - Support for Wazuh v3.9.5
 
-## Wazuh v3.9.4 - Kibana v6.8.1 / Kibana v6.8.2 / Kibana v7.2.0 / Kibana v7.2.1 / Kibana v7.3.0 - Revision 528
+## Wazuh v3.9.4 - Kibana v6.8.1 / Kibana v6.8.2 / Kibana v7.1.1 / Kibana v7.2.0 / Kibana v7.2.1 / Kibana v7.3.0 - Revision 532
 
 ### Added
 
@@ -46,6 +46,8 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Missing scrollbar on Firefox file viewer.  [df4e8f9](https://github.com/wazuh/wazuh-kibana-app/commit/df4e8f9305b35e9ee1473bed5f5d452dd3420567) 
 - Agent search filter by name, lost when refreshing. [71b5274](https://github.com/wazuh/wazuh-kibana-app/commit/71b5274ccc332d8961a158587152f7badab28a95) 
 - Alerts of level 12 cannot be displayed in the Summary table. [ec0e888](https://github.com/wazuh/wazuh-kibana-app/commit/ec0e8885d9f1306523afbc87de01a31f24e36309) 
+- Restored query from search bar in visualizations. [439128f](https://github.com/wazuh/wazuh-kibana-app/commit/439128f0a1f65b649a9dcb81ab5804ca20f65763) 
+- Fix Kibana filters loop in Firefox. [82f0f32](https://github.com/wazuh/wazuh-kibana-app/commit/82f0f32946d844ce96a28f0185f903e8e05c5589) 
 
 ## Wazuh v3.9.3 - Kibana v6.8.1 / v7.1.1 / v7.2.0 - Revision 523
 
