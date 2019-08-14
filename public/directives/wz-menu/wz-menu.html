@@ -1,11 +1,12 @@
-<md-toolbar ng-style="{'height': {{barHeight}} + 'px','min-height': {{barHeight}} + 'px'}">
+<md-toolbar ng-style="{'height': {{barHeight}} + 'px','min-height': {{barHeight}} + 'px'}" ng-hide="root.hideWzMenu">
 
     <!-- Main toolbar content -->
     <div class="md-toolbar-tools wz-menu-content">
 
         <!-- Main Wazuh app navigation buttons -->
         <md-button class="wz-menu-button" ng-href="#/overview" ng-click="setMenuNavItem('overview')"
-            ng-class="{'wz-menu-active': menuNavItem === 'overview' }" aria-label="Overview tab">
+            ng-class="{'wz-menu-active': menuNavItem === 'overview' || menuNavItem === 'health-check' }"
+            aria-label="Overview tab">
             <react-component name="EuiIcon" class="kbnGlobalNavLink__euiIcon" props="{type:'visualizeApp'}" /> Overview
         </md-button>
 
@@ -14,13 +15,14 @@
             <react-component name="EuiIcon" class="kbnGlobalNavLink__euiIcon" props="{type:'infraApp'}" /> Management
         </md-button>
 
-        <md-button class="wz-menu-button" ng-href="#/agents-preview" ng-click="setMenuNavItem('agents')"
-            ng-class="{'wz-menu-active': menuNavItem === 'agents' }" aria-label="Agents tab">
+        <md-button class="wz-menu-button" ng-href="#/agents-preview" ng-click="setMenuNavItem('agents-preview')"
+            ng-class="{'wz-menu-active': menuNavItem === 'agents-preview' || menuNavItem === 'agents' }"
+            aria-label="Agents tab">
             <i class="fa fa-fw fa-tv" aria-hidden="true"></i> Agents
         </md-button>
 
-        <md-button class="wz-menu-button" ng-href="#/wazuh-discover" ng-click="setMenuNavItem('discover')"
-            ng-class="{'wz-menu-active': menuNavItem === 'discover' }" aria-label="Discover tab">
+        <md-button class="wz-menu-button" ng-href="#/wazuh-discover" ng-click="setMenuNavItem('wazuh-discover')"
+            ng-class="{'wz-menu-active': menuNavItem === 'wazuh-discover' }" aria-label="Discover tab">
             <react-component name="EuiIcon" class="kbnGlobalNavLink__euiIcon" props="{type:'discoverApp'}" /> Discover
         </md-button>
 
@@ -64,7 +66,7 @@
         </span>
 
         <!-- Settings tab button -->
-        <md-button class="wz-menu-button md-icon-button" ng-href="#/settings"
+        <md-button class="wz-menu-button md-icon-button" ng-href="#/settings" ng-click="setMenuNavItem('settings')"
             ng-class="{'wz-menu-active': menuNavItem === 'settings' }" aria-label="Settings tab">
             <react-component name="EuiIcon" class="kbnGlobalNavLink__euiIcon" props="{type:'gear'}" />
         </md-button>

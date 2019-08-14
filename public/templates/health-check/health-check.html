@@ -11,16 +11,9 @@
                         Disabled
                     </td>
                     <td ng-if="result.status === 'Ready' || result.status === 'Error'">
-                        <span ng-if="result.status === 'Ready'" class="euiBadge euiBadge--secondary">
-                            <span class="euiBadge__content">
-                                <react-component name="EuiIcon" props="{type:'check', color:'#000'}" /><span
-                                    class="euiBadge__text">Ready</span></span></span>
-                        <span ng-if="result.status === 'Error'" class="euiBadge euiBadge--danger">
-                            <span class="euiBadge__content">
-                                <react-component name="EuiIcon" props="{type:'check', color:'#000'}" /><span
-                                    class="euiBadge__text">Ready</span></span></span>
+                        <i ng-if="result.status === 'Ready'" class="fa fa-fw fa-check wz-text-teal"></i>
                         <i ng-if="result.status === 'Error'" class="fa fa-fw fa-warning wz-text-red"></i>
-                    </td>
+                        {{result.status}}</td>
                     <td ng-if="result.status !== 'Ready' && result.status !== 'Error' && result.status !== 'disabled'">
                         <i class="fa fa-fw fa-spin fa-spinner"></i>
                     </td>
