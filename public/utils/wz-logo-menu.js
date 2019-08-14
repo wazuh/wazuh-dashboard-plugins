@@ -20,5 +20,5 @@ export const changeWazuhNavLogo = () => {
     $('.euiBreadcrumb').html(
       '<img src="/plugins/wazuh/img/logo.svg" class="navBarLogo" alt="">'
     );
-  }, 500);
+  }, 100);
 };
