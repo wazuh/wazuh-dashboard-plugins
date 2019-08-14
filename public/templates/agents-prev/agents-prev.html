@@ -34,23 +34,21 @@
                 </span>
                 <md-divider class="wz-margin-top-10"></md-divider>
                 <canvas id="bar" ng-if="ctrl.lastAgent && ctrl.lastAgent.id"
-                    class="wz-margin-top-16 chart chart-doughnut" <<<<<<< HEAD
-                    chart-data="[ctrl.agentsCountActive,ctrl.agentsCountDisconnected,ctrl.agentsCountNeverConnected]"=======chart-data="[ctrl.summary.agentsCountActive,ctrl.summary.agentsCountDisconnected,ctrl.summary.agentsCountNeverConnected]">>>>>>>
-                    ea3103dbb8500d67943406761bc0a0006b5e1bbb
-                    chart-labels="['Active','Disconnected', 'Never connected']" chart-colors="['#57C17B', '#BC52BC',
-                    '#9E3533']"
-                    chart-options="{cutoutPercentage: 75, legend: {display: true,position: 'right',},responsive: false,
-                    maintainAspectRatio: false}" />
-                    <div layout="row" class="wz-margin-top-16 layout-align-center-center"
-                        ng-if="!ctrl.lastAgent || !ctrl.lastAgent.id">
-                        There are no agents yet.
-                    </div>
-                    <div layout="row" class="wz-margin-top-16 layout-align-center-center"
-                        ng-if="!ctrl.lastAgent || !ctrl.lastAgent.id">
-                        <button class="kuiButton kuiButton--success" ng-click="ctrl.openRegistrationDocs()">
-                            <react-component name="EuiIcon" props="{type: 'help'}" /> How to
-                        </button>
-                    </div>
+                    class="wz-margin-top-16 chart chart-doughnut"
+                    chart-data="[ctrl.summary.agentsCountActive,ctrl.summary.agentsCountDisconnected,ctrl.summary.agentsCountNeverConnected]"
+                    chart-labels="['Active','Disconnected', 'Never connected']"
+                    chart-colors="['#57C17B', '#BC52BC', '#9E3533']"
+                    chart-options="{cutoutPercentage: 75, legend: {display: true,position: 'right',},responsive: false, maintainAspectRatio: false}" />
+                <div layout="row" class="wz-margin-top-16 layout-align-center-center"
+                    ng-if="!ctrl.lastAgent || !ctrl.lastAgent.id">
+                    There are no agents yet.
+                </div>
+                <div layout="row" class="wz-margin-top-16 layout-align-center-center"
+                    ng-if="!ctrl.lastAgent || !ctrl.lastAgent.id">
+                    <button class="kuiButton kuiButton--success" ng-click="ctrl.openRegistrationDocs()">
+                        <react-component name="EuiIcon" props="{type: 'help'}" /> How to
+                    </button>
+                </div>
             </div>
             <div flex class="layout-column md-padding">
                 <span class="wz-headline-title">
