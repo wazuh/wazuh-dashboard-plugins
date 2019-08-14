@@ -1186,7 +1186,7 @@ export class WazuhApiCtrl {
       const distinctUrl = `${config.url}:${config.port}/agents/full_summary`;
 
       const data = await needle('get', distinctUrl, {}, headers);
-      const response = data.body.data;
+      const response = ((data || {}).body || {}).data || {};
 
       const nodes = response.unique_node_names;
       const groups = response.groups;
