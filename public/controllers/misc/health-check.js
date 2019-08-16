@@ -68,7 +68,6 @@ export class HealthCheck {
     this.errors = [];
     this.processedChecks = 0;
     this.totalChecks = 0;
-    this.$rootScope.hideWzMenu = true;
   }
 
   /**

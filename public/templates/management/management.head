@@ -1,4 +1,9 @@
 <div flex="auto" layout="column" ng-cloak ng-controller="managementController as mctrl">
+
+    <!-- Top navbar section -->
+    <wz-menu ng-init="menuNavItem = 'manager'"></wz-menu>
+    <!-- End top navbar section -->
+
     <!-- Navigation section -->
     <div layout="row" layout-align="start center" ng-if="mctrl.tab !== 'monitoring' && mctrl.tab !== 'configuration'">
         <!-- Breadcrumbs -->

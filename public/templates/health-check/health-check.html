@@ -1,9 +1,13 @@
-<md-content flex="auto" layout="column" layout-align="center" class="health-check" ng-controller="healthCheck as ctrl">
-    <div layout="row" layout-align="center" class="health-check-loader">
+<md-content flex="auto" layout="column" layout-align="center" ng-controller="healthCheck as ctrl">
+    <div class="height-150" layout="row" layout-align="center">
+        <img aria-hidden="true" wz-src="/plugins/wazuh/img/icon_blue.svg" />
     </div>
-    <img aria-hidden="true" wz-src="/plugins/wazuh/img/icon_blue.svg" class="health-check-logo" />
     <div layout="row" class="layout-align-center margin-top-30">
-        <table class="table width-500">
+        <table flex="50" class="table">
+            <thead class="kuiTableHeaderCell">
+                <th>Description</th>
+                <th>Status</th>
+            </thead>
             <tbody>
                 <tr ng-repeat="result in ctrl.results track by $index">
                     <td>{{result.description}}</td>
