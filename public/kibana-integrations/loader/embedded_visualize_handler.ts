@@ -89,10 +89,6 @@ export class EmbeddedVisualizeHandler {
    * This should not be used by any plugin.
    * @ignore
    */
-<<<<<<< HEAD
-
-=======
->>>>>>> dabb7f7aa643acb68cf8410ef3c6fe5e262e2d5c
   public readonly data$: Rx.Observable<any>;
   public readonly inspectorAdapters: Adapters = {};
   private vis: Vis;

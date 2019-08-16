@@ -647,12 +647,12 @@ function discoverController(
   $scope.updateQueryAndFetch = function({ query, dateRange }) {
     // Wazuh filters are not ready yet
     if (!filtersAreReady()) return;
-    
+
     // Update query from search bar
     discoverPendingUpdates.removeAll();
     discoverPendingUpdates.addItem($state.query, queryFilter.getFilters());
     $rootScope.$broadcast('updateVis');
-    
+
     timefilter.setTime(dateRange);
     if (query) $state.query = query;
     $scope.fetch();
@@ -987,26 +987,6 @@ function discoverController(
       if (($scope.pinnedFilters || []).length) {
         await queryFilter.addFilters($scope.pinnedFilters);
       }
-      const currentFilters = queryFilter.getFilters();
-      const pinnedAgentIDs = currentFilters.filter(
-        item =>
-          ((item || {}).meta || {}).key === 'agent.id' &&
-          ((item || {}).$state || {}).store === 'globalState'
-      );
-
-      const implicitAgentIDs = wzCurrentFilters.filter(
-        item =>
-          ((typeof item || {}).meta || {}).removable !== 'undefined' &&
-          !((item || {}).meta || {}).removable &&
-          ((item || {}).meta || {}).key === 'agent.id'
-      );
-
-      if (pinnedAgentIDs.length && implicitAgentIDs.length) {
-        for (const filter of pinnedAgentIDs) {
-          queryFilter.removeFilter(filter);
-        }
-      }
-
       const currentFilters = queryFilter.getFilters();
       const pinnedAgentIDs = currentFilters.filter(
         item =>

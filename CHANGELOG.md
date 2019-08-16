@@ -45,11 +45,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Number of agents is not properly updated.  [f7cbbe5](https://github.com/wazuh/wazuh-kibana-app/commit/f7cbbe54394db825827715c3ad4370ac74317108) 
 - Missing scrollbar on Firefox file viewer.  [df4e8f9](https://github.com/wazuh/wazuh-kibana-app/commit/df4e8f9305b35e9ee1473bed5f5d452dd3420567) 
 - Agent search filter by name, lost when refreshing. [71b5274](https://github.com/wazuh/wazuh-kibana-app/commit/71b5274ccc332d8961a158587152f7badab28a95) 
-<<<<<<< HEAD
-- Alerts of level 12 cannot be displayed in the table. [ec0e888](https://github.com/wazuh/wazuh-kibana-app/commit/ec0e8885d9f1306523afbc87de01a31f24e36309) 
-=======
 - Alerts of level 12 cannot be displayed in the Summary table. [ec0e888](https://github.com/wazuh/wazuh-kibana-app/commit/ec0e8885d9f1306523afbc87de01a31f24e36309) 
->>>>>>> dabb7f7aa643acb68cf8410ef3c6fe5e262e2d5c
 
 ## Wazuh v3.9.3 - Kibana v6.8.1 / v7.1.1 / v7.2.0 - Revision 523
 
