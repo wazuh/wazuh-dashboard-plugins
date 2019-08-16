@@ -647,12 +647,29 @@ function discoverController(
   $scope.updateQueryAndFetch = function({ query, dateRange }) {
     // Wazuh filters are not ready yet
     if (!filtersAreReady()) return;
-    
+
+    // Preserve filters in discover
+    if (
+      ($scope.discoverFilters || []).length ||
+      ($scope.pinnedFilters || []).length
+    ) {
+      $scope.inheritedFilters = [
+        ...$scope.discoverFilters,
+        ...$scope.pinnedFilters,
+        ...queryFilter.getFilters()
+      ];
+      $scope.discoverFilters = [];
+      $scope.pinnedFilters = [];
+    }
+
     // Update query from search bar
     discoverPendingUpdates.removeAll();
-    discoverPendingUpdates.addItem($state.query, queryFilter.getFilters());
+    discoverPendingUpdates.addItem(
+      $state.query,
+      $scope.inheritedFilters || queryFilter.getFilters()
+    );
     $rootScope.$broadcast('updateVis');
-    
+    $scope.inheritedFilters = false;
     timefilter.setTime(dateRange);
     if (query) $state.query = query;
     $scope.fetch();
@@ -984,13 +1001,6 @@ function discoverController(
       });
     } else {
       $state.filters = localChange ? $state.filters : [];
-      if (($scope.discoverFilters || []).length) {
-        await queryFilter.setFilters($scope.discoverFilters);
-        $scope.discoverFilters = [];
-      } else if (($scope.pinnedFilters || []).length) {
-        await queryFilter.addFilters($scope.pinnedFilters);
-      }
-
       const currentFilters = queryFilter.getFilters();
       const pinnedAgentIDs = currentFilters.filter(
         item =>
@@ -1055,6 +1065,7 @@ function discoverController(
       }
       evt.stopPropagation();
       $scope.tabView = parameters.tabView || 'panels';
+      $scope.updateQueryAndFetch($state.query);
     }
   );
 
