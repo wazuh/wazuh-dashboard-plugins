@@ -73,7 +73,6 @@
   position: relative;
   height: 25px;
   color: #666666;
-  background-color: white !important;
 }
 
 /* Custom JSON viewer settings */
@@ -1062,9 +1061,9 @@ discover-app-w .container-fluid {
   z-index: 1!important;
 }
 
-@media only screen and (max-width: 767px){
-  .wz-menu-jq .md-toolbar-tools {
-    margin-left: -60px;
+@media (max-width: 959px) and (min-width: 0){
+  .md-toolbar-tools {
+      max-height: 49px!important;
   }
 }
 
@@ -1103,7 +1102,7 @@ md-toolbar.md-default-theme:not(.md-menu-toolbar), md-toolbar:not(.md-menu-toolb
 
 .header-global-wrapper + .app-wrapper:not(.hidden-chrome) {
   top: 49px!important;
-  left: 49px!important;
+  left: 48px!important;
 }
 @media only screen and (max-width: 767px){
   .header-global-wrapper + .app-wrapper:not(.hidden-chrome) {

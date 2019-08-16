@@ -3,7 +3,7 @@
         <react-component name="EuiProgress" props="{size: 'xs', color: 'primary'}" />
     </div>
 
-    <md-nav-bar ng-if="!ctrl.load" class="wz-nav-bar" md-selected-nav-item="ctrl.tab"
+    <md-nav-bar ng-if="!ctrl.load" class="wz-nav-bar wz-margin-top-10" md-selected-nav-item="ctrl.tab"
         nav-bar-aria-label="Settings navigation links">
         <md-nav-item class="wz-nav-item" md-nav-click="ctrl.switchTab('api', true)" name="api">API</md-nav-item>
         <md-nav-item class="wz-nav-item" md-nav-click="ctrl.switchTab('pattern', true)" name="pattern">Pattern
