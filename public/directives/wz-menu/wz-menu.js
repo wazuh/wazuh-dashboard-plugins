@@ -26,7 +26,6 @@ class WzMenu {
 
   controller(
     $scope,
-    $rootScope,
     $window,
     appState,
     patternHandler,
@@ -35,7 +34,7 @@ class WzMenu {
     wazuhConfig
   ) {
     $scope.showSelector = appState.getPatternSelector();
-    $scope.root = $rootScope;
+
     let height = false;
     try {
       height = $('#navDrawerMenu > ul:nth-child(2)')[0].clientHeight;
@@ -53,10 +52,6 @@ class WzMenu {
 
     $scope.goToClick = path => {
       $window.location.href = path;
-    };
-
-    $scope.setMenuNavItem = item => {
-      $scope.menuNavItem = item;
     };
 
     /**
@@ -99,12 +94,8 @@ class WzMenu {
           $scope.patternList = list;
           $scope.currentSelectedPattern = appState.getCurrentPattern();
         }
-        if (!$scope.menuNavItem) {
-          $scope.menuNavItem = appState
-            .getNavigation()
-            .currLocation.replace(/\//g, '');
-        }
         $scope.$applyAsync();
+
         return;
       } catch (error) {
         errorHandler.handle(error.message || error);

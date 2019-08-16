@@ -1,9 +1,12 @@
 <div flex="auto" layout="column" ng-cloak ng-controller="settingsController as ctrl">
+
+    <wz-menu ng-init="menuNavItem = 'settings'"></wz-menu>
+
     <div ng-if="ctrl.load" class="md-padding wz-margin-top-16">
         <react-component name="EuiProgress" props="{size: 'xs', color: 'primary'}" />
     </div>
 
-    <md-nav-bar ng-if="!ctrl.load" class="wz-nav-bar wz-margin-top-10" md-selected-nav-item="ctrl.tab"
+    <md-nav-bar ng-if="!ctrl.load" class="wz-nav-bar" md-selected-nav-item="ctrl.tab"
         nav-bar-aria-label="Settings navigation links">
         <md-nav-item class="wz-nav-item" md-nav-click="ctrl.switchTab('api', true)" name="api">API</md-nav-item>
         <md-nav-item class="wz-nav-item" md-nav-click="ctrl.switchTab('pattern', true)" name="pattern">Pattern

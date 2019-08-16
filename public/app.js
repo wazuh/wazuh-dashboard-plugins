@@ -39,35 +39,6 @@ import './components';
 // angular-charts.js
 import 'angular-chart.js';
 
-// pin-wz-menu.js
-import { changeWazuhNavLogo } from './utils/wz-logo-menu';
-
-// Font Awesome, Kibana UI framework and others
-import './utils/fontawesome/css/font-awesome.min.css';
-
-// Dev tools
-import './utils/codemirror';
-
-import './utils/jquery-ui';
-
-// Material
-import 'angular-material/angular-material.css';
-import 'angular-aria/angular-aria';
-import 'angular-animate/angular-animate';
-import 'angular-material/angular-material';
-
-// Cookies
-import 'angular-cookies/angular-cookies';
-
-import 'ui/autoload/all';
-
-// Wazuh
-import './kibana-integrations';
-import './services';
-import './controllers';
-import './factories';
-import './directives';
-
 // Set up Wazuh app
 const app = uiModules.get('app/wazuh', ['ngCookies', 'ngMaterial', 'chart.js']);
 
@@ -88,10 +59,6 @@ app.config([
 ]);
 
 app.run(function($rootScope, $route, $location, appState, $window) {
-  chrome
-    .setRootTemplate('<wz-menu></wz-menu><div ng-view></div>')
-    .setRootController(() => require('./app'));
-  changeWazuhNavLogo();
   appState.setNavigation({ status: false });
   appState.setNavigation({
     reloaded: false,
@@ -115,7 +82,6 @@ app.run(function($rootScope, $route, $location, appState, $window) {
 
   $rootScope.$on('$locationChangeSuccess', () => {
     const navigation = appState.getNavigation();
-    $rootScope.hideWzMenu = navigation.currLocation === '/health-check';
     appState.setNavigation({ currLocation: $location.path() });
     if (navigation.currLocation !== navigation.prevLocation) {
       if (navigation.discoverSections.includes(navigation.currLocation)) {
@@ -223,6 +189,32 @@ app.run(function($rootScope, $route, $location, appState, $window) {
     appState.setNavigation({ status: false });
   });
 });
+
+// Font Awesome, Kibana UI framework and others
+import './utils/fontawesome/css/font-awesome.min.css';
+
+// Dev tools
+import './utils/codemirror';
+
+import './utils/jquery-ui';
+
+// Material
+import 'angular-material/angular-material.css';
+import 'angular-aria/angular-aria';
+import 'angular-animate/angular-animate';
+import 'angular-material/angular-material';
+
+// Cookies
+import 'angular-cookies/angular-cookies';
+
+import 'ui/autoload/all';
+
+// Wazuh
+import './kibana-integrations';
+import './services';
+import './controllers';
+import './factories';
+import './directives';
 
 // Added due to Kibana 6.3.0. Do not modify.
 uiModules.get('kibana').provider('dashboardConfig', () => {
