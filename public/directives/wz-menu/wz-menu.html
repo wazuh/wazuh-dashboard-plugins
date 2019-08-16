@@ -1,7 +1,7 @@
 <md-toolbar ng-style="{'height': {{barHeight}} + 'px','min-height': {{barHeight}} + 'px'}" ng-hide="root.hideWzMenu">
 
     <!-- Main toolbar content -->
-    <div class="md-toolbar-tools wz-menu-content">
+    <div class="md-toolbar-tools wz-menu-content" ng-style="{'height': {{barHeight}} + 'px','min-height': {{barHeight}} + 'px'}" >
 
         <!-- Main Wazuh app navigation buttons -->
         <md-button class="wz-menu-button" ng-href="#/overview" ng-click="setMenuNavItem('overview')"

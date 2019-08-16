@@ -16,19 +16,15 @@
 
 /* Style to the base toolbar */
 /* Style applied to the toolbar-tools container */
-
 wz-menu {
-    position: fixed;
+    position: fixed!important;
     z-index: 999;
 }
-
 .wz-menu-content {
     color: #373a42;
     background-color: #FFF;
-    z-index: 1000;
     border-bottom: 1px solid #D3DAE6;
-    position: fixed;
-    width: calc(~'100% - 49px');
+    width: calc(~'100vw - 49px');
     box-shadow: 0 2px 2px -1px rgba(152, 162, 179, 0.3);
 }
 @media only screen and (max-width: 767px){
@@ -45,12 +41,12 @@ wz-menu {
 .wz-menu-button {
     font-size: 14px !important;
     transition: none !important;
-    min-height: 35px !important;
-    line-height: 35px !important;
-    height: 35px;
-    padding: 0px 8px;
-    border-radius: 4px;
-    margin: 0px 5px;
+    min-height: 30px !important;
+    line-height: 30px !important;
+    height: 49px;
+    border-radius: 0;
+    padding: 10px 13px;
+    margin: 0;
 }
 
 .wz-menu-button.md-icon-button {
@@ -84,29 +80,12 @@ wz-menu {
     background-color: #FFF;
 }
 
-.wz-menu-button .euiIcon--medium {
-    width: 16px !important;
-    height: 16px !important;
-}
-
-.wz-menu-bottom-line {
-    border-bottom: 1px solid #d3dae6;
-    width: 100%;
-    height: 1px;
-    left: 0;
-    position: absolute;
-    top: 97px;
-}
 
 .euiHeader {
     box-shadow: none !important;
 }
 
-md-toolbar {
-    height: 49px !important;
-    min-height: 0px !important;
-}
-
-.md-toolbar-tools {
-    height: 49px !important;
+.wz-menu-button .euiIcon--medium {
+    width: 16px !important;
+    height: 16px !important;
 }

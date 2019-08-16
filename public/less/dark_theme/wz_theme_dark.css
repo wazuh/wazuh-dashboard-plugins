@@ -5,10 +5,6 @@ html {
   color: #dfe5ef !important;
 }
 
-.application.tab-manager, .application.tab-wazuh-dev, .application.tab-overview, .application.tab-agents-preview, .application.tab-agents, .application.tab-settings, .application.tab-health-check {
-  background: #1a1b20!important;
-}
-
 .euiHeaderSectionItem__button,
 .euiListGroupItem__icon {
   color: #dfe5ef;
