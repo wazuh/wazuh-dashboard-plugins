@@ -41,7 +41,7 @@ export function Initialize(server) {
         : 'wazuh-alerts-3.x-*';
     global.XPACK_RBAC_ENABLED =
       configurationFile &&
-        typeof configurationFile['xpack.rbac.enabled'] !== 'undefined'
+      typeof configurationFile['xpack.rbac.enabled'] !== 'undefined'
         ? configurationFile['xpack.rbac.enabled']
         : true;
   } catch (e) {
@@ -66,7 +66,7 @@ export function Initialize(server) {
   const defaultIndexPattern = pattern || 'wazuh-alerts-3.x-*';
 
   // Save Wazuh App setup
-  const saveConfiguration = async () => {
+  const saveConfiguration = () => {
     try {
       const commonDate = new Date().toISOString();
 
@@ -159,13 +159,13 @@ export function Initialize(server) {
             log(
               'initialize:checkAPIEntriesExtensions',
               `Error updating API entry extensions with ID: ${
-              item._id
+                item._id
               } due to ${error.message || error}`
             );
             server.log(
               [blueWazuh, 'initialize:checkAPIEntriesExtensions', 'error'],
               `Error updating API entry extensions with ID: ${
-              item._id
+                item._id
               } due to ${error.message || error}`
             );
           }
@@ -231,31 +231,38 @@ export function Initialize(server) {
         );
       }
 
-      try {
-        if (!fs.existsSync(wazuhVersion)) {
-          throw new Error();
-        }
-      } catch (error) {
+      if (!fs.existsSync(wazuhVersion)) {
         log(
           'initialize[checkWazuhVersionRegistry]',
-          'wazuh-version registry does not exist. Initializating configuration...',
+          'wazuh-version registry does not exist. Initializing configuration.',
           'debug'
         );
 
-        // Save Setup Info
-        await saveConfiguration();
+        // Create the app registry file for the very first time
+        saveConfiguration();
+
+      } else {
+        // App registry file exists, just update it
+        const currentDate = new Date().toISOString();
+
+        // If this function fails, it throws an exception
+        const source = JSON.parse(fs.readFileSync(wazuhVersion, 'utf8'));
+
+        // Check if the stored revision differs from the package.json revision
+        const isNewApp = packageJSON.revision !== source.revision;
+        
+        // If it's an app with a different revision, it's a new installation
+        source['installationDate'] = isNewApp
+          ? currentDate
+          : source['installationDate'];
+
+        source['app-version'] = packageJSON.version;
+        source.revision = packageJSON.revision;
+        source.lastRestart = currentDate;
+
+        // If this function fails, it throws an exception
+        fs.writeFileSync(wazuhVersion, JSON.stringify(source), 'utf-8');
       }
-
-      let source = JSON.parse(fs.readFileSync(wazuhVersion, 'utf8'));
-      source['app-version'] = packageJSON.version;
-      source.revision = packageJSON.revision;
-      source.lastRestart = new Date().toISOString(); // Registry exists so we update the lastRestarted date only
-
-      fs.writeFileSync(wazuhVersion, JSON.stringify(source), err => {
-        if (err) {
-          throw new Error(err);
-        }
-      });
     } catch (error) {
       return Promise.reject(error);
     }
@@ -321,7 +328,7 @@ export function Initialize(server) {
       return Promise.reject(
         new Error(
           `Error creating ${
-          wzWrapper.WZ_KIBANA_INDEX
+            wzWrapper.WZ_KIBANA_INDEX
           } index due to ${error.message || error}`
         )
       );
@@ -342,7 +349,7 @@ export function Initialize(server) {
       return Promise.reject(
         new Error(
           `Error creating template for ${
-          wzWrapper.WZ_KIBANA_INDEX
+            wzWrapper.WZ_KIBANA_INDEX
           } due to ${error.message || error}`
         )
       );
