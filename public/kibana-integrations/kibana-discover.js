@@ -1039,7 +1039,7 @@ function discoverController(
   $scope.tabView = $location.search().tabView || 'panels';
   const changeTabViewListener = $rootScope.$on(
     'changeTabView',
-    async (evt, parameters) => {
+    (evt, parameters) => {
       $scope.pinnedFilters = getPinnedFilters();
       if (parameters.tabView !== 'discover') {
         queryFilter.removeAll();
