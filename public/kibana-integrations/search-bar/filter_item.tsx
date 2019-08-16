@@ -24,7 +24,7 @@ import { InjectedIntl, injectI18n } from '@kbn/i18n/react';
 import classNames from 'classnames';
 import React, { Component } from 'react';
 import { IndexPattern } from 'ui/index_patterns';
-import { FilterEditor } from 'ui/filter_bar/filter_editor';
+import { FilterEditor } from 'plugins/data/filter/filter_bar/filter_editor';
 import { FilterView } from './filter_view';
 
 interface Props {
@@ -64,7 +64,7 @@ class FilterItemUI extends Component<Props, State> {
     const dataTestSubjValue = filter.meta.value ? `filter-value-${filter.meta.value}` : '';
     const dataTestSubjDisabled = `filter-${
       this.props.filter.meta.disabled ? 'disabled' : 'enabled'
-    }`;
+      }`;
 
     const badge = (
       <FilterView
@@ -83,13 +83,13 @@ class FilterItemUI extends Component<Props, State> {
           {
             name: isFilterPinned(filter)
               ? this.props.intl.formatMessage({
-                  id: 'common.ui.filterBar.unpinFilterButtonLabel',
-                  defaultMessage: 'Unpin',
-                })
+                id: 'common.ui.filterBar.unpinFilterButtonLabel',
+                defaultMessage: 'Unpin',
+              })
               : this.props.intl.formatMessage({
-                  id: 'common.ui.filterBar.pinFilterButtonLabel',
-                  defaultMessage: 'Pin across all apps',
-                }),
+                id: 'common.ui.filterBar.pinFilterButtonLabel',
+                defaultMessage: 'Pin across all apps',
+              }),
             icon: 'pin',
             onClick: () => {
               this.closePopover();
@@ -109,13 +109,13 @@ class FilterItemUI extends Component<Props, State> {
           {
             name: negate
               ? this.props.intl.formatMessage({
-                  id: 'common.ui.filterBar.includeFilterButtonLabel',
-                  defaultMessage: 'Include results',
-                })
+                id: 'common.ui.filterBar.includeFilterButtonLabel',
+                defaultMessage: 'Include results',
+              })
               : this.props.intl.formatMessage({
-                  id: 'common.ui.filterBar.excludeFilterButtonLabel',
-                  defaultMessage: 'Exclude results',
-                }),
+                id: 'common.ui.filterBar.excludeFilterButtonLabel',
+                defaultMessage: 'Exclude results',
+              }),
             icon: negate ? 'plusInCircle' : 'minusInCircle',
             onClick: () => {
               this.closePopover();
@@ -126,13 +126,13 @@ class FilterItemUI extends Component<Props, State> {
           {
             name: disabled
               ? this.props.intl.formatMessage({
-                  id: 'common.ui.filterBar.enableFilterButtonLabel',
-                  defaultMessage: 'Re-enable',
-                })
+                id: 'common.ui.filterBar.enableFilterButtonLabel',
+                defaultMessage: 'Re-enable',
+              })
               : this.props.intl.formatMessage({
-                  id: 'common.ui.filterBar.disableFilterButtonLabel',
-                  defaultMessage: 'Temporarily disable',
-                }),
+                id: 'common.ui.filterBar.disableFilterButtonLabel',
+                defaultMessage: 'Temporarily disable',
+              }),
             icon: `${disabled ? 'eye' : 'eyeClosed'}`,
             onClick: () => {
               this.closePopover();
