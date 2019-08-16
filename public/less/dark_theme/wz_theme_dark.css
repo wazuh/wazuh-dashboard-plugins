@@ -5,6 +5,10 @@ html {
   color: #dfe5ef !important;
 }
 
+.application.tab-manager, .application.tab-wazuh-dev, .application.tab-overview, .application.tab-agents-preview, .application.tab-agents, .application.tab-settings, .application.tab-health-check {
+  background: #1a1b20!important;
+}
+
 .euiHeaderSectionItem__button,
 .euiListGroupItem__icon {
   color: #dfe5ef;
@@ -113,7 +117,6 @@ discover-app-w .container-fluid {
 
 .percentage {
   color: #fff;
-  background-color: transparent !important;
 }
 
 .wz-nav-item button.md-primary {
@@ -274,4 +277,8 @@ md-divider.md-default-theme, md-divider {
   background-color: #16171c;
   border: 1px solid #343741;
   color: #dfe5ef;
+}
+
+.wz-menu-content {
+  box-shadow: 0 2px 2px -1px rgba(0, 0, 0, 0.3)!important;
 }
