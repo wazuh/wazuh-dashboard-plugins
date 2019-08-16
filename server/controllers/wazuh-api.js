@@ -1318,7 +1318,7 @@ export class WazuhApiCtrl {
    * @param {Object} reply
    * @returns {Object} timestamp field or ErrorResponse
    */
-  async getTimeStamp(req, reply) {
+  getTimeStamp(req, reply) {
     try {
       const source = JSON.parse(fs.readFileSync(this.wazuhVersion, 'utf8'));
       if (source.installationDate && source.lastRestart) {
