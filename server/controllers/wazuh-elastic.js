@@ -332,11 +332,17 @@ export class WazuhElasticCtrl {
         req.auth.credentials.roles.includes('superuser');
 
       const data = await this.wzWrapper.getAllIndexPatterns();
-      if (namespace && namespace !== 'default') {
+
+      // Default namespace index patterns have no prefix.
+      // If it's a custom namespace, then filter by its name.
+      if (namespace) {
         data.hits.hits = data.hits.hits.filter(item =>
-          (item._id || '').includes(namespace)
+          namespace !== 'default'
+            ? (item._id || '').includes(namespace)
+            : (item._id || '').startsWith('index-pattern:')
         );
       }
+
       if ((((data || {}).hits || {}).hits || []).length === 0) {
         throw new Error('There are no index patterns');
       }
