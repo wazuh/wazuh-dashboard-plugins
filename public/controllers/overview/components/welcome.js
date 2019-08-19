@@ -171,7 +171,7 @@ export class WelcomeScreen extends Component {
               <EuiFlexGroup gutterSize="xs">
                 <EuiFlexItem />
                 <EuiFlexItem grow={false}>
-                  {this.buildPopover('popoverRegulatory', ['pci', 'gdpr'])}
+                  {this.buildPopover('popoverRegulatory', ['pci', 'gdpr', 'hipaa', 'nist'])}
                 </EuiFlexItem>
               </EuiFlexGroup>
               {!this.props.extensions.pci && !this.props.extensions.gdpr && (
@@ -196,6 +196,10 @@ export class WelcomeScreen extends Component {
                     this.buildTabCard('pci', 'visTagCloud')}
                   {this.props.extensions.gdpr &&
                     this.buildTabCard('gdpr', 'visBarVertical')}
+                  {this.props.extensions.hipaa &&
+                    this.buildTabCard('hipaa', 'emsApp')}
+                  {this.props.extensions.nist &&
+                    this.buildTabCard('nist', 'apmApp')}
                 </EuiFlexGrid>
               )}
             </EuiPanel>
