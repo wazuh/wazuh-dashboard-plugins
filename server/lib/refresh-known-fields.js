@@ -69,7 +69,9 @@ export async function checkKnownFields(
       );
 
     const defaultExists = list.filter(
-      item => item.title === defaultIndexPattern && typeof item.namespace === 'undefined'
+      item =>
+        item.title === defaultIndexPattern &&
+        typeof item.namespace === 'undefined'
     );
 
     if (defaultIndexPattern && defaultExists.length === 0) {

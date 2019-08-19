@@ -89,6 +89,7 @@ app.directive('wzTableEui', function() {
       $scope.basicTableProps = {
         path: $scope.path,
         initialSortField: $scope.initialSortField || false,
+        pageIndex: 0,
         columns: parseColumns($scope.keys),
         items: [],
         getData: options => fetch(options),
@@ -105,6 +106,7 @@ app.directive('wzTableEui', function() {
 
       $scope.$watch('items', () => {
         $scope.basicTableProps.items = [...$scope.items];
+        $scope.basicTableProps.pageIndex = 0;
       });
 
       $scope.$watch('keys', () => {

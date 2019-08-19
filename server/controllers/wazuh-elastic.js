@@ -33,42 +33,6 @@ export class WazuhElasticCtrl {
   }
 
   /**
-   * This get the timestamp field
-   * @param {Object} req
-   * @param {Object} reply
-   * @returns {Object} timestamp field or ErrorResponse
-   */
-  async getTimeStamp(req, reply) {
-    try {
-      const data = await this.wzWrapper.getWazuhVersionIndexAsSearch();
-      const source =
-        ((((data || {}).hits || {}).hits || [])[0] || {})._source || {};
-
-      if (source.installationDate && source.lastRestart) {
-        log(
-          'wazuh-elastic:getTimeStamp',
-          `Installation date: ${data.hits.hits[0]._source.installationDate}. Last restart: ${data.hits.hits[0]._source.lastRestart}`,
-          'debug'
-        );
-        return {
-          installationDate: data.hits.hits[0]._source.installationDate,
-          lastRestart: data.hits.hits[0]._source.lastRestart
-        };
-      } else {
-        throw new Error('Could not fetch .wazuh-version index');
-      }
-    } catch (error) {
-      log('wazuh-elastic:getTimeStamp', error.message || error);
-      return ErrorResponse(
-        error.message || 'Could not fetch .wazuh-version index',
-        4001,
-        500,
-        reply
-      );
-    }
-  }
-
-  /**
    * This retrieve a template from Elasticsearch
    * @param {Object} req
    * @param {Object} reply
@@ -241,7 +205,10 @@ export class WazuhElasticCtrl {
       payload.pattern = req.params.pattern;
       const spaces = this._server.plugins.spaces;
       const namespace = spaces && spaces.getSpaceId(req);
-      const data = await this.wzWrapper.searchWazuhAlertsWithPayload(payload, namespace);
+      const data = await this.wzWrapper.searchWazuhAlertsWithPayload(
+        payload,
+        namespace
+      );
 
       return data.hits.total.value === 0 ||
         typeof data.aggregations['2'].buckets[0] === 'undefined'
@@ -489,7 +456,6 @@ export class WazuhElasticCtrl {
               id
             );
           }
-
         }
 
         // Replace index-pattern for selector visualizations

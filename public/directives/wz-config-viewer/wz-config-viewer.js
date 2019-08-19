@@ -13,6 +13,7 @@
 import template from './wz-config-viewer.html';
 import { uiModules } from 'ui/modules';
 import CodeMirror from '../../utils/codemirror/lib/codemirror';
+import chrome from 'ui/chrome';
 
 const app = uiModules.get('app/wazuh', []);
 
@@ -32,6 +33,7 @@ class WzConfigViewer {
 
   controller($scope, $document, $window) {
     const window = $window;
+    const IS_DARK_THEME = chrome.getUiSettingsClient().get('theme:darkMode');
     const setJsonBox = () => {
       $scope.jsonCodeBox = CodeMirror.fromTextArea(
         $document[0].getElementById('viewer_json_box'),
@@ -42,7 +44,7 @@ class WzConfigViewer {
           matchBrackets: true,
           mode: { name: 'javascript', json: true },
           readOnly: true,
-          theme: 'ttcn',
+          theme: IS_DARK_THEME ? 'lesser-dark' : 'ttcn',
           foldGutter: true,
           styleSelectedText: true,
           gutters: ['CodeMirror-foldgutter']
@@ -60,7 +62,7 @@ class WzConfigViewer {
           matchBrackets: true,
           mode: 'text/xml',
           readOnly: true,
-          theme: 'ttcn',
+          theme: IS_DARK_THEME ? 'lesser-dark' : 'ttcn',
           foldGutter: true,
           styleSelectedText: true,
           gutters: ['CodeMirror-foldgutter']
@@ -79,7 +81,10 @@ class WzConfigViewer {
         const windows = $(window).height();
         const offsetTop = getPosition(editorContainer[0]).y;
         const bottom = $scope.isLogs ? 75 : 20;
+        const headerContainer = $('.wzXmlEditorHeader')
+        const headerContainerHeight = headerContainer.height() + 30 ? headerContainer.height() + 30 : $scope.isLogs ? 0 : 80;
         editorContainer.height(windows - (offsetTop + bottom));
+        $('.wzXmlEditorBody .CodeMirror').height(windows - (offsetTop + bottom + headerContainerHeight));
       }, 1);
     };
 

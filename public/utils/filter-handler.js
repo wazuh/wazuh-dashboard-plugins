@@ -103,17 +103,17 @@ export class FilterHandler {
     result.meta.params.query = manager;
     result.query.match = isCluster
       ? {
-        'cluster.name': {
-          query: manager,
-          type: 'phrase'
+          'cluster.name': {
+            query: manager,
+            type: 'phrase'
+          }
         }
-      }
       : {
-        'manager.name': {
-          query: manager,
-          type: 'phrase'
-        }
-      };
+          'manager.name': {
+            query: manager,
+            type: 'phrase'
+          }
+        };
     return result;
   }
 

@@ -19,7 +19,8 @@ import {
   getSavedSearch,
   goToKibana,
   getIp,
-  getWzConfig
+  getWzConfig,
+  apiCount
 } from './resolves';
 
 // HTML templates
@@ -79,6 +80,9 @@ function nestedResolve(
   appState,
   wzMisc
 ) {
+  const healthCheckStatus = $window.sessionStorage.getItem('healthCheck');
+  if (!healthCheckStatus) return;
+
   assignPreviousLocation($rootScope, $location);
   const location = $location.path();
   return getWzConfig($q, genericReq, wazuhConfig).then(() =>
@@ -105,6 +109,8 @@ function savedSearch(
   savedSearches,
   $route
 ) {
+  const healthCheckStatus = $window.sessionStorage.getItem('healthCheck');
+  if (!healthCheckStatus) return;
   assignPreviousLocation($rootScope, $location);
   return getSavedSearch(
     redirectWhenMissing,
@@ -135,7 +141,7 @@ routes.enable();
 routes
   .when('/health-check', {
     template: healthCheckTemplate,
-    resolve: { nestedResolve, ip }
+    resolve: { apiCount, wzConfig, ip }
   })
   .when('/agents/:id?/:tab?/:view?', {
     template: agentsTemplate,

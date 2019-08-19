@@ -217,8 +217,8 @@ export class CommonData {
   }
 
   /**
- * GET HIPAA
- */
+   * GET HIPAA
+   */
   async getHIPAA() {
     try {
       const hipaaTabs = [];
@@ -234,8 +234,8 @@ export class CommonData {
   }
 
   /**
- * GET NIST 800-53
- */
+   * GET NIST 800-53
+   */
   async getNIST() {
     try {
       const nistTabs = [];
