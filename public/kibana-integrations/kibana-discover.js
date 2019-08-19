@@ -1041,11 +1041,12 @@ function discoverController(
     'changeTabView',
     (evt, parameters) => {
       $scope.pinnedFilters = getPinnedFilters();
-      if (parameters.tabView !== 'discover') {
+      if (parameters.tabView !== 'discover' && !parameters.sameSection ) {
         queryFilter.removeAll();
       }
       evt.stopPropagation();
       $scope.tabView = parameters.tabView || 'panels';
+      $scope.tab = parameters.tab;
     }
   );
 
