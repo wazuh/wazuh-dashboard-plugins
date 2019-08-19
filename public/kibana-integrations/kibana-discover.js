@@ -1046,7 +1046,6 @@ function discoverController(
       }
       evt.stopPropagation();
       $scope.tabView = parameters.tabView || 'panels';
-      $scope.tab = parameters.tab;
     }
   );
 
