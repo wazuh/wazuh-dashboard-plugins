@@ -810,17 +810,16 @@ export class AgentsController {
         result[extension] = extensions[extension];
       }
     }
-    this.$scope.extensions = result;
+    return result;
   }
 
   /**
    * Get available welcome cards after getting the agent
    */
   loadWelcomeCardsProps() {
-    this.cleanExtensions(this.$scope.extensions);
     this.$scope.welcomeCardsProps = {
       switchTab: tab => this.switchTab(tab),
-      extensions: this.$scope.extensions,
+      extensions: this.cleanExtensions(this.$scope.extensions),
       agent: this.$scope.agent,
       api: this.appState.getCurrentAPI(),
       setExtensions: (api, extensions) =>
