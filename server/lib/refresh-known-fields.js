@@ -54,7 +54,8 @@ export async function checkKnownFields(
           if (valid.length === 4) {
             list.push({
               id: index._id.split('index-pattern:')[1],
-              title: index._source['index-pattern'].title
+              title: index._source['index-pattern'].title,
+              namespace: index._source.namespace
             });
           }
         }
@@ -68,7 +69,9 @@ export async function checkKnownFields(
       );
 
     const defaultExists = list.filter(
-      item => item.title === defaultIndexPattern
+      item =>
+        item.title === defaultIndexPattern &&
+        typeof item.namespace === 'undefined'
     );
 
     if (defaultIndexPattern && defaultExists.length === 0) {
@@ -126,20 +129,23 @@ export async function checkKnownFields(
           `Refreshing known fields for "index-pattern:${item.title}"`,
           'debug'
         );
-      await wzWrapper.updateIndexPatternKnownFields('index-pattern:' + item.id);
+      const prefix = item.namespace
+        ? `${item.namespace}:index-pattern:`
+        : 'index-pattern:';
+      await wzWrapper.updateIndexPatternKnownFields(`${prefix}${item.id}`);
     }
 
     !quiet && log('initialize', 'App ready to be used.', 'info');
-    !quiet &&
-      server.log([blueWazuh, 'initialize', 'info'], 'App ready to be used.');
+    !quiet && server.log('info', 'Wazuh app ready to be used.');
 
     return;
   } catch (error) {
     !quiet && log('initialize:checkKnownFields', error.message || error);
     !quiet &&
       server.log(
-        [blueWazuh, 'server', 'error'],
-        'Error importing objects into elasticsearch.' + error.message || error
+        'error',
+        'Wazuh app had en error importing objects into Elasticsearch.' +
+          error.message || error
       );
   }
 }

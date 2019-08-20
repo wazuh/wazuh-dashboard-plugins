@@ -386,6 +386,8 @@ export class SettingsController {
       tmpData.extensions.audit = config['extensions.audit'];
       tmpData.extensions.pci = config['extensions.pci'];
       tmpData.extensions.gdpr = config['extensions.gdpr'];
+      tmpData.extensions.hipaa = config['extensions.hipaa'];
+      tmpData.extensions.nist = config['extensions.nist'];
       tmpData.extensions.oscap = config['extensions.oscap'];
       tmpData.extensions.ciscat = config['extensions.ciscat'];
       tmpData.extensions.aws = config['extensions.aws'];
@@ -674,7 +676,7 @@ export class SettingsController {
    */
   async getAppInfo() {
     try {
-      const data = await this.genericReq.request('GET', '/elastic/setup');
+      const data = await this.genericReq.request('GET', '/api/setup');
       this.appInfo = {};
       this.appInfo['app-version'] = data.data.data['app-version'];
       this.appInfo['installationDate'] = data.data.data['installationDate'];

@@ -1,9 +1,4 @@
 <div flex="auto" layout="column" ng-cloak ng-controller="agentsController">
-
-    <!-- Top navbar section -->
-    <wz-menu ng-init="menuNavItem = 'agents'"></wz-menu>
-    <!-- End top navbar section -->
-
     <!-- Navigation section -->
     <div layout="row" layout-align="start center" ng-if="agent">
         <!-- Breadcrumbs -->
@@ -135,12 +130,16 @@
     <!-- End Security navigation bar -->
 
     <!-- Compliance navigation bar -->
-    <md-nav-bar ng-if="inArray(tab, complianceTabs) && extensions.pci && extensions.gdpr" class="wz-nav-bar"
+    <md-nav-bar ng-if="inArray(tab, complianceTabs) && (extensions.pci || extensions.gdpr || extensions.hipaa || extensions.nist)" class="wz-nav-bar"
         ng-show="tab !== 'welcome'" md-selected-nav-item="tab" nav-bar-aria-label="Compliance navigation links">
         <md-nav-item ng-show="extensions.pci" class="wz-nav-item" md-nav-click="switchTab('pci')" name="pci">{{
             tabNames['pci'] }}</md-nav-item>
         <md-nav-item ng-show="extensions.gdpr" class="wz-nav-item" md-nav-click="switchTab('gdpr')" name="gdpr">{{
             tabNames['gdpr'] }}</md-nav-item>
+        <md-nav-item ng-show="extensions.hipaa" class="wz-nav-item" md-nav-click="switchTab('hipaa')" name="hipaa">{{
+            tabNames['hipaa'] }}</md-nav-item>
+        <md-nav-item ng-show="extensions.nist" class="wz-nav-item" md-nav-click="switchTab('nist')" name="nist">{{
+            tabNames['nist'] }}</md-nav-item>
     </md-nav-bar>
     <!-- End Compliance navigation bar -->
 

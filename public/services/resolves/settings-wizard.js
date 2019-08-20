@@ -114,6 +114,8 @@ export function settingsWizard(
           audit: config['extensions.audit'],
           pci: config['extensions.pci'],
           gdpr: config['extensions.gdpr'],
+          hipaa: config['extensions.hipaa'],
+          nist: config['extensions.nist'],
           oscap: config['extensions.oscap'],
           ciscat: config['extensions.ciscat'],
           aws: config['extensions.aws'],
@@ -255,7 +257,7 @@ export function settingsWizard(
           });
       }
     }
-
+    appState.setWzMenu();
     return deferred.promise;
   } catch (error) {
     !disableErrors && errorHandler.handle(error);

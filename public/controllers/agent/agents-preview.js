@@ -92,9 +92,11 @@ export class AgentsPreviewController {
 
     this.$scope.$on('wazuhFetched', (ev, parameters) => {
       ev.stopPropagation();
-      this.$scope.showNoAgents =
-        !parameters.items.length > 0 && !parameters.filters.length;
     });
+
+    this.registerAgentsProps = {
+      addNewAgent: flag => this.addNewAgent(flag)
+    };
 
     this.init = false;
     //Load
@@ -201,6 +203,9 @@ export class AgentsPreviewController {
       this.osPlatforms = unique.osPlatforms;
       this.lastAgent = unique.lastAgent;
       this.summary = unique.summary;
+      if (!this.lastAgent || !this.lastAgent.id) {
+        this.addNewAgent(true);
+      }
 
       if (agentsTop.data.data === '') {
         this.mostActiveAgent.name = this.appState.getClusterInfo().manager;
@@ -225,8 +230,8 @@ export class AgentsPreviewController {
     return;
   }
 
-  registerNewAgent(flag) {
-    this.$scope.registerNewAgent = flag;
+  addNewAgent(flag) {
+    this.addingNewAgent = flag;
   }
 
   reloadList() {
@@ -245,6 +250,7 @@ export class AgentsPreviewController {
     } catch (error) {
       this.errorHandler.handle('Error refreshing agents stats');
     }
+    this.$scope.$broadcast('reloadSearchFilterBar', {});
   }
 
   openRegistrationDocs() {

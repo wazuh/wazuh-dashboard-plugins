@@ -18,10 +18,13 @@ import { defaultExt } from './lib/default-ext';
 import { BuildBody } from './lib/replicas-shards-helper';
 import { checkKnownFields } from './lib/refresh-known-fields';
 import { totalmem } from 'os';
+import fs from 'fs';
+import path from 'path';
 
 export function Initialize(server) {
+  const wazuhVersion = path.join(__dirname, '/wazuh-version.json');
   const blueWazuh = '\u001b[34mwazuh\u001b[39m';
-
+  const initializeErrorLogColors = [blueWazuh, 'initialize', 'error'];
   // Elastic JS Client
   const wzWrapper = new ElasticWrapper(server);
   log('initialize', `Kibana index: ${wzWrapper.WZ_KIBANA_INDEX}`, 'info');
@@ -45,7 +48,7 @@ export function Initialize(server) {
   } catch (e) {
     log('initialize', e.message || e);
     server.log(
-      [blueWazuh, 'initialize', 'error'],
+      initializeErrorLogColors,
       'Something went wrong while reading the configuration.' + e.message
     );
   }
@@ -64,12 +67,8 @@ export function Initialize(server) {
   const defaultIndexPattern = pattern || 'wazuh-alerts-3.x-*';
 
   // Save Wazuh App setup
-  const saveConfiguration = async () => {
+  const saveConfiguration = () => {
     try {
-      const shardConfiguration = BuildBody(configurationFile, 'wazuh-version');
-
-      await wzWrapper.createWazuhVersionIndex(shardConfiguration);
-
       const commonDate = new Date().toISOString();
 
       const configuration = {
@@ -81,18 +80,21 @@ export function Initialize(server) {
       };
 
       try {
-        await wzWrapper.insertWazuhVersionConfiguration(configuration);
-
+        fs.writeFileSync(wazuhVersion, JSON.stringify(configuration), err => {
+          if (err) {
+            throw new Error(err);
+          }
+        });
         log(
           'initialize:saveConfiguration',
-          'Wazuh configuration inserted',
+          'Wazuh configuration registry inserted',
           'debug'
         );
       } catch (error) {
         log('initialize:saveConfiguration', error.message || error);
         server.log(
-          [blueWazuh, 'initialize', 'error'],
-          'Could not insert Wazuh configuration'
+          initializeErrorLogColors,
+          'Could not create Wazuh configuration registry'
         );
       }
 
@@ -100,8 +102,8 @@ export function Initialize(server) {
     } catch (error) {
       log('initialize:saveConfiguration', error.message || error);
       server.log(
-        [blueWazuh, 'initialize', 'error'],
-        'Error creating index .wazuh-version.'
+        initializeErrorLogColors,
+        'Error creating wazuh-version registry'
       );
     }
   };
@@ -162,7 +164,7 @@ export function Initialize(server) {
               } due to ${error.message || error}`
             );
             server.log(
-              [blueWazuh, 'initialize:checkAPIEntriesExtensions', 'error'],
+              initializeErrorLogColors,
               `Error updating API entry extensions with ID: ${
                 item._id
               } due to ${error.message || error}`
@@ -208,39 +210,59 @@ export function Initialize(server) {
     }
   };
 
-  const checkWazuhVersionIndex = async () => {
+  const checkWazuhVersionRegistry = async () => {
     try {
       log(
-        'initialize[checkWazuhVersionIndex]',
-        'Checking .wazuh-version index.',
+        'initialize[checkWazuhVersionRegistry]',
+        'Checking wazuh-version registry.',
         'debug'
       );
-
       try {
-        await wzWrapper.getWazuhVersionIndex();
-        const shardConfiguration = BuildBody(
-          configurationFile,
-          'wazuh-version'
-        );
-        await wzWrapper.updateIndexSettings(
-          '.wazuh-version',
-          shardConfiguration
+        await wzWrapper.deleteWazuhVersionIndex();
+        log(
+          'initialize[checkWazuhVersionRegistry]',
+          'Successfully deleted old .wazuh-version index.',
+          'debug'
         );
       } catch (error) {
         log(
-          'initialize[checkWazuhVersionIndex]',
-          '.wazuh-version document does not exist. Initializating configuration...',
+          'initialize[checkWazuhVersionRegistry]',
+          'No need to delete old .wazuh-version index',
+          'debug'
+        );
+      }
+
+      if (!fs.existsSync(wazuhVersion)) {
+        log(
+          'initialize[checkWazuhVersionRegistry]',
+          'wazuh-version registry does not exist. Initializing configuration.',
           'debug'
         );
 
-        // Save Setup Info
-        await saveConfiguration();
-      }
+        // Create the app registry file for the very first time
+        saveConfiguration();
+      } else {
+        // App registry file exists, just update it
+        const currentDate = new Date().toISOString();
 
-      await wzWrapper.updateWazuhVersionIndexLastRestart(
-        packageJSON.version,
-        packageJSON.revision
-      );
+        // If this function fails, it throws an exception
+        const source = JSON.parse(fs.readFileSync(wazuhVersion, 'utf8'));
+
+        // Check if the stored revision differs from the package.json revision
+        const isNewApp = packageJSON.revision !== source.revision;
+
+        // If it's an app with a different revision, it's a new installation
+        source['installationDate'] = isNewApp
+          ? currentDate
+          : source['installationDate'];
+
+        source['app-version'] = packageJSON.version;
+        source.revision = packageJSON.revision;
+        source.lastRestart = currentDate;
+
+        // If this function fails, it throws an exception
+        fs.writeFileSync(wazuhVersion, JSON.stringify(source), 'utf-8');
+      }
     } catch (error) {
       return Promise.reject(error);
     }
@@ -251,7 +273,7 @@ export function Initialize(server) {
     try {
       await Promise.all([
         checkWazuhIndex(),
-        checkWazuhVersionIndex(),
+        checkWazuhVersionRegistry(),
         checkKnownFields(wzWrapper, log, server, defaultIndexPattern)
       ]);
       const reindexResult = await wzWrapper.reindexAppIndices();
@@ -264,10 +286,7 @@ export function Initialize(server) {
         );
     } catch (error) {
       log('initialize:init', error.message || error);
-      server.log(
-        [blueWazuh, 'initialize:init', 'error'],
-        error.message || error
-      );
+      server.log(initializeErrorLogColors, error.message || error);
       return Promise.reject(error);
     }
   };
@@ -284,7 +303,7 @@ export function Initialize(server) {
     } catch (error) {
       log('initialize:createKibanaTemplate', error.message || error);
       server.log(
-        [blueWazuh, 'initialize', 'error'],
+        initializeErrorLogColors,
         'Exception: ' + error.message || error
       );
     }
@@ -366,18 +385,11 @@ export function Initialize(server) {
           "Didn't find " + wzWrapper.WZ_KIBANA_INDEX + ' index...',
           'info'
         );
-        server.log(
-          [blueWazuh, 'initialize', 'info'],
-          "Didn't find " + wzWrapper.WZ_KIBANA_INDEX + ' index...'
-        );
         await getTemplateByName();
       }
     } catch (error) {
       log('initialize:checkKibanaStatus', error.message || error);
-      server.log(
-        [blueWazuh, 'initialize (checkKibanaStatus)', 'error'],
-        error.message || error
-      );
+      server.log(initializeErrorLogColors, error.message || error);
     }
   };
 

@@ -16,11 +16,22 @@
 
 /* Style to the base toolbar */
 /* Style applied to the toolbar-tools container */
+wz-menu {
+    position: fixed!important;
+    z-index: 999;
+}
 .wz-menu-content {
     color: #373a42;
     background-color: #FFF;
     border-bottom: 1px solid #D3DAE6;
+    width: calc(~'100vw - 49px');
+    box-shadow: 0 2px 2px -1px rgba(152, 162, 179, 0.3);
 }
+@media only screen and (max-width: 767px){
+    .wz-menu-content {
+        width: 100%;
+    }
+  }
 
 /* Style to override the font on the toolbar */
 .wz-menu-content {
@@ -30,12 +41,12 @@
 .wz-menu-button {
     font-size: 14px !important;
     transition: none !important;
-    min-height: 30px !important;
-    line-height: 30px !important;
-    height: 49px;
-    border-radius: 0;
-    padding: 10px 13px;
-    margin: 0;
+    min-height: 35px !important;
+    line-height: 35px !important;
+    height: 35px;
+    padding: 0px 8px;
+    border-radius: 4px;
+    margin: 0px 5px;
 }
 
 .wz-menu-button.md-icon-button {
@@ -67,6 +78,11 @@
 .wz-menu-select-option {
     color: #373a42;
     background-color: #FFF;
+}
+
+
+.euiHeader {
+    box-shadow: none !important;
 }
 
 .wz-menu-button .euiIcon--medium {
