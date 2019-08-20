@@ -26,6 +26,7 @@ class WzMenu {
 
   controller(
     $scope,
+    $rootScope,
     $window,
     appState,
     patternHandler,
@@ -34,7 +35,7 @@ class WzMenu {
     wazuhConfig
   ) {
     $scope.showSelector = appState.getPatternSelector();
-
+    $scope.root = $rootScope;
     let height = false;
     try {
       height = $('#navDrawerMenu > ul:nth-child(2)')[0].clientHeight;
@@ -43,15 +44,12 @@ class WzMenu {
 
     $scope.$applyAsync();
 
-    if (appState.getCurrentAPI()) {
-      $scope.theresAPI = true;
-      $scope.currentAPI = JSON.parse(appState.getCurrentAPI()).name;
-    } else {
-      $scope.theresAPI = false;
-    }
-
     $scope.goToClick = path => {
       $window.location.href = path;
+    };
+
+    $scope.setMenuNavItem = item => {
+      $scope.menuNavItem = item;
     };
 
     /**
@@ -94,8 +92,20 @@ class WzMenu {
           $scope.patternList = list;
           $scope.currentSelectedPattern = appState.getCurrentPattern();
         }
-        $scope.$applyAsync();
+        if (!$scope.menuNavItem) {
+          $scope.menuNavItem = appState
+            .getNavigation()
+            .currLocation.replace(/\//g, '');
+        }
 
+        if (appState.getCurrentAPI()) {
+          $scope.theresAPI = true;
+          $scope.currentAPI = JSON.parse(appState.getCurrentAPI()).name;
+        } else {
+          $scope.theresAPI = false;
+        }
+
+        $scope.$applyAsync();
         return;
       } catch (error) {
         errorHandler.handle(error.message || error);
@@ -103,7 +113,9 @@ class WzMenu {
       }
     };
 
-    load();
+    $scope.root.$on('loadWazuhMenu', () => {
+      load();
+    });
 
     // Function to change the current index pattern on the app
     $scope.changePattern = async selectedPattern => {

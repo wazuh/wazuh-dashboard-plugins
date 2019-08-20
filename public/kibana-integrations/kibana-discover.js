@@ -647,12 +647,12 @@ function discoverController(
   $scope.updateQueryAndFetch = function({ query, dateRange }) {
     // Wazuh filters are not ready yet
     if (!filtersAreReady()) return;
-    
+
     // Update query from search bar
     discoverPendingUpdates.removeAll();
     discoverPendingUpdates.addItem($state.query, queryFilter.getFilters());
     $rootScope.$broadcast('updateVis');
-    
+
     timefilter.setTime(dateRange);
     if (query) $state.query = query;
     $scope.fetch();
