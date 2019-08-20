@@ -24,6 +24,7 @@ import path from 'path';
 export function Initialize(server) {
   const wazuhVersion = path.join(__dirname, '/wazuh-version.json');
   const blueWazuh = '\u001b[34mwazuh\u001b[39m';
+  const initializeErrorLogColors = [blueWazuh, 'initialize', 'error'];
   // Elastic JS Client
   const wzWrapper = new ElasticWrapper(server);
   log('initialize', `Kibana index: ${wzWrapper.WZ_KIBANA_INDEX}`, 'info');
@@ -47,7 +48,7 @@ export function Initialize(server) {
   } catch (e) {
     log('initialize', e.message || e);
     server.log(
-      [blueWazuh, 'initialize', 'error'],
+      initializeErrorLogColors,
       'Something went wrong while reading the configuration.' + e.message
     );
   }
@@ -92,7 +93,7 @@ export function Initialize(server) {
       } catch (error) {
         log('initialize:saveConfiguration', error.message || error);
         server.log(
-          [blueWazuh, 'initialize', 'error'],
+          initializeErrorLogColors,
           'Could not create Wazuh configuration registry'
         );
       }
@@ -101,7 +102,7 @@ export function Initialize(server) {
     } catch (error) {
       log('initialize:saveConfiguration', error.message || error);
       server.log(
-        [blueWazuh, 'initialize', 'error'],
+        initializeErrorLogColors,
         'Error creating wazuh-version registry'
       );
     }
@@ -163,7 +164,7 @@ export function Initialize(server) {
               } due to ${error.message || error}`
             );
             server.log(
-              [blueWazuh, 'initialize:checkAPIEntriesExtensions', 'error'],
+              initializeErrorLogColors,
               `Error updating API entry extensions with ID: ${
                 item._id
               } due to ${error.message || error}`
@@ -240,7 +241,6 @@ export function Initialize(server) {
 
         // Create the app registry file for the very first time
         saveConfiguration();
-
       } else {
         // App registry file exists, just update it
         const currentDate = new Date().toISOString();
@@ -250,7 +250,7 @@ export function Initialize(server) {
 
         // Check if the stored revision differs from the package.json revision
         const isNewApp = packageJSON.revision !== source.revision;
-        
+
         // If it's an app with a different revision, it's a new installation
         source['installationDate'] = isNewApp
           ? currentDate
@@ -286,10 +286,7 @@ export function Initialize(server) {
         );
     } catch (error) {
       log('initialize:init', error.message || error);
-      server.log(
-        [blueWazuh, 'initialize:init', 'error'],
-        error.message || error
-      );
+      server.log(initializeErrorLogColors, error.message || error);
       return Promise.reject(error);
     }
   };
@@ -306,7 +303,7 @@ export function Initialize(server) {
     } catch (error) {
       log('initialize:createKibanaTemplate', error.message || error);
       server.log(
-        [blueWazuh, 'initialize', 'error'],
+        initializeErrorLogColors,
         'Exception: ' + error.message || error
       );
     }
@@ -388,18 +385,11 @@ export function Initialize(server) {
           "Didn't find " + wzWrapper.WZ_KIBANA_INDEX + ' index...',
           'info'
         );
-        server.log(
-          [blueWazuh, 'initialize', 'info'],
-          "Didn't find " + wzWrapper.WZ_KIBANA_INDEX + ' index...'
-        );
         await getTemplateByName();
       }
     } catch (error) {
       log('initialize:checkKibanaStatus', error.message || error);
-      server.log(
-        [blueWazuh, 'initialize (checkKibanaStatus)', 'error'],
-        error.message || error
-      );
+      server.log(initializeErrorLogColors, error.message || error);
     }
   };
 
