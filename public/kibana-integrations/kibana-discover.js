@@ -801,7 +801,8 @@ function discoverController(
 
   $scope.removeColumn = function removeColumn(columnName) {
     // Commented due to https://github.com/elastic/kibana/issues/22426
-    //$scope.indexPattern.popularizeField(field, 1);    columnActions.removeColumn($scope.state.columns, columnName);
+    //$scope.indexPattern.popularizeField(field, 1);    
+    columnActions.removeColumn($scope.state.columns, columnName);
   };
 
   $scope.moveColumn = function moveColumn(columnName, newIndex) {
