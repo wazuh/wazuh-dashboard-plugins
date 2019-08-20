@@ -221,6 +221,7 @@ app.run(function($rootScope, $route, $location, appState, $window) {
       }
     }
     appState.setNavigation({ status: false });
+    $rootScope.$emit('loadWazuhMenu', { });
   });
 });
 

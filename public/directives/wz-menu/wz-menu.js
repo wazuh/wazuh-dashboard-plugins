@@ -44,13 +44,6 @@ class WzMenu {
 
     $scope.$applyAsync();
 
-    if (appState.getCurrentAPI()) {
-      $scope.theresAPI = true;
-      $scope.currentAPI = JSON.parse(appState.getCurrentAPI()).name;
-    } else {
-      $scope.theresAPI = false;
-    }
-
     $scope.goToClick = path => {
       $window.location.href = path;
     };
@@ -104,6 +97,14 @@ class WzMenu {
             .getNavigation()
             .currLocation.replace(/\//g, '');
         }
+
+        if (appState.getCurrentAPI()) {
+          $scope.theresAPI = true;
+          $scope.currentAPI = JSON.parse(appState.getCurrentAPI()).name;
+        } else {
+          $scope.theresAPI = false;
+        }
+        
         $scope.$applyAsync();
         return;
       } catch (error) {
@@ -112,7 +113,9 @@ class WzMenu {
       }
     };
 
-    load();
+    $scope.root.$on('loadWazuhMenu', () => {
+      load();
+    });
 
     // Function to change the current index pattern on the app
     $scope.changePattern = async selectedPattern => {
