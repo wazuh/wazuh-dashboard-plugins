@@ -104,7 +104,7 @@ class WzMenu {
         } else {
           $scope.theresAPI = false;
         }
-        
+
         $scope.$applyAsync();
         return;
       } catch (error) {
