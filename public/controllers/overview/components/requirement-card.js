@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { EuiButtonIcon, EuiCard, EuiFlexItem, EuiFlexGroup } from '@elastic/eui';
 
-export class RequirementeCard extends Component {
+export class RequirementCard extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -15,7 +15,7 @@ export class RequirementeCard extends Component {
 
   buildCarrusel() {
     const items = this.props.items.map((req, index) => {
-      const title = `HIPAA Requirement: ${req.title}`;
+      const title = `${this.props.reqTitle}: ${req.title}`;
       return (
         <EuiFlexItem key={index}>
           <EuiCard
@@ -123,6 +123,7 @@ export class RequirementeCard extends Component {
   }
 }
 
-RequirementeCard.propTypes = {
-  items: PropTypes.array
+RequirementCard.propTypes = {
+  items: PropTypes.array,
+  reqTitle: PropTypes.string
 };

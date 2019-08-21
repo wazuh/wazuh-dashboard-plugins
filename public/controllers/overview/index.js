@@ -14,7 +14,7 @@ import { OverviewController } from './overview';
 import { WelcomeScreen } from './components/welcome';
 import { Stats } from './components/stats';
 import { AlertsStats } from './components/alerts-stats';
-import { RequirementeCard } from './components/requirement-card';
+import { RequirementCard } from './components/requirement-card';
 
 const app = uiModules.get('app/wazuh', ['react']);
 
@@ -23,4 +23,4 @@ app
   .value('WelcomeScreenOverview', WelcomeScreen)
   .value('StatsOverview', Stats)
   .value('AlertsStats', AlertsStats)
-  .value('RequirementeCard', RequirementeCard);
+  .value('RequirementCard', RequirementCard);
