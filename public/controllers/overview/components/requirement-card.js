@@ -12,26 +12,29 @@ export class RequirementCard extends Component {
     };
     this.chunkSize = 4;
     this.chartNum = 250;
+    this.expanded = false;
   }
 
   buildCarrusel() {
     const items = this.props.items.map((req, index) => {
       const title = `${this.props.reqTitle}: ${req.title}`;
+      const expandMessage = this.expanded ? 'Show less' : 'More info'
       const cardFooterContent = (
         <EuiButtonEmpty
           iconType="iInCircle"
           size="xs"
           className="footer-req wz-margin--10"
           onClick={() => this.expand()}>
-          More details
+          {expandMessage}
         </EuiButtonEmpty>
       );
       if (req.content.length >= this.chartNum) {
+        const content = this.expanded ? req.content : `${req.content.substring(0, this.chartNum - 5)}...`
         return (
           <EuiFlexItem key={index}>
             <EuiCard
               title={title}
-              description={`${req.content.substring(0, this.chartNum -5)}...`}
+              description={content}
               textAlign="left"
               className="wz-padding-bt-5"
               footer={cardFooterContent}
@@ -80,6 +83,8 @@ export class RequirementCard extends Component {
    * Expands the card to show all info
    */
   expand() {
+    this.expanded = !this.expanded;
+    this.buildCarrusel()
   }
 
   /**
