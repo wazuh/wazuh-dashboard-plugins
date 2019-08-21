@@ -248,8 +248,7 @@ export class OverviewController {
 
       if (newTab === 'pci') {
         const pciTabs = await this.commonData.getPCI();
-        this.pciTabs = pciTabs;
-        this.selectedPciIndex = 0;
+        this.pciReqs = {items: pciTabs, reqTitle: 'PCI DSS Requirement'}
       }
 
       if (newTab === 'gdpr') {
@@ -265,7 +264,6 @@ export class OverviewController {
       if (newTab === 'nist') {
         const nistTabs = await this.commonData.getNIST();
         this.nistReqs = {items: nistTabs, reqTitle: 'NIST 800-53 Requirement'}
-        this.selectedNistIndex = 0;
       }
 
       if (newTab !== 'welcome') this.tabHistory.push(newTab);

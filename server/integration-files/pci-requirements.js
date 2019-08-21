@@ -15,7 +15,7 @@ export const pciRequirementsFile = {
   '1.3.4':
     'Do not allow unauthorized outbound traffic from the cardholder data environment to the Internet.',
   '1.4':
-    'Install personal firewall software or equivalent functionality on any portable computing devices (including company and/or employee-owned) that connect to the Internet when outside the network (for example, laptops used by employees), and which are also used to access the CDE. Firewall (or equivalent) configurations include:<br><ul><li>Specific configuration settings are defined.</li><li>Personal firewall (or equivalent functionality) is actively running.</li><li>Personal firewall (or equivalent functionality) is not alterable by users of the portable computing devices.</li></ul>',
+    'Install personal firewall software or equivalent functionality on any portable computing devices (including company and/or employee-owned) that connect to the Internet when outside the network (for example, laptops used by employees), and which are also used to access the CDE. Firewall (or equivalent) configurations include:<ul><li>Specific configuration settings are defined.</li><li>Personal firewall (or equivalent functionality) is actively running.</li><li>Personal firewall (or equivalent functionality) is not alterable by users of the portable computing devices.</li></ul>',
   '2.2':
     'Develop configuration standards for all system components. Assure that these standards address all known security vulnerabilities and are consistent with industry accepted system hardening standards (CIS, ISO, SANS, NIST).',
   '2.2.2':
@@ -24,15 +24,15 @@ export const pciRequirementsFile = {
     'Implement additional security features for any required services, protocols, or daemons that are considered to be insecure',
   '2.2.4': 'Configure system security parameters to prevent misuse.',
   '4.1':
-    'Use strong cryptography and security protocols (for example, SSL/TLS, IPSEC, SSH, etc.) to safeguard sensitive cardholder data during transmission over open, public networks, including the following:<br><ul><li>Only trusted keys and certificates are accepted.</li><li>The protocol in use only supports secure versions or configurations.</li><li>The encryption strength is appropriate for the encryption methodology in use</li></ul>',
+    'Use strong cryptography and security protocols (for example, SSL/TLS, IPSEC, SSH, etc.) to safeguard sensitive cardholder data during transmission over open, public networks, including the following:<ul><li>Only trusted keys and certificates are accepted.</li><li>The protocol in use only supports secure versions or configurations.</li><li>The encryption strength is appropriate for the encryption methodology in use</li></ul>',
   '5.1':
     'Deploy anti-virus software on all systems commonly affected by malicious software (particularly personal computers and servers).',
   '5.2':
-    'Ensure that all anti-virus mechanisms are maintained as follows:<br><ul><li>Are kept current</li><li>Perform periodic scans</li><li>Generate audit logs which are retained per PCI DSS Requirement 10.7.</li></ul>',
+    'Ensure that all anti-virus mechanisms are maintained as follows:<ul><li>Are kept current</li><li>Perform periodic scans</li><li>Generate audit logs which are retained per PCI DSS Requirement 10.7.</li></ul>',
   '6.2':
     'Ensure that all system components and software are protected from known vulnerabilities by installing applicable vendor-supplied security patches. Install critical security patches within one month of release.',
   '6.5':
-    'Address common coding vulnerabilities in software development processes as follows:<br><ul><li>Train developers in secure coding techniques, including how to avoid common coding vulnerabilities, and understanding how sensitive data is handled in memory.</li><li>Develop applications based on secure coding guidelines</li></ul>',
+    'Address common coding vulnerabilities in software development processes as follows:<ul><li>Train developers in secure coding techniques, including how to avoid common coding vulnerabilities, and understanding how sensitive data is handled in memory.</li><li>Develop applications based on secure coding guidelines</li></ul>',
   '6.5.1':
     'Injection flaws, particularly SQL injection. Also consider OS Command Injection, LDAP and XPath injection flaws as well as other injection flaws.',
   '6.5.2': 'Buffer overflows',
@@ -75,9 +75,9 @@ export const pciRequirementsFile = {
   '10.6':
     'Review logs and security events for all system components to identify anomalies or suspicious activity',
   '10.6.1':
-    'Review the following at least daily: <br><ul><li>All security events</li><li>Logs of all system components that store, process, or transmit CHD and/or SAD, or that could</li>impact the security of CHD and/or SAD</li><li>Logs of all critical system components</li><li>Logs of all servers and system components that perform security functions (for example, firewalls, intrusion detection systems/intrusion prevention systems (IDS/IPS), authentication servers, ecommerce redirection servers, etc.)</li></ul>',
+    'Review the following at least daily: <ul><li>All security events</li><li>Logs of all system components that store, process, or transmit CHD and/or SAD, or that could</li>impact the security of CHD and/or SAD</li><li>Logs of all critical system components</li><li>Logs of all servers and system components that perform security functions (for example, firewalls, intrusion detection systems/intrusion prevention systems (IDS/IPS), authentication servers, ecommerce redirection servers, etc.)</li></ul>',
   '11.4':
-    'Use intrusion detection and/or intrusion prevention techniques to detect and/or prevent intrusions into the network.<br>Monitor all traffic at the perimeter of the cardholder data environment as well as at critical points in the cardholder data environment, and alert personnel to suspected compromises. Keep all intrusion detection and prevention engines, baselines, and signatures up to date.',
+    'Use intrusion detection and/or intrusion prevention techniques to detect and/or prevent intrusions into the network.Monitor all traffic at the perimeter of the cardholder data environment as well as at critical points in the cardholder data environment, and alert personnel to suspected compromises. Keep all intrusion detection and prevention engines, baselines, and signatures up to date.',
   '11.5':
     'Deploy a change detection mechanism (for example, file integrity monitoring tools) to alert personnel to unauthorized modification of critical system files, configuration files, or content files; and configure the software to perform critical file comparisons at least weekly.'
 };
