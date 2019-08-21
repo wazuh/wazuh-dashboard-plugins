@@ -45,66 +45,11 @@
     </div>
     <!-- End navigation section -->
 
-    <!-- Host monitoring navigation bar -->
-    <md-nav-bar ng-if="octrl.inArray(octrl.tab, octrl.hostMonitoringTabs)" class="wz-nav-bar"
-        ng-show="octrl.tab !== 'welcome'" md-selected-nav-item="octrl.tab"
-        nav-bar-aria-label="Host monitoring navigation links">
-        <md-nav-item class="wz-nav-item" md-nav-click="octrl.switchTab('general',true)" name="general">
-            {{ octrl.tabNames['general'] }}</md-nav-item>
-        <md-nav-item class="wz-nav-item" md-nav-click="octrl.switchTab('fim',true)" name="fim">
-            {{ octrl.tabNames['fim'] }}</md-nav-item>
-        <md-nav-item ng-show="octrl.extensions.aws" class="wz-nav-item" md-nav-click="octrl.switchTab('aws',true)"
-            name="aws">{{ octrl.tabNames['aws'] }}</md-nav-item>
-    </md-nav-bar>
-    <!-- End Host monitoring navigation bar -->
-
-    <!-- System audit navigation bar -->
-    <md-nav-bar
-        ng-if="octrl.inArray(octrl.tab, octrl.systemAuditTabs) && (octrl.extensions.audit || octrl.extensions.oscap || octrl.extensions.ciscat)"
-        class="wz-nav-bar" ng-show="octrl.tab !== 'welcome'" md-selected-nav-item="octrl.tab"
-        nav-bar-aria-label="System audit navigation links">
-        <md-nav-item class="wz-nav-item" md-nav-click="octrl.switchTab('pm',true)" name="pm">{{ octrl.tabNames['pm'] }}
-        </md-nav-item>
-        <md-nav-item ng-show="octrl.extensions.audit" class="wz-nav-item" md-nav-click="octrl.switchTab('audit',true)"
-            name="audit">{{ octrl.tabNames['audit'] }}</md-nav-item>
-        <md-nav-item ng-show="octrl.extensions.oscap" class="wz-nav-item" md-nav-click="octrl.switchTab('oscap',true)"
-            name="oscap">{{ octrl.tabNames['oscap'] }}</md-nav-item>
-        <md-nav-item ng-show="octrl.extensions.ciscat" class="wz-nav-item" md-nav-click="octrl.switchTab('ciscat',true)"
-            name="ciscat">{{ octrl.tabNames['ciscat'] }}</md-nav-item>
-    </md-nav-bar>
-    <!-- End System audit navigation bar -->
-
-    <!-- Security navigation bar -->
-    <md-nav-bar ng-if="octrl.inArray(octrl.tab, octrl.securityTabs)" class="wz-nav-bar"
-        ng-show="octrl.tab !== 'welcome'" md-selected-nav-item="octrl.tab"
-        nav-bar-aria-label="Security navigation links">
-        <md-nav-item class="wz-nav-item" md-nav-click="octrl.switchTab('vuls',true)" name="vuls">
-            {{ octrl.tabNames['vuls'] }}</md-nav-item>
-        <md-nav-item ng-show="octrl.extensions.virustotal" class="wz-nav-item"
-            md-nav-click="octrl.switchTab('virustotal',true)" name="virustotal">{{ octrl.tabNames['virustotal'] }}
-        </md-nav-item>
-        <md-nav-item ng-show="octrl.extensions.osquery" class="wz-nav-item"
-            md-nav-click="octrl.switchTab('osquery',true)" name="osquery">{{ octrl.tabNames['osquery'] }}</md-nav-item>
-        <md-nav-item ng-show="octrl.extensions.docker" class="wz-nav-item" md-nav-click="octrl.switchTab('docker',true)"
-            name="docker">
-            {{ octrl.tabNames['docker'] }}</md-nav-item>
-    </md-nav-bar>
-    <!-- End Security navigation bar -->
-
-    <!-- Compliance navigation bar -->
-    <md-nav-bar ng-if="octrl.inArray(octrl.tab, octrl.complianceTabs) && (octrl.extensions.pci || octrl.extensions.gdpr || octrl.extensions.hipaa || octrl.extensions.nist)"
-        class="wz-nav-bar" ng-show="octrl.tab !== 'welcome'" md-selected-nav-item="octrl.tab"
-        nav-bar-aria-label="Compliance navigation links">
-        <md-nav-item ng-show="octrl.extensions.pci" class="wz-nav-item" md-nav-click="octrl.switchTab('pci',true)"
-            name="pci">{{ octrl.tabNames['pci'] }}</md-nav-item>
-        <md-nav-item ng-show="octrl.extensions.gdpr" class="wz-nav-item" md-nav-click="octrl.switchTab('gdpr',true)"
-            name="gdpr">{{ octrl.tabNames['gdpr'] }}</md-nav-item>
-        <md-nav-item ng-show="octrl.extensions.hipaa" class="wz-nav-item" md-nav-click="octrl.switchTab('hipaa',true)"
-            name="hipaa">{{ octrl.tabNames['hipaa'] }}</md-nav-item>
-        <md-nav-item ng-show="octrl.extensions.nist" class="wz-nav-item" md-nav-click="octrl.switchTab('nist',true)"
-            name="nist">{{ octrl.tabNames['nist'] }}</md-nav-item>
-    </md-nav-bar>
-    <!-- End Compliance navigation bar -->
+    <!-- Navigation bar -->
+    <div ng-if="octrl.overviewTabsProps">
+        <react-component name="Tabs" props="octrl.overviewTabsProps" />
+    </div>
+    <!-- End of navigation bar -->
 
     <!-- Discover search bar section -->
     <kbn-dis ng-show="octrl.tab !== 'welcome'"></kbn-dis>

@@ -451,6 +451,7 @@ export class AgentsController {
     };
 
     this.$scope.expand = i => this.expand(i);
+    this.setTabs();
   }
   /**
    * Create metric for given object
@@ -663,6 +664,47 @@ export class AgentsController {
     } catch (error) {
       return Promise.reject(error);
     }
+
+    this.setTabs();
+  }
+
+  /**
+   * Build the current section tabs
+   */
+  setTabs() {
+    this.$scope.agentsTabsProps = false;
+    this.$scope.currentPanel = this.$scope.hostMonitoringTabs.includes(
+      this.$scope.tab
+    )
+      ? this.$scope.hostMonitoringTabs
+      : this.$scope.systemAuditTabs.includes(this.$scope.tab)
+      ? this.$scope.systemAuditTabs
+      : this.$scope.securityTabs.includes(this.$scope.tab)
+      ? this.$scope.securityTabs
+      : this.$scope.complianceTabs.includes(this.$scope.tab)
+      ? this.$scope.complianceTabs
+      : false;
+
+    if (!this.$scope.currentPanel) return;
+
+    const tabs = [];
+    this.$scope.currentPanel.forEach(x => {
+      if (this.$scope.extensions[x] !== false) {
+        tabs.push({
+          id: x,
+          name: this.$scope.tabNames[x]
+        });
+      }
+    });
+
+    this.$scope.agentsTabsProps = {
+      clickAction: tab => {
+        this.switchTab(tab, true);
+      },
+      selectedTab: this.$scope.tab || this.$scope.currentPanel[0],
+      tabs
+    };
+    this.$scope.$applyAsync();
   }
 
   goDiscover() {

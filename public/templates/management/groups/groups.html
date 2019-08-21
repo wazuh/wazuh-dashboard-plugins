@@ -42,11 +42,9 @@
             </div>
 
             <!-- End group actions -->
-            <md-nav-bar ng-if="lookingGroup && currentGroup && !addingAgents && !editingFile" class="wz-nav-bar"
-                md-selected-nav-item="groupsSelectedTab">
-                <md-nav-item class="wz-nav-item" md-nav-click="goBackToAgents()" name="agents">Agents</md-nav-item>
-                <md-nav-item class="wz-nav-item" md-nav-click="goBackFiles()" name="files">Content</md-nav-item>
-            </md-nav-bar>
+            <div ng-if="lookingGroup && currentGroup && !addingAgents && !editingFile && groupsTabsProps" class="md-margin-h">
+                <react-component name="Tabs" props="groupsTabsProps" />
+            </div>
 
             <!-- XML editor for group agents -->
             <div ng-show="editingFile">

@@ -614,6 +614,18 @@ export function GroupsController(
     $scope.$broadcast('wazuhSearch', {});
   };
 
+  $scope.groupsTabsProps = {
+    clickAction: tab => {
+      if (tab === 'agents') {
+        $scope.goBackToAgents();
+      } else if (tab === 'content') {
+        $scope.goBackFiles();
+      }
+    },
+    selectedTab: $scope.groupsSelectedTab || 'agents',
+    tabs: [{ id: 'agents', name: 'Agents' }, { id: 'content', name: 'Content' }]
+  };
+
   // Come from the pencil icon on the groups table
   $scope.$on('openGroupFromList', (ev, parameters) => {
     $scope.editingFile = true;
