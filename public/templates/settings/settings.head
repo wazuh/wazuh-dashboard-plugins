@@ -3,14 +3,6 @@
         <react-component name="EuiProgress" props="{size: 'xs', color: 'primary'}" />
     </div>
 
-    <md-nav-bar ng-if="!ctrl.load" class="wz-nav-bar wz-margin-top-10" md-selected-nav-item="ctrl.tab"
-        nav-bar-aria-label="Settings navigation links">
-        <md-nav-item class="wz-nav-item" md-nav-click="ctrl.switchTab('api', true)" name="api">API</md-nav-item>
-        <md-nav-item class="wz-nav-item" md-nav-click="ctrl.switchTab('pattern', true)" name="pattern">Pattern
-        </md-nav-item>
-        <md-nav-item class="wz-nav-item" md-nav-click="ctrl.switchTab('configuration', true)" name="configuration">
-            Configuration</md-nav-item>
-        <md-nav-item class="wz-nav-item" md-nav-click="ctrl.switchTab('logs', true); ctrl.refreshLogs()" name="logs">
-            Logs</md-nav-item>
-        <md-nav-item class="wz-nav-item" md-nav-click="ctrl.switchTab('about', true)" name="about">About</md-nav-item>
-    </md-nav-bar>
+    <div ng-if="!ctrl.load && ctrl.settingsTabsProps" class="wz-margin-top-10 md-margin-h">
+        <react-component name="Tabs" props="ctrl.settingsTabsProps" />
+    </div>

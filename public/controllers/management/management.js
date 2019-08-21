@@ -153,7 +153,7 @@ export class ManagementController {
 
     this.rulesetTabsProps = {
       clickAction: tab => this.setRulesTab(tab),
-      selectedTab: this.rulesetTab,
+      selectedTab: this.rulesetTab || 'rules',
       tabs: [
         { id: 'rules', name: 'Rules' },
         { id: 'decoders', name: 'Decoders' },
@@ -297,6 +297,7 @@ export class ManagementController {
       this.currentRule = false;
       this.currentDecoder = false;
       this.currentList = false;
+      this.managementTabsProps.selectedTab = this.tab;
     }
 
     this.$location.search('tab', this.tab);
