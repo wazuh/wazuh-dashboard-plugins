@@ -1,23 +1,6 @@
 <md-content flex layout="column" ng-if="octrl.tab === 'gdpr' && octrl.tabView === 'panels'"
     ng-class="{'no-opacity': resultState !== 'ready' || !rendered}" layout-align="start">
 
-    <div layout="row" layout-align="center stretch" ng-show="octrl.gdprTabs.length">
-        <md-card flex class="wz-md-card">
-            <md-tabs md-selected="selectedGdprIndex" class="wz-md-tab" md-border-bottom md-dynamic-height
-                id="gdprReq_tab">
-                <md-tab ng-repeat="tab in octrl.gdprTabs" ng-disabled="tab.disabled" label="{{tab.title}}">
-                    <div class="md-padding">
-                        <span class="wz-headline-title">GDPR Requirement: {{tab.title}}</span>
-                        <md-divider class="wz-margin-top-10"></md-divider>
-                        <div layout="row" class="wz-padding-top-10 wz-line-height">
-                            <div ng-bind-html="tab.content"></div>
-                        </div>
-                    </div>
-                </md-tab>
-            </md-tabs>
-        </md-card>
-    </div>
-
     <div ng-if="octrl.gdprReqs" layout="row" class="wz-margin-10" layout-align="center stretch">
         <react-component name='RequirementCard' props="octrl.gdprReqs"/>
     </div>
