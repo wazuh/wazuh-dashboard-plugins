@@ -1,13 +1,14 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { EuiCard, EuiFlexItem, EuiFlexGroup } from '@elastic/eui';
+import { EuiButtonIcon, EuiCard, EuiFlexItem, EuiFlexGroup } from '@elastic/eui';
 
 export class RequirementeCard extends Component {
   constructor(props) {
     super(props);
     this.state = {
       position: 0,
-      carrusel: []
+      carrusel: [],
+      carruselLength: 0
     };
   }
 
@@ -21,25 +22,41 @@ export class RequirementeCard extends Component {
             layout="horizontal"
             title={title}
             description={req.content}
-            onClick={() => this.updatePosition()}
+            onClick={() => {}}
           />
         </EuiFlexItem>
       );
     });
     const carrusel = this.chunk(items, 4);
-    this.setState({carrusel: carrusel, carruselLength: carrusel.length});
+    this.setState({ carrusel: carrusel, carruselLength: carrusel.length });
   }
 
   /**
-   * Updates the position to render the others requirements
+   * Slide to the right the carrusel
    */
-  updatePosition() {
-    const currentPosition = this.state.position;
-    let newPos = currentPosition + 1;
-    if (newPos >= this.state.carruselLength) newPos = 0;
-    this.setState({position: newPos});
+  slideRight() {
+    let newPos;
+    if (this.state.position === this.state.carruselLength - 1) {
+      newPos = 0;
+    } else {
+      newPos = this.state.position + 1;
+    }
+    this.setState({ position: newPos });
   }
 
+
+  /**
+   * Slides to the left the carrusel
+   */
+  slideLeft() {
+    let newPos;
+    if (this.state.position === 0) {
+      newPos = this.state.carruselLength - 1;
+    } else {
+      newPos = this.state.position - 1;
+    }
+    this.setState({ position: newPos });
+  }
 
   /**
    * Split an array into smallers array
@@ -65,7 +82,23 @@ export class RequirementeCard extends Component {
     return (
       <div>
         <EuiFlexGroup gutterSize="l">
+          {this.state.carruselLength > 1 && (
+            <EuiButtonIcon
+              className="wz-margin-left-10"
+              iconType="arrowLeft"
+              aria-label="Previous"
+              onClick={() => this.slideLeft()}
+            />
+          )}
           {cards}
+          {this.state.carruselLength > 1 && (
+            <EuiButtonIcon
+              className="wz-margin-right-10"
+              iconType="arrowRight"
+              aria-label="Next"
+              onClick={() => this.slideRight()}
+            />
+          )}
         </EuiFlexGroup>
       </div >
     );
