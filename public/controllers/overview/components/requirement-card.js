@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { EuiButtonIcon, EuiCard, EuiFlexItem, EuiFlexGroup } from '@elastic/eui';
+import { EuiButtonEmpty, EuiButtonIcon, EuiCard, EuiFlexItem, EuiFlexGroup } from '@elastic/eui';
 
 export class RequirementCard extends Component {
   constructor(props) {
@@ -11,22 +11,49 @@ export class RequirementCard extends Component {
       carruselLength: 0
     };
     this.chunkSize = 4;
+    this.chartNum = 250;
   }
 
   buildCarrusel() {
     const items = this.props.items.map((req, index) => {
       const title = `${this.props.reqTitle}: ${req.title}`;
-      return (
-        <EuiFlexItem key={index}>
-          <EuiCard
-            layout="horizontal"
-            title={title}
-            description={req.content}
-            onClick={() => { }}
-          />
-        </EuiFlexItem>
+      const cardFooterContent = (
+        <EuiButtonEmpty
+          iconType="iInCircle"
+          size="xs"
+          className="footer-req wz-margin--10"
+          onClick={() => this.expand()}>
+          More details
+        </EuiButtonEmpty>
       );
+      if (req.content.length >= this.chartNum) {
+        return (
+          <EuiFlexItem key={index}>
+            <EuiCard
+              title={title}
+              description={`${req.content.substring(0, this.chartNum -5)}...`}
+              textAlign="left"
+              className="wz-padding-bt-5"
+              footer={cardFooterContent}
+              onClick={() => { }}
+            />
+          </EuiFlexItem>
+        );
+      } else {
+        return (
+          <EuiFlexItem key={index}>
+            <EuiCard
+              title={title}
+              description={req.content}
+              textAlign="left"
+              className="wz-padding-bt-5"
+              onClick={() => { }}
+            />
+          </EuiFlexItem>
+        )
+      }
     });
+
     const carrusel = this.chunk(items, this.chunkSize);
     const lastArr = carrusel.length - 1;
     const last = carrusel[lastArr];
@@ -36,17 +63,23 @@ export class RequirementCard extends Component {
         carrusel[lastArr].push(
           <EuiFlexItem key={`hidden${i}`}>
             <EuiCard
-              layout="horizontal"
               title='Title'
               className='hiddenCard'
               description='Description'
-              onClick={() => {}}
+              textAlign='left'
+              onClick={() => { }}
             />
           </EuiFlexItem>
         )
       }
     }
     this.setState({ carrusel: carrusel, carruselLength: carrusel.length });
+  }
+
+  /**
+   * Expands the card to show all info
+   */
+  expand() {
   }
 
   /**
