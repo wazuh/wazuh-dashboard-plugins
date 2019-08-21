@@ -1183,16 +1183,16 @@ export class WazuhApiCtrl {
 
       const headers = ApiHelper.buildOptionsObject(config);
 
-      const distinctUrl = `${config.url}:${config.port}/agents/full_summary`;
+      const distinctUrl = `${config.url}:${config.port}/summary/agents`;
 
       const data = await needle('get', distinctUrl, {}, headers);
       const response = ((data || {}).body || {}).data || {};
 
-      const nodes = response.unique_node_names;
+      const nodes = response.nodes;
       const groups = response.groups;
-      const osPlatforms = response.unique_agent_os;
-      const versions = response.unique_agent_version;
-      const summary = response.summary;
+      const osPlatforms = response.agent_os;
+      const versions = response.agent_version;
+      const summary = response.agent_status;
       const lastAgent = response.last_registered_agent;
 
       const result = {
