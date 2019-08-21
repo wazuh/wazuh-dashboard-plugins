@@ -259,13 +259,12 @@ export class OverviewController {
 
       if (newTab === 'hipaa') {
         const hipaaTabs = await this.commonData.getHIPAA();
-        this.hipaaTabs = hipaaTabs;
         this.hipaaReqs = {items: hipaaTabs, reqTitle: 'HIPAA Requirement'};
       }
 
       if (newTab === 'nist') {
         const nistTabs = await this.commonData.getNIST();
-        this.nistTabs = nistTabs;
+        this.nistReqs = {items: nistTabs, reqTitle: 'NIST 800-53 Requirement'}
         this.selectedNistIndex = 0;
       }
 
