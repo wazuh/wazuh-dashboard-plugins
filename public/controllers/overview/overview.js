@@ -254,15 +254,14 @@ export class OverviewController {
 
       if (newTab === 'gdpr') {
         const gdprTabs = await this.commonData.getGDPR();
-        this.gdprTabs = gdprTabs;
-        this.selectedGdprIndex = 0;
+        this.gdprReqs = {items: gdprTabs, reqTitle: 'GDPR Requirement'}
+        console.log('gdpr reqs ',this.gdprReqs)
       }
 
       if (newTab === 'hipaa') {
         const hipaaTabs = await this.commonData.getHIPAA();
         this.hipaaTabs = hipaaTabs;
-        this.hipaaReqs = {items: this.hipaaTabs};
-        this.selectedHipaaIndex = 0;
+        this.hipaaReqs = {items: hipaaTabs, reqTitle: 'HIPAA Requirement'};
       }
 
       if (newTab === 'nist') {
