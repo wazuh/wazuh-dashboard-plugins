@@ -259,6 +259,7 @@ export class OverviewController {
       if (newTab === 'hipaa') {
         const hipaaTabs = await this.commonData.getHIPAA();
         this.hipaaTabs = hipaaTabs;
+        this.hipaaReqs = {items: this.hipaaTabs};
         this.selectedHipaaIndex = 0;
       }
 
