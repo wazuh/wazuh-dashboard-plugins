@@ -173,20 +173,17 @@ app.directive('kbnVis', function() {
             if (!lockFields) {
               try {
                 lockFields = true;
-                errorHandler.info(
-                  'Detected an incomplete index pattern, refreshing all its known fields...'
-                );
                 await genericReq.request(
                   'GET',
                   '/elastic/known-fields/all',
                   {}
                 );
                 lockFields = false;
-                errorHandler.info('Success');
                 return myRender(raw);
               } catch (error) {
                 lockFields = false;
-                throw error;
+                console.log(error.message || error);
+                errorHandler.handle('An error occurred fetching new index pattern fields.');
               }
             }
           } else {
