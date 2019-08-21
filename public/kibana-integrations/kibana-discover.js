@@ -644,7 +644,7 @@ function discoverController(
       });
   };
 
-  $scope.updateQueryAndFetch = async ({ query, dateRange }) => {
+  $scope.updateQueryAndFetch = function({ query, dateRange }) {
     // Wazuh filters are not ready yet
     if (!filtersAreReady()) return;
 
@@ -654,9 +654,8 @@ function discoverController(
       ($scope.pinnedFilters || []).length
     ) {
       $scope.inheritedFilters = [
-        ...$scope.discoverFilters,
-        ...$scope.pinnedFilters,
-        ...queryFilter.getFilters()
+        ...($scope.discoverFilters || []),
+        ...($scope.pinnedFilters || [])
       ];
       $scope.discoverFilters = [];
       $scope.pinnedFilters = [];
@@ -666,12 +665,12 @@ function discoverController(
     discoverPendingUpdates.removeAll();
     discoverPendingUpdates.addItem(
       $state.query,
-      $scope.inheritedFilters || queryFilter.getFilters()
+      [...($scope.inheritedFilters || []), ...queryFilter.getFilters()]
     );
     $rootScope.$broadcast('updateVis');
     $scope.inheritedFilters = false;
     timefilter.setTime(dateRange);
-    if (query) $state.query = query;
+    if (query && typeof query === 'object') $state.query = query;
     $scope.fetch();
   };
 
@@ -818,7 +817,7 @@ function discoverController(
 
   $scope.removeColumn = function removeColumn(columnName) {
     // Commented due to https://github.com/elastic/kibana/issues/22426
-    //$scope.indexPattern.popularizeField(field, 1);    
+    //$scope.indexPattern.popularizeField(field, 1);
     columnActions.removeColumn($scope.state.columns, columnName);
   };
 
@@ -1002,6 +1001,9 @@ function discoverController(
       });
     } else {
       $state.filters = localChange ? $state.filters : [];
+      if (($scope.pinnedFilters || []).length) {
+        await queryFilter.addFilters($scope.pinnedFilters);
+      }
       const currentFilters = queryFilter.getFilters();
       const pinnedAgentIDs = currentFilters.filter(
         item =>
@@ -1056,7 +1058,11 @@ function discoverController(
     'changeTabView',
     (evt, parameters) => {
       $scope.pinnedFilters = getPinnedFilters();
-      if (parameters.tabView !== 'discover' && $scope.tabView !== 'discover' && !parameters.sameSection ) {
+      if (
+        parameters.tabView !== 'discover' &&
+        $scope.tabView !== 'discover' &&
+        !parameters.sameSection
+      ) {
         queryFilter.removeAll();
       } else if (
         parameters.tabView !== 'discover' &&

@@ -209,9 +209,9 @@ export class OverviewController {
           localChange || preserveDiscover
         );
       } else {
-        this.$scope.$emit('changeTabView', { 
+        this.$scope.$emit('changeTabView', {
           tabView: this.tabView
-         });
+        });
       }
 
       this.checkMetrics(this.tab, subtab);

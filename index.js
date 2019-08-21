@@ -40,7 +40,7 @@ export default kibana =>
     init(server, options) {
       // Kibana spaces locker
       const xpackMainPlugin = server.plugins.xpack_main;
-      
+
       if (xpackMainPlugin) {
         xpackMainPlugin.registerFeature({
           id: 'wazuh',
