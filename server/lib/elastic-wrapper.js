@@ -9,11 +9,11 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import { knownFields } from '../integration-files/known-fields';
 import { monitoringKnownFields } from '../integration-files/monitoring-known-fields';
 
 export class ElasticWrapper {
   constructor(server) {
+    this.knownFields = [];
     this.cachedCredentials = {};
     this._server = server;
     this.usingSearchGuard = ((server || {}).plugins || {}).searchguard || false;
@@ -230,7 +230,7 @@ export class ElasticWrapper {
       if (fields) {
         currentFields = JSON.parse(fields);
 
-        if (Array.isArray(currentFields) && Array.isArray(knownFields)) {
+        if (Array.isArray(currentFields)) {
           currentFields = currentFields.filter(
             item =>
               item.name &&
@@ -239,12 +239,10 @@ export class ElasticWrapper {
               item.name !==
                 'data.aws.service.action.networkConnectionAction.remoteIpDetails.geoLocation.lon'
           );
-
-          this.mergeDetectedFields(knownFields, currentFields);
         }
       } else {
-        // It's a new index pattern, just add our known fields
-        currentFields = knownFields;
+        // It's a new index pattern
+        currentFields = [];
       }
 
       // Iterate over dynamic fields
