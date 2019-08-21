@@ -10,6 +10,7 @@ export class RequirementeCard extends Component {
       carrusel: [],
       carruselLength: 0
     };
+    this.chunkSize = 5;
   }
 
   buildCarrusel() {
@@ -22,12 +23,30 @@ export class RequirementeCard extends Component {
             layout="horizontal"
             title={title}
             description={req.content}
-            onClick={() => {}}
+            onClick={() => { }}
           />
         </EuiFlexItem>
       );
     });
-    const carrusel = this.chunk(items, 4);
+    const carrusel = this.chunk(items, this.chunkSize);
+    const lastArr = carrusel.length - 1;
+    const last = carrusel[lastArr];
+    const rest = this.chunkSize - last.length;
+    if (last.length < this.chunkSize) {
+      for (let i = 0; i < rest; i++) {
+        carrusel[lastArr].push(
+          <EuiFlexItem key={`hidden${i}`}>
+            <EuiCard
+              layout="horizontal"
+              title=''
+              className='hiddenCard'
+              description=''
+              onClick={() => { }}
+            />
+          </EuiFlexItem>
+        )
+      }
+    }
     this.setState({ carrusel: carrusel, carruselLength: carrusel.length });
   }
 
