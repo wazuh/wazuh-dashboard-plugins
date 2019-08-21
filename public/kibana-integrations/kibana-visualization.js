@@ -114,6 +114,12 @@ app.directive('kbnVis', function() {
                 $scope.visID,
                 rawVis[0]
               );
+
+              // Visualization doesn't need the "_source"
+              visualization.searchSource.setField('source', false);
+              // Visualization doesn't need "hits"
+              visualization.searchSource.setField('size', 0);
+
               rawFilters = visualization.searchSource.getField('filter');
 
               // Other case, use the pending one, if it is empty, it won't matter
@@ -136,7 +142,7 @@ app.directive('kbnVis', function() {
                   isAgentStatus && timeFilterSeconds < 900
                     ? { from: 'now-15m', to: 'now', mode: 'quick' }
                     : timefilter.getTime()
-              });
+              });    
               visHandlers.addItem(visHandler);
               visHandler.addRenderCompleteListener(renderComplete);
             } else if (rendered) {
