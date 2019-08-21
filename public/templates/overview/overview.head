@@ -1,9 +1,4 @@
 <div flex="auto" layout="column" ng-cloak ng-controller="overviewController as octrl">
-
-    <!-- Top navbar section -->
-    <wz-menu ng-init="menuNavItem = 'overview'"></wz-menu>
-    <!-- End top navbar section -->
-
     <!-- Navigation section -->
     <div layout="row" layout-align="start center">
         <!-- Breadcrumbs -->

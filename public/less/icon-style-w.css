@@ -2,4 +2,13 @@
   filter: invert(100%);
   max-width: 18px;
   left: -1px;
+  margin: 0;
+}
+
+.euiNavDrawerGroup__item .euiToolTipAnchor {
+  height: 32px;
+}
+
+.euiNavDrawerGroup__item .euiListGroupItem__button {
+  padding: 6px 8px;
 }

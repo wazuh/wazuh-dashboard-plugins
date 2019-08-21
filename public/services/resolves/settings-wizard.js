@@ -257,7 +257,7 @@ export function settingsWizard(
           });
       }
     }
-
+    appState.setWzMenu();
     return deferred.promise;
   } catch (error) {
     !disableErrors && errorHandler.handle(error);

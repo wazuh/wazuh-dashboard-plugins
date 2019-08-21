@@ -647,12 +647,12 @@ function discoverController(
   $scope.updateQueryAndFetch = function({ query, dateRange }) {
     // Wazuh filters are not ready yet
     if (!filtersAreReady()) return;
-    
+
     // Update query from search bar
     discoverPendingUpdates.removeAll();
     discoverPendingUpdates.addItem($state.query, queryFilter.getFilters());
     $rootScope.$broadcast('updateVis');
-    
+
     timefilter.setTime(dateRange);
     if (query) $state.query = query;
     $scope.fetch();
@@ -801,7 +801,8 @@ function discoverController(
 
   $scope.removeColumn = function removeColumn(columnName) {
     // Commented due to https://github.com/elastic/kibana/issues/22426
-    //$scope.indexPattern.popularizeField(field, 1);    columnActions.removeColumn($scope.state.columns, columnName);
+    //$scope.indexPattern.popularizeField(field, 1);    
+    columnActions.removeColumn($scope.state.columns, columnName);
   };
 
   $scope.moveColumn = function moveColumn(columnName, newIndex) {
@@ -1041,7 +1042,7 @@ function discoverController(
     'changeTabView',
     (evt, parameters) => {
       $scope.pinnedFilters = getPinnedFilters();
-      if (parameters.tabView !== 'discover') {
+      if (parameters.tabView !== 'discover' && !parameters.sameSection ) {
         queryFilter.removeAll();
       }
       evt.stopPropagation();

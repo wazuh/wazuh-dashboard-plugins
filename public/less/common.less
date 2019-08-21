@@ -73,7 +73,6 @@
   position: relative;
   height: 25px;
   color: #666666;
-  background-color: white !important;
 }
 
 /* Custom JSON viewer settings */
@@ -409,6 +408,10 @@
 
 /* Custom Kibana styles */
 
+md-content.md-default-theme, md-content{
+  background: transparent!important;
+}
+
 .wz-border-none,
 .wz-border-none md-select-value {
   border: none !important;
@@ -424,7 +427,7 @@
 }
 
 .table-hover > tbody > tr:hover {
-  background-color: #f0f0f0!important;
+  background-color: #fafbfd!important;
 }
 
 /* .table > tbody {
@@ -998,6 +1001,63 @@ discover-app-w .container-fluid {
   padding-top: 25px;
 }
 
+.navBarLogo {
+  width: 110px;
+  margin-top: 4px;
+}
+
+.application.tab-health-check wz-menu{
+  display: none;
+}
+
+.health-check table tr td{
+    border-top: none!important;
+}
+
+.health-check{
+  padding-top: 5%;
+}
+
+@keyframes rotation {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(359deg);
+  }
+}
+
+.health-check-loader{
+  height: 150px;
+  width: 150px;
+  margin: 0 auto;
+  position: relative;
+  border: 2px solid transparent;
+  border-top: 2px solid #00A9E5;
+  border-radius: 100%;
+  display: block;
+  animation: rotation .75s .5s infinite linear;
+  animation-play-state: running;
+}
+
+.health-check-logo{
+    width: 110px;
+    height: 110px;
+    float: left;
+    margin: 0 auto;
+    margin-top: -130px;
+    margin-bottom: 50px;
+    z-index: 1;
+}
+
+.CodeMirror-gutters {
+  z-index: 1!important;
+}
+
+md-toolbar.md-default-theme:not(.md-menu-toolbar), md-toolbar:not(.md-menu-toolbar) {
+    background-color: transparent!important;
+}
+
 .refresh-report-button {
   padding: 10px;
   text-align: right;
@@ -1029,4 +1089,19 @@ discover-app-w .container-fluid {
 
 .wz-margin-10 {
   margin: 10px;
+}
+
+.header-global-wrapper + .app-wrapper:not(.hidden-chrome) {
+  top: 48px!important;
+  left: 48px!important;
+}
+
+.application>div{
+  padding-top: 50px;
+}
+
+@media only screen and (max-width: 767px){
+  .header-global-wrapper + .app-wrapper:not(.hidden-chrome) {
+      left: 0!important;
+  }
 }

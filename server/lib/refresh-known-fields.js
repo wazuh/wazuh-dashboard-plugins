@@ -136,16 +136,16 @@ export async function checkKnownFields(
     }
 
     !quiet && log('initialize', 'App ready to be used.', 'info');
-    !quiet &&
-      server.log([blueWazuh, 'initialize', 'info'], 'App ready to be used.');
+    !quiet && server.log('info', 'Wazuh app ready to be used.');
 
     return;
   } catch (error) {
     !quiet && log('initialize:checkKnownFields', error.message || error);
     !quiet &&
       server.log(
-        [blueWazuh, 'server', 'error'],
-        'Error importing objects into elasticsearch.' + error.message || error
+        'error',
+        'Wazuh app had en error importing objects into Elasticsearch.' +
+          error.message || error
       );
   }
 }

@@ -382,7 +382,8 @@ export class AgentsController {
       this.$scope.showSyscheckFiles = !this.$scope.showSyscheckFiles;
       if (!this.$scope.showSyscheckFiles) {
         this.$scope.$emit('changeTabView', {
-          tabView: this.$scope.tabView
+          tabView: this.$scope.tabView,
+          sameSection: true
         });
       }
       this.$scope.$applyAsync();
@@ -393,7 +394,8 @@ export class AgentsController {
       this.$scope.showScaScan = !this.$scope.showScaScan;
       if (!this.$scope.showScaScan) {
         this.$scope.$emit('changeTabView', {
-          tabView: this.$scope.tabView
+          tabView: this.$scope.tabView,
+          sameSection: true
         });
       }
       this.$scope.$applyAsync();
@@ -566,7 +568,7 @@ export class AgentsController {
         this.$scope.agent.status =
           (((agentInfo || {}).data || {}).data || {}).status ||
           this.$scope.agent.status;
-      } catch (error) { } // eslint-disable-line
+      } catch (error) {} // eslint-disable-line
     }
 
     try {
@@ -614,7 +616,7 @@ export class AgentsController {
       if (tab === 'syscollector')
         try {
           await this.loadSyscollector(this.$scope.agent.id);
-        } catch (error) { } // eslint-disable-line
+        } catch (error) {} // eslint-disable-line
       if (tab === 'configuration') {
         this.$scope.switchConfigurationTab('welcome');
       } else {
