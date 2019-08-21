@@ -255,7 +255,6 @@ export class OverviewController {
       if (newTab === 'gdpr') {
         const gdprTabs = await this.commonData.getGDPR();
         this.gdprReqs = {items: gdprTabs, reqTitle: 'GDPR Requirement'}
-        console.log('gdpr reqs ',this.gdprReqs)
       }
 
       if (newTab === 'hipaa') {
