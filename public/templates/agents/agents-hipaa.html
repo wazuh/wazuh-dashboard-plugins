@@ -2,23 +2,10 @@
     layout-align="start">
 
     <!-- View: Panels -->
-
-    <div layout="row" layout-align="center stretch">
-        <md-card flex class="wz-md-card">
-            <md-tabs md-selected="selectedHipaaIndex" class="wz-md-tab" md-border-bottom md-dynamic-height id="hipaaReq_tab">
-                <md-tab ng-repeat="tab in hipaaTabs" ng-disabled="tab.disabled" label="{{tab.title}}">
-                    <div class="md-padding">
-                        <span class="wz-headline-title">HIPAA Requirement: {{tab.title}}</span>
-                        <md-divider class="wz-margin-top-10"></md-divider>
-                        <div layout="row" class="wz-padding-top-10 wz-line-height">
-                            <div ng-bind-html="tab.content"></div>
-                        </div>
-                    </div>
-                </md-tab>
-            </md-tabs>
-        </md-card>
+    <div ng-if="hipaaReqs" class="wz-margin-10">
+        <react-component name='RequirementCard' props="hipaaReqs"/>
     </div>
-
+    
     <div layout="row" layout-align="center stretch" class="height-300">
         <md-card flex class="wz-md-card" ng-class="{'fullscreen': expandArray[0]}">
             <md-card-actions layout="row" layout-align="end center" class="wz-card-actions-vis" ng-dblclick="expand(0)">
