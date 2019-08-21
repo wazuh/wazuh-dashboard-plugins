@@ -26,7 +26,7 @@ export class RequirementeCard extends Component {
         </EuiFlexItem>
       );
     });
-    const carrusel = this.chunk(items, 5);
+    const carrusel = this.chunk(items, 4);
     this.setState({carrusel: carrusel, carruselLength: carrusel.length});
   }
 
@@ -34,13 +34,16 @@ export class RequirementeCard extends Component {
    * Updates the position to render the others requirements
    */
   updatePosition() {
-    this.setState({position: 1});
+    const currentPosition = this.state.position;
+    let newPos = currentPosition + 1;
+    if (newPos >= this.state.carruselLength) newPos = 0;
+    this.setState({position: newPos});
   }
 
 
   /**
    * Split an array into smallers array
-   * @param {Array} arr 
+   * @param {Array} array 
    * @param {Number} size
    */
   chunk(array, size) {
