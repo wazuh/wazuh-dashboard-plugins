@@ -1,7 +1,7 @@
 <md-content flex layout="column" ng-if="octrl.tab === 'gdpr' && octrl.tabView === 'panels'"
     ng-class="{'no-opacity': resultState !== 'ready' || !rendered}" layout-align="start">
 
-    <div ng-if="octrl.gdprReqs" layout="row" class="wz-margin-10" layout-align="center stretch">
+    <div ng-if="octrl.gdprReqs" class="wz-margin-10">
         <react-component name='RequirementCard' props="octrl.gdprReqs"/>
     </div>
 
