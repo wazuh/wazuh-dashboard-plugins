@@ -10,11 +10,10 @@ export class RequirementeCard extends Component {
       carrusel: [],
       carruselLength: 0
     };
-    this.chunkSize = 5;
+    this.chunkSize = 4;
   }
 
   buildCarrusel() {
-    if (this.state.carrusel.length) return;
     const items = this.props.items.map((req, index) => {
       const title = `HIPAA Requirement: ${req.title}`;
       return (
@@ -38,10 +37,10 @@ export class RequirementeCard extends Component {
           <EuiFlexItem key={`hidden${i}`}>
             <EuiCard
               layout="horizontal"
-              title=''
+              title='Title'
               className='hiddenCard'
-              description=''
-              onClick={() => { }}
+              description='Description'
+              onClick={() => {}}
             />
           </EuiFlexItem>
         )
@@ -96,7 +95,7 @@ export class RequirementeCard extends Component {
   }
 
   render() {
-    this.buildCarrusel();
+    if (!this.state.carrusel.length) this.buildCarrusel();
     const cards = this.state.carrusel[this.state.position];
     return (
       <div>
