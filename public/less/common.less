@@ -1127,6 +1127,19 @@ md-toolbar.md-default-theme:not(.md-menu-toolbar), md-toolbar:not(.md-menu-toolb
   padding-top: 50px;
 }
 
+.reqCard {
+  cursor: default !important;
+}
+
+.reqCard:hover, .reqCard:focus {
+  transform: translateY(0px) !important;
+  box-shadow: 0 2px 2px -1px rgba(152, 162, 179, 0.3), 0 1px 5px -2px rgba(152, 162, 179, 0.3) !important;
+}
+
+.reqCard:hover .euiCard__title, .reqCard:focus .euiCard__title {
+  text-decoration: none !important;
+}
+
 @media only screen and (max-width: 767px){
   .header-global-wrapper + .app-wrapper:not(.hidden-chrome) {
       left: 0!important;

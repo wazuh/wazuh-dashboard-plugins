@@ -36,7 +36,7 @@ export class RequirementCard extends Component {
               title={title}
               description={content}
               textAlign="left"
-              className="wz-padding-bt-5"
+              className="wz-padding-bt-5 reqCard"
               footer={cardFooterContent}
               onClick={() => { }}
             />
@@ -49,7 +49,7 @@ export class RequirementCard extends Component {
               title={title}
               description={req.content}
               textAlign="left"
-              className="wz-padding-bt-5"
+              className="wz-padding-bt-5 reqCard"
               onClick={() => { }}
             />
           </EuiFlexItem>
