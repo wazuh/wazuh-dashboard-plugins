@@ -7,15 +7,15 @@ export class RequirementCard extends Component {
     super(props);
     this.state = {
       position: 0,
-      carrusel: [],
-      carruselLength: 0
+      carousel: [],
+      carouselLength: 0
     };
     this.chunkSize = 4;
     this.chartNum = 250;
     this.expanded = false;
   }
 
-  buildCarrusel() {
+  buildCarousel() {
     const items = this.props.items.map((req, index) => {
       const title = `${this.props.reqTitle}: ${req.title}`;
       const expandMessage = this.expanded ? 'Show less' : 'More info'
@@ -57,13 +57,13 @@ export class RequirementCard extends Component {
       }
     });
 
-    const carrusel = this.chunk(items, this.chunkSize);
-    const lastArr = carrusel.length - 1;
-    const last = carrusel[lastArr];
+    const carousel = this.chunk(items, this.chunkSize);
+    const lastArr = carousel.length - 1;
+    const last = carousel[lastArr];
     const rest = this.chunkSize - last.length;
     if (last.length < this.chunkSize) {
       for (let i = 0; i < rest; i++) {
-        carrusel[lastArr].push(
+        carousel[lastArr].push(
           <EuiFlexItem key={`hidden${i}`}>
             <EuiCard
               title='Title'
@@ -76,7 +76,7 @@ export class RequirementCard extends Component {
         )
       }
     }
-    this.setState({ carrusel: carrusel, carruselLength: carrusel.length });
+    this.setState({ carousel: carousel, carouselLength: carousel.length });
   }
 
   /**
@@ -84,33 +84,23 @@ export class RequirementCard extends Component {
    */
   expand() {
     this.expanded = !this.expanded;
-    this.buildCarrusel()
+    this.buildCarousel()
   }
 
   /**
-   * Slide to the right the carrusel
+   * Slide to the right the carousel
    */
   slideRight() {
-    let newPos;
-    if (this.state.position === this.state.carruselLength - 1) {
-      newPos = 0;
-    } else {
-      newPos = this.state.position + 1;
-    }
+    const newPos = this.state.position + 1;
     this.setState({ position: newPos });
   }
 
 
   /**
-   * Slides to the left the carrusel
+   * Slides to the left the carousel
    */
   slideLeft() {
-    let newPos;
-    if (this.state.position === 0) {
-      newPos = this.state.carruselLength - 1;
-    } else {
-      newPos = this.state.position - 1;
-    }
+    const newPos = this.state.position - 1;
     this.setState({ position: newPos });
   }
 
@@ -133,12 +123,12 @@ export class RequirementCard extends Component {
   }
 
   render() {
-    if (!this.state.carrusel.length) this.buildCarrusel();
-    const cards = this.state.carrusel[this.state.position];
+    if (!this.state.carousel.length) this.buildCarousel();
+    const cards = this.state.carousel[this.state.position];
     return (
       <div>
         <EuiFlexGroup gutterSize="l">
-          {this.state.carruselLength > 1 && (
+          {(this.state.carouselLength > 1 && this.state.position > 0) && (
             <EuiButtonIcon
               className="wz-margin-left-10"
               iconType="arrowLeft"
@@ -147,7 +137,7 @@ export class RequirementCard extends Component {
             />
           )}
           {cards}
-          {this.state.carruselLength > 1 && (
+          {(this.state.carouselLength > 1 && this.state.position < this.state.carouselLength - 1) && (
             <EuiButtonIcon
               className="wz-margin-right-10"
               iconType="arrowRight"
