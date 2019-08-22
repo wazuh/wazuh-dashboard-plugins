@@ -114,11 +114,6 @@ export class OverviewController {
     // This object represents the number of visualizations per tab; used to show a progress bar
     this.tabVisualizations.assign('overview');
 
-    this.hostMonitoringTabs = ['general', 'fim', 'aws'];
-    this.systemAuditTabs = ['pm', 'audit', 'oscap', 'ciscat', 'sca'];
-    this.securityTabs = ['vuls', 'virustotal', 'osquery', 'docker'];
-    this.complianceTabs = ['pci', 'gdpr', 'hipaa', 'nist'];
-
     this.wodlesConfiguration = null;
 
     this.init();
@@ -192,33 +187,17 @@ export class OverviewController {
    */
   setTabs() {
     this.overviewTabsProps = false;
-    this.currentPanel = this.hostMonitoringTabs.includes(this.tab)
-      ? this.hostMonitoringTabs
-      : this.systemAuditTabs.includes(this.tab)
-      ? this.systemAuditTabs
-      : this.securityTabs.includes(this.tab)
-      ? this.securityTabs
-      : this.complianceTabs.includes(this.tab)
-      ? this.complianceTabs
-      : false;
+    this.currentPanel = this.commonData.getCurrentPanel(this.tab);
 
     if (!this.currentPanel) return;
 
-    const tabs = [];
-    this.currentPanel.forEach(x => {
-      if (this.extensions[x] !== false) {
-        tabs.push({
-          id: x,
-          name: this.tabNames[x]
-        });
-      }
-    });
+    const tabs = this.commonData.getTabsFromCurrentPanel(this.currentPanel, this.extensions, this.tabNames );
 
     this.overviewTabsProps = {
       clickAction: tab => {
         this.switchTab(tab, true);
       },
-      selectedTab: this.tab || this.currentPanel && this.currentPanel.length ? this.currentPanel[0] : '',
+      selectedTab: this.tab || (this.currentPanel && this.currentPanel.length ? this.currentPanel[0] : ''),
       tabs
     };
     this.$scope.$applyAsync();

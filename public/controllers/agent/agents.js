@@ -163,11 +163,6 @@ export class AgentsController {
 
     this.tabVisualizations.assign('agents');
 
-    this.$scope.hostMonitoringTabs = ['general', 'fim', 'syscollector'];
-    this.$scope.systemAuditTabs = ['pm', 'sca', 'audit', 'oscap', 'ciscat'];
-    this.$scope.securityTabs = ['vuls', 'virustotal', 'osquery', 'docker'];
-    this.$scope.complianceTabs = ['pci', 'gdpr', 'hipaa', 'nist'];
-
     /**
      * This check if given array of items contais a single given item
      * @param {Object} item
@@ -692,35 +687,17 @@ export class AgentsController {
    */
   setTabs() {
     this.$scope.agentsTabsProps = false;
-    this.$scope.currentPanel = this.$scope.hostMonitoringTabs.includes(
-      this.$scope.tab
-    )
-      ? this.$scope.hostMonitoringTabs
-      : this.$scope.systemAuditTabs.includes(this.$scope.tab)
-      ? this.$scope.systemAuditTabs
-      : this.$scope.securityTabs.includes(this.$scope.tab)
-      ? this.$scope.securityTabs
-      : this.$scope.complianceTabs.includes(this.$scope.tab)
-      ? this.$scope.complianceTabs
-      : false;
+    this.currentPanel = this.commonData.getCurrentPanel(this.$scope.tab);
 
-    if (!this.$scope.currentPanel) return;
+    if (!this.currentPanel) return;
 
-    const tabs = [];
-    this.$scope.currentPanel.forEach(x => {
-      if (this.$scope.extensions[x] !== false) {
-        tabs.push({
-          id: x,
-          name: this.$scope.tabNames[x]
-        });
-      }
-    });
+    const tabs = this.commonData.getTabsFromCurrentPanel(this.currentPanel, this.$scope.extensions, this.$scope.tabNames );
 
     this.$scope.agentsTabsProps = {
       clickAction: tab => {
         this.switchTab(tab, true);
       },
-      selectedTab: this.$scope.tab || this.$scope.currentPanel && this.$scope.currentPanel.length ? this.$scope.currentPanel[0] : '',
+      selectedTab: this.$scope.tab || (this.currentPanel && this.currentPanel.length ? this.currentPanel[0] : ''),
       tabs
     };
     this.$scope.$applyAsync();
