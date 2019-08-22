@@ -1183,64 +1183,17 @@ export class WazuhApiCtrl {
 
       const headers = ApiHelper.buildOptionsObject(config);
 
-      const distinctUrl = `${config.url}:${config.port}/agents/stats/distinct`;
+      const distinctUrl = `${config.url}:${config.port}/summary/agents`;
 
-      const data = await Promise.all([
-        needle(
-          'get',
-          distinctUrl,
-          { fields: 'node_name', select: 'node_name' },
-          headers
-        ),
-        needle(
-          'get',
-          `${config.url}:${config.port}/agents/groups`,
-          {},
-          headers
-        ),
-        needle(
-          'get',
-          distinctUrl,
-          {
-            fields: 'os.name,os.platform,os.version',
-            select: 'os.name,os.platform,os.version'
-          },
-          headers
-        ),
-        needle(
-          'get',
-          distinctUrl,
-          { fields: 'version', select: 'version' },
-          headers
-        ),
-        needle(
-          'get',
-          `${config.url}:${config.port}/agents/summary`,
-          {},
-          headers
-        ),
-        needle(
-          'get',
-          `${config.url}:${config.port}/agents`,
-          { limit: 1, sort: '-dateAdd', q: 'id!=000' },
-          headers
-        )
-      ]);
+      const data = await needle('get', distinctUrl, {}, headers);
+      const response = ((data || {}).body || {}).data || {};
 
-      const parsedResponses = data.map(item =>
-        item && item.body && item.body.data && !item.body.error
-          ? item.body.data
-          : false
-      );
-
-      const [
-        nodes,
-        groups,
-        osPlatforms,
-        versions,
-        summary,
-        lastAgent
-      ] = parsedResponses;
+      const nodes = response.nodes;
+      const groups = response.groups;
+      const osPlatforms = response.agent_os;
+      const versions = response.agent_version;
+      const summary = response.agent_status;
+      const lastAgent = response.last_registered_agent;
 
       const result = {
         groups: [],
@@ -1295,8 +1248,8 @@ export class WazuhApiCtrl {
         });
       }
 
-      if (lastAgent && lastAgent.items && lastAgent.items.length) {
-        Object.assign(result.lastAgent, lastAgent.items[0]);
+      if (lastAgent) {
+        Object.assign(result.lastAgent, lastAgent);
       }
 
       return { error: 0, result };
