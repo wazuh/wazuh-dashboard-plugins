@@ -572,25 +572,21 @@ export class AgentsController {
       this.$scope.showScaScan = false;
       if (tab === 'pci') {
         const pciTabs = await this.commonData.getPCI();
-        this.$scope.pciTabs = pciTabs;
-        this.$scope.selectedPciIndex = 0;
+        this.$scope.pciReqs = {items: pciTabs, reqTitle: 'PCI DSS Requirement'}
       }
       if (tab === 'gdpr') {
         const gdprTabs = await this.commonData.getGDPR();
-        this.$scope.gdprTabs = gdprTabs;
-        this.$scope.selectedGdprIndex = 0;
+        this.$scope.gdprReqs = {items: gdprTabs, reqTitle: 'GDPR Requirement'};
       }
 
       if (tab === 'hipaa') {
         const hipaaTabs = await this.commonData.getHIPAA();
-        this.$scope.hipaaTabs = hipaaTabs;
-        this.$scope.selectedHipaaIndex = 0;
+        this.$scope.hipaaReqs = {items: hipaaTabs, reqTitle: 'HIPAA Requirement'};
       }
 
       if (tab === 'nist') {
         const nistTabs = await this.commonData.getNIST();
-        this.$scope.nistTabs = nistTabs;
-        this.$scope.selectedNistIndex = 0;
+        this.$scope.nistReqs = {items: nistTabs, reqTitle: 'NIST 800-53 Requirement'};
       }
 
       if (tab === 'sca') {

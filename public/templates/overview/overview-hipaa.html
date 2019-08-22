@@ -1,20 +1,8 @@
 <md-content flex layout="column" ng-if="octrl.tab === 'hipaa' && octrl.tabView === 'panels'" ng-class="{'no-opacity': resultState !== 'ready' || !rendered}"
     layout-align="start">
 
-    <div layout="row" layout-align="center stretch">
-        <md-card flex class="wz-md-card">
-            <md-tabs md-selected="selectedPciIndex" class="wz-md-tab" md-border-bottom md-dynamic-height id="hipaaReq_tab">
-                <md-tab ng-repeat="tab in octrl.hipaaTabs" ng-disabled="tab.disabled" label="{{tab.title}}">
-                    <div class="md-padding">
-                        <span class="wz-headline-title">HIPAA Requirement: {{tab.title}}</span>
-                        <md-divider class="wz-margin-top-10"></md-divider>
-                        <div layout="row" class="wz-padding-top-10 wz-line-height">
-                            <div ng-bind-html="tab.content"></div>
-                        </div>
-                    </div>
-                </md-tab>
-            </md-tabs>
-        </md-card>
+    <div ng-if="octrl.hipaaReqs" class="wz-margin-10">
+        <react-component name='RequirementCard' props="octrl.hipaaReqs"/>
     </div>
 
     <div layout="row" layout-align="center stretch" class="height-400">
