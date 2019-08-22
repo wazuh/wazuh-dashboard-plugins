@@ -375,8 +375,8 @@ export class CommonData {
     const keyIsTrue = key => (extensions || [])[key];
 
     let tabs = [];
-    currentPanel.forEach(x => {
-      if (keyExists(x) && keyIsTrue(x)) {
+    currentPanel.forEach(x => {      
+      if (!keyExists(x) || keyIsTrue(x)) {
         tabs.push({
           id: x,
           name: tabNames[x]
