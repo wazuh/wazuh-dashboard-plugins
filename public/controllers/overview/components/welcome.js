@@ -171,7 +171,12 @@ export class WelcomeScreen extends Component {
               <EuiFlexGroup gutterSize="xs">
                 <EuiFlexItem />
                 <EuiFlexItem grow={false}>
-                  {this.buildPopover('popoverRegulatory', ['pci', 'gdpr', 'hipaa', 'nist'])}
+                  {this.buildPopover('popoverRegulatory', [
+                    'pci',
+                    'gdpr',
+                    'hipaa',
+                    'nist'
+                  ])}
                 </EuiFlexItem>
               </EuiFlexGroup>
               {!this.props.extensions.pci && !this.props.extensions.gdpr && (

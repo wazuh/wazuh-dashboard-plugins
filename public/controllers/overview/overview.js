@@ -114,11 +114,6 @@ export class OverviewController {
     // This object represents the number of visualizations per tab; used to show a progress bar
     this.tabVisualizations.assign('overview');
 
-    this.hostMonitoringTabs = ['general', 'fim', 'aws'];
-    this.systemAuditTabs = ['pm', 'audit', 'oscap', 'ciscat', 'sca'];
-    this.securityTabs = ['vuls', 'virustotal', 'osquery', 'docker'];
-    this.complianceTabs = ['pci', 'gdpr', 'hipaa', 'nist'];
-
     this.wodlesConfiguration = null;
 
     this.init();
@@ -130,6 +125,8 @@ export class OverviewController {
       setExtensions: (api, extensions) =>
         this.appState.setExtensions(api, extensions)
     };
+
+    this.setTabs();
 
     this.$scope.$on('$destroy', () => {
       this.visFactoryService.clearAll();
@@ -185,6 +182,35 @@ export class OverviewController {
     }
   }
 
+  /**
+   * Build the current section tabs
+   */
+  setTabs() {
+    this.overviewTabsProps = false;
+    this.currentPanel = this.commonData.getCurrentPanel(this.tab);
+
+    if (!this.currentPanel) return;
+
+    const tabs = this.commonData.getTabsFromCurrentPanel(
+      this.currentPanel,
+      this.extensions,
+      this.tabNames
+    );
+
+    this.overviewTabsProps = {
+      clickAction: tab => {
+        this.switchTab(tab, true);
+      },
+      selectedTab:
+        this.tab ||
+        (this.currentPanel && this.currentPanel.length
+          ? this.currentPanel[0]
+          : ''),
+      tabs
+    };
+    this.$scope.$applyAsync();
+  }
+
   // Switch subtab
   async switchSubtab(
     subtab,
@@ -209,9 +235,9 @@ export class OverviewController {
           localChange || preserveDiscover
         );
       } else {
-        this.$scope.$emit('changeTabView', { 
+        this.$scope.$emit('changeTabView', {
           tabView: this.tabView
-         });
+        });
       }
 
       this.checkMetrics(this.tab, subtab);
@@ -300,6 +326,7 @@ export class OverviewController {
     } catch (error) {
       this.errorHandler.handle(error.message || error);
     }
+    this.setTabs();
     this.$scope.$applyAsync();
     return;
   }

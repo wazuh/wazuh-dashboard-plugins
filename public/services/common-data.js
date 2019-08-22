@@ -41,6 +41,11 @@ export class CommonData {
     this.globalState = globalState;
     this.savedTimefilter = null;
     this.refreshInterval = { pause: true, value: 0 };
+
+    this.hostMonitoringTabs = ['general', 'fim', 'aws'];
+    this.systemAuditTabs = ['pm', 'audit', 'oscap', 'ciscat', 'sca'];
+    this.securityTabs = ['vuls', 'virustotal', 'osquery', 'docker'];
+    this.complianceTabs = ['pci', 'gdpr', 'hipaa', 'nist'];
   }
 
   /**
@@ -351,5 +356,33 @@ export class CommonData {
 
   getRefreshInterval() {
     return this.refreshInterval;
+  }
+
+  getCurrentPanel(tab) {
+    return this.hostMonitoringTabs.includes(tab)
+      ? this.hostMonitoringTabs
+      : this.systemAuditTabs.includes(tab)
+      ? this.systemAuditTabs
+      : this.securityTabs.includes(tab)
+      ? this.securityTabs
+      : this.complianceTabs.includes(tab)
+      ? this.complianceTabs
+      : false;
+  }
+
+  getTabsFromCurrentPanel(currentPanel, extensions, tabNames) {
+    const keyExists = key => Object.keys(extensions).includes(key);
+    const keyIsTrue = key => (extensions || [])[key];
+
+    let tabs = [];
+    currentPanel.forEach(x => {
+      if (keyExists(x) && keyIsTrue(x)) {
+        tabs.push({
+          id: x,
+          name: tabNames[x]
+        });
+      }
+    });
+    return tabs;
   }
 }

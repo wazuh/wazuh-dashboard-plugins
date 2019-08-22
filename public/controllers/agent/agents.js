@@ -163,11 +163,6 @@ export class AgentsController {
 
     this.tabVisualizations.assign('agents');
 
-    this.$scope.hostMonitoringTabs = ['general', 'fim', 'syscollector'];
-    this.$scope.systemAuditTabs = ['pm', 'sca', 'audit', 'oscap', 'ciscat'];
-    this.$scope.securityTabs = ['vuls', 'virustotal', 'osquery', 'docker'];
-    this.$scope.complianceTabs = ['pci', 'gdpr', 'hipaa', 'nist'];
-
     /**
      * This check if given array of items contais a single given item
      * @param {Object} item
@@ -451,6 +446,7 @@ export class AgentsController {
     };
 
     this.$scope.expand = i => this.expand(i);
+    this.setTabs();
   }
   /**
    * Create metric for given object
@@ -663,6 +659,66 @@ export class AgentsController {
     } catch (error) {
       return Promise.reject(error);
     }
+
+    this.$scope.configurationTabsProps = {};
+    this.$scope.buildProps = tabs => {
+      const cleanTabs = [];
+      tabs.forEach(x => {
+        if (
+          this.$scope.configurationTab === 'integrity-monitoring' &&
+          x.id === 'fim-whodata' &&
+          x.agent &&
+          x.agent.agentPlatform !== 'linux'
+        )
+          return;
+
+        cleanTabs.push({
+          id: x.id,
+          name: x.name
+        });
+      });
+      this.$scope.configurationTabsProps = {
+        clickAction: tab => {
+          this.$scope.switchConfigurationSubTab(tab);
+        },
+        selectedTab:
+          this.$scope.configurationSubTab || (tabs && tabs.length)
+            ? tabs[0].id
+            : '',
+        tabs: cleanTabs
+      };
+    };
+
+    this.setTabs();
+  }
+
+  /**
+   * Build the current section tabs
+   */
+  setTabs() {
+    this.$scope.agentsTabsProps = false;
+    this.currentPanel = this.commonData.getCurrentPanel(this.$scope.tab);
+
+    if (!this.currentPanel) return;
+
+    const tabs = this.commonData.getTabsFromCurrentPanel(
+      this.currentPanel,
+      this.$scope.extensions,
+      this.$scope.tabNames
+    );
+
+    this.$scope.agentsTabsProps = {
+      clickAction: tab => {
+        this.switchTab(tab, true);
+      },
+      selectedTab:
+        this.$scope.tab ||
+        (this.currentPanel && this.currentPanel.length
+          ? this.currentPanel[0]
+          : ''),
+      tabs
+    };
+    this.$scope.$applyAsync();
   }
 
   goDiscover() {

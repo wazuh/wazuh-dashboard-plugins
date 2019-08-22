@@ -11,14 +11,10 @@
     <!-- End headline -->
 
     <!-- Amazon S3 navigation bar -->
-    <md-nav-bar
-        class="wz-nav-bar"
-        md-selected-nav-item="configurationSubTab"
-        nav-bar-aria-label="Amazon S3 navigation links">
-        <md-nav-item class="wz-nav-item" md-nav-click="switchConfigurationSubTab('amazon-general')" name="amazon-general">General</md-nav-item>
-        <md-nav-item class="wz-nav-item" md-nav-click="switchConfigurationSubTab('amazon-buckets')" name="amazon-buckets">Buckets</md-nav-item>
-        <md-nav-item class="wz-nav-item" md-nav-click="switchConfigurationSubTab('amazon-services')" name="amazon-services">Services</md-nav-item>
-    </md-nav-bar>
+    <div ng-if="configurationTabsProps" class="md-padding wz-padding-top-0"
+        ng-init="buildProps([{id:'amazon-general', name: 'General'}, {id: 'amazon-buckets', name: 'Buckets'}, {id: 'amazon-services', name: 'Services'}])">
+        <react-component name="Tabs" props="configurationTabsProps" />
+    </div>
     <!-- End Amazon S3 navigation bar -->
 
     <!-- Loading ring -->
