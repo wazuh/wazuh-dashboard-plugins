@@ -662,8 +662,7 @@ function discoverController(
     if ((discoverFilters || []).length || (pinnedFilters || []).length) {
       inheritedFilters = [...(discoverFilters || []), ...(pinnedFilters || [])];
       discoverFilters = [];
-      if(backFromDiscover)
-      pinnedFilters = [];
+      if (backFromDiscover) pinnedFilters = [];
     }
 
     // Update query from search bar
