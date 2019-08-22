@@ -313,10 +313,10 @@ export class OverviewAutoReport extends AutoReport {
       await this.setFilters();
       await this.generateReport();
       await this.driver.quit();
-      return 'Reporting success.';
+      return { finish: true, message: 'Reporting success.' };
     } catch (err) {
       await this.driver.quit();
-      return `${err}`;
+      return { finish: false, message: `${err}`};
     }
   }
 }
