@@ -658,24 +658,18 @@ function discoverController(
     if (!filtersAreReady()) return;
     let inheritedFilters;
     // Preserve filters in discover
-    if (
-      (discoverFilters || []).length ||
-      (pinnedFilters || []).length
-    ) {
-      inheritedFilters = [
-        ...(discoverFilters || []),
-        ...(pinnedFilters || [])
-      ];
+    if ((discoverFilters || []).length || (pinnedFilters || []).length) {
+      inheritedFilters = [...(discoverFilters || []), ...(pinnedFilters || [])];
       discoverFilters = [];
       pinnedFilters = [];
     }
 
     // Update query from search bar
     discoverPendingUpdates.removeAll();
-    discoverPendingUpdates.addItem(
-      $state.query,
-      [...(inheritedFilters || []), ...queryFilter.getFilters()]
-    );
+    discoverPendingUpdates.addItem($state.query, [
+      ...(inheritedFilters || []),
+      ...queryFilter.getFilters()
+    ]);
     $rootScope.$broadcast('updateVis');
     inheritedFilters = false;
     timefilter.setTime(dateRange);
@@ -802,7 +796,6 @@ function discoverController(
     noHitsSearchSource = null;
 
   $scope.updateDataSource = Promise.method(function updateDataSource() {
-
     // Wazuh
     const currentUrlPath = $location.path();
     const isPanels = $scope.tabView === 'panels';
@@ -1107,8 +1100,10 @@ function discoverController(
     'changeTabView',
     (evt, parameters) => {
       pinnedFilters = getPinnedFilters();
-      const isNotDiscover = parameters.tabView !== 'discover' && $scope.tabView !== 'discover';
-      const backDiscover = parameters.tabView !== 'discover' && $scope.tabView === 'discover';
+      const isNotDiscover =
+        parameters.tabView !== 'discover' && $scope.tabView !== 'discover';
+      const backDiscover =
+        parameters.tabView !== 'discover' && $scope.tabView === 'discover';
       const sameSection = parameters.sameSection;
 
       // If it's not the Discover and we are changing section,
