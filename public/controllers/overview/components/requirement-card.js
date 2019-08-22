@@ -38,7 +38,6 @@ export class RequirementCard extends Component {
               textAlign="left"
               className="wz-padding-bt-5 reqCard"
               footer={cardFooterContent}
-              onClick={() => { }}
             />
           </EuiFlexItem>
         );
@@ -50,7 +49,6 @@ export class RequirementCard extends Component {
               description={req.content}
               textAlign="left"
               className="wz-padding-bt-5 reqCard"
-              onClick={() => { }}
             />
           </EuiFlexItem>
         )
@@ -70,7 +68,6 @@ export class RequirementCard extends Component {
               className='hiddenCard'
               description='Description'
               textAlign='left'
-              onClick={() => { }}
             />
           </EuiFlexItem>
         )
@@ -109,14 +106,14 @@ export class RequirementCard extends Component {
    * @param {Array} array 
    * @param {Number} size
    */
-  chunk(array, size) {
+  chunk = (array, size) => {
     const chunked = [];
-    for (let i = 0; i < array.length; i++) {
+    for (const item of array) {
       const last = chunked[chunked.length - 1];
       if (!last || last.length === size) {
-        chunked.push([array[i]]);
+        chunked.push([item]);
       } else {
-        last.push(array[i]);
+        last.push(item);
       }
     }
     return chunked;
