@@ -157,6 +157,7 @@ function discoverController(
 
   // Wazuh. Copy for the discover filters
   let discoverFilters = [];
+  let backFromDiscover = false;
 
   const visualizeLoader = Private(VisualizeLoaderProvider);
   let visualizeHandler;
@@ -661,6 +662,7 @@ function discoverController(
     if ((discoverFilters || []).length || (pinnedFilters || []).length) {
       inheritedFilters = [...(discoverFilters || []), ...(pinnedFilters || [])];
       discoverFilters = [];
+      if(backFromDiscover)
       pinnedFilters = [];
     }
 
@@ -1105,7 +1107,7 @@ function discoverController(
       const backDiscover =
         parameters.tabView !== 'discover' && $scope.tabView === 'discover';
       const sameSection = parameters.sameSection;
-
+      backFromDiscover = backDiscover;
       // If it's not the Discover and we are changing section,
       // then clear all the filters.
       if (isNotDiscover && !sameSection) {
