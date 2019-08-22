@@ -136,6 +136,6 @@ export class AppState {
   }
 
   setWzMenu() {
-    this.$rootScope.$emit('loadWazuhMenu', { });
+    this.$rootScope.$emit('loadWazuhMenu', {});
   }
 }

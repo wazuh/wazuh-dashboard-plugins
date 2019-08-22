@@ -142,7 +142,7 @@ app.directive('kbnVis', function() {
                   isAgentStatus && timeFilterSeconds < 900
                     ? { from: 'now-15m', to: 'now', mode: 'quick' }
                     : timefilter.getTime()
-              });    
+              });
               visHandlers.addItem(visHandler);
               visHandler.addRenderCompleteListener(renderComplete);
             } else if (rendered) {
@@ -183,7 +183,9 @@ app.directive('kbnVis', function() {
               } catch (error) {
                 lockFields = false;
                 console.log(error.message || error);
-                errorHandler.handle('An error occurred fetching new index pattern fields.');
+                errorHandler.handle(
+                  'An error occurred fetching new index pattern fields.'
+                );
               }
             }
           } else {

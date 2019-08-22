@@ -155,6 +155,10 @@ function discoverController(
   // Wazuh. Copy for the pinned filters
   let pinnedFilters = [];
 
+  // Wazuh. Copy for the discover filters
+  let discoverFilters = [];
+  let backFromDiscover = false;
+
   const visualizeLoader = Private(VisualizeLoaderProvider);
   let visualizeHandler;
   const Vis = Private(VisProvider);
@@ -653,14 +657,24 @@ function discoverController(
   $scope.updateQueryAndFetch = function({ query, dateRange }) {
     // Wazuh filters are not ready yet
     if (!filtersAreReady()) return;
+    let inheritedFilters;
+    // Preserve filters in discover
+    if ((discoverFilters || []).length || (pinnedFilters || []).length) {
+      inheritedFilters = [...(discoverFilters || []), ...(pinnedFilters || [])];
+      discoverFilters = [];
+      if (backFromDiscover) pinnedFilters = [];
+    }
 
     // Update query from search bar
     discoverPendingUpdates.removeAll();
-    discoverPendingUpdates.addItem($state.query, queryFilter.getFilters());
+    discoverPendingUpdates.addItem($state.query, [
+      ...(inheritedFilters || []),
+      ...queryFilter.getFilters()
+    ]);
     $rootScope.$broadcast('updateVis');
-
+    inheritedFilters = false;
     timefilter.setTime(dateRange);
-    if (query) $state.query = query;
+    if (query && typeof query === 'object') $state.query = query;
     $scope.fetch();
   };
 
@@ -783,7 +797,6 @@ function discoverController(
     noHitsSearchSource = null;
 
   $scope.updateDataSource = Promise.method(function updateDataSource() {
-
     // Wazuh
     const currentUrlPath = $location.path();
     const isPanels = $scope.tabView === 'panels';
@@ -1088,13 +1101,18 @@ function discoverController(
     'changeTabView',
     (evt, parameters) => {
       pinnedFilters = getPinnedFilters();
-      const isDiscover = parameters.tabView === 'discover';
+      const isNotDiscover =
+        parameters.tabView !== 'discover' && $scope.tabView !== 'discover';
+      const backDiscover =
+        parameters.tabView !== 'discover' && $scope.tabView === 'discover';
       const sameSection = parameters.sameSection;
-
+      backFromDiscover = backDiscover;
       // If it's not the Discover and we are changing section,
       // then clear all the filters.
-      if (!isDiscover && !sameSection) {
+      if (isNotDiscover && !sameSection) {
         queryFilter.removeAll();
+      } else if (backDiscover) {
+        discoverFilters = queryFilter.getFilters();
       }
 
       // Prevent multiple executions
@@ -1114,6 +1132,8 @@ function discoverController(
           query: $state.query,
           dateRange: $scope.time
         });
+      } else {
+        $scope.updateQueryAndFetch($state.query);
       }
     }
   );
