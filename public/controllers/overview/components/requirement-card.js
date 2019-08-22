@@ -7,15 +7,15 @@ export class RequirementCard extends Component {
     super(props);
     this.state = {
       position: 0,
-      carousel: [],
-      carouselLength: 0
+      slider: [],
+      sliderLength: 0
     };
     this.chunkSize = 4;
     this.chartNum = 250;
     this.expanded = false;
   }
 
-  buildCarousel() {
+  buildSlider() {
     const items = this.props.items.map((req, index) => {
       const title = `${this.props.reqTitle}: ${req.title}`;
       const expandMessage = this.expanded ? 'Show less' : 'More info'
@@ -57,13 +57,13 @@ export class RequirementCard extends Component {
       }
     });
 
-    const carousel = this.chunk(items, this.chunkSize);
-    const lastArr = carousel.length - 1;
-    const last = carousel[lastArr];
+    const slider = this.chunk(items, this.chunkSize);
+    const lastArr = slider.length - 1;
+    const last = slider[lastArr];
     const rest = this.chunkSize - last.length;
     if (last.length < this.chunkSize) {
       for (let i = 0; i < rest; i++) {
-        carousel[lastArr].push(
+        slider[lastArr].push(
           <EuiFlexItem key={`hidden${i}`}>
             <EuiCard
               title='Title'
@@ -76,7 +76,7 @@ export class RequirementCard extends Component {
         )
       }
     }
-    this.setState({ carousel: carousel, carouselLength: carousel.length });
+    this.setState({ slider: slider, sliderLength: slider.length });
   }
 
   /**
@@ -84,11 +84,11 @@ export class RequirementCard extends Component {
    */
   expand() {
     this.expanded = !this.expanded;
-    this.buildCarousel()
+    this.buildSlider()
   }
 
   /**
-   * Slide to the right the carousel
+   * Slides to the right the slider
    */
   slideRight() {
     const newPos = this.state.position + 1;
@@ -97,7 +97,7 @@ export class RequirementCard extends Component {
 
 
   /**
-   * Slides to the left the carousel
+   * Slides to the left the slider
    */
   slideLeft() {
     const newPos = this.state.position - 1;
@@ -123,12 +123,12 @@ export class RequirementCard extends Component {
   }
 
   render() {
-    if (!this.state.carousel.length) this.buildCarousel();
-    const cards = this.state.carousel[this.state.position];
+    if (!this.state.slider.length) this.buildSlider();
+    const cards = this.state.slider[this.state.position];
     return (
       <div>
         <EuiFlexGroup gutterSize="l">
-          {(this.state.carouselLength > 1 && this.state.position > 0) && (
+          {(this.state.sliderLength > 1 && this.state.position > 0) && (
             <EuiButtonIcon
               className="wz-margin-left-10"
               iconType="arrowLeft"
@@ -137,7 +137,7 @@ export class RequirementCard extends Component {
             />
           )}
           {cards}
-          {(this.state.carouselLength > 1 && this.state.position < this.state.carouselLength - 1) && (
+          {(this.state.sliderLength > 1 && this.state.position < this.state.sliderLength - 1) && (
             <EuiButtonIcon
               className="wz-margin-right-10"
               iconType="arrowRight"
