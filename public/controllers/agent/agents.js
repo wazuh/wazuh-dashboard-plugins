@@ -665,6 +665,25 @@ export class AgentsController {
       return Promise.reject(error);
     }
 
+    this.$scope.configurationTabsProps = {};
+    this.$scope.buildProps = (tabs) => {
+      const cleanTabs = [];
+      tabs.forEach(x => {
+        if(this.$scope.configurationTab === 'integrity-monitoring' && x.id === 'fim-whodata' && x.agent && x.agent.agentPlatform !== 'linux') return;
+        
+        cleanTabs.push({
+          id: x.id,
+          name: x.name
+        });        
+      })
+      this.$scope.configurationTabsProps = {
+        clickAction: tab => { this.$scope.switchConfigurationSubTab(tab);        
+        },
+        selectedTab: this.$scope.configurationSubTab || tabs && tabs.length ? tabs[0].id : '',
+        tabs: cleanTabs
+      }    
+    }
+
     this.setTabs();
   }
 
@@ -701,7 +720,7 @@ export class AgentsController {
       clickAction: tab => {
         this.switchTab(tab, true);
       },
-      selectedTab: this.$scope.tab || this.$scope.currentPanel[0],
+      selectedTab: this.$scope.tab || this.$scope.currentPanel && this.$scope.currentPanel.length ? this.$scope.currentPanel[0] : '',
       tabs
     };
     this.$scope.$applyAsync();

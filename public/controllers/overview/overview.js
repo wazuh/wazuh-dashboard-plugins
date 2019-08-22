@@ -218,7 +218,7 @@ export class OverviewController {
       clickAction: tab => {
         this.switchTab(tab, true);
       },
-      selectedTab: this.tab || this.currentPanel[0],
+      selectedTab: this.tab || this.currentPanel && this.currentPanel.length ? this.currentPanel[0] : '',
       tabs
     };
     this.$scope.$applyAsync();
