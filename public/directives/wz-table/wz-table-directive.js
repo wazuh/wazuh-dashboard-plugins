@@ -566,7 +566,7 @@ app.directive('wzTable', function() {
 
       $scope.getSyscheckRowProps = item => {
         const excluded = ['$$hashKey', 'expanded', 'showTooltip'];
-        isWindows() && excluded.push(...['inode', 'gid', 'gname']);
+        isWindows() ? excluded.push(...['inode', 'gid', 'gname']) : excluded.push('attributes');
         const isRegistry = (item || {}).type === 'registry';
         isRegistry &&
           excluded.push(...['size', 'uname', 'sha256', 'uid', 'inode']);
