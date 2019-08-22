@@ -8,7 +8,7 @@
     <div layout="row" layout-align="center stretch" class="height-400">
         <md-card flex="20" class="wz-md-card" ng-class="{'fullscreen': octrl.expandArray[1]}">
             <md-card-actions layout="row" class="wz-card-actions-vis" ng-dblclick="octrl.expand(1)">
-                <span class="wz-headline-title">Top 10 agents by alerts number</span>
+                <span class="wz-headline-title">Most active agents</span>
                 <span flex></span>
                 <span class="cursor-pointer" ng-click="octrl.expand(1)">
                     <react-component name="EuiIcon" props="{type:'expand'}" />
@@ -32,7 +32,7 @@
         </md-card>
         <md-card flex="35" class="wz-md-card" ng-class="{'fullscreen': octrl.expandArray[0]}">
             <md-card-actions layout="row" class="wz-card-actions-vis" ng-dblclick="octrl.expand(0)">
-                <span class="wz-headline-title">Top requirements by agents</span>
+                <span class="wz-headline-title">Requiments distribution by agent</span>
                 <span flex></span>
                 <span class="cursor-pointer" ng-click="octrl.expand(0)">
                     <react-component name="EuiIcon" props="{type:'expand'}" />
@@ -47,7 +47,7 @@
     <div layout="row" layout-align="center stretch" class="height-300">
         <md-card flex="45" class="wz-md-card" ng-class="{'fullscreen': octrl.expandArray[3]}">
             <md-card-actions layout="row" class="wz-card-actions-vis" ng-dblclick="octrl.expand(3)">
-                <span class="wz-headline-title">Last alerts</span>
+                <span class="wz-headline-title">Alerts volume by agent</span>
                 <span flex></span>
                 <span class="cursor-pointer" ng-click="octrl.expand(3)">
                     <react-component name="EuiIcon" props="{type:'expand'}" />
@@ -60,7 +60,7 @@
         </md-card>
         <md-card flex="25" class="wz-md-card" ng-class="{'fullscreen': octrl.expandArray[4]}">
             <md-card-actions layout="row" class="wz-card-actions-vis" ng-dblclick="octrl.expand(4)">
-                <span class="wz-headline-title">Metrics</span>
+                <span class="wz-headline-title">Stats</span>
                 <span flex></span>
                 <span class="cursor-pointer" ng-click="octrl.expand(4)">
                     <react-component name="EuiIcon" props="{type:'expand'}" />

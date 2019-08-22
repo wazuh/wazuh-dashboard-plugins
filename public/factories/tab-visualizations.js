@@ -46,7 +46,7 @@ export class TabVisualizations {
       pci: 5,
       gdpr: 5,
       hipaa: 5,
-      nist: 5,
+      nist: 7,
       aws: 8,
       virustotal: 7,
       osquery: 5,
