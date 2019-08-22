@@ -792,9 +792,9 @@ export class SettingsController {
 
   settingsTabsProps = {
     clickAction: tab => {
-      this.switchTab(tab, true)
-      if(tab === 'logs') {
-        this.refreshLogs()
+      this.switchTab(tab, true);
+      if (tab === 'logs') {
+        this.refreshLogs();
       }
     },
     selectedTab: this.tab || 'api',

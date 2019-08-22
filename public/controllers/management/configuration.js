@@ -84,14 +84,18 @@ export class ConfigurationController {
     });
 
     this.$scope.configurationTabsProps = {};
-    this.$scope.buildProps = (tabs) => {
+    this.$scope.buildProps = tabs => {
       this.$scope.configurationTabsProps = {
-        clickAction: tab => { this.$scope.switchConfigurationSubTab(tab);        
+        clickAction: tab => {
+          this.$scope.switchConfigurationSubTab(tab);
         },
-        selectedTab: this.$scope.configurationSubTab || tabs && tabs.length ? tabs[0].id : '',
+        selectedTab:
+          this.$scope.configurationSubTab || (tabs && tabs.length)
+            ? tabs[0].id
+            : '',
         tabs
-      }
-    }
+      };
+    };
   }
 
   switchConfigurationSubTab(configurationSubTab) {

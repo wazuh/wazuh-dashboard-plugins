@@ -661,23 +661,33 @@ export class AgentsController {
     }
 
     this.$scope.configurationTabsProps = {};
-    this.$scope.buildProps = (tabs) => {
+    this.$scope.buildProps = tabs => {
       const cleanTabs = [];
       tabs.forEach(x => {
-        if(this.$scope.configurationTab === 'integrity-monitoring' && x.id === 'fim-whodata' && x.agent && x.agent.agentPlatform !== 'linux') return;
-        
+        if (
+          this.$scope.configurationTab === 'integrity-monitoring' &&
+          x.id === 'fim-whodata' &&
+          x.agent &&
+          x.agent.agentPlatform !== 'linux'
+        )
+          return;
+
         cleanTabs.push({
           id: x.id,
           name: x.name
-        });        
-      })
+        });
+      });
       this.$scope.configurationTabsProps = {
-        clickAction: tab => { this.$scope.switchConfigurationSubTab(tab);        
+        clickAction: tab => {
+          this.$scope.switchConfigurationSubTab(tab);
         },
-        selectedTab: this.$scope.configurationSubTab || tabs && tabs.length ? tabs[0].id : '',
+        selectedTab:
+          this.$scope.configurationSubTab || (tabs && tabs.length)
+            ? tabs[0].id
+            : '',
         tabs: cleanTabs
-      }    
-    }
+      };
+    };
 
     this.setTabs();
   }
@@ -691,13 +701,21 @@ export class AgentsController {
 
     if (!this.currentPanel) return;
 
-    const tabs = this.commonData.getTabsFromCurrentPanel(this.currentPanel, this.$scope.extensions, this.$scope.tabNames );
+    const tabs = this.commonData.getTabsFromCurrentPanel(
+      this.currentPanel,
+      this.$scope.extensions,
+      this.$scope.tabNames
+    );
 
     this.$scope.agentsTabsProps = {
       clickAction: tab => {
         this.switchTab(tab, true);
       },
-      selectedTab: this.$scope.tab || (this.currentPanel && this.currentPanel.length ? this.currentPanel[0] : ''),
+      selectedTab:
+        this.$scope.tab ||
+        (this.currentPanel && this.currentPanel.length
+          ? this.currentPanel[0]
+          : ''),
       tabs
     };
     this.$scope.$applyAsync();

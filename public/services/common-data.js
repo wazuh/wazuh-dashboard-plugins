@@ -360,20 +360,23 @@ export class CommonData {
 
   getCurrentPanel(tab) {
     return this.hostMonitoringTabs.includes(tab)
-    ? this.hostMonitoringTabs
-    : this.systemAuditTabs.includes(tab)
-    ? this.systemAuditTabs
-    : this.securityTabs.includes(tab)
-    ? this.securityTabs
-    : this.complianceTabs.includes(tab)
-    ? this.complianceTabs
-    : false;
+      ? this.hostMonitoringTabs
+      : this.systemAuditTabs.includes(tab)
+      ? this.systemAuditTabs
+      : this.securityTabs.includes(tab)
+      ? this.securityTabs
+      : this.complianceTabs.includes(tab)
+      ? this.complianceTabs
+      : false;
   }
 
   getTabsFromCurrentPanel(currentPanel, extensions, tabNames) {
+    const keyExists = key => Object.keys(extensions).includes(key);
+    const keyIsTrue = key => (extensions || [])[key];
+
     let tabs = [];
     currentPanel.forEach(x => {
-      if (extensions[x] !== false) {
+      if (keyExists(x) && keyIsTrue(x)) {
         tabs.push({
           id: x,
           name: tabNames[x]

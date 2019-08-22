@@ -191,13 +191,21 @@ export class OverviewController {
 
     if (!this.currentPanel) return;
 
-    const tabs = this.commonData.getTabsFromCurrentPanel(this.currentPanel, this.extensions, this.tabNames );
+    const tabs = this.commonData.getTabsFromCurrentPanel(
+      this.currentPanel,
+      this.extensions,
+      this.tabNames
+    );
 
     this.overviewTabsProps = {
       clickAction: tab => {
         this.switchTab(tab, true);
       },
-      selectedTab: this.tab || (this.currentPanel && this.currentPanel.length ? this.currentPanel[0] : ''),
+      selectedTab:
+        this.tab ||
+        (this.currentPanel && this.currentPanel.length
+          ? this.currentPanel[0]
+          : ''),
       tabs
     };
     this.$scope.$applyAsync();
