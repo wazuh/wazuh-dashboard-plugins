@@ -1,8 +1,6 @@
 const chai = require('chai');
 const needle = require('needle');
 
-const { version, revision } = require('../../package.json');
-
 const kibanaServer = process.env.KIBANA_IP || 'localhost';
 
 chai.should();

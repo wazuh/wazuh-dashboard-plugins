@@ -17,7 +17,6 @@ import {
   EuiPageBody
 } from '@elastic/eui';
 
-import { RegisterGuideDefs } from './register-guide-defs';
 import PropTypes from 'prop-types';
 
 export class RegisterAgent extends Component {
