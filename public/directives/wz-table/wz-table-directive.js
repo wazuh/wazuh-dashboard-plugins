@@ -13,7 +13,7 @@
 import template from './wz-table.html';
 import { uiModules } from 'ui/modules';
 import { DataFactory } from '../../services/data-factory';
-import { KeyEquivalenece } from '../../../util/csv-key-equivalence';
+import { KeyEquivalence } from '../../../util/csv-key-equivalence';
 import { calcTableRows } from './lib/rows';
 import { parseValue } from './lib/parse-value';
 import * as pagination from './lib/pagination';
@@ -35,7 +35,6 @@ app.directive('wzTable', function() {
       allowClick: '=allowClick',
       implicitFilter: '=implicitFilter',
       rowSizes: '=rowSizes',
-      extraLimit: '=extraLimit',
       emptyResults: '=emptyResults',
       customColumns: '=customColumns',
       implicitSort: '=implicitSort'
@@ -100,7 +99,7 @@ app.directive('wzTable', function() {
         $scope.implicitFilter,
         $scope.implicitSort
       );
-      $scope.keyEquivalence = KeyEquivalenece;
+      $scope.keyEquivalence = KeyEquivalence;
       $scope.totalItems = 0;
       $scope.wazuh_table_loading = true;
       $scope.items = [];
@@ -277,6 +276,10 @@ app.directive('wzTable', function() {
       $scope.parseValue = (key, item) =>
         parseValue(key, item, instance.path, $sce, timeService);
 
+      $scope.parseKey = key => {
+        return key ? key.value || key : key;
+      };
+
       /**
        * On controller loads
        */
@@ -299,17 +302,24 @@ app.directive('wzTable', function() {
       $scope.currentOffset = 0;
       let items = [];
       $scope.gap = 0;
+
       $scope.searchTable = () => pagination.searchTable($scope, items);
+
       $scope.groupToPages = () => pagination.groupToPages($scope);
+
       $scope.range = (size, start, end) =>
         pagination.range(size, start, end, $scope.gap);
+
       $scope.prevPage = () => pagination.prevPage($scope);
+
       $scope.nextPage = async (currentPage, last = false) =>
         pagination.nextPage(currentPage, $scope, errorHandler, fetch, last);
+
       $scope.firstPage = function() {
         $scope.setPage(1);
         $scope.prevPage();
       };
+
       $scope.setPage = function(page = false, logs = false, last = false) {
         this.n = page || this.n;
         $scope.currentPage = this.n;
@@ -493,26 +503,16 @@ app.directive('wzTable', function() {
         }
       };
 
-      $scope.showTooltip = (id1, id2, item, path) => {
-        const $element = $(`#${path}-td-` + id1 + '-' + id2 + ' div');
-        const $c = $element
-          .clone()
-          .css({ display: 'inline', width: 'auto', visibility: 'hidden' })
-          .appendTo('body');
-        if (
-          $c.width() > $element.width() &&
-          (($element || [])[0].children || [])[0].innerText !== '-'
-        ) {
+      $scope.showTooltip = (id1, id2, item) => {
+        const $element = $(
+          '#td-' + id1 + '-' + id2 + ' div span.wz-text-truncatable'
+        );
+        if ($element[0].offsetWidth < $element[0].scrollWidth) {
           if (!item.showTooltip) {
             item.showTooltip = [];
           }
           item.showTooltip[id2] = true;
         }
-        $c.remove();
-      };
-
-      $scope.parseKey = key => {
-        return key ? key.value || key : key;
       };
 
       const filterableColumns = () => {
@@ -552,7 +552,6 @@ app.directive('wzTable', function() {
         const lastKeyValue = $scope.keys[0].value || $scope.keys[0];
         return exists && keysLength && keyValue && lastKeyValue;
       };
-
       $scope.setColResizable = () => {
         $(`#table${$scope.scapepath} th`).resizable({
           handles: 'e',
@@ -569,14 +568,14 @@ app.directive('wzTable', function() {
 
       $scope.getSyscheckRowProps = item => {
         const excluded = ['$$hashKey', 'expanded', 'showTooltip'];
-        isWindows() && excluded.push(...['inode', 'gid', 'gname']);
+        isWindows() ? excluded.push(...['inode', 'gid', 'gname']) : excluded.push('attributes');
         const isRegistry = (item || {}).type === 'registry';
         isRegistry &&
           excluded.push(...['size', 'uname', 'sha256', 'uid', 'inode']);
         const items = [];
         for (const key in item) {
           !excluded.includes(key) &&
-            items.push({ key: KeyEquivalenece[key] || key, value: item[key] });
+            items.push({ key: KeyEquivalence[key] || key, value: item[key] });
         }
         const props = {
           items,

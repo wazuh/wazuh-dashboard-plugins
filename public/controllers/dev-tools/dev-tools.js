@@ -15,6 +15,7 @@ import { ExcludedIntelliSenseTriggerKeys } from '../../../util/excluded-devtools
 import queryString from 'querystring-browser';
 import $ from 'jquery';
 import * as FileSaver from '../../services/file-saver';
+
 export class DevToolsController {
   /**
    * Constructor
@@ -328,6 +329,19 @@ export class DevToolsController {
     }
   }
 
+  getPosition(element) {
+    var xPosition = 0;
+    var yPosition = 0;
+
+    while (element) {
+      xPosition += element.offsetLeft - element.scrollLeft + element.clientLeft;
+      yPosition += element.offsetTop - element.scrollTop + element.clientTop;
+      element = element.offsetParent;
+    }
+
+    return { x: xPosition, y: yPosition };
+  }
+
   /**
    * This set some required settings at init
    */
@@ -427,7 +441,7 @@ export class DevToolsController {
       const leftOrigWidth = $('#wz-dev-left-column').width();
       const rightOrigWidth = $('#wz-dev-right-column').width();
       $(evtDocument).mousemove(function(e) {
-        const leftWidth = e.pageX - 215 + 14;
+        const leftWidth = e.pageX - 85 + 14;
         let rightWidth = leftOrigWidth - leftWidth;
         $('#wz-dev-left-column').css('width', leftWidth);
         $('#wz-dev-right-column').css('width', rightOrigWidth + rightWidth);
@@ -471,6 +485,7 @@ export class DevToolsController {
         );
       }, 1);
     };
+    dynamicHeight();
   }
 
   /**
@@ -602,7 +617,7 @@ export class DevToolsController {
     } catch (error) {
       if ((error || {}).status === -1) {
         return this.apiOutputBox.setValue(
-          "Wazuh API don't reachable. Reason: timeout."
+          'Wazuh API is not reachable. Reason: timeout.'
         );
       } else {
         const parsedError = this.errorHandler.handle(error, null, null, true);
@@ -627,18 +642,5 @@ export class DevToolsController {
     } catch (error) {
       this.errorHandler.handle(error, 'Export JSON');
     }
-  }
-
-  getPosition(element) {
-    var xPosition = 0;
-    var yPosition = 0;
-
-    while (element) {
-      xPosition += element.offsetLeft - element.scrollLeft + element.clientLeft;
-      yPosition += element.offsetTop - element.scrollTop + element.clientTop;
-      element = element.offsetParent;
-    }
-
-    return { x: xPosition, y: yPosition };
   }
 }

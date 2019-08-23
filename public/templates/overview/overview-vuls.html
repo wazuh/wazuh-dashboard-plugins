@@ -1,19 +1,15 @@
-<md-content flex layout="column" ng-if="octrl.tab === 'vuls' && octrl.tabView === 'panels'"
-    ng-class="{'no-opacity': resultState !== 'ready' || !rendered}" layout-align="start">
+<md-content flex layout="column" ng-if="octrl.tab === 'vuls' && octrl.tabView === 'panels'" ng-class="{'no-opacity': resultState !== 'ready' || !rendered}"
+    layout-align="start">
 
-    <div layout="row">
-        <md-card flex class="wz-md-card wz-metric-color">
-            <md-card-content layout="row" class="wz-padding-metric">
-                <div class="wz-text-truncatable" flex>Critical severity alerts: <span class="wz-text-bold"
-                        ng-bind="octrl.vulnCritical()"></span></div>
-                <div class="wz-text-truncatable" flex>High severity alerts: <span class="wz-text-bold"
-                        ng-bind="octrl.vulnHigh()"></span></div>
-                <div class="wz-text-truncatable" flex>Medium severity alerts: <span class="wz-text-bold"
-                        ng-bind="octrl.vulnMedium()"></span></div>
-                <div class="wz-text-truncatable" flex>Low severity alerts: <span class="wz-text-bold"
-                        ng-bind="octrl.vulnLow()"></span></div>
-            </md-card-content>
-        </md-card>
+    <div layout="row" layout-padding>
+        <react-component flex name="AlertsStats" props="{
+            items: [
+                { description: 'Critical severity alerts', value: octrl.vulnCritical(), color: 'danger' },
+                { description: 'High severity alerts', value: octrl.vulnHigh(), color: 'primary' },
+                { description: 'Medium severity alerts', value: octrl.vulnMedium(), color: 'secondary' },
+                { description: 'Low severity alerts', value: octrl.vulnLow(), color: 'subdued' }
+            ]            
+        }" />
     </div>
 
     <div class="wz-no-display">
@@ -33,8 +29,7 @@
                 </span>
             </md-card-actions>
             <md-card-content class="wazuh-column">
-                <kbn-vis id="Wazuh-App-Overview-vulnerability-Most-affected-agents"
-                    vis-id="'Wazuh-App-Overview-vulnerability-Most-affected-agents'"></kbn-vis>
+                <kbn-vis id="Wazuh-App-Overview-vulnerability-Most-affected-agents" vis-id="'Wazuh-App-Overview-vulnerability-Most-affected-agents'"></kbn-vis>
             </md-card-content>
         </md-card>
         <md-card flex class="wz-md-card" ng-class="{'fullscreen': octrl.expandArray[1]}">
@@ -46,8 +41,7 @@
                 </span>
             </md-card-actions>
             <md-card-content class="wazuh-column">
-                <kbn-vis id="Wazuh-App-Overview-vulnerability-Alerts-severity"
-                    vis-id="'Wazuh-App-Overview-vulnerability-Alerts-severity'"></kbn-vis>
+                <kbn-vis id="Wazuh-App-Overview-vulnerability-Alerts-severity" vis-id="'Wazuh-App-Overview-vulnerability-Alerts-severity'"></kbn-vis>
             </md-card-content>
         </md-card>
     </div>
@@ -62,8 +56,7 @@
                 </span>
             </md-card-actions>
             <md-card-content class="wazuh-column">
-                <kbn-vis id="Wazuh-App-Overview-vulnerability-Vulnerability-severity-distribution"
-                    vis-id="'Wazuh-App-Overview-vulnerability-Vulnerability-severity-distribution'"></kbn-vis>
+                <kbn-vis id="Wazuh-App-Overview-vulnerability-Vulnerability-severity-distribution" vis-id="'Wazuh-App-Overview-vulnerability-Vulnerability-severity-distribution'"></kbn-vis>
             </md-card-content>
         </md-card>
         <md-card flex class="wz-md-card" ng-class="{'fullscreen': octrl.expandArray[3]}">
@@ -75,8 +68,7 @@
                 </span>
             </md-card-actions>
             <md-card-content class="wazuh-column">
-                <kbn-vis id="Wazuh-App-Overview-vulnerability-Commonly-affected-packages"
-                    vis-id="'Wazuh-App-Overview-vulnerability-Commonly-affected-packages'"></kbn-vis>
+                <kbn-vis id="Wazuh-App-Overview-vulnerability-Commonly-affected-packages" vis-id="'Wazuh-App-Overview-vulnerability-Commonly-affected-packages'"></kbn-vis>
             </md-card-content>
         </md-card>
         <md-card flex class="wz-md-card" ng-class="{'fullscreen': octrl.expandArray[4]}">
@@ -88,8 +80,7 @@
                 </span>
             </md-card-actions>
             <md-card-content class="wazuh-column">
-                <kbn-vis id="Wazuh-App-Overview-vulnerability-Most-common-CVEs"
-                    vis-id="'Wazuh-App-Overview-vulnerability-Most-common-CVEs'"></kbn-vis>
+                <kbn-vis id="Wazuh-App-Overview-vulnerability-Most-common-CVEs" vis-id="'Wazuh-App-Overview-vulnerability-Most-common-CVEs'"></kbn-vis>
             </md-card-content>
         </md-card>
         <md-card flex class="wz-md-card" ng-class="{'fullscreen': octrl.expandArray[5]}">
@@ -101,8 +92,7 @@
                 </span>
             </md-card-actions>
             <md-card-content class="wazuh-column">
-                <kbn-vis id="Wazuh-App-Overview-vulnerability-Most-common-CWEs"
-                    vis-id="'Wazuh-App-Overview-vulnerability-Most-common-CWEs'"></kbn-vis>
+                <kbn-vis id="Wazuh-App-Overview-vulnerability-Most-common-CWEs" vis-id="'Wazuh-App-Overview-vulnerability-Most-common-CWEs'"></kbn-vis>
             </md-card-content>
         </md-card>
     </div>

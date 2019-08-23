@@ -1,8 +1,5 @@
 <!-- No configuration section -->
-<wz-no-config
-  flex
-  error="'not-present'"
-  ng-if="configurationSubTab === 'pm-ignored' && currentConfig && currentConfig['syscheck-rootcheck'] && currentConfig['syscheck-rootcheck'].rootcheck && !currentConfig['syscheck-rootcheck']['rootcheck']['ignore'].length && !currentConfig['syscheck-rootcheck']['rootcheck']['ignore_sregex'].length"></wz-no-config>
+<wz-no-config flex error="'not-present'" ng-if="configurationSubTab === 'pm-ignored' && currentConfig && currentConfig['syscheck-rootcheck'] && currentConfig['syscheck-rootcheck'].rootcheck && (!currentConfig['syscheck-rootcheck'].rootcheck.ignore || ( currentConfig['syscheck-rootcheck'].rootcheck.ignore && !currentConfig['syscheck-rootcheck'].rootcheck.ignore.length))"></wz-no-config>
 <!-- End no configuration section -->
 
 <!-- Ignored card -->

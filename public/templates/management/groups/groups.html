@@ -42,11 +42,9 @@
             </div>
 
             <!-- End group actions -->
-            <md-nav-bar ng-if="lookingGroup && currentGroup && !addingAgents && !editingFile" class="wz-nav-bar"
-                md-selected-nav-item="groupsSelectedTab">
-                <md-nav-item class="wz-nav-item" md-nav-click="goBackToAgents()" name="agents">Agents</md-nav-item>
-                <md-nav-item class="wz-nav-item" md-nav-click="goBackFiles()" name="files">Content</md-nav-item>
-            </md-nav-bar>
+            <div ng-if="lookingGroup && currentGroup && !addingAgents && !editingFile && groupsTabsProps" class="md-margin-h">
+                <react-component name="Tabs" props="groupsTabsProps" />
+            </div>
 
             <!-- XML editor for group agents -->
             <div ng-show="editingFile">
@@ -123,7 +121,7 @@
                 <md-card flex class="wz-md-card _md flex md-margin-h wz-margin-top-16" ng-if="!lookingGroup">
                     <md-card-content>
                         <div layout="row">
-                            <wz-table custom-columns="true" flex extra-limit="100" path="'/agents/groups'" keys="['name','count','mergedSum']"
+                            <wz-table custom-columns="true" flex path="'/agents/groups'" keys="['name','count','mergedSum']"
                                 allow-click="true" row-sizes="[14,12,10]">
                             </wz-table>
                         </div>
@@ -142,6 +140,10 @@
                 <div ng-if='!addingAgents'>
                     <!-- Group agents table -->
                     <md-card flex class="wz-md-card _md flex md-margin-h wz-margin-top-16" ng-if="lookingGroup && groupsSelectedTab==='agents' && currentGroup">
+                        <md-card-actions layout="row" class="wz-card-actions wz-card-actions-top layout-align-end-center">
+                            <react-component name="ExportConfiguration" ng-hide="reportBusy && reportStatus" props="{exportConfiguration, type: 'group'}" />
+                            <react-component ng-show="reportBusy && reportStatus" name="EuiLoadingSpinner" props="{size:'m'}" />
+                        </md-card-actions>
                         <div layout="row" ng-show="failedErrors" class="extraHeader">
                             <md-list>
                                 <md-list-item class="error-enum-configuration" ng-repeat="group in failedErrors">
@@ -174,9 +176,13 @@
 
                     <!-- Group files table -->
                     <md-card flex class="wz-md-card _md flex md-margin-h wz-margin-top-16" ng-if="lookingGroup && groupsSelectedTab==='files' && !fileViewer && currentGroup">
+                        <md-card-actions layout="row" class="wz-card-actions wz-card-actions-top layout-align-end-center">
+                            <react-component name="ExportConfiguration" ng-hide="reportBusy && reportStatus" props="{exportConfiguration, type: 'group'}" />
+                            <react-component ng-show="reportBusy && reportStatus" name="EuiLoadingSpinner" props="{size:'m'}" />
+                        </md-card-actions>
                         <md-card-content>
                             <div layout="row">
-                                <wz-table custom-columns="true" extra-limit="100" flex path="'/agents/groups/' + currentGroup.name + '/files'"
+                                <wz-table custom-columns="true" flex path="'/agents/groups/' + currentGroup.name + '/files'"
                                     keys="[{value:'filename',width:'300px'},'hash']" allow-click="true" row-sizes="[16,14,12]">
                                 </wz-table>
                             </div>

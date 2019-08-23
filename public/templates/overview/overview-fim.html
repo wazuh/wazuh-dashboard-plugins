@@ -82,4 +82,18 @@
             </md-card-content>
         </md-card>
     </div>
+    <div layout="row" layout-align="center stretch" class="height-570">
+        <md-card flex class="wz-md-card" ng-class="{'fullscreen': octrl.expandArray[6]}">
+            <md-card-actions layout="row" class="wz-card-actions-vis" ng-dblclick="octrl.expand(6)">
+                <span class="wz-headline-title">Alerts summary</span>
+                <span flex></span>
+                <span class="cursor-pointer" ng-click="octrl.expand(6)">
+                    <react-component name="EuiIcon" props="{type:'expand'}" />
+                </span>
+            </md-card-actions>
+            <md-card-content class="wazuh-column">
+                <kbn-vis vis-id="'Wazuh-App-Overview-FIM-Alerts-summary'"></kbn-vis>
+            </md-card-content>
+        </md-card>
+    </div>
 </md-content>

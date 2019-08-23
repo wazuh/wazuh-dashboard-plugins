@@ -9,7 +9,7 @@
  *
  * Find more information about this on the LICENSE file.
  */
-export const KeyEquivalenece = {
+export const KeyEquivalence = {
   id: 'ID',
   timestamp: 'Timestamp',
   url: 'URL',
@@ -36,6 +36,8 @@ export const KeyEquivalenece = {
   file: 'File',
   gdpr: 'GDPR',
   pci: 'PCI',
+  hipaa: 'HIPAA',
+  'nist-800-53': 'NIST 800-53',
   cis: 'CIS',
   event: 'Event',
   groups: 'Groups',
@@ -108,5 +110,8 @@ export const KeyEquivalenece = {
   rationale: 'Rationale',
   registry: 'Registry',
   date: 'Date',
-  value: 'Value'
+  value: 'Value',
+  location: 'Location',
+  mtu: 'MTU',
+  attributes: 'Attributes'
 };

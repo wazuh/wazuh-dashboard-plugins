@@ -11,7 +11,6 @@
  */
 export const monitoringTemplate = {
   order: 0,
-  //template: 'wazuh-monitoring-3.x-*',
   settings: {
     'index.refresh_interval': '5s'
   },

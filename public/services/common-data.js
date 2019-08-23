@@ -41,6 +41,11 @@ export class CommonData {
     this.globalState = globalState;
     this.savedTimefilter = null;
     this.refreshInterval = { pause: true, value: 0 };
+
+    this.hostMonitoringTabs = ['general', 'fim', 'aws'];
+    this.systemAuditTabs = ['pm', 'audit', 'oscap', 'ciscat', 'sca'];
+    this.securityTabs = ['vuls', 'virustotal', 'osquery', 'docker'];
+    this.complianceTabs = ['pci', 'gdpr', 'hipaa', 'nist'];
   }
 
   /**
@@ -128,6 +133,8 @@ export class CommonData {
         audit: { group: 'audit' },
         pci: { group: 'pci_dss' },
         gdpr: { group: 'gdpr' },
+        hipaa: { group: 'hipaa' },
+        nist: { group: 'nist' },
         aws: { group: 'amazon' },
         virustotal: { group: 'virustotal' },
         osquery: { group: 'osquery' },
@@ -153,6 +160,12 @@ export class CommonData {
         } else if (tab === 'gdpr') {
           this.removeDuplicateExists('rule.gdpr');
           filters.push(filterHandler.gdprQuery());
+        } else if (tab === 'hipaa') {
+          this.removeDuplicateExists('rule.hipaa');
+          filters.push(filterHandler.hipaaQuery());
+        } else if (tab === 'nist') {
+          this.removeDuplicateExists('rule.nist_800_53');
+          filters.push(filterHandler.nistQuery());
         } else {
           this.removeDuplicateRuleGroups(tabFilters[tab].group);
           filters.push(filterHandler.ruleGroupQuery(tabFilters[tab].group));
@@ -203,6 +216,40 @@ export class CommonData {
         pciTabs.push({ title: key, content: data.data[key] });
       }
       return pciTabs;
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  }
+
+  /**
+   * GET HIPAA
+   */
+  async getHIPAA() {
+    try {
+      const hipaaTabs = [];
+      const data = await this.genericReq.request('GET', '/api/hipaa/all');
+      if (!data.data) return [];
+      for (const key in data.data) {
+        hipaaTabs.push({ title: key, content: data.data[key] });
+      }
+      return hipaaTabs;
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  }
+
+  /**
+   * GET NIST 800-53
+   */
+  async getNIST() {
+    try {
+      const nistTabs = [];
+      const data = await this.genericReq.request('GET', '/api/nist/all');
+      if (!data.data) return [];
+      for (const key in data.data) {
+        nistTabs.push({ title: key, content: data.data[key] });
+      }
+      return nistTabs;
     } catch (error) {
       return Promise.reject(error);
     }
@@ -309,5 +356,33 @@ export class CommonData {
 
   getRefreshInterval() {
     return this.refreshInterval;
+  }
+
+  getCurrentPanel(tab) {
+    return this.hostMonitoringTabs.includes(tab)
+      ? this.hostMonitoringTabs
+      : this.systemAuditTabs.includes(tab)
+      ? this.systemAuditTabs
+      : this.securityTabs.includes(tab)
+      ? this.securityTabs
+      : this.complianceTabs.includes(tab)
+      ? this.complianceTabs
+      : false;
+  }
+
+  getTabsFromCurrentPanel(currentPanel, extensions, tabNames) {
+    const keyExists = key => Object.keys(extensions).includes(key);
+    const keyIsTrue = key => (extensions || [])[key];
+
+    let tabs = [];
+    currentPanel.forEach(x => {      
+      if (!keyExists(x) || keyIsTrue(x)) {
+        tabs.push({
+          id: x,
+          name: tabNames[x]
+        });
+      }
+    });
+    return tabs;
   }
 }

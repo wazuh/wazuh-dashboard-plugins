@@ -16,6 +16,7 @@ import { getSavedSearch } from './get-saved-search';
 import { goToKibana } from './go-to-kibana';
 import { getIp } from './get-ip';
 import { getWzConfig } from './get-config';
+import { apiCount } from './api-count';
 
 export {
   checkTimestamp,
@@ -24,5 +25,6 @@ export {
   getSavedSearch,
   goToKibana,
   getIp,
-  getWzConfig
+  getWzConfig,
+  apiCount
 };

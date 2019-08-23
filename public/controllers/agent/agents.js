@@ -14,6 +14,7 @@ import { generateMetric } from '../../utils/generate-metric';
 import { TabNames } from '../../utils/tab-names';
 import * as FileSaver from '../../services/file-saver';
 import { TabDescription } from '../../../server/reporting/tab-description';
+import { UnsupportedComponents } from '../../utils/components-os-support';
 import {
   metricsGeneral,
   metricsAudit,
@@ -60,7 +61,8 @@ export class AgentsController {
     $mdDialog,
     groupHandler,
     wazuhConfig,
-    timeService
+    timeService,
+    genericReq
   ) {
     this.$scope = $scope;
     this.$location = $location;
@@ -79,6 +81,7 @@ export class AgentsController {
     this.groupHandler = groupHandler;
     this.wazuhConfig = wazuhConfig;
     this.timeService = timeService;
+    this.genericReq = genericReq;
 
     // Config on-demand
     this.$scope.isArray = Array.isArray;
@@ -160,11 +163,6 @@ export class AgentsController {
 
     this.tabVisualizations.assign('agents');
 
-    this.$scope.hostMonitoringTabs = ['general', 'fim', 'syscollector'];
-    this.$scope.systemAuditTabs = ['pm', 'sca', 'audit', 'oscap', 'ciscat'];
-    this.$scope.securityTabs = ['vuls', 'virustotal', 'osquery', 'docker'];
-    this.$scope.complianceTabs = ['pci', 'gdpr'];
-
     /**
      * This check if given array of items contais a single given item
      * @param {Object} item
@@ -212,6 +210,9 @@ export class AgentsController {
 
     this.$scope.startVis2Png = () => this.startVis2Png();
 
+    this.$scope.shouldShowComponent = component =>
+      this.shouldShowComponent(component);
+
     this.$scope.$on('$destroy', () => {
       this.visFactoryService.clearAll();
     });
@@ -221,6 +222,14 @@ export class AgentsController {
     this.$scope.goGroup = () => {
       this.shareAgent.setAgent(this.$scope.agent);
       this.$location.path('/manager/groups');
+    };
+
+    this.$scope.exportConfiguration = enabledComponents => {
+      this.reportingService.startConfigReport(
+        this.$scope.agent,
+        'agentConfig',
+        enabledComponents
+      );
     };
 
     this.$scope.restartAgent = async agent => {
@@ -368,7 +377,8 @@ export class AgentsController {
       this.$scope.showSyscheckFiles = !this.$scope.showSyscheckFiles;
       if (!this.$scope.showSyscheckFiles) {
         this.$scope.$emit('changeTabView', {
-          tabView: this.$scope.tabView
+          tabView: this.$scope.tabView,
+          sameSection: true
         });
       }
       this.$scope.$applyAsync();
@@ -379,7 +389,8 @@ export class AgentsController {
       this.$scope.showScaScan = !this.$scope.showScaScan;
       if (!this.$scope.showScaScan) {
         this.$scope.$emit('changeTabView', {
-          tabView: this.$scope.tabView
+          tabView: this.$scope.tabView,
+          sameSection: true
         });
       }
       this.$scope.$applyAsync();
@@ -435,6 +446,7 @@ export class AgentsController {
     };
 
     this.$scope.expand = i => this.expand(i);
+    this.setTabs();
   }
   /**
    * Create metric for given object
@@ -542,8 +554,8 @@ export class AgentsController {
     }
 
     // Update agent status
-    try {
-      if ((this.$scope || {}).agent || false) {
+    if (!force && ((this.$scope || {}).agent || false)) {
+      try {
         const agentInfo = await this.apiReq.request(
           'GET',
           `/agents/${this.$scope.agent.id}`,
@@ -552,21 +564,29 @@ export class AgentsController {
         this.$scope.agent.status =
           (((agentInfo || {}).data || {}).data || {}).status ||
           this.$scope.agent.status;
-      }
-    } catch (error) {} // eslint-disable-line
+      } catch (error) {} // eslint-disable-line
+    }
 
     try {
       this.$scope.showSyscheckFiles = false;
       this.$scope.showScaScan = false;
       if (tab === 'pci') {
         const pciTabs = await this.commonData.getPCI();
-        this.$scope.pciTabs = pciTabs;
-        this.$scope.selectedPciIndex = 0;
+        this.$scope.pciReqs = {items: pciTabs, reqTitle: 'PCI DSS Requirement'}
       }
       if (tab === 'gdpr') {
         const gdprTabs = await this.commonData.getGDPR();
-        this.$scope.gdprTabs = gdprTabs;
-        this.$scope.selectedGdprIndex = 0;
+        this.$scope.gdprReqs = {items: gdprTabs, reqTitle: 'GDPR Requirement'};
+      }
+
+      if (tab === 'hipaa') {
+        const hipaaTabs = await this.commonData.getHIPAA();
+        this.$scope.hipaaReqs = {items: hipaaTabs, reqTitle: 'HIPAA Requirement'};
+      }
+
+      if (tab === 'nist') {
+        const nistTabs = await this.commonData.getNIST();
+        this.$scope.nistReqs = {items: nistTabs, reqTitle: 'NIST 800-53 Requirement'};
       }
 
       if (tab === 'sca') {
@@ -635,6 +655,66 @@ export class AgentsController {
     } catch (error) {
       return Promise.reject(error);
     }
+
+    this.$scope.configurationTabsProps = {};
+    this.$scope.buildProps = tabs => {
+      const cleanTabs = [];
+      tabs.forEach(x => {
+        if (
+          this.$scope.configurationTab === 'integrity-monitoring' &&
+          x.id === 'fim-whodata' &&
+          x.agent &&
+          x.agent.agentPlatform !== 'linux'
+        )
+          return;
+
+        cleanTabs.push({
+          id: x.id,
+          name: x.name
+        });
+      });
+      this.$scope.configurationTabsProps = {
+        clickAction: tab => {
+          this.$scope.switchConfigurationSubTab(tab);
+        },
+        selectedTab:
+          this.$scope.configurationSubTab || (tabs && tabs.length)
+            ? tabs[0].id
+            : '',
+        tabs: cleanTabs
+      };
+    };
+
+    this.setTabs();
+  }
+
+  /**
+   * Build the current section tabs
+   */
+  setTabs() {
+    this.$scope.agentsTabsProps = false;
+    this.currentPanel = this.commonData.getCurrentPanel(this.$scope.tab);
+
+    if (!this.currentPanel) return;
+
+    const tabs = this.commonData.getTabsFromCurrentPanel(
+      this.currentPanel,
+      this.$scope.extensions,
+      this.$scope.tabNames
+    );
+
+    this.$scope.agentsTabsProps = {
+      clickAction: tab => {
+        this.switchTab(tab, true);
+      },
+      selectedTab:
+        this.$scope.tab ||
+        (this.currentPanel && this.currentPanel.length
+          ? this.currentPanel[0]
+          : ''),
+      tabs
+    };
+    this.$scope.$applyAsync();
   }
 
   goDiscover() {
@@ -683,86 +763,12 @@ export class AgentsController {
    */
   async loadSyscollector(id) {
     try {
-      // Continue API requests if we do have Syscollector enabled
-      // Fetch Syscollector data
-      const data = await Promise.all([
-        this.apiReq.request('GET', `/syscollector/${id}/hardware`, {}),
-        this.apiReq.request('GET', `/syscollector/${id}/os`, {}),
-        this.apiReq.request('GET', `/syscollector/${id}/ports`, { limit: 1 }),
-        this.apiReq.request('GET', `/syscollector/${id}/packages`, {
-          limit: 1,
-          select: 'scan_time'
-        }),
-        this.apiReq.request('GET', `/syscollector/${id}/processes`, {
-          limit: 1,
-          select: 'scan_time'
-        })
-      ]);
+      const syscollectorData = await this.genericReq.request(
+        'GET',
+        `/api/syscollector/${id}`
+      );
 
-      const result = data.map(item => ((item || {}).data || {}).data || false);
-
-      const [
-        hardwareResponse,
-        osResponse,
-        portsResponse,
-        packagesDateResponse,
-        processesDateResponse
-      ] = result;
-
-      // This API call may fail so we put it out of Promise.all
-      let netifaceResponse = false;
-      try {
-        const resultNetiface = await this.apiReq.request(
-          'GET',
-          `/syscollector/${id}/netiface`,
-          {}
-        );
-        netifaceResponse = ((resultNetiface || {}).data || {}).data || false;
-      } catch (error) {} // eslint-disable-line
-
-      // This API call may fail so we put it out of Promise.all
-      let netaddrResponse = false;
-      try {
-        const resultNetaddrResponse = await this.apiReq.request(
-          'GET',
-          `/syscollector/${id}/netaddr`,
-          { limit: 1 }
-        );
-        netaddrResponse =
-          ((resultNetaddrResponse || {}).data || {}).data || false;
-      } catch (error) {} // eslint-disable-line
-
-      // Before proceeding, syscollector data is an empty object
-      this.$scope.syscollector = {};
-
-      const packagesDate = packagesDateResponse
-        ? { ...packagesDateResponse }
-        : false;
-      const processesDate = processesDateResponse
-        ? { ...processesDateResponse }
-        : false;
-
-      // Fill syscollector object
-      this.$scope.syscollector = {
-        hardware:
-          typeof hardwareResponse === 'object' &&
-          Object.keys(hardwareResponse).length
-            ? { ...hardwareResponse }
-            : false,
-        os:
-          typeof osResponse === 'object' && Object.keys(osResponse).length
-            ? { ...osResponse }
-            : false,
-        netiface: netifaceResponse ? { ...netifaceResponse } : false,
-        ports: portsResponse ? { ...portsResponse } : false,
-        netaddr: netaddrResponse ? { ...netaddrResponse } : false,
-        packagesDate: ((packagesDate || {}).items || []).length
-          ? packagesDate.items[0].scan_time
-          : '-',
-        processesDate: ((processesDate || {}).items || []).length
-          ? processesDate.items[0].scan_time
-          : '-'
-      };
+      this.$scope.syscollector = (syscollectorData || {}).data || {};
 
       return;
     } catch (error) {
@@ -785,52 +791,23 @@ export class AgentsController {
 
       const id = this.commonData.checkLocationAgentId(newAgentId, globalAgent);
 
-      const data = [false, false, false];
+      const data = await this.apiReq.request('GET', `/agents/${id}`, {});
 
-      try {
-        data[0] = await this.apiReq.request('GET', `/agents/${id}`, {});
-      } catch (error) {} //eslint-disable-line
-
-      try {
-        data[1] = await this.apiReq.request(
-          'GET',
-          `/syscheck/${id}/last_scan`,
-          {}
-        );
-      } catch (error) {} //eslint-disable-line
-
-      try {
-        data[2] = await this.apiReq.request(
-          'GET',
-          `/rootcheck/${id}/last_scan`,
-          {}
-        );
-      } catch (error) {} //eslint-disable-line
-
-      const result = data.map(item => ((item || {}).data || {}).data || false);
-
-      const [agentInfo, syscheckLastScan, rootcheckLastScan] = result;
+      const agentInfo = ((data || {}).data || {}).data || false;
 
       // Agent
       this.$scope.agent = agentInfo;
-      if (this.$scope.agent.os) {
+      if (agentInfo && this.$scope.agent.os) {
         this.$scope.agentOS =
           this.$scope.agent.os.name + ' ' + this.$scope.agent.os.version;
-        this.$scope.agent.isLinuxOS = this.$scope.agent.os.uname.includes(
-          'Linux'
-        );
+        const isLinux = this.$scope.agent.os.uname.includes('Linux');
+        this.$scope.agent.agentPlatform = isLinux
+          ? 'linux'
+          : this.$scope.agent.os.platform;
       } else {
         this.$scope.agentOS = '-';
-        this.$scope.agent.isLinuxOS = false;
+        this.$scope.agent.agentPlatform = false;
       }
-
-      // Syscheck
-      this.$scope.agent.syscheck = syscheckLastScan;
-      this.validateSysCheck();
-
-      // Rootcheck
-      this.$scope.agent.rootcheck = rootcheckLastScan;
-      this.validateRootCheck();
 
       await this.$scope.switchTab(this.$scope.tab, true);
 
@@ -842,37 +819,7 @@ export class AgentsController {
             this.$scope.agent.group && !this.$scope.agent.group.includes(item)
         );
 
-      const outdatedAgents = await this.apiReq.request(
-        'GET',
-        '/agents/outdated/',
-        {}
-      );
-      this.$scope.agent.outdated = outdatedAgents.data.data.items
-        .map(x => x.id)
-        .find(x => x === this.$scope.agent.id);
-
-      if (this.$scope.agent.outdated) {
-        if (
-          this.appState.getSessionStorageItem(
-            `updatingAgent${this.$scope.agent.id}`
-          )
-        ) {
-          this.$scope.agent.upgrading = true;
-        }
-      } else {
-        if (
-          this.appState.getSessionStorageItem(
-            `updatingAgent${this.$scope.agent.id}`
-          )
-        ) {
-          this.appState.removeSessionStorageItem(
-            `updatingAgent${this.$scope.agent.id}`
-          );
-          this.$scope.agent.outdated = false;
-        }
-        this.$scope.$applyAsync();
-      }
-
+      this.loadWelcomeCardsProps();
       this.$scope.load = false;
       this.$scope.$applyAsync();
       return;
@@ -892,9 +839,46 @@ export class AgentsController {
         this.$location.path('/agents-preview');
       }
     }
+
     this.$scope.load = false;
     this.$scope.$applyAsync();
     return;
+  }
+
+  shouldShowComponent(component) {
+    return !(
+      UnsupportedComponents[this.$scope.agent.agentPlatform] ||
+      UnsupportedComponents['other']
+    ).includes(component);
+  }
+
+  cleanExtensions(extensions) {
+    const result = {};
+    for (const extension in extensions) {
+      if (
+        !(
+          UnsupportedComponents[this.$scope.agent.agentPlatform] ||
+          UnsupportedComponents['other']
+        ).includes(extension)
+      ) {
+        result[extension] = extensions[extension];
+      }
+    }
+    return result;
+  }
+
+  /**
+   * Get available welcome cards after getting the agent
+   */
+  loadWelcomeCardsProps() {
+    this.$scope.welcomeCardsProps = {
+      switchTab: tab => this.switchTab(tab),
+      extensions: this.cleanExtensions(this.$scope.extensions),
+      agent: this.$scope.agent,
+      api: this.appState.getCurrentAPI(),
+      setExtensions: (api, extensions) =>
+        this.appState.setExtensions(api, extensions)
+    };
   }
 
   switchGroupEdit() {
@@ -907,13 +891,13 @@ export class AgentsController {
    * @param {String} binding_text
    * @param {String} date
    */
-  offsetTimestamp = (text, time) => {
+  offsetTimestamp(text, time) {
     try {
       return text + this.timeService.offset(time);
     } catch (error) {
       return time !== '-' ? `${text}${time} (UTC)` : time;
     }
-  };
+  }
 
   /**
    * Navigate to the groups of an agent

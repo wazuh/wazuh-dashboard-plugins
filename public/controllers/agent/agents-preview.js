@@ -58,7 +58,7 @@ export class AgentsPreviewController {
    */
   $onInit() {
     this.init = true;
-    this.api =  JSON.parse(this.appState.getCurrentAPI()).id;
+    this.api = JSON.parse(this.appState.getCurrentAPI()).id;
     const loc = this.$location.search();
     if ((loc || {}).agent && (loc || {}).agent !== '000') {
       this.commonData.setTimefilter(timefilter.getTime());
@@ -90,11 +90,13 @@ export class AgentsPreviewController {
       this.$location.search('tab', this.submenuNavItem);
     });
 
-    this.$scope.$on('wazuhFetched', (ev, parameters) => {
+    this.$scope.$on('wazuhFetched', (ev) => {
       ev.stopPropagation();
-      this.$scope.showNoAgents =
-        !parameters.items.length > 0 && !parameters.filters.length;
     });
+
+    this.registerAgentsProps = {
+      addNewAgent: flag => this.addNewAgent(flag)
+    };
 
     this.init = false;
     //Load
@@ -201,6 +203,9 @@ export class AgentsPreviewController {
       this.osPlatforms = unique.osPlatforms;
       this.lastAgent = unique.lastAgent;
       this.summary = unique.summary;
+      if (!this.lastAgent || !this.lastAgent.id) {
+        this.addNewAgent(true);
+      }
 
       if (agentsTop.data.data === '') {
         this.mostActiveAgent.name = this.appState.getClusterInfo().manager;
@@ -225,22 +230,27 @@ export class AgentsPreviewController {
     return;
   }
 
-  registerNewAgent(flag) {
-    this.$scope.registerNewAgent = flag;
+  addNewAgent(flag) {
+    this.addingNewAgent = flag;
   }
 
   reloadList() {
-    this.refreshAgentsStats(); 
+    this.refreshAgentsStats();
     this.$scope.$broadcast('wazuhSearch', { term: this.prevSearch || '' });
   }
 
   async refreshAgentsStats() {
     try {
-      const data = await this.genericReq.request('GET', '/api/agents-unique/' + this.api, {});
-      this.summary  = ((data.data || {}).result || {}).summary || {};
+      const data = await this.genericReq.request(
+        'GET',
+        '/api/agents-unique/' + this.api,
+        {}
+      );
+      this.summary = ((data.data || {}).result || {}).summary || {};
     } catch (error) {
       this.errorHandler.handle('Error refreshing agents stats');
     }
+    this.$scope.$broadcast('reloadSearchFilterBar', {});
   }
 
   openRegistrationDocs() {

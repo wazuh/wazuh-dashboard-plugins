@@ -15,7 +15,8 @@ export class AppState {
    * @param {*} $cookies
    * @param {*} $window
    */
-  constructor($cookies, $window) {
+  constructor($rootScope, $cookies, $window) {
+    this.$rootScope = $rootScope;
     this.$cookies = $cookies;
     this.$window = $window;
     this.navigate = {};
@@ -132,5 +133,9 @@ export class AppState {
 
   getNavigation() {
     return this.navigate;
+  }
+
+  setWzMenu() {
+    this.$rootScope.$emit('loadWazuhMenu', {});
   }
 }

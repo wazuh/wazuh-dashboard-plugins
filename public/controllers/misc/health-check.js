@@ -68,6 +68,7 @@ export class HealthCheck {
     this.errors = [];
     this.processedChecks = 0;
     this.totalChecks = 0;
+    this.$rootScope.hideWzMenu = true;
   }
 
   /**
@@ -172,7 +173,7 @@ export class HealthCheck {
             const apiVersion = versionData.data.data;
             const setupData = await this.genericReq.request(
               'GET',
-              '/elastic/setup'
+              '/api/setup'
             );
             if (!setupData.data.data['app-version'] || !apiVersion) {
               this.errorHandler.handle(
@@ -266,7 +267,7 @@ export class HealthCheck {
       }
 
       if (!this.errors || !this.errors.length) {
-        await this.$timeout(800);
+        await this.$timeout(300);
         this.$window.location.assign(
           chrome.addBasePath('wazuh#' + this.$rootScope.previousLocation || '')
         );

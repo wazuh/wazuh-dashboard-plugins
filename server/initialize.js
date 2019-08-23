@@ -9,8 +9,6 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import needle from 'needle';
-import colors from 'ansicolors';
 import { log } from './logger';
 import { ElasticWrapper } from './lib/elastic-wrapper';
 import packageJSON from '../package.json';
@@ -20,10 +18,13 @@ import { defaultExt } from './lib/default-ext';
 import { BuildBody } from './lib/replicas-shards-helper';
 import { checkKnownFields } from './lib/refresh-known-fields';
 import { totalmem } from 'os';
+import fs from 'fs';
+import path from 'path';
 
 export function Initialize(server) {
-  const blueWazuh = colors.blue('wazuh');
-
+  const wazuhVersion = path.join(__dirname, '/wazuh-version.json');
+  const blueWazuh = '\u001b[34mwazuh\u001b[39m';
+  const initializeErrorLogColors = [blueWazuh, 'initialize', 'error'];
   // Elastic JS Client
   const wzWrapper = new ElasticWrapper(server);
   log('initialize', `Kibana index: ${wzWrapper.WZ_KIBANA_INDEX}`, 'info');
@@ -47,7 +48,7 @@ export function Initialize(server) {
   } catch (e) {
     log('initialize', e.message || e);
     server.log(
-      [blueWazuh, 'initialize', 'error'],
+      initializeErrorLogColors,
       'Something went wrong while reading the configuration.' + e.message
     );
   }
@@ -66,12 +67,8 @@ export function Initialize(server) {
   const defaultIndexPattern = pattern || 'wazuh-alerts-3.x-*';
 
   // Save Wazuh App setup
-  const saveConfiguration = async () => {
+  const saveConfiguration = () => {
     try {
-      const shardConfiguration = BuildBody(configurationFile, 'wazuh-version');
-
-      await wzWrapper.createWazuhVersionIndex(shardConfiguration);
-
       const commonDate = new Date().toISOString();
 
       const configuration = {
@@ -83,18 +80,21 @@ export function Initialize(server) {
       };
 
       try {
-        await wzWrapper.insertWazuhVersionConfiguration(configuration);
-
+        fs.writeFileSync(wazuhVersion, JSON.stringify(configuration), err => {
+          if (err) {
+            throw new Error(err);
+          }
+        });
         log(
           'initialize:saveConfiguration',
-          'Wazuh configuration inserted',
+          'Wazuh configuration registry inserted',
           'debug'
         );
       } catch (error) {
         log('initialize:saveConfiguration', error.message || error);
         server.log(
-          [blueWazuh, 'initialize', 'error'],
-          'Could not insert Wazuh configuration'
+          initializeErrorLogColors,
+          'Could not create Wazuh configuration registry'
         );
       }
 
@@ -102,8 +102,8 @@ export function Initialize(server) {
     } catch (error) {
       log('initialize:saveConfiguration', error.message || error);
       server.log(
-        [blueWazuh, 'initialize', 'error'],
-        'Error creating index .wazuh-version.'
+        initializeErrorLogColors,
+        'Error creating wazuh-version registry'
       );
     }
   };
@@ -125,7 +125,7 @@ export function Initialize(server) {
       const apiEntries = await wzWrapper.getWazuhAPIEntries();
       const configFile = await getConfiguration();
 
-      if (((apiEntries || {}).hits || {}).total > 0) {
+      if ((((apiEntries || {}).hits || {}).total || {}).value > 0) {
         const currentExtensions = !configFile ? defaultExt : {};
 
         if (configFile) {
@@ -164,7 +164,7 @@ export function Initialize(server) {
               } due to ${error.message || error}`
             );
             server.log(
-              [blueWazuh, 'initialize:checkAPIEntriesExtensions', 'error'],
+              initializeErrorLogColors,
               `Error updating API entry extensions with ID: ${
                 item._id
               } due to ${error.message || error}`
@@ -204,57 +204,65 @@ export function Initialize(server) {
       } else {
         await wzWrapper.updateIndexSettings('.wazuh', shardConfiguration);
         await checkAPIEntriesExtensions();
-
-        // The .wazuh index exists, we now proceed to check whether it's from an older version
-        try {
-          await wzWrapper.getOldWazuhSetup();
-
-          // Reindex!
-          return reindexOldVersion();
-        } catch (error) {
-          if (error.message && error.message !== 'Not Found') {
-            throw new Error(error.message || error);
-          }
-        }
       }
     } catch (error) {
       return Promise.reject(error);
     }
   };
 
-  const checkWazuhVersionIndex = async () => {
+  const checkWazuhVersionRegistry = async () => {
     try {
       log(
-        'initialize[checkWazuhVersionIndex]',
-        'Checking .wazuh-version index.',
+        'initialize[checkWazuhVersionRegistry]',
+        'Checking wazuh-version registry.',
         'debug'
       );
-
       try {
-        await wzWrapper.getWazuhVersionIndex();
-        const shardConfiguration = BuildBody(
-          configurationFile,
-          'wazuh-version'
-        );
-        await wzWrapper.updateIndexSettings(
-          '.wazuh-version',
-          shardConfiguration
+        await wzWrapper.deleteWazuhVersionIndex();
+        log(
+          'initialize[checkWazuhVersionRegistry]',
+          'Successfully deleted old .wazuh-version index.',
+          'debug'
         );
       } catch (error) {
         log(
-          'initialize[checkWazuhVersionIndex]',
-          '.wazuh-version document does not exist. Initializating configuration...',
+          'initialize[checkWazuhVersionRegistry]',
+          'No need to delete old .wazuh-version index',
+          'debug'
+        );
+      }
+
+      if (!fs.existsSync(wazuhVersion)) {
+        log(
+          'initialize[checkWazuhVersionRegistry]',
+          'wazuh-version registry does not exist. Initializing configuration.',
           'debug'
         );
 
-        // Save Setup Info
-        await saveConfiguration();
-      }
+        // Create the app registry file for the very first time
+        saveConfiguration();
+      } else {
+        // App registry file exists, just update it
+        const currentDate = new Date().toISOString();
 
-      await wzWrapper.updateWazuhVersionIndexLastRestart(
-        packageJSON.version,
-        packageJSON.revision
-      );
+        // If this function fails, it throws an exception
+        const source = JSON.parse(fs.readFileSync(wazuhVersion, 'utf8'));
+
+        // Check if the stored revision differs from the package.json revision
+        const isNewApp = packageJSON.revision !== source.revision;
+
+        // If it's an app with a different revision, it's a new installation
+        source['installationDate'] = isNewApp
+          ? currentDate
+          : source['installationDate'];
+
+        source['app-version'] = packageJSON.version;
+        source.revision = packageJSON.revision;
+        source.lastRestart = currentDate;
+
+        // If this function fails, it throws an exception
+        //fs.writeFileSync(wazuhVersion, JSON.stringify(source), 'utf-8');
+      }
     } catch (error) {
       return Promise.reject(error);
     }
@@ -265,15 +273,20 @@ export function Initialize(server) {
     try {
       await Promise.all([
         checkWazuhIndex(),
-        checkWazuhVersionIndex(),
+        checkWazuhVersionRegistry(),
         checkKnownFields(wzWrapper, log, server, defaultIndexPattern)
       ]);
+      const reindexResult = await wzWrapper.reindexAppIndices();
+      Array.isArray(reindexResult) &&
+        reindexResult.length === 2 &&
+        log(
+          'initialize:init',
+          `${reindexResult[0].value} (${reindexResult[0].result}) / ${reindexResult[1].value} (${reindexResult[1].result})`,
+          'debug'
+        );
     } catch (error) {
       log('initialize:init', error.message || error);
-      server.log(
-        [blueWazuh, 'initialize:init', 'error'],
-        error.message || error
-      );
+      server.log(initializeErrorLogColors, error.message || error);
       return Promise.reject(error);
     }
   };
@@ -290,7 +303,7 @@ export function Initialize(server) {
     } catch (error) {
       log('initialize:createKibanaTemplate', error.message || error);
       server.log(
-        [blueWazuh, 'initialize', 'error'],
+        initializeErrorLogColors,
         'Exception: ' + error.message || error
       );
     }
@@ -372,18 +385,11 @@ export function Initialize(server) {
           "Didn't find " + wzWrapper.WZ_KIBANA_INDEX + ' index...',
           'info'
         );
-        server.log(
-          [blueWazuh, 'initialize', 'info'],
-          "Didn't find " + wzWrapper.WZ_KIBANA_INDEX + ' index...'
-        );
         await getTemplateByName();
       }
     } catch (error) {
       log('initialize:checkKibanaStatus', error.message || error);
-      server.log(
-        [blueWazuh, 'initialize (checkKibanaStatus)', 'error'],
-        error.message || error
-      );
+      server.log(initializeErrorLogColors, error.message || error);
     }
   };
 
@@ -399,354 +405,6 @@ export function Initialize(server) {
         'debug'
       );
       setTimeout(() => checkStatus(), 3000);
-    }
-  };
-
-  const updateClusterInformation = async config => {
-    try {
-      await wzWrapper.updateWazuhIndexDocument(null, config.id, {
-        doc: {
-          api_user: config.api_user,
-          api_password: config.api_password,
-          url: config.url,
-          api_port: config.api_port,
-          manager: config.manager,
-          cluster_info: {
-            manager: config.manager,
-            node: config.cluster_info.node,
-            cluster: config.cluster_info.cluster,
-            status: config.cluster_info.status
-          }
-        }
-      });
-
-      log(
-        'initialize:updateClusterInformation',
-        `Successfully updated proper cluster information for ${config.manager}`,
-        'debug'
-      );
-
-      return;
-    } catch (error) {
-      return Promise.reject(
-        new Error(
-          `Could not update proper cluster information for ${
-            config.manager
-          } due to ${error.message || error}`
-        )
-      );
-    }
-  };
-
-  const updateSingleHostInformation = async config => {
-    try {
-      await wzWrapper.updateWazuhIndexDocument(null, config.id, {
-        doc: {
-          api_user: config.api_user,
-          api_password: config.api_password,
-          url: config.url,
-          api_port: config.api_port,
-          manager: config.manager,
-          cluster_info: {
-            manager: config.manager,
-            node: 'nodata',
-            cluster: 'nodata',
-            status: 'disabled'
-          }
-        }
-      });
-
-      log(
-        'initialize:updateSingleHostInformation',
-        `Successfully updated proper single host information for ${config.manager}`,
-        'debug'
-      );
-
-      return;
-    } catch (error) {
-      return Promise.reject(
-        new Error(
-          `Could not update proper single host information for ${
-            config.manager
-          } due to ${error.message || error}`
-        )
-      );
-    }
-  };
-
-  const getNodeInformation = async config => {
-    try {
-      const response = await needle(
-        'get',
-        `${config.url}:${config.api_port}/cluster/node`,
-        {},
-        {
-          headers: {
-            'wazuh-app-version': packageJSON.version
-          },
-          username: config.api_user,
-          password: Buffer.from(config.api_password, 'base64').toString(
-            'ascii'
-          ),
-          rejectUnauthorized: !config.insecure
-        }
-      );
-
-      if (!response.body.error) {
-        config.cluster_info = {};
-        config.cluster_info.status = 'enabled';
-        config.cluster_info.manager = config.manager;
-        config.cluster_info.node = response.body.data.node;
-        config.cluster_info.cluster = response.body.data.cluster;
-      } else if (response.body.error) {
-        log(
-          'initialize:getNodeInformation',
-          `Could not get cluster/node information for ${
-            config.manager
-          } due to ${response.body.error || response.body}`
-        );
-        server.log(
-          [blueWazuh, 'reindex', 'error'],
-          `Could not get cluster/node information for ${config.manager}`
-        );
-      }
-
-      return;
-    } catch (error) {
-      return Promise.reject(error);
-    }
-  };
-
-  const getClusterStatus = async config => {
-    try {
-      const response = await needle(
-        'get',
-        `${config.url}:${config.api_port}/cluster/status`,
-        {},
-        {
-          // Checking the cluster status
-          headers: {
-            'wazuh-app-version': packageJSON.version
-          },
-          username: config.api_user,
-          password: Buffer.from(config.api_password, 'base64').toString(
-            'ascii'
-          ),
-          rejectUnauthorized: !config.insecure
-        }
-      );
-
-      if (!response.body.error) {
-        if (response.body.data.enabled === 'yes') {
-          // If cluster mode is active
-          return getNodeInformation(config);
-        } else {
-          // Cluster mode is not active
-          config.cluster_info = {};
-          config.cluster_info.status = 'disabled';
-          config.cluster_info.cluster = 'Disabled';
-          config.cluster_info.manager = config.manager;
-        }
-
-        // We filled data for the API, let's insert it now
-        return updateClusterInformation(config);
-      } else {
-        log(
-          'initialize:getClusterStatus',
-          `Could not get cluster/status information for ${config.manager}`
-        );
-        server.log(
-          [blueWazuh, 'reindex', 'error'],
-          `Could not get cluster/status information for ${config.manager}`
-        );
-        return;
-      }
-    } catch (error) {
-      return Promise.reject(error);
-    }
-  };
-
-  const checkVersion = async config => {
-    try {
-      const response = await needle(
-        'get',
-        `${config.url}:${config.api_port}/version`,
-        {},
-        {
-          headers: {
-            'wazuh-app-version': packageJSON.version
-          },
-          username: config.api_user,
-          password: Buffer.from(config.api_password, 'base64').toString(
-            'ascii'
-          ),
-          rejectUnauthorized: !config.insecure
-        }
-      );
-
-      log(
-        'initialize:checkVersion',
-        `API is reachable ${config.manager}`,
-        'debug'
-      );
-
-      if (parseInt(response.body.error) === 0 && response.body.data) {
-        return getClusterStatus(config);
-      } else {
-        log(
-          'initialize:checkVersion',
-          `The API responded with some kind of error for ${config.manager}`
-        );
-        server.log(
-          [blueWazuh, 'reindex', 'error'],
-          `The API responded with some kind of error for ${config.manager}`
-        );
-        return;
-      }
-    } catch (error) {
-      log(
-        'initialize:checkVersion',
-        `API is NOT reachable ${config.manager} due to ${error.message ||
-          error}`
-      );
-      server.log(
-        [blueWazuh, 'reindex', 'info'],
-        `API is NOT reachable ${config.manager}`
-      );
-      // We weren't able to reach the API, reorganize data and fill with sample node and cluster name information
-      return updateSingleHostInformation(config);
-    }
-  };
-
-  const reachAPI = async config => {
-    try {
-      const id = config._id;
-      config = config._source;
-      config.id = id;
-      log('initialize:reachAPI', `Reaching ${config.manager}`, 'debug');
-      server.log([blueWazuh, 'reindex', 'info'], `Reaching ${config.manager}`);
-
-      if (config.cluster_info === undefined) {
-        // No cluster_info in the API configuration data -> 2.x version
-        await checkVersion(config);
-      } else {
-        // 3.x version
-        // Nothing to be done, cluster_info is present
-        log(
-          'initialize:reachAPI',
-          `Nothing to be done for ${config.manager} as it is already a 3.x version.`,
-          'debug'
-        );
-      }
-
-      return;
-    } catch (error) {
-      return Promise.reject(error);
-    }
-  };
-
-  // Reindex a .wazuh index from 2.x-5.x or 3.x-5.x to .wazuh and .wazuh-version in 3.x-6.x
-  const reindexOldVersion = async () => {
-    try {
-      log(
-        'initialize:reindexOldVersion',
-        `Old version detected. Proceeding to reindex.`,
-        'debug'
-      );
-
-      const configuration = {
-        source: {
-          index: '.wazuh',
-          type: 'wazuh-configuration'
-        },
-        dest: {
-          index: '.old-wazuh'
-        }
-      };
-
-      // Backing up .wazuh index
-      await wzWrapper.reindexWithCustomConfiguration(configuration);
-
-      log(
-        'initialize:reindexOldVersion',
-        'Successfully backed up .wazuh index',
-        'debug'
-      );
-
-      // And...this response does not take into acount new index population so...let's wait for it
-      setTimeout(() => swapIndex(), 3000);
-    } catch (error) {
-      log(
-        'initialize:reindexOldVersion',
-        `Could not begin the reindex process due to ${error.message || error}`
-      );
-      server.log(
-        [blueWazuh, 'reindex', 'error'],
-        `Could not begin the reindex process due to ${error.message || error}`
-      );
-    }
-  };
-
-  const swapIndex = async () => {
-    try {
-      // Deleting old .wazuh index
-      log('initialize:swapIndex', 'Deleting old .wazuh index', 'debug');
-
-      await wzWrapper.deleteIndexByName('.wazuh');
-
-      const configuration = {
-        source: {
-          index: '.old-wazuh',
-          type: 'wazuh-configuration'
-        },
-        dest: {
-          index: '.wazuh'
-        },
-        script: {
-          source: 'ctx._id = new Date().getTime()',
-          lang: 'painless'
-        }
-      };
-
-      log('initialize:swapIndex', 'Reindexing into the new .wazuh', 'debug');
-
-      // Reindexing from .old-wazuh where the type of document is wazuh-configuration into the new index .wazuh
-      await wzWrapper.reindexWithCustomConfiguration(configuration);
-
-      // Now we need to properly replace the cluster_info into the configuration -> improvement: pagination?
-      // And...this response does not take into acount new index population so...let's wait for it
-      setTimeout(() => reachAPIs(), 3000);
-    } catch (error) {
-      log(
-        'initialize:swapIndex',
-        `Could not reindex the new .wazuh due to ${error.message || error}`
-      );
-      server.log(
-        [blueWazuh, 'reindex', 'error'],
-        `Could not reindex the new .wazuh due to ${error.message || error}`
-      );
-    }
-  };
-
-  const reachAPIs = async () => {
-    try {
-      const data = await wzWrapper.searchIndexByName('.wazuh');
-      const promises = [];
-      for (let item of data.hits.hits) {
-        promises.push(reachAPI(item));
-      }
-      await Promise.all(promises);
-    } catch (error) {
-      log(
-        'initialize[reachAPIs]',
-        `Something happened while getting old API configuration data due to ${error.message ||
-          error}`
-      );
-      server.log(
-        [blueWazuh, 'reindex', 'error'],
-        `Something happened while getting old API configuration data due to ${error.message ||
-          error}`
-      );
     }
   };
 
