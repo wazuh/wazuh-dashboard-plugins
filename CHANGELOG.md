@@ -7,6 +7,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 ### Added
 
+- Support for Wazuh v3.10.0.
 - Added an interactive guide for registering agents, things are now easier for the user, guiding it through the steps needed ending in a _copy & paste_ snippet for deploying his agent [#1468](https://github.com/wazuh/wazuh-kibana-app/issues/1468).
 - Added new dashboards for the recently added regulatory compliance groups into the Wazuh core. They are HIPAA and NIST-800-53 [#1468](https://github.com/wazuh/wazuh-kibana-app/issues/1448), [#1638]( https://github.com/wazuh/wazuh-kibana-app/issues/1638).
 - Make the app work under a custom Kibana space [#1234](https://github.com/wazuh/wazuh-kibana-app/issues/1234), [#1450](https://github.com/wazuh/wazuh-kibana-app/issues/1450).
@@ -33,13 +34,13 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 ### Fixed
 
-- Alerts search bar fixed for Kibana 7.3, queries were not being applied as expected [#1686](https://github.com/wazuh/wazuh-kibana-app/issues/1686).
+- Alerts search bar fixed for Kibana v7.3.0, queries were not being applied as expected [#1686](https://github.com/wazuh/wazuh-kibana-app/issues/1686).
 - Hide attributes field from non-Windows agents in the FIM table [#1710](https://github.com/wazuh/wazuh-kibana-app/issues/1710).
 - Fixed broken view in Management > Configuration > Amazon S3 > Buckets, some information was missing [#1675](https://github.com/wazuh/wazuh-kibana-app/issues/1675).
 - Keep user's filters when switching from Discover to panel [#1685](https://github.com/wazuh/wazuh-kibana-app/issues/1685).
 - Reduce load time and amount of data to be fetched in _Management > Cluster monitoring_ section avoiding possible timeouts [#1663](https://github.com/wazuh/wazuh-kibana-app/issues/1663).
 - Restored _Remove column_ feature in Discover tabs [#1702](https://github.com/wazuh/wazuh-kibana-app/issues/1702).
-- Apps using Kibana 7.3 have a bug once the user goes back from _Agent > FIM > Files_ to _Agent > FIM > dashboard_, filters disappear, now it's working properly [#1700](https://github.com/wazuh/wazuh-kibana-app/issues/1700).
+- Apps using Kibana v7.3.0 had a bug once the user goes back from _Agent > FIM > Files_ to _Agent > FIM > dashboard_, filters disappear, now it's working properly [#1700](https://github.com/wazuh/wazuh-kibana-app/issues/1700).
 - Fixed visual bug in _Management > Cluster monitoring_ and a button position [1e3b748](https://github.com/wazuh/wazuh-kibana-app/commit/1e3b748f11b43b2e7956b830269b6d046d74d12c).
 - The app installation date was not being updated properly, now it's fixed [#1692](https://github.com/wazuh/wazuh-kibana-app/issues/1692).
 - Fixed _Network interfaces_ table in Inventory section, the table was not paginating [#1474](https://github.com/wazuh/wazuh-kibana-app/issues/1474).
