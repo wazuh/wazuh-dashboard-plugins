@@ -12,6 +12,7 @@
 import Chrome from 'selenium-webdriver/chrome';
 import {WebDriver, Builder, By, until} from 'selenium-webdriver';
 import Chromedriver from 'chromedriver';
+import { DriverService } from 'selenium-webdriver/remote';
 
 interface Report {
   uri: string,
@@ -43,6 +44,7 @@ class AutoReport {
   // tTo: string;
   driver!: WebDriver;
   controller!: string;
+  driverService!: DriverService;
 
   dateSelectors = {
     today: '[data-test-subj="superDatePickerCommonlyUsed_Today"]',
@@ -128,11 +130,20 @@ class AutoReport {
    * @returns {WebDriver}
    */
   async createDriver() {
-    Chrome.setDefaultService(new Chrome.ServiceBuilder(Chromedriver.path).build());
+    this.driverService = new Chrome.ServiceBuilder(Chromedriver.path).build();
+    Chrome.setDefaultService(this.driverService);
     return await new Builder()
     .forBrowser('chrome')
     .setChromeOptions(new Chrome.Options().headless().windowSize(this.screen))
     .build();
+  }
+
+  /**
+   * Close the webdriver and remove all instances of Chromedriver
+   */
+  async quitDriver() {
+    await this.driver.quit();
+    await this.driverService.kill();
   }
 
   /**
@@ -173,7 +184,7 @@ class AutoReport {
    */
   async openWazuh(){
     this.driver.get(this.url);
-    await this.driver.wait(until.urlContains(this.controller), 10000);
+    await this.driver.wait(until.urlContains(this.controller), 30000);
   }
 
   /**
@@ -312,10 +323,10 @@ export class OverviewAutoReport extends AutoReport {
       await this.setTime();
       await this.setFilters();
       await this.generateReport();
-      await this.driver.quit();
+      await this.quitDriver();
       return { finish: true, message: 'Reporting success.' };
     } catch (err) {
-      await this.driver.quit();
+      await this.quitDriver();
       return { finish: false, message: `${err}`};
     }
   }
@@ -368,10 +379,10 @@ export class AgentsAutoReport extends AutoReport {
         await this.setFilters();
       }
       await this.generateReport();
-      await this.driver.quit();
+      await this.quitDriver();
       return { finish: true, message: 'Reporting success.' };
     } catch (err) {
-      await this.driver.quit();
+      await this.quitDriver();
       return { finish: false, message: `${err}`};
     }
   }
