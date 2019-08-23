@@ -261,7 +261,7 @@ export function Initialize(server) {
         source.lastRestart = currentDate;
 
         // If this function fails, it throws an exception
-        //fs.writeFileSync(wazuhVersion, JSON.stringify(source), 'utf-8');
+        fs.writeFileSync(wazuhVersion, JSON.stringify(source), 'utf-8');
       }
     } catch (error) {
       return Promise.reject(error);
