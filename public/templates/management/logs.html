@@ -59,27 +59,27 @@
             </span>
         </div>
 
-        <button type="submit" aria-label="Search"
-            class="euiFlexItem euiFlexItem--flexGrowZero height-35 kuiButton kuiButton--secondary wz-margin-left-8"
+        <button type="submit" aria-label="Search" class="height-35 kuiButton kuiButton--secondary wz-margin-left-8"
             ng-click="ctrl.search(ctrl.custom_search)">
-            Search
+            <span>Search</span>
         </button>
         <div class="euiFlexItem euiFlexItem--flexGrowZero height-35 wz-margin-left-8">
             <div class="euiFilterGroup"></div>
         </div>
 
-        <button ng-if="!ctrl.realtime"
-            class="euiFlexItem euiFlexItem--flexGrowZero height-35 kuiButton kuiButton--secondary ng-scope wz-margin-left-8"
-            ng-click="ctrl.playRealtime()" aria-label="Play realtime button">
-            <react-component name="EuiIcon" props="{type:'play'}" />
-            Play realtime
+        <button class="height-35 kuiButton  ng-scope wz-margin-left-8"
+            ng-class="{'kuiButton--secondary': !ctrl.realtime, 'kuiButton--danger': ctrl.realtime}"
+            ng-click="!ctrl.realtime ? ctrl.playRealtime() : ctrl.stopRealtime()" aria-label="Realtime button">
+            <span ng-if="!ctrl.realtime">
+                <react-component name="EuiIcon" props="{type:'play'}" />
+                Play realtime
+            </span>
+            <span ng-if="ctrl.realtime">
+                <react-component name="EuiIcon" props="{type:'stop'}" />
+                Stop realtime
+            </span>
         </button>
-        <button ng-if="ctrl.realtime"
-            class="euiFlexItem euiFlexItem--flexGrowZero height-35 kuiButton kuiButton--danger ng-scope wz-margin-left-8"
-            ng-click="ctrl.stopRealtime()" aria-label="Stop realtime button">
-            <react-component name="EuiIcon" props="{type:'stop'}" />
-            Stop realtime
-        </button>
+
     </div>
 
     <!-- Logs section -->
@@ -103,13 +103,9 @@
     </div>
     <!-- End Logs section -->
 
-    <div layout="row" class="md-padding-h" ng-if="XMLContent === ''">
-        <div flex class="euiCallOut euiCallOut--warning wz-margin-top-17">
-            <div class="euiCallOutHeader">
-                <react-component name="EuiIcon" props="{type:'help',className:'euiCallOutHeader__title'}" />
-                <span class="euiCallOutHeader__title">No results match your search criteria</span>
-            </div>
-        </div>
+    <div layout="row" layout-padding ng-if="XMLContent === ''">
+        <react-component flex name="EuiCallOut"
+            props="{color:'warning',iconType:'help', title:'No results match your search criteria'}" />
     </div>
 
 </div>

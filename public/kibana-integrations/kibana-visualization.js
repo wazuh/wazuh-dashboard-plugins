@@ -15,7 +15,7 @@ import { getVisualizeLoader } from './loader';
 import { timefilter } from 'ui/timefilter';
 import dateMath from '@elastic/datemath';
 
-const app = uiModules.get('apps/webinar_app', []);
+const app = uiModules.get('app/wazuh', []);
 let lockFields = false;
 app.directive('kbnVis', function() {
   return {
@@ -114,6 +114,12 @@ app.directive('kbnVis', function() {
                 $scope.visID,
                 rawVis[0]
               );
+
+              // Visualization doesn't need the "_source"
+              visualization.searchSource.setField('source', false);
+              // Visualization doesn't need "hits"
+              visualization.searchSource.setField('size', 0);
+
               rawFilters = visualization.searchSource.getField('filter');
 
               // Other case, use the pending one, if it is empty, it won't matter
@@ -167,20 +173,19 @@ app.directive('kbnVis', function() {
             if (!lockFields) {
               try {
                 lockFields = true;
-                errorHandler.info(
-                  'Detected an incomplete index pattern, refreshing all its known fields...'
-                );
                 await genericReq.request(
                   'GET',
                   '/elastic/known-fields/all',
                   {}
                 );
                 lockFields = false;
-                errorHandler.info('Success');
                 return myRender(raw);
               } catch (error) {
                 lockFields = false;
-                throw error;
+                console.log(error.message || error);
+                errorHandler.handle(
+                  'An error occurred fetching new index pattern fields.'
+                );
               }
             }
           } else {

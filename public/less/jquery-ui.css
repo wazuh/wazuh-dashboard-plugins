@@ -26,7 +26,6 @@
   outline: 0;
   line-height: 1.3;
   text-decoration: none;
-  font-size: 100%;
   list-style: none;
 }
 .ui-helper-clearfix:before,
@@ -90,7 +89,6 @@
   margin: 2px 0 0 0;
   padding: 0.5em 0.5em 0.5em 0.7em;
   min-height: 0; /* support: IE7 */
-  font-size: 100%;
 }
 .ui-accordion .ui-accordion-icons {
   padding-left: 2.2em;

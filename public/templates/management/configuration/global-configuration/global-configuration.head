@@ -10,13 +10,10 @@
     <!-- End headline -->
 
     <!-- Global configuration navigation bar -->
-    <md-nav-bar ng-if="!agent || agent.id === '000'" class="wz-nav-bar" md-selected-nav-item="configurationSubTab"
-        nav-bar-aria-label="Global configuration navigation links">
-        <md-nav-item class="wz-nav-item" md-nav-click="switchConfigurationSubTab('global')" name="global">
-            Global</md-nav-item>
-        <md-nav-item class="wz-nav-item" md-nav-click="switchConfigurationSubTab('remote')" name="remote">
-            Remote</md-nav-item>
-    </md-nav-bar>
+    <div ng-if="(!agent || agent.id === '000') && configurationTabsProps" class="md-padding wz-padding-top-0"
+        ng-init="buildProps([{id:'global', name: 'Global'}, {id: 'remote', name: 'Remote'}])">
+        <react-component name="Tabs" props="configurationTabsProps" />
+    </div>
     <!-- End global configuration navigation bar -->
 
     <!-- Loading ring -->

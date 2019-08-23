@@ -22,7 +22,8 @@ export function GroupsController(
   shareAgent,
   groupHandler,
   wzTableFilter,
-  wazuhConfig
+  wazuhConfig,
+  reportingService
 ) {
   $scope.addingGroup = false;
   $scope.$on('groupsIsReloaded', () => {
@@ -236,6 +237,14 @@ export function GroupsController(
     $scope.lookingGroup = false;
     $scope.editingFile = false;
     $scope.$applyAsync();
+  };
+
+  $scope.exportConfiguration = enabledComponents => {
+    reportingService.startConfigReport(
+      $scope.currentGroup,
+      'groupConfig',
+      enabledComponents
+    );
   };
 
   /**
@@ -603,6 +612,18 @@ export function GroupsController(
       errorHandler.handle(error.message || error);
     }
     $scope.$broadcast('wazuhSearch', {});
+  };
+
+  $scope.groupsTabsProps = {
+    clickAction: tab => {
+      if (tab === 'agents') {
+        $scope.goBackToAgents();
+      } else if (tab === 'content') {
+        $scope.goBackFiles();
+      }
+    },
+    selectedTab: $scope.groupsSelectedTab || 'agents',
+    tabs: [{ id: 'agents', name: 'Agents' }, { id: 'content', name: 'Content' }]
   };
 
   // Come from the pencil icon on the groups table

@@ -1,0 +1,80 @@
+<md-content flex layout="column" ng-if="tab === 'nist' && tabView === 'panels'"
+    ng-class="{'no-opacity': resultState !== 'ready' || !rendered}" layout-align="start">
+
+    <!-- View: Panels -->
+
+    <div ng-if="nistReqs" class="wz-margin-10">
+        <react-component name='RequirementCard' props="nistReqs" />
+    </div>
+
+    <div layout="row" layout-align="center stretch" class="height-300">
+        <md-card flex="25" class="wz-md-card" ng-class="{'fullscreen': expandArray[0]}">
+            <md-card-actions layout="row" layout-align="end center" class="wz-card-actions-vis" ng-dblclick="expand(0)">
+                <span class="wz-headline-title">Stats</span>
+                <span flex></span>
+                <span class="cursor-pointer" ng-click="expand(0)">
+                    <react-component name="EuiIcon" props="{type:'expand'}" />
+                </span>
+            </md-card-actions>
+            <md-card-content class="wazuh-column">
+                <kbn-vis id="Wazuh-App-Agents-NIST-Stats" vis-id="'Wazuh-App-Agents-NIST-Stats'"></kbn-vis>
+            </md-card-content>
+        </md-card>
+        <md-card flex="25" class="wz-md-card" ng-class="{'fullscreen': expandArray[1]}">
+            <md-card-actions layout="row" layout-align="end center" class="wz-card-actions-vis" ng-dblclick="expand(1)">
+                <span class="wz-headline-title">Top 10 requirements</span>
+                <span flex></span>
+                <span class="cursor-pointer" ng-click="expand(1)">
+                    <react-component name="EuiIcon" props="{type:'expand'}" />
+                </span>
+            </md-card-actions>
+            <md-card-content class="wazuh-column">
+                <kbn-vis id="Wazuh-App-Agents-NIST-top-10-requirements" vis-id="'Wazuh-App-Agents-NIST-top-10-requirements'"></kbn-vis>
+            </md-card-content>
+        </md-card>
+        <md-card flex="50" class="wz-md-card" ng-class="{'fullscreen': expandArray[2]}">
+            <md-card-actions layout="row" layout-align="end center" class="wz-card-actions-vis" ng-dblclick="expand(2)">
+                <span class="wz-headline-title">Requirements distributed by level</span>
+                <span flex></span>
+                <span class="cursor-pointer" ng-click="expand(2)">
+                    <react-component name="EuiIcon" props="{type:'expand'}" />
+                </span>
+            </md-card-actions>
+            <md-card-content class="wazuh-column">
+                <kbn-vis id="Wazuh-App-Agents-NIST-Requirement-by-level" vis-id="'Wazuh-App-Agents-NIST-Requirement-by-level'"></kbn-vis>
+            </md-card-content>
+        </md-card>
+    </div>
+
+    <div layout="row" layout-align="center stretch" class="height-300">
+        <md-card flex class="wz-md-card" ng-class="{'fullscreen': expandArray[3]}">
+            <md-card-actions layout="row" layout-align="end center" class="wz-card-actions-vis" ng-dblclick="expand(3)">
+                <span class="wz-headline-title">Requirements over time</span>
+                <span flex></span>
+                <span class="cursor-pointer" ng-click="expand(3)">
+                    <react-component name="EuiIcon" props="{type:'expand'}" />
+                </span>
+            </md-card-actions>
+            <md-card-content class="wazuh-column">
+                <kbn-vis id="Wazuh-App-Agents-NIST-Requirements-stacked-overtime" vis-id="'Wazuh-App-Agents-NIST-Requirements-stacked-overtime'">
+                </kbn-vis>
+            </md-card-content>
+        </md-card>
+    </div>
+
+    <div layout="row" layout-align="center stretch" class="height-570">
+        <md-card class="wz-md-card" flex ng-class="{'fullscreen': expandArray[5]}">
+            <md-card-actions layout="row" layout-align="end center" class="wz-card-actions-vis" ng-dblclick="expand(5)">
+                <span class="wz-headline-title">Alerts summary</span>
+                <span flex></span>
+                <span class="cursor-pointer" ng-click="expand(5)">
+                    <react-component name="EuiIcon" props="{type:'expand'}" />
+                </span>
+            </md-card-actions>
+            <md-card-content class="wazuh-column">
+                <kbn-vis vis-id="'Wazuh-App-Agents-NIST-Last-alerts'"></kbn-vis>
+            </md-card-content>
+        </md-card>
+    </div>
+
+</md-content>

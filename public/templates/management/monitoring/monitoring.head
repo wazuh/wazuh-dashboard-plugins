@@ -14,15 +14,9 @@
         <!-- End cluster disabled breadcrumbs -->
 
         <!-- Status and reports navigation bar -->
-        <md-nav-bar class="wz-nav-bar" ng-show="mctrl.tab !== 'welcome'" md-selected-nav-item="mctrl.tab"
-            nav-bar-aria-label="Status and reports navigation links">
-            <md-nav-item class="wz-nav-item" md-nav-click="mctrl.switchTab('status')" name="status">Status</md-nav-item>
-            <md-nav-item class="wz-nav-item" md-nav-click="mctrl.switchTab('logs')" name="logs">Logs</md-nav-item>
-            <md-nav-item class="wz-nav-item" md-nav-click="mctrl.switchTab('monitoring')" name="monitoring">Cluster
-            </md-nav-item>
-            <md-nav-item class="wz-nav-item" md-nav-click="mctrl.switchTab('reporting')" name="reporting">Reporting
-            </md-nav-item>
-        </md-nav-bar>
+        <div ng-show="mctrl.tab !== 'welcome'" class="md-padding-h">
+            <react-component name="Tabs" props="mctrl.managementTabsProps" />
+        </div>
         <!-- End status and reports navigation bar -->
 
         <!-- Cluster disabled section -->
@@ -110,19 +104,13 @@
         <!-- End navigation section -->
 
         <!-- Status and reports navigation bar -->
-        <md-nav-bar ng-if="!loading" class="wz-nav-bar" ng-show="mctrl.tab !== 'welcome'"
-            md-selected-nav-item="mctrl.tab" nav-bar-aria-label="Status and reports navigation links">
-            <md-nav-item class="wz-nav-item" md-nav-click="mctrl.switchTab('status')" name="status">Status</md-nav-item>
-            <md-nav-item class="wz-nav-item" md-nav-click="mctrl.switchTab('logs')" name="logs">Logs</md-nav-item>
-            <md-nav-item class="wz-nav-item" md-nav-click="mctrl.switchTab('monitoring')" name="monitoring">Cluster
-            </md-nav-item>
-            <md-nav-item class="wz-nav-item" md-nav-click="mctrl.switchTab('reporting')" name="reporting">Reporting
-            </md-nav-item>
-        </md-nav-bar>
+        <div ng-if="!loading"  ng-show="mctrl.tab !== 'welcome'" class="md-padding-h">
+            <react-component name="Tabs" props="mctrl.managementTabsProps" />
+        </div>
         <!-- End status and reports navigation bar -->
 
         <!-- Discover search bar section -->
-        <kbn-dis ng-show="!loading && (!showNodes || currentNode)" class="wz-margin-top-10"></kbn-dis>
+        <kbn-dis ng-show="!loading && (!showNodes || currentNode)" class="wz-margin-top-10 monitoring-discover"></kbn-dis>
         <!-- End Discover search bar section -->
 
         <!-- Loading status section -->

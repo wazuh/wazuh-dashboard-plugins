@@ -1,9 +1,4 @@
 <div flex="auto" layout="column" ng-cloak ng-controller="overviewController as octrl">
-
-    <!-- Top navbar section -->
-    <wz-menu ng-init="menuNavItem = 'overview'"></wz-menu>
-    <!-- End top navbar section -->
-
     <!-- Navigation section -->
     <div layout="row" layout-align="start center">
         <!-- Breadcrumbs -->
@@ -22,7 +17,7 @@
         <!-- End separator -->
 
         <!-- Reporting button section -->
-        <div ng-show="octrl.tab !== 'welcome' && octrl.tabView === 'panels'">
+        <div ng-if="octrl.tab !== 'welcome' && octrl.tabView === 'panels'">
             <!-- Report button -->
             <button class="kuiButton kuiButton--secondary wz-margin-right-8 small" tooltip="Generate report"
                 tooltip-placement="bottom"
@@ -35,79 +30,26 @@
         <!-- End Reporting buttons section -->
 
         <!-- Discover/Dashboard buttons section -->
-        <div ng-show="octrl.tab !== 'welcome'" class="wz-margin-right-8">
+        <div ng-if="octrl.tab !== 'welcome'" class="wz-margin-right-8">
             <!-- Dashboard button -->
-            <button ng-if="octrl.tabView === 'discover'" class="kuiButton kuiButton--secondary small"
-                ng-click="octrl.switchSubtab('panels')" aria-label="Dashboard button">
-                <i class="fa fa-fw fa-th" aria-hidden="true"></i> Dashboard
-            </button>
-
-            <!-- Discover button -->
-            <button ng-if="octrl.tabView === 'panels'" class="kuiButton kuiButton--secondary small"
-                ng-click="octrl.switchSubtab('discover')" aria-label="Discover button">
-                <i class="fa fa-fw fa-compass" aria-hidden="true"></i> Discover
+            <button class="kuiButton kuiButton--secondary small"
+                ng-click="octrl.tabView === 'discover' ? octrl.switchSubtab('panels') : octrl.switchSubtab('discover')"
+                aria-label="Dashboard button">
+                <span ng-if="octrl.tabView === 'discover'"><i class="fa fa-fw fa-th" aria-hidden="true"></i>
+                    Dashboard</span>
+                <span ng-if="octrl.tabView === 'panels'"><i class="fa fa-fw fa-compass" aria-hidden="true"></i>
+                    Discover</span>
             </button>
         </div>
         <!-- End Discover/Dashboard buttons section -->
     </div>
     <!-- End navigation section -->
 
-    <!-- Host monitoring navigation bar -->
-    <md-nav-bar ng-if="octrl.inArray(octrl.tab, octrl.hostMonitoringTabs)" class="wz-nav-bar"
-        ng-show="octrl.tab !== 'welcome'" md-selected-nav-item="octrl.tab"
-        nav-bar-aria-label="Host monitoring navigation links">
-        <md-nav-item class="wz-nav-item" md-nav-click="octrl.switchTab('general',true)" name="general">
-            {{ octrl.tabNames['general'] }}</md-nav-item>
-        <md-nav-item class="wz-nav-item" md-nav-click="octrl.switchTab('fim',true)" name="fim">
-            {{ octrl.tabNames['fim'] }}</md-nav-item>
-        <md-nav-item ng-show="octrl.extensions.aws" class="wz-nav-item" md-nav-click="octrl.switchTab('aws',true)"
-            name="aws">{{ octrl.tabNames['aws'] }}</md-nav-item>
-    </md-nav-bar>
-    <!-- End Host monitoring navigation bar -->
-
-    <!-- System audit navigation bar -->
-    <md-nav-bar
-        ng-if="octrl.inArray(octrl.tab, octrl.systemAuditTabs) && (octrl.extensions.audit || octrl.extensions.oscap || octrl.extensions.ciscat)"
-        class="wz-nav-bar" ng-show="octrl.tab !== 'welcome'" md-selected-nav-item="octrl.tab"
-        nav-bar-aria-label="System audit navigation links">
-        <md-nav-item class="wz-nav-item" md-nav-click="octrl.switchTab('pm',true)" name="pm">{{ octrl.tabNames['pm'] }}
-        </md-nav-item>
-        <md-nav-item ng-show="octrl.extensions.audit" class="wz-nav-item" md-nav-click="octrl.switchTab('audit',true)"
-            name="audit">{{ octrl.tabNames['audit'] }}</md-nav-item>
-        <md-nav-item ng-show="octrl.extensions.oscap" class="wz-nav-item" md-nav-click="octrl.switchTab('oscap',true)"
-            name="oscap">{{ octrl.tabNames['oscap'] }}</md-nav-item>
-        <md-nav-item ng-show="octrl.extensions.ciscat" class="wz-nav-item" md-nav-click="octrl.switchTab('ciscat',true)"
-            name="ciscat">{{ octrl.tabNames['ciscat'] }}</md-nav-item>
-    </md-nav-bar>
-    <!-- End System audit navigation bar -->
-
-    <!-- Security navigation bar -->
-    <md-nav-bar ng-if="octrl.inArray(octrl.tab, octrl.securityTabs)" class="wz-nav-bar"
-        ng-show="octrl.tab !== 'welcome'" md-selected-nav-item="octrl.tab"
-        nav-bar-aria-label="Security navigation links">
-        <md-nav-item class="wz-nav-item" md-nav-click="octrl.switchTab('vuls',true)" name="vuls">
-            {{ octrl.tabNames['vuls'] }}</md-nav-item>
-        <md-nav-item ng-show="octrl.extensions.virustotal" class="wz-nav-item"
-            md-nav-click="octrl.switchTab('virustotal',true)" name="virustotal">{{ octrl.tabNames['virustotal'] }}
-        </md-nav-item>
-        <md-nav-item ng-show="octrl.extensions.osquery" class="wz-nav-item"
-            md-nav-click="octrl.switchTab('osquery',true)" name="osquery">{{ octrl.tabNames['osquery'] }}</md-nav-item>
-        <md-nav-item ng-show="octrl.extensions.docker" class="wz-nav-item" md-nav-click="octrl.switchTab('docker',true)"
-            name="docker">
-            {{ octrl.tabNames['docker'] }}</md-nav-item>
-    </md-nav-bar>
-    <!-- End Security navigation bar -->
-
-    <!-- Compliance navigation bar -->
-    <md-nav-bar ng-if="octrl.inArray(octrl.tab, octrl.complianceTabs) && octrl.extensions.pci && octrl.extensions.gdpr"
-        class="wz-nav-bar" ng-show="octrl.tab !== 'welcome'" md-selected-nav-item="octrl.tab"
-        nav-bar-aria-label="Compliance navigation links">
-        <md-nav-item ng-show="octrl.extensions.pci" class="wz-nav-item" md-nav-click="octrl.switchTab('pci',true)"
-            name="pci">{{ octrl.tabNames['pci'] }}</md-nav-item>
-        <md-nav-item ng-show="octrl.extensions.gdpr" class="wz-nav-item" md-nav-click="octrl.switchTab('gdpr',true)"
-            name="gdpr">{{ octrl.tabNames['gdpr'] }}</md-nav-item>
-    </md-nav-bar>
-    <!-- End Compliance navigation bar -->
+    <!-- Navigation bar -->
+    <div ng-if="octrl.overviewTabsProps">
+        <react-component name="Tabs" props="octrl.overviewTabsProps" />
+    </div>
+    <!-- End of navigation bar -->
 
     <!-- Discover search bar section -->
     <kbn-dis ng-show="octrl.tab !== 'welcome'"></kbn-dis>
@@ -132,12 +74,8 @@
     <!-- No results section -->
     <div layout="row" class="wz-margin-top-10 wz-margin-right-8 wz-margin-left-8" ng-if="octrl.tab !== 'welcome'"
         ng-show="resultState === 'none' && octrl.tabView === 'panels'">
-        <div flex class="euiCallOut euiCallOut--warning">
-            <div class="euiCallOutHeader">
-                <react-component name="EuiIcon" props="{type:'help',className:'euiCallOutHeader__title'}" />
-                <span class="euiCallOutHeader__title">There are no results for selected time range. Try another
-                    one.</span>
-            </div>
-        </div>
+        <react-component flex name="EuiCallOut"
+            props="{color:'warning',iconType:'help', title:'There are no results for selected time range. Try another
+            one.'}" />
     </div>
     <!-- No results section -->

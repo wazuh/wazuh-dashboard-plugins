@@ -434,6 +434,11 @@ app.directive('wzTagFilter', function() {
         }
       });
       $('#wz-search-filter-bar-input').attr('autocomplete', 'off');
+
+      $scope.$on('reloadSearchFilterBar', () => {
+        buildQuery($scope.groupedTagList);
+        $scope.$applyAsync();
+      });
       load();
     },
     template

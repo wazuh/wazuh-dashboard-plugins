@@ -3,142 +3,24 @@
     <!-- Headline -->
     <div layout="column" layout-padding>
         <span class="font-size-18">
-            <react-component name="EuiIcon" props="{type:'visControls'}" /> Wazuh API configuration
+            <react-component flex name="EuiIcon" props="{type:'visControls'}" /> Wazuh API configuration
         </span>
         <span class="md-subheader">
             Use Wazuh API settings to connect the Kibana plugin to your Wazuh manager or cluster
         </span>
     </div>
     <!-- End headline -->
-
-    <!-- API configuration card section -->
-    <div layout="row" layout-align="start start">
-        <md-card flex class="wz-md-card">
-            <md-card-content>
-                <!-- API entries headings section -->
-                <div layout="row" class="wz-padding-bottom-14" ng-if="ctrl.apiEntries.length">
-                    <p flex="15" class="wz-text-bold">Cluster</p>
-                    <p flex="20" class="wz-text-bold">Manager</p>
-                    <p flex="15" class="wz-text-bold">API URL</p>
-                    <p flex="15" class="wz-text-bold">API Port</p>
-                    <p flex="15" class="wz-text-bold">User</p>
-                    <p flex="20" class="wz-text-bold">Actions</p>
-                </div>
-                <!-- End API entries headings section -->
-
-                <!-- API entries list section -->
-                <div ng-repeat="entry in ctrl.apiEntries">
-                    <!-- API entry -->
-                    <div layout="row" layout-align="space-between center" class="wz-padding-top-10 wz-padding-bottom-14">
-                        <p flex="15">
-                            <i ng-show="(entry._id === ctrl.currentDefault)" tooltip="This is the default Manager"
-                                tooltip-placement="right" class="fa fa-star wz-color-orange" aria-hidden="true"></i>
-                            {{entry._source.cluster_info.cluster}}</p>
-                        <p flex="20">{{entry._source.cluster_info.manager}}</p>
-                        <p flex="15">{{entry._source.url}}</p>
-                        <p flex="15">{{entry._source.api_port}}</p>
-                        <p flex="15">{{entry._source.api_user}}</p>
-                        <p flex="20">
-                            <react-component name="EuiIcon" class="cursor-pointer" props="{type:'starEmpty'}" ng-click="ctrl.setDefault(entry)"
-                                tooltip="Set as default Manager" />
-                            <react-component name="EuiIcon" class="cursor-pointer" props="{type:'refresh'}" ng-click="ctrl.checkManager(entry)"
-                                tooltip="Check connection" />
-                            <react-component name="EuiIcon" class="cursor-pointer" props="{type:'pencil', color:'primary'}"
-                                ng-click="ctrl.toggleEditor(entry)" tooltip="Edit" />
-                            <react-component name="EuiIcon" class="cursor-pointer" props="{type:'trash', color:'danger'}"
-                                ng-click="ctrl.removeManager(entry)" tooltip="Remove manager" />
-                        </p>
-                    </div>
-                    <!-- End API entry -->
-                    <!-- Edit API form -->
-                    <div layout="row" layout-align="space-between center" ng-if="ctrl.showEditForm[entry._id] && ctrl.isEditing">
-                        <form flex ng-submit="ctrl.updateSettings(entry)" layout="column" layout-align="start stretch"
-                            class="margin-top-30">
-                            <!-- Input section -->
-                            <md-input-container class="wz-input-container">
-                                <label>Username</label>
-                                <input ng-model="ctrl.formUpdate.user" ng-init="formUpdate.user=entry._source.api_user"
-                                    type="text" placeholder="" aria-label="username" required />
-                            </md-input-container>
-                            <md-input-container class="wz-input-container">
-                                <label>Password</label>
-                                <input ng-model="ctrl.formUpdate.password" type="password" placeholder="" aria-label="password"
-                                    required />
-                            </md-input-container>
-                            <md-input-container class="wz-input-container">
-                                <label>URL</label>
-                                <input ng-model="ctrl.formUpdate.url" ng-init="formUpdate.url=entry._source.url" type="url"
-                                    placeholder="http(s)://" aria-label="full url" required />
-                            </md-input-container>
-                            <md-input-container class="wz-input-container">
-                                <label>Port</label>
-                                <input ng-model="ctrl.formUpdate.port" ng-init="formUpdate.port=entry._source.api_port"
-                                    type="text" placeholder="" aria-label="port" required />
-                            </md-input-container>
-                            <!-- Button and errors section -->
-                            <div layout="row" layout-align="center center" ng-if="ctrl.messageError">
-                                <p class="color-f9">{{ctrl.messageErrorUpdate}}</p>
-                            </div>
-                            <div layout="row" layout-align="center center">
-                                <md-button type="submit" class="wz-button md-primary" aria-label="Update API button">
-                                    <react-component name="EuiIcon" props="{type:'save'}" /> Save
-                                </md-button>
-                            </div>
-                        </form>
-                    </div>
-                    <!-- End edit API form -->
-                </div>
-                <!-- End API entries list section -->
-
-                <!-- Add API button section -->
-                <div ng-show="!ctrl.isUpdating() && ctrl.apiEntries.length" layout="row" layout-align="center center"
-                    class="wz-padding-top-10">
-                    <md-button ng-click="ctrl.switch()" class="wz-button md-primary" aria-label="Add new API button">
-                        <react-component name="EuiIcon" props="{type:'plusInCircle'}" /> Add new
-                    </md-button>
-                </div>
-                <!-- End add API button section -->
-
-                <!-- Add API section-->
-                <div layout="row" ng-show="!currentAPI || (ctrl.addManagerContainer && !ctrl.isEditing) || !ctrl.apiEntries.length">
-                    <!-- Add API form -->
-                    <form flex ng-submit="ctrl.saveSettings()" layout="column" layout-align="start stretch" class="margin-top-30">
-                        <!-- Input section -->
-                        <md-input-container class="wz-input-container">
-                            <label>Username</label>
-                            <input ng-model="ctrl.formData.user" type="text" placeholder="" aria-label="username"
-                                required />
-                        </md-input-container>
-                        <md-input-container class="wz-input-container">
-                            <label>Password</label>
-                            <input ng-model="ctrl.formData.password" type="password" placeholder="" aria-label="password"
-                                required />
-                        </md-input-container>
-                        <md-input-container class="wz-input-container">
-                            <label>URL</label>
-                            <input ng-model="ctrl.formData.url" type="url" placeholder="http(s)://" aria-label="full url"
-                                required />
-                        </md-input-container>
-                        <md-input-container class="wz-input-container">
-                            <label>Port</label>
-                            <input ng-model="ctrl.formData.port" type="text" placeholder="" aria-label="port" required />
-                        </md-input-container>
-                        <!-- Button and errors section -->
-                        <div layout="row" layout-align="center center" ng-if="ctrl.messageError">
-                            <p class="color-f9">{{ctrl.messageError}}</p>
-                        </div>
-                        <div layout="row" layout-align="center center">
-                            <md-button type="submit" class="wz-button md-primary" aria-label="Save API button">
-                                <react-component name="EuiIcon" props="{type:'save'}" /> Save
-                            </md-button>
-                        </div>
-                    </form>
-                    <!-- End add API form -->
-                </div>
-                <!-- End add API section-->
-            </md-card-content>
-        </md-card>
+    <div layout="row" layout-padding ng-if="ctrl.apiTableProps.apiEntries.length">
+        <react-component name="ApiTable" props="ctrl.apiTableProps" />
     </div>
-    <!-- End API configuration card section -->
+
+    <!-- Add API section-->
+    <div layout="row" layout-padding
+        ng-if="!currentAPI || (ctrl.addManagerContainer && !ctrl.isEditing) || !ctrl.apiEntries.length">
+        <react-component flex name="AddApi" props="ctrl.addApiProps" />
+        <!-- End add API form -->
+    </div>
+    <!-- End add API section-->
 
 </div>
+<!-- End API configuration card section -->

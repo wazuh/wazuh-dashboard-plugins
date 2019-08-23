@@ -86,6 +86,7 @@ app.directive('wzListManage', function() {
       const fetch = () => {
         try {
           $scope.filterTable();
+          $scope.$applyAsync();
           return;
         } catch (error) {
           errorHandler.handle(error.message || error);
@@ -228,7 +229,7 @@ app.directive('wzListManage', function() {
         $scope.removingEntry = false;
         fetch();
         $scope.setPage(
-          $scope.pagedItems.length - 1 >= $scope.n ? page : page - 1
+          $scope.pagedItems.length - 1 < $scope.n ? page - 1 : page
         );
       };
 

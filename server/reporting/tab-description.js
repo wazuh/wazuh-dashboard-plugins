@@ -50,6 +50,16 @@ export const TabDescription = {
     description:
       'General Data Protection Regulation (GDPR) sets guidelines for processing of personal data.'
   },
+  hipaa: {
+    title: 'HIPAA',
+    description:
+      'Health Insurance Portability and Accountability Act of 1996 (HIPAA) provides data privacy and security provisions for safeguarding medical information.'
+  },
+  nist: {
+    title: 'NIST 800-53',
+    description:
+      'National Institute of Standards and Technology Special Publication 800-53 (NIST 800-53) sets guidelines for federal information systems.'
+  },
   ciscat: {
     title: 'CIS-CAT',
     description:

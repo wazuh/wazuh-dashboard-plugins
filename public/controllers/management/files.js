@@ -46,7 +46,6 @@ export class FilesController {
       this.$scope.viewingDetail = this.$scope.mctrl.showFile.parameters.viewingDetail;
     }
     this.$scope.mctrl.showFile = false;
-
     this.$scope.$on('editFile', (ev, params) => {
       this.$scope.editorReadOnly = false;
       this.editFile(params);

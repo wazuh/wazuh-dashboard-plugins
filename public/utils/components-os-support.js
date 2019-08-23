@@ -1,5 +1,5 @@
 /*
- * Wazuh app - Wazuh table directive
+ * Wazuh app - Components compatibility operative system
  * Copyright (C) 2015-2019 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -9,5 +9,10 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import '../wz-table/wz-table-filter-service';
-import './wz-data-table-directive';
+
+export const UnsupportedComponents = {
+  linux: [],
+  windows: ['audit', 'oscap', 'vuls', 'docker'],
+  darwin: ['audit', 'oscap', 'vuls', 'docker'],
+  other: ['audit', 'oscap', 'vuls', 'docker']
+};

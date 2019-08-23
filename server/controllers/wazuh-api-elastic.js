@@ -125,7 +125,6 @@ export class WazuhApiElasticCtrl {
       api_port: payload.port,
       insecure: payload.insecure,
       component: 'API',
-      active: payload.active,
       cluster_info: payload.cluster_info,
       extensions: payload.extensions
     };

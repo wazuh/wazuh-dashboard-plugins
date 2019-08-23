@@ -1,9 +1,4 @@
 <div flex="auto" layout="column" ng-cloak ng-controller="managementController as mctrl">
-
-    <!-- Top navbar section -->
-    <wz-menu ng-init="menuNavItem = 'manager'"></wz-menu>
-    <!-- End top navbar section -->
-
     <!-- Navigation section -->
     <div layout="row" layout-align="start center" ng-if="mctrl.tab !== 'monitoring' && mctrl.tab !== 'configuration'">
         <!-- Breadcrumbs -->
@@ -67,14 +62,7 @@
         </div>
     </div>
 
-    <md-nav-bar ng-if="!mctrl.load && mctrl.inArray(mctrl.tab, mctrl.statusReportsTabs) && mctrl.tab !== 'monitoring'"
-        class="wz-nav-bar" ng-show="mctrl.tab !== 'welcome'" md-selected-nav-item="mctrl.tab"
-        nav-bar-aria-label="Status and reports navigation links">
-        <md-nav-item class="wz-nav-item" md-nav-click="mctrl.switchTab('status', true)" name="status">Status
-        </md-nav-item>
-        <md-nav-item class="wz-nav-item" md-nav-click="mctrl.switchTab('logs', true)" name="logs">Logs</md-nav-item>
-        <md-nav-item class="wz-nav-item" md-nav-click="mctrl.switchTab('monitoring', true)" name="monitoring">Cluster
-        </md-nav-item>
-        <md-nav-item class="wz-nav-item" md-nav-click="mctrl.switchTab('reporting', true)" name="reporting">Reporting
-        </md-nav-item>
-    </md-nav-bar>
+    <div ng-if="!mctrl.load && mctrl.inArray(mctrl.tab, mctrl.statusReportsTabs) && mctrl.tab !== 'monitoring' && mctrl.tab !== 'welcome'" 
+    class="md-padding-h" ng-show="mctrl.tab !== 'welcome'" >
+        <react-component name="Tabs" props="mctrl.managementTabsProps" />
+    </div>

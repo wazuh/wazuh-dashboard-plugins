@@ -54,7 +54,10 @@ export class OverviewRequest {
         }
       });
 
-      const response = await this.wzWrapper.searchWazuhAlertsWithPayload(base);
+      const response = await this.wzWrapper.searchWazuhAlertsWithPayload(
+        base,
+        this.namespace
+      );
       const aggArray = response.aggregations['2'].buckets;
 
       return aggArray.map(item => item.key);

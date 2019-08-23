@@ -113,4 +113,51 @@ export class ReportingService {
       this.errorHandler.handle(error.message || error);
     }
   }
+
+  async startConfigReport(obj, type, components) {
+    try {
+      this.$rootScope.reportBusy = true;
+      this.$rootScope.reportStatus = 'Generating PDF document...';
+      this.$rootScope.$applyAsync();
+
+      const docType =
+        type === 'agentConfig'
+          ? `wazuh-agent-${obj.id}`
+          : `wazuh-group-${obj.name}`;
+
+      const name = `${docType}-configuration-${(Date.now() / 1000) | 0}.pdf`;
+      const browserTimezone = moment.tz.guess(true);
+
+      const data = {
+        array: [],
+        name,
+        filters: [
+          type === 'agentConfig' ? { agent: obj.id } : { group: obj.name }
+        ],
+        time: '',
+        searchBar: '',
+        tables: [],
+        tab: type,
+        browserTimezone,
+        components
+      };
+
+      await this.genericReq.request('POST', '/reports', data);
+
+      this.$rootScope.reportBusy = false;
+      this.$rootScope.reportStatus = false;
+      this.$rootScope.$applyAsync();
+      this.errorHandler.info(
+        'Success. Go to Wazuh > Management > Reporting',
+        'Reporting'
+      );
+
+      return;
+    } catch (error) {
+      this.$rootScope.reportBusy = false;
+      this.$rootScope.reportStatus = false;
+      this.errorHandler.handle(error.message || error);
+      this.$rootScope.$applyAsync();
+    }
+  }
 }

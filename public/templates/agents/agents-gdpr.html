@@ -3,21 +3,8 @@
 
     <!-- View: Panels -->
 
-    <div layout="row" layout-align="center stretch">
-        <md-card flex class="wz-md-card">
-            <md-tabs md-selected="selectedGdprIndex" class="wz-md-tab" md-border-bottom md-dynamic-height
-                id="gdprReq_tab">
-                <md-tab ng-repeat="tab in gdprTabs" ng-disabled="tab.disabled" label="{{tab.title}}">
-                    <div class="md-padding">
-                        <span class="wz-headline-title">GDPR Requirement: {{tab.title}}</span>
-                        <md-divider class="wz-margin-top-10"></md-divider>
-                        <div layout="row" class="wz-padding-top-10 wz-line-height">
-                            <div ng-bind-html="tab.content"></div>
-                        </div>
-                    </div>
-                </md-tab>
-            </md-tabs>
-        </md-card>
+    <div ng-if="gdprReqs" class="wz-margin-10">
+        <react-component name='RequirementCard' props="gdprReqs"/>
     </div>
 
     <div layout="row" layout-align="center stretch" class="height-300">

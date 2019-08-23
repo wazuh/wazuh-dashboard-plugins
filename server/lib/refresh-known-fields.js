@@ -9,8 +9,7 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import colors from 'ansicolors';
-const blueWazuh = colors.blue('wazuh');
+const blueWazuh = '\u001b[34mwazuh\u001b[39m';
 
 /**
  * Refresh known fields for all valid index patterns.
@@ -34,7 +33,7 @@ export async function checkKnownFields(
     !quiet &&
       log(
         'initialize:checkKnownFields',
-        `Found ${indexPatternList.hits.total} index patterns`,
+        `Found ${indexPatternList.hits.total.value} index patterns`,
         'debug'
       );
 
@@ -55,7 +54,8 @@ export async function checkKnownFields(
           if (valid.length === 4) {
             list.push({
               id: index._id.split('index-pattern:')[1],
-              title: index._source['index-pattern'].title
+              title: index._source['index-pattern'].title,
+              namespace: index._source.namespace
             });
           }
         }
@@ -69,7 +69,9 @@ export async function checkKnownFields(
       );
 
     const defaultExists = list.filter(
-      item => item.title === defaultIndexPattern
+      item =>
+        item.title === defaultIndexPattern &&
+        typeof item.namespace === 'undefined'
     );
 
     if (defaultIndexPattern && defaultExists.length === 0) {
@@ -77,13 +79,13 @@ export async function checkKnownFields(
         log(
           'initialize:checkKnownFields',
           `Default index pattern not found, creating it...`,
-          'debug'
+          'info'
         );
 
       try {
         await wzWrapper.createIndexPattern(defaultIndexPattern);
       } catch (error) {
-        throw new Error('Error creating default index pattern');
+        log('initialize:checkKnownFields', error.message || error);
       }
 
       !quiet &&
@@ -97,7 +99,7 @@ export async function checkKnownFields(
       let tmplist = null;
       while (waitTill > new Date()) {
         tmplist = await wzWrapper.searchIndexPatternById(defaultIndexPattern);
-        if (tmplist.hits.total >= 1) break;
+        if (tmplist.hits.total.value >= 1) break;
         else waitTill = new Date(new Date().getTime() + 0.5 * 1000);
       }
 
@@ -127,20 +129,23 @@ export async function checkKnownFields(
           `Refreshing known fields for "index-pattern:${item.title}"`,
           'debug'
         );
-      await wzWrapper.updateIndexPatternKnownFields('index-pattern:' + item.id);
+      const prefix = item.namespace
+        ? `${item.namespace}:index-pattern:`
+        : 'index-pattern:';
+      await wzWrapper.updateIndexPatternKnownFields(`${prefix}${item.id}`);
     }
 
     !quiet && log('initialize', 'App ready to be used.', 'info');
-    !quiet &&
-      server.log([blueWazuh, 'initialize', 'info'], 'App ready to be used.');
+    !quiet && server.log('info', 'Wazuh app ready to be used.');
 
     return;
   } catch (error) {
     !quiet && log('initialize:checkKnownFields', error.message || error);
     !quiet &&
       server.log(
-        [blueWazuh, 'server', 'error'],
-        'Error importing objects into elasticsearch.' + error.message || error
+        'error',
+        'Wazuh app had en error importing objects into Elasticsearch.' +
+          error.message || error
       );
   }
 }

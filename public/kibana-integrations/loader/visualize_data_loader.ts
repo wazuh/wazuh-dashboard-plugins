@@ -184,6 +184,20 @@ export class VisualizeDataLoader {
       if (!canSkipResponseHandler) {
         this.visData = await Promise.resolve(this.responseHandler(requestHandlerResponse));
       }
+
+      const valueAxes = (this.vis.params || {}).valueAxes || false;
+      const hasSeries = ((this.visData || {}).series || []).length;
+      if (valueAxes && hasSeries) {
+        if (this.vis.params.type !== 'area') {
+          this.vis.params.valueAxes.forEach((axis: { scale: { max: number; }; }, idx: string | number) => {
+            const maxValue = Math.max.apply(Math, this.visData.series[idx].values.map((x: { y: any; }) => { return x.y; }));
+            const lengthMaxValue = maxValue.toString().length;
+            const addTo = parseInt('1' + '0'.repeat(lengthMaxValue - 1));
+            axis.scale.max = maxValue + (addTo / 2);
+          });
+        }
+      }
+
       return this.visData;
     } catch (error) {
       params.searchSource.cancelQueued();

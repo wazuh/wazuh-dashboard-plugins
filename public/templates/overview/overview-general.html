@@ -1,18 +1,15 @@
 <md-content flex layout="column" ng-if="octrl.tab === 'general' && octrl.tabView === 'panels'" layout-align="start"
     ng-class="{'no-opacity': resultState !== 'ready' || !rendered}">
-    <div layout="row">
-        <md-card flex class="wz-metric-color wz-md-card">
-            <md-card-content layout="row" class="wz-padding-metric">
-                <div class="wz-text-truncatable" flex>Alerts: <span class="wz-text-bold"
-                        ng-bind="octrl.totalAlerts()"></span></div>
-                <div class="wz-text-truncatable" flex>Level 12 or above alerts: <span class="wz-text-bold"
-                        ng-bind="octrl.level12()"></span></div>
-                <div class="wz-text-truncatable" flex>Authentication failure: <span class="wz-text-bold"
-                        ng-bind="octrl.authFailure()"></span></div>
-                <div class="wz-text-truncatable" flex>Authentication success: <span class="wz-text-bold"
-                        ng-bind="octrl.authSuccess()"></span></div>
-            </md-card-content>
-        </md-card>
+
+    <div layout="row" layout-padding>
+        <react-component flex name="AlertsStats" props="{
+            items: [
+                { description: 'Total', value: octrl.totalAlerts(), color: 'primary' },
+                { description: 'Level 12 or above alerts', value: octrl.level12(), color: 'accent' },
+                { description: 'Authentication failure', value: octrl.authFailure(), color: 'danger' }, 
+                { description: 'Authentication success', value: octrl.authSuccess(), color: 'secondary' }
+            ]            
+        }" />
     </div>
 
     <div class="wz-no-display">
@@ -32,8 +29,7 @@
                 </span>
             </md-card-actions>
             <md-card-content class="wazuh-column">
-                <kbn-vis id="Wazuh-App-Overview-General-Alert-level-evolution"
-                    vis-id="'Wazuh-App-Overview-General-Alert-level-evolution'"></kbn-vis>
+                <kbn-vis id="Wazuh-App-Overview-General-Alert-level-evolution" vis-id="'Wazuh-App-Overview-General-Alert-level-evolution'"></kbn-vis>
             </md-card-content>
         </md-card>
         <md-card flex class="wz-md-card" ng-class="{'fullscreen': octrl.expandArray[1]}">
@@ -60,8 +56,7 @@
                 </span>
             </md-card-actions>
             <md-card-content class="wazuh-column">
-                <kbn-vis id="Wazuh-App-Overview-General-Top-5-agents"
-                    vis-id="'Wazuh-App-Overview-General-Top-5-agents'"></kbn-vis>
+                <kbn-vis id="Wazuh-App-Overview-General-Top-5-agents" vis-id="'Wazuh-App-Overview-General-Top-5-agents'"></kbn-vis>
             </md-card-content>
         </md-card>
         <md-card flex class="wz-md-card" ng-class="{'fullscreen': octrl.expandArray[3]}">
@@ -73,8 +68,7 @@
                 </span>
             </md-card-actions>
             <md-card-content class="wazuh-column">
-                <kbn-vis id="Wazuh-App-Overview-General-Top-5-rule-groups"
-                    vis-id="'Wazuh-App-Overview-General-Top-5-rule-groups'"></kbn-vis>
+                <kbn-vis id="Wazuh-App-Overview-General-Top-5-rule-groups" vis-id="'Wazuh-App-Overview-General-Top-5-rule-groups'"></kbn-vis>
             </md-card-content>
         </md-card>
         <md-card flex class="wz-md-card" ng-class="{'fullscreen': octrl.expandArray[4]}">
@@ -86,8 +80,7 @@
                 </span>
             </md-card-actions>
             <md-card-content class="wazuh-column" ng-show="octrl.wzMonitoringEnabled">
-                <kbn-vis id="Wazuh-App-Overview-General-Agents-status"
-                    vis-id="'Wazuh-App-Overview-General-Agents-status'"></kbn-vis>
+                <kbn-vis id="Wazuh-App-Overview-General-Agents-status" vis-id="'Wazuh-App-Overview-General-Agents-status'"></kbn-vis>
             </md-card-content>
             <md-card-content class="wazuh-column" ng-show="!octrl.wzMonitoringEnabled">
                 <div layout="row">
@@ -120,7 +113,7 @@
         </md-card>
     </div>
 
-    <div layout="row" layout-align="space-between stretch" class="height-360">        
+    <div layout="row" layout-align="space-between stretch" class="height-360">
         <md-card flex class="wz-md-card" ng-class="{'fullscreen': octrl.expandArray[6]}">
             <md-card-actions layout="row" class="wz-card-actions-vis" ng-dblclick="octrl.expand(6)">
                 <span class="wz-headline-title">Alerts evolution - Top 5 agents</span>
@@ -130,8 +123,7 @@
                 </span>
             </md-card-actions>
             <md-card-content class="wazuh-column">
-                <kbn-vis id="Wazuh-App-Overview-General-Alerts-evolution-Top-5-agents"
-                    vis-id="'Wazuh-App-Overview-General-Alerts-evolution-Top-5-agents'"></kbn-vis>
+                <kbn-vis id="Wazuh-App-Overview-General-Alerts-evolution-Top-5-agents" vis-id="'Wazuh-App-Overview-General-Alerts-evolution-Top-5-agents'"></kbn-vis>
             </md-card-content>
         </md-card>
     </div>

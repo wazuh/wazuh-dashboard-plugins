@@ -12,13 +12,10 @@
     <!-- End headline -->
 
     <!-- CIS-CAT navigation bar -->
-    <md-nav-bar
-        class="wz-nav-bar"
-        md-selected-nav-item="configurationSubTab"
-        nav-bar-aria-label="CIS-CAT navigation links">
-        <md-nav-item class="wz-nav-item" md-nav-click="switchConfigurationSubTab('ciscat-general')" name="ciscat-general">General</md-nav-item>
-        <md-nav-item class="wz-nav-item" md-nav-click="switchConfigurationSubTab('ciscat-benchmarks')" name="ciscat-benchmarks">Benchmarks</md-nav-item>
-    </md-nav-bar>
+    <div ng-if="configurationTabsProps" class="md-padding wz-padding-top-0"
+        ng-init="buildProps([{id:'ciscat-general', name: 'General'}, {id: 'ciscat-benchmarks', name: 'Benchmarks'}])">
+        <react-component name="Tabs" props="configurationTabsProps" />
+    </div>
     <!-- End CIS-CAT navigation bar -->
 
     <div class="md-padding md-padding-top-16" ng-if="load">
