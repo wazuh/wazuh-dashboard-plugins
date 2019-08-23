@@ -9,7 +9,6 @@
  *
  * Find more information about this on the LICENSE file.
  */
-const blueWazuh = '\u001b[34mwazuh\u001b[39m';
 
 /**
  * Refresh known fields for all valid index patterns.

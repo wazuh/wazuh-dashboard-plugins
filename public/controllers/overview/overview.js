@@ -274,22 +274,25 @@ export class OverviewController {
 
       if (newTab === 'pci') {
         const pciTabs = await this.commonData.getPCI();
-        this.pciReqs = {items: pciTabs, reqTitle: 'PCI DSS Requirement'};
+        this.pciReqs = { items: pciTabs, reqTitle: 'PCI DSS Requirement' };
       }
 
       if (newTab === 'gdpr') {
         const gdprTabs = await this.commonData.getGDPR();
-        this.gdprReqs = {items: gdprTabs, reqTitle: 'GDPR Requirement'};
+        this.gdprReqs = { items: gdprTabs, reqTitle: 'GDPR Requirement' };
       }
 
       if (newTab === 'hipaa') {
         const hipaaTabs = await this.commonData.getHIPAA();
-        this.hipaaReqs = {items: hipaaTabs, reqTitle: 'HIPAA Requirement'};
+        this.hipaaReqs = { items: hipaaTabs, reqTitle: 'HIPAA Requirement' };
       }
 
       if (newTab === 'nist') {
         const nistTabs = await this.commonData.getNIST();
-        this.nistReqs = {items: nistTabs, reqTitle: 'NIST 800-53 Requirement'};
+        this.nistReqs = {
+          items: nistTabs,
+          reqTitle: 'NIST 800-53 Requirement'
+        };
       }
 
       if (newTab !== 'welcome') this.tabHistory.push(newTab);

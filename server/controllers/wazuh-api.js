@@ -99,13 +99,9 @@ export class WazuhApiCtrl {
         };
 
         // Update cluster information in Elasticsearch .wazuh document
-        const result = await this.wzWrapper.updateWazuhIndexDocument(
-          null,
-          req.payload,
-          {
-            doc: { cluster_info: api.cluster_info }
-          }
-        );
+        await this.wzWrapper.updateWazuhIndexDocument(null, req.payload, {
+          doc: { cluster_info: api.cluster_info }
+        });
 
         // Hide Wazuh API password
         api.password = '****';

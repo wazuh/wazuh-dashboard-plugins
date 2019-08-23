@@ -261,7 +261,6 @@ export const AgentConfiguration = {
             {
               logformat: 'Log format',
               log_format: 'Log format',
-              command: 'Run this command',
               alias: 'Command alias',
               ignore_binaries: 'Ignore binaries',
               target: 'Redirect output to this socket',
