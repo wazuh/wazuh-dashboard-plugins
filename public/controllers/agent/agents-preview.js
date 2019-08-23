@@ -90,7 +90,7 @@ export class AgentsPreviewController {
       this.$location.search('tab', this.submenuNavItem);
     });
 
-    this.$scope.$on('wazuhFetched', (ev) => {
+    this.$scope.$on('wazuhFetched', ev => {
       ev.stopPropagation();
     });
 

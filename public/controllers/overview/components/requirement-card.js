@@ -1,6 +1,12 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { EuiButtonEmpty, EuiButtonIcon, EuiCard, EuiFlexItem, EuiFlexGroup } from '@elastic/eui';
+import {
+  EuiButtonEmpty,
+  EuiButtonIcon,
+  EuiCard,
+  EuiFlexItem,
+  EuiFlexGroup
+} from '@elastic/eui';
 
 export class RequirementCard extends Component {
   constructor(props) {
@@ -18,18 +24,21 @@ export class RequirementCard extends Component {
   buildSlider() {
     const items = this.props.items.map((req, index) => {
       const title = `${this.props.reqTitle}: ${req.title}`;
-      const expandMessage = this.expanded ? 'Show less' : 'More info'
+      const expandMessage = this.expanded ? 'Show less' : 'More info';
       const cardFooterContent = (
         <EuiButtonEmpty
           iconType="iInCircle"
           size="xs"
           className="footer-req wz-margin--10"
-          onClick={() => this.expand()}>
+          onClick={() => this.expand()}
+        >
           {expandMessage}
         </EuiButtonEmpty>
       );
       if (req.content.length >= this.chartNum) {
-        const content = this.expanded ? req.content : `${req.content.substring(0, this.chartNum - 5)}...`
+        const content = this.expanded
+          ? req.content
+          : `${req.content.substring(0, this.chartNum - 5)}...`;
         return (
           <EuiFlexItem key={index}>
             <EuiCard
@@ -51,7 +60,7 @@ export class RequirementCard extends Component {
               className="wz-padding-bt-5 reqCard"
             />
           </EuiFlexItem>
-        )
+        );
       }
     });
 
@@ -64,13 +73,13 @@ export class RequirementCard extends Component {
         slider[lastArr].push(
           <EuiFlexItem key={`hidden${i}`}>
             <EuiCard
-              title='Title'
-              className='hiddenCard'
-              description='Description'
-              textAlign='left'
+              title="Title"
+              className="hiddenCard"
+              description="Description"
+              textAlign="left"
             />
           </EuiFlexItem>
-        )
+        );
       }
     }
     this.setState({ slider: slider, sliderLength: slider.length });
@@ -81,7 +90,7 @@ export class RequirementCard extends Component {
    */
   expand() {
     this.expanded = !this.expanded;
-    this.buildSlider()
+    this.buildSlider();
   }
 
   /**
@@ -91,7 +100,6 @@ export class RequirementCard extends Component {
     const newPos = this.state.position + 1;
     this.setState({ position: newPos });
   }
-
 
   /**
    * Slides to the left the slider
@@ -103,7 +111,7 @@ export class RequirementCard extends Component {
 
   /**
    * Split an array into smallers array
-   * @param {Array} array 
+   * @param {Array} array
    * @param {Number} size
    */
   chunk = (array, size) => {
@@ -117,7 +125,7 @@ export class RequirementCard extends Component {
       }
     }
     return chunked;
-  }
+  };
 
   render() {
     if (!this.state.slider.length) this.buildSlider();
@@ -125,7 +133,7 @@ export class RequirementCard extends Component {
     return (
       <div>
         <EuiFlexGroup gutterSize="l">
-          {(this.state.sliderLength > 1 && this.state.position > 0) && (
+          {this.state.sliderLength > 1 && this.state.position > 0 && (
             <EuiButtonIcon
               className="wz-margin-left-10"
               iconType="arrowLeft"
@@ -134,16 +142,17 @@ export class RequirementCard extends Component {
             />
           )}
           {cards}
-          {(this.state.sliderLength > 1 && this.state.position < this.state.sliderLength - 1) && (
-            <EuiButtonIcon
-              className="wz-margin-right-10"
-              iconType="arrowRight"
-              aria-label="Next"
-              onClick={() => this.slideRight()}
-            />
-          )}
+          {this.state.sliderLength > 1 &&
+            this.state.position < this.state.sliderLength - 1 && (
+              <EuiButtonIcon
+                className="wz-margin-right-10"
+                iconType="arrowRight"
+                aria-label="Next"
+                onClick={() => this.slideRight()}
+              />
+            )}
         </EuiFlexGroup>
-      </div >
+      </div>
     );
   }
 }
