@@ -715,6 +715,22 @@ export class AgentsController {
       this.$scope.tabNames
     );
 
+    const cleanTabs = [];
+    tabs.forEach(x => {
+      if (
+        (
+          UnsupportedComponents[this.$scope.agent.agentPlatform] ||
+          UnsupportedComponents['other']
+        ).includes(x.id)
+      )
+        return;
+
+      cleanTabs.push({
+        id: x.id,
+        name: x.name
+      });
+    });
+
     this.$scope.agentsTabsProps = {
       clickAction: tab => {
         this.switchTab(tab, true);
@@ -724,7 +740,7 @@ export class AgentsController {
         (this.currentPanel && this.currentPanel.length
           ? this.currentPanel[0]
           : ''),
-      tabs
+      tabs: cleanTabs
     };
     this.$scope.$applyAsync();
   }
@@ -888,8 +904,10 @@ export class AgentsController {
       extensions: this.cleanExtensions(this.$scope.extensions),
       agent: this.$scope.agent,
       api: this.appState.getCurrentAPI(),
-      setExtensions: (api, extensions) =>
-        this.appState.setExtensions(api, extensions)
+      setExtensions: (api, extensions) => {
+        this.appState.setExtensions(api, extensions);
+        this.$scope.extensions = extensions;
+      }
     };
   }
 
