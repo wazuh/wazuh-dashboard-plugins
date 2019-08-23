@@ -9,7 +9,7 @@
     <div layout="row" layout-align="center stretch" class="height-300">
         <md-card flex="50" class="wz-md-card" ng-class="{'fullscreen': expandArray[3]}">
             <md-card-actions layout="row" layout-align="end center" class="wz-card-actions-vis" ng-dblclick="expand(3)">
-                <span class="wz-headline-title">Requirements stacked over time</span>
+                <span class="wz-headline-title">Requirements over time</span>
                 <span flex></span>
                 <span class="cursor-pointer" ng-click="expand(3)">
                     <react-component name="EuiIcon" props="{type:'expand'}" />
@@ -37,14 +37,14 @@
     <div layout="row" layout-align="center stretch" class="height-300">
         <md-card flex="45" class="wz-md-card" ng-class="{'fullscreen': expandArray[0]}">
             <md-card-actions layout="row" layout-align="end center" class="wz-card-actions-vis" ng-dblclick="expand(0)">
-                <span class="wz-headline-title">Requirement over time hot map</span>
+                <span class="wz-headline-title">HIPAA requirements</span>
                 <span flex></span>
                 <span class="cursor-pointer" ng-click="expand(0)">
                     <react-component name="EuiIcon" props="{type:'expand'}" />
                 </span>
             </md-card-actions>
             <md-card-content class="wazuh-column">
-                <kbn-vis id="Wazuh-App-Agents-HIPAA-Hot-Map" vis-id="'Wazuh-App-Agents-HIPAA-Hot-Map'"></kbn-vis>
+                <kbn-vis id="Wazuh-App-Agents-HIPAA-Burbles" vis-id="'Wazuh-App-Agents-HIPAA-Burbles'"></kbn-vis>
             </md-card-content>
         </md-card>
         <md-card flex="30" class="wz-md-card" ng-class="{'fullscreen': expandArray[1]}">
