@@ -31,7 +31,6 @@
     "prebuild": "tsc; find . -name \"*.ts*\" -type f -not -path \"./node_modules/*\" -delete",
     "build": "plugin-helpers build",
     "test": "_mocha test/**/*",
-    "test:ui:server": "node ../../scripts/functional_tests_server.js",
     "test:ui:runner": "node ../../scripts/functional_test_runner.js"
   },
   "dependencies": {
