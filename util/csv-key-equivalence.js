@@ -119,5 +119,8 @@ export const KeyEquivalence = {
   id: 'ID',
   compliance: 'Compliance',
   rules: 'Rules',
-  reason: 'Reason'
+  reason: 'Reason',
+  registerIP: 'Register IP',
+  key: 'Key',
+  value: 'Value'
 };
