@@ -198,6 +198,7 @@ export function settingsWizard(
         genericReq
           .request('GET', '/elastic/apis')
           .then(data => {
+            appState.setWzMenu();
             if (data.data.length > 0) {
               const apiEntries = data.data;
               appState.setCurrentAPI(
@@ -228,6 +229,7 @@ export function settingsWizard(
         genericReq
           .request('GET', '/elastic/apis')
           .then(data => {
+            appState.setWzMenu();
             if (
               data.data.length > 0 &&
               data.data.find(x => x['_id'] == apiId)
@@ -257,7 +259,6 @@ export function settingsWizard(
           });
       }
     }
-    appState.setWzMenu();
     return deferred.promise;
   } catch (error) {
     !disableErrors && errorHandler.handle(error);
