@@ -202,7 +202,7 @@ export class WelcomeScreen extends Component {
                   ])}
                 </EuiFlexItem>
               </EuiFlexGroup>
-              {!this.props.extensions.pci && !this.props.extensions.gdpr && (
+              {!this.props.extensions.pci && !this.props.extensions.gdpr && !this.props.extensions.hipaa && !this.props.extensions.nist && (
                 <EuiFlexGroup>
                   <EuiFlexItem>
                     <EuiCallOut
@@ -218,7 +218,7 @@ export class WelcomeScreen extends Component {
                   </EuiFlexItem>
                 </EuiFlexGroup>
               )}
-              {(this.props.extensions.pci || this.props.extensions.gdpr) && (
+              {(this.props.extensions.pci || this.props.extensions.gdpr || this.props.extensions.hipaa || this.props.extensions.nist) && (
                 <EuiFlexGrid columns={2}>
                   {this.props.extensions.pci &&
                     this.buildTabCard('pci', 'visTagCloud')}

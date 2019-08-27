@@ -705,7 +705,7 @@ export class AgentsController {
    */
   setTabs() {
     this.$scope.agentsTabsProps = false;
-    this.currentPanel = this.commonData.getCurrentPanel(this.$scope.tab);
+    this.currentPanel = this.commonData.getCurrentPanel(this.$scope.tab, true);
 
     if (!this.currentPanel) return;
 
@@ -719,7 +719,7 @@ export class AgentsController {
     tabs.forEach(x => {
       if (
         (
-          UnsupportedComponents[this.$scope.agent.agentPlatform] ||
+          UnsupportedComponents[(this.$scope.agent || {}).agentPlatform] ||
           UnsupportedComponents['other']
         ).includes(x.id)
       )

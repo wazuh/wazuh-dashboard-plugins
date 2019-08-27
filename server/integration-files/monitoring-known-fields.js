@@ -22,15 +22,6 @@ export const monitoringKnownFields = [
     excluded: true
   },
   {
-    name: 'timestamp',
-    type: 'date',
-    count: 0,
-    scripted: false,
-    searchable: true,
-    aggregatable: true,
-    readFromDocValues: true
-  },
-  {
     name: '_id',
     type: 'string',
     count: 0,
