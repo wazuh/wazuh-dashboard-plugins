@@ -174,12 +174,14 @@ md-nav-bar.md-default-theme .md-nav-bar, md-nav-bar .md-nav-bar {
   background: #272931;
 }
 
-.table {
+
+.table-striped > tbody > tr:nth-of-type(even) {
+  background-color: #1d252f !important;
   color: #dfe5ef !important;
 }
 
 .table-striped > tbody > tr:nth-of-type(odd) {
-  background-color: #1a1b21;
+  background-color: #1a1b21 !important;
   color: #dfe5ef !important;
 }
 
