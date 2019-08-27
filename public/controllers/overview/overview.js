@@ -206,7 +206,7 @@ export class OverviewController {
         (this.currentPanel && this.currentPanel.length
           ? this.currentPanel[0]
           : ''),
-      tabs
+      tabs : tabs.filter(tab => tab.id != 'sca')
     };
     this.$scope.$applyAsync();
   }
