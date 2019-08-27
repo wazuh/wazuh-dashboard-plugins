@@ -317,3 +317,7 @@ md-divider.md-default-theme, md-divider {
 discover-app-w > main.container-fluid {
   background: #1a1b20 !important;
 }
+
+.wz-menu-select {
+  filter: invert(0) !important; 
+}
