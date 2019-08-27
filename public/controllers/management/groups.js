@@ -576,6 +576,10 @@ export function GroupsController(
     }
   };
 
+  $scope.clearFailedErrors = () => {
+    $scope.failedErrors = false;
+  };
+
   // Resetting the factory configuration
   $scope.$on('$destroy', () => {});
 
