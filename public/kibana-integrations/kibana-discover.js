@@ -464,8 +464,10 @@ function discoverController(
         if (!angular.equals(sort, currentSort)) $scope.fetch();
       });
 
-      const isRemovable = filter =>
-        typeof filter.meta.removable !== 'undefined' && !filter.meta.removable;
+      const noRemovable = filter =>
+        typeof filter.meta.removable !== 'undefined' &&
+        filter.meta.removable &&
+        ((filter || {}).$state || {}).store !== 'globalState';
 
       // update data source when filters update
       $scope.$listen(queryFilter, 'update', function() {
@@ -484,15 +486,7 @@ function discoverController(
           const key =
             item.meta.key || (Object.keys(item.query.match) || [undefined])[0];
           const isIncluded = nonRemovableFilters.includes(key);
-          const isNonRemovable = isRemovable(item);
-          if (isIncluded && !isNonRemovable) {
-            const removablesByKey = filters.filter(
-              x => x.meta.removable == false && x.meta.key === key
-            ).length;
-            if (removablesByKey < 1) {
-              item.meta.removable = false;
-            }
-          }
+          const isNonRemovable = noRemovable(item);
           const shouldBeAdded = (isIncluded && isNonRemovable) || !isIncluded;
           return shouldBeAdded;
         });
