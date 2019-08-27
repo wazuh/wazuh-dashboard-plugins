@@ -313,3 +313,7 @@ md-divider.md-default-theme, md-divider {
   color: #006E8A !important;
   text-decoration: underline !important;
 }
+
+discover-app-w > main.container-fluid {
+  background: #1a1b20 !important;
+}
