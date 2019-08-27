@@ -295,3 +295,15 @@ md-divider.md-default-theme, md-divider {
   border: 1px solid #343741 !important;
   color: #dfe5ef !important;
 }
+
+.extraHeader {
+  border-bottom: 1px solid #2e2f34!important;
+}
+
+.wzMultipleSelectorAdding{
+  background-color: #037200!important;
+}
+
+.wzMultipleSelectorRemoving{
+  background-color: #990000!important;
+}

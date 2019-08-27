@@ -20,7 +20,7 @@
                     </div>
                     <select size='10' multiple ng-model='availableItem' ng-change='selectedElement=null;doCheckLimit()'
                         class='width-100' ng-dblclick='moveItem(availableItem, availableItems, selectedItems);availableItem=null'>
-                        <option ng-repeat='item in availableItems | orderBy:sort' ng-style='{"background-color":(item.type === "a" ? "#c6ffc6": item.type === "r" ? "#ffe7e7" : "")}'
+                        <option ng-repeat='item in availableItems | orderBy:sort' ng-class="item.type === 'a' ? 'wzMultipleSelectorAdding' : item.type === 'r' ? 'wzMultipleSelectorRemoving' : ''"
                             ng-value="{{item}}">{{item.key + " - " + item.value}}</option>
                     </select>
                 </div>
@@ -53,7 +53,7 @@
                         ng-change='selectedElement=null' style='padding: 8px 15px'>
                     <select size='10' multiple ng-model='selectedElement' ng-change='availableItem=null;doCheckLimit()'
                         class='width-100' ng-dblclick='moveItem(selectedElement, selectedItems, availableItems);selectedElement=null'>
-                        <option ng-repeat='item in selectedItems | filter: selectedFilter | orderBy:sort' ng-style='{"background-color":(item.type === "a" ? "#c6ffc6": item.type === "r" ? "#ffe7e7" : "")}'
+                        <option ng-repeat='item in selectedItems | filter: selectedFilter | orderBy:sort' ng-class="item.type === 'a' ? 'wzMultipleSelectorAdding' : item.type === 'r' ? 'wzMultipleSelectorRemoving' : ''"
                             ng-value="{{item}}">{{item.key + " - " + item.value}}</option>
                     </select>
                 </div>
