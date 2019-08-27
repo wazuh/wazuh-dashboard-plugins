@@ -1054,15 +1054,15 @@ export class WazuhApiCtrl {
         req.payload.id
       );
 
-      let path_tmp = req.payload.path;
+      let tmpPath = req.payload.path;
 
-      if (path_tmp && typeof path_tmp === 'string') {
-        path_tmp = path_tmp[0] === '/' ? path_tmp.substr(1) : path_tmp;
+      if (tmpPath && typeof tmpPath === 'string') {
+        tmpPath = tmpPath[0] === '/' ? tmpPath.substr(1) : tmpPath;
       }
 
-      if (!path_tmp) throw new Error('An error occurred parsing path field');
+      if (!tmpPath) throw new Error('An error occurred parsing path field');
 
-      log('wazuh-api:csv', `Report ${path_tmp}`, 'debug');
+      log('wazuh-api:csv', `Report ${tmpPath}`, 'debug');
       // Real limit, regardless the user query
       const params = { limit: 500 };
 
@@ -1075,23 +1075,24 @@ export class WazuhApiCtrl {
 
       const cred = ApiHelper.buildOptionsObject(config);
 
-      const itemsArray = [];
+      let itemsArray = [];
       const output = await needle(
         'get',
-        `${config.url}:${config.port}/${path_tmp}`,
+        `${config.url}:${config.port}/${tmpPath}`,
         params,
         cred
       );
 
-      if ((((output || {}).body || {}).data || {}).totalItems) {
+      const totalItems = (((output || {}).body || {}).data || {}).totalItems;
+
+      if (totalItems) {
         params.offset = 0;
-        const { totalItems } = output.body.data;
         itemsArray.push(...output.body.data.items);
         while (itemsArray.length < totalItems && params.offset < totalItems) {
           params.offset += params.limit;
           const tmpData = await needle(
             'get',
-            `${config.url}:${config.port}/${path_tmp}`,
+            `${config.url}:${config.port}/${tmpPath}`,
             params,
             cred
           );
@@ -1099,49 +1100,66 @@ export class WazuhApiCtrl {
         }
       }
 
-      if ((((output || {}).body || {}).data || {}).totalItems) {
-        const isList = req.payload.path.includes('/lists');
-        const isAgents = req.payload.path.includes('/agents');
+      if (totalItems) {
+        const { path, filters } = req.payload;
+        const isList = path.includes('/lists') && filters && filters.length;
+        const isArrayOfLists =
+          path.includes('/lists') && (!filters || !filters.length);
+        const isAgents = path.includes('/agents') && !path.includes('groups');
+        const isAgentsOfGroup = path.startsWith('/agents/groups/');
+        let fields = Object.keys(output.body.data.items[0]);
 
-        const fields = isAgents
-          ? [
-              'id',
-              'status',
-              'name',
-              'ip',
-              'group',
-              'manager',
-              'node_name',
-              'dateAdd',
-              'version',
-              'lastKeepAlive',
-              'os.arch',
-              'os.build',
-              'os.codename',
-              'os.major',
-              'os.minor',
-              'os.name',
-              'os.platform',
-              'os.uname',
-              'os.version'
-            ]
-          : isList
-          ? ['key', 'value']
-          : Object.keys(output.body.data.items[0]);
-
-        const json2csvParser = new Parser({ fields });
-        if (isList) {
-          itemsArray[0].map(item => {
-            if (!item.value || !item.value.length) item.value = '-';
-            return item;
-          });
+        if (isAgents || isAgentsOfGroup) {
+          fields = [
+            'id',
+            'status',
+            'name',
+            'ip',
+            'group',
+            'manager',
+            'node_name',
+            'dateAdd',
+            'version',
+            'lastKeepAlive',
+            'os.arch',
+            'os.build',
+            'os.codename',
+            'os.major',
+            'os.minor',
+            'os.name',
+            'os.platform',
+            'os.uname',
+            'os.version'
+          ];
         }
 
-        let csv = json2csvParser.parse(isList ? itemsArray[0] : itemsArray);
+        if (isArrayOfLists) {
+          const flatLists = [];
+          for (const list of itemsArray) {
+            const { path, items } = list;
+            flatLists.push(
+              ...items.map(item => ({ path, key: item.key, value: item.value }))
+            );
+          }
+          fields = ['path', 'key', 'value'];
+          itemsArray = [...flatLists];
+        }
+
+        if (isList) {
+          fields = ['key', 'value'];
+          itemsArray = itemsArray[0];
+        }
+
+        fields = fields.map(item => ({ value: item, default: '-' }));
+
+        const json2csvParser = new Parser({ fields });
+
+        let csv = json2csvParser.parse(itemsArray);
 
         for (const field of fields) {
-          if (csv.includes(field)) {
-            csv = csv.replace(field, KeyEquivalence[field] || field);
+          const { value } = field;
+          if (csv.includes(value)) {
+            csv = csv.replace(value, KeyEquivalence[value] || value);
           }
         }
 
