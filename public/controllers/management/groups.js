@@ -566,6 +566,10 @@ export function GroupsController(
     return;
   };
 
+  $scope.clearFailedErrors = () => {
+    $scope.failedErrors = false;
+  };
+
   $scope.checkLimit = () => {
     if ($scope.firstSelectedList) {
       const itemsToSave = getItemsToSave();

@@ -49,7 +49,7 @@
             <!-- XML editor for group agents -->
             <div ng-show="editingFile">
                 <div layout="row" class="md-padding-h wz-margin-top-10">
-                    <span ng-click='closeEditingFile()' class='btn btn-info'>Cancel</span>
+                    <span ng-click='closeEditingFile()' class='wz-margin-top-3 kuiButton kuiButton--hollow'>Cancel</span>
                     <button ng-disabled='xmlHasErrors' ng-click='doSaveGroupAgentConfig()' class='height-35 kuiButton kuiButton--secondary wz-margin-left-8'>
                         <span ng-show='!xmlHasErrors'>
                             <svg class="euiIcon euiIcon--medium" focusable="false" xmlns="http://www.w3.org/2000/svg"
@@ -72,7 +72,7 @@
 
             <div ng-if="!editingFile">
                 <div layout="row" class="md-padding" ng-if="lookingGroup && currentGroup && addingAgents">
-                    <span ng-click='addMultipleAgents(false)' class='btn btn-info'>
+                    <span ng-click='addMultipleAgents(false)' class='wz-margin-top-3 kuiButton kuiButton--hollow'>
                         Cancel</span>
                     <span ng-hide='moreThan500' ng-click='saveAddAgents()' class='btn wz-button wz-margin-left-8'><i
                             aria-hidden='true' class='fa fa-fw fa-save'></i>
@@ -153,7 +153,7 @@
                                 </md-list-item>
                             </md-list>
                             <span flex></span>
-                            <a class='md-padding md-padding-top-10' ng-click='failedErrors = false'><i class="fa fa-times"
+                            <a class='md-padding md-padding-top-10' ng-click='clearFailedErrors()'><i class="fa fa-times"
                                     aria-hidden="true"></i></a>
                         </div>
                         <md-card-content>

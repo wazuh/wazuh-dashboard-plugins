@@ -181,7 +181,7 @@
     <!-- XML editor for rules -->
     <div layout="column" layout-align="start" ng-show="editingFile">
         <div layout="row">
-            <span ng-click='closeEditingFile()' class='btn btn-info'>Close</span>
+            <span ng-click='closeEditingFile()' class='wz-margin-top-3 kuiButton kuiButton--hollow'>Close</span>
             <button ng-disabled='xmlHasErrors || doingSaving' ng-click='doSaveConfig()' class='btn wz-button pull-right wz-margin-left-8'>
                 <span ng-show='!xmlHasErrors'><i aria-hidden='true' class='fa fa-fw fa-save' ng-class="doingSaving ? 'fa-spin fa-spinner' : ''"></i>Save
                     file</span>
