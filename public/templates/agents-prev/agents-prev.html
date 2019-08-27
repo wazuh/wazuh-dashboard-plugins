@@ -98,7 +98,7 @@
                             <p ng-if="ctrl.lastAgent && ctrl.lastAgent.id && ctrl.lastAgent.id !== '000'" ng-click="ctrl.showAgent(ctrl.lastAgent)"
                                 class="euiTitle euiTitle--small euiStat__title wz-text-link cursor-pointer">
                                 {{ctrl.lastAgent.name}}</p>
-                            <p ng-if="!ctrl.lastAgent || !ctrl.lastAgent.id" class="euiTitle euiTitle--small euiStat__title">
+                            <p ng-if="!ctrl.lastAgent || !ctrl.lastAgent.id || ctrl.lastAgent.id === '000'" class="euiTitle euiTitle--small euiStat__title">
                                 -</p>
                         </div>
                     </div>
@@ -111,7 +111,7 @@
                             <p ng-if="ctrl.lastAgent && ctrl.lastAgent.id && ctrl.mostActiveAgent.id !== '000'"
                                 ng-click="ctrl.showAgent(ctrl.mostActiveAgent)" class="euiTitle euiTitle--small euiStat__title wz-text-link cursor-pointer">
                                 {{ctrl.mostActiveAgent.name}}</p>
-                            <p ng-if="!ctrl.lastAgent || !ctrl.lastAgent.id" class="euiTitle euiTitle--small euiStat__title">
+                            <p ng-if="!ctrl.mostActiveAgent || !ctrl.mostActiveAgent.id || ctrl.mostActiveAgent.id === '000'" class="euiTitle euiTitle--small euiStat__title">
                                 -</p>
                         </div>
                     </div>
