@@ -140,6 +140,11 @@ function clearRuleId(commonData) {
   return Promise.resolve();
 }
 
+function enableWzMenu($rootScope, $location) {
+  const location = $location.path();
+  $rootScope.hideWzMenu = location.includes('/health-check');
+}
+
 //Routes
 routes.enable();
 routes
@@ -149,27 +154,27 @@ routes
   })
   .when('/agents/:id?/:tab?/:view?', {
     template: agentsTemplate,
-    resolve: { nestedResolve, ip, savedSearch }
+    resolve: { enableWzMenu, nestedResolve, ip, savedSearch }
   })
   .when('/agents-preview/', {
     template: agentsPrevTemplate,
-    resolve: { nestedResolve, ip, savedSearch }
+    resolve: { enableWzMenu, nestedResolve, ip, savedSearch }
   })
   .when('/manager/', {
     template: managementTemplate,
-    resolve: { nestedResolve, ip, savedSearch, clearRuleId }
+    resolve: { enableWzMenu, nestedResolve, ip, savedSearch, clearRuleId }
   })
   .when('/overview/', {
     template: overviewTemplate,
-    resolve: { nestedResolve, ip, savedSearch }
+    resolve: { enableWzMenu, nestedResolve, ip, savedSearch }
   })
   .when('/wazuh-discover/', {
     template: discoverTemplate,
-    resolve: { nestedResolve, ip, savedSearch }
+    resolve: { enableWzMenu, nestedResolve, ip, savedSearch }
   })
   .when('/settings', {
     template: settingsTemplate,
-    resolve: { nestedResolve, ip, savedSearch }
+    resolve: { enableWzMenu, nestedResolve, ip, savedSearch }
   })
   .when('/visualize/create?', {
     redirectTo: function() {},
@@ -185,11 +190,11 @@ routes
   })
   .when('/wazuh-dev', {
     template: devToolsTemplate,
-    resolve: { nestedResolve }
+    resolve: { enableWzMenu, nestedResolve }
   })
   .when('/blank-screen', {
     template: blankScreenTemplate,
-    resolve: { wzConfig }
+    resolve: { enableWzMenu, wzConfig }
   })
   .when('/', {
     redirectTo: '/overview/'
