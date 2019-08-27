@@ -204,7 +204,7 @@ export class WazuhReportingCtrl {
         const modifiedRows = [];
         for (const row of rows) {
           modifiedRows.push(
-            row.map(cell => ({ text: cell, style: 'standard' }))
+            row.map(cell => ({ text: cell || '-', style: 'standard' }))
           );
         }
 
@@ -213,12 +213,13 @@ export class WazuhReportingCtrl {
 
         full_body.push(
           table.columns.map(col => ({
-            text: col,
+            text: col || '-',
             style: 'whiteColor',
             border: [0, 0, 0, 0]
           })),
           ...modifiedRows
         );
+        console.log('full_body ', full_body)
         this.dd.content.push({
           fontSize: 8,
           table: {
@@ -268,7 +269,7 @@ export class WazuhReportingCtrl {
         const modifiedRows = [];
         for (const row of rows) {
           modifiedRows.push(
-            row.map(cell => ({ text: cell, style: 'standard' }))
+            row.map(cell => ({ text: cell || '-', style: 'standard' }))
           );
         }
         let widths = [];
@@ -278,7 +279,7 @@ export class WazuhReportingCtrl {
         if (table.type === 'config') {
           full_body.push(
             table.columns.map(col => ({
-              text: col,
+              text: col || '-',
               border: [0, 0, 0, 20],
               fontSize: 0,
               colSpan: 2
@@ -303,7 +304,7 @@ export class WazuhReportingCtrl {
         } else if (table.type === 'table') {
           full_body.push(
             table.columns.map(col => ({
-              text: col,
+              text: col || '-',
               style: 'whiteColor',
               border: [0, 0, 0, 0]
             })),
@@ -376,7 +377,7 @@ export class WazuhReportingCtrl {
                   margin: [40, 4, 0, 0]
                 },
                 {
-                  text: str,
+                  text: str || '-',
                   margin: [43, 0, 0, 0],
                   style: 'whiteColorFilters'
                 }
@@ -393,7 +394,7 @@ export class WazuhReportingCtrl {
                   margin: [40, 4, 0, 0]
                 },
                 {
-                  text: filters,
+                  text: filters || '-',
                   margin: [43, 0, 0, 0],
                   style: 'whiteColorFilters'
                 }
