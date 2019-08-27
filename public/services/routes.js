@@ -128,6 +128,10 @@ function wzConfig($q, genericReq, wazuhConfig, $rootScope, $location) {
 
 function wzKibana($location, $window, $rootScope) {
   assignPreviousLocation($rootScope, $location);
+  // Sets ?_a=(columns:!(_source),filters:!())
+  $location.search('_a', '(columns:!(_source),filters:!())');
+  // Removes ?_g
+  $location.search('_g', null);
   return goToKibana($location, $window);
 }
 
