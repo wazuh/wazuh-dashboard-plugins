@@ -113,5 +113,8 @@ export const KeyEquivalence = {
   value: 'Value',
   location: 'Location',
   mtu: 'MTU',
-  attributes: 'Attributes'
+  attributes: 'Attributes',
+  registerIP: 'Register IP',
+  key: 'Key',
+  value: 'Value'
 };
