@@ -187,7 +187,7 @@ export class OverviewController {
    */
   setTabs() {
     this.overviewTabsProps = false;
-    this.currentPanel = this.commonData.getCurrentPanel(this.tab);
+    this.currentPanel = this.commonData.getCurrentPanel(this.tab, false);
 
     if (!this.currentPanel) return;
 
