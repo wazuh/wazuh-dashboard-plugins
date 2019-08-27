@@ -2232,10 +2232,10 @@ export class WazuhReportingCtrl {
                 ],
                 rows: netaddr.data.items.map(x => {
                   return [
-                    x['interface'],
+                    x['iface'],
                     x['address'],
                     x['netmask'],
-                    x['protocol'],
+                    x['proto'],
                     x['broadcast']
                   ];
                 })
