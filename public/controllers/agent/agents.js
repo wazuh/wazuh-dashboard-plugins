@@ -564,7 +564,7 @@ export class AgentsController {
         this.$scope.agent.status =
           (((agentInfo || {}).data || {}).data || {}).status ||
           this.$scope.agent.status;
-      } catch (error) {} // eslint-disable-line
+      } catch (error) { } // eslint-disable-line
     }
 
     try {
@@ -620,7 +620,7 @@ export class AgentsController {
       if (tab === 'syscollector')
         try {
           await this.loadSyscollector(this.$scope.agent.id);
-        } catch (error) {} // eslint-disable-line
+        } catch (error) { } // eslint-disable-line
       if (tab === 'configuration') {
         this.$scope.switchConfigurationTab('welcome');
       } else {
@@ -715,6 +715,22 @@ export class AgentsController {
       this.$scope.tabNames
     );
 
+    const cleanTabs = [];
+    tabs.forEach(x => {
+      if (
+        (
+          UnsupportedComponents[(this.$scope.agent || {}).agentPlatform] ||
+          UnsupportedComponents['other']
+        ).includes(x.id)
+      )
+        return;
+
+      cleanTabs.push({
+        id: x.id,
+        name: x.name
+      });
+    });
+
     this.$scope.agentsTabsProps = {
       clickAction: tab => {
         this.switchTab(tab, true);
@@ -724,7 +740,7 @@ export class AgentsController {
         (this.currentPanel && this.currentPanel.length
           ? this.currentPanel[0]
           : ''),
-      tabs
+      tabs: cleanTabs
     };
     this.$scope.$applyAsync();
   }
