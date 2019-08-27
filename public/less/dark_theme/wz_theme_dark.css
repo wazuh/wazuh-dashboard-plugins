@@ -306,4 +306,31 @@ md-divider.md-default-theme, md-divider {
 
 .wzMultipleSelectorRemoving{
   background-color: #990000!important;
+
+}
+
+.wz-button {
+  background-color: #1BA9F5 !important;
+  border-color: #1BA9F5 !important;
+  color: #000 !important;
+}
+
+.wz-button-groups.active, .wz-button-groups:not([disabled]):hover, .wz-button.active, .wz-button:not([disabled]):hover, .wz-button-flat:not([disabled]):hover {
+  background-color: #0a9dec !important;
+  border-color: #0a9dec !important;
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.15), 0 2px 2px -1px rgba(0, 0, 0, 0.3) !important;
+  color: #000 !important;
+}
+
+.kuiButton--hollow:hover {
+  color: #006E8A !important;
+  text-decoration: underline !important;
+}
+
+discover-app-w > main.container-fluid {
+  background: #1a1b20 !important;
+}
+
+.wz-menu-select {
+  filter: invert(0) !important; 
 }
