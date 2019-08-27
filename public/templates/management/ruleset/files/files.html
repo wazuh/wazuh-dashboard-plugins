@@ -64,7 +64,7 @@
         <div layout="row" class="wz-padding-bottom-14">
             <div ng-if="!newFile && !editorReadOnly">
                 <span ng-click='closeEditingFile()' class='btn btn-info'>Cancel</span>
-                <button ng-disabled='xmlHasErrors || doingSaving' ng-click='doSaveConfig(false)'
+                <button ng-if='mctrl.adminMode' ng-disabled='xmlHasErrors || doingSaving' ng-click='doSaveConfig(false)'
                     class='btn wz-button pull-right wz-margin-left-8'>
                     <span ng-show='!xmlHasErrors'><i aria-hidden='true' class='fa fa-fw fa-save'
                             ng-class="doingSaving ? 'fa-spin fa-spinner' : ''"></i>Save
@@ -81,7 +81,7 @@
             </div>
             <div ng-if="newFile" layout="row" class="wz-width-100">
                 <button ng-click="closeEditingFile()" class="height-35 kuiButton kuiButton--hollow">Cancel</button>
-                <button ng-disabled='xmlHasErrors || newFileName === "" || doingSaving || overwriteError'
+                <button ng-if='mctrl.adminMode' ng-disabled='xmlHasErrors || newFileName === "" || doingSaving || overwriteError'
                     ng-click='doSaveConfig(true,newFileName)'
                     class="kuiButton kuiButton--secondary height-35 wz-margin-left-8">
                     <span ng-show='!xmlHasErrors'>
