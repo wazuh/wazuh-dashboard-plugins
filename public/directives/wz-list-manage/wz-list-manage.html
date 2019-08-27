@@ -1,7 +1,7 @@
 <div layout="column" layout-align="start">
     <div layout="row" ng-class="hideClose ? ['wz-margin-top-8', 'md-padding-h'] : ''">
         <span ng-if="!hideClose" ng-click='closeFn()' class='wz-margin-top-3 kuiButton kuiButton--hollow wz-margin-right-8'>Cancel</span>
-        <button
+        <button ng-if='adminMode'
             ng-disabled='!(currentItems || []).length || (currentList.new && !currentList.newName) || doingSaving || overwriteError'
             ng-click='saveList()' class='btn wz-button pull-right'>
             <span><i aria-hidden='true' class='fa fa-fw fa-save'
