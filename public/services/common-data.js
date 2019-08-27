@@ -42,15 +42,19 @@ export class CommonData {
     this.savedTimefilter = null;
     this.refreshInterval = { pause: true, value: 0 };
 
-    this.overviewTabs = { 'hostMonitoringTabs': ['general', 'fim', 'aws'], 
-    'systemAuditTabs': ['pm', 'audit', 'oscap', 'ciscat'], 
-    'securityTabs' : ['vuls', 'virustotal', 'osquery', 'docker'], 
-    'complianceTabs' :  ['pci', 'gdpr', 'hipaa', 'nist'] };
+    this.overviewTabs = {
+      hostMonitoringTabs: ['general', 'fim', 'aws'],
+      systemAuditTabs: ['pm', 'audit', 'oscap', 'ciscat'],
+      securityTabs: ['vuls', 'virustotal', 'osquery', 'docker'],
+      complianceTabs: ['pci', 'gdpr', 'hipaa', 'nist']
+    };
 
-    this.agentTabs = { 'hostMonitoringTabs': ['general', 'fim', 'syscollector'], 
-    'systemAuditTabs': ['pm', 'audit', 'oscap', 'ciscat', 'sca'], 
-    'securityTabs' : ['vuls', 'virustotal', 'osquery', 'docker'], 
-    'complianceTabs' :  ['pci', 'gdpr', 'hipaa', 'nist'] };
+    this.agentTabs = {
+      hostMonitoringTabs: ['general', 'fim', 'syscollector'],
+      systemAuditTabs: ['pm', 'audit', 'oscap', 'ciscat', 'sca'],
+      securityTabs: ['vuls', 'virustotal', 'osquery', 'docker'],
+      complianceTabs: ['pci', 'gdpr', 'hipaa', 'nist']
+    };
   }
 
   /**
