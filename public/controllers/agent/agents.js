@@ -705,7 +705,7 @@ export class AgentsController {
    */
   setTabs() {
     this.$scope.agentsTabsProps = false;
-    this.currentPanel = this.commonData.getCurrentPanel(this.$scope.tab);
+    this.currentPanel = this.commonData.getCurrentPanel(this.$scope.tab, true);
 
     if (!this.currentPanel) return;
 
@@ -888,8 +888,10 @@ export class AgentsController {
       extensions: this.cleanExtensions(this.$scope.extensions),
       agent: this.$scope.agent,
       api: this.appState.getCurrentAPI(),
-      setExtensions: (api, extensions) =>
-        this.appState.setExtensions(api, extensions)
+      setExtensions: (api, extensions) => {
+        this.appState.setExtensions(api, extensions);
+        this.$scope.extensions = extensions;
+      }
     };
   }
 

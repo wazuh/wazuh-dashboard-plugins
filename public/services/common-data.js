@@ -42,10 +42,19 @@ export class CommonData {
     this.savedTimefilter = null;
     this.refreshInterval = { pause: true, value: 0 };
 
-    this.hostMonitoringTabs = ['general', 'fim', 'aws'];
-    this.systemAuditTabs = ['pm', 'audit', 'oscap', 'ciscat', 'sca'];
-    this.securityTabs = ['vuls', 'virustotal', 'osquery', 'docker'];
-    this.complianceTabs = ['pci', 'gdpr', 'hipaa', 'nist'];
+    this.overviewTabs = {
+      hostMonitoringTabs: ['general', 'fim', 'aws'],
+      systemAuditTabs: ['pm', 'audit', 'oscap', 'ciscat'],
+      securityTabs: ['vuls', 'virustotal', 'osquery', 'docker'],
+      complianceTabs: ['pci', 'gdpr', 'hipaa', 'nist']
+    }
+
+    this.agentTabs = {
+      hostMonitoringTabs: ['general', 'fim', 'syscollector'],
+      systemAuditTabs: ['pm', 'audit', 'oscap', 'ciscat', 'sca'],
+      securityTabs: ['vuls', 'virustotal', 'osquery', 'docker'],
+      complianceTabs: ['pci', 'gdpr', 'hipaa', 'nist']
+    }
   }
 
   /**
@@ -358,15 +367,16 @@ export class CommonData {
     return this.refreshInterval;
   }
 
-  getCurrentPanel(tab) {
-    return this.hostMonitoringTabs.includes(tab)
-      ? this.hostMonitoringTabs
-      : this.systemAuditTabs.includes(tab)
-      ? this.systemAuditTabs
-      : this.securityTabs.includes(tab)
-      ? this.securityTabs
-      : this.complianceTabs.includes(tab)
-      ? this.complianceTabs
+  getCurrentPanel(tab, isAgent) {
+    const target = isAgent ? this.agentTabs : this.overviewTabs
+    return target.hostMonitoringTabs.includes(tab)
+      ? target.hostMonitoringTabs
+      : target.systemAuditTabs.includes(tab)
+      ? target.systemAuditTabs
+      : target.securityTabs.includes(tab)
+      ? target.securityTabs
+      : target.complianceTabs.includes(tab)
+      ? target.complianceTabs
       : false;
   }
 

@@ -187,7 +187,7 @@ export class OverviewController {
    */
   setTabs() {
     this.overviewTabsProps = false;
-    this.currentPanel = this.commonData.getCurrentPanel(this.tab);
+    this.currentPanel = this.commonData.getCurrentPanel(this.tab, false);
 
     if (!this.currentPanel) return;
 
@@ -206,7 +206,7 @@ export class OverviewController {
         (this.currentPanel && this.currentPanel.length
           ? this.currentPanel[0]
           : ''),
-      tabs : tabs.filter(tab => tab.id != 'sca')
+      tabs
     };
     this.$scope.$applyAsync();
   }
