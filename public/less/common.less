@@ -163,6 +163,23 @@
   border: 1px solid #d9d9d9 !important;
 }
 
+.md-toolbar-tools{
+  height: 50px!important;
+  max-height: 50px!important;
+  position: fixed;
+  padding-right: 20px!important;
+}
+
+.kbnGlobalNav:not(.kbnGlobalNav-isOpen) + .app-wrapper .md-toolbar-tools{
+  width: calc(~'100vw - 53px')!important;
+}
+
+.kbnGlobalNav.kbnGlobalNav-isOpen + .app-wrapper .md-toolbar-tools {
+  width: calc(~'100vw - 180px')!important;
+}
+
+
+
 .euiFlexGroup .euiFlexGroup:hover {
   background: #fafcfe;
 }
