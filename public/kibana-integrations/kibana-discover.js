@@ -281,14 +281,15 @@ function discoverController(
       const isNonRemovable = isRemovable(item);
       const shouldBeAdded = (isIncluded && isNonRemovable) || !isIncluded;
       if (!shouldBeAdded) {
-        errorHandler.handle(`Filter for ${key} already added`);
+        console.log(`Filter for ${key} already added`);
       }
       return shouldBeAdded;
     });
     ///////////////////////////////  END-WAZUH   ////////////////////////////////
-
     // The filters will automatically be set when the queryFilter emits an update event (see below)
     queryFilter.setFilters(finalFilters);
+    // Update our internal copy for the pinned filters
+    pinnedFilters = getPinnedFilters(finalFilters);
   };
 
   $scope.applyFilters = filters => {
@@ -1074,8 +1075,13 @@ function discoverController(
     }
   };
 
-  const getPinnedFilters = () => {
-    const currentFilters = queryFilter.getFilters();
+  /**
+   * Return a list of pinned filters from a given array of filters or
+   * from the queryFilter service if no array is given.
+   * @param {*} arr Optional. Array of filters to be used instead of getFilters()
+   */
+  const getPinnedFilters = arr => {
+    const currentFilters = arr || queryFilter.getFilters();
     if (currentFilters) {
       return currentFilters.filter(
         item => ((item || {}).$state || {}).store === 'globalState'
