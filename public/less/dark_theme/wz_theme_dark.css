@@ -174,6 +174,9 @@ md-nav-bar.md-default-theme .md-nav-bar, md-nav-bar .md-nav-bar {
   background: #272931;
 }
 
+table thead > tr {
+  background-color: #1a1b20 !important;
+}
 
 .table-striped > tbody > tr:nth-of-type(even) {
   background-color: #1d252f !important;
