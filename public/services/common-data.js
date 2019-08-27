@@ -47,14 +47,14 @@ export class CommonData {
       systemAuditTabs: ['pm', 'audit', 'oscap', 'ciscat'],
       securityTabs: ['vuls', 'virustotal', 'osquery', 'docker'],
       complianceTabs: ['pci', 'gdpr', 'hipaa', 'nist']
-    }
+    };
 
     this.agentTabs = {
       hostMonitoringTabs: ['general', 'fim', 'syscollector'],
       systemAuditTabs: ['pm', 'audit', 'oscap', 'ciscat', 'sca'],
       securityTabs: ['vuls', 'virustotal', 'osquery', 'docker'],
       complianceTabs: ['pci', 'gdpr', 'hipaa', 'nist']
-    }
+    };
   }
 
   /**
@@ -368,7 +368,7 @@ export class CommonData {
   }
 
   getCurrentPanel(tab, isAgent) {
-    const target = isAgent ? this.agentTabs : this.overviewTabs
+    const target = isAgent ? this.agentTabs : this.overviewTabs;
     return target.hostMonitoringTabs.includes(tab)
       ? target.hostMonitoringTabs
       : target.systemAuditTabs.includes(tab)
