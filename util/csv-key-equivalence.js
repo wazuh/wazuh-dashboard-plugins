@@ -115,6 +115,9 @@ export const KeyEquivalence = {
   mtu: 'MTU',
   attributes: 'Attributes',
   registerIP: 'Register IP',
-  key: 'Key',
-  value: 'Value'
+  policy_id: 'Policy ID',
+  policy_ID: 'Policy ID',
+  compliance: 'Compliance',
+  rules: 'Rules',
+  reason: 'Reason'
 };
