@@ -309,13 +309,13 @@ md-divider.md-default-theme, md-divider {
 
 }
 
-.wz-button {
+.wz-button, .wz-button-groups, .refresh-agents-btn {
   background-color: #1BA9F5 !important;
   border-color: #1BA9F5 !important;
   color: #000 !important;
 }
 
-.wz-button-groups.active, .wz-button-groups:not([disabled]):hover, .wz-button.active, .wz-button:not([disabled]):hover, .wz-button-flat:not([disabled]):hover {
+.wz-button-groups.active, .wz-button-groups:not([disabled]):hover, .wz-button.active, .wz-button:not([disabled]):hover, .wz-button-flat:not([disabled]):hover, .refresh-agents-btn:hover {
   background-color: #0a9dec !important;
   border-color: #0a9dec !important;
   box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.15), 0 2px 2px -1px rgba(0, 0, 0, 0.3) !important;
