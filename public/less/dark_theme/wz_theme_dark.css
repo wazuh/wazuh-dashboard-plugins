@@ -3,6 +3,11 @@ body,
 html.md-default-theme,
 html {
   color: #dfe5ef !important;
+  background-color: #1a1b20!important;
+}
+
+#kibana-body {
+  background-color: #1a1b20!important;
 }
 
 .euiHeaderSectionItem__button,
