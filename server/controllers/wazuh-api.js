@@ -758,6 +758,27 @@ export class WazuhApiCtrl {
   }
 
   /**
+   * Helper method for Dev Tools.
+   * https://documentation.wazuh.com/current/user-manual/api/reference.html
+   * Depending on the method and the path some parameters should be an array or not.
+   * Since we allow the user to write the request using both comma-separated and array as well,
+   * we need to check if it should be transformed or not.
+   * @param {*} method The request method
+   * @param {*} path The Wazuh API path
+   */
+  shouldKeepArrayAsIt(method, path) {
+    // Methods that we must respect a do not transform them
+    const isAgentsRestart = method === 'POST' && path === '/agents/restart';
+    const isActiveResponse =
+      method === 'PUT' && path.startsWith('/active-response/');
+    const isAddingAgentsToGroup =
+      method === 'POST' && path.startsWith('/agents/group/');
+
+    // Returns true only if one of the above conditions is true
+    return isAgentsRestart || isActiveResponse || isAddingAgentsToGroup;
+  }
+
+  /**
    * This performs a request over Wazuh API and returns its response
    * @param {String} method Method: GET, PUT, POST, DELETE
    * @param {String} path API route
@@ -821,7 +842,7 @@ export class WazuhApiCtrl {
         data = data.content;
       }
       const delay = (data || {}).delay || 0;
-      const fullUrl = getPath(api) + path;
+      let fullUrl = getPath(api) + path;
       if (delay) {
         const current = new Date();
         this.queue.addJob({
@@ -851,21 +872,30 @@ export class WazuhApiCtrl {
         }
       }
 
-      let fixedUrl = false;
-      if (method === 'DELETE') {
-        fixedUrl = `${
-          fullUrl.includes('?') ? fullUrl.split('?')[0] : fullUrl
-        }?${querystring.stringify(data)}`;
+      log('wazuh-api:makeRequest', `${method} ${fullUrl}`, 'debug');
+
+      // Extract keys from parameters
+      const dataProperties = Object.keys(data);
+
+      // Transform arrays into comma-separated string if applicable.
+      // The reason is that we are accepting arrays for comma-separated
+      // parameters in the Dev Tools
+      if (!this.shouldKeepArrayAsIt(method, path)) {
+        for (const key of dataProperties) {
+          if (Array.isArray(data[key])) {
+            data[key] = data[key].join();
+          }
+        }
       }
 
-      log('wazuh-api:makeRequest', `${method} ${fixedUrl || fullUrl}`, 'debug');
+      // DELETE must use URL query but we accept objects in Dev Tools
+      if (method === 'DELETE' && dataProperties.length) {
+        const query = querystring.stringify(data);
+        fullUrl += fullUrl.includes('?') ? `&${query}` : `?${query}`;
+        data = {};
+      }
 
-      const response = await needle(
-        method,
-        fixedUrl || fullUrl,
-        fixedUrl ? null : data,
-        options
-      );
+      const response = await needle(method, fullUrl, data, options);
 
       const responseIsDown = this.checkResponseIsDown(response);
 
@@ -933,6 +963,7 @@ export class WazuhApiCtrl {
       const options = ApiHelper.buildOptionsObject(api);
 
       const fullUrl = getPath(api) + path;
+
       log('wazuh-api:makeGenericRequest', `${method} ${fullUrl}`, 'debug');
       const response = await needle(method, fullUrl, data, options);
 
