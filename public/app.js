@@ -111,7 +111,6 @@ app.run(function($rootScope, $route, $location, appState, $window) {
 
   $rootScope.$on('$locationChangeSuccess', () => {
     const navigation = appState.getNavigation();
-    $rootScope.hideWzMenu = navigation.currLocation === '/health-check';
     appState.setNavigation({ currLocation: $location.path() });
     if (navigation.currLocation !== navigation.prevLocation) {
       if (navigation.discoverSections.includes(navigation.currLocation)) {
