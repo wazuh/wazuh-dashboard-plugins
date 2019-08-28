@@ -36,12 +36,6 @@ class WzMenu {
   ) {
     $scope.showSelector = appState.getPatternSelector();
     $scope.root = $rootScope;
-    let height = false;
-    try {
-      height = $('#navDrawerMenu > ul:nth-child(2)')[0].clientHeight;
-    } catch (error) {} // eslint-disable-line
-    $scope.barHeight = (height || 51) + 2;
-
     $scope.$applyAsync();
 
     $scope.goToClick = path => {
@@ -104,7 +98,7 @@ class WzMenu {
         } else {
           $scope.theresAPI = false;
         }
-
+        calcHeight();
         $scope.$applyAsync();
         return;
       } catch (error) {
@@ -112,6 +106,23 @@ class WzMenu {
         $scope.theresPattern = false;
       }
     };
+
+    const calcHeight = () => {
+      setTimeout(function() {
+        let height = false;
+        try {
+          height = $('#navDrawerMenu > ul:nth-child(2)')[0].clientHeight;
+        } catch (error) {} // eslint-disable-line
+        const barHeight = (height || 51) + 2;
+        $('.md-toolbar-tools')
+          .css('height', barHeight, 'important')
+          .css('max-height', barHeight, 'important');
+      }, 1);
+    };
+
+    $($window).on('resize', function() {
+      calcHeight();
+    });
 
     $scope.root.$on('loadWazuhMenu', () => {
       load();
