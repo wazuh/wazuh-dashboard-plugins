@@ -96,6 +96,10 @@ export class ConfigurationController {
         tabs
       };
     };
+
+    $(window).on('resize', () => {
+      this.dynamicHeight(1);
+    });
   }
 
   switchConfigurationSubTab(configurationSubTab) {
@@ -111,6 +115,7 @@ export class ConfigurationController {
         'sca'
       );
     }
+    this.dynamicHeight(1);
   }
 
   /**
@@ -132,6 +137,7 @@ export class ConfigurationController {
       false,
       (this.$scope.mctrl || {}).selectedNode
     );
+    this.dynamicHeight(500);
   }
 
   /**
@@ -207,6 +213,7 @@ export class ConfigurationController {
         });
         this.$location.search('configSubTab', true);
       }
+      this.dynamicHeight(500);
     } catch (error) {
       this.errorHandler.handle(error, 'Set configuration path');
     }
@@ -219,4 +226,43 @@ export class ConfigurationController {
       (this.$scope.mctrl || {}).selectedNode
     );
   }
+
+  /**
+   * Calculates the height dynamically
+   */
+  dynamicHeight(time) {
+    setTimeout(() => {
+      const editorContainer = $('.d-height');
+      const windows = $(window).height();
+      const offsetTop = this.getPosition(editorContainer[0]).y;
+      const bottom = this.$scope.isLogs ? 75 : 20;
+      const headerContainer = $('.wzXmlEditorHeader');
+      const headerContainerHeight =
+        headerContainer.height() + 50
+          ? headerContainer.height() + 50
+          : this.$scope.isLogs
+            ? 0
+            : 80;
+      editorContainer.height(windows - (offsetTop + bottom));
+      $('.d-height').height(
+        windows - (offsetTop + bottom + headerContainerHeight)
+      );
+      this.$scope.$applyAsync();
+    }, time);
+  }
+
+  getPosition(element) {
+    let xPosition = 0;
+    let yPosition = 0;
+
+    while (element) {
+      xPosition +=
+        element.offsetLeft - element.scrollLeft + element.clientLeft;
+      yPosition += element.offsetTop - element.scrollTop + element.clientTop;
+      element = element.offsetParent;
+    }
+
+    return { x: xPosition, y: yPosition };
+  }
+
 }
