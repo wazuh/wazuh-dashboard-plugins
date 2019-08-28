@@ -467,10 +467,17 @@ export class WazuhReportingCtrl {
           });
         } else if (section === 'groupConfig') {
           this.dd.content.push({
-            text: `Agents in group`,
+            text: 'Agents in group',
             style: { fontSize: 14, color: '#000' },
             margin: [0, 20, 0, 0]
           });
+          if (section === 'groupConfig' && !Object.keys(isAgents).length) {
+            this.dd.content.push({
+              text: 'There are still no agents in this group.',
+              style: { fontSize: 12, color: '#000' },
+              margin: [0, 10, 0, 0]
+            });
+          }
         }
         this.dd.content.push('\n');
       }
@@ -1689,7 +1696,7 @@ export class WazuhReportingCtrl {
             } catch (err) {} //eslint-disable-line
             if (Object.keys(configuration.data.items[0].config).length) {
               this.dd.content.push({
-                text: `Configurations`,
+                text: 'Configurations',
                 style: { fontSize: 14, color: '#000' },
                 margin: [0, 10, 0, 15]
               });
@@ -1822,6 +1829,12 @@ export class WazuhReportingCtrl {
                 }
                 tables = [];
               }
+            }else{
+              this.dd.content.push({
+                text: 'A configuration for this group has not yet been set up.',
+                style: { fontSize: 12, color: '#000' },
+                margin: [0, 10, 0, 15]
+              });              
             }
           }
           if (enabledComponents['1']) {
