@@ -35,7 +35,7 @@
     </div>
 
     <!-- This section contains the main content and the right sidenav -->
-    <div flex="auto" layout="row" ng-if="!load">
+    <div flex="auto" layout="row" ng-if="!load" class="d-height">
 
         <!-- No configuration section -->
         <wz-no-config
