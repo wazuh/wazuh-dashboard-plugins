@@ -47,7 +47,7 @@
                     ng-mouseleave="selectedCell = false" ng-click="handleClick(key,item,$event)">
                     <div class="wz-text-truncatable-container">
                         <span class="wzTableCellFilter" ng-show="filterableColumns[parseKey(key)] && selectedRow === $parent.$index && selectedCell == $index">
-                            <span class="fa fa-search-plus"></span> </span>
+                            <span ng-show="!lens" class="fa fa-search-plus"></span> </span>
                         <span class="wz-text-truncatable" ng-class="parseKey(key) === 'file' && (path === '/rules' || path === '/decoders' )? 'euiLink euiLink--primary' : ''">
                             {{
                             parseValue(key,item)

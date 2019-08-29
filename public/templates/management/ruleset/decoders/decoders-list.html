@@ -39,11 +39,11 @@
                     switch-text="Custom decoders" switch-change="dctrl.switchLocalDecoders()"></wz-kbn-switch>
             </md-card-actions>
             <md-card-content class="wz-padding-bottom-0">
-                <wz-table custom-columns="true" ng-if="!dctrl.showingLocalDecoders" implicit-filter="dctrl.appliedFilters"
+                <wz-table lens="dctrl.showingLocalDecoders" custom-columns="true" ng-if="!dctrl.showingLocalDecoders" implicit-filter="dctrl.appliedFilters"
                     flex path="'/decoders'" keys="['name',{value:'details.program_name',size:2,nosortable:true},{value:'details.order',size:2,nosortable:true},'file', 'path']"
                     allow-click="true" row-sizes="[16,13,11]">
                 </wz-table>
-                <wz-table custom-columns="true" ng-if="dctrl.showingLocalDecoders" flex path="'/decoders'" keys="['name',{value:'details.program_name',size:2,nosortable:true},{value:'details.order',size:2,nosortable:true},'file', 'path']"
+                <wz-table lens="dctrl.showingLocalDecoders" custom-columns="true" ng-if="dctrl.showingLocalDecoders" flex path="'/decoders'" keys="['name',{value:'details.program_name',size:2,nosortable:true},{value:'details.order',size:2,nosortable:true},'file', 'path']"
                     implicit-filter="dctrl.appliedFilters" allow-click="true" row-sizes="[16,13,11]">
                 </wz-table>
             </md-card-content>
