@@ -497,6 +497,8 @@ function discoverController(
                   loadedVisualizations.removeAll();
                   $rootScope.rendered = false;
                   $rootScope.loadingStatus = 'Fetching data...';
+                  // Forcing a digest cycle
+                  $rootScope.$applyAsync();
                 }
                 ////////////////////////////////////////////////////////////////////////////
                 $state.save();
@@ -763,6 +765,8 @@ function discoverController(
       loadedVisualizations.removeAll();
       $rootScope.rendered = false;
       $rootScope.loadingStatus = 'Fetching data...';
+      // Forcing a digest cycle
+      $rootScope.$applyAsync();
     }
     ////////////////////////////////////////////////////////////////////////////
     $scope.timeRange = {
@@ -1097,6 +1101,7 @@ function discoverController(
   const wzEventFiltersListener = $rootScope.$on(
     'wzEventFilters',
     (evt, parameters) => {
+      $rootScope.resultState = fetchStatuses.LOADING;
       if (!parameters.localChange) {
         if (!(pinnedFilters || []).length) {
           pinnedFilters = getPinnedFilters();
@@ -1111,6 +1116,7 @@ function discoverController(
   const changeTabViewListener = $rootScope.$on(
     'changeTabView',
     async (evt, parameters) => {
+      $rootScope.resultState = fetchStatuses.LOADING;
       pinnedFilters = getPinnedFilters();
       const goToDiscover = parameters.tabView === 'discover';
       const wasOnDiscover = $scope.tabView === 'discover';

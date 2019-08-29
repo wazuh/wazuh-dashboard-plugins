@@ -229,11 +229,13 @@ app.directive('kbnVis', function() {
 
         if (currentCompleted >= 100) {
           $rootScope.rendered = true;
+          $rootScope.loadingStatus = 'Fetching data...';
         } else if (
           $scope.visID !== 'Wazuh-App-Overview-General-Agents-status'
         ) {
           $rootScope.rendered = false;
         }
+        
         // Forcing a digest cycle
         $rootScope.$applyAsync();
       };
