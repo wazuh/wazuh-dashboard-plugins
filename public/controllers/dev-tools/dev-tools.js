@@ -15,6 +15,7 @@ import { ExcludedIntelliSenseTriggerKeys } from '../../../util/excluded-devtools
 import queryString from 'querystring-browser';
 import $ from 'jquery';
 import * as FileSaver from '../../services/file-saver';
+import { DynamicHeight } from '../../utils/dynamic-height';
 
 export class DevToolsController {
   /**
@@ -46,6 +47,7 @@ export class DevToolsController {
     this.linesWithClass = [];
     this.widgets = [];
     this.multipleKeyPressed = [];
+    this.dh = new DynamicHeight();
   }
 
   /**
@@ -465,26 +467,7 @@ export class DevToolsController {
       dynamicHeight();
     };
 
-    const dynamicHeight = () => {
-      const self = this;
-      const window = this.$window;
-      setTimeout(function() {
-        const windows = $(window).height();
-        $('#wz-dev-left-column').height(
-          windows - (self.getPosition($('#wz-dev-left-column')[0]).y + 20)
-        );
-        $('.wz-dev-column-separator').height(
-          windows - (self.getPosition($('.wz-dev-column-separator')[0]).y + 20)
-        );
-        $('#wz-dev-right-column').height(
-          windows - (self.getPosition($('#wz-dev-right-column')[0]).y + 20)
-        );
-        $('.wz-dev-column-separator span').height(
-          windows -
-            (self.getPosition($('.wz-dev-column-separator span')[0]).y + 20)
-        );
-      }, 1);
-    };
+    const dynamicHeight = () => this.dh.dynamicHeightDevTools(this, this.$window);
     dynamicHeight();
   }
 

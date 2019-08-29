@@ -13,6 +13,7 @@
 import template from './wz-config-viewer.html';
 import { uiModules } from 'ui/modules';
 import CodeMirror from '../../utils/codemirror/lib/codemirror';
+import { DynamicHeight } from '../../utils/dynamic-height';
 
 const app = uiModules.get('app/wazuh', []);
 
@@ -31,6 +32,7 @@ class WzConfigViewer {
   }
 
   controller($scope, $document, $window) {
+    const dh = new DynamicHeight();
     const window = $window;
     const setJsonBox = () => {
       $scope.jsonCodeBox = CodeMirror.fromTextArea(
@@ -49,6 +51,7 @@ class WzConfigViewer {
         }
       );
     };
+
     const setXmlBox = () => {
       $scope.xmlCodeBox = CodeMirror.fromTextArea(
         $document[0].getElementById('viewer_xml_box'),
@@ -69,29 +72,9 @@ class WzConfigViewer {
       bindXmlListener();
     };
 
-    $(window).on('resize', function() {
-      dynamicHeight();
+    $(window).on('resize', () => {
+      dh.dynamicHeight('configViewer', 30);
     });
-
-    const dynamicHeight = () => {
-      setTimeout(function() {
-        const editorContainer = $('.configViewer');
-        const windows = $(window).height();
-        const offsetTop = getPosition(editorContainer[0]).y;
-        const bottom = $scope.isLogs ? 75 : 20;
-        const headerContainer = $('.wzXmlEditorHeader');
-        const headerContainerHeight =
-          headerContainer.height() + 30
-            ? headerContainer.height() + 30
-            : $scope.isLogs
-            ? 0
-            : 80;
-        editorContainer.height(windows - (offsetTop + bottom));
-        $('.wzXmlEditorBody .CodeMirror').height(
-          windows - (offsetTop + bottom + headerContainerHeight)
-        );
-      }, 1);
-    };
 
     const refreshJsonBox = json => {
       $scope.jsoncontent = json;
@@ -100,7 +83,7 @@ class WzConfigViewer {
       }
       if ($scope.jsoncontent != false) {
         $scope.jsonCodeBox.setValue($scope.jsoncontent.replace(/\\\\/g, '\\'));
-        setTimeout(function() {
+        setTimeout(function () {
           $scope.jsonCodeBox.refresh();
           $scope.$applyAsync();
           window.dispatchEvent(new Event('resize')); // eslint-disable-line
@@ -109,7 +92,6 @@ class WzConfigViewer {
     };
 
     const refreshXmlBox = (xml, isLogs) => {
-      $scope.isLogs = isLogs;
       $scope.xmlcontent = xml;
       if (!$scope.xmlCodeBox) {
         setXmlBox();
@@ -119,13 +101,12 @@ class WzConfigViewer {
         setTimeout(function() {
           $scope.xmlCodeBox.refresh();
           $scope.$applyAsync();
-          $scope.isLogs
-            ? dynamicHeight()
+          isLogs
+            ? dh.dynamicHeight('configViewer', 30, isLogs)
             : window.dispatchEvent(new Event('resize')); // eslint-disable-line
         }, 200);
       }
     };
-
     $scope.callgetjson = () => $scope.getjson();
 
     $scope.callgetxml = () => $scope.getxml();
@@ -140,7 +121,7 @@ class WzConfigViewer {
 
     const bindXmlListener = () => {
       var scrollElement = $scope.xmlCodeBox.getScrollerElement();
-      $(scrollElement).bind('scroll', function(e) {
+      $(scrollElement).bind('scroll', function (e) {
         var element = $(e.currentTarget)[0];
         if (element.scrollHeight - element.scrollTop === element.clientHeight) {
           $scope.$emit('scrolledToBottom', {
@@ -167,20 +148,6 @@ class WzConfigViewer {
         $scope.jsonCodeBox.refresh();
       }
     });
-
-    function getPosition(element) {
-      var xPosition = 0;
-      var yPosition = 0;
-
-      while (element) {
-        xPosition +=
-          element.offsetLeft - element.scrollLeft + element.clientLeft;
-        yPosition += element.offsetTop - element.scrollTop + element.clientTop;
-        element = element.offsetParent;
-      }
-
-      return { x: xPosition, y: yPosition };
-    }
   }
 }
 
