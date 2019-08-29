@@ -11,7 +11,7 @@
  */
 export default [
   {
-    _id: 'Wazuh-App-Cluster-Overview',
+    _id: 'Wazuh-App-Cluster-monitoring-Overview',
     _type: 'visualization',
     _source: {
       title: 'Wazuh App Cluster Overview',
@@ -27,7 +27,7 @@ export default [
     }
   },
   {
-    _id: 'Wazuh-App-Cluster-Overview-Manager',
+    _id: 'Wazuh-App-Cluster-monitoring-Overview-Manager',
     _type: 'visualization',
     _source: {
       title: 'Wazuh App Cluster Overview Manager',
@@ -43,7 +43,7 @@ export default [
     }
   },
   {
-    _id: 'Wazuh-App-Cluster-Overview-Node',
+    _id: 'Wazuh-App-Cluster-monitoring-Overview-Node',
     _source: {
       title: 'Wazuh App Cluster Overview Node',
       visState:
@@ -60,7 +60,7 @@ export default [
     _type: 'visualization'
   },
   {
-    _id: 'Wazuh-App-Cluster-Overview-Node-Pie',
+    _id: 'Wazuh-App-Cluster-monitoring-Overview-Node-Pie',
     _type: 'visualization',
     _source: {
       title: 'Wazuh App Cluster Overview Node Pie',
