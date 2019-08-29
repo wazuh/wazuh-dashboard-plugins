@@ -221,9 +221,7 @@ app.directive('kbnVis', function() {
       });
 
       const renderComplete = () => {
-        console.log(typeof $scope.visID)
         if(!$scope.visID.toLowerCase().includes(tabVisualizations.getTab())){
-          console.log(`Destroying ${$scope.visID.toLowerCase()}, tab: ${tabVisualizations.getTab()}`)
           destroyAll();
           return;
         }
