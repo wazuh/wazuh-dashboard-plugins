@@ -236,7 +236,8 @@ export class OverviewController {
         );
       } else {
         this.$scope.$emit('changeTabView', {
-          tabView: this.tabView
+          tabView: this.tabView,
+          tab: this.tab
         });
       }
 
