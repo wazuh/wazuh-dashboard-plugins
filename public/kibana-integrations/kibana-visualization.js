@@ -17,6 +17,7 @@ import dateMath from '@elastic/datemath';
 
 const app = uiModules.get('app/wazuh', []);
 let lockFields = false;
+
 app.directive('kbnVis', function() {
   return {
     restrict: 'E',
@@ -205,17 +206,25 @@ app.directive('kbnVis', function() {
         }
       });
 
-      $scope.$on('$destroy', () => {
-        updateVisWatcher();
+      const destroyAll = () => {
         try {
           visualization.destroy();
         } catch (error) {} // eslint-disable-line
         try {
           visHandler.destroy();
         } catch (error) {} // eslint-disable-line
+      }
+
+      $scope.$on('$destroy', () => {
+        updateVisWatcher();
+        destroyAll();
       });
 
       const renderComplete = () => {
+        if(!$scope.visID.toLowerCase().includes(tabVisualizations.getTab())){
+          destroyAll();
+          return;
+        }
         rendered = true;
         loadedVisualizations.addItem(true);
         const currentCompleted = Math.round(
