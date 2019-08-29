@@ -260,6 +260,7 @@ export class OverviewController {
 
   // Switch tab
   async switchTab(newTab, force = false) {
+    this.tabVisualizations.setTab(newTab);
     this.$rootScope.rendered = false;
     this.$rootScope.$applyAsync();
     this.falseAllExpand();
@@ -302,8 +303,6 @@ export class OverviewController {
 
       if (this.tabHistory.length > 2)
         this.tabHistory = this.tabHistory.slice(-2);
-
-      this.tabVisualizations.setTab(newTab);
 
       if (this.tab === newTab && !force) return;
       

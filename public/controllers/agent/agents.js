@@ -546,6 +546,7 @@ export class AgentsController {
    * @param {*} force
    */
   async switchTab(tab, force = false) {
+    this.tabVisualizations.setTab(tab);
     this.$rootScope.rendered = false;
     this.$rootScope.$applyAsync();
     this.falseAllExpand();
@@ -633,7 +634,6 @@ export class AgentsController {
       if (!this.ignoredTabs.includes(tab)) this.tabHistory.push(tab);
       if (this.tabHistory.length > 2)
         this.tabHistory = this.tabHistory.slice(-2);
-      this.tabVisualizations.setTab(tab);
 
       if (this.$scope.tab === tab && !force) {
         this.$scope.$applyAsync();
