@@ -546,6 +546,8 @@ export class AgentsController {
    * @param {*} force
    */
   async switchTab(tab, force = false) {
+    this.$rootScope.rendered = false;
+    this.$rootScope.$applyAsync();
     this.falseAllExpand();
     if (this.ignoredTabs.includes(tab)) {
       this.commonData.setRefreshInterval(timefilter.getRefreshInterval());
