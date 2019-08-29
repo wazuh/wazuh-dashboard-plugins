@@ -37,7 +37,8 @@ app.directive('wzTable', function() {
       rowSizes: '=rowSizes',
       emptyResults: '=emptyResults',
       customColumns: '=customColumns',
-      implicitSort: '=implicitSort'
+      implicitSort: '=implicitSort',
+      lens: '=lens'
     },
     controller(
       $scope,
