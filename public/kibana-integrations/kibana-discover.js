@@ -154,7 +154,7 @@ function discoverController(
 ) {
   // Wazuh. Copy for the pinned filters
   let pinnedFilters = [];
-
+  let lastTab = 'unknown';
   // Wazuh. Copy for the discover filters
   let discoverFilters = [];
   let backFromDiscover = false;
@@ -290,7 +290,7 @@ function discoverController(
       }
       return shouldBeAdded;
     });
-    ///////////////////////////////  END-WAZUH   ////////////////////////////////  
+    ///////////////////////////////  END-WAZUH   ////////////////////////////////
     // The filters will automatically be set when the queryFilter emits an update event (see below)
     queryFilter.setFilters(finalFilters);
     // Update our internal copy for the pinned filters
@@ -1110,19 +1110,20 @@ function discoverController(
   $scope.tabView = $location.search().tabView || 'panels';
   const changeTabViewListener = $rootScope.$on(
     'changeTabView',
-    (evt, parameters) => {
+    async (evt, parameters) => {
       pinnedFilters = getPinnedFilters();
-      const isNotDiscover =
-        parameters.tabView !== 'discover' && $scope.tabView !== 'discover';
-      const backDiscover =
-        parameters.tabView !== 'discover' && $scope.tabView === 'discover';
-      const sameSection = parameters.sameSection;
+      const goToDiscover = parameters.tabView === 'discover';
+      const wasOnDiscover = $scope.tabView === 'discover';
+      const backDiscover = !goToDiscover && wasOnDiscover;
       backFromDiscover = backDiscover;
-      // If it's not the Discover and we are changing section,
-      // then clear all the filters.
-      if (isNotDiscover && !sameSection) {
-        queryFilter.removeAll();
-      } else if (backDiscover) {
+
+      // Store last tab we visited
+      const sameTab = lastTab === parameters.tab;
+      lastTab = parameters.tab;
+
+      if (!sameTab) {
+        await queryFilter.removeAll();
+      } else {
         discoverFilters = queryFilter.getFilters();
       }
 
@@ -1138,7 +1139,7 @@ function discoverController(
       // Wazuh. Force to retrieve "hits".
       // Before this version, we already had the hits, with the latest optimization
       // they are only retrieved if needed (Discover table).
-      if (parameters.tabView === 'discover') {
+      if (goToDiscover) {
         $scope.updateQueryAndFetch({
           query: $state.query,
           dateRange: $scope.time
