@@ -303,6 +303,7 @@ export function GroupsController(
     $scope.editingFile = false;
     appState.setNavigation({ status: true });
     $scope.$broadcast('closeEditXmlFile', {});
+    $scope.groupsTabsProps.selectedTab = 'files';
     $scope.$applyAsync();
   };
 
@@ -622,12 +623,12 @@ export function GroupsController(
     clickAction: tab => {
       if (tab === 'agents') {
         $scope.goBackToAgents();
-      } else if (tab === 'content') {
+      } else if (tab === 'files') {
         $scope.goBackFiles();
       }
     },
     selectedTab: $scope.groupsSelectedTab || 'agents',
-    tabs: [{ id: 'agents', name: 'Agents' }, { id: 'content', name: 'Content' }]
+    tabs: [{ id: 'agents', name: 'Agents' }, { id: 'files', name: 'Content' }]
   };
 
   // Come from the pencil icon on the groups table
