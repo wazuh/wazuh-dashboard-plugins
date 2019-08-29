@@ -47,7 +47,6 @@ export class DevToolsController {
     this.linesWithClass = [];
     this.widgets = [];
     this.multipleKeyPressed = [];
-    this.dh = new DynamicHeight();
   }
 
   /**
@@ -467,7 +466,7 @@ export class DevToolsController {
       dynamicHeight();
     };
 
-    const dynamicHeight = () => this.dh.dynamicHeightDevTools(this, this.$window);
+    const dynamicHeight = () => DynamicHeight.dynamicHeightDevTools(this, this.$window);
     dynamicHeight();
   }
 
