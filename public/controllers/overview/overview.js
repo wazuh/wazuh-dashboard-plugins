@@ -259,6 +259,8 @@ export class OverviewController {
 
   // Switch tab
   async switchTab(newTab, force = false) {
+    this.$rootScope.rendered = false;
+    this.$rootScope.$applyAsync();
     this.falseAllExpand();
     try {
       if (newTab === 'welcome') {

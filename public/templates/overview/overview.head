@@ -56,8 +56,8 @@
     <!-- End Discover search bar section -->
 
     <!-- Loading status section -->
-    <div layout="column" layout-align="center center" ng-if="octrl.tab !== 'welcome'"
-        ng-show="resultState === 'ready' && octrl.tabView === 'panels' && !rendered">
+    <div layout="column" layout-align="center center"
+        ng-if="octrl.tab !== 'welcome' && octrl.tabView === 'panels' && !rendered">
         <div class="percentage"><i class="fa fa-fw fa-spin fa-spinner" aria-hidden="true"></i></div>
         <div class="percentage">{{loadingStatus}}</div>
     </div>
@@ -74,8 +74,7 @@
     <!-- No results section -->
     <div layout="row" class="wz-margin-top-10 wz-margin-right-8 wz-margin-left-8" ng-if="octrl.tab !== 'welcome'"
         ng-show="resultState === 'none' && octrl.tabView === 'panels'">
-        <react-component flex name="EuiCallOut"
-            props="{color:'warning',iconType:'help', title:'There are no results for selected time range. Try another
+        <react-component flex name="EuiCallOut" props="{color:'warning',iconType:'help', title:'There are no results for selected time range. Try another
             one.'}" />
     </div>
     <!-- No results section -->

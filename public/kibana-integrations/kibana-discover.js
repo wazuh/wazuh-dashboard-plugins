@@ -127,8 +127,7 @@ function discoverController(
   getAppState,
   globalState,
   loadedVisualizations,
-  discoverPendingUpdates,
-  errorHandler
+  discoverPendingUpdates
 ) {
   const visualizeLoader = Private(VisualizeLoaderProvider);
   let visualizeHandler;
@@ -464,38 +463,8 @@ function discoverController(
         if (!angular.equals(sort, currentSort)) $scope.fetch();
       });
 
-      const noRemovable = filter =>
-        typeof filter.meta.removable !== 'undefined' &&
-        filter.meta.removable &&
-        ((filter || {}).$state || {}).store !== 'globalState';
-
       // update data source when filters update
       $scope.$listen(queryFilter, 'update', function() {
-        if (!$scope.implicitFilters) {
-          $scope.implicitFilters = queryFilter.getFilters();
-        }
-        let filters = queryFilter.getFilters();
-        ///////////////////////////////  WAZUH   ///////////////////////////////////
-        // Store non removable filters
-        const nonRemovableFilters = $scope.implicitFilters.map(
-          item => item.meta.key
-        );
-
-        // Compose final filters array not including filters that also exist as non removable filter
-        filters = filters.filter(item => {
-          let key;
-          if (typeof item.exists !== 'undefined') {
-            key = item.exists.field;
-          } else {
-            key =
-              item.meta.key || (Object.keys(item.query.match) || [undefined])[0];
-          }
-          const isIncluded = nonRemovableFilters.includes(key);
-          const isNonRemovable = noRemovable(item);
-          const shouldBeAdded = (isIncluded && isNonRemovable) || !isIncluded;
-          return shouldBeAdded;
-        });
-
         return $scope
           .updateDataSource()
           .then(function() {
@@ -503,13 +472,18 @@ function discoverController(
             ///////////////////////////////  WAZUH   ///////////////////////////////////
             ////////////////////////////////////////////////////////////////////////////
             discoverPendingUpdates.removeAll();
-            discoverPendingUpdates.addItem($state.query, filters);
+            discoverPendingUpdates.addItem(
+              $state.query,
+              queryFilter.getFilters()
+            );
             $rootScope.$broadcast('updateVis');
             $rootScope.$broadcast('fetch');
             if ($location.search().tab != 'configuration') {
               loadedVisualizations.removeAll();
               $rootScope.rendered = false;
               $rootScope.loadingStatus = 'Fetching data...';
+              // Forcing a digest cycle
+              $rootScope.$applyAsync();
             }
             ////////////////////////////////////////////////////////////////////////////
             ////////////////////////////////////////////////////////////////////////////
@@ -869,6 +843,8 @@ function discoverController(
       loadedVisualizations.removeAll();
       $rootScope.rendered = false;
       $rootScope.loadingStatus = 'Fetching data...';
+      // Forcing a digest cycle
+      $rootScope.$applyAsync();
     }
     ////////////////////////////////////////////////////////////////////////////
     ////////////////////////////////////////////////////////////////////////////
@@ -1137,6 +1113,7 @@ function discoverController(
   const wzEventFiltersListener = $rootScope.$on(
     'wzEventFilters',
     (evt, parameters) => {
+      $rootScope.resultState = 'loading';
       loadFilters(parameters.filters, parameters.localChange);
     }
   );
@@ -1145,6 +1122,7 @@ function discoverController(
   const changeTabViewListener = $rootScope.$on(
     'changeTabView',
     (evt, parameters) => {
+      $rootScope.resultState = 'loading';
       evt.stopPropagation();
       $scope.tabView = parameters.tabView || 'panels';
       $scope.updateQueryAndFetch($state.query);
