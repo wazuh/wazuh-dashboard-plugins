@@ -37,7 +37,6 @@ export class ConfigurationController {
     this.$scope.integrations = {};
     this.$scope.selectedItem = 0;
     this.showHelp = false;
-    this.dh = new DynamicHeight();
   }
 
   /**
@@ -100,7 +99,7 @@ export class ConfigurationController {
     };
 
     $(window).on('resize', () => {
-      this.dh.dynamicHeight('d-height', 50);
+      DynamicHeight.dynamicHeight('d-height', 50);
     });
   }
 
@@ -117,7 +116,7 @@ export class ConfigurationController {
         'sca'
       );
     }
-    this.dh.dynamicHeight('d-height', 50);
+    DynamicHeight.dynamicHeight('d-height', 50);
   }
 
   /**
@@ -139,7 +138,7 @@ export class ConfigurationController {
       false,
       (this.$scope.mctrl || {}).selectedNode
     );
-    this.dh.dynamicHeight('d-height', 50);
+    DynamicHeight.dynamicHeight('d-height', 50);
   }
 
   /**
@@ -215,7 +214,7 @@ export class ConfigurationController {
         });
         this.$location.search('configSubTab', true);
       }
-      this.dh.dynamicHeight('d-height', 50);
+      DynamicHeight.dynamicHeight('d-height', 50);
     } catch (error) {
       this.errorHandler.handle(error, 'Set configuration path');
     }

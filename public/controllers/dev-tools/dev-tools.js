@@ -50,7 +50,6 @@ export class DevToolsController {
     this.multipleKeyPressed = [];
     this.IS_DARK_THEME = chrome.getUiSettingsClient().get('theme:darkMode');
     this.$scope =  $scope;
-    this.dh = new DynamicHeight();
   }
 
   /**
@@ -470,7 +469,7 @@ export class DevToolsController {
       dynamicHeight();
     };
 
-    const dynamicHeight = () => this.dh.dynamicHeightDevTools(this, this.$window);
+    const dynamicHeight = () => DynamicHeight.dynamicHeightDevTools(this, this.$window);
     dynamicHeight();
   }
 

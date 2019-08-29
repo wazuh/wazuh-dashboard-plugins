@@ -33,7 +33,6 @@ class WzConfigViewer {
   }
 
   controller($scope, $document, $window) {
-    const dh = new DynamicHeight();
     const window = $window;
     const IS_DARK_THEME = chrome.getUiSettingsClient().get('theme:darkMode');
     const setJsonBox = () => {
@@ -75,7 +74,7 @@ class WzConfigViewer {
     };
 
     $(window).on('resize', () => {
-      dh.dynamicHeight('configViewer', 30);
+      DynamicHeight.dynamicHeight('configViewer', 30);
     });
 
     const refreshJsonBox = json => {
@@ -104,7 +103,7 @@ class WzConfigViewer {
           $scope.xmlCodeBox.refresh();
           $scope.$applyAsync();
           isLogs
-            ? dh.dynamicHeight('configViewer', 30, isLogs)
+            ? DynamicHeight.dynamicHeight('configViewer', 30, isLogs)
             : window.dispatchEvent(new Event('resize')); // eslint-disable-line
         }, 200);
       }
