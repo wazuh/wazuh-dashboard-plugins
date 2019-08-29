@@ -42,7 +42,6 @@ app.directive('wzXmlFileEditor', function() {
       $window
       ) {
       const window = $window;
-      const dh = new DynamicHeight();
       $scope.targetNameShown = $scope.targetName;
       $scope.configError = false;
       /**
@@ -108,7 +107,7 @@ app.directive('wzXmlFileEditor', function() {
         }
         checkingXmlError = false;
         $scope.$applyAsync();
-        dh.dynamicHeightXmlEditor();
+        DynamicHeight.dynamicHeightXmlEditor();
         return;
       };
 
@@ -213,7 +212,7 @@ app.directive('wzXmlFileEditor', function() {
           if (!isOk && Array.isArray(data.details)) {
             $scope.configError = data.details;
             $scope.$applyAsync();
-            dh.dynamicHeightXmlEditor();
+            DynamicHeight.dynamicHeightXmlEditor();
             throw new Error('Validation error');
           }
           return true;
@@ -337,14 +336,14 @@ app.directive('wzXmlFileEditor', function() {
       );
 
       $(window).on('resize', function() {
-        dh.dynamicHeightXmlEditor();
+        DynamicHeight.dynamicHeightXmlEditor();
       });
 
       const init = (data = false) => {
         try {
           $('.wzXmlEditor').height(0);
           $scope.xmlError = false;
-          dh.dynamicHeightXmlEditor();
+          DynamicHeight.dynamicHeightXmlEditor();
           $scope.xmlCodeBox.setValue(autoFormat(data || $scope.data));
           firstTime = false;
           setTimeout(() => {
@@ -378,7 +377,7 @@ app.directive('wzXmlFileEditor', function() {
         $scope.restartBtn = true;
         $scope.$applyAsync();
         $scope.$emit('showRestartBtn', { msg, target });
-        dh.dynamicHeightXmlEditor();
+        DynamicHeight.dynamicHeightXmlEditor();
       };
 
       $scope.$on('saveXmlFile', (ev, params) => saveFile(params));
@@ -386,7 +385,7 @@ app.directive('wzXmlFileEditor', function() {
       $scope.$on('removeRestartMsg', () => {
         $scope.restartBtn = false;
         $scope.$applyAsync();
-        dh.dynamicHeightXmlEditor();
+        DynamicHeight.dynamicHeightXmlEditor();
       });
 
       $rootScope.$on('changedInputFileName', (ev, params) => {
