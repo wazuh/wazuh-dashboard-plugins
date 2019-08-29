@@ -10,6 +10,7 @@
  * Find more information about this on the LICENSE file.
  */
 import { ConfigurationHandler } from '../../utils/config-handler';
+import { DynamicHeight } from '../../utils/dynamic-height';
 
 export class ConfigurationController {
   /**
@@ -36,6 +37,7 @@ export class ConfigurationController {
     this.$scope.integrations = {};
     this.$scope.selectedItem = 0;
     this.showHelp = false;
+    this.dh = new DynamicHeight();
   }
 
   /**
@@ -98,7 +100,7 @@ export class ConfigurationController {
     };
 
     $(window).on('resize', () => {
-      this.dynamicHeight(1);
+      this.dh.dynamicHeight('d-height', 50);
     });
   }
 
@@ -115,7 +117,7 @@ export class ConfigurationController {
         'sca'
       );
     }
-    this.dynamicHeight(1);
+    this.dh.dynamicHeight('d-height', 50);
   }
 
   /**
@@ -137,7 +139,7 @@ export class ConfigurationController {
       false,
       (this.$scope.mctrl || {}).selectedNode
     );
-    this.dynamicHeight(500);
+    this.dh.dynamicHeight('d-height', 50);
   }
 
   /**
@@ -213,7 +215,7 @@ export class ConfigurationController {
         });
         this.$location.search('configSubTab', true);
       }
-      this.dynamicHeight(500);
+      this.dh.dynamicHeight('d-height', 50);
     } catch (error) {
       this.errorHandler.handle(error, 'Set configuration path');
     }
@@ -225,44 +227,6 @@ export class ConfigurationController {
       false,
       (this.$scope.mctrl || {}).selectedNode
     );
-  }
-
-  /**
-   * Calculates the height dynamically
-   */
-  dynamicHeight(time) {
-    setTimeout(() => {
-      const editorContainer = $('.d-height');
-      const windows = $(window).height();
-      const offsetTop = this.getPosition(editorContainer[0]).y;
-      const bottom = this.$scope.isLogs ? 75 : 20;
-      const headerContainer = $('.wzXmlEditorHeader');
-      const headerContainerHeight =
-        headerContainer.height() + 50
-          ? headerContainer.height() + 50
-          : this.$scope.isLogs
-            ? 0
-            : 80;
-      editorContainer.height(windows - (offsetTop + bottom));
-      $('.d-height').height(
-        windows - (offsetTop + bottom + headerContainerHeight)
-      );
-      this.$scope.$applyAsync();
-    }, time);
-  }
-
-  getPosition(element) {
-    let xPosition = 0;
-    let yPosition = 0;
-
-    while (element) {
-      xPosition +=
-        element.offsetLeft - element.scrollLeft + element.clientLeft;
-      yPosition += element.offsetTop - element.scrollTop + element.clientTop;
-      element = element.offsetParent;
-    }
-
-    return { x: xPosition, y: yPosition };
   }
 
 }
