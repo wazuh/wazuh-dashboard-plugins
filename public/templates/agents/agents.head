@@ -100,7 +100,7 @@
 
     <!-- Loading status section -->
     <div layout="column" layout-align="center center"
-        ng-if="tab !== 'welcome' && tab !== 'sca' && tab !== 'configuration' && tab !== 'syscollector' && tabView === 'panels' && !rendered">
+        ng-if="tab !== 'welcome' && tab !== 'sca' && tab !== 'configuration' && tab !== 'syscollector' && tabView === 'panels' && !rendered && resultState !== 'none'">
         <div class="percentage"><i class="fa fa-fw fa-spin fa-spinner" aria-hidden="true"></i></div>
         <div class="percentage">{{loadingStatus}}</div>
     </div>
