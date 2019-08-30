@@ -442,7 +442,7 @@ export class DevToolsController {
       const leftOrigWidth = $('#wz-dev-left-column').width();
       const rightOrigWidth = $('#wz-dev-right-column').width();
       $(evtDocument).mousemove(function(e) {
-        const leftWidth = e.pageX - 85 + 14;
+        const leftWidth = e.pageX - 215 + 14;
         let rightWidth = leftOrigWidth - leftWidth;
         $('#wz-dev-left-column').css('width', leftWidth);
         $('#wz-dev-right-column').css('width', rightOrigWidth + rightWidth);
