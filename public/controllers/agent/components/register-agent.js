@@ -38,6 +38,13 @@ export class RegisterAgent extends Component {
     this.setState({ serverAddress: event.target.value });
   }
 
+  clearSteps(steps) {
+    if (['win', 'macos'].includes(this.state.selectedOS)) {
+      steps.splice(2, 1);
+    }
+    return steps;
+  }
+
   render() {
     const rpmButton = (
       <EuiButtonToggle
@@ -98,8 +105,50 @@ export class RegisterAgent extends Component {
       winText: `wazuh-agent-3.9.1-1.msi /q ADDRESS='${this.state.serverAddress}' AUTHD_SERVER='${this.state.serverAddress}'`
     };
 
-    const field = `${this.state.selectedOS}Text`;
-    const text = customTexts[field];
+    const repositoriesText = {
+      rpmRepo:
+        `rpm --import https://packages.wazuh.com/key/GPG-KEY-WAZUH &&
+cat > /etc/yum.repos.d/wazuh.repo <<\EOF
+[wazuh_repo]
+gpgcheck=1
+gpgkey=https://packages.wazuh.com/key/GPG-KEY-WAZUH
+enabled=1
+name=Wazuh repository
+baseurl=https://packages.wazuh.com/3.x/yum/
+protect=1
+EOF`,
+      debRepo:
+        `curl -s https://packages.wazuh.com/key/GPG-KEY-WAZUH | apt-key add - && 
+echo "deb https://packages.wazuh.com/3.x/apt/ stable main" | tee -a /etc/apt/sources.list.d/wazuh.list && 
+apt-get update`
+    }
+
+    const field = `${this.state.selectedOS}`;
+    const text = customTexts[`${field}Text`];
+    const repo = repositoriesText[`${field}Repo`];
+
+    const repository = (
+      <div>
+        {this.state.selectedOS && (
+          <EuiText>
+            <div style={copyButton}>
+              <EuiCopy textToCopy={repo}>
+                {copy => (
+                  <EuiButtonIcon
+                    onClick={copy}
+                    iconType="copy"
+                    aria-label="Copy"
+                  />
+                )}
+              </EuiCopy>
+            </div>
+            <EuiCodeBlock style={codeBlock} language="js">
+              {repo}
+            </EuiCodeBlock>
+          </EuiText>
+        )}
+      </div>
+    );
 
     const guide = (
       <div>
@@ -138,6 +187,16 @@ export class RegisterAgent extends Component {
         children: <Fragment>{ipInput}</Fragment>
       },
       {
+        title: 'Add the repository',
+        children: (
+          <div>
+            <Fragment>
+              <div>{repository}</div>
+            </Fragment>
+          </div>
+        )
+      },
+      {
         title: 'Complete the installation',
         children: (
           <div>
@@ -173,7 +232,7 @@ export class RegisterAgent extends Component {
               <EuiFlexItem>
                 <EuiPanel>
                   <EuiFlexItem>
-                    <EuiSteps steps={steps} />
+                    <EuiSteps steps={this.clearSteps(steps)} />
                   </EuiFlexItem>
                 </EuiPanel>
               </EuiFlexItem>
