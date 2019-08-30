@@ -501,7 +501,7 @@ export class AgentsController {
   ) {
     try {
       if (this.$scope.tabView === subtab && !force) return;
-
+      this.tabVisualizations.clearDeadVis();
       this.visFactoryService.clear(onlyAgent);
       this.$location.search('tabView', subtab);
       const localChange =

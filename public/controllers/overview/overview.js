@@ -223,7 +223,7 @@ export class OverviewController {
   ) {
     try {
       if (this.tabView === subtab && !force) return;
-
+      this.tabVisualizations.clearDeadVis();
       this.visFactoryService.clear();
       this.$location.search('tabView', subtab);
       const localChange =
