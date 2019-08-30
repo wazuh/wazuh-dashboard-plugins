@@ -148,7 +148,10 @@ export class OverviewController {
    */
   createMetrics(metricsObject) {
     for (const key in metricsObject) {
-      this[key] = () => generateMetric(metricsObject[key]);
+      this[key] = () => {
+        const metric = generateMetric(metricsObject[key]);
+        return !!metric ? metric : '-';
+      };
     }
   }
 
@@ -304,7 +307,7 @@ export class OverviewController {
         this.tabHistory = this.tabHistory.slice(-2);
 
       if (this.tab === newTab && !force) return;
-      
+
       const sameTab =
         ((this.tab === newTab && this.tabHistory.length < 2) ||
           (this.tabHistory.length === 2 &&
