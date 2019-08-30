@@ -43,7 +43,7 @@ app.directive('kbnVis', function() {
       let visualization = null;
       let visHandler = null;
       let renderInProgress = false;
-
+      let deadField = false;
       const calculateTimeFilterSeconds = ({ from, to }) => {
         try {
           const fromParsed = dateMath.parse(from);
@@ -146,7 +146,7 @@ app.directive('kbnVis', function() {
               });
               visHandlers.addItem(visHandler);
               visHandler.addRenderCompleteListener(renderComplete);
-            } else if (rendered) {
+            } else if (rendered && !deadField) {
               // There's a visualization object -> just update its filters
 
               // Use the pending one, if it is empty, it won't matter
@@ -171,6 +171,11 @@ app.directive('kbnVis', function() {
               'not locate that index-pattern-field'
             )
           ) {
+            if (deadField) {
+              tabVisualizations.addDeadVis();
+              return renderComplete();
+            }
+            deadField = true;
             if (!lockFields) {
               try {
                 lockFields = true;
@@ -180,7 +185,6 @@ app.directive('kbnVis', function() {
                   {}
                 );
                 lockFields = false;
-                return myRender(raw);
               } catch (error) {
                 lockFields = false;
                 console.log(error.message || error);
@@ -189,6 +193,9 @@ app.directive('kbnVis', function() {
                 );
               }
             }
+
+            renderInProgress = false;
+            return myRender(raw);
           } else {
             errorHandler.handle(error, 'Visualize');
           }
@@ -199,6 +206,9 @@ app.directive('kbnVis', function() {
 
       // Listen for changes
       const updateVisWatcher = $scope.$on('updateVis', () => {
+        if (deadField) {
+          return renderComplete();
+        }
         $scope.$applyAsync();
         const rawVis = rawVisualizations.getList();
         if (Array.isArray(rawVis) && rawVis.length) {
@@ -213,7 +223,7 @@ app.directive('kbnVis', function() {
         try {
           visHandler.destroy();
         } catch (error) {} // eslint-disable-line
-      }
+      };
 
       $scope.$on('$destroy', () => {
         updateVisWatcher();
@@ -221,30 +231,42 @@ app.directive('kbnVis', function() {
       });
 
       const renderComplete = () => {
-        if(!$scope.visID.toLowerCase().includes(tabVisualizations.getTab())){
+        const visId = $scope.visID.toLowerCase();
+        const tab = tabVisualizations.getTab();
+
+        if (!visId.includes(tab)) {
           destroyAll();
           return;
         }
+
         rendered = true;
         loadedVisualizations.addItem(true);
-        const currentCompleted = Math.round(
-          (loadedVisualizations.getList().length /
-            tabVisualizations.getItem(tabVisualizations.getTab())) *
-            100
-        );
-        $rootScope.loadingStatus = `Rendering visualizations... ${
-          currentCompleted > 100 ? 100 : currentCompleted
-        } %`;
 
-        if (currentCompleted >= 100) {
-          $rootScope.rendered = true;
-          $rootScope.loadingStatus = 'Fetching data...';
-        } else if (
-          $scope.visID !== 'Wazuh-App-Overview-General-Agents-status'
-        ) {
-          $rootScope.rendered = false;
+        const currentLoaded = loadedVisualizations.getList().length;
+        const deadVis = tabVisualizations.getDeadVis();
+        const totalTabVis = tabVisualizations.getItem(tab) - deadVis;
+
+        if (totalTabVis < 1) {
+          $rootScope.resultState = 'none';
+        } else {
+          const currentCompleted = Math.round(
+            (currentLoaded / totalTabVis) * 100
+          );
+
+          $rootScope.loadingStatus = `Rendering visualizations... ${
+            currentCompleted > 100 ? 100 : currentCompleted
+          } %`;
+
+          if (currentCompleted >= 100) {
+            $rootScope.rendered = true;
+            $rootScope.loadingStatus = 'Fetching data...';
+          } else if (
+            $scope.visID !== 'Wazuh-App-Overview-General-Agents-status'
+          ) {
+            $rootScope.rendered = false;
+          }
         }
-        
+
         // Forcing a digest cycle
         $rootScope.$applyAsync();
       };
