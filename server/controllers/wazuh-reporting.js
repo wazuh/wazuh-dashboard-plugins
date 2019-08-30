@@ -219,7 +219,7 @@ export class WazuhReportingCtrl {
           })),
           ...modifiedRows
         );
-        console.log('full_body ', full_body)
+
         this.dd.content.push({
           fontSize: 8,
           table: {
