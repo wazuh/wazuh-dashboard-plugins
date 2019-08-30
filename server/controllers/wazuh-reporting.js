@@ -1829,12 +1829,12 @@ export class WazuhReportingCtrl {
                 }
                 tables = [];
               }
-            }else{
+            } else {
               this.dd.content.push({
                 text: 'A configuration for this group has not yet been set up.',
                 style: { fontSize: 12, color: '#000' },
                 margin: [0, 10, 0, 15]
-              });              
+              });
             }
           }
           if (enabledComponents['1']) {

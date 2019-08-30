@@ -108,15 +108,15 @@ class WzMenu {
     };
 
     const calcHeight = () => {
-        let height = false;
-        try {
-          height = $('#navDrawerMenu > ul:nth-child(2)')[0].clientHeight;
-        } catch (error) {} // eslint-disable-line
-        const barHeight = (height || 51) + 2;
-        $('.md-toolbar-tools, md-toolbar')
-          .css('height', barHeight, 'important')
-          .css('max-height', barHeight, 'important');
-        $scope.settedMenuHeight = true;
+      let height = false;
+      try {
+        height = $('#navDrawerMenu > ul:nth-child(2)')[0].clientHeight;
+      } catch (error) {} // eslint-disable-line
+      const barHeight = (height || 51) + 2;
+      $('.md-toolbar-tools, md-toolbar')
+        .css('height', barHeight, 'important')
+        .css('max-height', barHeight, 'important');
+      $scope.settedMenuHeight = true;
     };
 
     $($window).on('resize', function() {

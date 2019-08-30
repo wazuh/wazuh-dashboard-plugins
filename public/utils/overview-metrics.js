@@ -24,10 +24,8 @@ const metricsGeneral = {
 const metricsVulnerability = {
   vulnCritical:
     '[vis-id="\'Wazuh-App-Overview-vuls-Metric-Critical-severity\'"]',
-  vulnHigh:
-    '[vis-id="\'Wazuh-App-Overview-vuls-Metric-High-severity\'"]',
-  vulnMedium:
-    '[vis-id="\'Wazuh-App-Overview-vuls-Metric-Medium-severity\'"]',
+  vulnHigh: '[vis-id="\'Wazuh-App-Overview-vuls-Metric-High-severity\'"]',
+  vulnMedium: '[vis-id="\'Wazuh-App-Overview-vuls-Metric-Medium-severity\'"]',
   vulnLow: '[vis-id="\'Wazuh-App-Overview-vuls-Metric-Low-severity\'"]'
 };
 

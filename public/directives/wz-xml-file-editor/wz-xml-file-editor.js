@@ -15,7 +15,7 @@ import CodeMirror from '../../utils/codemirror/lib/codemirror';
 import { uiModules } from 'ui/modules';
 import chrome from 'ui/chrome';
 import { DynamicHeight } from '../../utils/dynamic-height';
- 
+
 const app = uiModules.get('app/wazuh', []);
 
 app.directive('wzXmlFileEditor', function() {
@@ -41,7 +41,7 @@ app.directive('wzXmlFileEditor', function() {
       apiReq,
       $rootScope,
       $window
-      ) {
+    ) {
       const window = $window;
       const IS_DARK_THEME = chrome.getUiSettingsClient().get('theme:darkMode');
       $scope.targetNameShown = $scope.targetName;
@@ -56,7 +56,7 @@ app.directive('wzXmlFileEditor', function() {
       };
       let firstTime = true;
       const parser = new DOMParser(); // eslint-disable-line
-      
+
       /**
        * Escape "&" characters.
        * @param {*} text
@@ -399,7 +399,6 @@ app.directive('wzXmlFileEditor', function() {
         $location.search('editingFile', null);
         appState.setNavigation({ status: true });
       });
-
     },
     template
   };
