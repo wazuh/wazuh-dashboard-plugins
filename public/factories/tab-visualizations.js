@@ -111,4 +111,8 @@ export class TabVisualizations {
   getDeadVis() {
     return this.deadVisualizations;
   }
+
+  clearDeadVis() {
+    this.deadVisualizations = 0;
+  }
 }
