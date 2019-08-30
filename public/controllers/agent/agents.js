@@ -454,7 +454,10 @@ export class AgentsController {
    */
   createMetrics(metricsObject) {
     for (let key in metricsObject) {
-      this.$scope[key] = () => generateMetric(metricsObject[key]);
+      this.$scope[key] = () => {
+        const metric = generateMetric(metricsObject[key]);
+        return !!metric ? metric : '-';
+      };
     }
   }
 
