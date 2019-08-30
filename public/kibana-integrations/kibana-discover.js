@@ -1122,6 +1122,9 @@ function discoverController(
   const changeTabViewListener = $rootScope.$on(
     'changeTabView',
     (evt, parameters) => {
+      if(parameters.syscollector){
+        queryFilter.removeAll();
+      }
       $rootScope.resultState = 'loading';
       evt.stopPropagation();
       $scope.tabView = parameters.tabView || 'panels';
