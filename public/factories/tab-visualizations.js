@@ -56,6 +56,8 @@ export class TabVisualizations {
 
     this.tabVisualizations = {};
     this.currentTab = '';
+
+    this.deadVisualizations = 0;
   }
 
   /**
@@ -63,6 +65,7 @@ export class TabVisualizations {
    * @param {Object} tab
    */
   setTab(tab) {
+    this.deadVisualizations = 0;
     this.currentTab = tab;
   }
 
@@ -99,5 +102,13 @@ export class TabVisualizations {
    */
   removeAll() {
     this.tabVisualizations = {};
+  }
+
+  addDeadVis() {
+    this.deadVisualizations += 1;
+  }
+
+  getDeadVis() {
+    return this.deadVisualizations;
   }
 }
