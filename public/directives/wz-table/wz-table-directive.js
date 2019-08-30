@@ -520,9 +520,9 @@ app.directive('wzTable', function() {
           const key = $scope.parseKey(k);
           const canFilterInRules =
             $scope.path === '/rules' &&
-            (key === 'level' || key === 'file' || (key === 'path' && !$scope.lens));
+            (key === 'level' || (key === 'path' && !$scope.lens));
           const canFilterInDecoders =
-            $scope.path === '/decoders' && ((key === 'path' && !$scope.lens) || key === 'file');
+            $scope.path === '/decoders' && key === 'path' && !$scope.lens;
           $scope.filterableColumns[key] = !!(
             canFilterInRules || canFilterInDecoders
           );
