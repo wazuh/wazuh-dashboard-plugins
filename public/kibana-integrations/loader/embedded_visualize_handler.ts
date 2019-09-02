@@ -159,7 +159,7 @@ export class EmbeddedVisualizeHandler {
       timefilter.on('autoRefreshFetch', this.reload);
     }
 
-    // This is a hack to give maps visualizations access to data in the
+    // This is a workaround to give maps visualizations access to data in the
     // globalState, since they can no longer access it via searchSource.
     // TODO: Remove this as a part of elastic/kibana#30593
     this.vis.API.getGeohashBounds = () => {
