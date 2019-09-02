@@ -71,8 +71,7 @@ import { VislibSeriesResponseHandlerProvider } from 'ui/vis/response_handlers/vi
 import { DocTitleProvider } from 'ui/doc_title';
 import PluginsKibanaDiscoverHitSortFnProvider from 'plugins/kibana/discover/_hit_sort_fn';
 import { FilterBarQueryFilterProvider } from 'ui/filter_bar/query_filter';
-// No need for this since we are using custom interval options
-//import { intervalOptions } from 'ui/agg_types/buckets/_interval_options';
+import { intervalOptions } from 'ui/agg_types/buckets/_interval_options';
 import { stateMonitorFactory } from 'ui/state_management/state_monitor_factory';
 import { migrateLegacyQuery } from 'ui/utils/migrate_legacy_query';
 import { FilterManagerProvider } from 'ui/filter_manager';
@@ -148,70 +147,10 @@ function discoverController(
     requests: new RequestAdapter()
   };
 
-  //////////////////////////////////////////////////////////
-  //////////////////// WAZUH ///////////////////////////////
-  //////////////////////////////////////////////////////////
-  const calcWzInterval = () => {
-    let wzInterval = false;
-    try {
-      const from = dateMath.parse(timefilter.getTime().from);
-      const to = dateMath.parse(timefilter.getTime().to);
-
-      const totalSeconds = (to - from) / 1000;
-      if (totalSeconds <= 14401) wzInterval = 'm';
-      else if (totalSeconds > 14401 && totalSeconds <= 86400) wzInterval = 'h';
-      else if (totalSeconds > 86400 && totalSeconds <= 604800) wzInterval = 'd';
-      else if (totalSeconds > 604800 && totalSeconds <= 2419200)
-        wzInterval = 'w';
-      else wzInterval = 'M';
-    } catch (error) {} // eslint-disable-line
-
-    return wzInterval;
-  };
-  //////////////////////////////////////////////////////////
-  //////////////////////////////////////////////////////////
-  //////////////////////////////////////////////////////////
-
   $scope.getDocLink = getDocLink;
 
-  ///////////////////////////////////////////////////////////////////////////////
-  //////////// WAZUH ////////////////////////////////////////////////////////////
-  // Old code:                                                                 //
-  // $scope.intervalOptions = intervalOptions; //
-  ///////////////////////////////////////////////////////////////////////////////
-  $scope.intervalOptions = [
-    {
-      display: 'Minute',
-      val: 'm'
-    },
-    {
-      display: 'Hourly',
-      val: 'h'
-    },
-    {
-      display: 'Daily',
-      val: 'd'
-    },
-    {
-      display: 'Weekly',
-      val: 'w'
-    },
-    {
-      display: 'Monthly',
-      val: 'M'
-    },
-    {
-      display: 'Yearly',
-      val: 'y'
-    },
-    {
-      display: 'Custom',
-      val: 'custom'
-    }
-  ];
-  //////////////////////////////////////
-  //////////////////////////////////////
-  //////////////////////////////////////
+  $scope.intervalOptions = intervalOptions; 
+
   $scope.showInterval = false;
   $scope.minimumVisibleRows = 50;
 
@@ -366,13 +305,6 @@ function discoverController(
   $scope.uiState = $state.makeStateful('uiState');
 
   function getStateDefaults() {
-    //////////////////////////////////////////////////////////
-    //////////////////// WAZUH ///////////////////////////////
-    /////////////////////////////////////////////////////////
-    let wzInterval = calcWzInterval();
-    //////////////////////////////////////////////////////////
-    //////////////////////////////////////////////////////////
-    //////////////////////////////////////////////////////////
     return {
       query: $scope.searchSource.getField('query') || {
         query: '',
@@ -390,7 +322,7 @@ function discoverController(
           ? savedSearch.columns
           : config.get('defaultColumns').slice(),
       index: $scope.indexPattern.id,
-      interval: wzInterval || 'h', //// WAZUH /////
+      interval: 'auto',
       filters: _.cloneDeep($scope.searchSource.getOwnField('filter'))
     };
   }
@@ -440,15 +372,9 @@ function discoverController(
 
     $scope.updateDataSource().then(function() {
       $scope.$listen(timefilter, 'fetch', function() {
-        ////////////////////////////////////////////////
-        //               WAZUH                        //
-        ////////////////////////////////////////////////
-        $state.interval = calcWzInterval() || 'd';
-        ////////////////////////////////////////////////
-        ////////////////////////////////////////////////
-        ////////////////////////////////////////////////
-
         $scope.fetch();
+        // WAZUH
+        $rootScope.$broadcast('updateVis');
       });
 
       $scope.$watchCollection('state.sort', function(sort) {
@@ -924,7 +850,7 @@ function discoverController(
   async function setupVisualization() {
     // If no timefield has been specified we don't create a histogram of messages
     if (!$scope.opts.timefield) return;
-    $state.interval = calcWzInterval() || 'h';
+
     const visStateAggs = [
       {
         type: 'count',
