@@ -1,5 +1,5 @@
 /*
- * Wazuh app - Makes null the region maps (temporary hack in order to make it work)
+ * Wazuh app - Makes null the region maps (temporary fix in order to make it work)
  * Copyright (C) 2015-2019 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
