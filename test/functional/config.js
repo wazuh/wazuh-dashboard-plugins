@@ -5,7 +5,7 @@ import { pageObjects } from './page_objects';
 import { services } from './services';
 
 export default async function ({ readConfigFile }) {
-  const kibanaConfig = await readConfigFile(resolveKibanaPath('../test/functional/config.js'));
+  const kibanaConfig = await readConfigFile(resolveKibanaPath('test/functional/config.js'));
 
   return {
     testFiles: [
