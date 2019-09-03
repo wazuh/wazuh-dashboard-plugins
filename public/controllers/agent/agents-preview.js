@@ -11,6 +11,7 @@
  */
 import * as FileSaver from '../../services/file-saver';
 import { timefilter } from 'ui/timefilter';
+import { version } from '../../../package.json';
 
 export class AgentsPreviewController {
   /**
@@ -53,6 +54,7 @@ export class AgentsPreviewController {
     this.errorInit = false;
     this.$window = $window;
     this.timeService = timeService;
+    this.wazuhPackageVersion = version;
   }
 
   /**
@@ -272,7 +274,7 @@ export class AgentsPreviewController {
       const version = ((data.data || {}.data) || {}).data || {};
       return version.substr(1);
     } catch (error) {
-      return Promise.reject(error);
+      return this.wazuhPackageVersion;
     }
   }
 }

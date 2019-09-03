@@ -34,7 +34,7 @@ export class RegisterAgent extends Component {
     try {
       this.wazuhVersion = await this.props.getWazuhVersion();
     } catch (error) {
-      this.wazuhVersion = 'Unknown';
+      this.wazuhVersion = '-';
     }
   }
 
