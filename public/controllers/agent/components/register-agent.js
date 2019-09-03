@@ -15,7 +15,8 @@ import {
   EuiButtonEmpty,
   EuiCopy,
   EuiPage,
-  EuiPageBody
+  EuiPageBody,
+  EuiCallOut
 } from '@elastic/eui';
 
 import PropTypes from 'prop-types';
@@ -28,7 +29,7 @@ export class RegisterAgent extends Component {
       status: 'incomplete',
       selectedOS: '',
       serverAddress: ''
-    };  
+    };
   }
 
   async componentDidMount() {
@@ -109,6 +110,13 @@ export class RegisterAgent extends Component {
     const field = `${this.state.selectedOS}Text`;
     const text = customTexts[field];
     const language = this.state.selectedOS === 'win' ? 'ps' : 'bash';
+    const windowsAdvice = this.state.selectedOS === 'win' && (
+      <EuiCallOut
+        size="s"
+        title="You will need administrator privileges to perform this installation."
+        iconType="iInCircle"
+      />
+    );
 
     const guide = (
       <div>
@@ -128,6 +136,7 @@ export class RegisterAgent extends Component {
             <EuiCodeBlock style={codeBlock} language={language}>
               {text}
             </EuiCodeBlock>
+            {windowsAdvice}
           </EuiText>
         )}
       </div>
