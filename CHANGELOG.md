@@ -14,6 +14,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Added an alerts summary in _Overview > FIM_ panel [#1527](https://github.com/wazuh/wazuh-kibana-app/issues/1527).
 - Export all the information of a Wazuh group and its related agents in a PDF document [#1341](https://github.com/wazuh/wazuh-kibana-app/issues/1341).
 - Export the configuration of a certain agent as a PDF document. Supports granularity for exporting just certain sections of the configuration [#1340](https://github.com/wazuh/wazuh-kibana-app/issues/1340).
+- Added a new handler for dead visualizations [9d4d852](https://github.com/wazuh/wazuh-kibana-app/commit/9d4d8520b7d6346975aa068ffc4ae1b8b73b5e85)
 
 
 ### Changed
@@ -29,6 +30,8 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Replaced _Requirements over time_ visualizations in both PCI DSS and GDPR dashboards [35c539](https://github.com/wazuh/wazuh-kibana-app/commit/35c539eb328b3bded94aa7608f73f9cc51c235a6).
 - Do not show a toaster when a visualization field was not known yet, instead, show it just in case the internal refreshing failed [19a2e7](https://github.com/wazuh/wazuh-kibana-app/commit/19a2e71006b38f6a64d3d1eb8a20b02b415d7e07).
 - Minor optimizations for server logging [eb8e000](https://github.com/wazuh/wazuh-kibana-app/commit/eb8e00057dfea2dafef56319590ff832042c402d).
+- Moved "DynamicHeight" method to static methods [25c1fff](https://github.com/wazuh/wazuh-kibana-app/commit/25c1fff861f500e58fab99038665d40400559ee0)
+- Replaced multiple SVGs with the proper EUI components [ddbd276](https://github.com/wazuh/wazuh-kibana-app/commit/ddbd276efda06831443122f63721d85ee93f7e83)
 
 ### Fixed
 
@@ -40,6 +43,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - The app installation date was not being updated properly, now it's fixed [#1692](https://github.com/wazuh/wazuh-kibana-app/issues/1692).
 - Fixed _Network interfaces_ table in Inventory section, the table was not paginating [#1474](https://github.com/wazuh/wazuh-kibana-app/issues/1474).
 - Fixed Discover interval for visualization [e52eb12](https://github.com/wazuh/wazuh-kibana-app/commit/e52eb127863645fe773e38d95c427783c18e9a65).
+- Restored time interval built-in logic for Discover [1901fc5](https://github.com/wazuh/wazuh-kibana-app/commit/1901fc59a252226939cbd2edcfa038f02968c7b8)
 
 
 ## Wazuh v3.9.5 - Kibana v6.8.2 / Kibana v7.2.1 / Kibana v7.3.0 Revision 454
