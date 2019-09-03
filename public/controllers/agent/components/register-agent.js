@@ -27,7 +27,15 @@ export class RegisterAgent extends Component {
       status: 'incomplete',
       selectedOS: '',
       serverAddress: ''
-    };
+    };    
+  }
+
+  async componentDidMount() {
+    try {
+      this.wazuhVersion = await this.props.getWazuhVersion();
+    } catch (error) {
+      this.wazuhVersion = 'Unknown';
+    }
   }
 
   selectOS(os) {
@@ -90,12 +98,11 @@ export class RegisterAgent extends Component {
     const codeBlock = {
       zIndex: '100'
     };
-
     const customTexts = {
-      rpmText: `WAZUH_MANAGER_IP='${this.state.serverAddress}' yum install wazuh-agent`,
-      debText: `WAZUH_MANAGER_IP='${this.state.serverAddress}' apt-get install wazuh-agent`,
-      macosText: `launchctl setenv WAZUH_MANAGER_IP '${this.state.serverAddress}' && installer -pkg wazuh-agent-.pkg -target /`,
-      winText: `wazuh-agent-3.9.1-1.msi /q ADDRESS='${this.state.serverAddress}' AUTHD_SERVER='${this.state.serverAddress}'`
+      rpmText: `WAZUH_MANAGER_IP='${this.state.serverAddress}' yum install https://packages.wazuh.com/3.x/yum/wazuh-agent-${this.wazuhVersion}-1.x86_64.rpm`,
+      debText: `curl -so wazuh-agent.deb https://packages.wazuh.com/3.x/apt/pool/main/w/wazuh-agent/wazuh-agent_${this.wazuhVersion}-1_amd64.deb && WAZUH_MANAGER_IP='${this.state.serverAddress}' && dpkg -i ./wazuh-agent.deb`,
+      macosText: `curl -so wazuh-agent.pkg https://packages.wazuh.com/3.x/osx/wazuh-agent-${this.wazuhVersion}-1.pkg && launchctl setenv WAZUH_MANAGER_IP '${this.state.serverAddress}' && installer -pkg ./wazuh-agent.pkg -target /`,
+      winText: `Invoke-WebRequest -Uri https://packages.wazuh.com/3.x/windows/wazuh-agent-${this.wazuhVersion}-1.msi -OutFile wazuh-agent.msi; wazuh-agent.msi /q ADDRESS='${this.state.serverAddress}' AUTHD_SERVER='${this.state.serverAddress}'`
     };
 
     const field = `${this.state.selectedOS}Text`;
@@ -116,7 +123,7 @@ export class RegisterAgent extends Component {
                 )}
               </EuiCopy>
             </div>
-            <EuiCodeBlock style={codeBlock} language="js">
+            <EuiCodeBlock style={codeBlock} language="bash">
               {text}
             </EuiCodeBlock>
           </EuiText>
@@ -186,5 +193,6 @@ export class RegisterAgent extends Component {
 }
 
 RegisterAgent.propTypes = {
-  addNewAgent: PropTypes.func
+  addNewAgent: PropTypes.func,
+  getWazuhVersion: PropTypes.func
 };

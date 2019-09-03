@@ -27,6 +27,7 @@ export class AgentsPreviewController {
   constructor(
     $scope,
     genericReq,
+    apiReq,
     appState,
     $location,
     errorHandler,
@@ -40,6 +41,7 @@ export class AgentsPreviewController {
   ) {
     this.$scope = $scope;
     this.genericReq = genericReq;
+    this.apiReq = apiReq;
     this.appState = appState;
     this.$location = $location;
     this.errorHandler = errorHandler;
@@ -95,7 +97,8 @@ export class AgentsPreviewController {
     });
 
     this.registerAgentsProps = {
-      addNewAgent: flag => this.addNewAgent(flag)
+      addNewAgent: flag => this.addNewAgent(flag),
+      getWazuhVersion: () => this.getWazuhVersion()
     };
 
     this.init = false;
@@ -257,5 +260,19 @@ export class AgentsPreviewController {
       'https://documentation.wazuh.com/current/user-manual/registering/index.html',
       '_blank'
     );
+  }
+
+
+  /**
+   * Returns the Wazuh version as x.y.z
+   */
+  async getWazuhVersion() {
+    try {
+      const data = await this.apiReq.request('GET', '/version', {}); 
+      const version = ((data.data || {}.data) || {}).data || {};
+      return version.substr(1);
+    } catch (error) {
+      return Promise.reject(error);
+    }
   }
 }
