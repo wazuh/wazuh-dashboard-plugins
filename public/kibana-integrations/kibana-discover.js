@@ -1049,7 +1049,10 @@ function discoverController(
     'changeTabView',
     (evt, parameters) => {
       if(parameters.syscollector){
-        queryFilter.removeAll();
+        const currentFilters = queryFilter.getFilters();
+        currentFilters
+          .filter(item => ((item || {}).$state || {}).store !== 'globalState')
+          .forEach(item => queryFilter.removeFilter(item));
       }
       $rootScope.resultState = 'loading';
       evt.stopPropagation();
