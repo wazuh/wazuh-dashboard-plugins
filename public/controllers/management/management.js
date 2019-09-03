@@ -211,7 +211,7 @@ export class ManagementController {
       await this.configHandler.restartManager();
       this.isRestarting = false;
       this.$scope.$applyAsync();
-      this.errorHandler.info('Restarting manager.')
+      this.errorHandler.info('Restarting manager.');
     } catch (error) {
       this.isRestarting = false;
       this.$scope.$applyAsync();
@@ -229,7 +229,9 @@ export class ManagementController {
       await this.configHandler.restartCluster();
       this.isRestarting = false;
       this.$scope.$applyAsync();
-      this.errorHandler.info('Restarting cluster, it will take up to 30 seconds.')
+      this.errorHandler.info(
+        'Restarting cluster, it will take up to 30 seconds.'
+      );
     } catch (error) {
       this.isRestarting = false;
       this.$scope.$applyAsync();
