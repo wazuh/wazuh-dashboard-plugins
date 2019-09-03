@@ -101,7 +101,7 @@ export class RegisterAgent extends Component {
     };
     const customTexts = {
       rpmText: `WAZUH_MANAGER_IP='${this.state.serverAddress}' yum install https://packages.wazuh.com/3.x/yum/wazuh-agent-${this.wazuhVersion}-1.x86_64.rpm`,
-      debText: `curl -so wazuh-agent.deb https://packages.wazuh.com/3.x/apt/pool/main/w/wazuh-agent/wazuh-agent_${this.wazuhVersion}-1_amd64.deb && WAZUH_MANAGER_IP='${this.state.serverAddress}' && dpkg -i ./wazuh-agent.deb`,
+      debText: `curl -so wazuh-agent.deb https://packages.wazuh.com/3.x/apt/pool/main/w/wazuh-agent/wazuh-agent_${this.wazuhVersion}-1_amd64.deb && sudo WAZUH_MANAGER_IP='${this.state.serverAddress}' dpkg -i ./wazuh-agent.deb`,
       macosText: `curl -so wazuh-agent.pkg https://packages.wazuh.com/3.x/osx/wazuh-agent-${this.wazuhVersion}-1.pkg && launchctl setenv WAZUH_MANAGER_IP '${this.state.serverAddress}' && installer -pkg ./wazuh-agent.pkg -target /`,
       winText: `Invoke-WebRequest -Uri https://packages.wazuh.com/3.x/windows/wazuh-agent-${this.wazuhVersion}-1.msi -OutFile wazuh-agent.msi; wazuh-agent.msi /q ADDRESS='${this.state.serverAddress}' AUTHD_SERVER='${this.state.serverAddress}'`
     };
