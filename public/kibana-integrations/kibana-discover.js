@@ -12,7 +12,7 @@
  * Find more information about this on the LICENSE file.
  */
 import { uiModules } from 'ui/modules';
-import discoverTemplate from '../templates/kibana-template/kibana-discover-template.html';
+import discoverTemplate from '../templates/discover/discover.html';
 
 uiModules.get('app/wazuh', ['kibana/courier']).directive('kbnDis', [
   function() {
@@ -612,7 +612,7 @@ function discoverController(
    */
   const filtersAreReady = () => {
     const currentUrlPath = $location.path();
-    if (currentUrlPath && !currentUrlPath.includes('wazuh-discover')) {
+    if (currentUrlPath) {
       let filters = queryFilter.getFilters();
       filters = Array.isArray(filters)
         ? filters.filter(
@@ -808,13 +808,11 @@ function discoverController(
 
   $scope.updateDataSource = Promise.method(function updateDataSource() {
     // Wazuh
-    const currentUrlPath = $location.path();
     const isPanels = $scope.tabView === 'panels';
     const isClusterMonitoring = $scope.tabView === 'cluster-monitoring';
-    const isTopDiscover = currentUrlPath.includes('wazuh-discover');
 
     // Wazuh. Should we fetch "_source" and "hits" ?
-    const noHits = (isPanels || isClusterMonitoring) && !isTopDiscover;
+    const noHits = (isPanels || isClusterMonitoring);
 
     // Wazuh. The very first time, the copies are null, just create them
     if (!defaultSearchSource || !noHitsSearchSource) {

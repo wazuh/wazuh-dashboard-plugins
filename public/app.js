@@ -97,7 +97,6 @@ app.run(function($rootScope, $route, $location, appState, $window) {
     reloaded: false,
     discoverPrevious: false,
     discoverSections: [
-      '/wazuh-discover/',
       '/overview/',
       '/agents',
       '/wazuh-dev'
