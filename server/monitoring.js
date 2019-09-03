@@ -22,6 +22,7 @@ import { BuildBody } from './lib/replicas-shards-helper';
 import * as ApiHelper from './lib/api-helper';
 
 const blueWazuh = '\u001b[34mwazuh\u001b[39m';
+const monitoringErrorLogColors = [blueWazuh, 'monitoring', 'error'];
 
 export class Monitoring {
   /**
@@ -103,10 +104,7 @@ export class Monitoring {
     } catch (error) {
       !this.quiet && log('monitoring:configuration', error.message || error);
       !this.quiet &&
-        this.server.log(
-          [blueWazuh, 'monitoring', 'error'],
-          error.message || error
-        );
+        this.server.log(monitoringErrorLogColors, error.message || error);
     }
   }
 
@@ -151,10 +149,7 @@ export class Monitoring {
       this.agentsArray = [];
       !this.quiet && log('monitoring:checkStatus', error.message || error);
       !this.quiet &&
-        this.server.log(
-          [blueWazuh, 'monitoring', 'error'],
-          error.message || error
-        );
+        this.server.log(monitoringErrorLogColors, error.message || error);
     }
   }
 
@@ -212,18 +207,14 @@ export class Monitoring {
           'Wazuh API credentials not found or are not correct. Open the app in your browser and configure it to start monitoring agents.';
 
         !this.quiet && log('monitoring:checkAndSaveStatus', extraLog);
-        !this.quiet &&
-          this.server.log([blueWazuh, 'monitoring', 'error'], extraLog);
+        !this.quiet && this.server.log(monitoringErrorLogColors, extraLog);
       }
       return;
     } catch (error) {
       !this.quiet &&
         log('monitoring:checkAndSaveStatus', error.message || error);
       !this.quiet &&
-        this.server.log(
-          [blueWazuh, 'monitoring', 'error'],
-          error.message || error
-        );
+        this.server.log(monitoringErrorLogColors, error.message || error);
     }
   }
 
@@ -274,10 +265,7 @@ export class Monitoring {
     } catch (error) {
       !this.quiet && log('monitoring:loadCredentials', error.message || error);
       !this.quiet &&
-        this.server.log(
-          [blueWazuh, 'monitoring', 'error'],
-          error.message || error
-        );
+        this.server.log(monitoringErrorLogColors, error.message || error);
     }
   }
 
@@ -349,7 +337,7 @@ export class Monitoring {
       !this.quiet && log('monitoring:configureKibana', error.message || error);
       !this.quiet &&
         this.server.log(
-          [blueWazuh, 'monitoring', 'error'],
+          monitoringErrorLogColors,
           'Error creating index-pattern due to ' + error
         );
     }
@@ -404,7 +392,7 @@ export class Monitoring {
         );
       !this.quiet &&
         this.server.log(
-          [blueWazuh, 'monitoring', 'error'],
+          monitoringErrorLogColors,
           `Could not create ${datedIndex} index on elasticsearch due to ${error.message ||
             error}`
         );
@@ -453,7 +441,7 @@ export class Monitoring {
         );
       !this.quiet &&
         this.server.log(
-          [blueWazuh, 'monitoring', 'error'],
+          monitoringErrorLogColors,
           `Error inserting agent data into elasticsearch. Bulk request failed due to ${error.message ||
             error}`
         );
@@ -499,7 +487,7 @@ export class Monitoring {
         );
       !this.quiet &&
         this.server.log(
-          [blueWazuh, 'monitoring', 'error'],
+          monitoringErrorLogColors,
           `Could not check if the index ${
             this.datedIndex
           } exists due to ${error.message || error}`
@@ -578,7 +566,7 @@ export class Monitoring {
         );
       !this.quiet &&
         this.server.log(
-          [blueWazuh, 'monitoring', 'error'],
+          monitoringErrorLogColors,
           `Something went wrong updating wazuh-monitoring template... ${error.message ||
             error}`
         );
@@ -612,7 +600,7 @@ export class Monitoring {
         !this.quiet &&
           log(
             'monitoring:init',
-            'Checking if wazuh-monitoring pattern exists...',
+            'Checking if wazuh-monitoring-3.x-* index pattern exists...',
             'debug'
           );
 
@@ -626,17 +614,10 @@ export class Monitoring {
           );
         await this.wzWrapper.updateMonitoringIndexPatternKnownFields(patternId);
       } catch (error) {
-        !this.quiet &&
-          log(
-            'monitoring:init',
-            "Didn't find wazuh-monitoring pattern for Kibana v6.x. Proceeding to create it...",
-            'info'
-          );
-        !this.quiet &&
-          this.server.log(
-            [blueWazuh, 'monitoring', 'info'],
-            "Didn't find wazuh-monitoring pattern for Kibana v6.x. Proceeding to create it..."
-          );
+        const didNotFindMsg =
+          "Didn't find wazuh-monitoring-3.x-* index pattern for Kibana. Proceeding to create it...";
+        !this.quiet && log('monitoring:init', didNotFindMsg, 'info');
+        !this.quiet && this.server.log(monitoringErrorLogColors, didNotFindMsg);
         return this.createWazuhMonitoring();
       }
 
@@ -650,10 +631,7 @@ export class Monitoring {
       return;
     } catch (error) {
       !this.quiet &&
-        this.server.log(
-          [blueWazuh, 'monitoring', 'error'],
-          error.message || error
-        );
+        this.server.log(monitoringErrorLogColors, error.message || error);
       !this.quiet && log('monitoring:init', error.message || error);
       return;
     }
@@ -758,10 +736,7 @@ export class Monitoring {
 
       !this.quiet && log('monitoring:cronTask', error.message || error);
       !this.quiet &&
-        this.server.log(
-          [blueWazuh, 'monitoring :cronTask', 'error'],
-          error.message || error
-        );
+        this.server.log(monitoringErrorLogColors, error.message || error);
     }
   }
 

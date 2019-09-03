@@ -18,7 +18,7 @@ export class TabVisualizations {
     this.agents = {
       welcome: 0,
       general: 7,
-      fim: 6,
+      fim: 7,
       pm: 4,
       vuls: 10,
       oscap: 13,
@@ -27,7 +27,7 @@ export class TabVisualizations {
       gdpr: 6,
       pci: 6,
       hipaa: 6,
-      nist: 6,
+      nist: 5,
       virustotal: 6,
       configuration: 0,
       osquery: 5,
@@ -45,8 +45,8 @@ export class TabVisualizations {
       audit: 6,
       pci: 5,
       gdpr: 5,
-      hipaa: 5,
-      nist: 5,
+      hipaa: 8,
+      nist: 7,
       aws: 8,
       virustotal: 7,
       osquery: 5,
@@ -56,6 +56,8 @@ export class TabVisualizations {
 
     this.tabVisualizations = {};
     this.currentTab = '';
+
+    this.deadVisualizations = 0;
   }
 
   /**
@@ -63,6 +65,7 @@ export class TabVisualizations {
    * @param {Object} tab
    */
   setTab(tab) {
+    this.deadVisualizations = 0;
     this.currentTab = tab;
   }
 
@@ -99,5 +102,17 @@ export class TabVisualizations {
    */
   removeAll() {
     this.tabVisualizations = {};
+  }
+
+  addDeadVis() {
+    this.deadVisualizations += 1;
+  }
+
+  getDeadVis() {
+    return this.deadVisualizations;
+  }
+
+  clearDeadVis() {
+    this.deadVisualizations = 0;
   }
 }

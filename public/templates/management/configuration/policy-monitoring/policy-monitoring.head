@@ -25,16 +25,10 @@
   <!-- End headline -->
 
   <!-- Policy monitoring navigation bar -->
-  <md-nav-bar class="wz-nav-bar" md-selected-nav-item="configurationSubTab"
-    nav-bar-aria-label="Policy monitoring navigation links">
-    <md-nav-item class="wz-nav-item" md-nav-click="switchConfigurationSubTab('pm-general')" name="pm-general">General
-    </md-nav-item>
-    <md-nav-item class="wz-nav-item" md-nav-click="switchConfigurationSubTab('pm-unix')" name="pm-unix">System audit
-    </md-nav-item>
-    <md-nav-item class="wz-nav-item" md-nav-click="switchConfigurationSubTab('pm-ignored')" name="pm-ignored">Ignored
-    </md-nav-item>
-    <md-nav-item class="wz-nav-item" md-nav-click="switchConfigurationSubTab('pm-sca')" name="pm-sca">SCA</md-nav-item>
-  </md-nav-bar>
+  <div ng-if="configurationTabsProps" class="md-padding wz-padding-top-0"
+      ng-init="buildProps([{id:'pm-general', name: 'General'}, {id: 'pm-unix', name: 'System audit'}, {id: 'pm-ignored', name: 'Ignored'}, {id: 'pm-sca', name: 'SCA'}])">
+      <react-component name="Tabs" props="configurationTabsProps" />
+  </div>
   <!-- End Policy monitoring navigation bar -->
 
   <div class="md-padding md-padding-top-16" ng-if="load">

@@ -150,6 +150,27 @@ export class ManagementController {
     this.welcomeCardsProps = {
       switchTab: (tab, setNav) => this.switchTab(tab, setNav)
     };
+
+    this.rulesetTabsProps = {
+      clickAction: tab => this.setRulesTab(tab),
+      selectedTab: this.rulesetTab || 'rules',
+      tabs: [
+        { id: 'rules', name: 'Rules' },
+        { id: 'decoders', name: 'Decoders' },
+        { id: 'cdblists', name: 'Lists' }
+      ]
+    };
+
+    this.managementTabsProps = {
+      clickAction: tab => this.switchTab(tab, true),
+      selectedTab: this.tab,
+      tabs: [
+        { id: 'status', name: 'Status' },
+        { id: 'logs', name: 'Logs' },
+        { id: 'monitoring', name: 'Cluster' },
+        { id: 'reporting', name: 'Reporting' }
+      ]
+    };
   }
 
   /**
@@ -190,6 +211,7 @@ export class ManagementController {
       await this.configHandler.restartManager();
       this.isRestarting = false;
       this.$scope.$applyAsync();
+      this.errorHandler.info('Restarting manager.');
     } catch (error) {
       this.isRestarting = false;
       this.$scope.$applyAsync();
@@ -207,6 +229,9 @@ export class ManagementController {
       await this.configHandler.restartCluster();
       this.isRestarting = false;
       this.$scope.$applyAsync();
+      this.errorHandler.info(
+        'Restarting cluster, it will take up to 30 seconds.'
+      );
     } catch (error) {
       this.isRestarting = false;
       this.$scope.$applyAsync();
@@ -276,6 +301,7 @@ export class ManagementController {
       this.currentRule = false;
       this.currentDecoder = false;
       this.currentList = false;
+      this.managementTabsProps.selectedTab = this.tab;
     }
 
     this.$location.search('tab', this.tab);
@@ -286,11 +312,13 @@ export class ManagementController {
    * This set the rules tab
    * @param {String} tab
    */
-  setRulesTab(tab) {
+  setRulesTab(tab, flag) {
     this.rulesetTab = tab;
     this.globalRulesetTab = this.rulesetTab;
     this.managingFiles = false;
-    this.breadCrumbBack();
+    if (!flag) {
+      this.breadCrumbBack();
+    }
   }
 
   switchFilesSubTab(flag, showFile) {
@@ -303,9 +331,13 @@ export class ManagementController {
   breadCrumbBack(goRoot = false) {
     if (this.currentRule) {
       this.$scope.$broadcast('closeRuleView');
+      this.$scope.$broadcast('closeRulesetFile');
+      this.$scope.$emit('removeCurrentRule');
     }
     if (this.currentDecoder) {
       this.$scope.$broadcast('closeDecoderView');
+      this.$scope.$broadcast('closeRulesetFile');
+      this.$scope.$emit('removeCurrentDecoder');
     }
     if (this.currentList) {
       this.$scope.$broadcast('closeListView');
@@ -314,6 +346,7 @@ export class ManagementController {
       this.switchTab('ruleset', true);
       this.setRulesTab('rules');
     }
+    this.$scope.$applyAsync();
   }
 
   changeNode(node) {

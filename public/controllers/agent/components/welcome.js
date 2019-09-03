@@ -1,3 +1,16 @@
+/*
+ * Wazuh app - React component building the welcome screen of an agent.
+ * version, OS, registration date, last keep alive.
+ *
+ * Copyright (C) 2015-2019 Wazuh, Inc.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * Find more information about this on the LICENSE file.
+ */
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import {
@@ -153,16 +166,21 @@ export class WelcomeScreen extends Component {
                   ])}
                 </EuiFlexItem>
               </EuiFlexGroup>
-              {(UnsupportedComponents[this.props.agent.agentPlatform] || UnsupportedComponents['other']).includes('vuls') &&
-                !this.props.extensions.virustotal && !this.props.extensions.osquery && !this.props.extensions.docker && (
+              {(
+                UnsupportedComponents[this.props.agent.agentPlatform] ||
+                UnsupportedComponents['other']
+              ).includes('vuls') &&
+                !this.props.extensions.virustotal &&
+                !this.props.extensions.osquery &&
+                !this.props.extensions.docker && (
                   <EuiFlexGroup>
                     <EuiFlexItem>
                       <EuiCallOut
                         title={
                           <p>
-                            Click the <EuiIcon type="eye" /> icon to show
-                            thread detection and response extensions.
-                        </p>
+                            Click the <EuiIcon type="eye" /> icon to show thread
+                            detection and response extensions.
+                          </p>
                         }
                         color="success"
                         iconType="help"
@@ -171,8 +189,10 @@ export class WelcomeScreen extends Component {
                   </EuiFlexGroup>
                 )}
               <EuiFlexGrid columns={2}>
-                {!(UnsupportedComponents[this.props.agent.agentPlatform] || UnsupportedComponents['other']).includes('vuls') &&
-                  this.buildTabCard('vuls', 'securityApp')}
+                {!(
+                  UnsupportedComponents[this.props.agent.agentPlatform] ||
+                  UnsupportedComponents['other']
+                ).includes('vuls') && this.buildTabCard('vuls', 'securityApp')}
                 {this.props.extensions.virustotal &&
                   this.buildTabCard('virustotal', 'savedObjectsApp')}
                 {this.props.extensions.osquery &&
@@ -187,31 +207,46 @@ export class WelcomeScreen extends Component {
               <EuiFlexGroup gutterSize="xs">
                 <EuiFlexItem />
                 <EuiFlexItem grow={false}>
-                  {this.buildPopover('popoverRegulatory', ['pci', 'gdpr'])}
+                  {this.buildPopover('popoverRegulatory', [
+                    'pci',
+                    'gdpr',
+                    'hipaa',
+                    'nist'
+                  ])}
                 </EuiFlexItem>
               </EuiFlexGroup>
-              {!this.props.extensions.pci && !this.props.extensions.gdpr && (
-                <EuiFlexGroup>
-                  <EuiFlexItem>
-                    <EuiCallOut
-                      title={
-                        <p>
-                          Click the <EuiIcon type="eye" /> icon to show
-                          regulatory compliance extensions.
-                        </p>
-                      }
-                      color="success"
-                      iconType="help"
-                    />
-                  </EuiFlexItem>
-                </EuiFlexGroup>
-              )}
-              {(this.props.extensions.pci || this.props.extensions.gdpr) && (
+              {!this.props.extensions.pci &&
+                !this.props.extensions.gdpr &&
+                !this.props.extensions.hipaa &&
+                !this.props.extensions.nist && (
+                  <EuiFlexGroup>
+                    <EuiFlexItem>
+                      <EuiCallOut
+                        title={
+                          <p>
+                            Click the <EuiIcon type="eye" /> icon to show
+                            regulatory compliance extensions.
+                          </p>
+                        }
+                        color="success"
+                        iconType="help"
+                      />
+                    </EuiFlexItem>
+                  </EuiFlexGroup>
+                )}
+              {(this.props.extensions.pci ||
+                this.props.extensions.gdpr ||
+                this.props.extensions.hipaa ||
+                this.props.extensions.nist) && (
                 <EuiFlexGrid columns={2}>
                   {this.props.extensions.pci &&
                     this.buildTabCard('pci', 'visTagCloud')}
                   {this.props.extensions.gdpr &&
                     this.buildTabCard('gdpr', 'visBarVertical')}
+                  {this.props.extensions.hipaa &&
+                    this.buildTabCard('hipaa', 'emsApp')}
+                  {this.props.extensions.nist &&
+                    this.buildTabCard('nist', 'apmApp')}
                 </EuiFlexGrid>
               )}
             </EuiPanel>

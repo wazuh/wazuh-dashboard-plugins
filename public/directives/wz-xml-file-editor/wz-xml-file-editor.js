@@ -13,6 +13,8 @@
 import template from './wz-xml-file-editor.html';
 import CodeMirror from '../../utils/codemirror/lib/codemirror';
 import { uiModules } from 'ui/modules';
+import chrome from 'ui/chrome';
+import { DynamicHeight } from '../../utils/dynamic-height';
 
 const app = uiModules.get('app/wazuh', []);
 
@@ -41,6 +43,7 @@ app.directive('wzXmlFileEditor', function() {
       $window
     ) {
       const window = $window;
+      const IS_DARK_THEME = chrome.getUiSettingsClient().get('theme:darkMode');
       $scope.targetNameShown = $scope.targetName;
       $scope.configError = false;
       /**
@@ -51,7 +54,6 @@ app.directive('wzXmlFileEditor', function() {
       String.prototype.xmlReplace = function(str, newstr) {
         return this.split(str).join(newstr);
       };
-
       let firstTime = true;
       const parser = new DOMParser(); // eslint-disable-line
 
@@ -107,7 +109,7 @@ app.directive('wzXmlFileEditor', function() {
         }
         checkingXmlError = false;
         $scope.$applyAsync();
-        dynamicHeight();
+        DynamicHeight.dynamicHeightXmlEditor();
         return;
       };
 
@@ -212,7 +214,7 @@ app.directive('wzXmlFileEditor', function() {
           if (!isOk && Array.isArray(data.details)) {
             $scope.configError = data.details;
             $scope.$applyAsync();
-            dynamicHeight();
+            DynamicHeight.dynamicHeightXmlEditor();
             throw new Error('Validation error');
           }
           return true;
@@ -328,7 +330,7 @@ app.directive('wzXmlFileEditor', function() {
           matchClosing: true,
           matchBrackets: true,
           mode: 'text/xml',
-          theme: 'ttcn',
+          theme: IS_DARK_THEME ? 'lesser-dark' : 'ttcn',
           foldGutter: true,
           styleSelectedText: true,
           gutters: ['CodeMirror-foldgutter']
@@ -336,27 +338,14 @@ app.directive('wzXmlFileEditor', function() {
       );
 
       $(window).on('resize', function() {
-        dynamicHeight();
+        DynamicHeight.dynamicHeightXmlEditor();
       });
-
-      const dynamicHeight = () => {
-        setTimeout(function() {
-          const editorContainer = $('.wzXmlEditor');
-          const headerContainer = $('#wzXmlEditorHeader');
-          const windows = $(window).height();
-          const offsetTop = getPosition(editorContainer[0]).y;
-          editorContainer.height(windows - (offsetTop + 20));
-          $('.wzXmlEditorBody .CodeMirror').css({
-            height: 'calc(100% - ' + (headerContainer.height() - 22) + 'px)'
-          });
-        }, 1);
-      };
 
       const init = (data = false) => {
         try {
           $('.wzXmlEditor').height(0);
           $scope.xmlError = false;
-          dynamicHeight();
+          DynamicHeight.dynamicHeightXmlEditor();
           $scope.xmlCodeBox.setValue(autoFormat(data || $scope.data));
           firstTime = false;
           setTimeout(() => {
@@ -390,7 +379,7 @@ app.directive('wzXmlFileEditor', function() {
         $scope.restartBtn = true;
         $scope.$applyAsync();
         $scope.$emit('showRestartBtn', { msg, target });
-        dynamicHeight();
+        DynamicHeight.dynamicHeightXmlEditor();
       };
 
       $scope.$on('saveXmlFile', (ev, params) => saveFile(params));
@@ -398,7 +387,7 @@ app.directive('wzXmlFileEditor', function() {
       $scope.$on('removeRestartMsg', () => {
         $scope.restartBtn = false;
         $scope.$applyAsync();
-        dynamicHeight();
+        DynamicHeight.dynamicHeightXmlEditor();
       });
 
       $rootScope.$on('changedInputFileName', (ev, params) => {
@@ -410,21 +399,6 @@ app.directive('wzXmlFileEditor', function() {
         $location.search('editingFile', null);
         appState.setNavigation({ status: true });
       });
-
-      function getPosition(element) {
-        var xPosition = 0;
-        var yPosition = 0;
-
-        while (element) {
-          xPosition +=
-            element.offsetLeft - element.scrollLeft + element.clientLeft;
-          yPosition +=
-            element.offsetTop - element.scrollTop + element.clientTop;
-          element = element.offsetParent;
-        }
-
-        return { x: xPosition, y: yPosition };
-      }
     },
     template
   };

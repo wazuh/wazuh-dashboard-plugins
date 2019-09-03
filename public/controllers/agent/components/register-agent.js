@@ -1,3 +1,14 @@
+/*
+ * Wazuh app - React component for registering agents.
+ * Copyright (C) 2015-2019 Wazuh, Inc.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * Find more information about this on the LICENSE file.
+ */
 import React, { Component, Fragment } from 'react';
 
 import {
@@ -17,7 +28,6 @@ import {
   EuiPageBody
 } from '@elastic/eui';
 
-import { RegisterGuideDefs } from './register-guide-defs';
 import PropTypes from 'prop-types';
 
 export class RegisterAgent extends Component {
@@ -93,18 +103,10 @@ export class RegisterAgent extends Component {
     };
 
     const customTexts = {
-      rpmText: `WAZUH_MANAGER_IP='${
-        this.state.serverAddress
-        }' yum install wazuh-agent`,
-      debText: `WAZUH_MANAGER_IP='${
-        this.state.serverAddress
-        }' apt-get install wazuh-agent`,
-      macosText: `launchctl setenv WAZUH_MANAGER_IP '${
-        this.state.serverAddress
-        }' && installer -pkg wazuh-agent-.pkg -target /`,
-      winText: `wazuh-agent-3.9.1-1.msi /q ADDRESS='${
-        this.state.serverAddress
-        }' AUTHD_SERVER='${this.state.serverAddress}'`
+      rpmText: `WAZUH_MANAGER_IP='${this.state.serverAddress}' yum install wazuh-agent`,
+      debText: `WAZUH_MANAGER_IP='${this.state.serverAddress}' apt-get install wazuh-agent`,
+      macosText: `launchctl setenv WAZUH_MANAGER_IP '${this.state.serverAddress}' && installer -pkg wazuh-agent-.pkg -target /`,
+      winText: `wazuh-agent-3.9.1-1.msi /q ADDRESS='${this.state.serverAddress}' AUTHD_SERVER='${this.state.serverAddress}'`
     };
 
     const field = `${this.state.selectedOS}Text`;
@@ -112,7 +114,7 @@ export class RegisterAgent extends Component {
 
     const guide = (
       <div>
-        {(this.state.selectedOS) && (
+        {this.state.selectedOS && (
           <EuiText>
             <div style={copyButton}>
               <EuiCopy textToCopy={text}>

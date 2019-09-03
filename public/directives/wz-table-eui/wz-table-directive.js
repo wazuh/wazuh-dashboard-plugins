@@ -18,7 +18,7 @@ import * as listeners from './lib/listeners';
 import { searchData, filterData, queryData } from './lib/data';
 import { initTable } from './lib/init';
 import { sort } from './lib/sort';
-import React, { Component } from 'react';
+import React from 'react';
 import { EuiHealth } from '@elastic/eui';
 import * as ProcessEquivalence from '../../../util/process-state-equivalence';
 const app = uiModules.get('app/wazuh', []);
@@ -89,6 +89,7 @@ app.directive('wzTableEui', function() {
       $scope.basicTableProps = {
         path: $scope.path,
         initialSortField: $scope.initialSortField || false,
+        pageIndex: 0,
         columns: parseColumns($scope.keys),
         items: [],
         getData: options => fetch(options),
@@ -105,6 +106,7 @@ app.directive('wzTableEui', function() {
 
       $scope.$watch('items', () => {
         $scope.basicTableProps.items = [...$scope.items];
+        $scope.basicTableProps.pageIndex = 0;
       });
 
       $scope.$watch('keys', () => {

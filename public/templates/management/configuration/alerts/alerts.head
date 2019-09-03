@@ -15,19 +15,10 @@
     <!-- End headline -->
 
     <!-- Alerts navigation bar -->
-    <md-nav-bar ng-if="!agent || agent.id === '000'" class="wz-nav-bar" md-selected-nav-item="configurationSubTab"
-        nav-bar-aria-label="Alerts navigation links">
-        <md-nav-item class="wz-nav-item" md-nav-click="switchConfigurationSubTab('general-alerts')"
-            name="general-alerts">General</md-nav-item>
-        <md-nav-item class="wz-nav-item" md-nav-click="switchConfigurationSubTab('labels')" name="labels">
-            Labels</md-nav-item>
-        <md-nav-item class="wz-nav-item" md-nav-click="switchConfigurationSubTab('email-alerts')"
-            name="email-alerts">Email alerts</md-nav-item>
-        <md-nav-item class="wz-nav-item" md-nav-click="switchConfigurationSubTab('reports')" name="reports">
-            Reports</md-nav-item>
-        <md-nav-item class="wz-nav-item" md-nav-click="switchConfigurationSubTab('syslog')" name="syslog">
-            Syslog output</md-nav-item>
-    </md-nav-bar>
+    <div ng-if="(!agent || agent.id === '000') && configurationTabsProps" class="md-padding wz-padding-top-0"
+        ng-init="buildProps([{id:'general-alerts', name: 'General'}, {id: 'labels', name: 'Labels'}, {id: 'email-alerts', name: 'Email alerts'}, {id: 'reports', name: 'Reports'}, {id: 'syslog', name: 'Syslog output'}])">
+        <react-component name="Tabs" props="configurationTabsProps" />
+    </div>
     <!-- End Alerts navigation bar -->
 
     <div class="md-padding md-padding-top-16" ng-if="load">

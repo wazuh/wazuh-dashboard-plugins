@@ -98,7 +98,10 @@ export function RulesController(
       term.split('nist-800-53:')[1].trim()
     ) {
       $scope.custom_search = '';
-      const filter = { name: 'nist-800-53', value: term.split('nist-800-53:')[1].trim() };
+      const filter = {
+        name: 'nist-800-53',
+        value: term.split('nist-800-53:')[1].trim()
+      };
       $scope.appliedFilters = $scope.appliedFilters.filter(
         item => item.name !== 'nist-800-53'
       );

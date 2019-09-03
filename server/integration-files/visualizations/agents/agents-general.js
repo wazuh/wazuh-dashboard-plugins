@@ -11,7 +11,7 @@
  */
 export default [
   {
-    _id: 'Wazuh-App-Agents-Overview-Top-5-alerts',
+    _id: 'Wazuh-App-Agents-General-Top-5-alerts',
     _source: {
       title: 'Top 5 alerts',
       visState:
@@ -107,7 +107,7 @@ export default [
                               "value": "authentication_failed, authentication_failures",
                               "params": [
                                 "authentication_failed",
-                                "authentication_failures"
+                                "win_authentication_failed"
                               ],
                               "negate": false,
                               "disabled": false,
@@ -123,7 +123,7 @@ export default [
                                   },
                                   {
                                     "match_phrase": {
-                                      "rule.groups": "authentication_failures"
+                                      "rule.groups": "win_authentication_failed"
                                     }
                                   }
                                 ],
@@ -188,7 +188,7 @@ export default [
     _type: 'visualization'
   },
   {
-    _id: 'Wazuh-App-Agents-Overview-Top-10-groups',
+    _id: 'Wazuh-App-Agents-General-Top-10-groups',
     _source: {
       title: 'Top 5 rule groups',
       visState:
@@ -204,7 +204,7 @@ export default [
     _type: 'visualization'
   },
   {
-    _id: 'Wazuh-App-Agents-Overview-Top-5-PCI-DSS-Requirements',
+    _id: 'Wazuh-App-Agents-General-Top-5-PCI-DSS-Requirements',
     _source: {
       title: 'Top 5 PCI DSS requirements',
       visState:
@@ -220,7 +220,7 @@ export default [
     _type: 'visualization'
   },
   {
-    _id: 'Wazuh-App-Agents-Overview-Alert-groups-evolution',
+    _id: 'Wazuh-App-Agents-General-Alert-groups-evolution',
     _source: {
       title: 'Alert groups evolution',
       visState:
@@ -236,7 +236,7 @@ export default [
     _type: 'visualization'
   },
   {
-    _id: 'Wazuh-App-Agents-Overview-Alerts',
+    _id: 'Wazuh-App-Agents-General-Alerts',
     _source: {
       title: 'Alerts',
       visState:
@@ -252,7 +252,7 @@ export default [
     _type: 'visualization'
   },
   {
-    _id: 'Wazuh-App-Agents-Overview-Alerts-summary',
+    _id: 'Wazuh-App-Agents-General-Alerts-summary',
     _type: 'visualization',
     _source: {
       title: 'Alerts summary',
@@ -269,7 +269,7 @@ export default [
     }
   },
   {
-    _id: 'Wazuh-App-Agents-Overview-Groups-summary',
+    _id: 'Wazuh-App-Agents-General-Groups-summary',
     _type: 'visualization',
     _source: {
       title: 'Groups summary',

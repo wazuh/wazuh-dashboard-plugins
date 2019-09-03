@@ -1,5 +1,5 @@
 /*
- * Wazuh app - File for app requirements and set up
+ * Wazuh app - Load all the "resolve" functions.
  * Copyright (C) 2015-2019 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -16,6 +16,7 @@ import { getSavedSearch } from './get-saved-search';
 import { goToKibana } from './go-to-kibana';
 import { getIp } from './get-ip';
 import { getWzConfig } from './get-config';
+import { apiCount } from './api-count';
 
 export {
   checkTimestamp,
@@ -24,5 +25,6 @@ export {
   getSavedSearch,
   goToKibana,
   getIp,
-  getWzConfig
+  getWzConfig,
+  apiCount
 };

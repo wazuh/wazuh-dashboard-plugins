@@ -1,19 +1,8 @@
 <div flex="auto" layout="column" ng-cloak ng-controller="settingsController as ctrl">
-
-    <wz-menu ng-init="menuNavItem = 'settings'"></wz-menu>
-
     <div ng-if="ctrl.load" class="md-padding wz-margin-top-16">
         <react-component name="EuiProgress" props="{size: 'xs', color: 'primary'}" />
     </div>
 
-    <md-nav-bar ng-if="!ctrl.load" class="wz-nav-bar" md-selected-nav-item="ctrl.tab"
-        nav-bar-aria-label="Settings navigation links">
-        <md-nav-item class="wz-nav-item" md-nav-click="ctrl.switchTab('api', true)" name="api" data-test-subj="settingMenuApi">API</md-nav-item>
-        <md-nav-item class="wz-nav-item" md-nav-click="ctrl.switchTab('pattern', true)" name="pattern" data-test-subj="settingMenuPatter">Pattern
-        </md-nav-item>
-        <md-nav-item class="wz-nav-item" md-nav-click="ctrl.switchTab('configuration', true)" name="configuration" data-test-subj="settingMenuConfiguration">
-            Configuration</md-nav-item>
-        <md-nav-item class="wz-nav-item" md-nav-click="ctrl.switchTab('logs', true); ctrl.refreshLogs()" name="logs" data-test-subj="settingMenuLogs">
-            Logs</md-nav-item>
-        <md-nav-item class="wz-nav-item" md-nav-click="ctrl.switchTab('about', true)" name="about" data-test-subj="settingMenuAbout">About</md-nav-item>
-    </md-nav-bar>
+    <div ng-if="!ctrl.load && ctrl.settingsTabsProps" class="wz-margin-top-10 md-margin-h">
+        <react-component name="Tabs" props="ctrl.settingsTabsProps" />
+    </div>

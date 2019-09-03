@@ -17,8 +17,10 @@ import {
   disableFilter,
   enableFilter,
   Filter,
-  pinFilter,
+  //pinFilter,
   toggleFilterDisabled,
+  toggleFilterPinned,
+  isFilterPinned,
   toggleFilterNegated,
   unpinFilter,
 } from '@kbn/es-query';
@@ -27,9 +29,9 @@ import classNames from 'classnames';
 import React, { Component } from 'react';
 import chrome from 'ui/chrome';
 import { IndexPattern } from 'ui/index_patterns';
-import { FilterEditor } from 'ui/filter_bar/filter_editor';
+import { FilterEditor } from 'plugins/data/filter/filter_bar/filter_editor';
 import { FilterItem } from './filter_item';
-import { FilterOptions } from 'ui/filter_bar/filter_options';
+import { FilterOptions } from 'plugins/data/filter/filter_bar/filter_options';
 
 const config = chrome.getUiSettingsClient();
 
@@ -176,7 +178,17 @@ class FilterBarUI extends Component<Props, State> {
   };
 
   private onPinAll = () => {
-    const filters = this.props.filters.map(pinFilter);
+    const filters = this.props.filters.map(filter => {
+      const shouldExclude =
+        filter &&
+        filter.meta &&
+        typeof filter.meta.removable !== 'undefined' &&
+        !filter.meta.removable;
+      return isFilterPinned(filter) || shouldExclude
+        ? filter
+        : toggleFilterPinned(filter);
+    });
+
     this.props.onFiltersUpdated(filters);
   };
 

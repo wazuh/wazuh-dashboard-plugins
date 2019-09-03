@@ -11,7 +11,7 @@
  */
 export default [
   {
-    _id: 'Wazuh-App-Agents-vulnerability-Alerts-severity-over-time',
+    _id: 'Wazuh-App-Agents-vuls-Alerts-severity-over-time',
     _type: 'visualization',
     _source: {
       title: 'Alerts severity over time',
@@ -27,7 +27,7 @@ export default [
     }
   },
   {
-    _id: 'Wazuh-App-Agents-vulnerability-Alert-summary',
+    _id: 'Wazuh-App-Agents-vuls-Alert-summary',
     _type: 'visualization',
     _source: {
       title: 'Alerts summary',
@@ -44,7 +44,7 @@ export default [
     }
   },
   {
-    _id: 'Wazuh-App-Agents-vulnerability-Commonly-affected-packages',
+    _id: 'Wazuh-App-Agents-vuls-Commonly-affected-packages',
     _type: 'visualization',
     _source: {
       title: 'Top 5 affected packages',
@@ -60,7 +60,7 @@ export default [
     }
   },
   {
-    _id: 'Wazuh-App-Agents-vulnerability-Metric-Critical-severity',
+    _id: 'Wazuh-App-Agents-vuls-Metric-Critical-severity',
     _type: 'visualization',
     _source: {
       title: 'Metric Critical severity',
@@ -106,7 +106,7 @@ export default [
     }
   },
   {
-    _id: 'Wazuh-App-Agents-vulnerability-Metric-High-severity',
+    _id: 'Wazuh-App-Agents-vuls-Metric-High-severity',
     _type: 'visualization',
     _source: {
       title: 'Metric High severity',
@@ -152,7 +152,7 @@ export default [
     }
   },
   {
-    _id: 'Wazuh-App-Agents-vulnerability-Metric-Medium-severity',
+    _id: 'Wazuh-App-Agents-vuls-Metric-Medium-severity',
     _type: 'visualization',
     _source: {
       title: 'Metric Medium severity',
@@ -198,7 +198,7 @@ export default [
     }
   },
   {
-    _id: 'Wazuh-App-Agents-vulnerability-Metric-Low-severity',
+    _id: 'Wazuh-App-Agents-vuls-Metric-Low-severity',
     _type: 'visualization',
     _source: {
       title: 'Metric Low severity',
@@ -244,7 +244,7 @@ export default [
     }
   },
   {
-    _id: 'Wazuh-App-Agents-vulnerability-Top-Agents-severity',
+    _id: 'Wazuh-App-Agents-vuls-Top-Agents-severity',
     _type: 'visualization',
     _source: {
       title: 'Top Agents severity',
@@ -260,7 +260,7 @@ export default [
     }
   },
   {
-    _id: 'Wazuh-App-Agents-vulnerability-Most-common-rules',
+    _id: 'Wazuh-App-Agents-vuls-Most-common-rules',
     _type: 'visualization',
     _source: {
       title: 'Most common rules',
@@ -277,7 +277,7 @@ export default [
     }
   },
   {
-    _id: 'Wazuh-App-Agents-vulnerability-Vulnerability-severity-distribution',
+    _id: 'Wazuh-App-Agents-vuls-Vulnerability-severity-distribution',
     _type: 'visualization',
     _source: {
       title: 'Severity distribution',
@@ -293,7 +293,7 @@ export default [
     }
   },
   {
-    _id: 'Wazuh-App-Agents-vulnerability-Vulnerability-Most-common-CVEs',
+    _id: 'Wazuh-App-Agents-vuls-Vulnerability-Most-common-CVEs',
     _type: 'visualization',
     _source: {
       title: 'Most common CVEs',

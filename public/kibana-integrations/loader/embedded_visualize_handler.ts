@@ -44,6 +44,8 @@ import { AppState } from 'ui/state_management/app_state';
 import { timefilter } from 'ui/timefilter';
 // @ts-ignore
 import { RequestHandlerParams, Vis } from 'ui/vis';
+// @ts-ignore untyped dependency
+import { VisFiltersProvider } from 'ui/vis/vis_filters';
 // @ts-ignore
 import { PipelineDataLoader } from 'ui/visualize/loader/pipeline_data_loader';
 import { visualizationLoader } from './visualization_loader';
@@ -87,8 +89,6 @@ export class EmbeddedVisualizeHandler {
    * This should not be used by any plugin.
    * @ignore
    */
-
-
   public readonly data$: Rx.Observable<any>;
   public readonly inspectorAdapters: Adapters = {};
   private vis: Vis;
@@ -119,11 +119,14 @@ export class EmbeddedVisualizeHandler {
   private actions: any = {};
   private events$: Rx.Observable<any>;
   private autoFetch: boolean;
+  private errorHandler: any;
 
   constructor(
     private readonly element: HTMLElement,
     savedObject: VisSavedObject,
-    params: EmbeddedVisualizeHandlerParams
+    params: EmbeddedVisualizeHandlerParams,
+    injector,
+    errorHandler
   ) {
     const { searchSource, vis } = savedObject;
 
@@ -136,8 +139,10 @@ export class EmbeddedVisualizeHandler {
       query,
       autoFetch = true,
       pipelineDataLoader = false,
-      Private,
+      Private
     } = params;
+
+    this.errorHandler = errorHandler;
 
     this.dataLoaderParams = {
       searchSource,
@@ -184,7 +189,7 @@ export class EmbeddedVisualizeHandler {
       timefilter.on('autoRefreshFetch', this.reload);
     }
 
-    // This is a hack to give maps visualizations access to data in the
+    // This is a workaround to give maps visualizations access to data in the
     // globalState, since they can no longer access it via searchSource.
     // TODO: Remove this as a part of elastic/kibana#30593
     this.vis.API.getGeohashBounds = () => {
@@ -197,6 +202,7 @@ export class EmbeddedVisualizeHandler {
     this.dataLoader = pipelineDataLoader
       ? new PipelineDataLoader(vis)
       : new VisualizeDataLoader(vis, Private);
+    const visFilters: any = Private(VisFiltersProvider);
     this.renderCompleteHelper = new RenderCompleteHelper(element);
     this.inspectorAdapters = this.getActiveInspectorAdapters();
     this.vis.openInspector = this.openInspector;
@@ -217,7 +223,8 @@ export class EmbeddedVisualizeHandler {
     this.events$.subscribe(event => {
       if (this.actions[event.name]) {
         event.data.aggConfigs = getTableAggs(this.vis);
-        this.actions[event.name](event.data);
+        const newFilters = this.actions[event.name](event.data) || [];
+        visFilters.pushFilters(newFilters);
       }
     });
 
@@ -452,6 +459,7 @@ export class EmbeddedVisualizeHandler {
     this.dataLoaderParams.aggs = this.vis.getAggConfig();
     this.dataLoaderParams.forceFetch = forceFetch;
     this.dataLoaderParams.inspectorAdapters = this.inspectorAdapters;
+
     this.vis.filters = { timeRange: this.dataLoaderParams.timeRange };
     this.vis.requestError = undefined;
     this.vis.showRequestError = false;
@@ -486,18 +494,16 @@ export class EmbeddedVisualizeHandler {
     if (this.dataLoaderParams.searchSource && this.dataLoaderParams.searchSource.cancelQueued) {
       this.dataLoaderParams.searchSource.cancelQueued();
     }
-    
+
     this.vis.requestError = error;
     this.vis.showRequestError =
       error.type && ['NO_OP_SEARCH_STRATEGY', 'UNSUPPORTED_QUERY'].includes(error.type);
-    
+
+
     //Do not show notification toast if it's already being shown a similar toast
-     toastNotifications.addDanger({
-      title: i18n.translate('common.ui.visualize.dataLoaderError', {
-        defaultMessage: 'Error in visualization',
-      }),
-      text: error.message,
-    });
+    this.errorHandler.handle(error.message, i18n.translate('common.ui.visualize.dataLoaderError', {
+      defaultMessage: 'Error in visualization',
+    }));
   };
 
   private rendererProvider = (response: VisResponseData | null) => {

@@ -47,7 +47,7 @@ export class StatusController {
     try {
       return this.timeService.offset(time);
     } catch (error) {
-      return time !== '-' ? `${time} (UTC)` : time;
+      return time === (!'-' && !undefined) ? `${time} (UTC)` : time || '-';
     }
   }
 

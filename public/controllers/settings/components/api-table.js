@@ -1,3 +1,15 @@
+/*
+ * Wazuh app - React component building the API entries table.
+ *
+ * Copyright (C) 2015-2019 Wazuh, Inc.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * Find more information about this on the LICENSE file.
+ */
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
 import { RIGHT_ALIGNMENT } from '@elastic/eui/lib/services';
@@ -219,7 +231,9 @@ export class ApiTable extends Component {
               onClick={() => this.toggleDetails(item)}
               data-test-subj="apiTableEditButton"
               aria-label={
-                itemIdToExpandedRowMap[item.id] ? 'Collapse edition' : 'Expand edition'
+                itemIdToExpandedRowMap[item.id]
+                  ? 'Collapse edition'
+                  : 'Expand edition'
               }
               iconType={
                 itemIdToExpandedRowMap[item.id] ? 'arrowUp' : 'arrowDown'

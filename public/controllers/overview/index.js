@@ -1,5 +1,5 @@
 /*
- * Wazuh app - File for app requirements and set up
+ * Wazuh app - Load all the Overview controllers and related React components.
  * Copyright (C) 2015-2019 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -14,6 +14,7 @@ import { OverviewController } from './overview';
 import { WelcomeScreen } from './components/welcome';
 import { Stats } from './components/stats';
 import { AlertsStats } from './components/alerts-stats';
+import { RequirementCard } from './components/requirement-card';
 
 const app = uiModules.get('app/wazuh', ['react']);
 
@@ -21,4 +22,5 @@ app
   .controller('overviewController', OverviewController)
   .value('WelcomeScreenOverview', WelcomeScreen)
   .value('StatsOverview', Stats)
-  .value('AlertsStats', AlertsStats);
+  .value('AlertsStats', AlertsStats)
+  .value('RequirementCard', RequirementCard);

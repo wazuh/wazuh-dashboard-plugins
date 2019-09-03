@@ -1,0 +1,18 @@
+<svg width="40" height="30" xmlns="http://www.w3.org/2000/svg">
+ <defs>
+  <style>.cls-1{fill:#fff;}</style>
+ </defs>
+ <title>Asset 1</title>
+ <g>
+  <title>background</title>
+  <rect fill="none" id="canvas_background" height="32" width="42" y="-1" x="-1"/>
+ </g>
+ <g>
+  <title>Layer 1</title>
+  <g id="Layer_2">
+   <g id="Artwork">
+    <polygon id="svg_1" points="25,13 30.049999237060547,19.510000228881836 35.099998474121094,13 25,13 " class="cls-1"/>
+   </g>
+  </g>
+ </g>
+</svg>

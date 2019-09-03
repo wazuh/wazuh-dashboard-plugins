@@ -1,3 +1,14 @@
+/*
+ * Wazuh app - React base component for building tables.
+ * Copyright (C) 2015-2019 Wazuh, Inc.
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * Find more information about this on the LICENSE file.
+ */
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import { EuiBasicTable } from '@elastic/eui';
@@ -8,7 +19,7 @@ export class BasicTable extends Component {
 
     this.state = {
       items: this.props.items,
-      pageIndex: 0,
+      pageIndex: this.props.pageIndex,
       pageSize: 10,
       sortField: this.props.initialSortField || this.props.columns[0].field,
       sortDirection: 'desc'
@@ -22,7 +33,8 @@ export class BasicTable extends Component {
 
   UNSAFE_componentWillReceiveProps(nextProps) {
     this.setState({
-      items: nextProps.items
+      items: nextProps.items,
+      pageIndex: nextProps.pageIndex
     });
   }
 

@@ -9,11 +9,12 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import { knownFields } from '../integration-files/known-fields';
 import { monitoringKnownFields } from '../integration-files/monitoring-known-fields';
 
 export class ElasticWrapper {
   constructor(server) {
+    this.knownFields = [];
+    this.cachedCredentials = {};
     this._server = server;
     this.usingSearchGuard = ((server || {}).plugins || {}).searchguard || false;
     this.elasticRequest = server.plugins.elasticsearch.getCluster('data');
@@ -126,7 +127,7 @@ export class ElasticWrapper {
             title: title,
             timeFieldName: 'timestamp'
           },
-          namespace          
+          namespace
         }
       });
 
@@ -162,15 +163,16 @@ export class ElasticWrapper {
   }
 
   /**
- * Delete .wazuh-version index if exists
- */
+   * Delete .wazuh-version index if exists
+   */
   async deleteWazuhVersionIndex() {
     try {
       const data = await this.elasticRequest.callWithInternalUser(
         'indices.delete',
         {
           index: '.wazuh-version'
-        });
+        }
+      );
       return data;
     } catch (error) {
       return Promise.reject(error);
@@ -228,7 +230,7 @@ export class ElasticWrapper {
       if (fields) {
         currentFields = JSON.parse(fields);
 
-        if (Array.isArray(currentFields) && Array.isArray(knownFields)) {
+        if (Array.isArray(currentFields)) {
           currentFields = currentFields.filter(
             item =>
               item.name &&
@@ -237,12 +239,10 @@ export class ElasticWrapper {
               item.name !==
               'data.aws.service.action.networkConnectionAction.remoteIpDetails.geoLocation.lon'
           );
-
-          this.mergeDetectedFields(knownFields, currentFields);
         }
       } else {
-        // It's a new index pattern, just add our known fields
-        currentFields = knownFields;
+        // It's a new index pattern
+        currentFields = [];
       }
 
       // Iterate over dynamic fields
@@ -393,7 +393,10 @@ export class ElasticWrapper {
       if (!payload) return Promise.reject(new Error('No valid payload given'));
       const pattern = payload.pattern;
       delete payload.pattern;
-      const fullPattern = await this.getIndexPatternUsingGet(pattern, namespace);
+      const fullPattern = await this.getIndexPatternUsingGet(
+        pattern,
+        namespace
+      );
 
       const title =
         (((fullPattern || {})._source || {})['index-pattern'] || {}).title ||
@@ -411,6 +414,14 @@ export class ElasticWrapper {
     }
   }
 
+  cleanCachedCredentials() {
+    const now = new Date().getTime();
+    for (const key in this.cachedCredentials) {
+      if (now - this.cachedCredentials[key].fetched_at >= 2000)
+        delete this.cachedCredentials[key];
+    }
+  }
+
   /**
    * Search for the Wazuh API configuration document using its own id (usually it's a timestamp)
    * @param {*} id Eg: 12396176723
@@ -418,24 +429,31 @@ export class ElasticWrapper {
   async getWazuhConfigurationById(id) {
     try {
       if (!id) return Promise.reject(new Error('No valid document id given'));
+      this.cleanCachedCredentials();
+      if (!this.cachedCredentials[id]) {
+        const data = await this.elasticRequest.callWithInternalUser('get', {
+          index: '.wazuh',
+          type: '_doc',
+          id: id
+        });
+        const object = {
+          user: data._source.api_user,
+          secret: Buffer.from(data._source.api_password, 'base64').toString(
+            'ascii'
+          ),
+          url: data._source.url,
+          port: data._source.api_port,
+          insecure: data._source.insecure,
+          cluster_info: data._source.cluster_info,
+          extensions: data._source.extensions,
+          fetched_at: new Date().getTime()
+        };
+        this.cachedCredentials[id] = { ...object };
+      }
 
-      const data = await this.elasticRequest.callWithInternalUser('get', {
-        index: '.wazuh',
-        type: '_doc',
-        id: id
-      });
+      this.cachedCredentials[id].password = this.cachedCredentials[id].secret;
 
-      return {
-        user: data._source.api_user,
-        password: Buffer.from(data._source.api_password, 'base64').toString(
-          'ascii'
-        ),
-        url: data._source.url,
-        port: data._source.api_port,
-        insecure: data._source.insecure,
-        cluster_info: data._source.cluster_info,
-        extensions: data._source.extensions
-      };
+      return this.cachedCredentials[id];
     } catch (error) {
       return Promise.reject(error);
     }

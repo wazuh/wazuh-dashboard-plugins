@@ -112,5 +112,12 @@ export const KeyEquivalence = {
   date: 'Date',
   value: 'Value',
   location: 'Location',
-  mtu: 'MTU'
+  mtu: 'MTU',
+  attributes: 'Attributes',
+  policy_id: 'Policy ID',
+  policy_ID: 'Policy ID',
+  compliance: 'Compliance',
+  rules: 'Rules',
+  reason: 'Reason',
+  registerIP: 'Register IP'
 };

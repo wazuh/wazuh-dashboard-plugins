@@ -13,13 +13,15 @@
     <div flex layout="row">
         <div flex layout="column">
             <md-card flex class="wz-md-card _md flex">
-                <md-card-actions layout="row" class="wz-card-actions wz-card-actions-top layout-align-end-center"
-                    ng-hide="agent && agent.id !== '000' && agent.status !== 'Active'">
-                    <a ng-if="mctrl.adminMode || adminMode" ng-show="!agent || agent.id === '000'" ng-click="mctrl.setConfigTab('editconfiguration', true)">
+                <md-card-actions layout="row" class="wz-card-actions wz-card-actions-top layout-align-end-center">
+                    <a ng-if="mctrl.adminMode || adminMode" ng-show="!agent || agent.id === '000'"
+                        ng-click="mctrl.setConfigTab('editconfiguration', true)">
                         <react-component name="EuiIcon" props="{type:'pencil', color:'primary'}" /> Edit configuration
                     </a>
-                    <react-component ng-show="agent && agent.id !== '000' && agent.status === 'Active'" name="ExportConfiguration"
-                        ng-hide="reportBusy && reportStatus" props="{exportConfiguration, type: 'agent', agentPlatform: agent.agentPlatform}" />
+                    <span flex></span>
+                    <react-component ng-if="agent && agent.id !== '000' && agent.status === 'Active'"
+                        name="ExportConfiguration" ng-hide="reportBusy && reportStatus"
+                        props="{exportConfiguration, type: 'agent', agentPlatform: agent.agentPlatform}" />
                     <react-component ng-show="reportBusy && reportStatus" name="EuiLoadingSpinner" props="{size:'m'}" />
                 </md-card-actions>
                 <md-card-content>

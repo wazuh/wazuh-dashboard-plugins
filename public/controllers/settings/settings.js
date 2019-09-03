@@ -95,6 +95,7 @@ export class SettingsController {
     const location = this.$location.search();
     if (location && location.tab) {
       this.tab = location.tab;
+      this.settingsTabsProps.selectedTab = this.tab;
     }
 
     this.savingApi = false;
@@ -788,4 +789,21 @@ export class SettingsController {
       this.errorHandler.handle(error);
     }
   }
+
+  settingsTabsProps = {
+    clickAction: tab => {
+      this.switchTab(tab, true);
+      if (tab === 'logs') {
+        this.refreshLogs();
+      }
+    },
+    selectedTab: this.tab || 'api',
+    tabs: [
+      { id: 'api', name: 'API' },
+      { id: 'pattern', name: 'Pattern' },
+      { id: 'configuration', name: 'Configuration' },
+      { id: 'logs', name: 'Logs' },
+      { id: 'about', name: 'About' }
+    ]
+  };
 }
