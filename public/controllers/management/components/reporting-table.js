@@ -110,6 +110,7 @@ export class ReportingTable extends Component {
           columns={columns}
           pagination={pagination}
           onChange={obj => this.onTableChange(obj)}
+          data-test-subj="reportingTable"
         />
       </div>
     );
