@@ -227,5 +227,4 @@ export class ConfigurationController {
       (this.$scope.mctrl || {}).selectedNode
     );
   }
-
 }

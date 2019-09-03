@@ -82,7 +82,7 @@ class WzConfigViewer {
       }
       if ($scope.jsoncontent != false) {
         $scope.jsonCodeBox.setValue($scope.jsoncontent.replace(/\\\\/g, '\\'));
-        setTimeout(function () {
+        setTimeout(function() {
           $scope.jsonCodeBox.refresh();
           $scope.$applyAsync();
           window.dispatchEvent(new Event('resize')); // eslint-disable-line
@@ -120,7 +120,7 @@ class WzConfigViewer {
 
     const bindXmlListener = () => {
       var scrollElement = $scope.xmlCodeBox.getScrollerElement();
-      $(scrollElement).bind('scroll', function (e) {
+      $(scrollElement).bind('scroll', function(e) {
         var element = $(e.currentTarget)[0];
         if (element.scrollHeight - element.scrollTop === element.clientHeight) {
           $scope.$emit('scrolledToBottom', {

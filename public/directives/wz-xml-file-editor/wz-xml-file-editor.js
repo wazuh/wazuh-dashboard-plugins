@@ -14,7 +14,7 @@ import template from './wz-xml-file-editor.html';
 import CodeMirror from '../../utils/codemirror/lib/codemirror';
 import { uiModules } from 'ui/modules';
 import { DynamicHeight } from '../../utils/dynamic-height';
- 
+
 const app = uiModules.get('app/wazuh', []);
 
 app.directive('wzXmlFileEditor', function() {
@@ -40,7 +40,7 @@ app.directive('wzXmlFileEditor', function() {
       apiReq,
       $rootScope,
       $window
-      ) {
+    ) {
       const window = $window;
       $scope.targetNameShown = $scope.targetName;
       $scope.configError = false;
@@ -54,7 +54,7 @@ app.directive('wzXmlFileEditor', function() {
       };
       let firstTime = true;
       const parser = new DOMParser(); // eslint-disable-line
-      
+
       /**
        * Escape "&" characters.
        * @param {*} text
@@ -397,7 +397,6 @@ app.directive('wzXmlFileEditor', function() {
         $location.search('editingFile', null);
         appState.setNavigation({ status: true });
       });
-
     },
     template
   };

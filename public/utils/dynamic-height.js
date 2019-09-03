@@ -10,12 +10,11 @@
  * Find more information about this on the LICENSE file.
  */
 export class DynamicHeight {
-
   /**
-  * Calculates dynamically the height 
-  * @param {String} classElement 
-  * @param {Number} extraHeight 
-  */
+   * Calculates dynamically the height
+   * @param {String} classElement
+   * @param {Number} extraHeight
+   */
   static dynamicHeight(classElement, extraHeight, isLogs = false) {
     let editorContainer;
     const codeMirror = $('.CodeMirror');
@@ -32,18 +31,16 @@ export class DynamicHeight {
             headerContainer.height() + extraHeight
               ? headerContainer.height() + extraHeight
               : isLogs
-                ? 0
-                : 80;
+              ? 0
+              : 80;
           editorContainer.height(windows - (offsetTop + bottom));
           codeMirror.length
-            ?
-            $(`.${classElement} .CodeMirror`).height(
-              windows - (offsetTop + bottom + headerContainerHeight)
-            )
-            :
-            $(`.${classElement}`).height(
-              windows - (offsetTop + bottom + headerContainerHeight)
-            );
+            ? $(`.${classElement} .CodeMirror`).height(
+                windows - (offsetTop + bottom + headerContainerHeight)
+              )
+            : $(`.${classElement}`).height(
+                windows - (offsetTop + bottom + headerContainerHeight)
+              );
         }, 1);
       }
     }, 100);
@@ -74,8 +71,8 @@ export class DynamicHeight {
 
   /**
    * Calculates the dynamic height for the dev tools
-   * @param {Object} self 
-   * @param {Object} window 
+   * @param {Object} self
+   * @param {Object} window
    */
   static dynamicHeightDevTools(self, window) {
     let devToolsElement;
@@ -86,17 +83,23 @@ export class DynamicHeight {
         setTimeout(() => {
           const windows = $(window).height();
           $('#wz-dev-left-column').height(
-            windows - (DynamicHeight.getPosition($('#wz-dev-left-column')[0]).y + 20)
+            windows -
+              (DynamicHeight.getPosition($('#wz-dev-left-column')[0]).y + 20)
           );
           $('.wz-dev-column-separator').height(
-            windows - (DynamicHeight.getPosition($('.wz-dev-column-separator')[0]).y + 20)
+            windows -
+              (DynamicHeight.getPosition($('.wz-dev-column-separator')[0]).y +
+                20)
           );
           $('#wz-dev-right-column').height(
-            windows - (DynamicHeight.getPosition($('#wz-dev-right-column')[0]).y + 20)
+            windows -
+              (DynamicHeight.getPosition($('#wz-dev-right-column')[0]).y + 20)
           );
           $('.wz-dev-column-separator span').height(
             windows -
-            (DynamicHeight.getPosition($('.wz-dev-column-separator span')[0]).y + 20)
+              (DynamicHeight.getPosition($('.wz-dev-column-separator span')[0])
+                .y +
+                20)
           );
         }, 1);
       }
@@ -108,8 +111,7 @@ export class DynamicHeight {
     let yPosition = 0;
 
     while (element) {
-      xPosition +=
-        element.offsetLeft - element.scrollLeft + element.clientLeft;
+      xPosition += element.offsetLeft - element.scrollLeft + element.clientLeft;
       yPosition += element.offsetTop - element.scrollTop + element.clientTop;
       element = element.offsetParent;
     }

@@ -149,7 +149,7 @@ function discoverController(
 
   $scope.getDocLink = getDocLink;
 
-  $scope.intervalOptions = intervalOptions; 
+  $scope.intervalOptions = intervalOptions;
 
   $scope.showInterval = false;
   $scope.minimumVisibleRows = 50;
@@ -1048,7 +1048,7 @@ function discoverController(
   const changeTabViewListener = $rootScope.$on(
     'changeTabView',
     (evt, parameters) => {
-      if(parameters.syscollector){
+      if (parameters.syscollector) {
         const currentFilters = queryFilter.getFilters();
         currentFilters
           .filter(item => ((item || {}).$state || {}).store !== 'globalState')
