@@ -535,7 +535,7 @@ app.directive('wzTable', function() {
         const value = $scope.parseValue(key, item);
         let keyTmp = $scope.parseKey(key);
         const valueTmp = typeof value !== 'string' ? value.toString() : value;
-        if ($scope.filterableColumns[keyTmp]) {
+        if ($scope.filterableColumns[keyTmp] || keyTmp === 'file') {
           if (value !== '-' && keyTmp !== 'file') {
             const filter = `${keyTmp}:${valueTmp}`;
             $scope.$emit('applyFilter', { filter });
