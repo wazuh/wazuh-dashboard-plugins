@@ -54,7 +54,6 @@ export class AgentsPreviewController {
     this.errorInit = false;
     this.$window = $window;
     this.timeService = timeService;
-    this.wazuhPackageVersion = version;
   }
 
   /**
@@ -271,10 +270,10 @@ export class AgentsPreviewController {
   async getWazuhVersion() {
     try {
       const data = await this.apiReq.request('GET', '/version', {}); 
-      const version = ((data.data || {}.data) || {}).data || {};
-      return version.substr(1);
+      const result = ((data || {}).data || {}).data;
+      return result ? result.substr(1) : version;
     } catch (error) {
-      return this.wazuhPackageVersion;
+      return version;
     }
   }
 }

@@ -1,4 +1,5 @@
 import React, { Component, Fragment } from 'react';
+import { version } from '../../../../package.json';
 
 import {
   EuiSteps,
@@ -34,7 +35,7 @@ export class RegisterAgent extends Component {
     try {
       this.wazuhVersion = await this.props.getWazuhVersion();
     } catch (error) {
-      this.wazuhVersion = '-';
+      this.wazuhVersion = version;
     }
   }
 
