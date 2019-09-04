@@ -96,7 +96,7 @@ export const KeyEquivalence = {
   gid: 'Group ID',
   mtime: 'Last modified',
   priority: 'Priority',
-  cmd: 'CMD',
+  cmd: 'Command',
   nlwp: 'NLWP',
   process: 'Process',
   md5: 'MD5',
