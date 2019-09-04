@@ -13,6 +13,7 @@ import { uiModules } from 'ui/modules';
 import 'react';
 import {
   EuiIcon,
+  EuiTextArea,
   EuiSuperSelect,
   EuiLoadingSpinner,
   EuiProgress,
@@ -31,6 +32,7 @@ const app = uiModules.get('app/wazuh', ['react']);
 
 app
   .value('EuiIcon', EuiIcon)
+  .value('EuiTextArea', EuiTextArea)
   .value('EuiSuperSelect', EuiSuperSelect)
   .value('EuiLoadingSpinner', EuiLoadingSpinner)
   .value('EuiProgress', EuiProgress)
