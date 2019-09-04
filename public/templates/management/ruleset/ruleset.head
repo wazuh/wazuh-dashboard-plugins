@@ -3,4 +3,4 @@
     <react-component name="Tabs" props="mctrl.rulesetTabsProps" />
 </div>
 <div ng-if="!loading && !viewingDetail" flex layout="row">
-<div ng-class="mctrl.logtestOpened ? 'flex-65' : 'flex-95'">
+<div ng-class="mctrl.logtestOpened || mctrl.uploadOpened ? 'flex-65' : 'flex-95'">

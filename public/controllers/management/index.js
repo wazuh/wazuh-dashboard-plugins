@@ -27,6 +27,7 @@ import { FilesController } from './files';
 import { LogtestController } from './logtest';
 import { WelcomeScreen } from './components/welcome';
 import { ReportingTable } from './components/reporting-table';
+import { UploadFiles } from './components/upload-files';
 
 const app = uiModules.get('app/wazuh', []);
 
@@ -46,4 +47,5 @@ app
   .controller('filesController', FilesController)
   .controller('logtestController', LogtestController)
   .value('WelcomeScreenManagement', WelcomeScreen)
-  .value('ReportingTable', ReportingTable);
+  .value('ReportingTable', ReportingTable)
+  .value('UploadFiles', UploadFiles);

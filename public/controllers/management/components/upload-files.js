@@ -18,7 +18,8 @@ import {
   EuiButton,
   EuiListGroupItem,
   EuiCallOut,
-  EuiListGroup
+  EuiListGroup,
+  EuiTitle
 } from '@elastic/eui';
 
 export class UploadFiles extends Component {
@@ -49,7 +50,6 @@ export class UploadFiles extends Component {
         title={title}
         color="warning"
         iconType="iInCircle"
-        className="upload-file-advise"
       />
     );
   }
@@ -100,11 +100,14 @@ export class UploadFiles extends Component {
   render() {
     return (
       <Fragment>
+        <EuiTitle size="m">
+          <h1>{`Upload ${this.props.msg}`}</h1>
+        </EuiTitle>
         <EuiFlexItem>
           <EuiFilePicker
             id="filePicker"
             multiple
-            initialPromptText={this.props.msg}
+            initialPromptText={`Select or drag and drop your ${this.props.msg} files here`}
             className="no-max-width"
             onChange={files => {
               this.onChange(files);

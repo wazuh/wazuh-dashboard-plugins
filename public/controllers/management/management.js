@@ -48,6 +48,7 @@ export class ManagementController {
     this.statusReportsTabs = ['status', 'logs', 'reporting', 'monitoring'];
     this.currentGroup = false;
     this.logtestOpened = false;
+    this.uploadOpened = false;
 
     this.$scope.$on('setCurrentGroup', (ev, params) => {
       this.currentGroup = (params || {}).currentGroup || false;
@@ -169,7 +170,7 @@ export class ManagementController {
           this.$scope.$applyAsync();
           this.$scope.$broadcast('addNewFile', {type: this.globalRulesetTab})
          }},
-        { id: 'upload', name: 'Upload files', icon: 'savedObjectsApp', isOpen: false, action: () => this.openLogtest() },
+        { id: 'upload', name: 'Upload files', icon: 'savedObjectsApp', isOpen: false, action: () => this.openUploadFile() },
         { id: 'logtest', name: 'Logtest', icon: 'consoleApp', isOpen: false, action: () => this.openLogtest() }
       ]
     };
@@ -184,6 +185,12 @@ export class ManagementController {
         { id: 'reporting', name: 'Reporting' }
       ]
     };
+
+    this.uploadFilesProps = {
+      msg: 'rules',
+      path: 'etc/rules',
+      upload: (files, path) => this.uploadFile(files, path)
+    }
   }
 
   /**
@@ -393,8 +400,26 @@ export class ManagementController {
   }
 
   openLogtest() {
+    this.uploadOpened = false;
     this.logtestOpened = !this.logtestOpened;
     (this.rulesetShortcutsProps.shortcuts.find(x => x.id === 'logtest') || {}).isOpen = this.logtestOpened;
     this.$scope.$applyAsync();
+  }
+
+  openUploadFile() {
+    this.logtestOpened = false;
+    this.uploadOpened = !this.uploadOpened;
+    (this.rulesetShortcutsProps.shortcuts.find(x => x.id === 'upload') || {}).isOpen = this.uploadOpened;
+    this.$scope.$applyAsync();
+  }
+
+  /**
+   * Uploads the files
+   * @param {Array} files 
+   * @param {String} path 
+   */
+  async uploadFile(files, path) {
+    //TODO
+    return;
   }
 }
