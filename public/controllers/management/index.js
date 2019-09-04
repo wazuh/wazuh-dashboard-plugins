@@ -24,6 +24,7 @@ import { ConfigurationRulesetController } from './config-ruleset';
 import { ConfigurationGroupsController } from './config-groups';
 import { EditionController } from './edition';
 import { FilesController } from './files';
+import { LogtestController } from './logtest';
 import { WelcomeScreen } from './components/welcome';
 import { ReportingTable } from './components/reporting-table';
 
@@ -43,5 +44,6 @@ app
   .controller('configurationGroupsController', ConfigurationGroupsController)
   .controller('editionController', EditionController)
   .controller('filesController', FilesController)
+  .controller('logtestController', LogtestController)
   .value('WelcomeScreenManagement', WelcomeScreen)
   .value('ReportingTable', ReportingTable);

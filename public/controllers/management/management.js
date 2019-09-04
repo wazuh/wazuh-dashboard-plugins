@@ -47,6 +47,7 @@ export class ManagementController {
     this.wazuhManagementTabs = ['ruleset', 'groups', 'configuration'];
     this.statusReportsTabs = ['status', 'logs', 'reporting', 'monitoring'];
     this.currentGroup = false;
+    this.logtestOpened = false;
 
     this.$scope.$on('setCurrentGroup', (ev, params) => {
       this.currentGroup = (params || {}).currentGroup || false;
@@ -158,6 +159,18 @@ export class ManagementController {
         { id: 'rules', name: 'Rules' },
         { id: 'decoders', name: 'Decoders' },
         { id: 'cdblists', name: 'Lists' }
+      ]
+    };
+
+    this.rulesetShortcutsProps = {
+      shortcuts: [
+        { id: 'add', name: '', icon: 'createSingleMetricJob', isOpen: false, action: () =>  {
+          this.switchFilesSubTab();
+          this.$scope.$applyAsync();
+          this.$scope.$broadcast('addNewFile', {type: this.globalRulesetTab})
+         }},
+        { id: 'upload', name: 'Upload files', icon: 'savedObjectsApp', isOpen: false, action: () => this.openLogtest() },
+        { id: 'logtest', name: 'Logtest', icon: 'consoleApp', isOpen: false, action: () => this.openLogtest() }
       ]
     };
 
@@ -303,7 +316,7 @@ export class ManagementController {
       this.currentList = false;
       this.managementTabsProps.selectedTab = this.tab;
     }
-
+    this.rulesetShortcutsProps.shortcuts[0].name = `New ${this.globalRulesetTab} file`;
     this.$location.search('tab', this.tab);
     this.loadNodeList();
   }
@@ -315,6 +328,7 @@ export class ManagementController {
   setRulesTab(tab, flag) {
     this.rulesetTab = tab;
     this.globalRulesetTab = this.rulesetTab;
+    this.rulesetShortcutsProps.shortcuts[0].name = `New ${this.globalRulesetTab} file`;
     this.managingFiles = false;
     if (!flag) {
       this.breadCrumbBack();
@@ -375,6 +389,12 @@ export class ManagementController {
       console.log(error.message || error); // eslint-disable-line
     }
     this.loadingNodes = false;
+    this.$scope.$applyAsync();
+  }
+
+  openLogtest() {
+    this.logtestOpened = !this.logtestOpened;
+    (this.rulesetShortcutsProps.shortcuts.find(x => x.id === 'logtest') || {}).isOpen = this.logtestOpened;
     this.$scope.$applyAsync();
   }
 }
