@@ -39,7 +39,7 @@ app.directive('wzTableEui', function() {
       );
       const processStatus = value => ProcessEquivalence[value] || value;
 
-      const defaultRender = value => value || '-';
+      const defaultRender = value => value >= 0 ? value : !!value ? value : '-';
 
       const parseColumns = columnsArray => {
         return columnsArray.map(item => ({
