@@ -18,7 +18,8 @@ import {
   EuiButton,
   EuiListGroupItem,
   EuiFlexGroup,
-  EuiCallOut
+  EuiCallOut,
+  EuiListGroup
 } from '@elastic/eui';
 
 export class UploadFiles extends Component {
@@ -69,7 +70,7 @@ export class UploadFiles extends Component {
   renderFiles() {
     return (
       <Fragment>
-        <EuiFlexGroup className="list-of-files">
+        <EuiListGroup flush={true} className="list-of-files">
           {Object.keys(this.state.files).map((item, i) => (
             <EuiListGroupItem
               id={i}
@@ -86,7 +87,7 @@ export class UploadFiles extends Component {
               }}
             />
           ))}
-        </EuiFlexGroup>
+        </EuiListGroup>
       </Fragment>
     );
   }
