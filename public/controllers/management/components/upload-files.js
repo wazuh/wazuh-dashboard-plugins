@@ -54,6 +54,18 @@ export class UploadFiles extends Component {
     return result.length;
   }
 
+  checkValidFileExtensions() {
+    const path = this.props.path;
+    if (path.includes('etc/rules') || path.includes('etc/decoders')) {
+      const result = Object.keys(this.state.files).filter(item => {
+        const file = this.state.files[item].name;
+        return file.substr(file.length - 4) !== '.xml';
+      });
+      return result.length ? false : true;
+    }
+    return true;
+  }
+
   renderFiles() {
     return (
       <Fragment>
@@ -96,7 +108,8 @@ export class UploadFiles extends Component {
 
         {(this.state.files.length > 0 &&
           this.state.files.length < 6 &&
-          !this.checkOverSize() > 0 && (
+          !this.checkOverSize() > 0 &&
+          this.checkValidFileExtensions() > 0 && (
             <Fragment>
               <EuiFlexItem>
                 {this.renderFiles()}
@@ -117,9 +130,16 @@ export class UploadFiles extends Component {
             {this.renderWarning('The max number of concurrent files uploads is 5.')}
           </Fragment>
         ))}
+
         {(this.checkOverSize() > 0 && (
           <Fragment>
             {this.renderWarning(`The max size per file allowd is ${this.maxSize / 1024} Kb`)}
+          </Fragment>
+        ))}
+
+        {(!this.checkValidFileExtensions() > 0 && (
+          <Fragment>
+            {this.renderWarning('The files extensions are not valid.')}
           </Fragment>
         ))}
       </Fragment>
