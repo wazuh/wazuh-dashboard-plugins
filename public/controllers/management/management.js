@@ -324,6 +324,8 @@ export class ManagementController {
       this.managementTabsProps.selectedTab = this.tab;
     }
     this.rulesetShortcutsProps.shortcuts[0].name = `New ${this.globalRulesetTab} file`;
+    (this.rulesetShortcutsProps.shortcuts.find(x => x.id === 'upload') || {}).name = `Upload ${this.globalRulesetTab} file`;
+    this.uploadFilesProps.msg = this.globalRulesetTab;
     this.$location.search('tab', this.tab);
     this.loadNodeList();
   }
@@ -336,6 +338,8 @@ export class ManagementController {
     this.rulesetTab = tab;
     this.globalRulesetTab = this.rulesetTab;
     this.rulesetShortcutsProps.shortcuts[0].name = `New ${this.globalRulesetTab} file`;
+    (this.rulesetShortcutsProps.shortcuts.find(x => x.id === 'upload') || {}).name = `Upload ${this.globalRulesetTab} file`;
+    this.uploadFilesProps.msg = this.globalRulesetTab;
     this.managingFiles = false;
     if (!flag) {
       this.breadCrumbBack();
