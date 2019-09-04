@@ -17,7 +17,6 @@ import {
   EuiFilePicker,
   EuiButton,
   EuiListGroupItem,
-  EuiFlexGroup,
   EuiCallOut,
   EuiListGroup
 } from '@elastic/eui';
@@ -38,6 +37,11 @@ export class UploadFiles extends Component {
     });
   };
 
+
+  /**
+   * Renders a CallOut with a warning
+   * @param {String} title 
+   */
   renderWarning(title) {
     return (
       <EuiCallOut
@@ -50,11 +54,17 @@ export class UploadFiles extends Component {
     );
   }
 
+  /**
+   * Checks the size of the files in order to check if anyone is bigger that the size allowed
+   */
   checkOverSize() {
     const result = Object.keys(this.state.files).filter(item => { return this.state.files[item].size > this.maxSize });
     return result.length;
   }
 
+  /**
+   * Validates the files extension
+   */
   checkValidFileExtensions() {
     const path = this.props.path;
     if (path.includes('etc/rules') || path.includes('etc/decoders')) {
@@ -67,24 +77,19 @@ export class UploadFiles extends Component {
     return true;
   }
 
+  /**
+   * Renders a list with the attached files
+   */
   renderFiles() {
     return (
       <Fragment>
         <EuiListGroup flush={true} className="list-of-files">
-          {Object.keys(this.state.files).map((item, i) => (
+          {Object.keys(this.state.files).map((index) => (
             <EuiListGroupItem
-              id={i}
-              key={i}
-              label={`${this.state.files[item].name} (${this.state.files[item].size} Bytes)`}
-              onClick={() => window.alert('Button clicked')}
+              id={index}
+              key={index}
+              label={`${this.state.files[index].name} (${this.state.files[index].size} Bytes)`}
               isActive
-              extraAction={{
-                color: 'subdued',
-                onClick: () => { window.alert('Go to remove this file') },
-                iconType: 'cross',
-                iconSize: 's',
-                'aria-label': 'Remove file'
-              }}
             />
           ))}
         </EuiListGroup>
@@ -144,8 +149,6 @@ export class UploadFiles extends Component {
           </Fragment>
         ))}
       </Fragment>
-
-
     );
   }
 }
