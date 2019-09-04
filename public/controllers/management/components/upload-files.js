@@ -17,7 +17,8 @@ import {
   EuiFilePicker,
   EuiButton,
   EuiListGroupItem,
-  EuiFlexGroup
+  EuiFlexGroup,
+  EuiCallOut
 } from '@elastic/eui';
 
 export class UploadFiles extends Component {
@@ -25,8 +26,9 @@ export class UploadFiles extends Component {
     super(props);
 
     this.state = {
-      files: {}
+      files: {},
     };
+    this.maxSize = 307200; // 300Kb
   }
 
   onChange = files => {
@@ -35,6 +37,22 @@ export class UploadFiles extends Component {
     });
   };
 
+  renderWarning(title) {
+    return (
+      <EuiCallOut
+        size="s"
+        title={title}
+        color="warning"
+        iconType="iInCircle"
+        className="upload-file-advise"
+      />
+    );
+  }
+
+  checkOverSize() {
+    const result = Object.keys(this.state.files).filter(item => { return this.state.files[item].size > this.maxSize });
+    return result.length;
+  }
 
   renderFiles() {
     return (
@@ -49,7 +67,7 @@ export class UploadFiles extends Component {
               isActive
               extraAction={{
                 color: 'subdued',
-                onClick: () => {window.alert('Go to remove this file')},
+                onClick: () => { window.alert('Go to remove this file') },
                 iconType: 'cross',
                 iconSize: 's',
                 'aria-label': 'Remove file'
@@ -76,22 +94,37 @@ export class UploadFiles extends Component {
           />
         </EuiFlexItem>
 
-        {(this.state.files.length > 0 && (
-          <Fragment>
-            <EuiFlexItem>
-              {this.renderFiles()}
-            </EuiFlexItem>
-            <EuiFlexItem grow={false}>
-              <EuiButton className="upload-files-button"
-                fill
-                iconType="sortUp"
-                onClick={() => this.props.upload(this.state.files, this.props.path)}>
-                Upload
+        {(this.state.files.length > 0 &&
+          this.state.files.length < 6 &&
+          !this.checkOverSize() > 0 && (
+            <Fragment>
+              <EuiFlexItem>
+                {this.renderFiles()}
+              </EuiFlexItem>
+              <EuiFlexItem grow={false}>
+                <EuiButton className="upload-files-button"
+                  fill
+                  iconType="sortUp"
+                  onClick={() => this.props.upload(this.state.files, this.props.path)}>
+                  Upload
           </EuiButton>
-            </EuiFlexItem>
+              </EuiFlexItem>
+            </Fragment>
+          ))}
+
+        {(this.state.files.length > 5 && (
+          <Fragment>
+            {this.renderWarning('The max number of concurrent files uploads is 5.')}
+          </Fragment>
+        ))}
+        {(this.checkOverSize() > 0 && (
+          <Fragment>
+            {this.renderWarning(`The max size per file allowd is ${this.maxSize / 1024} Kb`)}
           </Fragment>
         ))}
       </Fragment>
+
+
     );
   }
 }
