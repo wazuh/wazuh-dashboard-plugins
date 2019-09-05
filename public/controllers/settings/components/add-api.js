@@ -15,88 +15,132 @@ import PropTypes from 'prop-types';
 import {
   EuiFlexGroup,
   EuiFlexItem,
-  EuiFormRow,
-  EuiFieldText,
-  EuiFieldPassword,
-  EuiFieldNumber,
+  EuiCodeBlock,
+  EuiText,
+  EuiSpacer,
+  EuiCode,
   EuiButton,
-  EuiPanel
+  EuiSteps,
+  EuiCallOut
 } from '@elastic/eui';
+
+import needle from 'needle';
 
 export class AddApi extends Component {
   constructor(props) {
     super(props);
-
     this.state = {
-      user: '',
-      password: '',
-      url: '',
-      port: 55000
+      status: 'incomplete',
+      fetchingData: false
     };
+    this.statuses = ['complete', 'warning'];
   }
 
-  onChangeEdit(e, field) {
+  handleComplete() {
     this.setState({
-      [field]: e.target.value
+      status: 'incomplete',
+      fetchingData: true
+    });
+
+    needle(
+      'GET',
+      'http://172.16.1.2:55000',
+      {},
+      {
+        headers: {
+          'wazuh-app-version': '3.10.0'
+        },
+        username: 'foo',
+        password: 'bar'
+      }
+    ).then(result => {
+      console.log(result);
+
+      this.setState({
+        status: this.statuses[Math.floor(Math.random() * 2)],
+        fetchingData: false
+      });
     });
   }
 
   render() {
-    return (
-      <EuiPanel>
-        <EuiFlexGroup>
-          <EuiFlexItem>
-            <EuiFormRow label="Username">
-              <EuiFieldText
-                onChange={e => this.onChangeEdit(e, 'user')}
-                placeholder="foo"
-              />
-            </EuiFormRow>
-          </EuiFlexItem>
-          <EuiFlexItem>
-            <EuiFormRow label="Password">
-              <EuiFieldPassword
-                onChange={e => this.onChangeEdit(e, 'password')}
-                placeholder="bar"
-              />
-            </EuiFormRow>
-          </EuiFlexItem>
-          <EuiFlexItem>
-            <EuiFormRow label="Host">
-              <EuiFieldText
-                onChange={e => this.onChangeEdit(e, 'url')}
-                placeholder="http://localhost"
-              />
-            </EuiFormRow>
-          </EuiFlexItem>
-          <EuiFlexItem>
-            <EuiFormRow label="Port">
-              <EuiFieldNumber
-                max={99999}
-                onChange={e => this.onChangeEdit(e, 'port')}
-                placeholder={55000}
-              />
-            </EuiFormRow>
-          </EuiFlexItem>
+    const apiExample = `hosts:
+    - <id>:
+        host: "<api_url>"
+        port: <api_port>
+        username: "<api_user>"
+        password: "<api_password>"
+`;
 
-          <EuiFlexItem grow={false}>
-            <EuiFormRow label="Actions">
-              <EuiButton
-                aria-label="Save"
-                iconType="save"
-                color="primary"
-                onClick={() => this.props.saveSettings({ ...this.state })}
-              >
-                Save
-              </EuiButton>
-            </EuiFormRow>
-          </EuiFlexItem>
-        </EuiFlexGroup>
-      </EuiPanel>
+    const checkConnectionChildren = (
+      <div>
+        {this.state.status === 'warning' && (
+          <EuiCallOut
+            color="warning"
+            iconType="help"
+            title="Wazuh API not reachable, please review your configuration."
+          />
+        )}
+        {this.state.status === 'warning' && <EuiSpacer />}
+        <EuiText>
+          Check that the Kibana server can reach the configured Wazuh API(s).
+        </EuiText>
+        <EuiSpacer />
+        <EuiButton
+          onClick={() => this.handleComplete()}
+          isLoading={this.state.fetchingData}
+        >
+          Check connection
+        </EuiButton>
+      </div>
     );
+
+    const editConfigChildren = (
+      <div>
+        <EuiText>
+          Modify <EuiCode>kibana/plugins/wazuh/config.yml</EuiCode> to set the
+          connection information.
+        </EuiText>
+        <EuiSpacer />
+        <EuiCodeBlock language="yaml">{apiExample}</EuiCodeBlock>
+        <EuiSpacer />
+        <EuiText>
+          Where <EuiCode>{'<id>'}</EuiCode> is an arbitrary ID,{' '}
+          <EuiCode>{'<api_url>'}</EuiCode> is the URL of the Wazuh API,{' '}
+          <EuiCode>{'<api_port>'}</EuiCode> is the port,{' '}
+          <EuiCode>{'<api_user>'}</EuiCode> and{' '}
+          <EuiCode>{'<api_password>'}</EuiCode> are the credentials to
+          authenticate.
+        </EuiText>
+      </div>
+    );
+
+    const steps = [
+      {
+        title: 'Edit the configuration',
+        children: editConfigChildren
+      },
+      {
+        title: 'Test the configuration',
+        children: checkConnectionChildren,
+        status: this.state.status
+      }
+    ];
+
+    const view = (
+      <EuiFlexGroup>
+        <EuiFlexItem />
+        <EuiFlexItem>
+          <EuiText>
+            <h2>Getting started</h2>
+          </EuiText>
+          <EuiSpacer />
+          <EuiSteps firstStepNumber={1} steps={steps} />
+        </EuiFlexItem>
+        <EuiFlexItem />
+      </EuiFlexGroup>
+    );
+
+    return view;
   }
 }
-
-AddApi.propTypes = {
-  saveSettings: PropTypes.func
-};
