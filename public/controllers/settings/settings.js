@@ -800,7 +800,6 @@ export class SettingsController {
     selectedTab: this.tab || 'api',
     tabs: [
       { id: 'api', name: 'API' },
-      { id: 'pattern', name: 'Pattern' },
       { id: 'configuration', name: 'Configuration' },
       { id: 'logs', name: 'Logs' },
       { id: 'about', name: 'About' }
