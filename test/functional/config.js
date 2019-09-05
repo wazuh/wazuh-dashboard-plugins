@@ -9,11 +9,7 @@ export default async function ({ readConfigFile }) {
 
   return {
     testFiles: [
-      require.resolve('./apps/wazuh'),
-      require.resolve('./apps/settings'),
-      require.resolve('./apps/health_check'),
       require.resolve('./apps/overview'),
-      require.resolve('./apps/management'),
     ],
 
     services: {

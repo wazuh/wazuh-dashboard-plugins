@@ -12,6 +12,7 @@
  */
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
+import { StringsTools } from '../../../utils/strings-tools';
 import {
   EuiCard,
   EuiIcon,
@@ -32,6 +33,7 @@ import { TabDescription } from '../../../../server/reporting/tab-description';
 export class WelcomeScreen extends Component {
   constructor(props) {
     super(props);
+    this.strtools = new StringsTools();
 
     this.state = {
       extensions: this.props.extensions
@@ -70,6 +72,7 @@ export class WelcomeScreen extends Component {
           icon={<EuiIcon size="xl" type={icon} />}
           title={TabDescription[tab].title}
           onClick={() => this.props.switchTab(tab)}
+          data-test-subj={`overviewWelcome${this.strtools.capitalize(tab)}`}
           description={TabDescription[tab].description}
         />
       </EuiFlexItem>
@@ -83,6 +86,7 @@ export class WelcomeScreen extends Component {
           <EuiSwitch
             label={`${TabDescription[extension].title} extension`}
             checked={this.state.extensions[extension]}
+            data-test-subj={`switch${this.strtools.capitalize(extension)}`}
             onChange={() => this.toggleExtension(extension)}
           />
         </EuiFormRow>
@@ -96,6 +100,7 @@ export class WelcomeScreen extends Component {
           <EuiButtonIcon
             aria-label="Extensions"
             iconType="eye"
+            data-test-subj={`eye${this.strtools.toUpperCamelCase(popoverName)}`}
             onClick={() => this.onButtonClick(popoverName)}
           />
         }
