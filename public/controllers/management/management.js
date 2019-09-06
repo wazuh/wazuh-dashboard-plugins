@@ -56,6 +56,7 @@ export class ManagementController {
     this.$scope.$on('removeCurrentGroup', () => {
       this.currentGroup = false;
       this.appState.setNavigation({ status: true });
+      this.$location.search('currentGroup', null);
     });
 
     this.$scope.$on('setCurrentRule', (ev, params) => {
@@ -164,13 +165,33 @@ export class ManagementController {
 
     this.rulesetShortcutsProps = {
       shortcuts: [
-        { id: 'add', name: '', icon: 'createSingleMetricJob', isOpen: false, action: () =>  {
-          this.switchFilesSubTab();
-          this.$scope.$applyAsync();
-          this.$scope.$broadcast('addNewFile', {type: this.globalRulesetTab})
-         }},
-        { id: 'upload', name: 'Upload files', icon: 'savedObjectsApp', isOpen: false, action: () => this.openLogtest() },
-        { id: 'logtest', name: 'Logtest', icon: 'consoleApp', isOpen: false, action: () => this.openLogtest() }
+        {
+          id: 'add',
+          name: '',
+          icon: 'createSingleMetricJob',
+          isOpen: false,
+          action: () => {
+            this.switchFilesSubTab();
+            this.$scope.$applyAsync();
+            this.$scope.$broadcast('addNewFile', {
+              type: this.globalRulesetTab
+            });
+          }
+        },
+        {
+          id: 'upload',
+          name: 'Upload files',
+          icon: 'savedObjectsApp',
+          isOpen: false,
+          action: () => this.openLogtest()
+        },
+        {
+          id: 'logtest',
+          name: 'Logtest',
+          icon: 'consoleApp',
+          isOpen: false,
+          action: () => this.openLogtest()
+        }
       ]
     };
 
@@ -295,6 +316,10 @@ export class ManagementController {
     if (this.tab === 'groups') {
       this.$scope.$broadcast('groupsIsReloaded');
     }
+    if (this.tab !== 'groups') {
+      this.currentGroup = false;
+      this.$location.search('currentGroup', null);
+    }
     if (this.tab === 'configuration' && !this.editTab) {
       this.globalConfigTab = 'overview';
       this.currentConfiguration = false;
@@ -394,7 +419,9 @@ export class ManagementController {
 
   openLogtest() {
     this.logtestOpened = !this.logtestOpened;
-    (this.rulesetShortcutsProps.shortcuts.find(x => x.id === 'logtest') || {}).isOpen = this.logtestOpened;
+    (
+      this.rulesetShortcutsProps.shortcuts.find(x => x.id === 'logtest') || {}
+    ).isOpen = this.logtestOpened;
     this.$scope.$applyAsync();
   }
 }

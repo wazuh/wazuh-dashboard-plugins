@@ -24,34 +24,32 @@ export class Shortcuts extends Component {
 
   idOpened = shortcut => {
     return shortcut.isOpen && shortcut.id !== 'add';
-  }
+  };
 
   onSelectedShortcutChanged = shortcut => {
     shortcut.action();
     this.setState({
-      selectedShortcutId: shortcut.isOpen && shortcut.id !== 'add' ? shortcut.id : false
+      selectedShortcutId:
+        shortcut.isOpen && shortcut.id !== 'add' ? shortcut.id : false
     });
   };
 
   renderShortcuts() {
     return this.props.shortcuts.map((shortcut, index) => (
-<EuiKeyPadMenuItemButton
-label={shortcut.name}
-key={index}
-betaBadgeIconType={this.idOpened(shortcut) ? 'cross' : ''}
-betaBadgeLabel={this.idOpened(shortcut) ? 'Close' : ''}
-onClick={() => this.onSelectedShortcutChanged(shortcut)}>
-<EuiIcon type={shortcut.icon} size="l" />
-</EuiKeyPadMenuItemButton>
+      <EuiKeyPadMenuItemButton
+        label={shortcut.name}
+        key={index}
+        betaBadgeIconType={this.idOpened(shortcut) ? 'cross' : ''}
+        betaBadgeLabel={this.idOpened(shortcut) ? 'Close' : ''}
+        onClick={() => this.onSelectedShortcutChanged(shortcut)}
+      >
+        <EuiIcon type={shortcut.icon} size="l" />
+      </EuiKeyPadMenuItemButton>
     ));
   }
 
   render() {
-    return (
-      <Fragment>
-        {this.renderShortcuts()}
-      </Fragment>
-    );
+    return <Fragment>{this.renderShortcuts()}</Fragment>;
   }
 }
 

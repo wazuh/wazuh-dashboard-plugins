@@ -188,11 +188,6 @@ table thead > tr {
   color: #dfe5ef !important;
 }
 
-.table-striped > tbody > tr:nth-of-type(odd) {
-  background-color: #1a1b21 !important;
-  color: #dfe5ef !important;
-}
-
 .table-hover > tbody > tr:hover {
   background-color: rgba(27, 169, 245, 0.05) !important;
 }

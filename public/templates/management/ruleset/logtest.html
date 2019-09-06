@@ -1,22 +1,5 @@
 </div>
-<div flex="30" ng-show="mctrl.logtestOpened" class="md-padding" ng-controller="logtestController as ctrl">
-    <h2 class="euiTitle euiTitle--medium">Logtest</h2>
-    <br>
-    <br>
-    <div class="euiText euiText--medium"><h4>Test one log per line</h4></div>
-    <br>
-    <react-component name="EuiTextArea" props="{fullWidth: true, value: ctrl.logInput}" />
-    <button ng-disabled='!ctrl.logInput || ctrl.processing' ng-click='ctrl.test()'
-    class='btn wz-button wz-margin-top-8'>
-    <span><i aria-hidden='true' class='fa fa-fw fa-save'
-            ng-class="ctrl.processing ? 'fa-spin fa-spinner' : ''"></i>Test log</span>
-</button>
-<br>
-<br>
-<div ng-show="ctrl.XMLContent">
-        <div layout="row">
-            <wz-config-viewer flex xmlcontent="ctrl.XMLContent" hide-header="true" />
-        </div>
-    </div>
+<div flex="30" ng-if="mctrl.logtestOpened" class="md-padding logtest">
+<react-component name="Logtest" props="{}"></react-component>
 </div>
 
