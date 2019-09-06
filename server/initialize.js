@@ -15,11 +15,13 @@ import packageJSON from '../package.json';
 import { kibanaTemplate } from './integration-files/kibana-template';
 import { getConfiguration } from './lib/get-configuration';
 import { defaultExt } from './lib/default-ext';
-import { BuildBody } from './lib/replicas-shards-helper';
 import { checkKnownFields } from './lib/refresh-known-fields';
 import { totalmem } from 'os';
 import fs from 'fs';
-import path from 'path';
+import path from 'path'; 
+import { ManageHosts } from './lib/manage-hosts';
+
+const manageHosts = new ManageHosts();
 
 export function Initialize(server) {
   const wazuhVersion = path.join(__dirname, '/wazuh-version.json');
@@ -42,7 +44,7 @@ export function Initialize(server) {
         : 'wazuh-alerts-3.x-*';
     global.XPACK_RBAC_ENABLED =
       configurationFile &&
-      typeof configurationFile['xpack.rbac.enabled'] !== 'undefined'
+        typeof configurationFile['xpack.rbac.enabled'] !== 'undefined'
         ? configurationFile['xpack.rbac.enabled']
         : true;
   } catch (e) {
@@ -160,13 +162,13 @@ export function Initialize(server) {
             log(
               'initialize:checkAPIEntriesExtensions',
               `Error updating API entry extensions with ID: ${
-                item._id
+              item._id
               } due to ${error.message || error}`
             );
             server.log(
               initializeErrorLogColors,
               `Error updating API entry extensions with ID: ${
-                item._id
+              item._id
               } due to ${error.message || error}`
             );
           }
@@ -191,24 +193,55 @@ export function Initialize(server) {
 
       const result = await wzWrapper.checkIfIndexExists('.wazuh');
 
-      const shardConfiguration = BuildBody(configurationFile, 'wazuh');
-
-      if (!result) {
+      if (result) {
         try {
-          await wzWrapper.createWazuhIndex(shardConfiguration);
-
-          log('initialize:checkWazuhIndex', 'Index .wazuh created.', 'debug');
+          const data = await wzWrapper.getWazuhAPIEntries();
+          const apiEntries = (((data || {}).hits || {}).hits || []);
+          await manageHosts.migrateFromIndex(apiEntries)
+          log('initialize:checkWazuhIndex', 'Index .wazuh will be removed and its content will be migrated to config.yml', 'debug');
+          // Check if all APIs entries were migrated properly and delete it from the .wazuh index
+          await checkProperlyMigrate();     
+          await wzWrapper.deleteIndexByName('.wazuh');
         } catch (error) {
-          throw new Error('Error creating index .wazuh.');
+          throw new Error(error);
         }
-      } else {
-        await wzWrapper.updateIndexSettings('.wazuh', shardConfiguration);
-        await checkAPIEntriesExtensions();
       }
     } catch (error) {
       return Promise.reject(error);
     }
   };
+
+  /**
+   * Checks if the API entries were properly migrated
+   * @param {Array} migratedApis
+   */
+  const checkProperlyMigrate = async () => {
+    try {
+      let apisIndex = await wzWrapper.getWazuhAPIEntries();
+      const hosts = await manageHosts.getHosts();
+      apisIndex = (apisIndex.hits || {}).hits || [];
+  
+      const apisIndexKeys = apisIndex.map(api => {
+        return api._id;
+      });
+      const hostsKeys = hosts.map(api => {
+        return Object.keys(api)[0];
+      });
+
+      // Get into an array the API entries that were not migrated, if the length is 0 then all the API entries were properly migrated.
+      const rest = apisIndexKeys.filter(k => {
+        return !hostsKeys.includes(k)
+      });
+
+      if (rest.length) {
+        throw new Error(`Cannot migrate all API entries, missed entries: (${rest.toString()})`)
+      }
+      log('initialize:checkProperlyMigrate', 'The API entries migration was successful', 'debug');
+    } catch (error) {
+      log('initialize:checkProperlyMigrate', `${error}`, 'error');
+      return Promise.reject(error);
+    }
+  }
 
   const checkWazuhVersionRegistry = async () => {
     try {
@@ -325,7 +358,7 @@ export function Initialize(server) {
       return Promise.reject(
         new Error(
           `Error creating ${
-            wzWrapper.WZ_KIBANA_INDEX
+          wzWrapper.WZ_KIBANA_INDEX
           } index due to ${error.message || error}`
         )
       );
@@ -346,7 +379,7 @@ export function Initialize(server) {
       return Promise.reject(
         new Error(
           `Error creating template for ${
-            wzWrapper.WZ_KIBANA_INDEX
+          wzWrapper.WZ_KIBANA_INDEX
           } due to ${error.message || error}`
         )
       );
