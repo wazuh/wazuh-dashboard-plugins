@@ -129,9 +129,6 @@ export class ApiTable extends Component {
 ApiTable.propTypes = {
   apiEntries: PropTypes.array,
   currentDefault: PropTypes.string,
-  updateSettings: PropTypes.func,
   setDefault: PropTypes.func,
   checkManager: PropTypes.func,
-  removeManager: PropTypes.func,
-  switch: PropTypes.func
 };
