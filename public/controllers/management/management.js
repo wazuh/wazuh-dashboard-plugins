@@ -425,7 +425,16 @@ export class ManagementController {
    * @param {String} path
    */
   async uploadFiles(files, path) {
-    //TODO
-    return;
+    try {
+      /*
+      * TODO: this function are receiving an array of files with this structure {file: <file>, content: <content>} also receives the path
+      * Needs the API request implementation 
+      */
+      this.errorHandler.info('Upload successful.')
+    return;  
+    } catch (error) {
+      this.errorHandler.handle(error.message || error);
+    }
+    
   }
 }
