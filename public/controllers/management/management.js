@@ -414,7 +414,7 @@ export class ManagementController {
   refreshUploadFileProps() {
     this.uploadFilesProps = {
       msg: this.rulesetTab,
-      path: this.rulesetTab === 'lists' ? 'etc/lists' : `etc/${this.rulesetTab}`,
+      path: `etc/${this.rulesetTab}`,
       upload: (files, path) => this.uploadFiles(files, path)
     } 
   }
