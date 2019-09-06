@@ -56,9 +56,39 @@ export class UploadFiles extends Component {
   }
 
   /**
-   * Renders a CallOut with a warning
-   * @param {String} title
+   * Creates an array of objects with the files names and their content
    */
+  async startUpload() {
+    try {
+      //this.props.upload(this.state.files, this.props.path)
+      const files = [];
+      Object.keys(this.state.files).forEach(index => {
+        const reader = new FileReader();
+        const file = this.state.files[index];
+        reader.readAsText(file);
+        // This interval is for wait until the FileReader has read the file content
+        const interval = setInterval(() => {
+          if (reader.readyState === 2) {
+            files.push({
+              file: file.name,
+              content: reader.result
+            })
+            clearInterval(interval);
+          }
+        }, 100);
+      });
+      await this.props.upload(files, this.props.path);
+      this.closePopover();
+    } catch (error) {
+      this.closePopover();
+      return Promise.reject(error);
+    }
+  }
+
+  /**
+  * Renders a CallOut with a warning
+  * @param {String} title
+  */
   renderWarning(title) {
     return (
       <EuiCallOut size="s" title={title} color="warning" iconType="iInCircle" />
@@ -157,7 +187,7 @@ export class UploadFiles extends Component {
                     fill
                     iconType="sortUp"
                     onClick={() =>
-                      this.props.upload(this.state.files, this.props.path)
+                      this.startUpload()
                     }
                   >
                     Upload
