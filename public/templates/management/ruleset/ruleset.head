@@ -6,5 +6,5 @@
 </div>
         <div layout="row" class="md-padding-h">
 <span flex></span>
-<button class="kuiButton kuiButton--secondary small wz-margin-left-10 height-35" style="margin-top:-80px" type="button" ng-click="mctrl.openLogtest()"><span class="euiButtonEmpty__content"><react-component name="EuiIcon" props="{type:'play', color:'primary'}"></react-component><span class="euiButtonEmpty__text">Test your logs</span></span></button>
+<button ng-show="!mctrl.logtestOpened" class="kuiButton kuiButton--secondary small wz-margin-left-10 height-35" style="margin-top:-80px" type="button" ng-click="mctrl.openLogtest()"><span class="euiButtonEmpty__content"><react-component name="EuiIcon" props="{type:'play', color:'primary'}"></react-component><span class="euiButtonEmpty__text">Test your logs</span></span></button>
 </div>

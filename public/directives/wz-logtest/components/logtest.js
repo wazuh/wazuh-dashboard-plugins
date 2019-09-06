@@ -15,11 +15,13 @@ import {
   EuiTitle,
   EuiButton,
   EuiButtonIcon,
+  EuiButtonEmpty,
   EuiTextArea,
   EuiFlexGroup,
   EuiFlexItem,
   EuiCodeBlock,
-  EuiSpacer
+  EuiSpacer,
+  EuiFlyoutFooter
 } from '@elastic/eui';
 
 export class Logtest extends Component {
@@ -72,21 +74,38 @@ export class Logtest extends Component {
         <EuiSpacer size="m" />
         <Fragment>
           <EuiTextArea
-            placeholder="Introduce a log..."
+            placeholder="Type one log per line..."
             fullWidth={true}
             aria-label=""
             rows={8}
             onChange={this.onChange}
           />
           <EuiSpacer size="s" />
-          <EuiFlexGroup gutterSize="xs">
-            <EuiFlexItem />
-            <EuiFlexItem grow={false}>
+            <EuiCodeBlock
+              style={codeBlock}
+              language="json"
+              fontSize="s"
+              overflowHeight={650}
+              isCopyable={this.state.testResult ? true : false}
+            >
+              {this.state.testResult || 'The test result will appear here.'}
+            </EuiCodeBlock>
+        </Fragment>
+        <EuiFlyoutFooter>
+            <EuiFlexGroup justifyContent="spaceBetween">
+              <EuiFlexItem grow={false}>
+                <EuiButtonEmpty
+                  iconType="cross"
+                  onClick={() => this.props.close()}
+                  flush="left">
+                  Close
+                </EuiButtonEmpty>
+              </EuiFlexItem>
+              <EuiFlexItem grow={false}>
               <EuiButton
                 isLoading={this.state.testing}
                 isDisabled={this.state.testing || !this.state.value}
                 iconType="play"
-                size="s"
                 fill
                 onClick={() => {
                   this.test();
@@ -94,20 +113,9 @@ export class Logtest extends Component {
               >
                 Test it
               </EuiButton>
-            </EuiFlexItem>
-          </EuiFlexGroup>
-          <EuiSpacer size="s" />
-          {this.state.testResult && !this.state.testing && (
-            <EuiCodeBlock
-              style={codeBlock}
-              language="json"
-              fontSize="s"
-              overflowHeight={675}
-            >
-              {this.state.testResult}
-            </EuiCodeBlock>
-          )}
-        </Fragment>
+              </EuiFlexItem>
+            </EuiFlexGroup>
+          </EuiFlyoutFooter>
       </Fragment>
     );
   }

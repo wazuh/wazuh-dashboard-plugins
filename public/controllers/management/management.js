@@ -330,6 +330,7 @@ export class ManagementController {
    * @param {String} tab
    */
   setRulesTab(tab, flag) {
+    this.openedFileDirect = false;
     this.rulesetTab = tab;
     this.globalRulesetTab = this.rulesetTab;
     this.managingFiles = false;
@@ -397,10 +398,16 @@ export class ManagementController {
   }
 
   openLogtest() {
-    this.uploadOpened = false;
     this.logtestOpened = !this.logtestOpened;
     this.$scope.$applyAsync();
   }
+
+newFile() {
+  this.openedFileDirect = true;
+  this.switchFilesSubTab();
+          this.$scope.$applyAsync();
+          this.$scope.$broadcast('addNewFile', {type: this.globalRulesetTab})
+}
 
   testLogtest = async log => {
     //return await this.apiReq.request('GET', '/testlog', {log});
@@ -421,11 +428,7 @@ export class ManagementController {
   };
 
   openUploadFile() {
-    this.logtestOpened = false;
     this.uploadOpened = !this.uploadOpened;
-    (
-      this.rulesetShortcutsProps.shortcuts.find(x => x.id === 'upload') || {}
-    ).isOpen = this.uploadOpened;
     this.$scope.$applyAsync();
   }
 

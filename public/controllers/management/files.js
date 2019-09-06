@@ -17,8 +17,7 @@ export class FilesController {
     rulesetHandler,
     errorHandler,
     appState,
-    $location,
-    $window
+    $location
   ) {
     this.$scope = $scope;
     this.wazuhConfig = wazuhConfig;
@@ -29,7 +28,6 @@ export class FilesController {
     this.appliedFilters = [];
     this.searchTerm = '';
     this.overwriteError = false;
-    this.window = $window;
   }
 
   $onInit() {
@@ -64,7 +62,7 @@ export class FilesController {
       this.$scope.editingFile = false;
       this.$scope.editorReadOnly = false;
       this.$scope.fetchedXML = null;
-      if (this.$scope.goBack) {
+      if (this.$scope.goBack || this.$scope.mctrl.openedFileDirect) {
         if (this.$scope.viewingDetail) {
           this.$scope.mctrl.setCurrentRule({
             currentRule: this.$scope.mctrl.currentRule
@@ -161,7 +159,6 @@ export class FilesController {
 
     this.$scope.$on('addNewFile', (ev, params) => {
       this.addNewFile(params.type);
-      this.window.dispatchEvent(new Event('resize')); // eslint-disable-line
     });
   }
 
