@@ -163,38 +163,6 @@ export class ManagementController {
       ]
     };
 
-    this.rulesetShortcutsProps = {
-      shortcuts: [
-        {
-          id: 'add',
-          name: '',
-          icon: 'createSingleMetricJob',
-          isOpen: false,
-          action: () => {
-            this.switchFilesSubTab();
-            this.$scope.$applyAsync();
-            this.$scope.$broadcast('addNewFile', {
-              type: this.globalRulesetTab
-            });
-          }
-        },
-        {
-          id: 'upload',
-          name: 'Upload files',
-          icon: 'savedObjectsApp',
-          isOpen: false,
-          action: () => this.openLogtest()
-        },
-        {
-          id: 'logtest',
-          name: 'Logtest',
-          icon: 'consoleApp',
-          isOpen: false,
-          action: () => this.openLogtest()
-        }
-      ]
-    };
-
     this.managementTabsProps = {
       clickAction: tab => this.switchTab(tab, true),
       selectedTab: this.tab,
@@ -341,7 +309,6 @@ export class ManagementController {
       this.currentList = false;
       this.managementTabsProps.selectedTab = this.tab;
     }
-    this.rulesetShortcutsProps.shortcuts[0].name = `New ${this.globalRulesetTab} file`;
     this.$location.search('tab', this.tab);
     this.loadNodeList();
   }
@@ -353,7 +320,6 @@ export class ManagementController {
   setRulesTab(tab, flag) {
     this.rulesetTab = tab;
     this.globalRulesetTab = this.rulesetTab;
-    this.rulesetShortcutsProps.shortcuts[0].name = `New ${this.globalRulesetTab} file`;
     this.managingFiles = false;
     if (!flag) {
       this.breadCrumbBack();
@@ -419,9 +385,6 @@ export class ManagementController {
 
   openLogtest() {
     this.logtestOpened = !this.logtestOpened;
-    (
-      this.rulesetShortcutsProps.shortcuts.find(x => x.id === 'logtest') || {}
-    ).isOpen = this.logtestOpened;
     this.$scope.$applyAsync();
   }
 }

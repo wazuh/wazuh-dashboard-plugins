@@ -27,7 +27,6 @@ import {
 
 import { BasicTable } from '../directives/wz-table-eui/components/table';
 import { Tabs } from '../directives/wz-tabs-eui/components/tabs';
-import { Shortcuts } from '../directives/wz-shortcuts-eui/components/shortcuts';
 import { Logtest } from '../directives/wz-logtest/components/logtest';
 
 const app = uiModules.get('app/wazuh', ['react']);
@@ -45,6 +44,5 @@ app
   .value('EuiCallOut', EuiCallOut)
   .value('BasicTable', BasicTable)
   .value('Tabs', Tabs)
-  .value('Shortcuts', Shortcuts)
   .value('Logtest', Logtest)
   .value('EuiSwitch', EuiSwitch);
