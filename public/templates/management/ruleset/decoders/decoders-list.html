@@ -6,18 +6,18 @@
                             <wz-kbn-switch class="md-primary wz-no-top-bottom-margin md-padding-h wz-margin-top-3" switch-model="dctrl.showingLocalDecoders"
                             switch-text="Custom decoders" switch-change="dctrl.switchLocalDecoders()"></wz-kbn-switch>
                             <span flex></span>
-                            <button ng-if="adminMode" type="button" ng-click="mctrl.newFile()" class="euiButtonEmpty euiButtonEmpty--primary euiButtonEmpty--small wz-margin-left-10">
-                                    <span class="euiButtonEmpty__content">
-                                        <react-component name="EuiIcon" props="{type:'plusInCircle'}" />
-                                        <span class="euiButtonEmpty__text">Add new decoder</span>
-                                    </span>
-                                </button>
                             <button ng-if="adminMode" type="button" ng-click="mctrl.switchFilesSubTab('decoders')" class="euiButtonEmpty euiButtonEmpty--primary euiButtonEmpty--small wz-margin-left-10">
                                     <span class="euiButtonEmpty__content">
                                         <react-component name="EuiIcon" props="{type:'folderOpen'}" />
                                         <span class="euiButtonEmpty__text">Manage decoders files</span>
                                     </span>
                                 </button>
+                                <button ng-if="adminMode" type="button" ng-click="mctrl.newFile()" class="euiButtonEmpty euiButtonEmpty--primary euiButtonEmpty--small wz-margin-left-10">
+                                        <span class="euiButtonEmpty__content">
+                                            <react-component name="EuiIcon" props="{type:'plusInCircle'}" />
+                                            <span class="euiButtonEmpty__text">Add new decoder</span>
+                                        </span>
+                                    </button>
                                 <button type="button" ng-click="dctrl.downloadCsv()" class="euiButtonEmpty euiButtonEmpty--primary euiButtonEmpty--small wz-margin-left-10">
                                         <span class="euiButtonEmpty__content">
                                             <react-component name="EuiIcon" props="{type:'exportAction'}" />
