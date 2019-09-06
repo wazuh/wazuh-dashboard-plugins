@@ -86,6 +86,21 @@ export class ManageHosts {
   }
 
   /**
+   * Returns the IDs of the current hosts in the wazuh-hosts.yml
+   */
+  async getCurrentHostsIds() {
+    try {
+      const hosts = await this.getHosts();
+      const ids = hosts.map(h => {return Object.keys(h)[0]})
+      log('manage-hosts:getCurrentHostsIds', 'Getting hosts ids', 'debug');
+      return ids;
+    } catch (error) {
+      log('manage-hosts:getCurrentHostsIds', error.message || error);
+      return Promise.reject(error);
+    }
+  }
+
+  /**
    * Get host by id
    * @param {String} id 
    */
@@ -155,16 +170,34 @@ export class ManageHosts {
   }
 
   /**
+   * Receives an array of hosts and checks if any host is already in the wazuh-hosts.yml, in this case is removed from the received array and returns the resulting array
+   * @param {Array} hosts 
+   */
+  async cleanExistingHosts(hosts) {
+    try {
+      const currentHosts = await this.getCurrentHostsIds();
+      const cleanHosts = hosts.filter(h => {return !currentHosts.includes(h.id)});
+      log('manage-hosts:cleanExistingHosts', 'Preventing add existings hosts', 'debug');
+      return cleanHosts;
+    } catch (error) {
+      log('manage-hosts:cleanExistingHosts', error.message || error);
+      return Promise.reject(error);
+    }
+    
+  }
+
+  /**
    * Recursive function used to add several APIs entries
    * @param {Array} hosts 
    */
   async addSeveralHosts(hosts) {
     try {
-      log('manage-hosts:addSeveralHosts', `Adding several hosts(${hosts.length})`, 'debug');
-      const entry = hosts.shift();
+      log('manage-hosts:addSeveralHosts', `Adding several hosts(${hostToAdd.length})`, 'debug');
+      const hostToAdd = await this.cleanExistingHosts(hosts);
+      const entry = hostToAdd.shift();
       const response = await this.addHost(entry);
-      if (hosts.length && response) {
-        await this.addSeveralHosts(hosts);
+      if (hostToAdd.length && response) {
+        await this.addSeveralHosts(hostToAdd);
       } else {
         return 'All APIs entries were migrated to the config.yml'
       }
