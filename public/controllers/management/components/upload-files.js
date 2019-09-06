@@ -21,8 +21,7 @@ import {
   EuiCallOut,
   EuiListGroup,
   EuiTitle,
-  EuiPopover,
-  EuiToast
+  EuiPopover
 } from '@elastic/eui';
 
 export class UploadFiles extends Component {
@@ -87,9 +86,9 @@ export class UploadFiles extends Component {
   }
 
   /**
-   * Renders a CallOut with a warning
-* @param {String} title
-      */
+  * Renders a CallOut with a warning
+  * @param {String} title
+  */
   renderWarning(title) {
     return (
       <EuiCallOut size="s" title={title} color="warning" iconType="iInCircle" />
