@@ -160,7 +160,7 @@ export class ManagementController {
       tabs: [
         { id: 'rules', name: 'Rules' },
         { id: 'decoders', name: 'Decoders' },
-        { id: 'cdblists', name: 'Lists' }
+        { id: 'lists', name: 'Lists' }
       ]
     };
 
@@ -414,7 +414,7 @@ export class ManagementController {
   refreshUploadFileProps() {
     this.uploadFilesProps = {
       msg: this.rulesetTab,
-      path: this.rulesetTab === 'cdblists' ? 'etc/lists' : `etc/${this.rulesetTab}`,
+      path: this.rulesetTab === 'lists' ? 'etc/lists' : `etc/${this.rulesetTab}`,
       upload: (files, path) => this.uploadFiles(files, path)
     } 
   }
