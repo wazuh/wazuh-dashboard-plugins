@@ -47,16 +47,9 @@ export class ManageHosts {
   composeRegex(host) {
     try {
       const hostId = Object.keys(host)[0];
-      const hostProps = Object.keys(host[hostId]).length;
-      let str = `\\s*-\\s*${hostId}\\s*:[\\n\\r]`;
-      for (let i = 0; i < hostProps; i++) {
-        str = str.concat('\\s*\\S*\\s*\\S*');
-        if (i != hostProps - 1) {
-          str = str.concat('[\\n\\r]')
-        }
-      }
+      const reg = `\\s*-\\s*${hostId}\\s*:\\s*\\n*\\s*url\\s*:\\s*\\S*\\s*\\n*\\s*port\\s*:\\s*\\S*\\s*\\n*\\s*user\\s*:\\s*\\S*\\s*\\n*\\s*password\\s*:\\s*\\S*`
       log('manage-hosts:composeRegex', 'Composing regex', 'debug');
-      return new RegExp(`${str}`, 'gm');
+      return new RegExp(`${reg}`, 'gm');
     } catch (error) {
       log('manage-hosts:composeRegex', error.message || error);
       throw error;
@@ -192,8 +185,8 @@ export class ManageHosts {
    */
   async addSeveralHosts(hosts) {
     try {
-      log('manage-hosts:addSeveralHosts', `Adding several hosts(${hostToAdd.length})`, 'debug');
       const hostToAdd = await this.cleanExistingHosts(hosts);
+      log('manage-hosts:addSeveralHosts', 'Adding several', 'debug');
       const entry = hostToAdd.shift();
       const response = await this.addHost(entry);
       if (hostToAdd.length && response) {
