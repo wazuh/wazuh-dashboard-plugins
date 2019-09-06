@@ -29,7 +29,7 @@ export class FilesController {
     this.appliedFilters = [];
     this.searchTerm = '';
     this.overwriteError = false;
-    this.window = $window
+    this.window = $window;
   }
 
   $onInit() {
@@ -163,12 +163,6 @@ export class FilesController {
       this.addNewFile(params.type);
       this.window.dispatchEvent(new Event('resize')); // eslint-disable-line
     });
-
-    this.$scope.uploadFilesProps = {
-      msg: this.$scope.mctrl.globalRulesetTab,
-      path: `etc/${this.$scope.mctrl.globalRulesetTab}`,
-      upload: (files, path) => this.uploadFile(files, path)
-    }  
   }
 
   async editFile(params, readonly = false) {
@@ -221,6 +215,11 @@ export class FilesController {
 
   switchFilesSubTab(tab) {
     this.filesSubTab = tab;
+    this.$scope.uploadFilesProps = {
+      msg: this.$scope.mctrl.globalRulesetTab,
+      path: `etc/${this.$scope.mctrl.globalRulesetTab}`,
+      upload: (files, path) => this.uploadFile(files, path)
+    };
   }
 
   search(term) {

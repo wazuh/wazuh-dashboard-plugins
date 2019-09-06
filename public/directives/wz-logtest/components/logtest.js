@@ -14,6 +14,7 @@ import PropTypes from 'prop-types';
 import {
   EuiTitle,
   EuiButton,
+  EuiButtonIcon,
   EuiTextArea,
   EuiFlexGroup,
   EuiFlexItem,
@@ -26,13 +27,15 @@ export class Logtest extends Component {
     super(props);
 
     this.state = {
-      value: '{log: log}',
+      value: '',
       testing: false
     };
   }
 
-  onChange = () => {
-    console.log('hola');
+  onChange = e => {
+    this.setState({
+      value: e.target.value
+    });
   };
 
   test = () => {
@@ -41,17 +44,17 @@ export class Logtest extends Component {
     });
     setTimeout(() => {
       var XMLContent = `**Phase 1: Completed pre-decoding.
-             full event: 'timestamp:2019-09-03T13:22:27.950+0000 rule:level:7 rule:description:python: Undocumented local_file protocol allows remote attackers to bypass protection mechanisms rule:id:23504 rule:firedtimes:33 rule:mail:false rule:groups:[vulnerability-detector] rule:gdpr:[IV_35.7.d] agent:id:000 agent:name:a205e5b2a1aa manager:{name:a205e5b2a1aa} id:1567516947.252273 cluster:name:wazuh cluster:node:master decoder:{name:json} data:{vulnerability:cve:CVE-2019-9948} data:{vulnerability:title:python: Undocumented local_file protocol allows remote attackers to bypass protection mechanisms} data:{vulnerability:severity:Medium} data:{vulnerability:published:2019-03-23T00:00:00+00:00} data:{vulnerability:state:Fixed} data:{vulnerability:cvss:{cvss3_score:7.400000}} data:{vulnerability:package:name:python} data:{vulnerability:package:version:2.7.5-80.el7_6} data:{vulnerability:package:condition:less than 2.7.5-86.el7} data:{vulnerability:advisories:RHSA-2019:2030,RHSA-2019:1700} data:{vulnerability:cwe_reference:CWE-749} data:{vulnerability:bugzilla_reference:https://bugzilla.redhat.com/show_bug.cgi?id=1695570} data:{vulnerability:reference:https://access.redhat.com/security/cve/CVE-2019-9948} location:vulnerability-detector'
-             timestamp: '(null)'
-             hostname: 'a205e5b2a1aa'
-             program_name: '(null)'
-             log: 'timestamp:2019-09-03T13:22:27.950+0000 rule:level:7 rule:description:python: Undocumented local_file protocol allows remote attackers to bypass protection mechanisms rule:id:23504 rule:firedtimes:33 rule:mail:false rule:groups:[vulnerability-detector] rule:gdpr:[IV_35.7.d] agent:id:000 agent:name:a205e5b2a1aa manager:{name:a205e5b2a1aa} id:1567516947.252273 cluster:name:wazuh cluster:node:master decoder:{name:json} data:{vulnerability:cve:CVE-2019-9948} data:{vulnerability:title:python: Undocumented local_file protocol allows remote attackers to bypass protection mechanisms} data:{vulnerability:severity:Medium} data:{vulnerability:published:2019-03-23T00:00:00+00:00} data:{vulnerability:state:Fixed} data:{vulnerability:cvss:{cvss3_score:7.400000}} data:{vulnerability:package:name:python} data:{vulnerability:package:version:2.7.5-80.el7_6} data:{vulnerability:package:condition:less than 2.7.5-86.el7} data:{vulnerability:advisories:RHSA-2019:2030,RHSA-2019:1700} data:{vulnerability:cwe_reference:CWE-749} data:{vulnerability:bugzilla_reference:https://bugzilla.redhat.com/show_bug.cgi?id=1695570} data:{vulnerability:reference:https://access.redhat.com/security/cve/CVE-2019-9948} location:vulnerability-detector'
-      **Phase 2: Completed decoding.
-             No decoder matched.
-      **Phase 3: Completed filtering (rules).
-             Rule id: '1002'
-             Level: '2'
-             Description: 'Unknown problem somewhere in the system.'`;
+  full event: 'timestamp:2019-09-03T13:22:27.950+0000 rule:level:7 rule:description:python: Undocumented local_file protocol allows remote attackers to bypass protection mechanisms rule:id:23504 rule:firedtimes:33 rule:mail:false rule:groups:[vulnerability-detector] rule:gdpr:[IV_35.7.d] agent:id:000 agent:name:a205e5b2a1aa manager:{name:a205e5b2a1aa} id:1567516947.252273 cluster:name:wazuh cluster:node:master decoder:{name:json} data:{vulnerability:cve:CVE-2019-9948} data:{vulnerability:title:python: Undocumented local_file protocol allows remote attackers to bypass protection mechanisms} data:{vulnerability:severity:Medium} data:{vulnerability:published:2019-03-23T00:00:00+00:00} data:{vulnerability:state:Fixed} data:{vulnerability:cvss:{cvss3_score:7.400000}} data:{vulnerability:package:name:python} data:{vulnerability:package:version:2.7.5-80.el7_6} data:{vulnerability:package:condition:less than 2.7.5-86.el7} data:{vulnerability:advisories:RHSA-2019:2030,RHSA-2019:1700} data:{vulnerability:cwe_reference:CWE-749} data:{vulnerability:bugzilla_reference:https://bugzilla.redhat.com/show_bug.cgi?id=1695570} data:{vulnerability:reference:https://access.redhat.com/security/cve/CVE-2019-9948} location:vulnerability-detector'
+  timestamp: '(null)'
+  hostname: 'a205e5b2a1aa'
+  program_name: '(null)'
+  log: 'timestamp:2019-09-03T13:22:27.950+0000 rule:level:7 rule:description:python: Undocumented local_file protocol allows remote attackers to bypass protection mechanisms rule:id:23504 rule:firedtimes:33 rule:mail:false rule:groups:[vulnerability-detector] rule:gdpr:[IV_35.7.d] agent:id:000 agent:name:a205e5b2a1aa manager:{name:a205e5b2a1aa} id:1567516947.252273 cluster:name:wazuh cluster:node:master decoder:{name:json} data:{vulnerability:cve:CVE-2019-9948} data:{vulnerability:title:python: Undocumented local_file protocol allows remote attackers to bypass protection mechanisms} data:{vulnerability:severity:Medium} data:{vulnerability:published:2019-03-23T00:00:00+00:00} data:{vulnerability:state:Fixed} data:{vulnerability:cvss:{cvss3_score:7.400000}} data:{vulnerability:package:name:python} data:{vulnerability:package:version:2.7.5-80.el7_6} data:{vulnerability:package:condition:less than 2.7.5-86.el7} data:{vulnerability:advisories:RHSA-2019:2030,RHSA-2019:1700} data:{vulnerability:cwe_reference:CWE-749} data:{vulnerability:bugzilla_reference:https://bugzilla.redhat.com/show_bug.cgi?id=1695570} data:{vulnerability:reference:https://access.redhat.com/security/cve/CVE-2019-9948} location:vulnerability-detector'
+**Phase 2: Completed decoding.
+  No decoder matched.
+**Phase 3: Completed filtering (rules).
+  Rule id: '1002'
+  Level: '2'
+  Description: 'Unknown problem somewhere in the system.'`;
       this.setState({
         testing: false,
         testResult: XMLContent
@@ -65,24 +68,36 @@ export class Logtest extends Component {
     };
     return (
       <Fragment>
-        <EuiTitle size="m">
-          <h2>Test your logs</h2>
-        </EuiTitle>
+        <EuiFlexGroup gutterSize="xs">
+          <EuiTitle size="s">
+            <h2>Test your logs</h2>
+          </EuiTitle>
+          <EuiFlexItem />
+          <EuiFlexItem grow={false}>
+            <EuiButtonIcon
+              color={'text'}
+              onClick={() => this.props.close()}
+              iconType="cross"
+              aria-label="Close"
+            />
+          </EuiFlexItem>
+        </EuiFlexGroup>
         <EuiSpacer size="m" />
         <Fragment>
           <EuiTextArea
-            placeholder="Test one log per line"
+            placeholder="Introduce a log..."
             fullWidth={true}
             aria-label=""
             rows={8}
             onChange={this.onChange}
           />
           <EuiSpacer size="s" />
-          <EuiFlexGroup gutterSize="s" alignItems="center" wrap>
+          <EuiFlexGroup gutterSize="xs">
+            <EuiFlexItem />
             <EuiFlexItem grow={false}>
               <EuiButton
                 isLoading={this.state.testing}
-                isDisabled={this.state.testing}
+                isDisabled={this.state.testing || !this.state.value}
                 iconType="play"
                 fill
                 onClick={() => {
@@ -97,9 +112,9 @@ export class Logtest extends Component {
           {this.state.testResult && !this.state.testing && (
             <EuiCodeBlock
               style={codeBlock}
-              language="javascript"
+              language="json"
               fontSize="s"
-              overflowHeight={650}
+              overflowHeight={675}
             >
               {this.state.testResult}
             </EuiCodeBlock>
@@ -111,5 +126,6 @@ export class Logtest extends Component {
 }
 
 Logtest.propTypes = {
-  clickAction: PropTypes.func
+  clickAction: PropTypes.func,
+  close: PropTypes.func
 };

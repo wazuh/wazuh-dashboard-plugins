@@ -175,9 +175,14 @@ export class ManagementController {
       ]
     };
 
+    this.logtestProps = {
+      clickAction: tab => this.switchTab(tab, true),
+      close: () => this.openLogtest()
+    };
+
     this.uploadFilesProps = {
       upload: (files, path) => this.uploadFile(files, path)
-    }
+    };
   }
 
   /**
@@ -397,14 +402,16 @@ export class ManagementController {
   openUploadFile() {
     this.logtestOpened = false;
     this.uploadOpened = !this.uploadOpened;
-    (this.rulesetShortcutsProps.shortcuts.find(x => x.id === 'upload') || {}).isOpen = this.uploadOpened;
+    (
+      this.rulesetShortcutsProps.shortcuts.find(x => x.id === 'upload') || {}
+    ).isOpen = this.uploadOpened;
     this.$scope.$applyAsync();
   }
 
   /**
    * Uploads the files
-   * @param {Array} files 
-   * @param {String} path 
+   * @param {Array} files
+   * @param {String} path
    */
   async uploadFile(files, path) {
     //TODO
