@@ -18,10 +18,9 @@
                                             <span class="euiButtonEmpty__text">Export formatted</span>
                                         </span>
                                     </button>
-                                    <!-- <react-component name="UploadFiles" ng-init="mctrl.uploadFilesProps.msg = 'decoders'; mctrl.uploadFilesProps.path = 'etc/decoders'" props="mctrl.uploadFilesProps"/>
-                             --></div>
+                                 </div>
             <div class="wz-padding-bottom-0">
-                    <div layout="row" style="margin-left: -16px;margin-bottom: 25px;padding-right:0" class="euiFlexGroup euiFlexGroup--alignItemsCenter euiFormControlLayout__childrenWrapper md-padding-h ng-scope wz-margin-top-16"
+                    <div layout="row" style="margin-left: -16px;margin-bottom: 20px;padding-right:0" class="euiFlexGroup euiFlexGroup--alignItemsCenter euiFormControlLayout__childrenWrapper md-padding-h ng-scope wz-margin-top-16"
         ng-if="!dctrl.editingFile && !mctrl.filesSubTab">
         <input placeholder="Filter decoders..." ng-model="dctrl.custom_search" type="text" class="euiFieldSearch euiFieldSearch--fullWidth euiFlexItem ng-empty ng-pristine ng-touched ng-valid"
             aria-invalid="false" wz-enter="dctrl.search(dctrl.custom_search)" id="search-input-rules">
@@ -33,11 +32,11 @@
         </div>
         <button type="submit" aria-label="Search" class="euiButton euiButton--primary euiButton--fill wz-margin-left-8"
             ng-click="dctrl.search(dctrl.custom_search)">
-            <react-component name="EuiIcon" props="{type:'search', color:'ghost'}"></react-component> Search
+            <react-component name="EuiIcon" props="{type:'search'}"></react-component> Search
         </button>
         </div>
 
-    <md-chips class="wz-chips md-padding-h wz-margin-top-16" readonly="true" ng-hide="!dctrl.appliedFilters.length || 
+    <md-chips readonly="true" ng-hide="!dctrl.appliedFilters.length || 
     (dctrl.appliedFilters.length === 1 && dctrl.includesFilter('path') && dctrl.showingLocalDecoders)"
         ng-if="!dctrl.editingFile">
         <md-chip class="wz-chip" ng-show="dctrl.includesFilter('file')">
@@ -51,6 +50,7 @@
             </span>
         </md-chip>
     </md-chips>
+    <div class="wz-margin-top-16">
                 <wz-table lens="dctrl.showingLocalDecoders" custom-columns="true" ng-if="!dctrl.showingLocalDecoders" implicit-filter="dctrl.appliedFilters"
                     flex path="'/decoders'" keys="['name',{value:'details.program_name',size:2,nosortable:true},{value:'details.order',size:2,nosortable:true},'file', 'path']"
                     allow-click="true" row-sizes="[16,13,11]">
@@ -59,6 +59,7 @@
                     implicit-filter="dctrl.appliedFilters" allow-click="true" row-sizes="[16,13,11]">
                 </wz-table>
             </div>
+        </div>
         </div>
     </div>
 </div>

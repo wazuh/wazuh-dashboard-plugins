@@ -18,10 +18,9 @@
                             <span class="euiButtonEmpty__text">Export formatted</span>
                         </span>
                     </button>
-                    <!-- <react-component name="UploadFiles" ng-init="mctrl.uploadFilesProps.msg = 'rules'; mctrl.uploadFilesProps.path = 'etc/rules'" props="mctrl.uploadFilesProps"/>
-                     --></div>
+                   </div>
             <div class="wz-padding-bottom-0">
-                    <div layout="row" style="margin-left: -16px;margin-bottom: 25px;padding-right:0" class="euiFlexGroup euiFlexGroup--alignItemsCenter euiFormControlLayout__childrenWrapper md-padding-h ng-scope wz-margin-top-16"
+                    <div layout="row" style="margin-left: -16px;margin-bottom: 20px;padding-right:0" class="euiFlexGroup euiFlexGroup--alignItemsCenter euiFormControlLayout__childrenWrapper md-padding-h ng-scope wz-margin-top-16"
         ng-if="!mctrl.filesSubTab">
         <input placeholder="Filter rules..." ng-model="custom_search" type="text" class="euiFieldSearch euiFieldSearch--fullWidth euiFlexItem"
             aria-invalid="false" wz-enter="search(custom_search)" id="search-input-rules">
@@ -34,11 +33,11 @@
         </div>
         <button type="submit" aria-label="Search" class="euiButton euiButton--primary euiButton--fill wz-margin-left-8"
             ng-click="search(custom_search)">
-            <react-component name="EuiIcon" props="{type:'search', color:'ghost'}"></react-component> Search
+            <react-component name="EuiIcon" props="{type:'search'}"></react-component> Search
         </button>
         </div>
 
-    <md-chips class="wz-chips md-padding-h wz-margin-top-16" readonly="true" ng-hide="!appliedFilters.length || 
+    <md-chips readonly="true" ng-hide="!appliedFilters.length || 
     (appliedFilters.length === 1 && includesFilter('path') && mctrl.showingLocalRules)"
         ng-if="!editingFile && !mctrl.filesSubTab">
         <md-chip class="wz-chip" ng-show="includesFilter('file')">
@@ -82,6 +81,7 @@
             </span>
         </md-chip>
     </md-chips>
+    <div class="wz-margin-top-16">
                 <wz-table lens="mctrl.showingLocalRules" custom-columns="true" flex ng-if="mctrl.showingLocalRules" path="'/rules'" keys="[{value: 'id', width: '85px'},{value:'description', width: 'auto'},{value:'groups',nosortable:true, width: '250px'},{value:'pci',nosortable:true, width: '170px'},{value:'gdpr',nosortable:true,width: '170px'}, {value:'hipaa',nosortable:true,width: '170px'}, {value:'nist-800-53',nosortable:true,width: '170px'}, {value: 'level', width: '100px'}, {value:'file',width: '200px'}, {value:'path', width: 'auto'}]"
                     implicit-filter="appliedFilters" allow-click="true" row-sizes="[16,14,12]">
                 </wz-table>
@@ -90,6 +90,7 @@
                     allow-click="true" row-sizes="[16,14,12]">
                 </wz-table>
             </div>
+        </div>
         </div>
     </div>
 </div>
