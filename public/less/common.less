@@ -850,16 +850,20 @@ wz-xml-file-editor {
   height: inherit;
 }
 
-.table-striped > tbody > tr:nth-of-type(odd) {
-  background-color: #f5f7fa;
-}
-
 .euiTableHeaderCell {
   font-weight: 600;
 }
 
 .table-striped-duo .selected {
   background: #ecf6fb !important;
+}
+
+.table-striped > tbody > tr:nth-of-type(odd){
+  background-color: transparent!important;
+}
+
+.table-striped > tbody > tr:nth-of-type(odd):hover{
+  background-color: #fafbfd!important;
 }
 
 .table-striped-duo > tbody tr:not(.euiTableRow):nth-child(2n + 1):not(:hover),
@@ -1183,4 +1187,16 @@ md-toolbar.md-default-theme:not(.md-menu-toolbar), md-toolbar:not(.md-menu-toolb
 .list-of-files .euiListGroupItem {
   background: white !important;
   color: #377dbb !important;
+}
+
+.logtest{
+  height: calc(~'100vh - 95px');
+  border-left: 1px solid #e1e2e3;
+  box-shadow: -2px 0px 2px -1px rgba(152, 162, 179, 0.3);
+  background: #fff;
+  margin-top: -50px;
+}
+
+.application.tab-manager {
+  background: #fafbfd;
 }

@@ -1,17 +1,5 @@
 </div>
-<div flex="30" ng-show="mctrl.logtestOpened" class="md-padding" ng-controller="logtestController as ctrl">
-    <h2 class="euiTitle euiTitle--medium">Logtest</h2>
-    <br>
-    <br>
-    <div class="euiText euiText--medium"><h4>Test one log per line</h4></div>
-    <br>
-    <textarea></textarea>
-<br>
-<br>
-<div ng-show="ctrl.XMLContent">
-        <div layout="row">
-            <wz-config-viewer flex xmlcontent="ctrl.XMLContent" hide-header="true" />
-        </div>
-    </div>
+<div flex="30" ng-if="mctrl.logtestOpened" class="md-padding logtest">
+<react-component name="Logtest" props="{}"></react-component>
 </div>
 
