@@ -174,10 +174,6 @@ export class ManagementController {
         { id: 'reporting', name: 'Reporting' }
       ]
     };
-
-    this.uploadFilesProps = {
-      upload: (files, path) => this.uploadFile(files, path)
-    }
   }
 
   /**
@@ -199,6 +195,12 @@ export class ManagementController {
     if (location && location.tab) {
       this.tab = location.tab;
       this.switchTab(this.tab);
+    }
+
+    this.uploadFilesProps = {
+      msg: this.$scope.mctrl.rulesetTab,
+      path: `etc/${this.$scope.mctrl.rulesetTab}`,
+      upload: (files, path) => this.uploadFiles(files, path)
     }
   }
 
@@ -326,6 +328,7 @@ export class ManagementController {
     this.rulesetTab = tab;
     this.globalRulesetTab = this.rulesetTab;
     this.managingFiles = false;
+    this.refreshUploadFileProps();
     if (!flag) {
       this.breadCrumbBack();
     }
@@ -401,12 +404,20 @@ export class ManagementController {
     this.$scope.$applyAsync();
   }
 
+  refreshUploadFileProps() {
+    this.uploadFilesProps = {
+      msg: this.rulesetTab,
+      path: this.rulesetTab === 'cdblists' ? 'etc/lists' : `etc/${this.rulesetTab}`,
+      upload: (files, path) => this.uploadFiles(files, path)
+    } 
+  }
+
   /**
    * Uploads the files
    * @param {Array} files 
    * @param {String} path 
    */
-  async uploadFile(files, path) {
+  async uploadFiles(files, path) {
     //TODO
     return;
   }

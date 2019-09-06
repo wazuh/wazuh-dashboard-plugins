@@ -163,12 +163,6 @@ export class FilesController {
       this.addNewFile(params.type);
       this.window.dispatchEvent(new Event('resize')); // eslint-disable-line
     });
-
-    this.$scope.uploadFilesProps = {
-      msg: this.$scope.mctrl.globalRulesetTab,
-      path: `etc/${this.$scope.mctrl.globalRulesetTab}`,
-      upload: (files, path) => this.uploadFile(files, path)
-    }  
   }
 
   async editFile(params, readonly = false) {
