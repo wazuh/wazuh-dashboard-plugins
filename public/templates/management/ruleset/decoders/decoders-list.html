@@ -1,8 +1,10 @@
 <div ng-if="!loading && !dctrl.viewingDetail" layout="column">
     <div layout="row" class="wz-margin-top-16">
-            <div flex class="euiPanel euiPanel--paddingLarge md-margin-h" ng-if="!dctrl.editingFile && !mctrl.filesSubTab">
-                    <div layout="row" layout-align="end center">
-                            <h1 class="euiTitle euiTitle--small">Decoders</h1>
+        <div flex class="euiPanel euiPanel--paddingLarge md-margin-h" ng-if="!dctrl.editingFile && !mctrl.filesSubTab">
+            <div layout="row" layout-align="end center">
+                            <h1 class="euiTitle euiTitle--medium">Decoders</h1>
+                            <wz-kbn-switch class="md-primary wz-no-top-bottom-margin md-padding-h wz-margin-top-3" switch-model="dctrl.showingLocalDecoders"
+                            switch-text="Custom decoders" switch-change="dctrl.switchLocalDecoders()"></wz-kbn-switch>
                             <span flex></span>
                             <button ng-if="adminMode" type="button" ng-click="mctrl.switchFilesSubTab('decoders')" class="euiButtonEmpty euiButtonEmpty--primary euiButtonEmpty--small wz-margin-left-10">
                                     <span class="euiButtonEmpty__content">
@@ -16,8 +18,8 @@
                                             <span class="euiButtonEmpty__text">Export formatted</span>
                                         </span>
                                     </button>
-                                    <react-component name="UploadFiles" props="{path:'etc/decoders'}"/>
-                            </div>
+                                    <!-- <react-component name="UploadFiles" ng-init="mctrl.uploadFilesProps.msg = 'decoders'; mctrl.uploadFilesProps.path = 'etc/decoders'" props="mctrl.uploadFilesProps"/>
+                             --></div>
             <div class="wz-padding-bottom-0">
                     <div layout="row" style="margin-left: -16px;margin-bottom: 25px;padding-right:0" class="euiFlexGroup euiFlexGroup--alignItemsCenter euiFormControlLayout__childrenWrapper md-padding-h ng-scope wz-margin-top-16"
         ng-if="!dctrl.editingFile && !mctrl.filesSubTab">
@@ -29,8 +31,6 @@
                 <react-component name="EuiIcon" props="{type:'search', className:'euiFormControlLayoutCustomIcon__icon'}" />
             </span>
         </div>
-        <wz-kbn-switch class="md-primary wz-no-top-bottom-margin md-padding-h" switch-model="dctrl.showingLocalDecoders"
-        switch-text="Custom decoders" switch-change="dctrl.switchLocalDecoders()"></wz-kbn-switch>
         <button type="submit" aria-label="Search" class="euiButton euiButton--primary euiButton--fill wz-margin-left-8"
             ng-click="dctrl.search(dctrl.custom_search)">
             <react-component name="EuiIcon" props="{type:'search', color:'ghost'}"></react-component> Search

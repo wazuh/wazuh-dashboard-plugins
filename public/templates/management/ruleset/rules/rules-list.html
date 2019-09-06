@@ -2,7 +2,9 @@
     <div layout="row" ng-if="!editingFile" class="wz-margin-top-16">
         <div flex class="euiPanel euiPanel--paddingLarge md-margin-h">
             <div layout="row" layout-align="end center">
-                    <h1 class="euiTitle euiTitle--small">Rules</h1>
+                    <h1 class="euiTitle euiTitle--medium">Rules</h1>
+                    <wz-kbn-switch class="md-primary wz-no-top-bottom-margin md-padding-h wz-margin-top-3" switch-model="mctrl.showingLocalRules"
+                    switch-text="Custom rules" switch-change="switchLocalRules()"></wz-kbn-switch>        
                     <span flex></span>
                     <button ng-if="adminMode" type="button" ng-click="mctrl.switchFilesSubTab('rules')" class="euiButtonEmpty euiButtonEmpty--primary euiButtonEmpty--small wz-margin-left-10">
                             <span class="euiButtonEmpty__content">
@@ -16,8 +18,8 @@
                             <span class="euiButtonEmpty__text">Export formatted</span>
                         </span>
                     </button>
-                    <react-component name="UploadFiles" props="{path:'etc/rules'}"/>
-                    </div>
+                    <!-- <react-component name="UploadFiles" ng-init="mctrl.uploadFilesProps.msg = 'rules'; mctrl.uploadFilesProps.path = 'etc/rules'" props="mctrl.uploadFilesProps"/>
+                     --></div>
             <div class="wz-padding-bottom-0">
                     <div layout="row" style="margin-left: -16px;margin-bottom: 25px;padding-right:0" class="euiFlexGroup euiFlexGroup--alignItemsCenter euiFormControlLayout__childrenWrapper md-padding-h ng-scope wz-margin-top-16"
         ng-if="!mctrl.filesSubTab">
@@ -30,8 +32,6 @@
                 <react-component name="EuiIcon" props="{type:'search', className:'euiFormControlLayoutCustomIcon__icon'}" />
             </span>
         </div>
-        <wz-kbn-switch class="md-primary wz-no-top-bottom-margin md-padding-h" switch-model="mctrl.showingLocalRules"
-        switch-text="Custom rules" switch-change="switchLocalRules()"></wz-kbn-switch>        
         <button type="submit" aria-label="Search" class="euiButton euiButton--primary euiButton--fill wz-margin-left-8"
             ng-click="search(custom_search)">
             <react-component name="EuiIcon" props="{type:'search', color:'ghost'}"></react-component> Search

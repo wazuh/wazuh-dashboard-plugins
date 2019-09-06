@@ -176,8 +176,6 @@ export class ManagementController {
     };
 
     this.uploadFilesProps = {
-      msg: 'rules',
-      path: 'etc/rules',
       upload: (files, path) => this.uploadFile(files, path)
     }
   }

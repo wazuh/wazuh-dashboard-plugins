@@ -113,10 +113,10 @@ export class UploadFiles extends Component {
 
   render() {
     const button = (<EuiButtonEmpty
-      iconType="exportAction"
+      iconType="importAction"
       iconSide="left"
       onClick={() => this.onButtonClick()}>
-      Import
+      Import files
     </EuiButtonEmpty>
     );
     return (
@@ -124,6 +124,7 @@ export class UploadFiles extends Component {
         id="popover"
         button={button}
         isOpen={this.state.isPopoverOpen}
+        anchorPosition="downRight"
         closePopover={() => this.closePopover()}>
         <div style={{ width: '300px' }}>
           <EuiTitle size="m">

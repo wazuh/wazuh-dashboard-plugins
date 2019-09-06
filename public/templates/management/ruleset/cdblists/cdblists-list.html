@@ -2,7 +2,7 @@
         <div layout="row" class="wz-margin-top-16">
                 <div flex class="euiPanel euiPanel--paddingLarge md-margin-h">
                         <div layout="row" layout-align="end center">
-                                <h1 class="euiTitle euiTitle--small">CDB lists</h1>
+                                <h1 class="euiTitle euiTitle--medium">CDB lists</h1>
                                 <span flex></span>
                                 <button ng-if="cdbctrl.adminMode" type="button" ng-click="cdbctrl.addNewList()" class="euiButtonEmpty euiButtonEmpty--primary euiButtonEmpty--small wz-margin-left-10">
                                         <span class="euiButtonEmpty__content">
@@ -16,7 +16,7 @@
                                         <span class="euiButtonEmpty__text">Export formatted</span>
                                     </span>
                                 </button>
-                                <react-component name="UploadFiles" props="{path:'etc/lists'}"/>
+                                <react-component name="UploadFiles" ng-init="mctrl.uploadFilesProps.msg = 'lists'; mctrl.uploadFilesProps.path = 'etc/lists'" props="mctrl.uploadFilesProps"/>
                                 </div>
     <div layout="row" style="margin-left: -16px;margin-bottom: 25px;padding-right:0" 
         class="euiFlexGroup euiFlexGroup--alignItemsCenter euiFormControlLayout__childrenWrapper md-padding-h ng-scope wz-margin-top-16"
