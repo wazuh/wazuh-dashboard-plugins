@@ -160,7 +160,7 @@ export class ManagementController {
       tabs: [
         { id: 'rules', name: 'Rules' },
         { id: 'decoders', name: 'Decoders' },
-        { id: 'cdblists', name: 'Lists' }
+        { id: 'lists', name: 'Lists' }
       ]
     };
 
@@ -173,6 +173,11 @@ export class ManagementController {
         { id: 'monitoring', name: 'Cluster' },
         { id: 'reporting', name: 'Reporting' }
       ]
+    };
+
+    this.logtestProps = {
+      clickAction: tab => this.switchTab(tab, true),
+      close: () => this.openLogtest()
     };
   }
 
@@ -400,22 +405,24 @@ export class ManagementController {
   openUploadFile() {
     this.logtestOpened = false;
     this.uploadOpened = !this.uploadOpened;
-    (this.rulesetShortcutsProps.shortcuts.find(x => x.id === 'upload') || {}).isOpen = this.uploadOpened;
+    (
+      this.rulesetShortcutsProps.shortcuts.find(x => x.id === 'upload') || {}
+    ).isOpen = this.uploadOpened;
     this.$scope.$applyAsync();
   }
 
   refreshUploadFileProps() {
     this.uploadFilesProps = {
       msg: this.rulesetTab,
-      path: this.rulesetTab === 'cdblists' ? 'etc/lists' : `etc/${this.rulesetTab}`,
+      path: `etc/${this.rulesetTab}`,
       upload: (files, path) => this.uploadFiles(files, path)
     } 
   }
 
   /**
    * Uploads the files
-   * @param {Array} files 
-   * @param {String} path 
+   * @param {Array} files
+   * @param {String} path
    */
   async uploadFiles(files, path) {
     //TODO

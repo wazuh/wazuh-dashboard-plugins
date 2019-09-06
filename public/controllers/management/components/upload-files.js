@@ -37,7 +37,7 @@ export class UploadFiles extends Component {
 
   onChange = files => {
     this.setState({
-      files: files,
+      files: files
     });
   };
 
@@ -57,16 +57,11 @@ export class UploadFiles extends Component {
 
   /**
    * Renders a CallOut with a warning
-   * @param {String} title 
+   * @param {String} title
    */
   renderWarning(title) {
     return (
-      <EuiCallOut
-        size="s"
-        title={title}
-        color="warning"
-        iconType="iInCircle"
-      />
+      <EuiCallOut size="s" title={title} color="warning" iconType="iInCircle" />
     );
   }
 
@@ -74,7 +69,9 @@ export class UploadFiles extends Component {
    * Checks the size of the files in order to check if anyone is bigger that the size allowed
    */
   checkOverSize() {
-    const result = Object.keys(this.state.files).filter(item => { return this.state.files[item].size > this.maxSize });
+    const result = Object.keys(this.state.files).filter(item => {
+      return this.state.files[item].size > this.maxSize;
+    });
     return result.length;
   }
 
@@ -100,7 +97,7 @@ export class UploadFiles extends Component {
     return (
       <Fragment>
         <EuiListGroup flush={true} className="list-of-files">
-          {Object.keys(this.state.files).map((index) => (
+          {Object.keys(this.state.files).map(index => (
             <EuiListGroupItem
               id={index}
               key={index}
@@ -114,12 +111,14 @@ export class UploadFiles extends Component {
   }
 
   render() {
-    const button = (<EuiButtonEmpty
-      iconType="importAction"
-      iconSide="left"
-      onClick={() => this.onButtonClick()}>
-      Import files
-    </EuiButtonEmpty>
+    const button = (
+      <EuiButtonEmpty
+        iconType="importAction"
+        iconSide="left"
+        onClick={() => this.onButtonClick()}
+      >
+        Import files
+      </EuiButtonEmpty>
     );
     return (
       <EuiPopover
@@ -127,7 +126,8 @@ export class UploadFiles extends Component {
         button={button}
         isOpen={this.state.isPopoverOpen}
         anchorPosition="downRight"
-        closePopover={() => this.closePopover()}>
+        closePopover={() => this.closePopover()}
+      >
         <div style={{ width: '300px' }}>
           <EuiTitle size="m">
             <h1>{`Upload ${this.props.msg}`}</h1>
@@ -145,42 +145,48 @@ export class UploadFiles extends Component {
             />
           </EuiFlexItem>
 
-          {(this.state.files.length > 0 &&
+          {this.state.files.length > 0 &&
             this.state.files.length < 6 &&
             !this.checkOverSize() > 0 &&
             this.checkValidFileExtensions() > 0 && (
               <Fragment>
-                <EuiFlexItem>
-                  {this.renderFiles()}
-                </EuiFlexItem>
+                <EuiFlexItem>{this.renderFiles()}</EuiFlexItem>
                 <EuiFlexItem grow={false}>
-                  <EuiButton className="upload-files-button"
+                  <EuiButton
+                    className="upload-files-button"
                     fill
                     iconType="sortUp"
-                    onClick={() => this.props.upload(this.state.files, this.props.path)}>
+                    onClick={() =>
+                      this.props.upload(this.state.files, this.props.path)
+                    }
+                  >
                     Upload
-          </EuiButton>
+                  </EuiButton>
                 </EuiFlexItem>
               </Fragment>
-            ))}
+            )}
 
-          {(this.state.files.length > 5 && (
+          {this.state.files.length > 5 && (
             <Fragment>
-              {this.renderWarning('The max number of concurrent files uploads is 5.')}
+              {this.renderWarning(
+                'The max number of concurrent files uploads is 5.'
+              )}
             </Fragment>
-          ))}
+          )}
 
-          {(this.checkOverSize() > 0 && (
+          {this.checkOverSize() > 0 && (
             <Fragment>
-              {this.renderWarning(`The max size per file allowd is ${this.maxSize / 1024} Kb`)}
+              {this.renderWarning(
+                `The max size per file allowd is ${this.maxSize / 1024} Kb`
+              )}
             </Fragment>
-          ))}
+          )}
 
-          {(!this.checkValidFileExtensions() > 0 && (
+          {!this.checkValidFileExtensions() > 0 && (
             <Fragment>
               {this.renderWarning('The files extensions are not valid.')}
             </Fragment>
-          ))}
+          )}
         </div>
       </EuiPopover>
     );

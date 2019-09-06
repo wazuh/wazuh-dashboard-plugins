@@ -29,7 +29,7 @@ export class FilesController {
     this.appliedFilters = [];
     this.searchTerm = '';
     this.overwriteError = false;
-    this.window = $window
+    this.window = $window;
   }
 
   $onInit() {
@@ -215,6 +215,11 @@ export class FilesController {
 
   switchFilesSubTab(tab) {
     this.filesSubTab = tab;
+    this.$scope.uploadFilesProps = {
+      msg: this.$scope.mctrl.globalRulesetTab,
+      path: `etc/${this.$scope.mctrl.globalRulesetTab}`,
+      upload: (files, path) => this.uploadFile(files, path)
+    };
   }
 
   search(term) {
