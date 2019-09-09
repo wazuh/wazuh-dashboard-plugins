@@ -61,9 +61,7 @@ export class ManageHosts {
    */
   async getHosts() {
     try {
-      if (this.busy) {
-        throw new Error('Another process is updating the configuration file');
-      }
+      this.checkBusy();
       this.busy = true;
       const raw = fs.readFileSync(this.file, { encoding: 'utf-8' });
       this.busy = false;
@@ -176,7 +174,13 @@ export class ManageHosts {
       log('manage-hosts:cleanExistingHosts', error.message || error);
       return Promise.reject(error);
     }
+  }
 
+  /**
+   * Throws an error is the wazuh-hosts.yml is busy
+   */
+  checkBusy() {
+    if (this.busy) throw new Error('Another process is writting the configuration file');
   }
 
   /**
@@ -209,9 +213,7 @@ export class ManageHosts {
     const compose = this.composeHost(host, id);
     let data = await fs.readFileSync(this.file, { encoding: 'utf-8' });
     try {
-      if (this.busy) {
-        throw new Error('Another process is updating the configuration file');
-      }
+      this.checkBusy();
       const hosts = await this.getHosts() || [];
       this.busy = true;
       if (!hosts.length) {
@@ -228,6 +230,8 @@ export class ManageHosts {
         }
       }
       this.busy = false;
+      this.updateRegistry.updateWazuhClusterInfo(id, host.cluster_info);
+
       log('manage-hosts:addHost', `Host ${id} was properly added`, 'debug');
       return id;
     } catch (error) {
@@ -244,9 +248,7 @@ export class ManageHosts {
   async deleteHost(req) {
     let data = await fs.readFileSync(this.file, { encoding: 'utf-8' });
     try {
-      if (this.busy) {
-        throw new Error('Another process is updating the configuration file');
-      }
+      this.checkBusy();
       const hosts = await this.getHosts() || [];
       this.busy = true;
       if (!hosts.length) {
@@ -286,9 +288,7 @@ export class ManageHosts {
   async updateHost(id, host) {
     let data = await fs.readFileSync(this.file, { encoding: 'utf-8' });
     try {
-      if (this.busy) {
-        throw new Error('Another process is updating the configuration file');
-      }
+      this.checkBusy();
       const hosts = await this.getHosts() || [];
       this.busy = true;
       if (!hosts.length) {
