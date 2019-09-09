@@ -177,7 +177,8 @@ export class ManagementController {
 
     this.logtestProps = {
       clickAction: log => this.testLogtest(log),
-      close: () => this.openLogtest()
+      close: () => this.openLogtest(),
+      showClose: true
     };
   }
 

@@ -50,6 +50,7 @@ export class DevToolsController {
     this.multipleKeyPressed = [];
     this.IS_DARK_THEME = chrome.getUiSettingsClient().get('theme:darkMode');
     this.$scope = $scope;
+    this.tab = '';
   }
 
   /**
@@ -468,11 +469,59 @@ export class DevToolsController {
       );
       dynamicHeight();
     };
+    
+    this.logtestProps = {
+      clickAction: log => this.testLogtest(log),
+      close: () => {},
+      showClose: false
+    };
 
+    this.toolsTabsProps = {
+      clickAction: tab => {
+        this.switchTab(tab);
+      },
+      selectedTab:
+        this.tab || 'devTools',
+      tabs: [{ id: 'devTools', name: 'API Dev console' }, { id: 'logtest', name: 'Test your logs' }]
+    };
+
+    this.welcomeCardsProps = {
+      clickAction: tab => this.switchTab(tab),
+      sections: [{ id: 'devTools', name: 'Test API', icon: 'consoleApp' }, { id: 'logtest', name: 'Test your logs' , icon: 'indexRollupApp' }]
+    };
+  
     const dynamicHeight = () =>
       DynamicHeight.dynamicHeightDevTools(this, this.$window);
     dynamicHeight();
   }
+
+  switchTab(tab) {    
+    this.tab = tab;
+    if(tab === 'logtest'){
+      DynamicHeight.dynamicHeightStatic('.euiCodeBlock', 75);
+    }
+    this.toolsTabsProps.selectedTab = tab;
+    window.dispatchEvent(new Event('resize')); // eslint-disable-line
+    this.$scope.$applyAsync();
+  }
+
+  testLogtest = async log => {
+    //return await this.apiReq.request('GET', '/testlog', {log});
+    const sleep = m => new Promise(r => setTimeout(r, m));
+    await sleep(1000);
+    return `**Phase 1: Completed pre-decoding.
+    full event: 'timestamp:2019-09-03T13:22:27.950+0000 rule:level:7 rule:description:python: Undocumented local_file protocol allows remote attackers to bypass protection mechanisms rule:id:23504 rule:firedtimes:33 rule:mail:false rule:groups:[vulnerability-detector] rule:gdpr:[IV_35.7.d] agent:id:000 agent:name:a205e5b2a1aa manager:{name:a205e5b2a1aa} id:1567516947.252273 cluster:name:wazuh cluster:node:master decoder:{name:json} data:{vulnerability:cve:CVE-2019-9948} data:{vulnerability:title:python: Undocumented local_file protocol allows remote attackers to bypass protection mechanisms} data:{vulnerability:severity:Medium} data:{vulnerability:published:2019-03-23T00:00:00+00:00} data:{vulnerability:state:Fixed} data:{vulnerability:cvss:{cvss3_score:7.400000}} data:{vulnerability:package:name:python} data:{vulnerability:package:version:2.7.5-80.el7_6} data:{vulnerability:package:condition:less than 2.7.5-86.el7} data:{vulnerability:advisories:RHSA-2019:2030,RHSA-2019:1700} data:{vulnerability:cwe_reference:CWE-749} data:{vulnerability:bugzilla_reference:https://bugzilla.redhat.com/show_bug.cgi?id=1695570} data:{vulnerability:reference:https://access.redhat.com/security/cve/CVE-2019-9948} location:vulnerability-detector'
+    timestamp: '(null)'
+    hostname: 'a205e5b2a1aa'
+    program_name: '(null)'
+    log: 'timestamp:2019-09-03T13:22:27.950+0000 rule:level:7 rule:description:python: Undocumented local_file protocol allows remote attackers to bypass protection mechanisms rule:id:23504 rule:firedtimes:33 rule:mail:false rule:groups:[vulnerability-detector] rule:gdpr:[IV_35.7.d] agent:id:000 agent:name:a205e5b2a1aa manager:{name:a205e5b2a1aa} id:1567516947.252273 cluster:name:wazuh cluster:node:master decoder:{name:json} data:{vulnerability:cve:CVE-2019-9948} data:{vulnerability:title:python: Undocumented local_file protocol allows remote attackers to bypass protection mechanisms} data:{vulnerability:severity:Medium} data:{vulnerability:published:2019-03-23T00:00:00+00:00} data:{vulnerability:state:Fixed} data:{vulnerability:cvss:{cvss3_score:7.400000}} data:{vulnerability:package:name:python} data:{vulnerability:package:version:2.7.5-80.el7_6} data:{vulnerability:package:condition:less than 2.7.5-86.el7} data:{vulnerability:advisories:RHSA-2019:2030,RHSA-2019:1700} data:{vulnerability:cwe_reference:CWE-749} data:{vulnerability:bugzilla_reference:https://bugzilla.redhat.com/show_bug.cgi?id=1695570} data:{vulnerability:reference:https://access.redhat.com/security/cve/CVE-2019-9948} location:vulnerability-detector'
+  **Phase 2: Completed decoding.
+    No decoder matched.
+  **Phase 3: Completed filtering (rules).
+    Rule id: '1002'
+    Level: '2'
+    Description: 'Unknown problem somewhere in the system.'`;
+  };
 
   /**
    * This method highlights one of the groups the first time

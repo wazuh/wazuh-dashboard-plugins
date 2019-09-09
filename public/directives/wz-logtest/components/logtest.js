@@ -11,6 +11,7 @@
  */
 import React, { Component, Fragment } from 'react';
 import PropTypes from 'prop-types';
+import { DynamicHeight } from '../../../utils/dynamic-height';
 import {
   EuiTitle,
   EuiButton,
@@ -51,18 +52,24 @@ export class Logtest extends Component {
     });
   };
 
+  dynamicHeight = () =>
+  DynamicHeight.dynamicHeightStatic('.euiCodeBlock', 70);
+
   render() {
     const codeBlock = {
       zIndex: '100'
     };
+
+    this.dynamicHeight();
     return (
       <Fragment>
+      {( this.props.showClose &&
         <EuiFlexGroup gutterSize="xs">
           <EuiTitle size="s">
             <h2>Test your logs</h2>
           </EuiTitle>
           <EuiFlexItem />
-          <EuiFlexItem grow={false}>
+          <EuiFlexItem grow={false}>          
             <EuiButtonIcon
               color={'text'}
               onClick={() => this.props.close()}
@@ -71,13 +78,14 @@ export class Logtest extends Component {
             />
           </EuiFlexItem>
         </EuiFlexGroup>
+        )}
         <EuiSpacer size="m" />
         <Fragment>
           <EuiTextArea
             placeholder="Type one log per line..."
             fullWidth={true}
             aria-label=""
-            rows={8}
+            rows={10}
             onChange={this.onChange}
           />
           <EuiSpacer size="s" />
@@ -85,7 +93,7 @@ export class Logtest extends Component {
               style={codeBlock}
               language="json"
               fontSize="s"
-              overflowHeight={650}
+              overflowHeight={1}
               isCopyable={this.state.testResult ? true : false}
             >
               {this.state.testResult || 'The test result will appear here.'}
@@ -94,12 +102,14 @@ export class Logtest extends Component {
         <EuiFlyoutFooter>
             <EuiFlexGroup justifyContent="spaceBetween">
               <EuiFlexItem grow={false}>
+              {( this.props.showClose &&
                 <EuiButtonEmpty
                   iconType="cross"
                   onClick={() => this.props.close()}
                   flush="left">
                   Close
                 </EuiButtonEmpty>
+              )}
               </EuiFlexItem>
               <EuiFlexItem grow={false}>
               <EuiButton
@@ -111,7 +121,7 @@ export class Logtest extends Component {
                   this.test();
                 }}
               >
-                Test it
+                Test
               </EuiButton>
               </EuiFlexItem>
             </EuiFlexGroup>
@@ -123,5 +133,6 @@ export class Logtest extends Component {
 
 Logtest.propTypes = {
   clickAction: PropTypes.func,
-  close: PropTypes.func
+  close: PropTypes.func,
+  showClose: PropTypes.bool
 };
