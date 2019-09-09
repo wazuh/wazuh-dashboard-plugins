@@ -13,11 +13,13 @@ import fs from 'fs';
 import yml from 'js-yaml';
 import path from 'path';
 import { log } from '../logger';
+import { UpdateRegistry } from './update-registry';
 
 export class ManageHosts {
   constructor() {
     this.busy = false;
     this.file = path.join(__dirname, '../../wazuh-hosts.yml');
+    this.updateRegistry = new UpdateRegistry();
   }
 
 
@@ -133,7 +135,9 @@ export class ManageHosts {
           url: host.url,
           port: host.api_port,
           user: host.api_user,
-          password: this.decodeApiPassword(host.api_password)
+          password: this.decodeApiPassword(host.api_password),
+          cluster_info: host.cluster_info,
+          extensions: host.extensions
         };
         entries.push(api);
       });
@@ -230,8 +234,7 @@ export class ManageHosts {
         }
       }
       this.busy = false;
-      this.updateRegistry.updateWazuhClusterInfo(id, host.cluster_info);
-
+      this.updateRegistry.updateWazuhClusterInfo(id, host.cluster_info, host.extensions);
       log('manage-hosts:addHost', `Host ${id} was properly added`, 'debug');
       return id;
     } catch (error) {
