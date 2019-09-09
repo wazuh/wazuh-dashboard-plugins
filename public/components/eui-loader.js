@@ -25,6 +25,7 @@ import {
 
 import { BasicTable } from '../directives/wz-table-eui/components/table';
 import { Tabs } from '../directives/wz-tabs-eui/components/tabs';
+import { ModulesGuide } from '../controllers/management/components/modules-guide';
 
 const app = uiModules.get('app/wazuh', ['react']);
 
@@ -39,4 +40,5 @@ app
   .value('EuiCallOut', EuiCallOut)
   .value('BasicTable', BasicTable)
   .value('Tabs', Tabs)
+  .value('ModulesGuide', ModulesGuide)
   .value('EuiSwitch', EuiSwitch);

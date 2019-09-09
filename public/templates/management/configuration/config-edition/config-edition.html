@@ -1,5 +1,5 @@
-<div flex="auto" layout="column" ng-if="mctrl.editionTab === 'editconfiguration'">
-    <div flex="auto" layout="column" ng-controller="editionController as editctrl"
+<div flex="auto" layout="row" ng-if="mctrl.editionTab === 'editconfiguration'">
+    <div ng-class="mctrl.helpOpened ? 'flex-60' : 'flex-100'" layout="column" ng-controller="editionController as editctrl"
         ng-show="editctrl.editingFile && !editctrl.load ">
 
         <!-- Headline (cluster) -->
@@ -89,6 +89,13 @@
                                     Confirm</md-button>
                             </div>
                         </div>
+                        <button type="button" ng-click="mctrl.openHelp()" class="euiButtonEmpty euiButtonEmpty--primary euiButtonEmpty--small wz-margin-left-10"
+                        ng-show="!mctrl.helpOpened">
+                                <span class="euiButtonEmpty__content">
+                                    <react-component name="EuiIcon" props="{type:'questionInCircle'}" />
+                                    <span class="euiButtonEmpty__text">Configure a module</span>
+                                </span>
+                            </button>
                     </div>
                 </div>
                 <div class="md-padding md-padding-top-10"
@@ -126,5 +133,8 @@
                 </div>
             </div>
         </div>
+    </div>
+    <div ng-show="mctrl.helpOpened" flex="40">
+                <react-component name="ModulesGuide" props="mctrl.modulesGuideProps" />
     </div>
 </div>

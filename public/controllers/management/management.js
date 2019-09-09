@@ -47,6 +47,7 @@ export class ManagementController {
     this.wazuhManagementTabs = ['ruleset', 'groups', 'configuration'];
     this.statusReportsTabs = ['status', 'logs', 'reporting', 'monitoring'];
     this.currentGroup = false;
+    this.helpOpened = false;
 
     this.$scope.$on('setCurrentGroup', (ev, params) => {
       this.currentGroup = (params || {}).currentGroup || false;
@@ -149,6 +150,10 @@ export class ManagementController {
 
     this.welcomeCardsProps = {
       switchTab: (tab, setNav) => this.switchTab(tab, setNav)
+    };
+
+    this.modulesGuideProps = {
+      close: () => this.openHelp()
     };
 
     this.rulesetTabsProps = {
@@ -376,5 +381,9 @@ export class ManagementController {
     }
     this.loadingNodes = false;
     this.$scope.$applyAsync();
+  }
+
+  openHelp = () => {
+    this.helpOpened = !this.helpOpened;
   }
 }
