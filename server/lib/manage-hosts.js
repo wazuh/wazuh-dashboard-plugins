@@ -84,7 +84,7 @@ export class ManageHosts {
   async getCurrentHostsIds() {
     try {
       const hosts = await this.getHosts();
-      const ids = hosts.map(h => {return Object.keys(h)[0]})
+      const ids = hosts.map(h => { return Object.keys(h)[0] })
       log('manage-hosts:getCurrentHostsIds', 'Getting hosts ids', 'debug');
       return ids;
     } catch (error) {
@@ -169,14 +169,14 @@ export class ManageHosts {
   async cleanExistingHosts(hosts) {
     try {
       const currentHosts = await this.getCurrentHostsIds();
-      const cleanHosts = hosts.filter(h => {return !currentHosts.includes(h.id)});
+      const cleanHosts = hosts.filter(h => { return !currentHosts.includes(h.id) });
       log('manage-hosts:cleanExistingHosts', 'Preventing add existings hosts', 'debug');
       return cleanHosts;
     } catch (error) {
       log('manage-hosts:cleanExistingHosts', error.message || error);
       return Promise.reject(error);
     }
-    
+
   }
 
   /**
@@ -185,15 +185,15 @@ export class ManageHosts {
    */
   async addSeveralHosts(hosts) {
     try {
-      const hostToAdd = await this.cleanExistingHosts(hosts);
       log('manage-hosts:addSeveralHosts', 'Adding several', 'debug');
+      const hostToAdd = await this.cleanExistingHosts(hosts);
+      if (!hostToAdd.length) return 'There are not APIs entries to migrate'
       const entry = hostToAdd.shift();
       const response = await this.addHost(entry);
       if (hostToAdd.length && response) {
         await this.addSeveralHosts(hostToAdd);
-      } else {
-        return 'All APIs entries were migrated to the config.yml'
       }
+      return 'All APIs entries were migrated to the config.yml'
     } catch (error) {
       log('manage-hosts:addSeveralHosts', error.message || error);
       return Promise.reject(error);
