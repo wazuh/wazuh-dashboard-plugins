@@ -20,7 +20,8 @@ import {
   EuiButtonIcon,
   EuiHealth,
   EuiCallOut,
-  EuiSwitch
+  EuiSwitch,
+  EuiSpacer
 } from '@elastic/eui';
 
 import { BasicTable } from '../directives/wz-table-eui/components/table';
@@ -39,4 +40,5 @@ app
   .value('EuiCallOut', EuiCallOut)
   .value('BasicTable', BasicTable)
   .value('Tabs', Tabs)
-  .value('EuiSwitch', EuiSwitch);
+  .value('EuiSwitch', EuiSwitch)
+  .value('EuiSpacer',EuiSpacer);
