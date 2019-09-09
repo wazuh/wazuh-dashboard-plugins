@@ -20,11 +20,12 @@ import { totalmem } from 'os';
 import fs from 'fs';
 import path from 'path'; 
 import { ManageHosts } from './lib/manage-hosts';
+import { UpdateRegistry } from './lib/update-registry';
 
 const manageHosts = new ManageHosts();
+const wazuhRegistry = new UpdateRegistry().file;
 
 export function Initialize(server) {
-  const wazuhVersion = path.join(__dirname, '/wazuh-version.json');
   const blueWazuh = '\u001b[34mwazuh\u001b[39m';
   const initializeErrorLogColors = [blueWazuh, 'initialize', 'error'];
   // Elastic JS Client
@@ -82,7 +83,7 @@ export function Initialize(server) {
       };
 
       try {
-        fs.writeFileSync(wazuhVersion, JSON.stringify(configuration), err => {
+        fs.writeFileSync(wazuhRegistry, JSON.stringify(configuration), err => {
           if (err) {
             throw new Error(err);
           }
@@ -243,31 +244,31 @@ export function Initialize(server) {
     }
   }
 
-  const checkWazuhVersionRegistry = async () => {
+  const checkWazuhRegistry = async () => {
     try {
       log(
-        'initialize[checkWazuhVersionRegistry]',
+        'initialize[checkwazuhRegistryRegistry]',
         'Checking wazuh-version registry.',
         'debug'
       );
       try {
         await wzWrapper.deleteWazuhVersionIndex();
         log(
-          'initialize[checkWazuhVersionRegistry]',
+          'initialize[checkwazuhRegistryRegistry]',
           'Successfully deleted old .wazuh-version index.',
           'debug'
         );
       } catch (error) {
         log(
-          'initialize[checkWazuhVersionRegistry]',
+          'initialize[checkwazuhRegistryRegistry]',
           'No need to delete old .wazuh-version index',
           'debug'
         );
       }
 
-      if (!fs.existsSync(wazuhVersion)) {
+      if (!fs.existsSync(wazuhRegistry)) {
         log(
-          'initialize[checkWazuhVersionRegistry]',
+          'initialize[checkwazuhRegistryRegistry]',
           'wazuh-version registry does not exist. Initializing configuration.',
           'debug'
         );
@@ -279,7 +280,7 @@ export function Initialize(server) {
         const currentDate = new Date().toISOString();
 
         // If this function fails, it throws an exception
-        const source = JSON.parse(fs.readFileSync(wazuhVersion, 'utf8'));
+        const source = JSON.parse(fs.readFileSync(wazuhRegistry, 'utf8'));
 
         // Check if the stored revision differs from the package.json revision
         const isNewApp = packageJSON.revision !== source.revision;
@@ -294,7 +295,7 @@ export function Initialize(server) {
         source.lastRestart = currentDate;
 
         // If this function fails, it throws an exception
-        fs.writeFileSync(wazuhVersion, JSON.stringify(source), 'utf-8');
+        fs.writeFileSync(wazuhRegistry, JSON.stringify(source), 'utf-8');
       }
     } catch (error) {
       return Promise.reject(error);
@@ -306,7 +307,7 @@ export function Initialize(server) {
     try {
       await Promise.all([
         checkWazuhIndex(),
-        checkWazuhVersionRegistry(),
+        checkWazuhRegistry(),
         checkKnownFields(wzWrapper, log, server, defaultIndexPattern)
       ]);
       const reindexResult = await wzWrapper.reindexAppIndices();
