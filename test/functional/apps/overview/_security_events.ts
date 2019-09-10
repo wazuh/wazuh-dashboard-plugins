@@ -1,5 +1,5 @@
 /*
- * Wazuh app - Generic error response constructor
+ * Wazuh app - Overview -> general test class
  * Copyright (C) 2015-2019 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -11,12 +11,14 @@
  */
 
 import expect from '@kbn/expect';
-import { Object } from 'core-js';
+import { FtrProviderContext } from '../../../../../../test/functional/ftr_provider_context';
 
-export default function({getService, getPageObjects}) {
-  const PageObjects = getPageObjects(['common', 'wazuhCommon', 'timePicker', ]);
+export default function({getService, getPageObjects, }: FtrProviderContext) {
+  const areaChart = getService('areaChart');
   const es = getService('es');
+  const esAreaChart = getService('esAreaChart');
   const find = getService('find');
+  const PageObjects = getPageObjects(['common', 'wazuhCommon', 'timePicker', ]);
   const testSubjects = getService('testSubjects');
 
   describe('security_events', () => {
@@ -29,7 +31,7 @@ export default function({getService, getPageObjects}) {
     it('should alertStats values are correct', async () => {
       await PageObjects.timePicker.setCommonlyUsedTime('superDatePickerCommonlyUsed_Today');
       await PageObjects.common.sleep(3000);
-      es_index = await testSubjects.click('querySubmitButton');
+      await testSubjects.click('querySubmitButton');
       await PageObjects.common.sleep(3000);
 
       const todayAlerts = await es.search({
@@ -72,6 +74,37 @@ export default function({getService, getPageObjects}) {
       expect(Number(alertStatsGroups.groups.level12)).to.be(Object.keys(esAlerts.level12).length);
       expect(Number(alertStatsGroups.groups.authFail)).to.be(Object.keys(esAlerts.authFail).length);
       expect(Number(alertStatsGroups.groups.authSuccess)).to.be(Object.keys(esAlerts.authSuccess).length);
+    });
+
+    it('should alert level evolution chart value ​​are correct', async () => {
+      await PageObjects.timePicker.setCommonlyUsedTime('superDatePickerCommonlyUsed_Today');
+      await PageObjects.common.sleep(3000);
+      await testSubjects.click('querySubmitButton');
+      await PageObjects.common.sleep(3000);
+
+      const chartSelector: string = '#Wazuh-App-Overview-General-Alert-level-evolution';
+      const values:object = await areaChart.getValues(chartSelector);
+
+      const esValues = await esAreaChart.getData('rule.level');
+
+      expect(JSON.stringify(esValues))
+        .to.be.equal(JSON.stringify(values));
+
+    });
+
+    it('should alert level evolution chart value ​​are correct', async () => {
+      await PageObjects.timePicker.setCommonlyUsedTime('superDatePickerCommonlyUsed_Today');
+      await PageObjects.common.sleep(3000);
+      await testSubjects.click('querySubmitButton');
+      await PageObjects.common.sleep(3000);
+
+      const chartSelector: string = '#Wazuh-App-Overview-General-Alerts';
+      const values:object = await areaChart.getValues(chartSelector);
+      
+      const esValues = await esAreaChart.getData();      
+
+      expect(JSON.stringify(esValues))
+        .to.be.equal(JSON.stringify(values));
     });
 
   });

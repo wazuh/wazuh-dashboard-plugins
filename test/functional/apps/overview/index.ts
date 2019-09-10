@@ -16,7 +16,7 @@ export default function ({ getService, loadTestFile }) {
   describe('overview', () => {
 
     before(async () => {
-      await browser.setWindowSize(1200, 800);
+      await browser.setWindowSize(3840, 2160);
     });
 
     loadTestFile(require.resolve('./_security_events'));
