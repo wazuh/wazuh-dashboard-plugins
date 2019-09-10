@@ -234,7 +234,7 @@ export class ManageHosts {
         }
       }
       this.busy = false;
-      this.updateRegistry.updateWazuhClusterInfo(id, host.cluster_info, host.extensions);
+      this.updateRegistry.migrateToRegistry(id, host.cluster_info, host.extensions);
       log('manage-hosts:addHost', `Host ${id} was properly added`, 'debug');
       return id;
     } catch (error) {

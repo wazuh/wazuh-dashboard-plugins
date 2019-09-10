@@ -253,11 +253,11 @@ export class SettingsController {
       const data = await this.testAPI.check(tmpData);
       tmpData.cluster_info = data.data;
       const { cluster_info } = tmpData;
-      //TODO update the information in the registry instead of in the Elastic
-      /*const tmpUrl = `/elastic/api-hostname/${id}`;
+      // Updates the cluster-information in the registry 
+      const tmpUrl = `/hosts/update-hostname/${id}`;
       await this.genericReq.request('PUT', tmpUrl, {
         cluster_info
-      });*/
+      });
       this.$scope.$emit('updateAPI', { cluster_info });
       this.apiEntries[index].cluster_info = cluster_info;
       this.wzMisc.setApiIsDown(false);

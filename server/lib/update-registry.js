@@ -97,22 +97,58 @@ export class UpdateRegistry {
   }
 
   /**
-   * Uptades the cluster information and extensions associated with an API id
+   * Migrates the cluster information and extensions associated to an API id
    * @param {String} id 
    * @param {Object} clusterInfo 
    * @param {Object} clusterExtensions 
    */
-  async updateWazuhClusterInfo(id, clusterInfo, clusterExtensions) {
+  async migrateToRegistry(id, clusterInfo, clusterExtensions) {
     try {
       const content = await this.readContent();
       if (!Object.keys(content).includes('hosts')) Object.assign(content, {hosts: {}});
       const info = { cluster_info: clusterInfo, extensions: clusterExtensions};
-      content.hosts[`${id}`] = info;
-      this.writeContent(content);
-      log('update-registry:updateWazuhClusterInfo', `API ${id} was properly updated`, 'debug');
+      content.hosts[id] = info;
+      await this.writeContent(content);
+      log('update-registry:migrateToRegistry', `API ${id} was properly migrated`, 'debug');
       return info;
     } catch (error) {
-      log('update-registry:updateWazuhClusterInfo', error.message || error);
+      log('update-registry:migrateToRegistry', error.message || error);
+      return Promise.reject(error);
+    }
+  }
+
+    /**
+   * Updates the cluster-information or manager-information in the registry
+   * @param {String} id 
+   * @param {Object} clusterInfo 
+   */
+  async updateAPIHostname(id, clusterInfo) {
+    try {
+      const content = await this.readContent();
+      content.hosts[id].cluster_info = clusterInfo;
+      await this.writeContent(content);
+      log('update-registry:updateAPIHostname', `API ${id} information was properly updated`, 'debug');
+      return id;
+    } catch (error) {
+      log('update-registry:updateAPIHostname', error.message || error);
+      return Promise.reject(error);
+    }
+  }
+
+      /**
+   * Updates the cluster-information or manager-information in the registry
+   * @param {String} id 
+   * @param {Object} clusterInfo 
+   */
+  async updateAPIExtensions(id, extensions) {
+    try {
+      const content = await this.readContent();
+      content.hosts[id].extensions = extensions;
+      await this.writeContent(content);
+      log('update-registry:updateAPIExtensions', `API ${id} extensions were properly updated`, 'debug');
+      return id;
+    } catch (error) {
+      log('update-registry:updateAPIHostname', error.message || error);
       return Promise.reject(error);
     }
   }

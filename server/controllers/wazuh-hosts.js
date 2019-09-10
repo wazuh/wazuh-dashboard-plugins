@@ -72,4 +72,31 @@ export class WazuhHostsCtrl {
       throw new Error(error);
     }
   }
+
+  /**
+ * This update an API hostname
+ * @param {Object} req
+ * @param {Object} reply
+ * Status response or ErrorResponse
+ */
+  async updateAPIHostname(req, reply) {
+    try {
+      const id = req.params.id;
+      await this.updateRegistry.updateAPIHostname(id, req.payload.cluster_info);
+      log(
+        'wazuh-hosts:updateAPIHostname',
+        `API entry ${req.params.id} hostname updated`,
+        'debug'
+      );
+      return { statusCode: 200, message: 'ok' };
+    } catch (error) {
+      log('wazuh-hosts:updateAPIHostname', error.message || error);
+      return ErrorResponse(
+        `Could not update data in wazuh-registry.json due to ${error.message || error}`,
+        2012,
+        500,
+        reply
+      );
+    }
+  }
 }

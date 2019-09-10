@@ -22,4 +22,14 @@ export function WazuhHostsRoutes(server) {
       return ctrl.getHostsEntries(req, reply);
     }
   });
+
+  // Updates the cluster-info or manager-info
+  server.route({
+    method: 'PUT',
+    path: '/hosts/update-hostname/{id}',
+    handler(req, reply) {
+      console.log('gonna update ', req.params.id)
+      return ctrl.updateAPIHostname(req, reply);
+    }
+  });
 }
