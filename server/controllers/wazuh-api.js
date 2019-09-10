@@ -104,11 +104,12 @@ export class WazuhApiCtrl {
         });
 
         // Hide Wazuh API password
-        api.password = '****';
+        const copied = {...api};
+        copied.secret = '****';
 
         return {
           statusCode: 200,
-          data: api,
+          data: copied,
           idChanged: req.idChanged || null
         };
       }

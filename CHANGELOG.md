@@ -43,7 +43,8 @@ All notable changes to the Wazuh app project will be documented in this file.
 - The app installation date was not being updated properly, now it's fixed [#1692](https://github.com/wazuh/wazuh-kibana-app/issues/1692).
 - Fixed _Network interfaces_ table in Inventory section, the table was not paginating [#1474](https://github.com/wazuh/wazuh-kibana-app/issues/1474).
 - Fixed Discover interval for visualization [e52eb12](https://github.com/wazuh/wazuh-kibana-app/commit/e52eb127863645fe773e38d95c427783c18e9a65).
-- Restored time interval built-in logic for Discover [1901fc5](https://github.com/wazuh/wazuh-kibana-app/commit/1901fc59a252226939cbd2edcfa038f02968c7b8)
+- Restored time interval built-in logic for Discover [1901fc5](https://github.com/wazuh/wazuh-kibana-app/commit/1901fc59a252226939cbd2edcfa038f02968c7b8).
+- APIs passwords are now obfuscated in server responses [404722a] (https://github.com/wazuh/wazuh-kibana-app/commit/404722a0d3b650c5f0245a129c21d2eda2219a6d)
 
 
 ## Wazuh v3.9.5 - Kibana v6.8.2 / Kibana v7.2.1 / Kibana v7.3.0 Revision 454
