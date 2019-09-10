@@ -3,7 +3,7 @@
 All notable changes to the Wazuh app project will be documented in this file.
 
 
-## Wazuh v3.10.0 - Kibana v6.8.2 / Kibana v7.3.0 - Revision
+## Wazuh v3.10.0 - Kibana v6.8.2 / Kibana v7.3.1 - Revision 540
 
 ### Added
 
@@ -34,13 +34,13 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 ### Fixed
 
-- Alerts search bar fixed for Kibana v7.3.0, queries were not being applied as expected [#1686](https://github.com/wazuh/wazuh-kibana-app/issues/1686).
+- Alerts search bar fixed for Kibana v7.3.1, queries were not being applied as expected [#1686](https://github.com/wazuh/wazuh-kibana-app/issues/1686).
 - Hide attributes field from non-Windows agents in the FIM table [#1710](https://github.com/wazuh/wazuh-kibana-app/issues/1710).
 - Fixed broken view in Management > Configuration > Amazon S3 > Buckets, some information was missing [#1675](https://github.com/wazuh/wazuh-kibana-app/issues/1675).
 - Keep user's filters when switching from Discover to panel [#1685](https://github.com/wazuh/wazuh-kibana-app/issues/1685).
 - Reduce load time and amount of data to be fetched in _Management > Cluster monitoring_ section avoiding possible timeouts [#1663](https://github.com/wazuh/wazuh-kibana-app/issues/1663).
 - Restored _Remove column_ feature in Discover tabs [#1702](https://github.com/wazuh/wazuh-kibana-app/issues/1702).
-- Apps using Kibana v7.3.0 had a bug once the user goes back from _Agent > FIM > Files_ to _Agent > FIM > dashboard_, filters disappear, now it's working properly [#1700](https://github.com/wazuh/wazuh-kibana-app/issues/1700).
+- Apps using Kibana v7.3.1 had a bug once the user goes back from _Agent > FIM > Files_ to _Agent > FIM > dashboard_, filters disappear, now it's working properly [#1700](https://github.com/wazuh/wazuh-kibana-app/issues/1700).
 - Fixed visual bug in _Management > Cluster monitoring_ and a button position [1e3b748](https://github.com/wazuh/wazuh-kibana-app/commit/1e3b748f11b43b2e7956b830269b6d046d74d12c).
 - The app installation date was not being updated properly, now it's fixed [#1692](https://github.com/wazuh/wazuh-kibana-app/issues/1692).
 - Fixed _Network interfaces_ table in Inventory section, the table was not paginating [#1474](https://github.com/wazuh/wazuh-kibana-app/issues/1474).
