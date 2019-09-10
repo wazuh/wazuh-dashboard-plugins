@@ -131,9 +131,8 @@ export class SettingsController {
 
   // Get current API index
   getCurrentAPIIndex() {
-    this.currentApiEntryIndex = this.apiEntries
-      .map(item => item._id)
-      .indexOf(this.currentDefault);
+    const idx = this.apiEntries.map(entry => Object.keys(entry)[0]).indexOf(this.currentDefault);
+    this.currentApiEntryIndex = idx;
   }
 
   // Set default API
@@ -194,8 +193,8 @@ export class SettingsController {
         this.$location.path('/blank-screen');
         return;
       }
+      const data = await this.genericReq.request('GET', '/hosts/apis');
 
-      const data = await this.genericReq.request('GET', '/elastic/apis');
       const apis = data.data;
       this.apiEntries = apis.length ? apis : [];
 
@@ -230,29 +229,37 @@ export class SettingsController {
   // Check manager connectivity
   async checkManager(item, isIndex, silent = false) {
     try {
+
+      // Get the index of the API in the entries
       const index = isIndex
         ? item
-        : this.apiEntries.map(item => item._id).indexOf(item._id);
-      const api = this.apiEntries[index];
-      const { _source, _id } = api;
-      const { api_user, url, api_port } = _source;
+        : this.apiEntries.map(entry => Object.keys(entry)[0]).indexOf(item.id);
+
+      // Get the Api information
+      const entry = this.apiEntries[index];
+      const id = Object.keys(entry)[0];
+      const api = entry[id];
+      const { user, url, port } = api;
       const tmpData = {
-        user: api_user,
+        user: user,
         url: url,
-        port: api_port,
+        port: port,
         cluster_info: {},
         insecure: 'true',
-        id: _id
+        id: id
       };
+
+      // Test the connection
       const data = await this.testAPI.check(tmpData);
       tmpData.cluster_info = data.data;
       const { cluster_info } = tmpData;
-      const tmpUrl = `/elastic/api-hostname/${_id}`;
+      //TODO update the information in the registry instead of in the Elastic
+      /*const tmpUrl = `/elastic/api-hostname/${id}`;
       await this.genericReq.request('PUT', tmpUrl, {
         cluster_info
-      });
+      });*/
       this.$scope.$emit('updateAPI', { cluster_info });
-      this.apiEntries[index]._source.cluster_info = cluster_info;
+      this.apiEntries[index].cluster_info = cluster_info;
       this.wzMisc.setApiIsDown(false);
       this.apiIsDown = false;
       !silent && this.errorHandler.info('Connection success', 'Settings');

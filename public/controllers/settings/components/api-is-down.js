@@ -126,7 +126,7 @@ hosts:
           <div>
             <EuiText>
               Review the settings in the{' '}
-              <EuiCode>kibana/plugins/wazuh/config.yml</EuiCode> file.
+              <EuiCode>kibana/plugins/wazuh/wazuh-hosts.yml</EuiCode> file.
             </EuiText>
             <EuiSpacer />
             <EuiCodeBlock language="yaml">{apiExample}</EuiCodeBlock>

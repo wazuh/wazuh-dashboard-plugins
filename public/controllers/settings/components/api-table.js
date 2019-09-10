@@ -49,31 +49,48 @@ export class ApiTable extends Component {
     });
   }
 
+  /**
+* Transforms the API entries object model
+*/
+  transformApiEntries(entries) {
+    try {
+      const arr = [];
+      entries.forEach(e => {
+        const id = Object.keys(e)[0];
+        const data = Object.assign(e[id], { id: id });
+        arr.push(data);
+      });
+      return arr;
+    } catch (error) {
+      throw error;
+    }
+  }
+
   render() {
-    const items = [...this.state.apiEntries];
+    const items = this.transformApiEntries([...this.state.apiEntries]);
     const columns = [
       {
-        field: '_source.cluster_info.cluster',
+        field: 'cluster_info.cluster',
         name: 'Cluster',
         align: 'left'
       },
       {
-        field: '_source.cluster_info.manager',
+        field: 'cluster_info.manager',
         name: 'Manager',
         align: 'left'
       },
       {
-        field: '_source.url',
+        field: 'url',
         name: 'Host',
         align: 'left'
       },
       {
-        field: '_source.api_port',
+        field: 'port',
         name: 'Port',
         align: 'left'
       },
       {
-        field: '_source.api_user',
+        field: 'user',
         name: 'User',
         align: 'left'
       },
@@ -85,7 +102,7 @@ export class ApiTable extends Component {
               <EuiToolTip position="bottom" content={<p>Set as default</p>}>
                 <EuiButtonIcon
                   iconType={
-                    item._id === this.state.currentDefault
+                    item.id === this.state.currentDefault
                       ? 'starFilled'
                       : 'starEmpty'
                   }
@@ -114,14 +131,11 @@ export class ApiTable extends Component {
       }
     ];
     return (
-
-
-        <EuiBasicTable
-          itemId="_id"
-          items={items}
-          columns={columns}
-        />
-
+      <EuiBasicTable
+        itemId="id"
+        items={items}
+        columns={columns}
+      />
     );
   }
 }
