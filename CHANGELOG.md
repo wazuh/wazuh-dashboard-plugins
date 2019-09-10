@@ -2,7 +2,7 @@
 
 All notable changes to the Wazuh app project will be documented in this file.
 
-## Wazuh v3.10.0 - Kibana v6.8.2 / Kibana v7.3.0 - Revision 455
+## Wazuh v3.10.0 - Kibana v6.8.2 / Kibana v7.3.1 - Revision 458
 
 ### Added
 
@@ -35,7 +35,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 
 ### Fixed
 
-- Alerts search bar fixed for Kibana v7.3.0, queries were not being applied as expected [#1686](https://github.com/wazuh/wazuh-kibana-app/issues/1686).
+- Alerts search bar fixed for Kibana v7.3.1, queries were not being applied as expected [#1686](https://github.com/wazuh/wazuh-kibana-app/issues/1686).
 - Hide attributes field from non-Windows agents in the FIM table [#1710](https://github.com/wazuh/wazuh-kibana-app/issues/1710).
 - Fixed broken view in Management > Configuration > Amazon S3 > Buckets, some information was missing [#1675](https://github.com/wazuh/wazuh-kibana-app/issues/1675).
 - Reduce load time and amount of data to be fetched in _Management > Cluster monitoring_ section avoiding possible timeouts [#1663](https://github.com/wazuh/wazuh-kibana-app/issues/1663).
