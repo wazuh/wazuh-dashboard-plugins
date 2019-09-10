@@ -44,6 +44,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed visual bug in _Management > Cluster monitoring_ and a button position [1e3b748](https://github.com/wazuh/wazuh-kibana-app/commit/1e3b748f11b43b2e7956b830269b6d046d74d12c).
 - The app installation date was not being updated properly, now it's fixed [#1692](https://github.com/wazuh/wazuh-kibana-app/issues/1692).
 - Fixed _Network interfaces_ table in Inventory section, the table was not paginating [#1474](https://github.com/wazuh/wazuh-kibana-app/issues/1474).
+- Fixed APIs passwords are now obfuscated in server responses [adc3152](https://github.com/wazuh/wazuh-kibana-app/pull/1782/commits/adc31525e26b25e4cb62d81cbae70a8430728af5).
 
 
 ## Wazuh v3.9.5 - Kibana v6.8.2 / Kibana v7.2.1 / Kibana v7.3.0 - Revision 531
