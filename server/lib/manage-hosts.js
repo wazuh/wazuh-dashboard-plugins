@@ -102,7 +102,9 @@ export class ManageHosts {
       log('manage-hosts:getHostById', `Getting host ${id}`, 'debug');
       const hosts = await this.getHosts();
       const host = hosts.filter(h => { return Object.keys(h)[0] == id });
-      return host[0];
+      const key = Object.keys(host[0])[0];
+      const result = Object.assign(host[0][key], {id: key});
+      return result;
     } catch (error) {
       log('manage-hosts:getHostById', error.message || error);
       return Promise.reject(error);

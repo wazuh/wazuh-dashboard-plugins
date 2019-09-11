@@ -32,6 +32,8 @@ import { Queue } from '../jobs/queue';
 import querystring from 'querystring';
 import fs from 'fs';
 import path from 'path';
+import { ManageHosts } from '../lib/manage-hosts';
+
 export class WazuhApiCtrl {
   /**
    * Constructor
@@ -41,6 +43,7 @@ export class WazuhApiCtrl {
     this.queue = Queue;
     this.wzWrapper = new ElasticWrapper(server);
     this.monitoringInstance = new Monitoring(server, true);
+    this.manageHosts = new ManageHosts();
     this.wazuhVersion = path.join(__dirname, '../wazuh-version.json');
   }
 
@@ -213,15 +216,12 @@ export class WazuhApiCtrl {
   async checkAPI(req, reply) {
     try {
       let apiAvailable = null;
-
       const notValid = this.validateCheckApiParams(req.payload);
       if (notValid) return ErrorResponse(notValid, 3003, 500, reply);
       log('wazuh-api:checkAPI', `${req.payload.id} is valid`, 'debug');
       // Check if a Wazuh API id is given (already stored API)
       if (req.payload && req.payload.id && !req.payload.password) {
-        const data = await this.wzWrapper.getWazuhConfigurationById(
-          req.payload.id
-        );
+        const data = await this.manageHosts.getHostById(req.payload.id);
         if (data) {
           apiAvailable = data;
         } else {
@@ -242,7 +242,6 @@ export class WazuhApiCtrl {
           'base64'
         ).toString('ascii');
       }
-
       let response = await needle(
         'get',
         `${apiAvailable.url}:${apiAvailable.port}/version`,
