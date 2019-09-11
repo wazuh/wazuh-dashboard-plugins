@@ -3,7 +3,7 @@
 All notable changes to the Wazuh app project will be documented in this file.
 
 
-## Wazuh v3.10.0 - Kibana v6.8.2 / Kibana v7.3.1 - Revision 540
+## Wazuh v3.10.0 - Kibana v7.3.1 - Revision 541
 
 ### Added
 
@@ -24,7 +24,6 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Replaced most of the _md-nav-bar_ Angular.js components with React components using EUI [#1705](https://github.com/wazuh/wazuh-kibana-app/pull/1705).
 - Replaced the requirements slider component with a new styled component [#1708](https://github.com/wazuh/wazuh-kibana-app/pull/1708).
 - Soft deprecated the _.wazuh-version_ internal index, now the app dumps its content if applicable to a registry file, then the app removes that index. Further versions will hard deprecate this index [#1467](https://github.com/wazuh/wazuh-kibana-app/issues/1467). 
-- Removed _known-fields.js_ file, no longer needed. Now the app fills the index pattern only using the Kibana internal API [#1682](https://github.com/wazuh/wazuh-kibana-app/issues/1682).
 - Visualizations now don't fetch the documents _source_, also, they now use _size: 0_ for fetching [#1663](https://github.com/wazuh/wazuh-kibana-app/issues/1663).
 - The app menu is now fixed on top of the view, it's not being hidden on every state change. Also, the Wazuh logo was placed in the top bar of Kibana UI [#1502](https://github.com/wazuh/wazuh-kibana-app/issues/1502).
 - Improved _getTimestamp_ method not returning a promise object because it's no longer needed [014bc3a](https://github.com/wazuh/wazuh-kibana-app/commit/014b3aba0d2e9cda0c4d521f5f16faddc434a21e). Also improved main Discover listener for Wazuh not returning a promise object [bd82823](https://github.com/wazuh/wazuh-kibana-app/commit/bd8282391a402b8c567b32739cf914a0135d74bc).
