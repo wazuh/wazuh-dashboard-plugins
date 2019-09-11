@@ -122,15 +122,15 @@ export class UpdateRegistry {
    * @param {String} id 
    * @param {Object} clusterInfo 
    */
-  async updateAPIHostname(id, clusterInfo) {
+  async updateClusterInfo(id, clusterInfo) {
     try {
       const content = await this.readContent();
       content.hosts[id].cluster_info = clusterInfo;
       await this.writeContent(content);
-      log('update-registry:updateAPIHostname', `API ${id} information was properly updated`, 'debug');
+      log('update-registry:updateClusterInfo', `API ${id} information was properly updated`, 'debug');
       return id;
     } catch (error) {
-      log('update-registry:updateAPIHostname', error.message || error);
+      log('update-registry:updateClusterInfo', error.message || error);
       return Promise.reject(error);
     }
   }

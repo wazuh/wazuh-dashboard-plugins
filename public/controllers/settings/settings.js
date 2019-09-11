@@ -135,41 +135,46 @@ export class SettingsController {
     this.currentApiEntryIndex = idx;
   }
 
+   /**
+   * Returns the index of the API in the entries array
+   * @param {Object} api 
+   */
+  getApiIndex(api) {
+    return this.apiEntries.map(entry => Object.keys(entry)[0]).indexOf(api.id)
+  }
+
   // Set default API
   setDefault(item) {
-    const index = this.apiEntries.map(item => item._id).indexOf(item._id);
-
-    const { _source, _id } = this.apiEntries[index];
-    const { cluster_info } = _source;
+    const index = this.getApiIndex(item);
+    const entry = this.apiEntries[index];
+    const key = Object.keys(entry)[0];
+    const api = entry[key];
+    const { cluster_info , id } = api;
     const { manager, cluster, status } = cluster_info;
 
     this.appState.setClusterInfo(cluster_info);
 
     const clusterEnabled = status === 'disabled';
-
     this.appState.setCurrentAPI(
       JSON.stringify({
         name: clusterEnabled ? manager : cluster,
-        id: _id
+        id: id
       })
     );
 
     this.$scope.$emit('updateAPI', {});
 
     const currentApi = this.appState.getCurrentAPI();
-    const { id } = JSON.parse(currentApi);
-    this.currentDefault = id;
+    this.currentDefault = JSON.parse(currentApi).id;
     this.apiTableProps.currentDefault = this.currentDefault;
     this.$scope.$applyAsync();
 
     this.errorHandler.info(`API ${manager} set as default`);
 
     this.getCurrentAPIIndex();
-
     if (currentApi && !this.appState.getExtensions(id)) {
-      const { _id, _source } = this.apiEntries[this.currentApiEntryIndex];
-      const { extensions } = _source;
-      this.appState.setExtensions(_id, extensions);
+      const { id, extensions } = this.apiEntries[this.currentApiEntryIndex][key];
+      this.appState.setExtensions(id, extensions);
     }
 
     this.$scope.$applyAsync();
@@ -229,11 +234,10 @@ export class SettingsController {
   // Check manager connectivity
   async checkManager(item, isIndex, silent = false) {
     try {
-
       // Get the index of the API in the entries
       const index = isIndex
         ? item
-        : this.apiEntries.map(entry => Object.keys(entry)[0]).indexOf(item.id);
+        : this.getApiIndex(item);
 
       // Get the Api information
       const entry = this.apiEntries[index];

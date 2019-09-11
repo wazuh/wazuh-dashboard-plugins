@@ -34,10 +34,10 @@ export class ApiTester {
         headers: { 'Content-Type': 'application/json' },
         timeout: timeout || 20000
       };
-
+      const payload = {id: data};
       const result = await this.$http.post(
         chrome.addBasePath('/api/check-stored-api'),
-        data,
+        payload,
         headers
       );
 

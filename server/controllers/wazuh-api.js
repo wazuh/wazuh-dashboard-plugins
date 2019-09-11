@@ -31,8 +31,8 @@ import * as ApiHelper from '../lib/api-helper';
 import { Queue } from '../jobs/queue';
 import querystring from 'querystring';
 import fs from 'fs';
-import path from 'path';
 import { ManageHosts } from '../lib/manage-hosts';
+import { UpdateRegistry } from '../lib/update-registry';
 
 export class WazuhApiCtrl {
   /**
@@ -44,7 +44,7 @@ export class WazuhApiCtrl {
     this.wzWrapper = new ElasticWrapper(server);
     this.monitoringInstance = new Monitoring(server, true);
     this.manageHosts = new ManageHosts();
-    this.wazuhVersion = path.join(__dirname, '../wazuh-version.json');
+    this.updateRegistry = new UpdateRegistry();
   }
 
   /**
@@ -55,15 +55,16 @@ export class WazuhApiCtrl {
    */
   async checkStoredAPI(req, reply) {
     try {
-      // Get config from elasticsearch
-      const api = await this.wzWrapper.getWazuhConfigurationById(req.payload);
-
+      // Get config from wazuh-hosts.yml
+      const id = req.payload.id || req.payload
+      const api = await this.manageHosts.getHostById(id);
+      
       // Check Elasticsearch API errors
-      if (api.error_code) {
-        throw new Error('Could not find Wazuh API entry on Elasticsearch.');
+      if (!Object.keys(api).length) {
+        throw new Error('Could not find Wazuh API entry on wazuh-hosts.yml');
       }
 
-      log('wazuh-api:checkStoredAPI', `${req.payload} exists`, 'debug');
+      log('wazuh-api:checkStoredAPI', `${id} exists`, 'debug');
 
       // Build credentials object for making a Wazuh API request
       const credInfo = ApiHelper.buildOptionsObject(api);
@@ -101,10 +102,8 @@ export class WazuhApiCtrl {
           cluster: clusterEnabled ? cluster.name : 'Disabled'
         };
 
-        // Update cluster information in Elasticsearch .wazuh document
-        await this.wzWrapper.updateWazuhIndexDocument(null, req.payload, {
-          doc: { cluster_info: api.cluster_info }
-        });
+        // Update cluster information in the wazuh-registry.json
+        await this.updateRegistry.updateClusterInfo(id, api.cluster_info);
 
         // Hide Wazuh API password
         api.password = '****';
@@ -139,19 +138,15 @@ export class WazuhApiCtrl {
           !error.body.found
         ) {
           try {
-            const apis = await this.wzWrapper.getWazuhAPIEntries();
-            for (const api of apis.hits.hits) {
+            const apis = await this.manageHosts.getHosts();
+            for (const api of apis) {
               try {
-                const options = ApiHelper.buildOptionsObject(api);
-
-                options.password = Buffer.from(
-                  api._source.api_password,
-                  'base64'
-                ).toString('ascii');
-
+                const id = Object.keys(api)[0];
+                const host = api[id];
+                const options = ApiHelper.buildOptionsObject(host);              
                 const response = await needle(
                   'get',
-                  `${api._source.url}:${api._source.api_port}/version`,
+                  `${host.url}:${host.port}/version`,
                   {},
                   options
                 );
@@ -164,9 +159,9 @@ export class WazuhApiCtrl {
                   ((response || {}).body || {}).error === 0 &&
                   ((response || {}).body || {}).data
                 ) {
-                  req.payload = api._id;
-                  req.idChanged = api._id;
-                  return this.checkStoredAPI(req, reply);
+                  req.payload = id;
+                  req.idChanged = id;
+                  return this.checkStoredAPI(req, reply, false);
                 }
               } catch (error) {} // eslint-disable-line
             }
@@ -1317,7 +1312,7 @@ export class WazuhApiCtrl {
    */
   getTimeStamp(req, reply) {
     try {
-      const source = JSON.parse(fs.readFileSync(this.wazuhVersion, 'utf8'));
+      const source = JSON.parse(fs.readFileSync(this.updateRegistry.file, 'utf8'));
       if (source.installationDate && source.lastRestart) {
         log(
           'wazuh-api:getTimeStamp',
@@ -1350,7 +1345,7 @@ export class WazuhApiCtrl {
    */
   async getSetupInfo(req, reply) {
     try {
-      const source = JSON.parse(fs.readFileSync(this.wazuhVersion, 'utf8'));
+      const source = JSON.parse(fs.readFileSync(this.updateRegistry.file, 'utf8'));
       return !Object.values(source).length
         ? { statusCode: 200, data: '' }
         : { statusCode: 200, data: source };
