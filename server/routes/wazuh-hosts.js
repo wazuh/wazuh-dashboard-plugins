@@ -28,7 +28,6 @@ export function WazuhHostsRoutes(server) {
     method: 'PUT',
     path: '/hosts/update-hostname/{id}',
     handler(req, reply) {
-      console.log('gonna update ', req.params.id)
       return ctrl.updateAPIHostname(req, reply);
     }
   });
