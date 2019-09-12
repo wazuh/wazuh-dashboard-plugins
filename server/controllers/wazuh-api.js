@@ -16,7 +16,6 @@ import { pciRequirementsFile } from '../integration-files/pci-requirements';
 import { gdprRequirementsFile } from '../integration-files/gdpr-requirements';
 import { hipaaRequirementsFile } from '../integration-files/hipaa-requirements';
 import { nistRequirementsFile } from '../integration-files/nist-requirements';
-import { ElasticWrapper } from '../lib/elastic-wrapper';
 import { getPath } from '../../util/get-path';
 import { Monitoring } from '../monitoring';
 import { ErrorResponse } from './error-response';
@@ -41,7 +40,6 @@ export class WazuhApiCtrl {
    */
   constructor(server) {
     this.queue = Queue;
-    this.wzWrapper = new ElasticWrapper(server);
     this.monitoringInstance = new Monitoring(server, true);
     this.manageHosts = new ManageHosts();
     this.updateRegistry = new UpdateRegistry();
@@ -59,7 +57,7 @@ export class WazuhApiCtrl {
       const id = req.payload.id || req.payload
       const api = await this.manageHosts.getHostById(id);
       
-      // Check Elasticsearch API errors
+      // Check Manage Hosts
       if (!Object.keys(api).length) {
         throw new Error('Could not find Wazuh API entry on wazuh-hosts.yml');
       }
@@ -340,27 +338,23 @@ export class WazuhApiCtrl {
         if (!req.headers.id) {
           return pciRequirementsFile;
         }
-        let api = await this.wzWrapper.getWazuhConfigurationById(
-          req.headers.id
-        );
+        
+        const apiId = req.headers.id;
+        const api = await this.manageHosts.getHostById(apiId);
 
-        if (api.error_code > 1) {
+        if (!Object.keys(api).length) {
           log(
             'wazuh-api:getPciRequirement',
-            'Elasticsearch unexpected error or cannot connect'
+            `Cannot get the credentials for the host ${apiId}`
           );
-          // Can not connect to elasticsearch
+          // Can not get credentials from wazuh-hosts
           return ErrorResponse(
-            'Elasticsearch unexpected error or cannot connect',
+            'Unexpected error getting host credentials',
             3007,
             400,
             reply
           );
-        } else if (api.error_code > 0) {
-          log('wazuh-api:getPciRequirement', 'Credentials do not exist');
-          // Credentials not found
-          return ErrorResponse('Credentials do not exist', 3008, 400, reply);
-        }
+        } 
 
         const response = await needle(
           'get',
@@ -422,9 +416,9 @@ export class WazuhApiCtrl {
         if (!req.headers.id) {
           return gdprRequirementsFile;
         }
-        const api = await this.wzWrapper.getWazuhConfigurationById(
-          req.headers.id
-        );
+
+        const apiId = req.headers.id;
+        const api = await this.manageHosts.getHostById(apiId);
 
         // Checking for GDPR
         const version = await needle(
@@ -453,23 +447,19 @@ export class WazuhApiCtrl {
           return {};
         }
 
-        if (api.error_code > 1) {
+        if (!Object.keys(api).length) {
           log(
             'wazuh-api:getGdprRequirement',
-            'Elasticsearch unexpected error or cannot connect'
+            'Unexpected error getting host credentials'
           );
-          // Can not connect to elasticsearch
+          // Can not get credentials from wazuh-hosts
           return ErrorResponse(
-            'Elasticsearch unexpected error or cannot connect',
+            'Unexpected error getting host credentials',
             3024,
             400,
             reply
           );
-        } else if (api.error_code > 0) {
-          log('wazuh-api:getGdprRequirement', 'Credentials do not exist');
-          // Credentials not found
-          return ErrorResponse('Credentials do not exist', 3025, 400, reply);
-        }
+        } 
 
         const response = await needle(
           'get',
@@ -549,27 +539,23 @@ export class WazuhApiCtrl {
         if (!req.headers.id) {
           return hipaaRequirementsFile;
         }
-        let api = await this.wzWrapper.getWazuhConfigurationById(
-          req.headers.id
-        );
 
-        if (api.error_code > 1) {
+        const apiId = req.headers.id;
+        const api = await this.manageHosts.getHostById(apiId);
+
+        if (!Object.keys(api).length) {
           log(
             'wazuh-api:getHipaaRequirement',
-            'Elasticsearch unexpected error or cannot connect'
+            'Unexpected error getting host credentials'
           );
-          // Can not connect to elasticsearch
+          // Can not get credentials from wazuh-hosts
           return ErrorResponse(
-            'Elasticsearch unexpected error or cannot connect',
+            'Unexpected error getting host credentials',
             3007,
             400,
             reply
           );
-        } else if (api.error_code > 0) {
-          log('wazuh-api:getHipaaRequirement', 'Credentials do not exist');
-          // Credentials not found
-          return ErrorResponse('Credentials do not exist', 3008, 400, reply);
-        }
+        } 
 
         const response = await needle(
           'get',
@@ -631,27 +617,23 @@ export class WazuhApiCtrl {
         if (!req.headers.id) {
           return nistRequirementsFile;
         }
-        let api = await this.wzWrapper.getWazuhConfigurationById(
-          req.headers.id
-        );
+       
+        const apiId = req.headers.id;
+        const api = await this.manageHosts.getHostById(apiId);
 
-        if (api.error_code > 1) {
+        if (!Object.keys(api).length) {
           log(
             'wazuh-api:getNistRequirement',
-            'Elasticsearch unexpected error or cannot connect'
+            'Unexpected error getting host credentials'
           );
-          // Can not connect to elasticsearch
+          // Can not get credentials from wazuh-hosts
           return ErrorResponse(
-            'Elasticsearch unexpected error or cannot connect',
+            'Unexpected error getting host credentials',
             3007,
             400,
             reply
           );
-        } else if (api.error_code > 0) {
-          log('wazuh-api:getNistRequirement', 'Credentials do not exist');
-          // Credentials not found
-          return ErrorResponse('Credentials do not exist', 3008, 400, reply);
-        }
+        } 
 
         const response = await needle(
           'get',
@@ -784,26 +766,22 @@ export class WazuhApiCtrl {
   async makeRequest(method, path, data, id, reply) {
     const devTools = !!(data || {}).devTools;
     try {
-      const api = await this.wzWrapper.getWazuhConfigurationById(id);
+      const api = await this.manageHosts.getHostById(id);
 
       if (devTools) {
         delete data.devTools;
       }
 
-      if (api.error_code > 1) {
-        log('wazuh-api:makeRequest', 'Could not connect with Elasticsearch');
-        //Can not connect to elasticsearch
+      if (!Object.keys(api).length) {
+        log('wazuh-api:makeRequest', 'Could not get host credentials');
+        //Can not get credentials from wazuh-hosts
         return ErrorResponse(
-          'Could not connect with Elasticsearch',
+          'Could not get host credentials',
           3011,
           404,
           reply
         );
-      } else if (api.error_code > 0) {
-        log('wazuh-api:makeRequest', 'Credentials do not exist');
-        //Credentials not found
-        return ErrorResponse('Credentials do not exist', 3012, 404, reply);
-      }
+      } 
 
       if (!data) {
         data = {};
@@ -940,15 +918,11 @@ export class WazuhApiCtrl {
    */
   async makeGenericRequest(method, path, data, id) {
     try {
-      const api = await this.wzWrapper.getWazuhConfigurationById(id);
-
-      if (api.error_code > 1) {
-        //Can not connect to elasticsearch
-        throw new Error('Could not connect with elasticsearch');
-      } else if (api.error_code > 0) {
-        //Credentials not found
-        throw new Error('Credentials does not exists');
-      }
+      const api = await this.manageHosts.getHostById(id);
+      if (!Object.keys(api).length) {
+        //Can not get credentials from wazuh-hosts
+        throw new Error('Could not get host credentials');
+      } 
 
       if (!data) {
         data = {};
@@ -1075,7 +1049,7 @@ export class WazuhApiCtrl {
         ? req.payload.filters
         : [];
 
-      const config = await this.wzWrapper.getWazuhConfigurationById(
+      const config = await this.manageHosts.getHostById(
         req.payload.id
       );
 
@@ -1216,7 +1190,7 @@ export class WazuhApiCtrl {
       if (!req.params || !req.params.api)
         throw new Error('Field api is required');
 
-      const config = await this.wzWrapper.getWazuhConfigurationById(
+      const config = await this.manageHosts.getHostById(
         req.params.api
       );
 
@@ -1376,7 +1350,7 @@ export class WazuhApiCtrl {
       const { agent } = req.params;
       const api = req.headers.id;
 
-      const config = await this.wzWrapper.getWazuhConfigurationById(api);
+      const config = await this.manageHosts.getHostById(api);
 
       const headers = ApiHelper.buildOptionsObject(config);
 
