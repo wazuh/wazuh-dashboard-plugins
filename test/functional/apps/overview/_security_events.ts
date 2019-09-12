@@ -15,8 +15,10 @@ import { FtrProviderContext } from '../../../../../../test/functional/ftr_provid
 
 export default function({getService, getPageObjects, }: FtrProviderContext) {
   const areaChart = getService('areaChart');
+  const pieCharts = getService('pieCharts');
   const es = getService('es');
   const esAreaChart = getService('esAreaChart');
+  const esPieChart = getService('esPieChart');
   const find = getService('find');
   const PageObjects = getPageObjects(['common', 'wazuhCommon', 'timePicker', ]);
   const testSubjects = getService('testSubjects');
@@ -104,6 +106,34 @@ export default function({getService, getPageObjects, }: FtrProviderContext) {
       const esValues = await esAreaChart.getData();      
 
       expect(JSON.stringify(esValues))
+        .to.be.equal(JSON.stringify(values));
+    });
+
+    it('should top 5 agent chart pie values are correct', async () => {
+      await PageObjects.timePicker.setCommonlyUsedTime('superDatePickerCommonlyUsed_Today');
+      await PageObjects.common.sleep(3000);
+      await testSubjects.click('querySubmitButton');
+      await PageObjects.common.sleep(3000);
+
+      const chartSelector: string = '#Wazuh-App-Overview-General-Top-5-agents';
+      const values = await pieCharts.getValues(chartSelector);
+      const esValues: object[] = await esPieChart.getData('agent.name');
+
+      expect(JSON.stringify(esValues.slice(0, 5)))
+        .to.be.equal(JSON.stringify(values));
+    });
+
+    it('should top 5 rule groups chart pie values are correct', async () => {
+      await PageObjects.timePicker.setCommonlyUsedTime('superDatePickerCommonlyUsed_Today');
+      await PageObjects.common.sleep(3000);
+      await testSubjects.click('querySubmitButton');
+      await PageObjects.common.sleep(3000);
+
+      const chartSelector: string = '#Wazuh-App-Overview-General-Top-5-rule-groups';
+      const values = await pieCharts.getValues(chartSelector);
+      const esValues = await esPieChart.getData('rule.groups');
+
+      expect(JSON.stringify(esValues.slice(0, 5)))
         .to.be.equal(JSON.stringify(values));
     });
 
