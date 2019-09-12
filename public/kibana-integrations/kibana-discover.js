@@ -279,8 +279,10 @@ function discoverController(
       if (typeof item.exists !== 'undefined') {
         key = item.exists.field;
       } else {
-        key =
-          item.meta.key || (Object.keys(item.query.match) || [undefined])[0];
+        const hasKey = item.meta.key;
+        const hasMeta = Object.keys((item.query || {}).match || {})[0];
+        const hasRange = Object.keys(item.range || {})[0];
+        key = hasKey || hasMeta || hasRange;
       }
       const isIncluded = nonRemovableFilters.includes(key);
       const isNonRemovable = isRemovable(item);
