@@ -82,7 +82,17 @@ export function EsAreaChartProvider({ getService, }: FtrProviderContext) {
         });
       });
       output.series = output.series.sort((a, b) => {
-        return a.label - b.label;
+
+        if (!isNaN(Number(a.label))) {
+          return Number(a.label) - Number(b.label);
+        }
+          
+        if (a.label > b.label) {
+          return 1;
+        } else if (a.label < b.label){
+          return -1;
+        }
+        return 0;
       });
       output.xAxisOrderedValues.sort();
     }

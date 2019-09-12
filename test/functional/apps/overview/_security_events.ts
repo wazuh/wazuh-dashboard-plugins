@@ -137,5 +137,21 @@ export default function({getService, getPageObjects, }: FtrProviderContext) {
         .to.be.equal(JSON.stringify(values));
     });
 
+    it('should alerts evolution - top 5 agents chart values are correct', async () => {
+      
+      await PageObjects.timePicker.setCommonlyUsedTime('superDatePickerCommonlyUsed_Today');
+      await PageObjects.common.sleep(3000);
+      await testSubjects.click('querySubmitButton');
+      await PageObjects.common.sleep(3000);
+
+      const chartSelector: string = '#Wazuh-App-Overview-General-Alerts-evolution-Top-5-agents';
+      const values:object = await areaChart.getValues(chartSelector);
+
+      const esValues = await esAreaChart.getData('agent.name');
+
+      expect(JSON.stringify(esValues))
+        .to.be.equal(JSON.stringify(values));
+    });
+
   });
 }
