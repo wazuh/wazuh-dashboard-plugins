@@ -1575,7 +1575,7 @@ export class WazuhReportingCtrl {
       columns.forEach((col, i) => {
         columns[i] = col[0].toUpperCase() + col.slice(1);
       });
-      
+
       const rows = tableData[key].map(x => {
         let row = [];
         for (let key in x) {
@@ -1589,7 +1589,7 @@ export class WazuhReportingCtrl {
               : JSON.stringify(x[key])
           );
         }
-        while(row.length < columns.length){
+        while (row.length < columns.length) {
           row.push('-');
         }
         return row;
@@ -1821,56 +1821,50 @@ export class WazuhReportingCtrl {
                       }
                     }
                   } else {
-                      /*INTEGRITY MONITORING MONITORED DIRECTORIES */
-                      if (config.config[_d].directories) {
-                        const directories = config.config[_d].directories;
-                        delete config.config[_d].directories;
-                          tables.push(
-                          ...this.getConfigTables(
-                            config.config[_d],
-                            section,
-                            idx
-                          )
-                        ); 
-                        let diffOpts = [];
-                        Object.keys(section.opts).forEach(x => {
-                          diffOpts.push(x);
+                    /*INTEGRITY MONITORING MONITORED DIRECTORIES */
+                    if (config.config[_d].directories) {
+                      const directories = config.config[_d].directories;
+                      delete config.config[_d].directories;
+                      tables.push(
+                        ...this.getConfigTables(config.config[_d], section, idx)
+                      );
+                      let diffOpts = [];
+                      Object.keys(section.opts).forEach(x => {
+                        diffOpts.push(x);
+                      });
+                      const columns = [
+                        '',
+                        ...diffOpts.filter(
+                          x => x !== 'check_all' && x !== 'check_sum'
+                        )
+                      ];
+                      let rows = [];
+                      directories.forEach(x => {
+                        let row = [];
+                        row.push(x.path);
+                        columns.forEach(y => {
+                          if (y !== '') {
+                            row.push(x[y] ? 'yes' : 'no');
+                          }
                         });
-                        const columns = [
-                          '',
-                          ...diffOpts.filter(
-                            x => x !== 'check_all' && x !== 'check_sum'
-                          )
-                        ];
-                        let rows = [];
-                        directories.forEach(x => {
-                          let row = [];
-                          row.push(x.path);
-                          columns.forEach(y => {
-                            if (y !== '') {
-                              row.push(
-                                x[y] ? 'yes' : 'no'
-                              );
-                            }
-                          });
-                          row.push(x.recursion_level);
-                          rows.push(row);
-                        });
-                        columns.forEach((x, idx) => {
-                          columns[idx] = section.opts[x];
-                        });
-                        columns.push('RL');
-                        tables.push({
-                          title: 'Monitored directories',
-                          type: 'table',
-                          columns,
-                          rows
-                        });
-                      } else{
-                    tables.push(
-                      ...this.getConfigTables(config.config[_d], section, idx)
-                    );
-                  }
+                        row.push(x.recursion_level);
+                        rows.push(row);
+                      });
+                      columns.forEach((x, idx) => {
+                        columns[idx] = section.opts[x];
+                      });
+                      columns.push('RL');
+                      tables.push({
+                        title: 'Monitored directories',
+                        type: 'table',
+                        columns,
+                        rows
+                      });
+                    } else {
+                      tables.push(
+                        ...this.getConfigTables(config.config[_d], section, idx)
+                      );
+                    }
                   }
                   for (const table of tables) {
                     this.renderConfigTables([table]);
