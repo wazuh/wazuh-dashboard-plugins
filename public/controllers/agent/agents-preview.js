@@ -99,7 +99,9 @@ export class AgentsPreviewController {
 
     this.registerAgentsProps = {
       addNewAgent: flag => this.addNewAgent(flag),
-      getWazuhVersion: () => this.getWazuhVersion()
+      getWazuhVersion: () => this.getWazuhVersion(),
+      getCurrentApiAddress: () => this.getCurrentApiAddress(),
+      needsPassword: () => this.needsPassword()
     };
 
     this.init = false;
@@ -263,6 +265,37 @@ export class AgentsPreviewController {
     );
   }
 
+
+  /**
+   * Returns if the password is neccesary to register a new agent
+   */
+  async needsPassword() {
+    try {
+      const result = this.apiReq.request('GET', '/agents/000/config/auth/auth', {});
+      const auth = ((result.data || {}).data || {}).auth || {};
+      const usePassword = auth.use_password === 'yes';
+      return usePassword;
+
+    } catch (error) {
+      return false;
+    }
+  }
+
+  /**
+   * Returns the current API address
+   */
+  async getCurrentApiAddress() {
+    try {
+      const result = await this.genericReq.request('GET', '/elastic/apis');
+      const entries = result.data || [];
+      const host = entries.filter(e => {return e._id == this.api});
+      const url = host[0]._source.url;
+      const numToClean = url.startsWith('https://') ? 8 : 7;
+      return url.substr(numToClean);
+    } catch (error) {
+      return false;
+    }
+  }
 
   /**
    * Returns the Wazuh version as x.y.z
