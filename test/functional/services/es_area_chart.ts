@@ -12,12 +12,25 @@
  */
 
 import { FtrProviderContext } from '../../../../../test/functional/ftr_provider_context';
-import { object } from 'joi';
-import { number } from 'prop-types';
 
-export function EsAreaChartProvider({getService, getPageObjects}: FtrProviderContext) {
+export function EsAreaChartProvider({ getService, }: FtrProviderContext) {
   const es = getService('es');
   const testSubjects = getService('testSubjects');
+
+  interface OutPut {
+    series: Series[],
+    xAxisOrderedValues: number[]
+  }
+
+  interface Series {
+    label: string,
+    values: Value[]
+  }
+
+  interface Value {
+    x: any,
+    y: any
+  }
 
   /**
    * Tools to get data of ElasticSearch for compare with visualizations.
@@ -34,11 +47,11 @@ export function EsAreaChartProvider({getService, getPageObjects}: FtrProviderCon
      * @returns {object}
      * @memberof EsAreaChart
      */
-    async getData (field: string = '') {
-      const output: object = {
+    async getData (field: string = ''): Promise<OutPut> {
+      const output: OutPut = {
         series: [],
         xAxisOrderedValues: []
-      }
+      };
 
       const alerts = await this.getAlerts();
 
@@ -50,7 +63,7 @@ export function EsAreaChartProvider({getService, getPageObjects}: FtrProviderCon
         }
 
         this.composeSeries(alert, field, output, interval);
-      })
+      });
       this.sortOutput(output);
       return output;
     }
@@ -59,17 +72,17 @@ export function EsAreaChartProvider({getService, getPageObjects}: FtrProviderCon
      * Sort the output of the `getData` method
      *
      * @private
-     * @param {object} output
+     * @param {OutPut} output
      * @memberof EsAreaChart
      */
-    private sortOutput(output: object) {
+    private sortOutput(output: OutPut) {
       output.series.forEach(serie => {
         serie.values = serie.values.sort((a, b) => {
-          return a['x'] - b['x'];
+          return a.x - b.x;
         });
       });
       output.series = output.series.sort((a, b) => {
-        return a['label'] - b['label']
+        return a.label - b.label;
       });
       output.xAxisOrderedValues.sort();
     }
@@ -101,7 +114,7 @@ export function EsAreaChartProvider({getService, getPageObjects}: FtrProviderCon
      * @param {number} interval
      * @memberof EsAreaChart
      */
-    private composeSeries (alert: object, field: string, output: object, interval: number ) {
+    private composeSeries (alert: object, field: string, output: OutPut, interval: number ) {
       if(output.series.length == 0){
         output.series.push(this.composeSerie(alert, interval, field));
       } else {
@@ -177,7 +190,7 @@ export function EsAreaChartProvider({getService, getPageObjects}: FtrProviderCon
      * @returns {object[]}
      * @memberof EsAreaChart
      */
-    private async getAlerts (from:string='now/d', to:string='now'): object[] {
+    private async getAlerts (from:string='now/d', to:string='now'): Promise<object[]> {
       const es_index = await testSubjects.getVisibleText('wzMenuPatternTitle');
       const alerts = await es.search({
         index: es_index,

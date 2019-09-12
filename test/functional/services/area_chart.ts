@@ -1,5 +1,5 @@
 /*
- * Wazuh app - Generic error response constructor
+ * Wazuh app - Tools to test the area chart visualizations
  * Copyright (C) 2015-2019 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -14,11 +14,8 @@ import { FtrProviderContext } from '../../../../../test/functional/ftr_provider_
 import { WebElementWrapper } from '../../../../../test/functional/services/lib/web_element_wrapper/web_element_wrapper';
 
 
-export function AreaChartProvider({ getService, getPageObjects, }: FtrProviderContext) {
+export function AreaChartProvider({ getService, }: FtrProviderContext) {
   const browser = getService('browser');
-  const find = getService('find');
-  const PageObjects = getPageObjects(['common', ]);
-
 
 
   /**
