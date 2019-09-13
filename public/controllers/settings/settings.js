@@ -127,8 +127,10 @@ export class SettingsController {
 
   // Get current API index
   getCurrentAPIIndex() {
-    const idx = this.apiEntries.map(entry => Object.keys(entry)[0]).indexOf(this.currentDefault);
-    this.currentApiEntryIndex = idx;
+    if (this.apiEntries.length) {
+      const idx = this.apiEntries.map(entry => Object.keys(entry)[0]).indexOf(this.currentDefault);
+      this.currentApiEntryIndex = idx;
+    }
   }
 
   /**
@@ -339,7 +341,6 @@ export class SettingsController {
       if (this.tab === 'logs') {
         this.getAppLogs();
       }
-
       this.getCurrentAPIIndex();
       if (this.currentApiEntryIndex || this.currentApiEntryIndex === 0) {
         await this.checkManager(this.currentApiEntryIndex, true, true);
