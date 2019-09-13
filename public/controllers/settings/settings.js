@@ -88,10 +88,6 @@ export class SettingsController {
       checkManager: entry => this.checkManager(entry)
     };
 
-    this.addApiProps = {
-      saveSettings: entry => this.saveSettings(entry)
-    };
-
     this.settingsTabsProps = {
       clickAction: tab => {
         this.switchTab(tab, true);
