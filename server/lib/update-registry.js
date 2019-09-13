@@ -152,4 +152,39 @@ export class UpdateRegistry {
       return Promise.reject(error);
     }
   }
+
+  /**
+   * Remove the given ids from the registry host entries
+   * @param {Array} ids 
+   */
+  async removeHostEntries(ids) {
+    try {
+      log('update-registry:removeHostEntry', 'Removing entry', 'debug');
+      const content = await this.readContent();
+      ids.forEach(id => delete content.hosts[id]);
+      await this.writeContent(content);
+    } catch (error) {
+      log('update-registry:removeHostEntry', error.message || error);
+      return Promise.reject(error);
+    }
+  }
+
+  /**
+   * Compare the hosts from wazuh-hosts.yml and the host in the wazuh-registry.file in order to remove the orphan registry register
+   * @param {Array} hosts
+   */
+  async removeOrphanEntries(hosts) {
+    try {
+      log('update-registry:removeOrphanEntries', 'Checking orphan registry entries', 'debug');
+      const entries = await this.getHosts();
+      const hostsKeys = hosts.map(h => {return Object.keys(h)[0]});
+      const entriesKeys = Object.keys(entries);
+      const diff = entriesKeys.filter(e => {return !hostsKeys.includes(e)});
+      await this.removeHostEntries(diff);
+    } catch (error) {
+      log('update-registry:removeOrphanEntries', error.message || error);
+      return Promise.reject(error);
+    }
+  }
 }
+

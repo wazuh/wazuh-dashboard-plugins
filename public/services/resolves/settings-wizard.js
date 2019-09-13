@@ -234,7 +234,7 @@ export function settingsWizard(
             } else {
               appState.removeCurrentAPI();
               if (data.data.length > 0) {
-                const firstEntry = data[0];
+                const firstEntry = data.data[0];
                 const id = Object.keys(firstEntry)[0];
                 const api = firstEntry[id];
                 const defaultApi = JSON.stringify({

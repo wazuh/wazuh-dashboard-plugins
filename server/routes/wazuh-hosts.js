@@ -31,4 +31,14 @@ export function WazuhHostsRoutes(server) {
       return ctrl.updateClusterInfo(req, reply);
     }
   });
+
+
+  // Checks the orphan hosts in the registry in order to delete them
+  server.route({
+    method: 'POST',
+    path: '/hosts/remove-orphan-entries',
+    handler(req, reply) {
+      return ctrl.removeOrphanEntries(req, reply);
+    }
+  });
 }

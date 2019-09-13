@@ -224,6 +224,8 @@ export class SettingsController {
     } catch (error) {
       this.errorHandler.handle('Error getting API entries', 'Settings');
     }
+    // Every time that the API entries are required in the settings the registry will be checked in order to remove orphan host entries
+    await this.genericReq.request('POST', '/hosts/remove-orphan-entries', {entries: this.apiEntries});
     return;
   }
 

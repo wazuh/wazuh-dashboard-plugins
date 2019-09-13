@@ -99,4 +99,26 @@ export class WazuhHostsCtrl {
       );
     }
   }
+
+  /**
+   * Remove the orphan host entries in the registry
+   * @param {Object} req
+   * @param {Object} reply
+   */
+  async removeOrphanEntries(req, reply) {
+    try {
+      log('wazuh-hosts:cleanRegistry', 'Cleaning registry', 'debug');
+      if (!req.payload && !req.payload.entries) throw new Error('No entries given to check');
+      await this.updateRegistry.removeOrphanEntries(req.payload.entries)
+      return { statusCode: 200, message: 'ok' };
+    } catch (error) {
+      log('wazuh-hosts:cleanRegistry', error.message || error);
+      return ErrorResponse(
+        `Could not clean entries in the wazuh-registry.json due to ${error.message || error}`,
+        2013,
+        500,
+        reply
+      );
+    }
+  }
 }
