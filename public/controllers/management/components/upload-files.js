@@ -72,7 +72,7 @@ export class UploadFiles extends Component {
             files.push({
               file: file.name,
               content: reader.result
-            })
+            });
             clearInterval(interval);
           }
         }, 100);
@@ -86,9 +86,9 @@ export class UploadFiles extends Component {
   }
 
   /**
-  * Renders a CallOut with a warning
-  * @param {String} title
-  */
+   * Renders a CallOut with a warning
+   * @param {String} title
+   */
   renderWarning(title) {
     return (
       <EuiCallOut size="s" title={title} color="warning" iconType="iInCircle" />
@@ -186,9 +186,7 @@ export class UploadFiles extends Component {
                     className="upload-files-button"
                     fill
                     iconType="sortUp"
-                    onClick={() =>
-                      this.startUpload()
-                    }
+                    onClick={() => this.startUpload()}
                   >
                     Upload
                   </EuiButton>

@@ -403,12 +403,12 @@ export class ManagementController {
     this.$scope.$applyAsync();
   }
 
-newFile() {
-  this.openedFileDirect = true;
-  this.switchFilesSubTab();
-          this.$scope.$applyAsync();
-          this.$scope.$broadcast('addNewFile', {type: this.globalRulesetTab})
-}
+  newFile() {
+    this.openedFileDirect = true;
+    this.switchFilesSubTab();
+    this.$scope.$applyAsync();
+    this.$scope.$broadcast('addNewFile', { type: this.globalRulesetTab });
+  }
 
   testLogtest = async log => {
     //return await this.apiReq.request('GET', '/testlog', {log});
@@ -449,14 +449,13 @@ newFile() {
   async uploadFiles(files, path) {
     try {
       /*
-      * TODO: this function are receiving an array of files with this structure {file: <file>, content: <content>} also receives the path
-      * Needs the API request implementation 
-      */
-      this.errorHandler.info('Upload successful.')
-    return;  
+       * TODO: this function are receiving an array of files with this structure {file: <file>, content: <content>} also receives the path
+       * Needs the API request implementation
+       */
+      this.errorHandler.info('Upload successful.');
+      return;
     } catch (error) {
       this.errorHandler.handle(error.message || error);
     }
-    
   }
 }

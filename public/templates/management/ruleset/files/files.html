@@ -19,7 +19,13 @@
                                         new {{mctrl.globalRulesetTab}} file</span>
                             </span>
                         </button>
-                <react-component name="UploadFiles" props="mctrl.uploadFilesProps"/>                
+                <react-component name="UploadFiles" props="mctrl.uploadFilesProps" class="wz-margin-left-10"/>
+                <button type="button" ng-click="mctrl.openLogtest()" class="euiButtonEmpty euiButtonEmpty--primary euiButtonEmpty--small wz-margin-left-10">
+                        <span class="euiButtonEmpty__content">
+                            <react-component name="EuiIcon" props="{type:'play'}" />
+                            <span class="euiButtonEmpty__text">Test your logs</span>
+                        </span>
+                    </button>             
                 </div>
 
                 <div class="wz-padding-bottom-0">

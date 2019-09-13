@@ -17,6 +17,7 @@ import $ from 'jquery';
 import * as FileSaver from '../../services/file-saver';
 import chrome from 'ui/chrome';
 import { DynamicHeight } from '../../utils/dynamic-height';
+import { TabDescription } from '../../../server/reporting/tab-description';
 
 export class DevToolsController {
   /**
@@ -36,7 +37,8 @@ export class DevToolsController {
     $window,
     appState,
     errorHandler,
-    $document
+    $document,
+    $timeout
   ) {
     this.apiReq = apiReq;
     this.genericReq = genericReq;
@@ -44,6 +46,7 @@ export class DevToolsController {
     this.appState = appState;
     this.errorHandler = errorHandler;
     this.$document = $document;
+    this.$timeout = $timeout;
     this.groups = [];
     this.linesWithClass = [];
     this.widgets = [];
@@ -130,6 +133,8 @@ export class DevToolsController {
         gutters: ['CodeMirror-foldgutter']
       }
     );
+
+    this.$scope.tabDescription = TabDescription;
 
     this.init();
     this.send(true);
@@ -469,40 +474,53 @@ export class DevToolsController {
       );
       dynamicHeight();
     };
-    
+
     this.logtestProps = {
       clickAction: log => this.testLogtest(log),
       close: () => {},
       showClose: false
     };
 
+    this.testConfigurationProps = {
+      clickAction: log => this.validateConfiguration(log),
+    };
+
     this.toolsTabsProps = {
       clickAction: tab => {
         this.switchTab(tab);
       },
-      selectedTab:
-        this.tab || 'devTools',
-      tabs: [{ id: 'devTools', name: 'API Dev console' }, { id: 'logtest', name: 'Test your logs' }]
+      selectedTab: this.tab || 'devTools',
+      tabs: [
+        { id: 'devTools', name: 'API console' },
+        { id: 'logtest', name: 'Test your logs' },
+        { id: 'testConfiguration', name: 'Test your configurations' }
+      ]
     };
 
     this.welcomeCardsProps = {
       clickAction: tab => this.switchTab(tab),
-      sections: [{ id: 'devTools', name: 'Test API', icon: 'consoleApp' }, { id: 'logtest', name: 'Test your logs' , icon: 'indexRollupApp' }]
+      sections: [
+        { id: 'devTools', icon: 'consoleApp' },
+        { id: 'logtest', icon: 'indexRollupApp' },
+        { id: 'testConfiguration', icon: 'advancedSettingsApp' }
+      ]
     };
-  
+
     const dynamicHeight = () =>
       DynamicHeight.dynamicHeightDevTools(this, this.$window);
     dynamicHeight();
   }
 
-  switchTab(tab) {    
+  switchTab(tab) {
     this.tab = tab;
-    if(tab === 'logtest'){
+    /*     if (tab === 'logtest') {
       DynamicHeight.dynamicHeightStatic('.euiCodeBlock', 75);
-    }
+    } */
     this.toolsTabsProps.selectedTab = tab;
-    window.dispatchEvent(new Event('resize')); // eslint-disable-line
     this.$scope.$applyAsync();
+    this.$timeout(100).then(() => {
+      window.dispatchEvent(new Event('resize')); // eslint-disable-line
+    });
   }
 
   testLogtest = async log => {
@@ -521,6 +539,13 @@ export class DevToolsController {
     Rule id: '1002'
     Level: '2'
     Description: 'Unknown problem somewhere in the system.'`;
+  };
+
+  validateConfiguration = async configuration => {
+    //return await this.apiReq.request('GET', '/testlog', {log});
+    const sleep = m => new Promise(r => setTimeout(r, m));
+    await sleep(1000);
+    return `ok`;
   };
 
   /**

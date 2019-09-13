@@ -22,6 +22,7 @@ import {
   EuiFlexItem,
   EuiCodeBlock,
   EuiSpacer,
+  EuiPanel,
   EuiFlyoutFooter
 } from '@elastic/eui';
 
@@ -53,65 +54,75 @@ export class Logtest extends Component {
   };
 
   dynamicHeight = () =>
-  DynamicHeight.dynamicHeightStatic('.euiCodeBlock', 70);
+    DynamicHeight.dynamicHeightStatic(
+      '.euiCodeBlock',
+      this.props.showClose ? 70 : 100
+    );
 
   render() {
     const codeBlock = {
       zIndex: '100'
     };
 
+    const logtest = (
+      <Fragment>
+        <EuiTextArea
+          placeholder="Type one log per line..."
+          fullWidth={true}
+          aria-label=""
+          rows={this.props.showClose ? 10 : 4}
+          onChange={this.onChange}
+        />
+        <EuiSpacer size="s" />
+        <EuiCodeBlock
+          style={codeBlock}
+          language="json"
+          fontSize="s"
+          overflowHeight={1}
+          isCopyable={this.state.testResult ? true : false}
+        >
+          {this.state.testResult || 'The test result will appear here.'}
+        </EuiCodeBlock>
+      </Fragment>
+    );
+
     this.dynamicHeight();
     return (
       <Fragment>
-      {( this.props.showClose &&
-        <EuiFlexGroup gutterSize="xs">
-          <EuiTitle size="s">
-            <h2>Test your logs</h2>
-          </EuiTitle>
-          <EuiFlexItem />
-          <EuiFlexItem grow={false}>          
-            <EuiButtonIcon
-              color={'text'}
-              onClick={() => this.props.close()}
-              iconType="cross"
-              aria-label="Close"
-            />
-          </EuiFlexItem>
-        </EuiFlexGroup>
+        {this.props.showClose && (
+          <EuiFlexGroup gutterSize="xs">
+            <EuiTitle size="s">
+              <h2>Test your logs</h2>
+            </EuiTitle>
+            <EuiFlexItem />
+            <EuiFlexItem grow={false}>
+              <EuiButtonIcon
+                color={'text'}
+                onClick={() => this.props.close()}
+                iconType="cross"
+                aria-label="Close"
+              />
+            </EuiFlexItem>
+          </EuiFlexGroup>
         )}
         <EuiSpacer size="m" />
-        <Fragment>
-          <EuiTextArea
-            placeholder="Type one log per line..."
-            fullWidth={true}
-            aria-label=""
-            rows={10}
-            onChange={this.onChange}
-          />
-          <EuiSpacer size="s" />
-            <EuiCodeBlock
-              style={codeBlock}
-              language="json"
-              fontSize="s"
-              overflowHeight={1}
-              isCopyable={this.state.testResult ? true : false}
-            >
-              {this.state.testResult || 'The test result will appear here.'}
-            </EuiCodeBlock>
-        </Fragment>
+        {(!this.props.showClose && (
+          <EuiPanel paddingSize="l">{logtest}</EuiPanel>
+        )) || <div>{logtest}</div>}
         <EuiFlyoutFooter>
-            <EuiFlexGroup justifyContent="spaceBetween">
-              <EuiFlexItem grow={false}>
-              {( this.props.showClose &&
+          <EuiFlexGroup justifyContent="spaceBetween">
+            <EuiFlexItem grow={false}>
+              {this.props.showClose && (
                 <EuiButtonEmpty
                   iconType="cross"
                   onClick={() => this.props.close()}
-                  flush="left">
+                  flush="left"
+                >
                   Close
                 </EuiButtonEmpty>
               )}
-              </EuiFlexItem>
-              <EuiFlexItem grow={false}>
+            </EuiFlexItem>
+            <EuiFlexItem grow={false}>
               <EuiButton
                 isLoading={this.state.testing}
                 isDisabled={this.state.testing || !this.state.value}
@@ -123,9 +134,9 @@ export class Logtest extends Component {
               >
                 Test
               </EuiButton>
-              </EuiFlexItem>
-            </EuiFlexGroup>
-          </EuiFlyoutFooter>
+            </EuiFlexItem>
+          </EuiFlexGroup>
+        </EuiFlyoutFooter>
       </Fragment>
     );
   }

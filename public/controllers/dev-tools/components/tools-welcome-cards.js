@@ -28,15 +28,9 @@ export class ToolsWelcomeCards extends Component {
     super(props);
   }
 
-  onButtonClick(btn) {
-    this.setState({
-      [btn]: !this.state[btn]
-    });
-  }
-
-  buildTabCards() {
+  buildToolsCards() {
     return this.props.sections.map((tab, index) => (
-      <EuiFlexItem grow={true}           key={index}> 
+      <EuiFlexItem grow={true} key={index}>
         <EuiCard
           icon={<EuiIcon size="xxl" type={tab.icon} />}
           title={TabDescription[tab.id].title}
@@ -44,20 +38,18 @@ export class ToolsWelcomeCards extends Component {
           description={TabDescription[tab.id].description}
           key={index}
         />
-                  </EuiFlexItem>
+      </EuiFlexItem>
     ));
   }
 
   render() {
     return (
       <div>
-            <EuiTitle size="m">
-      <h1>Wazuh tools</h1>
-    </EuiTitle>
-    <EuiSpacer size="m" />
-        <EuiFlexGroup>
-          {this.buildTabCards()}
-        </EuiFlexGroup>
+        <EuiTitle size="m">
+          <h1>Wazuh tools</h1>
+        </EuiTitle>
+        <EuiSpacer size="m" />
+        <EuiFlexGroup>{this.buildToolsCards()}</EuiFlexGroup>
       </div>
     );
   }

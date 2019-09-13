@@ -100,13 +100,15 @@ export const TabDescription = {
       'Monitor and collect the activity from Docker containers such as creation, running, starting, stopping or pausing events.'
   },
   devTools: {
-    title: 'API Dev console',
-    description:
-      'Test the Wazuh API endpoints.'
+    title: 'API console',
+    description: 'Test the Wazuh API endpoints.'
   },
   logtest: {
     title: 'Test your logs',
-    description:
-      'Check your ruleset testing logs.'
+    description: 'Check your ruleset testing logs.'
   },
+  testConfiguration: {
+    title: 'Test your configurations',
+    description: 'Check configurations before applying them'
+  }
 };
