@@ -87,6 +87,10 @@ export class SettingsController {
       checkManager: entry => this.checkManager(entry)
     };
 
+    this.addApiProps = {
+      checkForNewApis: () => this.checkForNewApis()
+    }
+
     this.settingsTabsProps = {
       clickAction: tab => {
         this.switchTab(tab, true);
@@ -425,6 +429,36 @@ export class SettingsController {
       this.cancelEditingKey();
       this.loadingChange = false;
       this.errorHandler.handle(error);
+    }
+  }
+
+  /**
+   * Checks if there are new APIs entries in the wazuh-hosts.yml
+   */
+  async checkForNewApis() {
+    try {
+      const result = await this.genericReq.request('GET', '/hosts/apis', {});
+      const hosts = result.data || [];
+      let numError = 0;
+      //Tries to check if there are new APIs entries in the wazuh-hosts.yml also, checks if some of them have connection
+      for (let idx in hosts) {
+        const host = hosts[idx];
+        const id = Object.keys(host)[0];
+        const api = Object.assign(host[id], { id: id });
+        delete api.password;
+        try {
+          await this.testAPI.check(api);
+        } catch (error) {
+          console.error('entro en este catch')
+          numError = numError + 1;
+        }
+      };
+      // Check if any API had a success connection
+      // TODO handle if some host has connection
+      //hosts.length > numError && console.log('ok')
+      return hosts;
+    } catch (error) {
+      return Promise.reject(error);
     }
   }
 }

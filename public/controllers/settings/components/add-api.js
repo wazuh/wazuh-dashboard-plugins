@@ -24,8 +24,6 @@ import {
   EuiCallOut
 } from '@elastic/eui';
 
-import needle from 'needle';
-
 export class AddApi extends Component {
   constructor(props) {
     super(props);
@@ -36,31 +34,23 @@ export class AddApi extends Component {
     this.statuses = ['complete', 'warning'];
   }
 
-  handleComplete() {
-    this.setState({
-      status: 'incomplete',
-      fetchingData: true
-    });
-
-    needle(
-      'GET',
-      'http://172.16.1.2:55000',
-      {},
-      {
-        headers: {
-          'wazuh-app-version': '3.10.0'
-        },
-        username: 'foo',
-        password: 'bar'
-      }
-    ).then(result => {
-      console.log(result);
-
+  async checkConnection() {
+    //TODO handle this
+    try {
+      this.setState({
+        status: 'incomplete',
+        fetchingData: true
+      });
+  
+      const result = await this.props.checkForNewApis();
+  
       this.setState({
         status: this.statuses[Math.floor(Math.random() * 2)],
         fetchingData: false
       });
-    });
+    } catch (error) {
+
+    }
   }
 
   render() {
@@ -87,7 +77,7 @@ export class AddApi extends Component {
         </EuiText>
         <EuiSpacer />
         <EuiButton
-          onClick={() => this.handleComplete()}
+          onClick={async () => await this.checkConnection()}
           isLoading={this.state.fetchingData}
         >
           Check connection
@@ -144,3 +134,7 @@ export class AddApi extends Component {
     return view;
   }
 }
+
+AddApi.propTypes = {
+  checkForNewApis: PropTypes.func
+};
