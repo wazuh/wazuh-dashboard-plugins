@@ -13,7 +13,6 @@
 // Imports all server modules
 import { Initialize } from './server/initialize';
 import { WazuhElasticRouter } from './server/routes/wazuh-elastic';
-import { WazuhApiElasticRoutes } from './server/routes/wazuh-api-elastic';
 import { Monitoring } from './server/monitoring';
 import { WazuhApiRoutes } from './server/routes/wazuh-api';
 import { WazuhHostsRoutes } from './server/routes/wazuh-hosts'
@@ -38,7 +37,6 @@ export function initApp(server) {
       );
       Initialize(server);
       WazuhElasticRouter(server);
-      WazuhApiElasticRoutes(server);
       monitoringInstance.run();
       indexPatternCronJobInstance.run();
       Queue.launchCronJob();
