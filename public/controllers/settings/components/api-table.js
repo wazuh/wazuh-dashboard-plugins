@@ -107,8 +107,8 @@ export class ApiTable extends Component {
                       : 'starEmpty'
                   }
                   aria-label="Set as default"
-                  onClick={() => {
-                    const currentDefault = this.props.setDefault(item);
+                  onClick={async () => {
+                    const currentDefault = await this.props.setDefault(item);
                     this.setState({
                       currentDefault
                     });

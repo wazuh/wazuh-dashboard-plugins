@@ -131,50 +131,55 @@ export class SettingsController {
     this.currentApiEntryIndex = idx;
   }
 
-   /**
-   * Returns the index of the API in the entries array
-   * @param {Object} api 
-   */
+  /**
+  * Returns the index of the API in the entries array
+  * @param {Object} api 
+  */
   getApiIndex(api) {
     return this.apiEntries.map(entry => Object.keys(entry)[0]).indexOf(api.id)
   }
 
   // Set default API
-  setDefault(item) {
-    const index = this.getApiIndex(item);
-    const entry = this.apiEntries[index];
-    const key = Object.keys(entry)[0];
-    const api = entry[key];
-    const { cluster_info , id } = api;
-    const { manager, cluster, status } = cluster_info;
+  async setDefault(item) {
+    try {
+      await this.checkManager(item, false, true);
+      const index = this.getApiIndex(item);
+      const entry = this.apiEntries[index];
+      const key = Object.keys(entry)[0];
+      const api = entry[key];
+      const { cluster_info, id } = api;
+      const { manager, cluster, status } = cluster_info;
 
-    this.appState.setClusterInfo(cluster_info);
+      // Check the connection before set as default 
+      this.appState.setClusterInfo(cluster_info);
+      const clusterEnabled = status === 'disabled';
+      this.appState.setCurrentAPI(
+        JSON.stringify({
+          name: clusterEnabled ? manager : cluster,
+          id: id
+        })
+      );
 
-    const clusterEnabled = status === 'disabled';
-    this.appState.setCurrentAPI(
-      JSON.stringify({
-        name: clusterEnabled ? manager : cluster,
-        id: id
-      })
-    );
+      this.$scope.$emit('updateAPI', {});
 
-    this.$scope.$emit('updateAPI', {});
+      const currentApi = this.appState.getCurrentAPI();
+      this.currentDefault = JSON.parse(currentApi).id;
+      this.apiTableProps.currentDefault = this.currentDefault;
+      this.$scope.$applyAsync();
 
-    const currentApi = this.appState.getCurrentAPI();
-    this.currentDefault = JSON.parse(currentApi).id;
-    this.apiTableProps.currentDefault = this.currentDefault;
-    this.$scope.$applyAsync();
+      this.errorHandler.info(`API ${manager} set as default`);
 
-    this.errorHandler.info(`API ${manager} set as default`);
+      this.getCurrentAPIIndex();
+      if (currentApi && !this.appState.getExtensions(id)) {
+        const { id, extensions } = this.apiEntries[this.currentApiEntryIndex][key];
+        this.appState.setExtensions(id, extensions);
+      }
 
-    this.getCurrentAPIIndex();
-    if (currentApi && !this.appState.getExtensions(id)) {
-      const { id, extensions } = this.apiEntries[this.currentApiEntryIndex][key];
-      this.appState.setExtensions(id, extensions);
+      this.$scope.$applyAsync();
+      return this.currentDefault;
+    } catch (error) {
+      this.errorHandler.handle(error);
     }
-
-    this.$scope.$applyAsync();
-    return this.currentDefault;
   }
 
   // Get settings function
@@ -225,7 +230,7 @@ export class SettingsController {
       this.errorHandler.handle('Error getting API entries', 'Settings');
     }
     // Every time that the API entries are required in the settings the registry will be checked in order to remove orphan host entries
-    await this.genericReq.request('POST', '/hosts/remove-orphan-entries', {entries: this.apiEntries});
+    await this.genericReq.request('POST', '/hosts/remove-orphan-entries', { entries: this.apiEntries });
     return;
   }
 
@@ -268,10 +273,14 @@ export class SettingsController {
       this.$scope.$applyAsync();
       return;
     } catch (error) {
-      if (!this.wzMisc.getApiIsDown()) {
+      if (!this.wzMisc.getApiIsDown() && !silent) {
         this.printError(error);
       } else {
-        !silent && this.errorHandler.handle(error);
+        if (!silent) {
+          this.errorHandler.handle(error);
+        } else {
+          return Promise.reject(error);
+        }
       }
     }
   }
