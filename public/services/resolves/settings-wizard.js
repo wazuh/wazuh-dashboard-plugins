@@ -198,12 +198,14 @@ export function settingsWizard(
               const firstEntry = data.data[0];
               const id = Object.keys(firstEntry)[0];
               const api = firstEntry[id];
-              appState.setCurrentAPI(
-                JSON.stringify({
-                  name: api.cluster_info.manager,
-                  id: id
-                })
-              );
+              if (api && api.cluster_info && api.cluster_info.manager) {
+                appState.setCurrentAPI(
+                  JSON.stringify({
+                    name: api.cluster_info.manager,
+                    id: id
+                  })
+                );
+              }
               callCheckStored();
             } else {
               setUpCredentials(

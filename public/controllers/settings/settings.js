@@ -76,7 +76,6 @@ export class SettingsController {
         delete this.configuration[key];
       }
     }
-
     // Loading data
     await this.getSettings();
 
@@ -205,7 +204,6 @@ export class SettingsController {
 
       const apis = data.data;
       this.apiEntries = apis.length ? apis : [];
-
       const currentApi = this.appState.getCurrentAPI();
 
       if (currentApi) {
@@ -341,11 +339,11 @@ export class SettingsController {
       if (this.tab === 'logs') {
         this.getAppLogs();
       }
+
       this.getCurrentAPIIndex();
-      if (this.currentApiEntryIndex || this.currentApiEntryIndex === 0) {
+      if ((this.currentApiEntryIndex || this.currentApiEntryIndex === 0) && this.currentApiEntryIndex >= 0) {
         await this.checkManager(this.currentApiEntryIndex, true, true);
       }
-
       this.$scope.$applyAsync();
     } catch (error) {
       this.errorHandler.handle(
