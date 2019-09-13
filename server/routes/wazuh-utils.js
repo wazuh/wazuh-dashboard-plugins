@@ -14,7 +14,7 @@ import { WazuhUtilsCtrl } from '../controllers';
 export function WazuhUtilsRoutes(server) {
   const ctrl = new WazuhUtilsCtrl();
 
-  // Returns the config.yml file parsed
+  // Returns the wazuh.yml file parsed
   server.route({
     method: 'GET',
     path: '/utils/configuration',
@@ -23,7 +23,7 @@ export function WazuhUtilsRoutes(server) {
     }
   });
 
-  // Returns the config.yml file in raw
+  // Returns the wazuh.yml file in raw
   server.route({
     method: 'PUT',
     path: '/utils/configuration',

@@ -143,7 +143,7 @@ export class ManageHosts {
         };
         entries.push(api);
       });
-      log('manage-hosts:transformIndexedApis', 'Transforming index API schedule to config.yml', 'debug');
+      log('manage-hosts:transformIndexedApis', 'Transforming index API schedule to wazuh.yml', 'debug');
     } catch (error) {
       log('manage-hosts:transformIndexedApis', error.message || error);
       throw error;
@@ -203,7 +203,7 @@ export class ManageHosts {
       if (hostToAdd.length && response) {
         await this.addSeveralHosts(hostToAdd);
       }
-      return 'All APIs entries were migrated to the config.yml'
+      return 'All APIs entries were migrated to the wazuh.yml'
     } catch (error) {
       log('manage-hosts:addSeveralHosts', error.message || error);
       return Promise.reject(error);

@@ -33,7 +33,7 @@ export function Initialize(server) {
 
   let configurationFile = {};
   let pattern = null;
-  // Read config from package.json and config.yml
+  // Read config from package.json and wazuh.yml
   try {
     configurationFile = getConfiguration();
 
@@ -124,7 +124,7 @@ export function Initialize(server) {
           const data = await wzWrapper.getWazuhAPIEntries();
           const apiEntries = (((data || {}).hits || {}).hits || []);
           await manageHosts.migrateFromIndex(apiEntries)
-          log('initialize:checkWazuhIndex', 'Index .wazuh will be removed and its content will be migrated to config.yml', 'debug');
+          log('initialize:checkWazuhIndex', 'Index .wazuh will be removed and its content will be migrated to wazuh-hosts.yml', 'debug');
           // Check if all APIs entries were migrated properly and delete it from the .wazuh index
           await checkProperlyMigrate();     
           await wzWrapper.deleteIndexByName('.wazuh');

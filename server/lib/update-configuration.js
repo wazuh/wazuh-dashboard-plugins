@@ -29,11 +29,11 @@ const needRestartFields = [
 export class UpdateConfigurationFile {
   constructor() {
     this.busy = false;
-    this.file = path.join(__dirname, '../../config.yml');
+    this.file = path.join(__dirname, '../../wazuh.yml');
   }
 
   /**
-   * Add or replace specific setting from config.yml
+   * Add or replace specific setting from wazuh.yml
    * @param {String} key The setting name.
    * @param {String} value New value for the setting.
    * @param {Boolean} exists If true, it just replaces the value for that key.
@@ -55,7 +55,7 @@ export class UpdateConfigurationFile {
   }
 
   /**
-   * Updates config.yml file. If it fails, it throws the error to the next function.
+   * Updates wazuh.yml file. If it fails, it throws the error to the next function.
    * @param {Object} input
    */
   updateConfiguration(input) {
