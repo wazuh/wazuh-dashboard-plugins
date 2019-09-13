@@ -14,11 +14,9 @@ import { ElasticWrapper } from './lib/elastic-wrapper';
 import packageJSON from '../package.json';
 import { kibanaTemplate } from './integration-files/kibana-template';
 import { getConfiguration } from './lib/get-configuration';
-import { defaultExt } from './lib/default-ext';
 import { checkKnownFields } from './lib/refresh-known-fields';
 import { totalmem } from 'os';
 import fs from 'fs';
-import path from 'path'; 
 import { ManageHosts } from './lib/manage-hosts';
 import { UpdateRegistry } from './lib/update-registry';
 
@@ -111,83 +109,10 @@ export function Initialize(server) {
     }
   };
 
+
   /**
-   * Checks for new extensions added to the config.yml,
-   * useful whenever a new extension is added and it's enabled by default.
-   * An old app package needs to update its stored API entries, this way we have consistency
-   * with the new extensions.
+   * Checks if the .wazuh index exist in order to migrate to wazuh-hosts.yml
    */
-  const checkAPIEntriesExtensions = async () => {
-    try {
-      log(
-        'initialize:checkAPIEntriesExtensions',
-        `Checking extensions consistency for all API entries`,
-        'debug'
-      );
-
-      const apiEntries = await wzWrapper.getWazuhAPIEntries();
-      const configFile = await getConfiguration();
-
-      if ((((apiEntries || {}).hits || {}).total || {}).value > 0) {
-        const currentExtensions = !configFile ? defaultExt : {};
-
-        if (configFile) {
-          for (const key in defaultExt) {
-            currentExtensions[key] =
-              typeof configFile['extensions.' + key] !== 'undefined'
-                ? configFile['extensions.' + key]
-                : defaultExt[key];
-          }
-        }
-
-        for (const item of apiEntries.hits.hits) {
-          for (const key in currentExtensions) {
-            if ((((item || {})._source || {}).extensions || {})[key]) {
-              continue;
-            } else {
-              if (((item || {})._source || {}).extensions) {
-                item._source.extensions[key] = currentExtensions[key];
-              }
-            }
-          }
-          try {
-            await wzWrapper.updateWazuhIndexDocument(null, item._id, {
-              doc: { extensions: item._source.extensions }
-            });
-            log(
-              'initialize:checkAPIEntriesExtensions',
-              `Successfully updated API entry extensions with ID: ${item._id}`,
-              'debug'
-            );
-          } catch (error) {
-            log(
-              'initialize:checkAPIEntriesExtensions',
-              `Error updating API entry extensions with ID: ${
-              item._id
-              } due to ${error.message || error}`
-            );
-            server.log(
-              initializeErrorLogColors,
-              `Error updating API entry extensions with ID: ${
-              item._id
-              } due to ${error.message || error}`
-            );
-          }
-        }
-      } else {
-        log(
-          'initialize:checkAPIEntriesExtensions',
-          'There are no API entries, skipping extensions check',
-          'debug'
-        );
-      }
-
-      return;
-    } catch (error) {
-      return Promise.reject(error);
-    }
-  };
-
   const checkWazuhIndex = async () => {
     try {
       log('initialize:checkWazuhIndex', 'Checking .wazuh index.', 'debug');
@@ -244,23 +169,27 @@ export function Initialize(server) {
     }
   }
 
+
+  /**
+   * Checks if the .wazuh-version exists, in this case it will be deleted and the wazuh-registry.json will be created
+   */
   const checkWazuhRegistry = async () => {
     try {
       log(
-        'initialize[checkwazuhRegistryRegistry]',
+        'initialize[checkwazuhRegistry]',
         'Checking wazuh-version registry.',
         'debug'
       );
       try {
         await wzWrapper.deleteWazuhVersionIndex();
         log(
-          'initialize[checkwazuhRegistryRegistry]',
+          'initialize[checkwazuhRegistry]',
           'Successfully deleted old .wazuh-version index.',
           'debug'
         );
       } catch (error) {
         log(
-          'initialize[checkwazuhRegistryRegistry]',
+          'initialize[checkwazuhRegistry]',
           'No need to delete old .wazuh-version index',
           'debug'
         );
@@ -268,7 +197,7 @@ export function Initialize(server) {
 
       if (!fs.existsSync(wazuhRegistry)) {
         log(
-          'initialize[checkwazuhRegistryRegistry]',
+          'initialize[checkwazuhRegistry]',
           'wazuh-version registry does not exist. Initializing configuration.',
           'debug'
         );
