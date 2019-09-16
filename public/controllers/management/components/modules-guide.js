@@ -12,6 +12,7 @@
  */
 import React, { Fragment, Component } from 'react';
 import PropTypes from 'prop-types';
+import { ModulesGuides } from '../../../utils/modules-guides';
 import {
   EuiFlexGroup,
   EuiFlexItem,
@@ -23,9 +24,11 @@ import {
   EuiCode,
   EuiSteps,
   EuiButtonIcon,
-  EuiSuperSelect
+  EuiSuperSelect,
+  EuiTextArea,
+  EuiSwitch,
+  EuiFieldText
 } from '@elastic/eui';
-
 
 export class ModulesGuide extends Component {
   constructor(props) {
@@ -33,10 +36,11 @@ export class ModulesGuide extends Component {
     this.state = {
       status: 'incomplete',
       fetchingData: false,
-      value: '',
+      value: ''
     };
     this.statuses = ['complete', 'warning'];
 
+    this.options = ModulesGuides['syscheck'].options;
     this.modules = [
       {
         value: 'rootcheck',
@@ -51,7 +55,7 @@ export class ModulesGuide extends Component {
               </p>
             </EuiText>
           </Fragment>
-        ),
+        )
       },
       {
         value: 'syscheck',
@@ -62,11 +66,11 @@ export class ModulesGuide extends Component {
             <EuiSpacer size="xs" />
             <EuiText size="s" color="subdued">
               <p className="euiTextColor--subdued">
-              Options for file integrity monitoring.
+                Options for file integrity monitoring.
               </p>
             </EuiText>
           </Fragment>
-        ),
+        )
       },
       {
         value: 'active-response',
@@ -77,12 +81,13 @@ export class ModulesGuide extends Component {
             <EuiSpacer size="xs" />
             <EuiText size="s" color="subdued">
               <p className="euiTextColor--subdued">
-              An existing command is bound to one or more rules or rule types along with additional criteria for when to execute the command.
+                An existing command is bound to one or more rules or rule types
+                along with additional criteria for when to execute the command.
               </p>
             </EuiText>
           </Fragment>
-        ),
-      },
+        )
+      }
     ];
   }
 
@@ -90,97 +95,137 @@ export class ModulesGuide extends Component {
     this.setState({ value, status: this.statuses[0], selectedModule: value });
   };
 
+  onGenerate = () => {
+    this.setState({ status: this.statuses[0] });
+    setTimeout(() => {
+      var blockHeight = $('#codeBlock').offset().top
+      $('#sideNav').animate({
+        scrollTop: blockHeight
+      }, 700);
+    }, 150)
+  };
+
   render() {
-    const apiExample = `<rootcheck>
-  <disabled>no</disabled>
-  <check_unixaudit>yes</check_unixaudit>
-  <check_files>yes</check_files>
-  <check_trojans>yes</check_trojans>
-  <check_dev>yes</check_dev>
-  <check_sys>yes</check_sys>
-  <check_pids>yes</check_pids>
-  <check_ports>yes</check_ports>
-  <check_if>yes</check_if>
+    const apiExample = `<!-- Policy monitoring -->
+    <rootcheck>
+    <disabled>no</disabled>
+    <check_unixaudit>yes</check_unixaudit>
+    <check_files>yes</check_files>
+    <check_trojans>yes</check_trojans>
+    <check_dev>yes</check_dev>
+    <check_sys>yes</check_sys>
+    <check_pids>yes</check_pids>
+    <check_ports>yes</check_ports>
+    <check_if>yes</check_if>
   
-  <!-- Frequency that rootcheck is executed - every 12 hours -->
-  <frequency>43200</frequency>
+    <!-- Frequency that rootcheck is executed - every 12 hours -->
+    <frequency>43200</frequency>
   
-  <rootkit_files>/var/ossec/etc/shared/rootkit_files.txt</rootkit_files>
-  <rootkit_trojans>/var/ossec/etc/shared/rootkit_trojans.txt</rootkit_trojans>
+    <rootkit_files>/var/ossec/etc/shared/rootkit_files.txt</rootkit_files>
+    <rootkit_trojans>/var/ossec/etc/shared/rootkit_trojans.txt</rootkit_trojans>
   
-  <system_audit>/var/ossec/etc/shared/system_audit_rcl.txt</system_audit>
-  <system_audit>/var/ossec/etc/shared/system_audit_ssh.txt</system_audit>
-  <system_audit>/var/ossec/etc/shared/cis_debian_linux_rcl.txt</system_audit>
+    <system_audit>/var/ossec/etc/shared/system_audit_rcl.txt</system_audit>
+    <system_audit>/var/ossec/etc/shared/system_audit_ssh.txt</system_audit>
+    <system_audit>/var/ossec/etc/shared/cis_debian_linux_rcl.txt</system_audit>
   
-  <skip_nfs>yes</skip_nfs>
-</rootcheck>`;
+    <skip_nfs>yes</skip_nfs>
+  </rootcheck>`;
 
     const editConfigChildren = (
       <div>
         {this.state.status === 'complete' && (
-                <Fragment>
-        <EuiText>
-        Default Unix configuration.
-        </EuiText>
-        <EuiCodeBlock language="yaml">{apiExample}</EuiCodeBlock>
-        <EuiSpacer />
-        <EuiCode>{'base_directory'}</EuiCode>
-        
-        <EuiText>
-        The base directory that will be prepended to the following options.
-        </EuiText>
-        </Fragment>
+          <Fragment>
+            <EuiCodeBlock language="xml">{apiExample}</EuiCodeBlock>
+          </Fragment>
         )}
       </div>
     );
 
+    const form = this.options.map(option => {
+      return (        
+      <div key={option.name}>
+        <span  style={{width: '150px', paddingTop: '10px', display: 'inline-block'}}> {option.name}:
+        </span>
+
+          {option.type === 'input' && (
+            <EuiFieldText placeholder="" value={''} aria-label="" />
+          )}
+
+          {option.type === 'switch' && (
+            <EuiSwitch label={''} checked={false} />
+          )}
+
+          {option.type === 'list' && (
+            <EuiTextArea
+              placeholder="One entry per line"
+              aria-label={option.description}
+              value=""
+            />
+          )}
+        </div>
+      );
+    });
+
     const selectModuleChildren = (
       <div>
-      <EuiSuperSelect
-        options={this.modules}
-        valueOfSelected={this.state.selectedModule}
-        onChange={this.onChange}
-        itemLayoutAlign="top"
-        hasDividers
-      />
+        <EuiSuperSelect
+          options={this.modules}
+          valueOfSelected={this.state.selectedModule}
+          onChange={this.onChange}
+          itemLayoutAlign="top"
+          hasDividers
+          fullWidth={true}
+        />
       </div>
     );
 
-    const steps = [
+    const steps = this.props.selectedModule ? [
+      {
+        title: `Configure ${this.props.selectedModule} module`,
+        children: form
+      },
+      {
+        title: 'Copy the configuration',
+        children: editConfigChildren,
+        status: this.state.status
+      }
+    ] : [
       {
         title: 'Select a module',
         children: selectModuleChildren
       },
       {
-        title: 'Edit the configuration',
+        title: 'Configure the module',
+        children: form
+      },
+      {
+        title: 'Copy the configuration',
         children: editConfigChildren,
         status: this.state.status
       }
     ];
 
     const view = (
-      <EuiFlexGroup>
-        <EuiFlexItem>
+      <EuiFlexItem>
         <EuiFlyoutHeader hasBorder>
-        <EuiFlexGroup gutterSize="xs">
-          <EuiTitle size="s">
-            <h2>How to configure a module</h2>
-          </EuiTitle>
-          <EuiFlexItem />
-          <EuiFlexItem grow={false}>
-            <EuiButtonIcon
-              color={'text'}
-              onClick={() => this.props.close()}
-              iconType="cross"
-              aria-label="Close"
-            />
-          </EuiFlexItem>
-        </EuiFlexGroup>
-  </EuiFlyoutHeader>
-          <EuiSpacer />
-          <EuiSteps firstStepNumber={1} steps={steps} />
-        </EuiFlexItem>
-      </EuiFlexGroup>
+          <EuiFlexGroup gutterSize="xs">
+            <EuiTitle size="s">
+              <h2>{this.props.selectedModule ? `How to configure ${this.props.selectedModule}` : `How to configure a module`}</h2>
+            </EuiTitle>
+            <EuiFlexItem />
+            <EuiFlexItem grow={false}>
+              <EuiButtonIcon
+                color={'text'}
+                onClick={() => this.props.close()}
+                iconType="cross"
+                aria-label="Close"
+              />
+            </EuiFlexItem>
+          </EuiFlexGroup>
+        </EuiFlyoutHeader>
+        <EuiSpacer />
+        <EuiSteps firstStepNumber={1} steps={steps} />
+      </EuiFlexItem>
     );
 
     return view;
@@ -188,5 +233,6 @@ export class ModulesGuide extends Component {
 }
 
 ModulesGuide.propTypes = {
+  selectedModule: PropTypes.string,
   close: PropTypes.func
 };

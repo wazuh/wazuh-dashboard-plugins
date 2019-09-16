@@ -1,3 +1,11 @@
+<md-content flex layout="column" ng-if="tab === 'docker' && tabView === 'panels'" layout-align="start" style="padding: 8px;">
+        <div class="euiCallOut euiCallOut--primary"><div class="euiCallOutHeader">
+            <span class="euiCallOutHeader__title">This module is not configured for this agent</span></div><div class="euiText euiText--small">
+                <p>You can easily set it up and start receiving alerts. To start, select one of the groups this agent belongs to and where you want to configure it: 
+                        <span ng-repeat="group in agent.group" class="wz-text-bold wz-text-link" ng-click="openGroupGuide($index, 'docker')">{{ group }}&nbsp;</span>
+                </p></div></div>
+        </md-content>
+        
 <md-content flex layout="column" ng-if="tab === 'docker' && tabView === 'panels'"
     ng-class="{'no-opacity': resultState !== 'ready' || !rendered}" layout-align="start">
 

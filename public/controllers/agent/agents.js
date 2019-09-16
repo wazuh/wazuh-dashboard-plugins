@@ -446,6 +446,7 @@ export class AgentsController {
     };
 
     this.$scope.expand = i => this.expand(i);
+    this.$scope.openGroupGuide = (agent, i) => this.openGroupGuide(agent, i);
     this.setTabs();
   }
   /**
@@ -1058,5 +1059,13 @@ export class AgentsController {
     const oldValue = this.$scope.expandArray[i];
     this.falseAllExpand();
     this.$scope.expandArray[i] = !oldValue;
+  }
+
+  openGroupGuide(idx, mod){
+    this.visFactoryService.clearAll();
+    this.shareAgent.setAgent(this.$scope.agent, idx);
+    this.$location.search('tab', 'groups');
+    this.$location.path('/manager');    
+    this.$location.search('groupModuleGuide', mod);
   }
 }

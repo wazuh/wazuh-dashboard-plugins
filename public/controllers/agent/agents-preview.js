@@ -263,13 +263,12 @@ export class AgentsPreviewController {
     );
   }
 
-
   /**
    * Returns the Wazuh version as x.y.z
    */
   async getWazuhVersion() {
     try {
-      const data = await this.apiReq.request('GET', '/version', {}); 
+      const data = await this.apiReq.request('GET', '/version', {});
       const result = ((data || {}).data || {}).data;
       return result ? result.substr(1) : version;
     } catch (error) {

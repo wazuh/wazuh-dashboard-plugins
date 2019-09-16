@@ -385,5 +385,5 @@ export class ManagementController {
 
   openHelp = () => {
     this.helpOpened = !this.helpOpened;
-  }
+  };
 }

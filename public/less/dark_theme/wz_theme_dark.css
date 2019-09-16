@@ -254,7 +254,7 @@ md-divider.md-default-theme, md-divider {
 }
 
 .euiFlexGroup .euiFlexGroup:hover {
-  background: #1D1E24;
+/*   background: #1D1E24; */
 }
 
 .wz-dev-box .CodeMirror {

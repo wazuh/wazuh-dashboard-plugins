@@ -72,6 +72,20 @@ export function GroupsController(
   // Store a boolean variable to check if come from agents
   const globalAgent = shareAgent.getAgent();
 
+  $scope.editGroupAgentConfig = async () => {
+    $scope.editingFile = true;
+    try {
+      $scope.fetchedXML = await fetchFile();
+      $location.search('editingFile', true);
+      appState.setNavigation({ status: true });
+      $scope.$broadcast('fetchedFile', { data: $scope.fetchedXML });
+    } catch (error) {
+      $scope.fetchedXML = null;
+      errorHandler.handle(error, 'Fetch file error');
+    }
+    $scope.$applyAsync();
+  };
+
   /**
    * This load at init some required data
    */
@@ -97,7 +111,6 @@ export function GroupsController(
         } else {
           throw Error(`Group ${globalGroup} not found`);
         }
-
         shareAgent.deleteAgent();
       }
 
@@ -146,6 +159,19 @@ export function GroupsController(
       }
       $scope.$emit('setCurrentGroup', { currentGroup: $scope.currentGroup });
       $scope.fileViewer = false;
+
+      const openGuide = $location.search().groupModuleGuide;
+      if(openGuide){
+       $scope.goBackFiles();
+       $scope.editGroupAgentConfig();
+       $scope.modulesGuideProps = {
+        selectedModule: $location.search().groupModuleGuide,
+        close: () => $scope.openHelp()
+      };
+      $location.search('groupModuleGuide', null);
+       $scope.helpOpened = true;
+      }
+
       $scope.$applyAsync();
     } catch (error) {
       errorHandler.handle(error, 'Groups');
@@ -283,20 +309,6 @@ export function GroupsController(
     } catch (error) {
       return Promise.reject(error);
     }
-  };
-
-  $scope.editGroupAgentConfig = async () => {
-    $scope.editingFile = true;
-    try {
-      $scope.fetchedXML = await fetchFile();
-      $location.search('editingFile', true);
-      appState.setNavigation({ status: true });
-      $scope.$broadcast('fetchedFile', { data: $scope.fetchedXML });
-    } catch (error) {
-      $scope.fetchedXML = null;
-      errorHandler.handle(error, 'Fetch file error');
-    }
-    $scope.$applyAsync();
   };
 
   $scope.closeEditingFile = () => {
