@@ -449,7 +449,6 @@ export class SettingsController {
         try {
           await this.testAPI.check(api);
         } catch (error) {
-          console.error('entro en este catch')
           numError = numError + 1;
         }
       };
