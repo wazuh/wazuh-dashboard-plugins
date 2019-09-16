@@ -20,6 +20,7 @@ import {
   EuiSpacer,
   EuiCode,
   EuiButton,
+  EuiButtonEmpty,
   EuiSteps,
   EuiCallOut
 } from '@elastic/eui';
@@ -31,7 +32,6 @@ export class AddApi extends Component {
       status: 'incomplete',
       fetchingData: false
     };
-    this.statuses = ['complete', 'warning'];
   }
 
   async checkConnection() {
@@ -41,15 +41,21 @@ export class AddApi extends Component {
         status: 'incomplete',
         fetchingData: true
       });
-  
-      const result = await this.props.checkForNewApis();
-  
+
+      await this.props.checkForNewApis();
+
       this.setState({
-        status: this.statuses[Math.floor(Math.random() * 2)],
-        fetchingData: false
+        status: 'complete',
+        fetchingData: false,
+        closedEnabled: true
       });
     } catch (error) {
-
+      this.setState({
+        status: error.type || 'danger',
+        closedEnabled: error.closedEnabled || false,
+        message: error.message || 'Wazuh API not reachable, please review your configuration',
+        fetchingData: false
+      });
     }
   }
 
@@ -64,14 +70,14 @@ export class AddApi extends Component {
 
     const checkConnectionChildren = (
       <div>
-        {this.state.status === 'warning' && (
+        {(this.state.status === 'warning' || this.state.status === 'danger') && (
           <EuiCallOut
-            color="warning"
+            color={this.state.status}
             iconType="help"
-            title="Wazuh API not reachable, please review your configuration."
+            title={this.state.message}
           />
         )}
-        {this.state.status === 'warning' && <EuiSpacer />}
+        {(this.state.status === 'warning' || this.state.status === 'danger') && <EuiSpacer />}
         <EuiText>
           Check that the Kibana server can reach the configured Wazuh API(s).
         </EuiText>
@@ -82,6 +88,14 @@ export class AddApi extends Component {
         >
           Check connection
         </EuiButton>
+        {this.state.closedEnabled && (
+          <EuiButtonEmpty
+            // TODO chagne action ot close
+            onClick={async () => await this.checkConnection()}
+          >
+            Close
+          </EuiButtonEmpty>
+        )}
       </div>
     );
 

@@ -443,6 +443,7 @@ export class SettingsController {
       const hosts = result.data || [];
       let numError = 0;
       //Tries to check if there are new APIs entries in the wazuh-hosts.yml also, checks if some of them have connection
+      if (!hosts.length) throw {message: 'Wazuh API not reachable, please review your configuration', type: 'danger', closedEnabled: false};
       for (let idx in hosts) {
         const host = hosts[idx];
         const id = Object.keys(host)[0];
@@ -454,10 +455,12 @@ export class SettingsController {
           numError = numError + 1;
         }
       };
-      // Check if any API had a success connection
-      // TODO handle if some host has connection
-      //hosts.length > numError && console.log('ok')
-      return hosts;
+      if (numError) {
+        const err = hosts.length > numError ? {message: 'Some API entry cannot be reachabled', type: 'warning', closedEnabled: true} : {message: 'Wazuh API not reachable, please review your configuration', type: 'danger', closedEnabled: false}
+        if (hosts.length > numError)
+        throw err;
+      }
+      return;
     } catch (error) {
       return Promise.reject(error);
     }
