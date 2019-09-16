@@ -104,7 +104,7 @@ export function settingsWizard(
       try {
         currentApi = JSON.parse(appState.getCurrentAPI()).id;
       } catch (error) {
-        // eslint-disable-next-line
+        console.log('Error parsing JSON (settingsWizards.callCheckStored 1)', error);
       }
       if (currentApi && !appState.getExtensions(currentApi)) {
         const extensions = {
@@ -122,8 +122,10 @@ export function settingsWizard(
         };
         appState.setExtensions(currentApi, extensions);
       }
+      
       checkTimestamp(appState, genericReq, $location, wzMisc)
-        .then(() => testAPI.checkStored(currentApi))
+        .then(() => {
+          testAPI.checkStored(currentApi)})
         .then(data => {
           if (data === 3099) {
             deferred.resolve();
@@ -205,13 +207,14 @@ export function settingsWizard(
                     id: id
                   })
                 );
+                callCheckStored();
               }
-              callCheckStored();
             } else {
               setUpCredentials(
                 'Wazuh App: Please set up Wazuh API credentials.'
               );
             }
+            deferred.resolve();
           })
           .catch(error => {
             !disableErrors && errorHandler.handle(error);
