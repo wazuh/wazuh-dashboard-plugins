@@ -124,8 +124,7 @@ export function settingsWizard(
       }
       
       checkTimestamp(appState, genericReq, $location, wzMisc)
-        .then(() => {
-          testAPI.checkStored(currentApi)})
+        .then(() => testAPI.checkStored(currentApi))
         .then(data => {
           if (data === 3099) {
             deferred.resolve();
