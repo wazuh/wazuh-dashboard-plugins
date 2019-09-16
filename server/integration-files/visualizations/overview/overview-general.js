@@ -32,7 +32,7 @@ export default [
     _source: {
       title: 'Agents status node',
       visState:
-        '{ "aggs": [], "params": { "expression": ".es(index=wazuh-monitoring-3.x-*, timefield=timestamp, split=node_name:5, metric=cardinality:id).label(label=\'$1\', regex=\'^.+:(.+)>.+\')", "interval": "15m" }, "title": "Agents per node", "type": "timelion" }',
+        '{ "aggs": [], "params": { "expression": ".es(index=wazuh-monitoring-3.x-*, timefield=timestamp, split=node_name:5, metric=cardinality:id).label(label=\'$1\', regex=\'^.+:(.+)>.+\').yaxis(tickDecimals=-1)", "interval": "15m" }, "title": "Agents per node", "type": "timelion" }',
       uiStateJSON:
         '{}',
       description: '',
