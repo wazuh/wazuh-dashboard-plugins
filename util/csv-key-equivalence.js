@@ -36,6 +36,8 @@ export const KeyEquivalence = {
   file: 'File',
   gdpr: 'GDPR',
   pci: 'PCI',
+  hipaa: 'HIPAA',
+  'nist-800-53': 'NIST 800-53',
   cis: 'CIS',
   event: 'Event',
   groups: 'Groups',
@@ -94,7 +96,7 @@ export const KeyEquivalence = {
   gid: 'Group ID',
   mtime: 'Last modified',
   priority: 'Priority',
-  cmd: 'CMD',
+  cmd: 'Command',
   nlwp: 'NLWP',
   process: 'Process',
   md5: 'MD5',
@@ -110,5 +112,12 @@ export const KeyEquivalence = {
   date: 'Date',
   value: 'Value',
   location: 'Location',
-  mtu: 'MTU'
+  mtu: 'MTU',
+  attributes: 'Attributes',
+  policy_id: 'Policy ID',
+  policy_ID: 'Policy ID',
+  compliance: 'Compliance',
+  rules: 'Rules',
+  reason: 'Reason',
+  registerIP: 'Register IP'
 };

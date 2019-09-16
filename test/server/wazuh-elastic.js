@@ -1,8 +1,6 @@
 const chai = require('chai');
 const needle = require('needle');
 
-const { version, revision } = require('../../package.json');
-
 const kibanaServer = process.env.KIBANA_IP || 'localhost';
 
 chai.should();
@@ -97,73 +95,6 @@ describe('wazuh-elastic', () => {
       res.body.statusCode.should.be.eql(200);
       res.body.status.should.be.eql(true);
       res.body.data.should.be.eql('Index pattern found');
-    });
-  });
-
-  /*it('GET /elastic/top/{mode}/{cluster}/{field}/{pattern}', async () => {
-        throw Error('Test not implemented...')
-    })*/
-
-  describe('Checking .wazuh-version index', () => {
-    it('GET /elastic/setup', async () => {
-      const res = await needle(
-        'get',
-        `${kibanaServer}:5601/elastic/setup`,
-        {},
-        headers
-      );
-      res.body.statusCode.should.be.eql(200);
-      res.body.data.should.be.a('object');
-      res.body.data.name.should.be.eql('Wazuh App');
-      res.body.data['app-version'].should.be.eql(version);
-      res.body.data.revision.should.be.eql(revision);
-      res.body.data.installationDate.should.be.a('string');
-      res.body.data.lastRestart.should.be.a('string');
-    });
-
-    it('GET /elastic/timestamp', async () => {
-      const res = await needle(
-        'get',
-        `${kibanaServer}:5601/elastic/timestamp`,
-        {},
-        headers
-      );
-      res.body.installationDate.should.be.a('string');
-      res.body.lastRestart.should.be.a('string');
-    });
-
-    it('POST /elastic/alerts full parameters', async () => {
-      const res = await needle(
-        'POST',
-        `${kibanaServer}:5601/elastic/alerts`,
-        {
-          pattern: 'wazuh-alerts-3.x-*',
-          'agent.id': '000',
-          'rule.groups': 'ossec',
-          'manager.name': 'master',
-          'cluster.name': 'wazuh',
-          size: 1
-        },
-        headers
-      );
-      const alerts = res.body.alerts;
-      alerts.should.be.a('array');
-      alerts.length.should.be.eql(1);
-      alerts[0].agent.id.should.be.eql('000');
-      alerts[0].rule.groups.includes('ossec').should.be.eql(true);
-      alerts[0].manager.name.should.be.eql('master');
-      alerts[0].cluster.name.should.be.eql('wazuh');
-    });
-
-    it('POST /elastic/alerts no parameters', async () => {
-      const res = await needle(
-        'POST',
-        `${kibanaServer}:5601/elastic/alerts`,
-        {},
-        headers
-      );
-      res.body.alerts.should.be.a('array');
-      res.body.alerts.length.should.be.eql(10);
     });
   });
 });

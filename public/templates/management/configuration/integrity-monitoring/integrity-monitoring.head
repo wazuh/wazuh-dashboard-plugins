@@ -24,16 +24,10 @@
     <!-- End headline -->
 
     <!-- Integrity monitoring navigation bar -->
-    <md-nav-bar
-        class="wz-nav-bar"
-        md-selected-nav-item="configurationSubTab"
-        nav-bar-aria-label="Integrity monitoring navigation links">
-        <md-nav-item class="wz-nav-item" md-nav-click="switchConfigurationSubTab('fim-general')" name="fim-general">General</md-nav-item>
-        <md-nav-item class="wz-nav-item" md-nav-click="switchConfigurationSubTab('fim-monitored')" name="fim-monitored">Monitored</md-nav-item>
-        <md-nav-item class="wz-nav-item" md-nav-click="switchConfigurationSubTab('fim-ignored')" name="fim-ignored">Ignored</md-nav-item>
-        <md-nav-item class="wz-nav-item" md-nav-click="switchConfigurationSubTab('fim-nodiff')" name="fim-nodiff">No diff</md-nav-item>
-        <md-nav-item class="wz-nav-item" md-nav-click="switchConfigurationSubTab('fim-whodata')" ng-if="!agent || agent.isLinuxOS" name="fim-whodata">Who-data</md-nav-item>
-    </md-nav-bar>
+    <div ng-if="configurationTabsProps" class="md-padding wz-padding-top-0"
+      ng-init="buildProps([{id:'fim-general', name: 'General'}, {id: 'fim-monitored', name: 'Monitored'}, {id: 'fim-ignored', name: 'Ignored'}, {id: 'fim-nodiff', name: 'No diff'}, {id: 'fim-whodata', name: 'Who-data', agent}])">
+      <react-component name="Tabs" props="configurationTabsProps" />
+    </div>
     <!-- End Integrity monitoring navigation bar -->
 
     <div class="md-padding md-padding-top-16" ng-if="load">
@@ -41,7 +35,7 @@
     </div>
 
     <!-- This section contains the main content and the right sidenav -->
-    <div flex="auto" layout="row" ng-if="!load">
+    <div flex="auto" layout="row" ng-if="!load" class="d-height">
 
         <!-- No configuration section -->
         <wz-no-config

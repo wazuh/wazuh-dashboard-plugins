@@ -17,8 +17,6 @@ const needRestartFields = [
   'pattern',
   'wazuh.shards',
   'wazuh.replicas',
-  'wazuh-version.shards',
-  'wazuh-version.replicas',
   'wazuh.monitoring.enabled',
   'wazuh.monitoring.frequency',
   'wazuh.monitoring.shards',

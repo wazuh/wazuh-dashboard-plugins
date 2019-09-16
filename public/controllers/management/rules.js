@@ -34,7 +34,7 @@ export function RulesController(
   /**
    * This performs a search with a given term
    */
-  $scope.search = term => {
+  $scope.search = (term, fromClick = false) => {
     let clearInput = true;
     if (term && term.startsWith('group:') && term.split('group:')[1].trim()) {
       $scope.custom_search = '';
@@ -82,6 +82,33 @@ export function RulesController(
       $scope.$broadcast('wazuhFilter', { filter });
     } else if (
       term &&
+      term.startsWith('hipaa:') &&
+      term.split('hipaa:')[1].trim()
+    ) {
+      $scope.custom_search = '';
+      const filter = { name: 'hipaa', value: term.split('hipaa:')[1].trim() };
+      $scope.appliedFilters = $scope.appliedFilters.filter(
+        item => item.name !== 'hipaa'
+      );
+      $scope.appliedFilters.push(filter);
+      $scope.$broadcast('wazuhFilter', { filter });
+    } else if (
+      term &&
+      term.startsWith('nist-800-53:') &&
+      term.split('nist-800-53:')[1].trim()
+    ) {
+      $scope.custom_search = '';
+      const filter = {
+        name: 'nist-800-53',
+        value: term.split('nist-800-53:')[1].trim()
+      };
+      $scope.appliedFilters = $scope.appliedFilters.filter(
+        item => item.name !== 'nist-800-53'
+      );
+      $scope.appliedFilters.push(filter);
+      $scope.$broadcast('wazuhFilter', { filter });
+    } else if (
+      term &&
       term.startsWith('file:') &&
       term.split('file:')[1].trim()
     ) {
@@ -110,7 +137,7 @@ export function RulesController(
       clearInput = false;
       $scope.$broadcast('wazuhSearch', { term, removeFilters: 0 });
     }
-    if (clearInput) {
+    if (clearInput && !fromClick) {
       const searchBar = $('#search-input-rules');
       searchBar.val('');
     }
@@ -225,11 +252,9 @@ export function RulesController(
    * This function takes back to the list but adding a filter from the detail view
    */
   $scope.addDetailFilter = (name, value) => {
-    $scope.appliedFilters.push({ name, value });
-    // Clear the autocomplete component
-    $scope.searchTerm = '';
     // Go back to the list
     $scope.closeDetailView();
+    $scope.search(`${name}:${value}`);
   };
 
   $scope.openFile = (file, path) => {
@@ -395,7 +420,7 @@ export function RulesController(
   });
 
   $scope.$on('applyFilter', (event, parameters) => {
-    $scope.search(parameters.filter);
+    $scope.search(parameters.filter, true);
   });
 
   $scope.$on('viewFileOnlyTable', (event, parameters) => {

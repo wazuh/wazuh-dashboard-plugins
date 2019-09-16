@@ -11,6 +11,7 @@
  */
 import * as FileSaver from '../../services/file-saver';
 import { timefilter } from 'ui/timefilter';
+import { version } from '../../../package.json';
 
 export class AgentsPreviewController {
   /**
@@ -27,6 +28,7 @@ export class AgentsPreviewController {
   constructor(
     $scope,
     genericReq,
+    apiReq,
     appState,
     $location,
     errorHandler,
@@ -40,6 +42,7 @@ export class AgentsPreviewController {
   ) {
     this.$scope = $scope;
     this.genericReq = genericReq;
+    this.apiReq = apiReq;
     this.appState = appState;
     this.$location = $location;
     this.errorHandler = errorHandler;
@@ -90,11 +93,14 @@ export class AgentsPreviewController {
       this.$location.search('tab', this.submenuNavItem);
     });
 
-    this.$scope.$on('wazuhFetched', (ev, parameters) => {
-      ev.stopPropagation();
-      this.$scope.showNoAgents =
-        !parameters.items.length > 0 && !parameters.filters.length;
+    this.$scope.$on('wazuhFetched', evt => {
+      evt.stopPropagation();
     });
+
+    this.registerAgentsProps = {
+      addNewAgent: flag => this.addNewAgent(flag),
+      getWazuhVersion: () => this.getWazuhVersion()
+    };
 
     this.init = false;
     //Load
@@ -201,6 +207,9 @@ export class AgentsPreviewController {
       this.osPlatforms = unique.osPlatforms;
       this.lastAgent = unique.lastAgent;
       this.summary = unique.summary;
+      if (!this.lastAgent || !this.lastAgent.id) {
+        this.addNewAgent(true);
+      }
 
       if (agentsTop.data.data === '') {
         this.mostActiveAgent.name = this.appState.getClusterInfo().manager;
@@ -225,13 +234,12 @@ export class AgentsPreviewController {
     return;
   }
 
-  registerNewAgent(flag) {
-    this.$scope.registerNewAgent = flag;
+  addNewAgent(flag) {
+    this.addingNewAgent = flag;
   }
 
   reloadList() {
     this.refreshAgentsStats();
-    this.$scope.$broadcast('wazuhSearch', { term: this.prevSearch || '' });
   }
 
   async refreshAgentsStats() {
@@ -245,6 +253,7 @@ export class AgentsPreviewController {
     } catch (error) {
       this.errorHandler.handle('Error refreshing agents stats');
     }
+    this.$scope.$broadcast('reloadSearchFilterBar', {});
   }
 
   openRegistrationDocs() {
@@ -252,5 +261,19 @@ export class AgentsPreviewController {
       'https://documentation.wazuh.com/current/user-manual/registering/index.html',
       '_blank'
     );
+  }
+
+
+  /**
+   * Returns the Wazuh version as x.y.z
+   */
+  async getWazuhVersion() {
+    try {
+      const data = await this.apiReq.request('GET', '/version', {}); 
+      const result = ((data || {}).data || {}).data;
+      return result ? result.substr(1) : version;
+    } catch (error) {
+      return version;
+    }
   }
 }

@@ -1,27 +1,14 @@
 <md-content flex layout="column" ng-if="octrl.tab === 'pci' && octrl.tabView === 'panels'"
     ng-class="{'no-opacity': resultState !== 'ready' || !rendered}" layout-align="start">
 
-    <div layout="row" layout-align="center stretch">
-        <md-card flex class="wz-md-card">
-            <md-tabs md-selected="selectedPciIndex" class="wz-md-tab" md-border-bottom md-dynamic-height
-                id="pciReq_tab">
-                <md-tab ng-repeat="tab in octrl.pciTabs" ng-disabled="tab.disabled" label="{{tab.title}}">
-                    <div class="md-padding">
-                        <span class="wz-headline-title">PCI DSS Requirement: {{tab.title}}</span>
-                        <md-divider class="wz-margin-top-10"></md-divider>
-                        <div layout="row" class="wz-padding-top-10 wz-line-height">
-                            <div ng-bind-html="tab.content"></div>
-                        </div>
-                    </div>
-                </md-tab>
-            </md-tabs>
-        </md-card>
+    <div ng-if="octrl.pciReqs" class="wz-margin-10">
+        <react-component name='RequirementCard' props="octrl.pciReqs"/>
     </div>
 
     <div layout="row" layout-align="center stretch" class="height-400">
         <md-card flex="70" class="wz-md-card" ng-class="{'fullscreen': octrl.expandArray[0]}">
             <md-card-actions layout="row" class="wz-card-actions-vis" ng-dblclick="octrl.expand(0)">
-                <span class="wz-headline-title">PCI requirements</span>
+                <span class="wz-headline-title">PCI DSS requirements</span>
                 <span flex></span>
                 <span class="cursor-pointer" ng-click="octrl.expand(0)">
                     <react-component name="EuiIcon" props="{type:'expand'}" />

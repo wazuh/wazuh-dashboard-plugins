@@ -12,6 +12,8 @@
 export const defaultExt = {
   pci: true,
   gdpr: true,
+  hipaa: true,
+  nist: true,
   audit: true,
   oscap: false,
   ciscat: false,

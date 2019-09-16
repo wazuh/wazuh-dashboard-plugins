@@ -1,0 +1,129 @@
+<md-content flex layout="column" ng-if="octrl.tab === 'hipaa' && octrl.tabView === 'panels'"
+    ng-class="{'no-opacity': resultState !== 'ready' || !rendered}" layout-align="start">
+
+    <div ng-if="octrl.hipaaReqs" class="wz-margin-10">
+        <react-component name='RequirementCard' props="octrl.hipaaReqs" />
+    </div>
+
+    <div layout="row" layout-align="center stretch" class="height-570">
+        <div flex layout="column">
+            <md-card flex class="wz-md-card" ng-class="{'fullscreen': octrl.expandArray[4]}">
+                <md-card-actions layout="row" class="wz-card-actions-vis" ng-dblclick="octrl.expand(4)">
+                    <span class="wz-headline-title">Alerts volume by agent</span>
+                    <span flex></span>
+                    <span class="cursor-pointer" ng-click="octrl.expand(4)">
+                        <react-component name="EuiIcon" props="{type:'expand'}" />
+                    </span>
+                </md-card-actions>
+                <md-card-content class="wazuh-column">
+                    <kbn-vis id="Wazuh-App-Overview-HIPAA-Heatmap" vis-id="'Wazuh-App-Overview-HIPAA-Heatmap'">
+                    </kbn-vis>
+                </md-card-content>
+            </md-card>
+        </div>
+        <div flex layout="column">
+            <div flex layout="row">
+                <md-card flex class="wz-md-card" ng-class="{'fullscreen': octrl.expandArray[0]}">
+                    <md-card-actions layout="row" class="wz-card-actions-vis" ng-dblclick="octrl.expand(0)">
+                        <span class="wz-headline-title">Most common alerts</span>
+                        <span flex></span>
+                        <span class="cursor-pointer" ng-click="octrl.expand(0)">
+                            <react-component name="EuiIcon" props="{type:'expand'}" />
+                        </span>
+                    </md-card-actions>
+                    <md-card-content class="wazuh-column">
+                        <kbn-vis id="Wazuh-App-Overview-HIPAA-Tag-cloud" vis-id="'Wazuh-App-Overview-HIPAA-Tag-cloud'">
+                        </kbn-vis>
+                    </md-card-content>
+                </md-card>
+                <md-card flex class="wz-md-card" ng-class="{'fullscreen': octrl.expandArray[1]}">
+                    <md-card-actions layout="row" class="wz-card-actions-vis" ng-dblclick="octrl.expand(1)">
+                        <span class="wz-headline-title">Top 10 requirements</span>
+                        <span flex></span>
+                        <span class="cursor-pointer" ng-click="octrl.expand(1)">
+                            <react-component name="EuiIcon" props="{type:'expand'}" />
+                        </span>
+                    </md-card-actions>
+                    <md-card-content class="wazuh-column">
+                        <kbn-vis id="Wazuh-App-Overview-HIPAA-Top-10-requirements"
+                            vis-id="'Wazuh-App-Overview-HIPAA-Top-10-requirements'"></kbn-vis>
+                    </md-card-content>
+                </md-card>
+            </div>
+            <div flex layout="row">
+                <md-card flex class="wz-md-card" ng-class="{'fullscreen': octrl.expandArray[7]}">
+                    <md-card-actions layout="row" class="wz-card-actions-vis" ng-dblclick="octrl.expand(7)">
+                        <span class="wz-headline-title">Most active agents</span>
+                        <span flex></span>
+                        <span class="cursor-pointer" ng-click="octrl.expand(7)">
+                            <react-component name="EuiIcon" props="{type:'expand'}" />
+                        </span>
+                    </md-card-actions>
+                    <md-card-content class="wazuh-column">
+                        <kbn-vis id="Wazuh-App-Overview-HIPAA-Top-10-agents"
+                            vis-id="'Wazuh-App-Overview-HIPAA-Top-10-agents'"></kbn-vis>
+                    </md-card-content>
+                </md-card>
+                <md-card flex class="wz-md-card" ng-class="{'fullscreen': octrl.expandArray[2]}">
+                    <md-card-actions layout="row" class="wz-card-actions-vis" ng-dblclick="octrl.expand(2)">
+                        <span class="wz-headline-title">Stats</span>
+                        <span flex></span>
+                        <span class="cursor-pointer" ng-click="octrl.expand(2)">
+                            <react-component name="EuiIcon" props="{type:'expand'}" />
+                        </span>
+                    </md-card-actions>
+                    <md-card-content class="wazuh-column">
+                        <kbn-vis id="Wazuh-App-Overview-HIPAA-Metrics" vis-id="'Wazuh-App-Overview-HIPAA-Metrics'">
+                        </kbn-vis>
+                    </md-card-content>
+                </md-card>
+            </div>
+
+        </div>
+    </div>
+
+    <div layout="row" layout-align="center stretch" class="height-400">
+        <md-card flex class="wz-md-card" ng-class="{'fullscreen': octrl.expandArray[3]}">
+            <md-card-actions layout="row" class="wz-card-actions-vis" ng-dblclick="octrl.expand(3)">
+                <span class="wz-headline-title">Requirements evolution over time</span>
+                <span flex></span>
+                <span class="cursor-pointer" ng-click="octrl.expand(3)">
+                    <react-component name="EuiIcon" props="{type:'expand'}" />
+                </span>
+            </md-card-actions>
+            <md-card-content class="wazuh-column">
+                <kbn-vis id="Wazuh-App-Overview-HIPAA-Top-requirements-over-time"
+                    vis-id="'Wazuh-App-Overview-HIPAA-Top-requirements-over-time'">
+                </kbn-vis>
+            </md-card-content>
+        </md-card>
+        <md-card flex class="wz-md-card" ng-class="{'fullscreen': octrl.expandArray[5]}">
+            <md-card-actions layout="row" class="wz-card-actions-vis" ng-dblclick="octrl.expand(5)">
+                <span class="wz-headline-title">Requirements distribution by agent</span>
+                <span flex></span>
+                <span class="cursor-pointer" ng-click="octrl.expand(5)">
+                    <react-component name="EuiIcon" props="{type:'expand'}" />
+                </span>
+            </md-card-actions>
+            <md-card-content class="wazuh-column">
+                <kbn-vis id="Wazuh-App-Overview-HIPAA-Top-10-requirements-over-time-by-agent"
+                    vis-id="'Wazuh-App-Overview-HIPAA-Top-10-requirements-over-time-by-agent'"></kbn-vis>
+            </md-card-content>
+        </md-card>
+    </div>
+
+    <div layout="row" layout-align="center stretch" class="height-570">
+        <md-card flex class="wz-md-card" ng-class="{'fullscreen': octrl.expandArray[6]}">
+            <md-card-actions layout="row" class="wz-card-actions-vis" ng-dblclick="octrl.expand(6)">
+                <span class="wz-headline-title">Alerts summary</span>
+                <span flex></span>
+                <span class="cursor-pointer" ng-click="octrl.expand(6)">
+                    <react-component name="EuiIcon" props="{type:'expand'}" />
+                </span>
+            </md-card-actions>
+            <md-card-content class="wazuh-column">
+                <kbn-vis vis-id="'Wazuh-App-Overview-HIPAA-Alerts-summary'"></kbn-vis>
+            </md-card-content>
+        </md-card>
+    </div>
+</md-content>

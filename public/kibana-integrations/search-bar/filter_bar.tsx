@@ -17,8 +17,10 @@ import {
   disableFilter,
   enableFilter,
   Filter,
-  pinFilter,
+  //pinFilter,
   toggleFilterDisabled,
+  toggleFilterPinned,
+  isFilterPinned,
   toggleFilterNegated,
   unpinFilter,
 } from '@kbn/es-query';
@@ -176,7 +178,17 @@ class FilterBarUI extends Component<Props, State> {
   };
 
   private onPinAll = () => {
-    const filters = this.props.filters.map(pinFilter);
+    const filters = this.props.filters.map(filter => {
+      const shouldExclude =
+        filter &&
+        filter.meta &&
+        typeof filter.meta.removable !== 'undefined' &&
+        !filter.meta.removable;
+      return isFilterPinned(filter) || shouldExclude
+        ? filter
+        : toggleFilterPinned(filter);
+    });
+
     this.props.onFiltersUpdated(filters);
   };
 

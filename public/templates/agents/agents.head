@@ -1,9 +1,4 @@
 <div flex="auto" layout="column" ng-cloak ng-controller="agentsController">
-
-    <!-- Top navbar section -->
-    <wz-menu ng-init="menuNavItem = 'agents'"></wz-menu>
-    <!-- End top navbar section -->
-
     <!-- Navigation section -->
     <div layout="row" layout-align="start center" ng-if="agent">
         <!-- Breadcrumbs -->
@@ -91,58 +86,11 @@
     </div>
     <!-- End navigation section -->
 
-    <!-- Host monitoring navigation bar -->
-    <md-nav-bar ng-if="inArray(tab, hostMonitoringTabs)" class="wz-nav-bar" ng-show="tab !== 'welcome'"
-        md-selected-nav-item="tab" nav-bar-aria-label="Host monitoring navigation links">
-        <md-nav-item class="wz-nav-item" md-nav-click="switchTab('general')" name="general">{{ tabNames['general'] }}
-        </md-nav-item>
-        <md-nav-item class="wz-nav-item" md-nav-click="switchTab('fim')" name="fim">{{ tabNames['fim'] }}</md-nav-item>
-        <md-nav-item class="wz-nav-item" md-nav-click="switchTab('syscollector')" name="syscollector">{{
-            tabNames['syscollector'] }}</md-nav-item>
-    </md-nav-bar>
-    <!-- End Host monitoring navigation bar -->
-
-    <!-- System audit navigation bar -->
-    <md-nav-bar ng-if="inArray(tab, systemAuditTabs) && (extensions.audit || extensions.oscap || extensions.ciscat)"
-        class="wz-nav-bar" ng-show="tab !== 'welcome'" md-selected-nav-item="tab"
-        nav-bar-aria-label="System audit navigation links">
-        <md-nav-item class="wz-nav-item" md-nav-click="switchTab('pm')" name="pm">{{ tabNames['pm'] }}</md-nav-item>
-        <md-nav-item class="wz-nav-item" md-nav-click="switchTab('sca')" name="sca">{{
-            tabNames['sca'] }}</md-nav-item>
-        <md-nav-item ng-show="extensions.audit" class="wz-nav-item" md-nav-click="switchTab('audit')" name="audit">{{
-            tabNames['audit'] }}</md-nav-item>
-        <md-nav-item ng-show="extensions.oscap" class="wz-nav-item" md-nav-click="switchTab('oscap')" name="oscap">{{
-            tabNames['oscap'] }}</md-nav-item>
-        <md-nav-item ng-show="extensions.ciscat" class="wz-nav-item" md-nav-click="switchTab('ciscat')" name="ciscat">{{
-            tabNames['ciscat'] }}</md-nav-item>
-    </md-nav-bar>
-    <!-- End System audit navigation bar -->
-
-    <!-- Security navigation bar -->
-    <md-nav-bar ng-if="inArray(tab, securityTabs)" class="wz-nav-bar" ng-show="tab !== 'welcome'"
-        md-selected-nav-item="tab" nav-bar-aria-label="Security navigation links">
-        <md-nav-item class="wz-nav-item" md-nav-click="switchTab('vuls')" name="vuls">{{ tabNames['vuls'] }}
-        </md-nav-item>
-        <md-nav-item ng-show="extensions.virustotal" class="wz-nav-item" md-nav-click="switchTab('virustotal')"
-            name="virustotal">{{
-            tabNames['virustotal'] }}</md-nav-item>
-        <md-nav-item ng-show="extensions.osquery" class="wz-nav-item" md-nav-click="switchTab('osquery')"
-            name="osquery">{{
-            tabNames['osquery'] }}</md-nav-item>
-        <md-nav-item ng-show="extensions.docker" class="wz-nav-item" md-nav-click="switchTab('docker')" name="docker">{{
-            tabNames['docker'] }}</md-nav-item>
-    </md-nav-bar>
-    <!-- End Security navigation bar -->
-
-    <!-- Compliance navigation bar -->
-    <md-nav-bar ng-if="inArray(tab, complianceTabs) && extensions.pci && extensions.gdpr" class="wz-nav-bar"
-        ng-show="tab !== 'welcome'" md-selected-nav-item="tab" nav-bar-aria-label="Compliance navigation links">
-        <md-nav-item ng-show="extensions.pci" class="wz-nav-item" md-nav-click="switchTab('pci')" name="pci">{{
-            tabNames['pci'] }}</md-nav-item>
-        <md-nav-item ng-show="extensions.gdpr" class="wz-nav-item" md-nav-click="switchTab('gdpr')" name="gdpr">{{
-            tabNames['gdpr'] }}</md-nav-item>
-    </md-nav-bar>
-    <!-- End Compliance navigation bar -->
+    <!-- Navigation bar -->
+    <div ng-if="agentsTabsProps" ng-show="tab !== 'welcome'">
+        <react-component name="Tabs" props="agentsTabsProps" />
+    </div>
+    <!-- End of navigation bar -->
 
     <!-- Discover search bar section -->
     <kbn-dis
@@ -152,8 +100,7 @@
 
     <!-- Loading status section -->
     <div layout="column" layout-align="center center"
-        ng-if="tab !== 'welcome' && tab !== 'sca' && tab !== 'configuration' && tab !== 'syscollector'"
-        ng-show="resultState === 'ready' && tabView === 'panels' && !rendered">
+        ng-if="tab !== 'welcome' && tab !== 'sca' && tab !== 'configuration' && tab !== 'syscollector' && tabView === 'panels' && !rendered && resultState !== 'none'">
         <div class="percentage"><i class="fa fa-fw fa-spin fa-spinner" aria-hidden="true"></i></div>
         <div class="percentage">{{loadingStatus}}</div>
     </div>
@@ -183,13 +130,7 @@
     <div layout="row" class="wz-margin-top-10 wz-margin-right-8 wz-margin-left-8"
         ng-if="!showSyscheckFiles && !showScaScan && tab !== 'welcome' && tab !== 'configuration' && tab !== 'syscollector' && tab !== 'sca'"
         ng-show="resultState === 'none' && tabView === 'panels'">
-        <div flex class="euiCallOut euiCallOut--warning">
-            <div class="euiCallOutHeader">
-                <react-component name="EuiIcon" props="{type:'help',className:'euiCallOutHeader__title'}" />
-                <span class="euiCallOutHeader__title">There are no results for selected time range. Try another
-                    one.</span>
-            </div>
-        </div>
+        <react-component flex name="EuiCallOut" props="{color:'warning',iconType:'help', title:'There are no results for selected time range. Try another one.'}" />
     </div>
     <!-- No results section -->
 

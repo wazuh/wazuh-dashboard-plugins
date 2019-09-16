@@ -22,7 +22,8 @@ export function GroupsController(
   shareAgent,
   groupHandler,
   wzTableFilter,
-  wazuhConfig
+  wazuhConfig,
+  reportingService
 ) {
   $scope.addingGroup = false;
   $scope.$on('groupsIsReloaded', () => {
@@ -238,6 +239,14 @@ export function GroupsController(
     $scope.$applyAsync();
   };
 
+  $scope.exportConfiguration = enabledComponents => {
+    reportingService.startConfigReport(
+      $scope.currentGroup,
+      'groupConfig',
+      enabledComponents
+    );
+  };
+
   /**
    * This show us a group file, for a given group and file
    */
@@ -294,6 +303,7 @@ export function GroupsController(
     $scope.editingFile = false;
     appState.setNavigation({ status: true });
     $scope.$broadcast('closeEditXmlFile', {});
+    $scope.groupsTabsProps.selectedTab = 'files';
     $scope.$applyAsync();
   };
 
@@ -557,6 +567,10 @@ export function GroupsController(
     return;
   };
 
+  $scope.clearFailedErrors = () => {
+    $scope.failedErrors = false;
+  };
+
   $scope.checkLimit = () => {
     if ($scope.firstSelectedList) {
       const itemsToSave = getItemsToSave();
@@ -603,6 +617,18 @@ export function GroupsController(
       errorHandler.handle(error.message || error);
     }
     $scope.$broadcast('wazuhSearch', {});
+  };
+
+  $scope.groupsTabsProps = {
+    clickAction: tab => {
+      if (tab === 'agents') {
+        $scope.goBackToAgents();
+      } else if (tab === 'files') {
+        $scope.goBackFiles();
+      }
+    },
+    selectedTab: $scope.groupsSelectedTab || 'agents',
+    tabs: [{ id: 'agents', name: 'Agents' }, { id: 'files', name: 'Content' }]
   };
 
   // Come from the pencil icon on the groups table

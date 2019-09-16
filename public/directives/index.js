@@ -1,5 +1,5 @@
 /*
- * Wazuh app - File for app requirements and set up
+ * Wazuh app - Load all the directives.
  * Copyright (C) 2015-2019 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -29,8 +29,6 @@ import './wz-multiple-selector/wz-multiple-selector';
 import './wz-multiple-selector/wz-multiple-selector.less';
 import './wz-list-manage/wz-list-manage';
 import './wz-kbn-switch/wz-kbn-switch';
-import './wz-register-agents/wz-register-agents';
-import './wz-register-agents/wz-register-agents.less';
 import './wz-add-filter-chip/wz-add-filter-chip';
 import './wz-add-filter-chip/wz-add-filter-chip.less';
 import './wz-src/wz-src';

@@ -13,6 +13,8 @@
 import template from './wz-config-viewer.html';
 import { uiModules } from 'ui/modules';
 import CodeMirror from '../../utils/codemirror/lib/codemirror';
+import chrome from 'ui/chrome';
+import { DynamicHeight } from '../../utils/dynamic-height';
 
 const app = uiModules.get('app/wazuh', []);
 
@@ -32,6 +34,7 @@ class WzConfigViewer {
 
   controller($scope, $document, $window) {
     const window = $window;
+    const IS_DARK_THEME = chrome.getUiSettingsClient().get('theme:darkMode');
     const setJsonBox = () => {
       $scope.jsonCodeBox = CodeMirror.fromTextArea(
         $document[0].getElementById('viewer_json_box'),
@@ -42,13 +45,14 @@ class WzConfigViewer {
           matchBrackets: true,
           mode: { name: 'javascript', json: true },
           readOnly: true,
-          theme: 'ttcn',
+          theme: IS_DARK_THEME ? 'lesser-dark' : 'ttcn',
           foldGutter: true,
           styleSelectedText: true,
           gutters: ['CodeMirror-foldgutter']
         }
       );
     };
+
     const setXmlBox = () => {
       $scope.xmlCodeBox = CodeMirror.fromTextArea(
         $document[0].getElementById('viewer_xml_box'),
@@ -60,7 +64,7 @@ class WzConfigViewer {
           matchBrackets: true,
           mode: 'text/xml',
           readOnly: true,
-          theme: 'ttcn',
+          theme: IS_DARK_THEME ? 'lesser-dark' : 'ttcn',
           foldGutter: true,
           styleSelectedText: true,
           gutters: ['CodeMirror-foldgutter']
@@ -69,29 +73,9 @@ class WzConfigViewer {
       bindXmlListener();
     };
 
-    $(window).on('resize', function() {
-      dynamicHeight();
+    $(window).on('resize', () => {
+      DynamicHeight.dynamicHeight('configViewer', 30);
     });
-
-    const dynamicHeight = () => {
-      setTimeout(function() {
-        const editorContainer = $('.configViewer');
-        const windows = $(window).height();
-        const offsetTop = getPosition(editorContainer[0]).y;
-        const bottom = $scope.isLogs ? 75 : 20;
-        const headerContainer = $('.wzXmlEditorHeader');
-        const headerContainerHeight =
-          headerContainer.height() + 30
-            ? headerContainer.height() + 30
-            : $scope.isLogs
-            ? 0
-            : 80;
-        editorContainer.height(windows - (offsetTop + bottom));
-        $('.wzXmlEditorBody .CodeMirror').height(
-          windows - (offsetTop + bottom + headerContainerHeight)
-        );
-      }, 1);
-    };
 
     const refreshJsonBox = json => {
       $scope.jsoncontent = json;
@@ -109,7 +93,6 @@ class WzConfigViewer {
     };
 
     const refreshXmlBox = (xml, isLogs) => {
-      $scope.isLogs = isLogs;
       $scope.xmlcontent = xml;
       if (!$scope.xmlCodeBox) {
         setXmlBox();
@@ -119,13 +102,12 @@ class WzConfigViewer {
         setTimeout(function() {
           $scope.xmlCodeBox.refresh();
           $scope.$applyAsync();
-          $scope.isLogs
-            ? dynamicHeight()
+          isLogs
+            ? DynamicHeight.dynamicHeight('configViewer', 30, isLogs)
             : window.dispatchEvent(new Event('resize')); // eslint-disable-line
         }, 200);
       }
     };
-
     $scope.callgetjson = () => $scope.getjson();
 
     $scope.callgetxml = () => $scope.getxml();
@@ -167,20 +149,6 @@ class WzConfigViewer {
         $scope.jsonCodeBox.refresh();
       }
     });
-
-    function getPosition(element) {
-      var xPosition = 0;
-      var yPosition = 0;
-
-      while (element) {
-        xPosition +=
-          element.offsetLeft - element.scrollLeft + element.clientLeft;
-        yPosition += element.offsetTop - element.scrollTop + element.clientTop;
-        element = element.offsetParent;
-      }
-
-      return { x: xPosition, y: yPosition };
-    }
   }
 }
 

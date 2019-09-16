@@ -14,6 +14,7 @@ import { generateMetric } from '../../utils/generate-metric';
 import { TabNames } from '../../utils/tab-names';
 import * as FileSaver from '../../services/file-saver';
 import { TabDescription } from '../../../server/reporting/tab-description';
+import { UnsupportedComponents } from '../../utils/components-os-support';
 import {
   metricsGeneral,
   metricsAudit,
@@ -162,11 +163,6 @@ export class AgentsController {
 
     this.tabVisualizations.assign('agents');
 
-    this.$scope.hostMonitoringTabs = ['general', 'fim', 'syscollector'];
-    this.$scope.systemAuditTabs = ['pm', 'sca', 'audit', 'oscap', 'ciscat'];
-    this.$scope.securityTabs = ['vuls', 'virustotal', 'osquery', 'docker'];
-    this.$scope.complianceTabs = ['pci', 'gdpr'];
-
     /**
      * This check if given array of items contais a single given item
      * @param {Object} item
@@ -214,6 +210,9 @@ export class AgentsController {
 
     this.$scope.startVis2Png = () => this.startVis2Png();
 
+    this.$scope.shouldShowComponent = component =>
+      this.shouldShowComponent(component);
+
     this.$scope.$on('$destroy', () => {
       this.visFactoryService.clearAll();
     });
@@ -223,6 +222,14 @@ export class AgentsController {
     this.$scope.goGroup = () => {
       this.shareAgent.setAgent(this.$scope.agent);
       this.$location.path('/manager/groups');
+    };
+
+    this.$scope.exportConfiguration = enabledComponents => {
+      this.reportingService.startConfigReport(
+        this.$scope.agent,
+        'agentConfig',
+        enabledComponents
+      );
     };
 
     this.$scope.restartAgent = async agent => {
@@ -370,7 +377,8 @@ export class AgentsController {
       this.$scope.showSyscheckFiles = !this.$scope.showSyscheckFiles;
       if (!this.$scope.showSyscheckFiles) {
         this.$scope.$emit('changeTabView', {
-          tabView: this.$scope.tabView
+          tabView: this.$scope.tabView,
+          tab: this.$scope.tab
         });
       }
       this.$scope.$applyAsync();
@@ -381,7 +389,8 @@ export class AgentsController {
       this.$scope.showScaScan = !this.$scope.showScaScan;
       if (!this.$scope.showScaScan) {
         this.$scope.$emit('changeTabView', {
-          tabView: this.$scope.tabView
+          tabView: this.$scope.tabView,
+          tab: this.$scope.tab
         });
       }
       this.$scope.$applyAsync();
@@ -437,14 +446,7 @@ export class AgentsController {
     };
 
     this.$scope.expand = i => this.expand(i);
-
-    this.$scope.welcomeCardsProps = {
-      switchTab: tab => this.switchTab(tab),
-      extensions: this.$scope.extensions,
-      api: this.appState.getCurrentAPI(),
-      setExtensions: (api, extensions) =>
-        this.appState.setExtensions(api, extensions)
-    };
+    this.setTabs();
   }
   /**
    * Create metric for given object
@@ -452,7 +454,10 @@ export class AgentsController {
    */
   createMetrics(metricsObject) {
     for (let key in metricsObject) {
-      this.$scope[key] = () => generateMetric(metricsObject[key]);
+      this.$scope[key] = () => {
+        const metric = generateMetric(metricsObject[key]);
+        return !!metric ? metric : '-';
+      };
     }
   }
 
@@ -496,7 +501,7 @@ export class AgentsController {
   ) {
     try {
       if (this.$scope.tabView === subtab && !force) return;
-
+      this.tabVisualizations.clearDeadVis();
       this.visFactoryService.clear(onlyAgent);
       this.$location.search('tabView', subtab);
       const localChange =
@@ -524,7 +529,8 @@ export class AgentsController {
         this.changeAgent = false;
       } else {
         this.$scope.$emit('changeTabView', {
-          tabView: this.$scope.tabView
+          tabView: this.$scope.tabView,
+          tab: this.$scope.tab
         });
       }
 
@@ -543,6 +549,9 @@ export class AgentsController {
    * @param {*} force
    */
   async switchTab(tab, force = false) {
+    this.tabVisualizations.setTab(tab);
+    this.$rootScope.rendered = false;
+    this.$rootScope.$applyAsync();
     this.falseAllExpand();
     if (this.ignoredTabs.includes(tab)) {
       this.commonData.setRefreshInterval(timefilter.getRefreshInterval());
@@ -570,13 +579,33 @@ export class AgentsController {
       this.$scope.showScaScan = false;
       if (tab === 'pci') {
         const pciTabs = await this.commonData.getPCI();
-        this.$scope.pciTabs = pciTabs;
-        this.$scope.selectedPciIndex = 0;
+        this.$scope.pciReqs = {
+          items: pciTabs,
+          reqTitle: 'PCI DSS Requirement'
+        };
       }
       if (tab === 'gdpr') {
         const gdprTabs = await this.commonData.getGDPR();
-        this.$scope.gdprTabs = gdprTabs;
-        this.$scope.selectedGdprIndex = 0;
+        this.$scope.gdprReqs = {
+          items: gdprTabs,
+          reqTitle: 'GDPR Requirement'
+        };
+      }
+
+      if (tab === 'hipaa') {
+        const hipaaTabs = await this.commonData.getHIPAA();
+        this.$scope.hipaaReqs = {
+          items: hipaaTabs,
+          reqTitle: 'HIPAA Requirement'
+        };
+      }
+
+      if (tab === 'nist') {
+        const nistTabs = await this.commonData.getNIST();
+        this.$scope.nistReqs = {
+          items: nistTabs,
+          reqTitle: 'NIST 800-53 Requirement'
+        };
       }
 
       if (tab === 'sca') {
@@ -608,7 +637,6 @@ export class AgentsController {
       if (!this.ignoredTabs.includes(tab)) this.tabHistory.push(tab);
       if (this.tabHistory.length > 2)
         this.tabHistory = this.tabHistory.slice(-2);
-      this.tabVisualizations.setTab(tab);
 
       if (this.$scope.tab === tab && !force) {
         this.$scope.$applyAsync();
@@ -645,6 +673,82 @@ export class AgentsController {
     } catch (error) {
       return Promise.reject(error);
     }
+
+    this.$scope.configurationTabsProps = {};
+    this.$scope.buildProps = tabs => {
+      const cleanTabs = [];
+      tabs.forEach(x => {
+        if (
+          this.$scope.configurationTab === 'integrity-monitoring' &&
+          x.id === 'fim-whodata' &&
+          x.agent &&
+          x.agent.agentPlatform !== 'linux'
+        )
+          return;
+
+        cleanTabs.push({
+          id: x.id,
+          name: x.name
+        });
+      });
+      this.$scope.configurationTabsProps = {
+        clickAction: tab => {
+          this.$scope.switchConfigurationSubTab(tab);
+        },
+        selectedTab:
+          this.$scope.configurationSubTab || (tabs && tabs.length)
+            ? tabs[0].id
+            : '',
+        tabs: cleanTabs
+      };
+    };
+
+    this.setTabs();
+  }
+
+  /**
+   * Build the current section tabs
+   */
+  setTabs() {
+    this.$scope.agentsTabsProps = false;
+    this.currentPanel = this.commonData.getCurrentPanel(this.$scope.tab, true);
+
+    if (!this.currentPanel) return;
+
+    const tabs = this.commonData.getTabsFromCurrentPanel(
+      this.currentPanel,
+      this.$scope.extensions,
+      this.$scope.tabNames
+    );
+
+    const cleanTabs = [];
+    tabs.forEach(x => {
+      if (
+        (
+          UnsupportedComponents[(this.$scope.agent || {}).agentPlatform] ||
+          UnsupportedComponents['other']
+        ).includes(x.id)
+      )
+        return;
+
+      cleanTabs.push({
+        id: x.id,
+        name: x.name
+      });
+    });
+
+    this.$scope.agentsTabsProps = {
+      clickAction: tab => {
+        this.switchTab(tab, true);
+      },
+      selectedTab:
+        this.$scope.tab ||
+        (this.currentPanel && this.currentPanel.length
+          ? this.currentPanel[0]
+          : ''),
+      tabs: cleanTabs
+    };
+    this.$scope.$applyAsync();
   }
 
   goDiscover() {
@@ -730,12 +834,13 @@ export class AgentsController {
       if (agentInfo && this.$scope.agent.os) {
         this.$scope.agentOS =
           this.$scope.agent.os.name + ' ' + this.$scope.agent.os.version;
-        this.$scope.agent.isLinuxOS = this.$scope.agent.os.uname.includes(
-          'Linux'
-        );
+        const isLinux = this.$scope.agent.os.uname.includes('Linux');
+        this.$scope.agent.agentPlatform = isLinux
+          ? 'linux'
+          : this.$scope.agent.os.platform;
       } else {
         this.$scope.agentOS = '-';
-        this.$scope.agent.isLinuxOS = false;
+        this.$scope.agent.agentPlatform = false;
       }
 
       await this.$scope.switchTab(this.$scope.tab, true);
@@ -748,6 +853,7 @@ export class AgentsController {
             this.$scope.agent.group && !this.$scope.agent.group.includes(item)
         );
 
+      this.loadWelcomeCardsProps();
       this.$scope.load = false;
       this.$scope.$applyAsync();
       return;
@@ -767,9 +873,48 @@ export class AgentsController {
         this.$location.path('/agents-preview');
       }
     }
+
     this.$scope.load = false;
     this.$scope.$applyAsync();
     return;
+  }
+
+  shouldShowComponent(component) {
+    return !(
+      UnsupportedComponents[this.$scope.agent.agentPlatform] ||
+      UnsupportedComponents['other']
+    ).includes(component);
+  }
+
+  cleanExtensions(extensions) {
+    const result = {};
+    for (const extension in extensions) {
+      if (
+        !(
+          UnsupportedComponents[this.$scope.agent.agentPlatform] ||
+          UnsupportedComponents['other']
+        ).includes(extension)
+      ) {
+        result[extension] = extensions[extension];
+      }
+    }
+    return result;
+  }
+
+  /**
+   * Get available welcome cards after getting the agent
+   */
+  loadWelcomeCardsProps() {
+    this.$scope.welcomeCardsProps = {
+      switchTab: tab => this.switchTab(tab),
+      extensions: this.cleanExtensions(this.$scope.extensions),
+      agent: this.$scope.agent,
+      api: this.appState.getCurrentAPI(),
+      setExtensions: (api, extensions) => {
+        this.appState.setExtensions(api, extensions);
+        this.$scope.extensions = extensions;
+      }
+    };
   }
 
   switchGroupEdit() {

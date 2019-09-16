@@ -35,7 +35,7 @@ export function apiCount($q, genericReq, $location, appState) {
       }
       deferred.resolve();
     })
-    .catch(err => {
+    .catch(() => {
       $location.search('_a', null);
       $location.search('tab', 'api');
       $location.path('/settings');

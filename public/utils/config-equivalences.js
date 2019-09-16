@@ -26,10 +26,6 @@ export const configEquivalences = {
   'wazuh.shards': 'Define the number of shards to use for the .wazuh index.',
   'wazuh.replicas':
     'Define the number of replicas to use for the .wazuh index.',
-  'wazuh-version.shards':
-    'Define the number of shards to use for the .wazuh-version index.',
-  'wazuh-version.replicas':
-    'Define the number of replicas to use for the .wazuh-version index.',
   'ip.selector':
     'Defines if the user is allowed to change the selected index pattern directly from the top menu bar.',
   'ip.ignore':

@@ -19,10 +19,12 @@ import {
   EuiBasicTable,
   EuiButtonIcon,
   EuiHealth,
-  EuiCallOut
+  EuiCallOut,
+  EuiSwitch
 } from '@elastic/eui';
 
 import { BasicTable } from '../directives/wz-table-eui/components/table';
+import { Tabs } from '../directives/wz-tabs-eui/components/tabs';
 
 const app = uiModules.get('app/wazuh', ['react']);
 
@@ -35,4 +37,6 @@ app
   .value('EuiBasicTable', EuiBasicTable)
   .value('EuiHealth', EuiHealth)
   .value('EuiCallOut', EuiCallOut)
-  .value('BasicTable', BasicTable);
+  .value('BasicTable', BasicTable)
+  .value('Tabs', Tabs)
+  .value('EuiSwitch', EuiSwitch);

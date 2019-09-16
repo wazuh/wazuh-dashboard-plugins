@@ -37,7 +37,8 @@ app.directive('wzTable', function() {
       rowSizes: '=rowSizes',
       emptyResults: '=emptyResults',
       customColumns: '=customColumns',
-      implicitSort: '=implicitSort'
+      implicitSort: '=implicitSort',
+      lens: '=lens'
     },
     controller(
       $scope,
@@ -519,9 +520,9 @@ app.directive('wzTable', function() {
           const key = $scope.parseKey(k);
           const canFilterInRules =
             $scope.path === '/rules' &&
-            (key === 'level' || key === 'file' || key === 'path');
+            (key === 'level' || (key === 'path' && !$scope.lens));
           const canFilterInDecoders =
-            $scope.path === '/decoders' && (key === 'path' || key === 'file');
+            $scope.path === '/decoders' && key === 'path' && !$scope.lens;
           $scope.filterableColumns[key] = !!(
             canFilterInRules || canFilterInDecoders
           );
@@ -532,7 +533,7 @@ app.directive('wzTable', function() {
         const value = $scope.parseValue(key, item);
         let keyTmp = $scope.parseKey(key);
         const valueTmp = typeof value !== 'string' ? value.toString() : value;
-        if ($scope.filterableColumns[keyTmp]) {
+        if ($scope.filterableColumns[keyTmp] || keyTmp === 'file') {
           if (value !== '-' && keyTmp !== 'file') {
             const filter = `${keyTmp}:${valueTmp}`;
             $scope.$emit('applyFilter', { filter });
@@ -566,7 +567,9 @@ app.directive('wzTable', function() {
 
       $scope.getSyscheckRowProps = item => {
         const excluded = ['$$hashKey', 'expanded', 'showTooltip'];
-        isWindows() && excluded.push(...['inode', 'gid', 'gname']);
+        isWindows()
+          ? excluded.push(...['inode', 'gid', 'gname'])
+          : excluded.push('attributes');
         const isRegistry = (item || {}).type === 'registry';
         isRegistry &&
           excluded.push(...['size', 'uname', 'sha256', 'uid', 'inode']);

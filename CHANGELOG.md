@@ -2,13 +2,57 @@
 
 All notable changes to the Wazuh app project will be documented in this file.
 
-## Wazuh v3.9.5 - Kibana v6.8.2 / Kibana v7.2.1 / Kibana v7.3.0 - Revision 533
+
+## Wazuh v3.10.0 - Kibana v7.3.2 - Revision 543
+
+### Added
+
+- Support for Wazuh v3.10.0.
+- Added an interactive guide for registering agents, things are now easier for the user, guiding it through the steps needed ending in a _copy & paste_ snippet for deploying his agent [#1468](https://github.com/wazuh/wazuh-kibana-app/issues/1468).
+- Added new dashboards for the recently added regulatory compliance groups into the Wazuh core. They are HIPAA and NIST-800-53 [#1468](https://github.com/wazuh/wazuh-kibana-app/issues/1448), [#1638]( https://github.com/wazuh/wazuh-kibana-app/issues/1638).
+- Make the app work under a custom Kibana space [#1234](https://github.com/wazuh/wazuh-kibana-app/issues/1234), [#1450](https://github.com/wazuh/wazuh-kibana-app/issues/1450).
+- Added the ability to manage the app as a native plugin when using Kibana spaces, now you can safely hide/show the app depending on the selected space [#1601](https://github.com/wazuh/wazuh-kibana-app/issues/1601).
+- Adapt the app the for Kibana dark mode [#1562](https://github.com/wazuh/wazuh-kibana-app/issues/1562).
+- Added an alerts summary in _Overview > FIM_ panel [#1527](https://github.com/wazuh/wazuh-kibana-app/issues/1527).
+- Export all the information of a Wazuh group and its related agents in a PDF document [#1341](https://github.com/wazuh/wazuh-kibana-app/issues/1341).
+- Export the configuration of a certain agent as a PDF document. Supports granularity for exporting just certain sections of the configuration [#1340](https://github.com/wazuh/wazuh-kibana-app/issues/1340).
+
+
+### Changed
+
+- Reduced _Agents preview_ load time using the new API endpoint `/summary/agents` [#1687](https://github.com/wazuh/wazuh-kibana-app/pull/1687).
+- Replaced most of the _md-nav-bar_ Angular.js components with React components using EUI [#1705](https://github.com/wazuh/wazuh-kibana-app/pull/1705).
+- Replaced the requirements slider component with a new styled component [#1708](https://github.com/wazuh/wazuh-kibana-app/pull/1708).
+- Soft deprecated the _.wazuh-version_ internal index, now the app dumps its content if applicable to a registry file, then the app removes that index. Further versions will hard deprecate this index [#1467](https://github.com/wazuh/wazuh-kibana-app/issues/1467). 
+- Visualizations now don't fetch the documents _source_, also, they now use _size: 0_ for fetching [#1663](https://github.com/wazuh/wazuh-kibana-app/issues/1663).
+- The app menu is now fixed on top of the view, it's not being hidden on every state change. Also, the Wazuh logo was placed in the top bar of Kibana UI [#1502](https://github.com/wazuh/wazuh-kibana-app/issues/1502).
+- Improved _getTimestamp_ method not returning a promise object because it's no longer needed [014bc3a](https://github.com/wazuh/wazuh-kibana-app/commit/014b3aba0d2e9cda0c4d521f5f16faddc434a21e). Also improved main Discover listener for Wazuh not returning a promise object [bd82823](https://github.com/wazuh/wazuh-kibana-app/commit/bd8282391a402b8c567b32739cf914a0135d74bc).
+- Replaced _Requirements over time_ visualizations in both PCI DSS and GDPR dashboards [35c539](https://github.com/wazuh/wazuh-kibana-app/commit/35c539eb328b3bded94aa7608f73f9cc51c235a6).
+- Do not show a toaster when a visualization field was not known yet, instead, show it just in case the internal refreshing failed [19a2e7](https://github.com/wazuh/wazuh-kibana-app/commit/19a2e71006b38f6a64d3d1eb8a20b02b415d7e07).
+- Minor optimizations for server logging [eb8e000](https://github.com/wazuh/wazuh-kibana-app/commit/eb8e00057dfea2dafef56319590ff832042c402d).
+
+### Fixed
+
+- Alerts search bar fixed for Kibana v7.3.1, queries were not being applied as expected [#1686](https://github.com/wazuh/wazuh-kibana-app/issues/1686).
+- Hide attributes field from non-Windows agents in the FIM table [#1710](https://github.com/wazuh/wazuh-kibana-app/issues/1710).
+- Fixed broken view in Management > Configuration > Amazon S3 > Buckets, some information was missing [#1675](https://github.com/wazuh/wazuh-kibana-app/issues/1675).
+- Keep user's filters when switching from Discover to panel [#1685](https://github.com/wazuh/wazuh-kibana-app/issues/1685).
+- Reduce load time and amount of data to be fetched in _Management > Cluster monitoring_ section avoiding possible timeouts [#1663](https://github.com/wazuh/wazuh-kibana-app/issues/1663).
+- Restored _Remove column_ feature in Discover tabs [#1702](https://github.com/wazuh/wazuh-kibana-app/issues/1702).
+- Apps using Kibana v7.3.1 had a bug once the user goes back from _Agent > FIM > Files_ to _Agent > FIM > dashboard_, filters disappear, now it's working properly [#1700](https://github.com/wazuh/wazuh-kibana-app/issues/1700).
+- Fixed visual bug in _Management > Cluster monitoring_ and a button position [1e3b748](https://github.com/wazuh/wazuh-kibana-app/commit/1e3b748f11b43b2e7956b830269b6d046d74d12c).
+- The app installation date was not being updated properly, now it's fixed [#1692](https://github.com/wazuh/wazuh-kibana-app/issues/1692).
+- Fixed _Network interfaces_ table in Inventory section, the table was not paginating [#1474](https://github.com/wazuh/wazuh-kibana-app/issues/1474).
+- Fixed APIs passwords are now obfuscated in server responses [adc3152](https://github.com/wazuh/wazuh-kibana-app/pull/1782/commits/adc31525e26b25e4cb62d81cbae70a8430728af5).
+
+
+## Wazuh v3.9.5 - Kibana v6.8.2 / Kibana v7.2.1 / Kibana v7.3.0 - Revision 531
 
 ### Added
 
 - Support for Wazuh v3.9.5
 
-## Wazuh v3.9.4 - Kibana v6.8.1 / Kibana v6.8.2 / Kibana v7.1.1 / Kibana v7.2.0 / Kibana v7.2.1 / Kibana v7.3.0 - Revision 532
+## Wazuh v3.9.4 - Kibana v6.8.1 / Kibana v6.8.2 / Kibana v7.2.0 / Kibana v7.2.1 / Kibana v7.3.0 - Revision 528
 
 ### Added
 

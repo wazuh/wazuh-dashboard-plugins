@@ -75,24 +75,6 @@ export function WazuhElasticRouter(server) {
     }
   });
 
-  // Return Wazuh Appsetup info
-  server.route({
-    method: 'GET',
-    path: '/elastic/setup',
-    handler(req, res) {
-      return ctrl.getSetupInfo(req, res);
-    }
-  });
-
-  // Useful to check cookie consistence
-  server.route({
-    method: 'GET',
-    path: '/elastic/timestamp',
-    handler(req, res) {
-      return ctrl.getTimeStamp(req, res);
-    }
-  });
-
   // Fetch alerts directly from Elasticsearch
   server.route({
     method: 'POST',

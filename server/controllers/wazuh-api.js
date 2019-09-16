@@ -14,6 +14,8 @@
 import needle from 'needle';
 import { pciRequirementsFile } from '../integration-files/pci-requirements';
 import { gdprRequirementsFile } from '../integration-files/gdpr-requirements';
+import { hipaaRequirementsFile } from '../integration-files/hipaa-requirements';
+import { nistRequirementsFile } from '../integration-files/nist-requirements';
 import { ElasticWrapper } from '../lib/elastic-wrapper';
 import { getPath } from '../../util/get-path';
 import { Monitoring } from '../monitoring';
@@ -28,6 +30,8 @@ import { apiRequestList } from '../../util/api-request-list';
 import * as ApiHelper from '../lib/api-helper';
 import { Queue } from '../jobs/queue';
 import querystring from 'querystring';
+import fs from 'fs';
+import path from 'path';
 export class WazuhApiCtrl {
   /**
    * Constructor
@@ -37,6 +41,7 @@ export class WazuhApiCtrl {
     this.queue = Queue;
     this.wzWrapper = new ElasticWrapper(server);
     this.monitoringInstance = new Monitoring(server, true);
+    this.wazuhVersion = path.join(__dirname, '../wazuh-version.json');
   }
 
   /**
@@ -94,20 +99,17 @@ export class WazuhApiCtrl {
         };
 
         // Update cluster information in Elasticsearch .wazuh document
-        const result = await this.wzWrapper.updateWazuhIndexDocument(
-          null,
-          req.payload,
-          {
-            doc: { cluster_info: api.cluster_info }
-          }
-        );
+        await this.wzWrapper.updateWazuhIndexDocument(null, req.payload, {
+          doc: { cluster_info: api.cluster_info }
+        });
 
         // Hide Wazuh API password
-        api.password = '****';
+        const copied = {...api};
+        copied.secret = '****';
 
         return {
           statusCode: 200,
-          data: api,
+          data: copied,
           idChanged: req.idChanged || null
         };
       }
@@ -541,6 +543,170 @@ export class WazuhApiCtrl {
   }
 
   /**
+   * This get PCI requirements
+   * @param {Object} req
+   * @param {Object} reply
+   * @returns {Array<Object>} requirements or ErrorResponse
+   */
+  async getHipaaRequirement(req, reply) {
+    try {
+      let hipaa_description = '';
+
+      if (req.params.requirement === 'all') {
+        if (!req.headers.id) {
+          return hipaaRequirementsFile;
+        }
+        let api = await this.wzWrapper.getWazuhConfigurationById(
+          req.headers.id
+        );
+
+        if (api.error_code > 1) {
+          log(
+            'wazuh-api:getHipaaRequirement',
+            'Elasticsearch unexpected error or cannot connect'
+          );
+          // Can not connect to elasticsearch
+          return ErrorResponse(
+            'Elasticsearch unexpected error or cannot connect',
+            3007,
+            400,
+            reply
+          );
+        } else if (api.error_code > 0) {
+          log('wazuh-api:getHipaaRequirement', 'Credentials do not exist');
+          // Credentials not found
+          return ErrorResponse('Credentials do not exist', 3008, 400, reply);
+        }
+
+        const response = await needle(
+          'get',
+          `${api.url}:${api.port}/rules/hipaa`,
+          {},
+          ApiHelper.buildOptionsObject(api)
+        );
+
+        if ((((response || {}).body || {}).data || {}).items) {
+          let HIPAAobject = {};
+          for (const item of response.body.data.items) {
+            if (typeof hipaaRequirementsFile[item] !== 'undefined')
+              HIPAAobject[item] = hipaaRequirementsFile[item];
+          }
+          return HIPAAobject;
+        } else {
+          log(
+            'wazuh-api:getPciRequirement',
+            'An error occurred trying to parse HIPAA requirements'
+          );
+          return ErrorResponse(
+            'An error occurred trying to parse HIPAA requirements',
+            3009,
+            400,
+            reply
+          );
+        }
+      } else {
+        if (
+          typeof hipaaRequirementsFile[req.params.requirement] !== 'undefined'
+        ) {
+          hipaa_description = hipaaRequirementsFile[req.params.requirement];
+        }
+
+        return {
+          hipaa: {
+            requirement: req.params.requirement,
+            description: hipaa_description
+          }
+        };
+      }
+    } catch (error) {
+      log('wazuh-api:getPciRequirement', error.message || error);
+      return ErrorResponse(error.message || error, 3010, 400, reply);
+    }
+  }
+
+  /**
+   * This get NIST 800-53 requirements
+   * @param {Object} req
+   * @param {Object} reply
+   * @returns {Array<Object>} requirements or ErrorResponse
+   */
+  async getNistRequirement(req, reply) {
+    try {
+      let nist_description = '';
+
+      if (req.params.requirement === 'all') {
+        if (!req.headers.id) {
+          return nistRequirementsFile;
+        }
+        let api = await this.wzWrapper.getWazuhConfigurationById(
+          req.headers.id
+        );
+
+        if (api.error_code > 1) {
+          log(
+            'wazuh-api:getNistRequirement',
+            'Elasticsearch unexpected error or cannot connect'
+          );
+          // Can not connect to elasticsearch
+          return ErrorResponse(
+            'Elasticsearch unexpected error or cannot connect',
+            3007,
+            400,
+            reply
+          );
+        } else if (api.error_code > 0) {
+          log('wazuh-api:getNistRequirement', 'Credentials do not exist');
+          // Credentials not found
+          return ErrorResponse('Credentials do not exist', 3008, 400, reply);
+        }
+
+        const response = await needle(
+          'get',
+          `${api.url}:${api.port}/rules/nist-800-53`,
+          {},
+          ApiHelper.buildOptionsObject(api)
+        );
+
+        if ((((response || {}).body || {}).data || {}).items) {
+          let NISTobject = {};
+          for (const item of response.body.data.items) {
+            if (typeof nistRequirementsFile[item] !== 'undefined')
+              NISTobject[item] = nistRequirementsFile[item];
+          }
+          return NISTobject;
+        } else {
+          log(
+            'wazuh-api:getNistRequirement',
+            'An error occurred trying to parse NIST 800-53 requirements'
+          );
+          return ErrorResponse(
+            'An error occurred trying to parse NIST 800-53 requirements',
+            3009,
+            400,
+            reply
+          );
+        }
+      } else {
+        if (
+          typeof nistRequirementsFile[req.params.requirement] !== 'undefined'
+        ) {
+          nist_description = nistRequirementsFile[req.params.requirement];
+        }
+
+        return {
+          nist: {
+            requirement: req.params.requirement,
+            description: nist_description
+          }
+        };
+      }
+    } catch (error) {
+      log('wazuh-api:getNistRequirement', error.message || error);
+      return ErrorResponse(error.message || error, 3010, 400, reply);
+    }
+  }
+
+  /**
    * Check main Wazuh daemons status
    * @param {*} api API entry stored in .wazuh
    * @param {*} path Optional. Wazuh API target path.
@@ -590,6 +756,27 @@ export class WazuhApiCtrl {
     return new Promise((resolve, reject) => {
       setTimeout(resolve, timeMs);
     });
+  }
+
+  /**
+   * Helper method for Dev Tools.
+   * https://documentation.wazuh.com/current/user-manual/api/reference.html
+   * Depending on the method and the path some parameters should be an array or not.
+   * Since we allow the user to write the request using both comma-separated and array as well,
+   * we need to check if it should be transformed or not.
+   * @param {*} method The request method
+   * @param {*} path The Wazuh API path
+   */
+  shouldKeepArrayAsIt(method, path) {
+    // Methods that we must respect a do not transform them
+    const isAgentsRestart = method === 'POST' && path === '/agents/restart';
+    const isActiveResponse =
+      method === 'PUT' && path.startsWith('/active-response/');
+    const isAddingAgentsToGroup =
+      method === 'POST' && path.startsWith('/agents/group/');
+
+    // Returns true only if one of the above conditions is true
+    return isAgentsRestart || isActiveResponse || isAddingAgentsToGroup;
   }
 
   /**
@@ -656,7 +843,7 @@ export class WazuhApiCtrl {
         data = data.content;
       }
       const delay = (data || {}).delay || 0;
-      const fullUrl = getPath(api) + path;
+      let fullUrl = getPath(api) + path;
       if (delay) {
         const current = new Date();
         this.queue.addJob({
@@ -686,21 +873,30 @@ export class WazuhApiCtrl {
         }
       }
 
-      let fixedUrl = false;
-      if (method === 'DELETE') {
-        fixedUrl = `${
-          fullUrl.includes('?') ? fullUrl.split('?')[0] : fullUrl
-        }?${querystring.stringify(data)}`;
+      log('wazuh-api:makeRequest', `${method} ${fullUrl}`, 'debug');
+
+      // Extract keys from parameters
+      const dataProperties = Object.keys(data);
+
+      // Transform arrays into comma-separated string if applicable.
+      // The reason is that we are accepting arrays for comma-separated
+      // parameters in the Dev Tools
+      if (!this.shouldKeepArrayAsIt(method, path)) {
+        for (const key of dataProperties) {
+          if (Array.isArray(data[key])) {
+            data[key] = data[key].join();
+          }
+        }
       }
 
-      log('wazuh-api:makeRequest', `${method} ${fixedUrl || fullUrl}`, 'debug');
+      // DELETE must use URL query but we accept objects in Dev Tools
+      if (method === 'DELETE' && dataProperties.length) {
+        const query = querystring.stringify(data);
+        fullUrl += fullUrl.includes('?') ? `&${query}` : `?${query}`;
+        data = {};
+      }
 
-      const response = await needle(
-        method,
-        fixedUrl || fullUrl,
-        fixedUrl ? null : data,
-        options
-      );
+      const response = await needle(method, fullUrl, data, options);
 
       const responseIsDown = this.checkResponseIsDown(response);
 
@@ -768,6 +964,7 @@ export class WazuhApiCtrl {
       const options = ApiHelper.buildOptionsObject(api);
 
       const fullUrl = getPath(api) + path;
+
       log('wazuh-api:makeGenericRequest', `${method} ${fullUrl}`, 'debug');
       const response = await needle(method, fullUrl, data, options);
 
@@ -889,15 +1086,15 @@ export class WazuhApiCtrl {
         req.payload.id
       );
 
-      let path_tmp = req.payload.path;
+      let tmpPath = req.payload.path;
 
-      if (path_tmp && typeof path_tmp === 'string') {
-        path_tmp = path_tmp[0] === '/' ? path_tmp.substr(1) : path_tmp;
+      if (tmpPath && typeof tmpPath === 'string') {
+        tmpPath = tmpPath[0] === '/' ? tmpPath.substr(1) : tmpPath;
       }
 
-      if (!path_tmp) throw new Error('An error occurred parsing path field');
+      if (!tmpPath) throw new Error('An error occurred parsing path field');
 
-      log('wazuh-api:csv', `Report ${path_tmp}`, 'debug');
+      log('wazuh-api:csv', `Report ${tmpPath}`, 'debug');
       // Real limit, regardless the user query
       const params = { limit: 500 };
 
@@ -910,23 +1107,24 @@ export class WazuhApiCtrl {
 
       const cred = ApiHelper.buildOptionsObject(config);
 
-      const itemsArray = [];
+      let itemsArray = [];
       const output = await needle(
         'get',
-        `${config.url}:${config.port}/${path_tmp}`,
+        `${config.url}:${config.port}/${tmpPath}`,
         params,
         cred
       );
 
-      if ((((output || {}).body || {}).data || {}).totalItems) {
+      const totalItems = (((output || {}).body || {}).data || {}).totalItems;
+
+      if (totalItems) {
         params.offset = 0;
-        const { totalItems } = output.body.data;
         itemsArray.push(...output.body.data.items);
         while (itemsArray.length < totalItems && params.offset < totalItems) {
           params.offset += params.limit;
           const tmpData = await needle(
             'get',
-            `${config.url}:${config.port}/${path_tmp}`,
+            `${config.url}:${config.port}/${tmpPath}`,
             params,
             cred
           );
@@ -934,49 +1132,66 @@ export class WazuhApiCtrl {
         }
       }
 
-      if ((((output || {}).body || {}).data || {}).totalItems) {
-        const isList = req.payload.path.includes('/lists');
-        const isAgents = req.payload.path.includes('/agents');
+      if (totalItems) {
+        const { path, filters } = req.payload;
+        const isList = path.includes('/lists') && filters && filters.length;
+        const isArrayOfLists =
+          path.includes('/lists') && (!filters || !filters.length);
+        const isAgents = path.includes('/agents') && !path.includes('groups');
+        const isAgentsOfGroup = path.startsWith('/agents/groups/');
+        let fields = Object.keys(output.body.data.items[0]);
 
-        const fields = isAgents
-          ? [
-              'id',
-              'status',
-              'name',
-              'ip',
-              'group',
-              'manager',
-              'node_name',
-              'dateAdd',
-              'version',
-              'lastKeepAlive',
-              'os.arch',
-              'os.build',
-              'os.codename',
-              'os.major',
-              'os.minor',
-              'os.name',
-              'os.platform',
-              'os.uname',
-              'os.version'
-            ]
-          : isList
-          ? ['key', 'value']
-          : Object.keys(output.body.data.items[0]);
-
-        const json2csvParser = new Parser({ fields });
-        if (isList) {
-          itemsArray[0].map(item => {
-            if (!item.value || !item.value.length) item.value = '-';
-            return item;
-          });
+        if (isAgents || isAgentsOfGroup) {
+          fields = [
+            'id',
+            'status',
+            'name',
+            'ip',
+            'group',
+            'manager',
+            'node_name',
+            'dateAdd',
+            'version',
+            'lastKeepAlive',
+            'os.arch',
+            'os.build',
+            'os.codename',
+            'os.major',
+            'os.minor',
+            'os.name',
+            'os.platform',
+            'os.uname',
+            'os.version'
+          ];
         }
 
-        let csv = json2csvParser.parse(isList ? itemsArray[0] : itemsArray);
+        if (isArrayOfLists) {
+          const flatLists = [];
+          for (const list of itemsArray) {
+            const { path, items } = list;
+            flatLists.push(
+              ...items.map(item => ({ path, key: item.key, value: item.value }))
+            );
+          }
+          fields = ['path', 'key', 'value'];
+          itemsArray = [...flatLists];
+        }
+
+        if (isList) {
+          fields = ['key', 'value'];
+          itemsArray = itemsArray[0];
+        }
+
+        fields = fields.map(item => ({ value: item, default: '-' }));
+
+        const json2csvParser = new Parser({ fields });
+
+        let csv = json2csvParser.parse(itemsArray);
 
         for (const field of fields) {
-          if (csv.includes(field)) {
-            csv = csv.replace(field, KeyEquivalence[field] || field);
+          const { value } = field;
+          if (csv.includes(value)) {
+            csv = csv.replace(value, KeyEquivalence[value] || value);
           }
         }
 
@@ -1014,64 +1229,17 @@ export class WazuhApiCtrl {
 
       const headers = ApiHelper.buildOptionsObject(config);
 
-      const distinctUrl = `${config.url}:${config.port}/agents/stats/distinct`;
+      const distinctUrl = `${config.url}:${config.port}/summary/agents`;
 
-      const data = await Promise.all([
-        needle(
-          'get',
-          distinctUrl,
-          { fields: 'node_name', select: 'node_name' },
-          headers
-        ),
-        needle(
-          'get',
-          `${config.url}:${config.port}/agents/groups`,
-          {},
-          headers
-        ),
-        needle(
-          'get',
-          distinctUrl,
-          {
-            fields: 'os.name,os.platform,os.version',
-            select: 'os.name,os.platform,os.version'
-          },
-          headers
-        ),
-        needle(
-          'get',
-          distinctUrl,
-          { fields: 'version', select: 'version' },
-          headers
-        ),
-        needle(
-          'get',
-          `${config.url}:${config.port}/agents/summary`,
-          {},
-          headers
-        ),
-        needle(
-          'get',
-          `${config.url}:${config.port}/agents`,
-          { limit: 1, sort: '-dateAdd', q: 'id!=000' },
-          headers
-        )
-      ]);
+      const data = await needle('get', distinctUrl, {}, headers);
+      const response = ((data || {}).body || {}).data || {};
 
-      const parsedResponses = data.map(item =>
-        item && item.body && item.body.data && !item.body.error
-          ? item.body.data
-          : false
-      );
-
-      const [
-        nodes,
-        groups,
-        osPlatforms,
-        versions,
-        summary,
-        lastAgent
-      ] = parsedResponses;
+      const nodes = response.nodes;
+      const groups = response.groups;
+      const osPlatforms = response.agent_os;
+      const versions = response.agent_version;
+      const summary = response.agent_status;
+      const lastAgent = response.last_registered_agent;
 
       const result = {
         groups: [],
@@ -1126,8 +1294,8 @@ export class WazuhApiCtrl {
         });
       }
 
-      if (lastAgent && lastAgent.items && lastAgent.items.length) {
-        Object.assign(result.lastAgent, lastAgent.items[0]);
+      if (lastAgent) {
+        Object.assign(result.lastAgent, lastAgent);
       }
 
       return { error: 0, result };
@@ -1141,6 +1309,63 @@ export class WazuhApiCtrl {
   getRequestList() {
     //Read a static JSON until the api call has implemented
     return apiRequestList;
+  }
+
+  /**
+   * This get the timestamp field
+   * @param {Object} req
+   * @param {Object} reply
+   * @returns {Object} timestamp field or ErrorResponse
+   */
+  getTimeStamp(req, reply) {
+    try {
+      const source = JSON.parse(fs.readFileSync(this.wazuhVersion, 'utf8'));
+      if (source.installationDate && source.lastRestart) {
+        log(
+          'wazuh-api:getTimeStamp',
+          `Installation date: ${source.installationDate}. Last restart: ${source.lastRestart}`,
+          'debug'
+        );
+        return {
+          installationDate: source.installationDate,
+          lastRestart: source.lastRestart
+        };
+      } else {
+        throw new Error('Could not fetch wazuh-version registry');
+      }
+    } catch (error) {
+      log('wazuh-api:getTimeStamp', error.message || error);
+      return ErrorResponse(
+        error.message || 'Could not fetch wazuh-version registry',
+        4001,
+        500,
+        reply
+      );
+    }
+  }
+
+  /**
+   * This get the wazuh setup settings
+   * @param {Object} req
+   * @param {Object} reply
+   * @returns {Object} setup info or ErrorResponse
+   */
+  async getSetupInfo(req, reply) {
+    try {
+      const source = JSON.parse(fs.readFileSync(this.wazuhVersion, 'utf8'));
+      return !Object.values(source).length
+        ? { statusCode: 200, data: '' }
+        : { statusCode: 200, data: source };
+    } catch (error) {
+      log('wazuh-api:getSetupInfo', error.message || error);
+      return ErrorResponse(
+        `Could not get data from wazuh-version registry due to ${error.message ||
+          error}`,
+        4005,
+        500,
+        reply
+      );
+    }
   }
 
   /**

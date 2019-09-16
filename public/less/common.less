@@ -73,7 +73,6 @@
   position: relative;
   height: 25px;
   color: #666666;
-  background-color: white !important;
 }
 
 /* Custom JSON viewer settings */
@@ -257,9 +256,9 @@
   box-shadow: none !important;
 }
 
-.btn-as-i:hover {
+.btn-as-i:hover, .btn-as-i:focus {
   background: none !important;
-  color: #006bb4;
+  color: #006bb4!important;
 }
 /* Custom reporting button styles */
 
@@ -409,6 +408,10 @@
 
 /* Custom Kibana styles */
 
+md-content.md-default-theme, md-content{
+  background: transparent!important;
+}
+
 .wz-border-none,
 .wz-border-none md-select-value {
   border: none !important;
@@ -424,7 +427,7 @@
 }
 
 .table-hover > tbody > tr:hover {
-  background-color: #f0f0f0!important;
+  background-color: #fafbfd!important;
 }
 
 /* .table > tbody {
@@ -535,7 +538,7 @@ md-sidenav {
 
 .wz-md-card:not(.wz-metric-color) {
   box-shadow: 0 2px 2px -1px rgba(0, 0, 0, 0.1) !important;
-  border: 1px solid #d3dae6 !important;
+  border: 1px solid #d3dae6;
   overflow: hidden;
 }
 
@@ -992,6 +995,82 @@ discover-app-w .container-fluid {
   background: #fff;
 }
 
+.registerAgent{
+  min-height: calc(~'100vh - 100px');
+  background: #fafbfd;
+  padding-top: 25px;
+}
+
+.navBarLogo {
+  width: 110px;
+  margin-top: 4px;
+}
+
+.application.tab-health-check wz-menu{
+  display: none;
+}
+
+.health-check table tr td{
+    border-top: none!important;
+}
+
+.health-check{
+  padding-top: 5%;
+}
+
+@keyframes rotation {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(359deg);
+  }
+}
+
+.health-check-loader{
+  height: 150px;
+  width: 150px;
+  margin: 0 auto;
+  position: relative;
+  border: 2px solid transparent;
+  border-top: 2px solid #00A9E5;
+  border-radius: 100%;
+  display: block;
+  animation: rotation .75s .5s infinite linear;
+  animation-play-state: running;
+}
+
+.health-check-logo{
+    width: 110px;
+    height: 110px;
+    float: left;
+    margin: 0 auto;
+    margin-top: -130px;
+    margin-bottom: 50px;
+    z-index: 1;
+}
+
+.CodeMirror-gutters {
+  z-index: 1!important;
+}
+
+md-toolbar { 
+  min-height: 0px !important;
+}
+
+.md-toolbar-tools { 
+  position: fixed !important;
+}
+
+md-toolbar.md-default-theme:not(.md-menu-toolbar), md-toolbar:not(.md-menu-toolbar) {
+    background-color: transparent!important;
+}
+
+.refresh-report-button {
+  padding: 10px;
+  text-align: right;
+}
+
 .monitoring-discover form{
   display: none;
 }
@@ -1014,4 +1093,67 @@ discover-app-w .container-fluid {
 
 .wz-md-card:not(.fullscreen) .sca-vis.table-scrollable .kbnAggTable__paginated{
   height: 150px;
+}
+
+.wz-margin-10 {
+  margin: 10px;
+}
+
+.wz-margin-top-3 {
+  margin-top: 3px !important;
+}
+
+.wz-margin-left-10 {
+  margin-left: 10px;
+}
+
+.wz-margin-right-10 {
+  margin-right: 10px;
+}
+
+.hiddenCard {
+  opacity: 0;
+  cursor: default !important;
+}
+
+.footer-req {
+  margin-top: -15px !important;
+  font-size: 12px !important;
+  cursor: pointer !important;
+}
+
+.wz-padding-bt-5 {
+  padding-bottom: 5px !important;
+}
+
+.wz-margin--10 {
+  margin-left: -10px;
+}
+
+.header-global-wrapper + .app-wrapper:not(.hidden-chrome) {
+  top: 48px!important;
+  left: 48px!important;
+}
+
+.reqCard {
+  cursor: default !important;
+}
+
+.reqCard:hover, .reqCard:focus {
+  transform: translateY(0px) !important;
+  box-shadow: 0 2px 2px -1px rgba(152, 162, 179, 0.3), 0 1px 5px -2px rgba(152, 162, 179, 0.3) !important;
+}
+
+.reqCard:hover .euiCard__title, .reqCard:focus .euiCard__title {
+  text-decoration: none !important;
+}
+
+@media only screen and (max-width: 767px){
+  .header-global-wrapper + .app-wrapper:not(.hidden-chrome) {
+      left: 0!important;
+  }
+}
+
+.requirements-cards.euiFlexGroup--gutterLarge {
+  margin: -10px !important;
 }

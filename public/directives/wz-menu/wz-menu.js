@@ -26,6 +26,7 @@ class WzMenu {
 
   controller(
     $scope,
+    $rootScope,
     $window,
     appState,
     patternHandler,
@@ -34,24 +35,15 @@ class WzMenu {
     wazuhConfig
   ) {
     $scope.showSelector = appState.getPatternSelector();
-
-    let height = false;
-    try {
-      height = $('#navDrawerMenu > ul:nth-child(2)')[0].clientHeight;
-    } catch (error) {} // eslint-disable-line
-    $scope.barHeight = (height || 51) + 2;
-
-    $scope.$applyAsync();
-
-    if (appState.getCurrentAPI()) {
-      $scope.theresAPI = true;
-      $scope.currentAPI = JSON.parse(appState.getCurrentAPI()).name;
-    } else {
-      $scope.theresAPI = false;
-    }
+    $scope.root = $rootScope;
+    $scope.settedMenuHeight = false;
 
     $scope.goToClick = path => {
       $window.location.href = path;
+    };
+
+    $scope.setMenuNavItem = item => {
+      $scope.menuNavItem = item;
     };
 
     /**
@@ -94,8 +86,20 @@ class WzMenu {
           $scope.patternList = list;
           $scope.currentSelectedPattern = appState.getCurrentPattern();
         }
-        $scope.$applyAsync();
+        if (!$scope.menuNavItem) {
+          $scope.menuNavItem = appState
+            .getNavigation()
+            .currLocation.replace(/\//g, '');
+        }
 
+        if (appState.getCurrentAPI()) {
+          $scope.theresAPI = true;
+          $scope.currentAPI = JSON.parse(appState.getCurrentAPI()).name;
+        } else {
+          $scope.theresAPI = false;
+        }
+        calcHeight();
+        $scope.$applyAsync();
         return;
       } catch (error) {
         errorHandler.handle(error.message || error);
@@ -103,7 +107,25 @@ class WzMenu {
       }
     };
 
-    load();
+    const calcHeight = () => {
+      let height = false;
+      try {
+        height = $('#navDrawerMenu > ul:nth-child(2)')[0].clientHeight;
+      } catch (error) {} // eslint-disable-line
+      const barHeight = (height || 51) + 2;
+      $('.md-toolbar-tools, md-toolbar')
+        .css('height', barHeight, 'important')
+        .css('max-height', barHeight, 'important');
+      $scope.settedMenuHeight = true;
+    };
+
+    $($window).on('resize', function() {
+      calcHeight();
+    });
+
+    $scope.root.$on('loadWazuhMenu', () => {
+      load();
+    });
 
     // Function to change the current index pattern on the app
     $scope.changePattern = async selectedPattern => {

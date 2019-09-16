@@ -21,6 +21,8 @@ export const TabNames = {
   ciscat: 'CIS-CAT',
   pci: 'PCI DSS',
   gdpr: 'GDPR',
+  hipaa: 'HIPAA',
+  nist: 'NIST 800-53',
   aws: 'Amazon AWS',
   virustotal: 'VirusTotal',
   configuration: 'Configuration',

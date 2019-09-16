@@ -114,11 +114,6 @@ export class OverviewController {
     // This object represents the number of visualizations per tab; used to show a progress bar
     this.tabVisualizations.assign('overview');
 
-    this.hostMonitoringTabs = ['general', 'fim', 'aws'];
-    this.systemAuditTabs = ['pm', 'audit', 'oscap', 'ciscat', 'sca'];
-    this.securityTabs = ['vuls', 'virustotal', 'osquery', 'docker'];
-    this.complianceTabs = ['pci', 'gdpr'];
-
     this.wodlesConfiguration = null;
 
     this.init();
@@ -130,6 +125,8 @@ export class OverviewController {
       setExtensions: (api, extensions) =>
         this.appState.setExtensions(api, extensions)
     };
+
+    this.setTabs();
 
     this.$scope.$on('$destroy', () => {
       this.visFactoryService.clearAll();
@@ -151,7 +148,10 @@ export class OverviewController {
    */
   createMetrics(metricsObject) {
     for (const key in metricsObject) {
-      this[key] = () => generateMetric(metricsObject[key]);
+      this[key] = () => {
+        const metric = generateMetric(metricsObject[key]);
+        return !!metric ? metric : '-';
+      };
     }
   }
 
@@ -185,6 +185,35 @@ export class OverviewController {
     }
   }
 
+  /**
+   * Build the current section tabs
+   */
+  setTabs() {
+    this.overviewTabsProps = false;
+    this.currentPanel = this.commonData.getCurrentPanel(this.tab, false);
+
+    if (!this.currentPanel) return;
+
+    const tabs = this.commonData.getTabsFromCurrentPanel(
+      this.currentPanel,
+      this.extensions,
+      this.tabNames
+    );
+
+    this.overviewTabsProps = {
+      clickAction: tab => {
+        this.switchTab(tab, true);
+      },
+      selectedTab:
+        this.tab ||
+        (this.currentPanel && this.currentPanel.length
+          ? this.currentPanel[0]
+          : ''),
+      tabs
+    };
+    this.$scope.$applyAsync();
+  }
+
   // Switch subtab
   async switchSubtab(
     subtab,
@@ -194,7 +223,7 @@ export class OverviewController {
   ) {
     try {
       if (this.tabView === subtab && !force) return;
-
+      this.tabVisualizations.clearDeadVis();
       this.visFactoryService.clear();
       this.$location.search('tabView', subtab);
       const localChange =
@@ -209,7 +238,10 @@ export class OverviewController {
           localChange || preserveDiscover
         );
       } else {
-        this.$scope.$emit('changeTabView', { tabView: this.tabView });
+        this.$scope.$emit('changeTabView', {
+          tabView: this.tabView,
+          tab: this.tab
+        });
       }
 
       this.checkMetrics(this.tab, subtab);
@@ -231,6 +263,9 @@ export class OverviewController {
 
   // Switch tab
   async switchTab(newTab, force = false) {
+    this.tabVisualizations.setTab(newTab);
+    this.$rootScope.rendered = false;
+    this.$rootScope.$applyAsync();
     this.falseAllExpand();
     try {
       if (newTab === 'welcome') {
@@ -246,22 +281,31 @@ export class OverviewController {
 
       if (newTab === 'pci') {
         const pciTabs = await this.commonData.getPCI();
-        this.pciTabs = pciTabs;
-        this.selectedPciIndex = 0;
+        this.pciReqs = { items: pciTabs, reqTitle: 'PCI DSS Requirement' };
       }
 
       if (newTab === 'gdpr') {
         const gdprTabs = await this.commonData.getGDPR();
-        this.gdprTabs = gdprTabs;
-        this.selectedGdprIndex = 0;
+        this.gdprReqs = { items: gdprTabs, reqTitle: 'GDPR Requirement' };
+      }
+
+      if (newTab === 'hipaa') {
+        const hipaaTabs = await this.commonData.getHIPAA();
+        this.hipaaReqs = { items: hipaaTabs, reqTitle: 'HIPAA Requirement' };
+      }
+
+      if (newTab === 'nist') {
+        const nistTabs = await this.commonData.getNIST();
+        this.nistReqs = {
+          items: nistTabs,
+          reqTitle: 'NIST 800-53 Requirement'
+        };
       }
 
       if (newTab !== 'welcome') this.tabHistory.push(newTab);
 
       if (this.tabHistory.length > 2)
         this.tabHistory = this.tabHistory.slice(-2);
-
-      this.tabVisualizations.setTab(newTab);
 
       if (this.tab === newTab && !force) return;
 
@@ -286,6 +330,7 @@ export class OverviewController {
     } catch (error) {
       this.errorHandler.handle(error.message || error);
     }
+    this.setTabs();
     this.$scope.$applyAsync();
     return;
   }
