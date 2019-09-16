@@ -125,6 +125,8 @@ export class UpdateRegistry {
   async updateClusterInfo(id, clusterInfo) {
     try {
       const content = await this.readContent();
+      // Checks if not exists in order to create
+      if (!content.hosts[id]) content.hosts[id] = {};
       content.hosts[id].cluster_info = clusterInfo;
       await this.writeContent(content);
       log('update-registry:updateClusterInfo', `API ${id} information was properly updated`, 'debug');
