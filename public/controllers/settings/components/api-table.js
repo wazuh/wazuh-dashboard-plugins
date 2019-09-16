@@ -36,28 +36,17 @@ export class ApiTable extends Component {
   }
 
   componentDidMount() {
-    this.setState({
-      apiEntries: [...this.props.apiEntries],
-      currentDefault: this.props.currentDefault
-    });
-  }
-
-  UNSAFE_componentWillReceiveProps(nextProps) {
-    this.setState({
-      apiEntries: nextProps.apiEntries,
-      currentDefault: nextProps.currentDefault
-    });
   }
 
   /**
-* Transforms the API entries object model
-*/
+  * Transforms the API entries object model
+  */
   transformApiEntries(entries) {
     try {
       const arr = [];
       entries.forEach(e => {
         const id = Object.keys(e)[0];
-        const data = Object.assign(e[id], { id: id });
+        const data = Object.assign(e[id], { id: id, cluster_info: e.cluster_info || {} });
         arr.push(data);
       });
       return arr;
@@ -67,7 +56,7 @@ export class ApiTable extends Component {
   }
 
   render() {
-    const items = this.transformApiEntries([...this.state.apiEntries]);
+    const items = this.transformApiEntries([...this.props.apiEntries]);
     const columns = [
       {
         field: 'cluster_info.cluster',
@@ -102,7 +91,7 @@ export class ApiTable extends Component {
               <EuiToolTip position="bottom" content={<p>Set as default</p>}>
                 <EuiButtonIcon
                   iconType={
-                    item.id === this.state.currentDefault
+                    item.id === this.props.currentDefault
                       ? 'starFilled'
                       : 'starEmpty'
                   }
@@ -144,5 +133,5 @@ ApiTable.propTypes = {
   apiEntries: PropTypes.array,
   currentDefault: PropTypes.string,
   setDefault: PropTypes.func,
-  checkManager: PropTypes.func,
+  checkManager: PropTypes.func
 };

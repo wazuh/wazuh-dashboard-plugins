@@ -274,6 +274,8 @@ export class SettingsController {
       this.wzMisc.setApiIsDown(false);
       this.apiIsDown = false;
       !silent && this.errorHandler.info('Connection success', 'Settings');
+      //Force react props update
+      this.apiTableProps.apiEntries = this.apiEntries;
       this.$scope.$applyAsync();
       return;
     } catch (error) {
