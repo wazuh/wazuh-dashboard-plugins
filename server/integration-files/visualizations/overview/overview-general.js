@@ -28,6 +28,23 @@ export default [
     _type: 'visualization'
   },
   {
+    _id: 'Wazuh-App-Overview-General-Agents-status-node',
+    _source: {
+      title: 'Agents status node',
+      visState:
+        '{ "aggs": [], "params": { "expression": ".es(index=wazuh-monitoring-3.x-*, timefield=timestamp, split=node_name:5, metric=cardinality:id).label(label=\'$1\', regex=\'^.+:(.+)>.+\')", "interval": "15m" }, "title": "Agents per node", "type": "timelion" }',
+      uiStateJSON:
+        '{}',
+      description: '',
+      version: 1,
+      kibanaSavedObjectMeta: {
+        searchSourceJSON:
+          '{"index":"wazuh-monitoring","filter":[],"query":{"query":"","language":"lucene"}}'
+      }
+    },
+    _type: 'visualization'
+  },
+  {
     _id: 'Wazuh-App-Overview-General-Metric-alerts',
     _source: {
       title: 'Metric alerts',

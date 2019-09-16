@@ -111,6 +111,46 @@
                 </div>
             </md-card-content>
         </md-card>
+        <md-card flex class="wz-md-card" ng-class="{'fullscreen': octrl.expandArray[4]}">
+            <md-card-actions layout="row" class="wz-card-actions-vis" ng-dblclick="octrl.expand(4)">
+                <span class="wz-headline-title">Agents by node</span>
+                <span flex></span>
+                <span class="cursor-pointer" ng-click="octrl.expand(4)">
+                    <react-component name="EuiIcon" props="{type:'expand'}" />
+                </span>
+            </md-card-actions>
+            <md-card-content class="wazuh-column" ng-show="octrl.wzMonitoringEnabled">
+                <kbn-vis id="Wazuh-App-Overview-General-Agents-status-node" vis-id="'Wazuh-App-Overview-General-Agents-status-node'"></kbn-vis>
+            </md-card-content>
+            <md-card-content class="wazuh-column" ng-show="!octrl.wzMonitoringEnabled">
+                <div layout="row">
+                    <div flex layout="column">
+                        <div layout="row" class="wz-padding-top-10"></div>
+                        <div layout="row" class="wz-padding-top-10">
+                            <p flex="50" class="wz-text-bold">Total</p>
+                            <p class="wz-text-right color-grey wz-text-bold">{{octrl.agentsCountTotal}}</p>
+                        </div>
+                        <div layout="row" class="wz-padding-top-10"></div>
+                        <div layout="row" class="wz-padding-top-10">
+                            <p flex="50">Active</p>
+                            <p class="wz-text-right color-grey">{{octrl.agentsCountActive}}</p>
+                        </div>
+                        <div layout="row" class="wz-padding-top-10">
+                            <p flex="50">Disconnected</p>
+                            <p class="wz-text-right color-grey">{{octrl.agentsCountDisconnected}}</p>
+                        </div>
+                        <div layout="row" class="wz-padding-top-10">
+                            <p flex="50">Never connected</p>
+                            <p class="wz-text-right color-grey">{{octrl.agentsCountNeverConnected}}</p>
+                        </div>
+                        <div layout="row" class="wz-padding-top-10">
+                            <p flex="50">Agents coverage</p>
+                            <p class="wz-text-right color-grey">{{(octrl.agentsCoverity | number:2)}}%</p>
+                        </div>
+                    </div>
+                </div>
+            </md-card-content>
+        </md-card>
     </div>
 
     <div layout="row" layout-align="space-between stretch" class="height-360">
