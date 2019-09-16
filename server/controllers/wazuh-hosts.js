@@ -31,7 +31,8 @@ export class WazuhHostsCtrl {
     try {
       const hosts = await this.manageHosts.getHosts();
       const registry = await this.updateRegistry.getHosts();
-      return this.joinHostRegistry(hosts, registry);
+      const result = this.joinHostRegistry(hosts, registry);
+      return result;
     } catch (error) {
       log('wazuh-hosts:getHostsEntries', error.message || error);
       return ErrorResponse(error.message || error, 2001, 500, reply);
@@ -62,17 +63,18 @@ export class WazuhHostsCtrl {
    */
   joinHostRegistry(hosts, registry) {
     try {
+      const joined = [];
       const ofuscated = this.ofuscatePassword(hosts);
       ofuscated.forEach(h => {
         const id = Object.keys(h)[0];
-        Object.assign(h[id], registry[id]);
+        const host = Object.assign(h, registry[id]);
+        joined.push(host);
       });
-      return ofuscated;
+      return joined;
     } catch (error) {
       throw new Error(error);
     }
   }
-
   /**
  * This update an API hostname
  * @param {Object} req
