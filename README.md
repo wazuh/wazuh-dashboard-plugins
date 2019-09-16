@@ -202,6 +202,7 @@ service kibana restart
 |      7.3.0     |       3.9.5       | /usr/share/kibana/bin/kibana-plugin install <https://packages.wazuh.com/wazuhapp/wazuhapp-3.9.5_7.3.0.zip> |
 |      6.8.2     |       3.10.0      | /usr/share/kibana/bin/kibana-plugin install <https://packages.wazuh.com/wazuhapp/wazuhapp-3.10.0_6.8.2.zip> |
 |      7.3.1     |       3.10.0      | /usr/share/kibana/bin/kibana-plugin install <https://packages.wazuh.com/wazuhapp/wazuhapp-3.10.0_7.3.1.zip> |
+|      7.3.2     |       3.10.0      | /usr/share/kibana/bin/kibana-plugin install <https://packages.wazuh.com/wazuhapp/wazuhapp-3.10.0_7.3.2.zip> |
 
 
 ## Contribute
