@@ -59,7 +59,19 @@ export function AreaChartProvider({ getService, }: FtrProviderContext) {
           values: this.composeValues(serie.values)
         });
       });
-      return series.sort((a, b) => { return a['label'] - b['label']});
+      return series.sort((a, b) => {
+
+        if (!isNaN(Number(a['label']))) {
+          return Number(a['label']) - Number(b['label']);
+        }
+          
+        if (a['label'] > b['label']) {
+          return 1;
+        } else if (a['label'] < b['label']){
+          return -1;
+        }
+        return 0;
+      });
     }
 
     /**
