@@ -90,7 +90,7 @@ export class AddApi extends Component {
         </EuiButton>
         {this.state.closedEnabled && (
           <EuiButtonEmpty
-            onClick={() => await this.props.closeAddApi()}
+            onClick={() => this.props.closeAddApi()}
           >
             Close
           </EuiButtonEmpty>
