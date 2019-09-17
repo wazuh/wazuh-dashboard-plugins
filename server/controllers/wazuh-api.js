@@ -104,7 +104,7 @@ export class WazuhApiCtrl {
         });
 
         // Hide Wazuh API password
-        const copied = {...api};
+        const copied = { ...api };
         copied.secret = '****';
 
         return {
