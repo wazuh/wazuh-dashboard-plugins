@@ -90,8 +90,7 @@ export class AddApi extends Component {
         </EuiButton>
         {this.state.closedEnabled && (
           <EuiButtonEmpty
-            // TODO chagne action ot close
-            onClick={async () => await this.checkConnection()}
+            onClick={() => await this.props.closeAddApi()}
           >
             Close
           </EuiButtonEmpty>
@@ -150,5 +149,6 @@ export class AddApi extends Component {
 }
 
 AddApi.propTypes = {
-  checkForNewApis: PropTypes.func
+  checkForNewApis: PropTypes.func,
+  closeAddApi: PropTypes.func
 };

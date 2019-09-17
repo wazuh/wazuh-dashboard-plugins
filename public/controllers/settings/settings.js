@@ -88,7 +88,8 @@ export class SettingsController {
     };
 
     this.addApiProps = {
-      checkForNewApis: () => this.checkForNewApis()
+      checkForNewApis: () => this.checkForNewApis(),
+      closeAddApi: () => this.closeAddApi()
     }
 
     this.settingsTabsProps = {
@@ -208,6 +209,8 @@ export class SettingsController {
 
       const apis = data.data;
       this.apiEntries = apis.length ? apis : [];
+      // Set the addingApi flag based on if there is any API entry
+      this.addingApi = !this.apiEntries.length;
       const currentApi = this.appState.getCurrentAPI();
 
       if (currentApi) {
@@ -444,6 +447,7 @@ export class SettingsController {
       let numError = 0;
       //Tries to check if there are new APIs entries in the wazuh-hosts.yml also, checks if some of them have connection
       if (!hosts.length) throw {message: 'Wazuh API not reachable, please review your configuration', type: 'danger', closedEnabled: false};
+      this.apiEntries = this.apiTableProps.apiEntries = hosts;
       for (let idx in hosts) {
         const host = hosts[idx];
         const id = Object.keys(host)[0];
@@ -464,5 +468,12 @@ export class SettingsController {
     } catch (error) {
       return Promise.reject(error);
     }
+  }
+
+  /**
+   * Closes the add API component
+   */
+  closeAddApi() {
+    this.addingApi = false;
   }
 }
