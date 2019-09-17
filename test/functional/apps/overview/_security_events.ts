@@ -12,13 +12,16 @@
 
 import expect from '@kbn/expect';
 import { FtrProviderContext } from '../../../../../../test/functional/ftr_provider_context';
+import { json } from 'd3';
 
 export default function({getService, getPageObjects, }: FtrProviderContext) {
   const areaChart = getService('areaChart');
   const pieCharts = getService('pieCharts');
+  const tableViz = getService('tableViz');
   const es = getService('es');
   const esAreaChart = getService('esAreaChart');
   const esPieChart = getService('esPieChart');
+  const esTableViz = getService('esTableViz');
   const find = getService('find');
   const PageObjects = getPageObjects(['common', 'wazuhCommon', 'timePicker', ]);
   const testSubjects = getService('testSubjects');
@@ -59,7 +62,7 @@ export default function({getService, getPageObjects, }: FtrProviderContext) {
         authFail: ((todayAlerts || {}).hits || {}).hits.filter(hit => {
           const groups = (((hit || {})._source || {}).rule || {}).groups
           return (
-            groups.includes('authentication_failed') || 
+            groups.includes('authentication_failed') ||
             groups.includes('authentication_failures')
           );
         }),
@@ -102,8 +105,8 @@ export default function({getService, getPageObjects, }: FtrProviderContext) {
 
       const chartSelector: string = '#Wazuh-App-Overview-General-Alerts';
       const values:object = await areaChart.getValues(chartSelector);
-      
-      const esValues = await esAreaChart.getData();      
+
+      const esValues = await esAreaChart.getData();
 
       expect(JSON.stringify(esValues))
         .to.be.equal(JSON.stringify(values));
@@ -138,7 +141,6 @@ export default function({getService, getPageObjects, }: FtrProviderContext) {
     });
 
     it('should alerts evolution - top 5 agents chart values are correct', async () => {
-      
       await PageObjects.timePicker.setCommonlyUsedTime('superDatePickerCommonlyUsed_Today');
       await PageObjects.common.sleep(3000);
       await testSubjects.click('querySubmitButton');
@@ -151,6 +153,26 @@ export default function({getService, getPageObjects, }: FtrProviderContext) {
 
       expect(JSON.stringify(esValues))
         .to.be.equal(JSON.stringify(values));
+    });
+
+    it('should alerts summary table values are correct', async () => {
+      await PageObjects.timePicker.setCommonlyUsedTime('superDatePickerCommonlyUsed_Today');
+      await PageObjects.common.sleep(3000);
+      await testSubjects.click('querySubmitButton');
+      await PageObjects.common.sleep(3000);
+
+      const summarySelector: string = '#Wazuh-App-Overview-General-Alerts-summary';
+      const values: object[] = await tableViz.getValues(summarySelector);
+
+      const esValues: object[] = await esTableViz.getData([
+        {field: 'rule.id', label: 'Rule ID'},
+        {field: 'rule.description', label: 'Description'},
+        {field: 'rule.level', label: 'Level'},
+        {method: 'count', field: 'rule.id', label: 'Count'},
+      ], 'Count', 'desc');
+
+      expect(JSON.stringify(esValues.slice(0, values.length)))
+      .to.be.equal(JSON.stringify(values))
     });
 
   });
