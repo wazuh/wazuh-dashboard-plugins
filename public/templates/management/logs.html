@@ -4,9 +4,9 @@
     <div ng-show="!ctrl.loading" layout="row" layout-align="start center" class="md-padding-h wz-margin-top-16">
         <!-- Daemon selector -->
         <div flex="20" layout="column" layout-align="center" class="wz-margin-right-15 wz-select-input">
-            <select flex class="kuiSelect wz-border-none cursor-pointer height-35"
-                ng-disabled="ctrl.realtime || !ctrl.daemons.length" id="categoryBox" ng-model="ctrl.category"
-                ng-change="ctrl.filter({name:'category',value:ctrl.category})" aria-label="Logs category">
+            <select flex class="kuiSelect wz-border-none cursor-pointer height-35" ng-disabled="ctrl.realtime || !ctrl.daemons.length"
+                id="categoryBox" ng-model="ctrl.category" ng-change="ctrl.filter({name:'category',value:ctrl.category})"
+                aria-label="Logs category">
                 <option value="all">All daemons</option>
                 <option ng-repeat="daemon in ctrl.daemons | orderObjectBy: 'title'" value="{{daemon.title}}">
                     {{daemon.title}}</option>
@@ -16,9 +16,8 @@
 
         <!-- Level selector -->
         <div flex="20" layout="column" layout-align="center" class="wz-select-input wz-margin-right-15">
-            <select flex class="kuiSelect wz-border-none cursor-pointer height-35" ng-disabled="ctrl.realtime"
-                id="levelBox" ng-model="ctrl.type_log" ng-change="ctrl.filter({name:'type_log',value:ctrl.type_log})"
-                aria-label="Logs level">
+            <select flex class="kuiSelect wz-border-none cursor-pointer height-35" ng-disabled="ctrl.realtime" id="levelBox"
+                ng-model="ctrl.type_log" ng-change="ctrl.filter({name:'type_log',value:ctrl.type_log})" aria-label="Logs level">
                 <option value="all">All log levels</option>
                 <option value="info">Info</option>
                 <option value="error">Error</option>
@@ -28,11 +27,9 @@
             </select>
         </div>
 
-        <div flex="20" layout="column" ng-show="ctrl.nodeList" layout-align="center"
-            class="wz-select-input wz-margin-right-15">
-            <select flex class="kuiSelect wz-border-none cursor-pointer height-35" ng-disabled="ctrl.realtime"
-                id="categoryBox" ng-model="ctrl.selectedNode" ng-change="ctrl.changeNode(ctrl.selectedNode)"
-                aria-label="Logs category">
+        <div flex="20" layout="column" ng-show="ctrl.nodeList" layout-align="center" class="wz-select-input wz-margin-right-15">
+            <select flex class="kuiSelect wz-border-none cursor-pointer height-35" ng-disabled="ctrl.realtime" id="categoryBox"
+                ng-model="ctrl.selectedNode" ng-change="ctrl.changeNode(ctrl.selectedNode)" aria-label="Logs category">
                 <option ng-repeat="node in ctrl.nodeList" value="{{node}}">{{node}}</option>
             </select>
         </div>
@@ -46,16 +43,13 @@
     </div>
     <!-- End Filters and Realtime button section -->
 
-    <div layout="row"
-        class="euiFlexGroup euiFlexGroup--alignItemsCenter euiFormControlLayout__childrenWrapper md-padding-h ng-scope wz-margin-top-16"
+    <div layout="row" class="euiFlexGroup euiFlexGroup--alignItemsCenter euiFormControlLayout__childrenWrapper md-padding-h ng-scope wz-margin-top-16"
         ng-if="ctrl.logsPath">
-        <input placeholder="Filter logs..." ng-model="ctrl.custom_search" type="text"
-            class="euiFieldSearch euiFieldSearch--fullWidth euiFlexItem height-35 ng-empty ng-pristine ng-touched ng-valid"
+        <input placeholder="Filter logs..." ng-model="ctrl.custom_search" type="text" class="euiFieldSearch euiFieldSearch--fullWidth euiFlexItem height-35 ng-empty ng-pristine ng-touched ng-valid"
             aria-invalid="false" wz-enter="ctrl.search(ctrl.custom_search)">
         <div class="euiFormControlLayoutIcons wz-margin-left-16">
             <span class="euiFormControlLayoutCustomIcon">
-                <react-component name="EuiIcon"
-                    props="{type:'search', className:'euiFormControlLayoutCustomIcon__icon'}" />
+                <react-component name="EuiIcon" props="{type:'search', className:'euiFormControlLayoutCustomIcon__icon'}" />
             </span>
         </div>
 
@@ -67,8 +61,7 @@
             <div class="euiFilterGroup"></div>
         </div>
 
-        <button class="height-35 kuiButton  ng-scope wz-margin-left-8"
-            ng-class="{'kuiButton--secondary': !ctrl.realtime, 'kuiButton--danger': ctrl.realtime}"
+        <button class="height-35 kuiButton  ng-scope wz-margin-left-8" ng-class="{'kuiButton--secondary': !ctrl.realtime, 'kuiButton--danger': ctrl.realtime}"
             ng-click="!ctrl.realtime ? ctrl.playRealtime() : ctrl.stopRealtime()" aria-label="Realtime button">
             <span ng-if="!ctrl.realtime">
                 <react-component name="EuiIcon" props="{type:'play'}" />
@@ -93,8 +86,7 @@
         </div>
     </div>
     <div layout="row" class="md-padding layout-align-end" ng-if="XMLContent !== ''">
-        <button type="button" ng-click="ctrl.downloadCsv()"
-            class="euiButtonEmpty euiButtonEmpty--primary euiButtonEmpty--small">
+        <button type="button" ng-click="ctrl.downloadCsv()" class="euiButtonEmpty euiButtonEmpty--primary euiButtonEmpty--small">
             <span class="euiButtonEmpty__content">
                 <react-component name="EuiIcon" props="{type:'importAction'}" />
                 <span class="euiButtonEmpty__text">Formatted</span>
@@ -104,8 +96,7 @@
     <!-- End Logs section -->
 
     <div layout="row" layout-padding ng-if="XMLContent === ''">
-        <react-component flex name="EuiCallOut"
-            props="{color:'warning',iconType:'help', title:'No results match your search criteria'}" />
+        <react-component flex name="EuiCallOut" props="{color:'warning',iconType:'help', title:'No results match your search criteria'}" />
     </div>
 
 </div>
