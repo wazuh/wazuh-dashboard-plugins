@@ -18,10 +18,9 @@ import {
   EuiCodeBlock,
   EuiText,
   EuiSpacer,
-  EuiPanel,
   EuiCode,
-  Fragment,
   EuiButton,
+  EuiButtonEmpty,
   EuiSteps,
   EuiBasicTable,
   EuiHealth
@@ -32,24 +31,53 @@ export class ApiIsDown extends Component {
     super(props);
     this.state = {
       status: 'incomplete',
-      fetchingData: false
+      fetchingData: false,
+      apiEntries: []
     };
   }
-  handleComplete() {
+
+
+  componentDidMount() {
     this.setState({
-      status: 'incomplete',
-      fetchingData: true
+      apiEntries: [...this.props.apiEntries]
     });
-    setTimeout(() => {
+  }
+
+  /**
+   * Checks again the connection in order to know the state of the API entries
+   */
+  async checkConnection() {
+    try {
+      let status = 'complete';
       this.setState({
-        status: 'complete',
-        fetchingData: false
+        fetchingData: true
       });
-    }, 1000);
+      const entries = this.state.apiEntries;
+      let numErr = 0;
+      for (let idx in entries) {
+        const entry = entries[idx];
+        try {
+          await this.props.testApi(entry);
+          entries[idx].status = 'online'
+        } catch (error) {
+          numErr = numErr + 1;
+          const code = ((error || {}).data || {}).code
+          const status = code === 3099 ? 'down' : 'unknown'
+          entries[idx].status = status
+        }
+      }
+      if (numErr) {
+        status = numErr >= entries.length ? 'danger' : 'warning';
+      }
+      this.setState({
+        apiEntries: entries,
+        fetchingData: false,
+        status: status
+      });
+    } catch (error) {}
   }
 
   render() {
-    console.log('entries ',this.props.apiEntries)
     const apiExample = `
 # Example Wazuh API configuration
 hosts:
@@ -67,16 +95,23 @@ hosts:
         </EuiText>
         <EuiSpacer />
         <EuiButton
-          onClick={() => this.handleComplete()}
+          onClick={async () => await this.checkConnection()}
           isLoading={this.state.fetchingData}
         >
           Check connection
         </EuiButton>
+        {this.state.status !== 'danger' && (
+          <EuiButtonEmpty
+            onClick={() => this.props.closeApiIsDown()}
+          >
+          Close
+        </EuiButtonEmpty>
+        )}
         <EuiSpacer />
         <EuiText>Already configured Wazuh API(s)</EuiText>
         <EuiSpacer />
         <EuiBasicTable
-          items={this.props.apiEntries}
+          items={this.state.apiEntries}
           columns={[
             { field: 'url', name: 'Host' },
             { field: 'port', name: 'Port' },
@@ -89,8 +124,8 @@ hosts:
                 ) : item === 'down' ? (
                   <EuiHealth color="danger">Offline</EuiHealth>
                 ) : (
-                  <EuiHealth color="subdued">Unknown</EuiHealth>
-                );
+                      <EuiHealth color="subdued">Unknown</EuiHealth>
+                    );
               }
             }
           ]}
@@ -150,5 +185,6 @@ hosts:
 
 ApiIsDown.propTypes = {
   apiEntries: PropTypes.array,
-  checkManager: PropTypes.func
+  testApi: PropTypes.func,
+  closeApiIsDown: PropTypes.func
 };

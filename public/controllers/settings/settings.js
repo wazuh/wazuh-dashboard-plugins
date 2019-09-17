@@ -94,7 +94,8 @@ export class SettingsController {
 
     this.apiIsDownProps = {
       apiEntries: this.transformApiEntries(this.apiEntries),
-      checkManager: entry => this.checkManager(entry)
+      testApi: entry => this.testAPI.check(entry),
+      closeApiIsDown: () => this.closeApiIsDown()
     }
 
     this.settingsTabsProps = {
@@ -506,5 +507,14 @@ export class SettingsController {
    */
   closeAddApi() {
     this.addingApi = false;
+    this.$scope.$applyAsync();
+  }
+
+  /**
+   * Closes the API is down component
+   */
+  closeApiIsDown() { 
+    this.apiIsDown = false;
+    this.$scope.$applyAsync();
   }
 }
