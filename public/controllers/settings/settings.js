@@ -446,7 +446,7 @@ export class SettingsController {
       const hosts = result.data || [];
       let numError = 0;
       //Tries to check if there are new APIs entries in the wazuh-hosts.yml also, checks if some of them have connection
-      if (!hosts.length) throw {message: 'Wazuh API not reachable, please review your configuration', type: 'danger', closedEnabled: false};
+      if (!hosts.length) throw {message: 'There were not found any API entry in the wazuh-hosts.yml', type: 'warning', closedEnabled: false};
       this.apiEntries = this.apiTableProps.apiEntries = hosts;
       for (let idx in hosts) {
         const host = hosts[idx];
@@ -460,8 +460,7 @@ export class SettingsController {
         }
       };
       if (numError) {
-        const err = hosts.length > numError ? {message: 'Some API entry cannot be reachabled', type: 'warning', closedEnabled: true} : {message: 'Wazuh API not reachable, please review your configuration', type: 'danger', closedEnabled: false}
-        if (hosts.length > numError)
+        const err = numError >= hosts.length ? {message: 'No API entry was reachable, please review your configuration', type: 'danger', closedEnabled: true} : {message: 'Some API entry cannot be reachabled', type: 'warning', closedEnabled: true};
         throw err;
       }
       return;
