@@ -34,10 +34,7 @@ export default function({getService, getPageObjects, }: FtrProviderContext) {
     });
 
     it('should alertStats values are correct', async () => {
-      await PageObjects.timePicker.setCommonlyUsedTime('superDatePickerCommonlyUsed_Today');
-      await PageObjects.common.sleep(3000);
-      await testSubjects.click('querySubmitButton');
-      await PageObjects.common.sleep(3000);
+      await PageObjects.wazuhCommon.setTodayRange();
 
       const todayAlerts = await es.search({
         index: es_index,
@@ -82,10 +79,7 @@ export default function({getService, getPageObjects, }: FtrProviderContext) {
     });
 
     it('should alert level evolution chart value ​​are correct', async () => {
-      await PageObjects.timePicker.setCommonlyUsedTime('superDatePickerCommonlyUsed_Today');
-      await PageObjects.common.sleep(3000);
-      await testSubjects.click('querySubmitButton');
-      await PageObjects.common.sleep(3000);
+      await PageObjects.wazuhCommon.setTodayRange();
 
       const chartSelector: string = '#Wazuh-App-Overview-General-Alert-level-evolution';
       const values:object = await areaChart.getValues(chartSelector);
@@ -98,10 +92,7 @@ export default function({getService, getPageObjects, }: FtrProviderContext) {
     });
 
     it('should alert level evolution chart value ​​are correct', async () => {
-      await PageObjects.timePicker.setCommonlyUsedTime('superDatePickerCommonlyUsed_Today');
-      await PageObjects.common.sleep(3000);
-      await testSubjects.click('querySubmitButton');
-      await PageObjects.common.sleep(3000);
+      await PageObjects.wazuhCommon.setTodayRange();
 
       const chartSelector: string = '#Wazuh-App-Overview-General-Alerts';
       const values:object = await areaChart.getValues(chartSelector);
@@ -113,10 +104,7 @@ export default function({getService, getPageObjects, }: FtrProviderContext) {
     });
 
     it('should top 5 agent chart pie values are correct', async () => {
-      await PageObjects.timePicker.setCommonlyUsedTime('superDatePickerCommonlyUsed_Today');
-      await PageObjects.common.sleep(3000);
-      await testSubjects.click('querySubmitButton');
-      await PageObjects.common.sleep(3000);
+      await PageObjects.wazuhCommon.setTodayRange();
 
       const chartSelector: string = '#Wazuh-App-Overview-General-Top-5-agents';
       const values = await pieCharts.getValues(chartSelector);
@@ -127,10 +115,7 @@ export default function({getService, getPageObjects, }: FtrProviderContext) {
     });
 
     it('should top 5 rule groups chart pie values are correct', async () => {
-      await PageObjects.timePicker.setCommonlyUsedTime('superDatePickerCommonlyUsed_Today');
-      await PageObjects.common.sleep(3000);
-      await testSubjects.click('querySubmitButton');
-      await PageObjects.common.sleep(3000);
+      await PageObjects.wazuhCommon.setTodayRange();
 
       const chartSelector: string = '#Wazuh-App-Overview-General-Top-5-rule-groups';
       const values = await pieCharts.getValues(chartSelector);
@@ -141,10 +126,7 @@ export default function({getService, getPageObjects, }: FtrProviderContext) {
     });
 
     it('should alerts evolution - top 5 agents chart values are correct', async () => {
-      await PageObjects.timePicker.setCommonlyUsedTime('superDatePickerCommonlyUsed_Today');
-      await PageObjects.common.sleep(3000);
-      await testSubjects.click('querySubmitButton');
-      await PageObjects.common.sleep(3000);
+      await PageObjects.wazuhCommon.setTodayRange();
 
       const chartSelector: string = '#Wazuh-App-Overview-General-Alerts-evolution-Top-5-agents';
       const values:object = await areaChart.getValues(chartSelector);
@@ -156,10 +138,7 @@ export default function({getService, getPageObjects, }: FtrProviderContext) {
     });
 
     it('should alerts summary table values are correct', async () => {
-      await PageObjects.timePicker.setCommonlyUsedTime('superDatePickerCommonlyUsed_Today');
-      await PageObjects.common.sleep(3000);
-      await testSubjects.click('querySubmitButton');
-      await PageObjects.common.sleep(3000);
+      await PageObjects.wazuhCommon.setTodayRange();
 
       const summarySelector: string = '#Wazuh-App-Overview-General-Alerts-summary';
       const values: object[] = await tableViz.getValues(summarySelector);
