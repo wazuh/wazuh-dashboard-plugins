@@ -1589,6 +1589,9 @@ export class WazuhReportingCtrl {
               : JSON.stringify(x[key])
           );
         }
+        while (row.length < columns.length) {
+          row.push('-');
+        }
         return row;
       });
       array.push({
@@ -1726,6 +1729,7 @@ export class WazuhReportingCtrl {
                 for (let _d of Object.keys(config.config)) {
                   for (let c of AgentConfiguration.configurations) {
                     for (let s of c.sections) {
+                      section.opts = s.opts || {};
                       for (let cn of s.config || []) {
                         if (cn.configuration === _d) {
                           section.labels = s.labels || [[]];
@@ -1817,9 +1821,50 @@ export class WazuhReportingCtrl {
                       }
                     }
                   } else {
-                    tables.push(
-                      ...this.getConfigTables(config.config[_d], section, idx)
-                    );
+                    /*INTEGRITY MONITORING MONITORED DIRECTORIES */
+                    if (config.config[_d].directories) {
+                      const directories = config.config[_d].directories;
+                      delete config.config[_d].directories;
+                      tables.push(
+                        ...this.getConfigTables(config.config[_d], section, idx)
+                      );
+                      let diffOpts = [];
+                      Object.keys(section.opts).forEach(x => {
+                        diffOpts.push(x);
+                      });
+                      const columns = [
+                        '',
+                        ...diffOpts.filter(
+                          x => x !== 'check_all' && x !== 'check_sum'
+                        )
+                      ];
+                      let rows = [];
+                      directories.forEach(x => {
+                        let row = [];
+                        row.push(x.path);
+                        columns.forEach(y => {
+                          if (y !== '') {
+                            row.push(x[y] ? 'yes' : 'no');
+                          }
+                        });
+                        row.push(x.recursion_level);
+                        rows.push(row);
+                      });
+                      columns.forEach((x, idx) => {
+                        columns[idx] = section.opts[x];
+                      });
+                      columns.push('RL');
+                      tables.push({
+                        title: 'Monitored directories',
+                        type: 'table',
+                        columns,
+                        rows
+                      });
+                    } else {
+                      tables.push(
+                        ...this.getConfigTables(config.config[_d], section, idx)
+                      );
+                    }
                   }
                   for (const table of tables) {
                     this.renderConfigTables([table]);

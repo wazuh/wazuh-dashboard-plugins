@@ -25,9 +25,6 @@ import 'uiExports/docViews';
 import 'uiExports/embeddableFactories';
 import 'uiExports/autocompleteProviders';
 
-// Require babel for Kibana 7.2
-import 'babel-polyfill';
-
 // Require CSS
 import './less/loader';
 import { uiModules } from 'ui/modules';
