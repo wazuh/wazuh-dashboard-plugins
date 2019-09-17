@@ -24,7 +24,7 @@ import { InjectedIntl, injectI18n } from '@kbn/i18n/react';
 import classNames from 'classnames';
 import React, { Component } from 'react';
 import { IndexPattern } from 'ui/index_patterns';
-import { FilterEditor } from 'plugins/data/filter/filter_bar/filter_editor';
+import { FilterEditor } from 'ui/filter_bar/filter_editor';
 import { FilterView } from './filter_view';
 
 interface Props {

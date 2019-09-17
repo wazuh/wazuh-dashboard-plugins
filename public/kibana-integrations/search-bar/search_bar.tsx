@@ -19,28 +19,29 @@ import { InjectedIntl, injectI18n } from '@kbn/i18n/react';
 import classNames from 'classnames';
 import React, { Component } from 'react';
 import ResizeObserver from 'resize-observer-polyfill';
+import { FilterBar } from './filter_bar';
 import { IndexPattern } from 'ui/index_patterns';
+import { QueryBar } from 'ui/query_bar';
 import { Storage } from 'ui/storage';
 
-import { QueryBar } from './query_bar';
-import { Query } from 'plugins/data/query/query_bar/index';
-import { FilterBar } from './filter_bar';
+interface Query {
+  query: string;
+  language: string;
+}
 
 interface DateRange {
   from: string;
   to: string;
 }
 
-/**
- * NgReact lib requires that changes to the props need to be made in the directive config as well
- * See [search_bar\directive\index.js] file
- */
 interface Props {
-  query: Query;
+  query: {
+    query: string;
+    language: string;
+  };
   onQuerySubmit: (payload: { dateRange: DateRange; query: Query }) => void;
   disableAutoFocus?: boolean;
   appName: string;
-  screenTitle: string;
   indexPatterns: IndexPattern[];
   store: Storage;
   filters: Filter[];
@@ -85,9 +86,9 @@ class SearchBarUI extends Component<Props, State> {
   };
 
   // member-ordering rules conflict with use-before-declaration rules
-  /* eslint-disable */
+  /* tslint:disable */
   public ro = new ResizeObserver(this.setFilterBarHeight);
-  /* eslint-enable */
+  /* tslint:enable */
 
   public toggleFiltersVisible = () => {
     this.setState({
@@ -111,16 +112,16 @@ class SearchBarUI extends Component<Props, State> {
 
   public render() {
     const filtersAppliedText = this.props.intl.formatMessage({
-      id: 'data.search.searchBar.filtersButtonFiltersAppliedTitle',
+      id: 'common.ui.searchBar.filtersButtonFiltersAppliedTitle',
       defaultMessage: 'filters applied.',
     });
     const clickToShowOrHideText = this.state.isFiltersVisible
       ? this.props.intl.formatMessage({
-        id: 'data.search.searchBar.filtersButtonClickToShowTitle',
+        id: 'common.ui.searchBar.filtersButtonClickToShowTitle',
         defaultMessage: 'Select to hide',
       })
       : this.props.intl.formatMessage({
-        id: 'data.search.searchBar.filtersButtonClickToHideTitle',
+        id: 'common.ui.searchBar.filtersButtonClickToHideTitle',
         defaultMessage: 'Select to show',
       });
 
@@ -129,7 +130,7 @@ class SearchBarUI extends Component<Props, State> {
         onClick={this.toggleFiltersVisible}
         isSelected={this.state.isFiltersVisible}
         hasActiveFilters={this.state.isFiltersVisible}
-        numFilters={this.props.filters.length > 0 ? this.props.filters.length : undefined}
+        numFilters={this.props.filters.length > 0 ? this.props.filters.length : null}
         aria-controls="GlobalFilterGroup"
         aria-expanded={!!this.state.isFiltersVisible}
         title={`${this.props.filters.length} ${filtersAppliedText} ${clickToShowOrHideText}`}
@@ -147,7 +148,6 @@ class SearchBarUI extends Component<Props, State> {
         {this.props.showQueryBar ? (
           <QueryBar
             query={this.props.query}
-            screenTitle={this.props.screenTitle}
             onSubmit={this.props.onQuerySubmit}
             appName={this.props.appName}
             indexPatterns={this.props.indexPatterns}

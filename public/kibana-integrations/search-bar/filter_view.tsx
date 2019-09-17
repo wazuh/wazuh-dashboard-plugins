@@ -19,7 +19,7 @@ import React, { SFC } from 'react';
 import {
   existsOperator,
   isOneOfOperator
-} from 'plugins/data/filter/filter_bar/filter_editor/lib/filter_operators';
+} from 'ui/filter_bar/filter_editor/lib/filter_operators';
 
 interface Props {
   filter: Filter;
