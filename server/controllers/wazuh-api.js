@@ -237,10 +237,15 @@ export class WazuhApiCtrl {
       }
       let response = await needle(
         'get',
-        `${apiAvailable.url}:${apiAvailable.port}/version`,
+        `${apiAvailable.url}:${apiAvailable.port}/manager/info`,
         {},
         ApiHelper.buildOptionsObject(apiAvailable)
       );
+
+      const responseIsDown = this.checkResponseIsDown(response);
+      if (responseIsDown) {
+        return ErrorResponse('ERROR3099', 3099, 500, reply);
+      }
 
       // Check wrong credentials
       if (parseInt(response.statusCode) === 401) {
