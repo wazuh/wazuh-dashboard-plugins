@@ -4,7 +4,7 @@
         <div class="md-padding padding-right-0">
             <button type="submit" aria-label="Search" class="euiFlexItem euiFlexItem--flexGrowZero height-35 kuiButton kuiButton--secondary "
                 ng-click="mctrl.setRulesTab(filesctrl.filesSubTab)" tooltip="Go back" tooltip-placement="bottom">
-                <react-component name="EuiIcon" props="{type:'sortLeft', color:'primary'}" />
+                <react-component name="EuiIcon" props="{type:'arrowLeft'}" />
             </button>
         </div>
         <div class="md-padding euiFlexGroup euiFlexGroup--alignItemsCenter euiFormControlLayout__childrenWrapper md-padding-h ng-scope ">
@@ -51,9 +51,11 @@
     <div flex layout="column">
         <div layout="row" class="wz-padding-bottom-14">
             <div ng-if="!newFile && !editorReadOnly">
-                <span ng-click='closeEditingFile()' class='btn btn-info'>Cancel</span>
-                <button ng-disabled='xmlHasErrors || doingSaving' ng-click='doSaveConfig(false)' class='btn wz-button pull-right wz-margin-left-8'>
-                    <span ng-show='!xmlHasErrors'><i aria-hidden='true' class='fa fa-fw fa-save' ng-class="doingSaving ? 'fa-spin fa-spinner' : ''"></i>Save
+                <span ng-click='closeEditingFile()' class='wz-margin-top-3 kuiButton kuiButton--hollow'>Cancel</span>
+                <button ng-if='mctrl.adminMode' ng-disabled='xmlHasErrors || doingSaving' ng-click='doSaveConfig(false)'
+                    class='btn wz-button pull-right wz-margin-left-8'>
+                    <span ng-show='!xmlHasErrors'><i aria-hidden='true' class='fa fa-fw fa-save'
+                            ng-class="doingSaving ? 'fa-spin fa-spinner' : ''"></i>Save
                         file</span>
                     <span ng-show='xmlHasErrors' class='btn-danger'><i aria-hidden='true' class='fa fa-fw fa-exclamation-triangle'></i>
                         XML format error</span>
@@ -61,15 +63,18 @@
             </div>
             <div ng-if="editorReadOnly">
                 <div layout="row" layout-align="start center">
-                    <span ng-click='closeEditingFile()' class='btn btn-info'>Close</span>
+                    <span ng-click='closeEditingFile()' class='wz-margin-top-3 kuiButton kuiButton--hollow'>Close</span>
                 </div>
             </div>
             <div ng-if="newFile" layout="row" class="wz-width-100">
-                <button ng-click="closeEditingFile()" class="height-35 kuiButton kuiButton--hollow">Cancel</button>
-                <button ng-disabled='xmlHasErrors || newFileName === "" || doingSaving || overwriteError' ng-click='doSaveConfig(true,newFileName)'
+                <button ng-click="closeEditingFile()"
+                    class="wz-margin-top-3 kuiButton kuiButton--hollow">Cancel</button>
+                <button ng-if='mctrl.adminMode'
+                    ng-disabled='xmlHasErrors || newFileName === "" || doingSaving || overwriteError'
+                    ng-click='doSaveConfig(true,newFileName)'
                     class="kuiButton kuiButton--secondary height-35 wz-margin-left-8">
                     <span ng-show='!xmlHasErrors'>
-                        <react-component name="EuiIcon" props="{type:'save', color:'primary'}" /> Save file
+                        <react-component name="EuiIcon" props="{type: 'alert'}" /> Save file
                     </span>
                     <span ng-show='xmlHasErrors' class='btn-danger'><i aria-hidden='true' class='fa fa-fw fa-exclamation-triangle'></i>
                         XML format error</span>

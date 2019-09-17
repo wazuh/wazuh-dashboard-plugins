@@ -153,7 +153,7 @@ export class ManagementController {
 
     this.rulesetTabsProps = {
       clickAction: tab => this.setRulesTab(tab),
-      selectedTab: this.rulesetTab,
+      selectedTab: this.rulesetTab || 'rules',
       tabs: [
         { id: 'rules', name: 'Rules' },
         { id: 'decoders', name: 'Decoders' },
@@ -211,6 +211,7 @@ export class ManagementController {
       await this.configHandler.restartManager();
       this.isRestarting = false;
       this.$scope.$applyAsync();
+      this.errorHandler.info('Restarting manager.');
     } catch (error) {
       this.isRestarting = false;
       this.$scope.$applyAsync();
@@ -228,6 +229,9 @@ export class ManagementController {
       await this.configHandler.restartCluster();
       this.isRestarting = false;
       this.$scope.$applyAsync();
+      this.errorHandler.info(
+        'Restarting cluster, it will take up to 30 seconds.'
+      );
     } catch (error) {
       this.isRestarting = false;
       this.$scope.$applyAsync();
@@ -297,6 +301,7 @@ export class ManagementController {
       this.currentRule = false;
       this.currentDecoder = false;
       this.currentList = false;
+      this.managementTabsProps.selectedTab = this.tab;
     }
 
     this.$location.search('tab', this.tab);

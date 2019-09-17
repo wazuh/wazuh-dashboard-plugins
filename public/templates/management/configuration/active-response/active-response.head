@@ -10,14 +10,10 @@
     <!-- End headline -->
 
     <!-- Commands & Active response navigation bar -->
-    <md-nav-bar
-        ng-if="!agent || agent.id === '000'"
-        class="wz-nav-bar"
-        md-selected-nav-item="configurationSubTab"
-        nav-bar-aria-label="Active response navigation links">
-        <md-nav-item class="wz-nav-item" md-nav-click="switchConfigurationSubTab('active-response')" name="active-response">Active response</md-nav-item>
-        <md-nav-item class="wz-nav-item" md-nav-click="switchConfigurationSubTab('commands')" name="commands">Commands</md-nav-item>
-    </md-nav-bar>
+    <div ng-if="(!agent || agent.id === '000') && configurationTabsProps" class="md-padding wz-padding-top-0"
+        ng-init="buildProps([{id:'active-response', name: 'Active response'}, {id: 'commands', name: 'Commands'}])">
+        <react-component name="Tabs" props="configurationTabsProps" />
+    </div>
     <!-- End Commands & Active response navigation bar -->
 
     <div class="md-padding md-padding-top-16" ng-if="load">

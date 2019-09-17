@@ -10,6 +10,7 @@
  * Find more information about this on the LICENSE file.
  */
 import { ConfigurationHandler } from '../../utils/config-handler';
+import { DynamicHeight } from '../../utils/dynamic-height';
 
 export class ConfigurationController {
   /**
@@ -82,6 +83,24 @@ export class ConfigurationController {
       }
       this.switchConfigurationTab(this.configurationTab, false, true);
     });
+
+    this.$scope.configurationTabsProps = {};
+    this.$scope.buildProps = tabs => {
+      this.$scope.configurationTabsProps = {
+        clickAction: tab => {
+          this.$scope.switchConfigurationSubTab(tab);
+        },
+        selectedTab:
+          this.$scope.configurationSubTab || (tabs && tabs.length)
+            ? tabs[0].id
+            : '',
+        tabs
+      };
+    };
+
+    $(window).on('resize', () => {
+      DynamicHeight.dynamicHeight('d-height', 50);
+    });
   }
 
   switchConfigurationSubTab(configurationSubTab) {
@@ -97,6 +116,7 @@ export class ConfigurationController {
         'sca'
       );
     }
+    DynamicHeight.dynamicHeight('d-height', 50);
   }
 
   /**
@@ -118,6 +138,7 @@ export class ConfigurationController {
       false,
       (this.$scope.mctrl || {}).selectedNode
     );
+    DynamicHeight.dynamicHeight('d-height', 50);
   }
 
   /**
@@ -193,6 +214,7 @@ export class ConfigurationController {
         });
         this.$location.search('configSubTab', true);
       }
+      DynamicHeight.dynamicHeight('d-height', 50);
     } catch (error) {
       this.errorHandler.handle(error, 'Set configuration path');
     }

@@ -41,6 +41,20 @@ export class CommonData {
     this.globalState = globalState;
     this.savedTimefilter = null;
     this.refreshInterval = { pause: true, value: 0 };
+
+    this.overviewTabs = {
+      hostMonitoringTabs: ['general', 'fim', 'aws'],
+      systemAuditTabs: ['pm', 'audit', 'oscap', 'ciscat'],
+      securityTabs: ['vuls', 'virustotal', 'osquery', 'docker'],
+      complianceTabs: ['pci', 'gdpr', 'hipaa', 'nist']
+    };
+
+    this.agentTabs = {
+      hostMonitoringTabs: ['general', 'fim', 'syscollector'],
+      systemAuditTabs: ['pm', 'audit', 'oscap', 'ciscat', 'sca'],
+      securityTabs: ['vuls', 'virustotal', 'osquery', 'docker'],
+      complianceTabs: ['pci', 'gdpr', 'hipaa', 'nist']
+    };
   }
 
   /**
@@ -351,5 +365,34 @@ export class CommonData {
 
   getRefreshInterval() {
     return this.refreshInterval;
+  }
+
+  getCurrentPanel(tab, isAgent) {
+    const target = isAgent ? this.agentTabs : this.overviewTabs;
+    return target.hostMonitoringTabs.includes(tab)
+      ? target.hostMonitoringTabs
+      : target.systemAuditTabs.includes(tab)
+      ? target.systemAuditTabs
+      : target.securityTabs.includes(tab)
+      ? target.securityTabs
+      : target.complianceTabs.includes(tab)
+      ? target.complianceTabs
+      : false;
+  }
+
+  getTabsFromCurrentPanel(currentPanel, extensions, tabNames) {
+    const keyExists = key => Object.keys(extensions).includes(key);
+    const keyIsTrue = key => (extensions || [])[key];
+
+    let tabs = [];
+    currentPanel.forEach(x => {
+      if (!keyExists(x) || keyIsTrue(x)) {
+        tabs.push({
+          id: x,
+          name: tabNames[x]
+        });
+      }
+    });
+    return tabs;
   }
 }

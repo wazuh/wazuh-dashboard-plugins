@@ -16,6 +16,7 @@ import queryString from 'querystring-browser';
 import $ from 'jquery';
 import * as FileSaver from '../../services/file-saver';
 import chrome from 'ui/chrome';
+import { DynamicHeight } from '../../utils/dynamic-height';
 
 export class DevToolsController {
   /**
@@ -48,6 +49,7 @@ export class DevToolsController {
     this.widgets = [];
     this.multipleKeyPressed = [];
     this.IS_DARK_THEME = chrome.getUiSettingsClient().get('theme:darkMode');
+    this.$scope = $scope;
   }
 
   /**
@@ -467,26 +469,8 @@ export class DevToolsController {
       dynamicHeight();
     };
 
-    const dynamicHeight = () => {
-      const self = this;
-      const window = this.$window;
-      setTimeout(function() {
-        const windows = $(window).height();
-        $('#wz-dev-left-column').height(
-          windows - (self.getPosition($('#wz-dev-left-column')[0]).y + 20)
-        );
-        $('.wz-dev-column-separator').height(
-          windows - (self.getPosition($('.wz-dev-column-separator')[0]).y + 20)
-        );
-        $('#wz-dev-right-column').height(
-          windows - (self.getPosition($('#wz-dev-right-column')[0]).y + 20)
-        );
-        $('.wz-dev-column-separator span').height(
-          windows -
-            (self.getPosition($('.wz-dev-column-separator span')[0]).y + 20)
-        );
-      }, 1);
-    };
+    const dynamicHeight = () =>
+      DynamicHeight.dynamicHeightDevTools(this, this.$window);
     dynamicHeight();
   }
 

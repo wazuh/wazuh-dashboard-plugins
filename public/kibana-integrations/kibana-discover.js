@@ -152,6 +152,13 @@ function discoverController(
   discoverPendingUpdates,
   errorHandler
 ) {
+  // Wazuh. Copy for the pinned filters
+  let pinnedFilters = [];
+  let lastTab = 'unknown';
+  // Wazuh. Copy for the discover filters
+  let discoverFilters = [];
+  let backFromDiscover = false;
+
   const visualizeLoader = Private(VisualizeLoaderProvider);
   let visualizeHandler;
   const Vis = Private(VisProvider);
@@ -268,20 +275,28 @@ function discoverController(
 
     // Compose final filters array not including filters that also exist as non removable filter
     const finalFilters = filters.filter(item => {
-      const key =
-        item.meta.key || (Object.keys(item.query.match) || [undefined])[0];
+      let key;
+      if (typeof item.exists !== 'undefined') {
+        key = item.exists.field;
+      } else {
+        const hasKey = item.meta.key;
+        const hasMeta = Object.keys((item.query || {}).match || {})[0];
+        const hasRange = Object.keys(item.range || {})[0];
+        key = hasKey || hasMeta || hasRange;
+      }
       const isIncluded = nonRemovableFilters.includes(key);
       const isNonRemovable = isRemovable(item);
       const shouldBeAdded = (isIncluded && isNonRemovable) || !isIncluded;
       if (!shouldBeAdded) {
-        errorHandler.handle(`Filter for ${key} already added`);
+        console.log(`Filter for ${key} already added`);
       }
       return shouldBeAdded;
     });
     ///////////////////////////////  END-WAZUH   ////////////////////////////////
-
     // The filters will automatically be set when the queryFilter emits an update event (see below)
     queryFilter.setFilters(finalFilters);
+    // Update our internal copy for the pinned filters
+    pinnedFilters = getPinnedFilters(finalFilters);
   };
 
   $scope.applyFilters = filters => {
@@ -480,11 +495,12 @@ function discoverController(
                   queryFilter.getFilters()
                 );
                 $rootScope.$broadcast('updateVis');
-                $rootScope.$broadcast('fetch');
                 if ($location.search().tab != 'configuration') {
                   loadedVisualizations.removeAll();
                   $rootScope.rendered = false;
                   $rootScope.loadingStatus = 'Fetching data...';
+                  // Forcing a digest cycle
+                  $rootScope.$applyAsync();
                 }
                 ////////////////////////////////////////////////////////////////////////////
                 $state.save();
@@ -553,7 +569,10 @@ function discoverController(
             else if (rowsEmpty && fetchStatus === fetchStatuses.LOADING)
               return status.LOADING;
             else if (!rowsEmpty) return status.READY;
-            else return status.NO_RESULTS;
+            else {
+              // Wazuh. If there are hits but no rows, the it's also a READY status
+              return $scope.hits ? status.READY : status.NO_RESULTS;
+            }
           }
 
           return function() {
@@ -648,9 +667,24 @@ function discoverController(
   $scope.updateQueryAndFetch = function({ query, dateRange }) {
     // Wazuh filters are not ready yet
     if (!filtersAreReady()) return;
+    let inheritedFilters;
+    // Preserve filters in discover
+    if ((discoverFilters || []).length || (pinnedFilters || []).length) {
+      inheritedFilters = [...(discoverFilters || []), ...(pinnedFilters || [])];
+      discoverFilters = [];
+      if (backFromDiscover) pinnedFilters = [];
+    }
+
+    // Update query from search bar
+    discoverPendingUpdates.removeAll();
+    discoverPendingUpdates.addItem($state.query, [
+      ...(inheritedFilters || []),
+      ...queryFilter.getFilters()
+    ]);
     $rootScope.$broadcast('updateVis');
+    inheritedFilters = false;
     timefilter.setTime(dateRange);
-    if (query) $state.query = query;
+    if (query && typeof query === 'object') $state.query = query;
     $scope.fetch();
   };
 
@@ -684,6 +718,8 @@ function discoverController(
 
     $scope.hits = resp.hits.total;
     $scope.rows = resp.hits.hits;
+    // Ensure we have "hits" and "rows" available as soon as possible
+    $scope.$applyAsync();
 
     // if we haven't counted yet, reset the counts
     const counts = ($scope.fieldCounts = $scope.fieldCounts || {});
@@ -731,6 +767,8 @@ function discoverController(
       loadedVisualizations.removeAll();
       $rootScope.rendered = false;
       $rootScope.loadingStatus = 'Fetching data...';
+      // Forcing a digest cycle
+      $rootScope.$applyAsync();
     }
     ////////////////////////////////////////////////////////////////////////////
     $scope.timeRange = {
@@ -763,9 +801,38 @@ function discoverController(
     kbnUrl.change('/discover');
   };
 
+  // Wazuh.
+  // defaultSearchSource -> Use it for Discover tabs and the Discover visualization.
+  // noHitsSearchSource  -> It doesn't fetch the "hits" array and it doesn't fetch the "_source",
+  //                        use it for panels.
+  let defaultSearchSource = null,
+    noHitsSearchSource = null;
+
   $scope.updateDataSource = Promise.method(function updateDataSource() {
+    // Wazuh
+    const currentUrlPath = $location.path();
+    const isPanels = $scope.tabView === 'panels';
+    const isClusterMonitoring = $scope.tabView === 'cluster-monitoring';
+    const isTopDiscover = currentUrlPath.includes('wazuh-discover');
+
+    // Wazuh. Should we fetch "_source" and "hits" ?
+    const noHits = (isPanels || isClusterMonitoring) && !isTopDiscover;
+
+    // Wazuh. The very first time, the copies are null, just create them
+    if (!defaultSearchSource || !noHitsSearchSource) {
+      defaultSearchSource = $scope.searchSource.createCopy();
+      noHitsSearchSource = $scope.searchSource.createCopy();
+      noHitsSearchSource.setField('source', false);
+    }
+
+    // Wazuh. Select the proper searchSource depending on the view
+    $scope.searchSource = noHits ? noHitsSearchSource : defaultSearchSource;
+
+    // Wazuh. Set the size to 0 depending on the selected searchSource
+    const size = noHits ? 0 : $scope.opts.sampleSize;
+
     $scope.searchSource
-      .setField('size', $scope.opts.sampleSize)
+      .setField('size', size) // Wazuh. Use custom size
       .setField('sort', getSort($state.sort, $scope.indexPattern))
       .setField('query', !$state.query ? null : $state.query)
       .setField('filter', queryFilter.getFilters());
@@ -797,7 +864,8 @@ function discoverController(
 
   $scope.removeColumn = function removeColumn(columnName) {
     // Commented due to https://github.com/elastic/kibana/issues/22426
-    //$scope.indexPattern.popularizeField(field, 1);    columnActions.removeColumn($scope.state.columns, columnName);
+    //$scope.indexPattern.popularizeField(field, 1);
+    columnActions.removeColumn($scope.state.columns, columnName);
   };
 
   $scope.moveColumn = function moveColumn(columnName, newIndex) {
@@ -820,6 +888,11 @@ function discoverController(
   };
 
   async function setupVisualization() {
+    // Wazuh. Do not setup visualization if there isn't a copy for the default searchSource
+    if (!defaultSearchSource) {
+      return;
+    }
+
     // If no timefield has been specified we don't create a histogram of messages
     if (!$scope.opts.timefield) return;
 
@@ -861,18 +934,21 @@ function discoverController(
     };
 
     $scope.vis = new Vis(
-      $scope.searchSource.getField('index'),
+      // Wazuh. Force to use the default searchSource copy
+      defaultSearchSource.getField('index'),
       visSavedObject.visState
     );
     visSavedObject.vis = $scope.vis;
 
-    $scope.searchSource.onRequestStart((searchSource, searchRequest) => {
+    // Wazuh. Force to use the default searchSource copy
+    defaultSearchSource.onRequestStart((searchSource, searchRequest) => {
       return $scope.vis
         .getAggConfig()
         .onSearchRequestStart(searchSource, searchRequest);
     });
 
-    $scope.searchSource.setField('aggs', function() {
+    // Wazuh. Force to use the default searchSource copy
+    defaultSearchSource.setField('aggs', function() {
       //////////////////// WAZUH ////////////////////////////////
       const result = $scope.vis.getAggConfig().toDsl();
       if (((result[2] || {}).date_histogram || {}).interval === '0ms') {
@@ -980,8 +1056,8 @@ function discoverController(
       });
     } else {
       $state.filters = localChange ? $state.filters : [];
-      if (($scope.pinnedFilters || []).length) {
-        await queryFilter.addFilters($scope.pinnedFilters);
+      if ((pinnedFilters || []).length) {
+        await queryFilter.addFilters(pinnedFilters);
       }
       const currentFilters = queryFilter.getFilters();
       const pinnedAgentIDs = currentFilters.filter(
@@ -1010,8 +1086,13 @@ function discoverController(
     }
   };
 
-  const getPinnedFilters = () => {
-    const currentFilters = queryFilter.getFilters();
+  /**
+   * Return a list of pinned filters from a given array of filters or
+   * from the queryFilter service if no array is given.
+   * @param {*} arr Optional. Array of filters to be used instead of getFilters()
+   */
+  const getPinnedFilters = arr => {
+    const currentFilters = arr || queryFilter.getFilters();
     if (currentFilters) {
       return currentFilters.filter(
         item => ((item || {}).$state || {}).store === 'globalState'
@@ -1022,9 +1103,10 @@ function discoverController(
   const wzEventFiltersListener = $rootScope.$on(
     'wzEventFilters',
     (evt, parameters) => {
+      $rootScope.resultState = fetchStatuses.LOADING;
       if (!parameters.localChange) {
-        if (!($scope.pinnedFilters || []).length) {
-          $scope.pinnedFilters = getPinnedFilters();
+        if (!(pinnedFilters || []).length) {
+          pinnedFilters = getPinnedFilters();
         }
         queryFilter.removeAll();
       }
@@ -1036,12 +1118,43 @@ function discoverController(
   const changeTabViewListener = $rootScope.$on(
     'changeTabView',
     async (evt, parameters) => {
-      $scope.pinnedFilters = getPinnedFilters();
-      if (parameters.tabView !== 'discover') {
-        queryFilter.removeAll();
+      $rootScope.resultState = fetchStatuses.LOADING;
+      pinnedFilters = getPinnedFilters();
+      const goToDiscover = parameters.tabView === 'discover';
+      const wasOnDiscover = $scope.tabView === 'discover';
+      const backDiscover = !goToDiscover && wasOnDiscover;
+      backFromDiscover = backDiscover;
+
+      // Store last tab we visited
+      const sameTab = lastTab === parameters.tab;
+      lastTab = parameters.tab;
+
+      if (!sameTab) {
+        await queryFilter.removeAll();
+      } else {
+        discoverFilters = queryFilter.getFilters();
       }
+
+      // Prevent multiple executions
       evt.stopPropagation();
+
+      // Assign the incoming value for tabView
       $scope.tabView = parameters.tabView || 'panels';
+
+      // Ensure tabView is always up-to-date.
+      $scope.$applyAsync();
+
+      // Wazuh. Force to retrieve "hits".
+      // Before this version, we already had the hits, with the latest optimization
+      // they are only retrieved if needed (Discover table).
+      if (goToDiscover) {
+        $scope.updateQueryAndFetch({
+          query: $state.query,
+          dateRange: $scope.time
+        });
+      } else {
+        $scope.updateQueryAndFetch($state.query);
+      }
     }
   );
 

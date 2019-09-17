@@ -18,7 +18,7 @@ import * as listeners from './lib/listeners';
 import { searchData, filterData, queryData } from './lib/data';
 import { initTable } from './lib/init';
 import { sort } from './lib/sort';
-import React, { Component } from 'react';
+import React from 'react';
 import { EuiHealth } from '@elastic/eui';
 import * as ProcessEquivalence from '../../../util/process-state-equivalence';
 const app = uiModules.get('app/wazuh', []);
@@ -39,7 +39,7 @@ app.directive('wzTableEui', function() {
       );
       const processStatus = value => ProcessEquivalence[value] || value;
 
-      const defaultRender = value => value || '-';
+      const defaultRender = value => value >= 0 ? value : !!value ? value : '-';
 
       const parseColumns = columnsArray => {
         return columnsArray.map(item => ({

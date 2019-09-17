@@ -1,5 +1,5 @@
 /*
- * Wazuh app - File for app requirements and set up
+ * Wazuh app - Load the Settings React components.
  * Copyright (C) 2015-2019 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify

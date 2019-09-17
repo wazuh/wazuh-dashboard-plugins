@@ -1,38 +1,14 @@
 <md-content flex layout="column" ng-if="octrl.tab === 'nist' && octrl.tabView === 'panels'" ng-class="{'no-opacity': resultState !== 'ready' || !rendered}"
     layout-align="start">
 
-    <div layout="row" layout-align="center stretch">
-        <md-card flex class="wz-md-card">
-            <md-tabs md-selected="selectedPciIndex" class="wz-md-tab" md-border-bottom md-dynamic-height id="nistReq_tab">
-                <md-tab ng-repeat="tab in octrl.nistTabs" ng-disabled="tab.disabled" label="{{tab.title}}">
-                    <div class="md-padding">
-                        <span class="wz-headline-title">NIST 800-53 Requirement: {{tab.title}}</span>
-                        <md-divider class="wz-margin-top-10"></md-divider>
-                        <div layout="row" class="wz-padding-top-10 wz-line-height">
-                            <div ng-bind-html="tab.content"></div>
-                        </div>
-                    </div>
-                </md-tab>
-            </md-tabs>
-        </md-card>
+    <div ng-if="octrl.nistReqs" class="wz-margin-10">
+        <react-component name='RequirementCard' props="octrl.nistReqs"/>
     </div>
 
     <div layout="row" layout-align="center stretch" class="height-400">
-        <md-card flex="70" class="wz-md-card" ng-class="{'fullscreen': octrl.expandArray[0]}">
-            <md-card-actions layout="row" class="wz-card-actions-vis" ng-dblclick="octrl.expand(0)">
-                <span class="wz-headline-title">NIST 800-53 requirements</span>
-                <span flex></span>
-                <span class="cursor-pointer" ng-click="octrl.expand(0)">
-                    <react-component name="EuiIcon" props="{type:'expand'}" />
-                </span>
-            </md-card-actions>
-            <md-card-content class="wazuh-column">
-                <kbn-vis id="Wazuh-App-Overview-NIST-requirements" vis-id="'Wazuh-App-Overview-NIST-requirements'"></kbn-vis>
-            </md-card-content>
-        </md-card>
-        <md-card flex="30" class="wz-md-card" ng-class="{'fullscreen': octrl.expandArray[1]}">
+        <md-card flex="20" class="wz-md-card" ng-class="{'fullscreen': octrl.expandArray[1]}">
             <md-card-actions layout="row" class="wz-card-actions-vis" ng-dblclick="octrl.expand(1)">
-                <span class="wz-headline-title">Top 10 agents by alerts number</span>
+                <span class="wz-headline-title">Most active agents</span>
                 <span flex></span>
                 <span class="cursor-pointer" ng-click="octrl.expand(1)">
                     <react-component name="EuiIcon" props="{type:'expand'}" />
@@ -42,10 +18,7 @@
                 <kbn-vis id="Wazuh-App-Overview-NIST-Agents" vis-id="'Wazuh-App-Overview-NIST-Agents'"></kbn-vis>
             </md-card-content>
         </md-card>
-    </div>
-
-    <div layout="row" layout-align="center stretch" class="height-300">
-        <md-card flex class="wz-md-card" ng-class="{'fullscreen': octrl.expandArray[2]}">
+        <md-card flex="45" class="wz-md-card" ng-class="{'fullscreen': octrl.expandArray[2]}">
             <md-card-actions layout="row" class="wz-card-actions-vis" ng-dblclick="octrl.expand(2)">
                 <span class="wz-headline-title">Top requirements over time</span>
                 <span flex></span>
@@ -57,12 +30,24 @@
                 <kbn-vis id="Wazuh-App-Overview-NIST-Requirements-over-time" vis-id="'Wazuh-App-Overview-NIST-Requirements-over-time'"></kbn-vis>
             </md-card-content>
         </md-card>
+        <md-card flex="35" class="wz-md-card" ng-class="{'fullscreen': octrl.expandArray[0]}">
+            <md-card-actions layout="row" class="wz-card-actions-vis" ng-dblclick="octrl.expand(0)">
+                <span class="wz-headline-title">Requiments distribution by agent</span>
+                <span flex></span>
+                <span class="cursor-pointer" ng-click="octrl.expand(0)">
+                    <react-component name="EuiIcon" props="{type:'expand'}" />
+                </span>
+            </md-card-actions>
+            <md-card-content class="wazuh-column">
+                <kbn-vis id="Wazuh-App-Overview-NIST-requirements-by-agents" vis-id="'Wazuh-App-Overview-NIST-requirements-by-agents'"></kbn-vis>
+            </md-card-content>
+        </md-card>
     </div>
 
-    <div layout="row" layout-align="center stretch" class="height-530">
-        <md-card flex class="wz-md-card" ng-class="{'fullscreen': octrl.expandArray[3]}">
+    <div layout="row" layout-align="center stretch" class="height-300">
+        <md-card flex="45" class="wz-md-card" ng-class="{'fullscreen': octrl.expandArray[3]}">
             <md-card-actions layout="row" class="wz-card-actions-vis" ng-dblclick="octrl.expand(3)">
-                <span class="wz-headline-title">Last alerts</span>
+                <span class="wz-headline-title">Alerts volume by agent</span>
                 <span flex></span>
                 <span class="cursor-pointer" ng-click="octrl.expand(3)">
                     <react-component name="EuiIcon" props="{type:'expand'}" />
@@ -73,29 +58,40 @@
                 </kbn-vis>
             </md-card-content>
         </md-card>
-    </div>
-
-    <div layout="row" layout-align="center stretch" class="height-255">
-        <md-card flex class="wz-md-card" ng-class="{'fullscreen': octrl.expandArray[4]}">
+        <md-card flex="25" class="wz-md-card" ng-class="{'fullscreen': octrl.expandArray[4]}">
             <md-card-actions layout="row" class="wz-card-actions-vis" ng-dblclick="octrl.expand(4)">
-                <span class="wz-headline-title">Requirements by agent</span>
+                <span class="wz-headline-title">Stats</span>
                 <span flex></span>
                 <span class="cursor-pointer" ng-click="octrl.expand(4)">
                     <react-component name="EuiIcon" props="{type:'expand'}" />
                 </span>
             </md-card-actions>
             <md-card-content class="wazuh-column">
-                <kbn-vis id="Wazuh-App-Overview-NIST-Requirements-by-agent" vis-id="'Wazuh-App-Overview-NIST-Requirements-by-agent'"></kbn-vis>
+                <kbn-vis id="Wazuh-App-Overview-NIST-Metrics" vis-id="'Wazuh-App-Overview-NIST-Metrics'">
+                </kbn-vis>
+            </md-card-content>
+        </md-card>
+        <md-card flex="30" class="wz-md-card" ng-class="{'fullscreen': octrl.expandArray[5]}">
+            <md-card-actions layout="row" class="wz-card-actions-vis" ng-dblclick="octrl.expand(5)">
+                <span class="wz-headline-title">Top 10 requirements</span>
+                <span flex></span>
+                <span class="cursor-pointer" ng-click="octrl.expand(5)">
+                    <react-component name="EuiIcon" props="{type:'expand'}" />
+                </span>
+            </md-card-actions>
+            <md-card-content class="wazuh-column">
+                <kbn-vis id="Wazuh-App-Overview-NIST-Top-10-requirements" vis-id="'Wazuh-App-Overview-NIST-Top-10-requirements'">
+                </kbn-vis>
             </md-card-content>
         </md-card>
     </div>
 
     <div layout="row" layout-align="center stretch" class="height-570">
-        <md-card flex class="wz-md-card" ng-class="{'fullscreen': octrl.expandArray[5]}">
-            <md-card-actions layout="row" class="wz-card-actions-vis" ng-dblclick="octrl.expand(5)">
+        <md-card flex class="wz-md-card" ng-class="{'fullscreen': octrl.expandArray[6]}">
+            <md-card-actions layout="row" class="wz-card-actions-vis" ng-dblclick="octrl.expand(6)">
                 <span class="wz-headline-title">Alerts summary</span>
                 <span flex></span>
-                <span class="cursor-pointer" ng-click="octrl.expand(5)">
+                <span class="cursor-pointer" ng-click="octrl.expand(6)">
                     <react-component name="EuiIcon" props="{type:'expand'}" />
                 </span>
             </md-card-actions>

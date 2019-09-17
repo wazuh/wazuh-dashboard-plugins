@@ -9,6 +9,7 @@
  *
  * Find more information about this on the LICENSE file.
  */
+
 import { knownFields } from '../integration-files/known-fields';
 import { monitoringKnownFields } from '../integration-files/monitoring-known-fields';
 
@@ -239,7 +240,6 @@ export class ElasticWrapper {
               item.name !==
                 'data.aws.service.action.networkConnectionAction.remoteIpDetails.geoLocation.lon'
           );
-
           this.mergeDetectedFields(knownFields, currentFields);
         }
       } else {

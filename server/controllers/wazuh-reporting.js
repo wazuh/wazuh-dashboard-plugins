@@ -204,7 +204,7 @@ export class WazuhReportingCtrl {
         const modifiedRows = [];
         for (const row of rows) {
           modifiedRows.push(
-            row.map(cell => ({ text: cell, style: 'standard' }))
+            row.map(cell => ({ text: cell || '-', style: 'standard' }))
           );
         }
 
@@ -213,7 +213,7 @@ export class WazuhReportingCtrl {
 
         full_body.push(
           table.columns.map(col => ({
-            text: col,
+            text: col || '-',
             style: 'whiteColor',
             border: [0, 0, 0, 0]
           })),
@@ -268,7 +268,7 @@ export class WazuhReportingCtrl {
         const modifiedRows = [];
         for (const row of rows) {
           modifiedRows.push(
-            row.map(cell => ({ text: cell, style: 'standard' }))
+            row.map(cell => ({ text: cell || '-', style: 'standard' }))
           );
         }
         let widths = [];
@@ -278,7 +278,7 @@ export class WazuhReportingCtrl {
         if (table.type === 'config') {
           full_body.push(
             table.columns.map(col => ({
-              text: col,
+              text: col || '-',
               border: [0, 0, 0, 20],
               fontSize: 0,
               colSpan: 2
@@ -303,7 +303,7 @@ export class WazuhReportingCtrl {
         } else if (table.type === 'table') {
           full_body.push(
             table.columns.map(col => ({
-              text: col,
+              text: col || '-',
               style: 'whiteColor',
               border: [0, 0, 0, 0]
             })),
@@ -376,7 +376,7 @@ export class WazuhReportingCtrl {
                   margin: [40, 4, 0, 0]
                 },
                 {
-                  text: str,
+                  text: str || '-',
                   margin: [43, 0, 0, 0],
                   style: 'whiteColorFilters'
                 }
@@ -393,7 +393,7 @@ export class WazuhReportingCtrl {
                   margin: [40, 4, 0, 0]
                 },
                 {
-                  text: filters,
+                  text: filters || '-',
                   margin: [43, 0, 0, 0],
                   style: 'whiteColorFilters'
                 }
@@ -467,10 +467,17 @@ export class WazuhReportingCtrl {
           });
         } else if (section === 'groupConfig') {
           this.dd.content.push({
-            text: `Agents in group`,
+            text: 'Agents in group',
             style: { fontSize: 14, color: '#000' },
             margin: [0, 20, 0, 0]
           });
+          if (section === 'groupConfig' && !Object.keys(isAgents).length) {
+            this.dd.content.push({
+              text: 'There are still no agents in this group.',
+              style: { fontSize: 12, color: '#000' },
+              margin: [0, 10, 0, 0]
+            });
+          }
         }
         this.dd.content.push('\n');
       }
@@ -1582,6 +1589,9 @@ export class WazuhReportingCtrl {
               : JSON.stringify(x[key])
           );
         }
+        while (row.length < columns.length) {
+          row.push('-');
+        }
         return row;
       });
       array.push({
@@ -1689,7 +1699,7 @@ export class WazuhReportingCtrl {
             } catch (err) {} //eslint-disable-line
             if (Object.keys(configuration.data.items[0].config).length) {
               this.dd.content.push({
-                text: `Configurations`,
+                text: 'Configurations',
                 style: { fontSize: 14, color: '#000' },
                 margin: [0, 10, 0, 15]
               });
@@ -1719,6 +1729,7 @@ export class WazuhReportingCtrl {
                 for (let _d of Object.keys(config.config)) {
                   for (let c of AgentConfiguration.configurations) {
                     for (let s of c.sections) {
+                      section.opts = s.opts || {};
                       for (let cn of s.config || []) {
                         if (cn.configuration === _d) {
                           section.labels = s.labels || [[]];
@@ -1810,9 +1821,50 @@ export class WazuhReportingCtrl {
                       }
                     }
                   } else {
-                    tables.push(
-                      ...this.getConfigTables(config.config[_d], section, idx)
-                    );
+                    /*INTEGRITY MONITORING MONITORED DIRECTORIES */
+                    if (config.config[_d].directories) {
+                      const directories = config.config[_d].directories;
+                      delete config.config[_d].directories;
+                      tables.push(
+                        ...this.getConfigTables(config.config[_d], section, idx)
+                      );
+                      let diffOpts = [];
+                      Object.keys(section.opts).forEach(x => {
+                        diffOpts.push(x);
+                      });
+                      const columns = [
+                        '',
+                        ...diffOpts.filter(
+                          x => x !== 'check_all' && x !== 'check_sum'
+                        )
+                      ];
+                      let rows = [];
+                      directories.forEach(x => {
+                        let row = [];
+                        row.push(x.path);
+                        columns.forEach(y => {
+                          if (y !== '') {
+                            row.push(x[y] ? 'yes' : 'no');
+                          }
+                        });
+                        row.push(x.recursion_level);
+                        rows.push(row);
+                      });
+                      columns.forEach((x, idx) => {
+                        columns[idx] = section.opts[x];
+                      });
+                      columns.push('RL');
+                      tables.push({
+                        title: 'Monitored directories',
+                        type: 'table',
+                        columns,
+                        rows
+                      });
+                    } else {
+                      tables.push(
+                        ...this.getConfigTables(config.config[_d], section, idx)
+                      );
+                    }
                   }
                   for (const table of tables) {
                     this.renderConfigTables([table]);
@@ -1822,6 +1874,12 @@ export class WazuhReportingCtrl {
                 }
                 tables = [];
               }
+            } else {
+              this.dd.content.push({
+                text: 'A configuration for this group has not yet been set up.',
+                style: { fontSize: 12, color: '#000' },
+                margin: [0, 10, 0, 15]
+              });
             }
           }
           if (enabledComponents['1']) {
@@ -1841,21 +1899,6 @@ export class WazuhReportingCtrl {
               apiId
             );
           }
-          let agentsInGroup = [];
-          try {
-            agentsInGroup = await this.apiRequest.makeGenericRequest(
-              'GET',
-              `/agents/groups/${g_id}`,
-              {},
-              apiId
-            );
-          } catch (err) {} //eslint-disable-line
-          await this.renderHeader(
-            tab,
-            g_id,
-            (((agentsInGroup || []).data || []).items || []).map(x => x.id),
-            apiId
-          );
         }
         if (isAgentConfig) {
           const configurations = AgentConfiguration.configurations;
@@ -2191,21 +2234,25 @@ export class WazuhReportingCtrl {
             if (ports && ports.data && ports.data.items) {
               tables.push({
                 title: 'Network ports',
-                columns: [
-                  'Local IP',
-                  'Local port',
-                  'Process',
-                  'State',
-                  'Protocol'
-                ],
+                columns:
+                  agentOs === 'windows'
+                    ? ['Local IP', 'Local port', 'Process', 'State', 'Protocol']
+                    : ['Local IP', 'Local port', 'State', 'Protocol'],
                 rows: ports.data.items.map(x => {
-                  return [
-                    x['local']['ip'],
-                    x['local']['port'],
-                    x['process'],
-                    x['state'],
-                    x['protocol']
-                  ];
+                  return agentOs === 'windows'
+                    ? [
+                        x['local']['ip'],
+                        x['local']['port'],
+                        x['process'],
+                        x['state'],
+                        x['protocol']
+                      ]
+                    : [
+                        x['local']['ip'],
+                        x['local']['port'],
+                        x['state'],
+                        x['protocol']
+                      ];
                 })
               });
             }
@@ -2247,10 +2294,10 @@ export class WazuhReportingCtrl {
                 ],
                 rows: netaddr.data.items.map(x => {
                   return [
-                    x['interface'],
+                    x['iface'],
                     x['address'],
                     x['netmask'],
-                    x['protocol'],
+                    x['proto'],
                     x['broadcast']
                   ];
                 })

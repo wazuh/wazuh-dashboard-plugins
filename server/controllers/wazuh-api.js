@@ -99,20 +99,17 @@ export class WazuhApiCtrl {
         };
 
         // Update cluster information in Elasticsearch .wazuh document
-        const result = await this.wzWrapper.updateWazuhIndexDocument(
-          null,
-          req.payload,
-          {
-            doc: { cluster_info: api.cluster_info }
-          }
-        );
+        await this.wzWrapper.updateWazuhIndexDocument(null, req.payload, {
+          doc: { cluster_info: api.cluster_info }
+        });
 
         // Hide Wazuh API password
-        api.password = '****';
+        const copied = {...api};
+        copied.secret = '****';
 
         return {
           statusCode: 200,
-          data: api,
+          data: copied,
           idChanged: req.idChanged || null
         };
       }
@@ -762,6 +759,27 @@ export class WazuhApiCtrl {
   }
 
   /**
+   * Helper method for Dev Tools.
+   * https://documentation.wazuh.com/current/user-manual/api/reference.html
+   * Depending on the method and the path some parameters should be an array or not.
+   * Since we allow the user to write the request using both comma-separated and array as well,
+   * we need to check if it should be transformed or not.
+   * @param {*} method The request method
+   * @param {*} path The Wazuh API path
+   */
+  shouldKeepArrayAsIt(method, path) {
+    // Methods that we must respect a do not transform them
+    const isAgentsRestart = method === 'POST' && path === '/agents/restart';
+    const isActiveResponse =
+      method === 'PUT' && path.startsWith('/active-response/');
+    const isAddingAgentsToGroup =
+      method === 'POST' && path.startsWith('/agents/group/');
+
+    // Returns true only if one of the above conditions is true
+    return isAgentsRestart || isActiveResponse || isAddingAgentsToGroup;
+  }
+
+  /**
    * This performs a request over Wazuh API and returns its response
    * @param {String} method Method: GET, PUT, POST, DELETE
    * @param {String} path API route
@@ -825,7 +843,7 @@ export class WazuhApiCtrl {
         data = data.content;
       }
       const delay = (data || {}).delay || 0;
-      const fullUrl = getPath(api) + path;
+      let fullUrl = getPath(api) + path;
       if (delay) {
         const current = new Date();
         this.queue.addJob({
@@ -855,21 +873,30 @@ export class WazuhApiCtrl {
         }
       }
 
-      let fixedUrl = false;
-      if (method === 'DELETE') {
-        fixedUrl = `${
-          fullUrl.includes('?') ? fullUrl.split('?')[0] : fullUrl
-        }?${querystring.stringify(data)}`;
+      log('wazuh-api:makeRequest', `${method} ${fullUrl}`, 'debug');
+
+      // Extract keys from parameters
+      const dataProperties = Object.keys(data);
+
+      // Transform arrays into comma-separated string if applicable.
+      // The reason is that we are accepting arrays for comma-separated
+      // parameters in the Dev Tools
+      if (!this.shouldKeepArrayAsIt(method, path)) {
+        for (const key of dataProperties) {
+          if (Array.isArray(data[key])) {
+            data[key] = data[key].join();
+          }
+        }
       }
 
-      log('wazuh-api:makeRequest', `${method} ${fixedUrl || fullUrl}`, 'debug');
+      // DELETE must use URL query but we accept objects in Dev Tools
+      if (method === 'DELETE' && dataProperties.length) {
+        const query = querystring.stringify(data);
+        fullUrl += fullUrl.includes('?') ? `&${query}` : `?${query}`;
+        data = {};
+      }
 
-      const response = await needle(
-        method,
-        fixedUrl || fullUrl,
-        fixedUrl ? null : data,
-        options
-      );
+      const response = await needle(method, fullUrl, data, options);
 
       const responseIsDown = this.checkResponseIsDown(response);
 
@@ -937,6 +964,7 @@ export class WazuhApiCtrl {
       const options = ApiHelper.buildOptionsObject(api);
 
       const fullUrl = getPath(api) + path;
+
       log('wazuh-api:makeGenericRequest', `${method} ${fullUrl}`, 'debug');
       const response = await needle(method, fullUrl, data, options);
 
@@ -1058,15 +1086,15 @@ export class WazuhApiCtrl {
         req.payload.id
       );
 
-      let path_tmp = req.payload.path;
+      let tmpPath = req.payload.path;
 
-      if (path_tmp && typeof path_tmp === 'string') {
-        path_tmp = path_tmp[0] === '/' ? path_tmp.substr(1) : path_tmp;
+      if (tmpPath && typeof tmpPath === 'string') {
+        tmpPath = tmpPath[0] === '/' ? tmpPath.substr(1) : tmpPath;
       }
 
-      if (!path_tmp) throw new Error('An error occurred parsing path field');
+      if (!tmpPath) throw new Error('An error occurred parsing path field');
 
-      log('wazuh-api:csv', `Report ${path_tmp}`, 'debug');
+      log('wazuh-api:csv', `Report ${tmpPath}`, 'debug');
       // Real limit, regardless the user query
       const params = { limit: 500 };
 
@@ -1079,23 +1107,24 @@ export class WazuhApiCtrl {
 
       const cred = ApiHelper.buildOptionsObject(config);
 
-      const itemsArray = [];
+      let itemsArray = [];
       const output = await needle(
         'get',
-        `${config.url}:${config.port}/${path_tmp}`,
+        `${config.url}:${config.port}/${tmpPath}`,
         params,
         cred
       );
 
-      if ((((output || {}).body || {}).data || {}).totalItems) {
+      const totalItems = (((output || {}).body || {}).data || {}).totalItems;
+
+      if (totalItems) {
         params.offset = 0;
-        const { totalItems } = output.body.data;
         itemsArray.push(...output.body.data.items);
         while (itemsArray.length < totalItems && params.offset < totalItems) {
           params.offset += params.limit;
           const tmpData = await needle(
             'get',
-            `${config.url}:${config.port}/${path_tmp}`,
+            `${config.url}:${config.port}/${tmpPath}`,
             params,
             cred
           );
@@ -1103,49 +1132,66 @@ export class WazuhApiCtrl {
         }
       }
 
-      if ((((output || {}).body || {}).data || {}).totalItems) {
-        const isList = req.payload.path.includes('/lists');
-        const isAgents = req.payload.path.includes('/agents');
+      if (totalItems) {
+        const { path, filters } = req.payload;
+        const isList = path.includes('/lists') && filters && filters.length;
+        const isArrayOfLists =
+          path.includes('/lists') && (!filters || !filters.length);
+        const isAgents = path.includes('/agents') && !path.includes('groups');
+        const isAgentsOfGroup = path.startsWith('/agents/groups/');
+        let fields = Object.keys(output.body.data.items[0]);
 
-        const fields = isAgents
-          ? [
-              'id',
-              'status',
-              'name',
-              'ip',
-              'group',
-              'manager',
-              'node_name',
-              'dateAdd',
-              'version',
-              'lastKeepAlive',
-              'os.arch',
-              'os.build',
-              'os.codename',
-              'os.major',
-              'os.minor',
-              'os.name',
-              'os.platform',
-              'os.uname',
-              'os.version'
-            ]
-          : isList
-          ? ['key', 'value']
-          : Object.keys(output.body.data.items[0]);
-
-        const json2csvParser = new Parser({ fields });
-        if (isList) {
-          itemsArray[0].map(item => {
-            if (!item.value || !item.value.length) item.value = '-';
-            return item;
-          });
+        if (isAgents || isAgentsOfGroup) {
+          fields = [
+            'id',
+            'status',
+            'name',
+            'ip',
+            'group',
+            'manager',
+            'node_name',
+            'dateAdd',
+            'version',
+            'lastKeepAlive',
+            'os.arch',
+            'os.build',
+            'os.codename',
+            'os.major',
+            'os.minor',
+            'os.name',
+            'os.platform',
+            'os.uname',
+            'os.version'
+          ];
         }
 
-        let csv = json2csvParser.parse(isList ? itemsArray[0] : itemsArray);
+        if (isArrayOfLists) {
+          const flatLists = [];
+          for (const list of itemsArray) {
+            const { path, items } = list;
+            flatLists.push(
+              ...items.map(item => ({ path, key: item.key, value: item.value }))
+            );
+          }
+          fields = ['path', 'key', 'value'];
+          itemsArray = [...flatLists];
+        }
+
+        if (isList) {
+          fields = ['key', 'value'];
+          itemsArray = itemsArray[0];
+        }
+
+        fields = fields.map(item => ({ value: item, default: '-' }));
+
+        const json2csvParser = new Parser({ fields });
+
+        let csv = json2csvParser.parse(itemsArray);
 
         for (const field of fields) {
-          if (csv.includes(field)) {
-            csv = csv.replace(field, KeyEquivalence[field] || field);
+          const { value } = field;
+          if (csv.includes(value)) {
+            csv = csv.replace(value, KeyEquivalence[value] || value);
           }
         }
 
@@ -1183,64 +1229,17 @@ export class WazuhApiCtrl {
 
       const headers = ApiHelper.buildOptionsObject(config);
 
-      const distinctUrl = `${config.url}:${config.port}/agents/stats/distinct`;
+      const distinctUrl = `${config.url}:${config.port}/summary/agents`;
 
-      const data = await Promise.all([
-        needle(
-          'get',
-          distinctUrl,
-          { fields: 'node_name', select: 'node_name' },
-          headers
-        ),
-        needle(
-          'get',
-          `${config.url}:${config.port}/agents/groups`,
-          {},
-          headers
-        ),
-        needle(
-          'get',
-          distinctUrl,
-          {
-            fields: 'os.name,os.platform,os.version',
-            select: 'os.name,os.platform,os.version'
-          },
-          headers
-        ),
-        needle(
-          'get',
-          distinctUrl,
-          { fields: 'version', select: 'version' },
-          headers
-        ),
-        needle(
-          'get',
-          `${config.url}:${config.port}/agents/summary`,
-          {},
-          headers
-        ),
-        needle(
-          'get',
-          `${config.url}:${config.port}/agents`,
-          { limit: 1, sort: '-dateAdd', q: 'id!=000' },
-          headers
-        )
-      ]);
+      const data = await needle('get', distinctUrl, {}, headers);
+      const response = ((data || {}).body || {}).data || {};
 
-      const parsedResponses = data.map(item =>
-        item && item.body && item.body.data && !item.body.error
-          ? item.body.data
-          : false
-      );
-
-      const [
-        nodes,
-        groups,
-        osPlatforms,
-        versions,
-        summary,
-        lastAgent
-      ] = parsedResponses;
+      const nodes = response.nodes;
+      const groups = response.groups;
+      const osPlatforms = response.agent_os;
+      const versions = response.agent_version;
+      const summary = response.agent_status;
+      const lastAgent = response.last_registered_agent;
 
       const result = {
         groups: [],
@@ -1295,8 +1294,8 @@ export class WazuhApiCtrl {
         });
       }
 
-      if (lastAgent && lastAgent.items && lastAgent.items.length) {
-        Object.assign(result.lastAgent, lastAgent.items[0]);
+      if (lastAgent) {
+        Object.assign(result.lastAgent, lastAgent);
       }
 
       return { error: 0, result };
@@ -1318,7 +1317,7 @@ export class WazuhApiCtrl {
    * @param {Object} reply
    * @returns {Object} timestamp field or ErrorResponse
    */
-  async getTimeStamp(req, reply) {
+  getTimeStamp(req, reply) {
     try {
       const source = JSON.parse(fs.readFileSync(this.wazuhVersion, 'utf8'));
       if (source.installationDate && source.lastRestart) {

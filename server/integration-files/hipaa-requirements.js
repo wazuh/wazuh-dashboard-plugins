@@ -11,7 +11,7 @@
  */
 export const hipaaRequirementsFile = {
   '164.312.a.1':
-    'Implement technical policies and procedures for electronic information systems that maintain electronic protected health information to allow access only to those persons or software programs that have been granted access rights.',
+    'Implement technical policies and procedures for electronic information systems that maintain electronic protected health information to allow access only to those persons or software programs that have access.',
   '164.312.a.2.I':
     'Assign a unique name and/or number for identifying and tracking user identity.',
   '164.312.a.2.II':
