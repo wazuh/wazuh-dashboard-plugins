@@ -81,7 +81,7 @@ export class SettingsController {
 
     this.apiTableProps = {
       currentDefault: this.currentDefault,
-      apiEntries: this.apiEntries,
+      apiEntries: this.transformApiEntries(this.apiEntries),
       compressed: true,
       setDefault: entry => this.setDefault(entry),
       checkManager: entry => this.checkManager(entry)
@@ -90,6 +90,11 @@ export class SettingsController {
     this.addApiProps = {
       checkForNewApis: () => this.checkForNewApis(),
       closeAddApi: () => this.closeAddApi()
+    }
+
+    this.apiIsDownProps = {
+      apiEntries: this.transformApiEntries(this.apiEntries),
+      checkManager: entry => this.checkManager(entry)
     }
 
     this.settingsTabsProps = {
@@ -278,7 +283,7 @@ export class SettingsController {
       this.apiIsDown = false;
       !silent && this.errorHandler.info('Connection success', 'Settings');
       //Force react props update
-      this.apiTableProps.apiEntries = this.apiEntries;
+      this.apiTableProps.apiEntries = this.transformApiEntries(this.apiEntries);
       this.$scope.$applyAsync();
       return;
     } catch (error) {
@@ -446,8 +451,7 @@ export class SettingsController {
       const hosts = result.data || [];
       let numError = 0;
       //Tries to check if there are new APIs entries in the wazuh-hosts.yml also, checks if some of them have connection
-      if (!hosts.length) throw {message: 'There were not found any API entry in the wazuh-hosts.yml', type: 'warning', closedEnabled: false};
-      this.apiEntries = this.apiTableProps.apiEntries = hosts;
+      if (!hosts.length) throw { message: 'There were not found any API entry in the wazuh-hosts.yml', type: 'warning', closedEnabled: false };
       for (let idx in hosts) {
         const host = hosts[idx];
         const id = Object.keys(host)[0];
@@ -455,19 +459,47 @@ export class SettingsController {
         delete api.password;
         try {
           await this.testAPI.check(api);
+          hosts[idx][id].status = 'online'
         } catch (error) {
+          const code = ((error || {}).data || {}).code
+          const status = code === 3099 ? 'down' : 'unknown'
+          hosts[idx][id].status = status
           numError = numError + 1;
         }
       };
+      this.apiEntries = this.apiTableProps.apiEntries = this.apiIsDownProps.apiEntries = this.transformApiEntries(hosts);
       if (numError) {
-        const err = numError >= hosts.length ? {message: 'No API entry was reachable, please review your configuration', type: 'danger', closedEnabled: true} : {message: 'Some API entry cannot be reachabled', type: 'warning', closedEnabled: true};
-        throw err;
+        if (numError >= hosts.length) {
+          this.apiIsDown = true;
+          this.addingApi = false;
+          this.$scope.$applyAsync();
+          return;
+        }
+        throw { message: 'Some API entry cannot be reachabled', type: 'warning', closedEnabled: true };
       }
       return;
     } catch (error) {
       return Promise.reject(error);
     }
   }
+
+  /**
+  * Transforms the API entries object model
+  * @param {Array} entries
+  */
+ transformApiEntries(entries) {
+  try {
+    const arr = [];
+    entries.forEach(e => {
+      const id = Object.keys(e)[0];
+      const data = Object.assign(e[id], { id: id, cluster_info: e.cluster_info || {} });
+      arr.push(data);
+    });
+    return arr;
+  } catch (error) {
+    throw error;
+  }
+}
 
   /**
    * Closes the add API component

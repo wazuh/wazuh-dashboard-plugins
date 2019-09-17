@@ -38,25 +38,8 @@ export class ApiTable extends Component {
   componentDidMount() {
   }
 
-  /**
-  * Transforms the API entries object model
-  */
-  transformApiEntries(entries) {
-    try {
-      const arr = [];
-      entries.forEach(e => {
-        const id = Object.keys(e)[0];
-        const data = Object.assign(e[id], { id: id, cluster_info: e.cluster_info || {} });
-        arr.push(data);
-      });
-      return arr;
-    } catch (error) {
-      throw error;
-    }
-  }
-
   render() {
-    const items = this.transformApiEntries([...this.props.apiEntries]);
+    const items = [...this.props.apiEntries];
     const columns = [
       {
         field: 'cluster_info.cluster',

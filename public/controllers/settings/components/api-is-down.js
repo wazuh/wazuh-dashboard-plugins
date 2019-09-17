@@ -32,11 +32,7 @@ export class ApiIsDown extends Component {
     super(props);
     this.state = {
       status: 'incomplete',
-      fetchingData: false,
-      hosts: [
-        { host: 'http://172.16.1.2', port: 55000, status: 'unknown' },
-        { host: 'http://localhost', port: 55000, status: 'unknown' }
-      ]
+      fetchingData: false
     };
   }
   handleComplete() {
@@ -47,16 +43,13 @@ export class ApiIsDown extends Component {
     setTimeout(() => {
       this.setState({
         status: 'complete',
-        fetchingData: false,
-        hosts: [
-          { host: 'http://172.16.1.2', port: 55000, status: 'offline' },
-          { host: 'http://localhost', port: 55000, status: 'online' }
-        ]
+        fetchingData: false
       });
     }, 1000);
   }
 
   render() {
+    console.log('entries ',this.props.apiEntries)
     const apiExample = `
 # Example Wazuh API configuration
 hosts:
@@ -83,9 +76,9 @@ hosts:
         <EuiText>Already configured Wazuh API(s)</EuiText>
         <EuiSpacer />
         <EuiBasicTable
-          items={this.state.hosts}
+          items={this.props.apiEntries}
           columns={[
-            { field: 'host', name: 'Host' },
+            { field: 'url', name: 'Host' },
             { field: 'port', name: 'Port' },
             {
               field: 'status',
@@ -93,7 +86,7 @@ hosts:
               render: item => {
                 return item === 'online' ? (
                   <EuiHealth color="success">Online</EuiHealth>
-                ) : item === 'offline' ? (
+                ) : item === 'down' ? (
                   <EuiHealth color="danger">Offline</EuiHealth>
                 ) : (
                   <EuiHealth color="subdued">Unknown</EuiHealth>
@@ -154,3 +147,8 @@ hosts:
     );
   }
 }
+
+ApiIsDown.propTypes = {
+  apiEntries: PropTypes.array,
+  checkManager: PropTypes.func
+};

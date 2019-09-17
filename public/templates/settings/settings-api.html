@@ -1,15 +1,19 @@
 <div layout="column" layout-align="start stretch" ng-if="ctrl.tab === 'api' && !ctrl.load">
 
-    <div layout="row" layout-padding ng-if="ctrl.apiEntries.length">
+    <!-- API table section-->
+    <div layout="row" layout-padding ng-if="ctrl.apiEntries.length && !ctrl.addingApi && !ctrl.apiIsDown">
         <react-component name="ApiTable" props="ctrl.apiTableProps" />
     </div>
 
     <!-- Add API section-->
-    <div layout="row" layout-padding ng-if="!ctrl.apiEntries.length">
+    <div layout="row" layout-padding ng-if="(!ctrl.apiEntries.length || ctrl.addingApi) && !ctrl.apiIsDown">
         <react-component flex name="AddApi" props="ctrl.addApiProps" />
-        <!-- End add API form -->
     </div>
-    <!-- End add API section-->
+
+    <!-- API is down section-->
+    <div layout="column" layout-padding ng-if="ctrl.apiIsDown">
+        <react-component name="ApiIsDown" props="ctrl.apiIsDownProps" />
+    </div>
 
 </div>
 <!-- End API configuration card section -->
