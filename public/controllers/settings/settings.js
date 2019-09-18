@@ -81,7 +81,7 @@ export class SettingsController {
 
     this.apiTableProps = {
       currentDefault: this.currentDefault,
-      apiEntries: this.transformApiEntries(this.apiEntries),
+      apiEntries: this.apiEntries,
       compressed: true,
       setDefault: entry => this.setDefault(entry),
       checkManager: entry => this.checkManager(entry)
@@ -93,7 +93,7 @@ export class SettingsController {
     }
 
     this.apiIsDownProps = {
-      apiEntries: this.transformApiEntries(this.apiEntries),
+      apiEntries: this.apiEntries,
       testApi: entry => this.testAPI.check(entry),
       closeApiIsDown: () => this.closeApiIsDown()
     }
@@ -138,7 +138,7 @@ export class SettingsController {
   // Get current API index
   getCurrentAPIIndex() {
     if (this.apiEntries.length) {
-      const idx = this.apiEntries.map(entry => Object.keys(entry)[0]).indexOf(this.currentDefault);
+      const idx = this.apiEntries.map(entry => entry.id).indexOf(this.currentDefault);
       this.currentApiEntryIndex = idx;
     }
   }
@@ -148,7 +148,7 @@ export class SettingsController {
   * @param {Object} api 
   */
   getApiIndex(api) {
-    return this.apiEntries.map(entry => Object.keys(entry)[0]).indexOf(api.id)
+    return this.apiEntries.map(entry => entry.id).indexOf(api.id)
   }
 
   // Set default API
@@ -156,9 +156,7 @@ export class SettingsController {
     try {
       await this.checkManager(item, false, true);
       const index = this.getApiIndex(item);
-      const entry = this.apiEntries[index];
-      const key = Object.keys(entry)[0];
-      const api = entry[key];
+      const api = this.apiEntries[index];
       const { cluster_info, id } = api;
       const { manager, cluster, status } = cluster_info;
 
@@ -256,10 +254,8 @@ export class SettingsController {
         : this.getApiIndex(item);
 
       // Get the Api information
-      const entry = this.apiEntries[index];
-      const id = Object.keys(entry)[0];
-      const api = entry[id];
-      const { user, url, port } = api;
+      const api = this.apiEntries[index];
+      const { user, url, port, id } = api;
       const tmpData = {
         user: user,
         url: url,
@@ -284,7 +280,7 @@ export class SettingsController {
       this.apiIsDown = false;
       !silent && this.errorHandler.info('Connection success', 'Settings');
       //Force react props update
-      this.apiTableProps.apiEntries = this.transformApiEntries(this.apiEntries);
+      this.apiTableProps.apiEntries = this.apiEntries;
       this.$scope.$applyAsync();
       return;
     } catch (error) {
@@ -455,20 +451,17 @@ export class SettingsController {
       if (!hosts.length) throw { message: 'There were not found any API entry in the wazuh-hosts.yml', type: 'warning', closedEnabled: false };
       for (let idx in hosts) {
         const host = hosts[idx];
-        const id = Object.keys(host)[0];
-        const api = Object.assign(host[id], { id: id });
-        delete api.password;
         try {
-          await this.testAPI.check(api);
-          hosts[idx][id].status = 'online'
+          await this.testAPI.check(host);
+          hosts[idx].status = 'online'
         } catch (error) {
           const code = ((error || {}).data || {}).code
           const status = code === 3099 ? 'down' : 'unknown'
-          hosts[idx][id].status = status
+          hosts[idx].status = status
           numError = numError + 1;
         }
       };
-      this.apiEntries = this.apiTableProps.apiEntries = this.apiIsDownProps.apiEntries = this.transformApiEntries(hosts);
+      this.apiEntries = this.apiTableProps.apiEntries = this.apiIsDownProps.apiEntries = hosts;
       if (numError) {
         if (numError >= hosts.length) {
           this.apiIsDown = true;
@@ -483,24 +476,6 @@ export class SettingsController {
       return Promise.reject(error);
     }
   }
-
-  /**
-  * Transforms the API entries object model
-  * @param {Array} entries
-  */
- transformApiEntries(entries) {
-  try {
-    const arr = [];
-    entries.forEach(e => {
-      const id = Object.keys(e)[0];
-      const data = Object.assign(e[id], { id: id, cluster_info: e.cluster_info || {} });
-      arr.push(data);
-    });
-    return arr;
-  } catch (error) {
-    throw error;
-  }
-}
 
   /**
    * Closes the add API component

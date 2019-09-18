@@ -67,7 +67,9 @@ export class WazuhHostsCtrl {
       const ofuscated = this.ofuscatePassword(hosts);
       ofuscated.forEach(h => {
         const id = Object.keys(h)[0];
-        const host = Object.assign(h, registry[id]);
+        const api = Object.assign(h[id], {id: id});
+        const host = Object.assign(api, registry[id]);
+        delete host.password;
         joined.push(host);
       });
       return joined;
