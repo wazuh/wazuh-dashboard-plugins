@@ -162,12 +162,12 @@ export class SettingsController {
       for (let idx in this.apiEntries) {
         try {
           const entry = this.apiEntries[idx];
-          await this.testAPI.check(entry);
+          await this.checkManager(entry, false, true);
           this.apiEntries[idx].status = 'online';
         } catch (error) {
-          const code = ((error || {}).data || {}).code
-          const status = code === 3099 ? 'down' : 'unknown'
-          this.apiEntries[idx].status = status
+          const code = ((error || {}).data || {}).code;
+          const status = code === 3099 ? 'down' : 'unknown';
+          this.apiEntries[idx].status = status;
           numError = numError + 1;
         }
       }
@@ -316,22 +316,13 @@ export class SettingsController {
       this.wzMisc.setApiIsDown(false);
       this.apiIsDown = false;
       !silent && this.errorHandler.info('Connection success', 'Settings');
-      //Force react props update
-      this.apiTableProps.apiEntries = this.apiEntries;
       this.$scope.$applyAsync();
       return;
     } catch (error) {
-      const code = ((error || {}).data || {}).code
-      const status = code === 3099 ? 'down' : 'unknown'
-      if (!this.wzMisc.getApiIsDown() && !silent) {
-        this.printError(error);
-      } else {
-        if (!silent) {
-          this.errorHandler.handle(error);
-        } else {
-          return Promise.reject({ error: error, status: status });
-        }
-      }
+      if (!silent) {
+        this.errorHandler.handle(error);
+      } 
+      return Promise.reject(error);
     }
   }
 

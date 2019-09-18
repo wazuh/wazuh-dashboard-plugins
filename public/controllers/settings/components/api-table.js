@@ -26,21 +26,42 @@ export class ApiTable extends Component {
     super(props);
 
     this.state = {
-      itemIdToExpandedRowMap: {},
-      user: '',
-      password: '',
-      url: '',
-      port: 55000,
-      apiEntries: [],
-      currentDefault: 0
+      apiEntries: []
     };
   }
 
   componentDidMount() {
+    this.setState({
+      apiEntries: this.props.apiEntries
+    })
+  }
+
+  /**
+   * Checks the API connectivity
+   * @param {Object} api 
+   */
+  async checkApi(api) {
+    try {
+      const entries = this.state.apiEntries;
+      const idx = entries.map(e => e.id).indexOf(api.id);
+      try {
+        await this.props.checkManager(api);
+        entries[idx].status = 'online';
+      } catch (error) {
+        const code = ((error || {}).data || {}).code;
+        const status = code === 3099 ? 'down' : 'unknown';
+        entries[idx].status = status
+      }
+      this.setState({
+        apiEntries: entries
+      });
+    } catch (error) {
+      console.error('Error checking manager connection ', error);
+    }
   }
 
   render() {
-    const items = [...this.props.apiEntries];
+    const items = [...this.state.apiEntries];
     const columns = [
       {
         field: 'cluster_info.cluster',
@@ -108,7 +129,7 @@ export class ApiTable extends Component {
                 <EuiButtonIcon
                   aria-label="Check connection"
                   iconType="refresh"
-                  onClick={() => this.props.checkManager(item)}
+                  onClick={async () => await this.checkApi(item)}
                   color="success"
                 />
               </EuiToolTip>
