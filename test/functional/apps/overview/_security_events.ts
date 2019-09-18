@@ -239,7 +239,7 @@ export default function({getService, getPageObjects, }: FtrProviderContext) {
           }
         }
       };
-      const esValues: object[] = await esTableViz.getData(query, fields, 'Count', 'desc');
+      const esValues: object[] = await esTableViz.getData(query, fields, ['-Count', '-Level', '-Rule ID']);
 
       expect(JSON.stringify(esValues.slice(0, values.length)))
       .to.be.equal(JSON.stringify(values));
@@ -547,7 +547,7 @@ export default function({getService, getPageObjects, }: FtrProviderContext) {
           }
         }
       };
-      const esValues: object[] = await esTableViz.getData(query, fields, 'Count', 'desc');
+      const esValues: object[] = await esTableViz.getData(query, fields, ['-Count', '-Level', '-Rule ID']);
 
       
       expect(JSON.stringify(esValues.slice(0, values.length)))
@@ -870,7 +870,7 @@ export default function({getService, getPageObjects, }: FtrProviderContext) {
           }
         }
       };
-      const esValues: object[] = await esTableViz.getData(query, fields, 'Count', 'desc');
+      const esValues: object[] = await esTableViz.getData(query, fields, ['-Count', '-Level', '-Rule ID']);
 
       
       expect(JSON.stringify(esValues.slice(0, values.length)))

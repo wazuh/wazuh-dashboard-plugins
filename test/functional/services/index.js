@@ -5,6 +5,7 @@ import { TableVizProvider } from './table_viz';
 import { EsAreaChartProvider } from './es_area_chart';
 import { EsPieChartProvider } from './es_pie_chart';
 import { EsTableVizProvider } from './es_table_viz';
+import { SortArrayProvider } from './sort_array';
 
 export const services = {
   popOver: ExtensionPopoverProvider,
@@ -14,4 +15,5 @@ export const services = {
   esAreaChart: EsAreaChartProvider,
   esPieChart: EsPieChartProvider,
   esTableViz: EsTableVizProvider,
+  sortArray: SortArrayProvider,
 }

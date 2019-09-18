@@ -16,20 +16,21 @@ import { SearchParams } from 'elasticsearch';
 
 export function EsTableVizProvider({ getService, }: FtrProviderContext) {
   const es = getService('es');
+  const sortArray = getService('sortArray');
   const testSubjects = getService('testSubjects');
 
   class EsTableViz {
 
-    async getData(query:SearchParams, fields:any[], orderField:string=null, order:string=null) {
+    async getData(query:SearchParams, fields:any[], orderField:string[]) {
       const alerts = await this.getAlerts(query);
       const data = await this.getSeries(alerts, fields);
-      const stringfyData = this.stringfyData(data);
 
       if (orderField) {
-        return this.sortData(stringfyData, orderField, order);
+        const sortedData = sortArray.sortData(data, orderField);
+        return  this.stringfyData(sortedData);
       }
 
-      return stringfyData;
+      return this.stringfyData(data);
     }
 
     private stringfyData (data:object[]) {
@@ -46,27 +47,7 @@ export function EsTableVizProvider({ getService, }: FtrProviderContext) {
       })
     }
 
-    private sortData (data, orderField, order) {
-      const sortData = data.sort((a, b) => {
-
-        if (!isNaN(Number(a[orderField]))) {
-          return Number(a[orderField]) - Number(b[orderField]);
-        }
-
-        if (a[orderField] > b[orderField]) {
-          return 1;
-        } else if (a[orderField] < b[orderField]){
-          return -1;
-        }
-        return 0;
-      });
-
-      if(order === 'desc') {
-        return sortData.reverse();
-      }
-      return sortData;
-    }
-
+    
     private getSeries (alerts, fields) {
       const series = []
       for (const alert of alerts) {
