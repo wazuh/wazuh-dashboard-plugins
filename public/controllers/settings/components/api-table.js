@@ -18,6 +18,7 @@ import {
   EuiBasicTable,
   EuiButtonIcon,
   EuiToolTip,
+  EuiHealth
 } from '@elastic/eui';
 
 export class ApiTable extends Component {
@@ -65,6 +66,20 @@ export class ApiTable extends Component {
         field: 'user',
         name: 'User',
         align: 'left'
+      },
+      {
+        field: 'status',
+        name: 'Status',
+        align: 'left',
+        render: item => {
+          return item === 'online' ? (
+            <EuiHealth color="success">Online</EuiHealth>
+          ) : item === 'down' ? (
+            <EuiHealth color="danger">Offline</EuiHealth>
+          ) : (
+                <EuiHealth color="subdued">Unknown</EuiHealth>
+              );
+        }
       },
       {
         name: 'Actions',

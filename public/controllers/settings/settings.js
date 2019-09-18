@@ -78,6 +78,8 @@ export class SettingsController {
     }
     // Loading data
     await this.getSettings();
+    await this.checkApisStatus();
+    console.log('apientries ctrl ', this.apiEntries)
 
     this.apiTableProps = {
       currentDefault: this.currentDefault,
@@ -150,6 +152,28 @@ export class SettingsController {
   */
   getApiIndex(api) {
     return this.apiEntries.map(entry => entry.id).indexOf(api.id)
+  }
+
+  /**
+   * Checks the API entries status in order to set if there are online, offline or unknown.
+   */
+  async checkApisStatus() {
+    try {
+      let numError = 0;
+      for (let idx in this.apiEntries) {
+        try {
+          const entry = this.apiEntries[idx];
+          await this.testAPI.check(entry);
+          this.apiEntries[idx].status = 'online';
+        } catch (error) {
+          const code = ((error || {}).data || {}).code
+          const status = code === 3099 ? 'down' : 'unknown'
+          this.apiEntries[idx].status = status
+          numError = numError + 1;
+        }
+      }
+      return numError;
+    } catch (error) {}
   }
 
   // Set default API
@@ -289,6 +313,7 @@ export class SettingsController {
       await this.updateClusterInfoInRegistry(id, cluster_info);
       this.$scope.$emit('updateAPI', { cluster_info });
       this.apiEntries[index].cluster_info = cluster_info;
+      this.apiEntries[index].status = 'online';
       this.wzMisc.setApiIsDown(false);
       this.apiIsDown = false;
       !silent && this.errorHandler.info('Connection success', 'Settings');
@@ -297,13 +322,15 @@ export class SettingsController {
       this.$scope.$applyAsync();
       return;
     } catch (error) {
+      const code = ((error || {}).data || {}).code
+      const status = code === 3099 ? 'down' : 'unknown'
       if (!this.wzMisc.getApiIsDown() && !silent) {
         this.printError(error);
       } else {
         if (!silent) {
           this.errorHandler.handle(error);
         } else {
-          return Promise.reject(error);
+          return Promise.reject({ error: error, status: status });
         }
       }
     }
@@ -459,24 +486,12 @@ export class SettingsController {
     try {
       const result = await this.genericReq.request('GET', '/hosts/apis', {});
       const hosts = result.data || [];
-      let numError = 0;
       //Tries to check if there are new APIs entries in the wazuh-hosts.yml also, checks if some of them have connection
       if (!hosts.length) throw { message: 'There were not found any API entry in the wazuh-hosts.yml', type: 'warning', closedEnabled: false };
       this.apiEntries = this.apiTableProps.apiEntries = this.apiIsDownProps.apiEntries = hosts;
-      for (let idx in hosts) {
-        const host = hosts[idx];
-        try {
-          await this.checkManager(host, false, true);
-          hosts[idx].status = 'online'
-        } catch (error) {
-          const code = ((error || {}).data || {}).code
-          const status = code === 3099 ? 'down' : 'unknown'
-          hosts[idx].status = status
-          numError = numError + 1;
-        }
-      };
-      if (numError) {
-        if (numError >= hosts.length) {
+      const notRecheable = await this.checkApisStatus();
+      if (notRecheable) {
+        if (notRecheable >= hosts.length) {
           this.apiIsDown = true;
           throw { message: 'Wazuh API not recheable, please review your configuration', type: 'danger', closedEnabled: true };
         }
@@ -499,7 +514,7 @@ export class SettingsController {
   /**
    * Closes the API is down component
    */
-  closeApiIsDown() { 
+  closeApiIsDown() {
     this.apiIsDown = false;
     this.$scope.$applyAsync();
   }

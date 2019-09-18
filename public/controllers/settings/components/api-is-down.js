@@ -59,16 +59,16 @@ export class ApiIsDown extends Component {
         try {
           const data = await this.props.testApi(entry);
           const clusterInfo = data.data || {};
-          const id = entries[idx].id;
-          entries[idx].status = 'online'
-          entries[idx].cluster_info = clusterInfo
+          const id = entries[idx].id;;
+          entries[idx].status = 'online';
+          entries[idx].cluster_info = clusterInfo;
           //Updates the cluster info in the registry
           await this.props.updateClusterInfoInRegistry(id, clusterInfo);
         } catch (error) {
           numErr = numErr + 1;
-          const code = ((error || {}).data || {}).code
-          const status = code === 3099 ? 'down' : 'unknown'
-          entries[idx].status = status
+          const code = ((error || {}).data || {}).code;
+          const status = code === 3099 ? 'down' : 'unknown';
+          entries[idx].status = status;
         }
       }
       if (numErr) {
