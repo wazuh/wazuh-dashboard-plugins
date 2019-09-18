@@ -181,7 +181,7 @@ export class SettingsController {
 
       this.getCurrentAPIIndex();
       if (currentApi && !this.appState.getExtensions(id)) {
-        const { id, extensions } = this.apiEntries[this.currentApiEntryIndex][key];
+        const { id, extensions } = this.apiEntries[this.currentApiEntryIndex];
         this.appState.setExtensions(id, extensions);
       }
 
