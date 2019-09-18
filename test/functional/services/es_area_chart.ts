@@ -47,13 +47,13 @@ export function EsAreaChartProvider({ getService, }: FtrProviderContext) {
      * @returns {object}
      * @memberof EsAreaChart
      */
-    async getData (field: string = ''): Promise<OutPut> {
+    async getData (query:SearchParams, field: string = ''): Promise<OutPut> {
       const output: OutPut = {
         series: [],
         xAxisOrderedValues: []
       };
 
-      const alerts = await this.getAlerts();
+      const alerts = await this.getAlerts(query);
 
       alerts.forEach((alert: object) => {
         const interval: number = this.calculateInterval(alert._source.timestamp);
@@ -200,22 +200,9 @@ export function EsAreaChartProvider({ getService, }: FtrProviderContext) {
      * @returns {object[]}
      * @memberof EsAreaChart
      */
-    private async getAlerts (from:string='now/d', to:string='now'): Promise<object[]> {
+    private async getAlerts (query:SearchParams): Promise<object[]> {
       const es_index = await testSubjects.getVisibleText('wzMenuPatternTitle');
-      const alerts = await es.search({
-        index: es_index,
-        body: {
-          size: 1000,
-          query: {
-            range: {
-              timestamp: {
-                gte: 'now/d',
-                lt: 'now'
-              }
-            }
-          }
-        }
-      });
+      const alerts = await es.search(query);
       return alerts.hits.hits;
     }
 

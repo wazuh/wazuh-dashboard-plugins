@@ -12,6 +12,7 @@
  */
 
 import { FtrProviderContext } from '../../../../../test/functional/ftr_provider_context';
+import { SearchParams } from 'elasticsearch';
 
 export function EsPieChartProvider({ getService, }: FtrProviderContext) {
   const es = getService('es');
@@ -31,10 +32,10 @@ export function EsPieChartProvider({ getService, }: FtrProviderContext) {
      * @returns
      * @memberof EsPieChart
      */
-    async getData (field: string = '') {
+    async getData (query:SearchParams, field: string = '') {
       const output:object[] = []
 
-      const alerts = await this.getAlerts();
+      const alerts = await this.getAlerts(query);
 
       alerts.forEach((alert: object) => {
         const fieldValue = this.getFieldValue(alert, field)
@@ -94,22 +95,9 @@ export function EsPieChartProvider({ getService, }: FtrProviderContext) {
      * @returns {Promise<object[]>}
      * @memberof EsPieChart
      */
-    private async getAlerts(from:string='now/d', to:string='now'): Promise<object[]> {
+    private async getAlerts(query:SearchParams): Promise<object[]> {
       const es_index = await testSubjects.getVisibleText('wzMenuPatternTitle');
-      const alerts = await es.search({
-        index: es_index,
-        body: {
-          size: 1000,
-          query: {
-            range: {
-              timestamp: {
-                gte: from,
-                lt: to
-              }
-            }
-          }
-        }
-      });
+      const alerts = await es.search(query);
       return alerts.hits.hits
     }
 

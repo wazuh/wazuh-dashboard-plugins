@@ -12,6 +12,7 @@
  */
 
 import { FtrProviderContext } from '../../../../../test/functional/ftr_provider_context';
+import { SearchParams } from 'elasticsearch';
 
 export function EsTableVizProvider({ getService, }: FtrProviderContext) {
   const es = getService('es');
@@ -19,8 +20,8 @@ export function EsTableVizProvider({ getService, }: FtrProviderContext) {
 
   class EsTableViz {
 
-    async getData(fields:any[], orderField:string=null, order:string=null) {
-      const alerts = await this.getAlerts();
+    async getData(query:SearchParams, fields:any[], orderField:string=null, order:string=null) {
+      const alerts = await this.getAlerts(query);
       const data = await this.getSeries(alerts, fields);
       const stringfyData = this.stringfyData(data);
 
@@ -116,22 +117,9 @@ export function EsTableVizProvider({ getService, }: FtrProviderContext) {
     }
 
 
-    private async getAlerts (from:string='now/d', to:string='now'): Promise<object[]> {
+    private async getAlerts (query: SearchParams): Promise<object[]> {
       const es_index = await testSubjects.getVisibleText('wzMenuPatternTitle');
-      const alerts = await es.search({
-        index: es_index,
-        body: {
-          size: 1000,
-          query: {
-            range: {
-              timestamp: {
-                gte: 'now/d',
-                lt: 'now'
-              }
-            }
-          }
-        }
-      });
+      const alerts = await es.search(query);
       return alerts.hits.hits;
     }
 

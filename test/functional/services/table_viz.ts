@@ -42,9 +42,12 @@ export function TableVizProvider({ getService, }: FtrProviderContext) {
 
     async getRows (tableBody: WebElementWrapper[], headerTitles: string[]) {
       const rows: object[] = [];
-
+      const RE_PATTER = /^\s+$/
       for (const tr of await tableBody.findAllByTagName('tr')) {
-        rows.push(await this.getRow(tr, headerTitles));
+        const trText = await tr.getVisibleText();
+        if (!RE_PATTER.test(trText)){
+          rows.push(await this.getRow(tr, headerTitles));
+        }
       }
       return rows;
     }
