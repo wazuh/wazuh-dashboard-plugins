@@ -1,28 +1,22 @@
-<div ng-if="!viewingDetail" ng-show="!editingFile" layout="column"
-    ng-init="filesctrl.switchFilesSubTab(mctrl.globalRulesetTab)">
+<div ng-if="!viewingDetail" ng-show="!editingFile" layout="column" ng-init="filesctrl.switchFilesSubTab(mctrl.globalRulesetTab)">
 
     <div layout="row">
         <div class="md-padding padding-right-0">
-            <button type="submit" aria-label="Search"
-                class="euiFlexItem euiFlexItem--flexGrowZero height-35 kuiButton kuiButton--secondary "
+            <button type="submit" aria-label="Search" class="euiFlexItem euiFlexItem--flexGrowZero height-35 kuiButton kuiButton--secondary "
                 ng-click="mctrl.setRulesTab(filesctrl.filesSubTab)" tooltip="Go back" tooltip-placement="bottom">
                 <react-component name="EuiIcon" props="{type:'arrowLeft'}" />
             </button>
         </div>
-        <div
-            class="md-padding euiFlexGroup euiFlexGroup--alignItemsCenter euiFormControlLayout__childrenWrapper md-padding-h ng-scope ">
-            <input placeholder="Filter files..." ng-model="filesctrl.custom_search" type="text"
-                class="euiFieldSearch euiFieldSearch--fullWidth euiFlexItem height-35 ng-empty ng-pristine ng-touched ng-valid"
+        <div class="md-padding euiFlexGroup euiFlexGroup--alignItemsCenter euiFormControlLayout__childrenWrapper md-padding-h ng-scope ">
+            <input placeholder="Filter files..." ng-model="filesctrl.custom_search" type="text" class="euiFieldSearch euiFieldSearch--fullWidth euiFlexItem height-35 ng-empty ng-pristine ng-touched ng-valid"
                 aria-invalid="false" wz-enter="filesctrl.search(filesctrl.custom_search)">
             <div class="euiFormControlLayoutIcons wz-margin-left-16">
                 <span class="euiFormControlLayoutCustomIcon">
-                    <react-component name="EuiIcon"
-                        props="{type:'search', className:'euiFormControlLayoutCustomIcon__icon'}" />
+                    <react-component name="EuiIcon" props="{type:'search', className:'euiFormControlLayoutCustomIcon__icon'}" />
                 </span>
             </div>
 
-            <button type="submit" aria-label="Search"
-                class="euiFlexItem euiFlexItem--flexGrowZero height-35 kuiButton kuiButton--secondary wz-margin-left-8"
+            <button type="submit" aria-label="Search" class="euiFlexItem euiFlexItem--flexGrowZero height-35 kuiButton kuiButton--secondary wz-margin-left-8"
                 ng-click="filesctrl.search(filesctrl.custom_search)">
                 Search
             </button>
@@ -41,15 +35,14 @@
             <md-card-content>
                 <wz-table ng-if="filesctrl.filesSubTab === 'rules' && mctrl.onlyLocalFiles" flex path="'/rules/files'"
                     implicit-filter="[{name: 'path', value: 'etc/rules'}]" keys="[{value: 'file', width: '25%'}]"
-                    allow-click="true" row-sizes="[16,13,11]" />
+                    allow-click="true" row-sizes="[16,13,11]" implicit-sort="'path'" />
                 <wz-table ng-if="filesctrl.filesSubTab === 'rules' && !mctrl.onlyLocalFiles" flex path="'/rules/files'"
-                    keys="[{value: 'file', width: '25%'}]" allow-click="true" row-sizes="[16,13,11]" />
-                <wz-table ng-if="filesctrl.filesSubTab === 'decoders' && mctrl.onlyLocalFiles" flex
-                    path="'/decoders/files'" implicit-filter="[{name: 'path', value: 'etc/decoders'}]"
-                    keys="[{value: 'file', width: '25%'}]" allow-click="true" row-sizes="[16,13,11]" />
-                <wz-table ng-if="filesctrl.filesSubTab === 'decoders' && !mctrl.onlyLocalFiles" flex
-                    path="'/decoders/files'" keys="[{value: 'file', width: '25%'}]" allow-click="true"
-                    row-sizes="[16,13,11]" />
+                    keys="[{value: 'file', width: '25%'}]" allow-click="true" row-sizes="[16,13,11]" implicit-sort="'file'" />
+                <wz-table ng-if="filesctrl.filesSubTab === 'decoders' && mctrl.onlyLocalFiles" flex path="'/decoders/files'"
+                    implicit-filter="[{name: 'path', value: 'etc/decoders'}]" keys="[{value: 'file', width: '25%'}]"
+                    allow-click="true" row-sizes="[16,13,11]" implicit-sort="'path'" />
+                <wz-table ng-if="filesctrl.filesSubTab === 'decoders' && !mctrl.onlyLocalFiles" flex path="'/decoders/files'"
+                    keys="[{value: 'file', width: '25%'}]" allow-click="true" row-sizes="[16,13,11]" implicit-sort="'file'" />
             </md-card-content>
         </md-card>
     </div>
@@ -64,8 +57,7 @@
                     <span ng-show='!xmlHasErrors'><i aria-hidden='true' class='fa fa-fw fa-save'
                             ng-class="doingSaving ? 'fa-spin fa-spinner' : ''"></i>Save
                         file</span>
-                    <span ng-show='xmlHasErrors' class='btn-danger'><i aria-hidden='true'
-                            class='fa fa-fw fa-exclamation-triangle'></i>
+                    <span ng-show='xmlHasErrors' class='btn-danger'><i aria-hidden='true' class='fa fa-fw fa-exclamation-triangle'></i>
                         XML format error</span>
                 </button>
             </div>
@@ -84,23 +76,20 @@
                     <span ng-show='!xmlHasErrors'>
                         <react-component name="EuiIcon" props="{type: 'alert'}" /> Save file
                     </span>
-                    <span ng-show='xmlHasErrors' class='btn-danger'><i aria-hidden='true'
-                            class='fa fa-fw fa-exclamation-triangle'></i>
+                    <span ng-show='xmlHasErrors' class='btn-danger'><i aria-hidden='true' class='fa fa-fw fa-exclamation-triangle'></i>
                         XML format error</span>
                 </button>
                 <input flex placeholder="{{type === 'rules' ? 'Eg: my_local_rule.xml' : 'Eg: my_local_decoder.xml'}}"
                     ng-model="newFileName" type="text" class="wz-margin-left-8 kuiLocalSearchInput" aria-invalid="false"
                     ng-change="cancelSaveAndOverwrite(newFileName)">
-                <button ng-show="restartBtn" class="kuiButton kuiButton--secondary height-35 wz-margin-left-8"
-                    type="button" ng-disabled="doingSaving || !restartBtn"
-                    ng-click="restart(); toggleRestartMsg()">Restart
+                <button ng-show="restartBtn" class="kuiButton kuiButton--secondary height-35 wz-margin-left-8" type="button"
+                    ng-disabled="doingSaving || !restartBtn" ng-click="restart(); toggleRestartMsg()">Restart
                     now</button>
             </div>
         </div>
         <div ng-if="!editorReadOnly && fetchedXML">
-            <wz-xml-file-editor file-name='{{type}}' data="fetchedXML"
-                target-name="newFile ? selectedItem.file : currentFile.file" valid-fn='xmlIsValid(valid)'
-                saving-param='toggleSaveConfig()' close-fn='closeEditingFile(reload)'>
+            <wz-xml-file-editor file-name='{{type}}' data="fetchedXML" target-name="newFile ? selectedItem.file : currentFile.file"
+                valid-fn='xmlIsValid(valid)' saving-param='toggleSaveConfig()' close-fn='closeEditingFile(reload)'>
             </wz-xml-file-editor>
         </div>
         <div ng-show="editorReadOnly && XMLContent">
