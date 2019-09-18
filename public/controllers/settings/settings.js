@@ -255,9 +255,9 @@ export class SettingsController {
       }
 
       if (currentApi && !this.appState.getExtensions(this.currentDefault)) {
-        const { _id, _source } = this.apiEntries[this.currentApiEntryIndex];
-        const { extensions } = _source;
-        this.appState.setExtensions(_id, extensions);
+        const { id, extensions } = this.apiEntries[this.currentApiEntryIndex];
+        const apiExtensions = extensions || {}
+        this.appState.setExtensions(id, apiExtensions);
       }
 
       this.$scope.$applyAsync();
