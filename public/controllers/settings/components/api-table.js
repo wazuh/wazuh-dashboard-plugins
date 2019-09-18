@@ -19,7 +19,10 @@ import {
   EuiButtonIcon,
   EuiToolTip,
   EuiHealth,
-  EuiPanel
+  EuiPanel,
+  EuiButtonEmpty,
+  EuiTitle,
+  EuiText
 } from '@elastic/eui';
 
 export class ApiTable extends Component {
@@ -141,6 +144,32 @@ export class ApiTable extends Component {
     ];
     return (
       <EuiPanel paddingSize="l">
+        <EuiFlexGroup>
+          <EuiFlexItem>
+            <EuiFlexGroup>
+              <EuiFlexItem>
+                <EuiTitle>
+                  <h2>Wazuh hosts</h2>
+                </EuiTitle>
+              </EuiFlexItem>
+            </EuiFlexGroup>
+          </EuiFlexItem>
+          <EuiFlexItem grow={false}>
+            <EuiButtonEmpty
+              iconType="plusInCircle"
+              onClick={() => this.props.showAddApi()}
+            >
+              Add new
+      </EuiButtonEmpty>
+          </EuiFlexItem>
+        </EuiFlexGroup>
+        <EuiFlexGroup>
+          <EuiFlexItem>
+            <EuiText color="subdued" style={{ paddingBottom: '15px' }}>
+              From here you can see how to set up your Wazuh host, establish as default, and check their connection and status.
+            </EuiText>
+          </EuiFlexItem>
+        </EuiFlexGroup>
         <EuiBasicTable
           itemId="id"
           items={items}

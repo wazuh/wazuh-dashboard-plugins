@@ -150,5 +150,6 @@ export class AddApi extends Component {
 
 AddApi.propTypes = {
   checkForNewApis: PropTypes.func,
-  closeAddApi: PropTypes.func
+  closeAddApi: PropTypes.func,
+  apiEntries: PropTypes.array
 };

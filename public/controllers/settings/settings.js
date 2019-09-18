@@ -85,12 +85,14 @@ export class SettingsController {
       apiEntries: this.apiEntries,
       compressed: true,
       setDefault: entry => this.setDefault(entry),
-      checkManager: entry => this.checkManager(entry)
+      checkManager: entry => this.checkManager(entry),
+      showAddApi: () => this.showAddApi()
     };
 
     this.addApiProps = {
       checkForNewApis: () => this.checkForNewApis(),
-      closeAddApi: () => this.closeAddApi()
+      closeAddApi: () => this.closeAddApi(),
+      apiEntries: this.apiEntries
     }
 
     this.apiIsDownProps = {
@@ -478,7 +480,7 @@ export class SettingsController {
       const hosts = result.data || [];
       //Tries to check if there are new APIs entries in the wazuh-hosts.yml also, checks if some of them have connection
       if (!hosts.length) throw { message: 'There were not found any API entry in the wazuh-hosts.yml', type: 'warning', closedEnabled: false };
-      this.apiEntries = this.apiTableProps.apiEntries = this.apiIsDownProps.apiEntries = hosts;
+      this.apiEntries = this.apiTableProps.apiEntries = this.apiIsDownProps.apiEntries = this.addApiProps.apiEntries = hosts;
       const notRecheable = await this.checkApisStatus();
       if (notRecheable) {
         if (notRecheable >= hosts.length) {
@@ -498,6 +500,14 @@ export class SettingsController {
    */
   closeAddApi() {
     this.addingApi = false;
+    this.$scope.$applyAsync();
+  }
+
+  /**
+   * Shows the add API component
+   */
+  showAddApi() {
+    this.addingApi = true;
     this.$scope.$applyAsync();
   }
 
