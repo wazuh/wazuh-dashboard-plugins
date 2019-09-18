@@ -196,9 +196,8 @@ export function settingsWizard(
           .request('GET', '/hosts/apis')
           .then(data => {
             if (data.data.length > 0) {
-              const firstEntry = data.data[0];
-              const id = Object.keys(firstEntry)[0];
-              const api = firstEntry[id];
+              const api = data.data[0];
+              const id = api.id;
               if (api && api.cluster_info && api.cluster_info.manager) {
                 appState.setCurrentAPI(
                   JSON.stringify({
@@ -232,15 +231,14 @@ export function settingsWizard(
           .then(data => {
             if (
               data.data.length > 0 &&
-              data.data.find(api => Object.keys(api)[0] == apiId)
+              data.data.find(api => api.id == apiId)
             ) {
               callCheckStored();
             } else {
               appState.removeCurrentAPI();
               if (data.data.length > 0) {
-                const firstEntry = data.data[0];
-                const id = Object.keys(firstEntry)[0];
-                const api = firstEntry[id];
+                const api = data.data[0];
+                const id = api.id;
                 const defaultApi = JSON.stringify({
                   name: api.cluster_info.manager,
                   id: id
