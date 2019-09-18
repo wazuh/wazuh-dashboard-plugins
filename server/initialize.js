@@ -77,7 +77,8 @@ export function Initialize(server) {
         'app-version': packageJSON.version,
         revision: packageJSON.revision,
         installationDate: commonDate,
-        lastRestart: commonDate
+        lastRestart: commonDate,
+        hosts: {}
       };
 
       try {
