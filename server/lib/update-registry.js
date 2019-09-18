@@ -179,7 +179,7 @@ export class UpdateRegistry {
     try {
       log('update-registry:removeOrphanEntries', 'Checking orphan registry entries', 'debug');
       const entries = await this.getHosts();
-      const hostsKeys = hosts.map(h => {return Object.keys(h)[0]});
+      const hostsKeys = hosts.map(h => {return h.id});
       const entriesKeys = Object.keys(entries);
       const diff = entriesKeys.filter(e => {return !hostsKeys.includes(e)});
       await this.removeHostEntries(diff);
