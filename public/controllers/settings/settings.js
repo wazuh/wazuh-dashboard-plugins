@@ -95,7 +95,8 @@ export class SettingsController {
     this.apiIsDownProps = {
       apiEntries: this.apiEntries,
       testApi: entry => this.testAPI.check(entry),
-      closeApiIsDown: () => this.closeApiIsDown()
+      closeApiIsDown: () => this.closeApiIsDown(),
+      updateClusterInfoInRegistry: (id, clusterInfo) => this.updateClusterInfoInRegistry(id, clusterInfo)
     }
 
     this.settingsTabsProps = {
@@ -245,6 +246,21 @@ export class SettingsController {
     return;
   }
 
+  /**
+   * @param {String} id 
+   * @param {Object} clusterInfo 
+   */
+  async updateClusterInfoInRegistry(id, clusterInfo) {
+    try {
+      const url = `/hosts/update-hostname/${id}`;
+      await this.genericReq.request('PUT', url, {
+        cluster_info: clusterInfo
+      });
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  }
+
   // Check manager connectivity
   async checkManager(item, isIndex, silent = false) {
     try {
@@ -270,10 +286,7 @@ export class SettingsController {
       tmpData.cluster_info = data.data;
       const { cluster_info } = tmpData;
       // Updates the cluster-information in the registry 
-      const tmpUrl = `/hosts/update-hostname/${id}`;
-      await this.genericReq.request('PUT', tmpUrl, {
-        cluster_info
-      });
+      await this.updateClusterInfoInRegistry(id, cluster_info);
       this.$scope.$emit('updateAPI', { cluster_info });
       this.apiEntries[index].cluster_info = cluster_info;
       this.wzMisc.setApiIsDown(false);
@@ -449,10 +462,11 @@ export class SettingsController {
       let numError = 0;
       //Tries to check if there are new APIs entries in the wazuh-hosts.yml also, checks if some of them have connection
       if (!hosts.length) throw { message: 'There were not found any API entry in the wazuh-hosts.yml', type: 'warning', closedEnabled: false };
+      this.apiEntries = this.apiTableProps.apiEntries = this.apiIsDownProps.apiEntries = hosts;
       for (let idx in hosts) {
         const host = hosts[idx];
         try {
-          await this.testAPI.check(host);
+          await this.checkManager(host, false, true);
           hosts[idx].status = 'online'
         } catch (error) {
           const code = ((error || {}).data || {}).code
@@ -461,7 +475,6 @@ export class SettingsController {
           numError = numError + 1;
         }
       };
-      this.apiEntries = this.apiTableProps.apiEntries = this.apiIsDownProps.apiEntries = hosts;
       if (numError) {
         if (numError >= hosts.length) {
           this.apiIsDown = true;

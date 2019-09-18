@@ -57,8 +57,13 @@ export class ApiIsDown extends Component {
       for (let idx in entries) {
         const entry = entries[idx];
         try {
-          await this.props.testApi(entry);
+          const data = await this.props.testApi(entry);
+          const clusterInfo = data.data || {};
+          const id = entries[idx].id;
           entries[idx].status = 'online'
+          entries[idx].cluster_info = clusterInfo
+          //Updates the cluster info in the registry
+          await this.props.updateClusterInfoInRegistry(id, clusterInfo);
         } catch (error) {
           numErr = numErr + 1;
           const code = ((error || {}).data || {}).code
@@ -100,7 +105,8 @@ hosts:
         >
           Check connection
         </EuiButton>
-        {this.state.status !== 'danger' && (
+        {this.state.status !== 'danger' &&
+         this.state.status !== 'incomplete' && (
           <EuiButtonEmpty
             onClick={() => this.props.closeApiIsDown()}
           >
@@ -185,6 +191,7 @@ hosts:
 
 ApiIsDown.propTypes = {
   apiEntries: PropTypes.array,
-  testApi: PropTypes.func,
-  closeApiIsDown: PropTypes.func
+  checkManager: PropTypes.func,
+  closeApiIsDown: PropTypes.func,
+  updateClusterInfoInRegistry: PropTypes.func
 };
