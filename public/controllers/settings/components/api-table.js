@@ -18,7 +18,8 @@ import {
   EuiBasicTable,
   EuiButtonIcon,
   EuiToolTip,
-  EuiHealth
+  EuiHealth,
+  EuiPanel
 } from '@elastic/eui';
 
 export class ApiTable extends Component {
@@ -139,11 +140,13 @@ export class ApiTable extends Component {
       }
     ];
     return (
-      <EuiBasicTable
-        itemId="id"
-        items={items}
-        columns={columns}
-      />
+      <EuiPanel paddingSize="l">
+        <EuiBasicTable
+          itemId="id"
+          items={items}
+          columns={columns}
+        />
+      </EuiPanel>
     );
   }
 }
