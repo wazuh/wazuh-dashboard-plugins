@@ -79,7 +79,6 @@ export class SettingsController {
     // Loading data
     await this.getSettings();
     await this.checkApisStatus();
-    console.log('apientries ctrl ', this.apiEntries)
 
     this.apiTableProps = {
       currentDefault: this.currentDefault,
