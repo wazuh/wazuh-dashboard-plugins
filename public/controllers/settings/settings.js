@@ -478,9 +478,7 @@ export class SettingsController {
       if (numError) {
         if (numError >= hosts.length) {
           this.apiIsDown = true;
-          this.addingApi = false;
-          this.$scope.$applyAsync();
-          return;
+          throw { message: 'Wazuh API not recheable, please review your configuration', type: 'danger', closedEnabled: true };
         }
         throw { message: 'Some API entry cannot be reachabled', type: 'warning', closedEnabled: true };
       }

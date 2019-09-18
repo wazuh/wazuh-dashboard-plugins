@@ -11,7 +11,7 @@
     </div>
 
     <!-- API is down section-->
-    <div layout="column" layout-padding ng-if="ctrl.apiIsDown">
+    <div layout="column" layout-padding ng-if="ctrl.apiIsDown && !ctrl.addingApi">
         <react-component name="ApiIsDown" props="ctrl.apiIsDownProps" />
     </div>
 
