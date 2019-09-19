@@ -20,6 +20,7 @@ export default function ({ getService, loadTestFile }) {
     });
 
     loadTestFile(require.resolve('./_security_events'));
+    loadTestFile(require.resolve('./_integrity_monitoring'));
 
   });
 }
