@@ -91,8 +91,7 @@ export class SettingsController {
 
     this.addApiProps = {
       checkForNewApis: () => this.checkForNewApis(),
-      closeAddApi: () => this.closeAddApi(),
-      apiEntries: this.apiEntries
+      closeAddApi: () => this.closeAddApi()
     }
 
     this.apiIsDownProps = {
@@ -508,6 +507,7 @@ export class SettingsController {
    */
   showAddApi() {
     this.addingApi = true;
+    this.addApiProps.enableClose = true;
     this.$scope.$applyAsync();
   }
 

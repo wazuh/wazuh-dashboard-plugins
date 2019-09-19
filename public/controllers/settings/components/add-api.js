@@ -60,11 +60,11 @@ export class AddApi extends Component {
   }
 
   render() {
-    const apiExample = `hosts:
+    const apiExample = `wazuh.hosts:
     - <id>:
         host: "<api_url>"
         port: <api_port>
-        username: "<api_user>"
+        user: "<api_user>"
         password: "<api_password>"
 `;
 
@@ -88,7 +88,7 @@ export class AddApi extends Component {
         >
           Check connection
         </EuiButton>
-        {this.state.closedEnabled && (
+        {(this.state.closedEnabled || this.props.enableClose) && (
           <EuiButtonEmpty
             onClick={() => this.props.closeAddApi()}
           >
@@ -134,9 +134,23 @@ export class AddApi extends Component {
       <EuiFlexGroup>
         <EuiFlexItem />
         <EuiFlexItem>
-          <EuiText>
-            <h2>Getting started</h2>
-          </EuiText>
+          <EuiFlexGroup>
+            <EuiFlexItem grow={false}>
+              <EuiText>
+                <h2>Getting started</h2>
+              </EuiText>
+            </EuiFlexItem>
+            <EuiFlexItem />
+            <EuiFlexItem>
+              <EuiButtonEmpty
+                size="s"
+                onClick={() => this.props.closeAddApi()}
+                iconType="cross"
+              >
+                close
+          </EuiButtonEmpty>
+            </EuiFlexItem>
+          </EuiFlexGroup>
           <EuiSpacer />
           <EuiSteps firstStepNumber={1} steps={steps} />
         </EuiFlexItem>
@@ -151,5 +165,5 @@ export class AddApi extends Component {
 AddApi.propTypes = {
   checkForNewApis: PropTypes.func,
   closeAddApi: PropTypes.func,
-  apiEntries: PropTypes.array
+  enableClose: PropTypes.bool
 };

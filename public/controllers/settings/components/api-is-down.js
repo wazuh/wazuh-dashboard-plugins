@@ -85,11 +85,11 @@ export class ApiIsDown extends Component {
   render() {
     const apiExample = `
 # Example Wazuh API configuration
-hosts:
+wazuh.hosts:
     - production:
         host: http://172.16.1.2
         port: 55000
-        username: foo
+        user: foo
         password: bar
 `;
 
