@@ -66,18 +66,20 @@ export class UploadFiles extends Component {
         const file = this.state.files[idx];
         reader.readAsText(file);
         // This interval is for wait until the FileReader has read the file content
-        const interval = setInterval(() => {
+        const interval = setInterval(async () => {
           if (reader.readyState === 2) {
             files.push({
               file: file.name,
               content: reader.result
             });
             clearInterval(interval);
+            if (files.length === this.state.files.length) {
+              await this.props.upload(files, this.props.path);
+              this.closePopover();
+            }
           }
         }, 100);
       }
-      await this.props.upload(files, this.props.path);
-      this.closePopover();
     } catch (error) {
       this.closePopover();
       return Promise.reject(error);
