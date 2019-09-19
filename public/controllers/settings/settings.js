@@ -73,7 +73,7 @@ export class SettingsController {
     try {
       for (const key in this.configuration) {
         this.configurationTypes[key] = typeof this.configuration[key];
-        if (key.includes('extension')) {
+        if (key.includes('extension') || key.includes('hosts')) {
           delete this.configuration[key];
         }
       }
