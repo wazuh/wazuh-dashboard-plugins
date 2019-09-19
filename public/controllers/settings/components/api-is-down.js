@@ -32,7 +32,8 @@ export class ApiIsDown extends Component {
     this.state = {
       status: 'incomplete',
       fetchingData: false,
-      apiEntries: []
+      apiEntries: [],
+      refreshingEntries: false
     };
   }
 
@@ -50,7 +51,8 @@ export class ApiIsDown extends Component {
     try {
       let status = 'complete';
       this.setState({
-        fetchingData: true
+        fetchingData: true,
+        refreshingEntries: true
       });
       const entries = this.state.apiEntries;
       let numErr = 0;
@@ -77,7 +79,8 @@ export class ApiIsDown extends Component {
       this.setState({
         apiEntries: entries,
         fetchingData: false,
-        status: status
+        status: status,
+        refreshingEntries: false
       });
     } catch (error) {}
   }
@@ -117,6 +120,7 @@ wazuh.hosts:
         <EuiText>Already configured Wazuh API(s)</EuiText>
         <EuiSpacer />
         <EuiBasicTable
+          loading={this.state.refreshingEntries}
           items={this.state.apiEntries}
           columns={[
             { field: 'url', name: 'Host' },
