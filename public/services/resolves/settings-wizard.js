@@ -122,7 +122,6 @@ export function settingsWizard(
         };
         appState.setExtensions(currentApi, extensions);
       }
-      
       checkTimestamp(appState, genericReq, $location, wzMisc)
         .then(() => testAPI.checkStored(currentApi))
         .then(data => {
@@ -194,19 +193,23 @@ export function settingsWizard(
       if (!currentApi) {
         genericReq
           .request('GET', '/hosts/apis')
-          .then(data => {
+          .then(async data => {
             if (data.data.length > 0) {
               const api = data.data[0];
               const id = api.id;
-              if (api && api.cluster_info && api.cluster_info.manager) {
-                appState.setCurrentAPI(
-                  JSON.stringify({
-                    name: api.cluster_info.manager,
-                    id: id
-                  })
-                );
-                callCheckStored();
-              }
+              //Updates the cluster information
+              const clus = await testAPI.check(api);
+                api.cluster_info = clus.data;
+                if (api && api.cluster_info && api.cluster_info.manager) {
+                  appState.setCurrentAPI(
+                    JSON.stringify({
+                      name: api.cluster_info.manager,
+                      id: id
+                    })
+                  );
+                  callCheckStored();
+                }
+              
             } else {
               setUpCredentials(
                 'Wazuh App: Please set up Wazuh API credentials.'
@@ -217,7 +220,7 @@ export function settingsWizard(
           .catch(error => {
             !disableErrors && errorHandler.handle(error);
             wzMisc.setWizard(true);
-            if (!$location.path().includes('/settings')) {
+            if (!$location.locationpath().includes('/settings')) {
               $location.search('_a', null);
               $location.search('tab', 'api');
               $location.path('/settings');
