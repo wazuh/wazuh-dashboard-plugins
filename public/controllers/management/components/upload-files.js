@@ -60,11 +60,10 @@ export class UploadFiles extends Component {
    */
   async startUpload() {
     try {
-      //this.props.upload(this.state.files, this.props.path)
       const files = [];
-      Object.keys(this.state.files).forEach(index => {
+      for (let idx = 0; idx < this.state.files.length; idx++) {
         const reader = new FileReader();
-        const file = this.state.files[index];
+        const file = this.state.files[idx];
         reader.readAsText(file);
         // This interval is for wait until the FileReader has read the file content
         const interval = setInterval(() => {
@@ -76,7 +75,7 @@ export class UploadFiles extends Component {
             clearInterval(interval);
           }
         }, 100);
-      });
+      }
       await this.props.upload(files, this.props.path);
       this.closePopover();
     } catch (error) {
