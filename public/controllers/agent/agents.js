@@ -1061,11 +1061,11 @@ export class AgentsController {
     this.$scope.expandArray[i] = !oldValue;
   }
 
-  openGroupGuide(idx, mod){
+  openGroupGuide(idx, mod) {
     this.visFactoryService.clearAll();
     this.shareAgent.setAgent(this.$scope.agent, idx);
     this.$location.search('tab', 'groups');
-    this.$location.path('/manager');    
+    this.$location.path('/manager');
     this.$location.search('groupModuleGuide', mod);
   }
 }

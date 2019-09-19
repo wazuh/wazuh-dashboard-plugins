@@ -161,15 +161,15 @@ export function GroupsController(
       $scope.fileViewer = false;
 
       const openGuide = $location.search().groupModuleGuide;
-      if(openGuide){
-       $scope.goBackFiles();
-       $scope.editGroupAgentConfig();
-       $scope.modulesGuideProps = {
-        selectedModule: $location.search().groupModuleGuide,
-        close: () => $scope.openHelp()
-      };
-      $location.search('groupModuleGuide', null);
-       $scope.helpOpened = true;
+      if (openGuide) {
+        $scope.goBackFiles();
+        $scope.editGroupAgentConfig();
+        $scope.modulesGuideProps = {
+          selectedModule: $location.search().groupModuleGuide,
+          close: () => $scope.openHelp()
+        };
+        $location.search('groupModuleGuide', null);
+        $scope.helpOpened = true;
       }
 
       $scope.$applyAsync();
