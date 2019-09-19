@@ -14,7 +14,7 @@
 # The following configuration is the default structure to define an API entry.
 #wazuh.hosts:
 #  - <id>:
-#     url: <url>
+#     url: http(s)://<url>
 #     port: <port>
 #     user: <user>
 #     password: <password> 
