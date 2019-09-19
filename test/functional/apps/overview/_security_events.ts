@@ -1,5 +1,5 @@
 /*
- * Wazuh app - Overview -> general test class
+ * Wazuh app - Overview -> general test
  * Copyright (C) 2015-2019 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -12,7 +12,6 @@
 
 import expect from '@kbn/expect';
 import { FtrProviderContext } from '../../../../../../test/functional/ftr_provider_context';
-import { json } from 'd3';
 import { SearchParams } from 'elasticsearch';
 
 export default function({getService, getPageObjects, }: FtrProviderContext) {
@@ -23,7 +22,7 @@ export default function({getService, getPageObjects, }: FtrProviderContext) {
   const esTableViz = getService('esTableViz');
   const filterBar = getService('filterBar');
   const find = getService('find');
-  const PageObjects = getPageObjects(['common', 'wazuhCommon', 'timePicker', ]);
+  const PageObjects = getPageObjects(['wazuhCommon', 'common']);
   const pieCharts = getService('pieCharts');
   const tableViz = getService('tableViz');
   const queryBar = getService('queryBar');
@@ -36,11 +35,13 @@ export default function({getService, getPageObjects, }: FtrProviderContext) {
       es_index = await testSubjects.getVisibleText('wzMenuPatternTitle');
     });
 
+    beforeEach(async () => {
+      await PageObjects.wazuhCommon.setTodayRange();
+    })
+
     //#region Visualization tests
 
     it('should alertStats values are correct', async () => {
-      await PageObjects.wazuhCommon.setTodayRange();
-
       const todayAlerts = await es.search({
         index: es_index,
         body: {
@@ -83,9 +84,7 @@ export default function({getService, getPageObjects, }: FtrProviderContext) {
       expect(Number(alertStatsGroups.groups.authSuccess)).to.be(Object.keys(esAlerts.authSuccess).length);
     });
 
-    it('should alert level evolution chart value ​​are correct', async () => {
-      await PageObjects.wazuhCommon.setTodayRange();
-
+    it('should alert level evolution chart value ​​are correct',async () => {
       const chartSelector: string = '#Wazuh-App-Overview-General-Alert-level-evolution';
       const values:object = await areaChart.getValues(chartSelector);
 
@@ -110,9 +109,7 @@ export default function({getService, getPageObjects, }: FtrProviderContext) {
 
     });
 
-    it('should alert chart values are correct', async () => {
-      await PageObjects.wazuhCommon.setTodayRange();
-
+    it('should alert chart values are correct',async () => {
       const chartSelector: string = '#Wazuh-App-Overview-General-Alerts';
       const values:object = await areaChart.getValues(chartSelector);
 
@@ -136,9 +133,7 @@ export default function({getService, getPageObjects, }: FtrProviderContext) {
         .to.be.equal(JSON.stringify(values));
     });
 
-    it('should top 5 agent chart pie values are correct', async () => {
-      await PageObjects.wazuhCommon.setTodayRange();
-
+    it('should top 5 agent chart pie values are correct',async () => {
       const chartSelector: string = '#Wazuh-App-Overview-General-Top-5-agents';
       const values = await pieCharts.getValues(chartSelector);
 
@@ -162,9 +157,7 @@ export default function({getService, getPageObjects, }: FtrProviderContext) {
         .to.be.equal(JSON.stringify(values));
     });
 
-    it('should top 5 rule groups chart pie values are correct', async () => {
-      await PageObjects.wazuhCommon.setTodayRange();
-
+    it('should top 5 rule groups chart pie values are correct',async () => {
       const chartSelector: string = '#Wazuh-App-Overview-General-Top-5-rule-groups';
       const values = await pieCharts.getValues(chartSelector);
       const query:SearchParams = {
@@ -187,9 +180,7 @@ export default function({getService, getPageObjects, }: FtrProviderContext) {
         .to.be.equal(JSON.stringify(values));
     });
 
-    it('should alerts evolution - top 5 agents chart values are correct', async () => {
-      await PageObjects.wazuhCommon.setTodayRange();
-
+    it('should alerts evolution - top 5 agents chart values are correct',async () => {
       const chartSelector: string = '#Wazuh-App-Overview-General-Alerts-evolution-Top-5-agents';
       const values:object = await areaChart.getValues(chartSelector);
 
@@ -213,12 +204,10 @@ export default function({getService, getPageObjects, }: FtrProviderContext) {
         .to.be.equal(JSON.stringify(values));
     });
 
-    it('should alerts summary table values are correct', async () => {
-      await PageObjects.wazuhCommon.setTodayRange();
-      
+    it('should alerts summary table values are correct',async () => {
       const summarySelector: string = '#Wazuh-App-Overview-General-Alerts-summary';
       const values: object[] = await tableViz.getValues(summarySelector);
-      
+
       const fields = [
         {field: 'rule.id', label: 'Rule ID'},
         {field: 'rule.description', label: 'Description'},
@@ -260,8 +249,7 @@ export default function({getService, getPageObjects, }: FtrProviderContext) {
 
     //#region filter tests
 
-    it('should alertStats values ​​are correct when add the filter rule.level: 7', async () => {
-      await PageObjects.wazuhCommon.setTodayRange();
+    it('should alertStats values ​​are correct when add the filter rule.level: 7',async () => {
       await filterBar.addFilter('rule.level', 'is', '7');
       await PageObjects.common.sleep(3000);
 
@@ -270,7 +258,7 @@ export default function({getService, getPageObjects, }: FtrProviderContext) {
         body: {
           size: 1000,
           query: {
-            bool: { 
+            bool: {
               must: [
                 {
                   term: {
@@ -319,8 +307,7 @@ export default function({getService, getPageObjects, }: FtrProviderContext) {
       await filterBar.removeAllFilters();
     });
 
-    it('should alert level evolution chart values are correct when add the filter rule.level: 7', async () => {
-      await PageObjects.wazuhCommon.setTodayRange();
+    it('should alert level evolution chart values are correct when add the filter rule.level: 7',async () => {
       await filterBar.addFilter('rule.level', 'is', '7');
       await PageObjects.common.sleep(3000);
 
@@ -332,7 +319,7 @@ export default function({getService, getPageObjects, }: FtrProviderContext) {
         body: {
           size: 1000,
           query: {
-            bool: { 
+            bool: {
               must: [
                 {
                   term: {
@@ -359,8 +346,7 @@ export default function({getService, getPageObjects, }: FtrProviderContext) {
       await filterBar.removeAllFilters();
     });
 
-    it('should alert chart values are correct when add the filter rule.level: 7', async () => {
-      await PageObjects.wazuhCommon.setTodayRange();
+    it('should alert chart values are correct when add the filter rule.level: 7',async () => {
       await filterBar.addFilter('rule.level', 'is', '7');
       await PageObjects.common.sleep(3000);
 
@@ -372,7 +358,7 @@ export default function({getService, getPageObjects, }: FtrProviderContext) {
         body: {
           size: 1000,
           query: {
-            bool: { 
+            bool: {
               must: [
                 {
                   term: {
@@ -399,20 +385,19 @@ export default function({getService, getPageObjects, }: FtrProviderContext) {
       await filterBar.removeAllFilters();
     });
 
-    it('should top 5 agent chart pie values are correct when add the filter rule.level: 7', async () => {
-      await PageObjects.wazuhCommon.setTodayRange();
+    it('should top 5 agent chart pie values are correct when add the filter rule.level: 7',async () => {
       await filterBar.addFilter('rule.level', 'is', '7');
       await PageObjects.common.sleep(3000);
 
       const chartSelector: string = '#Wazuh-App-Overview-General-Top-5-agents';
       const values = await pieCharts.getValues(chartSelector);
-      
+
       const query:SearchParams = {
         index: es_index,
         body: {
           size: 1000,
           query: {
-            bool: { 
+            bool: {
               must: [
                 {
                   term: {
@@ -439,8 +424,7 @@ export default function({getService, getPageObjects, }: FtrProviderContext) {
       await filterBar.removeAllFilters();
     });
 
-    it('should top 5 rule groups chart pie values are correct when add the filter rule.level: 7', async () => {
-      await PageObjects.wazuhCommon.setTodayRange();
+    it('should top 5 rule groups chart pie values are correct when add the filter rule.level: 7',async () => {
       await filterBar.addFilter('rule.level', 'is', '7');
       await PageObjects.common.sleep(3000);
 
@@ -452,7 +436,7 @@ export default function({getService, getPageObjects, }: FtrProviderContext) {
         body: {
           size: 1000,
           query: {
-            bool: { 
+            bool: {
               must: [
                 {
                   term: {
@@ -479,8 +463,7 @@ export default function({getService, getPageObjects, }: FtrProviderContext) {
       await filterBar.removeAllFilters();
     });
 
-    it('should alerts evolution - top 5 agents chart values are correct when add the filter rule.level: 7', async () => {
-      await PageObjects.wazuhCommon.setTodayRange();
+    it('should alerts evolution - top 5 agents chart values are correct when add the filter rule.level: 7',async () => {
       await filterBar.addFilter('rule.level', 'is', '7');
       await PageObjects.common.sleep(3000);
 
@@ -492,7 +475,7 @@ export default function({getService, getPageObjects, }: FtrProviderContext) {
         body: {
           size: 1000,
           query: {
-            bool: { 
+            bool: {
               must: [
                 {
                   term: {
@@ -519,14 +502,13 @@ export default function({getService, getPageObjects, }: FtrProviderContext) {
       await filterBar.removeAllFilters();
     });
 
-    it('should alerts summary table values are correct when add the filter rule.level: 7', async () => {
-      await PageObjects.wazuhCommon.setTodayRange();
+    it('should alerts summary table values are correct when add the filter rule.level: 7',async () => {
       await filterBar.addFilter('rule.level', 'is', '7');
       await PageObjects.common.sleep(3000);
 
       const summarySelector: string = '#Wazuh-App-Overview-General-Alerts-summary';
       const values: object[] = await tableViz.getValues(summarySelector);
-      
+
       const fields = [
         {field: 'rule.id', label: 'Rule ID'},
         {field: 'rule.description', label: 'Description'},
@@ -538,7 +520,7 @@ export default function({getService, getPageObjects, }: FtrProviderContext) {
         body: {
           size: 1000,
           query: {
-            bool: { 
+            bool: {
               must: [
                 {
                   term: {
@@ -560,7 +542,7 @@ export default function({getService, getPageObjects, }: FtrProviderContext) {
       };
       const esValues: object[] = await esTableViz.getData(query, fields, ['-Count', '-Level', '-Rule ID']);
 
-      
+
       expect(JSON.stringify(esValues.slice(0, values.length)))
       .to.be.equal(JSON.stringify(values));
       await filterBar.removeAllFilters();
@@ -570,8 +552,7 @@ export default function({getService, getPageObjects, }: FtrProviderContext) {
 
     //#region query bar tests
 
-    it('should alertStats values ​​are correct when add to the query bar rule.level: 7', async () => {
-      await PageObjects.wazuhCommon.setTodayRange();
+    it('should alertStats values ​​are correct when add to the query bar rule.level: 7',async () => {
       await queryBar.setQuery('rule.level:7');
       await queryBar.submitQuery();
       await PageObjects.common.sleep(3000);
@@ -581,7 +562,7 @@ export default function({getService, getPageObjects, }: FtrProviderContext) {
         body: {
           size: 1000,
           query: {
-            bool: { 
+            bool: {
               must: [
                 {
                   term: {
@@ -631,8 +612,7 @@ export default function({getService, getPageObjects, }: FtrProviderContext) {
       await queryBar.submitQuery();
     });
 
-    it('should alert level evolution chart values are correct when add to the query bar rule.level: 7', async () => {
-      await PageObjects.wazuhCommon.setTodayRange();
+    it('should alert level evolution chart values are correct when add to the query bar rule.level: 7',async () => {
       await queryBar.setQuery('rule.level:7');
       await queryBar.submitQuery();
       await PageObjects.common.sleep(3000);
@@ -645,7 +625,7 @@ export default function({getService, getPageObjects, }: FtrProviderContext) {
         body: {
           size: 1000,
           query: {
-            bool: { 
+            bool: {
               must: [
                 {
                   term: {
@@ -673,8 +653,7 @@ export default function({getService, getPageObjects, }: FtrProviderContext) {
       await queryBar.submitQuery();
     });
 
-    it('should alert chart values are correct when add the filter rule.level: 7', async () => {
-      await PageObjects.wazuhCommon.setTodayRange();
+    it('should alert chart values are correct when add the filter rule.level: 7',async () => {
       await queryBar.setQuery('rule.level:7');
       await queryBar.submitQuery();
       await PageObjects.common.sleep(3000);
@@ -687,7 +666,7 @@ export default function({getService, getPageObjects, }: FtrProviderContext) {
         body: {
           size: 1000,
           query: {
-            bool: { 
+            bool: {
               must: [
                 {
                   term: {
@@ -715,21 +694,20 @@ export default function({getService, getPageObjects, }: FtrProviderContext) {
       await queryBar.submitQuery();
     });
 
-    it('should top 5 agent chart pie values are correct when add to the query bar rule.level: 7', async () => {
-      await PageObjects.wazuhCommon.setTodayRange();
+    it('should top 5 agent chart pie values are correct when add to the query bar rule.level: 7',async () => {
       await queryBar.setQuery('rule.level:7');
       await queryBar.submitQuery();
       await PageObjects.common.sleep(3000);
 
       const chartSelector: string = '#Wazuh-App-Overview-General-Top-5-agents';
       const values = await pieCharts.getValues(chartSelector);
-      
+
       const query:SearchParams = {
         index: es_index,
         body: {
           size: 1000,
           query: {
-            bool: { 
+            bool: {
               must: [
                 {
                   term: {
@@ -757,8 +735,7 @@ export default function({getService, getPageObjects, }: FtrProviderContext) {
       await queryBar.submitQuery();
     });
 
-    it('should top 5 rule groups chart pie values are correct when add to the query bar rule.level: 7', async () => {
-      await PageObjects.wazuhCommon.setTodayRange();
+    it('should top 5 rule groups chart pie values are correct when add to the query bar rule.level: 7',async () => {
       await queryBar.setQuery('rule.level:7');
       await queryBar.submitQuery();
       await PageObjects.common.sleep(3000);
@@ -771,7 +748,7 @@ export default function({getService, getPageObjects, }: FtrProviderContext) {
         body: {
           size: 1000,
           query: {
-            bool: { 
+            bool: {
               must: [
                 {
                   term: {
@@ -799,8 +776,7 @@ export default function({getService, getPageObjects, }: FtrProviderContext) {
       await queryBar.submitQuery();
     });
 
-    it('should alerts evolution - top 5 agents chart values are correct when add to the query bar rule.level: 7', async () => {
-      await PageObjects.wazuhCommon.setTodayRange();
+    it('should alerts evolution - top 5 agents chart values are correct when add to the query bar rule.level: 7',async () => {
       await queryBar.setQuery('rule.level:7');
       await queryBar.submitQuery();
       await PageObjects.common.sleep(3000);
@@ -813,7 +789,7 @@ export default function({getService, getPageObjects, }: FtrProviderContext) {
         body: {
           size: 1000,
           query: {
-            bool: { 
+            bool: {
               must: [
                 {
                   term: {
@@ -841,15 +817,14 @@ export default function({getService, getPageObjects, }: FtrProviderContext) {
       await queryBar.submitQuery();
     });
 
-    it('should alerts summary table values are correct when add to the query bar rule.level: 7', async () => {
-      await PageObjects.wazuhCommon.setTodayRange();
+    it('should alerts summary table values are correct when add to the query bar rule.level: 7',async () => {
       await queryBar.setQuery('rule.level:7');
       await queryBar.submitQuery();
       await PageObjects.common.sleep(3000);
 
       const summarySelector: string = '#Wazuh-App-Overview-General-Alerts-summary';
       const values: object[] = await tableViz.getValues(summarySelector);
-      
+
       const fields = [
         {field: 'rule.id', label: 'Rule ID'},
         {field: 'rule.description', label: 'Description'},
@@ -861,7 +836,7 @@ export default function({getService, getPageObjects, }: FtrProviderContext) {
         body: {
           size: 1000,
           query: {
-            bool: { 
+            bool: {
               must: [
                 {
                   term: {
@@ -883,7 +858,7 @@ export default function({getService, getPageObjects, }: FtrProviderContext) {
       };
       const esValues: object[] = await esTableViz.getData(query, fields, ['-Count', '-Level', '-Rule ID']);
 
-      
+
       expect(JSON.stringify(esValues.slice(0, values.length)))
       .to.be.equal(JSON.stringify(values));
       await queryBar.setQuery('');
