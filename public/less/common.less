@@ -353,7 +353,7 @@
   box-shadow: none;
 }
 
-:focus:not(.wz-button):not(.input-filter-box):not(.kuiLocalSearchInput) {
+:focus:not(.wz-button):not(.input-filter-box):not(.kuiLocalSearchInput):not(.euiTextArea) {
   box-shadow: none !important;
 }
 
@@ -487,13 +487,9 @@ md-sidenav {
   color: #b4bcc2;
 }
 
-.wz-dev-title {
-  padding-bottom: 10px;
-}
-
 .wz-dev-column-separator {
   width: 12px;
-  margin-top: 25px;
+  margin-top: 15px;
   background: #dddddd;
   float: left;
   cursor: ew-resize;
@@ -850,16 +846,20 @@ wz-xml-file-editor {
   height: inherit;
 }
 
-.table-striped > tbody > tr:nth-of-type(odd) {
-  background-color: #f5f7fa;
-}
-
 .euiTableHeaderCell {
   font-weight: 600;
 }
 
 .table-striped-duo .selected {
   background: #ecf6fb !important;
+}
+
+.table-striped > tbody > tr:nth-of-type(odd){
+  background-color: transparent!important;
+}
+
+.table-striped > tbody > tr:nth-of-type(odd):hover{
+  background-color: #fafbfd!important;
 }
 
 .table-striped-duo > tbody tr:not(.euiTableRow):nth-child(2n + 1):not(:hover),
@@ -1004,6 +1004,10 @@ discover-app-w .container-fluid {
 .navBarLogo {
   width: 110px;
   margin-top: 4px;
+}
+
+.application{
+  background: #fafbfd;
 }
 
 .application.tab-health-check wz-menu{
@@ -1156,4 +1160,69 @@ md-toolbar.md-default-theme:not(.md-menu-toolbar), md-toolbar:not(.md-menu-toolb
 
 .requirements-cards.euiFlexGroup--gutterLarge {
   margin: -10px !important;
+}
+
+.no-max-width {
+  margin-top: 16px;
+  margin-left: -10px;
+}
+
+.no-max-width .euiFilePicker__wrap {
+  max-width: none !important;
+  margin: 0px 10px 0px 10px;
+  padding-right: 10px;
+}
+
+.upload-files-button {
+  width: 100px !important;
+  margin: auto !important;
+}
+
+.list-of-files {
+  margin: auto;
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+
+.list-of-files .euiListGroupItem {
+  background: white !important;
+  color: #377dbb !important;
+}
+
+.logtest-side{
+  height: calc(~'100vh - 95px');
+  border-left: 1px solid #e1e2e3;
+  box-shadow: -2px 0px 2px -1px rgba(152, 162, 179, 0.3);
+  margin-top: -50px;
+  background: #fff;
+  z-index: 10;
+  position : fixed;
+  right: 0;
+  width: calc(~'30% - 16px');
+}
+
+.logtest .euiFlyoutFooter, .logtest-side .euiFlyoutFooter{
+  margin: 0 -16px;
+    background: transparent;
+}
+
+.logtest-side .euiFlyoutFooter{
+  margin: 0 -16px;
+}
+
+.logtest .euiFlyoutFooter{
+  margin:  0 -16px -16px -16px;
+}
+
+.logtest .euiCodeBlock{
+  border: 1px solid #e1e2e3;
+}
+
+.logtest .euiTextArea, .logtest-side .euiTextArea{
+  max-height: 500px;
+  resize: none;
+}
+
+md-chips.md-default-theme .md-chips, md-chips .md-chips{
+  box-shadow: none;
 }
