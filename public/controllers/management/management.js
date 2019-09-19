@@ -28,7 +28,8 @@ export class ManagementController {
     configHandler,
     errorHandler,
     $interval,
-    apiReq
+    apiReq,
+    rulesetHandler
   ) {
     this.$scope = $scope;
     this.$rootScope = $rootScope;
@@ -49,6 +50,7 @@ export class ManagementController {
     this.currentGroup = false;
     this.logtestOpened = false;
     this.uploadOpened = false;
+    this.rulesetHandler = rulesetHandler;
 
     this.$scope.$on('setCurrentGroup', (ev, params) => {
       this.currentGroup = (params || {}).currentGroup || false;
@@ -448,14 +450,27 @@ export class ManagementController {
    */
   async uploadFiles(files, path) {
     try {
-      /*
-       * TODO: this function are receiving an array of files with this structure {file: <file>, content: <content>} also receives the path
-       * Needs the API request implementation
-       */
+      this.uploadErrors = [];
+      if (path === 'etc/rules') {
+        this.upload = this.rulesetHandler.sendRuleConfiguration
+      } else if (path === 'etc/decoders') {
+        this.upload = this.rulesetHandler.sendDecoderConfiguration
+      } else {
+        this.upload = this.rulesetHandler.sendCdbList
+      }
+      for (let idx in files) {
+        const { file, content } = files[idx];
+        try {
+          await this.upload(file, content, true); // True does not overwrite the file  
+        } catch (error) {
+           this.uploadErrors.push({file: file, error: error});
+        }
+      }
+      if (this.uploadErrors.length) throw this.uploadErrors;
       this.errorHandler.info('Upload successful.');
       return;
     } catch (error) {
       this.errorHandler.handle(error.message || error);
     }
   }
-}
+}     
