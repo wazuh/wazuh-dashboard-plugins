@@ -18,7 +18,7 @@ import { UpdateRegistry } from './update-registry';
 export class ManageHosts {
   constructor() {
     this.busy = false;
-    this.file = path.join(__dirname, '../../wazuh-hosts.yml');
+    this.file = path.join(__dirname, '../../wazuh.yml');
     this.updateRegistry = new UpdateRegistry();
   }
 
@@ -59,7 +59,7 @@ export class ManageHosts {
   }
 
   /**
-   * Returns the hosts in the wazuh-hosts.yml
+   * Returns the hosts in the wazuh.yml
    */
   async getHosts() {
     try {
@@ -69,7 +69,7 @@ export class ManageHosts {
       this.busy = false;
       const hosts = yml.load(raw);
       log('manage-hosts:getHosts', 'Getting hosts', 'debug');
-      const entries = (hosts || {})['wazuh.hosts'] || [];
+      const entries = (hosts || {})['hosts'] || [];
       return entries;
     } catch (error) {
       this.busy = false;
@@ -79,7 +79,7 @@ export class ManageHosts {
   }
 
   /**
-   * Returns the IDs of the current hosts in the wazuh-hosts.yml
+   * Returns the IDs of the current hosts in the wazuh.yml
    */
   async getCurrentHostsIds() {
     try {
@@ -167,7 +167,7 @@ export class ManageHosts {
   }
 
   /**
-   * Receives an array of hosts and checks if any host is already in the wazuh-hosts.yml, in this case is removed from the received array and returns the resulting array
+   * Receives an array of hosts and checks if any host is already in the wazuh.yml, in this case is removed from the received array and returns the resulting array
    * @param {Array} hosts 
    */
   async cleanExistingHosts(hosts) {
@@ -183,7 +183,7 @@ export class ManageHosts {
   }
 
   /**
-   * Throws an error is the wazuh-hosts.yml is busy
+   * Throws an error is the wazuh.yml is busy
    */
   checkBusy() {
     if (this.busy) throw new Error('Another process is writting the configuration file');
@@ -223,7 +223,7 @@ export class ManageHosts {
       const hosts = await this.getHosts() || [];
       this.busy = true;
       if (!hosts.length) {
-        const result = `${data}\nwazuh.hosts:\n${compose}\n`;
+        const result = `${data}\hosts:\n${compose}\n`;
         await fs.writeFileSync(this.file, result, 'utf8');
         data = await fs.readFileSync(this.file, { encoding: 'utf-8' });
       } else {
@@ -247,7 +247,7 @@ export class ManageHosts {
   }
 
   /**
-   * Delete a host from the wazuh-hosts.yml
+   * Delete a host from the wazuh.yml
    * @param {Object} req
    */
   async deleteHost(req) {
@@ -271,7 +271,7 @@ export class ManageHosts {
         await fs.writeFileSync(this.file, result, 'utf8');
         if (hostsNumber === 1) {
           data = await fs.readFileSync(this.file, { encoding: 'utf-8' });
-          const clearHosts = data.replace(new RegExp(`wazuh.hosts:\\s*[\\n\\r]`, 'gm'), '')
+          const clearHosts = data.replace(new RegExp(`hosts:\\s*[\\n\\r]`, 'gm'), '')
           await fs.writeFileSync(this.file, clearHosts, 'utf8');
         }
       }

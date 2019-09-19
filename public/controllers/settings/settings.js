@@ -478,14 +478,14 @@ export class SettingsController {
   }
 
   /**
-   * Checks if there are new APIs entries in the wazuh-hosts.yml
+   * Checks if there are new APIs entries in the wazuh.yml
    */
   async checkForNewApis() {
     try {
       const result = await this.genericReq.request('GET', '/hosts/apis', {});
       const hosts = result.data || [];
-      //Tries to check if there are new APIs entries in the wazuh-hosts.yml also, checks if some of them have connection
-      if (!hosts.length) throw { message: 'There were not found any API entry in the wazuh-hosts.yml', type: 'warning', closedEnabled: false };
+      //Tries to check if there are new APIs entries in the wazuh.yml also, checks if some of them have connection
+      if (!hosts.length) throw { message: 'There were not found any API entry in the wazuh.yml', type: 'warning', closedEnabled: false };
       this.apiEntries = this.apiTableProps.apiEntries = this.apiIsDownProps.apiEntries = hosts;
       const notRecheable = await this.checkApisStatus();
       if (notRecheable) {

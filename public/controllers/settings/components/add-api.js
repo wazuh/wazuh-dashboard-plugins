@@ -60,7 +60,7 @@ export class AddApi extends Component {
   }
 
   render() {
-    const apiExample = `wazuh.hosts:
+    const apiExample = `hosts:
     - <id>:
         host: "<api_url>"
         port: <api_port>
@@ -101,7 +101,7 @@ export class AddApi extends Component {
     const editConfigChildren = (
       <div>
         <EuiText>
-          Modify <EuiCode>kibana/plugins/wazuh/wazuh-hosts.yml</EuiCode> to set the
+          Modify <EuiCode>kibana/plugins/wazuh/wazuh.yml</EuiCode> to set the
           connection information.
         </EuiText>
         <EuiSpacer />

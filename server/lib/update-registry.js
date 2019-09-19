@@ -172,7 +172,7 @@ export class UpdateRegistry {
   }
 
   /**
-   * Compare the hosts from wazuh-hosts.yml and the host in the wazuh-registry.file in order to remove the orphan registry register
+   * Compare the hosts from wazuh.yml and the host in the wazuh-registry.file in order to remove the orphan registry register
    * @param {Array} hosts
    */
   async removeOrphanEntries(hosts) {

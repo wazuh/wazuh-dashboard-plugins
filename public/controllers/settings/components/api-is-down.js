@@ -88,7 +88,7 @@ export class ApiIsDown extends Component {
   render() {
     const apiExample = `
 # Example Wazuh API configuration
-wazuh.hosts:
+hosts:
     - production:
         host: http://172.16.1.2
         port: 55000
@@ -164,7 +164,7 @@ wazuh.hosts:
           <div>
             <EuiText>
               Review the settings in the{' '}
-              <EuiCode>kibana/plugins/wazuh/wazuh-hosts.yml</EuiCode> file.
+              <EuiCode>kibana/plugins/wazuh/wazuh.yml</EuiCode> file.
             </EuiText>
             <EuiSpacer />
             <EuiCodeBlock language="yaml">{apiExample}</EuiCodeBlock>

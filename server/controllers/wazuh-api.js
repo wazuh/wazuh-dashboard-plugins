@@ -53,13 +53,13 @@ export class WazuhApiCtrl {
    */
   async checkStoredAPI(req, reply) {
     try {
-      // Get config from wazuh-hosts.yml
+      // Get config from wazuh.yml
       const id = req.payload.id || req.payload
       const api = await this.manageHosts.getHostById(id);
       
       // Check Manage Hosts
       if (!Object.keys(api).length) {
-        throw new Error('Could not find Wazuh API entry on wazuh-hosts.yml');
+        throw new Error('Could not find Wazuh API entry on wazuh.yml');
       }
 
       log('wazuh-api:checkStoredAPI', `${id} exists`, 'debug');

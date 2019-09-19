@@ -112,7 +112,7 @@ export function Initialize(server) {
 
 
   /**
-   * Checks if the .wazuh index exist in order to migrate to wazuh-hosts.yml
+   * Checks if the .wazuh index exist in order to migrate to wazuh.yml
    */
   const checkWazuhIndex = async () => {
     try {
@@ -125,7 +125,7 @@ export function Initialize(server) {
           const data = await wzWrapper.getWazuhAPIEntries();
           const apiEntries = (((data || {}).hits || {}).hits || []);
           await manageHosts.migrateFromIndex(apiEntries)
-          log('initialize:checkWazuhIndex', 'Index .wazuh will be removed and its content will be migrated to wazuh-hosts.yml', 'debug');
+          log('initialize:checkWazuhIndex', 'Index .wazuh will be removed and its content will be migrated to wazuh.yml', 'debug');
           // Check if all APIs entries were migrated properly and delete it from the .wazuh index
           await checkProperlyMigrate();     
           await wzWrapper.deleteIndexByName('.wazuh');

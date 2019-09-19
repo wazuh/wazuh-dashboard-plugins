@@ -22,7 +22,7 @@ export class WazuhHostsCtrl {
   }
 
   /**
-   * This get all hosts entries in the wazuh-hosts.yml and the related info in the wazuh-registry.json
+   * This get all hosts entries in the wazuh.yml and the related info in the wazuh-registry.json
    * @param {Object} req
    * @param {Object} reply
    * API entries or ErrorResponse
