@@ -239,10 +239,21 @@ export default function({getService, getPageObjects, }: FtrProviderContext) {
           }
         }
       };
-      const esValues: object[] = await esTableViz.getData(query, fields, ['-Count', '-Level', '-Rule ID']);
-
-      expect(JSON.stringify(esValues.slice(0, values.length)))
-      .to.be.equal(JSON.stringify(values));
+      const esValues: object[] = await esTableViz.getData(query, fields, ['-Count', 'Level', '-Rule ID', ]);
+      let result = false;
+      for (const value of values) {
+        for (const esValue of esValues) {
+          if (JSON.stringify(value) === JSON.stringify(esValue)) {
+            result = true;
+            break;
+          }
+        }
+        if(!result){
+          break
+        }
+      }
+      expect(result)
+      .to.be.ok();
     });
 
     //#endregion
