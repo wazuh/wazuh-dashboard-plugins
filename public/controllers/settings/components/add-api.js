@@ -142,13 +142,15 @@ export class AddApi extends Component {
             </EuiFlexItem>
             <EuiFlexItem />
             <EuiFlexItem>
-              <EuiButtonEmpty
-                size="s"
-                onClick={() => this.props.closeAddApi()}
-                iconType="cross"
-              >
-                close
-          </EuiButtonEmpty>
+              {this.props.enableClose && (
+                <EuiButtonEmpty
+                  size="s"
+                  onClick={() => this.props.closeAddApi()}
+                  iconType="cross"
+                >
+                  close
+                </EuiButtonEmpty>
+              )}
             </EuiFlexItem>
           </EuiFlexGroup>
           <EuiSpacer />

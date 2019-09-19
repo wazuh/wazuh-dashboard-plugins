@@ -22,7 +22,7 @@ import {
   EuiPanel,
   EuiButtonEmpty,
   EuiTitle,
-  EuiText
+  EuiText,
 } from '@elastic/eui';
 
 export class ApiTable extends Component {
@@ -30,14 +30,29 @@ export class ApiTable extends Component {
     super(props);
 
     this.state = {
-      apiEntries: []
+      apiEntries: [],
+      refreshingEntries: false
     };
   }
 
   componentDidMount() {
     this.setState({
       apiEntries: this.props.apiEntries
-    })
+    });
+  }
+
+  /**
+   * Refresh the API entries
+   */
+  async refresh() {
+    try {
+      this.setState({refreshingEntries: true});
+      const entries = await this.props.refreshApiEntries();
+      this.setState({
+        apiEntries: entries,
+        refreshingEntries: false
+      });
+    } catch (error) {}
   }
 
   /**
@@ -160,7 +175,15 @@ export class ApiTable extends Component {
               onClick={() => this.props.showAddApi()}
             >
               Add new
-      </EuiButtonEmpty>
+          </EuiButtonEmpty>
+          </EuiFlexItem>
+          <EuiFlexItem grow={false}>
+            <EuiButtonEmpty
+                iconType="refresh"
+                onClick={async () => await this.refresh()}
+              >
+                Refresh
+            </EuiButtonEmpty>
           </EuiFlexItem>
         </EuiFlexGroup>
         <EuiFlexGroup>
@@ -174,6 +197,7 @@ export class ApiTable extends Component {
           itemId="id"
           items={items}
           columns={columns}
+          loading={this.state.refreshingEntries}
         />
       </EuiPanel>
     );
@@ -184,5 +208,6 @@ ApiTable.propTypes = {
   apiEntries: PropTypes.array,
   currentDefault: PropTypes.string,
   setDefault: PropTypes.func,
-  checkManager: PropTypes.func
+  checkManager: PropTypes.func,
+  refreshApiEntries: PropTypes.func
 };

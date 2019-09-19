@@ -86,7 +86,8 @@ export class SettingsController {
       compressed: true,
       setDefault: entry => this.setDefault(entry),
       checkManager: entry => this.checkManager(entry),
-      showAddApi: () => this.showAddApi()
+      showAddApi: () => this.showAddApi(),
+      refreshApiEntries: () => this.refreshApiEntries()
     };
 
     this.addApiProps = {
@@ -479,7 +480,7 @@ export class SettingsController {
       const hosts = result.data || [];
       //Tries to check if there are new APIs entries in the wazuh-hosts.yml also, checks if some of them have connection
       if (!hosts.length) throw { message: 'There were not found any API entry in the wazuh-hosts.yml', type: 'warning', closedEnabled: false };
-      this.apiEntries = this.apiTableProps.apiEntries = this.apiIsDownProps.apiEntries = this.addApiProps.apiEntries = hosts;
+      this.apiEntries = this.apiTableProps.apiEntries = this.apiIsDownProps.apiEntries = hosts;
       const notRecheable = await this.checkApisStatus();
       if (notRecheable) {
         if (notRecheable >= hosts.length) {
@@ -517,5 +518,20 @@ export class SettingsController {
   closeApiIsDown() {
     this.apiIsDown = false;
     this.$scope.$applyAsync();
+  }
+
+  /**
+   * Refresh the API entries
+   */
+  async refreshApiEntries() {
+    try {
+      const data = await this.genericReq.request('GET', '/hosts/apis');
+      const hosts = data.data;
+      this.apiEntries = hosts || [];
+      await this.checkApisStatus();
+      return this.apiEntries;
+    } catch (error) {
+      this.errorHandler.handle('Cannot refresh API entries');
+    }
   }
 }
