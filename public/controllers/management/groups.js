@@ -32,6 +32,7 @@ export function GroupsController(
     $scope.currentGroup = false;
     $scope.$emit('removeCurrentGroup');
     $scope.lookingGroup = false;
+    $scope.helpOpened = false;
     $scope.$applyAsync();
   });
 
@@ -166,7 +167,7 @@ export function GroupsController(
         $scope.editGroupAgentConfig();
         $scope.modulesGuideProps = {
           selectedModule: $location.search().groupModuleGuide,
-          close: () => $scope.openHelp()
+          close: () => {$scope.helpOpened = false}
         };
         $location.search('groupModuleGuide', null);
         $scope.helpOpened = true;
@@ -316,6 +317,7 @@ export function GroupsController(
     appState.setNavigation({ status: true });
     $scope.$broadcast('closeEditXmlFile', {});
     $scope.groupsTabsProps.selectedTab = 'files';
+    $scope.helpOpened = false;
     $scope.$applyAsync();
   };
 

@@ -58,6 +58,14 @@
                         <span ng-show='xmlHasErrors' class='btn-danger'><i aria-hidden='true' class='fa fa-fw fa-exclamation-triangle'></i>
                             XML format error</span>
                     </button>
+                    <span flex></span>
+                    <button type="button" ng-click="helpOpened = true" class="euiButtonEmpty euiButtonEmpty--primary euiButtonEmpty--small wz-margin-left-10"
+                    ng-show="!helpOpened">
+                            <span class="euiButtonEmpty__content">
+                                <react-component name="EuiIcon" props="{type:'questionInCircle'}" />
+                                <span class="euiButtonEmpty__text">Configure a module</span>
+                            </span>
+                        </button>
                 </div>
                 <div class="md-padding md-padding-top-10" ng-if="fetchedXML && currentGroup">
                     <wz-xml-file-editor file-name='agent.conf' data="fetchedXML" target-name="currentGroup.name + ' group'"

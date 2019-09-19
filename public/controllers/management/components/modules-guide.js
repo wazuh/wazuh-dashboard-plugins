@@ -43,6 +43,7 @@ export class ModulesGuide extends Component {
       status: this.statuses[1],
       fetchingData: false,
       value: '',
+      selectedModule: props.selectedModule || false,
       showAdvanced: false,
       isPopoverOpen: false
     };
@@ -65,12 +66,20 @@ export class ModulesGuide extends Component {
     });
   }
 
+  componentWillReceiveProps(nextProps) {// eslint-disable-line
+    // You don't have to do this check first, but it can help prevent an unneeded render
+    if(nextProps.selectedModule){
+      this.onChange(nextProps.selectedModule);
+    }
+  }
+
   updateModulesModel = () => {
     this.setState({
       options: this.ModulesGuides[this.state.selectedModule].options
     });
   }
   onChange = value => {
+    this.outputBlock = false;
     this.setState({
       value,
       status: this.statuses[1],
@@ -81,6 +90,11 @@ export class ModulesGuide extends Component {
 
   setSwitch = (option, e) => {
     this.ModulesGuides[this.state.selectedModule].options[option].value = e.target.checked;
+    this.updateModulesModel();
+  };
+
+  extraAttrChange = (option, attr, e) => {
+    this.ModulesGuides[this.state.selectedModule].options[option].extraAttr[attr].value = e.target.checked;
     this.updateModulesModel();
   };
 
@@ -115,7 +129,7 @@ export class ModulesGuide extends Component {
   };
 
   generateConfig = () => {
-    let outputBlock = `<${this.state.selectedModule}>`;
+    let outputBlock = this.ModulesGuides[this.state.selectedModule].isWodle ? `<wodle name="${this.state.selectedModule}">` : `<${this.state.selectedModule}>`;
     for (let idx_option in this.state.options) {
       const option = this.state.options[idx_option];
       //$scope.showExtraAttr(option) ? $scope.openExtraAttr(option) : ''
@@ -126,7 +140,7 @@ export class ModulesGuide extends Component {
           option.value !== undefined && (option['default_value'] == undefined ||
           option.value !== option['default_value'])
         ) {
-          outputBlock += `\n\t<${option.name}>${option.value}</${option.name}>`;
+          outputBlock += `\n\t<${option.name}>${option.value ? 'yes' : 'no'}</${option.name}>`;
         }
       } else if (option.type === 'input') {
         // Input
@@ -180,9 +194,7 @@ export class ModulesGuide extends Component {
         }
       }
     }
-    outputBlock += `\n</${this.state.selectedModule}>`;
-    //this.setState({ outputBlock });
-    //this.setState({ status: this.statuses[0] });
+    outputBlock += this.ModulesGuides[this.state.selectedModule].isWodle ? `\n</wodle>` : `\n</${this.state.selectedModule}>`;
     this.outputBlock = outputBlock;
     this.forceUpdate();
     //this.scrollToBottom();
@@ -194,15 +206,15 @@ export class ModulesGuide extends Component {
     });
   };
 
-  buildPopoverRows(option) {
+  buildPopoverRows(option, optionIdx) {
     const switches = Object.entries(option.extraAttr).map((attr, idx) => {
       return (
         <EuiFormRow key={idx} style={{ marginTop: '0px' }}>
           <EuiSwitch
             name="switch"
             label={attr[0]}
-            onChange={() => this.switchChange(attr[1])}
-            checked={attr[1].value || attr[1]['default_value'] || false}
+            onChange={(e) => this.extraAttrChange(optionIdx, attr[0], e)}
+            checked={attr[1].value === undefined ? ( attr[1]['default_value'] || false ) : attr[1].value}
           />
         </EuiFormRow>
       );
@@ -255,7 +267,7 @@ export class ModulesGuide extends Component {
                   {option.description}
                 </EuiTextColor>
               </EuiFlexItem>
-              <EuiFlexItem style={{ paddingTop: '25px' }}>
+              <EuiFlexItem style={{ paddingTop: '15px' }}>
                 <div>
                   {option.type === 'input' && (
                     <EuiFieldText
@@ -277,7 +289,7 @@ export class ModulesGuide extends Component {
                               isOpen={this.state.isPopoverOpen}
                               closePopover={() => this.togglePopover()}
                             >
-                              {this.buildPopoverRows(option)}
+                              {this.buildPopoverRows(option, idx)}
                             </EuiPopover>
                           </EuiFlexItem>
                         </EuiFlexGroup>
@@ -308,7 +320,8 @@ export class ModulesGuide extends Component {
                     <EuiTextArea
                       key= {idx}
                       placeholder="One entry per line"
-                      aria-label={option.description}
+                      label={''}
+                      onChange={e => this.setValue(idx, e)}
                       value={option.value}
                     />
                   )}
@@ -354,19 +367,7 @@ export class ModulesGuide extends Component {
       </Fragment>
     );
 
-    const steps = this.props.selectedModule
-      ? [
-          {
-            title: `Configure ${this.props.selectedModule} module`,
-            children: form
-          },
-          {
-            title: 'Copy the configuration',
-            children: editConfigChildren,
-            status: this.state.status
-          }
-        ]
-      : [
+    const steps = [
           {
             title: 'Select a module',
             children: selectModuleChildren
@@ -374,12 +375,11 @@ export class ModulesGuide extends Component {
           {
             title: 'Configure the module',
             children: form,
-            status: this.state.status
           },
           {
             title: 'Copy the configuration',
             children: editConfigChildren,
-            disabled: true
+            status: this.outputBlock ? this.statuses[0] : this.state.status
           }
         ];
 
@@ -389,9 +389,7 @@ export class ModulesGuide extends Component {
           <EuiFlexGroup gutterSize="xs">
             <EuiTitle size="s">
               <h2>
-                {this.props.selectedModule
-                  ? `How to configure ${this.props.selectedModule}`
-                  : `How to configure a module`}
+                How to configure modules
               </h2>
             </EuiTitle>
             <EuiFlexItem />

@@ -15,6 +15,7 @@ import { TabNames } from '../../utils/tab-names';
 import * as FileSaver from '../../services/file-saver';
 import { TabDescription } from '../../../server/reporting/tab-description';
 import { UnsupportedComponents } from '../../utils/components-os-support';
+import { queryConfig } from '../../services/query-config';
 import {
   metricsGeneral,
   metricsAudit,
@@ -316,6 +317,7 @@ export class AgentsController {
       if (!this.$location.search().configWodle) {
         this.$location.search('configWodle', this.$scope.configWodle);
       }
+     
       this.configurationHandler.switchWodle(
         wodleName,
         this.$scope,
@@ -447,6 +449,7 @@ export class AgentsController {
 
     this.$scope.expand = i => this.expand(i);
     this.$scope.openGroupGuide = (agent, i) => this.openGroupGuide(agent, i);
+    this.$scope.isConfigured = (name, isWodle) => this.isConfigured(name, isWodle);
     this.setTabs();
   }
   /**
@@ -554,6 +557,7 @@ export class AgentsController {
     this.$rootScope.rendered = false;
     this.$rootScope.$applyAsync();
     this.falseAllExpand();
+
     if (this.ignoredTabs.includes(tab)) {
       this.commonData.setRefreshInterval(timefilter.getRefreshInterval());
       timefilter.setRefreshInterval({ pause: true, value: 0 });
@@ -996,6 +1000,19 @@ export class AgentsController {
     );
   }
 
+  isConfigured =  async (name, isWodle = false) => {
+    if(isWodle){
+      const currentConfig = await queryConfig(
+        (this.$scope.agent || {}).id,
+        [{ component: 'wmodules', configuration: 'wmodules' }],
+        this.apiReq,
+        this.errorHandler,
+        false
+      );
+      this.$scope.showNoConfig = currentConfig && !currentConfig[name] && !this.$scope.isString(currentConfig['wmodules-wmodules'])
+    }
+  }
+
   async launchRootcheckScan() {
     try {
       const isActive = ((this.$scope.agent || {}).status || '') === 'Active';
@@ -1064,8 +1081,8 @@ export class AgentsController {
   openGroupGuide(idx, mod) {
     this.visFactoryService.clearAll();
     this.shareAgent.setAgent(this.$scope.agent, idx);
-    this.$location.search('tab', 'groups');
     this.$location.path('/manager');
+    this.$location.search('tab', 'groups');
     this.$location.search('groupModuleGuide', mod);
   }
 }

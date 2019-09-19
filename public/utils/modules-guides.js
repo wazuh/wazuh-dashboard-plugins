@@ -15,12 +15,6 @@ export const ModulesGuides = {
     id: 'syscheck',
     name: 'File integrity monitoring',
     description: 'Configuration options for file integrity monitoring.',
-    default_configuration: [
-      {
-        title: 'Default Unix configuration',
-        content: '<test> syscheck </test>'
-      }
-    ],
     options: [
       {
         name: 'directories',
@@ -232,6 +226,94 @@ export const ModulesGuides = {
         name: 'target',
         description: `Target specifies the name of the socket where the output will be redirected. The socket must be defined previously to use it with this option.`,
         type: 'input'
+      }
+    ]
+  },
+  'docker-listener': {
+    isWodle : true,
+    id: 'docker-listener',
+    name: 'Docker listener wodle',
+    description: 'Configuration options of the Docker wodle.',
+    options: [
+      {
+        name: 'interval',
+        description: `Waiting time to rerun the wodle in case it fails.`,
+        type: 'input',
+        required: true
+      },
+      {
+        name: 'attempts',
+        description: `Number of attempts to execute the wodle.`,
+        type: 'input',
+        required: true
+      },
+      {
+        name: 'run_on_start',
+        description: `Run command immediately when service is started.`,
+        type: 'switch',
+        required: true
+      },
+      {
+        name: 'disabled',
+        description: `Disable the Docker wodle.`,
+        type: 'switch',
+        required: true
+      }
+    ]
+  },
+  osquery: {
+    isWodle : true,
+    id: 'osquery',
+    name: 'Osquery wodle',
+    description: 'Configuration options of the osquery wodle.',
+    options: [
+      {
+        name: 'disabled',
+        description: `Disable the osquery wodle.`,
+        type: 'switch',
+        required: true,
+        default_value: false
+      },
+      {
+        name: 'run_daemon',
+        description: `Makes the module run osqueryd as a subprocess or lets the module monitor the results log without running Osquery.`,
+        type: 'switch',
+        required: true,
+        default_value: true
+      },
+      {
+        name: 'bin_path',
+        description: `Full path to the folder that contains the osqueryd executable.`,
+        type: 'input',
+        required: true
+      },
+      {
+        name: 'log_path',
+        description: `Full path to the results log written by Osquery.`,
+        type: 'input',
+        required: true
+      },      
+      {
+        name: 'config_path',
+        description: `Path to the Osquery configuration file. This path can be relative to the folder where the Wazuh agent is running.`,
+        type: 'input',
+        required: true
+      },
+      {
+        name: 'add_labels',
+        description: `Add the agent labels defined as decorators.`,
+        type: 'switch',
+        required: true,
+        default_value: true
+      },
+      {
+        name: 'pack',
+        description: `Add a query pack to the configuration. This option can be defined multiple times.`,
+        type: 'input',
+        required: true,
+        extraAttr: {
+          name: { value: "custom_pack", type: 'input' }
+        }
       }
     ]
   }
