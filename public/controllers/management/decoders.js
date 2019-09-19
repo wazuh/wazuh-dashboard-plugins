@@ -94,7 +94,7 @@ export class DecodersController {
     });
 
     this.$scope.$on('applyFilter', (event, parameters) => {
-      this.search(parameters.filter);
+      this.search(parameters.filter, true);
     });
 
     this.$scope.$on('viewFileOnlyTable', (event, parameters) => {
@@ -177,9 +177,9 @@ export class DecodersController {
    * This perfoms a search by a given term
    * @param {String} term
    */
-  search(term) {
+  search(term, fromClick = false) {
+    this.clearInput = true;
     if (term && term.startsWith('path:') && term.split('path:')[1].trim()) {
-      this.custom_search = '';
       if (!this.showingLocalDecoders) {
         const filter = { name: 'path', value: term.split('path:')[1].trim() };
         this.appliedFilters = this.appliedFilters.filter(
@@ -193,7 +193,6 @@ export class DecodersController {
       term.startsWith('file:') &&
       term.split('file:')[1].trim()
     ) {
-      this.custom_search = '';
       const filter = { name: 'file', value: term.split('file:')[1].trim() };
       this.appliedFilters = this.appliedFilters.filter(
         item => item.name !== 'file'
@@ -201,7 +200,11 @@ export class DecodersController {
       this.appliedFilters.push(filter);
       this.$scope.$broadcast('wazuhFilter', { filter });
     } else {
-      this.$scope.$broadcast('wazuhSearch', { term, removeFilters: true });
+      this.clearInput = false;
+      this.$scope.$broadcast('wazuhSearch', { term, removeFilters: 0 });
+    }
+    if (this.clearInput && !fromClick) {
+      this.custom_search = '';
     }
   }
 
@@ -294,11 +297,9 @@ export class DecodersController {
    * This function takes back to the list but adding a filter from the detail view
    */
   addDetailFilter(name, value) {
-    this.appliedFilters.push({ name, value });
-    // Clear the autocomplete component
-    this.searchTerm = '';
     // Go back to the list
     this.closeDetailView();
+    this.search(`${name}:${value}`);
   }
 
   openFile(file, path) {

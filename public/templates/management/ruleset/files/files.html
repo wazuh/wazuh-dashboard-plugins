@@ -50,15 +50,15 @@
 
                 <wz-table ng-if="filesctrl.filesSubTab === 'rules' && mctrl.onlyLocalFiles" flex path="'/rules/files'"
                     implicit-filter="[{name: 'path', value: 'etc/rules'}]" keys="[{value: 'file', width: '25%'}]"
-                    allow-click="true" row-sizes="[16,13,11]" />
+                    allow-click="true" row-sizes="[16,13,11]" implicit-sort="'path'" />
                 <wz-table ng-if="filesctrl.filesSubTab === 'rules' && !mctrl.onlyLocalFiles" flex path="'/rules/files'"
                     keys="[{value: 'file', width: '25%'}]" allow-click="true" row-sizes="[16,13,11]" />
                 <wz-table ng-if="filesctrl.filesSubTab === 'decoders' && mctrl.onlyLocalFiles" flex
                     path="'/decoders/files'" implicit-filter="[{name: 'path', value: 'etc/decoders'}]"
-                    keys="[{value: 'file', width: '25%'}]" allow-click="true" row-sizes="[16,13,11]" />
+                    keys="[{value: 'file', width: '25%'}]" allow-click="true" row-sizes="[16,13,11]"  implicit-sort="'path'" />
                 <wz-table ng-if="filesctrl.filesSubTab === 'decoders' && !mctrl.onlyLocalFiles" flex
                     path="'/decoders/files'" keys="[{value: 'file', width: '25%'}]" allow-click="true"
-                    row-sizes="[16,13,11]" />
+                    row-sizes="[16,13,11]" implicit-sort="'file'" />
         </div>
     </div>
 </div>
@@ -72,8 +72,7 @@
                     <span ng-show='!xmlHasErrors'><i aria-hidden='true' class='fa fa-fw fa-save'
                             ng-class="doingSaving ? 'fa-spin fa-spinner' : ''"></i>Save
                         file</span>
-                    <span ng-show='xmlHasErrors' class='btn-danger'><i aria-hidden='true'
-                            class='fa fa-fw fa-exclamation-triangle'></i>
+                    <span ng-show='xmlHasErrors' class='btn-danger'><i aria-hidden='true' class='fa fa-fw fa-exclamation-triangle'></i>
                         XML format error</span>
                 </button>
             </div>
@@ -92,23 +91,20 @@
                     <span ng-show='!xmlHasErrors'>
                         <react-component name="EuiIcon" props="{type: 'alert'}" /> Save file
                     </span>
-                    <span ng-show='xmlHasErrors' class='btn-danger'><i aria-hidden='true'
-                            class='fa fa-fw fa-exclamation-triangle'></i>
+                    <span ng-show='xmlHasErrors' class='btn-danger'><i aria-hidden='true' class='fa fa-fw fa-exclamation-triangle'></i>
                         XML format error</span>
                 </button>
                 <input flex placeholder="{{type === 'rules' ? 'Eg: my_local_rule.xml' : 'Eg: my_local_decoder.xml'}}"
                     ng-model="newFileName" type="text" class="wz-margin-left-8 kuiLocalSearchInput" aria-invalid="false"
                     ng-change="cancelSaveAndOverwrite(newFileName)">
-                <button ng-show="restartBtn" class="kuiButton kuiButton--secondary height-35 wz-margin-left-8"
-                    type="button" ng-disabled="doingSaving || !restartBtn"
-                    ng-click="restart(); toggleRestartMsg()">Restart
+                <button ng-show="restartBtn" class="kuiButton kuiButton--secondary height-35 wz-margin-left-8" type="button"
+                    ng-disabled="doingSaving || !restartBtn" ng-click="restart(); toggleRestartMsg()">Restart
                     now</button>
             </div>
         </div>
         <div ng-if="!editorReadOnly && fetchedXML">
-            <wz-xml-file-editor file-name='{{type}}' data="fetchedXML"
-                target-name="newFile ? selectedItem.file : currentFile.file" valid-fn='xmlIsValid(valid)'
-                saving-param='toggleSaveConfig()' close-fn='closeEditingFile(reload)'>
+            <wz-xml-file-editor file-name='{{type}}' data="fetchedXML" target-name="newFile ? selectedItem.file : currentFile.file"
+                valid-fn='xmlIsValid(valid)' saving-param='toggleSaveConfig()' close-fn='closeEditingFile(reload)'>
             </wz-xml-file-editor>
         </div>
         <div ng-show="editorReadOnly && XMLContent">

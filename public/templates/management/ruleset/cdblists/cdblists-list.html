@@ -32,8 +32,7 @@
             aria-invalid="false" wz-enter="cdbctrl.search(cdbctrl.custom_search)">
         <div class="euiFormControlLayoutIcons wz-margin-left-16">
             <span class="euiFormControlLayoutCustomIcon">
-                <react-component name="EuiIcon"
-                    props="{type:'search', className:'euiFormControlLayoutCustomIcon__icon'}" />
+                <react-component name="EuiIcon" props="{type:'search', className:'euiFormControlLayoutCustomIcon__icon'}" />
             </span>
         </div>
         <button type="submit" aria-label="Search" class="euiButton euiButton--primary euiButton--fill wz-margin-left-8"
@@ -42,7 +41,7 @@
         </button>
     </div>
                 <wz-table custom-columns="true" implicit-filter="cdbctrl.appliedFilters" flex path="'/lists/files'"
-                    keys="['name', 'path']" allow-click="true" row-sizes="[15,13,11]">
+                    keys="['name', 'path']" allow-click="true" row-sizes="[15,13,11]" implicit-sort="'name'">
                 </wz-table>
         </div>
     </div>

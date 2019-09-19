@@ -65,10 +65,10 @@
     <div class="wz-margin-top-16">
                 <wz-table lens="dctrl.showingLocalDecoders" custom-columns="true" ng-if="!dctrl.showingLocalDecoders" implicit-filter="dctrl.appliedFilters"
                     flex path="'/decoders'" keys="['name',{value:'details.program_name',size:2,nosortable:true},{value:'details.order',size:2,nosortable:true},'file', 'path']"
-                    allow-click="true" row-sizes="[16,13,11]">
+                    allow-click="true" row-sizes="[16,13,11]" implicit-sort="'name'">
                 </wz-table>
                 <wz-table lens="dctrl.showingLocalDecoders" custom-columns="true" ng-if="dctrl.showingLocalDecoders" flex path="'/decoders'" keys="['name',{value:'details.program_name',size:2,nosortable:true},{value:'details.order',size:2,nosortable:true},'file', 'path']"
-                    implicit-filter="dctrl.appliedFilters" allow-click="true" row-sizes="[16,13,11]">
+                    implicit-filter="dctrl.appliedFilters" allow-click="true" row-sizes="[16,13,11]" implicit-sort="'name'">
                 </wz-table>
             </div>
         </div>
