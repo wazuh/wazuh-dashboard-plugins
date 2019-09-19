@@ -9,7 +9,6 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import { base64 } from '../../utils/base64';
 import { TabNames } from '../../utils/tab-names';
 import { configEquivalences } from '../../utils/config-equivalences';
 import { kibana } from '../../../package.json';
@@ -55,74 +54,83 @@ export class SettingsController {
     }
 
     this.apiIsDown = this.wzMisc.getApiIsDown();
-
-    // Initialize
     this.currentApiEntryIndex = false;
-    this.formData = {};
     this.tab = 'api';
     this.load = true;
     this.loadingLogs = true;
-    this.addManagerContainer = false;
-    this.showEditForm = {};
-    this.formUpdate = {};
     this.editingKey = false;
-
-    this.userRegEx = new RegExp(/^.{3,100}$/);
-    this.passRegEx = new RegExp(/^.{3,100}$/);
-    this.urlRegEx = new RegExp(/^https?:\/\/[a-zA-Z0-9-.]{1,300}$/);
-    this.urlRegExIP = new RegExp(
-      /^https?:\/\/[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$/
-    );
-    this.portRegEx = new RegExp(/^[0-9]{2,5}$/);
-
-    // Tab names
     this.tabNames = TabNames;
-
     this.configuration = { ...(wazuhConfig.getConfig() || {}) };
-    for (const key in this.configuration) {
-      if (key.includes('extension')) {
-        delete this.configuration[key];
-      }
-    }
-
     this.configurationTypes = [];
-    for (const key in this.configuration) {
-      this.configurationTypes[key] = typeof this.configuration[key];
-    }
     this.indexPatterns = [];
     this.apiEntries = [];
-
-    const location = this.$location.search();
-    if (location && location.tab) {
-      this.tab = location.tab;
-      this.settingsTabsProps.selectedTab = this.tab;
-    }
-
-    this.savingApi = false;
   }
 
   /**
    * On controller loads
    */
-  $onInit() {
-    // Loading data
-    this.getSettings().then(() => {
+  async $onInit() {
+    try {
+      for (const key in this.configuration) {
+        this.configurationTypes[key] = typeof this.configuration[key];
+        if (key.includes('extension') || key.includes('hosts')) {
+          delete this.configuration[key];
+        }
+      }
+      // Loading data
+      await this.getSettings();
+      const down = await this.checkApisStatus();
+      //Checks if all the API entries are down
+      this.apiIsDown = (down >= this.apiEntries.length && this.apiEntries.length > 0);
+
       this.apiTableProps = {
         currentDefault: this.currentDefault,
         apiEntries: this.apiEntries,
         compressed: true,
         setDefault: entry => this.setDefault(entry),
         checkManager: entry => this.checkManager(entry),
-        removeManager: entry => this.removeManager(entry),
-        updateSettings: (entry, useItem = false) =>
-          this.updateSettings(entry, useItem),
-        switch: () => this.switch()
+        showAddApi: () => this.showAddApi(),
+        refreshApiEntries: () => this.refreshApiEntries()
       };
+
       this.addApiProps = {
-        saveSettings: entry => this.saveSettings(entry)
+        checkForNewApis: () => this.checkForNewApis(),
+        closeAddApi: () => this.closeAddApi()
+      }
+
+      this.apiIsDownProps = {
+        apiEntries: this.apiEntries,
+        testApi: entry => this.testAPI.check(entry),
+        closeApiIsDown: () => this.closeApiIsDown(),
+        updateClusterInfoInRegistry: (id, clusterInfo) => this.updateClusterInfoInRegistry(id, clusterInfo)
+      }
+
+      this.settingsTabsProps = {
+        clickAction: tab => {
+          this.switchTab(tab, true);
+          if (tab === 'logs') {
+            this.refreshLogs();
+          }
+        },
+        selectedTab: this.tab || 'api',
+        tabs: [
+          { id: 'api', name: 'API' },
+          { id: 'configuration', name: 'Configuration' },
+          { id: 'logs', name: 'Logs' },
+          { id: 'about', name: 'About' }
+        ]
       };
-      return this.getAppInfo();
-    });
+
+      const location = this.$location.search();
+      if (location && location.tab) {
+        this.tab = location.tab;
+        this.settingsTabsProps.selectedTab = this.tab;
+      }
+
+      await this.getAppInfo();
+    } catch (error) {
+      this.errorHandler.handle('Cannot initialize Settings')
+    }
   }
 
   /**
@@ -137,104 +145,83 @@ export class SettingsController {
     this.$location.search('tab', this.tab);
   }
 
-  /**
-   * Remove a Wazuh API entry
-   * @param {*} item
-   */
-  async removeManager(item) {
-    try {
-      const currentApi = this.appState.getCurrentAPI();
-      let index = this.apiEntries.map(item => item._id).indexOf(item._id);
-      if (currentApi) {
-        if (this.apiEntries[index]._id === JSON.parse(currentApi).id) {
-          // We are trying to remove the one selected as default
-          this.appState.removeCurrentAPI();
-        }
-      }
-      await this.genericReq.request(
-        'DELETE',
-        `/elastic/apis/${this.apiEntries[index]._id}`
-      );
-      this.showEditForm[this.apiEntries[index]._id] = false;
-      this.apiEntries.splice(index, 1);
-      this.wzMisc.setApiIsDown(false);
-      this.apiIsDown = false;
-      this.isEditing = false;
-      for (const key in this.showEditForm) this.showEditForm[key] = false;
-      this.$scope.$emit('updateAPI', {});
-      this.errorHandler.info('The API was removed successfully', 'Settings');
-      this.apiTableProps.apiEntries = this.apiEntries;
-      this.$scope.$applyAsync();
-    } catch (error) {
-      this.errorHandler.handle('Could not remove the API', 'Settings');
-    }
-    return this.apiEntries;
-  }
-
   // Get current API index
   getCurrentAPIIndex() {
-    // eslint-disable-next-line
-    this.apiEntries.map((entry, index, array) => {
-      if (entry._id === this.currentDefault) this.currentApiEntryIndex = index;
-    });
+    if (this.apiEntries.length) {
+      const idx = this.apiEntries.map(entry => entry.id).indexOf(this.currentDefault);
+      this.currentApiEntryIndex = idx;
+    }
   }
 
   /**
-   * This sort by timestamp two given objects
-   * @param {Object} a
-   * @param {Object} b
+  * Returns the index of the API in the entries array
+  * @param {Object} api 
+  */
+  getApiIndex(api) {
+    return this.apiEntries.map(entry => entry.id).indexOf(api.id)
+  }
+
+  /**
+   * Checks the API entries status in order to set if there are online, offline or unknown.
    */
-  sortByTimestamp(a, b) {
-    const intA = parseInt(a._id);
-    const intB = parseInt(b._id);
-    return intA > intB ? -1 : intA < intB ? 1 : 0;
+  async checkApisStatus() {
+    try {
+      let numError = 0;
+      for (let idx in this.apiEntries) {
+        try {
+          const entry = this.apiEntries[idx];
+          await this.checkManager(entry, false, true);
+          this.apiEntries[idx].status = 'online';
+        } catch (error) {
+          const code = ((error || {}).data || {}).code;
+          const status = code === 3099 ? 'down' : 'unknown';
+          this.apiEntries[idx].status = status;
+          numError = numError + 1;
+        }
+      }
+      return numError;
+    } catch (error) { }
   }
 
   // Set default API
-  setDefault(item) {
-    const index = this.apiEntries.map(item => item._id).indexOf(item._id);
+  async setDefault(item) {
+    try {
+      await this.checkManager(item, false, true);
+      const index = this.getApiIndex(item);
+      const api = this.apiEntries[index];
+      const { cluster_info, id } = api;
+      const { manager, cluster, status } = cluster_info;
 
-    this.appState.setClusterInfo(this.apiEntries[index]._source.cluster_info);
-
-    if (this.apiEntries[index]._source.cluster_info.status == 'disabled') {
+      // Check the connection before set as default 
+      this.appState.setClusterInfo(cluster_info);
+      const clusterEnabled = status === 'disabled';
       this.appState.setCurrentAPI(
         JSON.stringify({
-          name: this.apiEntries[index]._source.cluster_info.manager,
-          id: this.apiEntries[index]._id
+          name: clusterEnabled ? manager : cluster,
+          id: id
         })
       );
-    } else {
-      this.appState.setCurrentAPI(
-        JSON.stringify({
-          name: this.apiEntries[index]._source.cluster_info.cluster,
-          id: this.apiEntries[index]._id
-        })
-      );
+
+      this.$scope.$emit('updateAPI', {});
+
+      const currentApi = this.appState.getCurrentAPI();
+      this.currentDefault = JSON.parse(currentApi).id;
+      this.apiTableProps.currentDefault = this.currentDefault;
+      this.$scope.$applyAsync();
+
+      this.errorHandler.info(`API ${manager} set as default`);
+
+      this.getCurrentAPIIndex();
+      if (currentApi && !this.appState.getExtensions(id)) {
+        const { id, extensions } = this.apiEntries[this.currentApiEntryIndex];
+        this.appState.setExtensions(id, extensions);
+      }
+
+      this.$scope.$applyAsync();
+      return this.currentDefault;
+    } catch (error) {
+      this.errorHandler.handle(error);
     }
-
-    this.$scope.$emit('updateAPI', {});
-
-    const currentApi = this.appState.getCurrentAPI();
-    this.currentDefault = JSON.parse(currentApi).id;
-    this.apiTableProps.currentDefault = this.currentDefault;
-    this.$scope.$applyAsync();
-
-    this.errorHandler.info(
-      `API ${this.apiEntries[index]._source.cluster_info.manager} set as default`,
-      'Settings'
-    );
-
-    this.getCurrentAPIIndex();
-
-    if (currentApi && !this.appState.getExtensions(JSON.parse(currentApi).id)) {
-      this.appState.setExtensions(
-        this.apiEntries[this.currentApiEntryIndex]._id,
-        this.apiEntries[this.currentApiEntryIndex]._source.extensions
-      );
-    }
-
-    this.$scope.$applyAsync();
-    return this.currentDefault;
   }
 
   // Get settings function
@@ -245,399 +232,106 @@ export class SettingsController {
         '/elastic/index-patterns',
         {}
       );
+
       this.indexPatterns = patternList.data.data;
 
-      if (!patternList.data.data.length) {
+      if (!this.indexPatterns.length) {
         this.wzMisc.setBlankScr('Sorry but no valid index patterns were found');
         this.$location.search('tab', null);
         this.$location.path('/blank-screen');
         return;
       }
-      const data = await this.genericReq.request('GET', '/elastic/apis');
-      for (const entry of data.data) this.showEditForm[entry._id] = false;
+      const data = await this.genericReq.request('GET', '/hosts/apis');
 
-      this.apiEntries = data.data.length > 0 ? data.data : [];
-      this.apiEntries = this.apiEntries.sort(this.sortByTimestamp);
-
+      const apis = data.data;
+      this.apiEntries = apis.length ? apis : [];
+      // Set the addingApi flag based on if there is any API entry
+      this.addingApi = !this.apiEntries.length;
       const currentApi = this.appState.getCurrentAPI();
 
       if (currentApi) {
-        this.currentDefault = JSON.parse(currentApi).id;
+        const { id } = JSON.parse(currentApi);
+        this.currentDefault = id;
       }
 
       this.$scope.$applyAsync();
+
       this.getCurrentAPIIndex();
-      if (!this.currentApiEntryIndex && this.currentApiEntryIndex !== 0) return;
 
-      if (
-        currentApi &&
-        !this.appState.getExtensions(JSON.parse(currentApi).id)
-      ) {
-        this.appState.setExtensions(
-          this.apiEntries[this.currentApiEntryIndex]._id,
-          this.apiEntries[this.currentApiEntryIndex]._source.extensions
-        );
+      if (!this.currentApiEntryIndex && this.currentApiEntryIndex !== 0) {
+        return;
+      }
+
+      if (currentApi && !this.appState.getExtensions(this.currentDefault)) {
+        const { id, extensions } = this.apiEntries[this.currentApiEntryIndex];
+        const apiExtensions = extensions || {}
+        this.appState.setExtensions(id, apiExtensions);
       }
 
       this.$scope.$applyAsync();
-      return;
     } catch (error) {
       this.errorHandler.handle('Error getting API entries', 'Settings');
     }
+    // Every time that the API entries are required in the settings the registry will be checked in order to remove orphan host entries
+    await this.genericReq.request('POST', '/hosts/remove-orphan-entries', { entries: this.apiEntries });
     return;
   }
 
   /**
-   * This validate format of fileds in a given api connection form
-   * @param {Object} formName
+   * @param {String} id 
+   * @param {Object} clusterInfo 
    */
-  validator(formName) {
-    // Validate user
-    if (!this.userRegEx.test(this[formName].user)) {
-      return 'Invalid user field';
-    }
-
-    // Validate password
-    if (!this.passRegEx.test(this[formName].password)) {
-      return 'Invalid password field';
-    }
-
-    // Validate url
-    if (
-      !this.urlRegEx.test(this[formName].url) &&
-      !this.urlRegExIP.test(this[formName].url)
-    ) {
-      return 'Invalid url field';
-    }
-
-    // Validate port
-    const validatePort = parseInt(this[formName].port);
-    if (
-      !this.portRegEx.test(this[formName].port) ||
-      validatePort <= 0 ||
-      validatePort >= 99999
-    ) {
-      return 'Invalid port field';
-    }
-
-    return false;
-  }
-
-  /**
-   * This toggle to a given entry
-   * @param {Object} entry
-   */
-  toggleEditor(entry) {
-    if (this.formUpdate && this.formUpdate.password) {
-      this.formUpdate.password = '';
-    }
-    for (const key in this.showEditForm) {
-      if (entry && entry._id === key) continue;
-      this.showEditForm[key] = false;
-    }
-    this.showEditForm[entry._id] = !this.showEditForm[entry._id];
-    this.isEditing = this.showEditForm[entry._id];
-    this.addManagerContainer = false;
-    this.$scope.$applyAsync();
-  }
-
-  // Save settings function
-  async saveSettings(entry) {
+  async updateClusterInfoInRegistry(id, clusterInfo) {
     try {
-      if (this.savingApi) {
-        this.errorHandler.info('Please, wait for success message', 'Settings');
-        return this.apiEntries;
-      }
-
-      if (entry) {
-        this.formData = {
-          user: entry.user,
-          password: entry.password,
-          url: entry.url,
-          port: entry.port
-        };
-      }
-
-      this.savingApi = true;
-      this.messageError = '';
-      this.isEditing = false;
-      const invalid = this.validator('formData');
-
-      if (invalid) {
-        this.messageError = invalid;
-        this.errorHandler.handle(invalid, 'Settings');
-        this.savingApi = false;
-        return this.apiEntries;
-      }
-
-      const tmpData = {
-        user: this.formData.user,
-        password: base64.encode(this.formData.password),
-        url: this.formData.url,
-        port: this.formData.port,
-        cluster_info: {},
-        insecure: 'true',
-        extensions: {}
-      };
-
-      const config = this.wazuhConfig.getConfig();
-
-      this.appState.setPatternSelector(config['ip.selector']);
-
-      tmpData.extensions.audit = config['extensions.audit'];
-      tmpData.extensions.pci = config['extensions.pci'];
-      tmpData.extensions.gdpr = config['extensions.gdpr'];
-      tmpData.extensions.hipaa = config['extensions.hipaa'];
-      tmpData.extensions.nist = config['extensions.nist'];
-      tmpData.extensions.oscap = config['extensions.oscap'];
-      tmpData.extensions.ciscat = config['extensions.ciscat'];
-      tmpData.extensions.aws = config['extensions.aws'];
-      tmpData.extensions.virustotal = config['extensions.virustotal'];
-      tmpData.extensions.osquery = config['extensions.osquery'];
-      tmpData.extensions.docker = config['extensions.docker'];
-
-      const checkData = await this.testAPI.check(tmpData);
-
-      // API Check correct. Get Cluster info
-      tmpData.cluster_info = checkData.data;
-
-      // Insert new API entry
-      const data = await this.genericReq.request(
-        'PUT',
-        '/elastic/api',
-        tmpData
-      );
-      this.appState.setExtensions(data.data.response._id, tmpData.extensions);
-      const newEntry = {
-        _id: data.data.response._id,
-        _source: {
-          cluster_info: tmpData.cluster_info,
-          url: tmpData.url,
-          api_user: tmpData.user,
-          api_port: tmpData.port,
-          extensions: tmpData.extensions
-        }
-      };
-      this.apiEntries.push(newEntry);
-      this.apiEntries = this.apiEntries.sort(this.sortByTimestamp);
-      this.apiTableProps.apiEntries = this.apiEntries;
-      if (this.apiEntries.length === 1) {
-        this.setDefault(newEntry);
-      }
-      this.$scope.$applyAsync();
-
-      this.errorHandler.info('Wazuh API successfully added', 'Settings');
-      this.addManagerContainer = false;
-
-      this.formData = {};
-
-      // Setting current API as default if no one is in the cookies
-      if (!this.appState.getCurrentAPI()) {
-        // No cookie
-        if (
-          this.apiEntries[this.apiEntries.length - 1]._source.cluster_info
-            .status === 'disabled'
-        ) {
-          this.appState.setCurrentAPI(
-            JSON.stringify({
-              name: this.apiEntries[this.apiEntries.length - 1]._source
-                .cluster_info.manager,
-              id: this.apiEntries[this.apiEntries.length - 1]._id
-            })
-          );
-        } else {
-          this.appState.setCurrentAPI(
-            JSON.stringify({
-              name: this.apiEntries[this.apiEntries.length - 1]._source
-                .cluster_info.cluster,
-              id: this.apiEntries[this.apiEntries.length - 1]._id
-            })
-          );
-        }
-        this.$scope.$emit('updateAPI', {});
-        this.currentDefault = JSON.parse(this.appState.getCurrentAPI()).id;
-      }
-
-      try {
-        await this.genericReq.request('GET', '/api/monitoring');
-      } catch (error) {
-        if ((error || {}).status === -1) {
-          this.errorHandler.handle(
-            'Wazuh API was inserted correctly, but something happened while fetching agents data.',
-            'Fetch agents',
-            true
-          );
-        } else {
-          this.errorHandler.handle(error, 'Fetch agents');
-        }
-      }
-
-      await this.getSettings();
+      const url = `/hosts/update-hostname/${id}`;
+      await this.genericReq.request('PUT', url, {
+        cluster_info: clusterInfo
+      });
     } catch (error) {
-      if (error.status === 400) {
-        error.message =
-          'Please, fill all the fields in order to connect with Wazuh RESTful API.';
-      }
-      this.printError(error);
+      return Promise.reject(error);
     }
-    this.savingApi = false;
-    this.$scope.$applyAsync();
-    return this.apiEntries;
-  }
-
-  /**
-   * This show us if editor is updating
-   */
-  isUpdating() {
-    for (let key in this.showEditForm) {
-      if (this.showEditForm[key]) return true;
-    }
-    return false;
-  }
-
-  // Update settings function
-  async updateSettings(item, useItem = false) {
-    try {
-      if (this.savingApi) {
-        this.errorHandler.info('Please, wait for success message', 'Settings');
-        return this.apiEntries;
-      }
-      this.savingApi = true;
-      this.messageErrorUpdate = '';
-      if (useItem) {
-        this.formUpdate = {
-          user: item.user,
-          password: item.password,
-          url: item.url,
-          port: item.port
-        };
-      }
-
-      const invalid = this.validator('formUpdate');
-      if (invalid) {
-        this.messageErrorUpdate = invalid;
-        this.errorHandler.handle(invalid, 'Settings');
-        this.savingApi = false;
-        return this.apiEntries;
-      }
-
-      const index = this.apiEntries.map(item => item._id).indexOf(item._id);
-
-      const tmpData = {
-        user: this.formUpdate.user,
-        password: base64.encode(this.formUpdate.password),
-        url: this.formUpdate.url,
-        port: this.formUpdate.port,
-        cluster_info: {},
-        insecure: 'true',
-        id: this.apiEntries[index]._id,
-        extensions: this.apiEntries[index]._source.extensions
-      };
-
-      const data = await this.testAPI.check(tmpData);
-      tmpData.cluster_info = data.data;
-      await this.genericReq.request('PUT', '/elastic/api-settings', tmpData);
-      this.apiEntries[index]._source.cluster_info = tmpData.cluster_info;
-
-      this.wzMisc.setApiIsDown(false);
-      this.apiIsDown = false;
-
-      this.apiEntries[index]._source.cluster_info.cluster =
-        tmpData.cluster_info.cluster;
-      this.apiEntries[index]._source.cluster_info.manager =
-        tmpData.cluster_info.manager;
-      this.apiEntries[index]._source.url = tmpData.url;
-      this.apiEntries[index]._source.api_port = tmpData.port;
-      this.apiEntries[index]._source.api_user = tmpData.user;
-
-      this.apiEntries = this.apiEntries.sort(this.sortByTimestamp);
-      this.showEditForm[this.apiEntries[index]._id] = false;
-      this.isEditing = false;
-
-      this.errorHandler.info('The API was updated successfully', 'Settings');
-    } catch (error) {
-      this.printError(error, true);
-    }
-    this.savingApi = false;
-    this.$scope.$applyAsync();
-    return this.apiEntries;
-  }
-
-  /**
-   * This toggle the addManagerContainer flag
-   */
-  switch() {
-    this.addManagerContainer = !this.addManagerContainer;
   }
 
   // Check manager connectivity
   async checkManager(item, isIndex, silent = false) {
     try {
+      // Get the index of the API in the entries
       const index = isIndex
         ? item
-        : this.apiEntries.map(item => item._id).indexOf(item._id);
+        : this.getApiIndex(item);
 
+      // Get the Api information
+      const api = this.apiEntries[index];
+      const { user, url, port, id } = api;
       const tmpData = {
-        user: this.apiEntries[index]._source.api_user,
-        //password    : this.apiEntries[index]._source.api_password,
-        url: this.apiEntries[index]._source.url,
-        port: this.apiEntries[index]._source.api_port,
+        user: user,
+        url: url,
+        port: port,
         cluster_info: {},
         insecure: 'true',
-        id: this.apiEntries[index]._id
+        id: id
       };
 
+      // Test the connection
       const data = await this.testAPI.check(tmpData);
       tmpData.cluster_info = data.data;
-
-      const tmpUrl = `/elastic/api-hostname/${this.apiEntries[index]._id}`;
-      await this.genericReq.request('PUT', tmpUrl, {
-        cluster_info: tmpData.cluster_info
-      });
-      // Emit updateAPI event cause the cluster info could had been changed
-      this.$scope.$emit('updateAPI', { cluster_info: tmpData.cluster_info });
-      this.apiEntries[index]._source.cluster_info = tmpData.cluster_info;
+      const { cluster_info } = tmpData;
+      // Updates the cluster-information in the registry 
+      await this.updateClusterInfoInRegistry(id, cluster_info);
+      this.$scope.$emit('updateAPI', { cluster_info });
+      this.apiEntries[index].cluster_info = cluster_info;
+      this.apiEntries[index].status = 'online';
       this.wzMisc.setApiIsDown(false);
       this.apiIsDown = false;
       !silent && this.errorHandler.info('Connection success', 'Settings');
-
       this.$scope.$applyAsync();
       return;
     } catch (error) {
-      if (!this.wzMisc.getApiIsDown()) this.printError(error);
-      else {
-        !silent && this.errorHandler.handle(error);
+      if (!silent) {
+        this.errorHandler.handle(error);
       }
+      return Promise.reject(error);
     }
-  }
-
-  /**
-   * This change to a given index pattern
-   * @param {} newIndexPattern
-   */
-  async changeIndexPattern(newIndexPattern) {
-    try {
-      this.appState.setCurrentPattern(newIndexPattern);
-      await this.genericReq.request(
-        'GET',
-        `/elastic/known-fields/${newIndexPattern}`,
-        {}
-      );
-      this.$scope.$emit('updatePattern', {});
-      this.errorHandler.info(
-        'Successfully changed the default index-pattern',
-        'Settings'
-      );
-      this.selectedIndexPattern = newIndexPattern;
-      this.$scope.$applyAsync();
-      return;
-    } catch (error) {
-      this.errorHandler.handle(
-        'Error while changing the default index-pattern',
-        'Settings'
-      );
-    }
-    return;
   }
 
   /**
@@ -678,33 +372,28 @@ export class SettingsController {
   async getAppInfo() {
     try {
       const data = await this.genericReq.request('GET', '/api/setup');
-      this.appInfo = {};
-      this.appInfo['app-version'] = data.data.data['app-version'];
-      this.appInfo['installationDate'] = data.data.data['installationDate'];
-      this.appInfo['revision'] = data.data.data['revision'];
+      const response = data.data.data;
+      this.appInfo = {
+        'app-version': response['app-version'],
+        installationDate: response['installationDate'],
+        revision: response['revision']
+      };
+
       this.load = false;
       const config = this.wazuhConfig.getConfig();
       this.appState.setPatternSelector(config['ip.selector']);
-      if (
-        this.appState.getCurrentPattern() !== undefined &&
-        this.appState.getCurrentPattern() !== null
-      ) {
-        // There's a pattern in the cookies
-        this.selectedIndexPattern = this.appState.getCurrentPattern();
-      } else {
-        // There's no pattern in the cookies, pick the one in the settings
-        this.selectedIndexPattern = config['pattern'];
-      }
+      const pattern = this.appState.getCurrentPattern();
+      this.selectedIndexPattern = pattern || config['pattern'];
 
       if (this.tab === 'logs') {
         this.getAppLogs();
       }
+
       this.getCurrentAPIIndex();
-      if (this.currentApiEntryIndex || this.currentApiEntryIndex === 0) {
+      if ((this.currentApiEntryIndex || this.currentApiEntryIndex === 0) && this.currentApiEntryIndex >= 0) {
         await this.checkManager(this.currentApiEntryIndex, true, true);
       }
       this.$scope.$applyAsync();
-      return;
     } catch (error) {
       this.errorHandler.handle(
         'Error when loading Wazuh setup info',
@@ -756,20 +445,18 @@ export class SettingsController {
   /**
    * Change value for a given configuration key
    * @param {String} key Configuration key
-   * @param {String} newValue new configuration value for key
+   * @param {String} value New configuration value for key
    */
-  async editKey(key, newValue) {
+  async editKey(key, value) {
     try {
       this.loadingChange = true;
-      const response = await this.genericReq.request(
+      const data = await this.genericReq.request(
         'PUT',
         '/utils/configuration',
-        {
-          key,
-          value: newValue
-        }
+        { key, value }
       );
-      if (response.data.data) {
+      const response = data.data.data;
+      if (response) {
         this.errorHandler.handle(
           'You must restart Kibana for the changes to take effect',
           '',
@@ -777,10 +464,10 @@ export class SettingsController {
         );
       } else {
         this.errorHandler.info(
-          'Success. The configuration has been successfully updated'
+          'The configuration has been successfully updated'
         );
       }
-      this.configuration[key] = newValue;
+      this.configuration[key] = value;
       this.cancelEditingKey();
       this.loadingChange = false;
     } catch (error) {
@@ -790,20 +477,67 @@ export class SettingsController {
     }
   }
 
-  settingsTabsProps = {
-    clickAction: tab => {
-      this.switchTab(tab, true);
-      if (tab === 'logs') {
-        this.refreshLogs();
+  /**
+   * Checks if there are new APIs entries in the wazuh.yml
+   */
+  async checkForNewApis() {
+    try {
+      const result = await this.genericReq.request('GET', '/hosts/apis', {});
+      const hosts = result.data || [];
+      //Tries to check if there are new APIs entries in the wazuh.yml also, checks if some of them have connection
+      if (!hosts.length) throw { message: 'There were not found any API entry in the wazuh.yml', type: 'warning', closedEnabled: false };
+      this.apiEntries = this.apiTableProps.apiEntries = this.apiIsDownProps.apiEntries = hosts;
+      const notRecheable = await this.checkApisStatus();
+      if (notRecheable) {
+        if (notRecheable >= hosts.length) {
+          this.apiIsDown = true;
+          throw { message: 'Wazuh API not recheable, please review your configuration', type: 'danger', closedEnabled: true };
+        }
+        throw { message: 'Some API entry cannot be reachabled', type: 'warning', closedEnabled: true };
       }
-    },
-    selectedTab: this.tab || 'api',
-    tabs: [
-      { id: 'api', name: 'API' },
-      { id: 'pattern', name: 'Pattern' },
-      { id: 'configuration', name: 'Configuration' },
-      { id: 'logs', name: 'Logs' },
-      { id: 'about', name: 'About' }
-    ]
-  };
+      return;
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  }
+
+  /**
+   * Closes the add API component
+   */
+  closeAddApi() {
+    this.addingApi = false;
+    this.$scope.$applyAsync();
+  }
+
+  /**
+   * Shows the add API component
+   */
+  showAddApi() {
+    this.addingApi = true;
+    this.addApiProps.enableClose = true;
+    this.$scope.$applyAsync();
+  }
+
+  /**
+   * Closes the API is down component
+   */
+  closeApiIsDown() {
+    this.apiIsDown = false;
+    this.$scope.$applyAsync();
+  }
+
+  /**
+   * Refresh the API entries
+   */
+  async refreshApiEntries() {
+    try {
+      const data = await this.genericReq.request('GET', '/hosts/apis');
+      const hosts = data.data;
+      this.apiEntries = hosts || [];
+      await this.checkApisStatus();
+      return this.apiEntries;
+    } catch (error) {
+      this.errorHandler.handle('Cannot refresh API entries');
+    }
+  }
 }

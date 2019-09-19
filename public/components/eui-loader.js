@@ -22,7 +22,8 @@ import {
   EuiButtonEmpty,
   EuiHealth,
   EuiCallOut,
-  EuiSwitch
+  EuiSwitch,
+  EuiSpacer
 } from '@elastic/eui';
 
 import { BasicTable } from '../directives/wz-table-eui/components/table';
@@ -49,4 +50,5 @@ app
   .value('Logtest', Logtest)
   .value('ToolsWelcomeCards', ToolsWelcomeCards)
   .value('TestConfiguration', TestConfiguration)
-  .value('EuiSwitch', EuiSwitch);
+  .value('EuiSwitch', EuiSwitch)
+  .value('EuiSpacer',EuiSpacer);
