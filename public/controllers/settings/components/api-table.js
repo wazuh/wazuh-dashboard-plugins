@@ -115,9 +115,9 @@ export class ApiTable extends Component {
           return item === 'online' ? (
             <EuiHealth color="success">Online</EuiHealth>
           ) : item === 'down' ? (
-            <EuiHealth color="danger">Offline</EuiHealth>
+            <EuiHealth color="warning">Warning</EuiHealth>
           ) : (
-                <EuiHealth color="subdued">Unknown</EuiHealth>
+                <EuiHealth color="danger">Offline</EuiHealth>
               );
         }
       },
