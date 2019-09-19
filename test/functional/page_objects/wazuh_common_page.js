@@ -36,6 +36,19 @@ export function WazuhCommonProvider({ getService, getPageObjects }) {
       await testSubjects.click('overviewWelcomeGeneral');
     }
 
+    /**
+     * Navigate to `Integrity monitoring` without the timestamp parameter in the URL
+     *
+     * @memberof WazuhCommonPage
+     */
+    async OpenIntegrityMonitoring () {
+      log.debug('Open Security events');
+      await PageObjects.common.navigateToApp('settings');
+      await appsMenu.clickLink('Wazuh');
+      await appsMenu.clickLink('Wazuh');
+      await testSubjects.click('overviewWelcomeFim');
+    }
+
     async setTodayRange () {
       log.debug('Set today in the time range picker');
       await PageObjects.timePicker.setCommonlyUsedTime('superDatePickerCommonlyUsed_Today');
