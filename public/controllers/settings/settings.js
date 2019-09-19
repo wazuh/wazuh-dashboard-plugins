@@ -70,61 +70,67 @@ export class SettingsController {
    * On controller loads
    */
   async $onInit() {
-    for (const key in this.configuration) {
-      this.configurationTypes[key] = typeof this.configuration[key];
-      if (key.includes('extension')) {
-        delete this.configuration[key];
-      }
-    }
-    // Loading data
-    await this.getSettings();
-    await this.checkApisStatus();
-
-    this.apiTableProps = {
-      currentDefault: this.currentDefault,
-      apiEntries: this.apiEntries,
-      compressed: true,
-      setDefault: entry => this.setDefault(entry),
-      checkManager: entry => this.checkManager(entry),
-      showAddApi: () => this.showAddApi(),
-      refreshApiEntries: () => this.refreshApiEntries()
-    };
-
-    this.addApiProps = {
-      checkForNewApis: () => this.checkForNewApis(),
-      closeAddApi: () => this.closeAddApi()
-    }
-
-    this.apiIsDownProps = {
-      apiEntries: this.apiEntries,
-      testApi: entry => this.testAPI.check(entry),
-      closeApiIsDown: () => this.closeApiIsDown(),
-      updateClusterInfoInRegistry: (id, clusterInfo) => this.updateClusterInfoInRegistry(id, clusterInfo)
-    }
-
-    this.settingsTabsProps = {
-      clickAction: tab => {
-        this.switchTab(tab, true);
-        if (tab === 'logs') {
-          this.refreshLogs();
+    try {
+      for (const key in this.configuration) {
+        this.configurationTypes[key] = typeof this.configuration[key];
+        if (key.includes('extension')) {
+          delete this.configuration[key];
         }
-      },
-      selectedTab: this.tab || 'api',
-      tabs: [
-        { id: 'api', name: 'API' },
-        { id: 'configuration', name: 'Configuration' },
-        { id: 'logs', name: 'Logs' },
-        { id: 'about', name: 'About' }
-      ]
-    };
+      }
+      // Loading data
+      await this.getSettings();
+      const down = await this.checkApisStatus();
+      //Checks if all the API entries are down
+      this.apiIsDown = (down >= this.apiEntries.length && this.apiEntries.length > 0);
 
-    const location = this.$location.search();
-    if (location && location.tab) {
-      this.tab = location.tab;
-      this.settingsTabsProps.selectedTab = this.tab;
+      this.apiTableProps = {
+        currentDefault: this.currentDefault,
+        apiEntries: this.apiEntries,
+        compressed: true,
+        setDefault: entry => this.setDefault(entry),
+        checkManager: entry => this.checkManager(entry),
+        showAddApi: () => this.showAddApi(),
+        refreshApiEntries: () => this.refreshApiEntries()
+      };
+
+      this.addApiProps = {
+        checkForNewApis: () => this.checkForNewApis(),
+        closeAddApi: () => this.closeAddApi()
+      }
+
+      this.apiIsDownProps = {
+        apiEntries: this.apiEntries,
+        testApi: entry => this.testAPI.check(entry),
+        closeApiIsDown: () => this.closeApiIsDown(),
+        updateClusterInfoInRegistry: (id, clusterInfo) => this.updateClusterInfoInRegistry(id, clusterInfo)
+      }
+
+      this.settingsTabsProps = {
+        clickAction: tab => {
+          this.switchTab(tab, true);
+          if (tab === 'logs') {
+            this.refreshLogs();
+          }
+        },
+        selectedTab: this.tab || 'api',
+        tabs: [
+          { id: 'api', name: 'API' },
+          { id: 'configuration', name: 'Configuration' },
+          { id: 'logs', name: 'Logs' },
+          { id: 'about', name: 'About' }
+        ]
+      };
+
+      const location = this.$location.search();
+      if (location && location.tab) {
+        this.tab = location.tab;
+        this.settingsTabsProps.selectedTab = this.tab;
+      }
+
+      await this.getAppInfo();
+    } catch (error) {
+      this.errorHandler.handle('Cannot initialize Settings')
     }
-
-    await this.getAppInfo();
   }
 
   /**
@@ -174,7 +180,7 @@ export class SettingsController {
         }
       }
       return numError;
-    } catch (error) {}
+    } catch (error) { }
   }
 
   // Set default API
@@ -323,7 +329,7 @@ export class SettingsController {
     } catch (error) {
       if (!silent) {
         this.errorHandler.handle(error);
-      } 
+      }
       return Promise.reject(error);
     }
   }
