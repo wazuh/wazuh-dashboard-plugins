@@ -493,7 +493,7 @@ export class SettingsController {
           this.apiIsDown = true;
           throw { message: 'Wazuh API not recheable, please review your configuration', type: 'danger', closedEnabled: true };
         }
-        throw { message: 'Some API entry cannot be reachabled', type: 'warning', closedEnabled: true };
+        throw { message: 'Some API entry are not reachable', type: 'warning', closedEnabled: true };
       }
       return;
     } catch (error) {
