@@ -67,9 +67,9 @@ export class ManageHosts {
       this.busy = true;
       const raw = fs.readFileSync(this.file, { encoding: 'utf-8' });
       this.busy = false;
-      const hosts = yml.load(raw);
+      const content = yml.load(raw);
       log('manage-hosts:getHosts', 'Getting hosts', 'debug');
-      const entries = (hosts || {})['hosts'] || [];
+      const entries = (content || {})['hosts'] || [];
       return entries;
     } catch (error) {
       this.busy = false;
@@ -196,12 +196,11 @@ export class ManageHosts {
   async addSeveralHosts(hosts) {
     try {
       log('manage-hosts:addSeveralHosts', 'Adding several', 'debug');
-      const hostToAdd = await this.cleanExistingHosts(hosts);
-      if (!hostToAdd.length) return 'There are not APIs entries to migrate'
-      const entry = hostToAdd.shift();
-      const response = await this.addHost(entry);
-      if (hostToAdd.length && response) {
-        await this.addSeveralHosts(hostToAdd);
+      const hostsToAdd = await this.cleanExistingHosts(hosts);
+      if (!hostsToAdd.length) return 'There are not APIs entries to migrate'
+      for (let idx in hostsToAdd) {
+        const entry = hostsToAdd[idx];
+        await this.addHost(entry);
       }
       return 'All APIs entries were migrated to the wazuh.yml'
     } catch (error) {
@@ -223,7 +222,7 @@ export class ManageHosts {
       const hosts = await this.getHosts() || [];
       this.busy = true;
       if (!hosts.length) {
-        const result = `${data}\hosts:\n${compose}\n`;
+        const result = `${data}\nhosts:\n${compose}\n`;
         await fs.writeFileSync(this.file, result, 'utf8');
         data = await fs.readFileSync(this.file, { encoding: 'utf-8' });
       } else {

@@ -23,15 +23,13 @@ export function apiCount($q, genericReq, $location, appState) {
   genericReq
     .request('GET', '/hosts/apis')
     .then(data => {
-      if (!data.length) throw new Error('No API entries found');
+      if (!data || !data.data || !data.data.length) throw new Error('No API entries found');
       else {
-        const firstEntry = data[0];
-        const id = Object.keys(firstEntry)[0];
-        const api = firstEntry[id];
+        const api = data.data[0];
         appState.setCurrentAPI(
           JSON.stringify({
             name: api.cluster_info.manager,
-            id: id
+            id: api.id
           })
         );
       }
