@@ -21,8 +21,9 @@ import {
   EuiCallOut,
   EuiListGroup,
   EuiTitle,
-  EuiPopover,
-  EuiToolTip
+  EuiButtonIcon,
+  EuiText,
+  EuiPopover
 } from '@elastic/eui';
 
 export class UploadFiles extends Component {
@@ -32,7 +33,8 @@ export class UploadFiles extends Component {
     this.state = {
       files: {},
       isPopoverOpen: false,
-      uploadErrors: false
+      uploadErrors: false,
+      errorPopover: false
     };
     this.maxSize = 307200; // 300Kb
   }
@@ -52,6 +54,7 @@ export class UploadFiles extends Component {
 
   closePopover() {
     this.setState({
+      errorPopover: false,
       isPopoverOpen: false,
       files: {},
       uploadErrors: false
@@ -97,6 +100,27 @@ export class UploadFiles extends Component {
   renderWarning(title) {
     return (
       <EuiCallOut size="s" title={title} color="warning" iconType="iInCircle" />
+    );
+  }
+
+  /**
+   * Renders the error
+   */
+  renderError(){
+    return (
+      <EuiCallOut size="s" title={this.state.errorPopover.file} color="danger" iconType="alert">
+        <EuiText 
+          className='list-element-bad'
+          size='s'
+        >{this.state.errorPopover.error}
+          <EuiButtonIcon
+            iconType='cross'
+            arial-label='crossInACircleFilled'
+            className='list-element-bad'
+            onClick={() => this.setState({errorPopover:false})}
+          />
+        </EuiText>  
+      </EuiCallOut>
     );
   }
 
@@ -160,7 +184,16 @@ export class UploadFiles extends Component {
                 key={error.index}
                 label={error.file}
                 className={error.uploaded ? 'list-element-ok' : 'list-element-bad'}
-                iconType={error.uploaded ? 'check' : 'cross'}
+                iconType={error.uploaded ? 'check' : 'alert'}
+                extraAction={!error.uploaded && {
+                  color: 'subdued',
+                  onClick: () => this.setState({errorPopover: error}),
+                  iconType: 'inspect',
+                  iconSize: 's',
+                  alwaysShow: true,
+                  'aria-label': 'error',
+                  className: 'list-element-bad'
+                }}
                 isActive
               />
             )
@@ -214,6 +247,11 @@ export class UploadFiles extends Component {
                   this.renderFiles() ||
                   this.renderErrors()
                 }</EuiFlexItem>
+                {this.state.errorPopover && (
+                  <Fragment>
+                    {this.renderError()}
+                  </Fragment>
+                )}
                 <EuiFlexItem grow={false}>{!this.state.uploadErrors &&
                   <EuiButton
                     className="upload-files-button"
