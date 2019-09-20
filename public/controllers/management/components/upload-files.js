@@ -21,7 +21,8 @@ import {
   EuiCallOut,
   EuiListGroup,
   EuiTitle,
-  EuiPopover
+  EuiPopover,
+  EuiToolTip
 } from '@elastic/eui';
 
 export class UploadFiles extends Component {
@@ -30,7 +31,8 @@ export class UploadFiles extends Component {
 
     this.state = {
       files: {},
-      isPopoverOpen: false
+      isPopoverOpen: false,
+      uploadErrors: false
     };
     this.maxSize = 307200; // 300Kb
   }
@@ -51,7 +53,8 @@ export class UploadFiles extends Component {
   closePopover() {
     this.setState({
       isPopoverOpen: false,
-      files: {}
+      files: {},
+      uploadErrors: false
     });
   }
 
@@ -74,16 +77,17 @@ export class UploadFiles extends Component {
             });
             clearInterval(interval);
             if (files.length === this.state.files.length) {
-              await this.props.upload(files, this.props.path);
-              this.closePopover();
+              try {
+                await this.props.upload(files, this.props.path);
+                this.closePopover();
+              } catch (error) {
+                this.setState({ uploadErrors: error });
+              }
             }
           }
         }, 100);
       }
-    } catch (error) {
-      this.closePopover();
-      return Promise.reject(error);
-    }
+    } catch (error) { }
   }
 
   /**
@@ -141,6 +145,31 @@ export class UploadFiles extends Component {
     );
   }
 
+
+  /**
+   * Renders the errors when trying to upload files
+   */
+  renderErrors() {
+    return (
+      <Fragment>
+        <EuiListGroup flush={true} className="list-of-files-fail">
+          {this.state.uploadErrors.map(error => {
+            return (
+              <EuiListGroupItem
+                id={error.index}
+                key={error.index}
+                label={error.file}
+                className={error.uploaded ? 'list-element-ok' : 'list-element-bad'}
+                iconType={error.uploaded ? 'check' : 'cross'}
+                isActive
+              />
+            )
+          })}
+        </EuiListGroup>
+      </Fragment>
+    );
+  }
+
   render() {
     const button = (
       <EuiButtonEmpty
@@ -163,7 +192,7 @@ export class UploadFiles extends Component {
           <EuiTitle size="m">
             <h1>{`Upload ${this.props.msg}`}</h1>
           </EuiTitle>
-          <EuiFlexItem>
+          <EuiFlexItem>{!this.state.uploadErrors &&
             <EuiFilePicker
               id="filePicker"
               multiple
@@ -174,15 +203,18 @@ export class UploadFiles extends Component {
                 this.onChange(files);
               }}
             />
-          </EuiFlexItem>
+          }</EuiFlexItem>
 
           {this.state.files.length > 0 &&
             this.state.files.length < 6 &&
             !this.checkOverSize() > 0 &&
             this.checkValidFileExtensions() > 0 && (
               <Fragment>
-                <EuiFlexItem>{this.renderFiles()}</EuiFlexItem>
-                <EuiFlexItem grow={false}>
+                <EuiFlexItem>{!this.state.uploadErrors &&
+                  this.renderFiles() ||
+                  this.renderErrors()
+                }</EuiFlexItem>
+                <EuiFlexItem grow={false}>{!this.state.uploadErrors &&
                   <EuiButton
                     className="upload-files-button"
                     fill
@@ -191,7 +223,14 @@ export class UploadFiles extends Component {
                   >
                     Upload
                   </EuiButton>
-                </EuiFlexItem>
+                  ||
+                  <EuiButtonEmpty
+                    className="upload-files-button"
+                    onClick={() => this.closePopover()}
+                  >
+                    Close
+                </EuiButtonEmpty>
+                }</EuiFlexItem>
               </Fragment>
             )}
 
