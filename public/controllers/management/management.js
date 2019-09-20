@@ -450,7 +450,8 @@ export class ManagementController {
    */
   async uploadFiles(files, path) {
     try {
-      this.uploadErrors = [];
+      this.errors = false;
+      this.results = [];
       if (path === 'etc/rules') {
         this.upload = this.rulesetHandler.sendRuleConfiguration
       } else if (path === 'etc/decoders') {
@@ -462,15 +463,18 @@ export class ManagementController {
         const { file, content } = files[idx];
         try {
           await this.upload(file, content, true); // True does not overwrite the file  
+          this.results.push({index: idx, uploaded: true, file: file, error: 0});
         } catch (error) {
-           this.uploadErrors.push({file: file, error: error});
+          this.errors = true
+          this.results.push({index: idx, uploaded: false, file: file, error: error});
         }
       }
-      if (this.uploadErrors.length) throw this.uploadErrors;
-      this.errorHandler.info('Upload successful.');
+      if (this.errors) throw this.results;
+      this.errorHandler.info('Upload successful');
       return;
     } catch (error) {
-      this.errorHandler.handle(error.message || error);
+      if (Array.isArray(error) && error.length) return Promise.reject(error);
+      this.errorHandler.handle('Files cannot be uploaded');
     }
   }
 }     

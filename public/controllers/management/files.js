@@ -222,4 +222,11 @@ export class FilesController {
   search(term) {
     this.$scope.$broadcast('wazuhSearch', { term, removeFilters: 0 });
   }
+
+  /**
+   * Refresh the list of rules or decoders
+   */
+  refresh() {
+    this.search();
+  }
 }
