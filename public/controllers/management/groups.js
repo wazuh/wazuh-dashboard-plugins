@@ -131,11 +131,11 @@ export function GroupsController(
   $scope.toggle = () => ($scope.lookingGroup = true);
 
   /**
-   * This navigate to a selected agent
+   * This navigate to a selected agent dashboard
    */
-  $scope.showAgent = agent => {
-    shareAgent.setAgent(agent);
+  $scope.backDashboard = () => {
     $location.search('tab', null);
+    $location.search('goDashboard', $scope.openGuide === 'docker-listener' ? 'docker' :  $scope.openGuide);
     $location.path('/agents');
   };
 
@@ -161,13 +161,15 @@ export function GroupsController(
       $scope.$emit('setCurrentGroup', { currentGroup: $scope.currentGroup });
       $scope.fileViewer = false;
 
-      const openGuide = $location.search().groupModuleGuide;
-      if (openGuide) {
+      $scope.openGuide = $location.search().groupModuleGuide;
+      if ($scope.openGuide) {
         $scope.goBackFiles();
         $scope.editGroupAgentConfig();
         $scope.modulesGuideProps = {
           selectedModule: $location.search().groupModuleGuide,
-          close: () => {$scope.helpOpened = false}
+          close: () => {
+            $scope.helpOpened = false;
+          }
         };
         $location.search('groupModuleGuide', null);
         $scope.helpOpened = true;

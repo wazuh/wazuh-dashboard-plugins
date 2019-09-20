@@ -266,7 +266,13 @@ export class AgentsController {
 
     //Load
     try {
-      this.$scope.getAgent();
+      this.$scope.getAgent().then(() => {
+      const goDashboard = this.$location.search().goDashboard;
+      if (goDashboard) {
+        this.switchTab(goDashboard);
+        this.$location.search('goDashboard', null);
+      }
+    });
     } catch (e) {
       this.errorHandler.handle(
         'Unexpected exception loading controller',
@@ -317,7 +323,7 @@ export class AgentsController {
       if (!this.$location.search().configWodle) {
         this.$location.search('configWodle', this.$scope.configWodle);
       }
-     
+
       this.configurationHandler.switchWodle(
         wodleName,
         this.$scope,
@@ -449,7 +455,8 @@ export class AgentsController {
 
     this.$scope.expand = i => this.expand(i);
     this.$scope.openGroupGuide = (agent, i) => this.openGroupGuide(agent, i);
-    this.$scope.isConfigured = (name, isWodle) => this.isConfigured(name, isWodle);
+    this.$scope.isConfigured = (name, isWodle) =>
+      this.isConfigured(name, isWodle);
     this.setTabs();
   }
   /**
@@ -1000,8 +1007,8 @@ export class AgentsController {
     );
   }
 
-  isConfigured =  async (name, isWodle = false) => {
-    if(isWodle){
+  isConfigured = async (name, isWodle = false) => {
+    if (isWodle) {
       const currentConfig = await queryConfig(
         (this.$scope.agent || {}).id,
         [{ component: 'wmodules', configuration: 'wmodules' }],
@@ -1009,9 +1016,12 @@ export class AgentsController {
         this.errorHandler,
         false
       );
-      this.$scope.showNoConfig = currentConfig && !currentConfig[name] && !this.$scope.isString(currentConfig['wmodules-wmodules'])
+      this.$scope.showNoConfig =
+        currentConfig &&
+        !currentConfig[name] &&
+        !this.$scope.isString(currentConfig['wmodules-wmodules']);
     }
-  }
+  };
 
   async launchRootcheckScan() {
     try {

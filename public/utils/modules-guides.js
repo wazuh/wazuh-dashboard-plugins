@@ -230,9 +230,11 @@ export const ModulesGuides = {
     ]
   },
   'docker-listener': {
-    isWodle : true,
+    isWodle: true,
     id: 'docker-listener',
     name: 'Docker listener wodle',
+    docsLink:
+      'https://documentation.wazuh.com/current/user-manual/reference/ossec-conf/wodle-docker.html',
     description: 'Configuration options of the Docker wodle.',
     options: [
       {
@@ -262,7 +264,7 @@ export const ModulesGuides = {
     ]
   },
   osquery: {
-    isWodle : true,
+    isWodle: true,
     id: 'osquery',
     name: 'Osquery wodle',
     description: 'Configuration options of the osquery wodle.',
@@ -292,7 +294,7 @@ export const ModulesGuides = {
         description: `Full path to the results log written by Osquery.`,
         type: 'input',
         required: true
-      },      
+      },
       {
         name: 'config_path',
         description: `Path to the Osquery configuration file. This path can be relative to the folder where the Wazuh agent is running.`,
@@ -312,7 +314,7 @@ export const ModulesGuides = {
         type: 'input',
         required: true,
         extraAttr: {
-          name: { value: "custom_pack", type: 'input' }
+          name: { value: 'custom_pack', type: 'input' }
         }
       }
     ]

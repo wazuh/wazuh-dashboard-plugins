@@ -32,7 +32,9 @@ import {
   EuiSelect,
   EuiPopover,
   EuiFormRow,
-  EuiButtonEmpty
+  EuiButtonEmpty,
+  EuiCallOut,
+  EuiLink
 } from '@elastic/eui';
 
 export class ModulesGuide extends Component {
@@ -66,9 +68,10 @@ export class ModulesGuide extends Component {
     });
   }
 
-  componentWillReceiveProps(nextProps) {// eslint-disable-line
+  componentWillReceiveProps(nextProps) {
+    // eslint-disable-line
     // You don't have to do this check first, but it can help prevent an unneeded render
-    if(nextProps.selectedModule){
+    if (nextProps.selectedModule) {
       this.onChange(nextProps.selectedModule);
     }
   }
@@ -77,9 +80,10 @@ export class ModulesGuide extends Component {
     this.setState({
       options: this.ModulesGuides[this.state.selectedModule].options
     });
-  }
+  };
   onChange = value => {
     this.outputBlock = false;
+    this.docsLink = this.ModulesGuides[value].docsLink || false;
     this.setState({
       value,
       status: this.statuses[1],
@@ -89,17 +93,21 @@ export class ModulesGuide extends Component {
   };
 
   setSwitch = (option, e) => {
-    this.ModulesGuides[this.state.selectedModule].options[option].value = e.target.checked;
+    this.ModulesGuides[this.state.selectedModule].options[option].value =
+      e.target.checked;
     this.updateModulesModel();
   };
 
   extraAttrChange = (option, attr, e) => {
-    this.ModulesGuides[this.state.selectedModule].options[option].extraAttr[attr].value = e.target.checked;
+    this.ModulesGuides[this.state.selectedModule].options[option].extraAttr[
+      attr
+    ].value = e.target.checked;
     this.updateModulesModel();
   };
 
   setValue = (option, e) => {
-    this.ModulesGuides[this.state.selectedModule].options[option].value = e.target.value;
+    this.ModulesGuides[this.state.selectedModule].options[option].value =
+      e.target.value;
     this.updateModulesModel();
   };
 
@@ -129,7 +137,9 @@ export class ModulesGuide extends Component {
   };
 
   generateConfig = () => {
-    let outputBlock = this.ModulesGuides[this.state.selectedModule].isWodle ? `<wodle name="${this.state.selectedModule}">` : `<${this.state.selectedModule}>`;
+    let outputBlock = this.ModulesGuides[this.state.selectedModule].isWodle
+      ? `<wodle name="${this.state.selectedModule}">`
+      : `<${this.state.selectedModule}>`;
     for (let idx_option in this.state.options) {
       const option = this.state.options[idx_option];
       //$scope.showExtraAttr(option) ? $scope.openExtraAttr(option) : ''
@@ -137,16 +147,19 @@ export class ModulesGuide extends Component {
       if (option.type === 'switch') {
         // Switch
         if (
-          option.value !== undefined && (option['default_value'] == undefined ||
-          option.value !== option['default_value'])
+          option.value !== undefined &&
+          (option['default_value'] == undefined ||
+            option.value !== option['default_value'])
         ) {
-          outputBlock += `\n\t<${option.name}>${option.value ? 'yes' : 'no'}</${option.name}>`;
+          outputBlock += `\n\t<${option.name}>${option.value ? 'yes' : 'no'}</${
+            option.name
+          }>`;
         }
       } else if (option.type === 'input') {
         // Input
         if (option.value) {
           let extraAttributes = '';
-           if (option.extraAttr) {
+          if (option.extraAttr) {
             // add extra attributes
             for (let attrKey in option.extraAttr) {
               const attrDefaultValue = option.extraAttr[attrKey].default;
@@ -169,7 +182,7 @@ export class ModulesGuide extends Component {
           for (var i = 0; i < tmpValuesList.length; i++) {
             if (tmpValuesList[i]) {
               let extraAttributes = '';
-               if (option.extraAttr) {
+              if (option.extraAttr) {
                 // add extra attributes
                 for (let attrKey in option.extraAttr) {
                   const attrDefaultValue = option.extraAttr[attrKey].default;
@@ -182,7 +195,7 @@ export class ModulesGuide extends Component {
                     }"`;
                   }
                 }
-              } 
+              }
               outputBlock += `\n\t<${option.name}${extraAttributes}>${tmpValuesList[i]}</${option.name}>`;
             }
           }
@@ -194,7 +207,9 @@ export class ModulesGuide extends Component {
         }
       }
     }
-    outputBlock += this.ModulesGuides[this.state.selectedModule].isWodle ? `\n</wodle>` : `\n</${this.state.selectedModule}>`;
+    outputBlock += this.ModulesGuides[this.state.selectedModule].isWodle
+      ? `\n</wodle>`
+      : `\n</${this.state.selectedModule}>`;
     this.outputBlock = outputBlock;
     this.forceUpdate();
     //this.scrollToBottom();
@@ -213,8 +228,12 @@ export class ModulesGuide extends Component {
           <EuiSwitch
             name="switch"
             label={attr[0]}
-            onChange={(e) => this.extraAttrChange(optionIdx, attr[0], e)}
-            checked={attr[1].value === undefined ? ( attr[1]['default_value'] || false ) : attr[1].value}
+            onChange={e => this.extraAttrChange(optionIdx, attr[0], e)}
+            checked={
+              attr[1].value === undefined
+                ? attr[1]['default_value'] || false
+                : attr[1].value
+            }
           />
         </EuiFormRow>
       );
@@ -226,6 +245,15 @@ export class ModulesGuide extends Component {
   render() {
     const editConfigChildren = (
       <Fragment>
+        {(this.outputBlock && this.docsLink) && (
+          <EuiCallOut
+            iconType="questionInCircle"
+            style={{ marginBottom: '8px' }}
+            title="Some extra steps are needed to configure this module. Please visit our documentation:"
+          >
+            <EuiLink href={this.docsLink} target="_blank">{this.docsLink}</EuiLink>
+          </EuiCallOut>
+        )}
         {this.outputBlock && (
           <EuiCodeBlock language="xml">{this.outputBlock}</EuiCodeBlock>
         )}
@@ -271,7 +299,7 @@ export class ModulesGuide extends Component {
                 <div>
                   {option.type === 'input' && (
                     <EuiFieldText
-                    key= {idx}
+                      key={idx}
                       placeholder=""
                       value={option.value}
                       onChange={e => this.setValue(idx, e)}
@@ -283,7 +311,7 @@ export class ModulesGuide extends Component {
                       <div>
                         <EuiFlexGroup>
                           <EuiFlexItem>
-                           <EuiPopover
+                            <EuiPopover
                               ownFocus
                               button={popoverButton}
                               isOpen={this.state.isPopoverOpen}
@@ -298,16 +326,20 @@ export class ModulesGuide extends Component {
 
                   {option.type === 'switch' && (
                     <EuiSwitch
-                    key= {idx}
+                      key={idx}
                       label={''}
-                      onChange={(e) => this.setSwitch(idx, e)}
-                      checked={option.value === undefined ? ( option['default_value'] || false ) : option.value}
+                      onChange={e => this.setSwitch(idx, e)}
+                      checked={
+                        option.value === undefined
+                          ? option['default_value'] || false
+                          : option.value
+                      }
                     />
                   )}
 
                   {option.type === 'select' && (
                     <EuiSelect
-                    key= {idx}
+                      key={idx}
                       options={option.values.map(x => {
                         return { value: x, text: x };
                       })}
@@ -318,7 +350,7 @@ export class ModulesGuide extends Component {
 
                   {option.type === 'list' && (
                     <EuiTextArea
-                      key= {idx}
+                      key={idx}
                       placeholder="One entry per line"
                       label={''}
                       onChange={e => this.setValue(idx, e)}
@@ -368,29 +400,27 @@ export class ModulesGuide extends Component {
     );
 
     const steps = [
-          {
-            title: 'Select a module',
-            children: selectModuleChildren
-          },
-          {
-            title: 'Configure the module',
-            children: form,
-          },
-          {
-            title: 'Copy the configuration',
-            children: editConfigChildren,
-            status: this.outputBlock ? this.statuses[0] : this.state.status
-          }
-        ];
+      {
+        title: 'Select a module',
+        children: selectModuleChildren
+      },
+      {
+        title: 'Configure the module',
+        children: form
+      },
+      {
+        title: 'Copy the configuration',
+        children: editConfigChildren,
+        status: this.outputBlock ? this.statuses[0] : this.state.status
+      }
+    ];
 
     const view = (
       <EuiFlexItem id={'ModulesGuideElement'}>
         <EuiFlyoutHeader hasBorder>
           <EuiFlexGroup gutterSize="xs">
             <EuiTitle size="s">
-              <h2>
-                How to configure modules
-              </h2>
+              <h2>How to configure modules</h2>
             </EuiTitle>
             <EuiFlexItem />
             <EuiFlexItem grow={false}>
