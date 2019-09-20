@@ -12,6 +12,7 @@
  */
 
 import { FtrProviderContext } from '../../../../../test/functional/ftr_provider_context';
+import { SearchParams } from 'elasticsearch';
 
 export function EsAreaChartProvider({ getService, }: FtrProviderContext) {
   const es = getService('es');
@@ -43,8 +44,9 @@ export function EsAreaChartProvider({ getService, }: FtrProviderContext) {
      * Generates an object with the data in Elasticsearch to compare with
      * the visualizations
      *
+     * @param {SearchParams} query 
      * @param {string} [field=''] The field in the Elasticsearch index
-     * @returns {object}
+     * @returns {Promise<OutPut>}
      * @memberof EsAreaChart
      */
     async getData (query:SearchParams, field: string = ''): Promise<OutPut> {
@@ -201,7 +203,6 @@ export function EsAreaChartProvider({ getService, }: FtrProviderContext) {
      * @memberof EsAreaChart
      */
     private async getAlerts (query:SearchParams): Promise<object[]> {
-      const es_index = await testSubjects.getVisibleText('wzMenuPatternTitle');
       const alerts = await es.search(query);
       return alerts.hits.hits;
     }

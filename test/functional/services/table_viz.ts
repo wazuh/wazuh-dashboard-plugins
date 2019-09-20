@@ -18,20 +18,39 @@ export function TableVizProvider({ getService, }: FtrProviderContext) {
   const find = getService('find');
   const testSubjects = getService('testSubjects');
 
+  /**
+   * Tools to test the area table visualizations.
+   *
+   * @class TableViz
+   */
   class TableViz {
-      
-    async getValues (selector: string) {
+
+    /**
+     * Returns the data of a visualization on a processed object.
+     *
+     * @param {string} selector
+     * @returns {Promise<object[]>}
+     * @memberof TableViz
+     */
+    async getValues (selector: string): Promise<object[]> {
       const tableViz = await find.byCssSelector(selector);
       const tableHeader = await testSubjects.findDescendant('paginated-table-header', tableViz);
       const tableBody = await testSubjects.findDescendant('paginated-table-body', tableViz);
-      
 
       const headerTitles = await this.getHeaderTitles(tableHeader);
       const rows = await this.getRows(tableBody, headerTitles);
       return rows;
     }
 
-    async getHeaderTitles (tableHeader: WebElementWrapper){
+    /**
+     * Return an array with the titles of the table 
+     *
+     * @private
+     * @param {WebElementWrapper} tableHeader
+     * @returns {Promise<string[]>}
+     * @memberof TableViz
+     */
+    private async getHeaderTitles (tableHeader: WebElementWrapper): Promise<string[]>{
       const webElementsTableTitles: WebElementWrapper[] = await tableHeader.findAllByCssSelector('tr > th');
       const titles:string[] = [];
       for (const webElementTitle of webElementsTableTitles) {
@@ -40,7 +59,16 @@ export function TableVizProvider({ getService, }: FtrProviderContext) {
       return titles;
     }
 
-    async getRows (tableBody: WebElementWrapper[], headerTitles: string[]) {
+    /**
+     * Get all rows from the table visualization
+     *
+     * @private
+     * @param {WebElementWrapper} tableBody
+     * @param {string[]} headerTitles
+     * @returns {Promise<object[]>}
+     * @memberof TableViz
+     */
+    private async getRows (tableBody: WebElementWrapper, headerTitles: string[]): Promise<object[]> {
       const rows: object[] = [];
       const RE_PATTER = /^\s+$/
       for (const tr of await tableBody.findAllByTagName('tr')) {
@@ -52,7 +80,16 @@ export function TableVizProvider({ getService, }: FtrProviderContext) {
       return rows;
     }
 
-    async getRow (tr:WebElementWrapper, headerTitles: string[]) {
+    /**
+     * Returns an object with the data of a row of the table.
+     *
+     * @private
+     * @param {WebElementWrapper} tr
+     * @param {string[]} headerTitles
+     * @returns {Promise<object>}
+     * @memberof TableViz
+     */
+    private async getRow (tr:WebElementWrapper, headerTitles: string[]): Promise<object> {
       const tds = await tr.findAllByTagName('td');
       const row: object = {};
 
@@ -65,6 +102,6 @@ export function TableVizProvider({ getService, }: FtrProviderContext) {
       return row;
     }
   }
-  return new TableViz();  
+  return new TableViz();
 }
-  
+

@@ -24,7 +24,7 @@ export function PieChartsProvider({ getService,getPageObjects }: FtrProviderCont
   class PieCharts {
 
     /**
-     * Returns the data of a visualization on a processed object.
+     * Returns the data of a visualization on a processed object
      *
      * @param {string} selector
      * @returns

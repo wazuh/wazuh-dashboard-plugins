@@ -37,8 +37,8 @@ export function AreaChartProvider({ getService, }: FtrProviderContext) {
         `return d3.select('${selector} div.visWrapper__column svg')[0][0].__data__`
       );
       const output: object = {
-        series: this.composeSeries(element.series),
-        xAxisOrderedValues: element.xAxisOrderedValues.sort()
+        series: this.composeSeries(element['series']),
+        xAxisOrderedValues: element['xAxisOrderedValues'].sort()
       }
       return output;
     }
@@ -55,8 +55,8 @@ export function AreaChartProvider({ getService, }: FtrProviderContext) {
       const series: object[] = [];
       element.forEach((serie) => {
         series.push({
-          label: serie.label,
-          values: this.composeValues(serie.values)
+          label: serie['label'],
+          values: this.composeValues(serie['values'])
         });
       });
       return series.sort((a, b) => {
@@ -84,9 +84,9 @@ export function AreaChartProvider({ getService, }: FtrProviderContext) {
      */
     private composeValues (values:object[]) {
       const filteredValues = values.filter((value) => {
-        return value.xi === undefined;
+        return value['xi'] === undefined;
       }).map((value) => {
-        return {x: value.x, y: value.y};
+        return {x: value['x'], y: value['y']};
       });
 
       return filteredValues.sort((a,b) => {return a['x'] - b['x']});

@@ -22,7 +22,7 @@ export function WazuhCommonProvider({ getService, getPageObjects }) {
    * @class WazuhCommonPage
    */
   class WazuhCommonPage {
-    
+
     /**
      * Navigate to `Security events` without the timestamp parameter in the URL
      *
@@ -49,6 +49,12 @@ export function WazuhCommonProvider({ getService, getPageObjects }) {
       await testSubjects.click('overviewWelcomeFim');
     }
 
+
+    /**
+     * Select `today` in the commonly used times
+     *
+     * @memberof WazuhCommonPage
+     */
     async setTodayRange () {
       log.debug('Set today in the time range picker');
       await PageObjects.timePicker.setCommonlyUsedTime('superDatePickerCommonlyUsed_Today');

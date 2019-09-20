@@ -17,10 +17,23 @@ import { SearchParams } from 'elasticsearch';
 export function EsTableVizProvider({ getService, }: FtrProviderContext) {
   const es = getService('es');
   const sortArray = getService('sortArray');
-  const testSubjects = getService('testSubjects');
 
+  /**
+   * Tools to test the area chart visualizations.
+   *
+   * @class EsTableViz
+   */
   class EsTableViz {
 
+    /**
+     * Get raw data from visualization and return a processing object
+     *
+     * @param {SearchParams} query
+     * @param {any[]} fields
+     * @param {string[]} orderField
+     * @returns
+     * @memberof EsTableViz
+     */
     async getData(query:SearchParams, fields:any[], orderField:string[]) {
       const alerts = await this.getAlerts(query);
       const data = await this.getSeries(alerts, fields);
@@ -33,6 +46,14 @@ export function EsTableVizProvider({ getService, }: FtrProviderContext) {
       return this.stringfyData(data);
     }
 
+    /**
+     * Convert all values to strings
+     *
+     * @private
+     * @param {object[]} data
+     * @returns
+     * @memberof EsTableViz
+     */
     private stringfyData (data:object[]) {
       return data.map((element) => {
         const newElement = {}
@@ -47,7 +68,15 @@ export function EsTableVizProvider({ getService, }: FtrProviderContext) {
       })
     }
 
-    
+    /**
+     * Return an array with all series
+     *
+     * @private
+     * @param {*} alerts
+     * @param {*} fields
+     * @returns
+     * @memberof EsTableViz
+     */
     private getSeries (alerts, fields) {
       const series = []
       for (const alert of alerts) {
@@ -59,6 +88,15 @@ export function EsTableVizProvider({ getService, }: FtrProviderContext) {
       return series;
     }
 
+    /**
+     * Create a series from the data of an alert
+     *
+     * @private
+     * @param {*} alert
+     * @param {*} fields
+     * @returns
+     * @memberof EsTableViz
+     */
     private createSerie (alert, fields) {
       const serie = {};
       for (const field of fields) {
@@ -71,7 +109,16 @@ export function EsTableVizProvider({ getService, }: FtrProviderContext) {
       return serie;
     }
 
-
+    /**
+     * Check if serie exists in series
+     *
+     * @private
+     * @param {*} serie
+     * @param {*} series
+     * @param {*} fields
+     * @returns
+     * @memberof EsTableViz
+     */
     private serieExists (serie, series, fields) {
       return series.find((s) => {
         for (const field of fields) {
@@ -84,6 +131,7 @@ export function EsTableVizProvider({ getService, }: FtrProviderContext) {
         return true;
       });
     }
+
 
     private createOrUpdateSerie (findSerie, serie, series, fields) {
       if (findSerie) {
@@ -99,7 +147,6 @@ export function EsTableVizProvider({ getService, }: FtrProviderContext) {
 
 
     private async getAlerts (query: SearchParams): Promise<object[]> {
-      const es_index = await testSubjects.getVisibleText('wzMenuPatternTitle');
       const alerts = await es.search(query);
       return alerts.hits.hits;
     }
