@@ -905,7 +905,11 @@ export class WazuhApiCtrl {
       }
 
       const responseBody = (response || {}).body || {};
-      const responseData = responseBody.data || false;
+      let responseData = responseBody.data;
+      if (!responseData) {
+        responseData = typeof responseData === 'string' && path.includes('/files') && method === 'GET' ? ' ' : false
+        response.body.data = responseData
+      }
       const responseError = responseBody.error || false;
 
       if (!responseError && responseData) {
