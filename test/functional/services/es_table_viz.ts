@@ -16,7 +16,7 @@ import { SearchParams } from 'elasticsearch';
 
 export function EsTableVizProvider({ getService, }: FtrProviderContext) {
   const es = getService('es');
-  const sortArray = getService('sortArray');
+  const arrayHelper = getService('arrayHelper');
 
   /**
    * Tools to test the area chart visualizations.
@@ -39,7 +39,7 @@ export function EsTableVizProvider({ getService, }: FtrProviderContext) {
       const data = await this.getSeries(alerts, fields);
 
       if (orderField) {
-        const sortedData = sortArray.sortData(data, orderField);
+        const sortedData = arrayHelper.sortData(data, orderField);
         return  this.stringfyData(sortedData);
       }
 

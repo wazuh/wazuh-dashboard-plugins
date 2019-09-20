@@ -16,6 +16,7 @@ import { SearchParams } from 'elasticsearch';
 
 export default function({getService, getPageObjects, }: FtrProviderContext) {
   const areaChart = getService('areaChart');
+  const arrayHelper = getService('arrayHelper');
   const esAreaChart = getService('esAreaChart');
   const esPieChart = getService('esPieChart');
   const esTableViz = getService('esTableViz');
@@ -106,8 +107,8 @@ export default function({getService, getPageObjects, }: FtrProviderContext) {
       };
       const esValues = await esPieChart.getData(query, 'agent.name');
 
-      expect(JSON.stringify(esValues.slice(0, 5)))
-      .to.be.equal(JSON.stringify(values));
+      expect(arrayHelper.compareObjects(values, esValues))
+      .to.be.ok();
     });
 
     it('should Events summary values are correct', async () => {
@@ -252,19 +253,9 @@ export default function({getService, getPageObjects, }: FtrProviderContext) {
         }
       };
       const esValues: object[] = await esTableViz.getData(query, fields, ['-Count', 'Level', '-Rule ID', ]);
-      let result = false;
-      for (const value of values) {
-        for (const esValue of esValues) {
-          if (JSON.stringify(value) === JSON.stringify(esValue)) {
-            result = true;
-            break;
-          }
-        }
-        if(!result){
-          break
-        }
-      }
-      expect(result)
+
+      
+      expect(arrayHelper.compareObjects(values, esValues))
       .to.be.ok();
     });
 
@@ -410,8 +401,8 @@ export default function({getService, getPageObjects, }: FtrProviderContext) {
       };
       const esValues = await esPieChart.getData(query, 'agent.name');
 
-      expect(JSON.stringify(esValues.slice(0, 5)))
-      .to.be.equal(JSON.stringify(values));
+      expect(arrayHelper.compareObjects(values, esValues))
+      .to.be.ok();
       await filterBar.removeAllFilters();
     });
 
@@ -763,8 +754,8 @@ export default function({getService, getPageObjects, }: FtrProviderContext) {
       };
       const esValues = await esPieChart.getData(query, 'agent.name');
 
-      expect(JSON.stringify(esValues.slice(0, 5)))
-      .to.be.equal(JSON.stringify(values));
+      expect(arrayHelper.compareObjects(values, esValues))
+      .to.be.ok();
       await queryBar.setQuery('');
       await queryBar.submitQuery();
     });

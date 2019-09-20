@@ -12,9 +12,26 @@
  */
 
 
-export function SortArrayProvider( ) {
+export function ArrayHelperProvider( ) {
 
-  class SortArray {
+  class ArrayHelper {
+
+    compareObjects(vizValues: object[], esValues: object[]): Boolean{
+      let result = false;
+      for (const value of vizValues) {
+        for (const esValue of esValues) {
+          if (JSON.stringify(value) === JSON.stringify(esValue)) {
+            result = true;
+            break;
+          }
+        }
+        if(!result){
+          break
+        }
+      }
+      return result;
+    }
+
 
     static dynamicSort(property: any) {
       let sortOrder = 1;
@@ -38,7 +55,7 @@ export function SortArrayProvider( ) {
         const numberOfProperties = props.length;
         
         while(result === 0 && i < numberOfProperties) {
-            result = SortArray.dynamicSort(props[i])(obj1, obj2);
+            result = ArrayHelper.dynamicSort(props[i])(obj1, obj2);
             i++;
         }
         return result;
@@ -51,5 +68,5 @@ export function SortArrayProvider( ) {
     }
 
   }
-  return new SortArray();
+  return new ArrayHelper();
 }
