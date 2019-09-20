@@ -51,6 +51,7 @@ export class ManagementController {
     this.logtestOpened = false;
     this.uploadOpened = false;
     this.rulesetHandler = rulesetHandler;
+    this.helpOpened = false;
 
     this.$scope.$on('setCurrentGroup', (ev, params) => {
       this.currentGroup = (params || {}).currentGroup || false;
@@ -154,6 +155,10 @@ export class ManagementController {
 
     this.welcomeCardsProps = {
       switchTab: (tab, setNav) => this.switchTab(tab, setNav)
+    };
+
+    this.modulesGuideProps = {
+      close: () => this.openHelp()
     };
 
     this.rulesetTabsProps = {
@@ -477,4 +482,8 @@ export class ManagementController {
       this.errorHandler.handle('Files cannot be uploaded');
     }
   }
-}     
+     
+  openHelp = () => {
+    this.helpOpened = !this.helpOpened;
+  };
+}

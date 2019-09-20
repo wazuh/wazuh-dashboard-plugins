@@ -32,6 +32,7 @@ export function GroupsController(
     $scope.currentGroup = false;
     $scope.$emit('removeCurrentGroup');
     $scope.lookingGroup = false;
+    $scope.helpOpened = false;
     $scope.$applyAsync();
   });
 
@@ -72,6 +73,20 @@ export function GroupsController(
   // Store a boolean variable to check if come from agents
   const globalAgent = shareAgent.getAgent();
 
+  $scope.editGroupAgentConfig = async () => {
+    $scope.editingFile = true;
+    try {
+      $scope.fetchedXML = await fetchFile();
+      $location.search('editingFile', true);
+      appState.setNavigation({ status: true });
+      $scope.$broadcast('fetchedFile', { data: $scope.fetchedXML });
+    } catch (error) {
+      $scope.fetchedXML = null;
+      errorHandler.handle(error, 'Fetch file error');
+    }
+    $scope.$applyAsync();
+  };
+
   /**
    * This load at init some required data
    */
@@ -97,7 +112,6 @@ export function GroupsController(
         } else {
           throw Error(`Group ${globalGroup} not found`);
         }
-
         shareAgent.deleteAgent();
       }
 
@@ -117,11 +131,11 @@ export function GroupsController(
   $scope.toggle = () => ($scope.lookingGroup = true);
 
   /**
-   * This navigate to a selected agent
+   * This navigate to a selected agent dashboard
    */
-  $scope.showAgent = agent => {
-    shareAgent.setAgent(agent);
+  $scope.backDashboard = () => {
     $location.search('tab', null);
+    $location.search('goDashboard', $scope.openGuide === 'docker-listener' ? 'docker' :  $scope.openGuide);
     $location.path('/agents');
   };
 
@@ -146,6 +160,21 @@ export function GroupsController(
       }
       $scope.$emit('setCurrentGroup', { currentGroup: $scope.currentGroup });
       $scope.fileViewer = false;
+
+      $scope.openGuide = $location.search().groupModuleGuide;
+      if ($scope.openGuide) {
+        $scope.goBackFiles();
+        $scope.editGroupAgentConfig();
+        $scope.modulesGuideProps = {
+          selectedModule: $location.search().groupModuleGuide,
+          close: () => {
+            $scope.helpOpened = false;
+          }
+        };
+        $location.search('groupModuleGuide', null);
+        $scope.helpOpened = true;
+      }
+
       $scope.$applyAsync();
     } catch (error) {
       errorHandler.handle(error, 'Groups');
@@ -285,25 +314,12 @@ export function GroupsController(
     }
   };
 
-  $scope.editGroupAgentConfig = async () => {
-    $scope.editingFile = true;
-    try {
-      $scope.fetchedXML = await fetchFile();
-      $location.search('editingFile', true);
-      appState.setNavigation({ status: true });
-      $scope.$broadcast('fetchedFile', { data: $scope.fetchedXML });
-    } catch (error) {
-      $scope.fetchedXML = null;
-      errorHandler.handle(error, 'Fetch file error');
-    }
-    $scope.$applyAsync();
-  };
-
   $scope.closeEditingFile = () => {
     $scope.editingFile = false;
     appState.setNavigation({ status: true });
     $scope.$broadcast('closeEditXmlFile', {});
     $scope.groupsTabsProps.selectedTab = 'files';
+    $scope.helpOpened = false;
     $scope.$applyAsync();
   };
 

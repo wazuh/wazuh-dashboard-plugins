@@ -47,7 +47,8 @@
             </div>
 
             <!-- XML editor for group agents -->
-            <div ng-show="editingFile">
+            <div layout="row" >
+            <div ng-show="editingFile" ng-class="helpOpened ? 'flex-60' : 'flex-100'" >
                 <div layout="row" class="md-padding-h wz-margin-top-10">
                     <span ng-click='closeEditingFile()' class='wz-margin-top-3 kuiButton kuiButton--hollow'>Cancel</span>
                     <button ng-disabled='xmlHasErrors' ng-click='doSaveGroupAgentConfig()' class='height-35 kuiButton kuiButton--secondary wz-margin-left-8'>
@@ -57,6 +58,21 @@
                         <span ng-show='xmlHasErrors' class='btn-danger'><i aria-hidden='true' class='fa fa-fw fa-exclamation-triangle'></i>
                             XML format error</span>
                     </button>
+                    <span flex></span>
+                    <button type="button" ng-click="backDashboard()" class="euiButtonEmpty euiButtonEmpty--primary euiButtonEmpty--small wz-margin-left-10"
+                    ng-show="openGuide">
+                            <span class="euiButtonEmpty__content">
+                                <react-component name="EuiIcon" props="{type:'arrowLeft'}" />
+                                <span class="euiButtonEmpty__text">Return to {{openGuide}} dashboard</span>
+                            </span>
+                        </button>                    
+                    <button type="button" ng-click="helpOpened = true" class="euiButtonEmpty euiButtonEmpty--primary euiButtonEmpty--small wz-margin-left-10"
+                        ng-show="!helpOpened">
+                                <span class="euiButtonEmpty__content">
+                                    <react-component name="EuiIcon" props="{type:'questionInCircle'}" />
+                                    <span class="euiButtonEmpty__text">Configure a module</span>
+                                </span>
+                            </button>
                 </div>
                 <div class="md-padding md-padding-top-10" ng-if="fetchedXML && currentGroup">
                     <wz-xml-file-editor file-name='agent.conf' data="fetchedXML" target-name="currentGroup.name + ' group'"
@@ -64,6 +80,10 @@
                     </wz-xml-file-editor>
                 </div>
             </div>
+            <div ng-show="helpOpened" flex="40" class="modules-guide">
+                <react-component name="ModulesGuide" props="modulesGuideProps" />
+    </div>
+</div>
             <!-- XML editor for group agents -->
 
             <div ng-if="!editingFile">

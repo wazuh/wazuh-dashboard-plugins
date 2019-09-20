@@ -31,6 +31,7 @@ import { Tabs } from '../directives/wz-tabs-eui/components/tabs';
 import { Logtest } from '../directives/wz-logtest/components/logtest';
 import { ToolsWelcomeCards } from '../controllers/dev-tools/components/tools-welcome-cards';
 import { TestConfiguration } from '../controllers/dev-tools/components/test-configuration';
+import { ModulesGuide } from '../controllers/management/components/modules-guide';
 
 const app = uiModules.get('app/wazuh', ['react']);
 
@@ -52,3 +53,5 @@ app
   .value('TestConfiguration', TestConfiguration)
   .value('EuiSwitch', EuiSwitch)
   .value('EuiSpacer',EuiSpacer);
+  .value('ModulesGuide', ModulesGuide)
+  .value('EuiSwitch', EuiSwitch);
