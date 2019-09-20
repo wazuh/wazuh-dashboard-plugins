@@ -292,7 +292,7 @@ export class AgentsPreviewController {
    */
   async needsPassword() {
     try {
-      const result = this.apiReq.request('GET', '/agents/000/config/auth/auth', {});
+      const result = await this.apiReq.request('GET', '/agents/000/config/auth/auth', {});
       const auth = ((result.data || {}).data || {}).auth || {};
       const usePassword = auth.use_password === 'yes';
       return usePassword;
