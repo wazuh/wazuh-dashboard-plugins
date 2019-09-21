@@ -52,6 +52,6 @@ app
   .value('ToolsWelcomeCards', ToolsWelcomeCards)
   .value('TestConfiguration', TestConfiguration)
   .value('EuiSwitch', EuiSwitch)
-  .value('EuiSpacer',EuiSpacer);
+  .value('EuiSpacer',EuiSpacer)
   .value('ModulesGuide', ModulesGuide)
   .value('EuiSwitch', EuiSwitch);
