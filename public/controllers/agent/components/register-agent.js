@@ -217,12 +217,12 @@ export class RegisterAgent extends Component {
 
     return (
       <div>
-        <EuiPage restrictWidth="1000px">
+        <EuiPage restrictWidth="1000px" style={{background: "transparent"}} >
           <EuiPageBody>
             <EuiFlexGroup>
               <EuiFlexItem>
                 <EuiTitle>
-                  <h2>Add a new agent</h2>
+                  <h2>Deploy a new agent</h2>
                 </EuiTitle>
               </EuiFlexItem>
               <EuiFlexItem grow={false}>
