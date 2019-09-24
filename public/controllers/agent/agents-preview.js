@@ -232,7 +232,12 @@ export class AgentsPreviewController {
       this.lastAgent = unique.lastAgent;
       this.summary = unique.summary;
       if (!this.lastAgent || !this.lastAgent.id) {
-        this.addNewAgent(true);
+        if (this.addingNewAgent === undefined) {
+          this.addNewAgent(true);
+        }
+        this.hasAgents = false;
+      } else {
+        this.hasAgents = true;
       }
 
       if (agentsTop.data.data === '') {
