@@ -135,7 +135,15 @@ export function GroupsController(
    */
   $scope.backDashboard = () => {
     $location.search('tab', null);
-    $location.search('goDashboard', $scope.openGuide === 'docker-listener' ? 'docker' :  $scope.openGuide);
+    const equiv = {
+      'docker-listener': 'docker',
+      'cis-cat': 'ciscat',
+      'open-scap': 'oscap'
+    };
+    $location.search(
+      'goDashboard',
+      equiv[$scope.openGuide] || $scope.openGuide
+    );
     $location.path('/agents');
   };
 
