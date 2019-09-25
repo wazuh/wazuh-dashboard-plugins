@@ -264,24 +264,28 @@ export const ModulesGuides = {
         name: 'interval',
         description: 'Waiting time to rerun the wodle in case it fails.',
         type: 'input',
+        default_value: '1m',
         required: true
       },
       {
         name: 'attempts',
         description: 'Number of attempts to execute the wodle.',
         type: 'input',
+        default_value: '5',
         required: true
       },
       {
         name: 'run_on_start',
         description: 'Run command immediately when service is started.',
         type: 'switch',
+        default_value: true,
         required: true
       },
       {
         name: 'disabled',
         description: 'Disable the Docker wodle.',
         type: 'switch',
+        default_value: false,
         required: true
       }
     ]

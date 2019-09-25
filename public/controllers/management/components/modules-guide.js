@@ -148,17 +148,17 @@ export class ModulesGuide extends Component {
       if (option.type === 'switch') {
         // Switch
         if (
-          option.value !== undefined &&
+          (option.required) || (option.value !== undefined && !option.required &&
           (option['default_value'] == undefined ||
-            option.value !== option['default_value'])
+            option.value !== option['default_value']))
         ) {
-          outputBlock += `\n\t<${option.name}>${option.value ? 'yes' : 'no'}</${
+          outputBlock += `\n\t<${option.name}>${option.value === undefined ? (option.default_value ? 'yes' : 'no') : option.value ? 'yes' : 'no'}</${
             option.name
           }>`;
         }
       } else if (option.type === 'input') {
         // Input
-        if (option.value || option.extraTag) {
+        if (option.value || option.extraTag || option.required) {
           let extraAttributes = '';
           if (option.extraAttr) {
             // add extra attributes
@@ -186,9 +186,9 @@ export class ModulesGuide extends Component {
           }
           const value = option.value
             ? `${startExtraTag}${option.value}${endExtraTag}`
-            : '';
+            : option.default_value || '';
           const nameAndValue =
-            !option.value && !extraAttributes
+            !value && !extraAttributes
               ? ''
               : `\n\t<${option.name}${extraAttributes}>${value}</${option.name}>`;
           outputBlock += nameAndValue;
@@ -206,7 +206,7 @@ export class ModulesGuide extends Component {
                   const attrDefaultValue = option.extraAttr[attrKey].default;
                   const currentAttrValue = option.extraAttr[attrKey].value;
 
-                  if (attrDefaultValue !== currentAttrValue) {
+                  if (attrDefaultValue !== currentAttrValue || option.required) {
                     // Add attribute only if its value is different from default value
                     extraAttributes += ` ${attrKey}="${
                       currentAttrValue ? 'yes' : 'no'
