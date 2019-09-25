@@ -102,7 +102,7 @@ export class ModulesGuide extends Component {
   extraAttrChange = (option, attr, e) => {
     this.ModulesGuides[this.state.selectedModule].options[option].extraAttr[
       attr
-    ].value = attr.type === 'switch' ? e.target.checked : e.target.value;
+    ].value = this.ModulesGuides[this.state.selectedModule].options[option].extraAttr[attr].type === 'switch' ? e.target.checked : e.target.value;
     this.updateModulesModel();
   };
 
@@ -163,10 +163,10 @@ export class ModulesGuide extends Component {
           if (option.extraAttr) {
             // add extra attributes
             for (let attrKey in option.extraAttr) {
-              const attrDefaultValue = option.extraAttr[attrKey].default;
+              const attrDefaultValue = option.extraAttr[attrKey].default_value;
               const currentAttrValue = option.extraAttr[attrKey].value;
 
-              if (attrDefaultValue !== currentAttrValue) {
+              if (currentAttrValue !== undefined && attrDefaultValue !== currentAttrValue) {
                 // Add attribute only if its value is different from default value
                 if (option.extraAttr[attrKey].type === 'switch') {
                   extraAttributes += ` ${attrKey}="${
@@ -203,7 +203,7 @@ export class ModulesGuide extends Component {
               if (option.extraAttr) {
                 // add extra attributes
                 for (let attrKey in option.extraAttr) {
-                  const attrDefaultValue = option.extraAttr[attrKey].default;
+                  const attrDefaultValue = option.extraAttr[attrKey].default_value;
                   const currentAttrValue = option.extraAttr[attrKey].value;
 
                   if (attrDefaultValue !== currentAttrValue || option.required) {
