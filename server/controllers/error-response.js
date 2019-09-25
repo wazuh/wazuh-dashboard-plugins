@@ -44,9 +44,9 @@ export function ErrorResponse(
         message.includes('EAI_AGAIN')) &&
       code === 3005
     ) {
-      filteredMessage = 'Wrong URL being used to connect to the Wazuh API';
+      filteredMessage = 'Wazuh API is not reachable. Please check your url and port.';
     } else if (isString && message.includes('ECONNREFUSED') && code === 3005) {
-      filteredMessage = 'Wrong port being used to connect to the Wazuh API';
+      filteredMessage = 'Wazuh API is not reachable. Please check your url and port.';
     } else if (
       isString &&
       message.toLowerCase().includes('not found') &&
