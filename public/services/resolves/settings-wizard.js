@@ -220,7 +220,7 @@ export function settingsWizard(
           .catch(error => {
             !disableErrors && errorHandler.handle(error);
             wzMisc.setWizard(true);
-            if (!$location.locationpath().includes('/settings')) {
+            if (!$location.path().includes('/settings')) {
               $location.search('_a', null);
               $location.search('tab', 'api');
               $location.path('/settings');

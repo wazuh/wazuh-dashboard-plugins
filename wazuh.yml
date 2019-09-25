@@ -123,3 +123,10 @@
 #     port: <port>
 #     user: <user>
 #     password: <password> 
+
+hosts:
+  - default:
+     url: http://localhost
+     port: 55000
+     user: foo
+     password: bar
