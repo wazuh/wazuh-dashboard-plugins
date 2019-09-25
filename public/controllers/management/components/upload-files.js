@@ -23,6 +23,8 @@ import {
   EuiTitle,
   EuiButtonIcon,
   EuiText,
+  EuiIcon,
+  EuiSpacer,
   EuiPopover
 } from '@elastic/eui';
 
@@ -103,26 +105,33 @@ export class UploadFiles extends Component {
     );
   }
 
-  /**
-   * Renders the error
+   /**
+   * Renders the result of a file upload
    */
-  renderError(){
+  renderResult(result){
     return (
-      <EuiCallOut size="s" title={this.state.errorPopover.file} color="danger" iconType="alert">
+      <Fragment>
+        {!result.uploaded && <EuiCallOut size="s" title={result.file} color="danger" iconType="alert">
         <EuiText 
           className='list-element-bad'
           size='s'
-        >{this.state.errorPopover.error}
-          <EuiButtonIcon
-            iconType='cross'
-            arial-label='crossInACircleFilled'
-            className='list-element-bad'
-            onClick={() => this.setState({errorPopover:false})}
-          />
+        >{result.error}
         </EuiText>  
-      </EuiCallOut>
+      </EuiCallOut> 
+        || 
+      <EuiText 
+        className='list-element-ok'
+        size='s'
+        >
+        <EuiIcon type={'check'} /> 
+         {result.file} was uploaded successfully.
+      </EuiText> 
+      }
+    </Fragment>
     );
   }
+
+
 
   /**
    * Checks the size of the files in order to check if anyone is bigger that the size allowed
@@ -177,27 +186,32 @@ export class UploadFiles extends Component {
     return (
       <Fragment>
         <EuiListGroup flush={true} className="list-of-files-fail">
-          {this.state.uploadErrors.map(error => {
+          {this.state.uploadErrors.map((error, idx) => { // We firs show the files that were successfully uploaded
+            if(error.uploaded){
+              return (
+                <EuiFlexItem
+                  key={idx}
+                  id={error.index}>
+                  {this.renderResult(error)}
+                  <EuiSpacer size="s" />
+                </EuiFlexItem>
+              )
+            }
+          })
+          }
+          {this.state.uploadErrors.map((error, idx) => { 
+            if(!error.uploaded){ // When all successfully uploaded files are shown, then we show the failed files
             return (
-              <EuiListGroupItem
-                id={error.index}
-                key={error.index}
-                label={error.file}
-                className={error.uploaded ? 'list-element-ok' : 'list-element-bad'}
-                iconType={error.uploaded ? 'check' : 'alert'}
-                extraAction={!error.uploaded && {
-                  color: 'subdued',
-                  onClick: () => this.setState({errorPopover: error}),
-                  iconType: 'inspect',
-                  iconSize: 's',
-                  alwaysShow: true,
-                  'aria-label': 'error',
-                  className: 'list-element-bad'
-                }}
-                isActive
-              />
+              <EuiFlexItem
+                key={idx}
+                id={error.index}>
+                {this.renderResult(error)}
+                <EuiSpacer size="s" />
+              </EuiFlexItem>
             )
-          })}
+          }
+          })
+          }
         </EuiListGroup>
       </Fragment>
     );
@@ -247,11 +261,6 @@ export class UploadFiles extends Component {
                   this.renderFiles() ||
                   this.renderErrors()
                 }</EuiFlexItem>
-                {this.state.errorPopover && (
-                  <Fragment>
-                    {this.renderError()}
-                  </Fragment>
-                )}
                 <EuiFlexItem grow={false}>{!this.state.uploadErrors &&
                   <EuiButton
                     className="upload-files-button"

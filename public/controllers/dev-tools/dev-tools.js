@@ -492,8 +492,8 @@ export class DevToolsController {
       selectedTab: this.tab || 'devTools',
       tabs: [
         { id: 'devTools', name: 'API console' },
-        { id: 'logtest', name: 'Test your logs' },
-        { id: 'testConfiguration', name: 'Test your configurations' }
+        //{ id: 'logtest', name: 'Test your logs' },
+        //{ id: 'testConfiguration', name: 'Test your configurations' }
       ]
     };
 
@@ -501,8 +501,8 @@ export class DevToolsController {
       clickAction: tab => this.switchTab(tab),
       sections: [
         { id: 'devTools', icon: 'consoleApp' },
-        { id: 'logtest', icon: 'indexRollupApp' },
-        { id: 'testConfiguration', icon: 'advancedSettingsApp' }
+        //{ id: 'logtest', icon: 'indexRollupApp' },
+        //{ id: 'testConfiguration', icon: 'advancedSettingsApp' }
       ]
     };
 

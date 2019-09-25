@@ -10,7 +10,7 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import React, { Component } from 'react';
+import React, { Component,Fragment } from 'react';
 import PropTypes from 'prop-types';
 import {
   EuiCard,
@@ -30,15 +30,19 @@ export class ToolsWelcomeCards extends Component {
 
   buildToolsCards() {
     return this.props.sections.map((tab, index) => (
-      <EuiFlexItem grow={true} key={index}>
-        <EuiCard
-          icon={<EuiIcon size="xxl" type={tab.icon} />}
-          title={TabDescription[tab.id].title}
-          onClick={() => this.props.clickAction(tab.id)}
-          description={TabDescription[tab.id].description}
-          key={index}
-        />
-      </EuiFlexItem>
+      <Fragment>
+        <EuiFlexItem grow={true}></EuiFlexItem>
+        <EuiFlexItem grow={true} key={index}>
+          <EuiCard
+            icon={<EuiIcon size="xxl" type={tab.icon} />}
+            title={TabDescription[tab.id].title}
+            onClick={() => this.props.clickAction(tab.id)}
+            description={TabDescription[tab.id].description}
+            key={index}
+          />
+        </EuiFlexItem>
+        <EuiFlexItem grow={true}></EuiFlexItem>
+      </Fragment>
     ));
   }
 
