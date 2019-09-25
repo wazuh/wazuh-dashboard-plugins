@@ -68,8 +68,8 @@ export class ModulesGuide extends Component {
     });
   }
 
+  // eslint-disable-next-line
   componentWillReceiveProps(nextProps) {
-    // eslint-disable-line
     // You don't have to do this check first, but it can help prevent an unneeded render
     if (nextProps.selectedModule) {
       this.onChange(nextProps.selectedModule);
@@ -84,6 +84,7 @@ export class ModulesGuide extends Component {
   onChange = value => {
     this.outputBlock = false;
     this.docsLink = this.ModulesGuides[value].docsLink || false;
+    this.extraSteps = this.ModulesGuides[value].extraSteps || false;
     this.setState({
       value,
       status: this.statuses[1],
@@ -101,7 +102,7 @@ export class ModulesGuide extends Component {
   extraAttrChange = (option, attr, e) => {
     this.ModulesGuides[this.state.selectedModule].options[option].extraAttr[
       attr
-    ].value = e.target.checked;
+    ].value = attr.type === 'switch' ? e.target.checked : e.target.value;
     this.updateModulesModel();
   };
 
@@ -147,17 +148,17 @@ export class ModulesGuide extends Component {
       if (option.type === 'switch') {
         // Switch
         if (
-          option.value !== undefined &&
+          (option.required) || (option.value !== undefined && !option.required &&
           (option['default_value'] == undefined ||
-            option.value !== option['default_value'])
+            option.value !== option['default_value']))
         ) {
-          outputBlock += `\n\t<${option.name}>${option.value ? 'yes' : 'no'}</${
+          outputBlock += `\n\t<${option.name}>${option.value === undefined ? (option.default_value ? 'yes' : 'no') : option.value ? 'yes' : 'no'}</${
             option.name
           }>`;
         }
       } else if (option.type === 'input') {
         // Input
-        if (option.value) {
+        if (option.value || option.extraTag || option.required) {
           let extraAttributes = '';
           if (option.extraAttr) {
             // add extra attributes
@@ -167,13 +168,30 @@ export class ModulesGuide extends Component {
 
               if (attrDefaultValue !== currentAttrValue) {
                 // Add attribute only if its value is different from default value
-                extraAttributes += ` ${attrKey}="${
-                  currentAttrValue ? 'yes' : 'no'
-                }"`;
+                if (option.extraAttr[attrKey].type === 'switch') {
+                  extraAttributes += ` ${attrKey}="${
+                    currentAttrValue ? 'yes' : 'no'
+                  }"`;
+                } else if (option.extraAttr[attrKey].type === 'input') {
+                  extraAttributes += ` ${attrKey}="${currentAttrValue}"`;
+                }
               }
             }
           }
-          outputBlock += `\n\t<${option.name}${extraAttributes}>${option.value}</${option.name}>`;
+          let startExtraTag = '';
+          let endExtraTag = '';
+          if (option.extraTag) {
+            startExtraTag = `\n\t\t<${option.extraTag}>`;
+            endExtraTag = `</${option.extraTag}>\n\t`;
+          }
+          const value = option.value
+            ? `${startExtraTag}${option.value}${endExtraTag}`
+            : option.default_value || '';
+          const nameAndValue =
+            !value && !extraAttributes
+              ? ''
+              : `\n\t<${option.name}${extraAttributes}>${value}</${option.name}>`;
+          outputBlock += nameAndValue;
         }
       } else if (option.type === 'list') {
         // List - Area text
@@ -188,7 +206,7 @@ export class ModulesGuide extends Component {
                   const attrDefaultValue = option.extraAttr[attrKey].default;
                   const currentAttrValue = option.extraAttr[attrKey].value;
 
-                  if (attrDefaultValue !== currentAttrValue) {
+                  if (attrDefaultValue !== currentAttrValue || option.required) {
                     // Add attribute only if its value is different from default value
                     extraAttributes += ` ${attrKey}="${
                       currentAttrValue ? 'yes' : 'no'
@@ -222,36 +240,60 @@ export class ModulesGuide extends Component {
   };
 
   buildPopoverRows(option, optionIdx) {
-    const switches = Object.entries(option.extraAttr).map((attr, idx) => {
+    const entries = Object.entries(option.extraAttr).map((attr, idx) => {
       return (
-        <EuiFormRow key={idx} style={{ marginTop: '0px' }}>
-          <EuiSwitch
-            name="switch"
-            label={attr[0]}
-            onChange={e => this.extraAttrChange(optionIdx, attr[0], e)}
-            checked={
-              attr[1].value === undefined
-                ? attr[1]['default_value'] || false
-                : attr[1].value
-            }
-          />
-        </EuiFormRow>
+        <div key={idx}>
+          {attr[1].type === 'switch' && (
+            <EuiFormRow style={{ marginTop: '0px' }}>
+              <EuiSwitch
+                name="switch"
+                label={attr[0]}
+                onChange={e => this.extraAttrChange(optionIdx, attr[0], e)}
+                checked={
+                  attr[1].value === undefined
+                    ? attr[1]['default_value'] || false
+                    : attr[1].value
+                }
+              />
+            </EuiFormRow>
+          )}
+          {attr[1].type === 'input' && (
+            <EuiFormRow style={{ marginTop: '0px' }} label={attr[0]}>
+              <EuiFieldText
+                key={idx}
+                value={attr[1].value}
+                onChange={e => this.extraAttrChange(optionIdx, attr[0], e)}
+                aria-label=""
+              />
+            </EuiFormRow>
+          )}
+        </div>
       );
     });
 
-    return <div>{switches}</div>;
+    return <div>{entries}</div>;
   }
 
   render() {
     const editConfigChildren = (
       <Fragment>
-        {(this.outputBlock && this.docsLink) && (
+        {this.outputBlock && this.extraSteps && (
+          <EuiCallOut
+            color="warning"
+            iconType="alert"
+            style={{ marginBottom: '8px' }}
+            title={this.extraSteps}
+          ></EuiCallOut>
+        )}
+        {this.outputBlock && this.docsLink && (
           <EuiCallOut
             iconType="questionInCircle"
             style={{ marginBottom: '8px' }}
             title="Some extra steps are needed to configure this module. Please visit our documentation:"
           >
-            <EuiLink href={this.docsLink} target="_blank">{this.docsLink}</EuiLink>
+            <EuiLink href={this.docsLink} target="_blank">
+              {this.docsLink}
+            </EuiLink>
           </EuiCallOut>
         )}
         {this.outputBlock && (
@@ -300,29 +342,28 @@ export class ModulesGuide extends Component {
                   {option.type === 'input' && (
                     <EuiFieldText
                       key={idx}
-                      placeholder=""
+                      placeholder={option.extraTag || ''}
                       value={option.value}
                       onChange={e => this.setValue(idx, e)}
                       aria-label=""
                     />
                   )}
-                  {this.state.selectedModule === 'syscheck' &&
-                    option.name === 'directories' && (
-                      <div>
-                        <EuiFlexGroup>
-                          <EuiFlexItem>
-                            <EuiPopover
-                              ownFocus
-                              button={popoverButton}
-                              isOpen={this.state.isPopoverOpen}
-                              closePopover={() => this.togglePopover()}
-                            >
-                              {this.buildPopoverRows(option, idx)}
-                            </EuiPopover>
-                          </EuiFlexItem>
-                        </EuiFlexGroup>
-                      </div>
-                    )}
+                  {option.extraAttr && (
+                    <div>
+                      <EuiFlexGroup>
+                        <EuiFlexItem>
+                          <EuiPopover
+                            ownFocus
+                            button={popoverButton}
+                            isOpen={this.state.isPopoverOpen}
+                            closePopover={() => this.togglePopover()}
+                          >
+                            {this.buildPopoverRows(option, idx)}
+                          </EuiPopover>
+                        </EuiFlexItem>
+                      </EuiFlexGroup>
+                    </div>
+                  )}
 
                   {option.type === 'switch' && (
                     <EuiSwitch

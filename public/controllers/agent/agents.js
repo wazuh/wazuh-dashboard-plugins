@@ -93,6 +93,7 @@ export class AgentsController {
     this.$scope.integrations = {};
     this.$scope.selectedItem = 0;
     this.targetLocation = null;
+    this.$scope.showNoConfig = false;
     this.ignoredTabs = ['syscollector', 'welcome', 'configuration'];
 
     this.$scope.showSyscheckFiles = false;
@@ -267,12 +268,12 @@ export class AgentsController {
     //Load
     try {
       this.$scope.getAgent().then(() => {
-      const goDashboard = this.$location.search().goDashboard;
-      if (goDashboard) {
-        this.switchTab(goDashboard);
-        this.$location.search('goDashboard', null);
-      }
-    });
+        const goDashboard = this.$location.search().goDashboard;
+        if (goDashboard) {
+          this.switchTab(goDashboard);
+          this.$location.search('goDashboard', null);
+        }
+      });
     } catch (e) {
       this.errorHandler.handle(
         'Unexpected exception loading controller',
@@ -1016,10 +1017,16 @@ export class AgentsController {
         this.errorHandler,
         false
       );
-      this.$scope.showNoConfig =
-        currentConfig &&
-        !currentConfig[name] &&
-        !this.$scope.isString(currentConfig['wmodules-wmodules']);
+
+      const isConfigured = Object.values(
+        (currentConfig['wmodules-wmodules'] || {}).wmodules || []
+      ).find(x => Object.keys(x)[0] === name);
+      const isDisabled =
+        (
+          (Object.values(currentConfig['wmodules-wmodules'].wmodules) ||
+            [])[0] || {}
+        ).disabled !== 'no';
+      this.$scope.showNoConfig = !isConfigured || isDisabled;
     }
   };
 
