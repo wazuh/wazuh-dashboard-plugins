@@ -85,71 +85,102 @@
     </div>
 </div>
             <!-- XML editor for group agents -->
-            <div ng-controller="agentsPreviewController as actrl">
 
-                <div ng-if="!editingFile">
-                    <div ng-show="!actrl.addingNewAgent">
-                        <div layout="row" class="md-padding" ng-if="lookingGroup && currentGroup && addingAgents">
-                            <span ng-click='addMultipleAgents(false)' class='wz-margin-top-3 kuiButton kuiButton--hollow'>
-                                Cancel
-                            </span>
-                            <span ng-hide='moreThan500' ng-click='saveAddAgents()' class='btn wz-button wz-margin-left-8'>
-                                <i aria-hidden='true' class='fa fa-fw fa-save'></i>
-                                Apply changes
-                            </span>
-                            <span class='error-msg' ng-show='moreThan500'>
-                                <i class="fa fa-exclamation-triangle"></i> 
-                                It is not possible to apply changes of more than 500 additions or deletions
-                            </span>
-                        </div>
+            <div ng-if="!editingFile">
+                <div layout="row" class="md-padding" ng-if="lookingGroup && currentGroup && addingAgents">
+                    <span ng-click='addMultipleAgents(false)' class='wz-margin-top-3 kuiButton kuiButton--hollow'>
+                        Cancel</span>
+                    <span ng-hide='moreThan500' ng-click='saveAddAgents()' class='btn wz-button wz-margin-left-8'><i
+                            aria-hidden='true' class='fa fa-fw fa-save'></i>
+                        Apply changes</span>
+                    <span class='error-msg' ng-show='moreThan500'><i class="fa fa-exclamation-triangle"></i> It is not
+                        possible to apply changes of more than 500 additions or deletions</span>
+                </div>
+
+                <!-- Search bar -->
+                <div layout="row" class="wz-margin-top-16 euiFlexGroup euiFlexGroup--alignItemsCenter euiFormControlLayout__childrenWrapper md-padding-h ng-scope"
+                    ng-if="!addingAgents && !file">
+                    <input placeholder="{{groupsSelectedTab==='files' ? 'Filter files...' : lookingGroup ? 'Filter agents...' : 'Filter groups...'}}"
+                        ng-model="custom_search" type="text" class="euiFieldSearch euiFieldSearch--fullWidth euiFlexItem height-35 ng-empty ng-pristine ng-touched ng-valid"
+                        aria-invalid="false" wz-enter="search(custom_search)">
+                    <div class="euiFormControlLayoutIcons wz-margin-left-16">
+                        <span class="euiFormControlLayoutCustomIcon">
+                            <react-component name="EuiIcon" props="{type:'search', className:'euiFormControlLayoutCustomIcon__icon'}" />
+                        </span>
                     </div>
 
-                    <!-- Search bar -->
-                    <div layout="row" class="wz-margin-top-16 euiFlexGroup euiFlexGroup--alignItemsCenter euiFormControlLayout__childrenWrapper md-padding-h ng-scope"
-                        ng-if="!addingAgents && !file">
-                        <input placeholder="{{groupsSelectedTab==='files' ? 'Filter files...' : lookingGroup ? 'Filter agents...' : 'Filter groups...'}}"
-                            ng-model="custom_search" type="text" class="euiFieldSearch euiFieldSearch--fullWidth euiFlexItem height-35 ng-empty ng-pristine ng-touched ng-valid"
-                            aria-invalid="false" wz-enter="search(custom_search)">
-                        <div class="euiFormControlLayoutIcons wz-margin-left-16">
-                            <span class="euiFormControlLayoutCustomIcon">
-                                <react-component name="EuiIcon" props="{type:'search', className:'euiFormControlLayoutCustomIcon__icon'}" />
-                            </span>
-                        </div>
-
-                        <button type="submit" aria-label="Search" class="euiFlexItem euiFlexItem--flexGrowZero height-35 kuiButton kuiButton--secondary wz-margin-left-8"
-                            ng-click="search(custom_search)">
-                            Search
-                        </button>
-                        <div ng-if="lookingGroup && currentGroup && !addingAgents && !editingFile && !file && adminMode"
-                            class="euiFlexItem euiFlexItem--flexGrowZero height-35 wz-margin-left-8">
-                            <div class="euiFilterGroup"></div>
-                        </div>
-                        <button ng-if="lookingGroup && currentGroup && !addingAgents && !editingFile && !file && adminMode && groupsSelectedTab==='files'"
-                            class="euiFlexItem euiFlexItem--flexGrowZero height-35 kuiButton kuiButton--secondary ng-scope wz-margin-left-8"
-                            ng-click="editGroupAgentConfig(currentGroup)" aria-label="Edit group configuration">
-                            <react-component name="EuiIcon" props="{type:'pencil', color:'primary'}" />
-                            Edit group configuration
-                        </button>
-                        <button ng-if="lookingGroup && currentGroup && !addingAgents && !editingFile && !file && adminMode && groupsSelectedTab==='agents'"
-                            class="euiFlexItem euiFlexItem--flexGrowZero height-35 kuiButton kuiButton--secondary ng-scope wz-margin-left-8"
-                            ng-click="addMultipleAgents(true)" aria-label="Add or remove agents">
-                            <react-component name="EuiIcon" props="{type:'plusInCircle', color:'primary'}" />
-                            Add or remove agents
-                        </button>
-
+                    <button type="submit" aria-label="Search" class="euiFlexItem euiFlexItem--flexGrowZero height-35 kuiButton kuiButton--secondary wz-margin-left-8"
+                        ng-click="search(custom_search)">
+                        Search
+                    </button>
+                    <div ng-if="lookingGroup && currentGroup && !addingAgents && !editingFile && !file && adminMode"
+                        class="euiFlexItem euiFlexItem--flexGrowZero height-35 wz-margin-left-8">
+                        <div class="euiFilterGroup"></div>
                     </div>
-                    <!-- End search bar -->
+                    <button ng-if="lookingGroup && currentGroup && !addingAgents && !editingFile && !file && adminMode && groupsSelectedTab==='files'"
+                        class="euiFlexItem euiFlexItem--flexGrowZero height-35 kuiButton kuiButton--secondary ng-scope wz-margin-left-8"
+                        ng-click="editGroupAgentConfig(currentGroup)" aria-label="Edit group configuration">
+                        <react-component name="EuiIcon" props="{type:'pencil', color:'primary'}" />
+                        Edit group configuration
+                    </button>
+                    <button ng-if="lookingGroup && currentGroup && !addingAgents && !editingFile && !file && adminMode && groupsSelectedTab==='agents'"
+                        class="euiFlexItem euiFlexItem--flexGrowZero height-35 kuiButton kuiButton--secondary ng-scope wz-margin-left-8"
+                        ng-click="addMultipleAgents(true)" aria-label="Add or remove agents">
+                        <react-component name="EuiIcon" props="{type:'plusInCircle', color:'primary'}" />
+                        Add or remove agents
+                    </button>
 
-                    <!-- Groups table -->
-                    <md-card flex class="wz-md-card _md flex md-margin-h wz-margin-top-16" ng-if="!lookingGroup">
+                </div>
+                <!-- End search bar -->
+
+                <!-- Groups table -->
+                <md-card flex class="wz-md-card _md flex md-margin-h wz-margin-top-16" ng-if="!lookingGroup">
+                    <md-card-content>
+                        <div layout="row">
+                            <wz-table custom-columns="true" flex path="'/agents/groups'" keys="['name','count','mergedSum']"
+                                allow-click="true" row-sizes="[14,12,10]">
+                            </wz-table>
+                        </div>
+                        <div layout="row" layout-align="end center">
+                            <button type="button" ng-click="downloadCsv('/agents/groups')" class="euiButtonEmpty euiButtonEmpty--primary euiButtonEmpty--small">
+                                <span class="euiButtonEmpty__content">
+                                    <react-component name="EuiIcon" props="{type:'importAction'}" />
+                                    <span class="euiButtonEmpty__text">Formatted</span>
+                                </span>
+                            </button>
+                        </div>
+                    </md-card-content>
+                </md-card>
+                <!-- End groups table -->
+
+                <div ng-if='!addingAgents'>
+                    <!-- Group agents table -->
+                    <md-card flex class="wz-md-card _md flex md-margin-h wz-margin-top-16" ng-if="lookingGroup && groupsSelectedTab==='agents' && currentGroup">
+                        <md-card-actions layout="row" class="wz-card-actions wz-card-actions-top layout-align-end-center">
+                            <react-component name="ExportConfiguration" ng-hide="reportBusy && reportStatus" props="{exportConfiguration, type: 'group'}" />
+                            <react-component ng-show="reportBusy && reportStatus" name="EuiLoadingSpinner" props="{size:'m'}" />
+                        </md-card-actions>
+                        <div layout="row" ng-show="failedErrors" class="extraHeader">
+                            <md-list>
+                                <md-list-item class="error-enum-configuration" ng-repeat="group in failedErrors">
+                                    <span class="wz-agent-status-indicator small red-text padding-left-0"><span
+                                            ng-repeat="error in group">{{error.id}}{{$last
+                                            ? '' : ',&nbsp;'}}</span>: {{group[0].message}}</span>
+                                </md-list-item>
+                            </md-list>
+                            <span flex></span>
+                            <a class='md-padding md-padding-top-10' ng-click='clearFailedErrors()'><i class="fa fa-times"
+                                    aria-hidden="true"></i></a>
+                        </div>
                         <md-card-content>
                             <div layout="row">
-                                <wz-table custom-columns="true" flex path="'/agents/groups'" keys="['name','count','mergedSum']"
-                                    allow-click="true" row-sizes="[14,12,10]">
-                                </wz-table>
+                                <wz-table flex custom-columns="true" path="'/agents/groups/' + currentGroup.name" keys="['id','name','ip','status','os.name','os.version','version']"
+                                    allow-click="true" row-sizes="[14,12,10]" empty-results="'No agents were added to this group.'" />
                             </div>
-                            <div layout="row" layout-align="end center">
-                                <button type="button" ng-click="downloadCsv('/agents/groups')" class="euiButtonEmpty euiButtonEmpty--primary euiButtonEmpty--small">
+                            <div layout="row" ng-if="lookingGroup && groupsSelectedTab==='agents'">
+                                <span flex></span>
+                                <button type="button" ng-click="downloadCsv('/agents/groups/' + currentGroup.name)"
+                                    class="euiButtonEmpty euiButtonEmpty--primary euiButtonEmpty--small">
                                     <span class="euiButtonEmpty__content">
                                         <react-component name="EuiIcon" props="{type:'importAction'}" />
                                         <span class="euiButtonEmpty__text">Formatted</span>
@@ -158,115 +189,63 @@
                             </div>
                         </md-card-content>
                     </md-card>
-                    <!-- End groups table -->
 
-                    <div ng-if='!addingAgents'>
-                        <!-- Group agents table -->
-                        <md-card flex class="wz-md-card _md flex md-margin-h wz-margin-top-16" ng-if="lookingGroup && groupsSelectedTab==='agents' && currentGroup">
-                            <md-card-actions layout="row" class="wz-card-actions wz-card-actions-top layout-align-end-center">
-                                <react-component name="ExportConfiguration" ng-hide="reportBusy && reportStatus" props="{exportConfiguration, type: 'group'}" />
-                                <react-component ng-show="reportBusy && reportStatus" name="EuiLoadingSpinner" props="{size:'m'}" />
-                            </md-card-actions>
-                            <div layout="row" ng-show="failedErrors" class="extraHeader">
-                                <md-list>
-                                    <md-list-item class="error-enum-configuration" ng-repeat="group in failedErrors">
-                                        <span class="wz-agent-status-indicator small red-text padding-left-0"><span
-                                                ng-repeat="error in group">{{error.id}}{{$last
-                                                ? '' : ',&nbsp;'}}</span>: {{group[0].message}}</span>
-                                    </md-list-item>
-                                </md-list>
+                    <!-- Group files table -->
+                    <md-card flex class="wz-md-card _md flex md-margin-h wz-margin-top-16" ng-if="lookingGroup && groupsSelectedTab==='files' && !fileViewer && currentGroup">
+                        <md-card-actions layout="row" class="wz-card-actions wz-card-actions-top layout-align-end-center">
+                            <react-component name="ExportConfiguration" ng-hide="reportBusy && reportStatus" props="{exportConfiguration, type: 'group'}" />
+                            <react-component ng-show="reportBusy && reportStatus" name="EuiLoadingSpinner" props="{size:'m'}" />
+                        </md-card-actions>
+                        <md-card-content>
+                            <div layout="row">
+                                <wz-table custom-columns="true" flex path="'/agents/groups/' + currentGroup.name + '/files'"
+                                    keys="[{value:'filename',width:'300px'},'hash']" allow-click="true" row-sizes="[16,14,12]">
+                                </wz-table>
+                            </div>
+                            <div layout="row" ng-if="lookingGroup && groupsSelectedTab==='files' && !file">
                                 <span flex></span>
-                                <a class='md-padding md-padding-top-10' ng-click='clearFailedErrors()'><i class="fa fa-times"
-                                        aria-hidden="true"></i></a>
-                            </div>
-                            <md-card-content>
-                                <div layout="row">
-                                    <wz-table flex custom-columns="true" path="'/agents/groups/' + currentGroup.name" keys="['id','name','ip','status','os.name','os.version','version']"
-                                        allow-click="true" row-sizes="[14,12,10]" empty-results="'No agents were added to this group.'" />
-                                </div>
-                                <div layout="row" ng-if="lookingGroup && groupsSelectedTab==='agents'">
-                                    <span flex></span>
-                                    <button type="button" ng-click="downloadCsv('/agents/groups/' + currentGroup.name)"
-                                        class="euiButtonEmpty euiButtonEmpty--primary euiButtonEmpty--small">
-                                        <span class="euiButtonEmpty__content">
-                                            <react-component name="EuiIcon" props="{type:'importAction'}" />
-                                            <span class="euiButtonEmpty__text">Formatted</span>
-                                        </span>
-                                    </button>
-                                </div>
-                            </md-card-content>
-                        </md-card>
-
-                        <!-- Group files table -->
-                        <md-card flex class="wz-md-card _md flex md-margin-h wz-margin-top-16" ng-if="lookingGroup && groupsSelectedTab==='files' && !fileViewer && currentGroup">
-                            <md-card-actions layout="row" class="wz-card-actions wz-card-actions-top layout-align-end-center">
-                                <react-component name="ExportConfiguration" ng-hide="reportBusy && reportStatus" props="{exportConfiguration, type: 'group'}" />
-                                <react-component ng-show="reportBusy && reportStatus" name="EuiLoadingSpinner" props="{size:'m'}" />
-                            </md-card-actions>
-                            <md-card-content>
-                                <div layout="row">
-                                    <wz-table custom-columns="true" flex path="'/agents/groups/' + currentGroup.name + '/files'"
-                                        keys="[{value:'filename',width:'300px'},'hash']" allow-click="true" row-sizes="[16,14,12]">
-                                    </wz-table>
-                                </div>
-                                <div layout="row" ng-if="lookingGroup && groupsSelectedTab==='files' && !file">
-                                    <span flex></span>
-                                    <button type="button" ng-click="downloadCsv('/agents/groups/' + currentGroup.name + '/files')"
-                                        class="euiButtonEmpty euiButtonEmpty--primary euiButtonEmpty--small">
-                                        <span class="euiButtonEmpty__content">
-                                            <react-component name="EuiIcon" props="{type:'importAction'}" />
-                                            <span class="euiButtonEmpty__text">Formatted</span>
-                                        </span>
-                                    </button>
-                                </div>
-                            </md-card-content>
-                        </md-card>
-                        <!-- End Group files table -->
-
-                        <!-- CSV Download button section for group files-->
-
-                        <!-- End CSV Download button section for group files -->
-
-                        <!-- File JSON viewer section -->
-                        <div flex layout="column" class="md-padding" ng-if="lookingGroup && groupsSelectedTab==='files' && file">
-                            <div flex layout="column">
-                                <div layout="row" class="wz-padding-bottom-14">
-                                    <span flex class="wz-headline-title">{{ filename }}</span>
-                                    <button class="md-icon-button" ng-if="lookingGroup" aria-label="Back" tooltip="Close file"
-                                        tooltip-placement="left" ng-click="goBackFiles()"><i class="fa fa-fw fa-close"
-                                            aria-hidden="true"></i></button>
-                                    <!--<span flex class="wz-text-right cursor-pointer color-grey" ng-click="goBackFiles()">close</span>-->
-                                </div>
-                                <div flex layout="column">
-                                    <pre flex class="wz-pre groupContentViewer wzXmlEditor wz-overflow-y-auto"><code wz-dynamic="file"></code></pre>
-                                </div>
-                            </div>
-                        </div>
-                        <!-- End File JSON viewer section -->
-                    </div>
-
-                    <div layout="row" class="md-padding" ng-if="addingAgents">
-                        <div class='wzMultipleSelector' ng-show="actrl.addingNewAgent">
-                            <div flex="" class="euiCallOut euiCallOut--warning flex euiPage--restrictWidth-custom" style="max-width: 1000px;">
-                                <div class="euiCallOutHeader">
-                                    <span class="euiCallOutHeader__title ng-binding">
-                                        <react-component name="EuiIcon" props="{type:'help'}"><svg width="16" height="16" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" class="euiIcon euiIcon--medium euiIcon-isLoaded" focusable="false"><defs><path id="help-a" d="M13.6 12.186l-1.357-1.358c-.025-.025-.058-.034-.084-.056.53-.794.84-1.746.84-2.773a4.977 4.977 0 0 0-.84-2.772c.026-.02.059-.03.084-.056L13.6 3.813a6.96 6.96 0 0 1 0 8.373zM8 15A6.956 6.956 0 0 1 3.814 13.6l1.358-1.358c.025-.025.034-.057.055-.084C6.02 12.688 6.974 13 8 13a4.978 4.978 0 0 0 2.773-.84c.02.026.03.058.056.083l1.357 1.358A6.956 6.956 0 0 1 8 15zm-5.601-2.813a6.963 6.963 0 0 1 0-8.373l1.359 1.358c.024.025.057.035.084.056A4.97 4.97 0 0 0 3 8c0 1.027.31 1.98.842 2.773-.027.022-.06.031-.084.056l-1.36 1.358zm5.6-.187A4 4 0 1 1 8 4a4 4 0 0 1 0 8zM8 1c1.573 0 3.019.525 4.187 1.4l-1.357 1.358c-.025.025-.035.057-.056.084A4.979 4.979 0 0 0 8 3a4.979 4.979 0 0 0-2.773.842c-.021-.027-.03-.059-.055-.084L3.814 2.4A6.957 6.957 0 0 1 8 1zm0-1a8.001 8.001 0 1 0 .003 16.002A8.001 8.001 0 0 0 8 0z"></path></defs><use xlink:href="#help-a" fill-rule="evenodd"></use></svg></react-component>
-                                        No agents were added to this manager.
+                                <button type="button" ng-click="downloadCsv('/agents/groups/' + currentGroup.name + '/files')"
+                                    class="euiButtonEmpty euiButtonEmpty--primary euiButtonEmpty--small">
+                                    <span class="euiButtonEmpty__content">
+                                        <react-component name="EuiIcon" props="{type:'importAction'}" />
+                                        <span class="euiButtonEmpty__text">Formatted</span>
                                     </span>
-                                </div>
+                                </button>
                             </div>
-                            <react-component name="RegisterAgent" props="actrl.registerAgentsProps" />
-                        </div>
-                        <div class='wzMultipleSelector' ng-show="!actrl.addingNewAgent">
-                            <span ng-show='!multipleSelectorLoading' class="wzMultipleSelectorCounter"><span style='color:green'>+{{currentAdding}}</span>&nbsp;<span
-                                    style='color:red'>-{{currentDeleting}}</span></span>
-                            <wz-multiple-selector class='wzMultipleSelector' available-items="availableAgents.data"
-                                selected-items="selectedAgents.data" title-available-items="Available agents"
-                                title-selected-items="Current agents in the group" total-selected-items="totalSelectedAgents"
-                                reload-scroll='reload(element, searchTerm, 499, start)' limit="checkLimit()">
-                            </wz-multiple-selector>
+                        </md-card-content>
+                    </md-card>
+                    <!-- End Group files table -->
+
+                    <!-- CSV Download button section for group files-->
+
+                    <!-- End CSV Download button section for group files -->
+
+                    <!-- File JSON viewer section -->
+                    <div flex layout="column" class="md-padding" ng-if="lookingGroup && groupsSelectedTab==='files' && file">
+                        <div flex layout="column">
+                            <div layout="row" class="wz-padding-bottom-14">
+                                <span flex class="wz-headline-title">{{ filename }}</span>
+                                <button class="md-icon-button" ng-if="lookingGroup" aria-label="Back" tooltip="Close file"
+                                    tooltip-placement="left" ng-click="goBackFiles()"><i class="fa fa-fw fa-close"
+                                        aria-hidden="true"></i></button>
+                                <!--<span flex class="wz-text-right cursor-pointer color-grey" ng-click="goBackFiles()">close</span>-->
+                            </div>
+                            <div flex layout="column">
+                                <pre flex class="wz-pre groupContentViewer wzXmlEditor wz-overflow-y-auto"><code wz-dynamic="file"></code></pre>
+                            </div>
                         </div>
                     </div>
+                    <!-- End File JSON viewer section -->
+                </div>
+
+                <div layout="row" class="md-padding" ng-if="addingAgents">
+                    <span ng-show='!multipleSelectorLoading' class="wzMultipleSelectorCounter"><span style='color:green'>+{{currentAdding}}</span>&nbsp;<span
+                            style='color:red'>-{{currentDeleting}}</span></span>
+                    <wz-multiple-selector class='wzMultipleSelector' available-items="availableAgents.data"
+                        selected-items="selectedAgents.data" title-available-items="Available agents"
+                        title-selected-items="Current agents in the group" total-selected-items="totalSelectedAgents"
+                        reload-scroll='reload(element, searchTerm, 499, start)' limit="checkLimit()">
+                    </wz-multiple-selector>
                 </div>
             </div>
         </div>
