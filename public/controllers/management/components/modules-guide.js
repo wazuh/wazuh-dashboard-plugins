@@ -51,7 +51,26 @@ export class ModulesGuide extends Component {
     };
     this.outputBlock = false;
     this.ModulesGuides = ModulesGuides;
-    this.modules = Object.entries(ModulesGuides).map(x => {
+    this.modules = [];
+
+    if(this.props.isAgent !== undefined){
+      this.getModules(this.props.isAgent);
+    }
+  }
+
+  // eslint-disable-next-line
+  componentWillReceiveProps(nextProps) {
+    // You don't have to do this check first, but it can help prevent an unneeded render
+    if (nextProps.selectedModule) {
+      this.onChange(nextProps.selectedModule);
+    }
+    if (nextProps.isAgent) {
+      this.getModules(nextProps.isAgent);
+    }
+  }  
+  
+  getModules = (isAgent) => {
+    this.modules = Object.entries(ModulesGuides).filter(x => (isAgent ? (x[1].type === 1 || x[1].type === 2) : (x[1].type === 0 || x[1].type === 2))).map(x => {
       return {
         value: x[0],
         inputDisplay: x[1].name,
@@ -66,14 +85,6 @@ export class ModulesGuide extends Component {
         )
       };
     });
-  }
-
-  // eslint-disable-next-line
-  componentWillReceiveProps(nextProps) {
-    // You don't have to do this check first, but it can help prevent an unneeded render
-    if (nextProps.selectedModule) {
-      this.onChange(nextProps.selectedModule);
-    }
   }
 
   updateModulesModel = () => {
@@ -115,7 +126,7 @@ export class ModulesGuide extends Component {
   scrollToBottom = () => {
     var $target = $('#ModulesGuideElement');
     const targetHeight = $target.height();
-    $target.animate({ scrollTop: targetHeight }, 1000);
+    $target.animate({ scrollTop: targetHeight }, 'slow');
   };
 
   showAdvancedOptions = () => {
@@ -297,7 +308,9 @@ export class ModulesGuide extends Component {
           </EuiCallOut>
         )}
         {this.outputBlock && (
+          <div>
           <EuiCodeBlock language="xml">{this.outputBlock}</EuiCodeBlock>
+          </div>
         )}
       </Fragment>
     );
@@ -485,5 +498,6 @@ export class ModulesGuide extends Component {
 
 ModulesGuide.propTypes = {
   selectedModule: PropTypes.string,
-  close: PropTypes.func
+  close: PropTypes.func,
+  isAgent: PropTypes.bool
 };

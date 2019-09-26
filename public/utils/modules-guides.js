@@ -480,7 +480,7 @@ export const ModulesGuides = {
     name: 'CIS-CAT wodle',
     description: 'Configuration options of the CIS-CAT wodle.',
     extraSteps: `CIS-CAT is not installed by default. It is a proprietary software that you have to obtain for using this module.`,
-    type: 2,
+    type: 0,
     options: [
       {
         name: 'disabled',

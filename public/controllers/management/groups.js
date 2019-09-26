@@ -175,6 +175,7 @@ export function GroupsController(
         $scope.editGroupAgentConfig();
         $scope.modulesGuideProps = {
           selectedModule: $location.search().groupModuleGuide,
+          isAgent: true,
           close: () => {
             $scope.helpOpened = false;
           }
