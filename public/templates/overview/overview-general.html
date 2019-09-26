@@ -1,5 +1,5 @@
 <md-content flex layout="column" ng-if="octrl.tab === 'general' && octrl.tabView === 'panels'" layout-align="start"
-    ng-class="{'no-opacity': resultState !== 'ready' || !rendered}">
+ng-class="{'no-opacity': resultState !== 'ready' || !rendered}">
 
     <div layout="row" layout-padding>
         <react-component flex name="AlertsStats" props="{
@@ -123,6 +123,7 @@
                 </span>
             </md-card-actions>
             <md-card-content class="wazuh-column">
+
                 <kbn-vis id="Wazuh-App-Overview-General-Alerts-evolution-Top-5-agents" vis-id="'Wazuh-App-Overview-General-Alerts-evolution-Top-5-agents'"></kbn-vis>
             </md-card-content>
         </md-card>
