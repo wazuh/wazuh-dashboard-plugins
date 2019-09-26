@@ -934,6 +934,18 @@ export class WazuhApiCtrl {
         throw new Error('Could not get host credentials');
       } 
 
+      if (!method.match(/^(?:GET|PUT|POST|DELETE)$/)) {
+        log('wazuh-api:makeRequest', 'Request method is not valid.');
+        //Method is not a valid HTTP request method
+        throw new Error('Request method is not valid.');
+      }
+
+      if (!path.match(/^\/.+/)) {
+        log('wazuh-api:makeRequest', 'Request path is not valid.');
+        //Path doesn't start with '/'
+        throw new Error('Request path is not valid.');
+      }
+
       if (!data) {
         data = {};
       }
@@ -981,8 +993,16 @@ export class WazuhApiCtrl {
 
     if (!req.payload.method) {
       return ErrorResponse('Missing param: method', 3015, 400, reply);
-    } else if (!req.payload.path) {
+    } else if (!req.payload.method.match(/^(?:GET|PUT|POST|DELETE)$/)) {
+      log('wazuh-api:makeRequest', 'Request method is not valid.');
+      //Method is not a valid HTTP request method
+      return ErrorResponse('Request method is not valid.', 3015, 400, reply);
+    }else if (!req.payload.path) {
       return ErrorResponse('Missing param: path', 3016, 400, reply);
+    }else if (!req.payload.path.match(/^\/.+/)) {
+      log('wazuh-api:makeRequest', 'Request path is not valid.');
+      //Path doesn't start with '/'
+      return ErrorResponse('Request path is not valid.', 3015, 400, reply);
     } else {
       if (req.payload.method !== 'GET' && !adminMode) {
         log('wazuh-api:requestApi', 'Forbidden action, allowed methods: GET');
