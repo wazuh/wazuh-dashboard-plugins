@@ -104,6 +104,11 @@ export class ModulesGuide extends Component {
     });
   };
 
+  scrollToBottom = () => {
+    this.messagesEnd.scrollIntoView({ behavior: "smooth" });
+  }
+  
+
   setSwitch = (option, e) => {
     this.ModulesGuides[this.state.selectedModule].options[option].value =
       e.target.checked;
@@ -121,12 +126,6 @@ export class ModulesGuide extends Component {
     this.ModulesGuides[this.state.selectedModule].options[option].value =
       e.target.value;
     this.updateModulesModel();
-  };
-
-  scrollToBottom = () => {
-    var $target = $('#ModulesGuideElement');
-    const targetHeight = $target.height();
-    $target.animate({ scrollTop: targetHeight }, 'slow');
   };
 
   showAdvancedOptions = () => {
@@ -241,7 +240,7 @@ export class ModulesGuide extends Component {
       : `\n</${this.state.selectedModule}>`;
     this.outputBlock = outputBlock;
     this.forceUpdate();
-    //this.scrollToBottom();
+    setTimeout(() => this.scrollToBottom(), 100);
   };
 
   togglePopover = () => {
@@ -489,6 +488,9 @@ export class ModulesGuide extends Component {
         </EuiFlyoutHeader>
         <EuiSpacer />
         <EuiSteps firstStepNumber={1} steps={steps} />
+        { <div style={{ float:"left", clear: "both" }}
+             ref={(el) => { this.messagesEnd = el; }}>
+        </div>}
       </EuiFlexItem>
     );
 
