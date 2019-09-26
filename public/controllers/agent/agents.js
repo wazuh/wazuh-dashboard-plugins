@@ -1010,23 +1010,32 @@ export class AgentsController {
 
   isConfigured = async (name, isWodle = false) => {
     if (isWodle) {
-      const currentConfig = await queryConfig(
-        (this.$scope.agent || {}).id,
-        [{ component: 'wmodules', configuration: 'wmodules' }],
-        this.apiReq,
-        this.errorHandler,
-        false
-      );
-
-      const isConfigured = Object.values(
-        (currentConfig['wmodules-wmodules'] || {}).wmodules || []
-      ).find(x => Object.keys(x)[0] === name);
-      const isDisabled =
-        (
-          (Object.values(currentConfig['wmodules-wmodules'].wmodules) ||
-            [])[0] || {}
-        ).disabled !== 'no';
-      this.$scope.showNoConfig = !isConfigured || isDisabled;
+      const isActive = ((this.$scope.agent || {}).status || '') === 'Active';
+      if(isActive){
+        try{
+          const currentConfig = await queryConfig(
+            (this.$scope.agent || {}).id,
+            [{ component: 'wmodules', configuration: 'wmodules' }],
+            this.apiReq,
+            this.errorHandler,
+            false
+          );
+        
+          const isConfigured = Object.values(
+            (currentConfig['wmodules-wmodules'] || {}).wmodules || []
+          ).find(x => Object.keys(x)[0] === name);
+          const isDisabled =
+            (
+              (Object.values(currentConfig['wmodules-wmodules'].wmodules) ||
+                [])[0] || {}
+            ).disabled !== 'no';
+          this.$scope.showNoConfig = !isConfigured || isDisabled;
+        }catch{ 
+          this.$scope.showNoConfig = false
+        }
+      }else{
+        this.$scope.showNoConfig = false
+      }
     }
   };
 
