@@ -175,6 +175,7 @@ export function GroupsController(
         $scope.editGroupAgentConfig();
         $scope.modulesGuideProps = {
           selectedModule: $location.search().groupModuleGuide,
+          isAgent: true,
           close: () => {
             $scope.helpOpened = false;
           }
@@ -342,6 +343,15 @@ export function GroupsController(
       type: 'group'
     });
   };
+
+  $scope.loadModulesPropsAsAgent = () => {
+    $scope.modulesGuideProps = {
+      close: () => {
+        $scope.helpOpened = false;
+      },
+      isAgent: true
+    };
+  }
 
   $scope.reload = async (element, searchTerm, addOffset, start) => {
     if (element === 'left') {

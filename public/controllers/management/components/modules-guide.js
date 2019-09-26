@@ -51,7 +51,26 @@ export class ModulesGuide extends Component {
     };
     this.outputBlock = false;
     this.ModulesGuides = ModulesGuides;
-    this.modules = Object.entries(ModulesGuides).map(x => {
+    this.modules = [];
+
+    if(this.props.isAgent !== undefined){
+      this.getModules(this.props.isAgent);
+    }
+  }
+
+  // eslint-disable-next-line
+  componentWillReceiveProps(nextProps) {
+    // You don't have to do this check first, but it can help prevent an unneeded render
+    if (nextProps.selectedModule) {
+      this.onChange(nextProps.selectedModule);
+    }
+    if (nextProps.isAgent) {
+      this.getModules(nextProps.isAgent);
+    }
+  }  
+  
+  getModules = (isAgent) => {
+    this.modules = Object.entries(ModulesGuides).filter(x => (isAgent ? (x[1].type === 1 || x[1].type === 2) : (x[1].type === 0 || x[1].type === 2))).map(x => {
       return {
         value: x[0],
         inputDisplay: x[1].name,
@@ -66,14 +85,6 @@ export class ModulesGuide extends Component {
         )
       };
     });
-  }
-
-  // eslint-disable-next-line
-  componentWillReceiveProps(nextProps) {
-    // You don't have to do this check first, but it can help prevent an unneeded render
-    if (nextProps.selectedModule) {
-      this.onChange(nextProps.selectedModule);
-    }
   }
 
   updateModulesModel = () => {
@@ -93,6 +104,11 @@ export class ModulesGuide extends Component {
     });
   };
 
+  scrollToBottom = () => {
+    this.messagesEnd.scrollIntoView({ behavior: "smooth" });
+  }
+  
+
   setSwitch = (option, e) => {
     this.ModulesGuides[this.state.selectedModule].options[option].value =
       e.target.checked;
@@ -102,7 +118,7 @@ export class ModulesGuide extends Component {
   extraAttrChange = (option, attr, e) => {
     this.ModulesGuides[this.state.selectedModule].options[option].extraAttr[
       attr
-    ].value = attr.type === 'switch' ? e.target.checked : e.target.value;
+    ].value = this.ModulesGuides[this.state.selectedModule].options[option].extraAttr[attr].type === 'switch' ? e.target.checked : e.target.value;
     this.updateModulesModel();
   };
 
@@ -110,12 +126,6 @@ export class ModulesGuide extends Component {
     this.ModulesGuides[this.state.selectedModule].options[option].value =
       e.target.value;
     this.updateModulesModel();
-  };
-
-  scrollToBottom = () => {
-    var $target = $('#ModulesGuideElement');
-    const targetHeight = $target.height();
-    $target.animate({ scrollTop: targetHeight }, 1000);
   };
 
   showAdvancedOptions = () => {
@@ -163,10 +173,10 @@ export class ModulesGuide extends Component {
           if (option.extraAttr) {
             // add extra attributes
             for (let attrKey in option.extraAttr) {
-              const attrDefaultValue = option.extraAttr[attrKey].default;
+              const attrDefaultValue = option.extraAttr[attrKey].default_value;
               const currentAttrValue = option.extraAttr[attrKey].value;
 
-              if (attrDefaultValue !== currentAttrValue) {
+              if (currentAttrValue !== undefined && attrDefaultValue !== currentAttrValue) {
                 // Add attribute only if its value is different from default value
                 if (option.extraAttr[attrKey].type === 'switch') {
                   extraAttributes += ` ${attrKey}="${
@@ -203,7 +213,7 @@ export class ModulesGuide extends Component {
               if (option.extraAttr) {
                 // add extra attributes
                 for (let attrKey in option.extraAttr) {
-                  const attrDefaultValue = option.extraAttr[attrKey].default;
+                  const attrDefaultValue = option.extraAttr[attrKey].default_value;
                   const currentAttrValue = option.extraAttr[attrKey].value;
 
                   if (attrDefaultValue !== currentAttrValue || option.required) {
@@ -230,7 +240,7 @@ export class ModulesGuide extends Component {
       : `\n</${this.state.selectedModule}>`;
     this.outputBlock = outputBlock;
     this.forceUpdate();
-    //this.scrollToBottom();
+    setTimeout(() => this.scrollToBottom(), 100);
   };
 
   togglePopover = () => {
@@ -297,7 +307,9 @@ export class ModulesGuide extends Component {
           </EuiCallOut>
         )}
         {this.outputBlock && (
+          <div>
           <EuiCodeBlock language="xml">{this.outputBlock}</EuiCodeBlock>
+          </div>
         )}
       </Fragment>
     );
@@ -476,6 +488,9 @@ export class ModulesGuide extends Component {
         </EuiFlyoutHeader>
         <EuiSpacer />
         <EuiSteps firstStepNumber={1} steps={steps} />
+        { <div style={{ float:"left", clear: "both" }}
+             ref={(el) => { this.messagesEnd = el; }}>
+        </div>}
       </EuiFlexItem>
     );
 
@@ -485,5 +500,6 @@ export class ModulesGuide extends Component {
 
 ModulesGuide.propTypes = {
   selectedModule: PropTypes.string,
-  close: PropTypes.func
+  close: PropTypes.func,
+  isAgent: PropTypes.bool
 };

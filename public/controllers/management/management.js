@@ -158,7 +158,8 @@ export class ManagementController {
     };
 
     this.modulesGuideProps = {
-      close: () => this.openHelp()
+      close: () => this.openHelp(),
+      isAgent: false
     };
 
     this.rulesetTabsProps = {

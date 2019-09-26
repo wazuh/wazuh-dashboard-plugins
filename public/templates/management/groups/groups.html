@@ -66,7 +66,7 @@
                                 <span class="euiButtonEmpty__text">Return to {{openGuide}} dashboard</span>
                             </span>
                         </button>                    
-                    <button type="button" ng-click="helpOpened = true" class="euiButtonEmpty euiButtonEmpty--primary euiButtonEmpty--small wz-margin-left-10"
+                    <button type="button" ng-click="helpOpened = true; loadModulesPropsAsAgent()" class="euiButtonEmpty euiButtonEmpty--primary euiButtonEmpty--small wz-margin-left-10"
                         ng-show="!helpOpened">
                                 <span class="euiButtonEmpty__content">
                                     <react-component name="EuiIcon" props="{type:'questionInCircle'}" />

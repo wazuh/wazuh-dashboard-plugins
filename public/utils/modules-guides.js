@@ -26,61 +26,61 @@ export const ModulesGuides = {
         type: 'input',
         required: true,
         extraAttr: {
-          realtime: { default: false, type: 'switch' },
-          whodata: { default: false, type: 'switch' },
-          report_changes: { default: false, type: 'switch' },
-          check_all: { default: true },
+          realtime: { default_value: false, type: 'switch' },
+          whodata: { default_value: false, type: 'switch' },
+          report_changes: { default_value: false, type: 'switch' },
+          check_all: { default_value: true, type: 'switch' },
           check_sum: {
-            default: false,
+            default_value: false,
             requirement: 'check_all',
             type: 'switch'
           },
           check_sha1sum: {
-            default: false,
+            default_value: false,
             requirement: 'check_all',
             type: 'switch'
           },
           check_md5sum: {
-            default: false,
+            default_value: false,
             requirement: 'check_all',
             type: 'switch'
           },
           check_sha256sum: {
-            default: false,
+            default_value: false,
             requirement: 'check_all',
             type: 'switch'
           },
           check_size: {
-            default: false,
+            default_value: false,
             requirement: 'check_all',
             type: 'switch'
           },
           check_owner: {
-            default: false,
+            default_value: false,
             requirement: 'check_all',
             type: 'switch'
           },
           check_group: {
-            default: false,
+            default_value: false,
             requirement: 'check_all',
             type: 'switch'
           },
           check_perm: {
-            default: false,
+            default_value: false,
             requirement: 'check_all',
             type: 'switch'
           },
           check_mtime: {
-            default: false,
+            default_value: false,
             requirement: 'check_all',
             type: 'switch'
           },
           check_inode: {
-            default: false,
+            default_value: false,
             requirement: 'check_all',
             type: 'switch'
           },
-          follow_symbolic_link: { default: false, type: 'switch' },
+          follow_symbolic_link: { default_value: false, type: 'switch' },
           restrict: { type: 'input' },
           tags: { type: 'input' },
           recursion_level: { type: 'input' }
@@ -480,7 +480,7 @@ export const ModulesGuides = {
     name: 'CIS-CAT wodle',
     description: 'Configuration options of the CIS-CAT wodle.',
     extraSteps: `CIS-CAT is not installed by default. It is a proprietary software that you have to obtain for using this module.`,
-    type: 2,
+    type: 0,
     options: [
       {
         name: 'disabled',
@@ -560,6 +560,158 @@ export const ModulesGuides = {
           timeout: { type: 'input' }
         }
       }
+    ]
+  },
+  'rootcheck': {
+    id: 'rootcheck',
+    name: 'Policy monitoring',
+    description: 'Configuration options for policy monitoring and anomaly detection.',
+    type: 2,
+    options: [
+      {
+        name: 'disabled',
+        description: 'Disables the execution of rootcheck.',
+        type: 'switch',
+        required: true,
+        default_value: false
+      },
+      {
+        name: 'base_directory',
+        description: 'The base directory that will be prefixed to the following options: rootkit_files, rootkit_trojans and systems_audit',
+        type: 'input',
+        required: true,
+        default_value: '/'
+      },
+      {
+        name: 'ignore',
+        description:
+          'List of files or directories to be ignored (one entry per line). Multiple lines may be entered to include multiple files or directories. These files and directories will be ignored during scans.',
+        type: 'input',
+        required: true,
+        extraAttr: {
+          type: { type: 'input' },
+        }
+      },
+      {
+        name: 'rootkit_files',
+        description:
+          'Change the location of the rootkit files database.',
+        type: 'input',
+        required: true
+      },
+      {
+        name: 'rootkit_trojans',
+        description:
+          'Change the location of the rootkit trojans database.',
+        type: 'input',
+        required: true
+      },
+      {
+        name: 'windows_audit',
+        description:
+          'Specifies the path to a Windows audit definition file.',
+        type: 'list',
+      },
+      {
+        name: 'system_audit',
+        description:
+          'Specifies the path to an audit definition file for Unix-like systems.',
+        type: 'list',
+      },
+      {
+        name: 'windows_apps',
+        description: 'Specifies the path to a Windows application definition file.',
+        type: 'list',
+      },
+      {
+        name: 'windows_malware',
+        description: 'Specifies the path to a Windows malware definitions file.',
+        type: 'list',
+      },
+      {
+        name: 'scanall',
+        description: 'Tells rootcheck to scan the entire system. This option may lead to some false positives.',
+        type: 'switch',
+        default_value: false,
+      },
+      {
+        name: 'frequency',
+        description: 'Frequency that the rootcheck is going to be executed (in seconds).',
+        type: 'input',
+        default_value: '36000',
+      },
+      {
+        name: 'check_dev',
+        description: 'Enable or disable the checking of /dev.',
+        type: 'switch',
+        default_value: true,
+      },
+      {
+        name: 'check_files',
+        description: 'Enable or disable the checking of files.',
+        type: 'switch',
+        default_value: true,
+      },
+      {
+        name: 'check_if',
+        description: 'Enable or disable the checking of network interfaces.',
+        type: 'switch',
+        default_value: true,
+      },
+      {
+        name: 'check_pids',
+        description: 'Enable or disable the checking of process ID’s.',
+        type: 'switch',
+        default_value: true,
+      },
+      {
+        name: 'check_ports',
+        description: 'Enable or disable the checking of network ports.',
+        type: 'switch',
+        default_value: true,
+      },
+      {
+        name: 'check_sys',
+        description: 'Enable or disable checking for anomalous file system objects.',
+        type: 'switch',
+        default_value: true,
+      },
+      {
+        name: 'check_trojans',
+        description: 'Enable or disable checking for trojans.',
+        type: 'switch',
+        default_value: true,
+      },
+      {
+        name: 'check_unixaudit',
+        description: 'Enable or disable the checking of unixaudit.',
+        type: 'switch',
+        default_value: true,
+      },
+      {
+        name: 'check_winapps',
+        description: 'Enable or disable the checking of winapps.',
+        type: 'switch',
+        default_value: true,
+      },
+      {
+        name: 'check_winaudit',
+        description: 'Enable or disable the checking of winaudit.',
+        type: 'switch',
+        default_value: true,
+      },
+      {
+        name: 'check_winmalware',
+        description: 'Enable or disable checking for Windows malware.',
+        type: 'switch',
+        default_value: true,
+      },
+      {
+        name: 'skip_nfs',
+        description: 'Enable or disable the scanning of network mounted filesystems (Works on Linux and FreeBSD). Currently, skip_nfs will exclude checking files on CIFS or NFS mounts.',
+        type: 'switch',
+        default_value: true,
+      }, 
     ]
   }
 };
