@@ -724,43 +724,48 @@ export class AgentsController {
    */
   setTabs() {
     this.$scope.agentsTabsProps = false;
-    this.currentPanel = this.commonData.getCurrentPanel(this.$scope.tab, true);
+    if (this.$scope.agent) {
+      this.currentPanel = this.commonData.getCurrentPanel(
+        this.$scope.tab,
+        true
+      );
 
-    if (!this.currentPanel) return;
+      if (!this.currentPanel) return;
 
-    const tabs = this.commonData.getTabsFromCurrentPanel(
-      this.currentPanel,
-      this.$scope.extensions,
-      this.$scope.tabNames
-    );
+      const tabs = this.commonData.getTabsFromCurrentPanel(
+        this.currentPanel,
+        this.$scope.extensions,
+        this.$scope.tabNames
+      );
 
-    const cleanTabs = [];
-    tabs.forEach(x => {
-      if (
-        (
-          UnsupportedComponents[(this.$scope.agent || {}).agentPlatform] ||
-          UnsupportedComponents['other']
-        ).includes(x.id)
-      )
-        return;
+      const cleanTabs = [];
+      tabs.forEach(x => {
+        if (
+          (
+            UnsupportedComponents[(this.$scope.agent || {}).agentPlatform] ||
+            UnsupportedComponents['other']
+          ).includes(x.id)
+        )
+          return;
 
-      cleanTabs.push({
-        id: x.id,
-        name: x.name
+        cleanTabs.push({
+          id: x.id,
+          name: x.name
+        });
       });
-    });
 
-    this.$scope.agentsTabsProps = {
-      clickAction: tab => {
-        this.switchTab(tab, true);
-      },
-      selectedTab:
-        this.$scope.tab ||
-        (this.currentPanel && this.currentPanel.length
-          ? this.currentPanel[0]
-          : ''),
-      tabs: cleanTabs
-    };
+      this.$scope.agentsTabsProps = {
+        clickAction: tab => {
+          this.switchTab(tab, true);
+        },
+        selectedTab:
+          this.$scope.tab ||
+          (this.currentPanel && this.currentPanel.length
+            ? this.currentPanel[0]
+            : ''),
+        tabs: cleanTabs
+      };
+    }
     this.$scope.$applyAsync();
   }
 
@@ -1011,8 +1016,8 @@ export class AgentsController {
   isConfigured = async (name, isWodle = false) => {
     if (isWodle) {
       const isActive = ((this.$scope.agent || {}).status || '') === 'Active';
-      if(isActive){
-        try{
+      if (isActive) {
+        try {
           const currentConfig = await queryConfig(
             (this.$scope.agent || {}).id,
             [{ component: 'wmodules', configuration: 'wmodules' }],
@@ -1020,7 +1025,7 @@ export class AgentsController {
             this.errorHandler,
             false
           );
-        
+
           const isConfigured = Object.values(
             (currentConfig['wmodules-wmodules'] || {}).wmodules || []
           ).find(x => Object.keys(x)[0] === name);
@@ -1030,11 +1035,11 @@ export class AgentsController {
                 [])[0] || {}
             ).disabled !== 'no';
           this.$scope.showNoConfig = !isConfigured || isDisabled;
-        }catch{ 
-          this.$scope.showNoConfig = false
+        } catch {
+          this.$scope.showNoConfig = false;
         }
-      }else{
-        this.$scope.showNoConfig = false
+      } else {
+        this.$scope.showNoConfig = false;
       }
     }
   };

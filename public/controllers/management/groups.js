@@ -351,7 +351,7 @@ export function GroupsController(
       },
       isAgent: true
     };
-  }
+  };
 
   $scope.reload = async (element, searchTerm, addOffset, start) => {
     if (element === 'left') {

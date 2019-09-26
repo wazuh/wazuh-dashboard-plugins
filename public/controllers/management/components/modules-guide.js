@@ -53,7 +53,7 @@ export class ModulesGuide extends Component {
     this.ModulesGuides = ModulesGuides;
     this.modules = [];
 
-    if(this.props.isAgent !== undefined){
+    if (this.props.isAgent !== undefined) {
       this.getModules(this.props.isAgent);
     }
   }
@@ -67,25 +67,31 @@ export class ModulesGuide extends Component {
     if (nextProps.isAgent) {
       this.getModules(nextProps.isAgent);
     }
-  }  
-  
-  getModules = (isAgent) => {
-    this.modules = Object.entries(ModulesGuides).filter(x => (isAgent ? (x[1].type === 1 || x[1].type === 2) : (x[1].type === 0 || x[1].type === 2))).map(x => {
-      return {
-        value: x[0],
-        inputDisplay: x[1].name,
-        dropdownDisplay: (
-          <Fragment>
-            <strong>{x[1].name}</strong>
-            <EuiSpacer size="xs" />
-            <EuiText size="s" color="subdued">
-              <p className="euiTextColor--subdued">{x[1].description}</p>
-            </EuiText>
-          </Fragment>
-        )
-      };
-    });
   }
+
+  getModules = isAgent => {
+    this.modules = Object.entries(ModulesGuides)
+      .filter(x =>
+        isAgent
+          ? x[1].type === 1 || x[1].type === 2
+          : x[1].type === 0 || x[1].type === 2
+      )
+      .map(x => {
+        return {
+          value: x[0],
+          inputDisplay: x[1].name,
+          dropdownDisplay: (
+            <Fragment>
+              <strong>{x[1].name}</strong>
+              <EuiSpacer size="xs" />
+              <EuiText size="s" color="subdued">
+                <p className="euiTextColor--subdued">{x[1].description}</p>
+              </EuiText>
+            </Fragment>
+          )
+        };
+      });
+  };
 
   updateModulesModel = () => {
     this.setState({
@@ -105,9 +111,8 @@ export class ModulesGuide extends Component {
   };
 
   scrollToBottom = () => {
-    this.messagesEnd.scrollIntoView({ behavior: "smooth" });
-  }
-  
+    this.messagesEnd.scrollIntoView({ behavior: 'smooth' });
+  };
 
   setSwitch = (option, e) => {
     this.ModulesGuides[this.state.selectedModule].options[option].value =
@@ -118,7 +123,12 @@ export class ModulesGuide extends Component {
   extraAttrChange = (option, attr, e) => {
     this.ModulesGuides[this.state.selectedModule].options[option].extraAttr[
       attr
-    ].value = this.ModulesGuides[this.state.selectedModule].options[option].extraAttr[attr].type === 'switch' ? e.target.checked : e.target.value;
+    ].value =
+      this.ModulesGuides[this.state.selectedModule].options[option].extraAttr[
+        attr
+      ].type === 'switch'
+        ? e.target.checked
+        : e.target.value;
     this.updateModulesModel();
   };
 
@@ -158,13 +168,21 @@ export class ModulesGuide extends Component {
       if (option.type === 'switch') {
         // Switch
         if (
-          (option.required) || (option.value !== undefined && !option.required &&
-          (option['default_value'] == undefined ||
-            option.value !== option['default_value']))
+          option.required ||
+          (option.value !== undefined &&
+            !option.required &&
+            (option['default_value'] == undefined ||
+              option.value !== option['default_value']))
         ) {
-          outputBlock += `\n\t<${option.name}>${option.value === undefined ? (option.default_value ? 'yes' : 'no') : option.value ? 'yes' : 'no'}</${
-            option.name
-          }>`;
+          outputBlock += `\n\t<${option.name}>${
+            option.value === undefined
+              ? option.default_value
+                ? 'yes'
+                : 'no'
+              : option.value
+              ? 'yes'
+              : 'no'
+          }</${option.name}>`;
         }
       } else if (option.type === 'input') {
         // Input
@@ -176,7 +194,10 @@ export class ModulesGuide extends Component {
               const attrDefaultValue = option.extraAttr[attrKey].default_value;
               const currentAttrValue = option.extraAttr[attrKey].value;
 
-              if (currentAttrValue !== undefined && attrDefaultValue !== currentAttrValue) {
+              if (
+                currentAttrValue !== undefined &&
+                attrDefaultValue !== currentAttrValue
+              ) {
                 // Add attribute only if its value is different from default value
                 if (option.extraAttr[attrKey].type === 'switch') {
                   extraAttributes += ` ${attrKey}="${
@@ -213,10 +234,14 @@ export class ModulesGuide extends Component {
               if (option.extraAttr) {
                 // add extra attributes
                 for (let attrKey in option.extraAttr) {
-                  const attrDefaultValue = option.extraAttr[attrKey].default_value;
+                  const attrDefaultValue =
+                    option.extraAttr[attrKey].default_value;
                   const currentAttrValue = option.extraAttr[attrKey].value;
 
-                  if (attrDefaultValue !== currentAttrValue || option.required) {
+                  if (
+                    attrDefaultValue !== currentAttrValue ||
+                    option.required
+                  ) {
                     // Add attribute only if its value is different from default value
                     extraAttributes += ` ${attrKey}="${
                       currentAttrValue ? 'yes' : 'no'
@@ -308,7 +333,7 @@ export class ModulesGuide extends Component {
         )}
         {this.outputBlock && (
           <div>
-          <EuiCodeBlock language="xml">{this.outputBlock}</EuiCodeBlock>
+            <EuiCodeBlock language="xml">{this.outputBlock}</EuiCodeBlock>
           </div>
         )}
       </Fragment>
@@ -488,9 +513,14 @@ export class ModulesGuide extends Component {
         </EuiFlyoutHeader>
         <EuiSpacer />
         <EuiSteps firstStepNumber={1} steps={steps} />
-        { <div style={{ float:"left", clear: "both" }}
-             ref={(el) => { this.messagesEnd = el; }}>
-        </div>}
+        {
+          <div
+            style={{ float: 'left', clear: 'both' }}
+            ref={el => {
+              this.messagesEnd = el;
+            }}
+          ></div>
+        }
       </EuiFlexItem>
     );
 
