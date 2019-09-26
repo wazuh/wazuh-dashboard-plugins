@@ -442,6 +442,7 @@ export class ModulesGuide extends Component {
           {idx === this.state.options.length - 1 && (
             <EuiFlexGroup>
               <EuiFlexItem>
+                {(this.state.options || []).filter(x => x.required).length !== (this.state.options || []).length && (
                 <EuiButtonEmpty
                   onClick={this.showAdvancedOptions}
                   style={{ marginTop: '25px' }}
@@ -449,6 +450,7 @@ export class ModulesGuide extends Component {
                   {(this.state.showAdvanced && `Hide advanced options`) ||
                     `Show advanced options`}
                 </EuiButtonEmpty>
+                )}
               </EuiFlexItem>
               <EuiFlexItem>
                 <EuiButton
