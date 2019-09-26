@@ -46,7 +46,7 @@
                                 ng-repeat="currentLabel in currentConfig[(agent && agent.id !== '000') ? 'agent-labels' : 'analysis-labels'].labels">
                                 <td>{{ currentLabel.key }}</td>
                                 <td>{{ currentLabel.value }}</td>
-                                <td>{{ currentLabel.hidden ? 'yes' : 'no' }}</td>
+                                <td>{{ currentLabel.hidden }}</td>
                             </tr>
                         </tbody>
                     </table>
