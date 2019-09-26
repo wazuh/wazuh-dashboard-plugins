@@ -344,6 +344,15 @@ export function GroupsController(
     });
   };
 
+  $scope.loadModulesPropsAsAgent = () => {
+    $scope.modulesGuideProps = {
+      close: () => {
+        $scope.helpOpened = false;
+      },
+      isAgent: true
+    };
+  }
+
   $scope.reload = async (element, searchTerm, addOffset, start) => {
     if (element === 'left') {
       if (!$scope.availableAgents.loadedAll) {
