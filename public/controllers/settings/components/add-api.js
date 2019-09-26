@@ -60,13 +60,12 @@ export class AddApi extends Component {
   }
 
   render() {
-    const apiExample = `hosts:
-    - <id>:
-        host: "<api_url>"
-        port: <api_port>
-        user: "<api_user>"
-        password: "<api_password>"
-`;
+    const apiExample = `hosts:  
+  - <id>:
+     url: <api_url>
+     port: <api_port>
+     user: <api_user>
+     password: <api_password>`;
 
     const checkConnectionChildren = (
       <div>
@@ -141,7 +140,7 @@ export class AddApi extends Component {
               </EuiText>
             </EuiFlexItem>
             <EuiFlexItem />
-            <EuiFlexItem>
+            <EuiFlexItem grow={false}>
               {this.props.enableClose && (
                 <EuiButtonEmpty
                   size="s"
