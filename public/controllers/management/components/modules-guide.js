@@ -475,6 +475,7 @@ export class ModulesGuide extends Component {
           onChange={this.onChange}
           hasDividers
           fullWidth={true}
+          popoverClassName={'wz-max-height-400'}
         />
       </Fragment>
     );

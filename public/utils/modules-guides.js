@@ -355,6 +355,7 @@ export const ModulesGuides = {
   wodle_command: {
     id: 'wodle_command',
     isWodle: true,
+    type: 2,
     name: 'Command wodle',
     extraSteps: `Remote commands may be specified in the centralized configuration, however, they are disabled by default due to security reasons.
   When setting commands in a shared agent configuration, you must enable remote commands for Agent Modules.
