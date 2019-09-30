@@ -24,7 +24,7 @@ export function apiCount($q, genericReq, $location, appState) {
     .request('GET', '/hosts/apis')
     .then(data => {
       if (!data || !data.data || !data.data.length) throw new Error('No API entries found');
-      else {
+      if (!appState.getCurrentAPI()) {
         const api = data.data[0];
         appState.setCurrentAPI(
           JSON.stringify({
