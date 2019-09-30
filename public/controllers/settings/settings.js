@@ -564,7 +564,10 @@ export class SettingsController {
       this.$scope.$applyAsync();
       return this.apiEntries;
     } catch (error) {
+      this.apiEntries = [];
+      this.$scope.$applyAsync();
       this.errorHandler.handle('Cannot refresh API entries');
+      return Promise.reject(error);
     }
   }
 }

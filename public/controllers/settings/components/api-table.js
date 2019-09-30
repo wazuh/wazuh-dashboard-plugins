@@ -52,7 +52,12 @@ export class ApiTable extends Component {
         apiEntries: entries,
         refreshingEntries: false
       });
-    } catch (error) {}
+    } catch (error) {
+      this.setState({
+        apiEntries: [],
+        refreshingEntries: false
+      });
+    }
   }
 
   /**
