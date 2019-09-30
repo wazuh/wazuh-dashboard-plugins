@@ -262,7 +262,7 @@ export class SettingsController {
       }
 
       this.$scope.$applyAsync();
-
+      this.apiTableProps.currentDefault = this.currentDefault;
       this.getCurrentAPIIndex();
 
       if (!this.currentApiEntryIndex && this.currentApiEntryIndex !== 0) {
