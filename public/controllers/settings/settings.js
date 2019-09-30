@@ -514,6 +514,11 @@ export class SettingsController {
       const result = await this.genericReq.request('GET', '/hosts/apis', {});
       const hosts = result.data || [];
       this.apiEntries = this.apiTableProps.apiEntries = this.apiIsDownProps.apiEntries = hosts;
+      if (!hosts.length) {
+        this.apiIsDown = false;
+        this.addingApi = true;
+        this.$scope.$applyAsync();
+      }
       return hosts;
     } catch (error) {
       console.error('erorr ', error)
