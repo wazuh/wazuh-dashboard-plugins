@@ -77,49 +77,13 @@ export class SettingsController {
           delete this.configuration[key];
         }
       }
+      // Set component props
+      this.setComponentProps();
       // Loading data
       await this.getSettings();
       const down = await this.checkApisStatus();
       //Checks if all the API entries are down
       this.apiIsDown = (down >= this.apiEntries.length && this.apiEntries.length > 0);
-
-      this.apiTableProps = {
-        currentDefault: this.currentDefault,
-        apiEntries: this.apiEntries,
-        compressed: true,
-        setDefault: entry => this.setDefault(entry),
-        checkManager: entry => this.checkManager(entry),
-        showAddApi: () => this.showAddApi(),
-        refreshApiEntries: () => this.refreshApiEntries()
-      };
-
-      this.addApiProps = {
-        checkForNewApis: () => this.checkForNewApis(),
-        closeAddApi: () => this.closeAddApi()
-      }
-
-      this.apiIsDownProps = {
-        apiEntries: this.apiEntries,
-        testApi: entry => this.testAPI.check(entry),
-        closeApiIsDown: () => this.closeApiIsDown(),
-        updateClusterInfoInRegistry: (id, clusterInfo) => this.updateClusterInfoInRegistry(id, clusterInfo)
-      }
-
-      this.settingsTabsProps = {
-        clickAction: tab => {
-          this.switchTab(tab, true);
-          if (tab === 'logs') {
-            this.refreshLogs();
-          }
-        },
-        selectedTab: this.tab || 'api',
-        tabs: [
-          { id: 'api', name: 'API' },
-          { id: 'configuration', name: 'Configuration' },
-          { id: 'logs', name: 'Logs' },
-          { id: 'about', name: 'About' }
-        ]
-      };
 
       const location = this.$location.search();
       if (location && location.tab) {
@@ -130,6 +94,50 @@ export class SettingsController {
       await this.getAppInfo();
     } catch (error) {
       this.errorHandler.handle('Cannot initialize Settings')
+    }
+  }
+
+  /**
+   * Sets the component props
+   */
+  setComponentProps() {
+    this.apiTableProps = {
+      currentDefault: this.currentDefault,
+      apiEntries: this.apiEntries,
+      compressed: true,
+      setDefault: entry => this.setDefault(entry),
+      checkManager: entry => this.checkManager(entry),
+      showAddApi: () => this.showAddApi(),
+      refreshApiEntries: () => this.refreshApiEntries()
+    };
+
+    this.addApiProps = {
+      checkForNewApis: () => this.checkForNewApis(),
+      closeAddApi: () => this.closeAddApi()
+    }
+
+    this.apiIsDownProps = {
+      apiEntries: this.apiEntries,
+      testApi: entry => this.testAPI.check(entry),
+      closeApiIsDown: () => this.closeApiIsDown(),
+      getHosts: () => this.getHosts(),
+      updateClusterInfoInRegistry: (id, clusterInfo) => this.updateClusterInfoInRegistry(id, clusterInfo)
+    }
+
+    this.settingsTabsProps = {
+      clickAction: tab => {
+        this.switchTab(tab, true);
+        if (tab === 'logs') {
+          this.refreshLogs();
+        }
+      },
+      selectedTab: this.tab || 'api',
+      tabs: [
+        { id: 'api', name: 'API' },
+        { id: 'configuration', name: 'Configuration' },
+        { id: 'logs', name: 'Logs' },
+        { id: 'about', name: 'About' }
+      ]
     }
   }
 
@@ -241,10 +249,9 @@ export class SettingsController {
         this.$location.path('/blank-screen');
         return;
       }
-      const data = await this.genericReq.request('GET', '/hosts/apis');
+      
+      await this.getHosts();
 
-      const apis = data.data;
-      this.apiEntries = apis.length ? apis : [];
       // Set the addingApi flag based on if there is any API entry
       this.addingApi = !this.apiEntries.length;
       const currentApi = this.appState.getCurrentAPI();
@@ -255,7 +262,7 @@ export class SettingsController {
       }
 
       this.$scope.$applyAsync();
-
+      this.apiTableProps.currentDefault = this.currentDefault;
       this.getCurrentAPIIndex();
 
       if (!this.currentApiEntryIndex && this.currentApiEntryIndex !== 0) {
@@ -482,21 +489,39 @@ export class SettingsController {
    */
   async checkForNewApis() {
     try {
-      const result = await this.genericReq.request('GET', '/hosts/apis', {});
-      const hosts = result.data || [];
+      const hosts = await this.getHosts();
       //Tries to check if there are new APIs entries in the wazuh.yml also, checks if some of them have connection
       if (!hosts.length) throw { message: 'There were not found any API entry in the wazuh.yml', type: 'warning', closedEnabled: false };
-      this.apiEntries = this.apiTableProps.apiEntries = this.apiIsDownProps.apiEntries = hosts;
       const notRecheable = await this.checkApisStatus();
       if (notRecheable) {
         if (notRecheable >= hosts.length) {
           this.apiIsDown = true;
           throw { message: 'Wazuh API not recheable, please review your configuration', type: 'danger', closedEnabled: true };
         }
-        throw { message: 'Some API entry are not reachable', type: 'warning', closedEnabled: true };
+        throw { message: 'Some API entries are not reachable', type: 'warning', closedEnabled: true };
       }
       return;
     } catch (error) {
+      return Promise.reject(error);
+    }
+  }
+
+  /**
+   * Get the hosts in the wazuh.yml
+   */
+  async getHosts() {
+    try {
+      const result = await this.genericReq.request('GET', '/hosts/apis', {});
+      const hosts = result.data || [];
+      this.apiEntries = this.apiTableProps.apiEntries = this.apiIsDownProps.apiEntries = hosts;
+      if (!hosts.length) {
+        this.apiIsDown = false;
+        this.addingApi = true;
+        this.$scope.$applyAsync();
+      }
+      return hosts;
+    } catch (error) {
+      console.error('erorr ', error)
       return Promise.reject(error);
     }
   }
@@ -531,10 +556,12 @@ export class SettingsController {
    */
   async refreshApiEntries() {
     try {
-      const data = await this.genericReq.request('GET', '/hosts/apis');
-      const hosts = data.data;
+      const hosts = await this.getHosts();
       this.apiEntries = hosts || [];
-      await this.checkApisStatus();
+      const down = await this.checkApisStatus();
+      //Checks if all the API entries are down
+      this.apiIsDown = (down >= this.apiEntries.length && this.apiEntries.length > 0);
+      this.$scope.$applyAsync();
       return this.apiEntries;
     } catch (error) {
       this.errorHandler.handle('Cannot refresh API entries');

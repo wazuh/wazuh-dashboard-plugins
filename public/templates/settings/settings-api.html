@@ -6,7 +6,7 @@
     </div>
 
     <!-- Add API section-->
-    <div layout="row" layout-padding ng-if="(!ctrl.apiEntries.length || ctrl.addingApi) && !ctrl.apiIsDown">
+    <div layout="row" layout-padding ng-if="!ctrl.apiEntries.length || ctrl.addingApi">
         <react-component flex name="AddApi" props="ctrl.addApiProps" />
     </div>
 
