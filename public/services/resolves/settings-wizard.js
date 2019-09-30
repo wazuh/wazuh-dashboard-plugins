@@ -174,6 +174,34 @@ export function settingsWizard(
       return deferred.resolve();
     };
 
+    // Iterates the API entries in order to set one as default
+    const tryToSetDefault = async apis => {
+      try {
+        for (let idx in apis) {
+          const api = apis[idx];
+          const id = api.id;
+          try {
+            const clus = await testAPI.check(api);
+            api.cluster_info = clus.data;
+            if (api && api.cluster_info && api.cluster_info.manager) {
+              appState.setCurrentAPI(
+                JSON.stringify({
+                  name: api.cluster_info.manager,
+                  id: id
+                })
+              );
+              callCheckStored();
+              break;
+            }
+          } catch (error) {
+            //Do nothing in order to follow the flow of the for
+          }
+        }
+      } catch (error) {
+        return Promise.reject(error);
+      }
+    }
+
     const currentParams = $location.search();
     const targetedAgent =
       currentParams && (currentParams.agent || currentParams.agent === '000');
@@ -195,21 +223,9 @@ export function settingsWizard(
           .request('GET', '/hosts/apis')
           .then(async data => {
             if (data.data.length > 0) {
-              const api = data.data[0];
-              const id = api.id;
-              //Updates the cluster information
-              const clus = await testAPI.check(api);
-                api.cluster_info = clus.data;
-                if (api && api.cluster_info && api.cluster_info.manager) {
-                  appState.setCurrentAPI(
-                    JSON.stringify({
-                      name: api.cluster_info.manager,
-                      id: id
-                    })
-                  );
-                  callCheckStored();
-                }
-              
+              // Try to set some API entrie as default
+              await tryToSetDefault(data.data);
+
             } else {
               setUpCredentials(
                 'Wazuh App: Please set up Wazuh API credentials.'
