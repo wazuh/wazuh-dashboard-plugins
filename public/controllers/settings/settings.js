@@ -553,7 +553,10 @@ export class SettingsController {
     try {
       const hosts = await this.getHosts();
       this.apiEntries = hosts || [];
-      await this.checkApisStatus();
+      const down = await this.checkApisStatus();
+      //Checks if all the API entries are down
+      this.apiIsDown = (down >= this.apiEntries.length && this.apiEntries.length > 0);
+      this.$scope.$applyAsync();
       return this.apiEntries;
     } catch (error) {
       this.errorHandler.handle('Cannot refresh API entries');
