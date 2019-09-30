@@ -255,9 +255,7 @@ export class ModulesGuide extends Component {
         }
       } else if (option.type === 'select') {
         // Select
-        if (option.value) {
-          outputBlock += `\n\t<${option.name}>${option.value}</${option.name}>`;
-        }
+          outputBlock += `\n\t<${option.name}>${option.value || option.values[0]}</${option.name}>`;
       }
     }
     outputBlock += this.ModulesGuides[this.state.selectedModule].isWodle

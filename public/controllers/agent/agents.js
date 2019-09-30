@@ -1115,5 +1115,6 @@ export class AgentsController {
     this.$location.path('/manager');
     this.$location.search('tab', 'groups');
     this.$location.search('groupModuleGuide', mod);
+    this.$scope.$emit('setMenuNavItem', { tab: 'manager' });
   }
 }

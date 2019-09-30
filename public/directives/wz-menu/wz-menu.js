@@ -46,6 +46,10 @@ class WzMenu {
       $scope.menuNavItem = item;
     };
 
+    $scope.$on('setMenuNavItem', (ev, parameters) => {
+      $scope.setMenuNavItem(parameters.tab)
+    });
+
     /**
      * When controller loads
      */

@@ -144,6 +144,7 @@ export function GroupsController(
       'goDashboard',
       equiv[$scope.openGuide] || $scope.openGuide
     );
+    $scope.$emit('setMenuNavItem', { tab: 'agents' });
     $location.path('/agents');
   };
 
@@ -195,6 +196,7 @@ export function GroupsController(
   $scope.$on('wazuhShowGroup', (ev, parameters) => {
     ev.stopPropagation();
     $scope.groupsSelectedTab = 'agents';
+    $scope.groupsTabsProps.selectedTab = 'agents';
     return $scope.loadGroup(parameters.group);
   });
 
@@ -329,6 +331,7 @@ export function GroupsController(
     $scope.$broadcast('closeEditXmlFile', {});
     $scope.groupsTabsProps.selectedTab = 'files';
     $scope.helpOpened = false;
+    $scope.openGuide = false;
     $scope.$applyAsync();
   };
 
