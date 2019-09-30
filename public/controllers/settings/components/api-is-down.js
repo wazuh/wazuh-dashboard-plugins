@@ -50,9 +50,11 @@ export class ApiIsDown extends Component {
   async checkConnection() {
     try {
       let status = 'complete';
+      const hosts = await this.props.getHosts();
       this.setState({
         fetchingData: true,
-        refreshingEntries: true
+        refreshingEntries: true,
+        apiEntries: hosts
       });
       const entries = this.state.apiEntries;
       let numErr = 0;
@@ -197,5 +199,6 @@ ApiIsDown.propTypes = {
   apiEntries: PropTypes.array,
   checkManager: PropTypes.func,
   closeApiIsDown: PropTypes.func,
-  updateClusterInfoInRegistry: PropTypes.func
+  updateClusterInfoInRegistry: PropTypes.func,
+  getHosts: PropTypes.func
 };
