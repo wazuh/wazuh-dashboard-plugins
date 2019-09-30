@@ -90,7 +90,7 @@ export class ApiIsDown extends Component {
 # Example Wazuh API configuration
 hosts:
     - production:
-        host: http://172.16.1.2
+        url: http://172.16.1.2
         port: 55000
         user: foo
         password: bar
