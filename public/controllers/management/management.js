@@ -368,6 +368,7 @@ export class ManagementController {
       this.switchTab('ruleset', true);
       this.setRulesTab('rules');
     }
+    this.$scope.$broadcast('closeRulesetFile');
     this.$scope.$applyAsync();
   }
 
