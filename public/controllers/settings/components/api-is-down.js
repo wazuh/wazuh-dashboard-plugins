@@ -23,7 +23,8 @@ import {
   EuiButtonEmpty,
   EuiSteps,
   EuiBasicTable,
-  EuiHealth
+  EuiHealth,
+  EuiCallOut
 } from '@elastic/eui';
 
 export class ApiIsDown extends Component {
@@ -50,6 +51,7 @@ export class ApiIsDown extends Component {
   async checkConnection() {
     try {
       let status = 'complete';
+      this.setState({error: false});
       const hosts = await this.props.getHosts();
       this.setState({
         fetchingData: true,
@@ -84,7 +86,11 @@ export class ApiIsDown extends Component {
         status: status,
         refreshingEntries: false
       });
-    } catch (error) {}
+    } catch (error) {
+      if (error && error.data && error.data.message && error.data.code === 2001) {
+        this.setState({error: error.data.message, status: 'danger'});
+      }
+    }
   }
 
   render() {
@@ -121,7 +127,8 @@ hosts:
         <EuiSpacer />
         <EuiText>Already configured Wazuh API(s)</EuiText>
         <EuiSpacer />
-        <EuiBasicTable
+        {!this.state.error && (
+          <EuiBasicTable
           loading={this.state.refreshingEntries}
           items={this.state.apiEntries}
           columns={[
@@ -142,6 +149,13 @@ hosts:
             }
           ]}
         />
+        ) || (
+          <EuiCallOut
+            color='danger'
+            iconType="cross"
+            title={this.state.error}
+          />
+        )}       
       </div>
     );
 

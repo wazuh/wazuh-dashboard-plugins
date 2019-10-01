@@ -30,16 +30,42 @@ export class AddApi extends Component {
     super(props);
     this.state = {
       status: 'incomplete',
-      fetchingData: false
+      fetchingData: false,
+      blockClose: false
     };
   }
 
+
+  componentDidMount() {
+    this.setState({enableClose: this.props.enableClose});
+    this.checkErrorsAtInit();
+  }
+
+  /**
+   * Checks if the component was initialized with some error in order to show it
+   */
+  checkErrorsAtInit() {
+    if (this.props.errorsAtInit) {
+      const error = this.props.errorsAtInit;
+      this.setState({
+        status: error.type || 'danger',
+        blockClose: true,
+        message: (error.data || error).message || 'Wazuh API not reachable, please review your configuration',
+        fetchingData: false
+      });
+    }
+  }
+
+  /**
+   * Check the APIs connections
+   */
   async checkConnection() {
     //TODO handle this
     try {
       this.setState({
         status: 'incomplete',
-        fetchingData: true
+        fetchingData: true,
+        blockClose: false,
       });
 
       await this.props.checkForNewApis();
@@ -50,10 +76,13 @@ export class AddApi extends Component {
         closedEnabled: true
       });
     } catch (error) {
+      const close = (error.data && error.data.code && error.data.code === 2001) ? false : (error.closedEnabled || false);
       this.setState({
         status: error.type || 'danger',
-        closedEnabled: error.closedEnabled || false,
-        message: error.message || 'Wazuh API not reachable, please review your configuration',
+        closedEnabled: close,
+        blockClose: !close,
+        enableClose: false,
+        message: (error.data || error).message || 'Wazuh API not reachable, please review your configuration',
         fetchingData: false
       });
     }
@@ -87,7 +116,7 @@ export class AddApi extends Component {
         >
           Check connection
         </EuiButton>
-        {(this.state.closedEnabled || this.props.enableClose) && (
+        {((this.state.closedEnabled || this.state.enableClose) && !this.state.blockClose) && (
           <EuiButtonEmpty
             onClick={() => this.props.closeAddApi()}
           >
@@ -141,7 +170,7 @@ export class AddApi extends Component {
             </EuiFlexItem>
             <EuiFlexItem />
             <EuiFlexItem grow={false}>
-              {this.props.enableClose && (
+              {(this.state.enableClose && !this.state.blockClose) && (
                 <EuiButtonEmpty
                   size="s"
                   onClick={() => this.props.closeAddApi()}

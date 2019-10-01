@@ -511,6 +511,7 @@ export class SettingsController {
    */
   async getHosts() {
     try {
+      this.addApiProps.errorsAtInit = false;
       const result = await this.genericReq.request('GET', '/hosts/apis', {});
       const hosts = result.data || [];
       this.apiEntries = this.apiTableProps.apiEntries = this.apiIsDownProps.apiEntries = hosts;
@@ -521,7 +522,6 @@ export class SettingsController {
       }
       return hosts;
     } catch (error) {
-      console.error('erorr ', error)
       return Promise.reject(error);
     }
   }
@@ -566,7 +566,7 @@ export class SettingsController {
     } catch (error) {
       this.apiEntries = [];
       this.$scope.$applyAsync();
-      this.errorHandler.handle('Cannot refresh API entries');
+      this.addApiProps.errorsAtInit = error;
       return Promise.reject(error);
     }
   }
