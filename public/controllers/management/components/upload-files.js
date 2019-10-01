@@ -49,7 +49,6 @@ export class UploadFiles extends Component {
   onButtonClick() {
     this.setState({
       isPopoverOpen: !this.state.isPopoverOpen,
-      files: {}
     });
   }
 
