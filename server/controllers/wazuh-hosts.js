@@ -27,32 +27,16 @@ export class WazuhHostsCtrl {
    * @param {Object} reply
    * API entries or ErrorResponse
    */
-  async getHostsEntries(req, reply) {
+  async getHostsEntries(req, reply, removePassword = true) {
     try {
-      const hosts = await this.manageHosts.getHosts();
+      const hosts = await this.manageHosts.getHosts(removePassword);
       const registry = await this.updateRegistry.getHosts();
-      const result = this.joinHostRegistry(hosts, registry);
+      const result = this.joinHostRegistry(hosts, registry, removePassword);
       return result;
     } catch (error) {
       log('wazuh-hosts:getHostsEntries', error.message || error);
-      return ErrorResponse(error.message || error, 2001, 500, reply);
-    }
-  }
-
-  /**
-   * Ofuscate the password
-   * @param {Array} hosts 
-   */
-  ofuscatePassword(hosts) {
-    try {
-      const ofuscated = hosts.map(h => {
-        const id = Object.keys(h)[0];
-        h[id].password = '******';
-        return h;
-      });
-      return ofuscated;
-    } catch (error) {
-      throw new Error(error);
+      const errorResponse = reply ? ErrorResponse(error.message || error, 2001, 500, reply) : error;
+      return errorResponse;
     }
   }
 
@@ -61,15 +45,14 @@ export class WazuhHostsCtrl {
    * @param {Object} hosts 
    * @param {Object} registry 
    */
-  joinHostRegistry(hosts, registry) {
+  joinHostRegistry(hosts, registry, removePassword = true) {
     try {
       const joined = [];
-      const ofuscated = this.ofuscatePassword(hosts);
-      ofuscated.forEach(h => {
+      hosts.forEach(h => {
         const id = Object.keys(h)[0];
         const api = Object.assign(h[id], {id: id});
         const host = Object.assign(api, registry[id]);
-        delete host.password;
+        if (removePassword) delete host.password;
         joined.push(host);
       });
       return joined;
