@@ -198,7 +198,6 @@ export const ModulesGuides = {
         description:
           'This indicates the location of a log or wild-carded group of logs to be read.',
         type: 'input',
-        required: true
       },
       {
         name: 'log_format',
@@ -360,7 +359,6 @@ export const ModulesGuides = {
     extraSteps: `Remote commands may be specified in the centralized configuration, however, they are disabled by default due to security reasons.
   When setting commands in a shared agent configuration, you must enable remote commands for Agent Modules.
   This is enabled by adding the following line to the file etc/local_internal_options.conf in the agent:
-  
   wazuh_command.remote_commands=1`,
     description: 'Configuration options of the Command wodle.',
     options: [
@@ -462,7 +460,6 @@ export const ModulesGuides = {
         type: 'input',
         required: true,
         extraTag: 'profile',
-        default_value: false,
         extraAttr: {
           type: { type: 'input' },
           path: { type: 'input' },
@@ -502,14 +499,14 @@ export const ModulesGuides = {
         name: 'java_path',
         description:
           'Define where Java is located. If this parameter is not set, the wodle will search for the Java location in the default environment variable $PATH.',
-        type: 'switch',
-        required: true
+        type: 'input',
+        required: true,
       },
       {
         name: 'ciscat_path',
         description: 'Define where CIS-CAT is located.',
-        type: 'switch',
-        required: true
+        type: 'input',
+        required: true,
       },
       {
         name: 'interval',
@@ -522,39 +519,30 @@ export const ModulesGuides = {
         name: 'scan-on-start',
         description: 'Run evaluation immediately when service is started.',
         type: 'switch',
-        required: true,
         default_value: true
       },
       {
         name: 'day',
         description: 'Day of the month to run the CIS-CAT scan.',
         type: 'input',
-        required: true,
-        default_value: true
       },
       {
         name: 'wday',
         description:
           'Day of the week to run the CIS-CAT scan. This option is not compatible with the day option.',
         type: 'input',
-        required: true,
-        default_value: true
       },
       {
         name: 'time',
         description:
           'Time of the day to run the scan. It has to be represented in the format hh:mm.',
         type: 'input',
-        required: true,
-        default_value: true
       },
       {
         name: 'content',
         description: 'Define an evaluation.',
         type: 'input',
-        required: true,
         extraTag: 'profile',
-        default_value: false,
         extraAttr: {
           type: { type: 'input' },
           path: { type: 'input' },
@@ -563,11 +551,10 @@ export const ModulesGuides = {
       }
     ]
   },
-  rootcheck: {
+  'rootcheck': {
     id: 'rootcheck',
     name: 'Policy monitoring',
-    description:
-      'Configuration options for policy monitoring and anomaly detection.',
+    description: 'Configuration options for policy monitoring and anomaly detection.',
     type: 2,
     options: [
       {
@@ -575,12 +562,10 @@ export const ModulesGuides = {
         description: 'Disables the execution of rootcheck.',
         type: 'switch',
         required: true,
-        default_value: false
       },
       {
         name: 'base_directory',
-        description:
-          'The base directory that will be prefixed to the following options: rootkit_files, rootkit_trojans and systems_audit',
+        description: 'The base directory that will be prefixed to the following options: rootkit_files, rootkit_trojans and systems_audit',
         type: 'input',
         required: true,
         default_value: '/'
@@ -592,132 +577,129 @@ export const ModulesGuides = {
         type: 'input',
         required: true,
         extraAttr: {
-          type: { type: 'input' }
+          type: { type: 'input' },
         }
       },
       {
         name: 'rootkit_files',
-        description: 'Change the location of the rootkit files database.',
+        description:
+          'Change the location of the rootkit files database.',
         type: 'input',
         required: true
       },
       {
         name: 'rootkit_trojans',
-        description: 'Change the location of the rootkit trojans database.',
+        description:
+          'Change the location of the rootkit trojans database.',
         type: 'input',
         required: true
       },
       {
         name: 'windows_audit',
-        description: 'Specifies the path to a Windows audit definition file.',
-        type: 'list'
+        description:
+          'Specifies the path to a Windows audit definition file.',
+        type: 'list',
       },
       {
         name: 'system_audit',
         description:
           'Specifies the path to an audit definition file for Unix-like systems.',
-        type: 'list'
+        type: 'list',
       },
       {
         name: 'windows_apps',
-        description:
-          'Specifies the path to a Windows application definition file.',
-        type: 'list'
+        description: 'Specifies the path to a Windows application definition file.',
+        type: 'list',
       },
       {
         name: 'windows_malware',
-        description:
-          'Specifies the path to a Windows malware definitions file.',
-        type: 'list'
+        description: 'Specifies the path to a Windows malware definitions file.',
+        type: 'list',
       },
       {
         name: 'scanall',
-        description:
-          'Tells rootcheck to scan the entire system. This option may lead to some false positives.',
+        description: 'Tells rootcheck to scan the entire system. This option may lead to some false positives.',
         type: 'switch',
-        default_value: false
+        default_value: false,
       },
       {
         name: 'frequency',
-        description:
-          'Frequency that the rootcheck is going to be executed (in seconds).',
+        description: 'Frequency that the rootcheck is going to be executed (in seconds).',
         type: 'input',
-        default_value: '36000'
+        default_value: '36000',
       },
       {
         name: 'check_dev',
         description: 'Enable or disable the checking of /dev.',
         type: 'switch',
-        default_value: true
+        default_value: true,
       },
       {
         name: 'check_files',
         description: 'Enable or disable the checking of files.',
         type: 'switch',
-        default_value: true
+        default_value: true,
       },
       {
         name: 'check_if',
         description: 'Enable or disable the checking of network interfaces.',
         type: 'switch',
-        default_value: true
+        default_value: true,
       },
       {
         name: 'check_pids',
         description: 'Enable or disable the checking of process ID’s.',
         type: 'switch',
-        default_value: true
+        default_value: true,
       },
       {
         name: 'check_ports',
         description: 'Enable or disable the checking of network ports.',
         type: 'switch',
-        default_value: true
+        default_value: true,
       },
       {
         name: 'check_sys',
-        description:
-          'Enable or disable checking for anomalous file system objects.',
+        description: 'Enable or disable checking for anomalous file system objects.',
         type: 'switch',
-        default_value: true
+        default_value: true,
       },
       {
         name: 'check_trojans',
         description: 'Enable or disable checking for trojans.',
         type: 'switch',
-        default_value: true
+        default_value: true,
       },
       {
         name: 'check_unixaudit',
         description: 'Enable or disable the checking of unixaudit.',
         type: 'switch',
-        default_value: true
+        default_value: true,
       },
       {
         name: 'check_winapps',
         description: 'Enable or disable the checking of winapps.',
         type: 'switch',
-        default_value: true
+        default_value: true,
       },
       {
         name: 'check_winaudit',
         description: 'Enable or disable the checking of winaudit.',
         type: 'switch',
-        default_value: true
+        default_value: true,
       },
       {
         name: 'check_winmalware',
         description: 'Enable or disable checking for Windows malware.',
         type: 'switch',
-        default_value: true
+        default_value: true,
       },
       {
         name: 'skip_nfs',
-        description:
-          'Enable or disable the scanning of network mounted filesystems (Works on Linux and FreeBSD). Currently, skip_nfs will exclude checking files on CIFS or NFS mounts.',
+        description: 'Enable or disable the scanning of network mounted filesystems (Works on Linux and FreeBSD). Currently, skip_nfs will exclude checking files on CIFS or NFS mounts.',
         type: 'switch',
-        default_value: true
-      }
+        default_value: true,
+      }, 
     ]
   }
 };

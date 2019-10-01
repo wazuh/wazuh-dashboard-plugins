@@ -1029,11 +1029,8 @@ export class AgentsController {
           const isConfigured = Object.values(
             (currentConfig['wmodules-wmodules'] || {}).wmodules || []
           ).find(x => Object.keys(x)[0] === name);
-          const isDisabled =
-            (
-              (Object.values(currentConfig['wmodules-wmodules'].wmodules) ||
-                [])[0] || {}
-            ).disabled !== 'no';
+          const foundModule = (isConfigured[name] || {});
+          const isDisabled = foundModule.disabled !== "no";
           this.$scope.showNoConfig = !isConfigured || isDisabled;
         } catch {
           this.$scope.showNoConfig = false;
