@@ -1,53 +1,24 @@
-<div flex="auto" ng-controller="devToolsController as ctrl" layout="column" style="height: calc(100vh - 98px)">
-    <div ng-show="!ctrl.tab " style="width: 1000px;
-    margin: 0 auto;
-    margin-top: 50px;"><react-component name="ToolsWelcomeCards" props="ctrl.welcomeCardsProps"></react-component>
-    </div>
-    <div ng-show="ctrl.tab">
+<div flex="auto" ng-controller="devToolsController as ctrl" layout="column" class="dev-tools-max-height">
     <md-content flex layout="column" class="md-padding" layout-align="start">
-<!--         <react-component name="Tabs" props="ctrl.toolsTabsProps" /> -->
-<div layout="row" layout-align="end center" class="height-35">
-    <button type="submit" style="width: 40px;    text-align: center;"
-    class="euiButtonEmpty euiButtonEmpty--primary euiButtonEmpty--medium wz-margin-right-20"
-    ng-click="ctrl.tab = false" tooltip="Go back" tooltip-placement="bottom">
-    <react-component name="EuiIcon" props="{type:'arrowLeft'}" />
-</button>
-        <h1 class="euiTitle euiTitle--medium">{{tabDescription[ctrl.tab].title}}</h1>
-        <span flex></span>       
-        <div ng-if="ctrl.tab === 'devTools'">
-            <span class="wz-headline-title wz-dev-title font-size-18">
-                <i ng-click="ctrl.help()"
-                    class="fa fa-question wz-question-dev-color cursor-pointer pull-right fa-fw"
-                    aria-hidden="true"></i>
-                <i ng-click="ctrl.exportOutput()" tooltip="Export as JSON" tooltip-placement="bottom"
-                    class="fa fa-download wz-question-dev-color cursor-pointer pull-right fa-fw"
-                    aria-hidden="true"></i>
-            </span>
-        </div>     
-</div>
-        <div class="wz-dev-box" ng-show="ctrl.tab === 'devTools'">
+        <div class="wz-dev-box">
             <div id="wz-dev-left-column" flex layout="column">
-                <span class="wz-headline-title wz-dev-title">&nbsp;<i ng-click="ctrl.send()"
+                <span class="wz-headline-title wz-dev-title">Console <i ng-click="ctrl.send()"
                         class="fa fa-play wz-play-dev-color cursor-pointer pull-right fa-fw wz-always-top"
                         id="play_button" aria-hidden="true"></i></span>
                 <textarea flex id="api_input"></textarea>
             </div>
             <div class="wz-dev-column-separator layout-column"><span>︙</span></div>
             <div id="wz-dev-right-column" flex layout="column">
-                    <span class="wz-headline-title wz-dev-title">&nbsp;</span>
+                <span class="wz-headline-title wz-dev-title">
+                    <i ng-click="ctrl.help()"
+                        class="fa fa-question wz-question-dev-color cursor-pointer pull-right fa-fw"
+                        aria-hidden="true"></i>
+                    <i ng-click="ctrl.exportOutput()" tooltip="Export as JSON" tooltip-placement="bottom"
+                        class="fa fa-download wz-question-dev-color cursor-pointer pull-right fa-fw"
+                        aria-hidden="true"></i>
+                </span>
                 <textarea flex id="api_output"></textarea>
             </div>
         </div>
-        <div ng-if="ctrl.tab === 'logtest'">
-                <div class="logtest">
-                        <react-component name="Logtest" props="ctrl.logtestProps"></react-component>
-                </div>
-        </div>
-        <div ng-if="ctrl.tab === 'testConfiguration'">
-                <div class="logtest">
-                        <react-component name="TestConfiguration" props="ctrl.testConfigurationProps"></react-component>
-                </div>
-        </div>
     </md-content>
-</div>
 </div>
