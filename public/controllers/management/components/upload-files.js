@@ -21,7 +21,6 @@ import {
   EuiCallOut,
   EuiListGroup,
   EuiTitle,
-  EuiButtonIcon,
   EuiText,
   EuiIcon,
   EuiSpacer,
@@ -105,29 +104,30 @@ export class UploadFiles extends Component {
     );
   }
 
-   /**
-   * Renders the result of a file upload
-   */
-  renderResult(result){
+  /**
+  * Renders the result of a file upload
+  */
+  renderResult(result) {
     return (
       <Fragment>
-        {!result.uploaded && <EuiCallOut size="s" title={result.file} color="danger" iconType="alert">
-        <EuiText 
-          className='list-element-bad'
-          size='s'
-        >{result.error}
-        </EuiText>  
-      </EuiCallOut> 
-        || 
-      <EuiText 
-        className='list-element-ok'
-        size='s'
-        >
-        <EuiIcon type={'check'} /> 
-         {result.file} was uploaded successfully.
-      </EuiText> 
-      }
-    </Fragment>
+        {!result.uploaded &&
+          <EuiCallOut size="s" title={result.file} color="danger" iconType="alert">
+            <EuiText
+              className='list-element-bad'
+              size='s'
+            >{result.error}
+            </EuiText>
+          </EuiCallOut>
+          ||
+          <EuiCallOut size="s" title={result.file} color="success" iconType="check">
+            <EuiText
+              className='list-element-ok'
+              size='s'
+            > File upload successfully
+            </EuiText>
+          </EuiCallOut>
+        }
+      </Fragment>
     );
   }
 
@@ -186,8 +186,8 @@ export class UploadFiles extends Component {
     return (
       <Fragment>
         <EuiListGroup flush={true} className="list-of-files-fail">
-          {this.state.uploadErrors.map((error, idx) => { // We firs show the files that were successfully uploaded
-            if(error.uploaded){
+          {this.state.uploadErrors.map((error, idx) => { // We first show the files that were successfully uploaded
+            if (error.uploaded) {
               return (
                 <EuiFlexItem
                   key={idx}
@@ -199,17 +199,17 @@ export class UploadFiles extends Component {
             }
           })
           }
-          {this.state.uploadErrors.map((error, idx) => { 
-            if(!error.uploaded){ // When all successfully uploaded files are shown, then we show the failed files
-            return (
-              <EuiFlexItem
-                key={idx}
-                id={error.index}>
-                {this.renderResult(error)}
-                <EuiSpacer size="s" />
-              </EuiFlexItem>
-            )
-          }
+          {this.state.uploadErrors.map((error, idx) => {
+            if (!error.uploaded) { // When all successfully uploaded files are shown, then we show the failed files
+              return (
+                <EuiFlexItem
+                  key={idx}
+                  id={error.index}>
+                  {this.renderResult(error)}
+                  <EuiSpacer size="s" />
+                </EuiFlexItem>
+              )
+            }
           })
           }
         </EuiListGroup>
