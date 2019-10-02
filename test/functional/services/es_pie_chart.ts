@@ -16,7 +16,6 @@ import { SearchParams } from 'elasticsearch';
 
 export function EsPieChartProvider({ getService, }: FtrProviderContext) {
   const es = getService('es');
-  const testSubjects = getService('testSubjects');
 
   /**
    * Tools to get data of ElasticSearch for compare with visualizations.
@@ -96,7 +95,6 @@ export function EsPieChartProvider({ getService, }: FtrProviderContext) {
      * @memberof EsPieChart
      */
     private async getAlerts(query:SearchParams): Promise<object[]> {
-      const es_index = await testSubjects.getVisibleText('wzMenuPatternTitle');
       const alerts = await es.search(query);
       return alerts.hits.hits
     }

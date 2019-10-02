@@ -16,6 +16,7 @@ import { SearchParams } from 'elasticsearch';
 
 export default function({getService, getPageObjects, }: FtrProviderContext) {
   const areaChart = getService('areaChart');
+  const arrayHelper = getService('arrayHelper');
   const es = getService('es');
   const esAreaChart = getService('esAreaChart');
   const esPieChart = getService('esPieChart');
@@ -24,15 +25,15 @@ export default function({getService, getPageObjects, }: FtrProviderContext) {
   const find = getService('find');
   const PageObjects = getPageObjects(['wazuhCommon', 'common']);
   const pieCharts = getService('pieCharts');
-  const tableViz = getService('tableViz');
   const queryBar = getService('queryBar');
+  const tableViz = getService('tableViz');
   const testSubjects = getService('testSubjects');
 
   describe('security_events', () => {
     let es_index: string;
     before(async () => {
       await PageObjects.wazuhCommon.OpenSecurityEvents();
-      es_index = await testSubjects.getVisibleText('wzMenuPatternTitle');
+      es_index = 'wazuh-alerts-3.x-*';
     });
 
     beforeEach(async () => {
@@ -458,8 +459,8 @@ export default function({getService, getPageObjects, }: FtrProviderContext) {
       };
       const esValues = await esPieChart.getData(query, 'rule.groups');
 
-      expect(JSON.stringify(esValues.slice(0, 5)))
-        .to.be.equal(JSON.stringify(values));
+      expect(arrayHelper.compareObjects(values, esValues))
+      .to.be.ok();
       await filterBar.removeAllFilters();
     });
 
@@ -769,9 +770,8 @@ export default function({getService, getPageObjects, }: FtrProviderContext) {
         }
       };
       const esValues = await esPieChart.getData(query, 'rule.groups');
-
-      expect(JSON.stringify(esValues.slice(0, 5)))
-        .to.be.equal(JSON.stringify(values));
+      expect(arrayHelper.compareObjects(values, esValues))
+      .to.be.ok();
       await queryBar.setQuery('');
       await queryBar.submitQuery();
     });

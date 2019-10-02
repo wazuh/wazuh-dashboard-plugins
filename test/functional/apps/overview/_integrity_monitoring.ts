@@ -32,7 +32,7 @@ export default function({getService, getPageObjects, }: FtrProviderContext) {
     let es_index: string;
     before(async () => {
       await PageObjects.wazuhCommon.OpenIntegrityMonitoring();
-      es_index = await testSubjects.getVisibleText('wzMenuPatternTitle');
+      es_index = 'wazuh-alerts-3.x-*';
     });
 
     beforeEach(async () => {
