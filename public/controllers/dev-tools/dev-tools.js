@@ -482,7 +482,7 @@ export class DevToolsController {
     };
 
     this.testConfigurationProps = {
-      clickAction: log => this.validateConfiguration(log),
+      clickAction: log => this.validateConfiguration(log)
     };
 
     this.toolsTabsProps = {
@@ -491,7 +491,7 @@ export class DevToolsController {
       },
       selectedTab: this.tab || 'devTools',
       tabs: [
-        { id: 'devTools', name: 'API console' },
+        { id: 'devTools', name: 'API console' }
         //{ id: 'logtest', name: 'Test your logs' },
         //{ id: 'testConfiguration', name: 'Test your configurations' }
       ]
@@ -500,7 +500,7 @@ export class DevToolsController {
     this.welcomeCardsProps = {
       clickAction: tab => this.switchTab(tab),
       sections: [
-        { id: 'devTools', icon: 'consoleApp' },
+        { id: 'devTools', icon: 'consoleApp' }
         //{ id: 'logtest', icon: 'indexRollupApp' },
         //{ id: 'testConfiguration', icon: 'advancedSettingsApp' }
       ]

@@ -12,7 +12,15 @@
  */
 import React, { Component, Fragment } from 'react';
 import PropTypes from 'prop-types';
-import { EuiCodeEditor, EuiCallOut, EuiSpacer, EuiPanel, EuiFlexItem, EuiButton, EuiFlexGroup } from '@elastic/eui';
+import {
+  EuiCodeEditor,
+  EuiCallOut,
+  EuiSpacer,
+  EuiPanel,
+  EuiFlexItem,
+  EuiButton,
+  EuiFlexGroup
+} from '@elastic/eui';
 import { DynamicHeight } from '../../../utils/dynamic-height';
 
 export class TestConfiguration extends Component {
@@ -27,9 +35,8 @@ export class TestConfiguration extends Component {
   }
 
   onChange = value => {
-    this.setState({ configuration : value });
+    this.setState({ configuration: value });
   };
-
 
   validate = async () => {
     this.setState({
@@ -43,29 +50,27 @@ export class TestConfiguration extends Component {
   };
 
   dynamicHeight = () =>
-  DynamicHeight.dynamicHeightStatic(
-    '.euiCodeEditorWrapper',
-    this.state.result ? 110 : 110 
-  );
+    DynamicHeight.dynamicHeightStatic(
+      '.euiCodeEditorWrapper',
+      this.state.result ? 110 : 110
+    );
 
   render() {
-
     this.dynamicHeight();
     return (
       <div>
         <Fragment>
           <EuiSpacer size="m" />
           <EuiPanel paddingSize="l">
-          {this.state.result && (
-            <div>
-            <EuiCallOut
-              title="The configuration is valid!"
-              color="success"
-              iconType="check"
-            >
-            </EuiCallOut>
-                        <EuiSpacer size="m" />
-                        </div>
+            {this.state.result && (
+              <div>
+                <EuiCallOut
+                  title="The configuration is valid!"
+                  color="success"
+                  iconType="check"
+                ></EuiCallOut>
+                <EuiSpacer size="m" />
+              </div>
             )}
             <EuiCodeEditor
               theme="XML"
@@ -83,10 +88,9 @@ export class TestConfiguration extends Component {
           </EuiPanel>
           <EuiSpacer size="m" />
           <EuiFlexGroup justifyContent="spaceBetween">
+            <EuiFlexItem grow={false}></EuiFlexItem>
             <EuiFlexItem grow={false}>
-            </EuiFlexItem>
-            <EuiFlexItem grow={false}>
-            <EuiButton
+              <EuiButton
                 isLoading={this.state.validating}
                 isDisabled={this.state.validating || !this.state.configuration}
                 fill
@@ -98,7 +102,7 @@ export class TestConfiguration extends Component {
               </EuiButton>
             </EuiFlexItem>
           </EuiFlexGroup>
-                    </Fragment>
+        </Fragment>
       </div>
     );
   }

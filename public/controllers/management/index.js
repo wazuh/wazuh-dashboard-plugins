@@ -26,6 +26,7 @@ import { EditionController } from './edition';
 import { FilesController } from './files';
 import { WelcomeScreen } from './components/welcome';
 import { ReportingTable } from './components/reporting-table';
+import { GroupsTable } from './components/groups-table';
 import { UploadFiles } from './components/upload-files';
 
 const app = uiModules.get('app/wazuh', []);
@@ -46,4 +47,5 @@ app
   .controller('filesController', FilesController)
   .value('WelcomeScreenManagement', WelcomeScreen)
   .value('ReportingTable', ReportingTable)
+  .value('GroupsTable', GroupsTable)
   .value('UploadFiles', UploadFiles);

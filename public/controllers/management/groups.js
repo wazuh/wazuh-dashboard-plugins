@@ -99,6 +99,11 @@ export function GroupsController(
         }
 
         shareAgent.deleteAgent();
+      } else {
+        const loadedGroups = await apiReq.request('GET', '/agents/groups/', {
+          limit: 1000
+        });
+        $scope.buildGroupsTableProps(loadedGroups.data.data.items);
       }
 
       const configuration = wazuhConfig.getConfig();
@@ -139,6 +144,7 @@ export function GroupsController(
       $scope.totalFiles = count.data.data.totalItems;
       $scope.fileViewer = false;
       $scope.currentGroup = group;
+      $scope.groupsSelectedTab = 'agents';
       $location.search('currentGroup', group.name);
       if ($location.search() && $location.search().navigation) {
         appState.setNavigation({ status: true });
@@ -154,9 +160,9 @@ export function GroupsController(
   };
 
   //listeners
+
   $scope.$on('wazuhShowGroup', (ev, parameters) => {
     ev.stopPropagation();
-    $scope.groupsSelectedTab = 'agents';
     return $scope.loadGroup(parameters.group);
   });
 
@@ -631,14 +637,44 @@ export function GroupsController(
     tabs: [{ id: 'agents', name: 'Agents' }, { id: 'files', name: 'Content' }]
   };
 
+  $scope.deleteGroup = async group => {
+    try {
+      await groupHandler.removeGroup(group.name);
+    } catch (error) {
+      errorHandler.handle(error.message || error);
+    }
+  };
+
+  $scope.buildGroupsTableProps = items => {
+    $scope.groupsTableProps = {
+      items,
+      createGroup: name => {
+        $scope.createGroup(name);
+      },
+      goGroup: group => {
+        $scope.loadGroup(group);
+      },
+      editGroup: group => {
+        $scope.openGroupFromList(group);
+      },
+      deleteGroup: group => {
+        $scope.deleteGroup(group);
+      },
+      export: () => {
+        $scope.downloadCsv('/agents/groups');
+      },
+      refresh: () => {
+        load();
+      }
+    };
+  };
+
   // Come from the pencil icon on the groups table
-  $scope.$on('openGroupFromList', (ev, parameters) => {
+  $scope.openGroupFromList = group => {
     $scope.editingFile = true;
     $scope.groupsSelectedTab = 'files';
     appState.setNavigation({ status: true });
     $location.search('navigation', true);
-    return $scope
-      .loadGroup(parameters.group)
-      .then(() => $scope.editGroupAgentConfig());
-  });
+    return $scope.loadGroup(group).then(() => $scope.editGroupAgentConfig());
+  };
 }

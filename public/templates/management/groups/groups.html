@@ -8,29 +8,8 @@
         </div>
 
         <!-- Headline -->
-        <div ng-show="!load" layout="column" layout-padding ng-if="!currentGroup || !currentGroup.name">
-            <div layout="row">
-                <span class="font-size-18">
-                    <i class="fa fa-fw fa-object-group" aria-hidden="true"></i> Groups </span>
-                <span ng-if='adminMode' class="font-size-18 wz-text-link wz-margin-left-8" ng-click="switchAddingGroup()">
-                    <react-component ng-if="!addingGroup" name="EuiIcon" props="{type:'plusInCircle', color:'primary'}" />
-                    <svg ng-if="addingGroup" class="euiIcon euiIcon--medium" focusable="false" xmlns="http://www.w3.org/2000/svg"
-                        width="16" height="16" viewBox="0 0 16 16">
-                        <path fill-rule="evenodd" d="M7.5 0C11.636 0 15 3.364 15 7.5S11.636 15 7.5 15 0 11.636 0 7.5 3.364 0 7.5 0zm0 .882a6.618 6.618 0 1 0 0 13.236A6.618 6.618 0 0 0 7.5.882zM3.5 7h8a.5.5 0 1 1 0 1h-8a.5.5 0 0 1 0-1z">
-                        </path>
-                    </svg>
-                </span>
-            </div>
-            <div layout="row" ng-if="addingGroup" ng-if='adminMode' class="wz-padding-bottom-0">
-                <input placeholder="Group name..." ng-model="groupToBeAdded" type="text" class="kuiLocalSearchInput addGroupInput ng-empty ng-pristine ng-scope ng-touched ng-valid"
-                    aria-invalid="false">
-                <button type="submit" aria-label="Search" class="kuiLocalSearchButton addGroupBtn" ng-click="createGroup(groupToBeAdded)">
-                    <span class="fa fa-save fa-fw" aria-hidden="true"></span>
-                </button>
-            </div>
-            <div layout="row" ng-if="!addingGroup">
-                <span class="md-subheader">List and check your groups, its agents and files</span>
-            </div>
+        <div ng-show="!load" layout="column" layout-padding ng-if="(!currentGroup || !currentGroup.name) && groupsTableProps && !lookingGroup">
+                <react-component name="GroupsTable" props="groupsTableProps" />
         </div>
         <!-- End headline -->
 
@@ -76,62 +55,6 @@
                     <span class='error-msg' ng-show='moreThan500'><i class="fa fa-exclamation-triangle"></i> It is not
                         possible to apply changes of more than 500 additions or deletions</span>
                 </div>
-
-                <!-- Search bar -->
-                <div layout="row" class="wz-margin-top-16 euiFlexGroup euiFlexGroup--alignItemsCenter euiFormControlLayout__childrenWrapper md-padding-h ng-scope"
-                    ng-if="!addingAgents && !file">
-                    <input placeholder="{{groupsSelectedTab==='files' ? 'Filter files...' : lookingGroup ? 'Filter agents...' : 'Filter groups...'}}"
-                        ng-model="custom_search" type="text" class="euiFieldSearch euiFieldSearch--fullWidth euiFlexItem height-35 ng-empty ng-pristine ng-touched ng-valid"
-                        aria-invalid="false" wz-enter="search(custom_search)">
-                    <div class="euiFormControlLayoutIcons wz-margin-left-16">
-                        <span class="euiFormControlLayoutCustomIcon">
-                            <react-component name="EuiIcon" props="{type:'search', className:'euiFormControlLayoutCustomIcon__icon'}" />
-                        </span>
-                    </div>
-
-                    <button type="submit" aria-label="Search" class="euiFlexItem euiFlexItem--flexGrowZero height-35 kuiButton kuiButton--secondary wz-margin-left-8"
-                        ng-click="search(custom_search)">
-                        Search
-                    </button>
-                    <div ng-if="lookingGroup && currentGroup && !addingAgents && !editingFile && !file && adminMode"
-                        class="euiFlexItem euiFlexItem--flexGrowZero height-35 wz-margin-left-8">
-                        <div class="euiFilterGroup"></div>
-                    </div>
-                    <button ng-if="lookingGroup && currentGroup && !addingAgents && !editingFile && !file && adminMode && groupsSelectedTab==='files'"
-                        class="euiFlexItem euiFlexItem--flexGrowZero height-35 kuiButton kuiButton--secondary ng-scope wz-margin-left-8"
-                        ng-click="editGroupAgentConfig(currentGroup)" aria-label="Edit group configuration">
-                        <react-component name="EuiIcon" props="{type:'pencil', color:'primary'}" />
-                        Edit group configuration
-                    </button>
-                    <button ng-if="lookingGroup && currentGroup && !addingAgents && !editingFile && !file && adminMode && groupsSelectedTab==='agents'"
-                        class="euiFlexItem euiFlexItem--flexGrowZero height-35 kuiButton kuiButton--secondary ng-scope wz-margin-left-8"
-                        ng-click="addMultipleAgents(true)" aria-label="Add or remove agents">
-                        <react-component name="EuiIcon" props="{type:'plusInCircle', color:'primary'}" />
-                        Add or remove agents
-                    </button>
-
-                </div>
-                <!-- End search bar -->
-
-                <!-- Groups table -->
-                <md-card flex class="wz-md-card _md flex md-margin-h wz-margin-top-16" ng-if="!lookingGroup">
-                    <md-card-content>
-                        <div layout="row">
-                            <wz-table custom-columns="true" flex path="'/agents/groups'" keys="['name','count','mergedSum']"
-                                allow-click="true" row-sizes="[14,12,10]">
-                            </wz-table>
-                        </div>
-                        <div layout="row" layout-align="end center">
-                            <button type="button" ng-click="downloadCsv('/agents/groups')" class="euiButtonEmpty euiButtonEmpty--primary euiButtonEmpty--small">
-                                <span class="euiButtonEmpty__content">
-                                    <react-component name="EuiIcon" props="{type:'importAction'}" />
-                                    <span class="euiButtonEmpty__text">Formatted</span>
-                                </span>
-                            </button>
-                        </div>
-                    </md-card-content>
-                </md-card>
-                <!-- End groups table -->
 
                 <div ng-if='!addingAgents'>
                     <!-- Group agents table -->

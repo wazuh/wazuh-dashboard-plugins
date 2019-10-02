@@ -907,8 +907,13 @@ export class WazuhApiCtrl {
       const responseBody = (response || {}).body || {};
       let responseData = responseBody.data;
       if (!responseData) {
-        responseData = typeof responseData === 'string' && path.includes('/files') && method === 'GET' ? ' ' : false
-        response.body.data = responseData
+        responseData =
+          typeof responseData === 'string' &&
+          path.includes('/files') &&
+          method === 'GET'
+            ? ' '
+            : false;
+        response.body.data = responseData;
       }
       const responseError = responseBody.error || false;
 
@@ -1024,9 +1029,9 @@ export class WazuhApiCtrl {
       log('wazuh-api:makeRequest', 'Request method is not valid.');
       //Method is not a valid HTTP request method
       return ErrorResponse('Request method is not valid.', 3015, 400, reply);
-    }else if (!req.payload.path) {
+    } else if (!req.payload.path) {
       return ErrorResponse('Missing param: path', 3016, 400, reply);
-    }else if (!req.payload.path.match(/^\/.+/)) {
+    } else if (!req.payload.path.match(/^\/.+/)) {
       log('wazuh-api:makeRequest', 'Request path is not valid.');
       //Path doesn't start with '/'
       return ErrorResponse('Request path is not valid.', 3015, 400, reply);
