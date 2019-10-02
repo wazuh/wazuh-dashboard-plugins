@@ -29,7 +29,8 @@ import {
   EuiCallOut
 } from '@elastic/eui';
 
-export class GroupsTable extends Component {
+export class GroupsTable extends Component {  
+  _isMounted = false;
   constructor(props) {
     super(props);
 
@@ -68,12 +69,25 @@ export class GroupsTable extends Component {
     });
   }
 
+  componentDidMount() {
+    this._isMounted = true;
+    if (this._isMounted) this.bindEnterToInput();
+  }
+
   componentDidUpdate() {
-    /**
-     * Looking for the input element to bind the keypress event, once the input is found the interval is clear
-     */
+    this.bindEnterToInput();
+  }
+
+  componentWillUnmount() {
+    this._isMounted = false;
+  }
+
+  /**
+  * Looking for the input element to bind the keypress event, once the input is found the interval is clear
+  */
+  bindEnterToInput() {
     try {
-      const interval = setInterval(async() => {
+      const interval = setInterval(async () => {
         const input = document.getElementsByClassName('groupNameInput');
         if (input.length) {
           const i = input[0];
@@ -94,7 +108,7 @@ export class GroupsTable extends Component {
     if (this.state.isPopoverOpen) {
       this.closePopover();
     } else {
-      this.setState({isPopoverOpen: true});
+      this.setState({ isPopoverOpen: true });
     }
   }
 
@@ -126,14 +140,14 @@ export class GroupsTable extends Component {
 
   async createGroup() {
     try {
-      this.setState({msg: false});
+      this.setState({ msg: false });
       const groupName = this.state.newGroupName;
       await this.props.createGroup(groupName);
       this.clearGroupName();
       this.refresh();
-      this.setState({msg: {msg:`${groupName} created`, type:'success'}});
+      this.setState({ msg: { msg: `${groupName} created`, type: 'success' } });
     } catch (error) {
-      this.setState({msg: {msg:error, type:'danger'}});
+      this.setState({ msg: { msg: error, type: 'danger' } });
     }
   }
 
