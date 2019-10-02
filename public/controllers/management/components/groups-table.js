@@ -41,7 +41,6 @@ export class GroupsTable extends Component {
       newGroupName: '',
       isPopoverOpen: false
     };
-    this.firstRender = true;
   }
 
   /**
@@ -67,12 +66,28 @@ export class GroupsTable extends Component {
     });
   }
 
-  componentDidMount(){
-    $('.groupNameInput').keypress((e) => {
-      if(e.which === 13){
-       console.log("enter");
-      }
-   });
+  componentDidUpdate() {
+    /**
+     * Looking for the input element to bind the keypress event, once the input is found the interval is clear
+     */
+    try {
+      const interval = setInterval(() => {
+        const input = document.getElementsByClassName('groupNameInput');
+        if (input.length) {
+          const i = input[0];
+          if (!i.onkeypress) {
+            i.onkeypress = async (e) => {
+              if(e.which === 13) {
+                await this.props.createGroup(this.state.newGroupName);
+                this.clearGroupName();
+                this.refresh();
+              }
+            };
+          }
+          clearInterval(interval);
+        }
+      }, 150);
+    } catch (error) {}
   }
 
   togglePopover() {
