@@ -20,7 +20,7 @@ export function buildOptionsObject(api) {
     },
     username: api.user,
     password: api.password,
-    rejectUnauthorized: api.url.includes('https://')
+    rejectUnauthorized: false
   };
 }
 
