@@ -614,17 +614,6 @@ export function GroupsController(
     $scope.addingGroup = !$scope.addingGroup;
   };
 
-  $scope.createGroup = async name => {
-    try {
-      $scope.addingGroup = false;
-      await groupHandler.createGroup(name);
-      errorHandler.info(`Group ${name} has been created`);
-    } catch (error) {
-      errorHandler.handle(error.message || error);
-    }
-    $scope.$broadcast('wazuhSearch', {});
-  };
-
   $scope.groupsTabsProps = {
     clickAction: tab => {
       if (tab === 'agents') {
@@ -648,8 +637,8 @@ export function GroupsController(
   $scope.buildGroupsTableProps = items => {
     $scope.groupsTableProps = {
       items,
-      createGroup: name => {
-        $scope.createGroup(name);
+      createGroup: async name => {
+        await groupHandler.createGroup(name);
       },
       goGroup: group => {
         $scope.loadGroup(group);

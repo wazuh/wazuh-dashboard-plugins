@@ -25,7 +25,8 @@ import {
   EuiFormRow,
   EuiFieldText,
   EuiSpacer,
-  EuiButton
+  EuiButton,
+  EuiCallOut
 } from '@elastic/eui';
 
 export class GroupsTable extends Component {
@@ -39,7 +40,8 @@ export class GroupsTable extends Component {
       showPerPageOptions: true,
       showConfirm: false,
       newGroupName: '',
-      isPopoverOpen: false
+      isPopoverOpen: false,
+      msg: false
     };
   }
 
@@ -71,34 +73,36 @@ export class GroupsTable extends Component {
      * Looking for the input element to bind the keypress event, once the input is found the interval is clear
      */
     try {
-      const interval = setInterval(() => {
+      const interval = setInterval(async() => {
         const input = document.getElementsByClassName('groupNameInput');
         if (input.length) {
           const i = input[0];
           if (!i.onkeypress) {
             i.onkeypress = async (e) => {
-              if(e.which === 13) {
-                await this.props.createGroup(this.state.newGroupName);
-                this.clearGroupName();
-                this.refresh();
+              if (e.which === 13) {
+                await this.createGroup(this.state.newGroupName);
               }
             };
           }
           clearInterval(interval);
         }
       }, 150);
-    } catch (error) {}
+    } catch (error) { }
   }
 
   togglePopover() {
-    this.setState({
-      isPopoverOpen: !this.state.isPopoverOpen
-    });
+    if (this.state.isPopoverOpen) {
+      this.closePopover();
+    } else {
+      this.setState({isPopoverOpen: true});
+    }
   }
 
   closePopover() {
     this.setState({
-      isPopoverOpen: false
+      isPopoverOpen: false,
+      msg: false,
+      newGroupName: ''
     });
   }
 
@@ -118,6 +122,19 @@ export class GroupsTable extends Component {
     this.setState({
       showConfirm: groupName
     });
+  }
+
+  async createGroup() {
+    try {
+      this.setState({msg: false});
+      const groupName = this.state.newGroupName;
+      await this.props.createGroup(groupName);
+      this.clearGroupName();
+      this.refresh();
+      this.setState({msg: {msg:`${groupName} created`, type:'success'}});
+    } catch (error) {
+      this.setState({msg: {msg:error, type:'danger'}});
+    }
   }
 
   render() {
@@ -247,13 +264,24 @@ export class GroupsTable extends Component {
                 />
               </EuiFormRow>
               <EuiSpacer size="xs" />
+              {this.state.msg && (
+                <Fragment>
+                  <EuiFlexGroup>
+                    <EuiFlexItem>
+                      <EuiCallOut title={this.state.msg.msg} color={this.state.msg.type} iconType={this.state.msg.type === 'danger' ? 'cross' : 'check'} />
+                    </EuiFlexItem>
+                  </EuiFlexGroup>
+                  <EuiSpacer size="xs" />
+                </Fragment>
+              )}
+              <EuiSpacer size="xs" />
               <EuiFlexGroup>
                 <EuiFlexItem>
                   <EuiButton
                     iconType="save"
                     fill
                     onClick={async () => {
-                      await this.props.createGroup(this.state.newGroupName);
+                      await this.createGroup(this.state.newGroupName);
                       this.clearGroupName();
                       this.refresh();
                     }}
