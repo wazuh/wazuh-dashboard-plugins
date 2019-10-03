@@ -12,43 +12,168 @@
 import beautifier from '../../utils/json-beautifier';
 import * as FileSaver from '../../services/file-saver';
 
-export function GroupsController(
-  $scope,
-  $location,
-  apiReq,
-  errorHandler,
-  csvReq,
-  appState,
-  shareAgent,
-  groupHandler,
-  wzTableFilter,
-  wazuhConfig,
-  reportingService
-) {
-  $scope.addingGroup = false;
-  $scope.$on('groupsIsReloaded', () => {
-    $scope.groupsSelectedTab = false;
-    $scope.editingFile = false;
-    $scope.currentGroup = false;
-    $scope.$emit('removeCurrentGroup');
-    $scope.lookingGroup = false;
-    $scope.$applyAsync();
-  });
+export class GroupsController {
+  constructor(
+    $scope,
+    $location,
+    apiReq,
+    errorHandler,
+    csvReq,
+    appState,
+    shareAgent,
+    groupHandler,
+    wazuhConfig,
+    reportingService
+  ) {
+    this.scope = $scope;
+    this.location = $location;
+    this.apiReq = apiReq;
+    this.errorHandler = errorHandler;
+    this.csvReq = csvReq;
+    this.appState = appState;
+    this.shareAgent = shareAgent;
+    this.groupHandler = groupHandler;
+    this.wazuhConfig = wazuhConfig;
+    this.reportingService = reportingService;
+  }
 
-  $scope.load = true;
+  async $onInit() {
+    try {
+      this.addingGroup = false;
+      this.load = true;
+      // Store a boolean variable to check if come from agents
+      this.globalAgent = this.shareAgent.getAgent();
+
+      await this.loadGroups();
+
+      // Listeners
+      this.scope.$on('wazuhShowGroup', (ev, parameters) => {
+        ev.stopPropagation();
+        return this.loadGroup(parameters.group);
+      });
+
+      this.scope.$on('wazuhShowGroupFile', (ev, parameters) => {
+        ev.stopPropagation();
+        if (
+          ((parameters || {}).fileName || '').includes('agent.conf') &&
+          this.adminMode
+        ) {
+          return this.editGroupAgentConfig();
+        }
+        return this.showFile(parameters.groupName, parameters.fileName);
+      });
+
+      this.scope.$on('groupsIsReloaded', () => {
+        this.groupsSelectedTab = false;
+        this.editingFile = false;
+        this.currentGroup = false;
+        this.scope.$emit('removeCurrentGroup');
+        this.lookingGroup = false;
+        this.scope.$applyAsync();
+      });
+
+      this.scope.$on('updateGroupInformation', this.updateGroupInformation());
+
+      // Resetting the factory configuration
+      this.scope.$on('$destroy', () => {});
+
+      this.scope.$watch('lookingGroup', value => {
+        this.availableAgents = {
+          loaded: false,
+          data: [],
+          offset: 0,
+          loadedAll: false
+        };
+        this.selectedAgents = {
+          loaded: false,
+          data: [],
+          offset: 0,
+          loadedAll: false
+        };
+        this.addMultipleAgents(false);
+        if (!value) {
+          this.file = false;
+          this.filename = false;
+        }
+      });
+
+      // Props
+      this.exportConfigurationProps = {
+        exportConfiguration: enabledComponents => this.exportConfiguration(enabledComponents),
+        type: 'group'
+      }
+
+      this.groupsTabsProps = {
+        clickAction: tab => {
+          if (tab === 'agents') {
+            this.goBackToAgents();
+          } else if (tab === 'files') {
+            this.goBackFiles();
+          }
+        },
+        selectedTab: this.groupsSelectedTab || 'agents',
+        tabs: [{ id: 'agents', name: 'Agents' }, { id: 'files', name: 'Content' }]
+      };
+      return;
+    } catch (error) {
+      this.errorHandler.handle(error, 'Groups');
+    }
+  };
+
 
   /**
-   * Get full data on CSV format from a path
-   * @param {String} data_path path with data to convert
+   * Loads the initial information
    */
-  $scope.downloadCsv = async data_path => {
+  async loadGroups() {
     try {
-      errorHandler.info('Your download should begin automatically...', 'CSV');
-      const currentApi = JSON.parse(appState.getCurrentAPI()).id;
-      const output = await csvReq.fetch(
-        data_path,
+      // If come from agents
+      if (this.globalAgent) {
+        const globalGroup = this.shareAgent.getSelectedGroup();
+        // Get ALL groups
+        const data = await this.apiReq.request('GET', '/agents/groups/', {
+          limit: 1000
+        });
+        const filtered = data.data.data.items.filter(
+          group => group.name === globalGroup
+        );
+
+        if (Array.isArray(filtered) && filtered.length) {
+          // Load that our group
+          this.loadGroup(filtered[0], true);
+          this.lookingGroup = true;
+          this.addingAgents = false;
+        } else {
+          throw Error(`Group ${globalGroup} not found`);
+        }
+
+        this.shareAgent.deleteAgent();
+      } else {
+        const loadedGroups = await this.apiReq.request('GET', '/agents/groups/', {
+          limit: 1000
+        });
+        this.buildGroupsTableProps(loadedGroups.data.data.items);
+        const configuration = this.wazuhConfig.getConfig();
+        this.adminMode = !!(configuration || {}).admin;
+        this.load = false;
+        this.scope.$applyAsync();
+      }
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  }
+
+  /**
+  * Get full data on CSV format from a path
+  * @param {String} path path with data to convert
+  */
+  async downloadCsv(path) {
+    try {
+      this.errorHandler.info('Your download should begin automatically...', 'CSV');
+      const currentApi = JSON.parse(this.appState.getCurrentAPI()).id;
+      const output = await this.csvReq.fetch(
+        path,
         currentApi,
-        wzTableFilter.get()
+        //this.wzTableFilter.get()//TODO solve the filter problems
       );
       const blob = new Blob([output], { type: 'text/csv' }); // eslint-disable-line
 
@@ -56,135 +181,79 @@ export function GroupsController(
 
       return;
     } catch (error) {
-      errorHandler.handle(error, 'Download CSV');
+      this.errorHandler.handle(error, 'Download CSV');
     }
     return;
-  };
+  }
 
   /**
    * This perfoms a search by a given term
    * @param {String} term
    */
-  $scope.search = term => {
-    $scope.$broadcast('wazuhSearch', { term });
+  search(term) {
+    this.scope.$broadcast('wazuhSearch', { term });
   };
 
-  // Store a boolean variable to check if come from agents
-  const globalAgent = shareAgent.getAgent();
 
-  /**
-   * This load at init some required data
-   */
-  const load = async () => {
-    try {
-      // If come from agents
-      if (globalAgent) {
-        const globalGroup = shareAgent.getSelectedGroup();
-        // Get ALL groups
-        const data = await apiReq.request('GET', '/agents/groups/', {
-          limit: 1000
-        });
-
-        const filtered = data.data.data.items.filter(
-          group => group.name === globalGroup
-        );
-
-        if (Array.isArray(filtered) && filtered.length) {
-          // Load that our group
-          $scope.loadGroup(filtered[0], true);
-          $scope.lookingGroup = true;
-          $scope.addingAgents = false;
-        } else {
-          throw Error(`Group ${globalGroup} not found`);
-        }
-
-        shareAgent.deleteAgent();
-      } else {
-        const loadedGroups = await apiReq.request('GET', '/agents/groups/', {
-          limit: 1000
-        });
-        $scope.buildGroupsTableProps(loadedGroups.data.data.items);
-      }
-
-      const configuration = wazuhConfig.getConfig();
-      $scope.adminMode = !!(configuration || {}).admin;
-      $scope.load = false;
-
-      $scope.$applyAsync();
-    } catch (error) {
-      errorHandler.handle(error, 'Groups');
-    }
-    return;
-  };
-
-  load();
-
-  $scope.toggle = () => ($scope.lookingGroup = true);
+  toggle() {
+    this.lookingGroup = true;
+  }
 
   /**
    * This navigate to a selected agent
+   * @param {Number} agentId
    */
-  $scope.showAgent = agent => {
-    shareAgent.setAgent(agent);
-    $location.search('tab', null);
-    $location.path('/agents');
+  showAgent(agentId) {
+    this.shareAgent.setAgent(agentId);
+    this.location.search('tab', null);
+    this.location.path('/agents');
   };
 
   /**
    * This load the group information to a given agent
+   * @param {String} group
+   * @param {Boolean} firstTime
    */
-  $scope.loadGroup = async (group, firstTime) => {
+  async loadGroup(group, firstTime) {
     try {
-      if (!firstTime) $scope.lookingGroup = true;
-      const count = await apiReq.request(
+      if (!firstTime) this.lookingGroup = true;
+      const count = await this.apiReq.request(
         'GET',
         `/agents/groups/${group.name}/files`,
         { limit: 1 }
       );
-      $scope.totalFiles = count.data.data.totalItems;
-      $scope.fileViewer = false;
-      $scope.currentGroup = group;
-      $scope.groupsSelectedTab = 'agents';
-      $location.search('currentGroup', group.name);
-      if ($location.search() && $location.search().navigation) {
-        appState.setNavigation({ status: true });
-        $location.search('navigation', null);
+      this.totalFiles = count.data.data.totalItems;
+      this.fileViewer = false;
+      this.currentGroup = group;
+      this.groupsSelectedTab = 'agents';
+      this.location.search('currentGroup', group.name);
+      if (this.location.search() && this.location.search().navigation) {
+        this.appState.setNavigation({ status: true });
+        this.location.search('navigation', null);
       }
-      $scope.$emit('setCurrentGroup', { currentGroup: $scope.currentGroup });
-      $scope.fileViewer = false;
-      $scope.$applyAsync();
+      this.scope.$emit('setCurrentGroup', { currentGroup: this.currentGroup });
+      this.fileViewer = false;
+      this.scope.$applyAsync();
     } catch (error) {
-      errorHandler.handle(error, 'Groups');
+      this.errorHandler.handle(error, 'Groups');
     }
     return;
   };
 
-  //listeners
 
-  $scope.$on('wazuhShowGroup', (ev, parameters) => {
-    ev.stopPropagation();
-    return $scope.loadGroup(parameters.group);
-  });
-
-  $scope.$on('wazuhShowGroupFile', (ev, parameters) => {
-    ev.stopPropagation();
-    if (
-      ((parameters || {}).fileName || '').includes('agent.conf') &&
-      $scope.adminMode
-    ) {
-      return $scope.editGroupAgentConfig();
-    }
-    return $scope.showFile(parameters.groupName, parameters.fileName);
-  });
-
-  const updateGroupInformation = async (event, parameters) => {
+  /**
+   * Updates the group information
+   * @param {Object} event 
+   * @param {Object} parameters 
+   */
+  async updateGroupInformation(event, parameters) {
     try {
-      if ($scope.currentGroup) {
+      if (this.currentGroup) {
         const result = await Promise.all([
-          await apiReq.request('GET', `/agents/groups/${parameters.group}`, {
+          await this.apiReq.request('GET', `/agents/groups/${parameters.group}`, {
             limit: 1
           }),
-          await apiReq.request('GET', `/agents/groups`, {
+          await this.apiReq.request('GET', `/agents/groups`, {
             search: parameters.group
           })
         ]);
@@ -196,58 +265,60 @@ export function GroupsController(
           item => item.name === parameters.group
         );
 
-        $scope.currentGroup.count = (count || {}).totalItems || 0;
+        this.currentGroup.count = (count || {}).totalItems || 0;
         if (updatedGroup) {
-          $scope.currentGroup.configSum = updatedGroup.configSum;
-          $scope.currentGroup.mergedSum = updatedGroup.mergedSum;
+          this.currentGroup.configSum = updatedGroup.configSum;
+          this.currentGroup.mergedSum = updatedGroup.mergedSum;
         }
       }
     } catch (error) {
-      errorHandler.handle(error, 'Groups');
+      this.errorHandler.handle(error, 'Groups');
     }
-    $scope.$applyAsync();
+    this.scope.$applyAsync();
     return;
   };
-
-  $scope.$on('updateGroupInformation', updateGroupInformation);
 
   /**
    * This navigate back to agents overview
    */
-  $scope.goBackToAgents = () => {
-    $scope.groupsSelectedTab = 'agents';
-    $scope.file = false;
-    $scope.filename = false;
-    $scope.$applyAsync();
+  goBackToAgents() {
+    this.groupsSelectedTab = 'agents';
+    this.file = false;
+    this.filename = false;
+    this.scope.$applyAsync();
   };
 
   /**
    * This navigate back to files
    */
-  $scope.goBackFiles = () => {
-    $scope.groupsSelectedTab = 'files';
-    $scope.addingAgents = false;
-    $scope.editingFile = false;
-    $scope.file = false;
-    $scope.filename = false;
-    $scope.fileViewer = false;
-    $scope.$applyAsync();
+  goBackFiles() {
+    this.groupsSelectedTab = 'files';
+    this.addingAgents = false;
+    this.editingFile = false;
+    this.file = false;
+    this.filename = false;
+    this.fileViewer = false;
+    this.scope.$applyAsync();
   };
 
   /**
    * This navigate back to groups
    */
-  $scope.goBackGroups = () => {
-    $scope.currentGroup = false;
-    $scope.$emit('removeCurrentGroup');
-    $scope.lookingGroup = false;
-    $scope.editingFile = false;
-    $scope.$applyAsync();
+  goBackGroups() {
+    this.currentGroup = false;
+    this.scope.$emit('removeCurrentGroup');
+    this.lookingGroup = false;
+    this.editingFile = false;
+    this.scope.$applyAsync();
   };
 
-  $scope.exportConfiguration = enabledComponents => {
-    reportingService.startConfigReport(
-      $scope.currentGroup,
+  /**
+   * 
+   * @param {Object} enabledComponents 
+   */
+  exportConfiguration(enabledComponents) {
+    this.reportingService.startConfigReport(
+      this.currentGroup,
       'groupConfig',
       enabledComponents
     );
@@ -255,29 +326,31 @@ export function GroupsController(
 
   /**
    * This show us a group file, for a given group and file
+   *
+   * @param {String} groupName
+   * @param {String} fileName
    */
-  $scope.showFile = async (groupName, fileName) => {
+  async showFile(groupName, fileName) {
     try {
-      if ($scope.filename) $scope.filename = '';
+      if (this.filename) this.filename = '';
       if (fileName === '../ar.conf') fileName = 'ar.conf';
-      $scope.fileViewer = true;
+      this.fileViewer = true;
       const tmpName = `/agents/groups/${groupName}/files/${fileName}`;
-      const data = await apiReq.request('GET', tmpName, {});
-      $scope.file = beautifier.prettyPrint(data.data.data);
-      $scope.filename = fileName;
-
-      $scope.$applyAsync();
+      const data = await this.apiReq.request('GET', tmpName, {});
+      this.file = beautifier.prettyPrint(data.data.data);
+      this.filename = fileName;
+      this.scope.$applyAsync();
     } catch (error) {
-      errorHandler.handle(error, 'Groups');
+      this.errorHandler.handle(error, 'Groups');
     }
     return;
   };
 
-  const fetchFile = async () => {
+  async fetchFile() {
     try {
-      const data = await apiReq.request(
+      const data = await this.apiReq.request(
         'GET',
-        `/agents/groups/${$scope.currentGroup.name}/files/agent.conf`,
+        `/agents/groups/${this.currentGroup.name}/files/agent.conf`,
         { format: 'xml' }
       );
       const xml = ((data || {}).data || {}).data || false;
@@ -291,125 +364,130 @@ export function GroupsController(
     }
   };
 
-  $scope.editGroupAgentConfig = async () => {
-    $scope.editingFile = true;
+  async editGroupAgentConfig() {
+    this.editingFile = true;
     try {
-      $scope.fetchedXML = await fetchFile();
-      $location.search('editingFile', true);
-      appState.setNavigation({ status: true });
-      $scope.$broadcast('fetchedFile', { data: $scope.fetchedXML });
+      this.fetchedXML = await this.fetchFile();
+      this.location.search('editingFile', true);
+      this.appState.setNavigation({ status: true });
+      this.scope.$broadcast('fetchedFile', { data: this.fetchedXML });
     } catch (error) {
-      $scope.fetchedXML = null;
-      errorHandler.handle(error, 'Fetch file error');
+      this.fetchedXML = null;
+      this.errorHandler.handle(error, 'Fetch file error');
     }
-    $scope.$applyAsync();
+    this.scope.$applyAsync();
   };
 
-  $scope.closeEditingFile = () => {
-    $scope.editingFile = false;
-    appState.setNavigation({ status: true });
-    $scope.$broadcast('closeEditXmlFile', {});
-    $scope.groupsTabsProps.selectedTab = 'files';
-    $scope.$applyAsync();
+  closeEditingFile() {
+    this.editingFile = false;
+    this.appState.setNavigation({ status: true });
+    this.scope.$broadcast('closeEditXmlFile', {});
+    this.groupsTabsProps.selectedTab = 'files';
+    this.scope.$applyAsync();
   };
 
-  $scope.xmlIsValid = valid => {
-    $scope.xmlHasErrors = valid;
-    $scope.$applyAsync();
+  /**
+   * Set if the XML is valid
+   * @param {Boolean} valid 
+   */
+  xmlIsValid(valid) {
+    this.xmlHasErrors = valid;
+    this.scope.$applyAsync();
   };
 
-  $scope.doSaveGroupAgentConfig = () => {
-    $scope.$broadcast('saveXmlFile', {
-      group: $scope.currentGroup.name,
+  doSaveGroupAgentConfig() {
+    this.scope.$broadcast('saveXmlFile', {
+      group: this.currentGroup.name,
       type: 'group'
     });
   };
 
-  $scope.reload = async (element, searchTerm, addOffset, start) => {
+
+  async reload(element, searchTerm, addOffset, start) {
     if (element === 'left') {
-      if (!$scope.availableAgents.loadedAll) {
-        $scope.multipleSelectorLoading = true;
+      if (!this.availableAgents.loadedAll) {
+        this.multipleSelectorLoading = true;
         if (start) {
-          $scope.selectedAgents.offset = 0;
+          this.selectedAgents.offset = 0;
         } else {
-          $scope.availableAgents.offset += addOffset + 1;
+          this.availableAgents.offset += addOffset + 1;
         }
         try {
-          await loadAllAgents(searchTerm, start);
+          await this.loadAllAgents(searchTerm, start);
         } catch (error) {
-          errorHandler.handle(error, 'Error fetching all available agents');
+          this.errorHandler.handle(error, 'Error fetching all available agents');
         }
       }
     } else {
-      if (!$scope.selectedAgents.loadedAll) {
-        $scope.multipleSelectorLoading = true;
-        $scope.selectedAgents.offset += addOffset + 1;
-        await $scope.loadSelectedAgents(searchTerm);
+      if (!this.selectedAgents.loadedAll) {
+        this.multipleSelectorLoading = true;
+        this.selectedAgents.offset += addOffset + 1;
+        await this.loadSelectedAgents(searchTerm);
       }
     }
 
-    $scope.multipleSelectorLoading = false;
-    $scope.$applyAsync();
+    this.multipleSelectorLoading = false;
+    this.scope.$applyAsync();
   };
 
-  $scope.loadSelectedAgents = async searchTerm => {
+  async loadSelectedAgents(searchTerm) {
     try {
       let params = {
-        offset: !searchTerm ? $scope.selectedAgents.offset : 0,
+        offset: !searchTerm ? this.selectedAgents.offset : 0,
         select: ['id', 'name']
       };
       if (searchTerm) {
         params.search = searchTerm;
       }
-      const result = await apiReq.request(
+      const result = await this.apiReq.request(
         'GET',
-        `/agents/groups/${$scope.currentGroup.name}`,
+        `/agents/groups/${this.currentGroup.name}`,
         params
       );
-      $scope.totalSelectedAgents = result.data.data.totalItems;
+      this.totalSelectedAgents = result.data.data.totalItems;
       const mapped = result.data.data.items.map(item => {
         return { key: item.id, value: item.name };
       });
       if (searchTerm) {
-        $scope.selectedAgents.data = mapped;
-        $scope.selectedAgents.loadedAll = true;
+        this.selectedAgents.data = mapped;
+        this.selectedAgents.loadedAll = true;
       } else {
-        $scope.selectedAgents.data = $scope.selectedAgents.data.concat(mapped);
+        this.selectedAgents.data = this.selectedAgents.data.concat(mapped);
       }
       if (
-        $scope.selectedAgents.data.length === 0 ||
-        $scope.selectedAgents.data.length < 500 ||
-        $scope.selectedAgents.offset >= $scope.totalSelectedAgents
+        this.selectedAgents.data.length === 0 ||
+        this.selectedAgents.data.length < 500 ||
+        this.selectedAgents.offset >= this.totalSelectedAgents
       ) {
-        $scope.selectedAgents.loadedAll = true;
+        this.selectedAgents.loadedAll = true;
       }
     } catch (error) {
-      errorHandler.handle(error, 'Error fetching group agents');
+      this.errorHandler.handle(error, 'Error fetching group agents');
     }
-    $scope.selectedAgents.loaded = true;
+    this.selectedAgents.loaded = true;
   };
 
-  const loadAllAgents = async (searchTerm, start) => {
+  async loadAllAgents(searchTerm, start) {
     try {
       const params = {
         limit: 500,
-        offset: !searchTerm ? $scope.availableAgents.offset : 0,
+        offset: !searchTerm ? this.availableAgents.offset : 0,
         select: ['id', 'name']
       };
 
       if (searchTerm) {
         params.search = searchTerm;
-        $scope.availableAgents.offset = 0;
+        this.availableAgents.offset = 0;
       }
 
-      const req = await apiReq.request('GET', '/agents/', params);
+      const req = await this.apiReq.request('GET', '/agents/', params);
 
-      $scope.totalAgents = req.data.data.totalItems;
+      this.totalAgents = req.data.data.totalItems;
 
       const mapped = req.data.data.items
         .filter(item => {
           return (
-            $scope.selectedAgents.data.filter(selected => {
+            this.selectedAgents.data.filter(selected => {
               return selected.key == item.id;
             }).length == 0 && item.id !== '000'
           );
@@ -419,78 +497,78 @@ export function GroupsController(
         });
 
       if (searchTerm || start) {
-        $scope.availableAgents.data = mapped;
+        this.availableAgents.data = mapped;
       } else {
-        $scope.availableAgents.data = $scope.availableAgents.data.concat(
+        this.availableAgents.data = this.availableAgents.data.concat(
           mapped
         );
       }
 
-      if ($scope.availableAgents.data.length < 10 && !searchTerm) {
-        if ($scope.availableAgents.offset >= $scope.totalAgents) {
-          $scope.availableAgents.loadedAll = true;
+      if (this.availableAgents.data.length < 10 && !searchTerm) {
+        if (this.availableAgents.offset >= this.totalAgents) {
+          this.availableAgents.loadedAll = true;
         }
-        if (!$scope.availableAgents.loadedAll) {
-          $scope.availableAgents.offset += 499;
-          await loadAllAgents();
+        if (!this.availableAgents.loadedAll) {
+          this.availableAgents.offset += 499;
+          await this.loadAllAgents();
         }
       }
     } catch (error) {
-      errorHandler.handle(error, 'Error fetching all available agents');
+      this.errorHandler.handle(error, 'Error fetching all available agents');
     }
   };
 
-  $scope.addMultipleAgents = async toggle => {
+  async addMultipleAgents(toggle) {
     try {
-      $scope.addingAgents = toggle;
-      if (toggle && !$scope.availableAgents.loaded) {
-        $scope.availableAgents = {
+      this.addingAgents = toggle;
+      if (toggle && !this.availableAgents.loaded) {
+        this.availableAgents = {
           loaded: false,
           data: [],
           offset: 0,
           loadedAll: false
         };
-        $scope.selectedAgents = {
+        this.selectedAgents = {
           loaded: false,
           data: [],
           offset: 0,
           loadedAll: false
         };
-        $scope.multipleSelectorLoading = true;
-        while (!$scope.selectedAgents.loadedAll) {
-          await $scope.loadSelectedAgents();
-          $scope.selectedAgents.offset += 499;
+        this.multipleSelectorLoading = true;
+        while (!this.selectedAgents.loadedAll) {
+          await this.loadSelectedAgents();
+          this.selectedAgents.offset += 499;
         }
-        $scope.firstSelectedList = [...$scope.selectedAgents.data];
-        await loadAllAgents();
-        $scope.multipleSelectorLoading = false;
+        this.firstSelectedList = [...this.selectedAgents.data];
+        await this.loadAllAgents();
+        this.multipleSelectorLoading = false;
       }
     } catch (error) {
-      errorHandler.handle(error, 'Error adding agents');
+      this.errorHandler.handle(error, 'Error adding agents');
     }
-    $scope.$applyAsync();
+    this.scope.$applyAsync();
     return;
   };
 
-  const getItemsToSave = () => {
-    const original = $scope.firstSelectedList;
-    const modified = $scope.selectedAgents.data;
-    $scope.deletedAgents = [];
-    $scope.addedAgents = [];
+  getItemsToSave() {
+    const original = this.firstSelectedList;
+    const modified = this.selectedAgents.data;
+    this.deletedAgents = [];
+    this.addedAgents = [];
 
     modified.forEach(mod => {
       if (original.filter(e => e.key === mod.key).length === 0) {
-        $scope.addedAgents.push(mod);
+        this.addedAgents.push(mod);
       }
     });
     original.forEach(orig => {
       if (modified.filter(e => e.key === orig.key).length === 0) {
-        $scope.deletedAgents.push(orig);
+        this.deletedAgents.push(orig);
       }
     });
 
-    const addedIds = [...new Set($scope.addedAgents.map(x => x.key))];
-    const deletedIds = [...new Set($scope.deletedAgents.map(x => x.key))];
+    const addedIds = [...new Set(this.addedAgents.map(x => x.key))];
+    const deletedIds = [...new Set(this.deletedAgents.map(x => x.key))];
 
     return { addedIds, deletedIds };
   };
@@ -500,7 +578,7 @@ export function GroupsController(
    * @param {*} collection Array<object>
    * @param {*} property String
    */
-  const groupBy = (collection, property) => {
+  groupBy(collection, property) {
     try {
       const values = [];
       const result = [];
@@ -519,16 +597,16 @@ export function GroupsController(
     }
   };
 
-  $scope.saveAddAgents = async () => {
-    const itemsToSave = getItemsToSave();
+  async saveAddAgents() {
+    const itemsToSave = this.getItemsToSave();
     const failedIds = [];
 
     try {
-      $scope.multipleSelectorLoading = true;
+      this.multipleSelectorLoading = true;
       if (itemsToSave.addedIds.length) {
-        const addResponse = await apiReq.request(
+        const addResponse = await this.apiReq.request(
           'POST',
-          `/agents/group/${$scope.currentGroup.name}`,
+          `/agents/group/${this.currentGroup.name}`,
           { ids: itemsToSave.addedIds }
         );
         if (addResponse.data.data.failed_ids) {
@@ -536,9 +614,9 @@ export function GroupsController(
         }
       }
       if (itemsToSave.deletedIds.length) {
-        const deleteResponse = await apiReq.request(
+        const deleteResponse = await this.apiReq.request(
           'DELETE',
-          `/agents/group/${$scope.currentGroup.name}`,
+          `/agents/group/${this.currentGroup.name}`,
           { ids: itemsToSave.deletedIds.toString() }
         );
         if (deleteResponse.data.data.failed_ids) {
@@ -551,119 +629,89 @@ export function GroupsController(
           id: (item || {}).id,
           message: ((item || {}).error || {}).message
         }));
-        $scope.failedErrors = groupBy(failedErrors, 'message') || false;
+        this.failedErrors = groupBy(failedErrors, 'message') || false;
         errorHandler.info(
           `Group has been updated but an error has occurred with ${failedIds.length} agents`,
           '',
           true
         );
       } else {
-        errorHandler.info('Group has been updated');
+        this.errorHandler.info('Group has been updated');
       }
-      $scope.addMultipleAgents(false);
-      $scope.multipleSelectorLoading = false;
-      await updateGroupInformation(null, {
-        group: $scope.currentGroup.name
+      this.addMultipleAgents(false);
+      this.multipleSelectorLoading = false;
+      await this.updateGroupInformation(null, {
+        group: this.scope.currentGroup.name
       });
     } catch (err) {
-      $scope.multipleSelectorLoading = false;
-      errorHandler.handle(err, 'Error applying changes');
+      this.multipleSelectorLoading = false;
+      this.errorHandler.handle(err, 'Error applying changes');
     }
-    $scope.$applyAsync();
+    this.scope.$applyAsync();
     return;
   };
 
-  $scope.clearFailedErrors = () => {
-    $scope.failedErrors = false;
+  clearFailedErrors() {
+    this.failedErrors = false;
   };
 
-  $scope.checkLimit = () => {
-    if ($scope.firstSelectedList) {
+  checkLimit() {
+    if (this.firstSelectedList) {
       const itemsToSave = getItemsToSave();
-      $scope.currentAdding = itemsToSave.addedIds.length;
-      $scope.currentDeleting = itemsToSave.deletedIds.length;
-      $scope.moreThan500 =
-        $scope.currentAdding > 500 || $scope.currentDeleting > 500;
+      this.currentAdding = itemsToSave.addedIds.length;
+      this.currentDeleting = itemsToSave.deletedIds.length;
+      this.moreThan500 =
+        this.currentAdding > 500 || this.currentDeleting > 500;
     }
   };
 
-  // Resetting the factory configuration
-  $scope.$on('$destroy', () => {});
-
-  $scope.$watch('lookingGroup', value => {
-    $scope.availableAgents = {
-      loaded: false,
-      data: [],
-      offset: 0,
-      loadedAll: false
-    };
-    $scope.selectedAgents = {
-      loaded: false,
-      data: [],
-      offset: 0,
-      loadedAll: false
-    };
-    $scope.addMultipleAgents(false);
-    if (!value) {
-      $scope.file = false;
-      $scope.filename = false;
-    }
-  });
-
-  $scope.switchAddingGroup = () => {
-    $scope.addingGroup = !$scope.addingGroup;
+  switchAddingGroup() {
+    this.addingGroup = !this.addingGroup;
   };
 
-  $scope.groupsTabsProps = {
-    clickAction: tab => {
-      if (tab === 'agents') {
-        $scope.goBackToAgents();
-      } else if (tab === 'files') {
-        $scope.goBackFiles();
-      }
-    },
-    selectedTab: $scope.groupsSelectedTab || 'agents',
-    tabs: [{ id: 'agents', name: 'Agents' }, { id: 'files', name: 'Content' }]
-  };
 
-  $scope.deleteGroup = async group => {
+  async deleteGroup(group) {
     try {
-      await groupHandler.removeGroup(group.name);
+      await this.groupHandler.removeGroup(group.name);
     } catch (error) {
-      errorHandler.handle(error.message || error);
+      this.errorHandler.handle(error.message || error);
     }
   };
 
-  $scope.buildGroupsTableProps = items => {
-    $scope.groupsTableProps = {
+
+  buildGroupsTableProps(items) {
+    this.groupsTableProps = {
       items,
       createGroup: async name => {
-        await groupHandler.createGroup(name);
+        await this.groupHandler.createGroup(name);
       },
       goGroup: group => {
-        $scope.loadGroup(group);
+        this.loadGroup(group);
       },
       editGroup: group => {
-        $scope.openGroupFromList(group);
+        this.openGroupFromList(group);
       },
       deleteGroup: group => {
-        $scope.deleteGroup(group);
+        this.deleteGroup(group);
       },
       export: () => {
-        $scope.downloadCsv('/agents/groups');
+        this.downloadCsv('/agents/groups');
       },
       refresh: () => {
-        load();
+        this.loadGroups();
       }
     };
   };
 
-  // Come from the pencil icon on the groups table
-  $scope.openGroupFromList = group => {
-    $scope.editingFile = true;
-    $scope.groupsSelectedTab = 'files';
-    appState.setNavigation({ status: true });
-    $location.search('navigation', true);
-    return $scope.loadGroup(group).then(() => $scope.editGroupAgentConfig());
+  /**
+   * When clicking in the pencil icon this open the config group editor
+   * @param {Group} group 
+   */
+  openGroupFromList(group) {
+    this.editingFile = true;
+    this.groupsSelectedTab = 'files';
+    this.appState.setNavigation({ status: true });
+    this.location.search('navigation', true);
+    return this.loadGroup(group).then(() => this.editGroupAgentConfig());
   };
 }
