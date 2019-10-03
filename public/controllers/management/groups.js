@@ -47,23 +47,8 @@ export class GroupsController {
       await this.loadGroups();
 
       // Listeners
-      this.scope.$on('wazuhShowGroup', (ev, parameters) => {
-        ev.stopPropagation();
-        return this.loadGroup(parameters.group);
-      });
-
-      this.scope.$on('wazuhShowGroupFile', (ev, parameters) => {
-        ev.stopPropagation();
-        if (
-          ((parameters || {}).fileName || '').includes('agent.conf') &&
-          this.adminMode
-        ) {
-          return this.editGroupAgentConfig();
-        }
-        return this.showFile(parameters.groupName, parameters.fileName);
-      });
-
-      this.scope.$on('groupsIsReloaded', () => {
+      this.scope.$on('groupsIsReloaded', async() => {
+        await this.loadGroups();
         this.groupsSelectedTab = false;
         this.editingFile = false;
         this.currentGroup = false;
@@ -75,7 +60,7 @@ export class GroupsController {
       this.scope.$on('updateGroupInformation', this.updateGroupInformation());
 
       // Resetting the factory configuration
-      this.scope.$on('$destroy', () => {});
+      this.scope.$on('$destroy', () => { console.log('destroy') });
 
       this.scope.$watch('lookingGroup', value => {
         this.availableAgents = {
@@ -136,10 +121,9 @@ export class GroupsController {
         const filtered = data.data.data.items.filter(
           group => group.name === globalGroup
         );
-
         if (Array.isArray(filtered) && filtered.length) {
           // Load that our group
-          this.loadGroup(filtered[0], true);
+          this.loadGroup(filtered[0]);
           this.lookingGroup = true;
           this.addingAgents = false;
         } else {
@@ -155,8 +139,8 @@ export class GroupsController {
         const configuration = this.wazuhConfig.getConfig();
         this.adminMode = !!(configuration || {}).admin;
         this.load = false;
-        this.scope.$applyAsync();
       }
+      this.scope.$applyAsync();
     } catch (error) {
       return Promise.reject(error);
     }
@@ -212,11 +196,11 @@ export class GroupsController {
   /**
    * This load the group information to a given agent
    * @param {String} group
-   * @param {Boolean} firstTime
    */
-  async loadGroup(group, firstTime) {
+  async loadGroup(group) {
     try {
-      if (!firstTime) this.lookingGroup = true;
+      this.groupsSelectedTab = 'agents';
+      this.lookingGroup = true;
       const count = await this.apiReq.request(
         'GET',
         `/agents/groups/${group.name}/files`,
@@ -233,6 +217,8 @@ export class GroupsController {
       }
       this.scope.$emit('setCurrentGroup', { currentGroup: this.currentGroup });
       this.fileViewer = false;
+      this.load = false;
+      this.globalAgent = false;
       this.scope.$applyAsync();
     } catch (error) {
       this.errorHandler.handle(error, 'Groups');

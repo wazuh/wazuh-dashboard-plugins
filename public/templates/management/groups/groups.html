@@ -1,5 +1,7 @@
 <div flex layout="column" ng-class="{'cursor-wait': multipleSelectorLoading}" ng-controller="groupsPreviewController as gp"
     ng-if="mctrl.tab == 'groups'">
+
+    <!-- Main content -->
     <md-content flex layout="column" class=" overflow-hidden" ng-init="gp.lookingGroup=false">
         
         <!-- Loading ring -->
@@ -7,21 +9,23 @@
             <react-component name="EuiProgress" props="{size: 'xs', color: 'primary'}" />
         </div>
 
-        <!-- Headline -->
+        <!-- Main table (list of groups) -->
         <div ng-show="!gp.load" layout="column" layout-padding ng-if="(!gp.currentGroup || !gp.currentGroup.name) && gp.groupsTableProps && !gp.lookingGroup">
-                <react-component name="GroupsTable" props="gp.groupsTableProps" />
+            <react-component name="GroupsTable" props="gp.groupsTableProps" />
         </div>
-        <!-- End headline -->
+        <!-- End main table -->
 
-        <div flex layout="column" layout-align="start stretch" ng-show="!gp.load" ng-init="gp.groupsSelectedTab='agents'">
+        
+        <!-- Inside the group -->
+        <div flex layout="column" layout-align="start stretch" ng-show="!gp.load && gp.lookingGroup " ng-init="gp.groupsSelectedTab='agents'">
             <!-- MD5 Sums and Details cards -->
-            <div layout="row" class="md-padding" ng-if="gp.lookingGroup && gp.currentGroup">
+            <div layout="row" class="md-padding" ng-if="gp.currentGroup">
                 <span class="wz-headline-title font-size-18"><i class="fa fa-fw fa-object-group" aria-hidden="true"></i>
                     {{gp.currentGroup.name}}</span>
             </div>
 
-            <!-- End group actions -->
-            <div ng-if="gp.lookingGroup && gp.currentGroup && !gp.addingAgents && !gp.editingFile && gp.groupsTabsProps" class="md-margin-h">
+            <!-- Tabs for the groups Agents / Files -->
+            <div ng-if="gp.currentGroup && !gp.addingAgents && !gp.editingFile && gp.groupsTabsProps" class="md-margin-h">
                 <react-component name="Tabs" props="gp.groupsTabsProps" />
             </div>
 
@@ -43,10 +47,10 @@
                     </wz-xml-file-editor>
                 </div>
             </div>
-            <!-- XML editor for group agents -->
+            <!-- End XML editor for group agents -->
 
             <div ng-if="!gp.editingFile">
-                <div layout="row" class="md-padding" ng-if="gp.lookingGroup && gp.currentGroup && gp.addingAgents">
+                <div layout="row" class="md-padding" ng-if="gp.currentGroup && gp.addingAgents">
                     <span ng-click='gp.addMultipleAgents(false)' class='wz-margin-top-3 kuiButton kuiButton--hollow'>
                         Cancel</span>
                     <span ng-hide='moreThan500' ng-click='gp.saveAddAgents()' class='btn wz-button wz-margin-left-8'><i
@@ -58,7 +62,7 @@
 
                 <div ng-if='!gp.addingAgents'>
                     <!-- Group agents table -->
-                    <md-card flex class="wz-md-card _md flex md-margin-h wz-margin-top-16" ng-if="gp.lookingGroup && gp.groupsSelectedTab==='agents' && gp.currentGroup">
+                    <md-card flex class="wz-md-card _md flex md-margin-h wz-margin-top-16" ng-if="gp.groupsSelectedTab==='agents' && gp.currentGroup">
                         <md-card-actions layout="row" class="wz-card-actions wz-card-actions-top layout-align-end-center">
                             <react-component name="ExportConfiguration" ng-hide="gp.reportBusy && gp.reportStatus" props="gp.exportConfigurationProps" />
                             <react-component ng-show="gp.reportBusy && gp.reportStatus" name="EuiLoadingSpinner" props="{size:'m'}" />
@@ -80,7 +84,7 @@
                                 <wz-table flex custom-columns="true" path="'/agents/groups/' + gp.currentGroup.name" keys="['id','name','ip','status','os.name','os.version','version']"
                                     allow-click="true" row-sizes="[14,12,10]" empty-results="'No agents were added to this group.'" />
                             </div>
-                            <div layout="row" ng-if="gp.lookingGroup && gp.groupsSelectedTab==='agents'">
+                            <div layout="row" ng-if="gp.groupsSelectedTab==='agents'">
                                 <span flex></span>
                                 <button type="button" ng-click="gp.downloadCsv('/agents/groups/' + gp.currentGroup.name)"
                                     class="euiButtonEmpty euiButtonEmpty--primary euiButtonEmpty--small">
@@ -94,7 +98,7 @@
                     </md-card>
 
                     <!-- Group files table -->
-                    <md-card flex class="wz-md-card _md flex md-margin-h wz-margin-top-16" ng-if="gp.lookingGroup && gp.groupsSelectedTab==='files' && !gp.fileViewer && gp.currentGroup">
+                    <md-card flex class="wz-md-card _md flex md-margin-h wz-margin-top-16" ng-if="gp.groupsSelectedTab==='files' && !gp.fileViewer && gp.currentGroup">
                         <md-card-actions layout="row" class="wz-card-actions wz-card-actions-top layout-align-end-center">
                             <react-component name="ExportConfiguration" ng-hide="gp.reportBusy && gp.reportStatus" props="gp.exportConfigurationProps" />
                             <react-component ng-show="gp.reportBusy && gp.reportStatus" name="EuiLoadingSpinner" props="{size:'m'}" />
@@ -105,7 +109,7 @@
                                     keys="[{value:'filename',width:'300px'},'hash']" allow-click="true" row-sizes="[16,14,12]">
                                 </wz-table>
                             </div>
-                            <div layout="row" ng-if="gp.lookingGroup && gp.groupsSelectedTab==='files' && !gp.file">
+                            <div layout="row" ng-if="gp.groupsSelectedTab==='files' && !gp.file">
                                 <span flex></span>
                                 <button type="button" ng-click="gp.downloadCsv('/agents/groups/' + gp.currentGroup.name + '/files')"
                                     class="euiButtonEmpty euiButtonEmpty--primary euiButtonEmpty--small">
@@ -115,8 +119,7 @@
                                     </span>
                                 </button>
                             </div>
-                        </md-card-content>
-                    </md-card>
+                        </md-card-content>                    </md-card>
                     <!-- End Group files table -->
 
                     <!-- CSV Download button section for group files-->
@@ -124,7 +127,7 @@
                     <!-- End CSV Download button section for group files -->
 
                     <!-- File JSON viewer section -->
-                    <div flex layout="column" class="md-padding" ng-if="gp.lookingGroup && gp.groupsSelectedTab==='files' && gp.file">
+                    <div flex layout="column" class="md-padding" ng-if="gp.groupsSelectedTab==='files' && gp.file">
                         <div flex layout="column">
                             <div layout="row" class="wz-padding-bottom-14">
                                 <span flex class="wz-headline-title">{{ gp.filename }}</span>
@@ -152,5 +155,6 @@
                 </div>
             </div>
         </div>
+        <!-- End inside the group -->
     </md-content>
 </div>
