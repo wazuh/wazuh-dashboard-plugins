@@ -223,7 +223,7 @@ export function settingsWizard(
           .request('GET', '/hosts/apis')
           .then(async data => {
             if (data.data.length > 0) {
-              // Try to set some API entrie as default
+              // Try to set some API entry as default
               await tryToSetDefault(data.data);
 
             } else {
