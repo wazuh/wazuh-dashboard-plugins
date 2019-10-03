@@ -627,7 +627,7 @@ export class GroupsController {
       this.addMultipleAgents(false);
       this.multipleSelectorLoading = false;
       await this.updateGroupInformation(null, {
-        group: this.scope.currentGroup.name
+        group: this.currentGroup.name
       });
     } catch (err) {
       this.multipleSelectorLoading = false;
@@ -643,7 +643,7 @@ export class GroupsController {
 
   checkLimit() {
     if (this.firstSelectedList) {
-      const itemsToSave = getItemsToSave();
+      const itemsToSave = this.getItemsToSave();
       this.currentAdding = itemsToSave.addedIds.length;
       this.currentDeleting = itemsToSave.deletedIds.length;
       this.moreThan500 =
