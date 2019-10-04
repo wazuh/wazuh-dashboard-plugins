@@ -177,6 +177,7 @@ export function settingsWizard(
     // Iterates the API entries in order to set one as default
     const tryToSetDefault = async apis => {
       try {
+        let errors = 0;
         for (let idx in apis) {
           const api = apis[idx];
           const id = api.id;
@@ -194,7 +195,11 @@ export function settingsWizard(
               break;
             }
           } catch (error) {
-            //Do nothing in order to follow the flow of the for
+            // Sum errors to check if any API could be selected
+            errors++;
+            if (errors >= apis.length) {
+              throw new Error('Could not select any API entry');
+            }
           }
         }
       } catch (error) {
@@ -225,7 +230,6 @@ export function settingsWizard(
             if (data.data.length > 0) {
               // Try to set some API entrie as default
               await tryToSetDefault(data.data);
-
             } else {
               setUpCredentials(
                 'Wazuh App: Please set up Wazuh API credentials.'
