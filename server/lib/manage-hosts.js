@@ -79,6 +79,24 @@ export class ManageHosts {
   }
 
   /**
+   * This function checks if the hosts: key exists in the wazuh.yml for preventing duplicate in case of there's not any host defined
+   */
+  async checkIfHostsKeyExists() {
+    try {
+      log('manage-hosts:checkIfHostsKeyExists', 'Checking hosts key', 'debug');
+      this.busy = true;
+      const raw = fs.readFileSync(this.file, { encoding: 'utf-8' });
+      this.busy = false;
+      const content = yml.load(raw);
+      return Object.keys(content || {}).includes('hosts');
+    } catch (error) {
+      log('manage-hosts:checkIfHostsKeyExists', error.message || error);
+      this.busy = false;
+      return Promise.reject(error);
+    }
+  }
+
+  /**
    * Returns the IDs of the current hosts in the wazuh.yml
    */
   async getCurrentHostsIds() {
@@ -222,9 +240,9 @@ export class ManageHosts {
       const hosts = await this.getHosts() || [];
       this.busy = true;
       if (!hosts.length) {
-        const result = `${data}\nhosts:\n${compose}\n`;
+        const hostsExists = await this.checkIfHostsKeyExists();
+        const result = !hostsExists ? `${data}\nhosts:\n${compose}\n` : `${data}\n${compose}\n`;
         await fs.writeFileSync(this.file, result, 'utf8');
-        data = await fs.readFileSync(this.file, { encoding: 'utf-8' });
       } else {
         const lastHost = (hosts || []).pop();
         if (lastHost) {
