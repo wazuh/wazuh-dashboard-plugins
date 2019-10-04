@@ -235,6 +235,7 @@ export function settingsWizard(
                 'Wazuh App: Default API has been updated.',
                 defaultApi
               );
+              $location.path('/settings');
             } else {
               setUpCredentials(
                 'Wazuh App: Please set up Wazuh API credentials.'
