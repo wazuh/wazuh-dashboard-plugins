@@ -63,14 +63,6 @@ export class AgentsInGroupTable extends Component {
     }
   }
 
-  /**
-   * Sends to the agent given overview
-   * @param {String} agent
-   */
-  goToAgent(agent) {
-    console.log('going to ', agent)
-  }
-
   showConfirm(groupName) {
     this.setState({
       showConfirm: groupName
@@ -126,7 +118,7 @@ export class AgentsInGroupTable extends Component {
                       <EuiFlexItem grow={false}>
                         <EuiButtonIcon
                           aria-label="View group details"
-                          onClick={() => this.goToAgent(item.id)}
+                          onClick={() => this.props.goToAgent(item)}
                           iconType="eye"
                         />
                       </EuiFlexItem>
@@ -236,6 +228,7 @@ AgentsInGroupTable.propTypes = {
   getAgentsByGroup: PropTypes.func,
   addAgents: PropTypes.func,
   export: PropTypes.func,
-  removeAgentFromGroup: PropTypes.func
+  removeAgentFromGroup: PropTypes.func,
+  goToAgent: PropTypes.func
 };
 

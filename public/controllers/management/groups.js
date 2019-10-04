@@ -104,7 +104,8 @@ export class GroupsController {
         getAgentsByGroup: group => this.getAgentsByGroup(group),
         addAgents: () => this.addMultipleAgents(true),
         export: group => this.downloadCsv(`/agents/groups/${group}`),
-        removeAgentFromGroup: (agent, group) => this.removeAgentFromGroup(agent, group)
+        removeAgentFromGroup: (agent, group) => this.removeAgentFromGroup(agent, group),
+        goToAgent: agent => this.goToAgent(agent)
       };
 
       return;
@@ -738,5 +739,17 @@ export class GroupsController {
     } catch (error) {
       this.errorHandler.handle(error.message || error);
     }
+  }
+
+  /**
+   * Navigate to an agent
+   */
+  goToAgent(item) {
+    this.shareAgent.setAgent(item);
+    this.shareAgent.setTargetLocation({
+      tab: 'welcome',
+      subTab: 'panels'
+    });
+    this.location.path('/agents');
   }
 }
