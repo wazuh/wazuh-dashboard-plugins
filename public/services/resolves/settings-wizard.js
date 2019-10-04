@@ -257,7 +257,7 @@ export function settingsWizard(
         const apiId = (JSON.parse(currentApi) || {}).id;
         genericReq
           .request('GET', '/hosts/apis')
-          .then(data => {
+          .then(async data => {
             if (
               data.data.length > 0 &&
               data.data.find(api => api.id == apiId)
@@ -266,16 +266,13 @@ export function settingsWizard(
             } else {
               appState.removeCurrentAPI();
               if (data.data.length > 0) {
-                const api = data.data[0];
-                const id = api.id;
-                const defaultApi = JSON.stringify({
-                  name: api.cluster_info.manager,
-                  id: id
-                });
+                // Try to set some API entrie as default
+                const defaultApi = await tryToSetDefault(data.data);
                 setUpCredentials(
                   'Wazuh App: Default API has been updated.',
                   defaultApi
                 );
+                $location.path('/settings');
               } else {
                 setUpCredentials(
                   'Wazuh App: Please set up Wazuh API credentials.',
