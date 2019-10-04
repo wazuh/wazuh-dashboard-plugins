@@ -185,14 +185,15 @@ export function settingsWizard(
             const clus = await testAPI.check(api);
             api.cluster_info = clus.data;
             if (api && api.cluster_info && api.cluster_info.manager) {
+              const defaultApi = JSON.stringify({
+                name: api.cluster_info.manager,
+                id: id
+              });
               appState.setCurrentAPI(
-                JSON.stringify({
-                  name: api.cluster_info.manager,
-                  id: id
-                })
+                defaultApi
               );
               callCheckStored();
-              break;
+              return defaultApi;
             }
           } catch (error) {
             // Sum errors to check if any API could be selected
@@ -229,7 +230,11 @@ export function settingsWizard(
           .then(async data => {
             if (data.data.length > 0) {
               // Try to set some API entrie as default
-              await tryToSetDefault(data.data);
+              const defaultApi = await tryToSetDefault(data.data);
+              setUpCredentials(
+                'Wazuh App: Default API has been updated.',
+                defaultApi
+              );
             } else {
               setUpCredentials(
                 'Wazuh App: Please set up Wazuh API credentials.'
