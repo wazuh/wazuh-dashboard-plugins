@@ -61,7 +61,7 @@
                 </div>
 
                 <div ng-if='!gp.addingAgents'>
-                    <!-- Group agents table -->
+                <!-- Group agents table -->
 
                 <!-- buttons to add agents TODO set in a new component -->
                 <div>
@@ -71,14 +71,10 @@
                         <react-component name="EuiIcon" props="{type:'pencil', color:'primary'}" />
                         Edit group configuration
                     </button>
-                    <button ng-if="gp.lookingGroup && gp.currentGroup && !gp.addingAgents && !gp.editingFile && !gp.file && gp.adminMode && gp.groupsSelectedTab==='agents'"
-                        class="euiFlexItem euiFlexItem--flexGrowZero height-35 kuiButton kuiButton--secondary ng-scope wz-margin-left-8"
-                        ng-click="gp.addMultipleAgents(true)" aria-label="Add or remove agents">
-                        <react-component name="EuiIcon" props="{type:'plusInCircle', color:'primary'}" />
-                        Add or remove agents
-                    </button>
                 </div>
                 <!-- end buttons to add agents -->
+                    
+                    <react-component ng-if="gp.currentGroup" name="AgentsInGroupTable" props="gp.agentsInGroupTableProps"/>
 
                     <md-card flex class="wz-md-card _md flex md-margin-h wz-margin-top-16" ng-if="gp.groupsSelectedTab==='agents' && gp.currentGroup">
                         <md-card-actions layout="row" class="wz-card-actions wz-card-actions-top layout-align-end-center">
@@ -163,8 +159,8 @@
                 </div>
 
                 <div layout="row" class="md-padding" ng-if="gp.addingAgents">
-                    <span ng-show='!gp.multipleSelectorLoading' class="wzMultipleSelectorCounter"><span style='color:green'>+{{gp.currentAdding}}</span>&nbsp;<span>
-                            style='color:red'>-{{gp.currentDeleting}}</span></span>
+                    <span ng-show='!gp.multipleSelectorLoading' class="wzMultipleSelectorCounter"><span style='color:green'>+{{gp.currentAdding}}</span>&nbsp;
+                    <span style='color:red'>-{{gp.currentDeleting}}</span></span>
                     <wz-multiple-selector class='wzMultipleSelector' available-items="gp.availableAgents.data"
                         selected-items="gp.selectedAgents.data" title-available-items="Available agents"
                         title-selected-items="Current agents in the group" total-selected-items="gp.totalSelectedAgents"

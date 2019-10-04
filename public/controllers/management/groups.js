@@ -47,7 +47,7 @@ export class GroupsController {
       await this.loadGroups();
 
       // Listeners
-      this.scope.$on('groupsIsReloaded', async() => {
+      this.scope.$on('groupsIsReloaded', async () => {
         await this.loadGroups();
         this.groupsSelectedTab = false;
         this.editingFile = false;
@@ -86,7 +86,7 @@ export class GroupsController {
       this.exportConfigurationProps = {
         exportConfiguration: enabledComponents => this.exportConfiguration(enabledComponents),
         type: 'group'
-      }
+      };
 
       this.groupsTabsProps = {
         clickAction: tab => {
@@ -99,6 +99,14 @@ export class GroupsController {
         selectedTab: this.groupsSelectedTab || 'agents',
         tabs: [{ id: 'agents', name: 'Agents' }, { id: 'files', name: 'Content' }]
       };
+
+      this.agentsInGroupTableProps = {
+        getAgentsByGroup: group => this.getAgentsByGroup(group),
+        addAgents: () => this.addMultipleAgents(true),
+        export: group => this.downloadCsv(`/agents/groups/${group}`),
+        removeAgentFromGroup: (agent, group) => this.removeAgentFromGroup(agent, group)
+      };
+
       return;
     } catch (error) {
       this.errorHandler.handle(error, 'Groups');
@@ -209,6 +217,7 @@ export class GroupsController {
       this.totalFiles = count.data.data.totalItems;
       this.fileViewer = false;
       this.currentGroup = group;
+      this.agentsInGroupTableProps.group = this.currentGroup;
       this.groupsSelectedTab = 'agents';
       this.location.search('currentGroup', group.name);
       if (this.location.search() && this.location.search().navigation) {
@@ -700,4 +709,34 @@ export class GroupsController {
     this.location.search('navigation', true);
     return this.loadGroup(group).then(() => this.editGroupAgentConfig());
   };
+
+  /**
+   * Returns the agents in a group
+   * @param {String} group 
+   */
+  async getAgentsByGroup(group) {
+    try {
+      const g = group || this.currentGroup.name;
+      const result = await this.apiReq.request('GET', `/agents/groups/${g}`, {});
+      const agents = (((result || {}).data || {}).data || {}).items || [];
+      return agents;
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  }
+
+  /**
+   * Removes an agent from a group
+   * @param {String} agent
+   * @param {Strin} group
+   */
+  async removeAgentFromGroup(agent, group) {
+    try {
+      const g = group || this.currentGroup.name
+      const data = await this.groupHandler.removeAgentFromGroup(g, agent);
+      this.errorHandler.info(((data || {}).data || {}).data);
+    } catch (error) {
+      this.errorHandler.handle(error.message || error);
+    }
+  }
 }
