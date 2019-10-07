@@ -29,21 +29,25 @@ import {
   EuiCallOut
 } from '@elastic/eui';
 
-export class GroupsTable extends Component {  
+export class GroupsTable extends Component {
   _isMounted = false;
   constructor(props) {
     super(props);
 
     this.state = {
       items: this.props.items,
+      originalItems: this.props.items,
       pageIndex: 0,
       pageSize: 10,
       showPerPageOptions: true,
       showConfirm: false,
       newGroupName: '',
       isPopoverOpen: false,
-      msg: false
+      msg: false,
+      isLoading: false
     };
+
+    this.filters = { name: 'search', value: '' };
   }
 
   /**
@@ -54,6 +58,7 @@ export class GroupsTable extends Component {
       this.setState({ refreshingGroups: true });
       await this.props.refresh();
       this.setState({
+        originalItems: this.props.items,
         refreshingGroups: false
       });
     } catch (error) {
@@ -151,6 +156,24 @@ export class GroupsTable extends Component {
     }
   }
 
+
+  onQueryChange = ({ query }) => {
+    if (query) {
+      this.setState({ isLoading: true });
+      const filter = query.text || "";
+      this.filters.value = filter;
+      const items = filter
+        ? this.state.originalItems.filter(item => {
+          return item.name.toLowerCase().includes(filter.toLowerCase());
+        })
+        : this.state.originalItems;
+      this.setState({
+        isLoading: false,
+        items: items,
+      });
+    }
+  };
+
   render() {
     const columns = [
       {
@@ -234,6 +257,7 @@ export class GroupsTable extends Component {
     ];
 
     const search = {
+      onChange: this.onQueryChange,
       box: {
         incremental: this.state.incremental,
         schema: true
@@ -309,7 +333,7 @@ export class GroupsTable extends Component {
           <EuiFlexItem grow={false}>
             <EuiButtonEmpty
               iconType="importAction"
-              onClick={async () => await this.props.export()}
+              onClick={async () => await this.props.export([this.filters])}
             >
               Export formatted
             </EuiButtonEmpty>
@@ -334,7 +358,7 @@ export class GroupsTable extends Component {
           columns={columns}
           search={search}
           pagination={true}
-          loading={this.state.refreshingGroups}
+          loading={this.state.refreshingGroups || this.state.isLoading}
         />
       </EuiPanel>
     );

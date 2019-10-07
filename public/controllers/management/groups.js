@@ -103,7 +103,7 @@ export class GroupsController {
       this.agentsInGroupTableProps = {
         getAgentsByGroup: group => this.getAgentsByGroup(group),
         addAgents: () => this.addMultipleAgents(true),
-        export: group => this.downloadCsv(`/agents/groups/${group}`),
+        export: (group, filters) => this.downloadCsv(`/agents/groups/${group}`, filters),
         removeAgentFromGroup: (agent, group) => this.removeAgentFromGroup(agent, group),
         goToAgent: agent => this.goToAgent(agent),
         exportConfigurationProps: this.exportConfigurationProps
@@ -160,19 +160,18 @@ export class GroupsController {
   * Get full data on CSV format from a path
   * @param {String} path path with data to convert
   */
-  async downloadCsv(path) {
+  async downloadCsv(path, filters) {
     try {
       this.errorHandler.info('Your download should begin automatically...', 'CSV');
       const currentApi = JSON.parse(this.appState.getCurrentAPI()).id;
       const output = await this.csvReq.fetch(
         path,
         currentApi,
-        //this.wzTableFilter.get()//TODO solve the filter problems
+        filters
       );
       const blob = new Blob([output], { type: 'text/csv' }); // eslint-disable-line
 
-      FileSaver.saveAs(blob, 'groups.csv');
-
+      FileSaver.saveAs(blob, 'groups.csv');      
       return;
     } catch (error) {
       this.errorHandler.handle(error, 'Download CSV');
@@ -691,8 +690,8 @@ export class GroupsController {
       deleteGroup: group => {
         this.deleteGroup(group);
       },
-      export: () => {
-        this.downloadCsv('/agents/groups');
+      export: (filters) => {
+        this.downloadCsv('/agents/groups', filters);
       },
       refresh: () => {
         this.loadGroups();

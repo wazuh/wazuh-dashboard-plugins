@@ -31,8 +31,12 @@ export class AgentsInGroupTable extends Component {
 
     this.state = {
       group: 'Group',
-      agents: []
+      agents: [],
+      originalAgents: [],
+      isLoading: false,
     };
+
+    this.filters = { name: 'search', value: '' };
   }
 
   async componentDidMount() {
@@ -40,13 +44,30 @@ export class AgentsInGroupTable extends Component {
       const agents = await this.props.getAgentsByGroup(this.props.group.name);
       this.setState({
         groupName: this.props.group.name || 'Group',
-        agents: agents
+        agents: agents,
+        originalAgents: agents
       });
     } catch (error) {
       console.error('error mounting the component ', error)
     }
   }
 
+  onQueryChange = ({ query }) => {
+    if (query) {
+      this.setState({ isLoading: true });
+      const filter = query.text || "";
+      this.filters.value = filter;
+      const items = filter
+        ? this.state.originalAgents.filter(item => {
+          return item.name.toLowerCase().includes(filter.toLowerCase());
+        })
+        : this.state.originalAgents;
+      this.setState({
+        isLoading: false,
+        agents: items,
+      });
+    }
+  };
 
   /**
    * Refresh the agents
@@ -56,11 +77,11 @@ export class AgentsInGroupTable extends Component {
       this.setState({ refreshingAgents: true });
       const agents = await this.props.getAgentsByGroup(this.props.group.name);
       this.setState({
-        agents: agents,
+        originalAgents: agents,
         refreshingAgents: false
       });
     } catch (error) {
-      this.setState({ refreshingAgents: true });
+      this.setState({ refreshingAgents: false });
       console.error('error refreshing agents ', error)
     }
   }
@@ -164,6 +185,7 @@ export class AgentsInGroupTable extends Component {
     ];
 
     const search = {
+      onChange: this.onQueryChange,
       box: {
         incremental: this.state.incremental,
         schema: true
@@ -199,7 +221,7 @@ export class AgentsInGroupTable extends Component {
           <EuiFlexItem grow={false}>
             <EuiButtonEmpty
               iconType="importAction"
-              onClick={async () => await this.props.export(this.state.groupName)}
+              onClick={async () => await this.props.export(this.state.groupName, [this.filters])}
             >
               Export formatted
             </EuiButtonEmpty>
@@ -223,7 +245,7 @@ export class AgentsInGroupTable extends Component {
           columns={columns}
           search={search}
           pagination={true}
-          loading={this.state.refreshingAgents}
+          loading={this.state.refreshingAgents || this.state.isLoading}
         />
       </EuiPanel>
     );
