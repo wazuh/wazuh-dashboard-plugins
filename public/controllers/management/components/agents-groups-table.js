@@ -30,7 +30,7 @@ export class AgentsInGroupTable extends Component {
     super(props);
 
     this.state = {
-      group: 'Group',
+      groupName: this.props.group.name || 'Group',
       agents: [],
       originalAgents: [],
       isLoading: false,
@@ -43,7 +43,6 @@ export class AgentsInGroupTable extends Component {
     try {
       const agents = await this.props.getAgentsByGroup(this.props.group.name);
       this.setState({
-        groupName: this.props.group.name || 'Group',
         agents: agents,
         originalAgents: agents
       });
@@ -199,7 +198,7 @@ export class AgentsInGroupTable extends Component {
             <EuiFlexGroup>
               <EuiFlexItem>
                 <EuiTitle>
-                  <h2>{`${this.state.groupName} group`}</h2>
+                  <h2>{this.state.groupName}</h2>
                 </EuiTitle>
               </EuiFlexItem>
             </EuiFlexGroup>
