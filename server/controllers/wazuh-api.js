@@ -1163,30 +1163,38 @@ export class WazuhApiCtrl {
           path.includes('/lists') && (!filters || !filters.length);
         const isAgents = path.includes('/agents') && !path.includes('groups');
         const isAgentsOfGroup = path.startsWith('/agents/groups/');
+        const isFiles = path.endsWith('/files');
         let fields = Object.keys(output.body.data.items[0]);
 
         if (isAgents || isAgentsOfGroup) {
-          fields = [
-            'id',
-            'status',
-            'name',
-            'ip',
-            'group',
-            'manager',
-            'node_name',
-            'dateAdd',
-            'version',
-            'lastKeepAlive',
-            'os.arch',
-            'os.build',
-            'os.codename',
-            'os.major',
-            'os.minor',
-            'os.name',
-            'os.platform',
-            'os.uname',
-            'os.version'
-          ];
+          if (isFiles) {
+            fields = [
+              'filename',
+              'hash'
+            ];
+          } else {
+            fields = [
+              'id',
+              'status',
+              'name',
+              'ip',
+              'group',
+              'manager',
+              'node_name',
+              'dateAdd',
+              'version',
+              'lastKeepAlive',
+              'os.arch',
+              'os.build',
+              'os.codename',
+              'os.major',
+              'os.minor',
+              'os.name',
+              'os.platform',
+              'os.uname',
+              'os.version'
+            ];
+          }
         }
 
         if (isArrayOfLists) {
