@@ -57,6 +57,17 @@ export class GroupsController {
         this.scope.$applyAsync();
       });
 
+      this.scope.$on('wazuhShowGroupFile', (ev, parameters) => {
+        ev.stopPropagation();
+        if (
+          ((parameters || {}).fileName || '').includes('agent.conf') &&
+          this.scope.adminMode
+        ) {
+          return this.editGroupAgentConfig();
+        }
+        return this.showFile(parameters.groupName, parameters.fileName);
+      });
+
       this.scope.$on('updateGroupInformation', this.updateGroupInformation());
 
       // Resetting the factory configuration
