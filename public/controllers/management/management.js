@@ -28,7 +28,8 @@ export class ManagementController {
     configHandler,
     errorHandler,
     $interval,
-    apiReq
+    apiReq,
+    rulesetHandler
   ) {
     this.$scope = $scope;
     this.$rootScope = $rootScope;
@@ -47,6 +48,9 @@ export class ManagementController {
     this.wazuhManagementTabs = ['ruleset', 'groups', 'configuration'];
     this.statusReportsTabs = ['status', 'logs', 'reporting', 'monitoring'];
     this.currentGroup = false;
+    this.logtestOpened = false;
+    this.uploadOpened = false;
+    this.rulesetHandler = rulesetHandler;
 
     this.$scope.$on('setCurrentGroup', (ev, params) => {
       this.currentGroup = (params || {}).currentGroup || false;
@@ -55,6 +59,7 @@ export class ManagementController {
     this.$scope.$on('removeCurrentGroup', () => {
       this.currentGroup = false;
       this.appState.setNavigation({ status: true });
+      this.$location.search('currentGroup', null);
     });
 
     this.$scope.$on('setCurrentRule', (ev, params) => {
@@ -157,7 +162,7 @@ export class ManagementController {
       tabs: [
         { id: 'rules', name: 'Rules' },
         { id: 'decoders', name: 'Decoders' },
-        { id: 'cdblists', name: 'Lists' }
+        { id: 'lists', name: 'Lists' }
       ]
     };
 
@@ -170,6 +175,12 @@ export class ManagementController {
         { id: 'monitoring', name: 'Cluster' },
         { id: 'reporting', name: 'Reporting' }
       ]
+    };
+
+    this.logtestProps = {
+      clickAction: log => this.testLogtest(log),
+      close: () => this.openLogtest(),
+      showClose: true
     };
   }
 
@@ -193,6 +204,12 @@ export class ManagementController {
       this.tab = location.tab;
       this.switchTab(this.tab);
     }
+
+    this.uploadFilesProps = {
+      msg: this.$scope.mctrl.rulesetTab,
+      path: `etc/${this.$scope.mctrl.rulesetTab}`,
+      upload: (files, path) => this.uploadFiles(files, path)
+    };
   }
 
   /**
@@ -282,6 +299,10 @@ export class ManagementController {
     if (this.tab === 'groups') {
       this.$scope.$broadcast('groupsIsReloaded');
     }
+    if (this.tab !== 'groups') {
+      this.currentGroup = false;
+      this.$location.search('currentGroup', null);
+    }
     if (this.tab === 'configuration' && !this.editTab) {
       this.globalConfigTab = 'overview';
       this.currentConfiguration = false;
@@ -303,7 +324,6 @@ export class ManagementController {
       this.currentList = false;
       this.managementTabsProps.selectedTab = this.tab;
     }
-
     this.$location.search('tab', this.tab);
     this.loadNodeList();
   }
@@ -313,9 +333,11 @@ export class ManagementController {
    * @param {String} tab
    */
   setRulesTab(tab, flag) {
+    this.openedFileDirect = false;
     this.rulesetTab = tab;
     this.globalRulesetTab = this.rulesetTab;
     this.managingFiles = false;
+    this.refreshUploadFileProps();
     if (!flag) {
       this.breadCrumbBack();
     }
@@ -346,6 +368,7 @@ export class ManagementController {
       this.switchTab('ruleset', true);
       this.setRulesTab('rules');
     }
+    this.$scope.$broadcast('closeRulesetFile');
     this.$scope.$applyAsync();
   }
 
@@ -377,4 +400,82 @@ export class ManagementController {
     this.loadingNodes = false;
     this.$scope.$applyAsync();
   }
-}
+
+  openLogtest() {
+    this.logtestOpened = !this.logtestOpened;
+    this.$scope.$applyAsync();
+  }
+
+  newFile() {
+    this.openedFileDirect = true;
+    this.switchFilesSubTab();
+    this.$scope.$applyAsync();
+    this.$scope.$broadcast('addNewFile', { type: this.globalRulesetTab });
+  }
+
+  testLogtest = async log => {
+    //return await this.apiReq.request('GET', '/testlog', {log});
+    const sleep = m => new Promise(r => setTimeout(r, m));
+    await sleep(1000);
+    return `**Phase 1: Completed pre-decoding.
+    full event: 'timestamp:2019-09-03T13:22:27.950+0000 rule:level:7 rule:description:python: Undocumented local_file protocol allows remote attackers to bypass protection mechanisms rule:id:23504 rule:firedtimes:33 rule:mail:false rule:groups:[vulnerability-detector] rule:gdpr:[IV_35.7.d] agent:id:000 agent:name:a205e5b2a1aa manager:{name:a205e5b2a1aa} id:1567516947.252273 cluster:name:wazuh cluster:node:master decoder:{name:json} data:{vulnerability:cve:CVE-2019-9948} data:{vulnerability:title:python: Undocumented local_file protocol allows remote attackers to bypass protection mechanisms} data:{vulnerability:severity:Medium} data:{vulnerability:published:2019-03-23T00:00:00+00:00} data:{vulnerability:state:Fixed} data:{vulnerability:cvss:{cvss3_score:7.400000}} data:{vulnerability:package:name:python} data:{vulnerability:package:version:2.7.5-80.el7_6} data:{vulnerability:package:condition:less than 2.7.5-86.el7} data:{vulnerability:advisories:RHSA-2019:2030,RHSA-2019:1700} data:{vulnerability:cwe_reference:CWE-749} data:{vulnerability:bugzilla_reference:https://bugzilla.redhat.com/show_bug.cgi?id=1695570} data:{vulnerability:reference:https://access.redhat.com/security/cve/CVE-2019-9948} location:vulnerability-detector'
+    timestamp: '(null)'
+    hostname: 'a205e5b2a1aa'
+    program_name: '(null)'
+    log: 'timestamp:2019-09-03T13:22:27.950+0000 rule:level:7 rule:description:python: Undocumented local_file protocol allows remote attackers to bypass protection mechanisms rule:id:23504 rule:firedtimes:33 rule:mail:false rule:groups:[vulnerability-detector] rule:gdpr:[IV_35.7.d] agent:id:000 agent:name:a205e5b2a1aa manager:{name:a205e5b2a1aa} id:1567516947.252273 cluster:name:wazuh cluster:node:master decoder:{name:json} data:{vulnerability:cve:CVE-2019-9948} data:{vulnerability:title:python: Undocumented local_file protocol allows remote attackers to bypass protection mechanisms} data:{vulnerability:severity:Medium} data:{vulnerability:published:2019-03-23T00:00:00+00:00} data:{vulnerability:state:Fixed} data:{vulnerability:cvss:{cvss3_score:7.400000}} data:{vulnerability:package:name:python} data:{vulnerability:package:version:2.7.5-80.el7_6} data:{vulnerability:package:condition:less than 2.7.5-86.el7} data:{vulnerability:advisories:RHSA-2019:2030,RHSA-2019:1700} data:{vulnerability:cwe_reference:CWE-749} data:{vulnerability:bugzilla_reference:https://bugzilla.redhat.com/show_bug.cgi?id=1695570} data:{vulnerability:reference:https://access.redhat.com/security/cve/CVE-2019-9948} location:vulnerability-detector'
+  **Phase 2: Completed decoding.
+    No decoder matched.
+  **Phase 3: Completed filtering (rules).
+    Rule id: '1002'
+    Level: '2'
+    Description: 'Unknown problem somewhere in the system.'`;
+  };
+
+  openUploadFile() {
+    this.uploadOpened = !this.uploadOpened;
+    this.$scope.$applyAsync();
+  }
+
+  refreshUploadFileProps() {
+    this.uploadFilesProps = {
+      msg: this.rulesetTab,
+      path: `etc/${this.rulesetTab}`,
+      upload: (files, path) => this.uploadFiles(files, path)
+    };
+  }
+
+  /**
+   * Uploads the files
+   * @param {Array} files
+   * @param {String} path
+   */
+  async uploadFiles(files, path) {
+    try {
+      this.errors = false;
+      this.results = [];
+      if (path === 'etc/rules') {
+        this.upload = this.rulesetHandler.sendRuleConfiguration
+      } else if (path === 'etc/decoders') {
+        this.upload = this.rulesetHandler.sendDecoderConfiguration
+      } else {
+        this.upload = this.rulesetHandler.sendCdbList
+      }
+      for (let idx in files) {
+        const { file, content } = files[idx];
+        try {
+          await this.upload(file, content, true); // True does not overwrite the file  
+          this.results.push({index: idx, uploaded: true, file: file, error: 0});
+        } catch (error) {
+          this.errors = true
+          this.results.push({index: idx, uploaded: false, file: file, error: error});
+        }
+      }
+      if (this.errors) throw this.results;
+      this.errorHandler.info('Upload successful');
+      return;
+    } catch (error) {
+      if (Array.isArray(error) && error.length) return Promise.reject(error);
+      this.errorHandler.handle('Files cannot be uploaded');
+    }
+  }
+}     
