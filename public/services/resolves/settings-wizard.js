@@ -29,6 +29,7 @@ export function settingsWizard(
     const checkResponse = data => {
       let fromWazuhHosts = false;
       if (parseInt(data.data.error) === 2) {
+        console.log('default akaaakaa')
         !disableErrors &&
           errorHandler.handle(
             'Please set up Wazuh API credentials.',
@@ -235,12 +236,12 @@ export function settingsWizard(
                 'Wazuh App: Default API has been updated.',
                 defaultApi
               );
-              $location.path('/settings');
             } else {
               setUpCredentials(
                 'Wazuh App: Please set up Wazuh API credentials.'
               );
             }
+            $location.path('/settings');
             deferred.resolve();
           })
           .catch(error => {

@@ -203,7 +203,11 @@ export class HealthCheck {
       this.$scope.$applyAsync();
       return;
     } catch (error) {
-      this.handleError(error);
+      if (error && error.data && error.data.code && error.data.code === 3002) {
+        return error;
+      } else {
+        this.handleError(error);
+      }
     }
   }
 
