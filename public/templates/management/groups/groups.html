@@ -18,12 +18,7 @@
         
         <!-- Inside the group -->
         <div flex layout="column" layout-align="start stretch" ng-show="!gp.load && gp.lookingGroup " ng-init="gp.groupsSelectedTab='agents'">
-            <!-- MD5 Sums and Details cards -->
-            <div layout="row" class="md-padding" ng-if="gp.currentGroup">
-                <span class="wz-headline-title font-size-18"><i class="fa fa-fw fa-object-group" aria-hidden="true"></i>
-                    {{gp.currentGroup.name}}</span>
-            </div>
-
+            
             <!-- Tabs for the groups Agents / Files -->
             <div ng-if="gp.currentGroup && !gp.addingAgents && !gp.editingFile && gp.groupsTabsProps" class="md-margin-h">
                 <react-component name="Tabs" props="gp.groupsTabsProps" />
@@ -72,44 +67,11 @@
                         Edit group configuration
                     </button>
                 </div>
-                <!-- end buttons to add agents -->
-                    
-                    <react-component ng-if="gp.currentGroup" name="AgentsInGroupTable" props="gp.agentsInGroupTableProps"/>
+                <!-- end buttons to add agents -->                    
 
-                    <md-card flex class="wz-md-card _md flex md-margin-h wz-margin-top-16" ng-if="gp.groupsSelectedTab==='agents' && gp.currentGroup">
-                        <md-card-actions layout="row" class="wz-card-actions wz-card-actions-top layout-align-end-center">
-                            <react-component name="ExportConfiguration" ng-hide="gp.reportBusy && gp.reportStatus" props="gp.exportConfigurationProps" />
-                            <react-component ng-show="gp.reportBusy && gp.reportStatus" name="EuiLoadingSpinner" props="{size:'m'}" />
-                        </md-card-actions>
-                        <div layout="row" ng-show="gp.failedErrors" class="extraHeader">
-                            <md-list>
-                                <md-list-item class="error-enum-configuration" ng-repeat="group in gp.failedErrors">
-                                    <span class="wz-agent-status-indicator small red-text padding-left-0"><span
-                                            ng-repeat="error in group">{{error.id}}{{$last
-                                            ? '' : ',&nbsp;'}}</span>: {{group[0].message}}</span>
-                                </md-list-item>
-                            </md-list>
-                            <span flex></span>
-                            <a class='md-padding md-padding-top-10' ng-click='gp.clearFailedErrors()'><i class="fa fa-times"
-                                    aria-hidden="true"></i></a>
-                        </div>
-                        <md-card-content>
-                            <div layout="row">
-                                <wz-table flex custom-columns="true" path="'/agents/groups/' + gp.currentGroup.name" keys="['id','name','ip','status','os.name','os.version','version']"
-                                    allow-click="true" row-sizes="[14,12,10]" empty-results="'No agents were added to this group.'" />
-                            </div>
-                            <div layout="row" ng-if="gp.groupsSelectedTab==='agents'">
-                                <span flex></span>
-                                <button type="button" ng-click="gp.downloadCsv('/agents/groups/' + gp.currentGroup.name)"
-                                    class="euiButtonEmpty euiButtonEmpty--primary euiButtonEmpty--small">
-                                    <span class="euiButtonEmpty__content">
-                                        <react-component name="EuiIcon" props="{type:'importAction'}" />
-                                        <span class="euiButtonEmpty__text">Formatted</span>
-                                    </span>
-                                </button>
-                            </div>
-                        </md-card-content>
-                    </md-card>
+                    <div flex ng-if="gp.groupsSelectedTab==='agents' && gp.currentGroup">
+                        <react-component ng-if="gp.currentGroup" name="AgentsInGroupTable" props="gp.agentsInGroupTableProps"/>
+                    </div>
 
                     <!-- Group files table -->
                     <md-card flex class="wz-md-card _md flex md-margin-h wz-margin-top-16" ng-if="gp.groupsSelectedTab==='files' && !gp.fileViewer && gp.currentGroup">
