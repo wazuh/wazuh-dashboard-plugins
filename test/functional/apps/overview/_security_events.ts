@@ -543,9 +543,8 @@ export default function({getService, getPageObjects, }: FtrProviderContext) {
       };
       const esValues: object[] = await esTableViz.getData(query, fields, ['-Count', '-Level', '-Rule ID']);
 
-
-      expect(JSON.stringify(esValues.slice(0, values.length)))
-      .to.be.equal(JSON.stringify(values));
+      expect(arrayHelper.compareObjects(values, esValues))
+      .to.be.ok();
       await filterBar.removeAllFilters();
     });
 
@@ -858,9 +857,8 @@ export default function({getService, getPageObjects, }: FtrProviderContext) {
       };
       const esValues: object[] = await esTableViz.getData(query, fields, ['-Count', '-Level', '-Rule ID']);
 
-
-      expect(JSON.stringify(esValues.slice(0, values.length)))
-      .to.be.equal(JSON.stringify(values));
+      expect(arrayHelper.compareObjects(values, esValues))
+      .to.be.ok();
       await queryBar.setQuery('');
       await queryBar.submitQuery();
     });
