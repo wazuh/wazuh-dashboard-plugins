@@ -9,12 +9,10 @@
             <react-component name="EuiProgress" props="{size: 'xs', color: 'primary'}" />
         </div>
 
-        <!-- Main table (list of groups) -->
+        <!-- Groups table -->
         <div ng-show="!gp.load" layout="column" layout-padding ng-if="(!gp.currentGroup || !gp.currentGroup.name) && gp.groupsTableProps && !gp.lookingGroup">
             <react-component name="GroupsTable" props="gp.groupsTableProps" />
         </div>
-        <!-- End main table -->
-
         
         <!-- Inside the group -->
         <div flex layout="column" layout-align="start stretch" ng-show="!gp.load && gp.lookingGroup " ng-init="gp.groupsSelectedTab='agents'">
@@ -55,58 +53,22 @@
                         possible to apply changes of more than 500 additions or deletions</span>
                 </div>
 
-                <div ng-if='!gp.addingAgents'>
-                <!-- Group agents table -->
+                <div ng-if='!gp.addingAgents'> 
 
-                <!-- buttons to add agents TODO set in a new component -->
-                <div>
-                        <button ng-if="gp.lookingGroup && gp.currentGroup && !gp.addingAgents && !gp.editingFile && !gp.file && gp.adminMode && gp.groupsSelectedTab==='files'"
-                        class="euiFlexItem euiFlexItem--flexGrowZero height-35 kuiButton kuiButton--secondary ng-scope wz-margin-left-8"
-                        ng-click="gp.editGroupAgentConfig(currentGroup)" aria-label="Edit group configuration">
-                        <react-component name="EuiIcon" props="{type:'pencil', color:'primary'}" />
-                        Edit group configuration
-                    </button>
-                </div>
-                <!-- end buttons to add agents -->                    
-
+                    <!-- Group agents table -->
                     <div flex ng-if="gp.groupsSelectedTab==='agents' && gp.currentGroup">
-                        <react-component ng-if="gp.currentGroup" name="AgentsInGroupTable" props="gp.agentsInGroupTableProps"/>
+                        <react-component name="AgentsInGroupTable" props="gp.agentsInGroupTableProps"/>
                     </div>
 
                     <!-- Group files table -->
-                    <md-card flex class="wz-md-card _md flex md-margin-h wz-margin-top-16" ng-if="gp.groupsSelectedTab==='files' && !gp.fileViewer && gp.currentGroup">
-                        <md-card-actions layout="row" class="wz-card-actions wz-card-actions-top layout-align-end-center">
-                            <react-component name="ExportConfiguration" ng-hide="gp.reportBusy && gp.reportStatus" props="gp.exportConfigurationProps" />
-                            <react-component ng-show="gp.reportBusy && gp.reportStatus" name="EuiLoadingSpinner" props="{size:'m'}" />
-                        </md-card-actions>
-                        <md-card-content>
-                            <div layout="row">
-                                <wz-table custom-columns="true" flex path="'/agents/groups/' + gp.currentGroup.name + '/files'"
-                                    keys="[{value:'filename',width:'300px'},'hash']" allow-click="true" row-sizes="[16,14,12]">
-                                </wz-table>
-                            </div>
-                            <div layout="row" ng-if="gp.groupsSelectedTab==='files' && !gp.file">
-                                <span flex></span>
-                                <button type="button" ng-click="gp.downloadCsv('/agents/groups/' + gp.currentGroup.name + '/files')"
-                                    class="euiButtonEmpty euiButtonEmpty--primary euiButtonEmpty--small">
-                                    <span class="euiButtonEmpty__content">
-                                        <react-component name="EuiIcon" props="{type:'importAction'}" />
-                                        <span class="euiButtonEmpty__text">Formatted</span>
-                                    </span>
-                                </button>
-                            </div>
-                        </md-card-content>                    </md-card>
-                    <!-- End Group files table -->
-
-                    <!-- CSV Download button section for group files-->
-
-                    <!-- End CSV Download button section for group files -->
+                    <react-component ng-if="gp.groupsSelectedTab==='files' && !gp.fileViewer && gp.currentGroup" name="FilesInGroupTable" props="gp.filesInGroupTableProps"/>
 
                     <!-- File JSON viewer section -->
                     <div flex layout="column" class="md-padding" ng-if="gp.groupsSelectedTab==='files' && gp.file">
                         <div flex layout="column">
                             <div layout="row" class="wz-padding-bottom-14">
                                 <span flex class="wz-headline-title">{{ gp.filename }}</span>
+                                <!-- Go back button -->
                                 <button class="md-icon-button" ng-if="gp.lookingGroup" aria-label="Back" tooltip="Close file"
                                     tooltip-placement="left" ng-click="gp.goBackFiles()"><i class="fa fa-fw fa-close"
                                         aria-hidden="true"></i></button>

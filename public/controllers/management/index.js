@@ -27,6 +27,7 @@ import { FilesController } from './files';
 import { WelcomeScreen } from './components/welcome';
 import { ReportingTable } from './components/reporting-table';
 import { AgentsInGroupTable } from './components/agents-groups-table';
+import { FilesInGroupTable } from './components/files-group-table';
 import { GroupsTable } from './components/groups-table';
 import { UploadFiles } from './components/upload-files';
 
@@ -50,4 +51,5 @@ app
   .value('ReportingTable', ReportingTable)
   .value('GroupsTable', GroupsTable)
   .value('AgentsInGroupTable', AgentsInGroupTable)
+  .value('FilesInGroupTable', FilesInGroupTable)
   .value('UploadFiles', UploadFiles);

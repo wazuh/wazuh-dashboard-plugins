@@ -58,10 +58,11 @@ export class GroupsController {
       });
 
       this.scope.$on('wazuhShowGroupFile', (ev, parameters) => {
+        console.log('parameters ', parameters)
         ev.stopPropagation();
         if (
           ((parameters || {}).fileName || '').includes('agent.conf') &&
-          this.scope.adminMode
+          this.adminMode
         ) {
           return this.editGroupAgentConfig();
         }
@@ -119,6 +120,14 @@ export class GroupsController {
         goToAgent: agent => this.goToAgent(agent),
         exportConfigurationProps: this.exportConfigurationProps
       };
+
+      this.filesInGroupTableProps = {
+        getFilesFromGroup: group => this.getFilesFromGroup(group),
+        export: (group, filters) => this.downloadCsv(`/agents/groups/${group}/files`, filters),
+        editConfig: () => this.editGroupAgentConfig(),
+        openFileContent: (group, file) => this.openFileContent(group, file),
+        exportConfigurationProps: this.exportConfigurationProps
+      }
 
       return;
     } catch (error) {
@@ -229,7 +238,9 @@ export class GroupsController {
       this.totalFiles = count.data.data.totalItems;
       this.fileViewer = false;
       this.currentGroup = group;
+      // Set the name to the react tables
       this.agentsInGroupTableProps.group = this.currentGroup;
+      this.filesInGroupTableProps.group = this.currentGroup;
       this.groupsSelectedTab = 'agents';
       this.location.search('currentGroup', group.name);
       if (this.location.search() && this.location.search().navigation) {
@@ -732,6 +743,35 @@ export class GroupsController {
       const result = await this.apiReq.request('GET', `/agents/groups/${g}`, {});
       const agents = (((result || {}).data || {}).data || {}).items || [];
       return agents;
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  }
+
+  /**
+   * Returns the files in a group
+   * @param {String} group 
+   */
+  async getFilesFromGroup(group) {
+    try {
+      const g = group || this.currentGroup.name;
+      const result = await this.apiReq.request('GET', `/agents/groups/${g}/files`, {});
+      const files = (((result || {}).data || {}).data || {}).items || [];
+      return files;
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  }
+
+  /**
+   * Opens the content of the file
+   * @param {String} group 
+   * @param {String} file 
+   */
+  async openFileContent(group, file) {
+    try {
+      if (file.includes('agent.conf') && this.adminMode) return this.editGroupAgentConfig();
+      return await this.showFile(group, file);
     } catch (error) {
       return Promise.reject(error);
     }
