@@ -23,6 +23,8 @@ import {
   EuiText
 } from '@elastic/eui';
 
+import { ExportConfiguration } from '../../agent/components/export-configuration';
+
 export class AgentsInGroupTable extends Component {
   constructor(props) {
     super(props);
@@ -190,6 +192,11 @@ export class AgentsInGroupTable extends Component {
             </EuiButtonEmpty>
           </EuiFlexItem>
           <EuiFlexItem grow={false}>
+            <ExportConfiguration
+              exportConfiguration={enabledComponents => this.props.exportConfigurationProps.exportConfiguration(enabledComponents)}
+              type={this.props.exportConfigurationProps.type} />
+          </EuiFlexItem>
+          <EuiFlexItem grow={false}>
             <EuiButtonEmpty
               iconType="importAction"
               onClick={async () => await this.props.export(this.state.groupName)}
@@ -229,6 +236,7 @@ AgentsInGroupTable.propTypes = {
   addAgents: PropTypes.func,
   export: PropTypes.func,
   removeAgentFromGroup: PropTypes.func,
-  goToAgent: PropTypes.func
+  goToAgent: PropTypes.func,
+  exportConfigurationProps: PropTypes.object
 };
 

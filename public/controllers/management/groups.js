@@ -105,7 +105,8 @@ export class GroupsController {
         addAgents: () => this.addMultipleAgents(true),
         export: group => this.downloadCsv(`/agents/groups/${group}`),
         removeAgentFromGroup: (agent, group) => this.removeAgentFromGroup(agent, group),
-        goToAgent: agent => this.goToAgent(agent)
+        goToAgent: agent => this.goToAgent(agent),
+        exportConfigurationProps: this.exportConfigurationProps
       };
 
       return;
