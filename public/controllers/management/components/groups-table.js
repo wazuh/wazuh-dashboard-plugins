@@ -26,7 +26,8 @@ import {
   EuiFieldText,
   EuiSpacer,
   EuiButton,
-  EuiCallOut
+  EuiCallOut,
+  EuiToolTip
 } from '@elastic/eui';
 
 export class GroupsTable extends Component {
@@ -201,30 +202,45 @@ export class GroupsTable extends Component {
                 {this.state.showConfirm !== item.name && (
                   <Fragment>
                     <EuiFlexItem grow={false}>
-                      <EuiButtonIcon
-                        aria-label="View group details"
-                        onClick={() => this.props.goGroup(item)}
-                        iconType="eye"
-                      />
+                      <EuiToolTip
+                        position="right"
+                        content="View group details"
+                      >
+                        <EuiButtonIcon
+                          aria-label="View group details"
+                          onClick={() => this.props.goGroup(item)}
+                          iconType="eye"
+                        />
+                      </EuiToolTip>
                     </EuiFlexItem>
                     <EuiFlexItem grow={false}>
-                      <EuiButtonIcon
-                        aria-label="Edit group configuration"
-                        onClick={() => this.props.editGroup(item)}
-                        iconType="pencil"
-                      />
+                      <EuiToolTip
+                        position="right"
+                        content="Edit group configuration"
+                      >
+                        <EuiButtonIcon
+                          aria-label="Edit group configuration"
+                          onClick={() => this.props.editGroup(item)}
+                          iconType="pencil"
+                        />
+                      </EuiToolTip>
                     </EuiFlexItem>
                   </Fragment>
                 )}
                 {this.state.showConfirm !== item.name &&
                   item.name !== 'default' && (
                     <EuiFlexItem grow={false}>
+                      <EuiToolTip
+                        position="right"
+                        content="Delete group"
+                      >
                       <EuiButtonIcon
                         aria-label="Delete groups"
                         onClick={() => this.showConfirm(item.name)}
                         iconType="trash"
                         color="danger"
                       />
+                      </EuiToolTip>
                     </EuiFlexItem>
                   )}
                 {this.state.showConfirm === item.name && (

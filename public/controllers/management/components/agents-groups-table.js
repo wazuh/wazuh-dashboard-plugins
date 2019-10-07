@@ -20,7 +20,8 @@ import {
   EuiPanel,
   EuiTitle,
   EuiButtonEmpty,
-  EuiText
+  EuiText,
+  EuiToolTip
 } from '@elastic/eui';
 
 import { ExportConfiguration } from '../../agent/components/export-configuration';
@@ -138,19 +139,29 @@ export class AgentsInGroupTable extends Component {
                   item.name !== 'default' && (
                     <Fragment>
                       <EuiFlexItem grow={false}>
-                        <EuiButtonIcon
-                          aria-label="View group details"
-                          onClick={() => this.props.goToAgent(item)}
-                          iconType="eye"
-                        />
+                        <EuiToolTip
+                          position="right"
+                          content="Go to the agent"
+                        >
+                          <EuiButtonIcon
+                            aria-label="View agent details"
+                            onClick={() => this.props.goToAgent(item)}
+                            iconType="eye"
+                          />
+                        </EuiToolTip>
                       </EuiFlexItem>
                       <EuiFlexItem grow={false}>
-                        <EuiButtonIcon
-                          aria-label="Delete groups"
-                          onClick={() => this.showConfirm(item.name)}
-                          iconType="trash"
-                          color="danger"
-                        />
+                        <EuiToolTip
+                          position="right"
+                          content="Delete agent"
+                        >
+                          <EuiButtonIcon
+                            aria-label="Delete groups"
+                            onClick={() => this.showConfirm(item.name)}
+                            iconType="trash"
+                            color="danger"
+                          />
+                        </EuiToolTip>
                       </EuiFlexItem>
                     </Fragment>
                   )}
