@@ -189,7 +189,7 @@ export class ConfigurationRulesetController {
       if (rulesettab === 'decoders') {
         this.$scope.searchPlaceholder = 'Filter local decoders...';
       }
-      if (rulesettab === 'cdblists') {
+      if (rulesettab === 'lists') {
         this.$scope.searchPlaceholder = 'Filter CDB lists...';
         this.$scope.currentList = false;
         this.$scope.search();

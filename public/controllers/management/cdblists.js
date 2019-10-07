@@ -165,6 +165,13 @@ export class CdbListsController {
   }
 
   /**
+   * Refresh the list of cdb lists
+   */
+  refresh(){
+    this.search();
+  }
+
+  /**
    * This function takes back to the list but adding a filter from the detail view
    */
   addDetailFilter(name, value) {
