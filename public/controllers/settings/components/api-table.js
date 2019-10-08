@@ -22,8 +22,7 @@ import {
   EuiPanel,
   EuiButtonEmpty,
   EuiTitle,
-  EuiText,
-  EuiLoadingSpinner
+  EuiText
 } from '@elastic/eui';
 
 export class ApiTable extends Component {
@@ -47,7 +46,7 @@ export class ApiTable extends Component {
    */
   async refresh() {
     try {
-      this.setState({ refreshingEntries: true });
+      this.setState({ refreshingEntries: true, apiEntries: [] });
       const entries = await this.props.refreshApiEntries();
       this.setState({
         apiEntries: entries,
@@ -129,17 +128,13 @@ export class ApiTable extends Component {
         name: 'Status',
         align: 'left',
         render: item => {
-          if (item) {
-            return item === 'online' ? (
-              <EuiHealth color="success">Online</EuiHealth>
-            ) : item === 'down' ? (
-              <EuiHealth color="warning">Warning</EuiHealth>
-            ) : (
-                  <EuiHealth color="danger">Offline</EuiHealth>
-                );
-          } else {
-             return (<span><EuiLoadingSpinner size="s"/><span>&nbsp;&nbsp;Checking</span></span>);
-          }
+          return item === 'online' ? (
+            <EuiHealth color="success">Online</EuiHealth>
+          ) : item === 'down' ? (
+            <EuiHealth color="warning">Warning</EuiHealth>
+          ) : (
+                <EuiHealth color="danger">Offline</EuiHealth>
+              );
         },
         sortable: true,
       },
@@ -231,6 +226,7 @@ export class ApiTable extends Component {
           pagination={true}
           sorting={true}
           loading={this.state.refreshingEntries}
+          message='Refreshing API entries...'
         />
       </EuiPanel>
     );
