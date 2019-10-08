@@ -175,17 +175,17 @@ export class SettingsController {
   async checkApisStatus() {
     try {
       let numError = 0;
-      this.apiEntries.forEach(async entry => {
+      for (let idx in this.apiEntries) {
         try {
-          await this.checkManager(entry, false, true);
-          entry.status = 'online';
+          await this.checkManager(this.apiEntries[idx], false, true);
+          this.apiEntries[idx].status = 'online';
         } catch (error) {
           const code = ((error || {}).data || {}).code;
           const status = code === 3099 ? 'down' : 'unknown';
-          entry.status = status;
+          this.apiEntries[idx].status = status;
           numError = numError + 1;
         }
-      })
+      };
       return numError;
     } catch (error) { }
   }
