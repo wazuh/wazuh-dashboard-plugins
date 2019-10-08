@@ -22,7 +22,6 @@ import {
   EuiListGroup,
   EuiTitle,
   EuiText,
-  EuiIcon,
   EuiSpacer,
   EuiPopover
 } from '@elastic/eui';

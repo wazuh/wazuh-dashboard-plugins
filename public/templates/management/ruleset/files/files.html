@@ -19,7 +19,7 @@
                                         new {{mctrl.globalRulesetTab}} file</span>
                             </span>
                         </button>
-                <react-component name="UploadFiles" props="mctrl.uploadFilesProps" class="wz-margin-left-10"/>
+                <react-component ng-if="mctrl.adminMode" name="UploadFiles" props="mctrl.uploadFilesProps" class="wz-margin-left-10"/>
                 <button type="button" ng-click="filesctrl.refresh()" class="euiButtonEmpty euiButtonEmpty--primary euiButtonEmpty--small wz-margin-left-10">
                     <span class="euiButtonEmpty__content">
                         <react-component name="EuiIcon" props="{type:'refresh'}" />
