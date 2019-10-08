@@ -15,7 +15,7 @@ import React, { Component } from 'react';
 import {
   EuiFlexGroup,
   EuiFlexItem,
-  EuiBasicTable,
+  EuiInMemoryTable,
   EuiButtonIcon,
   EuiToolTip,
   EuiHealth,
@@ -84,33 +84,44 @@ export class ApiTable extends Component {
     }
   }
 
-  render() {
+  render() {   
     const items = [...this.state.apiEntries];
     const columns = [
       {
+        field: 'id',
+        name: 'ID',
+        align: 'left',
+        sortable: true,
+      },
+      {
         field: 'cluster_info.cluster',
         name: 'Cluster',
-        align: 'left'
+        align: 'left',
+        sortable: true,
       },
       {
         field: 'cluster_info.manager',
         name: 'Manager',
-        align: 'left'
+        align: 'left',
+        sortable: true,
       },
       {
         field: 'url',
         name: 'Host',
-        align: 'left'
+        align: 'left',
+        sortable: true,
       },
       {
         field: 'port',
         name: 'Port',
-        align: 'left'
+        align: 'left',
+        sortable: true,
       },
       {
         field: 'user',
         name: 'User',
-        align: 'left'
+        align: 'left',
+        sortable: true,
       },
       {
         field: 'status',
@@ -124,7 +135,8 @@ export class ApiTable extends Component {
           ) : (
                 <EuiHealth color="danger">Offline</EuiHealth>
               );
-        }
+        },
+        sortable: true,
       },
       {
         name: 'Actions',
@@ -162,6 +174,14 @@ export class ApiTable extends Component {
         )
       }
     ];
+
+    const search = {
+      box: {
+        incremental: this.state.incremental,
+        schema: true,
+      }
+    };
+
     return (
       <EuiPanel paddingSize="l">
         <EuiFlexGroup>
@@ -198,10 +218,13 @@ export class ApiTable extends Component {
             </EuiText>
           </EuiFlexItem>
         </EuiFlexGroup>
-        <EuiBasicTable
+        <EuiInMemoryTable
           itemId="id"
           items={items}
+          search={search}
           columns={columns}
+          pagination={true}
+          sorting={true}
           loading={this.state.refreshingEntries}
         />
       </EuiPanel>

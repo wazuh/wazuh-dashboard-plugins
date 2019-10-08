@@ -132,6 +132,7 @@ hosts:
           loading={this.state.refreshingEntries}
           items={this.state.apiEntries}
           columns={[
+            { field: 'id' , name: 'ID' },
             { field: 'url', name: 'Host' },
             { field: 'port', name: 'Port' },
             {
