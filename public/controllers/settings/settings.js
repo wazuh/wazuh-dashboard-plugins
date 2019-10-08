@@ -178,11 +178,11 @@ export class SettingsController {
       this.apiEntries.forEach(async entry => {
         try {
           await this.checkManager(entry, false, true);
-          this.apiEntries[idx].status = 'online';
+          entry.status = 'online';
         } catch (error) {
           const code = ((error || {}).data || {}).code;
           const status = code === 3099 ? 'down' : 'unknown';
-          this.apiEntries[idx].status = status;
+          entry.status = status;
           numError = numError + 1;
         }
       })
