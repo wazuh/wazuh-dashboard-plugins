@@ -23,6 +23,7 @@ import {
   EuiButtonEmpty,
   EuiTitle,
   EuiText,
+  EuiLoadingSpinner
 } from '@elastic/eui';
 
 export class ApiTable extends Component {
@@ -46,7 +47,7 @@ export class ApiTable extends Component {
    */
   async refresh() {
     try {
-      this.setState({refreshingEntries: true});
+      this.setState({ refreshingEntries: true });
       const entries = await this.props.refreshApiEntries();
       this.setState({
         apiEntries: entries,
@@ -84,7 +85,7 @@ export class ApiTable extends Component {
     }
   }
 
-  render() {   
+  render() {
     const items = [...this.state.apiEntries];
     const columns = [
       {
@@ -128,13 +129,17 @@ export class ApiTable extends Component {
         name: 'Status',
         align: 'left',
         render: item => {
-          return item === 'online' ? (
-            <EuiHealth color="success">Online</EuiHealth>
-          ) : item === 'down' ? (
-            <EuiHealth color="warning">Warning</EuiHealth>
-          ) : (
-                <EuiHealth color="danger">Offline</EuiHealth>
-              );
+          if (item) {
+            return item === 'online' ? (
+              <EuiHealth color="success">Online</EuiHealth>
+            ) : item === 'down' ? (
+              <EuiHealth color="warning">Warning</EuiHealth>
+            ) : (
+                  <EuiHealth color="danger">Offline</EuiHealth>
+                );
+          } else {
+             return (<span><EuiLoadingSpinner size="s"/><span>&nbsp;&nbsp;Checking</span></span>);
+          }
         },
         sortable: true,
       },
@@ -204,10 +209,10 @@ export class ApiTable extends Component {
           </EuiFlexItem>
           <EuiFlexItem grow={false}>
             <EuiButtonEmpty
-                iconType="refresh"
-                onClick={async () => await this.refresh()}
-              >
-                Refresh
+              iconType="refresh"
+              onClick={async () => await this.refresh()}
+            >
+              Refresh
             </EuiButtonEmpty>
           </EuiFlexItem>
         </EuiFlexGroup>
