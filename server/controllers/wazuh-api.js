@@ -905,7 +905,11 @@ export class WazuhApiCtrl {
       }
 
       const responseBody = (response || {}).body || {};
-      const responseData = responseBody.data || false;
+      let responseData = responseBody.data;
+      if (!responseData) {
+        responseData = typeof responseData === 'string' && path.includes('/files') && method === 'GET' ? ' ' : false
+        response.body.data = responseData
+      }
       const responseError = responseBody.error || false;
 
       if (!responseError && responseData) {
@@ -957,6 +961,18 @@ export class WazuhApiCtrl {
         throw new Error('Credentials does not exists');
       }
 
+      if (!method.match(/^(?:GET|PUT|POST|DELETE)$/)) {
+        log('wazuh-api:makeRequest', 'Request method is not valid.');
+        //Method is not a valid HTTP request method
+        throw new Error('Request method is not valid.');
+      }
+
+      if (!path.match(/^\/.+/)) {
+        log('wazuh-api:makeRequest', 'Request path is not valid.');
+        //Path doesn't start with '/'
+        throw new Error('Request path is not valid.');
+      }
+
       if (!data) {
         data = {};
       }
@@ -1004,8 +1020,16 @@ export class WazuhApiCtrl {
 
     if (!req.payload.method) {
       return ErrorResponse('Missing param: method', 3015, 400, reply);
-    } else if (!req.payload.path) {
+    } else if (!req.payload.method.match(/^(?:GET|PUT|POST|DELETE)$/)) {
+      log('wazuh-api:makeRequest', 'Request method is not valid.');
+      //Method is not a valid HTTP request method
+      return ErrorResponse('Request method is not valid.', 3015, 400, reply);
+    }else if (!req.payload.path) {
       return ErrorResponse('Missing param: path', 3016, 400, reply);
+    }else if (!req.payload.path.match(/^\/.+/)) {
+      log('wazuh-api:makeRequest', 'Request path is not valid.');
+      //Path doesn't start with '/'
+      return ErrorResponse('Request path is not valid.', 3015, 400, reply);
     } else {
       if (req.payload.method !== 'GET' && !adminMode) {
         log('wazuh-api:requestApi', 'Forbidden action, allowed methods: GET');
@@ -1139,30 +1163,38 @@ export class WazuhApiCtrl {
           path.includes('/lists') && (!filters || !filters.length);
         const isAgents = path.includes('/agents') && !path.includes('groups');
         const isAgentsOfGroup = path.startsWith('/agents/groups/');
+        const isFiles = path.endsWith('/files');
         let fields = Object.keys(output.body.data.items[0]);
 
         if (isAgents || isAgentsOfGroup) {
-          fields = [
-            'id',
-            'status',
-            'name',
-            'ip',
-            'group',
-            'manager',
-            'node_name',
-            'dateAdd',
-            'version',
-            'lastKeepAlive',
-            'os.arch',
-            'os.build',
-            'os.codename',
-            'os.major',
-            'os.minor',
-            'os.name',
-            'os.platform',
-            'os.uname',
-            'os.version'
-          ];
+          if (isFiles) {
+            fields = [
+              'filename',
+              'hash'
+            ];
+          } else {
+            fields = [
+              'id',
+              'status',
+              'name',
+              'ip',
+              'group',
+              'manager',
+              'node_name',
+              'dateAdd',
+              'version',
+              'lastKeepAlive',
+              'os.arch',
+              'os.build',
+              'os.codename',
+              'os.major',
+              'os.minor',
+              'os.name',
+              'os.platform',
+              'os.uname',
+              'os.version'
+            ];
+          }
         }
 
         if (isArrayOfLists) {

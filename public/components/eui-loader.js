@@ -13,11 +13,13 @@ import { uiModules } from 'ui/modules';
 import 'react';
 import {
   EuiIcon,
+  EuiTextArea,
   EuiSuperSelect,
   EuiLoadingSpinner,
   EuiProgress,
   EuiBasicTable,
   EuiButtonIcon,
+  EuiButtonEmpty,
   EuiHealth,
   EuiCallOut,
   EuiSwitch
@@ -25,18 +27,26 @@ import {
 
 import { BasicTable } from '../directives/wz-table-eui/components/table';
 import { Tabs } from '../directives/wz-tabs-eui/components/tabs';
+import { Logtest } from '../directives/wz-logtest/components/logtest';
+import { ToolsWelcomeCards } from '../controllers/dev-tools/components/tools-welcome-cards';
+import { TestConfiguration } from '../controllers/dev-tools/components/test-configuration';
 
 const app = uiModules.get('app/wazuh', ['react']);
 
 app
   .value('EuiIcon', EuiIcon)
+  .value('EuiTextArea', EuiTextArea)
   .value('EuiSuperSelect', EuiSuperSelect)
   .value('EuiLoadingSpinner', EuiLoadingSpinner)
   .value('EuiProgress', EuiProgress)
   .value('EuiButtonIcon', EuiButtonIcon)
+  .value('EuiButtonEmpty', EuiButtonEmpty)
   .value('EuiBasicTable', EuiBasicTable)
   .value('EuiHealth', EuiHealth)
   .value('EuiCallOut', EuiCallOut)
   .value('BasicTable', BasicTable)
   .value('Tabs', Tabs)
+  .value('Logtest', Logtest)
+  .value('ToolsWelcomeCards', ToolsWelcomeCards)
+  .value('TestConfiguration', TestConfiguration)
   .value('EuiSwitch', EuiSwitch);

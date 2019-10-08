@@ -63,7 +63,9 @@ export class CdbListsController {
         const data = await this.rulesetHandler.getCdbList(
           `${this.currentList.path}/${this.currentList.name}`
         );
-        this.currentList.list = stringToObj(data.data.data);
+        let list = stringToObj(data.data.data);
+        list = Object.keys(list).length === 1 && !Object.keys(list)[0].trim() ? {} : list
+        this.currentList.list = list;
         this.viewingDetail = true;
         this.$scope.$emit('setCurrentList', { currentList: this.currentList });
       } catch (error) {
@@ -160,6 +162,13 @@ export class CdbListsController {
       this.errorHandler.handle(error, 'Download CSV');
     }
     return;
+  }
+
+  /**
+   * Refresh the list of cdb lists
+   */
+  refresh(){
+    this.search();
   }
 
   /**

@@ -39,12 +39,14 @@
                         <thead class="wz-text-bold">
                             <th class="wz-text-left">Label key</th>
                             <th class="wz-text-left">Label value</th>
+                            <th class="wz-text-left">Hidden</th>
                         </thead>
                         <tbody class="wz-word-wrap">
                             <tr
-                                ng-repeat="(key, value) in currentConfig[(agent && agent.id !== '000') ? 'agent-labels' : 'analysis-labels'].labels">
-                                <td>{{ key }}</td>
-                                <td>{{ value }}</td>
+                                ng-repeat="currentLabel in currentConfig[(agent && agent.id !== '000') ? 'agent-labels' : 'analysis-labels'].labels">
+                                <td>{{ currentLabel.key }}</td>
+                                <td>{{ currentLabel.value }}</td>
+                                <td>{{ currentLabel.hidden }}</td>
                             </tr>
                         </tbody>
                     </table>

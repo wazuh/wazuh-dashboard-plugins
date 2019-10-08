@@ -62,7 +62,7 @@ export class FilesController {
       this.$scope.editingFile = false;
       this.$scope.editorReadOnly = false;
       this.$scope.fetchedXML = null;
-      if (this.$scope.goBack) {
+      if (this.$scope.goBack || this.$scope.mctrl.openedFileDirect) {
         if (this.$scope.viewingDetail) {
           this.$scope.mctrl.setCurrentRule({
             currentRule: this.$scope.mctrl.currentRule
@@ -156,6 +156,10 @@ export class FilesController {
     this.$scope.restart = () => {
       this.$scope.$emit('performRestart', {});
     };
+
+    this.$scope.$on('addNewFile', (ev, params) => {
+      this.addNewFile(params.type);
+    });
   }
 
   async editFile(params, readonly = false) {
@@ -208,9 +212,21 @@ export class FilesController {
 
   switchFilesSubTab(tab) {
     this.filesSubTab = tab;
+    this.$scope.uploadFilesProps = {
+      msg: this.$scope.mctrl.globalRulesetTab,
+      path: `etc/${this.$scope.mctrl.globalRulesetTab}`,
+      upload: (files, path) => this.uploadFile(files, path)
+    };
   }
 
   search(term) {
     this.$scope.$broadcast('wazuhSearch', { term, removeFilters: 0 });
+  }
+
+  /**
+   * Refresh the list of rules or decoders
+   */
+  refresh() {
+    this.search();
   }
 }

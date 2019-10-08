@@ -70,6 +70,26 @@ export class DynamicHeight {
   }
 
   /**
+   * Calculate the dynamic height for the XML editor
+   */
+  static dynamicHeightStatic(classElement, staticHeight) {
+    let editorContainer;
+    const interval = setInterval(() => {
+      editorContainer = $(classElement);
+      if (editorContainer.length) {
+        clearInterval(interval);
+        setTimeout(() => {
+          const editorContainer = $(classElement);
+          const offsetTop = DynamicHeight.getPosition(editorContainer[0]).y;
+          $(classElement).css({
+            height: 'calc(100vh - ' + (offsetTop + staticHeight + 2) + 'px)'
+          });
+        }, 1);
+      }
+    }, 100);
+  }
+
+  /**
    * Calculates the dynamic height for the dev tools
    * @param {Object} self
    * @param {Object} window
