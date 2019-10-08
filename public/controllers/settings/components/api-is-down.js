@@ -24,7 +24,8 @@ import {
   EuiSteps,
   EuiBasicTable,
   EuiHealth,
-  EuiCallOut
+  EuiCallOut,
+  EuiLoadingSpinner
 } from '@elastic/eui';
 
 export class ApiIsDown extends Component {
@@ -139,13 +140,18 @@ hosts:
               field: 'status',
               name: 'Status',
               render: item => {
-                return item === 'online' ? (
-                  <EuiHealth color="success">Online</EuiHealth>
-                ) : item === 'down' ? (
-                  <EuiHealth color="warning">Warning</EuiHealth>
-                ) : (
-                      <EuiHealth color="danger">Offline</EuiHealth>
-                    );
+                if (item) {
+                  return item === 'online' ? (
+                    <EuiHealth color="success">Online</EuiHealth>
+                  ) : item === 'down' ? (
+                    <EuiHealth color="warning">Warning</EuiHealth>
+                  ) : (
+                        <EuiHealth color="danger">Offline</EuiHealth>
+                      );
+                } else {
+                  return (<span><EuiLoadingSpinner size="s"/><span>&nbsp;&nbsp;Checking</span></span>);
+                }
+                
               }
             }
           ]}
