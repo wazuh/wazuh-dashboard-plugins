@@ -183,17 +183,11 @@ table thead > tr {
   background-color: #1a1b20 !important;
 }
 
-.table-striped > tbody > tr:nth-of-type(even) {
-  background-color: #1d252f !important;
-  color: #dfe5ef !important;
-}
-
-.table-striped > tbody > tr:nth-of-type(odd) {
-  background-color: #1a1b21 !important;
-  color: #dfe5ef !important;
-}
-
 .table-hover > tbody > tr:hover {
+  background-color: rgba(27, 169, 245, 0.05) !important;
+}
+
+.table-striped > tbody > tr:nth-of-type(odd):hover {
   background-color: rgba(27, 169, 245, 0.05) !important;
 }
 
@@ -346,4 +340,11 @@ discover-app-w > main.container-fluid {
 
 .wz-menu-select {
   filter: invert(0) !important; 
+}
+
+.logtest{
+  border-left: 1px solid #343741!important;
+  box-shadow: -2px 0px 2px -1px rgba(0, 0, 0, 0.3)!important;
+  background: #1a1b20;
+  z-index: 10;
 }
