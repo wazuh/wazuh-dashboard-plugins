@@ -175,9 +175,8 @@ export class SettingsController {
   async checkApisStatus() {
     try {
       let numError = 0;
-      for (let idx in this.apiEntries) {
+      this.apiEntries.forEach(async entry => {
         try {
-          const entry = this.apiEntries[idx];
           await this.checkManager(entry, false, true);
           this.apiEntries[idx].status = 'online';
         } catch (error) {
@@ -186,7 +185,7 @@ export class SettingsController {
           this.apiEntries[idx].status = status;
           numError = numError + 1;
         }
-      }
+      })
       return numError;
     } catch (error) { }
   }
@@ -249,7 +248,7 @@ export class SettingsController {
         this.$location.path('/blank-screen');
         return;
       }
-      
+
       await this.getHosts();
 
       // Set the addingApi flag based on if there is any API entry
