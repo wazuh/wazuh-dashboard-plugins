@@ -175,7 +175,7 @@ export function settingsWizard(
       return deferred.resolve();
     };
 
-    // Iterates theys in order to set one as default
+    // Iterates them in order to set one as default
     const tryToSetDefault = async apis => {
       try {
         let errors = 0;
@@ -267,7 +267,7 @@ export function settingsWizard(
             } else {
               appState.removeCurrentAPI();
               if (data.data.length > 0) {
-                // Try to set somey as default
+                // Try to set some as default
                 const defaultApi = await tryToSetDefault(data.data);
                 setUpCredentials(
                   'Wazuh App: Default API has been updated.',
