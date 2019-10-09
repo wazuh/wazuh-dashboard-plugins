@@ -23,8 +23,7 @@ import {
   EuiButtonEmpty,
   EuiTitle,
   EuiText,
-  EuiLoadingSpinner,
-  EuiIcon
+  EuiLoadingSpinner
 } from '@elastic/eui';
 
 export class ApiTable extends Component {
@@ -168,7 +167,7 @@ export class ApiTable extends Component {
               <span>
                 <EuiHealth color="warning">Warning</EuiHealth>
                 <EuiToolTip position="top" content={item.downReason}>
-                  <EuiIcon color="primary" style={{ marginTop: '-12px' }} type="questionInCircle"/>
+                  <EuiButtonIcon color="primary" style={{ marginTop: '-12px' }} iconType="questionInCircle" onClick={() => this.props.copyToClipBoard(item.downReason)}/>
                 </EuiToolTip>
 
               </span>
@@ -176,7 +175,7 @@ export class ApiTable extends Component {
                   <span>
                     <EuiHealth color="danger">Offline</EuiHealth>
                     <EuiToolTip position="top" content={item.downReason}>
-                      <EuiIcon color="primary" style={{ marginTop: '-12px' }} type="questionInCircle"/>
+                      <EuiButtonIcon color="primary" style={{ marginTop: '-12px' }} iconType="questionInCircle" onClick={() => this.props.copyToClipBoard(item.downReason)}/>
                     </EuiToolTip>
                   </span >
                 );
@@ -289,5 +288,6 @@ ApiTable.propTypes = {
   getHosts: PropTypes.func,
   testApi: PropTypes.func,
   showAddApiWithInitialError: PropTypes.func,
-  showApiIsDown: PropTypes.func
+  showApiIsDown: PropTypes.func,
+  copyToClipBoard: PropTypes.func
 };

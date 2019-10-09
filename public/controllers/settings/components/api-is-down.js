@@ -26,8 +26,8 @@ import {
   EuiHealth,
   EuiCallOut,
   EuiLoadingSpinner,
-  EuiIcon,
-  EuiToolTip
+  EuiToolTip,
+  EuiButtonIcon
 } from '@elastic/eui';
 
 export class ApiIsDown extends Component {
@@ -150,7 +150,7 @@ hosts:
                       <span>
                         <EuiHealth color="warning">Warning</EuiHealth>
                         <EuiToolTip position="top" content={item.downReason}>
-                          <EuiIcon color="primary" style={{ marginTop: '-12px' }} type="questionInCircle" />
+                         <EuiButtonIcon color="primary" style={{ marginTop: '-12px' }} iconType="questionInCircle" onClick={() => this.props.copyToClipBoard(item.downReason)}/>
                         </EuiToolTip>
 
                       </span>
@@ -158,7 +158,7 @@ hosts:
                           <span>
                             <EuiHealth color="danger">Offline</EuiHealth>
                             <EuiToolTip position="top" content={item.downReason}>
-                              <EuiIcon color="primary" style={{ marginTop: '-12px' }} type="questionInCircle" />
+                             <EuiButtonIcon color="primary" style={{ marginTop: '-12px' }} iconType="questionInCircle" onClick={() => this.props.copyToClipBoard(item.downReason)}/>
                             </EuiToolTip>
                           </span >
                         );
@@ -235,5 +235,6 @@ ApiIsDown.propTypes = {
   checkManager: PropTypes.func,
   closeApiIsDown: PropTypes.func,
   updateClusterInfoInRegistry: PropTypes.func,
-  getHosts: PropTypes.func
+  getHosts: PropTypes.func,
+  copyToClipboard: PropTypes.func
 };

@@ -112,7 +112,8 @@ export class SettingsController {
       testApi: entry => this.testAPI.check(entry),
       showAddApiWithInitialError: error => this.showAddApiWithInitialError(error),
       updateClusterInfoInRegistry: (id, clusterInfo) => this.updateClusterInfoInRegistry(id, clusterInfo),
-      showApiIsDown: () => this.showApiIsDown()
+      showApiIsDown: () => this.showApiIsDown(),
+      copyToClipBoard: msg => this.copyToClipBoard(msg)
     };
 
     this.addApiProps = {
@@ -125,7 +126,8 @@ export class SettingsController {
       testApi: entry => this.testAPI.check(entry),
       closeApiIsDown: () => this.closeApiIsDown(),
       getHosts: () => this.getHosts(),
-      updateClusterInfoInRegistry: (id, clusterInfo) => this.updateClusterInfoInRegistry(id, clusterInfo)
+      updateClusterInfoInRegistry: (id, clusterInfo) => this.updateClusterInfoInRegistry(id, clusterInfo),
+      copyToClipBoard: msg => this.copyToClipBoard(msg)
     }
 
     this.settingsTabsProps = {
@@ -548,9 +550,9 @@ export class SettingsController {
     this.$scope.$applyAsync();
   }
 
-   /**
-   * Shows the add API component
-   */
+  /**
+  * Shows the add API component
+  */
   showApiIsDown() {
     this.apiIsDown = true;
     this.$scope.$applyAsync();
@@ -579,7 +581,7 @@ export class SettingsController {
    */
   async refreshApiEntries() {
     try {
-      this.apiEntries  = await this.getHosts();
+      this.apiEntries = await this.getHosts();
       const down = await this.checkApisStatus();
       //Checks if all the API entries are down
       this.apiIsDown = (down >= this.apiEntries.length && this.apiEntries.length > 0);
@@ -589,5 +591,19 @@ export class SettingsController {
       this.showAddApiWithInitialError(error);
       return Promise.reject(error);
     }
+  }
+
+  /**
+   * Copy to the clickboard the string passed
+   * @param {String} msg 
+   */
+  copyToClipBoard(msg) {
+    const el = document.createElement('textarea');
+    el.value = msg;
+    document.body.appendChild(el);
+    el.select();
+    document.execCommand('copy');
+    document.body.removeChild(el);
+    this.errorHandler.info('Error copied to the clipboard');
   }
 }
