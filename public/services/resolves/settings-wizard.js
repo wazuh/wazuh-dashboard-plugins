@@ -29,7 +29,6 @@ export function settingsWizard(
     const checkResponse = data => {
       let fromWazuhHosts = false;
       if (parseInt(data.data.error) === 2) {
-        console.log('default akaaakaa');
         !disableErrors &&
           errorHandler.handle(
             'Please set up Wazuh API credentials.',
