@@ -32,7 +32,6 @@ export function WazuhHostsRoutes(server) {
     }
   });
 
-
   // Checks the orphan hosts in the registry in order to delete them
   server.route({
     method: 'POST',

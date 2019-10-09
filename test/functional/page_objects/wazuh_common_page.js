@@ -22,13 +22,12 @@ export function WazuhCommonProvider({ getService, getPageObjects }) {
    * @class WazuhCommonPage
    */
   class WazuhCommonPage {
-
     /**
      * Navigate to `Security events` without the timestamp parameter in the URL
      *
      * @memberof WazuhCommonPage
      */
-    async OpenSecurityEvents () {
+    async OpenSecurityEvents() {
       log.debug('Open Security events');
       await PageObjects.common.navigateToApp('settings');
       await appsMenu.clickLink('Wazuh');
@@ -41,7 +40,7 @@ export function WazuhCommonProvider({ getService, getPageObjects }) {
      *
      * @memberof WazuhCommonPage
      */
-    async OpenIntegrityMonitoring () {
+    async OpenIntegrityMonitoring() {
       log.debug('Open Security events');
       await PageObjects.common.navigateToApp('settings');
       await appsMenu.clickLink('Wazuh');
@@ -49,19 +48,20 @@ export function WazuhCommonProvider({ getService, getPageObjects }) {
       await testSubjects.click('overviewWelcomeFim');
     }
 
-
     /**
      * Select `today` in the commonly used times
      *
      * @memberof WazuhCommonPage
      */
-    async setTodayRange () {
+    async setTodayRange() {
       log.debug('Set today in the time range picker');
-      await PageObjects.timePicker.setCommonlyUsedTime('superDatePickerCommonlyUsed_Today');
+      await PageObjects.timePicker.setCommonlyUsedTime(
+        'superDatePickerCommonlyUsed_Today'
+      );
       await PageObjects.common.sleep(3000);
       await testSubjects.click('querySubmitButton');
       await PageObjects.common.sleep(3000);
     }
   }
-  return new WazuhCommonPage;
+  return new WazuhCommonPage();
 }

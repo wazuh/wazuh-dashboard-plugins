@@ -15,5 +15,5 @@ export const services = {
   esAreaChart: EsAreaChartProvider,
   esPieChart: EsPieChartProvider,
   esTableViz: EsTableVizProvider,
-  arrayHelper: ArrayHelperProvider,
-}
+  arrayHelper: ArrayHelperProvider
+};

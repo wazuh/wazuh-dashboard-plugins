@@ -19,13 +19,16 @@ export class UpdateRegistry {
     this.file = path.join(__dirname, '../../server/wazuh-registry.json');
   }
 
-
   /**
    * Reads the Wazuh registry content
    */
   async readContent() {
     try {
-      log('update-registry:readContent', 'Reading wazuh-registry.json content', 'debug');
+      log(
+        'update-registry:readContent',
+        'Reading wazuh-registry.json content',
+        'debug'
+      );
       const content = await fs.readFileSync(this.file, { encoding: 'utf-8' });
       return JSON.parse(content);
     } catch (error) {
@@ -49,9 +52,9 @@ export class UpdateRegistry {
   }
 
   /**
- * Returns the cluster information associated to an API id
- * @param {String} id 
- */
+   * Returns the cluster information associated to an API id
+   * @param {String} id
+   */
   async getHostById(id) {
     try {
       if (!id) throw new Error('API id is missing');
@@ -65,11 +68,15 @@ export class UpdateRegistry {
 
   /**
    * Writes the wazuh-registry.json
-   * @param {Object} content 
+   * @param {Object} content
    */
   async writeContent(content) {
     try {
-      log('update-registry:writeContent', 'Writting wazuh-registry.json content', 'debug');
+      log(
+        'update-registry:writeContent',
+        'Writting wazuh-registry.json content',
+        'debug'
+      );
       if (this.busy) {
         throw new Error('Another process is updating the registry file');
       }
@@ -78,14 +85,14 @@ export class UpdateRegistry {
       this.busy = false;
     } catch (error) {
       log('update-registry:writeContent', error.message || error);
-      return Promise.reject(error)
+      return Promise.reject(error);
     }
   }
 
   /**
    * Checks if the host exist in order to update the data, otherwise creates it
-   * @param {String} id 
-   * @param {Object} hosts 
+   * @param {String} id
+   * @param {Object} hosts
    */
   checkHost(id, hosts) {
     try {
@@ -98,18 +105,23 @@ export class UpdateRegistry {
 
   /**
    * Migrates the cluster information and extensions associated to an API id
-   * @param {String} id 
-   * @param {Object} clusterInfo 
-   * @param {Object} clusterExtensions 
+   * @param {String} id
+   * @param {Object} clusterInfo
+   * @param {Object} clusterExtensions
    */
   async migrateToRegistry(id, clusterInfo, clusterExtensions) {
     try {
       const content = await this.readContent();
-      if (!Object.keys(content).includes('hosts')) Object.assign(content, {hosts: {}});
-      const info = { cluster_info: clusterInfo, extensions: clusterExtensions};
+      if (!Object.keys(content).includes('hosts'))
+        Object.assign(content, { hosts: {} });
+      const info = { cluster_info: clusterInfo, extensions: clusterExtensions };
       content.hosts[id] = info;
       await this.writeContent(content);
-      log('update-registry:migrateToRegistry', `API ${id} was properly migrated`, 'debug');
+      log(
+        'update-registry:migrateToRegistry',
+        `API ${id} was properly migrated`,
+        'debug'
+      );
       return info;
     } catch (error) {
       log('update-registry:migrateToRegistry', error.message || error);
@@ -117,10 +129,10 @@ export class UpdateRegistry {
     }
   }
 
-    /**
+  /**
    * Updates the cluster-information or manager-information in the registry
-   * @param {String} id 
-   * @param {Object} clusterInfo 
+   * @param {String} id
+   * @param {Object} clusterInfo
    */
   async updateClusterInfo(id, clusterInfo) {
     try {
@@ -129,7 +141,11 @@ export class UpdateRegistry {
       if (!content.hosts[id]) content.hosts[id] = {};
       content.hosts[id].cluster_info = clusterInfo;
       await this.writeContent(content);
-      log('update-registry:updateClusterInfo', `API ${id} information was properly updated`, 'debug');
+      log(
+        'update-registry:updateClusterInfo',
+        `API ${id} information was properly updated`,
+        'debug'
+      );
       return id;
     } catch (error) {
       log('update-registry:updateClusterInfo', error.message || error);
@@ -137,17 +153,21 @@ export class UpdateRegistry {
     }
   }
 
-      /**
+  /**
    * Updates the cluster-information or manager-information in the registry
-   * @param {String} id 
-   * @param {Object} clusterInfo 
+   * @param {String} id
+   * @param {Object} clusterInfo
    */
   async updateAPIExtensions(id, extensions) {
     try {
       const content = await this.readContent();
       content.hosts[id].extensions = extensions;
       await this.writeContent(content);
-      log('update-registry:updateAPIExtensions', `API ${id} extensions were properly updated`, 'debug');
+      log(
+        'update-registry:updateAPIExtensions',
+        `API ${id} extensions were properly updated`,
+        'debug'
+      );
       return id;
     } catch (error) {
       log('update-registry:updateAPIHostname', error.message || error);
@@ -157,7 +177,7 @@ export class UpdateRegistry {
 
   /**
    * Remove the given ids from the registry host entries
-   * @param {Array} ids 
+   * @param {Array} ids
    */
   async removeHostEntries(ids) {
     try {
@@ -177,11 +197,19 @@ export class UpdateRegistry {
    */
   async removeOrphanEntries(hosts) {
     try {
-      log('update-registry:removeOrphanEntries', 'Checking orphan registry entries', 'debug');
+      log(
+        'update-registry:removeOrphanEntries',
+        'Checking orphan registry entries',
+        'debug'
+      );
       const entries = await this.getHosts();
-      const hostsKeys = hosts.map(h => {return h.id});
+      const hostsKeys = hosts.map(h => {
+        return h.id;
+      });
       const entriesKeys = Object.keys(entries);
-      const diff = entriesKeys.filter(e => {return !hostsKeys.includes(e)});
+      const diff = entriesKeys.filter(e => {
+        return !hostsKeys.includes(e);
+      });
       await this.removeHostEntries(diff);
     } catch (error) {
       log('update-registry:removeOrphanEntries', error.message || error);
@@ -189,4 +217,3 @@ export class UpdateRegistry {
     }
   }
 }
-

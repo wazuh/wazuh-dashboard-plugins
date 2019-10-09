@@ -71,7 +71,11 @@ export class UpdateConfigurationFile {
       const { key, value } = (input || {}).payload || {};
       this.updateLine(key, value, typeof configuration[key] !== 'undefined');
       this.busy = false;
-      log('update-configuration:updateConfiguration', 'Updating configuration', 'debug');
+      log(
+        'update-configuration:updateConfiguration',
+        'Updating configuration',
+        'debug'
+      );
       return { needRestart: needRestartFields.includes(key) };
     } catch (error) {
       log('update-configuration:updateConfiguration', error.message || error);

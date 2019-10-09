@@ -45,4 +45,4 @@ app
   .value('BasicTable', BasicTable)
   .value('Tabs', Tabs)
   .value('EuiSwitch', EuiSwitch)
-  .value('EuiSpacer',EuiSpacer);
+  .value('EuiSpacer', EuiSpacer);

@@ -159,7 +159,7 @@ export function GroupsController(
     $scope.groupsSelectedTab = 'agents';
     $scope.groupsTabsProps.selectedTab = 'agents';
     return $scope.loadGroup(parameters.group);
-  });;
+  });
 
   $scope.$on('wazuhShowGroupFile', (ev, parameters) => {
     ev.stopPropagation();

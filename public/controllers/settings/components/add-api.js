@@ -35,9 +35,8 @@ export class AddApi extends Component {
     };
   }
 
-
   componentDidMount() {
-    this.setState({enableClose: this.props.enableClose});
+    this.setState({ enableClose: this.props.enableClose });
     this.checkErrorsAtInit();
   }
 
@@ -50,7 +49,9 @@ export class AddApi extends Component {
       this.setState({
         status: error.type || 'danger',
         blockClose: true,
-        message: (error.data || error).message || 'Wazuh API not reachable, please review your configuration',
+        message:
+          (error.data || error).message ||
+          'Wazuh API not reachable, please review your configuration',
         fetchingData: false
       });
     }
@@ -65,7 +66,7 @@ export class AddApi extends Component {
       this.setState({
         status: 'incomplete',
         fetchingData: true,
-        blockClose: false,
+        blockClose: false
       });
 
       await this.props.checkForNewApis();
@@ -76,13 +77,18 @@ export class AddApi extends Component {
         closedEnabled: true
       });
     } catch (error) {
-      const close = (error.data && error.data.code && error.data.code === 2001) ? false : (error.closedEnabled || false);
+      const close =
+        error.data && error.data.code && error.data.code === 2001
+          ? false
+          : error.closedEnabled || false;
       this.setState({
         status: error.type || 'danger',
         closedEnabled: close,
         blockClose: !close,
         enableClose: false,
-        message: (error.data || error).message || 'Wazuh API not reachable, please review your configuration',
+        message:
+          (error.data || error).message ||
+          'Wazuh API not reachable, please review your configuration',
         fetchingData: false
       });
     }
@@ -98,14 +104,16 @@ export class AddApi extends Component {
 
     const checkConnectionChildren = (
       <div>
-        {(this.state.status === 'warning' || this.state.status === 'danger') && (
+        {(this.state.status === 'warning' ||
+          this.state.status === 'danger') && (
           <EuiCallOut
             color={this.state.status}
             iconType="help"
             title={this.state.message}
           />
         )}
-        {(this.state.status === 'warning' || this.state.status === 'danger') && <EuiSpacer />}
+        {(this.state.status === 'warning' ||
+          this.state.status === 'danger') && <EuiSpacer />}
         <EuiText>
           Check that the Kibana server can reach the configured Wazuh API(s).
         </EuiText>
@@ -116,13 +124,12 @@ export class AddApi extends Component {
         >
           Check connection
         </EuiButton>
-        {((this.state.closedEnabled || this.state.enableClose) && !this.state.blockClose) && (
-          <EuiButtonEmpty
-            onClick={() => this.props.closeAddApi()}
-          >
-            Close
-          </EuiButtonEmpty>
-        )}
+        {(this.state.closedEnabled || this.state.enableClose) &&
+          !this.state.blockClose && (
+            <EuiButtonEmpty onClick={() => this.props.closeAddApi()}>
+              Close
+            </EuiButtonEmpty>
+          )}
       </div>
     );
 
@@ -170,7 +177,7 @@ export class AddApi extends Component {
             </EuiFlexItem>
             <EuiFlexItem />
             <EuiFlexItem grow={false}>
-              {(this.state.enableClose && !this.state.blockClose) && (
+              {this.state.enableClose && !this.state.blockClose && (
                 <EuiButtonEmpty
                   size="s"
                   onClick={() => this.props.closeAddApi()}

@@ -454,20 +454,30 @@ export class ManagementController {
       this.errors = false;
       this.results = [];
       if (path === 'etc/rules') {
-        this.upload = this.rulesetHandler.sendRuleConfiguration
+        this.upload = this.rulesetHandler.sendRuleConfiguration;
       } else if (path === 'etc/decoders') {
-        this.upload = this.rulesetHandler.sendDecoderConfiguration
+        this.upload = this.rulesetHandler.sendDecoderConfiguration;
       } else {
-        this.upload = this.rulesetHandler.sendCdbList
+        this.upload = this.rulesetHandler.sendCdbList;
       }
       for (let idx in files) {
         const { file, content } = files[idx];
         try {
-          await this.upload(file, content, true); // True does not overwrite the file  
-          this.results.push({index: idx, uploaded: true, file: file, error: 0});
+          await this.upload(file, content, true); // True does not overwrite the file
+          this.results.push({
+            index: idx,
+            uploaded: true,
+            file: file,
+            error: 0
+          });
         } catch (error) {
-          this.errors = true
-          this.results.push({index: idx, uploaded: false, file: file, error: error});
+          this.errors = true;
+          this.results.push({
+            index: idx,
+            uploaded: false,
+            file: file,
+            error: error
+          });
         }
       }
       if (this.errors) throw this.results;
@@ -478,4 +488,4 @@ export class ManagementController {
       this.errorHandler.handle('Files cannot be uploaded');
     }
   }
-}     
+}

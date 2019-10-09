@@ -67,7 +67,10 @@ export class VisHandlers {
         return !!(((item || {}).vis || {}).searchSource || {}).rawResponse
           ? {
               rawResponse: item.vis.searchSource.rawResponse,
-              title: item.vis.title || item.dataLoader.previousVisState.title || 'Table',
+              title:
+                item.vis.title ||
+                item.dataLoader.previousVisState.title ||
+                'Table',
               columns
             }
           : false;
@@ -105,7 +108,8 @@ export class VisHandlers {
         item &&
         item.vis &&
         item.vis.title !== 'Agents status' &&
-        ((item.dataLoader || {}).previousVisState || {}).title !== 'Agents status' &&
+        ((item.dataLoader || {}).previousVisState || {}).title !==
+          'Agents status' &&
         item.vis.searchSource &&
         item.vis.searchSource.rawResponse &&
         item.vis.searchSource.rawResponse.hits &&

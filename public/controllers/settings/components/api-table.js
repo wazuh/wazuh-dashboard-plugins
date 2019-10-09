@@ -42,10 +42,9 @@ export class ApiTable extends Component {
     });
   }
 
-
   /**
-  * Refresh the API entries
-  */
+   * Refresh the API entries
+   */
   async refresh() {
     try {
       let status = 'complete';
@@ -62,7 +61,7 @@ export class ApiTable extends Component {
         try {
           const data = await this.props.testApi(entry);
           const clusterInfo = data.data || {};
-          const id = entries[idx].id;;
+          const id = entries[idx].id;
           entries[idx].status = 'online';
           entries[idx].cluster_info = clusterInfo;
           //Updates the cluster info in the registry
@@ -70,7 +69,8 @@ export class ApiTable extends Component {
         } catch (error) {
           numErr = numErr + 1;
           const code = ((error || {}).data || {}).code;
-          const downReason = ((error || {}).data || {}).message || 'Wazuh is not reachable';
+          const downReason =
+            ((error || {}).data || {}).message || 'Wazuh is not reachable';
           const status = code === 3099 ? 'down' : 'unknown';
           entries[idx].status = { status, downReason };
         }
@@ -84,7 +84,12 @@ export class ApiTable extends Component {
         refreshingEntries: false
       });
     } catch (error) {
-      if (error && error.data && error.data.message && error.data.code === 2001) {
+      if (
+        error &&
+        error.data &&
+        error.data.message &&
+        error.data.code === 2001
+      ) {
         this.props.showAddApiWithInitialError(error);
       }
     }
@@ -92,7 +97,7 @@ export class ApiTable extends Component {
 
   /**
    * Checks the API connectivity
-   * @param {Object} api 
+   * @param {Object} api
    */
   async checkApi(api) {
     try {
@@ -103,7 +108,8 @@ export class ApiTable extends Component {
         entries[idx].status = 'online';
       } catch (error) {
         const code = ((error || {}).data || {}).code;
-        const downReason = ((error || {}).data || {}).message || 'Wazuh is not reachable';
+        const downReason =
+          ((error || {}).data || {}).message || 'Wazuh is not reachable';
         const status = code === 3099 ? 'down' : 'unknown';
         entries[idx].status = { status, downReason };
       }
@@ -122,37 +128,37 @@ export class ApiTable extends Component {
         field: 'id',
         name: 'ID',
         align: 'left',
-        sortable: true,
+        sortable: true
       },
       {
         field: 'cluster_info.cluster',
         name: 'Cluster',
         align: 'left',
-        sortable: true,
+        sortable: true
       },
       {
         field: 'cluster_info.manager',
         name: 'Manager',
         align: 'left',
-        sortable: true,
+        sortable: true
       },
       {
         field: 'url',
         name: 'Host',
         align: 'left',
-        sortable: true,
+        sortable: true
       },
       {
         field: 'port',
         name: 'Port',
         align: 'left',
-        sortable: true,
+        sortable: true
       },
       {
         field: 'user',
         name: 'User',
         align: 'left',
-        sortable: true,
+        sortable: true
       },
       {
         field: 'status',
@@ -167,22 +173,35 @@ export class ApiTable extends Component {
               <span>
                 <EuiHealth color="warning">Warning</EuiHealth>
                 <EuiToolTip position="top" content={item.downReason}>
-                  <EuiButtonIcon color="primary" style={{ marginTop: '-12px' }} iconType="questionInCircle" onClick={() => this.props.copyToClipBoard(item.downReason)}/>
+                  <EuiButtonIcon
+                    color="primary"
+                    style={{ marginTop: '-12px' }}
+                    iconType="questionInCircle"
+                    onClick={() => this.props.copyToClipBoard(item.downReason)}
+                  />
                 </EuiToolTip>
-
               </span>
             ) : (
-                  <span>
-                    <EuiHealth color="danger">Offline</EuiHealth>
-                    <EuiToolTip position="top" content={item.downReason}>
-                      <EuiButtonIcon color="primary" style={{ marginTop: '-12px' }} iconType="questionInCircle" onClick={() => this.props.copyToClipBoard(item.downReason)}/>
-                    </EuiToolTip>
-                  </span >
-                );
+              <span>
+                <EuiHealth color="danger">Offline</EuiHealth>
+                <EuiToolTip position="top" content={item.downReason}>
+                  <EuiButtonIcon
+                    color="primary"
+                    style={{ marginTop: '-12px' }}
+                    iconType="questionInCircle"
+                    onClick={() => this.props.copyToClipBoard(item.downReason)}
+                  />
+                </EuiToolTip>
+              </span>
+            );
           } else {
-            return (<span><EuiLoadingSpinner size="s" /><span>&nbsp;&nbsp;Checking</span></span>);
+            return (
+              <span>
+                <EuiLoadingSpinner size="s" />
+                <span>&nbsp;&nbsp;Checking</span>
+              </span>
+            );
           }
-
         }
       },
       {
@@ -225,7 +244,7 @@ export class ApiTable extends Component {
     const search = {
       box: {
         incremental: this.state.incremental,
-        schema: true,
+        schema: true
       }
     };
 
@@ -247,7 +266,7 @@ export class ApiTable extends Component {
               onClick={() => this.props.showAddApi()}
             >
               Add new
-          </EuiButtonEmpty>
+            </EuiButtonEmpty>
           </EuiFlexItem>
           <EuiFlexItem grow={false}>
             <EuiButtonEmpty
@@ -261,7 +280,8 @@ export class ApiTable extends Component {
         <EuiFlexGroup>
           <EuiFlexItem>
             <EuiText color="subdued" style={{ paddingBottom: '15px' }}>
-              From here you can see how to set up your Wazuh host, establish as default, and check their connection and status.
+              From here you can see how to set up your Wazuh host, establish as
+              default, and check their connection and status.
             </EuiText>
           </EuiFlexItem>
         </EuiFlexGroup>

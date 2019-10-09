@@ -35,22 +35,24 @@ export class WazuhHostsCtrl {
       return result;
     } catch (error) {
       log('wazuh-hosts:getHostsEntries', error.message || error);
-      const errorResponse = reply ? ErrorResponse(error.message || error, 2001, 500, reply) : error;
+      const errorResponse = reply
+        ? ErrorResponse(error.message || error, 2001, 500, reply)
+        : error;
       return errorResponse;
     }
   }
 
   /**
    * Joins the hosts with the related information in the registry
-   * @param {Object} hosts 
-   * @param {Object} registry 
+   * @param {Object} hosts
+   * @param {Object} registry
    */
   joinHostRegistry(hosts, registry, removePassword = true) {
     try {
       const joined = [];
       hosts.forEach(h => {
         const id = Object.keys(h)[0];
-        const api = Object.assign(h[id], {id: id});
+        const api = Object.assign(h[id], { id: id });
         const host = Object.assign(api, registry[id]);
         if (removePassword) delete host.password;
         joined.push(host);
@@ -61,11 +63,11 @@ export class WazuhHostsCtrl {
     }
   }
   /**
- * This update an API hostname
- * @param {Object} req
- * @param {Object} reply
- * Status response or ErrorResponse
- */
+   * This update an API hostname
+   * @param {Object} req
+   * @param {Object} reply
+   * Status response or ErrorResponse
+   */
   async updateClusterInfo(req, reply) {
     try {
       const id = req.params.id;
@@ -79,7 +81,8 @@ export class WazuhHostsCtrl {
     } catch (error) {
       log('wazuh-hosts:updateClusterInfo', error.message || error);
       return ErrorResponse(
-        `Could not update data in wazuh-registry.json due to ${error.message || error}`,
+        `Could not update data in wazuh-registry.json due to ${error.message ||
+          error}`,
         2012,
         500,
         reply
@@ -95,13 +98,15 @@ export class WazuhHostsCtrl {
   async removeOrphanEntries(req, reply) {
     try {
       log('wazuh-hosts:cleanRegistry', 'Cleaning registry', 'debug');
-      if (!req.payload && !req.payload.entries) throw new Error('No entries given to check');
-      await this.updateRegistry.removeOrphanEntries(req.payload.entries)
+      if (!req.payload && !req.payload.entries)
+        throw new Error('No entries given to check');
+      await this.updateRegistry.removeOrphanEntries(req.payload.entries);
       return { statusCode: 200, message: 'ok' };
     } catch (error) {
       log('wazuh-hosts:cleanRegistry', error.message || error);
       return ErrorResponse(
-        `Could not clean entries in the wazuh-registry.json due to ${error.message || error}`,
+        `Could not clean entries in the wazuh-registry.json due to ${error.message ||
+          error}`,
         2013,
         500,
         reply

@@ -43,7 +43,7 @@ export function Initialize(server) {
         : 'wazuh-alerts-3.x-*';
     global.XPACK_RBAC_ENABLED =
       configurationFile &&
-        typeof configurationFile['xpack.rbac.enabled'] !== 'undefined'
+      typeof configurationFile['xpack.rbac.enabled'] !== 'undefined'
         ? configurationFile['xpack.rbac.enabled']
         : true;
   } catch (e) {
@@ -110,7 +110,6 @@ export function Initialize(server) {
     }
   };
 
-
   /**
    * Checks if the .wazuh index exist in order to migrate to wazuh.yml
    */
@@ -123,11 +122,15 @@ export function Initialize(server) {
       if (result) {
         try {
           const data = await wzWrapper.getWazuhAPIEntries();
-          const apiEntries = (((data || {}).hits || {}).hits || []);
-          await manageHosts.migrateFromIndex(apiEntries)
-          log('initialize:checkWazuhIndex', 'Index .wazuh will be removed and its content will be migrated to wazuh.yml', 'debug');
+          const apiEntries = ((data || {}).hits || {}).hits || [];
+          await manageHosts.migrateFromIndex(apiEntries);
+          log(
+            'initialize:checkWazuhIndex',
+            'Index .wazuh will be removed and its content will be migrated to wazuh.yml',
+            'debug'
+          );
           // Check if all APIs entries were migrated properly and delete it from the .wazuh index
-          await checkProperlyMigrate();     
+          await checkProperlyMigrate();
           await wzWrapper.deleteIndexByName('.wazuh');
         } catch (error) {
           throw new Error(error);
@@ -147,7 +150,7 @@ export function Initialize(server) {
       let apisIndex = await wzWrapper.getWazuhAPIEntries();
       const hosts = await manageHosts.getHosts();
       apisIndex = (apisIndex.hits || {}).hits || [];
-  
+
       const apisIndexKeys = apisIndex.map(api => {
         return api._id;
       });
@@ -157,19 +160,24 @@ export function Initialize(server) {
 
       // Get into an array the API entries that were not migrated, if the length is 0 then all the API entries were properly migrated.
       const rest = apisIndexKeys.filter(k => {
-        return !hostsKeys.includes(k)
+        return !hostsKeys.includes(k);
       });
 
       if (rest.length) {
-        throw new Error(`Cannot migrate all API entries, missed entries: (${rest.toString()})`)
+        throw new Error(
+          `Cannot migrate all API entries, missed entries: (${rest.toString()})`
+        );
       }
-      log('initialize:checkProperlyMigrate', 'The API entries migration was successful', 'debug');
+      log(
+        'initialize:checkProperlyMigrate',
+        'The API entries migration was successful',
+        'debug'
+      );
     } catch (error) {
       log('initialize:checkProperlyMigrate', `${error}`, 'error');
       return Promise.reject(error);
     }
-  }
-
+  };
 
   /**
    * Checks if the .wazuh-version exists, in this case it will be deleted and the wazuh-registry.json will be created
@@ -289,7 +297,7 @@ export function Initialize(server) {
       return Promise.reject(
         new Error(
           `Error creating ${
-          wzWrapper.WZ_KIBANA_INDEX
+            wzWrapper.WZ_KIBANA_INDEX
           } index due to ${error.message || error}`
         )
       );
@@ -310,7 +318,7 @@ export function Initialize(server) {
       return Promise.reject(
         new Error(
           `Error creating template for ${
-          wzWrapper.WZ_KIBANA_INDEX
+            wzWrapper.WZ_KIBANA_INDEX
           } due to ${error.message || error}`
         )
       );

@@ -11,33 +11,31 @@
  */
 
 export class StringsTools {
-    constructor () {}
-    /**
-     * Set the first letter to upper case
-     *
-     * @param {*} str
-     * @returns capitalized str
-     * @memberof StringsTools
-     */
-    capitalize (str) {
-      return str[0].toUpperCase() + str.slice(1);
-    }
-  
-    
-    /**
-     * Remove all white spaces from str
-     *
-     * @param {*} str
-     * @returns striped str
-     * @memberof StringsTools
-     */
-    strip (str) {
-      return str.replace(/\s+/g, '');
-    }
-  
-    toUpperCamelCase (str) {
-      const capitalizeStrs = str.split(' ').map((s) => this.capitalize(s));
-      return capitalizeStrs.join('');
-    }
-  
+  constructor() {}
+  /**
+   * Set the first letter to upper case
+   *
+   * @param {*} str
+   * @returns capitalized str
+   * @memberof StringsTools
+   */
+  capitalize(str) {
+    return str[0].toUpperCase() + str.slice(1);
   }
+
+  /**
+   * Remove all white spaces from str
+   *
+   * @param {*} str
+   * @returns striped str
+   * @memberof StringsTools
+   */
+  strip(str) {
+    return str.replace(/\s+/g, '');
+  }
+
+  toUpperCamelCase(str) {
+    const capitalizeStrs = str.split(' ').map(s => this.capitalize(s));
+    return capitalizeStrs.join('');
+  }
+}

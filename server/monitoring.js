@@ -249,7 +249,7 @@ export class Monitoring {
           user: element.user,
           password: element.password,
           url: element.url,
-          port: element.port,
+          port: element.port
         };
         log(
           'monitoring:loadCredentials',

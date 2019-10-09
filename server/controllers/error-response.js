@@ -44,9 +44,11 @@ export function ErrorResponse(
         message.includes('EAI_AGAIN')) &&
       code === 3005
     ) {
-      filteredMessage = 'Wazuh API is not reachable. Please check your url and port.';
+      filteredMessage =
+        'Wazuh API is not reachable. Please check your url and port.';
     } else if (isString && message.includes('ECONNREFUSED') && code === 3005) {
-      filteredMessage = 'Wazuh API is not reachable. Please check your url and port.';
+      filteredMessage =
+        'Wazuh API is not reachable. Please check your url and port.';
     } else if (
       isString &&
       message.toLowerCase().includes('not found') &&
