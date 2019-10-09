@@ -346,8 +346,11 @@ export class ManagementController {
   switchFilesSubTab(flag, showFile) {
     this.managingFiles = flag || true;
     if (showFile) {
-      this.showFile = showFile;
-    }
+      this.showFile = showFile;   
+      this.$scope.$broadcast('editFromTable');
+    }else{
+      this.$scope.$broadcast('closeRulesetFile');      
+    } 
   }
 
   breadCrumbBack(goRoot = false) {

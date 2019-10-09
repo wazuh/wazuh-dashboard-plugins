@@ -33,22 +33,27 @@ export class FilesController {
   $onInit() {
     const configuration = this.wazuhConfig.getConfig();
     this.adminMode = !!(configuration || {}).admin;
-    if (this.$scope.mctrl.showFile) {
-      this.$scope.editorReadOnly = !(
-        this.$scope.mctrl.showFile.parameters.path === 'etc/rules' ||
-        this.$scope.mctrl.showFile.parameters.path === 'etc/decoders'
-      );
-      this.editFile(
-        this.$scope.mctrl.showFile.parameters,
-        this.$scope.editorReadOnly
-      );
-      this.$scope.goBack = true;
-      this.$scope.viewingDetail = this.$scope.mctrl.showFile.parameters.viewingDetail;
-    }
+
     this.$scope.mctrl.showFile = false;
     this.$scope.$on('editFile', (ev, params) => {
       this.$scope.editorReadOnly = false;
       this.editFile(params);
+      this.$scope.$applyAsync();
+    });
+
+    this.$scope.$on('editFromTable', () => {
+      if (this.$scope.mctrl.showFile) {
+        this.$scope.editorReadOnly = !(
+          this.$scope.mctrl.showFile.parameters.path === 'etc/rules' ||
+          this.$scope.mctrl.showFile.parameters.path === 'etc/decoders'
+        );
+        this.editFile(
+          this.$scope.mctrl.showFile.parameters,
+          this.$scope.editorReadOnly
+        );
+        this.$scope.goBack = true;
+        this.$scope.viewingDetail = this.$scope.mctrl.showFile.parameters.viewingDetail;
+      }
       this.$scope.$applyAsync();
     });
 
