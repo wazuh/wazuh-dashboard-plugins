@@ -54,9 +54,9 @@ export class WazuhApiCtrl {
   async checkStoredAPI(req, reply) {
     try {
       // Get config from wazuh.yml
-      const id = req.payload.id || req.payload
+      const id = req.payload.id || req.payload;
       const api = await this.manageHosts.getHostById(id);
-      
+
       // Check Manage Hosts
       if (!Object.keys(api).length) {
         throw new Error('Could not find Wazuh API entry on wazuh.yml');
@@ -77,7 +77,12 @@ export class WazuhApiCtrl {
 
       // Look for socket-related errors
       if (this.checkResponseIsDown(response)) {
-        return ErrorResponse(`ERROR3099 - ${response.body.message || 'Wazuh not ready yet'}`, 3099, 500, reply);
+        return ErrorResponse(
+          `ERROR3099 - ${response.body.message || 'Wazuh not ready yet'}`,
+          3099,
+          500,
+          reply
+        );
       }
 
       // Store error and data fields from the Wazuh API into different variables
@@ -142,7 +147,7 @@ export class WazuhApiCtrl {
               try {
                 const id = Object.keys(api)[0];
                 const host = api[id];
-                const options = ApiHelper.buildOptionsObject(host);              
+                const options = ApiHelper.buildOptionsObject(host);
                 const response = await needle(
                   'get',
                   `${host.url}:${host.port}/version`,
@@ -151,7 +156,13 @@ export class WazuhApiCtrl {
                 );
 
                 if (this.checkResponseIsDown(response)) {
-                  return ErrorResponse(`ERROR3099 - ${response.body.message || 'Wazuh not ready yet'}`, 3099, 500, reply);
+                  return ErrorResponse(
+                    `ERROR3099 - ${response.body.message ||
+                      'Wazuh not ready yet'}`,
+                    3099,
+                    500,
+                    reply
+                  );
                 }
 
                 if (
@@ -245,7 +256,12 @@ export class WazuhApiCtrl {
 
       const responseIsDown = this.checkResponseIsDown(response);
       if (responseIsDown) {
-        return ErrorResponse(`ERROR3099 - ${response.body.message || 'Wazuh not ready yet'}`, 3099, 500, reply);
+        return ErrorResponse(
+          `ERROR3099 - ${response.body.message || 'Wazuh not ready yet'}`,
+          3099,
+          500,
+          reply
+        );
       }
 
       // Check wrong credentials
@@ -344,7 +360,7 @@ export class WazuhApiCtrl {
         if (!req.headers.id) {
           return pciRequirementsFile;
         }
-        
+
         const apiId = req.headers.id;
         const api = await this.manageHosts.getHostById(apiId);
 
@@ -360,7 +376,7 @@ export class WazuhApiCtrl {
             400,
             reply
           );
-        } 
+        }
 
         const response = await needle(
           'get',
@@ -465,7 +481,7 @@ export class WazuhApiCtrl {
             400,
             reply
           );
-        } 
+        }
 
         const response = await needle(
           'get',
@@ -561,7 +577,7 @@ export class WazuhApiCtrl {
             400,
             reply
           );
-        } 
+        }
 
         const response = await needle(
           'get',
@@ -623,7 +639,7 @@ export class WazuhApiCtrl {
         if (!req.headers.id) {
           return nistRequirementsFile;
         }
-       
+
         const apiId = req.headers.id;
         const api = await this.manageHosts.getHostById(apiId);
 
@@ -639,7 +655,7 @@ export class WazuhApiCtrl {
             400,
             reply
           );
-        } 
+        }
 
         const response = await needle(
           'get',
@@ -787,7 +803,7 @@ export class WazuhApiCtrl {
           404,
           reply
         );
-      } 
+      }
 
       if (!data) {
         data = {};
@@ -845,7 +861,12 @@ export class WazuhApiCtrl {
               'wazuh-api:makeRequest',
               'Wazuh API is online but Wazuh is not ready yet'
             );
-            return ErrorResponse(`ERROR3099 - ${response.body.message || 'Wazuh not ready yet'}`, 3099, 500, reply);
+            return ErrorResponse(
+              `ERROR3099 - ${response.body.message || 'Wazuh not ready yet'}`,
+              3099,
+              500,
+              reply
+            );
           }
         }
       }
@@ -877,14 +898,24 @@ export class WazuhApiCtrl {
 
       const responseIsDown = this.checkResponseIsDown(response);
       if (responseIsDown) {
-        return ErrorResponse(`ERROR3099 - ${response.body.message || 'Wazuh not ready yet'}`, 3099, 500, reply);
+        return ErrorResponse(
+          `ERROR3099 - ${response.body.message || 'Wazuh not ready yet'}`,
+          3099,
+          500,
+          reply
+        );
       }
 
       const responseBody = (response || {}).body || {};
       let responseData = responseBody.data;
       if (!responseData) {
-        responseData = typeof responseData === 'string' && path.includes('/files') && method === 'GET' ? ' ' : false
-        response.body.data = responseData
+        responseData =
+          typeof responseData === 'string' &&
+          path.includes('/files') &&
+          method === 'GET'
+            ? ' '
+            : false;
+        response.body.data = responseData;
       }
       const responseError = responseBody.error || false;
 
@@ -931,7 +962,7 @@ export class WazuhApiCtrl {
       if (!Object.keys(api).length) {
         //Can not get credentials from wazuh-hosts
         throw new Error('Could not get host credentials');
-      } 
+      }
 
       if (!method.match(/^(?:GET|PUT|POST|DELETE)$/)) {
         log('wazuh-api:makeRequest', 'Request method is not valid.');
@@ -996,9 +1027,9 @@ export class WazuhApiCtrl {
       log('wazuh-api:makeRequest', 'Request method is not valid.');
       //Method is not a valid HTTP request method
       return ErrorResponse('Request method is not valid.', 3015, 400, reply);
-    }else if (!req.payload.path) {
+    } else if (!req.payload.path) {
       return ErrorResponse('Missing param: path', 3016, 400, reply);
-    }else if (!req.payload.path.match(/^\/.+/)) {
+    } else if (!req.payload.path.match(/^\/.+/)) {
       log('wazuh-api:makeRequest', 'Request path is not valid.');
       //Path doesn't start with '/'
       return ErrorResponse('Request path is not valid.', 3015, 400, reply);
@@ -1078,9 +1109,7 @@ export class WazuhApiCtrl {
         ? req.payload.filters
         : [];
 
-      const config = await this.manageHosts.getHostById(
-        req.payload.id
-      );
+      const config = await this.manageHosts.getHostById(req.payload.id);
 
       let tmpPath = req.payload.path;
 
@@ -1140,10 +1169,7 @@ export class WazuhApiCtrl {
 
         if (isAgents || isAgentsOfGroup) {
           if (isFiles) {
-            fields = [
-              'filename',
-              'hash'
-            ];
+            fields = ['filename', 'hash'];
           } else {
             fields = [
               'id',
@@ -1227,9 +1253,7 @@ export class WazuhApiCtrl {
       if (!req.params || !req.params.api)
         throw new Error('Field api is required');
 
-      const config = await this.manageHosts.getHostById(
-        req.params.api
-      );
+      const config = await this.manageHosts.getHostById(req.params.api);
 
       const headers = ApiHelper.buildOptionsObject(config);
 
@@ -1323,7 +1347,9 @@ export class WazuhApiCtrl {
    */
   getTimeStamp(req, reply) {
     try {
-      const source = JSON.parse(fs.readFileSync(this.updateRegistry.file, 'utf8'));
+      const source = JSON.parse(
+        fs.readFileSync(this.updateRegistry.file, 'utf8')
+      );
       if (source.installationDate && source.lastRestart) {
         log(
           'wazuh-api:getTimeStamp',
@@ -1356,7 +1382,9 @@ export class WazuhApiCtrl {
    */
   async getSetupInfo(req, reply) {
     try {
-      const source = JSON.parse(fs.readFileSync(this.updateRegistry.file, 'utf8'));
+      const source = JSON.parse(
+        fs.readFileSync(this.updateRegistry.file, 'utf8')
+      );
       return !Object.values(source).length
         ? { statusCode: 200, data: '' }
         : { statusCode: 200, data: source };

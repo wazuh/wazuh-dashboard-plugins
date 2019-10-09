@@ -140,7 +140,7 @@ export class HealthCheck {
   async checkApiConnection() {
     try {
       const currentApi = JSON.parse(this.appState.getCurrentAPI() || '{}');
-      if (this.checks.api && currentApi && currentApi.id) {     
+      if (this.checks.api && currentApi && currentApi.id) {
         const data = await this.testAPI.checkStored(currentApi.id);
 
         if (((data || {}).data || {}).idChanged) {
@@ -217,7 +217,7 @@ export class HealthCheck {
   async load() {
     try {
       const configuration = this.wazuhConfig.getConfig();
-      
+
       this.appState.setPatternSelector(configuration['ip.selector']);
 
       this.checks.pattern = configuration['checks.pattern'];

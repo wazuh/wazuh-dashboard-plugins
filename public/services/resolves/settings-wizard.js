@@ -29,7 +29,7 @@ export function settingsWizard(
     const checkResponse = data => {
       let fromWazuhHosts = false;
       if (parseInt(data.data.error) === 2) {
-        console.log('default akaaakaa')
+        console.log('default akaaakaa');
         !disableErrors &&
           errorHandler.handle(
             'Please set up Wazuh API credentials.',
@@ -105,7 +105,10 @@ export function settingsWizard(
       try {
         currentApi = JSON.parse(appState.getCurrentAPI()).id;
       } catch (error) {
-        console.log('Error parsing JSON (settingsWizards.callCheckStored 1)', error);
+        console.log(
+          'Error parsing JSON (settingsWizards.callCheckStored 1)',
+          error
+        );
       }
       if (currentApi && !appState.getExtensions(currentApi)) {
         const extensions = {
@@ -152,7 +155,7 @@ export function settingsWizard(
             }
           }
         })
-        .catch((error) => {
+        .catch(error => {
           appState.removeCurrentAPI();
           setUpCredentials(
             'Wazuh App: Please set up Wazuh API credentials.',
@@ -190,9 +193,7 @@ export function settingsWizard(
                 name: api.cluster_info.manager,
                 id: id
               });
-              appState.setCurrentAPI(
-                defaultApi
-              );
+              appState.setCurrentAPI(defaultApi);
               callCheckStored();
               return defaultApi;
             }
@@ -207,7 +208,7 @@ export function settingsWizard(
       } catch (error) {
         return Promise.reject(error);
       }
-    }
+    };
 
     const currentParams = $location.search();
     const targetedAgent =
@@ -282,7 +283,7 @@ export function settingsWizard(
               }
             }
           })
-          .catch((error) => {
+          .catch(error => {
             setUpCredentials('Wazuh App: Please set up Wazuh API credentials.');
           });
       }

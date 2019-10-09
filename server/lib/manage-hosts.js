@@ -22,11 +22,10 @@ export class ManageHosts {
     this.updateRegistry = new UpdateRegistry();
   }
 
-
   /**
    * Composes the host structure
-   * @param {Object} host 
-   * @param {String} id 
+   * @param {Object} host
+   * @param {String} id
    */
   composeHost(host, id) {
     try {
@@ -44,12 +43,12 @@ export class ManageHosts {
 
   /**
    * Regex to build the host
-   * @param {Object} host 
+   * @param {Object} host
    */
   composeRegex(host) {
     try {
       const hostId = Object.keys(host)[0];
-      const reg = `\\s*-\\s*${hostId}\\s*:\\s*\\n*\\s*url\\s*:\\s*\\S*\\s*\\n*\\s*port\\s*:\\s*\\S*\\s*\\n*\\s*user\\s*:\\s*\\S*\\s*\\n*\\s*password\\s*:\\s*\\S*`
+      const reg = `\\s*-\\s*${hostId}\\s*:\\s*\\n*\\s*url\\s*:\\s*\\S*\\s*\\n*\\s*port\\s*:\\s*\\S*\\s*\\n*\\s*user\\s*:\\s*\\S*\\s*\\n*\\s*password\\s*:\\s*\\S*`;
       log('manage-hosts:composeRegex', 'Composing regex', 'debug');
       return new RegExp(`${reg}`, 'gm');
     } catch (error) {
@@ -102,7 +101,9 @@ export class ManageHosts {
   async getCurrentHostsIds() {
     try {
       const hosts = await this.getHosts();
-      const ids = hosts.map(h => { return Object.keys(h)[0] })
+      const ids = hosts.map(h => {
+        return Object.keys(h)[0];
+      });
       log('manage-hosts:getCurrentHostsIds', 'Getting hosts ids', 'debug');
       return ids;
     } catch (error) {
@@ -113,15 +114,17 @@ export class ManageHosts {
 
   /**
    * Get host by id
-   * @param {String} id 
+   * @param {String} id
    */
   async getHostById(id) {
     try {
       log('manage-hosts:getHostById', `Getting host ${id}`, 'debug');
       const hosts = await this.getHosts();
-      const host = hosts.filter(h => { return Object.keys(h)[0] == id });
+      const host = hosts.filter(h => {
+        return Object.keys(h)[0] == id;
+      });
       const key = Object.keys(host[0])[0];
-      const result = Object.assign(host[0][key], {id: key}) || {};
+      const result = Object.assign(host[0][key], { id: key }) || {};
       return result;
     } catch (error) {
       log('manage-hosts:getHostById', error.message || error);
@@ -131,18 +134,15 @@ export class ManageHosts {
 
   /**
    * Decodes the API password
-   * @param {String} password 
+   * @param {String} password
    */
   decodeApiPassword(password) {
-    return Buffer.from(
-      password,
-      'base64'
-    ).toString('ascii');
+    return Buffer.from(password, 'base64').toString('ascii');
   }
 
   /**
    *  Iterate the array with the API entries in given from the .wazuh index in order to create a valid array
-   * @param {Object} apiEntries 
+   * @param {Object} apiEntries
    */
   transformIndexedApis(apiEntries) {
     const entries = [];
@@ -161,7 +161,11 @@ export class ManageHosts {
         };
         entries.push(api);
       });
-      log('manage-hosts:transformIndexedApis', 'Transforming index API schedule to wazuh.yml', 'debug');
+      log(
+        'manage-hosts:transformIndexedApis',
+        'Transforming index API schedule to wazuh.yml',
+        'debug'
+      );
     } catch (error) {
       log('manage-hosts:transformIndexedApis', error.message || error);
       throw error;
@@ -169,11 +173,10 @@ export class ManageHosts {
     return entries;
   }
 
-
   /**
-  * Calls transformIndexedApis() to get the entries to migrate and after that calls addSeveralHosts()
-  * @param {Object} apiEntries 
-  */
+   * Calls transformIndexedApis() to get the entries to migrate and after that calls addSeveralHosts()
+   * @param {Object} apiEntries
+   */
   async migrateFromIndex(apiEntries) {
     try {
       const apis = this.transformIndexedApis(apiEntries);
@@ -186,13 +189,19 @@ export class ManageHosts {
 
   /**
    * Receives an array of hosts and checks if any host is already in the wazuh.yml, in this case is removed from the received array and returns the resulting array
-   * @param {Array} hosts 
+   * @param {Array} hosts
    */
   async cleanExistingHosts(hosts) {
     try {
       const currentHosts = await this.getCurrentHostsIds();
-      const cleanHosts = hosts.filter(h => { return !currentHosts.includes(h.id) });
-      log('manage-hosts:cleanExistingHosts', 'Preventing add existings hosts', 'debug');
+      const cleanHosts = hosts.filter(h => {
+        return !currentHosts.includes(h.id);
+      });
+      log(
+        'manage-hosts:cleanExistingHosts',
+        'Preventing add existings hosts',
+        'debug'
+      );
       return cleanHosts;
     } catch (error) {
       log('manage-hosts:cleanExistingHosts', error.message || error);
@@ -204,23 +213,24 @@ export class ManageHosts {
    * Throws an error is the wazuh.yml is busy
    */
   checkBusy() {
-    if (this.busy) throw new Error('Another process is writting the configuration file');
+    if (this.busy)
+      throw new Error('Another process is writting the configuration file');
   }
 
   /**
    * Recursive function used to add several APIs entries
-   * @param {Array} hosts 
+   * @param {Array} hosts
    */
   async addSeveralHosts(hosts) {
     try {
       log('manage-hosts:addSeveralHosts', 'Adding several', 'debug');
       const hostsToAdd = await this.cleanExistingHosts(hosts);
-      if (!hostsToAdd.length) return 'There are not APIs entries to migrate'
+      if (!hostsToAdd.length) return 'There are not APIs entries to migrate';
       for (let idx in hostsToAdd) {
         const entry = hostsToAdd[idx];
         await this.addHost(entry);
       }
-      return 'All APIs entries were migrated to the wazuh.yml'
+      return 'All APIs entries were migrated to the wazuh.yml';
     } catch (error) {
       log('manage-hosts:addSeveralHosts', error.message || error);
       return Promise.reject(error);
@@ -229,7 +239,7 @@ export class ManageHosts {
 
   /**
    * Add a single host
-   * @param {Obeject} host 
+   * @param {Obeject} host
    */
   async addHost(host) {
     const id = host.id || new Date().getTime();
@@ -237,23 +247,35 @@ export class ManageHosts {
     let data = await fs.readFileSync(this.file, { encoding: 'utf-8' });
     try {
       this.checkBusy();
-      const hosts = await this.getHosts() || [];
+      const hosts = (await this.getHosts()) || [];
       this.busy = true;
       if (!hosts.length) {
         const hostsExists = await this.checkIfHostsKeyExists();
-        const result = !hostsExists ? `${data}\nhosts:\n${compose}\n` : `${data}\n${compose}\n`;
+        const result = !hostsExists
+          ? `${data}\nhosts:\n${compose}\n`
+          : `${data}\n${compose}\n`;
         await fs.writeFileSync(this.file, result, 'utf8');
       } else {
         const lastHost = (hosts || []).pop();
         if (lastHost) {
-          const lastHostObject = this.composeHost(lastHost[Object.keys(lastHost)[0]], Object.keys(lastHost)[0]);
+          const lastHostObject = this.composeHost(
+            lastHost[Object.keys(lastHost)[0]],
+            Object.keys(lastHost)[0]
+          );
           const regex = this.composeRegex(lastHost);
-          const replace = data.replace(regex, `\n${lastHostObject}\n${compose}\n`)
+          const replace = data.replace(
+            regex,
+            `\n${lastHostObject}\n${compose}\n`
+          );
           await fs.writeFileSync(this.file, replace, 'utf8');
         }
       }
       this.busy = false;
-      this.updateRegistry.migrateToRegistry(id, host.cluster_info, host.extensions);
+      this.updateRegistry.migrateToRegistry(
+        id,
+        host.cluster_info,
+        host.extensions
+      );
       log('manage-hosts:addHost', `Host ${id} was properly added`, 'debug');
       return id;
     } catch (error) {
@@ -271,29 +293,36 @@ export class ManageHosts {
     let data = await fs.readFileSync(this.file, { encoding: 'utf-8' });
     try {
       this.checkBusy();
-      const hosts = await this.getHosts() || [];
+      const hosts = (await this.getHosts()) || [];
       this.busy = true;
       if (!hosts.length) {
         throw new Error('There are not configured hosts.');
       } else {
         const hostsNumber = hosts.length;
-        const target = (hosts || []).find((element) => {
+        const target = (hosts || []).find(element => {
           return Object.keys(element)[0] === req.params.id;
         });
         if (!target) {
           throw new Error(`Host ${req.params.id} not found.`);
         }
         const regex = this.composeRegex(target);
-        const result = data.replace(regex, ``)
+        const result = data.replace(regex, ``);
         await fs.writeFileSync(this.file, result, 'utf8');
         if (hostsNumber === 1) {
           data = await fs.readFileSync(this.file, { encoding: 'utf-8' });
-          const clearHosts = data.replace(new RegExp(`hosts:\\s*[\\n\\r]`, 'gm'), '')
+          const clearHosts = data.replace(
+            new RegExp(`hosts:\\s*[\\n\\r]`, 'gm'),
+            ''
+          );
           await fs.writeFileSync(this.file, clearHosts, 'utf8');
         }
       }
       this.busy = false;
-      log('manage-hosts:deleteHost', `Host ${req.params.id} was properly deleted`, 'debug');
+      log(
+        'manage-hosts:deleteHost',
+        `Host ${req.params.id} was properly deleted`,
+        'debug'
+      );
       return true;
     } catch (error) {
       this.busy = false;
@@ -304,19 +333,19 @@ export class ManageHosts {
 
   /**
    * Updates the hosts information
-   * @param {String} id 
-   * @param {Object} host 
+   * @param {String} id
+   * @param {Object} host
    */
   async updateHost(id, host) {
     let data = await fs.readFileSync(this.file, { encoding: 'utf-8' });
     try {
       this.checkBusy();
-      const hosts = await this.getHosts() || [];
+      const hosts = (await this.getHosts()) || [];
       this.busy = true;
       if (!hosts.length) {
         throw new Error('There are not configured hosts.');
       } else {
-        const target = (hosts || []).find((element) => {
+        const target = (hosts || []).find(element => {
           return Object.keys(element)[0] === id;
         });
         if (!target) {
@@ -327,7 +356,11 @@ export class ManageHosts {
         await fs.writeFileSync(this.file, result, 'utf8');
       }
       this.busy = false;
-      log('manage-hosts:updateHost', `Host ${id} was properly updated`, 'debug');
+      log(
+        'manage-hosts:updateHost',
+        `Host ${id} was properly updated`,
+        'debug'
+      );
       return true;
     } catch (error) {
       this.busy = false;

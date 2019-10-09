@@ -297,11 +297,14 @@ export class AgentsPreviewController {
    */
   async needsPassword() {
     try {
-      const result = await this.apiReq.request('GET', '/agents/000/config/auth/auth', {});
+      const result = await this.apiReq.request(
+        'GET',
+        '/agents/000/config/auth/auth',
+        {}
+      );
       const auth = ((result.data || {}).data || {}).auth || {};
       const usePassword = auth.use_password === 'yes';
       return usePassword;
-
     } catch (error) {
       return false;
     }
@@ -314,7 +317,9 @@ export class AgentsPreviewController {
     try {
       const result = await this.genericReq.request('GET', '/elastic/apis');
       const entries = result.data || [];
-      const host = entries.filter(e => {return e._id == this.api});
+      const host = entries.filter(e => {
+        return e._id == this.api;
+      });
       const url = host[0]._source.url;
       const numToClean = url.startsWith('https://') ? 8 : 7;
       return url.substr(numToClean);

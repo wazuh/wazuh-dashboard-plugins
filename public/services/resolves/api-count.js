@@ -23,7 +23,8 @@ export function apiCount($q, genericReq, $location, appState) {
   genericReq
     .request('GET', '/hosts/apis')
     .then(async data => {
-      if (!data || !data.data || !data.data.length) throw new Error('No API entries found');
+      if (!data || !data.data || !data.data.length)
+        throw new Error('No API entries found');
       if (!appState.getCurrentAPI()) {
         await tryToSetDefault(data.data, appState);
       }

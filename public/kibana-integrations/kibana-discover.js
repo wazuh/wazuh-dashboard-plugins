@@ -814,7 +814,7 @@ function discoverController(
     const isClusterMonitoring = $scope.tabView === 'cluster-monitoring';
 
     // Wazuh. Should we fetch "_source" and "hits" ?
-    const noHits = (isPanels || isClusterMonitoring);
+    const noHits = isPanels || isClusterMonitoring;
 
     // Wazuh. The very first time, the copies are null, just create them
     if (!defaultSearchSource || !noHitsSearchSource) {

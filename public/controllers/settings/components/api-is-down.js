@@ -41,7 +41,6 @@ export class ApiIsDown extends Component {
     };
   }
 
-
   componentDidMount() {
     this.setState({
       apiEntries: [...this.props.apiEntries]
@@ -68,7 +67,7 @@ export class ApiIsDown extends Component {
         try {
           const data = await this.props.testApi(entry);
           const clusterInfo = data.data || {};
-          const id = entries[idx].id;;
+          const id = entries[idx].id;
           entries[idx].status = 'online';
           entries[idx].cluster_info = clusterInfo;
           //Updates the cluster info in the registry
@@ -76,7 +75,8 @@ export class ApiIsDown extends Component {
         } catch (error) {
           numErr = numErr + 1;
           const code = ((error || {}).data || {}).code;
-          const downReason = ((error || {}).data || {}).message || 'Wazuh is not reachable';
+          const downReason =
+            ((error || {}).data || {}).message || 'Wazuh is not reachable';
           const status = code === 3099 ? 'down' : 'unknown';
           entries[idx].status = { status, downReason };
         }
@@ -91,7 +91,12 @@ export class ApiIsDown extends Component {
         refreshingEntries: false
       });
     } catch (error) {
-      if (error && error.data && error.data.message && error.data.code === 2001) {
+      if (
+        error &&
+        error.data &&
+        error.data.message &&
+        error.data.code === 2001
+      ) {
         this.setState({ error: error.data.message, status: 'danger' });
       }
     }
@@ -122,16 +127,14 @@ hosts:
         </EuiButton>
         {this.state.status !== 'danger' &&
           this.state.status !== 'incomplete' && (
-            <EuiButtonEmpty
-              onClick={() => this.props.closeApiIsDown()}
-            >
+            <EuiButtonEmpty onClick={() => this.props.closeApiIsDown()}>
               Close
-        </EuiButtonEmpty>
+            </EuiButtonEmpty>
           )}
         <EuiSpacer />
         <EuiText>Already configured Wazuh API(s)</EuiText>
         <EuiSpacer />
-        {!this.state.error && (
+        {(!this.state.error && (
           <EuiBasicTable
             loading={this.state.refreshingEntries}
             items={this.state.apiEntries}
@@ -150,33 +153,50 @@ hosts:
                       <span>
                         <EuiHealth color="warning">Warning</EuiHealth>
                         <EuiToolTip position="top" content={item.downReason}>
-                         <EuiButtonIcon color="primary" style={{ marginTop: '-12px' }} iconType="questionInCircle" onClick={() => this.props.copyToClipBoard(item.downReason)}/>
+                          <EuiButtonIcon
+                            color="primary"
+                            style={{ marginTop: '-12px' }}
+                            iconType="questionInCircle"
+                            onClick={() =>
+                              this.props.copyToClipBoard(item.downReason)
+                            }
+                          />
                         </EuiToolTip>
-
                       </span>
                     ) : (
-                          <span>
-                            <EuiHealth color="danger">Offline</EuiHealth>
-                            <EuiToolTip position="top" content={item.downReason}>
-                             <EuiButtonIcon color="primary" style={{ marginTop: '-12px' }} iconType="questionInCircle" onClick={() => this.props.copyToClipBoard(item.downReason)}/>
-                            </EuiToolTip>
-                          </span >
-                        );
+                      <span>
+                        <EuiHealth color="danger">Offline</EuiHealth>
+                        <EuiToolTip position="top" content={item.downReason}>
+                          <EuiButtonIcon
+                            color="primary"
+                            style={{ marginTop: '-12px' }}
+                            iconType="questionInCircle"
+                            onClick={() =>
+                              this.props.copyToClipBoard(item.downReason)
+                            }
+                          />
+                        </EuiToolTip>
+                      </span>
+                    );
                   } else {
-                    return (<span><EuiLoadingSpinner size="s" /><span>&nbsp;&nbsp;Checking</span></span>);
+                    return (
+                      <span>
+                        <EuiLoadingSpinner size="s" />
+                        <span>&nbsp;&nbsp;Checking</span>
+                      </span>
+                    );
                   }
-
                 }
               }
             ]}
           />
-        ) || (
-            <EuiCallOut
-              color='danger'
-              iconType="cross"
-              title={this.state.error}
-            />
-          )}
+        )) || (
+          <EuiCallOut
+            color="danger"
+            iconType="cross"
+            title={this.state.error}
+          />
+        )}
       </div>
     );
 

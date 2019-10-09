@@ -83,7 +83,8 @@ export class SettingsController {
       await this.getSettings();
       const down = await this.checkApisStatus();
       //Checks if all the API entries are down
-      this.apiIsDown = (down >= this.apiEntries.length && this.apiEntries.length > 0);
+      this.apiIsDown =
+        down >= this.apiEntries.length && this.apiEntries.length > 0;
 
       const location = this.$location.search();
       if (location && location.tab) {
@@ -93,7 +94,7 @@ export class SettingsController {
 
       await this.getAppInfo();
     } catch (error) {
-      this.errorHandler.handle('Cannot initialize Settings')
+      this.errorHandler.handle('Cannot initialize Settings');
     }
   }
 
@@ -110,8 +111,10 @@ export class SettingsController {
       showAddApi: () => this.showAddApi(),
       getHosts: () => this.getHosts(),
       testApi: entry => this.testAPI.check(entry),
-      showAddApiWithInitialError: error => this.showAddApiWithInitialError(error),
-      updateClusterInfoInRegistry: (id, clusterInfo) => this.updateClusterInfoInRegistry(id, clusterInfo),
+      showAddApiWithInitialError: error =>
+        this.showAddApiWithInitialError(error),
+      updateClusterInfoInRegistry: (id, clusterInfo) =>
+        this.updateClusterInfoInRegistry(id, clusterInfo),
       showApiIsDown: () => this.showApiIsDown(),
       copyToClipBoard: msg => this.copyToClipBoard(msg)
     };
@@ -119,16 +122,17 @@ export class SettingsController {
     this.addApiProps = {
       checkForNewApis: () => this.checkForNewApis(),
       closeAddApi: () => this.closeAddApi()
-    }
+    };
 
     this.apiIsDownProps = {
       apiEntries: this.apiEntries,
       testApi: entry => this.testAPI.check(entry),
       closeApiIsDown: () => this.closeApiIsDown(),
       getHosts: () => this.getHosts(),
-      updateClusterInfoInRegistry: (id, clusterInfo) => this.updateClusterInfoInRegistry(id, clusterInfo),
+      updateClusterInfoInRegistry: (id, clusterInfo) =>
+        this.updateClusterInfoInRegistry(id, clusterInfo),
       copyToClipBoard: msg => this.copyToClipBoard(msg)
-    }
+    };
 
     this.settingsTabsProps = {
       clickAction: tab => {
@@ -144,7 +148,7 @@ export class SettingsController {
         { id: 'logs', name: 'Logs' },
         { id: 'about', name: 'About' }
       ]
-    }
+    };
   }
 
   /**
@@ -162,17 +166,19 @@ export class SettingsController {
   // Get current API index
   getCurrentAPIIndex() {
     if (this.apiEntries.length) {
-      const idx = this.apiEntries.map(entry => entry.id).indexOf(this.currentDefault);
+      const idx = this.apiEntries
+        .map(entry => entry.id)
+        .indexOf(this.currentDefault);
       this.currentApiEntryIndex = idx;
     }
   }
 
   /**
-  * Returns the index of the API in the entries array
-  * @param {Object} api 
-  */
+   * Returns the index of the API in the entries array
+   * @param {Object} api
+   */
   getApiIndex(api) {
-    return this.apiEntries.map(entry => entry.id).indexOf(api.id)
+    return this.apiEntries.map(entry => entry.id).indexOf(api.id);
   }
 
   /**
@@ -187,14 +193,15 @@ export class SettingsController {
           this.apiEntries[idx].status = 'online';
         } catch (error) {
           const code = ((error || {}).data || {}).code;
-          const downReason = ((error || {}).data || {}).message || 'Wazuh is not reachable';
+          const downReason =
+            ((error || {}).data || {}).message || 'Wazuh is not reachable';
           const status = code === 3099 ? 'down' : 'unknown';
           this.apiEntries[idx].status = { status, downReason };
           numError = numError + 1;
         }
-      };
+      }
       return numError;
-    } catch (error) { }
+    } catch (error) {}
   }
 
   // Set default API
@@ -206,7 +213,7 @@ export class SettingsController {
       const { cluster_info, id } = api;
       const { manager, cluster, status } = cluster_info;
 
-      // Check the connection before set as default 
+      // Check the connection before set as default
       this.appState.setClusterInfo(cluster_info);
       const clusterEnabled = status === 'disabled';
       this.appState.setCurrentAPI(
@@ -277,7 +284,7 @@ export class SettingsController {
 
       if (currentApi && !this.appState.getExtensions(this.currentDefault)) {
         const { id, extensions } = this.apiEntries[this.currentApiEntryIndex];
-        const apiExtensions = extensions || {}
+        const apiExtensions = extensions || {};
         this.appState.setExtensions(id, apiExtensions);
       }
 
@@ -286,13 +293,15 @@ export class SettingsController {
       this.errorHandler.handle('Error getting API entries', 'Settings');
     }
     // Every time that the API entries are required in the settings the registry will be checked in order to remove orphan host entries
-    await this.genericReq.request('POST', '/hosts/remove-orphan-entries', { entries: this.apiEntries });
+    await this.genericReq.request('POST', '/hosts/remove-orphan-entries', {
+      entries: this.apiEntries
+    });
     return;
   }
 
   /**
-   * @param {String} id 
-   * @param {Object} clusterInfo 
+   * @param {String} id
+   * @param {Object} clusterInfo
    */
   async updateClusterInfoInRegistry(id, clusterInfo) {
     try {
@@ -309,9 +318,7 @@ export class SettingsController {
   async checkManager(item, isIndex, silent = false) {
     try {
       // Get the index of the API in the entries
-      const index = isIndex
-        ? item
-        : this.getApiIndex(item);
+      const index = isIndex ? item : this.getApiIndex(item);
 
       // Get the Api information
       const api = this.apiEntries[index];
@@ -329,7 +336,7 @@ export class SettingsController {
       const data = await this.testAPI.check(tmpData);
       tmpData.cluster_info = data.data;
       const { cluster_info } = tmpData;
-      // Updates the cluster-information in the registry 
+      // Updates the cluster-information in the registry
       await this.updateClusterInfoInRegistry(id, cluster_info);
       this.$scope.$emit('updateAPI', { cluster_info });
       this.apiEntries[index].cluster_info = cluster_info;
@@ -403,7 +410,10 @@ export class SettingsController {
       }
 
       this.getCurrentAPIIndex();
-      if ((this.currentApiEntryIndex || this.currentApiEntryIndex === 0) && this.currentApiEntryIndex >= 0) {
+      if (
+        (this.currentApiEntryIndex || this.currentApiEntryIndex === 0) &&
+        this.currentApiEntryIndex >= 0
+      ) {
         await this.checkManager(this.currentApiEntryIndex, true, true);
       }
       this.$scope.$applyAsync();
@@ -499,14 +509,28 @@ export class SettingsController {
       this.addApiProps.errorsAtInit = false;
       const hosts = await this.getHosts();
       //Tries to check if there are new APIs entries in the wazuh.yml also, checks if some of them have connection
-      if (!hosts.length) throw { message: 'There were not found any API entry in the wazuh.yml', type: 'warning', closedEnabled: false };
+      if (!hosts.length)
+        throw {
+          message: 'There were not found any API entry in the wazuh.yml',
+          type: 'warning',
+          closedEnabled: false
+        };
       const notRecheable = await this.checkApisStatus();
       if (notRecheable) {
         if (notRecheable >= hosts.length) {
           this.apiIsDown = true;
-          throw { message: 'Wazuh API not recheable, please review your configuration', type: 'danger', closedEnabled: true };
+          throw {
+            message:
+              'Wazuh API not recheable, please review your configuration',
+            type: 'danger',
+            closedEnabled: true
+          };
         }
-        throw { message: 'Some API entries are not reachable', type: 'warning', closedEnabled: true };
+        throw {
+          message: 'Some API entries are not reachable',
+          type: 'warning',
+          closedEnabled: true
+        };
       }
       return;
     } catch (error) {
@@ -551,8 +575,8 @@ export class SettingsController {
   }
 
   /**
-  * Shows the add API component
-  */
+   * Shows the add API component
+   */
   showApiIsDown() {
     this.apiIsDown = true;
     this.$scope.$applyAsync();
@@ -584,7 +608,8 @@ export class SettingsController {
       this.apiEntries = await this.getHosts();
       const down = await this.checkApisStatus();
       //Checks if all the API entries are down
-      this.apiIsDown = (down >= this.apiEntries.length && this.apiEntries.length > 0);
+      this.apiIsDown =
+        down >= this.apiEntries.length && this.apiEntries.length > 0;
       this.$scope.$applyAsync();
       return this.apiEntries;
     } catch (error) {
@@ -595,7 +620,7 @@ export class SettingsController {
 
   /**
    * Copy to the clickboard the string passed
-   * @param {String} msg 
+   * @param {String} msg
    */
   copyToClipBoard(msg) {
     const el = document.createElement('textarea');

@@ -4,13 +4,13 @@ import { resolveKibanaPath } from '@kbn/plugin-helpers';
 import { pageObjects } from './page_objects';
 import { services } from './services';
 
-export default async function ({ readConfigFile }) {
-  const kibanaConfig = await readConfigFile(resolveKibanaPath('test/functional/config.js'));
+export default async function({ readConfigFile }) {
+  const kibanaConfig = await readConfigFile(
+    resolveKibanaPath('test/functional/config.js')
+  );
 
   return {
-    testFiles: [
-      require.resolve('./apps/overview'),
-    ],
+    testFiles: [require.resolve('./apps/overview')],
 
     services: {
       ...kibanaConfig.get('services'),
@@ -19,22 +19,22 @@ export default async function ({ readConfigFile }) {
 
     pageObjects: {
       ...kibanaConfig.get('pageObjects'),
-      ...pageObjects,
+      ...pageObjects
     },
 
     apps: {
       ...kibanaConfig.get('apps'),
       wazuh: {
-        pathname: '/app/wazuh',
+        pathname: '/app/wazuh'
       }
     },
 
     esArchiver: {
-      directory: resolve(__dirname, './es_archives'),
+      directory: resolve(__dirname, './es_archives')
     },
 
     screenshots: {
-      directory: resolve(__dirname, './tmp/screenshots'),
+      directory: resolve(__dirname, './tmp/screenshots')
     },
 
     servers: kibanaConfig.get('servers'),
@@ -47,7 +47,7 @@ export default async function ({ readConfigFile }) {
         ...kibanaConfig.get('kbnTestServer.serverArgs'),
         '--oss',
         `--plugin-path=${resolve(__dirname, '../../')}`
-      ],
-    },
+      ]
+    }
   };
 }

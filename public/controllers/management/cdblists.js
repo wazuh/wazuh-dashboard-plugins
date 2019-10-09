@@ -64,7 +64,10 @@ export class CdbListsController {
           `${this.currentList.path}/${this.currentList.name}`
         );
         let list = stringToObj(data.data.data);
-        list = Object.keys(list).length === 1 && !Object.keys(list)[0].trim() ? {} : list
+        list =
+          Object.keys(list).length === 1 && !Object.keys(list)[0].trim()
+            ? {}
+            : list;
         this.currentList.list = list;
         this.viewingDetail = true;
         this.$scope.$emit('setCurrentList', { currentList: this.currentList });
@@ -167,7 +170,7 @@ export class CdbListsController {
   /**
    * Refresh the list of cdb lists
    */
-  refresh(){
+  refresh() {
     this.search();
   }
 
