@@ -177,6 +177,7 @@ export class ApiTable extends Component {
                     color="primary"
                     style={{ marginTop: '-12px' }}
                     iconType="questionInCircle"
+                    aria-label="Info about the error"
                     onClick={() => this.props.copyToClipBoard(item.downReason)}
                   />
                 </EuiToolTip>
@@ -189,6 +190,7 @@ export class ApiTable extends Component {
                     color="primary"
                     style={{ marginTop: '-12px' }}
                     iconType="questionInCircle"
+                    aria-label="Info about the error"
                     onClick={() => this.props.copyToClipBoard(item.downReason)}
                   />
                 </EuiToolTip>
