@@ -108,7 +108,11 @@ export class SettingsController {
       setDefault: entry => this.setDefault(entry),
       checkManager: entry => this.checkManager(entry),
       showAddApi: () => this.showAddApi(),
-      refreshApiEntries: () => this.refreshApiEntries()
+      getHosts: () => this.getHosts(),
+      testApi: entry => this.testAPI.check(entry),
+      showAddApiWithInitialError: error => this.showAddApiWithInitialError(error),
+      updateClusterInfoInRegistry: (id, clusterInfo) => this.updateClusterInfoInRegistry(id, clusterInfo),
+      showApiIsDown: () => this.showApiIsDown()
     };
 
     this.addApiProps = {
@@ -488,6 +492,8 @@ export class SettingsController {
    */
   async checkForNewApis() {
     try {
+      this.addingApi = true;
+      this.addApiProps.errorsAtInit = false;
       const hosts = await this.getHosts();
       //Tries to check if there are new APIs entries in the wazuh.yml also, checks if some of them have connection
       if (!hosts.length) throw { message: 'There were not found any API entry in the wazuh.yml', type: 'warning', closedEnabled: false };
@@ -510,7 +516,6 @@ export class SettingsController {
    */
   async getHosts() {
     try {
-      this.addApiProps.errorsAtInit = false;
       const result = await this.genericReq.request('GET', '/hosts/apis', {});
       const hosts = result.data || [];
       this.apiEntries = this.apiTableProps.apiEntries = this.apiIsDownProps.apiEntries = hosts;
@@ -542,6 +547,14 @@ export class SettingsController {
     this.$scope.$applyAsync();
   }
 
+   /**
+   * Shows the add API component
+   */
+  showApiIsDown() {
+    this.apiIsDown = true;
+    this.$scope.$applyAsync();
+  }
+
   /**
    * Closes the API is down component
    */
@@ -551,21 +564,28 @@ export class SettingsController {
   }
 
   /**
+   * Shows the add api component with an initial error
+   */
+  showAddApiWithInitialError(error) {
+    this.addApiProps.errorsAtInit = error;
+    this.apiEntries = [];
+    this.addingApi = true;
+    this.$scope.$applyAsync();
+  }
+
+  /**
    * Refresh the API entries
    */
   async refreshApiEntries() {
     try {
-      const hosts = await this.getHosts();
-      this.apiEntries = hosts || [];
+      this.apiEntries  = await this.getHosts();
       const down = await this.checkApisStatus();
       //Checks if all the API entries are down
       this.apiIsDown = (down >= this.apiEntries.length && this.apiEntries.length > 0);
       this.$scope.$applyAsync();
       return this.apiEntries;
     } catch (error) {
-      this.apiEntries = [];
-      this.$scope.$applyAsync();
-      this.addApiProps.errorsAtInit = error;
+      this.showAddApiWithInitialError(error);
       return Promise.reject(error);
     }
   }

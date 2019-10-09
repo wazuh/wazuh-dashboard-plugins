@@ -22,7 +22,9 @@ import {
   EuiPanel,
   EuiButtonEmpty,
   EuiTitle,
-  EuiText
+  EuiText,
+  EuiLoadingSpinner,
+
 } from '@elastic/eui';
 
 export class ApiTable extends Component {
@@ -41,22 +43,50 @@ export class ApiTable extends Component {
     });
   }
 
-  /**
-   * Refresh the API entries
-   */
+
+ /**
+ * Refresh the API entries
+ */
   async refresh() {
     try {
-      this.setState({ refreshingEntries: true, apiEntries: [] });
-      const entries = await this.props.refreshApiEntries();
+      let status = 'complete';
+      this.setState({ error: false });
+      const hosts = await this.props.getHosts();
+      this.setState({
+        refreshingEntries: true,
+        apiEntries: hosts
+      });
+      const entries = this.state.apiEntries;
+      let numErr = 0;
+      for (let idx in entries) {
+        const entry = entries[idx];
+        try {
+          const data = await this.props.testApi(entry);
+          const clusterInfo = data.data || {};
+          const id = entries[idx].id;;
+          entries[idx].status = 'online';
+          entries[idx].cluster_info = clusterInfo;
+          //Updates the cluster info in the registry
+          await this.props.updateClusterInfoInRegistry(id, clusterInfo);
+        } catch (error) {
+          numErr = numErr + 1;
+          const code = ((error || {}).data || {}).code;
+          const status = code === 3099 ? 'down' : 'unknown';
+          entries[idx].status = status;
+        }
+      }
+      if (numErr) {
+        if (numErr >= entries.length) this.props.showApiIsDown();
+      }
       this.setState({
         apiEntries: entries,
+        status: status,
         refreshingEntries: false
       });
     } catch (error) {
-      this.setState({
-        apiEntries: [],
-        refreshingEntries: false
-      });
+      if (error && error.data && error.data.message && error.data.code === 2001) {
+        this.props.showAddApiWithInitialError(error);
+      }
     }
   }
 
@@ -127,16 +157,21 @@ export class ApiTable extends Component {
         field: 'status',
         name: 'Status',
         align: 'left',
-        render: item => {
-          return item === 'online' ? (
-            <EuiHealth color="success">Online</EuiHealth>
-          ) : item === 'down' ? (
-            <EuiHealth color="warning">Warning</EuiHealth>
-          ) : (
-                <EuiHealth color="danger">Offline</EuiHealth>
-              );
-        },
         sortable: true,
+        render: item => {
+          if (item) {
+            return item === 'online' ? (
+              <EuiHealth color="success">Online</EuiHealth>
+            ) : item === 'down' ? (
+              <EuiHealth color="warning">Warning</EuiHealth>
+            ) : (
+                  <EuiHealth color="danger">Offline</EuiHealth>
+                );
+          } else {
+            return (<span><EuiLoadingSpinner size="s" /><span>&nbsp;&nbsp;Checking</span></span>);
+          }
+
+        }
       },
       {
         name: 'Actions',
@@ -226,7 +261,6 @@ export class ApiTable extends Component {
           pagination={true}
           sorting={true}
           loading={this.state.refreshingEntries}
-          message='Refreshing API entries...'
         />
       </EuiPanel>
     );
@@ -238,5 +272,9 @@ ApiTable.propTypes = {
   currentDefault: PropTypes.string,
   setDefault: PropTypes.func,
   checkManager: PropTypes.func,
-  refreshApiEntries: PropTypes.func
+  updateClusterInfoInRegistry: PropTypes.func,
+  getHosts: PropTypes.func,
+  testApi: PropTypes.func,
+  showAddApiWithInitialError: PropTypes.func,
+  showApiIsDown: PropTypes.func
 };
