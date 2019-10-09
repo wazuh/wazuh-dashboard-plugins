@@ -1,15 +1,20 @@
 /*
- * Author: Elasticsearch B.V.
- * Updated by Wazuh, Inc.
+ * Licensed to Elasticsearch B.V. under one or more contributor
+ * license agreements. See the NOTICE file distributed with
+ * this work for additional information regarding copyright
+ * ownership. Elasticsearch B.V. licenses this file to you under
+ * the Apache License, Version 2.0 (the "License"); you may
+ * not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * Copyright (C) 2015-2019 Wazuh, Inc.
+ *    http://www.apache.org/licenses/LICENSE-2.0
  *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * Find more information about this on the LICENSE file.
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
  */
 
 import { StringUtils } from 'ui/utils/string_utils';
@@ -31,18 +36,18 @@ export class SavedObjectLoader {
     this.chrome = chrome;
 
     this.loaderProperties = {
-      name: `${this.lowercaseType}s`,
+      name: `${ this.lowercaseType }s`,
       noun: StringUtils.upperFirst(this.type),
-      nouns: `${this.lowercaseType}s`
+      nouns: `${ this.lowercaseType }s`,
     };
 
     this.savedObjectsClient = savedObjectClient;
   }
 
-  // Fake async function, only to resolve a promise
-  async processFunc() {
-    return;
-  }
+    // Fake async function, only to resolve a promise
+    async processFunc() {
+      return;
+    }
 
   /**
    * Retrieve a saved object by id. Returns a promise that completes when the object finishes
@@ -85,7 +90,7 @@ export class SavedObjectLoader {
   }
 
   urlFor(id) {
-    return this.kbnUrl.eval(`#/${this.lowercaseType}/{{id}}`, { id: id });
+    return this.kbnUrl.eval(`#/${ this.lowercaseType }/{{id}}`, { id: id });
   }
 
   delete(ids) {
@@ -135,24 +140,22 @@ export class SavedObjectLoader {
    * @returns {Promise}
    */
   findAll(search = '', size = 100, fields) {
-    return this.savedObjectsClient
-      .find({
+    return this.savedObjectsClient.find(
+      {
         type: this.lowercaseType,
         search: search ? `${search}*` : undefined,
         perPage: size,
         page: 1,
         searchFields: ['title^3', 'description'],
         defaultSearchOperator: 'AND',
-        fields
-      })
-      .then(resp => {
-        return {
-          total: resp.total,
-          hits: resp.savedObjects.map(savedObject =>
-            this.mapSavedObjectApiHits(savedObject)
-          )
-        };
-      });
+        fields,
+      }).then((resp) => {
+      return {
+        total: resp.total,
+        hits: resp.savedObjects
+          .map((savedObject) => this.mapSavedObjectApiHits(savedObject))
+      };
+    });
   }
 
   find(search = '', size = 100) {

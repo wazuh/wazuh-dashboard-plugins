@@ -37,7 +37,7 @@ import {
   // @ts-ignore
 } from 'ui/vis';
 
-import { VisResponseData } from './types';
+import { VisResponseData } from 'ui/visualize/loader';
 
 function getHandler<T extends RequestHandler | ResponseHandler>(
   from: Array<{ name: string; handler: T }>,
