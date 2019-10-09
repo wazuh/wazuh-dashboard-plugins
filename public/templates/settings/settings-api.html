@@ -1,26 +1,19 @@
 <div layout="column" layout-align="start stretch" ng-if="ctrl.tab === 'api' && !ctrl.load">
 
-    <!-- Headline -->
-    <div layout="column" layout-padding>
-        <span class="font-size-18">
-            <react-component flex name="EuiIcon" props="{type:'visControls'}" /> Wazuh API configuration
-        </span>
-        <span class="md-subheader">
-            Use Wazuh API settings to connect the Kibana plugin to your Wazuh manager or cluster
-        </span>
-    </div>
-    <!-- End headline -->
-    <div layout="row" layout-padding ng-if="ctrl.apiTableProps.apiEntries.length">
+    <!-- API table section-->
+    <div layout="row" layout-padding ng-if="ctrl.apiEntries.length && !ctrl.addingApi && !ctrl.apiIsDown">
         <react-component name="ApiTable" props="ctrl.apiTableProps" />
     </div>
 
     <!-- Add API section-->
-    <div layout="row" layout-padding
-        ng-if="!currentAPI || (ctrl.addManagerContainer && !ctrl.isEditing) || !ctrl.apiEntries.length">
+    <div layout="row" layout-padding ng-if="!ctrl.apiEntries.length || ctrl.addingApi">
         <react-component flex name="AddApi" props="ctrl.addApiProps" />
-        <!-- End add API form -->
     </div>
-    <!-- End add API section-->
+
+    <!-- API is down section-->
+    <div layout="column" layout-padding ng-if="ctrl.apiIsDown && !ctrl.addingApi">
+        <react-component name="ApiIsDown" props="ctrl.apiIsDownProps" />
+    </div>
 
 </div>
 <!-- End API configuration card section -->

@@ -27,8 +27,9 @@ export function settingsWizard(
   try {
     const deferred = $q.defer();
     const checkResponse = data => {
-      let fromElastic = false;
+      let fromWazuhHosts = false;
       if (parseInt(data.data.error) === 2) {
+        console.log('default akaaakaa')
         !disableErrors &&
           errorHandler.handle(
             'Please set up Wazuh API credentials.',
@@ -42,12 +43,12 @@ export function settingsWizard(
       ) {
         wzMisc.setApiIsDown(true);
       } else {
-        fromElastic = true;
+        fromWazuhHosts = true;
         wzMisc.setBlankScr(errorHandler.handle(data));
         appState.removeCurrentAPI();
       }
 
-      if (!fromElastic) {
+      if (!fromWazuhHosts) {
         wzMisc.setWizard(true);
         if (!$location.path().includes('/settings')) {
           $location.search('_a', null);
@@ -99,16 +100,13 @@ export function settingsWizard(
 
     const callCheckStored = () => {
       const config = wazuhConfig.getConfig();
-
       let currentApi = false;
 
       try {
         currentApi = JSON.parse(appState.getCurrentAPI()).id;
       } catch (error) {
-        // eslint-disable-next-line
-        console.log(`Error parsing JSON (settingsWizards.callCheckStored 1)`);
+        console.log('Error parsing JSON (settingsWizards.callCheckStored 1)', error);
       }
-
       if (currentApi && !appState.getExtensions(currentApi)) {
         const extensions = {
           audit: config['extensions.audit'],
@@ -125,7 +123,6 @@ export function settingsWizard(
         };
         appState.setExtensions(currentApi, extensions);
       }
-
       checkTimestamp(appState, genericReq, $location, wzMisc)
         .then(() => testAPI.checkStored(currentApi))
         .then(data => {
@@ -155,7 +152,7 @@ export function settingsWizard(
             }
           }
         })
-        .catch(() => {
+        .catch((error) => {
           appState.removeCurrentAPI();
           setUpCredentials(
             'Wazuh App: Please set up Wazuh API credentials.',
@@ -178,6 +175,40 @@ export function settingsWizard(
       return deferred.resolve();
     };
 
+    // Iterates them in order to set one as default
+    const tryToSetDefault = async apis => {
+      try {
+        let errors = 0;
+        for (let idx in apis) {
+          const api = apis[idx];
+          const id = api.id;
+          try {
+            const clus = await testAPI.check(api);
+            api.cluster_info = clus.data;
+            if (api && api.cluster_info && api.cluster_info.manager) {
+              const defaultApi = JSON.stringify({
+                name: api.cluster_info.manager,
+                id: id
+              });
+              appState.setCurrentAPI(
+                defaultApi
+              );
+              callCheckStored();
+              return defaultApi;
+            }
+          } catch (error) {
+            // Sum errors to check if any API could be selected
+            errors++;
+            if (errors >= apis.length) {
+              throw new Error('Could not select any API entry');
+            }
+          }
+        }
+      } catch (error) {
+        return Promise.reject(error);
+      }
+    }
+
     const currentParams = $location.search();
     const targetedAgent =
       currentParams && (currentParams.agent || currentParams.agent === '000');
@@ -196,22 +227,22 @@ export function settingsWizard(
       const currentApi = appState.getCurrentAPI();
       if (!currentApi) {
         genericReq
-          .request('GET', '/elastic/apis')
-          .then(data => {
+          .request('GET', '/hosts/apis')
+          .then(async data => {
             if (data.data.length > 0) {
-              const apiEntries = data.data;
-              appState.setCurrentAPI(
-                JSON.stringify({
-                  name: apiEntries[0]._source.cluster_info.manager,
-                  id: apiEntries[0]._id
-                })
+              // Try to set some API entry as default
+              const defaultApi = await tryToSetDefault(data.data);
+              setUpCredentials(
+                'Wazuh App: Default API has been updated.',
+                defaultApi
               );
-              callCheckStored();
             } else {
               setUpCredentials(
                 'Wazuh App: Please set up Wazuh API credentials.'
               );
             }
+            $location.path('/settings');
+            deferred.resolve();
           })
           .catch(error => {
             !disableErrors && errorHandler.handle(error);
@@ -226,24 +257,23 @@ export function settingsWizard(
       } else {
         const apiId = (JSON.parse(currentApi) || {}).id;
         genericReq
-          .request('GET', '/elastic/apis')
-          .then(data => {
+          .request('GET', '/hosts/apis')
+          .then(async data => {
             if (
               data.data.length > 0 &&
-              data.data.find(x => x['_id'] == apiId)
+              data.data.find(api => api.id == apiId)
             ) {
               callCheckStored();
             } else {
               appState.removeCurrentAPI();
               if (data.data.length > 0) {
-                const defaultApi = JSON.stringify({
-                  name: data.data[0]._source.cluster_info.manager,
-                  id: data.data[0]._id
-                });
+                // Try to set some as default
+                const defaultApi = await tryToSetDefault(data.data);
                 setUpCredentials(
                   'Wazuh App: Default API has been updated.',
                   defaultApi
                 );
+                $location.path('/settings');
               } else {
                 setUpCredentials(
                   'Wazuh App: Please set up Wazuh API credentials.',
@@ -252,7 +282,7 @@ export function settingsWizard(
               }
             }
           })
-          .catch(() => {
+          .catch((error) => {
             setUpCredentials('Wazuh App: Please set up Wazuh API credentials.');
           });
       }

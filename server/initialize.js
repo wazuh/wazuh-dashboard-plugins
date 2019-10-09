@@ -14,15 +14,16 @@ import { ElasticWrapper } from './lib/elastic-wrapper';
 import packageJSON from '../package.json';
 import { kibanaTemplate } from './integration-files/kibana-template';
 import { getConfiguration } from './lib/get-configuration';
-import { defaultExt } from './lib/default-ext';
-import { BuildBody } from './lib/replicas-shards-helper';
 import { checkKnownFields } from './lib/refresh-known-fields';
 import { totalmem } from 'os';
 import fs from 'fs';
-import path from 'path';
+import { ManageHosts } from './lib/manage-hosts';
+import { UpdateRegistry } from './lib/update-registry';
+
+const manageHosts = new ManageHosts();
+const wazuhRegistry = new UpdateRegistry().file;
 
 export function Initialize(server) {
-  const wazuhVersion = path.join(__dirname, '/wazuh-version.json');
   const blueWazuh = '\u001b[34mwazuh\u001b[39m';
   const initializeErrorLogColors = [blueWazuh, 'initialize', 'error'];
   // Elastic JS Client
@@ -32,7 +33,7 @@ export function Initialize(server) {
 
   let configurationFile = {};
   let pattern = null;
-  // Read config from package.json and config.yml
+  // Read config from package.json and wazuh.yml
   try {
     configurationFile = getConfiguration();
 
@@ -42,7 +43,7 @@ export function Initialize(server) {
         : 'wazuh-alerts-3.x-*';
     global.XPACK_RBAC_ENABLED =
       configurationFile &&
-      typeof configurationFile['xpack.rbac.enabled'] !== 'undefined'
+        typeof configurationFile['xpack.rbac.enabled'] !== 'undefined'
         ? configurationFile['xpack.rbac.enabled']
         : true;
   } catch (e) {
@@ -76,11 +77,12 @@ export function Initialize(server) {
         'app-version': packageJSON.version,
         revision: packageJSON.revision,
         installationDate: commonDate,
-        lastRestart: commonDate
+        lastRestart: commonDate,
+        hosts: {}
       };
 
       try {
-        fs.writeFileSync(wazuhVersion, JSON.stringify(configuration), err => {
+        fs.writeFileSync(wazuhRegistry, JSON.stringify(configuration), err => {
           if (err) {
             throw new Error(err);
           }
@@ -108,133 +110,95 @@ export function Initialize(server) {
     }
   };
 
+
   /**
-   * Checks for new extensions added to the config.yml,
-   * useful whenever a new extension is added and it's enabled by default.
-   * An old app package needs to update its stored API entries, this way we have consistency
-   * with the new extensions.
+   * Checks if the .wazuh index exist in order to migrate to wazuh.yml
    */
-  const checkAPIEntriesExtensions = async () => {
-    try {
-      log(
-        'initialize:checkAPIEntriesExtensions',
-        `Checking extensions consistency for all API entries`,
-        'debug'
-      );
-
-      const apiEntries = await wzWrapper.getWazuhAPIEntries();
-      const configFile = await getConfiguration();
-
-      if ((((apiEntries || {}).hits || {}).total || {}).value > 0) {
-        const currentExtensions = !configFile ? defaultExt : {};
-
-        if (configFile) {
-          for (const key in defaultExt) {
-            currentExtensions[key] =
-              typeof configFile['extensions.' + key] !== 'undefined'
-                ? configFile['extensions.' + key]
-                : defaultExt[key];
-          }
-        }
-
-        for (const item of apiEntries.hits.hits) {
-          for (const key in currentExtensions) {
-            if ((((item || {})._source || {}).extensions || {})[key]) {
-              continue;
-            } else {
-              if (((item || {})._source || {}).extensions) {
-                item._source.extensions[key] = currentExtensions[key];
-              }
-            }
-          }
-          try {
-            await wzWrapper.updateWazuhIndexDocument(null, item._id, {
-              doc: { extensions: item._source.extensions }
-            });
-            log(
-              'initialize:checkAPIEntriesExtensions',
-              `Successfully updated API entry extensions with ID: ${item._id}`,
-              'debug'
-            );
-          } catch (error) {
-            log(
-              'initialize:checkAPIEntriesExtensions',
-              `Error updating API entry extensions with ID: ${
-                item._id
-              } due to ${error.message || error}`
-            );
-            server.log(
-              initializeErrorLogColors,
-              `Error updating API entry extensions with ID: ${
-                item._id
-              } due to ${error.message || error}`
-            );
-          }
-        }
-      } else {
-        log(
-          'initialize:checkAPIEntriesExtensions',
-          'There are no API entries, skipping extensions check',
-          'debug'
-        );
-      }
-
-      return;
-    } catch (error) {
-      return Promise.reject(error);
-    }
-  };
-
   const checkWazuhIndex = async () => {
     try {
       log('initialize:checkWazuhIndex', 'Checking .wazuh index.', 'debug');
 
       const result = await wzWrapper.checkIfIndexExists('.wazuh');
 
-      const shardConfiguration = BuildBody(configurationFile, 'wazuh');
-
-      if (!result) {
+      if (result) {
         try {
-          await wzWrapper.createWazuhIndex(shardConfiguration);
-
-          log('initialize:checkWazuhIndex', 'Index .wazuh created.', 'debug');
+          const data = await wzWrapper.getWazuhAPIEntries();
+          const apiEntries = (((data || {}).hits || {}).hits || []);
+          await manageHosts.migrateFromIndex(apiEntries)
+          log('initialize:checkWazuhIndex', 'Index .wazuh will be removed and its content will be migrated to wazuh.yml', 'debug');
+          // Check if all APIs entries were migrated properly and delete it from the .wazuh index
+          await checkProperlyMigrate();     
+          await wzWrapper.deleteIndexByName('.wazuh');
         } catch (error) {
-          throw new Error('Error creating index .wazuh.');
+          throw new Error(error);
         }
-      } else {
-        await wzWrapper.updateIndexSettings('.wazuh', shardConfiguration);
-        await checkAPIEntriesExtensions();
       }
     } catch (error) {
       return Promise.reject(error);
     }
   };
 
-  const checkWazuhVersionRegistry = async () => {
+  /**
+   * Checks if the API entries were properly migrated
+   * @param {Array} migratedApis
+   */
+  const checkProperlyMigrate = async () => {
+    try {
+      let apisIndex = await wzWrapper.getWazuhAPIEntries();
+      const hosts = await manageHosts.getHosts();
+      apisIndex = (apisIndex.hits || {}).hits || [];
+  
+      const apisIndexKeys = apisIndex.map(api => {
+        return api._id;
+      });
+      const hostsKeys = hosts.map(api => {
+        return Object.keys(api)[0];
+      });
+
+      // Get into an array the API entries that were not migrated, if the length is 0 then all the API entries were properly migrated.
+      const rest = apisIndexKeys.filter(k => {
+        return !hostsKeys.includes(k)
+      });
+
+      if (rest.length) {
+        throw new Error(`Cannot migrate all API entries, missed entries: (${rest.toString()})`)
+      }
+      log('initialize:checkProperlyMigrate', 'The API entries migration was successful', 'debug');
+    } catch (error) {
+      log('initialize:checkProperlyMigrate', `${error}`, 'error');
+      return Promise.reject(error);
+    }
+  }
+
+
+  /**
+   * Checks if the .wazuh-version exists, in this case it will be deleted and the wazuh-registry.json will be created
+   */
+  const checkWazuhRegistry = async () => {
     try {
       log(
-        'initialize[checkWazuhVersionRegistry]',
+        'initialize[checkwazuhRegistry]',
         'Checking wazuh-version registry.',
         'debug'
       );
       try {
         await wzWrapper.deleteWazuhVersionIndex();
         log(
-          'initialize[checkWazuhVersionRegistry]',
+          'initialize[checkwazuhRegistry]',
           'Successfully deleted old .wazuh-version index.',
           'debug'
         );
       } catch (error) {
         log(
-          'initialize[checkWazuhVersionRegistry]',
+          'initialize[checkwazuhRegistry]',
           'No need to delete old .wazuh-version index',
           'debug'
         );
       }
 
-      if (!fs.existsSync(wazuhVersion)) {
+      if (!fs.existsSync(wazuhRegistry)) {
         log(
-          'initialize[checkWazuhVersionRegistry]',
+          'initialize[checkwazuhRegistry]',
           'wazuh-version registry does not exist. Initializing configuration.',
           'debug'
         );
@@ -246,7 +210,7 @@ export function Initialize(server) {
         const currentDate = new Date().toISOString();
 
         // If this function fails, it throws an exception
-        const source = JSON.parse(fs.readFileSync(wazuhVersion, 'utf8'));
+        const source = JSON.parse(fs.readFileSync(wazuhRegistry, 'utf8'));
 
         // Check if the stored revision differs from the package.json revision
         const isNewApp = packageJSON.revision !== source.revision;
@@ -261,7 +225,7 @@ export function Initialize(server) {
         source.lastRestart = currentDate;
 
         // If this function fails, it throws an exception
-        fs.writeFileSync(wazuhVersion, JSON.stringify(source), 'utf-8');
+        fs.writeFileSync(wazuhRegistry, JSON.stringify(source), 'utf-8');
       }
     } catch (error) {
       return Promise.reject(error);
@@ -273,7 +237,7 @@ export function Initialize(server) {
     try {
       await Promise.all([
         checkWazuhIndex(),
-        checkWazuhVersionRegistry(),
+        checkWazuhRegistry(),
         checkKnownFields(wzWrapper, log, server, defaultIndexPattern)
       ]);
       const reindexResult = await wzWrapper.reindexAppIndices();
@@ -325,7 +289,7 @@ export function Initialize(server) {
       return Promise.reject(
         new Error(
           `Error creating ${
-            wzWrapper.WZ_KIBANA_INDEX
+          wzWrapper.WZ_KIBANA_INDEX
           } index due to ${error.message || error}`
         )
       );
@@ -346,7 +310,7 @@ export function Initialize(server) {
       return Promise.reject(
         new Error(
           `Error creating template for ${
-            wzWrapper.WZ_KIBANA_INDEX
+          wzWrapper.WZ_KIBANA_INDEX
           } due to ${error.message || error}`
         )
       );

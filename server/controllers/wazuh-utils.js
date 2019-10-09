@@ -25,7 +25,7 @@ export class WazuhUtilsCtrl {
   constructor() {}
 
   /**
-   * Returns the config.yml file parsed
+   * Returns the wazuh.yml file parsed
    * @param {Object} req
    * @param {Object} reply
    * @returns {Object} Configuration File or ErrorResponse
@@ -45,7 +45,7 @@ export class WazuhUtilsCtrl {
   }
 
   /**
-   * Returns the config.yml file in raw
+   * Returns the wazuh.yml file in raw
    * @param {Object} req
    * @param {Object} reply
    * @returns {Object} Configuration File or ErrorResponse

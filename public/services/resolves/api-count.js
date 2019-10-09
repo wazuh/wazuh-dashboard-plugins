@@ -21,17 +21,11 @@
 export function apiCount($q, genericReq, $location, appState) {
   const deferred = $q.defer();
   genericReq
-    .request('GET', '/elastic/apis')
-    .then(data => {
-      if (!data.data.length) throw new Error('No API entries found');
-      else {
-        const firstEntry = data.data[0];
-        appState.setCurrentAPI(
-          JSON.stringify({
-            name: firstEntry._source.cluster_info.manager,
-            id: firstEntry._id
-          })
-        );
+    .request('GET', '/hosts/apis')
+    .then(async data => {
+      if (!data || !data.data || !data.data.length) throw new Error('No API entries found');
+      if (!appState.getCurrentAPI()) {
+        await tryToSetDefault(data.data, appState);
       }
       deferred.resolve();
     })
@@ -42,4 +36,26 @@ export function apiCount($q, genericReq, $location, appState) {
       deferred.resolve();
     });
   return deferred.promise;
+}
+
+// Iterates the API entries in order to set one as default
+function tryToSetDefault(apis, appState) {
+  try {
+    for (let idx in apis) {
+      const api = apis[idx];
+      try {
+        appState.setCurrentAPI(
+          JSON.stringify({
+            name: api.cluster_info.manager,
+            id: api.id
+          })
+        );
+        break;
+      } catch (error) {
+        //Do nothing in order to follow the flow of the for
+      }
+    }
+  } catch (error) {
+    return Promise.reject(error);
+  }
 }
