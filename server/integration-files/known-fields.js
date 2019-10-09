@@ -7384,8 +7384,4 @@ export const knownFields = [
     aggregatable: true,
     readFromDocValues: true
   }
-<<<<<<< HEAD
 ];
-=======
-];
->>>>>>> 555b8eefe24ede1dd3488a596d28c4e936f338e5
