@@ -30,7 +30,8 @@
     "lint": "eslint . --ext .js -c .eslintrc.json --color",
     "prebuild": "tsc; find . -name \"*.ts*\" -type f -not -path \"./node_modules/*\" -delete",
     "build": "plugin-helpers build",
-    "test": "_mocha test/**/*"
+    "test": "_mocha test/**/*",
+    "test:ui:runner": "node ../../scripts/functional_test_runner.js"
   },
   "dependencies": {
     "angular-animate": "1.7.8",

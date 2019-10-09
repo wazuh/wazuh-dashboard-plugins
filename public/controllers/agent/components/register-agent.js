@@ -39,15 +39,25 @@ export class RegisterAgent extends Component {
     this.state = {
       status: 'incomplete',
       selectedOS: '',
-      serverAddress: ''
+      serverAddress: '',
+      wazuhPassword: ''
     };
   }
 
   async componentDidMount() {
     try {
-      this.wazuhVersion = await this.props.getWazuhVersion();
+      const wazuhVersion = await this.props.getWazuhVersion();
+      const apiAddress = await this.props.getCurrentApiAddress();
+      const needsPassword = await this.props.needsPassword();
+      this.setState({
+        serverAddress: apiAddress,
+        needsPassword: needsPassword,
+        wazuhVersion: wazuhVersion
+      })
     } catch (error) {
-      this.wazuhVersion = version;
+      this.setState({
+        wazuhVersion: version
+      })
     }
   }
 
@@ -58,6 +68,21 @@ export class RegisterAgent extends Component {
   setServerAddress(event) {
     this.setState({ serverAddress: event.target.value });
   }
+
+  setWazuhPassword(event) {
+    this.setState({ wazuhPassword: event.target.value });
+  }
+
+  /**
+   * Checks if the password is not needed, in that case remove the input password step
+   * @param {Array} steps
+   */
+  cleanSteps(steps) {
+    if (this.state.needsPassword) return steps;
+    steps.splice(2,1);
+    return steps;
+  }
+
 
   render() {
     const rpmButton = (
@@ -100,6 +125,14 @@ export class RegisterAgent extends Component {
       />
     );
 
+    const passwordInput = (
+      <EuiFieldText
+        placeholder="Wazuh password..."
+        value={this.state.wazuhPassword}
+        onChange={event => this.setWazuhPassword(event)}
+      />
+    );
+
     const copyButton = {
       position: 'relative',
       float: 'right',
@@ -112,10 +145,10 @@ export class RegisterAgent extends Component {
       zIndex: '100'
     };
     const customTexts = {
-      rpmText: `sudo WAZUH_MANAGER_IP='${this.state.serverAddress}' yum install https://packages.wazuh.com/3.x/yum/wazuh-agent-${this.wazuhVersion}-1.x86_64.rpm`,
-      debText: `curl -so wazuh-agent.deb https://packages.wazuh.com/3.x/apt/pool/main/w/wazuh-agent/wazuh-agent_${this.wazuhVersion}-1_amd64.deb && sudo WAZUH_MANAGER_IP='${this.state.serverAddress}' dpkg -i ./wazuh-agent.deb`,
-      macosText: `curl -so wazuh-agent.pkg https://packages.wazuh.com/3.x/osx/wazuh-agent-${this.wazuhVersion}-1.pkg && sudo launchctl setenv WAZUH_MANAGER_IP '${this.state.serverAddress}' && sudo installer -pkg ./wazuh-agent.pkg -target /`,
-      winText: `Invoke-WebRequest -Uri https://packages.wazuh.com/3.x/windows/wazuh-agent-${this.wazuhVersion}-1.msi -OutFile wazuh-agent.msi; wazuh-agent.msi /q ADDRESS='${this.state.serverAddress}' AUTHD_SERVER='${this.state.serverAddress}'`
+      rpmText: `sudo WAZUH_MANAGER_IP='${this.state.serverAddress}'${this.state.needsPassword ? ` WAZUH_PASSWORD='${this.state.wazuhPassword}' ` : ' '}yum install https://packages.wazuh.com/3.x/yum/wazuh-agent-${this.state.wazuhVersion}-1.x86_64.rpm`,
+      debText: `curl -so wazuh-agent.deb https://packages.wazuh.com/3.x/apt/pool/main/w/wazuh-agent/wazuh-agent_${this.state.wazuhVersion}-1_amd64.deb && sudo WAZUH_MANAGER_IP='${this.state.serverAddress}'${this.state.needsPassword ? ` WAZUH_PASSWORD='${this.state.wazuhPassword}' ` : ' '} dpkg -i ./wazuh-agent.deb`,
+      macosText: `curl -so wazuh-agent.pkg https://packages.wazuh.com/3.x/osx/wazuh-agent-${this.state.wazuhVersion}-1.pkg && sudo launchctl setenv WAZUH_MANAGER_IP '${this.state.serverAddress}'${this.state.needsPassword ? ` setenv WAZUH_PASSWORD '${this.state.wazuhPassword}' ` : ' '} && sudo installer -pkg ./wazuh-agent.pkg -target /`,
+      winText: `Invoke-WebRequest -Uri https://packages.wazuh.com/3.x/windows/wazuh-agent-${this.state.wazuhVersion}-1.msi -OutFile wazuh-agent.msi; wazuh-agent.msi /q ADDRESS='${this.state.serverAddress}' AUTHD_SERVER='${this.state.serverAddress}'${this.state.needsPassword ? ` PASSWORD='${this.state.wazuhPassword}' ` : ' '}`
     };
 
     const field = `${this.state.selectedOS}Text`;
@@ -167,6 +200,10 @@ export class RegisterAgent extends Component {
         children: <Fragment>{ipInput}</Fragment>
       },
       {
+        title: 'Wazuh password',
+        children: <Fragment>{passwordInput}</Fragment>
+      },
+      {
         title: 'Complete the installation',
         children: (
           <div>
@@ -180,12 +217,12 @@ export class RegisterAgent extends Component {
 
     return (
       <div>
-        <EuiPage restrictWidth="1000px">
+        <EuiPage restrictWidth="1000px" style={{background: "transparent"}} >
           <EuiPageBody>
             <EuiFlexGroup>
               <EuiFlexItem>
                 <EuiTitle>
-                  <h2>Add a new agent</h2>
+                  <h2>Deploy a new agent</h2>
                 </EuiTitle>
               </EuiFlexItem>
               <EuiFlexItem grow={false}>
@@ -202,7 +239,7 @@ export class RegisterAgent extends Component {
               <EuiFlexItem>
                 <EuiPanel>
                   <EuiFlexItem>
-                    <EuiSteps steps={steps} />
+                    <EuiSteps steps={this.cleanSteps(steps)} />
                   </EuiFlexItem>
                 </EuiPanel>
               </EuiFlexItem>
@@ -216,5 +253,7 @@ export class RegisterAgent extends Component {
 
 RegisterAgent.propTypes = {
   addNewAgent: PropTypes.func,
-  getWazuhVersion: PropTypes.func
+  getWazuhVersion: PropTypes.func,
+  getCurrentApiAddress: PropTypes.func,
+  needsPassword: PropTypes.func
 };
