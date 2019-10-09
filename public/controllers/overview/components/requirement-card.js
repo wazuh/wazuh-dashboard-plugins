@@ -144,7 +144,7 @@ export class RequirementCard extends Component {
     const cards = this.state.slider[this.state.position];
     return (
       <div>
-        <EuiFlexGroup gutterSize="l">
+        <EuiFlexGroup gutterSize="l" className="requirements-cards">
           {this.state.sliderLength > 1 && this.state.position > 0 && (
             <EuiButtonIcon
               className="wz-margin-left-10"

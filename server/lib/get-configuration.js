@@ -19,7 +19,7 @@ export function getConfiguration() {
     const now = new Date().getTime();
     const dateDiffer = now - lastAssign;
     if (!cachedConfiguration || dateDiffer >= 10000) {
-      const customPath = path.join(__dirname, '../../config.yml');
+      const customPath = path.join(__dirname, '../../wazuh.yml');
       const raw = fs.readFileSync(customPath, { encoding: 'utf-8' });
       const file = yml.load(raw);
       cachedConfiguration = { ...file };

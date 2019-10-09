@@ -3,6 +3,11 @@ body,
 html.md-default-theme,
 html {
   color: #dfe5ef !important;
+  background-color: #1a1b20!important;
+}
+
+#kibana-body {
+  background-color: #1a1b20!important;
 }
 
 .euiHeaderSectionItem__button,
@@ -174,16 +179,15 @@ md-nav-bar.md-default-theme .md-nav-bar, md-nav-bar .md-nav-bar {
   background: #272931;
 }
 
-.table {
-  color: #dfe5ef !important;
-}
-
-.table-striped > tbody > tr:nth-of-type(odd) {
-  background-color: #1a1b21;
-  color: #dfe5ef !important;
+table thead > tr {
+  background-color: #1a1b20 !important;
 }
 
 .table-hover > tbody > tr:hover {
+  background-color: rgba(27, 169, 245, 0.05) !important;
+}
+
+.table-striped > tbody > tr:nth-of-type(odd):hover {
   background-color: rgba(27, 169, 245, 0.05) !important;
 }
 
@@ -266,7 +270,15 @@ md-divider.md-default-theme, md-divider {
 .CodeMirror-hints{
   background-color: #16171c !important;
   border-color: #000;
-  color: #dfe5ef;
+  color: #dfe5ef!important;
+}
+
+.CodeMirror-hint{
+  color: #dfe5ef!important;
+}
+
+.CodeMirror-hint:hover{
+  background-color: #25262E;
 }
 
 .wz-input-text {
@@ -277,4 +289,62 @@ md-divider.md-default-theme, md-divider {
 
 .wz-menu-content {
   box-shadow: 0 2px 2px -1px rgba(0, 0, 0, 0.3)!important;
+}
+
+.wz-menu-select {
+  background-color: #16171c !important;
+  border: 1px solid #343741 !important;
+  color: #dfe5ef !important;
+}
+
+.wz-menu-select-option {
+  background-color: #16171c !important;
+  border: 1px solid #343741 !important;
+  color: #dfe5ef !important;
+}
+
+.extraHeader {
+  border-bottom: 1px solid #2e2f34!important;
+}
+
+.wzMultipleSelectorAdding{
+  background-color: #037200!important;
+}
+
+.wzMultipleSelectorRemoving{
+  background-color: #990000!important;
+
+}
+
+.wz-button, .wz-button-groups, .refresh-agents-btn {
+  background-color: #1BA9F5 !important;
+  border-color: #1BA9F5 !important;
+  color: #000 !important;
+}
+
+.wz-button-groups.active, .wz-button-groups:not([disabled]):hover, .wz-button.active, .wz-button:not([disabled]):hover, .wz-button-flat:not([disabled]):hover, .refresh-agents-btn:hover {
+  background-color: #0a9dec !important;
+  border-color: #0a9dec !important;
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.15), 0 2px 2px -1px rgba(0, 0, 0, 0.3) !important;
+  color: #000 !important;
+}
+
+.kuiButton--hollow:hover {
+  color: #006E8A !important;
+  text-decoration: underline !important;
+}
+
+discover-app-w > main.container-fluid {
+  background: #1a1b20 !important;
+}
+
+.wz-menu-select {
+  filter: invert(0) !important; 
+}
+
+.logtest{
+  border-left: 1px solid #343741!important;
+  box-shadow: -2px 0px 2px -1px rgba(0, 0, 0, 0.3)!important;
+  background: #1a1b20;
+  z-index: 10;
 }

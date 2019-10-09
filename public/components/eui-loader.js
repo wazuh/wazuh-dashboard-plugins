@@ -13,14 +13,17 @@ import { uiModules } from 'ui/modules';
 import 'react';
 import {
   EuiIcon,
+  EuiTextArea,
   EuiSuperSelect,
   EuiLoadingSpinner,
   EuiProgress,
   EuiBasicTable,
   EuiButtonIcon,
+  EuiButtonEmpty,
   EuiHealth,
   EuiCallOut,
-  EuiSwitch
+  EuiSwitch,
+  EuiSpacer
 } from '@elastic/eui';
 
 import { BasicTable } from '../directives/wz-table-eui/components/table';
@@ -30,13 +33,16 @@ const app = uiModules.get('app/wazuh', ['react']);
 
 app
   .value('EuiIcon', EuiIcon)
+  .value('EuiTextArea', EuiTextArea)
   .value('EuiSuperSelect', EuiSuperSelect)
   .value('EuiLoadingSpinner', EuiLoadingSpinner)
   .value('EuiProgress', EuiProgress)
   .value('EuiButtonIcon', EuiButtonIcon)
+  .value('EuiButtonEmpty', EuiButtonEmpty)
   .value('EuiBasicTable', EuiBasicTable)
   .value('EuiHealth', EuiHealth)
   .value('EuiCallOut', EuiCallOut)
   .value('BasicTable', BasicTable)
   .value('Tabs', Tabs)
-  .value('EuiSwitch', EuiSwitch);
+  .value('EuiSwitch', EuiSwitch)
+  .value('EuiSpacer', EuiSpacer);

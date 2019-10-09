@@ -14,7 +14,7 @@
                     <div layout="row">
                         <input placeholder='Filter...' ng-model='availableFilter' type='text' class='kuiLocalSearchInput'
                             wz-enter='doReload("left", availableFilter, true)' ng-change='availableItem=null'>
-                        <button type='submit' class='kuiLocalSearchButton height-40' ng-click='doReload("left", availableFilter, true)'>
+                        <button type='submit' class='kuiLocalSearchButton height-40 refresh-agents-btn' ng-click='doReload("left", availableFilter, true)'>
                             <span class='fa fa-search' aria-hidden='true'></span>
                         </button>
                     </div>

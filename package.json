@@ -1,8 +1,8 @@
 {
   "name": "wazuh",
-  "version": "3.10.2",
-  "revision": "0462",
-  "code": "0462-0",
+  "version": "3.11.0",
+  "revision": "0470",
+  "code": "0470-0",
   "kibana": {
     "version": "6.8.3"
   },
@@ -30,7 +30,8 @@
     "lint": "eslint . --ext .js -c .eslintrc.json --color",
     "prebuild": "tsc; find . -name \"*.ts*\" -type f -not -path \"./node_modules/*\" -delete",
     "build": "plugin-helpers build",
-    "test": "_mocha test/**/*"
+    "test": "_mocha test/**/*",
+    "test:ui:runner": "node ../../scripts/functional_test_runner.js"
   },
   "dependencies": {
     "angular-animate": "1.7.8",

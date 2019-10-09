@@ -93,15 +93,17 @@ export class AgentsPreviewController {
       this.$location.search('tab', this.submenuNavItem);
     });
 
-    this.$scope.$on('wazuhFetched', ev => {
-      ev.stopPropagation();
+    this.$scope.$on('wazuhFetched', evt => {
+      evt.stopPropagation();
     });
 
     this.registerAgentsProps = {
       addNewAgent: flag => this.addNewAgent(flag),
-      getWazuhVersion: () => this.getWazuhVersion()
+      getWazuhVersion: () => this.getWazuhVersion(),
+      getCurrentApiAddress: () => this.getCurrentApiAddress(),
+      needsPassword: () => this.needsPassword()
     };
-
+    this.hasAgents = true;
     this.init = false;
     //Load
     this.load();
@@ -181,11 +183,33 @@ export class AgentsPreviewController {
       this.searchBarModel = {
         name: [],
         status: ['Active', 'Disconnected', 'Never connected'],
-        group: unique.groups,
-        version: unique.versions,
-        'os.platform': unique.osPlatforms.map(x => x.platform),
-        'os.version': unique.osPlatforms.map(x => x.version),
-        'os.name': unique.osPlatforms.map(x => x.name)
+        group: unique.groups.sort((a, b) => {
+          return a.toString().localeCompare(b.toString());
+        }),
+        version: unique.versions.sort((a, b) => {
+          return a.toString().localeCompare(b.toString(), undefined, {
+            numeric: true,
+            sensitivity: 'base'
+          });
+        }),
+        'os.platform': unique.osPlatforms
+          .map(x => x.platform)
+          .sort((a, b) => {
+            return a.toString().localeCompare(b.toString());
+          }),
+        'os.version': unique.osPlatforms
+          .map(x => x.version)
+          .sort((a, b) => {
+            return a.toString().localeCompare(b.toString(), undefined, {
+              numeric: true,
+              sensitivity: 'base'
+            });
+          }),
+        'os.name': unique.osPlatforms
+          .map(x => x.name)
+          .sort((a, b) => {
+            return a.toString().localeCompare(b.toString());
+          })
       };
 
       if (clusterInfo.status === 'enabled' && unique.nodes) {
@@ -208,7 +232,12 @@ export class AgentsPreviewController {
       this.lastAgent = unique.lastAgent;
       this.summary = unique.summary;
       if (!this.lastAgent || !this.lastAgent.id) {
-        this.addNewAgent(true);
+        if (this.addingNewAgent === undefined) {
+          this.addNewAgent(true);
+        }
+        this.hasAgents = false;
+      } else {
+        this.hasAgents = true;
       }
 
       if (agentsTop.data.data === '') {
@@ -261,6 +290,40 @@ export class AgentsPreviewController {
       'https://documentation.wazuh.com/current/user-manual/registering/index.html',
       '_blank'
     );
+  }
+
+  /**
+   * Returns if the password is neccesary to register a new agent
+   */
+  async needsPassword() {
+    try {
+      const result = await this.apiReq.request(
+        'GET',
+        '/agents/000/config/auth/auth',
+        {}
+      );
+      const auth = ((result.data || {}).data || {}).auth || {};
+      const usePassword = auth.use_password === 'yes';
+      return usePassword;
+    } catch (error) {
+      return false;
+    }
+  }
+
+  /**
+   * Returns the current API address
+   */
+  async getCurrentApiAddress() {
+    try {
+      const result = await this.genericReq.request('GET', '/hosts/apis');
+      const entries = result.data || [];
+      const host = entries.filter(e => {return e.id == this.api});
+      const url = host[0].url;
+      const numToClean = url.startsWith('https://') ? 8 : 7;
+      return url.substr(numToClean);
+    } catch (error) {
+      return false;
+    }
   }
 
   /**

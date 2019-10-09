@@ -348,6 +348,7 @@ app.directive('wzXmlFileEditor', function() {
           firstTime = false;
           setTimeout(() => {
             $scope.xmlCodeBox.refresh();
+            $window.dispatchEvent(new Event('resize')); // eslint-disable-line
           }, 1);
         } catch (error) {
           errorHandler.handle(error, 'Fetching original file');

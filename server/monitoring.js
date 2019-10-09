@@ -21,6 +21,7 @@ import { parseCron } from './lib/parse-cron';
 import { indexDate } from './lib/index-date';
 import { BuildBody } from './lib/replicas-shards-helper';
 import * as ApiHelper from './lib/api-helper';
+import { WazuhHostsCtrl } from '../server/controllers/wazuh-hosts';
 
 const blueWazuh = colors.blue('wazuh');
 
@@ -38,6 +39,7 @@ export class Monitoring {
     this.index_pattern = 'wazuh-monitoring-3.x-*';
     this.index_prefix = 'wazuh-monitoring-3.x-';
     this.wzWrapper = new ElasticWrapper(server);
+    this.wazuhHosts = new WazuhHostsCtrl();
     this.agentsArray = [];
     this.quiet = quiet;
     this.initVariables();
@@ -217,30 +219,26 @@ export class Monitoring {
    */
   async loadCredentials(apiEntries) {
     try {
-      if (typeof apiEntries === 'undefined' || !('hits' in apiEntries)) return;
+      if (typeof apiEntries === 'undefined') return;
 
-      const filteredApis = apiEntries.hits.filter(
+      const filteredApis = apiEntries.filter(
         (element, index, self) =>
           index ===
           self.findIndex(
             t =>
-              t._source.api_user === element._source.api_user &&
-              t._source.api_password === element._source.api_password &&
-              t._source.url === element._source.url &&
-              t._source.api_port === element._source.api_port
+              t.user === element.user &&
+              t.password === element.password &&
+              t.url === element.url &&
+              t.port === element.port
           )
       );
 
       for (const element of filteredApis) {
         const apiEntry = {
-          user: element._source.api_user,
-          password: Buffer.from(
-            element._source.api_password,
-            'base64'
-          ).toString('ascii'),
-          url: element._source.url,
-          port: element._source.api_port,
-          insecure: element._source.insecure
+          user: element.user,
+          password: element.password,
+          url: element.url,
+          port: element.port
         };
 
         await this.checkAndSaveStatus(apiEntry);
@@ -262,10 +260,9 @@ export class Monitoring {
    */
   async getConfig() {
     try {
-      const data = await this.wzWrapper.getWazuhAPIEntries();
-
-      if (data.hits.total > 0) {
-        return data.hits;
+      const hosts = await this.wazuhHosts.getHostsEntries(false, false, false);
+      if (hosts.length) {
+        return hosts;
       }
 
       !this.quiet &&
@@ -281,7 +278,7 @@ export class Monitoring {
     } catch (error) {
       !this.quiet && log('monitoring:getConfig', error.message || error);
       return {
-        error: 'no elasticsearch',
+        error: 'no wazuh hosts',
         error_code: 2
       };
     }

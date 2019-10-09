@@ -22,18 +22,13 @@
 
         <md-button class="wz-menu-button" ng-href="#/agents-preview" ng-click="setMenuNavItem('agents-preview')"
             ng-class="{'wz-menu-active': menuNavItem === 'agents-preview' || menuNavItem === 'agents' }"
-            aria-label="Agents tab">
+            aria-label="Agents tab" data-test-subj="wzMenuAgents">
             <i class="fa fa-fw fa-tv" aria-hidden="true"></i> Agents
         </md-button>
 
-        <md-button class="wz-menu-button" ng-href="#/wazuh-discover" ng-click="setMenuNavItem('wazuh-discover')"
-            ng-class="{'wz-menu-active': menuNavItem === 'wazuh-discover' }" aria-label="Discover tab">
-            <react-component name="EuiIcon" class="kbnGlobalNavLink__euiIcon"
-            props="{type:'discoverApp', color:'ghost'}" /> Discover
-        </md-button>
-
         <md-button class="wz-menu-button" ng-href="#/wazuh-dev" ng-click="setMenuNavItem('wazuh-dev')"
-            ng-class="{'wz-menu-active': menuNavItem === 'wazuh-dev' }" aria-label="Dev Tools tab">
+            ng-class="{'wz-menu-active': menuNavItem === 'wazuh-dev' }" aria-label="Dev Tools tab"
+            data-test-subj="wzMenuDevTools">
             <react-component name="EuiIcon" class="kbnGlobalNavLink__euiIcon" props="{type:'console'}" /> Dev tools
         </md-button>
 
@@ -44,7 +39,7 @@
         <!-- Case 1a - There's API -->
         <span ng-show="theresAPI" class="small" tooltip="Selected API" tooltip-placement="left">
             <i class="fa fa-star fa-fw wz-color-orange" aria-hidden="true"></i>{{currentAPI}}<span
-                ng-if="showSelector">&nbsp;&ndash;&nbsp;</span>
+                ng-if="showSelector && patternList.length > 1">&nbsp;&ndash;&nbsp;</span>
         </span>
 
         <!-- Case 1b - There's no API -->
@@ -52,7 +47,7 @@
             No API<span ng-if="showSelector">&nbsp;&ndash;&nbsp;</span>
         </span>
 
-        <!-- Case 2a - There's pattern and there's more than one -->
+        <!-- There's pattern and there's more than one -->
         <span ng-if="showSelector" ng-show="theresPattern && patternList && patternList.length > 1" class="small"
             tooltip="Selected index pattern" tooltip-placement="left">
             <select class="wz-menu-select" ng-model="currentSelectedPattern"
@@ -63,12 +58,6 @@
                     {{pattern.title}}
                 </option>
             </select>
-        </span>
-
-        <!-- Case 2b - There's pattern and there's only one-->
-        <span ng-if="showSelector" ng-show="theresPattern && patternList && patternList.length === 1" class="small"
-            tooltip="Selected index pattern" tooltip-placement="left">
-            {{patternList[0].title}}
         </span>
 
         <!-- Settings tab button -->

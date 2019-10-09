@@ -4559,6 +4559,24 @@ export const knownFields = [
     readFromDocValues: true
   },
   {
+    name: 'rule.hipaa',
+    type: 'string',
+    count: 0,
+    scripted: false,
+    searchable: true,
+    aggregatable: true,
+    readFromDocValues: true
+  },
+  {
+    name: 'rule.nist_800_53',
+    type: 'string',
+    count: 0,
+    scripted: false,
+    searchable: true,
+    aggregatable: true,
+    readFromDocValues: true
+  },
+  {
     name: 'rule.gpg13',
     type: 'string',
     count: 0,
@@ -7366,4 +7384,8 @@ export const knownFields = [
     aggregatable: true,
     readFromDocValues: true
   }
+<<<<<<< HEAD
 ];
+=======
+];
+>>>>>>> 555b8eefe24ede1dd3488a596d28c4e936f338e5

@@ -6,7 +6,7 @@
             configuration settings
         </span>
         <span class="md-subheader">Configuration file located at <span
-                class="wz-text-monospace">/usr/share/kibana/plugins/wazuh/config.yml</span></span>
+                class="wz-text-monospace">/usr/share/kibana/plugins/wazuh/wazuh.yml</span></span>
     </div>
     <!-- End headline -->
     <div layout="row" layout-align="start center" ng-if="!ctrl.load">
@@ -45,15 +45,15 @@
                                         ng-model="ctrl.editingNewValue" min=0></input>
                                     <select
                                         ng-if="ctrl.editingKey === key && ctrl.configurationTypes[key] === 'boolean'"
-                                        ng-disabled="ctrl.loadingChange" class="wz-input-text wz-width-100"
+                                        ng-disabled="ctrl.loadingChange" class="wz-menu-select wz-input-text wz-width-100"
                                         ng-model="ctrl.editingNewValue"
                                         ng-options="o as o for o in [true, false]"></select>
                                     <select ng-if="ctrl.editingKey === key && key === 'wazuh.monitoring.creation'"
-                                        ng-disabled="ctrl.loadingChange" class="wz-input-text wz-width-100"
+                                        ng-disabled="ctrl.loadingChange" class="wz-menu-select wz-input-text wz-width-100"
                                         ng-model="ctrl.editingNewValue"
                                         ng-options="key as value for (key , value) in  {'h': 'hourly', 'd': 'daily', 'w': 'weekly', 'm': 'monthly'}"></select>
                                     <select ng-if="ctrl.editingKey === key && key === 'logs.level'"
-                                        ng-disabled="ctrl.loadingChange" class="wz-input-text wz-width-100"
+                                        ng-disabled="ctrl.loadingChange" class="wz-menu-select wz-input-text wz-width-100"
                                         ng-model="ctrl.editingNewValue"
                                         ng-options="key as value for (key , value) in  {'info': 'info', 'debug': 'debug'}"></select>
                                     <textarea

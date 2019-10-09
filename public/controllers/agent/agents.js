@@ -377,7 +377,8 @@ export class AgentsController {
       this.$scope.showSyscheckFiles = !this.$scope.showSyscheckFiles;
       if (!this.$scope.showSyscheckFiles) {
         this.$scope.$emit('changeTabView', {
-          tabView: this.$scope.tabView
+          tabView: this.$scope.tabView,
+          tab: this.$scope.tab
         });
       }
       this.$scope.$applyAsync();
@@ -388,7 +389,8 @@ export class AgentsController {
       this.$scope.showScaScan = !this.$scope.showScaScan;
       if (!this.$scope.showScaScan) {
         this.$scope.$emit('changeTabView', {
-          tabView: this.$scope.tabView
+          tabView: this.$scope.tabView,
+          tab: this.$scope.tab
         });
       }
       this.$scope.$applyAsync();
@@ -527,7 +529,8 @@ export class AgentsController {
         this.changeAgent = false;
       } else {
         this.$scope.$emit('changeTabView', {
-          tabView: this.$scope.tabView
+          tabView: this.$scope.tabView,
+          tab: this.$scope.tab
         });
       }
 

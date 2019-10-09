@@ -91,6 +91,12 @@ app.directive('wzTable', function() {
       };
 
       /**
+       * This sort data for a given filed
+       */
+      $scope.sort = async field =>
+        sort(field, $scope, instance, fetch, errorHandler);
+
+      /**
        * Init variables
        */
       let realTime = false;
@@ -100,6 +106,9 @@ app.directive('wzTable', function() {
         $scope.implicitFilter,
         $scope.implicitSort
       );
+      if ($scope.implicitSort && $scope.implicitSort !== 'timestamp') {
+        $scope.sort($scope.implicitSort);
+      }
       $scope.keyEquivalence = KeyEquivalence;
       $scope.totalItems = 0;
       $scope.wazuh_table_loading = true;
@@ -192,12 +201,6 @@ app.directive('wzTable', function() {
           return Promise.reject(error);
         }
       };
-
-      /**
-       * This sort data for a given filed
-       */
-      $scope.sort = async field =>
-        sort(field, $scope, instance, fetch, errorHandler);
 
       /**
        * This search in table data with a given term

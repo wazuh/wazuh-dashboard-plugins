@@ -12,21 +12,18 @@
  */
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
-import { RIGHT_ALIGNMENT } from '@elastic/eui/lib/services';
 import {
   EuiFlexGroup,
   EuiFlexItem,
-  EuiBasicTable,
-  EuiPanel,
+  EuiInMemoryTable,
   EuiButtonIcon,
   EuiToolTip,
-  EuiFormRow,
-  EuiFieldText,
-  EuiFieldPassword,
-  EuiFieldNumber,
-  EuiButton,
-  EuiSpacer,
-  EuiButtonEmpty
+  EuiHealth,
+  EuiPanel,
+  EuiButtonEmpty,
+  EuiTitle,
+  EuiText,
+  EuiLoadingSpinner
 } from '@elastic/eui';
 
 export class ApiTable extends Component {
@@ -34,127 +31,178 @@ export class ApiTable extends Component {
     super(props);
 
     this.state = {
-      itemIdToExpandedRowMap: {},
-      user: '',
-      password: '',
-      url: '',
-      port: 55000,
       apiEntries: [],
-      currentDefault: 0
+      refreshingEntries: false
     };
   }
 
   componentDidMount() {
     this.setState({
-      apiEntries: [...this.props.apiEntries],
-      currentDefault: this.props.currentDefault
+      apiEntries: this.props.apiEntries
     });
   }
 
-  onChangeEdit(e, field) {
-    this.setState({
-      [field]: e.target.value
-    });
-  }
-
-  toggleDetails(item) {
-    const itemIdToExpandedRowMap = { ...this.state.itemIdToExpandedRowMap };
-    if (itemIdToExpandedRowMap[item._id]) {
-      delete itemIdToExpandedRowMap[item._id];
-    } else {
-      itemIdToExpandedRowMap[item._id] = (
-        <EuiFlexGroup>
-          <EuiFlexItem>
-            <EuiFormRow label="Username">
-              <EuiFieldText
-                onChange={e => this.onChangeEdit(e, 'user')}
-                placeholder="foo"
-              />
-            </EuiFormRow>
-          </EuiFlexItem>
-          <EuiFlexItem>
-            <EuiFormRow label="Password">
-              <EuiFieldPassword
-                onChange={e => this.onChangeEdit(e, 'password')}
-                placeholder="bar"
-              />
-            </EuiFormRow>
-          </EuiFlexItem>
-          <EuiFlexItem>
-            <EuiFormRow label="Host">
-              <EuiFieldText
-                onChange={e => this.onChangeEdit(e, 'url')}
-                placeholder="http://localhost"
-              />
-            </EuiFormRow>
-          </EuiFlexItem>
-          <EuiFlexItem>
-            <EuiFormRow label="Port">
-              <EuiFieldNumber
-                max={99999}
-                onChange={e => this.onChangeEdit(e, 'port')}
-                placeholder={55000}
-              />
-            </EuiFormRow>
-          </EuiFlexItem>
-
-          <EuiFlexItem grow={false}>
-            <EuiFormRow label="Actions">
-              <EuiButton
-                aria-label="Update"
-                iconType="save"
-                color="primary"
-                onClick={() =>
-                  this.props
-                    .updateSettings({ ...this.state, _id: item._id }, true)
-                    .then(result => result !== -1 && this.toggleDetails(item))
-                }
-              >
-                Save
-              </EuiButton>
-            </EuiFormRow>
-          </EuiFlexItem>
-        </EuiFlexGroup>
-      );
+  /**
+   * Refresh the API entries
+   */
+  async refresh() {
+    try {
+      let status = 'complete';
+      this.setState({ error: false });
+      const hosts = await this.props.getHosts();
+      this.setState({
+        refreshingEntries: true,
+        apiEntries: hosts
+      });
+      const entries = this.state.apiEntries;
+      let numErr = 0;
+      for (let idx in entries) {
+        const entry = entries[idx];
+        try {
+          const data = await this.props.testApi(entry);
+          const clusterInfo = data.data || {};
+          const id = entries[idx].id;
+          entries[idx].status = 'online';
+          entries[idx].cluster_info = clusterInfo;
+          //Updates the cluster info in the registry
+          await this.props.updateClusterInfoInRegistry(id, clusterInfo);
+        } catch (error) {
+          numErr = numErr + 1;
+          const code = ((error || {}).data || {}).code;
+          const downReason =
+            ((error || {}).data || {}).message || 'Wazuh is not reachable';
+          const status = code === 3099 ? 'down' : 'unknown';
+          entries[idx].status = { status, downReason };
+        }
+      }
+      if (numErr) {
+        if (numErr >= entries.length) this.props.showApiIsDown();
+      }
+      this.setState({
+        apiEntries: entries,
+        status: status,
+        refreshingEntries: false
+      });
+    } catch (error) {
+      if (
+        error &&
+        error.data &&
+        error.data.message &&
+        error.data.code === 2001
+      ) {
+        this.props.showAddApiWithInitialError(error);
+      }
     }
-    this.setState({ itemIdToExpandedRowMap });
   }
 
-  UNSAFE_componentWillReceiveProps(nextProps) {
-    this.setState({
-      apiEntries: nextProps.apiEntries,
-      currentDefault: nextProps.currentDefault
-    });
+  /**
+   * Checks the API connectivity
+   * @param {Object} api
+   */
+  async checkApi(api) {
+    try {
+      const entries = this.state.apiEntries;
+      const idx = entries.map(e => e.id).indexOf(api.id);
+      try {
+        await this.props.checkManager(api);
+        entries[idx].status = 'online';
+      } catch (error) {
+        const code = ((error || {}).data || {}).code;
+        const downReason =
+          ((error || {}).data || {}).message || 'Wazuh is not reachable';
+        const status = code === 3099 ? 'down' : 'unknown';
+        entries[idx].status = { status, downReason };
+      }
+      this.setState({
+        apiEntries: entries
+      });
+    } catch (error) {
+      console.error('Error checking manager connection ', error);
+    }
   }
 
   render() {
-    const { itemIdToExpandedRowMap } = this.state;
     const items = [...this.state.apiEntries];
     const columns = [
       {
-        field: '_source.cluster_info.cluster',
+        field: 'id',
+        name: 'ID',
+        align: 'left',
+        sortable: true
+      },
+      {
+        field: 'cluster_info.cluster',
         name: 'Cluster',
-        align: 'left'
+        align: 'left',
+        sortable: true
       },
       {
-        field: '_source.cluster_info.manager',
+        field: 'cluster_info.manager',
         name: 'Manager',
-        align: 'left'
+        align: 'left',
+        sortable: true
       },
       {
-        field: '_source.url',
+        field: 'url',
         name: 'Host',
-        align: 'left'
+        align: 'left',
+        sortable: true
       },
       {
-        field: '_source.api_port',
+        field: 'port',
         name: 'Port',
-        align: 'left'
+        align: 'left',
+        sortable: true
       },
       {
-        field: '_source.api_user',
+        field: 'user',
         name: 'User',
-        align: 'left'
+        align: 'left',
+        sortable: true
+      },
+      {
+        field: 'status',
+        name: 'Status',
+        align: 'left',
+        sortable: true,
+        render: item => {
+          if (item) {
+            return item === 'online' ? (
+              <EuiHealth color="success">Online</EuiHealth>
+            ) : item.status === 'down' ? (
+              <span>
+                <EuiHealth color="warning">Warning</EuiHealth>
+                <EuiToolTip position="top" content={item.downReason}>
+                  <EuiButtonIcon
+                    color="primary"
+                    style={{ marginTop: '-12px' }}
+                    iconType="questionInCircle"
+                    onClick={() => this.props.copyToClipBoard(item.downReason)}
+                  />
+                </EuiToolTip>
+              </span>
+            ) : (
+              <span>
+                <EuiHealth color="danger">Offline</EuiHealth>
+                <EuiToolTip position="top" content={item.downReason}>
+                  <EuiButtonIcon
+                    color="primary"
+                    style={{ marginTop: '-12px' }}
+                    iconType="questionInCircle"
+                    onClick={() => this.props.copyToClipBoard(item.downReason)}
+                  />
+                </EuiToolTip>
+              </span>
+            );
+          } else {
+            return (
+              <span>
+                <EuiLoadingSpinner size="s" />
+                <span>&nbsp;&nbsp;Checking</span>
+              </span>
+            );
+          }
+        }
       },
       {
         name: 'Actions',
@@ -164,13 +212,13 @@ export class ApiTable extends Component {
               <EuiToolTip position="bottom" content={<p>Set as default</p>}>
                 <EuiButtonIcon
                   iconType={
-                    item._id === this.state.currentDefault
+                    item.id === this.props.currentDefault
                       ? 'starFilled'
                       : 'starEmpty'
                   }
                   aria-label="Set as default"
-                  onClick={() => {
-                    const currentDefault = this.props.setDefault(item);
+                  onClick={async () => {
+                    const currentDefault = await this.props.setDefault(item);
                     this.setState({
                       currentDefault
                     });
@@ -183,75 +231,69 @@ export class ApiTable extends Component {
                 <EuiButtonIcon
                   aria-label="Check connection"
                   iconType="refresh"
-                  onClick={() => this.props.checkManager(item)}
+                  onClick={async () => await this.checkApi(item)}
                   color="success"
-                />
-              </EuiToolTip>
-            </EuiFlexItem>
-            <EuiFlexItem grow={false}>
-              <EuiToolTip position="bottom" content={<p>Remove</p>}>
-                <EuiButtonIcon
-                  aria-label="Remove manager"
-                  iconType="trash"
-                  onClick={() =>
-                    this.props.removeManager(item).then(apiEntries =>
-                      this.setState({
-                        apiEntries
-                      })
-                    )
-                  }
-                  color="danger"
                 />
               </EuiToolTip>
             </EuiFlexItem>
           </EuiFlexGroup>
         )
-      },
-
-      {
-        align: RIGHT_ALIGNMENT,
-        width: '40px',
-        isExpander: true,
-        render: item => (
-          <EuiToolTip position="bottom" content={<p>Edit</p>}>
-            <EuiButtonIcon
-              onClick={() => this.toggleDetails(item)}
-              aria-label={
-                itemIdToExpandedRowMap[item.id]
-                  ? 'Collapse edition'
-                  : 'Expand edition'
-              }
-              iconType={
-                itemIdToExpandedRowMap[item.id] ? 'arrowUp' : 'arrowDown'
-              }
-            />
-          </EuiToolTip>
-        )
       }
     ];
+
+    const search = {
+      box: {
+        incremental: this.state.incremental,
+        schema: true
+      }
+    };
+
     return (
-      <EuiPanel>
-        <EuiBasicTable
-          itemId="_id"
-          items={items}
-          columns={columns}
-          itemIdToExpandedRowMap={this.state.itemIdToExpandedRowMap}
-          isExpandable={true}
-        />
-        <EuiSpacer size="m" />
+      <EuiPanel paddingSize="l">
         <EuiFlexGroup>
-          <EuiFlexItem />
+          <EuiFlexItem>
+            <EuiFlexGroup>
+              <EuiFlexItem>
+                <EuiTitle>
+                  <h2>Wazuh hosts</h2>
+                </EuiTitle>
+              </EuiFlexItem>
+            </EuiFlexGroup>
+          </EuiFlexItem>
           <EuiFlexItem grow={false}>
             <EuiButtonEmpty
-              aria-label="Add"
               iconType="plusInCircle"
-              onClick={() => this.props.switch()}
+              onClick={() => this.props.showAddApi()}
             >
               Add new
             </EuiButtonEmpty>
           </EuiFlexItem>
-          <EuiFlexItem />
+          <EuiFlexItem grow={false}>
+            <EuiButtonEmpty
+              iconType="refresh"
+              onClick={async () => await this.refresh()}
+            >
+              Refresh
+            </EuiButtonEmpty>
+          </EuiFlexItem>
         </EuiFlexGroup>
+        <EuiFlexGroup>
+          <EuiFlexItem>
+            <EuiText color="subdued" style={{ paddingBottom: '15px' }}>
+              From here you can see how to set up your Wazuh host, establish as
+              default, and check their connection and status.
+            </EuiText>
+          </EuiFlexItem>
+        </EuiFlexGroup>
+        <EuiInMemoryTable
+          itemId="id"
+          items={items}
+          search={search}
+          columns={columns}
+          pagination={true}
+          sorting={true}
+          loading={this.state.refreshingEntries}
+        />
       </EuiPanel>
     );
   }
@@ -260,9 +302,12 @@ export class ApiTable extends Component {
 ApiTable.propTypes = {
   apiEntries: PropTypes.array,
   currentDefault: PropTypes.string,
-  updateSettings: PropTypes.func,
   setDefault: PropTypes.func,
   checkManager: PropTypes.func,
-  removeManager: PropTypes.func,
-  switch: PropTypes.func
+  updateClusterInfoInRegistry: PropTypes.func,
+  getHosts: PropTypes.func,
+  testApi: PropTypes.func,
+  showAddApiWithInitialError: PropTypes.func,
+  showApiIsDown: PropTypes.func,
+  copyToClipBoard: PropTypes.func
 };
