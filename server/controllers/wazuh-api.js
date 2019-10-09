@@ -77,7 +77,7 @@ export class WazuhApiCtrl {
 
       // Look for socket-related errors
       if (this.checkResponseIsDown(response)) {
-        return ErrorResponse('ERROR3099', 3099, 500, reply);
+        return ErrorResponse(`ERROR3099 - ${response.body.message || 'Wazuh not ready yet'}`, 3099, 500, reply);
       }
 
       // Store error and data fields from the Wazuh API into different variables
@@ -151,7 +151,7 @@ export class WazuhApiCtrl {
                 );
 
                 if (this.checkResponseIsDown(response)) {
-                  return ErrorResponse('ERROR3099', 3099, 500, reply);
+                  return ErrorResponse(`ERROR3099 - ${response.body.message || 'Wazuh not ready yet'}`, 3099, 500, reply);
                 }
 
                 if (
@@ -245,7 +245,7 @@ export class WazuhApiCtrl {
 
       const responseIsDown = this.checkResponseIsDown(response);
       if (responseIsDown) {
-        return ErrorResponse('ERROR3099', 3099, 500, reply);
+        return ErrorResponse(`ERROR3099 - ${response.body.message || 'Wazuh not ready yet'}`, 3099, 500, reply);
       }
 
       // Check wrong credentials
@@ -845,7 +845,7 @@ export class WazuhApiCtrl {
               'wazuh-api:makeRequest',
               'Wazuh API is online but Wazuh is not ready yet'
             );
-            return ErrorResponse('ERROR3099', 3099, 500, reply);
+            return ErrorResponse(`ERROR3099 - ${response.body.message || 'Wazuh not ready yet'}`, 3099, 500, reply);
           }
         }
       }
@@ -876,9 +876,8 @@ export class WazuhApiCtrl {
       const response = await needle(method, fullUrl, data, options);
 
       const responseIsDown = this.checkResponseIsDown(response);
-
       if (responseIsDown) {
-        return ErrorResponse('ERROR3099', 3099, 500, reply);
+        return ErrorResponse(`ERROR3099 - ${response.body.message || 'Wazuh not ready yet'}`, 3099, 500, reply);
       }
 
       const responseBody = (response || {}).body || {};
