@@ -196,9 +196,8 @@ export class EmbeddedVisualizeHandler {
       });
     };
 
-    this.dataLoader = pipelineDataLoader
-      ? new PipelineDataLoader(vis)
-      : new VisualizeDataLoader(vis, Private);
+    //WAZUH disable pipelineLoader
+    this.dataLoader = new VisualizeDataLoader(vis, Private);
     const visFilters: any = Private(VisFiltersProvider);
     this.renderCompleteHelper = new RenderCompleteHelper(element);
     this.inspectorAdapters = this.getActiveInspectorAdapters();
