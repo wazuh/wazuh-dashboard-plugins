@@ -65,7 +65,10 @@ export class UpdateConfigurationFile {
       }
       this.busy = true;
       const configuration = getConfiguration() || {};
-      if (!!configuration.admin) {
+      const adminUndefined = !Object.keys(configuration).includes('admin');
+      const adminIsTrue = configuration.admin;
+
+      if (!adminUndefined && !adminIsTrue) {
         throw new Error('You are not authorized to update the configuration');
       }
       const { key, value } = (input || {}).payload || {};
