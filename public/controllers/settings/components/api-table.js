@@ -24,7 +24,7 @@ import {
   EuiTitle,
   EuiText,
   EuiLoadingSpinner,
-
+  EuiIcon
 } from '@elastic/eui';
 
 export class ApiTable extends Component {
@@ -44,9 +44,9 @@ export class ApiTable extends Component {
   }
 
 
- /**
- * Refresh the API entries
- */
+  /**
+  * Refresh the API entries
+  */
   async refresh() {
     try {
       let status = 'complete';
@@ -71,8 +71,9 @@ export class ApiTable extends Component {
         } catch (error) {
           numErr = numErr + 1;
           const code = ((error || {}).data || {}).code;
+          const downReason = ((error || {}).data || {}).message || 'Wazuh is not reachable';
           const status = code === 3099 ? 'down' : 'unknown';
-          entries[idx].status = status;
+          entries[idx].status = { status, downReason };
         }
       }
       if (numErr) {
@@ -103,8 +104,9 @@ export class ApiTable extends Component {
         entries[idx].status = 'online';
       } catch (error) {
         const code = ((error || {}).data || {}).code;
+        const downReason = ((error || {}).data || {}).message || 'Wazuh is not reachable';
         const status = code === 3099 ? 'down' : 'unknown';
-        entries[idx].status = status
+        entries[idx].status = { status, downReason };
       }
       this.setState({
         apiEntries: entries
@@ -162,10 +164,21 @@ export class ApiTable extends Component {
           if (item) {
             return item === 'online' ? (
               <EuiHealth color="success">Online</EuiHealth>
-            ) : item === 'down' ? (
-              <EuiHealth color="warning">Warning</EuiHealth>
+            ) : item.status === 'down' ? (
+              <span>
+                <EuiHealth color="warning">Warning</EuiHealth>
+                <EuiToolTip position="top" content={item.downReason}>
+                  <EuiIcon color="primary" style={{ marginTop: '-12px' }} type="questionInCircle"/>
+                </EuiToolTip>
+
+              </span>
             ) : (
-                  <EuiHealth color="danger">Offline</EuiHealth>
+                  <span>
+                    <EuiHealth color="danger">Offline</EuiHealth>
+                    <EuiToolTip position="top" content={item.downReason}>
+                      <EuiIcon color="primary" style={{ marginTop: '-12px' }} type="questionInCircle"/>
+                    </EuiToolTip>
+                  </span >
                 );
           } else {
             return (<span><EuiLoadingSpinner size="s" /><span>&nbsp;&nbsp;Checking</span></span>);

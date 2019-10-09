@@ -185,8 +185,9 @@ export class SettingsController {
           this.apiEntries[idx].status = 'online';
         } catch (error) {
           const code = ((error || {}).data || {}).code;
+          const downReason = ((error || {}).data || {}).message || 'Wazuh is not reachable';
           const status = code === 3099 ? 'down' : 'unknown';
-          this.apiEntries[idx].status = status;
+          this.apiEntries[idx].status = { status, downReason };
           numError = numError + 1;
         }
       };
