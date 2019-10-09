@@ -317,7 +317,9 @@ export class AgentsPreviewController {
     try {
       const result = await this.genericReq.request('GET', '/hosts/apis');
       const entries = result.data || [];
-      const host = entries.filter(e => {return e.id == this.api});
+      const host = entries.filter(e => {
+        return e.id == this.api;
+      });
       const url = host[0].url;
       const numToClean = url.startsWith('https://') ? 8 : 7;
       return url.substr(numToClean);
