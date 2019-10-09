@@ -315,12 +315,10 @@ export class AgentsPreviewController {
    */
   async getCurrentApiAddress() {
     try {
-      const result = await this.genericReq.request('GET', '/elastic/apis');
+      const result = await this.genericReq.request('GET', '/hosts/apis');
       const entries = result.data || [];
-      const host = entries.filter(e => {
-        return e._id == this.api;
-      });
-      const url = host[0]._source.url;
+      const host = entries.filter(e => {return e.id == this.api});
+      const url = host[0].url;
       const numToClean = url.startsWith('https://') ? 8 : 7;
       return url.substr(numToClean);
     } catch (error) {
