@@ -36,7 +36,6 @@ export class AgentsTable extends Component {
 
   constructor(props) {
     super(props);
-
   }
 
   componentDidMount() {    
@@ -94,12 +93,12 @@ export class AgentsTable extends Component {
         sortable: true,
       },
       {
-        field: 'r_date',
+        field: 'dateAdd',
         name: 'Registration date',
         sortable: true,
       },
       {
-        field: 'lk_alive',
+        field: 'lastKeepAlive',
         name: 'Last keep alive',
         sortable: true,
       },
@@ -137,21 +136,7 @@ export class AgentsTable extends Component {
           <EuiFlexItem>
             <EuiInMemoryTable
               itemId="id"
-              items={[
-                {
-                "id": "001",
-                "name": "jose-msi",
-                "ip": "192.168.0.105",
-                "status": "Active",
-                "group": "default",
-                "os_name": "Ubuntu",
-                "os_version": "19.04",
-                "version": "Wazuh v3.10.2",
-                "r_date": "2019/10/03 11:57:29",
-                "lk_alive": "2019/10/04 15:30:13",
-                "actions":""
-                },
-              ]}
+              items={this.props.agents}
               columns={columns}
               search={search}
               pagination={true}
@@ -171,4 +156,5 @@ export class AgentsTable extends Component {
 }
 
 AgentsTable.propTypes = {
+  agents: PropTypes.array
 };
