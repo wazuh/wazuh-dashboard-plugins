@@ -23,35 +23,48 @@ import {
   EuiIcon,
   EuiTitle,
   EuiButtonEmpty,
+  EuiSearchBar,
   EuiText,
   EuiPopover,
   EuiFormRow,
   EuiFieldText,
   EuiSpacer,
   EuiButton,
-  EuiCallOut
+  EuiCallOut,
 } from '@elastic/eui';
+
+
+class WzInMemoryTable extends EuiInMemoryTable {
+  constructor(props) {
+    super(props);
+  }
+
+  renderSearchBar() {
+    const { search } = this.props;
+    const isBoolean = item => {return typeof item == 'boolean'};
+    if (search) {
+      const {
+        onChange, // eslint-disable-line no-unused-vars
+        ...searchBarProps
+      } = isBoolean(search) ? {} : search;
+      if (searchBarProps.box && searchBarProps.box.schema === true) {
+        searchBarProps.box.schema = this.resolveSearchSchema();
+      }
+
+      return <EuiSearchBar onChange={this.onQueryChange} {...searchBarProps} />;
+    }
+  }
+}
+
 
 export class AgentsTable extends Component {
 
   constructor(props) {
     super(props);
   }
-
-  componentDidMount() {    
-  }
-
-
-
-  render() {
-    const search = {
-      box: {
-        incremental: true,
-        schema: true,
-      }
-    };
-
-    const columns = [
+  
+  columns() {
+    return [
       {
         field: 'id',
         name: 'ID',
@@ -105,50 +118,78 @@ export class AgentsTable extends Component {
       {
         field: 'actions',
         name: 'Actions',
-        render: () => {
-          return (
-            <div>
-              <EuiIcon type="discoverApp" style={{marginRight: 5}} />
-              <EuiIcon type="wrench" />
-            </div>
-          );
-        }
+        render: this.actions
       },
-
     ];
+  }
+
+  actions(item) {
+    const style = {
+      marginRight: 5
+    }
+
+    return (
+      <div>
+        
+        <EuiIcon type="discoverApp" style={style} />
+        <EuiIcon type="wrench" />
+      </div>
+    );
+  };
+
+  formattedButton() {
+    return (
+      <EuiFlexItem grow={false}>
+        <EuiButtonEmpty iconType="importAction" onClick={() => this.refresh()}>
+          Formatted          
+        </EuiButtonEmpty>
+      </EuiFlexItem>
+    );
+  }
+
+  render() {
+    const search = {
+      box: {
+        incremental: true,
+        schema: true,
+      }
+    };
 
     const groupStyle = {
       margin: 15
-    }
+    } 
 
 
     return (
       
-      <EuiPanel paddingSize="none">
-        <EuiFlexGroup className="wz-card-actions">
+      <EuiPanel paddingSize="l">
+        <EuiFlexGroup>
           <EuiFlexItem>
-            <a>
-            <EuiIcon type="plusInCircle" /> Add new agent
-            </a>
+            <EuiFlexGroup>
+              <EuiFlexItem>
+                <EuiTitle>
+                  <h2>Agents</h2>
+                </EuiTitle>
+              </EuiFlexItem>
+            </EuiFlexGroup>
+          </EuiFlexItem>
+          <this.formattedButton />
+          <EuiFlexItem grow={false}>
+            <EuiButtonEmpty iconType="plusInCircle" onClick={() => this.refresh()}>
+              Add new agent
+            </EuiButtonEmpty>
           </EuiFlexItem>
         </EuiFlexGroup>
         <EuiFlexGroup style={groupStyle}>
           <EuiFlexItem>
-            <EuiInMemoryTable
+            <WzInMemoryTable
               itemId="id"
               items={this.props.agents}
-              columns={columns}
+              columns={this.columns()}
               search={search}
               pagination={true}
             />
           </EuiFlexItem>
-        </EuiFlexGroup>
-        <EuiFlexGroup style={groupStyle}>
-        <EuiFlexItem style={{alignItems: 'flex-end'}}>
-          <a>
-            <EuiIcon type="importAction" /> Formatted          
-          </a>
-        </EuiFlexItem>
         </EuiFlexGroup>
       </EuiPanel>
     );
