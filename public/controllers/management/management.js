@@ -348,9 +348,9 @@ export class ManagementController {
     if (showFile) {
       this.showFile = showFile;   
       this.$scope.$broadcast('editFromTable');
-    }else{
-      this.$scope.$broadcast('closeRulesetFile');      
-    } 
+    } else if(!this.openedFileDirect){
+      this.$scope.$broadcast('closeRulesetFile');
+    }
   }
 
   breadCrumbBack(goRoot = false) {
