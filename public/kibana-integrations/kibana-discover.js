@@ -718,7 +718,7 @@ function discoverController(
     let inheritedFilters;
     // Preserve filters in discover
     if ((discoverFilters || []).length || (pinnedFilters || []).length) {
-      inheritedFilters = [...(discoverFilters || []), ...(pinnedFilters || [])];
+      inheritedFilters = discoverFilters || [];
       discoverFilters = [];
       if (backFromDiscover) pinnedFilters = [];
     }
@@ -1274,7 +1274,9 @@ function discoverController(
     $scope.updateQueryAndFetch($state.query);
 
     if (goToDiscover) {
-      $scope.fetch();
+      setTimeout(() => {
+        $scope.fetch();
+      }, 100);
     }
   });
   ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
