@@ -2,17 +2,17 @@
 <wz-no-config
   flex
   error="'not-present'"
-  ng-if="configurationSubTab === 'vulnerabilities-feeds' && currentConfig && currentConfig['vulnerability-detector'] && !currentConfig['vulnerability-detector'].feeds"></wz-no-config>
+  ng-if="configurationSubTab === 'vulnerabilities-feeds' && currentConfig && currentConfig['vulnerability-detector'] && !currentConfig['vulnerability-detector'].providers"></wz-no-config>
 <!-- End no configuration section -->
 
-<!-- Feeds card -->
-<md-card class="wz-md-card" ng-if="!JSONContent && !XMLContent && configurationSubTab === 'vulnerabilities-feeds' && currentConfig && currentConfig['vulnerability-detector'] && currentConfig['vulnerability-detector'].feeds">
+<!-- Providers card -->
+<md-card class="wz-md-card" ng-if="!JSONContent && !XMLContent && configurationSubTab === 'vulnerabilities-feeds' && currentConfig && currentConfig['vulnerability-detector'] && currentConfig['vulnerability-detector'].providers">
     <md-card-content>
         <div layout="row" layout-align="start center">
             <div>
-                <span class="font-size-16">Feeds</span>
+                <span class="font-size-16">Providers</span>
                 <div class="wz-margin-top-10">
-                    <span class="md-subheader small">List of OVAL databases to check for vulnerability scans</span>
+                    <span class="md-subheader small">List of OVAL databases providers to check for vulnerability scans</span>
                 </div>
             </div>
             <span flex></span>
@@ -29,19 +29,44 @@
                 <thead class="wz-text-bold">
                     <th class="wz-text-left">Name</th>
                     <th class="wz-text-left">Version</th>
-                    <th class="wz-text-left col-lg-2">Update interval</th>
-                    <th class="wz-text-left col-lg-3">Alt. path</th>
-                    <th class="wz-text-left col-lg-3">Alt. URL</th>
-                    <th class="wz-text-left">Alt. port</th>
+                    <th class="wz-text-left">Update interval</th>
+                    <th class="wz-text-left">Update from year</th>
+                    <th class="wz-text-left">Path</th>
+                    <th class="wz-text-left col-lg-2">URL</th>
+                    <th class="wz-text-left col-lg-2">URL attributes</th>
+                    <th class="wz-text-left col-lg-3">Allow</th>
                 </thead>
                 <tbody class="wz-word-wrap">
-                    <tr ng-repeat="item in currentConfig['vulnerability-detector'].feeds">
+                    <tr ng-repeat="item in currentConfig['vulnerability-detector'].providers">
                         <td>{{ item.name || '-' }}</td>
                         <td>{{ item.version || '-' }}</td>
-                        <td>{{ item.interval || '-' }}</td>
+                        <td>{{ item.update_interval || '-' }}</td>
+                        <td>{{ item.update_from_year || '-' }}</td>
                         <td>{{ item.path || '-' }}</td>
-                        <td>{{ item.alternative.url || '-' }}</td>
-                        <td>{{ item.alternative.port || '-' }}</td>
+                        <td>{{ item.url || '-' }}</td>
+                        <td>
+                            <span ng-if="!item.url_attrs">-</span>
+                            <div ng-if="item.url_attrs">
+                            <span><b>Start: </b>{{item.url_attrs.start || '-' }}</span><br>
+                            <span><b>End: </b>{{item.url_attrs.end || '-' }}</span><br>
+                            <span><b>Port: </b>{{item.url_attrs.port || '-' }}</span>
+                        </div>
+                        </td>
+                        <td>
+                            <span ng-if="!item.allow">-</span>
+                            <table ng-if="item.allow" class="table table-bordered table-striped table-condensed">
+                                    <thead class="wz-text-bold">
+                                            <th class="wz-text-left col-lg-6">Replaced OS</th>
+                                            <th class="wz-text-left col-lg-6">Source</th>
+                                        </thead>
+                                        <tbody class="wz-word-wrap">
+                                                <tr ng-repeat="i in item.allow">
+                                                    <td>{{ i.replaced_os || '-' }}</td>
+                                                    <td>{{ i.src.toString() || '-' }}</td>
+                                                </tr>
+                                            </tbody>
+                            </table>
+                        </td>                        
                     </tr>
                 </tbody>
             </table>
@@ -50,4 +75,4 @@
         <!-- End configuration block -->
     </md-card-content>
 </md-card>
-<!-- End feeds card -->
+<!-- End providers card -->
