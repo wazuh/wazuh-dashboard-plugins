@@ -73,7 +73,8 @@ export class RulesetHandler {
     try {
       const result = await this.apiReq.request(
         'POST',
-        `/manager/files?path=etc/rules/${rule.file || rule}&overwrite=${!overwrite}`,
+        `/manager/files?path=etc/rules/${rule.file ||
+          rule}&overwrite=${!overwrite}`,
         { content, origin: 'xmleditor' }
       );
       return result;
@@ -85,9 +86,8 @@ export class RulesetHandler {
     try {
       const result = await this.apiReq.request(
         'POST',
-        `/manager/files?path=etc/decoders/${
-          decoder.file || decoder
-        }&overwrite=${!overwrite}`,
+        `/manager/files?path=etc/decoders/${decoder.file ||
+          decoder}&overwrite=${!overwrite}`,
         { content, origin: 'xmleditor' }
       );
       return result;

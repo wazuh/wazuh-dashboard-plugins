@@ -22,14 +22,12 @@ import {
   EuiButtonEmpty,
   EuiHealth,
   EuiCallOut,
-  EuiSwitch
+  EuiSwitch,
+  EuiSpacer
 } from '@elastic/eui';
 
 import { BasicTable } from '../directives/wz-table-eui/components/table';
 import { Tabs } from '../directives/wz-tabs-eui/components/tabs';
-import { Logtest } from '../directives/wz-logtest/components/logtest';
-import { ToolsWelcomeCards } from '../controllers/dev-tools/components/tools-welcome-cards';
-import { TestConfiguration } from '../controllers/dev-tools/components/test-configuration';
 
 const app = uiModules.get('app/wazuh', ['react']);
 
@@ -46,7 +44,5 @@ app
   .value('EuiCallOut', EuiCallOut)
   .value('BasicTable', BasicTable)
   .value('Tabs', Tabs)
-  .value('Logtest', Logtest)
-  .value('ToolsWelcomeCards', ToolsWelcomeCards)
-  .value('TestConfiguration', TestConfiguration)
-  .value('EuiSwitch', EuiSwitch);
+  .value('EuiSwitch', EuiSwitch)
+  .value('EuiSpacer', EuiSpacer);

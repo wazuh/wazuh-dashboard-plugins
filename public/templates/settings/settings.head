@@ -3,6 +3,6 @@
         <react-component name="EuiProgress" props="{size: 'xs', color: 'primary'}" />
     </div>
 
-    <div ng-if="!ctrl.load && ctrl.settingsTabsProps" class="wz-margin-top-10 md-margin-h">
+    <div ng-if="!ctrl.load && ctrl.settingsTabsProps && !ctrl.apiIsDown && ctrl.apiTableProps.apiEntries.length" class="wz-margin-top-10 md-margin-h">
         <react-component name="Tabs" props="ctrl.settingsTabsProps" />
     </div>

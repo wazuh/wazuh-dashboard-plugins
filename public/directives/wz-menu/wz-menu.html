@@ -4,23 +4,25 @@
         <!-- Main Wazuh app navigation buttons -->
         <md-button class="wz-menu-button" ng-href="#/overview" ng-click="setMenuNavItem('overview')"
             ng-class="{'wz-menu-active': menuNavItem === 'overview' || menuNavItem === 'health-check' }"
-            aria-label="Overview tab">
+            aria-label="Overview tab" data-test-subj="wzMenuOverview">
             <react-component name="EuiIcon" class="kbnGlobalNavLink__euiIcon" props="{type:'visualizeApp'}" /> Overview
         </md-button>
 
         <md-button class="wz-menu-button" ng-href="#/manager" ng-click="setMenuNavItem('manager')"
-            ng-class="{'wz-menu-active': menuNavItem === 'manager' }" aria-label="Cluster tab">
+            ng-class="{'wz-menu-active': menuNavItem === 'manager' }" aria-label="Cluster tab"
+            data-test-subj="wzMenuManagement">
             <react-component name="EuiIcon" class="kbnGlobalNavLink__euiIcon" props="{type:'infraApp'}" /> Management
         </md-button>
 
         <md-button class="wz-menu-button" ng-href="#/agents-preview" ng-click="setMenuNavItem('agents-preview')"
             ng-class="{'wz-menu-active': menuNavItem === 'agents-preview' || menuNavItem === 'agents' }"
-            aria-label="Agents tab">
+            aria-label="Agents tab" data-test-subj="wzMenuAgents">
             <i class="fa fa-fw fa-tv" aria-hidden="true"></i> Agents
         </md-button>
 
         <md-button class="wz-menu-button" ng-href="#/wazuh-dev" ng-click="setMenuNavItem('wazuh-dev')"
-            ng-class="{'wz-menu-active': menuNavItem === 'wazuh-dev' }" aria-label="Dev Tools tab">
+            ng-class="{'wz-menu-active': menuNavItem === 'wazuh-dev' }" aria-label="Dev Tools tab"
+            data-test-subj="wzMenuDevTools">
             <react-component name="EuiIcon" class="kbnGlobalNavLink__euiIcon" props="{type:'console'}" /> Dev tools
         </md-button>
 
