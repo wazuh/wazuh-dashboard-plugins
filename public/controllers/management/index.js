@@ -27,6 +27,7 @@ import { FilesController } from './files';
 import { WelcomeScreen } from './components/welcome';
 import { ReportingTable } from './components/reporting-table';
 import { UploadFiles } from './components/upload-files';
+import { MainRuleset } from './components/ruleset/main-ruleset';
 
 const app = uiModules.get('app/wazuh', []);
 
@@ -46,4 +47,5 @@ app
   .controller('filesController', FilesController)
   .value('WelcomeScreenManagement', WelcomeScreen)
   .value('ReportingTable', ReportingTable)
-  .value('UploadFiles', UploadFiles);
+  .value('UploadFiles', UploadFiles)
+  .value('MainRuleset', MainRuleset);
