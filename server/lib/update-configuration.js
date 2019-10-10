@@ -11,6 +11,7 @@
  */
 import fs from 'fs';
 import path from 'path';
+import { log } from '../logger';
 import { getConfiguration } from './get-configuration';
 
 const needRestartFields = [
@@ -28,31 +29,33 @@ const needRestartFields = [
 export class UpdateConfigurationFile {
   constructor() {
     this.busy = false;
+    this.file = path.join(__dirname, '../../wazuh.yml');
   }
 
   /**
-   * Add or replace specific setting from config.yml
+   * Add or replace specific setting from wazuh.yml
    * @param {String} key The setting name.
    * @param {String} value New value for the setting.
    * @param {Boolean} exists If true, it just replaces the value for that key.
    */
   updateLine(key, value, exists = false) {
     try {
-      const file = path.join(__dirname, '../../config.yml');
-      const data = fs.readFileSync(file, { encoding: 'utf-8' });
+      const data = fs.readFileSync(this.file, { encoding: 'utf-8' });
       const re = new RegExp(`^${key}\\s{0,}:\\s{1,}.*`, 'gm');
       const result = exists
         ? data.replace(re, `${key}: ${value}`)
         : `${data}\n${key}: ${value}`;
-      fs.writeFileSync(file, result, 'utf8');
+      fs.writeFileSync(this.file, result, 'utf8');
+      log('update-configuration:updateLine', 'Updating line', 'debug');
       return true;
     } catch (error) {
+      log('update-configuration:updateLine', error.message || error);
       throw error;
     }
   }
 
   /**
-   * Updates config.yml file. If it fails, it throws the error to the next function.
+   * Updates wazuh.yml file. If it fails, it throws the error to the next function.
    * @param {Object} input
    */
   updateConfiguration(input) {
@@ -62,14 +65,23 @@ export class UpdateConfigurationFile {
       }
       this.busy = true;
       const configuration = getConfiguration() || {};
-      if (!!configuration.admin) {
+      const adminUndefined = !Object.keys(configuration).includes('admin');
+      const adminIsTrue = configuration.admin;
+
+      if (!adminUndefined && !adminIsTrue) {
         throw new Error('You are not authorized to update the configuration');
       }
       const { key, value } = (input || {}).payload || {};
       this.updateLine(key, value, typeof configuration[key] !== 'undefined');
       this.busy = false;
+      log(
+        'update-configuration:updateConfiguration',
+        'Updating configuration',
+        'debug'
+      );
       return { needRestart: needRestartFields.includes(key) };
     } catch (error) {
+      log('update-configuration:updateConfiguration', error.message || error);
       this.busy = false;
       throw error;
     }

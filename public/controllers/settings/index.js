@@ -16,8 +16,10 @@ const app = uiModules.get('app/wazuh', []);
 
 import { ApiTable } from './components/api-table';
 import { AddApi } from './components/add-api';
+import { ApiIsDown } from './components/api-is-down';
 
 app
   .controller('settingsController', SettingsController)
   .value('ApiTable', ApiTable)
-  .value('AddApi', AddApi);
+  .value('AddApi', AddApi)
+  .value('ApiIsDown', ApiIsDown);

@@ -108,8 +108,25 @@
 # ------------------------------- App privileges --------------------------------
 #admin: true
 #
-# ------------------------------- App logging level ---------------------------------
+# ------------------------------- App logging level -----------------------------
 # Set the logging level for the Wazuh App log files.
 # Default value: info
 # Allowed values: info, debug
 #logs.level: info
+#
+#-------------------------------- API entries -----------------------------------
+#The following configuration is the default structure to define an API entry.
+#
+#hosts:
+#  - <id>:
+#     url: http(s)://<url>
+#     port: <port>
+#     user: <user>
+#     password: <password> 
+
+hosts:
+  - default:
+     url: http://localhost
+     port: 55000
+     user: foo
+     password: bar

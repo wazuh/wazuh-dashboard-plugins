@@ -258,7 +258,6 @@ export class GroupsController {
     return;
   };
 
-
   /**
    * Updates the group information
    * @param {Object} event 

@@ -1,16 +1,22 @@
 /*
- * Author: Elasticsearch B.V.
- * Updated by Wazuh, Inc.
+ * Licensed to Elasticsearch B.V. under one or more contributor
+ * license agreements. See the NOTICE file distributed with
+ * this work for additional information regarding copyright
+ * ownership. Elasticsearch B.V. licenses this file to you under
+ * the Apache License, Version 2.0 (the "License"); you may
+ * not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * Copyright (C) 2015-2019 Wazuh, Inc.
+ *    http://www.apache.org/licenses/LICENSE-2.0
  *
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * Find more information about this on the LICENSE file.
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
  */
+
 import { EuiButtonEmpty, EuiFlexGroup, EuiFlexItem, EuiPopover } from '@elastic/eui';
 import {
   buildEmptyFilter,
@@ -27,13 +33,11 @@ import {
 import { FormattedMessage, InjectedIntl, injectI18n } from '@kbn/i18n/react';
 import classNames from 'classnames';
 import React, { Component } from 'react';
-import chrome from 'ui/chrome';
+import { UiSettingsClientContract } from 'src/core/public';
 import { IndexPattern } from 'ui/index_patterns';
 import { FilterEditor } from 'plugins/data/filter/filter_bar/filter_editor';
 import { FilterItem } from './filter_item';
 import { FilterOptions } from 'plugins/data/filter/filter_bar/filter_options';
-
-const config = chrome.getUiSettingsClient();
 
 interface Props {
   filters: Filter[];
@@ -41,6 +45,7 @@ interface Props {
   className: string;
   indexPatterns: IndexPattern[];
   intl: InjectedIntl;
+  uiSettings: UiSettingsClientContract;
 }
 
 interface State {
@@ -53,6 +58,9 @@ class FilterBarUI extends Component<Props, State> {
   };
 
   public render() {
+    if (!this.props.uiSettings) {
+      return null;
+    }
     const classes = classNames('globalFilterBar', this.props.className);
 
     return (
@@ -74,7 +82,7 @@ class FilterBarUI extends Component<Props, State> {
           />
         </EuiFlexItem>
 
-        <EuiFlexItem>
+        <EuiFlexItem className="globalFilterGroup__filterFlexItem">
           <EuiFlexGroup
             className={classes}
             wrap={true}
@@ -92,21 +100,21 @@ class FilterBarUI extends Component<Props, State> {
 
   private renderItems() {
     return this.props.filters.map((filter, i) => (
-      <EuiFlexItem key={i} grow={false}>
+      <EuiFlexItem key={i} grow={false} className="globalFilterBar__flexItem">
         <FilterItem
           id={`${i}`}
           filter={filter}
           onUpdate={newFilter => this.onUpdate(i, newFilter)}
           onRemove={() => this.onRemove(i)}
           indexPatterns={this.props.indexPatterns}
+          uiSettings={this.props.uiSettings}
         />
       </EuiFlexItem>
     ));
   }
 
-
   private renderAddFilter() {
-    const isPinned = config.get('filters:pinnedByDefault');
+    const isPinned = this.props.uiSettings.get('filters:pinnedByDefault');
     const [indexPattern] = this.props.indexPatterns;
     const index = indexPattern && indexPattern.id;
     const newFilter = buildEmptyFilter(isPinned, index);
@@ -115,7 +123,7 @@ class FilterBarUI extends Component<Props, State> {
       <EuiButtonEmpty size="xs" onClick={this.onOpenAddFilterPopover} data-test-subj="addFilter">
         +{' '}
         <FormattedMessage
-          id="common.ui.filterBar.addFilterButtonLabel"
+          id="data.filter.filterBar.addFilterButtonLabel"
           defaultMessage="Add filter"
         />
       </EuiButtonEmpty>
@@ -141,6 +149,7 @@ class FilterBarUI extends Component<Props, State> {
                 onSubmit={this.onAdd}
                 onCancel={this.onCloseAddFilterPopover}
                 key={JSON.stringify(newFilter)}
+                uiSettings={this.props.uiSettings}
               />
             </div>
           </EuiFlexItem>

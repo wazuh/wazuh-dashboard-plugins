@@ -139,10 +139,9 @@ export class HealthCheck {
    */
   async checkApiConnection() {
     try {
-      if (this.checks.api) {
-        const data = await this.testAPI.checkStored(
-          JSON.parse(this.appState.getCurrentAPI()).id
-        );
+      const currentApi = JSON.parse(this.appState.getCurrentAPI() || '{}');
+      if (this.checks.api && currentApi && currentApi.id) {
+        const data = await this.testAPI.checkStored(currentApi.id);
 
         if (((data || {}).data || {}).idChanged) {
           const apiRaw = JSON.parse(this.appState.getCurrentAPI());
@@ -204,7 +203,11 @@ export class HealthCheck {
       this.$scope.$applyAsync();
       return;
     } catch (error) {
-      this.handleError(error);
+      if (error && error.data && error.data.code && error.data.code === 3002) {
+        return error;
+      } else {
+        this.handleError(error);
+      }
     }
   }
 

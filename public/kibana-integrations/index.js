@@ -12,4 +12,4 @@
 import './kibana-visualization';
 import './kibana-discover';
 import './saved-visualizations';
-import './search-bar/search-bar-directive';
+import './wz-top-nav';
