@@ -30,8 +30,8 @@ Visualize and analyze Wazuh alerts stored in Elasticsearch using our Kibana app 
 
 ## Requisites
 
-- Wazuh HIDS 3.10.2
-- Wazuh RESTful API 3.10.2
+- Wazuh HIDS 3.11.0
+- Wazuh RESTful API 3.11.0
 - Kibana 6.8.3
 - Elasticsearch 6.8.3
 
