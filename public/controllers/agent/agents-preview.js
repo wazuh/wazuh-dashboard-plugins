@@ -105,42 +105,12 @@ export class AgentsPreviewController {
     };
     this.hasAgents = true;
     this.init = false;
+    //Props
+    this.tableAgentsProps = {
+      wzReq: (method, path, body) => this.apiReq.request(method, path, body)
+    } 
     //Load
     this.load();
-  }
-
-  async getAgents() {
-    const removeMaster = (agent) => { return agent.id !== '000'; };
-    const checkField = (field) => { return (field !== undefined) ? field : "-"; };
-    const rawAgents = await this.apiReq.request(
-      'GET',
-      '/agents',
-      {}
-    );
-
-    const agentsWithoutMaster = ((((rawAgents || {}).data) || {}).data || {}).items.filter(
-      removeMaster
-    );
-
-
-    const formatedAgents = agentsWithoutMaster.map(
-      (agent) => {
-        return {
-          "id": agent.id,
-          "name": agent.name,
-          "ip": agent.ip,
-          "status": agent.status,
-          "group": checkField(agent.group),
-          "os_name": checkField(((agent || {}).os || {}).name),
-          "os_version": checkField(((agent || {}).os || {}).version),
-          "version": checkField(agent.version),
-          "dateAdd": agent.dateAdd,
-          "lastKeepAlive": checkField(agent.lastKeepAlive),
-          "actions": agent.id
-        }
-      }
-    );
-    return formatedAgents;
   }
 
   /**
@@ -294,9 +264,7 @@ export class AgentsPreviewController {
     }
     this.loading = false;
     this.$scope.$applyAsync();
-    this.tableAgentsProps = {
-      agents: await this.getAgents()
-    } 
+    
     return;
   }
 

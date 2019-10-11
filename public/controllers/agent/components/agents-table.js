@@ -15,44 +15,41 @@
 import React, { Component, Fragment } from 'react';
 import PropTypes from 'prop-types';
 import {
-  EuiInMemoryTable,
-  EuiButtonIcon,
-  EuiFlexItem,
-  EuiFlexGroup,
-  EuiPanel,
-  EuiIcon,
-  EuiTitle,
-  EuiButtonEmpty,
-  EuiSearchBar,
-  EuiText,
-  EuiPopover,
-  EuiFormRow,
-  EuiFieldText,
-  EuiSpacer,
+  EuiBasicTable,
   EuiButton,
+  EuiButtonEmpty,
+  EuiButtonIcon,
   EuiCallOut,
+  EuiComboBox,
+  EuiFieldText,
+  EuiFlexGroup,
+  EuiFlexItem,
+  EuiFormRow,
+  EuiIcon,
+  EuiInMemoryTable,
+  EuiPanel,
+  EuiPopover,
+  EuiSearchBar,
+  EuiSpacer,
+  EuiSuggest,
+  EuiText,
+  EuiTitle,
+  InM
 } from '@elastic/eui';
 
-
 class WzInMemoryTable extends EuiInMemoryTable {
+
   constructor(props) {
     super(props);
+
   }
 
-  renderSearchBar() {
-    const { search } = this.props;
-    const isBoolean = item => {return typeof item == 'boolean'};
-    if (search) {
-      const {
-        onChange, // eslint-disable-line no-unused-vars
-        ...searchBarProps
-      } = isBoolean(search) ? {} : search;
-      if (searchBarProps.box && searchBarProps.box.schema === true) {
-        searchBarProps.box.schema = this.resolveSearchSchema();
-      }
+  
 
-      return <EuiSearchBar onChange={this.onQueryChange} {...searchBarProps} />;
-    }
+  getItems() {
+    const result = super.getItems()
+    result.totalItemCount = this.props.totalItems
+    return result;
   }
 }
 
@@ -61,6 +58,62 @@ export class AgentsTable extends Component {
 
   constructor(props) {
     super(props);
+    this.onTableChange = this.onTableChange.bind(this);
+    this.state = {
+      "pageIndex": 0,
+      "previusIndex": 0,
+      "totalItems": 0
+    }
+  }
+  
+
+  async componentDidMount() {
+    await this.getAgents();
+  }
+
+  async componentDidUpdate() {
+    if(this.state.pageIndex !== this.state.previusIndex){
+      await this.getAgents();
+      this.setState({previusIndex: this.state.pageIndex});
+    }
+  }
+
+  async getAgents() {
+    const checkField = (field) => { return (field !== undefined) ? field : "-"; };
+    const rawAgents = await this.props.wzReq(
+      'GET',
+      '/agents',
+      this.createFilter()
+    );
+
+    const formatedAgents = (((rawAgents || {}).data || {}).data || {}).items.map(
+      (agent) => {
+        return {
+          "id": agent.id,
+          "name": agent.name,
+          "ip": agent.ip,
+          "status": agent.status,
+          "group": checkField(agent.group),
+          "os_name": checkField(((agent || {}).os || {}).name) + checkField(((agent || {}).os || {}).version),
+          "version": checkField(agent.version),
+          "dateAdd": agent.dateAdd,
+          "lastKeepAlive": checkField(agent.lastKeepAlive),
+          "actions": agent.id
+        }
+      }
+    );
+    
+    this.setState({totalItems: (((rawAgents || {}).data || {}).data || {}).totalItems - 1})
+    this.setState({agents: formatedAgents})
+  }
+
+  createFilter(){
+    const offset = ((this.state || {}).pageIndex !== undefined) ? (this.state || {}).pageIndex : 0;
+    const limit = ((this.state || {}).pageSize !== undefined) ? (this.state || {}).pageSize : 10;
+    return {
+      "offset": (offset * limit) + 1,
+      "limit": limit
+    }
   }
   
   columns() {
@@ -93,11 +146,6 @@ export class AgentsTable extends Component {
       {
         field: 'os_name',
         name: 'OS name',
-        sortable: true,
-      },
-      {
-        field: 'os_version',
-        name: 'OS version',
         sortable: true,
       },
       {
@@ -146,20 +194,31 @@ export class AgentsTable extends Component {
       </EuiFlexItem>
     );
   }
+  onTableChange ({page = {}, sort = {}})  {
+    this.setState({pageSize: page.size});
+    this.setState({pageIndex: page.index});
+  }
 
+  
   render() {
+
     const search = {
       box: {
-        incremental: true,
-        schema: true,
+        incremental: false,
+        schema: {
+          "strict": true,
+          "fields":{
+            "status": {
+              "type":"string"
+            }
+          }
+        },
       }
     };
 
     const groupStyle = {
       margin: 15
-    } 
-
-
+    }
     return (
       
       <EuiPanel paddingSize="l">
@@ -184,10 +243,13 @@ export class AgentsTable extends Component {
           <EuiFlexItem>
             <WzInMemoryTable
               itemId="id"
-              items={this.props.agents}
+              items={(this.state || {}).agents}
               columns={this.columns()}
+              sorting={true}
               search={search}
               pagination={true}
+              totalItems={this.state.totalItems}
+              onTableChange={this.onTableChange}
             />
           </EuiFlexItem>
         </EuiFlexGroup>
@@ -197,5 +259,9 @@ export class AgentsTable extends Component {
 }
 
 AgentsTable.propTypes = {
-  agents: PropTypes.array
+  wzReq: PropTypes.func
 };
+
+
+
+
