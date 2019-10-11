@@ -14,7 +14,8 @@ import {
   EuiSelect
 } from '@elastic/eui';
 
-import PropTypes from 'prop-types';
+import { connect } from 'react-redux';
+import { changeRulesetSection } from './redux/actions';
 
 
 /**
@@ -29,26 +30,14 @@ import PropTypes from 'prop-types';
  * 
  */
 
-export class WzSectionSelector extends Component {
+class WzSectionSelector extends Component {
   constructor(props) {
     super(props);
-
-    this.state = {
-      section: this.props.section
-    }
-
-    this.options = this.props.options;
-  }
-
-  componentDidMount() {
-    console.log('SectionSelector mounted ', this.state);
-    console.log('Options ', this.options)
   }
 
   onChange = e => {
-    this.setState({
-      section: e.target.value,
-    });
+    const section = e.target.value;
+    this.props.changeSection(section);
   };
 
 
@@ -56,8 +45,8 @@ export class WzSectionSelector extends Component {
     return (
       <EuiSelect
         id="wzSelector"
-        options={this.options}
-        value={this.state.section}
+        options={this.props.state.ruleset.sections}
+        value={this.props.state.ruleset.section}
         onChange={this.onChange}
         aria-label="Section selector"
       />
@@ -65,7 +54,16 @@ export class WzSectionSelector extends Component {
   }
 }
 
-WzSectionSelector.propTypes = {
-  section: PropTypes.string,
-  options: PropTypes.array
+const mapStateToProps = (state) => {
+  return {
+    state: state
+  };
 };
+
+const mapDispatchToProps = (dispatch) => {
+  return {
+    changeSection: section => dispatch(changeRulesetSection(section))
+  }
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(WzSectionSelector);

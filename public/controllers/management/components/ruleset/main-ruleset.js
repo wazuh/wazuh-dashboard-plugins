@@ -10,6 +10,8 @@
  * Find more information about this on the LICENSE file.
  */
 import React, { Component } from 'react';
+import PropTypes from 'prop-types';
+// Eui components
 import {
   EuiFlexGroup,
   EuiFlexItem,
@@ -18,14 +20,13 @@ import {
   EuiText,
   EuiTitle,
   EuiSearchBar,
-  EuiSelect,
   EuiButtonEmpty
 } from '@elastic/eui';
-
-import PropTypes from 'prop-types';
-
+// Redux
+import { Provider } from 'react-redux';
+import store from './redux/store';
 // Wazuh components
-import { WzSectionSelector } from './section-selector';
+import WzSectionSelector from './section-selector';
 
 
 export class WzRuleset extends Component {
@@ -36,17 +37,15 @@ export class WzRuleset extends Component {
       section: this.props.section
     }
 
-    this.sectionOptions = [
-      { value: 'rules', text: 'Rules' },
-      { value: 'decoders', text: 'Decoders' },
-      { value: 'lists', text: 'CDB lists' },
-    ];
   }
 
   async componentDidMount() {
-    console.log('WzRuleset mounted ', this.state);
-    const r = await this.props.wzReq('GET', '/rules/files', { limit: 500, offset: 0 });
-    console.log('Request: ', r);
+    //Trying a request await this.props.wzReq('GET', '/rules/files', { limit: 500, offset: 0 });
+    store.subscribe(() => {
+      const state = store.getState().ruleset;
+      const section = state.section;
+      this.setState({ section: section });
+    });
   }
 
   render() {
@@ -91,49 +90,51 @@ export class WzRuleset extends Component {
     );
 
     return (
-      <EuiPage style={{ background: 'transparent' }}>
-        <EuiPanel>
+      <Provider store={store}>
+        <EuiPage style={{ background: 'transparent' }}>
+          <EuiPanel>
 
-          {/* Section title: Rules/Decoders/CDBlists */}
-          <EuiFlexGroup>
-            <EuiFlexItem grow={false}>
-              <EuiTitle>
-                <h2>Ruleset</h2>
-              </EuiTitle>
-            </EuiFlexItem>
-            <EuiFlexItem>{/* This EuiFlexItem separates the title from the action buttons */}</EuiFlexItem>
-            <EuiFlexItem grow={false}>
-              {manageFiles}
-            </EuiFlexItem>
-            <EuiFlexItem grow={false}>
-              {addNewRuleButton}
-            </EuiFlexItem>
-            <EuiFlexItem grow={false}>
-              {exportButton}
-            </EuiFlexItem>
-          </EuiFlexGroup>
+            {/* Section title: Rules/Decoders/CDBlists */}
+            <EuiFlexGroup>
+              <EuiFlexItem grow={false}>
+                <EuiTitle>
+                  <h2>Ruleset</h2>
+                </EuiTitle>
+              </EuiFlexItem>
+              <EuiFlexItem>{/* This EuiFlexItem separates the title from the action buttons */}</EuiFlexItem>
+              <EuiFlexItem grow={false}>
+                {manageFiles}
+              </EuiFlexItem>
+              <EuiFlexItem grow={false}>
+                {addNewRuleButton}
+              </EuiFlexItem>
+              <EuiFlexItem grow={false}>
+                {exportButton}
+              </EuiFlexItem>
+            </EuiFlexGroup>
 
-          {/* Description */}
-          <EuiFlexGroup>
-            <EuiFlexItem>
-              <EuiText color="subdued">
-                From here you can manage your rules, decoders and CDB lists.
+            {/* Description */}
+            <EuiFlexGroup>
+              <EuiFlexItem>
+                <EuiText color="subdued">
+                  From here you can manage your rules, decoders and CDB lists.
               </EuiText>
-            </EuiFlexItem>
-          </EuiFlexGroup>
+              </EuiFlexItem>
+            </EuiFlexGroup>
 
-          {/* Search bar and section selector*/}
-          <EuiFlexGroup>
-            <EuiFlexItem>
-              {searchBar}
-            </EuiFlexItem>
-            <EuiFlexItem grow={false}>
-              <WzSectionSelector section={this.state.section} options={this.sectionOptions}/>
-            </EuiFlexItem>
-          </EuiFlexGroup>
+            {/* Search bar and section selector*/}
+            <EuiFlexGroup>
+              <EuiFlexItem>
+                {searchBar}
+              </EuiFlexItem>
+              <EuiFlexItem grow={false}>
+                <WzSectionSelector />
+              </EuiFlexItem>
+            </EuiFlexGroup>
 
-        </EuiPanel>
-      </EuiPage>
+          </EuiPanel>
+        </EuiPage>
+      </Provider>
     )
   }
 }
