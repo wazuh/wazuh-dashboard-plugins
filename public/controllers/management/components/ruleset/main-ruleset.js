@@ -40,8 +40,10 @@ export class MainRuleset extends Component {
     ];
   }
 
-  componentDidMount() {
+  async componentDidMount() {
     console.log('MainRuleset mounted ', this.state);
+    const r = await this.props.wzReq('GET', '/rules/files', {limit: 500, offset: 0});
+    console.log('Request: ', r);
   }
 
   onSectionChange = e => {
@@ -50,7 +52,9 @@ export class MainRuleset extends Component {
     });
   };
 
+
   render() {
+    // Search bar
     const searchBar = (
       <EuiSearchBar
         box={{
@@ -60,6 +64,7 @@ export class MainRuleset extends Component {
       />
     );
 
+    // Section selector
     const sectionSelector = (
       <EuiSelect
         id="selectRulesetSection"
@@ -70,6 +75,7 @@ export class MainRuleset extends Component {
       />
     );
 
+    // Export button
     const exportButton = (
       <EuiButtonEmpty
         iconType="exportAction"
@@ -79,6 +85,7 @@ export class MainRuleset extends Component {
       </EuiButtonEmpty>
     );
     
+    // Add new rule button
     const addNewRuleButton = (
       <EuiButtonEmpty
         iconType="plusInCircle"
@@ -88,6 +95,7 @@ export class MainRuleset extends Component {
       </EuiButtonEmpty>
     );
 
+    // Manage files
     const manageFiles = (
       <EuiButtonEmpty
         iconType="folderClosed"
@@ -142,5 +150,6 @@ export class MainRuleset extends Component {
 }
 
 MainRuleset.propTypes = {
-  section: PropTypes.string
+  section: PropTypes.string,
+  wzReq: PropTypes.func
 };

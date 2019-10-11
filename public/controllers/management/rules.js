@@ -61,6 +61,12 @@ export class RulesController {
   }
 
   async $onInit() {
+    // Props
+    this.mainRulesProps = {
+      section: 'rules',
+      wzReq: (method, path, body) => this.apiReq.request(method, path, body)
+    }
+
     //Initialization
     this.searchTerm = '';
     this.viewingDetail = false;
