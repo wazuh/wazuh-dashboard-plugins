@@ -24,8 +24,11 @@ import {
 
 import PropTypes from 'prop-types';
 
+// Wazuh components
+import { WzSectionSelector } from './section-selector';
 
-export class MainRuleset extends Component {
+
+export class WzRuleset extends Component {
   constructor(props) {
     super(props);
 
@@ -41,17 +44,10 @@ export class MainRuleset extends Component {
   }
 
   async componentDidMount() {
-    console.log('MainRuleset mounted ', this.state);
-    const r = await this.props.wzReq('GET', '/rules/files', {limit: 500, offset: 0});
+    console.log('WzRuleset mounted ', this.state);
+    const r = await this.props.wzReq('GET', '/rules/files', { limit: 500, offset: 0 });
     console.log('Request: ', r);
   }
-
-  onSectionChange = e => {
-    this.setState({
-      section: e.target.value,
-    });
-  };
-
 
   render() {
     // Search bar
@@ -64,17 +60,6 @@ export class MainRuleset extends Component {
       />
     );
 
-    // Section selector
-    const sectionSelector = (
-      <EuiSelect
-        id="selectRulesetSection"
-        options={this.sectionOptions}
-        value={this.state.section}
-        onChange={this.onSectionChange}
-        aria-label="Section selector"
-      />
-    );
-
     // Export button
     const exportButton = (
       <EuiButtonEmpty
@@ -84,7 +69,7 @@ export class MainRuleset extends Component {
         Export formatted
       </EuiButtonEmpty>
     );
-    
+
     // Add new rule button
     const addNewRuleButton = (
       <EuiButtonEmpty
@@ -102,13 +87,13 @@ export class MainRuleset extends Component {
         onClick={async () => console.log('managing files')}
       >
         {`Manage ${this.state.section} files`}
-      </EuiButtonEmpty>  
+      </EuiButtonEmpty>
     );
 
     return (
       <EuiPage style={{ background: 'transparent' }}>
-        {/* Main panel */}
         <EuiPanel>
+
           {/* Section title: Rules/Decoders/CDBlists */}
           <EuiFlexGroup>
             <EuiFlexItem grow={false}>
@@ -127,6 +112,8 @@ export class MainRuleset extends Component {
               {exportButton}
             </EuiFlexItem>
           </EuiFlexGroup>
+
+          {/* Description */}
           <EuiFlexGroup>
             <EuiFlexItem>
               <EuiText color="subdued">
@@ -134,22 +121,24 @@ export class MainRuleset extends Component {
               </EuiText>
             </EuiFlexItem>
           </EuiFlexGroup>
-          {/* Search bar and select to change between sections*/}
+
+          {/* Search bar and section selector*/}
           <EuiFlexGroup>
             <EuiFlexItem>
               {searchBar}
             </EuiFlexItem>
             <EuiFlexItem grow={false}>
-              {sectionSelector}
+              <WzSectionSelector section={this.state.section} options={this.sectionOptions}/>
             </EuiFlexItem>
           </EuiFlexGroup>
+
         </EuiPanel>
       </EuiPage>
     )
   }
 }
 
-MainRuleset.propTypes = {
+WzRuleset.propTypes = {
   section: PropTypes.string,
   wzReq: PropTypes.func
 };
