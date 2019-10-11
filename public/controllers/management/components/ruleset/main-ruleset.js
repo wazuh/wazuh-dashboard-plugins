@@ -27,6 +27,7 @@ import { Provider } from 'react-redux';
 import store from './redux/store';
 // Wazuh components
 import WzSectionSelector from './section-selector';
+import WzRulesetTable from './ruleset-table';
 
 
 export class WzRuleset extends Component {
@@ -132,6 +133,12 @@ export class WzRuleset extends Component {
               </EuiFlexItem>
             </EuiFlexGroup>
 
+            {/* Table */}
+            <EuiFlexGroup>
+              <EuiFlexItem>
+                <WzRulesetTable wzReq={(method, path, options) => this.props.wzReq(method, path, options)} />
+              </EuiFlexItem>
+            </EuiFlexGroup>
           </EuiPanel>
         </EuiPage>
       </Provider>
