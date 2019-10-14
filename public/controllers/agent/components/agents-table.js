@@ -120,51 +120,55 @@ export class AgentsTable extends Component {
     this.state = {
       "pageIndex": 0,
       "previusIndex": 0,
-      "totalItems": 0
+      "totalItems": 0,
+      "isLoading": false
     }
   }
   
 
   async componentDidMount() {
     await this.getAgents();
+    this.setState({isLoading: false});
   }
 
   async componentDidUpdate() {
     if(this.state.pageIndex !== this.state.previusIndex){
       await this.getAgents();
       this.setState({previusIndex: this.state.pageIndex});
+      this.setState({isLoading: false});
     }
   }
 
   async getAgents() {
-    const checkField = (field) => { return (field !== undefined) ? field : "-"; };
     const rawAgents = await this.props.wzReq(
       'GET',
       '/agents',
       this.createFilter()
     );
 
-    const formatedAgents = (((rawAgents || {}).data || {}).data || {}).items.map(
-      (agent) => {
-        return {
-          "id": agent.id,
-          "name": agent.name,
-          "ip": agent.ip,
-          "status": agent.status,
-          "group": checkField(agent.group),
-          "os_name": checkField(((agent || {}).os || {}).name) + checkField(((agent || {}).os || {}).version),
-          "version": checkField(agent.version),
-          "dateAdd": agent.dateAdd,
-          "lastKeepAlive": checkField(agent.lastKeepAlive),
-          "actions": agent.id
-        }
-      }
-    );
+    const formatedAgents = (((rawAgents || {}).data || {}).data || {}).items.map(this.formatAgent);
 
     this.setState({totalItems: (((rawAgents || {}).data || {}).data || {}).totalItems - 1});
 
     const {beforeEmptyAgents, afterEmptyAgents} = this.generateEmpties(formatedAgents.length);
     this.setState({agents: [...beforeEmptyAgents, ...formatedAgents, ...afterEmptyAgents] });
+  }
+
+  formatAgent(agent) {
+    const checkField = (field) => { return (field !== undefined) ? field : "-"; };
+
+    return {
+      "id": agent.id,
+      "name": agent.name,
+      "ip": agent.ip,
+      "status": agent.status,
+      "group": checkField(agent.group),
+      "os_name": checkField(((agent || {}).os || {}).name) + checkField(((agent || {}).os || {}).version),
+      "version": checkField(agent.version),
+      "dateAdd": agent.dateAdd,
+      "lastKeepAlive": checkField(agent.lastKeepAlive),
+      "actions": agent.id
+    }
   }
 
   generateEmpties(nAgents) {
@@ -246,14 +250,20 @@ export class AgentsTable extends Component {
     const style = {
       marginRight: 5
     }
-
-    return (
+    if(item){
+      return (
+        <div>
+          <EuiIcon type="discoverApp" style={style} />
+          <EuiIcon type="wrench" />
+        </div>
+      );
+    } else {
+      return (
       <div>
-        
-        <EuiIcon type="discoverApp" style={style} />
-        <EuiIcon type="wrench" />
+        <EuiIcon type="wrench" style={{fillOpacity: 0}} />
       </div>
-    );
+      );
+    }
   };
 
   formattedButton() {
@@ -266,8 +276,11 @@ export class AgentsTable extends Component {
     );
   }
   onTableChange ({page = {}, sort = {}})  {
-    this.setState({pageSize: page.size});
-    this.setState({pageIndex: page.index});
+    this.setState({
+      pageSize: page.size,
+      pageIndex: page.index,
+      isLoading:true
+    })
   }
 
   
@@ -322,6 +335,7 @@ export class AgentsTable extends Component {
             <WzInMemoryTable
               itemId="id"
               items={(this.state || {}).agents}
+              loading={this.state.isLoading}
               columns={this.columns()}
               sorting={true}
               search={search}
