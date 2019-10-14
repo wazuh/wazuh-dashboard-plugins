@@ -24,7 +24,7 @@ import {
 } from '@elastic/eui';
 // Redux
 import { Provider } from 'react-redux';
-import store from './redux/store';
+import store from '../../../../redux/store';
 // Wazuh components
 import WzSectionSelector from './section-selector';
 import WzRulesetTable from './ruleset-table';
@@ -43,7 +43,7 @@ export class WzRuleset extends Component {
   async componentDidMount() {
     //Trying a request await this.props.wzReq('GET', '/rules/files', { limit: 500, offset: 0 });
     store.subscribe(() => {
-      const state = store.getState().ruleset;
+      const state = store.getState().rulesetReducers;
       const section = state.section;
       this.setState({ section: section });
     });

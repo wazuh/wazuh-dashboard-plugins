@@ -33,7 +33,7 @@ class WzRulesetTable extends Component {
   }
 
   render() {
-    const columns = this.props.state.ruleset[this.props.state.ruleset.section].columns
+    const columns = this.props.state.rulesetReducers[this.props.state.rulesetReducers.section].columns
     const items = (this.state && this.state.items) ? [...this.state.items] : [];
     return (
       <EuiBasicTable

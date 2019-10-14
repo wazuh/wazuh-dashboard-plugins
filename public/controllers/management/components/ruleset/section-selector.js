@@ -15,7 +15,7 @@ import {
 } from '@elastic/eui';
 
 import { connect } from 'react-redux';
-import { changeRulesetSection } from './redux/actions';
+import { changeRulesetSection } from '../../../../redux/actions/rulesetActions';
 
 
 /**
@@ -45,8 +45,8 @@ class WzSectionSelector extends Component {
     return (
       <EuiSelect
         id="wzSelector"
-        options={this.props.state.ruleset.sections}
-        value={this.props.state.ruleset.section}
+        options={this.props.state.rulesetReducers.sections}
+        value={this.props.state.rulesetReducers.section}
         onChange={this.onChange}
         aria-label="Section selector"
       />

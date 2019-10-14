@@ -10,15 +10,11 @@
  * Find more information about this on the LICENSE file.
  */
 
-const rootReducers = (state, action) => {
-  switch (action.type) {
-    //Changes the ruleset section
-    case 'CHANGE_RULESET_SECTION':
-      state.ruleset.section = action.section;
-      return Object.assign({}, state);
-    default:
-      return state;
-  }
-}
+import { combineReducers } from 'redux';
+import rulesetReducers from './rulesetReducers';
 
-export default rootReducers;
+
+export default combineReducers({
+  rulesetReducers
+})
+
