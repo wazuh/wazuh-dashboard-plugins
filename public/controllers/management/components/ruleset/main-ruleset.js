@@ -23,14 +23,14 @@ import {
   EuiButtonEmpty
 } from '@elastic/eui';
 // Redux
-import { Provider } from 'react-redux';
 import store from '../../../../redux/store';
+import WzReduxProvider from '../../../../redux/wz-redux-provider';
 // Wazuh components
 import WzSectionSelector from './section-selector';
 import WzRulesetTable from './ruleset-table';
 
 
-export class WzRuleset extends Component {
+export default class WzRuleset extends Component {
   constructor(props) {
     super(props);
 
@@ -39,7 +39,6 @@ export class WzRuleset extends Component {
     }
 
   }
-
   async componentDidMount() {
     //Trying a request await this.props.wzReq('GET', '/rules/files', { limit: 500, offset: 0 });
     store.subscribe(() => {
@@ -91,7 +90,7 @@ export class WzRuleset extends Component {
     );
 
     return (
-      <Provider store={store}>
+      <WzReduxProvider>
         <EuiPage style={{ background: 'transparent' }}>
           <EuiPanel>
 
@@ -141,12 +140,8 @@ export class WzRuleset extends Component {
             </EuiFlexGroup>
           </EuiPanel>
         </EuiPage>
-      </Provider>
+      </WzReduxProvider>
     )
   }
 }
 
-WzRuleset.propTypes = {
-  section: PropTypes.string,
-  wzReq: PropTypes.func
-};

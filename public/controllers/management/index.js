@@ -27,7 +27,7 @@ import { FilesController } from './files';
 import { WelcomeScreen } from './components/welcome';
 import { ReportingTable } from './components/reporting-table';
 import { UploadFiles } from './components/upload-files';
-import { WzRuleset } from './components/ruleset/main-ruleset';
+import WzRuleset from './components/ruleset/main-ruleset';
 
 const app = uiModules.get('app/wazuh', []);
 

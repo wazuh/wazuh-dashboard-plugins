@@ -78,20 +78,48 @@ const initialState = {
   decoders: {
     columns: [
       {
-        field: 'id',
-        name: 'ID',
+        field: 'name',
+        name: 'Name',
         align: 'left',
         sortable: true
       },
       {
-        field: 'description',
-        name: 'Description',
+        field: 'details.program_name',
+        name: 'Program name',
         align: 'left',
         sortable: true
       },
       {
-        field: 'field',
-        name: 'Field',
+        field: 'details.order',
+        name: 'Order',
+        align: 'left',
+        sortable: true
+      },
+      {
+        field: 'file',
+        name: 'File',
+        align: 'left',
+        sortable: true
+      },
+      {
+        field: 'path',
+        name: 'Path',
+        align: 'left',
+        sortable: true
+      }
+    ]
+  },
+  lists: {
+    columns: [
+      {
+        field: 'name',
+        name: 'Name',
+        align: 'left',
+        sortable: true
+      },
+      {
+        field: 'path',
+        name: 'Path',
         align: 'left',
         sortable: true
       }
