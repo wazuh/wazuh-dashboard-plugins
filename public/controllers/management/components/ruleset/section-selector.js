@@ -15,29 +15,49 @@ import {
 } from '@elastic/eui';
 
 import { connect } from 'react-redux';
-import { changeRulesetSection } from '../../../../redux/actions/rulesetActions';
+import {
+  updateRulesetSection,
+  updateRules,
+  updateDecoders,
+  updateLists,
+  updateLoadingStatus
+} from '../../../../redux/actions/rulesetActions';
 
-
-/**
- * The section must be a key of the options in order to match, example:
- * 
- *  const section = 'rules';
- *  const options = [
- *     { value: 'rules', text: 'Rules' },
- *     { value: 'decoders', text: 'Decoders' },
- *     { value: 'lists', text: 'CDB lists' },
- *    ];
- * 
- */
+import { WzRequest } from '../../../../react-services/wz-request';
 
 class WzSectionSelector extends Component {
   constructor(props) {
     super(props);
+
+    this.sections = [
+      { value: 'rules', text: 'Rules' },
+      { value: 'decoders', text: 'Decoders' },
+      { value: 'lists', text: 'CDB lists' },
+    ];
+
+    this.paths = {
+      rules: '/rules',
+      decoders: '/decoders',
+      lists: '/lists/files'
+    }
+
+    this.wzReq = WzRequest;
   }
 
-  onChange = e => {
-    const section = e.target.value;
-    this.props.changeSection(section);
+  onChange = async e => {
+    try {
+      this.props.updateLoadingStatus(true);
+      const section = e.target.value;
+      const result = await this.wzReq.request('GET', this.paths[section], {})
+      const items = result.data.data.items;
+      if (section === 'rules') this.props.updateRules(items);
+      if (section === 'decoders') this.props.updateDecoders(items);
+      if (section === 'lists') this.props.updateLists(items);
+      this.props.changeSection(section);
+      this.props.updateLoadingStatus(false);
+    } catch(error){
+      console.error('Error updating sections an data');
+    }
   };
 
 
@@ -45,8 +65,8 @@ class WzSectionSelector extends Component {
     return (
       <EuiSelect
         id="wzSelector"
-        options={this.props.state.rulesetReducers.sections}
-        value={this.props.state.rulesetReducers.section}
+        options={this.sections}
+        value={this.props.state.section}
         onChange={this.onChange}
         aria-label="Section selector"
       />
@@ -56,13 +76,17 @@ class WzSectionSelector extends Component {
 
 const mapStateToProps = (state) => {
   return {
-    state: state
+    state: state.rulesetReducers
   };
 };
 
 const mapDispatchToProps = (dispatch) => {
   return {
-    changeSection: section => dispatch(changeRulesetSection(section))
+    changeSection: section => dispatch(updateRulesetSection(section)),
+    updateRules: data => dispatch(updateRules(data)),
+    updateDecoders: data => dispatch(updateDecoders(data)),
+    updateLists: data => dispatch(updateLists(data)),
+    updateLoadingStatus: status => dispatch(updateLoadingStatus(status))
   }
 };
 

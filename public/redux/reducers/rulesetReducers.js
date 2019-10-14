@@ -12,128 +12,28 @@
 
 const initialState = {
   section: 'rules',
-  sections: [
-    { value: 'rules', text: 'Rules' },
-    { value: 'decoders', text: 'Decoders' },
-    { value: 'lists', text: 'CDB lists' },
-  ],
-  rules: {
-    columns: [
-      {
-        field: 'id',
-        name: 'ID',
-        align: 'left',
-        sortable: true
-      },
-      {
-        field: 'description',
-        name: 'Description',
-        align: 'left',
-        sortable: true
-      },
-      {
-        field: 'groups',
-        name: 'Groups',
-        align: 'left',
-        sortable: true
-      },
-      {
-        field: 'pci',
-        name: 'PCI',
-        align: 'left',
-        sortable: true
-      },
-      {
-        field: 'gdpr',
-        name: 'GDPR',
-        align: 'left',
-        sortable: true
-      },
-      {
-        field: 'hipaa',
-        name: 'HIPAA',
-        align: 'left',
-        sortable: true
-      },
-      {
-        field: 'nist-800-53',
-        name: 'NIST 800-53',
-        align: 'left',
-        sortable: true
-      },
-      {
-        field: 'level',
-        name: 'Level',
-        align: 'left',
-        sortable: true
-      },
-      {
-        field: 'field',
-        name: 'Field',
-        align: 'left',
-        sortable: true
-      }
-    ]
-  },
-  decoders: {
-    columns: [
-      {
-        field: 'name',
-        name: 'Name',
-        align: 'left',
-        sortable: true
-      },
-      {
-        field: 'details.program_name',
-        name: 'Program name',
-        align: 'left',
-        sortable: true
-      },
-      {
-        field: 'details.order',
-        name: 'Order',
-        align: 'left',
-        sortable: true
-      },
-      {
-        field: 'file',
-        name: 'File',
-        align: 'left',
-        sortable: true
-      },
-      {
-        field: 'path',
-        name: 'Path',
-        align: 'left',
-        sortable: true
-      }
-    ]
-  },
-  lists: {
-    columns: [
-      {
-        field: 'name',
-        name: 'Name',
-        align: 'left',
-        sortable: true
-      },
-      {
-        field: 'path',
-        name: 'Path',
-        align: 'left',
-        sortable: true
-      }
-    ]
+  isLoading: false,
+  data: {
+    rules: [],
+    decoders: [],
+    lists: []
   }
+
 }
 
 const rulesetReducers = (state = initialState, action) => {
   switch (action.type) {
-    //Changes the ruleset section
-    case 'CHANGE_RULESET_SECTION':
-      state.section = action.section;
-      //return Object.assign({}, state, {ruleset: {section: action.section}});
-      return Object.assign({}, state);
+    case 'UPDATE_RULESET_SECTION':
+      return Object.assign({}, state, { section: action.section });
+    case 'UPDATE_LOADING_STATUS':
+      console.log('action ', action)
+      return Object.assign({}, state, { isLoading: action.status });
+    case 'UPDATE_RULES':
+      return Object.assign({}, state, { data: { rules: action.data } });
+    case 'UPDATE_DECODERS':
+      return Object.assign({}, state, { data: { decoders: action.data } });
+    case 'UPDATE_LISTS':
+      return Object.assign({}, state, { data: { lists: action.data } });
     default:
       return state;
   }

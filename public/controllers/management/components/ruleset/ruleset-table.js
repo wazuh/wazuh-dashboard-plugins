@@ -11,47 +11,46 @@
  */
 import React, { Component } from 'react';
 import {
-  EuiBasicTable
+  EuiInMemoryTable
 } from '@elastic/eui';
-import PropTypes from 'prop-types';
+
+import { WzRequest } from '../../../../react-services/wz-request';
 
 import { connect } from 'react-redux';
 
 class WzRulesetTable extends Component {
   constructor(props) {
     super(props);
-  }
 
-  async componentDidMount() {
-    try {
-      const result = await this.props.wzReq('GET', '/rules', {});
-      const items = result.data.data.items;
-      this.setState({ items: items });
-    } catch (error) {
-      console.error('error mounting ', error)
+    this.wzReq = WzRequest;
+
+    this.columns = {
+      rules: [{ field: 'id', name: 'ID', align: 'left', sortable: true }, { field: 'description', name: 'Description', align: 'left', sortable: true }, { field: 'groups', name: 'Groups', align: 'left', sortable: true }, { field: 'pci', name: 'PCI', align: 'left', sortable: true }, { field: 'gdpr', name: 'GDPR', align: 'left', sortable: true }, { field: 'hipaa', name: 'HIPAA', align: 'left', sortable: true }, { field: 'nist-800-53', name: 'NIST 800-53', align: 'left', sortable: true }, { field: 'level', name: 'Level', align: 'left', sortable: true }, { field: 'field', name: 'Field', align: 'left', sortable: true }],
+      decoders: [{ field: 'name', name: 'Name', align: 'left', sortable: true }, { field: 'details.program_name', name: 'Program name', align: 'left', sortable: true }, { field: 'details.order', name: 'Order', align: 'left', sortable: true }, { field: 'file', name: 'File', align: 'left', sortable: true }, { field: 'path', name: 'Path', align: 'left', sortable: true }],
+      lists: [{ field: 'name', name: 'Name', align: 'left', sortable: true }, { field: 'path', name: 'Path', align: 'left', sortable: true }]
     }
   }
 
   render() {
-    const columns = this.props.state.rulesetReducers[this.props.state.rulesetReducers.section].columns
-    const items = (this.state && this.state.items) ? [...this.state.items] : [];
+    const reduxData = this.props.state
+    const columns = this.columns[reduxData.section];
     return (
-      <EuiBasicTable
+      <EuiInMemoryTable
         itemId="id"
-        items={items}
+        items={reduxData.data[reduxData.section]}
         columns={columns}
+        pagination={true}
+        loading={reduxData.isLoading}
+        sorting={true}
+        message={false}
       />
     )
   }
 }
 
-WzRulesetTable.propTypes = {
-  wzReq: PropTypes.func
-};
-
-const mapStateToProps = (state, ownProps) => {
+const mapStateToProps = (state) => {
   return {
-    state: state
+    state: state.rulesetReducers
   };
 };
 

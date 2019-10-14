@@ -10,9 +10,58 @@
  * Find more information about this on the LICENSE file.
  */
 
-export const changeRulesetSection = (section) => {
+/**
+ * Update the ruleset section
+ * @param {String} section 
+ */
+export const updateRulesetSection = (section) => {
   return {
-    type: "CHANGE_RULESET_SECTION",
+    type: "UPDATE_RULESET_SECTION",
     section: section
+  }
+}
+
+
+/**
+ * Update the rules
+ * @param {Array} rules 
+ */
+export const updateRules = (rules) => {
+  return {
+    type: "UPDATE_RULES",
+    data: rules
+  }
+}
+
+/**
+ * Update the decoders
+ * @param {Array} decoders 
+ */
+export const updateDecoders = (decoders) => {
+  return {
+    type: "UPDATE_DECODERS",
+    data: decoders
+  }
+}
+
+/**
+ * Update the lists
+ * @param {Array} lists 
+ */
+export const updateLists = (lists) => {
+  return {
+    type: "UPDATE_LISTS",
+    data: lists
+  }
+}
+
+/**
+ * Update the loading status
+ * @param {Boolean} loading 
+ */
+export const updateLoadingStatus = (loading) => {
+  return {
+    type: "UPDATE_LOADING_STATUS",
+    status: loading
   }
 }
