@@ -44,13 +44,71 @@ class WzInMemoryTable extends EuiInMemoryTable {
 
   }
 
-  
+  componentDidUpdate() {
+    if ((this.state || {}).selectPage !== undefined){
+      if ((this.state || {}).selectPage !== (this.state || {}).pageIndex){
+        this.setState({ pageIndex: this.state.selectPage });
+      }
+    }
+  }
 
   getItems() {
     const result = super.getItems()
     result.totalItemCount = this.props.totalItems
     return result;
   }
+
+
+  onTableChange = ({ page = {}, sort = {} }) => {
+
+    const { index: pageIndex, size: pageSize } = page;
+
+    let { field: sortName, direction: sortDirection } = sort;
+
+    // To keep backwards compatibility reportedSortName needs to be tracked separately
+    // from sortName; sortName gets stored internally while reportedSortName is sent to the callback
+    let reportedSortName = sortName;
+
+    // EuiBasicTable returns the column's `field` if it exists instead of `name`,
+    // map back to `name` if this is the case
+    for (let i = 0; i < this.props.columns.length; i++) {
+      const column = this.props.columns[i];
+      if (column.field === sortName) {
+        sortName = column.name;
+        break;
+      }
+    }
+
+    // Allow going back to 'neutral' sorting
+    if (
+      this.state.allowNeutralSort &&
+      this.state.sortName === sortName &&
+      this.state.sortDirection === 'desc' &&
+      sortDirection === 'asc'
+    ) {
+      sortName = '';
+      reportedSortName = '';
+      sortDirection = '';
+    }
+
+    if (this.props.onTableChange) {
+      this.props.onTableChange({
+        page,
+        sort: {
+          field: reportedSortName,
+          direction: sortDirection,
+        },
+      });
+    }
+
+    this.setState({
+      selectPage: page.index,
+      pageIndex,
+      pageSize,
+      sortName,
+      sortDirection,
+    });
+  };
 }
 
 
@@ -102,9 +160,22 @@ export class AgentsTable extends Component {
         }
       }
     );
-    
-    this.setState({totalItems: (((rawAgents || {}).data || {}).data || {}).totalItems - 1})
-    this.setState({agents: formatedAgents})
+
+    this.setState({totalItems: (((rawAgents || {}).data || {}).data || {}).totalItems - 1});
+
+    const {beforeEmptyAgents, afterEmptyAgents} = this.generateEmpties(formatedAgents.length);
+    this.setState({agents: [...beforeEmptyAgents, ...formatedAgents, ...afterEmptyAgents] });
+  }
+
+  generateEmpties(nAgents) {
+    const beforeEmptyAgents = ((this.state || {}).pageIndex)
+      ? [...Array(this.state.pageIndex * this.state.pageSize).keys()]
+      : [];
+    const afterEmptyAgents = ((this.state || {}).pageIndex)
+      ? [...Array(this.state.totalItems - beforeEmptyAgents.length - nAgents).keys()]
+      : [...Array(this.state.totalItems - nAgents).keys()];
+
+    return {beforeEmptyAgents, afterEmptyAgents};
   }
 
   createFilter(){
@@ -216,6 +287,13 @@ export class AgentsTable extends Component {
       }
     };
 
+    const pagination = {
+      pageIndex: 0,
+      pageSize: 10,
+      totalItemCount: this.state.totalItems,
+      hidePerPageOptions: true
+    }
+
     const groupStyle = {
       margin: 15
     }
@@ -247,7 +325,7 @@ export class AgentsTable extends Component {
               columns={this.columns()}
               sorting={true}
               search={search}
-              pagination={true}
+              pagination={pagination}
               totalItems={this.state.totalItems}
               onTableChange={this.onTableChange}
             />
