@@ -1,6 +1,6 @@
 {
   "name": "wazuh",
-  "version": "3.11.0",
+  "version": "3.1.0",
   "revision": "0560",
   "code": "0560-0",
   "kibana": {
@@ -38,6 +38,8 @@
     "angular-chart.js": "1.1.1",
     "angular-cookies": "1.6.5",
     "angular-material": "1.1.18",
+    "axios": "^0.19.0",
+    "babel-polyfill": "^6.13.0",
     "dom-to-image": "^2.6.0",
     "install": "^0.10.1",
     "js2xmlparser": "^3.0.0",
@@ -49,8 +51,7 @@
     "querystring-browser": "1.0.4",
     "simple-tail": "^1.1.0",
     "timsort": "^0.3.0",
-    "winston": "3.0.0",
-    "babel-polyfill": "^6.13.0"
+    "winston": "3.0.0"
   },
   "devDependencies": {
     "@elastic/plugin-helpers": "^7.1.8",
