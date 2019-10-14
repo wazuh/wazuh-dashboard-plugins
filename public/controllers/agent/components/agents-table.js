@@ -69,15 +69,6 @@ class WzInMemoryTable extends EuiInMemoryTable {
     // from sortName; sortName gets stored internally while reportedSortName is sent to the callback
     let reportedSortName = sortName;
 
-    // EuiBasicTable returns the column's `field` if it exists instead of `name`,
-    // map back to `name` if this is the case
-    for (let i = 0; i < this.props.columns.length; i++) {
-      const column = this.props.columns[i];
-      if (column.field === sortName) {
-        sortName = column.name;
-        break;
-      }
-    }
 
     // Allow going back to 'neutral' sorting
     if (
@@ -132,9 +123,10 @@ export class AgentsTable extends Component {
   }
 
   async componentDidUpdate() {
-    if(this.state.pageIndex !== this.state.previusIndex){
+    if(this.state.pageIndex !== this.state.previusIndex || this.state.sortField !== this.state.previusField){
       await this.getAgents();
       this.setState({previusIndex: this.state.pageIndex});
+      this.setState({sortField: this.state.previusField});
       this.setState({isLoading: false});
     }
   }
@@ -185,10 +177,22 @@ export class AgentsTable extends Component {
   createFilter(){
     const offset = ((this.state || {}).pageIndex !== undefined) ? (this.state || {}).pageIndex : 0;
     const limit = ((this.state || {}).pageSize !== undefined) ? (this.state || {}).pageSize : 10;
-    return {
+    const filter = {
       "offset": (offset * limit) + 1,
       "limit": limit
+    };
+    if ((this.state || {}).sortField !== undefined) {
+      if ((this.state || {}).sortField !== "") {
+        const fields = this.columns().filter((field) => {
+          return (field.field === this.state.sortField || field.name === this.state.sortField);
+        })
+        if(fields.length > 0) {
+          const direction = (this.state || {}).sortDirection === 'asc' ? '+' : '-';
+          filter.sort = direction + fields[0].field;
+        }
+      }
     }
+    return filter;
   }
   
   columns() {
@@ -279,7 +283,9 @@ export class AgentsTable extends Component {
     this.setState({
       pageSize: page.size,
       pageIndex: page.index,
-      isLoading:true
+      isLoading:true,
+      sortField: sort.field,
+      sortDirection: sort.direction
     })
   }
 
