@@ -103,6 +103,7 @@ export class AgentsPreviewController {
       getCurrentApiAddress: () => this.getCurrentApiAddress(),
       needsPassword: () => this.needsPassword()
     };
+
     this.hasAgents = true;
     this.init = false;
     //Load
@@ -180,6 +181,75 @@ export class AgentsPreviewController {
       const [agentsUnique, agentsTop] = data;
       const unique = agentsUnique.data.result;
 
+      this.searchProp = [
+        {
+          label: 'Status',
+          options: [
+            {
+              label: 'Active',
+              group: 'status'
+            },
+            {
+              label: 'Disconnected',
+              group: 'status'
+            },
+            {
+              label: 'Never connected',
+              group: 'status'
+            }
+          ]
+        },
+        {
+          label: 'Group',
+          options: unique.groups.map(x => {return {label : x, group: 'group'}}).sort((a, b) => {
+            return a.label.toString().localeCompare(b.label.toString());
+          })
+        },
+        {
+          label: 'Version',
+          options: unique.versions.map(x => {return {label : x, group: 'version'}}).sort((a, b) => {
+            return a.label.toString().localeCompare(b.label.toString(), undefined, {
+              numeric: true,
+              sensitivity: 'base'
+            })}
+          )
+        },
+        {
+          label: 'OS platform',
+          options: unique.osPlatforms
+          .map(x => {return {label: x.platform, group: 'os.platform'}})
+          .sort((a, b) => {
+            return a.label.toString().localeCompare(b.label.toString());
+          })
+        },
+        {
+          label: 'OS version',
+          options: unique.osPlatforms
+          .map(x => { return {label: x.version, group: 'os.version'}})
+          .sort((a, b) => {
+            return a.label.toString().localeCompare(b.label.toString(), undefined, {
+              numeric: true,
+              sensitivity: 'base'
+            });
+          })
+        },
+        {
+          label: 'OS name',
+          options: unique.osPlatforms
+          .map(x => { return {label: x.name, group: 'os.name'}})
+          .sort((a, b) => {
+            return a.label.toString().localeCompare(b.label.toString());
+          })
+        },
+      ];
+
+      this.WzFilterBarProps = {
+        clickAction: (query) => {
+          this.query(query.q, query.search);
+        },
+        model: this.searchProp
+      };
+
       this.searchBarModel = {
         name: [],
         status: ['Active', 'Disconnected', 'Never connected'],
@@ -192,24 +262,27 @@ export class AgentsPreviewController {
             sensitivity: 'base'
           });
         }),
-        'os.platform': unique.osPlatforms
+        'os.platform': Array.from(
+          new Set(unique.osPlatforms
           .map(x => x.platform)
           .sort((a, b) => {
             return a.toString().localeCompare(b.toString());
-          }),
-        'os.version': unique.osPlatforms
+          }))),
+        'os.version': Array.from(
+          new Set(unique.osPlatforms
           .map(x => x.version)
           .sort((a, b) => {
             return a.toString().localeCompare(b.toString(), undefined, {
               numeric: true,
               sensitivity: 'base'
             });
-          }),
-        'os.name': unique.osPlatforms
+          }))),
+        'os.name': Array.from(
+          new Set(unique.osPlatforms
           .map(x => x.name)
           .sort((a, b) => {
             return a.toString().localeCompare(b.toString());
-          })
+          })))
       };
 
       if (clusterInfo.status === 'enabled' && unique.nodes) {
