@@ -15,8 +15,6 @@ import {
   EuiButtonIcon
 } from '@elastic/eui';
 
-import { WzRequest } from '../../../../react-services/wz-request';
-
 import { connect } from 'react-redux';
 
 import columns from './columns';
@@ -24,8 +22,6 @@ import columns from './columns';
 class WzRulesetTable extends Component {
   constructor(props) {
     super(props);
-
-    this.wzReq = WzRequest;
 
     this.columns = columns;
   }
