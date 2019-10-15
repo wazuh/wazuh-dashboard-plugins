@@ -38,9 +38,9 @@ export class WzRequest {
       }
       return Promise.resolve(data);
     } catch (error) {
-      return ((error || {}).data || {}).message || false
-        ? Promise.reject(error.data.message)
-        : Promise.reject(error.message || error);
+      return (((error || {}).response || {}).data || {}).message || false
+        ? Promise.reject(error.response.data.message)
+        : Promise.reject(error.response.message || error.response || error);
     }
   }
 
