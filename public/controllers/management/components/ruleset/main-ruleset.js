@@ -10,7 +10,6 @@
  * Find more information about this on the LICENSE file.
  */
 import React, { Component } from 'react';
-import PropTypes from 'prop-types';
 // Eui components
 import {
   EuiFlexGroup,
@@ -19,8 +18,7 @@ import {
   EuiPage,
   EuiText,
   EuiTitle,
-  EuiSearchBar,
-  EuiButtonEmpty
+  EuiSearchBar
 } from '@elastic/eui';
 // Redux
 import store from '../../../../redux/store';
@@ -28,6 +26,7 @@ import WzReduxProvider from '../../../../redux/wz-redux-provider';
 // Wazuh components
 import WzSectionSelector from './section-selector';
 import WzRulesetTable from './ruleset-table';
+import WzRulesetActionButtons from './actions-buttons';
 
 
 export default class WzRuleset extends Component {
@@ -59,36 +58,6 @@ export default class WzRuleset extends Component {
       />
     );
 
-    // Export button
-    const exportButton = (
-      <EuiButtonEmpty
-        iconType="exportAction"
-        onClick={async () => console.log('exporting')}
-      >
-        Export formatted
-      </EuiButtonEmpty>
-    );
-
-    // Add new rule button
-    const addNewRuleButton = (
-      <EuiButtonEmpty
-        iconType="plusInCircle"
-        onClick={async () => console.log('adding new')}
-      >
-        {`Add new ${this.state.section} files`}
-      </EuiButtonEmpty>
-    );
-
-    // Manage files
-    const manageFiles = (
-      <EuiButtonEmpty
-        iconType="folderClosed"
-        onClick={async () => console.log('managing files')}
-      >
-        {`Manage ${this.state.section} files`}
-      </EuiButtonEmpty>
-    );
-
     return (
       <WzReduxProvider>
         <EuiPage style={{ background: 'transparent' }}>
@@ -102,15 +71,8 @@ export default class WzRuleset extends Component {
                 </EuiTitle>
               </EuiFlexItem>
               <EuiFlexItem>{/* This EuiFlexItem separates the title from the action buttons */}</EuiFlexItem>
-              <EuiFlexItem grow={false}>
-                {manageFiles}
-              </EuiFlexItem>
-              <EuiFlexItem grow={false}>
-                {addNewRuleButton}
-              </EuiFlexItem>
-              <EuiFlexItem grow={false}>
-                {exportButton}
-              </EuiFlexItem>
+              {/* Action buttons */}
+              <WzRulesetActionButtons />
             </EuiFlexGroup>
 
             {/* Description */}
@@ -128,6 +90,7 @@ export default class WzRuleset extends Component {
                 {searchBar}
               </EuiFlexItem>
               <EuiFlexItem grow={false}>
+                {/* Selector */}
                 <WzSectionSelector />
               </EuiFlexItem>
             </EuiFlexGroup>
