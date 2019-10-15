@@ -63,10 +63,10 @@ class WzSectionSelector extends Component {
    */
   async fetchData(section) {
     try {
-      this.props.toggleShowFiles(false);
       this.props.updateLoadingStatus(true);
       const result = await this.wzReq.apiReq('GET', this.paths[section], {})
       const items = result.data.data.items;
+      this.props.toggleShowFiles(false);
       this.props.updateColumns(this.columns[section]);
       this.props.updateItems(items);
       this.props.changeSection(section);
