@@ -64,13 +64,8 @@ class WzInMemoryTable extends EuiInMemoryTable {
     const { index: pageIndex, size: pageSize } = page;
 
     let { field: sortName, direction: sortDirection } = sort;
-
-    // To keep backwards compatibility reportedSortName needs to be tracked separately
-    // from sortName; sortName gets stored internally while reportedSortName is sent to the callback
     let reportedSortName = sortName;
 
-
-    // Allow going back to 'neutral' sorting
     if (
       this.state.allowNeutralSort &&
       this.state.sortName === sortName &&
@@ -137,8 +132,10 @@ export class AgentsTable extends Component {
       '/agents',
       this.createFilter()
     );
-
-    const formatedAgents = (((rawAgents || {}).data || {}).data || {}).items.map(this.formatAgent);
+    const agentsWithoutMaster = (((rawAgents || {}).data || {}).data || {}).items.filter(
+      (agent) => { return (agent.id !== '000'); }
+    )
+    const formatedAgents = agentsWithoutMaster.map(this.formatAgent);
 
     this.setState({totalItems: (((rawAgents || {}).data || {}).data || {}).totalItems - 1});
 
@@ -167,32 +164,43 @@ export class AgentsTable extends Component {
     const beforeEmptyAgents = ((this.state || {}).pageIndex)
       ? [...Array(this.state.pageIndex * this.state.pageSize).keys()]
       : [];
+
+    const afterElements = this.state.totalItems - beforeEmptyAgents.length - nAgents;
     const afterEmptyAgents = ((this.state || {}).pageIndex)
-      ? [...Array(this.state.totalItems - beforeEmptyAgents.length - nAgents).keys()]
+      ? [...Array((afterElements >= 0) ? afterElements : 0).keys()]
       : [...Array(this.state.totalItems - nAgents).keys()];
 
     return {beforeEmptyAgents, afterEmptyAgents};
   }
 
-  createFilter(){
+  createFilter() {
     const offset = ((this.state || {}).pageIndex !== undefined) ? (this.state || {}).pageIndex : 0;
     const limit = ((this.state || {}).pageSize !== undefined) ? (this.state || {}).pageSize : 10;
     const filter = {
-      "offset": (offset * limit) + 1,
-      "limit": limit
+      "offset": (offset * limit),
+      "limit": limit + 1
     };
-    if ((this.state || {}).sortField !== undefined) {
-      if ((this.state || {}).sortField !== "") {
-        const fields = this.columns().filter((field) => {
-          return (field.field === this.state.sortField || field.name === this.state.sortField);
-        })
-        if(fields.length > 0) {
-          const direction = (this.state || {}).sortDirection === 'asc' ? '+' : '-';
-          filter.sort = direction + fields[0].field;
-        }
+    this.addSortFilter(filter);
+    return filter;
+  }
+
+  addSortFilter(filter) {
+    const sortFieldExists = (this.state || {}).sortField !== undefined;
+    const sortFieldNotEmpty = (this.state || {}).sortField !== "";
+    if (sortFieldExists && sortFieldNotEmpty) {
+      const fields = this.columns().filter((field) => {
+        return (field.field === this.state.sortField || field.name === this.state.sortField);
+      })
+      if(fields.length < 0) {
+        return;
+      }
+      const direction = (this.state || {}).sortDirection === 'asc' ? '+' : '-';
+      if (fields[0].field === 'os_name') {
+        filter.sort = direction + 'os.name,os.version';            
+      } else {
+        filter.sort = direction + fields[0].field;
       }
     }
-    return filter;
   }
   
   columns() {
