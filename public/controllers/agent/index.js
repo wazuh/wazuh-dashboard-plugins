@@ -15,7 +15,6 @@ import { AgentsController } from './agents';
 import { RegisterAgent } from './components/register-agent';
 import { ExportConfiguration } from './components/export-configuration';
 import { WelcomeScreen } from './components/welcome';
-import { WzFilterBar } from './components/filter-bar';
 import { Stats } from './components/stats';
 
 const app = uiModules.get('app/wazuh', []);
@@ -26,5 +25,4 @@ app
   .value('RegisterAgent', RegisterAgent)
   .value('ExportConfiguration', ExportConfiguration)
   .value('WelcomeScreenAgent', WelcomeScreen)
-  .value('WzFilterBar', WzFilterBar)
   .value('StatsAgent', Stats);
