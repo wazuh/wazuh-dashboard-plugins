@@ -82,7 +82,7 @@ class WzRulesetActionButtons extends Component {
   }
 
   render() {
-    const { section } = this.props.state;
+    const { section, showingFiles } = this.props.state;
 
     // Export button
     const exportButton = (
@@ -108,10 +108,10 @@ class WzRulesetActionButtons extends Component {
     // Manage files
     const manageFiles = (
       <EuiButtonEmpty
-        iconType="folderClosed"
+        iconType={showingFiles ? 'apmTrace' : 'folderClosed'}
         onClick={async () => await this.toggleFiles()}
       >
-        {`Manage ${section} files`}
+        {showingFiles ? `Manage ${section}` : `Manage ${section} files`}
       </EuiButtonEmpty>
     );
     return (
