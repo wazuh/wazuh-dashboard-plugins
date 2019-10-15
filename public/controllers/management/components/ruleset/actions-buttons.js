@@ -107,9 +107,9 @@ class WzRulesetActionButtons extends Component {
       console.log('UPLOAD SUCCESS');
       return;
     } catch (error) {
+      if (Array.isArray(error) && error.length) return Promise.reject(error);
       console.error('Errors uploading several files ', error);
       //TODO handle the erros
-      //if (Array.isArray(error) && error.length) return Promise.reject(error);
       //this.errorHandler.handle('Files cannot be uploaded');
     }
   }
