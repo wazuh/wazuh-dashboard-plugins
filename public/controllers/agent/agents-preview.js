@@ -205,50 +205,68 @@ export class AgentsPreviewController {
         },
         {
           label: 'Group',
-          options: unique.groups.map(x => {return {label : x, group: 'group'}}).sort((a, b) => {
-            return a.label.toString().localeCompare(b.label.toString());
-          })
+          options: unique.groups
+            .map(x => {
+              return { label: x, group: 'group' };
+            })
+            .sort((a, b) => {
+              return a.label.toString().localeCompare(b.label.toString());
+            })
         },
         {
           label: 'Version',
-          options: unique.versions.map(x => {return {label : x, group: 'version'}}).sort((a, b) => {
-            return a.label.toString().localeCompare(b.label.toString(), undefined, {
-              numeric: true,
-              sensitivity: 'base'
-            })}
-          )
+          options: unique.versions
+            .map(x => {
+              return { label: x, group: 'version' };
+            })
+            .sort((a, b) => {
+              return a.label
+                .toString()
+                .localeCompare(b.label.toString(), undefined, {
+                  numeric: true,
+                  sensitivity: 'base'
+                });
+            })
         },
         {
           label: 'OS platform',
           options: unique.osPlatforms
-          .map(x => {return {label: x.platform, group: 'os.platform'}})
-          .sort((a, b) => {
-            return a.label.toString().localeCompare(b.label.toString());
-          })
+            .map(x => {
+              return { label: x.platform, group: 'os.platform' };
+            })
+            .sort((a, b) => {
+              return a.label.toString().localeCompare(b.label.toString());
+            })
         },
         {
           label: 'OS version',
           options: unique.osPlatforms
-          .map(x => { return {label: x.version, group: 'os.version'}})
-          .sort((a, b) => {
-            return a.label.toString().localeCompare(b.label.toString(), undefined, {
-              numeric: true,
-              sensitivity: 'base'
-            });
-          })
+            .map(x => {
+              return { label: x.version, group: 'os.version' };
+            })
+            .sort((a, b) => {
+              return a.label
+                .toString()
+                .localeCompare(b.label.toString(), undefined, {
+                  numeric: true,
+                  sensitivity: 'base'
+                });
+            })
         },
         {
           label: 'OS name',
           options: unique.osPlatforms
-          .map(x => { return {label: x.name, group: 'os.name'}})
-          .sort((a, b) => {
-            return a.label.toString().localeCompare(b.label.toString());
-          })
-        },
+            .map(x => {
+              return { label: x.name, group: 'os.name' };
+            })
+            .sort((a, b) => {
+              return a.label.toString().localeCompare(b.label.toString());
+            })
+        }
       ];
 
       this.WzFilterBarProps = {
-        clickAction: (query) => {
+        clickAction: query => {
           this.query(query.q, query.search);
         },
         model: this.searchProp
@@ -267,26 +285,35 @@ export class AgentsPreviewController {
           });
         }),
         'os.platform': Array.from(
-          new Set(unique.osPlatforms
-          .map(x => x.platform)
-          .sort((a, b) => {
-            return a.toString().localeCompare(b.toString());
-          }))),
+          new Set(
+            unique.osPlatforms
+              .map(x => x.platform)
+              .sort((a, b) => {
+                return a.toString().localeCompare(b.toString());
+              })
+          )
+        ),
         'os.version': Array.from(
-          new Set(unique.osPlatforms
-          .map(x => x.version)
-          .sort((a, b) => {
-            return a.toString().localeCompare(b.toString(), undefined, {
-              numeric: true,
-              sensitivity: 'base'
-            });
-          }))),
+          new Set(
+            unique.osPlatforms
+              .map(x => x.version)
+              .sort((a, b) => {
+                return a.toString().localeCompare(b.toString(), undefined, {
+                  numeric: true,
+                  sensitivity: 'base'
+                });
+              })
+          )
+        ),
         'os.name': Array.from(
-          new Set(unique.osPlatforms
-          .map(x => x.name)
-          .sort((a, b) => {
-            return a.toString().localeCompare(b.toString());
-          })))
+          new Set(
+            unique.osPlatforms
+              .map(x => x.name)
+              .sort((a, b) => {
+                return a.toString().localeCompare(b.toString());
+              })
+          )
+        )
       };
 
       if (clusterInfo.status === 'enabled' && unique.nodes) {
@@ -395,7 +422,9 @@ export class AgentsPreviewController {
     try {
       const result = await this.genericReq.request('GET', '/hosts/apis');
       const entries = result.data || [];
-      const host = entries.filter(e => {return e.id == this.api});
+      const host = entries.filter(e => {
+        return e.id == this.api;
+      });
       const url = host[0].url;
       const numToClean = url.startsWith('https://') ? 8 : 7;
       return url.substr(numToClean);
