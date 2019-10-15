@@ -19,7 +19,7 @@ import React, { SFC } from 'react';
 import {
   existsOperator,
   isOneOfOperator
-} from 'plugins/data/filter/filter_bar/filter_editor/lib/filter_operators';
+} from 'ui/filter_bar/filter_editor/lib/filter_operators';
 
 interface Props {
   filter: Filter;
@@ -76,12 +76,12 @@ export const FilterView: SFC<Props> = ({ filter, ...rest }: Props) => {
       <span>{getFilterDisplayText(filter)}</span>
     </EuiBadge>
   ) : (
-      <EuiBadge
-        className={rest.className}
-      >
-        <span>{getFilterDisplayText(filter)}</span>
-      </EuiBadge>
-    );
+    <EuiBadge
+      className={rest.className}
+    >
+      <span>{getFilterDisplayText(filter)}</span>
+    </EuiBadge>
+  );
 };
 
 export function getFilterDisplayText(filter: Filter) {
@@ -91,8 +91,8 @@ export function getFilterDisplayText(filter: Filter) {
 
   const prefix = filter.meta.negate
     ? ` ${i18n.translate('common.ui.filterBar.negatedFilterPrefix', {
-      defaultMessage: 'NOT '
-    })}`
+        defaultMessage: 'NOT '
+      })}`
     : '';
 
   switch (filter.meta.type) {
@@ -107,7 +107,7 @@ export function getFilterDisplayText(filter: Filter) {
     case 'phrases':
       return `${prefix}${filter.meta.key} ${isOneOfOperator.message} ${
         filter.meta.value
-        }`;
+      }`;
     case 'query_string':
       return `${prefix}${filter.meta.value}`;
     case 'range':

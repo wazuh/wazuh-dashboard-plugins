@@ -44,8 +44,6 @@ import { AppState } from 'ui/state_management/app_state';
 import { timefilter } from 'ui/timefilter';
 // @ts-ignore
 import { RequestHandlerParams, Vis } from 'ui/vis';
-// @ts-ignore untyped dependency
-import { VisFiltersProvider } from 'ui/vis/vis_filters';
 // @ts-ignore
 import { PipelineDataLoader } from 'ui/visualize/loader/pipeline_data_loader';
 import { visualizationLoader } from './visualization_loader';
@@ -89,6 +87,7 @@ export class EmbeddedVisualizeHandler {
    * This should not be used by any plugin.
    * @ignore
    */
+
   public readonly data$: Rx.Observable<any>;
   public readonly inspectorAdapters: Adapters = {};
   private vis: Vis;
@@ -189,7 +188,7 @@ export class EmbeddedVisualizeHandler {
       timefilter.on('autoRefreshFetch', this.reload);
     }
 
-    // This is a workaround to give maps visualizations access to data in the
+    // This is a hack to give maps visualizations access to data in the
     // globalState, since they can no longer access it via searchSource.
     // TODO: Remove this as a part of elastic/kibana#30593
     this.vis.API.getGeohashBounds = () => {
@@ -202,7 +201,6 @@ export class EmbeddedVisualizeHandler {
     this.dataLoader = pipelineDataLoader
       ? new PipelineDataLoader(vis)
       : new VisualizeDataLoader(vis, Private);
-    const visFilters: any = Private(VisFiltersProvider);
     this.renderCompleteHelper = new RenderCompleteHelper(element);
     this.inspectorAdapters = this.getActiveInspectorAdapters();
     this.vis.openInspector = this.openInspector;
@@ -223,8 +221,7 @@ export class EmbeddedVisualizeHandler {
     this.events$.subscribe(event => {
       if (this.actions[event.name]) {
         event.data.aggConfigs = getTableAggs(this.vis);
-        const newFilters = this.actions[event.name](event.data) || [];
-        visFilters.pushFilters(newFilters);
+        this.actions[event.name](event.data);
       }
     });
 
@@ -459,7 +456,6 @@ export class EmbeddedVisualizeHandler {
     this.dataLoaderParams.aggs = this.vis.getAggConfig();
     this.dataLoaderParams.forceFetch = forceFetch;
     this.dataLoaderParams.inspectorAdapters = this.inspectorAdapters;
-
     this.vis.filters = { timeRange: this.dataLoaderParams.timeRange };
     this.vis.requestError = undefined;
     this.vis.showRequestError = false;

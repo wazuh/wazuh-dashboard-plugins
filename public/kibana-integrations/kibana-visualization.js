@@ -17,7 +17,6 @@ import dateMath from '@elastic/datemath';
 
 const app = uiModules.get('app/wazuh', []);
 let lockFields = false;
-
 app.directive('kbnVis', function() {
   return {
     restrict: 'E',
@@ -43,7 +42,7 @@ app.directive('kbnVis', function() {
       let visualization = null;
       let visHandler = null;
       let renderInProgress = false;
-      let deadField = false;
+
       const calculateTimeFilterSeconds = ({ from, to }) => {
         try {
           const fromParsed = dateMath.parse(from);
@@ -115,12 +114,6 @@ app.directive('kbnVis', function() {
                 $scope.visID,
                 rawVis[0]
               );
-
-              // Visualization doesn't need the "_source"
-              visualization.searchSource.setField('source', false);
-              // Visualization doesn't need "hits"
-              visualization.searchSource.setField('size', 0);
-
               rawFilters = visualization.searchSource.getField('filter');
 
               // Other case, use the pending one, if it is empty, it won't matter
@@ -146,7 +139,7 @@ app.directive('kbnVis', function() {
               });
               visHandlers.addItem(visHandler);
               visHandler.addRenderCompleteListener(renderComplete);
-            } else if (rendered && !deadField) {
+            } else if (rendered) {
               // There's a visualization object -> just update its filters
 
               // Use the pending one, if it is empty, it won't matter
@@ -171,31 +164,25 @@ app.directive('kbnVis', function() {
               'not locate that index-pattern-field'
             )
           ) {
-            if (deadField) {
-              tabVisualizations.addDeadVis();
-              return renderComplete();
-            }
-            deadField = true;
             if (!lockFields) {
               try {
                 lockFields = true;
+                errorHandler.info(
+                  'Detected an incomplete index pattern, refreshing all its known fields...'
+                );
                 await genericReq.request(
                   'GET',
                   '/elastic/known-fields/all',
                   {}
                 );
                 lockFields = false;
+                errorHandler.info('Success');
+                return myRender(raw);
               } catch (error) {
                 lockFields = false;
-                console.log(error.message || error);
-                errorHandler.handle(
-                  'An error occurred fetching new index pattern fields.'
-                );
+                throw error;
               }
             }
-
-            renderInProgress = false;
-            return myRender(raw);
           } else {
             errorHandler.handle(error, 'Visualize');
           }
@@ -206,9 +193,6 @@ app.directive('kbnVis', function() {
 
       // Listen for changes
       const updateVisWatcher = $scope.$on('updateVis', () => {
-        if (deadField) {
-          return renderComplete();
-        }
         $scope.$applyAsync();
         const rawVis = rawVisualizations.getList();
         if (Array.isArray(rawVis) && rawVis.length) {
@@ -216,57 +200,35 @@ app.directive('kbnVis', function() {
         }
       });
 
-      const destroyAll = () => {
+      $scope.$on('$destroy', () => {
+        updateVisWatcher();
         try {
           visualization.destroy();
         } catch (error) {} // eslint-disable-line
         try {
           visHandler.destroy();
         } catch (error) {} // eslint-disable-line
-      };
-
-      $scope.$on('$destroy', () => {
-        updateVisWatcher();
-        destroyAll();
       });
 
       const renderComplete = () => {
-        const visId = $scope.visID.toLowerCase();
-        const tab = tabVisualizations.getTab();
-
-        if (!visId.includes(tab)) {
-          destroyAll();
-          return;
-        }
-
         rendered = true;
         loadedVisualizations.addItem(true);
+        const currentCompleted = Math.round(
+          (loadedVisualizations.getList().length /
+            tabVisualizations.getItem(tabVisualizations.getTab())) *
+            100
+        );
+        $rootScope.loadingStatus = `Rendering visualizations... ${
+          currentCompleted > 100 ? 100 : currentCompleted
+        } %`;
 
-        const currentLoaded = loadedVisualizations.getList().length;
-        const deadVis = tabVisualizations.getDeadVis();
-        const totalTabVis = tabVisualizations.getItem(tab) - deadVis;
-
-        if (totalTabVis < 1) {
-          $rootScope.resultState = 'none';
-        } else {
-          const currentCompleted = Math.round(
-            (currentLoaded / totalTabVis) * 100
-          );
-
-          $rootScope.loadingStatus = `Rendering visualizations... ${
-            currentCompleted > 100 ? 100 : currentCompleted
-          } %`;
-
-          if (currentCompleted >= 100) {
-            $rootScope.rendered = true;
-            $rootScope.loadingStatus = 'Fetching data...';
-          } else if (
-            $scope.visID !== 'Wazuh-App-Overview-General-Agents-status'
-          ) {
-            $rootScope.rendered = false;
-          }
+        if (currentCompleted >= 100) {
+          $rootScope.rendered = true;
+        } else if (
+          $scope.visID !== 'Wazuh-App-Overview-General-Agents-status'
+        ) {
+          $rootScope.rendered = false;
         }
-
         // Forcing a digest cycle
         $rootScope.$applyAsync();
       };
