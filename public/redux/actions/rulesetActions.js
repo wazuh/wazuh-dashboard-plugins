@@ -1,5 +1,3 @@
-import columns from "../../controllers/management/components/ruleset/columns"
-
 /*
  * Wazuh app - React component for registering agents.
  * Copyright (C) 2015-2019 Wazuh, Inc.
