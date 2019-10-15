@@ -25,7 +25,7 @@ import {
 } from '../../../../redux/actions/rulesetActions';
 
 import { WzRequest } from '../../../../react-services/wz-request';
-import columns from './columns';
+import columns from './utils/columns';
 
 class WzSectionSelector extends Component {
   constructor(props) {

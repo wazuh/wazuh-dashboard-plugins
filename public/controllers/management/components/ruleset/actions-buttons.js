@@ -29,7 +29,9 @@ import {
 
 import { WzRequest } from '../../../../react-services/wz-request';
 import exportCsv from '../../../../react-services/wz-csv';
-import columns from './columns';
+import { UploadFiles } from '../../../management/components/upload-files';
+import columns from './utils/columns';
+import RulesetHandler from './utils/ruleset-handler';
 
 class WzRulesetActionButtons extends Component {
   constructor(props) {
@@ -45,6 +47,7 @@ class WzRulesetActionButtons extends Component {
       lists: '/lists/files'
     }
     this.columns = columns;
+    this.rulesetHandler = RulesetHandler;
   }
 
   /**
@@ -59,6 +62,56 @@ class WzRulesetActionButtons extends Component {
       console.error('Error exporting as CSV ', error);
     }
     this.setState({ generatingCsv: false });
+  }
+
+  /**
+   * Uploads the files
+   * @param {Array} files
+   * @param {String} path
+   */
+  async uploadFiles(files, path) {
+    try {
+      let errors = false;
+      let results = [];
+      let upload;
+      if (path === 'etc/rules') {
+        upload = this.rulesetHandler.sendRuleConfiguration;
+      } else if (path === 'etc/decoders') {
+        upload = this.rulesetHandler.sendDecoderConfiguration;
+      } else {
+        upload = this.rulesetHandler.sendCdbList;
+      }
+      for (let idx in files) {
+        const { file, content } = files[idx];
+        try {
+          await upload(file, content, true); // True does not overwrite the file
+          results.push({
+            index: idx,
+            uploaded: true,
+            file: file,
+            error: 0
+          });
+        } catch (error) {
+          console.error('ERROR FILE ONLY ONE ', error)
+          errors = true;
+          results.push({
+            index: idx,
+            uploaded: false,
+            file: file,
+            error: error
+          });
+        }
+      }
+      if (errors) throw results;
+      //this.errorHandler.info('Upload successful');
+      console.log('UPLOAD SUCCESS');
+      return;
+    } catch (error) {
+      console.error('Errors uploading several files ', error);
+      //TODO handle the erros
+      //if (Array.isArray(error) && error.length) return Promise.reject(error);
+      //this.errorHandler.handle('Files cannot be uploaded');
+    }
   }
 
   /**
@@ -120,11 +173,19 @@ class WzRulesetActionButtons extends Component {
           <EuiFlexItem grow={false}>
             {manageFiles}
           </EuiFlexItem>
-          )
+        )
         }
         <EuiFlexItem grow={false}>
           {addNewRuleButton}
         </EuiFlexItem>
+        {(section === 'lists' || showingFiles) && (
+          <EuiFlexItem grow={false}>
+            <UploadFiles
+              msg={section}
+              path={`etc/${section}`}
+              upload={async (files, path) => await this.uploadFiles(files, path)} />
+          </EuiFlexItem>
+        )}
         <EuiFlexItem grow={false}>
           {exportButton}
         </EuiFlexItem>
