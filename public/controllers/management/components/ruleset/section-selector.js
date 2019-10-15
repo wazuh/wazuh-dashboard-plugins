@@ -18,7 +18,8 @@ import { connect } from 'react-redux';
 import {
   updateRulesetSection,
   updateLoadingStatus,
-  updateItems
+  updateItems,
+  resetRuleset
 } from '../../../../redux/actions/rulesetActions';
 
 import { WzRequest } from '../../../../react-services/wz-request';
@@ -42,6 +43,12 @@ class WzSectionSelector extends Component {
     this.wzReq = WzRequest;
   }
 
+  componentWillUnmount() {
+    // When the component is going to be unmounted the ruleset state is reset
+    this.props.resetRuleset();
+  }
+
+
   onChange = async e => {
     try {
       this.props.updateLoadingStatus(true);
@@ -52,7 +59,7 @@ class WzSectionSelector extends Component {
       this.props.changeSection(section);
       this.props.updateLoadingStatus(false);
     } catch(error){
-      console.error('Error updating sections an data');
+      console.error('Error updating sections an data ', error);
     }
   };
 
@@ -80,7 +87,8 @@ const mapDispatchToProps = (dispatch) => {
   return {
     changeSection: section => dispatch(updateRulesetSection(section)),
     updateLoadingStatus: status => dispatch(updateLoadingStatus(status)),
-    updateItems: items => dispatch(updateItems(items))
+    updateItems: items => dispatch(updateItems(items)),
+    resetRuleset: () => dispatch(resetRuleset())
   }
 };
 

@@ -16,7 +16,7 @@
  */
 export const updateRulesetSection = (section) => {
   return {
-    type: "UPDATE_RULESET_SECTION",
+    type: 'UPDATE_RULESET_SECTION',
     section: section
   }
 }
@@ -27,7 +27,7 @@ export const updateRulesetSection = (section) => {
  */
 export const updateItems = (items) => {
   return {
-    type: "UPDATE_ITEMS",
+    type: 'UPDATE_ITEMS',
     items: items
   }
 }
@@ -38,7 +38,16 @@ export const updateItems = (items) => {
  */
 export const updateLoadingStatus = (loading) => {
   return {
-    type: "UPDATE_LOADING_STATUS",
+    type: 'UPDATE_LOADING_STATUS',
     status: loading
+  }
+}
+
+/**
+ * Reset the ruleset store
+ */
+export const resetRuleset = () => {
+  return {
+    type: 'RESET'
   }
 }

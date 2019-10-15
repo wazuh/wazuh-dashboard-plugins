@@ -25,6 +25,8 @@ const rulesetReducers = (state = initialState, action) => {
       return Object.assign({}, state, { isLoading: action.status });
     case 'UPDATE_ITEMS':
       return Object.assign({}, state, { items: action.items });
+    case 'RESET':
+      return initialState;
     default:
       return state;
   }
