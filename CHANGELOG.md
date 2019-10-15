@@ -3,6 +3,13 @@
 All notable changes to the Wazuh app project will be documented in this file.
 
 
+## Wazuh v3.10.2 - Kibana v7.4.0 - Revision 547
+
+### Added
+
+- Support for Kibana v7.4.0
+- Support for Wazuh v3.10.2.
+
 
 ## Wazuh v3.10.2 - Kibana v7.3.2 - Revision 546
 
