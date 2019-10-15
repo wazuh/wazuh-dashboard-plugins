@@ -32,15 +32,15 @@ class WzRulesetTable extends Component {
   }
 
   render() {
-    const reduxData = this.props.state
-    const columns = this.columns[reduxData.section];
+    const { section, isLoading, items } = this.props.state;
+    const columns = this.columns[section];
     return (
       <EuiInMemoryTable
         itemId="id"
-        items={reduxData.items}
+        items={items}
         columns={columns}
         pagination={true}
-        loading={reduxData.isLoading}
+        loading={isLoading}
         sorting={true}
         message={false}
       />

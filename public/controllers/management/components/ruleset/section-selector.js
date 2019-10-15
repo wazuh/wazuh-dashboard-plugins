@@ -43,24 +43,36 @@ class WzSectionSelector extends Component {
     this.wzReq = WzRequest;
   }
 
+  componentDidMount() {
+    // Fetch the data in the first mount
+    this.fetchData(this.props.state.section);
+  }
+
   componentWillUnmount() {
     // When the component is going to be unmounted the ruleset state is reset
     this.props.resetRuleset();
   }
 
-
-  onChange = async e => {
+  /**
+   * Fetch the data for a section: rules, decoders, lists...
+   * @param {String} section 
+   */
+  async fetchData(section) {
     try {
       this.props.updateLoadingStatus(true);
-      const section = e.target.value;
       const result = await this.wzReq.request('GET', this.paths[section], {})
       const items = result.data.data.items;
       this.props.updateItems(items);
       this.props.changeSection(section);
       this.props.updateLoadingStatus(false);
-    } catch(error){
+    } catch (error) {
       console.error('Error updating sections an data ', error);
     }
+  }
+
+  onChange = async e => {
+    const section = e.target.value;
+    this.fetchData(section);
   };
 
 
