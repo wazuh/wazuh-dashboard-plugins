@@ -12,7 +12,7 @@
  * Find more information about this on the LICENSE file.
  */
 import { uiModules } from 'ui/modules';
-import discoverTemplate from '../templates/kibana-template/kibana-discover-template.html';
+import discoverTemplate from '../templates/discover/discover.html';
 
 uiModules.get('app/wazuh', ['kibana/courier']).directive('kbnDis', [
   function() {
@@ -25,8 +25,8 @@ uiModules.get('app/wazuh', ['kibana/courier']).directive('kbnDis', [
 ]);
 
 // Added dependencies (from Kibana module)
-import 'plugins/kibana/discover/doc_table/pager';
-import 'ui/render_directive';
+import 'plugins/kibana/discover/doc_table/lib/pager';
+import 'ui/directives/render_directive';
 
 // Added from its index.js
 import 'plugins/kibana/discover/saved_searches/saved_searches';
@@ -37,14 +37,11 @@ import 'plugins/kibana/discover/controllers/discover';
 
 // Research added (further checks needed)
 
-import 'ui/style_compile/style_compile';
-import 'ui/registry/doc_views';
-import 'plugins/kbn_doc_views/kbn_doc_views';
-import 'plugins/kibana/discover/doc_table/pager_control';
 import _ from 'lodash';
 import { i18n } from '@kbn/i18n';
 import React from 'react';
 import angular from 'angular';
+import { Subscription } from 'rxjs';
 import moment from 'moment';
 import chrome from 'ui/chrome';
 import dateMath from '@elastic/datemath';
@@ -55,7 +52,7 @@ import { getSort } from 'plugins/kibana/discover/doc_table/lib/get_sort';
 import * as columnActions from 'plugins/kibana/discover/doc_table/actions/columns';
 import * as filterActions from 'plugins/kibana/discover/doc_table/actions/filter';
 
-import 'ui/listen';
+import 'ui/directives/listen';
 import 'ui/visualize';
 import './debounce';
 import 'ui/fixed_scroll';
@@ -68,7 +65,7 @@ import {
 } from 'ui/courier';
 import { toastNotifications } from 'ui/notify';
 import { VisProvider } from 'ui/vis';
-import { FilterBarQueryFilterProvider } from './search-bar/query-filter';
+import { FilterBarQueryFilterProvider } from 'ui/filter_manager/query_filter';
 import { vislibSeriesResponseHandlerProvider } from 'ui/vis/response_handlers/vislib';
 import { docTitle } from 'ui/doc_title';
 import { intervalOptions } from 'ui/agg_types/buckets/_interval_options';
@@ -78,7 +75,7 @@ import uiRoutes from 'ui/routes';
 import { StateProvider } from 'ui/state_management/state';
 import { migrateLegacyQuery } from 'ui/utils/migrate_legacy_query';
 import { subscribeWithScope } from 'ui/utils/subscribe_with_scope';
-import { getFilterGenerator } from './search-bar/filter-generator';
+import { getFilterGenerator } from 'ui/filter_manager';
 import { SavedObjectsClientProvider } from 'ui/saved_objects';
 import { VisualizeLoaderProvider } from 'ui/visualize/loader/visualize_loader';
 import { recentlyAccessed } from 'ui/persisted_log';
@@ -96,16 +93,20 @@ import {
   getRequestInspectorStats,
   getResponseInspectorStats
 } from 'ui/courier/utils/courier_inspector_utils';
-const { showOpenSearchPanel } = data.search.ui;
+import { showOpenSearchPanel } from 'plugins/kibana/discover/top_nav/show_open_search_panel';
 import { tabifyAggResponse } from 'ui/agg_response/tabify';
 import { showSaveModal } from 'ui/saved_objects/show_saved_object_save_modal';
 import { SavedObjectSaveModal } from 'ui/saved_objects/components/saved_object_save_modal';
-const { getRootBreadcrumbs, getSavedSearchBreadcrumbs } = data.search.ui;
+import {
+  getRootBreadcrumbs,
+  getSavedSearchBreadcrumbs
+} from 'plugins/kibana/discover/breadcrumbs';
 import { buildVislibDimensions } from 'ui/visualize/loader/pipeline_helpers/build_pipeline';
 import 'ui/capabilities/route_setup';
-import { defaultSearchStrategy } from 'ui/courier/search_strategy/default_search_strategy';
-import { data } from 'plugins/data/setup';
-data.search.loadLegacyDirectives();
+
+import { setup as data } from 'plugins/data/legacy';
+
+const { savedQueryService } = data.search.services;
 
 const fetchStatuses = {
   UNINITIALIZED: 'uninitialized',
@@ -114,7 +115,6 @@ const fetchStatuses = {
 };
 
 const app = uiModules.get('apps/discover', [
-  'kibana/notify',
   'kibana/courier',
   'kibana/url',
   'kibana/index_patterns',
@@ -139,7 +139,6 @@ function discoverController(
   Private,
   Promise,
   config,
-  courier,
   kbnUrl,
   localStorage,
   uiCapabilities,
@@ -149,11 +148,12 @@ function discoverController(
   getAppState,
   globalState,
   loadedVisualizations,
-  discoverPendingUpdates,
-  errorHandler
+  discoverPendingUpdates
 ) {
   // Wazuh. Copy for the pinned filters
   let pinnedFilters = [];
+  let initialFilters = [];
+  let lastFilters = [];
   let lastTab = 'unknown';
   // Wazuh. Copy for the discover filters
   let discoverFilters = [];
@@ -178,6 +178,8 @@ function discoverController(
   let filterUpdateSubscription;
   let filterFetchSubscription;
 
+  const subscriptions = new Subscription();
+
   timefilter.disableTimeRangeSelector();
   timefilter.disableAutoRefreshSelector();
 
@@ -187,7 +189,14 @@ function discoverController(
   $scope.minimumVisibleRows = 50;
   $scope.fetchStatus = fetchStatuses.UNINITIALIZED;
   $scope.refreshInterval = timefilter.getRefreshInterval();
-
+  $scope.savedQuery = $route.current.locals.savedQuery;
+  $scope.showSaveQuery = uiCapabilities.discover.saveQuery;
+  $scope.$watch(
+    () => uiCapabilities.discover.saveQuery,
+    newCapability => {
+      $scope.showSaveQuery = newCapability;
+    }
+  );
   $scope.intervalEnabled = function(interval) {
     return interval.val !== 'custom';
   };
@@ -195,7 +204,6 @@ function discoverController(
   // the saved savedSearch
   const savedSearch = $route.current.locals.savedSearch;
   $scope.$on('$destroy', () => {
-    savedSearch.destroy();
     if (filterFetchSubscription) filterFetchSubscription.unsubscribe();
     if (filterUpdateSubscription) filterUpdateSubscription.unsubscribe();
   });
@@ -294,19 +302,24 @@ function discoverController(
     });
     ///////////////////////////////  END-WAZUH   ////////////////////////////////
     // The filters will automatically be set when the queryFilter emits an update event (see below)
-    queryFilter.setFilters(finalFilters);
+    queryFilter.setFilters(finalFilters).then(() => {
+      lastFilters = queryFilter.getFilters();
+    });
     // Update our internal copy for the pinned filters
     pinnedFilters = getPinnedFilters(finalFilters);
   };
 
   $scope.applyFilters = filters => {
-    queryFilter.addFiltersAndChangeTimeFilter(filters);
+    queryFilter.addFiltersAndChangeTimeFilter(filters).then(() => {
+      lastFilters = queryFilter.getFilters();
+    });
     $scope.state.$newFilters = [];
   };
 
   $scope.$watch('state.$newFilters', (filters = []) => {
     if (filters.length === 1) {
-      $scope.applyFilters(filters);
+      queryFilter.removeAll();
+      $scope.applyFilters([...(lastFilters || initialFilters), ...filters]);
     }
   });
 
@@ -379,12 +392,13 @@ function discoverController(
 
   function getStateDefaults() {
     return {
-      query: $scope.searchSource.getField('query') || {
-        query: '',
-        language:
-          localStorage.get('kibana.userQueryLanguage') ||
-          config.get('search:queryLanguage')
-      },
+      query: ($scope.savedQuery && $scope.savedQuery.attributes.query) ||
+        $scope.searchSource.getField('query') || {
+          query: '',
+          language:
+            localStorage.get('kibana.userQueryLanguage') ||
+            config.get('search:queryLanguage')
+        },
       sort: getSort.array(
         savedSearch.sort,
         $scope.indexPattern,
@@ -396,7 +410,9 @@ function discoverController(
           : config.get('defaultColumns').slice(),
       index: $scope.indexPattern.id,
       interval: 'auto',
-      filters: _.cloneDeep($scope.searchSource.getOwnField('filter'))
+      filters:
+        ($scope.savedQuery && $scope.savedQuery.attributes.filters) ||
+        _.cloneDeep($scope.searchSource.getOwnField('filter'))
     };
   }
 
@@ -442,6 +458,16 @@ function discoverController(
     indexPatternList: $route.current.locals.ip.list
   };
 
+  const shouldSearchOnPageLoad = () => {
+    // A saved search is created on every page load, so we check the ID to see if we're loading a
+    // previously saved search or if it is just transient
+    return (
+      config.get('discover:searchOnPageLoad') ||
+      savedSearch.id !== undefined ||
+      _.get($scope, 'refreshInterval.pause') === false
+    );
+  };
+
   const init = _.once(function() {
     stateMonitor = stateMonitorFactory.create($state, getStateDefaults());
     stateMonitor.onChange(status => {
@@ -450,40 +476,49 @@ function discoverController(
     $scope.$on('$destroy', () => stateMonitor.destroy());
 
     $scope.updateDataSource().then(function() {
-      $scope.$listen(timefilter, 'fetch', function() {
-        $scope.fetch();
-        // WAZUH
-        $rootScope.$broadcast('updateVis');
-      });
-      $scope.$listen(timefilter, 'autoRefreshFetch', function() {
-        $scope.fetch();
-      });
-      $scope.$listen(timefilter, 'refreshIntervalUpdate', () => {
-        $scope.updateRefreshInterval();
-      });
-      $scope.$listen(timefilter, 'timeUpdate', () => {
-        $scope.updateTime();
-      });
+      subscriptions.add(
+        subscribeWithScope($scope, timefilter.getAutoRefreshFetch$(), {
+          next: $scope.fetch
+        })
+      );
+
+      subscriptions.add(
+        subscribeWithScope($scope, timefilter.getRefreshIntervalUpdate$(), {
+          next: $scope.updateRefreshInterval
+        })
+      );
+      subscriptions.add(
+        subscribeWithScope($scope, timefilter.getTimeUpdate$(), {
+          next: $scope.updateTime
+        })
+      );
+      subscriptions.add(
+        subscribeWithScope($scope, timefilter.getFetch$(), {
+          next: () => {
+            $scope.fetch;
+            // WAZUH
+            $rootScope.$broadcast('updateVis');
+          }
+        })
+      );
 
       $scope.$watchCollection('state.sort', function(sort) {
         if (!sort) return;
 
-        // get the current sort from {key: val} to ["key", "val"];
-        const currentSort = Object.entries(
-          $scope.searchSource.getField('sort')
-        ).pop();
+        // get the current sort from searchSource as array of arrays
+        const currentSort = getSort.array(
+          $scope.searchSource.getField('sort'),
+          $scope.indexPattern
+        );
 
         // if the searchSource doesn't know, tell it so
         if (!angular.equals(sort, currentSort)) $scope.fetch();
       });
 
       // update data source when filters update
-      filterUpdateSubscription = subscribeWithScope(
-        $scope,
-        queryFilter.getUpdates$(),
-        {
+      subscriptions.add(
+        subscribeWithScope($scope, queryFilter.getUpdates$(), {
           next: () => {
-            $scope.filters = queryFilter.getFilters();
             $scope
               .updateDataSource()
               .then(function() {
@@ -494,6 +529,7 @@ function discoverController(
                   $state.query,
                   queryFilter.getFilters()
                 );
+                $scope.filters = queryFilter.getFilters();
                 $rootScope.$broadcast('updateVis');
                 if ($location.search().tab != 'configuration') {
                   loadedVisualizations.removeAll();
@@ -507,16 +543,14 @@ function discoverController(
               })
               .catch(console.error); // eslint-disable-line
           }
-        }
+        })
       );
 
       // fetch data when filters fire fetch event
-      filterFetchSubscription = subscribeWithScope(
-        $scope,
-        queryFilter.getUpdates$(),
-        {
+      subscriptions.add(
+        subscribeWithScope($scope, queryFilter.getUpdates$(), {
           next: $scope.fetch
-        }
+        })
       );
 
       // update data source when hitting forward/back and the query changes
@@ -528,8 +562,10 @@ function discoverController(
         $scope.enableTimeRangeSelector = !!timefield;
       });
 
-      $scope.$watch('state.interval', function() {
-        $scope.fetch();
+      $scope.$watch('state.interval', function(newInterval, oldInterval) {
+        if (newInterval !== oldInterval) {
+          $scope.fetch();
+        }
       });
 
       $scope.$watch('vis.aggs', function() {
@@ -543,9 +579,11 @@ function discoverController(
         }
       });
 
-      $scope.$watch('state.query', newQuery => {
-        const query = migrateLegacyQuery(newQuery || '');
-        $scope.updateQueryAndFetch({ query });
+      $scope.$watch('state.query', (newQuery, oldQuery) => {
+        if (!_.isEqual(newQuery, oldQuery)) {
+          const query = migrateLegacyQuery(newQuery);
+          $scope.updateQueryAndFetch({ query });
+        }
       });
 
       $scope.$watchMulti(
@@ -553,20 +591,24 @@ function discoverController(
         (function updateResultState() {
           let prev = {};
           const status = {
+            UNINITIALIZED: 'uninitialized',
             LOADING: 'loading', // initial data load
             READY: 'ready', // results came back
             NO_RESULTS: 'none' // no results came back
           };
 
           function pick(rows, oldRows, fetchStatus) {
-            // initial state, pretend we are loading
-            if (rows == null && oldRows == null) return status.LOADING;
+            // initial state, pretend we're already loading if we're about to execute a search so
+            // that the uninitilized message doesn't flash on screen
+            if (rows == null && oldRows == null && shouldSearchOnPageLoad()) {
+              return status.LOADING;
+            }
 
+            if (fetchStatus === fetchStatuses.UNINITIALIZED) {
+              return status.UNINITIALIZED;
+            }
             const rowsEmpty = _.isEmpty(rows);
-            const preparingForFetch =
-              fetchStatus === fetchStatuses.UNINITIALIZED;
-            if (preparingForFetch) return status.LOADING;
-            else if (rowsEmpty && fetchStatus === fetchStatuses.LOADING)
+            if (rowsEmpty && fetchStatus === fetchStatuses.LOADING)
               return status.LOADING;
             else if (!rowsEmpty) return status.READY;
             else {
@@ -602,6 +644,10 @@ function discoverController(
 
       init.complete = true;
       $state.replace();
+
+      if (shouldSearchOnPageLoad()) {
+        $scope.fetch();
+      }
     });
   });
 
@@ -614,7 +660,7 @@ function discoverController(
    */
   const filtersAreReady = () => {
     const currentUrlPath = $location.path();
-    if (currentUrlPath && !currentUrlPath.includes('wazuh-discover')) {
+    if (currentUrlPath) {
       let filters = queryFilter.getFilters();
       filters = Array.isArray(filters)
         ? filters.filter(
@@ -650,6 +696,8 @@ function discoverController(
       })
       .then(onResults)
       .catch(error => {
+        // If the request was aborted then no need to surface this error in the UI
+        if (error instanceof Error && error.name === 'AbortError') return;
         const fetchError = getPainlessError(error);
 
         if (fetchError) {
@@ -670,7 +718,7 @@ function discoverController(
     let inheritedFilters;
     // Preserve filters in discover
     if ((discoverFilters || []).length || (pinnedFilters || []).length) {
-      inheritedFilters = [...(discoverFilters || []), ...(pinnedFilters || [])];
+      inheritedFilters = discoverFilters || [];
       discoverFilters = [];
       if (backFromDiscover) pinnedFilters = [];
     }
@@ -783,7 +831,16 @@ function discoverController(
   };
 
   $scope.updateRefreshInterval = function() {
-    $scope.refreshInterval = timefilter.getRefreshInterval();
+    const newInterval = timefilter.getRefreshInterval();
+    const shouldFetch =
+      _.get($scope, 'refreshInterval.pause') === true &&
+      newInterval.pause === false;
+
+    $scope.refreshInterval = newInterval;
+
+    if (shouldFetch) {
+      $scope.fetch();
+    }
   };
 
   $scope.onRefreshChange = function({ isPaused, refreshInterval }) {
@@ -810,13 +867,11 @@ function discoverController(
 
   $scope.updateDataSource = Promise.method(function updateDataSource() {
     // Wazuh
-    const currentUrlPath = $location.path();
     const isPanels = $scope.tabView === 'panels';
     const isClusterMonitoring = $scope.tabView === 'cluster-monitoring';
-    const isTopDiscover = currentUrlPath.includes('wazuh-discover');
 
     // Wazuh. Should we fetch "_source" and "hits" ?
-    const noHits = (isPanels || isClusterMonitoring) && !isTopDiscover;
+    const noHits = isPanels || isClusterMonitoring;
 
     // Wazuh. The very first time, the copies are null, just create them
     if (!defaultSearchSource || !noHitsSearchSource) {
@@ -838,8 +893,8 @@ function discoverController(
       .setField('filter', queryFilter.getFilters());
   });
 
-  $scope.setSortOrder = function setSortOrder(columnName, direction) {
-    $scope.state.sort = [columnName, direction];
+  $scope.setSortOrder = function setSortOrder(sortPair) {
+    $scope.state.sort = sortPair;
   };
 
   // TODO: On array fields, negating does not negate the combination, rather all terms
@@ -886,6 +941,74 @@ function discoverController(
   $scope.showAllRows = function() {
     $scope.minimumVisibleRows = $scope.hits;
   };
+
+  $scope.onQuerySaved = savedQuery => {
+    $scope.savedQuery = savedQuery;
+  };
+
+  $scope.onSavedQueryUpdated = savedQuery => {
+    $scope.savedQuery = { ...savedQuery };
+  };
+
+  $scope.onClearSavedQuery = () => {
+    delete $scope.savedQuery;
+    delete $state.savedQuery;
+    $state.query = {
+      query: '',
+      language:
+        localStorage.get('kibana.userQueryLanguage') ||
+        config.get('search:queryLanguage')
+    };
+    queryFilter.removeAll();
+    $state.save();
+    $scope.fetch();
+  };
+
+  const updateStateFromSavedQuery = savedQuery => {
+    $state.query = savedQuery.attributes.query;
+    queryFilter.setFilters(savedQuery.attributes.filters || []).then(() => {
+      lastFilters = queryFilter.getFilters();
+    });
+
+    if (savedQuery.attributes.timefilter) {
+      timefilter.setTime({
+        from: savedQuery.attributes.timefilter.from,
+        to: savedQuery.attributes.timefilter.to
+      });
+      if (savedQuery.attributes.timefilter.refreshInterval) {
+        timefilter.setRefreshInterval(
+          savedQuery.attributes.timefilter.refreshInterval
+        );
+      }
+    }
+
+    $scope.fetch();
+  };
+
+  $scope.$watch('savedQuery', newSavedQuery => {
+    if (!newSavedQuery) return;
+
+    $state.savedQuery = newSavedQuery.id;
+    $state.save();
+
+    updateStateFromSavedQuery(newSavedQuery);
+  });
+
+  $scope.$watch('state.savedQuery', newSavedQueryId => {
+    if (!newSavedQueryId) {
+      $scope.savedQuery = undefined;
+      return;
+    }
+
+    if ($scope.savedQuery && newSavedQueryId !== $scope.savedQuery.id) {
+      savedQueryService.getSavedQuery(newSavedQueryId).then(savedQuery => {
+        $scope.$evalAsync(() => {
+          $scope.savedQuery = savedQuery;
+          updateStateFromSavedQuery(savedQuery);
+        });
+      });
+    }
+  });
 
   async function setupVisualization() {
     // Wazuh. Do not setup visualization if there isn't a copy for the default searchSource
@@ -1056,8 +1179,10 @@ function discoverController(
       });
     } else {
       $state.filters = localChange ? $state.filters : [];
-      if ((pinnedFilters || []).length) {
-        await queryFilter.addFilters(pinnedFilters);
+      const pFilters =
+        [...(pinnedFilters || []), globalState.filters || []] || [];
+      if (pFilters.length) {
+        await queryFilter.addFilters(pFilters);
       }
       const currentFilters = queryFilter.getFilters();
       const pinnedAgentIDs = currentFilters.filter(
@@ -1075,13 +1200,16 @@ function discoverController(
 
       if (pinnedAgentIDs.length && implicitAgentIDs.length) {
         for (const filter of pinnedAgentIDs) {
-          queryFilter.removeFilter(filter);
+          await queryFilter.removeFilter(filter);
+          pinnedFilters = getPinnedFilters();
         }
       }
 
+      initialFilters = lastFilters = wzCurrentFilters;
+
       queryFilter
         .addFilters(wzCurrentFilters)
-        .then(() => {})
+        .then(() => lastFilters = queryFilter.getFilters())
         .catch(error => console.log(error.message || error)); // eslint-disable-line
     }
   };
@@ -1094,73 +1222,62 @@ function discoverController(
   const getPinnedFilters = arr => {
     const currentFilters = arr || queryFilter.getFilters();
     if (currentFilters) {
-      return currentFilters.filter(
+      const pinnedFilters = currentFilters.filter(
         item => ((item || {}).$state || {}).store === 'globalState'
       );
+      return pinnedFilters;
     }
   };
 
-  const wzEventFiltersListener = $rootScope.$on(
-    'wzEventFilters',
-    (evt, parameters) => {
-      $rootScope.resultState = fetchStatuses.LOADING;
-      if (!parameters.localChange) {
-        if (!(pinnedFilters || []).length) {
-          pinnedFilters = getPinnedFilters();
-        }
-        queryFilter.removeAll();
+  $rootScope.$on('wzEventFilters', (evt, parameters) => {
+    $rootScope.resultState = fetchStatuses.LOADING;
+    if (!parameters.localChange) {
+      if (!(pinnedFilters || []).length) {
+        pinnedFilters = getPinnedFilters();
       }
-      loadFilters(parameters.filters, parameters.localChange);
+      queryFilter.removeAll();
     }
-  );
+    loadFilters(parameters.filters, parameters.localChange);
+  });
 
   $scope.tabView = $location.search().tabView || 'panels';
-  const changeTabViewListener = $rootScope.$on(
-    'changeTabView',
-    async (evt, parameters) => {
-      $rootScope.resultState = fetchStatuses.LOADING;
-      pinnedFilters = getPinnedFilters();
-      const goToDiscover = parameters.tabView === 'discover';
-      const wasOnDiscover = $scope.tabView === 'discover';
-      const backDiscover = !goToDiscover && wasOnDiscover;
-      backFromDiscover = backDiscover;
+  $rootScope.$on('changeTabView', async (evt, parameters) => {
+    $rootScope.resultState = fetchStatuses.LOADING;
+    pinnedFilters = getPinnedFilters();
+    const goToDiscover = parameters.tabView === 'discover';
+    const wasOnDiscover = $scope.tabView === 'discover';
+    const backDiscover = !goToDiscover && wasOnDiscover;
+    backFromDiscover = backDiscover;
 
-      // Store last tab we visited
-      const sameTab = lastTab === parameters.tab;
-      lastTab = parameters.tab;
+    // Store last tab we visited
+    const sameTab = lastTab === parameters.tab;
+    lastTab = parameters.tab;
 
-      if (!sameTab) {
-        await queryFilter.removeAll();
-      } else {
-        discoverFilters = queryFilter.getFilters();
-      }
-
-      // Prevent multiple executions
-      evt.stopPropagation();
-
-      // Assign the incoming value for tabView
-      $scope.tabView = parameters.tabView || 'panels';
-
-      // Ensure tabView is always up-to-date.
-      $scope.$applyAsync();
-
-      // Wazuh. Force to retrieve "hits".
-      // Before this version, we already had the hits, with the latest optimization
-      // they are only retrieved if needed (Discover table).
-      if (goToDiscover) {
-        $scope.updateQueryAndFetch({
-          query: $state.query,
-          dateRange: $scope.time
-        });
-      } else {
-        $scope.updateQueryAndFetch($state.query);
-      }
+    if (!sameTab) {
+      await queryFilter.removeAll();
+    } else {
+      discoverFilters = queryFilter.getFilters();
     }
-  );
 
-  $scope.$on('$destroy', () => {
-    wzEventFiltersListener();
-    changeTabViewListener();
+    // Prevent multiple executions
+    evt.stopPropagation();
+
+    // Assign the incoming value for tabView
+    $scope.tabView = parameters.tabView || 'panels';
+
+    // Ensure tabView is always up-to-date.
+    $scope.$applyAsync();
+
+    // Wazuh. Force to retrieve "hits".
+    // Before this version, we already had the hits, with the latest optimization
+    // they are only retrieved if needed (Discover table).
+    $scope.updateQueryAndFetch($state.query);
+
+    if (goToDiscover) {
+      setTimeout(() => {
+        $scope.fetch();
+      }, 100);
+    }
   });
   ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
