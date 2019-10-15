@@ -16,13 +16,9 @@ import {
 
 import { connect } from 'react-redux';
 
-import columns from './columns';
-
 class WzRulesetTable extends Component {
   constructor(props) {
     super(props);
-
-    this.columns = columns;
   }
 
   render() {
