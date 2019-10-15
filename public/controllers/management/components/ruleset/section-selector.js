@@ -17,10 +17,8 @@ import {
 import { connect } from 'react-redux';
 import {
   updateRulesetSection,
-  updateRules,
-  updateDecoders,
-  updateLists,
-  updateLoadingStatus
+  updateLoadingStatus,
+  updateItems
 } from '../../../../redux/actions/rulesetActions';
 
 import { WzRequest } from '../../../../react-services/wz-request';
@@ -50,9 +48,7 @@ class WzSectionSelector extends Component {
       const section = e.target.value;
       const result = await this.wzReq.request('GET', this.paths[section], {})
       const items = result.data.data.items;
-      if (section === 'rules') this.props.updateRules(items);
-      if (section === 'decoders') this.props.updateDecoders(items);
-      if (section === 'lists') this.props.updateLists(items);
+      this.props.updateItems(items);
       this.props.changeSection(section);
       this.props.updateLoadingStatus(false);
     } catch(error){
@@ -83,10 +79,8 @@ const mapStateToProps = (state) => {
 const mapDispatchToProps = (dispatch) => {
   return {
     changeSection: section => dispatch(updateRulesetSection(section)),
-    updateRules: data => dispatch(updateRules(data)),
-    updateDecoders: data => dispatch(updateDecoders(data)),
-    updateLists: data => dispatch(updateLists(data)),
-    updateLoadingStatus: status => dispatch(updateLoadingStatus(status))
+    updateLoadingStatus: status => dispatch(updateLoadingStatus(status)),
+    updateItems: items => dispatch(updateItems(items))
   }
 };
 

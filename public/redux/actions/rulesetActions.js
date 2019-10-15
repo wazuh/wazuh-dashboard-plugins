@@ -21,37 +21,14 @@ export const updateRulesetSection = (section) => {
   }
 }
 
-
 /**
- * Update the rules
+ * Update the items, they could be rules, decoders or lists, also, could be files
  * @param {Array} rules 
  */
-export const updateRules = (rules) => {
+export const updateItems = (items) => {
   return {
-    type: "UPDATE_RULES",
-    data: rules
-  }
-}
-
-/**
- * Update the decoders
- * @param {Array} decoders 
- */
-export const updateDecoders = (decoders) => {
-  return {
-    type: "UPDATE_DECODERS",
-    data: decoders
-  }
-}
-
-/**
- * Update the lists
- * @param {Array} lists 
- */
-export const updateLists = (lists) => {
-  return {
-    type: "UPDATE_LISTS",
-    data: lists
+    type: "UPDATE_ITEMS",
+    items: items
   }
 }
 

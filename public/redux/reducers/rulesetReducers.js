@@ -13,11 +13,7 @@
 const initialState = {
   section: 'rules',
   isLoading: false,
-  data: {
-    rules: [],
-    decoders: [],
-    lists: []
-  }
+  items: []
 
 }
 
@@ -26,14 +22,9 @@ const rulesetReducers = (state = initialState, action) => {
     case 'UPDATE_RULESET_SECTION':
       return Object.assign({}, state, { section: action.section });
     case 'UPDATE_LOADING_STATUS':
-      console.log('action ', action)
       return Object.assign({}, state, { isLoading: action.status });
-    case 'UPDATE_RULES':
-      return Object.assign({}, state, { data: { rules: action.data } });
-    case 'UPDATE_DECODERS':
-      return Object.assign({}, state, { data: { decoders: action.data } });
-    case 'UPDATE_LISTS':
-      return Object.assign({}, state, { data: { lists: action.data } });
+    case 'UPDATE_ITEMS':
+      return Object.assign({}, state, { items: action.items });
     default:
       return state;
   }

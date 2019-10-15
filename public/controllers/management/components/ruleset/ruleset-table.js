@@ -37,7 +37,7 @@ class WzRulesetTable extends Component {
     return (
       <EuiInMemoryTable
         itemId="id"
-        items={reduxData.data[reduxData.section]}
+        items={reduxData.items}
         columns={columns}
         pagination={true}
         loading={reduxData.isLoading}
