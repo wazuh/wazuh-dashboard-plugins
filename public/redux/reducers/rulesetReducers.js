@@ -13,8 +13,10 @@
 const initialState = {
   section: 'rules',
   isLoading: false,
-  items: []
-
+  showingFiles: false,
+  columns: [],
+  items: [],
+  filters: []
 }
 
 const rulesetReducers = (state = initialState, action) => {
@@ -23,8 +25,12 @@ const rulesetReducers = (state = initialState, action) => {
       return Object.assign({}, state, { section: action.section });
     case 'UPDATE_LOADING_STATUS':
       return Object.assign({}, state, { isLoading: action.status });
+    case 'UPDATE_COLUMNS':
+        return Object.assign({}, state, { columns: action.columns });
     case 'UPDATE_ITEMS':
       return Object.assign({}, state, { items: action.items });
+    case 'TOGGLE_SHOW_FILES':
+      return Object.assign({}, state, { showingFiles: action.status });
     case 'RESET':
       return initialState;
     default:

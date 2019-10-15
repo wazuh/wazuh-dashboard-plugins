@@ -18,11 +18,14 @@ import { connect } from 'react-redux';
 import {
   updateRulesetSection,
   updateLoadingStatus,
+  updateColumns,
   updateItems,
-  resetRuleset
+  resetRuleset,
+  toggleShowFiles
 } from '../../../../redux/actions/rulesetActions';
 
 import { WzRequest } from '../../../../react-services/wz-request';
+import columns from './columns';
 
 class WzSectionSelector extends Component {
   constructor(props) {
@@ -41,6 +44,7 @@ class WzSectionSelector extends Component {
     }
 
     this.wzReq = WzRequest;
+    this.columns = columns;
   }
 
   componentDidMount() {
@@ -59,9 +63,11 @@ class WzSectionSelector extends Component {
    */
   async fetchData(section) {
     try {
+      this.props.toggleShowFiles(false);
       this.props.updateLoadingStatus(true);
       const result = await this.wzReq.apiReq('GET', this.paths[section], {})
       const items = result.data.data.items;
+      this.props.updateColumns(this.columns[section]);
       this.props.updateItems(items);
       this.props.changeSection(section);
       this.props.updateLoadingStatus(false);
@@ -100,7 +106,9 @@ const mapDispatchToProps = (dispatch) => {
     changeSection: section => dispatch(updateRulesetSection(section)),
     updateLoadingStatus: status => dispatch(updateLoadingStatus(status)),
     updateItems: items => dispatch(updateItems(items)),
-    resetRuleset: () => dispatch(resetRuleset())
+    resetRuleset: () => dispatch(resetRuleset()),
+    toggleShowFiles: status => dispatch(toggleShowFiles(status)),
+    updateColumns: columns => dispatch(updateColumns(columns))
   }
 };
 

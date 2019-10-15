@@ -100,6 +100,14 @@ const columns = {
       align: 'left',
       sortable: true
     }
+  ],
+  files: [
+    {
+      field: 'file',
+      name: 'File',
+      align: 'left',
+      sortable: true
+    }
   ]
 }
 

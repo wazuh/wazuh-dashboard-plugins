@@ -11,8 +11,7 @@
  */
 import React, { Component } from 'react';
 import {
-  EuiInMemoryTable,
-  EuiButtonIcon
+  EuiInMemoryTable
 } from '@elastic/eui';
 
 import { connect } from 'react-redux';
@@ -27,8 +26,7 @@ class WzRulesetTable extends Component {
   }
 
   render() {
-    const { section, isLoading, items } = this.props.state;
-    const columns = this.columns[section];
+    const { isLoading, items, columns } = this.props.state;
     return (
       <EuiInMemoryTable
         itemId="id"

@@ -1,3 +1,5 @@
+import columns from "../../controllers/management/components/ruleset/columns"
+
 /*
  * Wazuh app - React component for registering agents.
  * Copyright (C) 2015-2019 Wazuh, Inc.
@@ -18,6 +20,17 @@ export const updateRulesetSection = (section) => {
   return {
     type: 'UPDATE_RULESET_SECTION',
     section: section
+  }
+}
+
+/**
+ * Update the columns to show in the table
+ * @param {Array} columns 
+ */
+export const updateColumns = (columns) => {
+  return {
+    type: 'UPDATE_COLUMNS',
+    columns: columns
   }
 }
 
@@ -49,5 +62,16 @@ export const updateLoadingStatus = (loading) => {
 export const resetRuleset = () => {
   return {
     type: 'RESET'
+  }
+}
+
+/**
+ * Toggle show files 
+ * @param {Boolean} status 
+ */
+export const toggleShowFiles = (status) => {
+  return {
+    type: 'TOGGLE_SHOW_FILES',
+    status: status
   }
 }
