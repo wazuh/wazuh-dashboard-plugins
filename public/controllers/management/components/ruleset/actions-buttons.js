@@ -11,16 +11,19 @@
 */
 import React, { Component, Fragment } from 'react';
 // Eui components
-import { EuiFlexItem, EuiButtonEmpty } from '@elastic/eui';
+import {
+  EuiFlexItem,
+  EuiButtonEmpty,
+  EuiGlobalToastList
+} from '@elastic/eui';
 
 import { connect } from 'react-redux';
 
 import {
-
   updateItems,
 } from '../../../../redux/actions/rulesetActions';
 
-import { WzRequest } from '../../../../react-services/wz-request';
+import exportCsv from '../../../../react-services/wz-csv';
 
 class WzRulesetActionButtons extends Component {
   constructor(props) {
@@ -32,24 +35,23 @@ class WzRulesetActionButtons extends Component {
       lists: '/lists/files'
     }
 
-    this.wzReq = WzRequest;
+    this.state = { generatingCsv: false };
+    this.exportCsv = exportCsv;
   }
 
   /**
-   * Fetch the data for a section: rules, decoders, lists...
-   * @param {String} section 
+   * Generates a CSV
    */
-  async fetchData(section) {
+  async generateCsv() {
     try {
-      this.props.updateLoadingStatus(true);
-      const result = await this.wzReq.apiReq('GET', this.paths[section], {})
-      const items = result.data.data.items;
-      this.props.updateItems(items);
-      this.props.changeSection(section);
-      this.props.updateLoadingStatus(false);
+      this.setState({ generatingCsv: true });
+      const { section } = this.props.state;
+      const filters = []; //TODO get filters from the search bar
+      await this.exportCsv(`/${section}`, filters, section);
     } catch (error) {
-      console.error('Error updating sections an data ', error);
+      console.error('Error exporting as CSV ', error);
     }
+    this.setState({ generatingCsv: false });
   }
 
   render() {
@@ -59,7 +61,8 @@ class WzRulesetActionButtons extends Component {
     const exportButton = (
       <EuiButtonEmpty
         iconType="exportAction"
-        onClick={async () => await this.wzReq.csvReq('/rules', {})}
+        onClick={async () => await this.generateCsv()}
+        isLoading={this.state.generatingCsv}
       >
         Export formatted
       </EuiButtonEmpty>
