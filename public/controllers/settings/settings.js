@@ -527,7 +527,7 @@ export class SettingsController {
           };
         }
         throw {
-          message: 'Some API entries are not reachable',
+          message: `Some Api entries are not rechable but at least one it is. That's mean that the Wazuh App can be used, but please, review your hosts configuration in order to solve the unreachable Api entries.`,
           type: 'warning',
           closedEnabled: true
         };
