@@ -64,7 +64,11 @@
                             </wz-config-item>
                             <wz-config-item label="Only receive logs occured after start"
                                 ng-if="agent && agent.os && agent.os.platform === 'windows'"
-                                value="currentConfig['logcollector-localfile']['localfile-logs'][selectedItem]['only-future-events'] || '-'">
+                                value="currentConfig['logcollector-localfile']['localfile-logs'][selectedItem]['only-future-events']">
+                            </wz-config-item>
+                            <wz-config-item label="Time in seconds to try to reconnect with Windows Event Channel when it has fallen"
+                                ng-if="agent && agent.os && agent.os.platform === 'windows'"
+                                value="currentConfig['logcollector-localfile']['localfile-logs'][selectedItem]['reconnect_time']">
                             </wz-config-item>
                             <wz-config-item label="Filter logs using this XPATH query"
                                 ng-if="agent && agent.os && agent.os.platform === 'windows'"

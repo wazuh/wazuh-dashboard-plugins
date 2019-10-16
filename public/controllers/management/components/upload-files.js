@@ -244,7 +244,6 @@ export class UploadFiles extends Component {
                 multiple
                 compressed={false}
                 initialPromptText={`Select or drag and drop your ${this.props.msg} files here`}
-                className="no-max-width"
                 onChange={files => {
                   this.onChange(files);
                 }}
