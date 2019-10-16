@@ -157,10 +157,22 @@ const columns = {
   ],
   lists: [
     {
-      field: 'name',
       name: 'Name',
       align: 'left',
-      sortable: true
+      sortable: true,
+      render: item => {
+        return (
+          <EuiToolTip position="top" content={`Show ${item.name} content`}>
+            <EuiLink onClick={async () => {
+              const result = await RulesetHandler.getCdbList(`${item.path}/${item.name}`);
+              console.log(result)
+            }
+            }>
+              {item.name}
+            </EuiLink>
+          </EuiToolTip>
+        )
+      }
     },
     {
       field: 'path',
