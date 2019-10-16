@@ -1,15 +1,27 @@
 import React from 'react';
-import { EuiLink } from '@elastic/eui';
+import { EuiToolTip, EuiLink } from '@elastic/eui';
 import RulesetHandler from './ruleset-handler';
 
 const columns = {
   rules: [
     {
-      field: 'id',
       name: 'ID',
       align: 'left',
       sortable: true,
-      width: '5%'
+      width: '5%',
+      render: item => {
+        return (
+          <EuiToolTip position="top" content={`Show rule ID ${item.id} information`}>
+            <EuiLink onClick={async () => {
+              const result = await RulesetHandler.getRuleInformation(item.file);
+              console.log(result)
+            }
+            }>
+              {item.id}
+            </EuiLink>
+          </EuiToolTip>
+        )
+      }
     },
     {
       field: 'description',
@@ -68,11 +80,16 @@ const columns = {
       width: '15%',
       render: item => {
         return (
-          <EuiLink onClick={async () => {
-            const result = await RulesetHandler.getRuleContent(item);
-            console.log(result)
-          }
-          }>{item}</EuiLink>)
+          <EuiToolTip position="top" content={`Show ${item} content`}>
+            <EuiLink onClick={async () => {
+              const result = await RulesetHandler.getRuleContent(item);
+              console.log(result)
+            }
+            }>
+              {item}
+            </EuiLink>
+          </EuiToolTip>
+        )
       }
     },
     {
@@ -85,10 +102,22 @@ const columns = {
   ],
   decoders: [
     {
-      field: 'name',
       name: 'Name',
       align: 'left',
-      sortable: true
+      sortable: true,
+      render: item => {
+        return (
+          <EuiToolTip position="top" content={`Show ${item.name} decoder information`}>
+            <EuiLink onClick={async () => {
+              const result = await RulesetHandler.getDecoderInformation(item.file);
+              console.log(result)
+            }
+            }>
+              {item.name}
+            </EuiLink>
+          </EuiToolTip>
+        )
+      }
     },
     {
       field: 'details.program_name',
@@ -109,11 +138,14 @@ const columns = {
       sortable: true,
       render: item => {
         return (
-          <EuiLink onClick={async () => {
-            const result = await RulesetHandler.getDecoderContent(item);
-            console.log(result)
-          }
-          }>{item}</EuiLink>)
+          <EuiToolTip position="top" content={`Show ${item} content`}>
+            <EuiLink onClick={async () => {
+              const result = await RulesetHandler.getDecoderContent(item);
+              console.log(result)
+            }
+            }>{item}</EuiLink>
+          </EuiToolTip>
+        )
       }
     },
     {
