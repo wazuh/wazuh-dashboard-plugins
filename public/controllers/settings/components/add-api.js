@@ -168,7 +168,7 @@ export class AddApi extends Component {
     const view = (
       <EuiFlexGroup>
         <EuiFlexItem />
-        <EuiFlexItem>
+        <EuiFlexItem className="min-guide-width">
           <EuiFlexGroup>
             <EuiFlexItem grow={false}>
               <EuiText>

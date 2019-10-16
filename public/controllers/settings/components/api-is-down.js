@@ -103,8 +103,7 @@ export class ApiIsDown extends Component {
   }
 
   render() {
-    const apiExample = `
-# Example Wazuh API configuration
+    const apiExample = `# Example Wazuh API configuration
 hosts:
     - production:
         url: http://172.16.1.2
@@ -239,7 +238,7 @@ hosts:
     return (
       <EuiFlexGroup>
         <EuiFlexItem />
-        <EuiFlexItem>
+        <EuiFlexItem className="min-guide-width">
           <EuiText>
             <h2>Wazuh API seems to be down</h2>
           </EuiText>
