@@ -27,7 +27,8 @@ import {
   EuiCallOut,
   EuiLoadingSpinner,
   EuiToolTip,
-  EuiButtonIcon
+  EuiButtonIcon,
+  EuiPanel
 } from '@elastic/eui';
 
 export class ApiIsDown extends Component {
@@ -164,21 +165,21 @@ hosts:
                         </EuiToolTip>
                       </span>
                     ) : (
-                      <span>
-                        <EuiHealth color="danger">Offline</EuiHealth>
-                        <EuiToolTip position="top" content={item.downReason}>
-                          <EuiButtonIcon
-                            color="primary"
-                            style={{ marginTop: '-12px' }}
-                            iconType="questionInCircle"
-                            aria-label="Info about the error"
-                            onClick={() =>
-                              this.props.copyToClipBoard(item.downReason)
-                            }
-                          />
-                        </EuiToolTip>
-                      </span>
-                    );
+                          <span>
+                            <EuiHealth color="danger">Offline</EuiHealth>
+                            <EuiToolTip position="top" content={item.downReason}>
+                              <EuiButtonIcon
+                                color="primary"
+                                style={{ marginTop: '-12px' }}
+                                iconType="questionInCircle"
+                                aria-label="Info about the error"
+                                onClick={() =>
+                                  this.props.copyToClipBoard(item.downReason)
+                                }
+                              />
+                            </EuiToolTip>
+                          </span>
+                        );
                   } else {
                     return (
                       <span>
@@ -192,12 +193,12 @@ hosts:
             ]}
           />
         )) || (
-          <EuiCallOut
-            color="danger"
-            iconType="cross"
-            title={this.state.error}
-          />
-        )}
+            <EuiCallOut
+              color="danger"
+              iconType="cross"
+              title={this.state.error}
+            />
+          )}
       </div>
     );
 
@@ -239,11 +240,13 @@ hosts:
       <EuiFlexGroup>
         <EuiFlexItem />
         <EuiFlexItem className="min-guide-width">
-          <EuiText>
-            <h2>Wazuh API seems to be down</h2>
-          </EuiText>
-          <EuiSpacer />
-          <EuiSteps firstStepNumber={1} steps={steps} />
+          <EuiPanel>
+            <EuiText>
+              <h2>Wazuh API seems to be down</h2>
+            </EuiText>
+            <EuiSpacer />
+            <EuiSteps firstStepNumber={1} steps={steps} />
+          </EuiPanel>
         </EuiFlexItem>
         <EuiFlexItem />
       </EuiFlexGroup>
