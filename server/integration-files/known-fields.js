@@ -4254,7 +4254,7 @@ export const knownFields = [
     readFromDocValues: true
   },
   {
-    name: 'data.vulnerability.software.name',
+    name: 'data.vulnerability.package.name',
     type: 'string',
     count: 0,
     scripted: false,
