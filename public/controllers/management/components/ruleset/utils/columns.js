@@ -4,55 +4,71 @@ const columns = {
       field: 'id',
       name: 'ID',
       align: 'left',
-      sortable: true
+      sortable: true,
+      width: '5%'      
     },
     {
       field: 'description',
       name: 'Description',
       align: 'left',
-      sortable: true
+      sortable: true,
+      width: '30%'  
     },
     {
       field: 'groups',
       name: 'Groups',
       align: 'left',
-      sortable: true
+      sortable: true,
+      width: '10%'  
     },
     {
       field: 'pci',
       name: 'PCI',
       align: 'left',
-      sortable: true
+      sortable: true,
+      width: '10%'  
     },
     {
       field: 'gdpr',
       name: 'GDPR',
       align: 'left',
-      sortable: true
+      sortable: true,
+      width: '10%'  
     },
     {
       field: 'hipaa',
       name: 'HIPAA',
       align: 'left',
-      sortable: true
+      sortable: true,
+      width: '10%'  
     },
     {
       field: 'nist-800-53',
       name: 'NIST 800-53',
       align: 'left',
-      sortable: true
+      sortable: true,
+      width: '10%'  
     },
     {
       field: 'level',
       name: 'Level',
       align: 'left',
-      sortable: true
+      sortable: true,
+      width: '5%'  
     },
     {
-      field: 'field',
-      name: 'Field',
+      field: 'file',
+      name: 'File',
       align: 'left',
-      sortable: true
+      sortable: true,
+      width: '15%'  
+    },
+    {
+      field: 'path',
+      name: 'Path',
+      align: 'left',
+      sortable: true,
+      width: '10%'  
     }
   ],
   decoders: [
