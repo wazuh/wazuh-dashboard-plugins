@@ -22,7 +22,8 @@ import {
   EuiButton,
   EuiButtonEmpty,
   EuiSteps,
-  EuiCallOut
+  EuiCallOut,
+  EuiPanel
 } from '@elastic/eui';
 
 export class AddApi extends Component {
@@ -106,12 +107,12 @@ export class AddApi extends Component {
       <div>
         {(this.state.status === 'warning' ||
           this.state.status === 'danger') && (
-          <EuiCallOut
-            color={this.state.status}
-            iconType="help"
-            title={this.state.message}
-          />
-        )}
+            <EuiCallOut
+              color={this.state.status}
+              iconType="help"
+              title={this.state.message}
+            />
+          )}
         {(this.state.status === 'warning' ||
           this.state.status === 'danger') && <EuiSpacer />}
         <EuiText>
@@ -168,28 +169,30 @@ export class AddApi extends Component {
     const view = (
       <EuiFlexGroup>
         <EuiFlexItem />
-        <EuiFlexItem>
-          <EuiFlexGroup>
-            <EuiFlexItem grow={false}>
-              <EuiText>
-                <h2>Getting started</h2>
-              </EuiText>
-            </EuiFlexItem>
-            <EuiFlexItem />
-            <EuiFlexItem grow={false}>
-              {this.state.enableClose && !this.state.blockClose && (
-                <EuiButtonEmpty
-                  size="s"
-                  onClick={() => this.props.closeAddApi()}
-                  iconType="cross"
-                >
-                  close
+        <EuiFlexItem className="min-guide-width">
+          <EuiPanel>
+            <EuiFlexGroup>
+              <EuiFlexItem grow={false}>
+                <EuiText>
+                  <h2>Getting started</h2>
+                </EuiText>
+              </EuiFlexItem>
+              <EuiFlexItem />
+              <EuiFlexItem grow={false}>
+                {this.state.enableClose && !this.state.blockClose && (
+                  <EuiButtonEmpty
+                    size="s"
+                    onClick={() => this.props.closeAddApi()}
+                    iconType="cross"
+                  >
+                    close
                 </EuiButtonEmpty>
-              )}
-            </EuiFlexItem>
-          </EuiFlexGroup>
-          <EuiSpacer />
-          <EuiSteps firstStepNumber={1} steps={steps} />
+                )}
+              </EuiFlexItem>
+            </EuiFlexGroup>
+            <EuiSpacer />
+            <EuiSteps firstStepNumber={1} steps={steps} />
+          </EuiPanel>
         </EuiFlexItem>
         <EuiFlexItem />
       </EuiFlexGroup>
