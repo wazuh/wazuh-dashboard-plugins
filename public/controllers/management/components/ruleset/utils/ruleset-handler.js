@@ -14,6 +14,39 @@ import { WzRequest } from '../../../../../react-services/wz-request';
 
 export default class RulesetHandler {
 
+  /**
+   * Get the information about a rule
+   * @param {String} file 
+   */
+  static async getRuleInformation(file) {
+    try {
+      const result = await WzRequest.apiReq('GET', `/rules`, {
+        file
+      });
+      return result;
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  }
+
+  /**
+   * Get the default about a decoder
+   * @param {String} file 
+   */
+  static async getDecoderInformation(file) {
+    try {
+      const result = await WzRequest.apiReq('GET', `/decoders`, {
+        file
+      });
+      return result;
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  }
+
+  /**
+   * Get the local rules
+   */
   static async getLocalRules() {
     try {
       const result = await WzRequest.apiReq('GET', `/rules`, {
@@ -25,6 +58,9 @@ export default class RulesetHandler {
     }
   }
 
+  /**
+   * Get the local decoders
+   */
   static async getLocalDecoders() {
     try {
       const result = await WzRequest.apiReq('GET', `/decoders`, {
@@ -36,7 +72,12 @@ export default class RulesetHandler {
     }
   }
 
-  static async getRuleConfiguration(path, nolocal = false) {
+  /**
+   * Get the content of a rule file
+   * @param {String} path 
+   * @param {Boolean} nolocal 
+   */
+  static async getRuleContent(path, nolocal = true) {
     try {
       const _path = nolocal ? `ruleset/rules/${path}` : `etc/rules/${path}`;
       const result = await WzRequest.apiReq('GET', `/manager/files`, {
@@ -47,7 +88,13 @@ export default class RulesetHandler {
       return Promise.reject(error);
     }
   }
-  static async getDecoderConfiguration(path, nolocal = false) {
+
+  /**
+   * Get the content of a decoder file
+   * @param {String} path 
+   * @param {Boolean} nolocal 
+   */
+  static async getDecoderContent(path, nolocal = true) {
     try {
       const _path = nolocal
         ? `ruleset/decoders/${path}`
@@ -60,6 +107,11 @@ export default class RulesetHandler {
       return Promise.reject(error);
     }
   }
+
+  /**
+   * Get the content of a CDB list
+   * @param {String} path 
+   */
   static async getCdbList(path) {
     try {
       const result = await WzRequest.apiReq('GET', `/manager/files`, {
@@ -70,6 +122,13 @@ export default class RulesetHandler {
       return Promise.reject(error);
     }
   }
+
+  /**
+   * Send the rule content
+   * @param {String} rule 
+   * @param {String} content 
+   * @param {Boolean} overwrite 
+   */
   static async sendRuleConfiguration(rule, content, overwrite) {
     try {
       const result = await WzRequest.apiReq(
@@ -83,6 +142,13 @@ export default class RulesetHandler {
       return Promise.reject(error);
     }
   }
+
+  /**
+   * Send the decoders content
+   * @param {String} decoder 
+   * @param {String} content 
+   * @param {Boolean} overwrite 
+   */
   static async sendDecoderConfiguration(decoder, content, overwrite) {
     try {
       const result = await WzRequest.apiReq(
@@ -97,6 +163,12 @@ export default class RulesetHandler {
     }
   }
 
+  /**
+   * Send the cdb list content
+   * @param {String} list 
+   * @param {String} content 
+   * @param {Boolean} overwrite 
+   */
   static async sendCdbList(list, content, overwrite) {
     try {
       const result = await WzRequest.apiReq(
@@ -110,6 +182,11 @@ export default class RulesetHandler {
     }
   }
 
+  /**
+   * Delete a file
+   * @param {String} file 
+   * @param {String} path 
+   */
   static async deleteFile(file, path) {
     let type;
     switch (path) {
