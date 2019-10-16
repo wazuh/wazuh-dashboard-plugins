@@ -36,25 +36,25 @@ import {
   EuiTitle,
   InM
 } from '@elastic/eui';
+import { WzFilterBar } from '../../../components/wz-filter-bar/wz-filter-bar'
 
 class WzInMemoryTable extends EuiInMemoryTable {
 
   constructor(props) {
     super(props);
-
   }
 
   componentDidUpdate() {
     if ((this.state || {}).selectPage !== undefined){
       if ((this.state || {}).selectPage !== (this.state || {}).pageIndex){
-        this.setState({ pageIndex: this.state.selectPage });
+        this.setState({ pageIndex: this.state.selectPage });        
       }
     }
   }
 
   getItems() {
     const result = super.getItems()
-    result.totalItemCount = this.props.totalItems
+    result.totalItemCount = this.props.totalitems
     return result;
   }
 
@@ -86,7 +86,9 @@ class WzInMemoryTable extends EuiInMemoryTable {
         },
       });
     }
-
+    if(this.props.items.length < this.state.pageSize){
+      this.setState({pageIndex: 0});
+    }
     this.setState({
       selectPage: page.index,
       pageIndex,
@@ -95,6 +97,47 @@ class WzInMemoryTable extends EuiInMemoryTable {
       sortDirection,
     });
   };
+
+
+
+  renderSearchBar() {
+    const { search } = this.props;
+    if (search) {
+      const {
+        onChange, // eslint-disable-line no-unused-vars
+        ...searchBarProps
+      } = search;
+
+      if (searchBarProps.box && searchBarProps.box.schema === true) {
+        searchBarProps.box.schema = this.resolveSearchSchema();
+      }
+      this.wzFilterProps = { 
+        model: [
+          {
+            label: 'Status',
+            options: [
+              {
+                label: 'Active',
+                group: 'status'
+              },
+              {
+                label: 'Disconnected',
+                group: 'status'
+              },
+              {
+                label: 'Never connected',
+                group: 'status'
+              }
+            ]
+          },
+        ],
+        clickAction: this.props.clickAction
+      }
+
+      return <WzFilterBar {...this.wzFilterProps} />;
+    }
+  }
+  
 }
 
 
@@ -103,9 +146,13 @@ export class AgentsTable extends Component {
   constructor(props) {
     super(props);
     this.onTableChange = this.onTableChange.bind(this);
+    this.onQueryChange = this.onQueryChange.bind(this);
     this.state = {
       "pageIndex": 0,
       "previusIndex": 0,
+      "previusSort": "",
+      "previusSortDirection": "",
+      "previusQ": "",
       "totalItems": 0,
       "isLoading": false
     }
@@ -115,15 +162,28 @@ export class AgentsTable extends Component {
   async componentDidMount() {
     await this.getAgents();
     this.setState({isLoading: false});
+
   }
 
   async componentDidUpdate() {
-    if(this.state.pageIndex !== this.state.previusIndex || this.state.sortField !== this.state.previusField){
+    if(this.isFilterChange()){
+      await this.getAgents();
       await this.getAgents();
       this.setState({previusIndex: this.state.pageIndex});
-      this.setState({sortField: this.state.previusField});
+      this.setState({previusSort: this.state.sortField});
+      this.setState({previusSortDirection: this.state.sortDirection});
+      this.setState({previusQ: this.state.q});
       this.setState({isLoading: false});
     }
+  }
+
+  isFilterChange () {
+    const pageIndexChange = this.state.pageIndex !== this.state.previusIndex;
+    const sortChange = this.state.sortField !== this.state.previusSort 
+      || this.state.sortDirection !== this.state.previusSortDirection;
+    const qChange = this.state.q !== this.state.previusQ;
+    
+    return (pageIndexChange || sortChange || qChange);
   }
 
   async getAgents() {
@@ -161,6 +221,9 @@ export class AgentsTable extends Component {
   }
 
   generateEmpties(nAgents) {
+    if(this.nAgents < this.state.pageSize){
+      return{beforeEmptyAgents: [], afterEmptyAgents: []};
+    }
     const beforeEmptyAgents = ((this.state || {}).pageIndex)
       ? [...Array(this.state.pageIndex * this.state.pageSize).keys()]
       : [];
@@ -168,8 +231,7 @@ export class AgentsTable extends Component {
     const afterElements = this.state.totalItems - beforeEmptyAgents.length - nAgents;
     const afterEmptyAgents = ((this.state || {}).pageIndex)
       ? [...Array((afterElements >= 0) ? afterElements : 0).keys()]
-      : [...Array(this.state.totalItems - nAgents).keys()];
-
+      : [...Array(nAgents > 0 ? this.state.totalItems - nAgents: 0).keys()];
     return {beforeEmptyAgents, afterEmptyAgents};
   }
 
@@ -180,6 +242,7 @@ export class AgentsTable extends Component {
       "offset": (offset * limit),
       "limit": limit + 1
     };
+    this.addQFilter(filter);
     this.addSortFilter(filter);
     return filter;
   }
@@ -202,7 +265,16 @@ export class AgentsTable extends Component {
       }
     }
   }
-  
+
+  addQFilter(filter) {
+    const qFieldExists = (this.state || {}).q !== undefined;
+    const qFieldNotEmpty = (this.state || {}).q !== "";
+    if (qFieldExists && qFieldNotEmpty) {
+      filter.q = this.state.q;
+    }
+  }
+
+
   columns() {
     return [
       {
@@ -297,6 +369,16 @@ export class AgentsTable extends Component {
     })
   }
 
+  onQueryChange ({q, search}) {
+    if ((this.state || {}).q !== q) {
+      this.setState({q: q});
+    }
+
+    if((this.state || {}).search !== search) {
+      this.setState({search: search});
+    }
+  }
+
   
   render() {
 
@@ -315,15 +397,12 @@ export class AgentsTable extends Component {
     };
 
     const pagination = {
-      pageIndex: 0,
+      pageIndex: this.state.pageIndex,
       pageSize: 10,
       totalItemCount: this.state.totalItems,
       hidePerPageOptions: true
     }
 
-    const groupStyle = {
-      margin: 15
-    }
     return (
       
       <EuiPanel paddingSize="l">
@@ -344,7 +423,7 @@ export class AgentsTable extends Component {
             </EuiButtonEmpty>
           </EuiFlexItem>
         </EuiFlexGroup>
-        <EuiFlexGroup style={groupStyle}>
+        <EuiFlexGroup>
           <EuiFlexItem>
             <WzInMemoryTable
               itemId="id"
@@ -354,8 +433,9 @@ export class AgentsTable extends Component {
               sorting={true}
               search={search}
               pagination={pagination}
-              totalItems={this.state.totalItems}
+              totalitems={this.state.totalItems}
               onTableChange={this.onTableChange}
+              clickAction={this.onQueryChange}
             />
           </EuiFlexItem>
         </EuiFlexGroup>
