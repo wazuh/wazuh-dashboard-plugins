@@ -37,9 +37,14 @@ export default class WzRuleset extends Component {
       section: this.props.section
     }
 
+    this.sectionNames = {
+      rules: 'Rules',
+      decoders: 'Decoders',
+      lists: 'CDB lists'
+    }
+
   }
   async componentDidMount() {
-    //Trying a request await this.props.wzReq('GET', '/rules/files', { limit: 500, offset: 0 });
     store.subscribe(() => {
       const state = store.getState().rulesetReducers;
       const section = state.section;
@@ -48,11 +53,12 @@ export default class WzRuleset extends Component {
   }
 
   render() {
+    const { section } = this.state;
     // Search bar
     const searchBar = (
       <EuiSearchBar
         box={{
-          placeholder: `Filter ${this.state.section}...`
+          placeholder: `Filter ${section}...`
         }}
         onChange={() => { console.log('changing') }}
       />
@@ -62,12 +68,11 @@ export default class WzRuleset extends Component {
       <WzReduxProvider>
         <EuiPage style={{ background: 'transparent' }}>
           <EuiPanel>
-
             {/* Section title: Rules/Decoders/CDBlists */}
             <EuiFlexGroup>
               <EuiFlexItem grow={false}>
                 <EuiTitle>
-                  <h2>Ruleset</h2>
+                  <h2>{this.sectionNames[section]}</h2>
                 </EuiTitle>
               </EuiFlexItem>
               <EuiFlexItem>{/* This EuiFlexItem separates the title from the action buttons */}</EuiFlexItem>
@@ -79,8 +84,8 @@ export default class WzRuleset extends Component {
             <EuiFlexGroup>
               <EuiFlexItem>
                 <EuiText color="subdued">
-                  From here you can manage your rules, decoders and CDB lists.
-              </EuiText>
+                  {`From here you can manage your ${section}.`}
+                </EuiText>
               </EuiFlexItem>
             </EuiFlexGroup>
 
