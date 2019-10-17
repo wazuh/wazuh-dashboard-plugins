@@ -289,7 +289,7 @@ function discoverController(
     });
     ///////////////////////////////  END-WAZUH   ////////////////////////////////
     // The filters will automatically be set when the queryFilter emits an update event (see below)
-    queryFilter.setFilters(finalFilters).then(()=> {
+    queryFilter.setFilters(finalFilters).then(() => {
       $scope.pinnedFilters = getPinnedFilters();
     });
   };
@@ -1170,38 +1170,39 @@ function discoverController(
     }
   };
 
-  $rootScope.$on(
-    'wzEventFilters',
-    (evt, parameters) => {
-      loadFilters(parameters.filters, parameters.localChange);
-    }
-  );
+  $rootScope.$on('wzEventFilters', (evt, parameters) => {
+    loadFilters(parameters.filters, parameters.localChange);
+  });
 
   $scope.tabView = $location.search().tabView || 'panels';
-  $rootScope.$on(
-    'changeTabView',
-    async (evt, parameters) => {
-      $scope.pinnedFilters = getPinnedFilters();
-      if (parameters.tabView !== 'discover') {
-        queryFilter.removeAll();
-      }else{
-        $scope.resultState = 'loading';
-        $scope.updateQueryAndFetch({
-          query: $state.query,
-          dateRange: $scope.time
-        });
-        $scope.fetch();
-      }
-      $scope.tabView = parameters.tabView || 'panels';
-
-      evt.stopPropagation();
-      if($scope.tabView === 'discover') {
-       $scope.updateQueryAndFetch($state.query);
-      $scope.fetch(); 
-      }
-      $scope.$applyAsync();
+  $rootScope.$on('changeTabView', async (evt, parameters) => {
+    $scope.pinnedFilters = getPinnedFilters();
+    const goToDiscover = parameters.tabView === 'discover';
+    const wasOnDiscover = $scope.tabView === 'discover';
+    const backDiscover = !goToDiscover && wasOnDiscover;
+    if (
+      (parameters.tabView !== 'discover' && !backDiscover) ||
+      parameters.tab !== $scope.tab
+    ) {
+      queryFilter.removeAll();
+    } else {
+      $scope.resultState = 'loading';
+      $scope.updateQueryAndFetch({
+        query: $state.query,
+        dateRange: $scope.time
+      });
+      $scope.fetch();
     }
-  );
+    $scope.tabView = parameters.tabView || 'panels';
+    $scope.tab = parameters.tab;
+
+    evt.stopPropagation();
+    if ($scope.tabView === 'discover') {
+      $scope.updateQueryAndFetch($state.query);
+      $scope.fetch();
+    }
+    $scope.$applyAsync();
+  });
   ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
