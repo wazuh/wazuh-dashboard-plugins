@@ -16,7 +16,11 @@ const initialState = {
   showingFiles: false,
   columns: [],
   items: [],
-  filters: []
+  filters: [],
+  ruleInfo: false,
+  decoderInfo: false,
+  listInfo: false,
+  fileContent: false
 }
 
 const rulesetReducers = (state = initialState, action) => {

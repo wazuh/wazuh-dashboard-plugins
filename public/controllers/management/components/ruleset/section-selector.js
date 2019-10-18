@@ -54,7 +54,8 @@ class WzSectionSelector extends Component {
 
   componentWillUnmount() {
     // When the component is going to be unmounted the ruleset state is reset
-    this.props.resetRuleset();
+    const { ruleInfo, decoderInfo, listInfo, fileContent } = this.props.state;
+    if (!ruleInfo && !decoderInfo && !listInfo && !fileContent) this.props.resetRuleset();
   }
 
   /**

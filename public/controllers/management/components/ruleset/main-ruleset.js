@@ -44,7 +44,7 @@ export default class WzRuleset extends Component {
     }
 
   }
-  async componentDidMount() {
+  UNSAFE_componentWillMount() {
     store.subscribe(() => {
       const state = store.getState().rulesetReducers;
       const section = state.section;
