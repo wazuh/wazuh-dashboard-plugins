@@ -118,6 +118,7 @@ class WzRulesetActionButtons extends Component {
    */
   async toggleFiles() {
     try {
+      this.props.updateItems([]);// Clean the items to avoid flick
       this.props.updateLoadingStatus(true);
       const { showingFiles, section } = this.props.state;
       this.props.toggleShowFiles(!showingFiles)

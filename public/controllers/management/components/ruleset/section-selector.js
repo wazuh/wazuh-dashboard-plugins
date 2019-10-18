@@ -63,6 +63,8 @@ class WzSectionSelector extends Component {
    */
   async fetchData(section) {
     try {
+      this.props.updateItems([]);// Clean the items to avoid flick
+      this.props.changeSection(section);
       this.props.updateLoadingStatus(true);
       const result = await this.wzReq.apiReq('GET', this.paths[section], {})
       const items = result.data.data.items;
