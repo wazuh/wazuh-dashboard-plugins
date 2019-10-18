@@ -10,104 +10,35 @@
  * Find more information about this on the LICENSE file.
  */
 import React, { Component } from 'react';
-// Eui components
-import {
-  EuiFlexGroup,
-  EuiFlexItem,
-  EuiPanel,
-  EuiPage,
-  EuiText,
-  EuiTitle,
-  EuiSearchBar
-} from '@elastic/eui';
 // Redux
 import store from '../../../../redux/store';
 import WzReduxProvider from '../../../../redux/wz-redux-provider';
-// Wazuh components
-import WzSectionSelector from './section-selector';
-import WzRulesetTable from './ruleset-table';
-import WzRulesetActionButtons from './actions-buttons';
-
+//Wazuh ruleset tables(rules, decoder, lists)
+import WzRulesetOverview from './ruleset-overview';
 
 export default class WzRuleset extends Component {
   constructor(props) {
     super(props);
-
-    this.state = {
-      section: this.props.section
-    }
-
-    this.sectionNames = {
-      rules: 'Rules',
-      decoders: 'Decoders',
-      lists: 'CDB lists'
-    }
-
+    this.state = {}; //Init state empty to avoid fails when try to read any parameter and this.state is not defined yet
   }
+
   UNSAFE_componentWillMount() {
     store.subscribe(() => {
       const state = store.getState().rulesetReducers;
-      const section = state.section;
-      this.setState({ section: section });
+      this.setState(state);
     });
   }
 
-  render() {
-    const { section } = this.state;
-    // Search bar
-    const searchBar = (
-      <EuiSearchBar
-        box={{
-          placeholder: `Filter ${section}...`
-        }}
-        onChange={() => { console.log('changing') }}
-      />
-    );
 
+  render() {
+    const showRulesetOverview = (!this.state.ruleInfo && !this.state.decoderInfo && !this.state.listInfo && !this.state.fileContent);
     return (
       <WzReduxProvider>
-        <EuiPage style={{ background: 'transparent' }}>
-          <EuiPanel>
-            {/* Section title: Rules/Decoders/CDBlists */}
-            <EuiFlexGroup>
-              <EuiFlexItem grow={false}>
-                <EuiTitle>
-                  <h2>{this.sectionNames[section]}</h2>
-                </EuiTitle>
-              </EuiFlexItem>
-              <EuiFlexItem>{/* This EuiFlexItem separates the title from the action buttons */}</EuiFlexItem>
-              {/* Action buttons */}
-              <WzRulesetActionButtons />
-            </EuiFlexGroup>
-
-            {/* Description */}
-            <EuiFlexGroup>
-              <EuiFlexItem>
-                <EuiText color="subdued">
-                  {`From here you can manage your ${section}.`}
-                </EuiText>
-              </EuiFlexItem>
-            </EuiFlexGroup>
-
-            {/* Search bar and section selector*/}
-            <EuiFlexGroup>
-              <EuiFlexItem>
-                {searchBar}
-              </EuiFlexItem>
-              <EuiFlexItem grow={false}>
-                {/* Selector */}
-                <WzSectionSelector />
-              </EuiFlexItem>
-            </EuiFlexGroup>
-
-            {/* Table */}
-            <EuiFlexGroup>
-              <EuiFlexItem>
-                <WzRulesetTable wzReq={(method, path, options) => this.props.wzReq(method, path, options)} />
-              </EuiFlexItem>
-            </EuiFlexGroup>
-          </EuiPanel>
-        </EuiPage>
+        {showRulesetOverview && (
+          <WzRulesetOverview />
+        ) || (
+          <div>NO OVERVIEW</div>
+        )}
       </WzReduxProvider>
     )
   }
