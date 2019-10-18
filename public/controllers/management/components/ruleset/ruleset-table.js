@@ -21,7 +21,6 @@ import RulesetColums from './utils/columns';
 class WzRulesetTable extends Component {
   constructor(props) {
     super(props);
-    console.log('this.props ', this.props)
     this.rulesetColums = new RulesetColums(this.props);
   }
 
