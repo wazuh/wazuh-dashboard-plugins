@@ -1188,8 +1188,7 @@ function discoverController(
     } else {
       $scope.resultState = 'loading';
       $scope.updateQueryAndFetch({
-        query: $state.query,
-        dateRange: $scope.time
+        query: $state.query
       });
       $scope.fetch();
     }
@@ -1198,7 +1197,6 @@ function discoverController(
 
     evt.stopPropagation();
     if ($scope.tabView === 'discover') {
-      $scope.updateQueryAndFetch($state.query);
       $scope.fetch();
     }
     $scope.$applyAsync();
