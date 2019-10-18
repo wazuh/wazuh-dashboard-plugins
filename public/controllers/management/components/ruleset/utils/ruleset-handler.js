@@ -80,10 +80,8 @@ export default class RulesetHandler {
   static async getRuleContent(path, nolocal = true) {
     try {
       const _path = nolocal ? `ruleset/rules/${path}` : `etc/rules/${path}`;
-      const result = await WzRequest.apiReq('GET', `/manager/files`, {
-        path: _path
-      });
-      return ((result || {}).data || {}).data || false;
+      const result = await this.getFileContent(_path);
+      return result;
     } catch (error) {
       return Promise.reject(error);
     }
@@ -99,10 +97,8 @@ export default class RulesetHandler {
       const _path = nolocal
         ? `ruleset/decoders/${path}`
         : `etc/decoders/${path}`;
-      const result = await WzRequest.apiReq('GET', `/manager/files`, {
-        path: _path
-      });
-      return ((result || {}).data || {}).data || false;
+      const result = await this.getFileContent(_path);
+      return result;
     } catch (error) {
       return Promise.reject(error);
     }
@@ -114,10 +110,23 @@ export default class RulesetHandler {
    */
   static async getCdbList(path) {
     try {
+      const result = await this.getFileContent(path);
+      return result;
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  }
+
+  /**
+   * Get the content of any type of file Rules, Decoders, CDB lists...
+   * @param {String} path 
+   */
+  static async getFileContent(path) {
+    try {
       const result = await WzRequest.apiReq('GET', `/manager/files`, {
         path: path
       });
-      return result;
+      return ((result || {}).data || {}).data || false;
     } catch (error) {
       return Promise.reject(error);
     }

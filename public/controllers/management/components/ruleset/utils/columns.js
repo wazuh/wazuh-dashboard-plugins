@@ -1,5 +1,5 @@
 import React from 'react';
-import { EuiToolTip, EuiLink } from '@elastic/eui';
+import { EuiToolTip, EuiButtonIcon, EuiLink } from '@elastic/eui';
 import RulesetHandler from './ruleset-handler';
 
 const columns = {
@@ -187,6 +187,38 @@ const columns = {
       name: 'File',
       align: 'left',
       sortable: true
+    },
+    {
+      name: 'Actions',
+      align: 'left',
+      render: item => {
+        console.log(item)
+        return (
+          <div>
+            <EuiToolTip position="top" content={`Show ${item.file} content`}>
+              <EuiButtonIcon
+                aria-label="Show content"
+                iconType="eye"
+                onClick={async () => {
+                  const result = await RulesetHandler.getFileContent(`${item.path}/${item.file}`);
+                  console.log(result)
+                }}
+                color="primary"
+              />
+            </EuiToolTip>
+            <EuiToolTip position="top" content={`Remove ${item.file} file`}>
+              <EuiButtonIcon
+                aria-label="Show content"
+                iconType="trash"
+                onClick={async () => {
+                  console.log(`deleting ${item.file}`);
+                }}
+                color="danger"
+              />
+            </EuiToolTip>
+          </div>
+        )
+      }
     }
   ]
 }
