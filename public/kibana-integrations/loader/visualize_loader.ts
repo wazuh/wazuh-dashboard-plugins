@@ -22,22 +22,20 @@
  * the docs (docs/development/visualize/development-create-visualization.asciidoc)
  * are up to date.
  */
-
 // @ts-ignore
 import chrome from 'ui/chrome';
 // @ts-ignore
-import { FilterBarQueryFilterProvider } from 'ui/filter_manager/query_filter';
+import { FilterBarQueryFilterProvider } from 'ui/filter_bar/query_filter';
 // @ts-ignore
 import { IPrivate } from 'ui/private';
 import { EmbeddedVisualizeHandler } from './embedded_visualize_handler';
-import { VisSavedObject, VisualizeLoaderParams } from 'ui/visualize/loader';
+import { VisSavedObject, VisualizeLoaderParams } from './types';
 
 export class VisualizeLoader {
-  constructor(
-    private readonly savedVisualizations: any,
-    private readonly pipelineDataLoader: boolean,
-    private readonly Private: IPrivate
-  ) {}
+  constructor(private readonly savedVisualizations: any, private readonly Private: IPrivate, $injector) {
+    // @ts-ignore
+    this.injector = $injector;
+  }
 
   /**
    * Renders a saved visualization specified by its id into a DOM element.
@@ -142,19 +140,14 @@ export class VisualizeLoader {
       queryFilter: this.Private(FilterBarQueryFilterProvider),
       // lets add Private to the params, we'll need to pass it to visualize later
       Private: this.Private,
-      pipelineDataLoader: this.pipelineDataLoader,
     };
-
-    return new EmbeddedVisualizeHandler(element, savedObj, handlerParams);
+    // @ts-ignore
+    return new EmbeddedVisualizeHandler(element, savedObj, handlerParams, this.injector);
   }
 }
 
-function VisualizeLoaderProvider(
-  savedVisualizations: any,
-  interpreterConfig: any,
-  Private: IPrivate
-) {
-  return new VisualizeLoader(savedVisualizations, interpreterConfig.enableInVisualize, Private);
+function VisualizeLoaderProvider(savedVisualizations: any, Private: IPrivate, $injector) {
+  return new VisualizeLoader(savedVisualizations, Private, $injector);
 }
 
 /**

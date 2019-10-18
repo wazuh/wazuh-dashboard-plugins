@@ -17,18 +17,13 @@
  * under the License.
  */
 
- 
+// @ts-ignore untyped dependency
+import { registries } from '@kbn/interpreter/public';
 // @ts-ignore
 import { EventEmitter } from 'events';
-import { debounce, forEach, get, isEqual } from 'lodash';
+import { debounce, forEach, get } from 'lodash';
 import * as Rx from 'rxjs';
 import { share } from 'rxjs/operators';
-// @ts-ignore
-import { i18n } from '@kbn/i18n';
-// @ts-ignore
-import { toastNotifications } from 'ui/notify';
-// @ts-ignore
-import { registries } from 'plugins/interpreter/registries';
 // @ts-ignore
 import { Inspector } from 'ui/inspector';
 // @ts-ignore
@@ -45,35 +40,35 @@ import { AppState } from 'ui/state_management/app_state';
 import { timefilter } from 'ui/timefilter';
 // @ts-ignore
 import { RequestHandlerParams, Vis } from 'ui/vis';
-// @ts-ignore untyped dependency
-import { VisFiltersProvider } from 'ui/vis/vis_filters';
 // @ts-ignore
 import { PipelineDataLoader } from 'ui/visualize/loader/pipeline_data_loader';
-import { visualizationLoader } from 'ui/visualize/loader';
+import { visualizationLoader } from './visualization_loader';
 import { VisualizeDataLoader } from './visualize_data_loader';
-import { onlyDisabledFiltersChanged } from 'plugins/data';
-
+// @ts-ignore
 import { DataAdapter, RequestAdapter } from 'ui/inspector/adapters';
 
+// @ts-ignore
 import { getTableAggs } from 'ui/visualize/loader/pipeline_helpers/utilities';
 import {
   VisResponseData,
   VisSavedObject,
   VisualizeLoaderParams,
   VisualizeUpdateParams,
-} from 'ui/visualize/loader';
+} from './types';
 // @ts-ignore
 import { queryGeohashBounds } from 'ui/visualize/loader/utils';
+// @ts-ignore
+import { i18n } from '@kbn/i18n';
+// @ts-ignore
+import { toastNotifications } from 'ui/notify';
 
 interface EmbeddedVisualizeHandlerParams extends VisualizeLoaderParams {
   Private: IPrivate;
   queryFilter: any;
   autoFetch?: boolean;
-  pipelineDataLoader?: boolean;
 }
 
 const RENDER_COMPLETE_EVENT = 'render_complete';
-const DATA_SHARED_ITEM = 'data-shared-item';
 const LOADING_ATTRIBUTE = 'data-loading';
 const RENDERING_COUNT_ATTRIBUTE = 'data-rendering-count';
 
@@ -89,13 +84,13 @@ export class EmbeddedVisualizeHandler {
    * This should not be used by any plugin.
    * @ignore
    */
+  public static readonly __ENABLE_PIPELINE_DATA_LOADER__: boolean = false;
   public readonly data$: Rx.Observable<any>;
   public readonly inspectorAdapters: Adapters = {};
   private vis: Vis;
   private handlers: any;
   private loaded: boolean = false;
   private destroyed: boolean = false;
-  private pipelineDataLoader: boolean = false;
 
   private listeners = new EventEmitter();
   private firstRenderComplete: Promise<void>;
@@ -119,13 +114,12 @@ export class EmbeddedVisualizeHandler {
   private actions: any = {};
   private events$: Rx.Observable<any>;
   private autoFetch: boolean;
-  private abortController?: AbortController;
-  private autoRefreshFetchSubscription: Rx.Subscription | undefined;
 
   constructor(
     private readonly element: HTMLElement,
     savedObject: VisSavedObject,
-    params: EmbeddedVisualizeHandlerParams
+    params: EmbeddedVisualizeHandlerParams,
+    $injector
   ) {
     const { searchSource, vis } = savedObject;
 
@@ -137,7 +131,6 @@ export class EmbeddedVisualizeHandler {
       filters,
       query,
       autoFetch = true,
-      pipelineDataLoader = false,
       Private,
     } = params;
 
@@ -152,17 +145,13 @@ export class EmbeddedVisualizeHandler {
       forceFetch: false,
     };
 
-    this.pipelineDataLoader = pipelineDataLoader;
-
     // Listen to the first RENDER_COMPLETE_EVENT to resolve this promise
     this.firstRenderComplete = new Promise(resolve => {
       this.listeners.once(RENDER_COMPLETE_EVENT, resolve);
     });
 
     element.setAttribute(LOADING_ATTRIBUTE, '');
-    element.setAttribute(DATA_SHARED_ITEM, '');
     element.setAttribute(RENDERING_COUNT_ATTRIBUTE, '0');
-
     element.addEventListener('renderComplete', this.onRenderCompleteListener);
 
     this.autoFetch = autoFetch;
@@ -183,7 +172,7 @@ export class EmbeddedVisualizeHandler {
     this.vis.on('reload', this.reload);
     this.uiState.on('change', this.onUiStateChange);
     if (autoFetch) {
-      this.autoRefreshFetchSubscription = timefilter.getAutoRefreshFetch$().subscribe(this.reload);
+      timefilter.on('autoRefreshFetch', this.reload);
     }
 
     // This is a hack to give maps visualizations access to data in the
@@ -196,15 +185,14 @@ export class EmbeddedVisualizeHandler {
       });
     };
 
-    //WAZUH disable pipelineLoader
-    this.dataLoader = new VisualizeDataLoader(vis, Private);
-    const visFilters: any = Private(VisFiltersProvider);
+    this.dataLoader = EmbeddedVisualizeHandler.__ENABLE_PIPELINE_DATA_LOADER__
+      ? new PipelineDataLoader(vis)
+      : new VisualizeDataLoader(vis, Private), $injector;
     this.renderCompleteHelper = new RenderCompleteHelper(element);
     this.inspectorAdapters = this.getActiveInspectorAdapters();
     this.vis.openInspector = this.openInspector;
     this.vis.hasInspector = this.hasInspector;
 
-    // init default actions
     forEach(this.vis.type.events, (event, eventName) => {
       if (event.disabled || !eventName) {
         return;
@@ -219,8 +207,7 @@ export class EmbeddedVisualizeHandler {
     this.events$.subscribe(event => {
       if (this.actions[event.name]) {
         event.data.aggConfigs = getTableAggs(this.vis);
-        const newFilters = this.actions[event.name](event.data) || [];
-        visFilters.pushFilters(newFilters);
+        this.actions[event.name](event.data);
       }
     });
 
@@ -276,10 +263,9 @@ export class EmbeddedVisualizeHandler {
    */
   public destroy(): void {
     this.destroyed = true;
-    this.cancel();
     this.debouncedFetchAndRender.cancel();
     if (this.autoFetch) {
-      if (this.autoRefreshFetchSubscription) this.autoRefreshFetchSubscription.unsubscribe();
+      timefilter.off('autoRefreshFetch', this.reload);
     }
     this.vis.removeListener('reload', this.reload);
     this.vis.removeListener('update', this.handleVisUpdate);
@@ -303,7 +289,7 @@ export class EmbeddedVisualizeHandler {
 
   /**
    * renders visualization with provided data
-   * @param response: visualization data
+   * @param visData: visualization data
    */
   public render = (response: VisResponseData | null = null): void => {
     const executeRenderer = this.rendererProvider(response);
@@ -452,14 +438,7 @@ export class EmbeddedVisualizeHandler {
     this.fetchAndRender();
   };
 
-  private cancel = () => {
-    if (this.abortController) this.abortController.abort();
-  };
-
   private fetch = (forceFetch: boolean = false) => {
-    this.cancel();
-    this.abortController = new AbortController();
-    this.dataLoaderParams.abortSignal = this.abortController.signal;
     this.dataLoaderParams.aggs = this.vis.getAggConfig();
     this.dataLoaderParams.forceFetch = forceFetch;
     this.dataLoaderParams.inspectorAdapters = this.inspectorAdapters;
@@ -468,39 +447,32 @@ export class EmbeddedVisualizeHandler {
     this.vis.requestError = undefined;
     this.vis.showRequestError = false;
 
-    return (
-      this.dataLoader
-        // Don't pass in this.dataLoaderParams directly because it may be modified async in another
-        // call to fetch before the previous one has completed
-        .fetch({ ...this.dataLoaderParams })
-        .then(data => {
-          // Pipeline responses never throw errors, so we need to check for
-          // `type: 'error'`, and then throw so it can be caught below.
-          // TODO: We should revisit this after we have fully migrated
-          // to the new expression pipeline infrastructure.
-          if (data && data.type === 'error') {
-            throw data.error;
-          }
+    return this.dataLoader
+      .fetch(this.dataLoaderParams)
+      .then(data => {
+        // Pipeline responses never throw errors, so we need to check for
+        // `type: 'error'`, and then throw so it can be caught below.
+        // TODO: We should revisit this after we have fully migrated
+        // to the new expression pipeline infrastructure.
+        if (data && data.type === 'error') {
+          throw data.error;
+        }
 
-          if (data && data.value) {
-            this.dataSubject.next(data.value);
-          }
-          return data;
-        })
-        .catch(this.handleDataLoaderError)
-    );
+        if (data && data.value) {
+          this.dataSubject.next(data.value);
+        }
+        return data;
+      })
+      .catch(this.handleDataLoaderError);
   };
 
   /**
-   * When dataLoader returns an error, we need to make sure it surfaces in the UI.
-   *
-   * TODO: Eventually we should add some custom error messages for issues that are
-   * frequently encountered by users.
-   */
+ * When dataLoader returns an error, we need to make sure it surfaces in the UI.
+ *
+ * TODO: Eventually we should add some custom error messages for issues that are
+ * frequently encountered by users.
+ */
   private handleDataLoaderError = (error: any): void => {
-    // If the data loader was aborted then no need to surface this error in the UI
-    if (error && error.name === 'AbortError') return;
-
     // TODO: come up with a general way to cancel execution of pipeline expressions.
     if (this.dataLoaderParams.searchSource && this.dataLoaderParams.searchSource.cancelQueued) {
       this.dataLoaderParams.searchSource.cancelQueued();
@@ -522,7 +494,7 @@ export class EmbeddedVisualizeHandler {
     let renderer: any = null;
     let args: any[] = [];
 
-    if (this.pipelineDataLoader) {
+    if (EmbeddedVisualizeHandler.__ENABLE_PIPELINE_DATA_LOADER__) {
       renderer = registries.renderers.get(get(response || {}, 'as', 'visualization'));
       args = [this.element, get(response, 'value', { visType: this.vis.type.name }), this.handlers];
     } else {

@@ -1,20 +1,15 @@
 /*
- * Licensed to Elasticsearch B.V. under one or more contributor
- * license agreements. See the NOTICE file distributed with
- * this work for additional information regarding copyright
- * ownership. Elasticsearch B.V. licenses this file to you under
- * the Apache License, Version 2.0 (the "License"); you may
- * not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * Author: Elasticsearch B.V.
+ * Updated by Wazuh, Inc.
  *
- *    http://www.apache.org/licenses/LICENSE-2.0
+ * Copyright (C) 2015-2019 Wazuh, Inc.
  *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * Find more information about this on the LICENSE file.
  */
 
 import { EuiContextMenu, EuiPopover } from '@elastic/eui';
@@ -28,9 +23,8 @@ import {
 import { InjectedIntl, injectI18n } from '@kbn/i18n/react';
 import classNames from 'classnames';
 import React, { Component } from 'react';
-import { UiSettingsClientContract } from 'src/core/public';
 import { IndexPattern } from 'ui/index_patterns';
-import { FilterEditor } from 'plugins/data/filter/filter_bar/filter_editor';
+import { FilterEditor } from 'ui/filter_bar/filter_editor';
 import { FilterView } from './filter_view';
 
 interface Props {
@@ -41,7 +35,6 @@ interface Props {
   onUpdate: (filter: Filter) => void;
   onRemove: () => void;
   intl: InjectedIntl;
-  uiSettings: UiSettingsClientContract;
 }
 
 interface State {
@@ -71,7 +64,7 @@ class FilterItemUI extends Component<Props, State> {
     const dataTestSubjValue = filter.meta.value ? `filter-value-${filter.meta.value}` : '';
     const dataTestSubjDisabled = `filter-${
       this.props.filter.meta.disabled ? 'disabled' : 'enabled'
-    }`;
+      }`;
 
     const badge = (
       <FilterView
@@ -90,13 +83,13 @@ class FilterItemUI extends Component<Props, State> {
           {
             name: isFilterPinned(filter)
               ? this.props.intl.formatMessage({
-                  id: 'data.filter.filterBar.unpinFilterButtonLabel',
-                  defaultMessage: 'Unpin',
-                })
+                id: 'common.ui.filterBar.unpinFilterButtonLabel',
+                defaultMessage: 'Unpin',
+              })
               : this.props.intl.formatMessage({
-                  id: 'data.filter.filterBar.pinFilterButtonLabel',
-                  defaultMessage: 'Pin across all apps',
-                }),
+                id: 'common.ui.filterBar.pinFilterButtonLabel',
+                defaultMessage: 'Pin across all apps',
+              }),
             icon: 'pin',
             onClick: () => {
               this.closePopover();
@@ -106,7 +99,7 @@ class FilterItemUI extends Component<Props, State> {
           },
           {
             name: this.props.intl.formatMessage({
-              id: 'data.filter.filterBar.editFilterButtonLabel',
+              id: 'common.ui.filterBar.editFilterButtonLabel',
               defaultMessage: 'Edit filter',
             }),
             icon: 'pencil',
@@ -116,13 +109,13 @@ class FilterItemUI extends Component<Props, State> {
           {
             name: negate
               ? this.props.intl.formatMessage({
-                  id: 'data.filter.filterBar.includeFilterButtonLabel',
-                  defaultMessage: 'Include results',
-                })
+                id: 'common.ui.filterBar.includeFilterButtonLabel',
+                defaultMessage: 'Include results',
+              })
               : this.props.intl.formatMessage({
-                  id: 'data.filter.filterBar.excludeFilterButtonLabel',
-                  defaultMessage: 'Exclude results',
-                }),
+                id: 'common.ui.filterBar.excludeFilterButtonLabel',
+                defaultMessage: 'Exclude results',
+              }),
             icon: negate ? 'plusInCircle' : 'minusInCircle',
             onClick: () => {
               this.closePopover();
@@ -133,13 +126,13 @@ class FilterItemUI extends Component<Props, State> {
           {
             name: disabled
               ? this.props.intl.formatMessage({
-                  id: 'data.filter.filterBar.enableFilterButtonLabel',
-                  defaultMessage: 'Re-enable',
-                })
+                id: 'common.ui.filterBar.enableFilterButtonLabel',
+                defaultMessage: 'Re-enable',
+              })
               : this.props.intl.formatMessage({
-                  id: 'data.filter.filterBar.disableFilterButtonLabel',
-                  defaultMessage: 'Temporarily disable',
-                }),
+                id: 'common.ui.filterBar.disableFilterButtonLabel',
+                defaultMessage: 'Temporarily disable',
+              }),
             icon: `${disabled ? 'eye' : 'eyeClosed'}`,
             onClick: () => {
               this.closePopover();
@@ -149,7 +142,7 @@ class FilterItemUI extends Component<Props, State> {
           },
           {
             name: this.props.intl.formatMessage({
-              id: 'data.filter.filterBar.deleteFilterButtonLabel',
+              id: 'common.ui.filterBar.deleteFilterButtonLabel',
               defaultMessage: 'Delete',
             }),
             icon: 'trash',
@@ -171,7 +164,6 @@ class FilterItemUI extends Component<Props, State> {
               indexPatterns={this.props.indexPatterns}
               onSubmit={this.onSubmit}
               onCancel={this.closePopover}
-              uiSettings={this.props.uiSettings}
             />
           </div>
         ),
@@ -181,8 +173,6 @@ class FilterItemUI extends Component<Props, State> {
     return (
       <EuiPopover
         id={`popoverFor_filter${id}`}
-        className={`globalFilterItem__popover`}
-        anchorClassName={`globalFilterItem__popoverAnchor`}
         isOpen={this.state.isPopoverOpen}
         closePopover={this.closePopover}
         button={badge}

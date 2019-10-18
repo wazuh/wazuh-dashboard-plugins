@@ -1,39 +1,40 @@
 /*
- * Licensed to Elasticsearch B.V. under one or more contributor
- * license agreements. See the NOTICE file distributed with
- * this work for additional information regarding copyright
- * ownership. Elasticsearch B.V. licenses this file to you under
- * the Apache License, Version 2.0 (the "License"); you may
- * not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * Author: Elasticsearch B.V.
+ * Updated by Wazuh, Inc.
  *
- *    http://www.apache.org/licenses/LICENSE-2.0
+ * Copyright (C) 2015-2019 Wazuh, Inc.
  *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * Find more information about this on the LICENSE file.
  */
-
+import _ from 'lodash';
+import { Scanner } from 'ui/utils/scanner';
 import { StringUtils } from 'ui/utils/string_utils';
 
-/**
- * The SavedObjectLoader class provides some convenience functions
- * to load and save one kind of saved objects (specified in the constructor).
- *
- * It is based on the SavedObjectClient which implements loading and saving
- * in an abstract, type-agnostic way. If possible, use SavedObjectClient directly
- * to avoid pulling in extra functionality which isn't used.
- */
 export class SavedObjectLoader {
-  constructor(SavedObjectClass, kbnUrl, chrome, savedObjectClient) {
+  constructor(
+    SavedObjectClass,
+    kbnIndex,
+    kbnUrl,
+    $http,
+    chrome,
+    savedObjectsClient
+  ) {
     this.type = SavedObjectClass.type;
     this.Class = SavedObjectClass;
     this.lowercaseType = this.type.toLowerCase();
+    this.kbnIndex = kbnIndex;
     this.kbnUrl = kbnUrl;
     this.chrome = chrome;
+
+    this.scanner = new Scanner($http, {
+      index: kbnIndex,
+      type: this.lowercaseType
+    });
 
     this.loaderProperties = {
       name: `${this.lowercaseType}s`,
@@ -41,7 +42,7 @@ export class SavedObjectLoader {
       nouns: `${this.lowercaseType}s`
     };
 
-    this.savedObjectsClient = savedObjectClient;
+    this.savedObjectsClient = savedObjectsClient;
   }
 
   // Fake async function, only to resolve a promise
@@ -121,6 +122,13 @@ export class SavedObjectLoader {
     return source;
   }
 
+  scanAll(queryString, pageSize = 1000) {
+    return this.scanner.scanAndMap(queryString, {
+      pageSize,
+      docCount: Infinity
+    });
+  }
+
   /**
    * Updates hit.attributes to contain an id and url field, and returns the updated
    * attributes object.
@@ -147,7 +155,6 @@ export class SavedObjectLoader {
         perPage: size,
         page: 1,
         searchFields: ['title^3', 'description'],
-        defaultSearchOperator: 'AND',
         fields
       })
       .then(resp => {
