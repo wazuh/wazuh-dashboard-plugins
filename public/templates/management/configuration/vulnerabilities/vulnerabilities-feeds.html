@@ -47,9 +47,9 @@
                         <td>
                             <span ng-if="!item.url_attrs">-</span>
                             <div ng-if="item.url_attrs">
-                            <span><b>Start: </b>{{item.url_attrs.start || '-' }}</span><br>
-                            <span><b>End: </b>{{item.url_attrs.end || '-' }}</span><br>
-                            <span><b>Port: </b>{{item.url_attrs.port || '-' }}</span>
+                            <span ng-show="item.url_attrs.start"><b>Start: </b>{{item.url_attrs.start}}</span><br>
+                            <span ng-show="item.url_attrs.end"><b>End: </b>{{item.url_attrs.end}}</span><br>
+                            <span ng-show="item.url_attrs.port"><b>Port: </b>{{item.url_attrs.port}}</span>
                         </div>
                         </td>
                         <td>
