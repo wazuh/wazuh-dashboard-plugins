@@ -32,6 +32,10 @@ const rulesetReducers = (state = initialState, action) => {
       return Object.assign({}, state, { isLoading: action.status });
     case 'UPDATE_ITEMS':
       return Object.assign({}, state, { items: action.items });
+    case 'UPDATE_RULE_INFO':
+      return Object.assign({}, state, { ruleInfo: action.info, decoderInfo: false, listInfo: false });
+    case 'UPDATE_DECODER_INFO':
+      return Object.assign({}, state, { decoderInfo: action.info, ruleInfo: false, listInfo: false });
     case 'UPDATE_FILE_CONTENT':
       return Object.assign({}, state, {fileContent: action.content});
     case 'TOGGLE_SHOW_FILES':

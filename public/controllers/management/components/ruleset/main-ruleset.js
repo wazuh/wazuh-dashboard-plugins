@@ -40,6 +40,7 @@ export default class WzRuleset extends Component {
   render() {
     const showRulesetOverview = (!this.state.ruleInfo && !this.state.decoderInfo && !this.state.listInfo && !this.state.fileContent);
     const fileContent = this.state.fileContent;
+    const info = this.state.ruleInfo || this.state.decoderInfo || this.state.listInfo;
 
     return (
       <WzReduxProvider>
@@ -48,7 +49,7 @@ export default class WzRuleset extends Component {
         ) || fileContent && (
           <div>{fileContent}</div>
         ) || (
-          <div>INFO ABOUT RULES, DECODERS OR LISTS</div>
+          <div>{JSON.stringify(info)}</div>
         )}
       </WzReduxProvider>
     )

@@ -23,7 +23,7 @@ export default class RulesetHandler {
       const result = await WzRequest.apiReq('GET', `/rules`, {
         file
       });
-      return result;
+      return ((result || {}).data || {}).data || false;
     } catch (error) {
       return Promise.reject(error);
     }
@@ -38,7 +38,7 @@ export default class RulesetHandler {
       const result = await WzRequest.apiReq('GET', `/decoders`, {
         file
       });
-      return result;
+      return ((result || {}).data || {}).data || false;
     } catch (error) {
       return Promise.reject(error);
     }

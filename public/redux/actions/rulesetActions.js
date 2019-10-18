@@ -73,3 +73,17 @@ export const toggleShowFiles = (status) => {
     status: status
   }
 }
+
+export const updateRuleInfo = (info) => {
+  return {
+    type: 'UPDATE_RULE_INFO',
+    info: info
+  }
+}
+
+export const updateDecoderInfo = (info) => {
+  return {
+    type: 'UPDATE_DECODER_INFO',
+    info: info
+  }  
+}

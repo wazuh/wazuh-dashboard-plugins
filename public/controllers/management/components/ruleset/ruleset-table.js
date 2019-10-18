@@ -18,7 +18,9 @@ import { connect } from 'react-redux';
 
 import {
   updateLoadingStatus,
-  updateFileContent
+  updateFileContent,
+  updateRuleInfo,
+  updateDecoderInfo
 } from '../../../../redux/actions/rulesetActions';
 
 import RulesetColums from './utils/columns';
@@ -56,7 +58,9 @@ const mapStateToProps = (state) => {
 const mapDispatchToProps = (dispatch) => {
   return {
     updateLoadingStatus: status => dispatch(updateLoadingStatus(status)),
-    updateFileContent: content => dispatch(updateFileContent(content))
+    updateFileContent: content => dispatch(updateFileContent(content)),
+    updateRuleInfo: info => dispatch(updateRuleInfo(info)),
+    updateDecoderInfo: info => dispatch(updateDecoderInfo(info))
   }
 };
 
