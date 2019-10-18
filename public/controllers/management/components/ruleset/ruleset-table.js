@@ -16,13 +16,19 @@ import {
 
 import { connect } from 'react-redux';
 
+import RulesetColums from './utils/columns';
+
 class WzRulesetTable extends Component {
   constructor(props) {
     super(props);
+    console.log('this.props ', this.props)
+    this.rulesetColums = new RulesetColums(this.props);
   }
 
   render() {
-    const { isLoading, items, columns } = this.props.state;
+    const { isLoading, items, section, showingFiles } = this.props.state;
+    const rulesetColums = this.rulesetColums.columns;
+    const columns =  showingFiles ? rulesetColums.files : rulesetColums[section]
     return (
       <EuiInMemoryTable
         itemId="id"

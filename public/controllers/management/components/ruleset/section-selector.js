@@ -18,7 +18,6 @@ import { connect } from 'react-redux';
 import {
   updateRulesetSection,
   updateLoadingStatus,
-  updateColumns,
   updateItems,
   resetRuleset,
   toggleShowFiles
@@ -67,9 +66,8 @@ class WzSectionSelector extends Component {
       this.props.updateLoadingStatus(true);
       const result = await this.wzReq.apiReq('GET', this.paths[section], {})
       const items = result.data.data.items;
-      this.props.toggleShowFiles(false);
-      this.props.updateColumns(this.columns[section]);
       this.props.updateItems(items);
+      this.props.toggleShowFiles(false);
       this.props.changeSection(section);
       this.props.updateLoadingStatus(false);
     } catch (error) {
@@ -108,8 +106,7 @@ const mapDispatchToProps = (dispatch) => {
     updateLoadingStatus: status => dispatch(updateLoadingStatus(status)),
     updateItems: items => dispatch(updateItems(items)),
     resetRuleset: () => dispatch(resetRuleset()),
-    toggleShowFiles: status => dispatch(toggleShowFiles(status)),
-    updateColumns: columns => dispatch(updateColumns(columns))
+    toggleShowFiles: status => dispatch(toggleShowFiles(status))
   }
 };
 

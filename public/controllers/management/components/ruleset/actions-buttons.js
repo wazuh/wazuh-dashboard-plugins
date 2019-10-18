@@ -23,7 +23,6 @@ import { toggleShowFiles } from '../../../../redux/actions/rulesetActions';
 
 import {
   updateItems,
-  updateColumns,
   updateLoadingStatus
 } from '../../../../redux/actions/rulesetActions';
 
@@ -125,8 +124,6 @@ class WzRulesetActionButtons extends Component {
       const path = !showingFiles ? `${this.paths[section]}/files` : this.paths[section];
       const result = await this.wzReq.apiReq('GET', path, {});
       const items = result.data.data.items;
-      const columns = !showingFiles ? this.columns.files : this.columns[section]
-      this.props.updateColumns(columns);
       this.props.updateItems(items);
       this.props.updateLoadingStatus(false);
     } catch (error) {
@@ -203,7 +200,6 @@ const mapStateToProps = (state) => {
 const mapDispatchToProps = (dispatch) => {
   return {
     updateItems: items => dispatch(updateItems(items)),
-    updateColumns: columns => dispatch(updateColumns(columns)),
     toggleShowFiles: status => dispatch(toggleShowFiles(status)),
     updateLoadingStatus: status => dispatch(updateLoadingStatus(status))
   }

@@ -22,17 +22,6 @@ export const updateRulesetSection = (section) => {
 }
 
 /**
- * Update the columns to show in the table
- * @param {Array} columns 
- */
-export const updateColumns = (columns) => {
-  return {
-    type: 'UPDATE_COLUMNS',
-    columns: columns
-  }
-}
-
-/**
  * Update the items, they could be rules, decoders or lists, also, could be files
  * @param {Array} rules 
  */
