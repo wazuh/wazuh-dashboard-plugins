@@ -179,7 +179,26 @@ const columns = {
       name: 'Path',
       align: 'left',
       sortable: true
-    }
+    },
+    {
+      name: 'Actions',
+      align: 'left',
+      render: item => {
+        return (
+          <EuiToolTip position="top" content={`Remove ${item.name}`}>
+            <EuiButtonIcon
+              aria-label="Show content"
+              iconType="trash"
+              onClick={async () => {
+                console.log(`deleting ${item.path}/${item.name}`);
+              }}
+              color="danger"
+            />
+          </EuiToolTip>
+        )
+      }
+    },
+
   ],
   files: [
     {
