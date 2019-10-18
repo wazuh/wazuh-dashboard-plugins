@@ -150,15 +150,6 @@ function discoverController(
   loadedVisualizations,
   discoverPendingUpdates
 ) {
-  // Wazuh. Copy for the pinned filters
-  let pinnedFilters = [];
-  let initialFilters = [];
-  let lastFilters = [];
-  let lastTab = 'unknown';
-  // Wazuh. Copy for the discover filters
-  let discoverFilters = [];
-  let backFromDiscover = false;
-
   const visualizeLoader = Private(VisualizeLoaderProvider);
   let visualizeHandler;
   const Vis = Private(VisProvider);
@@ -174,9 +165,6 @@ function discoverController(
   const inspectorAdapters = {
     requests: new RequestAdapter()
   };
-
-  let filterUpdateSubscription;
-  let filterFetchSubscription;
 
   const subscriptions = new Subscription();
 
@@ -204,8 +192,7 @@ function discoverController(
   // the saved savedSearch
   const savedSearch = $route.current.locals.savedSearch;
   $scope.$on('$destroy', () => {
-    if (filterFetchSubscription) filterFetchSubscription.unsubscribe();
-    if (filterUpdateSubscription) filterUpdateSubscription.unsubscribe();
+    subscriptions.unsubscribe();
   });
 
   const $appStatus = ($scope.appStatus = this.appStatus = {
@@ -303,23 +290,18 @@ function discoverController(
     ///////////////////////////////  END-WAZUH   ////////////////////////////////
     // The filters will automatically be set when the queryFilter emits an update event (see below)
     queryFilter.setFilters(finalFilters).then(() => {
-      lastFilters = queryFilter.getFilters();
+      $scope.pinnedFilters = getPinnedFilters();
     });
-    // Update our internal copy for the pinned filters
-    pinnedFilters = getPinnedFilters(finalFilters);
   };
 
   $scope.applyFilters = filters => {
-    queryFilter.addFiltersAndChangeTimeFilter(filters).then(() => {
-      lastFilters = queryFilter.getFilters();
-    });
+    queryFilter.addFiltersAndChangeTimeFilter(filters);
     $scope.state.$newFilters = [];
   };
 
   $scope.$watch('state.$newFilters', (filters = []) => {
     if (filters.length === 1) {
-      queryFilter.removeAll();
-      $scope.applyFilters([...(lastFilters || initialFilters), ...filters]);
+      $scope.applyFilters(filters);
     }
   });
 
@@ -531,6 +513,8 @@ function discoverController(
                 );
                 $scope.filters = queryFilter.getFilters();
                 $rootScope.$broadcast('updateVis');
+                $rootScope.$broadcast('fetch');
+
                 if ($location.search().tab != 'configuration') {
                   loadedVisualizations.removeAll();
                   $rootScope.rendered = false;
@@ -715,22 +699,11 @@ function discoverController(
   $scope.updateQueryAndFetch = function({ query, dateRange }) {
     // Wazuh filters are not ready yet
     if (!filtersAreReady()) return;
-    let inheritedFilters;
-    // Preserve filters in discover
-    if ((discoverFilters || []).length || (pinnedFilters || []).length) {
-      inheritedFilters = discoverFilters || [];
-      discoverFilters = [];
-      if (backFromDiscover) pinnedFilters = [];
-    }
 
     // Update query from search bar
     discoverPendingUpdates.removeAll();
-    discoverPendingUpdates.addItem($state.query, [
-      ...(inheritedFilters || []),
-      ...queryFilter.getFilters()
-    ]);
+    discoverPendingUpdates.addItem($state.query, queryFilter.getFilters());
     $rootScope.$broadcast('updateVis');
-    inheritedFilters = false;
     timefilter.setTime(dateRange);
     if (query && typeof query === 'object') $state.query = query;
     $scope.fetch();
@@ -966,9 +939,7 @@ function discoverController(
 
   const updateStateFromSavedQuery = savedQuery => {
     $state.query = savedQuery.attributes.query;
-    queryFilter.setFilters(savedQuery.attributes.filters || []).then(() => {
-      lastFilters = queryFilter.getFilters();
-    });
+    queryFilter.setFilters(savedQuery.attributes.filters || []);
 
     if (savedQuery.attributes.timefilter) {
       timefilter.setTime({
@@ -1179,105 +1150,56 @@ function discoverController(
       });
     } else {
       $state.filters = localChange ? $state.filters : [];
-      const pFilters =
-        [...(pinnedFilters || []), globalState.filters || []] || [];
-      if (pFilters.length) {
-        await queryFilter.addFilters(pFilters);
+      if (($scope.pinnedFilters || []).length) {
+        await queryFilter.addFilters($scope.pinnedFilters);
       }
-      const currentFilters = queryFilter.getFilters();
-      const pinnedAgentIDs = currentFilters.filter(
-        item =>
-          ((item || {}).meta || {}).key === 'agent.id' &&
-          ((item || {}).$state || {}).store === 'globalState'
-      );
-
-      const implicitAgentIDs = wzCurrentFilters.filter(
-        item =>
-          ((typeof item || {}).meta || {}).removable !== 'undefined' &&
-          !((item || {}).meta || {}).removable &&
-          ((item || {}).meta || {}).key === 'agent.id'
-      );
-
-      if (pinnedAgentIDs.length && implicitAgentIDs.length) {
-        for (const filter of pinnedAgentIDs) {
-          await queryFilter.removeFilter(filter);
-          pinnedFilters = getPinnedFilters();
-        }
-      }
-
-      initialFilters = lastFilters = wzCurrentFilters;
 
       queryFilter
         .addFilters(wzCurrentFilters)
-        .then(() => lastFilters = queryFilter.getFilters())
+        .then(() => {})
         .catch(error => console.log(error.message || error)); // eslint-disable-line
     }
   };
 
-  /**
-   * Return a list of pinned filters from a given array of filters or
-   * from the queryFilter service if no array is given.
-   * @param {*} arr Optional. Array of filters to be used instead of getFilters()
-   */
-  const getPinnedFilters = arr => {
-    const currentFilters = arr || queryFilter.getFilters();
+  const getPinnedFilters = () => {
+    const currentFilters = queryFilter.getFilters();
     if (currentFilters) {
-      const pinnedFilters = currentFilters.filter(
+      return currentFilters.filter(
         item => ((item || {}).$state || {}).store === 'globalState'
       );
-      return pinnedFilters;
     }
   };
 
   $rootScope.$on('wzEventFilters', (evt, parameters) => {
-    $rootScope.resultState = fetchStatuses.LOADING;
-    if (!parameters.localChange) {
-      if (!(pinnedFilters || []).length) {
-        pinnedFilters = getPinnedFilters();
-      }
-      queryFilter.removeAll();
-    }
     loadFilters(parameters.filters, parameters.localChange);
   });
 
   $scope.tabView = $location.search().tabView || 'panels';
   $rootScope.$on('changeTabView', async (evt, parameters) => {
-    $rootScope.resultState = fetchStatuses.LOADING;
-    pinnedFilters = getPinnedFilters();
+    $scope.pinnedFilters = getPinnedFilters();
     const goToDiscover = parameters.tabView === 'discover';
     const wasOnDiscover = $scope.tabView === 'discover';
     const backDiscover = !goToDiscover && wasOnDiscover;
-    backFromDiscover = backDiscover;
-
-    // Store last tab we visited
-    const sameTab = lastTab === parameters.tab;
-    lastTab = parameters.tab;
-
-    if (!sameTab) {
-      await queryFilter.removeAll();
+    if (
+      (parameters.tabView !== 'discover' && !backDiscover) ||
+      parameters.tab !== $scope.tab
+    ) {
+      queryFilter.removeAll();
     } else {
-      discoverFilters = queryFilter.getFilters();
+      $scope.resultState = 'loading';
+      $scope.updateQueryAndFetch({
+        query: $state.query
+      });
+      $scope.fetch();
     }
-
-    // Prevent multiple executions
-    evt.stopPropagation();
-
-    // Assign the incoming value for tabView
     $scope.tabView = parameters.tabView || 'panels';
+    $scope.tab = parameters.tab;
 
-    // Ensure tabView is always up-to-date.
-    $scope.$applyAsync();
-
-    // Wazuh. Force to retrieve "hits".
-    // Before this version, we already had the hits, with the latest optimization
-    // they are only retrieved if needed (Discover table).
-    $scope.updateQueryAndFetch($state.query);
-
-    if (goToDiscover) {
-      setTimeout(() => {
-        $scope.fetch();
-      }, 100);
+    evt.stopPropagation();
+    if ($scope.tabView === 'discover') {
+      $scope.fetch();
     }
+    $scope.$applyAsync();
   });
   ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
