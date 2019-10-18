@@ -1,3 +1,5 @@
+import { objectify } from "tslint/lib/utils";
+
 /*
  * Wazuh app - React component for registering agents.
  * Copyright (C) 2015-2019 Wazuh, Inc.
@@ -30,6 +32,8 @@ const rulesetReducers = (state = initialState, action) => {
       return Object.assign({}, state, { isLoading: action.status });
     case 'UPDATE_ITEMS':
       return Object.assign({}, state, { items: action.items });
+    case 'UPDATE_FILE_CONTENT':
+      return Object.assign({}, state, {fileContent: action.content});
     case 'TOGGLE_SHOW_FILES':
       return Object.assign({}, state, { showingFiles: action.status });
     case 'RESET':

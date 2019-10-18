@@ -20,24 +20,35 @@ export default class WzRuleset extends Component {
   constructor(props) {
     super(props);
     this.state = {}; //Init state empty to avoid fails when try to read any parameter and this.state is not defined yet
+    this.store = store;
   }
 
   UNSAFE_componentWillMount() {
-    store.subscribe(() => {
-      const state = store.getState().rulesetReducers;
+    this.store.subscribe(() => {
+      const state = this.store.getState().rulesetReducers;
       this.setState(state);
     });
   }
 
+  componentWillUnmount() {
+    // When the component is going to be unmounted the ruleset state is reset
+    const { ruleInfo, decoderInfo, listInfo, fileContent } = this.state;
+    if (!ruleInfo && !decoderInfo && !listInfo && !fileContent) this.store.dispatch({type: 'RESET'});
+  }  
+
 
   render() {
     const showRulesetOverview = (!this.state.ruleInfo && !this.state.decoderInfo && !this.state.listInfo && !this.state.fileContent);
+    const fileContent = this.state.fileContent;
+
     return (
       <WzReduxProvider>
         {showRulesetOverview && (
           <WzRulesetOverview />
+        ) || fileContent && (
+          <div>{fileContent}</div>
         ) || (
-          <div>NO OVERVIEW</div>
+          <div>INFO ABOUT RULES, DECODERS OR LISTS</div>
         )}
       </WzReduxProvider>
     )

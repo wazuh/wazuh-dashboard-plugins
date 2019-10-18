@@ -19,7 +19,6 @@ import {
   updateRulesetSection,
   updateLoadingStatus,
   updateItems,
-  resetRuleset,
   toggleShowFiles
 } from '../../../../redux/actions/rulesetActions';
 
@@ -49,12 +48,6 @@ class WzSectionSelector extends Component {
   componentDidMount() {
     // Fetch the data in the first mount
     this.fetchData(this.props.state.section);
-  }
-
-  componentWillUnmount() {
-    // When the component is going to be unmounted the ruleset state is reset
-    const { ruleInfo, decoderInfo, listInfo, fileContent } = this.props.state;
-    if (!ruleInfo && !decoderInfo && !listInfo && !fileContent) this.props.resetRuleset();
   }
 
   /**
@@ -107,7 +100,6 @@ const mapDispatchToProps = (dispatch) => {
     changeSection: section => dispatch(updateRulesetSection(section)),
     updateLoadingStatus: status => dispatch(updateLoadingStatus(status)),
     updateItems: items => dispatch(updateItems(items)),
-    resetRuleset: () => dispatch(resetRuleset()),
     toggleShowFiles: status => dispatch(toggleShowFiles(status))
   }
 };

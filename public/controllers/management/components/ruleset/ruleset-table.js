@@ -16,6 +16,11 @@ import {
 
 import { connect } from 'react-redux';
 
+import {
+  updateLoadingStatus,
+  updateFileContent
+} from '../../../../redux/actions/rulesetActions';
+
 import RulesetColums from './utils/columns';
 
 class WzRulesetTable extends Component {
@@ -48,4 +53,12 @@ const mapStateToProps = (state) => {
   };
 };
 
-export default connect(mapStateToProps)(WzRulesetTable);
+const mapDispatchToProps = (dispatch) => {
+  return {
+    updateLoadingStatus: status => dispatch(updateLoadingStatus(status)),
+    updateFileContent: content => dispatch(updateFileContent(content))
+  }
+};
+
+
+export default connect(mapStateToProps, mapDispatchToProps)(WzRulesetTable);

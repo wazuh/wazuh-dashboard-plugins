@@ -33,6 +33,17 @@ export const updateItems = (items) => {
 }
 
 /**
+ * Update the files content
+ * @param {String} content 
+ */
+export const updateFileContent = (content) => {
+  return {
+    type: 'UPDATE_FILE_CONTENT',
+    content: content
+  }
+}
+
+/**
  * Update the loading status
  * @param {Boolean} loading 
  */

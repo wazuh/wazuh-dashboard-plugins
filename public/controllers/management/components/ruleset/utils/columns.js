@@ -89,7 +89,8 @@ export default class RulesetColumns {
               <EuiToolTip position="top" content={`Show ${item} content`}>
                 <EuiLink onClick={async () => {
                   const result = await this.RulesetHandler.getRuleContent(item);
-                  console.log(result)
+                  this.tableProps.updateFileContent(result);
+                  //console.log(result)
                 }
                 }>
                   {item}
@@ -147,7 +148,8 @@ export default class RulesetColumns {
               <EuiToolTip position="top" content={`Show ${item} content`}>
                 <EuiLink onClick={async () => {
                   const result = await this.RulesetHandler.getDecoderContent(item);
-                  console.log(result)
+                  this.tableProps.updateFileContent(result);
+                  //console.log(result)
                 }
                 }>{item}</EuiLink>
               </EuiToolTip>
@@ -171,9 +173,9 @@ export default class RulesetColumns {
               <EuiToolTip position="top" content={`Show ${item.name} content`}>
                 <EuiLink onClick={async () => {
                   const result = await this.RulesetHandler.getCdbList(`${item.path}/${item.name}`);
-                  console.log(result)
-                  //this.tableProps.resetRuleset();
-                  console.log('props exe')
+                  //console.log(result)
+                  //this.tableProps.updateLoadingStatus(!this.tableProps.state.isLoading);
+                  //console.log('props exe')
                 }
                 }>
                   {item.name}

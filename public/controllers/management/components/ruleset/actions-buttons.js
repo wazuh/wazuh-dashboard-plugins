@@ -19,10 +19,9 @@ import {
 
 import { connect } from 'react-redux';
 
-import { toggleShowFiles } from '../../../../redux/actions/rulesetActions';
-
 import {
   updateItems,
+  toggleShowFiles,
   updateLoadingStatus
 } from '../../../../redux/actions/rulesetActions';
 
