@@ -19,8 +19,6 @@
 // @ts-ignore
 import { isEqual } from 'lodash';
 // @ts-ignore
-import { getVisParams } from 'ui/visualize/loader/pipeline_helpers/build_pipeline';
-// @ts-ignore
 import { VisRequestHandlersRegistryProvider as RequestHandlersProvider } from 'ui/registry/vis_request_handlers';
 // @ts-ignore
 import { VisResponseHandlersRegistryProvider as ResponseHandlerProvider } from 'ui/registry/vis_response_handlers';
@@ -37,7 +35,10 @@ import {
   // @ts-ignore
 } from 'ui/vis';
 
-import { VisResponseData } from 'ui/visualize/loader';
+import { VisResponseData } from './types';
+// @ts-ignore
+import { getVisParams } from 'ui/visualize/loader/pipeline_helpers/build_pipeline';
+
 
 function getHandler<T extends RequestHandler | ResponseHandler>(
   from: Array<{ name: string; handler: T }>,
@@ -52,6 +53,7 @@ function getHandler<T extends RequestHandler | ResponseHandler>(
   }
   return handlerDesc.handler;
 }
+
 
 export class VisualizeDataLoader {
   private requestHandler: RequestHandler;
@@ -107,19 +109,6 @@ export class VisualizeDataLoader {
       this.visData = await Promise.resolve(
         this.responseHandler(requestHandlerResponse, visParams.dimensions)
       );
-    }
-
-    const valueAxes = (visParams || {}).valueAxes || false;
-    const hasSeries = ((this.visData || {}).series || []).length;
-    if (valueAxes && hasSeries) {
-      if (visParams.type !== 'area') {
-        visParams.valueAxes.forEach((axis: { scale: { max: number; }; }, idx: string | number) => {
-          const maxValue = Math.max.apply(Math, this.visData.series[idx].values.map((x: { y: any; }) => { return x.y; }));
-          const lengthMaxValue = maxValue.toString().length;
-          const addTo = parseInt('1' + '0'.repeat(lengthMaxValue - 1));
-          axis.scale.max = maxValue + (addTo / 2);
-        });
-      }
     }
 
     return {
