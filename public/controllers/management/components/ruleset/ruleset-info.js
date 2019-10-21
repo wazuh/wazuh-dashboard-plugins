@@ -9,10 +9,13 @@ import {
   EuiTitle,
   EuiToolTip,
   EuiText,
-  EuiSpacer
+  EuiSpacer,
+  EuiInMemoryTable
 } from '@elastic/eui';
 
 import { connect } from 'react-redux';
+
+import RulesetColums from './utils/columns';
 
 class WzRulesetInfo extends Component {
   constructor(props) {
@@ -24,6 +27,7 @@ class WzRulesetInfo extends Component {
       hipaa: 'HIPAA',
       'nist-800-53': 'NIST-800-53'
     }
+    this.columns = new RulesetColums(this.props);
   }
 
   /**
@@ -123,74 +127,101 @@ class WzRulesetInfo extends Component {
     const currentRuleInfo = currentRuleArr[0];
     const { description, details, file, path, level, id, groups } = currentRuleInfo;
     const compliance = this.buildCompliance(currentRuleInfo);
+    const columns = this.columns.columns.rulesInfo;
+
 
     return (
       <EuiPage style={{ background: 'transparent' }}>
-        <EuiPanel>
-          {/* Rule description name */}
-          <EuiFlexGroup>
-            <EuiFlexItem grow={false}>
-              <EuiTitle>
-                <h2>
-                  <EuiToolTip position="right" content="Back to rules">
-                    <EuiButtonIcon aria-label="Back" color="subdued" iconSize="l" iconType="arrowLeft" onClick={() => console.log('GO BACK')} />
-                  </EuiToolTip>
-                  {description}
-                </h2>
-              </EuiTitle>
-            </EuiFlexItem>
-          </EuiFlexGroup>
-
-          {/* Cards */}
-          <EuiFlexGroup>
-            {/* General info */}
-            <EuiFlexItem>
-              <EuiPanel paddingSize="s">
-                <EuiText color="subdued">Information</EuiText>
-                <EuiSpacer size="xs" className="subdued-background" />
-                <EuiSpacer size="s" />
-                {this.renderInfo(id, level, file, path)}
-              </EuiPanel>
-            </EuiFlexItem>
-            {/* Details */}
-            <EuiFlexItem>
-              <EuiPanel paddingSize="s">
-                <EuiText color="subdued">Details</EuiText>
-                <EuiSpacer size="xs" className="subdued-background" />
-                <EuiSpacer size="s" />
-                {this.renderDetails(details)}
-              </EuiPanel>
-            </EuiFlexItem>
-            {/* Groups */}
-            <EuiFlexItem>
-              <EuiPanel paddingSize="s">
-                <EuiText color="subdued">Groups</EuiText>
-                <EuiSpacer size="xs" className="subdued-background" />
-                <EuiSpacer size="s" />
-                {this.renderGroups(groups)}
-              </EuiPanel>
-            </EuiFlexItem>
-            {/* Compliance */}
-            {Object.keys(compliance).length > 0 && (
+        <EuiFlexGroup>
+          <EuiFlexItem>
+            {/* Rule description name */}
+            <EuiFlexGroup>
+              <EuiFlexItem grow={false}>
+                <EuiTitle>
+                  <h2>
+                    <EuiToolTip position="right" content="Back to rules">
+                      <EuiButtonIcon aria-label="Back" color="subdued" iconSize="l" iconType="arrowLeft" onClick={() => console.log('GO BACK')} />
+                    </EuiToolTip>
+                    {description}
+                  </h2>
+                </EuiTitle>
+              </EuiFlexItem>
+            </EuiFlexGroup>
+            <EuiSpacer size="m" />
+            {/* Cards */}
+            <EuiFlexGroup>
+              {/* General info */}
               <EuiFlexItem>
                 <EuiPanel paddingSize="s">
-                  <EuiText color="subdued">Compliance</EuiText>
+                  <EuiText color="subdued">Information</EuiText>
                   <EuiSpacer size="xs" className="subdued-background" />
                   <EuiSpacer size="s" />
-                  {this.renderCompliance(compliance)}
+                  {this.renderInfo(id, level, file, path)}
                 </EuiPanel>
               </EuiFlexItem>
-            )}
-          </EuiFlexGroup>
+              {/* Details */}
+              <EuiFlexItem>
+                <EuiPanel paddingSize="s">
+                  <EuiText color="subdued">Details</EuiText>
+                  <EuiSpacer size="xs" className="subdued-background" />
+                  <EuiSpacer size="s" />
+                  {this.renderDetails(details)}
+                </EuiPanel>
+              </EuiFlexItem>
+              {/* Groups */}
+              <EuiFlexItem>
+                <EuiPanel paddingSize="s">
+                  <EuiText color="subdued">Groups</EuiText>
+                  <EuiSpacer size="xs" className="subdued-background" />
+                  <EuiSpacer size="s" />
+                  {this.renderGroups(groups)}
+                </EuiPanel>
+              </EuiFlexItem>
+              {/* Compliance */}
+              {Object.keys(compliance).length > 0 && (
+                <EuiFlexItem>
+                  <EuiPanel paddingSize="s">
+                    <EuiText color="subdued">Compliance</EuiText>
+                    <EuiSpacer size="xs" className="subdued-background" />
+                    <EuiSpacer size="s" />
+                    {this.renderCompliance(compliance)}
+                  </EuiPanel>
+                </EuiFlexItem>
+              )}
+            </EuiFlexGroup>
 
-
-          {/* Table */}
-          <EuiFlexGroup>
-            <EuiFlexItem>
-              {/* <WzRulesetTable wzReq={(method, path, options) => this.props.wzReq(method, path, options)} /> */}
-            </EuiFlexItem>
-          </EuiFlexGroup>
-        </EuiPanel>
+            {/* Table */}
+            <EuiSpacer size="l" />
+            <EuiPanel paddingSize="m">
+              <EuiFlexGroup>
+                <EuiFlexItem>
+                  <EuiFlexGroup>
+                    <EuiFlexItem>
+                      <EuiTitle size="s">
+                        <h5>
+                          Related rules
+                      </h5>
+                      </EuiTitle>
+                    </EuiFlexItem>
+                  </EuiFlexGroup>
+                  <EuiSpacer size="m" />
+                  <EuiFlexGroup>
+                    <EuiFlexItem>
+                      <EuiInMemoryTable
+                        itemId="id"
+                        items={rules}
+                        columns={columns}
+                        pagination={true}
+                        sorting={true}
+                        message={false}
+                      />
+                    </EuiFlexItem>
+                  </EuiFlexGroup>
+                </EuiFlexItem>
+              </EuiFlexGroup>
+            </EuiPanel>
+          </EuiFlexItem>
+        </EuiFlexGroup>
       </EuiPage>
     );
   }

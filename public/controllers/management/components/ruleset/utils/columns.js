@@ -246,7 +246,98 @@ export default class RulesetColumns {
             )
           }
         }
-      ]
+      ],
+      rulesInfo: [
+        {
+          name: 'ID',
+          align: 'left',
+          sortable: true,
+          width: '5%',
+          render: item => {
+            return (
+              <EuiToolTip position="top" content={`Show rule ID ${item.id} information`}>
+                <EuiLink onClick={async () => {
+                  const result = await this.RulesetHandler.getRuleInformation(item.file, item.id);
+                  this.tableProps.updateRuleInfo(result);
+                }
+                }>
+                  {item.id}
+                </EuiLink>
+              </EuiToolTip>
+            )
+          }
+        },
+            {
+          field: 'file',
+          name: 'File',
+          align: 'left',
+          sortable: true,
+          width: '15%',
+          render: item => {
+            return (
+              <EuiToolTip position="top" content={`Show ${item} content`}>
+                <EuiLink onClick={async () => {
+                  const result = await this.RulesetHandler.getRuleContent(item);
+                  this.tableProps.updateFileContent(result);
+                  //console.log(result)
+                }
+                }>
+                  {item}
+                </EuiLink>
+              </EuiToolTip>
+            )
+          }
+        },
+        {
+          field: 'description',
+          name: 'Description',
+          align: 'left',
+          sortable: true,
+          width: '30%'
+        },
+        {
+          field: 'groups',
+          name: 'Groups',
+          align: 'left',
+          sortable: true,
+          width: '10%'
+        },
+        {
+          field: 'pci',
+          name: 'PCI',
+          align: 'left',
+          sortable: true,
+          width: '10%'
+        },
+        {
+          field: 'gdpr',
+          name: 'GDPR',
+          align: 'left',
+          sortable: true,
+          width: '10%'
+        },
+        {
+          field: 'hipaa',
+          name: 'HIPAA',
+          align: 'left',
+          sortable: true,
+          width: '10%'
+        },
+        {
+          field: 'nist-800-53',
+          name: 'NIST 800-53',
+          align: 'left',
+          sortable: true,
+          width: '10%'
+        },
+        {
+          field: 'level',
+          name: 'Level',
+          align: 'left',
+          sortable: true,
+          width: '5%'
+        }
+      ],
     }
   }
 }
