@@ -904,7 +904,8 @@ export const knownFields = [
     readFromDocValues: true
   },
   {
-    name: 'data.aws.resource.instanceDetails.networkInterfaces.privateIpAddress',
+    name:
+      'data.aws.resource.instanceDetails.networkInterfaces.privateIpAddress',
     type: 'ip',
     count: 0,
     scripted: false,
@@ -994,7 +995,8 @@ export const knownFields = [
     readFromDocValues: true
   },
   {
-    name: 'data.aws.service.action.networkConnectionAction.remoteIpDetails.geoLocation',
+    name:
+      'data.aws.service.action.networkConnectionAction.remoteIpDetails.geoLocation',
     type: 'geo_point',
     count: 0,
     scripted: false,
@@ -1003,7 +1005,8 @@ export const knownFields = [
     readFromDocValues: true
   },
   {
-    name: 'data.aws.service.action.networkConnectionAction.remoteIpDetails.ipAddressV4',
+    name:
+      'data.aws.service.action.networkConnectionAction.remoteIpDetails.ipAddressV4',
     type: 'ip',
     count: 0,
     scripted: false,
@@ -3729,4 +3732,4 @@ export const knownFields = [
     aggregatable: true,
     readFromDocValues: true
   }
-]
+];

@@ -165,21 +165,21 @@ hosts:
                         </EuiToolTip>
                       </span>
                     ) : (
-                          <span>
-                            <EuiHealth color="danger">Offline</EuiHealth>
-                            <EuiToolTip position="top" content={item.downReason}>
-                              <EuiButtonIcon
-                                color="primary"
-                                style={{ marginTop: '-12px' }}
-                                iconType="questionInCircle"
-                                aria-label="Info about the error"
-                                onClick={() =>
-                                  this.props.copyToClipBoard(item.downReason)
-                                }
-                              />
-                            </EuiToolTip>
-                          </span>
-                        );
+                      <span>
+                        <EuiHealth color="danger">Offline</EuiHealth>
+                        <EuiToolTip position="top" content={item.downReason}>
+                          <EuiButtonIcon
+                            color="primary"
+                            style={{ marginTop: '-12px' }}
+                            iconType="questionInCircle"
+                            aria-label="Info about the error"
+                            onClick={() =>
+                              this.props.copyToClipBoard(item.downReason)
+                            }
+                          />
+                        </EuiToolTip>
+                      </span>
+                    );
                   } else {
                     return (
                       <span>
@@ -193,12 +193,12 @@ hosts:
             ]}
           />
         )) || (
-            <EuiCallOut
-              color="danger"
-              iconType="cross"
-              title={this.state.error}
-            />
-          )}
+          <EuiCallOut
+            color="danger"
+            iconType="cross"
+            title={this.state.error}
+          />
+        )}
       </div>
     );
 
