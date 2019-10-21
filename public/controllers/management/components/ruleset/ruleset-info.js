@@ -124,7 +124,6 @@ class WzRulesetInfo extends Component {
     const { description, details, file, path, level, id, groups } = currentRuleInfo;
     const compliance = this.buildCompliance(currentRuleInfo);
 
-
     return (
       <EuiPage style={{ background: 'transparent' }}>
         <EuiPanel>
@@ -172,14 +171,16 @@ class WzRulesetInfo extends Component {
               </EuiPanel>
             </EuiFlexItem>
             {/* Compliance */}
-            <EuiFlexItem>
-              <EuiPanel paddingSize="s">
-                <EuiText color="subdued">Compliance</EuiText>
-                <EuiSpacer size="xs" className="subdued-background" />
-                <EuiSpacer size="s" />
-                {this.renderCompliance(compliance)}
-              </EuiPanel>
-            </EuiFlexItem>
+            {Object.keys(compliance).length > 0 && (
+              <EuiFlexItem>
+                <EuiPanel paddingSize="s">
+                  <EuiText color="subdued">Compliance</EuiText>
+                  <EuiSpacer size="xs" className="subdued-background" />
+                  <EuiSpacer size="s" />
+                  {this.renderCompliance(compliance)}
+                </EuiPanel>
+              </EuiFlexItem>
+            )}
           </EuiFlexGroup>
 
 
