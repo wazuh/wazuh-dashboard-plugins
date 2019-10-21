@@ -27,7 +27,8 @@ import {
   EuiCallOut,
   EuiLoadingSpinner,
   EuiToolTip,
-  EuiButtonIcon
+  EuiButtonIcon,
+  EuiPanel
 } from '@elastic/eui';
 
 export class ApiIsDown extends Component {
@@ -103,8 +104,7 @@ export class ApiIsDown extends Component {
   }
 
   render() {
-    const apiExample = `
-# Example Wazuh API configuration
+    const apiExample = `# Example Wazuh API configuration
 hosts:
     - production:
         url: http://172.16.1.2
@@ -239,12 +239,14 @@ hosts:
     return (
       <EuiFlexGroup>
         <EuiFlexItem />
-        <EuiFlexItem>
-          <EuiText>
-            <h2>Wazuh API seems to be down</h2>
-          </EuiText>
-          <EuiSpacer />
-          <EuiSteps firstStepNumber={1} steps={steps} />
+        <EuiFlexItem className="min-guide-width">
+          <EuiPanel>
+            <EuiText>
+              <h2>Wazuh API seems to be down</h2>
+            </EuiText>
+            <EuiSpacer />
+            <EuiSteps firstStepNumber={1} steps={steps} />
+          </EuiPanel>
         </EuiFlexItem>
         <EuiFlexItem />
       </EuiFlexGroup>

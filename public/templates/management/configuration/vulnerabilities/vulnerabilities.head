@@ -13,7 +13,7 @@
 
     <!-- Vulnerabilities navigation bar -->
     <div ng-if="configurationTabsProps" class="md-padding wz-padding-top-0"
-        ng-init="buildProps([{id:'vulnerabilities-general', name: 'General'}, {id: 'vulnerabilities-feeds', name: 'Feeds'}])">
+        ng-init="buildProps([{id:'vulnerabilities-general', name: 'General'}, {id: 'vulnerabilities-feeds', name: 'Providers'}])">
         <react-component name="Tabs" props="configurationTabsProps" />
     </div>
     <!-- End Vulnerabilities navigation bar -->

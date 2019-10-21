@@ -12,7 +12,15 @@
  */
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { EuiBasicTable, EuiButtonIcon } from '@elastic/eui';
+import {
+  EuiFlexGroup,
+  EuiFlexItem,
+  EuiBasicTable,
+  EuiButtonIcon,
+  EuiPanel,
+  EuiTitle,
+  EuiText
+} from '@elastic/eui';
 
 export class ReportingTable extends Component {
   constructor(props) {
@@ -116,14 +124,32 @@ export class ReportingTable extends Component {
     };
 
     return (
-      <div>
-        <EuiBasicTable
-          items={pageOfItems}
-          columns={columns}
-          pagination={pagination}
-          onChange={obj => this.onTableChange(obj)}
-        />
-      </div>
+      <EuiPanel>
+        <EuiFlexGroup>
+          <EuiFlexItem>
+            <EuiTitle>
+              <h2>Reporting</h2>
+            </EuiTitle>
+          </EuiFlexItem>
+        </EuiFlexGroup>
+        <EuiFlexGroup>
+          <EuiFlexItem>
+            <EuiText color="subdued" style={{ paddingBottom: '15px' }}>
+              From here you can check all your reports.
+            </EuiText>
+          </EuiFlexItem>
+        </EuiFlexGroup>
+        <EuiFlexGroup>
+          <EuiFlexItem>
+            <EuiBasicTable
+              items={pageOfItems}
+              columns={columns}
+              pagination={pagination}
+              onChange={obj => this.onTableChange(obj)}
+            />
+          </EuiFlexItem>
+        </EuiFlexGroup>
+      </EuiPanel>
     );
   }
 }

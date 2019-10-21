@@ -12,7 +12,7 @@
 
 export const UnsupportedComponents = {
   linux: [],
-  windows: ['audit', 'oscap', 'vuls', 'docker'],
+  windows: ['audit', 'oscap', 'docker'],
   darwin: ['audit', 'oscap', 'vuls', 'docker'],
   other: ['audit', 'oscap', 'vuls', 'docker']
 };
