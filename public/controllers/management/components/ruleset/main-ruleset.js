@@ -15,6 +15,8 @@ import store from '../../../../redux/store';
 import WzReduxProvider from '../../../../redux/wz-redux-provider';
 //Wazuh ruleset tables(rules, decoder, lists)
 import WzRulesetOverview from './ruleset-overview';
+//Information about rule or decoder
+import WzRulesetInfo from './ruleset-info';
 
 export default class WzRuleset extends Component {
   constructor(props) {
@@ -49,7 +51,7 @@ export default class WzRuleset extends Component {
         ) || fileContent && (
           <div>{fileContent}</div>
         ) || (
-          <div>{JSON.stringify(info)}</div>
+          <WzRulesetInfo />
         )}
       </WzReduxProvider>
     )

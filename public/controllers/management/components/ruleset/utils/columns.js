@@ -19,7 +19,7 @@ export default class RulesetColumns {
             return (
               <EuiToolTip position="top" content={`Show rule ID ${item.id} information`}>
                 <EuiLink onClick={async () => {
-                  const result = await this.RulesetHandler.getRuleInformation(item.file);
+                  const result = await this.RulesetHandler.getRuleInformation(item.file, item.id);
                   this.tableProps.updateRuleInfo(result);
                 }
                 }>

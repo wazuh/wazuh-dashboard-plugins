@@ -17,13 +17,16 @@ export default class RulesetHandler {
   /**
    * Get the information about a rule
    * @param {String} file 
+   * @param {Number} id
    */
-  static async getRuleInformation(file) {
+  static async getRuleInformation(file, id) {
     try {
       const result = await WzRequest.apiReq('GET', `/rules`, {
         file
       });
-      return ((result || {}).data || {}).data || false;
+      const info = ((result || {}).data || {}).data || false;
+      if (info) Object.assign(info, { current: id }); //Assign the current rule ID to filter later in the component
+      return info;
     } catch (error) {
       return Promise.reject(error);
     }
