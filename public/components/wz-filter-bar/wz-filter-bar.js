@@ -22,7 +22,8 @@ export class WzFilterBar extends Component {
 
     this.state = {
       selectedOptions: [],
-      toggleIdSelected: 'AND'
+      toggleIdSelected: 'AND',
+      isProcessing: true,
     };
 
     this.toggleButtons = [
@@ -44,37 +45,41 @@ export class WzFilterBar extends Component {
     selectedOptions[option].type =
       selectedOptions[option].type === 'AND' ? 'OR' : 'AND';
     this.setState({
-      selectedOptions
+      selectedOptions,
+      isProcessing: true,
     });
   };
 
   componentDidUpdate() {
-    for (let i = 0; i < this.state.selectedOptions.length; i++) {
-      const el = $('.wzFilterBarOperator .euiBadge__content')[i];
-      const hasBtn = $(el).find('.wzFilterBarOperatorBtn');
-      if (hasBtn.length) {
-        $(hasBtn[0]).remove();
-      }
-      if (i !== 0) {
-        if (this.state.selectedOptions[i].type != 'search') {
-          const button = $(
-            `<button class="wzFilterBarOperatorBtn euiButtonEmpty euiButtonEmpty--primary euiButtonEmpty--xSmall"><b>${this.state.selectedOptions[i].type}<b></button>`
-          );
-          button[0].addEventListener('click', ev => {
-            this.onOperatorClick(ev, i);
-          });
-          $(el).prepend(button);
-        } else {
-          const button = $(
-            `<span class="wzFilterBarOperatorBtn"><b>AND<b></button>`
-          );
-          $(el).prepend(button);
+    if (this.state.isProcessing) {
+        for (let i = 0; i < this.state.selectedOptions.length; i++) {
+          const el = $('.wzFilterBarOperator .euiBadge__content')[i];
+        const hasBtn = $(el).find('.wzFilterBarOperatorBtn');
+        if (hasBtn.length) {
+          $(hasBtn[0]).remove();
+        }
+        if (i !== 0) {
+          if (this.state.selectedOptions[i].type != 'search') {
+            const button = $(
+              `<button class="wzFilterBarOperatorBtn euiButtonEmpty euiButtonEmpty--primary euiButtonEmpty--xSmall"><b>${this.state.selectedOptions[i].type}<b></button>`
+              );
+            button[0].addEventListener('click', ev => {
+              this.onOperatorClick(ev, i);
+            });
+            $(el).prepend(button);
+          } else {
+            const button = $(
+              `<span class="wzFilterBarOperatorBtn"><b>AND<b></button>`
+            );
+            $(el).prepend(button);
+          }
         }
       }
+      this.buildQuery();
+      this.setState({isProcessing: false });
     }
-    this.buildQuery();
   }
-
+  
   onChange = selectedOptions => {
     const last = selectedOptions.findIndex(x => {
       return !x.type;
@@ -125,7 +130,8 @@ export class WzFilterBar extends Component {
 
     this.options = model;
     this.setState({
-      selectedOptions
+      selectedOptions,
+      isProcessing: true,
     });
   };
 
@@ -166,6 +172,8 @@ export class WzFilterBar extends Component {
         }
       }
     );
+
+    this.setState({ isProcessing: true });
   };
 
   buildQuery = () => {
