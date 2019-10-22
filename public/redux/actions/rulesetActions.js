@@ -87,3 +87,15 @@ export const updateDecoderInfo = (info) => {
     info: info
   }  
 }
+
+export const cleanInfo = () => {
+  return {
+    type: 'CLEAN_INFO'
+  }
+}
+
+export const cleanFileContent = () => {
+  return {
+    type: 'CLEAN_CONTENT'
+  }
+}

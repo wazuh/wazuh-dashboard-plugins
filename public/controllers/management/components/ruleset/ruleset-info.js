@@ -16,12 +16,13 @@ import {
 
 import { connect } from 'react-redux';
 
-import RulesetColums from './utils/columns';
 import RulesetHandler from './utils/ruleset-handler';
 
 
 import {
-  updateFileContent
+  updateFileContent, 
+  cleanFileContent,
+  cleanInfo
 } from '../../../../redux/actions/rulesetActions';
 
 class WzRulesetInfo extends Component {
@@ -34,7 +35,7 @@ class WzRulesetInfo extends Component {
       hipaa: 'HIPAA',
       'nist-800-53': 'NIST-800-53'
     }
-    //this.columns = new RulesetColums({ updateFileContent: this.props.updateFileContent, changeBetweenRules: this.changeBetweenRules, setState: this.setState });
+
     this.rulesetHandler = RulesetHandler;
     this.columns = [
       {
@@ -216,7 +217,7 @@ class WzRulesetInfo extends Component {
       const key = keys[i];
       listCompliance.push(
         <Fragment>
-          <li key={`id-${key}`}><b>{key}</b></li>
+          <li key={`id-${key}`}><b>{this.complianceEquivalences[key]}</b></li>
           <EuiSpacer size="s" />
         </Fragment>
       )
@@ -270,7 +271,7 @@ class WzRulesetInfo extends Component {
                         color="subdued"
                         iconSize="l"
                         iconType="arrowLeft"
-                        onClick={() => console.log('GO BACK')} />
+                        onClick={() => this.props.cleanInfo()} />
                     </EuiToolTip>
                     {description}
                   </h2>
@@ -366,7 +367,9 @@ const mapStateToProps = (state) => {
 
 const mapDispatchToProps = (dispatch) => {
   return {
-    updateFileContent: content => dispatch(updateFileContent(content))
+    updateFileContent: content => dispatch(updateFileContent(content)),
+    cleanFileContent: () => dispatch(cleanFileContent()),
+    cleanInfo: () => dispatch(cleanInfo())
   }
 };
 

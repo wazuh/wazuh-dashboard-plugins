@@ -35,9 +35,13 @@ const rulesetReducers = (state = initialState, action) => {
     case 'UPDATE_DECODER_INFO':
       return Object.assign({}, state, { decoderInfo: action.info, ruleInfo: false, listInfo: false });
     case 'UPDATE_FILE_CONTENT':
-      return Object.assign({}, state, {fileContent: action.content});
+      return Object.assign({}, state, { fileContent: action.content });
     case 'TOGGLE_SHOW_FILES':
       return Object.assign({}, state, { showingFiles: action.status });
+    case 'CLEAN_INFO':
+      return Object.assign({}, state, { decoderInfo: false, ruleInfo: false, listInfo: false });
+    case 'CLEAN_CONTENT':
+      return Object.assign({}, state, { fileContent: false });
     case 'RESET':
       return initialState;
     default:

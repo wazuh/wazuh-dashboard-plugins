@@ -6,8 +6,7 @@ import {
   EuiPanel,
   EuiPage,
   EuiText,
-  EuiTitle,
-  EuiSearchBar
+  EuiTitle
 } from '@elastic/eui';
 
 import { connect } from 'react-redux';
@@ -16,6 +15,7 @@ import { connect } from 'react-redux';
 import WzSectionSelector from './section-selector';
 import WzRulesetTable from './ruleset-table';
 import WzRulesetActionButtons from './actions-buttons';
+import { WzFilterBar } from '../../../../components/wz-filter-bar/wz-filter-bar';
 
 class WzRulesetOverview extends Component {
   constructor(props) {
@@ -25,19 +25,35 @@ class WzRulesetOverview extends Component {
       decoders: 'Decoders',
       lists: 'CDB lists'
     }
+    this.model = [
+      {
+        label: 'Level',
+        options: [
+          {
+            label: '0',
+            group: 'level'
+          },
+          {
+            label: '1',
+            group: 'level'
+          },
+          {
+            label: '2',
+            group: 'level'
+          }
+        ]
+      },
+    ];
+  }
+
+
+  clickActionFilterBar(obj) {
+    console.log('clicking ', obj)
   }
 
   render() {
     const { section } = this.props.state;
-    // Search bar
-    const searchBar = (
-      <EuiSearchBar
-        box={{
-          placeholder: `Filter ${section}...`
-        }}
-        onChange={() => { console.log('changing') }}
-      />
-    );
+
     return (
       <EuiPage style={{ background: 'transparent' }}>
         <EuiPanel>
@@ -65,7 +81,10 @@ class WzRulesetOverview extends Component {
           {/* Search bar and section selector*/}
           <EuiFlexGroup>
             <EuiFlexItem>
-              {searchBar}
+              <WzFilterBar
+                model={this.model}
+                clickAction={(obj) => this.clickActionFilterBar(obj)}
+              />
             </EuiFlexItem>
             <EuiFlexItem grow={false}>
               {/* Selector */}
