@@ -7,7 +7,7 @@ export default class RulesetColumns {
   
   constructor(tableProps) {
     this.tableProps = tableProps;
-    this.RulesetHandler = RulesetHandler;
+    this.rulesetHandler = RulesetHandler;
     this.columns = {
       rules: [
         {
@@ -19,7 +19,7 @@ export default class RulesetColumns {
             return (
               <EuiToolTip position="top" content={`Show rule ID ${item.id} information`}>
                 <EuiLink onClick={async () => {
-                  const result = await this.RulesetHandler.getRuleInformation(item.file, item.id);
+                  const result = await this.rulesetHandler.getRuleInformation(item.file, item.id);
                   this.tableProps.updateRuleInfo(result);
                 }
                 }>
@@ -88,9 +88,8 @@ export default class RulesetColumns {
             return (
               <EuiToolTip position="top" content={`Show ${item} content`}>
                 <EuiLink onClick={async () => {
-                  const result = await this.RulesetHandler.getRuleContent(item);
+                  const result = await this.rulesetHandler.getRuleContent(item);
                   this.tableProps.updateFileContent(result);
-                  //console.log(result)
                 }
                 }>
                   {item}
@@ -116,7 +115,7 @@ export default class RulesetColumns {
             return (
               <EuiToolTip position="top" content={`Show ${item.name} decoder information`}>
                 <EuiLink onClick={async () => {
-                  const result = await this.RulesetHandler.getDecoderInformation(item.file);
+                  const result = await this.rulesetHandler.getDecoderInformation(item.file);
                   this.tableProps.updateDecoderInfo(result);
                 }
                 }>
@@ -147,9 +146,8 @@ export default class RulesetColumns {
             return (
               <EuiToolTip position="top" content={`Show ${item} content`}>
                 <EuiLink onClick={async () => {
-                  const result = await this.RulesetHandler.getDecoderContent(item);
+                  const result = await this.rulesetHandler.getDecoderContent(item);
                   this.tableProps.updateFileContent(result);
-                  //console.log(result)
                 }
                 }>{item}</EuiLink>
               </EuiToolTip>
@@ -172,7 +170,7 @@ export default class RulesetColumns {
             return (
               <EuiToolTip position="top" content={`Show ${item.name} content`}>
                 <EuiLink onClick={async () => {
-                  const result = await this.RulesetHandler.getCdbList(`${item.path}/${item.name}`);
+                  const result = await this.rulesetHandler.getCdbList(`${item.path}/${item.name}`);
                   console.log(result)
                 }
                 }>
@@ -226,7 +224,7 @@ export default class RulesetColumns {
                     aria-label="Show content"
                     iconType="eye"
                     onClick={async () => {
-                      const result = await this.RulesetHandler.getFileContent(`${item.path}/${item.file}`);
+                      const result = await this.rulesetHandler.getFileContent(`${item.path}/${item.file}`);
                       console.log(result)
                     }}
                     color="primary"
@@ -257,8 +255,7 @@ export default class RulesetColumns {
             return (
               <EuiToolTip position="top" content={`Show rule ID ${item.id} information`}>
                 <EuiLink onClick={async () => {
-                  const result = await this.RulesetHandler.getRuleInformation(item.file, item.id);
-                  this.tableProps.updateRuleInfo(result);
+                  this.tableProps.changeBetweenRules(item.id);
                 }
                 }>
                   {item.id}
@@ -277,9 +274,8 @@ export default class RulesetColumns {
             return (
               <EuiToolTip position="top" content={`Show ${item} content`}>
                 <EuiLink onClick={async () => {
-                  const result = await this.RulesetHandler.getRuleContent(item);
+                  const result = await this.rulesetHandler.getRuleContent(item);
                   this.tableProps.updateFileContent(result);
-                  //console.log(result)
                 }
                 }>
                   {item}
@@ -337,7 +333,7 @@ export default class RulesetColumns {
           sortable: true,
           width: '5%'
         }
-      ],
+      ]
     }
   }
 }

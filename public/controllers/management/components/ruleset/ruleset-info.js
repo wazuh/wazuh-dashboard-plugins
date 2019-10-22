@@ -10,12 +10,19 @@ import {
   EuiToolTip,
   EuiText,
   EuiSpacer,
-  EuiInMemoryTable
+  EuiInMemoryTable,
+  EuiLink
 } from '@elastic/eui';
 
 import { connect } from 'react-redux';
 
 import RulesetColums from './utils/columns';
+import RulesetHandler from './utils/ruleset-handler';
+
+
+import {
+  updateFileContent
+} from '../../../../redux/actions/rulesetActions';
 
 class WzRulesetInfo extends Component {
   constructor(props) {
@@ -27,7 +34,97 @@ class WzRulesetInfo extends Component {
       hipaa: 'HIPAA',
       'nist-800-53': 'NIST-800-53'
     }
-    this.columns = new RulesetColums(this.props);
+    //this.columns = new RulesetColums({ updateFileContent: this.props.updateFileContent, changeBetweenRules: this.changeBetweenRules, setState: this.setState });
+    this.rulesetHandler = RulesetHandler;
+    this.columns = [
+      {
+        name: 'ID',
+        align: 'left',
+        sortable: true,
+        width: '5%',
+        render: item => {
+          return (
+            <EuiToolTip position="top" content={`Show rule ID ${item.id} information`}>
+              <EuiLink onClick={async () => {
+                this.changeBetweenRules(item.id);
+              }
+              }>
+                {item.id}
+              </EuiLink>
+            </EuiToolTip>
+          )
+        }
+      },
+      {
+        field: 'description',
+        name: 'Description',
+        align: 'left',
+        sortable: true,
+        width: '30%'
+      },
+      {
+        field: 'groups',
+        name: 'Groups',
+        align: 'left',
+        sortable: true,
+        width: '10%'
+      },
+      {
+        field: 'pci',
+        name: 'PCI',
+        align: 'left',
+        sortable: true,
+        width: '10%'
+      },
+      {
+        field: 'gdpr',
+        name: 'GDPR',
+        align: 'left',
+        sortable: true,
+        width: '10%'
+      },
+      {
+        field: 'hipaa',
+        name: 'HIPAA',
+        align: 'left',
+        sortable: true,
+        width: '10%'
+      },
+      {
+        field: 'nist-800-53',
+        name: 'NIST 800-53',
+        align: 'left',
+        sortable: true,
+        width: '10%'
+      },
+      {
+        field: 'level',
+        name: 'Level',
+        align: 'left',
+        sortable: true,
+        width: '5%'
+      },
+      {
+        field: 'file',
+        name: 'File',
+        align: 'left',
+        sortable: true,
+        width: '15%',
+        render: item => {
+          return (
+            <EuiToolTip position="top" content={`Show ${item} content`}>
+              <EuiLink onClick={async () => {
+                const result = await this.rulesetHandler.getRuleContent(item);
+                this.props.updateFileContent(result);
+              }
+              }>
+                {item}
+              </EuiLink>
+            </EuiToolTip>
+          )
+        }
+      }
+    ];
   }
 
   /**
@@ -43,6 +140,14 @@ class WzRulesetInfo extends Component {
     return compliance || {};
   }
 
+
+  /**
+   * Render the basic information in a list
+   * @param {Number} id 
+   * @param {Number} level 
+   * @param {String} file 
+   * @param {String} path 
+   */
   renderInfo(id, level, file, path) {
     return (
       <ul>
@@ -58,6 +163,10 @@ class WzRulesetInfo extends Component {
     )
   }
 
+  /**
+   * Render a list with the details
+   * @param {Array} details 
+   */
   renderDetails(details) {
     const detailsToRender = [];
     Object.keys(details).forEach(key => {
@@ -75,6 +184,10 @@ class WzRulesetInfo extends Component {
     )
   }
 
+  /**
+   * Render the groups
+   * @param {Array} groups 
+   */
   renderGroups(groups) {
     const listGroups = [];
     groups.forEach(group => {
@@ -92,6 +205,10 @@ class WzRulesetInfo extends Component {
     )
   }
 
+  /**
+   * Render the compliance(HIPAA, NIST...)
+   * @param {Array} compliance 
+   */
   renderCompliance(compliance) {
     const listCompliance = [];
     const keys = Object.keys(compliance);
@@ -119,15 +236,23 @@ class WzRulesetInfo extends Component {
     )
   }
 
+  /**
+   * Changes between rules
+   * @param {Number} ruleId 
+   */
+  changeBetweenRules(ruleId) {
+    this.setState({ currentRuleId: ruleId });
+  }
+
   render() {
-    const { section, ruleInfo } = this.props.state;
-    const currentRuleId = ruleInfo.current;
+    const { ruleInfo, isLoading } = this.props.state;
+    const currentRuleId = (this.state && this.state.currentRuleId) ? this.state.currentRuleId : ruleInfo.current;
     const rules = ruleInfo.items;
     const currentRuleArr = rules.filter(r => { return r.id === currentRuleId });
     const currentRuleInfo = currentRuleArr[0];
     const { description, details, file, path, level, id, groups } = currentRuleInfo;
     const compliance = this.buildCompliance(currentRuleInfo);
-    const columns = this.columns.columns.rulesInfo;
+    const columns = this.columns;
 
 
     return (
@@ -140,7 +265,12 @@ class WzRulesetInfo extends Component {
                 <EuiTitle>
                   <h2>
                     <EuiToolTip position="right" content="Back to rules">
-                      <EuiButtonIcon aria-label="Back" color="subdued" iconSize="l" iconType="arrowLeft" onClick={() => console.log('GO BACK')} />
+                      <EuiButtonIcon
+                        aria-label="Back"
+                        color="subdued"
+                        iconSize="l"
+                        iconType="arrowLeft"
+                        onClick={() => console.log('GO BACK')} />
                     </EuiToolTip>
                     {description}
                   </h2>
@@ -212,6 +342,7 @@ class WzRulesetInfo extends Component {
                         items={rules}
                         columns={columns}
                         pagination={true}
+                        loading={isLoading}
                         sorting={true}
                         message={false}
                       />
@@ -233,4 +364,11 @@ const mapStateToProps = (state) => {
   };
 };
 
-export default connect(mapStateToProps)(WzRulesetInfo);
+const mapDispatchToProps = (dispatch) => {
+  return {
+    updateFileContent: content => dispatch(updateFileContent(content))
+  }
+};
+
+
+export default connect(mapStateToProps, mapDispatchToProps)(WzRulesetInfo);
