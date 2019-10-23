@@ -161,13 +161,14 @@ class WzRulesetFilterBar extends Component {
 
   render() {
     const { selectedOptions, isInvalid } = this.state;
+    const options = !Object.keys(this.props.state.filters).length ? [] : selectedOptions;
     return (
       <EuiComboBox
         className="WzFilterBar"
         fullWidth={true}
         noSuggestions
         placeholder="Filters..."
-        selectedOptions={selectedOptions}
+        selectedOptions={options}
         onCreateOption={this.onCreateOption}
         onChange={this.onChange}
         onSearchChange={this.onSearchChange}

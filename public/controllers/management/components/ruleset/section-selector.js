@@ -57,7 +57,6 @@ class WzSectionSelector extends Component {
     try {
       this.props.updateItems([]);// Clean the items to avoid flick
       this.props.changeSection(section);
-      this.props.cleanFilters();
       this.props.updateLoadingStatus(true);
       const result = await this.wzReq.apiReq('GET', this.paths[section], {})
       const items = result.data.data.items;
@@ -72,6 +71,7 @@ class WzSectionSelector extends Component {
 
   onChange = async e => {
     const section = e.target.value;
+    this.props.cleanFilters();
     this.fetchData(section);
   };
 
