@@ -33,7 +33,7 @@ class WzRulesetFilterBar extends Component {
 
     this.rulesetHandler = RulesetHandler;
     this.availableOptions = {
-      rules: ['nist-800-53', 'hipaa', 'gdpr', 'pci', 'group', 'level', 'path', 'file'],
+      rules: ['nist-800-53', 'hipaa', 'gdpr', 'pci', 'gpg13', 'group', 'level', 'path', 'file'],
       decoders: ['path', 'file'],
       lists: []
     }
