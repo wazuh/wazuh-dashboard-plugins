@@ -32,9 +32,11 @@ class WzRulesetFilterBar extends Component {
     };
 
     this.rulesetHandler = RulesetHandler;
-    this.availableOptions = ['nist-800-53', 'hipaa', 'gdpr', 'pci', 'group', 'level', 'path', 'file'];
-    this.currentOptions = {};
-
+    this.availableOptions = {
+      rules: ['nist-800-53', 'hipaa', 'gdpr', 'pci', 'group', 'level', 'path', 'file'],
+      decoders: ['path', 'file'],
+      lists: []
+    }
   }
 
   componentDidMount() {
@@ -44,10 +46,11 @@ class WzRulesetFilterBar extends Component {
 
 
   isValid = value => {
+    const options = this.availableOptions[this.props.state.section];
     const valueSplit = value.split(':');
     const oneTwoDots = valueSplit.length - 1 === 1; // Has : once 
     const moreTwoDots = valueSplit.length - 1 > 1; // Has : several times
-    const notAvailable = !this.availableOptions.includes(valueSplit[0]); // Not include in the available options
+    const notAvailable = !options.includes(valueSplit[0]); // Not include in the available options
     if (moreTwoDots || (oneTwoDots && notAvailable)) return false; // Only allow : once in order to split, also only allow the this.availableOptions if contents :
     return true;
   }
@@ -81,9 +84,13 @@ class WzRulesetFilterBar extends Component {
    */
   async fetchItems(filters) {
     try {
+      const { section } = this.props.state;
+      let fetcher = this.rulesetHandler.getRules// By default the fetcher is for rules
+      if (section === 'decoders') fetcher = this.rulesetHandler.getDecoders; // If section is decoders the fetcher changes
+      if (section === 'lists') fetcher = this.rulesetHandler.getLists// If the sections is lists the fetcher changes too
       this.props.updateLoadingStatus(true);
       this.props.updateItems([]);
-      const result = await this.rulesetHandler.getRules(filters);
+      const result = await fetcher(filters);
       this.props.updateItems(result);
       this.props.updateLoadingStatus(false);
     } catch (error) {

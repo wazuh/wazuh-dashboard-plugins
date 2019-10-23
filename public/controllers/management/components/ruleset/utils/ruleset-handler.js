@@ -59,6 +59,15 @@ export default class RulesetHandler {
     }
   }
 
+  static async getLists(filters = {}) {
+    try {
+      const result = await WzRequest.apiReq('GET', `/lists/files`, filters);
+      return (((result || {}).data || {}).data || {}).items || false;
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  }
+
     /**
    * Get the local rules
    */
