@@ -19,7 +19,8 @@ import {
   updateRulesetSection,
   updateLoadingStatus,
   updateItems,
-  toggleShowFiles
+  toggleShowFiles,
+  cleanFilters
 } from '../../../../redux/actions/rulesetActions';
 
 import { WzRequest } from '../../../../react-services/wz-request';
@@ -56,6 +57,7 @@ class WzSectionSelector extends Component {
     try {
       this.props.updateItems([]);// Clean the items to avoid flick
       this.props.changeSection(section);
+      this.props.cleanFilters();
       this.props.updateLoadingStatus(true);
       const result = await this.wzReq.apiReq('GET', this.paths[section], {})
       const items = result.data.data.items;
@@ -98,7 +100,8 @@ const mapDispatchToProps = (dispatch) => {
     changeSection: section => dispatch(updateRulesetSection(section)),
     updateLoadingStatus: status => dispatch(updateLoadingStatus(status)),
     updateItems: items => dispatch(updateItems(items)),
-    toggleShowFiles: status => dispatch(toggleShowFiles(status))
+    toggleShowFiles: status => dispatch(toggleShowFiles(status)),
+    cleanFilters: () => dispatch(cleanFilters())
   }
 };
 

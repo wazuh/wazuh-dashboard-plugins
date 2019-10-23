@@ -88,6 +88,19 @@ export const updateDecoderInfo = (info) => {
   }  
 }
 
+export const updateFilters = (filters) => {
+  return {
+    type: 'UPDATE_FILTERS',
+    filters: filters
+  }
+}
+
+export const cleanFilters = () => {
+  return {
+    type: 'CLEAN_FILTERS'
+  }
+}
+
 export const cleanInfo = () => {
   return {
     type: 'CLEAN_INFO'

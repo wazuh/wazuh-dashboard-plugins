@@ -48,6 +48,30 @@ export default class RulesetHandler {
   }
 
   /**
+   * Get the rules
+   */
+  static async getRules(filters = {}) {
+    try {
+      const result = await WzRequest.apiReq('GET', `/rules`, filters);
+      return (((result || {}).data || {}).data || {}).items || false;
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  }
+
+    /**
+   * Get the local rules
+   */
+  static async getDecoders(filters = {}) {
+    try {
+      const result = await WzRequest.apiReq('GET', `/decoders`, filters);
+      return (((result || {}).data || {}).data || {}).items || false;
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  }
+
+  /**
    * Get the local rules
    */
   static async getLocalRules() {
@@ -55,7 +79,7 @@ export default class RulesetHandler {
       const result = await WzRequest.apiReq('GET', `/rules`, {
         path: 'etc/rules'
       });
-      return result;
+      return (((result || {}).data || {}).data || {}).items || false;
     } catch (error) {
       return Promise.reject(error);
     }
@@ -69,7 +93,7 @@ export default class RulesetHandler {
       const result = await WzRequest.apiReq('GET', `/decoders`, {
         path: 'etc/decoders'
       });
-      return result;
+      return (((result || {}).data || {}).data || {}).items || false;
     } catch (error) {
       return Promise.reject(error);
     }

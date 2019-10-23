@@ -15,7 +15,7 @@ import { connect } from 'react-redux';
 import WzSectionSelector from './section-selector';
 import WzRulesetTable from './ruleset-table';
 import WzRulesetActionButtons from './actions-buttons';
-import { WzFilterBar } from '../../../../components/wz-filter-bar/wz-filter-bar';
+import WzRulesetFilterBar from './ruleset-filter-bar';
 
 class WzRulesetOverview extends Component {
   constructor(props) {
@@ -81,10 +81,7 @@ class WzRulesetOverview extends Component {
           {/* Search bar and section selector*/}
           <EuiFlexGroup>
             <EuiFlexItem>
-              <WzFilterBar
-                model={this.model}
-                clickAction={(obj) => this.clickActionFilterBar(obj)}
-              />
+              <WzRulesetFilterBar />
             </EuiFlexItem>
             <EuiFlexItem grow={false}>
               {/* Selector */}
