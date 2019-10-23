@@ -81,8 +81,11 @@ class WzRulesetFilterBar extends Component {
    */
   async fetchItems(filters) {
     try {
+      this.props.updateLoadingStatus(true);
+      this.props.updateItems([]);
       const result = await this.rulesetHandler.getRules(filters);
       this.props.updateItems(result);
+      this.props.updateLoadingStatus(false);
     } catch (error) {
       return Promise.reject(error);
     }
