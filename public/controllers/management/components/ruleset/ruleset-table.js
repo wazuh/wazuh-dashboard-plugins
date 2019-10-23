@@ -35,6 +35,7 @@ class WzRulesetTable extends Component {
     const { isLoading, items, section, showingFiles } = this.props.state;
     const rulesetColums = this.rulesetColums.columns;
     const columns =  showingFiles ? rulesetColums.files : rulesetColums[section]
+    const message = isLoading ? false : 'No results...';
     return (
       <EuiInMemoryTable
         itemId="id"
@@ -43,7 +44,7 @@ class WzRulesetTable extends Component {
         pagination={true}
         loading={isLoading}
         sorting={true}
-        message={false}
+        message={message}
       />
     )
   }
