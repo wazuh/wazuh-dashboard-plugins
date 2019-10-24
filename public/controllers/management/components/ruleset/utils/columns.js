@@ -4,7 +4,7 @@ import RulesetHandler from './ruleset-handler';
 
 
 export default class RulesetColumns {
-  
+
   constructor(tableProps) {
     this.tableProps = tableProps;
     this.rulesetHandler = RulesetHandler;
@@ -191,20 +191,33 @@ export default class RulesetColumns {
           align: 'left',
           render: item => {
             return (
-              <EuiToolTip position="top" content={`Remove ${item.name}`}>
-                <EuiButtonIcon
-                  aria-label="Show content"
-                  iconType="trash"
-                  onClick={async () => {
-                    console.log(`deleting ${item.path}/${item.name}`);
-                  }}
-                  color="danger"
-                />
-              </EuiToolTip>
+              <div>
+                <EuiToolTip position="top" content={`Edit ${item.name} content`}>
+                  <EuiButtonIcon
+                    aria-label="Edit content"
+                    iconType="pencil"
+                    onClick={async () => {
+                      const result = await this.rulesetHandler.getCdbList(`${item.path}/${item.name}`);
+                      console.log(result)
+                    }}
+                    color="primary"
+                  />
+                </EuiToolTip>
+                <EuiToolTip position="top" content={`Remove ${item.name}`}>
+                  <EuiButtonIcon
+                    aria-label="Show content"
+                    iconType="trash"
+                    onClick={async () => {
+                      console.log(`deleting ${item.path}/${item.name}`);
+                    }}
+                    color="danger"
+                  />
+                </EuiToolTip>
+              </div>
             )
           }
         },
-    
+
       ],
       files: [
         {
@@ -217,8 +230,8 @@ export default class RulesetColumns {
           name: 'Actions',
           align: 'left',
           render: item => {
-            return (
-              <div>
+            if (item.path.startsWith('ruleset/')) {
+              return (
                 <EuiToolTip position="top" content={`Show ${item.file} content`}>
                   <EuiButtonIcon
                     aria-label="Show content"
@@ -230,108 +243,35 @@ export default class RulesetColumns {
                     color="primary"
                   />
                 </EuiToolTip>
-                <EuiToolTip position="top" content={`Remove ${item.file} file`}>
-                  <EuiButtonIcon
-                    aria-label="Show content"
-                    iconType="trash"
-                    onClick={async () => {
-                      console.log(`deleting ${item.file}`);
-                    }}
-                    color="danger"
-                  />
-                </EuiToolTip>
-              </div>
-            )
+              )
+            } else {
+              return (
+                <div>
+                  <EuiToolTip position="top" content={`Edit ${item.file} content`}>
+                    <EuiButtonIcon
+                      aria-label="Edit content"
+                      iconType="pencil"
+                      onClick={async () => {
+                        const result = await this.rulesetHandler.getFileContent(`${item.path}/${item.file}`);
+                        console.log(result)
+                      }}
+                      color="primary"
+                    />
+                  </EuiToolTip>
+                  <EuiToolTip position="top" content={`Remove ${item.file} file`}>
+                    <EuiButtonIcon
+                      aria-label="Show content"
+                      iconType="trash"
+                      onClick={async () => {
+                        console.log(`deleting ${item.file}`);
+                      }}
+                      color="danger"
+                    />
+                  </EuiToolTip>
+                </div>
+              )
+            }
           }
-        }
-      ],
-      rulesInfo: [
-        {
-          name: 'ID',
-          align: 'left',
-          sortable: true,
-          width: '5%',
-          render: item => {
-            return (
-              <EuiToolTip position="top" content={`Show rule ID ${item.id} information`}>
-                <EuiLink onClick={async () => {
-                  this.tableProps.changeBetweenRules(item.id);
-                }
-                }>
-                  {item.id}
-                </EuiLink>
-              </EuiToolTip>
-            )
-          }
-        },
-            {
-          field: 'file',
-          name: 'File',
-          align: 'left',
-          sortable: true,
-          width: '15%',
-          render: item => {
-            return (
-              <EuiToolTip position="top" content={`Show ${item} content`}>
-                <EuiLink onClick={async () => {
-                  const result = await this.rulesetHandler.getRuleContent(item);
-                  this.tableProps.updateFileContent(result);
-                }
-                }>
-                  {item}
-                </EuiLink>
-              </EuiToolTip>
-            )
-          }
-        },
-        {
-          field: 'description',
-          name: 'Description',
-          align: 'left',
-          sortable: true,
-          width: '30%'
-        },
-        {
-          field: 'groups',
-          name: 'Groups',
-          align: 'left',
-          sortable: true,
-          width: '10%'
-        },
-        {
-          field: 'pci',
-          name: 'PCI',
-          align: 'left',
-          sortable: true,
-          width: '10%'
-        },
-        {
-          field: 'gdpr',
-          name: 'GDPR',
-          align: 'left',
-          sortable: true,
-          width: '10%'
-        },
-        {
-          field: 'hipaa',
-          name: 'HIPAA',
-          align: 'left',
-          sortable: true,
-          width: '10%'
-        },
-        {
-          field: 'nist-800-53',
-          name: 'NIST 800-53',
-          align: 'left',
-          sortable: true,
-          width: '10%'
-        },
-        {
-          field: 'level',
-          name: 'Level',
-          align: 'left',
-          sortable: true,
-          width: '5%'
         }
       ]
     }
