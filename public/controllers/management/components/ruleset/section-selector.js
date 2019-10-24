@@ -51,18 +51,20 @@ class WzSectionSelector extends Component {
 
   /**
    * Fetch the data for a section: rules, decoders, lists...
-   * @param {String} section 
+   * @param {String} newSection 
    */
-  async fetchData(section) {
+  async fetchData(newSection) {
     try {
+      const currentSection = this.props.state.section;
+      if (Object.keys(this.props.state.filters).length && newSection === currentSection) return; // If there's any filter and the section is de same doesn't fetch again
       this.props.updateItems([]);// Clean the items to avoid flick
-      this.props.changeSection(section);
+      this.props.changeSection(newSection);
       this.props.updateLoadingStatus(true);
-      const result = await this.wzReq.apiReq('GET', this.paths[section], {})
+      const result = await this.wzReq.apiReq('GET', this.paths[newSection], {})
       const items = result.data.data.items;
       this.props.updateItems(items);
       this.props.toggleShowFiles(false);
-      this.props.changeSection(section);
+      this.props.changeSection(newSection);
       this.props.updateLoadingStatus(false);
     } catch (error) {
       console.error('Error updating sections an data ', error);
