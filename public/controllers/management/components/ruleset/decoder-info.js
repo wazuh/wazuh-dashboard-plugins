@@ -112,15 +112,19 @@ class WzDecoderInfo extends Component {
         <li key="position"><b>Position:</b>&nbsp;<span className="subdued-color">{position}</span></li>
         <EuiSpacer size="s" />
         <li key="file"><b>File:</b>
-          <EuiLink onClick={async () => this.setNewFiltersAndBack({ file: file })}>
-            &nbsp;{file}
-          </EuiLink>
+          <EuiToolTip position="top" content={`Filter by this file: ${file}`}>
+            <EuiLink onClick={async () => this.setNewFiltersAndBack({ file: file })}>
+              &nbsp;{file}
+            </EuiLink>
+          </EuiToolTip>
         </li>
         <EuiSpacer size="s" />
         <li key="path"><b>Path:</b>
-          <EuiLink onClick={async () => this.setNewFiltersAndBack({ path: path })}>
-            &nbsp;{path}
-          </EuiLink>
+          <EuiToolTip position="top" content={`Filter by this path: ${path}`}>
+            <EuiLink onClick={async () => this.setNewFiltersAndBack({ path: path })}>
+              &nbsp;{path}
+            </EuiLink>
+          </EuiToolTip>
         </li>
         <EuiSpacer size="s" />
       </ul>

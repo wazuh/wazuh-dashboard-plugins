@@ -167,22 +167,28 @@ class WzRuleInfo extends Component {
         <li key="id"><b>ID:</b>&nbsp;{id}</li>
         <EuiSpacer size="s" />
         <li key="level"><b>Level:</b>
-          <EuiLink onClick={async () => this.setNewFiltersAndBack({ level: level })}>
-            &nbsp;{level}
-          </EuiLink>
+          <EuiToolTip position="top" content={`Filter by this level: ${level}`}>
+            <EuiLink onClick={async () => this.setNewFiltersAndBack({ level: level })}>
+              &nbsp;{level}
+            </EuiLink>
+          </EuiToolTip>
         </li>
 
         <EuiSpacer size="s" />
         <li key="file"><b>File:</b>
-          <EuiLink onClick={async () => this.setNewFiltersAndBack({ file: file })}>
-            &nbsp;{file}
-          </EuiLink>
+          <EuiToolTip position="top" content={`Filter by this file: ${file}`}>
+            <EuiLink onClick={async () => this.setNewFiltersAndBack({ file: file })}>
+              &nbsp;{file}
+            </EuiLink>
+          </EuiToolTip>
         </li>
         <EuiSpacer size="s" />
         <li key="path"><b>Path:</b>
-          <EuiLink onClick={async () => this.setNewFiltersAndBack({ path: path })}>
-            &nbsp;{path}
-          </EuiLink>
+          <EuiToolTip position="top" content={`Filter by this path: ${path}`}>
+            <EuiLink onClick={async () => this.setNewFiltersAndBack({ path: path })}>
+              &nbsp;{path}
+            </EuiLink>
+          </EuiToolTip>
         </li>
 
         <EuiSpacer size="s" />
@@ -192,8 +198,8 @@ class WzRuleInfo extends Component {
 
   /**
    * Render a list with the details
-   * @param {Array} details 
-   */
+* @param {Array} details
+    */
   renderDetails(details) {
     const detailsToRender = [];
     Object.keys(details).forEach(key => {
@@ -213,15 +219,19 @@ class WzRuleInfo extends Component {
 
   /**
    * Render the groups
-   * @param {Array} groups 
-   */
+* @param {Array} groups
+    */
   renderGroups(groups) {
     const listGroups = [];
     groups.forEach(group => {
       listGroups.push(
         <Fragment>
           <EuiLink onClick={async () => this.setNewFiltersAndBack({ group: group })}>
-            <li key={group}>{group}</li>
+            <EuiToolTip position="top" content={`Filter by this group: ${group}`}>
+              <li key={group}>
+                {group}
+              </li>
+            </EuiToolTip>
           </EuiLink>
           <EuiSpacer size="s" />
         </Fragment>
@@ -236,8 +246,8 @@ class WzRuleInfo extends Component {
 
   /**
    * Render the compliance(HIPAA, NIST...)
-   * @param {Array} compliance 
-   */
+* @param {Array} compliance
+    */
   renderCompliance(compliance) {
     const listCompliance = [];
     const keys = Object.keys(compliance);
@@ -255,7 +265,9 @@ class WzRuleInfo extends Component {
         listCompliance.push(
           <Fragment>
             <EuiLink onClick={async () => this.setNewFiltersAndBack({ filters })}>
-              <li key={element}>{element}</li>
+              <EuiToolTip position="top" content="Filter by this compliance">
+                <li key={element}>{element}</li>
+              </EuiToolTip>
             </EuiLink>
             <EuiSpacer size="s" />
           </Fragment>
@@ -271,8 +283,8 @@ class WzRuleInfo extends Component {
 
   /**
    * Changes between rules
-   * @param {Number} ruleId 
-   */
+* @param {Number} ruleId
+    */
   changeBetweenRules(ruleId) {
     this.setState({ currentRuleId: ruleId });
   }
