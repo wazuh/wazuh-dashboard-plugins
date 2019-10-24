@@ -41,7 +41,7 @@ const rulesetReducers = (state = initialState, action) => {
     case 'TOGGLE_SHOW_FILES':
       return Object.assign({}, state, { showingFiles: action.status });
     case 'CLEAN_INFO':
-      return Object.assign({}, state, { decoderInfo: false, ruleInfo: false, listInfo: false });
+      return Object.assign({}, state, { decoderInfo: false, ruleInfo: false, listInfo: false, fileContent: false });
     case 'CLEAN_CONTENT':
       return Object.assign({}, state, { fileContent: false });
     case 'CLEAN_FILTERS':

@@ -74,7 +74,8 @@ class WzDecoderInfo extends Component {
               <EuiLink onClick={async () => {
                 const result = await this.rulesetHandler.getDecoderContent(item);
                 console.log('result ', result)
-                this.tableProps.updateFileContent(result);
+                const file = { name: item, content: result };
+                this.tableProps.updateFileContent(file);
               }
               }>{item}</EuiLink>
             </EuiToolTip>

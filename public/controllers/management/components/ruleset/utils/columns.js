@@ -89,7 +89,8 @@ export default class RulesetColumns {
               <EuiToolTip position="top" content={`Show ${item} content`}>
                 <EuiLink onClick={async () => {
                   const result = await this.rulesetHandler.getRuleContent(item);
-                  this.tableProps.updateFileContent(result);
+                  const file = { name: item, content: result };
+                  this.tableProps.updateFileContent(file);
                 }
                 }>
                   {item}
@@ -147,7 +148,8 @@ export default class RulesetColumns {
               <EuiToolTip position="top" content={`Show ${item} content`}>
                 <EuiLink onClick={async () => {
                   const result = await this.rulesetHandler.getDecoderContent(item);
-                  this.tableProps.updateFileContent(result);
+                  const file = { name: item, content: result };
+                  this.tableProps.updateFileContent(file);
                 }
                 }>{item}</EuiLink>
               </EuiToolTip>
@@ -238,7 +240,8 @@ export default class RulesetColumns {
                     iconType="eye"
                     onClick={async () => {
                       const result = await this.rulesetHandler.getFileContent(`${item.path}/${item.file}`);
-                      console.log(result)
+                      const file = { name: item.file, content: result };
+                      this.tableProps.updateFileContent(file);
                     }}
                     color="primary"
                   />
