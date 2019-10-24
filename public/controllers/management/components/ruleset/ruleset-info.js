@@ -199,7 +199,7 @@ class WzRulesetInfo extends Component {
     Object.keys(details).forEach(key => {
       detailsToRender.push(
         <Fragment>
-          <li key={`id-${key}`}><b>{key}:</b>&nbsp;{details[key]}</li>
+          <li key={key}><b>{key}:</b>&nbsp;{details[key]}</li>
           <EuiSpacer size="s" />
         </Fragment>
       );
@@ -221,7 +221,7 @@ class WzRulesetInfo extends Component {
       listGroups.push(
         <Fragment>
           <EuiLink onClick={async () => this.setNewFiltersAndBack({ group: group })}>
-            <li key={`id-${group}`}>{group}</li>
+            <li key={group}>{group}</li>
           </EuiLink>
           <EuiSpacer size="s" />
         </Fragment>
@@ -245,7 +245,7 @@ class WzRulesetInfo extends Component {
       const key = keys[i];
       listCompliance.push(
         <Fragment>
-          <li key={`id-${key}`}><b>{this.complianceEquivalences[key]}</b></li>
+          <li key={key}><b>{this.complianceEquivalences[key]}</b></li>
           <EuiSpacer size="s" />
         </Fragment>
       )
@@ -255,7 +255,7 @@ class WzRulesetInfo extends Component {
         listCompliance.push(
           <Fragment>
             <EuiLink onClick={async () => this.setNewFiltersAndBack({ filters })}>
-              <li key={`id-${element}`}>{element}</li>
+              <li key={element}>{element}</li>
             </EuiLink>
             <EuiSpacer size="s" />
           </Fragment>
