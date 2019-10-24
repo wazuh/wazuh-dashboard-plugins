@@ -16,7 +16,8 @@ import WzReduxProvider from '../../../../redux/wz-redux-provider';
 //Wazuh ruleset tables(rules, decoder, lists)
 import WzRulesetOverview from './ruleset-overview';
 //Information about rule or decoder
-import WzRulesetInfo from './ruleset-info';
+import WzRuleInfo from './rule-info';
+import WzDecoderInfo from './decoder-info';
 
 export default class WzRuleset extends Component {
   constructor(props) {
@@ -35,24 +36,22 @@ export default class WzRuleset extends Component {
   componentWillUnmount() {
     // When the component is going to be unmounted the ruleset state is reset
     const { ruleInfo, decoderInfo, listInfo, fileContent } = this.state;
-    if (!ruleInfo && !decoderInfo && !listInfo && !fileContent) this.store.dispatch({type: 'RESET'});
-  }  
+    if (!ruleInfo && !decoderInfo && !listInfo && !fileContent) this.store.dispatch({ type: 'RESET' });
+  }
 
 
   render() {
-    const showRulesetOverview = (!this.state.ruleInfo && !this.state.decoderInfo && !this.state.listInfo && !this.state.fileContent);
-    const fileContent = this.state.fileContent;
-    const info = this.state.ruleInfo || this.state.decoderInfo || this.state.listInfo;
+    const { ruleInfo, decoderInfo, listInfo, fileContent } = this.state;
 
     return (
       <WzReduxProvider>
-        {showRulesetOverview && (
-          <WzRulesetOverview />
-        ) || fileContent && (
-          <div>{fileContent}</div>
-        ) || (
-          <WzRulesetInfo />
-        )}
+        {
+          ruleInfo && (<WzRuleInfo />)
+          || decoderInfo && (<WzDecoderInfo />)
+          || listInfo && (<h3>LIST INFO</h3>)
+          || fileContent && (<div>{fileContent}</div>)
+          || (<WzRulesetOverview />)
+        }
       </WzReduxProvider>
     )
   }

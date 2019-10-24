@@ -27,7 +27,7 @@ import {
   cleanFilters
 } from '../../../../redux/actions/rulesetActions';
 
-class WzRulesetInfo extends Component {
+class WzRuleInfo extends Component {
   constructor(props) {
     super(props);
     this.complianceEquivalences = {
@@ -48,7 +48,7 @@ class WzRulesetInfo extends Component {
         render: item => {
           return (
             <EuiToolTip position="top" content={`Show rule ID ${item.id} information`}>
-              <EuiLink onClick={async () => {
+              <EuiLink onClick={() => {
                 this.changeBetweenRules(item.id);
               }
               }>
@@ -408,4 +408,4 @@ const mapDispatchToProps = (dispatch) => {
 };
 
 
-export default connect(mapStateToProps, mapDispatchToProps)(WzRulesetInfo);
+export default connect(mapStateToProps, mapDispatchToProps)(WzRuleInfo);

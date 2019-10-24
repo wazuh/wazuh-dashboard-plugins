@@ -36,12 +36,14 @@ export default class RulesetHandler {
    * Get the default about a decoder
    * @param {String} file 
    */
-  static async getDecoderInformation(file) {
+  static async getDecoderInformation(file, name) {
     try {
       const result = await WzRequest.apiReq('GET', `/decoders`, {
         file
       });
-      return ((result || {}).data || {}).data || false;
+      const info = ((result || {}).data || {}).data || false;
+      if (info) Object.assign(info, { current: name });
+      return info;
     } catch (error) {
       return Promise.reject(error);
     }
@@ -68,9 +70,9 @@ export default class RulesetHandler {
     }
   }
 
-    /**
-   * Get the local rules
-   */
+  /**
+ * Get the local rules
+ */
   static async getDecoders(filters = {}) {
     try {
       const result = await WzRequest.apiReq('GET', `/decoders`, filters);

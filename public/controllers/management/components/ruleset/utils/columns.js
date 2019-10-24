@@ -115,7 +115,7 @@ export default class RulesetColumns {
             return (
               <EuiToolTip position="top" content={`Show ${item.name} decoder information`}>
                 <EuiLink onClick={async () => {
-                  const result = await this.rulesetHandler.getDecoderInformation(item.file);
+                  const result = await this.rulesetHandler.getDecoderInformation(item.file, item.name);
                   this.tableProps.updateDecoderInfo(result);
                 }
                 }>
