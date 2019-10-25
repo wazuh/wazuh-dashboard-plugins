@@ -33,8 +33,11 @@ import {
   EuiFlexItem,
   EuiTitle,
   EuiToolTip,
-  EuiButtonIcon
+  EuiButtonIcon,
+  EuiButton
 } from '@elastic/eui';
+
+import RulesetHandler from './utils/ruleset-handler';
 
 class WzRulesetEditor extends Component {
   constructor(props) {
@@ -45,17 +48,55 @@ class WzRulesetEditor extends Component {
       matchClosing: true,
       matchBrackets: true,
       mode: 'text/xml',
+      readOnly: false,//TODO check ADMIN MODE
       //theme: IS_DARK_THEME ? 'lesser-dark' : 'ttcn',
       foldGutter: true,
       styleSelectedText: true,
       gutters: ['CodeMirror-foldgutter']
     }
+    this.codeMirrorContent = this.props.state.fileContent.content;
+    this.rulesetHandler = RulesetHandler;
+    this.state = {
+      isSaving: false
+    }
   }
 
+
+  /**
+   * Save the new content 
+   * @param {String} name 
+   * @param {Boolean} overwrite 
+   */
+  async save(name, overwrite = true) {
+    try {
+      this.setState({ isSaving: true });
+      const { section } = this.props.state;
+      let saver = this.rulesetHandler.sendRuleConfiguration; // By default the saver is for rules
+      if (section === 'decoders') saver = this.rulesetHandler.sendDecoderConfiguration;
+      if (section === 'lists') save = this.rulesetHandler.sendCdbList;
+      const r = await saver(name, this.codeMirrorContent, overwrite);
+      console.log('result ', r)
+    } catch (error) {
+      console.error('Error saving content ', error);
+    }
+    this.setState({ isSaving: false });
+  }
 
   render() {
     const { section, fileContent } = this.props.state;
     const { name, content } = fileContent;
+
+    const saveButton = (
+      <EuiButton
+        fill
+        iconType="save"
+        isLoading={this.state.isSaving}
+        onClick={() => this.save(name, true)}>
+        Save
+      </EuiButton>
+    );
+
+
     return (
       <EuiPage style={{ background: 'transparent' }}>
         <EuiFlexGroup>
@@ -77,6 +118,10 @@ class WzRulesetEditor extends Component {
                   </h2>
                 </EuiTitle>
               </EuiFlexItem>
+              <EuiFlexItem />{/* This flex item is for separating between title and save button */}
+              <EuiFlexItem grow={false}>
+                {saveButton}
+              </EuiFlexItem>
             </EuiFlexGroup>
             <EuiSpacer size="m" />
             <EuiFlexGroup>
@@ -85,7 +130,7 @@ class WzRulesetEditor extends Component {
                   className="react-code-mirror"
                   options={this.codeMirrorOptions}
                   value={content}
-                  onChange={newContent => console.log('changing value in codemirror')}
+                  onChange={newContent => this.codeMirrorContent = newContent}
                 />
               </EuiFlexItem>
             </EuiFlexGroup>

@@ -181,7 +181,7 @@ export default class RulesetHandler {
       const result = await WzRequest.apiReq(
         'POST',
         `/manager/files?path=etc/rules/${rule.file ||
-        rule}&overwrite=${!overwrite}`,
+        rule}&overwrite=${overwrite}`,
         { content, origin: 'xmleditor' }
       );
       return result;
@@ -201,7 +201,7 @@ export default class RulesetHandler {
       const result = await WzRequest.apiReq(
         'POST',
         `/manager/files?path=etc/decoders/${decoder.file ||
-        decoder}&overwrite=${!overwrite}`,
+        decoder}&overwrite=${overwrite}`,
         { content, origin: 'xmleditor' }
       );
       return result;
@@ -220,7 +220,7 @@ export default class RulesetHandler {
     try {
       const result = await WzRequest.apiReq(
         'POST',
-        `/manager/files?path=etc/lists/${list}&overwrite=${!overwrite}`,
+        `/manager/files?path=etc/lists/${list}&overwrite=${overwrite}`,
         { content, origin: 'raw' }
       );
       return result;
