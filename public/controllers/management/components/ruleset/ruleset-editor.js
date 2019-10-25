@@ -48,7 +48,6 @@ class WzRulesetEditor extends Component {
       matchClosing: true,
       matchBrackets: true,
       mode: 'text/xml',
-      readOnly: false,//TODO check ADMIN MODE
       //theme: IS_DARK_THEME ? 'lesser-dark' : 'ttcn',
       foldGutter: true,
       styleSelectedText: true,
@@ -84,7 +83,10 @@ class WzRulesetEditor extends Component {
 
   render() {
     const { section, fileContent } = this.props.state;
-    const { name, content } = fileContent;
+    console
+    const { name, content, path } = fileContent;
+    const isEditable = path !== 'ruleset/rules' && path !== 'ruleset/decoders';
+    const options = Object.assign(this.codeMirrorOptions, { readOnly: !isEditable });////TODO check ADMIN MODE
 
     const saveButton = (
       <EuiButton
@@ -119,16 +121,18 @@ class WzRulesetEditor extends Component {
                 </EuiTitle>
               </EuiFlexItem>
               <EuiFlexItem />{/* This flex item is for separating between title and save button */}
-              <EuiFlexItem grow={false}>
-                {saveButton}
-              </EuiFlexItem>
+              {isEditable && (
+                <EuiFlexItem grow={false}>
+                  {saveButton}
+                </EuiFlexItem>
+              )}
             </EuiFlexGroup>
             <EuiSpacer size="m" />
             <EuiFlexGroup>
               <EuiFlexItem>
                 <CodeMirror
                   className="react-code-mirror"
-                  options={this.codeMirrorOptions}
+                  options={options}
                   value={content}
                   onChange={newContent => this.codeMirrorContent = newContent}
                 />
@@ -136,7 +140,7 @@ class WzRulesetEditor extends Component {
             </EuiFlexGroup>
           </EuiFlexItem>
         </EuiFlexGroup>
-      </EuiPage>
+      </EuiPage >
     )
   }
 }
