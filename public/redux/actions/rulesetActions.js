@@ -112,3 +112,10 @@ export const cleanFileContent = () => {
     type: 'CLEAN_CONTENT'
   }
 }
+
+export const updateAdminMode = status => {
+  return {
+    type: 'UPDATE_ADMIN_MODE',
+    status: status
+  }
+}

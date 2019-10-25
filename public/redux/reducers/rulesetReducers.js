@@ -19,7 +19,8 @@ const initialState = {
   ruleInfo: false,
   decoderInfo: false,
   listInfo: false,
-  fileContent: false
+  fileContent: false,
+  adminMode: true
 }
 
 const rulesetReducers = (state = initialState, action) => {
@@ -38,6 +39,8 @@ const rulesetReducers = (state = initialState, action) => {
       return Object.assign({}, state, { fileContent: action.content, decoderInfo: false, ruleInfo: false, listInfo: false });
     case 'UPDATE_FILTERS':
       return Object.assign({}, state, { filters: action.filters });
+    case 'UPDATE_ADMIN_MODE':
+      return Object.assign({}, state, { adminMode: action.status });
     case 'TOGGLE_SHOW_FILES':
       return Object.assign({}, state, { showingFiles: action.status });
     case 'CLEAN_INFO':

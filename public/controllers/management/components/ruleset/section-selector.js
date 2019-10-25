@@ -20,10 +20,12 @@ import {
   updateLoadingStatus,
   updateItems,
   toggleShowFiles,
-  cleanFilters
+  cleanFilters,
+  updateAdminMode
 } from '../../../../redux/actions/rulesetActions';
 
 import { WzRequest } from '../../../../react-services/wz-request';
+import checkAdminMode from './utils/check-admin-mode';
 
 class WzSectionSelector extends Component {
   constructor(props) {
@@ -60,8 +62,11 @@ class WzSectionSelector extends Component {
       this.props.updateItems([]);// Clean the items to avoid flick
       this.props.changeSection(newSection);
       this.props.updateLoadingStatus(true);
-      const result = await this.wzReq.apiReq('GET', this.paths[newSection], {})
+      const result = await this.wzReq.apiReq('GET', this.paths[newSection], {});
       const items = result.data.data.items;
+      //Set the admin mode
+      const admin = await checkAdminMode();
+      this.props.updateAdminMode(admin);
       this.props.updateItems(items);
       this.props.toggleShowFiles(false);
       this.props.changeSection(newSection);
@@ -103,7 +108,8 @@ const mapDispatchToProps = (dispatch) => {
     updateLoadingStatus: status => dispatch(updateLoadingStatus(status)),
     updateItems: items => dispatch(updateItems(items)),
     toggleShowFiles: status => dispatch(toggleShowFiles(status)),
-    cleanFilters: () => dispatch(cleanFilters())
+    cleanFilters: () => dispatch(cleanFilters()),
+    updateAdminMode: status => (dispatch(updateAdminMode(status)))
   }
 };
 
