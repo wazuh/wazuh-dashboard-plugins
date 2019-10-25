@@ -273,8 +273,15 @@ function discoverController(
 
     // Compose final filters array not including filters that also exist as non removable filter
     const finalFilters = filters.filter(item => {
-      const key =
-        item.meta.key || (Object.keys(item.query.match) || [undefined])[0];
+      let key;
+      if (typeof item.exists !== 'undefined') {
+        key = item.exists.field;
+      } else {
+        const hasKey = item.meta.key;
+        const hasMeta = Object.keys((item.query || {}).match || {})[0];
+        const hasRange = Object.keys(item.range || {})[0];
+        key = hasKey || hasMeta || hasRange;
+      }
       const isIncluded = nonRemovableFilters.includes(key);
       const isNonRemovable = isRemovable(item);
       const shouldBeAdded = (isIncluded && isNonRemovable) || !isIncluded;
