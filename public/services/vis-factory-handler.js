@@ -79,7 +79,7 @@ export class VisFactoryService {
       );
       this.rawVisualizations.assignItems(data.data.raw);
       this.commonData.assignFilters(filterHandler, tab, localChange);
-      this.$rootScope.$emit('changeTabView', { tabView: subtab, tab });
+      this.$rootScope.$emit('changeTabView', { tabView: subtab });
       this.$rootScope.$broadcast('updateVis');
       return;
     } catch (error) {
@@ -106,7 +106,7 @@ export class VisFactoryService {
           : false;
       data && this.rawVisualizations.assignItems(data.data.raw);
       this.commonData.assignFilters(filterHandler, tab, localChange, id);
-      this.$rootScope.$emit('changeTabView', { tabView: subtab, tab });
+      this.$rootScope.$emit('changeTabView', { tabView: subtab });
       this.$rootScope.$broadcast('updateVis');
       return;
     } catch (error) {

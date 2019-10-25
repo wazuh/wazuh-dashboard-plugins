@@ -1,15 +1,11 @@
 <discover-app-w class="app-container">
   <!-- Local nav. -->
   <div data-transclude-slot="topLeftCorner" class="kuiLocalBreadcrumbs" ng-if="tabView === 'discover'">
-    <!-- Breadcrumbs. -->
-    <h1 id="kui_local_breadcrumb" class="kuiLocalBreadcrumb" ng-if="opts.savedSearch.id">
+    <h1 tabindex="0" id="kui_local_breadcrumb" class="kuiLocalBreadcrumb" ng-if="opts.savedSearch.id">
       <span class="kuiLocalBreadcrumb__emphasis">
-        <button class="kuiLink" type="button" id="reload_saved_search" aria-label="{{::'kbn.discover.reloadSavedSearchAriaLabel' | i18n: {defaultMessage: 'Reload saved search'} }}"
+        <span id="reload_saved_search" aria-label="{{::'kbn.discover.reloadSavedSearchAriaLabel' | i18n: {defaultMessage: 'Reload saved search'} }}"
           tooltip="{{::'kbn.discover.reloadSavedSearchTooltip' | i18n: {defaultMessage: 'Reload saved search'} }}"
-          tooltip-placement="right" tooltip-append-to-body="1" ng-click="resetQuery()">
-          <span class="kuiIcon fa-undo small"></span>
-          {{::'kbn.discover.reloadSavedSearchButton' | i18n: {defaultMessage: 'Reload'} }}
-        </button>
+          tooltip-placement="right" tooltip-append-to-body="1" ng-click="resetQuery()" kbn-accessible-click class="kuiIcon fa-undo small"></span>&nbsp;
       </span>
     </h1>
     <div class="kuiLocalBreadcrumb">
@@ -22,9 +18,9 @@
     <!-- Transcluded elements. -->
     <div data-transclude-slots>
       <!-- Search. -->
-      <div data-transclude-slot="bottomRow" class="fullWidth">
-        <wz-search-bar query="state.query" screen-title="screenTitle" on-query-submit="updateQueryAndFetch" app-name="'discover'"
-          index-patterns="[indexPattern]" filters="filters" on-filters-updated="onFiltersUpdated" show-date-picker="enableTimeRangeSelector"
+      <div style="padding-top: 10px;" data-transclude-slot="bottomRow" class="fullWidth">
+        <wz-search-bar query="state.query" on-query-submit="updateQueryAndFetch" app-name="'discover'" index-patterns="[indexPattern]"
+          filters="filters" on-filters-updated="onFiltersUpdated" show-date-picker="enableTimeRangeSelector"
           date-range-from="time.from" date-range-to="time.to" is-refresh-paused="refreshInterval.pause"
           refresh-interval="refreshInterval.value" on-refresh-change="onRefreshChange" watch-depth="reference"
           show-filter-bar="tabView !== 'cluster-monitoring'"></wz-search-bar>
@@ -55,7 +51,7 @@
             <div ng-hide="fetchError" class="dscOverlay">
               <h2 i18n-id="kbn.discover.searchingTitle" i18n-default-message="Searching" class="euiTitle euiTitle--small"></h2>
               <div class="euiSpacer euiSpacer--m"></div>
-              <div class="euiLoadingSpinner euiLoadingSpinner--large" data-test-subj="loadingSpinner"></div>
+              <div class="euiLoadingSpinner euiLoadingSpinner--large"></div>
               <div class="euiSpacer euiSpacer--m"></div>
               <div ng-show="fetchStatus">{{fetchStatus.complete}} / {{fetchStatus.total}}</div>
             </div>
@@ -74,15 +70,14 @@
               class="dscTimechart" ng-if="opts.timefield">
               <header class="dscTimechart__header">
                 <div class="small">
-                  <label for="dscResultsIntervalSelector" tooltip="{{::'kbn.discover.howToChangeTheTimeTooltip' | i18n: {defaultMessage: 'To change the time, click the clock icon in the navigation bar'} }}">
-                    {{toMoment(timeRange.from)}} - {{toMoment(timeRange.to)}}
-                  </label>
+                  <span tooltip="{{::'kbn.discover.howToChangeTheTimeTooltip' | i18n: {defaultMessage: 'To change the time, click the clock icon in the navigation bar'} }}">
+                    {{timeRange.from | moment}} - {{timeRange.to | moment}}
+                  </span>
 
                   &mdash;
 
                   <span class="form-inline">
-                    <select id="dscResultsIntervalSelector" class="dscResults__interval form-control" ng-model="state.interval"
-                      ng-options="interval.val as interval.display for interval in intervalOptions | filter: intervalEnabled"
+                    <select class="dscResults__interval form-control" ng-model="state.interval" ng-options="interval.val as interval.display for interval in intervalOptions | filter: intervalEnabled"
                       ng-blur="toggleInterval()" data-test-subj="discoverIntervalSelect">
                     </select>
                     <span ng-if="bucketInterval.scaled">
