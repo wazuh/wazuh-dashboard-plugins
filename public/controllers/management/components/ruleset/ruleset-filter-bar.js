@@ -11,7 +11,7 @@
  */
 import React, { Component } from 'react';
 
-import { EuiComboBox } from '@elastic/eui';
+import { EuiComboBox, EuiFormRow } from '@elastic/eui';
 import { connect } from 'react-redux';
 
 import {
@@ -37,6 +37,7 @@ class WzRulesetFilterBar extends Component {
       decoders: ['path', 'file'],
       lists: []
     }
+    this.notValidMessage = false;
   }
 
   componentDidMount() {
@@ -46,12 +47,23 @@ class WzRulesetFilterBar extends Component {
 
 
   isValid = value => {
+    if (this.props.state.section === 'lists') return true;//There are not filters for lists
+    const lowerValue = value.toLowerCase()
+    const availableOptions = this.availableOptions[this.props.state.section].toString();
+    this.notValidMessage = false;
     const options = this.availableOptions[this.props.state.section];
-    const valueSplit = value.split(':');
+    const valueSplit = lowerValue.split(':');
     const oneTwoDots = valueSplit.length - 1 === 1; // Has : once 
     const moreTwoDots = valueSplit.length - 1 > 1; // Has : several times
     const notAvailable = !options.includes(valueSplit[0]); // Not include in the available options
-    if (moreTwoDots || (oneTwoDots && notAvailable)) return false; // Only allow : once in order to split, also only allow the this.availableOptions if contents :
+    if (moreTwoDots || (oneTwoDots && notAvailable)) {
+      if (oneTwoDots) {
+        this.notValidMessage = `${valueSplit[0]} is a not valid filter, the available filters are: ${availableOptions}`;
+      } else {
+        this.notValidMessage = 'Only allow ":" once';
+      }
+      return false;
+    }
     return true;
   }
 
@@ -125,18 +137,23 @@ class WzRulesetFilterBar extends Component {
   }
 
   onCreateOption = searchValue => {
+    const isList = this.props.state.section === 'lists';
+    const lowerValue = searchValue.toLowerCase();
     const currentOptions = { ...this.props.state.filters };
-    const creatingSplit = searchValue.split(':');
-    let key;
+    const creatingSplit = lowerValue.split(':');
+    let key = 'search';
     let value;
-    if (creatingSplit.length > 1) {
-      key = creatingSplit[0];
-      value = creatingSplit[1];
+    if (!isList) {
+      if (creatingSplit.length > 1) {
+        key = creatingSplit[0];
+        value = creatingSplit[1];
+      } else {
+        value = creatingSplit[0];
+      }
+      if (!this.isValid(lowerValue) || !value) return false; // Return false to explicitly reject the user's input.
     } else {
-      key = 'search';
-      value = creatingSplit[0];
+      value = lowerValue;
     }
-    if (!this.isValid(searchValue) || !value) return false; // Return false to explicitly reject the user's input.
     currentOptions[key] = value;
     this.props.updateFilters(currentOptions);
     this.buildSelectedOptions(currentOptions);
@@ -169,18 +186,25 @@ class WzRulesetFilterBar extends Component {
   render() {
     const { selectedOptions, isInvalid } = this.state;
     const options = !Object.keys(this.props.state.filters).length ? [] : selectedOptions;
+    const availableOptions = this.availableOptions[this.props.state.section].toString();
+    const filters = availableOptions ? `Available filters are: ${availableOptions}` : 'Search lists...';
+
     return (
-      <EuiComboBox
-        className="WzFilterBar"
-        fullWidth={true}
-        noSuggestions
-        placeholder="Filters..."
-        selectedOptions={options}
-        onCreateOption={this.onCreateOption}
-        onChange={this.onChange}
-        onSearchChange={this.onSearchChange}
+      <EuiFormRow
+        className="wz-form-row"
         isInvalid={isInvalid}
-      />
+        error={this.notValidMessage}
+      >
+        <EuiComboBox
+          noSuggestions
+          placeholder={filters}
+          selectedOptions={options}
+          onCreateOption={this.onCreateOption}
+          onChange={this.onChange}
+          onSearchChange={this.onSearchChange}
+          isInvalid={isInvalid}
+        />
+      </EuiFormRow>
     );
   }
 }
