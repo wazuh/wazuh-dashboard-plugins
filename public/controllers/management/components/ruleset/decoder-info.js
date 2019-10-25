@@ -35,17 +35,18 @@ class WzDecoderInfo extends Component {
     this.rulesetHandler = RulesetHandler;
     this.columns = [
       {
+        field: 'name',
         name: 'Name',
         align: 'left',
         sortable: true,
-        render: item => {
+        render: value => {
           return (
-            <EuiToolTip position="top" content={`Show ${item.name} decoder information`}>
+            <EuiToolTip position="top" content={`Show ${value} decoder information`}>
               <EuiLink onClick={() => {
-                this.changeBetweenDecoders(item.name);
+                this.changeBetweenDecoders(value);
               }
               }>
-                {item.name}
+                {value}
               </EuiLink>
             </EuiToolTip>
           )
@@ -68,16 +69,16 @@ class WzDecoderInfo extends Component {
         name: 'File',
         align: 'left',
         sortable: true,
-        render: item => {
+        render: (value, item) => {
           return (
-            <EuiToolTip position="top" content={`Show ${item} content`}>
+            <EuiToolTip position="top" content={`Show ${value} content`}>
               <EuiLink onClick={async () => {
-                const result = await this.rulesetHandler.getDecoderContent(item);
+                const result = await this.rulesetHandler.getDecoderContent(value);
                 console.log('result ', result)
-                const file = { name: item, content: result };
+                const file = { name: value, content: result, path: item.path };
                 this.props.updateFileContent(file);
               }
-              }>{item}</EuiLink>
+              }>{value}</EuiLink>
             </EuiToolTip>
           )
         }

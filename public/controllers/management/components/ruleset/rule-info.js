@@ -41,18 +41,19 @@ class WzRuleInfo extends Component {
     this.rulesetHandler = RulesetHandler;
     this.columns = [
       {
+        field: 'id',
         name: 'ID',
         align: 'left',
         sortable: true,
         width: '5%',
-        render: item => {
+        render: value => {
           return (
-            <EuiToolTip position="top" content={`Show rule ID ${item.id} information`}>
+            <EuiToolTip position="top" content={`Show rule ID ${value} information`}>
               <EuiLink onClick={() => {
-                this.changeBetweenRules(item.id);
+                this.changeBetweenRules(value);
               }
               }>
-                {item.id}
+                {value}
               </EuiLink>
             </EuiToolTip>
           )
@@ -113,16 +114,16 @@ class WzRuleInfo extends Component {
         align: 'left',
         sortable: true,
         width: '15%',
-        render: item => {
+        render: (value, item) => {
           return (
-            <EuiToolTip position="top" content={`Show ${item} content`}>
+            <EuiToolTip position="top" content={`Show ${value} content`}>
               <EuiLink onClick={async () => {
-                const result = await this.rulesetHandler.getRuleContent(item);
-                const file = { name: item, content: result };
+                const result = await this.rulesetHandler.getRuleContent(value);
+                const file = { name: value, content: result, path: item.path };
                 this.props.updateFileContent(file);
               }
               }>
-                {item}
+                {value}
               </EuiLink>
             </EuiToolTip>
           )

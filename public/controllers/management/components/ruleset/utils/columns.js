@@ -11,19 +11,20 @@ export default class RulesetColumns {
     this.columns = {
       rules: [
         {
+          field: 'id',
           name: 'ID',
           align: 'left',
           sortable: true,
           width: '5%',
-          render: item => {
+          render: (value, item) => {
             return (
-              <EuiToolTip position="top" content={`Show rule ID ${item.id} information`}>
+              <EuiToolTip position="top" content={`Show rule ID ${value} information`}>
                 <EuiLink onClick={async () => {
-                  const result = await this.rulesetHandler.getRuleInformation(item.file, item.id);
+                  const result = await this.rulesetHandler.getRuleInformation(item.file, value);
                   this.tableProps.updateRuleInfo(result);
                 }
                 }>
-                  {item.id}
+                  {value}
                 </EuiLink>
               </EuiToolTip>
             )
@@ -84,16 +85,16 @@ export default class RulesetColumns {
           align: 'left',
           sortable: true,
           width: '15%',
-          render: item => {
+          render: (value, item) => {
             return (
-              <EuiToolTip position="top" content={`Show ${item} content`}>
+              <EuiToolTip position="top" content={`Show ${value} content`}>
                 <EuiLink onClick={async () => {
-                  const result = await this.rulesetHandler.getRuleContent(item);
-                  const file = { name: item, content: result };
+                  const result = await this.rulesetHandler.getRuleContent(value);
+                  const file = { name: value, content: result, path: item.path };
                   this.tableProps.updateFileContent(file);
                 }
                 }>
-                  {item}
+                  {value}
                 </EuiLink>
               </EuiToolTip>
             )
@@ -109,18 +110,19 @@ export default class RulesetColumns {
       ],
       decoders: [
         {
+          field: 'name',
           name: 'Name',
           align: 'left',
           sortable: true,
-          render: item => {
+          render: (value, item) => {
             return (
-              <EuiToolTip position="top" content={`Show ${item.name} decoder information`}>
+              <EuiToolTip position="top" content={`Show ${value} decoder information`}>
                 <EuiLink onClick={async () => {
-                  const result = await this.rulesetHandler.getDecoderInformation(item.file, item.name);
+                  const result = await this.rulesetHandler.getDecoderInformation(item.file, value);
                   this.tableProps.updateDecoderInfo(result);
                 }
                 }>
-                  {item.name}
+                  {value}
                 </EuiLink>
               </EuiToolTip>
             )
@@ -143,15 +145,15 @@ export default class RulesetColumns {
           name: 'File',
           align: 'left',
           sortable: true,
-          render: item => {
+          render: (value, item) => {
             return (
-              <EuiToolTip position="top" content={`Show ${item} content`}>
+              <EuiToolTip position="top" content={`Show ${value} content`}>
                 <EuiLink onClick={async () => {
-                  const result = await this.rulesetHandler.getDecoderContent(item);
-                  const file = { name: item, content: result };
+                  const result = await this.rulesetHandler.getDecoderContent(value);
+                  const file = { name: value, content: result, path: item.path };
                   this.tableProps.updateFileContent(file);
                 }
-                }>{item}</EuiLink>
+                }>{value}</EuiLink>
               </EuiToolTip>
             )
           }
@@ -165,18 +167,19 @@ export default class RulesetColumns {
       ],
       lists: [
         {
+          field: 'name',
           name: 'Name',
           align: 'left',
           sortable: true,
-          render: item => {
+          render: (value, item) => {
             return (
-              <EuiToolTip position="top" content={`Show ${item.name} content`}>
+              <EuiToolTip position="top" content={`Show ${value} content`}>
                 <EuiLink onClick={async () => {
-                  const result = await this.rulesetHandler.getCdbList(`${item.path}/${item.name}`);
+                  const result = await this.rulesetHandler.getCdbList(`${item.path}/${value}`);
                   console.log(result)
                 }
                 }>
-                  {item.name}
+                  {value}
                 </EuiLink>
               </EuiToolTip>
             )
@@ -240,7 +243,7 @@ export default class RulesetColumns {
                     iconType="eye"
                     onClick={async () => {
                       const result = await this.rulesetHandler.getFileContent(`${item.path}/${item.file}`);
-                      const file = { name: item.file, content: result };
+                      const file = { name: item.file, content: result, path: item.path };
                       this.tableProps.updateFileContent(file);
                     }}
                     color="primary"
@@ -256,7 +259,7 @@ export default class RulesetColumns {
                       iconType="pencil"
                       onClick={async () => {
                         const result = await this.rulesetHandler.getFileContent(`${item.path}/${item.file}`);
-                        const file = { name: item.file, content: result };
+                        const file = { name: item.file, content: result, path: item.path };
                         this.tableProps.updateFileContent(file);
                       }}
                       color="primary"
