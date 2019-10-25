@@ -132,7 +132,7 @@ class WzRulesetActionButtons extends Component {
   }
 
   render() {
-    const { section, showingFiles } = this.props.state;
+    const { section, showingFiles, adminMode } = this.props.state;
 
     // Export button
     const exportButton = (
@@ -166,16 +166,18 @@ class WzRulesetActionButtons extends Component {
     );
     return (
       <Fragment>
-        {section !== 'lists' && (
+        {(section !== 'lists' && adminMode) && (
           <EuiFlexItem grow={false}>
             {manageFiles}
           </EuiFlexItem>
         )
         }
-        <EuiFlexItem grow={false}>
-          {addNewRuleButton}
-        </EuiFlexItem>
-        {(section === 'lists' || showingFiles) && (
+        {adminMode && (
+          <EuiFlexItem grow={false}>
+            {addNewRuleButton}
+          </EuiFlexItem>
+        )}
+        {((section === 'lists' || showingFiles) && adminMode) && (
           <EuiFlexItem grow={false}>
             <UploadFiles
               msg={section}
