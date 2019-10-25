@@ -4,7 +4,8 @@
     <div layout="column" layout-padding>
         <div>
             <span class="font-size-18">Amazon S3</span>
-            <span class="wz-agent-status-indicator small teal">Enabled</span>
+            <span ng-if="currentConfig && currentConfig['aws-s3'] && currentConfig.disabled === 'no'" class="wz-agent-status-indicator small teal">Enabled</span>
+            <span ng-if="!currentConfig || !currentConfig['aws-s3'] || (currentConfig && currentConfig['aws-s3'].disabled === 'yes')" class="wz-agent-status-indicator small red">Disabled</span>
         </div>
         <span class="md-subheader">Security events related to Amazon AWS services, collected directly via AWS API</span>
     </div>
