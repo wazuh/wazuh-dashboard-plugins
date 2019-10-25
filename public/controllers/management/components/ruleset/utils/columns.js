@@ -256,7 +256,8 @@ export default class RulesetColumns {
                       iconType="pencil"
                       onClick={async () => {
                         const result = await this.rulesetHandler.getFileContent(`${item.path}/${item.file}`);
-                        console.log(result)
+                        const file = { name: item.file, content: result };
+                        this.tableProps.updateFileContent(file);
                       }}
                       color="primary"
                     />

@@ -75,7 +75,7 @@ class WzDecoderInfo extends Component {
                 const result = await this.rulesetHandler.getDecoderContent(item);
                 console.log('result ', result)
                 const file = { name: item, content: result };
-                this.tableProps.updateFileContent(file);
+                this.props.updateFileContent(file);
               }
               }>{item}</EuiLink>
             </EuiToolTip>
