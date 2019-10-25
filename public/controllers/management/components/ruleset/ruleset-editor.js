@@ -34,7 +34,8 @@ import {
   EuiTitle,
   EuiToolTip,
   EuiButtonIcon,
-  EuiButton
+  EuiButton,
+  EuiCallOut
 } from '@elastic/eui';
 
 import RulesetHandler from './utils/ruleset-handler';
@@ -56,7 +57,9 @@ class WzRulesetEditor extends Component {
     this.codeMirrorContent = this.props.state.fileContent.content;
     this.rulesetHandler = RulesetHandler;
     this.state = {
-      isSaving: false
+      isSaving: false,
+      error: false,
+      savedComplete: false
     }
   }
 
@@ -68,22 +71,20 @@ class WzRulesetEditor extends Component {
    */
   async save(name, overwrite = true) {
     try {
-      this.setState({ isSaving: true });
+      this.setState({ isSaving: true, error: false, savedComplete: false });
       const { section } = this.props.state;
       let saver = this.rulesetHandler.sendRuleConfiguration; // By default the saver is for rules
       if (section === 'decoders') saver = this.rulesetHandler.sendDecoderConfiguration;
       if (section === 'lists') save = this.rulesetHandler.sendCdbList;
-      const r = await saver(name, this.codeMirrorContent, overwrite);
-      console.log('result ', r)
+      await saver(name, this.codeMirrorContent, overwrite);
+      this.setState({ savedComplete: true, isSaving: false });
     } catch (error) {
-      console.error('Error saving content ', error);
+      this.setState({ error, isSaving: false });
     }
-    this.setState({ isSaving: false });
   }
 
   render() {
     const { section, fileContent } = this.props.state;
-    console
     const { name, content, path } = fileContent;
     const isEditable = path !== 'ruleset/rules' && path !== 'ruleset/decoders';
     const options = Object.assign(this.codeMirrorOptions, { readOnly: !isEditable });////TODO check ADMIN MODE
@@ -130,12 +131,32 @@ class WzRulesetEditor extends Component {
             <EuiSpacer size="m" />
             <EuiFlexGroup>
               <EuiFlexItem>
-                <CodeMirror
-                  className="react-code-mirror"
-                  options={options}
-                  value={content}
-                  onChange={newContent => this.codeMirrorContent = newContent}
-                />
+                {/* If everythin was ok while saving */}
+                {this.state.savedComplete && (
+                  <EuiFlexGroup>
+                    <EuiFlexItem>
+                      <EuiCallOut color="success" iconType="check" title={`File ${name} was successfully saved`} />
+                    </EuiFlexItem>
+                  </EuiFlexGroup>
+                )}
+                {/* If there was any error while saving */}
+                {this.state.error && (
+                  <EuiFlexGroup>
+                    <EuiFlexItem>
+                      <EuiCallOut color="danger" iconType="cross" title={this.state.error} />
+                    </EuiFlexItem>
+                  </EuiFlexGroup>
+                )}
+                <EuiFlexGroup>
+                  <EuiFlexItem>
+                    <CodeMirror
+                      className="react-code-mirror"
+                      options={options}
+                      value={content}
+                      onChange={newContent => this.codeMirrorContent = newContent}
+                    />
+                  </EuiFlexItem>
+                </EuiFlexGroup>
               </EuiFlexItem>
             </EuiFlexGroup>
           </EuiFlexItem>
