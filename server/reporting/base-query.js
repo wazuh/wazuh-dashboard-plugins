@@ -9,7 +9,7 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import { getConfiguration } from './get-configuration';
+import { getConfiguration } from '../lib/get-configuration';
 
 export function Base(pattern, filters, gte, lte) {
 

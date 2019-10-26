@@ -458,14 +458,14 @@ export class WazuhElasticCtrl {
                 ? monitoringPattern
                 : monitoringPattern + '*'
             );
-            aux_source.kibanaSavedObjectMeta.searchSourceJSON = defaultStr.replace(
+            aux_source.kibanaSavedObjectMeta.searchSourceJSON = aux_source.kibanaSavedObjectMeta.searchSourceJSON.replace(
               /wazuh-timestamp/g, patternTimeFilter);
           } else {
             aux_source.kibanaSavedObjectMeta.searchSourceJSON = defaultStr.replace(
               /wazuh-alerts/g,
               id
             );
-            aux_source.kibanaSavedObjectMeta.searchSourceJSON = defaultStr.replace(
+            aux_source.kibanaSavedObjectMeta.searchSourceJSON = aux_source.kibanaSavedObjectMeta.searchSourceJSON.replace(
               /wazuh-timestamp/g, patternTimeFilter);
           }
         }

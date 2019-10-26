@@ -11,7 +11,7 @@
  */
 import { ElasticWrapper } from '../lib/elastic-wrapper';
 import { Base } from './base-query';
-import { getConfiguration } from './get-configuration';
+import { getConfiguration } from '../lib/get-configuration';
 
 export class SyscheckRequest {
   /**
