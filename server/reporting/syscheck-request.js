@@ -11,6 +11,7 @@
  */
 import { ElasticWrapper } from '../lib/elastic-wrapper';
 import { Base } from './base-query';
+import { getConfiguration } from './get-configuration';
 
 export class SyscheckRequest {
   /**
@@ -136,6 +137,10 @@ export class SyscheckRequest {
     try {
       const base = {};
 
+      const configFile = getConfiguration();
+      let patternTimeFilter =
+        (configFile || {})['pattern.time.filter'] || 'timestamp';
+
       Object.assign(base, Base(pattern, filters, gte, lte));
 
       Object.assign(base.aggs, {
@@ -150,7 +155,7 @@ export class SyscheckRequest {
           aggs: {
             '1': {
               max: {
-                field: 'timestamp'
+                field: patternTimeFilter
               }
             }
           }
@@ -190,6 +195,10 @@ export class SyscheckRequest {
     try {
       const base = {};
 
+      const configFile = getConfiguration();
+      let patternTimeFilter =
+        (configFile || {})['pattern.time.filter'] || 'timestamp';
+
       Object.assign(base, Base(pattern, filters, gte, lte));
 
       Object.assign(base.aggs, {
@@ -204,7 +213,7 @@ export class SyscheckRequest {
           aggs: {
             '1': {
               max: {
-                field: 'timestamp'
+                field: patternTimeFilter
               }
             }
           }

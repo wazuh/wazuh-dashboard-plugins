@@ -20,6 +20,10 @@ export const monitoringTemplate = {
         type: 'date',
         format: 'dateOptionalTime'
       },
+      '@timestamp': {
+        type: 'date',
+        format: 'dateOptionalTime'
+      },
       status: {
         type: 'keyword'
       },

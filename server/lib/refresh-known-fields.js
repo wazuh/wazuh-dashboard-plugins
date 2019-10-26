@@ -38,7 +38,7 @@ export async function checkKnownFields(
 
     const list = [];
     if (((indexPatternList || {}).hits || {}).hits) {
-      const minimum = ['timestamp', 'rule.id', 'manager.name', 'agent.id'];
+      const minimum = ['rule.id', 'manager.name', 'agent.id'];
 
       if (indexPatternList.hits.hits.length > 0) {
         for (const index of indexPatternList.hits.hits) {

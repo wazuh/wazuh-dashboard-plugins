@@ -14,6 +14,7 @@ export async function getWzConfig($q, genericReq, wazuhConfig) {
   // Remember to keep this values equal to default config.yml values
   const defaultConfig = {
     pattern: 'wazuh-alerts-3.x-*',
+    'pattern.time.filter': 'timestamp',
     'checks.pattern': true,
     'checks.template': true,
     'checks.api': true,

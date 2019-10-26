@@ -406,6 +406,9 @@ export class Monitoring {
    */
   async insertDocument(datedIndex, clusterName) {
     try {
+      const configFile = getConfiguration();
+      let patternTimeFilter =
+        (configFile || {})['pattern.time.filter'] || 'timestamp';
       let body = '';
       if (this.agentsArray.length > 0) {
         log(
@@ -416,7 +419,7 @@ export class Monitoring {
         for (const element of this.agentsArray) {
           body += '{ "index":  { "_index": "' + datedIndex + '" } }\n';
           let date = new Date(Date.now()).toISOString();
-          element['timestamp'] = date;
+          element[patternTimeFilter] = date;
           element.host = element.manager;
           element.cluster = { name: clusterName ? clusterName : 'disabled' };
           body += JSON.stringify(element) + '\n';

@@ -22,6 +22,7 @@
 #
 # Default index pattern to use.
 #pattern: wazuh-alerts-3.x-*
+#pattern.time.filter: timestamp
 #
 # ----------------------------------- Checks -----------------------------------
 #

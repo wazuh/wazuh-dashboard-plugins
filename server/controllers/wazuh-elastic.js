@@ -409,6 +409,8 @@ export class WazuhElasticCtrl {
       const config = getConfiguration();
       let monitoringPattern =
         (config || {})['wazuh.monitoring.pattern'] || 'wazuh-monitoring-3.x-*';
+      let patternTimeFilter =
+        (config || {})['pattern.time.filter'] || 'timestamp';
       log(
         'wazuh-elastic:buildVisualizationsRaw',
         `Building ${app_objects.length} visualizations`,
@@ -456,11 +458,15 @@ export class WazuhElasticCtrl {
                 ? monitoringPattern
                 : monitoringPattern + '*'
             );
+            aux_source.kibanaSavedObjectMeta.searchSourceJSON = defaultStr.replace(
+              /wazuh-timestamp/g, patternTimeFilter);
           } else {
             aux_source.kibanaSavedObjectMeta.searchSourceJSON = defaultStr.replace(
               /wazuh-alerts/g,
               id
             );
+            aux_source.kibanaSavedObjectMeta.searchSourceJSON = defaultStr.replace(
+              /wazuh-timestamp/g, patternTimeFilter);
           }
         }
 
@@ -470,6 +476,8 @@ export class WazuhElasticCtrl {
             /wazuh-alerts/g,
             id
           );
+          aux_source.visState = aux_source.visState.replace(
+            /wazuh-timestamp/g, patternTimeFilter);
         }
 
         // Bulk source

@@ -9,7 +9,14 @@
  *
  * Find more information about this on the LICENSE file.
  */
+import { getConfiguration } from './get-configuration';
+
 export function Base(pattern, filters, gte, lte) {
+
+  const configFile = getConfiguration();
+  let patternTimeFilter =
+    (configFile || {})['pattern.time.filter'] || 'timestamp';
+
   return {
     pattern: pattern,
     size: 0,
@@ -17,7 +24,7 @@ export function Base(pattern, filters, gte, lte) {
     stored_fields: ['*'],
     script_fields: {},
     docvalue_fields: [
-      'timestamp',
+      patternTimeFilter,
       'data.vulnerability.published',
       'data.vulnerability.updated',
       'syscheck.mtime_after',
@@ -36,7 +43,7 @@ export function Base(pattern, filters, gte, lte) {
           },
           {
             range: {
-              timestamp: {
+              patternTimeFilter: {
                 gte: gte,
                 lte: lte,
                 format: 'epoch_millis'
