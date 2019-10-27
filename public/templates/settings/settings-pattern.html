@@ -26,6 +26,20 @@
                 </div>
             </md-card-content>
         </md-card>
+
+        <md-card flex class="wz-md-card">
+            <md-card-content>
+                <div layout="row">
+                    <p class="md-body-1"><strong>Note:</strong> Select the field to use as the time filter for the index pattern. <strong>Warning</strong>, this is a system wide setting.</p>
+                </div>
+                <div flex="25" layout="column" class="wz-select-input wz-margin-top-10">
+                    <select class="kuiSelect wz-border-none cursor-pointer" ng-model="ctrl.selectedIndexPatternTimeFilter"
+                        ng-change="ctrl.changeIndexPatternTimeFilter(ctrl.selectedIndexPatternTimeFilter)" aria-label="Select index pattern time filter">
+                        <option ng-repeat="indexPatternTimeFilter in ctrl.indexPatternTimeFilters" value="{{indexPatternTimeFilter}}">{{indexPatternTimeFilter}}</option>
+                    </select>
+                </div>
+            </md-card-content>
+        </md-card>
     </div>
     <!-- End pattern selector section -->
 

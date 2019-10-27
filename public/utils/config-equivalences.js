@@ -1,5 +1,7 @@
 export const configEquivalences = {
   pattern: 'Default index pattern to use on the app.',
+  'pattern.time.filter':
+    'Default field used as time filter in the index pattern.',
   'checks.pattern':
     'Enable or disable the index pattern health check when opening the app.',
   'checks.template':

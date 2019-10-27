@@ -41,10 +41,17 @@ export class UpdateConfigurationFile {
       const file = path.join(__dirname, '../../config.yml');
       const data = fs.readFileSync(file, { encoding: 'utf-8' });
       const re = new RegExp(`^${key}\\s{0,}:\\s{1,}.*`, 'gm');
-      const result = exists
+      if (typeof value === 'string' || value instanceof String) {
+        const result = exists
+        ? data.replace(re, `${key}: '${value}'`)
+        : `${data}\n${key}: '${value}'`;
+        fs.writeFileSync(file, result, 'utf8');
+      } else {
+        const result = exists
         ? data.replace(re, `${key}: ${value}`)
         : `${data}\n${key}: ${value}`;
-      fs.writeFileSync(file, result, 'utf8');
+        fs.writeFileSync(file, result, 'utf8');
+      }
       return true;
     } catch (error) {
       throw error;
@@ -61,12 +68,15 @@ export class UpdateConfigurationFile {
         throw new Error('Another process is updating the configuration file');
       }
       this.busy = true;
-      const configuration = getConfiguration() || {};
+      let configuration = getConfiguration() || {};
       if (!!configuration.admin) {
         throw new Error('You are not authorized to update the configuration');
       }
       const { key, value } = (input || {}).payload || {};
       this.updateLine(key, value, typeof configuration[key] !== 'undefined');
+      if (key === "pattern.time.filter") {
+        configuration = getConfiguration(true) || {};
+      }
       this.busy = false;
       return { needRestart: needRestartFields.includes(key) };
     } catch (error) {

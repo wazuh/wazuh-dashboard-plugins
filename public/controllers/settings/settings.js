@@ -641,6 +641,37 @@ export class SettingsController {
   }
 
   /**
+   * Index pattern time filter
+   * @param {} newIndexPatternTimeFilter
+   */
+  async changeIndexPatternTimeFilter(newIndexPatternTimeFilter) {
+    try {
+      await this.editKey(
+        'pattern.time.filter', 
+        newIndexPatternTimeFilter
+      );
+      await this.genericReq.request(
+        'GET',
+        `/elastic/known-fields/${this.appState.getCurrentPattern()}`,
+        {}
+      );
+      this.errorHandler.info(
+        'Successfully changed the default index-pattern time filter',
+        'Settings'
+      );
+      this.selectedIndexPatternTimeFilter = newIndexPatternTimeFilter;
+      this.$scope.$applyAsync();
+      return;
+    } catch (error) {
+      this.errorHandler.handle(
+        'Error while changing the default index-pattern time filter',
+        'Settings'
+      );
+    }
+    return;
+  }
+
+  /**
    * This set the error, and checks if is updating
    * @param {*} error
    * @param {*} updating
@@ -695,6 +726,9 @@ export class SettingsController {
         // There's no pattern in the cookies, pick the one in the settings
         this.selectedIndexPattern = config['pattern'];
       }
+
+      this.selectedIndexPatternTimeFilter = config['pattern.time.filter'];
+      this.indexPatternTimeFilters = ['timestamp', '@timestamp']
 
       if (this.tab === 'logs') {
         this.getAppLogs();

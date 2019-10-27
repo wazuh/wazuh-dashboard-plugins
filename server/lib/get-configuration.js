@@ -14,11 +14,11 @@ import yml from 'js-yaml';
 import path from 'path';
 let cachedConfiguration = null;
 let lastAssign = new Date().getTime();
-export function getConfiguration() {
+export function getConfiguration(force = false) {
   try {
     const now = new Date().getTime();
     const dateDiffer = now - lastAssign;
-    if (!cachedConfiguration || dateDiffer >= 10000) {
+    if (!cachedConfiguration || dateDiffer >= 10000 || force) {
       const customPath = path.join(__dirname, '../../config.yml');
       const raw = fs.readFileSync(customPath, { encoding: 'utf-8' });
       const file = yml.load(raw);
