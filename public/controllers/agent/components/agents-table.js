@@ -12,7 +12,7 @@
  */
 
 
-import React, { Component, Fragment } from 'react';
+import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import {
   EuiBasicTable,
@@ -37,6 +37,7 @@ import {
   InM
 } from '@elastic/eui';
 import { WzFilterBar } from '../../../components/wz-filter-bar/wz-filter-bar'
+import { raw } from 'joi';
 
 export class AgentsTable extends Component {
 
@@ -77,11 +78,21 @@ export class AgentsTable extends Component {
 
   async componentDidMount() {
     await this.getItems();
+    const filterGroups = await this.filterBarModelGroups();
+    const filterOs = await this.filterBarModelOs();
+    const filterVersion = await this.filterBarModelWazuhVersion();
+    this.setState({ 
+      filterGroups,
+      filterOs,
+      filterVersion
+    });
   }
+  
   async componentDidUpdate() {
     if (this.state.isProcessing) {
       await this.getItems();
     }
+
   }
 
 
@@ -236,25 +247,95 @@ export class AgentsTable extends Component {
     );
   }
 
-  filterBar() {
-    const model = [
+  filterBarModelStatus() {
+    return {
+      label: 'Status',
+      options: [
+        {
+          label: 'Active',
+          group: 'status'
+        },
+        {
+          label: 'Disconnected',
+          group: 'status'
+        },
+        {
+          label: 'Never connected',
+          group: 'status'
+        }
+      ]
+    };
+  }
+
+  async filterBarModelGroups() {
+    const rawGroups = await this.props.wzReq('GET', '/agents/groups', {});
+    const itemsGroups = (((rawGroups || {}).data || {}).data || {}).items;
+    const groups = itemsGroups
+      .filter((item) => { return item.count > 0; })
+      .map((item) => { return { label: item.name, group: 'group' } });
+    return {
+      label: 'Groups',
+      options: groups,
+    };
+  }
+
+  async filterBarModelOs() {
+    const rawOs = await this.props.wzReq(
+      'GET', 
+      '/agents/stats/distinct?pretty',
       {
-        label: 'Status',
-        options: [
-          {
-            label: 'Active',
-            group: 'status'
-          },
-          {
-            label: 'Disconnected',
-            group: 'status'
-          },
-          {
-            label: 'Never connected',
-            group: 'status'
-          }
-        ]
-      },
+        'fields':'os.platform,os.version',
+        'q':'id!=000'
+      }
+    )
+    const itemsOs = (((rawOs || {}).data || {}).data || {}).items
+    const os = itemsOs 
+      .filter((item) => { return Object.keys(item).includes('os') })
+      .map((item) => {
+        const { platform, version } = item.os;
+        return {
+          label: `${platform}-${version}`,
+          group: 'osPlatform',
+          query: `os.platform=${platform};os.version=${version}`
+        };
+      })
+    return {
+      label: 'OS platform',
+      options: os,
+    };
+  }
+
+  async filterBarModelWazuhVersion() {
+    const rawVersions = await this.props.wzReq(
+      'GET',
+      '/agents/stats/distinct?pretty',
+      {
+        'fields':'version',
+        'q':'id!=000'
+      }
+    );
+    const itemsVersions = (((rawVersions || {}).data || {}).data || {}).items;
+    const versions = itemsVersions
+      .filter((item) => { return Object.keys(item).includes('version')})
+      .map((item) => {
+        return {
+          label: item.version,
+          group: 'version'
+        }
+      });
+    return {
+      label: 'Version',
+      options: versions,
+    }
+  }
+
+  filterBar() {
+    const { filterGroups, filterOs, filterVersion, } = this.state;
+    const model = [
+      this.filterBarModelStatus(),
+      filterGroups || {label:'Groups', options: []},
+      filterOs || {label:'OS platform', options: []},
+      filterVersion || {label:'Version', options: []},
     ];
 
     return (
