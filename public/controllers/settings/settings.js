@@ -661,6 +661,7 @@ export class SettingsController {
       );
       this.selectedIndexPatternTimeFilter = newIndexPatternTimeFilter;
       this.$scope.$applyAsync();
+      this.$window.location.reload();
       return;
     } catch (error) {
       this.errorHandler.handle(
