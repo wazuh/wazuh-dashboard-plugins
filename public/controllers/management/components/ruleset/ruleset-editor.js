@@ -75,7 +75,6 @@ class WzRulesetEditor extends Component {
       const { section } = this.props.state;
       let saver = this.rulesetHandler.sendRuleConfiguration; // By default the saver is for rules
       if (section === 'decoders') saver = this.rulesetHandler.sendDecoderConfiguration;
-      if (section === 'lists') save = this.rulesetHandler.sendCdbList;
       await saver(name, this.codeMirrorContent, overwrite);
       this.setState({ savedComplete: true, isSaving: false });
     } catch (error) {
