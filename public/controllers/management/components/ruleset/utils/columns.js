@@ -8,6 +8,7 @@ export default class RulesetColumns {
   constructor(tableProps) {
     this.tableProps = tableProps;
     this.rulesetHandler = RulesetHandler;
+    this.adminMode = this.tableProps.state.adminMode;
     this.columns = {
       rules: [
         {
@@ -89,7 +90,8 @@ export default class RulesetColumns {
             return (
               <EuiToolTip position="top" content={`Show ${value} content`}>
                 <EuiLink onClick={async () => {
-                  const result = await this.rulesetHandler.getRuleContent(value);
+                  const noLocal = item.path.startsWith('ruleset/');
+                  const result = await this.rulesetHandler.getRuleContent(value, noLocal);
                   const file = { name: value, content: result, path: item.path };
                   this.tableProps.updateFileContent(file);
                 }
@@ -149,7 +151,8 @@ export default class RulesetColumns {
             return (
               <EuiToolTip position="top" content={`Show ${value} content`}>
                 <EuiLink onClick={async () => {
-                  const result = await this.rulesetHandler.getDecoderContent(value);
+                  const noLocal = item.path.startsWith('ruleset/');
+                  const result = await this.rulesetHandler.getDecoderContent(value, noLocal);
                   const file = { name: value, content: result, path: item.path };
                   this.tableProps.updateFileContent(file);
                 }

@@ -84,9 +84,9 @@ class WzRulesetEditor extends Component {
   }
 
   render() {
-    const { section, fileContent } = this.props.state;
+    const { section, fileContent, adminMode } = this.props.state;
     const { name, content, path } = fileContent;
-    const isEditable = path !== 'ruleset/rules' && path !== 'ruleset/decoders';
+    const isEditable = path !== 'ruleset/rules' && path !== 'ruleset/decoders' && adminMode;
     const options = Object.assign(this.codeMirrorOptions, { readOnly: !isEditable });////TODO check ADMIN MODE
 
     const saveButton = (

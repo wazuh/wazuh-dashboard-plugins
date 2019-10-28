@@ -118,7 +118,8 @@ class WzRuleInfo extends Component {
           return (
             <EuiToolTip position="top" content={`Show ${value} content`}>
               <EuiLink onClick={async () => {
-                const result = await this.rulesetHandler.getRuleContent(value);
+                const noLocal = item.path.startsWith('ruleset/');
+                const result = await this.rulesetHandler.getRuleContent(value, noLocal);
                 const file = { name: value, content: result, path: item.path };
                 this.props.updateFileContent(file);
               }
