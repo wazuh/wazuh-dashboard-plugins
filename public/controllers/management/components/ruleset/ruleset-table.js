@@ -28,10 +28,10 @@ import RulesetColums from './utils/columns';
 class WzRulesetTable extends Component {
   constructor(props) {
     super(props);
-    this.rulesetColums = new RulesetColums(this.props);
   }
 
   render() {
+    this.rulesetColums = new RulesetColums(this.props);
     const { isLoading, items, section, showingFiles } = this.props.state;
     const rulesetColums = this.rulesetColums.columns;
     const columns =  showingFiles ? rulesetColums.files : rulesetColums[section]

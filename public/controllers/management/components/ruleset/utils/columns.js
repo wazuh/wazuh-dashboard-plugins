@@ -193,39 +193,7 @@ export default class RulesetColumns {
           name: 'Path',
           align: 'left',
           sortable: true
-        },
-        {
-          name: 'Actions',
-          align: 'left',
-          render: item => {
-            return (
-              <div>
-                <EuiToolTip position="top" content={`Edit ${item.name} content`}>
-                  <EuiButtonIcon
-                    aria-label="Edit content"
-                    iconType="pencil"
-                    onClick={async () => {
-                      const result = await this.rulesetHandler.getCdbList(`${item.path}/${item.name}`);
-                      console.log(result)
-                    }}
-                    color="primary"
-                  />
-                </EuiToolTip>
-                <EuiToolTip position="top" content={`Remove ${item.name}`}>
-                  <EuiButtonIcon
-                    aria-label="Show content"
-                    iconType="trash"
-                    onClick={async () => {
-                      console.log(`deleting ${item.path}/${item.name}`);
-                    }}
-                    color="danger"
-                  />
-                </EuiToolTip>
-              </div>
-            )
-          }
-        },
-
+        }
       ],
       files: [
         {
@@ -284,6 +252,42 @@ export default class RulesetColumns {
           }
         }
       ]
+    }
+    // If the admin mode is enabled the action column in CDB lists is shown
+    if (this.adminMode) {
+      this.columns.lists.push(
+        {
+          name: 'Actions',
+          align: 'left',
+          render: item => {
+            return (
+              <div>
+                <EuiToolTip position="top" content={`Edit ${item.name} content`}>
+                  <EuiButtonIcon
+                    aria-label="Edit content"
+                    iconType="pencil"
+                    onClick={async () => {
+                      const result = await this.rulesetHandler.getCdbList(`${item.path}/${item.name}`);
+                      console.log(result)
+                    }}
+                    color="primary"
+                  />
+                </EuiToolTip>
+                <EuiToolTip position="top" content={`Remove ${item.name}`}>
+                  <EuiButtonIcon
+                    aria-label="Show content"
+                    iconType="trash"
+                    onClick={async () => {
+                      console.log(`deleting ${item.path}/${item.name}`);
+                    }}
+                    color="danger"
+                  />
+                </EuiToolTip>
+              </div>
+            )
+          }
+        }
+      );
     }
   }
 }
