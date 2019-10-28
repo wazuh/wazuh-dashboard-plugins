@@ -18,12 +18,11 @@ export class WzFilterBar extends Component {
   constructor(props) {
     super(props);
 
-    this.options = JSON.parse(JSON.stringify(this.props.model));
-
     this.state = {
       selectedOptions: [],
       toggleIdSelected: 'AND',
       isProcessing: true,
+      options: this.props.model,
     };
 
     this.toggleButtons = [
@@ -45,38 +44,58 @@ export class WzFilterBar extends Component {
     selectedOptions[option].type =
       selectedOptions[option].type === 'AND' ? 'OR' : 'AND';
     this.setState({
-      selectedOptions,
       isProcessing: true,
+      selectedOptions,
     });
   };
 
-  componentDidUpdate() {
+  componentDidUpdate(prevProps, prevState) {
+    if (JSON.stringify(prevProps.model) !== JSON.stringify(this.props.model)) {
+      this.setState({ options: this.props.model });
+    }
     if (this.state.isProcessing) {
-        for (let i = 0; i < this.state.selectedOptions.length; i++) {
-          const el = $('.wzFilterBarOperator .euiBadge__content')[i];
-        const hasBtn = $(el).find('.wzFilterBarOperatorBtn');
-        if (hasBtn.length) {
-          $(hasBtn[0]).remove();
-        }
-        if (i !== 0) {
-          if (this.state.selectedOptions[i].type != 'search') {
-            const button = $(
-              `<button class="wzFilterBarOperatorBtn euiButtonEmpty euiButtonEmpty--primary euiButtonEmpty--xSmall"><b>${this.state.selectedOptions[i].type}<b></button>`
+        for (const i in this.state.selectedOptions) {
+          if (this.state.selectedOptions.hasOwnProperty(i)) {
+            const selectedOptions = this.state.selectedOptions[i];
+        // for (let i = 0; i < this.state.selectedOptions.length; i++) {
+            const el = $('.wzFilterBarOperator .euiBadge__content')[i];
+            const hasBtn = $(el).find('.wzFilterBarOperatorBtn');
+            if (hasBtn.length) {
+              $(hasBtn[0]).remove();
+            }
+            if (i != 0) {
+              if (selectedOptions.type != 'search') {
+                const button = $(
+                  `<button class="wzFilterBarOperatorBtn euiButtonEmpty euiButtonEmpty--primary euiButtonEmpty--xSmall"><b>${selectedOptions.type}<b></button>`
+                  );
+                button[0].addEventListener('click', ev => {
+                  this.onOperatorClick(ev, i);
+                });
+                $(el).prepend(button);
+              } else {
+              const button = $(
+                `<span class="wzFilterBarOperatorBtn"><b>AND<b></button>`
               );
-            button[0].addEventListener('click', ev => {
-              this.onOperatorClick(ev, i);
-            });
-            $(el).prepend(button);
-          } else {
-            const button = $(
-              `<span class="wzFilterBarOperatorBtn"><b>AND<b></button>`
-            );
-            $(el).prepend(button);
+              $(el).prepend(button);
+            }
           }
         }
       }
       this.buildQuery();
       this.setState({isProcessing: false });
+    }
+  }
+
+  checkIfExistsOrIsSearch(selectedOptions, last) {
+    const { group, label, type } = selectedOptions[last]
+    const lastOption = `${group.trim().toLowerCase()}:${label.trim().toLowerCase()}`;
+
+    for (const option of selectedOptions) {
+      const isSelected = option.label.trim().toLowerCase() === lastOption;
+      const isSearch = (type === 'search' && option.type === 'search')
+      if (isSelected || isSearch){
+        return true;
+      }
     }
   }
   
@@ -86,52 +105,47 @@ export class WzFilterBar extends Component {
     });
 
     if (last !== -1) {
-      for (let i = 0; i < selectedOptions.length - 1; i++) {
-        if (
-          selectedOptions[i].label.trim().toLowerCase() ===
-            selectedOptions[last].group.trim().toLowerCase() +
-              ':' +
-              selectedOptions[last].label.trim().toLowerCase() ||
-          (selectedOptions[last].type === 'search' &&
-            selectedOptions[i].type === 'search')
-        )
-          return;
+      if (this.checkIfExistsOrIsSearch(selectedOptions, last)) {
+        return;
       }
 
-      const newFitler = selectedOptions[last];
-      newFitler.type = this.state.toggleIdSelected;
-      if (!newFitler.label.includes(':')) {
-        newFitler.label_ = newFitler.label;
-      }
+      const newFilter = selectedOptions[last];
 
-      newFitler.label = selectedOptions[last].group + ':' + newFitler.label_;
-      newFitler.className = 'wzFilterBarOperator';
+      newFilter.type = this.state.toggleIdSelected;
+      if (!newFilter.label.includes(':')) {
+        newFilter.label_ = newFilter.label;
+      }
+      
+      newFilter.label = selectedOptions[last].group + ':' + newFilter.label_;
+      newFilter.className = 'wzFilterBarOperator';
     }
-    const model = JSON.parse(JSON.stringify(this.props.model));
+
+    const options = this.props.model;
     selectedOptions
       .filter(x => {
         return x.type != 'search';
       })
       .forEach(x => {
-        const group = model.findIndex(m => {
+        const group = options.findIndex(m => {
           const g1 = x.group.toLowerCase();
           const g2 = ((m.options[0] || []).group || '').toLowerCase();
           return g1 === g2;
         });
         if (group != undefined && group != -1) {
-          const idx = model[group].options.findIndex(l => {
+          const idx = options[group].options.findIndex(l => {
             return (
               l.label.trim().toLowerCase() === x.label_.trim().toLowerCase()
             );
           });
-          if (idx !== -1) model[group].options.splice(idx, 1);
+          
+          if (idx !== -1) options[group].options.splice(idx, 1);
         }
       });
 
-    this.options = model;
     this.setState({
-      selectedOptions,
       isProcessing: true,
+      selectedOptions,
+      options,
     });
   };
 
@@ -200,7 +214,9 @@ export class WzFilterBar extends Component {
         if (idx != 0) {
           queryObj.query += option.type === 'AND' ? ';' : ',';
         }
-        queryObj.query += option.label.replace(':', '=');
+        queryObj.query += (option.query) 
+          ? option.query
+          : option.label.replace(':', '=');
       });
       if (twoOrMoreElements) {
         queryObj.query += ')';
@@ -210,12 +226,13 @@ export class WzFilterBar extends Component {
   };
 
   render() {
+    const { options, selectedOptions } = this.state;
     return (
       <EuiComboBox
         className="WzFilterBar"
         placeholder="Add filter or search"
-        options={this.options}
-        selectedOptions={this.state.selectedOptions}
+        options={options}
+        selectedOptions={selectedOptions}
         onChange={this.onChange}
         fullWidth={true}
         onCreateOption={this.onCreateOption}
