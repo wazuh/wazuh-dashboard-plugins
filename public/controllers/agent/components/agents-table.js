@@ -81,10 +81,14 @@ export class AgentsTable extends Component {
     const filterGroups = await this.filterBarModelGroups();
     const filterOs = await this.filterBarModelOs();
     const filterVersion = await this.filterBarModelWazuhVersion();
+    const filterOsPlatform = await this.filterBarModelOsPlatform();
+    const filterNodes = await this.filterBarModelNodes();
     this.setState({ 
       filterGroups,
       filterOs,
-      filterVersion
+      filterVersion,
+      filterOsPlatform,
+      filterNodes,
     });
   }
   
@@ -284,24 +288,76 @@ export class AgentsTable extends Component {
       'GET', 
       '/agents/stats/distinct?pretty',
       {
-        'fields':'os.platform,os.version',
+        'fields':'os.name,os.version',
         'q':'id!=000'
       }
-    )
-    const itemsOs = (((rawOs || {}).data || {}).data || {}).items
+    );
+    const itemsOs = (((rawOs || {}).data || {}).data || {}).items;
     const os = itemsOs 
       .filter((item) => { return Object.keys(item).includes('os') })
       .map((item) => {
-        const { platform, version } = item.os;
+        const { name, version } = item.os;
         return {
-          label: `${platform}-${version}`,
-          group: 'osPlatform',
-          query: `os.platform=${platform};os.version=${version}`
+          label: `${name}-${version}`,
+          group: 'osname',
+          query: `os.name=${name};os.version=${version}`
         };
-      })
+      });
     return {
-      label: 'OS platform',
+      label: 'OS Name',
       options: os,
+    };
+  }
+
+  async filterBarModelOsPlatform() {
+    const rawOsPlatform = await this.props.wzReq(
+      'GET', 
+      '/agents/stats/distinct?pretty',
+      {
+        'fields':'os.platform',
+        'q':'id!=000'
+      }
+    );
+    const itemsOsPlatform = (((rawOsPlatform || {}).data || {}).data || {}).items;
+    const osPlatform = itemsOsPlatform 
+      .filter((item) => { return Object.keys(item).includes('os') })
+      .map((item) => {
+        const { platform } = item.os;
+        return {
+          label: platform,
+          group: 'osplatform',
+          query: `os.name=${platform}`
+        };
+      });
+    return {
+      label: 'OS Platform',
+      options: osPlatform,
+    };
+  }
+
+  async filterBarModelNodes() {
+    const rawNodes = await this.props.wzReq(
+      'GET', 
+      '/agents/stats/distinct?pretty',
+      {
+        'fields':'node_name',
+        'q':'id!=000;node_name!=unknown'
+      }
+    );
+    const itemsNodes = (((rawNodes || {}).data || {}).data || {}).items;
+    const nodes = itemsNodes 
+      .filter((item) => { return Object.keys(item).includes('node_name') })
+      .map((item) => {
+        const { node_name } = item;
+        return {
+          label: node_name,
+          group: 'nodename',
+          query: `node_name=${node_name}`
+        };
+      });
+    return {
+      label: 'Nodes',
+      options: nodes,
     };
   }
 
@@ -330,12 +386,20 @@ export class AgentsTable extends Component {
   }
 
   filterBar() {
-    const { filterGroups, filterOs, filterVersion, } = this.state;
+    const {
+      filterGroups,
+      filterOs,
+      filterVersion,
+      filterOsPlatform,
+      filterNodes,
+    } = this.state;
     const model = [
       this.filterBarModelStatus(),
       filterGroups || {label:'Groups', options: []},
-      filterOs || {label:'OS platform', options: []},
+      filterOs || {label:'OS Name', options: []},
+      filterOsPlatform || {label:'OS Platform', options: []},
       filterVersion || {label:'Version', options: []},
+      filterNodes || {label:'Nodes', options: []},
     ];
 
     return (

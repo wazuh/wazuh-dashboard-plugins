@@ -12,7 +12,6 @@
 import React, { Component } from 'react';
 import { EuiComboBox } from '@elastic/eui';
 import PropTypes from 'prop-types';
-import './wz-filter-bar.css';
 
 export class WzFilterBar extends Component {
   constructor(props) {
@@ -229,7 +228,6 @@ export class WzFilterBar extends Component {
     const { options, selectedOptions } = this.state;
     return (
       <EuiComboBox
-        className="WzFilterBar"
         placeholder="Add filter or search"
         options={options}
         selectedOptions={selectedOptions}
