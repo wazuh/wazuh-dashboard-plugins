@@ -163,6 +163,8 @@ export class WazuhElasticCtrl {
    */
   async getFieldTop(req, reply) {
     try {
+      let patternTimeFilter =
+        (config || {})['pattern.time.filter'] || 'timestamp';
       // Top field payload
       let payload = {
         size: 1,
@@ -174,7 +176,7 @@ export class WazuhElasticCtrl {
                 'agent.id': '000'
               }
             },
-            filter: { range: { timestamp: {} } }
+            filter: { range: { patternTimeFilter: {} } }
           }
         },
         aggs: {
@@ -191,8 +193,8 @@ export class WazuhElasticCtrl {
       // Set up time interval, default to Last 24h
       const timeGTE = 'now-1d';
       const timeLT = 'now';
-      payload.query.bool.filter.range['timestamp']['gte'] = timeGTE;
-      payload.query.bool.filter.range['timestamp']['lt'] = timeLT;
+      payload.query.bool.filter.range[patternTimeFilter]['gte'] = timeGTE;
+      payload.query.bool.filter.range[patternTimeFilter]['lt'] = timeLT;
 
       // Set up match for default cluster name
       payload.query.bool.must.push(
@@ -283,7 +285,7 @@ export class WazuhElasticCtrl {
    * @param {Array<Object>} indexPatternList List of index patterns
    */
   validateIndexPattern(indexPatternList) {
-    const minimum = ['timestamp', 'rule.groups', 'manager.name', 'agent.id'];
+    const minimum = ['rule.groups', 'manager.name', 'agent.id'];
     let list = [];
     for (const index of indexPatternList) {
       let valid, parsed;
@@ -517,11 +519,14 @@ export class WazuhElasticCtrl {
     try {
       const visArray = [];
       let aux_source, bulk_content;
+      let patternTimeFilter =
+        (config || {})['pattern.time.filter'] || 'timestamp';
 
       for (const element of app_objects) {
         // Stringify and replace index-pattern for visualizations
         aux_source = JSON.stringify(element._source);
         aux_source = aux_source.replace(/wazuh-alerts/g, id);
+        aux_source = aux_source.replace(/wazuh-timestamp/g, patternTimeFilter);
         aux_source = JSON.parse(aux_source);
 
         // Bulk source
@@ -710,6 +715,8 @@ export class WazuhElasticCtrl {
    */
   async alerts(req, reply) {
     try {
+      let patternTimeFilter =
+        (config || {})['pattern.time.filter'] || 'timestamp';
       const pattern = req.payload.pattern || 'wazuh-alerts-3.x-*';
       const from = req.payload.from || 'now-1d';
       const to = req.payload.to || 'now';
@@ -741,7 +748,7 @@ export class WazuhElasticCtrl {
 
       payload.size = size;
       payload.docvalue_fields = [
-        'timestamp',
+        patternTimeFilter,
         'cluster.name',
         'manager.name',
         'agent.id',

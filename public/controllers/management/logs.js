@@ -20,6 +20,7 @@ export class LogsController {
    * @param {*} csvReq
    * @param {*} appState
    * @param {*} wzTableFilter
+   * @param {*} wazuhConfig
    */
   constructor(
     $scope,
@@ -28,8 +29,9 @@ export class LogsController {
     csvReq,
     appState,
     wzTableFilter,
-    timeService
-  ) {
+    timeService,
+    wazuhConfig
+    ) {
     this.$scope = $scope;
     this.apiReq = apiReq;
     this.errorHandler = errorHandler;
@@ -41,6 +43,7 @@ export class LogsController {
     this.category = 'all';
     this.sortFilter = false;
     this.timeService = timeService;
+    this.wazuhConfig = wazuhConfig;
   }
 
   /**
@@ -102,7 +105,10 @@ export class LogsController {
   }
 
   sort() {
-    this.$scope.$broadcast('wazuhSort', { field: 'timestamp' });
+    const config = this.wazuhConfig.getConfig();
+    this.selectedIndexPatternTimeFilter = config['pattern.time.filter'];
+
+    this.$scope.$broadcast('wazuhSort', { field: this.selectedIndexPatternTimeFilter });
   }
 
   /**

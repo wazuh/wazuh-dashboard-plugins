@@ -21,8 +21,8 @@
 # ------------------------------- Index patterns -------------------------------
 #
 # Default index pattern to use.
-#pattern: wazuh-alerts-3.x-*
-#pattern.time.filter: timestamp
+#pattern: 'wazuh-alerts-3.x-*'
+#pattern.time.filter: 'timestamp'
 #
 # ----------------------------------- Checks -----------------------------------
 #
@@ -100,10 +100,10 @@
 # Configure wazuh-monitoring-3.x-* indices custom creation interval.
 # Values: h (hourly), d (daily), w (weekly), m (monthly)
 # Default: d
-#wazuh.monitoring.creation: d
+#wazuh.monitoring.creation: 'd'
 #
 # Default index pattern to use for Wazuh monitoring
-#wazuh.monitoring.pattern: wazuh-monitoring-3.x-*
+#wazuh.monitoring.pattern: 'wazuh-monitoring-3.x-*'
 #
 #
 # ------------------------------- App privileges --------------------------------
@@ -113,4 +113,4 @@
 # Set the logging level for the Wazuh App log files.
 # Default value: info
 # Allowed values: info, debug
-#logs.level: info
+#logs.level: 'info'
