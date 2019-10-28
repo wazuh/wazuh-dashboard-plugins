@@ -50,7 +50,7 @@ export async function checkKnownFields(
           }
           valid = parsed.filter(item => minimum.includes(item.name));
 
-          if (valid.length === 4) {
+          if (valid.length === 3) {
             list.push({
               id: index._id.split('index-pattern:')[1],
               title: index._source['index-pattern'].title,

@@ -163,6 +163,7 @@ export class WazuhElasticCtrl {
    */
   async getFieldTop(req, reply) {
     try {
+      const config = getConfiguration();
       let patternTimeFilter =
         (config || {})['pattern.time.filter'] || 'timestamp';
       // Top field payload
@@ -176,7 +177,7 @@ export class WazuhElasticCtrl {
                 'agent.id': '000'
               }
             },
-            filter: { range: { patternTimeFilter: {} } }
+            filter: { range: {} }
           }
         },
         aggs: {
@@ -193,6 +194,7 @@ export class WazuhElasticCtrl {
       // Set up time interval, default to Last 24h
       const timeGTE = 'now-1d';
       const timeLT = 'now';
+      payload.query.bool.filter.range[patternTimeFilter] = {};
       payload.query.bool.filter.range[patternTimeFilter]['gte'] = timeGTE;
       payload.query.bool.filter.range[patternTimeFilter]['lt'] = timeLT;
 
@@ -296,7 +298,7 @@ export class WazuhElasticCtrl {
       }
 
       valid = parsed.filter(item => minimum.includes(item.name));
-      if (valid.length === 4) {
+      if (valid.length === 3) {
         list.push({
           id: index._id.split('index-pattern:')[1],
           title: index._source['index-pattern'].title
@@ -460,8 +462,6 @@ export class WazuhElasticCtrl {
                 ? monitoringPattern
                 : monitoringPattern + '*'
             );
-            aux_source.kibanaSavedObjectMeta.searchSourceJSON = aux_source.kibanaSavedObjectMeta.searchSourceJSON.replace(
-              /wazuh-timestamp/g, patternTimeFilter);
           } else {
             aux_source.kibanaSavedObjectMeta.searchSourceJSON = defaultStr.replace(
               /wazuh-alerts/g,
@@ -519,6 +519,7 @@ export class WazuhElasticCtrl {
     try {
       const visArray = [];
       let aux_source, bulk_content;
+      const config = getConfiguration();
       let patternTimeFilter =
         (config || {})['pattern.time.filter'] || 'timestamp';
 
