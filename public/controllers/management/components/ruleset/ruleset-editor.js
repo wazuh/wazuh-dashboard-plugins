@@ -9,7 +9,7 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import React, { Component, Fragment } from 'react';
+import React, { Component } from 'react';
 
 
 import CodeMirror from 'react-codemirror';
@@ -40,6 +40,7 @@ import {
 } from '@elastic/eui';
 
 import RulesetHandler from './utils/ruleset-handler';
+import validateConfigAfterSent from './utils/valid-configuration';
 
 class WzRulesetEditor extends Component {
   constructor(props) {
@@ -61,6 +62,7 @@ class WzRulesetEditor extends Component {
       isSaving: false,
       error: false,
       savedComplete: false,
+      warning: false,
       inputValue: ''
     }
   }
@@ -77,16 +79,18 @@ class WzRulesetEditor extends Component {
    */
   async save(name, overwrite = true) {
     try {
-      // If the name comes as .xml only mean that the input is empty
-      if (name === '.xml') {
-        this.setState({ error: 'Please insert a valid name', isSaving: false });
-        return;
-      }
       this.setState({ isSaving: true, error: false, savedComplete: false });
       const { section } = this.props.state;
       let saver = this.rulesetHandler.sendRuleConfiguration; // By default the saver is for rules
       if (section === 'decoders') saver = this.rulesetHandler.sendDecoderConfiguration;
       await saver(name, this.codeMirrorContent, overwrite);
+      try {
+        await validateConfigAfterSent();
+      } catch (error) {
+        const warning = Object.assign(error, { savedMessage: `File ${name} saved, but there were found several error while validating the configuration.` });
+        this.setState({ warning, isSaving: false })
+        return;
+      }
       this.setState({ savedComplete: true, isSaving: false });
     } catch (error) {
       this.setState({ error, isSaving: false });
@@ -116,6 +120,7 @@ class WzRulesetEditor extends Component {
         fill
         iconType="save"
         isLoading={this.state.isSaving}
+        isDisabled={nameForSaving.length <= 4}
         onClick={() => this.save(nameForSaving, overwrite)}>
         Save
       </EuiButton>
@@ -190,6 +195,23 @@ class WzRulesetEditor extends Component {
                   <EuiFlexGroup>
                     <EuiFlexItem>
                       <EuiCallOut color="danger" iconType="cross" title={this.state.error} />
+                    </EuiFlexItem>
+                  </EuiFlexGroup>
+                )}
+                {/* If there was any warning while saving */}
+                {this.state.warning && (
+                  <EuiFlexGroup>
+                    <EuiFlexItem>
+                      <EuiCallOut color="warning">
+                        <span style={{ color: '#c3880a' }}>{this.state.warning.savedMessage}</span>
+                        <EuiToolTip position="top" content={this.state.warning.details}>
+                          <EuiButtonIcon
+                            color="primary"
+                            iconType="questionInCircle"
+                            aria-label="Info about the error"
+                          />
+                        </EuiToolTip>
+                      </EuiCallOut>
                     </EuiFlexItem>
                   </EuiFlexGroup>
                 )}
