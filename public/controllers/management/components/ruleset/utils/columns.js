@@ -178,10 +178,10 @@ export default class RulesetColumns {
             return (
               <EuiToolTip position="top" content={`Show ${value} content`}>
                 <EuiLink onClick={async () => {
-                  const result = await this.rulesetHandler.getCdbList(`${item.path}/${value}`);
-                  console.log(result)
-                }
-                }>
+                  const result = await this.rulesetHandler.getCdbList(`${item.path}/${item.name}`);
+                  const file = { name: item.name, content: result, path: item.path };
+                  this.tableProps.updateListContent(file);
+                }}>
                   {value}
                 </EuiLink>
               </EuiToolTip>
@@ -268,7 +268,8 @@ export default class RulesetColumns {
                     iconType="pencil"
                     onClick={async () => {
                       const result = await this.rulesetHandler.getCdbList(`${item.path}/${item.name}`);
-                      console.log(result)
+                      const file = { name: item.name, content: result, path: item.path };
+                      this.tableProps.updateListContent(file);
                     }}
                     color="primary"
                   />

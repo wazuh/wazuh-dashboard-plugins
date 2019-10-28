@@ -44,6 +44,17 @@ export const updateFileContent = (content) => {
 }
 
 /**
+ * Update the lists content
+ * @param {String} content 
+ */
+export const updateListContent = (content) => {
+  return {
+    type: 'UPDATE_LIST_CONTENT',
+    content: content
+  }
+}
+
+/**
  * Update the loading status
  * @param {Boolean} loading 
  */

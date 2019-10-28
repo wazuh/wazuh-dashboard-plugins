@@ -19,6 +19,7 @@ import WzRulesetOverview from './ruleset-overview';
 import WzRuleInfo from './rule-info';
 import WzDecoderInfo from './decoder-info';
 import WzRulesetEditor from './ruleset-editor';
+import WzListEditor from './list-editor';
 
 export default class WzRuleset extends Component {
   constructor(props) {
@@ -49,7 +50,7 @@ export default class WzRuleset extends Component {
         {
           ruleInfo && (<WzRuleInfo />)
           || decoderInfo && (<WzDecoderInfo />)
-          || listInfo && (<h3>LIST INFO</h3>)
+          || listInfo && (<WzListEditor />)
           || (fileContent || addingRulesetFile) && (<WzRulesetEditor />)
           || (<WzRulesetOverview />)
         }
