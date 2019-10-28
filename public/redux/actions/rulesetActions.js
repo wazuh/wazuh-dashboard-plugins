@@ -119,3 +119,10 @@ export const updateAdminMode = status => {
     status: status
   }
 }
+
+export const updteAddingRulesetFile = content => {
+  return {
+    type: 'UPDATE_ADDING_RULESET_FILE',
+    content: content
+  }
+}

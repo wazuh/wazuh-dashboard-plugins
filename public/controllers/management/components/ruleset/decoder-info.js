@@ -92,6 +92,12 @@ class WzDecoderInfo extends Component {
     ];
   }
 
+
+  componentWillUnmount() {
+    // When the component is going to be unmounted its info is clear
+    this.props.cleanInfo();
+  }
+  
   /**
    * Clean the existing filters and sets the new ones and back to the previous section
    */

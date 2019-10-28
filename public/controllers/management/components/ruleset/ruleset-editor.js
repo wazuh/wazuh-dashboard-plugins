@@ -9,7 +9,7 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import React, { Component } from 'react';
+import React, { Component, Fragment } from 'react';
 
 
 import CodeMirror from 'react-codemirror';
@@ -35,7 +35,8 @@ import {
   EuiToolTip,
   EuiButtonIcon,
   EuiButton,
-  EuiCallOut
+  EuiCallOut,
+  EuiFieldText
 } from '@elastic/eui';
 
 import RulesetHandler from './utils/ruleset-handler';
@@ -59,10 +60,15 @@ class WzRulesetEditor extends Component {
     this.state = {
       isSaving: false,
       error: false,
-      savedComplete: false
+      savedComplete: false,
+      inputValue: ''
     }
   }
 
+  componentWillUnmount() {
+    // When the component is going to be unmounted its info is clear
+    this.props.cleanInfo();
+  }
 
   /**
    * Save the new content 
@@ -71,6 +77,11 @@ class WzRulesetEditor extends Component {
    */
   async save(name, overwrite = true) {
     try {
+      // If the name comes as .xml only mean that the input is empty
+      if (name === '.xml') {
+        this.setState({ error: 'Please insert a valid name', isSaving: false });
+        return;
+      }
       this.setState({ isSaving: true, error: false, savedComplete: false });
       const { section } = this.props.state;
       let saver = this.rulesetHandler.sendRuleConfiguration; // By default the saver is for rules
@@ -82,18 +93,30 @@ class WzRulesetEditor extends Component {
     }
   }
 
+  /**
+   * onChange the input value in case adding new file
+   */
+  onChange = e => {
+    this.setState({
+      inputValue: e.target.value,
+    });
+  };
+
   render() {
-    const { section, fileContent, adminMode } = this.props.state;
-    const { name, content, path } = fileContent;
-    const isEditable = path !== 'ruleset/rules' && path !== 'ruleset/decoders' && adminMode;
-    const options = Object.assign(this.codeMirrorOptions, { readOnly: !isEditable });////TODO check ADMIN MODE
+    const { section, fileContent, adminMode, addingRulesetFile } = this.props.state;
+    const { name, content, path } = addingRulesetFile ? addingRulesetFile : fileContent;
+    const isEditable = addingRulesetFile ? true : (path !== 'ruleset/rules' && path !== 'ruleset/decoders' && adminMode);
+    const options = Object.assign(this.codeMirrorOptions, { readOnly: !isEditable });
+    let nameForSaving = addingRulesetFile ? this.state.inputValue : name;
+    nameForSaving = name.endsWith('.xml') ? nameForSaving : `${nameForSaving}.xml`;
+    const overwrite = !addingRulesetFile;
 
     const saveButton = (
       <EuiButton
         fill
         iconType="save"
         isLoading={this.state.isSaving}
-        onClick={() => this.save(name, true)}>
+        onClick={() => this.save(nameForSaving, overwrite)}>
         Save
       </EuiButton>
     );
@@ -106,19 +129,43 @@ class WzRulesetEditor extends Component {
             {/* File name and back button */}
             <EuiFlexGroup>
               <EuiFlexItem grow={false}>
-                <EuiTitle>
-                  <h2>
-                    <EuiToolTip position="right" content={`Back to ${section}`}>
-                      <EuiButtonIcon
-                        aria-label="Back"
-                        color="subdued"
-                        iconSize="l"
-                        iconType="arrowLeft"
-                        onClick={() => this.props.cleanInfo()} />
-                    </EuiToolTip>
-                    {name}
-                  </h2>
-                </EuiTitle>
+                {!addingRulesetFile && (
+                  <EuiTitle>
+                    <h2>
+                      <EuiToolTip position="right" content={`Back to ${section}`}>
+                        <EuiButtonIcon
+                          aria-label="Back"
+                          color="subdued"
+                          iconSize="l"
+                          iconType="arrowLeft"
+                          onClick={() => this.props.cleanInfo()} />
+                      </EuiToolTip>
+                      {nameForSaving}
+                    </h2>
+                  </EuiTitle>
+                ) || (
+                    <EuiFlexGroup>
+                      <EuiFlexItem grow={false}>
+                        <EuiToolTip position="right" content={`Back to ${section}`}>
+                          <EuiButtonIcon
+                            aria-label="Back"
+                            color="subdued"
+                            iconSize="l"
+                            iconType="arrowLeft"
+                            onClick={() => this.props.cleanInfo()} />
+                        </EuiToolTip>
+                      </EuiFlexItem>
+                      <EuiFlexItem>
+                        <EuiFieldText
+                          style={{ width: '300px' }}
+                          placeholder={`Type your new ${section} file name here`}
+                          value={this.state.inputValue}
+                          onChange={this.onChange}
+                          aria-label="aria-label to prevent react warning"
+                        />
+                      </EuiFlexItem>
+                    </EuiFlexGroup>
+                  )}
               </EuiFlexItem>
               <EuiFlexItem />{/* This flex item is for separating between title and save button */}
               {isEditable && (
@@ -134,7 +181,7 @@ class WzRulesetEditor extends Component {
                 {this.state.savedComplete && (
                   <EuiFlexGroup>
                     <EuiFlexItem>
-                      <EuiCallOut color="success" iconType="check" title={`File ${name} was successfully saved`} />
+                      <EuiCallOut color="success" iconType="check" title={`File ${nameForSaving} was successfully saved`} />
                     </EuiFlexItem>
                   </EuiFlexGroup>
                 )}

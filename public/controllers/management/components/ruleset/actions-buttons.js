@@ -22,7 +22,8 @@ import { connect } from 'react-redux';
 import {
   updateItems,
   toggleShowFiles,
-  updateLoadingStatus
+  updateLoadingStatus,
+  updteAddingRulesetFile
 } from '../../../../redux/actions/rulesetActions';
 
 import { WzRequest } from '../../../../react-services/wz-request';
@@ -149,7 +150,7 @@ class WzRulesetActionButtons extends Component {
     const addNewRuleButton = (
       <EuiButtonEmpty
         iconType="plusInCircle"
-        onClick={async () => console.log('adding new')}
+        onClick={async () => this.props.updteAddingRulesetFile({ name: '', content: '<!-- Modify it at your will. -->', path: `etc/${section}` })}
       >
         {`Add new ${section} file`}
       </EuiButtonEmpty>
@@ -203,7 +204,8 @@ const mapDispatchToProps = (dispatch) => {
   return {
     updateItems: items => dispatch(updateItems(items)),
     toggleShowFiles: status => dispatch(toggleShowFiles(status)),
-    updateLoadingStatus: status => dispatch(updateLoadingStatus(status))
+    updateLoadingStatus: status => dispatch(updateLoadingStatus(status)),
+    updteAddingRulesetFile: content => dispatch(updteAddingRulesetFile(content))
   }
 };
 

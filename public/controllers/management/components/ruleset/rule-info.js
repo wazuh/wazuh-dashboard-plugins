@@ -133,6 +133,11 @@ class WzRuleInfo extends Component {
     ];
   }
 
+  componentWillUnmount() {
+    // When the component is going to be unmounted its info is clear
+    this.props.cleanInfo();
+  }
+
   /**
    * Build an object with the compliance info about a rule
    * @param {Object} ruleInfo 

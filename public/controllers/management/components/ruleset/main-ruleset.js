@@ -36,13 +36,13 @@ export default class WzRuleset extends Component {
 
   componentWillUnmount() {
     // When the component is going to be unmounted the ruleset state is reset
-    const { ruleInfo, decoderInfo, listInfo, fileContent } = this.state;
-    if (!ruleInfo && !decoderInfo && !listInfo && !fileContent) this.store.dispatch({ type: 'RESET' });
+    const { ruleInfo, decoderInfo, listInfo, fileContent, addingRulesetFile } = this.state;
+    if (!ruleInfo && !decoderInfo && !listInfo && !fileContent, !addingRulesetFile) this.store.dispatch({ type: 'RESET' });
   }
 
 
   render() {
-    const { ruleInfo, decoderInfo, listInfo, fileContent } = this.state;
+    const { ruleInfo, decoderInfo, listInfo, fileContent, addingRulesetFile } = this.state;
 
     return (
       <WzReduxProvider>
@@ -50,7 +50,7 @@ export default class WzRuleset extends Component {
           ruleInfo && (<WzRuleInfo />)
           || decoderInfo && (<WzDecoderInfo />)
           || listInfo && (<h3>LIST INFO</h3>)
-          || fileContent && (<WzRulesetEditor />)
+          || (fileContent || addingRulesetFile) && (<WzRulesetEditor />)
           || (<WzRulesetOverview />)
         }
       </WzReduxProvider>
