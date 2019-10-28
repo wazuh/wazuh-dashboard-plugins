@@ -21,7 +21,8 @@ import {
   updateItems,
   toggleShowFiles,
   cleanFilters,
-  updateAdminMode
+  updateAdminMode,
+  updateError
 } from '../../../../redux/actions/rulesetActions';
 
 import { WzRequest } from '../../../../react-services/wz-request';
@@ -72,7 +73,7 @@ class WzSectionSelector extends Component {
       this.props.changeSection(newSection);
       this.props.updateLoadingStatus(false);
     } catch (error) {
-      console.error('Error updating sections an data ', error);
+      this.props.updateError(error);
     }
   }
 
@@ -109,7 +110,8 @@ const mapDispatchToProps = (dispatch) => {
     updateItems: items => dispatch(updateItems(items)),
     toggleShowFiles: status => dispatch(toggleShowFiles(status)),
     cleanFilters: () => dispatch(cleanFilters()),
-    updateAdminMode: status => (dispatch(updateAdminMode(status)))
+    updateAdminMode: status => (dispatch(updateAdminMode(status))),
+    updateError: error => (dispatch(updateError(error)))
   }
 };
 

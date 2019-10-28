@@ -21,35 +21,38 @@ const initialState = {
   listInfo: false,
   fileContent: false,
   adminMode: true,
-  addingRulesetFile: false
+  addingRulesetFile: false,
+  error: false
 }
 
 const rulesetReducers = (state = initialState, action) => {
   switch (action.type) {
     case 'UPDATE_RULESET_SECTION':
-      return Object.assign({}, state, { section: action.section });
+      return Object.assign({}, state, { section: action.section, error: false });
     case 'UPDATE_LOADING_STATUS':
-      return Object.assign({}, state, { isLoading: action.status });
+      return Object.assign({}, state, { isLoading: action.status, error: false });
     case 'UPDATE_ITEMS':
-      return Object.assign({}, state, { items: action.items });
+      return Object.assign({}, state, { items: action.items, error: false });
     case 'UPDATE_RULE_INFO':
-      return Object.assign({}, state, { ruleInfo: action.info, decoderInfo: false, listInfo: false });
+      return Object.assign({}, state, { ruleInfo: action.info, decoderInfo: false, listInfo: false, error: false });
     case 'UPDATE_DECODER_INFO':
-      return Object.assign({}, state, { decoderInfo: action.info, ruleInfo: false, listInfo: false });
+      return Object.assign({}, state, { decoderInfo: action.info, ruleInfo: false, listInfo: false, error: false });
     case 'UPDATE_FILE_CONTENT':
-      return Object.assign({}, state, { fileContent: action.content, decoderInfo: false, ruleInfo: false, listInfo: false });
+      return Object.assign({}, state, { fileContent: action.content, decoderInfo: false, ruleInfo: false, listInfo: false, error: false });
     case 'UPDATE_FILTERS':
-      return Object.assign({}, state, { filters: action.filters });
+      return Object.assign({}, state, { filters: action.filters, error: false });
     case 'UPDATE_ADMIN_MODE':
       return Object.assign({}, state, { adminMode: action.status });
     case 'UPDATE_ADDING_RULESET_FILE':
-      return Object.assign({}, state, { addingRulesetFile: action.content });
+      return Object.assign({}, state, { addingRulesetFile: action.content, error: false });
+    case 'UPDATE_ERROR':
+      return Object.assign({}, state, { error: action.error });
     case 'TOGGLE_SHOW_FILES':
-      return Object.assign({}, state, { showingFiles: action.status });
+      return Object.assign({}, state, { showingFiles: action.status, error: false });
     case 'CLEAN_INFO':
-      return Object.assign({}, state, { decoderInfo: false, ruleInfo: false, listInfo: false, fileContent: false, addingRulesetFile: false });
+      return Object.assign({}, state, { decoderInfo: false, ruleInfo: false, listInfo: false, fileContent: false, addingRulesetFile: false, error: false });
     case 'CLEAN_CONTENT':
-      return Object.assign({}, state, { fileContent: false });
+      return Object.assign({}, state, { fileContent: false, error: false });
     case 'CLEAN_FILTERS':
       return Object.assign({}, state, { filters: {} });
     case 'RESET':

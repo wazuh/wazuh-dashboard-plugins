@@ -17,7 +17,8 @@ import { connect } from 'react-redux';
 import {
   updateLoadingStatus,
   updateItems,
-  updateFilters
+  updateFilters,
+  updateError
 } from '../../../../redux/actions/rulesetActions';
 
 import RulesetHandler from './utils/ruleset-handler';
@@ -106,6 +107,7 @@ class WzRulesetFilterBar extends Component {
       this.props.updateItems(result);
       this.props.updateLoadingStatus(false);
     } catch (error) {
+      this.props.updateError(error);
       return Promise.reject(error);
     }
 
@@ -219,7 +221,8 @@ const mapDispatchToProps = (dispatch) => {
   return {
     updateItems: items => dispatch(updateItems(items)),
     updateLoadingStatus: status => dispatch(updateLoadingStatus(status)),
-    updateFilters: filters => dispatch(updateFilters(filters))
+    updateFilters: filters => dispatch(updateFilters(filters)),
+    updateError: error => dispatch(updateError(error))
   }
 };
 

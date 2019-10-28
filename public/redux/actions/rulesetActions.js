@@ -126,3 +126,10 @@ export const updteAddingRulesetFile = content => {
     content: content
   }
 }
+
+export const updateError = error => {
+  return {
+    type: 'UPDATE_ERROR',
+    error: error
+  }
+}

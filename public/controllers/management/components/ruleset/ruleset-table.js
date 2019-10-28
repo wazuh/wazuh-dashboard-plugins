@@ -11,7 +11,8 @@
  */
 import React, { Component } from 'react';
 import {
-  EuiInMemoryTable
+  EuiInMemoryTable,
+  EuiCallOut
 } from '@elastic/eui';
 
 import { connect } from 'react-redux';
@@ -32,21 +33,28 @@ class WzRulesetTable extends Component {
 
   render() {
     this.rulesetColums = new RulesetColums(this.props);
-    const { isLoading, items, section, showingFiles } = this.props.state;
+    const { isLoading, items, section, showingFiles, error } = this.props.state;
     const rulesetColums = this.rulesetColums.columns;
-    const columns =  showingFiles ? rulesetColums.files : rulesetColums[section]
+    const columns = showingFiles ? rulesetColums.files : rulesetColums[section]
     const message = isLoading ? false : 'No results...';
-    return (
-      <EuiInMemoryTable
-        itemId="id"
-        items={items}
-        columns={columns}
-        pagination={true}
-        loading={isLoading}
-        sorting={true}
-        message={message}
-      />
-    )
+    if (!error) {
+      return (
+        <EuiInMemoryTable
+          itemId="id"
+          items={items}
+          columns={columns}
+          pagination={true}
+          loading={isLoading}
+          sorting={true}
+          message={message}
+        />
+      );
+    } else {
+      return (
+        <EuiCallOut color="warning" title={error} iconType="gear"/>
+      );
+    }
+
   }
 }
 
