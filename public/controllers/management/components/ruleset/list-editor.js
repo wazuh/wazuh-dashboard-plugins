@@ -34,6 +34,10 @@ import RulesetHandler from './utils/ruleset-handler';
 class WzListEditor extends Component {
   constructor(props) {
     super(props);
+    this.state = {
+      isSaving: false
+    };
+    
     this.items = {};
     this.sendCdbList = RulesetHandler.sendCdbList;
 
@@ -142,15 +146,16 @@ class WzListEditor extends Component {
 
   async saveList(name, path) {
     try {
+      this.setState({ isSaving: true });
       const overwrite = true;
       const raw = this.itemsToRaw();
-      const result =  await this.sendCdbList(name, path, raw, overwrite);
+      await this.sendCdbList(name, path, raw, overwrite);
     } catch (error) {
       console.error('Error saving CDB list ', error);
     }
+    this.setState({ isSaving: false });
   }
 
-  //isLoading={this.state.isSaving} 
   //isDisabled={nameForSaving.length <= 4} 
   render() {
     const { listInfo, isLoading, error, adminMode } = this.props.state;
@@ -162,6 +167,7 @@ class WzListEditor extends Component {
       <EuiButton
         fill
         iconType="save"
+        isLoading={this.state.isSaving}
         onClick={async () => this.saveList(name, path)}>
         Save
       </EuiButton>
