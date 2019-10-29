@@ -28,7 +28,6 @@ import { connect } from 'react-redux';
 
 import {
   cleanInfo,
-
 } from '../../../../redux/actions/rulesetActions';
 
 
@@ -73,6 +72,11 @@ class WzListEditor extends Component {
     const { name, path, content } = listInfo;
     const items = this.contentToArray(content);
     const message = isLoading ? false : 'No results...';
+    const search = {
+      box: {
+        incremental: true,
+      }
+    }
 
     return (
       <EuiPage style={{ background: 'transparent' }}>
@@ -98,15 +102,16 @@ class WzListEditor extends Component {
             </EuiFlexGroup>
             {/* CDB list table */}
             <EuiFlexGroup>
-              <EuiFlexItem>
+              <EuiFlexItem style={{marginTop: '30px'}}>
                 <EuiInMemoryTable
                   itemId="id"
                   items={items}
                   columns={this.columns}
-                  pagination={true}
+                  pagination={{ pageSizeOptions: [10, 15] }}
                   loading={isLoading}
                   sorting={true}
                   message={message}
+                  search={{ box: { incremental: true } }}
                 />
               </EuiFlexItem>
             </EuiFlexGroup>
