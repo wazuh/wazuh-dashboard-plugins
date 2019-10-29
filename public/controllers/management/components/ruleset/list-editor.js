@@ -13,15 +13,12 @@ import React, { Component } from 'react';
 import {
   EuiInMemoryTable,
   EuiPage,
-  EuiSpacer,
   EuiFlexGroup,
   EuiFlexItem,
   EuiTitle,
   EuiToolTip,
   EuiButtonIcon,
   EuiButton,
-  EuiCallOut,
-  EuiFieldText,
   EuiText
 } from '@elastic/eui';
 
@@ -31,10 +28,15 @@ import {
   cleanInfo,
 } from '../../../../redux/actions/rulesetActions';
 
+import RulesetHandler from './utils/ruleset-handler';
+
 
 class WzListEditor extends Component {
   constructor(props) {
     super(props);
+    this.items = {};
+    this.sendCdbList = RulesetHandler.sendCdbList;
+
     this.columns = [
       {
         field: 'key',
@@ -49,6 +51,7 @@ class WzListEditor extends Component {
         sortable: true
       }
     ];
+
     this.adminColumns = [
       {
         field: 'key',
@@ -100,24 +103,69 @@ class WzListEditor extends Component {
    * @param {String} content 
    */
   contentToArray(content) {
-    const arrContent = [];
+    const obj = this.contentToObject(content);
+    const items = [];
+    for (const key in obj) {
+      const value = obj[key];
+      items.push(Object.assign({ key, value }));
+    }
+    return items;
+  }
+
+  /**
+   * Save in the state as object the items for an easy modification by key-value
+   * @param {String} content 
+   */
+  contentToObject(content) {
+    const items = {};
     const lines = content.split('\n');
     lines.forEach(line => {
       const split = line.split(':');
       const key = split[0];
       const value = split[1] || '';
-      const obj = Object.assign({ key, value });
-      arrContent.push(obj);
+      if (key) items[key] = value; // Prevent add empty keys
     });
-    return arrContent;
+    this.items = { ...items };
+    return items;
   }
 
+  /**
+   * Transform this.items (an object) into a raw string
+   */
+  itemsToRaw() {
+    let raw = '';
+    Object.keys(this.items).forEach(key => {
+      raw = raw ? `${raw}\n${key}:${this.items[key]}` : `${key}:${this.items[key]}`;
+    });
+    return raw;
+  }
+
+  async saveList(name, path) {
+    try {
+      const overwrite = true;
+      const raw = this.itemsToRaw();
+      const result =  await this.sendCdbList(name, path, raw, overwrite);
+    } catch (error) {
+      console.error('Error saving CDB list ', error);
+    }
+  }
+
+  //isLoading={this.state.isSaving} 
+  //isDisabled={nameForSaving.length <= 4} 
   render() {
     const { listInfo, isLoading, error, adminMode } = this.props.state;
     const { name, path, content } = listInfo;
     const items = this.contentToArray(content);
     const message = isLoading ? false : 'No results...';
     const columns = adminMode ? this.adminColumns : this.columns;
+    const saveButton = (
+      <EuiButton
+        fill
+        iconType="save"
+        onClick={async () => this.saveList(name, path)}>
+        Save
+      </EuiButton>
+    );
 
     return (
       <EuiPage style={{ background: 'transparent' }}>
@@ -145,6 +193,12 @@ class WzListEditor extends Component {
                   {path}
                 </EuiText>
               </EuiFlexItem>
+              <EuiFlexItem />{/* This flex item is for separating between title and save button */}
+              {adminMode && (
+                <EuiFlexItem grow={false}>
+                  {saveButton}
+                </EuiFlexItem>
+              )}
             </EuiFlexGroup>
             {/* CDB list table */}
             <EuiFlexGroup>

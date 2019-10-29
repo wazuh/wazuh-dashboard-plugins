@@ -242,14 +242,15 @@ export default class RulesetHandler {
   /**
    * Send the cdb list content
    * @param {String} list 
+   * @param {String} path 
    * @param {String} content 
    * @param {Boolean} overwrite 
    */
-  static async sendCdbList(list, content, overwrite) {
+  static async sendCdbList(list, path, content, overwrite) {
     try {
       const result = await WzRequest.apiReq(
         'POST',
-        `/manager/files?path=etc/lists/${list}&overwrite=${overwrite}`,
+        `/manager/files?path=${path}/${list}&overwrite=${overwrite}`,
         { content, origin: 'raw' }
       );
       return result;
