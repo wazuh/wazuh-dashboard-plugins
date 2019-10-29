@@ -118,17 +118,44 @@ class WzRulesetActionButtons extends Component {
    */
   async toggleFiles() {
     try {
-      this.props.updateItems([]);// Clean the items to avoid flick
       this.props.updateLoadingStatus(true);
       const { showingFiles, section } = this.props.state;
       this.props.toggleShowFiles(!showingFiles)
       const path = !showingFiles ? `${this.paths[section]}/files` : this.paths[section];
-      const result = await this.wzReq.apiReq('GET', path, {});
-      const items = result.data.data.items;
-      this.props.updateItems(items);
+      await this.updateItems(path);
       this.props.updateLoadingStatus(false);
     } catch (error) {
       console.error('error toggling ', error)
+    }
+  }
+
+  /**
+   * Refresh the items
+   */
+  async refresh() {
+    try {
+      this.props.updateLoadingStatus(true);
+      const { showingFiles, section } = this.props.state;
+      const path = showingFiles ? `${this.paths[section]}/files` : this.paths[section];
+      await this.updateItems(path);
+      this.props.updateLoadingStatus(false);
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  }
+
+  /**
+   * Update the intems in the redux store
+   * @param {String} path 
+   */
+  async updateItems(path) {
+    try {
+      this.props.updateItems([]); // Clean the items 
+      const result = await this.wzReq.apiReq('GET', path, {});
+      const items = result.data.data.items;
+      this.props.updateItems(items);
+    } catch (error) {
+      return Promise.reject(error);
     }
   }
 
@@ -165,6 +192,17 @@ class WzRulesetActionButtons extends Component {
         {showingFiles ? `Manage ${section}` : `Manage ${section} files`}
       </EuiButtonEmpty>
     );
+
+    // Refresh
+    const refresh = (
+      <EuiButtonEmpty
+        iconType="refresh"
+        onClick={async () => await this.refresh()}
+      >
+        Refresh
+      </EuiButtonEmpty>
+    );
+
     return (
       <Fragment>
         {(section !== 'lists' && adminMode) && (
@@ -188,6 +226,9 @@ class WzRulesetActionButtons extends Component {
         )}
         <EuiFlexItem grow={false}>
           {exportButton}
+        </EuiFlexItem>
+        <EuiFlexItem grow={false}>
+          {refresh}
         </EuiFlexItem>
       </Fragment>
     );
