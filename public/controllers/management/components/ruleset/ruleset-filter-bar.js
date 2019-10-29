@@ -48,7 +48,8 @@ class WzRulesetFilterBar extends Component {
 
 
   isValid = value => {
-    if (this.props.state.section === 'lists') return true;//There are not filters for lists
+    const { section, showingFiles } = this.props.state;
+    if (section === 'lists' || showingFiles) return true;//There are not filters for lists
     const lowerValue = value.toLowerCase()
     const availableOptions = this.availableOptions[this.props.state.section].toString();
     this.notValidMessage = false;
@@ -186,10 +187,11 @@ class WzRulesetFilterBar extends Component {
   };
 
   render() {
+    const { section, showingFiles } = this.props.state;
     const { selectedOptions, isInvalid } = this.state;
     const options = !Object.keys(this.props.state.filters).length ? [] : selectedOptions;
     const availableOptions = this.availableOptions[this.props.state.section].toString();
-    const filters = availableOptions ? `Available filters are: ${availableOptions}` : 'Search lists...';
+    const filters = (availableOptions && !showingFiles) ? `Available filters are: ${availableOptions}` : `Search ${section} files...`;
 
     return (
       <EuiFormRow
