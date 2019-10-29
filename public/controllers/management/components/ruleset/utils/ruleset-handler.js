@@ -61,6 +61,23 @@ export default class RulesetHandler {
     }
   }
 
+  /**
+   * Get the rules files
+   */
+  static async getRulesFiles(filters = {}) {
+    try {
+      const result = await WzRequest.apiReq('GET', `/rules/files`, filters);
+      return (((result || {}).data || {}).data || {}).items || false;
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  }
+
+
+  /**
+   * Get the CDB lists
+   * @param {Object} filters 
+   */
   static async getLists(filters = {}) {
     try {
       const result = await WzRequest.apiReq('GET', `/lists/files`, filters);
@@ -71,11 +88,23 @@ export default class RulesetHandler {
   }
 
   /**
- * Get the local rules
- */
+   * Get the decoders
+   */
   static async getDecoders(filters = {}) {
     try {
       const result = await WzRequest.apiReq('GET', `/decoders`, filters);
+      return (((result || {}).data || {}).data || {}).items || false;
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  }
+
+  /**
+   * Get the decoder files
+   */
+  static async getDecodersFiles(filters = {}) {
+    try {
+      const result = await WzRequest.apiReq('GET', `/decoders/files`, filters);
       return (((result || {}).data || {}).data || {}).items || false;
     } catch (error) {
       return Promise.reject(error);

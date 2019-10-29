@@ -22,7 +22,8 @@ import {
   updateFileContent,
   updateRuleInfo,
   updateDecoderInfo,
-  updateListContent
+  updateListContent,
+  updateItems
 } from '../../../../redux/actions/rulesetActions';
 
 import RulesetColums from './utils/columns';
@@ -71,7 +72,8 @@ const mapDispatchToProps = (dispatch) => {
     updateFileContent: content => dispatch(updateFileContent(content)),
     updateRuleInfo: info => dispatch(updateRuleInfo(info)),
     updateDecoderInfo: info => dispatch(updateDecoderInfo(info)),
-    updateListContent: content => dispatch(updateListContent(content))
+    updateListContent: content => dispatch(updateListContent(content)),
+    updateItems: items => dispatch(updateItems(items))
   }
 };
 

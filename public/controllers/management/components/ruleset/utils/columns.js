@@ -222,6 +222,7 @@ export default class RulesetColumns {
                 </EuiToolTip>
               )
             } else {
+              const filesGetter = item.path.includes('/rules') ? this.rulesetHandler.getRulesFiles : this.rulesetHandler.getDecodersFiles
               return (
                 <div>
                   <EuiToolTip position="top" content={`Edit ${item.file} content`}>
@@ -242,6 +243,10 @@ export default class RulesetColumns {
                       iconType="trash"
                       onClick={async () => {
                         await this.rulesetHandler.deleteFile(item.file, item.path);
+                        this.tableProps.updateLoadingStatus(true);
+                        const items = await filesGetter();
+                        this.tableProps.updateItems(items);
+                        this.tableProps.updateLoadingStatus(false);
                       }}
                       color="danger"
                     />
@@ -280,6 +285,10 @@ export default class RulesetColumns {
                     iconType="trash"
                     onClick={async () => {
                       await this.rulesetHandler.deleteFile(item.name, item.path);
+                      this.tableProps.updateLoadingStatus(true);
+                      const items = await this.rulesetHandler.getLists();
+                      this.tableProps.updateItems(items);
+                      this.tableProps.updateLoadingStatus(false);
                     }}
                     color="danger"
                   />
