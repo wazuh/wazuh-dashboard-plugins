@@ -241,7 +241,7 @@ export default class RulesetColumns {
                       aria-label="Show content"
                       iconType="trash"
                       onClick={async () => {
-                        console.log(`deleting ${item.file}`);
+                        await this.rulesetHandler.deleteFile(item.file, item.path);
                       }}
                       color="danger"
                     />
@@ -279,7 +279,7 @@ export default class RulesetColumns {
                     aria-label="Show content"
                     iconType="trash"
                     onClick={async () => {
-                      console.log(`deleting ${item.path}/${item.name}`);
+                      await this.rulesetHandler.deleteFile(item.name, item.path);
                     }}
                     color="danger"
                   />

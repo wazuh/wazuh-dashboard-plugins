@@ -235,21 +235,10 @@ export default class RulesetHandler {
    * @param {String} path 
    */
   static async deleteFile(file, path) {
-    let type;
-    switch (path) {
-      case '/rules/files':
-        type = 'rules';
-        break;
-      case '/decoders/files':
-        type = 'decoders';
-        break;
-      case '/lists/files':
-        type = 'lists';
-        break;
-    }
+    const fullPath = `${path}/${file}`;
     try {
       const result = await WzRequest.apiReq('DELETE', '/manager/files', {
-        path: `${file.path}/${type !== 'lists' ? file.file : file.name}`
+        path: fullPath
       });
       return result;
     } catch (error) {
