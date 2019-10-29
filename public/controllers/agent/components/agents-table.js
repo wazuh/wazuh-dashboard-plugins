@@ -78,12 +78,14 @@ export class AgentsTable extends Component {
 
   async componentDidMount() {
     await this.getItems();
+    const filterStatus = await this.filterBarModelStatus();
     const filterGroups = await this.filterBarModelGroups();
     const filterOs = await this.filterBarModelOs();
     const filterVersion = await this.filterBarModelWazuhVersion();
     const filterOsPlatform = await this.filterBarModelOsPlatform();
     const filterNodes = await this.filterBarModelNodes();
-    this.setState({ 
+    this.setState({
+      filterStatus,
       filterGroups,
       filterOs,
       filterVersion,
@@ -243,7 +245,7 @@ export class AgentsTable extends Component {
         </EuiFlexItem>
         {formattedButton}
         <EuiFlexItem grow={false}>
-          <EuiButtonEmpty iconType="plusInCircle" onClick={() => this.refresh()}>
+          <EuiButtonEmpty iconType="plusInCircle" onClick={() => this.props.addingNewAgent()}>
             Add new agent
           </EuiButtonEmpty>
         </EuiFlexItem>
@@ -387,6 +389,7 @@ export class AgentsTable extends Component {
 
   filterBar() {
     const {
+      filterStatus,
       filterGroups,
       filterOs,
       filterVersion,
@@ -394,7 +397,7 @@ export class AgentsTable extends Component {
       filterNodes,
     } = this.state;
     const model = [
-      this.filterBarModelStatus(),
+      filterStatus || {label: 'Status', options: []},
       filterGroups || {label:'Groups', options: []},
       filterOs || {label:'OS Name', options: []},
       filterOsPlatform || {label:'OS Platform', options: []},
@@ -460,5 +463,6 @@ export class AgentsTable extends Component {
 }
 
 AgentsTable.propTypes = {
-  wzReq: PropTypes.func
+  wzReq: PropTypes.func,
+  addingNewAgent: PropTypes.func,
 };

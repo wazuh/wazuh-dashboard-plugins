@@ -49,30 +49,29 @@ export class WzFilterBar extends Component {
     });
   };
 
-  componentDidUpdate(prevProps, prevState) {
+  componentDidUpdate(prevProps) {
     if (JSON.stringify(prevProps.model) !== JSON.stringify(this.props.model)) {
       this.setState({ options: this.props.model });
     }
     if (this.state.isProcessing) {
-        for (const i in this.state.selectedOptions) {
-          if (this.state.selectedOptions.hasOwnProperty(i)) {
-            const selectedOptions = this.state.selectedOptions[i];
-        // for (let i = 0; i < this.state.selectedOptions.length; i++) {
-            const el = $('.wzFilterBarOperator .euiBadge__content')[i];
-            const hasBtn = $(el).find('.wzFilterBarOperatorBtn');
-            if (hasBtn.length) {
-              $(hasBtn[0]).remove();
-            }
-            if (i != 0) {
-              if (selectedOptions.type != 'search') {
-                const button = $(
-                  `<button class="wzFilterBarOperatorBtn euiButtonEmpty euiButtonEmpty--primary euiButtonEmpty--xSmall"><b>${selectedOptions.type}<b></button>`
-                  );
-                button[0].addEventListener('click', ev => {
-                  this.onOperatorClick(ev, i);
-                });
-                $(el).prepend(button);
-              } else {
+      for (const i in this.state.selectedOptions) {
+        if (this.state.selectedOptions.hasOwnProperty(i)) {
+          const selectedOptions = this.state.selectedOptions[i];
+          const el = $('.wzFilterBarOperator .euiBadge__content')[i];
+          const hasBtn = $(el).find('.wzFilterBarOperatorBtn');
+          if (hasBtn.length) {
+            $(hasBtn[0]).remove();
+          }
+          if (i != 0) {
+            if (selectedOptions.type != 'search') {
+              const button = $(
+                `<button class="wzFilterBarOperatorBtn euiButtonEmpty euiButtonEmpty--primary euiButtonEmpty--xSmall"><b>${selectedOptions.type}<b></button>`
+              );
+              button[0].addEventListener('click', ev => {
+                this.onOperatorClick(ev, i);
+              });
+              $(el).prepend(button);
+            } else {
               const button = $(
                 `<span class="wzFilterBarOperatorBtn"><b>AND<b></button>`
               );
@@ -99,6 +98,33 @@ export class WzFilterBar extends Component {
     }
   }
   
+
+  encodeFilter(option) {
+    const newFilter = option;
+
+    newFilter.type = this.state.toggleIdSelected;
+    if (!newFilter.label.includes(':')) {
+      newFilter.label_ = newFilter.label;
+    }
+    
+    newFilter.label = option.group + ':' + newFilter.label_;
+    newFilter.className = 'wzFilterBarOperator';
+  }
+
+  decodeFilters(options, selectedOptions) {
+    const labels = selectedOptions.map((item) => {return item.label_});
+    for (const groups of options) {
+      for (const option of groups.options) {
+        if(option.label.includes(':') && !labels.includes(option.label_)){
+          option.label = option.label_;
+          delete option.type;
+          delete option.label_;
+          delete option.className;
+        }
+      }
+    }
+  }
+
   onChange = selectedOptions => {
     const last = selectedOptions.findIndex(x => {
       return !x.type;
@@ -109,15 +135,7 @@ export class WzFilterBar extends Component {
         return;
       }
 
-      const newFilter = selectedOptions[last];
-
-      newFilter.type = this.state.toggleIdSelected;
-      if (!newFilter.label.includes(':')) {
-        newFilter.label_ = newFilter.label;
-      }
-      
-      newFilter.label = selectedOptions[last].group + ':' + newFilter.label_;
-      newFilter.className = 'wzFilterBarOperator';
+      this.encodeFilter(selectedOptions[last]);
     }
 
     const options = this.props.model;
@@ -141,7 +159,7 @@ export class WzFilterBar extends Component {
           if (idx !== -1) options[group].options.splice(idx, 1);
         }
       });
-
+    this.decodeFilters(options, selectedOptions);
     this.setState({
       isProcessing: true,
       selectedOptions,
