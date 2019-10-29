@@ -12,41 +12,108 @@
 import React, { Component } from 'react';
 import {
   EuiInMemoryTable,
-  EuiCallOut
+  EuiPage,
+  EuiSpacer,
+  EuiFlexGroup,
+  EuiFlexItem,
+  EuiTitle,
+  EuiToolTip,
+  EuiButtonIcon,
+  EuiButton,
+  EuiCallOut,
+  EuiFieldText
 } from '@elastic/eui';
 
 import { connect } from 'react-redux';
 
 import {
-  updateLoadingStatus
+  cleanInfo,
+
 } from '../../../../redux/actions/rulesetActions';
 
 
 class WzListEditor extends Component {
   constructor(props) {
     super(props);
-    this.colums = [
+    this.columns = [
       {
-        field: 'name',
-        name: 'Name',
+        field: 'key',
+        name: 'Key',
         align: 'left',
         sortable: true
       },
       {
-        field: 'path',
-        name: 'Path',
+        field: 'value',
+        name: 'Value',
         align: 'left',
         sortable: true
       }
     ];
   }
 
+  /**
+   * When getting a CDB list is returned a raw text, this function parses it to an array
+   * @param {String} content 
+   */
+  contentToArray(content) {
+    const arrContent = [];
+    const lines = content.split('\n');
+    lines.forEach(line => {
+      const split = line.split(':');
+      const key = split[0];
+      const value = split[1] || '';
+      const obj = Object.assign({ key, value });
+      arrContent.push(obj);
+    });
+    return arrContent;
+  }
+
   render() {
-    const { listInfo } = this.props.state;
+    const { listInfo, isLoading, error } = this.props.state;
     const { name, path, content } = listInfo;
+    const items = this.contentToArray(content);
+    const message = isLoading ? false : 'No results...';
+
     return (
-      <div>{content}</div>
-    )
+      <EuiPage style={{ background: 'transparent' }}>
+        <EuiFlexGroup>
+          <EuiFlexItem>
+            {/* File name and back button when watching or editing a CDB list */}
+            <EuiFlexGroup>
+              <EuiFlexItem>
+                <EuiTitle>
+                  <h2>
+                    <EuiToolTip position="right" content={'Back to lists'}>
+                      <EuiButtonIcon
+                        aria-label="Back"
+                        color="subdued"
+                        iconSize="l"
+                        iconType="arrowLeft"
+                        onClick={() => this.props.cleanInfo()} />
+                    </EuiToolTip>
+                    {name}
+                  </h2>
+                </EuiTitle>
+              </EuiFlexItem>
+            </EuiFlexGroup>
+            {/* CDB list table */}
+            <EuiFlexGroup>
+              <EuiFlexItem>
+                <EuiInMemoryTable
+                  itemId="id"
+                  items={items}
+                  columns={this.columns}
+                  pagination={true}
+                  loading={isLoading}
+                  sorting={true}
+                  message={message}
+                />
+              </EuiFlexItem>
+            </EuiFlexGroup>
+          </EuiFlexItem>
+        </EuiFlexGroup>
+      </EuiPage>
+    );
   }
 }
 
@@ -58,7 +125,7 @@ const mapStateToProps = (state) => {
 
 const mapDispatchToProps = (dispatch) => {
   return {
-    updateLoadingStatus: status => dispatch(updateLoadingStatus(status))
+    cleanInfo: () => dispatch(cleanInfo())
   }
 };
 
