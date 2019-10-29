@@ -49,6 +49,50 @@ class WzListEditor extends Component {
         sortable: true
       }
     ];
+    this.adminColumns = [
+      {
+        field: 'key',
+        name: 'Key',
+        align: 'left',
+        sortable: true
+      },
+      {
+        field: 'value',
+        name: 'Value',
+        align: 'left',
+        sortable: true
+      },
+      {
+        name: 'Actions',
+        align: 'left',
+        render: item => {
+          return (
+            <div>
+              <EuiToolTip position="top" content={`Edit ${item.key}`}>
+                <EuiButtonIcon
+                  aria-label="Edit content"
+                  iconType="pencil"
+                  onClick={async () => {
+                    console.log(`editing ${item.key}`)
+                  }}
+                  color="primary"
+                />
+              </EuiToolTip>
+              <EuiToolTip position="top" content={`Remove ${item.key}`}>
+                <EuiButtonIcon
+                  aria-label="Show content"
+                  iconType="trash"
+                  onClick={async () => {
+                    console.log(`deleting ${item.key}`);
+                  }}
+                  color="danger"
+                />
+              </EuiToolTip>
+            </div>
+          )
+        }
+      }
+    ];
   }
 
   /**
@@ -69,15 +113,11 @@ class WzListEditor extends Component {
   }
 
   render() {
-    const { listInfo, isLoading, error } = this.props.state;
+    const { listInfo, isLoading, error, adminMode } = this.props.state;
     const { name, path, content } = listInfo;
     const items = this.contentToArray(content);
     const message = isLoading ? false : 'No results...';
-    const search = {
-      box: {
-        incremental: true,
-      }
-    }
+    const columns = adminMode ? this.adminColumns : this.columns;
 
     return (
       <EuiPage style={{ background: 'transparent' }}>
@@ -100,7 +140,7 @@ class WzListEditor extends Component {
                   </h2>
                 </EuiTitle>
               </EuiFlexItem>
-              <EuiFlexItem style={{marginLeft: '-5px !important'}}>
+              <EuiFlexItem style={{ marginLeft: '-5px !important' }}>
                 <EuiText color="subdued" style={{ marginTop: '10px' }}>
                   {path}
                 </EuiText>
@@ -112,7 +152,7 @@ class WzListEditor extends Component {
                 <EuiInMemoryTable
                   itemId="id"
                   items={items}
-                  columns={this.columns}
+                  columns={columns}
                   pagination={{ pageSizeOptions: [10, 15] }}
                   loading={isLoading}
                   sorting={true}
