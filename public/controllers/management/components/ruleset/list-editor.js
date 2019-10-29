@@ -21,7 +21,8 @@ import {
   EuiButtonIcon,
   EuiButton,
   EuiCallOut,
-  EuiFieldText
+  EuiFieldText,
+  EuiText
 } from '@elastic/eui';
 
 import { connect } from 'react-redux';
@@ -84,7 +85,7 @@ class WzListEditor extends Component {
           <EuiFlexItem>
             {/* File name and back button when watching or editing a CDB list */}
             <EuiFlexGroup>
-              <EuiFlexItem>
+              <EuiFlexItem grow={false}>
                 <EuiTitle>
                   <h2>
                     <EuiToolTip position="right" content={'Back to lists'}>
@@ -99,10 +100,15 @@ class WzListEditor extends Component {
                   </h2>
                 </EuiTitle>
               </EuiFlexItem>
+              <EuiFlexItem style={{marginLeft: '-5px !important'}}>
+                <EuiText color="subdued" style={{ marginTop: '10px' }}>
+                  {path}
+                </EuiText>
+              </EuiFlexItem>
             </EuiFlexGroup>
             {/* CDB list table */}
             <EuiFlexGroup>
-              <EuiFlexItem style={{marginTop: '30px'}}>
+              <EuiFlexItem style={{ marginTop: '30px' }}>
                 <EuiInMemoryTable
                   itemId="id"
                   items={items}
