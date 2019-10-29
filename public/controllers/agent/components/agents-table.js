@@ -54,6 +54,7 @@ export class AgentsTable extends Component {
       q: '',
       search: '',
     }
+    this.downloadCsv.bind(this);
   }
 
   onTableChange = ({ page = {}, sort = {} }) => {
@@ -163,11 +164,16 @@ export class AgentsTable extends Component {
       "actions": agent.id
     }
   }
-  
+  downloadCsv = () => {
+    const {q,  search={}} = this.buildFilter();
+    const filterQ = { name: 'q', value: q };
+    const filterSearch = {name: 'search', value: search}
+    this.props.downloadCsv([filterQ, filterSearch])
+  }
   formattedButton() {
     return (
       <EuiFlexItem grow={false}>
-        <EuiButtonEmpty iconType="importAction" onClick={() => this.refresh()}>
+        <EuiButtonEmpty iconType="importAction" onClick={this.downloadCsv}>
           Formatted          
         </EuiButtonEmpty>
       </EuiFlexItem>

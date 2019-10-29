@@ -110,6 +110,7 @@ export class AgentsPreviewController {
     this.tableAgentsProps = {
       wzReq: (method, path, body) => this.apiReq.request(method, path, body),
       addingNewAgent: () => this.addNewAgent(true),
+      downloadCsv: (filters = []) => this.downloadCsv(filters),
     } 
     //Load
     this.load();
@@ -137,7 +138,7 @@ export class AgentsPreviewController {
   /**
    * Exports the table in CSV format
    */
-  async downloadCsv() {
+  async downloadCsv(filters) {
     try {
       this.errorHandler.info(
         'Your download should begin automatically...',
@@ -146,7 +147,7 @@ export class AgentsPreviewController {
       const output = await this.csvReq.fetch(
         '/agents',
         this.api,
-        this.wzTableFilter.get()
+        filters
       );
       const blob = new Blob([output], { type: 'text/csv' }); // eslint-disable-line
 
