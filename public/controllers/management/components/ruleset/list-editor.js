@@ -45,7 +45,8 @@ class WzListEditor extends Component {
       isPopoverOpen: false,
       addingKey: '',
       addingValue: '',
-      editingValue: ''
+      editingValue: '',
+      newListName: ''
     };
 
     this.items = {};
@@ -204,11 +205,19 @@ class WzListEditor extends Component {
    * @param {String} name 
    * @param {String} path 
    */
-  async saveList(name, path) {
+  async saveList(name, path, addingNew = false) {
     try {
-      this.setState({ isSaving: true });
-      const overwrite = true;
+      if (!name) {
+        console.log('Please insert a valid name');
+        return;
+      }
+      const overwrite = addingNew; // If adding new disable the overwrite
       const raw = this.itemsToRaw();
+      if (!raw) {
+        console.log('Please insert at least one item, a CDB list cannot be empty');
+        return;
+      }
+      this.setState({ isSaving: true });
       await this.sendCdbList(name, path, raw, overwrite);
     } catch (error) {
       console.error('Error saving CDB list ', error);
@@ -245,6 +254,12 @@ class WzListEditor extends Component {
   onChangeEditingValue = e => {
     this.setState({
       editingValue: e.target.value,
+    });
+  };
+
+  onNewListNameChange = e => {
+    this.setState({
+      newListName: e.target.value,
     });
   };
 
@@ -292,11 +307,45 @@ class WzListEditor extends Component {
   }
 
   /**
+   * Render an input in order to set a cdb list name
+   */
+  renderInputNameForNewCdbList() {
+    return (
+      <Fragment>
+        <EuiFlexItem grow={false}>
+          <EuiTitle>
+            <h2>
+              <EuiToolTip position="right" content={'Back to lists'}>
+                <EuiButtonIcon
+                  aria-label="Back"
+                  color="subdued"
+                  iconSize="l"
+                  iconType="arrowLeft"
+                  onClick={() => this.props.cleanInfo()} />
+              </EuiToolTip>
+              {name}
+            </h2>
+          </EuiTitle>
+        </EuiFlexItem>
+        <EuiFlexItem style={{ marginLeft: '-5px !important' }}>
+          <EuiFieldText
+            style={{marginLeft: '-18px'}}
+            placeholder="New CDB list name"
+            value={this.state.newListName}
+            onChange={this.onNewListNameChange}
+            aria-label="Use aria labels when no actual label is in use"
+          />
+        </EuiFlexItem>
+      </Fragment>
+    );
+  }
+
+  /**
    * Render an add buton with a popover to add new key and values and the save button for saving the list changes
    * @param {String} name
    * @param {String} path
    */
-  renderAddAndSave(name, path) {
+  renderAddAndSave(name, path, newList = false) {
     const addButton = (
       <EuiButtonEmpty
         onClick={() => this.openPopover()}>
@@ -309,7 +358,7 @@ class WzListEditor extends Component {
         fill
         iconType="save"
         isLoading={this.state.isSaving}
-        onClick={async () => this.saveList(name, path)}>
+        onClick={async () => this.saveList(name, path, newList)}>
         Save
       </EuiButton>
     );
@@ -410,16 +459,23 @@ class WzListEditor extends Component {
     const message = isLoading ? false : 'No results...';
     const columns = adminMode ? this.adminColumns : this.columns;
 
+    const addingNew = name === false || !name;
+    const listName = this.state.newListName || name;
+
     return (
       <EuiPage style={{ background: 'transparent' }}>
         <EuiFlexGroup>
           <EuiFlexItem>
             {/* File name and back button when watching or editing a CDB list */}
             <EuiFlexGroup>
-              {this.renderTitle(name, path)}
+              {!addingNew && (
+                this.renderTitle(name, path))
+                || (
+                  this.renderInputNameForNewCdbList()
+                )}
               <EuiFlexItem />{/* This flex item is for separating between title and save button */}
               {/* Pop over to add new key and value */}
-              {(adminMode && !this.state.editing) && (this.renderAddAndSave(name, path))}
+              {(adminMode && !this.state.editing) && (this.renderAddAndSave(listName, path, !addingNew))}
             </EuiFlexGroup>
             {/* CDB list table */}
             <EuiFlexGroup>

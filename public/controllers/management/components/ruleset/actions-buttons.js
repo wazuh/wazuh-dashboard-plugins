@@ -23,7 +23,8 @@ import {
   updateItems,
   toggleShowFiles,
   updateLoadingStatus,
-  updteAddingRulesetFile
+  updteAddingRulesetFile,
+  updateListContent
 } from '../../../../redux/actions/rulesetActions';
 
 import { WzRequest } from '../../../../react-services/wz-request';
@@ -177,7 +178,17 @@ class WzRulesetActionButtons extends Component {
     const addNewRuleButton = (
       <EuiButtonEmpty
         iconType="plusInCircle"
-        onClick={async () => this.props.updteAddingRulesetFile({ name: '', content: '<!-- Modify it at your will. -->', path: `etc/${section}` })}
+        onClick={() => this.props.updteAddingRulesetFile({ name: '', content: '<!-- Modify it at your will. -->', path: `etc/${section}` })}
+      >
+        {`Add new ${section} file`}
+      </EuiButtonEmpty>
+    );
+
+    //Add new CDB list button
+    const addNewCdbListButton = (
+      <EuiButtonEmpty
+        iconType="plusInCircle"
+        onClick={() => this.props.updateListContent({ name: false, content: '', path: 'etc/lists' })}
       >
         {`Add new ${section} file`}
       </EuiButtonEmpty>
@@ -211,9 +222,14 @@ class WzRulesetActionButtons extends Component {
           </EuiFlexItem>
         )
         }
-        {adminMode && (
+        {(adminMode && section !== 'lists') && (
           <EuiFlexItem grow={false}>
             {addNewRuleButton}
+          </EuiFlexItem>
+        )}
+        {(adminMode && section === 'lists') && (
+          <EuiFlexItem grow={false}>
+            {addNewCdbListButton}
           </EuiFlexItem>
         )}
         {((section === 'lists' || showingFiles) && adminMode) && (
@@ -246,7 +262,8 @@ const mapDispatchToProps = (dispatch) => {
     updateItems: items => dispatch(updateItems(items)),
     toggleShowFiles: status => dispatch(toggleShowFiles(status)),
     updateLoadingStatus: status => dispatch(updateLoadingStatus(status)),
-    updteAddingRulesetFile: content => dispatch(updteAddingRulesetFile(content))
+    updteAddingRulesetFile: content => dispatch(updteAddingRulesetFile(content)),
+    updateListContent: content => dispatch(updateListContent(content))
   }
 };
 
