@@ -44,7 +44,8 @@ class WzListEditor extends Component {
       editing: false,
       isPopoverOpen: false,
       addingKey: '',
-      addingValue: ''
+      addingValue: '',
+      editingValue: ''
     };
 
     this.items = {};
@@ -76,35 +77,74 @@ class WzListEditor extends Component {
         field: 'value',
         name: 'Value',
         align: 'left',
-        sortable: true
+        sortable: true,
+        render: (value, item) => {
+          if (this.state.editing === item.key) {
+            return (
+              <EuiFieldText
+                placeholder="New value"
+                value={this.state.editingValue}
+                onChange={this.onChangeEditingValue}
+                aria-label="Use aria labels when no actual label is in use"
+              />
+            );
+          } else {
+            return (<span>{value}</span>);
+          }
+        }
       },
       {
         name: 'Actions',
         align: 'left',
         render: item => {
-          return (
-            <div>
-              <EuiToolTip position="top" content={`Edit ${item.key}`}>
-                <EuiButtonIcon
-                  aria-label="Edit content"
-                  iconType="pencil"
-                  onClick={() => {
-                    console.log(`editing ${item.key}`)
-                    this.setState({ editing: item.key });
-                  }}
-                  color="primary"
-                />
-              </EuiToolTip>
-              <EuiToolTip position="top" content={`Remove ${item.key}`}>
-                <EuiButtonIcon
-                  aria-label="Show content"
-                  iconType="trash"
-                  onClick={() => {this.deleteItem(item.key)}}
-                  color="danger"
-                />
-              </EuiToolTip>
-            </div>
-          )
+          if (this.state.editing === item.key) {
+            return (
+              <Fragment>
+                <EuiText color="subdued">{'Are you sure?'}</EuiText>
+                <EuiToolTip position="top" content={'Yes'}>
+                  <EuiButtonIcon
+                    aria-label="Confirm value"
+                    iconType="check"
+                    onClick={() => {
+                      this.setEditedValue();
+                    }}
+                    color="primary"
+                  />
+                </EuiToolTip>
+                <EuiToolTip position="top" content={'No'}>
+                  <EuiButtonIcon
+                    aria-label="Cancel edition"
+                    iconType="cross"
+                    onClick={() => { this.setState({ editing: false }) }}
+                    color="danger"
+                  />
+                </EuiToolTip>
+              </Fragment>
+            );
+          } else {
+            return (
+              <Fragment>
+                <EuiToolTip position="top" content={`Edit ${item.key}`}>
+                  <EuiButtonIcon
+                    aria-label="Edit content"
+                    iconType="pencil"
+                    onClick={() => {
+                      this.setState({ editing: item.key, editingValue: item.value });
+                    }}
+                    color="primary"
+                  />
+                </EuiToolTip>
+                <EuiToolTip position="top" content={`Remove ${item.key}`}>
+                  <EuiButtonIcon
+                    aria-label="Show content"
+                    iconType="trash"
+                    onClick={() => { this.deleteItem(item.key) }}
+                    color="danger"
+                  />
+                </EuiToolTip>
+              </Fragment>
+            );
+          }
         }
       }
     ];
@@ -202,6 +242,12 @@ class WzListEditor extends Component {
     });
   };
 
+  onChangeEditingValue = e => {
+    this.setState({
+      editingValue: e.target.value,
+    });
+  };
+
   /**
    * Append a key value to this.items and after that if everything works ok re-create the array for the table
    */
@@ -221,13 +267,28 @@ class WzListEditor extends Component {
   }
 
   /**
+   * Set the new value in the input field when editing a item value (this.props.editingValue)
+   */
+  setEditedValue() {
+    const key = this.state.editing;
+    const value = this.state.editingValue;
+    this.items[key] = value;
+    const itemsArr = this.contentToArray(this.items);
+    this.setState({
+      items: itemsArr,
+      editing: false,
+      editingValue: ''
+    });
+  }
+
+  /**
    * Delete a item from the list
    * @param {String} key 
    */
   deleteItem(key) {
     delete this.items[key];
     const items = this.contentToArray(this.items);
-    this.setState({items});
+    this.setState({ items });
   }
 
   /**
@@ -293,7 +354,7 @@ class WzListEditor extends Component {
               onChange={this.onChangeValue}
               aria-label="Use aria labels when no actual label is in use"
             />
-            <div style={{textAlign: 'center'}}>
+            <div style={{ textAlign: 'center' }}>
               <EuiSpacer size="m" />
               {addItemButton}
               <EuiSpacer size="s" />
@@ -349,8 +410,6 @@ class WzListEditor extends Component {
     const message = isLoading ? false : 'No results...';
     const columns = adminMode ? this.adminColumns : this.columns;
 
-    const search = this.state.editing ? false : { box: { incremental: true } };
-
     return (
       <EuiPage style={{ background: 'transparent' }}>
         <EuiFlexGroup>
@@ -360,18 +419,11 @@ class WzListEditor extends Component {
               {this.renderTitle(name, path)}
               <EuiFlexItem />{/* This flex item is for separating between title and save button */}
               {/* Pop over to add new key and value */}
-              {adminMode && (this.renderAddAndSave(name, path))}
+              {(adminMode && !this.state.editing) && (this.renderAddAndSave(name, path))}
             </EuiFlexGroup>
             {/* CDB list table */}
             <EuiFlexGroup>
               <EuiFlexItem>
-                {this.state.editing && (
-                  <EuiFlexGroup>
-                    <EuiFlexItem>
-                      <h3>editando</h3>
-                    </EuiFlexItem>
-                  </EuiFlexGroup>
-                )}
                 <EuiFlexGroup>
                   <EuiFlexItem style={{ marginTop: '30px' }}>
                     <EuiInMemoryTable
@@ -382,7 +434,7 @@ class WzListEditor extends Component {
                       loading={isLoading}
                       sorting={true}
                       message={message}
-                      search={search}
+                      search={{ box: { incremental: true } }}
                     />
                   </EuiFlexItem>
                 </EuiFlexGroup>
