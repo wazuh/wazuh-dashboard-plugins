@@ -946,6 +946,18 @@ export class WazuhApiCtrl {
         throw new Error('Request path is not valid.');
       }
 
+      if (!method.match(/^(?:GET|PUT|POST|DELETE)$/)) {
+        log('wazuh-api:makeRequest', 'Request method is not valid.');
+        //Method is not a valid HTTP request method
+        throw new Error('Request method is not valid.');
+      }
+
+      if (!path.match(/^\/.+/)) {
+        log('wazuh-api:makeRequest', 'Request path is not valid.');
+        //Path doesn't start with '/'
+        throw new Error('Request path is not valid.');
+      }
+
       if (!data) {
         data = {};
       }
