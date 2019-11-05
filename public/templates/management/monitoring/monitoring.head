@@ -28,7 +28,7 @@
                     <md-divider class="wz-margin-top-10"></md-divider>
                     <div layout="column" class="wz-padding-top-10">
                         <p>The cluster is disabled. Visit the documentation on <a target="_blank"
-                                href="https://documentation.wazuh.com/current/user-manual/manager/wazuh-cluster.html">this
+                                href="https://documentation.wazuh.com/current/user-manual/configuring-cluster/index.html">this
                                 link</a> to learn about how to enable it.
                         </p>
                     </div>
