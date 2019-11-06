@@ -33,11 +33,11 @@ import {
   EuiSpacer,
   EuiSuggest,
   EuiText,
+  EuiToolTip,
   EuiTitle,
   InM
 } from '@elastic/eui';
 import { WzFilterBar } from '../../../components/wz-filter-bar/wz-filter-bar'
-import { raw } from 'joi';
 
 export class AgentsTable extends Component {
 
@@ -150,7 +150,6 @@ export class AgentsTable extends Component {
 
   formatAgent(agent) {
     const checkField = (field) => { return (field !== undefined) ? field : "-"; };
-
     return {
       "id": agent.id,
       "name": agent.name,
@@ -161,9 +160,31 @@ export class AgentsTable extends Component {
       "version": checkField(agent.version),
       "dateAdd": agent.dateAdd,
       "lastKeepAlive": checkField(agent.lastKeepAlive),
-      "actions": agent.id
+      "actions": agent
     }
   }
+
+  actionButtonsRender(agent) {
+    return (
+      <div className="wz-action-buttons">
+        <EuiToolTip content="Open Discover panel for this agent" position="left">
+          <EuiButtonIcon
+            onClick={() => this.props.clickAction(agent, 'discover')}
+            iconType="discoverApp"
+            aria-label="Open Discover panel for this agent"
+          />
+        </EuiToolTip>
+        <EuiToolTip content="Open configuration for this agent" position="left">
+          <EuiButtonIcon
+            onClick={() => this.props.clickAction(agent, 'configuration')}
+            iconType="wrench"
+            aria-label="Open configuration for this agent"
+          />
+        </EuiToolTip>
+      </div>
+    );
+  }
+
   downloadCsv = () => {
     const {q,  search={}} = this.buildFilter();
     const filterQ = { name: 'q', value: q };
@@ -231,12 +252,12 @@ export class AgentsTable extends Component {
       {
         field: 'actions',
         name: 'Actions',
-        render: this.actions
+        render: (agent) => this.actionButtonsRender(agent)
       },
     ];
   }
 
-  title() {
+  headRender() {
     const formattedButton = this.formattedButton()
     return (
       <EuiFlexGroup>
@@ -393,7 +414,7 @@ export class AgentsTable extends Component {
     }
   }
 
-  filterBar() {
+  filterBarRender() {
     const {
       filterStatus,
       filterGroups,
@@ -423,7 +444,7 @@ export class AgentsTable extends Component {
     );
   }
 
-  table() {
+  tableRender() {
     const {pageIndex, pageSize, totalItems, agents, sortField, sortDirection} = this.state
     const columns = this.columns();
     const pagination = {
@@ -454,9 +475,9 @@ export class AgentsTable extends Component {
   }
 
   render() {
-    const title = this.title();
-    const filter = this.filterBar();
-    const table = this.table();
+    const title = this.headRender();
+    const filter = this.filterBarRender();
+    const table = this.tableRender();
 
     return (
       <EuiPanel paddingSize="l">
@@ -471,4 +492,6 @@ export class AgentsTable extends Component {
 AgentsTable.propTypes = {
   wzReq: PropTypes.func,
   addingNewAgent: PropTypes.func,
+  downloadCsv: PropTypes.func,
+  clickAction: PropTypes.func,
 };

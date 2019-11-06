@@ -10,8 +10,10 @@
  * Find more information about this on the LICENSE file.
  */
 import * as FileSaver from '../../services/file-saver';
+import { DataFactory } from '../../services/data-factory';
 import { timefilter } from 'ui/timefilter';
 import { version } from '../../../package.json';
+import { clickAction } from '../../directives/wz-table/lib/click-action'
 
 export class AgentsPreviewController {
   /**
@@ -106,11 +108,28 @@ export class AgentsPreviewController {
 
     this.hasAgents = true;
     this.init = false;
+    const instance = new DataFactory(
+      this.apiReq,
+      '/agents',
+      false,
+      false
+    )
     //Props
     this.tableAgentsProps = {
       wzReq: (method, path, body) => this.apiReq.request(method, path, body),
       addingNewAgent: () => this.addNewAgent(true),
       downloadCsv: (filters = []) => this.downloadCsv(filters),
+      clickAction: (item, openAction= false) => {
+        clickAction(
+          item,
+          openAction,
+          instance,
+          this.shareAgent,
+          this.$location,
+          this.$scope,
+          this.appState
+        )
+      }
     } 
     //Load
     this.load();
