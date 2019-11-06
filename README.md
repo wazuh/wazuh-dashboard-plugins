@@ -211,6 +211,9 @@ service kibana restart
 |      7.3.2     |       3.10.1      | /usr/share/kibana/bin/kibana-plugin install <https://packages.wazuh.com/wazuhapp/wazuhapp-3.10.1_7.3.2.zip> |
 |      6.8.3     |       3.10.2      | /usr/share/kibana/bin/kibana-plugin install <https://packages.wazuh.com/wazuhapp/wazuhapp-3.10.2_6.8.3.zip> |
 |      7.3.2     |       3.10.2      | /usr/share/kibana/bin/kibana-plugin install <https://packages.wazuh.com/wazuhapp/wazuhapp-3.10.2_7.3.2.zip> |
+|      7.4.0     |       3.10.2      | /usr/share/kibana/bin/kibana-plugin install <https://packages.wazuh.com/wazuhapp/wazuhapp-3.10.2_7.4.0.zip> |
+|      7.4.1     |       3.10.2      | /usr/share/kibana/bin/kibana-plugin install <https://packages.wazuh.com/wazuhapp/wazuhapp-3.10.2_7.4.1.zip> |
+|      7.4.2     |       3.10.2      | /usr/share/kibana/bin/kibana-plugin install <https://packages.wazuh.com/wazuhapp/wazuhapp-3.10.2_7.4.2.zip> |
 |      6.8.3     |       3.11.0      | /usr/share/kibana/bin/kibana-plugin install <https://packages.wazuh.com/wazuhapp/wazuhapp-3.11.0_6.8.3.zip> |
 |      7.2.0     |       3.11.0      | /usr/share/kibana/bin/kibana-plugin install <https://packages.wazuh.com/wazuhapp/wazuhapp-3.11.0_7.2.0.zip> |
 |      7.4.2     |       3.11.0      | /usr/share/kibana/bin/kibana-plugin install <https://packages.wazuh.com/wazuhapp/wazuhapp-3.11.0_7.4.2.zip> |
