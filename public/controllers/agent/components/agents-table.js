@@ -16,26 +16,15 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import {
   EuiBasicTable,
-  EuiButton,
   EuiButtonEmpty,
   EuiButtonIcon,
-  EuiCallOut,
-  EuiComboBox,
-  EuiFieldText,
+  EuiLink,
   EuiFlexGroup,
   EuiFlexItem,
-  EuiFormRow,
-  EuiIcon,
-  EuiInMemoryTable,
   EuiPanel,
-  EuiPopover,
-  EuiSearchBar,
-  EuiSpacer,
-  EuiSuggest,
-  EuiText,
   EuiToolTip,
   EuiTitle,
-  InM
+  EuiHealth,
 } from '@elastic/eui';
 import { WzFilterBar } from '../../../components/wz-filter-bar/wz-filter-bar'
 
@@ -48,6 +37,7 @@ export class AgentsTable extends Component {
       pageIndex: 0,
       pageSize: 10,
       sortField: 'id',
+      isLoading: false,
       sortDirection: 'asc',
       isProcessing: true,
       totalItems: 0,
@@ -66,6 +56,7 @@ export class AgentsTable extends Component {
       sortField,
       sortDirection,
       isProcessing: true,
+      isLoading: true,
     });
   };
 
@@ -74,6 +65,7 @@ export class AgentsTable extends Component {
       q,
       search,
       isProcessing: true,
+      isLoading: true,
     });
   };
 
@@ -113,8 +105,9 @@ export class AgentsTable extends Component {
     const formatedAgents = (((rawAgents || {}).data || {}).data || {}).items.map(this.formatAgent);
     this.setState({
       agents: formatedAgents,
-      totalItems: (((rawAgents || {}).data || {}).data || {}).totalItems - 1,
+      totalItems: (((rawAgents || {}).data || {}).data || {}).totalItems,
       isProcessing: false,
+      isLoading: false,
     });
   }
 
@@ -150,23 +143,39 @@ export class AgentsTable extends Component {
 
   formatAgent(agent) {
     const checkField = (field) => { return (field !== undefined) ? field : "-"; };
+    const agentVersion = (agent.version !== undefined) ? agent.version.split(' ')[1] : "."; 
     return {
-      "id": agent.id,
+      "id": agent,
       "name": agent.name,
       "ip": agent.ip,
       "status": agent.status,
       "group": checkField(agent.group),
-      "os_name": checkField(((agent || {}).os || {}).name) + checkField(((agent || {}).os || {}).version),
-      "version": checkField(agent.version),
+      "os_name": agent,
+      // "os_name": checkField(((agent || {}).os || {}).name) + checkField(((agent || {}).os || {}).version),
+      "version": agentVersion,
       "dateAdd": agent.dateAdd,
       "lastKeepAlive": checkField(agent.lastKeepAlive),
       "actions": agent
     }
   }
 
+  welcomePanelButtonRender(agent, field, color='primary', size=false) {
+    return (
+      <EuiToolTip content="View the welcome panel for this agent" position="right">
+        <EuiLink
+          onClick={() => this.props.clickAction(agent)}
+          aria-label="View the welcome panel for this agent"
+          color={color}
+        >
+          { (agent[field].lenght > size) ? `${agent[field].substring(0, size)}...` :agent[field] }
+        </EuiLink>
+      </EuiToolTip>
+    )
+  }
+
   actionButtonsRender(agent) {
     return (
-      <div className="wz-action-buttons">
+      <div>
         <EuiToolTip content="Open Discover panel for this agent" position="left">
           <EuiButtonIcon
             onClick={() => this.props.clickAction(agent, 'discover')}
@@ -177,11 +186,53 @@ export class AgentsTable extends Component {
         <EuiToolTip content="Open configuration for this agent" position="left">
           <EuiButtonIcon
             onClick={() => this.props.clickAction(agent, 'configuration')}
+            color={'text'}
             iconType="wrench"
             aria-label="Open configuration for this agent"
           />
         </EuiToolTip>
       </div>
+    );
+  }
+
+  addIconPlatformRender(agent) {
+    let icon = false;
+    const checkField = (field) => { return (field !== undefined) ? field : "-"; };
+    const os = (agent || {}).os;
+
+    if (((os || {}).uname || '').includes('Linux')){
+      icon = 'linux'
+    } else if ((os || {}).platform === 'windows') {
+      icon = 'windows'
+    } else if ((os || {}).platform === 'darwin') {
+      icon = 'apple'
+    }
+    const os_name = checkField(((agent || {}).os || {}).name) 
+      + checkField(((agent || {}).os || {}).version);
+
+    return (
+      <span className="euiTableCellContent__text euiTableCellContent--truncateText">
+        <i className={`fa fa-${icon}`} aria-hidden="true"></i> {os_name}
+      </span>
+    );
+
+  }
+
+  addHealthStatusRender(status) {
+    const color = (status) => {
+      if (status.toLowerCase() === 'active') {
+        return 'success';
+      } else if (status.toLowerCase() === 'disconnected') {
+        return 'danger';
+      } else if (status.toLowerCase() === 'never connected') {
+        return 'subdued';
+      }
+    };
+
+    return (
+      <span className="euiTableCellContent__text euiTableCellContent--truncateText">    
+        <EuiHealth color={color(status)}></EuiHealth> {status}
+      </span>
     );
   }
 
@@ -208,50 +259,64 @@ export class AgentsTable extends Component {
         field: 'id',
         name: 'ID',
         sortable: true,
+        width: '65px',
+        render: (agent) => this.welcomePanelButtonRender(agent, 'id'),
       },
       {
         field: 'name',
         name: 'Name',
         sortable: true,
+        width: '15%',
+        truncateText: true,
       },
       {
         field: 'ip',
         name: 'IP',
-        sortable: true,
-      },
-      {
-        field: 'status',
-        name: 'Status',
+        truncateText: true,
         sortable: true,
       },
       {
         field: 'group',
-        name: 'Group',
+        name: 'Group(s)',
+        truncateText: true,
         sortable: true,
       },
       {
         field: 'os_name',
-        name: 'OS name',
+        name: 'OS',
         sortable: true,
+        truncateText: true,
+        render: (agent) => this.addIconPlatformRender(agent),
       },
       {
         field: 'version',
         name: 'Version',
+        truncateText: true,
         sortable: true,
       },
       {
         field: 'dateAdd',
         name: 'Registration date',
+        truncateText: true,
         sortable: true,
       },
       {
         field: 'lastKeepAlive',
         name: 'Last keep alive',
+        truncateText: true,
         sortable: true,
+      },
+      {
+        field: 'status',
+        name: 'Status',
+        truncateText: true,
+        sortable: true,
+        render: (status) => this.addHealthStatusRender(status),
       },
       {
         field: 'actions',
         name: 'Actions',
+        width: '65px',
         render: (agent) => this.actionButtonsRender(agent)
       },
     ];
@@ -459,6 +524,7 @@ export class AgentsTable extends Component {
         direction: sortDirection,
       },
     };
+    const isLoading = this.state.isLoading
     return (
       <EuiFlexGroup>
         <EuiFlexItem>
@@ -468,6 +534,7 @@ export class AgentsTable extends Component {
             pagination={pagination}
             onChange={this.onTableChange}
             sorting={sorting}
+            loading={isLoading}
           />
         </EuiFlexItem>
       </EuiFlexGroup>
