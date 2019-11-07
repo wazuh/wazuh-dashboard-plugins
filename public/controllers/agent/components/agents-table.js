@@ -286,7 +286,7 @@ export class AgentsTable extends Component {
         name: 'OS',
         sortable: true,
         truncateText: true,
-        render: (agent) => this.addIconPlatformRender(agent),
+        render: this.addIconPlatformRender,
       },
       {
         field: 'version',
@@ -311,13 +311,13 @@ export class AgentsTable extends Component {
         name: 'Status',
         truncateText: true,
         sortable: true,
-        render: (status) => this.addHealthStatusRender(status),
+        render: this.addHealthStatusRender,
       },
       {
         field: 'actions',
         name: 'Actions',
         width: '65px',
-        render: (agent) => this.actionButtonsRender(agent)
+        render: this.actionButtonsRender
       },
     ];
   }
@@ -516,7 +516,7 @@ export class AgentsTable extends Component {
       pageIndex: pageIndex,
       pageSize: pageSize,
       totalItemCount: totalItems,
-      hidePerPageOptions: true,
+      pageSizeOptions: [10, 25, 50, 100],
     }
     const sorting = {
       sort: {
