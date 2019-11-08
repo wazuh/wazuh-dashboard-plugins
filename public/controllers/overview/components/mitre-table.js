@@ -75,6 +75,7 @@ export class MitreTable extends Component {
     const filter = {
       offset: pageIndex * pageSize,
       limit: pageSize,
+      sort: this.buildSortFilter(),
     };
 
     if (q !== ''){
@@ -109,17 +110,17 @@ export class MitreTable extends Component {
       {
         field: 'name',
         name: 'Name',
-        sortable: true,
+        sortable: false,
       },
       {
         field: 'modified',
         name: 'Modified',
-        sortable: true,
+        sortable: false,
       },
       {
         field: 'phases',
         name: 'Phases',
-        sortable: true,
+        sortable: false,
       },
     ];
   }
@@ -155,7 +156,7 @@ export class MitreTable extends Component {
           <EuiFlexGroup>
             <EuiFlexItem>
               <EuiTitle>
-                <h2>MITRE ATT&CK </h2>
+                <h2> MITRE ATT&CK </h2>
               </EuiTitle>
             </EuiFlexItem>
           </EuiFlexGroup>
