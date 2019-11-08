@@ -167,6 +167,7 @@ export class WelcomeScreen extends Component {
                   {this.buildPopover('popoverThreat', [
                     'virustotal',
                     'osquery',
+                    'mitre',
                     'docker'
                   ])}
                 </EuiFlexItem>
@@ -179,6 +180,8 @@ export class WelcomeScreen extends Component {
                   this.buildTabCard('osquery', 'searchProfilerApp')}
                 {this.props.extensions.docker &&
                   this.buildTabCard('docker', 'spacesApp')}
+                {this.props.extensions.mitre &&
+                  this.buildTabCard('mitre', 'spacesApp')} {/* TODO- Change "spacesApp" icon*/}
               </EuiFlexGrid>
             </EuiPanel>
           </EuiFlexItem>

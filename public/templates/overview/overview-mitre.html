@@ -1,0 +1,13 @@
+
+<md-content flex layout="column" ng-if="octrl.tab === 'mitre' && octrl.tabView === 'panels'"
+    ng-class="{'no-opacity': resultState !== 'ready' || !rendered}" layout-align="start">
+  <!-- TODO REPLACE WITH THIS md-content   <md-content flex layout="column" ng-if="octrl.tab === 'mitre' && octrl.tabView === 'panels'"
+        ng-class="{'no-opacity': resultState !== 'ready' || !rendered}" layout-align="start"> --->
+    <div class="wz-no-display">
+        <kbn-vis vis-id="'Wazuh-App-Overview-MITRE'" id="Wazuh-App-Overview-MITRE"></kbn-vis>    
+    </div>
+
+    <div layout="row" layout-padding>
+        <react-component flex name="MitreTable" props="octrl.mitreTableProps">
+    </div>
+</md-content>

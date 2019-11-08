@@ -59,6 +59,9 @@ export class OverviewController {
     this.appState = appState;
     this.errorHandler = errorHandler;
     this.apiReq = apiReq;
+    this.mitreTableProps = {
+      wzReq: (method, path, body) => this.apiReq.request(method, path, body)
+    }
     this.tabVisualizations = tabVisualizations;
     this.commonData = commonData;
     this.reportingService = reportingService;

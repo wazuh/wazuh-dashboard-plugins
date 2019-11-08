@@ -36,6 +36,11 @@ const metricsScap = {
   scapLowestScore: '[vis-id="\'Wazuh-App-Overview-OSCAP-Lowest-score\'"]'
 };
 
+// Metrics Scap
+const metricsMitre = {
+  mitreMetrics: '[vis-id="\'Wazuh-App-Overview-MITRE\'"]'
+};
+
 // Metrics CIS-CAT
 const metricsCiscat = {
   ciscatScanNotChecked:
@@ -73,5 +78,6 @@ export default {
   metricsScap,
   metricsCiscat,
   metricsVirustotal,
-  metricsOsquery
+  metricsOsquery,
+  metricsMitre
 };
