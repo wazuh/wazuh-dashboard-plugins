@@ -106,7 +106,7 @@ export class AgentsTable extends Component {
       this.buildFilter()
     );
 
-    const formatedAgents = (((rawAgents || {}).data || {}).data || {}).items.map(this.formatAgent);
+    const formatedAgents = (((rawAgents || {}).data || {}).data || {}).items.map(this.formatAgent.bind(this));
     this.setState({
       agents: formatedAgents,
       totalItems: (((rawAgents || {}).data || {}).data || {}).totalItems,
@@ -147,7 +147,9 @@ export class AgentsTable extends Component {
 
   formatAgent(agent) {
     const checkField = (field) => { return (field !== undefined) ? field : "-"; };
+    const lastKeepAlive = (date, timeService) => { return (date !== undefined) ? timeService(date) : "-"; };
     const agentVersion = (agent.version !== undefined) ? agent.version.split(' ')[1] : "."; 
+    const { timeService } = this.props;
     return {
       "id": agent,
       "name": agent.name,
@@ -157,8 +159,8 @@ export class AgentsTable extends Component {
       "os_name": agent,
       // "os_name": checkField(((agent || {}).os || {}).name) + checkField(((agent || {}).os || {}).version),
       "version": agentVersion,
-      "dateAdd": agent.dateAdd,
-      "lastKeepAlive": checkField(agent.lastKeepAlive),
+      "dateAdd": timeService(agent.dateAdd),
+      "lastKeepAlive": lastKeepAlive(agent.lastKeepAlive, timeService),
       "actions": agent
     }
   }
@@ -567,4 +569,5 @@ AgentsTable.propTypes = {
   addingNewAgent: PropTypes.func,
   downloadCsv: PropTypes.func,
   clickAction: PropTypes.func,
+  timeService: PropTypes.func
 };

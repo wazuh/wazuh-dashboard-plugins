@@ -13,7 +13,7 @@ import * as FileSaver from '../../services/file-saver';
 import { DataFactory } from '../../services/data-factory';
 import { timefilter } from 'ui/timefilter';
 import { version } from '../../../package.json';
-import { clickAction } from '../../directives/wz-table/lib/click-action'
+import { clickAction } from '../../directives/wz-table/lib/click-action';
 
 export class AgentsPreviewController {
   /**
@@ -129,7 +129,8 @@ export class AgentsPreviewController {
           this.$scope,
           this.appState
         )
-      }
+      },
+      timeService: (date) => this.timeService.offset(date),
     } 
     //Load
     this.load();
