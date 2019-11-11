@@ -14,7 +14,10 @@
             <md-card-content>
                 <div layout="row" layout-align="start center">
                     <div>
-                        <span class="font-size-16">{{mctrl.selectedNode}} settings</span>
+                        <span class="font-size-16">Archives settings</span>
+                        <div class="wz-margin-top-10">
+                            <span class="md-subheader small">Basic archives log settings</span>
+                        </div>
                     </div>
                     <span flex></span>
                     <span ng-class="JSONContent ? 'wz-text-active' : ''" class="wz-text-link small"
@@ -27,31 +30,36 @@
 
                 <!-- Configuration block -->
                 <div class="wz-padding-top-10">
-                    <wz-config-item label="Plain format" ng-if="currentConfig['analysis-logging'].logging.plain"
-                        value="currentConfig['analysis-logging'].logging.plain">
+                    <wz-config-item label="Plain format"
+                        ng-if="currentConfig['analysis-logging'].logging.archives.plain_format"
+                        value="currentConfig['analysis-logging'].logging.archives.plain_format">
                     </wz-config-item>
-                    <wz-config-item label="JSON format" ng-if="currentConfig['analysis-logging'].logging.json"
-                        value="currentConfig['analysis-logging'].logging.json">
+                    <wz-config-item label="JSON format"
+                        ng-if="currentConfig['analysis-logging'].logging.archives.json_format"
+                        value="currentConfig['analysis-logging'].logging.archives.json_format">
                     </wz-config-item>
-                    <wz-config-item label="Compress rotation" ng-if="currentConfig['analysis-logging'].logging.compress"
-                        value="currentConfig['analysis-logging'].logging.compress">
+                    <wz-config-item label="Compress rotation"
+                        ng-if="currentConfig['analysis-logging'].logging.archives.compress_rotation"
+                        value="currentConfig['analysis-logging'].logging.archives.compress_rotation">
                     </wz-config-item>
-                    <wz-config-item label="Saved rotations" ng-if="currentConfig['analysis-logging'].logging.rotations"
-                        value="currentConfig['analysis-logging'].logging.rotations">
+                    <wz-config-item label="Saved rotations"
+                        ng-if="currentConfig['analysis-logging'].logging.archives.saved_rotations"
+                        value="currentConfig['analysis-logging'].logging.archives.saved_rotations">
                     </wz-config-item>
-                    <wz-config-item label="Schedule" ng-if="currentConfig['analysis-logging'].logging.schedule"
-                        value="currentConfig['analysis-logging'].logging.schedule">
+                    <wz-config-item label="Schedule" ng-if="currentConfig['analysis-logging'].logging.archives.schedule"
+                        value="currentConfig['analysis-logging'].logging.archives.schedule">
                     </wz-config-item>
                     <wz-config-item label="Maximum log size"
-                        ng-if="currentConfig['analysis-logging'].logging.maxlogsize"
-                        value="currentConfig['analysis-logging'].logging.maxlogsize">
+                        ng-if="currentConfig['analysis-logging'].logging.archives.maxsize"
+                        value="currentConfig['analysis-logging'].logging.archives.maxsize">
                     </wz-config-item>
                     <wz-config-item label="Minimum log size"
-                        ng-if="currentConfig['analysis-logging'].logging.minlogsize"
-                        value="currentConfig['analysis-logging'].logging.minlogsize">
+                        ng-if="currentConfig['analysis-logging'].logging.archives.minsize"
+                        value="currentConfig['analysis-logging'].logging.archives.minsize">
                     </wz-config-item>
-                    <wz-config-item label="Maximum log age" ng-if="currentConfig['analysis-logging'].logging.maxlogage"
-                        value="currentConfig['analysis-logging'].logging.maxlogage">
+                    <wz-config-item label="Maximum log age"
+                        ng-if="currentConfig['analysis-logging'].logging.archives.maxage"
+                        value="currentConfig['analysis-logging'].logging.archives.maxage">
                     </wz-config-item>
                 </div>
                 <!-- End configuration block -->
