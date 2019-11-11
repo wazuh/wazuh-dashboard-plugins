@@ -66,6 +66,9 @@ export class ConfigurationHandler {
         node
       );
 
+      console.log('HERRE');
+      console.log($scope.currentConfig);
+
       if ($scope.configurationSubTab === 'pm-sca') {
         $scope.currentConfig.sca = this.parseWodle($scope.currentConfig, 'sca');
       }
