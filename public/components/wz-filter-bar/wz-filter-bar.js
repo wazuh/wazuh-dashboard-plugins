@@ -17,14 +17,13 @@ import './wz-filter-bar.css';
 export class WzFilterBar extends Component {
   constructor(props) {
     super(props);
-
+    const { model, selectedOptions } = this.props;
     this.state = {
-      selectedOptions: [],
+      selectedOptions: selectedOptions || [],
       toggleIdSelected: 'AND',
       isProcessing: true,
-      options: this.props.model,
+      options: model,
     };
-
     this.toggleButtons = [
       {
         id: 'AND',
@@ -50,8 +49,28 @@ export class WzFilterBar extends Component {
   };
 
   componentDidUpdate(prevProps) {
-    if (JSON.stringify(prevProps.model) !== JSON.stringify(this.props.model)) {
-      this.setState({ options: this.props.model });
+    const { model } = this.props
+    if (JSON.stringify(prevProps.model) !== JSON.stringify(model)) {
+      const { selectedOptions } = this.state;
+      this.clearSeletedOptions(model, selectedOptions)
+
+      for (const selectedOption of selectedOptions){
+        for (const group of model) {
+          let flag = false
+          for (const option of group.options) {
+            if(selectedOption.group === option.group){
+              flag = true
+              break;
+            }
+          }
+          if (flag) {
+            group.options.push(selectedOption);
+            break;
+          }
+        }
+      }
+      
+      this.setState({ options: model });
     }
     if (this.state.isProcessing) {
       for (const i in this.state.selectedOptions) {
@@ -125,6 +144,29 @@ export class WzFilterBar extends Component {
     }
   }
 
+  clearSeletedOptions(options, selectedOptions) {
+    selectedOptions
+    .filter(x => {
+      return x.type != 'search';
+    })
+    .forEach(x => {
+      const group = options.findIndex(m => {
+        const g1 = x.group.toLowerCase();
+        const g2 = ((m.options[0] || []).group || '').toLowerCase();
+        return g1 === g2;
+      });
+      if (group != undefined && group != -1) {
+        const idx = options[group].options.findIndex(l => {
+          return (
+            l.label.trim().toLowerCase() === x.label_.trim().toLowerCase()
+          );
+        });
+        if (idx !== -1) options[group].options.splice(idx, 1);
+        
+      }
+    });
+  }
+
   onChange = selectedOptions => {
     const last = selectedOptions.findIndex(x => {
       return !x.type;
@@ -138,28 +180,10 @@ export class WzFilterBar extends Component {
       this.encodeFilter(selectedOptions[last]);
     }
 
-    const options = this.props.model;
-    selectedOptions
-      .filter(x => {
-        return x.type != 'search';
-      })
-      .forEach(x => {
-        const group = options.findIndex(m => {
-          const g1 = x.group.toLowerCase();
-          const g2 = ((m.options[0] || []).group || '').toLowerCase();
-          return g1 === g2;
-        });
-        if (group != undefined && group != -1) {
-          const idx = options[group].options.findIndex(l => {
-            return (
-              l.label.trim().toLowerCase() === x.label_.trim().toLowerCase()
-            );
-          });
-          
-          if (idx !== -1) options[group].options.splice(idx, 1);
-        }
-      });
+    const options = this.state.options;
+    this.clearSeletedOptions(options, selectedOptions);
     this.decodeFilters(options, selectedOptions);
+
     this.setState({
       isProcessing: true,
       selectedOptions,
@@ -204,7 +228,6 @@ export class WzFilterBar extends Component {
         }
       }
     );
-
     this.setState({ isProcessing: true });
   };
 
@@ -239,7 +262,7 @@ export class WzFilterBar extends Component {
       if (twoOrMoreElements) {
         queryObj.query += ')';
       }
-      this.props.clickAction({ q: queryObj.query, search: queryObj.search });
+      this.props.clickAction({ q: queryObj.query, search: queryObj.search, selectedOptions: selectedOptions});
     } catch (error) {} // eslint-disable-line
   };
 
@@ -259,6 +282,7 @@ export class WzFilterBar extends Component {
 }
 
 WzFilterBar.propTypes = {
+  clickAction: PropTypes.func,
   model: PropTypes.array,
-  clickAction: PropTypes.func
+  selectedOptions: PropTypes.array,
 };

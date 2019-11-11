@@ -32,17 +32,19 @@ export class AgentsTable extends Component {
 
   constructor(props) {
     super(props);
+    const selectedOptions = JSON.parse(sessionStorage.getItem('agents_preview_selected_options'));
     this.state = {
       agents: [],
+      isLoading: false,
+      isProcessing: true,
       pageIndex: 0,
       pageSize: 10,
-      sortField: 'id',
-      isLoading: false,
-      sortDirection: 'asc',
-      isProcessing: true,
-      totalItems: 0,
       q: '',
       search: '',
+      selectedOptions: selectedOptions || [],
+      sortDirection: 'asc',
+      sortField: 'id',
+      totalItems: 0,
     }
     this.downloadCsv.bind(this);
   }
@@ -60,10 +62,12 @@ export class AgentsTable extends Component {
     });
   };
 
-  onQueryChange = ({q={}, search={}}) => {
+  onQueryChange = ({q={}, search={}, selectedOptions={}}) => {
+    sessionStorage.setItem('agents_preview_selected_options', JSON.stringify(selectedOptions));
     this.setState({
       q,
       search,
+      selectedOptions,
       isProcessing: true,
       isLoading: true,
     });
@@ -496,6 +500,7 @@ export class AgentsTable extends Component {
       filterVersion || {label:'Version', options: []},
       filterNodes || {label:'Nodes', options: []},
     ];
+    const { selectedOptions } = this.state;
 
     return (
       <EuiFlexGroup>
@@ -503,6 +508,7 @@ export class AgentsTable extends Component {
           <WzFilterBar
             model={model}
             clickAction={this.onQueryChange}
+            selectedOptions={selectedOptions}
           />
         </EuiFlexItem>
       </EuiFlexGroup>
