@@ -1,6 +1,7 @@
 <!-- This section contains the main content and the right sidenav -->
-<div flex="auto" layout="row" ng-if="!load && configurationSubTab === 'logging'">
+<div flex="auto" layout="row" ng-if="!load && configurationSubTab === 'internal'">
 
+    <h1>Internal</h1>
     <!-- No configuration section -->
     <wz-no-config flex error="currentConfig['analysis-global']"
         ng-if="currentConfig['analysis-global'] && isString(currentConfig['analysis-global'])"></wz-no-config>
