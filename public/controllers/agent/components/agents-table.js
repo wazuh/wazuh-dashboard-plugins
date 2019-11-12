@@ -543,6 +543,7 @@ export class AgentsTable extends Component {
             onChange={this.onTableChange}
             sorting={sorting}
             loading={isLoading}
+            noItemsMessage="No agents found"
           />
         </EuiFlexItem>
       </EuiFlexGroup>
