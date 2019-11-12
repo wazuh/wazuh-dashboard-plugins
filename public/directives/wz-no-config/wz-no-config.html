@@ -3,8 +3,9 @@
     <!-- No configuration card -->
     <md-card class="wz-md-card">
         <md-card-content class="wz-text-center">
-            <react-component name="EuiIcon" props="{type:'help'}" /> <span class="wz-headline-title">Configuration not
-                available</span>
+            <react-component name="EuiIcon" props="{type:'help'}" />
+            <span ng-if="error === 'not-present'" class="wz-headline-title">Configuration not available</span>
+            <span ng-if="error !== 'not-present'" class="wz-headline-title">Error fetching configuration</span>
             <md-divider class="wz-margin-top-10"></md-divider>
             <div layout="column" class="wz-padding-top-10">
                 <p ng-if="error === 'not-present'">This section is not present on the configuration file.</p>
