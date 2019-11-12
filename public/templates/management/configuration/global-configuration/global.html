@@ -21,50 +21,7 @@
         <!-- The main card will all the settings -->
         <md-card class="wz-md-card" ng-if="!JSONContent && !XMLContent && !editingFile">
             <md-card-content>
-                <div layout="row" layout-align="start center">
-                    <div>
-                        <span class="font-size-16">Main settings</span>
-                        <div class="wz-margin-top-10">
-                            <span class="md-subheader small">Basic alerts and logging settings</span>
-                        </div>
-                    </div>
-                    <span flex></span>
-                    <span ng-class="JSONContent ? 'wz-text-active' : ''" class="wz-text-link small"
-                        ng-click="getJSON()">JSON</span>
-                    <span class="small">&nbsp;&centerdot;&nbsp;</span>
-                    <span ng-class="XMLContent ? 'wz-text-active' : ''" class="wz-text-link small"
-                        ng-click="getXML()">XML</span>
-                </div>
-                <md-divider class="wz-margin-top-10"></md-divider>
-
-                <!-- Configuration block -->
-                <div class="wz-padding-top-10">
-
-                    <wz-config-item label="Write alerts to alerts.log file"
-                        value="currentConfig['analysis-global'].global.alerts_log">
-                    </wz-config-item>
-                    <wz-config-item label="Write JSON formatted alerts to alerts.json file"
-                        value="currentConfig['analysis-global'].global.jsonout_output">
-                    </wz-config-item>
-                    <wz-config-item label="Archive all the alerts in plain text format"
-                        value="currentConfig['analysis-global'].global.logall">
-                    </wz-config-item>
-                    <wz-config-item label="Archive all the alerts in JSON format"
-                        value="currentConfig['analysis-global'].global.logall_json">
-                    </wz-config-item>
-                    <wz-config-item label="Customized alerts format for alerts.log file"
-                        value="currentConfig['analysis-global'].global.custom_alert_output">
-                    </wz-config-item>
-                    <wz-config-item label="Size limit of alert files"
-                        value="currentConfig['analysis-global'].global.max_output_size">
-                    </wz-config-item>
-                    <wz-config-item label="File rotation interval"
-                        value="currentConfig['analysis-global'].global.rotate_interval">
-                    </wz-config-item>
-
-                </div>
-                <!-- End configuration block -->
-
+                
                 <div ng-if="!agent || agent.id === '000'" class="wz-margin-top-10">
                     <span class="font-size-16">Email settings</span>
                     <div class="wz-margin-top-10">
