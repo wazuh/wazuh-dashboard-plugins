@@ -5,7 +5,7 @@
         <div>
             <span class="font-size-18">Integrations</span>
         </div>
-        <span class="md-subheader">Slack, VirusTotal and PagerDuty integrations with external APIs</span>
+        <span class="md-subheader">Slack, VirusTotal, PagerDuty and custom integrations with external APIs</span>
     </div>
     <!-- End headline -->
 
@@ -27,15 +27,9 @@
             ng-if="currentConfig['integrator-integration'] && !isString(currentConfig['integrator-integration'])">
 
             <!-- VirusTotal integration card -->
-            <md-card class="wz-md-card" ng-if="!JSONContent && !XMLContent">
+            <md-card class="wz-md-card" ng-if="!JSONContent && !XMLContent" >
                 <md-card-content>
                     <div layout="row" layout-align="start center">
-                        <div ng-if="integrations['virustotal']">
-                            <span class="font-size-16">VirusTotal</span>
-                            <div class="wz-margin-top-10">
-                                <span class="md-subheader small">Get notified when malicious software is found</span>
-                            </div>
-                        </div>
                         <span flex></span>
                         <span ng-class="JSONContent ? 'wz-text-active' : ''" class="wz-text-link small"
                             ng-click="getJSON()">JSON</span>
@@ -44,90 +38,59 @@
                             ng-click="getXML()">XML</span>
                     </div>
                     <md-divider class="wz-margin-top-10"></md-divider>
-
-                    <!-- Configuration block -->
-                    <div class="wz-padding-top-10" ng-if="integrations['virustotal']">
-                        <wz-config-item label="Filter alerts by this level or above"
-                            value="integrations['virustotal'].level">
-                        </wz-config-item>
-                        <wz-config-item label="Filter alerts by these rule IDs"
-                            value="integrations['virustotal'].rule_id">
-                        </wz-config-item>
-                        <wz-config-item label="Filter alerts by these rule groups"
-                            value="integrations['virustotal'].group">
-                        </wz-config-item>
-                        <wz-config-item label="Filter alerts by location (agent, IP or file)"
-                            value="integrations['virustotal'].event_location">
-                        </wz-config-item>
-                        <wz-config-item label="Used format to write alerts"
-                            value="integrations['virustotal'].alert_format">
-                        </wz-config-item>
-
-                    </div>
-                    <!-- End configuration block -->
-
-                    <div class="wz-margin-top-10" ng-if="integrations['slack']">
-                        <span class="font-size-16">Slack</span>
-                        <div class="wz-margin-top-10">
-                            <span class="md-subheader small">Get alerts directly on Slack</span>
+                    
+                    <div ng-repeat="(key, value) in integrations">
+                        <div class="wz-margin-top-10" ng-if="key=='slack'">
+                            <span class="font-size-16">Slack</span>
+                            <div class="wz-margin-top-10">
+                                <span class="md-subheader small">Get alerts directly on Slack</span>
+                            </div>
                         </div>
-                    </div>
-                    <md-divider class="wz-margin-top-10" ng-if="integrations['slack']"></md-divider>
-
-                    <!-- Configuration block -->
-                    <div class="wz-padding-top-10" ng-if="integrations['slack']">
-
-                        <wz-config-item label="Hook URL" value="integrations['slack'].hook_url">
-                        </wz-config-item>
-                        <wz-config-item label="Filter alerts by this level or above"
-                            value="integrations['slack'].level">
-                        </wz-config-item>
-                        <wz-config-item label="Filter alerts by these rule IDs" value="integrations['slack'].rule_id">
-                        </wz-config-item>
-                        <wz-config-item label="Filter alerts by these rule groups" value="integrations['slack'].group">
-                        </wz-config-item>
-                        <wz-config-item label="Filter alerts by location (agent, IP or file)"
-                            value="integrations['slack'].event_location">
-                        </wz-config-item>
-                        <wz-config-item label="Used format to write alerts" value="integrations['slack'].alert_format">
-                        </wz-config-item>
-
-                    </div>
-                    <!-- End configuration block -->
-
-                    <div class="wz-margin-top-10" ng-if="integrations['pagerduty']">
-                        <span class="font-size-16">PagerDuty</span>
-                        <div class="wz-margin-top-10">
-                            <span class="md-subheader small">Get alerts on this streamlined incident resolution
-                                software</span>
+                        <div class="wz-margin-top-10" ng-if="key=='virustotal'">
+                            <span class="font-size-16">VirusTotal</span>
+                            <div class="wz-margin-top-10">
+                                <span class="md-subheader small">Get notified when malicious software is found</span>
+                            </div>
                         </div>
+                        <div class="wz-margin-top-10" ng-if="key=='pagerduty'">
+                            <span class="font-size-16">PagerDuty</span>
+                            <div class="wz-margin-top-10">
+                                <span class="md-subheader small">Get alerts on this streamlined incident resolution
+                                    software</span>
+                            </div>
+                        </div>
+                        <div class="wz-margin-top-10" ng-if="key!='pagerduty' && key!='virustotal' && key!='slack'">
+                            <span class="font-size-16" style="text-transform: capitalize;">{{value.name}}</span>
+                            <div class="wz-margin-top-10">
+                                <span class="md-subheader small">Custom integration</span>
+                            </div>
+                        </div>
+                        <md-divider class="wz-margin-top-10" ng-if="integrations['slack']"></md-divider>
+    
+                        <!-- Configuration block -->
+                        <div class="wz-padding-top-10" >
+    
+                            <wz-config-item label="Hook URL" value="value.hook_url">
+                            </wz-config-item>
+                            <wz-config-item label="Filter alerts by this level or above"
+                                value="value.level">
+                            </wz-config-item>
+                            <wz-config-item label="Filter alerts by these rule IDs" value="value.rule_id">
+                            </wz-config-item>
+                            <wz-config-item label="Filter alerts by these rule groups" value="value.group">
+                            </wz-config-item>
+                            <wz-config-item label="Filter alerts by location (agent, IP or file)"
+                                value="value.event_location">
+                            </wz-config-item>
+                            <wz-config-item label="Used format to write alerts" value="value.alert_format">
+                            </wz-config-item>
+    
+                        </div>
+                        <!-- End configuration block -->
                     </div>
-                    <md-divider class="wz-margin-top-10" ng-if="integrations['pagerduty']"></md-divider>
-
-                    <!-- Configuration block -->
-                    <div class="wz-padding-top-10" ng-if="integrations['pagerduty']">
-
-                        <wz-config-item label="Filter alerts by this level or above"
-                            value="integrations['pagerduty'].level">
-                        </wz-config-item>
-                        <wz-config-item label="Filter alerts by these rule IDs"
-                            value="integrations['pagerduty'].rule_id">
-                        </wz-config-item>
-                        <wz-config-item label="Filter alerts by these rule groups"
-                            value="integrations['pagerduty'].group">
-                        </wz-config-item>
-                        <wz-config-item label="Filter alerts by location (agent, IP or file)"
-                            value="integrations['pagerduty'].event_location">
-                        </wz-config-item>
-                        <wz-config-item label="Used format to write alerts"
-                            value="integrations['pagerduty'].alert_format">
-                        </wz-config-item>
-
-                    </div>
-                    <!-- End configuration block -->
                 </md-card-content>
+                
             </md-card>
-            <!-- End VirusTotal integration card -->
 
             <wz-config-viewer flex getjson="getJSON()" getxml="getXML()" jsoncontent="JSONContent"
                 xmlcontent="XMLContent" />

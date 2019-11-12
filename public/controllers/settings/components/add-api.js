@@ -107,12 +107,12 @@ export class AddApi extends Component {
       <div>
         {(this.state.status === 'warning' ||
           this.state.status === 'danger') && (
-            <EuiCallOut
-              color={this.state.status}
-              iconType="help"
-              title={this.state.message}
-            />
-          )}
+          <EuiCallOut
+            color={this.state.status}
+            iconType="help"
+            title={this.state.message}
+          />
+        )}
         {(this.state.status === 'warning' ||
           this.state.status === 'danger') && <EuiSpacer />}
         <EuiText>
@@ -186,7 +186,7 @@ export class AddApi extends Component {
                     iconType="cross"
                   >
                     close
-                </EuiButtonEmpty>
+                  </EuiButtonEmpty>
                 )}
               </EuiFlexItem>
             </EuiFlexGroup>
