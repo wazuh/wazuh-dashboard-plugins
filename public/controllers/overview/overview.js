@@ -20,7 +20,8 @@ import {
   metricsScap,
   metricsCiscat,
   metricsVirustotal,
-  metricsOsquery
+  metricsOsquery,
+  metricsMitre
 } from '../../utils/overview-metrics';
 
 import { timefilter } from 'ui/timefilter';
@@ -59,9 +60,6 @@ export class OverviewController {
     this.appState = appState;
     this.errorHandler = errorHandler;
     this.apiReq = apiReq;
-    this.mitreTableProps = {
-      wzReq: (method, path, body) => this.apiReq.request(method, path, body)
-    }
     this.tabVisualizations = tabVisualizations;
     this.commonData = commonData;
     this.reportingService = reportingService;
@@ -184,6 +182,9 @@ export class OverviewController {
         case 'osquery':
           this.createMetrics(metricsOsquery);
           break;
+        case 'mitre':
+          this.createMetrics(metricsMitre);
+          break;
       }
     }
   }
@@ -292,6 +293,19 @@ export class OverviewController {
         this.gdprReqs = { items: gdprTabs, reqTitle: 'GDPR Requirement' };
       }
 
+      if (newTab === 'mitre') {
+        const result = await this.apiReq.request('GET', '/rules/mitre', {});
+        this.$scope.mitreIds = ((((result || {}).data) || {}).data || {}).items
+        //this.$scope.mitreIds = ["T1503","T1436","T1122", "T1526", "T1522", "T9999"] //example data
+        
+        this.mitreCardsSliderProps = {
+          items: this.$scope.mitreIds ,
+          attacksCount: this.$scope.attacksCount,
+          reqTitle: "MITRE",
+          wzReq: (method, path, body) => this.apiReq.request(method, path, body)
+        }
+      }
+
       if (newTab === 'hipaa') {
         const hipaaTabs = await this.commonData.getHIPAA();
         this.hipaaReqs = { items: hipaaTabs, reqTitle: 'HIPAA Requirement' };
@@ -338,6 +352,8 @@ export class OverviewController {
     return;
   }
 
+
+  
   /**
    * Transform a visualization into an image
    */
@@ -394,6 +410,23 @@ export class OverviewController {
     try {
       await this.loadConfiguration();
       await this.switchTab(this.tab, true);
+
+      this.$scope.$on('sendVisDataRows', (ev, param) => {
+        const rows = (param || {}).mitreRows.tables[0].rows
+        this.$scope.attacksCount = {}
+        for(var i in rows){
+          this.$scope.attacksCount[rows[i]["col-0-2"]] = rows[i]["col-1-1"]
+        }
+
+        
+      this.mitreCardsSliderProps = {
+        items: this.$scope.mitreIds,
+        attacksCount: this.$scope.attacksCount,
+        reqTitle: "MITRE",
+        wzReq: (method, path, body) => this.apiReq.request(method, path, body)
+        }
+      });
+
     } catch (error) {
       this.errorHandler.handle(error.message || error);
     }

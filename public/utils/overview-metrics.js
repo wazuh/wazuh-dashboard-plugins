@@ -36,7 +36,7 @@ const metricsScap = {
   scapLowestScore: '[vis-id="\'Wazuh-App-Overview-OSCAP-Lowest-score\'"]'
 };
 
-// Metrics Scap
+// Metrics Mitre
 const metricsMitre = {
   mitreMetrics: '[vis-id="\'Wazuh-App-Overview-MITRE\'"]'
 };

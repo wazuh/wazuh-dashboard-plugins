@@ -7,7 +7,7 @@
         <kbn-vis vis-id="'Wazuh-App-Overview-MITRE'" id="Wazuh-App-Overview-MITRE"></kbn-vis>    
     </div>
 
-    <div layout="row" layout-padding>
-        <react-component flex name="MitreTable" props="octrl.mitreTableProps">
+    <div layout="row" ng-if="mitreIds" layout-padding>
+        <react-component flex name="MitreCardsSlider" props="octrl.mitreCardsSliderProps">
     </div>
 </md-content>

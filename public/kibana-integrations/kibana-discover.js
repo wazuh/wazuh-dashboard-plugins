@@ -281,7 +281,7 @@ function discoverController(
       }
       const isIncluded = nonRemovableFilters.includes(key);
       const isNonRemovable = isRemovable(item);
-      const shouldBeAdded = (isIncluded && isNonRemovable) || !isIncluded;
+      const shouldBeAdded = true; // TODO FIX
       if (!shouldBeAdded) {
         console.log(`Filter for ${key} already added`);
       }

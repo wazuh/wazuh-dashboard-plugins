@@ -21,7 +21,8 @@ import {
   metricsVulnerability,
   metricsScap,
   metricsCiscat,
-  metricsVirustotal
+  metricsVirustotal,
+  metricsMitre
 } from '../../utils/agents-metrics';
 
 import { ConfigurationHandler } from '../../utils/config-handler';
@@ -481,7 +482,10 @@ export class AgentsController {
         case 'virustotal':
           this.createMetrics(metricsVirustotal);
           break;
-      }
+        case 'mitre':
+          this.createMetrics(metricsMitre);
+          break;
+    }
     }
   }
 

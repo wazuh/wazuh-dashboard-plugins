@@ -260,6 +260,9 @@ app.directive('kbnVis', function() {
           if (currentCompleted >= 100) {
             $rootScope.rendered = true;
             $rootScope.loadingStatus = 'Fetching data...';
+            $scope.$emit('sendVisDataRows', {
+              "mitreRows" : visHandler.dataLoader["visData"]
+            });
           } else if (
             $scope.visID !== 'Wazuh-App-Overview-General-Agents-status'
           ) {
