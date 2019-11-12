@@ -218,7 +218,7 @@ export class AgentsTable extends Component {
 
     return (
       <span className="euiTableCellContent__text euiTableCellContent--truncateText">
-        <i className={`fa fa-${icon}`} aria-hidden="true"></i> {os_name}
+        <i className={`fa fa-${icon}`} aria-hidden="true"></i> {os_name === '--' ? '-' : os_name }
       </span>
     );
 
@@ -323,7 +323,7 @@ export class AgentsTable extends Component {
         field: 'actions',
         name: 'Actions',
         width: '65px',
-        render: this.actionButtonsRender
+        render: (agent) => this.actionButtonsRender(agent)
       },
     ];
   }
