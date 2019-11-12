@@ -41,6 +41,7 @@ class WzRulesetTable extends Component {
     const message = isLoading ? false : 'No results...';
     if (!error) {
       return (
+        <div>
         <EuiInMemoryTable
           itemId="id"
           items={items}
@@ -50,6 +51,7 @@ class WzRulesetTable extends Component {
           sorting={true}
           message={message}
         />
+        </div>
       );
     } else {
       return (

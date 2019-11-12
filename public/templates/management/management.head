@@ -5,11 +5,6 @@
         <div layout="row" layout-padding>
             <!-- If you're not on the Welcome tab, show a functional breadcrumb -->
             <div
-                ng-if="mctrl.tab !== 'welcome' && !mctrl.currentGroup && !mctrl.currentRule && !mctrl.currentDecoder && !mctrl.currentList">
-                <span class="wz-text-link cursor-pointer" ng-click="mctrl.switchTab('welcome', true)">Management</span>
-                <span> / {{ mctrl.tabNames[mctrl.tab] }}</span>
-            </div>
-            <div
                 ng-if="mctrl.tab !== 'welcome' && !mctrl.currentGroup && (mctrl.currentRule || mctrl.currentDecoder || mctrl.currentList)">
                 <span class="wz-text-link cursor-pointer" ng-click="mctrl.switchTab('welcome', true)">Management</span>
                 <span class="wz-text-link cursor-pointer" ng-click="mctrl.breadCrumbBack(true);"> /

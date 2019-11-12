@@ -47,11 +47,6 @@ class WzSectionSelector extends Component {
     this.wzReq = WzRequest;
   }
 
-  componentDidMount() {
-    // Fetch the data in the first mount
-    this.fetchData(this.props.state.section);
-  }
-
   /**
    * Fetch the data for a section: rules, decoders, lists...
    * @param {String} newSection 

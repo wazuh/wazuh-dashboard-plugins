@@ -1,10 +1,10 @@
 {
   "name": "wazuh",
-  "version": "3.11.0",
+  "version": "3.10.2",
   "revision": "0561",
   "code": "0561-0",
   "kibana": {
-    "version": "7.4.0"
+    "version": "7.4.2"
   },
   "description": "Wazuh app",
   "main": "index.js",
@@ -50,6 +50,7 @@
     "pug-loader": "^2.4.0",
     "querystring-browser": "1.0.4",
     "react-redux": "^7.1.1",
+    "react-codemirror": "^1.0.0",
     "redux": "^4.0.4",
     "simple-tail": "^1.1.0",
     "timsort": "^0.3.0",
