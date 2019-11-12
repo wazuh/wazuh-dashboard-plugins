@@ -23,13 +23,15 @@ import {
   EuiText,
   EuiFlyoutHeader,
   EuiFlyoutBody,
-  EuiStat
+  EuiStat,
+  EuiPanel
 } from '@elastic/eui';
 
 export class MitreCardsSlider extends Component {
   constructor(props) {
     super(props);
     this.state = {
+      chunkSize: 6,
       position: 0,
       slider: [],
       sliderLength: 0,
@@ -37,14 +39,14 @@ export class MitreCardsSlider extends Component {
       isFlyoutVisible: false,
       isSwitchChecked: true,
     };
-    this.chunkSize = 6;
     this.expanded = false;
     this.closeFlyout = this.closeFlyout.bind(this);
     this.showFlyout = this.showFlyout.bind(this);
   }
   
   async componentDidMount() {
-    this.setState({ sliderLength: this.props.items.length });
+    window.addEventListener('resize', this.updateDimensions);
+    this.setState({ sliderLength: this.props.items.length, chunkSize: 6});
     this.setState({ slider: this.props.items });
     this.setState({ sliderInfo: {
       "T1021": {"name" : "Remote Services"},
@@ -80,6 +82,23 @@ export class MitreCardsSlider extends Component {
     } });
   }
 
+  componentWillUnmount() {
+    window.removeEventListener('resize', this.updateDimensions);
+  }
+
+  /**
+   * Updates the chunk size depending on the window width so we avoid unnecessary scroll
+   */
+  updateDimensions = () => { 
+    if(window.innerWidth < 1300 && this.state.chunkSize !== 4){
+      this.setState({chunkSize: 4});
+    }
+    if(window.innerWidth >= 1300 && this.state.chunkSize !== 6){
+      this.setState({chunkSize: 6});
+    }else if(window.innerWidth <= 1050 && this.state.chunkSize !== 2){
+      this.setState({chunkSize: 2});
+    }
+  };
 
   /**
    * When props are updated, we sort the list depending on the alerts count
@@ -97,15 +116,12 @@ export class MitreCardsSlider extends Component {
   }
   
   /**
-   * 
    * @param {*} cards - Array of cards to be shown
    */
   buildSlider(cards) {
     const items = cards.map((currentItem, index) => {
-      
       const currentCardData = this.state.sliderInfo[currentItem];
       const title = `${currentCardData.name || "Attack id: "+currentCardData.id}`;
-      const description = `Count: ${currentCardData.count}`;
       const cardFooterContent = (
         <EuiButtonEmpty
           iconType="iInCircle"
@@ -113,19 +129,20 @@ export class MitreCardsSlider extends Component {
           className="footer-req wz-margin--10"
           onClick={() => this.showFlyout(currentCardData)}
         >
-          {"More info"}
+          {"View details"}
         </EuiButtonEmpty>
       );
       
         return (
           <EuiFlexItem key={index}>
-            <EuiCard
-              title={title}
-              description={this.getDescription(currentCardData)}
-              textAlign="left"
-              className="wz-padding-bt-5 reqCard"
-              footer={cardFooterContent}
-            />
+            <EuiPanel 
+            className="wz-padding-bt-5 reqCard">
+              <EuiTitle size="s" className="wz-text-truncatable">
+                <h2>{title}</h2>
+                </EuiTitle>
+            {this.getDescription(currentCardData,index)}
+            {cardFooterContent}
+            </EuiPanel>
           </EuiFlexItem>
         );
     });
@@ -136,13 +153,13 @@ export class MitreCardsSlider extends Component {
    * Returns the view of the current card data (ID and Total Alerts)
    * @param {*} cardData 
    */
-  getDescription(cardData){
+  getDescription(cardData,index){
     return (
       <EuiFlexGroup gutterSize="l" className="requirements-cards">
-        <EuiFlexItem key={0}>
+        <EuiFlexItem >
           <EuiStat title={cardData.id} description="ID" titleSize="s" />
         </EuiFlexItem>
-        <EuiFlexItem key={0}>
+        <EuiFlexItem>
           <EuiStat title={cardData.count} description="Total alerts" titleColor="primary" titleSize="m" />  
         </EuiFlexItem>
       </EuiFlexGroup>
@@ -154,7 +171,7 @@ export class MitreCardsSlider extends Component {
  */
   showCards() {
     var cardsToShow = []
-    for(var i=this.state.position*this.chunkSize; i < (this.state.position+1)*this.chunkSize && i < this.state.sliderLength  ; i++){
+    for(var i=this.state.position*this.state.chunkSize; i < (this.state.position+1)*this.state.chunkSize && i < this.state.sliderLength  ; i++){
       const currentCardId = this.state.slider[i]
       var tmpSliderInfo = this.state.sliderInfo
       const attackCount = (this.props.attacksCount || {})[currentCardId] || 0
@@ -257,7 +274,7 @@ export class MitreCardsSlider extends Component {
     
     return ( 
       <div>
-        <EuiFlexGroup gutterSize="l" className="requirements-cards">
+        <EuiFlexGroup gutterSize="l" >
           {this.state.sliderLength > 1 && this.state.position > 0 && (
             <EuiButtonIcon
               className="wz-margin-left-10"
@@ -270,7 +287,7 @@ export class MitreCardsSlider extends Component {
           {this.showCards()}
           
           {this.state.sliderLength > 1 &&
-            (this.state.position+1)*this.chunkSize < this.state.sliderLength - 1 && (
+            (this.state.position+1)*this.state.chunkSize < this.state.sliderLength - 1 && (
               <EuiButtonIcon
                 className="wz-margin-right-10"
                 iconType="arrowRight"
