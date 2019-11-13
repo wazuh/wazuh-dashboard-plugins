@@ -132,39 +132,8 @@
             </div>
         </div>
 
-        <div layout="row" class="md-padding">
-            <wz-tag-filter flex path="'/agents'" query-fn="ctrl.query(q, search)" fields-model="ctrl.searchBarModel">
-            </wz-tag-filter>
-            <md-button class="agents-prev-btn btn btn-info" style="height: 48px;margin: 0px 0 0 8px!important;"
-                ng-click="ctrl.reloadList()">
-                <react-component name="EuiIcon" props="{type:'refresh'}" /> Refresh</md-button>
-        </div>
-
-        <div layout="row">
-            <md-card flex class="wz-md-card _md flex md-margin-h">
-                <md-card-actions ng-if="adminMode" layout="row" layout-align="end center"
-                    class="wz-card-actions wz-card-actions-top">
-                    <a ng-click="ctrl.addNewAgent(true)">
-                        <react-component name="EuiIcon" props="{type:'plusInCircle'}" /> Add new agent </a>
-                    <span flex></span>
-                </md-card-actions>
-                <md-card-content>
-                    <div layout="row">
-                        <wz-table custom-columns="true" flex path="'/agents'"
-                            keys="[{value: 'id', width: '75px'},'name','ip','status','group','os.name','os.version','version', {value: 'dateAdd', offset: true}, {value: 'lastKeepAlive', offset: true}]"
-                            allow-click="true" row-sizes="[17,15,13]" implicit-sort="'id'"></wz-table>
-                    </div>
-                    <div layout="row" layout-align="end center">
-                        <button type="button" ng-click="ctrl.downloadCsv()"
-                            class="euiButtonEmpty euiButtonEmpty--primary euiButtonEmpty--small">
-                            <span class="euiButtonEmpty__content">
-                                <react-component name="EuiIcon" props="{type:'importAction'}" />
-                                <span class="euiButtonEmpty__text">Formatted</span>
-                            </span>
-                        </button>
-                    </div>
-                </md-card-content>
-            </md-card>
+        <div layout="row" layout-padding>
+            <react-component name="AgentsTable" props="ctrl.tableAgentsProps" />
         </div>
     </div>
 </div>

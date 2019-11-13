@@ -9,6 +9,8 @@
  *
  * Find more information about this on the LICENSE file.
  */
+import chrome from 'ui/chrome';
+import moment from 'moment-timezone'
 
 export class TimeService {
   /**
@@ -17,21 +19,12 @@ export class TimeService {
    */
   offset(d) {
     try {
-      const [day, time] = d.indexOf('T') !== -1 ? d.split('T') : d.split(' ');
-      const [year, month, monthDay] =
-        d.indexOf('-') !== -1 ? day.split('-') : day.split('/');
-      const [hour, minute, seconds] = time.split(':');
-      const date = new Date(
-        year,
-        parseInt(month) - 1,
-        monthDay,
-        hour,
-        minute,
-        seconds.split('.')[0]
-      );
-      const offset = new Date().getTimezoneOffset();
-      const offsetTime = new Date(date.getTime() - offset * 60000);
-      return offsetTime.toLocaleString('en-ZA').replace(',', '');
+      const dateUTC = moment.utc(d);
+      const kibanaTz = chrome.getUiSettingsClient().get('dateFormat:tz');
+      const dateLocate = kibanaTz === 'Browser' 
+        ? moment(dateUTC).local() 
+        : moment(dateUTC).tz(kibanaTz);
+      return dateLocate.format('YYYY/MM/DD HH:mm:ss');
     } catch (error) {
       throw new Error(error);
     }

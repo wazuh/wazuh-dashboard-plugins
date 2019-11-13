@@ -1,18 +1,10 @@
 .wzFilterBarOperatorBtn{
-    text-align: left;
-    line-height: 0;
-    padding-right: 5px;
-    font-size: 14px!important;
-  }
+  text-align: left;
+  line-height: 0;
+  padding-right: 5px;
+  font-size: 14px!important;
+}
 
-  .euiComboBoxOptionsList  {
-    width: 25%!important;
-  }
-
-  .euiComboBoxOptionsList__rowWrap{
-      max-height: 350px!important;
-  }
-
-  .euiComboBoxOptionsList .ReactVirtualized__List{
-    height: 350px!important;
-  }
+#wazuh-app > div > div.euiComboBoxOptionsList  {
+  width: 25%!important;
+}
