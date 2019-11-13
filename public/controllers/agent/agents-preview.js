@@ -10,8 +10,10 @@
  * Find more information about this on the LICENSE file.
  */
 import * as FileSaver from '../../services/file-saver';
+import { DataFactory } from '../../services/data-factory';
 import { timefilter } from 'ui/timefilter';
 import { version } from '../../../package.json';
+import { clickAction } from '../../directives/wz-table/lib/click-action';
 
 export class AgentsPreviewController {
   /**
@@ -103,8 +105,33 @@ export class AgentsPreviewController {
       getCurrentApiAddress: () => this.getCurrentApiAddress(),
       needsPassword: () => this.needsPassword()
     };
+
     this.hasAgents = true;
     this.init = false;
+    const instance = new DataFactory(
+      this.apiReq,
+      '/agents',
+      false,
+      false
+    )
+    //Props
+    this.tableAgentsProps = {
+      wzReq: (method, path, body) => this.apiReq.request(method, path, body),
+      addingNewAgent: () => this.addNewAgent(true),
+      downloadCsv: (filters = []) => this.downloadCsv(filters),
+      clickAction: (item, openAction= false) => {
+        clickAction(
+          item,
+          openAction,
+          instance,
+          this.shareAgent,
+          this.$location,
+          this.$scope,
+          this.appState
+        )
+      },
+      timeService: (date) => this.timeService.offset(date),
+    } 
     //Load
     this.load();
   }
@@ -131,7 +158,7 @@ export class AgentsPreviewController {
   /**
    * Exports the table in CSV format
    */
-  async downloadCsv() {
+  async downloadCsv(filters) {
     try {
       this.errorHandler.info(
         'Your download should begin automatically...',
@@ -140,7 +167,7 @@ export class AgentsPreviewController {
       const output = await this.csvReq.fetch(
         '/agents',
         this.api,
-        this.wzTableFilter.get()
+        filters
       );
       const blob = new Blob([output], { type: 'text/csv' }); // eslint-disable-line
 
@@ -180,55 +207,7 @@ export class AgentsPreviewController {
       const [agentsUnique, agentsTop] = data;
       const unique = agentsUnique.data.result;
 
-      this.searchBarModel = {
-        name: [],
-        status: ['Active', 'Disconnected', 'Never connected'],
-        group: unique.groups.sort((a, b) => {
-          return a.toString().localeCompare(b.toString());
-        }),
-        version: unique.versions.sort((a, b) => {
-          return a.toString().localeCompare(b.toString(), undefined, {
-            numeric: true,
-            sensitivity: 'base'
-          });
-        }),
-        'os.platform': unique.osPlatforms
-          .map(x => x.platform)
-          .sort((a, b) => {
-            return a.toString().localeCompare(b.toString());
-          }),
-        'os.version': unique.osPlatforms
-          .map(x => x.version)
-          .sort((a, b) => {
-            return a.toString().localeCompare(b.toString(), undefined, {
-              numeric: true,
-              sensitivity: 'base'
-            });
-          }),
-        'os.name': unique.osPlatforms
-          .map(x => x.name)
-          .sort((a, b) => {
-            return a.toString().localeCompare(b.toString());
-          })
-      };
 
-      if (clusterInfo.status === 'enabled' && unique.nodes) {
-        this.searchBarModel.node_name = unique.nodes;
-      }
-
-      this.searchBarModel['os.name'] = Array.from(
-        new Set(this.searchBarModel['os.name'])
-      );
-      this.searchBarModel['os.version'] = Array.from(
-        new Set(this.searchBarModel['os.version'])
-      );
-      this.searchBarModel['os.platform'] = Array.from(
-        new Set(this.searchBarModel['os.platform'])
-      );
-      this.groups = unique.groups;
-      this.nodes = unique.nodes.map(item => ({ id: item }));
-      this.versions = unique.versions.map(item => ({ id: item }));
-      this.osPlatforms = unique.osPlatforms;
       this.lastAgent = unique.lastAgent;
       this.summary = unique.summary;
       if (!this.lastAgent || !this.lastAgent.id) {
@@ -260,6 +239,7 @@ export class AgentsPreviewController {
     }
     this.loading = false;
     this.$scope.$applyAsync();
+    
     return;
   }
 
