@@ -151,7 +151,7 @@ class WzRulesetOverview extends Component {
           </EuiFlexGroup>
           <EuiFlexGroup>
             <EuiFlexItem>
-              <WzRulesetTable wzReq={(method, path, options) => this.props.wzReq(method, path, options)} />
+              <WzRulesetTable />
             </EuiFlexItem>
           </EuiFlexGroup>
         </EuiPanel>
