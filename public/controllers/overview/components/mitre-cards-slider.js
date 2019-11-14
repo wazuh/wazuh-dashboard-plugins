@@ -15,7 +15,6 @@ import PropTypes from 'prop-types';
 import {
   EuiButtonEmpty,
   EuiButtonIcon,
-  EuiCard,
   EuiFlexItem,
   EuiFlexGroup,
   EuiFlyout,
@@ -24,7 +23,12 @@ import {
   EuiFlyoutHeader,
   EuiFlyoutBody,
   EuiStat,
-  EuiPanel
+  EuiPanel,
+  EuiLoadingContent,
+  EuiLink,
+  EuiSpacer,
+  EuiDescriptionList,
+  EuiToolTip
 } from '@elastic/eui';
 
 export class MitreCardsSlider extends Component {
@@ -36,6 +40,7 @@ export class MitreCardsSlider extends Component {
       slider: [],
       sliderLength: 0,
       sliderInfo: {},
+      currentCardData: {},
       isFlyoutVisible: false,
       isSwitchChecked: true,
     };
@@ -121,6 +126,7 @@ export class MitreCardsSlider extends Component {
   buildSlider(cards) {
     const items = cards.map((currentItem, index) => {
       const currentCardData = this.state.sliderInfo[currentItem];
+      const tooltipText = `Filter by this attack`
       const title = `${currentCardData.name || "Attack id: "+currentCardData.id}`;
       const cardFooterContent = (
         <EuiButtonEmpty
@@ -135,13 +141,18 @@ export class MitreCardsSlider extends Component {
       
         return (
           <EuiFlexItem key={index}>
-            <EuiPanel 
-            className="wz-padding-bt-5 reqCard">
-              <EuiTitle size="s" className="wz-text-truncatable">
-                <h2>{title}</h2>
-                </EuiTitle>
-            {this.getDescription(currentCardData,index)}
-            {cardFooterContent}
+            <EuiPanel className="wz-padding-bt-5 reqCard">
+              <EuiLink onClick={() => this.addFilter(currentCardData.id)}>
+                <EuiToolTip position="top" content={tooltipText}>
+                  <EuiTitle size="s" className="wz-text-truncatable title-pin">
+                    <h2>{title}</h2>
+                  </EuiTitle>
+                </EuiToolTip>
+              </EuiLink>
+              <EuiSpacer size="xs" />
+              {this.getDescription(currentCardData,index)}
+              <EuiSpacer size="xs" />
+              {cardFooterContent}
             </EuiPanel>
           </EuiFlexItem>
         );
@@ -149,6 +160,15 @@ export class MitreCardsSlider extends Component {
     return items;
   }
 
+  /**
+   * Filters search by mitre.id
+   * @param {*} attackId 
+   */
+  addFilter(attackId) {
+    this.props.addFilter(attackId)
+  }
+
+  
   /**
    * Returns the view of the current card data (ID and Total Alerts)
    * @param {*} cardData 
@@ -238,36 +258,118 @@ export class MitreCardsSlider extends Component {
   };
 
   closeFlyout() {
-    this.setState({ isFlyoutVisible: false });
+    this.setState({ isFlyoutVisible: false, currentCardData: {} });
   }
 
-  showFlyout(cardData) {
-    console.log(cardData) // data of selected card
-    // TODO - Request extra data to our API so we can print its data in the flyout
+  updateCurrentCardData(currentData) {
+    if(currentData){
+      const cardId = currentData.id
+      const cardPhases = currentData.phases
+      const cardPlatforms = currentData.platforms
+      const cardDescription = currentData.json.description
+      const cardName = currentData.json.name
+      const cardDataSources = currentData.json.x_mitre_data_sources
+      const cardVersion = currentData.json.x_mitre_version
+
+      this.setState({currentCardData: {
+        id: cardId,
+        phases: cardPhases,
+        platforms: cardPlatforms,
+        description: cardDescription,
+        name: cardName,
+        dataSources: cardDataSources,
+        version: cardVersion
+        }
+      })
+    }
+  }
+
+  async showFlyout(cardData) {
     this.setState({ isFlyoutVisible: true });
+    const result = await this.props.wzReq("GET", "/mitre",{q: `id=${cardData.id}`})
+    const formattedResult = ((((result || {}).data || {}).data ).items || [])[0] || {}
+    this.updateCurrentCardData(formattedResult)
+  }
+
+
+  getFlyoutHeader(){
+   return (<EuiFlyoutHeader hasBorder>
+      {(Object.keys(this.state.currentCardData).length === 0) &&
+          <div>
+            <EuiLoadingContent lines={1} />
+          </div>
+        ||
+        <EuiTitle size="m">
+          <h2 id="flyoutSmallTitle">{this.state.currentCardData.name}</h2>
+        </EuiTitle>
+        }
+    </EuiFlyoutHeader> 
+   )
+  }
+
+  getFlyoutBody(){
+    const link = `https://attack.mitre.org/techniques/${this.state.currentCardData.id}/`
+    
+    const data = [
+      {
+        title: 'Id',
+        description: this.state.currentCardData.id,
+      },
+      {
+        title: 'Tactic',
+        description: this.state.currentCardData.phases,
+      },
+      {
+        title: 'Platform',
+        description: this.state.currentCardData.platforms,
+      },
+      {
+        title: 'Data sources',
+        description: this.state.currentCardData.dataSources,
+      },
+      {
+        title: 'Version',
+        description: this.state.currentCardData.version,
+      },
+      {
+        title: 'Description',
+        description: this.state.currentCardData.description,
+      },
+    ];
+    return (
+      <EuiFlyoutBody>
+        {(Object.keys(this.state.currentCardData).length === 0) &&
+          <div>
+            <EuiLoadingContent lines={2} />
+            <EuiLoadingContent lines={3} />
+          </div>
+        ||
+        <div>
+          <EuiDescriptionList listItems={data} />
+          <EuiSpacer />
+          <p>
+            More info:{' '}
+            <EuiLink href={link} target="_blank">
+              {`MITRE ATT&CK - ${this.state.currentCardData.id}`}
+            </EuiLink>
+          </p>
+        </div>
+        }
+    </EuiFlyoutBody>
+    )
   }
 
   render() {
     let flyout;
     if (this.state.isFlyoutVisible) {
       flyout = (
-        // TODO
+        
         <EuiFlyout
           onClose={this.closeFlyout}
           size="s"
           aria-labelledby="flyoutSmallTitle">
-          <EuiFlyoutHeader hasBorder>
-            <EuiTitle size="s">
-              <h2 id="flyoutSmallTitle">Attack id - ?</h2>
-            </EuiTitle>
-          </EuiFlyoutHeader>
-          <EuiFlyoutBody>
-            <EuiText>
-              <p>
-                Description
-              </p>
-            </EuiText>
-          </EuiFlyoutBody>
+          {this.getFlyoutHeader()}
+          {this.getFlyoutBody()}
         </EuiFlyout>
       );
     }
@@ -308,6 +410,7 @@ MitreCardsSlider.propTypes = {
   items: PropTypes.array,
   attacksCount: PropTypes.object,
   reqTitle: PropTypes.string,
-  wzReq: PropTypes.func
+  wzReq: PropTypes.func,
+  addFilter: PropTypes.func
 };
 

@@ -83,6 +83,7 @@ export class OverviewController {
       false,
       false
     ];
+    
   }
 
   /**
@@ -302,7 +303,8 @@ export class OverviewController {
           items: this.$scope.mitreIds ,
           attacksCount: this.$scope.attacksCount,
           reqTitle: "MITRE",
-          wzReq: (method, path, body) => this.apiReq.request(method, path, body)
+          wzReq: (method, path, body) => this.apiReq.request(method, path, body),
+          addFilter: (id) => this.addMitrefilter(id)
         }
       }
 
@@ -352,8 +354,6 @@ export class OverviewController {
     return;
   }
 
-
-  
   /**
    * Transform a visualization into an image
    */
@@ -403,6 +403,11 @@ export class OverviewController {
     }
   }
 
+
+  addMitrefilter(id){
+    console.log(id)
+  }
+
   /**
    * On controller loads
    */
@@ -423,7 +428,8 @@ export class OverviewController {
         items: this.$scope.mitreIds,
         attacksCount: this.$scope.attacksCount,
         reqTitle: "MITRE",
-        wzReq: (method, path, body) => this.apiReq.request(method, path, body)
+        wzReq: (method, path, body) => this.apiReq.request(method, path, body),
+        addFilter: (id) => this.addMitrefilter(id)
         }
       });
 
