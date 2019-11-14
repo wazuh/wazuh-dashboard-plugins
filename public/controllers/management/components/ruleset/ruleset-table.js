@@ -11,8 +11,8 @@
  */
 import React, { Component } from 'react';
 import {
-  EuiInMemoryTable,
-  EuiCallOut
+  EuiBasicTable,
+  EuiCallOut,
 } from '@elastic/eui';
 
 import { connect } from 'react-redux';
@@ -23,30 +23,111 @@ import {
   updateRuleInfo,
   updateDecoderInfo,
   updateListContent,
-  updateItems
+  updateItems,
+  updateIsProcessing,
+  updatePageIndex,
 } from '../../../../redux/actions/rulesetActions';
 
 import RulesetColums from './utils/columns';
+import { WzRequest } from '../../../../react-services/wz-request';
+
 
 class WzRulesetTable extends Component {
   constructor(props) {
     super(props);
+    this.wzReq = (...args) => WzRequest.apiReq(...args);
+    this.state = {
+      items: [],
+      pageSize: 10,
+      totalItems: 0,
+    };
+    this.paths = {
+      rules: '/rules',
+      decoders: '/decoders',
+      lists: '/lists/files'
+    }
+  }
+
+  async componentDidMount() {
+  }
+
+  async componentDidUpdate() {
+    if (this.props.state.isProcessing) {
+      await this.getItems()
+    }
+  }
+  async getItems() {
+    const { section, } = this.props.state;
+    const rawItems = await this.wzReq(
+      'GET',
+      this.paths[section],
+      this.buildFilter(),
+    )
+    const { items, totalItems } = ((rawItems || {}).data || {}).data;
+    console.log(items)
+    this.setState({
+      items,
+      totalItems,
+      isProcessing: false,
+    });
+    this.props.updateIsProcessing(false);
+  }
+
+  buildFilter() {
+    const { pageIndex } = this.props.state
+    const { pageSize, } = this.state;
+    const filter = {
+      offset: pageIndex * pageSize,
+      limit: pageSize,
+    }
+
+    return filter;
+  }
+
+  onTableChange = ({ page = {}, sort = {}}) => {
+    const { index: pageIndex, size: pageSize } = page;
+    const { field: sortField, direction: sortDirection } = sort;
+    this.setState({
+      pageSize,
+      sortField,
+      sortDirection,
+    })
+    this.props.updatePageIndex(pageIndex);
+    this.props.updateIsProcessing(true);
   }
 
   render() {
     this.rulesetColums = new RulesetColums(this.props);
-    const { isLoading, items, section, showingFiles, error } = this.props.state;
+    const {
+      isLoading,
+      section,
+      pageIndex,
+      showingFiles,
+      error,
+    } = this.props.state;
+    const {
+      items,
+      pageSize,
+      totalItems,
+    } = this.state;
     const rulesetColums = this.rulesetColums.columns;
     const columns = showingFiles ? rulesetColums.files : rulesetColums[section]
     const message = isLoading ? false : 'No results...';
+    const pagination = {
+      pageIndex: pageIndex,
+      pageSize: pageSize,
+      totalItemCount: totalItems,
+      pageSizeOptions: [10, 25, 50, 100],
+    }
     if (!error) {
       return (
         <div>
-        <EuiInMemoryTable
+        <EuiBasicTable
           itemId="id"
           items={items}
           columns={columns}
-          pagination={true}
+          pagination={pagination}
+          onChange={this.onTableChange}
           loading={isLoading}
           sorting={true}
           message={message}
@@ -75,7 +156,9 @@ const mapDispatchToProps = (dispatch) => {
     updateRuleInfo: info => dispatch(updateRuleInfo(info)),
     updateDecoderInfo: info => dispatch(updateDecoderInfo(info)),
     updateListContent: content => dispatch(updateListContent(content)),
-    updateItems: items => dispatch(updateItems(items))
+    updateItems: items => dispatch(updateItems(items)),
+    updateIsProcessing: isProcessing => dispatch(updateIsProcessing(isProcessing)),
+    updatePageIndex: pageIndex => dispatch(updatePageIndex(pageIndex)),
   }
 };
 

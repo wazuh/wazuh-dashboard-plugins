@@ -22,7 +22,9 @@ const initialState = {
   fileContent: false,
   adminMode: true,
   addingRulesetFile: false,
-  error: false
+  isProcessing: true,
+  pageIndex: 0,
+  error: false,
 }
 
 const rulesetReducers = (state = initialState, action) => {
@@ -37,6 +39,10 @@ const rulesetReducers = (state = initialState, action) => {
       return Object.assign({}, state, { ruleInfo: action.info, decoderInfo: false, listInfo: false, error: false });
     case 'UPDATE_DECODER_INFO':
       return Object.assign({}, state, { decoderInfo: action.info, ruleInfo: false, listInfo: false, error: false });
+    case 'UPDATE_IS_PROCESSING':
+      return Object.assign({}, state, { isProcessing: action.isProcessing, ruleInfo: false, listInfo: false, error: false });
+    case 'UPDATE_PAGE_INDEX':
+      return Object.assign({}, state, { pageIndex: action.pageIndex, ruleInfo: false, listInfo: false, error: false });
     case 'UPDATE_FILE_CONTENT':
       return Object.assign({}, state, { fileContent: action.content, decoderInfo: false, ruleInfo: false, listInfo: false, error: false });
     case 'UPDATE_LIST_CONTENT':

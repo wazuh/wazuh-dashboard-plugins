@@ -22,7 +22,8 @@ import {
   toggleShowFiles,
   cleanFilters,
   updateAdminMode,
-  updateError
+  updateError,
+  updateIsProcessing,
 } from '../../../../redux/actions/rulesetActions';
 
 import { WzRequest } from '../../../../react-services/wz-request';
@@ -55,7 +56,6 @@ class WzSectionSelector extends Component {
     try {
       const currentSection = this.props.state.section;
       if (Object.keys(this.props.state.filters).length && newSection === currentSection) return; // If there's any filter and the section is de same doesn't fetch again
-      this.props.updateItems([]);// Clean the items to avoid flick
       this.props.changeSection(newSection);
       this.props.updateLoadingStatus(true);
       const result = await this.wzReq.apiReq('GET', this.paths[newSection], {});
@@ -63,7 +63,6 @@ class WzSectionSelector extends Component {
       //Set the admin mode
       const admin = await checkAdminMode();
       this.props.updateAdminMode(admin);
-      this.props.updateItems(items);
       this.props.toggleShowFiles(false);
       this.props.changeSection(newSection);
       this.props.updateLoadingStatus(false);
@@ -75,6 +74,7 @@ class WzSectionSelector extends Component {
   onChange = async e => {
     const section = e.target.value;
     this.props.cleanFilters();
+    this.props.updateIsProcessing(true);
     this.fetchData(section);
   };
 
@@ -105,8 +105,9 @@ const mapDispatchToProps = (dispatch) => {
     updateItems: items => dispatch(updateItems(items)),
     toggleShowFiles: status => dispatch(toggleShowFiles(status)),
     cleanFilters: () => dispatch(cleanFilters()),
-    updateAdminMode: status => (dispatch(updateAdminMode(status))),
-    updateError: error => (dispatch(updateError(error)))
+    updateAdminMode: status => dispatch(updateAdminMode(status)),
+    updateError: error => dispatch(updateError(error)),
+    updateIsProcessing: isProcessing => dispatch(updateIsProcessing(isProcessing)),
   }
 };
 

@@ -99,6 +99,20 @@ export const updateDecoderInfo = (info) => {
   }  
 }
 
+export const updateIsProcessing = (isProcessing) => {
+  return {
+    type: 'UPDATE_IS_PROCESSING',
+    isProcessing: isProcessing
+  }
+}
+
+export const updatePageIndex = (pageIndex) => {
+  return {
+    type: 'UPDATE_PAGE_INDEX',
+    pageIndex: pageIndex
+  }
+}
+
 export const updateFilters = (filters) => {
   return {
     type: 'UPDATE_FILTERS',

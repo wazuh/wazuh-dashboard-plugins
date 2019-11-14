@@ -22,7 +22,9 @@ import {
   toggleShowFiles,
   cleanFilters,
   updateAdminMode,
-  updateError
+  updateError,
+  updateIsProcessing,
+  updatePageIndex,
 } from '../../../../redux/actions/rulesetActions';
 
 import checkAdminMode from './utils/check-admin-mode';
@@ -94,6 +96,8 @@ class WzRulesetSideMenu extends Component {
         selectedItemName: section,
       });
     this.props.cleanFilters();
+    this.props.updateIsProcessing(true);
+    this.props.updatePageIndex(0);
     if (['rules', 'decoders', 'lists'].includes(section)) {
       this.fetchData(section);
     } else if(section === 'ruleset') {
@@ -162,8 +166,10 @@ const mapDispatchToProps = (dispatch) => {
     updateItems: items => dispatch(updateItems(items)),
     toggleShowFiles: status => dispatch(toggleShowFiles(status)),
     cleanFilters: () => dispatch(cleanFilters()),
-    updateAdminMode: status => (dispatch(updateAdminMode(status))),
-    updateError: error => (dispatch(updateError(error)))
+    updateAdminMode: status => dispatch(updateAdminMode(status)),
+    updateError: error => dispatch(updateError(error)),
+    updateIsProcessing: isPorcessing => dispatch(updateIsProcessing(isPorcessing)),
+    updatePageIndex: pageIndex => dispatch(updatePageIndex(pageIndex))
   }
 };
 
