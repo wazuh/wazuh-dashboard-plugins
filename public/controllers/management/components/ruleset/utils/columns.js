@@ -281,6 +281,7 @@ export default class RulesetColumns {
             name: 'Actions',
             align: 'left',
             render: item => {
+              const defaultItems = this.tableProps.state.defaultItems;
               return (
                 <div>
                   <EuiToolTip position="top" content={`Edit ${item.name} content`}>
@@ -295,7 +296,7 @@ export default class RulesetColumns {
                       color="primary"
                     />
                   </EuiToolTip>
-                  <EuiToolTip position="top" content={`Remove ${item.name}`}>
+                  <EuiToolTip position="top" content={(defaultItems.indexOf(`${item.path}/${item.name}`) === -1)? `Delete ${item.name}`: `The ${item.name} list cannot be deleted`}>
                     <EuiButtonIcon
                       aria-label="Show content"
                       iconType="trash"
@@ -304,6 +305,7 @@ export default class RulesetColumns {
                         this.tableProps.updateShowModal(true);
                       }}
                       color="danger"
+                      disabled={defaultItems.indexOf(`${item.path}/${item.name}`) !== -1}
                     />
                   </EuiToolTip>
                 </div>

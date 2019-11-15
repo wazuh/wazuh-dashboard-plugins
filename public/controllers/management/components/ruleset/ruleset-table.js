@@ -28,6 +28,7 @@ import {
   updateListItemsForRemove,
   updateSortDirection,
   updateSortField,
+  updateDefaultItems,
 } from '../../../../redux/actions/rulesetActions';
 
 import RulesetColums from './utils/columns';
@@ -64,6 +65,22 @@ class WzRulesetTable extends Component {
       `${this.paths[section]}${showingFiles ? '/files': ''}`,
       this.buildFilter(),
     )
+
+    if(this.props.state.defaultItems.length === 0 && section === 'lists'){
+      const requestDefaultItems = await this.wzReq(
+        'GET',
+        '/manager/configuration',
+        {
+          'wait_for_complete' : false,
+          'section': 'ruleset',
+          'field': 'list'
+        }
+      );
+  
+      const defaultItems = ((requestDefaultItems || {}).data || {}).data;
+      this.props.updateDefaultItems(defaultItems);
+    }
+
     const { items, totalItems } = ((rawItems || {}).data || {}).data;
     this.setState({
       items,
@@ -206,6 +223,7 @@ const mapDispatchToProps = (dispatch) => {
     updateDecoderInfo: info => dispatch(updateDecoderInfo(info)),
     updateListContent: content => dispatch(updateListContent(content)),
     updateItems: items => dispatch(updateItems(items)),
+    updateDefaultItems: defaultItems => dispatch(updateDefaultItems(defaultItems)),
     updateIsProcessing: isProcessing => dispatch(updateIsProcessing(isProcessing)),
     updatePageIndex: pageIndex => dispatch(updatePageIndex(pageIndex)),
     updateShowModal: showModal => dispatch(updateShowModal(showModal)),

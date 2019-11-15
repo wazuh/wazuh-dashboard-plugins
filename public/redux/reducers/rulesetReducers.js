@@ -29,6 +29,7 @@ const initialState = {
   showModal: false,
   sortDirection: 'asc',
   sortField: 'id',
+  defaultItems: [],
 }
 
 const rulesetReducers = (state = initialState, action) => {
@@ -39,6 +40,8 @@ const rulesetReducers = (state = initialState, action) => {
       return Object.assign({}, state, { filters: {} });
     case 'CLEAN_INFO':
       return Object.assign({}, state, { decoderInfo: false, ruleInfo: false, listInfo: false, fileContent: false, addingRulesetFile: false, error: false });
+    case 'RESET':
+      return initialState;
     case 'TOGGLE_SHOW_FILES':
       return Object.assign({}, state, { showingFiles: action.status, error: false });
     case 'UPDATE_ADDING_RULESET_FILE':
@@ -47,6 +50,8 @@ const rulesetReducers = (state = initialState, action) => {
       return Object.assign({}, state, { adminMode: action.status });
     case 'UPDATE_DECODER_INFO':
       return Object.assign({}, state, { decoderInfo: action.info, ruleInfo: false, listInfo: false, error: false });
+    case 'UPDATE_DEFAULT_ITEMS':
+      return Object.assign({}, state, { defaultItems: action.defaultItems, error: false });
     case 'UPDATE_ERROR':
       return Object.assign({}, state, { error: action.error });
     case 'UPDATE_FILE_CONTENT':
@@ -75,8 +80,6 @@ const rulesetReducers = (state = initialState, action) => {
       return Object.assign({}, state, { sortDirection: action.sortDirection, error: false });
     case 'UPDATE_SORT_FIELD':
       return Object.assign({}, state, { sortField: action.sortField, error: false });
-    case 'RESET':
-      return initialState;
     default: return state;
   }
 }
