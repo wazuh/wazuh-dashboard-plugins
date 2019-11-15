@@ -117,8 +117,9 @@ export class AgentsPreviewController {
     //Props
     this.tableAgentsProps = {
       wzReq: (method, path, body) => this.apiReq.request(method, path, body),
-      addingNewAgent: () => this.addNewAgent(true),
+      addingNewAgent: () => {this.addNewAgent(true); this.$scope.$applyAsync()},
       downloadCsv: (filters = []) => this.downloadCsv(filters),
+      showAgent: (agent) => this.showAgent(agent),
       clickAction: (item, openAction= false) => {
         clickAction(
           item,

@@ -68,6 +68,7 @@ export class WelcomeScreen extends Component {
     return (
       <EuiFlexItem>
         <EuiCard
+          size="xs"
           layout="horizontal"
           icon={<EuiIcon size="xl" type={icon} />}
           title={TabDescription[tab].title}
