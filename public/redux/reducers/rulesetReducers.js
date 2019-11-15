@@ -25,6 +25,8 @@ const initialState = {
   isProcessing: true,
   pageIndex: 0,
   error: false,
+  showModal: false,
+  itemList: [],
 }
 
 const rulesetReducers = (state = initialState, action) => {
@@ -49,6 +51,10 @@ const rulesetReducers = (state = initialState, action) => {
       return Object.assign({}, state, { fileContent: false, decoderInfo: false, ruleInfo: false, listInfo: action.content, error: false });
     case 'UPDATE_FILTERS':
       return Object.assign({}, state, { filters: action.filters, error: false });
+    case 'UPDATE_SHOW_MODAL':
+      return Object.assign({}, state, { showModal: action.showModal, error: false });
+    case 'UPDATE_LIST_ITEMS_FOR_REMOVE':
+      return Object.assign({}, state, { itemList: action.itemList, error: false });
     case 'UPDATE_ADMIN_MODE':
       return Object.assign({}, state, { adminMode: action.status });
     case 'UPDATE_ADDING_RULESET_FILE':

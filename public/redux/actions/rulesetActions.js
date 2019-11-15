@@ -43,6 +43,20 @@ export const updateFileContent = (content) => {
   }
 }
 
+export const updateShowModal = (showModal) => {
+  return {
+    type: 'UPDATE_SHOW_MODAL',
+    showModal: showModal
+  }
+}
+
+export const updateListItemsForRemove = (itemList) => {
+  return {
+    type: 'UPDATE_LIST_ITEMS_FOR_REMOVE',
+    itemList: itemList
+  }
+}
+
 /**
  * Update the lists content
  * @param {String} content 

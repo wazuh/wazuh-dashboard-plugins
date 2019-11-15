@@ -10,12 +10,10 @@
  * Find more information about this on the LICENSE file.
  */
 import React, { Component } from 'react';
-import {
-  EuiBasicTable,
-  EuiCallOut,
-} from '@elastic/eui';
+import { EuiBasicTable, EuiCallOut, EuiOverlayMask, EuiConfirmModal } from '@elastic/eui';
 
 import { connect } from 'react-redux';
+import RulesetHandler from './utils/ruleset-handler';
 
 import {
   updateLoadingStatus,
@@ -26,11 +24,12 @@ import {
   updateItems,
   updateIsProcessing,
   updatePageIndex,
+  updateShowModal,
+  updateListItemsForRemove,
 } from '../../../../redux/actions/rulesetActions';
 
 import RulesetColums from './utils/columns';
 import { WzRequest } from '../../../../react-services/wz-request';
-
 
 class WzRulesetTable extends Component {
   constructor(props) {
@@ -44,27 +43,22 @@ class WzRulesetTable extends Component {
     this.paths = {
       rules: '/rules',
       decoders: '/decoders',
-      lists: '/lists/files'
-    }
+      lists: '/lists/files',
+    };
+    this.rulesetHandler = RulesetHandler;
   }
 
-  async componentDidMount() {
-  }
+  async componentDidMount() {}
 
   async componentDidUpdate() {
     if (this.props.state.isProcessing) {
-      await this.getItems()
+      await this.getItems();
     }
   }
   async getItems() {
-    const { section, } = this.props.state;
-    const rawItems = await this.wzReq(
-      'GET',
-      this.paths[section],
-      this.buildFilter(),
-    )
+    const { section } = this.props.state;
+    const rawItems = await this.wzReq('GET', this.paths[section], this.buildFilter());
     const { items, totalItems } = ((rawItems || {}).data || {}).data;
-    console.log(items)
     this.setState({
       items,
       totalItems,
@@ -74,78 +68,104 @@ class WzRulesetTable extends Component {
   }
 
   buildFilter() {
-    const { pageIndex } = this.props.state
-    const { pageSize, } = this.state;
+    const { pageIndex } = this.props.state;
+    const { pageSize } = this.state;
     const filter = {
       offset: pageIndex * pageSize,
       limit: pageSize,
-    }
+    };
 
     return filter;
   }
 
-  onTableChange = ({ page = {}, sort = {}}) => {
+  onTableChange = ({ page = {}, sort = {} }) => {
     const { index: pageIndex, size: pageSize } = page;
     const { field: sortField, direction: sortDirection } = sort;
     this.setState({
       pageSize,
       sortField,
       sortDirection,
-    })
+    });
     this.props.updatePageIndex(pageIndex);
     this.props.updateIsProcessing(true);
-  }
+  };
 
   render() {
     this.rulesetColums = new RulesetColums(this.props);
-    const {
-      isLoading,
-      section,
-      pageIndex,
-      showingFiles,
-      error,
-    } = this.props.state;
-    const {
-      items,
-      pageSize,
-      totalItems,
-    } = this.state;
+    const { isLoading, section, pageIndex, showingFiles, error } = this.props.state;
+    const { items, pageSize, totalItems } = this.state;
     const rulesetColums = this.rulesetColums.columns;
-    const columns = showingFiles ? rulesetColums.files : rulesetColums[section]
+    const columns = showingFiles ? rulesetColums.files : rulesetColums[section];
     const message = isLoading ? false : 'No results...';
     const pagination = {
       pageIndex: pageIndex,
       pageSize: pageSize,
       totalItemCount: totalItems,
       pageSizeOptions: [10, 25, 50, 100],
-    }
+    };
     if (!error) {
+      const itemList = this.props.state.itemList;
       return (
         <div>
-        <EuiBasicTable
-          itemId="id"
-          items={items}
-          columns={columns}
-          pagination={pagination}
-          onChange={this.onTableChange}
-          loading={isLoading}
-          sorting={true}
-          message={message}
-        />
+          <EuiBasicTable
+            itemId="id"
+            items={items}
+            columns={columns}
+            pagination={pagination}
+            onChange={this.onTableChange}
+            loading={isLoading}
+            sorting={true}
+            message={message}
+          />
+          {this.props.state.showModal ? (
+            <EuiOverlayMask>
+              <EuiConfirmModal
+                title="Are you sure?"
+                onCancel={() => this.props.updateShowModal(false)}
+                onConfirm={() => {
+                  this.removeItems(itemList);
+                  this.props.updateShowModal(false);
+                }}
+                cancelButtonText="No, don't do it"
+                confirmButtonText="Yes, do it"
+                defaultFocusedButton="cancel"
+                buttonColor="danger"
+              >
+                <p>Are you sure you want to remove?</p>
+                <div>
+                  {itemList.map(function(item, i) {
+                    return (
+                      <li key={i}>{[item.name]}</li>
+                    );
+                  })}
+                </div>
+              </EuiConfirmModal>
+            </EuiOverlayMask>
+          ) : null}
         </div>
       );
     } else {
-      return (
-        <EuiCallOut color="warning" title={error} iconType="gear"/>
-      );
+      return <EuiCallOut color="warning" title={error} iconType="gear" />;
     }
-
   }
+
+  async removeItems(items) {
+    this.props.updateLoadingStatus(true);
+    const results = items.map(async (item, i) => {
+      await this.rulesetHandler.deleteFile(item.name, item.path);
+    });
+
+    Promise.all(results).then((completed) => {
+      this.props.updateIsProcessing(true);
+      this.props.updateLoadingStatus(false);
+    });
+  }; 
 }
+
 
 const mapStateToProps = (state) => {
   return {
-    state: state.rulesetReducers
+    state: state.rulesetReducers,
   };
 };
 
@@ -159,8 +179,9 @@ const mapDispatchToProps = (dispatch) => {
     updateItems: items => dispatch(updateItems(items)),
     updateIsProcessing: isProcessing => dispatch(updateIsProcessing(isProcessing)),
     updatePageIndex: pageIndex => dispatch(updatePageIndex(pageIndex)),
-  }
+    updateShowModal: showModal => dispatch(updateShowModal(showModal)),
+    updateListItemsForRemove: itemList => dispatch(updateListItemsForRemove(itemList)),
+  };
 };
-
 
 export default connect(mapStateToProps, mapDispatchToProps)(WzRulesetTable);

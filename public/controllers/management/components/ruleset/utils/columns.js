@@ -300,11 +300,8 @@ export default class RulesetColumns {
                       aria-label="Show content"
                       iconType="trash"
                       onClick={async () => {
-                        await this.rulesetHandler.deleteFile(item.name, item.path);
-                        this.tableProps.updateLoadingStatus(true);
-                        const items = await this.rulesetHandler.getLists();
-                        this.tableProps.updateItems(items);
-                        this.tableProps.updateLoadingStatus(false);
+                        this.tableProps.updateListItemsForRemove([item]);
+                        this.tableProps.updateShowModal(true);
                       }}
                       color="danger"
                     />
