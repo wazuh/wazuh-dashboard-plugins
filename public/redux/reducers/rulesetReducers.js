@@ -27,6 +27,7 @@ const initialState = {
   error: false,
   showModal: false,
   itemList: [],
+  defaultItems: [],
 }
 
 const rulesetReducers = (state = initialState, action) => {
@@ -55,6 +56,8 @@ const rulesetReducers = (state = initialState, action) => {
       return Object.assign({}, state, { showModal: action.showModal, error: false });
     case 'UPDATE_LIST_ITEMS_FOR_REMOVE':
       return Object.assign({}, state, { itemList: action.itemList, error: false });
+    case 'UPDATE_DEFAULT_ITEMS':
+      return Object.assign({}, state, { defaultItems: action.defaultItems, error: false });
     case 'UPDATE_ADMIN_MODE':
       return Object.assign({}, state, { adminMode: action.status });
     case 'UPDATE_ADDING_RULESET_FILE':

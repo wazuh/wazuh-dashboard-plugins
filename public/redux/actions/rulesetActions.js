@@ -57,6 +57,13 @@ export const updateListItemsForRemove = (itemList) => {
   }
 }
 
+export const updateDefaultItems = (defaultItems) => {
+  return {
+    type: 'UPDATE_DEFAULT_ITEMS',
+    defaultItems: defaultItems
+  }
+}
+
 /**
  * Update the lists content
  * @param {String} content 
