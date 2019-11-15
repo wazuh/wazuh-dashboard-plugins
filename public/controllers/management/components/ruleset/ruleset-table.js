@@ -56,8 +56,13 @@ class WzRulesetTable extends Component {
     }
   }
   async getItems() {
-    const { section } = this.props.state;
-    const rawItems = await this.wzReq('GET', this.paths[section], this.buildFilter());
+    console.log(this.props.state)
+    const { section, showingFiles } = this.props.state;
+    const rawItems = await this.wzReq(
+      'GET',
+      `${this.paths[section]}${showingFiles ? '/files': ''}`,
+      this.buildFilter(),
+    )
     const { items, totalItems } = ((rawItems || {}).data || {}).data;
     this.setState({
       items,

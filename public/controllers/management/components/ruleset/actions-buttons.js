@@ -24,7 +24,9 @@ import {
   toggleShowFiles,
   updateLoadingStatus,
   updteAddingRulesetFile,
-  updateListContent
+  updateListContent,
+  updateIsProcessing,
+  updatePageIndex,
 } from '../../../../redux/actions/rulesetActions';
 
 import { WzRequest } from '../../../../react-services/wz-request';
@@ -120,10 +122,10 @@ class WzRulesetActionButtons extends Component {
   async toggleFiles() {
     try {
       this.props.updateLoadingStatus(true);
-      const { showingFiles, section } = this.props.state;
-      this.props.toggleShowFiles(!showingFiles)
-      const path = !showingFiles ? `${this.paths[section]}/files` : this.paths[section];
-      await this.updateItems(path);
+      const { showingFiles, } = this.props.state;
+      this.props.toggleShowFiles(!showingFiles);
+      this.props.updateIsProcessing(true);
+      this.props.updatePageIndex(0);
       this.props.updateLoadingStatus(false);
     } catch (error) {
       console.error('error toggling ', error)
@@ -263,7 +265,9 @@ const mapDispatchToProps = (dispatch) => {
     toggleShowFiles: status => dispatch(toggleShowFiles(status)),
     updateLoadingStatus: status => dispatch(updateLoadingStatus(status)),
     updteAddingRulesetFile: content => dispatch(updteAddingRulesetFile(content)),
-    updateListContent: content => dispatch(updateListContent(content))
+    updateListContent: content => dispatch(updateListContent(content)),
+    updateIsProcessing: isProcessing => dispatch(updateIsProcessing(isProcessing)),
+    updatePageIndex: pageIndex => dispatch(updatePageIndex(pageIndex)),
   }
 };
 
