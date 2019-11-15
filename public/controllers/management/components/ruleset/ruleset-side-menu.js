@@ -25,6 +25,8 @@ import {
   updateError,
   updateIsProcessing,
   updatePageIndex,
+  updateSortDirection,
+  updateSortField,
 } from '../../../../redux/actions/rulesetActions';
 
 import checkAdminMode from './utils/check-admin-mode';
@@ -92,20 +94,22 @@ class WzRulesetSideMenu extends Component {
   clickMenuItem = async name => {
     const section = name;
     if(this.state.selectedItemName !== section){
-      this.setState({
-        selectedItemName: section,
-      });
-    this.props.cleanFilters();
-    this.props.updateIsProcessing(true);
-    this.props.updatePageIndex(0);
-    if (['rules', 'decoders', 'lists'].includes(section)) {
-      this.fetchData(section);
-    } else if(section === 'ruleset') {
-      this.fetchData(this.rulesetSections.rules.id);
-    } else{
+        this.setState({
+          selectedItemName: section,
+        });
+      this.props.updateSortDirection('asc');
+      this.props.updateSortField(section === 'rules' ? 'id' : 'name');
+      this.props.cleanFilters();
+      this.props.updateIsProcessing(true);
+      this.props.updatePageIndex(0);
+      if (['rules', 'decoders', 'lists'].includes(section)) {
+        this.fetchData(section);
+      } else if(section === 'ruleset') {
+        this.fetchData(this.rulesetSections.rules.id);
+      } else{
 
+      }
     }
-  }
   };
 
   createItem = (item, data = {}) => {
@@ -169,7 +173,9 @@ const mapDispatchToProps = (dispatch) => {
     updateAdminMode: status => dispatch(updateAdminMode(status)),
     updateError: error => dispatch(updateError(error)),
     updateIsProcessing: isPorcessing => dispatch(updateIsProcessing(isPorcessing)),
-    updatePageIndex: pageIndex => dispatch(updatePageIndex(pageIndex))
+    updatePageIndex: pageIndex => dispatch(updatePageIndex(pageIndex)),
+    updateSortDirection: sortDirection => dispatch(updateSortDirection(sortDirection)),
+    updateSortField: sortField => dispatch(updateSortField(sortField)),
   }
 };
 

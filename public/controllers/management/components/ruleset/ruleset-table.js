@@ -26,6 +26,8 @@ import {
   updatePageIndex,
   updateShowModal,
   updateListItemsForRemove,
+  updateSortDirection,
+  updateSortField,
 } from '../../../../redux/actions/rulesetActions';
 
 import RulesetColums from './utils/columns';
@@ -56,7 +58,6 @@ class WzRulesetTable extends Component {
     }
   }
   async getItems() {
-    console.log(this.props.state)
     const { section, showingFiles } = this.props.state;
     const rawItems = await this.wzReq(
       'GET',
@@ -78,36 +79,59 @@ class WzRulesetTable extends Component {
     const filter = {
       offset: pageIndex * pageSize,
       limit: pageSize,
+      sort: this.buildSortFilter(),
     };
 
     return filter;
   }
 
+  buildSortFilter() {
+    const {sortField, sortDirection} = this.props.state;
+
+    const field = sortField;
+    const direction = (sortDirection === 'asc') ? '+' : '-';
+    
+    return direction+field;
+  }
+
   onTableChange = ({ page = {}, sort = {} }) => {
     const { index: pageIndex, size: pageSize } = page;
     const { field: sortField, direction: sortDirection } = sort;
-    this.setState({
-      pageSize,
-      sortField,
-      sortDirection,
-    });
+    this.setState({ pageSize });
     this.props.updatePageIndex(pageIndex);
+    this.props.updateSortDirection(sortDirection);
+    this.props.updateSortField(sortField);
     this.props.updateIsProcessing(true);
   };
 
   render() {
     this.rulesetColums = new RulesetColums(this.props);
-    const { isLoading, section, pageIndex, showingFiles, error } = this.props.state;
-    const { items, pageSize, totalItems } = this.state;
+    const {
+      isLoading,
+      section,
+      pageIndex,
+      showingFiles,
+      error,
+      sortField,
+      sortDirection,
+    } = this.props.state;
+    const { items, pageSize, totalItems, } = this.state;
     const rulesetColums = this.rulesetColums.columns;
     const columns = showingFiles ? rulesetColums.files : rulesetColums[section];
-    const message = isLoading ? false : 'No results...';
+    const message = isLoading ? null : 'No results...';
     const pagination = {
       pageIndex: pageIndex,
       pageSize: pageSize,
       totalItemCount: totalItems,
       pageSizeOptions: [10, 25, 50, 100],
     };
+    const sorting = {
+      sort: {
+        field: sortField,
+        direction: sortDirection,
+      },
+    }
+    
     if (!error) {
       const itemList = this.props.state.itemList;
       return (
@@ -119,7 +143,7 @@ class WzRulesetTable extends Component {
             pagination={pagination}
             onChange={this.onTableChange}
             loading={isLoading}
-            sorting={true}
+            sorting={sorting}
             message={message}
           />
           {this.props.state.showModal ? (
@@ -186,6 +210,8 @@ const mapDispatchToProps = (dispatch) => {
     updatePageIndex: pageIndex => dispatch(updatePageIndex(pageIndex)),
     updateShowModal: showModal => dispatch(updateShowModal(showModal)),
     updateListItemsForRemove: itemList => dispatch(updateListItemsForRemove(itemList)),
+    updateSortDirection: sortDirection => dispatch(updateSortDirection(sortDirection)),
+    updateSortField: sortField => dispatch(updateSortField(sortField)),
   };
 };
 

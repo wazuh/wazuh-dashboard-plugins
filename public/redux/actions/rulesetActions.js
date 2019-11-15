@@ -43,6 +43,10 @@ export const updateFileContent = (content) => {
   }
 }
 
+/**
+ * Toggle the modal confirm of the ruleset table
+ * @param {Boolean} showModal 
+ */
 export const updateShowModal = (showModal) => {
   return {
     type: 'UPDATE_SHOW_MODAL',
@@ -50,10 +54,28 @@ export const updateShowModal = (showModal) => {
   }
 }
 
+/**
+ * Update the list of items to remove 
+ * @param {Array} itemList 
+ */
 export const updateListItemsForRemove = (itemList) => {
   return {
     type: 'UPDATE_LIST_ITEMS_FOR_REMOVE',
     itemList: itemList
+  }
+}
+
+export const updateSortField = (sortField) => {
+  return {
+    type: 'UPDATE_SORT_FIELD',
+    sortField: sortField
+  }
+}
+
+export const updateSortDirection = (sortDirection) => {
+  return {
+    type: 'UPDATE_SORT_DIRECTION',
+    sortDirection: sortDirection
   }
 }
 
@@ -99,6 +121,10 @@ export const toggleShowFiles = (status) => {
   }
 }
 
+/**
+ * Update the rule info 
+ * @param {String} info 
+ */
 export const updateRuleInfo = (info) => {
   return {
     type: 'UPDATE_RULE_INFO',
@@ -106,6 +132,10 @@ export const updateRuleInfo = (info) => {
   }
 }
 
+/**
+ * Update the decoder info
+ * @param {String} info 
+ */
 export const updateDecoderInfo = (info) => {
   return {
     type: 'UPDATE_DECODER_INFO',
@@ -113,6 +143,10 @@ export const updateDecoderInfo = (info) => {
   }  
 }
 
+/**
+ * Toggle the updating of the table 
+ * @param {Boolean} isProcessing 
+ */
 export const updateIsProcessing = (isProcessing) => {
   return {
     type: 'UPDATE_IS_PROCESSING',
@@ -120,6 +154,10 @@ export const updateIsProcessing = (isProcessing) => {
   }
 }
 
+/**
+ * Set the page index value of the table 
+ * @param {Number} pageIndex 
+ */
 export const updatePageIndex = (pageIndex) => {
   return {
     type: 'UPDATE_PAGE_INDEX',
@@ -127,6 +165,10 @@ export const updatePageIndex = (pageIndex) => {
   }
 }
 
+/**
+ * Update the filters 
+ * @param {string} filters 
+ */
 export const updateFilters = (filters) => {
   return {
     type: 'UPDATE_FILTERS',

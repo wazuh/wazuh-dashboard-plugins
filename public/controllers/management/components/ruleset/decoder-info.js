@@ -286,7 +286,7 @@ class WzDecoderInfo extends Component {
                         pagination={true}
                         loading={isLoading}
                         sorting={true}
-                        message={false}
+                        message={null}
                       />
                     </EuiFlexItem>
                   </EuiFlexGroup>

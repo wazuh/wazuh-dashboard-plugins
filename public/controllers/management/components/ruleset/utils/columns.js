@@ -44,35 +44,35 @@ export default class RulesetColumns {
             field: 'groups',
             name: 'Groups',
             align: 'left',
-            sortable: true,
+            sortable: false,
             width: '10%'
           },
           {
             field: 'pci',
             name: 'PCI',
             align: 'left',
-            sortable: true,
+            sortable: false,
             width: '10%'
           },
           {
             field: 'gdpr',
             name: 'GDPR',
             align: 'left',
-            sortable: true,
+            sortable: false,
             width: '10%'
           },
           {
             field: 'hipaa',
             name: 'HIPAA',
             align: 'left',
-            sortable: true,
+            sortable: false,
             width: '10%'
           },
           {
             field: 'nist-800-53',
             name: 'NIST 800-53',
             align: 'left',
-            sortable: true,
+            sortable: false,
             width: '10%'
           },
           {
@@ -136,13 +136,13 @@ export default class RulesetColumns {
             field: 'details.program_name',
             name: 'Program name',
             align: 'left',
-            sortable: true
+            sortable: false
           },
           {
             field: 'details.order',
             name: 'Order',
             align: 'left',
-            sortable: true
+            sortable: false
           },
           {
             field: 'file',
