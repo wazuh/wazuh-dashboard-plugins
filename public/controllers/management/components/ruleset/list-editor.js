@@ -23,14 +23,12 @@ import {
   EuiButtonEmpty,
   EuiPopover,
   EuiFieldText,
-  EuiSpacer
+  EuiSpacer,
 } from '@elastic/eui';
 
 import { connect } from 'react-redux';
 
-import {
-  cleanInfo,
-} from '../../../../redux/actions/rulesetActions';
+import { cleanInfo, updateListContent } from '../../../../redux/actions/rulesetActions';
 
 import RulesetHandler from './utils/ruleset-handler';
 
@@ -47,25 +45,26 @@ class WzListEditor extends Component {
       addingKey: '',
       addingValue: '',
       editingValue: '',
-      newListName: ''
+      newListName: '',
     };
 
     this.items = {};
-    this.sendCdbList = RulesetHandler.sendCdbList;
+
+    this.rulesetHandler = RulesetHandler;
 
     this.columns = [
       {
         field: 'key',
         name: 'Key',
         align: 'left',
-        sortable: true
+        sortable: true,
       },
       {
         field: 'value',
         name: 'Value',
         align: 'left',
-        sortable: true
-      }
+        sortable: true,
+      },
     ];
 
     this.adminColumns = [
@@ -73,7 +72,7 @@ class WzListEditor extends Component {
         field: 'key',
         name: 'Key',
         align: 'left',
-        sortable: true
+        sortable: true,
       },
       {
         field: 'value',
@@ -91,9 +90,9 @@ class WzListEditor extends Component {
               />
             );
           } else {
-            return (<span>{value}</span>);
+            return <span>{value}</span>;
           }
-        }
+        },
       },
       {
         name: 'Actions',
@@ -117,7 +116,7 @@ class WzListEditor extends Component {
                   <EuiButtonIcon
                     aria-label="Cancel edition"
                     iconType="cross"
-                    onClick={() => { this.setState({ editing: false }) }}
+                    onClick={() => this.setState({ editing: false }) }
                     color="danger"
                   />
                 </EuiToolTip>
@@ -140,15 +139,15 @@ class WzListEditor extends Component {
                   <EuiButtonIcon
                     aria-label="Show content"
                     iconType="trash"
-                    onClick={() => { this.deleteItem(item.key) }}
+                    onClick={() => this.deleteItem(item.key) }
                     color="danger"
                   />
                 </EuiToolTip>
               </Fragment>
             );
           }
-        }
-      }
+        },
+      },
     ];
   }
 
@@ -163,7 +162,7 @@ class WzListEditor extends Component {
 
   /**
    * When getting a CDB list is returned a raw text, this function parses it to an array
-   * @param {Object} obj 
+   * @param {Object} obj
    */
   contentToArray(obj) {
     const items = [];
@@ -176,7 +175,7 @@ class WzListEditor extends Component {
 
   /**
    * Save in the state as object the items for an easy modification by key-value
-   * @param {String} content 
+   * @param {String} content
    */
   contentToObject(content) {
     const items = {};
@@ -203,8 +202,8 @@ class WzListEditor extends Component {
 
   /**
    * Save the list
-   * @param {String} name 
-   * @param {String} path 
+   * @param {String} name
+   * @param {String} path
    */
   async saveList(name, path, addingNew = false) {
     try {
@@ -215,12 +214,24 @@ class WzListEditor extends Component {
       const overwrite = addingNew; // If adding new disable the overwrite
       const raw = this.itemsToRaw();
       if (!raw) {
-        this.showToast('warning', 'Please insert at least one item', 'Please insert at least one item, a CDB list cannot be empty', 3000);
+        this.showToast(
+          'warning',
+          'Please insert at least one item',
+          'Please insert at least one item, a CDB list cannot be empty',
+          3000
+        );
         return;
       }
       this.setState({ isSaving: true });
-      await this.sendCdbList(name, path, raw, overwrite);
-      this.showToast('success', 'Success', 'CBD List successfully created', 3000);
+      await this.rulesetHandler.sendCdbList(name, path, raw, overwrite);
+      if (!addingNew) {
+        const result = await this.rulesetHandler.getCdbList(`${path}/${name}`);
+        const file = { name: name, content: result, path: path };
+        this.props.updateListContent(file);
+        this.showToast('success', 'Success', 'CBD List successfully created', 3000);
+      } else {
+        this.showToast('success', 'Success', 'CBD List updated', 3000);
+      }
     } catch (error) {
       this.showToast('danger', 'Error', 'Error saving CDB list', 3000);
     }
@@ -232,9 +243,9 @@ class WzListEditor extends Component {
       color: color,
       title: title,
       text: text,
-      toastLifeTimeMs: time
+      toastLifeTimeMs: time,
     });
-  }
+  };
 
   openPopover = () => {
     this.setState({
@@ -245,7 +256,7 @@ class WzListEditor extends Component {
   closePopover = () => {
     this.setState({
       isPopoverOpen: false,
-      addingKey: 'key'
+      addingKey: 'key',
     });
   };
 
@@ -287,7 +298,7 @@ class WzListEditor extends Component {
     this.setState({
       items: itemsArr,
       addingKey: '',
-      addingValue: ''
+      addingValue: '',
     });
   }
 
@@ -302,13 +313,13 @@ class WzListEditor extends Component {
     this.setState({
       items: itemsArr,
       editing: false,
-      editingValue: ''
+      editingValue: '',
     });
   }
 
   /**
    * Delete a item from the list
-   * @param {String} key 
+   * @param {String} key
    */
   deleteItem(key) {
     delete this.items[key];
@@ -331,7 +342,8 @@ class WzListEditor extends Component {
                   color="subdued"
                   iconSize="l"
                   iconType="arrowLeft"
-                  onClick={() => this.props.cleanInfo()} />
+                  onClick={() => this.props.cleanInfo()}
+                />
               </EuiToolTip>
               {name}
             </h2>
@@ -339,7 +351,7 @@ class WzListEditor extends Component {
         </EuiFlexItem>
         <EuiFlexItem style={{ marginLeft: '-5px !important' }}>
           <EuiFieldText
-            style={{marginLeft: '-18px'}}
+            style={{ marginLeft: '-18px' }}
             placeholder="New CDB list name"
             value={this.state.newListName}
             onChange={this.onNewListNameChange}
@@ -356,42 +368,30 @@ class WzListEditor extends Component {
    * @param {String} path
    */
   renderAddAndSave(name, path, newList = false) {
-    const addButton = (
-      <EuiButtonEmpty
-        onClick={() => this.openPopover()}>
-        Add
-      </EuiButtonEmpty>
-    )
+    const addButton = <EuiButtonEmpty onClick={() => this.openPopover()}>Add</EuiButtonEmpty>;
 
     const saveButton = (
       <EuiButton
         fill
         iconType="save"
         isLoading={this.state.isSaving}
-        onClick={async () => this.saveList(name, path, newList)}>
+        onClick={async () => this.saveList(name, path, newList)}
+      >
         Save
       </EuiButton>
     );
 
     const addItemButton = (
-      <EuiButton
-        fill
-        onClick={() => this.addItem()}
-      >
+      <EuiButton fill onClick={() => this.addItem()}>
         Add
       </EuiButton>
     );
 
-    const closeButton = (
-      <EuiButtonEmpty
-        onClick={() => this.closePopover()}>
-        Close
-      </EuiButtonEmpty>
-    )
+    const closeButton = <EuiButtonEmpty onClick={() => this.closePopover()}>Close</EuiButtonEmpty>;
 
     return (
       <Fragment>
-        <EuiFlexItem style={{ textAlign: "rigth" }} grow={false}>
+        <EuiFlexItem style={{ textAlign: 'rigth' }} grow={false}>
           <EuiPopover
             id="addKeyValuePopover"
             ownFocus
@@ -422,10 +422,8 @@ class WzListEditor extends Component {
           </EuiPopover>
         </EuiFlexItem>
         {/* Save button */}
-        <EuiFlexItem grow={false}>
-          {saveButton}
-        </EuiFlexItem>
-      </Fragment >
+        <EuiFlexItem grow={false}>{saveButton}</EuiFlexItem>
+      </Fragment>
     );
   }
 
@@ -446,7 +444,8 @@ class WzListEditor extends Component {
                   color="subdued"
                   iconSize="l"
                   iconType="arrowLeft"
-                  onClick={() => this.props.cleanInfo()} />
+                  onClick={() => this.props.cleanInfo()}
+                />
               </EuiToolTip>
               {name}
             </h2>
@@ -461,7 +460,7 @@ class WzListEditor extends Component {
     );
   }
 
-  //isDisabled={nameForSaving.length <= 4} 
+  //isDisabled={nameForSaving.length <= 4}
   render() {
     const { listInfo, isLoading, error, adminMode } = this.props.state;
     const { name, path } = listInfo;
@@ -478,14 +477,13 @@ class WzListEditor extends Component {
           <EuiFlexItem>
             {/* File name and back button when watching or editing a CDB list */}
             <EuiFlexGroup>
-              {!addingNew && (
-                this.renderTitle(name, path))
-                || (
-                  this.renderInputNameForNewCdbList()
-                )}
-              <EuiFlexItem />{/* This flex item is for separating between title and save button */}
+              {(!addingNew && this.renderTitle(name, path)) || this.renderInputNameForNewCdbList()}
+              <EuiFlexItem />
+              {/* This flex item is for separating between title and save button */}
               {/* Pop over to add new key and value */}
-              {(adminMode && !this.state.editing) && (this.renderAddAndSave(listName, path, !addingNew))}
+              {adminMode &&
+                !this.state.editing &&
+                this.renderAddAndSave(listName, path, !addingNew)}
             </EuiFlexGroup>
             {/* CDB list table */}
             <EuiFlexGroup>
@@ -513,16 +511,17 @@ class WzListEditor extends Component {
   }
 }
 
-const mapStateToProps = (state) => {
+const mapStateToProps = state => {
   return {
-    state: state.rulesetReducers
+    state: state.rulesetReducers,
   };
 };
 
-const mapDispatchToProps = (dispatch) => {
+const mapDispatchToProps = dispatch => {
   return {
-    cleanInfo: () => dispatch(cleanInfo())
-  }
+    cleanInfo: () => dispatch(cleanInfo()),
+    updateListContent: content => dispatch(updateListContent(content)),
+  };
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(WzListEditor);
