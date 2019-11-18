@@ -51,7 +51,9 @@ class WzRulesetTable extends Component {
     this.rulesetHandler = RulesetHandler;
   }
 
-  async componentDidMount() {}
+  async componentDidMount() {
+    this.props.updateIsProcessing(true);
+  }
 
   async componentDidUpdate() {
     if (this.props.state.isProcessing) {

@@ -18,7 +18,7 @@ const initialState = {
   fileContent: false,
   filters: {},
   isLoading: false,
-  isProcessing: true,
+  isProcessing: false,
   itemList: [],
   items: [],
   listInfo: false,
