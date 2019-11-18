@@ -20,7 +20,6 @@ import {
 import { connect } from 'react-redux';
 
 import {
-  updateItems,
   toggleShowFiles,
   updateLoadingStatus,
   updteAddingRulesetFile,
@@ -158,21 +157,6 @@ class WzRulesetActionButtons extends Component {
     }, 100);
   }
 
-  /**
-   * Update the intems in the redux store
-   * @param {String} path 
-   */
-  async updateItems(path) {
-    try {
-      this.props.updateItems([]); // Clean the items 
-      const result = await this.wzReq.apiReq('GET', path, {});
-      const items = result.data.data.items;
-      this.props.updateItems(items);
-    } catch (error) {
-      return Promise.reject(error);
-    }
-  }
-
   render() {
     const { section, showingFiles, adminMode } = this.props.state;
 
@@ -272,7 +256,6 @@ const mapStateToProps = (state) => {
 
 const mapDispatchToProps = (dispatch) => {
   return {
-    updateItems: items => dispatch(updateItems(items)),
     toggleShowFiles: status => dispatch(toggleShowFiles(status)),
     updateLoadingStatus: status => dispatch(updateLoadingStatus(status)),
     updteAddingRulesetFile: content => dispatch(updteAddingRulesetFile(content)),

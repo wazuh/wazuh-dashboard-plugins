@@ -22,17 +22,6 @@ export const updateRulesetSection = (section) => {
 }
 
 /**
- * Update the items, they could be rules, decoders or lists, also, could be files
- * @param {Array} rules 
- */
-export const updateItems = (items) => {
-  return {
-    type: 'UPDATE_ITEMS',
-    items: items
-  }
-}
-
-/**
  * Update the files content
  * @param {String} content 
  */

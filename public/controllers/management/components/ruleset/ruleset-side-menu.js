@@ -18,7 +18,6 @@ import {
 import {
   updateRulesetSection,
   updateLoadingStatus,
-  updateItems,
   toggleShowFiles,
   cleanFilters,
   updateAdminMode,
@@ -74,7 +73,6 @@ class WzRulesetSideMenu extends Component {
     try {
       const currentSection = this.props.state.section;
       if (Object.keys(this.props.state.filters).length && newSection === currentSection) return; // If there's any filter and the section is de same doesn't fetch again
-      this.props.updateItems([]);// Clean the items to avoid flick
       this.props.changeSection(newSection);
       this.props.updateLoadingStatus(true);
       const result = await this.wzReq.apiReq('GET', this.paths[newSection], {});
@@ -82,7 +80,6 @@ class WzRulesetSideMenu extends Component {
       //Set the admin mode
       const admin = await checkAdminMode();
       this.props.updateAdminMode(admin);
-      this.props.updateItems(items);
       this.props.toggleShowFiles(false);
       this.props.changeSection(newSection);
       this.props.updateLoadingStatus(false);
@@ -167,7 +164,6 @@ const mapDispatchToProps = (dispatch) => {
   return {
     changeSection: section => dispatch(updateRulesetSection(section)),
     updateLoadingStatus: status => dispatch(updateLoadingStatus(status)),
-    updateItems: items => dispatch(updateItems(items)),
     toggleShowFiles: status => dispatch(toggleShowFiles(status)),
     cleanFilters: () => dispatch(cleanFilters()),
     updateAdminMode: status => dispatch(updateAdminMode(status)),

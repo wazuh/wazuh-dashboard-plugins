@@ -18,7 +18,6 @@ import { connect } from 'react-redux';
 import {
   updateRulesetSection,
   updateLoadingStatus,
-  updateItems,
   toggleShowFiles,
   cleanFilters,
   updateAdminMode,
@@ -102,7 +101,6 @@ const mapDispatchToProps = (dispatch) => {
   return {
     changeSection: section => dispatch(updateRulesetSection(section)),
     updateLoadingStatus: status => dispatch(updateLoadingStatus(status)),
-    updateItems: items => dispatch(updateItems(items)),
     toggleShowFiles: status => dispatch(toggleShowFiles(status)),
     cleanFilters: () => dispatch(cleanFilters()),
     updateAdminMode: status => dispatch(updateAdminMode(status)),
