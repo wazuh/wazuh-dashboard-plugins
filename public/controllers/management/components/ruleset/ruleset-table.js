@@ -10,7 +10,12 @@
  * Find more information about this on the LICENSE file.
  */
 import React, { Component } from 'react';
-import { EuiBasicTable, EuiCallOut, EuiOverlayMask, EuiConfirmModal } from '@elastic/eui';
+import {
+  EuiBasicTable,
+  EuiCallOut,
+  EuiOverlayMask,
+  EuiConfirmModal
+} from '@elastic/eui';
 
 import { connect } from 'react-redux';
 import RulesetHandler from './utils/ruleset-handler';

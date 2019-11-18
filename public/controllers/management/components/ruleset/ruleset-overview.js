@@ -9,7 +9,7 @@ import {
   EuiTitle,
   EuiSwitch,
   EuiPopover,
-  EuiButtonIcon,
+  EuiButton,
   EuiButtonEmpty
 } from '@elastic/eui';
 
@@ -17,6 +17,7 @@ import { connect } from 'react-redux';
 
 // Wazuh components
 import WzRulesetTable from './ruleset-table';
+import WzPopoverFilters from './ruleset-popover-filters';
 import WzRulesetActionButtons from './actions-buttons';
 import WzRulesetFilterBar from './ruleset-filter-bar';
 import './ruleset-overview.css';
@@ -48,20 +49,6 @@ class WzRulesetOverview extends Component {
         ]
       },
     ];
-
-    this.filters = {
-      rules: [
-        { label: 'File', value: 'file' }, { label: 'Path', value: 'path' }, { label: 'Level', value: 'level' },
-        { label: 'Group', value: 'group' }, { label: 'PCI control', value: 'pci' }, { label: 'GDPR', value: 'gdpr' }, { label: 'HIPAA', value: 'hipaa' }, { label: 'NIST-800-53', value: 'nist-800-53' }
-      ],
-      decoders: [
-        { label: 'File', value: 'file' }, { label: 'Path', value: 'path' }
-      ]
-    };
-
-    this.state = {
-      isPopoverOpen: false
-    }
   }
 
 
@@ -69,30 +56,8 @@ class WzRulesetOverview extends Component {
     console.log('clicking ', obj)
   }
 
-  onButtonClick() {
-    this.setState({
-      isPopoverOpen: !this.state.isPopoverOpen,
-    });
-  }
-
-  closePopover() {
-    this.setState({
-      isPopoverOpen: false,
-    });
-  }
-
   render() {
     const { section } = this.props.state;
-
-    const button = (
-      <EuiButtonIcon
-        style={{ padding: 12 }}
-        color='primary'
-        onClick={() => this.onButtonClick()}
-        iconType="filter"
-        aria-label="Filter"
-      />
-    );
 
     return (
       <EuiPage style={{ background: 'transparent' }}>
@@ -128,25 +93,7 @@ class WzRulesetOverview extends Component {
               <WzRulesetFilterBar />
             </EuiFlexItem>
             {(section === 'rules' || section === 'decoders') &&
-              <EuiFlexItem grow={false} style={{ marginLeft: 0 }}>
-                <EuiPopover
-                  id="trapFocus"
-                  ownFocus
-                  button={button}
-                  isOpen={this.state.isPopoverOpen}
-                  anchorPosition="downRight"
-                  closePopover={this.closePopover.bind(this)}>
-                  {this.filters[section].map((filter, idx) => (
-                    <div key={idx}>
-                      <EuiButtonEmpty size="s"
-                        iconSide='right'
-                        onClick={() => this.applyFilter(filter.value)}>
-                        {filter.label}
-                      </EuiButtonEmpty>
-                    </div>
-                  ))}
-                </EuiPopover>
-              </EuiFlexItem>
+              <WzPopoverFilters />
             }
           </EuiFlexGroup>
           <EuiFlexGroup>
