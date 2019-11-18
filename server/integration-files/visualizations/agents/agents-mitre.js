@@ -1,5 +1,5 @@
 /*
- * Wazuh app - Module for Overview MITRE visualizations
+ * Wazuh app - Module for Agents/MITRE visualizations
  * Copyright (C) 2015-2019 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -11,7 +11,7 @@
  */
 export default [
   {
-    _id: 'Wazuh-App-Overview-MITRE',
+    _id: 'Wazuh-App-Agents-MITRE',
     _source: {
       title: 'Mitre attack count',
       visState:
@@ -27,7 +27,7 @@ export default [
     _type: 'visualization',
   },
   {
-    _id: 'Wazuh-App-Overview-MITRE-Alerts-Evolution',
+    _id: 'Wazuh-App-Agents-MITRE-Alerts-Evolution',
     _source: {
       title: 'Mitre alerts evolution',
       visState:
@@ -43,11 +43,11 @@ export default [
     _type: 'visualization',
   },
   {
-    _id: 'Wazuh-App-Overview-MITRE-Attacks-By-Agent',
+    _id: 'Wazuh-App-Agents-MITRE-Attacks-By-Agent',
     _source: {
       title: 'Attacks count by agent',
       visState:
-        '{"title":"Level by attack by agent","type":"pie","params":{"type":"pie","addTooltip":true,"addLegend":true,"legendPosition":"right","isDonut":true,"labels":{"show":false,"values":true,"last_level":true,"truncate":100},"dimensions":{"metric":{"accessor":1,"format":{"id":"number"},"params":{},"aggType":"count"},"buckets":[{"accessor":0,"format":{"id":"terms","params":{"id":"string","otherBucketLabel":"Other","missingBucketLabel":"Missing"}},"params":{},"aggType":"terms"}]}},"aggs":[{"id":"1","enabled":true,"type":"count","schema":"metric","params":{}},{"id":"2","enabled":true,"type":"terms","schema":"segment","params":{"field":"agent.name","orderBy":"1","order":"desc","size":5,"otherBucket":false,"otherBucketLabel":"Other","missingBucket":false,"missingBucketLabel":"Missing"}},{"id":"3","enabled":true,"type":"terms","schema":"segment","params":{"field":"rule.mitre.id","orderBy":"1","order":"desc","size":5,"otherBucket":false,"otherBucketLabel":"Other","missingBucket":false,"missingBucketLabel":"Missing"}},{"id":"4","enabled":true,"type":"terms","schema":"segment","params":{"field":"rule.level","orderBy":"1","order":"desc","size":5,"otherBucket":false,"otherBucketLabel":"Other","missingBucket":false,"missingBucketLabel":"Missing"}}]}',
+        '{"title":"Attacks count by agent","type":"pie","params":{"addLegend":true,"addTooltip":true,"dimensions":{"metric":{"accessor":1,"format":{"id":"number"},"params":{},"aggType":"count"},"buckets":[{"accessor":0,"format":{"id":"terms","params":{"id":"string","otherBucketLabel":"Other","missingBucketLabel":"Missing"}},"params":{},"aggType":"terms"},{"accessor":2,"format":{"id":"terms","params":{"id":"string","otherBucketLabel":"Other","missingBucketLabel":"Missing"}},"params":{},"aggType":"terms"}]},"isDonut":true,"labels":{"last_level":true,"show":false,"truncate":100,"values":true},"legendPosition":"right","type":"pie"},"aggs":[{"id":"1","enabled":true,"type":"count","schema":"metric","params":{}},{"id":"2","enabled":true,"type":"terms","schema":"segment","params":{"field":"agent.name","customLabel":"Agent name","orderBy":"1","order":"desc","size":5,"otherBucket":false,"otherBucketLabel":"Other","missingBucket":false,"missingBucketLabel":"Missing"}},{"id":"3","enabled":true,"type":"terms","schema":"segment","params":{"field":"rule.mitre.id","customLabel":"Attack ID", "orderBy":"1","order":"desc","size":5,"otherBucket":false,"otherBucketLabel":"Other","missingBucket":false,"missingBucketLabel":"Missing"}}]}',
       uiStateJSON: '{}',
       description: '',
       version: 1,
@@ -59,9 +59,41 @@ export default [
     _type: 'visualization',
   },
   {
-    _id: 'Wazuh-App-Overview-MITRE-Attacks-By-Tactic',
+    _id: 'Wazuh-App-Agents-MITRE-Level-By-Tactic',
     _source: {
-      title: 'Alerts level by agent',
+      title: 'Alerts level by tactic',
+      visState:
+        '{"title":"Alerts level by tactic","type":"pie","params":{"type":"pie","addTooltip":true,"addLegend":true,"legendPosition":"right","isDonut":true,"labels":{"show":false,"values":true,"last_level":true,"truncate":100},"dimensions":{"metric":{"accessor":1,"format":{"id":"number"},"params":{},"aggType":"count"},"buckets":[{"accessor":0,"format":{"id":"terms","params":{"id":"string","otherBucketLabel":"Other","missingBucketLabel":"Missing"}},"params":{},"aggType":"terms"},{"accessor":2,"format":{"id":"terms","params":{"id":"number","otherBucketLabel":"Other","missingBucketLabel":"Missing"}},"params":{},"aggType":"terms"}]}},"aggs":[{"id":"1","enabled":true,"type":"count","schema":"metric","params":{}},{"id":"3","enabled":true,"type":"terms","schema":"segment","params":{"field":"rule.mitre.tactics","orderBy":"1","order":"desc","size":5,"otherBucket":false,"otherBucketLabel":"Other","missingBucket":false,"missingBucketLabel":"Missing","customLabel":"Attack ID"}},{"id":"4","enabled":true,"type":"terms","schema":"segment","params":{"field":"rule.level","orderBy":"1","order":"desc","size":5,"otherBucket":false,"otherBucketLabel":"Other","missingBucket":false,"missingBucketLabel":"Missing","customLabel":"Rule level"}}]}',
+      uiStateJSON: '{}',
+      description: '',
+      version: 1,
+      kibanaSavedObjectMeta: {
+        searchSourceJSON:
+          '{"index":"wazuh-alerts","filter":[],"query":{"language":"lucene","query":""}}',
+      },
+    },
+    _type: 'visualization',
+  },
+  {
+    _id: 'Wazuh-App-Agents-MITRE-Level-By-Attack',
+    _source: {
+      title: 'Alerts level by attack',
+      visState:
+        '{"title":"Alerts level by attack","type":"pie","params":{"type":"pie","addTooltip":true,"addLegend":true,"legendPosition":"right","isDonut":true,"labels":{"show":false,"values":true,"last_level":true,"truncate":100},"dimensions":{"metric":{"accessor":1,"format":{"id":"number"},"params":{},"aggType":"count"},"buckets":[{"accessor":0,"format":{"id":"terms","params":{"id":"string","otherBucketLabel":"Other","missingBucketLabel":"Missing"}},"params":{},"aggType":"terms"},{"accessor":2,"format":{"id":"terms","params":{"id":"string","otherBucketLabel":"Other","missingBucketLabel":"Missing"}},"params":{},"aggType":"terms"},{"accessor":4,"format":{"id":"terms","params":{"id":"number","otherBucketLabel":"Other","missingBucketLabel":"Missing"}},"params":{},"aggType":"terms"}]}},"aggs":[{"id":"1","enabled":true,"type":"count","schema":"metric","params":{}},{"id":"3","enabled":true,"type":"terms","schema":"segment","params":{"field":"rule.mitre.id","orderBy":"1","order":"desc","size":5,"otherBucket":false,"otherBucketLabel":"Other","missingBucket":false,"missingBucketLabel":"Missing","customLabel":"Attack ID"}},{"id":"4","enabled":true,"type":"terms","schema":"segment","params":{"field":"rule.level","orderBy":"1","order":"desc","size":5,"otherBucket":false,"otherBucketLabel":"Other","missingBucket":false,"missingBucketLabel":"Missing","customLabel":"Rule level"}}]}',
+      uiStateJSON: '{}',
+      description: '',
+      version: 1,
+      kibanaSavedObjectMeta: {
+        searchSourceJSON:
+          '{"index":"wazuh-alerts","filter":[],"query":{"language":"lucene","query":""}}',
+      },
+    },
+    _type: 'visualization',
+  },
+  {
+    _id: 'Wazuh-App-Agents-MITRE-Attacks-By-Tactic',
+    _source: {
+      title: 'Top tactics',
       visState:
         '{"title":"Attacks by tactic","type":"histogram","params":{"type":"histogram","grid":{"categoryLines":false},"categoryAxes":[{"id":"CategoryAxis-1","type":"category","position":"bottom","show":true,"style":{},"scale":{"type":"linear"},"labels":{"show":true,"filter":true,"truncate":100},"title":{}}],"valueAxes":[{"id":"ValueAxis-1","name":"LeftAxis-1","type":"value","position":"left","show":true,"style":{},"scale":{"type":"linear","mode":"normal"},"labels":{"show":true,"rotate":0,"filter":false,"truncate":100},"title":{"text":"Count"}}],"seriesParams":[{"show":"true","type":"histogram","mode":"stacked","data":{"label":"Count","id":"1"},"valueAxis":"ValueAxis-1","drawLinesBetweenPoints":true,"showCircles":true}],"addTooltip":true,"addLegend":true,"legendPosition":"right","times":[],"addTimeMarker":false,"labels":{"show":false},"thresholdLine":{"show":false,"value":10,"width":1,"style":"full","color":"#34130C"},"dimensions":{"x":null,"y":[{"accessor":1,"format":{"id":"number"},"params":{},"aggType":"count"}],"series":[{"accessor":0,"format":{"id":"terms","params":{"id":"string","otherBucketLabel":"Other","missingBucketLabel":"Missing"}},"params":{},"aggType":"terms"}]}},"aggs":[{"id":"1","enabled":true,"type":"count","schema":"metric","params":{}},{"id":"2","enabled":true,"type":"terms","schema":"group","params":{"field":"rule.mitre.id","orderBy":"1","order":"desc","size":5,"otherBucket":false,"otherBucketLabel":"Other","missingBucket":false,"missingBucketLabel":"Missing"}},{"id":"3","enabled":true,"type":"terms","schema":"segment","params":{"field":"rule.mitre.tactics","orderBy":"1","order":"desc","size":5,"otherBucket":false,"otherBucketLabel":"Other","missingBucket":false,"missingBucketLabel":"Missing"}}]}',
       uiStateJSON: '{}',
@@ -75,23 +107,7 @@ export default [
     _type: 'visualization',
   },
   {
-    _id: 'Wazuh-App-Overview-MITRE-Top-Tactics-By-Agent',
-    _source: {
-      title: 'Top tactics by agent',
-      visState:
-        '{"title":"Top tactics by agents","type":"horizontal_bar","params":{"type":"histogram","grid":{"categoryLines":false},"categoryAxes":[{"id":"CategoryAxis-1","type":"category","position":"left","show":true,"style":{},"scale":{"type":"linear"},"labels":{"show":true,"rotate":0,"filter":false,"truncate":200},"title":{}}],"valueAxes":[{"id":"ValueAxis-1","name":"LeftAxis-1","type":"value","position":"bottom","show":true,"style":{},"scale":{"type":"linear","mode":"normal"},"labels":{"show":true,"rotate":75,"filter":true,"truncate":100},"title":{"text":"Count"}}],"seriesParams":[{"show":true,"type":"histogram","mode":"normal","data":{"label":"Count","id":"1"},"valueAxis":"ValueAxis-1","drawLinesBetweenPoints":true,"showCircles":true}],"addTooltip":true,"addLegend":true,"legendPosition":"right","times":[],"addTimeMarker":false,"labels":{},"dimensions":{"x":{"accessor":0,"format":{"id":"terms","params":{"id":"string","otherBucketLabel":"Other","missingBucketLabel":"Missing"}},"params":{},"aggType":"terms"},"y":[{"accessor":2,"format":{"id":"number"},"params":{},"aggType":"count"}],"series":[{"accessor":1,"format":{"id":"terms","params":{"id":"string","otherBucketLabel":"Other","missingBucketLabel":"Missing"}},"params":{},"aggType":"terms"}]}},"aggs":[{"id":"1","enabled":true,"type":"count","schema":"metric","params":{}},{"id":"2","enabled":true,"type":"terms","schema":"segment","params":{"field":"agent.name","orderBy":"1","order":"desc","size":5,"otherBucket":false,"otherBucketLabel":"Other","missingBucket":false,"missingBucketLabel":"Missing"}},{"id":"3","enabled":true,"type":"terms","schema":"group","params":{"field":"rule.mitre.tactics","orderBy":"1","order":"desc","size":5,"otherBucket":false,"otherBucketLabel":"Other","missingBucket":false,"missingBucketLabel":"Missing"}}]}',
-      uiStateJSON: '{}',
-      description: '',
-      version: 1,
-      kibanaSavedObjectMeta: {
-        searchSourceJSON:
-          '{"index":"wazuh-alerts","filter":[],"query":{"language":"lucene","query":""}}',
-      },
-    },
-    _type: 'visualization',
-  },
-  {
-    _id: 'Wazuh-App-Overview-MITRE-Top-Tactics',
+    _id: 'Wazuh-App-Agents-MITRE-Top-Tactics',
     _source: {
       title: 'Top tactics',
       visState:
@@ -107,8 +123,9 @@ export default [
     _type: 'visualization',
   },
 
+
   {
-    _id: 'Wazuh-App-Overview-MITRE-Top-Credential-Access',
+    _id: 'Wazuh-App-Agents-MITRE-Top-Credential-Access',
     _source: {
       title: 'Top Credential Access',
       visState:
@@ -124,7 +141,7 @@ export default [
     _type: 'visualization',
   },
   {
-    _id: 'Wazuh-App-Overview-MITRE-Top-Initial-Access',
+    _id: 'Wazuh-App-Agents-MITRE-Top-Initial-Access',
     _source: {
       title: 'Top Initial Access',
       visState:
@@ -140,7 +157,7 @@ export default [
     _type: 'visualization',
   },
   {
-    _id: 'Wazuh-App-Overview-MITRE-Top-Execution',
+    _id: 'Wazuh-App-Agents-MITRE-Top-Execution',
     _source: {
       title: 'Top Execution',
       visState:
@@ -156,7 +173,7 @@ export default [
     _type: 'visualization',
   },
   {
-    _id: 'Wazuh-App-Overview-MITRE-Top-Persistence',
+    _id: 'Wazuh-App-Agents-MITRE-Top-Persistence',
     _source: {
       title: 'Top Persistence',
       visState:
@@ -172,7 +189,7 @@ export default [
     _type: 'visualization',
   },
   {
-    _id: 'Wazuh-App-Overview-MITRE-Top-Privilege-Escalation',
+    _id: 'Wazuh-App-Agents-MITRE-Top-Privilege-Escalation',
     _source: {
       title: 'Top Privilege Escalation',
       visState:
@@ -188,7 +205,7 @@ export default [
     _type: 'visualization',
   },
   {
-    _id: 'Wazuh-App-Overview-MITRE-Top-Defense-Evasion',
+    _id: 'Wazuh-App-Agents-MITRE-Top-Defense-Evasion',
     _source: {
       title: 'Top Defense Evasion',
       visState:
@@ -204,7 +221,7 @@ export default [
     _type: 'visualization',
   },
   {
-    _id: 'Wazuh-App-Overview-MITRE-Top-Discovery',
+    _id: 'Wazuh-App-Agents-MITRE-Top-Discovery',
     _source: {
       title: 'Top Discovery',
       visState:
@@ -220,7 +237,7 @@ export default [
     _type: 'visualization',
   },
   {
-    _id: 'Wazuh-App-Overview-MITRE-Top-Lateral-Movement',
+    _id: 'Wazuh-App-Agents-MITRE-Top-Lateral-Movement',
     _source: {
       title: 'Top Lateral Movement',
       visState:
@@ -236,7 +253,7 @@ export default [
     _type: 'visualization',
   },
   {
-    _id: 'Wazuh-App-Overview-MITRE-Top-Collection',
+    _id: 'Wazuh-App-Agents-MITRE-Top-Collection',
     _source: {
       title: 'Top Collection',
       visState:
@@ -253,7 +270,7 @@ export default [
   },
 
   {
-    _id: 'Wazuh-App-Overview-MITRE-Top-Impact',
+    _id: 'Wazuh-App-Agents-MITRE-Top-Impact',
     _source: {
       title: 'Top Impact',
       visState:
@@ -270,7 +287,7 @@ export default [
   },
 
   {
-    _id: 'Wazuh-App-Overview-MITRE-Top-Command-Control',
+    _id: 'Wazuh-App-Agents-MITRE-Top-Command-Control',
     _source: {
       title: 'Top Command-Control',
       visState:
@@ -287,7 +304,7 @@ export default [
   },
 
   {
-    _id: 'Wazuh-App-Overview-MITRE-Top-Exfiltration',
+    _id: 'Wazuh-App-Agents-MITRE-Top-Exfiltration',
     _source: {
       title: 'Top Exfiltration',
       visState:

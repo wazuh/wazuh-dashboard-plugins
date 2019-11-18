@@ -132,6 +132,23 @@ export class AgentsController {
       this.commonData.removeTimefilter();
     }
 
+    this.$scope.$on('sendVisDataRows', (ev, param) => {
+      const rows = (param || {}).mitreRows.tables[0].rows
+      this.$scope.attacksCount = {}
+      for(var i in rows){
+        this.$scope.attacksCount[rows[i]["col-0-2"]] = rows[i]["col-1-1"]
+      }
+
+      
+    this.$scope.mitreCardsSliderProps = {
+      items: this.$scope.mitreIds,
+      attacksCount: this.$scope.attacksCount,
+      reqTitle: "MITRE",
+      wzReq: (method, path, body) => this.apiReq.request(method, path, body),
+      addFilter: (id) => this.addMitrefilter(id)
+      }
+    });
+
     this.$scope.TabDescription = TabDescription;
 
     this.$rootScope.reportStatus = false;
@@ -590,6 +607,20 @@ export class AgentsController {
         };
       }
 
+      if (tab === 'mitre') {
+        const result = await this.apiReq.request('GET', '/rules/mitre', {});
+        this.$scope.mitreIds = ((((result || {}).data) || {}).data || {}).items
+        console.log(this.$scope.mitreIds)
+
+        this.$scope.mitreCardsSliderProps = {
+          items: this.$scope.mitreIds ,
+          attacksCount: this.$scope.attacksCount,
+          reqTitle: "MITRE",
+          wzReq: (method, path, body) => this.apiReq.request(method, path, body),
+          addFilter: (id) => this.addMitrefilter(id)
+        }
+      }
+      
       if (tab === 'hipaa') {
         const hipaaTabs = await this.commonData.getHIPAA();
         this.$scope.hipaaReqs = {

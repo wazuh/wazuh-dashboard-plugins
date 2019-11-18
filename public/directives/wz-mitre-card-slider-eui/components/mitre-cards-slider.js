@@ -19,7 +19,6 @@ import {
   EuiFlexGroup,
   EuiFlyout,
   EuiTitle,
-  EuiText,
   EuiFlyoutHeader,
   EuiFlyoutBody,
   EuiStat,

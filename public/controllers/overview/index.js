@@ -15,7 +15,6 @@ import { WelcomeScreen } from './components/welcome';
 import { Stats } from './components/stats';
 import { AlertsStats } from './components/alerts-stats';
 import { RequirementCard } from './components/requirement-card';
-import { MitreCardsSlider } from './components/mitre-cards-slider';
 
 const app = uiModules.get('app/wazuh', ['react']);
 
@@ -25,4 +24,3 @@ app
   .value('StatsOverview', Stats)
   .value('AlertsStats', AlertsStats)
   .value('RequirementCard', RequirementCard)
-  .value('MitreCardsSlider', MitreCardsSlider);
