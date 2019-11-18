@@ -321,7 +321,6 @@ export default class RulesetColumns {
       await this.rulesetHandler.deleteFile(item.file, item.path);
       this.tableProps.updateLoadingStatus(true);
       const items = await filesGetter();
-      this.tableProps.updateItems(items);
       this.tableProps.updateLoadingStatus(false);
     }
 

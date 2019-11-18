@@ -16,7 +16,6 @@ import { connect } from 'react-redux';
 
 import {
   updateLoadingStatus,
-  updateItems,
   updateFilters,
   updateError
 } from '../../../../redux/actions/rulesetActions';
@@ -103,9 +102,7 @@ class WzRulesetFilterBar extends Component {
       if (section === 'decoders') fetcher = this.rulesetHandler.getDecoders; // If section is decoders the fetcher changes
       if (section === 'lists') fetcher = this.rulesetHandler.getLists// If the sections is lists the fetcher changes too
       this.props.updateLoadingStatus(true);
-      this.props.updateItems([]);
       const result = await fetcher(filters);
-      this.props.updateItems(result);
       this.props.updateLoadingStatus(false);
     } catch (error) {
       this.props.updateError(error);
@@ -220,7 +217,6 @@ const mapStateToProps = (state) => {
 
 const mapDispatchToProps = (dispatch) => {
   return {
-    updateItems: items => dispatch(updateItems(items)),
     updateLoadingStatus: status => dispatch(updateLoadingStatus(status)),
     updateFilters: filters => dispatch(updateFilters(filters)),
     updateError: error => dispatch(updateError(error))
