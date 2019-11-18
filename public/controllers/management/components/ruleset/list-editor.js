@@ -34,6 +34,7 @@ import {
 
 import RulesetHandler from './utils/ruleset-handler';
 
+import { toastNotifications } from 'ui/notify';
 
 class WzListEditor extends Component {
   constructor(props) {
@@ -208,23 +209,32 @@ class WzListEditor extends Component {
   async saveList(name, path, addingNew = false) {
     try {
       if (!name) {
-        console.log('Please insert a valid name');
+        this.showToast('warning', 'Invalid name', 'Please insert a valid name', 3000);
         return;
       }
       const overwrite = addingNew; // If adding new disable the overwrite
       const raw = this.itemsToRaw();
       if (!raw) {
-        console.log('Please insert at least one item, a CDB list cannot be empty');
+        this.showToast('warning', 'Please insert at least one item', 'Please insert at least one item, a CDB list cannot be empty', 3000);
         return;
       }
       this.setState({ isSaving: true });
       await this.sendCdbList(name, path, raw, overwrite);
+      this.showToast('success', 'Success', 'CBD List successfully created', 3000);
     } catch (error) {
-      console.error('Error saving CDB list ', error);
+      this.showToast('danger', 'Error', 'Error saving CDB list', 3000);
     }
     this.setState({ isSaving: false });
   }
 
+  showToast = (color, title, text, time) => {
+    toastNotifications.add({
+      color: color,
+      title: title,
+      text: text,
+      toastLifeTimeMs: time
+    });
+  }
 
   openPopover = () => {
     this.setState({
