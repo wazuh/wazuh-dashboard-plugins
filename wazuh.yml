@@ -126,7 +126,7 @@
 
 hosts:
   - default:
-     url: http://192.168.0.156
+     url: http://localhost
      port: 55000
      user: foo
      password: bar
