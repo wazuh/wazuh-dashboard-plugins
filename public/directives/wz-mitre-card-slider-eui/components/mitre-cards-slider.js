@@ -263,12 +263,23 @@ export class MitreCardsSlider extends Component {
   updateCurrentCardData(currentData) {
     if(currentData){
       const cardId = currentData.id
-      const cardPhases = currentData.phases
-      const cardPlatforms = currentData.platforms
-      const cardDescription = currentData.json.description
-      const cardName = currentData.json.name
-      const cardDataSources = currentData.json.x_mitre_data_sources
-      const cardVersion = currentData.json.x_mitre_version
+
+      
+      let cardPhases = currentData.phases
+      if(currentData.phases && Array.isArray(currentData.phases))
+        cardPhases = currentData.phases.toString()
+      
+      let cardPlatforms = currentData.platforms
+      if(currentData.platforms && Array.isArray(currentData.platforms))
+        cardPlatforms = currentData.platforms.toString()
+
+      let cardDataSources = currentData.json.x_mitre_data_sources
+      if(currentData.json.x_mitre_data_sources && Array.isArray(currentData.json.x_mitre_data_sources))
+        cardDataSources = currentData.json.x_mitre_data_sources.toString()
+      
+      const cardDescription = (currentData.json || {}).description
+      const cardName = (currentData.json || {}).name
+      const cardVersion = (currentData.json || {}).x_mitre_version
 
       this.setState({currentCardData: {
         id: cardId,
