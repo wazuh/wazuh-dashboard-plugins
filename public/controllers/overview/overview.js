@@ -403,9 +403,13 @@ export class OverviewController {
     }
   }
 
-
+  /**
+   * Filter by Mitre.ID
+   * @param {*} id 
+   */
   addMitrefilter(id){
-    console.log(id)
+    const filter = `{"meta":{"index":"wazuh-alerts-3.x-*"},"query":{"match":{"rule.mitre.id":{"query":"${id}","type":"phrase"}}}}`;
+    this.$rootScope.$emit('addNewKibanaFilter', { filter : JSON.parse(filter) });
   }
 
   /**

@@ -610,7 +610,6 @@ export class AgentsController {
       if (tab === 'mitre') {
         const result = await this.apiReq.request('GET', '/rules/mitre', {});
         this.$scope.mitreIds = ((((result || {}).data) || {}).data || {}).items
-        console.log(this.$scope.mitreIds)
 
         this.$scope.mitreCardsSliderProps = {
           items: this.$scope.mitreIds ,
@@ -733,6 +732,16 @@ export class AgentsController {
     };
 
     this.setTabs();
+  }
+
+
+   /**
+   * Filter by Mitre.ID
+   * @param {*} id 
+   */
+  addMitrefilter(id){
+    const filter = `{"meta":{"index":"wazuh-alerts-3.x-*"},"query":{"match":{"rule.mitre.id":{"query":"${id}","type":"phrase"}}}}`;
+    this.$rootScope.$emit('addNewKibanaFilter', { filter : JSON.parse(filter) });
   }
 
   /**
