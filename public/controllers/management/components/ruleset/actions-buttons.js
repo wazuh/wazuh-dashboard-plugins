@@ -50,6 +50,7 @@ class WzRulesetActionButtons extends Component {
     }
     this.columns = columns;
     this.rulesetHandler = RulesetHandler;
+    this.refreshTimeoutId = null;
   }
 
   /**
@@ -137,14 +138,24 @@ class WzRulesetActionButtons extends Component {
    */
   async refresh() {
     try {
-      this.props.updateLoadingStatus(true);
-      const { showingFiles, section } = this.props.state;
-      const path = showingFiles ? `${this.paths[section]}/files` : this.paths[section];
-      await this.updateItems(path);
-      this.props.updateLoadingStatus(false);
+      this.props.updateIsProcessing(true);
+      this.onRefreshLoading();
+
     } catch (error) {
       return Promise.reject(error);
     }
+  }
+
+  onRefreshLoading() {
+    clearInterval(this.refreshTimeoutId);
+
+    this.props.updateLoadingStatus(true);
+    this.refreshTimeoutId =  setInterval(() => {
+      if(!this.props.state.isProcessing) {
+        this.props.updateLoadingStatus(false);
+        clearInterval(this.refreshTimeoutId);
+      }
+    }, 100);
   }
 
   /**
