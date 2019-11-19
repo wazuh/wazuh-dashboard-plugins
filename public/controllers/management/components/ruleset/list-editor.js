@@ -24,6 +24,7 @@ import {
   EuiPopover,
   EuiFieldText,
   EuiSpacer,
+  EuiPanel,
 } from '@elastic/eui';
 
 import { connect } from 'react-redux';
@@ -473,39 +474,41 @@ class WzListEditor extends Component {
 
     return (
       <EuiPage style={{ background: 'transparent' }}>
-        <EuiFlexGroup>
-          <EuiFlexItem>
-            {/* File name and back button when watching or editing a CDB list */}
-            <EuiFlexGroup>
-              {(!addingNew && this.renderTitle(name, path)) || this.renderInputNameForNewCdbList()}
-              <EuiFlexItem />
-              {/* This flex item is for separating between title and save button */}
-              {/* Pop over to add new key and value */}
-              {adminMode &&
-                !this.state.editing &&
-                this.renderAddAndSave(listName, path, !addingNew)}
-            </EuiFlexGroup>
-            {/* CDB list table */}
-            <EuiFlexGroup>
-              <EuiFlexItem>
-                <EuiFlexGroup>
-                  <EuiFlexItem style={{ marginTop: '30px' }}>
-                    <EuiInMemoryTable
-                      itemId="id"
-                      items={this.state.items}
-                      columns={columns}
-                      pagination={{ pageSizeOptions: [10, 15] }}
-                      loading={isLoading}
-                      sorting={true}
-                      message={message}
-                      search={{ box: { incremental: true } }}
-                    />
-                  </EuiFlexItem>
-                </EuiFlexGroup>
-              </EuiFlexItem>
-            </EuiFlexGroup>
-          </EuiFlexItem>
-        </EuiFlexGroup>
+        <EuiPanel>
+          <EuiFlexGroup>
+            <EuiFlexItem>
+              {/* File name and back button when watching or editing a CDB list */}
+              <EuiFlexGroup>
+                {(!addingNew && this.renderTitle(name, path)) || this.renderInputNameForNewCdbList()}
+                <EuiFlexItem />
+                {/* This flex item is for separating between title and save button */}
+                {/* Pop over to add new key and value */}
+                {adminMode &&
+                  !this.state.editing &&
+                  this.renderAddAndSave(listName, path, !addingNew)}
+              </EuiFlexGroup>
+              {/* CDB list table */}
+              <EuiFlexGroup>
+                <EuiFlexItem>
+                  <EuiFlexGroup>
+                    <EuiFlexItem style={{ marginTop: '30px' }}>
+                      <EuiInMemoryTable
+                        itemId="id"
+                        items={this.state.items}
+                        columns={columns}
+                        pagination={{ pageSizeOptions: [10, 15] }}
+                        loading={isLoading}
+                        sorting={true}
+                        message={message}
+                        search={{ box: { incremental: true } }}
+                      />
+                    </EuiFlexItem>
+                  </EuiFlexGroup>
+                </EuiFlexItem>
+              </EuiFlexGroup>
+            </EuiFlexItem>
+          </EuiFlexGroup>
+        </EuiPanel>
       </EuiPage>
     );
   }
