@@ -28,6 +28,7 @@ import {
 
 import { BasicTable } from '../directives/wz-table-eui/components/table';
 import { MitreCardsSlider } from '../directives/wz-mitre-card-slider-eui/components/mitre-cards-slider';
+import { MitreTable } from '../directives/wz-mitre-table-eui/components/mitre-table';
 import { Tabs } from '../directives/wz-tabs-eui/components/tabs';
 
 const app = uiModules.get('app/wazuh', ['react']);
@@ -47,4 +48,5 @@ app
   .value('Tabs', Tabs)
   .value('EuiSwitch', EuiSwitch)
   .value('EuiSpacer', EuiSpacer)
+  .value('MitreTable', MitreTable)
   .value('MitreCardsSlider', MitreCardsSlider);

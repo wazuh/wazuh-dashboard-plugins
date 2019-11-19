@@ -65,6 +65,7 @@ export class OverviewController {
     this.reportingService = reportingService;
     this.visFactoryService = visFactoryService;
     this.wazuhConfig = wazuhConfig;
+    this.showingMitreTable = false
     this.expandArray = [
       false,
       false,
@@ -127,6 +128,9 @@ export class OverviewController {
       setExtensions: (api, extensions) =>
         this.appState.setExtensions(api, extensions)
     };
+    this.mitreTableProps = {
+      wzReq: (method, path, body) => this.apiReq.request(method, path, body)
+    }
 
     this.setTabs();
 
@@ -188,6 +192,13 @@ export class OverviewController {
           break;
       }
     }
+  }
+
+  /**
+   * Show/hide MITRE table
+   */
+  switchMitreTab() {
+    this.showingMitreTable = !this.showingMitreTable
   }
 
   /**
@@ -269,6 +280,7 @@ export class OverviewController {
   // Switch tab
   async switchTab(newTab, force = false) {
     this.tabVisualizations.setTab(newTab);
+    this.showingMitreTable = false;
     this.$rootScope.rendered = false;
     this.$rootScope.$applyAsync();
     this.falseAllExpand();

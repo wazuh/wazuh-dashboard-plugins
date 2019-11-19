@@ -4,233 +4,250 @@
     <div class="wz-no-display">
         <kbn-vis vis-id="'Wazuh-App-Overview-MITRE'" id="Wazuh-App-Overview-MITRE"></kbn-vis>    
     </div>
-
-    <div layout="row" ng-if="mitreIds" layout-padding>
-        <react-component flex name="MitreCardsSlider" props="octrl.mitreCardsSliderProps">
+    <div layout="row">
+        <span flex></span>
+        <md-button ng-show="!octrl.showingMitreTable" ng-click="octrl.switchMitreTab()" class="discoverSectionSwitchBtn pull-right">
+            <i class="fa fa-fw fa-database"></i>
+            Show MITRE Database
+        </md-button>
+        <md-button ng-show="octrl.showingMitreTable" ng-click="octrl.switchMitreTab()" class="discoverSectionSwitchBtn pull-right" style="margin-top: 20px !important; margin-right: 20px !important;">
+            <i class="fa fa-fw fa-area-chart"></i>
+            Show MITRE dashboard
+        </md-button>
     </div>
 
-    <!-- First row -->
-    <div layout="row" layout-align="center stretch" class="height-400">
-        <md-card flex="70" class="wz-md-card" ng-class="{'fullscreen': octrl.expandArray[0]}">
-            <md-card-actions layout="row" class="wz-card-actions-vis" ng-dblclick="octrl.expand(0)">
-                <span class="wz-headline-title">Alerts evolution over time</span>
-                <span flex></span>
-                <span class="cursor-pointer" ng-click="octrl.expand(0)">
-                    <react-component name="EuiIcon" props="{type:'expand'}" />
-                </span>
-            </md-card-actions>
-            <md-card-content class="wazuh-column">
-                <kbn-vis id="Wazuh-App-Overview-MITRE-Alerts-Evolution"
-                    vis-id="'Wazuh-App-Overview-MITRE-Alerts-Evolution'"></kbn-vis>
-            </md-card-content>
-        </md-card>
-        <md-card flex="30" class="wz-md-card" ng-class="{'fullscreen': octrl.expandArray[1]}">
-            <md-card-actions layout="row" class="wz-card-actions-vis" ng-dblclick="octrl.expand(1)">
-                <span class="wz-headline-title">Top tactics</span>
-                <span flex></span>
-                <span class="cursor-pointer" ng-click="octrl.expand(1)">
-                    <react-component name="EuiIcon" props="{type:'expand'}" />
-                </span>
-            </md-card-actions>
-            <md-card-content class="wazuh-column">
-                <kbn-vis id="Wazuh-App-Overview-MITRE-Top-Tactics" vis-id="'Wazuh-App-Overview-MITRE-Top-Tactics'"></kbn-vis>
-            </md-card-content>
-        </md-card> 
-    </div>
-    <!-- Second row -->
-    <div layout="row" layout-align="center stretch" class="height-400">
-        <md-card flex="30" class="wz-md-card" ng-class="{'fullscreen': octrl.expandArray[2]}">
-            <md-card-actions layout="row" class="wz-card-actions-vis" ng-dblclick="octrl.expand(2)">
-                <span class="wz-headline-title">Attacks by tactic</span>
-                <span flex></span>
-                <span class="cursor-pointer" ng-click="octrl.expand(2)">
-                    <react-component name="EuiIcon" props="{type:'expand'}" />
-                </span>
-            </md-card-actions>
-            <md-card-content class="wazuh-column">
-                <kbn-vis id="Wazuh-App-Overview-MITRE-Attacks-By-Tactic" vis-id="'Wazuh-App-Overview-MITRE-Attacks-By-Tactic'"></kbn-vis>
-            </md-card-content>
-        </md-card>
-        <md-card flex="40" class="wz-md-card" ng-class="{'fullscreen': octrl.expandArray[4]}">
-            <md-card-actions layout="row" class="wz-card-actions-vis" ng-dblclick="octrl.expand(4)">
-                <span class="wz-headline-title">Top tactics by agent</span>
-                <span flex></span>
-                <span class="cursor-pointer" ng-click="octrl.expand(4)">
-                    <react-component name="EuiIcon" props="{type:'expand'}" />
-                </span>
-            </md-card-actions>
-            <md-card-content class="wazuh-column">
-                <kbn-vis id="Wazuh-App-Overview-MITRE-Top-Tactics-By-Agent" vis-id="'Wazuh-App-Overview-MITRE-Top-Tactics-By-Agent'"></kbn-vis>
-            </md-card-content>
-        </md-card> 
-        <md-card flex="30" class="wz-md-card" ng-class="{'fullscreen': octrl.expandArray[3]}">
-            <md-card-actions layout="row" class="wz-card-actions-vis" ng-dblclick="octrl.expand(3)">
-                <span class="wz-headline-title">MITRE attacks by agent</span>
-                <span flex></span>
-                <span class="cursor-pointer" ng-click="octrl.expand(3)">
-                    <react-component name="EuiIcon" props="{type:'expand'}" />
-                </span>
-            </md-card-actions>
-            <md-card-content class="wazuh-column">
-                <kbn-vis id="Wazuh-App-Overview-MITRE-Attacks-By-Agent" vis-id="'Wazuh-App-Overview-MITRE-Attacks-By-Agent'"></kbn-vis>
-            </md-card-content>
-        </md-card> 
-    </div>
-    <!-- Third row -->
-    <div layout="row" layout-align="center stretch" style="height:300px;">
-            <md-card flex="25" class="wz-md-card" ng-class="{'fullscreen': expandArray[2]}">
-                <md-card-actions layout="row" class="wz-card-actions-vis" ng-dblclick="expand(2)">
-                    <span class="wz-headline-title">Top Credential Access Alerts</span>
-                    <span flex></span>
-                    <span class="cursor-pointer" ng-click="expand(2)">
-                        <react-component name="EuiIcon" props="{type:'expand'}" />
-                    </span>
-                </md-card-actions>
-                <md-card-content class="wazuh-column">
-                    <kbn-vis id="Wazuh-App-Overview-MITRE-Top-Credential-Access" vis-id="'Wazuh-App-Overview-MITRE-Top-Credential-Access'"></kbn-vis>
-                </md-card-content>
-            </md-card>
-            <md-card flex="25" class="wz-md-card" ng-class="{'fullscreen': expandArray[2]}">
-                <md-card-actions layout="row" class="wz-card-actions-vis" ng-dblclick="expand(2)">
-                    <span class="wz-headline-title">Top Initial Access Alerts</span>
-                    <span flex></span>
-                    <span class="cursor-pointer" ng-click="expand(2)">
-                        <react-component name="EuiIcon" props="{type:'expand'}" />
-                    </span>
-                </md-card-actions>
-                <md-card-content class="wazuh-column">
-                    <kbn-vis id="Wazuh-App-Overview-MITRE-Top-Initial-Access" vis-id="'Wazuh-App-Overview-MITRE-Top-Initial-Access'"></kbn-vis>
-                </md-card-content>
-            </md-card>
-            <md-card flex="25" class="wz-md-card" ng-class="{'fullscreen': expandArray[2]}">
-                <md-card-actions layout="row" class="wz-card-actions-vis" ng-dblclick="expand(2)">
-                    <span class="wz-headline-title">Top Execution Alerts</span>
-                    <span flex></span>
-                    <span class="cursor-pointer" ng-click="expand(2)">
-                        <react-component name="EuiIcon" props="{type:'expand'}" />
-                    </span>
-                </md-card-actions>
-                <md-card-content class="wazuh-column">
-                    <kbn-vis id="Wazuh-App-Overview-MITRE-Top-Execution" vis-id="'Wazuh-App-Overview-MITRE-Top-Execution'"></kbn-vis>
-                </md-card-content>
-            </md-card>
-            <md-card flex="25" class="wz-md-card" ng-class="{'fullscreen': expandArray[2]}">
-                <md-card-actions layout="row" class="wz-card-actions-vis" ng-dblclick="expand(2)">
-                    <span class="wz-headline-title">Top Persistence Alerts</span>
-                    <span flex></span>
-                    <span class="cursor-pointer" ng-click="expand(2)">
-                        <react-component name="EuiIcon" props="{type:'expand'}" />
-                    </span>
-                </md-card-actions>
-                <md-card-content class="wazuh-column">
-                    <kbn-vis id="Wazuh-App-Overview-MITRE-Top-Persistence" vis-id="'Wazuh-App-Overview-MITRE-Top-Persistence'"></kbn-vis>
-                </md-card-content>
-            </md-card>
+    <div layout="row" ng-show="octrl.showingMitreTable" layout-padding>
+        <react-component flex name="MitreTable" props="octrl.mitreTableProps">
     </div>
 
+    <div ng-show="!octrl.showingMitreTable" >
+        <div layout="row" ng-if="mitreIds" layout-padding>
+            <react-component flex name="MitreCardsSlider" props="octrl.mitreCardsSliderProps">
+        </div>
 
-    <div layout="row" layout-align="center stretch" style="height:300px;">
-            <md-card flex="25" class="wz-md-card" ng-class="{'fullscreen': expandArray[2]}">
-                <md-card-actions layout="row" class="wz-card-actions-vis" ng-dblclick="expand(2)">
-                    <span class="wz-headline-title">Top Privilege Escalation Alerts</span>
+        <!-- First row -->
+        <div layout="row" layout-align="center stretch" class="height-400">
+            <md-card flex="70" class="wz-md-card" ng-class="{'fullscreen': octrl.expandArray[0]}">
+                <md-card-actions layout="row" class="wz-card-actions-vis" ng-dblclick="octrl.expand(0)">
+                    <span class="wz-headline-title">Alerts evolution over time</span>
                     <span flex></span>
-                    <span class="cursor-pointer" ng-click="expand(2)">
+                    <span class="cursor-pointer" ng-click="octrl.expand(0)">
                         <react-component name="EuiIcon" props="{type:'expand'}" />
                     </span>
                 </md-card-actions>
                 <md-card-content class="wazuh-column">
-                    <kbn-vis id="Wazuh-App-Overview-MITRE-Top-Privilege-Escalation" vis-id="'Wazuh-App-Overview-MITRE-Top-Privilege-Escalation'"></kbn-vis>
+                    <kbn-vis id="Wazuh-App-Overview-MITRE-Alerts-Evolution"
+                        vis-id="'Wazuh-App-Overview-MITRE-Alerts-Evolution'"></kbn-vis>
                 </md-card-content>
             </md-card>
-            <md-card flex="25" class="wz-md-card" ng-class="{'fullscreen': expandArray[2]}">
-                <md-card-actions layout="row" class="wz-card-actions-vis" ng-dblclick="expand(2)">
-                    <span class="wz-headline-title">Top Lateral Movement Alerts</span>
+            <md-card flex="30" class="wz-md-card" ng-class="{'fullscreen': octrl.expandArray[1]}">
+                <md-card-actions layout="row" class="wz-card-actions-vis" ng-dblclick="octrl.expand(1)">
+                    <span class="wz-headline-title">Top tactics</span>
                     <span flex></span>
-                    <span class="cursor-pointer" ng-click="expand(2)">
+                    <span class="cursor-pointer" ng-click="octrl.expand(1)">
                         <react-component name="EuiIcon" props="{type:'expand'}" />
                     </span>
                 </md-card-actions>
                 <md-card-content class="wazuh-column">
-                    <kbn-vis id="Wazuh-App-Overview-MITRE-Top-Lateral-Movement" vis-id="'Wazuh-App-Overview-MITRE-Top-Lateral-Movement'"></kbn-vis>
+                    <kbn-vis id="Wazuh-App-Overview-MITRE-Top-Tactics" vis-id="'Wazuh-App-Overview-MITRE-Top-Tactics'"></kbn-vis>
                 </md-card-content>
-            </md-card>
-            <md-card flex="25" class="wz-md-card" ng-class="{'fullscreen': expandArray[2]}">
-                <md-card-actions layout="row" class="wz-card-actions-vis" ng-dblclick="expand(2)">
-                    <span class="wz-headline-title">Top Defense Evasion Alerts</span>
+            </md-card> 
+        </div>
+        <!-- Second row -->
+        <div layout="row" layout-align="center stretch" class="height-400">
+            <md-card flex="30" class="wz-md-card" ng-class="{'fullscreen': octrl.expandArray[2]}">
+                <md-card-actions layout="row" class="wz-card-actions-vis" ng-dblclick="octrl.expand(2)">
+                    <span class="wz-headline-title">Attacks by tactic</span>
                     <span flex></span>
-                    <span class="cursor-pointer" ng-click="expand(2)">
+                    <span class="cursor-pointer" ng-click="octrl.expand(2)">
                         <react-component name="EuiIcon" props="{type:'expand'}" />
                     </span>
                 </md-card-actions>
                 <md-card-content class="wazuh-column">
-                    <kbn-vis id="Wazuh-App-Overview-MITRE-Top-Defense-Evasion" vis-id="'Wazuh-App-Overview-MITRE-Top-Defense-Evasion'"></kbn-vis>
+                    <kbn-vis id="Wazuh-App-Overview-MITRE-Attacks-By-Tactic" vis-id="'Wazuh-App-Overview-MITRE-Attacks-By-Tactic'"></kbn-vis>
                 </md-card-content>
             </md-card>
-            <md-card flex="25" class="wz-md-card" ng-class="{'fullscreen': expandArray[2]}">
-                <md-card-actions layout="row" class="wz-card-actions-vis" ng-dblclick="expand(2)">
-                    <span class="wz-headline-title">Top Discovery Alerts</span>
+            <md-card flex="40" class="wz-md-card" ng-class="{'fullscreen': octrl.expandArray[4]}">
+                <md-card-actions layout="row" class="wz-card-actions-vis" ng-dblclick="octrl.expand(4)">
+                    <span class="wz-headline-title">Top tactics by agent</span>
                     <span flex></span>
-                    <span class="cursor-pointer" ng-click="expand(2)">
+                    <span class="cursor-pointer" ng-click="octrl.expand(4)">
                         <react-component name="EuiIcon" props="{type:'expand'}" />
                     </span>
                 </md-card-actions>
                 <md-card-content class="wazuh-column">
-                    <kbn-vis id="Wazuh-App-Overview-MITRE-Top-Discovery" vis-id="'Wazuh-App-Overview-MITRE-Top-Discovery'"></kbn-vis>
+                    <kbn-vis id="Wazuh-App-Overview-MITRE-Top-Tactics-By-Agent" vis-id="'Wazuh-App-Overview-MITRE-Top-Tactics-By-Agent'"></kbn-vis>
                 </md-card-content>
-            </md-card>
-    </div>
+            </md-card> 
+            <md-card flex="30" class="wz-md-card" ng-class="{'fullscreen': octrl.expandArray[3]}">
+                <md-card-actions layout="row" class="wz-card-actions-vis" ng-dblclick="octrl.expand(3)">
+                    <span class="wz-headline-title">MITRE attacks by agent</span>
+                    <span flex></span>
+                    <span class="cursor-pointer" ng-click="octrl.expand(3)">
+                        <react-component name="EuiIcon" props="{type:'expand'}" />
+                    </span>
+                </md-card-actions>
+                <md-card-content class="wazuh-column">
+                    <kbn-vis id="Wazuh-App-Overview-MITRE-Attacks-By-Agent" vis-id="'Wazuh-App-Overview-MITRE-Attacks-By-Agent'"></kbn-vis>
+                </md-card-content>
+            </md-card> 
+        </div>
+        <!-- Third row -->
+        <div layout="row" layout-align="center stretch" style="height:300px;">
+                <md-card flex="25" class="wz-md-card" ng-class="{'fullscreen': expandArray[2]}">
+                    <md-card-actions layout="row" class="wz-card-actions-vis" ng-dblclick="expand(2)">
+                        <span class="wz-headline-title">Top Credential Access Alerts</span>
+                        <span flex></span>
+                        <span class="cursor-pointer" ng-click="expand(2)">
+                            <react-component name="EuiIcon" props="{type:'expand'}" />
+                        </span>
+                    </md-card-actions>
+                    <md-card-content class="wazuh-column">
+                        <kbn-vis id="Wazuh-App-Overview-MITRE-Top-Credential-Access" vis-id="'Wazuh-App-Overview-MITRE-Top-Credential-Access'"></kbn-vis>
+                    </md-card-content>
+                </md-card>
+                <md-card flex="25" class="wz-md-card" ng-class="{'fullscreen': expandArray[2]}">
+                    <md-card-actions layout="row" class="wz-card-actions-vis" ng-dblclick="expand(2)">
+                        <span class="wz-headline-title">Top Initial Access Alerts</span>
+                        <span flex></span>
+                        <span class="cursor-pointer" ng-click="expand(2)">
+                            <react-component name="EuiIcon" props="{type:'expand'}" />
+                        </span>
+                    </md-card-actions>
+                    <md-card-content class="wazuh-column">
+                        <kbn-vis id="Wazuh-App-Overview-MITRE-Top-Initial-Access" vis-id="'Wazuh-App-Overview-MITRE-Top-Initial-Access'"></kbn-vis>
+                    </md-card-content>
+                </md-card>
+                <md-card flex="25" class="wz-md-card" ng-class="{'fullscreen': expandArray[2]}">
+                    <md-card-actions layout="row" class="wz-card-actions-vis" ng-dblclick="expand(2)">
+                        <span class="wz-headline-title">Top Execution Alerts</span>
+                        <span flex></span>
+                        <span class="cursor-pointer" ng-click="expand(2)">
+                            <react-component name="EuiIcon" props="{type:'expand'}" />
+                        </span>
+                    </md-card-actions>
+                    <md-card-content class="wazuh-column">
+                        <kbn-vis id="Wazuh-App-Overview-MITRE-Top-Execution" vis-id="'Wazuh-App-Overview-MITRE-Top-Execution'"></kbn-vis>
+                    </md-card-content>
+                </md-card>
+                <md-card flex="25" class="wz-md-card" ng-class="{'fullscreen': expandArray[2]}">
+                    <md-card-actions layout="row" class="wz-card-actions-vis" ng-dblclick="expand(2)">
+                        <span class="wz-headline-title">Top Persistence Alerts</span>
+                        <span flex></span>
+                        <span class="cursor-pointer" ng-click="expand(2)">
+                            <react-component name="EuiIcon" props="{type:'expand'}" />
+                        </span>
+                    </md-card-actions>
+                    <md-card-content class="wazuh-column">
+                        <kbn-vis id="Wazuh-App-Overview-MITRE-Top-Persistence" vis-id="'Wazuh-App-Overview-MITRE-Top-Persistence'"></kbn-vis>
+                    </md-card-content>
+                </md-card>
+        </div>
 
 
-    <div layout="row" layout-align="center stretch" style="height:300px;">
-            <md-card flex="25" class="wz-md-card" ng-class="{'fullscreen': expandArray[2]}">
-                <md-card-actions layout="row" class="wz-card-actions-vis" ng-dblclick="expand(2)">
-                    <span class="wz-headline-title">Top Collection Alerts</span>
-                    <span flex></span>
-                    <span class="cursor-pointer" ng-click="expand(2)">
-                        <react-component name="EuiIcon" props="{type:'expand'}" />
-                    </span>
-                </md-card-actions>
-                <md-card-content class="wazuh-column">
-                    <kbn-vis id="Wazuh-App-Overview-MITRE-Top-Collection" vis-id="'Wazuh-App-Overview-MITRE-Top-Collection'"></kbn-vis>
-                </md-card-content>
-            </md-card>
-            <md-card flex="25" class="wz-md-card" ng-class="{'fullscreen': expandArray[2]}">
-                <md-card-actions layout="row" class="wz-card-actions-vis" ng-dblclick="expand(2)">
-                    <span class="wz-headline-title">Top Command and Control Alerts</span>
-                    <span flex></span>
-                    <span class="cursor-pointer" ng-click="expand(2)">
-                        <react-component name="EuiIcon" props="{type:'expand'}" />
-                    </span>
-                </md-card-actions>
-                <md-card-content class="wazuh-column">
-                    <kbn-vis id="Wazuh-App-Overview-MITRE-Top-Command-Control" vis-id="'Wazuh-App-Overview-MITRE-Top-Command-Control'"></kbn-vis>
-                </md-card-content>
-            </md-card>
-            <md-card flex="25" class="wz-md-card" ng-class="{'fullscreen': expandArray[2]}">
-                <md-card-actions layout="row" class="wz-card-actions-vis" ng-dblclick="expand(2)">
-                    <span class="wz-headline-title">Top Exfiltration Alerts</span>
-                    <span flex></span>
-                    <span class="cursor-pointer" ng-click="expand(2)">
-                        <react-component name="EuiIcon" props="{type:'expand'}" />
-                    </span>
-                </md-card-actions>
-                <md-card-content class="wazuh-column">
-                    <kbn-vis id="Wazuh-App-Overview-MITRE-Top-Exfiltration" vis-id="'Wazuh-App-Overview-MITRE-Top-Exfiltration'"></kbn-vis>
-                </md-card-content>
-            </md-card>
-            <md-card flex="25" class="wz-md-card" ng-class="{'fullscreen': expandArray[2]}">
-                <md-card-actions layout="row" class="wz-card-actions-vis" ng-dblclick="expand(2)">
-                    <span class="wz-headline-title">Top Impact Alerts</span>
-                    <span flex></span>
-                    <span class="cursor-pointer" ng-click="expand(2)">
-                        <react-component name="EuiIcon" props="{type:'expand'}" />
-                    </span>
-                </md-card-actions>
-                <md-card-content class="wazuh-column">
-                    <kbn-vis id="Wazuh-App-Overview-MITRE-Top-Impact" vis-id="'Wazuh-App-Overview-MITRE-Top-Impact'"></kbn-vis>
-                </md-card-content>
-            </md-card>
-    </div>
+        <div layout="row" layout-align="center stretch" style="height:300px;">
+                <md-card flex="25" class="wz-md-card" ng-class="{'fullscreen': expandArray[2]}">
+                    <md-card-actions layout="row" class="wz-card-actions-vis" ng-dblclick="expand(2)">
+                        <span class="wz-headline-title">Top Privilege Escalation Alerts</span>
+                        <span flex></span>
+                        <span class="cursor-pointer" ng-click="expand(2)">
+                            <react-component name="EuiIcon" props="{type:'expand'}" />
+                        </span>
+                    </md-card-actions>
+                    <md-card-content class="wazuh-column">
+                        <kbn-vis id="Wazuh-App-Overview-MITRE-Top-Privilege-Escalation" vis-id="'Wazuh-App-Overview-MITRE-Top-Privilege-Escalation'"></kbn-vis>
+                    </md-card-content>
+                </md-card>
+                <md-card flex="25" class="wz-md-card" ng-class="{'fullscreen': expandArray[2]}">
+                    <md-card-actions layout="row" class="wz-card-actions-vis" ng-dblclick="expand(2)">
+                        <span class="wz-headline-title">Top Lateral Movement Alerts</span>
+                        <span flex></span>
+                        <span class="cursor-pointer" ng-click="expand(2)">
+                            <react-component name="EuiIcon" props="{type:'expand'}" />
+                        </span>
+                    </md-card-actions>
+                    <md-card-content class="wazuh-column">
+                        <kbn-vis id="Wazuh-App-Overview-MITRE-Top-Lateral-Movement" vis-id="'Wazuh-App-Overview-MITRE-Top-Lateral-Movement'"></kbn-vis>
+                    </md-card-content>
+                </md-card>
+                <md-card flex="25" class="wz-md-card" ng-class="{'fullscreen': expandArray[2]}">
+                    <md-card-actions layout="row" class="wz-card-actions-vis" ng-dblclick="expand(2)">
+                        <span class="wz-headline-title">Top Defense Evasion Alerts</span>
+                        <span flex></span>
+                        <span class="cursor-pointer" ng-click="expand(2)">
+                            <react-component name="EuiIcon" props="{type:'expand'}" />
+                        </span>
+                    </md-card-actions>
+                    <md-card-content class="wazuh-column">
+                        <kbn-vis id="Wazuh-App-Overview-MITRE-Top-Defense-Evasion" vis-id="'Wazuh-App-Overview-MITRE-Top-Defense-Evasion'"></kbn-vis>
+                    </md-card-content>
+                </md-card>
+                <md-card flex="25" class="wz-md-card" ng-class="{'fullscreen': expandArray[2]}">
+                    <md-card-actions layout="row" class="wz-card-actions-vis" ng-dblclick="expand(2)">
+                        <span class="wz-headline-title">Top Discovery Alerts</span>
+                        <span flex></span>
+                        <span class="cursor-pointer" ng-click="expand(2)">
+                            <react-component name="EuiIcon" props="{type:'expand'}" />
+                        </span>
+                    </md-card-actions>
+                    <md-card-content class="wazuh-column">
+                        <kbn-vis id="Wazuh-App-Overview-MITRE-Top-Discovery" vis-id="'Wazuh-App-Overview-MITRE-Top-Discovery'"></kbn-vis>
+                    </md-card-content>
+                </md-card>
+        </div>
+
+
+        <div layout="row" layout-align="center stretch" style="height:300px;">
+                <md-card flex="25" class="wz-md-card" ng-class="{'fullscreen': expandArray[2]}">
+                    <md-card-actions layout="row" class="wz-card-actions-vis" ng-dblclick="expand(2)">
+                        <span class="wz-headline-title">Top Collection Alerts</span>
+                        <span flex></span>
+                        <span class="cursor-pointer" ng-click="expand(2)">
+                            <react-component name="EuiIcon" props="{type:'expand'}" />
+                        </span>
+                    </md-card-actions>
+                    <md-card-content class="wazuh-column">
+                        <kbn-vis id="Wazuh-App-Overview-MITRE-Top-Collection" vis-id="'Wazuh-App-Overview-MITRE-Top-Collection'"></kbn-vis>
+                    </md-card-content>
+                </md-card>
+                <md-card flex="25" class="wz-md-card" ng-class="{'fullscreen': expandArray[2]}">
+                    <md-card-actions layout="row" class="wz-card-actions-vis" ng-dblclick="expand(2)">
+                        <span class="wz-headline-title">Top Command and Control Alerts</span>
+                        <span flex></span>
+                        <span class="cursor-pointer" ng-click="expand(2)">
+                            <react-component name="EuiIcon" props="{type:'expand'}" />
+                        </span>
+                    </md-card-actions>
+                    <md-card-content class="wazuh-column">
+                        <kbn-vis id="Wazuh-App-Overview-MITRE-Top-Command-Control" vis-id="'Wazuh-App-Overview-MITRE-Top-Command-Control'"></kbn-vis>
+                    </md-card-content>
+                </md-card>
+                <md-card flex="25" class="wz-md-card" ng-class="{'fullscreen': expandArray[2]}">
+                    <md-card-actions layout="row" class="wz-card-actions-vis" ng-dblclick="expand(2)">
+                        <span class="wz-headline-title">Top Exfiltration Alerts</span>
+                        <span flex></span>
+                        <span class="cursor-pointer" ng-click="expand(2)">
+                            <react-component name="EuiIcon" props="{type:'expand'}" />
+                        </span>
+                    </md-card-actions>
+                    <md-card-content class="wazuh-column">
+                        <kbn-vis id="Wazuh-App-Overview-MITRE-Top-Exfiltration" vis-id="'Wazuh-App-Overview-MITRE-Top-Exfiltration'"></kbn-vis>
+                    </md-card-content>
+                </md-card>
+                <md-card flex="25" class="wz-md-card" ng-class="{'fullscreen': expandArray[2]}">
+                    <md-card-actions layout="row" class="wz-card-actions-vis" ng-dblclick="expand(2)">
+                        <span class="wz-headline-title">Top Impact Alerts</span>
+                        <span flex></span>
+                        <span class="cursor-pointer" ng-click="expand(2)">
+                            <react-component name="EuiIcon" props="{type:'expand'}" />
+                        </span>
+                    </md-card-actions>
+                    <md-card-content class="wazuh-column">
+                        <kbn-vis id="Wazuh-App-Overview-MITRE-Top-Impact" vis-id="'Wazuh-App-Overview-MITRE-Top-Impact'"></kbn-vis>
+                    </md-card-content>
+                </md-card>
+            </div>
+        </div>
 
 
 </md-content>
