@@ -233,7 +233,7 @@ class WzListEditor extends Component {
         this.showToast('success', 'Success', 'CBD List updated', 3000);
       }
     } catch (error) {
-      this.showToast('danger', 'Error', 'Error saving CDB list', 3000);
+      this.showToast('danger', 'Error', 'Error saving CDB list: ' + error, 3000);
     }
     this.setState({ isSaving: false });
   }
