@@ -10,13 +10,9 @@
  * Find more information about this on the LICENSE file.
  */
 import React, { Component } from 'react';
-import {
-  EuiFlexGroup,
-  EuiFlexItem
-} from '@elastic/eui';
 // Redux
-import store from '../../../../redux/store';
-import WzReduxProvider from '../../../../redux/wz-redux-provider';
+import store from '../../../../../redux/store';
+import WzReduxProvider from '../../../../../redux/wz-redux-provider';
 //Wazuh ruleset tables(rules, decoder, lists)
 import WzRulesetOverview from './ruleset-overview';
 //Information about rule or decoder
@@ -24,7 +20,6 @@ import WzRuleInfo from './rule-info';
 import WzDecoderInfo from './decoder-info';
 import WzRulesetEditor from './ruleset-editor';
 import WzListEditor from './list-editor';
-import WzRulesetSideMenu from './ruleset-side-menu';
 
 export default class WzRuleset extends Component {
   constructor(props) {
@@ -52,20 +47,13 @@ export default class WzRuleset extends Component {
 
     return (
       <WzReduxProvider>
-        <EuiFlexGroup>
-          <EuiFlexItem grow={false}>
-            <WzRulesetSideMenu />
-          </EuiFlexItem>
-          <EuiFlexItem grow={false}>
-            {
-              ruleInfo && (<WzRuleInfo />)
-              || decoderInfo && (<WzDecoderInfo />)
-              || listInfo && (<WzListEditor />)
-              || (fileContent || addingRulesetFile) && (<WzRulesetEditor />)
-              || (<WzRulesetOverview />)
-            }
-          </EuiFlexItem>
-        </EuiFlexGroup>
+        {
+          ruleInfo && (<WzRuleInfo />)
+          || decoderInfo && (<WzDecoderInfo />)
+          || listInfo && (<WzListEditor />)
+          || (fileContent || addingRulesetFile) && (<WzRulesetEditor />)
+          || (<WzRulesetOverview />)
+        }
       </WzReduxProvider>
     )
   }

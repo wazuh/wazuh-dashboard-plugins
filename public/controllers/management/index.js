@@ -28,9 +28,11 @@ import { WelcomeScreen } from './components/welcome';
 import { ReportingTable } from './components/reporting-table';
 import { AgentsInGroupTable } from './components/agents-groups-table';
 import { FilesInGroupTable } from './components/files-group-table';
-import { GroupsTable } from './components/groups-table';
+import { GroupsTable } from './components/management/groups/groups-table';
 import { UploadFiles } from './components/upload-files';
-import WzRuleset from './components/ruleset/main-ruleset';
+import WzRuleset from './components/management/ruleset/main-ruleset';
+import WzManagementProvider from './components/management/management-main';
+import WzManagement from './components/management/management-provider';
 
 const app = uiModules.get('app/wazuh', []);
 
@@ -52,6 +54,8 @@ app
   .value('ReportingTable', ReportingTable)
   .value('UploadFiles', UploadFiles)
   .value('WzRuleset', WzRuleset)
+  .value('WzManagement', WzManagement)
+  .value('WzManagementProvider', WzManagementProvider)
   .value('GroupsTable', GroupsTable)
   .value('AgentsInGroupTable', AgentsInGroupTable)
   .value('FilesInGroupTable', FilesInGroupTable)

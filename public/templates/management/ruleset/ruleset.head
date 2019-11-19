@@ -1,6 +1,0 @@
-<div flex="auto" layout="column" ng-if="mctrl.globalRuleSet == 'ruleset'">
-<div ng-if="!loading && !viewingDetail" flex layout="row">
-<div ng-class="mctrl.logtestOpened ? 'flex-70' : 'flex-100'">
-        <div layout="row" class="md-padding-h">
-<span flex></span>
-</div>

@@ -28,7 +28,7 @@ import {
 
 import { connect } from 'react-redux';
 
-import { cleanInfo, updateListContent } from '../../../../redux/actions/rulesetActions';
+import { cleanInfo, updateListContent } from '../../../../../redux/actions/rulesetActions';
 
 import RulesetHandler from './utils/ruleset-handler';
 

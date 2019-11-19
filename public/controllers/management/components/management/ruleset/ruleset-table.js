@@ -33,10 +33,10 @@ import {
   updateSortDirection,
   updateSortField,
   updateDefaultItems,
-} from '../../../../redux/actions/rulesetActions';
+} from '../../../../../redux/actions/rulesetActions';
 
 import RulesetColums from './utils/columns';
-import { WzRequest } from '../../../../react-services/wz-request';
+import { WzRequest } from '../../../../../react-services/wz-request';
 
 class WzRulesetTable extends Component {
   constructor(props) {

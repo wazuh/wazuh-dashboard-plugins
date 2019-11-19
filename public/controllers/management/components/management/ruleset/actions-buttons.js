@@ -26,11 +26,11 @@ import {
   updateListContent,
   updateIsProcessing,
   updatePageIndex,
-} from '../../../../redux/actions/rulesetActions';
+} from '../../../../../redux/actions/rulesetActions';
 
-import { WzRequest } from '../../../../react-services/wz-request';
-import exportCsv from '../../../../react-services/wz-csv';
-import { UploadFiles } from '../../../management/components/upload-files';
+import { WzRequest } from '../../../../../react-services/wz-request';
+import exportCsv from '../../../../../react-services/wz-csv';
+import { UploadFiles } from '../../upload-files';
 import columns from './utils/columns';
 import RulesetHandler from './utils/ruleset-handler';
 

@@ -18,7 +18,7 @@ import 'codemirror/mode/xml/xml';
 import { connect } from 'react-redux';
 import {
   cleanInfo
-} from '../../../../redux/actions/rulesetActions';
+} from '../../../../../redux/actions/rulesetActions';
 
 // Eui components
 import {
