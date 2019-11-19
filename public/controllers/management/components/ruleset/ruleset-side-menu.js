@@ -38,7 +38,7 @@ class WzRulesetSideMenu extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      selectedItemName: 'rules'
+      selectedItemName: this.props.section || 'rules'
     };
 
     this.rulesetSections = {
@@ -90,10 +90,10 @@ class WzRulesetSideMenu extends Component {
 
   clickMenuItem = async name => {
     const section = name;
-    if(this.state.selectedItemName !== section){
-        this.setState({
-          selectedItemName: section,
-        });
+    if (this.state.selectedItemName !== section) {
+      this.setState({
+        selectedItemName: section,
+      });
       this.props.updateSortDirection('asc');
       this.props.updateSortField(section === 'rules' ? 'id' : 'name');
       this.props.cleanFilters();
@@ -101,10 +101,10 @@ class WzRulesetSideMenu extends Component {
       this.props.updatePageIndex(0);
       if (['rules', 'decoders', 'lists'].includes(section)) {
         this.fetchData(section);
-      } else if(section === 'ruleset') {
+      } else if (section === 'ruleset') {
         this.fetchData(this.rulesetSections.rules.id);
-      } else{
-
+      } else if (section === 'groups') {
+        console.log("groups")
       }
     }
   };

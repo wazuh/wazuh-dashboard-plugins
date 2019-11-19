@@ -27,8 +27,11 @@ import {
   EuiSpacer,
   EuiButton,
   EuiCallOut,
-  EuiToolTip
+  EuiToolTip,
+  EuiPage
 } from '@elastic/eui';
+import WzRulesetSideMenu from '../components/ruleset/ruleset-side-menu';
+import WzReduxProvider from '../../../redux/wz-redux-provider';
 
 export class GroupsTable extends Component {
   _isMounted = false;
@@ -234,12 +237,12 @@ export class GroupsTable extends Component {
                         position="right"
                         content="Delete group"
                       >
-                      <EuiButtonIcon
-                        aria-label="Delete groups"
-                        onClick={() => this.showConfirm(item.name)}
-                        iconType="trash"
-                        color="danger"
-                      />
+                        <EuiButtonIcon
+                          aria-label="Delete groups"
+                          onClick={() => this.showConfirm(item.name)}
+                          iconType="trash"
+                          color="danger"
+                        />
                       </EuiToolTip>
                     </EuiFlexItem>
                   )}
@@ -291,92 +294,103 @@ export class GroupsTable extends Component {
     );
 
     return (
-      <EuiPanel paddingSize="l">
+      <WzReduxProvider>
         <EuiFlexGroup>
-          <EuiFlexItem>
-            <EuiFlexGroup>
-              <EuiFlexItem>
-                <EuiTitle>
-                  <h2>Groups</h2>
-                </EuiTitle>
-              </EuiFlexItem>
-            </EuiFlexGroup>
-          </EuiFlexItem>
           <EuiFlexItem grow={false}>
-            <EuiPopover
-              id="popover"
-              button={newGroupButton}
-              isOpen={this.state.isPopoverOpen}
-              closePopover={() => this.closePopover()}
-            >
-              <EuiFormRow label="Introduce the group name" id="">
-                <EuiFieldText
-                  className="groupNameInput"
-                  value={this.state.newGroupName}
-                  onChange={this.onChangeNewGroupName}
-                  aria-label=""
-                />
-              </EuiFormRow>
-              <EuiSpacer size="xs" />
-              {this.state.msg && (
-                <Fragment>
-                  <EuiFlexGroup>
-                    <EuiFlexItem>
-                      <EuiCallOut title={this.state.msg.msg} color={this.state.msg.type} iconType={this.state.msg.type === 'danger' ? 'cross' : 'check'} />
-                    </EuiFlexItem>
-                  </EuiFlexGroup>
-                  <EuiSpacer size="xs" />
-                </Fragment>
-              )}
-              <EuiSpacer size="xs" />
-              <EuiFlexGroup>
-                <EuiFlexItem>
-                  <EuiButton
-                    iconType="save"
-                    fill
-                    onClick={async () => {
-                      await this.createGroup(this.state.newGroupName);
-                      this.clearGroupName();
-                      this.refresh();
-                    }}
-                  >
-                    Save new group
+            <WzRulesetSideMenu section={'groups'}/>
+          </EuiFlexItem>
+          <EuiFlexItem>
+            <EuiPage style={{ background: 'transparent' }}>
+              <EuiPanel>
+                <EuiFlexGroup>
+                  <EuiFlexItem>
+                    <EuiFlexGroup>
+                      <EuiFlexItem>
+                        <EuiTitle>
+                          <h2>Groups</h2>
+                        </EuiTitle>
+                      </EuiFlexItem>
+                    </EuiFlexGroup>
+                  </EuiFlexItem>
+                  <EuiFlexItem grow={false}>
+                    <EuiPopover
+                      id="popover"
+                      button={newGroupButton}
+                      isOpen={this.state.isPopoverOpen}
+                      closePopover={() => this.closePopover()}
+                    >
+                      <EuiFormRow label="Introduce the group name" id="">
+                        <EuiFieldText
+                          className="groupNameInput"
+                          value={this.state.newGroupName}
+                          onChange={this.onChangeNewGroupName}
+                          aria-label=""
+                        />
+                      </EuiFormRow>
+                      <EuiSpacer size="xs" />
+                      {this.state.msg && (
+                        <Fragment>
+                          <EuiFlexGroup>
+                            <EuiFlexItem>
+                              <EuiCallOut title={this.state.msg.msg} color={this.state.msg.type} iconType={this.state.msg.type === 'danger' ? 'cross' : 'check'} />
+                            </EuiFlexItem>
+                          </EuiFlexGroup>
+                          <EuiSpacer size="xs" />
+                        </Fragment>
+                      )}
+                      <EuiSpacer size="xs" />
+                      <EuiFlexGroup>
+                        <EuiFlexItem>
+                          <EuiButton
+                            iconType="save"
+                            fill
+                            onClick={async () => {
+                              await this.createGroup(this.state.newGroupName);
+                              this.clearGroupName();
+                              this.refresh();
+                            }}
+                          >
+                            Save new group
                   </EuiButton>
-                </EuiFlexItem>
-              </EuiFlexGroup>
-            </EuiPopover>
-          </EuiFlexItem>
-          <EuiFlexItem grow={false}>
-            <EuiButtonEmpty
-              iconType="importAction"
-              onClick={async () => await this.props.export([this.filters])}
-            >
-              Export formatted
+                        </EuiFlexItem>
+                      </EuiFlexGroup>
+                    </EuiPopover>
+                  </EuiFlexItem>
+                  <EuiFlexItem grow={false}>
+                    <EuiButtonEmpty
+                      iconType="exportAction"
+                      onClick={async () => await this.props.export([this.filters])}
+                    >
+                      Export formatted
             </EuiButtonEmpty>
-          </EuiFlexItem>
-          <EuiFlexItem grow={false}>
-            <EuiButtonEmpty iconType="refresh" onClick={() => this.refresh()}>
-              Refresh
+                  </EuiFlexItem>
+                  <EuiFlexItem grow={false}>
+                    <EuiButtonEmpty iconType="refresh" onClick={() => this.refresh()}>
+                      Refresh
             </EuiButtonEmpty>
-          </EuiFlexItem>
-        </EuiFlexGroup>
-        <EuiFlexGroup>
-          <EuiFlexItem>
-            <EuiText color="subdued" style={{ paddingBottom: '15px' }}>
-              From here you can list and check your groups, its agents and
-              files.
+                  </EuiFlexItem>
+                </EuiFlexGroup>
+                <EuiFlexGroup>
+                  <EuiFlexItem>
+                    <EuiText color="subdued" style={{ paddingBottom: '15px' }}>
+                      From here you can list and check your groups, its agents and
+                      files.
             </EuiText>
+                  </EuiFlexItem>
+                </EuiFlexGroup>
+                <EuiInMemoryTable
+                  itemId="id"
+                  items={this.state.items}
+                  columns={columns}
+                  search={search}
+                  pagination={true}
+                  loading={this.state.refreshingGroups || this.state.isLoading}
+                />
+              </EuiPanel>
+            </EuiPage>
           </EuiFlexItem>
         </EuiFlexGroup>
-        <EuiInMemoryTable
-          itemId="id"
-          items={this.state.items}
-          columns={columns}
-          search={search}
-          pagination={true}
-          loading={this.state.refreshingGroups || this.state.isLoading}
-        />
-      </EuiPanel>
+      </WzReduxProvider>
     );
   }
 }
