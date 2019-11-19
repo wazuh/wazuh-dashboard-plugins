@@ -11,10 +11,6 @@
  */
 import React, { Component } from 'react';
 
-
-import CodeMirror from 'react-codemirror';
-import 'codemirror/mode/xml/xml';
-
 import { connect } from 'react-redux';
 import {
   cleanInfo
@@ -31,7 +27,8 @@ import {
   EuiButtonIcon,
   EuiButton,
   EuiCallOut,
-  EuiFieldText
+  EuiFieldText,
+  EuiCodeEditor,
 } from '@elastic/eui';
 
 import RulesetHandler from './utils/ruleset-handler';
@@ -40,25 +37,25 @@ import validateConfigAfterSent from './utils/valid-configuration';
 class WzRulesetEditor extends Component {
   constructor(props) {
     super(props);
-    this.codeMirrorOptions = {
-      lineNumbers: true,
-      lineWrapping: true,
-      matchClosing: true,
-      matchBrackets: true,
-      mode: 'text/xml',
-      //theme: IS_DARK_THEME ? 'lesser-dark' : 'ttcn',
-      foldGutter: true,
-      styleSelectedText: true,
-      gutters: ['CodeMirror-foldgutter']
+    this.codeEditorOptions = {
+      fontSize: '14px',
+      enableBasicAutocompletion: true,
+      enableSnippets: true,
+      enableLiveAutocompletion: true
     }
-    this.codeMirrorContent = this.props.state.fileContent.content;
     this.rulesetHandler = RulesetHandler;
+    const { fileContent, addingRulesetFile } = this.props.state;
+    const { name, content, path } = addingRulesetFile ? addingRulesetFile : fileContent;
+
     this.state = {
       isSaving: false,
       error: false,
       savedComplete: false,
       warning: false,
-      inputValue: ''
+      inputValue: '',
+      content,
+      name,
+      path,
     }
   }
 
@@ -74,11 +71,12 @@ class WzRulesetEditor extends Component {
    */
   async save(name, overwrite = true) {
     try {
+      const { content } = this.state
       this.setState({ isSaving: true, error: false, savedComplete: false });
       const { section } = this.props.state;
       let saver = this.rulesetHandler.sendRuleConfiguration; // By default the saver is for rules
       if (section === 'decoders') saver = this.rulesetHandler.sendDecoderConfiguration;
-      await saver(name, this.codeMirrorContent, overwrite);
+      await saver(name, content , overwrite);
       try {
         await validateConfigAfterSent();
       } catch (error) {
@@ -102,10 +100,9 @@ class WzRulesetEditor extends Component {
   };
 
   render() {
-    const { section, fileContent, adminMode, addingRulesetFile } = this.props.state;
-    const { name, content, path } = addingRulesetFile ? addingRulesetFile : fileContent;
+    const { section, adminMode, addingRulesetFile } = this.props.state;
+    const { name, content, path } = this.state;
     const isEditable = addingRulesetFile ? true : (path !== 'ruleset/rules' && path !== 'ruleset/decoders' && adminMode);
-    const options = Object.assign(this.codeMirrorOptions, { readOnly: !isEditable });
     let nameForSaving = addingRulesetFile ? this.state.inputValue : name;
     nameForSaving = name.endsWith('.xml') ? nameForSaving : `${nameForSaving}.xml`;
     const overwrite = !addingRulesetFile;
@@ -121,14 +118,13 @@ class WzRulesetEditor extends Component {
       </EuiButton>
     );
 
-
     return (
       <EuiPage style={{ background: 'transparent' }}>
         <EuiFlexGroup>
           <EuiFlexItem>
             {/* File name and back button */}
             <EuiFlexGroup>
-              <EuiFlexItem grow={false}>
+              <EuiFlexItem>
                 {!addingRulesetFile && (
                   <EuiTitle>
                     <h2>
@@ -212,12 +208,15 @@ class WzRulesetEditor extends Component {
                 )}
                 <EuiFlexGroup>
                   <EuiFlexItem>
-                    <CodeMirror
-                      className="react-code-mirror"
-                      options={options}
+                    <EuiCodeEditor
+                      width="100%"
                       value={content}
-                      onChange={newContent => this.codeMirrorContent = newContent}
-                    />
+                      onChange={newContent => this.setState({content: newContent})}
+                      mode="xml"
+                      isReadOnly={!isEditable}
+                      setOptions={this.codeEditorOptions}
+                      aria-label="Code Editor"
+                    ></EuiCodeEditor>
                   </EuiFlexItem>
                 </EuiFlexGroup>
               </EuiFlexItem>
@@ -228,7 +227,6 @@ class WzRulesetEditor extends Component {
     )
   }
 }
-
 
 const mapStateToProps = (state) => {
   return {
