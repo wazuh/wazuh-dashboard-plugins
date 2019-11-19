@@ -10,7 +10,7 @@
         </div>
 
         <!-- Groups table -->
-        <div ng-show="!gp.load" layout="column" layout-padding ng-if="(!gp.currentGroup || !gp.currentGroup.name) && gp.groupsTableProps && !gp.lookingGroup">
+        <div ng-show="!gp.load" layout="column" ng-if="(!gp.currentGroup || !gp.currentGroup.name) && gp.groupsTableProps && !gp.lookingGroup">
             <react-component name="GroupsTable" props="gp.groupsTableProps" />
         </div>
         
