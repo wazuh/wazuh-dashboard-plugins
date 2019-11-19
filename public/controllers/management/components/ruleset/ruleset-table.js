@@ -67,26 +67,16 @@ class WzRulesetTable extends Component {
   
   async getItems() {
     const { section, showingFiles } = this.props.state;
+
+    if(this.props.state.defaultItems.length === 0 && section === 'lists'){
+      await this.setDefaultItems();
+    }
+    
     const rawItems = await this.wzReq(
       'GET',
       `${this.paths[section]}${showingFiles ? '/files': ''}`,
       this.buildFilter(),
     )
-
-    if(this.props.state.defaultItems.length === 0 && section === 'lists'){
-      const requestDefaultItems = await this.wzReq(
-        'GET',
-        '/manager/configuration',
-        {
-          'wait_for_complete' : false,
-          'section': 'ruleset',
-          'field': 'list'
-        }
-      );
-  
-      const defaultItems = ((requestDefaultItems || {}).data || {}).data;
-      this.props.updateDefaultItems(defaultItems);
-    }
 
     const { items, totalItems } = ((rawItems || {}).data || {}).data;
     this.setState({
@@ -95,6 +85,21 @@ class WzRulesetTable extends Component {
       isProcessing: false,
     });
     this.props.updateIsProcessing(false);
+  }
+
+  async setDefaultItems() {
+    const requestDefaultItems = await this.wzReq(
+      'GET',
+      '/manager/configuration',
+      {
+        'wait_for_complete' : false,
+        'section': 'ruleset',
+        'field': 'list'
+      }
+    );
+
+    const defaultItems = ((requestDefaultItems || {}).data || {}).data;
+    this.props.updateDefaultItems(defaultItems);
   }
 
   buildFilter() {
