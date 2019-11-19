@@ -56,7 +56,7 @@ export default class WzRuleset extends Component {
           <EuiFlexItem grow={false}>
             <WzRulesetSideMenu />
           </EuiFlexItem>
-          <EuiFlexItem grow={false}>
+          <EuiFlexItem>
             {
               ruleInfo && (<WzRuleInfo />)
               || decoderInfo && (<WzDecoderInfo />)

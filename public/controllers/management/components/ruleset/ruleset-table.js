@@ -71,7 +71,7 @@ class WzRulesetTable extends Component {
     if(this.props.state.defaultItems.length === 0 && section === 'lists'){
       await this.setDefaultItems();
     }
-    
+
     const rawItems = await this.wzReq(
       'GET',
       `${this.paths[section]}${showingFiles ? '/files': ''}`,
