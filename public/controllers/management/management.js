@@ -314,6 +314,9 @@ export class ManagementController {
       this.currentList = false;
       this.managementTabsProps.selectedTab = this.tab;
     }
+    this.managementProps = {
+      section : this.tab === 'ruleset' ? this.rulesetTab : this.tab
+    }
     this.$location.search('tab', this.tab);
     this.loadNodeList();
   }

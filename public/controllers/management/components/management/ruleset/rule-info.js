@@ -17,7 +17,6 @@ import {
 import { connect } from 'react-redux';
 
 import RulesetHandler from './utils/ruleset-handler';
-import { colors } from './utils/colors';
 
 
 import {
@@ -26,24 +25,32 @@ import {
   cleanInfo,
   updateFilters,
   cleanFilters
-} from '../../../../redux/actions/rulesetActions';
+} from '../../../../../redux/actions/rulesetActions';
 
-class WzDecoderInfo extends Component {
+class WzRuleInfo extends Component {
   constructor(props) {
     super(props);
+    this.complianceEquivalences = {
+      pci: 'PCI DSS',
+      gdpr: 'GDPR',
+      gpg13: 'GPG 13',
+      hipaa: 'HIPAA',
+      'nist-800-53': 'NIST-800-53'
+    }
 
     this.rulesetHandler = RulesetHandler;
     this.columns = [
       {
-        field: 'name',
-        name: 'Name',
+        field: 'id',
+        name: 'ID',
         align: 'left',
         sortable: true,
+        width: '5%',
         render: value => {
           return (
-            <EuiToolTip position="top" content={`Show ${value} decoder information`}>
+            <EuiToolTip position="top" content={`Show rule ID ${value} information`}>
               <EuiLink onClick={() => {
-                this.changeBetweenDecoders(value);
+                this.changeBetweenRules(value);
               }
               }>
                 {value}
@@ -53,51 +60,98 @@ class WzDecoderInfo extends Component {
         }
       },
       {
-        field: 'details.program_name',
-        name: 'Program name',
+        field: 'description',
+        name: 'Description',
         align: 'left',
-        sortable: true
+        sortable: true,
+        width: '30%'
       },
       {
-        field: 'details.order',
-        name: 'Order',
+        field: 'groups',
+        name: 'Groups',
         align: 'left',
-        sortable: true
+        sortable: true,
+        width: '10%'
+      },
+      {
+        field: 'pci',
+        name: 'PCI',
+        align: 'left',
+        sortable: true,
+        width: '10%'
+      },
+      {
+        field: 'gdpr',
+        name: 'GDPR',
+        align: 'left',
+        sortable: true,
+        width: '10%'
+      },
+      {
+        field: 'hipaa',
+        name: 'HIPAA',
+        align: 'left',
+        sortable: true,
+        width: '10%'
+      },
+      {
+        field: 'nist-800-53',
+        name: 'NIST 800-53',
+        align: 'left',
+        sortable: true,
+        width: '10%'
+      },
+      {
+        field: 'level',
+        name: 'Level',
+        align: 'left',
+        sortable: true,
+        width: '5%'
       },
       {
         field: 'file',
         name: 'File',
         align: 'left',
         sortable: true,
+        width: '15%',
         render: (value, item) => {
           return (
             <EuiToolTip position="top" content={`Show ${value} content`}>
               <EuiLink onClick={async () => {
                 const noLocal = item.path.startsWith('ruleset/');
-                const result = await this.rulesetHandler.getDecoderContent(value, noLocal);
+                const result = await this.rulesetHandler.getRuleContent(value, noLocal);
                 const file = { name: value, content: result, path: item.path };
                 this.props.updateFileContent(file);
               }
-              }>{value}</EuiLink>
+              }>
+                {value}
+              </EuiLink>
             </EuiToolTip>
           )
         }
-      },
-      {
-        field: 'path',
-        name: 'Path',
-        align: 'left',
-        sortable: true
       }
     ];
   }
-
 
   componentWillUnmount() {
     // When the component is going to be unmounted its info is clear
     this.props.cleanInfo();
   }
-  
+
+  /**
+   * Build an object with the compliance info about a rule
+   * @param {Object} ruleInfo 
+   */
+  buildCompliance(ruleInfo) {
+    const compliance = {};
+    const complianceKeys = ['gdpr', 'gpg13', 'hipaa', 'nist-800-53', 'pci'];
+    Object.keys(ruleInfo).forEach(key => {
+      if (complianceKeys.includes(key) && ruleInfo[key].length) compliance[key] = ruleInfo[key]
+    });
+    return compliance || {};
+  }
+
+
   /**
    * Clean the existing filters and sets the new ones and back to the previous section
    */
@@ -110,14 +164,24 @@ class WzDecoderInfo extends Component {
 
   /**
    * Render the basic information in a list
-   * @param {Number} position 
+   * @param {Number} id 
+   * @param {Number} level 
    * @param {String} file 
    * @param {String} path 
    */
-  renderInfo(position, file, path) {
+  renderInfo(id, level, file, path) {
     return (
       <ul>
-        <li key="position"><b>Position:</b>&nbsp;<span className="subdued-color">{position}</span></li>
+        <li key="id"><b>ID:</b>&nbsp;{id}</li>
+        <EuiSpacer size="s" />
+        <li key="level"><b>Level:</b>
+          <EuiToolTip position="top" content={`Filter by this level: ${level}`}>
+            <EuiLink onClick={async () => this.setNewFiltersAndBack({ level: level })}>
+              &nbsp;{level}
+            </EuiLink>
+          </EuiToolTip>
+        </li>
+
         <EuiSpacer size="s" />
         <li key="file"><b>File:</b>
           <EuiToolTip position="top" content={`Filter by this file: ${file}`}>
@@ -134,6 +198,7 @@ class WzDecoderInfo extends Component {
             </EuiLink>
           </EuiToolTip>
         </li>
+
         <EuiSpacer size="s" />
       </ul>
     )
@@ -141,22 +206,14 @@ class WzDecoderInfo extends Component {
 
   /**
    * Render a list with the details
-   * @param {Array} details 
-   */
+* @param {Array} details
+    */
   renderDetails(details) {
     const detailsToRender = [];
     Object.keys(details).forEach(key => {
-      let content = details[key]
-      if (key === 'regex') {
-        content = this.colorRegex(content);
-      } else if (key === 'order') {
-        content = this.colorOrder(content);
-      } else {
-        content = <span className="subdued-color">{details[key]}</span>;
-      }
       detailsToRender.push(
         <Fragment>
-          <li key={key}><b>{key}:</b>&nbsp;{content}</li>
+          <li key={key}><b>{key}:</b>&nbsp;{details[key]}</li>
           <EuiSpacer size="s" />
         </Fragment>
       );
@@ -169,51 +226,85 @@ class WzDecoderInfo extends Component {
   }
 
   /**
-   * This set a color to a given order
-   * @param {String} order
-   */
-  colorOrder(order) {
-    order = order.toString();
-    let valuesArray = order.split(',');
-    const result = [];
-    for (let i = 0, len = valuesArray.length; i < len; i++) {
-      const coloredString = <span style={{ color: colors[i] }}>{valuesArray[i]}</span>;
-      result.push(coloredString);
-    }
-    return result;
+   * Render the groups
+* @param {Array} groups
+    */
+  renderGroups(groups) {
+    const listGroups = [];
+    groups.forEach(group => {
+      listGroups.push(
+        <Fragment>
+          <EuiLink onClick={async () => this.setNewFiltersAndBack({ group: group })}>
+            <EuiToolTip position="top" content={`Filter by this group: ${group}`}>
+              <li key={group}>
+                {group}
+              </li>
+            </EuiToolTip>
+          </EuiLink>
+          <EuiSpacer size="s" />
+        </Fragment>
+      );
+    });
+    return (
+      <ul>
+        {listGroups}
+      </ul>
+    )
   }
 
   /**
-     * This set a color to a given regex
-     * @param {String} regex
-     */
-  colorRegex(regex) {
-    regex = regex.toString();
-    const starts = <span className="subdued-color">{regex.split('(')[0]}</span>;
-    let valuesArray = regex.match(/\(((?!<\/span>).)*?\)(?!<\/span>)/gim);
-    const result = [starts];
-    for (let i = 0, len = valuesArray.length; i < len; i++) {
-      const coloredString = <span style={{ color: colors[i] }}>{valuesArray[i]}</span>;
-      result.push(coloredString);
+   * Render the compliance(HIPAA, NIST...)
+* @param {Array} compliance
+    */
+  renderCompliance(compliance) {
+    const listCompliance = [];
+    const keys = Object.keys(compliance);
+    for (let i in Object.keys(keys)) {
+      const key = keys[i];
+      listCompliance.push(
+        <Fragment>
+          <li key={key}><b>{this.complianceEquivalences[key]}</b></li>
+          <EuiSpacer size="s" />
+        </Fragment>
+      )
+      compliance[key].forEach(element => {
+        const filters = {};
+        filters[key] = element;
+        listCompliance.push(
+          <Fragment>
+            <EuiLink onClick={async () => this.setNewFiltersAndBack({ filters })}>
+              <EuiToolTip position="top" content="Filter by this compliance">
+                <li key={element}>{element}</li>
+              </EuiToolTip>
+            </EuiLink>
+            <EuiSpacer size="s" />
+          </Fragment>
+        );
+      });
     }
-    return result;
+    return (
+      <ul>
+        {listCompliance}
+      </ul>
+    )
   }
 
   /**
-   * Changes between decoders
-   * @param {Number} name 
-   */
-  changeBetweenDecoders(name) {
-    this.setState({ currentDecoder: name });
+   * Changes between rules
+* @param {Number} ruleId
+    */
+  changeBetweenRules(ruleId) {
+    this.setState({ currentRuleId: ruleId });
   }
 
   render() {
-    const { decoderInfo, isLoading } = this.props.state;
-    const currentDecoder = (this.state && this.state.currentDecoder) ? this.state.currentDecoder : decoderInfo.current;
-    const decoders = decoderInfo.items;
-    const currentDecoderArr = decoders.filter(r => { return r.name === currentDecoder });
-    const currentDecoderInfo = currentDecoderArr[0];
-    const { position, details, file, name, path } = currentDecoderInfo;
+    const { ruleInfo, isLoading } = this.props.state;
+    const currentRuleId = (this.state && this.state.currentRuleId) ? this.state.currentRuleId : ruleInfo.current;
+    const rules = ruleInfo.items;
+    const currentRuleArr = rules.filter(r => { return r.id === currentRuleId });
+    const currentRuleInfo = currentRuleArr[0];
+    const { description, details, file, path, level, id, groups } = currentRuleInfo;
+    const compliance = this.buildCompliance(currentRuleInfo);
     const columns = this.columns;
 
 
@@ -221,12 +312,12 @@ class WzDecoderInfo extends Component {
       <EuiPage style={{ background: 'transparent' }}>
         <EuiFlexGroup>
           <EuiFlexItem>
-            {/* Decoder description name */}
+            {/* Rule description name */}
             <EuiFlexGroup>
               <EuiFlexItem grow={false}>
                 <EuiTitle>
                   <h2>
-                    <EuiToolTip position="right" content="Back to decoders">
+                    <EuiToolTip position="right" content="Back to rules">
                       <EuiButtonIcon
                         aria-label="Back"
                         color="subdued"
@@ -234,7 +325,7 @@ class WzDecoderInfo extends Component {
                         iconType="arrowLeft"
                         onClick={() => this.props.cleanInfo()} />
                     </EuiToolTip>
-                    {name}
+                    {description}
                   </h2>
                 </EuiTitle>
               </EuiFlexItem>
@@ -248,7 +339,7 @@ class WzDecoderInfo extends Component {
                   <EuiText color="subdued">Information</EuiText>
                   <EuiSpacer size="xs" className="subdued-background" />
                   <EuiSpacer size="s" />
-                  {this.renderInfo(position, file, path)}
+                  {this.renderInfo(id, level, file, path)}
                 </EuiPanel>
               </EuiFlexItem>
               {/* Details */}
@@ -260,6 +351,26 @@ class WzDecoderInfo extends Component {
                   {this.renderDetails(details)}
                 </EuiPanel>
               </EuiFlexItem>
+              {/* Groups */}
+              <EuiFlexItem>
+                <EuiPanel paddingSize="s">
+                  <EuiText color="subdued">Groups</EuiText>
+                  <EuiSpacer size="xs" className="subdued-background" />
+                  <EuiSpacer size="s" />
+                  {this.renderGroups(groups)}
+                </EuiPanel>
+              </EuiFlexItem>
+              {/* Compliance */}
+              {Object.keys(compliance).length > 0 && (
+                <EuiFlexItem>
+                  <EuiPanel paddingSize="s">
+                    <EuiText color="subdued">Compliance</EuiText>
+                    <EuiSpacer size="xs" className="subdued-background" />
+                    <EuiSpacer size="s" />
+                    {this.renderCompliance(compliance)}
+                  </EuiPanel>
+                </EuiFlexItem>
+              )}
             </EuiFlexGroup>
 
             {/* Table */}
@@ -271,7 +382,7 @@ class WzDecoderInfo extends Component {
                     <EuiFlexItem>
                       <EuiTitle size="s">
                         <h5>
-                          Related decoders
+                          Related rules
                       </h5>
                       </EuiTitle>
                     </EuiFlexItem>
@@ -281,12 +392,12 @@ class WzDecoderInfo extends Component {
                     <EuiFlexItem>
                       <EuiInMemoryTable
                         itemId="id"
-                        items={decoders}
+                        items={rules}
                         columns={columns}
                         pagination={true}
                         loading={isLoading}
                         sorting={true}
-                        message={null}
+                        message={false}
                       />
                     </EuiFlexItem>
                   </EuiFlexGroup>
@@ -317,4 +428,4 @@ const mapDispatchToProps = (dispatch) => {
 };
 
 
-export default connect(mapStateToProps, mapDispatchToProps)(WzDecoderInfo);
+export default connect(mapStateToProps, mapDispatchToProps)(WzRuleInfo);

@@ -27,14 +27,17 @@ import {
   updateSortDirection,
   updateSortField,
 } from '../../../../redux/actions/rulesetActions';
+import {
+  updateManagementSection,
+} from '../../../../redux/actions/managementActions';
 
-import checkAdminMode from './utils/check-admin-mode';
+import checkAdminMode from './ruleset/utils/check-admin-mode';
 
 import { WzRequest } from '../../../../react-services/wz-request';
 
 import { connect } from 'react-redux';
 
-class WzRulesetSideMenu extends Component {
+class WzManagementSideMenu extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -73,7 +76,7 @@ class WzRulesetSideMenu extends Component {
     try {
       const currentSection = this.props.state.section;
       if (Object.keys(this.props.state.filters).length && newSection === currentSection) return; // If there's any filter and the section is de same doesn't fetch again
-      this.props.changeSection(newSection);
+      this.props.changeRulesetSection(newSection);
       this.props.updateLoadingStatus(true);
       const result = await this.wzReq.apiReq('GET', this.paths[newSection], {});
       const items = result.data.data.items;
@@ -81,7 +84,7 @@ class WzRulesetSideMenu extends Component {
       const admin = await checkAdminMode();
       this.props.updateAdminMode(admin);
       this.props.toggleShowFiles(false);
-      this.props.changeSection(newSection);
+      this.props.changeRulesetSection(newSection);
       this.props.updateLoadingStatus(false);
     } catch (error) {
       this.props.updateError(error);
@@ -89,6 +92,7 @@ class WzRulesetSideMenu extends Component {
   }
 
   clickMenuItem = async name => {
+    const fromSection = this.state.selectedItemName;
     const section = name;
     if (this.state.selectedItemName !== section) {
       this.setState({
@@ -99,12 +103,14 @@ class WzRulesetSideMenu extends Component {
       this.props.cleanFilters();
       this.props.updateIsProcessing(true);
       this.props.updatePageIndex(0);
-      if (['rules', 'decoders', 'lists'].includes(section)) {
+      const rulesetSections = ['rules', 'decoders', 'lists'];
+      if (rulesetSections.includes(section) && rulesetSections.includes(fromSection)) {
         this.fetchData(section);
-      } else if (section === 'ruleset') {
-        this.fetchData(this.rulesetSections.rules.id);
-      } else if (section === 'groups') {
-        console.log("groups")
+      } else if (rulesetSections.includes(section) && !rulesetSections.includes(fromSection)) {
+        await this.props.changeManagementSection('ruleset');
+        //this.fetchData(section);
+      } else if (section === 'groups' && rulesetSections.includes(fromSection)) {
+        this.props.changeManagementSection('groups');
       }
     }
   };
@@ -162,7 +168,7 @@ const mapStateToProps = (state) => {
 
 const mapDispatchToProps = (dispatch) => {
   return {
-    changeSection: section => dispatch(updateRulesetSection(section)),
+    changeRulesetSection: section => dispatch(updateRulesetSection(section)),
     updateLoadingStatus: status => dispatch(updateLoadingStatus(status)),
     toggleShowFiles: status => dispatch(toggleShowFiles(status)),
     cleanFilters: () => dispatch(cleanFilters()),
@@ -172,9 +178,8 @@ const mapDispatchToProps = (dispatch) => {
     updatePageIndex: pageIndex => dispatch(updatePageIndex(pageIndex)),
     updateSortDirection: sortDirection => dispatch(updateSortDirection(sortDirection)),
     updateSortField: sortField => dispatch(updateSortField(sortField)),
+    changeManagementSection: section => dispatch(updateManagementSection(section)),
   }
 };
 
-
-
-export default connect(mapStateToProps, mapDispatchToProps)(WzRulesetSideMenu);
+export default connect(mapStateToProps, mapDispatchToProps)(WzManagementSideMenu);

@@ -1,4 +1,4 @@
-import { WzRequest } from '../../../../../react-services/wz-request';
+import { WzRequest } from '../../../../../../react-services/wz-request';
 
 /**
  * Check de admin mode and return true or false(if admin mode is not set in the wazuh.yml the default value is true)

@@ -244,29 +244,13 @@ export default class RulesetColumns {
                           aria-label="Delete content"
                           iconType="trash"
                           onClick={() => {
-                            this.showConfirmDelete(item);
+                            this.tableProps.updateListItemsForRemove([item]);
+                            this.tableProps.updateShowModal(true);
                           }}
                           color="danger"
                         />
                       </EuiToolTip>
                     </div>
-                    {(this.removingItem === item.file) && (
-                      <div>
-                        <div>
-                          <span>This file will be removed</span>
-                        </div>
-                        <div>
-                          <EuiButtonEmpty onClick={() => this.removingItem = null}>
-                            Cancel
-                    </EuiButtonEmpty>
-                          <EuiButtonEmpty
-                            color="danger"
-                            onClick={() => { this.confirmDelete(item.name); this.forceUpdate() }}>
-                            Confirm
-    </EuiButtonEmpty>
-                        </div>
-                      </div>
-                    )}
                   </div>
                 )
               }
@@ -316,33 +300,6 @@ export default class RulesetColumns {
       }
     }
 
-    this.confirmDelete = async (item) => {
-      const filesGetter = item.path.includes('/rules') ? this.rulesetHandler.getRulesFiles : this.rulesetHandler.getDecodersFiles
-      await this.rulesetHandler.deleteFile(item.file, item.path);
-      this.tableProps.updateLoadingStatus(true);
-      const items = await filesGetter();
-      this.tableProps.updateLoadingStatus(false);
-    }
-
-    this.showConfirmDelete = (item) => {
-      item.removingItem = true;
-      /*       return (        
-            <EuiOverlayMask>
-              <EuiConfirmModal
-                title={item.file}
-                onCancel={this.closeModal}
-                onConfirm={this.confirmDelete}
-                cancelButtonText="No, don't do it"
-                confirmButtonText="Yes, do it"
-                defaultFocusedButton="confirm">
-                <p>You&rsquo;re about to do something.</p>
-                <p>Are you sure you want to do this?</p>
-              </EuiConfirmModal>
-            </EuiOverlayMask>); */
-      this.removingItem = this.removingItem === item.file ? null : item.file;
-      console.log(this.removingItem)
-      this.buildColumns();
-    }
     this.buildColumns();
   }
 }

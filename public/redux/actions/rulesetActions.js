@@ -17,7 +17,7 @@
 export const updateRulesetSection = (section) => {
   return {
     type: 'UPDATE_RULESET_SECTION',
-    section: section
+    section
   }
 }
 

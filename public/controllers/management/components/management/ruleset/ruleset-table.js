@@ -33,10 +33,10 @@ import {
   updateSortDirection,
   updateSortField,
   updateDefaultItems,
-} from '../../../../redux/actions/rulesetActions';
+} from '../../../../../redux/actions/rulesetActions';
 
 import RulesetColums from './utils/columns';
-import { WzRequest } from '../../../../react-services/wz-request';
+import { WzRequest } from '../../../../../react-services/wz-request';
 
 class WzRulesetTable extends Component {
   constructor(props) {
@@ -67,26 +67,16 @@ class WzRulesetTable extends Component {
   
   async getItems() {
     const { section, showingFiles } = this.props.state;
+
+    if(this.props.state.defaultItems.length === 0 && section === 'lists'){
+      await this.setDefaultItems();
+    }
+
     const rawItems = await this.wzReq(
       'GET',
       `${this.paths[section]}${showingFiles ? '/files': ''}`,
       this.buildFilter(),
     )
-
-    if(this.props.state.defaultItems.length === 0 && section === 'lists'){
-      const requestDefaultItems = await this.wzReq(
-        'GET',
-        '/manager/configuration',
-        {
-          'wait_for_complete' : false,
-          'section': 'ruleset',
-          'field': 'list'
-        }
-      );
-  
-      const defaultItems = ((requestDefaultItems || {}).data || {}).data;
-      this.props.updateDefaultItems(defaultItems);
-    }
 
     const { items, totalItems } = ((rawItems || {}).data || {}).data;
     this.setState({
@@ -95,6 +85,21 @@ class WzRulesetTable extends Component {
       isProcessing: false,
     });
     this.props.updateIsProcessing(false);
+  }
+
+  async setDefaultItems() {
+    const requestDefaultItems = await this.wzReq(
+      'GET',
+      '/manager/configuration',
+      {
+        'wait_for_complete' : false,
+        'section': 'ruleset',
+        'field': 'list'
+      }
+    );
+
+    const defaultItems = ((requestDefaultItems || {}).data || {}).data;
+    this.props.updateDefaultItems(defaultItems);
   }
 
   buildFilter() {
@@ -188,7 +193,7 @@ class WzRulesetTable extends Component {
                 <div>
                   {itemList.map(function(item, i) {
                     return (
-                      <li key={i}>{[item.name]}</li>
+                      <li key={i}>{(item.file)? item.file: item.name}</li>
                     );
                   })}
                 </div>
@@ -205,7 +210,7 @@ class WzRulesetTable extends Component {
   async removeItems(items) {
     this.props.updateLoadingStatus(true);
     const results = items.map(async (item, i) => {
-      await this.rulesetHandler.deleteFile(item.name, item.path);
+      await this.rulesetHandler.deleteFile((item.file)? item.file: item.name, item.path);
     });
 
     Promise.all(results).then((completed) => {

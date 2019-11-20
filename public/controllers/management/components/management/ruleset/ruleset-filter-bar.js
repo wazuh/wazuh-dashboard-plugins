@@ -18,7 +18,7 @@ import {
   updateLoadingStatus,
   updateFilters,
   updateError
-} from '../../../../redux/actions/rulesetActions';
+} from '../../../../../redux/actions/rulesetActions';
 
 import RulesetHandler from './utils/ruleset-handler';
 

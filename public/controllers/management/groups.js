@@ -191,7 +191,7 @@ export class GroupsController {
       );
       const blob = new Blob([output], { type: 'text/csv' }); // eslint-disable-line
 
-      FileSaver.saveAs(blob, 'groups.csv');      
+      FileSaver.saveAs(blob, 'groups.csv');
       return;
     } catch (error) {
       this.errorHandler.handle(error, 'Download CSV');
@@ -718,8 +718,8 @@ export class GroupsController {
         this.loadGroups();
       }
     };
-  };
-
+  }
+  
   /**
    * When clicking in the pencil icon this open the config group editor
    * @param {Group} group 
