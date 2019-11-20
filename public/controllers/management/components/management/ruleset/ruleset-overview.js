@@ -19,7 +19,7 @@ import { connect } from 'react-redux';
 import WzRulesetTable from './ruleset-table';
 import WzRulesetActionButtons from './actions-buttons';
 import './ruleset-overview.css';
-import WzSearchBarFilter from '../../../../components/wz-search-bar/wz-search-bar'
+import WzSearchBarFilter from '../../../../../components/wz-search-bar/wz-search-bar'
 
 class WzRulesetOverview extends Component {
   constructor(props) {
