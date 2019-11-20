@@ -212,6 +212,7 @@ class WzRulesetEditor extends Component {
                     <EuiFlexItem>
                       <EuiCodeEditor
                         width="100%"
+                        height="calc(100vh - 250px)"
                         value={content}
                         onChange={newContent => this.setState({content: newContent})}
                         mode="xml"
