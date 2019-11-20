@@ -193,7 +193,7 @@ class WzRulesetTable extends Component {
                 <div>
                   {itemList.map(function(item, i) {
                     return (
-                      <li key={i}>{[item.name]}</li>
+                      <li key={i}>{(item.file)? item.file: item.name}</li>
                     );
                   })}
                 </div>
@@ -210,7 +210,7 @@ class WzRulesetTable extends Component {
   async removeItems(items) {
     this.props.updateLoadingStatus(true);
     const results = items.map(async (item, i) => {
-      await this.rulesetHandler.deleteFile(item.name, item.path);
+      await this.rulesetHandler.deleteFile((item.file)? item.file: item.name, item.path);
     });
 
     Promise.all(results).then((completed) => {
