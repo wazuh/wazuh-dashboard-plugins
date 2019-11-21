@@ -32,18 +32,15 @@ import {
 import {
   updateManagementSection,
 } from '../../../../redux/actions/managementActions';
-
 import checkAdminMode from './ruleset/utils/check-admin-mode';
-
 import { WzRequest } from '../../../../react-services/wz-request';
-
 import { connect } from 'react-redux';
 
 class WzManagementSideMenu extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      selectedItemName: this.props.section || 'rules'
+      selectedItemName: this.props.section || 'ruleset'
     };
 
     this.managementSections = {
@@ -71,11 +68,18 @@ class WzManagementSideMenu extends Component {
     this.wzReq = WzRequest;
   }
 
+  UNSAFE_componentWillReceiveProps(nextProps) {
+    // You don't have to do this check first, but it can help prevent an unneeded render
+    if (nextProps.section !== this.state.selectedItemName) {
+      this.setState({ selectedItemName: nextProps.section });
+    }
+  }
+
   componentDidMount() {
     // Fetch the data in the first mount
     if (['rules', 'decoders', 'lists'].includes(this.state.selectedItemName)) {
-      this.fetchData(this.managementSections.rules.id);
-    }
+      this.fetchData(this.managementSections.rules.id);    }
+    this.props.changeManagementSection(this.state.selectedItemName);
   }
 
   /**
@@ -118,6 +122,7 @@ class WzManagementSideMenu extends Component {
         this.fetchData(section);
       } else if (managementSections.includes(section) && !managementSections.includes(fromSection)) {
         this.props.changeManagementSection('ruleset');
+        this.props.switchTab('ruleset');
         this.fetchData(section);
       } else if (section === 'groups' && managementSections.includes(fromSection)) {
         this.props.changeManagementSection('groups');

@@ -1,15 +1,6 @@
 <div ng-cloak ng-controller="managementController as mctrl" style="padding-top: 16px">
-    <div layout="row" layout-align="start center" ng-if="mctrl.tab !== 'monitoring' && mctrl.tab === 'configuration'">
+    <div layout="row" layout-align="start center" ng-if="mctrl.tab !== 'monitoring' && mctrl.tab === 'configuration'" class="sideBarContent">
         <div layout-padding class="euiFlexGroup">
-
-            <div layout="row" ng-if="!mctrl.currentConfiguration && mctrl.editionTab !== 'editconfiguration'"
-                class="euiFlexItem">
-                <span class="wz-text-link cursor-pointer euiBreadcrumb"
-                    ng-click="mctrl.switchTab('welcome', true)">Management</span>
-                <span class="euiBreadcrumb"> / </span>
-                <span>{{ mctrl.tabNames[mctrl.tab] }}</span>
-            </div>
-
             <div layout="row" ng-if="mctrl.currentConfiguration || mctrl.editionTab === 'editconfiguration'"
                 class="euiFlexItem">
                 <span class="wz-text-link cursor-pointer euiBreadcrumb"
