@@ -28,6 +28,7 @@ import {
   updatePageIndex,
   updateSortDirection,
   updateSortField,
+  cleanInfo,
 } from '../../../../redux/actions/rulesetActions';
 import {
   updateManagementSection,
@@ -91,6 +92,7 @@ class WzManagementSideMenu extends Component {
       const currentSection = this.props.state.section;
       if (Object.keys(this.props.state.filters).length && newSection === currentSection) return; // If there's any filter and the section is de same doesn't fetch again
       this.props.changeRulesetSection(newSection);
+      this.props.cleanInfo();
       this.props.updateLoadingStatus(true);
       const result = await this.wzReq.apiReq('GET', this.paths[newSection], {});
       const items = result.data.data.items;
@@ -238,6 +240,7 @@ const mapDispatchToProps = (dispatch) => {
     updateSortDirection: sortDirection => dispatch(updateSortDirection(sortDirection)),
     updateSortField: sortField => dispatch(updateSortField(sortField)),
     changeManagementSection: section => dispatch(updateManagementSection(section)),
+    cleanInfo: () => dispatch(cleanInfo()),
   }
 };
 
