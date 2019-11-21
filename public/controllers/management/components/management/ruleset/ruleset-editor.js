@@ -29,6 +29,7 @@ import {
   EuiCallOut,
   EuiFieldText,
   EuiCodeEditor,
+  EuiPanel,
 } from '@elastic/eui';
 
 import RulesetHandler from './utils/ruleset-handler';
@@ -120,28 +121,15 @@ class WzRulesetEditor extends Component {
 
     return (
       <EuiPage style={{ background: 'transparent' }}>
-        <EuiFlexGroup>
-          <EuiFlexItem>
-            {/* File name and back button */}
-            <EuiFlexGroup>
-              <EuiFlexItem>
-                {!addingRulesetFile && (
-                  <EuiTitle>
-                    <h2>
-                      <EuiToolTip position="right" content={`Back to ${section}`}>
-                        <EuiButtonIcon
-                          aria-label="Back"
-                          color="subdued"
-                          iconSize="l"
-                          iconType="arrowLeft"
-                          onClick={() => this.props.cleanInfo()} />
-                      </EuiToolTip>
-                      {nameForSaving}
-                    </h2>
-                  </EuiTitle>
-                ) || (
-                    <EuiFlexGroup>
-                      <EuiFlexItem grow={false}>
+        <EuiPanel>
+          <EuiFlexGroup>
+            <EuiFlexItem>
+              {/* File name and back button */}
+              <EuiFlexGroup>
+                <EuiFlexItem>
+                  {!addingRulesetFile && (
+                    <EuiTitle>
+                      <h2>
                         <EuiToolTip position="right" content={`Back to ${section}`}>
                           <EuiButtonIcon
                             aria-label="Back"
@@ -150,79 +138,95 @@ class WzRulesetEditor extends Component {
                             iconType="arrowLeft"
                             onClick={() => this.props.cleanInfo()} />
                         </EuiToolTip>
-                      </EuiFlexItem>
+                        {nameForSaving}
+                      </h2>
+                    </EuiTitle>
+                  ) || (
+                      <EuiFlexGroup>
+                        <EuiFlexItem grow={false}>
+                          <EuiToolTip position="right" content={`Back to ${section}`}>
+                            <EuiButtonIcon
+                              aria-label="Back"
+                              color="subdued"
+                              iconSize="l"
+                              iconType="arrowLeft"
+                              onClick={() => this.props.cleanInfo()} />
+                          </EuiToolTip>
+                        </EuiFlexItem>
+                        <EuiFlexItem>
+                          <EuiFieldText
+                            style={{ width: '300px' }}
+                            placeholder={`Type your new ${section} file name here`}
+                            value={this.state.inputValue}
+                            onChange={this.onChange}
+                            aria-label="aria-label to prevent react warning"
+                          />
+                        </EuiFlexItem>
+                      </EuiFlexGroup>
+                    )}
+                </EuiFlexItem>
+                <EuiFlexItem />{/* This flex item is for separating between title and save button */}
+                {isEditable && (
+                  <EuiFlexItem grow={false}>
+                    {saveButton}
+                  </EuiFlexItem>
+                )}
+              </EuiFlexGroup>
+              <EuiSpacer size="m" />
+              <EuiFlexGroup>
+                <EuiFlexItem>
+                  {/* If everythin was ok while saving */}
+                  {this.state.savedComplete && (
+                    <EuiFlexGroup>
                       <EuiFlexItem>
-                        <EuiFieldText
-                          style={{ width: '300px' }}
-                          placeholder={`Type your new ${section} file name here`}
-                          value={this.state.inputValue}
-                          onChange={this.onChange}
-                          aria-label="aria-label to prevent react warning"
-                        />
+                        <EuiCallOut color="success" iconType="check" title={`File ${nameForSaving} was successfully saved`} />
                       </EuiFlexItem>
                     </EuiFlexGroup>
                   )}
-              </EuiFlexItem>
-              <EuiFlexItem />{/* This flex item is for separating between title and save button */}
-              {isEditable && (
-                <EuiFlexItem grow={false}>
-                  {saveButton}
+                  {/* If there was any error while saving */}
+                  {this.state.error && (
+                    <EuiFlexGroup>
+                      <EuiFlexItem>
+                        <EuiCallOut color="danger" iconType="cross" title={this.state.error} />
+                      </EuiFlexItem>
+                    </EuiFlexGroup>
+                  )}
+                  {/* If there was any warning while saving */}
+                  {this.state.warning && (
+                    <EuiFlexGroup>
+                      <EuiFlexItem>
+                        <EuiCallOut color="warning">
+                          <span style={{ color: '#c3880a' }}>{this.state.warning.savedMessage}</span>
+                          <EuiToolTip position="top" content={this.state.warning.details}>
+                            <EuiButtonIcon
+                              color="primary"
+                              iconType="questionInCircle"
+                              aria-label="Info about the error"
+                            />
+                          </EuiToolTip>
+                        </EuiCallOut>
+                      </EuiFlexItem>
+                    </EuiFlexGroup>
+                  )}
+                  <EuiFlexGroup>
+                    <EuiFlexItem>
+                      <EuiCodeEditor
+                        width="100%"
+                        height="calc(100vh - 250px)"
+                        value={content}
+                        onChange={newContent => this.setState({content: newContent})}
+                        mode="xml"
+                        isReadOnly={!isEditable}
+                        setOptions={this.codeEditorOptions}
+                        aria-label="Code Editor"
+                      ></EuiCodeEditor>
+                    </EuiFlexItem>
+                  </EuiFlexGroup>
                 </EuiFlexItem>
-              )}
-            </EuiFlexGroup>
-            <EuiSpacer size="m" />
-            <EuiFlexGroup>
-              <EuiFlexItem>
-                {/* If everythin was ok while saving */}
-                {this.state.savedComplete && (
-                  <EuiFlexGroup>
-                    <EuiFlexItem>
-                      <EuiCallOut color="success" iconType="check" title={`File ${nameForSaving} was successfully saved`} />
-                    </EuiFlexItem>
-                  </EuiFlexGroup>
-                )}
-                {/* If there was any error while saving */}
-                {this.state.error && (
-                  <EuiFlexGroup>
-                    <EuiFlexItem>
-                      <EuiCallOut color="danger" iconType="cross" title={this.state.error} />
-                    </EuiFlexItem>
-                  </EuiFlexGroup>
-                )}
-                {/* If there was any warning while saving */}
-                {this.state.warning && (
-                  <EuiFlexGroup>
-                    <EuiFlexItem>
-                      <EuiCallOut color="warning">
-                        <span style={{ color: '#c3880a' }}>{this.state.warning.savedMessage}</span>
-                        <EuiToolTip position="top" content={this.state.warning.details}>
-                          <EuiButtonIcon
-                            color="primary"
-                            iconType="questionInCircle"
-                            aria-label="Info about the error"
-                          />
-                        </EuiToolTip>
-                      </EuiCallOut>
-                    </EuiFlexItem>
-                  </EuiFlexGroup>
-                )}
-                <EuiFlexGroup>
-                  <EuiFlexItem>
-                    <EuiCodeEditor
-                      width="100%"
-                      value={content}
-                      onChange={newContent => this.setState({content: newContent})}
-                      mode="xml"
-                      isReadOnly={!isEditable}
-                      setOptions={this.codeEditorOptions}
-                      aria-label="Code Editor"
-                    ></EuiCodeEditor>
-                  </EuiFlexItem>
-                </EuiFlexGroup>
-              </EuiFlexItem>
-            </EuiFlexGroup>
-          </EuiFlexItem>
-        </EuiFlexGroup>
+              </EuiFlexGroup>
+            </EuiFlexItem>
+          </EuiFlexGroup>
+        </EuiPanel>
       </EuiPage >
     )
   }
