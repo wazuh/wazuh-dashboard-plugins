@@ -126,6 +126,10 @@ export class OverviewController {
         this.appState.setExtensions(api, extensions)
     };
 
+    this.sideNavProps = {
+      switchTab: (newTab, force = false) => this.switchTab(newTab, force)
+    };
+
     this.setTabs();
 
     this.$scope.$on('$destroy', () => {

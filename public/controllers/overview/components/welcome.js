@@ -27,6 +27,16 @@ import {
   EuiFlexGrid,
   EuiCallOut
 } from '@elastic/eui';
+import ciscatIcon from '../../../img/icons/ico_cis.svg';
+import oscapIcon from '../../../img/icons/ico_openscap.svg';
+import virusTotalIcon from '../../../img/icons/ico_virustotal.svg';
+import mitreIcon from '../../../img/icons/ico_mitre.svg';
+import hipaaIcon from '../../../img/icons/ico_hipaa.svg';
+import pciIcon from '../../../img/icons/ico_pci.svg';
+import nistIcon from '../../../img/icons/ico_nist.svg';
+import gdprIcon from '../../../img/icons/ico_gdpr.svg';
+import dockerIcon from '../../../img/icons/ico_docker.svg';
+import osqueryIcon from '../../../img/icons/ico_osquery.svg';
 
 import { TabDescription } from '../../../../server/reporting/tab-description';
 
@@ -149,9 +159,9 @@ export class WelcomeScreen extends Component {
                 {this.props.extensions.audit &&
                   this.buildTabCard('audit', 'monitoringApp')}
                 {this.props.extensions.oscap &&
-                  this.buildTabCard('oscap', 'codeApp')}
+                  this.buildTabCard('oscap', oscapIcon)}
                 {this.props.extensions.ciscat &&
-                  this.buildTabCard('ciscat', 'auditbeatApp')}
+                  this.buildTabCard('ciscat', ciscatIcon)}
               </EuiFlexGrid>
             </EuiPanel>
           </EuiFlexItem>
@@ -174,11 +184,11 @@ export class WelcomeScreen extends Component {
               <EuiFlexGrid columns={2}>
                 {this.buildTabCard('vuls', 'securityApp')}
                 {this.props.extensions.virustotal &&
-                  this.buildTabCard('virustotal', 'savedObjectsApp')}
+                  this.buildTabCard('virustotal', virusTotalIcon)}
                 {this.props.extensions.osquery &&
-                  this.buildTabCard('osquery', 'searchProfilerApp')}
+                  this.buildTabCard('osquery', osqueryIcon)}
                 {this.props.extensions.docker &&
-                  this.buildTabCard('docker', 'spacesApp')}
+                  this.buildTabCard('docker', dockerIcon)}
               </EuiFlexGrid>
             </EuiPanel>
           </EuiFlexItem>
@@ -221,13 +231,13 @@ export class WelcomeScreen extends Component {
                 this.props.extensions.nist) && (
                 <EuiFlexGrid columns={2}>
                   {this.props.extensions.pci &&
-                    this.buildTabCard('pci', 'visTagCloud')}
+                    this.buildTabCard('pci', pciIcon)}
                   {this.props.extensions.gdpr &&
-                    this.buildTabCard('gdpr', 'visBarVertical')}
+                    this.buildTabCard('gdpr', gdprIcon)}
                   {this.props.extensions.hipaa &&
-                    this.buildTabCard('hipaa', 'emsApp')}
+                    this.buildTabCard('hipaa', hipaaIcon)}
                   {this.props.extensions.nist &&
-                    this.buildTabCard('nist', 'apmApp')}
+                    this.buildTabCard('nist', nistIcon)}
                 </EuiFlexGrid>
               )}
             </EuiPanel>
