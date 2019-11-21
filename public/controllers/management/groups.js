@@ -39,6 +39,7 @@ export class GroupsController {
 
   async $onInit() {
     try {
+      this.mctrl = this.scope.mctrl;
       this.addingGroup = false;
       this.load = true;
       // Store a boolean variable to check if come from agents
@@ -58,7 +59,6 @@ export class GroupsController {
       });
 
       this.scope.$on('wazuhShowGroupFile', (ev, parameters) => {
-        console.log('parameters ', parameters)
         ev.stopPropagation();
         if (
           ((parameters || {}).fileName || '').includes('agent.conf') &&
@@ -72,7 +72,7 @@ export class GroupsController {
       this.scope.$on('updateGroupInformation', this.updateGroupInformation());
 
       // Resetting the factory configuration
-      this.scope.$on('$destroy', () => { console.log('destroy') });
+      this.scope.$on('$destroy', () => { });
 
       this.scope.$watch('lookingGroup', value => {
         this.availableAgents = {
@@ -718,6 +718,7 @@ export class GroupsController {
         this.loadGroups();
       }
     }
+    this.mctrl.managementProps.groupsProps = this.groupsTableProps;
   }
   
   /**

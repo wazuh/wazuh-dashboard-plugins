@@ -54,7 +54,7 @@ class WzManagementSideMenu extends Component {
       configuration: { id: 'configuration', text: 'Configuration' },
       statusReports: { id: 'statusReports', text: 'Status and reports' },
       status: { id: 'status', text: 'Status' },
-      cluster: { id: 'cluster', text: 'Cluster' },
+      cluster: { id: 'monitoring', text: 'Cluster' },
       logs: { id: 'logs', text: 'Logs' },
       reporting: { id: 'reporting', text: 'Reporting' },
     };

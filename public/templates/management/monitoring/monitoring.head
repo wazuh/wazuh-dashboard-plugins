@@ -43,6 +43,35 @@
             <react-component name="EuiProgress" props="{size: 'xs', color: 'primary'}" />
         </div>
 
+
+        <!-- Navigation section -->
+        <div layout="row" layout-align="start center" ng-if="!loading">
+            <div layout="row" layout-padding>
+                <div ng-if="showConfig">
+                    <span class="wz-text-link cursor-pointer" ng-click="goBack()">{{ mctrl.tabNames[mctrl.tab] }}</span>
+                    <span> / </span>
+                    <span class="wz-text-link cursor-pointer" ng-click="goBack()">{{ currentAPI }}</span>
+                    <span> / Overview</span>
+                </div>
+                <div ng-if="showNodes && !currentNode">
+                    <span class="wz-text-link cursor-pointer" ng-click="goBack()">{{ mctrl.tabNames[mctrl.tab] }}</span>
+                    <span> / </span>
+                    <span class="wz-text-link cursor-pointer" ng-click="goBack()">{{ currentAPI }}</span>
+                    <span> / </span>
+                    <span>Nodes</span>
+                </div>
+                <div ng-if="currentNode">
+                    <span class="wz-text-link cursor-pointer" ng-click="goBack()">{{ mctrl.tabNames[mctrl.tab] }}</span>
+                    <span> / </span>
+                    <span class="wz-text-link cursor-pointer" ng-click="goBack()">{{ currentAPI }}</span>
+                    <span> / </span>
+                    <span class="wz-text-link cursor-pointer" ng-click="goNodes()">Nodes</span>
+                    <span> / </span>
+                    <span class="wz-text-bold">{{ currentNode.name }}</span>
+                </div>
+            </div>
+        </div>
+        <!-- End navigation section -->
        
 
         <!-- Discover search bar section -->

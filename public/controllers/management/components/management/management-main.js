@@ -39,10 +39,9 @@ class WzManagementMain extends Component {
                     <WzManagementSideMenu section={section} {...this.props}/>
                 </EuiFlexItem>
                 <EuiFlexItem>
-                    <div>
+                    <div style={{margin: '12px 12px 0px 0px'}}>
                         {
-                            section === 'groups' && (<GroupsTable />)
-                            || ruleset.includes(section) && (<WzRuleset />)
+                            ruleset.includes(section) && (<WzRuleset />)
                         }
                     </div>
                 </EuiFlexItem>

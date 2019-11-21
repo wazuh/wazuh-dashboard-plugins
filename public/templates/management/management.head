@@ -1,4 +1,13 @@
 <div ng-cloak ng-controller="managementController as mctrl" style="padding-top: 16px">
+    <!-- Navigation section -->
+    <div layout="row" layout-align="start center" ng-if="mctrl.tab !== 'monitoring' && mctrl.tab !== 'configuration'" class="sideBarContent">
+        <!-- Breadcrumbs -->
+        <div layout="row" layout-padding ng-if="mctrl.tab === 'groups' && mctrl.currentGroup && mctrl.currentGroup.name">
+                <span class="wz-text-link cursor-pointer" ng-click="mctrl.switchTab('groups', true)">{{ mctrl.tabNames[mctrl.tab] }}</span>
+                <span> / {{ mctrl.currentGroup.name }} </span>
+        </div>
+        <!-- End breadcrumbs -->
+    </div>
     <div layout="row" layout-align="start center" ng-if="mctrl.tab !== 'monitoring' && mctrl.tab === 'configuration'" class="sideBarContent">
         <div layout-padding class="euiFlexGroup">
             <div layout="row" ng-if="mctrl.currentConfiguration || mctrl.editionTab === 'editconfiguration'"

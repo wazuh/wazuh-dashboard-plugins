@@ -1,5 +1,5 @@
 <div flex layout="column" ng-class="{'cursor-wait': multipleSelectorLoading}" ng-controller="groupsPreviewController as gp"
-    ng-if="mctrl.tab == 'groups'">
+    ng-if="mctrl.tab == 'groups'" class="sideBarContent">
 
     <!-- Main content -->
     <md-content flex layout="column" class=" overflow-hidden" ng-init="gp.lookingGroup=false">
@@ -11,7 +11,7 @@
 
         <!-- Groups table -->
         <div ng-show="!gp.load" layout="column" ng-if="(!gp.currentGroup || !gp.currentGroup.name) && gp.groupsTableProps && !gp.lookingGroup">
-<!--             <react-component name="GroupsTable" props="gp.groupsTableProps" /> -->
+             <react-component name="GroupsTable" props="gp.groupsTableProps" /> 
         </div>
         
         <!-- Inside the group -->
