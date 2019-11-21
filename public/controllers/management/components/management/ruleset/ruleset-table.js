@@ -19,6 +19,7 @@ import {
 
 import { connect } from 'react-redux';
 import RulesetHandler from './utils/ruleset-handler';
+import { toastNotifications } from 'ui/notify';
 
 import {
   updateLoadingStatus,
@@ -213,6 +214,15 @@ class WzRulesetTable extends Component {
     }
   }
 
+  showToast = (color, title, text, time) => {
+    toastNotifications.add({
+      color: color,
+      title: title,
+      text: text,
+      toastLifeTimeMs: time,
+    });
+  };
+
   async removeItems(items) {
     this.props.updateLoadingStatus(true);
     const results = items.map(async (item, i) => {
@@ -222,6 +232,7 @@ class WzRulesetTable extends Component {
     Promise.all(results).then((completed) => {
       this.props.updateIsProcessing(true);
       this.props.updateLoadingStatus(false);
+      this.showToast('success', 'Success', 'Deleted correctly', 3000);
     });
   }; 
 }
