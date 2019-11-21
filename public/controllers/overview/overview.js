@@ -127,7 +127,8 @@ export class OverviewController {
     };
 
     this.sideNavProps = {
-      switchTab: (newTab, force = false) => this.switchTab(newTab, force)
+      switchTab: (newTab, force = false) => this.switchTab(newTab, force),
+      extensions: this.extensions
     };
 
     this.setTabs();

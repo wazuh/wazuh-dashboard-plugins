@@ -35,8 +35,145 @@ export class OverviewSideNav extends Component {
     };
   }
 
+  getExtensions() {
 
-  render() {
+    /**
+     * navPosition: 
+     * 0 - Security Information Management
+     * 1 - Auditing and policy monitoring
+     * 2 - Threat detection and response
+     * 3 - Regulatory compliance
+     * 
+     * item:
+     * item to be rendered in the EuiSideNav
+     * 
+     *  */ 
+    return {
+      audit: {
+        navPosition: 1,
+        item: {
+          name: 'System auditing',
+          id: 2,
+          onClick: () => {
+            this.props.switchTab('audit');
+          },
+          icon: <EuiIcon type="monitoringApp" />,
+        }
+      },
+      pci: {
+        navPosition: 3,
+        item: {
+          name: 'PCI DSS',
+          id: 1,
+          onClick: () => {
+            this.props.switchTab('pci');
+          },
+          icon: <EuiIcon type={pciIcon} />,
+        },
+      },
+      aws : {
+        navPosition: 0,
+        item: {
+          name: 'Amazon aws',
+          id: 3,
+          onClick: () => {
+            this.props.switchTab('aws');
+          },
+          icon: <EuiIcon type="logoAWSMono" />,
+        }
+      },
+      ciscat: {
+        navPosition: 1,
+        item: {
+          name: 'CIS-CAT',
+          id: 4,
+          onClick: () => {
+            this.props.switchTab('ciscat');
+          },
+          icon: <EuiIcon type={ciscatIcon} />,
+        }
+      },      
+      docker: {
+        navPosition: 2,
+        item: {
+          name: 'Docker listener',
+          id: 4,
+          onClick: () => {
+            this.props.switchTab('docker');
+          },
+          icon: <EuiIcon type={dockerIcon} />,
+        }
+      },
+      gdpr: {
+        navPosition: 3,
+        item: {
+          name: 'GDPR',
+          id: 2,
+          onClick: () => {
+            this.props.switchTab('gdpr');
+          },
+          icon: <EuiIcon type={gdprIcon} />,
+        }
+      },
+      hipaa: {
+        navPosition: 3,
+        item: {
+          name: 'HIPAA',
+          id: 3,
+          onClick: () => {
+            this.props.switchTab('hipaa');
+          },
+          icon: <EuiIcon type={hipaaIcon} />,
+        }
+      },
+      nist: {
+        navPosition: 3,
+        item: {
+          name: 'NIST 800-53',
+          id: 4,
+          onClick: () => {
+            this.props.switchTab('nist');
+          },
+          icon: <EuiIcon type={nistIcon} />,
+        }
+      },
+      oscap: {
+        navPosition: 1,
+        item: {
+          name: 'OpenSCAP',
+          id: 3,
+          onClick: () => {
+            this.props.switchTab('oscap');
+          },
+          icon: <EuiIcon type={oscapIcon} />,
+        },
+      },
+      osquery: {
+        navPosition: 2,
+        item: {
+          name: 'Osquery',
+          id: 3,
+          onClick: () => {
+            this.props.switchTab('osquery');
+          },
+          icon: <EuiIcon type={osqueryIcon} />,
+        }
+      },
+      virustotal: {
+        navPosition: 2,
+        item: {
+          name: 'VirusTotal',
+          id: 2,
+          onClick: () => {
+            this.props.switchTab('virustotal');
+          },
+          icon: <EuiIcon type={virusTotalIcon} />,
+        },
+      },
+    }
+  }
+
+  getInitialSideNav(){
     const sideNav = [
       {
         name: 'Security Information Management',
@@ -58,14 +195,7 @@ export class OverviewSideNav extends Component {
             },
             icon: <EuiIcon type="loggingApp" />,
           },
-          {
-            name: 'Amazon aws',
-            id: 3,
-            onClick: () => {
-              this.props.switchTab('aws');
-            },
-            icon: <EuiIcon type="logoAWSMono" />,
-          },
+          
         ],
       },
       {
@@ -79,30 +209,6 @@ export class OverviewSideNav extends Component {
               this.props.switchTab('pm');
             },
             icon: <EuiIcon type="advancedSettingsApp" />,
-          },
-          {
-            name: 'System auditing',
-            id: 2,
-            onClick: () => {
-              this.props.switchTab('audit');
-            },
-            icon: <EuiIcon type="monitoringApp" />,
-          },
-          {
-            name: 'OpenSCAP',
-            id: 3,
-            onClick: () => {
-              this.props.switchTab('oscap');
-            },
-            icon: <EuiIcon type={oscapIcon} />,
-          },
-          {
-            name: 'CIS-CAT',
-            id: 4,
-            onClick: () => {
-              this.props.switchTab('ciscat');
-            },
-            icon: <EuiIcon type={ciscatIcon} />,
           },
         ],
       },
@@ -118,74 +224,34 @@ export class OverviewSideNav extends Component {
             },
             icon: <EuiIcon type="securityApp" />,
           },
-          {
-            name: 'VirusTotal',
-            id: 2,
-            onClick: () => {
-              this.props.switchTab('virustotal');
-            },
-            icon: <EuiIcon type={virusTotalIcon} />,
-          },
-          {
-            name: 'Osquery',
-            id: 3,
-            onClick: () => {
-              this.props.switchTab('osquery');
-            },
-            icon: <EuiIcon type={osqueryIcon} />,
-          },
-          {
-            name: 'Docker listener',
-            id: 4,
-            onClick: () => {
-              this.props.switchTab('docker');
-            },
-            icon: <EuiIcon type={dockerIcon} />,
-          },
         ],
       },
       {
         name: 'Regulatory compliance',
         id: 4,
         items: [
-          {
-            name: 'PCI DSS',
-            id: 1,
-            onClick: () => {
-              this.props.switchTab('pci');
-            },
-            icon: <EuiIcon type={pciIcon} />,
-          },
-          {
-            name: 'GDPR',
-            id: 2,
-            onClick: () => {
-              this.props.switchTab('gdpr');
-            },
-            icon: <EuiIcon type={gdprIcon} />,
-          },
-          {
-            name: 'HIPAA',
-            id: 3,
-            onClick: () => {
-              this.props.switchTab('hipaa');
-            },
-            icon: <EuiIcon type={hipaaIcon} />,
-          },
-          {
-            name: 'NIST 800-53',
-            id: 4,
-            onClick: () => {
-              this.props.switchTab('nist');
-            },
-            icon: <EuiIcon type={nistIcon} />,
-          },
         ],
       },
     ];
 
+    return sideNav;
+  }
+  
+
+  render() {
+    const extensions = this.getExtensions()
+    let sideNav = this.getInitialSideNav()
+
+    Object.keys(extensions).forEach((key) => {
+      if(this.props.extensions[key] && this.props.extensions[key] === true){
+        const currentExtension = extensions[key]
+        
+        sideNav[currentExtension.navPosition].items.push(currentExtension.item)
+      }
+    })
 
 
+    
     return (
       <div className="wz-overview-sidenav">
         <EuiButtonEmpty href="#">
@@ -204,4 +270,5 @@ export class OverviewSideNav extends Component {
 
 OverviewSideNav.propTypes = {
   switchTab: PropTypes.func,
+  extensions: PropTypes.object
 };

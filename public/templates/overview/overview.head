@@ -16,7 +16,6 @@
             <div ng-class="octrl.tab !== 'welcome' ? 'wz-overview-dashboard' : ''">
                 <!-- Navigation section -->
                 <div layout="row" layout-align="start center"> 
-                    <h1>Security Events</h2>
                     <!-- Separator -->
                     <span flex></span>
                     <!-- End separator -->
