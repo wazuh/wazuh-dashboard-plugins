@@ -11,6 +11,8 @@
  */
 import React, { Component } from 'react';
 import {
+  EuiFlexItem,
+  EuiButtonEmpty,
   EuiSideNav,
   EuiIcon
 } from '@elastic/eui';
@@ -44,14 +46,20 @@ class WzManagementSideMenu extends Component {
       selectedItemName: this.props.section || 'rules'
     };
 
-    this.rulesetSections = {
+    this.managementSections = {
       management: { id: 'management', text: 'Management' },
+      administration: { id: 'administration', text: 'Administration' },
       ruleset: { id: 'ruleset', text: 'Ruleset' },
       rules: { id: 'rules', text: 'Rules' },
       decoders: { id: 'decoders', text: 'Decoders' },
       lists: { id: 'lists', text: 'CDB lists' },
       groups: { id: 'groups', text: 'Groups' },
       configuration: { id: 'configuration', text: 'Configuration' },
+      statusReports: { id: 'statusReports', text: 'Status and reports' },
+      status: { id: 'status', text: 'Status' },
+      cluster: { id: 'cluster', text: 'Cluster' },
+      logs: { id: 'logs', text: 'Logs' },
+      reporting: { id: 'reporting', text: 'Reporting' },
     };
 
     this.paths = {
@@ -65,12 +73,14 @@ class WzManagementSideMenu extends Component {
 
   componentDidMount() {
     // Fetch the data in the first mount
-    this.fetchData(this.rulesetSections.rules.id);
+    if (['rules', 'decoders', 'lists'].includes(this.state.selectedItemName)) {
+      this.fetchData(this.managementSections.rules.id);
+    }
   }
 
   /**
  * Fetch the data for a section: rules, decoders, lists...
- * @param {String} newSection 
+ * @param {String} newSection
  */
   async fetchData(newSection) {
     try {
@@ -91,9 +101,9 @@ class WzManagementSideMenu extends Component {
     }
   }
 
-  clickMenuItem = async name => {
+  clickMenuItem = name => {
     const fromSection = this.state.selectedItemName;
-    const section = name;
+    let section = name;
     if (this.state.selectedItemName !== section) {
       this.setState({
         selectedItemName: section,
@@ -103,14 +113,20 @@ class WzManagementSideMenu extends Component {
       this.props.cleanFilters();
       this.props.updateIsProcessing(true);
       this.props.updatePageIndex(0);
-      const rulesetSections = ['rules', 'decoders', 'lists'];
-      if (rulesetSections.includes(section) && rulesetSections.includes(fromSection)) {
+      const managementSections = ['rules', 'decoders', 'lists'];
+      if (managementSections.includes(section) && managementSections.includes(fromSection)) {
         this.fetchData(section);
-      } else if (rulesetSections.includes(section) && !rulesetSections.includes(fromSection)) {
-        await this.props.changeManagementSection('ruleset');
-        //this.fetchData(section);
-      } else if (section === 'groups' && rulesetSections.includes(fromSection)) {
+      } else if (managementSections.includes(section) && !managementSections.includes(fromSection)) {
+        this.props.changeManagementSection('ruleset');
+        this.fetchData(section);
+      } else if (section === 'groups' && managementSections.includes(fromSection)) {
         this.props.changeManagementSection('groups');
+      } else {
+        if(section === 'cluster'){
+          section = 'monitoring';
+        }
+        this.props.changeManagementSection(section);
+        this.props.switchTab(section);
       }
     }
   };
@@ -127,35 +143,73 @@ class WzManagementSideMenu extends Component {
   };
 
   render() {
-    const sideNav = [
-      this.createItem(this.rulesetSections.management, {
-        icon: <EuiIcon type="indexRollupApp" />,
+    const sideNavAdmin = [
+      this.createItem(this.managementSections.administration, {
+        disabled: true,
+        icon: <EuiIcon type="managementApp" />,
         items: [
-          this.createItem(this.rulesetSections.ruleset, {
+          this.createItem(this.managementSections.ruleset, {
             disabled: true,
-            icon: <EuiIcon type="managementApp" />,
+            icon: <EuiIcon type="indexRollupApp" />,
             forceOpen: true,
             items: [
-              this.createItem(this.rulesetSections.rules),
-              this.createItem(this.rulesetSections.decoders),
-              this.createItem(this.rulesetSections.lists),
+              this.createItem(this.managementSections.rules),
+              this.createItem(this.managementSections.decoders),
+              this.createItem(this.managementSections.lists),
             ],
           }),
-          this.createItem(this.rulesetSections.groups, {
+          this.createItem(this.managementSections.groups, {
             icon: <EuiIcon type="spacesApp" />,
           }),
-          this.createItem(this.rulesetSections.configuration, {
+          this.createItem(this.managementSections.configuration, {
             icon: <EuiIcon type="devToolsApp" />,
           })
         ],
       })
     ];
 
+    const sideNavStatus = [
+      this.createItem(this.managementSections.statusReports, {
+        disabled: true,
+        icon: <EuiIcon type="indexSettings" />,
+        items: [
+          this.createItem(this.managementSections.status, {
+            icon: <EuiIcon type="uptimeApp" />,
+          }),
+          this.createItem(this.managementSections.cluster, {
+            icon: <EuiIcon type="packetbeatApp" />,
+          }),
+          this.createItem(this.managementSections.logs, {
+            icon: <EuiIcon type="filebeatApp" />,
+          }),
+          this.createItem(this.managementSections.reporting, {
+            icon: <EuiIcon type="reportingApp" />,
+          })
+        ],
+      })
+    ];
+
     return (
-      <EuiSideNav
-        items={sideNav}
-        style={{ padding: 16 }}
-      />
+      <div>
+        <EuiFlexItem grow={false}>
+          <EuiButtonEmpty
+            style={{ margin: "0px 6px" }}
+            size="s"
+            onClick={() => this.props.switchTab('welcome')}
+            iconType="arrowLeft"
+            className={'sideMenuButton'}>
+            Management
+        </EuiButtonEmpty>
+        </EuiFlexItem>
+        <EuiSideNav
+          items={sideNavAdmin}
+          style={{ padding: 16 }}
+        />
+        <EuiSideNav
+          items={sideNavStatus}
+          style={{ padding: 16 }}
+        />
+      </div>
     );
   }
 }

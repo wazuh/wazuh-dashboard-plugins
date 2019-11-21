@@ -31,8 +31,8 @@ import { FilesInGroupTable } from './components/files-group-table';
 import { GroupsTable } from './components/management/groups/groups-table';
 import { UploadFiles } from './components/upload-files';
 import WzRuleset from './components/management/ruleset/main-ruleset';
-import WzManagementProvider from './components/management/management-main';
 import WzManagement from './components/management/management-provider';
+import WzManagementMain from './components/management/management-main';
 
 const app = uiModules.get('app/wazuh', []);
 
@@ -55,7 +55,7 @@ app
   .value('UploadFiles', UploadFiles)
   .value('WzRuleset', WzRuleset)
   .value('WzManagement', WzManagement)
-  .value('WzManagementProvider', WzManagementProvider)
+  .value('WzManagementMain', WzManagementMain)
   .value('GroupsTable', GroupsTable)
   .value('AgentsInGroupTable', AgentsInGroupTable)
   .value('FilesInGroupTable', FilesInGroupTable)
