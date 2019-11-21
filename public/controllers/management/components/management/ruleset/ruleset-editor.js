@@ -13,7 +13,8 @@ import React, { Component } from 'react';
 
 import { connect } from 'react-redux';
 import {
-  cleanInfo
+  cleanInfo,
+  updateFileContent,
 } from '../../../../../redux/actions/rulesetActions';
 
 // Eui components
@@ -26,7 +27,6 @@ import {
   EuiToolTip,
   EuiButtonIcon,
   EuiButton,
-  EuiCallOut,
   EuiFieldText,
   EuiCodeEditor,
   EuiPanel,
@@ -35,7 +35,10 @@ import {
 import RulesetHandler from './utils/ruleset-handler';
 import validateConfigAfterSent from './utils/valid-configuration';
 
+import { toastNotifications } from 'ui/notify';
+
 class WzRulesetEditor extends Component {
+  _isMounted = false;
   constructor(props) {
     super(props);
     this.codeEditorOptions = {
@@ -46,13 +49,11 @@ class WzRulesetEditor extends Component {
     }
     this.rulesetHandler = RulesetHandler;
     const { fileContent, addingRulesetFile } = this.props.state;
-    const { name, content, path } = addingRulesetFile ? addingRulesetFile : fileContent;
+    const { name, content, path } = fileContent ? fileContent : addingRulesetFile;
 
     this.state = {
       isSaving: false,
       error: false,
-      savedComplete: false,
-      warning: false,
       inputValue: '',
       content,
       name,
@@ -62,7 +63,12 @@ class WzRulesetEditor extends Component {
 
   componentWillUnmount() {
     // When the component is going to be unmounted its info is clear
+    this._isMounted = false;
     this.props.cleanInfo();
+  }
+
+  componentDidMount() {
+    this._isMounted = true;
   }
 
   /**
@@ -71,9 +77,12 @@ class WzRulesetEditor extends Component {
    * @param {Boolean} overwrite 
    */
   async save(name, overwrite = true) {
+    if (!this._isMounted) {
+      return;
+    }
     try {
       const { content } = this.state
-      this.setState({ isSaving: true, error: false, savedComplete: false });
+      this.setState({ isSaving: true, error: false });
       const { section } = this.props.state;
       let saver = this.rulesetHandler.sendRuleConfiguration; // By default the saver is for rules
       if (section === 'decoders') saver = this.rulesetHandler.sendDecoderConfiguration;
@@ -82,13 +91,38 @@ class WzRulesetEditor extends Component {
         await validateConfigAfterSent();
       } catch (error) {
         const warning = Object.assign(error, { savedMessage: `File ${name} saved, but there were found several error while validating the configuration.` });
-        this.setState({ warning, isSaving: false })
+        this.setState({ isSaving: false });
+        this.goToEdit(name);
+        this.showToast('warning', warning.savedMessage, warning.details, 3000);
         return;
       }
-      this.setState({ savedComplete: true, isSaving: false });
+      this.setState({ isSaving: false });
+      this.goToEdit(name);
+
+      let textSuccess = 'New file successfully created'
+      if(overwrite) {
+        textSuccess = 'File successfully edited'
+      }
+      this.showToast('success', 'Success', textSuccess, 3000);
     } catch (error) {
       this.setState({ error, isSaving: false });
+      this.showToast('danger', 'Error', 'Error saving CDB list: ' + error, 3000);
     }
+  }
+
+  showToast = (color, title, text, time) => {
+    toastNotifications.add({
+      color: color,
+      title: title,
+      text: text,
+      toastLifeTimeMs: time,
+    });
+  };
+
+  goToEdit = (name) => {
+    const { content, path } = this.state;
+    const file = { name: name, content: content, path: path };
+    this.props.updateFileContent(file);
   }
 
   /**
@@ -101,12 +135,12 @@ class WzRulesetEditor extends Component {
   };
 
   render() {
-    const { section, adminMode, addingRulesetFile } = this.props.state;
+    const { section, adminMode, addingRulesetFile, fileContent } = this.props.state;
     const { name, content, path } = this.state;
     const isEditable = addingRulesetFile ? true : (path !== 'ruleset/rules' && path !== 'ruleset/decoders' && adminMode);
     let nameForSaving = addingRulesetFile ? this.state.inputValue : name;
     nameForSaving = name.endsWith('.xml') ? nameForSaving : `${nameForSaving}.xml`;
-    const overwrite = !addingRulesetFile;
+    const overwrite = fileContent ? true : false;
 
     const saveButton = (
       <EuiButton
@@ -127,7 +161,29 @@ class WzRulesetEditor extends Component {
               {/* File name and back button */}
               <EuiFlexGroup>
                 <EuiFlexItem>
-                  {!addingRulesetFile && (
+                  {!fileContent && (
+                    <EuiFlexGroup>
+                    <EuiFlexItem grow={false}>
+                      <EuiToolTip position="right" content={`Back to ${section}`}>
+                        <EuiButtonIcon
+                          aria-label="Back"
+                          color="subdued"
+                          iconSize="l"
+                          iconType="arrowLeft"
+                          onClick={() => this.props.cleanInfo()} />
+                      </EuiToolTip>
+                    </EuiFlexItem>
+                    <EuiFlexItem>
+                      <EuiFieldText
+                        style={{ width: '300px' }}
+                        placeholder={`Type your new ${section} file name here`}
+                        value={this.state.inputValue}
+                        onChange={this.onChange}
+                        aria-label="aria-label to prevent react warning"
+                      />
+                    </EuiFlexItem>
+                  </EuiFlexGroup>
+                  ) || (
                     <EuiTitle>
                       <h2>
                         <EuiToolTip position="right" content={`Back to ${section}`}>
@@ -141,29 +197,7 @@ class WzRulesetEditor extends Component {
                         {nameForSaving}
                       </h2>
                     </EuiTitle>
-                  ) || (
-                      <EuiFlexGroup>
-                        <EuiFlexItem grow={false}>
-                          <EuiToolTip position="right" content={`Back to ${section}`}>
-                            <EuiButtonIcon
-                              aria-label="Back"
-                              color="subdued"
-                              iconSize="l"
-                              iconType="arrowLeft"
-                              onClick={() => this.props.cleanInfo()} />
-                          </EuiToolTip>
-                        </EuiFlexItem>
-                        <EuiFlexItem>
-                          <EuiFieldText
-                            style={{ width: '300px' }}
-                            placeholder={`Type your new ${section} file name here`}
-                            value={this.state.inputValue}
-                            onChange={this.onChange}
-                            aria-label="aria-label to prevent react warning"
-                          />
-                        </EuiFlexItem>
-                      </EuiFlexGroup>
-                    )}
+                  )}
                 </EuiFlexItem>
                 <EuiFlexItem />{/* This flex item is for separating between title and save button */}
                 {isEditable && (
@@ -175,39 +209,6 @@ class WzRulesetEditor extends Component {
               <EuiSpacer size="m" />
               <EuiFlexGroup>
                 <EuiFlexItem>
-                  {/* If everythin was ok while saving */}
-                  {this.state.savedComplete && (
-                    <EuiFlexGroup>
-                      <EuiFlexItem>
-                        <EuiCallOut color="success" iconType="check" title={`File ${nameForSaving} was successfully saved`} />
-                      </EuiFlexItem>
-                    </EuiFlexGroup>
-                  )}
-                  {/* If there was any error while saving */}
-                  {this.state.error && (
-                    <EuiFlexGroup>
-                      <EuiFlexItem>
-                        <EuiCallOut color="danger" iconType="cross" title={this.state.error} />
-                      </EuiFlexItem>
-                    </EuiFlexGroup>
-                  )}
-                  {/* If there was any warning while saving */}
-                  {this.state.warning && (
-                    <EuiFlexGroup>
-                      <EuiFlexItem>
-                        <EuiCallOut color="warning">
-                          <span style={{ color: '#c3880a' }}>{this.state.warning.savedMessage}</span>
-                          <EuiToolTip position="top" content={this.state.warning.details}>
-                            <EuiButtonIcon
-                              color="primary"
-                              iconType="questionInCircle"
-                              aria-label="Info about the error"
-                            />
-                          </EuiToolTip>
-                        </EuiCallOut>
-                      </EuiFlexItem>
-                    </EuiFlexGroup>
-                  )}
                   <EuiFlexGroup>
                     <EuiFlexItem>
                       <EuiCodeEditor
@@ -240,7 +241,8 @@ const mapStateToProps = (state) => {
 
 const mapDispatchToProps = (dispatch) => {
   return {
-    cleanInfo: () => dispatch(cleanInfo())
+    cleanInfo: () => dispatch(cleanInfo()),
+    updateFileContent: content => dispatch(updateFileContent(content)),
   }
 };
 

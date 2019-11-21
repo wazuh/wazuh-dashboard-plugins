@@ -39,6 +39,7 @@ import RulesetColums from './utils/columns';
 import { WzRequest } from '../../../../../react-services/wz-request';
 
 class WzRulesetTable extends Component {
+  _isMounted = false;
   constructor(props) {
     super(props);
     this.wzReq = (...args) => WzRequest.apiReq(...args);
@@ -57,12 +58,17 @@ class WzRulesetTable extends Component {
 
   async componentDidMount() {
     this.props.updateIsProcessing(true);
+    this._isMounted = true;
   }
 
   async componentDidUpdate() {
-    if (this.props.state.isProcessing) {
+    if (this.props.state.isProcessing && this._isMounted) {
       await this.getItems();
     }
+  }
+
+  componentWillUnmount() {
+    this._isMounted = false;
   }
   
   async getItems() {
