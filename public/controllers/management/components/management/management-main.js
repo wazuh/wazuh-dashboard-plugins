@@ -23,7 +23,7 @@ import { GroupsTable } from './groups/groups-table';
 import { changeManagementSection } from '../../../../redux/reducers/managementReducers';
 import { connect } from 'react-redux';
 
-class WzManagement extends Component {
+class WzManagementMain extends Component {
     constructor(props) {
         super(props);
         this.state = {};
@@ -32,16 +32,17 @@ class WzManagement extends Component {
 
     render() {
         const { section } = this.props;
+        const ruleset = ['ruleset', 'rules', 'decoders', 'lists']
         return (
             <EuiFlexGroup>
                 <EuiFlexItem grow={false}>
-                    <WzManagementSideMenu />
+                    <WzManagementSideMenu section={section} {...this.props}/>
                 </EuiFlexItem>
                 <EuiFlexItem>
                     <div>
                         {
                             section === 'groups' && (<GroupsTable />)
-                            || (<WzRuleset />)
+                            || ruleset.includes(section) && (<WzRuleset />)
                         }
                     </div>
                 </EuiFlexItem>
@@ -56,4 +57,4 @@ function mapStateToProps(state) {
     };
 }
 
-export default connect(mapStateToProps, {})(WzManagement);
+export default connect(mapStateToProps, {})(WzManagementMain);

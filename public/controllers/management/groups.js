@@ -80,13 +80,13 @@ export class GroupsController {
           data: [],
           offset: 0,
           loadedAll: false
-        };
+        }
         this.selectedAgents = {
           loaded: false,
           data: [],
           offset: 0,
           loadedAll: false
-        };
+        }
         this.addMultipleAgents(false);
         if (!value) {
           this.file = false;
@@ -98,7 +98,7 @@ export class GroupsController {
       this.exportConfigurationProps = {
         exportConfiguration: enabledComponents => this.exportConfiguration(enabledComponents),
         type: 'group'
-      };
+      }
 
       this.groupsTabsProps = {
         clickAction: tab => {
@@ -110,7 +110,7 @@ export class GroupsController {
         },
         selectedTab: this.groupsSelectedTab || 'agents',
         tabs: [{ id: 'agents', name: 'Agents' }, { id: 'files', name: 'Content' }]
-      };
+      }
 
       this.agentsInGroupTableProps = {
         getAgentsByGroup: group => this.getAgentsByGroup(group),
@@ -119,7 +119,7 @@ export class GroupsController {
         removeAgentFromGroup: (agent, group) => this.removeAgentFromGroup(agent, group),
         goToAgent: agent => this.goToAgent(agent),
         exportConfigurationProps: this.exportConfigurationProps
-      };
+      }
 
       this.filesInGroupTableProps = {
         getFilesFromGroup: group => this.getFilesFromGroup(group),
@@ -133,7 +133,7 @@ export class GroupsController {
     } catch (error) {
       this.errorHandler.handle(error, 'Groups');
     }
-  };
+  }
 
 
   /**
@@ -205,7 +205,7 @@ export class GroupsController {
    */
   search(term) {
     this.scope.$broadcast('wazuhSearch', { term });
-  };
+  }
 
 
   toggle() {
@@ -220,7 +220,7 @@ export class GroupsController {
     this.shareAgent.setAgent(agentId);
     this.location.search('tab', null);
     this.location.path('/agents');
-  };
+  }
 
   /**
    * This load the group information to a given agent
@@ -256,7 +256,7 @@ export class GroupsController {
       this.errorHandler.handle(error, 'Groups');
     }
     return;
-  };
+  }
 
   /**
    * Updates the group information
@@ -293,7 +293,7 @@ export class GroupsController {
     }
     this.scope.$applyAsync();
     return;
-  };
+  }
 
   /**
    * This navigate back to agents overview
@@ -303,7 +303,7 @@ export class GroupsController {
     this.file = false;
     this.filename = false;
     this.scope.$applyAsync();
-  };
+  }
 
   /**
    * This navigate back to files
@@ -316,7 +316,7 @@ export class GroupsController {
     this.filename = false;
     this.fileViewer = false;
     this.scope.$applyAsync();
-  };
+  }
 
   /**
    * This navigate back to groups
@@ -327,7 +327,7 @@ export class GroupsController {
     this.lookingGroup = false;
     this.editingFile = false;
     this.scope.$applyAsync();
-  };
+  }
 
   /**
    * 
@@ -339,7 +339,7 @@ export class GroupsController {
       'groupConfig',
       enabledComponents
     );
-  };
+  }
 
   /**
    * This show us a group file, for a given group and file
@@ -361,7 +361,7 @@ export class GroupsController {
       this.errorHandler.handle(error, 'Groups');
     }
     return;
-  };
+  }
 
   async fetchFile() {
     try {
@@ -379,7 +379,7 @@ export class GroupsController {
     } catch (error) {
       return Promise.reject(error);
     }
-  };
+  }
 
   async editGroupAgentConfig() {
     this.editingFile = true;
@@ -393,7 +393,7 @@ export class GroupsController {
       this.errorHandler.handle(error, 'Fetch file error');
     }
     this.scope.$applyAsync();
-  };
+  }
 
   closeEditingFile() {
     this.editingFile = false;
@@ -401,7 +401,7 @@ export class GroupsController {
     this.scope.$broadcast('closeEditXmlFile', {});
     this.groupsTabsProps.selectedTab = 'files';
     this.scope.$applyAsync();
-  };
+  }
 
   /**
    * Set if the XML is valid
@@ -410,14 +410,14 @@ export class GroupsController {
   xmlIsValid(valid) {
     this.xmlHasErrors = valid;
     this.scope.$applyAsync();
-  };
+  }
 
   doSaveGroupAgentConfig() {
     this.scope.$broadcast('saveXmlFile', {
       group: this.currentGroup.name,
       type: 'group'
     });
-  };
+  }
 
 
   async reload(element, searchTerm, addOffset, start) {
@@ -445,14 +445,14 @@ export class GroupsController {
 
     this.multipleSelectorLoading = false;
     this.scope.$applyAsync();
-  };
+  }
 
   async loadSelectedAgents(searchTerm) {
     try {
       let params = {
         offset: !searchTerm ? this.selectedAgents.offset : 0,
         select: ['id', 'name']
-      };
+      }
       if (searchTerm) {
         params.search = searchTerm;
       }
@@ -463,7 +463,7 @@ export class GroupsController {
       );
       this.totalSelectedAgents = result.data.data.totalItems;
       const mapped = result.data.data.items.map(item => {
-        return { key: item.id, value: item.name };
+        return { key: item.id, value: item.name }
       });
       if (searchTerm) {
         this.selectedAgents.data = mapped;
@@ -482,7 +482,7 @@ export class GroupsController {
       this.errorHandler.handle(error, 'Error fetching group agents');
     }
     this.selectedAgents.loaded = true;
-  };
+  }
 
   async loadAllAgents(searchTerm, start) {
     try {
@@ -490,7 +490,7 @@ export class GroupsController {
         limit: 500,
         offset: !searchTerm ? this.availableAgents.offset : 0,
         select: ['id', 'name']
-      };
+      }
 
       if (searchTerm) {
         params.search = searchTerm;
@@ -510,7 +510,7 @@ export class GroupsController {
           );
         })
         .map(item => {
-          return { key: item.id, value: item.name };
+          return { key: item.id, value: item.name }
         });
 
       if (searchTerm || start) {
@@ -533,7 +533,7 @@ export class GroupsController {
     } catch (error) {
       this.errorHandler.handle(error, 'Error fetching all available agents');
     }
-  };
+  }
 
   async addMultipleAgents(toggle) {
     try {
@@ -544,13 +544,13 @@ export class GroupsController {
           data: [],
           offset: 0,
           loadedAll: false
-        };
+        }
         this.selectedAgents = {
           loaded: false,
           data: [],
           offset: 0,
           loadedAll: false
-        };
+        }
         this.multipleSelectorLoading = true;
         while (!this.selectedAgents.loadedAll) {
           await this.loadSelectedAgents();
@@ -565,7 +565,7 @@ export class GroupsController {
     }
     this.scope.$applyAsync();
     return;
-  };
+  }
 
   getItemsToSave() {
     const original = this.firstSelectedList;
@@ -587,8 +587,8 @@ export class GroupsController {
     const addedIds = [...new Set(this.addedAgents.map(x => x.key))];
     const deletedIds = [...new Set(this.deletedAgents.map(x => x.key))];
 
-    return { addedIds, deletedIds };
-  };
+    return { addedIds, deletedIds }
+  }
 
   /**
    * Re-group the given array depending on the property provided as parameter.
@@ -612,7 +612,7 @@ export class GroupsController {
     } catch (error) {
       return false;
     }
-  };
+  }
 
   async saveAddAgents() {
     const itemsToSave = this.getItemsToSave();
@@ -666,11 +666,11 @@ export class GroupsController {
     }
     this.scope.$applyAsync();
     return;
-  };
+  }
 
   clearFailedErrors() {
     this.failedErrors = false;
-  };
+  }
 
   checkLimit() {
     if (this.firstSelectedList) {
@@ -680,11 +680,11 @@ export class GroupsController {
       this.moreThan500 =
         this.currentAdding > 500 || this.currentDeleting > 500;
     }
-  };
+  }
 
   switchAddingGroup() {
     this.addingGroup = !this.addingGroup;
-  };
+  }
 
 
   async deleteGroup(group) {
@@ -693,7 +693,7 @@ export class GroupsController {
     } catch (error) {
       this.errorHandler.handle(error.message || error);
     }
-  };
+  }
 
 
   buildGroupsTableProps(items) {
@@ -717,7 +717,7 @@ export class GroupsController {
       refresh: () => {
         this.loadGroups();
       }
-    };
+    }
   }
   
   /**
@@ -730,7 +730,7 @@ export class GroupsController {
     this.appState.setNavigation({ status: true });
     this.location.search('navigation', true);
     return this.loadGroup(group).then(() => this.editGroupAgentConfig());
-  };
+  }
 
   /**
    * Returns the agents in a group

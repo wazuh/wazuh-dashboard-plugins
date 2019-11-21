@@ -2,9 +2,9 @@ import React, { Component } from 'react';
 // Redux
 import store from '../../../../redux/store';
 import WzReduxProvider from '../../../../redux/wz-redux-provider';
-import WzManagement from '../management/management-main'
+import WzManagementMain from '../management/management-main'
 
-export default class WzManagementProvider extends Component {
+export default class WzManagement extends Component {
     constructor(props) {
         super(props);
         this.state = {};
@@ -14,7 +14,7 @@ export default class WzManagementProvider extends Component {
     render() {
         return (
             <WzReduxProvider>
-                <WzManagement />
+                <WzManagementMain {...this.props}/>
             </WzReduxProvider>
         )
     }
