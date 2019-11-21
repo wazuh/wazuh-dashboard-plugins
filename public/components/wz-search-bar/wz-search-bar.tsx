@@ -100,15 +100,12 @@ export default class WzSearchBarFilter extends Component {
   }
 
   render() {
-    const popOver = this.renderPopOver();
+    const popOver = this.props.filters ? this.renderPopOver(): null;
     const searchBar = this.renderSearchBar();
     return (
       <EuiFlexGroup>
         <EuiFlexItem grow={false} style={{marginRight: 0}}>
-          {this.props.filters 
-            ? popOver
-            : null
-          }
+          {popOver}
         </EuiFlexItem>
         <EuiFlexItem style={{marginLeft: 0}}>
           {searchBar}
