@@ -122,7 +122,7 @@ class WzManagementSideMenu extends Component {
         this.fetchData(section);
       } else if (managementSections.includes(section) && !managementSections.includes(fromSection)) {
         this.props.changeManagementSection('ruleset');
-        this.props.switchTab('ruleset');
+        this.props.switchTab('rules');
         this.fetchData(section);
       } else if (section === 'groups' && managementSections.includes(fromSection)) {
         this.props.changeManagementSection('groups');
@@ -195,7 +195,7 @@ class WzManagementSideMenu extends Component {
     ];
 
     return (
-      <div>
+      <div style={{ position: 'fixed' }} >
         <EuiFlexItem grow={false}>
           <EuiButtonEmpty
             style={{ margin: "0px 6px" }}
