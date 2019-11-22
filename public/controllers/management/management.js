@@ -156,16 +156,6 @@ export class ManagementController {
       switchTab: (tab, setNav) => this.switchTab(tab, setNav)
     };
 
-    this.rulesetTabsProps = {
-      clickAction: tab => this.setRulesTab(tab),
-      selectedTab: this.rulesetTab || 'rules',
-      tabs: [
-        { id: 'rules', name: 'Rules' },
-        { id: 'decoders', name: 'Decoders' },
-        { id: 'lists', name: 'Lists' }
-      ]
-    };
-
     this.managementTabsProps = {
       clickAction: tab => this.switchTab(tab, true),
       selectedTab: this.tab,
@@ -182,6 +172,12 @@ export class ManagementController {
       close: () => this.openLogtest(),
       showClose: true
     };
+
+    this.managementProps = {
+      switchTab: (section) => this.switchTab(section, true),
+      section: "",
+      groupsProps: {},
+    }
   }
 
   /**
@@ -324,6 +320,7 @@ export class ManagementController {
       this.currentList = false;
       this.managementTabsProps.selectedTab = this.tab;
     }
+    this.managementProps.section = this.tab === 'ruleset' ? this.rulesetTab : this.tab;
     this.$location.search('tab', this.tab);
     this.loadNodeList();
   }
