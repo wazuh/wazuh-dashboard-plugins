@@ -11,110 +11,37 @@
  */
 import React, { Component } from 'react';
 import PropTypes, {InferProps} from 'prop-types';
-import {
-  EuiSearchBar,
-  EuiButtonEmpty,
-  EuiFormRow,
-  EuiPopover,
-  EuiButton,
-  EuiFlexItem,
-  EuiFlexGroup,
-} from '@elastic/eui';
-import { filter } from 'bluebird';
+import { EuiSuggest } from '../eui-suggest';
+import { WzSearchFormatSelector } from './wz-search-format-selector'
 
-interface filter {
-  label: string,
-  value: string,
-}
-export default class WzSearchBarFilter extends Component {
+export default class WzSearchBar extends Component {
   state: {
-    isPopoverOpen: boolean,
-    query: string,
+    searchFormat: string
   }
-  props!: {
-    filters: filter[]
+  props!:{
+    status: string
+    suggestions: JSX.Element
+    onInputChange: Function
   }
+
   constructor(props) {
     super(props);
     this.state = {
-      isPopoverOpen: false,
-      query: '',
+      searchFormat: '?Q'
     }
   }
 
-  closePopover(): void {
-    this.setState({ isPopoverOpen: false });
-  }
-
-  renderPopOver(): JSX.Element {
-    const { query } = this.state;
-    const button = (
-      <EuiButton
-        fill
-        style={{ padding: 12, borderTopRightRadius: 0, borderBottomRightRadius: 0 }}
-        color='primary'
-        onClick={() => {this.setState({ isPopoverOpen:true })}}
-        iconType="logstashFilter"
-        aria-label="Filter">
-        Filters
-      </EuiButton>
-    );
-    return (
-      <EuiPopover
-        id="trapFocus"
-        ownFocus
-        button={button}
-        isOpen={this.state.isPopoverOpen}
-        anchorPosition="downRight"
-        closePopover={this.closePopover.bind(this)}>
-        
-        {this.props.filters.map((filter, idx) => (
-              <div key={idx}>
-                <EuiButtonEmpty size="s"
-                  iconSide='right'
-                  // TODO: Add the logic to applyFilters
-                  onClick={() => this.setState({query:`${query} ${filter.value}:`})}>
-                  {filter.label}
-                </EuiButtonEmpty>
-              </div>
-            )
-          )
-        }
-      </EuiPopover>
-    )
-  }
-
-  renderSearchBar(): JSX.Element {
-    const { query } = this.state
-    return (
-      <EuiFormRow
-        className="wz-form-row"
-        isInvalid={false}
-        error={"Gola"}
-      >
-        <EuiSearchBar
-          onChange={() => {}}
-          query={query} />
-      </EuiFormRow>
-    );
-  }
+  
+  onChangeSearchFormat = (format) => {console.log(format)}
 
   render() {
-    const popOver = this.props.filters ? this.renderPopOver(): null;
-    const searchBar = this.renderSearchBar();
-    return (
-      <EuiFlexGroup>
-        <EuiFlexItem grow={false} style={{marginRight: 0}}>
-          {popOver}
-        </EuiFlexItem>
-        <EuiFlexItem style={{marginLeft: 0}}>
-          {searchBar}
-        </EuiFlexItem>
-      </EuiFlexGroup>
-    )
-  }
-}
+    const {status, suggestions, onInputChange} = this.props
 
-WzSearchBarFilter.propTypes = {
-  filters: PropTypes.array,
+    return <EuiSuggest
+      status={status}
+      append={<WzSearchFormatSelector onChange={this.onChangeSearchFormat}/>}
+      suggestions={suggestions}
+      onInputChange={onInputChange}
+    />;
+  }
 }
