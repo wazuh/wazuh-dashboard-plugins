@@ -37,14 +37,18 @@ import nistIcon from '../../../img/icons/ico_nist.svg';
 import gdprIcon from '../../../img/icons/ico_gdpr.svg';
 import dockerIcon from '../../../img/icons/ico_docker.svg';
 import osqueryIcon from '../../../img/icons/ico_osquery.svg';
+import { ExtensionDetails } from './extension-details';
 
 export class AddNewExtension extends Component {
   constructor(props) {
     super(props);
     this.state = {
       currentTab: '',
-      isShowingExtension: false
+      isShowingExtension: false,
+      currentExtensionData: ''
     };
+    this.closeExtensionDetails = this.closeExtensionDetails.bind(this)
+
     this.extensionsGroups = {
       security: {
         aws: {
@@ -140,132 +144,155 @@ export class AddNewExtension extends Component {
     return (<EuiIcon size="xl" type={this.extensionsGroups[extension]} />)
   }
 
-getExtensions(group) {
-  
-  let extensions = []
-  if(group === 'all'){
-    extensions = {...this.extensionsGroups.security, ...this.extensionsGroups.auditing, ...this.extensionsGroups.threat, ...this.extensionsGroups.regulatory }
-  }else{
-    extensions = this.extensionsGroups[group]
+  getExtensions(group) {
+    
+    let extensions = []
+    if(group === 'all'){
+      extensions = {...this.extensionsGroups.security, ...this.extensionsGroups.auditing, ...this.extensionsGroups.threat, ...this.extensionsGroups.regulatory }
+    }else{
+      extensions = this.extensionsGroups[group]
+    }
+
+    const extensionsPanel = Object.keys(extensions).map((key, index) => {
+      const currentExtension = extensions[key];
+      return(
+        <EuiFlexItem key={index}>
+          <EuiCard
+            layout="horizontal"
+            icon={(<EuiIcon size="xl" type={currentExtension.icon} />) }
+            title={currentExtension.title}
+            description={currentExtension.description}
+            onClick={() => this.setState({currentExtensionData: currentExtension, isShowingExtension: true}) }
+          />
+        </EuiFlexItem>
+      )
+    });
+    return extensionsPanel;
   }
 
-  const extensionsPanel = Object.keys(extensions).map((key, index) => {
-    const currentExtension = extensions[key];
-    return(
-      <EuiFlexItem key={index}>
-         <EuiCard
-          layout="horizontal"
-          icon={(<EuiIcon size="xl" type={currentExtension.icon} />) }
-          title={currentExtension.title}
-          description={currentExtension.description}
-          onClick={() => window.alert('TODO - ' + key)}
+  getTabs() {
+    return [
+      {
+        id: 'all',
+        name: 'All',
+        content: (
+          <Fragment>
+            <EuiSpacer />
+              <EuiFlexGrid columns={4}>
+                {this.getExtensions('all')}
+              </EuiFlexGrid>
+          </Fragment>
+        ),
+      },
+      {
+        id: 'security',
+        name: 'Security information management',
+        content: (
+          <Fragment>
+            <EuiSpacer />
+              <EuiFlexGrid columns={4}>
+                {this.getExtensions('security')}
+              </EuiFlexGrid>
+          </Fragment>
+        ),
+      },
+      {
+        id: 'auditing',
+        name: 'Auditing and policy monitoring',
+        content: (
+          <Fragment>
+            <EuiSpacer />
+              <EuiFlexGrid columns={4}>
+                {this.getExtensions('auditing')}
+              </EuiFlexGrid>
+          </Fragment>
+        ),
+      },
+      {
+        id: 'threat',
+        name: 'Threat detection and response',
+        content: (
+          <Fragment>
+            <EuiSpacer />
+              <EuiFlexGrid columns={4}>
+                {this.getExtensions('threat')}
+              </EuiFlexGrid>
+          </Fragment>
+        ),
+      },
+      {
+        id: 'regulatory',
+        name: 'Regulatory Compliance',
+        content: (
+          <Fragment>
+            <EuiSpacer />
+              <EuiFlexGrid columns={4}>
+                {this.getExtensions('regulatory')}
+              </EuiFlexGrid>
+          </Fragment>
+        ),
+      },
+    ]
+  }
+
+
+
+
+
+
+  showExtensions() {
+    const tabs = this.getTabs()
+
+    return (
+      <EuiTabbedContent
+          tabs={tabs}
+          initialSelectedTab={tabs[0]}
+          autoFocus="initial"
+          onTabClick={tab => {
+            console.log('clicked tab', tab);
+          }}
         />
-      </EuiFlexItem>
     )
-  });
-  return extensionsPanel;
-}
+  }
 
+  showCards(){
+    return (
+      <EuiPage restrictWidth="1100px" style={{ background: 'transparent' }}>
+        <EuiPageBody>
+          <EuiFlexGroup>
+            <EuiFlexItem>
+              <EuiTitle size="l">
+                <h1>Wazuh extensions directory</h1>
+              </EuiTitle>
+            </EuiFlexItem>
+            <EuiFlexItem grow={false}>
+            </EuiFlexItem>
+          </EuiFlexGroup>
+          <EuiSpacer size="m"></EuiSpacer>
+          <EuiFlexGroup>
+            <EuiFlexItem>
+              {this.showExtensions()}
+            </EuiFlexItem>
+          </EuiFlexGroup>
+        </EuiPageBody>
+      </EuiPage>
+      )
+  }
 
-showExtensions() {
-  const tabs = [
-    {
-      id: 'all',
-      name: 'All',
-      content: (
-        <Fragment>
-          <EuiSpacer />
-            <EuiFlexGrid columns={4}>
-              {this.getExtensions('all')}
-            </EuiFlexGrid>
-        </Fragment>
-      ),
-    },
-    {
-      id: 'security',
-      name: 'Security information management',
-      content: (
-        <Fragment>
-          <EuiSpacer />
-            <EuiFlexGrid columns={4}>
-              {this.getExtensions('security')}
-            </EuiFlexGrid>
-        </Fragment>
-      ),
-    },
-    {
-      id: 'auditing',
-      name: 'Auditing and policy monitoring',
-      content: (
-        <Fragment>
-          <EuiSpacer />
-            <EuiFlexGrid columns={4}>
-              {this.getExtensions('auditing')}
-            </EuiFlexGrid>
-        </Fragment>
-      ),
-    },
-    {
-      id: 'threat',
-      name: 'Threat detection and response',
-      content: (
-        <Fragment>
-          <EuiSpacer />
-            <EuiFlexGrid columns={4}>
-              {this.getExtensions('threat')}
-            </EuiFlexGrid>
-        </Fragment>
-      ),
-    },
-    {
-      id: 'regulatory',
-      name: 'Regulatory Compliance',
-      content: (
-        <Fragment>
-          <EuiSpacer />
-            <EuiFlexGrid columns={4}>
-              {this.getExtensions('regulatory')}
-            </EuiFlexGrid>
-        </Fragment>
-      ),
-    },
-  ]
+  closeExtensionDetails(){
+    this.setState(
+      {
+        isShowingExtension: false,
+        currentExtensionData: ''
+      }
+    )
+  }
 
-  return (
-    <EuiTabbedContent
-        tabs={tabs}
-        initialSelectedTab={tabs[0]}
-        autoFocus="initial"
-        onTabClick={tab => {
-          console.log('clicked tab', tab);
-        }}
-      />
-  )
-}
-
-showCards(){
-return (
-  <EuiPage restrictWidth="1100px" style={{ background: 'transparent' }}>
-    <EuiPageBody>
-      <EuiFlexGroup>
-        <EuiFlexItem>
-          <EuiTitle size="l">
-            <h1>Wazuh extensions directory</h1>
-          </EuiTitle>
-        </EuiFlexItem>
-        <EuiFlexItem grow={false}>TODO back button
-        </EuiFlexItem>
-      </EuiFlexGroup>
-      <EuiSpacer size="m"></EuiSpacer>
-      <EuiFlexGroup>
-        <EuiFlexItem>
-          {this.showExtensions()}
-        </EuiFlexItem>
-      </EuiFlexGroup>
-    </EuiPageBody>
-  </EuiPage>
-  )
-}
+  showExtensionDetails(){
+    return(
+      <ExtensionDetails currentExtension={this.state.currentExtensionData} closeExtensionDetails={this.closeExtensionDetails}></ExtensionDetails>
+    )
+  }
 
   render() {
 
@@ -273,6 +300,7 @@ return (
     return (
       <div>
         {(!this.state.isShowingExtension && this.showCards())}
+        {(this.state.isShowingExtension && this.showExtensionDetails())}
       </div>
     );
   }
