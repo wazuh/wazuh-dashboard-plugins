@@ -1,12 +1,5 @@
 import React from 'react';
-import {
-  EuiToolTip,
-  EuiButtonIcon,
-  EuiLink,
-  EuiButtonEmpty,
-  EuiOverlayMask,
-  EuiConfirmModal,
-} from '@elastic/eui';
+import { EuiToolTip, EuiButtonIcon } from '@elastic/eui';
 
 export default class RulesetColumns {
   constructor(tableProps) {
@@ -40,7 +33,6 @@ export default class RulesetColumns {
           name: 'Actions',
           align: 'left',
           render: item => {
-            const defaultItems = this.tableProps.state.defaultItems;
             return (
               <div>
                 <EuiToolTip position="top" content={`View ${item.name} details`}>
@@ -61,9 +53,9 @@ export default class RulesetColumns {
                 <EuiToolTip
                   position="top"
                   content={
-                    defaultItems.indexOf(`${item.path}/${item.name}`) === -1
-                      ? `Delete ${item.name}`
-                      : `The ${item.name} list cannot be deleted`
+                    item.name === 'default'
+                      ? `The ${item.name} group cannot be deleted`
+                      : `Delete ${item.name}`
                   }
                 >
                   <EuiButtonIcon
@@ -74,7 +66,7 @@ export default class RulesetColumns {
                       this.tableProps.updateShowModal(true);
                     }}
                     color="danger"
-                    disabled={defaultItems.indexOf(`${item.path}/${item.name}`) !== -1}
+                    disabled={item.name === 'default'}
                   />
                 </EuiToolTip>
               </div>
