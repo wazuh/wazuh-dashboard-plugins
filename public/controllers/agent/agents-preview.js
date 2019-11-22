@@ -117,10 +117,10 @@ export class AgentsPreviewController {
     //Props
     this.tableAgentsProps = {
       wzReq: (method, path, body) => this.apiReq.request(method, path, body),
-      addingNewAgent: () => {this.addNewAgent(true); this.$scope.$applyAsync()},
-      downloadCsv: (filters = []) => this.downloadCsv(filters),
-      showAgent: (agent) => this.showAgent(agent),
-      clickAction: (item, openAction= false) => {
+      addingNewAgent: () => { this.addNewAgent(true); this.$scope.$applyAsync() },
+      downloadCsv: (filters = []) => { this.downloadCsv(filters); this.$scope.$applyAsync() },
+      showAgent: (agent) => { this.showAgent(agent); this.$scope.$applyAsync() },
+      clickAction: (item, openAction = false) => {
         clickAction(
           item,
           openAction,
@@ -129,10 +129,11 @@ export class AgentsPreviewController {
           this.$location,
           this.$scope,
           this.appState
-        )
+        ); 
+        this.$scope.$applyAsync()
       },
       timeService: (date) => this.timeService.offset(date),
-    } 
+    }
     //Load
     this.load();
   }
@@ -240,7 +241,7 @@ export class AgentsPreviewController {
     }
     this.loading = false;
     this.$scope.$applyAsync();
-    
+
     return;
   }
 
