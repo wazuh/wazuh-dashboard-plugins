@@ -21,7 +21,8 @@ import {
   EuiFlexItem,
   EuiStat,
   EuiTitle,
-  EuiIcon
+  EuiIcon,
+  EuiLoadingSpinner
 } from '@elastic/eui';
 import * as d3 from "d3";
 import { AgentsTable } from './agents-table'
@@ -30,10 +31,11 @@ export class AgentsPreview extends Component {
 
   constructor(props) {
     super(props);
-    this.state = { data: [] }
+    this.state = { data: [], loading: false }
   }
 
-  initialize() {
+  async initialize() {
+    this.setState({ loading: true });
     d3.select("body").append("div")
       .attr("class", "tooltip-donut")
       .style("display", 'none')
@@ -43,7 +45,8 @@ export class AgentsPreview extends Component {
       .style("border-radius", '5px')
       .style("z-index", 100)
       .style("border", '1px solid #D3DAE6');
-    this.getSummary();
+    await this.getSummary();
+    this.setState({ loading: false });
   }
 
   componentDidMount() {
@@ -65,6 +68,7 @@ export class AgentsPreview extends Component {
       this.lastAgent = lastAgent.data.data.items[0];
       this.summary = this.groupBy(result.data.data.items, 'status');
       this.agentsCoverity = this.totalAgents ? ((this.summary['Active'] || []).length / this.totalAgents) * 100 : 0;
+      this.mostActiveAgent = await this.props.tableProps.getMostActive();
       const model = [
         { id: 'active', label: "Active", value: (this.summary['Active'] || []).length },
         { id: 'disconnected', label: "Disconnected", value: (this.summary['Disconnected'] || []).length },
@@ -86,7 +90,6 @@ export class AgentsPreview extends Component {
 
     return (
       <EuiPage>
-
         <EuiFlexGroup>
           <EuiFlexItem grow={false} style={{ width: 300 }}>
             <EuiPanel>
@@ -100,24 +103,30 @@ export class AgentsPreview extends Component {
                   </EuiTitle>
                 </EuiFlexItem>
               </EuiFlexGroup>
-              <svg width={266} height={150}>
-                <g transform={`translate(${133} ${70})`}>
-                  {data.map((d, i) => (
-                    <Slice key={i}
-                      innerRadius={60}
-                      outerRadius={40}
-                      cornerRadius={3}
-                      padAngle={0.025}
-                      value={d}
-                      label={d.id}
-                      fill={colors[i]} />
-                  ))}
-                </g>
-              </svg>
+              {(this.state.loading &&
+                <EuiFlexItem>
+                  <EuiLoadingSpinner style={{ margin: '6px auto' }} size="xl" />
+                </EuiFlexItem>
+              )}
+              {((this.totalAgents > 0 && !this.state.loading) &&
+                <svg width={266} height={150}>
+                  <g transform={`translate(${133} ${70})`}>
+                    {data.map((d, i) => (
+                      <Slice key={i}
+                        innerRadius={60}
+                        outerRadius={40}
+                        cornerRadius={3}
+                        padAngle={0.025}
+                        value={d}
+                        label={d.id}
+                        fill={colors[i]} />
+                    ))}
+                  </g>
+                </svg>
+              )}
               {(this.summary &&
                 <div>
                   <EuiFlexGroup>
-
                     <EuiFlexItem>
                       <EuiStat
                         title={this.totalAgents}
@@ -156,26 +165,30 @@ export class AgentsPreview extends Component {
                 </div>
               )}
             </EuiPanel>
-            <EuiPanel style={{ marginTop: 12 }}>
-              <EuiFlexGroup>
-                <EuiFlexItem grow={false}>
-                  <EuiIcon size={'l'} type={'dataVisualizer'} />
-                </EuiFlexItem>
-                <EuiFlexItem style={{ marginLeft: 0 }}>
-                  <EuiTitle size={'s'}>
-                    <h2>Details</h2>
-                  </EuiTitle>
-                </EuiFlexItem>
-              </EuiFlexGroup>
-              {(this.agentsCoverity &&
-                <div>
-                  <EuiStat style={{ paddingTop: 10 }}
-                    title=''
-                    textAlign="center"
-                    description="Agents coverage"
-                    titleColor="primary"
-                  />
-                  <ProgressChart width={266} height={125} percent={this.agentsCoverity}></ProgressChart>
+            {(this.totalAgents > 0 &&
+              <EuiPanel style={{ marginTop: 12 }}>
+                <EuiFlexGroup>
+                  <EuiFlexItem grow={false}>
+                    <EuiIcon size={'l'} type={'dataVisualizer'} />
+                  </EuiFlexItem>
+                  <EuiFlexItem style={{ marginLeft: 0 }}>
+                    <EuiTitle size={'s'}>
+                      <h2>Details</h2>
+                    </EuiTitle>
+                  </EuiFlexItem>
+                </EuiFlexGroup>
+                {((this.agentsCoverity > 0 && !this.state.loading) &&
+                  <div>
+                    <EuiStat style={{ paddingTop: 10 }}
+                      title=''
+                      textAlign="center"
+                      description="Agents coverage"
+                      titleColor="primary"
+                    />
+                    <ProgressChart width={266} height={125} percent={this.agentsCoverity}></ProgressChart>
+                  </div>
+                )}
+                {(this.lastAgent &&
                   <EuiFlexGroup style={{ marginTop: 0 }}>
                     <EuiFlexItem>
                       <EuiStat
@@ -189,22 +202,24 @@ export class AgentsPreview extends Component {
                       />
                     </EuiFlexItem>
                   </EuiFlexGroup>
+                )}
+                {(this.mostActiveAgent &&
                   <EuiFlexGroup>
                     <EuiFlexItem>
                       <EuiStat
                         className='euiStatLink'
-                        title='agent'
+                        title={this.mostActiveAgent.name}
                         titleSize="s"
                         textAlign="center"
                         description="Most active agent"
                         titleColor="primary"
-                        onClick={() => this.props.tableProps.showAgent(this.lastAgent)}
+                        onClick={() => this.props.tableProps.showAgent(this.mostActiveAgent)}
                       />
                     </EuiFlexItem>
                   </EuiFlexGroup>
-                </div>
-              )}
-            </EuiPanel>
+                )}
+              </EuiPanel>
+            )}
           </EuiFlexItem>
           <EuiFlexItem style={{ 'marginLeft': 4 }}>
             <AgentsTable
