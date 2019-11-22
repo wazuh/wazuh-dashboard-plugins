@@ -33,7 +33,6 @@ import {
   updatePageIndex,
 } from '../../../../../redux/actions/rulesetActions';
 
-import { WzRequest } from '../../../../../react-services/wz-request';
 import exportCsv from '../../../../../react-services/wz-csv';
 import GroupsHandler from './utils/groups-handler';
 import { toastNotifications } from 'ui/notify';
@@ -46,8 +45,6 @@ class WzGroupsActionButtons extends Component {
 
     this.state = { generatingCsv: false, isPopoverOpen: false, newGroupName: '' };
     this.exportCsv = exportCsv;
-
-    this.wzReq = (...args) => WzRequest.apiReq(...args);
 
     this.groupsHandler = GroupsHandler;
     this.refreshTimeoutId = null;
@@ -143,7 +140,7 @@ class WzGroupsActionButtons extends Component {
   async createGroup() {
     try {
       this.props.updateLoadingStatus(true);
-      const saver = await this.wzReq('PUT', `/agents/groups/${this.state.newGroupName}`, {});
+      await this.groupsHandler.saveGroup(this.state.newGroupName);
       this.showToast('success', 'Success', 'The group has been created correctly', 2000);
       this.clearGroupName();
 

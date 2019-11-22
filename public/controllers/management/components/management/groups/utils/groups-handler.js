@@ -14,13 +14,26 @@ import { WzRequest } from '../../../../../../react-services/wz-request';
 
 export default class GroupsHandler {
   /**
+   * Save a new group
+   * @param {String} name
+   */
+  static async saveGroup(name) {
+    try {
+      const result = await WzRequest.apiReq('PUT', `/agents/groups/${name}`, {});
+      return result;
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  }
+
+  /**
    * Delete a group
-   * @param {String} name 
+   * @param {String} name
    */
   static async deleteGroup(name) {
     try {
       const result = await WzRequest.apiReq('DELETE', '/agents/groups', {
-        ids: name
+        ids: name,
       });
       return result;
     } catch (error) {
