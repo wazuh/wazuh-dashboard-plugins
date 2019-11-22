@@ -96,6 +96,16 @@ export class ConfigurationGroupsController {
     this.$scope.switchAddingGroup = () => {
       this.$scope.addingGroup = !this.$scope.addingGroup;
     };
+    this.$scope.createGroup = async name => {
+      try {
+        this.$scope.addingGroup = false;
+        await this.groupHandler.createGroup(name);
+        this.errorHandler.info(`Group ${name} has been created`);
+      } catch (error) {
+        this.errorHandler.handle(error.message || error);
+      }
+      this.$scope.$broadcast('wazuhSearch', {});
+    };
 
     this.$scope.closeEditingFile();
     this.$scope.selectData;

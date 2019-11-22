@@ -1,0 +1,5 @@
+<div flex ng-if="!loading && mctrl.globalRulesetTab == 'decoders' && !mctrl.managingFiles" class="" ng-controller="decodersController as dctrl" layout="column" id="rulesContainer" layout-align="start space-around">
+
+    <div ng-if="loading" class="md-padding wz-margin-top-16">
+        <react-component name="EuiProgress" props="{size: 'xs', color: 'primary'}" />
+    </div>

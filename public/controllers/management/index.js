@@ -25,15 +25,8 @@ import { ConfigurationGroupsController } from './config-groups';
 import { EditionController } from './edition';
 import { FilesController } from './files';
 import { WelcomeScreen } from './components/welcome';
-import { WelcomeWrapper } from './components/welcome-wrapper';
 import { ReportingTable } from './components/reporting-table';
-import { AgentsInGroupTable } from './components/agents-groups-table';
-import { FilesInGroupTable } from './components/files-group-table';
-import { GroupsTable } from './components/management/groups/groups-table';
 import { UploadFiles } from './components/upload-files';
-import WzRuleset from './components/management/ruleset/main-ruleset';
-import WzManagement from './components/management/management-provider';
-import WzManagementMain from './components/management/management-main';
 
 const app = uiModules.get('app/wazuh', []);
 
@@ -50,15 +43,7 @@ app
   .controller('configurationRulesetController', ConfigurationRulesetController)
   .controller('configurationGroupsController', ConfigurationGroupsController)
   .controller('editionController', EditionController)
-  .controller('filesController', FilesController)  
+  .controller('filesController', FilesController)
   .value('WelcomeScreenManagement', WelcomeScreen)
-  .value('WelcomeWrapper', WelcomeWrapper)
   .value('ReportingTable', ReportingTable)
-  .value('UploadFiles', UploadFiles)
-  .value('WzRuleset', WzRuleset)
-  .value('WzManagement', WzManagement)
-  .value('WzManagementMain', WzManagementMain)
-  .value('GroupsTable', GroupsTable)
-  .value('AgentsInGroupTable', AgentsInGroupTable)
-  .value('FilesInGroupTable', FilesInGroupTable)
   .value('UploadFiles', UploadFiles);

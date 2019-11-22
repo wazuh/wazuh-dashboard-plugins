@@ -13,31 +13,12 @@ export class RulesetHandler {
   constructor(apiReq) {
     this.apiReq = apiReq;
   }
-
-  async getRules(filter = {}) {
-    try {
-      const result = await this.apiReq.request('GET', `/rules`, filter);
-      return ((result || {}).data || {}).data || false;
-    } catch (error) {
-      return Promise.reject(error);
-    }
-  }
-
-  async getDecoders(filter = {}) {
-    try {
-      const result = await this.apiReq.request('GET', `/decoders`, filter);
-      return ((result || {}).data || {}).data || false;
-    } catch (error) {
-      return Promise.reject(error);
-    }
-  }
-
   async getLocalRules() {
     try {
       const result = await this.apiReq.request('GET', `/rules`, {
         path: 'etc/rules'
       });
-      return ((result || {}).data || {}).data || false;
+      return result;
     } catch (error) {
       return Promise.reject(error);
     }
@@ -48,7 +29,7 @@ export class RulesetHandler {
       const result = await this.apiReq.request('GET', `/decoders`, {
         path: 'etc/decoders'
       });
-      return ((result || {}).data || {}).data || false;
+      return result;
     } catch (error) {
       return Promise.reject(error);
     }
@@ -83,7 +64,7 @@ export class RulesetHandler {
       const result = await this.apiReq.request('GET', `/manager/files`, {
         path: path
       });
-      return ((result || {}).data || {}).data || false;
+      return result;
     } catch (error) {
       return Promise.reject(error);
     }

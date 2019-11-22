@@ -105,6 +105,7 @@ export class AgentsPreviewController {
       getCurrentApiAddress: () => this.getCurrentApiAddress(),
       needsPassword: () => this.needsPassword()
     };
+
     this.hasAgents = true;
     this.init = false;
     const instance = new DataFactory(

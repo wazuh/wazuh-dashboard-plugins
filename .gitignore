@@ -65,5 +65,3 @@ package-lock.json
 build/
 
 yarn.lock
-
-server/wazuh-registry.json
