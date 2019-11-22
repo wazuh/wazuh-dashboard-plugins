@@ -75,7 +75,7 @@ export class AgentsTable extends Component {
 
   async componentDidMount() {
     await this.getItems();
-    const filterStatus = await this.filterBarModelStatus();
+    const filterStatus = this.filterBarModelStatus();
     const filterGroups = await this.filterBarModelGroups();
     const filterOs = await this.filterBarModelOs();
     const filterVersion = await this.filterBarModelWazuhVersion();
@@ -90,14 +90,17 @@ export class AgentsTable extends Component {
       filterNodes,
     });
   }
-  
-  async componentDidUpdate() {
+
+  async componentDidUpdate(prevProps, prevState) {
     if (this.state.isProcessing) {
+      const {q, search} = this.state;
+      const {q: prevQ, search: prevSearch} = prevState;
+      if (prevQ !== q || prevSearch !== search) {
+        this.setState({pageIndex: 0});
+      }
       await this.getItems();
     }
-
   }
-
 
   async getItems() {
     const rawAgents = await this.props.wzReq(
@@ -136,7 +139,7 @@ export class AgentsTable extends Component {
 
     const field = (sortField === 'os_name') ? '' : sortField;
     const direction = (sortDirection === 'asc') ? '+' : '-';
-    
+
     return direction+field;
   }
 
@@ -148,7 +151,7 @@ export class AgentsTable extends Component {
   formatAgent(agent) {
     const checkField = (field) => { return (field !== undefined) ? field : "-"; };
     const lastKeepAlive = (date, timeService) => { return (date !== undefined) ? timeService(date) : "-"; };
-    const agentVersion = (agent.version !== undefined) ? agent.version.split(' ')[1] : "."; 
+    const agentVersion = (agent.version !== undefined) ? agent.version.split(' ')[1] : ".";
     const { timeService } = this.props;
     return {
       "id": agent,
@@ -157,7 +160,6 @@ export class AgentsTable extends Component {
       "status": agent.status,
       "group": checkField(agent.group),
       "os_name": agent,
-      // "os_name": checkField(((agent || {}).os || {}).name) + checkField(((agent || {}).os || {}).version),
       "version": agentVersion,
       "dateAdd": timeService(agent.dateAdd),
       "lastKeepAlive": lastKeepAlive(agent.lastKeepAlive, timeService),
@@ -213,7 +215,7 @@ export class AgentsTable extends Component {
     } else if ((os || {}).platform === 'darwin') {
       icon = 'apple'
     }
-    const os_name = checkField(((agent || {}).os || {}).name) 
+    const os_name = checkField(((agent || {}).os || {}).name)
       + checkField(((agent || {}).os || {}).version);
 
     return (
@@ -236,7 +238,7 @@ export class AgentsTable extends Component {
     };
 
     return (
-      <span className="euiTableCellContent__text euiTableCellContent--truncateText">    
+      <span className="euiTableCellContent__text euiTableCellContent--truncateText">
         <EuiHealth color={color(status)}></EuiHealth> {status}
       </span>
     );
@@ -252,7 +254,7 @@ export class AgentsTable extends Component {
     return (
       <EuiFlexItem grow={false}>
         <EuiButtonEmpty iconType="importAction" onClick={this.downloadCsv}>
-          Formatted          
+          Formatted
         </EuiButtonEmpty>
       </EuiFlexItem>
     );
@@ -385,7 +387,7 @@ export class AgentsTable extends Component {
 
   async filterBarModelOs() {
     const rawOs = await this.props.wzReq(
-      'GET', 
+      'GET',
       '/agents/stats/distinct?pretty',
       {
         'fields':'os.name,os.version',
@@ -393,7 +395,7 @@ export class AgentsTable extends Component {
       }
     );
     const itemsOs = (((rawOs || {}).data || {}).data || {}).items;
-    const os = itemsOs 
+    const os = itemsOs
       .filter((item) => { return Object.keys(item).includes('os') })
       .map((item) => {
         const { name, version } = item.os;
@@ -411,7 +413,7 @@ export class AgentsTable extends Component {
 
   async filterBarModelOsPlatform() {
     const rawOsPlatform = await this.props.wzReq(
-      'GET', 
+      'GET',
       '/agents/stats/distinct?pretty',
       {
         'fields':'os.platform',
@@ -419,7 +421,7 @@ export class AgentsTable extends Component {
       }
     );
     const itemsOsPlatform = (((rawOsPlatform || {}).data || {}).data || {}).items;
-    const osPlatform = itemsOsPlatform 
+    const osPlatform = itemsOsPlatform
       .filter((item) => { return Object.keys(item).includes('os') })
       .map((item) => {
         const { platform } = item.os;
@@ -437,7 +439,7 @@ export class AgentsTable extends Component {
 
   async filterBarModelNodes() {
     const rawNodes = await this.props.wzReq(
-      'GET', 
+      'GET',
       '/agents/stats/distinct?pretty',
       {
         'fields':'node_name',
@@ -445,7 +447,7 @@ export class AgentsTable extends Component {
       }
     );
     const itemsNodes = (((rawNodes || {}).data || {}).data || {}).items;
-    const nodes = itemsNodes 
+    const nodes = itemsNodes
       .filter((item) => { return Object.keys(item).includes('node_name') })
       .map((item) => {
         const { node_name } = item;
