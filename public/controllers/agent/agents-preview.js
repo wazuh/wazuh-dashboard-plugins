@@ -116,9 +116,11 @@ export class AgentsPreviewController {
     //Props
     this.tableAgentsProps = {
       wzReq: (method, path, body) => this.apiReq.request(method, path, body),
-      addingNewAgent: () => this.addNewAgent(true),
-      downloadCsv: (filters = []) => this.downloadCsv(filters),
-      clickAction: (item, openAction= false) => {
+      addingNewAgent: () => { this.addNewAgent(true); this.$scope.$applyAsync() },
+      downloadCsv: (filters = []) => { this.downloadCsv(filters); this.$scope.$applyAsync() },
+      showAgent: (agent) => { this.showAgent(agent); this.$scope.$applyAsync() },
+      getMostActive: async () => { return await this.getMostActive() },
+      clickAction: (item, openAction = false) => {
         clickAction(
           item,
           openAction,
@@ -127,10 +129,11 @@ export class AgentsPreviewController {
           this.$location,
           this.$scope,
           this.appState
-        )
+        );
+        this.$scope.$applyAsync()
       },
       timeService: (date) => this.timeService.offset(date),
-    } 
+    }
     //Load
     this.load();
   }
@@ -179,6 +182,26 @@ export class AgentsPreviewController {
     return;
   }
 
+  async getMostActive() {
+    try {
+      const data = await this.genericReq.request(
+        'GET',
+        `/elastic/top/${this.firstUrlParam}/${this.secondUrlParam}/agent.name/${this.pattern}`
+      )
+      this.mostActiveAgent.name = data.data.data;
+      const info = await this.genericReq.request(
+        'GET',
+        `/elastic/top/${this.firstUrlParam}/${this.secondUrlParam}/agent.id/${this.pattern}`
+      );
+      if (info.data.data === '' && this.mostActiveAgent.name !== '') {
+        this.mostActiveAgent.id = '000';
+      } else {
+        this.mostActiveAgent.id = info.data.data;
+      }
+      return this.mostActiveAgent;
+    } catch (error) { }
+  }
+
   /**
    * On controller loads
    */
@@ -190,78 +213,22 @@ export class AgentsPreviewController {
       this.$scope.adminMode = !!(configuration || {}).admin;
 
       const clusterInfo = this.appState.getClusterInfo();
-      const firstUrlParam =
+      this.firstUrlParam =
         clusterInfo.status === 'enabled' ? 'cluster' : 'manager';
-      const secondUrlParam = clusterInfo[firstUrlParam];
+      this.secondUrlParam = clusterInfo[this.firstUrlParam];
 
-      const pattern = this.appState.getCurrentPattern();
-
-      const data = await Promise.all([
-        this.genericReq.request('GET', '/api/agents-unique/' + this.api, {}),
-        this.genericReq.request(
-          'GET',
-          `/elastic/top/${firstUrlParam}/${secondUrlParam}/agent.name/${pattern}`
-        )
-      ]);
-      const [agentsUnique, agentsTop] = data;
-      const unique = agentsUnique.data.result;
-
-
-      this.lastAgent = unique.lastAgent;
-      this.summary = unique.summary;
-      if (!this.lastAgent || !this.lastAgent.id) {
-        if (this.addingNewAgent === undefined) {
-          this.addNewAgent(true);
-        }
-        this.hasAgents = false;
-      } else {
-        this.hasAgents = true;
-      }
-
-      if (agentsTop.data.data === '') {
-        this.mostActiveAgent.name = this.appState.getClusterInfo().manager;
-        this.mostActiveAgent.id = '000';
-      } else {
-        this.mostActiveAgent.name = agentsTop.data.data;
-        const info = await this.genericReq.request(
-          'GET',
-          `/elastic/top/${firstUrlParam}/${secondUrlParam}/agent.id/${pattern}`
-        );
-        if (info.data.data === '' && this.mostActiveAgent.name !== '') {
-          this.mostActiveAgent.id = '000';
-        } else {
-          this.mostActiveAgent.id = info.data.data;
-        }
-      }
+      this.pattern = this.appState.getCurrentPattern();
     } catch (error) {
       this.errorInit = this.errorHandler.handle(error, false, false, true);
     }
     this.loading = false;
     this.$scope.$applyAsync();
-    
+
     return;
   }
 
   addNewAgent(flag) {
     this.addingNewAgent = flag;
-  }
-
-  reloadList() {
-    this.refreshAgentsStats();
-  }
-
-  async refreshAgentsStats() {
-    try {
-      const data = await this.genericReq.request(
-        'GET',
-        '/api/agents-unique/' + this.api,
-        {}
-      );
-      this.summary = ((data.data || {}).result || {}).summary || {};
-    } catch (error) {
-      this.errorHandler.handle('Error refreshing agents stats');
-    }
-    this.$scope.$broadcast('reloadSearchFilterBar', {});
   }
 
   openRegistrationDocs() {
