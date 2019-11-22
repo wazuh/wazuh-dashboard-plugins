@@ -152,7 +152,6 @@ class WzGroupsActionButtons extends Component {
       this.props.updateLoadingStatus(false);
       this.closePopover();
     } catch (error) {
-      console.log('Error', error);
       this.props.updateLoadingStatus(false);
       this.showToast(
         'danger',
@@ -161,6 +160,26 @@ class WzGroupsActionButtons extends Component {
         2000
       );
     }
+  }
+
+  /**
+   * Generates a CSV
+   */
+  async generateCsv() {
+    try {
+      this.setState({ generatingCsv: true });
+      const { section, filters } = this.props.state; //TODO get filters from the search bar from the REDUX store
+      await this.exportCsv('/agents/groups', filters, 'Groups');
+      this.showToast('success', 'Success', 'CSV. Your download should begin automatically...', 2000);
+    } catch (error) {
+      this.showToast(
+        'danger',
+        'Error',
+        `Error when exporting the CSV file: ${error}`,
+        2000
+      );
+    }
+    this.setState({ generatingCsv: false });
   }
 
   showToast = (color, title, text, time) => {
@@ -172,6 +191,20 @@ class WzGroupsActionButtons extends Component {
     });
   };
 
+  /* <EuiFlexItem grow={false}>
+              <EuiButtonEmpty
+                iconType="exportAction"
+                onClick={async () => await this.props.export([this.filters])}
+              >
+                Export formatted
+            </EuiButtonEmpty>
+            </EuiFlexItem>
+            <EuiFlexItem grow={false}>
+              <EuiButtonEmpty iconType="refresh" onClick={() => this.refresh()}>
+                Refresh
+            </EuiButtonEmpty>
+            </EuiFlexItem> */
+
   render() {
     const { section, showingFiles, adminMode } = this.props.state;
 
@@ -179,6 +212,17 @@ class WzGroupsActionButtons extends Component {
     const newGroupButton = (
       <EuiButtonEmpty iconSide="left" iconType="plusInCircle" onClick={() => this.togglePopover()}>
         Add new groups
+      </EuiButtonEmpty>
+    );
+
+    // Export button
+    const exportButton = (
+      <EuiButtonEmpty
+        iconType="exportAction"
+        onClick={async () => await this.generateCsv()}
+        isLoading={this.state.generatingCsv}
+      >
+        Export formatted
       </EuiButtonEmpty>
     );
 
@@ -215,6 +259,7 @@ class WzGroupsActionButtons extends Component {
             </EuiFlexGroup>
           </EuiPopover>
         </EuiFlexItem>
+        <EuiFlexItem grow={false}>{exportButton}</EuiFlexItem>
       </Fragment>
     );
   }
