@@ -1155,7 +1155,7 @@ function discoverController(
       }
 
       queryFilter
-        .addFilters(wzCurrentFilters)
+        .addFilters([...wzCurrentFilters, ...globalState.filters || []])
         .then(() => {})
         .catch(error => console.log(error.message || error)); // eslint-disable-line
     }
