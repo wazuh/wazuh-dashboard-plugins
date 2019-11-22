@@ -24,6 +24,7 @@ import virustotal from './overview-virustotal';
 import vuls from './overview-vuls';
 import osquery from './overview-osquery';
 import docker from './overview-docker';
+import newExtension from './overview-new-extension';
 
 export {
   audit,
@@ -40,5 +41,6 @@ export {
   virustotal,
   vuls,
   osquery,
-  docker
+  docker,
+  newExtension
 };

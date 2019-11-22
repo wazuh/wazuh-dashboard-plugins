@@ -15,6 +15,7 @@ import PropTypes from 'prop-types';
 import {
   EuiSideNav,
   EuiButtonEmpty,
+  EuiButton,
   EuiIcon
 } from '@elastic/eui';
 import ciscatIcon from '../../../img/icons/ico_cis.svg';
@@ -33,6 +34,7 @@ export class OverviewSideNav extends Component {
     super(props);
     this.state = {
     };
+    this.getAddNewExtensionButton = this.getAddNewExtensionButton.bind(this)
   }
 
   getExtensions() {
@@ -238,7 +240,21 @@ export class OverviewSideNav extends Component {
   }
   
 
-  render() {
+  getAddNewExtensionButton() {
+    return (
+        <EuiButton
+        className={"wz-add-new-extension"}
+        onClick={() => this.props.switchTab('newExtension')}>
+          Add a new extension
+        </EuiButton>
+    )
+  }
+
+
+
+
+
+  render() {    
     const extensions = this.getExtensions()
     let sideNav = this.getInitialSideNav()
 
@@ -250,7 +266,13 @@ export class OverviewSideNav extends Component {
       }
     })
 
-
+    // Force the last button to be "Add a new extension"
+    sideNav[3].items.push(
+        {
+        id: 10,
+        renderItem: this.getAddNewExtensionButton,
+        },
+    )
     
     return (
       <div className="wz-overview-sidenav">
