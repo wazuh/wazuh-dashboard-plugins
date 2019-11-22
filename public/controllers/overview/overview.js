@@ -131,6 +131,10 @@ export class OverviewController {
       extensions: this.extensions
     };
 
+    this.addNewExtensionProps = {
+      extensions: this.extensions
+    };
+
     this.setTabs();
 
     this.$scope.$on('$destroy', () => {

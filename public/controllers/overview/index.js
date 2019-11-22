@@ -16,6 +16,7 @@ import { Stats } from './components/stats';
 import { AlertsStats } from './components/alerts-stats';
 import { RequirementCard } from './components/requirement-card';
 import { OverviewSideNav } from './components/overview-sidenav';
+import { AddNewExtension } from './components/add-new-extension';
 
 const app = uiModules.get('app/wazuh', ['react']);
 
@@ -25,4 +26,5 @@ app
   .value('StatsOverview', Stats)
   .value('AlertsStats', AlertsStats)
   .value('RequirementCard', RequirementCard)
-  .value('OverviewSideNav', OverviewSideNav);
+  .value('OverviewSideNav', OverviewSideNav)
+  .value('AddNewExtension', AddNewExtension);
