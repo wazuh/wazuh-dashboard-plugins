@@ -7,12 +7,10 @@ import {
   EuiOverlayMask,
   EuiConfirmModal,
 } from '@elastic/eui';
-import RulesetHandler from './ruleset-handler';
 
 export default class RulesetColumns {
   constructor(tableProps) {
     this.tableProps = tableProps;
-    this.rulesetHandler = RulesetHandler;
     this.adminMode = this.tableProps.state.adminMode;
 
     this.buildColumns = () => {
@@ -72,9 +70,8 @@ export default class RulesetColumns {
                     aria-label="Delete content"
                     iconType="trash"
                     onClick={async () => {
-                      console.log('Deteled');
-                      // this.tableProps.updateListItemsForRemove([item]);
-                      // this.tableProps.updateShowModal(true);
+                      this.tableProps.updateListItemsForRemove([item]);
+                      this.tableProps.updateShowModal(true);
                     }}
                     color="danger"
                     disabled={defaultItems.indexOf(`${item.path}/${item.name}`) !== -1}

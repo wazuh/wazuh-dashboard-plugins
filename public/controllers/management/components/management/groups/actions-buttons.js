@@ -35,7 +35,7 @@ import {
 
 import { WzRequest } from '../../../../../react-services/wz-request';
 import exportCsv from '../../../../../react-services/wz-csv';
-import RulesetHandler from './utils/ruleset-handler';
+import GroupsHandler from './utils/groups-handler';
 import { toastNotifications } from 'ui/notify';
 
 class WzGroupsActionButtons extends Component {
@@ -49,7 +49,7 @@ class WzGroupsActionButtons extends Component {
 
     this.wzReq = (...args) => WzRequest.apiReq(...args);
 
-    this.rulesetHandler = RulesetHandler;
+    this.groupsHandler = GroupsHandler;
     this.refreshTimeoutId = null;
   }
 

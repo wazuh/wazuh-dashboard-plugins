@@ -13,7 +13,7 @@ import React, { Component } from 'react';
 import { EuiBasicTable, EuiCallOut, EuiOverlayMask, EuiConfirmModal } from '@elastic/eui';
 
 import { connect } from 'react-redux';
-import RulesetHandler from './utils/ruleset-handler';
+import GroupsHandler from './utils/groups-handler';
 import { toastNotifications } from 'ui/notify';
 
 import {
@@ -45,7 +45,7 @@ class WzGroupsTable extends Component {
       totalItems: 0,
     };
 
-    this.rulesetHandler = RulesetHandler;
+    this.groupsHandler = GroupsHandler;
   }
 
   async componentDidMount() {
@@ -194,7 +194,7 @@ class WzGroupsTable extends Component {
   async removeItems(items) {
     this.props.updateLoadingStatus(true);
     const results = items.map(async (item, i) => {
-      await this.rulesetHandler.deleteFile(item.file ? item.file : item.name, item.path);
+      await this.groupsHandler.deleteGroup(item.name);
     });
 
     Promise.all(results).then(completed => {
