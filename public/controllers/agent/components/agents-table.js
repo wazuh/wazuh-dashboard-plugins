@@ -76,7 +76,7 @@ export class AgentsTable extends Component {
 
   async componentDidMount() {
     await this.getItems();
-    const filterStatus = await this.filterBarModelStatus();
+    const filterStatus = this.filterBarModelStatus();
     const filterGroups = await this.filterBarModelGroups();
     const filterOs = await this.filterBarModelOs();
     const filterVersion = await this.filterBarModelWazuhVersion();
@@ -98,6 +98,11 @@ export class AgentsTable extends Component {
       isLoading: true,
     });
     if (this.state.isProcessing) {
+      const {q, search} = this.state;
+      const {q: prevQ, search: prevSearch} = prevState;
+      if (prevQ !== q || prevSearch !== search) {
+        this.setState({pageIndex: 0});
+      }
       await this.getItems();
     }
     await this.props.reload();
@@ -107,12 +112,17 @@ export class AgentsTable extends Component {
     });
   }
 
-  async componentDidUpdate() {
+  async componentDidUpdate(prevProps, prevState) {
     if (this.state.isProcessing) {
+      const {q, search} = this.state;
+      const {q: prevQ, search: prevSearch} = prevState;
+      if (prevQ !== q || prevSearch !== search) {
+        this.setState({pageIndex: 0});
+      }
       await this.getItems();
     }
   }
-
+  
   async getItems() {
     const rawAgents = await this.props.wzReq(
       'GET',
