@@ -64,6 +64,7 @@ export class OverviewController {
     this.reportingService = reportingService;
     this.visFactoryService = visFactoryService;
     this.wazuhConfig = wazuhConfig;
+    this.isShowingSideNav = true
     this.expandArray = [
       false,
       false,
@@ -128,7 +129,8 @@ export class OverviewController {
 
     this.sideNavProps = {
       switchTab: (newTab, force = false) => this.switchTab(newTab, force),
-      extensions: this.extensions
+      extensions: this.extensions,
+      switchSideNav: (isShowing) => this.switchSideNavBar(isShowing)
     };
 
     this.addNewExtensionProps = {
@@ -269,6 +271,10 @@ export class OverviewController {
     if (tab === 'aws') return 'aws-s3';
     return false;
   }
+
+  switchSideNavBar(){
+    this.isShowingSideNav = !this.isShowingSideNav
+  } 
 
   // Switch tab
   async switchTab(newTab, force = false) {

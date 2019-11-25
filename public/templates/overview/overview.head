@@ -13,7 +13,8 @@
             <react-component ng-if="octrl.tab !== 'welcome'" name="OverviewSideNav" props="octrl.sideNavProps" />
             <!-- End SideNav -->
 
-            <div  ng-class="octrl.tab !== 'welcome' ? 'wz-overview-dashboard' : ''">
+            <div  ng-class="{'wz-overview-dashboard' : (octrl.tab !== 'welcome' && octrl.isShowingSideNav)  ,   'wz-overview-dashboard-5' : (octrl.tab !== 'welcome') }">
+                
                 <div ng-if="octrl.tab !== 'newExtension'">
                     <!-- Navigation section -->
                     <div layout="row" layout-align="start center"> 

@@ -237,9 +237,6 @@ export class AddNewExtension extends Component {
 
 
 
-
-
-
   showExtensions() {
     const tabs = this.getTabs()
 
