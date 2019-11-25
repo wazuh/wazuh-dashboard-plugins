@@ -25,13 +25,9 @@ import {
 import { connect } from 'react-redux';
 
 import {
-  toggleShowFiles,
   updateLoadingStatus,
-  updteAddingRulesetFile,
-  updateListContent,
   updateIsProcessing,
-  updatePageIndex,
-} from '../../../../../redux/actions/rulesetActions';
+} from '../../../../../redux/actions/groupsActions';
 
 import exportCsv from '../../../../../react-services/wz-csv';
 import GroupsHandler from './utils/groups-handler';
@@ -255,18 +251,14 @@ class WzGroupsActionButtons extends Component {
 
 const mapStateToProps = state => {
   return {
-    state: state.rulesetReducers,
+    state: state.groupsReducers,
   };
 };
 
 const mapDispatchToProps = dispatch => {
   return {
-    toggleShowFiles: status => dispatch(toggleShowFiles(status)),
     updateLoadingStatus: status => dispatch(updateLoadingStatus(status)),
-    updteAddingRulesetFile: content => dispatch(updteAddingRulesetFile(content)),
-    updateListContent: content => dispatch(updateListContent(content)),
     updateIsProcessing: isProcessing => dispatch(updateIsProcessing(isProcessing)),
-    updatePageIndex: pageIndex => dispatch(updatePageIndex(pageIndex)),
   };
 };
 

@@ -29,7 +29,7 @@ import {
   updateSortDirection,
   updateSortField,
   updateDefaultItems,
-} from '../../../../../redux/actions/rulesetActions';
+} from '../../../../../redux/actions/groupsActions';
 
 import GroupsColums from './utils/columns';
 import { WzRequest } from '../../../../../react-services/wz-request';
@@ -78,6 +78,7 @@ class WzGroupsTable extends Component {
       });
       this.props.updateIsProcessing(false);
     } catch (error) {
+      this.props.updateIsProcessing(false);
       return Promise.reject(error);
     }
   }
@@ -109,7 +110,7 @@ class WzGroupsTable extends Component {
     this.setState({ pageSize });
     this.props.updatePageIndex(pageIndex);
     this.props.updateSortDirection(sortDirection);
-    this.props.updateSortField(sortField);
+    this.props.changeGroupsSortField(sortField);
     this.props.updateIsProcessing(true);
   };
 
@@ -207,7 +208,7 @@ class WzGroupsTable extends Component {
 
 const mapStateToProps = state => {
   return {
-    state: state.rulesetReducers,
+    state: state.groupsReducers,
   };
 };
 
@@ -224,7 +225,7 @@ const mapDispatchToProps = dispatch => {
     updateShowModal: showModal => dispatch(updateShowModal(showModal)),
     updateListItemsForRemove: itemList => dispatch(updateListItemsForRemove(itemList)),
     updateSortDirection: sortDirection => dispatch(updateSortDirection(sortDirection)),
-    updateSortField: sortField => dispatch(updateSortField(sortField)),
+    changeGroupsSortField: sortField => dispatch(updateSortField(sortField)),
   };
 };
 

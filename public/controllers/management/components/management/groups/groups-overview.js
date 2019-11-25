@@ -19,10 +19,10 @@ import { connect } from 'react-redux';
 import WzGroupsTable from './groups-table';
 import WzGroupsActionButtons from './actions-buttons';
 
-import {
-  updateIsProcessing,
-  updateLoadingStatus,
-} from '../../../../../redux/actions/rulesetActions';
+// import {
+//   updateIsProcessing,
+//   updateLoadingStatus,
+// } from '../../../../../redux/actions/groupsActions';
 
 export class WzGroupsOverview extends Component {
   _isMounted = false;
@@ -142,11 +142,11 @@ const mapStateToProps = state => {
   };
 };
 
-const mapDispatchToProps = dispatch => {
-  return {
-    updateLoadingStatus: status => dispatch(updateLoadingStatus(status)),
-    updateIsProcessing: isProcessing => dispatch(updateIsProcessing(isProcessing)),
-  };
-};
+// const mapDispatchToProps = dispatch => {
+//   return {
+//     updateLoadingStatus: status => dispatch(updateLoadingStatus(status)),
+//     updateIsProcessing: isProcessing => dispatch(updateIsProcessing(isProcessing)),
+//   };
+// };
 
-export default connect(mapStateToProps, mapDispatchToProps)(WzGroupsOverview);
+export default connect(mapStateToProps)(WzGroupsOverview);

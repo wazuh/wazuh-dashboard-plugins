@@ -12,10 +12,11 @@
 
 import { combineReducers } from 'redux';
 import rulesetReducers from './rulesetReducers';
+import groupsReducers from './groupsReducers';
 import managementReducers from './managementReducers';
 
 export default combineReducers({
   rulesetReducers,
-  managementReducers
-})
-
+  groupsReducers,
+  managementReducers,
+});

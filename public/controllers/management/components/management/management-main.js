@@ -21,7 +21,7 @@ import WzManagementSideMenu from './management-side-menu';
 import WzRuleset from './ruleset/main-ruleset';
 import WzGroups from './groups/main-groups';
 // import { GroupsTable } from './groups/groups-table';
-import { changeManagementSection } from '../../../../redux/reducers/managementReducers';
+// import { changeManagementSection } from '../../../../redux/reducers/managementReducers';
 import { connect } from 'react-redux';
 
 class WzManagementMain extends Component {
@@ -54,7 +54,7 @@ class WzManagementMain extends Component {
 
 function mapStateToProps(state) {
     return {
-        section: changeManagementSection(state),
+        state: state.managementReducers,
     };
 }
 

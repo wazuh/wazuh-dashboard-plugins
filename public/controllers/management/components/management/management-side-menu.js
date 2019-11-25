@@ -80,7 +80,7 @@ class WzManagementSideMenu extends Component {
     // Fetch the data in the first mount
     if (['rules', 'decoders', 'lists'].includes(this.state.selectedItemName)) {
       this.fetchData(this.managementSections.rules.id);    }
-    this.props.changeManagementSection(this.state.selectedItemName);
+    this.props.updateManagementSection(this.state.selectedItemName);
   }
 
   /**
@@ -123,16 +123,16 @@ class WzManagementSideMenu extends Component {
       if (managementSections.includes(section) && managementSections.includes(fromSection)) {
         this.fetchData(section);
       } else if (managementSections.includes(section) && !managementSections.includes(fromSection)) {
-        this.props.changeManagementSection('ruleset');
+        this.props.updateManagementSection('ruleset');
         this.props.switchTab('rules');
         this.fetchData(section);
       } else if (section === 'groups' && managementSections.includes(fromSection)) {
-        this.props.changeManagementSection('groups');
+        this.props.updateManagementSection('groups');
       } else {
         if(section === 'cluster'){
           section = 'monitoring';
         }
-        this.props.changeManagementSection(section);
+        this.props.updateManagementSection(section);
         this.props.switchTab(section);
       }
     }
@@ -239,7 +239,7 @@ const mapDispatchToProps = (dispatch) => {
     updatePageIndex: pageIndex => dispatch(updatePageIndex(pageIndex)),
     updateSortDirection: sortDirection => dispatch(updateSortDirection(sortDirection)),
     updateSortField: sortField => dispatch(updateSortField(sortField)),
-    changeManagementSection: section => dispatch(updateManagementSection(section)),
+    updateManagementSection: section => dispatch(updateManagementSection(section)),
     cleanInfo: () => dispatch(cleanInfo()),
   }
 };

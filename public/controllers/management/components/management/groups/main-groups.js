@@ -16,7 +16,7 @@ import WzReduxProvider from '../../../../../redux/wz-redux-provider';
 //Wazuh ruleset groups
 import WzGroupsOverview from './groups-overview';
 //Information about rule or decoder
-// import WzRuleInfo from './rule-info';
+import WzGroupDetail from './group-detail';
 // import WzDecoderInfo from './decoder-info';
 // import WzRulesetEditor from './ruleset-editor';
 // import WzListEditor from './list-editor';
@@ -41,21 +41,19 @@ export default class WzGroups extends Component {
     // if (!ruleInfo && !decoderInfo && !listInfo && !fileContent, !addingRulesetFile) this.store.dispatch({ type: 'RESET' });
   }
 
-
   render() {
     // const { ruleInfo, decoderInfo, listInfo, fileContent, addingRulesetFile } = this.state;
-
+    const { groupDetail } = this.state;
     return (
       <WzReduxProvider>
         {
-          // ruleInfo && (<WzRuleInfo />)
+          groupDetail && (<WzGroupDetail />)
           // || decoderInfo && (<WzDecoderInfo />)
           // || listInfo && (<WzListEditor />)
           // || (fileContent || addingRulesetFile) && (<WzRulesetEditor />)
-          (<WzGroupsOverview />)
+          || <WzGroupsOverview />
         }
       </WzReduxProvider>
-    )
+    );
   }
 }
-
