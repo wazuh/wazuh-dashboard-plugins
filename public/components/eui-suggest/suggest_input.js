@@ -107,6 +107,7 @@ export class EuiSuggestInput extends Component {
         <EuiInputPopover
           id="popover"
           input={customInput}
+          onFocus={e => this.setState({isPopoverOpen: true})}
           isOpen={this.state.isPopoverOpen}
           panelPaddingSize="none"
           fullWidth
