@@ -19,7 +19,8 @@ import {
   EuiListGroupItem,
   EuiFieldSearch,
   EuiSuggest,
-  EuiIcon
+  EuiIcon,
+  EuiButton
 } from '@elastic/eui';
 
 import { TabDescription } from '../../../server/reporting/tab-description';
@@ -48,7 +49,6 @@ class WzVisualizePopover extends Component {
     this.visualizeSections = [
       {
         "subsections": [
-          { name: "Open extensions directory", id: "extensionsDirectory", icon: "securityApp" },
           { name: "Security Events", id: "general", icon: "securityApp" },
           { name: "Integrity Monitoring", id: "fim", icon: "securityApp" },
           { name: "Amazon AWS", id: "aws", icon: "logoAWS" },
@@ -382,6 +382,13 @@ class WzVisualizePopover extends Component {
               {this.getSections(3)}
               <EuiFlexItem>
                 {this.noResults === 4 && (<div>No results</div>)}
+              </EuiFlexItem>
+            </EuiFlexGroup>
+            <EuiFlexGroup>
+              <EuiFlexItem style={{marginTop: "30px"}}>
+              <EuiButton color="primary" onClick={() => this.selectItem('extensionsDirectory')}>
+                Open extensions directory
+           </EuiButton>
               </EuiFlexItem>
             </EuiFlexGroup>
           </EuiFlexItem>

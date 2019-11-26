@@ -134,7 +134,9 @@ export class OverviewController {
     };
 
     this.addNewExtensionProps = {
-      extensions: this.extensions
+      extensions: this.extensions,
+      setExtensions: (id,extensions) => AppState.setExtensions(id,extensions),
+      api: AppState.getCurrentAPI()
     };
     this.setTabs();
 

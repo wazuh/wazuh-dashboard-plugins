@@ -43,14 +43,16 @@ export class AddNewExtension extends Component {
       security: {
         aws: {
           enabled: props.extensions.aws,
-          title: "aws",
+          url: '/plugins/wazuh/img/dashboards/osquery_dashboard.png',
+          title: "AWS",
           description: TabDescription.aws.description,
           icon: 'logoAWSMono'
         },
         gcp: {
           enabled: props.extensions.gcp,
           title: "Google Cloud Platform",
-          description: "GCP description",
+          url: '/plugins/wazuh/img/dashboards/osquery_dashboard.png',
+          description: "GCP description - GCP description - GCP description - GCP description ",
           icon: 'logoGCPMono'
         },
       },
@@ -58,18 +60,21 @@ export class AddNewExtension extends Component {
         audit: {
           enabled: props.extensions.audit,
           title: TabDescription.audit.title,
+          url: '/plugins/wazuh/img/dashboards/osquery_dashboard.png',
           description: TabDescription.audit.description,
           icon: 'monitoringApp'
         },
         oscap:  {
           enabled: props.extensions.oscap,
           title: TabDescription.oscap.title,
+          url: '/plugins/wazuh/img/dashboards/osquery_dashboard.png',
           description: TabDescription.oscap.description,
           icon: "securityApp"
         },
         ciscat:  {
           enabled: props.extensions.ciscat,
           title: TabDescription.ciscat.title,
+          url: TabDescription.ciscat.url,
           description: TabDescription.ciscat.description,
           icon: "securityApp"
         },
@@ -78,24 +83,28 @@ export class AddNewExtension extends Component {
         virustotal:  {
           enabled: props.extensions.virustotal,
           title: TabDescription.virustotal.title,
+          url: TabDescription.virustotal.url,
           description: TabDescription.virustotal.description,
           icon: "securityApp"
         },
         osquery:  {
           enabled: props.extensions.osquery,
           title: TabDescription.osquery.title,
+          url: '/plugins/wazuh/img/dashboards/osquery_dashboard.png',
           description: TabDescription.osquery.description,
           icon: "securityApp"
         },
         docker:  {
           enabled: props.extensions.docker,
           title: TabDescription.docker.title,
+          url: '/plugins/wazuh/img/dashboards/osquery_dashboard.png',
           description: TabDescription.docker.description,
           icon: "securityApp"
         },
         /*
         mitre: {
           enabled: props.extensions.mitre,
+          title: TabDescription.mitre.title,
           title: TabDescription.mitre.title,
           description: TabDescription.mitre.description,
           icon: mitreIcon
@@ -105,24 +114,28 @@ export class AddNewExtension extends Component {
         pci:  {
           enabled: props.extensions.pci,
           title: TabDescription.pci.title,
+          url: '/plugins/wazuh/img/dashboards/osquery_dashboard.png',
           description: TabDescription.pci.description,
           icon: "securityApp"
         },
         gdpr:  {
           enabled: props.extensions.gdpr,
           title: TabDescription.gdpr.title,
+          url: '/plugins/wazuh/img/dashboards/osquery_dashboard.png',
           description: TabDescription.gdpr.description,
           icon: "securityApp"
         },
         hipaa:  {
           enabled: props.extensions.hipaa,
           title: TabDescription.hipaa.title,
+          url: '/plugins/wazuh/img/dashboards/osquery_dashboard.png',
           description: TabDescription.hipaa.description,
           icon: "securityApp"
         },
         nist:  {
           enabled: props.extensions.nist,
           title: TabDescription.nist.title,
+          url: '/plugins/wazuh/img/dashboards/osquery_dashboard.png',
           description: TabDescription.nist.description,
           icon: "securityApp"
         },
@@ -152,7 +165,7 @@ export class AddNewExtension extends Component {
             icon={(<EuiIcon size="xl" type={currentExtension.icon} />) }
             title={currentExtension.title}
             description={currentExtension.description}
-            onClick={() => this.setState({currentExtensionData: currentExtension, isShowingExtension: true}) }
+            onClick={() => this.setState({currentExtensionData: currentExtension, currentExtensionId: key, isShowingExtension: true}) }
           />
         </EuiFlexItem>
       )
@@ -280,7 +293,13 @@ export class AddNewExtension extends Component {
 
   showExtensionDetails(){
     return(
-      <ExtensionDetails currentExtension={this.state.currentExtensionData} closeExtensionDetails={this.closeExtensionDetails}></ExtensionDetails>
+      <ExtensionDetails
+        currentExtension={this.state.currentExtensionData}
+        currentExtensionId={this.state.currentExtensionId}
+        allExtensions={this.props.extensions}
+        closeExtensionDetails={this.closeExtensionDetails}
+        setExtensions={this.props.setExtensions}
+        api={this.props.api}></ExtensionDetails>
     )
   }
 
@@ -297,5 +316,7 @@ export class AddNewExtension extends Component {
 }
 
 AddNewExtension.propTypes = {
-  extensions: PropTypes.object
+  extensions: PropTypes.object,
+  setExtensions: PropTypes.func,
+  api: PropTypes.string
 };
