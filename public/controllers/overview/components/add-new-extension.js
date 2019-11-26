@@ -54,12 +54,14 @@ export class AddNewExtension extends Component {
         aws: {
           enabled: props.extensions.aws,
           title: TabDescription.aws.title,
+          url: TabDescription.aws.url,
           description: TabDescription.aws.description,
           icon: 'logoAWSMono'
         },
         gcp: {
           enabled: props.extensions.gcp,
           title: TabDescription.gcp.title,
+          url: TabDescription.gcp.url,
           description: TabDescription.gcp.description,
           icon: 'logoGCPMono'
         },
@@ -68,18 +70,21 @@ export class AddNewExtension extends Component {
         audit: {
           enabled: props.extensions.audit,
           title: TabDescription.audit.title,
+          url: TabDescription.audit.url,
           description: TabDescription.audit.description,
           icon: 'monitoringApp'
         },
         oscap:  {
           enabled: props.extensions.oscap,
           title: TabDescription.oscap.title,
+          url: TabDescription.oscap.url,
           description: TabDescription.oscap.description,
           icon: oscapIcon
         },
         ciscat:  {
           enabled: props.extensions.ciscat,
           title: TabDescription.ciscat.title,
+          url: TabDescription.ciscat.url,
           description: TabDescription.ciscat.description,
           icon: ciscatIcon
         },
@@ -88,24 +93,28 @@ export class AddNewExtension extends Component {
         virustotal:  {
           enabled: props.extensions.virustotal,
           title: TabDescription.virustotal.title,
+          url: TabDescription.virustotal.url,
           description: TabDescription.virustotal.description,
           icon: virusTotalIcon
         },
         osquery:  {
           enabled: props.extensions.osquery,
           title: TabDescription.osquery.title,
+          url: TabDescription.osquery.url,
           description: TabDescription.osquery.description,
           icon: osqueryIcon
         },
         docker:  {
           enabled: props.extensions.docker,
           title: TabDescription.docker.title,
+          url: TabDescription.docker.url,
           description: TabDescription.docker.description,
           icon: dockerIcon
         },
         /*
         mitre: {
           enabled: props.extensions.mitre,
+          title: TabDescription.mitre.title,
           title: TabDescription.mitre.title,
           description: TabDescription.mitre.description,
           icon: mitreIcon
@@ -115,24 +124,28 @@ export class AddNewExtension extends Component {
         pci:  {
           enabled: props.extensions.pci,
           title: TabDescription.pci.title,
+          url: TabDescription.pci.url,
           description: TabDescription.pci.description,
           icon: pciIcon
         },
         gdpr:  {
           enabled: props.extensions.gdpr,
           title: TabDescription.gdpr.title,
+          url: TabDescription.gdpr.url,
           description: TabDescription.gdpr.description,
           icon: gdprIcon
         },
         hipaa:  {
           enabled: props.extensions.hipaa,
           title: TabDescription.hipaa.title,
+          url: TabDescription.hipaa.url,
           description: TabDescription.hipaa.description,
           icon: hipaaIcon
         },
         nist:  {
           enabled: props.extensions.nist,
           title: TabDescription.nist.title,
+          url: TabDescription.nist.url,
           description: TabDescription.nist.description,
           icon: nistIcon
         },
@@ -162,7 +175,7 @@ export class AddNewExtension extends Component {
             icon={(<EuiIcon size="xl" type={currentExtension.icon} />) }
             title={currentExtension.title}
             description={currentExtension.description}
-            onClick={() => this.setState({currentExtensionData: currentExtension, isShowingExtension: true}) }
+            onClick={() => this.setState({currentExtensionData: currentExtension, currentExtensionId: key, isShowingExtension: true}) }
           />
         </EuiFlexItem>
       )
@@ -287,7 +300,13 @@ export class AddNewExtension extends Component {
 
   showExtensionDetails(){
     return(
-      <ExtensionDetails currentExtension={this.state.currentExtensionData} closeExtensionDetails={this.closeExtensionDetails}></ExtensionDetails>
+      <ExtensionDetails
+        currentExtension={this.state.currentExtensionData}
+        currentExtensionId={this.state.currentExtensionId}
+        allExtensions={this.props.extensions}
+        closeExtensionDetails={this.closeExtensionDetails}
+        setExtensions={this.props.setExtensions}
+        api={this.props.api}></ExtensionDetails>
     )
   }
 
@@ -304,5 +323,7 @@ export class AddNewExtension extends Component {
 }
 
 AddNewExtension.propTypes = {
-  extensions: PropTypes.object
+  extensions: PropTypes.object,
+  setExtensions: PropTypes.func,
+  api: PropTypes.string
 };

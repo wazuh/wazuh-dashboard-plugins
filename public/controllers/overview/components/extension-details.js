@@ -11,6 +11,8 @@
  * Find more information about this on the LICENSE file.
  */
 import React, { Component, Fragment } from 'react';
+
+import chrome from 'ui/chrome'
 import PropTypes from 'prop-types';
 import {
   EuiPage,
@@ -27,6 +29,7 @@ import {
   EuiSteps,
   EuiText,
   EuiCodeBlock,
+  EuiImage,
   EuiSubSteps,
 } from '@elastic/eui';
 
@@ -72,10 +75,16 @@ export class ExtensionDetails extends Component {
 
 
   onSwitchChange = e => {
+    const extensions = this.props.allExtensions;
+    extensions[this.props.currentExtensionId] = !extensions[this.props.currentExtensionId];
+    try {
+      const api = JSON.parse(this.props.api).id;
+      api && this.props.setExtensions(api, extensions);
+    } catch (error) {} //eslint-disable-line
+
     this.setState({
       checked: e.target.checked,
     });
-    console.log("TODO - enable/disable extension")
   };
 
 
@@ -110,13 +119,7 @@ export class ExtensionDetails extends Component {
               <EuiTitle size="l">
                  <h1><EuiIcon size="xl" type={this.props.currentExtension.icon} /> {this.props.currentExtension.title}</h1>
               </EuiTitle>
-            </EuiFlexItem>
-            <EuiFlexItem grow={false}> <EuiButtonEmpty onClick={() => this.props.closeExtensionDetails()}>Close</EuiButtonEmpty>
-            </EuiFlexItem>
-          </EuiFlexGroup>
-          <EuiSpacer size="m"></EuiSpacer>
-          <EuiFlexGroup>
-            <EuiFlexItem>
+               <EuiSpacer size="m"></EuiSpacer>
               {this.props.currentExtension.description}
                <EuiSpacer size="xxl"></EuiSpacer>
               <EuiSwitch
@@ -124,6 +127,24 @@ export class ExtensionDetails extends Component {
                 checked={this.state.checked}
                 onChange={this.onSwitchChange}
               />
+            </EuiFlexItem>
+            <EuiFlexItem grow={false}>
+            {
+                this.props.currentExtension.url && (<EuiImage
+                  size="m"
+                  hasShadow
+                  allowFullScreen
+                  alt="Osquery dashboard example"
+                  url={chrome.addBasePath(this.props.currentExtension.url)}
+                />
+              )} 
+            </EuiFlexItem>
+            <EuiFlexItem grow={false}>
+              <EuiButtonEmpty onClick={() => this.props.closeExtensionDetails()}><EuiIcon type="cross"></EuiIcon> Close</EuiButtonEmpty>
+            </EuiFlexItem>
+          </EuiFlexGroup>
+          <EuiFlexGroup>
+            <EuiFlexItem>
             </EuiFlexItem>
           </EuiFlexGroup>
           <EuiSpacer size="xxl"></EuiSpacer>
@@ -147,5 +168,9 @@ export class ExtensionDetails extends Component {
 
 ExtensionDetails.propTypes = {
   currentExtension: PropTypes.object,
-  closeExtensionDetails: PropTypes.func
+  currentExtensionId: PropTypes.string,
+  allExtensions: PropTypes.object,
+  closeExtensionDetails: PropTypes.func,
+  setExtensions: PropTypes.func,
+  api: PropTypes.string
 };

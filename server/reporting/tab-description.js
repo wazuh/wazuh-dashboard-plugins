@@ -9,6 +9,7 @@
  *
  * Find more information about this on the LICENSE file.
  */
+
 export const TabDescription = {
   general: {
     title: 'Security events',
@@ -83,12 +84,13 @@ export const TabDescription = {
   configuration: {
     title: 'Configuration',
     description:
-      'Check the current agent configuration remotely applied by its group.'
+      'Check the current agent configuration remotely applied by its group.',
   },
   osquery: {
     title: 'Osquery',
     description:
-      'Osquery can be used to expose an operating system as a high-performance relational database.'
+      'Osquery can be used to expose an operating system as a high-performance relational database.',
+    url : '/plugins/wazuh/img/dashboards/osquery_dashboard.png' 
   },
   sca: {
     title: 'Security configuration assessment',
@@ -110,5 +112,9 @@ export const TabDescription = {
   testConfiguration: {
     title: 'Test your configurations',
     description: 'Check configurations before applying them'
+  },
+  gcp: {
+    title: 'Google Cloud Platform',
+    description: 'Security events related to your Google Cloud Platform, collected directly via GCP API.'
   }
 };
