@@ -25,7 +25,8 @@ import {
   EuiButtonIcon,
   EuiFormRow,
   EuiFlexGrid,
-  EuiCallOut
+  EuiCallOut,
+  EuiTitle
 } from '@elastic/eui';
 
 import { TabDescription } from '../../../../server/reporting/tab-description';
@@ -61,7 +62,7 @@ export class WelcomeScreen extends Component {
     try {
       const api = JSON.parse(this.props.api).id;
       api && this.props.setExtensions(api, extensions);
-    } catch (error) {} //eslint-disable-line
+    } catch (error) { } //eslint-disable-line
   }
 
   buildTabCard(tab, icon) {
@@ -70,7 +71,8 @@ export class WelcomeScreen extends Component {
         <EuiCard
           size="xs"
           layout="horizontal"
-          icon={<EuiIcon size="xl" type={icon} />}
+          icon={<EuiIcon size="l" type={icon} color='primary' />}
+          className='homSynopsis__card homSynopsis__card--noPanel'
           title={TabDescription[tab].title}
           onClick={() => this.props.switchTab(tab)}
           data-test-subj={`overviewWelcome${this.strtools.capitalize(tab)}`}
@@ -118,13 +120,18 @@ export class WelcomeScreen extends Component {
       <div>
         <EuiFlexGroup>
           <EuiFlexItem>
-            <EuiPanel betaBadgeLabel="Security Information Management">
+            <EuiPanel>
               <EuiFlexGroup gutterSize="xs">
-                <EuiFlexItem />
+                <EuiFlexItem>
+                  <EuiTitle size="s">
+                    <h2>Security Information Management</h2>
+                  </EuiTitle>
+                </EuiFlexItem>
                 <EuiFlexItem grow={false}>
                   {this.buildPopover('popoverSecurity', ['aws'])}
                 </EuiFlexItem>
               </EuiFlexGroup>
+              <EuiSpacer size='m' />
               <EuiFlexGrid columns={2}>
                 {this.buildTabCard('general', 'dashboardApp')}
                 {this.buildTabCard('fim', 'loggingApp')}
@@ -134,9 +141,13 @@ export class WelcomeScreen extends Component {
             </EuiPanel>
           </EuiFlexItem>
           <EuiFlexItem>
-            <EuiPanel betaBadgeLabel="Auditing and Policy Monitoring">
+            <EuiPanel>
               <EuiFlexGroup gutterSize="xs">
-                <EuiFlexItem />
+                <EuiFlexItem>
+                  <EuiTitle size="s">
+                    <h2>Auditing and Policy Monitoring</h2>
+                  </EuiTitle>
+                </EuiFlexItem>
                 <EuiFlexItem grow={false}>
                   {this.buildPopover('popoverAuditing', [
                     'audit',
@@ -145,6 +156,7 @@ export class WelcomeScreen extends Component {
                   ])}
                 </EuiFlexItem>
               </EuiFlexGroup>
+              <EuiSpacer size='m' />
               <EuiFlexGrid columns={2}>
                 {this.buildTabCard('pm', 'advancedSettingsApp')}
                 {this.props.extensions.audit &&
@@ -161,9 +173,13 @@ export class WelcomeScreen extends Component {
         <EuiSpacer size="xl" />
         <EuiFlexGroup>
           <EuiFlexItem>
-            <EuiPanel betaBadgeLabel="Threat Detection and Response">
+            <EuiPanel>
               <EuiFlexGroup gutterSize="xs">
-                <EuiFlexItem />
+                <EuiFlexItem>
+                  <EuiTitle size="s">
+                    <h2>Threat Detection and Response</h2>
+                  </EuiTitle>
+                </EuiFlexItem>
                 <EuiFlexItem grow={false}>
                   {this.buildPopover('popoverThreat', [
                     'virustotal',
@@ -172,6 +188,7 @@ export class WelcomeScreen extends Component {
                   ])}
                 </EuiFlexItem>
               </EuiFlexGroup>
+              <EuiSpacer size='m' />
               <EuiFlexGrid columns={2}>
                 {this.buildTabCard('vuls', 'securityApp')}
                 {this.props.extensions.virustotal &&
@@ -183,11 +200,14 @@ export class WelcomeScreen extends Component {
               </EuiFlexGrid>
             </EuiPanel>
           </EuiFlexItem>
-
           <EuiFlexItem>
-            <EuiPanel betaBadgeLabel="Regulatory Compliance">
+            <EuiPanel>
               <EuiFlexGroup gutterSize="xs">
-                <EuiFlexItem />
+                <EuiFlexItem>
+                  <EuiTitle size="s">
+                    <h2>Regulatory Compliance</h2>
+                  </EuiTitle>
+                </EuiFlexItem>
                 <EuiFlexItem grow={false}>
                   {this.buildPopover('popoverRegulatory', [
                     'pci',
@@ -197,6 +217,7 @@ export class WelcomeScreen extends Component {
                   ])}
                 </EuiFlexItem>
               </EuiFlexGroup>
+              <EuiSpacer size='m' />
               {!this.props.extensions.pci &&
                 !this.props.extensions.gdpr &&
                 !this.props.extensions.hipaa &&
@@ -220,17 +241,17 @@ export class WelcomeScreen extends Component {
                 this.props.extensions.gdpr ||
                 this.props.extensions.hipaa ||
                 this.props.extensions.nist) && (
-                <EuiFlexGrid columns={2}>
-                  {this.props.extensions.pci &&
-                    this.buildTabCard('pci', 'visTagCloud')}
-                  {this.props.extensions.gdpr &&
-                    this.buildTabCard('gdpr', 'visBarVertical')}
-                  {this.props.extensions.hipaa &&
-                    this.buildTabCard('hipaa', 'emsApp')}
-                  {this.props.extensions.nist &&
-                    this.buildTabCard('nist', 'apmApp')}
-                </EuiFlexGrid>
-              )}
+                  <EuiFlexGrid columns={2}>
+                    {this.props.extensions.pci &&
+                      this.buildTabCard('pci', 'visTagCloud')}
+                    {this.props.extensions.gdpr &&
+                      this.buildTabCard('gdpr', 'visBarVertical')}
+                    {this.props.extensions.hipaa &&
+                      this.buildTabCard('hipaa', 'emsApp')}
+                    {this.props.extensions.nist &&
+                      this.buildTabCard('nist', 'apmApp')}
+                  </EuiFlexGrid>
+                )}
             </EuiPanel>
           </EuiFlexItem>
         </EuiFlexGroup>

@@ -10,8 +10,6 @@
  * Find more information about this on the LICENSE file.
  */
 
-import chrome from 'ui/chrome';
-
 // Adds the logowz-menu
 export const changeWazuhNavLogo = () => {
   const interval = setInterval(() => {
@@ -19,9 +17,8 @@ export const changeWazuhNavLogo = () => {
     if (nav.length) {
       clearInterval(interval);
     }
-    const url = chrome.addBasePath('/plugins/wazuh/img/logo.svg');
     $('.euiBreadcrumb').html(
-      `<img src="${url}" class="navBarLogo" alt="">`
+      ''
     );
   }, 100);
 };

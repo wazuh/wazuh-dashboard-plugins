@@ -20,23 +20,37 @@ wz-menu {
     z-index: 999;
 }
 .wz-menu-content {
-    color: #373a42;
+    color: #006BB4;
     background-color: #FFF;
-    border-bottom: 1px solid #D3DAE6;
-    width: calc(~'100vw - 49px');
+    width: calc(~'100vw - 48px')!important;
     box-shadow: 0 2px 2px -1px rgba(152, 162, 179, 0.3);
+    border-bottom: 1px solid #d3dae6;
+    padding: 0 8px 0px 16px;
+    font-size: 14px;
 }
+
 @media only screen and (max-width: 767px){
     .wz-menu-content {
         width: 100%;
     }
   }
 
-/* Style to override the font on the toolbar */
-.wz-menu-content {
-    font-size: 14px;
-}
 
+
+    md-toolbar .bsTooltip-inner{
+        padding: 8px 3px;
+      }
+
+.wz-menu-logo {
+    position: absolute;
+    left: 0;
+    width: 100%;
+    text-align: center;
+    z-index: -1;
+    filter: hue-rotate(30deg) brightness(0.8);
+    opacity: .9;
+  }
+  
 .wz-menu-button {
     font-size: 14px !important;
     transition: none !important;
@@ -45,7 +59,8 @@ wz-menu {
     height: 35px;
     padding: 0px 8px;
     border-radius: 4px;
-    margin: 0px 5px;
+    margin-right: 5px;
+    min-width: 45px!important;
 }
 
 .wz-menu-button.md-icon-button {

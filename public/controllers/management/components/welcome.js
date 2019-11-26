@@ -18,7 +18,8 @@ import {
   EuiPanel,
   EuiFlexItem,
   EuiFlexGroup,
-  EuiSpacer
+  EuiSpacer,
+  EuiTitle
 } from '@elastic/eui';
 
 import {
@@ -44,13 +45,17 @@ class WelcomeScreen extends Component {
       <WzReduxProvider>
         <EuiFlexGroup>
           <EuiFlexItem>
-            <EuiPanel betaBadgeLabel="Administration">
+            <EuiPanel>
+              <EuiTitle size="s">
+                <h2>Administration</h2>
+              </EuiTitle>
               <EuiSpacer size="m" />
               <EuiFlexGroup>
                 <EuiFlexItem>
                   <EuiCard
                     layout="horizontal"
-                    icon={<EuiIcon size="xl" type="indexRollupApp" />}
+                    className='homSynopsis__card homSynopsis__card--noPanel'
+                    icon={<EuiIcon size="l" type="indexRollupApp" color='primary'/>}
                     title="Ruleset"
                     onClick={() => this.switchSection('ruleset')}
                     description="Manage your Wazuh cluster ruleset."
@@ -59,7 +64,8 @@ class WelcomeScreen extends Component {
                 <EuiFlexItem>
                   <EuiCard
                     layout="horizontal"
-                    icon={<EuiIcon size="xl" type="usersRolesApp" />}
+                    className='homSynopsis__card homSynopsis__card--noPanel'
+                    icon={<EuiIcon size="l" type="usersRolesApp" color='primary'/>}
                     title="Groups"
                     onClick={() => this.switchSection('groups')}
                     description="Manage your agent groups."
@@ -70,7 +76,8 @@ class WelcomeScreen extends Component {
                 <EuiFlexItem>
                   <EuiCard
                     layout="horizontal"
-                    icon={<EuiIcon size="xl" type="devToolsApp" />}
+                    className='homSynopsis__card homSynopsis__card--noPanel'
+                    icon={<EuiIcon size="l" type="devToolsApp" color='primary'/>}
                     title="Configuration"
                     onClick={() => this.switchSection('configuration')}
                     description="Manage your Wazuh cluster configuration."
@@ -81,13 +88,17 @@ class WelcomeScreen extends Component {
             </EuiPanel>
           </EuiFlexItem>
           <EuiFlexItem>
-            <EuiPanel betaBadgeLabel="Status and reports">
+            <EuiPanel>
+              <EuiTitle size="s">
+                <h2>Status and reports</h2>
+              </EuiTitle>
               <EuiSpacer size="m" />
               <EuiFlexGroup>
                 <EuiFlexItem>
                   <EuiCard
                     layout="horizontal"
-                    icon={<EuiIcon size="xl" type="uptimeApp" />}
+                    className='homSynopsis__card homSynopsis__card--noPanel'
+                    icon={<EuiIcon size="l" type="uptimeApp" color='primary' />}
                     title="Status"
                     onClick={() => this.switchSection('status')}
                     description="Manage your Wazuh cluster status."
@@ -96,7 +107,8 @@ class WelcomeScreen extends Component {
                 <EuiFlexItem>
                   <EuiCard
                     layout="horizontal"
-                    icon={<EuiIcon size="xl" type="indexPatternApp" />}
+                    className='homSynopsis__card homSynopsis__card--noPanel'
+                    icon={<EuiIcon size="l" type="indexPatternApp" color='primary'/>}
                     title="Cluster"
                     onClick={() => this.switchSection('monitoring')}
                     description="Visualize your Wazuh cluster."
@@ -107,7 +119,8 @@ class WelcomeScreen extends Component {
                 <EuiFlexItem>
                   <EuiCard
                     layout="horizontal"
-                    icon={<EuiIcon size="xl" type="filebeatApp" />}
+                    className='homSynopsis__card homSynopsis__card--noPanel'
+                    icon={<EuiIcon size="l" type="filebeatApp" color='primary'/>}
                     title="Logs"
                     onClick={() => this.switchSection('logs')}
                     description="Logs from your Wazuh cluster."
@@ -116,7 +129,8 @@ class WelcomeScreen extends Component {
                 <EuiFlexItem>
                   <EuiCard
                     layout="horizontal"
-                    icon={<EuiIcon size="xl" type="reportingApp" />}
+                    className='homSynopsis__card homSynopsis__card--noPanel'
+                    icon={<EuiIcon size="l" type="reportingApp" color='primary'/>}
                     title="Reporting"
                     onClick={() => this.switchSection('reporting')}
                     description="Check your stored Wazuh reports."
