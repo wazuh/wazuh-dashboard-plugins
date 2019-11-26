@@ -94,10 +94,11 @@ export class MitreCardsSlider extends Component {
    * Updates the chunk size depending on the window width so we avoid unnecessary scroll
    */
   updateDimensions = () => { 
-    if(window.innerWidth < 1300 && this.state.chunkSize !== 4){
+    this.setState({position: 0})
+    if(window.innerWidth < 1450 && this.state.chunkSize !== 4){
       this.setState({chunkSize: 4});
     }
-    if(window.innerWidth >= 1300 && this.state.chunkSize !== 6){
+    if(window.innerWidth >= 1450 && this.state.chunkSize !== 6){
       this.setState({chunkSize: 6});
     }else if(window.innerWidth <= 1050 && this.state.chunkSize !== 2){
       this.setState({chunkSize: 2});
