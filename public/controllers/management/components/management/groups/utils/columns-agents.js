@@ -1,7 +1,7 @@
 import React from 'react';
 import { EuiToolTip, EuiButtonIcon } from '@elastic/eui';
 
-export default class RulesetColumns {
+export default class GroupsAgentsColumns {
   constructor(tableProps) {
     this.tableProps = tableProps;
     this.adminMode = this.tableProps.state.adminMode;
@@ -9,20 +9,44 @@ export default class RulesetColumns {
     this.buildColumns = () => {
       this.columns = [
         {
+          field: 'id',
+          name: 'Id',
+          align: 'left',
+          sortable: true,
+        },
+        {
           field: 'name',
           name: 'Name',
           align: 'left',
           sortable: true,
         },
         {
-          field: 'count',
-          name: 'Agents',
+          field: 'ip',
+          name: 'Ip',
           align: 'left',
           sortable: true,
         },
         {
-          field: 'configSum',
-          name: 'Configuratino checksum',
+          field: 'status',
+          name: 'Status',
+          align: 'left',
+          sortable: true,
+        },
+        {
+          field: 'os.name',
+          name: 'Os name',
+          align: 'left',
+          sortable: true,
+        },
+        {
+          field: 'os.version',
+          name: 'Os version',
+          align: 'left',
+          sortable: true,
+        },
+        {
+          field: 'version',
+          name: 'Version',
           align: 'left',
           sortable: true,
         },
@@ -35,30 +59,24 @@ export default class RulesetColumns {
           render: item => {
             return (
               <div>
-                <EuiToolTip position="top" content={`View ${item.name} details`}>
+                <EuiToolTip position="top" content={`Go to the agent`}>
                   <EuiButtonIcon
-                    aria-label="View group details"
+                    aria-label="Go to the agent"
                     iconType="eye"
                     onClick={async () => {
-                      this.tableProps.updateGroupDetail(item);
+                      // TODO: go to the agent
                     }}
                     color="primary"
                   />
                 </EuiToolTip>
-                <EuiToolTip
-                  position="top"
-                  content={
-                    item.name === 'default'
-                      ? `The ${item.name} group cannot be deleted`
-                      : `Delete ${item.name}`
-                  }
-                >
+                <EuiToolTip position="top" content={`Delete agent`}>
                   <EuiButtonIcon
-                    aria-label="Delete content"
+                    aria-label="Delete agent"
                     iconType="trash"
                     onClick={async () => {
-                      this.tableProps.updateListItemsForRemove([item]);
-                      this.tableProps.updateShowModal(true);
+                      // TODO: Remove agents in the group
+                      // this.tableProps.updateListItemsForRemove([item]);
+                      // this.tableProps.updateShowModal(true);
                     }}
                     color="danger"
                     disabled={item.name === 'default'}

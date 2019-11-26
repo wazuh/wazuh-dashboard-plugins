@@ -12,7 +12,7 @@
 
 // /**
 //  * Update the ruleset section
-//  * @param {String} section 
+//  * @param {String} section
 //  */
 // export const updateRulesetSection = (section) => {
 //   return {
@@ -23,7 +23,7 @@
 
 // /**
 //  * Update the files content
-//  * @param {String} content 
+//  * @param {String} content
 //  */
 // export const updateFileContent = (content) => {
 //   return {
@@ -34,39 +34,39 @@
 
 /**
  * Toggle the modal confirm of the ruleset table
- * @param {Boolean} showModal 
+ * @param {Boolean} showModal
  */
-export const updateShowModal = (showModal) => {
+export const updateShowModal = showModal => {
   return {
     type: 'UPDATE_SHOW_MODAL',
-    showModal: showModal
-  }
-}
+    showModal: showModal,
+  };
+};
 
 /**
- * Update the list of items to remove 
- * @param {Array} itemList 
+ * Update the list of items to remove
+ * @param {Array} itemList
  */
-export const updateListItemsForRemove = (itemList) => {
+export const updateListItemsForRemove = itemList => {
   return {
     type: 'UPDATE_LIST_ITEMS_FOR_REMOVE',
-    itemList: itemList
-  }
-}
+    itemList: itemList,
+  };
+};
 
-export const updateSortField = (sortField) => {
+export const updateSortField = sortField => {
   return {
     type: 'UPDATE_SORT_FIELD',
-    sortField: sortField
-  }
-}
+    sortField: sortField,
+  };
+};
 
-export const updateSortDirection = (sortDirection) => {
+export const updateSortDirection = sortDirection => {
   return {
     type: 'UPDATE_SORT_DIRECTION',
-    sortDirection: sortDirection
-  }
-}
+    sortDirection: sortDirection,
+  };
+};
 
 // export const updateDefaultItems = (defaultItems) => {
 //   return {
@@ -77,7 +77,7 @@ export const updateSortDirection = (sortDirection) => {
 
 // /**
 //  * Update the lists content
-//  * @param {String} content 
+//  * @param {String} content
 //  */
 // export const updateListContent = (content) => {
 //   return {
@@ -88,14 +88,21 @@ export const updateSortDirection = (sortDirection) => {
 
 /**
  * Update the loading status
- * @param {Boolean} loading 
+ * @param {Boolean} loading
  */
-export const updateLoadingStatus = (loading) => {
+export const updateLoadingStatus = loading => {
   return {
     type: 'UPDATE_LOADING_STATUS',
-    status: loading
-  }
-}
+    status: loading,
+  };
+};
+
+export const updateGroupDetail = item => {
+  return {
+    type: 'UPDATE_GROUP_DETAIL',
+    itemDetail: item,
+  };
+};
 
 // /**
 //  * Reset the ruleset store
@@ -107,8 +114,8 @@ export const updateLoadingStatus = (loading) => {
 // }
 
 // /**
-//  * Toggle show files 
-//  * @param {Boolean} status 
+//  * Toggle show files
+//  * @param {Boolean} status
 //  */
 // export const toggleShowFiles = (status) => {
 //   return {
@@ -118,8 +125,8 @@ export const updateLoadingStatus = (loading) => {
 // }
 
 // /**
-//  * Update the rule info 
-//  * @param {String} info 
+//  * Update the rule info
+//  * @param {String} info
 //  */
 // export const updateRuleInfo = (info) => {
 //   return {
@@ -130,59 +137,59 @@ export const updateLoadingStatus = (loading) => {
 
 // /**
 //  * Update the decoder info
-//  * @param {String} info 
+//  * @param {String} info
 //  */
 // export const updateDecoderInfo = (info) => {
 //   return {
 //     type: 'UPDATE_DECODER_INFO',
 //     info: info
-//   }  
+//   }
 // }
 
 /**
- * Toggle the updating of the table 
- * @param {Boolean} isProcessing 
+ * Toggle the updating of the table
+ * @param {Boolean} isProcessing
  */
-export const updateIsProcessing = (isProcessing) => {
+export const updateIsProcessing = isProcessing => {
   return {
     type: 'UPDATE_IS_PROCESSING',
-    isProcessing: isProcessing
-  }
-}
+    isProcessing: isProcessing,
+  };
+};
 
 /**
- * Set the page index value of the table 
- * @param {Number} pageIndex 
+ * Set the page index value of the table
+ * @param {Number} pageIndex
  */
-export const updatePageIndex = (pageIndex) => {
+export const updatePageIndex = pageIndex => {
   return {
     type: 'UPDATE_PAGE_INDEX',
-    pageIndex: pageIndex
-  }
-}
+    pageIndex: pageIndex,
+  };
+};
 
-// /**
-//  * Update the filters 
-//  * @param {string} filters 
-//  */
-// export const updateFilters = (filters) => {
-//   return {
-//     type: 'UPDATE_FILTERS',
-//     filters: filters
-//   }
-// }
+/**
+ * Update the filters
+ * @param {string} filters
+ */
+export const updateFilters = filters => {
+  return {
+    type: 'UPDATE_FILTERS',
+    filters: filters,
+  };
+};
 
-// export const cleanFilters = () => {
-//   return {
-//     type: 'CLEAN_FILTERS'
-//   }
-// }
+export const cleanFilters = () => {
+  return {
+    type: 'CLEAN_FILTERS',
+  };
+};
 
-// export const cleanInfo = () => {
-//   return {
-//     type: 'CLEAN_INFO'
-//   }
-// }
+export const cleanInfo = () => {
+  return {
+    type: 'CLEAN_INFO',
+  };
+};
 
 // export const cleanFileContent = () => {
 //   return {

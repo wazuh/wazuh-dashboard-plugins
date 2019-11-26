@@ -16,10 +16,11 @@ const initialState = {
   // decoderInfo: false,
   // error: false,
   // fileContent: false,
-  // filters: {},
+  filters: {},
   isLoading: false,
   isProcessing: false,
   itemList: [],
+  itemDetail: false,
   // items: [],
   // listInfo: false,
   pageIndex: 0,
@@ -73,6 +74,30 @@ const groupsReducers = (state = initialState, action) => {
     return {
       ...state,
       showModal: action.showModal,
+    };
+  }
+  if (action.type === 'UPDATE_GROUP_DETAIL') {
+    return {
+      ...state,
+      itemDetail: action.itemDetail,
+    };
+  }
+  if (action.type === 'CLEAN_FILTERS') {
+    return {
+      ...state,
+      filters: {},
+    };
+  }
+  if (action.type === 'UPDATE_FILTERS') {
+    return {
+      ...state,
+      filters: filters,
+    };
+  }
+  if (action.type === 'CLEAN_INFO') {
+    return {
+      ...state,
+      itemDetail: false,
     };
   }
 

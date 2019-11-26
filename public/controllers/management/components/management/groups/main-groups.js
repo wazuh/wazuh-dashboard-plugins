@@ -28,12 +28,12 @@ export default class WzGroups extends Component {
     this.store = store;
   }
 
-  // UNSAFE_componentWillMount() {
-  //   this.store.subscribe(() => {
-  //     const state = this.store.getState().rulesetReducers;
-  //     this.setState(state);
-  //   });
-  // }
+  UNSAFE_componentWillMount() {
+    this.store.subscribe(() => {
+      const state = this.store.getState().groupsReducers;
+      this.setState(state);
+    });
+  }
 
   componentWillUnmount() {
     // When the component is going to be unmounted the ruleset state is reset
@@ -43,16 +43,15 @@ export default class WzGroups extends Component {
 
   render() {
     // const { ruleInfo, decoderInfo, listInfo, fileContent, addingRulesetFile } = this.state;
-    const { groupDetail } = this.state;
+    const { itemDetail } = this.state;
     return (
       <WzReduxProvider>
-        {
-          groupDetail && (<WzGroupDetail />)
+        {(itemDetail && <WzGroupDetail />) || (
           // || decoderInfo && (<WzDecoderInfo />)
           // || listInfo && (<WzListEditor />)
           // || (fileContent || addingRulesetFile) && (<WzRulesetEditor />)
-          || <WzGroupsOverview />
-        }
+          <WzGroupsOverview />
+        )}
       </WzReduxProvider>
     );
   }

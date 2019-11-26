@@ -29,17 +29,14 @@ import {
   updateSortDirection,
   updateSortField,
   updateDefaultItems,
-  updateGroupDetail,
 } from '../../../../../redux/actions/groupsActions';
 
-import GroupsColums from './utils/columns';
-import { WzRequest } from '../../../../../react-services/wz-request';
+import GroupsAgentsColums from './utils/columns-agents';
 
-class WzGroupsTable extends Component {
+class WzGroupsAgentsTable extends Component {
   _isMounted = false;
   constructor(props) {
     super(props);
-    this.wzReq = (...args) => WzRequest.apiReq(...args);
     this.state = {
       items: [],
       pageSize: 10,
@@ -51,6 +48,7 @@ class WzGroupsTable extends Component {
 
   async componentDidMount() {
     this.props.updateIsProcessing(true);
+
     this._isMounted = true;
   }
 
@@ -69,7 +67,7 @@ class WzGroupsTable extends Component {
    */
   async getItems() {
     try {
-      const rawItems = await this.wzReq('GET', '/agents/groups', this.buildFilter());
+      const rawItems = await this.groupsHandler.agentsGroup(this.props.state.itemDetail.name);
       const { items, totalItems } = ((rawItems || {}).data || {}).data;
 
       this.setState({
@@ -116,16 +114,10 @@ class WzGroupsTable extends Component {
   };
 
   render() {
-    this.groupsColumns = new GroupsColums(this.props);
-    const {
-      isLoading,
-      pageIndex,
-      error,
-      sortField,
-      sortDirection,
-    } = this.props.state;
+    this.groupsAgentsColumns = new GroupsAgentsColums(this.props);
+    const { isLoading, pageIndex, error, sortField, sortDirection } = this.props.state;
     const { items, pageSize, totalItems } = this.state;
-    const columns = this.groupsColumns.columns;
+    const columns = this.groupsAgentsColumns.columns;
     const message = isLoading ? null : 'No results...';
     const pagination = {
       pageIndex: pageIndex,
@@ -227,8 +219,7 @@ const mapDispatchToProps = dispatch => {
     updateListItemsForRemove: itemList => dispatch(updateListItemsForRemove(itemList)),
     updateSortDirection: sortDirection => dispatch(updateSortDirection(sortDirection)),
     updateSortField: sortField => dispatch(updateSortField(sortField)),
-    updateGroupDetail: itemDetail => dispatch(updateGroupDetail(itemDetail)),
   };
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(WzGroupsTable);
+export default connect(mapStateToProps, mapDispatchToProps)(WzGroupsAgentsTable);
