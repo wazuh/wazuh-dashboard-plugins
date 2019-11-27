@@ -321,8 +321,8 @@ export class GroupsController {
    *
    * @param {Object} enabledComponents
    */
-  exportConfiguration(enabledComponents) {
-    this.reportingService.startConfigReport(this.currentGroup, 'groupConfig', enabledComponents);
+  exportConfiguration(enabledComponents, group) {
+    this.reportingService.startConfigReport(group, 'groupConfig', enabledComponents);
   }
 
   /**
@@ -704,6 +704,13 @@ export class GroupsController {
       },
       showAddingAgents: (status, group) => {
         this.showAddingAgents(status, group);
+      },
+      exportConfigurationProps: {
+        exportConfiguration: (enabledComponents, group) => this.exportConfiguration(enabledComponents, group),
+        type: 'group',
+      },
+      currentGroup: group => {
+        this.currentGroup = group;
       },
     };
     this.mctrl.managementProps.groupsProps = this.groupsTableProps;

@@ -33,6 +33,7 @@ import {
 import exportCsv from '../../../../../react-services/wz-csv';
 import GroupsHandler from './utils/groups-handler';
 import { toastNotifications } from 'ui/notify';
+import { ExportConfiguration } from '../../../../agent/components/export-configuration';
 
 class WzGroupsActionButtonsAgents extends Component {
   _isMounted = false;
@@ -40,7 +41,11 @@ class WzGroupsActionButtonsAgents extends Component {
   constructor(props) {
     super(props);
 
-    this.state = { generatingCsv: false, isPopoverOpen: false, newGroupName: '' };
+    this.state = {
+      generatingCsv: false,
+      isPopoverOpen: false,
+      newGroupName: '',
+    };
     this.exportCsv = exportCsv;
 
     this.groupsHandler = GroupsHandler;
@@ -89,10 +94,7 @@ class WzGroupsActionButtonsAgents extends Component {
   }
 
   showManageAgents() {
-    // TODO: Show manage agents
     const { itemDetail } = this.props.state;
-
-    console.log(itemDetail);
 
     this.props.updateShowAddAgents(true);
     this.props.groupsProps.showAddingAgents(true, itemDetail);
@@ -181,27 +183,6 @@ class WzGroupsActionButtonsAgents extends Component {
     this.setState({ generatingCsv: false });
   }
 
-  /**
-   * Generates a PDF
-   */
-  async generatePDF() {
-    try {
-      // TODO: GeneratingPDF
-      // this.setState({ generatingCsv: true });
-      // const { section, filters } = this.props.state; //TODO get filters from the search bar from the REDUX store
-      // await this.exportCsv('/agents/groups', filters, 'Groups');
-      // this.showToast(
-      //   'success',
-      //   'Success',
-      //   'CSV. Your download should begin automatically...',
-      //   2000
-      // );
-    } catch (error) {
-      this.showToast('danger', 'Error', `Error when exporting the PDF file: ${error}`, 2000);
-    }
-    // this.setState({ generatingCsv: false }); // TODO: generatingPDF state
-  }
-
   showToast = (color, title, text, time) => {
     toastNotifications.add({
       color: color,
@@ -225,13 +206,15 @@ class WzGroupsActionButtonsAgents extends Component {
 
     // Export PDF button
     const exportPDFButton = (
-      <EuiButtonEmpty
-        iconType="exportAction"
-        onClick={async () => await this.generatePDF()}
-        isLoading={this.state.generatingCsv}
-      >
-        Export PDF
-      </EuiButtonEmpty>
+      <ExportConfiguration
+        exportConfiguration={enabledComponents =>
+          this.props.groupsProps.exportConfigurationProps.exportConfiguration(
+            enabledComponents,
+            this.props.state.itemDetail
+          )
+        }
+        type={this.props.groupsProps.exportConfigurationProps.type}
+      />
     );
     // Export button
     const exportCSVButton = (
