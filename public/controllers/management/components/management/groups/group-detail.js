@@ -9,6 +9,8 @@ import {
   EuiText,
   EuiTab,
   EuiTabs,
+  EuiToolTip,
+  EuiButtonIcon,
 } from '@elastic/eui';
 
 import { connect } from 'react-redux';
@@ -114,13 +116,26 @@ class WzGroupDetail extends Component {
             <EuiFlexItem>
               <EuiFlexGroup>
                 <EuiFlexItem grow={false}>
+                  <EuiToolTip position="right" content={`Back to groups`}>
+                    <EuiButtonIcon
+                      aria-label="Back"
+                      color="subdued"
+                      iconSize="l"
+                      iconType="arrowLeft"
+                      onClick={() => this.props.cleanInfo()}
+                    />
+                  </EuiToolTip>
+                </EuiFlexItem>
+                <EuiFlexItem grow={false}>
                   <EuiTitle>
                     <h1>{itemDetail.name}</h1>
                   </EuiTitle>
                 </EuiFlexItem>
               </EuiFlexGroup>
             </EuiFlexItem>
-            {(this.state.selectedTabId === 'agents' && <WzGroupsActionButtonsAgents {...this.props} />) ||
+            {(this.state.selectedTabId === 'agents' && (
+              <WzGroupsActionButtonsAgents {...this.props} />
+            )) ||
               (this.state.selectedTabId === 'files' && <h1>Buttons</h1>)}
           </EuiFlexGroup>
           <EuiFlexGroup>
