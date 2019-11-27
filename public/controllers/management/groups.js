@@ -208,10 +208,11 @@ export class GroupsController {
    * This navigate to a selected agent
    * @param {Number} agentId
    */
-  showAgent(agentId) {
-    this.shareAgent.setAgent(agentId);
+  showAgent(agent) {
+    this.shareAgent.setAgent(agent);
     this.location.search('tab', null);
     this.location.path('/agents');
+    this.scope.$applyAsync();
   }
 
   /**
@@ -706,11 +707,15 @@ export class GroupsController {
         this.showAddingAgents(status, group);
       },
       exportConfigurationProps: {
-        exportConfiguration: (enabledComponents, group) => this.exportConfiguration(enabledComponents, group),
+        exportConfiguration: (enabledComponents, group) =>
+          this.exportConfiguration(enabledComponents, group),
         type: 'group',
       },
       currentGroup: group => {
         this.currentGroup = group;
+      },
+      showAgent: agent => {
+        this.showAgent(agent);
       },
     };
     this.mctrl.managementProps.groupsProps = this.groupsTableProps;

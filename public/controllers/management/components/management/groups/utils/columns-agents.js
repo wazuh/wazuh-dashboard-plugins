@@ -64,7 +64,7 @@ export default class GroupsAgentsColumns {
                     aria-label="Go to the agent"
                     iconType="eye"
                     onClick={async () => {
-                      // TODO: go to the agent
+                      this.tableProps.groupsProps.showAgent(item);
                     }}
                     color="primary"
                   />

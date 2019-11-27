@@ -81,7 +81,7 @@ class WzGroupDetail extends Component {
         </EuiFlexGroup>
         <EuiFlexGroup>
           <EuiFlexItem>
-            <WzGroupsAgentsTable />
+            <WzGroupsAgentsTable {...this.props} />
           </EuiFlexItem>
         </EuiFlexGroup>
       </Fragment>
