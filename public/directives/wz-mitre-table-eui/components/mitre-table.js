@@ -12,7 +12,24 @@
  */
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { EuiPanel, EuiBasicTable, EuiFlexItem, EuiFlexGroup, EuiButtonEmpty, EuiTitle, EuiFieldSearch } from '@elastic/eui';
+import { EuiPanel,
+  EuiBasicTable,
+  EuiFlexItem, 
+  EuiFlexGroup, 
+  EuiButtonEmpty, 
+  EuiTitle,
+  EuiTextColor,
+  EuiFieldSearch, 
+  EuiToolTip, 
+  EuiButtonIcon, 
+  EuiFlyout,
+  EuiFlyoutHeader,
+  EuiFlyoutBody,
+  EuiLoadingContent,
+  EuiLink,
+  EuiSpacer,
+  EuiDescriptionList,
+} from '@elastic/eui';
 
 
  export class MitreTable extends Component {
@@ -30,7 +47,12 @@ import { EuiPanel, EuiBasicTable, EuiFlexItem, EuiFlexGroup, EuiButtonEmpty, Eui
       totalItems: 0,
       q: '',
       search: '',
+      currentTechniqueData: {},
+      isFlyoutVisible: false,
     };
+
+    this.closeFlyout = this.closeFlyout.bind(this);
+    this.showFlyout = this.showFlyout.bind(this);
   }
 
 
@@ -40,20 +62,19 @@ import { EuiPanel, EuiBasicTable, EuiFlexItem, EuiFlexGroup, EuiButtonEmpty, Eui
     await this.getItems();
   }
 
-   async componentDidUpdate() {
+  async componentDidUpdate() {
     if (this.state.isProcessing) {
       await this.getItems();
     }
   }
 
    formatTactic(tactic) {
-    //const checkField = (field) => { return (field !== undefined) ? field : "-"; };
-
      return {
       "id": tactic.id,
       "name": tactic.json.name,
       "phases": tactic.phases,
       "modified": tactic.json.modified,
+      "actions": tactic
     }
   }
 
@@ -124,12 +145,43 @@ import { EuiPanel, EuiBasicTable, EuiFlexItem, EuiFlexGroup, EuiButtonEmpty, Eui
         name: 'Phases',
         sortable: false,
       },
+      {
+        field: 'actions',
+        name: 'Actions',
+        sortable: false,
+        render: (tactic) => this.actionButtonsRender(tactic)
+      },
     ];
   }
 
 
+  actionButtonsRender(tactic) {
+    return (
+      <div>
+        <EuiToolTip content="View details" position="left">
+          <EuiButtonIcon
+            onClick={() => this.showFlyout(tactic)}
+            iconType="eye"
+            aria-label="View details"
+          />
+        </EuiToolTip>
+      </div>
+    );
+  }
+
+  async showFlyout(techniqueData) {
+    this.setState({ isFlyoutVisible: true });
+    const result = await this.props.wzReq("GET", "/mitre",{q: `id=${techniqueData.id}`})
+    const formattedResult = ((((result || {}).data || {}).data ).items || [])[0] || {}
+    this.updateCurrentTechniqueData(formattedResult)
+  }
+
+
+  closeFlyout() {
+    this.setState({ isFlyoutVisible: false, currentTechniqueData: {} });
+  }
+
   onTableBarChange = e => {
-    console.log(e)
     this.setState({
       searchValue: e.target.value,
     });
@@ -154,14 +206,20 @@ import { EuiPanel, EuiBasicTable, EuiFlexItem, EuiFlexGroup, EuiButtonEmpty, Eui
       isProcessing: true,
     });
   };
-
-   formattedButton() {
+    /**
+     * The "Export Formatted" button have been removed as long as the API can only returns 10 results.
+     */
+   formattedButton() { 
     return (
-      <EuiFlexItem grow={false}>
-        <EuiButtonEmpty iconType="importAction" onClick={this.downloadCsv}>
-          Formatted          
-        </EuiButtonEmpty>
-      </EuiFlexItem>
+      <div>
+        {/*
+          <EuiFlexItem grow={false}>
+            <EuiButtonEmpty iconType="importAction" onClick={this.downloadCsv}>
+              Export formatted          
+            </EuiButtonEmpty>
+          </EuiFlexItem>
+        */}
+      </div>
     );
   }
 
@@ -178,16 +236,23 @@ import { EuiPanel, EuiBasicTable, EuiFlexItem, EuiFlexGroup, EuiButtonEmpty, Eui
               </EuiTitle>
             </EuiFlexItem>
           </EuiFlexGroup>
+           <EuiSpacer size="m"/>
+          <EuiFlexGroup>
+            <EuiFlexItem style={{ paddingBottom: 10 }}>
+              <EuiTextColor color="subdued">
+                <p>
+                From here you can list the globally-accessible knowledge base of adversary tactics and techniques based on real-world observations.
+                </p>
+              </EuiTextColor>
+            </EuiFlexItem>
+          </EuiFlexGroup>
         </EuiFlexItem>
         {formattedButton}
-        <EuiFlexItem grow={false}>
-          { /*<EuiButtonEmpty iconType="plusInCircle" onClick={() => this.props.addingNewAgent()}>
-            Add new agent
-          </EuiButtonEmpty> 
-    */}
-        </EuiFlexItem>
       </EuiFlexGroup>
-      <EuiFlexGroup className="wz-margin-10">
+      { /*
+      * Searchbar is disabled until our API adds the `search` filter to the `/mitre` call
+      <EuiSpacer size="m"/>
+      <EuiFlexGroup style={{ marginLeft: 2 }}>
         <EuiFieldSearch
                   fullWidth={true}
                   placeholder="Filter MITRE attacks"
@@ -197,6 +262,7 @@ import { EuiPanel, EuiBasicTable, EuiFlexItem, EuiFlexGroup, EuiButtonEmpty, Eui
                   aria-label="Filter MITRE attacks"
                 />
         </EuiFlexGroup>
+        */}
       </div>
     );
   }
@@ -234,8 +300,6 @@ import { EuiPanel, EuiBasicTable, EuiFlexItem, EuiFlexGroup, EuiButtonEmpty, Eui
   }
 
    filterBar() {
-
-
      return (
       <EuiFlexGroup>
         <EuiFlexItem>
@@ -246,22 +310,142 @@ import { EuiPanel, EuiBasicTable, EuiFlexItem, EuiFlexGroup, EuiButtonEmpty, Eui
   }
 
 
-   render() {
+  updateCurrentTechniqueData(currentData) {
+    if(currentData){
+      const techniqueId = currentData.id
 
-     const title = this.title();
+      let techniquePhases = currentData.phases
+      if(currentData.phases && Array.isArray(currentData.phases))
+        techniquePhases = currentData.phases.toString()
+      
+      let techniquePlatforms = currentData.platforms
+      if(currentData.platforms && Array.isArray(currentData.platforms))
+        techniquePlatforms = currentData.platforms.toString()
+
+      let techniqueDataSources = currentData.json.x_mitre_data_sources
+      if(currentData.json.x_mitre_data_sources && Array.isArray(currentData.json.x_mitre_data_sources))
+        techniqueDataSources = currentData.json.x_mitre_data_sources.toString()
+      
+      const techniqueDescription = (currentData.json || {}).description
+      const techniqueName = (currentData.json || {}).name
+      const techniqueVersion = (currentData.json || {}).x_mitre_version
+
+      this.setState({currentTechniqueData: {
+        id: techniqueId,
+        phases: techniquePhases,
+        platforms: techniquePlatforms,
+        description: techniqueDescription,
+        name: techniqueName,
+        dataSources: techniqueDataSources,
+        version: techniqueVersion
+        }
+      })
+    }
+  }
+
+
+  getFlyoutHeader(){
+    return (<EuiFlyoutHeader hasBorder>
+       {(Object.keys(this.state.currentTechniqueData).length === 0) &&
+           <div>
+             <EuiLoadingContent lines={1} />
+           </div>
+         ||
+         <EuiTitle size="m">
+           <h2 id="flyoutSmallTitle">{this.state.currentTechniqueData.name}</h2>
+         </EuiTitle>
+         }
+     </EuiFlyoutHeader> 
+    )
+   }
+ 
+   getFlyoutBody(){
+     const link = `https://attack.mitre.org/techniques/${this.state.currentTechniqueData.id}/`
+     
+     const data = [
+       {
+         title: 'Id',
+         description: this.state.currentTechniqueData.id,
+       },
+       {
+         title: 'Tactic',
+         description: this.state.currentTechniqueData.phases,
+       },
+       {
+         title: 'Platform',
+         description: this.state.currentTechniqueData.platforms,
+       },
+       {
+         title: 'Data sources',
+         description: this.state.currentTechniqueData.dataSources,
+       },
+       {
+         title: 'Version',
+         description: this.state.currentTechniqueData.version,
+       },
+       {
+         title: 'Description',
+         description: this.state.currentTechniqueData.description,
+       },
+     ];
+     return (
+       <EuiFlyoutBody>
+         {(Object.keys(this.state.currentTechniqueData).length === 0) &&
+           <div>
+             <EuiLoadingContent lines={2} />
+             <EuiLoadingContent lines={3} />
+           </div>
+         ||
+         <div>
+           <EuiDescriptionList listItems={data} />
+           <EuiSpacer />
+           <p>
+             More info:{' '}
+             <EuiLink href={link} target="_blank">
+               {`MITRE ATT&CK - ${this.state.currentTechniqueData.id}`}
+             </EuiLink>
+           </p>
+         </div>
+         }
+     </EuiFlyoutBody>
+     )
+   }
+
+
+   render() {
+    let flyout;
+    if (this.state.isFlyoutVisible) {
+      flyout = (
+        
+        <EuiFlyout
+          onClose={this.closeFlyout}
+          size="s"
+          aria-labelledby="flyoutSmallTitle">
+          {this.getFlyoutHeader()}
+          {this.getFlyoutBody()}
+        </EuiFlyout>
+      );
+    }
+    
+
+    const title = this.title();
     const filter = this.filterBar();
     const table = this.table();
 
      return (
-      <EuiPanel paddingSize="l">
-        {title}
-        {filter}
-        {table}
-      </EuiPanel>
+       <div>
+        <EuiPanel paddingSize="l">
+          {title}
+          {filter}
+          {table}
+        </EuiPanel>
+
+        {flyout}
+      </div>
     );
   }
 }
 
  MitreTable.propTypes = {
-  wzReq: PropTypes.func
+  wzReq: PropTypes.func,
 };
