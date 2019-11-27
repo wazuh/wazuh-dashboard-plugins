@@ -16,7 +16,7 @@ import { connect } from 'react-redux';
 import GroupsHandler from './utils/groups-handler';
 
 import { cleanInfo } from '../../../../../redux/actions/groupsActions';
-import WzGroupsActionButtons from './actions-buttons';
+import WzGroupsActionButtonsAgents from './actions-buttons-agents';
 import WzGroupsAgentsTable from './groups-agents-table';
 
 class WzGroupDetail extends Component {
@@ -45,7 +45,6 @@ class WzGroupDetail extends Component {
 
   componentWillUnmount() {
     // When the component is going to be unmounted its info is clear
-    this.props.cleanInfo();
   }
 
   onSelectedTabChanged = id => {
@@ -121,9 +120,8 @@ class WzGroupDetail extends Component {
                 </EuiFlexItem>
               </EuiFlexGroup>
             </EuiFlexItem>
-            {/* {(this.state.selectedTabId === 'agents' && this.renderAgents()) ||
-                (this.state.selectedTabId === 'files' && this.renderFiles())} */}
-            <WzGroupsActionButtons />
+            {(this.state.selectedTabId === 'agents' && <WzGroupsActionButtonsAgents {...this.props} />) ||
+              (this.state.selectedTabId === 'files' && <h1>Buttons</h1>)}
           </EuiFlexGroup>
           <EuiFlexGroup>
             <EuiFlexItem>

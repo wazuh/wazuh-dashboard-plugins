@@ -42,7 +42,7 @@ class WzManagementMain extends Component {
                 <EuiFlexItem>
                     <div>
                         {
-                            section === 'groups' && (<WzGroups />)
+                            section === 'groups' && (<WzGroups {...this.props}/>)
                             || ruleset.includes(section) && (<WzRuleset />)
                         }
                     </div>

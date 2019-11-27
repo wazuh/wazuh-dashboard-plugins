@@ -21,11 +21,23 @@ import WzGroupDetail from './group-detail';
 // import WzRulesetEditor from './ruleset-editor';
 // import WzListEditor from './list-editor';
 
-export default class WzGroups extends Component {
+import { updateShowAddAgents } from '../../../../../redux/actions/groupsActions';
+import { connect } from 'react-redux';
+
+class WzGroups extends Component {
   constructor(props) {
     super(props);
     this.state = {}; //Init state empty to avoid fails when try to read any parameter and this.state is not defined yet
     this.store = store;
+  }
+
+  UNSAFE_componentWillReceiveProps(nextProps) {
+    if (nextProps.groupsProps.closeAddingAgents && this.state.showAddAgents) {
+      this.setState({
+        closeAddingAgents: true,
+      });
+      this.props.updateShowAddAgents(false);
+    }
   }
 
   UNSAFE_componentWillMount() {
@@ -43,16 +55,32 @@ export default class WzGroups extends Component {
 
   render() {
     // const { ruleInfo, decoderInfo, listInfo, fileContent, addingRulesetFile } = this.state;
-    const { itemDetail } = this.state;
+    const { itemDetail, showAddAgents } = this.state;
+
     return (
       <WzReduxProvider>
-        {(itemDetail && <WzGroupDetail />) || (
-          // || decoderInfo && (<WzDecoderInfo />)
-          // || listInfo && (<WzListEditor />)
-          // || (fileContent || addingRulesetFile) && (<WzRulesetEditor />)
-          <WzGroupsOverview />
-        )}
+        {!showAddAgents &&
+          ((itemDetail && <WzGroupDetail {...this.props} />) || (
+            // || decoderInfo && (<WzDecoderInfo />)
+            // || listInfo && (<WzListEditor />)
+            // || (fileContent || addingRulesetFile) && (<WzRulesetEditor />)
+            <WzGroupsOverview />
+          ))}
       </WzReduxProvider>
     );
   }
 }
+
+const mapStateToProps = state => {
+  return {
+    state: state.groupsReducers,
+  };
+};
+
+const mapDispatchToProps = dispatch => {
+  return {
+    updateShowAddAgents: showAddAgents => dispatch(updateShowAddAgents(showAddAgents)),
+  };
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(WzGroups);

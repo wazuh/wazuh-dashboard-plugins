@@ -191,6 +191,13 @@ export const cleanInfo = () => {
   };
 };
 
+export const updateShowAddAgents = showAddAgents => {
+  return {
+    type: 'UPDATE_SHOW_ADD_AGENTS',
+    showAddAgents: showAddAgents,
+  };
+};
+
 // export const cleanFileContent = () => {
 //   return {
 //     type: 'CLEAN_CONTENT'

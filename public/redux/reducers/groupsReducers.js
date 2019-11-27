@@ -30,6 +30,7 @@ const initialState = {
   showModal: false,
   sortDirection: 'asc',
   sortField: 'name',
+  showAddAgents: false,
   // defaultItems: [],
 };
 
@@ -98,6 +99,12 @@ const groupsReducers = (state = initialState, action) => {
     return {
       ...state,
       itemDetail: false,
+    };
+  }
+  if (action.type === 'UPDATE_SHOW_ADD_AGENTS') {
+    return {
+      ...state,
+      showAddAgents: action.showAddAgents,
     };
   }
 
