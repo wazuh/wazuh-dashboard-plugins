@@ -309,7 +309,6 @@ export class OverviewController {
       if (newTab === 'mitre') {
         const result = await this.apiReq.request('GET', '/rules/mitre', {});
         this.$scope.mitreIds = ((((result || {}).data) || {}).data || {}).items
-        //this.$scope.mitreIds = ["T1503","T1436","T1122", "T1526", "T1522", "T9999"] //example data
         
         this.mitreCardsSliderProps = {
           items: this.$scope.mitreIds ,
@@ -440,14 +439,14 @@ export class OverviewController {
         }
 
         
-      this.mitreCardsSliderProps = {
-        items: this.$scope.mitreIds,
-        attacksCount: this.$scope.attacksCount,
-        reqTitle: "MITRE",
-        wzReq: (method, path, body) => this.apiReq.request(method, path, body),
-        addFilter: (id) => this.addMitrefilter(id)
-        }
-      });
+        this.mitreCardsSliderProps = {
+          items: this.$scope.mitreIds,
+          attacksCount: this.$scope.attacksCount,
+          reqTitle: "MITRE",
+          wzReq: (method, path, body) => this.apiReq.request(method, path, body),
+          addFilter: (id) => this.addMitrefilter(id)
+          }
+        });
 
     } catch (error) {
       this.errorHandler.handle(error.message || error);

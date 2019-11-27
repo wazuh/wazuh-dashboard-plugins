@@ -50,7 +50,7 @@ export class MitreCardsSlider extends Component {
   
   async componentDidMount() {
     window.addEventListener('resize', this.updateDimensions);
-    this.setState({ sliderLength: this.props.items.length, chunkSize: 6});
+    this.setState({ sliderLength: (this.props.items || []).length || 0, chunkSize: 6});
     this.setState({ slider: this.props.items });
     this.setState({ sliderInfo: {
       "T1021": {"name" : "Remote Services"},
@@ -90,6 +90,7 @@ export class MitreCardsSlider extends Component {
     window.removeEventListener('resize', this.updateDimensions);
   }
 
+
   /**
    * Updates the chunk size depending on the window width so we avoid unnecessary scroll
    */
@@ -111,10 +112,11 @@ export class MitreCardsSlider extends Component {
    * @param {*} nextProps 
    */
   UNSAFE_componentWillReceiveProps(nextProps) {
-    let sliderObject = {}
-    this.state.slider.forEach((key) => {
+    this.setState({ sliderLength: (nextProps.items || []).length || 0});
+    let sliderObject = {};
+    (this.state.slider || []).forEach((key) => {
       sliderObject[key] = 0
-    })
+    });
     const tmpSlider = {...sliderObject, ...nextProps.attacksCount};
     const sliderSorted = Object.keys(tmpSlider).sort(function(a,b){return tmpSlider[b]-tmpSlider[a]});
     this.setState({ slider: sliderSorted, position: 0});
