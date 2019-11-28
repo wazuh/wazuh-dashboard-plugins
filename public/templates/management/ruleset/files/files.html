@@ -56,15 +56,15 @@
             </div>
         </div>
 
-                <wz-table ng-if="filesctrl.filesSubTab === 'rules' && mctrl.onlyLocalFiles" flex path="'/rules/files'"
+                <wz-table ng-if="mctrl.globalRulesetTab === 'rules' && mctrl.onlyLocalFiles" flex path="'/rules/files'"
                     implicit-filter="[{name: 'path', value: 'etc/rules'}]" keys="[{value: 'file', width: '25%'}]"
                     allow-click="true" row-sizes="[16,13,11]" implicit-sort="'path'" />
-                <wz-table ng-if="filesctrl.filesSubTab === 'rules' && !mctrl.onlyLocalFiles" flex path="'/rules/files'"
+                <wz-table ng-if="mctrl.globalRulesetTab === 'rules' && !mctrl.onlyLocalFiles" flex path="'/rules/files'"
                     keys="[{value: 'file', width: '25%'}]" allow-click="true" row-sizes="[16,13,11]" />
-                <wz-table ng-if="filesctrl.filesSubTab === 'decoders' && mctrl.onlyLocalFiles" flex
+                <wz-table ng-if="mctrl.globalRulesetTab === 'decoders' && mctrl.onlyLocalFiles" flex
                     path="'/decoders/files'" implicit-filter="[{name: 'path', value: 'etc/decoders'}]"
                     keys="[{value: 'file', width: '25%'}]" allow-click="true" row-sizes="[16,13,11]"  implicit-sort="'path'" />
-                <wz-table ng-if="filesctrl.filesSubTab === 'decoders' && !mctrl.onlyLocalFiles" flex
+                <wz-table ng-if="mctrl.globalRulesetTab === 'decoders' && !mctrl.onlyLocalFiles" flex
                     path="'/decoders/files'" keys="[{value: 'file', width: '25%'}]" allow-click="true"
                     row-sizes="[16,13,11]" implicit-sort="'file'" />
         </div>
