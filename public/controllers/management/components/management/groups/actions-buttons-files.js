@@ -14,12 +14,6 @@ import React, { Component, Fragment } from 'react';
 import {
   EuiFlexItem,
   EuiButtonEmpty,
-  EuiPopover,
-  EuiFormRow,
-  EuiFieldText,
-  EuiSpacer,
-  EuiFlexGroup,
-  EuiButton,
 } from '@elastic/eui';
 
 import { connect } from 'react-redux';
@@ -27,6 +21,7 @@ import { connect } from 'react-redux';
 import {
   updateLoadingStatus,
   updateIsProcessing,
+  updateFileContent,
 } from '../../../../../redux/actions/groupsActions';
 
 import exportCsv from '../../../../../react-services/wz-csv';
@@ -88,10 +83,15 @@ class WzGroupsActionButtonsFiles extends Component {
     }, 100);
   }
 
-  showGroupConfiguration() {
+  async showGroupConfiguration() {
     const { itemDetail } = this.props.state;
     // TODO: groups configurations
-    console.log('Group configurations');
+    const result = await this.groupsHandler.getFileContent(
+      `/agents/groups/${itemDetail.name}/files/agent.conf`
+    );
+
+    const file = { name: 'agent.conf', content: result, isEditable: true };
+    this.props.updateFileContent(file);
   }
 
   closePopover() {
@@ -249,6 +249,7 @@ const mapDispatchToProps = dispatch => {
   return {
     updateLoadingStatus: status => dispatch(updateLoadingStatus(status)),
     updateIsProcessing: isProcessing => dispatch(updateIsProcessing(isProcessing)),
+    updateFileContent: content => dispatch(updateFileContent(content)),
   };
 };
 
