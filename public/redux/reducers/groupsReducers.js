@@ -39,6 +39,7 @@ const groupsReducers = (state = initialState, action) => {
     return {
       ...state,
       isProcessing: action.isProcessing,
+      isLoading: action.isProcessing,
     };
   }
   if (action.type === 'UPDATE_LOADING_STATUS') {
