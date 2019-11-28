@@ -22,6 +22,7 @@ import {
   updatePageIndex,
   updateSortDirection,
   updateSortField,
+  updateFileContent,
 } from '../../../../../redux/actions/groupsActions';
 
 import GroupsFilesColumns from './utils/columns-files';
@@ -168,6 +169,7 @@ const mapDispatchToProps = dispatch => {
     updatePageIndex: pageIndex => dispatch(updatePageIndex(pageIndex)),
     updateSortDirection: sortDirection => dispatch(updateSortDirection(sortDirection)),
     updateSortField: sortField => dispatch(updateSortField(sortField)),
+    updateFileContent: content => dispatch(updateFileContent(content)),
   };
 };
 
