@@ -1,7 +1,7 @@
 import React from 'react';
 import { EuiToolTip, EuiButtonIcon } from '@elastic/eui';
 
-export default class RulesetColumns {
+export default class GroupsColums {
   constructor(tableProps) {
     this.tableProps = tableProps;
     this.adminMode = this.tableProps.state.adminMode;

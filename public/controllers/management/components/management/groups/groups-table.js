@@ -32,7 +32,7 @@ import {
   updateGroupDetail,
 } from '../../../../../redux/actions/groupsActions';
 
-import GroupsColums from './utils/columns';
+import GroupsColums from './utils/columns-main';
 import { WzRequest } from '../../../../../react-services/wz-request';
 
 class WzGroupsTable extends Component {

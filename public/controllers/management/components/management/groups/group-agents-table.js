@@ -33,7 +33,7 @@ import {
 
 import GroupsAgentsColums from './utils/columns-agents';
 
-class WzGroupsAgentsTable extends Component {
+class WzGroupAgentsTable extends Component {
   _isMounted = false;
   constructor(props) {
     super(props);
@@ -222,4 +222,4 @@ const mapDispatchToProps = dispatch => {
   };
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(WzGroupsAgentsTable);
+export default connect(mapStateToProps, mapDispatchToProps)(WzGroupAgentsTable);

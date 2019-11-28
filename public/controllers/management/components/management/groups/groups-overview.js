@@ -17,7 +17,7 @@ import { connect } from 'react-redux';
 
 // Wazuh components
 import WzGroupsTable from './groups-table';
-import WzGroupsActionButtons from './actions-buttons';
+import WzGroupsActionButtons from './actions-buttons-main';
 
 // import {
 //   updateIsProcessing,

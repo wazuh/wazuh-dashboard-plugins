@@ -19,7 +19,7 @@ import store from '../../../../redux/store';
 
 import WzManagementSideMenu from './management-side-menu';
 import WzRuleset from './ruleset/main-ruleset';
-import WzGroups from './groups/main-groups';
+import WzGroups from './groups/groups-main';
 // import { GroupsTable } from './groups/groups-table';
 // import { changeManagementSection } from '../../../../redux/reducers/managementReducers';
 import { connect } from 'react-redux';
