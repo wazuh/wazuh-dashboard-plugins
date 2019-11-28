@@ -31,6 +31,7 @@ const initialState = {
   sortDirection: 'asc',
   sortField: 'name',
   showAddAgents: false,
+  selectedTabId: 'agents',
   // defaultItems: [],
 };
 
@@ -118,6 +119,12 @@ const groupsReducers = (state = initialState, action) => {
     return {
       ...state,
       fileContent: false,
+    };
+  }
+  if (action.type === 'UPDATE_SELECTED_TAB') {
+    return {
+      ...state,
+      selectedTabId: action.selectedTabId,
     };
   }
 

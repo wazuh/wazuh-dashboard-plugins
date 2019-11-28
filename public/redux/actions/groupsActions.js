@@ -208,6 +208,13 @@ export const updateShowAddAgents = showAddAgents => {
   };
 };
 
+export const updateSelectedTab = selectedTabId => {
+  return {
+    type: 'UPDATE_SELECTED_TAB',
+    selectedTabId: selectedTabId,
+  };
+};
+
 // export const cleanFileContent = () => {
 //   return {
 //     type: 'CLEAN_CONTENT'

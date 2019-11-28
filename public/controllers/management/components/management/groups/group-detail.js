@@ -17,7 +17,7 @@ import { connect } from 'react-redux';
 
 import GroupsHandler from './utils/groups-handler';
 
-import { cleanInfo } from '../../../../../redux/actions/groupsActions';
+import { cleanInfo, updateSelectedTab } from '../../../../../redux/actions/groupsActions';
 import WzGroupsActionButtonsAgents from './actions-buttons-agents';
 import WzGroupsActionButtonsFiles from './actions-buttons-files';
 import WzGroupAgentsTable from './group-agents-table';
@@ -41,7 +41,7 @@ class WzGroupDetail extends Component {
     ];
 
     this.state = {
-      selectedTabId: 'agents',
+      selectedTabId: this.props.state.selectedTabId,
     };
 
     this.groupsHandler = GroupsHandler;
@@ -55,7 +55,13 @@ class WzGroupDetail extends Component {
     this.setState({
       selectedTabId: id,
     });
+    this.props.updateSelectedTab(id);
   };
+
+  goBack() {
+    this.props.cleanInfo();
+    this.props.updateSelectedTab('agents');
+  }
 
   renderTabs() {
     return this.tabs.map((tab, index) => (
@@ -126,7 +132,7 @@ class WzGroupDetail extends Component {
                       color="subdued"
                       iconSize="l"
                       iconType="arrowLeft"
-                      onClick={() => this.props.cleanInfo()}
+                      onClick={() => this.goBack()}
                     />
                   </EuiToolTip>
                 </EuiFlexItem>
@@ -170,6 +176,7 @@ const mapStateToProps = state => {
 const mapDispatchToProps = dispatch => {
   return {
     cleanInfo: () => dispatch(cleanInfo()),
+    updateSelectedTab: selectedTabId => dispatch(updateSelectedTab(selectedTabId)),
   };
 };
 
