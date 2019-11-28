@@ -119,5 +119,7 @@ export const KeyEquivalence = {
   compliance: 'Compliance',
   rules: 'Rules',
   reason: 'Reason',
-  registerIP: 'Register IP'
+  registerIP: 'Register IP',
+  'hotfix': 'Update code',
+  'scan.time': 'Registered by Wazuh at'
 };
