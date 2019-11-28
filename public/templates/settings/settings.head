@@ -1,8 +1,8 @@
-<div flex="auto" layout="column" ng-cloak ng-controller="settingsController as ctrl">
-    <div ng-if="ctrl.load" class="md-padding wz-margin-top-16">
+<div ng-cloak ng-controller="settingsController as ctrl">
+    <div ng-if="ctrl.load" class="md-padding">
         <react-component name="EuiProgress" props="{size: 'xs', color: 'primary'}" />
     </div>
 
-    <div ng-if="!ctrl.load && ctrl.settingsTabsProps && !ctrl.apiIsDown && ctrl.apiTableProps.apiEntries.length" class="wz-margin-top-10 md-margin-h">
-        <react-component name="Tabs" props="ctrl.settingsTabsProps" />
+    <div ng-if="!ctrl.load && ctrl.settingsTabsProps && !ctrl.apiIsDown && ctrl.apiTableProps.apiEntries.length">
+        <react-component name="WzSettingsSideMenu" props="ctrl.settingsTabsProps" />        
     </div>

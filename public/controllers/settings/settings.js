@@ -141,13 +141,13 @@ export class SettingsController {
           this.refreshLogs();
         }
       },
-      selectedTab: this.tab || 'api',
-      tabs: [
-        { id: 'api', name: 'API' },
-        { id: 'configuration', name: 'Configuration' },
-        { id: 'logs', name: 'Logs' },
-        { id: 'about', name: 'About' }
-      ]
+      selectedTab: this.tab || 'api'
+    };
+
+    this.settingsLogsProps = {
+      getLogs: async () => {
+        return await this.getAppLogs();
+      }
     };
   }
 
@@ -201,7 +201,7 @@ export class SettingsController {
         }
       }
       return numError;
-    } catch (error) {}
+    } catch (error) { }
   }
 
   // Set default API
@@ -370,13 +370,11 @@ export class SettingsController {
    */
   async getAppLogs() {
     try {
-      this.loadingLogs = true;
       const logs = await this.genericReq.request('GET', '/utils/logs', {});
-      this.logs = logs.data.lastLogs.map(item => JSON.parse(item));
-      this.loadingLogs = false;
       this.$scope.$applyAsync();
+      return logs.data.lastLogs.map(item => JSON.parse(item));
     } catch (error) {
-      this.logs = [
+      return [
         {
           date: new Date(),
           level: 'error',

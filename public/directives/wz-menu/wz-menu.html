@@ -2,15 +2,15 @@
     <!-- Main toolbar content -->
     <div class="md-toolbar-tools wz-menu-content">
         <!-- Main Wazuh app navigation buttons -->
-        <a ng-href="#/home" ng-click="setMenuNavItem('home')"
+<!--         <a ng-href="#/home" ng-click="setMenuNavItem('home')"
             ng-class="{'wz-menu-active': menuNavItem === 'home' || menuNavItem === 'health-check' }"
             aria-label="Overview tab" data-test-subj="wzMenuOverview" class="md-button wz-menu-button" tooltip="Overview" tooltip-placement="bottom">
             <react-component name="EuiIcon" props="{type:'metricbeatApp', color: 'primary', size: 'm'}" />
-        </a>
+        </a> -->
 
         <a ng-href="#/overview" ng-click="setMenuNavItem('overview')"
             ng-class="{'wz-menu-active': menuNavItem === 'overview' || menuNavItem === 'health-check' }"
-            aria-label="Overview tab" data-test-subj="wzMenuOverview" class="md-button wz-menu-button" tooltip="Dashboards" tooltip-placement="bottom">
+            aria-label="Overview tab" data-test-subj="wzMenuOverview" class="md-button wz-menu-button" tooltip="Overview" tooltip-placement="bottom">
             <react-component name="EuiIcon" props="{type:'visualizeApp', color: 'primary', size: 'm'}" />
         </a>
 
@@ -40,7 +40,7 @@
         <span flex></span>
 
         <!-- API/Index pattern section -->
-        <div style="padding-left: 8px;">
+        <div style="padding: 0px 8px">
             <!-- Case 1a - There's API -->
             <span ng-show="theresAPI" tooltip="Selected API" tooltip-placement="bottom">
                 <react-component name="EuiIcon" props="{type:'starFilledSpace', color: 'primary', size: 'm'}" />{{currentAPI}}<span
@@ -66,8 +66,8 @@
             </span>
         </div>
         <!-- Settings tab button -->
-        <span tooltip="Settings" tooltip-placement="bottom">
-            <a ng-href="#/settings" ng-click="setMenuNavItem('settings')" ng-class="{'wz-menu-active': menuNavItem === 'settings' }" 
+        <span>
+            <a tooltip="Settings" tooltip-placement="bottom" ng-href="#/settings" ng-click="setMenuNavItem('settings')" ng-class="{'wz-menu-active': menuNavItem === 'settings' }" 
                 aria-label="Settings tab" class="md-button wz-menu-button">
                 <react-component name="EuiIcon" props="{type:'advancedSettingsApp', color: 'primary', size: 'm'}" />
             </a>
