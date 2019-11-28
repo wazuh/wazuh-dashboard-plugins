@@ -33,13 +33,11 @@ import {
 } from '../../../../../redux/actions/groupsActions';
 
 import GroupsColums from './utils/columns-main';
-import { WzRequest } from '../../../../../react-services/wz-request';
 
 class WzGroupsTable extends Component {
   _isMounted = false;
   constructor(props) {
     super(props);
-    this.wzReq = (...args) => WzRequest.apiReq(...args);
     this.state = {
       items: [],
       pageSize: 10,
@@ -69,7 +67,7 @@ class WzGroupsTable extends Component {
    */
   async getItems() {
     try {
-      const rawItems = await this.wzReq('GET', '/agents/groups', this.buildFilter());
+      const rawItems = await this.groupsHandler.listGroups(this.buildFilter());
       const { items, totalItems } = ((rawItems || {}).data || {}).data;
 
       this.setState({
@@ -117,13 +115,7 @@ class WzGroupsTable extends Component {
 
   render() {
     this.groupsColumns = new GroupsColums(this.props);
-    const {
-      isLoading,
-      pageIndex,
-      error,
-      sortField,
-      sortDirection,
-    } = this.props.state;
+    const { isLoading, pageIndex, error, sortField, sortDirection } = this.props.state;
     const { items, pageSize, totalItems } = this.state;
     const columns = this.groupsColumns.columns;
     const message = isLoading ? null : 'No results...';
