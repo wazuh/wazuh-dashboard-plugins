@@ -85,7 +85,6 @@ class WzGroupsActionButtonsFiles extends Component {
 
   async showGroupConfiguration() {
     const { itemDetail } = this.props.state;
-    // TODO: groups configurations
     const result = await this.groupsHandler.getFileContent(
       `/agents/groups/${itemDetail.name}/files/agent.conf`
     );
