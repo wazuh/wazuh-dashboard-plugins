@@ -42,6 +42,20 @@ export default class GroupsHandler {
   }
 
   /**
+   * Remove a single group of an agent
+   * @param {String} agentId
+   * @param {String} groupId
+   */
+  static async deleteAgent(agentId, groupId) {
+    try {
+      const result = await WzRequest.apiReq('DELETE', `/agents/${agentId}/group/${groupId}`, {});
+      return result;
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  }
+
+  /**
    * Get list agents in a group
    * @param {String} name
    */

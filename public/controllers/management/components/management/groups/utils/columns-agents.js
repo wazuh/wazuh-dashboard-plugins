@@ -74,9 +74,8 @@ export default class GroupsAgentsColumns {
                     aria-label="Delete agent"
                     iconType="trash"
                     onClick={async () => {
-                      // TODO: Remove agents in the group
-                      // this.tableProps.updateListItemsForRemove([item]);
-                      // this.tableProps.updateShowModal(true);
+                      this.tableProps.updateListItemsForRemove([item]);
+                      this.tableProps.updateShowModal(true);
                     }}
                     color="danger"
                     disabled={item.name === 'default'}

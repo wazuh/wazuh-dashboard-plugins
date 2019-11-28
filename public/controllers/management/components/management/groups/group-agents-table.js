@@ -186,9 +186,11 @@ class WzGroupAgentsTable extends Component {
   };
 
   async removeItems(items) {
+    const { itemDetail } = this.props.state;
+
     this.props.updateLoadingStatus(true);
     const results = items.map(async (item, i) => {
-      await this.groupsHandler.deleteGroup(item.name);
+      await this.groupsHandler.deleteAgent(item.id, itemDetail.name);
     });
 
     Promise.all(results).then(completed => {
