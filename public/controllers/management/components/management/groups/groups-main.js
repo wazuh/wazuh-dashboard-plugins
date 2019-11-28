@@ -19,7 +19,7 @@ import WzGroupsOverview from './groups-overview';
 import WzGroupDetail from './group-detail';
 // import WzDecoderInfo from './decoder-info';
 // import WzRulesetEditor from './ruleset-editor';
-// import WzListEditor from './list-editor';
+import WzGroupEditor from './groups-editor';
 
 import { updateShowAddAgents } from '../../../../../redux/actions/groupsActions';
 import { connect } from 'react-redux';
@@ -55,17 +55,18 @@ class WzGroups extends Component {
 
   render() {
     // const { ruleInfo, decoderInfo, listInfo, fileContent, addingRulesetFile } = this.state;
-    const { itemDetail, showAddAgents } = this.state;
+    const { itemDetail, showAddAgents, fileContent } = this.state;
 
     return (
       <WzReduxProvider>
         {!showAddAgents &&
-          ((itemDetail && <WzGroupDetail {...this.props} />) || (
-            // || decoderInfo && (<WzDecoderInfo />)
-            // || listInfo && (<WzListEditor />)
-            // || (fileContent || addingRulesetFile) && (<WzRulesetEditor />)
-            <WzGroupsOverview />
-          ))}
+          ((itemDetail && !fileContent && <WzGroupDetail {...this.props} />) ||
+            (fileContent && <WzGroupEditor />) || (
+              // || decoderInfo && (<WzDecoderInfo />)
+              // || listInfo && (<WzListEditor />)
+              // || (fileContent || addingRulesetFile) && (<WzRulesetEditor />)
+              <WzGroupsOverview />
+            ))}
       </WzReduxProvider>
     );
   }

@@ -107,6 +107,18 @@ const groupsReducers = (state = initialState, action) => {
       showAddAgents: action.showAddAgents,
     };
   }
+  if (action.type === 'UPDATE_FILE_CONTENT') {
+    return {
+      ...state,
+      fileContent: action.content,
+    };
+  }
+  if (action.type === 'CLEAN_FILE_CONTENT') {
+    return {
+      ...state,
+      fileContent: false,
+    };
+  }
 
   return state;
 };

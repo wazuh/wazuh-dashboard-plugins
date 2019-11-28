@@ -19,7 +19,9 @@ import GroupsHandler from './utils/groups-handler';
 
 import { cleanInfo } from '../../../../../redux/actions/groupsActions';
 import WzGroupsActionButtonsAgents from './actions-buttons-agents';
+import WzGroupsActionButtonsFiles from './actions-buttons-files';
 import WzGroupAgentsTable from './group-agents-table';
+import WzGroupFilesTable from './group-files-table';
 
 class WzGroupDetail extends Component {
   constructor(props) {
@@ -100,7 +102,9 @@ class WzGroupDetail extends Component {
           </EuiFlexItem>
         </EuiFlexGroup>
         <EuiFlexGroup>
-          <EuiFlexItem>{/* <WzGroupsTable /> */}</EuiFlexItem>
+          <EuiFlexItem>
+            <WzGroupFilesTable />
+          </EuiFlexItem>
         </EuiFlexGroup>
       </Fragment>
     );
@@ -136,7 +140,9 @@ class WzGroupDetail extends Component {
             {(this.state.selectedTabId === 'agents' && (
               <WzGroupsActionButtonsAgents {...this.props} />
             )) ||
-              (this.state.selectedTabId === 'files' && <h1>Buttons</h1>)}
+              (this.state.selectedTabId === 'files' && (
+                <WzGroupsActionButtonsFiles {...this.props} />
+              ))}
           </EuiFlexGroup>
           <EuiFlexGroup>
             <EuiFlexItem>

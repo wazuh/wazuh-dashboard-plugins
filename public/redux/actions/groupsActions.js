@@ -21,16 +21,26 @@
 //   }
 // }
 
-// /**
-//  * Update the files content
-//  * @param {String} content
-//  */
-// export const updateFileContent = (content) => {
-//   return {
-//     type: 'UPDATE_FILE_CONTENT',
-//     content: content
-//   }
-// }
+/**
+ * Update the files content
+ * @param {String} content
+ */
+export const updateFileContent = content => {
+  return {
+    type: 'UPDATE_FILE_CONTENT',
+    content: content,
+  };
+};
+
+/**
+ * Update the files content
+ * @param {String} content
+ */
+export const cleanFileContent = () => {
+  return {
+    type: 'CLEAN_FILE_CONTENT',
+  };
+};
 
 /**
  * Toggle the modal confirm of the ruleset table

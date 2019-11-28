@@ -55,12 +55,56 @@ export default class GroupsHandler {
   }
 
   /**
+   * Get files in a group
+   * @param {String} name
+   */
+  static async filesGroup(name) {
+    try {
+      const result = await WzRequest.apiReq('GET', `/agents/groups/${name}/files`, {});
+      return result;
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  }
+
+  /**
    * Get list groups
    * @param {String} name
    */
   static async listGroups(filters) {
     try {
       const result = await WzRequest.apiReq('GET', '/agents/groups', filters);
+      return result;
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  }
+
+  /**
+   * Get the content of groups files
+   * @param {String} path
+   */
+  static async getFileContent(path) {
+    try {
+      const result = await WzRequest.apiReq('GET', path, { format: 'xml' });
+      return ((result || {}).data || {}).data || false;
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  }
+
+  /**
+   * Send the file content
+   * @param {String} fileName
+   * @param {String} groupId
+   * @param {String} content
+   */
+  static async sendGroupConfiguration(fileName, groupId, content) {
+    try {
+      const result = await WzRequest.apiReq('POST', `/agents/groups/${groupId}/files/${fileName}`, {
+        content,
+        origin: 'xmleditor',
+      });
       return result;
     } catch (error) {
       return Promise.reject(error);
