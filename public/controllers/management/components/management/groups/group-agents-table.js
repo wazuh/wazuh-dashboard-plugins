@@ -146,23 +146,17 @@ class WzGroupAgentsTable extends Component {
           {this.props.state.showModal ? (
             <EuiOverlayMask>
               <EuiConfirmModal
-                title="Are you sure?"
+                title={`Delete ${itemList[0].file ? itemList[0].file : itemList[0].name} agent?`}
                 onCancel={() => this.props.updateShowModal(false)}
                 onConfirm={() => {
                   this.removeItems(itemList);
                   this.props.updateShowModal(false);
                 }}
-                cancelButtonText="No, don't do it"
-                confirmButtonText="Yes, do it"
+                cancelButtonText="Cancel"
+                confirmButtonText="Delete"
                 defaultFocusedButton="cancel"
                 buttonColor="danger"
               >
-                <p>Are you sure you want to remove?</p>
-                <div>
-                  {itemList.map(function(item, i) {
-                    return <li key={i}>{item.file ? item.file : item.name}</li>;
-                  })}
-                </div>
               </EuiConfirmModal>
             </EuiOverlayMask>
           ) : null}
