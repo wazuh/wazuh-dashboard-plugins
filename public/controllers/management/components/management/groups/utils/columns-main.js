@@ -24,7 +24,7 @@ export default class GroupsColums {
         },
         {
           field: 'configSum',
-          name: 'Configuratino checksum',
+          name: 'Configuration checksum',
           align: 'left',
           sortable: true,
         },
