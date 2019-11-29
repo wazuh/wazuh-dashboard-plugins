@@ -10,7 +10,7 @@
  * Find more information about this on the LICENSE file.
  */
 import React, { Component } from 'react';
-import { EuiBasicTable, EuiCallOut, EuiOverlayMask, EuiConfirmModal } from '@elastic/eui';
+import { EuiInMemoryTable, EuiCallOut, EuiOverlayMask, EuiConfirmModal } from '@elastic/eui';
 
 import { connect } from 'react-redux';
 import GroupsHandler from './utils/groups-handler';
@@ -129,7 +129,7 @@ class WzGroupFilesTable extends Component {
     if (!error) {
       return (
         <div>
-          <EuiBasicTable
+          <EuiInMemoryTable
             itemId="id"
             items={items}
             columns={columns}
@@ -138,6 +138,7 @@ class WzGroupFilesTable extends Component {
             loading={isLoading}
             sorting={sorting}
             message={message}
+            search={{ box: { incremental: true } }}
           />
         </div>
       );
