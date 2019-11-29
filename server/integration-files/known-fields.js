@@ -625,6 +625,24 @@ export const knownFields = [
     readFromDocValues: true
   },
   {
+    name: 'data.aws.awsRegion',
+    type: 'string',
+    count: 0,
+    scripted: false,
+    searchable: true,
+    aggregatable: true,
+    readFromDocValues: true
+  },
+  {
+    name: 'data.aws.region',
+    type: 'string',
+    count: 0,
+    scripted: false,
+    searchable: true,
+    aggregatable: true,
+    readFromDocValues: true
+  },
+  {
     name: 'data.aws.account_id',
     type: 'string',
     count: 0,
@@ -3679,6 +3697,15 @@ export const knownFields = [
     readFromDocValues: true
   },
   {
+    name: 'data.docker.Action',
+    type: 'string',
+    count: 0,
+    scripted: false,
+    searchable: true,
+    aggregatable: true,
+    readFromDocValues: true
+  },
+  {
     name: 'data.docker.Actor.Attributes.container',
     type: 'string',
     count: 0,
@@ -3725,6 +3752,15 @@ export const knownFields = [
   },
   {
     name: 'data.docker.status',
+    type: 'string',
+    count: 0,
+    scripted: false,
+    searchable: true,
+    aggregatable: true,
+    readFromDocValues: true
+  },
+  {
+    name: 'data.docker.Type',
     type: 'string',
     count: 0,
     scripted: false,
