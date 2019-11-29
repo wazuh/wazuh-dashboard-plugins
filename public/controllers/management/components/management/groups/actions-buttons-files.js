@@ -89,7 +89,7 @@ class WzGroupsActionButtonsFiles extends Component {
       `/agents/groups/${itemDetail.name}/files/agent.conf`
     );
 
-    const file = { name: 'agent.conf', content: result, isEditable: true };
+    const file = { name: 'agent.conf', content: result, isEditable: true, groupName: itemDetail.name };
     this.props.updateFileContent(file);
   }
 

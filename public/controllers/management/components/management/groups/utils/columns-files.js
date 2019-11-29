@@ -46,7 +46,7 @@ export default class GroupsFilesColumns {
                       const isEditable = item.filename === 'agent.conf';
                       const data = !isEditable ? beautifier.prettyPrint(result) : result;
 
-                      const file = { name: item.filename, content: data, isEditable: isEditable };
+                      const file = { name: item.filename, content: data, isEditable: isEditable, groupName: itemDetail.name };
                       this.tableProps.updateFileContent(file);
                     }}
                     color="primary"

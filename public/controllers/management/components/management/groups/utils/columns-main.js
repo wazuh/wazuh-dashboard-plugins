@@ -1,10 +1,12 @@
 import React from 'react';
 import { EuiToolTip, EuiButtonIcon } from '@elastic/eui';
+import GroupsHandler from './groups-handler';
 
 export default class GroupsColums {
   constructor(tableProps) {
     this.tableProps = tableProps;
     this.adminMode = this.tableProps.state.adminMode;
+    this.groupsHandler = GroupsHandler;
 
     this.buildColumns = () => {
       this.columns = [
@@ -45,6 +47,15 @@ export default class GroupsColums {
                     color="primary"
                   />
                 </EuiToolTip>
+                <EuiToolTip position="top" content={'Edit group configuration'}>
+                  <EuiButtonIcon
+                    aria-label="Edit group configuration"
+                    iconType="pencil"
+                    onClick={async () => {
+                      this.showGroupConfiguration(item.name);
+                    }}
+                  />
+                </EuiToolTip>
                 <EuiToolTip
                   position="top"
                   content={
@@ -72,5 +83,14 @@ export default class GroupsColums {
     };
 
     this.buildColumns();
+  }
+
+  async showGroupConfiguration(groupId) {
+    const result = await this.groupsHandler.getFileContent(
+      `/agents/groups/${groupId}/files/agent.conf`
+    );
+
+    const file = { name: 'agent.conf', content: result, isEditable: true, groupName: groupId};
+    this.tableProps.updateFileContent(file);
   }
 }

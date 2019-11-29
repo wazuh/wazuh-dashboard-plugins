@@ -45,8 +45,9 @@ class WzGroupsEditor extends Component {
       enableLiveAutocompletion: true,
     };
     this.groupsHandler = GroupsHandler;
-    const { fileContent, itemDetail } = this.props.state;
-    const { name, content, isEditable } = fileContent;
+    const { fileContent } = this.props.state;
+
+    const { name, content, isEditable, groupName } = fileContent;
 
     this.state = {
       error: false,
@@ -54,7 +55,7 @@ class WzGroupsEditor extends Component {
       content,
       name,
       isEditable,
-      nameGroup: itemDetail.name,
+      groupName: groupName,
     };
   }
 
@@ -70,17 +71,16 @@ class WzGroupsEditor extends Component {
   /**
    * Save the new content
    * @param {String} name
-   * @param {Boolean} overwrite
    */
   async save(name) {
     if (!this._isMounted) {
       return;
     }
     try {
-      const { content, nameGroup } = this.state;
+      const { content, groupName } = this.state;
       this.setState({ isSaving: true, error: false });
       let saver = this.groupsHandler.sendGroupConfiguration; // By default the saver is for rules
-      await saver(name, nameGroup, content);
+      await saver(name, groupName, content);
       try {
         await validateConfigAfterSent();
       } catch (error) {
@@ -110,8 +110,7 @@ class WzGroupsEditor extends Component {
   };
 
   render() {
-    const { itemDetail } = this.props.state;
-    const { name, content, isEditable } = this.state;
+    const { name, content, isEditable, groupName } = this.state;
 
     const saveButton = (
       <EuiButton
@@ -119,7 +118,7 @@ class WzGroupsEditor extends Component {
         iconType="save"
         isLoading={this.state.isSaving}
         isDisabled={name.length <= 4}
-        onClick={() => this.save(name, itemDetail.name, content)}
+        onClick={() => this.save(name)}
       >
         Save
       </EuiButton>
@@ -144,7 +143,7 @@ class WzGroupsEditor extends Component {
                           onClick={() => this.props.cleanFileContent()}
                         />
                       </EuiToolTip>
-                      {name}
+                      <b>{name}</b> of <b>{groupName}</b> group
                     </h2>
                   </EuiTitle>
                 </EuiFlexItem>
