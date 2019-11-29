@@ -27,7 +27,8 @@ import {
   EuiCopy,
   EuiPage,
   EuiPageBody,
-  EuiCallOut
+  EuiCallOut,
+  EuiSpacer
 } from '@elastic/eui';
 
 import PropTypes from 'prop-types';
@@ -164,7 +165,7 @@ export class RegisterAgent extends Component {
         this.state.serverAddress
       }'${
         this.state.needsPassword
-          ? ` setenv WAZUH_PASSWORD '${this.state.wazuhPassword}' `
+          ? ` WAZUH_PASSWORD '${this.state.wazuhPassword}'`
           : ' '
       } && sudo installer -pkg ./wazuh-agent.pkg -target /`,
       winText: `Invoke-WebRequest -Uri https://packages.wazuh.com/3.x/windows/wazuh-agent-${
@@ -248,23 +249,24 @@ export class RegisterAgent extends Component {
           <EuiPageBody>
             <EuiFlexGroup>
               <EuiFlexItem>
-                <EuiTitle>
-                  <h2>Deploy a new agent</h2>
-                </EuiTitle>
-              </EuiFlexItem>
-              <EuiFlexItem grow={false}>
-                <EuiButtonEmpty
-                  size="s"
-                  onClick={() => this.props.addNewAgent(false)}
-                  iconType="cross"
-                >
-                  close
-                </EuiButtonEmpty>
-              </EuiFlexItem>
-            </EuiFlexGroup>
-            <EuiFlexGroup>
-              <EuiFlexItem>
                 <EuiPanel>
+                  <EuiFlexGroup>
+                    <EuiFlexItem>
+                      <EuiTitle>
+                        <h2>Deploy a new agent</h2>
+                      </EuiTitle>
+                    </EuiFlexItem>
+                    <EuiFlexItem grow={false}>
+                      <EuiButtonEmpty
+                        size="s"
+                        onClick={() => this.props.addNewAgent(false)}
+                        iconType="cross"
+                      >
+                        close
+                      </EuiButtonEmpty>
+                    </EuiFlexItem>
+                  </EuiFlexGroup>
+                  <EuiSpacer></EuiSpacer>
                   <EuiFlexItem>
                     <EuiSteps steps={this.cleanSteps(steps)} />
                   </EuiFlexItem>
