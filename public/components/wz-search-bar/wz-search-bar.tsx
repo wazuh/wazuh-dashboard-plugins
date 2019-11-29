@@ -34,9 +34,13 @@ export default class WzSearchBar extends Component {
     isProcessing: boolean
     inputStage: string
     inputValue: string
+    isSearch: boolean
+    lastField?: string
+    lastOperator?: string
+    isInvalid: boolean
+    status: string
   }
   props!:{
-    status: string
     qSuggests: suggestItem[]
     onInputChange: Function
   }
@@ -49,6 +53,9 @@ export default class WzSearchBar extends Component {
       isProcessing: false,
       inputStage: 'fields',
       inputValue: '',
+      isSearch: false,
+      isInvalid: false,
+      status: 'unchanged',
     }
   }
 
@@ -57,7 +64,7 @@ export default class WzSearchBar extends Component {
   }
 
   componentDidUpdate() {
-    if (this.state.isProcessing){
+    if (this.state.isProcessing && !this.state.isInvalid){
       const { inputStage,  } = this.state;
       if (inputStage === 'fields'){
         this.buildSuggestFields();
@@ -91,13 +98,15 @@ export default class WzSearchBar extends Component {
       }
       return field;
     })
+    
     if (inputValue != '') {
       fields.unshift({
         type: { iconType: 'search', color: 'tint8' },
         label: inputValue,
       });
     }
-    this.setState({suggestions: fields});
+    const isSearch = fields.length > 1 ? false : true;
+    this.setState({suggestions: fields, isSearch});
   }
 
   // TODO:
@@ -106,11 +115,13 @@ export default class WzSearchBar extends Component {
       suggestions: [
         {
           type: { iconType: 'kqlOperand', color: 'tint1' },
-          label: 'equal',
+          label: '=',
+          description: 'Equal'
         },
         {
           type: { iconType: 'kqlOperand', color: 'tint1' },
-          label: 'not equal',
+          label: '!=',
+          description: 'not equal',
         },
       ]
     })
@@ -122,33 +133,85 @@ export default class WzSearchBar extends Component {
       inputValue: value,
       isProcessing: true,
     });
+    this.inputStageHandler(value);
     if(value.length > 10) {
       this.props.onInputChange(value);
     }
+    return "asd"
   }
   
   onChangeSearchFormat = (format) => {console.log(format)}
   
   onKeyPress = (e:KeyboardEvent)  => {
     if(e.key === 'Enter') {
-      this.setState({
-        inputStage: 'operators',
-        isProcessing: true
-      })
+      const { isSearch, inputValue } = this.state;
+      if (isSearch) {
+        this.props.onInputChange({search: inputValue});
+      } else {
+        this.setState({
+          inputStage: 'operators',
+          isProcessing: true
+        })
+      }
     }
   }
 
-  render() {
-    const { status } = this.props
-    const { suggestions } = this.state;
+  onItemClick(item) {
+    const { inputValue } = this.state;
+    let inputStage:string = '';
+    if (item.type.iconType === 'kqlField') {
+      inputStage = 'operators';
+    } else if (item.type.iconType === 'kqlOperand') {
+      inputStage = 'values';
+    }
+    this.setState({
+      inputValue: inputValue + item.label,
+      isProcessing: true,
+      inputStage,
+    });
+  }
 
-    return <EuiSuggest
+  inputStageHandler(inputValue: string) {
+    const queries = inputValue.split(/,|;/);
+    const lastIndex = queries.length - 1;
+    const operators = /=|!=|<|>|~/
+    
+    if(queries[lastIndex].match(operators)){
+      const { qSuggests } = this.props;
+      console.log('has operator')
+      const {0: field, 1: value} = queries[lastIndex].split(operators);
+      const result = qSuggests.find((item) => {return item.label === field})
+      if (result)
+        console.log('field Exists')
+      else
+        this.setState({
+          isInvalid: true,
+          suggestions: [
+          {
+            type: { iconType: 'alert', color: 'tint2' },
+            label: `The field ${field} no exists`,
+          }
+        ]});
+    }else {
+      this.setState({inputStage: 'fields',});
+    }
+
+  }
+
+  render() {
+    const { status, suggestions, inputValue, isInvalid } = this.state;
+
+    return (
+      <EuiSuggest
       status={status}
-      onKeyPress={this.onKeyPress}
-      onItemClick={() => {}}
-      append={<WzSearchFormatSelector onChange={this.onChangeSearchFormat}/>}
-      suggestions={suggestions}
-      onInputChange={this.onInputChange}
-    />;
+        value={inputValue}
+        onKeyPress={this.onKeyPress}
+        onItemClick={this.onItemClick.bind(this)}
+        append={<WzSearchFormatSelector onChange={this.onChangeSearchFormat}/>}
+        suggestions={suggestions}
+        onInputChange={this.onInputChange}
+        isInvalid={isInvalid}
+      />
+    );
   }
 }
