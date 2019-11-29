@@ -10,30 +10,6 @@
         <!-- Inside the group -->
         <div flex layout="column" layout-align="start stretch" ng-show="!gp.load && gp.lookingGroup "
             ng-init="gp.groupsSelectedTab='agents'">
-            <!-- XML editor for group agents -->
-            <div ng-show="gp.editingFile">
-                <div layout="row" class="md-padding-h wz-margin-top-10">
-                    <span ng-click='gp.closeEditingFile()'
-                        class='wz-margin-top-3 kuiButton kuiButton--hollow'>Cancel</span>
-                    <button ng-disabled='gp.xmlHasErrors' ng-click='gp.doSaveGroupAgentConfig()'
-                        class='height-35 kuiButton kuiButton--secondary wz-margin-left-8'>
-                        <span ng-show='!gp.xmlHasErrors'>
-                            <react-component name="EuiIcon" props="{type: 'save'}" /> Save file
-                        </span>
-                        <span ng-show='gp.xmlHasErrors' class='btn-danger'><i aria-hidden='true'
-                                class='fa fa-fw fa-exclamation-triangle'></i>
-                            XML format error</span>
-                    </button>
-                </div>
-                <div class="md-padding md-padding-top-10" ng-if="gp.fetchedXML && gp.currentGroup">
-                    <wz-xml-file-editor file-name='agent.conf' data="gp.fetchedXML"
-                        target-name="gp.currentGroup.name + ' group'" valid-fn='gp.xmlIsValid(valid)'
-                        close-fn='gp.closeEditingFile(reload)'>
-                    </wz-xml-file-editor>
-                </div>
-            </div>
-            <!-- End XML editor for group agents -->
-
             <div ng-if="!gp.editingFile">
                 <div layout="row" class="md-padding" ng-if="gp.currentGroup && gp.addingAgents">
                     <span ng-click='gp.cancelButton()' class='wz-margin-top-3 kuiButton kuiButton--hollow'>
@@ -44,27 +20,6 @@
                     <span class='error-msg' ng-show='gp.moreThan500'><i class="fa fa-exclamation-triangle"></i> It is
                         not
                         possible to apply changes of more than 500 additions or deletions</span>
-                </div>
-
-                <div ng-if='!gp.addingAgents'>
-                    <!-- File JSON viewer section -->
-                    <div flex layout="column" class="md-padding" ng-if="gp.groupsSelectedTab==='files' && gp.file">
-                        <div flex layout="column">
-                            <div layout="row" class="wz-padding-bottom-14">
-                                <span flex class="wz-headline-title">{{ gp.filename }}</span>
-                                <!-- Go back button -->
-                                <button class="md-icon-button" ng-if="gp.lookingGroup" aria-label="Back"
-                                    tooltip="Close file" tooltip-placement="left" ng-click="gp.goBackFiles()"><i
-                                        class="fa fa-fw fa-close" aria-hidden="true"></i></button>
-                                <!--<span flex class="wz-text-right cursor-pointer color-grey" ng-click="goBackFiles()">close</span>-->
-                            </div>
-                            <div flex layout="column">
-                                <pre flex
-                                    class="wz-pre groupContentViewer wzXmlEditor wz-overflow-y-auto"><code wz-dynamic="gp.file"></code></pre>
-                            </div>
-                        </div>
-                    </div>
-                    <!-- End File JSON viewer section -->
                 </div>
 
                 <div layout="row" class="md-padding" ng-if="gp.addingAgents">

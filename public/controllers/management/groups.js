@@ -9,8 +9,6 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import beautifier from '../../utils/json-beautifier';
-import * as FileSaver from '../../services/file-saver';
 
 export class GroupsController {
   constructor(
@@ -18,7 +16,6 @@ export class GroupsController {
     $location,
     apiReq,
     errorHandler,
-    csvReq,
     appState,
     shareAgent,
     groupHandler,
@@ -29,7 +26,6 @@ export class GroupsController {
     this.location = $location;
     this.apiReq = apiReq;
     this.errorHandler = errorHandler;
-    this.csvReq = csvReq;
     this.appState = appState;
     this.shareAgent = shareAgent;
     this.groupHandler = groupHandler;
@@ -48,25 +44,6 @@ export class GroupsController {
       await this.loadGroups();
 
       // Listeners
-      this.scope.$on('groupsIsReloaded', async () => {
-        await this.loadGroups();
-        this.groupsSelectedTab = false;
-        this.editingFile = false;
-        this.currentGroup = false;
-        this.scope.$emit('removeCurrentGroup');
-        this.lookingGroup = false;
-        this.scope.$applyAsync();
-      });
-
-      this.scope.$on('wazuhShowGroupFile', (ev, parameters) => {
-        ev.stopPropagation();
-        if (((parameters || {}).fileName || '').includes('agent.conf') && this.adminMode) {
-          return this.editGroupAgentConfig();
-        }
-        return this.showFile(parameters.groupName, parameters.fileName);
-      });
-
-      this.scope.$on('updateGroupInformation', this.updateGroupInformation());
 
       // Resetting the factory configuration
       this.scope.$on('$destroy', () => {});
@@ -97,35 +74,12 @@ export class GroupsController {
         type: 'group',
       };
 
-      this.groupsTabsProps = {
-        clickAction: tab => {
-          if (tab === 'agents') {
-            this.goBackToAgents();
-          } else if (tab === 'files') {
-            this.goBackFiles();
-          }
-        },
-        selectedTab: this.groupsSelectedTab || 'agents',
-        tabs: [
-          { id: 'agents', name: 'Agents' },
-          { id: 'files', name: 'Content' },
-        ],
-      };
-
       this.agentsInGroupTableProps = {
-        getAgentsByGroup: group => this.getAgentsByGroup(group),
         addAgents: () => this.addMultipleAgents(true),
-        export: (group, filters) => this.downloadCsv(`/agents/groups/${group}`, filters),
-        removeAgentFromGroup: (agent, group) => this.removeAgentFromGroup(agent, group),
-        goToAgent: agent => this.goToAgent(agent),
         exportConfigurationProps: this.exportConfigurationProps,
       };
 
       this.filesInGroupTableProps = {
-        getFilesFromGroup: group => this.getFilesFromGroup(group),
-        export: (group, filters) => this.downloadCsv(`/agents/groups/${group}/files`, filters),
-        editConfig: () => this.editGroupAgentConfig(),
-        openFileContent: (group, file) => this.openFileContent(group, file),
         exportConfigurationProps: this.exportConfigurationProps,
       };
 
@@ -171,33 +125,6 @@ export class GroupsController {
     } catch (error) {
       return Promise.reject(error);
     }
-  }
-
-  /**
-   * Get full data on CSV format from a path
-   * @param {String} path path with data to convert
-   */
-  async downloadCsv(path, filters) {
-    try {
-      this.errorHandler.info('Your download should begin automatically...', 'CSV');
-      const currentApi = JSON.parse(this.appState.getCurrentAPI()).id;
-      const output = await this.csvReq.fetch(path, currentApi, filters);
-      const blob = new Blob([output], { type: 'text/csv' }); // eslint-disable-line
-
-      FileSaver.saveAs(blob, 'groups.csv');
-      return;
-    } catch (error) {
-      this.errorHandler.handle(error, 'Download CSV');
-    }
-    return;
-  }
-
-  /**
-   * This perfoms a search by a given term
-   * @param {String} term
-   */
-  search(term) {
-    this.scope.$broadcast('wazuhSearch', { term });
   }
 
   toggle() {
@@ -250,185 +177,11 @@ export class GroupsController {
   }
 
   /**
-   * Updates the group information
-   * @param {Object} event
-   * @param {Object} parameters
-   */
-  async updateGroupInformation(event, parameters) {
-    try {
-      if (this.currentGroup) {
-        const result = await Promise.all([
-          await this.apiReq.request('GET', `/agents/groups/${parameters.group}`, {
-            limit: 1,
-          }),
-          await this.apiReq.request('GET', `/agents/groups`, {
-            search: parameters.group,
-          }),
-        ]);
-
-        const [count, sums] = result.map(item => ((item || {}).data || {}).data || false);
-        const updatedGroup = ((sums || {}).items || []).find(
-          item => item.name === parameters.group
-        );
-
-        this.currentGroup.count = (count || {}).totalItems || 0;
-        if (updatedGroup) {
-          this.currentGroup.configSum = updatedGroup.configSum;
-          this.currentGroup.mergedSum = updatedGroup.mergedSum;
-        }
-      }
-    } catch (error) {
-      this.errorHandler.handle(error, 'Groups');
-    }
-    this.scope.$applyAsync();
-    return;
-  }
-
-  /**
-   * This navigate back to agents overview
-   */
-  goBackToAgents() {
-    this.groupsSelectedTab = 'agents';
-    this.file = false;
-    this.filename = false;
-    this.scope.$applyAsync();
-  }
-
-  /**
-   * This navigate back to files
-   */
-  goBackFiles() {
-    this.groupsSelectedTab = 'files';
-    this.addingAgents = false;
-    this.editingFile = false;
-    this.file = false;
-    this.filename = false;
-    this.fileViewer = false;
-    this.scope.$applyAsync();
-  }
-
-  /**
-   * This navigate back to groups
-   */
-  goBackGroups() {
-    this.currentGroup = false;
-    this.scope.$emit('removeCurrentGroup');
-    this.lookingGroup = false;
-    this.editingFile = false;
-    this.scope.$applyAsync();
-  }
-
-  /**
    *
    * @param {Object} enabledComponents
    */
   exportConfiguration(enabledComponents, group) {
     this.reportingService.startConfigReport(group, 'groupConfig', enabledComponents);
-  }
-
-  /**
-   * This show us a group file, for a given group and file
-   *
-   * @param {String} groupName
-   * @param {String} fileName
-   */
-  async showFile(groupName, fileName) {
-    try {
-      if (this.filename) this.filename = '';
-      if (fileName === '../ar.conf') fileName = 'ar.conf';
-      this.fileViewer = true;
-      const tmpName = `/agents/groups/${groupName}/files/${fileName}`;
-      const data = await this.apiReq.request('GET', tmpName, {});
-      this.file = beautifier.prettyPrint(data.data.data);
-      this.filename = fileName;
-      this.scope.$applyAsync();
-    } catch (error) {
-      this.errorHandler.handle(error, 'Groups');
-    }
-    return;
-  }
-
-  async fetchFile() {
-    try {
-      const data = await this.apiReq.request(
-        'GET',
-        `/agents/groups/${this.currentGroup.name}/files/agent.conf`,
-        { format: 'xml' }
-      );
-      const xml = ((data || {}).data || {}).data || false;
-
-      if (!xml) {
-        throw new Error('Could not fetch agent.conf file');
-      }
-      return xml;
-    } catch (error) {
-      return Promise.reject(error);
-    }
-  }
-
-  async editGroupAgentConfig() {
-    this.editingFile = true;
-    try {
-      this.fetchedXML = await this.fetchFile();
-      this.location.search('editingFile', true);
-      this.appState.setNavigation({ status: true });
-      this.scope.$broadcast('fetchedFile', { data: this.fetchedXML });
-    } catch (error) {
-      this.fetchedXML = null;
-      this.errorHandler.handle(error, 'Fetch file error');
-    }
-    this.scope.$applyAsync();
-  }
-
-  closeEditingFile() {
-    this.editingFile = false;
-    this.appState.setNavigation({ status: true });
-    this.scope.$broadcast('closeEditXmlFile', {});
-    this.groupsTabsProps.selectedTab = 'files';
-    this.scope.$applyAsync();
-  }
-
-  /**
-   * Set if the XML is valid
-   * @param {Boolean} valid
-   */
-  xmlIsValid(valid) {
-    this.xmlHasErrors = valid;
-    this.scope.$applyAsync();
-  }
-
-  doSaveGroupAgentConfig() {
-    this.scope.$broadcast('saveXmlFile', {
-      group: this.currentGroup.name,
-      type: 'group',
-    });
-  }
-
-  async reload(element, searchTerm, addOffset, start) {
-    if (element === 'left') {
-      if (!this.availableAgents.loadedAll) {
-        this.multipleSelectorLoading = true;
-        if (start) {
-          this.selectedAgents.offset = 0;
-        } else {
-          this.availableAgents.offset += addOffset + 1;
-        }
-        try {
-          await this.loadAllAgents(searchTerm, start);
-        } catch (error) {
-          this.errorHandler.handle(error, 'Error fetching all available agents');
-        }
-      }
-    } else {
-      if (!this.selectedAgents.loadedAll) {
-        this.multipleSelectorLoading = true;
-        this.selectedAgents.offset += addOffset + 1;
-        await this.loadSelectedAgents(searchTerm);
-      }
-    }
-
-    this.multipleSelectorLoading = false;
-    this.scope.$applyAsync();
   }
 
   async loadSelectedAgents(searchTerm) {
@@ -644,9 +397,6 @@ export class GroupsController {
       }
       // this.addMultipleAgents(false);
       this.multipleSelectorLoading = false;
-      await this.updateGroupInformation(null, {
-        group: this.currentGroup.name,
-      });
       this.cancelButton();
     } catch (err) {
       this.multipleSelectorLoading = false;
@@ -673,36 +423,10 @@ export class GroupsController {
     this.addingGroup = !this.addingGroup;
   }
 
-  async deleteGroup(group) {
-    try {
-      await this.groupHandler.removeGroup(group.name);
-    } catch (error) {
-      this.errorHandler.handle(error.message || error);
-    }
-  }
-
   buildGroupsTableProps(items) {
     this.groupsTableProps = {
       items,
       closeAddingAgents: false,
-      createGroup: async name => {
-        await this.groupHandler.createGroup(name);
-      },
-      goGroup: group => {
-        this.loadGroup(group);
-      },
-      editGroup: group => {
-        this.openGroupFromList(group);
-      },
-      deleteGroup: group => {
-        this.deleteGroup(group);
-      },
-      export: filters => {
-        this.downloadCsv('/agents/groups', filters);
-      },
-      refresh: () => {
-        this.loadGroups();
-      },
       showAddingAgents: (status, group) => {
         this.showAddingAgents(status, group);
       },
@@ -728,88 +452,5 @@ export class GroupsController {
     this.lookingGroup = true;
     await this.addMultipleAgents(status);
     this.load = false;
-  }
-
-  /**
-   * When clicking in the pencil icon this open the config group editor
-   * @param {Group} group
-   */
-  openGroupFromList(group) {
-    this.editingFile = true;
-    this.groupsSelectedTab = 'files';
-    this.appState.setNavigation({ status: true });
-    this.location.search('navigation', true);
-    return this.loadGroup(group).then(() => this.editGroupAgentConfig());
-  }
-
-  /**
-   * Returns the agents in a group
-   * @param {String} group
-   */
-  async getAgentsByGroup(group) {
-    try {
-      const g = group || this.currentGroup.name;
-      const result = await this.apiReq.request('GET', `/agents/groups/${g}`, {});
-      const agents = (((result || {}).data || {}).data || {}).items || [];
-      return agents;
-    } catch (error) {
-      return Promise.reject(error);
-    }
-  }
-
-  /**
-   * Returns the files in a group
-   * @param {String} group
-   */
-  async getFilesFromGroup(group) {
-    try {
-      const g = group || this.currentGroup.name;
-      const result = await this.apiReq.request('GET', `/agents/groups/${g}/files`, {});
-      const files = (((result || {}).data || {}).data || {}).items || [];
-      return files;
-    } catch (error) {
-      return Promise.reject(error);
-    }
-  }
-
-  /**
-   * Opens the content of the file
-   * @param {String} group
-   * @param {String} file
-   */
-  async openFileContent(group, file) {
-    try {
-      if (file.includes('agent.conf') && this.adminMode) return this.editGroupAgentConfig();
-      return await this.showFile(group, file);
-    } catch (error) {
-      return Promise.reject(error);
-    }
-  }
-
-  /**
-   * Removes an agent from a group
-   * @param {String} agent
-   * @param {Strin} group
-   */
-  async removeAgentFromGroup(agent, group) {
-    try {
-      const g = group || this.currentGroup.name;
-      const data = await this.groupHandler.removeAgentFromGroup(g, agent);
-      this.errorHandler.info(((data || {}).data || {}).data);
-    } catch (error) {
-      this.errorHandler.handle(error.message || error);
-    }
-  }
-
-  /**
-   * Navigate to an agent
-   */
-  goToAgent(item) {
-    this.shareAgent.setAgent(item);
-    this.shareAgent.setTargetLocation({
-      tab: 'welcome',
-      subTab: 'panels',
-    });
-    this.location.path('/agents');
   }
 }
