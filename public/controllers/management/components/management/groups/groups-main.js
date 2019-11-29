@@ -13,12 +13,10 @@ import React, { Component } from 'react';
 // Redux
 import store from '../../../../../redux/store';
 import WzReduxProvider from '../../../../../redux/wz-redux-provider';
-//Wazuh ruleset groups
+//Wazuh groups overview
 import WzGroupsOverview from './groups-overview';
 //Information about rule or decoder
 import WzGroupDetail from './group-detail';
-// import WzDecoderInfo from './decoder-info';
-// import WzRulesetEditor from './ruleset-editor';
 import WzGroupEditor from './groups-editor';
 
 import { updateShowAddAgents, resetGroup } from '../../../../../redux/actions/groupsActions';
@@ -48,24 +46,18 @@ class WzGroups extends Component {
   }
 
   componentWillUnmount() {
-    // When the component is going to be unmounted the ruleset state is reset
+    // When the component is going to be unmounted the groups state is reset
     this.props.resetGroup();
   }
 
   render() {
-    // const { ruleInfo, decoderInfo, listInfo, fileContent, addingRulesetFile } = this.state;
     const { itemDetail, showAddAgents, fileContent } = this.state;
 
     return (
       <WzReduxProvider>
         {!showAddAgents &&
           ((itemDetail && !fileContent && <WzGroupDetail {...this.props} />) ||
-            (fileContent && <WzGroupEditor />) || (
-              // || decoderInfo && (<WzDecoderInfo />)
-              // || listInfo && (<WzListEditor />)
-              // || (fileContent || addingRulesetFile) && (<WzRulesetEditor />)
-              <WzGroupsOverview />
-            ))}
+            (fileContent && <WzGroupEditor />) || <WzGroupsOverview />)}
       </WzReduxProvider>
     );
   }

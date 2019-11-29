@@ -10,17 +10,6 @@
  * Find more information about this on the LICENSE file.
  */
 
-// /**
-//  * Update the ruleset section
-//  * @param {String} section
-//  */
-// export const updateRulesetSection = (section) => {
-//   return {
-//     type: 'UPDATE_RULESET_SECTION',
-//     section
-//   }
-// }
-
 /**
  * Update the files content
  * @param {String} content
@@ -43,7 +32,7 @@ export const cleanFileContent = () => {
 };
 
 /**
- * Toggle the modal confirm of the ruleset table
+ * Toggle the modal confirm of the groups table
  * @param {Boolean} showModal
  */
 export const updateShowModal = showModal => {
@@ -78,24 +67,6 @@ export const updateSortDirection = sortDirection => {
   };
 };
 
-// export const updateDefaultItems = (defaultItems) => {
-//   return {
-//     type: 'UPDATE_DEFAULT_ITEMS',
-//     defaultItems: defaultItems
-//   }
-// }
-
-// /**
-//  * Update the lists content
-//  * @param {String} content
-//  */
-// export const updateListContent = (content) => {
-//   return {
-//     type: 'UPDATE_LIST_CONTENT',
-//     content: content
-//   }
-// }
-
 /**
  * Update the loading status
  * @param {Boolean} loading
@@ -122,39 +93,6 @@ export const resetGroup = () => {
     type: 'RESET',
   };
 };
-
-// /**
-//  * Toggle show files
-//  * @param {Boolean} status
-//  */
-// export const toggleShowFiles = (status) => {
-//   return {
-//     type: 'TOGGLE_SHOW_FILES',
-//     status: status
-//   }
-// }
-
-// /**
-//  * Update the rule info
-//  * @param {String} info
-//  */
-// export const updateRuleInfo = (info) => {
-//   return {
-//     type: 'UPDATE_RULE_INFO',
-//     info: info
-//   }
-// }
-
-// /**
-//  * Update the decoder info
-//  * @param {String} info
-//  */
-// export const updateDecoderInfo = (info) => {
-//   return {
-//     type: 'UPDATE_DECODER_INFO',
-//     info: info
-//   }
-// }
 
 /**
  * Toggle the updating of the table
@@ -214,30 +152,3 @@ export const updateSelectedTab = selectedTabId => {
     selectedTabId: selectedTabId,
   };
 };
-
-// export const cleanFileContent = () => {
-//   return {
-//     type: 'CLEAN_CONTENT'
-//   }
-// }
-
-// export const updateAdminMode = status => {
-//   return {
-//     type: 'UPDATE_ADMIN_MODE',
-//     status: status
-//   }
-// }
-
-// export const updteAddingRulesetFile = content => {
-//   return {
-//     type: 'UPDATE_ADDING_RULESET_FILE',
-//     content: content
-//   }
-// }
-
-// export const updateError = error => {
-//   return {
-//     type: 'UPDATE_ERROR',
-//     error: error
-//   }
-// }

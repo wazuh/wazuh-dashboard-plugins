@@ -19,16 +19,12 @@ import { toastNotifications } from 'ui/notify';
 import {
   updateLoadingStatus,
   updateFileContent,
-  updateRuleInfo,
-  updateDecoderInfo,
-  updateListContent,
   updateIsProcessing,
   updatePageIndex,
   updateShowModal,
   updateListItemsForRemove,
   updateSortDirection,
   updateSortField,
-  updateDefaultItems,
 } from '../../../../../redux/actions/groupsActions';
 
 import GroupsAgentsColums from './utils/columns-agents';
@@ -212,10 +208,6 @@ const mapDispatchToProps = dispatch => {
   return {
     updateLoadingStatus: status => dispatch(updateLoadingStatus(status)),
     updateFileContent: content => dispatch(updateFileContent(content)),
-    updateRuleInfo: info => dispatch(updateRuleInfo(info)),
-    updateDecoderInfo: info => dispatch(updateDecoderInfo(info)),
-    updateListContent: content => dispatch(updateListContent(content)),
-    updateDefaultItems: defaultItems => dispatch(updateDefaultItems(defaultItems)),
     updateIsProcessing: isProcessing => dispatch(updateIsProcessing(isProcessing)),
     updatePageIndex: pageIndex => dispatch(updatePageIndex(pageIndex)),
     updateShowModal: showModal => dispatch(updateShowModal(showModal)),

@@ -10,7 +10,7 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import React, { Component, Fragment } from 'react';
+import React, { Component } from 'react';
 import { EuiFlexItem, EuiFlexGroup, EuiPanel, EuiTitle, EuiText, EuiPage } from '@elastic/eui';
 
 import { connect } from 'react-redux';
@@ -18,11 +18,6 @@ import { connect } from 'react-redux';
 // Wazuh components
 import WzGroupsTable from './groups-table';
 import WzGroupsActionButtons from './actions-buttons-main';
-
-// import {
-//   updateIsProcessing,
-//   updateLoadingStatus,
-// } from '../../../../../redux/actions/groupsActions';
 
 export class WzGroupsOverview extends Component {
   _isMounted = false;
@@ -141,12 +136,5 @@ const mapStateToProps = state => {
     state: state.rulesetReducers,
   };
 };
-
-// const mapDispatchToProps = dispatch => {
-//   return {
-//     updateLoadingStatus: status => dispatch(updateLoadingStatus(status)),
-//     updateIsProcessing: isProcessing => dispatch(updateIsProcessing(isProcessing)),
-//   };
-// };
 
 export default connect(mapStateToProps)(WzGroupsOverview);
