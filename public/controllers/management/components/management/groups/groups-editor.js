@@ -59,13 +59,23 @@ class WzGroupsEditor extends Component {
     };
   }
 
+  updateHeight = () => {
+    this.height = window.innerHeight - 275; //eslint-disable-line
+    this.forceUpdate();
+  };
+
   componentWillUnmount() {
     // When the component is going to be unmounted its info is clear
     this._isMounted = false;
+    window.removeEventListener('resize', this.updateHeight); //eslint-disable-line
   }
 
   componentDidMount() {
     this._isMounted = true;
+    this.height = window.innerHeight - 275; //eslint-disable-line
+    console.log(this.height);
+    window.addEventListener('resize', this.updateHeight); //eslint-disable-line
+    this.forceUpdate();
   }
 
   /**
@@ -168,8 +178,13 @@ class WzGroupsEditor extends Component {
                           aria-label="Code Editor"
                         ></EuiCodeEditor>
                       )) || (
-                        <EuiCodeBlock language="xml" fontSize="m" paddingSize="m" isCopyable>
-                          {content}
+                        <EuiCodeBlock
+                          language="xml"
+                          fontSize="m"
+                          paddingSize="m"
+                          overflowHeight={this.height}
+                        >
+                          >{content}
                         </EuiCodeBlock>
                       )}
                     </EuiFlexItem>
