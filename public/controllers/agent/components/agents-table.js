@@ -25,6 +25,7 @@ import {
   EuiToolTip,
   EuiTitle,
   EuiHealth,
+  EuiTextColor
 } from '@elastic/eui';
 import { WzFilterBar } from '../../../components/wz-filter-bar/wz-filter-bar'
 
@@ -62,7 +63,7 @@ export class AgentsTable extends Component {
     });
   };
 
-  onQueryChange = ({q={}, search={}, selectedOptions={}}) => {
+  onQueryChange = ({ q = {}, search = {}, selectedOptions = {} }) => {
     sessionStorage.setItem('agents_preview_selected_options', JSON.stringify(selectedOptions));
     this.setState({
       q,
@@ -75,7 +76,7 @@ export class AgentsTable extends Component {
 
   async componentDidMount() {
     await this.getItems();
-    const filterStatus = await this.filterBarModelStatus();
+    const filterStatus = this.filterBarModelStatus();
     const filterGroups = await this.filterBarModelGroups();
     const filterOs = await this.filterBarModelOs();
     const filterVersion = await this.filterBarModelWazuhVersion();
@@ -90,15 +91,26 @@ export class AgentsTable extends Component {
       filterNodes,
     });
   }
-  
-  async componentDidUpdate() {
-    if (this.state.isProcessing) {
-      await this.getItems();
-    }
 
+  async reloadAgents() {
+    this.setState({
+      isProcessing: true,
+      isLoading: true,
+    });
+    await this.props.reload();
   }
 
-
+  async componentDidUpdate(prevProps, prevState) {
+    if (this.state.isProcessing) {
+      const {q, search} = this.state;
+      const {q: prevQ, search: prevSearch} = prevState;
+      if (prevQ !== q || prevSearch !== search) {
+        this.setState({pageIndex: 0});
+      }
+      await this.getItems();
+    }
+  }
+  
   async getItems() {
     const rawAgents = await this.props.wzReq(
       'GET',
@@ -132,23 +144,23 @@ export class AgentsTable extends Component {
   }
 
   buildSortFilter() {
-    const {sortField, sortDirection} = this.state;
+    const { sortField, sortDirection } = this.state;
 
     const field = (sortField === 'os_name') ? '' : sortField;
     const direction = (sortDirection === 'asc') ? '+' : '-';
-    
-    return direction+field;
+
+    return direction + field;
   }
 
   buildQFilter() {
     const { q } = this.state;
-    return (q === '') ? `id!=000` :`id!=000;${q}`;
+    return (q === '') ? `id!=000` : `id!=000;${q}`;
   }
 
   formatAgent(agent) {
     const checkField = (field) => { return (field !== undefined) ? field : "-"; };
     const lastKeepAlive = (date, timeService) => { return (date !== undefined) ? timeService(date) : "-"; };
-    const agentVersion = (agent.version !== undefined) ? agent.version.split(' ')[1] : "."; 
+    const agentVersion = (agent.version !== undefined) ? agent.version.split(' ')[1] : ".";
     const { timeService } = this.props;
     return {
       "id": agent,
@@ -157,7 +169,6 @@ export class AgentsTable extends Component {
       "status": agent.status,
       "group": checkField(agent.group),
       "os_name": agent,
-      // "os_name": checkField(((agent || {}).os || {}).name) + checkField(((agent || {}).os || {}).version),
       "version": agentVersion,
       "dateAdd": timeService(agent.dateAdd),
       "lastKeepAlive": lastKeepAlive(agent.lastKeepAlive, timeService),
@@ -165,7 +176,7 @@ export class AgentsTable extends Component {
     }
   }
 
-  welcomePanelButtonRender(agent, field, color='primary', size=false) {
+  welcomePanelButtonRender(agent, field, color = 'primary', size = false) {
     return (
       <EuiToolTip content="View the welcome panel for this agent" position="right">
         <EuiLink
@@ -173,7 +184,7 @@ export class AgentsTable extends Component {
           aria-label="View the welcome panel for this agent"
           color={color}
         >
-          { (agent[field].lenght > size) ? `${agent[field].substring(0, size)}...` :agent[field] }
+          {(agent[field].lenght > size) ? `${agent[field].substring(0, size)}...` : agent[field]}
         </EuiLink>
       </EuiToolTip>
     )
@@ -197,6 +208,30 @@ export class AgentsTable extends Component {
             aria-label="Open configuration for this agent"
           />
         </EuiToolTip>
+        {/*         <EuiToolTip content="Restart agent" position="left">
+          <EuiButtonIcon
+            onClick={() => this.props.clickAction(agent, 'configuration')}
+            color={'primary'}
+            iconType="refresh"
+            aria-label="Restart agent"
+          />
+        </EuiToolTip> */}
+        {/*         <EuiToolTip content="Upgrade agent" position="left">
+          <EuiButtonIcon
+            onClick={() => this.props.clickAction(agent, 'configuration')}
+            color={'success'}
+            iconType="sortUp"
+            aria-label="Upgrade agent"
+          />
+        </EuiToolTip> */}
+        {/*         <EuiToolTip content="Delete this agent" position="left">
+          <EuiButtonIcon
+            onClick={() => this.props.clickAction(agent, 'configuration')}
+            color={'danger'}
+            iconType="trash"
+            aria-label="Delete this agent"
+          />
+        </EuiToolTip> */}
       </div>
     );
   }
@@ -206,19 +241,19 @@ export class AgentsTable extends Component {
     const checkField = (field) => { return (field !== undefined) ? field : "-"; };
     const os = (agent || {}).os;
 
-    if (((os || {}).uname || '').includes('Linux')){
+    if (((os || {}).uname || '').includes('Linux')) {
       icon = 'linux'
     } else if ((os || {}).platform === 'windows') {
       icon = 'windows'
     } else if ((os || {}).platform === 'darwin') {
       icon = 'apple'
     }
-    const os_name = checkField(((agent || {}).os || {}).name) 
+    const os_name = checkField(((agent || {}).os || {}).name)
       + checkField(((agent || {}).os || {}).version);
 
     return (
       <span className="euiTableCellContent__text euiTableCellContent--truncateText">
-        <i className={`fa fa-${icon}`} aria-hidden="true"></i> {os_name === '--' ? '-' : os_name }
+        <i className={`fa fa-${icon} AgentsTable__soBadge AgentsTable__soBadge--${icon}`} aria-hidden="true"></i> {os_name === '--' ? '-' : os_name}
       </span>
     );
 
@@ -236,28 +271,27 @@ export class AgentsTable extends Component {
     };
 
     return (
-      <span className="euiTableCellContent__text euiTableCellContent--truncateText">    
-        <EuiHealth color={color(status)}></EuiHealth> {status}
-      </span>
+      <EuiHealth color={color(status)}>
+        {status}
+      </EuiHealth>
     );
   }
 
   downloadCsv = () => {
-    const {q,  search={}} = this.buildFilter();
+    const { q, search = {} } = this.buildFilter();
     const filterQ = { name: 'q', value: q };
-    const filterSearch = {name: 'search', value: search}
+    const filterSearch = { name: 'search', value: search }
     this.props.downloadCsv([filterQ, filterSearch])
   }
   formattedButton() {
     return (
       <EuiFlexItem grow={false}>
         <EuiButtonEmpty iconType="importAction" onClick={this.downloadCsv}>
-          Formatted          
+          Export formatted
         </EuiButtonEmpty>
       </EuiFlexItem>
     );
   }
-
 
   columns() {
     return [
@@ -272,7 +306,6 @@ export class AgentsTable extends Component {
         field: 'name',
         name: 'Name',
         sortable: true,
-        width: '15%',
         truncateText: true,
       },
       {
@@ -297,6 +330,7 @@ export class AgentsTable extends Component {
       {
         field: 'version',
         name: 'Version',
+        width: '100px',
         truncateText: true,
         sortable: true,
       },
@@ -320,9 +354,10 @@ export class AgentsTable extends Component {
         render: this.addHealthStatusRender,
       },
       {
+        align: 'right',
+        width: '100px',
         field: 'actions',
         name: 'Actions',
-        width: '65px',
         render: (agent) => this.actionButtonsRender(agent)
       },
     ];
@@ -331,23 +366,44 @@ export class AgentsTable extends Component {
   headRender() {
     const formattedButton = this.formattedButton()
     return (
-      <EuiFlexGroup>
-        <EuiFlexItem>
-          <EuiFlexGroup>
-            <EuiFlexItem>
-              <EuiTitle>
-                <h2>Agents</h2>
-              </EuiTitle>
-            </EuiFlexItem>
-          </EuiFlexGroup>
-        </EuiFlexItem>
-        {formattedButton}
-        <EuiFlexItem grow={false}>
-          <EuiButtonEmpty iconType="plusInCircle" onClick={() => this.props.addingNewAgent()}>
-            Add new agent
+      <div>
+        <EuiFlexGroup>
+          <EuiFlexItem>
+            <EuiFlexGroup>
+              <EuiFlexItem>
+                <EuiTitle>
+                  <h2>Agents</h2>
+                </EuiTitle>
+              </EuiFlexItem>
+            </EuiFlexGroup>
+          </EuiFlexItem>
+          <EuiFlexItem grow={false}>
+            <EuiButtonEmpty iconType="plusInCircle" onClick={() => this.props.addingNewAgent()}>
+              Deploy new agent
           </EuiButtonEmpty>
-        </EuiFlexItem>
-      </EuiFlexGroup>
+          </EuiFlexItem>
+          {/* TODO:           <EuiFlexItem grow={false}>
+            <EuiButtonEmpty iconType="brush" onClick={() => this.props.addingNewAgent()}>
+              Purgue agents
+          </EuiButtonEmpty>
+          </EuiFlexItem> */}
+          {formattedButton}
+          <EuiFlexItem grow={false}>
+            <EuiButtonEmpty iconType="refresh" onClick={() => this.reloadAgents()}>
+              Refresh
+          </EuiButtonEmpty>
+          </EuiFlexItem>
+        </EuiFlexGroup>
+        <EuiFlexGroup>
+          <EuiFlexItem style={{ paddingBottom: 10 }}>
+            <EuiTextColor color="subdued">
+              <p>
+                From here you can manage all the monitored host agents reporting to the manager.
+              </p>
+            </EuiTextColor>
+          </EuiFlexItem>
+        </EuiFlexGroup>
+      </div>
     );
   }
 
@@ -385,15 +441,15 @@ export class AgentsTable extends Component {
 
   async filterBarModelOs() {
     const rawOs = await this.props.wzReq(
-      'GET', 
+      'GET',
       '/agents/stats/distinct?pretty',
       {
-        'fields':'os.name,os.version',
-        'q':'id!=000'
+        'fields': 'os.name,os.version',
+        'q': 'id!=000'
       }
     );
     const itemsOs = (((rawOs || {}).data || {}).data || {}).items;
-    const os = itemsOs 
+    const os = itemsOs
       .filter((item) => { return Object.keys(item).includes('os') })
       .map((item) => {
         const { name, version } = item.os;
@@ -411,15 +467,15 @@ export class AgentsTable extends Component {
 
   async filterBarModelOsPlatform() {
     const rawOsPlatform = await this.props.wzReq(
-      'GET', 
+      'GET',
       '/agents/stats/distinct?pretty',
       {
-        'fields':'os.platform',
-        'q':'id!=000'
+        'fields': 'os.platform',
+        'q': 'id!=000'
       }
     );
     const itemsOsPlatform = (((rawOsPlatform || {}).data || {}).data || {}).items;
-    const osPlatform = itemsOsPlatform 
+    const osPlatform = itemsOsPlatform
       .filter((item) => { return Object.keys(item).includes('os') })
       .map((item) => {
         const { platform } = item.os;
@@ -437,15 +493,15 @@ export class AgentsTable extends Component {
 
   async filterBarModelNodes() {
     const rawNodes = await this.props.wzReq(
-      'GET', 
+      'GET',
       '/agents/stats/distinct?pretty',
       {
-        'fields':'node_name',
-        'q':'id!=000;node_name!=unknown'
+        'fields': 'node_name',
+        'q': 'id!=000;node_name!=unknown'
       }
     );
     const itemsNodes = (((rawNodes || {}).data || {}).data || {}).items;
-    const nodes = itemsNodes 
+    const nodes = itemsNodes
       .filter((item) => { return Object.keys(item).includes('node_name') })
       .map((item) => {
         const { node_name } = item;
@@ -466,13 +522,13 @@ export class AgentsTable extends Component {
       'GET',
       '/agents/stats/distinct?pretty',
       {
-        'fields':'version',
-        'q':'id!=000'
+        'fields': 'version',
+        'q': 'id!=000'
       }
     );
     const itemsVersions = (((rawVersions || {}).data || {}).data || {}).items;
     const versions = itemsVersions
-      .filter((item) => { return Object.keys(item).includes('version')})
+      .filter((item) => { return Object.keys(item).includes('version') })
       .map((item) => {
         return {
           label: item.version,
@@ -495,12 +551,12 @@ export class AgentsTable extends Component {
       filterNodes,
     } = this.state;
     const model = [
-      filterStatus || {label: 'Status', options: []},
-      filterGroups || {label:'Groups', options: []},
-      filterOs || {label:'OS Name', options: []},
-      filterOsPlatform || {label:'OS Platform', options: []},
-      filterVersion || {label:'Version', options: []},
-      filterNodes || {label:'Nodes', options: []},
+      filterStatus || { label: 'Status', options: [] },
+      filterGroups || { label: 'Groups', options: [] },
+      filterOs || { label: 'OS Name', options: [] },
+      filterOsPlatform || { label: 'OS Platform', options: [] },
+      filterVersion || { label: 'Version', options: [] },
+      filterNodes || { label: 'Nodes', options: [] },
     ];
     const { selectedOptions } = this.state;
 
@@ -518,7 +574,7 @@ export class AgentsTable extends Component {
   }
 
   tableRender() {
-    const {pageIndex, pageSize, totalItems, agents, sortField, sortDirection} = this.state
+    const { pageIndex, pageSize, totalItems, agents, sortField, sortDirection } = this.state
     const columns = this.columns();
     const pagination = {
       pageIndex: pageIndex,
@@ -570,5 +626,6 @@ AgentsTable.propTypes = {
   addingNewAgent: PropTypes.func,
   downloadCsv: PropTypes.func,
   clickAction: PropTypes.func,
-  timeService: PropTypes.func
+  timeService: PropTypes.func,  
+  reload: PropTypes.func
 };
