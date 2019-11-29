@@ -127,6 +127,9 @@ const groupsReducers = (state = initialState, action) => {
       selectedTabId: action.selectedTabId,
     };
   }
+  if (action.type === 'RESET') {
+    return initialState;
+  }
 
   return state;
 };

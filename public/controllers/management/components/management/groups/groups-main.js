@@ -21,7 +21,7 @@ import WzGroupDetail from './group-detail';
 // import WzRulesetEditor from './ruleset-editor';
 import WzGroupEditor from './groups-editor';
 
-import { updateShowAddAgents } from '../../../../../redux/actions/groupsActions';
+import { updateShowAddAgents, resetGroup } from '../../../../../redux/actions/groupsActions';
 import { connect } from 'react-redux';
 
 class WzGroups extends Component {
@@ -49,8 +49,7 @@ class WzGroups extends Component {
 
   componentWillUnmount() {
     // When the component is going to be unmounted the ruleset state is reset
-    // const { ruleInfo, decoderInfo, listInfo, fileContent, addingRulesetFile } = this.state;
-    // if (!ruleInfo && !decoderInfo && !listInfo && !fileContent, !addingRulesetFile) this.store.dispatch({ type: 'RESET' });
+    this.props.resetGroup();
   }
 
   render() {
@@ -80,6 +79,7 @@ const mapStateToProps = state => {
 
 const mapDispatchToProps = dispatch => {
   return {
+    resetGroup: () => dispatch(resetGroup()),
     updateShowAddAgents: showAddAgents => dispatch(updateShowAddAgents(showAddAgents)),
   };
 };

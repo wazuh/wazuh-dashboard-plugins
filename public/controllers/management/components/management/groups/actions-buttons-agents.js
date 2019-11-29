@@ -11,16 +11,7 @@
  */
 import React, { Component, Fragment } from 'react';
 // Eui components
-import {
-  EuiFlexItem,
-  EuiButtonEmpty,
-  EuiPopover,
-  EuiFormRow,
-  EuiFieldText,
-  EuiSpacer,
-  EuiFlexGroup,
-  EuiButton,
-} from '@elastic/eui';
+import { EuiFlexItem, EuiButtonEmpty } from '@elastic/eui';
 
 import { connect } from 'react-redux';
 

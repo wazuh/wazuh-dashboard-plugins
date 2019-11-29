@@ -114,14 +114,14 @@ export const updateGroupDetail = item => {
   };
 };
 
-// /**
-//  * Reset the ruleset store
-//  */
-// export const resetRuleset = () => {
-//   return {
-//     type: 'RESET'
-//   }
-// }
+/**
+ * Reset the group store
+ */
+export const resetGroup = () => {
+  return {
+    type: 'RESET',
+  };
+};
 
 // /**
 //  * Toggle show files
