@@ -265,7 +265,6 @@ import { RIGHT_ALIGNMENT } from '@elastic/eui/lib/services';
             <EuiFlexItem style={{ paddingBottom: 10 }}>
               <EuiTextColor color="subdued">
                 <p>
-                 TODO - table description
                 </p>
               </EuiTextColor>
             </EuiFlexItem>
