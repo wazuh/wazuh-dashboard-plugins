@@ -307,7 +307,7 @@ import { RIGHT_ALIGNMENT } from '@elastic/eui/lib/services';
     };
 
 
-     return (
+    return (
       <EuiFlexGroup>
         <EuiFlexItem>
           <EuiBasicTable
@@ -334,60 +334,81 @@ import { RIGHT_ALIGNMENT } from '@elastic/eui/lib/services';
     } else {
       const listItems = [
         {
-          title: 'File name',
-          description: item.file,
+          field: 'Field',
+          value: item.file,
         },
         {
-          title: 'Date',
-          description: item.date,
+          field: 'Date',
+          value: item.date,
         },
         {
-          title: 'Last modified',
-          description: item.mtime,
+          field: 'Last modified',
+          value: item.mtime,
         },
         {
-          title: 'Permissions',
-          description: item.perm,
+          field: 'Permissions',
+          value: item.perm,
         },
         {
-          title: 'Inode',
-          description: item.inode,
+          field: 'Inode',
+          value: item.inode,
         },
         {
-          title: 'MD5',
-          description: item.md5,
+          field: 'MD5',
+          value: item.md5,
         },
         {
-          title: 'SHA256',
-          description: item.sha256,
+          field: 'SHA256',
+          value: item.sha256,
         },
         {
-          title: 'SHA1',
-          description: item.sha1,
+          field: 'SHA1',
+          value: item.sha1,
         },
         {
-          title: 'User',
-          description: item.uname,
+          field: 'User',
+          value: item.uname,
         },
         {
-          title: 'User ID',
-          description: item.uid,
+          field: 'User ID',
+          value: item.uid,
         },
         {
-          title: 'Group',
-          description: item.gname,
+          field: 'Group',
+          value: item.gname,
         },
         {
-          title: 'Group ID',
-          description: item.gid,
+          field: 'Group ID',
+          value: item.gid,
         },
         {
-          title: 'Type',
-          description: item.type,
+          field: 'Type',
+          value: item.type,
         },
       ];
+      const listColumns = [
+        {
+          field: 'field',
+          name: "Field",
+          align: "left",
+          width: "120px",
+          
+        },
+        {
+          field: 'value',
+          name: "Value",
+          align: "left"
+        },
+      ]
       itemIdToExpandedRowMap[item.file] = (
-        <EuiDescriptionList className="wz-margin-left-7" listItems={listItems} />
+        <EuiPanel 
+          className="wz-margin-10"
+          paddingSize="m">
+            <EuiBasicTable
+              items={listItems}
+              columns={listColumns}
+            />
+        </EuiPanel>
       );
     }
     this.setState({ itemIdToExpandedRowMap });
