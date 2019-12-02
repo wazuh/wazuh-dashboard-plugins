@@ -15,22 +15,16 @@ import PropTypes from 'prop-types';
 import { EuiPanel,
   EuiBasicTable,
   EuiFlexItem, 
-  EuiFlexGroup, 
-  EuiButtonEmpty, 
+  EuiFlexGroup,
   EuiTitle,
   EuiTextColor,
-  EuiFieldSearch, 
   EuiToolTip, 
-  EuiButtonIcon, 
-  EuiFlyout,
-  EuiFlyoutHeader,
-  EuiFlyoutBody,
-  EuiLoadingContent,
-  EuiLink,
+  EuiButtonIcon,
   EuiSpacer,
   EuiDescriptionList,
 } from '@elastic/eui';
 
+import { RIGHT_ALIGNMENT } from '@elastic/eui/lib/services';
 
  export class SyscheckTable extends Component {
   constructor(props) {
@@ -47,6 +41,7 @@ import { EuiPanel,
       totalItems: 0,
       q: '',
       search: '',
+      itemIdToExpandedRowMap: {}
     };
 
   }
@@ -55,7 +50,6 @@ import { EuiPanel,
 
 
    async componentDidMount() {
-     console.log("jaja")
     await this.getItems();
   }
 
@@ -66,7 +60,7 @@ import { EuiPanel,
   }
 
    formatFile(file) {
-     return { // TODO 
+     return {
       "file": file.file,
       "size": file.size,
       "gname": file.gname,
@@ -75,13 +69,18 @@ import { EuiPanel,
       "uid": file.uid,
       "gid": file.gid,
       "mtime": file.mtime,
+      "sha256": file.sha256,
+      "sha1": file.sha1,
+      "md5": file.md5,
+      "inode": file.inode,
+      "type": file.type,
+      "date": file.date,
     }
   }
 
 
    async getItems(){
     const files = await this.props.wzReq('GET',`/syscheck/${this.props.agentId}`,this.buildFilter());
-    console.log(files)
     const formattedFiles =  (((files || {}).data || {}).data || {}).items.map(this.formatFile);
     this.setState({
       monitoredFiles: formattedFiles,
@@ -123,7 +122,9 @@ import { EuiPanel,
     return direction+field;
   }
 
-   columns() {
+  columns() {
+    const itemIdToExpandedRowMap = this.state.itemIdToExpandedRowMap
+
     return [
       {
         field: 'file',
@@ -169,6 +170,18 @@ import { EuiPanel,
         name: 'Group ID',
         sortable: true,
         width: "75px"
+      },
+      {
+        align: RIGHT_ALIGNMENT,
+        width: '40px',
+        isExpander: true,
+        render: item => (
+          <EuiButtonIcon
+            onClick={() => this.toggleDetails(item)}
+            aria-label={itemIdToExpandedRowMap[item.file] ? 'Collapse' : 'Expand'}
+            iconType={itemIdToExpandedRowMap[item.file] ? 'arrowUp' : 'arrowDown'}
+          />
+        ),
       },
     ];
   }
@@ -278,7 +291,7 @@ import { EuiPanel,
   }
 
    table(){
-    const {pageIndex, pageSize, totalItems, sortField, sortDirection} = this.state
+    const {pageIndex, pageSize, totalItems, sortField, sortDirection, itemIdToExpandedRowMap} = this.state
     const monitoredFiles = this.state.monitoredFiles
     const columns = this.columns()
     const pagination = {
@@ -304,24 +317,94 @@ import { EuiPanel,
               pagination={pagination}
               onChange={this.onTableChange}
               sorting={sorting}
+              itemId="file"
+              itemIdToExpandedRowMap={this.state.itemIdToExpandedRowMap}
+              isExpandable={true}
             />
         </EuiFlexItem>
       </EuiFlexGroup>
     );
   }
 
+
+  toggleDetails = item => {
+    const itemIdToExpandedRowMap = { ...this.state.itemIdToExpandedRowMap };
+
+    if (itemIdToExpandedRowMap[item.file]) {
+      delete itemIdToExpandedRowMap[item.file];
+    } else {
+      const listItems = [
+        {
+          title: 'File name',
+          description: item.file,
+        },
+        {
+          title: 'Date',
+          description: item.date,
+        },
+        {
+          title: 'Last modified',
+          description: item.mtime,
+        },
+        {
+          title: 'Permissions',
+          description: item.perm,
+        },
+        {
+          title: 'Inode',
+          description: item.inode,
+        },
+        {
+          title: 'MD5',
+          description: item.md5,
+        },
+        {
+          title: 'SHA256',
+          description: item.sha256,
+        },
+        {
+          title: 'SHA1',
+          description: item.sha1,
+        },
+        {
+          title: 'User',
+          description: item.uname,
+        },
+        {
+          title: 'User ID',
+          description: item.uid,
+        },
+        {
+          title: 'Group',
+          description: item.gname,
+        },
+        {
+          title: 'Group ID',
+          description: item.gid,
+        },
+        {
+          title: 'Type',
+          description: item.type,
+        },
+      ];
+      itemIdToExpandedRowMap[item.file] = (
+        <EuiDescriptionList className="wz-margin-left-7" listItems={listItems} />
+      );
+    }
+    this.setState({ itemIdToExpandedRowMap });
+  };
+
+
+
    filterBar() {
      return (
       <EuiFlexGroup>
         <EuiFlexItem>
-
+          
          </EuiFlexItem>
       </EuiFlexGroup>
     );
   }
-
-
-
 
 
    render() {    
@@ -337,7 +420,6 @@ import { EuiPanel,
           {filter}
           {table}
         </EuiPanel>
-
       </div>
     );
   }
