@@ -136,34 +136,39 @@ import { EuiPanel,
         sortable: true,
       },
       {
+        field: 'mtime',
+        name: 'Last modified',
+        sortable: true,
+      },
+      {
         field: 'gname',
         name: 'Group',
         sortable: true,
+        width: "100px"
       },
       {
         field: 'uname',
         name: 'User',
         sortable: true,
+        width: "100px"
       },
       {
         field: 'perm',
         name: 'Permissions',
         sortable: true,
+        width: "100px"
       },
       {
         field: 'uid',
         name: 'User ID',
         sortable: true,
+        width: "75px"
       },
       {
         field: 'gid',
         name: 'Group ID',
         sortable: true,
-      },
-      {
-        field: 'mtime',
-        name: 'Last modified',
-        sortable: true,
+        width: "75px"
       },
     ];
   }
