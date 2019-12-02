@@ -17,6 +17,7 @@ import { EuiPanel,
   EuiFlexItem, 
   EuiFlexGroup,
   EuiTitle,
+  EuiFieldSearch,
   EuiTextColor,
   EuiToolTip, 
   EuiButtonIcon,
@@ -91,7 +92,6 @@ import { RIGHT_ALIGNMENT } from '@elastic/eui/lib/services';
 
    buildFilter() {
     const { pageIndex, pageSize, search, q} = this.state;
-
 
      const filter = {
       offset: pageIndex * pageSize,
@@ -211,6 +211,7 @@ import { RIGHT_ALIGNMENT } from '@elastic/eui/lib/services';
   onTableBarSearch = searchTxt => {
     this.setState({
       search: searchTxt,
+      isProcessing: true,
     });
   };
 
@@ -272,26 +273,24 @@ import { RIGHT_ALIGNMENT } from '@elastic/eui/lib/services';
         </EuiFlexItem>
         {formattedButton}
       </EuiFlexGroup>
-      { /*
-      * Searchbar is disabled until our API adds the `search` filter to the `/mitre` call
       <EuiSpacer size="m"/>
       <EuiFlexGroup style={{ marginLeft: 2 }}>
         <EuiFieldSearch
                   fullWidth={true}
-                  placeholder="Filter MITRE attacks"
+                  placeholder="Filter monitored files..."
                   value={this.state.searchValue}
                   onChange={this.onTableBarChange}
                   onSearch={this.onTableBarSearch}
-                  aria-label="Filter MITRE attacks"
+                  aria-label="Filter monitored files..."
                 />
         </EuiFlexGroup>
-        */}
+        
       </div>
     );
   }
 
    table(){
-    const {pageIndex, pageSize, totalItems, sortField, sortDirection, itemIdToExpandedRowMap} = this.state
+    const {pageIndex, pageSize, totalItems, sortField, sortDirection} = this.state
     const monitoredFiles = this.state.monitoredFiles
     const columns = this.columns()
     const pagination = {
