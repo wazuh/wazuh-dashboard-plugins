@@ -19,18 +19,20 @@
 wz-menu {
     z-index: 999;
 }
-.wz-menu-content {
+.wz-menu {
     color: #006BB4;
     background-color: #FFF;
     width: calc(~'100vw - 48px')!important;
     box-shadow: 0 2px 2px -1px rgba(152, 162, 179, 0.3);
     border-bottom: 1px solid #d3dae6;
-    padding: 0 8px 0px 16px;
+    padding: 7px 8px 0px 16px;
     font-size: 14px;
+    position: fixed !important;
+    height: 50px;
 }
 
 @media only screen and (max-width: 767px){
-    .wz-menu-content {
+    .wz-menu {
         width: 100%;
     }
   }
@@ -44,13 +46,8 @@ wz-menu {
       }
 
 .wz-menu-logo {
-    position: absolute;
-    left: 0;
-    width: 100%;
-    text-align: center;
-    z-index: -1;
-    filter: hue-rotate(30deg) brightness(0.75);
-    opacity: .9;
+    filter: hue-rotate(30deg) brightness(0.8);
+    margin-top: 4px;
   }
   
 .wz-menu-button {
@@ -80,6 +77,7 @@ wz-menu {
 }
 .wz-menu-button:not([disabled]):hover {
     background-color: #f5f7fa;
+    text-decoration: none;
 }
 
 /* Style for index-pattern selector */

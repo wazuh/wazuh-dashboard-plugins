@@ -1,5 +1,5 @@
 <div ng-cloak ng-controller="settingsController as ctrl">
-    <div ng-if="ctrl.load" class="md-padding">
+    <div ng-show="ctrl.load" class="euiPage">
         <react-component name="EuiProgress" props="{size: 'xs', color: 'primary'}" />
     </div>
 

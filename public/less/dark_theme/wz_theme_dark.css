@@ -139,9 +139,10 @@ md-nav-bar.md-default-theme .md-nav-bar, md-nav-bar .md-nav-bar {
   color: white!important;
 }
 
-.wz-menu-content {
+.wz-menu {
   background-color: #1a1b20;
   color: white;
+  position: fixed;
 }
 
 .wz-menu-button.wz-menu-active {
@@ -286,7 +287,7 @@ md-divider.md-default-theme, md-divider {
   color: #dfe5ef;
 }
 
-.wz-menu-content {
+.wz-menu {
   box-shadow: 0 2px 2px -1px rgba(0, 0, 0, 0.3)!important;
 }
 

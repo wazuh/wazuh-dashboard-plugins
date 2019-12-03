@@ -1,46 +1,48 @@
-<md-toolbar ng-hide="root.hideWzMenu || !settedMenuHeight">
+<div ng-hide="root.hideWzMenu || !settedMenuHeight">
     <!-- Main toolbar content -->
-    <div class="md-toolbar-tools wz-menu-content">
+    <div class="wz-menu euiFlexGroup">
         <!-- Main Wazuh app navigation buttons -->
 <!--         <a ng-href="#/home" ng-click="setMenuNavItem('home')"
             ng-class="{'wz-menu-active': menuNavItem === 'home' || menuNavItem === 'health-check' }"
             aria-label="Overview tab" data-test-subj="wzMenuOverview" class="md-button wz-menu-button" tooltip="Overview" tooltip-placement="bottom">
             <react-component name="EuiIcon" props="{type:'metricbeatApp', color: 'primary', size: 'm'}" />
         </a> -->
-
+<div class="euiFlexItem euiFlexItem--flexGrowZero">
+        <div class="euiFlexGroup">
         <a ng-href="#/overview" ng-click="setMenuNavItem('overview')"
             ng-class="{'wz-menu-active': menuNavItem === 'overview' || menuNavItem === 'health-check' }"
-            aria-label="Overview tab" data-test-subj="wzMenuOverview" class="md-button wz-menu-button" tooltip="Overview" tooltip-placement="bottom">
+            aria-label="Overview tab" data-test-subj="wzMenuOverview" class="md-button wz-menu-button euiButtonEmpty euiButtonEmpty--primary">
             <react-component name="EuiIcon" props="{type:'visualizeApp', color: 'primary', size: 'm'}" />
+            <span> Overview</span>
         </a>
 
         <a ng-href="#/manager" ng-click="setMenuNavItem('manager')"
             ng-class="{'wz-menu-active': menuNavItem === 'manager' }" aria-label="Cluster tab"
-            data-test-subj="wzMenuManagement" class="md-button wz-menu-button" tooltip="Management" tooltip-placement="bottom">
+            data-test-subj="wzMenuManagement" class="md-button wz-menu-button euiButtonEmpty euiButtonEmpty--primary">
             <react-component name="EuiIcon" props="{type:'managementApp', color: 'primary', size: 'm'}" />
+            <span> Management</span>
         </a>
 
         <a ng-href="#/agents-preview" ng-click="setMenuNavItem('agents-preview')"
             ng-class="{'wz-menu-active': menuNavItem === 'agents-preview' || menuNavItem === 'agents' }"
-            aria-label="Agents tab" data-test-subj="wzMenuAgents" class="md-button wz-menu-button" tooltip="Agents" tooltip-placement="bottom">
+            aria-label="Agents tab" data-test-subj="wzMenuAgents" class="md-button wz-menu-button euiButtonEmpty euiButtonEmpty--primary">
             <react-component name="EuiIcon" props="{type:'watchesApp', color: 'primary', size: 'm'}" />
+            <span> Agents</span>
         </a>
 
         <a ng-href="#/wazuh-dev" ng-click="setMenuNavItem('wazuh-dev')"
             ng-class="{'wz-menu-active': menuNavItem === 'wazuh-dev' }" aria-label="Dev Tools tab"
-            data-test-subj="wzMenuDevTools" class="md-button wz-menu-button" tooltip="Dev Tools" tooltip-placement="bottom">
+            data-test-subj="wzMenuDevTools" class="md-button wz-menu-button euiButtonEmpty euiButtonEmpty--primary">
             <react-component name="EuiIcon" props="{type:'consoleApp', color: 'primary', size: 'm'}" />
+            <span> Dev Tools</span>
         </a>
-
-        <div class="wz-menu-logo">
-            <img wz-src="/plugins/wazuh/img/logo.svg" class="navBarLogo" alt="">
-        </div>
-
+    </div>
+</div>
         <!-- Fill up the space between left and right area -->
-        <span flex></span>
+        <div class="euiFlexItem"></div>
 
         <!-- API/Index pattern section -->
-        <div style="padding: 0px 8px">
+        <div class="euiFlexItem euiFlexItem--flexGrowZero" style="padding: 11px">
             <!-- Case 1a - There's API -->
             <span ng-show="theresAPI" tooltip="Selected API" tooltip-placement="bottom">
                 <react-component name="EuiIcon" props="{type:'starFilledSpace', color: 'primary', size: 'm'}" />{{currentAPI}}<span
@@ -66,15 +68,17 @@
             </span>
         </div>
         <!-- Settings tab button -->
+        <div class="euiFlexItem euiFlexItem--flexGrowZero">
         <span>
             <a tooltip="Settings" tooltip-placement="bottom" ng-href="#/settings" ng-click="setMenuNavItem('settings')" ng-class="{'wz-menu-active': menuNavItem === 'settings' }" 
-                aria-label="Settings tab" class="md-button wz-menu-button">
+                aria-label="Settings tab" class="md-button wz-menu-button euiButtonEmpty euiButtonEmpty--primary">
                 <react-component name="EuiIcon" props="{type:'advancedSettingsApp', color: 'primary', size: 'm'}" />
             </a>
         </span>
     </div>
+</div>
 
-</md-toolbar>
+</div>
 
 <div layout="row" ng-if="wazuhNotReadyYet">
     <div flex class="euiCallOut euiCallOut--warning">
