@@ -200,18 +200,23 @@ export default class WzSearchBar extends Component {
 
   onItemClick(item: suggestItem) {
     const { inputValue } = this.state;
+    const qInterperter = new QInterpreter(inputValue);
     let inputStage:string = '';
     if (item.type.iconType === 'kqlField') {
+      qInterperter.setlastQuery(item.label);
       inputStage = 'operators';
     } else if (item.type.iconType === 'kqlOperand') {
+      qInterperter.setlastQuery(item.label);
       inputStage = 'values';
     } else if (item.type.iconType === 'kqlValue') {
+      qInterperter.setlastQuery(item.label);
       inputStage = 'conjuntions';
     } else if (item.type.iconType === 'kqlSelector') {
+      qInterperter.addNewQuery(item.label);
       inputStage = 'fields';
     }
     this.setState({
-      inputValue: inputValue + item.label,
+      inputValue: qInterperter.toString(),
       isProcessing: true,
       currentField: 'status',
       inputStage,
@@ -222,7 +227,6 @@ export default class WzSearchBar extends Component {
     const qInterpreter = new QInterpreter(inputValue);
 
     const {field, operator=false, value=false, conjuntion=false} = qInterpreter.lastQuery()
-    console.log(value)
     if(value !== false) {
       const { qSuggests } = this.props;
       const result = qSuggests.find((item) => {return item.label === field})

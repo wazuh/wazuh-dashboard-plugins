@@ -66,6 +66,9 @@ export class QInterpreter {
     }
   }
 
+  qNumber():number {
+    return this.queryObjects.length
+  }
 
 
   getQuery():queryObject {return {
@@ -74,25 +77,51 @@ export class QInterpreter {
     value: 'string'
   }}
 
+  
+  setlastQuery(newInput: string):queryObject {
+    const lastQuery = this.queryObjects[this.qNumber()-1];
+    const { operator=false, value= false } = lastQuery;
+    console.log(lastQuery);
+    if (value !== false) {
+      lastQuery.value = newInput;
+    } else if (operator !== false || newInput.match(this.operators)) {
+      lastQuery.operator = newInput;
+    } else {
+      lastQuery.field = newInput
+    }
+    
+    this.queryObjects[this.qNumber()-1] = lastQuery;
+    return lastQuery;
+  }
+
   lastQuery():queryObject {
     const lastQuery = this.queryObjects.length -1
     return this.queryObjects[lastQuery];
   }
 
+  addNewQuery(conjuntion:string, field='', operator=false, value=false) {
+    const newQuery: queryObject = {
+      conjuntion,
+      field
+    };
+    if (operator !== false) {
+      newQuery['operator'] = operator;
+    }
+    if (value !== false) {
+      newQuery['value'] = value;
+    }
+    this.queryObjects.push(newQuery);
+  }
+
   toString():string { 
     let query = '';
     for (const qObject of this.queryObjects) {
+      query += qObject.conjuntion ? qObject.conjuntion : '';
       query += qObject.field;
       query += qObject.operator ? qObject.operator : '';
       query += qObject.value ? qObject.value : '';
-      query += qObject.conjuntion ? qObject.conjuntion : '';
     }
     this.query = query;
     return query
   }
 }
-
-const a = new QInterpreter('');
-console.log(a.lastQuery());
-// const b = new QInterpreter('asd=123;dsa=1');
-// const c = new QInterpreter('asd!=asd,fq>3,fq>3,fq>3');
