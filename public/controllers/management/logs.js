@@ -49,6 +49,10 @@ export class LogsController {
   $onInit() {
     this.initialize();
 
+    this.logsProps = {
+      wzReq: (method, path, body) => this.apiReq.request(method, path, body)
+    }
+
     this.$scope.$on('wazuhFetched', (ev, parameters) => {
       this.$scope.XMLContent = this.parseLogsToText(parameters.items) || '';
 
