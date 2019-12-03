@@ -81,7 +81,6 @@ export class QInterpreter {
   setlastQuery(newInput: string):queryObject {
     const lastQuery = this.queryObjects[this.qNumber()-1];
     const { operator=false, value= false } = lastQuery;
-    console.log(lastQuery);
     if (value !== false) {
       lastQuery.value = newInput;
     } else if (operator !== false || newInput.match(this.operators)) {
@@ -105,9 +104,11 @@ export class QInterpreter {
       field
     };
     if (operator !== false) {
+      // @ts-ignore
       newQuery['operator'] = operator;
     }
     if (value !== false) {
+      // @ts-ignore
       newQuery['value'] = value;
     }
     this.queryObjects.push(newQuery);
