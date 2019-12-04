@@ -139,7 +139,7 @@ export default class StatusHandler {
   /**
    * Restart manager (single-node API call)
    */
-  async restartManager() {
+  static async restartManager() {
     try {
       const validationError = await WzRequest.apiReq(
         'GET',

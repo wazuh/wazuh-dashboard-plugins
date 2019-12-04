@@ -135,6 +135,7 @@ export class WzStatusOverview extends Component {
         const daemons = await this.statusHandler.managerStatus();
         const listDaemons = this.objToArr(daemons.data.data);
         this.props.updateListDaemons(listDaemons);
+        this.props.updateSelectedNode(false);
         this.props.updateNodeInfo(managerInfo);
       }
     }

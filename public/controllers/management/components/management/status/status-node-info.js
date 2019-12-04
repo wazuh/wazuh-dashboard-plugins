@@ -34,7 +34,7 @@ export class WzStatusNodeInfo extends Component {
 
   render() {
     const { nodeInfo, selectedNode } = this.props.state;
-    const title = selectedNode + ' information';
+    const title = selectedNode ? selectedNode + ' information' : 'Manager information';
 
     const titleStyle = {
       marginLeft: '4px',
@@ -51,11 +51,8 @@ export class WzStatusNodeInfo extends Component {
           <EuiFlexItem>
             <EuiFlexGroup>
               <EuiFlexItem>
-                <EuiTitle>
-                  <h3>
-                    <EuiIcon type="node" size="m" />
-                    <span style={titleStyle}>{title}</span>
-                  </h3>
+                <EuiTitle size="m">
+                  <h2>{title}</h2>
                 </EuiTitle>
               </EuiFlexItem>
             </EuiFlexGroup>

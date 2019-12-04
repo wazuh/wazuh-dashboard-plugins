@@ -15,7 +15,7 @@ const initialState = {
   isLoading: false,
   isProcessing: false,
   listNodes: [],
-  selectedNode: false,
+  selectedNode: null,
   listDaemons: [],
   stats: false,
   nodeInfo: false,
@@ -89,7 +89,7 @@ const statusReducers = (state = initialState, action) => {
     return {
       ...state,
       listNodes: [],
-      selectedNode: false,
+      selectedNode: null,
       listDaemons: [],
       stats: false,
       nodeInfo: false,

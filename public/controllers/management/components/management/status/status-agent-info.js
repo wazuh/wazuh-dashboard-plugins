@@ -55,11 +55,8 @@ export class WzStatusAgentInfo extends Component {
           <EuiFlexItem>
             <EuiFlexGroup>
               <EuiFlexItem>
-                <EuiTitle>
-                  <h3>
-                    <EuiIcon type="visTable" size="m" />
-                    <span style={titleStyle}>Last registered agent</span>
-                  </h3>
+                <EuiTitle size="m">
+                  <h2>Last registered agent</h2>
                 </EuiTitle>
               </EuiFlexItem>
             </EuiFlexGroup>
