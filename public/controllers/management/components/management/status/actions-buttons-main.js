@@ -111,7 +111,7 @@ class WzStatusActionButtons extends Component {
       this.props.updateLoadingStatus(false);
     } catch (error) {
       this.props.updateLoadingStatus(false);
-      this.clusterError = `Node ${node} is down`; // TODO: errors
+      this.showToast('danger', 'Cluster Error', `Node ${node} is down`, 3000);
     }
 
     return;

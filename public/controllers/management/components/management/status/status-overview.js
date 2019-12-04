@@ -45,6 +45,8 @@ import WzStatusStats from './status-stats';
 import WzStatusNodeInfo from './status-node-info';
 import WzStatusAgentInfo from './status-agent-info';
 
+import { toastNotifications } from 'ui/notify';
+
 export class WzStatusOverview extends Component {
   _isMounted = false;
   constructor(props) {
@@ -123,7 +125,12 @@ export class WzStatusOverview extends Component {
       this.props.updateNodeInfo(nodeInfo.data.data);
     } else {
       if (clusterStatus && clusterStatus.enabled === 'yes' && clusterStatus.running === 'no') {
-        this.clusterError = `Cluster is enabled but it's not running, please check your cluster health.`; // TODO: ERROR
+        this.showToast(
+          'danger',
+          'Cluster Error',
+          `Cluster is enabled but it's not running, please check your cluster health.`,
+          3000
+        );
       } else {
         const daemons = await this.statusHandler.managerStatus();
         const listDaemons = this.objToArr(daemons.data.data);
@@ -139,6 +146,15 @@ export class WzStatusOverview extends Component {
 
     return;
   }
+
+  showToast = (color, title, text, time) => {
+    toastNotifications.add({
+      color: color,
+      title: title,
+      text: text,
+      toastLifeTimeMs: time,
+    });
+  };
 
   render() {
     const { isLoading, listDaemons, stats, nodeInfo, agentInfo } = this.props.state;
