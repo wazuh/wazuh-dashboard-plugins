@@ -20,6 +20,7 @@ import {
   updateIsProcessing,
   updateListDaemons,
   updateNodeInfo,
+  updateSelectedNode,
 } from '../../../../../redux/actions/statusActions';
 
 import StatusHandler from './utils/status-handler';
@@ -68,10 +69,11 @@ class WzStatusActionButtons extends Component {
    * This change to a selected node
    * @param {String} node
    */
-  async changeNode(node) {
+  changeNode = async e => {
     try {
-      // this.clusterError = false;
+      const node = e.target.value;
       this.props.updateLoadingStatus(true);
+      this.props.updateSelectedNode(node);
 
       const daemons = await this.statusHandler.clusterNodeStatus(node);
       const listDaemons = this.objToArr(daemons.data.data);
@@ -87,7 +89,7 @@ class WzStatusActionButtons extends Component {
     }
 
     return;
-  }
+  };
 
   onRefreshLoading() {
     clearInterval(this.refreshTimeoutId);
@@ -168,6 +170,7 @@ const mapDispatchToProps = dispatch => {
     updateIsProcessing: isProcessing => dispatch(updateIsProcessing(isProcessing)),
     updateListDaemons: listDaemons => dispatch(updateListDaemons(listDaemons)),
     updateNodeInfo: nodeInfo => dispatch(updateNodeInfo(nodeInfo)),
+    updateSelectedNode: selectedNode => dispatch(updateSelectedNode(selectedNode)),
   };
 };
 
