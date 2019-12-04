@@ -121,8 +121,8 @@ export default class WzSearchBar extends Component {
         label: inputValue,
       });
     }
-    const isSearch = fields.length > 1 ? false : true;
-    this.setState({suggestions: fields, isSearch});
+    const isSearch = qInterpreter.qNumber() > 1 ? false : true;
+    this.setState({suggestions: fields, isSearch });
   }
 
   buildSuggestOperators() {
@@ -133,7 +133,8 @@ export default class WzSearchBar extends Component {
     const suggestions:suggestItem[] = operatorsAllow.map(this.CreateSuggestOperator);
 
     this.setState({
-      suggestions
+      suggestions,
+      isSearch: false,
     })
   }
 
@@ -178,7 +179,10 @@ export default class WzSearchBar extends Component {
           }
           suggestions.push(item);
         }
-        this.setState({suggestions});
+        this.setState({
+          suggestions,
+          isSearch: false,
+        });
       }
     }
   }
@@ -195,15 +199,19 @@ export default class WzSearchBar extends Component {
       }
     })
     this.setState({
-      suggestions
+      suggestions,
+      isSearch: false,
     })
   }
 
-  onInputChange = (value) => {
+  onInputChange = (value:string) => {
     this.setState({
       inputValue: value,
       isProcessing: true,
     });
+    if (value.length === 0) {
+      this.props.onInputChange({});
+    }
     this.inputStageHandler(value);
   }
   
@@ -214,11 +222,8 @@ export default class WzSearchBar extends Component {
       const { isSearch, inputValue } = this.state;
       if (isSearch) {
         this.props.onInputChange({search: inputValue});
-      } else {
-        this.setState({
-          inputStage: 'operators',
-          isProcessing: true
-        })
+      } else if(inputValue.length > 0) {
+        this.props.onInputChange({q: inputValue});
       }
     }
   }
