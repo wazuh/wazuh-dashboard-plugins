@@ -17,7 +17,6 @@ import { DecodersController } from './decoders';
 import { LogsController } from './logs';
 import { ManagementController } from './management';
 import { RulesController } from './rules';
-import { StatusController } from './status';
 import { ClusterController } from './monitoring';
 import { CdbListsController } from './cdblists';
 import { ConfigurationRulesetController } from './config-ruleset';
@@ -45,13 +44,12 @@ app
   .controller('groupsPreviewController', GroupsController)
   .controller('managerLogController', LogsController)
   .controller('rulesController', RulesController)
-  .controller('managerStatusController', StatusController)
   .controller('clusterController', ClusterController)
   .controller('cdbListsController', CdbListsController)
   .controller('configurationRulesetController', ConfigurationRulesetController)
   .controller('configurationGroupsController', ConfigurationGroupsController)
   .controller('editionController', EditionController)
-  .controller('filesController', FilesController)  
+  .controller('filesController', FilesController)
   .value('WelcomeScreenManagement', WelcomeScreen)
   .value('WelcomeWrapper', WelcomeWrapper)
   .value('ReportingTable', ReportingTable)
