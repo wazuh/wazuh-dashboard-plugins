@@ -11,7 +11,7 @@
  * Find more information about this on the LICENSE file.
  */
 import React, { Component } from 'react';
-import { EuiPanel, EuiFlexGroup, EuiFlexItem, EuiTitle, EuiIcon } from '@elastic/eui';
+import { EuiPanel, EuiFlexGroup, EuiFlexItem, EuiTitle } from '@elastic/eui';
 
 import { connect } from 'react-redux';
 
@@ -26,8 +26,6 @@ export class WzStatusNodeInfo extends Component {
     this._isMounted = true;
   }
 
-  componentDidUpdate() {}
-
   componentWillUnmount() {
     this._isMounted = false;
   }
@@ -35,11 +33,6 @@ export class WzStatusNodeInfo extends Component {
   render() {
     const { nodeInfo, selectedNode } = this.props.state;
     const title = selectedNode ? selectedNode + ' information' : 'Manager information';
-
-    const titleStyle = {
-      marginLeft: '4px',
-      fontSize: '17px',
-    };
 
     const greyStyle = {
       color: 'grey',

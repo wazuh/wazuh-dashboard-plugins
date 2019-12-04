@@ -26,8 +26,6 @@ export class WzStatusAgentInfo extends Component {
     this._isMounted = true;
   }
 
-  componentDidUpdate() {}
-
   componentWillUnmount() {
     this._isMounted = false;
   }
@@ -39,11 +37,6 @@ export class WzStatusAgentInfo extends Component {
       : agentInfo.os.uname
       ? agentInfo.os.uname
       : '-';
-
-    const titleStyle = {
-      marginLeft: '4px',
-      fontSize: '17px',
-    };
 
     const greyStyle = {
       color: 'grey',

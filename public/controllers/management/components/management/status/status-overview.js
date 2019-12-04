@@ -24,7 +24,6 @@ import {
 import { connect } from 'react-redux';
 import {
   updateLoadingStatus,
-  updateIsProcessing,
   updateAdminMode,
   updateListNodes,
   updateSelectedNode,
@@ -207,7 +206,6 @@ const mapStateToProps = state => {
 const mapDispatchToProps = dispatch => {
   return {
     updateLoadingStatus: status => dispatch(updateLoadingStatus(status)),
-    updateIsProcessing: isProcessing => dispatch(updateIsProcessing(isProcessing)),
     updateAdminMode: status => dispatch(updateAdminMode(status)),
     updateListNodes: listNodes => dispatch(updateListNodes(listNodes)),
     updateSelectedNode: selectedNode => dispatch(updateSelectedNode(selectedNode)),

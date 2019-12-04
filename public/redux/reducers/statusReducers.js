@@ -1,5 +1,5 @@
 /*
- * Wazuh app - React component for registering agents.
+ * Wazuh app - React component for status.
  * Copyright (C) 2015-2019 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -13,7 +13,6 @@
 const initialState = {
   adminMode: true,
   isLoading: false,
-  isProcessing: false,
   listNodes: [],
   selectedNode: null,
   listDaemons: [],
@@ -24,13 +23,6 @@ const initialState = {
 };
 
 const statusReducers = (state = initialState, action) => {
-  if (action.type === 'UPDATE_IS_PROCESSING') {
-    return {
-      ...state,
-      isProcessing: action.isProcessing,
-      isLoading: action.isProcessing,
-    };
-  }
   if (action.type === 'UPDATE_LOADING_STATUS') {
     return {
       ...state,

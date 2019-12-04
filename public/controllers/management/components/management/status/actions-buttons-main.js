@@ -1,5 +1,5 @@
 /*
- * Wazuh app - React component for registering agents.
+ * Wazuh app - React component of actions buttons for status.
  * Copyright (C) 2015-2019 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -23,7 +23,6 @@ import { connect } from 'react-redux';
 
 import {
   updateLoadingStatus,
-  updateIsProcessing,
   updateListDaemons,
   updateNodeInfo,
   updateSelectedNode,
@@ -164,6 +163,7 @@ class WzStatusActionButtons extends Component {
     } = this.props.state;
 
     let options = this.transforToOptions(listNodes);
+
     // Select node
     const selectNode = (
       <EuiSelect
@@ -234,7 +234,6 @@ const mapStateToProps = state => {
 const mapDispatchToProps = dispatch => {
   return {
     updateLoadingStatus: status => dispatch(updateLoadingStatus(status)),
-    updateIsProcessing: isProcessing => dispatch(updateIsProcessing(isProcessing)),
     updateListDaemons: listDaemons => dispatch(updateListDaemons(listDaemons)),
     updateNodeInfo: nodeInfo => dispatch(updateNodeInfo(nodeInfo)),
     updateSelectedNode: selectedNode => dispatch(updateSelectedNode(selectedNode)),

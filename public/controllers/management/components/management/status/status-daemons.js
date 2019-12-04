@@ -11,17 +11,7 @@
  * Find more information about this on the LICENSE file.
  */
 import React, { Component } from 'react';
-import {
-  EuiFlexItem,
-  EuiFlexGroup,
-  EuiPanel,
-  EuiIcon,
-  EuiText,
-  EuiPage,
-  EuiSpacer,
-  EuiTitle,
-  EuiHealth,
-} from '@elastic/eui';
+import { EuiFlexGroup, EuiIcon, EuiText, EuiPage } from '@elastic/eui';
 
 import { connect } from 'react-redux';
 

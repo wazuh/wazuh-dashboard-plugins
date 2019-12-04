@@ -1,5 +1,5 @@
 /*
- * Wazuh app - React component for registering agents.
+ * Wazuh app - React component for status.
  * Copyright (C) 2015-2019 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -18,17 +18,6 @@ export const updateLoadingStatus = loading => {
   return {
     type: 'UPDATE_LOADING_STATUS',
     status: loading,
-  };
-};
-
-/**
- * Toggle the updating of the table
- * @param {Boolean} isProcessing
- */
-export const updateIsProcessing = isProcessing => {
-  return {
-    type: 'UPDATE_IS_PROCESSING',
-    isProcessing: isProcessing,
   };
 };
 

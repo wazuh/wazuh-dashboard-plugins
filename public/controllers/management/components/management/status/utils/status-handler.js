@@ -1,5 +1,5 @@
 /*
- * Wazuh app - Ruleset handler service
+ * Wazuh app - Status handler service
  * Copyright (C) 2015-2019 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
