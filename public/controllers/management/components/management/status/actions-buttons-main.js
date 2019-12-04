@@ -124,7 +124,7 @@ class WzStatusActionButtons extends Component {
   };
 
   render() {
-    const { isLoading, listNodes, selectedNode } = this.props.state;
+    const { isLoading, listNodes, selectedNode, adminMode } = this.props.state;
     let options = this.transforToOptions(listNodes);
     // Select node
     const selectNode = (
@@ -152,7 +152,7 @@ class WzStatusActionButtons extends Component {
     return (
       <Fragment>
         <EuiFlexItem grow={false}>{selectNode}</EuiFlexItem>
-        <EuiFlexItem grow={false}>{restartButton}</EuiFlexItem>
+        {adminMode && <EuiFlexItem grow={false}>{restartButton}</EuiFlexItem>}
       </Fragment>
     );
   }
