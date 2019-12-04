@@ -11,7 +11,13 @@
  */
 import React, { Component, Fragment } from 'react';
 // Eui components
-import { EuiFlexItem, EuiButtonEmpty, EuiSelect } from '@elastic/eui';
+import {
+  EuiFlexItem,
+  EuiButtonEmpty,
+  EuiSelect,
+  EuiOverlayMask,
+  EuiConfirmModal,
+} from '@elastic/eui';
 
 import { connect } from 'react-redux';
 
@@ -34,7 +40,9 @@ class WzStatusActionButtons extends Component {
 
     this.refreshTimeoutId = null;
     this.statusHandler = StatusHandler;
-    this.state = {};
+    this.state = {
+      isModalVisible: false,
+    };
   }
 
   componentDidMount() {
@@ -48,14 +56,32 @@ class WzStatusActionButtons extends Component {
   }
 
   /**
+   * Restart cluster
+   */
+  async restartCluster() {
+    this.props.updateLoadingStatus(true);
+    try {
+      const result = await this.statusHandler.restartCluster();
+      this.props.updateLoadingStatus(false);
+      // this.errorHandler.info('Restarting cluster.'); //TODO: TOAST INFO
+    } catch (error) {
+      this.props.updateLoadingStatus(false);
+      // this.errorHandler.handle(error.message || error, 'Error restarting cluster'); // TODO: TOAST ERROR
+    }
+  }
+
+  /**
    * Restart manager
    */
-  async restart() {
+  async restartManager() {
+    this.props.updateLoadingStatus(true);
     try {
-      this.props.updateIsProcessing(true);
-      this.onRefreshLoading();
+      await this.statusHandler.restartManager();
+      this.props.updateLoadingStatus(false);
+      // this.errorHandler.info('Restarting manager.'); //TODO: TOAST INFO
     } catch (error) {
-      return Promise.reject(error);
+      this.props.updateLoadingStatus(false);
+      // this.errorHandler.handle(error.message || error, 'Error restarting manager'); // TODO: TOAST ERROR
     }
   }
 
@@ -123,8 +149,12 @@ class WzStatusActionButtons extends Component {
     return options;
   };
 
+  closeModal = () => {
+    this.setState({ isModalVisible: false });
+  };
+
   render() {
-    const { isLoading, listNodes, selectedNode, adminMode } = this.props.state;
+    const { isLoading, listNodes, selectedNode, adminMode, clusterEnabled } = this.props.state;
     let options = this.transforToOptions(listNodes);
     // Select node
     const selectNode = (
@@ -142,17 +172,44 @@ class WzStatusActionButtons extends Component {
     const restartButton = (
       <EuiButtonEmpty
         iconType="refresh"
-        onClick={async () => await this.restart()}
+        onClick={async () => this.setState({ isModalVisible: true })}
         isDisabled={isLoading}
       >
-        Restart cluster
+        {clusterEnabled && 'Restart cluster'}
+        {!clusterEnabled && 'Restart manager'}
       </EuiButtonEmpty>
     );
+
+    let modal;
+
+    if (this.state.isModalVisible) {
+      modal = (
+        <EuiOverlayMask>
+          <EuiConfirmModal
+            title={clusterEnabled ? 'Cluster will be restarted' : 'Manager will be restarted'}
+            onCancel={this.closeModal}
+            onConfirm={() => {
+              if (clusterEnabled) {
+                this.restartCluster();
+              } else {
+                this.restartManager();
+              }
+              this.setState({ isModalVisible: false });
+            }}
+            cancelButtonText="Cancel"
+            confirmButtonText="Confirm"
+            defaultFocusedButton="cancel"
+            buttonColor="danger"
+          ></EuiConfirmModal>
+        </EuiOverlayMask>
+      );
+    }
 
     return (
       <Fragment>
         <EuiFlexItem grow={false}>{selectNode}</EuiFlexItem>
         {adminMode && <EuiFlexItem grow={false}>{restartButton}</EuiFlexItem>}
+        {modal}
       </Fragment>
     );
   }

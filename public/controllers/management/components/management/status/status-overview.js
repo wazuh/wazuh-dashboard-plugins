@@ -32,6 +32,7 @@ import {
   updateStats,
   updateNodeInfo,
   updateAgentInfo,
+  updateClusterEnabled,
   cleanInfo,
 } from '../../../../../redux/actions/statusActions';
 import checkAdminMode from './utils/check-admin-mode';
@@ -106,6 +107,8 @@ export class WzStatusOverview extends Component {
       agentsCountTotal: total,
       agentsCoverity: total ? (active / total) * 100 : 0,
     });
+
+    this.props.updateClusterEnabled(clusterStatus && clusterStatus.enabled === 'yes');
 
     if (clusterStatus && clusterStatus.enabled === 'yes' && clusterStatus.running === 'yes') {
       const nodes = await this.statusHandler.clusterNodes();
@@ -197,6 +200,7 @@ const mapDispatchToProps = dispatch => {
     updateStats: stats => dispatch(updateStats(stats)),
     updateNodeInfo: nodeInfo => dispatch(updateNodeInfo(nodeInfo)),
     updateAgentInfo: agentInfo => dispatch(updateAgentInfo(agentInfo)),
+    updateClusterEnabled: clusterEnabled => dispatch(updateClusterEnabled(clusterEnabled)),
     cleanInfo: () => dispatch(cleanInfo()),
   };
 };

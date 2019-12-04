@@ -81,6 +81,13 @@ export const updateAgentInfo = agentInfo => {
   };
 };
 
+export const updateClusterEnabled = status => {
+  return {
+    type: 'UPDATE_CLUSTER_ENABLED',
+    clusterEnabled: status,
+  };
+};
+
 export const cleanInfo = () => {
   return {
     type: 'CLEAN_INFO',
