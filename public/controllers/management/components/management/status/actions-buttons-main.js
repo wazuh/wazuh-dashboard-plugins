@@ -63,10 +63,10 @@ class WzStatusActionButtons extends Component {
     try {
       const result = await this.statusHandler.restartCluster();
       this.props.updateLoadingStatus(false);
-      // this.errorHandler.info('Restarting cluster.'); //TODO: TOAST INFO
+      this.showToast('success', '', 'Restarting cluster, it will take up to 30 seconds.', 3000);
     } catch (error) {
       this.props.updateLoadingStatus(false);
-      // this.errorHandler.handle(error.message || error, 'Error restarting cluster'); // TODO: TOAST ERROR
+      this.showToast('danger', 'Error restarting cluster', error.message || error, 3000);
     }
   }
 
@@ -78,10 +78,10 @@ class WzStatusActionButtons extends Component {
     try {
       await this.statusHandler.restartManager();
       this.props.updateLoadingStatus(false);
-      // this.errorHandler.info('Restarting manager.'); //TODO: TOAST INFO
+      this.showToast('success', '', 'Restarting manager.', 3000);
     } catch (error) {
       this.props.updateLoadingStatus(false);
-      // this.errorHandler.handle(error.message || error, 'Error restarting manager'); // TODO: TOAST ERROR
+      this.showToast('danger', 'Error restarting manager', error.message || error, 3000);
     }
   }
 
@@ -199,7 +199,6 @@ class WzStatusActionButtons extends Component {
             cancelButtonText="Cancel"
             confirmButtonText="Confirm"
             defaultFocusedButton="cancel"
-            buttonColor="danger"
           ></EuiConfirmModal>
         </EuiOverlayMask>
       );
