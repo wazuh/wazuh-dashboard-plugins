@@ -11,6 +11,7 @@
  * Find more information about this on the LICENSE file.
  */
 import React, { Component } from 'react';
+import ReactMarkdown from 'react-markdown';
 import PropTypes from 'prop-types';
 import { EuiPanel,
   EuiBasicTable,
@@ -30,6 +31,7 @@ import { EuiPanel,
   EuiSpacer,
   EuiDescriptionList,
 } from '@elastic/eui';
+import { array } from 'joi';
 
 
  export class MitreTable extends Component {
@@ -72,7 +74,7 @@ import { EuiPanel,
      return {
       "id": tactic.id,
       "name": tactic.json.name,
-      "phases": tactic.phases,
+      "phase_name": tactic.phases,
       "modified": tactic.json.modified,
       "actions": tactic
     }
@@ -141,16 +143,10 @@ import { EuiPanel,
         sortable: false,
       },
       {
-        field: 'phases',
+        field: 'phase_name',
         name: 'Phases',
-        sortable: false,
-      },
-      {
-        field: 'actions',
-        name: 'Actions',
-        sortable: false,
-        render: (tactic) => this.actionButtonsRender(tactic)
-      },
+        sortable: true,
+      }
     ];
   }
 
@@ -171,7 +167,7 @@ import { EuiPanel,
 
   async showFlyout(techniqueData) {
     this.setState({ isFlyoutVisible: true });
-    const result = await this.props.wzReq("GET", "/mitre",{q: `id=${techniqueData.id}`})
+    const result = await this.props.wzReq("GET", "/mitre",{q: `id=${techniqueData}`})
     const formattedResult = ((((result || {}).data || {}).data ).items || [])[0] || {}
     this.updateCurrentTechniqueData(formattedResult)
   }
@@ -190,7 +186,9 @@ import { EuiPanel,
   onTableBarSearch = searchTxt => {
     this.setState({
       search: searchTxt,
-    });
+    },
+    this.getItems
+    );
   };
 
 
@@ -249,8 +247,6 @@ import { EuiPanel,
         </EuiFlexItem>
         {formattedButton}
       </EuiFlexGroup>
-      { /*
-      * Searchbar is disabled until our API adds the `search` filter to the `/mitre` call
       <EuiSpacer size="m"/>
       <EuiFlexGroup style={{ marginLeft: 2 }}>
         <EuiFieldSearch
@@ -262,10 +258,18 @@ import { EuiPanel,
                   aria-label="Filter MITRE attacks"
                 />
         </EuiFlexGroup>
-        */}
+      
       </div>
     );
   }
+
+  getRowProps = item => {
+    const { id } = item;
+    return {
+      'data-test-subj': `row-${id}`,
+      onClick: () => this.showFlyout(id),
+    };
+  };
 
    table(){
     const {pageIndex, pageSize, totalItems, sortField, sortDirection} = this.state
@@ -292,6 +296,7 @@ import { EuiPanel,
               columns={columns}
               pagination={pagination}
               onChange={this.onTableChange}
+              rowProps={this.getRowProps}
               sorting={sorting}
             />
         </EuiFlexItem>
@@ -332,7 +337,7 @@ import { EuiPanel,
 
       this.setState({currentTechniqueData: {
         id: techniqueId,
-        phases: techniquePhases,
+        phase_name: techniquePhases,
         platforms: techniquePlatforms,
         description: techniqueDescription,
         name: techniqueName,
@@ -358,10 +363,22 @@ import { EuiPanel,
      </EuiFlyoutHeader> 
     )
    }
+
+   getArrayFormatted(arrayText) {
+    try{
+      const stringText = (arrayText.toString());
+      const splitString = stringText.split(',');
+      const resultString = splitString.join(', ');
+      return resultString;
+    }catch(err){
+      return arrayText;
+    }
+   }
  
    getFlyoutBody(){
      const link = `https://attack.mitre.org/techniques/${this.state.currentTechniqueData.id}/`
      
+     const formattedDescription = this.state.currentTechniqueData.description ? (<ReactMarkdown className="wz-markdown-margin" source={this.state.currentTechniqueData.description} />) : this.state.currentTechniqueData.description;
      const data = [
        {
          title: 'Id',
@@ -369,15 +386,15 @@ import { EuiPanel,
        },
        {
          title: 'Tactic',
-         description: this.state.currentTechniqueData.phases,
+         description: this.getArrayFormatted(this.state.currentTechniqueData.phase_name),
        },
        {
          title: 'Platform',
-         description: this.state.currentTechniqueData.platforms,
+         description: this.getArrayFormatted(this.state.currentTechniqueData.platforms),
        },
        {
          title: 'Data sources',
-         description: this.state.currentTechniqueData.dataSources,
+         description: this.getArrayFormatted(this.state.currentTechniqueData.dataSources),
        },
        {
          title: 'Version',
@@ -385,7 +402,7 @@ import { EuiPanel,
        },
        {
          title: 'Description',
-         description: this.state.currentTechniqueData.description,
+         description: formattedDescription,
        },
      ];
      return (
@@ -419,7 +436,8 @@ import { EuiPanel,
         
         <EuiFlyout
           onClose={this.closeFlyout}
-          size="s"
+          maxWidth="35%"
+          className="flyout-no-overlap"
           aria-labelledby="flyoutSmallTitle">
           {this.getFlyoutHeader()}
           {this.getFlyoutBody()}

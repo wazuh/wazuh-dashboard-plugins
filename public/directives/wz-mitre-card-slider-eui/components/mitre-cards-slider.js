@@ -11,6 +11,7 @@
  * Find more information about this on the LICENSE file.
  */
 import React, { Component } from 'react';
+import ReactMarkdown from 'react-markdown';
 import PropTypes from 'prop-types';
 import {
   EuiButtonEmpty,
@@ -320,9 +321,21 @@ export class MitreCardsSlider extends Component {
    )
   }
 
+  getArrayFormatted(arrayText) {
+    try{
+      const stringText = (arrayText.toString());
+      const splitString = stringText.split(',');
+      const resultString = splitString.join(', ');
+      return resultString;
+    }catch(err){
+      return arrayText;
+    }
+   }
+
   getFlyoutBody(){
     const link = `https://attack.mitre.org/techniques/${this.state.currentCardData.id}/`
-    
+
+    const formattedDescription = this.state.currentCardData.description ? (<ReactMarkdown className="wz-markdown-margin" source={this.state.currentCardData.description} />) : this.state.currentCardData.description;
     const data = [
       {
         title: 'Id',
@@ -330,15 +343,15 @@ export class MitreCardsSlider extends Component {
       },
       {
         title: 'Tactic',
-        description: this.state.currentCardData.phases,
+        description: this.getArrayFormatted(this.state.currentCardData.phases),
       },
       {
         title: 'Platform',
-        description: this.state.currentCardData.platforms,
+        description: this.getArrayFormatted(this.state.currentCardData.platforms),
       },
       {
         title: 'Data sources',
-        description: this.state.currentCardData.dataSources,
+        description: this.getArrayFormatted(this.state.currentCardData.dataSources),
       },
       {
         title: 'Version',
@@ -346,7 +359,7 @@ export class MitreCardsSlider extends Component {
       },
       {
         title: 'Description',
-        description: this.state.currentCardData.description,
+        description: formattedDescription,
       },
     ];
     return (
@@ -378,8 +391,9 @@ export class MitreCardsSlider extends Component {
       flyout = (
         
         <EuiFlyout
+          className="flyout-no-overlap"
           onClose={this.closeFlyout}
-          size="s"
+          maxWidth="35%"
           aria-labelledby="flyoutSmallTitle">
           {this.getFlyoutHeader()}
           {this.getFlyoutBody()}
