@@ -12,8 +12,10 @@
 import React, { Component, KeyboardEvent } from 'react';
 import PropTypes, {InferProps} from 'prop-types';
 import { EuiSuggest } from '../eui-suggest';
-import { WzSearchFormatSelector } from './wz-search-format-selector'
-import { QInterpreter, queryObject } from './lib/q-interpreter'
+import { WzSearchFormatSelector } from './wz-search-format-selector';
+import { WzSearchBadges } from './wz-search-badges';
+import { QInterpreter, queryObject } from './lib/q-interpreter';
+import { EuiFlexGroup, EuiFlexItem } from '@elastic/eui';
 
 interface suggestItem {
   type: {iconType: string, color: string }
@@ -41,6 +43,7 @@ export default class WzSearchBar extends Component {
     isInvalid: boolean
     status: string
     currentField: string | null
+    filters: {}
   };
   props!:{
     qSuggests: qSuggests[]
@@ -67,6 +70,7 @@ export default class WzSearchBar extends Component {
       isInvalid: false,
       status: 'unchanged',
       currentField: null,
+      filters: {}
     }
   }
 
@@ -205,13 +209,17 @@ export default class WzSearchBar extends Component {
   }
 
   onInputChange = (value:string) => {
+    const { filters } = this.state;
+    if (value.length === 0) {
+      delete filters['q'];
+      this.props.onInputChange(filters);
+    }
+    
     this.setState({
       inputValue: value,
       isProcessing: true,
+      filters
     });
-    if (value.length === 0) {
-      this.props.onInputChange({});
-    }
     this.inputStageHandler(value);
   }
   
@@ -219,17 +227,20 @@ export default class WzSearchBar extends Component {
   
   onKeyPress = (e:KeyboardEvent)  => {
     if(e.key === 'Enter') {
-      const { isSearch, inputValue } = this.state;
+      const { isSearch, inputValue, filters } = this.state;
       if (isSearch) {
-        this.props.onInputChange({search: inputValue});
+        filters['search'] = inputValue;
+        this.setState({inputValue:'', isProcessing: true});
       } else if(inputValue.length > 0) {
-        this.props.onInputChange({q: inputValue});
+        filters['q'] = inputValue;
       }
+      this.props.onInputChange(filters);
+      this.setState({filters})
     }
   }
 
   onItemClick(item: suggestItem) {
-    const { inputValue } = this.state;
+    const { inputValue, filters } = this.state;
     const qInterperter = new QInterpreter(inputValue);
     let inputStage:string = '';
     if (item.type.iconType === 'kqlField') {
@@ -240,20 +251,30 @@ export default class WzSearchBar extends Component {
       inputStage = 'values';
     } else if (item.type.iconType === 'kqlValue') {
       qInterperter.setlastQuery(item.label);
-      this.props.onInputChange({q:qInterperter.toString()});
+      filters['q'] = qInterperter.toString()
+      this.props.onInputChange(filters);
       inputStage = 'conjuntions';
     } else if (item.type.iconType === 'kqlSelector') {
       qInterperter.addNewQuery(item.label);
       inputStage = 'fields';
     } else if (item.type.iconType === 'search') {
-      this.props.onInputChange({search: inputValue});
+      filters['search'] = inputValue;
+      this.props.onInputChange(filters);
     }
     this.setState({
       inputValue: qInterperter.toString(),
       isProcessing: true,
       currentField: 'status',
+      filters,
       inputStage,
     });
+  }
+
+  onDeleteBadge(badge) {
+    const { filters } = this.state;
+    delete filters[badge.field];
+    this.props.onInputChange(filters);
+    this.setState({filters});
   }
 
   inputStageHandler(inputValue: string) {
@@ -289,19 +310,32 @@ export default class WzSearchBar extends Component {
   }
 
   render() {
-    const { status, suggestions, inputValue, isInvalid } = this.state;
-
+    const { status, suggestions, inputValue, isInvalid, filters } = this.state;
+    const formatedFilter = [...Object.keys(filters).map((item) => {return {field: item, value: filters[item]}})];
     return (
-      <EuiSuggest
-      status={status}
-        value={inputValue}
-        onKeyPress={this.onKeyPress}
-        onItemClick={this.onItemClick.bind(this)}
-        append={<WzSearchFormatSelector onChange={this.onChangeSearchFormat}/>}
-        suggestions={suggestions}
-        onInputChange={this.onInputChange}
-        isInvalid={isInvalid}
-      />
+      <div>
+        <EuiFlexGroup>
+          <EuiFlexItem>
+            <EuiSuggest
+            status={status}
+              value={inputValue}
+              onKeyPress={this.onKeyPress}
+              onItemClick={this.onItemClick.bind(this)}
+              append={<WzSearchFormatSelector onChange={this.onChangeSearchFormat}/>}
+              suggestions={suggestions}
+              onInputChange={this.onInputChange}
+              isInvalid={isInvalid}
+            />
+          </EuiFlexItem>
+        </EuiFlexGroup>
+        <EuiFlexGroup>
+          <EuiFlexItem grow={false}>
+            <WzSearchBadges
+            filters={formatedFilter}
+            onChange={this.onDeleteBadge.bind(this)} />
+          </EuiFlexItem>
+        </EuiFlexGroup>
+      </div>
     );
   }
 }
