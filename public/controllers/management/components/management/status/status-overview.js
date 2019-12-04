@@ -127,7 +127,6 @@ export class WzStatusOverview extends Component {
       if (clusterStatus && clusterStatus.enabled === 'yes' && clusterStatus.running === 'no') {
         this.showToast(
           'danger',
-          'Cluster Error',
           `Cluster is enabled but it's not running, please check your cluster health.`,
           3000
         );
@@ -148,11 +147,10 @@ export class WzStatusOverview extends Component {
     return;
   }
 
-  showToast = (color, title, text, time) => {
+  showToast = (color, text, time) => {
     toastNotifications.add({
       color: color,
-      title: title,
-      text: text,
+      title: text,
       toastLifeTimeMs: time,
     });
   };

@@ -64,10 +64,10 @@ class WzStatusActionButtons extends Component {
     try {
       const result = await this.statusHandler.restartCluster();
       this.setState({ isRestarting: false });
-      this.showToast('success', '', 'Restarting cluster, it will take up to 30 seconds.', 3000);
+      this.showToast('success', 'Restarting cluster, it will take up to 30 seconds.', 3000);
     } catch (error) {
       this.setState({ isRestarting: false });
-      this.showToast('danger', 'Error restarting cluster', error.message || error, 3000);
+      this.showToast('danger', error.message || error, 3000);
     }
   }
 
@@ -79,10 +79,10 @@ class WzStatusActionButtons extends Component {
     try {
       await this.statusHandler.restartManager();
       this.setState({ isRestarting: false });
-      this.showToast('success', '', 'Restarting manager.', 3000);
+      this.showToast('success', 'Restarting manager.', 3000);
     } catch (error) {
       this.setState({ isRestarting: false });
-      this.showToast('danger', 'Error restarting manager', error.message || error, 3000);
+      this.showToast('danger', error.message || error, 3000);
     }
   }
 
@@ -112,7 +112,7 @@ class WzStatusActionButtons extends Component {
       this.props.updateLoadingStatus(false);
     } catch (error) {
       this.props.updateLoadingStatus(false);
-      this.showToast('danger', 'Cluster Error', `Node ${node} is down`, 3000);
+      this.showToast('danger', `Node ${node} is down`, 3000);
     }
 
     return;
@@ -130,11 +130,10 @@ class WzStatusActionButtons extends Component {
     }, 100);
   }
 
-  showToast = (color, title, text, time) => {
+  showToast = (color, text, time) => {
     toastNotifications.add({
       color: color,
-      title: title,
-      text: text,
+      title: text,
       toastLifeTimeMs: time,
     });
   };
