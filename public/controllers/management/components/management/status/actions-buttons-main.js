@@ -42,6 +42,7 @@ class WzStatusActionButtons extends Component {
     this.statusHandler = StatusHandler;
     this.state = {
       isModalVisible: false,
+      isRestarting: false,
     };
   }
 
@@ -59,13 +60,13 @@ class WzStatusActionButtons extends Component {
    * Restart cluster
    */
   async restartCluster() {
-    this.props.updateLoadingStatus(true);
+    this.setState({ isRestarting: true });
     try {
       const result = await this.statusHandler.restartCluster();
-      this.props.updateLoadingStatus(false);
+      this.setState({ isRestarting: false });
       this.showToast('success', '', 'Restarting cluster, it will take up to 30 seconds.', 3000);
     } catch (error) {
-      this.props.updateLoadingStatus(false);
+      this.setState({ isRestarting: false });
       this.showToast('danger', 'Error restarting cluster', error.message || error, 3000);
     }
   }
@@ -74,13 +75,13 @@ class WzStatusActionButtons extends Component {
    * Restart manager
    */
   async restartManager() {
-    this.props.updateLoadingStatus(true);
+    this.setState({ isRestarting: true });
     try {
       await this.statusHandler.restartManager();
-      this.props.updateLoadingStatus(false);
+      this.setState({ isRestarting: false });
       this.showToast('success', '', 'Restarting manager.', 3000);
     } catch (error) {
-      this.props.updateLoadingStatus(false);
+      this.setState({ isRestarting: false });
       this.showToast('danger', 'Error restarting manager', error.message || error, 3000);
     }
   }
@@ -154,7 +155,15 @@ class WzStatusActionButtons extends Component {
   };
 
   render() {
-    const { isLoading, listNodes, selectedNode, adminMode, clusterEnabled } = this.props.state;
+    const {
+      isLoading,
+      listNodes,
+      selectedNode,
+      adminMode,
+      clusterEnabled,
+      isRestarting,
+    } = this.props.state;
+
     let options = this.transforToOptions(listNodes);
     // Select node
     const selectNode = (
@@ -163,7 +172,7 @@ class WzStatusActionButtons extends Component {
         options={options}
         value={selectedNode}
         onChange={this.changeNode}
-        disabled={isLoading}
+        disabled={isLoading || this.state.isRestarting}
         aria-label="Select node"
       />
     );
@@ -174,6 +183,7 @@ class WzStatusActionButtons extends Component {
         iconType="refresh"
         onClick={async () => this.setState({ isModalVisible: true })}
         isDisabled={isLoading}
+        isLoading={this.state.isRestarting}
       >
         {clusterEnabled && 'Restart cluster'}
         {!clusterEnabled && 'Restart manager'}
