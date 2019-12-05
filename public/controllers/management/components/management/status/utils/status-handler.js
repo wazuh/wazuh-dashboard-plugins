@@ -105,6 +105,8 @@ export default class StatusHandler {
       const result = await WzRequest.apiReq('GET', '/agents', {
         limit: 1,
         sort: '-dateAdd',
+        status: 'active',
+        q: 'id!=000',
       });
       return result;
     } catch (error) {

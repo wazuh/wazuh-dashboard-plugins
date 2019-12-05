@@ -19,6 +19,7 @@ import {
   EuiProgress,
   EuiPage,
   EuiSpacer,
+  EuiFlexGrid,
 } from '@elastic/eui';
 
 import { connect } from 'react-redux';
@@ -179,15 +180,19 @@ export class WzStatusOverview extends Component {
               <EuiSpacer size="l" />
               {!isLoading && stats && <WzStatusStats />}
               <EuiSpacer size="l" />
-              {!isLoading && nodeInfo && agentInfo && (
-                <EuiFlexGroup>
-                  <EuiFlexItem>
-                    <WzStatusNodeInfo />
-                  </EuiFlexItem>
-                  <EuiFlexItem>
-                    <WzStatusAgentInfo />
-                  </EuiFlexItem>
-                </EuiFlexGroup>
+              {!isLoading && (
+                <EuiFlexGrid columns={2}>
+                  {nodeInfo && (
+                    <EuiFlexItem>
+                      <WzStatusNodeInfo />
+                    </EuiFlexItem>
+                  )}
+                  {agentInfo && (
+                    <EuiFlexItem>
+                      <WzStatusAgentInfo />
+                    </EuiFlexItem>
+                  )}
+                </EuiFlexGrid>
               )}
             </EuiFlexItem>
           </EuiFlexGroup>
