@@ -1,6 +1,6 @@
 <div ng-if="octrl.tab === 'mitre' && octrl.tabView === 'panels'">
     <!-- Mitre cards slider-->
-    <div ng-show="!octrl.showingMitreTable && resultState !== 'none' && resultState !== 'loading'">
+    <div ng-show="!octrl.showingMitreTable && resultState !== 'none' && resultState !== 'loading'" ng-if="mitreIds">
         <div layout="row" layout-padding>
             <react-component flex name="MitreCardsSlider" props="octrl.mitreCardsSliderProps">
         </div>
