@@ -41,29 +41,39 @@ export class WzSearchFormatSelector extends Component {
 
   constructor(props) {
     super(props);
-    
-    const makeId = () => {
-      const id = Math.random().toString(36).slice(-8);
-      return /^\d/.test(id) ? 'x' + id : id;
-    }
-
-    const idPrefix = makeId();
-
-    this.toggleButtons = [
-      {
-        id: `${idPrefix}0`,
-        label: '?Q',
-      },
-      {
-        id: `${idPrefix}1`,
-        label: 'API',
-      },
-    ];
-
+    const { qFilterEnabled, apiFilterEnabled } = props;  
+    this.toggleButtons = this.initToggleButtons(qFilterEnabled, apiFilterEnabled);
     this.state = {
       isPopoverOpen: false,
       toggleIdSelected: this.toggleButtons[0],
     };
+  }
+
+  initToggleButtons(qEnable:boolean, apiEnable:boolean):toggleButton[] {
+    const makeId = () => {
+      const id = Math.random().toString(36).slice(-8);
+      return /^\d/.test(id) ? 'x' + id : id;
+    }
+    const idPrefix = makeId();
+    const toggleButtons:toggleButton[] = [];
+    if (qEnable) {
+      toggleButtons.push(
+        {
+          id: `${idPrefix}0`,
+          label: '?Q',
+        }
+      )
+    }
+
+    if (apiEnable) {
+      toggleButtons.push(
+        {
+          id: `${idPrefix}1`,
+          label: 'API',
+        },
+      )
+    }
+    return toggleButtons;
   }
   
   onButtonClick() {
@@ -79,15 +89,34 @@ export class WzSearchFormatSelector extends Component {
   }
 
   onToggleChange = optionId => {
+    const newSelectedOption = this.getLabelButtonSelected(optionId);
     this.setState({
-      toggleIdSelected: this.getLabelButtonSelected(optionId),
+      toggleIdSelected: newSelectedOption,
     });
-    this.props.onChange(this.state.toggleIdSelected.label);
+    this.props.onChange((newSelectedOption || {}).label);
   };
 
   getLabelButtonSelected(optionId) {
     const toggleIdSelected = this.toggleButtons.find((item) => {return item.id == optionId});
     return toggleIdSelected;
+  }
+
+  renderFooter():JSX.Element | null {
+    const {toggleIdSelected} = this.state;
+    if (this.toggleButtons.length <= 1) {
+      return null;
+    }
+    return (
+      <EuiPopoverFooter>
+        <EuiButtonGroup
+          legend="This is a basic group"
+          color='primary'
+          options={this.toggleButtons}
+          idSelected={toggleIdSelected.id}
+          onChange={this.onToggleChange}
+        />
+      </EuiPopoverFooter>
+    );
   }
 
   render() {
@@ -98,6 +127,7 @@ export class WzSearchFormatSelector extends Component {
         {toggleIdSelected.label}
       </EuiButtonEmpty>
     );
+    const renderFooter = this.renderFooter()
     return (
       <EuiPopover 
         id='wzFormatSelector'
@@ -117,15 +147,7 @@ export class WzSearchFormatSelector extends Component {
               </p>
             </EuiText>
           </div>
-        <EuiPopoverFooter>
-          <EuiButtonGroup
-            legend="This is a basic group"
-            color='primary'
-            options={this.toggleButtons}
-            idSelected={toggleIdSelected.id}
-            onChange={this.onToggleChange}
-          />
-        </EuiPopoverFooter>
+          { renderFooter }
       </EuiPopover>
     );
   }
