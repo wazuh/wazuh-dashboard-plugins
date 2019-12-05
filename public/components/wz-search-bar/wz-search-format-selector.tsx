@@ -34,6 +34,8 @@ export class WzSearchFormatSelector extends Component {
 
   props!: {
     onChange: Function
+    qFilterEnabled?: boolean
+    apiFilterEnabled?: boolean
   }
 
 

@@ -30,9 +30,17 @@ interface qSuggests {
   values: Function | [] | undefined
 }
 
+interface apiSuggests {
+  label: string
+  description: string
+  values?: string[]
+  multiValue?: boolean
+  range?: boolean
+}
+
 export default class WzSearchBar extends Component {
   state: {
-    searchFormat: string
+    searchFormat: string | null
     suggestions: suggestItem[]
     isProcessing: boolean
     inputStage: string
@@ -42,12 +50,13 @@ export default class WzSearchBar extends Component {
     lastOperator?: string
     isInvalid: boolean
     status: string
-    currentField: string | null
     filters: {}
   };
   props!:{
     qSuggests: qSuggests[]
+    apiSuggests: apiSuggests[]
     onInputChange: Function
+    searchDisable?: boolean
   };
   operators: {};
 
@@ -60,8 +69,9 @@ export default class WzSearchBar extends Component {
       '<': 'Smaller',
       '~': 'Like',
     }
+
     this.state = {
-      searchFormat: '?Q',
+      searchFormat: (props.qSuggests) ? '?Q' : (props.apiSuggests) ? 'API' : null,
       suggestions: [],
       isProcessing: false,
       inputStage: 'fields',
@@ -69,7 +79,6 @@ export default class WzSearchBar extends Component {
       isSearch: false,
       isInvalid: false,
       status: 'unchanged',
-      currentField: null,
       filters: {}
     }
   }
@@ -78,56 +87,99 @@ export default class WzSearchBar extends Component {
     this.buildSuggestFields();
   }
 
+  isUpdated() {
+    const { isProcessing, isInvalid } = this.state;
+    return isProcessing && !isInvalid;
+  }
+
   componentDidUpdate() {
-    if (this.state.isProcessing && !this.state.isInvalid){
-      const { inputStage,  } = this.state;
-      if (inputStage === 'fields'){
-        this.buildSuggestFields();
-      } else if (inputStage === 'operators') {
-        this.buildSuggestOperators();
-      } else if (inputStage === 'values') {
-        this.buildSuggestValues();
-      } else if (inputStage === 'conjuntions'){
-        this.buildSuggestConjuntions();
-      }
-      this.setState({isProcessing: false});
+    if (!this.isUpdated()){
+      return;
     }
+    const { inputStage, searchFormat} = this.state;
+    if (inputStage === 'fields'){
+      this.buildSuggestFields();
+    } else if (inputStage === 'operators' && searchFormat) {
+      this.buildSuggestOperators();
+    } else if (inputStage === 'values' && searchFormat) {
+      this.buildSuggestValues();
+    } else if (inputStage === 'conjuntions' && searchFormat){
+      this.buildSuggestConjuntions();
+    }
+    this.setState({isProcessing: false});
   }
 
 
   buildSuggestFields() {
     const { searchFormat, inputValue } = this.state;
-    const { qSuggests } = this.props
-    const rawfields = searchFormat === '?Q' 
-      ? qSuggests
-      : [];
-    const qInterpreter = new QInterpreter(inputValue);
-    const { field } = qInterpreter.lastQuery();
-    const fields = rawfields
-    .filter((item) => {
-      return item.label.includes(field);
-    })
-    .map((item) => {
-      const suggestItem = {
-        type: { iconType: 'kqlField', color: 'tint4' },
-        label: item.label,
-      };
-
-      if (item.description) {
-        suggestItem['description'] = item.description;
-      }
-      return suggestItem;
-    })
-    
-    if (inputValue != '' && qInterpreter.qNumber() <= 1) {
-      fields.unshift({
-        type: { iconType: 'search', color: 'tint8' },
-        label: inputValue,
-      });
+    const { searchDisable } = this.props;
+    const fields:suggestItem[] = [];
+    let isSearch = true;
+    if (searchFormat === '?Q') {
+      fields.push(...this.buildSuggestFieldsQ());
+    } else if (searchFormat === 'API') {
+      fields.push(...this.buildSuggestFieldAPI());
     }
-    const isSearch = qInterpreter.qNumber() > 1 ? false : true;
+
+    if (!searchDisable && inputValue !== '') {
+      const suggestSearch = this.buildSuggestFieldsSearch();
+      // @ts-ignore
+      suggestSearch && fields.unshift(suggestSearch);
+    }
+
     this.setState({suggestions: fields, isSearch });
   }
+
+  buildSuggestFieldsSearch():suggestItem | undefined {
+    const { inputValue } = this.state;
+    const qInterpreter = new QInterpreter(inputValue);
+    if (qInterpreter.qNumber() <= 1) {
+      const searchSuggestItem: suggestItem = {
+        type: { iconType: 'search', color: 'tint8' },
+        label: inputValue,
+      };
+      return searchSuggestItem;
+    }
+  }
+
+  buildSuggestFieldsQ():suggestItem[] {
+    const { qSuggests } = this.props
+    const { inputValue } = this.state;
+    const qInterpreter = new QInterpreter(inputValue);
+    const { field } = qInterpreter.lastQuery();
+    const fields:suggestItem[] = qSuggests
+    .filter((item) => this.filterSuggestFields(item, field))
+    .map(this.mapSuggestFields);
+    
+    return fields;
+  }
+
+  buildSuggestFieldAPI():suggestItem[] {
+    const { apiSuggests } = this.props;
+    const { inputValue } = this.state;
+    const { 0:field } = inputValue.split(':');
+    const fields:suggestItem[] = apiSuggests
+    .filter((item) => this.filterSuggestFields(item, field))
+    .map(this.mapSuggestFields)
+    return fields;
+  }
+
+  filterSuggestFields(item:(apiSuggests | qSuggests), field:string) {
+    return item.label.includes(field);
+  }
+
+  mapSuggestFields(item:(apiSuggests | qSuggests)):suggestItem {
+    const suggestItem = {
+      type: { iconType: 'kqlField', color: 'tint4' },
+      label: item.label,
+    }
+    if (item.description) {
+      suggestItem['description'] = item.description;
+    }
+    return suggestItem;
+  }
+
+  
 
   buildSuggestOperators() {
     const { operators=false } = this.getCurrentField();
@@ -144,8 +196,8 @@ export default class WzSearchBar extends Component {
 
   getLastQuery():queryObject {
     const { inputValue }= this.state;
-    const qInterperter = new QInterpreter(inputValue);
-    return qInterperter.lastQuery();
+    const qInterpreter = new QInterpreter(inputValue);
+    return qInterpreter.lastQuery();
   }
 
   getCurrentField():qSuggests {
@@ -169,26 +221,24 @@ export default class WzSearchBar extends Component {
 
   buildSuggestValues() {
     const { field } = this.getLastQuery();
-    if (field) {
-      const {values} = this.getCurrentField();
-      if(typeof values === 'function') {
+    const {values} = this.getCurrentField();
+    const rawSuggestions:suggestItem[] = typeof values === 'function'
+      ? values()
+      : values;
 
-      } else {
-        const suggestions:suggestItem[] = []
-        for (const value of values || []) {
-          const item:suggestItem = {
-            type: {iconType: 'kqlValue', color: 'tint0'},
-            // @ts-ignore
-            label: typeof value !== 'string' ? value.toString(): value,
-          }
-          suggestions.push(item);
-        }
-        this.setState({
-          suggestions,
-          isSearch: false,
-        });
+    const suggestions:suggestItem[] = []
+    for (const value of rawSuggestions) {
+      const item:suggestItem = {
+        type: {iconType: 'kqlValue', color: 'tint0'},
+        // @ts-ignore
+        label: typeof value !== 'string' ? value.toString(): value,
       }
+      suggestions.push(item);
     }
+    this.setState({
+      suggestions,
+      isSearch: false,
+    });
   }
 
   buildSuggestConjuntions() {
@@ -226,17 +276,19 @@ export default class WzSearchBar extends Component {
   onChangeSearchFormat = (format) => {console.log(format)}
   
   onKeyPress = (e:KeyboardEvent)  => {
-    if(e.key === 'Enter') {
-      const { isSearch, inputValue, filters } = this.state;
-      if (isSearch) {
-        filters['search'] = inputValue;
-        this.setState({inputValue:'', isProcessing: true});
-      } else if(inputValue.length > 0) {
-        filters['q'] = inputValue;
-      }
-      this.props.onInputChange(filters);
-      this.setState({filters})
+    const { isInvalid } = this.state;
+    if(e.key !== 'Enter' && !isInvalid) {
+      return;
     }
+    const { isSearch, inputValue, filters } = this.state;
+    if (isSearch) {
+      filters['search'] = inputValue;
+      this.setState({inputValue:'', isProcessing: true});
+    } else if(inputValue.length > 0) {
+      filters['q'] = inputValue;
+    }
+    this.props.onInputChange(filters);
+    this.setState({filters})
   }
 
   onItemClick(item: suggestItem) {
@@ -249,7 +301,7 @@ export default class WzSearchBar extends Component {
     } else if (item.type.iconType === 'kqlOperand') {
       qInterperter.setlastQuery(item.label);
       inputStage = 'values';
-    } else if (item.type.iconType === 'kqlValue') {
+    } else if (item.type.iconType === 'kqlValue' && item.type.color === 'tint0') {
       qInterperter.setlastQuery(item.label);
       filters['q'] = qInterperter.toString()
       this.props.onInputChange(filters);
@@ -264,7 +316,6 @@ export default class WzSearchBar extends Component {
     this.setState({
       inputValue: qInterperter.toString(),
       isProcessing: true,
-      currentField: 'status',
       filters,
       inputStage,
     });
@@ -288,12 +339,10 @@ export default class WzSearchBar extends Component {
         this.setState({
           isInvalid: false,
           inputStage: 'values',
-          currentField: field
         });
       } else {
         this.setState({
           isInvalid: true,
-          currentField: null,
           suggestions: [{
             type: { iconType: 'alert', color: 'tint2' },
             label: `The field ${field} no exists`,
@@ -304,14 +353,28 @@ export default class WzSearchBar extends Component {
       this.setState({
         isInvalid: false,
         inputStage: 'fields',
-        currentField: null,
       });
     }
+  }
+
+  renderFormatSelector() {
+    const { qSuggests, apiSuggests } = this.props;
+    const qFilterEnabled = qSuggests ? true : false;
+    const apiFilterEnabled = apiSuggests ? true : false;
+    if (!qFilterEnabled && !apiFilterEnabled) {
+      return null;
+    }
+    return (<WzSearchFormatSelector 
+      onChange={this.onChangeSearchFormat}
+      qFilterEnabled={qFilterEnabled}
+      apiFilterEnabled={apiFilterEnabled}
+    />);
   }
 
   render() {
     const { status, suggestions, inputValue, isInvalid, filters } = this.state;
     const formatedFilter = [...Object.keys(filters).map((item) => {return {field: item, value: filters[item]}})];
+    const searchFormatSelector = this.renderFormatSelector();
     return (
       <div>
         <EuiFlexGroup>
@@ -321,7 +384,7 @@ export default class WzSearchBar extends Component {
               value={inputValue}
               onKeyPress={this.onKeyPress}
               onItemClick={this.onItemClick.bind(this)}
-              append={<WzSearchFormatSelector onChange={this.onChangeSearchFormat}/>}
+              append={searchFormatSelector}
               suggestions={suggestions}
               onInputChange={this.onInputChange}
               isInvalid={isInvalid}
@@ -331,8 +394,8 @@ export default class WzSearchBar extends Component {
         <EuiFlexGroup>
           <EuiFlexItem grow={false}>
             <WzSearchBadges
-            filters={formatedFilter}
-            onChange={this.onDeleteBadge.bind(this)} />
+              filters={formatedFilter}
+              onChange={this.onDeleteBadge.bind(this)} />
           </EuiFlexItem>
         </EuiFlexGroup>
       </div>
