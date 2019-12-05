@@ -25,7 +25,6 @@ import { EditionController } from './edition';
 import { FilesController } from './files';
 import { WelcomeScreen } from './components/welcome';
 import { WelcomeWrapper } from './components/welcome-wrapper';
-import { ReportingTable } from './components/reporting-table';
 import { AgentsInGroupTable } from './components/agents-groups-table';
 import { FilesInGroupTable } from './components/files-group-table';
 import { GroupsTable } from './components/management/groups/groups-table';
@@ -52,7 +51,6 @@ app
   .controller('filesController', FilesController)
   .value('WelcomeScreenManagement', WelcomeScreen)
   .value('WelcomeWrapper', WelcomeWrapper)
-  .value('ReportingTable', ReportingTable)
   .value('UploadFiles', UploadFiles)
   .value('WzRuleset', WzRuleset)
   .value('WzManagement', WzManagement)
