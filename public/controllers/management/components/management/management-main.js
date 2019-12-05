@@ -18,6 +18,7 @@ import WzManagementSideMenu from './management-side-menu';
 import WzRuleset from './ruleset/main-ruleset';
 import WzGroups from './groups/groups-main';
 import WzStatus from './status/status-main';
+import WzReporting from './reporting/reporting-main';
 // import { GroupsTable } from './groups/groups-table';
 // import { changeManagementSection } from '../../../../redux/reducers/managementReducers';
 import { connect } from 'react-redux';
@@ -41,6 +42,7 @@ class WzManagementMain extends Component {
           <div>
             {(section === 'groups' && <WzGroups {...this.props} />) ||
               (section === 'status' && <WzStatus />) ||
+              (section === 'reporting' && <WzReporting />) ||
               (ruleset.includes(section) && <WzRuleset />)}
           </div>
         </EuiFlexItem>
