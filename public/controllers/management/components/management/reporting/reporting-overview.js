@@ -15,6 +15,7 @@ import { EuiFlexItem, EuiFlexGroup, EuiPanel, EuiTitle, EuiPage, EuiText } from 
 
 // Wazuh components
 import WzReportingTable from './reporting-table';
+import WzReportingActionButtons from './utils/actions-buttons-main';
 
 export class WzReportingOverview extends Component {
   _isMounted = false;
@@ -47,6 +48,7 @@ export class WzReportingOverview extends Component {
                 </EuiFlexItem>
               </EuiFlexGroup>
             </EuiFlexItem>
+            <WzReportingActionButtons />
           </EuiFlexGroup>
           <EuiFlexGroup>
             <EuiFlexItem>
