@@ -32,11 +32,15 @@ export class WzStatusAgentInfo extends Component {
 
   render() {
     const { agentInfo } = this.props.state;
-    const operatingSystem = agentInfo.os.name
-      ? agentInfo.os.name + agentInfo.os.version
-      : agentInfo.os.uname
-      ? agentInfo.os.uname
-      : '-';
+    const status = agentInfo.status;
+    let operatingSystem = false;
+    if (status !== 'Never connected') {
+      operatingSystem = agentInfo.os.name
+        ? agentInfo.os.name + agentInfo.os.version
+        : agentInfo.os.uname
+        ? agentInfo.os.uname
+        : '-';
+    }
 
     const greyStyle = {
       color: 'grey',
@@ -75,18 +79,22 @@ export class WzStatusAgentInfo extends Component {
           <EuiFlexItem>Date add</EuiFlexItem>
           <EuiFlexItem style={greyStyle}>{agentInfo.dateAdd}</EuiFlexItem>
         </EuiFlexGroup>
-        <EuiFlexGroup>
-          <EuiFlexItem>Version</EuiFlexItem>
-          <EuiFlexItem style={greyStyle}>{agentInfo.version}</EuiFlexItem>
-        </EuiFlexGroup>
-        <EuiFlexGroup>
-          <EuiFlexItem>Last keep alive</EuiFlexItem>
-          <EuiFlexItem style={greyStyle}>{agentInfo.lastKeepAlive}</EuiFlexItem>
-        </EuiFlexGroup>
-        <EuiFlexGroup>
-          <EuiFlexItem>Operating system</EuiFlexItem>
-          <EuiFlexItem style={greyStyle}>{operatingSystem}</EuiFlexItem>
-        </EuiFlexGroup>
+        {status !== 'Never connected' && (
+          <div>
+            <EuiFlexGroup>
+              <EuiFlexItem>Version</EuiFlexItem>
+              <EuiFlexItem style={greyStyle}>{agentInfo.version}</EuiFlexItem>
+            </EuiFlexGroup>
+            <EuiFlexGroup>
+              <EuiFlexItem>Last keep alive</EuiFlexItem>
+              <EuiFlexItem style={greyStyle}>{agentInfo.lastKeepAlive}</EuiFlexItem>
+            </EuiFlexGroup>
+            <EuiFlexGroup>
+              <EuiFlexItem>Operating system</EuiFlexItem>
+              <EuiFlexItem style={greyStyle}>{operatingSystem}</EuiFlexItem>
+            </EuiFlexGroup>
+          </div>
+        )}
       </EuiPanel>
     );
   }
