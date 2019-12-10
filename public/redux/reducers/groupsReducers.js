@@ -21,7 +21,9 @@ const initialState = {
   section: 'groups',
   showModal: false,
   sortDirection: 'asc',
+  sortDirectionFile: 'asc',
   sortField: 'name',
+  sortFieldFile: 'filename',
   showAddAgents: false,
   selectedTabId: 'agents',
 };
@@ -52,10 +54,22 @@ const groupsReducers = (state = initialState, action) => {
       sortDirection: action.sortDirection,
     };
   }
+  if (action.type === 'UPDATE_SORT_DIRECTION_FILE') {
+    return {
+      ...state,
+      sortDirectionFile: action.sortDirectionFile,
+    };
+  }
   if (action.type === 'UPDATE_SORT_FIELD') {
     return {
       ...state,
       sortField: action.sortField,
+    };
+  }
+  if (action.type === 'UPDATE_SORT_FIELD_FILE') {
+    return {
+      ...state,
+      sortFieldFile: action.sortFieldFile,
     };
   }
   if (action.type === 'UPDATE_LIST_ITEMS_FOR_REMOVE') {

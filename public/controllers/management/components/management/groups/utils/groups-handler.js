@@ -72,9 +72,9 @@ export default class GroupsHandler {
    * Get files in a group
    * @param {String} name
    */
-  static async filesGroup(name) {
+  static async filesGroup(name, filters) {
     try {
-      const result = await WzRequest.apiReq('GET', `/agents/groups/${name}/files`, {});
+      const result = await WzRequest.apiReq('GET', `/agents/groups/${name}/files`, filters);
       return result;
     } catch (error) {
       return Promise.reject(error);

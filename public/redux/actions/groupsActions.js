@@ -60,10 +60,24 @@ export const updateSortField = sortField => {
   };
 };
 
+export const updateSortFieldFile = sortFieldFile => {
+  return {
+    type: 'UPDATE_SORT_FIELD_FILE',
+    sortFieldFile: sortFieldFile,
+  };
+};
+
 export const updateSortDirection = sortDirection => {
   return {
     type: 'UPDATE_SORT_DIRECTION',
     sortDirection: sortDirection,
+  };
+};
+
+export const updateSortDirectionFile = sortDirectionFile => {
+  return {
+    type: 'UPDATE_SORT_DIRECTION_FILE',
+    sortDirectionFile: sortDirectionFile,
   };
 };
 

@@ -1,5 +1,5 @@
 /*
- * Wazuh app - React component for registering agents.
+ * Wazuh app - React component for groups files table.
  * Copyright (C) 2015-2019 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -10,7 +10,7 @@
  * Find more information about this on the LICENSE file.
  */
 import React, { Component } from 'react';
-import { EuiInMemoryTable, EuiCallOut } from '@elastic/eui';
+import { EuiBasicTable, EuiCallOut } from '@elastic/eui';
 
 import { connect } from 'react-redux';
 import GroupsHandler from './utils/groups-handler';
@@ -20,8 +20,8 @@ import {
   updateLoadingStatus,
   updateIsProcessing,
   updatePageIndex,
-  updateSortDirection,
-  updateSortField,
+  updateSortDirectionFile,
+  updateSortFieldFile,
   updateFileContent,
 } from '../../../../../redux/actions/groupsActions';
 
@@ -61,7 +61,10 @@ class WzGroupFilesTable extends Component {
    */
   async getItems() {
     try {
-      const rawItems = await this.groupsHandler.filesGroup(this.props.state.itemDetail.name);
+      const rawItems = await this.groupsHandler.filesGroup(
+        this.props.state.itemDetail.name,
+        this.buildFilter()
+      );
       const { items, totalItems } = ((rawItems || {}).data || {}).data;
 
       this.setState({
@@ -89,27 +92,27 @@ class WzGroupFilesTable extends Component {
   }
 
   buildSortFilter() {
-    const { sortField, sortDirection } = this.props.state;
+    const { sortFieldFile, sortDirectionFile } = this.props.state;
 
-    const field = sortField;
-    const direction = sortDirection === 'asc' ? '+' : '-';
+    const field = sortFieldFile;
+    const direction = sortDirectionFile === 'asc' ? '+' : '-';
 
     return direction + field;
   }
 
   onTableChange = ({ page = {}, sort = {} }) => {
     const { index: pageIndex, size: pageSize } = page;
-    const { field: sortField, direction: sortDirection } = sort;
+    const { field: sortFieldFile, direction: sortDirectionFile } = sort;
     this.setState({ pageSize });
     this.props.updatePageIndex(pageIndex);
-    this.props.updateSortDirection(sortDirection);
-    this.props.changeGroupsSortField(sortField);
+    this.props.updateSortDirectionFile(sortDirectionFile);
+    this.props.updateSortFieldFile(sortFieldFile);
     this.props.updateIsProcessing(true);
   };
 
   render() {
     this.groupsAgentsColumns = new GroupsFilesColumns(this.props);
-    const { isLoading, pageIndex, error, sortField, sortDirection } = this.props.state;
+    const { isLoading, pageIndex, error, sortFieldFile, sortDirectionFile } = this.props.state;
     const { items, pageSize, totalItems } = this.state;
     const columns = this.groupsAgentsColumns.columns;
     const message = isLoading ? null : 'No results...';
@@ -121,15 +124,15 @@ class WzGroupFilesTable extends Component {
     };
     const sorting = {
       sort: {
-        field: sortField,
-        direction: sortDirection,
+        field: sortFieldFile,
+        direction: sortDirectionFile,
       },
     };
 
     if (!error) {
       return (
         <div>
-          <EuiInMemoryTable
+          <EuiBasicTable
             itemId="id"
             items={items}
             columns={columns}
@@ -168,8 +171,8 @@ const mapDispatchToProps = dispatch => {
     updateLoadingStatus: status => dispatch(updateLoadingStatus(status)),
     updateIsProcessing: isProcessing => dispatch(updateIsProcessing(isProcessing)),
     updatePageIndex: pageIndex => dispatch(updatePageIndex(pageIndex)),
-    updateSortDirection: sortDirection => dispatch(updateSortDirection(sortDirection)),
-    updateSortField: sortField => dispatch(updateSortField(sortField)),
+    updateSortDirectionFile: sortDirectionFile => dispatch(updateSortDirectionFile(sortDirectionFile)),
+    updateSortFieldFile: sortFieldFile => dispatch(updateSortFieldFile(sortFieldFile)),
     updateFileContent: content => dispatch(updateFileContent(content)),
   };
 };
