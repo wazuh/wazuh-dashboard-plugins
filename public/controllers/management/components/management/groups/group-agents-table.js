@@ -156,8 +156,7 @@ class WzGroupAgentsTable extends Component {
                 confirmButtonText="Delete"
                 defaultFocusedButton="cancel"
                 buttonColor="danger"
-              >
-              </EuiConfirmModal>
+              ></EuiConfirmModal>
             </EuiOverlayMask>
           ) : null}
         </div>
@@ -184,11 +183,18 @@ class WzGroupAgentsTable extends Component {
       await this.groupsHandler.deleteAgent(item.id, itemDetail.name);
     });
 
-    Promise.all(results).then(completed => {
-      this.props.updateIsProcessing(true);
-      this.props.updateLoadingStatus(false);
-      this.showToast('success', 'Success', 'Deleted correctly', 3000);
-    });
+    Promise.all(results).then(
+      completed => {
+        this.props.updateIsProcessing(true);
+        this.props.updateLoadingStatus(false);
+        this.showToast('success', 'Success', 'Deleted correctly', 3000);
+      },
+      error => {
+        this.props.updateIsProcessing(true);
+        this.props.updateLoadingStatus(false);
+        this.showToast('danger', 'Error', error, 3000);
+      }
+    );
   }
 }
 
