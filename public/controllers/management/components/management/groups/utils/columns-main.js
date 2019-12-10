@@ -29,57 +29,71 @@ export default class GroupsColums {
           sortable: true,
         },
       ];
-      // If the admin mode is enabled the action column in CDB lists is shown
-      if (this.adminMode) {
-        this.columns.push({
-          name: 'Actions',
-          align: 'left',
-          render: item => {
-            return (
-              <div>
-                <EuiToolTip position="top" content={`View ${item.name} details`}>
-                  <EuiButtonIcon
-                    aria-label="View group details"
-                    iconType="eye"
-                    onClick={async () => {
-                      this.tableProps.updateGroupDetail(item);
-                    }}
-                    color="primary"
-                  />
-                </EuiToolTip>
-                <EuiToolTip position="top" content={'Edit group configuration'}>
-                  <EuiButtonIcon
-                    aria-label="Edit group configuration"
-                    iconType="pencil"
-                    onClick={async () => {
-                      this.showGroupConfiguration(item.name);
-                    }}
-                  />
-                </EuiToolTip>
-                <EuiToolTip
-                  position="top"
-                  content={
-                    item.name === 'default'
-                      ? `The ${item.name} group cannot be deleted`
-                      : `Delete ${item.name}`
-                  }
-                >
-                  <EuiButtonIcon
-                    aria-label="Delete content"
-                    iconType="trash"
-                    onClick={async () => {
-                      this.tableProps.updateListItemsForRemove([item]);
-                      this.tableProps.updateShowModal(true);
-                    }}
-                    color="danger"
-                    disabled={item.name === 'default'}
-                  />
-                </EuiToolTip>
-              </div>
-            );
-          },
-        });
-      }
+      this.columns.push({
+        name: 'Actions',
+        align: 'left',
+        render: item => {
+          return (
+            <div>
+              {(this.adminMode && (
+                <div>
+                  <EuiToolTip position="top" content={`View ${item.name} details`}>
+                    <EuiButtonIcon
+                      aria-label="View group details"
+                      iconType="eye"
+                      onClick={async () => {
+                        this.tableProps.updateGroupDetail(item);
+                      }}
+                      color="primary"
+                    />
+                  </EuiToolTip>
+                  <EuiToolTip position="top" content={'Edit group configuration'}>
+                    <EuiButtonIcon
+                      aria-label="Edit group configuration"
+                      iconType="pencil"
+                      onClick={async () => {
+                        this.showGroupConfiguration(item.name);
+                      }}
+                    />
+                  </EuiToolTip>
+                  <EuiToolTip
+                    position="top"
+                    content={
+                      item.name === 'default'
+                        ? `The ${item.name} group cannot be deleted`
+                        : `Delete ${item.name}`
+                    }
+                  >
+                    <EuiButtonIcon
+                      aria-label="Delete content"
+                      iconType="trash"
+                      onClick={async () => {
+                        this.tableProps.updateListItemsForRemove([item]);
+                        this.tableProps.updateShowModal(true);
+                      }}
+                      color="danger"
+                      disabled={item.name === 'default'}
+                    />
+                  </EuiToolTip>
+                </div>
+              )) || (
+                <div>
+                  <EuiToolTip position="top" content={`View ${item.name} details`}>
+                    <EuiButtonIcon
+                      aria-label="View group details"
+                      iconType="eye"
+                      onClick={async () => {
+                        this.tableProps.updateGroupDetail(item);
+                      }}
+                      color="primary"
+                    />
+                  </EuiToolTip>
+                </div>
+              )}
+            </div>
+          );
+        },
+      });
     };
 
     this.buildColumns();

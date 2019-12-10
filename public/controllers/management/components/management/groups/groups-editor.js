@@ -45,7 +45,7 @@ class WzGroupsEditor extends Component {
       enableLiveAutocompletion: true,
     };
     this.groupsHandler = GroupsHandler;
-    const { fileContent } = this.props.state;
+    const { fileContent, adminMode } = this.props.state;
 
     const { name, content, isEditable, groupName } = fileContent;
 
@@ -55,6 +55,7 @@ class WzGroupsEditor extends Component {
       content,
       name,
       isEditable,
+      adminMode,
       groupName: groupName,
     };
   }
@@ -82,13 +83,15 @@ class WzGroupsEditor extends Component {
    * @param {String} name
    */
   async save(name) {
-    if (!this._isMounted) {
+    const { adminMode } = this.props.state;
+
+    if (!this._isMounted || !adminMode) {
       return;
     }
     try {
       const { content, groupName } = this.state;
       this.setState({ isSaving: true, error: false });
-      let saver = this.groupsHandler.sendGroupConfiguration; // By default the saver is for rules
+      let saver = this.groupsHandler.sendGroupConfiguration;
       await saver(name, groupName, content);
       try {
         await validateConfigAfterSent();
@@ -119,7 +122,7 @@ class WzGroupsEditor extends Component {
   };
 
   render() {
-    const { name, content, isEditable, groupName } = this.state;
+    const { name, content, isEditable, groupName, adminMode } = this.state;
 
     const saveButton = (
       <EuiButton
@@ -157,8 +160,7 @@ class WzGroupsEditor extends Component {
                   </EuiTitle>
                 </EuiFlexItem>
                 <EuiFlexItem />
-                {/* This flex item is for separating between title and save button */}
-                {isEditable && <EuiFlexItem grow={false}>{saveButton}</EuiFlexItem>}
+                {isEditable && adminMode && <EuiFlexItem grow={false}>{saveButton}</EuiFlexItem>}
               </EuiFlexGroup>
               <EuiSpacer size="m" />
               <EuiFlexGroup>
@@ -172,7 +174,7 @@ class WzGroupsEditor extends Component {
                           value={content}
                           onChange={newContent => this.setState({ content: newContent })}
                           mode="xml"
-                          isReadOnly={false}
+                          isReadOnly={!adminMode}
                           setOptions={this.codeEditorOptions}
                           aria-label="Code Editor"
                         ></EuiCodeEditor>

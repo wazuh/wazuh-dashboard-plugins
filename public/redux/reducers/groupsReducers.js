@@ -46,6 +46,12 @@ const groupsReducers = (state = initialState, action) => {
       isLoading: action.status,
     };
   }
+  if (action.type === 'UPDATE_ADMIN_MODE') {
+    return {
+      ...state,
+      adminMode: action.status,
+    };
+  }
   if (action.type === 'UPDATE_PAGE_INDEX') {
     return {
       ...state,

@@ -186,6 +186,8 @@ class WzGroupsActionButtons extends Component {
   };
 
   render() {
+    const { adminMode } = this.props.state;
+
     // Add new group button
     const newGroupButton = (
       <EuiButtonEmpty iconSide="left" iconType="plusInCircle" onClick={() => this.togglePopover()}>
@@ -213,38 +215,40 @@ class WzGroupsActionButtons extends Component {
 
     return (
       <Fragment>
-        <EuiFlexItem grow={false}>
-          <EuiPopover
-            id="popover"
-            button={newGroupButton}
-            isOpen={this.state.isPopoverOpen}
-            closePopover={() => this.closePopover()}
-          >
-            <EuiFormRow label="Introduce the group name" id="">
-              <EuiFieldText
-                className="groupNameInput"
-                value={this.state.newGroupName}
-                onChange={this.onChangeNewGroupName}
-                aria-label=""
-              />
-            </EuiFormRow>
-            <EuiSpacer size="xs" />
-            <EuiFlexGroup>
-              <EuiFlexItem>
-                <EuiButton
-                  iconType="save"
-                  isDisabled={this.state.newGroupName == ''}
-                  fill
-                  onClick={async () => {
-                    await this.createGroup();
-                  }}
-                >
-                  Save new group
-                </EuiButton>
-              </EuiFlexItem>
-            </EuiFlexGroup>
-          </EuiPopover>
-        </EuiFlexItem>
+        {adminMode && (
+          <EuiFlexItem grow={false}>
+            <EuiPopover
+              id="popover"
+              button={newGroupButton}
+              isOpen={this.state.isPopoverOpen}
+              closePopover={() => this.closePopover()}
+            >
+              <EuiFormRow label="Introduce the group name" id="">
+                <EuiFieldText
+                  className="groupNameInput"
+                  value={this.state.newGroupName}
+                  onChange={this.onChangeNewGroupName}
+                  aria-label=""
+                />
+              </EuiFormRow>
+              <EuiSpacer size="xs" />
+              <EuiFlexGroup>
+                <EuiFlexItem>
+                  <EuiButton
+                    iconType="save"
+                    isDisabled={this.state.newGroupName == ''}
+                    fill
+                    onClick={async () => {
+                      await this.createGroup();
+                    }}
+                  >
+                    Save new group
+                  </EuiButton>
+                </EuiFlexItem>
+              </EuiFlexGroup>
+            </EuiPopover>
+          </EuiFlexItem>
+        )}
         <EuiFlexItem grow={false}>{exportButton}</EuiFlexItem>
         <EuiFlexItem grow={false}>{refreshButton}</EuiFlexItem>
       </Fragment>

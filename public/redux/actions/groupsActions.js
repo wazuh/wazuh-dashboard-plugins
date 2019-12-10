@@ -21,6 +21,13 @@ export const updateFileContent = content => {
   };
 };
 
+export const updateAdminMode = status => {
+  return {
+    type: 'UPDATE_ADMIN_MODE',
+    status: status,
+  };
+};
+
 /**
  * Update the files content
  * @param {String} content

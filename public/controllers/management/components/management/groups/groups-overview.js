@@ -17,6 +17,10 @@ import { EuiFlexItem, EuiFlexGroup, EuiPanel, EuiTitle, EuiText, EuiPage } from 
 import WzGroupsTable from './groups-table';
 import WzGroupsActionButtons from './actions-buttons-main';
 
+import { connect } from 'react-redux';
+import { updateAdminMode } from '../../../../../redux/actions/groupsActions';
+import checkAdminMode from './utils/check-admin-mode';
+
 export class WzGroupsOverview extends Component {
   _isMounted = false;
   constructor(props) {
@@ -25,12 +29,19 @@ export class WzGroupsOverview extends Component {
 
   componentDidMount() {
     this._isMounted = true;
+    this.setAdminMode();
   }
 
   componentDidUpdate() {}
 
   componentWillUnmount() {
     this._isMounted = false;
+  }
+
+  async setAdminMode() {
+    //Set the admin mode
+    const admin = await checkAdminMode();
+    this.props.updateAdminMode(admin);
   }
 
   render() {
@@ -67,4 +78,16 @@ export class WzGroupsOverview extends Component {
   }
 }
 
-export default WzGroupsOverview;
+const mapStateToProps = state => {
+  return {
+    state: state.groupsReducers,
+  };
+};
+
+const mapDispatchToProps = dispatch => {
+  return {
+    updateAdminMode: status => dispatch(updateAdminMode(status)),
+  };
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(WzGroupsOverview);

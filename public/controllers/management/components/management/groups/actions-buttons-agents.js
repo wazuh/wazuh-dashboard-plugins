@@ -184,6 +184,8 @@ class WzGroupsActionButtonsAgents extends Component {
   };
 
   render() {
+    const { adminMode } = this.props.state;
+
     // Add new group button
     const manageAgentsButton = (
       <EuiButtonEmpty
@@ -227,7 +229,7 @@ class WzGroupsActionButtonsAgents extends Component {
 
     return (
       <Fragment>
-        <EuiFlexItem grow={false}>{manageAgentsButton}</EuiFlexItem>
+        {adminMode && <EuiFlexItem grow={false}>{manageAgentsButton}</EuiFlexItem>}
         <EuiFlexItem grow={false}>{exportPDFButton}</EuiFlexItem>
         <EuiFlexItem grow={false}>{exportCSVButton}</EuiFlexItem>
         <EuiFlexItem grow={false}>{refreshButton}</EuiFlexItem>

@@ -51,41 +51,55 @@ export default class GroupsAgentsColumns {
           sortable: true,
         },
       ];
-      // If the admin mode is enabled the action column in CDB lists is shown
-      if (this.adminMode) {
-        this.columns.push({
-          name: 'Actions',
-          align: 'left',
-          render: item => {
-            return (
-              <div>
-                <EuiToolTip position="top" content={`Go to the agent`}>
-                  <EuiButtonIcon
-                    aria-label="Go to the agent"
-                    iconType="eye"
-                    onClick={async () => {
-                      this.tableProps.groupsProps.showAgent(item);
-                    }}
-                    color="primary"
-                  />
-                </EuiToolTip>
-                <EuiToolTip position="top" content={`Delete agent`}>
-                  <EuiButtonIcon
-                    aria-label="Delete agent"
-                    iconType="trash"
-                    onClick={async () => {
-                      this.tableProps.updateListItemsForRemove([item]);
-                      this.tableProps.updateShowModal(true);
-                    }}
-                    color="danger"
-                    disabled={item.name === 'default'}
-                  />
-                </EuiToolTip>
-              </div>
-            );
-          },
-        });
-      }
+      this.columns.push({
+        name: 'Actions',
+        align: 'left',
+        render: item => {
+          return (
+            <div>
+              {(this.adminMode && (
+                <div>
+                  <EuiToolTip position="top" content={`Go to the agent`}>
+                    <EuiButtonIcon
+                      aria-label="Go to the agent"
+                      iconType="eye"
+                      onClick={async () => {
+                        this.tableProps.groupsProps.showAgent(item);
+                      }}
+                      color="primary"
+                    />
+                  </EuiToolTip>
+                  <EuiToolTip position="top" content={`Delete agent`}>
+                    <EuiButtonIcon
+                      aria-label="Delete agent"
+                      iconType="trash"
+                      onClick={async () => {
+                        this.tableProps.updateListItemsForRemove([item]);
+                        this.tableProps.updateShowModal(true);
+                      }}
+                      color="danger"
+                      disabled={item.name === 'default'}
+                    />
+                  </EuiToolTip>
+                </div>
+              )) || (
+                <div>
+                  <EuiToolTip position="top" content={`Go to the agent`}>
+                    <EuiButtonIcon
+                      aria-label="Go to the agent"
+                      iconType="eye"
+                      onClick={async () => {
+                        this.tableProps.groupsProps.showAgent(item);
+                      }}
+                      color="primary"
+                    />
+                  </EuiToolTip>
+                </div>
+              )}
+            </div>
+          );
+        },
+      });
     };
 
     this.buildColumns();
