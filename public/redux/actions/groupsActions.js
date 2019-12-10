@@ -60,6 +60,13 @@ export const updateSortField = sortField => {
   };
 };
 
+export const updateSortFieldAgents = sortFieldAgents => {
+  return {
+    type: 'UPDATE_SORT_FIELD_AGENTS',
+    sortFieldAgents: sortFieldAgents,
+  };
+};
+
 export const updateSortFieldFile = sortFieldFile => {
   return {
     type: 'UPDATE_SORT_FIELD_FILE',
@@ -71,6 +78,13 @@ export const updateSortDirection = sortDirection => {
   return {
     type: 'UPDATE_SORT_DIRECTION',
     sortDirection: sortDirection,
+  };
+};
+
+export const updateSortDirectionAgents = sortDirectionAgents => {
+  return {
+    type: 'UPDATE_SORT_DIRECTION_AGENTS',
+    sortDirectionAgents: sortDirectionAgents,
   };
 };
 
@@ -131,6 +145,28 @@ export const updatePageIndex = pageIndex => {
 };
 
 /**
+ * Set the page index value of the table file
+ * @param {Number} pageIndexFile
+ */
+export const updatePageIndexFile = pageIndexFile => {
+  return {
+    type: 'UPDATE_PAGE_INDEX_FILE',
+    pageIndexFile: pageIndexFile,
+  };
+};
+
+/**
+ * Set the page index value of the table agents
+ * @param {Number} pageIndexAgents
+ */
+export const updatePageIndexAgents = pageIndexAgents => {
+  return {
+    type: 'UPDATE_PAGE_INDEX_AGENTS',
+    pageIndexAgents: pageIndexAgents,
+  };
+};
+
+/**
  * Update the filters
  * @param {string} filters
  */
@@ -150,6 +186,12 @@ export const cleanFilters = () => {
 export const cleanInfo = () => {
   return {
     type: 'CLEAN_INFO',
+  };
+};
+
+export const cleanTabs = () => {
+  return {
+    type: 'CLEAN_TABS',
   };
 };
 

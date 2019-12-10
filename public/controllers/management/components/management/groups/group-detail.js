@@ -17,7 +17,7 @@ import { connect } from 'react-redux';
 
 import GroupsHandler from './utils/groups-handler';
 
-import { cleanInfo, updateSelectedTab } from '../../../../../redux/actions/groupsActions';
+import { cleanTabs, updateSelectedTab } from '../../../../../redux/actions/groupsActions';
 import WzGroupsActionButtonsAgents from './actions-buttons-agents';
 import WzGroupsActionButtonsFiles from './actions-buttons-files';
 import WzGroupAgentsTable from './group-agents-table';
@@ -59,8 +59,7 @@ class WzGroupDetail extends Component {
   };
 
   goBack() {
-    this.props.cleanInfo();
-    this.props.updateSelectedTab('agents');
+    this.props.cleanTabs();
   }
 
   renderTabs() {
@@ -175,7 +174,7 @@ const mapStateToProps = state => {
 
 const mapDispatchToProps = dispatch => {
   return {
-    cleanInfo: () => dispatch(cleanInfo()),
+    cleanTabs: () => dispatch(cleanTabs()),
     updateSelectedTab: selectedTabId => dispatch(updateSelectedTab(selectedTabId)),
   };
 };

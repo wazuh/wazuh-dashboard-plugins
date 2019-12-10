@@ -10,7 +10,7 @@
  * Find more information about this on the LICENSE file.
  */
 import React, { Component } from 'react';
-import { EuiInMemoryTable, EuiCallOut, EuiOverlayMask, EuiConfirmModal } from '@elastic/eui';
+import { EuiBasicTable, EuiCallOut, EuiOverlayMask, EuiConfirmModal } from '@elastic/eui';
 
 import { connect } from 'react-redux';
 import GroupsHandler from './utils/groups-handler';
@@ -20,11 +20,11 @@ import {
   updateLoadingStatus,
   updateFileContent,
   updateIsProcessing,
-  updatePageIndex,
+  updatePageIndexAgents,
   updateShowModal,
   updateListItemsForRemove,
-  updateSortDirection,
-  updateSortField,
+  updateSortDirectionAgents,
+  updateSortFieldAgents,
 } from '../../../../../redux/actions/groupsActions';
 
 import GroupsAgentsColums from './utils/columns-agents';
@@ -63,7 +63,10 @@ class WzGroupAgentsTable extends Component {
    */
   async getItems() {
     try {
-      const rawItems = await this.groupsHandler.agentsGroup(this.props.state.itemDetail.name);
+      const rawItems = await this.groupsHandler.agentsGroup(
+        this.props.state.itemDetail.name,
+        this.buildFilter()
+      );
       const { items, totalItems } = ((rawItems || {}).data || {}).data;
 
       this.setState({
@@ -79,10 +82,10 @@ class WzGroupAgentsTable extends Component {
   }
 
   buildFilter() {
-    const { pageIndex } = this.props.state;
+    const { pageIndexAgents } = this.props.state;
     const { pageSize } = this.state;
     const filter = {
-      offset: pageIndex * pageSize,
+      offset: pageIndexAgents * pageSize,
       limit: pageSize,
       sort: this.buildSortFilter(),
     };
@@ -91,40 +94,40 @@ class WzGroupAgentsTable extends Component {
   }
 
   buildSortFilter() {
-    const { sortField, sortDirection } = this.props.state;
+    const { sortFieldAgents, sortDirectionAgents } = this.props.state;
 
-    const field = sortField;
-    const direction = sortDirection === 'asc' ? '+' : '-';
+    const field = sortFieldAgents;
+    const direction = sortDirectionAgents === 'asc' ? '+' : '-';
 
     return direction + field;
   }
 
   onTableChange = ({ page = {}, sort = {} }) => {
-    const { index: pageIndex, size: pageSize } = page;
-    const { field: sortField, direction: sortDirection } = sort;
+    const { index: pageIndexAgents, size: pageSize } = page;
+    const { field: sortFieldAgents, direction: sortDirectionAgents } = sort;
     this.setState({ pageSize });
-    this.props.updatePageIndex(pageIndex);
-    this.props.updateSortDirection(sortDirection);
-    this.props.changeGroupsSortField(sortField);
+    this.props.updatePageIndexAgents(pageIndexAgents);
+    this.props.updateSortDirectionAgents(sortDirectionAgents);
+    this.props.updateSortFieldAgents(sortFieldAgents);
     this.props.updateIsProcessing(true);
   };
 
   render() {
     this.groupsAgentsColumns = new GroupsAgentsColums(this.props);
-    const { isLoading, pageIndex, error, sortField, sortDirection } = this.props.state;
+    const { isLoading, pageIndexAgents, error, sortFieldAgents, sortDirectionAgents } = this.props.state;
     const { items, pageSize, totalItems } = this.state;
     const columns = this.groupsAgentsColumns.columns;
     const message = isLoading ? null : 'No results...';
     const pagination = {
-      pageIndex: pageIndex,
+      pageIndex: pageIndexAgents,
       pageSize: pageSize,
       totalItemCount: totalItems,
       pageSizeOptions: [10, 25, 50, 100],
     };
     const sorting = {
       sort: {
-        field: sortField,
-        direction: sortDirection,
+        field: sortFieldAgents,
+        direction: sortDirectionAgents,
       },
     };
 
@@ -132,7 +135,7 @@ class WzGroupAgentsTable extends Component {
       const itemList = this.props.state.itemList;
       return (
         <div>
-          <EuiInMemoryTable
+          <EuiBasicTable
             itemId="id"
             items={items}
             columns={columns}
@@ -209,11 +212,12 @@ const mapDispatchToProps = dispatch => {
     updateLoadingStatus: status => dispatch(updateLoadingStatus(status)),
     updateFileContent: content => dispatch(updateFileContent(content)),
     updateIsProcessing: isProcessing => dispatch(updateIsProcessing(isProcessing)),
-    updatePageIndex: pageIndex => dispatch(updatePageIndex(pageIndex)),
+    updatePageIndexAgents: pageIndexAgents => dispatch(updatePageIndexAgents(pageIndexAgents)),
     updateShowModal: showModal => dispatch(updateShowModal(showModal)),
     updateListItemsForRemove: itemList => dispatch(updateListItemsForRemove(itemList)),
-    updateSortDirection: sortDirection => dispatch(updateSortDirection(sortDirection)),
-    updateSortField: sortField => dispatch(updateSortField(sortField)),
+    updateSortDirectionAgents: sortDirectionAgents =>
+      dispatch(updateSortDirectionAgents(sortDirectionAgents)),
+    updateSortFieldAgents: sortFieldAgents => dispatch(updateSortFieldAgents(sortFieldAgents)),
   };
 };
 

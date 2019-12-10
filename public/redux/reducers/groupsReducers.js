@@ -18,12 +18,16 @@ const initialState = {
   itemList: [],
   itemDetail: false,
   pageIndex: 0,
+  pageIndexFile: 0,
+  pageIndexAgents: 0,
   section: 'groups',
   showModal: false,
   sortDirection: 'asc',
   sortDirectionFile: 'asc',
+  sortDirectionAgents: 'asc',
   sortField: 'name',
   sortFieldFile: 'filename',
+  sortFieldAgents: 'name',
   showAddAgents: false,
   selectedTabId: 'agents',
 };
@@ -48,10 +52,28 @@ const groupsReducers = (state = initialState, action) => {
       pageIndex: action.pageIndex,
     };
   }
+  if (action.type === 'UPDATE_PAGE_INDEX_AGENTS') {
+    return {
+      ...state,
+      pageIndexAgents: action.pageIndexAgents,
+    };
+  }
+  if (action.type === 'UPDATE_PAGE_INDEX_FILE') {
+    return {
+      ...state,
+      pageIndexFile: action.pageIndexFile,
+    };
+  }
   if (action.type === 'UPDATE_SORT_DIRECTION') {
     return {
       ...state,
       sortDirection: action.sortDirection,
+    };
+  }
+  if (action.type === 'UPDATE_SORT_DIRECTION_AGENTS') {
+    return {
+      ...state,
+      sortDirectionAgents: action.sortDirectionAgents,
     };
   }
   if (action.type === 'UPDATE_SORT_DIRECTION_FILE') {
@@ -64,6 +86,12 @@ const groupsReducers = (state = initialState, action) => {
     return {
       ...state,
       sortField: action.sortField,
+    };
+  }
+  if (action.type === 'UPDATE_SORT_FIELD_AGENTS') {
+    return {
+      ...state,
+      sortFieldAgents: action.sortFieldAgents,
     };
   }
   if (action.type === 'UPDATE_SORT_FIELD_FILE') {
@@ -130,6 +158,19 @@ const groupsReducers = (state = initialState, action) => {
     return {
       ...state,
       selectedTabId: action.selectedTabId,
+    };
+  }
+  if (action.type === 'CLEAN_TABS') {
+    return {
+      ...state,
+      pageIndexAgents: 0,
+      pageIndexFile: 0,
+      sortFieldFile: 'filename',
+      sortFieldAgents: 'name',
+      sortDirectionFile: 'asc',
+      sortDirectionAgents: 'asc',
+      selectedTabId: 'agents',
+      itemDetail: false,
     };
   }
   if (action.type === 'RESET') {

@@ -19,7 +19,7 @@ import { toastNotifications } from 'ui/notify';
 import {
   updateLoadingStatus,
   updateIsProcessing,
-  updatePageIndex,
+  updatePageIndexFile,
   updateSortDirectionFile,
   updateSortFieldFile,
   updateFileContent,
@@ -80,10 +80,10 @@ class WzGroupFilesTable extends Component {
   }
 
   buildFilter() {
-    const { pageIndex } = this.props.state;
+    const { pageIndexFile } = this.props.state;
     const { pageSize } = this.state;
     const filter = {
-      offset: pageIndex * pageSize,
+      offset: pageIndexFile * pageSize,
       limit: pageSize,
       sort: this.buildSortFilter(),
     };
@@ -101,10 +101,10 @@ class WzGroupFilesTable extends Component {
   }
 
   onTableChange = ({ page = {}, sort = {} }) => {
-    const { index: pageIndex, size: pageSize } = page;
+    const { index: pageIndexFile, size: pageSize } = page;
     const { field: sortFieldFile, direction: sortDirectionFile } = sort;
     this.setState({ pageSize });
-    this.props.updatePageIndex(pageIndex);
+    this.props.updatePageIndexFile(pageIndexFile);
     this.props.updateSortDirectionFile(sortDirectionFile);
     this.props.updateSortFieldFile(sortFieldFile);
     this.props.updateIsProcessing(true);
@@ -112,12 +112,12 @@ class WzGroupFilesTable extends Component {
 
   render() {
     this.groupsAgentsColumns = new GroupsFilesColumns(this.props);
-    const { isLoading, pageIndex, error, sortFieldFile, sortDirectionFile } = this.props.state;
+    const { isLoading, pageIndexFile, error, sortFieldFile, sortDirectionFile } = this.props.state;
     const { items, pageSize, totalItems } = this.state;
     const columns = this.groupsAgentsColumns.columns;
     const message = isLoading ? null : 'No results...';
     const pagination = {
-      pageIndex: pageIndex,
+      pageIndex: pageIndexFile,
       pageSize: pageSize,
       totalItemCount: totalItems,
       pageSizeOptions: [10, 25, 50, 100],
@@ -170,8 +170,9 @@ const mapDispatchToProps = dispatch => {
   return {
     updateLoadingStatus: status => dispatch(updateLoadingStatus(status)),
     updateIsProcessing: isProcessing => dispatch(updateIsProcessing(isProcessing)),
-    updatePageIndex: pageIndex => dispatch(updatePageIndex(pageIndex)),
-    updateSortDirectionFile: sortDirectionFile => dispatch(updateSortDirectionFile(sortDirectionFile)),
+    updatePageIndexFile: pageIndexFile => dispatch(updatePageIndexFile(pageIndexFile)),
+    updateSortDirectionFile: sortDirectionFile =>
+      dispatch(updateSortDirectionFile(sortDirectionFile)),
     updateSortFieldFile: sortFieldFile => dispatch(updateSortFieldFile(sortFieldFile)),
     updateFileContent: content => dispatch(updateFileContent(content)),
   };
