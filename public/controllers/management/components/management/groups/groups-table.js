@@ -1,5 +1,5 @@
 /*
- * Wazuh app - React component for registering agents.
+ * Wazuh app - React component for groups main table.
  * Copyright (C) 2015-2019 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -10,7 +10,7 @@
  * Find more information about this on the LICENSE file.
  */
 import React, { Component } from 'react';
-import { EuiInMemoryTable, EuiCallOut, EuiOverlayMask, EuiConfirmModal } from '@elastic/eui';
+import { EuiBasicTable, EuiCallOut, EuiOverlayMask, EuiConfirmModal } from '@elastic/eui';
 
 import { connect } from 'react-redux';
 import GroupsHandler from './utils/groups-handler';
@@ -105,7 +105,7 @@ class WzGroupsTable extends Component {
     this.setState({ pageSize });
     this.props.updatePageIndex(pageIndex);
     this.props.updateSortDirection(sortDirection);
-    this.props.changeGroupsSortField(sortField);
+    this.props.updateSortField(sortField);
     this.props.updateIsProcessing(true);
   };
 
@@ -132,7 +132,7 @@ class WzGroupsTable extends Component {
       const itemList = this.props.state.itemList;
       return (
         <div>
-          <EuiInMemoryTable
+          <EuiBasicTable
             itemId="id"
             items={items}
             columns={columns}
@@ -156,8 +156,7 @@ class WzGroupsTable extends Component {
                 confirmButtonText="Delete"
                 defaultFocusedButton="cancel"
                 buttonColor="danger"
-              >
-              </EuiConfirmModal>
+              ></EuiConfirmModal>
             </EuiOverlayMask>
           ) : null}
         </div>
@@ -182,11 +181,18 @@ class WzGroupsTable extends Component {
       await this.groupsHandler.deleteGroup(item.name);
     });
 
-    Promise.all(results).then(completed => {
-      this.props.updateIsProcessing(true);
-      this.props.updateLoadingStatus(false);
-      this.showToast('success', 'Success', 'Deleted correctly', 3000);
-    });
+    Promise.all(results).then(
+      completed => {
+        this.props.updateIsProcessing(true);
+        this.props.updateLoadingStatus(false);
+        this.showToast('success', 'Success', 'Deleted correctly', 3000);
+      },
+      error => {
+        this.props.updateIsProcessing(true);
+        this.props.updateLoadingStatus(false);
+        this.showToast('danger', 'Error', error, 3000);
+      }
+    );
   }
 }
 

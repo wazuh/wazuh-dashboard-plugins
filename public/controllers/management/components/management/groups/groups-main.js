@@ -1,5 +1,5 @@
 /*
- * Wazuh app - React component for registering agents.
+ * Wazuh app - React component for groups.
  * Copyright (C) 2015-2019 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -15,7 +15,7 @@ import store from '../../../../../redux/store';
 import WzReduxProvider from '../../../../../redux/wz-redux-provider';
 //Wazuh groups overview
 import WzGroupsOverview from './groups-overview';
-//Information about rule or decoder
+
 import WzGroupDetail from './group-detail';
 import WzGroupEditor from './groups-editor';
 
