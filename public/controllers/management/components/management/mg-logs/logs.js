@@ -437,7 +437,7 @@ export default class WzLogs extends Component {
                         &nbsp; Click here to load more logs.</p> ) 
                         ||
                         (this.state.loadingLogs) &&
-                        (<p className="wz-load-extra" onClick={() => this.loadExtraLogs()}>     <EuiLoadingSpinner size="m" />&nbsp; Loading...</p> ) 
+                        (<p className="wz-load-extra"> <EuiLoadingSpinner size="m" />&nbsp; Loading...</p> ) 
 
                         }
                     </EuiCodeBlock>
