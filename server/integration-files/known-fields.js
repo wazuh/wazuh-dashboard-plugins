@@ -787,6 +787,24 @@ export const knownFields = [
     readFromDocValues: true
   },
   {
+    name: 'data.aws.eventTime',
+    type: 'date',
+    count: 0,
+    scripted: false,
+    searchable: true,
+    aggregatable: true,
+    readFromDocValues: true
+  },
+  {
+    name: 'data.aws.created-at',
+    type: 'date',
+    count: 0,
+    scripted: false,
+    searchable: true,
+    aggregatable: true,
+    readFromDocValues: true
+  },
+  {
     name: 'data.aws.id',
     type: 'string',
     count: 0,
@@ -1133,6 +1151,15 @@ export const knownFields = [
   },
   {
     name: 'data.aws.updatedAt',
+    type: 'date',
+    count: 0,
+    scripted: false,
+    searchable: true,
+    aggregatable: true,
+    readFromDocValues: true
+  },
+  {
+    name: 'data.aws.userIdentity.sessionContext.attributes.creationDate',
     type: 'date',
     count: 0,
     scripted: false,
