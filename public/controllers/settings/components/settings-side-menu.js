@@ -70,16 +70,22 @@ export default class WzSettingsSideMenu extends Component {
 
     const { selectedTab } = this.state;
     return (
-      <EuiFlexGroup>
-        <EuiFlexItem grow={false} style={{ width: 190 }}>
-          <EuiSideNav items={sideNav} style={{ padding: 16 }} />
-        </EuiFlexItem>
-        {selectedTab === 'configuration' && (
-          <EuiFlexItem>
-            <WzConfigurationSettings {...this.props}/>
-          </EuiFlexItem>
+      <div>
+        {(selectedTab !== 'configuration' && (
+          <div style={{ position: 'fixed' }}>
+            <EuiSideNav items={sideNav} style={{ padding: 16 }} />
+          </div>
+        )) || (
+          <EuiFlexGroup>
+            <EuiFlexItem grow={false} style={{ width: 190 }}>
+              <EuiSideNav items={sideNav} style={{ padding: 16 }} />
+            </EuiFlexItem>
+            <EuiFlexItem>
+              <WzConfigurationSettings {...this.props} />
+            </EuiFlexItem>
+          </EuiFlexGroup>
         )}
-      </EuiFlexGroup>
+      </div>
     );
   }
 }
