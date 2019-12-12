@@ -54,7 +54,7 @@ export class WzConfigurationTable extends Component {
   newValueItem(newValue, key, type) {
     let newValueWithType = newValue;
 
-    if (type === 'number') {
+    if (type === 'number' && newValue) {
       newValueWithType = parseInt(newValue);
     }
 
@@ -69,18 +69,35 @@ export class WzConfigurationTable extends Component {
     this.setState({ items });
   }
 
-  async editKey(key, value) {
+  async editKey(key, value, type) {
     this.setState({ isLoading: true });
     try {
-      // const rawItems = await this.groupsHandler.listGroups(this.buildFilter());
-      const result = await this.configurationHandler.editKey(key, value);
-      console.log(result);
-      await this.getItems();
-      this.setEditingKey(null);
-      // TODO: reset server
+      const result = await this.configurationHandler.editKey(
+        key,
+        type === 'number' ? (value ? value : 0) : value
+      );
+
+      let newValue = value;
+      if (type === 'object') {
+        newValue = JSON.parse(value);
+      }
+      if (type === 'boolean') {
+        newValue = value === 'true' ? true : false;
+      }
+      if (type === 'number') {
+        newValue = value ? value : 0;
+      }
+
+      this.newValueItem(newValue, key, type);
+      this.setState({ editingKey: null, isLoading: false });
+
+      if (result.data.data) {
+        this.showToast('warning', 'You must restart Kibana for the changes to take effect', 3000);
+      } else {
+        this.showToast('success', 'The configuration has been successfully updated', 3000);
+      }
     } catch (error) {
-      // TODO:
-      this.setState({ isLoading: false });
+      return Promise.reject(error);
     }
   }
 
@@ -122,36 +139,18 @@ export class WzConfigurationTable extends Component {
       this.setState({ items: arrayItems, isLoading: false });
     } catch (error) {
       this.setState({ isLoading: false });
+      return Promise.reject(error);
     }
-    // TODO:
-    // const { section, showingFiles } = this.props.state;
-    // if(this.props.state.defaultItems.length === 0 && section === 'lists'){
-    //   await this.setDefaultItems();
-    // }
-    // const rawItems = await this.wzReq(
-    //   'GET',
-    //   `${this.paths[section]}${showingFiles ? '/files': ''}`,
-    //   this.buildFilter(),
-    // )
-    // const { items, totalItems } = ((rawItems || {}).data || {}).data;
-    // this.setState({
-    //   items,
-    //   totalItems,
-    //   isProcessing: false,
-    // });
-    // this.props.updateIsProcessing(false);
   }
 
-  onTableChange = () => {
-    console.log('On change');
-  };
+  onTableChange = () => {};
 
   render() {
     const { isLoading, error } = this.state;
     const { items, editingKey } = this.state;
     const message = isLoading ? null : 'No results...';
 
-    this.configurationColums = new ConfigurationColums(this.functions, editingKey); // TODO:
+    this.configurationColums = new ConfigurationColums(this.functions, editingKey);
     const columns = this.configurationColums.columns;
 
     if (!error) {
@@ -172,11 +171,10 @@ export class WzConfigurationTable extends Component {
     }
   }
 
-  showToast = (color, title, text, time) => {
+  showToast = (color, title, time) => {
     toastNotifications.add({
       color: color,
       title: title,
-      text: text,
       toastLifeTimeMs: time,
     });
   };

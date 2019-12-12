@@ -23,7 +23,6 @@ export default class WzSettingsSideMenu extends Component {
       settings: { id: 'settings', text: 'App Settings' },
       api: { id: 'api', text: 'API Hosts' },
       configuration: { id: 'configuration', text: 'Configuration' },
-      configuration2: { id: 'configuration2', text: 'Configuration2' },
       logs: { id: 'logs', text: 'Logs' },
       about: { id: 'about', text: 'About' },
     };
@@ -57,9 +56,6 @@ export default class WzSettingsSideMenu extends Component {
             icon: <EuiIcon type="link" color="primary" />,
           }),
           this.createItem(this.settingsSections.configuration, {
-            icon: <EuiIcon type="devToolsApp" color="primary" />,
-          }),
-          this.createItem(this.settingsSections.configuration2, {
             icon: <EuiIcon type="devToolsApp" color="primary" />,
           }),
           this.createItem(this.settingsSections.logs, {

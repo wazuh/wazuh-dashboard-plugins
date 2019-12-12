@@ -1,5 +1,5 @@
 /*
- * Wazuh app - Ruleset handler service
+ * Wazuh app - Configuration handler service
  * Copyright (C) 2015-2019 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -19,8 +19,7 @@ export default class ConfigurationHandler {
   static async editKey(key, value) {
     try {
       const result = await WzRequest.genericReq('PUT', '/utils/configuration', { key, value });
-      const data = ((result || {}).data || {}).data || {};
-      return data;
+      return result;
     } catch (error) {
       return Promise.reject(error);
     }
