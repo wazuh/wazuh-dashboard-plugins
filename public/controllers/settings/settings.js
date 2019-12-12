@@ -141,7 +141,8 @@ export class SettingsController {
           this.refreshLogs();
         }
       },
-      selectedTab: this.tab || 'api'
+      selectedTab: this.tab || 'api',
+      wazuhConfig: this.wazuhConfig
     };
 
     this.settingsLogsProps = {
