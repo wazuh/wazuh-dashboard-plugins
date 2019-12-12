@@ -64,6 +64,7 @@ class WzRulesetTable extends Component {
 
   async componentDidUpdate() {
     if (this.props.state.isProcessing && this._isMounted) {
+      this.props.updateIsProcessing(false);
       await this.getItems();
     }
   }
@@ -92,6 +93,7 @@ class WzRulesetTable extends Component {
       isProcessing: false,
     });
     this.props.updateIsProcessing(false);
+    this.props.updateLoadingStatus(false);
   }
 
   async setDefaultItems() {

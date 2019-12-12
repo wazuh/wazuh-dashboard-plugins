@@ -94,14 +94,11 @@ class WzManagementSideMenu extends Component {
       this.props.changeRulesetSection(newSection);
       this.props.cleanInfo();
       this.props.updateLoadingStatus(true);
-      const result = await this.wzReq.apiReq('GET', this.paths[newSection], {});
-      const items = result.data.data.items;
       //Set the admin mode
       const admin = await checkAdminMode();
       this.props.updateAdminMode(admin);
       this.props.toggleShowFiles(false);
       this.props.changeRulesetSection(newSection);
-      this.props.updateLoadingStatus(false);
     } catch (error) {
       this.props.updateError(error);
     }
@@ -122,12 +119,11 @@ class WzManagementSideMenu extends Component {
       const managementSections = ['rules', 'decoders', 'lists'];
       if (managementSections.includes(section) && managementSections.includes(fromSection)) {
         this.fetchData(section);
+        this.props.switchTab(section);
       } else if (managementSections.includes(section) && !managementSections.includes(fromSection)) {
         this.props.updateManagementSection('ruleset');
         this.props.switchTab('rules');
         this.fetchData(section);
-      } else if (section === 'groups' && managementSections.includes(fromSection)) {
-        this.props.updateManagementSection('groups');
       } else {
         if(section === 'cluster'){
           section = 'monitoring';
