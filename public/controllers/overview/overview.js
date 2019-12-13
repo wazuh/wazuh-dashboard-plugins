@@ -20,7 +20,8 @@ import {
   metricsScap,
   metricsCiscat,
   metricsVirustotal,
-  metricsOsquery
+  metricsOsquery,
+  metricsMitre
 } from '../../utils/overview-metrics';
 
 import { timefilter } from 'ui/timefilter';
@@ -64,6 +65,7 @@ export class OverviewController {
     this.reportingService = reportingService;
     this.visFactoryService = visFactoryService;
     this.wazuhConfig = wazuhConfig;
+    this.showingMitreTable = false
     this.expandArray = [
       false,
       false,
@@ -82,6 +84,7 @@ export class OverviewController {
       false,
       false
     ];
+    
   }
 
   /**
@@ -181,8 +184,18 @@ export class OverviewController {
         case 'osquery':
           this.createMetrics(metricsOsquery);
           break;
+        case 'mitre':
+          this.createMetrics(metricsMitre);
+          break;
       }
     }
+  }
+
+  /**
+   * Show/hide MITRE table
+   */
+  switchMitreTab() {
+    this.showingMitreTable = !this.showingMitreTable
   }
 
   /**
@@ -264,6 +277,7 @@ export class OverviewController {
   // Switch tab
   async switchTab(newTab, force = false) {
     this.tabVisualizations.setTab(newTab);
+    this.showingMitreTable = false;
     this.$rootScope.rendered = false;
     this.$rootScope.$applyAsync();
     this.falseAllExpand();
@@ -287,6 +301,24 @@ export class OverviewController {
       if (newTab === 'gdpr') {
         const gdprTabs = await this.commonData.getGDPR();
         this.gdprReqs = { items: gdprTabs, reqTitle: 'GDPR Requirement' };
+      }
+
+      if (newTab === 'mitre') {
+        const result = await this.apiReq.request('GET', '/rules/mitre', {});
+        this.$scope.mitreIds = ((((result || {}).data) || {}).data || {}).items
+        
+        this.mitreCardsSliderProps = {
+          items: this.$scope.mitreIds ,
+          attacksCount: this.$scope.attacksCount,
+          reqTitle: "MITRE",
+          wzReq: (method, path, body) => this.apiReq.request(method, path, body),
+          addFilter: (id) => this.addMitrefilter(id)
+        }
+
+        this.mitreTableProps = {
+          wzReq: (method, path, body) => this.apiReq.request(method, path, body),
+          attacksCount: this.$scope.attacksCount,
+        }
       }
 
       if (newTab === 'hipaa') {
@@ -385,12 +417,42 @@ export class OverviewController {
   }
 
   /**
+   * Filter by Mitre.ID
+   * @param {*} id 
+   */
+  addMitrefilter(id){
+    const filter = `{"meta":{"index":"wazuh-alerts-3.x-*"},"query":{"match":{"rule.mitre.id":{"query":"${id}","type":"phrase"}}}}`;
+    this.$rootScope.$emit('addNewKibanaFilter', { filter : JSON.parse(filter) });
+  }
+
+  /**
    * On controller loads
    */
   async init() {
     try {
       await this.loadConfiguration();
       await this.switchTab(this.tab, true);
+
+      this.$scope.$on('sendVisDataRows', (ev, param) => {
+        const rows = (param || {}).mitreRows.tables[0].rows
+        this.$scope.attacksCount = {}
+        for(var i in rows){
+          this.$scope.attacksCount[rows[i]["col-0-2"]] = rows[i]["col-1-1"]
+        }
+
+        this.mitreTableProps = {
+          wzReq: (method, path, body) => this.apiReq.request(method, path, body),
+          attacksCount: this.$scope.attacksCount,
+        }
+        this.mitreCardsSliderProps = {
+          items: this.$scope.mitreIds,
+          attacksCount: this.$scope.attacksCount,
+          reqTitle: "MITRE",
+          wzReq: (method, path, body) => this.apiReq.request(method, path, body),
+          addFilter: (id) => this.addMitrefilter(id)
+          }
+        });
+
     } catch (error) {
       this.errorHandler.handle(error.message || error);
     }

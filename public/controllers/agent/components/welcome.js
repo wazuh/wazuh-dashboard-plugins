@@ -171,7 +171,12 @@ export class WelcomeScreen extends Component {
                   </EuiTitle>
                 </EuiFlexItem>
                 <EuiFlexItem grow={false}>
-                  {this.buildPopover('popoverThreat', ['virustotal', 'osquery', 'docker'])}
+                  {this.buildPopover('popoverThreat', [
+                    'virustotal',
+                    'osquery',
+                    'docker',
+                    'mitre'
+                  ])}
                 </EuiFlexItem>
               </EuiFlexGroup>
               <EuiSpacer size="l" />
@@ -181,6 +186,7 @@ export class WelcomeScreen extends Component {
               ).includes('vuls') &&
                 !this.props.extensions.virustotal &&
                 !this.props.extensions.osquery &&
+                !this.props.extensions.mitre &&
                 !this.props.extensions.docker && (
                   <EuiFlexGroup>
                     <EuiFlexItem>
@@ -204,8 +210,12 @@ export class WelcomeScreen extends Component {
                 ).includes('vuls') && this.buildTabCard('vuls', 'securityApp')}
                 {this.props.extensions.virustotal &&
                   this.buildTabCard('virustotal', 'savedObjectsApp')}
-                {this.props.extensions.osquery && this.buildTabCard('osquery', 'searchProfilerApp')}
-                {this.props.extensions.docker && this.buildTabCard('docker', 'spacesApp')}
+                {this.props.extensions.osquery &&
+                  this.buildTabCard('osquery', 'searchProfilerApp')}
+                {this.props.extensions.docker &&
+                  this.buildTabCard('docker', 'spacesApp')}
+                {this.props.extensions.mitre &&
+                  this.buildTabCard('mitre', 'spacesApp')} {/* TODO- Change "spacesApp" icon*/}
               </EuiFlexGrid>
             </EuiPanel>
           </EuiFlexItem>

@@ -121,6 +121,7 @@ export class WelcomeScreen extends Component {
       <EuiPage style={{padding:0}}>
         <EuiFlexGroup>
           <EuiFlexItem>
+
             <EuiFlexGroup>
               <EuiFlexItem>
                 <EuiPanel>
@@ -172,7 +173,6 @@ export class WelcomeScreen extends Component {
                 </EuiPanel>
               </EuiFlexItem>
             </EuiFlexGroup>
-
             <EuiSpacer size="xl" />
             <EuiFlexGroup>
               <EuiFlexItem>
@@ -200,6 +200,8 @@ export class WelcomeScreen extends Component {
                       this.buildTabCard('osquery', 'searchProfilerApp')}
                     {this.props.extensions.docker &&
                       this.buildTabCard('docker', 'spacesApp')}
+                    {this.props.extensions.mitre &&
+                      this.buildTabCard('mitre', 'spacesApp')} {/* TODO- Change "spacesApp" icon*/}
                   </EuiFlexGrid>
                 </EuiPanel>
               </EuiFlexItem>

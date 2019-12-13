@@ -43,6 +43,12 @@ const metricsScap = {
   scapLowestScore: '[vis-id="\'Wazuh-App-Agents-OSCAP-Lower-score-metric\'"]'
 };
 
+// Metrics Mitre
+const metricsMitre = {
+  mitreMetrics: '[vis-id="\'Wazuh-App-Overview-MITRE\'"]'
+};
+
+
 // Metrics CIS-CAT
 const metricsCiscat = {
   ciscatScanNotChecked:

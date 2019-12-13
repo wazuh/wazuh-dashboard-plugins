@@ -45,14 +45,14 @@ export class CommonData {
     this.overviewTabs = {
       hostMonitoringTabs: ['general', 'fim', 'aws'],
       systemAuditTabs: ['pm', 'audit', 'oscap', 'ciscat'],
-      securityTabs: ['vuls', 'virustotal', 'osquery', 'docker'],
+      securityTabs: ['vuls', 'virustotal', 'osquery', 'docker', 'mitre'],
       complianceTabs: ['pci', 'gdpr', 'hipaa', 'nist']
     };
 
     this.agentTabs = {
       hostMonitoringTabs: ['general', 'fim', 'syscollector'],
       systemAuditTabs: ['pm', 'audit', 'oscap', 'ciscat', 'sca'],
-      securityTabs: ['vuls', 'virustotal', 'osquery', 'docker'],
+      securityTabs: ['vuls', 'virustotal', 'osquery', 'docker','mitre'],
       complianceTabs: ['pci', 'gdpr', 'hipaa', 'nist']
     };
   }
@@ -175,6 +175,9 @@ export class CommonData {
         } else if (tab === 'nist') {
           this.removeDuplicateExists('rule.nist_800_53');
           filters.push(filterHandler.nistQuery());
+        } else if (tab === 'mitre') {
+          this.removeDuplicateExists('rule.mitre.id');
+          filters.push(filterHandler.mitreQuery());
         } else {
           this.removeDuplicateRuleGroups(tabFilters[tab].group);
           filters.push(filterHandler.ruleGroupQuery(tabFilters[tab].group));

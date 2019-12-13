@@ -53,6 +53,7 @@ export const TabNames = {
   agentless: 'Agentless',
   inventory: 'Inventory',
   osquery: 'Osquery',
+  mitre: 'MITRE ATT&CK',
   'open-scap': 'OpenSCAP',
   'cis-cat': 'CIS-CAT',
   'vulnerability-detector': 'Vulnerabilities',

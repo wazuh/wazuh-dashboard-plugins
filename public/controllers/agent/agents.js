@@ -21,7 +21,8 @@ import {
   metricsVulnerability,
   metricsScap,
   metricsCiscat,
-  metricsVirustotal
+  metricsVirustotal,
+  metricsMitre
 } from '../../utils/agents-metrics';
 
 import { ConfigurationHandler } from '../../utils/config-handler';
@@ -128,6 +129,23 @@ export class AgentsController {
       timefilter.setTime(savedTimefilter);
       this.commonData.removeTimefilter();
     }
+
+    this.$scope.$on('sendVisDataRows', (ev, param) => {
+      const rows = (param || {}).mitreRows.tables[0].rows
+      this.$scope.attacksCount = {}
+      for(var i in rows){
+        this.$scope.attacksCount[rows[i]["col-0-2"]] = rows[i]["col-1-1"]
+      }
+
+      
+    this.$scope.mitreCardsSliderProps = {
+      items: this.$scope.mitreIds,
+      attacksCount: this.$scope.attacksCount,
+      reqTitle: "MITRE",
+      wzReq: (method, path, body) => this.apiReq.request(method, path, body),
+      addFilter: (id) => this.addMitrefilter(id)
+      }
+    });
 
     this.$scope.TabDescription = TabDescription;
 
@@ -479,7 +497,10 @@ export class AgentsController {
         case 'virustotal':
           this.createMetrics(metricsVirustotal);
           break;
-      }
+        case 'mitre':
+          this.createMetrics(metricsMitre);
+          break;
+    }
     }
   }
 
@@ -584,6 +605,19 @@ export class AgentsController {
         };
       }
 
+      if (tab === 'mitre') {
+        const result = await this.apiReq.request('GET', '/rules/mitre', {});
+        this.$scope.mitreIds = ((((result || {}).data) || {}).data || {}).items
+
+        this.$scope.mitreCardsSliderProps = {
+          items: this.$scope.mitreIds ,
+          attacksCount: this.$scope.attacksCount,
+          reqTitle: "MITRE",
+          wzReq: (method, path, body) => this.apiReq.request(method, path, body),
+          addFilter: (id) => this.addMitrefilter(id)
+        }
+      }
+      
       if (tab === 'hipaa') {
         const hipaaTabs = await this.commonData.getHIPAA();
         this.$scope.hipaaReqs = {
@@ -696,6 +730,16 @@ export class AgentsController {
     };
 
     this.setTabs();
+  }
+
+
+   /**
+   * Filter by Mitre.ID
+   * @param {*} id 
+   */
+  addMitrefilter(id){
+    const filter = `{"meta":{"index":"wazuh-alerts-3.x-*"},"query":{"match":{"rule.mitre.id":{"query":"${id}","type":"phrase"}}}}`;
+    this.$rootScope.$emit('addNewKibanaFilter', { filter : JSON.parse(filter) });
   }
 
   /**
