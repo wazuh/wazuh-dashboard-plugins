@@ -62,8 +62,11 @@ class WzRulesetTable extends Component {
     this._isMounted = true;
   }
 
-  async componentDidUpdate() {
-    if (this.props.state.isProcessing && this._isMounted) {
+  async componentDidUpdate(prevProps) {
+    const sectionChanged = prevProps.state.section !== this.props.state.section
+   
+    if ( (this.props.state.isProcessing && this._isMounted) || sectionChanged) {
+      this.props.updateLoadingStatus(true);
       this.props.updateIsProcessing(false);
       await this.getItems();
     }
@@ -76,6 +79,9 @@ class WzRulesetTable extends Component {
   async getItems() {
     const { section, showingFiles } = this.props.state;
 
+    this.setState({
+      items : []
+    });
     if(this.props.state.defaultItems.length === 0 && section === 'lists'){
       await this.setDefaultItems();
     }
@@ -92,7 +98,6 @@ class WzRulesetTable extends Component {
       totalItems,
       isProcessing: false,
     });
-    this.props.updateIsProcessing(false);
     this.props.updateLoadingStatus(false);
   }
 
@@ -124,9 +129,9 @@ class WzRulesetTable extends Component {
   }
 
   buildSortFilter() {
-    const {sortField, sortDirection} = this.props.state;
-
-    const field = sortField;
+    const {sortDirection, section} = this.props.state;
+    
+    const field = section === 'rules' ? 'id' : 'name';
     const direction = (sortDirection === 'asc') ? '+' : '-';
     
     return direction+field;
@@ -174,6 +179,7 @@ class WzRulesetTable extends Component {
       const itemList = this.props.state.itemList;
       return (
         <div>
+        { (`${section}`)}
           <EuiBasicTable
             itemId="id"
             items={items}

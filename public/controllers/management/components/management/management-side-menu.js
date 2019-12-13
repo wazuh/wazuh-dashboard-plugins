@@ -92,6 +92,7 @@ class WzManagementSideMenu extends Component {
       const currentSection = this.props.state.section;
       if (Object.keys(this.props.state.filters).length && newSection === currentSection) return; // If there's any filter and the section is de same doesn't fetch again
       this.props.changeRulesetSection(newSection);
+      this.props.changeSection(newSection);
       this.props.cleanInfo();
       this.props.updateLoadingStatus(true);
       //Set the admin mode
@@ -99,6 +100,7 @@ class WzManagementSideMenu extends Component {
       this.props.updateAdminMode(admin);
       this.props.toggleShowFiles(false);
       this.props.changeRulesetSection(newSection);
+      this.props.changeSection(newSection);
     } catch (error) {
       this.props.updateError(error);
     }
@@ -112,7 +114,7 @@ class WzManagementSideMenu extends Component {
         selectedItemName: section,
       });
       this.props.updateSortDirection('asc');
-      this.props.updateSortField(section === 'rules' ? 'id' : 'name');
+      this.props.updateSortField(section !== 'rules' ? 'name' : 'id');
       this.props.cleanFilters();
       this.props.updateIsProcessing(true);
       this.props.updatePageIndex(0);
@@ -121,8 +123,8 @@ class WzManagementSideMenu extends Component {
         this.fetchData(section);
         this.props.switchTab(section);
       } else if (managementSections.includes(section) && !managementSections.includes(fromSection)) {
-        this.props.updateManagementSection('ruleset');
-        this.props.switchTab('rules');
+        this.props.updateManagementSection(section);
+        this.props.switchTab(section);
         this.fetchData(section);
       } else {
         if(section === 'cluster'){
@@ -226,6 +228,7 @@ const mapStateToProps = (state) => {
 const mapDispatchToProps = (dispatch) => {
   return {
     changeRulesetSection: section => dispatch(updateRulesetSection(section)),
+    changeSection: section => dispatch(updateManagementSection(section)),
     updateLoadingStatus: status => dispatch(updateLoadingStatus(status)),
     toggleShowFiles: status => dispatch(toggleShowFiles(status)),
     cleanFilters: () => dispatch(cleanFilters()),
