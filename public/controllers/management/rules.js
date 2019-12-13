@@ -1,5 +1,5 @@
 /*
- * Wazuh app - Ruleset controllers
+ * @param {Objet} * Wazuh app - Ruleset controllers
  * Copyright (C) 2015-2019 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -13,185 +13,296 @@ import * as FileSaver from '../../services/file-saver';
 
 import { colors } from './colors';
 
-export function RulesController(
-  $scope,
-  $sce,
-  errorHandler,
-  appState,
-  csvReq,
-  wzTableFilter,
-  $location,
-  apiReq,
-  wazuhConfig,
-  rulesetHandler
-) {
-  $scope.overwriteError = false;
-  $scope.isObject = item => typeof item === 'object';
-  $scope.mctrl = $scope.$parent.$parent.$parent.mctrl;
-  $scope.mctrl.showingLocalRules = false;
-  $scope.mctrl.onlyLocalFiles = false;
-  $scope.appliedFilters = [];
+
+export class RulesController {
+  /**
+   * Class constructor
+    * @param {Objet} $scope
+    * @param {Objet} $sce
+    * @param {Objet} errorHandler
+    * @param {Objet} appState
+    * @param {Objet} csvReq
+    * @param {Objet} wzTableFilter
+    * @param {Objet} $location
+    * @param {Objet} apiReq
+    * @param {Objet} wazuhConfig
+    * @param {Objet} rulesetHandler
+   */
+
+  constructor(
+    $scope,
+    $sce,
+    errorHandler,
+    appState,
+    csvReq,
+    wzTableFilter,
+    $location,
+    apiReq,
+    wazuhConfig,
+    rulesetHandler
+  ) {
+    this.scope = $scope;
+    this.sce = $sce;
+    this.errorHandler = errorHandler;
+    this.appState = appState;
+    this.csvReq = csvReq;
+    this.wzTableFilter = wzTableFilter;
+    this.location = $location;
+    this.apiReq = apiReq;
+    this.wazuhConfig = wazuhConfig;
+    this.rulesetHandler = rulesetHandler;
+
+    this.overwriteError = false;
+    this.isObject = item => typeof item === 'object';
+    this.mctrl = this.scope.mctrl;
+    this.mctrl.showingLocalRules = false;
+    this.mctrl.onlyLocalFiles = false;
+    this.appliedFilters = [];
+  }
+
+  async $onInit() {
+    // Props
+    this.mainRulesProps = {
+      section: 'rules',
+      wzReq: (method, path, body) => this.apiReq.request(method, path, body)
+    }
+
+    //Initialization
+    this.searchTerm = '';
+    this.viewingDetail = false;
+    this.isArray = Array.isArray;
+
+    const configuration = this.wazuhConfig.getConfig();
+    this.adminMode = !!(configuration || {}).admin;
+
+
+    // Listeners
+    this.scope.$on('closeRuleView', () => {
+      this.closeDetailView();
+    });
+
+    this.scope.$on('rulesetIsReloaded', () => {
+      this.viewingDetail = false;
+      this.scope.$applyAsync();
+    });
+
+    this.scope.$on('wazuhShowRule', (event, parameters) => {
+      this.currentRule = parameters.rule;
+      this.scope.$emit('setCurrentRule', { currentRule: this.currentRule });
+      if (!(Object.keys((this.currentRule || {}).details || {}) || []).length) {
+        this.currentRule.details = false;
+      }
+      this.viewingDetail = true;
+      this.scope.$applyAsync();
+    });
+
+    this.scope.$on('showRestart', () => {
+      this.restartBtn = true;
+      this.scope.$applyAsync();
+    });
+
+    this.scope.$on('showSaveAndOverwrite', () => {
+      this.overwriteError = true;
+      this.scope.$applyAsync();
+    });
+
+    this.scope.$on('applyFilter', (event, parameters) => {
+      this.scope.search(parameters.filter, true);
+    });
+
+    this.scope.$on('viewFileOnlyTable', (event, parameters) => {
+      parameters.viewingDetail = this.viewingDetail;
+      this.mctrl.switchFilesSubTab('rules', { parameters });
+    });
+
+    if (this.location.search() && this.location.search().ruleid) {
+      const incomingRule = this.location.search().ruleid;
+      this.location.search('ruleid', null);
+      try {
+        const data = await this.apiReq.request('get', `/rules/${incomingRule}`, {});
+        const response = (((data || {}).data || {}).data || {}).items || [];
+        if (response.length) {
+          const result = response.filter(rule => rule.details.overwrite);
+          this.currentRule = result.length ? result[0] : response[0];
+        }
+        this.scope.$emit('setCurrentRule', { currentRule: this.currentRule });
+        if (
+          !(Object.keys((this.currentRule || {}).details || {}) || []).length
+        ) {
+          this.currentRule.details = false;
+        }
+        this.viewingDetail = true;
+        this.scope.$applyAsync();
+      } catch (error) {
+        this.errorHandler.handle(
+          `Error fetching rule: ${incomingRule} from the Wazuh API`
+        )
+      }
+    }
+  }
+
   /**
    * This performs a search with a given term
+   * @param {String} term 
+   * @param {Boolean} fromClick 
    */
-  $scope.search = (term, fromClick = false) => {
+  search(term, fromClick = false) {
     let clearInput = true;
     if (term && term.startsWith('group:') && term.split('group:')[1].trim()) {
-      $scope.custom_search = '';
+      this.custom_search = '';
       const filter = { name: 'group', value: term.split('group:')[1].trim() };
-      $scope.appliedFilters = $scope.appliedFilters.filter(
+      this.appliedFilters = this.appliedFilters.filter(
         item => item.name !== 'group'
       );
-      $scope.appliedFilters.push(filter);
-      $scope.$broadcast('wazuhFilter', { filter });
+
+      this.appliedFilters.push(filter);
+      this.scope.$broadcast('wazuhFilter', { filter });
     } else if (
       term &&
       term.startsWith('level:') &&
       term.split('level:')[1].trim()
     ) {
-      $scope.custom_search = '';
+      this.custom_search = '';
       const filter = { name: 'level', value: term.split('level:')[1].trim() };
-      $scope.appliedFilters = $scope.appliedFilters.filter(
+      this.appliedFilters = this.appliedFilters.filter(
         item => item.name !== 'level'
       );
-      $scope.appliedFilters.push(filter);
-      $scope.$broadcast('wazuhFilter', { filter });
+      this.appliedFilters.push(filter);
+      this.scope.$broadcast('wazuhFilter', { filter });
     } else if (
       term &&
       term.startsWith('pci:') &&
       term.split('pci:')[1].trim()
     ) {
-      $scope.custom_search = '';
+      this.custom_search = '';
       const filter = { name: 'pci', value: term.split('pci:')[1].trim() };
-      $scope.appliedFilters = $scope.appliedFilters.filter(
+      this.appliedFilters = this.appliedFilters.filter(
         item => item.name !== 'pci'
       );
-      $scope.appliedFilters.push(filter);
-      $scope.$broadcast('wazuhFilter', { filter });
+      this.appliedFilters.push(filter);
+      this.scope.$broadcast('wazuhFilter', { filter });
     } else if (
       term &&
       term.startsWith('gdpr:') &&
       term.split('gdpr:')[1].trim()
     ) {
-      $scope.custom_search = '';
+      this.custom_search = '';
       const filter = { name: 'gdpr', value: term.split('gdpr:')[1].trim() };
-      $scope.appliedFilters = $scope.appliedFilters.filter(
+      this.appliedFilters = this.appliedFilters.filter(
         item => item.name !== 'gdpr'
       );
-      $scope.appliedFilters.push(filter);
-      $scope.$broadcast('wazuhFilter', { filter });
+      this.appliedFilters.push(filter);
+      this.scope.$broadcast('wazuhFilter', { filter });
     } else if (
       term &&
       term.startsWith('hipaa:') &&
       term.split('hipaa:')[1].trim()
     ) {
-      $scope.custom_search = '';
+      this.custom_search = '';
       const filter = { name: 'hipaa', value: term.split('hipaa:')[1].trim() };
-      $scope.appliedFilters = $scope.appliedFilters.filter(
+      this.appliedFilters = this.appliedFilters.filter(
         item => item.name !== 'hipaa'
       );
-      $scope.appliedFilters.push(filter);
-      $scope.$broadcast('wazuhFilter', { filter });
+      this.appliedFilters.push(filter);
+      this.scope.$broadcast('wazuhFilter', { filter });
     } else if (
       term &&
       term.startsWith('nist-800-53:') &&
       term.split('nist-800-53:')[1].trim()
     ) {
-      $scope.custom_search = '';
+      this.custom_search = '';
       const filter = {
         name: 'nist-800-53',
         value: term.split('nist-800-53:')[1].trim()
       };
-      $scope.appliedFilters = $scope.appliedFilters.filter(
+      this.appliedFilters = this.appliedFilters.filter(
         item => item.name !== 'nist-800-53'
       );
-      $scope.appliedFilters.push(filter);
-      $scope.$broadcast('wazuhFilter', { filter });
+      this.appliedFilters.push(filter);
+      this.scope.$broadcast('wazuhFilter', { filter });
     } else if (
       term &&
       term.startsWith('file:') &&
       term.split('file:')[1].trim()
     ) {
-      $scope.custom_search = '';
+      this.custom_search = '';
       const filter = { name: 'file', value: term.split('file:')[1].trim() };
-      $scope.appliedFilters = $scope.appliedFilters.filter(
+      this.appliedFilters = this.appliedFilters.filter(
         item => item.name !== 'file'
       );
-      $scope.appliedFilters.push(filter);
-      $scope.$broadcast('wazuhFilter', { filter });
+      this.appliedFilters.push(filter);
+      this.scope.$broadcast('wazuhFilter', { filter });
     } else if (
       term &&
       term.startsWith('path:') &&
       term.split('path:')[1].trim()
     ) {
-      $scope.custom_search = '';
-      if (!$scope.mctrl.showingLocalRules) {
+      this.custom_search = '';
+      if (!this.mctrl.showingLocalRules) {
         const filter = { name: 'path', value: term.split('path:')[1].trim() };
-        $scope.appliedFilters = $scope.appliedFilters.filter(
+        this.appliedFilters = this.appliedFilters.filter(
           item => item.name !== 'path'
         );
-        $scope.appliedFilters.push(filter);
-        $scope.$broadcast('wazuhFilter', { filter });
+        this.appliedFilters.push(filter);
+        this.scope.$broadcast('wazuhFilter', { filter });
       }
     } else {
       clearInput = false;
-      $scope.$broadcast('wazuhSearch', { term, removeFilters: 0 });
+      this.scope.$broadcast('wazuhSearch', { term, removeFilters: 0 });
     }
     if (clearInput && !fromClick) {
       const searchBar = $('#search-input-rules');
       searchBar.val('');
     }
-    $scope.$applyAsync();
-  };
+    this.scope.$applyAsync();
+  }
 
   /**
-   * This show us if new filter is already included in filters
-   * @param {String} filterName
-   */
-  $scope.includesFilter = filterName =>
-    $scope.appliedFilters.map(item => item.name).includes(filterName);
+ * This show us if new filter is already included in filters
+ * @param {String} filterName
+ */
+  includesFilter(filterName) {
+    return this.appliedFilters.map(item => item.name).includes(filterName);
+  }
 
   /**
    * Get a filter given its name
    * @param {String} filterName
    */
-  $scope.getFilter = filterName => {
-    const filtered = $scope.appliedFilters.filter(
+  getFilter(filterName) {
+    const filtered = this.appliedFilters.filter(
       item => item.name === filterName
     );
-    return filtered.length ? filtered[0].value : '';
-  };
+    const filter = filtered.length ? filtered[0].value : '';
+    return filter;
+  }
 
-  $scope.switchLocalRules = () => {
-    $scope.removeFilter('path');
-    if (!$scope.mctrl.showingLocalRules) {
-      $scope.appliedFilters.push({ name: 'path', value: 'etc/rules' });
-    }
-  };
+
+  /**
+   * Swotch between tabs
+   */
+  switchLocalRules() {
+    this.removeFilter('path');
+    if (!this.mctrl.showingLocalRules) this.appliedFilters.push({ name: 'path', value: 'etc/rules' });
+  }
 
   /**
    * This a the filter given its name
    * @param {String} filterName
    */
-  $scope.removeFilter = filterName => {
-    $scope.appliedFilters = $scope.appliedFilters.filter(
+  removeFilter(filterName) {
+    this.appliedFilters = this.appliedFilters.filter(
       item => item.name !== filterName
     );
-    return $scope.$broadcast('wazuhRemoveFilter', { filterName });
-  };
+    return this.scope.$broadcast('wazuhRemoveFilter', { filterName });
+  }
 
-  //Initialization
-  $scope.searchTerm = '';
-  $scope.viewingDetail = false;
-  $scope.isArray = Array.isArray;
-
-  const configuration = wazuhConfig.getConfig();
-  $scope.adminMode = !!(configuration || {}).admin;
 
   /**
-   * This set color to a given rule argument
-   */
-  $scope.colorRuleArg = ruleArg => {
+  * This set color to a given rule argument
+  * @param {String} ruleArg
+  */
+  colorRuleArg(ruleArg) {
     ruleArg = ruleArg.toString();
     let valuesArray = ruleArg.match(/\$\(((?!<\/span>).)*?\)(?!<\/span>)/gim);
     let coloredString = ruleArg;
@@ -204,38 +315,28 @@ export function RulesController(
         coloredString = coloredString.replace(
           /\$\(((?!<\/span>).)*?\)(?!<\/span>)/im,
           '<span style="color: ' +
-            colors[i] +
-            ' ">' +
-            valuesArray[i] +
-            '</span>'
+          colors[i] +
+          ' ">' +
+          valuesArray[i] +
+          '</span>'
         );
       }
     }
 
-    return $sce.trustAsHtml(coloredString);
-  };
-
-  $scope.$on('closeRuleView', () => {
-    $scope.closeDetailView();
-  });
-
-  // Reloading event listener
-  $scope.$on('rulesetIsReloaded', () => {
-    $scope.viewingDetail = false;
-    $scope.$applyAsync();
-  });
+    return this.sce.trustAsHtml(coloredString);
+  }
 
   /**
    * Get full data on CSV format
    */
-  $scope.downloadCsv = async () => {
+  async downloadCsv() {
     try {
-      errorHandler.info('Your download should begin automatically...', 'CSV');
-      const currentApi = JSON.parse(appState.getCurrentAPI()).id;
-      const output = await csvReq.fetch(
+      this.errorHandler.info('Your download should begin automatically...', 'CSV');
+      const currentApi = JSON.parse(this.appState.getCurrentAPI()).id;
+      const output = await this.csvReq.fetch(
         '/rules',
         currentApi,
-        wzTableFilter.get()
+        this.wzTableFilter.get()
       );
       const blob = new Blob([output], { type: 'text/csv' }); // eslint-disable-line
 
@@ -243,188 +344,164 @@ export function RulesController(
 
       return;
     } catch (error) {
-      errorHandler.handle(error, 'Download CSV');
+      this.errorHandler.handle(error, 'Download CSV');
     }
     return;
-  };
+  }
 
   /**
-   * This function takes back to the list but adding a filter from the detail view
-   */
-  $scope.addDetailFilter = (name, value) => {
+ * This function takes back to the list but adding a filter from the detail view
+ * @param {String} name
+ * @param {String} value
+ */
+  addDetailFilter(name, value) {
     // Go back to the list
-    $scope.closeDetailView();
-    $scope.search(`${name}:${value}`);
-  };
+    this.closeDetailView();
+    this.search(`${name}:${value}`);
+  }
 
-  $scope.openFile = (file, path) => {
+  /**
+   * Open a file
+   * @param {String} file 
+   * @param {String} path 
+   */
+  openFile(file, path) {
     if (file && path) {
-      $scope.mctrl.switchFilesSubTab('rules', {
+      this.mctrl.switchFilesSubTab('rules', {
         parameters: {
           file: { file, path },
           path,
-          viewingDetail: $scope.viewingDetail
+          viewingDetail: this.viewingDetail
         }
       });
     }
-  };
+  }
 
-  //listeners
-  $scope.$on('wazuhShowRule', (event, parameters) => {
-    $scope.currentRule = parameters.rule;
-    $scope.$emit('setCurrentRule', { currentRule: $scope.currentRule });
-    if (!(Object.keys(($scope.currentRule || {}).details || {}) || []).length) {
-      $scope.currentRule.details = false;
-    }
-    $scope.viewingDetail = true;
-    $scope.$applyAsync();
-  });
-
-  $scope.editRulesConfig = async () => {
-    $scope.editingFile = true;
+  /**
+   * Open an edit a rules file
+   */
+  async editRulesConfig() {
+    this.editingFile = true;
     try {
-      $scope.fetchedXML = await rulesetHandler.getRuleConfiguration(
-        $scope.currentRule.file
+      this.fetchedXML = await this.rulesetHandler.getRuleConfiguration(
+        this.currentRule.file
       );
-      $location.search('editingFile', true);
-      appState.setNavigation({ status: true });
-      $scope.$applyAsync();
-      $scope.$broadcast('fetchedFile', { data: $scope.fetchedXML });
+      this.location.search('editingFile', true);
+      this.appState.setNavigation({ status: true });
+      this.scope.$applyAsync();
+      this.scope.$broadcast('fetchedFile', { data: this.scope.fetchedXML });
     } catch (error) {
-      $scope.fetchedXML = null;
-      errorHandler.handle(error, 'Fetch file error');
+      this.fetchedXML = null;
+      this.errorHandler.handle(error, 'Fetch file error');
     }
-  };
+  }
 
-  $scope.closeEditingFile = async () => {
-    if ($scope.currentRule) {
+
+  /**
+   * Close the edition of the file
+   */
+  async closeEditingFile() {
+    if (this.currentRule) {
       try {
-        const ruleReloaded = await apiReq.request(
+        const ruleReloaded = await this.apiReq.request(
           'GET',
-          `/rules/${$scope.currentRule.id}`,
+          `/rules/${this.currentRule.id}`,
           {}
         );
         const response =
           (((ruleReloaded || {}).data || {}).data || {}).items || [];
         if (response.length) {
           const result = response.filter(rule => rule.details.overwrite);
-          $scope.currentRule = result.length ? result[0] : response[0];
+          this.currentRule = result.length ? result[0] : response[0];
         } else {
-          $scope.currentRule = false;
-          $scope.closeDetailView(true);
+          this.currentRule = false;
+          this.closeDetailView(true);
         }
-        $scope.fetchedXML = false;
+        this.fetchedXML = false;
       } catch (error) {
-        errorHandler.handle(error.message || error);
+        this.errorHandler.handle(error.message || error);
       }
     }
 
-    $scope.editingFile = false;
-    $scope.$applyAsync();
-    appState.setNavigation({ status: true });
-    $scope.$broadcast('closeEditXmlFile', {});
-    $scope.$applyAsync();
-  };
+    this.editingFile = false;
+    this.scope.$applyAsync();
+    this.appState.setNavigation({ status: true });
+    this.scope.$broadcast('closeEditXmlFile', {});
+    this.scope.$applyAsync();
+  }
 
-  $scope.xmlIsValid = valid => {
-    $scope.xmlHasErrors = valid;
-    $scope.$applyAsync();
-  };
+  /**
+   * Checks if the XML is false
+   */
+  xmlIsValid() {
+    this.xmlHasErrors = valid;
+    this.scope.$applyAsync();
+  }
 
   /**
    * This function changes to the rules list view
    */
-  $scope.closeDetailView = clear => {
-    $scope.mctrl.showingLocalRules = !$scope.mctrl.showingLocalRules;
+  closeDetailView(clear) {
+    this.mctrl.showingLocalRules = !this.mctrl.showingLocalRules;
     if (clear)
-      $scope.appliedFilters = $scope.appliedFilters.slice(
+      this.appliedFilters = this.appliedFilters.slice(
         0,
-        $scope.appliedFilters.length - 1
+        this.appliedFilters.length - 1
       );
-    $scope.viewingDetail = false;
-    $scope.currentRule = false;
-    $scope.closeEditingFile();
-    $scope.$emit('removeCurrentRule');
-    $scope.switchLocalRules();
-    $scope.mctrl.showingLocalRules = !$scope.mctrl.showingLocalRules;
-    $scope.$applyAsync();
-  };
-
-  if ($location.search() && $location.search().ruleid) {
-    const incomingRule = $location.search().ruleid;
-    $location.search('ruleid', null);
-    apiReq
-      .request('get', `/rules/${incomingRule}`, {})
-      .then(data => {
-        const response = (((data || {}).data || {}).data || {}).items || [];
-        if (response.length) {
-          const result = response.filter(rule => rule.details.overwrite);
-          $scope.currentRule = result.length ? result[0] : response[0];
-        }
-        $scope.$emit('setCurrentRule', { currentRule: $scope.currentRule });
-        if (
-          !(Object.keys(($scope.currentRule || {}).details || {}) || []).length
-        ) {
-          $scope.currentRule.details = false;
-        }
-        $scope.viewingDetail = true;
-        $scope.$applyAsync();
-      })
-      .catch(() =>
-        errorHandler.handle(
-          `Error fetching rule: ${incomingRule} from the Wazuh API`
-        )
-      );
+    this.viewingDetail = false;
+    this.currentRule = false;
+    this.closeEditingFile();
+    this.scope.$emit('removeCurrentRule');
+    this.switchLocalRules();
+    this.mctrl.showingLocalRules = !this.mctrl.showingLocalRules;
+    this.scope.$applyAsync();
   }
 
-  $scope.toggleSaveConfig = () => {
-    $scope.doingSaving = false;
-    $scope.$applyAsync();
-  };
+  /**
+   * Enable the save
+   */
+  toggleSaveConfig() {
+    this.doingSaving = false;
+    this.scope.$applyAsync();
+  }
 
-  $scope.toggleRestartMsg = () => {
-    $scope.restartBtn = false;
-    $scope.$applyAsync();
-  };
+  /**
+   * Enable the restart
+   */
+  toggleRestartMsg() {
+    this.restartBtn = false;
+    this.scope.$applyAsync();
+  }
 
-  $scope.cancelSaveAndOverwrite = () => {
-    $scope.overwriteError = false;
-    $scope.$applyAsync();
-  };
+  /**
+   * Cancel the save
+   */
+  cancelSaveAndOverwrite() {
+    this.overwriteError = false;
+    this.scope.$applyAsync();
+  }
 
-  $scope.doSaveConfig = () => {
-    const clusterInfo = appState.getClusterInfo();
+  /**
+   * Emit the event to save the config
+   */
+  doSaveConfig() {
+    const clusterInfo = this.appState.getClusterInfo();
     const showRestartManager =
       clusterInfo.status === 'enabled' ? 'cluster' : 'manager';
-    $scope.doingSaving = true;
+    this.doingSaving = true;
     const objParam = {
-      rule: $scope.currentRule,
+      rule: this.currentRule,
       showRestartManager,
-      isOverwrite: !!$scope.overwriteError
-    };
-    $scope.$broadcast('saveXmlFile', objParam);
-  };
+      isOverwrite: !!this.overwriteError
+    }
+    this.scope.$broadcast('saveXmlFile', objParam);
+  }
 
-  $scope.restart = () => {
-    $scope.$emit('performRestart', {});
-  };
-
-  $scope.$on('showRestart', () => {
-    $scope.restartBtn = true;
-    $scope.$applyAsync();
-  });
-
-  $scope.$on('showSaveAndOverwrite', () => {
-    $scope.overwriteError = true;
-    $scope.$applyAsync();
-  });
-
-  $scope.$on('applyFilter', (event, parameters) => {
-    $scope.search(parameters.filter, true);
-  });
-
-  $scope.$on('viewFileOnlyTable', (event, parameters) => {
-    parameters.viewingDetail = $scope.viewingDetail;
-    $scope.mctrl.switchFilesSubTab('rules', { parameters });
-  });
+  /**
+   * Emit the event to restart
+   */
+  restart() {
+    this.scope.$emit('performRestart', {});
+  }
 }
+

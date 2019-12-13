@@ -10,8 +10,10 @@
  * Find more information about this on the LICENSE file.
  */
 import * as FileSaver from '../../services/file-saver';
+import { DataFactory } from '../../services/data-factory';
 import { timefilter } from 'ui/timefilter';
 import { version } from '../../../package.json';
+import { clickAction } from '../../directives/wz-table/lib/click-action';
 
 export class AgentsPreviewController {
   /**
@@ -105,6 +107,33 @@ export class AgentsPreviewController {
     };
     this.hasAgents = true;
     this.init = false;
+    const instance = new DataFactory(
+      this.apiReq,
+      '/agents',
+      false,
+      false
+    )
+    //Props
+    this.tableAgentsProps = {
+      wzReq: (method, path, body) => this.apiReq.request(method, path, body),
+      addingNewAgent: () => { this.addNewAgent(true); this.$scope.$applyAsync() },
+      downloadCsv: (filters = []) => { this.downloadCsv(filters); this.$scope.$applyAsync() },
+      showAgent: (agent) => { this.showAgent(agent); this.$scope.$applyAsync() },
+      getMostActive: async () => { return await this.getMostActive() },
+      clickAction: (item, openAction = false) => {
+        clickAction(
+          item,
+          openAction,
+          instance,
+          this.shareAgent,
+          this.$location,
+          this.$scope,
+          this.appState
+        );
+        this.$scope.$applyAsync()
+      },
+      timeService: (date) => this.timeService.offset(date),
+    }
     //Load
     this.load();
   }
@@ -131,7 +160,7 @@ export class AgentsPreviewController {
   /**
    * Exports the table in CSV format
    */
-  async downloadCsv() {
+  async downloadCsv(filters) {
     try {
       this.errorHandler.info(
         'Your download should begin automatically...',
@@ -140,7 +169,7 @@ export class AgentsPreviewController {
       const output = await this.csvReq.fetch(
         '/agents',
         this.api,
-        this.wzTableFilter.get()
+        filters
       );
       const blob = new Blob([output], { type: 'text/csv' }); // eslint-disable-line
 
@@ -151,6 +180,26 @@ export class AgentsPreviewController {
       this.errorHandler.handle(error, 'Download CSV');
     }
     return;
+  }
+
+  async getMostActive() {
+    try {
+      const data = await this.genericReq.request(
+        'GET',
+        `/elastic/top/${this.firstUrlParam}/${this.secondUrlParam}/agent.name/${this.pattern}`
+      )
+      this.mostActiveAgent.name = data.data.data;
+      const info = await this.genericReq.request(
+        'GET',
+        `/elastic/top/${this.firstUrlParam}/${this.secondUrlParam}/agent.id/${this.pattern}`
+      );
+      if (info.data.data === '' && this.mostActiveAgent.name !== '') {
+        this.mostActiveAgent.id = '000';
+      } else {
+        this.mostActiveAgent.id = info.data.data;
+      }
+      return this.mostActiveAgent;
+    } catch (error) { }
   }
 
   /**
@@ -164,125 +213,22 @@ export class AgentsPreviewController {
       this.$scope.adminMode = !!(configuration || {}).admin;
 
       const clusterInfo = this.appState.getClusterInfo();
-      const firstUrlParam =
+      this.firstUrlParam =
         clusterInfo.status === 'enabled' ? 'cluster' : 'manager';
-      const secondUrlParam = clusterInfo[firstUrlParam];
+      this.secondUrlParam = clusterInfo[this.firstUrlParam];
 
-      const pattern = this.appState.getCurrentPattern();
-
-      const data = await Promise.all([
-        this.genericReq.request('GET', '/api/agents-unique/' + this.api, {}),
-        this.genericReq.request(
-          'GET',
-          `/elastic/top/${firstUrlParam}/${secondUrlParam}/agent.name/${pattern}`
-        )
-      ]);
-      const [agentsUnique, agentsTop] = data;
-      const unique = agentsUnique.data.result;
-
-      this.searchBarModel = {
-        name: [],
-        status: ['Active', 'Disconnected', 'Never connected'],
-        group: unique.groups.sort((a, b) => {
-          return a.toString().localeCompare(b.toString());
-        }),
-        version: unique.versions.sort((a, b) => {
-          return a.toString().localeCompare(b.toString(), undefined, {
-            numeric: true,
-            sensitivity: 'base'
-          });
-        }),
-        'os.platform': unique.osPlatforms
-          .map(x => x.platform)
-          .sort((a, b) => {
-            return a.toString().localeCompare(b.toString());
-          }),
-        'os.version': unique.osPlatforms
-          .map(x => x.version)
-          .sort((a, b) => {
-            return a.toString().localeCompare(b.toString(), undefined, {
-              numeric: true,
-              sensitivity: 'base'
-            });
-          }),
-        'os.name': unique.osPlatforms
-          .map(x => x.name)
-          .sort((a, b) => {
-            return a.toString().localeCompare(b.toString());
-          })
-      };
-
-      if (clusterInfo.status === 'enabled' && unique.nodes) {
-        this.searchBarModel.node_name = unique.nodes;
-      }
-
-      this.searchBarModel['os.name'] = Array.from(
-        new Set(this.searchBarModel['os.name'])
-      );
-      this.searchBarModel['os.version'] = Array.from(
-        new Set(this.searchBarModel['os.version'])
-      );
-      this.searchBarModel['os.platform'] = Array.from(
-        new Set(this.searchBarModel['os.platform'])
-      );
-      this.groups = unique.groups;
-      this.nodes = unique.nodes.map(item => ({ id: item }));
-      this.versions = unique.versions.map(item => ({ id: item }));
-      this.osPlatforms = unique.osPlatforms;
-      this.lastAgent = unique.lastAgent;
-      this.summary = unique.summary;
-      if (!this.lastAgent || !this.lastAgent.id) {
-        if (this.addingNewAgent === undefined) {
-          this.addNewAgent(true);
-        }
-        this.hasAgents = false;
-      } else {
-        this.hasAgents = true;
-      }
-
-      if (agentsTop.data.data === '') {
-        this.mostActiveAgent.name = this.appState.getClusterInfo().manager;
-        this.mostActiveAgent.id = '000';
-      } else {
-        this.mostActiveAgent.name = agentsTop.data.data;
-        const info = await this.genericReq.request(
-          'GET',
-          `/elastic/top/${firstUrlParam}/${secondUrlParam}/agent.id/${pattern}`
-        );
-        if (info.data.data === '' && this.mostActiveAgent.name !== '') {
-          this.mostActiveAgent.id = '000';
-        } else {
-          this.mostActiveAgent.id = info.data.data;
-        }
-      }
+      this.pattern = this.appState.getCurrentPattern();
     } catch (error) {
       this.errorInit = this.errorHandler.handle(error, false, false, true);
     }
     this.loading = false;
     this.$scope.$applyAsync();
+
     return;
   }
 
   addNewAgent(flag) {
     this.addingNewAgent = flag;
-  }
-
-  reloadList() {
-    this.refreshAgentsStats();
-  }
-
-  async refreshAgentsStats() {
-    try {
-      const data = await this.genericReq.request(
-        'GET',
-        '/api/agents-unique/' + this.api,
-        {}
-      );
-      this.summary = ((data.data || {}).result || {}).summary || {};
-    } catch (error) {
-      this.errorHandler.handle('Error refreshing agents stats');
-    }
-    this.$scope.$broadcast('reloadSearchFilterBar', {});
   }
 
   openRegistrationDocs() {

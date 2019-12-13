@@ -10,3 +10,8 @@
  * Find more information about this on the LICENSE file.
  */
 import './eui-loader';
+import { uiModules } from 'ui/modules';
+import { WzFilterBar } from './wz-filter-bar/wz-filter-bar';
+
+const app = uiModules.get('app/wazuh', []);
+app.value('WzFilterBar', WzFilterBar);

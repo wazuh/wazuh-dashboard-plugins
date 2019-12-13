@@ -66,7 +66,6 @@ export class FilesController {
     this.$scope.closeEditingFile = (flag = false) => {
       this.$scope.viewingDetail = false;
       this.$scope.editingFile = false;
-      this.$scope.editingFile = false;
       this.$scope.editorReadOnly = false;
       this.$scope.fetchedXML = null;
       if (this.$scope.goBack || this.$scope.mctrl.openedFileDirect) {

@@ -16,6 +16,10 @@
 
 /* Custom healthcheck and blank screen styles */
 
+.kbnGlobalBannerList{
+  display: none;
+}
+
 .error-notify {
   font-size: 20px;
   color: black;
@@ -161,10 +165,6 @@
 .kuiLocalSearchInput:focus {
   box-shadow: 0 2px 2px -1px rgba(0, 0, 0, 0.1) !important;
   border: 1px solid #d9d9d9 !important;
-}
-
-.euiFlexGroup .euiFlexGroup:hover {
-  background: #fafcfe;
 }
 
 /* Custom Manager/Status styles */
@@ -1010,7 +1010,7 @@ discover-app-w .container-fluid {
 }
 
 .application{
-  //background: #fafbfd;
+  background: #fafbfd;
 }
 
 .application.tab-health-check wz-menu{
@@ -1100,6 +1100,10 @@ md-toolbar.md-default-theme:not(.md-menu-toolbar), md-toolbar:not(.md-menu-toolb
 
 .wz-md-card:not(.fullscreen) .sca-vis.table-scrollable .kbnAggTable__paginated{
   height: 150px;
+}
+
+.wz-margin-16 {
+  margin: 16px;
 }
 
 .wz-margin-10 {
@@ -1254,4 +1258,70 @@ md-chips.md-default-theme .md-chips, md-chips .md-chips{
 
 .table-vis-container{
   overflow: auto !important;
+}
+
+.AgentsTable__soBadge{
+  font-size: 18px!important;
+  padding-right: 3px;
+}
+.AgentsTable__soBadge--windows{
+  color: lightskyblue;
+}
+
+.AgentsTable__soBadge--darwin{
+  color: gray;
+}
+
+.euiStatLink .euiStat__title{
+  cursor: pointer;
+}
+
+.euiStatLink .euiStat__title:hover {
+  text-decoration: underline;
+}
+
+.subdued-background {
+  background: #d3dae6;
+}
+
+.subdued-color {
+  color: #808184;
+}
+
+.react-code-mirror {
+  height: 73vh;
+  border: solid 1px #d9d9d9;
+}
+
+.react-code-mirror > .CodeMirror.CodeMirror-wrap.cm-s-default{
+  height: 100% !important;
+}
+
+.wz-form-row {
+  width: 100% !important;
+  max-width: none !important;
+}
+
+.wz-form-row .euiComboBox {
+  width: 100% !important;
+  max-width: none !important;
+}
+
+.wz-form-row .euiFormControlLayout {
+  width: 100% !important;
+  max-width: none !important;
+}
+
+.wz-form-row .euiComboBox__inputWrap.euiComboBox__inputWrap-isClearable {
+  width: 100% !important;
+  max-width: none !important;
+}
+
+.sideMenuButton .euiButtonEmpty__content{
+  justify-content: left!important;
+}
+
+.sideBarContent{
+  float: right;
+  width: calc(~'100vw - 240px');
 }
