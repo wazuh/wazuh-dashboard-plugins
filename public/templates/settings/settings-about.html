@@ -1,43 +1,57 @@
-<div layout="column" layout-align="start stretch" ng-if="ctrl.tab === 'about' && !ctrl.load">
-
+<div ng-if="ctrl.tab === 'about' && !ctrl.load" class="sideBarContent">
+    <div class="euiPage euiPageBody">
     <!-- App information section -->
-    <div layout="row" layout-align="start center" ng-if="!ctrl.load" class="wz-margin-top-10">
-        <md-card flex class="wz-metric-color wz-md-card">
-            <md-card-content layout="row" class="wz-padding-metric">
+    <div ng-if="!ctrl.load">
+            <div class="euiCallOut euiCallOut--primary" style="display: flex">
                 <div class="wz-text-truncatable" flex>App version: <span
                         class="wz-text-bold">{{ctrl.appInfo["app-version"]}}</span></div>
                 <div class="wz-text-truncatable" flex>App revision: <span
                         class="wz-text-bold">{{ctrl.appInfo["revision"]}}</span></div>
                 <div class="wz-text-truncatable" flex>Install date: <span
                         class="wz-text-bold">{{ctrl.appInfo["installationDate"] | date : "medium"}}</span></div>
-            </md-card-content>
-        </md-card>
+                </div>
     </div>
     <!-- End app information section -->
-
-    <div layout="row">
-        <md-card flex class="wz-md-card">
-            <md-card-content>
-                <react-component name="EuiIcon" props="{type:'iInCircle'}" /> <span class="wz-headline-title">Welcome to
-                    the
-                    Wazuh app for Kibana {{ctrl.kibanaVersion}}</span>
-                <md-divider class="wz-margin-top-10"></md-divider>
-                <div layout="row" layout-padding class="wz-line-height">
+    <div class="euiSpacer euiSpacer--l"></div>
+    <div class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--directionRow euiFlexGroup--responsive">
+            <div class="euiFlexItem">
+        <div class="euiPanel euiPanel--paddingLarge">
+                <div class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--directionRow euiFlexGroup--responsive">
+                        <div class="euiFlexItem euiFlexItem--flexGrowZero">
+                            <div class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--directionRow euiFlexGroup--responsive">
+                                <div class="euiFlexItem">
+                                    <h2 class="euiTitle euiTitle--medium">Welcome to the Wazuh app for Kibana {{ctrl.kibanaVersion}}</h2>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                <div class="euiSpacer euiSpacer--l"></div>
+                <div class="euiText euiText--medium">
+                    <p>
                     Wazuh Kibana plugin provides management and monitoring capabilities, giving users control
                     over the Wazuh infrastructure. Using this plugin you can monitor your agents status and
                     configuration, query and visualize your alert data and monitor manager rules and
                     configuration.
+                </p>
                 </div>
-            </md-card-content>
-        </md-card>
-        <md-card flex class="wz-md-card">
-            <md-card-content>
-                <react-component name="EuiIcon" props="{type:'questionInCircle'}" /> <span
-                    class="wz-headline-title">Community</span>
-                <md-divider class="wz-margin-top-10"></md-divider>
+            </div>
+        </div>
+        <div class="euiFlexItem">
+            <div class="euiPanel euiPanel--paddingLarge">
+                    <div class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--directionRow euiFlexGroup--responsive">
+                            <div class="euiFlexItem euiFlexItem--flexGrowZero">
+                                <div class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--directionRow euiFlexGroup--responsive">
+                                    <div class="euiFlexItem">
+                                        <h2 class="euiTitle euiTitle--medium">Community</h2>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    <div class="euiSpacer euiSpacer--m"></div>
                 <div layout="row" layout-padding class="wz-line-height">
                     Enjoy your Wazuh experience and please don't hesitate to give us your feedback.
                 </div>
+                <div class="euiSpacer euiSpacer--l"></div>
                 <div layout="row" class="layout-align-center-center" flex>
                     <react-component name="EuiButtonIcon"
                         props="{iconType:'logoSlack', iconSize:'xxl', href: 'https://wazuh.com/community/join-us-on-slack/', target: '_blank'}" />
@@ -47,9 +61,8 @@
                         props="{iconType:'logoGithub', iconSize:'xxl', href: 'https://github.com/wazuh/wazuh-kibana-app', target: '_blank'}" />
 
                 </div>
-
-            </md-card-content>
-        </md-card>
+            </div>
+        </div>
     </div>
-
+</div>
 </div>
