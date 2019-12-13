@@ -1,5 +1,5 @@
 /*
- * Wazuh app - React component for groups main table.
+ * Wazuh app - React component for registering agents.
  * Copyright (C) 2015-2019 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -20,17 +20,16 @@ import {
   updateLoadingStatus,
   updateFileContent,
   updateIsProcessing,
-  updatePageIndex,
+  updatePageIndexAgents,
   updateShowModal,
   updateListItemsForRemove,
-  updateSortDirection,
-  updateSortField,
-  updateGroupDetail,
+  updateSortDirectionAgents,
+  updateSortFieldAgents,
 } from '../../../../../redux/actions/groupsActions';
 
-import GroupsColums from './utils/columns-main';
+import GroupsAgentsColums from './utils/columns-agents';
 
-class WzGroupsTable extends Component {
+class WzGroupAgentsTable extends Component {
   _isMounted = false;
   constructor(props) {
     super(props);
@@ -45,6 +44,7 @@ class WzGroupsTable extends Component {
 
   async componentDidMount() {
     this.props.updateIsProcessing(true);
+
     this._isMounted = true;
   }
 
@@ -63,7 +63,10 @@ class WzGroupsTable extends Component {
    */
   async getItems() {
     try {
-      const rawItems = await this.groupsHandler.listGroups(this.buildFilter());
+      const rawItems = await this.groupsHandler.agentsGroup(
+        this.props.state.itemDetail.name,
+        this.buildFilter()
+      );
       const { items, totalItems } = ((rawItems || {}).data || {}).data;
 
       this.setState({
@@ -79,10 +82,10 @@ class WzGroupsTable extends Component {
   }
 
   buildFilter() {
-    const { pageIndex } = this.props.state;
+    const { pageIndexAgents } = this.props.state;
     const { pageSize } = this.state;
     const filter = {
-      offset: pageIndex * pageSize,
+      offset: pageIndexAgents * pageSize,
       limit: pageSize,
       sort: this.buildSortFilter(),
     };
@@ -91,40 +94,40 @@ class WzGroupsTable extends Component {
   }
 
   buildSortFilter() {
-    const { sortField, sortDirection } = this.props.state;
+    const { sortFieldAgents, sortDirectionAgents } = this.props.state;
 
-    const field = sortField;
-    const direction = sortDirection === 'asc' ? '+' : '-';
+    const field = sortFieldAgents;
+    const direction = sortDirectionAgents === 'asc' ? '+' : '-';
 
     return direction + field;
   }
 
   onTableChange = ({ page = {}, sort = {} }) => {
-    const { index: pageIndex, size: pageSize } = page;
-    const { field: sortField, direction: sortDirection } = sort;
+    const { index: pageIndexAgents, size: pageSize } = page;
+    const { field: sortFieldAgents, direction: sortDirectionAgents } = sort;
     this.setState({ pageSize });
-    this.props.updatePageIndex(pageIndex);
-    this.props.updateSortDirection(sortDirection);
-    this.props.updateSortField(sortField);
+    this.props.updatePageIndexAgents(pageIndexAgents);
+    this.props.updateSortDirectionAgents(sortDirectionAgents);
+    this.props.updateSortFieldAgents(sortFieldAgents);
     this.props.updateIsProcessing(true);
   };
 
   render() {
-    this.groupsColumns = new GroupsColums(this.props);
-    const { isLoading, pageIndex, error, sortField, sortDirection } = this.props.state;
+    this.groupsAgentsColumns = new GroupsAgentsColums(this.props);
+    const { isLoading, pageIndexAgents, error, sortFieldAgents, sortDirectionAgents } = this.props.state;
     const { items, pageSize, totalItems } = this.state;
-    const columns = this.groupsColumns.columns;
+    const columns = this.groupsAgentsColumns.columns;
     const message = isLoading ? null : 'No results...';
     const pagination = {
-      pageIndex: pageIndex,
+      pageIndex: pageIndexAgents,
       pageSize: pageSize,
       totalItemCount: totalItems,
       pageSizeOptions: [10, 25, 50, 100],
     };
     const sorting = {
       sort: {
-        field: sortField,
-        direction: sortDirection,
+        field: sortFieldAgents,
+        direction: sortDirectionAgents,
       },
     };
 
@@ -146,7 +149,7 @@ class WzGroupsTable extends Component {
           {this.props.state.showModal ? (
             <EuiOverlayMask>
               <EuiConfirmModal
-                title={`Delete ${itemList[0].file ? itemList[0].file : itemList[0].name} group?`}
+                title={`Delete ${itemList[0].file ? itemList[0].file : itemList[0].name} agent?`}
                 onCancel={() => this.props.updateShowModal(false)}
                 onConfirm={() => {
                   this.removeItems(itemList);
@@ -176,9 +179,11 @@ class WzGroupsTable extends Component {
   };
 
   async removeItems(items) {
+    const { itemDetail } = this.props.state;
+
     this.props.updateLoadingStatus(true);
     const results = items.map(async (item, i) => {
-      await this.groupsHandler.deleteGroup(item.name);
+      await this.groupsHandler.deleteAgent(item.id, itemDetail.name);
     });
 
     Promise.all(results).then(
@@ -207,13 +212,13 @@ const mapDispatchToProps = dispatch => {
     updateLoadingStatus: status => dispatch(updateLoadingStatus(status)),
     updateFileContent: content => dispatch(updateFileContent(content)),
     updateIsProcessing: isProcessing => dispatch(updateIsProcessing(isProcessing)),
-    updatePageIndex: pageIndex => dispatch(updatePageIndex(pageIndex)),
+    updatePageIndexAgents: pageIndexAgents => dispatch(updatePageIndexAgents(pageIndexAgents)),
     updateShowModal: showModal => dispatch(updateShowModal(showModal)),
     updateListItemsForRemove: itemList => dispatch(updateListItemsForRemove(itemList)),
-    updateSortDirection: sortDirection => dispatch(updateSortDirection(sortDirection)),
-    updateSortField: sortField => dispatch(updateSortField(sortField)),
-    updateGroupDetail: itemDetail => dispatch(updateGroupDetail(itemDetail)),
+    updateSortDirectionAgents: sortDirectionAgents =>
+      dispatch(updateSortDirectionAgents(sortDirectionAgents)),
+    updateSortFieldAgents: sortFieldAgents => dispatch(updateSortFieldAgents(sortFieldAgents)),
   };
 };
 
-export default connect(mapStateToProps, mapDispatchToProps)(WzGroupsTable);
+export default connect(mapStateToProps, mapDispatchToProps)(WzGroupAgentsTable);

@@ -92,24 +92,12 @@ export class AgentsTable extends Component {
     });
   }
 
-  async reload() {
+  async reloadAgents() {
     this.setState({
       isProcessing: true,
       isLoading: true,
     });
-    if (this.state.isProcessing) {
-      const {q, search} = this.state;
-      const {q: prevQ, search: prevSearch} = prevState;
-      if (prevQ !== q || prevSearch !== search) {
-        this.setState({pageIndex: 0});
-      }
-      await this.getItems();
-    }
     await this.props.reload();
-    this.setState({
-      isProcessing: false,
-      isLoading: false,
-    });
   }
 
   async componentDidUpdate(prevProps, prevState) {
@@ -394,14 +382,14 @@ export class AgentsTable extends Component {
               Deploy new agent
           </EuiButtonEmpty>
           </EuiFlexItem>
-          {/*           <EuiFlexItem grow={false}>
+          {/* TODO:           <EuiFlexItem grow={false}>
             <EuiButtonEmpty iconType="brush" onClick={() => this.props.addingNewAgent()}>
               Purgue agents
           </EuiButtonEmpty>
           </EuiFlexItem> */}
           {formattedButton}
           <EuiFlexItem grow={false}>
-            <EuiButtonEmpty iconType="refresh" onClick={() => this.reload()}>
+            <EuiButtonEmpty iconType="refresh" onClick={() => this.reloadAgents()}>
               Refresh
           </EuiButtonEmpty>
           </EuiFlexItem>
