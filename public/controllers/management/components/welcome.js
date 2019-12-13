@@ -21,16 +21,27 @@ import {
   EuiSpacer
 } from '@elastic/eui';
 
-export class WelcomeScreen extends Component {
+import {
+  updateManagementSection,
+} from '../../../redux/actions/managementActions';
+import WzReduxProvider from '../../../redux/wz-redux-provider';
+import { connect } from 'react-redux';
+
+class WelcomeScreen extends Component {
   constructor(props) {
     super(props);
 
     this.state = {};
   }
 
+  switchSection(section) {
+    this.props.switchTab(section, true);
+    this.props.changeManagementSection(section);
+  }
+
   render() {
     return (
-      <div>
+      <WzReduxProvider>
         <EuiFlexGroup>
           <EuiFlexItem>
             <EuiPanel betaBadgeLabel="Administration">
@@ -41,7 +52,7 @@ export class WelcomeScreen extends Component {
                     layout="horizontal"
                     icon={<EuiIcon size="xl" type="indexRollupApp" />}
                     title="Ruleset"
-                    onClick={() => this.props.switchTab('ruleset', true)}
+                    onClick={() => this.switchSection('ruleset')}
                     description="Manage your Wazuh cluster ruleset."
                   />
                 </EuiFlexItem>
@@ -50,7 +61,7 @@ export class WelcomeScreen extends Component {
                     layout="horizontal"
                     icon={<EuiIcon size="xl" type="usersRolesApp" />}
                     title="Groups"
-                    onClick={() => this.props.switchTab('groups', true)}
+                    onClick={() => this.switchSection('groups')}
                     description="Manage your agent groups."
                   />
                 </EuiFlexItem>
@@ -61,7 +72,7 @@ export class WelcomeScreen extends Component {
                     layout="horizontal"
                     icon={<EuiIcon size="xl" type="devToolsApp" />}
                     title="Configuration"
-                    onClick={() => this.props.switchTab('configuration', true)}
+                    onClick={() => this.switchSection('configuration')}
                     description="Manage your Wazuh cluster configuration."
                   />
                 </EuiFlexItem>
@@ -78,7 +89,7 @@ export class WelcomeScreen extends Component {
                     layout="horizontal"
                     icon={<EuiIcon size="xl" type="uptimeApp" />}
                     title="Status"
-                    onClick={() => this.props.switchTab('status', true)}
+                    onClick={() => this.switchSection('status')}
                     description="Manage your Wazuh cluster status."
                   />
                 </EuiFlexItem>
@@ -87,7 +98,7 @@ export class WelcomeScreen extends Component {
                     layout="horizontal"
                     icon={<EuiIcon size="xl" type="indexPatternApp" />}
                     title="Cluster"
-                    onClick={() => this.props.switchTab('monitoring', true)}
+                    onClick={() => this.switchSection('monitoring')}
                     description="Visualize your Wazuh cluster."
                   />
                 </EuiFlexItem>
@@ -98,7 +109,7 @@ export class WelcomeScreen extends Component {
                     layout="horizontal"
                     icon={<EuiIcon size="xl" type="filebeatApp" />}
                     title="Logs"
-                    onClick={() => this.props.switchTab('logs', true)}
+                    onClick={() => this.switchSection('logs')}
                     description="Logs from your Wazuh cluster."
                   />
                 </EuiFlexItem>
@@ -107,7 +118,7 @@ export class WelcomeScreen extends Component {
                     layout="horizontal"
                     icon={<EuiIcon size="xl" type="reportingApp" />}
                     title="Reporting"
-                    onClick={() => this.props.switchTab('reporting', true)}
+                    onClick={() => this.switchSection('reporting')}
                     description="Check your stored Wazuh reports."
                   />
                 </EuiFlexItem>
@@ -115,7 +126,7 @@ export class WelcomeScreen extends Component {
             </EuiPanel>
           </EuiFlexItem>
         </EuiFlexGroup>
-      </div>
+      </WzReduxProvider>
     );
   }
 }
@@ -123,3 +134,11 @@ export class WelcomeScreen extends Component {
 WelcomeScreen.propTypes = {
   switchTab: PropTypes.func
 };
+
+const mapDispatchToProps = (dispatch) => {
+  return {
+    changeManagementSection: section => dispatch(updateManagementSection(section)),
+  }
+};
+
+export default connect(null, mapDispatchToProps)(WelcomeScreen);
