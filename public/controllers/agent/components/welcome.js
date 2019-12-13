@@ -25,7 +25,8 @@ import {
   EuiButtonIcon,
   EuiFormRow,
   EuiFlexGrid,
-  EuiCallOut
+  EuiCallOut,
+  EuiTitle,
 } from '@elastic/eui';
 
 import { TabDescription } from '../../../../server/reporting/tab-description';
@@ -36,19 +37,19 @@ export class WelcomeScreen extends Component {
     super(props);
 
     this.state = {
-      extensions: this.props.extensions
+      extensions: this.props.extensions,
     };
   }
 
   onButtonClick(btn) {
     this.setState({
-      [btn]: !this.state[btn]
+      [btn]: !this.state[btn],
     });
   }
 
   closePopover(popover) {
     this.setState({
-      [popover]: false
+      [popover]: false,
     });
   }
 
@@ -56,7 +57,7 @@ export class WelcomeScreen extends Component {
     const extensions = this.state.extensions;
     extensions[extension] = !extensions[extension];
     this.setState({
-      extensions
+      extensions,
     });
     try {
       const api = JSON.parse(this.props.api).id;
@@ -68,8 +69,10 @@ export class WelcomeScreen extends Component {
     return (
       <EuiFlexItem>
         <EuiCard
+          size="xs"
           layout="horizontal"
-          icon={<EuiIcon size="xl" type={icon} />}
+          icon={<EuiIcon size="xl" type={icon} color="primary" />}
+          className="homSynopsis__card"
           title={TabDescription[tab].title}
           onClick={() => this.props.switchTab(tab)}
           description={TabDescription[tab].description}
@@ -116,7 +119,14 @@ export class WelcomeScreen extends Component {
       <div>
         <EuiFlexGroup>
           <EuiFlexItem>
-            <EuiPanel betaBadgeLabel="Security Information Management">
+            <EuiPanel>
+              <EuiFlexGroup gutterSize="xs">
+                <EuiFlexItem>
+                  <EuiTitle size="s">
+                    <h2>Security Information Management</h2>
+                  </EuiTitle>
+                </EuiFlexItem>
+              </EuiFlexGroup>
               <EuiSpacer size="l" />
               <EuiFlexGrid columns={2}>
                 {this.buildTabCard('general', 'dashboardApp')}
@@ -127,26 +137,24 @@ export class WelcomeScreen extends Component {
             </EuiPanel>
           </EuiFlexItem>
           <EuiFlexItem>
-            <EuiPanel betaBadgeLabel="Auditing and Policy Monitoring">
+            <EuiPanel>
               <EuiFlexGroup gutterSize="xs">
-                <EuiFlexItem />
+                <EuiFlexItem>
+                  <EuiTitle size="s">
+                    <h2>Auditing and Policy Monitoring</h2>
+                  </EuiTitle>
+                </EuiFlexItem>
                 <EuiFlexItem grow={false}>
-                  {this.buildPopover('popoverAuditing', [
-                    'audit',
-                    'oscap',
-                    'ciscat'
-                  ])}
+                  {this.buildPopover('popoverAuditing', ['audit', 'oscap', 'ciscat'])}
                 </EuiFlexItem>
               </EuiFlexGroup>
+              <EuiSpacer size="l" />
               <EuiFlexGrid columns={2}>
                 {this.buildTabCard('pm', 'advancedSettingsApp')}
                 {this.buildTabCard('sca', 'securityAnalyticsApp')}
-                {this.props.extensions.audit &&
-                  this.buildTabCard('audit', 'monitoringApp')}
-                {this.props.extensions.oscap &&
-                  this.buildTabCard('oscap', 'codeApp')}
-                {this.props.extensions.ciscat &&
-                  this.buildTabCard('ciscat', 'auditbeatApp')}
+                {this.props.extensions.audit && this.buildTabCard('audit', 'monitoringApp')}
+                {this.props.extensions.oscap && this.buildTabCard('oscap', 'codeApp')}
+                {this.props.extensions.ciscat && this.buildTabCard('ciscat', 'auditbeatApp')}
               </EuiFlexGrid>
             </EuiPanel>
           </EuiFlexItem>
@@ -155,9 +163,13 @@ export class WelcomeScreen extends Component {
         <EuiSpacer size="xl" />
         <EuiFlexGroup>
           <EuiFlexItem>
-            <EuiPanel betaBadgeLabel="Threat Detection and Response">
+            <EuiPanel>
               <EuiFlexGroup gutterSize="xs">
-                <EuiFlexItem />
+                <EuiFlexItem>
+                  <EuiTitle size="s">
+                    <h2>Threat Detection and Response</h2>
+                  </EuiTitle>
+                </EuiFlexItem>
                 <EuiFlexItem grow={false}>
                   {this.buildPopover('popoverThreat', [
                     'virustotal',
@@ -167,6 +179,7 @@ export class WelcomeScreen extends Component {
                   ])}
                 </EuiFlexItem>
               </EuiFlexGroup>
+              <EuiSpacer size="l" />
               {(
                 UnsupportedComponents[this.props.agent.agentPlatform] ||
                 UnsupportedComponents['other']
@@ -180,8 +193,8 @@ export class WelcomeScreen extends Component {
                       <EuiCallOut
                         title={
                           <p>
-                            Click the <EuiIcon type="eye" /> icon to show thread
-                            detection and response extensions.
+                            Click the <EuiIcon type="eye" /> icon to show thread detection and
+                            response extensions.
                           </p>
                         }
                         color="success"
@@ -207,18 +220,18 @@ export class WelcomeScreen extends Component {
             </EuiPanel>
           </EuiFlexItem>
           <EuiFlexItem>
-            <EuiPanel betaBadgeLabel="Regulatory Compliance">
+            <EuiPanel>
               <EuiFlexGroup gutterSize="xs">
-                <EuiFlexItem />
+                <EuiFlexItem>
+                  <EuiTitle size="s">
+                    <h2>Regulatory Compliance</h2>
+                  </EuiTitle>
+                </EuiFlexItem>
                 <EuiFlexItem grow={false}>
-                  {this.buildPopover('popoverRegulatory', [
-                    'pci',
-                    'gdpr',
-                    'hipaa',
-                    'nist'
-                  ])}
+                  {this.buildPopover('popoverRegulatory', ['pci', 'gdpr', 'hipaa', 'nist'])}
                 </EuiFlexItem>
               </EuiFlexGroup>
+              <EuiSpacer size="l" />
               {!this.props.extensions.pci &&
                 !this.props.extensions.gdpr &&
                 !this.props.extensions.hipaa &&
@@ -228,8 +241,8 @@ export class WelcomeScreen extends Component {
                       <EuiCallOut
                         title={
                           <p>
-                            Click the <EuiIcon type="eye" /> icon to show
-                            regulatory compliance extensions.
+                            Click the <EuiIcon type="eye" /> icon to show regulatory compliance
+                            extensions.
                           </p>
                         }
                         color="success"
@@ -243,14 +256,10 @@ export class WelcomeScreen extends Component {
                 this.props.extensions.hipaa ||
                 this.props.extensions.nist) && (
                 <EuiFlexGrid columns={2}>
-                  {this.props.extensions.pci &&
-                    this.buildTabCard('pci', 'visTagCloud')}
-                  {this.props.extensions.gdpr &&
-                    this.buildTabCard('gdpr', 'visBarVertical')}
-                  {this.props.extensions.hipaa &&
-                    this.buildTabCard('hipaa', 'emsApp')}
-                  {this.props.extensions.nist &&
-                    this.buildTabCard('nist', 'apmApp')}
+                  {this.props.extensions.pci && this.buildTabCard('pci', 'visTagCloud')}
+                  {this.props.extensions.gdpr && this.buildTabCard('gdpr', 'visBarVertical')}
+                  {this.props.extensions.hipaa && this.buildTabCard('hipaa', 'emsApp')}
+                  {this.props.extensions.nist && this.buildTabCard('nist', 'apmApp')}
                 </EuiFlexGrid>
               )}
             </EuiPanel>
@@ -266,5 +275,5 @@ WelcomeScreen.propTypes = {
   agent: PropTypes.object,
   setExtensions: PropTypes.func,
   switchTab: PropTypes.func,
-  api: PropTypes.string
+  api: PropTypes.string,
 };

@@ -1,6 +1,6 @@
 const initialState = { section: '' };
 
-export default (state = initialState, action) => {
+const managementReducers = (state = initialState, action) => {
   if (action.type === 'UPDATE_MANAGEMENT_SECTION') {
     return {
       ...state,
@@ -11,4 +11,4 @@ export default (state = initialState, action) => {
   return state;
 };
 
-export const changeManagementSection = state => state.managementReducers.section;
+export default managementReducers;

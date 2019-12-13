@@ -21,7 +21,7 @@ export const changeWazuhNavLogo = () => {
     }
     const url = chrome.addBasePath('/plugins/wazuh/img/logo.svg');
     $('.euiBreadcrumb').html(
-      `<img src="${url}" class="navBarLogo" alt="">`
+      `<div class="wz-menu-logo"><img src="${url}" class="navBarLogo" alt=""></div>`
     );
   }, 100);
 };

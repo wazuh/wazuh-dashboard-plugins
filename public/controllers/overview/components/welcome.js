@@ -25,7 +25,9 @@ import {
   EuiButtonIcon,
   EuiFormRow,
   EuiFlexGrid,
-  EuiCallOut
+  EuiCallOut,
+  EuiTitle,
+  EuiPage
 } from '@elastic/eui';
 
 import { TabDescription } from '../../../../server/reporting/tab-description';
@@ -61,7 +63,7 @@ export class WelcomeScreen extends Component {
     try {
       const api = JSON.parse(this.props.api).id;
       api && this.props.setExtensions(api, extensions);
-    } catch (error) {} //eslint-disable-line
+    } catch (error) { } //eslint-disable-line
   }
 
   buildTabCard(tab, icon) {
@@ -70,7 +72,8 @@ export class WelcomeScreen extends Component {
         <EuiCard
           size="xs"
           layout="horizontal"
-          icon={<EuiIcon size="xl" type={icon} />}
+          icon={<EuiIcon size="xl" type={icon} color='primary' />}
+          className='homSynopsis__card'
           title={TabDescription[tab].title}
           onClick={() => this.props.switchTab(tab)}
           data-test-subj={`overviewWelcome${this.strtools.capitalize(tab)}`}
@@ -115,129 +118,151 @@ export class WelcomeScreen extends Component {
 
   render() {
     return (
-      <div>
+      <EuiPage style={{padding:0}}>
         <EuiFlexGroup>
           <EuiFlexItem>
-            <EuiPanel betaBadgeLabel="Security Information Management">
-              <EuiFlexGroup gutterSize="xs">
-                <EuiFlexItem />
-                <EuiFlexItem grow={false}>
-                  {this.buildPopover('popoverSecurity', ['aws'])}
-                </EuiFlexItem>
-              </EuiFlexGroup>
-              <EuiFlexGrid columns={2}>
-                {this.buildTabCard('general', 'dashboardApp')}
-                {this.buildTabCard('fim', 'loggingApp')}
-                {this.props.extensions.aws &&
-                  this.buildTabCard('aws', 'logoAWSMono')}
-              </EuiFlexGrid>
-            </EuiPanel>
-          </EuiFlexItem>
-          <EuiFlexItem>
-            <EuiPanel betaBadgeLabel="Auditing and Policy Monitoring">
-              <EuiFlexGroup gutterSize="xs">
-                <EuiFlexItem />
-                <EuiFlexItem grow={false}>
-                  {this.buildPopover('popoverAuditing', [
-                    'audit',
-                    'oscap',
-                    'ciscat'
-                  ])}
-                </EuiFlexItem>
-              </EuiFlexGroup>
-              <EuiFlexGrid columns={2}>
-                {this.buildTabCard('pm', 'advancedSettingsApp')}
-                {this.props.extensions.audit &&
-                  this.buildTabCard('audit', 'monitoringApp')}
-                {this.props.extensions.oscap &&
-                  this.buildTabCard('oscap', 'codeApp')}
-                {this.props.extensions.ciscat &&
-                  this.buildTabCard('ciscat', 'auditbeatApp')}
-              </EuiFlexGrid>
-            </EuiPanel>
-          </EuiFlexItem>
-        </EuiFlexGroup>
 
-        <EuiSpacer size="xl" />
-        <EuiFlexGroup>
-          <EuiFlexItem>
-            <EuiPanel betaBadgeLabel="Threat Detection and Response">
-              <EuiFlexGroup gutterSize="xs">
-                <EuiFlexItem />
-                <EuiFlexItem grow={false}>
-                  {this.buildPopover('popoverThreat', [
-                    'virustotal',
-                    'osquery',
-                    'mitre',
-                    'docker'
-                  ])}
-                </EuiFlexItem>
-              </EuiFlexGroup>
-              <EuiFlexGrid columns={2}>
-                {this.buildTabCard('vuls', 'securityApp')}
-                {this.props.extensions.virustotal &&
-                  this.buildTabCard('virustotal', 'savedObjectsApp')}
-                {this.props.extensions.osquery &&
-                  this.buildTabCard('osquery', 'searchProfilerApp')}
-                {this.props.extensions.docker &&
-                  this.buildTabCard('docker', 'spacesApp')}
-                {this.props.extensions.mitre &&
-                  this.buildTabCard('mitre', 'spacesApp')} {/* TODO- Change "spacesApp" icon*/}
-              </EuiFlexGrid>
-            </EuiPanel>
-          </EuiFlexItem>
-
-          <EuiFlexItem>
-            <EuiPanel betaBadgeLabel="Regulatory Compliance">
-              <EuiFlexGroup gutterSize="xs">
-                <EuiFlexItem />
-                <EuiFlexItem grow={false}>
-                  {this.buildPopover('popoverRegulatory', [
-                    'pci',
-                    'gdpr',
-                    'hipaa',
-                    'nist'
-                  ])}
-                </EuiFlexItem>
-              </EuiFlexGroup>
-              {!this.props.extensions.pci &&
-                !this.props.extensions.gdpr &&
-                !this.props.extensions.hipaa &&
-                !this.props.extensions.nist && (
-                  <EuiFlexGroup>
+            <EuiFlexGroup>
+              <EuiFlexItem>
+                <EuiPanel>
+                  <EuiFlexGroup gutterSize="xs">
                     <EuiFlexItem>
-                      <EuiCallOut
-                        title={
-                          <p>
-                            Click the <EuiIcon type="eye" /> icon to show
-                            regulatory compliance extensions.
-                          </p>
-                        }
-                        color="success"
-                        iconType="help"
-                      />
+                      <EuiTitle size="s">
+                        <h2>Security Information Management</h2>
+                      </EuiTitle>
+                    </EuiFlexItem>
+                    <EuiFlexItem grow={false}>
+                      {this.buildPopover('popoverSecurity', ['aws'])}
                     </EuiFlexItem>
                   </EuiFlexGroup>
-                )}
-              {(this.props.extensions.pci ||
-                this.props.extensions.gdpr ||
-                this.props.extensions.hipaa ||
-                this.props.extensions.nist) && (
-                <EuiFlexGrid columns={2}>
-                  {this.props.extensions.pci &&
-                    this.buildTabCard('pci', 'visTagCloud')}
-                  {this.props.extensions.gdpr &&
-                    this.buildTabCard('gdpr', 'visBarVertical')}
-                  {this.props.extensions.hipaa &&
-                    this.buildTabCard('hipaa', 'emsApp')}
-                  {this.props.extensions.nist &&
-                    this.buildTabCard('nist', 'apmApp')}
-                </EuiFlexGrid>
-              )}
-            </EuiPanel>
+                  <EuiSpacer size='m' />
+                  <EuiFlexGrid columns={2}>
+                    {this.buildTabCard('general', 'dashboardApp')}
+                    {this.buildTabCard('fim', 'loggingApp')}
+                    {this.props.extensions.aws &&
+                      this.buildTabCard('aws', 'logoAWSMono')}
+                  </EuiFlexGrid>
+                </EuiPanel>
+              </EuiFlexItem>
+              <EuiFlexItem>
+                <EuiPanel>
+                  <EuiFlexGroup gutterSize="xs">
+                    <EuiFlexItem>
+                      <EuiTitle size="s">
+                        <h2>Auditing and Policy Monitoring</h2>
+                      </EuiTitle>
+                    </EuiFlexItem>
+                    <EuiFlexItem grow={false}>
+                      {this.buildPopover('popoverAuditing', [
+                        'audit',
+                        'oscap',
+                        'ciscat'
+                      ])}
+                    </EuiFlexItem>
+                  </EuiFlexGroup>
+                  <EuiSpacer size='m' />
+                  <EuiFlexGrid columns={2}>
+                    {this.buildTabCard('pm', 'advancedSettingsApp')}
+                    {this.props.extensions.audit &&
+                      this.buildTabCard('audit', 'monitoringApp')}
+                    {this.props.extensions.oscap &&
+                      this.buildTabCard('oscap', 'codeApp')}
+                    {this.props.extensions.ciscat &&
+                      this.buildTabCard('ciscat', 'auditbeatApp')}
+                  </EuiFlexGrid>
+                </EuiPanel>
+              </EuiFlexItem>
+            </EuiFlexGroup>
+            <EuiSpacer size="xl" />
+            <EuiFlexGroup>
+              <EuiFlexItem>
+                <EuiPanel>
+                  <EuiFlexGroup gutterSize="xs">
+                    <EuiFlexItem>
+                      <EuiTitle size="s">
+                        <h2>Threat Detection and Response</h2>
+                      </EuiTitle>
+                    </EuiFlexItem>
+                    <EuiFlexItem grow={false}>
+                      {this.buildPopover('popoverThreat', [
+                        'virustotal',
+                        'osquery',
+                        'docker'
+                      ])}
+                    </EuiFlexItem>
+                  </EuiFlexGroup>
+                  <EuiSpacer size='m' />
+                  <EuiFlexGrid columns={2}>
+                    {this.buildTabCard('vuls', 'securityApp')}
+                    {this.props.extensions.virustotal &&
+                      this.buildTabCard('virustotal', 'savedObjectsApp')}
+                    {this.props.extensions.osquery &&
+                      this.buildTabCard('osquery', 'searchProfilerApp')}
+                    {this.props.extensions.docker &&
+                      this.buildTabCard('docker', 'spacesApp')}
+                    {this.props.extensions.mitre &&
+                      this.buildTabCard('mitre', 'spacesApp')} {/* TODO- Change "spacesApp" icon*/}
+                  </EuiFlexGrid>
+                </EuiPanel>
+              </EuiFlexItem>
+              <EuiFlexItem>
+                <EuiPanel>
+                  <EuiFlexGroup gutterSize="xs">
+                    <EuiFlexItem>
+                      <EuiTitle size="s">
+                        <h2>Regulatory Compliance</h2>
+                      </EuiTitle>
+                    </EuiFlexItem>
+                    <EuiFlexItem grow={false}>
+                      {this.buildPopover('popoverRegulatory', [
+                        'pci',
+                        'gdpr',
+                        'hipaa',
+                        'nist'
+                      ])}
+                    </EuiFlexItem>
+                  </EuiFlexGroup>
+                  <EuiSpacer size='m' />
+                  {!this.props.extensions.pci &&
+                    !this.props.extensions.gdpr &&
+                    !this.props.extensions.hipaa &&
+                    !this.props.extensions.nist && (
+                      <EuiFlexGroup>
+                        <EuiFlexItem>
+                          <EuiCallOut
+                            title={
+                              <p>
+                                Click the <EuiIcon type="eye" /> icon to show
+                                regulatory compliance extensions.
+                          </p>
+                            }
+                            color="success"
+                            iconType="help"
+                          />
+                        </EuiFlexItem>
+                      </EuiFlexGroup>
+                    )}
+                  {(this.props.extensions.pci ||
+                    this.props.extensions.gdpr ||
+                    this.props.extensions.hipaa ||
+                    this.props.extensions.nist) && (
+                      <EuiFlexGrid columns={2}>
+                        {this.props.extensions.pci &&
+                          this.buildTabCard('pci', 'visTagCloud')}
+                        {this.props.extensions.gdpr &&
+                          this.buildTabCard('gdpr', 'visBarVertical')}
+                        {this.props.extensions.hipaa &&
+                          this.buildTabCard('hipaa', 'emsApp')}
+                        {this.props.extensions.nist &&
+                          this.buildTabCard('nist', 'apmApp')}
+                      </EuiFlexGrid>
+                    )}
+                </EuiPanel>
+              </EuiFlexItem>
+            </EuiFlexGroup>
           </EuiFlexItem>
         </EuiFlexGroup>
-      </div>
+      </EuiPage>
     );
   }
 }

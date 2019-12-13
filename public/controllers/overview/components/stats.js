@@ -12,7 +12,7 @@
  */
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { EuiStat, EuiFlexItem, EuiFlexGroup } from '@elastic/eui';
+import { EuiStat, EuiFlexItem, EuiFlexGroup, EuiPage } from '@elastic/eui';
 
 export class Stats extends Component {
   constructor(props) {
@@ -23,7 +23,7 @@ export class Stats extends Component {
 
   render() {
     return (
-      <div>
+      <EuiPage>
         <EuiFlexGroup>
           <EuiFlexItem />
           <EuiFlexItem>
@@ -60,7 +60,7 @@ export class Stats extends Component {
           </EuiFlexItem>
           <EuiFlexItem />
         </EuiFlexGroup>
-      </div>
+      </EuiPage>
     );
   }
 }

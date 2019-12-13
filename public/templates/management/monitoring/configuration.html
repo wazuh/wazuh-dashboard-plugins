@@ -2,25 +2,24 @@
 <div layout="row" layout-align="start stretch" class="wz-timelions wz-margin-top-0" ng-show="showConfig">
 
     <!-- Overview visualization card -->
-    <md-card class="wz-md-card"
+    <div class="euiPanel euiFlexItem wz-margin-10" class="wz-md-card"
         ng-class="{'no-opacity-overview-monitoring': resultState !== 'ready' || !rendered,'flex-30': resultState === 'ready' && rendered}">
         <md-card-content class="wazuh-column">
-            <span class="wz-headline-title">Top 5 nodes</span>
-            <md-divider class="wz-margin-top-10"></md-divider>
+            <span class="embPanel__header embPanel__title embPanel__dragger layout-row wz-headline-title">Top 5 nodes</span>
             <kbn-vis ng-show="rendered" vis-id="'Wazuh-App-Cluster-monitoring-Overview-Node-Pie'"
                 id="Wazuh-App-Cluster-monitoring-Overview-Node-Pie"></kbn-vis>
             <span class="wz-padding-top-10 wz-text-center" ng-show="!rendered">There are no results for selected time
                 range. Try another one.</span>
         </md-card-content>
-    </md-card>
+    </div>
 
     <!-- Cluster configuration card -->
     <md-card flex class="wz-md-card">
-        <md-card-content>
-            <i class="fa fa-fw fa-server" aria-hidden="true"></i> <span class="wz-headline-title">Cluster
-                configuration</span>
-            <md-divider class="wz-margin-top-10"></md-divider>
-            <!-- Configuration options -->
+            <md-card-content>
+                <i class="fa fa-fw fa-server" aria-hidden="true"></i> <span class="wz-headline-title">Cluster
+                    configuration</span>
+                <md-divider class="wz-margin-top-10"></md-divider>
+                <!-- Configuration options -->
             <div layout="row" class="wz-padding-top-10">
                 <span flex="25">Disabled</span>
                 <span class="color-grey">{{configuration.disabled}}</span>
