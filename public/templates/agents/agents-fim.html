@@ -203,35 +203,7 @@
         </md-card>
     </div>
 
-    <div layout="row" class="wz-padding-top-0" ng-if="agent && agent.os && agent.os.platform !== 'windows'">
-        <md-card flex="" class="wz-md-card _md flex">
-            <md-card-content class="wz-padding-bottom-30">
-                <div layout="row" class="wz-margin-top-10 wz-margin-bottom-25">
-                    <input placeholder="Filter files..." ng-model="filesSearch" type="text"
-                        class="kuiLocalSearchInput ng-empty ng-pristine ng-scope ng-touched ng-valid height-30"
-                        aria-invalid="false" wz-enter="searchSyscheckFile(filesSearch)">
-                    <button type="submit" aria-label="Search" class="kuiLocalSearchButton height-30"
-                        ng-click="searchSyscheckFile(filesSearch)">
-                        <span class="fa fa-search" aria-hidden="true"></span>
-                    </button>
-                </div>
-                <div layout="row" ng-if="agent && !load" class="wz-margin-top-16 wz-margin-bottom-40-inv">
-                    <wz-table custom-columns="true" flex path="'/syscheck/' + agent.id" row-sizes="[16,14,12]"
-                       
-                        keys="['file',{value: 'size', width: '100px'},{value: 'gname', width: '150px'},{value: 'uname', width: '150px'},{value: 'perm', width: '125px'},'sha256',{value: 'uid', width: '100px'},{value: 'gid', width: '100px'},{value: 'mtime', width: '150px'}]">
-                    </wz-table>
-                </div>
-            </md-card-content>
-            <md-card-actions layout="row" layout-align="end center" class="layout-align-end-center layout-row">
-
-                <button type="button" ng-click="downloadCsv('/syscheck/' + agent.id, 'fim-files.csv')"
-                    class="euiButtonEmpty euiButtonEmpty--primary euiButtonEmpty--small">
-                    <span class="euiButtonEmpty__content">
-                        <react-component name="EuiIcon" props="{type:'importAction'}" />
-                        <span class="euiButtonEmpty__text">Formatted</span>
-                    </span>
-                </button>
-            </md-card-actions>
-        </md-card>
+    <div layout="row" class="wz-margin-10" ng-if="agent && agent.os && agent.os.platform !== 'windows'">
+        <react-component name="SyscheckTable" props="syscheckTableProps" />
     </div>
 </md-content>

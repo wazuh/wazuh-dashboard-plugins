@@ -27,6 +27,7 @@ import {
 } from '@elastic/eui';
 
 import { BasicTable } from '../directives/wz-table-eui/components/table';
+import { SyscheckTable } from '../directives/wz-syscheck-table/components/syscheck-table';
 import { Tabs } from '../directives/wz-tabs-eui/components/tabs';
 
 const app = uiModules.get('app/wazuh', ['react']);
@@ -45,4 +46,5 @@ app
   .value('BasicTable', BasicTable)
   .value('Tabs', Tabs)
   .value('EuiSwitch', EuiSwitch)
+  .value('SyscheckTable', SyscheckTable)
   .value('EuiSpacer', EuiSpacer);
