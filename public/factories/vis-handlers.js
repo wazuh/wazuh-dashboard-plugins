@@ -57,33 +57,35 @@ export class VisHandlers {
 
     // Check raw response from all rendered tables
     const tables = this.list
-      .filter(item => (((item || {}).vis || {})._state || {}).type === 'table')
+      .filter(item => (((item || {}).vis || {}).type || {}).type === 'table')
       .map(item => {
         const columns = [];
-        for (const table of item.dataLoader.visData.tables) {
-          columns.push(...table.columns.map(t => t.name));
-        }
+         for (const agg of item.vis._state.aggs.filter(x => x.params.customLabel)) {
+          columns.push(agg.params.customLabel);
+        } 
+        const count = item.vis._state.aggs.find(x => !x.params.customLabel);
+        columns.push(count.type)
 
         return !!(((item || {}).vis || {}).searchSource || {}).rawResponse
           ? {
-              rawResponse: item.vis.searchSource.rawResponse,
-              title:
-                item.vis.title ||
-                item.dataLoader.previousVisState.title ||
-                'Table',
-              columns
-            }
+            rawResponse: item.vis.searchSource.rawResponse,
+            title:
+              item.vis._state.title ||
+              item.dataLoader.previousVisState.title ||
+              'Table',
+            columns
+          }
           : false;
       });
 
     if (this.list && this.list.length) {
       const visualization = this.list[0].vis;
-      // Parse applied filters for the first visualization
-      const filters = visualization.API.queryFilter.getFilters();
 
       // Parse current time range
-      const { from, to } = visualization.API.timeFilter.getTime();
+      const { from, to } = visualization.filters.timeRange;
       const { query } = visualization.searchSource._fields.query;
+      // Parse applied filters for the first visualization
+      const filters = visualization.searchSource._fields.filter;
 
       Object.assign(appliedFilters, {
         filters,
@@ -109,7 +111,7 @@ export class VisHandlers {
         item.vis &&
         item.vis.title !== 'Agents status' &&
         ((item.dataLoader || {}).previousVisState || {}).title !==
-          'Agents status' &&
+        'Agents status' &&
         item.vis.searchSource &&
         item.vis.searchSource.rawResponse &&
         item.vis.searchSource.rawResponse.hits &&
