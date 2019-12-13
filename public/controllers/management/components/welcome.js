@@ -36,7 +36,7 @@ class WelcomeScreen extends Component {
 
   switchSection(section) {
     this.props.switchTab(section, true);
-    this.props.changeManagementSection(section);
+    this.props.updateManagementSection(section);
   }
 
   render() {
@@ -137,7 +137,7 @@ WelcomeScreen.propTypes = {
 
 const mapDispatchToProps = (dispatch) => {
   return {
-    changeManagementSection: section => dispatch(updateManagementSection(section)),
+    updateManagementSection: section => dispatch(updateManagementSection(section)),
   }
 };
 
