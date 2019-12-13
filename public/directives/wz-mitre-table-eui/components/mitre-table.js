@@ -16,8 +16,7 @@ import PropTypes from 'prop-types';
 import { EuiPanel,
   EuiBasicTable,
   EuiFlexItem, 
-  EuiFlexGroup, 
-  EuiButtonEmpty, 
+  EuiFlexGroup,
   EuiTitle,
   EuiTextColor,
   EuiFieldSearch, 
@@ -31,7 +30,6 @@ import { EuiPanel,
   EuiSpacer,
   EuiDescriptionList,
 } from '@elastic/eui';
-import { array } from 'joi';
 
 
  export class MitreTable extends Component {
@@ -75,21 +73,31 @@ import { array } from 'joi';
       "id": tactic.id,
       "name": tactic.json.name,
       "phase_name": tactic.phases,
-      "modified": tactic.json.modified,
+      "modified": new Date(tactic.json.modified).toLocaleString('en-ZA').replace(',', ''),
       "actions": tactic
     }
   }
 
 
    async getItems(){
-    const tactics = await this.props.wzReq('GET','/mitre',this.buildFilter());
-    const formattedTactics =  (((tactics || {}).data || {}).data || {}).items.map(this.formatTactic);
-
-     this.setState({
-      tactics: formattedTactics,
-      totalItems: (((tactics || {}).data || {}).data || {}).totalItems - 1,
-      isProcessing: false,
-    });
+    try{
+      const tactics = await this.props.wzReq('GET','/mitre',this.buildFilter());
+      const formattedTactics =  (((tactics || {}).data || {}).data || {}).items.map(this.formatTactic);
+      formattedTactics.map( (key) => {
+        if(this.props.attacksCount && this.props.attacksCount[key.id]){
+          key["count"] = this.props.attacksCount[key.id];
+        }else{
+          key["count"] = 0;
+        }
+      });
+  
+       this.setState({
+        tactics: formattedTactics,
+        totalItems: (((tactics || {}).data || {}).data || {}).totalItems - 1,
+        isProcessing: false,
+      });
+     }catch(error){ } // eslint-disable-line
+     
   }
 
    buildFilter() {
@@ -131,6 +139,7 @@ import { array } from 'joi';
         field: 'id',
         name: 'ID',
         sortable: true,
+        width: "100px"
       },
       {
         field: 'name',
@@ -146,7 +155,13 @@ import { array } from 'joi';
         field: 'phase_name',
         name: 'Phases',
         sortable: true,
-      }
+      },
+      {
+        field: 'count',
+        name: 'Alerts Count',
+        sortable: false,
+        width: "150px"
+      },
     ];
   }
 

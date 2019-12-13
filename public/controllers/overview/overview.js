@@ -128,9 +128,6 @@ export class OverviewController {
       setExtensions: (api, extensions) =>
         this.appState.setExtensions(api, extensions)
     };
-    this.mitreTableProps = {
-      wzReq: (method, path, body) => this.apiReq.request(method, path, body)
-    }
 
     this.setTabs();
 
@@ -317,6 +314,11 @@ export class OverviewController {
           wzReq: (method, path, body) => this.apiReq.request(method, path, body),
           addFilter: (id) => this.addMitrefilter(id)
         }
+
+        this.mitreTableProps = {
+          wzReq: (method, path, body) => this.apiReq.request(method, path, body),
+          attacksCount: this.$scope.attacksCount,
+        }
       }
 
       if (newTab === 'hipaa') {
@@ -438,7 +440,10 @@ export class OverviewController {
           this.$scope.attacksCount[rows[i]["col-0-2"]] = rows[i]["col-1-1"]
         }
 
-        
+        this.mitreTableProps = {
+          wzReq: (method, path, body) => this.apiReq.request(method, path, body),
+          attacksCount: this.$scope.attacksCount,
+        }
         this.mitreCardsSliderProps = {
           items: this.$scope.mitreIds,
           attacksCount: this.$scope.attacksCount,
