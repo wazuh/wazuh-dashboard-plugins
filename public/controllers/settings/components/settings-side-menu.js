@@ -80,7 +80,7 @@ export default class WzSettingsSideMenu extends Component {
             <EuiFlexItem grow={false} style={{ width: 190 }}>
               <EuiSideNav items={sideNav} style={{ padding: 16 }} />
             </EuiFlexItem>
-            <EuiFlexItem>
+            <EuiFlexItem style={{ marginLeft: '6px' }}>
               <WzConfigurationSettings {...this.props} />
             </EuiFlexItem>
           </EuiFlexGroup>

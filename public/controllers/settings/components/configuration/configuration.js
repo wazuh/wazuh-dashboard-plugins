@@ -38,7 +38,7 @@ export class WzConfigurationSettings extends Component {
 
   render() {
     return (
-      <EuiPage>
+      <EuiPage style={{ paddingLeft: 0 }}>
         <EuiPanel paddingSize="l">
           <EuiFlexGroup>
             <EuiFlexItem>

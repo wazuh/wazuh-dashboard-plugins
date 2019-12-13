@@ -44,7 +44,7 @@ class WelcomeScreen extends Component {
   render() {
     return (
       <WzReduxProvider>
-        <EuiPage>
+        <EuiPage style={{padding:0}}>
           <EuiFlexGroup>
             <EuiFlexItem>
               <EuiPanel>

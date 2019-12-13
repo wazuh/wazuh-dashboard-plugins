@@ -118,7 +118,7 @@ export class WelcomeScreen extends Component {
 
   render() {
     return (
-      <EuiPage>
+      <EuiPage style={{padding:0}}>
         <EuiFlexGroup>
           <EuiFlexItem>
             <EuiFlexGroup>
