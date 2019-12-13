@@ -10,50 +10,51 @@
  * Find more information about this on the LICENSE file.
  */
 import React, { Component } from 'react';
-import {
-    EuiFlexGroup,
-    EuiFlexItem
-} from '@elastic/eui';
+import { EuiFlexGroup, EuiFlexItem } from '@elastic/eui';
 // Redux
 import store from '../../../../redux/store';
 
 import WzManagementSideMenu from './management-side-menu';
 import WzRuleset from './ruleset/main-ruleset';
-import { GroupsTable } from './groups/groups-table';
-import { changeManagementSection } from '../../../../redux/reducers/managementReducers';
+import WzGroups from './groups/groups-main';
+import WzStatus from './status/status-main';
+import WzReporting from './reporting/reporting-main';
+// import { GroupsTable } from './groups/groups-table';
+// import { changeManagementSection } from '../../../../redux/reducers/managementReducers';
 import { connect } from 'react-redux';
 
 class WzManagementMain extends Component {
-    constructor(props) {
-        super(props);
-        this.state = {};
-        this.store = store;
-    }
+  constructor(props) {
+    super(props);
+    this.state = {};
+    this.store = store;
+  }
 
-    render() {
-        const { section } = this.props;
-        const ruleset = ['ruleset', 'rules', 'decoders', 'lists']
-        return (
-            <EuiFlexGroup>
-                <EuiFlexItem grow={false} style={{width:190}}>
-                    <WzManagementSideMenu section={section} {...this.props}/>
-                </EuiFlexItem>
-                <EuiFlexItem>
-                    <div style={{margin: '12px 12px 0px 0px'}}>
-                        {
-                            ruleset.includes(section) && (<WzRuleset />)
-                        }
-                    </div>
-                </EuiFlexItem>
-            </EuiFlexGroup>
-        )
-    }
+  render() {
+    const { section } = this.props;
+    const ruleset = ['ruleset', 'rules', 'decoders', 'lists'];
+    return (
+      <EuiFlexGroup>
+        <EuiFlexItem grow={false} style={{ width: 190 }}>
+          <WzManagementSideMenu section={section} {...this.props} />
+        </EuiFlexItem>
+        <EuiFlexItem>
+          <div>
+            {(section === 'groups' && <WzGroups {...this.props} />) ||
+              (section === 'status' && <WzStatus />) ||
+              (section === 'reporting' && <WzReporting />) ||
+              (ruleset.includes(section) && <WzRuleset />)}
+          </div>
+        </EuiFlexItem>
+      </EuiFlexGroup>
+    );
+  }
 }
 
 function mapStateToProps(state) {
-    return {
-        section: changeManagementSection(state),
-    };
+  return {
+    state: state.managementReducers,
+  };
 }
 
 export default connect(mapStateToProps, {})(WzManagementMain);

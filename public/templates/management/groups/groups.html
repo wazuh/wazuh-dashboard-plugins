@@ -1,90 +1,31 @@
-<div flex layout="column" ng-class="{'cursor-wait': multipleSelectorLoading}" ng-controller="groupsPreviewController as gp"
-    ng-if="mctrl.tab == 'groups'" class="sideBarContent">
-
+<div flex layout="column" ng-class="{'cursor-wait': multipleSelectorLoading}"
+    ng-controller="groupsPreviewController as gp" ng-if="mctrl.tab == 'groups'" class="sideBarContent">
     <!-- Main content -->
     <md-content flex layout="column" class=" overflow-hidden" ng-init="gp.lookingGroup=false">
-        
         <!-- Loading ring -->
-        <div class="md-padding md-padding-top-16" ng-show="load">
+        <div class="md-padding md-padding-top-16" ng-show="gp.load">
             <react-component name="EuiProgress" props="{size: 'xs', color: 'primary'}" />
         </div>
 
-        <!-- Groups table -->
-        <div ng-show="!gp.load" layout="column" ng-if="(!gp.currentGroup || !gp.currentGroup.name) && gp.groupsTableProps && !gp.lookingGroup">
-             <react-component name="GroupsTable" props="gp.groupsTableProps" /> 
-        </div>
-        
         <!-- Inside the group -->
-        <div flex layout="column" layout-align="start stretch" ng-show="!gp.load && gp.lookingGroup " ng-init="gp.groupsSelectedTab='agents'">
-            
-            <!-- Tabs for the groups Agents / Files -->
-            <div ng-if="gp.currentGroup && !gp.addingAgents && !gp.editingFile && gp.groupsTabsProps" class="md-margin-h">
-                <react-component name="Tabs" props="gp.groupsTabsProps" />
-            </div>
-
-            <!-- XML editor for group agents -->
-            <div ng-show="gp.editingFile">
-                <div layout="row" class="md-padding-h wz-margin-top-10">
-                    <span ng-click='gp.closeEditingFile()' class='wz-margin-top-3 kuiButton kuiButton--hollow'>Cancel</span>
-                    <button ng-disabled='gp.xmlHasErrors' ng-click='gp.doSaveGroupAgentConfig()' class='height-35 kuiButton kuiButton--secondary wz-margin-left-8'>
-                        <span ng-show='!gp.xmlHasErrors'>
-                            <react-component name="EuiIcon" props="{type: 'save'}" /> Save file
-                        </span>
-                        <span ng-show='gp.xmlHasErrors' class='btn-danger'><i aria-hidden='true' class='fa fa-fw fa-exclamation-triangle'></i>
-                            XML format error</span>
-                    </button>
-                </div>
-                <div class="md-padding md-padding-top-10" ng-if="gp.fetchedXML && gp.currentGroup">
-                    <wz-xml-file-editor file-name='agent.conf' data="gp.fetchedXML" target-name="gp.currentGroup.name + ' group'"
-                        valid-fn='gp.xmlIsValid(valid)' close-fn='gp.closeEditingFile(reload)'>
-                    </wz-xml-file-editor>
-                </div>
-            </div>
-            <!-- End XML editor for group agents -->
-
+        <div flex layout="column" layout-align="start stretch" ng-show="!gp.load && gp.lookingGroup "
+            ng-init="gp.groupsSelectedTab='agents'">
             <div ng-if="!gp.editingFile">
                 <div layout="row" class="md-padding" ng-if="gp.currentGroup && gp.addingAgents">
-                    <span ng-click='gp.addMultipleAgents(false)' class='wz-margin-top-3 kuiButton kuiButton--hollow'>
+                    <span ng-click='gp.cancelButton()' class='wz-margin-top-3 kuiButton kuiButton--hollow'>
                         Cancel</span>
                     <span ng-hide='moreThan500' ng-click='gp.saveAddAgents()' class='btn wz-button wz-margin-left-8'><i
                             aria-hidden='true' class='fa fa-fw fa-save'></i>
                         Apply changes</span>
-                    <span class='error-msg' ng-show='gp.moreThan500'><i class="fa fa-exclamation-triangle"></i> It is not
+                    <span class='error-msg' ng-show='gp.moreThan500'><i class="fa fa-exclamation-triangle"></i> It is
+                        not
                         possible to apply changes of more than 500 additions or deletions</span>
                 </div>
 
-                <div ng-if='!gp.addingAgents'> 
-
-                    <!-- Group agents table -->
-                    <div flex ng-if="gp.groupsSelectedTab==='agents' && gp.currentGroup">
-                        <react-component name="AgentsInGroupTable" props="gp.agentsInGroupTableProps"/>
-                    </div>
-
-                    <!-- Group files table -->
-                    <react-component ng-if="gp.groupsSelectedTab==='files' && !gp.fileViewer && gp.currentGroup" name="FilesInGroupTable" props="gp.filesInGroupTableProps"/>
-
-                    <!-- File JSON viewer section -->
-                    <div flex layout="column" class="md-padding" ng-if="gp.groupsSelectedTab==='files' && gp.file">
-                        <div flex layout="column">
-                            <div layout="row" class="wz-padding-bottom-14">
-                                <span flex class="wz-headline-title">{{ gp.filename }}</span>
-                                <!-- Go back button -->
-                                <button class="md-icon-button" ng-if="gp.lookingGroup" aria-label="Back" tooltip="Close file"
-                                    tooltip-placement="left" ng-click="gp.goBackFiles()"><i class="fa fa-fw fa-close"
-                                        aria-hidden="true"></i></button>
-                                <!--<span flex class="wz-text-right cursor-pointer color-grey" ng-click="goBackFiles()">close</span>-->
-                            </div>
-                            <div flex layout="column">
-                                <pre flex class="wz-pre groupContentViewer wzXmlEditor wz-overflow-y-auto"><code wz-dynamic="gp.file"></code></pre>
-                            </div>
-                        </div>
-                    </div>
-                    <!-- End File JSON viewer section -->
-                </div>
-
                 <div layout="row" class="md-padding" ng-if="gp.addingAgents">
-                    <span ng-show='!gp.multipleSelectorLoading' class="wzMultipleSelectorCounter"><span style='color:green'>+{{gp.currentAdding}}</span>&nbsp;
-                    <span style='color:red'>-{{gp.currentDeleting}}</span></span>
+                    <span ng-show='!gp.multipleSelectorLoading' class="wzMultipleSelectorCounter"><span
+                            style='color:green'>+{{gp.currentAdding}}</span>&nbsp;
+                        <span style='color:red'>-{{gp.currentDeleting}}</span></span>
                     <wz-multiple-selector class='wzMultipleSelector' available-items="gp.availableAgents.data"
                         selected-items="gp.selectedAgents.data" title-available-items="Available agents"
                         title-selected-items="Current agents in the group" total-selected-items="gp.totalSelectedAgents"
