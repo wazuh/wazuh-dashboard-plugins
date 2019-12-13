@@ -179,7 +179,6 @@ class WzRulesetTable extends Component {
       const itemList = this.props.state.itemList;
       return (
         <div>
-        { (`${section}`)}
           <EuiBasicTable
             itemId="id"
             items={items}
