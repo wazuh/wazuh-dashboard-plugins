@@ -123,8 +123,10 @@
                                 ng-click="ctrl.showAgent(ctrl.mostActiveAgent)"
                                 class="euiTitle euiTitle--small euiStat__title wz-text-link cursor-pointer">
                                 {{ctrl.mostActiveAgent.name}}</p>
-                            <p ng-if="!ctrl.lastAgent || !ctrl.lastAgent.id"
+                            <p ng-if="ctrl.lastAgent && ctrl.lastAgent.id && ctrl.mostActiveAgent.id === '000'"
                                 class="euiTitle euiTitle--small euiStat__title">
+                                --</p>
+                            <p ng-if="!ctrl.lastAgent || !ctrl.lastAgent.id" class="euiTitle euiTitle--small euiStat__title">
                                 -</p>
                         </div>
                     </div>

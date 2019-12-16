@@ -17,7 +17,7 @@ export const changeWazuhNavLogo = () => {
     if (nav.length) {
       clearInterval(interval);
     }
-    $('.euiBreadcrumb').html(
+    $('.euiBreadcrumbs').html(
       '<img src="/plugins/wazuh/img/logo.svg" class="navBarLogo" alt="">'
     );
   }, 100);
