@@ -419,19 +419,15 @@ export class WazuhReportingCtrl {
 
     const len = filters.length;
     for (let i = 0; i < len; i++) {
-      const filter = filters[i];
-
-      str +=
-        i === len - 1
-          ? (filter.meta.negate ? 'NOT ' : '') +
-            filter.meta.key +
-            ': ' +
-            filter.meta.value
-          : (filter.meta.negate ? 'NOT ' : '') +
-            filter.meta.key +
-            ': ' +
-            filter.meta.value +
-            ' AND ';
+      const { negate, key, value, params, type } = filters[i].meta;
+      str += `${negate ? 'NOT ' : ''}`;
+      str += `${key}: `;
+      str += `${type === 'range' 
+        ? `${params.gte}-${params.lt}` 
+        : !!value 
+          ? value 
+          : (params || {}).query}`;
+      str += `${i === len - 1 ? '' : ' AND ' }`;
     }
 
     if (searchBar) {
