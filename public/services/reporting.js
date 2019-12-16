@@ -78,7 +78,7 @@ export class ReportingService {
         this.vis2png.assignHTMLItem(item, tmpHTMLElement);
       }
 
-      const appliedFilters = this.visHandlers.getAppliedFilters(
+      const appliedFilters = await this.visHandlers.getAppliedFilters(
         syscollectorFilters
       );
 

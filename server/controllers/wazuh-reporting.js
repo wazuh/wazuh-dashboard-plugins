@@ -177,11 +177,7 @@ export class WazuhReportingCtrl {
   renderTables(tables, isVis = true) {
     for (const table of tables) {
       let rowsparsed = [];
-      if (isVis) {
-        rowsparsed = rawParser(table.rawResponse, table.columns);
-      } else {
-        rowsparsed = table.rows;
-      }
+      rowsparsed = table.rows;
       if (Array.isArray(rowsparsed) && rowsparsed.length) {
         const rows =
           rowsparsed.length > 100 ? rowsparsed.slice(0, 99) : rowsparsed;
