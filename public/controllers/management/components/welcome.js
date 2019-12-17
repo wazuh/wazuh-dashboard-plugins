@@ -44,14 +44,11 @@ class WelcomeScreen extends Component {
   render() {
     return (
       <WzReduxProvider>
-        <EuiPage style={{padding:0}}>
+        <EuiPage>
           <EuiFlexGroup>
             <EuiFlexItem>
-              <EuiPanel>
-                <EuiTitle size="s">
-                  <h2>Administration</h2>
-                </EuiTitle>
-                <EuiSpacer size="s" />
+            <EuiPanel betaBadgeLabel="Administration">
+              <EuiSpacer size="m" />
                 <EuiFlexGroup>
                   <EuiFlexItem>
                     <EuiCard
@@ -90,11 +87,8 @@ class WelcomeScreen extends Component {
               </EuiPanel>
             </EuiFlexItem>
             <EuiFlexItem>
-              <EuiPanel>
-                <EuiTitle size="s">
-                  <h2>Status and reports</h2>
-                </EuiTitle>
-                <EuiSpacer size="s" />
+            <EuiPanel betaBadgeLabel="Status and reports">
+              <EuiSpacer size="m" />
                 <EuiFlexGroup>
                   <EuiFlexItem>
                     <EuiCard
