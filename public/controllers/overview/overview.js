@@ -13,6 +13,7 @@ import { FilterHandler } from '../../utils/filter-handler';
 import { generateMetric } from '../../utils/generate-metric';
 import { TabNames } from '../../utils/tab-names';
 import { TabDescription } from '../../../server/reporting/tab-description';
+import { visualizations } from '../../templates/overview/visualizations';
 
 import {
   metricsGeneral,
@@ -57,6 +58,7 @@ export class OverviewController {
     this.$scope = $scope;
     this.$location = $location;
     this.$rootScope = $rootScope;
+    this.visualizations = visualizations;
     this.appState = appState;
     this.errorHandler = errorHandler;
     this.apiReq = apiReq;
@@ -66,25 +68,7 @@ export class OverviewController {
     this.visFactoryService = visFactoryService;
     this.wazuhConfig = wazuhConfig;
     this.showingMitreTable = false
-    this.expandArray = [
-      false,
-      false,
-      false,
-      false,
-      false,
-      false,
-      false,
-      false,
-      false,
-      false,
-      false,
-      false,
-      false,
-      false,
-      false,
-      false
-    ];
-    
+    this.expandedVis = false;
   }
 
   /**
@@ -280,7 +264,7 @@ export class OverviewController {
     this.showingMitreTable = false;
     this.$rootScope.rendered = false;
     this.$rootScope.$applyAsync();
-    this.falseAllExpand();
+    this.expandedVis = false;
     try {
       if (newTab === 'welcome') {
         this.commonData.setRefreshInterval(timefilter.getRefreshInterval());
@@ -306,9 +290,9 @@ export class OverviewController {
       if (newTab === 'mitre') {
         const result = await this.apiReq.request('GET', '/rules/mitre', {});
         this.$scope.mitreIds = ((((result || {}).data) || {}).data || {}).items
-        
+
         this.mitreCardsSliderProps = {
-          items: this.$scope.mitreIds ,
+          items: this.$scope.mitreIds,
           attacksCount: this.$scope.attacksCount,
           reqTitle: "MITRE",
           wzReq: (method, path, body) => this.apiReq.request(method, path, body),
@@ -420,9 +404,9 @@ export class OverviewController {
    * Filter by Mitre.ID
    * @param {*} id 
    */
-  addMitrefilter(id){
+  addMitrefilter(id) {
     const filter = `{"meta":{"index":"wazuh-alerts-3.x-*"},"query":{"match":{"rule.mitre.id":{"query":"${id}","type":"phrase"}}}}`;
-    this.$rootScope.$emit('addNewKibanaFilter', { filter : JSON.parse(filter) });
+    this.$rootScope.$emit('addNewKibanaFilter', { filter: JSON.parse(filter) });
   }
 
   /**
@@ -436,7 +420,7 @@ export class OverviewController {
       this.$scope.$on('sendVisDataRows', (ev, param) => {
         const rows = (param || {}).mitreRows.tables[0].rows
         this.$scope.attacksCount = {}
-        for(var i in rows){
+        for (var i in rows) {
           this.$scope.attacksCount[rows[i]["col-0-2"]] = rows[i]["col-1-1"]
         }
 
@@ -450,8 +434,8 @@ export class OverviewController {
           reqTitle: "MITRE",
           wzReq: (method, path, body) => this.apiReq.request(method, path, body),
           addFilter: (id) => this.addMitrefilter(id)
-          }
-        });
+        }
+      });
 
     } catch (error) {
       this.errorHandler.handle(error.message || error);
@@ -460,30 +444,11 @@ export class OverviewController {
     return;
   }
 
-  falseAllExpand() {
-    this.expandArray = [
-      false,
-      false,
-      false,
-      false,
-      false,
-      false,
-      false,
-      false,
-      false,
-      false,
-      false,
-      false,
-      false,
-      false,
-      false,
-      false
-    ];
+  checkExpandedVis(idx1, idx2) {
+    return this.expandedVis === `${idx1}-${idx2}`;
   }
 
-  expand(i) {
-    const oldValue = this.expandArray[i];
-    this.falseAllExpand();
-    this.expandArray[i] = !oldValue;
+  expand(idx1, idx2) {
+    this.expandedVis = this.expandedVis === `${idx1}-${idx2}` ? false : `${idx1}-${idx2}`;
   }
 }

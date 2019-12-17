@@ -127,9 +127,8 @@ app.directive('kbnVis', function () {
               implicitFilter = discoverList ? discoverList[0].query : '';
 
               setSearchSource(discoverList);
-
               visHandler = loader.embedVisualizationWithSavedObject(
-                $(`[vis-id="'${$scope.visID}'"]`)[0],
+                $(`[id="${$scope.visID}"]`)[0],
                 visualization,
                 {}
               );
