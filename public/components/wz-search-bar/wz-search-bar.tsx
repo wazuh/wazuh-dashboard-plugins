@@ -96,8 +96,8 @@ export default class WzSearchBar extends Component {
     if (!this.isUpdated()){
       return;
     }
-    const { inputStage, searchFormat} = this.state;
-    if (inputStage === 'fields'){
+    const { inputStage, searchFormat, inputValue } = this.state;
+    if (inputStage === 'fields' || inputValue === ''){
       this.buildSuggestFields();
     } else if (inputStage === 'operators' && searchFormat) {
       this.buildSuggestOperators();
@@ -123,7 +123,6 @@ export default class WzSearchBar extends Component {
 
     if (!searchDisable && inputValue !== '') {
       const suggestSearch = this.buildSuggestFieldsSearch();
-      // @ts-ignore
       suggestSearch && fields.unshift(suggestSearch);
     }
 
@@ -144,13 +143,11 @@ export default class WzSearchBar extends Component {
 
   buildSuggestFieldsQ():suggestItem[] {
     const { qSuggests } = this.props
-    const { inputValue } = this.state;
-    const qInterpreter = new QInterpreter(inputValue);
-    const { field } = qInterpreter.lastQuery();
+    const { field } = this.getLastQuery();
     const fields:suggestItem[] = qSuggests
     .filter((item) => this.filterSuggestFields(item, field))
     .map(this.mapSuggestFields);
-    
+
     return fields;
   }
 
@@ -164,7 +161,7 @@ export default class WzSearchBar extends Component {
     return fields;
   }
 
-  filterSuggestFields(item:(apiSuggests | qSuggests), field:string) {
+  filterSuggestFields(item:(apiSuggests | qSuggests), field:string='') {
     return item.label.includes(field);
   }
 
@@ -179,12 +176,12 @@ export default class WzSearchBar extends Component {
     return suggestItem;
   }
 
-  
+
 
   buildSuggestOperators() {
     const { operators=false } = this.getCurrentField();
-    const operatorsAllow = operators 
-      ? operators 
+    const operatorsAllow = operators
+      ? operators
       : [...Object.keys(this.operators)];
     const suggestions:suggestItem[] = operatorsAllow.map(this.CreateSuggestOperator);
 
@@ -219,26 +216,44 @@ export default class WzSearchBar extends Component {
     }
   }
 
-  buildSuggestValues() {
-    const { field } = this.getLastQuery();
-    const {values} = this.getCurrentField();
-    const rawSuggestions:suggestItem[] = typeof values === 'function'
-      ? values()
+  async buildSuggestValues() {
+    this.setState({status: 'loading'});
+    const { values } = this.getCurrentField();
+    const rawSuggestions:string[] = typeof values === 'function'
+      ? await values()
       : values;
-
+    const filterSuggestions = rawSuggestions.filter(this.filterSuggestValues.bind(this));
     const suggestions:suggestItem[] = []
-    for (const value of rawSuggestions) {
-      const item:suggestItem = {
-        type: {iconType: 'kqlValue', color: 'tint0'},
-        // @ts-ignore
-        label: typeof value !== 'string' ? value.toString(): value,
-      }
+
+    for (const value of filterSuggestions) {
+      const item:suggestItem = this.buildSuggestValue(value);
       suggestions.push(item);
     }
+
     this.setState({
       suggestions,
       isSearch: false,
+      status: 'unchanged',
     });
+  }
+
+  buildSuggestValue(value:string|number) {
+    return {
+      type: {iconType: 'kqlValue', color: 'tint0'},
+      label: typeof value !== 'string' ? value.toString(): value,
+    };
+  }
+
+  filterSuggestValues(item:number|string) {
+    const { value } = this.getLastQuery();
+    if (typeof item === 'number' && !!value) {
+      // @ts-ignore
+      return item == value;
+    } else if (!!value) {
+      // @ts-ignore
+      return item.includes(value);
+    }
+    return true;
   }
 
   buildSuggestConjuntions() {
@@ -264,7 +279,7 @@ export default class WzSearchBar extends Component {
       delete filters['q'];
       this.props.onInputChange(filters);
     }
-    
+
     this.setState({
       inputValue: value,
       isProcessing: true,
@@ -272,9 +287,9 @@ export default class WzSearchBar extends Component {
     });
     this.inputStageHandler(value);
   }
-  
+
   onChangeSearchFormat = (format) => {console.log(format)}
-  
+
   onKeyPress = (e:KeyboardEvent)  => {
     const { isInvalid } = this.state;
     if(e.key !== 'Enter' && !isInvalid) {
@@ -315,6 +330,7 @@ export default class WzSearchBar extends Component {
     }
     this.setState({
       inputValue: qInterperter.toString(),
+      suggestions: [],
       isProcessing: true,
       filters,
       inputStage,
@@ -364,7 +380,7 @@ export default class WzSearchBar extends Component {
     if (!qFilterEnabled && !apiFilterEnabled) {
       return null;
     }
-    return (<WzSearchFormatSelector 
+    return (<WzSearchFormatSelector
       onChange={this.onChangeSearchFormat}
       qFilterEnabled={qFilterEnabled}
       apiFilterEnabled={apiFilterEnabled}
@@ -380,7 +396,7 @@ export default class WzSearchBar extends Component {
         <EuiFlexGroup>
           <EuiFlexItem>
             <EuiSuggest
-            status={status}
+              status={status}
               value={inputValue}
               onKeyPress={this.onKeyPress}
               onItemClick={this.onItemClick.bind(this)}
