@@ -56,7 +56,7 @@ const rulesetReducers = (state = initialState, action) => {
       return Object.assign({}, state, { error: action.error });
     case 'UPDATE_FILE_CONTENT':
       return Object.assign({}, state, { fileContent: action.content, decoderInfo: false, ruleInfo: false, listInfo: false, error: false });
-    case 'UPDATE_FILTERS':
+    case 'UPDATE_RULE_FILTERS':
       return Object.assign({}, state, { filters: action.filters, error: false });
     case 'UPDATE_IS_PROCESSING':
       return Object.assign({}, state, { isProcessing: action.isProcessing, ruleInfo: false, listInfo: false, error: false });
