@@ -121,6 +121,71 @@ export class WelcomeScreen extends Component {
       <EuiPage style={{padding:0}}>
         <EuiFlexGroup>
           <EuiFlexItem>
+            <EuiPanel betaBadgeLabel="Security Information Management">
+              <EuiFlexGroup gutterSize="xs">
+                <EuiFlexItem />
+                <EuiFlexItem grow={false}>
+                  {this.buildPopover('popoverSecurity', ['aws'])}
+                </EuiFlexItem>
+              </EuiFlexGroup>
+              <EuiFlexGrid columns={2}>
+                {this.buildTabCard('general', 'dashboardApp')}
+                {this.buildTabCard('fim', 'filebeatApp')}
+                {this.props.extensions.aws &&
+                  this.buildTabCard('aws', 'logoAWSMono')}
+              </EuiFlexGrid>
+            </EuiPanel>
+          </EuiFlexItem>
+          <EuiFlexItem>
+            <EuiPanel betaBadgeLabel="Auditing and Policy Monitoring">
+              <EuiFlexGroup gutterSize="xs">
+                <EuiFlexItem />
+                <EuiFlexItem grow={false}>
+                  {this.buildPopover('popoverAuditing', [
+                    'audit',
+                    'oscap',
+                    'ciscat'
+                  ])}
+                </EuiFlexItem>
+              </EuiFlexGroup>
+              <EuiFlexGrid columns={2}>
+                {this.buildTabCard('pm', 'advancedSettingsApp')}
+                {this.props.extensions.audit &&
+                  this.buildTabCard('audit', 'monitoringApp')}
+                {this.props.extensions.oscap &&
+                  this.buildTabCard('oscap', 'codeApp')}
+                {this.props.extensions.ciscat &&
+                  this.buildTabCard('ciscat', 'auditbeatApp')}
+              </EuiFlexGrid>
+            </EuiPanel>
+          </EuiFlexItem>
+        </EuiFlexGroup>
+
+        <EuiSpacer size="xl" />
+        <EuiFlexGroup>
+          <EuiFlexItem>
+            <EuiPanel betaBadgeLabel="Threat Detection and Response">
+              <EuiFlexGroup gutterSize="xs">
+                <EuiFlexItem />
+                <EuiFlexItem grow={false}>
+                  {this.buildPopover('popoverThreat', [
+                    'virustotal',
+                    'osquery',
+                    'docker'
+                  ])}
+                </EuiFlexItem>
+              </EuiFlexGroup>
+              <EuiFlexGrid columns={2}>
+                {this.buildTabCard('vuls', 'securityApp')}
+                {this.props.extensions.virustotal &&
+                  this.buildTabCard('virustotal', 'savedObjectsApp')}
+                {this.props.extensions.osquery &&
+                  this.buildTabCard('osquery', 'searchProfilerApp')}
+                {this.props.extensions.docker &&
+                  this.buildTabCard('docker', 'spacesApp')}
+              </EuiFlexGrid>
+            </EuiPanel>
+          </EuiFlexItem>
 
             <EuiFlexGroup>
               <EuiFlexItem>
