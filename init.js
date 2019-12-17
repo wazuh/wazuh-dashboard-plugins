@@ -28,7 +28,7 @@ export function initApp(server) {
 
   log('init:initApp', `Waiting for Kibana migration jobs`, 'debug');
   server.kibanaMigrator
-    .runMigrations()
+    .awaitMigration()
     .then(() => {
       log(
         'init:initApp',

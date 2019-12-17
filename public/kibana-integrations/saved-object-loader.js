@@ -38,17 +38,17 @@ export class SavedObjectLoader {
     this.loaderProperties = {
       name: `${this.lowercaseType}s`,
       noun: StringUtils.upperFirst(this.type),
-      nouns: `${this.lowercaseType}s`,
+      nouns: `${this.lowercaseType}s`
     };
 
     this.savedObjectsClient = savedObjectClient;
   }
 
-    // Fake async function, only to resolve a promise
-    async processFunc() {
-      return;
-    }
-  
+  // Fake async function, only to resolve a promise
+  async processFunc() {
+    return;
+  }
+
   /**
    * Retrieve a saved object by id. Returns a promise that completes when the object finishes
    * initializing.
@@ -148,13 +148,14 @@ export class SavedObjectLoader {
         page: 1,
         searchFields: ['title^3', 'description'],
         defaultSearchOperator: 'AND',
-        fields,
+        fields
       })
-      .then((resp) => {
+      .then(resp => {
         return {
           total: resp.total,
-          hits: resp.savedObjects
-            .map((savedObject) => this.mapSavedObjectApiHits(savedObject))
+          hits: resp.savedObjects.map(savedObject =>
+            this.mapSavedObjectApiHits(savedObject)
+          )
         };
       });
   }

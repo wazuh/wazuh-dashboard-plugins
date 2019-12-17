@@ -27,13 +27,6 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Fixed error exporting as CSV the files into a group [#1833](https://github.com/wazuh/wazuh-kibana-app/issues/1833).
 
 
-## Wazuh v3.10.2 - Kibana v7.5.0 - Revision 550
-
-### Added
-
-- Support for Kibana v7.5.0
-
-
 ## Wazuh v3.10.2 - Kibana v7.3.2 - Revision 546
 
 ### Added
