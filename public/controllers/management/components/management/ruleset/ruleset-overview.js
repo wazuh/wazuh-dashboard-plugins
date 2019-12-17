@@ -8,9 +8,6 @@ import {
   EuiText,
   EuiTitle,
   EuiSwitch,
-  EuiPopover,
-  EuiButton,
-  EuiButtonEmpty
 } from '@elastic/eui';
 
 import { connect } from 'react-redux';
@@ -19,7 +16,10 @@ import { connect } from 'react-redux';
 import WzRulesetTable from './ruleset-table';
 import WzRulesetActionButtons from './actions-buttons';
 import './ruleset-overview.css';
-import WzSearchBarFilter from '../../../../../components/wz-search-bar/wz-search-bar'
+import WzSearchBar from '../../../../../components/wz-search-bar/wz-search-bar';
+import { updateFilters, updateIsProcessing } from '../../../../../redux/actions/rulesetActions';
+import { WzRequest } from '../../../../../react-services/wz-request';
+
 
 class WzRulesetOverview extends Component {
   constructor(props) {
@@ -29,40 +29,13 @@ class WzRulesetOverview extends Component {
       decoders: 'Decoders',
       lists: 'CDB lists'
     }
-    this.model = [
-      {
-        label: 'Level',
-        options: [
-          {
-            label: '0',
-            group: 'level'
-          },
-          {
-            label: '1',
-            group: 'level'
-          },
-          {
-            label: '2',
-            group: 'level'
-          }
-        ]
-      },
-    ];
-    this.filters = {
-      rules: [
-        { label: 'File', value: 'file' }, { label: 'Path', value: 'path' }, { label: 'Level', value: 'level' },
-        { label: 'Group', value: 'group' }, { label: 'PCI control', value: 'pci' }, { label: 'GDPR', value: 'gdpr' }, { label: 'HIPAA', value: 'hipaa' }, { label: 'NIST-800-53', value: 'nist-800-53' }
-      ],
-      decoders: [
-        { label: 'File', value: 'file' }, { label: 'Path', value: 'path' }
-      ]
-    };
   }
 
 
   clickActionFilterBar(obj) {
     console.log('clicking ', obj)
   }
+
 
   render() {
     const { section } = this.props.state;
@@ -96,8 +69,60 @@ class WzRulesetOverview extends Component {
               </EuiText>
             </EuiFlexItem>
           </EuiFlexGroup>
-          <WzSearchBarFilter 
-            filters={this.filters[section]} />
+          <WzSearchBar
+            qSuggests={[
+              {
+                label: 'status',
+                description: 'Filters the rules by status.',
+                operators: ['=', '!='],
+                values: ['enabled', 'disabled'],
+              },
+              // TODO: Wait to framework team fix this call
+              // {
+              //   label: 'group',
+              //   description: 'Filters the rules by group',
+              //   operators: ['=', '!=', '~'],
+              //   values: async () => {
+              //     const wzReq = (...args) => WzRequest.apiReq(...args);
+              //     const result = await wzReq('GET', '/rules/groups', {});
+              //     return (((result || {}).data || {}).data || {}).items;
+              //   },
+              // },
+              {
+                label: 'level',
+                description: 'Filters the rules by level',
+                operators: ['=', '!=', '<', '>'],
+                values: [...Array(16).keys()],
+              },
+              {
+                label: 'file',
+                description: 'Filters the rules by file name.',
+                operators: ['=', '!='],
+                values: async () => {
+                  const wzReq = (...args) => WzRequest.apiReq(...args);
+                  const result = await wzReq('GET', '/rules/files', {});
+                  return (((result || {}).data || {}).data || {}).items.map((item) => {return item.file});
+                },
+              },
+              // TODO: Wait to framework team fix this call
+              // {
+              //   label: 'path',
+              //   description: '',
+              //   operators: ['=', '!=', '~'],
+              //   values: async () => {
+              //     const wzReq = (...args) => WzRequest.apiReq(...args);
+              //     const result = await wzReq('GET', '/manager/configuration', {
+              //       section:'ruleset',
+              //       field: 'rule_dir',
+              //     });
+              //     console.log(result.data)
+              //     return ((result || {}).data || {}).data;
+              //   }
+              // },
+
+
+            ]}            
+            onInputChange={(filters) => {this.props.updateFilters(filters); this.props.updateIsProcessing(true)}} />
           <EuiFlexGroup>
             <EuiFlexItem>
               <WzRulesetTable />
@@ -115,4 +140,11 @@ const mapStateToProps = (state) => {
   };
 };
 
-export default connect(mapStateToProps)(WzRulesetOverview);
+const mapDispatchToProps = (dispatch) => {
+  return {
+    updateFilters: filters => dispatch(updateFilters(filters)),
+    updateIsProcessing: isProcessing => dispatch(updateIsProcessing(isProcessing)),
+  };
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(WzRulesetOverview);

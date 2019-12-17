@@ -117,14 +117,15 @@ class WzRulesetTable extends Component {
   }
 
   buildFilter() {
-    const { pageIndex } = this.props.state;
+    const { pageIndex, filters } = this.props.state;
     const { pageSize } = this.state;
+    console.log(filters);
     const filter = {
       offset: pageIndex * pageSize,
       limit: pageSize,
       sort: this.buildSortFilter(),
+      ...filters
     };
-
     return filter;
   }
 
