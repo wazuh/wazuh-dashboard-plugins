@@ -35,10 +35,10 @@ class WzManagementMain extends Component {
     const ruleset = ['ruleset', 'rules', 'decoders', 'lists'];
     return (
       <EuiFlexGroup>
-        <EuiFlexItem grow={false} style={{ width: 190 }}>
+        <EuiFlexItem grow={false} style={{ width: 190, marginRight: 0 }}>
           <WzManagementSideMenu section={section} {...this.props} />
         </EuiFlexItem>
-        <EuiFlexItem>
+        <EuiFlexItem style={{ marginLeft: '7px' }}>
           <div>
             {(section === 'groups' && <WzGroups {...this.props} />) ||
               (section === 'status' && <WzStatus />) ||

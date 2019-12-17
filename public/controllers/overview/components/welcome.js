@@ -252,6 +252,7 @@ export class WelcomeScreen extends Component {
                       {this.buildPopover('popoverThreat', [
                         'virustotal',
                         'osquery',
+                        'mitre',
                         'docker'
                       ])}
                     </EuiFlexItem>
