@@ -14,11 +14,11 @@
 import { initApp } from './init';
 import { resolve } from 'path';
 
-export default kibana =>
-  new kibana.Plugin({
+export default function (kibana) {
+  return new kibana.Plugin({
+    require: ['kibana', 'elasticsearch'],
     id: 'wazuh',
     name: 'wazuh',
-    require: ['kibana', 'elasticsearch'],
     uiExports: {
       app: {
         id: 'wazuh',
@@ -37,20 +37,48 @@ export default kibana =>
         });
       }
     },
-    init(server, options) {
-      // Kibana spaces locker
-      const xpackMainPlugin = server.plugins.xpack_main;
 
+    config(Joi) {
+      return Joi.object({
+        enabled: Joi.boolean().default(true),
+      }).default();
+    },
+
+    init(server, options) { // eslint-disable-line no-unused-vars
+      const xpackMainPlugin = server.plugins.xpack_main;
       if (xpackMainPlugin) {
+        const featureId = 'wazuh';
+
         xpackMainPlugin.registerFeature({
-          id: 'wazuh',
+          id: featureId,
           name: 'Wazuh',
-          app: ['wazuh', 'kibana', 'elasticsearch'],
-          navLinkId: 'wazuh',
-          privileges: {}
+          navLinkId: featureId,
+          icon: 'questionInCircle',
+          app: [featureId, 'kibana', 'elasticsearch'],
+          catalogue: [],
+          privileges: {
+            all: {
+              api: [],
+              savedObject: {
+                all: [],
+                read: [],
+              },
+              ui: ['show'],
+            },
+            read: {
+              api: [],
+              savedObject: {
+                all: [],
+                read: [],
+              },
+              ui: ['show'],
+            },
+          },
         });
       }
 
-      return initApp(server, options);
+      // Add server routes and initialize the plugin here
+      initApp(server);
     }
   });
+}
