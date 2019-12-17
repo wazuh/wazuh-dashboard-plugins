@@ -11,14 +11,14 @@
  */
 import $ from 'jquery';
 import { uiModules } from 'ui/modules';
-import { getVisualizeLoader } from './loader';
+import { getVisualizeLoader } from 'ui/visualize/loader';
 import { timefilter } from 'ui/timefilter';
 import dateMath from '@elastic/datemath';
 
 const app = uiModules.get('app/wazuh', []);
 let lockFields = false;
 
-app.directive('kbnVis', function() {
+app.directive('kbnVis', function () {
   return {
     restrict: 'E',
     scope: {
@@ -160,9 +160,18 @@ app.directive('kbnVis', function() {
                 timeRange:
                   isAgentStatus && timeFilterSeconds < 900
                     ? { from: 'now-15m', to: 'now', mode: 'quick' }
-                    : timefilter.getTime()
+                    : timefilter.getTime(),
+                filters: isAgentStatus ? [] : discoverList[1] || []
               });
+
+              if (!isAgentStatus) {
+                visHandler.update({
+                  query: discoverList[0]
+
+                });
+              }
               setSearchSource(discoverList);
+              $rootScope.rendered = true;
             }
           }
         } catch (error) {
@@ -219,10 +228,10 @@ app.directive('kbnVis', function() {
       const destroyAll = () => {
         try {
           visualization.destroy();
-        } catch (error) {} // eslint-disable-line
+        } catch (error) { } // eslint-disable-line
         try {
           visHandler.destroy();
-        } catch (error) {} // eslint-disable-line
+        } catch (error) { } // eslint-disable-line
       };
 
       $scope.$on('$destroy', () => {
@@ -255,7 +264,7 @@ app.directive('kbnVis', function() {
 
           $rootScope.loadingStatus = `Rendering visualizations... ${
             currentCompleted > 100 ? 100 : currentCompleted
-          } %`;
+            } %`;
 
           if (currentCompleted >= 100) {
             $rootScope.rendered = true;
