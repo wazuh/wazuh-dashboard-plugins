@@ -237,9 +237,9 @@ function discoverController(
   $scope.searchSource.setParent(timeRangeSearchSource);
 
   const pageTitleSuffix = savedSearch.id && savedSearch.title ? `: ${savedSearch.title}` : '';
-  docTitle.change(`Discover${pageTitleSuffix}`);
+  docTitle.change(`Wazuh${pageTitleSuffix}`);
   const discoverBreadcrumbsTitle = i18n.translate('kbn.discover.discoverBreadcrumbTitle', {
-    defaultMessage: 'Discover',
+    defaultMessage: 'Wazuh',
   });
 
   if (savedSearch.id && savedSearch.title) {
@@ -283,7 +283,7 @@ function discoverController(
       }
       const isIncluded = nonRemovableFilters.includes(key);
       const isNonRemovable = isRemovable(item);
-      const shouldBeAdded = true; // TODO FIX
+      const shouldBeAdded = (isIncluded && isNonRemovable) || !isIncluded;
       if (!shouldBeAdded) {
         console.log(`Filter for ${key} already added`);
       }
@@ -293,9 +293,7 @@ function discoverController(
     // The filters will automatically be set when the queryFilter emits an update event (see below)
     queryFilter.setFilters([...$scope.wzCurrentFilters, ...finalFilters]);
     $scope.$applyAsync();
-/*     $scope.hideCloseButtons(); */
     $scope.fetch();
-/*     $scope.activeNoImplicitsFilters(); */
     $rootScope.$broadcast('updateVis');
   };
 
@@ -1022,19 +1020,6 @@ function discoverController(
       return result;
       ///////////////////////////////////////////////////////////
     });
-
-    $timeout(async () => {
-      const visEl = $element.find('#discoverHistogram')[0];
-      if (visEl) {
-        visualizeHandler = await visualizeLoader.embedVisualizationWithSavedObject(
-          visEl,
-          visSavedObject,
-          {
-            autoFetch: false
-          }
-        );
-      }
-    });
   }
 
   function resolveIndexPatternLoading() {
@@ -1161,10 +1146,6 @@ function discoverController(
 
   $rootScope.$on('wzEventFilters', (evt, parameters) => {
     loadFilters(parameters.filters, parameters.localChange, parameters.tab);
-  });
-
-  $rootScope.$on('addNewKibanaFilter', (evt, parameters) => {
-    $scope.applyFilters([parameters.filter]);
   });
 
   $scope.tabView = $location.search().tabView || 'panels';

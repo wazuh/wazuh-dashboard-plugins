@@ -51,4 +51,6 @@ app
   .value('EuiSpacer', EuiSpacer)
   .value('MitreTable', MitreTable)
   .value('SyscheckTable', SyscheckTable)
-  .value('MitreCardsSlider', MitreCardsSlider);
+  .value('MitreCardsSlider', MitreCardsSlider)
+  .value('SyscheckTable', SyscheckTable)
+  .value('EuiSpacer', EuiSpacer);

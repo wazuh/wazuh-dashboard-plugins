@@ -171,6 +171,7 @@ app.directive('kbnVis', function () {
                 });
               }
               setSearchSource(discoverList);
+              $rootScope.rendered = true;
             }
           }
         } catch (error) {

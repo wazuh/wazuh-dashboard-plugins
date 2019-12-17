@@ -39,7 +39,7 @@ export class VisHandlers {
    * Get all applied filters
    * @param {*} syscollector
    */
-  getAppliedFilters(syscollector) {
+  async getAppliedFilters(syscollector) {
     const appliedFilters = {};
 
     if (syscollector) {
@@ -56,27 +56,23 @@ export class VisHandlers {
     }
 
     // Check raw response from all rendered tables
-    const tables = this.list
-      .filter(item => (((item || {}).vis || {}).type || {}).type === 'table')
-      .map(item => {
-        const columns = [];
-         for (const agg of item.vis._state.aggs.filter(x => x.params.customLabel)) {
-          columns.push(agg.params.customLabel);
-        } 
-        const count = item.vis._state.aggs.find(x => !x.params.customLabel);
-        columns.push(count.type)
+    let tables = this.list.filter(item => (((item || {}).vis || {})._state || {}).type === 'table');
+    for (let i = 0; i < tables.length; i++) {
+      const columns = [];
+      const title = tables[i].vis._state.title || tables[i].dataLoader.previousVisState.title || 'Table';
+      const item = await tables[i].fetch();
+      for (const table of item.value.visData.tables) {
+        columns.push(...table.columns.map(t => t.name));
+      }
 
-        return !!(((item || {}).vis || {}).searchSource || {}).rawResponse
-          ? {
-            rawResponse: item.vis.searchSource.rawResponse,
-            title:
-              item.vis._state.title ||
-              item.dataLoader.previousVisState.title ||
-              'Table',
-            columns
-          }
-          : false;
-      });
+      tables[i] = !!(((((item || {}).value || {}).visData || {}).tables || [])[0] || {}).rows
+        ? {
+          rows: item.value.visData.tables[0].rows.map(x => { return Object.values(x) }),
+          title,
+          columns
+        }
+        : false;
+    }
 
     if (this.list && this.list.length) {
       const visualization = this.list[0].vis;
@@ -97,7 +93,7 @@ export class VisHandlers {
         tables
       });
     }
-
+    
     return appliedFilters;
   }
 

@@ -47,6 +47,7 @@ export const TabNames = {
   'database-output': 'Database output',
   alerts: 'Alerts',
   'global-configuration': 'Global configuration',
+  'log-settings': 'Log settings',
   'integrity-monitoring': 'Integrity monitoring',
   'policy-monitoring': 'Policy monitoring',
   'log-collection': 'Log collection',
