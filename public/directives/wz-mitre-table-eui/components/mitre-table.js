@@ -28,7 +28,7 @@ import { EuiPanel,
   EuiLoadingContent,
   EuiLink,
   EuiSpacer,
-  EuiDescriptionList,
+  EuiDescriptionList  
 } from '@elastic/eui';
 
 
@@ -73,7 +73,7 @@ import { EuiPanel,
       "id": tactic.id,
       "name": tactic.json.name,
       "phase_name": tactic.phases,
-      "modified": new Date(tactic.json.modified).toLocaleString('en-ZA').replace(',', ''),
+      "platforms": tactic.platforms,
       "actions": tactic
     }
   }
@@ -147,8 +147,8 @@ import { EuiPanel,
         sortable: false,
       },
       {
-        field: 'modified',
-        name: 'Modified',
+        field: 'platforms',
+        name: 'Platforms',
         sortable: false,
       },
       {
@@ -254,7 +254,7 @@ import { EuiPanel,
             <EuiFlexItem style={{ paddingBottom: 10 }}>
               <EuiTextColor color="subdued">
                 <p>
-                From here you can list the globally-accessible knowledge base of adversary tactics and techniques based on real-world observations.
+                Search in MITRE knowledge base for tactics and techniques.
                 </p>
               </EuiTextColor>
             </EuiFlexItem>
@@ -266,11 +266,11 @@ import { EuiPanel,
       <EuiFlexGroup style={{ marginLeft: 2 }}>
         <EuiFieldSearch
                   fullWidth={true}
-                  placeholder="Filter MITRE attacks"
+                  placeholder="Filter"
                   value={this.state.searchValue}
                   onChange={this.onTableBarChange}
                   onSearch={this.onTableBarSearch}
-                  aria-label="Filter MITRE attacks"
+                  aria-label="Filte"
                 />
         </EuiFlexGroup>
       
@@ -346,6 +346,17 @@ import { EuiPanel,
       if(currentData.json.x_mitre_data_sources && Array.isArray(currentData.json.x_mitre_data_sources))
         techniqueDataSources = currentData.json.x_mitre_data_sources.toString()
       
+
+      let techniqueModifiedDate = currentData.json.modified
+      if(currentData.json.modified)
+        techniqueModifiedDate = new Date(currentData.json.modified).toLocaleString('en-ZA').replace(',', '')
+
+
+      let techniqueCreatedDate = currentData.json.created
+      if(currentData.json.created)
+        techniqueCreatedDate = new Date(currentData.json.created).toLocaleString('en-ZA').replace(',', '')
+        
+
       const techniqueDescription = (currentData.json || {}).description
       const techniqueName = (currentData.json || {}).name
       const techniqueVersion = (currentData.json || {}).x_mitre_version
@@ -355,6 +366,8 @@ import { EuiPanel,
         phase_name: techniquePhases,
         platforms: techniquePlatforms,
         description: techniqueDescription,
+        modified: techniqueModifiedDate,
+        created: techniqueCreatedDate,
         name: techniqueName,
         dataSources: techniqueDataSources,
         version: techniqueVersion
@@ -365,6 +378,8 @@ import { EuiPanel,
 
 
   getFlyoutHeader(){
+    const link = `https://attack.mitre.org/techniques/${this.state.currentTechniqueData.id}/`
+
     return (<EuiFlyoutHeader hasBorder>
        {(Object.keys(this.state.currentTechniqueData).length === 0) &&
            <div>
@@ -372,7 +387,13 @@ import { EuiPanel,
            </div>
          ||
          <EuiTitle size="m">
-           <h2 id="flyoutSmallTitle">{this.state.currentTechniqueData.name}</h2>
+           <h2 id="flyoutSmallTitle">{this.state.currentTechniqueData.name}  &nbsp;
+           <EuiButtonIcon
+            href={`${link}`}
+            iconType="link"
+            aria-label="Link Mitre"
+          />
+          </h2>
          </EuiTitle>
          }
      </EuiFlyoutHeader> 
@@ -391,9 +412,12 @@ import { EuiPanel,
    }
  
    getFlyoutBody(){
-     const link = `https://attack.mitre.org/techniques/${this.state.currentTechniqueData.id}/`
-     
-     const formattedDescription = this.state.currentTechniqueData.description ? (<ReactMarkdown className="wz-markdown-margin" source={this.state.currentTechniqueData.description} />) : this.state.currentTechniqueData.description;
+     var descripionTmp = this.state.currentTechniqueData.description
+     if(this.state.currentTechniqueData.description){ //Replace '<code>' with '`', so it can be printed correctly in markdown
+      descripionTmp = this.state.currentTechniqueData.description.replace(/<code>/gi, '`')
+      descripionTmp = descripionTmp.replace(/<\/code>/gi, '`')
+     }
+     const formattedDescription = this.state.currentTechniqueData.description ? (<ReactMarkdown className="wz-markdown-margin" source={descripionTmp} />) : descripionTmp;
      const data = [
        {
          title: 'Id',
@@ -410,6 +434,14 @@ import { EuiPanel,
        {
          title: 'Data sources',
          description: this.getArrayFormatted(this.state.currentTechniqueData.dataSources),
+       },
+       {
+         title: 'Created',
+         description: this.state.currentTechniqueData.created,
+       },
+       {
+         title: 'Modified',
+         description: this.state.currentTechniqueData.modified,
        },
        {
          title: 'Version',
@@ -431,12 +463,6 @@ import { EuiPanel,
          <div>
            <EuiDescriptionList listItems={data} />
            <EuiSpacer />
-           <p>
-             More info:{' '}
-             <EuiLink href={link} target="_blank">
-               {`MITRE ATT&CK - ${this.state.currentTechniqueData.id}`}
-             </EuiLink>
-           </p>
          </div>
          }
      </EuiFlyoutBody>

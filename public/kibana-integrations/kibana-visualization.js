@@ -268,9 +268,15 @@ app.directive('kbnVis', function () {
           
           const visTitle = (((visHandler || {}).vis || {})._state || {}).title
           if(visTitle === 'Mitre attack count'){
-            $scope.$emit('sendVisDataRows', {
-              "mitreRows" : visHandler.dataLoader["visData"]
+
+            visHandler.fetch().then( x => {
+              if(x){
+                $scope.$emit('sendVisDataRows', {
+                  "mitreRows" : x.value["visData"]
+                });
+              }
             });
+            
           }
           if (currentCompleted >= 100) {
             $rootScope.rendered = true;

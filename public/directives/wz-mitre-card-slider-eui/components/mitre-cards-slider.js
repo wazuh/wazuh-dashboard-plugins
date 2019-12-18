@@ -47,9 +47,16 @@ export class MitreCardsSlider extends Component {
     this.expanded = false;
     this.closeFlyout = this.closeFlyout.bind(this);
     this.showFlyout = this.showFlyout.bind(this);
+    this.sliderObserver = new ResizeObserver(entries => {
+      entries.forEach(entry => {
+        this.updateDimensions(entry.contentRect.width);
+      });
+    });
   }
   
   async componentDidMount() {
+    const sliderElement = document.querySelector('#mitreSlider');
+    this.sliderObserver.observe(sliderElement);
     window.addEventListener('resize', this.updateDimensions);
     this.setState({ sliderLength: (this.props.items || []).length || 0, chunkSize: 6});
     this.setState({ slider: this.props.items });
@@ -95,14 +102,15 @@ export class MitreCardsSlider extends Component {
   /**
    * Updates the chunk size depending on the window width so we avoid unnecessary scroll
    */
-  updateDimensions = () => { 
+  updateDimensions = (width) => { 
     this.setState({position: 0})
-    if(window.innerWidth < 1450 && this.state.chunkSize !== 4){
+
+    if(width < 1600 && this.state.chunkSize !== 4){
       this.setState({chunkSize: 4});
     }
-    if(window.innerWidth >= 1450 && this.state.chunkSize !== 6){
+    if(width >= 1600 && this.state.chunkSize !== 6){
       this.setState({chunkSize: 6});
-    }else if(window.innerWidth <= 1050 && this.state.chunkSize !== 2){
+    }else if(width <= 1050 && this.state.chunkSize !== 2){
       this.setState({chunkSize: 2});
     }
   };
@@ -180,7 +188,7 @@ export class MitreCardsSlider extends Component {
     return (
       <EuiFlexGroup gutterSize="l" className="requirements-cards">
         <EuiFlexItem >
-          <EuiStat title={cardData.id} description="ID" titleSize="s" />
+          <EuiStat title={cardData.id} description="ID" titleSize="s" className="mitre-title"/>
         </EuiFlexItem>
         <EuiFlexItem>
           <EuiStat title={cardData.count} description="Total alerts" titleColor="primary" titleSize="m" />  
@@ -280,6 +288,14 @@ export class MitreCardsSlider extends Component {
       let cardDataSources = currentData.json.x_mitre_data_sources
       if(currentData.json.x_mitre_data_sources && Array.isArray(currentData.json.x_mitre_data_sources))
         cardDataSources = currentData.json.x_mitre_data_sources.toString()
+
+      let cardDataModified = currentData.json.modified
+      if(currentData.json.modified)
+        cardDataModified = new Date(currentData.json.modified).toLocaleString('en-ZA').replace(',', '')
+
+      let cardDataCreated = currentData.json.created
+      if(currentData.json.created)
+        cardDataCreated = new Date(currentData.json.created).toLocaleString('en-ZA').replace(',', '')
       
       const cardDescription = (currentData.json || {}).description
       const cardName = (currentData.json || {}).name
@@ -290,6 +306,8 @@ export class MitreCardsSlider extends Component {
         phases: cardPhases,
         platforms: cardPlatforms,
         description: cardDescription,
+        modified: cardDataModified,
+        created: cardDataCreated,
         name: cardName,
         dataSources: cardDataSources,
         version: cardVersion
@@ -307,18 +325,31 @@ export class MitreCardsSlider extends Component {
 
 
   getFlyoutHeader(){
-   return (<EuiFlyoutHeader hasBorder>
+    const link = `https://attack.mitre.org/techniques/${this.state.currentCardData.id}/`
+    
+    return (<EuiFlyoutHeader hasBorder>
       {(Object.keys(this.state.currentCardData).length === 0) &&
           <div>
             <EuiLoadingContent lines={1} />
           </div>
         ||
         <EuiTitle size="m">
-          <h2 id="flyoutSmallTitle">{this.state.currentCardData.name}</h2>
+          <h2 id="flyoutSmallTitle">{this.state.currentCardData.name} &nbsp;
+           <EuiButtonIcon
+            href={`${link}`}
+            iconType="link"
+            aria-label="Link Mitre"
+          /> &nbsp;
+          <EuiButtonIcon
+           onClick={ () => alert("aplicar filtro")}
+           iconType="eye"
+           aria-label="Filtro"
+         />
+          </h2>
         </EuiTitle>
         }
     </EuiFlyoutHeader> 
-   )
+    )
   }
 
   getArrayFormatted(arrayText) {
@@ -333,7 +364,6 @@ export class MitreCardsSlider extends Component {
    }
 
   getFlyoutBody(){
-    const link = `https://attack.mitre.org/techniques/${this.state.currentCardData.id}/`
 
     const formattedDescription = this.state.currentCardData.description ? (<ReactMarkdown className="wz-markdown-margin" source={this.state.currentCardData.description} />) : this.state.currentCardData.description;
     const data = [
@@ -352,6 +382,14 @@ export class MitreCardsSlider extends Component {
       {
         title: 'Data sources',
         description: this.getArrayFormatted(this.state.currentCardData.dataSources),
+      },
+      {
+        title: 'Created',
+        description: this.state.currentCardData.modified,
+      },
+      {
+        title: 'Modified',
+        description: this.state.currentCardData.created,
       },
       {
         title: 'Version',
@@ -373,12 +411,6 @@ export class MitreCardsSlider extends Component {
         <div>
           <EuiDescriptionList listItems={data} />
           <EuiSpacer />
-          <p>
-            More info:{' '}
-            <EuiLink href={link} target="_blank">
-              {`MITRE ATT&CK - ${this.state.currentCardData.id}`}
-            </EuiLink>
-          </p>
         </div>
         }
     </EuiFlyoutBody>
@@ -403,7 +435,7 @@ export class MitreCardsSlider extends Component {
     
     return ( 
       <div>
-        <EuiFlexGroup gutterSize="l" >
+        <EuiFlexGroup id="mitreSlider" gutterSize="l" >
           {this.state.sliderLength > 1 && this.state.position > 0 && (
             <EuiButtonIcon
               className="wz-margin-left-10"

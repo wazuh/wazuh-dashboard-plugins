@@ -1,6 +1,6 @@
-<div ng-if="octrl.tab === 'mitre' && octrl.tabView === 'panels'">
+<div ng-if="octrl.tab === 'mitre' && octrl.tabView === 'panels'" style="margin-top: 10px;">
     <!-- Mitre cards slider-->
-    <div ng-show="!octrl.showingMitreTable && resultState !== 'none' && resultState !== 'loading'" ng-if="mitreIds">
+    <div ng-show="octrl.showingMitreTable && resultState !== 'none' && resultState !== 'loading'" ng-if="mitreIds">
         <div layout="row" layout-padding>
             <react-component flex name="MitreCardsSlider" props="octrl.mitreCardsSliderProps">
         </div>
@@ -13,14 +13,14 @@
         </div>
     </div>
     <!-- MITRE TABLE -->
-    <div layout="row" ng-show="octrl.showingMitreTable || resultState === 'none'" layout-padding>
+    <div layout="row" ng-show="!octrl.showingMitreTable || resultState === 'none'" layout-padding>
         <react-component flex name="MitreTable" props="octrl.mitreTableProps">
     </div>
     <!-- Arrow up button to open MITRE cards slider -->
-    <div layout="row" style="color:#216bb4" layout-align="center stretch" ng-show="octrl.showingMitreTable">
+    <div layout="row" style="color:#216bb4" layout-align="center stretch" ng-show="!octrl.showingMitreTable && resultState !== 'none'">
         <md-button ng-click="octrl.switchMitreTab()"
             aria-label="Show mitre sliders">
-            <react-component name="EuiIcon" class="kbnGlobalNavLink__euiIcon" props="{type:'arrowUp'}" /> Go back to techniques summary
+            <react-component name="EuiIcon" class="kbnGlobalNavLink__euiIcon" props="{type:'arrowDown'}" /> View techniques summary
         </md-button>
     </div>
 </div>

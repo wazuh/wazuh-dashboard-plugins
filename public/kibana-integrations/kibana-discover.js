@@ -1148,6 +1148,10 @@ function discoverController(
     loadFilters(parameters.filters, parameters.localChange, parameters.tab);
   });
 
+  $rootScope.$on('addNewKibanaFilter', (evt, parameters) => {
+    $scope.applyFilters([parameters.filter]);
+  });
+
   $scope.tabView = $location.search().tabView || 'panels';
   $rootScope.$on('changeTabView', async (evt, parameters) => {
     $scope.resultState = 'loading';
