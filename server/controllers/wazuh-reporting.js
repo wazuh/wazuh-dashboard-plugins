@@ -38,8 +38,6 @@ import {
   OverviewVisualizations
 } from '../integration-files/visualizations';
 
-import { log } from '../logger';
-
 const REPORTING_PATH = '../../../../optimize/wazuh-reporting';
 
 export class WazuhReportingCtrl {
@@ -48,7 +46,6 @@ export class WazuhReportingCtrl {
    * @param {*} server
    */
   constructor(server) {
-    log('reporting', 'Class constructor started', 'debug');
     this.server = server;
     this.fonts = {
       Roboto: {
@@ -171,8 +168,6 @@ export class WazuhReportingCtrl {
     };
 
     this.apiRequest = new WazuhApiCtrl(server);
-
-    log('reporting', 'Class constructor finished properly', 'debug');
   }
 
   /**
@@ -180,12 +175,13 @@ export class WazuhReportingCtrl {
    * @param {Array<Object>} tables tables to render
    */
   renderTables(tables, isVis = true) {
-    log('reporting:renderTables', 'Started to render tables', 'info');
-    log('reporting:renderTables', `tables: ${tables.length}`, 'debug');
-    log('reporting:renderTables', `isVis: ${isVis}`, 'debug');
     for (const table of tables) {
       let rowsparsed = [];
-      rowsparsed = table.rows;
+      if (isVis) {
+        rowsparsed = rawParser(table.rawResponse, table.columns);
+      } else {
+        rowsparsed = table.rows;
+      }
       if (Array.isArray(rowsparsed) && rowsparsed.length) {
         const rows =
           rowsparsed.length > 100 ? rowsparsed.slice(0, 99) : rowsparsed;
@@ -200,8 +196,8 @@ export class WazuhReportingCtrl {
           parseInt(a[a.length - 1]) < parseInt(b[b.length - 1])
             ? 1
             : parseInt(a[a.length - 1]) > parseInt(b[b.length - 1])
-              ? -1
-              : 0;
+            ? -1
+            : 0;
 
         TimSort.sort(rows, sortFunction);
 
@@ -238,7 +234,6 @@ export class WazuhReportingCtrl {
           }
         });
         this.dd.content.push('\n');
-        log('reporting:renderTables', `Table rendered`, 'debug');
       }
     }
   }
@@ -248,12 +243,6 @@ export class WazuhReportingCtrl {
    * @param {Array<Object>} tables tables to render
    */
   renderConfigTables(tables) {
-    log(
-      'reporting:renderConfigTables',
-      'Started to render configuration tables',
-      'info'
-    );
-    log('reporting:renderConfigTables', `tables: ${tables.length}`, 'debug');
     for (const table of tables) {
       let rowsparsed = table.rows;
       if (Array.isArray(rowsparsed) && rowsparsed.length) {
@@ -337,7 +326,6 @@ export class WazuhReportingCtrl {
         }
         this.dd.content.push('\n');
       }
-      log('reporting:renderConfigTables', `Table rendered`, 'debug');
     }
   }
 
@@ -346,7 +334,6 @@ export class WazuhReportingCtrl {
    * @param {*} date JavaScript Date
    */
   formatDate(date) {
-    log('reporting:formatDate', `Format date ${date}`, 'info');
     const year = date.getFullYear();
     const month = date.getMonth() + 1;
     const day = date.getDate();
@@ -355,10 +342,9 @@ export class WazuhReportingCtrl {
     const seconds = date.getSeconds();
     const str = `${year}-${month < 10 ? '0' + month : month}-${
       day < 10 ? '0' + day : day
-      }T${hours < 10 ? '0' + hours : hours}:${
+    }T${hours < 10 ? '0' + hours : hours}:${
       minutes < 10 ? '0' + minutes : minutes
-      }:${seconds < 10 ? '0' + seconds : seconds}`;
-    log('reporting:formatDate', `str: ${str}`, 'debug');
+    }:${seconds < 10 ? '0' + seconds : seconds}`;
     return str;
   }
 
@@ -369,16 +355,6 @@ export class WazuhReportingCtrl {
    * @param {String} filters E.g: cluster.name: wazuh AND rule.groups: vulnerability
    */
   renderTimeRangeAndFilters(from, to, filters, timeZone) {
-    log(
-      'reporting:renderTimeRangeAndFilters',
-      `Started to render the time range and the filters`,
-      'info'
-    );
-    log(
-      'reporting:renderTimeRangeAndFilters',
-      `from: ${from}, to: ${to}, filters: ${filters}, timeZone: ${timeZone}`,
-      'debug'
-    );
     const fromDate = new Date(
       new Date(from).toLocaleString('en-US', { timeZone })
     );
@@ -435,11 +411,6 @@ export class WazuhReportingCtrl {
     });
 
     this.dd.content.push({ text: '\n' });
-    log(
-      'reporting:renderTimeRangeAndFilters',
-      'Time range and filters rendered',
-      'debug'
-    );
   }
 
   /**
@@ -448,31 +419,29 @@ export class WazuhReportingCtrl {
    * @param {String} searchBar search term
    */
   sanitizeFilters(filters, searchBar) {
-    log('reporting:sanitizeFilters', `Started to sanitize filters`, 'info');
-    log(
-      'reporting:sanitizeFilters',
-      `filters: ${filters.length}, searchBar: ${searchBar}`,
-      'debug'
-    );
     let str = '';
 
     const len = filters.length;
     for (let i = 0; i < len; i++) {
-      const { negate, key, value, params, type } = filters[i].meta;
-      str += `${negate ? 'NOT ' : ''}`;
-      str += `${key}: `;
-      str += `${type === 'range' 
-        ? `${params.gte}-${params.lt}` 
-        : !!value 
-          ? value 
-          : (params || {}).query}`;
-      str += `${i === len - 1 ? '' : ' AND ' }`;
+      const filter = filters[i];
+
+      str +=
+        i === len - 1
+          ? (filter.meta.negate ? 'NOT ' : '') +
+            filter.meta.key +
+            ': ' +
+            filter.meta.value
+          : (filter.meta.negate ? 'NOT ' : '') +
+            filter.meta.key +
+            ': ' +
+            filter.meta.value +
+            ' AND ';
     }
 
     if (searchBar) {
       str += ' AND ' + searchBar;
     }
-    log('reporting:sanitizeFilters', `str: ${str}`, 'debug');
+
     return str;
   }
 
@@ -485,11 +454,6 @@ export class WazuhReportingCtrl {
    */
   async renderHeader(section, tab, isAgents, apiId) {
     try {
-      log(
-        'reporting:renderHeader',
-        `section: ${section}, tab: ${tab}, isAgents: ${isAgents}, apiId: ${apiId}`,
-        'debug'
-      );
       if (section && typeof section === 'string') {
         if (section !== 'agentConfig' && section !== 'groupConfig') {
           this.dd.content.push({
@@ -572,7 +536,6 @@ export class WazuhReportingCtrl {
 
       return;
     } catch (error) {
-      log('reporting:renderHeader', error.message || error);
       return Promise.reject(error);
     }
   }
@@ -584,14 +547,6 @@ export class WazuhReportingCtrl {
    * @param {Object} tab tab target
    */
   checkTitle(item, isAgents, tab) {
-    log(
-      'reporting:checkTitle',
-      `Item ID ${item.id}, from ${
-      isAgents ? 'agents' : 'overview'
-      } and tab ${tab}`,
-      'info'
-    );
-
     const title = isAgents
       ? AgentsVisualizations[tab].filter(v => v._id === item.id)
       : OverviewVisualizations[tab].filter(v => v._id === item.id);
@@ -605,11 +560,6 @@ export class WazuhReportingCtrl {
    * @param {Object} tab tab target
    */
   renderVisualizations(array, isAgents, tab) {
-    log(
-      'reporting:renderVisualizations',
-      `${array.length} visualizations for tab ${tab}`,
-      'info'
-    );
     const single_vis = array.filter(item => item.width >= 600);
     const double_vis = array.filter(item => item.width < 600);
 
@@ -686,11 +636,6 @@ export class WazuhReportingCtrl {
    */
   async buildAgentsTable(ids, apiId, multi = false) {
     if (!ids || !ids.length) return;
-    log(
-      'reporting:buildAgentsTable',
-      `${ids.length} agents for API ${apiId}`,
-      'info'
-    );
     try {
       const rows = [];
       if (multi) {
@@ -731,11 +676,6 @@ export class WazuhReportingCtrl {
               Object.assign(data, agent.data);
             }
           } catch (error) {
-            log(
-              'reporting:buildAgentsTable',
-              `Skip agent due to: ${error.message || error}`,
-              'debug'
-            );
             continue;
           }
           const str = Array(6).fill('-');
@@ -774,7 +714,6 @@ export class WazuhReportingCtrl {
 
       this.dd.content.push('\n');
     } catch (error) {
-      log('reporting:buildAgentsTable', error.message || error);
       return Promise.reject(error);
     }
   }
@@ -802,11 +741,6 @@ export class WazuhReportingCtrl {
     agent = null
   ) {
     try {
-      log(
-        'reporting:extendedInformation',
-        `Section ${section} and tab ${tab}, API is ${apiId}. From ${from} to ${to}. Filters ${filters}. Index pattern ${pattern}`,
-        'info'
-      );
       if (section === 'agents' && !agent) {
         throw new Error(
           'Reporting for specific agent needs an agent ID in order to work properly'
@@ -822,11 +756,6 @@ export class WazuhReportingCtrl {
       const totalAgents = agents.data.totalItems;
 
       if (section === 'overview' && tab === 'vuls') {
-        log(
-          'reporting:extendedInformation',
-          'Fetching overview vulnerability detector metrics',
-          'debug'
-        );
         const low = await this.vulnerabilityRequest.uniqueSeverityCount(
           from,
           to,
@@ -859,11 +788,6 @@ export class WazuhReportingCtrl {
         this.dd.content.push({ text: 'Summary', style: 'h2' });
         this.dd.content.push('\n');
         const ulcustom = [];
-        log(
-          'reporting:extendedInformation',
-          'Adding overview vulnerability detector metrics',
-          'debug'
-        );
         if (critical)
           ulcustom.push(
             `${critical} of ${totalAgents} agents have critical vulnerabilities.`
@@ -885,11 +809,7 @@ export class WazuhReportingCtrl {
           ul: ulcustom
         });
         this.dd.content.push('\n');
-        log(
-          'reporting:extendedInformation',
-          'Fetching overview vulnerability detector top 3 agents by category',
-          'debug'
-        );
+
         const lowRank = await this.vulnerabilityRequest.topAgentCount(
           from,
           to,
@@ -918,11 +838,7 @@ export class WazuhReportingCtrl {
           filters,
           pattern
         );
-        log(
-          'reporting:extendedInformation',
-          'Adding overview vulnerability detector top 3 agents by category',
-          'debug'
-        );
+
         if (criticalRank && criticalRank.length) {
           this.dd.content.push({
             text: 'Top 3 agents with critical severity vulnerabilities',
@@ -963,21 +879,11 @@ export class WazuhReportingCtrl {
           this.dd.content.push('\n');
         }
 
-        log(
-          'reporting:extendedInformation',
-          'Fetching overview vulnerability detector top 3 CVEs',
-          'debug'
-        );
         const cveRank = await this.vulnerabilityRequest.topCVECount(
           from,
           to,
           filters,
           pattern
-        );
-        log(
-          'reporting:extendedInformation',
-          'Adding overview vulnerability detector top 3 CVEs',
-          'debug'
         );
         if (cveRank && cveRank.length) {
           this.dd.content.push({ text: 'Top 3 CVE', style: 'h2' });
@@ -995,21 +901,11 @@ export class WazuhReportingCtrl {
       }
 
       if (section === 'overview' && tab === 'general') {
-        log(
-          'reporting:extendedInformation',
-          'Fetching top 3 agents with level 15 alerts',
-          'debug'
-        );
         const level15Rank = await this.overviewRequest.topLevel15(
           from,
           to,
           filters,
           pattern
-        );
-        log(
-          'reporting:extendedInformation',
-          'Adding top 3 agents with level 15 alerts',
-          'debug'
         );
         if (level15Rank.length) {
           this.dd.content.push({
@@ -1021,21 +917,11 @@ export class WazuhReportingCtrl {
       }
 
       if (section === 'overview' && tab === 'pm') {
-        log(
-          'reporting:extendedInformation',
-          'Fetching most common rootkits',
-          'debug'
-        );
         const top5RootkitsRank = await this.rootcheckRequest.top5RootkitsDetected(
           from,
           to,
           filters,
           pattern
-        );
-        log(
-          'reporting:extendedInformation',
-          'Adding most common rootkits',
-          'debug'
         );
         if (top5RootkitsRank && top5RootkitsRank.length) {
           this.dd.content.push({
@@ -1059,7 +945,7 @@ export class WazuhReportingCtrl {
           );
           this.dd.content.push('\n');
         }
-        log('reporting:extendedInformation', 'Fetching hidden pids', 'debug');
+
         const hiddenPids = await this.rootcheckRequest.agentsWithHiddenPids(
           from,
           to,
@@ -1098,11 +984,6 @@ export class WazuhReportingCtrl {
       }
 
       if (['overview', 'agents'].includes(section) && tab === 'pci') {
-        log(
-          'reporting:extendedInformation',
-          'Fetching top PCI DSS requirements',
-          'debug'
-        );
         const topPciRequirements = await this.pciRequest.topPCIRequirements(
           from,
           to,
@@ -1148,11 +1029,6 @@ export class WazuhReportingCtrl {
       }
 
       if (['overview', 'agents'].includes(section) && tab === 'gdpr') {
-        log(
-          'reporting:extendedInformation',
-          'Fetching top GDPR requirements',
-          'debug'
-        );
         const topGdprRequirements = await this.gdprRequest.topGDPRRequirements(
           from,
           to,
@@ -1199,11 +1075,6 @@ export class WazuhReportingCtrl {
       }
 
       if (section === 'overview' && tab === 'audit') {
-        log(
-          'reporting:extendedInformation',
-          'Fetching agents with high number of failed sudo commands',
-          'debug'
-        );
         const auditAgentsNonSuccess = await this.auditRequest.getTop3AgentsSudoNonSuccessful(
           from,
           to,
@@ -1242,11 +1113,6 @@ export class WazuhReportingCtrl {
       }
 
       if (section === 'overview' && tab === 'fim') {
-        log(
-          'reporting:extendedInformation',
-          'Fetching top 3 rules for FIM',
-          'debug'
-        );
         const rules = await this.syscheckRequest.top3Rules(
           from,
           to,
@@ -1272,11 +1138,6 @@ export class WazuhReportingCtrl {
           this.dd.content.push('\n');
         }
 
-        log(
-          'reporting:extendedInformation',
-          'Fetching top 3 agents for FIM',
-          'debug'
-        );
         const agents = await this.syscheckRequest.top3agents(
           from,
           to,
@@ -1301,11 +1162,6 @@ export class WazuhReportingCtrl {
       }
 
       if (section === 'agents' && tab === 'pm') {
-        log(
-          'reporting:extendedInformation',
-          `Fetching rootcheck database for agent ${agent}`,
-          'debug'
-        );
         const database = await this.apiRequest.makeGenericRequest(
           'GET',
           `/rootcheck/${agent}`,
@@ -1393,11 +1249,7 @@ export class WazuhReportingCtrl {
             this.dd.content.push('\n');
           }
         }
-        log(
-          'reporting:extendedInformation',
-          `Fetching top 5 detected rootkits`,
-          'debug'
-        );
+
         const top5RootkitsRank = await this.rootcheckRequest.top5RootkitsDetected(
           from,
           to,
@@ -1427,11 +1279,6 @@ export class WazuhReportingCtrl {
       }
 
       if (section === 'agents' && tab === 'audit') {
-        log(
-          'reporting:extendedInformation',
-          `Fetching most common failed syscalls`,
-          'debug'
-        );
         const auditFailedSyscall = await this.auditRequest.getTopFailedSyscalls(
           from,
           to,
@@ -1451,11 +1298,6 @@ export class WazuhReportingCtrl {
       }
 
       if (section === 'agents' && tab === 'fim') {
-        log(
-          'reporting:extendedInformation',
-          `Fetching syscheck database for agent ${agent}`,
-          'debug'
-        );
         const lastScan = await this.apiRequest.makeGenericRequest(
           'GET',
           `/syscheck/${agent}/last_scan`,
@@ -1480,11 +1322,6 @@ export class WazuhReportingCtrl {
           this.dd.content.push('\n');
         }
 
-        log(
-          'reporting:extendedInformation',
-          `Fetching last 10 deleted files for FIM`,
-          'debug'
-        );
         const lastTenDeleted = await this.syscheckRequest.lastTenDeletedFiles(
           from,
           to,
@@ -1502,11 +1339,6 @@ export class WazuhReportingCtrl {
           );
         this.dd.content.push('\n');
 
-        log(
-          'reporting:extendedInformation',
-          `Fetching last 10 modified files`,
-          'debug'
-        );
         const lastTenModified = await this.syscheckRequest.lastTenModifiedFiles(
           from,
           to,
@@ -1526,11 +1358,6 @@ export class WazuhReportingCtrl {
       }
 
       if (section === 'agents' && tab === 'syscollector') {
-        log(
-          'reporting:extendedInformation',
-          `Fetching hardware information for agent ${agent}`,
-          'debug'
-        );
         const hardware = await this.apiRequest.makeGenericRequest(
           'GET',
           `/syscollector/${agent}/hardware`,
@@ -1549,7 +1376,7 @@ export class WazuhReportingCtrl {
           if (hardware.data.ram && hardware.data.ram.total)
             ulcustom.push(
               Number(hardware.data.ram.total / 1024 / 1024).toFixed(2) +
-              'GB RAM'
+                'GB RAM'
             );
           ulcustom &&
             ulcustom.length &&
@@ -1559,11 +1386,6 @@ export class WazuhReportingCtrl {
           this.dd.content.push('\n');
         }
 
-        log(
-          'reporting:extendedInformation',
-          `Fetching OS information for agent ${agent}`,
-          'debug'
-        );
         const os = await this.apiRequest.makeGenericRequest(
           'GET',
           `/syscollector/${agent}/os`,
@@ -1588,22 +1410,13 @@ export class WazuhReportingCtrl {
             });
           this.dd.content.push('\n');
         }
-        log(
-          'reporting:extendedInformation',
-          `Fetching top critical packages`,
-          'debug'
-        );
+
         const topCriticalPackages = await this.vulnerabilityRequest.topPackages(
           from,
           to,
           'Critical',
           filters,
           pattern
-        );
-        log(
-          'reporting:extendedInformation',
-          `Fetching top high packages`,
-          'debug'
         );
         const topHighPackages = await this.vulnerabilityRequest.topPackages(
           from,
@@ -1696,13 +1509,11 @@ export class WazuhReportingCtrl {
 
       return false;
     } catch (error) {
-      log('reporting:extendedInformation', error.message || error);
       return Promise.reject(error);
     }
   }
 
-  getConfigRows(data, labels) {
-    log('reporting:getConfigRows', `Building configuration rows`, 'info');
+  getConfigRows = (data, labels) => {
     const result = [];
     for (let prop in data || []) {
       if (Array.isArray(data[prop])) {
@@ -1716,10 +1527,9 @@ export class WazuhReportingCtrl {
       ]);
     }
     return result;
-  }
+  };
 
-  getConfigTables(data, section, tab, array = []) {
-    log('reporting:getConfigTables', `Building configuration tables`, 'info');
+  getConfigTables = (data, section, tab, array = []) => {
     let plainData = {};
     const nestedData = [];
     const tableData = [];
@@ -1734,8 +1544,8 @@ export class WazuhReportingCtrl {
           plainData[key] =
             Array.isArray(data[key]) && typeof data[key][0] !== 'object'
               ? data[key].map(x => {
-                return typeof x === 'object' ? JSON.stringify(x) : x + '\n';
-              })
+                  return typeof x === 'object' ? JSON.stringify(x) : x + '\n';
+                })
               : data[key];
         } else if (
           Array.isArray(data[key]) &&
@@ -1755,7 +1565,7 @@ export class WazuhReportingCtrl {
       title: (section.options || {}).hideHeader
         ? ''
         : (section.tabs || [])[tab] ||
-        (section.isGroupConfig ? ((section.labels || [])[0] || [])[tab] : ''),
+          (section.isGroupConfig ? ((section.labels || [])[0] || [])[tab] : ''),
       columns: ['', ''],
       type: 'config',
       rows: this.getConfigRows(plainData, (section.labels || [])[0])
@@ -1773,10 +1583,10 @@ export class WazuhReportingCtrl {
             typeof x[key] !== 'object'
               ? x[key]
               : Array.isArray(x[key])
-                ? x[key].map(x => {
+              ? x[key].map(x => {
                   return x + '\n';
                 })
-                : JSON.stringify(x[key])
+              : JSON.stringify(x[key])
           );
         }
         while (row.length < columns.length) {
@@ -1797,7 +1607,7 @@ export class WazuhReportingCtrl {
     });
 
     return array;
-  }
+  };
 
   /**
    * Builds a PDF report from multiple PNG images
@@ -1807,7 +1617,6 @@ export class WazuhReportingCtrl {
    */
   async report(req, reply) {
     try {
-      log('reporting:report', `Report started`, 'info');
       // Init
       this.printer = new PdfPrinter(this.fonts);
       this.dd.content = [];
@@ -1887,9 +1696,7 @@ export class WazuhReportingCtrl {
                 {},
                 apiId
               );
-            } catch (error) {
-              log('reporting:report', error.message || error, 'debug');
-            }
+            } catch (err) {} //eslint-disable-line
             if (Object.keys(configuration.data.items[0].config).length) {
               this.dd.content.push({
                 text: 'Configurations',
@@ -1968,10 +1775,10 @@ export class WazuhReportingCtrl {
                               typeof x[key] !== 'object'
                                 ? x[key]
                                 : Array.isArray(x[key])
-                                  ? x[key].map(x => {
+                                ? x[key].map(x => {
                                     return x + '\n';
                                   })
-                                  : JSON.stringify(x[key])
+                                : JSON.stringify(x[key])
                             );
                           });
                           return row;
@@ -2037,7 +1844,6 @@ export class WazuhReportingCtrl {
                         row.push(x.path);
                         columns.forEach(y => {
                           if (y !== '') {
-                            y = y !== "check_whodata" ? y : 'whodata';
                             row.push(x[y] ? 'yes' : 'no');
                           }
                         });
@@ -2085,9 +1891,7 @@ export class WazuhReportingCtrl {
                 {},
                 apiId
               );
-            } catch (error) {
-              log('reporting:report', error.message || error, 'debug');
-            }
+            } catch (err) {} //eslint-disable-line
             await this.renderHeader(
               tab,
               g_id,
@@ -2108,20 +1912,12 @@ export class WazuhReportingCtrl {
               {},
               apiId
             );
-          } catch (error) {
-            log('reporting:report', error.message || error, 'debug');
-          }
-
+          } catch (err) {} //eslint-disable-line
           kfilters = [];
           await this.renderHeader(tab, tab, a_id, apiId);
           let idxComponent = 0;
           for (let config of configurations) {
             let titleOfSection = false;
-            log(
-              'reporting:report',
-              `Iterate over ${config.sections.length} configuration sections`,
-              'debug'
-            );
             for (let section of config.sections) {
               if (
                 enabledComponents[idxComponent] &&
@@ -2131,11 +1927,7 @@ export class WazuhReportingCtrl {
                 const configs = (section.config || []).concat(
                   section.wodle || []
                 );
-                log(
-                  'reporting:report',
-                  `Iterate over ${configs.length} configuration blocks`,
-                  'debug'
-                );
+
                 for (let conf of configs) {
                   let data = {};
                   try {
@@ -2157,7 +1949,7 @@ export class WazuhReportingCtrl {
                       data &&
                       data.data &&
                       Object.keys(data.data[Object.keys(data.data)[0]]).length >
-                      0
+                        0
                     ) {
                       if (!titleOfSection) {
                         this.dd.content.push({
@@ -2209,10 +2001,10 @@ export class WazuhReportingCtrl {
                                     typeof x[key] !== 'object'
                                       ? x[key]
                                       : Array.isArray(x[key])
-                                        ? x[key].map(x => {
+                                      ? x[key].map(x => {
                                           return x + '\n';
                                         })
-                                        : JSON.stringify(x[key])
+                                      : JSON.stringify(x[key])
                                   );
                                 });
                                 return row;
@@ -2328,9 +2120,7 @@ export class WazuhReportingCtrl {
                         margin: [0, 0, 0, 20]
                       });
                     }
-                  } catch (error) {
-                    log('reporting:report', error.message || error, 'debug');
-                  }
+                  } catch (err) {} //eslint-disable-line
                   idx++;
                 }
                 for (const table of tables) {
@@ -2344,7 +2134,6 @@ export class WazuhReportingCtrl {
         }
         const isSycollector = tab === 'syscollector';
         if (isSycollector) {
-          log('reporting:report', `Syscollector report`, 'debug');
           let agentId = '';
           let agentOs = '';
           try {
@@ -2372,15 +2161,8 @@ export class WazuhReportingCtrl {
               agent && agent.data && agent.data.os && agent.data.os.platform
                 ? agent.data.os.platform
                 : '';
-          } catch (error) {
-            log('reporting:report', error.message || error, 'debug');
-          }
+          } catch (err) {} //eslint-disable-line
           try {
-            log(
-              'reporting:report',
-              `Fetching packages for agent ${agentId}`,
-              'debug'
-            );
             const packages = await this.apiRequest.makeGenericRequest(
               'GET',
               `/syscollector/${agentId}/packages`,
@@ -2394,34 +2176,27 @@ export class WazuhReportingCtrl {
                   agentOs === 'windows'
                     ? ['Name', 'Architecture', 'Version', 'Vendor']
                     : [
-                      'Name',
-                      'Architecture',
-                      'Version',
-                      'Vendor',
-                      'Description'
-                    ],
+                        'Name',
+                        'Architecture',
+                        'Version',
+                        'Vendor',
+                        'Description'
+                      ],
                 rows: packages.data.items.map(x => {
                   return agentOs === 'windows'
                     ? [x['name'], x['architecture'], x['version'], x['vendor']]
                     : [
-                      x['name'],
-                      x['architecture'],
-                      x['version'],
-                      x['vendor'],
-                      x['description']
-                    ];
+                        x['name'],
+                        x['architecture'],
+                        x['version'],
+                        x['vendor'],
+                        x['description']
+                      ];
                 })
               });
             }
-          } catch (error) {
-            log('reporting:report', error.message || error, 'debug');
-          }
+          } catch (err) {} //eslint-disable-line
           try {
-            log(
-              'reporting:report',
-              `Fetching processes for agent ${agentId}`,
-              'debug'
-            );
             const processes = await this.apiRequest.makeGenericRequest(
               'GET',
               `/syscollector/${agentId}/processes`,
@@ -2439,24 +2214,17 @@ export class WazuhReportingCtrl {
                   return agentOs === 'windows'
                     ? [x['name'], x['cmd'], x['priority'], x['nlwp']]
                     : [
-                      x['name'],
-                      x['euser'],
-                      x['nice'],
-                      ProcessEquivalence[x.state]
-                    ];
+                        x['name'],
+                        x['euser'],
+                        x['nice'],
+                        ProcessEquivalence[x.state]
+                      ];
                 })
               });
             }
-          } catch (error) {
-            log('reporting:report', error.message || error, 'debug');
-          }
+          } catch (err) {} //eslint-disable-line
 
           try {
-            log(
-              'reporting:report',
-              `Fetching ports for agent ${agentId}`,
-              'debug'
-            );
             const ports = await this.apiRequest.makeGenericRequest(
               'GET',
               `/syscollector/${agentId}/ports`,
@@ -2473,31 +2241,24 @@ export class WazuhReportingCtrl {
                 rows: ports.data.items.map(x => {
                   return agentOs === 'windows'
                     ? [
-                      x['local']['ip'],
-                      x['local']['port'],
-                      x['process'],
-                      x['state'],
-                      x['protocol']
-                    ]
+                        x['local']['ip'],
+                        x['local']['port'],
+                        x['process'],
+                        x['state'],
+                        x['protocol']
+                      ]
                     : [
-                      x['local']['ip'],
-                      x['local']['port'],
-                      x['state'],
-                      x['protocol']
-                    ];
+                        x['local']['ip'],
+                        x['local']['port'],
+                        x['state'],
+                        x['protocol']
+                      ];
                 })
               });
             }
-          } catch (error) {
-            log('reporting:report', error.message || error, 'debug');
-          }
+          } catch (err) {} //eslint-disable-line
 
           try {
-            log(
-              'reporting:report',
-              `Fetching netiface for agent ${agentId}`,
-              'debug'
-            );
             const netiface = await this.apiRequest.makeGenericRequest(
               'GET',
               `/syscollector/${agentId}/netiface`,
@@ -2513,15 +2274,8 @@ export class WazuhReportingCtrl {
                 })
               });
             }
-          } catch (error) {
-            log('reporting:report', error.message || error, 'debug');
-          }
+          } catch (err) {} //eslint-disable-line
           try {
-            log(
-              'reporting:report',
-              `Fetching netaddr for agent ${agentId}`,
-              'debug'
-            );
             const netaddr = await this.apiRequest.makeGenericRequest(
               'GET',
               `/syscollector/${agentId}/netaddr`,
@@ -2549,9 +2303,7 @@ export class WazuhReportingCtrl {
                 })
               });
             }
-          } catch (error) {
-            log('reporting:report', error.message || error, 'debug');
-          }
+          } catch (err) {} //eslint-disable-line
         }
 
         if (!isAgentConfig && !isGroupConfig) {
@@ -2606,7 +2358,6 @@ export class WazuhReportingCtrl {
       }
       return { error: 0, data: null };
     } catch (error) {
-      log('reporting:report', error.message || error);
       // Delete generated file if an error occurred
       if (
         ((req || {}).payload || {}).name &&
@@ -2630,13 +2381,11 @@ export class WazuhReportingCtrl {
    */
   async getReports(req, reply) {
     try {
-      log('reporting:report', `Fetching created reports`, 'info');
       if (!fs.existsSync(path.join(__dirname, REPORTING_PATH))) {
         fs.mkdirSync(path.join(__dirname, REPORTING_PATH));
       }
       const list = [];
       const reportDir = path.join(__dirname, REPORTING_PATH);
-      log('reporting:getReports', `Directory: ${reportDir}`, 'debug');
       const sortFunction = (a, b) =>
         a.date < b.date ? 1 : a.date > b.date ? -1 : 0;
       fs.readdirSync(reportDir).forEach(file => {
@@ -2648,16 +2397,9 @@ export class WazuhReportingCtrl {
         };
         list.push(file);
       });
-      log(
-        'reporting:getReports',
-        `Using TimSort for sorting ${list.length} items`,
-        'debug'
-      );
       TimSort.sort(list, sortFunction);
-      log('reporting:getReports', `Total: ${list.length}`, 'debug');
-      return { list };
+      return { list: list };
     } catch (error) {
-      log('reporting:getReports', error.message || error);
       return ErrorResponse(error.message || error, 5031, 500, reply);
     }
   }
@@ -2670,14 +2412,11 @@ export class WazuhReportingCtrl {
    */
   async getReportByName(req, reply) {
     try {
-      log('reporting:getReportByName', `Fetching report by name`, 'info');
       if (!req.params || !req.params.name) throw new Error('Invalid file name');
-      log('reporting:getReportByName', `Name: ${req.params.name}`, 'debug');
       return reply.file(
         path.join(__dirname, REPORTING_PATH + '/' + req.params.name)
       );
     } catch (error) {
-      log('reporting:getReportByName', error.message || error);
       return ErrorResponse(error.message || error, 5030, 500, reply);
     }
   }
@@ -2690,15 +2429,12 @@ export class WazuhReportingCtrl {
    */
   async deleteReportByName(req, reply) {
     try {
-      log('reporting:deleteReportByName', `Deleting report by name`, 'info');
       if (!req.params || !req.params.name) throw new Error('Invalid file name');
-      log('reporting:deleteReportByName', `Name: ${req.params.name}`, 'debug');
       fs.unlinkSync(
         path.join(__dirname, REPORTING_PATH + '/' + req.params.name)
       );
       return { error: 0 };
     } catch (error) {
-      log('reporting:deleteReportByName', error.message || error);
       return ErrorResponse(error.message || error, 5032, 500, reply);
     }
   }
