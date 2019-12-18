@@ -57,7 +57,7 @@
             <!-- End of navigation bar -->
 
             <!-- Discover search bar section -->
-            <kbn-dis ng-show="octrl.tab !== 'welcome'"></kbn-dis>
+            <kbn-dis ng-show="octrl.tab !== 'welcome'" style="padding-bottom: 16px;"></kbn-dis>
             <!-- End Discover search bar section -->
 
             <!-- Loading status section -->

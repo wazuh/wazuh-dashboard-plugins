@@ -26,7 +26,6 @@ import {
   EuiFormRow,
   EuiFlexGrid,
   EuiCallOut,
-  EuiTitle,
   EuiPage
 } from '@elastic/eui';
 
@@ -118,39 +117,30 @@ export class WelcomeScreen extends Component {
 
   render() {
     return (
-      <EuiPage style={{padding:0}}>
+      <EuiPage style={{ padding: 0 }}>
         <EuiFlexGroup>
           <EuiFlexItem>
             <EuiFlexGroup>
               <EuiFlexItem>
-                <EuiPanel>
+                <EuiPanel betaBadgeLabel="Security Information Management">
                   <EuiFlexGroup gutterSize="xs">
-                    <EuiFlexItem>
-                      <EuiTitle size="s">
-                        <h2>Security Information Management</h2>
-                      </EuiTitle>
-                    </EuiFlexItem>
+                    <EuiFlexItem />
                     <EuiFlexItem grow={false}>
                       {this.buildPopover('popoverSecurity', ['aws'])}
                     </EuiFlexItem>
                   </EuiFlexGroup>
-                  <EuiSpacer size='m' />
                   <EuiFlexGrid columns={2}>
                     {this.buildTabCard('general', 'dashboardApp')}
-                    {this.buildTabCard('fim', 'loggingApp')}
+                    {this.buildTabCard('fim', 'filebeatApp')}
                     {this.props.extensions.aws &&
                       this.buildTabCard('aws', 'logoAWSMono')}
                   </EuiFlexGrid>
                 </EuiPanel>
               </EuiFlexItem>
               <EuiFlexItem>
-                <EuiPanel>
+                <EuiPanel betaBadgeLabel="Auditing and Policy Monitoring">
                   <EuiFlexGroup gutterSize="xs">
-                    <EuiFlexItem>
-                      <EuiTitle size="s">
-                        <h2>Auditing and Policy Monitoring</h2>
-                      </EuiTitle>
-                    </EuiFlexItem>
+                    <EuiFlexItem />
                     <EuiFlexItem grow={false}>
                       {this.buildPopover('popoverAuditing', [
                         'audit',
@@ -159,7 +149,6 @@ export class WelcomeScreen extends Component {
                       ])}
                     </EuiFlexItem>
                   </EuiFlexGroup>
-                  <EuiSpacer size='m' />
                   <EuiFlexGrid columns={2}>
                     {this.buildTabCard('pm', 'advancedSettingsApp')}
                     {this.props.extensions.audit &&
@@ -172,25 +161,22 @@ export class WelcomeScreen extends Component {
                 </EuiPanel>
               </EuiFlexItem>
             </EuiFlexGroup>
+
             <EuiSpacer size="xl" />
             <EuiFlexGroup>
               <EuiFlexItem>
-                <EuiPanel>
+                <EuiPanel betaBadgeLabel="Threat Detection and Response">
                   <EuiFlexGroup gutterSize="xs">
-                    <EuiFlexItem>
-                      <EuiTitle size="s">
-                        <h2>Threat Detection and Response</h2>
-                      </EuiTitle>
-                    </EuiFlexItem>
+                    <EuiFlexItem />
                     <EuiFlexItem grow={false}>
                       {this.buildPopover('popoverThreat', [
                         'virustotal',
                         'osquery',
+                        'mitre',
                         'docker'
                       ])}
                     </EuiFlexItem>
                   </EuiFlexGroup>
-                  <EuiSpacer size='m' />
                   <EuiFlexGrid columns={2}>
                     {this.buildTabCard('vuls', 'securityApp')}
                     {this.props.extensions.virustotal &&
@@ -204,14 +190,11 @@ export class WelcomeScreen extends Component {
                   </EuiFlexGrid>
                 </EuiPanel>
               </EuiFlexItem>
+
               <EuiFlexItem>
-                <EuiPanel>
+                <EuiPanel betaBadgeLabel="Regulatory Compliance">
                   <EuiFlexGroup gutterSize="xs">
-                    <EuiFlexItem>
-                      <EuiTitle size="s">
-                        <h2>Regulatory Compliance</h2>
-                      </EuiTitle>
-                    </EuiFlexItem>
+                    <EuiFlexItem />
                     <EuiFlexItem grow={false}>
                       {this.buildPopover('popoverRegulatory', [
                         'pci',
@@ -221,7 +204,6 @@ export class WelcomeScreen extends Component {
                       ])}
                     </EuiFlexItem>
                   </EuiFlexGroup>
-                  <EuiSpacer size='m' />
                   {!this.props.extensions.pci &&
                     !this.props.extensions.gdpr &&
                     !this.props.extensions.hipaa &&
