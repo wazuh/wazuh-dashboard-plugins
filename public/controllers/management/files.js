@@ -57,6 +57,12 @@ export class FilesController {
       this.$scope.$applyAsync();
     });
 
+    this.$scope.$on('showSaveAndOverwrite', () => {
+      this.$scope.newFile = true;
+      this.$scope.editorReadOnly = false;
+      this.$scope.$applyAsync();
+    });
+
     this.$scope.$on('viewFileOnly', (ev, params) => {
       this.$scope.editorReadOnly = true;
       this.editFile(params, true);
