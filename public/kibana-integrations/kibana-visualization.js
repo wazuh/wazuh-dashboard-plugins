@@ -171,7 +171,6 @@ app.directive('kbnVis', function () {
                 });
               }
               setSearchSource(discoverList);
-              $rootScope.rendered = true;
             }
           }
         } catch (error) {
@@ -264,14 +263,14 @@ app.directive('kbnVis', function () {
 
           $rootScope.loadingStatus = `Rendering visualizations... ${
             currentCompleted > 100 ? 100 : currentCompleted
-          } %`;
-          
-          const visTitle = (((visHandler || {}).vis || {})._state || {}).title
-          if(visTitle === 'Mitre attack count'){
-            $scope.$emit('sendVisDataRows', {
-              "mitreRows" : visHandler.dataLoader["visData"]
-            });
-          }
+            } %`;
+
+            const visTitle = (((visHandler || {}).vis || {})._state || {}).title
+            if(visTitle === 'Mitre attack count'){
+              $scope.$emit('sendVisDataRows', {
+                "mitreRows" : visHandler.dataLoader["visData"]
+              });
+            }            
           if (currentCompleted >= 100) {
             $rootScope.rendered = true;
             $rootScope.loadingStatus = 'Fetching data...';
