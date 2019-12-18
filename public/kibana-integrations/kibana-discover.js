@@ -501,8 +501,8 @@ function discoverController(
                   queryFilter.getFilters()
                 );
                 $scope.filters = queryFilter.getFilters();
-                $rootScope.$broadcast('updateVis');
                 $rootScope.$broadcast('fetch');
+                $rootScope.$broadcast('updateVis');
                 if ($location.search().tab != 'configuration') {
                   loadedVisualizations.removeAll();
                   $rootScope.rendered = false;
@@ -691,16 +691,16 @@ function discoverController(
     // Update query from search bar
     discoverPendingUpdates.removeAll();
     discoverPendingUpdates.addItem($state.query, queryFilter.getFilters());
-
+    //Kibana 7.5.0
+    queryFilter.setFilters(queryFilter.getFilters());
+    /////
+    $rootScope.$broadcast('updateVis');
     timefilter.setTime(dateRange);
     if (query && typeof query === 'object') $state.query = query;
-
     $scope.fetch();
-    $rootScope.$broadcast('updateVis');
   };
 
   function onResults(resp) {
-
     logInspectorResponse(resp);
 
     if ($scope.opts.timefield) {
@@ -735,7 +735,7 @@ function discoverController(
 
     $scope.fetchStatus = fetchStatuses.COMPLETE;
     $scope.activeNoImplicitsFilters();
-    //$rootScope.$broadcast('updateVis');
+    $rootScope.$broadcast('updateVis');
   }
 
   let inspectorRequest;
@@ -1100,7 +1100,7 @@ function discoverController(
   $rootScope.$watch('rendered', () => {
     if (!$rootScope.rendered) {
       $scope.hideCloseButtons();
-    }else{
+    } else {
       $scope.activeNoImplicitsFilters();
     }
   });

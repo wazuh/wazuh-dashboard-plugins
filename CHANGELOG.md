@@ -3,29 +3,43 @@
 All notable changes to the Wazuh app project will be documented in this file.
 
 
-## Wazuh v3.11.0 - Kibana v7.4.2 - Revision 560
+## Wazuh v3.11.0 - Kibana v6.8.5, v7.3.2, v7.5.0 - Revision 580
 
 ### Added
 
 - Support for Wazuh v3.11.0.
-- Support for Kibana v7.4.2 [#1831](https://github.com/wazuh/wazuh-kibana-app/issues/1831).
+- Support for Kibana v7.5.0.
 - The API credentials configuration has been moved from the .wazuh index to a wazuh.yml configuration file. Now the configuration of the API hosts is done from the file and not from the application. [#1465](https://github.com/wazuh/wazuh-kibana-app/issues/1465) [#1771](https://github.com/wazuh/wazuh-kibana-app/issues/1771).
 - Upload ruleset files using a "drag and drop" component [#1770](https://github.com/wazuh/wazuh-kibana-app/issues/1770)
 - Add logs for the reporting module [#1622](https://github.com/wazuh/wazuh-kibana-app/issues/1622).
 - Extended the "Add new agent" guide [#1767](https://github.com/wazuh/wazuh-kibana-app/issues/1767).
+- Add new table for windows hotfixes [#1932](https://github.com/wazuh/wazuh-kibana-app/pull/1932)
 
 ### Changed
 
 - Removed Discover from top menu [#1699](https://github.com/wazuh/wazuh-kibana-app/issues/1699).
 - Hide index pattern selector in case that only one exists [#1799](https://github.com/wazuh/wazuh-kibana-app/issues/1799).
+- Remove visualizations legend [#1936](https://github.com/wazuh/wazuh-kibana-app/pull/1936)
+- Normalize the field whodata in the group reporting [#1921](https://github.com/wazuh/wazuh-kibana-app/pull/1921)
+- A message in the configuration view is ambiguous [#1870](https://github.com/wazuh/wazuh-kibana-app/issues/1870)
+
 
 ### Fixed
 
 - Empty files now throws an error [#1806](https://github.com/wazuh/wazuh-kibana-app/issues/1806).
-- Fixed the way to check admin mode [#1838](https://github.com/wazuh/wazuh-kibana-app/issues/1838).
 - Arguments for wazuh api requests are now validated [#1815](https://github.com/wazuh/wazuh-kibana-app/issues/1815).
+- Fixed the way to check admin mode [#1838](https://github.com/wazuh/wazuh-kibana-app/issues/1838).
 - Fixed error exporting as CSV the files into a group [#1833](https://github.com/wazuh/wazuh-kibana-app/issues/1833).
-
+- Fixed XML validator false error for `<` [1882](https://github.com/wazuh/wazuh-kibana-app/issues/1882)
+- Fixed "New file" editor doesn't allow saving twice [#1896](https://github.com/wazuh/wazuh-kibana-app/issues/1896)
+- Fixed decoders files [#1929](https://github.com/wazuh/wazuh-kibana-app/pull/1929)
+- Fixed registration guide [#1926](https://github.com/wazuh/wazuh-kibana-app/pull/1926)
+- Fixed infinite load on Ciscat views [#1920](https://github.com/wazuh/wazuh-kibana-app/pull/1920), [#1916](https://github.com/wazuh/wazuh-kibana-app/pull/1916)
+- Fixed missing fields in the Visualizations [#1913](https://github.com/wazuh/wazuh-kibana-app/pull/1913)
+- Fixed Amazon S3 status is wrong in configuration section [#1864](https://github.com/wazuh/wazuh-kibana-app/issues/1864)
+- Fixed hidden overflow in the fim configuration [#1887](https://github.com/wazuh/wazuh-kibana-app/pull/1887)
+- Fixed Logo source fail after adding server.basePath [#1871](https://github.com/wazuh/wazuh-kibana-app/issues/1871)
+- Fixed the documentation broken links [#1853](https://github.com/wazuh/wazuh-kibana-app/pull/1853)
 
 ## Wazuh v3.10.2 - Kibana v7.5.0 - Revision 550
 
