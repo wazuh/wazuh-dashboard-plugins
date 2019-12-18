@@ -1,5 +1,5 @@
 /*
- * Wazuh app - React component for alerts stats.
+ * Wazuh app - Wazuh syscheck table component.
  *
  * Copyright (C) 2015-2019 Wazuh, Inc.
  *
