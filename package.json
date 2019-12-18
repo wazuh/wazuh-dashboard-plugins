@@ -1,10 +1,10 @@
 {
   "name": "wazuh",
   "version": "3.11.0",
-  "revision": "0561",
-  "code": "0561-0",
+  "revision": "0570",
+  "code": "0570-0",
   "kibana": {
-    "version": "7.5.0"
+    "version": "7.3.2"
   },
   "description": "Wazuh app",
   "main": "index.js",
@@ -30,15 +30,13 @@
     "lint": "eslint . --ext .js -c .eslintrc.json --color",
     "prebuild": "tsc; find . -name \"*.ts*\" -type f -not -path \"./node_modules/*\" -delete",
     "build": "plugin-helpers build",
-    "test": "_mocha test/**/*",
-    "test:ui:runner": "node ../../scripts/functional_test_runner.js"
+    "test": "_mocha test/**/*"
   },
   "dependencies": {
     "angular-animate": "1.7.8",
     "angular-chart.js": "1.1.1",
     "angular-cookies": "1.6.5",
     "angular-material": "1.1.18",
-    "babel-polyfill": "^6.13.0",
     "dom-to-image": "^2.6.0",
     "install": "^0.10.1",
     "js2xmlparser": "^3.0.0",
@@ -50,10 +48,11 @@
     "querystring-browser": "1.0.4",
     "simple-tail": "^1.1.0",
     "timsort": "^0.3.0",
-    "winston": "3.0.0"
+    "winston": "3.0.0",
+    "babel-polyfill": "^6.13.0"
   },
   "devDependencies": {
-    "@elastic/plugin-helpers": "^7.1.8",
+    "@kbn/plugin-helpers": "link:../../packages/kbn-plugin-helpers",
     "babel-eslint": "^8.2.6",
     "chai": "^4.1.2",
     "eslint": "^5.10.0",
