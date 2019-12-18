@@ -1087,6 +1087,15 @@ export const knownFields = [
     readFromDocValues: true
   },
   {
+    name: 'data.aws.log_info.s3bucket',
+    type: 'string',
+    count: 0,
+    scripted: false,
+    searchable: true,
+    aggregatable: true,
+    readFromDocValues: true
+  },
+  {
     name: 'data.aws.sourceIPAddress',
     type: 'string',
     count: 1,
