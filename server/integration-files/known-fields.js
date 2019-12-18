@@ -2293,7 +2293,25 @@ export const knownFields = [
     readFromDocValues: true
   },
   {
+    name: 'data.osquery.action',
+    type: 'string',
+    count: 0,
+    scripted: false,
+    searchable: true,
+    aggregatable: true,
+    readFromDocValues: true
+  },
+  {
     name: 'data.osquery.pack',
+    type: 'string',
+    count: 0,
+    scripted: false,
+    searchable: true,
+    aggregatable: true,
+    readFromDocValues: true
+  },
+  {
+    name: 'data.osquery.calendarTime',
     type: 'string',
     count: 0,
     scripted: false,
