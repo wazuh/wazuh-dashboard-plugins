@@ -33,7 +33,7 @@
  
     <!-- First row -->
     <div layout="row" layout-align="center stretch" class="height-400">
-        <md-card flex="70" class="wz-md-card" ng-class="{'fullscreen': octrl.expandArray[0]}">
+        <div class="euiPanel euiFlexItem wz-margin-10" flex class="wz-md-card"  ng-class="{'fullscreen': octrl.expandArray[0]}">
             <md-card-actions layout="row" class="wz-card-actions-vis" ng-dblclick="octrl.expand(0)">
                 <span class="wz-headline-title">Alerts evolution over time</span>
                 <span flex></span>
@@ -45,8 +45,8 @@
                 <kbn-vis id="Wazuh-App-Overview-MITRE-Alerts-Evolution"
                     vis-id="'Wazuh-App-Overview-MITRE-Alerts-Evolution'"></kbn-vis>
             </md-card-content>
-        </md-card>
-        <md-card flex="30" class="wz-md-card" ng-class="{'fullscreen': octrl.expandArray[1]}">
+        </div>
+        <div class="euiPanel euiFlexItem wz-margin-10" flex class="wz-md-card"  ng-class="{'fullscreen': octrl.expandArray[1]}">
             <md-card-actions layout="row" class="wz-card-actions-vis" ng-dblclick="octrl.expand(1)">
                 <span class="wz-headline-title">Top tactics</span>
                 <span flex></span>
@@ -57,11 +57,11 @@
             <md-card-content class="wazuh-column">
                 <kbn-vis id="Wazuh-App-Overview-MITRE-Top-Tactics" vis-id="'Wazuh-App-Overview-MITRE-Top-Tactics'"></kbn-vis>
             </md-card-content>
-        </md-card> 
+        </div> 
     </div>
     <!-- Second row -->
     <div layout="row" layout-align="center stretch" class="height-400">
-        <md-card flex="30" class="wz-md-card" ng-class="{'fullscreen': octrl.expandArray[2]}">
+        <div class="euiPanel euiFlexItem wz-margin-10" flex class="wz-md-card"  ng-class="{'fullscreen': octrl.expandArray[2]}">
             <md-card-actions layout="row" class="wz-card-actions-vis" ng-dblclick="octrl.expand(2)">
                 <span class="wz-headline-title">Attacks by tactic</span>
                 <span flex></span>
@@ -72,8 +72,8 @@
             <md-card-content class="wazuh-column">
                 <kbn-vis id="Wazuh-App-Overview-MITRE-Attacks-By-Tactic" vis-id="'Wazuh-App-Overview-MITRE-Attacks-By-Tactic'"></kbn-vis>
             </md-card-content>
-        </md-card>
-        <md-card flex="40" class="wz-md-card" ng-class="{'fullscreen': octrl.expandArray[4]}">
+        </div>
+        <div class="euiPanel euiFlexItem wz-margin-10" ng-class="{'fullscreen': octrl.expandArray[4]}">
             <md-card-actions layout="row" class="wz-card-actions-vis" ng-dblclick="octrl.expand(4)">
                 <span class="wz-headline-title">Top tactics by agent</span>
                 <span flex></span>
@@ -84,8 +84,8 @@
             <md-card-content class="wazuh-column">
                 <kbn-vis id="Wazuh-App-Overview-MITRE-Top-Tactics-By-Agent" vis-id="'Wazuh-App-Overview-MITRE-Top-Tactics-By-Agent'"></kbn-vis>
             </md-card-content>
-        </md-card> 
-        <md-card flex="30" class="wz-md-card" ng-class="{'fullscreen': octrl.expandArray[3]}">
+        </div> 
+        <div class="euiPanel euiFlexItem wz-margin-10" ng-class="{'fullscreen': octrl.expandArray[3]}">
             <md-card-actions layout="row" class="wz-card-actions-vis" ng-dblclick="octrl.expand(3)">
                 <span class="wz-headline-title">MITRE attacks by agent</span>
                 <span flex></span>
@@ -96,7 +96,7 @@
             <md-card-content class="wazuh-column">
                 <kbn-vis id="Wazuh-App-Overview-MITRE-Attacks-By-Agent" vis-id="'Wazuh-App-Overview-MITRE-Attacks-By-Agent'"></kbn-vis>
             </md-card-content>
-        </md-card> 
+        </div> 
     </div>
 
 </md-content>
