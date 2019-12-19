@@ -130,7 +130,7 @@ service kibana restart
  
 ## Older packages 
  
-| Kibana version | Wazuh app version | Package                                                                                                |
+| Kibana version | Wazuh app version | Package                                                         |
 | :------------: | :---------------: | :-------------------------------------------------------------- |
 |      6.0.0     |       3.0.0       | <https://packages.wazuh.com/wazuhapp/wazuhapp-3.0.0_6.0.0.zip>  |
 |      6.0.1     |       3.0.0       | <https://packages.wazuh.com/wazuhapp/wazuhapp-3.0.0_6.0.1.zip>  |
