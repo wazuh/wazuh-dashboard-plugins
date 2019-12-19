@@ -3,12 +3,12 @@
 All notable changes to the Wazuh app project will be documented in this file.
 
 
-## Wazuh v3.11.0 - Kibana v6.8.5, v7.3.2, v7.5.0 - Revision 580
+## Wazuh v3.11.0 - Kibana v6.8.5, v7.3.2, v7.5.1 - Revision 580
 
 ### Added
 
 - Support for Wazuh v3.11.0.
-- Support for Kibana v7.5.0.
+- Support for Kibana v7.5.1.
 - The API credentials configuration has been moved from the .wazuh index to a wazuh.yml configuration file. Now the configuration of the API hosts is done from the file and not from the application. [#1465](https://github.com/wazuh/wazuh-kibana-app/issues/1465) [#1771](https://github.com/wazuh/wazuh-kibana-app/issues/1771).
 - Upload ruleset files using a "drag and drop" component [#1770](https://github.com/wazuh/wazuh-kibana-app/issues/1770)
 - Add logs for the reporting module [#1622](https://github.com/wazuh/wazuh-kibana-app/issues/1622).
