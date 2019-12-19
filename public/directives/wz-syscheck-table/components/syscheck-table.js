@@ -211,6 +211,7 @@ import { RIGHT_ALIGNMENT } from '@elastic/eui/lib/services';
   onTableBarSearch = searchTxt => {
     this.setState({
       search: searchTxt,
+      pageIndex: 0,
       isProcessing: true,
     });
   };
