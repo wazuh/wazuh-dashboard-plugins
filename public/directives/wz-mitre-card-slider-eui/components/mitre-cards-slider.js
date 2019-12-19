@@ -24,11 +24,13 @@ import {
   EuiFlyoutBody,
   EuiStat,
   EuiPanel,
+  EuiButton,
   EuiLoadingContent,
   EuiLink,
   EuiSpacer,
   EuiDescriptionList,
-  EuiToolTip
+  EuiToolTip,
+  EuiCheckbox
 } from '@elastic/eui';
 
 export class MitreCardsSlider extends Component {
@@ -206,12 +208,14 @@ export class MitreCardsSlider extends Component {
       const currentCardId = this.state.slider[i]
       var tmpSliderInfo = this.state.sliderInfo
       const attackCount = (this.props.attacksCount || {})[currentCardId] || 0
-      if(!this.state.sliderInfo[currentCardId] || attackCount !== this.state.sliderInfo[currentCardId].count){ //updates count if it has changes (e.g. filters changed)
-        const attackName = (this.state.sliderInfo[currentCardId] || {}).name || ""
-        tmpSliderInfo[currentCardId] = {id: currentCardId, count: attackCount, name: attackName}
-        this.setState({ sliderInfo: tmpSliderInfo });
+      if(attackCount || attackCount === 0 && !this.state.showOnlyMatchedAttack){  // TODO showOnlyMatche
+        if(!this.state.sliderInfo[currentCardId] || attackCount !== this.state.sliderInfo[currentCardId].count){ //updates count if it has changes (e.g. filters changed)
+          const attackName = (this.state.sliderInfo[currentCardId] || {}).name || ""
+          tmpSliderInfo[currentCardId] = {id: currentCardId, count: attackCount, name: attackName}
+          this.setState({ sliderInfo: tmpSliderInfo });
+        }
+        cardsToShow.push(currentCardId)
       }
-      cardsToShow.push(currentCardId)
     }
     return this.buildSlider(cardsToShow);
   }
@@ -337,6 +341,7 @@ export class MitreCardsSlider extends Component {
           <h2 id="flyoutSmallTitle">{this.state.currentCardData.name} &nbsp;
            <EuiButtonIcon
             href={`${link}`}
+            target="_blank"
             iconType="link"
             aria-label="Link Mitre"
           /> &nbsp;
@@ -364,6 +369,7 @@ export class MitreCardsSlider extends Component {
    }
 
   getFlyoutBody(){
+    const link = `https://attack.mitre.org/techniques/${this.state.currentCardData.id}/`
 
     const formattedDescription = this.state.currentCardData.description ? (<ReactMarkdown className="wz-markdown-margin" source={this.state.currentCardData.description} />) : this.state.currentCardData.description;
     const data = [
@@ -411,11 +417,28 @@ export class MitreCardsSlider extends Component {
         <div>
           <EuiDescriptionList listItems={data} />
           <EuiSpacer />
+          <EuiButton
+             style={{marginBottom: "100px"}}
+              href={`${link}`}
+              target="_blank"
+              iconType="popout">
+              Go to documentation
+          </EuiButton>
+
+          <EuiSpacer />
+          <EuiSpacer />
         </div>
         }
     </EuiFlyoutBody>
     )
   }
+
+  onCheckBoxChange = e => {
+    this.setState({
+      showOnlyMatchedAttack: e.target.checked,
+    });
+  };
+
 
   render() {
     let flyout;
@@ -435,19 +458,25 @@ export class MitreCardsSlider extends Component {
     
     return ( 
       <div>
+         <EuiCheckbox
+          id={"testCheckBox"}
+          label="Show only matched techniques"
+          checked={this.state.showOnlyMatchedAttack}
+          onChange={this.onCheckBoxChange}
+        />
         <EuiFlexGroup id="mitreSlider" gutterSize="l" >
-          {this.state.sliderLength > 1 && this.state.position > 0 && (
+          { /*this.state.sliderLength > 1 && this.state.position > 0 && (
             <EuiButtonIcon
               className="wz-margin-left-10"
               iconType="arrowLeft"
               aria-label="Previous"
               onClick={() => this.slideLeft()}
             />
-          )}
+          ) */}
           
           {this.showCards()}
           
-          {this.state.sliderLength > 1 &&
+          { /** this.state.sliderLength > 1 &&
             (this.state.position+1)*this.state.chunkSize < this.state.sliderLength - 1 && (
               <EuiButtonIcon
                 className="wz-margin-right-10"
@@ -455,7 +484,7 @@ export class MitreCardsSlider extends Component {
                 aria-label="Next"
                 onClick={() => this.slideRight()}
               />
-            )}
+            ) */}
         </EuiFlexGroup>
       
         {flyout}

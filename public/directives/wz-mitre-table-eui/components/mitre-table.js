@@ -21,6 +21,7 @@ import { EuiPanel,
   EuiTextColor,
   EuiFieldSearch, 
   EuiToolTip, 
+  EuiButton,
   EuiButtonIcon, 
   EuiFlyout,
   EuiFlyoutHeader,
@@ -143,18 +144,18 @@ import { EuiPanel,
       },
       {
         field: 'name',
-        name: 'Name',
+        name: 'Technique',
         sortable: false,
+      },
+      {
+        field: 'phase_name',
+        name: 'Tactics',
+        sortable: true,
       },
       {
         field: 'platforms',
         name: 'Platforms',
         sortable: false,
-      },
-      {
-        field: 'phase_name',
-        name: 'Phases',
-        sortable: true,
       },
       {
         field: 'count',
@@ -201,6 +202,7 @@ import { EuiPanel,
   onTableBarSearch = searchTxt => {
     this.setState({
       search: searchTxt,
+      pageIndex: 0,
     },
     this.getItems
     );
@@ -378,7 +380,7 @@ import { EuiPanel,
 
 
   getFlyoutHeader(){
-    const link = `https://attack.mitre.org/techniques/${this.state.currentTechniqueData.id}/`
+    const link = `https://attack.mitre.org/techniques/${this.state.currentTechniqueData.id}/`;
 
     return (<EuiFlyoutHeader hasBorder>
        {(Object.keys(this.state.currentTechniqueData).length === 0) &&
@@ -390,6 +392,7 @@ import { EuiPanel,
            <h2 id="flyoutSmallTitle">{this.state.currentTechniqueData.name}  &nbsp;
            <EuiButtonIcon
             href={`${link}`}
+            target="_blank"
             iconType="link"
             aria-label="Link Mitre"
           />
@@ -412,6 +415,7 @@ import { EuiPanel,
    }
  
    getFlyoutBody(){
+    const link = `https://attack.mitre.org/techniques/${this.state.currentTechniqueData.id}/`;
      var descripionTmp = this.state.currentTechniqueData.description
      if(this.state.currentTechniqueData.description){ //Replace '<code>' with '`', so it can be printed correctly in markdown
       descripionTmp = this.state.currentTechniqueData.description.replace(/<code>/gi, '`')
@@ -463,6 +467,13 @@ import { EuiPanel,
          <div>
            <EuiDescriptionList listItems={data} />
            <EuiSpacer />
+           <EuiButton
+              style={{marginBottom: "100px"}}
+              href={`${link}`}
+              target="_blank"
+              iconType="popout">
+              Go to documentation
+          </EuiButton>
          </div>
          }
      </EuiFlyoutBody>
