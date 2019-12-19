@@ -22,7 +22,7 @@ All notable changes to the Wazuh app project will be documented in this file.
 - Remove visualizations legend [#1936](https://github.com/wazuh/wazuh-kibana-app/pull/1936)
 - Normalize the field whodata in the group reporting [#1921](https://github.com/wazuh/wazuh-kibana-app/pull/1921)
 - A message in the configuration view is ambiguous [#1870](https://github.com/wazuh/wazuh-kibana-app/issues/1870)
-
+- Refactor syscheck table [#1941](https://github.com/wazuh/wazuh-kibana-app/pull/1941)
 
 ### Fixed
 
