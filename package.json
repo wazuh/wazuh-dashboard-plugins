@@ -4,7 +4,7 @@
   "revision": "0480",
   "code": "0480-0",
   "kibana": {
-    "version": "6.8.3"
+    "version": "6.8.6"
   },
   "description": "Wazuh app",
   "main": "index.js",
