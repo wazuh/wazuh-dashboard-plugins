@@ -25,7 +25,7 @@ import {
   EuiToolTip,
   EuiTitle,
   EuiHealth,
-  EuiTextColor
+  EuiSpacer
 } from '@elastic/eui';
 import { WzFilterBar } from '../../../components/wz-filter-bar/wz-filter-bar'
 
@@ -102,15 +102,15 @@ export class AgentsTable extends Component {
 
   async componentDidUpdate(prevProps, prevState) {
     if (this.state.isProcessing) {
-      const {q, search} = this.state;
-      const {q: prevQ, search: prevSearch} = prevState;
+      const { q, search } = this.state;
+      const { q: prevQ, search: prevSearch } = prevState;
       if (prevQ !== q || prevSearch !== search) {
-        this.setState({pageIndex: 0});
+        this.setState({ pageIndex: 0 });
       }
       await this.getItems();
     }
   }
-  
+
   async getItems() {
     const rawAgents = await this.props.wzReq(
       'GET',
@@ -394,15 +394,7 @@ export class AgentsTable extends Component {
           </EuiButtonEmpty>
           </EuiFlexItem>
         </EuiFlexGroup>
-        <EuiFlexGroup>
-          <EuiFlexItem style={{ paddingBottom: 10 }}>
-            <EuiTextColor color="subdued">
-              <p>
-                From here you can manage all the monitored host agents reporting to the manager.
-              </p>
-            </EuiTextColor>
-          </EuiFlexItem>
-        </EuiFlexGroup>
+        <EuiSpacer size="xs" />
       </div>
     );
   }
@@ -626,6 +618,6 @@ AgentsTable.propTypes = {
   addingNewAgent: PropTypes.func,
   downloadCsv: PropTypes.func,
   clickAction: PropTypes.func,
-  timeService: PropTypes.func,  
+  timeService: PropTypes.func,
   reload: PropTypes.func
 };
