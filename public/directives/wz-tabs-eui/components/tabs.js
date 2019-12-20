@@ -38,15 +38,16 @@ export class Tabs extends Component {
   };
 
   renderTabs() {
-    return this.tabs.map((tab, index) => (
-      <EuiTab
-        onClick={() => this.onSelectedTabChanged(tab.id)}
-        isSelected={tab.id === this.state.selectedTabId}
+    return this.tabs.map((tab, index) => {
+      const selectedTabId = tab.id === this.state.selectedTabId;
+      return (<EuiTab
+        onClick={() => selectedTabId ? null : this.onSelectedTabChanged(tab.id)}
+        isSelected={selectedTabId}
         key={index}
       >
         {tab.name}
       </EuiTab>
-    ));
+    )});
   }
 
   render() {
