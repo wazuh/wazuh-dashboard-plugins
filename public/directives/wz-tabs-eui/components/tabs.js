@@ -12,6 +12,7 @@
 import React, { Component, Fragment } from 'react';
 import PropTypes from 'prop-types';
 import { EuiTabs, EuiTab } from '@elastic/eui';
+import { TabVisualizations } from '../../../factories/tab-visualizations';
 
 export class Tabs extends Component {
   constructor(props) {
@@ -21,33 +22,38 @@ export class Tabs extends Component {
     this.props.tabs.forEach(tab => {
       this.tabs.push({
         id: tab.id,
-        name: tab.name
+        name: tab.name,
       });
     });
 
     this.state = {
-      selectedTabId: this.props.selectedTab
+      selectedTabId: this.props.selectedTab,
     };
+
+    this.tabVisualizations = new TabVisualizations();
   }
 
   onSelectedTabChanged = id => {
     this.setState({
-      selectedTabId: id
+      selectedTabId: id,
     });
     this.props.clickAction(id);
   };
 
   renderTabs() {
     return this.tabs.map((tab, index) => {
-      const selectedTabId = tab.id === this.state.selectedTabId;
-      return (<EuiTab
-        onClick={() => selectedTabId ? null : this.onSelectedTabChanged(tab.id)}
-        isSelected={selectedTabId}
-        key={index}
-      >
-        {tab.name}
-      </EuiTab>
-    )});
+      const selectedTabId =
+        tab.id === this.state.selectedTabId && this.tabVisualizations.agents[tab.id] !== undefined;
+      return (
+        <EuiTab
+          onClick={() => (selectedTabId ? null : this.onSelectedTabChanged(tab.id))}
+          isSelected={selectedTabId}
+          key={index}
+        >
+          {tab.name}
+        </EuiTab>
+      );
+    });
   }
 
   render() {
@@ -62,5 +68,5 @@ export class Tabs extends Component {
 Tabs.propTypes = {
   tabs: PropTypes.array,
   selectedTab: PropTypes.string,
-  clickAction: PropTypes.func
+  clickAction: PropTypes.func,
 };
