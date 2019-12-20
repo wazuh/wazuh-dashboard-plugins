@@ -41,6 +41,7 @@ export class MitreCardsSlider extends Component {
       position: 0,
       slider: [],
       sliderLength: 0,
+      sliderDOMelement: <div></div>,
       sliderInfo: {},
       currentCardData: {},
       isFlyoutVisible: false,
@@ -49,20 +50,16 @@ export class MitreCardsSlider extends Component {
     this.expanded = false;
     this.closeFlyout = this.closeFlyout.bind(this);
     this.showFlyout = this.showFlyout.bind(this);
-    this.sliderObserver = new ResizeObserver(entries => {
-      entries.forEach(entry => {
-        this.updateDimensions(entry.contentRect.width);
-      });
-    });
   }
   
   async componentDidMount() {
     const sliderElement = document.querySelector('#mitreSlider');
-    this.sliderObserver.observe(sliderElement);
     window.addEventListener('resize', this.updateDimensions);
-    this.setState({ sliderLength: (this.props.items || []).length || 0, chunkSize: 6});
-    this.setState({ slider: this.props.items });
-    this.setState({ sliderInfo: {
+    this.setState({ sliderLength: (this.props.items || []).length || 0, 
+      chunkSize: 6, 
+      sliderDOMelement: sliderElement,
+      slider: this.props.items, 
+      sliderInfo: {
       "T1021": {"name" : "Remote Services"},
       "T1040" : {"name" : "Network Sniffing"},
       "T1043" : {"name" : "Commonly Used Port"} ,
@@ -104,9 +101,9 @@ export class MitreCardsSlider extends Component {
   /**
    * Updates the chunk size depending on the window width so we avoid unnecessary scroll
    */
-  updateDimensions = (width) => { 
+  updateDimensions = () => { 
     this.setState({position: 0})
-
+    const width= this.state.sliderDOMelement.offsetWidth;
     if(width < 1600 && this.state.chunkSize !== 4){
       this.setState({chunkSize: 4});
     }
