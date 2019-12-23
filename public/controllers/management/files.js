@@ -33,22 +33,33 @@ export class FilesController {
   $onInit() {
     const configuration = this.wazuhConfig.getConfig();
     this.adminMode = !!(configuration || {}).admin;
-    if (this.$scope.mctrl.showFile) {
-      this.$scope.editorReadOnly = !(
-        this.$scope.mctrl.showFile.parameters.path === 'etc/rules' ||
-        this.$scope.mctrl.showFile.parameters.path === 'etc/decoders'
-      );
-      this.editFile(
-        this.$scope.mctrl.showFile.parameters,
-        this.$scope.editorReadOnly
-      );
-      this.$scope.goBack = true;
-      this.$scope.viewingDetail = this.$scope.mctrl.showFile.parameters.viewingDetail;
-    }
+
     this.$scope.mctrl.showFile = false;
     this.$scope.$on('editFile', (ev, params) => {
       this.$scope.editorReadOnly = false;
       this.editFile(params);
+      this.$scope.$applyAsync();
+    });
+
+    this.$scope.$on('editFromTable', () => {
+      if (this.$scope.mctrl.showFile) {
+        this.$scope.editorReadOnly = !(
+          this.$scope.mctrl.showFile.parameters.path === 'etc/rules' ||
+          this.$scope.mctrl.showFile.parameters.path === 'etc/decoders'
+        );
+        this.editFile(
+          this.$scope.mctrl.showFile.parameters,
+          this.$scope.editorReadOnly
+        );
+        this.$scope.goBack = true;
+        this.$scope.viewingDetail = this.$scope.mctrl.showFile.parameters.viewingDetail;
+      }
+      this.$scope.$applyAsync();
+    });
+
+    this.$scope.$on('showSaveAndOverwrite', () => {
+      this.$scope.newFile = true;
+      this.$scope.editorReadOnly = false;
       this.$scope.$applyAsync();
     });
 
@@ -59,10 +70,12 @@ export class FilesController {
     });
 
     this.$scope.closeEditingFile = (flag = false) => {
+      this.$scope.viewingDetail = false;
+      this.$scope.editingFile = false;
       this.$scope.editingFile = false;
       this.$scope.editorReadOnly = false;
       this.$scope.fetchedXML = null;
-      if (this.$scope.goBack) {
+      if (this.$scope.goBack || this.$scope.mctrl.openedFileDirect) {
         if (this.$scope.viewingDetail) {
           this.$scope.mctrl.setCurrentRule({
             currentRule: this.$scope.mctrl.currentRule
@@ -156,6 +169,10 @@ export class FilesController {
     this.$scope.restart = () => {
       this.$scope.$emit('performRestart', {});
     };
+
+    this.$scope.$on('addNewFile', (ev, params) => {
+      this.addNewFile(params.type);
+    });
   }
 
   async editFile(params, readonly = false) {
@@ -208,9 +225,21 @@ export class FilesController {
 
   switchFilesSubTab(tab) {
     this.filesSubTab = tab;
+    this.$scope.uploadFilesProps = {
+      msg: this.$scope.mctrl.globalRulesetTab,
+      path: `etc/${this.$scope.mctrl.globalRulesetTab}`,
+      upload: (files, path) => this.uploadFile(files, path)
+    };
   }
 
   search(term) {
     this.$scope.$broadcast('wazuhSearch', { term, removeFilters: 0 });
+  }
+
+  /**
+   * Refresh the list of rules or decoders
+   */
+  refresh() {
+    this.search();
   }
 }

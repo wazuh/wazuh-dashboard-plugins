@@ -88,6 +88,7 @@ app.directive('wzXmlFileEditor', function() {
           const text = $scope.xmlCodeBox.getValue();
           let xml = replaceIllegalXML(text);
           xml = xml.replace(/..xml.+\?>/, '');
+          xml = xml.replace(/\\</gm, '');
           const xmlDoc = parser.parseFromString(
             `<file>${xml}</file>`,
             'text/xml'
@@ -262,6 +263,17 @@ app.directive('wzXmlFileEditor', function() {
                 ? showRestartMessage(msg, params.showRestartManager)
                 : errorHandler.handle(warnMsg, '', true)
               : errorHandler.info(msg);
+            if(params.isNewFile) {
+              $scope.$emit('editFile', {
+                file: {
+                  file: params.rule.file,
+                  path: 'etc/rules',
+                  status: 'enabled',
+                  type: 'rule',
+                },
+                path: 'etc/rules',
+              });
+            }
           } else if (params.decoder) {
             close = false;
             await rulesetHandler.sendDecoderConfiguration(
@@ -280,6 +292,17 @@ app.directive('wzXmlFileEditor', function() {
                 ? showRestartMessage(msg, params.showRestartManager)
                 : errorHandler.handle(warnMsg, '', true)
               : errorHandler.info(msg);
+            if(params.isNewFile) {
+              $scope.$emit('editFile', {
+                file: {
+                  file: params.decoder.file,
+                  path: '/decoders/files',
+                  status: 'enabled',
+                  type: 'decoder',
+                },
+                path: '/decoders/files',
+              });
+            }
           } else if (params.node) {
             close = false;
             await configHandler.saveNodeConfiguration(params.node, xml);
@@ -350,6 +373,7 @@ app.directive('wzXmlFileEditor', function() {
           firstTime = false;
           setTimeout(() => {
             $scope.xmlCodeBox.refresh();
+            $window.dispatchEvent(new Event('resize')); // eslint-disable-line
           }, 1);
         } catch (error) {
           errorHandler.handle(error, 'Fetching original file');

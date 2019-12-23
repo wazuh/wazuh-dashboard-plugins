@@ -11,7 +11,7 @@
  */
 
 export async function getWzConfig($q, genericReq, wazuhConfig) {
-  // Remember to keep this values equal to default config.yml values
+  // Remember to keep this values equal to default wazuh.yml values
   const defaultConfig = {
     pattern: 'wazuh-alerts-3.x-*',
     'checks.pattern': true,
@@ -57,7 +57,7 @@ export async function getWzConfig($q, genericReq, wazuhConfig) {
       typeof ymlContent === 'object' &&
       (Object.keys(ymlContent) || []).length
     ) {
-      // Replace default values with custom values from config.yml file
+      // Replace default values with custom values from wazuh.yml file
       for (const key in ymlContent) {
         defaultConfig[key] = ymlContent[key];
       }
@@ -66,7 +66,7 @@ export async function getWzConfig($q, genericReq, wazuhConfig) {
     wazuhConfig.setConfig(defaultConfig);
   } catch (error) {
     wazuhConfig.setConfig(defaultConfig);
-    console.log('Error parsing config.yml, using default values.'); // eslint-disable-line
+    console.log('Error parsing wazuh.yml, using default values.'); // eslint-disable-line
     console.log(error.message || error); // eslint-disable-line
   }
 

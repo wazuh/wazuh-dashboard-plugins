@@ -1,4 +1,5 @@
-<div ng-if="!ctrl.init && !ctrl.loading && ctrl.errorInit" class="wz-margin-top-16" layout="column" layout-align="start space-around">
+<div ng-if="!ctrl.init && !ctrl.loading && ctrl.errorInit" class="wz-margin-top-16" layout="column"
+    layout-align="start space-around">
     <div flex layout="row" layout-align="center center">
         <md-card flex="50" class="wz-md-card" flex>
             <md-card-content class="wz-text-center">
@@ -32,14 +33,18 @@
                     <react-component name="EuiIcon" props="{type:'node'}" /> Status
                 </span>
                 <md-divider class="wz-margin-top-10"></md-divider>
-                <canvas id="bar" ng-if="ctrl.lastAgent && ctrl.lastAgent.id" class="wz-margin-top-16 chart chart-doughnut"
+                <canvas id="bar" ng-if="ctrl.lastAgent && ctrl.lastAgent.id"
+                    class="wz-margin-top-16 chart chart-doughnut"
                     chart-data="[ctrl.summary.agentsCountActive,ctrl.summary.agentsCountDisconnected,ctrl.summary.agentsCountNeverConnected]"
-                    chart-labels="['Active','Disconnected', 'Never connected']" chart-colors="['#57C17B', '#BC52BC', '#9E3533']"
+                    chart-labels="['Active','Disconnected', 'Never connected']"
+                    chart-colors="['#57C17B', '#BC52BC', '#9E3533']"
                     chart-options="{cutoutPercentage: 75, legend: {display: true,position: 'right',},responsive: false, maintainAspectRatio: false}" />
-                <div layout="row" class="wz-margin-top-16 layout-align-center-center" ng-if="!ctrl.lastAgent || !ctrl.lastAgent.id">
+                <div layout="row" class="wz-margin-top-16 layout-align-center-center"
+                    ng-if="!ctrl.lastAgent || !ctrl.lastAgent.id">
                     There are no agents yet.
                 </div>
-                <div layout="row" class="wz-margin-top-16 layout-align-center-center" ng-if="!ctrl.lastAgent || !ctrl.lastAgent.id">
+                <div layout="row" class="wz-margin-top-16 layout-align-center-center"
+                    ng-if="!ctrl.lastAgent || !ctrl.lastAgent.id">
                     <button class="kuiButton kuiButton--success" ng-click="ctrl.openRegistrationDocs()">
                         <react-component name="EuiIcon" props="{type: 'help'}" /> How to
                     </button>
@@ -50,7 +55,8 @@
                     <react-component name="EuiIcon" props="{type:'visHeatmap'}" /> Details
                 </span>
                 <md-divider class="wz-margin-top-10"></md-divider>
-                <div class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--directionRow euiFlexGroup--responsive wz-margin-top-4">
+                <div
+                    class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--directionRow euiFlexGroup--responsive wz-margin-top-4">
                     <div class="euiFlexItem euiFlexItem--flexGrowZero">
 
                         <div class="euiStat">
@@ -66,7 +72,8 @@
                             <div class="euiText euiText--small euiStat__description">
                                 <p>Disconnected</p>
                             </div>
-                            <p class="euiTitle euiTitle--small euiStat__title">{{ctrl.summary.agentsCountDisconnected}}</p>
+                            <p class="euiTitle euiTitle--small euiStat__title">{{ctrl.summary.agentsCountDisconnected}}
+                            </p>
                         </div>
                     </div>
                     <div class="euiFlexItem euiFlexItem--flexGrowZero">
@@ -75,16 +82,18 @@
                             <div class="euiText euiText--small euiStat__description">
                                 <p>Never connected</p>
                             </div>
-                            <p class="euiTitle euiTitle--small euiStat__title">{{ctrl.summary.agentsCountNeverConnected}}</p>
+                            <p class="euiTitle euiTitle--small euiStat__title">
+                                {{ctrl.summary.agentsCountNeverConnected}}</p>
                         </div>
                     </div>
                     <div class="euiFlexItem euiFlexItem--flexGrowZero">
+
                         <div class="euiStat">
                             <div class="euiText euiText--small euiStat__description">
                                 <p>Agents coverage</p>
                             </div>
-                            <p class="euiTitle euiTitle--small euiStat__title">{{(ctrl.summary.agentsCoverity |
-                                number:2)}}%</p>
+                            <p class="euiTitle euiTitle--small euiStat__title">
+                                {{(ctrl.summary.agentsCoverity | number:2)}}%</p>
                         </div>
                     </div>
                 </div>
@@ -95,10 +104,12 @@
                             <div class="euiText euiText--small euiStat__description">
                                 <p>Last registered agent</p>
                             </div>
-                            <p ng-if="ctrl.lastAgent && ctrl.lastAgent.id && ctrl.lastAgent.id !== '000'" ng-click="ctrl.showAgent(ctrl.lastAgent)"
+                            <p ng-if="ctrl.lastAgent && ctrl.lastAgent.id && ctrl.lastAgent.id !== '000'"
+                                ng-click="ctrl.showAgent(ctrl.lastAgent)"
                                 class="euiTitle euiTitle--small euiStat__title wz-text-link cursor-pointer">
                                 {{ctrl.lastAgent.name}}</p>
-                            <p ng-if="!ctrl.lastAgent || !ctrl.lastAgent.id" class="euiTitle euiTitle--small euiStat__title">
+                            <p ng-if="!ctrl.lastAgent || !ctrl.lastAgent.id"
+                                class="euiTitle euiTitle--small euiStat__title">
                                 -</p>
                         </div>
                     </div>
@@ -109,12 +120,11 @@
                                 <p>Most active agent</p>
                             </div>
                             <p ng-if="ctrl.lastAgent && ctrl.lastAgent.id && ctrl.mostActiveAgent.id !== '000'"
-                                ng-click="ctrl.showAgent(ctrl.mostActiveAgent)" class="euiTitle euiTitle--small euiStat__title wz-text-link cursor-pointer">
+                                ng-click="ctrl.showAgent(ctrl.mostActiveAgent)"
+                                class="euiTitle euiTitle--small euiStat__title wz-text-link cursor-pointer">
                                 {{ctrl.mostActiveAgent.name}}</p>
-                            <p ng-if="ctrl.lastAgent && ctrl.lastAgent.id && ctrl.mostActiveAgent.id === '000'"
+                            <p ng-if="!ctrl.lastAgent || !ctrl.lastAgent.id"
                                 class="euiTitle euiTitle--small euiStat__title">
-                                --</p>
-                            <p ng-if="!ctrl.lastAgent || !ctrl.lastAgent.id" class="euiTitle euiTitle--small euiStat__title">
                                 -</p>
                         </div>
                     </div>
@@ -132,18 +142,21 @@
 
         <div layout="row">
             <md-card flex class="wz-md-card _md flex md-margin-h">
-                <md-card-actions ng-if="adminMode" layout="row" layout-align="end center" class="wz-card-actions wz-card-actions-top">
+                <md-card-actions ng-if="adminMode" layout="row" layout-align="end center"
+                    class="wz-card-actions wz-card-actions-top">
                     <a ng-click="ctrl.addNewAgent(true)">
                         <react-component name="EuiIcon" props="{type:'plusInCircle'}" /> Add new agent </a>
                     <span flex></span>
                 </md-card-actions>
                 <md-card-content>
                     <div layout="row">
-                        <wz-table custom-columns="true" flex path="'/agents'" keys="[{value: 'id', width: '75px'},'name','ip','status','group','os.name','os.version','version', {value: 'dateAdd', offset: true}, {value: 'lastKeepAlive', offset: true}]"
-                            allow-click="true" row-sizes="[17,15,13]"></wz-table>
+                        <wz-table custom-columns="true" flex path="'/agents'"
+                            keys="[{value: 'id', width: '75px'},'name','ip','status','group','os.name','os.version','version', {value: 'dateAdd', offset: true}, {value: 'lastKeepAlive', offset: true}]"
+                            allow-click="true" row-sizes="[17,15,13]" implicit-sort="'id'"></wz-table>
                     </div>
                     <div layout="row" layout-align="end center">
-                        <button type="button" ng-click="ctrl.downloadCsv()" class="euiButtonEmpty euiButtonEmpty--primary euiButtonEmpty--small">
+                        <button type="button" ng-click="ctrl.downloadCsv()"
+                            class="euiButtonEmpty euiButtonEmpty--primary euiButtonEmpty--small">
                             <span class="euiButtonEmpty__content">
                                 <react-component name="EuiIcon" props="{type:'importAction'}" />
                                 <span class="euiButtonEmpty__text">Formatted</span>

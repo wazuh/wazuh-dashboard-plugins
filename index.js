@@ -53,23 +53,25 @@ export default function (kibana) {
           id: featureId,
           name: 'Wazuh',
           navLinkId: featureId,
-          icon: 'questionInCircle',
+          icon: '/plugins/wazuh/img/icon.svg',
           app: [featureId, 'kibana', 'elasticsearch'],
           catalogue: [],
           privileges: {
             all: {
+              app: [featureId],
               api: [],
               savedObject: {
-                all: [],
-                read: [],
+                all: ['wazuh-alerts-3.x-*', 'wazuh-monitoring-3.x-*'],
+                read: ['wazuh-alerts-3.x-*', 'wazuh-monitoring-3.x-*'],
               },
-              ui: ['show'],
+              ui: ['save', 'show'],
             },
             read: {
+              app: [featureId],
               api: [],
               savedObject: {
                 all: [],
-                read: [],
+                read: ['wazuh-alerts-3.x-*', 'wazuh-monitoring-3.x-*'],
               },
               ui: ['show'],
             },
@@ -78,7 +80,7 @@ export default function (kibana) {
       }
 
       // Add server routes and initialize the plugin here
-      initApp(server);
+      initApp(server, options);
     }
   });
 }

@@ -11,7 +11,6 @@
  */
 import { healthCheck } from './health-check';
 import { recentlyAccessed } from 'plugins/kibana/home/components/recently_accessed';
-
 export function getSavedSearch(
   redirectWhenMissing,
   $location,

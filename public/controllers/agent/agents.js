@@ -375,12 +375,6 @@ export class AgentsController {
 
     this.$scope.switchSyscheckFiles = () => {
       this.$scope.showSyscheckFiles = !this.$scope.showSyscheckFiles;
-      if (!this.$scope.showSyscheckFiles) {
-        this.$scope.$emit('changeTabView', {
-          tabView: this.$scope.tabView,
-          tab: this.$scope.tab
-        });
-      }
       this.$scope.$applyAsync();
     };
 
@@ -711,44 +705,49 @@ export class AgentsController {
    */
   setTabs() {
     this.$scope.agentsTabsProps = false;
-    this.currentPanel = this.commonData.getCurrentPanel(this.$scope.tab, true);
+    if (this.$scope.agent) {
+      this.currentPanel = this.commonData.getCurrentPanel(
+        this.$scope.tab,
+        true
+      );
 
-    if (!this.currentPanel) return;
+      if (!this.currentPanel) return;
 
-    const tabs = this.commonData.getTabsFromCurrentPanel(
-      this.currentPanel,
-      this.$scope.extensions,
-      this.$scope.tabNames
-    );
+      const tabs = this.commonData.getTabsFromCurrentPanel(
+        this.currentPanel,
+        this.$scope.extensions,
+        this.$scope.tabNames
+      );
 
-    const cleanTabs = [];
-    tabs.forEach(x => {
-      if (
-        (
-          UnsupportedComponents[(this.$scope.agent || {}).agentPlatform] ||
-          UnsupportedComponents['other']
-        ).includes(x.id)
-      )
-        return;
+      const cleanTabs = [];
+      tabs.forEach(x => {
+        if (
+          (
+            UnsupportedComponents[(this.$scope.agent || {}).agentPlatform] ||
+            UnsupportedComponents['other']
+          ).includes(x.id)
+        )
+          return;
 
-      cleanTabs.push({
-        id: x.id,
-        name: x.name
+        cleanTabs.push({
+          id: x.id,
+          name: x.name
+        });
       });
-    });
 
-    this.$scope.agentsTabsProps = {
-      clickAction: tab => {
-        this.switchTab(tab, true);
-      },
-      selectedTab:
-        this.$scope.tab ||
-        (this.currentPanel && this.currentPanel.length
-          ? this.currentPanel[0]
-          : ''),
-      tabs: cleanTabs
-    };
-    this.$scope.$applyAsync();
+      this.$scope.agentsTabsProps = {
+        clickAction: tab => {
+          this.switchTab(tab, true);
+        },
+        selectedTab:
+          this.$scope.tab ||
+          (this.currentPanel && this.currentPanel.length
+            ? this.currentPanel[0]
+            : ''),
+        tabs: cleanTabs
+      };
+      this.$scope.$applyAsync();
+    }
   }
 
   goDiscover() {
@@ -842,6 +841,14 @@ export class AgentsController {
         this.$scope.agentOS = '-';
         this.$scope.agent.agentPlatform = false;
       }
+
+
+
+      this.$scope.syscheckTableProps = {
+        wzReq: (method, path, body) => this.apiReq.request(method, path, body),
+        agentId: this.$scope.agent.id
+      }
+    
 
       await this.$scope.switchTab(this.$scope.tab, true);
 
