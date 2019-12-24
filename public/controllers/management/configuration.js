@@ -37,6 +37,7 @@ export class ConfigurationController {
     this.$scope.integrations = {};
     this.$scope.selectedItem = 0;
     this.showHelp = false;
+    this.mctrl = this.$scope.mctrl;
   }
 
   /**
@@ -97,6 +98,11 @@ export class ConfigurationController {
         tabs
       };
     };
+
+    //Adding props to configurationProps
+    this.mctrl.managementProps.configurationProps = {};
+    this.mctrl.managementProps.configurationProps.switchWodle = this.switchWodle;
+    this.mctrl.managementProps.configurationProps.switchConfigTab = this.switchConfigTab;
 
     $(window).on('resize', () => {
       DynamicHeight.dynamicHeight('d-height', 50);

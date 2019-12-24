@@ -177,6 +177,7 @@ export class ManagementController {
       switchTab: (section) => this.switchTab(section, true),
       section: "",
       groupsProps: {},
+      // configurationProps: this.mctrl.managementProps.configurationProps
     }
   }
 
