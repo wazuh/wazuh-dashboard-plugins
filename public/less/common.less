@@ -72,11 +72,8 @@
 }
 
 .percentage {
-  font-size: 18px;
   text-align: center;
-  position: relative;
-  height: 25px;
-  color: #666666;
+  color: gray;
 }
 
 /* Custom JSON viewer settings */
@@ -165,10 +162,6 @@
 .kuiLocalSearchInput:focus {
   box-shadow: 0 2px 2px -1px rgba(0, 0, 0, 0.1) !important;
   border: 1px solid #d9d9d9 !important;
-}
-
-.euiFlexGroup .euiFlexGroup:hover {
-  //background: #fafcfe;
 }
 
 /* Custom Manager/Status styles */
@@ -654,10 +647,6 @@ md-switch.md-checked .md-thumb {
   z-index: 9999 !important;
 }
 
-.euiTitle {
-  font-weight: normal !important;
-}
-
 .wzEuiTitle {
   font-size: 20px !important;
 }
@@ -897,7 +886,7 @@ wz-xml-file-editor {
 }
 
 .daemon-label {
-  width: 165px;
+  width: 200px;
   float: left;
   border-radius: 30px;
   margin: 3px;
@@ -1006,12 +995,10 @@ discover-app-w .container-fluid {
 .registerAgent{
   min-height: calc(~'100vh - 100px');
   background: #fafbfd;
-  padding-top: 25px;
 }
 
 .navBarLogo {
-  width: 110px;
-  margin-top: 4px;
+  width: 125px;
 }
 
 .application{
@@ -1064,18 +1051,6 @@ discover-app-w .container-fluid {
 
 .CodeMirror-gutters {
   z-index: 1!important;
-}
-
-md-toolbar { 
-  min-height: 0px !important;
-}
-
-.md-toolbar-tools { 
-  position: fixed !important;
-}
-
-md-toolbar.md-default-theme:not(.md-menu-toolbar), md-toolbar:not(.md-menu-toolbar) {
-    background-color: transparent!important;
 }
 
 .refresh-report-button {
@@ -1265,6 +1240,47 @@ md-chips.md-default-theme .md-chips, md-chips .md-chips{
   overflow: auto !important;
 }
 
+
+.title-pin:hover {
+  cursor: pointer;
+}
+
+.title-pin:hover:after {
+  padding-left: 5px;
+  font-size: 12px;
+  content: "\f00e";
+  font-family: "FontAwesome";
+  color: #0b6bb4;
+  position: absolute;
+}
+
+.flyout-no-overlap {
+  margin-top: 50px;
+}
+
+.wz-markdown-margin > p {
+  margin-top: 5px;
+
+.AgentsTable__soBadge{
+  font-size: 18px!important;
+  padding-right: 3px;
+}
+.AgentsTable__soBadge--windows{
+  color: lightskyblue;
+}
+
+.AgentsTable__soBadge--darwin{
+  color: gray;
+}
+
+.euiStatLink .euiStat__title{
+  cursor: pointer;
+}
+
+.euiStatLink .euiStat__title:hover {
+  text-decoration: underline;
+}
+
 .subdued-background {
   background: #d3dae6;
 }
@@ -1309,4 +1325,18 @@ md-chips.md-default-theme .md-chips, md-chips .md-chips{
 .sideBarContent{
   float: right;
   width: calc(~'100vw - 240px');
+}
+
+.wz-log-viewer{
+  border: solid #8080806b 1px;
+}
+
+.wz-load-extra{
+  color: #257dbd;
+  text-align: center;
+  cursor: pointer;
+}
+
+.wz-load-extra:hover{
+  text-decoration: underline;
 }

@@ -99,11 +99,19 @@
     <!-- End Discover search bar section -->
 
     <!-- Loading status section -->
-    <div layout="column" layout-align="center center"
-        ng-if="tab !== 'welcome' && tab !== 'sca' && tab !== 'configuration' && tab !== 'syscollector' && tabView === 'panels' && !rendered && resultState !== 'none'">
-        <div class="percentage"><i class="fa fa-fw fa-spin fa-spinner" aria-hidden="true"></i></div>
-        <div class="percentage">{{loadingStatus}}</div>
-    </div>
+                <div class="euiFlexGroup euiFlexGroup--gutterLarge euiFlexGroup--justifyContentSpaceAround euiFlexGroup--directionRow euiFlexGroup--responsive">
+                <div class="euiFlexItem euiFlexItem--flexGrowZero euiTextAlign euiTextAlign--center" ng-show="tab !== 'welcome' && tab !== 'sca' && tab !== 'configuration' && tab !== 'syscollector' && tabView === 'panels' && !rendered && resultState !== 'none'">
+                    <span class="euiLoadingChart euiLoadingChart--large">
+                        <span class="euiLoadingChart__bar"></span>
+                        <span class="euiLoadingChart__bar"></span>
+                        <span class="euiLoadingChart__bar"></span>
+                        <span class="euiLoadingChart__bar"></span>
+                    </span>
+                    <div class="euiSpacer euiSpacer--m"></div>
+                    <div class="percentage">{{loadingStatus}}</div>
+                </div>
+            </div>
+
     <!-- End loading status section -->
 
     <!-- Report status section -->

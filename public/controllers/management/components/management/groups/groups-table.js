@@ -1,6 +1,5 @@
 /*
- * Wazuh app - React component for building the groups table.
- *
+ * Wazuh app - React component for groups main table.
  * Copyright (C) 2015-2019 Wazuh, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
@@ -10,79 +9,49 @@
  *
  * Find more information about this on the LICENSE file.
  */
-import React, { Component, Fragment } from 'react';
-import PropTypes from 'prop-types';
-import {
-  EuiInMemoryTable,
-  EuiButtonIcon,
-  EuiFlexItem,
-  EuiFlexGroup,
-  EuiPanel,
-  EuiTitle,
-  EuiButtonEmpty,
-  EuiText,
-  EuiPopover,
-  EuiFormRow,
-  EuiFieldText,
-  EuiSpacer,
-  EuiButton,
-  EuiCallOut,
-  EuiToolTip,
-  EuiPage
-} from '@elastic/eui';
+import React, { Component } from 'react';
+import { EuiBasicTable, EuiCallOut, EuiOverlayMask, EuiConfirmModal } from '@elastic/eui';
 
-export class GroupsTable extends Component {
+import { connect } from 'react-redux';
+import GroupsHandler from './utils/groups-handler';
+import { toastNotifications } from 'ui/notify';
+
+import {
+  updateLoadingStatus,
+  updateFileContent,
+  updateIsProcessing,
+  updatePageIndex,
+  updateShowModal,
+  updateListItemsForRemove,
+  updateSortDirection,
+  updateSortField,
+  updateGroupDetail,
+} from '../../../../../redux/actions/groupsActions';
+
+import GroupsColums from './utils/columns-main';
+
+class WzGroupsTable extends Component {
   _isMounted = false;
   constructor(props) {
     super(props);
-
     this.state = {
-      items: this.props.items,
-      originalItems: this.props.items,
-      pageIndex: 0,
+      items: [],
       pageSize: 10,
-      showPerPageOptions: true,
-      showConfirm: false,
-      newGroupName: '',
-      isPopoverOpen: false,
-      msg: false,
-      isLoading: false
+      totalItems: 0,
     };
 
-    this.filters = { name: 'search', value: '' };
+    this.groupsHandler = GroupsHandler;
   }
 
-  /**
-   * Refresh the groups entries
-   */
-  async refresh() {
-    try {
-      this.setState({ refreshingGroups: true });
-      await this.props.refresh();
-      this.setState({
-        originalItems: this.props.items,
-        refreshingGroups: false
-      });
-    } catch (error) {
-      this.setState({
-        refreshingGroups: false
-      });
-    }
-  }
-
-  UNSAFE_componentWillReceiveProps(nextProps) {
-    this.setState({
-      items: nextProps.items
-    });
-  }
-
-  componentDidMount() {
+  async componentDidMount() {
+    this.props.updateIsProcessing(true);
     this._isMounted = true;
-    if (this._isMounted) this.bindEnterToInput();
   }
 
-  componentDidUpdate() {
-    this.bindEnterToInput();
+  async componentDidUpdate() {
+    if (this.props.state.isProcessing && this._isMounted) {
+      await this.getItems();
+    }
   }
 
   componentWillUnmount() {
@@ -90,306 +59,161 @@ export class GroupsTable extends Component {
   }
 
   /**
-  * Looking for the input element to bind the keypress event, once the input is found the interval is clear
-  */
-  bindEnterToInput() {
+   * Loads the initial information
+   */
+  async getItems() {
     try {
-      const interval = setInterval(async () => {
-        const input = document.getElementsByClassName('groupNameInput');
-        if (input.length) {
-          const i = input[0];
-          if (!i.onkeypress) {
-            i.onkeypress = async (e) => {
-              if (e.which === 13) {
-                await this.createGroup(this.state.newGroupName);
-              }
-            };
-          }
-          clearInterval(interval);
-        }
-      }, 150);
-    } catch (error) { }
-  }
+      const rawItems = await this.groupsHandler.listGroups(this.buildFilter());
+      const { items, totalItems } = ((rawItems || {}).data || {}).data;
 
-  togglePopover() {
-    if (this.state.isPopoverOpen) {
-      this.closePopover();
-    } else {
-      this.setState({ isPopoverOpen: true });
-    }
-  }
-
-  closePopover() {
-    this.setState({
-      isPopoverOpen: false,
-      msg: false,
-      newGroupName: ''
-    });
-  }
-
-  clearGroupName() {
-    this.setState({
-      newGroupName: ''
-    });
-  }
-
-  onChangeNewGroupName = e => {
-    this.setState({
-      newGroupName: e.target.value
-    });
-  };
-
-  showConfirm(groupName) {
-    this.setState({
-      showConfirm: groupName
-    });
-  }
-
-  async createGroup() {
-    try {
-      this.setState({ msg: false });
-      const groupName = this.state.newGroupName;
-      await this.props.createGroup(groupName);
-      this.clearGroupName();
-      this.refresh();
-      this.setState({ msg: { msg: `${groupName} created`, type: 'success' } });
-    } catch (error) {
-      this.setState({ msg: { msg: error, type: 'danger' } });
-    }
-  }
-
-
-  onQueryChange = ({ query }) => {
-    if (query) {
-      this.setState({ isLoading: true });
-      const filter = query.text || "";
-      this.filters.value = filter;
-      const items = filter
-        ? this.state.originalItems.filter(item => {
-          return item.name.toLowerCase().includes(filter.toLowerCase());
-        })
-        : this.state.originalItems;
       this.setState({
-        isLoading: false,
-        items: items,
+        items,
+        totalItems,
+        isProcessing: false,
       });
+      this.props.updateIsProcessing(false);
+    } catch (error) {
+      this.props.updateIsProcessing(false);
+      return Promise.reject(error);
     }
+  }
+
+  buildFilter() {
+    const { pageIndex } = this.props.state;
+    const { pageSize } = this.state;
+    const filter = {
+      offset: pageIndex * pageSize,
+      limit: pageSize,
+      sort: this.buildSortFilter(),
+    };
+
+    return filter;
+  }
+
+  buildSortFilter() {
+    const { sortField, sortDirection } = this.props.state;
+
+    const field = sortField;
+    const direction = sortDirection === 'asc' ? '+' : '-';
+
+    return direction + field;
+  }
+
+  onTableChange = ({ page = {}, sort = {} }) => {
+    const { index: pageIndex, size: pageSize } = page;
+    const { field: sortField, direction: sortDirection } = sort;
+    this.setState({ pageSize });
+    this.props.updatePageIndex(pageIndex);
+    this.props.updateSortDirection(sortDirection);
+    this.props.updateSortField(sortField);
+    this.props.updateIsProcessing(true);
   };
 
   render() {
-    const columns = [
-      {
-        field: 'name',
-        name: 'Name',
-        sortable: true
+    this.groupsColumns = new GroupsColums(this.props);
+    const { isLoading, pageIndex, error, sortField, sortDirection } = this.props.state;
+    const { items, pageSize, totalItems } = this.state;
+    const columns = this.groupsColumns.columns;
+    const message = isLoading ? null : 'No results...';
+    const pagination = {
+      pageIndex: pageIndex,
+      pageSize: pageSize,
+      totalItemCount: totalItems,
+      pageSizeOptions: [10, 25, 50, 100],
+    };
+    const sorting = {
+      sort: {
+        field: sortField,
+        direction: sortDirection,
       },
-      {
-        field: 'count',
-        name: 'Agents',
-        sortable: true
-      },
-      {
-        field: 'mergedSum',
-        name: 'Configuration checksum',
-        sortable: true
-      },
-      {
-        name: 'Actions',
-
-        render: item => {
-          return (
-            <div>
-              <EuiFlexGroup>
-                {this.state.showConfirm !== item.name && (
-                  <Fragment>
-                    <EuiFlexItem grow={false}>
-                      <EuiToolTip
-                        position="right"
-                        content="View group details"
-                      >
-                        <EuiButtonIcon
-                          aria-label="View group details"
-                          onClick={() => this.props.goGroup(item)}
-                          iconType="eye"
-                        />
-                      </EuiToolTip>
-                    </EuiFlexItem>
-                    <EuiFlexItem grow={false}>
-                      <EuiToolTip
-                        position="right"
-                        content="Edit group configuration"
-                      >
-                        <EuiButtonIcon
-                          aria-label="Edit group configuration"
-                          onClick={() => this.props.editGroup(item)}
-                          iconType="pencil"
-                        />
-                      </EuiToolTip>
-                    </EuiFlexItem>
-                  </Fragment>
-                )}
-                {this.state.showConfirm !== item.name &&
-                  item.name !== 'default' && (
-                    <EuiFlexItem grow={false}>
-                      <EuiToolTip
-                        position="right"
-                        content="Delete group"
-                      >
-                        <EuiButtonIcon
-                          aria-label="Delete groups"
-                          onClick={() => this.showConfirm(item.name)}
-                          iconType="trash"
-                          color="danger"
-                        />
-                      </EuiToolTip>
-                    </EuiFlexItem>
-                  )}
-                {this.state.showConfirm === item.name && (
-                  <EuiFlexItem grow={true}>
-                    <EuiText>
-                      <p>
-                        Are you sure you want to delete this group?
-                        <EuiButtonEmpty onClick={() => this.showConfirm(false)}>
-                          No
-                        </EuiButtonEmpty>
-                        <EuiButtonEmpty
-                          onClick={async () => {
-                            this.showConfirm(false);
-                            await this.props.deleteGroup(item);
-                            this.refresh();
-                          }}
-                          color="danger"
-                        >
-                          Yes
-                        </EuiButtonEmpty>
-                      </p>
-                    </EuiText>
-                  </EuiFlexItem>
-                )}
-              </EuiFlexGroup>
-            </div>
-          );
-        }
-      }
-    ];
-
-    const search = {
-      onChange: this.onQueryChange,
-      box: {
-        incremental: this.state.incremental,
-        schema: true
-      }
     };
 
-    const newGroupButton = (
-      <EuiButtonEmpty
-        iconSide="left"
-        iconType="plusInCircle"
-        onClick={() => this.togglePopover()}
-      >
-        Add new groups
-      </EuiButtonEmpty>
-    );
-
-    return (
-      <EuiPage style={{ background: 'transparent' }}>
-        <EuiPanel>
-          <EuiFlexGroup>
-            <EuiFlexItem>
-              <EuiFlexGroup>
-                <EuiFlexItem>
-                  <EuiTitle>
-                    <h2>Groups</h2>
-                  </EuiTitle>
-                </EuiFlexItem>
-              </EuiFlexGroup>
-            </EuiFlexItem>
-            <EuiFlexItem grow={false}>
-              <EuiPopover
-                id="popover"
-                button={newGroupButton}
-                isOpen={this.state.isPopoverOpen}
-                closePopover={() => this.closePopover()}
-              >
-                <EuiFormRow label="Introduce the group name" id="">
-                  <EuiFieldText
-                    className="groupNameInput"
-                    value={this.state.newGroupName}
-                    onChange={this.onChangeNewGroupName}
-                    aria-label=""
-                  />
-                </EuiFormRow>
-                <EuiSpacer size="xs" />
-                {this.state.msg && (
-                  <Fragment>
-                    <EuiFlexGroup>
-                      <EuiFlexItem>
-                        <EuiCallOut title={this.state.msg.msg} color={this.state.msg.type} iconType={this.state.msg.type === 'danger' ? 'cross' : 'check'} />
-                      </EuiFlexItem>
-                    </EuiFlexGroup>
-                    <EuiSpacer size="xs" />
-                  </Fragment>
-                )}
-                <EuiSpacer size="xs" />
-                <EuiFlexGroup>
-                  <EuiFlexItem>
-                    <EuiButton
-                      iconType="save"
-                      fill
-                      onClick={async () => {
-                        await this.createGroup(this.state.newGroupName);
-                        this.clearGroupName();
-                        this.refresh();
-                      }}
-                    >
-                      Save new group
-                  </EuiButton>
-                  </EuiFlexItem>
-                </EuiFlexGroup>
-              </EuiPopover>
-            </EuiFlexItem>
-            <EuiFlexItem grow={false}>
-              <EuiButtonEmpty
-                iconType="exportAction"
-                onClick={async () => await this.props.export([this.filters])}
-              >
-                Export formatted
-            </EuiButtonEmpty>
-            </EuiFlexItem>
-            <EuiFlexItem grow={false}>
-              <EuiButtonEmpty iconType="refresh" onClick={() => this.refresh()}>
-                Refresh
-            </EuiButtonEmpty>
-            </EuiFlexItem>
-          </EuiFlexGroup>
-          <EuiFlexGroup>
-            <EuiFlexItem>
-              <EuiText color="subdued" style={{ paddingBottom: '15px' }}>
-                From here you can list and check your groups, its agents and
-                files.
-            </EuiText>
-            </EuiFlexItem>
-          </EuiFlexGroup>
-          <EuiInMemoryTable
+    if (!error) {
+      const itemList = this.props.state.itemList;
+      return (
+        <div>
+          <EuiBasicTable
             itemId="id"
-            items={this.state.items}
+            items={items}
             columns={columns}
-            search={search}
-            pagination={true}
-            loading={this.state.refreshingGroups || this.state.isLoading}
+            pagination={pagination}
+            onChange={this.onTableChange}
+            loading={isLoading}
+            sorting={sorting}
+            message={message}
+            search={{ box: { incremental: true } }}
           />
-        </EuiPanel>
-      </EuiPage>
+          {this.props.state.showModal ? (
+            <EuiOverlayMask>
+              <EuiConfirmModal
+                title={`Delete ${itemList[0].file ? itemList[0].file : itemList[0].name} group?`}
+                onCancel={() => this.props.updateShowModal(false)}
+                onConfirm={() => {
+                  this.removeItems(itemList);
+                  this.props.updateShowModal(false);
+                }}
+                cancelButtonText="Cancel"
+                confirmButtonText="Delete"
+                defaultFocusedButton="cancel"
+                buttonColor="danger"
+              ></EuiConfirmModal>
+            </EuiOverlayMask>
+          ) : null}
+        </div>
+      );
+    } else {
+      return <EuiCallOut color="warning" title={error} iconType="gear" />;
+    }
+  }
+
+  showToast = (color, title, text, time) => {
+    toastNotifications.add({
+      color: color,
+      title: title,
+      text: text,
+      toastLifeTimeMs: time,
+    });
+  };
+
+  async removeItems(items) {
+    this.props.updateLoadingStatus(true);
+    const results = items.map(async (item, i) => {
+      await this.groupsHandler.deleteGroup(item.name);
+    });
+
+    Promise.all(results).then(
+      completed => {
+        this.props.updateIsProcessing(true);
+        this.props.updateLoadingStatus(false);
+        this.showToast('success', 'Success', 'Deleted correctly', 3000);
+      },
+      error => {
+        this.props.updateIsProcessing(true);
+        this.props.updateLoadingStatus(false);
+        this.showToast('danger', 'Error', error, 3000);
+      }
     );
   }
 }
 
-GroupsTable.propTypes = {
-  items: PropTypes.array,
-  createGroup: PropTypes.func,
-  goGroup: PropTypes.func,
-  editGroup: PropTypes.func,
-  export: PropTypes.func,
-  refresh: PropTypes.func,
-  deleteGroup: PropTypes.func
+const mapStateToProps = state => {
+  return {
+    state: state.groupsReducers,
+  };
 };
+
+const mapDispatchToProps = dispatch => {
+  return {
+    updateLoadingStatus: status => dispatch(updateLoadingStatus(status)),
+    updateFileContent: content => dispatch(updateFileContent(content)),
+    updateIsProcessing: isProcessing => dispatch(updateIsProcessing(isProcessing)),
+    updatePageIndex: pageIndex => dispatch(updatePageIndex(pageIndex)),
+    updateShowModal: showModal => dispatch(updateShowModal(showModal)),
+    updateListItemsForRemove: itemList => dispatch(updateListItemsForRemove(itemList)),
+    updateSortDirection: sortDirection => dispatch(updateSortDirection(sortDirection)),
+    updateSortField: sortField => dispatch(updateSortField(sortField)),
+    updateGroupDetail: itemDetail => dispatch(updateGroupDetail(itemDetail)),
+  };
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(WzGroupsTable);

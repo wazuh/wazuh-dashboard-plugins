@@ -62,6 +62,8 @@ const rulesetReducers = (state = initialState, action) => {
       return Object.assign({}, state, { isProcessing: action.isProcessing, ruleInfo: false, listInfo: false, error: false });
     case 'UPDATE_ITEMS':
       return Object.assign({}, state, { items: action.items, error: false });
+    case 'REMOVE_ITEMS':
+      return Object.assign({}, state, { items: [], error: false });
     case 'UPDATE_LIST_CONTENT':
       return Object.assign({}, state, { fileContent: false, decoderInfo: false, ruleInfo: false, listInfo: action.content, error: false });
     case 'UPDATE_LIST_ITEMS_FOR_REMOVE':

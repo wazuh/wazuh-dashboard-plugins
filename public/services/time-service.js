@@ -13,6 +13,7 @@ import chrome from 'ui/chrome';
 import moment from 'moment-timezone'
 
 export class TimeService {
+  constructor() { }
   /**
    * Returns given date adding the timezone offset
    * @param {string} date Date
