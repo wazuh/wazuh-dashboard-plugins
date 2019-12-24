@@ -36,7 +36,7 @@ export class WzReportingOverview extends Component {
 
   render() {
     return (
-      <EuiPage style={{ background: 'transparent' }}>
+      <EuiPage style={{ background: 'transparent', paddingLeft: 0 }}>
         <EuiPanel>
           <EuiFlexGroup>
             <EuiFlexItem>

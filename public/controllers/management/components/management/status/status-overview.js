@@ -159,7 +159,7 @@ export class WzStatusOverview extends Component {
     const { isLoading, listDaemons, stats, nodeInfo, agentInfo } = this.props.state;
 
     return (
-      <EuiPage style={{ background: 'transparent' }}>
+      <EuiPage style={{ background: 'transparent', paddingLeft: 0 }}>
         <EuiPanel>
           <EuiFlexGroup>
             <EuiFlexItem>
